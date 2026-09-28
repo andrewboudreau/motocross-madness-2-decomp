@@ -1,0 +1,12 @@
+[
+  {
+    "class": "ConnectionInfoType",
+    "vtable_slot": 1,
+    "candidate_symbol_contains": "UnknownVirtualSlot1@ConnectionInfoType",
+    "target_va": "0x0044d710",
+    "target_size": 1,
+    "confidence": "high-body-low-name",
+    "status": "exact-byte-match",
+    "notes": "One-byte no-op virtual body; nearby source-file evidence places this region in/near dlgprocs.cpp, but exact TU ownership is not asserted."
+  }
+]

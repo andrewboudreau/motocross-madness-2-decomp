@@ -1,0 +1,24 @@
+[
+  {
+    "class": "Game",
+    "vtable_va": "0x0055299c",
+    "vtable_slots": [1, 5],
+    "candidate_symbol_contains": "UnknownVirtualSlot1@Game",
+    "target_va": "0x00467ae0",
+    "target_size": 6,
+    "confidence": "high-body-low-name",
+    "status": "exact-byte-match",
+    "notes": "6/6 bytes match with clang-cl. Shared return-1 virtual; original name remains unknown."
+  },
+  {
+    "class": "Game",
+    "vtable_va": "0x0055299c",
+    "vtable_slots": [3, 4],
+    "candidate_symbol_contains": "UnknownVirtualSlot3@Game",
+    "target_va": "0x00468c90",
+    "target_size": 6,
+    "confidence": "high-body-low-name",
+    "status": "exact-byte-match",
+    "notes": "6/6 bytes match with clang-cl. Original function name remains unknown."
+  }
+]

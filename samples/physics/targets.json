@@ -1,0 +1,9 @@
+[
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot31@PhysicsBody",
+    "target_va": "0x004cc0a0",
+    "target_size": 13,
+    "notes": "stores sole 4-byte argument at this+0x180",
+    "class": "PhysicsBody"
+  }
+]

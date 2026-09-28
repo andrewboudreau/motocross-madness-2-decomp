@@ -1,0 +1,12 @@
+[
+  {
+    "class": "PCKeyboardDevice",
+    "vtable_slot": 3,
+    "candidate_symbol_contains": "UnknownVirtualSlot3@PCKeyboardDevice",
+    "target_va": "0x00464e90",
+    "target_size": 1,
+    "confidence": "high-body-low-name",
+    "status": "exact-byte-match",
+    "notes": "One-byte no-op virtual shared by several classes; original name and exact TU ownership remain unknown."
+  }
+]

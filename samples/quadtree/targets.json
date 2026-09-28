@@ -1,0 +1,9 @@
+[
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot1@QuadTreeObject",
+    "target_va": "0x00434ce0",
+    "target_size": 8,
+    "notes": "one 4-byte argument; returns 15",
+    "class": "QuadTreeObject"
+  }
+]
