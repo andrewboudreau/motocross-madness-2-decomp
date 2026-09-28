@@ -7,7 +7,9 @@
 //
 // Semantic field names remain unknown; preserve raw offsets until call-site
 // evidence improves them.
-struct CameraValue12 { unsigned int a; unsigned int b; unsigned int c; };\n\nclass FollowCamera {
+struct CameraValue12 { unsigned int a; unsigned int b; unsigned int c; };
+
+class FollowCamera {
 public:
     virtual void v00(); virtual void v01(); virtual void v02(); virtual void v03();
     virtual void v04(); virtual void v05(); virtual void v06(); virtual void v07();
@@ -19,11 +21,13 @@ public:
     virtual void v28(); virtual void v29(); virtual void v30(); virtual void v31();
     virtual void v32(); virtual void v33(); virtual void v34(); virtual void v35();
     virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39();
-    virtual void v40(); virtual void v41(); virtual void v42();\n    virtual void UnknownVirtualSlot43(const CameraValue12& value);
+    virtual void v40(); virtual void v41(); virtual void v42();
+    virtual void UnknownVirtualSlot43(const CameraValue12& value);
     virtual void v44(); virtual void v45(); virtual void v46(); virtual void v47();
     virtual void v48(); virtual void v49(); virtual void v50(); virtual void v51();
     virtual void v52(); virtual void v53(); virtual void v54(); virtual void v55();
-    virtual void v56();\n    virtual CameraValue12 UnknownVirtualSlot57(int mode); virtual void v58(); virtual void v59();
+    virtual void v56();
+    virtual CameraValue12 UnknownVirtualSlot57(int mode); virtual void v58(); virtual void v59();
     virtual void v60(); virtual void v61(); virtual void v62();
 
     virtual void UnknownVirtualSlot63();
@@ -32,7 +36,7 @@ public:
     virtual void UnknownVirtualSlot66();
     virtual void UnknownVirtualSlot67();
     virtual void v68();
-    virtual void v69();
+    virtual void UnknownVirtualSlot69();
     virtual void UnknownVirtualSlot70(int value);
     virtual void UnknownVirtualSlot71(int value);
     virtual void UnknownVirtualSlot72();
@@ -77,7 +81,17 @@ void FollowCamera::UnknownVirtualSlot67() {
     *reinterpret_cast<unsigned int*>(p + 0x258) = 0x42AA0000u;
 }
 
-// Strong ABI reconstruction: slot 57 returns a 12-byte aggregate by value.\n// MSVC uses a hidden return buffer and returns that buffer in EAX; retail then\n// copies three dwords into this+0x2A8 and passes the cache to virtual slot 43.\nvoid FollowCamera::UnknownVirtualSlot69() {\n    CameraValue12 value = UnknownVirtualSlot57(0);\n    CameraValue12* cached = reinterpret_cast<CameraValue12*>(reinterpret_cast<char*>(this) + 0x2A8);\n    *cached = value;\n    UnknownVirtualSlot43(*cached);\n}\n\n// Strong semantic reconstruction, but not a clang smoke target.
+// Strong ABI reconstruction: slot 57 returns a 12-byte aggregate by value.
+// MSVC uses a hidden return buffer and returns that buffer in EAX; retail then
+// copies three dwords into this+0x2A8 and passes the cache to virtual slot 43.
+void FollowCamera::UnknownVirtualSlot69() {
+    CameraValue12 value = UnknownVirtualSlot57(0);
+    CameraValue12* cached = reinterpret_cast<CameraValue12*>(reinterpret_cast<char*>(this) + 0x2A8);
+    *cached = value;
+    UnknownVirtualSlot43(*cached);
+}
+
+// Strong semantic reconstruction, but not a clang smoke target.
 void FollowCamera::UnknownVirtualSlot70(int value) {
     char* p = reinterpret_cast<char*>(this);
 
@@ -100,6 +114,47 @@ void FollowCamera::UnknownVirtualSlot70(int value) {
         *reinterpret_cast<int*>(p + 0x258) =
             *reinterpret_cast<int*>(p + 0x24C);
     }
+}
+
+// State dispatcher reconstructed from retail 0x00466E50.
+// States 0-4 dispatch through FollowCamera virtuals, then snapshot the exact
+// preset triplet before a final update virtual.
+void FollowCamera::UnknownVirtualSlot71(int value) {
+    char* p = reinterpret_cast<char*>(this);
+
+    *reinterpret_cast<int*>(p + 0x244) = value;
+    v58();
+
+    switch (*reinterpret_cast<unsigned int*>(p + 0x244)) {
+        case 0:
+            UnknownVirtualSlot66();
+            break;
+        case 1:
+            UnknownVirtualSlot65();
+            break;
+        case 2:
+            UnknownVirtualSlot64();
+            break;
+        case 3:
+            *reinterpret_cast<int*>(p + 0x258) =
+                *reinterpret_cast<int*>(p + 0x2F0);
+            UnknownVirtualSlot63();
+            break;
+        case 4:
+            *reinterpret_cast<int*>(p + 0x2F0) =
+                *reinterpret_cast<int*>(p + 0x258);
+            v60();
+            break;
+    }
+
+    *reinterpret_cast<int*>(p + 0x2C4) =
+        *reinterpret_cast<int*>(p + 0x220);
+    *reinterpret_cast<int*>(p + 0x2C8) =
+        *reinterpret_cast<int*>(p + 0x22C);
+    *reinterpret_cast<int*>(p + 0x2CC) =
+        *reinterpret_cast<int*>(p + 0x234);
+
+    v61();
 }
 
 // Retail behavior strongly matches a simple cyclic state-list advance.

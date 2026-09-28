@@ -100,13 +100,29 @@ CASES = [
         'target_size': 21,
         'reason': 'retail VC6 zeros EAX once and fans it out to three fields; clang emits repeated immediate-zero stores',
     },
-    {\n        'name': 'FollowCamera::slot69 cached 12-byte aggregate',\n        'source': 'samples/camera/FollowCameraProbe.cpp',\n        'symbol': 'UnknownVirtualSlot69@FollowCamera',\n        'target_va': '0x00466a80',\n        'target_size': 65,\n        'reason': 'hidden 12-byte return-buffer ABI plus three-dword cache copy; clang /GS- is 64 bytes but schedules copy/registers differently',\n    },\n    {
+    {
+        'name': 'FollowCamera::slot69 cached 12-byte aggregate',
+        'source': 'samples/camera/FollowCameraProbe.cpp',
+        'symbol': 'UnknownVirtualSlot69@FollowCamera',
+        'target_va': '0x00466a80',
+        'target_size': 65,
+        'reason': 'hidden 12-byte return-buffer ABI plus three-dword cache copy; clang /GS- is 64 bytes but schedules copy/registers differently',
+    },
+    {
         'name': 'FollowCamera::slot70 mode/state toggle',
         'source': 'samples/camera/FollowCameraProbe.cpp',
         'symbol': 'UnknownVirtualSlot70@FollowCamera',
         'target_va': '0x00467040',
         'target_size': 101,
         'reason': 'strongly reconstructed state/save/restore flow; modern clang chooses different register allocation and branch shape',
+    },
+    {
+        'name': 'FollowCamera::slot71 state dispatcher',
+        'source': 'samples/camera/FollowCameraProbe.cpp',
+        'symbol': 'UnknownVirtualSlot71@FollowCamera',
+        'target_va': '0x00466e50',
+        'target_size': 171,
+        'reason': 'state 0-4 virtual dispatch plus camera-preset snapshot is strongly reconstructed; clang /GS- emits 151 bytes with different VC6-era switch/register scheduling',
     },
     {
         'name': 'FollowCamera::slot72 cyclic state-list advance',

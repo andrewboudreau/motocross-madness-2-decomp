@@ -1,4 +1,4 @@
-# Motocross Madness 2 decomp bootstrap — v0.5
+# Motocross Madness 2 decomp bootstrap — v0.6
 
 Linux-first tooling for reconstructing and byte-matching the native x86 C++ code in **Motocross Madness 2** from a user-owned `MCM2PCG.exe` installer.
 
@@ -29,11 +29,11 @@ For the supplied installer:
 - **145** canonical VC6 scalar deleting-destructor wrappers
 - **28** vtable `this`-adjustor thunks
 - **492** decoded vtable-write sites
-- **51** mechanically classified small functions
-- **34/34** automatically generated high-confidence C++ probes exact under clang-cl's x86 MSVC ABI
-- **14/14** hand-written bootstrap samples exact
-- **35 unique exact retail functions** across the two gates
-- **11** explicit historical-compiler calibration targets
+- **57** mechanically classified small functions
+- **39/39** automatically generated high-confidence C++ probes exact under clang-cl's x86 MSVC ABI
+- **19/19** hand-written bootstrap samples exact
+- **40 unique exact retail functions** across the two gates
+- **16** explicit historical-compiler calibration targets
 - dominant Rich record `Utc12_CPP / build 8447 / 197 objects`, consistent with **Visual C++ 6.0 SP3 generation**
 
 The important v0.4+ correction is preservation of every MSVC `CompleteObjectLocator`. v0.3 could collapse secondary vtables on multiple-inheritance classes; v0.4 does not.
@@ -54,7 +54,7 @@ The bootstrap extracts the retail files, analyzes the executable, generates clas
 
 ```bash
 make status
-make smoke          # 14 hand-written exact samples
+make smoke          # hand-written exact samples
 make easy-smoke     # generated high-confidence probes
 make calibration    # compiler-sensitive targets; mismatch under clang is expected
 ```
@@ -100,3 +100,16 @@ See `docs/TOOLCHAIN.md`.
 RTTI names, source-path strings, COL/vtable offsets, target bytes, and decoded machine behavior are evidence. Semantic names and types remain provisional until corroborated. Do not use inline assembly, copied bytes, naked functions, or linker tricks just to manufacture matches.
 
 See `AGENTS.md` and `docs/CLASS_MODEL.md`.
+
+
+## Promoted reconstruction
+
+`src/reconstructed/BaseObject.{h,cpp}` is the first promoted class slice.
+Class identity, primary vtable, `this+0x04` storage, constructor initialization,
+destructor core, AddRef behavior, and GetRefCount behavior are directly evidenced.
+Release remains a historical-compiler calibration target.
+
+The active camera slice now has exact FollowCamera preset methods plus a state
+machine and a strong MSVC hidden-return-buffer interpretation for slot 69. See
+`docs/V06_CAMERA_UI.md`, `docs/V06_FOLLOW_CAMERA_MODE.md`, and
+`docs/RECONSTRUCTION_STATUS.md`.

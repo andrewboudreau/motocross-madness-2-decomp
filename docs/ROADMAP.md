@@ -4,7 +4,7 @@
 
 Build a reproducible, agent-friendly path from a user-owned retail MCM2 installer to readable C++ whose emitted historical-MSVC x86 code can be compared mechanically against the retail executable.
 
-## Bootstrap v0.5 — current state
+## Bootstrap v0.6 — current state
 
 Completed:
 
@@ -18,18 +18,20 @@ Completed:
 - 145 canonical VC6 scalar deleting destructors with destructor-core targets;
 - 28 vtable `this`-adjustor thunks;
 - 492 decoded vtable-write sites for constructor/destructor hunting;
-- 51 conservative easy-function classifications;
+- 57 conservative easy-function classifications;
 - automatic C++98 probe generation for high-confidence patterns;
-- **34/34 generated exact probes under clang-cl MSVC x86 ABI**;
-- 14/14 hand-written exact samples;
-- **35 unique exact functions** total in the bootstrap validation corpus;
-- 11 compiler-calibration targets, including BaseObject ctor/dtor/delete wrapper/Release;
+- **39/39 generated exact probes under clang-cl MSVC x86 ABI**;
+- **19/19 hand-written exact samples**;
+- **40 unique exact functions** total in the bootstrap validation corpus;
+- 16 compiler-calibration targets, including BaseObject special members and FollowCamera slots 63/69/70/71/72;
 - relocation-aware COFF matcher;
 - Linux/Wine VC6 compiler wrapper + private-tree importer/fingerprinter;
 - source-xref proximity evidence;
 - structured agent queue in `analysis/function_manifest.json`;
 - 249 joined class dossiers plus ranked `analysis/work_queue.json`;
-- self-test that verifies workspace readiness, retail hash, analysis floors, and both clang gates.
+- self-test that verifies workspace readiness, retail hash, analysis floors, and both clang gates;
+- promoted `BaseObject` reconstruction under `src/reconstructed/`;
+- FollowCamera exact preset slice plus state-toggle/cyclic-list/hidden-return-buffer/state-dispatch calibration targets.
 
 ## Next hard gate — authentic VC6 SP3 oracle
 
@@ -43,8 +45,8 @@ make vc6-gate VC6_ROOT=$PWD/toolchains/vc6sp3
 
 Highest-value outcomes:
 
-1. all 34 generated high-confidence probes stay exact under VC6;
-2. all 14 hand-written smoke samples stay exact;
+1. all 39 generated high-confidence probes stay exact under VC6;
+2. all 19 hand-written smoke samples stay exact;
 3. `BaseObject::BaseObject()` reproduces the retail `mov eax,ecx` / vptr / `refCount=1` shape;
 4. the BaseObject scalar deleting destructor reproduces the 30-byte canonical VC6 wrapper;
 5. `BaseObject::~BaseObject()` reproduces the retail vptr reset;
@@ -58,7 +60,7 @@ Treat failures first as compiler-version/profile evidence, not permission to dis
 ## After compiler calibration
 
 1. Lock empirically supported flags (`/O*`, `/G*`, runtime, exceptions, function-level linking).
-2. Promote BaseObject into a real recovered header/source model.
+2. Extend the promoted BaseObject model into GameObject and the next coherent base hierarchy.
 3. Build coherent class slices rather than isolated functions:
    - GameObject/BaseObject
    - UIControl family

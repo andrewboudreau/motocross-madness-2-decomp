@@ -105,17 +105,47 @@ the CMOV but still folds/reorders the retail load/store sequence. This does
 **not** prove the original `/G5` vs `/G6` setting by itself; it makes slot 72
 a particularly useful VC6 profile-calibration target.
 
-## Slot 69 — cached 12-byte value
+## Slot 69 — cached 12-byte aggregate / hidden return buffer
 
-At `0x00466A80`, the method:
+At `0x00466A80`, the call sequence is stronger than a generic 12-byte copy:
 
-1. invokes another virtual method through vtable offset `+0xE4`;
-2. receives a three-dword / 12-byte result;
-3. copies those 12 bytes to `this + 0x2A8`;
-4. invokes another virtual through vtable offset `+0xAC`.
+1. reserve a 12-byte local;
+2. push explicit argument `0`;
+3. push the address of that 12-byte local;
+4. call virtual slot 57 through vtable offset `+0xE4`;
+5. use returned EAX as the address of that same aggregate;
+6. copy the three dwords to `this + 0x2A8`;
+7. call virtual slot 43 through `+0xAC`, passing the cached aggregate by reference.
 
-The 12-byte shape is consistent with a 3-component vector, but that type/name is
-not yet promoted because the evidence only proves size and copy behavior.
+That is a strong match for the MSVC x86 hidden-return-buffer ABI for a
+12-byte struct returned by value. A deliberately non-semantic provisional
+declaration is:
+
+```cpp
+struct CameraValue12 {
+    unsigned int a, b, c;
+};
+
+virtual CameraValue12 UnknownVirtualSlot57(int mode);
+virtual void UnknownVirtualSlot43(const CameraValue12& value);
+```
+
+and slot 69 becomes:
+
+```cpp
+CameraValue12 value = UnknownVirtualSlot57(0);
+field_2A8 = value;
+UnknownVirtualSlot43(field_2A8);
+```
+
+The 12-byte type is intentionally **not** called `Vector3` yet. The size,
+copy behavior, hidden-return-buffer convention, and cache offset are strong
+evidence; semantic type identity still needs use-site corroboration.
+
+With the modern clang calibration profile using `/GS-`, the candidate is
+64 bytes versus retail's 65 bytes. Register allocation and three-dword copy
+scheduling differ, so this is a historical-compiler calibration target rather
+than a clang smoke match.
 
 ## Slot 68 — bounded camera parameter update
 
@@ -128,19 +158,54 @@ but it is not enough yet to call it distance/FOV/angle.
 
 ## Slot 71 — state dispatch
 
-At `0x00466E50`, the method:
+Retail address `0x00466E50`, size 171 bytes.
 
-1. stores its argument to `this + 0x244`;
-2. calls another virtual method through vtable offset `+0xE8`;
-3. switches over the stored value for states 0–4;
-4. dispatches to FollowCamera virtuals at offsets including `+0x108`,
-   `+0x104`, `+0x100`, `+0xFC`, and `+0xF0`;
-5. snapshots the exact preset triplet
-   `+0x220/+0x22C/+0x234` into `+0x2C4/+0x2C8/+0x2CC`;
-6. calls another virtual through `+0xF4`.
+The machine behavior reconstructs cleanly as ordinary C++:
 
-This strongly corroborates `+0x244` as a discrete camera-state field without
-proving the original enum/type name.
+```cpp
+field_244 = value;
+virtual_slot_58();
+
+switch (field_244) {
+    case 0:
+        virtual_slot_66();
+        break;
+    case 1:
+        virtual_slot_65();
+        break;
+    case 2:
+        virtual_slot_64();
+        break;
+    case 3:
+        field_258 = field_2F0;
+        virtual_slot_63();
+        break;
+    case 4:
+        field_2F0 = field_258;
+        virtual_slot_60();
+        break;
+}
+
+field_2C4 = field_220;
+field_2C8 = field_22C;
+field_2CC = field_234;
+virtual_slot_61();
+```
+
+This ties several previously independent observations together:
+
+- `+0x244` is a discrete current-state value;
+- exact preset methods at slots 64–66 are direct state-dispatch destinations;
+- state 3 restores `+0x258` from `+0x2F0` before slot 63;
+- state 4 saves `+0x258` to `+0x2F0` before slot 60;
+- every dispatch snapshots the three exact preset fields into
+  `+0x2C4/+0x2C8/+0x2CC`.
+
+The readable candidate compiles to 151 bytes under the current clang
+MSVC-x86 profile versus 171 retail bytes, with about **18.37%** comparable
+byte agreement. The semantic structure is much stronger than that raw number:
+the difference is dominated by switch lowering, register allocation, and copy
+scheduling. Slot 71 is therefore a high-value VC6 calibration target.
 
 ## Current direct FollowCamera field map
 
