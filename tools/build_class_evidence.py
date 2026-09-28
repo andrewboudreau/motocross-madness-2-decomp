@@ -94,7 +94,7 @@ def main():
     hints=defaultdict(lambda:defaultdict(lambda:{'evidence':[]}))
     size_by_kind={
         'get_i32':4,'get_i32_ignore_args':4,'set_i32_arg':4,'set_i32_arg_if_nonzero':4,
-        'set_i32_const':4,'copy_i32_field':4,'test_i32_nonzero':4,
+        'set_i32_const':4,'set_i32_constants':4,'zero_i32_fields':4,'copy_i32_field':4,'test_i32_nonzero':4,
         'set_i32_const_and_arg':4,
         'get_u8':1,'get_float':4,'address_of_field':None,'sub_i32_fields':4,
         'get_nested_float':4,'get_indexed_i32_stride32':4,'address_of_indexed_stride32':4,
@@ -112,6 +112,10 @@ def main():
             offsets=[details['pointer_offset']]
         elif kind=='set_i32_const_and_arg':
             offsets=[details['const_offset'],details['arg_offset']]
+        elif kind=='set_i32_constants':
+            offsets=[x['offset'] for x in details['stores']]
+        elif kind=='zero_i32_fields':
+            offsets=list(details['offsets'])
         elif kind in ('get_indexed_i32_stride32','address_of_indexed_stride32'):
             offsets=[details['index_offset'],details['base_offset']]
         if not offsets: continue
