@@ -30,5 +30,35 @@
     "clang_pentium_match_percent": 19.5652,
     "status": "historical-compiler-calibration",
     "reason": "Retail preserves explicit increment/store/compare/wrap loads; modern P6-target clang uses CMOV. Pentium-target clang removes CMOV but still optimizes the sequence more aggressively than retail VC6."
+  },
+  {
+    "name": "FollowCamera::slot68 bounded distance-derived parameter",
+    "candidate_symbol_contains": "UnknownVirtualSlot68@FollowCamera",
+    "target_va": "0x00466d50",
+    "target_size": 241,
+    "clang_candidate_size": 243,
+    "clang_match_percent": 4.3062,
+    "status": "historical-compiler-calibration",
+    "reason": "Natural C++ reproduces the recovered math/data flow and is within 2 bytes of retail size, but x87 scheduling/comparisons differ heavily from VC6."
+  },
+  {
+    "name": "FollowCamera::slot69 cached 12-byte virtual return",
+    "candidate_symbol_contains": "UnknownVirtualSlot69@FollowCamera",
+    "target_va": "0x00466a80",
+    "target_size": 65,
+    "clang_candidate_size": 86,
+    "clang_match_percent": 16.3934,
+    "status": "historical-compiler-calibration",
+    "reason": "VehicleCamera slot 57 confirms MSVC hidden return-buffer ABI for a 12-byte by-value return plus one float argument; clang copies/caches the value with different stack/security/codegen."
+  },
+  {
+    "name": "FollowCamera::slot71 state dispatcher",
+    "candidate_symbol_contains": "UnknownVirtualSlot71@FollowCamera",
+    "target_va": "0x00466e50",
+    "target_size": 171,
+    "clang_candidate_size": 151,
+    "clang_match_percent": 18.3673,
+    "status": "historical-compiler-calibration",
+    "reason": "State 0-4 dispatch and snapshot/save-restore behavior agree; clang collapses the switch into a computed virtual offset rather than VC6's per-case calls/jump-table shape."
   }
 ]

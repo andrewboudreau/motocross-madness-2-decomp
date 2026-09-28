@@ -167,3 +167,61 @@ proving the original enum/type name.
 Only offsets and direct machine behavior are evidence-backed. Semantic names
 remain provisional until callers, strings, asset data, or additional code
 corroborate them.
+
+
+## Concrete C++ calibration candidates for slots 68/69/71
+
+The reconstructed source now lives in `samples/camera/FollowCameraStateProbe.cpp` and is wired into the historical compiler calibration runner.
+
+### Slot 68 — distance-derived bounded parameter
+
+Retail `0x00466D50` is 241 bytes. The recovered flow is:
+
+```text
+value = *(12-byte value*)(this + 0x2B4)
+value.y += 3.0
+dx = abs(*(float*)(this + 0x170) - value.x)
+dz = abs(*(float*)(this + 0x178) - value.z)
+distance = sqrt_like(dx*dx + dz*dz)
+field_258 = (200 - distance) * (1/180) * 60 + 10
+field_258 = clamp(field_258, 10, 70)
+virtual_slot_29(value)
+```
+
+The default clang/MSVC-ABI candidate is **243 bytes**, only two bytes away in total size, but matches just **4.3062%** of comparable bytes because floating-point stack scheduling/comparison codegen differs heavily. This is a strong VC6 calibration target, not a clang match.
+
+### Slot 69 — hidden return-buffer ABI confirmed
+
+Retail `0x00466A80` is 65 bytes. The key ABI question is now resolved by the VehicleCamera slot-57 override at `0x0052CA10`:
+
+- slot 57 returns a **12-byte value by value** using MSVC's hidden result pointer;
+- it accepts one explicit 4-byte/float argument;
+- slot 69 calls it with `0.0f`;
+- retail copies the returned 12 bytes to `this + 0x2A8`;
+- it then passes `this + 0x2A8` to virtual slot 43.
+
+The natural C++ candidate is therefore:
+
+```cpp
+CameraValue3 value = UnknownVirtualSlot57(0.0f);
+field_2A8 = value;
+UnknownVirtualSlot43(&field_2A8);
+```
+
+Clang emits 86 bytes and matches **16.3934%** of comparable retail bytes. The mismatch is code-shape/toolchain evidence; the calling convention and data flow are strongly supported by the binaries.
+
+### Slot 71 — state dispatcher source candidate
+
+Retail `0x00466E50` is 171 bytes. The source candidate now explicitly preserves the recovered switch:
+
+- write state to `+0x244`;
+- call slot 58;
+- states 0/1/2 dispatch to preset slots 66/65/64;
+- state 3 restores `+0x258` from `+0x2F0` then calls slot 63;
+- state 4 saves `+0x258` to `+0x2F0` then calls slot 60;
+- snapshot `+0x220/+0x22C/+0x234` into `+0x2C4/+0x2C8/+0x2CC`;
+- call slot 61.
+
+Clang emits 151 bytes and matches **18.3673%**. It folds the case dispatch into a computed vtable offset, whereas retail VC6 emits explicit per-case virtual calls and a jump table.
+
+These three functions increase the calibration corpus without changing the exact-match count. They are specifically intended to distinguish the authentic VC6 backend/profile from modern clang.
