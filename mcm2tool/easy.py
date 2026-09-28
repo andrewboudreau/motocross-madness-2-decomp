@@ -179,6 +179,31 @@ def classify_easy_bytes(blob: bytes) -> EasyPattern | None:
         returned = int.from_bytes(blob[11:15], 'little', signed=True)
         return EasyPattern('write_arg_i32_const_return_const', 18, {'stored_value': stored, 'return_value': returned, 'pop_bytes': 4}, 'high')
 
+    # Two or more literal dword stores into members followed by ret. This is a
+    # common VC6 shape for small state/preset initializers and is highly stable
+    # under clang-cl's x86 MSVC ABI for the retail cases seen so far.
+    stores = []
+    pos = 0
+    while pos + 10 <= len(blob) and blob[pos:pos+2] == b'\xc7\x81':
+        off = int.from_bytes(blob[pos+2:pos+6], 'little', signed=True)
+        value = int.from_bytes(blob[pos+6:pos+10], 'little', signed=False)
+        stores.append({'offset': off, 'value_u32': value})
+        pos += 10
+    if len(stores) >= 2 and pos < len(blob) and blob[pos] == 0xC3:
+        return EasyPattern('set_i32_constants', pos + 1, {'stores': stores}, 'high')
+
+    # VC6 also likes to zero EAX once and fan it out to several fields. Modern
+    # clang often prefers repeated immediate-zero stores, so keep this as a
+    # medium-stability compiler-calibration pattern rather than a smoke target.
+    if blob.startswith(b'\x33\xc0'):
+        offsets = []
+        pos = 2
+        while pos + 6 <= len(blob) and blob[pos:pos+2] == b'\x89\x81':
+            offsets.append(int.from_bytes(blob[pos+2:pos+6], 'little', signed=True))
+            pos += 6
+        if len(offsets) >= 2 and pos < len(blob) and blob[pos] == 0xC3:
+            return EasyPattern('zero_i32_fields', pos + 1, {'offsets': offsets}, 'medium')
+
     # Store a literal dword into a member. For float-looking bit patterns the
     # consumer can reinterpret the literal; the bytes alone do not prove type.
     if len(blob) >= 11 and blob[:2] == b'\xc7\x81' and blob[10] == 0xC3:
@@ -230,7 +255,7 @@ def discover_easy_vtable_targets(pe: PEImage, vtables: list[dict]) -> list[dict]
     rows = []
     for va, uses in refs.items():
         try:
-            blob = pe.bytes_at_va(va, 32)
+            blob = pe.bytes_at_va(va, 64)
         except Exception:
             continue
         pat = classify_easy_bytes(blob)
