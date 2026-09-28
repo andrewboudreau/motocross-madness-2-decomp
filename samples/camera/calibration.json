@@ -1,0 +1,22 @@
+[
+  {
+    "name": "FollowCamera::slot63 zero preset",
+    "candidate_symbol_contains": "UnknownVirtualSlot63@FollowCamera",
+    "target_va": "0x00466c90",
+    "target_size": 21,
+    "clang_candidate_size": 31,
+    "clang_match_percent": 19.0476,
+    "status": "historical-compiler-calibration",
+    "reason": "Retail VC6 zeros EAX once and fans it out to three stores; modern clang emits three immediate-zero stores."
+  },
+  {
+    "name": "FollowCamera::slot70 mode/state toggle",
+    "candidate_symbol_contains": "UnknownVirtualSlot70@FollowCamera",
+    "target_va": "0x00467040",
+    "target_size": 101,
+    "clang_candidate_size": 99,
+    "clang_match_percent": 18.1818,
+    "status": "historical-compiler-calibration",
+    "reason": "Control flow and member accesses are strongly reconstructed, but clang chooses different register allocation and branch/code shapes."
+  }
+]
