@@ -100,7 +100,7 @@ CASES = [
         'target_size': 21,
         'reason': 'retail VC6 zeros EAX once and fans it out to three fields; clang emits repeated immediate-zero stores',
     },
-    {
+    {\n        'name': 'FollowCamera::slot69 cached 12-byte aggregate',\n        'source': 'samples/camera/FollowCameraProbe.cpp',\n        'symbol': 'UnknownVirtualSlot69@FollowCamera',\n        'target_va': '0x00466a80',\n        'target_size': 65,\n        'reason': 'hidden 12-byte return-buffer ABI plus three-dword cache copy; clang /GS- is 64 bytes but schedules copy/registers differently',\n    },\n    {
         'name': 'FollowCamera::slot70 mode/state toggle',
         'source': 'samples/camera/FollowCameraProbe.cpp',
         'symbol': 'UnknownVirtualSlot70@FollowCamera',
