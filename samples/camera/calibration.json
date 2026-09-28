@@ -18,5 +18,17 @@
     "clang_match_percent": 18.1818,
     "status": "historical-compiler-calibration",
     "reason": "Control flow and member accesses are strongly reconstructed, but clang chooses different register allocation and branch/code shapes."
+  },
+  {
+    "name": "FollowCamera::slot72 cyclic state-list advance",
+    "candidate_symbol_contains": "UnknownVirtualSlot72@FollowCamera",
+    "target_va": "0x00466fb0",
+    "target_size": 62,
+    "clang_candidate_size": 47,
+    "clang_match_percent": 17.0213,
+    "clang_pentium_candidate_size": 46,
+    "clang_pentium_match_percent": 19.5652,
+    "status": "historical-compiler-calibration",
+    "reason": "Retail preserves explicit increment/store/compare/wrap loads; modern P6-target clang uses CMOV. Pentium-target clang removes CMOV but still optimizes the sequence more aggressively than retail VC6."
   }
 ]
