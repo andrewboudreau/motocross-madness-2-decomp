@@ -1,0 +1,51 @@
+[
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot34@UIControl",
+    "target_va": "0x004703c0",
+    "target_size": 7,
+    "notes": "returns *(int*)(this+0xC0); field name unknown",
+    "class": "UIControl"
+  },
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot35@UIControl",
+    "target_va": "0x004703d0",
+    "target_size": 7,
+    "notes": "returns *(int*)(this+0xD0); field name unknown",
+    "class": "UIControl"
+  },
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot36@UIControl",
+    "target_va": "0x004703e0",
+    "target_size": 7,
+    "notes": "returns *(int*)(this+0xE4); field name unknown",
+    "class": "UIControl"
+  },
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot37@UIControl",
+    "target_va": "0x004703f0",
+    "target_size": 7,
+    "notes": "returns address this+0xDC; pointee/member name unknown",
+    "class": "UIControl"
+  },
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot52@UIControl",
+    "target_va": "0x00470400",
+    "target_size": 10,
+    "notes": "stores sole 4-byte argument at this+0x7C",
+    "class": "UIControl"
+  },
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot54@UIControl",
+    "target_va": "0x00470a70",
+    "target_size": 13,
+    "notes": "stores sole 4-byte argument at this+0x1B4",
+    "class": "UIControl"
+  },
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot50@UIControl",
+    "target_va": "0x00470640",
+    "target_size": 21,
+    "notes": "sets this+0x1C0=0 and this+0x1BC=3; field names unknown",
+    "class": "UIControl"
+  }
+]

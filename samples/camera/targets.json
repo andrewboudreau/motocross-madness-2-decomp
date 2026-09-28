@@ -1,0 +1,30 @@
+[
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot64@FollowCamera",
+    "target_va": "0x00466cb0",
+    "target_size": 31,
+    "notes": "three literal 32-bit stores at +0x22C/+0x234/+0x220",
+    "class": "FollowCamera"
+  },
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot65@FollowCamera",
+    "target_va": "0x00466cd0",
+    "target_size": 31,
+    "notes": "second three-literal preset over the same fields",
+    "class": "FollowCamera"
+  },
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot66@FollowCamera",
+    "target_va": "0x00466cf0",
+    "target_size": 41,
+    "notes": "four-literal preset; adds direct evidence for field +0x258",
+    "class": "FollowCamera"
+  },
+  {
+    "candidate_symbol_contains": "UnknownVirtualSlot67@FollowCamera",
+    "target_va": "0x00466d20",
+    "target_size": 41,
+    "notes": "four-literal FollowCamera preset over +0x22C/+0x234/+0x220/+0x258",
+    "class": "FollowCamera"
+  }
+]
