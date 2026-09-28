@@ -1,0 +1,12 @@
+{
+  "notes": "Flag sets are hypotheses. RTTI (/GR) is confirmed by the retail binary; optimization/runtime/CPU flags still need empirical matching.",
+  "profiles": {
+    "vc6_o2_ml_g6": ["/nologo", "/c", "/O2", "/GR", "/GX", "/ML", "/G6"],
+    "vc6_o2_mt_g6": ["/nologo", "/c", "/O2", "/GR", "/GX", "/MT", "/G6"],
+    "vc6_o2_ml": ["/nologo", "/c", "/O2", "/GR", "/GX", "/ML"],
+    "vc6_o2_mt": ["/nologo", "/c", "/O2", "/GR", "/GX", "/MT"],
+    "vc6_o1_ml": ["/nologo", "/c", "/O1", "/GR", "/GX", "/ML"],
+    "vc6_o1_mt": ["/nologo", "/c", "/O1", "/GR", "/GX", "/MT"],
+    "clang_probe": ["/nologo", "/c", "/O2", "/GR", "/EHsc"]
+  }
+}

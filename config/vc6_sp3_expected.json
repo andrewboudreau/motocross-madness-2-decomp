@@ -1,0 +1,10 @@
+{
+  "notes": "Core SP3 file versions come from archived Microsoft KB Q230733. LINK 6.00.8447 is also directly consistent with MCM2's Linker600 Rich build 8447. cl.exe's banner is not a sufficient SP-level test by itself.",
+  "core_files": {
+    "C1.DLL": ["12.0.8472", "12.00.8472"],
+    "C1XX.DLL": ["12.0.8472", "12.00.8472"],
+    "C2.DLL": ["12.0.8447", "12.00.8447"],
+    "CVTRES.EXE": ["5.0.1736", "5.00.1736"],
+    "LINK.EXE": ["6.0.8447", "6.00.8447"]
+  }
+}

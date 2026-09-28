@@ -1,0 +1,16 @@
+services:
+  decomp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    working_dir: /repo
+    environment:
+      WINEARCH: win32
+      WINEPREFIX: /wine
+      WINEDEBUG: -all
+      VC6_ROOT: /toolchains/vc6sp3
+    volumes:
+      - .:/repo
+      - ${MCM2_INPUT_DIR:-./input}:/input:ro
+      - ${VC6_ROOT_HOST:-./toolchains/vc6sp3}:/toolchains/vc6sp3:ro
+    command: ["python3", "tools/bootstrap.py", "/input/MCM2PCG.exe"]

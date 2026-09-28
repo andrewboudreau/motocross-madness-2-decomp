@@ -1,0 +1,8 @@
+work/
+*.obj
+*.o
+*.pdb
+*.idb
+*.ilk
+__pycache__/
+.git/

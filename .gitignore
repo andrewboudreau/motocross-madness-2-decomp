@@ -1,0 +1,26 @@
+work/
+*.obj
+*.o
+*.pdb
+*.idb
+*.ilk
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+input/
+toolchains/
+
+# Proprietary / user-supplied binaries must never be committed
+*.exe
+*.dll
+*.cab
+*.iso
+*.msi
+*.lib
+*.pdb
+*.idb
+*.ilk
+*.zip
+*.7z
+*.rar
