@@ -27,3 +27,4 @@ toolchains/
 
 # Reproducible provenance snapshots are generated from private local inputs.
 analysis/provenance/
+analysis/allocation/

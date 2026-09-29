@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "input_sha256": "31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874",
+  "notes": "Reviewed ranges and labels are hypotheses tied to this build; no original symbols or library identity is claimed.",
+  "functions": [
+    {
+      "va": "0x004a2b00",
+      "size": 127,
+      "label": "category_tracker_initialize",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "8b3f65a1339e4c1ad0b9a7c457bc9b3dd90cc1bfc1b555d872ae55b1e2b7caa7"
+    },
+    {
+      "va": "0x004a2b80",
+      "size": 63,
+      "label": "category_tracker_destroy",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "f232454f75d5031231433d3c5f2743ec3916166065e3f8d9f9ccfd76a7065fdb"
+    },
+    {
+      "va": "0x004a2bf0",
+      "size": 266,
+      "label": "find_or_add_category",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "137647bc6ad713ae9a78870620081964cf358a1bfa67a81deedceb59e5fb5cd7"
+    },
+    {
+      "va": "0x004a2d00",
+      "size": 27,
+      "label": "select_category_return_previous",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "d1e518211f0a0c0160ac51e2588f80b7c3cbeb5071dfd28345f89b4d59305ea6"
+    },
+    {
+      "va": "0x004a2d90",
+      "size": 10,
+      "label": "restore_category_index",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "b994e2bd1bc262c5b463fca225534224134549b75fddcc1f700f38a59510b90e"
+    },
+    {
+      "va": "0x004a2de0",
+      "size": 18,
+      "label": "add_secondary_counter",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "1b0e86b18560930bb391b6d7d8c9c95b24bf4cf3b3aa13a5f5bbb4c4a6f9e166"
+    },
+    {
+      "va": "0x004a2e00",
+      "size": 18,
+      "label": "subtract_secondary_counter",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "b5cab0059067b25dff430ad4ece89b48369927fb233e81ecb2d866fb2e047955"
+    },
+    {
+      "va": "0x004a2e20",
+      "size": 57,
+      "label": "allocate_then_account_on_success",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "60e7c9a7d1c8ffa9752635ca8c410ae2e09289331d4ebb77d92185c96762317a"
+    },
+    {
+      "va": "0x004a2e60",
+      "size": 96,
+      "label": "tracked_deallocate_A",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "31cd336e6c43efc39077bdbb59e93b28b3fe0a82ef3027fc6f8da4a13dc0b181"
+    },
+    {
+      "va": "0x004a2fc0",
+      "size": 67,
+      "label": "calloc_then_account_on_success",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "9e32d339dda4113577096be4b731af2b5c6e5b0fadc81be0ffb6e4fa2040103c"
+    },
+    {
+      "va": "0x004a3010",
+      "size": 70,
+      "label": "account_then_allocate",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "9c87be877f4477488f2801a0695756553dc9fec0c071f05ff5c5799c01ec5dab"
+    },
+    {
+      "va": "0x004a3060",
+      "size": 96,
+      "label": "tracked_deallocate_B",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "ebd117ff0c4ac6637cd58350e4595c39c536ca43675ac78c0a58cca0560bd955"
+    },
+    {
+      "va": "0x004a30c0",
+      "size": 96,
+      "label": "deleting_destructor_common_deallocation_target",
+      "layer_hypothesis": "application_accounting",
+      "sha256": "4706aff0befe2b8e58627e4a756ed90dabe8e1935e8a64273b32230d20c8e589"
+    },
+    {
+      "va": "0x005351f0",
+      "size": 69,
+      "label": "allocation_size_msize_like",
+      "layer_hypothesis": "runtime_candidate",
+      "sha256": "fdda5c2b9b7cfb21688ae190b7153c3dc3f294438937d87a516d1f10f7b25efb"
+    },
+    {
+      "va": "0x0053789d",
+      "size": 18,
+      "label": "malloc_like_entry",
+      "layer_hypothesis": "runtime_candidate",
+      "sha256": "c195690cceff273614b99ecf88736e7bce97110cc992994d9ebfd844a823ce97"
+    },
+    {
+      "va": "0x005378af",
+      "size": 44,
+      "label": "allocation_retry_new_handler_like",
+      "layer_hypothesis": "runtime_candidate",
+      "sha256": "dd1a0f6aab04652706c9fd655f0ba486fafed8a91d871a25acbf89982beb2b59"
+    },
+    {
+      "va": "0x005378db",
+      "size": 78,
+      "label": "small_block_or_heap_allocation",
+      "layer_hypothesis": "runtime_candidate",
+      "sha256": "6801bf29003b26bb9a67569b01c6c9f01644f3ef57a6b24ad217ffd2b6a95c19"
+    },
+    {
+      "va": "0x00537929",
+      "size": 72,
+      "label": "free_like_entry",
+      "layer_hypothesis": "runtime_candidate",
+      "sha256": "57917166b58d59fd6a8c3a462da18e7b227d871f48b72af1144e7666fc7155af"
+    },
+    {
+      "va": "0x0053821f",
+      "size": 97,
+      "label": "lock_indexed_critical_section",
+      "layer_hypothesis": "runtime_candidate",
+      "sha256": "f23d603ebd03f7ab08171d9372e6e8a6459b766ee9871c00082ed928ed3314e6"
+    },
+    {
+      "va": "0x00538280",
+      "size": 21,
+      "label": "unlock_indexed_critical_section",
+      "layer_hypothesis": "runtime_candidate",
+      "sha256": "755b78ec60ca19181cc0992b4dac8a6bde74e472f24e9f05087c860fdb3c6546"
+    },
+    {
+      "va": "0x0053b67f",
+      "size": 43,
+      "label": "small_block_region_lookup",
+      "layer_hypothesis": "runtime_candidate",
+      "sha256": "8a9108b0c20ef31a6eda8cd7675b7121a41b49b99a21aaf0a747081b31c99d15"
+    }
+  ],
+  "category_select_va": "0x004a2d00",
+  "same_body_groups": [
+    [
+      "0x004a2e60",
+      "0x004a3060",
+      "0x004a30c0"
+    ]
+  ],
+  "globals": [
+    {
+      "va": "0x0056df04",
+      "role": "pointer to active accounting record",
+      "initial_pointer": "0x006850c0"
+    },
+    {
+      "va": "0x006850c0",
+      "role": "statically allocated accounting record"
+    },
+    {
+      "va": "0x006850dc",
+      "role": "fallback accounting counter"
+    },
+    {
+      "va": "0x0068b460",
+      "role": "heap handle storage used by lower-level heap calls"
+    },
+    {
+      "va": "0x0056df08",
+      "role": "initial category label",
+      "literal": "Unclaimed"
+    }
+  ],
+  "probe": {
+    "source": "samples/allocation/AllocationAccountingProbe.cpp",
+    "bindings": {
+      "?probe_ledger@@3PAUAllocationLedgerProbe@@A": "0x0056df04",
+      "?probe_fallback_counter@@3IA": "0x006850dc",
+      "_probe_size_005351F0": "0x005351f0",
+      "_probe_free_00537929": "0x00537929",
+      "_probe_malloc_0053789D": "0x0053789d",
+      "_probe_calloc_00537AA9": "0x00537aa9"
+    },
+    "targets": [
+      {
+        "symbol": "RestoreCategory@AllocationLedgerProbe",
+        "va": "0x004a2d90",
+        "size": 10
+      },
+      {
+        "symbol": "_ProbeTrackedDeallocate",
+        "va": "0x004a2e60",
+        "size": 96
+      },
+      {
+        "symbol": "_ProbeTrackedDeallocate",
+        "va": "0x004a3060",
+        "size": 96
+      },
+      {
+        "symbol": "_ProbeTrackedDeallocate",
+        "va": "0x004a30c0",
+        "size": 96
+      },
+      {
+        "symbol": "_ProbeAllocateAfterSuccess",
+        "va": "0x004a2e20",
+        "size": 57
+      },
+      {
+        "symbol": "_ProbeAllocateBeforeAttempt",
+        "va": "0x004a3010",
+        "size": 70
+      },
+      {
+        "symbol": "_ProbeCallocAfterSuccess",
+        "va": "0x004a2fc0",
+        "size": 67
+      }
+    ]
+  }
+}

@@ -97,3 +97,13 @@ provenance: ensure-work
 
 provenance-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_provenance.py' -v
+
+.PHONY: allocation allocation-probes allocation-test
+allocation: ensure-work
+	$(PYTHON) tools/analyze_allocation.py --exe "$(EXE)"
+
+allocation-probes: ensure-work
+	$(PYTHON) tools/analyze_allocation.py --exe "$(EXE)" --compile-probe
+
+allocation-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_allocation.py' -v

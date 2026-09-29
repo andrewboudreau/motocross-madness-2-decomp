@@ -18,3 +18,4 @@ analysis/provenance/
 **/*.zip
 **/*.7z
 **/*.rar
+analysis/allocation/
