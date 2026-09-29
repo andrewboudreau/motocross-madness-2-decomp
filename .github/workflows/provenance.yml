@@ -1,0 +1,19 @@
+name: Provenance synthetic tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Synthetic PE and provenance tests (no proprietary inputs)
+        run: make provenance-test

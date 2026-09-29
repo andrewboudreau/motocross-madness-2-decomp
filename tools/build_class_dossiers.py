@@ -48,7 +48,7 @@ def main():
     for f in funcs:
         for u in f.get('vtable_uses',[]):
             c=u['class']; by_func[c][f['target_va']]=f
-            # For TU/source attribution, avoid inherited primary-vtable entries.
+            # For TU/source attribution, avoid inherited primary-vtable entries:
             # a shared BaseObject/GameObject method is evidence for the base, not
             # for every derived class that happens to inherit the same pointer.
             if int(u.get('object_offset',0))==0 and relation_by_use.get((c,int(u['slot'])))!='inherited':
@@ -70,4 +70,104 @@ def main():
     for c in classes:
         name=c['name']
         # Structural anchors (vptr writes / destructor bodies) are much safer for
-        # translation-unitÁÉ½á¥µ¥ÑäÑ¡…¸•¹•É¥ŒÍ¡…É•ÙÑ…‰±”ÍÑÕˆ,¸‘‘¥É•Ð(€€€€€€€€Œµ•Ñ¡½‰½‘¥•Ì½¹±äÝ¡•¸Ñ¡•ä±¥Ù”¹•…ÈÑ¡…Ð±…ÍÌÌÍÑÉÕÑÕÉ…°±ÕÍÑ•È¸(€€€€€€€ÍÑÉÕÑÕÉ…°õÍ•Ð ¤(€€€€€€€™½ÈÜ¥¸‰å}ÝÉ¥Ñ”¹•Ð¡¹…µ”±mt¤èÍÑÉÕÑÕÉ…°¹…‘¡¥¹Ð¡Ýl½‘•}Ù„t°ÄØ¤¤(€€€€€€€™½È¥¸‰å}‘Ñ½È¹•Ð¡¹…µ”±mt¤è(€€€€€€€€€€€ÍÑÉÕÑÕÉ…°¹…‘¡¥¹Ð¡‘lÝÉ…ÁÁ•É}Ù„t°ÄØ¤¤ìÍÑÉÕÑÕÉ…°¹…‘¡¥¹Ð¡‘l‘•ÍÑÉÕÑ½É}Ù„t°ÄØ¤¤(€€€€€€€™½ÈÐ¥¸‰å}Ñ¡Õ¹¬¹•Ð¡¹…µ”±mt¤èÍÑÉÕÑÕÉ…°¹…‘¡¥¹Ð¡ÑlÑ¡Õ¹­}Ù„t°ÄØ¤¤(€€€€€€€…¹¡½ÉÌõÍ•Ð¡ÍÑÉÕÑÕÉ…°¤(€€€€€€€‘¥É•Ñ}Ù…Ìõm¥¹Ð¡™lÑ…É•Ñ}Ù„t°ÄØ¤™½È˜¥¸‰å}‘¥É•Ñ}™Õ¹Œ¹•Ð¡¹…µ”±íô¤¹Ù…±Õ•Ì ¥t(€€€€€€€¥˜ÍÑÉÕÑÕÉ…°è(€€€€€€€€€€€™½ÈÙ„¥¸‘¥É•Ñ}Ù…Ìè(€€€€€€€€€€€€€€€¥˜µ¥¸¡…‰Ì¡Ù„µ„¤™½È„¥¸ÍÑÉÕÑÕÉ…°¤€ðô€ÁàÐÀÀÀè…¹¡½ÉÌ¹…‘¡Ù„¤(€€€€€€€•±Í”è(€€€€€€€€€€€…¹¡½ÉÌ¹ÕÁ‘…Ñ”¡‘¥É•Ñ}Ù…Ì¤((€€€€€€€…¹‘¥‘…Ñ•Ìõíô(€€€€€€€¹…µ”õ¹½É´¡¹…µ”¤(€€€€€€€™½ÈÌ¥¸Í½ÕÉ•}™¥±•Ìè(€€€€€€€€€€€ÍÑ•´õA…Ñ ¡Íl™¥±•¹…µ”t¤¹ÍÑ•´(€€€€€€€€€€€Í¸õ¹½É´¡ÍÑ•´¤(€€€€€€€€€€€É•…Í½¹ÌõmtìÍ½É”ôÀ(€€€€€€€€€€€¥˜Í¸ôõ¹…µ”è(€€€€€€€€€€€€€€€Í½É”¬ôÄÀÀìÉ•…Í½¹Ì¹…ÁÁ•¹ ™¥±•¹…µ”ÍÑ•´•á…Ñ±äµ…Ñ¡•ÌIQQ$±…ÍÌ¹…µ”œ¤(€€€€€€€€€€€•±¥˜¹…µ”…¹€¡¹…µ”¥¸Í¸½ÈÍ¸¥¸¹…µ”¤…¹µ¥¸¡±•¸¡¹…µ”¤±±•¸¡Í¸¤¤øôÔè(€€€€€€€€€€€€€€€Í½É”¬ôÐÔìÉ•…Í½¹Ì¹…ÁÁ•¹ ™¥±•¹…µ”½±…ÍÌ¹½Éµ…±¥é•¹…µ•Ì½Ù•É±…Àœ¤(€€€€€€€€€€€…¹‘¥‘…Ñ•ÍmÍl½É¥¥¹…±}Á…Ñ utõìÁ…Ñ œéÍl½É¥¥¹…±}Á…Ñ t°™¥±•¹…µ”œéÍl™¥±•¹…µ”t°‰Í½É”ˆéÍ½É”°‰É•…Í½¹ÌˆéÉ•…Í½¹Ì°‰¹•…É•ÍÑ}…¹¡½É}‘¥ÍÑ…¹”ˆé9½¹”°‰¹•…É•ÍÑ}…¹¡½É}Ù„ˆé9½¹”°‰¹•…É•ÍÑ}áÉ•™}Ù„ˆé9½¹•ô((€€€€€€€¥˜…¹¡½ÉÌ…¹…±±}áÉ•™Ìè(€€€€€€€€€€€€ŒI•½ÉÑ¡”¹•…É•ÍÐ±…ÍÌ…¹¡½È€´ø}}%1}|áÉ•˜™½È•… Í½ÕÉ”Á…Ñ ¸(€€€€€€€€€€€Á•ÉÁ…Ñ õíô(€€€€€€€€€€€™½ÈáØ±Á…Ñ ¥¸…±±}áÉ•™Ìè(€€€€€€€€€€€€€€€„õµ¥¸¡…¹¡½ÉÌ±­•äõ±…µ‰‘„…Øé…‰Ì¡…ØµáØ¤¤(€€€€€€€€€€€€€€€‘¥ÍÐõ…‰Ì¡„µáØ¤(€€€€€€€€€€€€€€€ÕÈõÁ•ÉÁ…Ñ ¹•Ð¡Á…Ñ ¤(€€€€€€€€€€€€€€€¥˜ÕÈ¥Ì9½¹”½È‘¥ÍÐñÕÉlÁtèÁ•ÉÁ…Ñ¡mÁ…Ñ¡tô¡‘¥ÍÐ±„±áØ¤(€€€€€€€€€€€™½ÈÁ…Ñ °¡‘¥ÍÐ±„±áØ¤¥¸Á•ÉÁ…Ñ ¹¥Ñ•µÌ ¤è(€€€€€€€€€€€€€€€¥˜Á…Ñ ¹½Ð¥¸…¹‘¥‘…Ñ•Ìè½¹Ñ¥¹Õ”(€€€€€€€€€€€€€€€•¹Ðõ…¹‘¥‘…Ñ•ÍmÁ…Ñ¡t(€€€€€€€€€€€€€€€•¹Ñl¹•…É•ÍÑ}…¹¡½É}‘¥ÍÑ…¹”tõ‘¥ÍÐ(€€€€€€€€€€€€€€€•¹Ñl¹•…É•ÍÑ}…¹¡½É}Ù„tõ˜œÁáí„èÀááôœ(€€€€€€€€€€€€€€€•¹Ñl¹•…É•ÍÑ}áÉ•™}Ù„tõ˜œÁáíáØèÀááôœ(€€€€€€€€€€€€€€€€Œ-••ÀÁÉ½á¥µ¥Ñä•Ù¥‘•¹”‘•±¥‰•É…Ñ•±äµ½‘•ÍÐÙÌ…¸•á…Ð™¥±•¹…µ”µ…Ñ ¸(€€€€€€€€€€€€€€€¥˜‘¥ÍÐðôÁàÄÀÀè(€€€€€€€€€€€€€€€€€€€•¹ÑlÍ½É”t¬ôÌÔì•¹ÑlÉ•…Í½¹Ìt¹…ÁÁ•¹ }}%1}|áÉ•˜Ý¥Ñ¡¥¸€ÁàÄÀÀ½˜±…ÍÌ•Ù¥‘•¹”œ¤(€€€€€€€€€€€€€€€•±¥˜‘¥ÍÐðôÁàÐÀÀè(€€€€€€€€€€€€€€€€€€€•¹ÑlÍ½É”t¬ôÈÔì•¹ÑlÉ•…Í½¹Ìt¹…ÁÁ•¹ }}%1}|áÉ•˜Ý¥Ñ¡¥¸€ÁàÐÀÀ½˜±…ÍÌ•Ù¥‘•¹”œ¤(€€€€€€€€€€€€€€€•±¥˜‘¥ÍÐðôÁàÄÀÀÀè(€€€€€€€€€€€€€€€€€€€•¹ÑlÍ½É”t¬ôÄÔì•¹ÑlÉ•…Í½¹Ìt¹…ÁÁ•¹ }}%1}|áÉ•˜Ý¥Ñ¡¥¸€ÁàÄÀÀÀ½˜±…ÍÌ•Ù¥‘•¹”œ¤(€€€€€€€€€€€€€€€•±¥˜‘¥ÍÐðôÁàÐÀÀÀè(€€€€€€€€€€€€€€€€€€€•¹ÑlÍ½É”t¬ôÔì•¹ÑlÉ•…Í½¹Ìt¹…ÁÁ•¹ }}%1}|áÉ•˜Ý¥Ñ¡¥¸€ÁàÐÀÀÀ½˜±…ÍÌ•Ù¥‘•¹”œ¤(€€€€€€€Í½ÕÉ•}…¹‘¥‘…Ñ•Ìõmà™½Èà¥¸…¹‘¥‘…Ñ•Ì¹Ù…±Õ•Ì ¤¥˜álÍ½É”tøÁt(€€€€€€€Í½ÕÉ•}…¹‘¥‘…Ñ•Ì¹Í½ÉÐ¡­•äõ±…µ‰‘„àè µálÍ½É”t±ál¹•…É•ÍÑ}…¹¡½É}‘¥ÍÑ…¹”t¥˜ál¹•…É•ÍÑ}…¹¡½É}‘¥ÍÑ…¹”t¥Ì¹½Ð9½¹”•±Í”€ÄððØÀ±ál™¥±•¹…µ”t¤¤(€€€€€€€É•Œõì(€€€€€€€€€€€€±…ÍÌœé¹…µ”°(€€€€€€€€€€€€‘¥É•Ñ}‰…Í•ÌœéŒ¹•Ð ‘¥É•Ñ}‰…Í•Ìœ±mt¤°(€€€€€€€€€€€€‰…Í•}‘•ÍÉ¥ÁÑ½ÉÌœéŒ¹•Ð ‰…Í•Ìœ±mt¤°(€€€€€€€€€€€€ÙÑ…‰±•Ìœé‰å}ÙÐ¹•Ð¡¹…µ”±mt¤°(€€€€€€€€€€€€ÁÉ¥µ…Éå}½Ù•ÉÉ¥‘•}µ…Àœé‰å}½Ù•ÉÉ¥‘”¹•Ð¡¹…µ”¤°(€€€€€€€€€€€€±…å½ÕÑ}¡¥¹ÑÌœé‰å}±…å½ÕÐ¹•Ð¡¹…µ”¤°(€€€€€€€€€€€€‘•±•Ñ¥¹}‘•ÍÑÉÕÑ½ÉÌœé‰å}‘Ñ½È¹•Ð¡¹…µ”±mt¤°(€€€€€€€€€€€€Ñ¡¥Í}…‘©ÕÍÑ½É}Ñ¡Õ¹­Ìœé‰å}Ñ¡Õ¹¬¹•Ð¡¹…µ”±mt¤°(€€€€€€€€€€€€ÙÑ…‰±•}ÝÉ¥Ñ•}Í¥Ñ•Ìœé‰å}ÝÉ¥Ñ”¹•Ð¡¹…µ”±mt¤°(€€€€€€€€€€€€™Õ¹Ñ¥½¹}Ñ…É•ÑÌœé±¥ÍÐ¡‰å}™Õ¹Œ¹•Ð¡¹…µ”±íô¤¹Ù…±Õ•Ì ¤¤°(€€€€€€€€€€€€‘¥É•Ñ}™Õ¹Ñ¥½¹}Ñ…É•ÑÌœé±¥ÍÐ¡‰å}‘¥É•Ñ}™Õ¹Œ¹•Ð¡¹…µ”±íô¤¹Ù…±Õ•Ì ¤¤°(€€€€€€€€€€€€Í½ÕÉ•}…¹‘¥‘…Ñ•ÌœéÍ½ÕÉ•}…¹‘¥‘…Ñ•Ílèát°(€€€€€€€€€€€€•Ù¥‘•¹•}…¹¡½É}½Õ¹Ðœé±•¸¡…¹¡½ÉÌ¤°(€€€€€€€ô(€€€€€€€½ÕÐ¹…ÁÁ•¹¡É•Œ¤((€€€A…Ñ  …¹…±åÍ¥Ì½±…ÍÍ}‘½ÍÍ¥•ÉÌ¹©Í½¸œ¤¹ÝÉ¥Ñ•}Ñ•áÐ¡©Í½¸¹‘ÕµÁÌ¡½ÕÐ±¥¹‘•¹ÐôÈ¤¬q¸œ¤(€€€™½ÕÌõl	…Í•=‰©•Ðœ°…µ”œ°U%½¹ÑÉ½°œ°U%5Õ±Ñ¥MÑ…Ñ”œ°Y•¡¥±”œ°	¥­”œ°A¡åÍ¥Í	½‘äœ°EÕ…‘QÉ••=‰©•Ðt(€€€‰´õíál±…ÍÌtéà™½Èà¥¸½ÕÑô(€€€±¥¹•ÌõlœŒ±…ÍÌ‘½ÍÍ¥•ÉÌƒŠPµ•¡…¹¥…±±ä…ÍÍ•µ‰±••Ù¥‘•¹”œ°œœ°€•¹•É…Ñ•™É½´IQQ$°ÙÑ…‰±•Ì°‘•ÍÑÉÕÑ½È½Ñ¡Õ¹¬…¹…±åÍ¥Ì°ÙÁÑÈÝÉ¥Ñ•Ì°‰åÑ”µ±…ÍÍ¥™¥•™Õ¹Ñ¥½¹Ì°…¹É•½Ù•É•}}%1}}€ÍÑÉ¥¹Ì¸M½ÕÉ”µ™¥±”É…¹­¥¹Ì…É”¡¥¹ÑÌ°¹½ÐÁÉ½½˜¸œ°œt(€€€™½È¸¥¸™½ÕÌè(€€€€€€€õ‰´¹•Ð¡¸¤(€€€€€€€¥˜¹½Ðè½¹Ñ¥¹Õ”(€€€€€€€±¥¹•Ì€¬ôm˜œŒŒí¹ôœ°œt(€€€€€€€±¥¹•Ì¹…ÁÁ•¹ ¥É•Ð‰…Í•Ìè€œ¬ œ°€œ¹©½¥¸¡‘l‘¥É•Ñ}‰…Í•Ìt¤¥˜‘l‘¥É•Ñ}‰…Í•Ìt•±Í”€œ¡É½½Ð€¼¹½¹”É•½Ù•É•¤œ¤¤(€€€€€€€±¥¹•Ì¹…ÁÁ•¹¡˜‰YÑ…‰±•Ìèí±•¸¡‘lÙÑ…‰±•Ìt¥ôìÙÁÑÈÝÉ¥Ñ”Í¥Ñ•Ìèí±•¸¡‘lÙÑ…‰±•}ÝÉ¥Ñ•}Í¥Ñ•Ìt¥ôì‘¥É•Ð™Õ¹Ñ¥½¸Ñ…É•ÑÌèí±•¸¡‘l‘¥É•Ñ}™Õ¹Ñ¥½¹}Ñ…É•ÑÌt¥ô€¡í±•¸¡‘l™Õ¹Ñ¥½¹}Ñ…É•ÑÌt¥ô¥¹±Õ‘¥¹œ¥¹¡•É¥Ñ•½Í¡…É•ÕÍ•Ì¤ˆ¤(€€€€€€€¥˜¹•Ð ±…å½ÕÑ}¡¥¹ÑÌœ¤è(€€€€€€€€€€€™¥•±‘Ìõ‘l±…å½ÕÑ}¡¥¹ÑÌt¹•Ð ™¥•±‘Ìœ±mt¤(€€€€€€€€€€€±¥¹•Ì¹…ÁÁ•¹ ¥É•Ð±…å½ÕÐ½™™Í•ÑÌè€œ¬œ°€œ¹©½¥¸¡˜ˆ¬Ááíál½™™Í•Ðtéáôˆ™½Èà¥¸™¥•±‘Ì¤¤(€€€€€€€¥˜‘lÍ½ÕÉ•}…¹‘¥‘…Ñ•Ìtè(€€€€€€€€€€€±¥¹•Ì¹…ÁÁ•¹ Q½ÀÍ½ÕÉ”¡¥¹ÑÌèœ¤(€€€€€€€€€€€™½ÈÌ¥¸‘lÍ½ÕÉ•}…¹‘¥‘…Ñ•ÌulèÑtè(€€€€€€€€€€€€€€€‘¥ÍÐõÌ¹•Ð ¹•…É•ÍÑ}…¹¡½É}‘¥ÍÑ…¹”œ¤(€€€€€€€€€€€€€€€•áÑÉ„õ˜ˆ°¹•…É•ÍÐ•Ù¥‘•¹”½áÉ•˜‘¥ÍÑ…¹”€Ááí‘¥ÍÐéáôˆ¥˜‘¥ÍÐ¥Ì¹½Ð9½¹”•±Í”€œœ(€€€€€€€€€€€€€€€±¥¹•Ì¹…ÁÁ•¹¡˜ˆ´íÍlÁ…Ñ uõ€ƒŠPÍ½É”íÍlÍ½É”uõí•áÑÉ…ôììœì€œ¹©½¥¸¡ÍlÉ•…Í½¹Ìt¥ôˆ¤(€€€€€€€¥˜‘lÙÑ…‰±•Ìtè(€€€€€€€€€€€±¥¹•Ì¹…ÁÁ•¹ YÑ…‰±”É•½É‘Ìèœ¤(€€€€€€€€€€€™½ÈØ¥¸‘lÙÑ…‰±•Ìtè(€€€€€€€€€€€€€€€±¥¹•Ì¹…ÁÁ•¹¡˜ˆ´íÙlÙÑ…‰±•}Ù„uõ€…Ð½‰©•Ð½™™Í•Ð€¬Ááí¥¹Ð¡Ø¹•Ð ½‰©•Ñ}½™™Í•Ðœ°À¤¤éáõ€€¡í±•¸¡Ø¹•Ð •¹ÑÉ¥•Ìœ±mt¤¥ôÍ±½ÑÌ¤ˆ¤(€€€€€€€±¥¹•Ì¹…ÁÁ•¹ œœ¤(€€€A…Ñ  ‘½Ì½1MM}=MM%IL¹µœ¤¹ÝÉ¥Ñ•}Ñ•áÐ q¸œ¹©½¥¸¡±¥¹•Ì¤¬q¸œ¤(€€€ÁÉ¥¹Ð¡©Í½¸¹‘ÕµÁÌ¡ì±…ÍÍ}‘½ÍÍ¥•ÉÌœé±•¸¡½ÕÐ¤°±…ÍÍ•Í}Ý¥Ñ¡}Í½ÕÉ•}…¹‘¥‘…Ñ•ÌœéÍÕ´¡‰½½°¡álÍ½ÕÉ•}…¹‘¥‘…Ñ•Ìt¤™½Èà¥¸½ÕÐ¤°½ÕÑÁÕÐœè…¹…±åÍ¥Ì½±…ÍÍ}‘½ÍÍ¥•ÉÌ¹©Í½¸ô±¥¹‘•¹ÐôÈ¤¤()¥˜}}¹…µ•}|ôô}}µ…¥¹}|œèµ…¥¸ ¤
+        # translation-unit proximity than generic shared vtable stubs. Add direct
+        # method bodies only when they live near that class's structural cluster.
+        structural=set()
+        for w in by_write.get(name,[]): structural.add(int(w['code_va'],16))
+        for d in by_dtor.get(name,[]):
+            structural.add(int(d['wrapper_va'],16)); structural.add(int(d['destructor_va'],16))
+        for t in by_thunk.get(name,[]): structural.add(int(t['thunk_va'],16))
+        anchors=set(structural)
+        direct_vas=[int(f['target_va'],16) for f in by_direct_func.get(name,{}).values()]
+        if structural:
+            for va in direct_vas:
+                if min(abs(va-a) for a in structural) <= 0x4000: anchors.add(va)
+        else:
+            anchors.update(direct_vas)
+
+        candidates={}
+        cname=norm(name)
+        for s in source_files:
+            stem=Path(s['filename']).stem
+            sn=norm(stem)
+            reasons=[]; score=0
+            if sn==cname:
+                score+=100; reasons.append('filename stem exactly matches RTTI class name')
+            elif cname and (cname in sn or sn in cname) and min(len(cname),len(sn))>=5:
+                score+=45; reasons.append('filename/class normalized names overlap')
+            candidates[s['original_path']]={'path':s['original_path'],'filename':s['filename'],'score':score,'reasons':reasons,'nearest_anchor_distance':None,'nearest_anchor_va':None,'nearest_xref_va':None}
+
+        if anchors and all_xrefs:
+            # Record the nearest class anchor -> __FILE__ xref for each source path.
+            perpath={}
+            for xv,path in all_xrefs:
+                a=min(anchors,key=lambda av:abs(av-xv))
+                dist=abs(a-xv)
+                cur=perpath.get(path)
+                if cur is None or dist<cur[0]: perpath[path]=(dist,a,xv)
+            for path,(dist,a,xv) in perpath.items():
+                if path not in candidates: continue
+                ent=candidates[path]
+                ent['nearest_anchor_distance']=dist
+                ent['nearest_anchor_va']=f'0x{a:08x}'
+                ent['nearest_xref_va']=f'0x{xv:08x}'
+                # Keep proximity evidence deliberately modest vs an exact filename match.
+                if dist<=0x100:
+                    ent['score']+=35; ent['reasons'].append('__FILE__ xref within 0x100 of class evidence')
+                elif dist<=0x400:
+                    ent['score']+=25; ent['reasons'].append('__FILE__ xref within 0x400 of class evidence')
+                elif dist<=0x1000:
+                    ent['score']+=15; ent['reasons'].append('__FILE__ xref within 0x1000 of class evidence')
+                elif dist<=0x4000:
+                    ent['score']+=5; ent['reasons'].append('__FILE__ xref within 0x4000 of class evidence')
+        source_candidates=[x for x in candidates.values() if x['score']>0]
+        source_candidates.sort(key=lambda x:(-x['score'],x['nearest_anchor_distance'] if x['nearest_anchor_distance'] is not None else 1<<60,x['filename']))
+
+        rec={
+            'class':name,
+            'direct_bases':c.get('direct_bases',[]),
+            'base_descriptors':c.get('bases',[]),
+            'vtables':by_vt.get(name,[]),
+            'primary_override_map':by_override.get(name),
+            'layout_hints':by_layout.get(name),
+            'deleting_destructors':by_dtor.get(name,[]),
+            'this_adjustor_thunks':by_thunk.get(name,[]),
+            'vtable_write_sites':by_write.get(name,[]),
+            'function_targets':list(by_func.get(name,{}).values()),
+            'direct_function_targets':list(by_direct_func.get(name,{}).values()),
+            'source_candidates':source_candidates[:8],
+            'evidence_anchor_count':len(anchors),
+        }
+        out.append(rec)
+
+    Path('analysis/class_dossiers.json').write_text(json.dumps(out,indent=2)+'\n')
+
+    # Human-readable focused summary for high-value classes, if present.
+    focus=['BaseObject','Game','UIControl','UIMultiState','Vehicle','Bike','PhysicsBody','QuadTreeObject']
+    bm={x['class']:x for x in out}
+    lines=['# Class dossiers â€” mechanically assembled evidence','',
+           'Generated from RTTI, vtables, destructor/thunk analysis, vptr writes, byte-classified functions, and recovered `__FILE__` strings. Source-file rankings are hints, not proof.','']
+    for n in focus:
+        d=bm.get(n)
+        if not d: continue
+        lines += [f'## {n}','']
+        lines.append('Direct bases: '+(', '.join(d['direct_bases']) if d['direct_bases'] else '(root / none recovered)'))
+        lines.append(f"Vtables: {len(d['vtables'])}; vptr write sites: {len(d['vtable_write_sites'])}; direct function targets: {len(d['direct_function_targets'])} ({len(d['function_targets'])} including inherited/shared uses)")
+        if d.get('layout_hints'):
+            fields=d['layout_hints'].get('fields',[])
+            lines.append('Direct layout offsets: '+', '.join(f"+0x{x['offset']:x}" for x in fields))
+        if d['source_candidates']:
+            lines.append('Top source hints:')
+            for s in d['source_candidates'][:4]:
+                dist=s.get('nearest_anchor_distance')
+                extra=f", nearest evidence/xref distance 0x{dist:x}" if dist is not None else ''
+                lines.append(f"- `{s['path']}` â€” score {s['score']}{extra}; {'; '.join(s['reasons'])}")
+        if d['vtables']:
+            lines.append('Vtable records:')
+            for v in d['vtables']:
+                lines.append(f"- `{v['vtable_va']}` at object offset `+0x{int(v.get('object_offset',0)):x}` ({len(v.get('entries',[]))} slots)")
+        lines.append('')
+    Path('docs/CLASS_DOSSIERS.md').write_text('\n'.join(lines)+'\n')
+    print(json.dumps({'class_dossiers':len(out),'classes_with_source_candidates':sum(bool(x['source_candidates']) for x in out),'output':'analysis/class_dossiers.json'},indent=2))
+
+if __name__=='__main__': main()

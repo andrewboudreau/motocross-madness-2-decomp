@@ -90,3 +90,10 @@ clean-work:
 
 static-check:
 	PYTHONPATH=. $(PYTHON) tools/static_check.py
+
+.PHONY: provenance provenance-test
+provenance: ensure-work
+	$(PYTHON) tools/build_provenance.py --exe "$(EXE)"
+
+provenance-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_provenance.py' -v

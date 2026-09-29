@@ -24,3 +24,6 @@ toolchains/
 *.zip
 *.7z
 *.rar
+
+# Reproducible provenance snapshots are generated from private local inputs.
+analysis/provenance/

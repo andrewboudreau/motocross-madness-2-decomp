@@ -6,3 +6,15 @@ work/
 *.ilk
 __pycache__/
 .git/
+input/
+toolchains/
+analysis/provenance/
+**/*.exe
+**/*.dll
+**/*.cab
+**/*.iso
+**/*.msi
+**/*.lib
+**/*.zip
+**/*.7z
+**/*.rar
