@@ -1,0 +1,19 @@
+name: Category source evidence tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Category and allocation regressions (no game or VC6)
+        run: make allocation-test categories-test

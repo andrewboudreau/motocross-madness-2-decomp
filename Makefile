@@ -107,3 +107,10 @@ allocation-probes: ensure-work
 
 allocation-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_allocation.py' -v
+
+.PHONY: categories categories-test
+categories: provenance
+	$(PYTHON) tools/build_categories.py --exe "$(EXE)"
+
+categories-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_categories.py' -v

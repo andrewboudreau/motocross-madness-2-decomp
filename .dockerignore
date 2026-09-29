@@ -19,3 +19,4 @@ analysis/provenance/
 **/*.7z
 **/*.rar
 analysis/allocation/
+analysis/categories/

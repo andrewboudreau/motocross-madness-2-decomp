@@ -135,3 +135,28 @@ PYTHONPATH=. python3 tools/nearest_source.py 0x4703c0
 ## External references
 
 `docs/REFERENCES.md` contains community resources such as the archived Motocross Madness file-format repository. Treat them as context, not ground truth for code/class reconstruction unless independently verified against the retail binary.
+
+## Category-driven source triage
+
+```bash
+make categories
+make categories-test
+python3 tools/build_categories.py --query Terrain
+python3 tools/build_categories.py --query QuarryStuntEvent.cpp
+```
+
+Read `docs/CATEGORIES.md` and the generated `analysis/categories/review_queue.json`.
+Category selections are allocation-context evidence, not exclusive source or
+class ownership. Keep a many-to-many relationship: the loading/orchestration
+candidates select several different labels. A matching filename is not needed
+for a category label, and a category name does not establish a filename.
+
+Inspect the exact selector call, literal argument, source-reference instructions,
+and non-inherited primary RTTI slots before promoting any semantic name. The
+category tool re-decodes these facts against the input hash; provenance supplies
+candidate ranges only. It does not propagate labels to callees, sibling methods,
+derived classes, or whole translation units. No source files should be moved
+based solely on this report.
+
+The category review queue is an additive triage view. It does not change the
+existing byte-match manifest or count semantic similarity as an exact match.
