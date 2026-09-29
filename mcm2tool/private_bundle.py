@@ -55,7 +55,7 @@ def sha256_file(path: Path) -> str:
 
 def _normalized_member(name: str) -> PurePosixPath:
     # ZIP uses forward slash regardless of host. Reject Windows drive/UNC forms too.
-    if not name or "\" in name or name.startswith(("/", "\")):
+    if not name or "\\" in name or name.startswith(("/", "\\")):
         raise BundleError(f"unsafe archive member: {name!r}")
     path = PurePosixPath(name)
     if path.is_absolute() or any(part in ("", ".", "..") for part in path.parts):
@@ -107,10 +107,7 @@ def verify_archive(path: Path, expected_archive_sha256: str | None = None) -> di
         if set(manifest) != payload:
             missing_manifest = sorted(payload - set(manifest))
             phantom = sorted(set(manifest) - payload)
-            raise BundleError(
-                f"manifest/archive membership differs; "
-                f"unlisted={missing_manifest[:5]} missing={phantom[:5]}"
-            )
+            raise BundleError(f"manifest/archive membership differs; unlisted={missing_manifest[:5]} missing={phantom[:5]}")
         for name, expected in sorted(manifest.items()):
             if not isinstance(expected, str) or not len(expected) == 64:
                 raise BundleError(f"invalid manifest hash for {name}")
@@ -143,12 +140,8 @@ def download(url: str, destination: Path, token: str | None = None) -> None:
         shutil.copyfileobj(response, out, length=1024 * 1024)
 
 
-def install_archive(
-    archive: Path,
-    root: Path,
-    expected_archive_sha256: str | None = None,
-    overwrite: bool = False,
-) -> BundleInstall:
+def install_archive(archive: Path, root: Path, expected_archive_sha256: str | None = None,
+                    overwrite: bool = False) -> BundleInstall:
     result = verify_archive(archive, expected_archive_sha256)
     root = root.expanduser().resolve()
     marker = root / "private-inputs-state.json"
@@ -156,18 +149,10 @@ def install_archive(
         if marker.exists() and not overwrite:
             current = json.loads(marker.read_text())
             if current.get("archive_sha256") == result["archive_sha256"]:
-                return BundleInstall(
-                    root,
-                    root / "toolchains/vc6sp3",
-                    root / "work/game/mcm2.exe",
-                    root / PROVENANCE_PATH,
-                    result["archive_sha256"],
-                    result["payload_files"],
-                )
+                return BundleInstall(root, root / "toolchains/vc6sp3", root / "work/game/mcm2.exe",
+                                     root / PROVENANCE_PATH, result["archive_sha256"], result["payload_files"])
         if not overwrite:
-            raise BundleError(
-                f"destination is not empty: {root}; pass overwrite=True to replace it"
-            )
+            raise BundleError(f"destination is not empty: {root}; pass overwrite=True to replace it")
     root.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="mcm2-private-install-", dir=root.parent) as td:
         stage = Path(td) / "payload"
@@ -183,13 +168,11 @@ def install_archive(
                     shutil.copyfileobj(src, out, length=1024 * 1024)
         finally:
             zf.close()
-
         # Recheck extracted bytes; never trust extraction alone.
         manifest = json.loads((stage / MANIFEST_PATH).read_text())
         for name, expected in manifest.items():
             if sha256_file(stage / name) != expected:
                 raise BundleError(f"extracted payload hash mismatch: {name}")
-
         state = {
             "schema_version": 1,
             "archive_sha256": result["archive_sha256"],
@@ -199,19 +182,9 @@ def install_archive(
             "exe": str((root / "work/game/mcm2.exe").resolve()),
             "provenance": result["provenance"],
         }
-        (stage / "private-inputs-state.json").write_text(
-            json.dumps(state, indent=2) + "
-"
-        )
+        (stage / "private-inputs-state.json").write_text(json.dumps(state, indent=2) + "\n")
         if root.exists():
             shutil.rmtree(root)
         stage.replace(root)
-
-    return BundleInstall(
-        root,
-        root / "toolchains/vc6sp3",
-        root / "work/game/mcm2.exe",
-        root / PROVENANCE_PATH,
-        result["archive_sha256"],
-        result["payload_files"],
-    )
+    return BundleInstall(root, root / "toolchains/vc6sp3", root / "work/game/mcm2.exe",
+                         root / PROVENANCE_PATH, result["archive_sha256"], result["payload_files"])
