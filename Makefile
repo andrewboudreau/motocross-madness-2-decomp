@@ -114,3 +114,10 @@ categories: provenance
 
 categories-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_categories.py' -v
+
+.PHONY: category-contexts category-contexts-test
+category-contexts: ensure-work
+	$(PYTHON) tools/build_category_contexts.py --exe "$(EXE)"
+
+category-contexts-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_category_contexts.py' -v

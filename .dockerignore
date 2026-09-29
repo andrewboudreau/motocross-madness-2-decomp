@@ -20,3 +20,4 @@ analysis/provenance/
 **/*.rar
 analysis/allocation/
 analysis/categories/
+analysis/category_contexts/
