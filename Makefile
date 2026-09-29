@@ -121,3 +121,13 @@ category-contexts: ensure-work
 
 category-contexts-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_category_contexts.py' -v
+
+.PHONY: category-pilots category-pilots-probe category-pilots-test
+category-pilots: ensure-work
+	$(PYTHON) tools/review_category_pilots.py --exe "$(EXE)"
+
+category-pilots-probe: ensure-work
+	$(PYTHON) tools/review_category_pilots.py --exe "$(EXE)" --compile-probe
+
+category-pilots-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_category_pilots.py' -v
