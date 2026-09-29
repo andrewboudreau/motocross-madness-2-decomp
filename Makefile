@@ -2,6 +2,8 @@ PYTHON ?= python3
 INSTALLER ?= MCM2PCG.exe
 EXE ?= work/game/mcm2.exe
 VC6_ROOT ?=
+PRIVATE_ROOT ?= $(HOME)/.cache/mcm2-private
+PRIVATE_BUNDLE ?=
 
 .PHONY: bootstrap extract analyze class-evidence msvc-artifacts ensure-work smoke smoke-vc6 easy-smoke easy-smoke-vc6 calibration calibration-vc6 status easy manifest work-queue selftest static-check wine-init import-vc6 probe-vc6 vc6-gate clean-work
 
@@ -121,3 +123,20 @@ category-contexts: ensure-work
 
 category-contexts-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_category_contexts.py' -v
+
+.PHONY: private-install private-ready vc6-private-gate private-bundle-test
+private-install:
+	@if [ -n "$(PRIVATE_BUNDLE)" ]; then \
+		$(PYTHON) tools/install_private_bundle.py --archive "$(PRIVATE_BUNDLE)" --root "$(PRIVATE_ROOT)"; \
+	else \
+		$(PYTHON) tools/install_private_bundle.py --url-env MCM2_PRIVATE_BUNDLE_URL --root "$(PRIVATE_ROOT)"; \
+	fi
+
+private-ready:
+	$(PYTHON) tools/with_private_env.py --root "$(PRIVATE_ROOT)" -- $(PYTHON) tools/vc6_acceptance.py --root "$(PRIVATE_ROOT)"
+
+vc6-private-gate:
+	$(PYTHON) tools/with_private_env.py --root "$(PRIVATE_ROOT)" -- $(PYTHON) tools/vc6_acceptance.py --root "$(PRIVATE_ROOT)" --full-gate
+
+private-bundle-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_private_bundle.py' -v

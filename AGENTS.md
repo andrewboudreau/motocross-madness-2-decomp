@@ -160,3 +160,27 @@ based solely on this report.
 
 The category review queue is an additive triage view. It does not change the
 existing byte-match manifest or count semantic similarity as an exact match.
+
+
+## Private historical compiler environment
+
+The repository must never contain the VC6 binaries, libraries, headers, signed
+bundle URL, access token, or retail executable. See `docs/PRIVATE_TOOLCHAIN.md`.
+
+Use the verified private installer and wrapper:
+
+```bash
+make private-install PRIVATE_BUNDLE=/path/to/mcm2-vc6sp3-private-inputs.zip
+make private-ready
+make vc6-private-gate
+```
+
+In a Linux/cloud worker, put `MCM2_PRIVATE_BUNDLE_URL` in the environment's
+setup-only secret store and run `bash tools/setup_vc6_linux.sh`. Do not echo or
+commit the URL. Native Windows may use `tools/setup_vc6_windows.ps1`.
+
+A static fingerprint is not proof that VC6 executed. `private-ready` requires
+the authentic CL.EXE process to emit a nonempty i386 COFF object. Never fall
+back to clang when that acceptance step fails. Keep environment readiness
+separate from byte-match success: a real VC6 mismatch is compiler/profile/source
+evidence, not permission to alter readable C++ or claim the worker is broken.
