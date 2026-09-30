@@ -1,6 +1,7 @@
 // SoultreePhysicsCharacter small virtuals (assigned targets).  TU ownership tier 2:
 // SoulTreePhysics.cpp (__FILE__ at 0x00503b13/0x00503f87).
-#include "SoultreePhysicsCharacter.h"
+#include "../hierarchy/SoultreePhysicsCharacter.h"
+#include "../soultree_base/SoultreePhysicsCallees.h"
 
 extern void Fn_4b5a60(SoultreeVec3 a, SoultreeVec3 b, float* c, float* d, float* e, float* f,
                       float* g, float* h, float* i);
@@ -36,7 +37,8 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot42()
 
 // slot 33 (0x005040f0), retail `ret 0x18`
 int SoultreePhysicsCharacter::UnknownVirtualSlot33(const SoultreeVec3* a1, const SoultreeVec3* a2,
-                                                   const SoultreeVec3* a3, int a4, int a5, float a6)
+                                                   const SoultreeVec3* a3, const SoultreeVec3* a4,
+                                                   int a5, float a6)
 {
     UnknownVirtualSlot1(a6);
     field_0x88 = *a2;
@@ -49,7 +51,7 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot33(const SoultreeVec3* a1, const
     } else {
         field_0x08->Fn_4fc9a0(0, &field_0x18);
     }
-    field_0x21c.Fn_4a8b00();
+    Method_0x004a8b00();
     field_0x128->Fn_435fe0();
     field_0x109 = 0;
     field_0x20d = 1;
@@ -61,8 +63,8 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot33(const SoultreeVec3* a1, const
 void SoultreePhysicsCharacter::UnknownVirtualSlot41()
 {
     field_0x42c->Fn_4fc540(0, field_0xa0, field_0xac);
-    field_0x3bc->Fn_4fc050(0, &field_0xa0, &field_0xac, 1, 0);
-    field_0x21c.Fn_4a8b00();
+    d3d_field_0x1a0->Fn_4fc050(0, &field_0xa0, &field_0xac, 1, 0);
+    Method_0x004a8b00();
     field_0x430 = 0;
     UnknownVirtualSlot34();
     Fn_4b5a60(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c, &field_0x38,

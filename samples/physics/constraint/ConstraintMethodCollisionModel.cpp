@@ -4,7 +4,7 @@
 // SOLVER OVERVIEW (semantic names are tier 3; instruction behaviour is tier 1)
 //   Method: single-contact IMPULSE (velocity-level rigid body response) plus a small
 //   PROJECTION step. There is no penalty force and no iterative solver in this file.
-//   Structure of one step (UnknownVirtualSlot11 at 0x0043ba70, called every tick by slot 10):
+//   Structure of one step (GameObjectVirtualSlot11 at 0x0043ba70, called every tick by slot 10):
 //     1. Save dt (+0xc0). If the model is active (+0xec) refresh the collision node
 //        (0x435fb0/0x435fe0); when the base reports an overlap (0x438e70) push the body
 //        back along the recorded contact normal by 1.005 (projection) and refresh again.
@@ -54,7 +54,7 @@ ConstraintMethodCollisionModel::~ConstraintMethodCollisionModel()
 {
 }
 
-GameObject* ConstraintMethodCollisionModel::UnknownVirtualSlot8(int a)
+GameObject* ConstraintMethodCollisionModel::GameObjectVirtualSlot8(int a)
 {
     Fn_004320f0(a, 1, 1, 1);
     field_0x88 = 0x43b800;
@@ -63,16 +63,16 @@ GameObject* ConstraintMethodCollisionModel::UnknownVirtualSlot8(int a)
     return this;
 }
 
-int ConstraintMethodCollisionModel::UnknownVirtualSlot10(float t)
+int ConstraintMethodCollisionModel::GameObjectVirtualSlot10(float t)
 {
     if (!field_0xe8)
-        UnknownVirtualSlot11(t);
-    return CollisionObject::UnknownVirtualSlot10(t);
+        GameObjectVirtualSlot11(t);
+    return CollisionObject::GameObjectVirtualSlot10(t);
 }
 
-void ConstraintMethodCollisionModel::UnknownVirtualSlot14()
+void ConstraintMethodCollisionModel::GameObjectVirtualSlot14()
 {
-    CollisionObject::UnknownVirtualSlot14();
+    CollisionObject::GameObjectVirtualSlot14();
 }
 
 void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, int arg)
@@ -103,7 +103,7 @@ static inline float Dot3(const ConVec3& a, const ConVec3& b)
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-int ConstraintMethodCollisionModel::UnknownVirtualSlot11(float t)
+int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
 {
     dt = t;
     if (field_0xec) {

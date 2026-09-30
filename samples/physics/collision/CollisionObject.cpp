@@ -80,7 +80,7 @@ CollisionObject::CollisionObject(int a)
     if (g_VegetationTypeId == (char)0xff)
         g_VegetationTypeId = g_TypeRegistry->FindTypeId("Vegetation");
     Fn_00469ce0(this);
-    field_0x08 = g_TypeRegistry->FindTypeId("CollisionObject");
+    QuadTreeObject::field_0x08 = g_TypeRegistry->FindTypeId("CollisionObject");
     field_0x50 = 0;
     field_0x54 = 0;
     field_0x5c = 0;

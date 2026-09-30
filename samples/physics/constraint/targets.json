@@ -74,7 +74,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot8",
+    "candidate_symbol_contains": "GameObjectVirtualSlot8@ConstraintMethodCollisionModel",
     "target_va": "0x43b9a0",
     "target_size": 59,
     "expect": "exact",
@@ -92,7 +92,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot10",
+    "candidate_symbol_contains": "GameObjectVirtualSlot10@ConstraintMethodCollisionModel",
     "target_va": "0x43ba40",
     "target_size": 37,
     "expect": "exact",
@@ -101,7 +101,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot11",
+    "candidate_symbol_contains": "GameObjectVirtualSlot11@ConstraintMethodCollisionModel",
     "target_va": "0x43ba70",
     "target_size": 829,
     "expect": "partial",
@@ -128,7 +128,7 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot14",
+    "candidate_symbol_contains": "GameObjectVirtualSlot14@ConstraintMethodCollisionModel",
     "target_va": "0x43c880",
     "target_size": 5,
     "expect": "exact",

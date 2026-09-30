@@ -8,10 +8,10 @@
 #ifndef CONSTRAINT_METHOD_COLLISION_MODEL_H
 #define CONSTRAINT_METHOD_COLLISION_MODEL_H
 
-#include "ConstraintBase.h"
+#include "../collision/CollisionObject.h"   // canonical CollisionObject chain (MIGRATION.md)
 #include "ConstraintTypes.h"
 
-// One probe point (32 bytes), see AddProbePoint / UnknownVirtualSlot11.
+// One probe point (32 bytes), see AddProbePoint / GameObjectVirtualSlot11.
 struct ConstraintProbe {
     ConVec3 localPoint;    // +0x00 point in the owner node's space
     ConNode* node;         // +0x0c owner node
@@ -26,10 +26,10 @@ public:
 
     // Secondary vtable (this == subobject at +12) overrides.
     virtual ~ConstraintMethodCollisionModel();               // 0x0043b950 -> core 0x0043b980
-    virtual GameObject* UnknownVirtualSlot8(int a);          // 0x0043b9a0
-    virtual int UnknownVirtualSlot10(float dt);              // 0x0043ba40
-    virtual int UnknownVirtualSlot11(float dt);              // 0x0043ba70
-    virtual void UnknownVirtualSlot14();                     // 0x0043c880 (tail jump)
+    virtual GameObject* GameObjectVirtualSlot8(int a);       // 0x0043b9a0
+    virtual int GameObjectVirtualSlot10(float dt);           // 0x0043ba40
+    virtual int GameObjectVirtualSlot11(float dt);           // 0x0043ba70
+    virtual void GameObjectVirtualSlot14();                  // 0x0043c880 (tail jump)
 
     void SetBody(ConBody* b, int useNodeModel, int arg);     // 0x0043b9e0
     void AddProbePoint(ConVec3 point, ConNode* node);   // 0x0043c7f0

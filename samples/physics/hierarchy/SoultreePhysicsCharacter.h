@@ -38,7 +38,28 @@ public:
     virtual int UnknownVirtualSlot33(const SoultreeVec3* a1, const SoultreeVec3* a2,
                                      const SoultreeVec3* a3, const SoultreeVec3* a4, int a5,
                                      float a6);                  // 0x005040f0
-    virtual void UnknownVirtualSlot40(int a1, int a2, int a3);   // 0x00503de0 (signature provisional)
+    // Slot 40 (0x00503de0, `ret 0x6c` = 27 argument dwords, tier 1).  Grouping (tier 2):
+    //  * a6..a8 (dwords 5..13, 0-based) are three Vec3 by value.  Both the body and the one direct caller
+    //    (Vehicle.cpp 0x005261e3, `call 0x00503de0`) copy them with the `sub esp,0xc;
+    //    mov [esp],..` struct-copy shape; the body forwards them unchanged to slot 2.
+    //  * a3 is a NUL-terminated name (strlen/strncpy, then ".col" is appended).
+    //  * a4 is a pointer (`test byte [a4+0x25],1`).
+    //  * a1, a3, a4, a5 go to D3DIMVirtualSlot11 as (a1, a3, a4, a5, 1, 1).
+    //  * Slot 2 (0x00500c50) stores the rest:
+    //      a9 -> 0x1f4 (pointer; +0x40 read into field_0x1f8), a10 -> 0x124, a11 -> 0x150,
+    //      a12 -> 0x1c8 (element count of the 0x12c array), a14 -> 0x1f0 (pointer),
+    //      a15 -> 0x1e4, a16 -> 0x1ec, a17 -> 0x148, a18 -> 0x14c, a19 -> 0x210,
+    //      a20 -> byte 0x20f.
+    //  * Float types (a15, a17, a18) follow the Vehicle caller's float constants
+    //    (0.02f, 0.001f, 0.1f); a20 is pushed zero-extended from a byte (tier 2).
+    //  * Returns the GameObject virtual base (`this ? this+vbase : 0` at 0x0050408e).  The
+    //    sibling SoultreePhysicsObject slot 40 (0x00503970, ret 0x70) has the same shape; its
+    //    SceneManager caller 0x004ed3bf passes the result to GameObject::Method_0x00469190.
+    virtual GameObject* UnknownVirtualSlot40(int a1, int a2, const char* a3, void* a4, int a5,
+                                             SoultreeVec3 a6, SoultreeVec3 a7, SoultreeVec3 a8,
+                                             void* a9, int a10, int a11, int a12, int a13,
+                                             void* a14, float a15, int a16, float a17, float a18,
+                                             int a19, char a20, int a21);
     virtual void UnknownVirtualSlot41();                          // 0x00504360
     virtual int UnknownVirtualSlot42();                           // 0x00504470
 

@@ -18,60 +18,32 @@
 #define COLLISION_OBJECT_H
 
 #include "CollisionTypes.h"
+#include "../soultree_base/GameObject.h"   // canonical BaseObject, GameObject
 
 class CollisionModelSource;   // scene-graph node source used by shape setup 0x004324b0
 struct CollisionHullBody;      // CollisionShapeTests.h
 struct CollisionModelBody;
 struct CollisionSweepQuery;
 
-// Provisional stub of BaseObject/GameObject: 27 virtual slots, exactly the vtable
-// shape read from the GraphicsTest vtable 0x00553de4.  Signatures are tier 3
-// (argument counts come from the `ret N` of the shared default implementations).
-class GameObject {
-public:
-    virtual ~GameObject();                      // slot 0
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8(int a);
-    virtual void UnknownVirtualSlot9(int a);
-    virtual void UnknownVirtualSlot10(int a);
-    virtual int UnknownVirtualSlot11(int a);
-    virtual void UnknownVirtualSlot12();
-    virtual void UnknownVirtualSlot13();
-    virtual void UnknownVirtualSlot14();        // draw (CollisionObject/Tire override)
-    virtual void UnknownVirtualSlot15();
-    virtual void UnknownVirtualSlot16(int a);
-    virtual void UnknownVirtualSlot17();
-    virtual void UnknownVirtualSlot18();
-    virtual void UnknownVirtualSlot19(int a);
-    virtual void UnknownVirtualSlot20(int a);
-    virtual void UnknownVirtualSlot21(int a);
-    virtual void UnknownVirtualSlot22(int a, int b);
-    virtual void UnknownVirtualSlot23(int a, int b);
-    virtual void UnknownVirtualSlot24(int a, int b, int c, int d, int e);
-    virtual void UnknownVirtualSlot25(int a);
-    virtual void UnknownVirtualSlot26();
-
-    int field_0x04[5];
-    void* field_0x18;                           // object with a vtable, called by slot 14
-    char field_0x1c[0x28];
-};
-
+// BaseObject/GameObject are the canonical classes (MIGRATION.md).  GraphicsTest derives
+// from GameObject non-virtually (pdisp -1), so there is no vbptr/vtordisp here and
+// GameObject members are at their plain offsets from the GraphicsTest subobject.
+// Retail GraphicsTest vtable 0x00553de4 differs from GameObject's 0x00552a2c only in
+// slot 0 (dtor 0x0047bce0); slot 10 is inherited (0x004693d0), so GraphicsTest does not
+// override it (tier 1, analysis/vtables.json).
 class GraphicsTest : public GameObject {
 public:
-    GraphicsTest(int a);
-    virtual ~GraphicsTest();
-    virtual void UnknownVirtualSlot10(int a);
-    // Non-virtual GraphicsTest methods used by CollisionObject::UnknownVirtualSlot14.
+    GraphicsTest(int a);                        // 0x0047bc70
+    virtual ~GraphicsTest();                    // slot 0: 0x0047bce0
+    // Non-virtual GraphicsTest methods used by CollisionObject::GameObjectVirtualSlot14.
     void Fn_0047c6c0(int a, int b, int c, int d);
     void Fn_0047c6f0();
     void Fn_0047c0b0(void* a, int b, int c);
     void Fn_00469ce0(GraphicsTest* owner);   // 0x00469ce0, registers the object (thiscall, 1 arg)
+
+    // GraphicsTest's own data: GameObject ends at 0x2c and CollisionObject's fields start
+    // at 0x50 - 12, so GraphicsTest owns 0x2c..0x44 (tier 2: extent only).
+    char field_0x2c[0x18];
 };
 
 class QuadTreeObject {
@@ -122,9 +94,9 @@ class CollisionObject : public QuadTreeObject, public GraphicsTest {
 public:
     CollisionObject(int a);                     // 0x00431e70
     virtual ~CollisionObject();                 // slot 0 @12: 0x00431fd0 -> core 0x00432000
-    virtual void UnknownVirtualSlot10(int a);   // 0x00499ae0
-    virtual void UnknownVirtualSlot14();        // 0x00434540
-    virtual void UnknownVirtualSlot23(int a, int b); // 0x00434970
+    virtual int GameObjectVirtualSlot10(float dt);    // 0x00499ae0
+    virtual void GameObjectVirtualSlot14();           // 0x00434540 (draw; also overridden by Tire)
+    virtual void GameObjectVirtualSlot23(int a, int b); // 0x00434970 (ret 8)
 
     // Non-virtual members (this == complete object).
     void FreeShape();                                        // 0x00432430
@@ -132,6 +104,11 @@ public:
     void Fn_00432120(int a);                                 // 0x00432120
     void SetSphereShape(CollisionVec3 center, float radius); // 0x004329a0 (type 4)
     void SetCapsuleShape(CollisionVec3 p0, CollisionVec3 p1, float radius);  // 0x00432a20 (type 3)
+    void Fn_004324b0(void* node, int a, int b, int c, int d); // 0x004324b0, shape setup from a node
+    void Fn_00432800(void* node, int a);                      // 0x00432800
+    void Fn_00435fb0();                                       // 0x00435fb0
+    void Fn_00435fe0();                                       // 0x00435fe0
+    int Fn_00438e70();                                        // 0x00438e70
 
     // Narrow phase (CollisionShapeTests.cpp, names tier 3).  These are thiscall members that
     // mostly ignore `this`: the 0x00438b90 dispatchers forward ecx unchanged down the chain.
@@ -157,9 +134,9 @@ public:
     int field_0x50;                             // shape type 0..4
     void* field_0x54;                           // shape payload (see shape structs)
     int field_0x58;
-    void* field_0x5c;
+    void* field_0x5c;                           // contact record pointer (constraint solver)
     int field_0x60;
-    int field_0x64;
+    int field_0x64;                             // type tag; 0x3ea (1002) = has a body at +0xc4
     int field_0x68;
     int field_0x6c;
     int field_0x70;
@@ -168,8 +145,8 @@ public:
     int field_0x7c;
     int field_0x80;
     int field_0x84;
-    int field_0x88;
-    int field_0x8c;
+    int field_0x88;                             // callback (0x0043b9a0 stores 0x0043b800)
+    int field_0x8c;                             // callback (0x0043b9a0 stores 0x00464e90)
     int field_0x90;
     int field_0x94;
     int field_0x98;
@@ -177,5 +154,8 @@ public:
     CollisionVec3 field_0xa0;
     CollisionVec3 field_0xac;
 };
+
+typedef char collision_graphics_test_assert_sizeof[(sizeof(GraphicsTest) == 0x44) ? 1 : -1];
+typedef char collision_object_assert_sizeof[(sizeof(CollisionObject) == 0xb8) ? 1 : -1];
 
 #endif

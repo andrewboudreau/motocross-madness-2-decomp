@@ -4,7 +4,9 @@
 
 - `hierarchy/SoultreePhysicsCharacter.h` includes everything below it.
 - `hierarchy/D3DIMSoultreeCharacter.h` holds `Character` and `D3DIMSoultreeCharacter`.
-- `soultree_base/SoultreePhysicsBaseObject.h` holds `BaseObject`, `GameObject` and `SoultreePhysicsBaseObject`. Agent A owns it. Include it; do not fork it.
+- `soultree_base/SoultreePhysicsBaseObject.h` holds `SoultreePhysicsBaseObject`. Agent A owns it. Include it; do not fork it.
+- `soultree_base/GameObject.h` holds `BaseObject` and `GameObject`. `SoultreePhysicsBaseObject.h` includes it. Hierarchies outside Soultree (CollisionObject) include only this file.
+- `collision/CollisionObject.h` holds `GraphicsTest`, `QuadTreeObject` and `CollisionObject`.
 
 `hierarchy/LayoutProbe.cpp` proves the layout. There are 15/15 exact byte matches under `vc6_o2_ml`: six vbase deleting destructors, eight adjustor thunks and one vtordisp thunk. There are also compile-time `sizeof`/`offsetof` checks.
 
@@ -38,8 +40,42 @@ The committed files under `samples/physics/` are now the hand-edited source of t
 - **Vehicle slot 64 is `void(float)`.** Retail 0x00528e50 materialises no return value, and it is byte-exact as `void`. Slot 63 keeps `int(float)`.
 - **`field_0x1f8` is `float`.** Tier 1: KrustyBike slot 12 (0x0048de20) does `fld`/`fmul` on it.
 - **Cast at the use site.** Do not use inline accessor functions for rule 6. VC6 schedules the load differently when the cast is inside an inline accessor. Bike slot 8 lost its exact match that way, and Vehicle slots 4, 19, 35 and 49 lost bytes.
-- **Collision must follow the current signatures.** Its overrides need `int GameObjectVirtualSlot10(float dt)` and a `const SoultreeVec3*` in slot 33's `a4`.
-- **Open item: SoultreePhysicsCharacter slot 40 (0x00503de0).** It is declared `(int,int,int)`, but the body ends in `ret 0x6c`, which is 27 dword arguments.
+
+## Status (collision, constraint migrated)
+
+No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_collision`, `work/b_soultree_collision` and `work/f_constraint` only compile and match, so there was nothing to retire.
+
+- **`collision/SoultreePhysicsCharacter.h` is deleted.** `collision/SoultreePhysicsCharacter.cpp` includes the canonical header and `SoultreePhysicsCallees.h`.
+  - `field_0x21c.Fn_4a8b00()` became `Method_0x004a8b00()`.
+  - `field_0x3bc` became `d3d_field_0x1a0`.
+  - Slot 33's `a4` is `const SoultreeVec3*`.
+- **`collision/CollisionObject.h` is canonical.** `constraint/ConstraintBase.h` is deleted, and constraint includes `../collision/CollisionObject.h`.
+  - The stub GameObject is gone. `GraphicsTest : GameObject` (non-virtual) now owns `char field_0x2c[0x18]`.
+  - `GraphicsTest` no longer declares a slot 10 override: its vtable inherits 0x004693d0.
+  - `sizeof(GraphicsTest) == 0x44` and `sizeof(CollisionObject) == 0xb8` are asserted.
+  - The five non-virtual CollisionObject methods that constraint used (0x004324b0, 0x00432800, 0x00435fb0, 0x00435fe0, 0x00438e70) moved into the canonical header.
+  - Overrides are `GameObjectVirtualSlot10(float)`, `GameObjectVirtualSlot14()` and `GameObjectVirtualSlot23(int,int)`. Constraint's overrides are `GameObjectVirtualSlot8/10/11/14`, and `constraint/targets.json` names them `GameObjectVirtualSlotN@ConstraintMethodCollisionModel`. No collision target named a renamed slot.
+  - `QuadTreeObject::field_0x04/0x08` now share names with `BaseObject::field_0x04` and `GameObject::field_0x08`, so the CollisionObject ctor writes `QuadTreeObject::field_0x08`.
+- **Why `GameObject.h` exists.** `SoultreePhysicsBaseObject.h` pulls in `common/Math3D.h`, and Math3D's four `static const Vec3` constants add dynamic initializers to every TU that includes it. Including it from CollisionObject.h renumbered constraint's TU initializer (`$E1`, 0x0043c8e0) and broke that target. The retail TU has exactly one initializer.
+- **`GameObjectVirtualSlot23(int a, int b)`.** Retail 0x004695d0 is `ret 8`, and CollisionObject overrides it (0x00434970). This is the only placeholder signature changed.
+- **vtable_counts all print `ok`:** CollisionObject 2/27, QuadTreeObject 2, ConstraintMethodCollisionModel 3/27, GameObject 27, SoultreePhysicsBaseObject 40/27, SoultreePhysicsCharacter 43/12/27, KrustyBike 103/12/27.
+- **SoultreePhysicsCharacter slot 40 (0x00503de0) is resolved.** It is `GameObject* (int, int, const char*, void*, int, Vec3, Vec3, Vec3, void*, int, int, int, int, void*, float, int, float, float, int, char, int)`, which is 27 dwords. A compiled definition emits `ret 0x6c` and the retail `this ? vbase : 0` tail. The per-argument evidence is in the header comment.
+
+### Leftover canonical-header disagreements
+
+1. **SoultreePhysicsBaseObject slot 2 (0x00500c50)** is still 26 `int`s. Its arguments 2..10 are three `Vec3` by value: SPC slot 40 forwards them with the struct-copy shape.
+   - The slot 40 body cannot be written readably until slot 2 changes. Both slot-40 targets (0x00503de0 and SoultreePhysicsObject's 0x00503970) remain unimplemented.
+   - SoultreePhysicsObject slot 40 is `ret 0x70`. Its SceneManager caller is at 0x004ed3bf.
+2. **GameObject placeholders.** They are still `void()`, but retail default bodies pop arguments:
+   - `ret 4`: slots 9, 16, 19, 20, 21, 25
+   - `ret 8`: slot 22
+   - `ret 0x14`: slot 24
+   Any future override must fix the placeholder first, as was done for slot 23.
+3. **`collision/ConstraintMethodCollisionModel.{h,cpp}` is a second, minimal declaration of the constraint class.** It covers only primary slot 2 (0x0044d710, which is also a collision target).
+4. **Three vector types.**
+   - `CollisionVec3` (collision/CollisionTypes.h) and `ConVec3` (constraint/ConstraintTypes.h) are the Math3D `Vec3` layout.
+   - They stay separate on purpose: they declare out-of-line operators (to force retail calls), while Math3D defines them inline.
+   - Unifying them needs the Math3D static-initializer issue solved first.
 
 ## General rules
 
