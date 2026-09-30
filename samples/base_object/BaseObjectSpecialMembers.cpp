@@ -13,5 +13,7 @@ protected:
     int refCount;
 };
 
-BaseObject::BaseObject() : refCount(1) {}
+// Assigned in the body: retail stores the vptr before refCount, the order
+// VC6 uses for body assignments (an initializer list stores refCount first).
+BaseObject::BaseObject() { refCount = 1; }
 BaseObject::~BaseObject() {}

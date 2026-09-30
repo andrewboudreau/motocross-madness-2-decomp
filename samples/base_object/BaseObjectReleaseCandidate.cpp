@@ -9,13 +9,15 @@ protected:
     int refCount;
 };
 
+// Single exit: retail returns the loaded count itself when it is already zero
+// (no separate `return 0` path). Exact under VC6 SP3 /O2 without /G6; /G6
+// schedules `push esi` after the zero test instead of before it.
 int BaseObject::Release() {
-    if (refCount != 0) {
-        int remaining = refCount - 1;
-        refCount = remaining;
-        if (remaining == 0)
+    int remaining = refCount;
+    if (remaining) {
+        remaining = --refCount;
+        if (!remaining)
             delete this;
-        return remaining;
     }
-    return 0;
+    return remaining;
 }

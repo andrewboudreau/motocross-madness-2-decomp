@@ -167,11 +167,16 @@ For example, BaseObject has:
 0x00405150    write BaseObject vtable
 ```
 
-The natural source candidate is therefore:
+The source candidate is therefore:
 
 ```cpp
-BaseObject::BaseObject() : refCount(1) {}
+BaseObject::BaseObject() { refCount = 1; }
 BaseObject::~BaseObject() {}
 ```
+
+The assignment is in the body because retail writes the vptr before
+`refCount`; under VC6 SP3 an initializer list `: refCount(1)` emits the two
+stores in the opposite order. The constructor and scalar deleting destructor
+now match exactly under VC6 (see `docs/VC6_MATCHING.md`).
 
 Modern clang does not reproduce VC6's special-member code shape, so those functions are compiler-calibration targets rather than clang smoke tests.

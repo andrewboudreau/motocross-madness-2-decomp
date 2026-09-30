@@ -61,6 +61,57 @@ class CoffObject:
                 off=sec.reloc_ptr+r*10
                 va,si,typ=struct.unpack_from('<IIH',self.data,off)
                 self.relocations.append(CoffRelocation(sec.index,va,si,typ))
+        # Compiler-generated functions (e.g. scalar deleting destructors) have
+        # no auxiliary TotalSize, but /Z7 still emits a CodeView procedure
+        # record with the code length. Use it only where the aux size is absent.
+        # The relocation may target an undefined external entry for the same
+        # name (VC6 does this for ??_G); resolve it to the single definition.
+        defined:dict[str,list[CoffSymbol]]={}
+        for s in self.symbols:
+            if s.section_number>0 and s.type==0x20: defined.setdefault(s.name,[]).append(s)
+        for index,size in self._codeview_proc_sizes().items():
+            s=self.symbol_by_index.get(index)
+            if s is None: continue
+            if s.section_number<=0:
+                matches=defined.get(s.name,[])
+                if len(matches)!=1: continue
+                s=matches[0]
+            if s.function_size is None and s.section_number>0 and s.type==0x20:
+                s.function_size=size
+
+    # CodeView S_LPROC32/S_GPROC32 (32-bit type index) and their CV4 forms
+    # (16-bit type index): record type -> offset of the `off` field after
+    # reclen/rectyp. `len` always follows pParent/pEnd/pNext.
+    _CV_PROC_OFF={0x100a:28,0x100b:28,0x0204:26,0x0205:26}
+    _IMAGE_REL_I386_SECREL=0x000b
+
+    def _codeview_proc_sizes(self)->dict[int,int]:
+        """Map function symbol index -> CodeView procedure length.
+
+        The procedure is tied to its function by the SECREL relocation on the
+        record's `off` field. Conflicting lengths for one symbol are dropped.
+        """
+        sizes:dict[int,int]={}; conflicts:set[int]=set()
+        for sec in self.sections:
+            if not sec.name.startswith('.debug$S'): continue
+            b=self.data[sec.raw_ptr:sec.raw_ptr+sec.raw_size]
+            secrel={r.virtual_address:r.symbol_index for r in self.relocations
+                    if r.section_number==sec.index and r.type==self._IMAGE_REL_I386_SECREL}
+            # Per-object symbol sections start with a CV signature; per-COMDAT ones do not.
+            pos=4 if len(b)>=4 and struct.unpack_from('<I',b,0)[0] in (1,2,4) else 0
+            while pos+4<=len(b):
+                reclen,rectyp=struct.unpack_from('<HH',b,pos)
+                if reclen<2 or pos+2+reclen>len(b): break
+                off_field=self._CV_PROC_OFF.get(rectyp)
+                if off_field is not None and reclen>=2+off_field+4:
+                    length=struct.unpack_from('<I',b,pos+4+12)[0]
+                    index=secrel.get(pos+4+off_field)
+                    if index is not None:
+                        if index in sizes and sizes[index]!=length: conflicts.add(index)
+                        sizes[index]=length
+                pos+=2+reclen
+        for index in conflicts: del sizes[index]
+        return sizes
 
     def _str(self,offset:int)->str:
         pos=self._str_off+offset
