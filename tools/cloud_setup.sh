@@ -18,7 +18,8 @@
 #                               Installed once to $MCM2_PRIVATE_ROOT (default
 #                               ~/.cache/mcm2-private) and symlinked into the checkout,
 #                               so worktrees can share it (run this script in each).
-#   MCM2_PRIVATE_BUNDLE_SHA256  optional override of the pinned bundle hash
+#   MCM2_PRIVATE_BUNDLE_SHA256  optional override of the hash pinned in
+#                               config/private_bundle_expected.json
 #
 # or, separately:
 #
@@ -53,7 +54,7 @@ done
 RETAIL_EXE_SHA256=31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874
 INSTALLER="$ROOT/input/MCM2PCG.exe"
 VC6_ROOT="$ROOT/toolchains/vc6sp3"
-BUNDLE_SHA256="${MCM2_PRIVATE_BUNDLE_SHA256:-ce25eecdb4e0b55020847a32c9bd2b6449dbd82ceb3c83e7b4de8b27cc48b209}"
+BUNDLE_SHA256="${MCM2_PRIVATE_BUNDLE_SHA256:-$(python3 -c 'import json;print(json.load(open("config/private_bundle_expected.json"))["archive_sha256"])')}"
 PRIVATE_ROOT="${MCM2_PRIVATE_ROOT:-$HOME/.cache/mcm2-private}"
 WINEPREFIX="$ROOT/work/wine-vc6"
 export WINEARCH=win32 WINEDEBUG=-all WINEPREFIX PYTHONPATH="$ROOT"
@@ -125,38 +126,25 @@ if command -v wine >/dev/null && [ ! -f "$WINEPREFIX/system.reg" ]; then
 fi
 
 # ------------------------------------------------------------ private bundle --
-if [ -n "${MCM2_PRIVATE_BUNDLE_URL:-}" ] && [ ! -f "$PRIVATE_ROOT/.installed-$BUNDLE_SHA256" ]; then
+# Download with curl (goes through the proxy/CA setup like everything else),
+# then hand the ZIP to the repo's verifying installer, which checks the pinned
+# archive hash, every manifest entry and mcm2.exe, and writes the
+# private-inputs-state.json that tools/with_private_env.py expects.
+MARKER="$PRIVATE_ROOT/private-inputs-state.json"
+if [ -n "${MCM2_PRIVATE_BUNDLE_URL:-}" ] && ! grep -qs "$BUNDLE_SHA256" "$MARKER"; then
   log "fetching private bundle (URL not printed)"
   zip="$PRIVATE_ROOT.download.zip"
   if fetch "$MCM2_PRIVATE_BUNDLE_URL" "$zip" "$BUNDLE_SHA256"; then
-    rm -rf "$PRIVATE_ROOT.tmp" && mkdir -p "$PRIVATE_ROOT.tmp"
-    if unzip -Z1 "$zip" | grep -qvE '^(toolchains/vc6sp3/|work/(game|private-inputs)/)|(^|/)\.\.(/|$)'; then
-      warn "bundle contains unexpected paths; refusing to install"
-    elif unzip -q "$zip" -d "$PRIVATE_ROOT.tmp" && python3 - "$PRIVATE_ROOT.tmp" "$RETAIL_EXE_SHA256" <<'EOF'
-import hashlib, json, sys
-from pathlib import Path
-root, want_exe = Path(sys.argv[1]), sys.argv[2]
-h = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-sums = json.loads((root / 'work/private-inputs/SHA256SUMS.json').read_text())
-bad = [k for k, v in sums.items() if not (root / k).is_file() or h(root / k) != v]
-if h(root / 'work/game/mcm2.exe') != want_exe: bad.append('work/game/mcm2.exe (target hash)')
-if bad: sys.exit('bundle verification failed: ' + ', '.join(bad[:5]))
-print(f'[cloud-setup] bundle verified: {len(sums)} files')
-EOF
-    then
-      rm -rf "$PRIVATE_ROOT" && mv "$PRIVATE_ROOT.tmp" "$PRIVATE_ROOT"
-      touch "$PRIVATE_ROOT/.installed-$BUNDLE_SHA256"
-    else
-      warn "bundle extraction/verification failed"
-    fi
-    rm -rf "$PRIVATE_ROOT.tmp"
+    python3 tools/install_private_bundle.py --archive "$zip" --archive-sha256 "$BUNDLE_SHA256" \
+      --root "$PRIVATE_ROOT" --overwrite >/dev/null \
+      && log "bundle verified and installed" || warn "bundle verification/install failed"
   else
     warn "could not fetch MCM2_PRIVATE_BUNDLE_URL"
   fi
   rm -f "$zip"
 fi
 
-if [ -f "$PRIVATE_ROOT/.installed-$BUNDLE_SHA256" ]; then
+if grep -qs "$BUNDLE_SHA256" "$MARKER"; then
   # Link (never overwrite) the shared install into this checkout/worktree.
   mkdir -p toolchains work
   [ -e toolchains/vc6sp3 ] || ln -s "$PRIVATE_ROOT/toolchains/vc6sp3" toolchains/vc6sp3
