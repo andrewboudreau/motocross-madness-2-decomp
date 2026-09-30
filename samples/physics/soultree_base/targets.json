@@ -42,7 +42,7 @@
     "target_va": "0x005013d0",
     "target_size": 473,
     "expect": "partial",
-    "notes": "69.37% match under vc6_o2_ml; load order of a3/a4 operands"
+    "notes": "69.37% under vc6_o2_ml; the two cross products get different x87 operand order than retail (permuting source order has no effect); minor fld scheduling"
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -60,7 +60,7 @@
     "target_va": "0x0040b410",
     "target_size": 432,
     "expect": "partial",
-    "notes": "35.68% match under vc6_o2_ml; regalloc/scheduling; squared-length reuse"
+    "notes": "65.10% under vc6_o2_ml; retail reads lenSq components via an esi pointer, stores lenSq with fstp then reloads it, and keeps a fst of the FastSqrt result"
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -68,8 +68,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot7@SoultreePhysicsBaseObject",
     "target_va": "0x005019e0",
     "target_size": 485,
-    "expect": "partial",
-    "notes": "74.38% match under vc6_o2_ml; loop regalloc"
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml; uninitialized int last frees a register, contact cached in a local, VecLengthFast sums z*z+(x*x+y*y)"
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -77,8 +77,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot8@SoultreePhysicsBaseObject",
     "target_va": "0x00501bd0",
     "target_size": 76,
-    "expect": "partial",
-    "notes": "51.56% match under vc6_o2_ml; temp copy"
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml; chained assignment field_0x194 = field_0x1a0 = f()"
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -86,8 +86,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot9@SoultreePhysicsBaseObject",
     "target_va": "0x00501ce0",
     "target_size": 187,
-    "expect": "partial",
-    "notes": "46.75% match under vc6_o2_ml; scheduling"
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml; ternary clamp of *steps, if/else on dt"
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -104,8 +104,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot11@SoultreePhysicsBaseObject",
     "target_va": "0x00501da0",
     "target_size": 105,
-    "expect": "partial",
-    "notes": "37.62% match under vc6_o2_ml; arg push order"
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml; Fn_4b0df0 j is unsigned char"
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -123,7 +123,7 @@
     "target_va": "0x00501e90",
     "target_size": 483,
     "expect": "partial",
-    "notes": "25.05% match under vc6_o2_ml; negative-branch temp layout, frame 0x4c vs 0x40"
+    "notes": "25.05% under vc6_o2_ml; negative-branch temp layout, frame 0x4c vs 0x40; tried local temp/declaration variants without gain"
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -159,7 +159,7 @@
     "target_va": "0x00502330",
     "target_size": 239,
     "expect": "partial",
-    "notes": "73.54% match under vc6_o2_ml; regalloc"
+    "notes": "96.41% under vc6_o2_ml; residual x87 operand order in the y term of the normalized sum"
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -303,7 +303,7 @@
     "target_va": "0x004aa210",
     "target_size": 305,
     "expect": "partial",
-    "notes": "9.84% match under vc6_o2_ml; regalloc/temp copy differences (retail keeps vector temps)"
+    "notes": "76.19% under vc6_o2_ml; store interleaving of constants vs field_0xa0/0xac copies still differs"
   },
   {
     "class": "SoultreePhysicsBaseObject",

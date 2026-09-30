@@ -182,9 +182,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot1(float value)
 // slot 8 (0x00501bd0)
 void SoultreePhysicsBaseObject::UnknownVirtualSlot8()
 {
-    SoultreeVec3 t = field_0x08->Fn_4fd7f0(&field_0x18);
-    field_0x1a0 = t;
-    field_0x194 = t;
+    field_0x194 = field_0x1a0 = field_0x08->Fn_4fd7f0(&field_0x18);
 }
 
 // slot 9 (0x00501ce0): fixed-timestep accumulator.
@@ -195,15 +193,15 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot9(float dt, int* steps)
     *steps = n;
     if (n) {
         field_0x1e0 = field_0x144 - n * field_0x1e4;
-        if (*steps > field_0x1ec)
-            *steps = field_0x1ec;
+        *steps = (*steps > field_0x1ec) ? field_0x1ec : *steps;
         field_0x13c = field_0x1e4;
     } else {
         field_0x1e0 = 0.0f;
         if (dt != 0.0f) {
             field_0x13c = field_0x144;
         } else {
-            field_0x13c = field_0x144 = field_0x1e4;
+            field_0x13c = field_0x1e4;
+            field_0x144 = field_0x1e4;
         }
         *steps = 1;
     }
@@ -271,8 +269,7 @@ SoultreeVec3 SoultreePhysicsBaseObject::UnknownVirtualSlot17()
         n++;
     }
     if (n) {
-        float inv = 1.0f / n;
-        return sum * inv;
+        return SoultreeVec3(sum.x * (1.0f / n), sum.y * (1.0f / n), sum.z * (1.0f / n));
     }
     return g_Zero;
 }
@@ -430,7 +427,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(SoultreeVec3* a, float* b)
         return;
     float k = -(field_0x148 * field_0xbc);
     field_0x1ac = field_0x64 * k;
-    float lenSq = SquareMagnitudeAcc(field_0x1ac);
+    float lenSq = field_0x1ac.z * field_0x1ac.z + (field_0x1ac.x * field_0x1ac.x + field_0x1ac.y * field_0x1ac.y);
     if (lenSq == 1.0f) {
         lenSq = 1.0f;
     } else {
@@ -465,7 +462,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(SoultreeVec3* a, float* b)
 // otherwise the table-driven square root at 0x00460b50.
 static inline float VecLengthFast(const SoultreeVec3& v)
 {
-    float s = SquareMagnitudeAcc(v);
+    float s = v.z * v.z + (v.x * v.x + v.y * v.y);
     if (s == 1.0f)
         return 1.0f;
     return FastSqrt(s);
@@ -475,12 +472,12 @@ static inline float VecLengthFast(const SoultreeVec3& v)
 // active contact by 1 - (its distance / summed distance).  Tier 3 reading.
 void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const SoultreeVec3* a)
 {
-    float dist[124];
+    float dist[128];
     int i;
     if (field_0x1d0) {
         float sum = 0.0f;
         int n = 0;
-        int last = 0;
+        int last;
         for (i = 0; i < field_0x130; i++) {
             SoultreeContact* c = field_0x12c[i];
             if (c->field_0xa4) {
@@ -510,8 +507,9 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const SoultreeVec3* a)
         }
     } else {
         for (i = 0; i < field_0x130; i++) {
-            field_0x12c[i]->field_0xa0 = 0.0f;
-            field_0x12c[i]->field_0x44 = g_Zero;
+            SoultreeContact* c = field_0x12c[i];
+            c->field_0xa0 = 0.0f;
+            c->field_0x44 = g_Zero;
         }
     }
 }
@@ -575,16 +573,13 @@ SoultreeVec3* SoultreeScaleVec3(SoultreeVec3* out, const SoultreeVec3* v, float 
 void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
 {
     if (field_0x88.x == 0.0f && field_0x88.z == 0.0f) {
-        float s = (field_0x88.y < 0.0f) ? 1.0f : -1.0f;
-        field_0x88.x = s * field_0x94.x;
-        field_0x88.y = s * field_0x94.y;
-        field_0x88.z = s * field_0x94.z;
+        float s = (field_0x88.y >= 0.0f) ? -1.0f : 1.0f;
+        field_0x88 = s * field_0x94;
     }
     field_0x94 = g_SoultreeVec3_685190;
     field_0x88.y = 0.0f;
     UnknownVirtualSlot35(1, 0);
     UnknownVirtualSlot34();
-    field_0xa0 = field_0x88;
     field_0x2c = 0.0f;
     field_0x30 = 0.0f;
     field_0x38 = 0.0f;
@@ -597,6 +592,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     field_0x58 = 1.0f;
     field_0x60 = 1.0f;
     field_0x5c = 0.0f;
+    field_0xa0 = field_0x88;
     field_0xac = field_0x94;
     field_0x50 = field_0x34;
 }

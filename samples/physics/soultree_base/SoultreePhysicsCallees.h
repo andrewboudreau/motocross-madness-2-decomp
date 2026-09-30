@@ -30,9 +30,9 @@ extern "C++" {
 void Fn_4cb6e0(SoultreeVec3* a, SoultreeVec3* b, SoultreeVec3* c, float d, int e);
 
 class SoultreeBody;
-// 0x004b0df0 (17 args)
+// 0x004b0df0 (17 args); j is an unsigned char (the caller zero-extends it with mov al)
 int Fn_4b0df0(SoultreeBody* a, int b, SoultreeVec3* c, float d, int e, int f, int g, int h,
-              float i, int j, SoultreeVec3* k, int l, int m, SoultreeVec3* n, SoultreeVec3* o,
+              float i, unsigned char j, SoultreeVec3* k, int l, int m, SoultreeVec3* n, SoultreeVec3* o,
               SoultreeVec3* p, int* q);
 }
 
