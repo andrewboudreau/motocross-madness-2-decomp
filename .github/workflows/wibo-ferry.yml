@@ -1,4 +1,4 @@
-name: Temporary public Wibo ferry
+name: Temporary public calibration ferry
 
 on:
   pull_request:
@@ -9,9 +9,12 @@ permissions:
   contents: read
 
 jobs:
-  fetch-wibo:
+  ferry:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - name: Archive exact PR source
+        run: git archive --format=tar.gz HEAD -o source.tar.gz
       - name: Download pinned Wibo 1.2.0
         run: |
           set -euo pipefail
@@ -22,7 +25,9 @@ jobs:
           ./wibo-x86_64 --help >/dev/null
       - uses: actions/upload-artifact@v4
         with:
-          name: wibo-1.2.0-x86_64
-          path: wibo-x86_64
+          name: calibration-public-inputs
+          path: |
+            wibo-x86_64
+            source.tar.gz
           if-no-files-found: error
           retention-days: 1
