@@ -6,7 +6,7 @@
     "target_va": "0x0040c4c0",
     "target_size": 118,
     "expect": "partial",
-    "notes": "slot 34 (override); ~78.1% match: cross product loads/FPU ops correct; VC6 prologue push order and fld scheduling differ | UPDATE: 93.6->78.9% (34) cross product fld order differs"
+    "notes": "78.9% (118/118). Cross of field_0x88 x field_0x94 stored to field_0x4cc; first divergence: fld operand order/prologue of the cross terms (VC6 commutes the multiplicands)."
   },
   {
     "class": "Vehicle",
@@ -15,7 +15,7 @@
     "target_va": "0x0040c540",
     "target_size": 130,
     "expect": "partial",
-    "notes": "slot 35 (override); ~80.2% match: same cause as slot 34 (shape of Vec3 cross temp scheduling) | UPDATE: 93.65%: cross fld operand order differs"
+    "notes": "93.65% (130/130). Same cross as slot 34 after Method_004FC050; first divergence: fld operand order in the cross terms."
   },
   {
     "class": "Vehicle",
@@ -375,7 +375,7 @@
     "target_va": "0x00526fa0",
     "target_size": 1161,
     "expect": "partial",
-    "notes": "slot 7 (override); ~9% byte match (position-shifted): control flow and FPU ops decoded and reproduced (inverse-distance blend of *arg over active contacts/wheels); remaining diff is local layout (retail keeps the share temp at esp+0x10 and the running total at 0x1c, we swap them) and x87 term order of the squared-distance sum"
+    "notes": "8.8% (1155/1161). Inverse-distance blend of *arg over active contacts/wheels. First divergence +0x2a: branch distance (frame 0x214 matches); retail keeps the share temp at esp+0x10 and running total at 0x1c (we swap them) and the x87 term order of the squared-distance sum differs."
   },
   {
     "class": "Vehicle",
@@ -384,7 +384,7 @@
     "target_va": "0x005286a0",
     "target_size": 784,
     "expect": "partial",
-    "notes": "slot 56 (introduced); ~30% byte match: tilt-angle computation fully decoded (project reference normal perpendicular to axis via Dot/ScaleVec/SubVec/Normalize helpers, side = right x axis, angle = asin(min(1,|perp x side|)*sign), cos stored on request); diffs are local stack layout (retail temps at esp+0xc/0x18/0x24) and esi/edi register roles | UPDATE: 32.7%, 782/784B: structure right, esi/edi/ebx/ebp role swap (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac)"
+    "notes": "32.7% (782/784). Tilt angle: project reference normal perpendicular to axis, side = right x axis, angle = asin(min(1,|perp x side|))*sign, cos to field_0x4b0 on request. First divergence: register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac; we swap them); declaration order/locals did not change it."
   },
   {
     "class": "Vehicle",
@@ -393,7 +393,7 @@
     "target_va": "0x005289c0",
     "target_size": 938,
     "expect": "partial",
-    "notes": "slot 58 (introduced); ~22% byte match (esi/edi role swap shifts everything): snaps pose to wheels; control flow matches instruction-for-instruction up to register naming. Retail keeps a dead 'second highest wheel' (edx) alive which flips this/lead-wheel register assignment; we drop it as dead | UPDATE: 99.77% (938/938B): only mov edx,edi ordering at +0xbd differs; ternary abs helper VehAbsT needed"
+    "notes": "99.77% (938/938). Snap pose to wheels. Only divergence: ordering of one mov edx,edi at +0xbd (retail mov edi,ecx; mov edx,edi). Needs ternary abs (VehAbsT); the reordered second=top/top=w form regresses to 23%."
   },
   {
     "class": "Vehicle",
@@ -402,7 +402,7 @@
     "target_va": "0x0052b6d0",
     "target_size": 63,
     "expect": "partial",
-    "notes": "slot 55 (introduced); returns out (eax) - decoded; see match % | UPDATE: 42.6%: retail first copy from global uses edx dword moves with out reload"
+    "notes": "42.6% (59/63). Returns out (eax). First divergence: the copy from the global vec uses edx dword moves and reloads out in retail."
   },
   {
     "class": "Vehicle",
@@ -411,7 +411,7 @@
     "target_va": "0x005281b0",
     "target_size": 539,
     "expect": "partial",
-    "notes": "slot 74 (introduced); ~9% byte match: velocity-deflection decoded (impulse dir*(m^2/-k*dt) scaled by min(1.5c,1) added to velocity, renormalised to old speed, returns signed acos angle; 0 if negligible/non-finite). Diffs: retail keeps k live in x87 and uses esi=dir/edi=this; our register roles and FPU temp order differ"
+    "notes": "8.4% (547/539). Velocity deflection, returns signed acos angle. First divergence +0x4: retail esi=dir(arg) / edi=this, we swap (esi=this); retail keeps k live in x87."
   },
   {
     "class": "Vehicle",
@@ -420,7 +420,7 @@
     "target_va": "0x00527e30",
     "target_size": 831,
     "expect": "partial",
-    "notes": "slot 72 (introduced); ~4% byte match: contact/wheel normal accumulation + slot-74 call decoded (sum of flagged wheels' +0x230 crossed with normal sum gives the push axis). Diffs: retail keeps this in ebx/out in esi and pushes ebp late; our register allocation differs and shifts all bytes"
+    "notes": "4.1% (814/831). Normal accumulation + slot-74 call. First divergence +0x0: frame sub esp,0x2c vs our 0x28 (one extra local); retail keeps this in ebx and out in esi and pushes ebp late, so all later bytes shift."
   },
   {
     "class": "Vehicle",
@@ -429,7 +429,7 @@
     "target_va": "0x529dc0",
     "target_size": 529,
     "expect": "partial",
-    "notes": "Impact post: 3 passes (aux wheels, wheels, contacts) gated by material table; 6.25% (size 528/529). Cause: retail keeps the found wheel/contact loop index/pointer in different regs and emits the common tail once (shared), ours inlines it per pass."
+    "notes": "7.9% (482/529). Impact post over 3 passes (aux wheels, wheels, contacts). First divergence +0x0f: retail places the found-action block right after each loop (loop back-edge is cmp/jge exit/jmp top); we place it after all loops (jl top). Retail also holds constant 1 in edi across the sink call. Shared commit tail is reproduced via goto commit."
   },
   {
     "class": "Vehicle",
@@ -438,7 +438,7 @@
     "target_va": "0x529fe0",
     "target_size": 679,
     "expect": "partial",
-    "notes": "Scrape impact w/ clamped vector into sink+0x74; 8.3% (size 681/679). Cause: retail hoists loop pointers (esi/edi) and shares tail; x87 sign select (-1/1 * w280.z) ordering."
+    "notes": "8.4% (681/679). Scrape impact with clamped vector into sink+0x74. First divergence +0x0: frame 0xc (retail) vs 0x10 and register roles (retail ebp=this, esi=wheel list; we edi=this); retail hoists loop pointers and shares the tail."
   },
   {
     "class": "Vehicle",
@@ -447,7 +447,7 @@
     "target_va": "0x52a290",
     "target_size": 614,
     "expect": "partial",
-    "notes": "Same as 19 without material gate, sink at event+0xc, flag 0x168; 4.5% (size 602/614). Cause: loop/register allocation, tail sharing."
+    "notes": "4.5% (602/614). Slot 19 without material gate, sink at event+0xc, flag 0x168. First divergence +0x3: retail counts up in eax with 'cmp eax,ecx' and compares wheel fields via loaded regs; we cache zero in ebx (cmp mem,ebx)."
   },
   {
     "class": "Vehicle",
@@ -456,7 +456,7 @@
     "target_va": "0x5265d0",
     "target_size": 555,
     "expect": "partial",
-    "notes": "Two lever-arm offsets (a1+a2xa3, a7+a8xa9)*a14 fed to 17-arg cdecl helper 0x5004a0, then |a1| -> field_0xbc, field_0xcc = xform(field_0xd8); 10.8% (size 487/555). Cause: retail stores cross/scale temps via stack int copies and keeps edi/ebp shuffles; arg roles of 5004a0 unknown."
+    "notes": "10.8% (487/555). Two lever-arm offsets (a1+a2xa3, a7+a8xa9)*a14 into helper 0x5004a0, then |a1| -> field_0xbc, field_0xcc = xform(field_0xd8). First divergence +0x3: retail loads a2 into eax and a3 into ecx (cross a3.z*a2.y with regs swapped vs ours); locals go through int stack copies; retail mid-body pushes are in a different order."
   },
   {
     "class": "Vehicle",
@@ -465,7 +465,7 @@
     "target_va": "0x5276d0",
     "target_size": 523,
     "expect": "partial",
-    "notes": "Look-at offset from vehicle pos toward lead wheel / midpoint of two wheels, rotated by xform 4FD710, else field_0x194; 8.3% (size 479/523). Cause: retail routes each branch through stack temps + int copies; register roles differ."
+    "notes": "8.3% (479/523). Look-at offset toward lead wheel / midpoint of two wheels rotated by 4FD710, else field_0x194. First divergence +0x0: retail tests flag in al and has frame 0x24 (ours 0x18, dl): retail keeps d.x on the x87 stack across the midpoint temp and routes vecs through int stack temps."
   },
   {
     "class": "Vehicle",
@@ -474,15 +474,15 @@
     "target_va": "0x52a940",
     "target_size": 3254,
     "expect": "partial",
-    "notes": "Per-frame vehicle step: substep loop (slot9 count, contacts, speed/lean smoothing, wheel-derived transform, basis block refresh); 9.5% (size 3248/3254). Cause: block/stack-temp layout (retail keeps hit/res in ebp, sequences vec copies via int movs) shifts most offsets; structure and call sequence match."
+    "notes": "9.5% (3248/3254). Per-frame step. All 72 calls (vtable slots and direct) match retail in order. First divergence +0x0: frame sub esp,0x104 vs ours 0xb8 (76 bytes of extra retail temps); retail also CSEs constant 0 into ebx (xor ebx,ebx at +0x94), so hit/res sit in ebp and every 0 compare/store uses ebx."
   },
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot38@Vehicle",
     "target_va": "0x5268d0",
-    "target_size": 1472,
+    "target_size": 1578,
     "expect": "partial",
-    "notes": "5.1% (1101/1455 B). Collision-response dispatch on event code (0/1, 0x69, 0x2711 with body -> slot 4; 0x6a/0x3e9 no body -> slot 3). Retail duplicates per-case vector setup and copies vecs via int stack temps; ours is shared/smaller."
+    "notes": "17.0% (1534/1578 with the 106-byte jump index table). Collision-response dispatch as a switch: cases 0/1 (event body), 0x66/0x6a (impact sink), 0x69, 0x2711, 0x3e9, default returns without the tail. First divergence +0x4: retail builds s=(1,1,1) through a struct temp at esp+0x3c and stores it at esp+0x14 (locals E+8); ours lands at E+0x14; hasBody is in ebp/otherVel in ebx in retail, swapped in ours."
   }
 ]

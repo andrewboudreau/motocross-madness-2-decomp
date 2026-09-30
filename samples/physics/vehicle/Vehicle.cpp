@@ -767,8 +767,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
             if (!(v > 1.0f))
                 v = 1.0f;
             ev->field_0x04->Method_004B8D90(w->field_0xd8, v);
-            VehCommitImpact(ev, ev->field_0x04);
-            return;
+            goto commit;
         }
     }
     for (i = 0; i < field_0x544; i++) {
@@ -777,8 +776,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
             (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174])) {
             w->field_0x160 = 1;
             ev->field_0x04->Method_004B8D90(w->field_0xd8, 0.0f);
-            VehCommitImpact(ev, ev->field_0x04);
-            return;
+            goto commit;
         }
     }
     for (i = 0; i < field_0x130; i++) {
@@ -787,10 +785,12 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
             (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + c->field_0xbc])) {
             c->field_0xa8 = 1;
             ev->field_0x04->Method_004B8D90(c->field_0x20, 0.0f);
-            VehCommitImpact(ev, ev->field_0x04);
-            return;
+            goto commit;
         }
     }
+    return;
+commit:
+    VehCommitImpact(ev, ev->field_0x04);
 }
 
 // Slide/scrape impact: like slot 18 but posts a clamped scrape vector (wheel normal-ish frame
@@ -895,6 +895,22 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
     }
 }
 
+static inline VehVec3 VehCrossA(const VehVec3& a, const VehVec3& b)
+{
+    VehVec3 r;
+    r.x = b.z * a.y - b.y * a.z;
+    r.y = b.x * a.z - b.z * a.x;
+    r.z = b.y * a.x - b.x * a.y;
+    return r;
+}
+static inline VehVec3 VehCrossB(const VehVec3& a, const VehVec3& b)
+{
+    VehVec3 r;
+    r.x = a.y * b.z - a.z * b.y;
+    r.y = a.z * b.x - a.x * b.z;
+    r.z = a.x * b.y - a.y * b.x;
+    return r;
+}
 // ---- slot 4 / slot 46 ----
 // Slot 4: builds two lever-arm offsets (a1 + a2 x a3, a7 + a8 x a9), each scaled by a14, and hands
 // them with the frame data to helper 0x5004a0. Afterwards it caches |*a1| in field_0xbc and
@@ -904,12 +920,12 @@ void Vehicle::UnknownVirtualSlot4(const VehVec3* a0, VehVec3* a1, const VehVec3*
                                   const VehVec3* a8, const VehVec3* a9, VehVec3* a10, VehVec3* a11,
                                   int a12, float* a13, float a14)
 {
-    field_0x1ac = ((const VehV3*)a2)->Cross(*a3);
+    field_0x1ac = VehCrossA(*a2, *a3);
     VehVec3 p;
     p.x = (a1->x + field_0x1ac.x) * a14;
     p.y = (field_0x1ac.y + a1->y) * a14;
     p.z = (field_0x1ac.z + a1->z) * a14;
-    field_0x1ac = ((const VehV3*)a8)->Cross(*a9);
+    field_0x1ac = VehCrossB(*a8, *a9);
     VehVec3 q;
     q.x = (field_0x1ac.x + a7->x) * a14;
     q.y = (field_0x1ac.y + a7->y) * a14;
@@ -1213,6 +1229,14 @@ void Vehicle::UnknownVirtualSlot49(float frame)
 // geometry (contact point minus our position, other body's velocity/normal) and hands it to the
 // impulse solver in slot 4 (other body present) or slot 3 (static/no body). Afterwards kills
 // residual creep velocity and, if requested, runs the post-collision update.
+static inline VehVec3 VehOnes()
+{
+    VehVec3 r;
+    r.x = 1.0f;
+    r.y = 1.0f;
+    r.z = 1.0f;
+    return r;
+}
 struct VehicleContactSet {
     char pad_0x00[0xA0];
     VehVec3 field_0xa0;            // contact point
@@ -1225,21 +1249,24 @@ struct VehicleCollisionEvent {     // 'c' argument (provisional)
 
 void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
 {
-    VehVec3 s;                     // scale/mask vector (1,1,1)
-    VehVec3 p;                     // lever vector (1,1,1)
-    VehVec3 v30, v3c, v48;
-    float l10 = 0;                 // the other body's field_0x24 (float) or 0
+    float l10;                     // the other body's field_0x24 (float) or 0
     int l14;
-    int ctx = 0;
+    VehVec3 s;                     // scale/mask vector (1,1,1)
+    VehVec3 p;                     // lever vector
+    VehVec3 v30;
+    VehVec3 v3c;
+    VehVec3 v48;
+    int ctx;
     int hasBody;
     Vehicle* other = 0;
     VehVec3* otherVel = 0;
-    VehVec3* otherAng = 0;
     VehVec3 rel;
 
-    s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
-    p = s;
-    if (b == 0x6a) {
+    s = VehOnes();
+    switch (b) {
+    case 0x66:
+    case 0x6a:
+        s = VehOnes();
         hasBody = 0;
         if (field_0x124 && (((char*)field_0x124)[0x25] & 1)) {
             VehVec3 pos = ((VehicleContactSet*)field_0x128)->field_0xa0;
@@ -1248,39 +1275,52 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
             ((VehicleImpactSink*)field_0x5ac)->field_0x74 = p;
             ((VehicleImpactSink*)field_0x5ac)->field_0x60 = 1;
         }
-    } else if (b == 0x3e9) {
+        break;
+    case 0x3e9:
+        s = VehOnes();
         hasBody = 0;
-    } else if (b == 0 || b == 1) {
-        other = ((VehicleCollisionEvent*)c)->field_0x60;
+        break;
+    case 0:
+    case 1:
         hasBody = 1;
+        other = ((VehicleCollisionEvent*)c)->field_0x60;
         l10 = other->field_0x24;
         otherVel = &other->field_0x64;
-        otherAng = &other->field_0xd8;
-        v3c.x = ((VehicleContactSet*)field_0x128)->field_0xa0.x - other->field_0x18.x;
-        v3c.y = ((VehicleContactSet*)field_0x128)->field_0xa0.y - other->field_0x18.y;
-        v3c.z = ((VehicleContactSet*)field_0x128)->field_0xa0.z - other->field_0x18.z;
-        v48 = other->field_0xcc;
-        v30 = other->field_0xe4;
         ctx = (int)other->d3d_field_0x1a0;
-    } else if (b == 0x69 || b == 0x2711) {
-        other = ((VehicleCollisionEvent*)c)->field_0x60;
+        v3c = VehOffset(((VehicleContactSet*)field_0x128)->field_0xa0, other->field_0x18);
+        v48 = other->field_0xcc;
+        c = &other->field_0xd8;
+        v30 = other->field_0xe4;
+        break;
+    case 0x69:
         hasBody = 1;
+        ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->field_0x60 + 0x34);
         v30 = g_VehZeroVec3; v3c = g_VehZeroVec3; v48 = g_VehZeroVec3;
-        ctx = (b == 0x69) ? *(int*)((char*)other + 0x34) : *(int*)((char*)other + 0x1a0);
-        otherVel = (VehVec3*)((char*)ctx + (b == 0x69 ? 0x40 : 0x224));
         l10 = 0;
-    } else {
-        hasBody = 0;
-        goto tail;
+        p.x = 1.0f; p.y = 1.0f; p.z = 1.0f;
+        s = p;
+        otherVel = (VehVec3*)(ctx + 0x40);
+        c = 0;
+        break;
+    case 0x2711:
+        hasBody = 1;
+        ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->field_0x60 + 0x1a0);
+        v30 = g_VehZeroVec3; v3c = g_VehZeroVec3; v48 = g_VehZeroVec3;
+        l10 = 0;
+        p.x = 1.0f; p.y = 1.0f; p.z = 1.0f;
+        s = p;
+        otherVel = (VehVec3*)(ctx + 0x224);
+        c = 0;
+        break;
+    default:
+        return;
     }
 
-    rel.x = ((VehicleContactSet*)field_0x128)->field_0xa0.x - field_0x18.x;
-    rel.y = ((VehicleContactSet*)field_0x128)->field_0xa0.y - field_0x18.y;
-    rel.z = ((VehicleContactSet*)field_0x128)->field_0xa0.z - field_0x18.z;
+    rel = VehOffset(((VehicleContactSet*)field_0x128)->field_0xa0, field_0x18);
     if (hasBody) {
         l14 = (b == 0x2711 || b == 0x69) ? 0 : (int)otherVel;
         UnknownVirtualSlot4(&((VehicleContactSet*)field_0x128)->field_0xac, &field_0x64, &field_0xcc, &rel, l10, b, ctx,
-                            otherVel, otherAng, &v48, &v3c, &v30, l14, &l10, 1.0f);
+                            otherVel, (VehVec3*)c, &v48, &v3c, &v30, l14, &l10, 1.0f);
         if (other) {
             *((char*)other + 0x10a) = 0;
             float len2 = otherVel->x * otherVel->x + otherVel->y * otherVel->y + otherVel->z * otherVel->z;
