@@ -19,6 +19,12 @@
 // VC6 note (/O2, no /Op): the compiler reassociates float sums, e.g. the source
 // sum a*b + c*d + e*f is emitted as (c*d + e*f) + a*b. Write sums in natural x,y,z
 // order and let the compiler reorder them; do not permute terms to chase bytes.
+// Exception: explicit parentheses do constrain VC6. Vec3Normalize (0x005087b0)
+// needs 'z*z + (x*x + y*y)' to get retail's (x*x + y*y) + z*z. Treat such
+// grouping as evidence of how the source was written, not as term shuffling.
+//
+// Exact byte-match bodies for MatrixZero, IntegrateAdamsBashforth2, QuatDerivative
+// and Vec3Normalize are in Math3D.cpp (samples/physics/common/targets.json).
 #ifndef MCM2_PHYSICS_COMMON_MATH3D_H
 #define MCM2_PHYSICS_COMMON_MATH3D_H
 
@@ -177,6 +183,55 @@ static const Vec3 kVec3Zero(0.0f, 0.0f, 0.0f);
 static const Vec3 kVec3XAxis(1.0f, 0.0f, 0.0f);
 static const Vec3 kVec3YAxis(0.0f, 1.0f, 0.0f);
 static const Vec3 kVec3ZAxis(0.0f, 0.0f, 1.0f);
+
+// ---------------------------------------------------------------------------
+// More out-of-line helpers (added in the third revision; append-only).
+// ---------------------------------------------------------------------------
+
+// 0x005087b0, 150 bytes, __cdecl, hidden result pointer first. Returns v unchanged
+// when |v|^2 == 1.0f exactly. Otherwise returns v * FastInvSqrt(|v|^2)
+// (0x00460c00). Tier 1 arithmetic. The name is tier 3 and was chosen so it does not
+// collide with local helpers in other areas. Body in Math3D.cpp.
+Vec3 Vec3Normalize(const Vec3& v);
+
+// Out-of-line (non-inlined COMDAT) instances of the inline helpers above. These
+// are the same functions, so they get no separate declarations (tier 2, identical
+// decoded bodies):
+//  * 0x00404e60: Vec3::Vec3(float x, float y, float z), __thiscall, ret 0xc.
+//  * 0x00515600: CrossProduct(const Vec3&, const Vec3&), __cdecl, hidden result
+//    pointer first. Its components match the inline formula.
+//
+// 0x0042a1a0: 4x4 matrix product. __cdecl, a destination pointer first, then two
+// Matrix4 BY VALUE (add esp,0x84 at the callers). SoultreeObject 0x004fc050 passes
+// &localMatrix straight in as the destination and does not copy afterwards, so
+// this is modelled as an out-parameter rather than a struct return (tier 2).
+// Operand order and naming are tier 3: out = a * b in the row-vector convention.
+void MatrixMultiply(Matrix4* out, Matrix4 a, Matrix4 b);
+
+// 0x004b5a60, 657 bytes, __cdecl: (Vec3 a, Vec3 b, float* out0 ... ) with seven
+// pointer arguments after the two by-value vectors. It returns at once if any of
+// the first three pointers is null. It derives three angles with the CRT x87
+// intrinsic at 0x00535240 (an _CIacos/_CIasin-style helper, argument in st(0)).
+// The first angle comes from (a.x, a.z) / sqrt(a.x^2 + a.z^2), with a fallback of
+// (1, 0) at zero length. Not reconstructed: the exact pointer roles and the second
+// vector's role are open. The name and parameters are provisional (tier 3).
+void UnknownVectorsToAngles_4b5a60(Vec3 a, Vec3 b, float* out0, float* out1,
+                                   float* out2, float* out3, float* out4,
+                                   float* out5, float* out6);
+
+// 0x004cb6e0, 892 bytes, __cdecl: per-axis settle/clamp of two accumulators.
+// Arguments: (float* a, float* b, const float* c, float dt, unsigned char mask), each
+// pointer being 3 floats. For each axis k (bit 1<<k of mask), when c[k] != 0:
+//   * mask bit clear and a[k] == 0: if b[k] != 0 and sign(b[k]) != sign(c[k]),
+//     then b[k] += c[k] if |b[k]| > |c[k]|, else b[k] = 0. Nothing happens when the
+//     signs are equal or b[k] == 0.
+//   * otherwise, with t = a[k] + dt*b[k] and d = dt*c[k]: b[k] += c[k] when
+//     sign(t) == sign(d), when |t| > |d|, or when t == 0. Otherwise a[k] = b[k] = 0.
+// This reads like a static-friction or stop-at-zero integrator guard. Tier 2
+// arithmetic (decoded from the x axis; y and z repeat it with bits 2 and 4). The
+// name and parameter roles are tier 3.
+void UnknownAxisSettle_4cb6e0(float* a, float* b, const float* c, float dt,
+                              unsigned char mask);
 
 // Scene-graph node helpers (local/world transforms) are SoultreeObject methods;
 // see SoultreeObject.h, which physics code reaches through node pointers.

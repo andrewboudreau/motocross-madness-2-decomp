@@ -83,6 +83,19 @@ public:
     // frame == 0 converts through parent->WorldToLocalPoint when there is a parent.
     void SetPositionIn(SoultreeObject* frame, const Vec3* p);
 
+    // 0x004fc050, 1171 bytes, ret 0x14. The inverse of GetAxesIn. It builds a
+    // rotation whose row 2 is *axisZ and row 1 is *axisY, given in 'frame' space,
+    // and stores it into localMatrix. The local translation (+0xe8..+0xf0) is saved
+    // first and restored afterwards, then InvalidateWorldMatrix (0x004fb850) runs.
+    // With orthogonalize != 0 it forms r = axisZ x axisY. keepZ != 0 recomputes
+    // axisY = axisZ x r; otherwise axisZ = r x axisY. It then normalizes both
+    // (0x005087b0, Vec3Normalize), and row 0 is the cross of the other two
+    // (0x00515600). frame == this stores the rotation as it is; otherwise it goes
+    // through the frame's and the parent's matrices (0x0042a1a0). Tier 2 for data
+    // flow. The names and the role of the last argument are tier 3.
+    void SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const Vec3* axisY,
+                   int orthogonalize, int keepZ);
+
     // ---- layout (offsets tier 1 from the constructor/helpers; names tier 3) ----
     char pad_0x000[0x38];          // QuadTreeObject vptr (+0), GameObject vptr (+12)...
     char name[0x80];               // 0x038, compared by FindByName (size unknown)
