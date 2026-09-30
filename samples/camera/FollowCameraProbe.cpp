@@ -85,8 +85,11 @@ void FollowCamera::UnknownVirtualSlot67() {
 // MSVC uses a hidden return buffer and returns that buffer in EAX; retail then
 // copies three dwords into this+0x2A8 and passes the cache to virtual slot 43.
 void FollowCamera::UnknownVirtualSlot69() {
+    // Retail keeps the cache address live across the hidden-return-buffer
+    // virtual call (EDI in the observed body), then reuses it for slot 43.
+    CameraValue12* cached = reinterpret_cast<CameraValue12*>(
+        reinterpret_cast<char*>(this) + 0x2A8);
     CameraValue12 value = UnknownVirtualSlot57(0);
-    CameraValue12* cached = reinterpret_cast<CameraValue12*>(reinterpret_cast<char*>(this) + 0x2A8);
     *cached = value;
     UnknownVirtualSlot43(*cached);
 }
@@ -147,12 +150,15 @@ void FollowCamera::UnknownVirtualSlot71(int value) {
             break;
     }
 
-    *reinterpret_cast<int*>(p + 0x2C4) =
-        *reinterpret_cast<int*>(p + 0x220);
-    *reinterpret_cast<int*>(p + 0x2C8) =
-        *reinterpret_cast<int*>(p + 0x22C);
-    *reinterpret_cast<int*>(p + 0x2CC) =
-        *reinterpret_cast<int*>(p + 0x234);
+    // Retail loads all three source values before beginning the snapshot
+    // stores. Keeping the values explicit also avoids relying on scheduler
+    // reordering of three independent raw-offset assignments.
+    int value220 = *reinterpret_cast<int*>(p + 0x220);
+    int value22C = *reinterpret_cast<int*>(p + 0x22C);
+    int value234 = *reinterpret_cast<int*>(p + 0x234);
+    *reinterpret_cast<int*>(p + 0x2C4) = value220;
+    *reinterpret_cast<int*>(p + 0x2C8) = value22C;
+    *reinterpret_cast<int*>(p + 0x2CC) = value234;
 
     v61();
 }

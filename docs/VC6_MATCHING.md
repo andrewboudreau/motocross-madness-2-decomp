@@ -45,9 +45,28 @@ RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 ## Next targets
 
 [FollowCamera](FOLLOW_CAMERA.md) slots 69 (`0x00466a80`) and 71 (`0x00466e50`)
-remain nonmatching under all tested profiles. Slots 63/70, UIStatic slot 30 and
-UIMultiState slots 34–37 match the default. UIControl slots 61/62 and FollowCamera
-slot 72 additionally match without `/G6`.
+remain the two nonmatching cases in the last executed best-profile matrix. The
+published counts above therefore remain **14/16** until authentic VC6 is rerun.
+
+The next rerun is now better constrained. Slot 69's candidate computes the
+`this+0x2a8` cache address before the hidden-return-buffer virtual call, matching
+the retail lifetime that keeps this address live across that call. Slot 71 now
+uses its independently measured **192-byte compiler extent**: 171 bytes through
+the RET, one alignment NOP, and the five-entry absolute switch table at
+`0x00466efc..0x00466f0f`; the next routine begins at `0x00466f10`. The old
+171-byte target incorrectly omitted compiler-owned table bytes.
+
+Strict matching can now resolve a COFF relocation without an external binding
+only when the relocation symbol is in the selected function's section **and its
+final S+A address falls inside that independently measured function extent**.
+This is intended for compiler-emitted switch tables. Same-section references
+outside the function and all external references still fail closed unless they
+have explicit reviewed bindings. These changes are calibration preparation, not
+a claim that either slot has newly matched.
+
+Slots 63/70, UIStatic slot 30 and UIMultiState slots 34–37 match the default.
+UIControl slots 61/62 and FollowCamera slot 72 additionally match without
+`/G6`.
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
@@ -67,9 +86,13 @@ original flag. Format references: [PE/COFF](https://learn.microsoft.com/en-us/wi
 and [CodeView](https://github.com/microsoft/microsoft-pdb/blob/master/include/cvinfo.h).
 
 `tools/match.py --bindings` applies DIR32/REL32 relocations and compares every byte.
-Bindings require independent address evidence. Without bindings the tool masks
-relocation fields; that is strict only when no bytes were masked. Unsupported or
-unresolved relocations fail strict matching.
+Bindings require independent address evidence. `tools/match.py --strict` also
+allows only provably same-function internal relocations: the relocation's
+section must match the selected function and its final S+A target must lie
+inside the independently measured candidate extent. This supports switch tables
+without manufacturing external addresses. Without either option the tool keeps
+legacy relocation-masked diagnostics; they are strict only when no bytes were
+masked. Unsupported or unresolved relocations fail strict matching.
 
 ## Reproduce
 

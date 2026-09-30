@@ -105,6 +105,7 @@ CASES = [
     },
     {
         'name': 'FollowCamera::slot69 cached 12-byte aggregate',
+        'strict': True,
         'source': 'samples/camera/FollowCameraProbe.cpp',
         'symbol': 'UnknownVirtualSlot69@FollowCamera',
         'target_va': '0x00466a80',
@@ -121,11 +122,12 @@ CASES = [
     },
     {
         'name': 'FollowCamera::slot71 state dispatcher',
+        'strict': True,
         'source': 'samples/camera/FollowCameraProbe.cpp',
         'symbol': 'UnknownVirtualSlot71@FollowCamera',
         'target_va': '0x00466e50',
-        'target_size': 171,
-        'reason': 'state 0-4 virtual dispatch plus camera-preset snapshot is strongly reconstructed; clang /GS- emits 151 bytes with different VC6-era switch/register scheduling',
+        'target_size': 192,
+        'reason': '171 instruction bytes are followed by one alignment NOP and a five-entry switch table before the next routine at 0x00466f10; strict matching resolves only those same-function relocations',
     },
     {
         'name': 'FollowCamera::slot72 cyclic state-list advance',
@@ -158,6 +160,7 @@ def main():
                 rows.append({**c,'compile_error':cr.stdout}); continue
             match_cmd=[sys.executable,'tools/match.py','--exe',args.exe,'--target-va',c['target_va'],'--target-size',str(c['target_size']),'--obj',str(obj),'--symbol',c['symbol'],'--json']
             if c.get('bindings'): match_cmd += ['--bindings',c['bindings']]
+            if c.get('strict'): match_cmd += ['--strict']
             mr=subprocess.run(match_cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
             try: result=json.loads(mr.stdout)
             except Exception: result={'match_error':mr.stdout}
