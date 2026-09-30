@@ -73,7 +73,7 @@ void CollisionPoint::Fn_0043a640(const CollisionVec3* a1, const CollisionVec3* a
 {
     field_0x38 = field_0x14 - *a1;
 
-    float s = CollisionDot(field_0x2c, *a2);
+    float s = field_0x2c.y * a2->y + field_0x2c.x * a2->x + field_0x2c.z * a2->z;
     CollisionVec3 u = field_0x2c * s;
     CollisionVec3 c = CollisionCross(u, *a4);
 

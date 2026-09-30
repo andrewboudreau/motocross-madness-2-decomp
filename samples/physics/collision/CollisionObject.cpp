@@ -3,11 +3,20 @@
 //     contact from position delta, separating direction and tangent frame via
 //     cross products; normalizes (0x5087b0), computes penetration/length, and
 //     registers points with AddCollisionPoint (0x43a330).
-//   0x43aa30 reduces the contact manifold; 0x43ad80 finalizes contacts.
+//   0x43aa30 merges the penetrating contacts (mean position, summed+normalised normal,
+//     deepest penetration, response terms); 0x43ad80 refreshes contacts (CollisionContactUpdate.cpp).
 //   Broadphase helpers: SphereContainsPointXZ (0x43a1e0, point-in-circle in XZ),
 //     BoundingSpheresOverlap (0x43a270). Vector helpers: CollisionRejectFrom
 //     (0x43b190, a - proj_b a), CollisionLength (0x435ec0), CollisionDivide (0x43c890).
-//   0x436100-0x436e50 and 0x4376f0-0x4389b0 are narrow-phase shape tests; not yet decoded.
+//   Narrow phase (CollisionShapeTests.cpp, tier 3 names; shape type = field_0x50:
+//     0 hull/oriented box, 1 model = array of hulls, 2 static mesh, 3 capsule, 4 sphere):
+//     TestAgainst 0x436430 filters and picks TestHull/Model/MeshAgainst (0x438b90/0x438c10/0x438c90);
+//     the first two jump-table into HullVs{Hull 0x436720, Model 0x436e50, Capsule 0x437aa0,
+//     Sphere 0x4379c0} and ModelVs{Hull 0x437c20, Model 0x438280, Capsule 0x4389b0, Sphere 0x438860};
+//     swept variants 0x436af0 / 0x4376f0 / 0x437ef0 / 0x438550 are chosen by the hull swept flag.
+//     Hull tests bring the query into the other body's frame, call the box test 0x428950
+//     (or 0x429570/0x429890 for sphere/capsule), average contacts and transform them back.
+//     GetWorldBounds 0x436100 is an Arvo transformed AABB.
 //   CollisionObject owns shapes (ctor 0x431e70, FreeShape 0x432430).
 
 #include "CollisionObject.h"

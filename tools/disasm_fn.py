@@ -156,6 +156,9 @@ def main() -> int:
     if a.json:
         print(json.dumps({
             'va': f'0x{va:08x}', 'size': size, 'table_end': f'0x{table_end:08x}',
+            # VC6 emits switch tables inline after the code; a COFF symbol extent covers them,
+            # so compare jump-table functions with this size rather than 'size'.
+            'extent_with_tables': table_end - va,
             'padding_after': npad, 'next_candidate_start': f'0x{end + npad:08x}',
             'vtable_slots': slots.get(va, []),
             'jump_tables': [{'va': f'0x{t:08x}', 'entries': [f'0x{x:08x}' for x in e]} for t, e in tables],

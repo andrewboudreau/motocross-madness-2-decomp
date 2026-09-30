@@ -20,6 +20,9 @@
 #include "CollisionTypes.h"
 
 class CollisionModelSource;   // scene-graph node source used by shape setup 0x004324b0
+struct CollisionHullBody;      // CollisionShapeTests.h
+struct CollisionModelBody;
+struct CollisionSweepQuery;
 
 // Provisional stub of BaseObject/GameObject: 27 virtual slots, exactly the vtable
 // shape read from the GraphicsTest vtable 0x00553de4.  Signatures are tier 3
@@ -129,6 +132,27 @@ public:
     void Fn_00432120(int a);                                 // 0x00432120
     void SetSphereShape(CollisionVec3 center, float radius); // 0x004329a0 (type 4)
     void SetCapsuleShape(CollisionVec3 p0, CollisionVec3 p1, float radius);  // 0x00432a20 (type 3)
+
+    // Narrow phase (CollisionShapeTests.cpp, names tier 3).  These are thiscall members that
+    // mostly ignore `this`: the 0x00438b90 dispatchers forward ecx unchanged down the chain.
+    void GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMax);   // 0x00436100
+    int TestAgainst(CollisionObject* other);                             // 0x00436430
+    int HullVsHull(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q);        // 0x00436720
+    int HullVsHullSwept(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q);   // 0x00436af0
+    int HullVsModel(CollisionHullBody* a, CollisionModelBody* b, CollisionSweepQuery* q);      // 0x00436e50
+    int HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* b, CollisionSweepQuery* q); // 0x004376f0
+    int HullVsSphere(CollisionHullBody* hull, CollisionSphereShape* sphere);                   // 0x004379c0
+    int HullVsCapsule(CollisionHullBody* hull, CollisionCapsuleShape* capsule);                // 0x00437aa0
+    int ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, CollisionSweepQuery* q);      // 0x00437c20
+    int ModelVsHullSwept(CollisionModelBody* a, CollisionHullBody* b, CollisionSweepQuery* q); // 0x00437ef0
+    int ModelVsModel(CollisionModelBody* a, CollisionModelBody* b, CollisionSweepQuery* q);    // 0x00438280
+    int ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody* b, CollisionSweepQuery* q); // 0x00438550
+    int ModelVsSphere(CollisionModelBody* model, CollisionSphereShape* sphere);                // 0x00438860
+    int ModelVsCapsule(CollisionModelBody* model, CollisionCapsuleShape* capsule);             // 0x004389b0
+    int TestHullAgainst(CollisionObject* other);                         // 0x00438b90 (this is type 0)
+    int TestModelAgainst(CollisionObject* other);                        // 0x00438c10 (this is type 1)
+    int Fn_004392c0(CollisionObject* other);                             // 0x004392c0 (bounds test used by TestMeshAgainst)
+    int TestMeshAgainst(CollisionObject* other);                         // 0x00438c90 (this is type 2)
 
     int field_0x50;                             // shape type 0..4
     void* field_0x54;                           // shape payload (see shape structs)
