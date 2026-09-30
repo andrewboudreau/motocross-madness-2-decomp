@@ -19,7 +19,7 @@ int OrientationAnglesFromVectors(Vec3 a, Vec3 b, float* yaw, float* pitch, float
 
     // Heading of a in the x/z plane: (cos, sin) = (a.z, a.x) / |(a.z, a.x)|.
     float c, s;
-    float len = (float)sqrt(a.z * a.z + a.x * a.x);
+    float len = (float)sqrt(a.x * a.x + a.z * a.z);
     if (len == 0.0f) {
         c = 1.0f;
         s = 0.0f;

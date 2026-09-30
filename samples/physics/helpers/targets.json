@@ -303,6 +303,6 @@
     "target_va": "0x4b5a60",
     "target_size": 657,
     "expect": "partial",
-    "notes": "partial 95.7%: provisional semantics; remaining diffs in fmul operand order/temp slots in the pitch/roll rotation."
+    "notes": "partial 97.1%: provisional semantics; sqrt(a.x*a.x+a.z*a.z) order fixed. Remaining: fmul operand order in the b rotation sums (source term order has no effect) and one extra live FPU stack value before the pitch sqrt."
   }
 ]
