@@ -5,19 +5,18 @@
 #include <stdlib.h>
 #include "KrustyBike.h"
 
-// Provisional: identity on a float.  Passing a member straight to a float parameter makes
-// VC6 push the raw dword; retail instead loads the value on the FPU (fld / fstp [esp]),
-// which is what a float-returning inline (an accessor) produces.
-// KbFloat: identity inline. Forces the fld/fstp [esp] argument pattern retail shows; the original
-// likely used inline float getters on the owning class (Provisional, tier 3).
+// KbFloat: identity inline standing in for the original inline float getters (tier 3).
+// Passing a member straight to a float parameter makes VC6 push the raw dword; retail
+// instead loads the value on the FPU (fld / fstp [esp]), which is what a float-returning
+// accessor produces.  Used at two call sites only.
 static inline float KbFloat(float v) { return v; }
 
-// Provisional: square root with an exact-one shortcut (slot 14 tail; retail returns the
-// pooled 1.0f through the FPU, which a plain member store of 1.0f does not reproduce).
 // Provisional: rand() scaled to [0,1) (1/32768); kept as a float-returning inline so the
 // later scale factor is not constant-folded into it (a plain return folds; the local does not).
 static inline float KbRandUnit() { float r = rand() * (1.0f / 32768.0f); return r; }
 
+// Provisional: square root with an exact-one shortcut (slot 14 tail; retail returns the
+// pooled 1.0f through the FPU, which a plain member store of 1.0f does not reproduce).
 static inline float KbLength(const KbVec3& v)
 {
     float d = v.x * v.x;   // accumulated term by term: a one-line sum loads in a different order

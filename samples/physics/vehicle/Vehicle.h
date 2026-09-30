@@ -69,7 +69,7 @@ extern void __cdecl VehSlot4Helper(float a, const VehVec3* b, float c, VehicleXf
                                    VehVec3* j, int k, float* l);
 struct VehicleContact;
 // 0x0043ad80 / 0x0043aa30 / 0x0043aff0: contact-array helpers used by slot 49 (provisional).
-extern int  __cdecl VehContactsA(int a, int* count, int n, VehicleContact** arr, int b, VehVec3* pos, int c, float d);
+extern int  __cdecl VehContactsA(int a, int* count, int n, VehicleContact** arr, SoultreeProbe* b, VehVec3* pos, int c, float d);
 extern void __cdecl VehContactsB(int n, VehicleContact** arr, VehVec3* scale, VehVec3* p, VehVec3* v,
                                  VehVec3* pos18, VehVec3* pos0c, VehVec3* o1, VehVec3* o2, VehVec3* o3);
 extern void __cdecl VehContactsC(int n, VehicleContact** arr);
@@ -255,7 +255,7 @@ public:
     // 0x0052a940 forwards its argument unchanged to slots 9 (float dt), 39, 64 and 65,
     // so it and they take the float time step (tier 2).
     virtual void UnknownVirtualSlot49(float dt);
-    virtual void UnknownVirtualSlot50(int a, int b, int c);
+    virtual void UnknownVirtualSlot50(int a, float b, int c);
     virtual int UnknownVirtualSlot51();
     virtual int UnknownVirtualSlot52();
     virtual float UnknownVirtualSlot53();
@@ -375,7 +375,7 @@ public:
     float field_0x4e8;
     float field_0x4ec;
     int field_0x4f0;
-    int field_0x4f4;
+    float field_0x4f4;   // tier 2: countdown; slot 49 tests > 0 and subtracts field_0x13c (frame dt), slot 50 stores it
     VehicleAxis* field_0x4f8;
     VehicleAxis* field_0x4fc;
     VehicleAxis* field_0x500;

@@ -1,7 +1,6 @@
-// Shared types (now from ../common/Math3D.h). for the SoultreePhysicsBaseObject reconstruction.
-// Replace with ../common/Math3D.h when the shared math header lands.
-// Tier 3: names are invented; only the 12-byte {x,y,z} float layout is
-// confirmed (3 dword moves for copies, fld/fmul at +0/+4/+8).
+// Shared types for the SoultreePhysicsBaseObject reconstruction; Vec3 comes from
+// ../common/Math3D.h.  Tier 3: names are invented; only the 12-byte {x,y,z} float
+// layout is confirmed (3 dword moves for copies, fld/fmul at +0/+4/+8).
 #ifndef SOULTREE_PHYSICS_TYPES_H
 #define SOULTREE_PHYSICS_TYPES_H
 

@@ -186,7 +186,11 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot8()
     field_0x194 = field_0x1a0 = field_0x08->Fn_4fd7f0(&field_0x18);
 }
 
-// slot 9 (0x00501ce0): fixed-timestep accumulator.
+// slot 9 (0x00501ce0): fixed-timestep accumulator (tier 3 reading; the arithmetic is decoded).
+// field_0x1e4 is the fixed step, field_0x1e0 the carried remainder, field_0x1ec the cap on
+// steps per frame.  steps = floor((dt + remainder) / step), remainder' = leftover time; when
+// less than one step has elapsed the frame runs as a single variable-length step of dt (or
+// of one nominal step when dt is 0).  field_0x13c = step length used, field_0x140 = 1/step.
 void SoultreePhysicsBaseObject::UnknownVirtualSlot9(float dt, int* steps)
 {
     field_0x144 = dt + field_0x1e0;
@@ -422,6 +426,10 @@ int SoultreePhysicsBaseObject::UnknownVirtualSlot39(float dt)
 // slot 6 (0x0040b410): shared with Vehicle/Character (same address).  Applies a drag-like
 // correction along field_0x64 limited by the amount in *b.  Semantic reading is tier 3;
 // note that the retail code compares and divides by the SQUARED length (see below).
+// Reading: v = -(k * speed) * dir is a velocity-proportional (linear drag) vector.  The
+// amount applied is clamped by a budget (num/den scaled by the available time t, num/den
+// being a mass over the step) - if the drag exceeds the budget it is scaled down, otherwise it
+// is applied whole and the budget is charged for what was used.  The result accumulates into *a.
 void SoultreePhysicsBaseObject::UnknownVirtualSlot6(SoultreeVec3* a, float* b)
 {
     if (field_0xb8 <= 0.001f)
@@ -471,6 +479,8 @@ static inline float VecLengthFast(const SoultreeVec3& v)
 
 // slot 7 (0x005019e0): distributes the vector *a over the contacts, weighting each
 // active contact by 1 - (its distance / summed distance).  Tier 3 reading.
+// This is an inverse-distance weighting: contacts closer to the body position get the larger
+// share (a lone active contact gets the whole vector, weight 1).  Vehicle slot 7 is a near copy.
 void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const SoultreeVec3* a)
 {
     float dist[128];
@@ -690,13 +700,6 @@ struct SoultreeHeldObject {        // entries of the list above
     SoultreeVec3 field_0x64;
     float field_0x70, field_0x74, field_0x78;
 };
-struct SoultreeProbe {             // field_0x1f4 (also read by slots 2/11)
-    char pad_0x00[0x40];
-    float field_0x40;              // copied to field_0x1f8 by slot 2
-    // thiscall, callee pops 6 args
-    int Fn_506e90(const SoultreeVec3* from, const SoultreeVec3* to, SoultreeVec3* out, int a, int b,
-                  int c);
-};
 struct SoultreePadObject {         // attachment field_0x08 / field_0x0c targets: only +0x60 is written
     char pad_0x00[0x60];
     int field_0x60;
@@ -725,7 +728,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
 {
     if (!field_0x1dc)
         return;
-    if (!field_0x124 || !(((char*)field_0x124)[0x25] & 1))
+    if (!field_0x124 || !(field_0x124->field_0x25 & 1))
         return;
     if (!field_0x200) {
         SoultreeNodeList* list = *(SoultreeNodeList**)((char*)field_0x08 + 0x1bc);
@@ -739,7 +742,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
         int hit;
         SoultreeVec3 pos = UnknownVirtualSlot17();
         pos.y += 1.5f;
-        SoultreeHeldObject* h = (SoultreeHeldObject*)field_0x200;
+        SoultreeHeldObject* h = field_0x200;
         SoultreeVec3 out;
         SoultreeVec3 to;
         const SoultreeVec3* dir;
@@ -750,7 +753,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
         } else {
             dir = &h->field_0x64;
         }
-        hit = ((SoultreeProbe*)field_0x1f4)->Fn_506e90(&pos, dir, &out, 0, 0, 0);
+        hit = field_0x1f4->Fn_506e90(&pos, dir, &out, 0, 0, 0);
         if (hit != (unsigned char)field_0x1fc) {
             for (int i = 0; i < field_0x1dc; i++) {
                 SoultreeAttachment* a = &field_0x1d4[i];
@@ -870,8 +873,8 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Soult
                                                            int a20)
 {
     field_0x210 = a18;
-    field_0x124 = a7;
-    field_0x1f4 = (int)a6;
+    field_0x124 = (GameObject*)a7;
+    field_0x1f4 = (SoultreeProbe*)a6;
     field_0x150 = a8;
     field_0x1f0 = a11;
     field_0x1e4 = a12;
@@ -910,7 +913,10 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Soult
     SoultreeVec3 center;
     field_0x08->Fn_4fe850(&center, &extents);
     float ident[9] = { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
-    SoultreeVec3* inertia = &field_0xf0;   // inverse inertia diagonal (tier 3)
+    // Inverse inertia diagonal (tier 3 names; the formulas are decoded).  Sphere mode
+    // (a17 == 1): I = 0.4 * m * r^2 (solid sphere), stored as 1/I on all three axes.  Otherwise a
+    // solid box of full sizes (sx,sy,sz) = 2 * extents: I_x = m/12 * (sy^2 + sz^2), etc.
+    SoultreeVec3* inertia = &field_0xf0;   // always non-null; the test only steers codegen
     if (inertia) {
         if (a17 == 1) {
             float inv = 1.0f / (0.4f * field_0x158 * (a16 * a16));

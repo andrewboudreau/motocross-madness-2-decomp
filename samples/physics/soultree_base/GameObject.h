@@ -65,7 +65,10 @@ public:
 
     char field_0x08[0x10];
     void* field_0x18;                   // written by slot 8 (0x004692f0)
-    char field_0x1c[0x10];              // GameObject ends at 0x2c (ctor 0x00468ca0 extent)
+    char field_0x1c[9];
+    unsigned char field_0x25;           // bit 0 tested by SoultreePhysicsBaseObject slot 21 and Vehicle
+                                        // slot 38 through field_0x124 (tier 3: "enabled" flag)
+    char field_0x26[6];                 // GameObject ends at 0x2c (ctor 0x00468ca0 extent)
 };
 
 #endif

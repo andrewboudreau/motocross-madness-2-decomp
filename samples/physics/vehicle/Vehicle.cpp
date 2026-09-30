@@ -84,7 +84,7 @@ int Vehicle::UnknownVirtualSlot42()
     return field_0x444 == 0 && field_0x433 >= 0 && field_0x430;
 }
 
-void Vehicle::UnknownVirtualSlot50(int a, int b, int c)
+void Vehicle::UnknownVirtualSlot50(int a, float b, int c)
 {
     field_0x4f0 = a;
     field_0x4f4 = b;
@@ -184,6 +184,10 @@ void Vehicle::UnknownVirtualSlot67()
 }
 
 // Reads a float through the input map's value source (written back into the argument slot).
+// Tier 2: retail tests the argument as an int (callers pass a bool/flag) and then reuses
+// that same stack slot as the float out-buffer.  Retyping it as float (tried) changes the
+// test to an FPU compare and the callers' pushes, and loses the exact match of slots
+// 77-83, so it stays int with the (float*)&arg pun.
 int Vehicle::UnknownVirtualSlot77(int arg)
 {
     if (arg && field_0x468->field_0x0c
@@ -407,9 +411,9 @@ void Vehicle::UnknownVirtualSlot7(const VehVec3* arg)
                 active--;
                 c->field_0xa0 = w;
                 share.x = arg->x * w;
- share.y = arg->y * w;
- share.z = arg->z * w;
- c->field_0x44 = share;
+                share.y = arg->y * w;
+                share.z = arg->z * w;
+                c->field_0x44 = share;
             }
         }
         return;
@@ -419,9 +423,9 @@ void Vehicle::UnknownVirtualSlot7(const VehVec3* arg)
             field_0x53c[i]->field_0x158 = field_0x53c[i]->field_0x294;
             float w = field_0x53c[i]->field_0x158;
             share.x = arg->x * w;
- share.y = arg->y * w;
- share.z = arg->z * w;
- field_0x53c[i]->field_0xfc = share;
+            share.y = arg->y * w;
+            share.z = arg->z * w;
+            field_0x53c[i]->field_0xfc = share;
         }
         return;
     }
@@ -443,9 +447,9 @@ void Vehicle::UnknownVirtualSlot7(const VehVec3* arg)
                 float k = 1.0f - dist[i] / total;
                 w->field_0x158 = k;
                 share.x = arg->x * k;
- share.y = arg->y * k;
- share.z = arg->z * k;
- w->field_0xfc = share;
+                share.y = arg->y * k;
+                share.z = arg->z * k;
+                w->field_0xfc = share;
             }
         }
     } else if (field_0x4a8 == 1) {
@@ -621,6 +625,10 @@ static inline VehVec3 VehNormalized(const VehVec3& v)
     return r;
 }
 
+// Tier 3 reading: an impulse-style velocity deflection.  k is an effective-mass term along dir,
+// r = -m^2/k * dt is the impulse magnitude, and the deflected velocity is v' = v + min(1.5c,1) * r * dir,
+// rescaled to keep the old speed (a pure turn); the returned value is the signed angle between
+// v and v' (acos of the normalised dot product).
 // Deflects the velocity (field_0x64) by an impulse applied at `point` along `dir` (tier 3).
 // k = slot73(effective mass/stiffness) * d; the change is dir * (-(m*m)/k * dt) scaled by
 // min(1.5*c, 1); the new velocity is renormalised to the old speed (field_0xbc) and the signed
@@ -674,6 +682,9 @@ float Vehicle::UnknownVirtualSlot74(VehVec3* point, VehVec3* dir, float c, float
     return -sign;
 }
 
+// Tier 3 reading: accumulates per-wheel ground normals and suspension loads into one
+// support normal and a lean/steer response (via slot 74).  Wheels are averaged, so more than
+// one contact normalises the sum.
 // Sums the contact normals (and, for wheels with field_0x1c0 set, their +0x230 vectors) of the
 // wheels and pushes the vehicle along the resulting cross direction (tier 3). *out receives the
 // summed normal (normalised when more than one contact); field_0x4b8/0x43c receive the result
@@ -767,7 +778,8 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
             if (!(v > 1.0f))
                 v = 1.0f;
             ev->field_0x04->Method_004B8D90(w->field_0xd8, v);
-            goto commit;
+            VehCommitImpact(ev, ev->field_0x04);
+            return;
         }
     }
     for (i = 0; i < field_0x544; i++) {
@@ -776,7 +788,8 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
             (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174])) {
             w->field_0x160 = 1;
             ev->field_0x04->Method_004B8D90(w->field_0xd8, 0.0f);
-            goto commit;
+            VehCommitImpact(ev, ev->field_0x04);
+            return;
         }
     }
     for (i = 0; i < field_0x130; i++) {
@@ -785,12 +798,10 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
             (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + c->field_0xbc])) {
             c->field_0xa8 = 1;
             ev->field_0x04->Method_004B8D90(c->field_0x20, 0.0f);
-            goto commit;
+            VehCommitImpact(ev, ev->field_0x04);
+            return;
         }
     }
-    return;
-commit:
-    VehCommitImpact(ev, ev->field_0x04);
 }
 
 // Slide/scrape impact: like slot 18 but posts a clamped scrape vector (wheel normal-ish frame
@@ -961,8 +972,10 @@ VehVec3* Vehicle::UnknownVirtualSlot46(VehVec3* out, float arg)
             VehicleWheel* b = field_0x548;
             if (!a->field_0x2a8) {
                 a = field_0x548;
-                if (!a->field_0x2a8)
-                    goto done;
+                if (!a->field_0x2a8) {
+                    *out = *src;
+                    return out;
+                }
                 b = field_0x54c;
             } else {
                 b = field_0x548;
@@ -987,15 +1000,31 @@ VehVec3* Vehicle::UnknownVirtualSlot46(VehVec3* out, float arg)
         }
         src = ((VehicleXform*)d3d_field_0x1a0)->Method_004FD710(&t, &field_0x1ac);
     }
-done:
     *out = *src;
     return out;
 }
 
 // ---- slot 49: per-frame vehicle step ----
+// Slot 49 is the per-frame step of the vehicle (tier 3 phase names, from the slot calls):
+//   A. setup      - slot 9 fixed-timestep accumulator gives the substep count; slots 30/64/60/65
+//                   refresh per-frame inputs; an initial contact query (VehContactsA) when more
+//                   than one substep is pending.
+//   B. per substep, in order:
+//        1. input/state  - decay the speed-state timer, poll slots 80-82 (input flags), and
+//                          the field_0x4f4 countdown (slot 50 clears it);
+//        2. ground query - contact query, then slots 8/6/7 (position sample, drag, weighting
+//                          of contact reactions) and slots 71/72/86 (support normal, wheel loads);
+//        3. dynamics     - slots 13/14 (force/torque accumulation), Methods 00527A20/005293E0/
+//                          00529450/00529C20 (wheel forces), VehSmooth (exponential smoothers);
+//        4. integrate    - slots 26/48/85/87-95 (integration, lean/pose), write the position
+//                          back into the transform node, slot 28 advances the substep counter;
+//        5. bookkeeping  - slot 34, basis block refresh, previous velocity, slot 29.
+//   C. epilogue   - slot 21 attachments refresh, final smoothers.
 // Runs the substep loop of the vehicle simulation (tier 3 names). Each pass: pulls the substep
 // count, updates the smoothed speed/lean state, gathers contact reactions, integrates the
 // frame transform from the wheels/contacts, and refreshes the cached basis block.
+// Exponential smoother (tier 3 reading): x += (target - x) * a with a = min(dt, tau) / tau,
+// where tau is field_0x04, field_0x08 is the blend factor a, and field_0x00 the smoothed value.
 static inline void VehSmooth(VehicleSmoother* s, float dt, float target)
 {
     float step = dt;
@@ -1066,10 +1095,9 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         ((VehicleXform*)field_0x218)->Method_004FC9A0(0, &field_0x18);
         float t53 = UnknownVirtualSlot53();
         Method_00528EB0();
-        float& timer = (float&)field_0x4f4;      // float timer kept in an int-typed field (raw copy in slot 50)
-        if (timer > 0.0f) {
-            timer -= field_0x13c;
-            if (timer <= 0.0f)
+        if (field_0x4f4 > 0.0f) {
+            field_0x4f4 -= field_0x13c;
+            if (field_0x4f4 <= 0.0f)
                 UnknownVirtualSlot50(0, 0, 0);
         }
         field_0x5a8 = field_0x4a8 == field_0x544;
@@ -1268,7 +1296,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     case 0x6a:
         s = VehOnes();
         hasBody = 0;
-        if (field_0x124 && (((char*)field_0x124)[0x25] & 1)) {
+        if (field_0x124 && (field_0x124->field_0x25 & 1)) {
             VehVec3 pos = ((VehicleContactSet*)field_0x128)->field_0xa0;
             ((VehicleImpactSink*)field_0x5ac)->Method_004B9DC0(pos);
             p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
@@ -1338,7 +1366,6 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         p.z = field_0x64.z + field_0x1ac.z;
         UnknownVirtualSlot3(&((VehicleContactSet*)field_0x128)->field_0xac, &p, &rel, &s, b, 0, &l10);
     }
-tail:
     if (field_0xb8 < 0.001f && field_0xbc < 0.1f) {
         field_0x64 = g_VehZeroVec3;
         field_0xd8.y = 0.0f;

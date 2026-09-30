@@ -3,7 +3,7 @@
 #include <math.h>
 #include "Bike.h"
 
-#define BIKE_MIN(a, b) ((a) < (b) ? (a) : (b))
+static inline float BikeMin(float a, float b) { return a < b ? a : b; }
 
 float Bike::UnknownVirtualSlot32()
 {
@@ -387,9 +387,9 @@ void Bike::UnknownVirtualSlot65(float arg)
     if (field_0x504.y <= 0.4f || arg <= 11.0f)
         return;
     float t = field_0x588 * 0.6f;
-    t = BIKE_MIN(t, 100.0f);
+    t = BikeMin(t, 100.0f);
     t = t * arg * 5.0f;
-    t = BIKE_MIN(t, 10000.0f);
+    t = BikeMin(t, 10000.0f);
     if (rear->w_0x268 && rear->w_0x148 > 30.0f) {
         rear->w_0x2ac->q_0x94 = t;
         return;
@@ -428,7 +428,7 @@ BikeVec3 Bike::UnknownVirtualSlot76(const BikeVec3* a, const BikeVec3* b)
         float lean = field_0x4c;
         if (lean < 0.0f)
             lean = -lean;
-        lean = BIKE_MIN(lean, 1.0f);
+        lean = BikeMin(lean, 1.0f);
         float k = -(field_0x504.y + 0.125f);
         k = (0.0f > k) ? 0.0f : k;
         k = (1.4f - lean) * k * 1.6f;
@@ -510,7 +510,7 @@ void Bike::UnknownVirtualSlot102(float)
         float t = -(field_0x47c->field_0x04 / field_0x47c->field_0x08);
         t = (t + 1.0f) * 0.25f;
         t += 0.25f;
-        t = (t > 0.25f) ? BIKE_MIN(t, 0.75f) : 0.25f;
+        t = (t > 0.25f) ? BikeMin(t, 0.75f) : 0.25f;
         field_0x65c = t;
         D3DIMSoultreeCharacter::Method_0x004a8bf0(field_0x6b4[1], t);
         return;
@@ -596,7 +596,7 @@ void Bike::UnknownVirtualSlot72(BikeVec3* out, VehicleWheel*)
     } else {
         scale = 1.0f;
     }
-    weight = BIKE_MIN(weight, 1.0f);
+    weight = BikeMin(weight, 1.0f);
     field_0x4b8 = UnknownVirtualSlot74(&field_0x5f0->w_0x23c, &perp, weight, scale);
     field_0x43c = field_0x4b8 * field_0x140;
 }
@@ -641,9 +641,9 @@ float Bike::UnknownVirtualSlot61(float threshold)
                 a = -a;
             if (a > 0.005f) {
                 u *= 32.0f;
-                u = BIKE_MIN(u, 1.57f);
+                u = BikeMin(u, 1.57f);
                 float b = a * 5.0f;
-                b = BIKE_MIN(b, 1.5f);
+                b = BikeMin(b, 1.5f);
                 u = u * field_0x13c * b;
                 field_0x628 = (field_0x4ac < 0.0f) ? -u : u;
                 field_0x62c = field_0x1e4 * -1.333f * field_0x628;
@@ -692,6 +692,9 @@ static inline float BikeLength(float lenSq)
 
 // Slot 97: builds the rider ragdoll ("rider.col") and attaches the 15 body
 // bones by name (Pelvis, UprTorso, Head, arms, legs, feet) with local offsets.
+// BikeAttachBone is __forceinline because retail expands the same sequence at each of the 15
+// call sites; the original was probably a macro or an inline member (tier 3), and a plain
+// call does not reproduce the bytes.
 static __forceinline void BikeAttachBone(Bike* self, const char* name, float x, float y, float z)
 {
     BikeVec3 offset;

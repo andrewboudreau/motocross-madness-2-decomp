@@ -1,5 +1,4 @@
 // KrustyBikeTypes.h -- PROVISIONAL supporting types for the KrustyBike reconstruction.
-// Hand-edited (the spec.py generator is retired; see hierarchy/MIGRATION.md).
 //
 // Everything here is tier-3 (provisional): member offsets are confirmed by decoded
 // instructions in the KrustyBike overrides, but the names are inferred.  The base
@@ -162,7 +161,7 @@ unsigned char Kb_004B0AC0(KbVec3* pos, float r0, float r1, float r2, float scale
                           int a, int b, int c, int d);
 // 0x004B0DF0: the query the base slot 11 issues (SoulTreePhysics.cpp Fn_4b0df0).  This
 // override passes different constants, so k and l are declared as nullable Vec3 pointers.
-int Kb_004B0DF0(void* body, int obj, KbVec3* pos, float scale, int e, int f, int g, int h,
+int Kb_004B0DF0(void* body, SoultreeProbe* obj, KbVec3* pos, float scale, int e, int f, int g, int h,
                 float i, int j, const KbVec3* k, const KbVec3* l, int m, KbVec3* n, KbVec3* o,
                 KbVec3* p, int* q);
 

@@ -20,6 +20,11 @@
 #include "../common/Math3D.h"
 
 // ---------------------------------------------------------------------------
+// NOTE: soultree_base/GameObject.h is the canonical GameObject.  This stand-in is kept
+// because PhysicsBody overrides slot 14 as `int` (0x004cbf10 returns a value) while the
+// canonical GameObjectVirtualSlot14 is declared `void`, and the collision/tire agents
+// override it as void; the canonical stub cannot switch without touching their areas.
+// Slot layout and field offsets (0x04..0x2f, enabled bit at +0x25) are identical.
 // Provisional GameObject / GraphicsTest stand-ins: 27 virtual slots (the
 // GraphicsTest vtable 0x00553de4 shape). Only the slots PhysicsBody overrides have
 // meaningful signatures. Arguments of slots 10/11 are 4-byte values (ret 4). The

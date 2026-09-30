@@ -60,7 +60,7 @@ public:
     char field_0x00[0x44];
     SoultreeVec3 field_0x44;
     SoultreeVec3 field_0x50;
-    int field_0x5c_pad;     // placeholder so +0x60 below lines up
+    int pad_0x5c;     // placeholder so +0x60 below lines up
     int field_0x60;
     char field_0x64[0x10];
     int field_0x74;                          // flag word (slot 21 sets/clears bit 0x800)

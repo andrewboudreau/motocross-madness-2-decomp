@@ -181,7 +181,7 @@ int PhysicsRigidBody::UnknownVirtualSlot11(float dt)
         dPosition[0].x = velocity.x;
         dPosition[0].y = velocity.y;
         dPosition[0].z = velocity.z;
-        if (mass > 0.0) {
+        if (mass > 0.0) {     // double compare against 0.0 is intentional (retail loads a double zero)
             float m = mass;
             Vec3 a = force * (1.0f / m);
             dVelocity[0].x = a.x;
@@ -193,6 +193,8 @@ int PhysicsRigidBody::UnknownVirtualSlot11(float dt)
             dVelocity[0].z = 0.0f;
         }
         dOrientation[0] = QuatDerivative(orientation, angularVelocity);
+        // Euler's rotational equation for a rigid body (tier 3 naming; arithmetic decoded):
+        //   L = I w;   alpha = I^-1 (tau - w x L)
         Vec3 L = RotateVector(angularVelocity, inertia);
         Vec3 alpha = RotateVector(torque - CrossProduct(angularVelocity, L), invInertia);
         dAngularVelocity[0].x = alpha.x;

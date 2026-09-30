@@ -31,7 +31,6 @@ struct BikeA1A0;
 struct BikeA128;
 struct BikeElem;
 struct BikeA1F4;
-struct BikeA5AC;
 struct BikeA640;
 struct BikeA644;
 struct BikeQ;
@@ -155,10 +154,6 @@ struct BikeA1F4 {
     int i_0xbe8;
 };
 
-struct BikeA5AC {
-
-};
-
 struct BikeA640 {
     float l_0x0;
     float l_0x4;
@@ -196,12 +191,11 @@ struct BikeXform {
     void Method_0x004fd1f0(BikeVec3 pos, BikeVec3 dir, float mag);
 };
 
-float BikeMath_0x00460b50(float x);
+float BikeMath_0x00460b50(float x);            // cdecl, returns float in st0
 void BikeFunc_0x004b5a60(BikeVec3 a, BikeVec3 b, float* p1, float* p2, float* p3, float* p4, float* p5, float* p6, float* p7);   // cdecl
 float BikeMath_0x00460c00(float x);            // cdecl; used to scale a vector by 1/length (provisional)
 struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };
 extern BikeGlobal_0056e26c* g_Bike_0056e26c;    // pointer read at 0x0056e26c (frame delta / time step; provisional)
-            // cdecl, returns float in st0
 extern BikeVec3 g_BikeVec3_005778a8;
 extern BikeVec3 g_BikeVec3_005778c8;
 BikeVec3* BikeVecAdd_0x00421cb0(BikeVec3* out, const BikeVec3* a, const BikeVec3* b);   // cdecl

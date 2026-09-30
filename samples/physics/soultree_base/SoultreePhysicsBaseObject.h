@@ -26,6 +26,15 @@
 class SoultreeNode;       // pointed to by field_0x08 (scene node / transform owner)
 class SoultreeContact;    // elements of the field_0x12c array
 class SoultreeBody;       // pointed to by field_0x128
+struct SoultreeHeldObject; // defined in SoulTreePhysics.cpp (slot 21)
+// Object probed for ray hits (field_0x1f4); only the members the base uses are modelled.
+struct SoultreeProbe {
+    char pad_0x00[0x40];
+    float field_0x40;              // copied to field_0x1f8 by slot 2
+    // thiscall, callee pops 6 args
+    int Fn_506e90(const SoultreeVec3* from, const SoultreeVec3* to, SoultreeVec3* out, int a, int b,
+                  int c);
+};
 class SoultreeSlot1f0;
 class SoultreeAttachTarget;
 class SoultreeAttachment; // 40-byte records in the field_0x1d4 array
@@ -176,7 +185,8 @@ public:
     char field_0x10a;
     SoultreeVec3 field_0x10c;
     SoultreeVec3 field_0x118;
-    void* field_0x124;
+    GameObject* field_0x124;            // tier 3: only its byte +0x25 bit 0 is read (slot 21, Vehicle slot 38);
+                                        // that offset is GameObject::field_0x25
     SoultreeBody* field_0x128;
     SoultreeContact** field_0x12c;      // array of field_0x130 pointers
     int field_0x130;
@@ -210,10 +220,11 @@ public:
     float field_0x1e8;
     int field_0x1ec;
     SoultreeSlot1f0* field_0x1f0;
-    int field_0x1f4;
+    SoultreeProbe* field_0x1f4;         // tier 2: slot 2 stores a6 here and reads float +0x40 from it;
+                                        // slot 21 calls thiscall 0x00506e90 on it; passed as 'obj' to 0x004b0df0
     float field_0x1f8;                  // fld/fmul in KrustyBike slot 12 (0x0048de20), tier 1
     char field_0x1fc;
-    void* field_0x200;
+    SoultreeHeldObject* field_0x200;    // tier 3: tracked object picked from the node list by slot 21 (only user)
     int field_0x204;
     int field_0x208;
     char field_0x20c;
