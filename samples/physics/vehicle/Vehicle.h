@@ -35,7 +35,7 @@ struct VehBlock7 { float f[7]; };   // 28-byte state block (pose/orientation val
 // vector members when they are reset.
 extern Vec3 g_VehZeroVec3;
 
-// 0x00460b50 FastSqrt / 0x00460c00 FastInvSqrt are declared in ../common/FastMath.h.
+// 0x00460b50 FastSqrt / 0x00460c00 FastInvSqrt are declared in math/FastMath.h.
 
 // ---- provisional collaborator types (layout only what the code touches) ----
 

@@ -4,7 +4,7 @@
 #define SOULTREE_PHYSICS_CONTACT_H
 
 #include "SoultreePhysicsTypes.h"
-#include "../collision/CollisionObject.h"
+#include "collision/CollisionObject.h"
 
 // Element of SoultreePhysicsBaseObject::field_0x12c (count in field_0x130).
 // Has a vfptr at +0 (slot 1 is called with no arguments by slot 13).  Tier 3 names.
@@ -40,7 +40,7 @@ public:
 };
 
 // The object at SoultreePhysicsBaseObject::field_0x128 is a CollisionObject (0xb8 bytes,
-// ctor 0x00431e70; tier 1) -- see ../collision/CollisionObject.h.  Its field_0xa0 (contact
+// ctor 0x00431e70; tier 1) -- see collision/CollisionObject.h (src/krusty2).  Its field_0xa0 (contact
 // point) and field_0xac (contact normal) are CollisionVec3 there, which slots 28/38 view
 // as Vec3 until the collision vector type is unified with Vec3.
 

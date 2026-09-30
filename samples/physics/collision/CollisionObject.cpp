@@ -19,7 +19,7 @@
 //     GetWorldBounds 0x436100 is an Arvo transformed AABB.
 //   CollisionObject owns shapes (ctor 0x431e70, FreeShape 0x432430).
 
-#include "CollisionObject.h"
+#include "collision/CollisionObject.h"
 
 // Retail helpers reached by direct call (addresses are the call targets).
 void Fn_0042a160(void* p);                       // shape sub-object destructor (cdecl, 1 arg)

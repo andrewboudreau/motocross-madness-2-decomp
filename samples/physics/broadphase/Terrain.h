@@ -13,10 +13,10 @@
 #ifndef BROADPHASE_TERRAIN_H
 #define BROADPHASE_TERRAIN_H
 
-#include "../soultree_base/GameObject.h"
-#include "../common/FastMath.h"
-#include "../common/MemTag.h"
-#include "../common/DebugAlloc.h"
+#include "core/GameObject.h"
+#include "math/FastMath.h"
+#include "core/MemTag.h"
+#include "core/DebugAlloc.h"
 
 // PROVISIONAL stand-in: the 0x004aae20 ctor only stores 0 in its first dword.
 class GroundFogableObject {
@@ -69,7 +69,7 @@ public:
 };
 
 // 0x0056df04 / 0x004a2d00 / 0x004a2d90 bracket the Terrain dtor body: MemTagStack in
-// ../common/MemTag.h.
+// core/MemTag.h.
 
 // 16-dword block copied into +0xc44 from 0x004a1410's return value (a 4x4 matrix, tier 2:
 // 0x40 bytes).  Provisional.

@@ -24,7 +24,7 @@
 #include "SoultreePhysicsTypes.h"
 
 class SoultreeContact;    // elements of the field_0x12c array
-class CollisionObject;    // pointed to by field_0x128 (../collision/CollisionObject.h)
+class CollisionObject;    // pointed to by field_0x128 (collision/CollisionObject.h (src/krusty2))
 struct SoultreeHeldObject; // defined in SoulTreePhysics.cpp (slot 21)
 // Object probed for ray hits (field_0x1f4); only the members the base uses are modelled.
 struct SoultreeProbe {
@@ -38,7 +38,7 @@ class SoultreeSlot1f0;
 class SoultreeAttachTarget;
 class SoultreeAttachment; // 40-byte records in the field_0x1d4 array
 
-#include "GameObject.h"   // BaseObject, GameObject
+#include "core/GameObject.h"   // BaseObject, GameObject
 
 class SoultreePhysicsBaseObject : public virtual GameObject {
 public:

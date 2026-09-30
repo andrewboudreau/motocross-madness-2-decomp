@@ -5,7 +5,7 @@
 #ifndef CONSTRAINT_METHOD_COLLISION_MODEL_H
 #define CONSTRAINT_METHOD_COLLISION_MODEL_H
 
-#include "CollisionObject.h"
+#include "collision/CollisionObject.h"
 
 class ConstraintMethodCollisionModel : public CollisionObject {
 public:

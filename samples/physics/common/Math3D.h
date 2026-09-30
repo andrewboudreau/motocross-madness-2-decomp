@@ -88,7 +88,7 @@ struct Matrix4 {
 // ---------------------------------------------------------------------------
 
 // 0x00460b50 FastSqrt and 0x00460c00 FastInvSqrt: see FastMath.h.
-#include "FastMath.h"
+#include "math/FastMath.h"
 
 // ---------------------------------------------------------------------------
 // Quaternions and matrix helpers (added after the first release; append-only).

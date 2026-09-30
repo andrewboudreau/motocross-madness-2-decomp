@@ -61,12 +61,15 @@ def main():
     (out/'source_paths.txt').write_text('\n'.join(source_paths)+'\n')
     source_manifest=[]
     root=Path(args.skeleton_root); root.mkdir(parents=True,exist_ok=True)
+    # promoted translation units may live in area subfolders (e.g. broadphase/Quadtree.cpp);
+    # don't recreate a flat skeleton next to them
+    existing={f.name.lower() for f in root.rglob('*') if f.is_file()}
     for p in source_paths:
         name=p.rsplit('\\',1)[-1]
         ext=Path(name).suffix.lower()
         source_manifest.append({'original_path':p,'filename':name,'kind':ext.lstrip('.')})
         dst=root/name
-        if not dst.exists():
+        if not dst.exists() and name.lower() not in existing:
             comment='//'
             dst.write_text(f'{comment} Recovered translation-unit name from Motocross Madness 2 retail binary.\n{comment} Original path: {p}\n{comment} Status: skeleton; implementation not yet reconstructed.\n')
     (out/'source_manifest.json').write_text(json.dumps(source_manifest,indent=2)+'\n')
