@@ -13,5 +13,6 @@ protected:
     int refCount;
 };
 
-BaseObject::BaseObject() : refCount(1) {}
+// The body assignment preserves the observed vptr-before-field store order.
+BaseObject::BaseObject() { refCount = 1; }
 BaseObject::~BaseObject() {}

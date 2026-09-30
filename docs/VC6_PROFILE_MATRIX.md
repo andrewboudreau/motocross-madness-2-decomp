@@ -57,3 +57,28 @@ binary evidence should agree before promoting flags to confirmed status.
 Once a profile is strongly established, per-translation-unit exceptions can be
 investigated separately instead of contorting readable source to compensate for
 the wrong compiler switches.
+
+## Native Windows follow-up, 2026-09-30
+
+After the BaseObject constructor/Release source changes and CodeView extent
+support for the generated deleting wrapper, the full matrix produced:
+
+| Profile | Strict generated | Manual | Calibration |
+| --- | --- | --- | --- |
+| `vc6_o2_ml_g6` | 39/39 | 19/19 | 10/16 |
+| `vc6_o2_mt_g6` | 39/39 | 19/19 | 10/16 |
+| `vc6_o2_ml` | 39/39 | 19/19 | 14/16 |
+| `vc6_o2_mt` | 39/39 | 19/19 | 14/16 |
+| `vc6_o1_ml` | 31/39 | 13/19 | 8/16 |
+| `vc6_o1_mt` | 31/39 | 13/19 | 8/16 |
+
+All `/O2` profiles resolve the BaseObject vtable and deleting-wrapper call
+addresses. Removing `/G6` also matches BaseObject Release, UIControl slots 61/62
+and FollowCamera slot 72. `/ML` and `/MT` produce equal counts within each tested
+CPU/optimization profile, so the improvement cannot be attributed to runtime
+selection. FollowCamera slots 69 and 71 remain nonmatching under both leading
+profiles. The default remains unchanged pending broader per-TU evidence. See
+`VC6_MATCHING.md`.
+
+Summaries prefer `strict_exact` when present. A wrong relocation binding cannot
+be counted as exact merely because the legacy masked comparison passes.

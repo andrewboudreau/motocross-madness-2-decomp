@@ -78,6 +78,7 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
         converted.append({'offset': rel.virtual_address - sym.value, 'type': rel.type, 'symbol': record.name})
     patched, audit = apply_relocations(raw, converted, bindings, target_va)
     return {**compare_bytes(retail, patched), 'symbol': sym.name,
+            'extent_source': sym.extent_source,
             'target_va': f'0x{target_va:08x}', 'relocations_applied': audit,
             'alignment_padding_bytes': padding,
             'bindings_are_identity_proof': False}

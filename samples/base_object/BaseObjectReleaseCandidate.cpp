@@ -1,4 +1,5 @@
-// Next VC6 calibration target. Class name/layout are evidence-backed; method name is provisional.
+// VC6 /O2 without /G6 matches retail at 0x00405170 (32 bytes).
+// Class name/layout are evidence-backed; method/member names remain provisional.
 class BaseObject {
 public:
     virtual ~BaseObject();
@@ -10,12 +11,11 @@ protected:
 };
 
 int BaseObject::Release() {
-    if (refCount != 0) {
-        int remaining = refCount - 1;
-        refCount = remaining;
+    int remaining = refCount;
+    if (remaining != 0) {
+        remaining = --refCount;
         if (remaining == 0)
             delete this;
-        return remaining;
     }
-    return 0;
+    return remaining;
 }

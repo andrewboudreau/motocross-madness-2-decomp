@@ -17,7 +17,8 @@ retail installer
 
 Native Windows VC6 SP3 matching now passes **19/19 hand-written samples** without
 relocation masking and **39/39 generated probes** with address relocations resolved.
-Calibration passes **8/16**. See [the executed checks and remaining gaps](docs/VC6_MATCHING.md).
+Default-profile calibration passes **10/16**; `/O2` profiles without `/G6`
+reach **14/16**. See [the executed checks and remaining gaps](docs/VC6_MATCHING.md).
 The bootstrap inventory below also includes earlier clang results.
 
 For the supplied installer:
@@ -116,7 +117,8 @@ See `AGENTS.md` and `docs/CLASS_MODEL.md`.
 `src/reconstructed/BaseObject.{h,cpp}` is the first promoted class slice.
 Class identity, primary vtable, `this+0x04` storage, constructor initialization,
 destructor core, AddRef behavior, and GetRefCount behavior are directly evidenced.
-Release remains a historical-compiler calibration target.
+All six BaseObject bodies, including Release and the generated deleting destructor,
+match VC6 SP3 `/O2` without `/G6`, with relocations resolved.
 
 The active camera slice now has exact FollowCamera preset methods plus a state
 machine and a strong MSVC hidden-return-buffer interpretation for slot 69. See
