@@ -19,6 +19,8 @@ struct KbSensor;
 struct KbXform;
 struct KbChild;
 struct KbObj128;
+struct KbWheel;
+struct KbWheelQ;
 
 // KbVec3 is the shared Math3D Vec3 (12 bytes: x,y,z at +0,+4,+8; tier 1 layout).
 #include "../bike/Bike.h"
@@ -76,7 +78,8 @@ struct KbRacer {
 };
 
 struct KbRaceHandler {
-    void Fn_004DE580(void* who, float a, int b);   // a: *slot 3/4 float* result
+    void Fn_004DE580(void* who, float a, int b);
+    void Fn_004DE580(void* who, float a, float b);   // slot 4 forwards its float a4 unchanged (same callee)   // a: *slot 3/4 float* result
 };
 
 // Object reached through KrustyBike+0x740 (event/race context).
@@ -127,5 +130,26 @@ struct KbDirector {
     void Fn_004DCF20(KbObj128* who, int a);
 };
 extern KbDirector* g_kbDirector; // pointer global at 0x0068ABA4
+
+
+// Wheel/contact object reached through Bike::field_0x5f4 (area-local view; the canonical
+// BikeWheel is cast to this at the use site).  Only the members KrustyBike touches.
+struct KbWheelQ {
+    // 0x004D31B0: per-frame update fed with the wheel vectors (purpose unknown).
+    void Fn_004D31B0(float a, KbVec3* b, float c, bool d, float e, KbVec3* f, float* g);
+};
+struct KbWheel {
+    char pad_0x0000[0x230];
+    KbVec3 w_0x230;
+    char pad_0x023C[0xC];
+    KbVec3 w_0x248;
+    char pad_0x0254[0xC];
+    int w_0x260;
+    char pad_0x0264[0x1C];
+    float w_0x280;
+    char pad_0x0284[0x24];
+    KbWheelQ* w_0x2a8;
+    void Fn_00513F90(void* owner);   // 0x00513F90
+};
 
 #endif

@@ -14,8 +14,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot3@KrustyBike",
     "target_va": "0x0048dbf0",
     "target_size": 109,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 87.6% byte match. Retail loads [eax+0x44] after the argument pushes; instruction scheduling differs."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 87.6% byte match. Retail loads [eax...)"
   },
   {
     "class": "KrustyBike",
@@ -23,8 +23,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot4@KrustyBike",
     "target_va": "0x0048dc60",
     "target_size": 112,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 78.9% byte match. Argument push/load order differs from retail."
+    "expect": "exact",
+    "notes": "vtable slot 4 override of Bike (base 0x005265d0). Exact: forwards float a4 unchanged to the handler (Fn_004DE580 float overload)."
   },
   {
     "class": "KrustyBike",
@@ -41,8 +41,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot33@KrustyBike",
     "target_va": "0x0048e130",
     "target_size": 87,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 54.2% byte match. Retail keeps eax live across the Vec3 copy; prologue ordering differs."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 54.2% byte match. Retail keeps eax ...)"
   },
   {
     "class": "KrustyBike",
@@ -68,8 +68,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot84@KrustyBike",
     "target_va": "0x00491630",
     "target_size": 103,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 96.0% byte match. mov edx,[ecx] load ordering differs."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 96.0% byte match. mov edx,[ecx] loa...)"
   },
   {
     "class": "KrustyBike",
@@ -78,7 +78,7 @@
     "target_va": "0x004919a0",
     "target_size": 229,
     "expect": "partial",
-    "notes": "Semantics reconstructed; 40.0% byte match. Table-index loads (game+0x2d74 / +0x60c) are scheduled before the fld of speed in retail; local arrays are initialized b then a."
+    "notes": "66.5% (size 230/229). Only register allocation differs: retail keeps the KbGame pointer in eax and the 60c index in edx in the else arm (a1 form), and loads 60c before the setne in the true arm; every source form tried compiles to the same bytes."
   },
   {
     "class": "KrustyBike",
@@ -104,8 +104,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot76@KrustyBike",
     "target_va": "0x00491ca0",
     "target_size": 103,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 73.6% byte match. Struct-return temp lea offset differs."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 73.6% byte match. Struct-return tem...)"
   },
   {
     "class": "KrustyBike",
@@ -131,8 +131,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot81@KrustyBike",
     "target_va": "0x004923d0",
     "target_size": 88,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 96.6% byte match. push eax vs mov ecx,esi ordering differs."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 96.6% byte match. push eax vs mov e...)"
   },
   {
     "class": "KrustyBike",
@@ -167,8 +167,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot71@KrustyBike",
     "target_va": "0x00492530",
     "target_size": 105,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 29.8% byte match. Retail loads argument into edx before the je; branch layout differs."
+    "expect": "exact",
+    "notes": "vtable slot 71 override of Bike (base 0x0040a480). Exact with a single trailing base call after if/else."
   },
   {
     "class": "KrustyBike",
@@ -194,8 +194,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot42@KrustyBike",
     "target_va": "0x00495820",
     "target_size": 164,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 25.3% byte match. Retail uses cmp byte / unsigned char counter and different condition order."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 25.3% byte match. Retail uses cmp b...)"
   },
   {
     "class": "KrustyBike",
@@ -203,8 +203,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot24@KrustyBike",
     "target_va": "0x004958d0",
     "target_size": 123,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 30.4% byte match. Retail duplicates tail blocks; ours tail-merged."
+    "expect": "exact",
+    "notes": "vtable slot 24 override of Bike. Exact with separate return 0 in each arm (duplicated tail)."
   },
   {
     "class": "KrustyBike",
@@ -221,8 +221,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot69@KrustyBike",
     "target_va": "0x004959d0",
     "target_size": 85,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 88.3% byte match. Store order of 0x454 vs global load differs."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 88.3% byte match. Store order of 0x...)"
   },
   {
     "class": "KrustyBike",
@@ -266,8 +266,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot15@KrustyBike",
     "target_va": "0x00495cb0",
     "target_size": 176,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 86.9% byte match. Instruction scheduling only: retail loads the second argument earlier and keeps &s at esp+0x14."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 86.9% byte match. Instruction sched...)"
   },
   {
     "class": "KrustyBike",
@@ -275,8 +275,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot16@KrustyBike",
     "target_va": "0x00495d60",
     "target_size": 124,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 95.2% byte match. Only store order (mov [ecx],edx vs fstp) differs."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 95.2% byte match. Only store order ...)"
   },
   {
     "class": "KrustyBike",
@@ -284,8 +284,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot22@KrustyBike",
     "target_va": "0x00495de0",
     "target_size": 42,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 27.5% byte match. Retail compares [ecx+0x204] in edx; condition order/branch layout differs."
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 27.5% byte match. Retail compares [...)"
   },
   {
     "class": "KrustyBike",
@@ -302,8 +302,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot48@KrustyBike",
     "target_va": "0x004964e0",
     "target_size": 249,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 15.4% byte match. Retail keeps dt (field_0x13c) as a stack local and multiplies from memory; ours keeps it in st(1). Structure otherwise the same (vec ops)."
+    "expect": "exact",
+    "notes": "vtable slot 48 override of Bike (base 0x0052a890). Exact: dt passed straight from field_0x13c (no local copy)."
   },
   {
     "class": "KrustyBike",
@@ -312,7 +312,7 @@
     "target_va": "0x004965e0",
     "target_size": 431,
     "expect": "partial",
-    "notes": "Semantics reconstructed; 38.8% byte match. Vector-op shape matches (420/431 bytes); retail loads arg a late and builds the Vec3(0,y,0) through a float temp."
+    "notes": "57.5% (size 431/431). Matches through the a->x/a->z stores. First divergence: Vec3(0, field_0x24*a->y, 0) - retail materialises the pooled 0.0f via fld/fst (x and z share one FPU value) while VC6 emits hoisted immediate stores. Also the squared-length loads come in order y,x,z in retail (z,y,x here). Tail (d==1.0f shortcut returning pooled 1.0f) matches via the KbLength helper."
   },
   {
     "class": "KrustyBike",
@@ -321,7 +321,7 @@
     "target_va": "0x00496d10",
     "target_size": 135,
     "expect": "partial",
-    "notes": "Semantics reconstructed; ~40% byte match. Retail has a jmp+11 nop pad prologue (16 bytes, not source-expressible); body also differs in virtual call codegen on the embedded sub-object."
+    "notes": "Body (from 0x496d20) 61.6%; the whole function cannot match: retail starts with jmp +11 and 11 nops (patch-point padding, not expressible in C++). Body divergence: retail computes the KbSink pointer (lea ecx,[eax+0xc]) after loading the game global in ecx and derefs the vptr through it."
   },
   {
     "class": "KrustyBike",
@@ -331,5 +331,14 @@
     "target_size": 85,
     "expect": "exact",
     "notes": "non-virtual state reset called from slot 1"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot86@KrustyBike",
+    "target_va": "0x00491b70",
+    "target_size": 298,
+    "expect": "exact",
+    "notes": "Exact. Wheel-force step: ramp from field_0x664 (float in retail), wheel query call, halve force when g_kbGame flag set. Needs KbFloat identity inline to get fld/fstp [esp] arg pattern."
   }
 ]

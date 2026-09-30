@@ -55,6 +55,7 @@ public:
     virtual int UnknownVirtualSlot81();
     virtual int UnknownVirtualSlot82();
     virtual int UnknownVirtualSlot83(VehicleWheel* wheel);
+    virtual void UnknownVirtualSlot86();
     virtual int UnknownVirtualSlot84(int a, int b);
     virtual void UnknownVirtualSlot96();
     virtual void UnknownVirtualSlot101();
@@ -73,7 +74,9 @@ public:
     float field_0x758; // 0x758
     char pad_0x075C[0x10];
     float field_0x76c; // 0x76C
-    char pad_0x0770[0x34];
+    char pad_0x0770[0x1C];
+    int field_0x78c; // 0x78C
+    char pad_0x0790[0x14];
     char field_0x7a4; // 0x7A4
     char pad_0x07A5[0x3];
     float field_0x7a8; // 0x7A8
