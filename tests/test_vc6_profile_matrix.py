@@ -4,6 +4,12 @@ from tools.vc6_profile_matrix import summarize_calibration, summarize_rows
 
 
 class ProfileMatrixTests(unittest.TestCase):
+    def test_strict_failure_overrides_masked_success(self):
+        result = {'exact_after_relocation_mask': True, 'strict_exact': False,
+                  'match_percent': 100}
+        self.assertEqual(summarize_rows([result])['exact'], 0)
+        self.assertEqual(summarize_calibration([{'result': result}])['exact'], 0)
+
     def test_summarize_rows(self):
         summary = summarize_rows([
             {'exact_after_relocation_mask': True, 'match_percent': 100},

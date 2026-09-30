@@ -6,22 +6,25 @@ from pathlib import Path
 CASES = [
     {
         'name': 'BaseObject::BaseObject constructor',
+        'bindings': 'samples/base_object/special_member_bindings.json',
         'source': 'samples/base_object/BaseObjectSpecialMembers.cpp',
         'symbol': '??0BaseObject',
         'target_va': '0x00405120',
         'target_size': 16,
-        'reason': 'natural constructor initializes the BaseObject vptr and refCount=1; retail register/ModRM shape is VC6-specific',
+        'reason': 'constructor-body assignment preserves the retail vptr-before-field store order; vtable relocation is resolved',
     },
     {
         'name': 'BaseObject scalar deleting destructor',
+        'bindings': 'samples/base_object/special_member_bindings.json',
         'source': 'samples/base_object/BaseObjectSpecialMembers.cpp',
         'symbol': '??_GBaseObject',
         'target_va': '0x00405130',
         'target_size': 30,
-        'reason': 'canonical VC6 scalar deleting-destructor wrapper; modern clang uses different delete/flag codegen',
+        'reason': 'canonical VC6 wrapper; CodeView supplies its length, both direct-call relocations are resolved',
     },
     {
         'name': 'BaseObject::~BaseObject destructor core',
+        'bindings': 'samples/base_object/special_member_bindings.json',
         'source': 'samples/base_object/BaseObjectSpecialMembers.cpp',
         'symbol': '??1BaseObject',
         'target_va': '0x00405150',
@@ -34,7 +37,7 @@ CASES = [
         'symbol': 'Release@BaseObject',
         'target_va': '0x00405170',
         'target_size': 32,
-        'reason': 'small nontrivial refcount/delete control flow; strong VC6 codegen discriminator',
+        'reason': 'local remaining count across virtual deletion; exact with VC6 /O2 without /G6',
     },
     {
         'name': 'UIControl::slot61 field difference',
@@ -153,7 +156,9 @@ def main():
             cr=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
             if cr.returncode:
                 rows.append({**c,'compile_error':cr.stdout}); continue
-            mr=subprocess.run([sys.executable,'tools/match.py','--exe',args.exe,'--target-va',c['target_va'],'--target-size',str(c['target_size']),'--obj',str(obj),'--symbol',c['symbol'],'--json'],text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            match_cmd=[sys.executable,'tools/match.py','--exe',args.exe,'--target-va',c['target_va'],'--target-size',str(c['target_size']),'--obj',str(obj),'--symbol',c['symbol'],'--json']
+            if c.get('bindings'): match_cmd += ['--bindings',c['bindings']]
+            mr=subprocess.run(match_cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
             try: result=json.loads(mr.stdout)
             except Exception: result={'match_error':mr.stdout}
             rows.append({**c,'compiler':args.compiler,'result':result})

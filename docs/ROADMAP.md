@@ -37,7 +37,8 @@ Completed:
 
 Native Windows SP3 execution is verified: 19/19 manual samples match without
 relocation masking, 39/39 generated probes pass with their relocations resolved,
-and calibration passes 8/16. Compiler acquisition is complete for this pass.
+and default-profile calibration passes 10/16 (14/16 with `/O2` profiles without
+`/G6`). Compiler acquisition is complete for this pass.
 See [VC6_MATCHING.md](VC6_MATCHING.md) for the exact scope and remaining failures.
 
 To reproduce on another machine with a privately owned SP3-patched `VC98` tree:
@@ -52,13 +53,16 @@ Calibration checklist (passing entries remain regression checks):
 
 1. preserve 39/39 strict generated probe results (both global addresses are now validated);
 2. preserve 19/19 hand-written exact smoke samples;
-3. `BaseObject::BaseObject()` reproduces the retail `mov eax,ecx` / vptr / `refCount=1` shape;
-4. the BaseObject scalar deleting destructor reproduces the 30-byte canonical VC6 wrapper;
-5. validate the vptr destination in the currently masked-exact destructor core;
-6. `BaseObject::Release()` becomes exact;
-7. UI slots 61/62 reproduce VC6's two-register subtraction;
+3. preserve the strict 16-byte BaseObject constructor match obtained with a constructor-body assignment;
+4. preserve the 30-byte BaseObject scalar deleting-destructor match, using CodeView length and resolved calls;
+5. preserve the strict 7-byte destructor-core match with its vptr destination validated;
+6. preserve the 32-byte `BaseObject::Release()` match under `/O2` without `/G6`;
+7. preserve UI slots 61/62's two-register subtraction matches under `/O2` without `/G6`;
 8. preserve the exact UIStatic return-zero `33 C0 C3` encoding;
 9. preserve the four exact UIMultiState indexed-element methods.
+
+The remaining two failures under the best tested profiles are FollowCamera slots
+69 and 71. These are the next source/profile calibration targets.
 
 Treat failures first as compiler-version/profile evidence, not permission to distort readable source.
 

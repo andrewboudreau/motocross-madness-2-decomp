@@ -44,7 +44,7 @@ def summarize_rows(rows) -> dict:
     return {
         'total': len(rows),
         'exact': sum(
-            bool(row.get('exact_after_relocation_mask'))
+            bool(row.get('strict_exact', row.get('exact_after_relocation_mask')))
             for row in rows
             if isinstance(row, dict)
         ),
@@ -82,7 +82,7 @@ def summarize_calibration(rows) -> dict:
             if isinstance(row, dict)
         ),
         'exact': sum(
-            bool(result.get('exact_after_relocation_mask'))
+            bool(result.get('strict_exact', result.get('exact_after_relocation_mask')))
             for result in results
         ),
         'mean_match_percent': (

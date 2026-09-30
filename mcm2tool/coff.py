@@ -11,6 +11,13 @@ class CoffSection:
 class CoffSymbol:
     index:int; name:str; value:int; section_number:int; type:int; storage_class:int; aux_count:int
     function_size:int|None = None
+    codeview_size:int|None = None
+
+    @property
+    def extent_source(self):
+        if self.function_size is not None: return 'coff_function_aux'
+        if self.codeview_size is not None: return 'codeview_proc'
+        return 'symbol_or_section_boundary'
 
 @dataclass
 class CoffRelocation:
@@ -61,57 +68,61 @@ class CoffObject:
                 off=sec.reloc_ptr+r*10
                 va,si,typ=struct.unpack_from('<IIH',self.data,off)
                 self.relocations.append(CoffRelocation(sec.index,va,si,typ))
-        # Compiler-generated functions (e.g. scalar deleting destructors) have
-        # no auxiliary TotalSize, but /Z7 still emits a CodeView procedure
-        # record with the code length. Use it only where the aux size is absent.
-        # The relocation may target an undefined external entry for the same
-        # name (VC6 does this for ??_G); resolve it to the single definition.
-        defined:dict[str,list[CoffSymbol]]={}
-        for s in self.symbols:
-            if s.section_number>0 and s.type==0x20: defined.setdefault(s.name,[]).append(s)
-        for index,size in self._codeview_proc_sizes().items():
-            s=self.symbol_by_index.get(index)
-            if s is None: continue
-            if s.section_number<=0:
-                matches=defined.get(s.name,[])
-                if len(matches)!=1: continue
-                s=matches[0]
-            if s.function_size is None and s.section_number>0 and s.type==0x20:
-                s.function_size=size
+        self._read_codeview_sizes()
 
-    # CodeView S_LPROC32/S_GPROC32 (32-bit type index) and their CV4 forms
-    # (16-bit type index): record type -> offset of the `off` field after
-    # reclen/rectyp. `len` always follows pParent/pEnd/pNext.
-    _CV_PROC_OFF={0x100a:28,0x100b:28,0x0204:26,0x0205:26}
-    _IMAGE_REL_I386_SECREL=0x000b
+    def _read_codeview_sizes(self):
+        """Read legacy VC6 procedure records, bound by i386 COFF relocations.
 
-    def _codeview_proc_sizes(self)->dict[int,int]:
-        """Map function symbol index -> CodeView procedure length.
-
-        The procedure is tied to its function by the SECREL relocation on the
-        record's `off` field. Conflicting lengths for one symbol are dropped.
+        VC6 omits function auxiliary records for generated deleting destructors,
+        but /Z7 still emits S_[GL]PROC32_ST with an independent procedure length.
+        Layout: microsoft/microsoft-pdb include/cvinfo.h, PROCSYM32. No retail
+        bytes, target lengths, debug display names, or padding heuristics enter
+        this association. Other CodeView generations are deliberately ignored.
         """
-        sizes:dict[int,int]={}; conflicts:set[int]=set()
-        for sec in self.sections:
-            if not sec.name.startswith('.debug$S'): continue
-            b=self.data[sec.raw_ptr:sec.raw_ptr+sec.raw_size]
-            secrel={r.virtual_address:r.symbol_index for r in self.relocations
-                    if r.section_number==sec.index and r.type==self._IMAGE_REL_I386_SECREL}
-            # Per-object symbol sections start with a CV signature; per-COMDAT ones do not.
-            pos=4 if len(b)>=4 and struct.unpack_from('<I',b,0)[0] in (1,2,4) else 0
-            while pos+4<=len(b):
-                reclen,rectyp=struct.unpack_from('<HH',b,pos)
-                if reclen<2 or pos+2+reclen>len(b): break
-                off_field=self._CV_PROC_OFF.get(rectyp)
-                if off_field is not None and reclen>=2+off_field+4:
-                    length=struct.unpack_from('<I',b,pos+4+12)[0]
-                    index=secrel.get(pos+4+off_field)
-                    if index is not None:
-                        if index in sizes and sizes[index]!=length: conflicts.add(index)
-                        sizes[index]=length
-                pos+=2+reclen
-        for index in conflicts: del sizes[index]
-        return sizes
+        if self.machine != 0x14c:
+            return
+        sections = [sec for sec in self.sections if sec.name == '.debug$S']
+        signature = struct.pack('<I', 2)  # CV_SIGNATURE_C11
+        if not any(self.data[sec.raw_ptr:sec.raw_ptr+4] == signature for sec in sections):
+            return
+        for sec in sections:
+            raw = self.data[sec.raw_ptr:sec.raw_ptr+sec.raw_size]
+            if len(raw) != sec.raw_size:
+                raise CoffError('truncated CodeView section')
+            pos = 4 if raw.startswith(signature) else 0
+            rels = [r for r in self.relocations if r.section_number == sec.index]
+            while pos < len(raw):
+                if pos + 4 > len(raw):
+                    raise CoffError('truncated CodeView record header')
+                length, kind = struct.unpack_from('<HH', raw, pos)
+                end = pos + 2 + length
+                if length < 2 or end > len(raw):
+                    raise CoffError('invalid CodeView record length')
+                if kind in (0x100a, 0x100b):  # S_LPROC32_ST, S_GPROC32_ST
+                    if length < 38 or pos + 40 + raw[pos+39] > end:
+                        raise CoffError('truncated CodeView procedure record')
+                    offsets = [r for r in rels if r.virtual_address == pos+32]
+                    segments = [r for r in rels if r.virtual_address == pos+36]
+                    if (len(offsets) == len(segments) == 1 and
+                            offsets[0].type == 0x000b and segments[0].type == 0x000a and
+                            offsets[0].symbol_index == segments[0].symbol_index and
+                            raw[pos+32:pos+38] == b'\0' * 6):
+                        ref = self.symbol_by_index.get(offsets[0].symbol_index)
+                        if ref is None:
+                            raise CoffError('CodeView references missing/auxiliary symbol')
+                        # VC6 may reference an undefined duplicate of the defined
+                        # function symbol. Require a unique exact COFF name.
+                        matches = [s for s in self.symbols if s.name == ref.name and
+                                   s.section_number > 0 and s.type == 0x20]
+                        if len(matches) != 1:
+                            raise CoffError('ambiguous or missing CodeView function definition')
+                        sym = matches[0]
+                        size = struct.unpack_from('<I', raw, pos+16)[0]
+                        if ((sym.function_size is not None and sym.function_size != size) or
+                                (sym.codeview_size is not None and sym.codeview_size != size)):
+                            raise CoffError(f'conflicting function lengths for {sym.name}')
+                        sym.codeview_size = size
+                pos = end
 
     def _str(self,offset:int)->str:
         pos=self._str_off+offset
@@ -142,10 +153,11 @@ class CoffObject:
         sec=self.section(s.section_number)
         starts=sorted({x.value for x in self.symbols if x.section_number==s.section_number and x.value>s.value and x.storage_class in (2,3,105)})
         end=starts[0] if starts else sec.raw_size
-        if s.function_size is not None:
-            declared_end = s.value + s.function_size
-            if s.function_size <= 0 or declared_end > min(end, sec.raw_size):
-                raise CoffError(f'invalid function size for {s.name}: {s.function_size}')
+        size = s.function_size if s.function_size is not None else s.codeview_size
+        if size is not None:
+            declared_end = s.value + size
+            if size <= 0 or declared_end > min(end, sec.raw_size):
+                raise CoffError(f'invalid function size for {s.name}: {size}')
             end = declared_end
         if end<s.value: raise CoffError('bad symbol extent')
         raw=self.data[sec.raw_ptr+s.value:sec.raw_ptr+end]
@@ -156,7 +168,7 @@ def alignment_padding(cand:bytes,target_size:int,sym_offset:int,align:int=16,fil
     """Diagnose a possible alignment tail; never use this as a match boundary.
 
     Target-dependent NOP trimming is not proof of a function's extent. Matchers
-    use symbol_extent and its compiler-emitted auxiliary length instead.
+    use symbol_extent and its compiler-emitted auxiliary/CodeView length instead.
 
     Without COMDAT sections, VC6 pads each function in .text to a 16-byte
     boundary with NOPs, so a symbol's extent (up to the next symbol or section

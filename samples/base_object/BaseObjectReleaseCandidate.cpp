@@ -1,4 +1,5 @@
-// Next VC6 calibration target. Class name/layout are evidence-backed; method name is provisional.
+// VC6 /O2 without /G6 matches retail at 0x00405170 (32 bytes).
+// Class name/layout are evidence-backed; method/member names remain provisional.
 class BaseObject {
 public:
     virtual ~BaseObject();
@@ -9,14 +10,11 @@ protected:
     int refCount;
 };
 
-// Single exit: retail returns the loaded count itself when it is already zero
-// (no separate `return 0` path). Exact under VC6 SP3 /O2 without /G6; /G6
-// schedules `push esi` after the zero test instead of before it.
 int BaseObject::Release() {
     int remaining = refCount;
-    if (remaining) {
+    if (remaining != 0) {
         remaining = --refCount;
-        if (!remaining)
+        if (remaining == 0)
             delete this;
     }
     return remaining;
