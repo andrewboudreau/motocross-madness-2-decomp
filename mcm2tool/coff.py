@@ -87,6 +87,19 @@ class CoffObject:
         rel=[r for r in self.relocations if r.section_number==sec.index and s.value<=r.virtual_address<end]
         return raw,end-s.value,rel
 
+def alignment_padding(cand:bytes,target_size:int,sym_offset:int,align:int=16,fill:int=0x90)->int:
+    """Count trailing section-alignment filler after a candidate function.
+
+    Without COMDAT sections, VC6 pads each function in .text to a 16-byte
+    boundary with NOPs, so a symbol's extent (up to the next symbol or section
+    end) can exceed the real function. The excess is filler only if it is all
+    `fill`, shorter than `align`, and ends on an `align` boundary. Returns the
+    filler length, or 0 when the tail is anything else.
+    """
+    extra=len(cand)-target_size
+    if extra<=0 or extra>=align or (sym_offset+len(cand))%align: return 0
+    return extra if all(b==fill for b in cand[target_size:]) else 0
+
 RELOC_WIDTH_I386={0x0000:0,0x0001:2,0x0002:2,0x0006:4,0x0007:4,0x0009:2,0x000A:2,0x000B:4,0x000C:4,0x0014:4}
 
 def relocation_mask(obj:CoffObject,s:CoffSymbol,size:int,relocs:list[CoffRelocation])->bytearray:
