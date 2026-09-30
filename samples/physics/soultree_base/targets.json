@@ -310,9 +310,9 @@
     "source": "SoulTreePhysics.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot37@SoultreePhysicsBaseObject",
     "target_va": "0x00502a40",
-    "target_size": 256,
-    "expect": "partial",
-    "notes": "100.00% match under vc6_o2_ml; 100% bytes but size 272 vs 256: VC6 switch jump-table layout differs"
+    "target_size": 272,
+    "expect": "exact",
+    "notes": "Exact under vc6_o2_ml; target_size 272 = extent_with_tables (code 256 + inline switch jump table 16)."
   },
   {
     "class": "SoultreePhysicsBaseObject",
