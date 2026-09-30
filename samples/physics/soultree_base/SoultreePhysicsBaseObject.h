@@ -58,10 +58,16 @@ public:
     virtual void GameObjectVirtualSlot5();
     virtual void GameObjectVirtualSlot6();
     virtual void GameObjectVirtualSlot7();
-    virtual void GameObjectVirtualSlot8();
+    // Slot 8: 0x004692f0 `mov eax,ecx; mov ecx,[esp+4]; mov [eax+0x18],ecx; ret 4` ->
+    // stores its argument in field_0x18 and returns this (tier 1 decoded body).
+    virtual GameObject* GameObjectVirtualSlot8(int a);
     virtual void GameObjectVirtualSlot9();
-    virtual void GameObjectVirtualSlot10();
-    virtual void GameObjectVirtualSlot11();
+    // Slots 10/11 take one dword (`ret 4` in 0x004693d0, 0x004da540 and every override:
+    // 0x005036f0, 0x00504210, 0x0052a830, 0x004977a0).  Float time step and int result
+    // are tier 2 (constraint solver 0x0043ba70/0x0043bdb0 use the argument as a float;
+    // 0x004da540 is `mov eax,1; ret 4`).
+    virtual int GameObjectVirtualSlot10(float dt);
+    virtual int GameObjectVirtualSlot11(float dt);
     virtual void GameObjectVirtualSlot12();
     virtual void GameObjectVirtualSlot13();
     virtual void GameObjectVirtualSlot14();
@@ -77,13 +83,19 @@ public:
     virtual void GameObjectVirtualSlot24();
     virtual void GameObjectVirtualSlot25();
     virtual void GameObjectVirtualSlot26();
-    char field_0x08[0x24];
+    // Non-virtual, this == the GameObject subobject (Bike slot 97 0x00409420 computes
+    // `lea ecx,[vbase]` before calling it).  Argument types tier 3.
+    void Method_0x00469190(void* a, int b);
+
+    char field_0x08[0x10];
+    void* field_0x18;                   // written by slot 8 (0x004692f0)
+    char field_0x1c[0x10];              // GameObject ends at 0x2c (ctor 0x00468ca0 extent)
 };
 
 class SoultreePhysicsBaseObject : public virtual GameObject {
 public:
     virtual ~SoultreePhysicsBaseObject();       // deleting dtor 0x00504290 via vbase vtable slot 0
-    virtual void GameObjectVirtualSlot10();     // override, thunk 0x005042d0 -> 0x005036f0
+    virtual int GameObjectVirtualSlot10(float dt); // override, thunk 0x005042d0 -> 0x005036f0
     // --- vtable 0x00557d90 (offset 0), slots 0..39, all introduced here ---
     virtual void UnknownVirtualSlot0(float value);
     virtual void UnknownVirtualSlot1(float value);
@@ -92,22 +104,39 @@ public:
         int a10, int a11, int a12, int a13, int a14, int a15, int a16, int a17,
         int a18, int a19, int a20, int a21, int a22, int a23, int a24, int a25,
         int a26);
-    virtual void UnknownVirtualSlot3(int a1, int a2, int a3, int a4, int a5, int a6, int a7);
-    virtual void UnknownVirtualSlot4(int a1, SoultreeVec3* a2, const SoultreeVec3* a3,
-                                     const SoultreeVec3* a4, int a5, int a6, int a7,
+    // Slot 3 (ret 0x1c).  Pointer types are tier 2: Vehicle callers (slots 38, 49) pass
+    // Vec3 addresses for a1..a4; a5 is the event code KrustyBike 0x0048dbf0 compares with
+    // 1000 and 0x67.  a7 is the address of the same local whose value Vehicle slot 38
+    // passes as slot 4's a5 (the other body's field_0x24 float), hence float* (tier 2).
+    virtual void UnknownVirtualSlot3(const SoultreeVec3* a1, const SoultreeVec3* a2,
+                                     const SoultreeVec3* a3, const SoultreeVec3* a4,
+                                     int a5, int a6, float* a7);
+    // Slot 4 (ret 0x3c).  a2..a4/a8..a10 are dereferenced as Vec3 by this body (tier 1);
+    // a1, a11, a12 receive Vec3 addresses at the Vehicle slot 38 call site (tier 2).  That
+    // caller passes the other body's field_0x24 (a float, 1/field_0x158) as a5 and the
+    // address of the local holding it as a14; KrustyBike 0x0048dc60 reads *a14 (tier 2).
+    virtual void UnknownVirtualSlot4(const SoultreeVec3* a1, SoultreeVec3* a2, const SoultreeVec3* a3,
+                                     const SoultreeVec3* a4, float a5, int a6, int a7,
                                      const SoultreeVec3* a8, const SoultreeVec3* a9,
-                                     const SoultreeVec3* a10, int a11, int a12, int a13,
-                                     int a14, float a15);
+                                     const SoultreeVec3* a10, SoultreeVec3* a11, SoultreeVec3* a12,
+                                     int a13, float* a14, float a15);
     virtual int UnknownVirtualSlot5(int value);
     virtual void UnknownVirtualSlot6(SoultreeVec3* a, float* b);
-    virtual void UnknownVirtualSlot7(SoultreeVec3* a);
+    virtual void UnknownVirtualSlot7(const SoultreeVec3* a);  // only read (0x005019e0, tier 2)
     virtual void UnknownVirtualSlot8();
     virtual void UnknownVirtualSlot9(float dt, int* steps);
     virtual int UnknownVirtualSlot10();
-    virtual int UnknownVirtualSlot11(int a1, int a2, int a3, int a4, int a5);
+    // Slot 11 (ret 0x14): returns the 0x004b0df0 result (tier 1).  a2..a4 receive Vec3
+    // addresses and a5 an int address at the Vehicle slot 49 call site (tier 2).
+    virtual int UnknownVirtualSlot11(int a1, SoultreeVec3* a2, SoultreeVec3* a3, SoultreeVec3* a4,
+                                     int* a5);
     virtual int UnknownVirtualSlot12(int value);
     virtual void UnknownVirtualSlot13(SoultreeVec3* a, SoultreeVec3* b, float c);
-    virtual void UnknownVirtualSlot14(const SoultreeVec3* a1, const SoultreeVec3* a2, int a3);
+    // Slot 14 (ret 0xc): retail 0x00502080 passes a2 to slot 16, a3 to slot 15 and later
+    // dereferences a1 (tier 1 decoded stack offsets); all three are Vec3 pointers.
+    // a1 is not const: the KrustyBike override 0x004965e0 zeroes a1->x and a1->z (tier 1).
+    virtual void UnknownVirtualSlot14(SoultreeVec3* a1, const SoultreeVec3* a2,
+                                      const SoultreeVec3* a3);
     virtual void UnknownVirtualSlot15(const SoultreeVec3* a, SoultreeVec3* b);
     virtual SoultreeVec3 UnknownVirtualSlot16(const SoultreeVec3* a);
     virtual SoultreeVec3 UnknownVirtualSlot17();
@@ -127,13 +156,21 @@ public:
     virtual void UnknownVirtualSlot31();
     virtual float UnknownVirtualSlot32();
     virtual int UnknownVirtualSlot33(const SoultreeVec3* a1, const SoultreeVec3* a2,
-                                     const SoultreeVec3* a3, int a4, int a5, float a6);
-    virtual int UnknownVirtualSlot34();
-    virtual int UnknownVirtualSlot35(int a, int b);
+                                     const SoultreeVec3* a3, const SoultreeVec3* a4, int a5,
+                                     float a6);  // a4 unused here; Vehicle passes a Vec3 address (tier 2)
+    // Slots 34/35 are declared void: 0x004aa1c0/0x004aa1e0 end in `call; ret` with no use
+    // of eax, identical for either return type; the Vehicle overrides 0x0040c4c0 and
+    // 0x0040c540 return nothing (tier 2).
+    virtual void UnknownVirtualSlot34();
+    virtual void UnknownVirtualSlot35(int a, int b);
     virtual void UnknownVirtualSlot36();
     virtual SoultreeAttachment* UnknownVirtualSlot37(int type, void* a2, SoultreeAttachTarget* a3, const SoultreeVec3* v);
-    virtual void UnknownVirtualSlot38(int a1, int a2, int a3);
-    virtual int UnknownVirtualSlot39(int a);
+    // Slot 38 (ret 0xc): 0x00501600 switches on a2 (0x66/0x68/0x69/0x6a/0x2711) and reads
+    // a3->+0x60 as the other body (tier 1); a3's type is provisional.
+    virtual void UnknownVirtualSlot38(int a1, int a2, void* a3);
+    // Slot 39 (ret 4): argument unused here; Vehicle slot 49 0x0052a940 passes it the same
+    // dword it passes to slot 9 (float dt), so float (tier 2).
+    virtual int UnknownVirtualSlot39(float dt);
 
     // --- data members (offsets confirmed by decoded accesses; names provisional) ---
     // vfptr at +0, vbptr at +4 (compiler generated)
@@ -211,7 +248,7 @@ public:
     int field_0x1ec;
     SoultreeSlot1f0* field_0x1f0;
     int field_0x1f4;
-    int field_0x1f8;
+    float field_0x1f8;                  // fld/fmul in KrustyBike slot 12 (0x0048de20), tier 1
     char field_0x1fc;
     void* field_0x200;
     int field_0x204;

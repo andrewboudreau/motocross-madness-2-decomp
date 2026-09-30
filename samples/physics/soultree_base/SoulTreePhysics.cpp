@@ -70,9 +70,9 @@ float SoultreePhysicsBaseObject::UnknownVirtualSlot32()
     return field_0x15c;
 }
 
-int SoultreePhysicsBaseObject::UnknownVirtualSlot34()
+void SoultreePhysicsBaseObject::UnknownVirtualSlot34()
 {
-    return field_0x08->Fn_4fc540(0, field_0x88, field_0x94);
+    field_0x08->Fn_4fc540(0, field_0x88, field_0x94);
 }
 
 // ==== chunks ====
@@ -107,7 +107,9 @@ static inline SoultreeVec3 SoultreeCross(const SoultreeVec3& a, const SoultreeVe
 }
 
 // slot 3 (0x00501310): runs the TU-local solver helper, then refreshes cached values.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot3(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot3(const SoultreeVec3* a1, const SoultreeVec3* a2,
+                                                    const SoultreeVec3* a3, const SoultreeVec3* a4,
+                                                    int a5, int a6, float* a7)
 {
     Fn_500220(field_0x14c, field_0x24, field_0x08, a1, a2, a3, &field_0xe4, a4, &field_0xd8,
               &field_0x64, a7, a6);
@@ -116,11 +118,11 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot3(int a1, int a2, int a3, int 
 }
 
 // slot 4 (0x005013d0)
-void SoultreePhysicsBaseObject::UnknownVirtualSlot4(int a1, SoultreeVec3* a2, const SoultreeVec3* a3,
-                                                    const SoultreeVec3* a4, int a5, int a6, int a7,
+void SoultreePhysicsBaseObject::UnknownVirtualSlot4(const SoultreeVec3* a1, SoultreeVec3* a2, const SoultreeVec3* a3,
+                                                    const SoultreeVec3* a4, float a5, int a6, int a7,
                                                     const SoultreeVec3* a8, const SoultreeVec3* a9,
-                                                    const SoultreeVec3* a10, int a11, int a12, int a13,
-                                                    int a14, float a15)
+                                                    const SoultreeVec3* a10, SoultreeVec3* a11,
+                                                    SoultreeVec3* a12, int a13, float* a14, float a15)
 {
     SoultreeVec3 l1 = (SoultreeCross(*a3, *a4) + *a2) * a15;
     SoultreeVec3 l2 = (SoultreeCross(*a9, *a10) + *a8) * a15;
@@ -131,9 +133,9 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot4(int a1, SoultreeVec3* a2, co
 }
 
 // slot 35 (0x004aa1e0)
-int SoultreePhysicsBaseObject::UnknownVirtualSlot35(int a, int b)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot35(int a, int b)
 {
-    return field_0x08->Fn_4fc050(0, &field_0x88, &field_0x94, a, b);
+    field_0x08->Fn_4fc050(0, &field_0x88, &field_0x94, a, b);
 }
 // slot 0 (0x005008d0): stores value + field_0x150 and derived quantities.
 void SoultreePhysicsBaseObject::UnknownVirtualSlot0(float value)
@@ -209,7 +211,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot9(float dt, int* steps)
 }
 
 // slot 11 (0x00501da0)
-int SoultreePhysicsBaseObject::UnknownVirtualSlot11(int a1, int a2, int a3, int a4, int a5)
+int SoultreePhysicsBaseObject::UnknownVirtualSlot11(int a1, SoultreeVec3* a2, SoultreeVec3* a3,
+                                                    SoultreeVec3* a4, int* a5)
 {
     return Fn_4b0df0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, 0, 0x7fffffff,
                      0x7fffffff, 0, 3.0f, field_0x20f, &field_0xa0, 0, !field_0x109,
@@ -350,7 +353,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot31()
 
 // slot 33 (0x00501c20)
 int SoultreePhysicsBaseObject::UnknownVirtualSlot33(const SoultreeVec3* a1, const SoultreeVec3* a2,
-                                                    const SoultreeVec3* a3, int a4, int a5, float a6)
+                                                    const SoultreeVec3* a3, const SoultreeVec3* a4,
+                                                    int a5, float a6)
 {
     UnknownVirtualSlot1(a6);
     field_0x88 = *a2;
@@ -407,7 +411,7 @@ SoultreeAttachment* SoultreePhysicsBaseObject::UnknownVirtualSlot37(int type, vo
 }
 
 // slot 39 (0x005019a0)
-int SoultreePhysicsBaseObject::UnknownVirtualSlot39(int a)
+int SoultreePhysicsBaseObject::UnknownVirtualSlot39(float dt)
 {
     if (field_0x109) {
         field_0x0c = field_0x10c;
@@ -469,7 +473,7 @@ static inline float VecLengthFast(const SoultreeVec3& v)
 
 // slot 7 (0x005019e0): distributes the vector *a over the contacts, weighting each
 // active contact by 1 - (its distance / summed distance).  Tier 3 reading.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot7(SoultreeVec3* a)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot7(const SoultreeVec3* a)
 {
     float dist[124];
     int i;
@@ -547,10 +551,11 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(SoultreeVec3* a1, SoultreeV
 }
 
 // slot 14 (0x00502080): integrates the accumulated force/torque estimates.
-void SoultreePhysicsBaseObject::UnknownVirtualSlot14(const SoultreeVec3* a1, const SoultreeVec3* a2, int a3)
+void SoultreePhysicsBaseObject::UnknownVirtualSlot14(SoultreeVec3* a1, const SoultreeVec3* a2,
+                                                     const SoultreeVec3* a3)
 {
-    field_0xc0 = UnknownVirtualSlot16(a1);
-    UnknownVirtualSlot15(a2, &field_0xc0);
+    field_0xc0 = UnknownVirtualSlot16(a2);
+    UnknownVirtualSlot15(a3, &field_0xc0);
     field_0xd8 += field_0xc0 * field_0x13c;
     field_0xd8 *= 0.999f;
     field_0x70 = *a1 * field_0x24;

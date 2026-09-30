@@ -23,14 +23,14 @@ struct VehV3 : VehVec3
 void Vehicle::UnknownVirtualSlot34()
 {
     VehV3& a = (VehV3&)field_0x88;
-    field_0x3bc->Method_004FC540(0, &a, &field_0x94);
+    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC540(0, &a, &field_0x94);
     field_0x4cc = a.Cross(field_0x94);
 }
 
 void Vehicle::UnknownVirtualSlot35(int a, int b)
 {
     VehV3& v = (VehV3&)field_0x88;
-    field_0x3bc->Method_004FC050(0, &v, &field_0x94, b, a);
+    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC050(0, &v, &field_0x94, a, b);
     field_0x4cc = v.Cross(field_0x94);
 }
 
@@ -61,7 +61,7 @@ int Vehicle::UnknownVirtualSlot25()
     return field_0x5b0 > field_0x480->field_0x00 && field_0x444 == 0 && field_0xbc < 22.0f;
 }
 
-void Vehicle::UnknownVirtualSlot92(VehVec3*, VehVec3*) {}
+void Vehicle::UnknownVirtualSlot92(const VehVec3*, const VehVec3*) {}
 
 void Vehicle::UnknownVirtualSlot0(float dt)
 {
@@ -102,7 +102,7 @@ int Vehicle::UnknownVirtualSlot62(float arg)
     return field_0x5a4 && field_0x444 == 0;
 }
 
-int Vehicle::UnknownVirtualSlot89(int arg)
+int Vehicle::UnknownVirtualSlot89(float arg)
 {
     return UnknownVirtualSlot66();
 }
@@ -135,9 +135,9 @@ int Vehicle::UnknownVirtualSlot81()
     return field_0x468->UnknownVirtualSlot3(0x1d, 0, 0x3f, 0) != 0;
 }
 
-void Vehicle::UnknownVirtualSlot84(int a, int b)
+int Vehicle::UnknownVirtualSlot84(int a, int b)
 {
-    field_0x468->UnknownVirtualSlot2(a, b);
+    return field_0x468->UnknownVirtualSlot2(a, b);
 }
 
 // Provisional semantics: true when the accumulated travel (0xbc - 0xb8) is less than arg * 0x450.
@@ -147,7 +147,7 @@ int Vehicle::UnknownVirtualSlot70(float arg)
 }
 
 // Provisional: field_0x4ec / sin(steer angle), zero when the angle is zero.
-float Vehicle::UnknownVirtualSlot73(VehVec3* a, VehVec3* b)
+float Vehicle::UnknownVirtualSlot73(const VehVec3* a, const VehVec3* b)
 {
     VehicleSteerState* s = field_0x47c;
     float m = s->field_0x04;
@@ -162,12 +162,12 @@ float Vehicle::UnknownVirtualSlot73(VehVec3* a, VehVec3* b)
 void Vehicle::UnknownVirtualSlot67()
 {
     for (int i = 0; i < field_0x130; i++) {
-        VehicleContact* c = field_0x12c[i];
+        VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
         if (c->field_0x04 != 0)
             c->field_0xa4 = 0;
     }
     field_0x444 = 0;
-    field_0x454 = 0;
+    field_0x454 = 0.0f;
     field_0x5b4 = 0;
 }
 
@@ -195,23 +195,24 @@ int Vehicle::UnknownVirtualSlot79()
     return field_0x468->UnknownVirtualSlot3(0x2d, 0, 0x3f, 0) != 0;
 }
 
-int Vehicle::UnknownVirtualSlot64(int arg)
+void Vehicle::UnknownVirtualSlot64(float arg)
 {
-    if (field_0x444 == 0)
-        return UnknownVirtualSlot63(arg);
+    if (field_0x444 == 0) {
+        UnknownVirtualSlot63(arg);
+        return;
+    }
     field_0x504 = g_VehZeroVec3;
     field_0x474 = 0.0f;
     field_0x470 = 0.0f;
-    return 0;
 }
 
 // Provisional semantics: a cross product returned through out (a x b).
-void Vehicle::UnknownVirtualSlot76(VehVec3* out, VehVec3* a, VehVec3* b)
+VehVec3 Vehicle::UnknownVirtualSlot76(const VehVec3* a, const VehVec3* b)
 {
-    *out = ((VehV3*)a)->Cross(*b);
+    return ((const VehV3*)a)->Cross(*b);
 }
 
-void Vehicle::UnknownVirtualSlot90(int* a, int b)
+void Vehicle::UnknownVirtualSlot90(int* a, float b)
 {
     if (Method_00526830()) {
         *a = 1;
@@ -348,7 +349,7 @@ static inline float VehDistance(const VehVec3& a, const VehVec3& b)
     return VehFastSqrt(d2);
 }
 
-void Vehicle::UnknownVirtualSlot7(VehVec3* arg)
+void Vehicle::UnknownVirtualSlot7(const VehVec3* arg)
 {
     VehVec3 share;
     float total;
@@ -362,7 +363,7 @@ void Vehicle::UnknownVirtualSlot7(VehVec3* arg)
         total = 0.0f;
         int last = 0;
         for (i = 0; i < field_0x130; i++) {
-            VehicleContact* c = field_0x12c[i];
+            VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
             if (c->field_0xa4) {
                 dist[i] = VehDistance(field_0x18, c->field_0x14);
                 total += dist[i];
@@ -374,12 +375,12 @@ void Vehicle::UnknownVirtualSlot7(VehVec3* arg)
             }
         }
         if (active == 1) {
-            field_0x12c[last]->field_0xa0 = 1.0f;
-            field_0x12c[last]->field_0x44 = *arg;
+            ((VehicleContact**)field_0x12c)[last]->field_0xa0 = 1.0f;
+            ((VehicleContact**)field_0x12c)[last]->field_0x44 = *arg;
             return;
         }
         for (i = 0; active > 0; i++) {
-            VehicleContact* c = field_0x12c[i];
+            VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
             if (c->field_0xa4) {
                 float w = 1.0f - dist[i] / total;
                 active--;
@@ -455,8 +456,8 @@ static inline float VehAbs(float x)
 void Vehicle::UnknownVirtualSlot56(VehVec3* a, int b, VehVec3* c)
 {
     if (field_0x544 == 0) {
-        field_0x4ac = field_0x48.f[0];
-        field_0x4b0 = field_0x2c.f[4];
+        field_0x4ac = field_0x48;
+        field_0x4b0 = field_0x3c;
         return;
     }
     VehVec3 n;
@@ -469,8 +470,8 @@ void Vehicle::UnknownVirtualSlot56(VehVec3* a, int b, VehVec3* c)
     VehVec3* perp = &field_0x1b8;
     *perp = *VehSubVec(&t, &n, &proj);
     if ((perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) || !perp) {
-        field_0x4ac = field_0x48.f[0];
-        field_0x4b0 = field_0x2c.f[4];
+        field_0x4ac = field_0x48;
+        field_0x4b0 = field_0x3c;
         return;
     }
     *perp = *VehNormalize(&t, perp);
@@ -507,7 +508,7 @@ void Vehicle::UnknownVirtualSlot58(VehVec3* a, int b)
         if (b == 0) {
             float y = field_0x548->field_0xd8.y;
             field_0x0c.y = y;
-            field_0x3bc->Method_004FC630(field_0x0c.x, y, field_0x0c.z);
+            ((VehicleXform*)d3d_field_0x1a0)->Method_004FC630(field_0x0c.x, y, field_0x0c.z);
         }
         field_0x548->field_0x150 = 0.0f;
     } else {
@@ -529,13 +530,13 @@ void Vehicle::UnknownVirtualSlot58(VehVec3* a, int b)
             }
             dir = *Method_00528400(&t);
         }
-        field_0x3bc->Method_004FC050(0, &field_0x88, &dir, 1, 0);
+        ((VehicleXform*)d3d_field_0x1a0)->Method_004FC050(0, &field_0x88, &dir, 1, 0);
         UnknownVirtualSlot34();
-        field_0x3bc->Method_004FC9A0(0, &field_0x0c);
+        ((VehicleXform*)d3d_field_0x1a0)->Method_004FC9A0(0, &field_0x0c);
         if (b == 0) {
             float y = top->field_0x228 - top->field_0xcc.y + top->field_0xd8.y;
             field_0x0c.y = y;
-            field_0x3bc->Method_004FC630(field_0x0c.x, y, field_0x0c.z);
+            ((VehicleXform*)d3d_field_0x1a0)->Method_004FC630(field_0x0c.x, y, field_0x0c.z);
         }
         if (field_0x544 == 2) {
             VehVec3 v0;
@@ -543,23 +544,29 @@ void Vehicle::UnknownVirtualSlot58(VehVec3* a, int b)
             t = *UnknownVirtualSlot55(&v0, &field_0x194);
             UnknownVirtualSlot56(&t, 0, &dir);
             float lean = field_0x4ac;
-            v0 = *field_0x3bc->Method_004FD710(&v2, &t);
+            v0 = *((VehicleXform*)d3d_field_0x1a0)->Method_004FD710(&v2, &t);
             if (VehAbs(lean) > 0.001f) {
                 if (VehAbs(v0.z) > 0.001f || VehAbs(v0.y) > 0.001f || VehAbs(v0.x) > 0.001f) {
-                    field_0x3bc->Method_004FD1F0(v0, field_0x194, lean);
+                    ((VehicleXform*)d3d_field_0x1a0)->Method_004FD1F0(v0, field_0x194, lean);
                     UnknownVirtualSlot34();
-                    field_0x3bc->Method_004FC9A0(0, &field_0x0c);
+                    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC9A0(0, &field_0x0c);
                 }
             }
         }
     }
     field_0x47c->field_0x00->Method_004FC050(0, &field_0x88, &field_0x94, 0, 1);
     field_0x108 = false;
-    VehBasisToBlock(field_0x88, field_0x94, &field_0x2c.f[2], &field_0x2c.f[1], &field_0x2c.f[0],
-                    &field_0x2c.f[3], &field_0x2c.f[4], &field_0x2c.f[6], &field_0x2c.f[5]);
+    VehBasisToBlock(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c,
+                    &field_0x38, &field_0x3c, &field_0x44, &field_0x40);
     field_0xa0 = field_0x88;
     field_0xac = field_0x94;
+    field_0x50 = field_0x34;
+    field_0x4c = field_0x30;
     field_0x48 = field_0x2c;
+    field_0x54 = field_0x38;
+    field_0x58 = field_0x3c;
+    field_0x60 = field_0x44;
+    field_0x5c = field_0x40;
 }
 
 static inline VehVec3 VehNormalized(const VehVec3& v)
@@ -708,13 +715,14 @@ static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink* si
 
 // Posts a one-shot impact for the first wheel (aux-driven first, then any) or contact whose
 // surface material is flagged in the material table and which has not yet reported one.
-void Vehicle::UnknownVirtualSlot18(VehicleImpactEvent* ev)
+void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
 {
+    VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
     int i;
     for (i = 0; i < field_0x544; i++) {
         VehicleWheel* w = field_0x53c[i];
         if (w->field_0x2a8 && w->field_0x260 && !w->field_0x160 &&
-            (!field_0x1f0 || field_0x1f0->field_0xa4[0x400 + w->field_0x174])) {
+            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174])) {
             w->field_0x160 = 1;
             float v = w->field_0x2bc * 20.0f;
             if (!(v > 1.0f))
@@ -727,7 +735,7 @@ void Vehicle::UnknownVirtualSlot18(VehicleImpactEvent* ev)
     for (i = 0; i < field_0x544; i++) {
         VehicleWheel* w = field_0x53c[i];
         if (w->field_0x260 && !w->field_0x160 &&
-            (!field_0x1f0 || field_0x1f0->field_0xa4[0x400 + w->field_0x174])) {
+            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174])) {
             w->field_0x160 = 1;
             ev->field_0x04->Method_004B8D90(w->field_0xd8, 0.0f);
             VehCommitImpact(ev, ev->field_0x04);
@@ -735,9 +743,9 @@ void Vehicle::UnknownVirtualSlot18(VehicleImpactEvent* ev)
         }
     }
     for (i = 0; i < field_0x130; i++) {
-        VehicleContact* c = field_0x12c[i];
+        VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
         if (c->field_0xa4 && !c->field_0xa8 &&
-            (!field_0x1f0 || field_0x1f0->field_0xa4[0x400 + c->field_0xbc])) {
+            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + c->field_0xbc])) {
             c->field_0xa8 = 1;
             ev->field_0x04->Method_004B8D90(c->field_0x20, 0.0f);
             VehCommitImpact(ev, ev->field_0x04);
@@ -748,14 +756,15 @@ void Vehicle::UnknownVirtualSlot18(VehicleImpactEvent* ev)
 
 // Slide/scrape impact: like slot 18 but posts a clamped scrape vector (wheel normal-ish frame
 // scaled by the wheel's 0x290 gain and dt) into the sink's +0x74 vector.
-void Vehicle::UnknownVirtualSlot19(VehicleImpactEvent* ev)
+void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
 {
+    VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
     VehicleWheel* w = 0;
     int i;
     for (i = 0; i < field_0x544; i++) {
         w = field_0x53c[i];
         if (w->field_0x2a8 && w->field_0x260 && !w->field_0x164 &&
-            (!field_0x1f0 || field_0x1f0->field_0xa4[0x408 + w->field_0x174]))
+            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x408 + w->field_0x174]))
             break;
     }
     if (i < field_0x544) {
@@ -768,7 +777,7 @@ void Vehicle::UnknownVirtualSlot19(VehicleImpactEvent* ev)
         field_0x1b8.y = 0.0f;
         field_0x1b8.z = -w->field_0x28c;
         VehVec3 t;
-        field_0x1ac = *field_0x3bc->Method_004FD5C0(&t, &field_0x1b8);
+        field_0x1ac = *((VehicleXform*)d3d_field_0x1a0)->Method_004FD5C0(&t, &field_0x1b8);
         field_0x1ac.y = w->field_0x2bc * 3.0f;
         float s = w->field_0x290 * field_0x140;
         field_0x1ac.x *= s;
@@ -786,7 +795,7 @@ void Vehicle::UnknownVirtualSlot19(VehicleImpactEvent* ev)
     for (i = 0; i < field_0x544; i++) {
         w = field_0x53c[i];
         if (w->field_0x260 && !w->field_0x164 &&
-            (!field_0x1f0 || field_0x1f0->field_0xa4[0x408 + w->field_0x174]))
+            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x408 + w->field_0x174]))
             break;
     }
     if (i < field_0x544) {
@@ -799,8 +808,9 @@ void Vehicle::UnknownVirtualSlot19(VehicleImpactEvent* ev)
 
 // Second scrape channel: like slot 19 (sink at event+0x0c, no per-material table gate) but posts a clamped scrape vector (wheel normal-ish frame
 // scaled by the wheel's 0x290 gain and dt) into the sink's +0x74 vector.
-void Vehicle::UnknownVirtualSlot20(VehicleImpactEvent* ev)
+void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
 {
+    VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
     VehicleWheel* w = 0;
     int i;
     for (i = 0; i < field_0x544; i++) {
@@ -818,7 +828,7 @@ void Vehicle::UnknownVirtualSlot20(VehicleImpactEvent* ev)
         field_0x1b8.y = 0.0f;
         field_0x1b8.z = -w->field_0x28c;
         VehVec3 t;
-        field_0x1ac = *field_0x3bc->Method_004FD5C0(&t, &field_0x1b8);
+        field_0x1ac = *((VehicleXform*)d3d_field_0x1a0)->Method_004FD5C0(&t, &field_0x1b8);
         field_0x1ac.y = w->field_0x2bc * 3.0f;
         float s = w->field_0x290 * field_0x140;
         field_0x1ac.x *= s;
@@ -850,27 +860,28 @@ void Vehicle::UnknownVirtualSlot20(VehicleImpactEvent* ev)
 // Slot 4: builds two lever-arm offsets (a1 + a2 x a3, a7 + a8 x a9), each scaled by a14, and hands
 // them with the frame data to helper 0x5004a0. Afterwards it caches |*a1| in field_0xbc and
 // field_0xcc = the frame transform of field_0xd8 (tier 3).
-void Vehicle::UnknownVirtualSlot4(int a0, VehVec3* a1, VehVec3* a2, VehVec3* a3, int a4, int a5, int a6,
-                                  VehVec3* a7, VehVec3* a8, VehVec3* a9, int a10, int a11, int a12,
-                                  int a13, float a14)
+void Vehicle::UnknownVirtualSlot4(const VehVec3* a0, VehVec3* a1, const VehVec3* a2,
+                                  const VehVec3* a3, float a4, int a5, int a6, const VehVec3* a7,
+                                  const VehVec3* a8, const VehVec3* a9, VehVec3* a10, VehVec3* a11,
+                                  int a12, float* a13, float a14)
 {
-    field_0x1ac = ((VehV3*)a2)->Cross(*a3);
+    field_0x1ac = ((const VehV3*)a2)->Cross(*a3);
     VehVec3 p;
     p.x = (a1->x + field_0x1ac.x) * a14;
     p.y = (field_0x1ac.y + a1->y) * a14;
     p.z = (field_0x1ac.z + a1->z) * a14;
-    field_0x1ac = ((VehV3*)a8)->Cross(*a9);
+    field_0x1ac = ((const VehV3*)a8)->Cross(*a9);
     VehVec3 q;
     q.x = (field_0x1ac.x + a7->x) * a14;
     q.y = (field_0x1ac.y + a7->y) * a14;
     q.z = (field_0x1ac.z + a7->z) * a14;
-    VehSlot4Helper(field_0x14c, a0, field_0x24, field_0x3bc, &p, a3,
+    VehSlot4Helper(field_0x14c, a0, field_0x24, ((VehicleXform*)d3d_field_0x1a0), &p, a3,
                    field_0x444 ? &field_0xf0 : &field_0xe4, &field_0xd8, a1, a5, a6,
                    &q, a9, a10, a11, a12, a13);
     float len2 = a1->x * a1->x + a1->y * a1->y + a1->z * a1->z;
     field_0xbc = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
     VehVec3 t;
-    field_0xcc = *field_0x3bc->Method_004FD5C0(&t, &field_0xd8);
+    field_0xcc = *((VehicleXform*)d3d_field_0x1a0)->Method_004FD5C0(&t, &field_0xd8);
 }
 
 static inline VehVec3 VehOffset(const VehVec3& a, const VehVec3& b)
@@ -919,7 +930,7 @@ VehVec3* Vehicle::UnknownVirtualSlot46(VehVec3* out, float arg)
             VehVec3* p = &field_0x548->field_0xcc;
             field_0x1ac = VehOffset(*p, field_0x0c);
         }
-        src = field_0x3bc->Method_004FD710(&t, &field_0x1ac);
+        src = ((VehicleXform*)d3d_field_0x1a0)->Method_004FD710(&t, &field_0x1ac);
     }
 done:
     *out = *src;
@@ -939,7 +950,7 @@ static inline void VehSmooth(VehicleSmoother* s, float dt, float target)
     s->field_0x00 = (target - s->field_0x00) * s->field_0x08 + s->field_0x00;
 }
 
-void Vehicle::UnknownVirtualSlot49(int frame)
+void Vehicle::UnknownVirtualSlot49(float frame)
 {
     int steps;
     VehVec3 up;          // frame reference vector (from field_0x188)
@@ -958,7 +969,7 @@ void Vehicle::UnknownVirtualSlot49(int frame)
     field_0x1d0 = 0;
     hit = UnknownVirtualSlot39(frame);
     if (!hit && !field_0x444 && steps != 1) {
-        VehContactsA(UnknownVirtualSlot5(0), &field_0x1cc, field_0x130, field_0x12c, field_0x1f4,
+        VehContactsA(UnknownVirtualSlot5(0), &field_0x1cc, field_0x130, ((VehicleContact**)field_0x12c), field_0x1f4,
                      &field_0x18, field_0x1c4, field_0x160);
         field_0x1d0 = field_0x1cc > 0;
     }
@@ -997,7 +1008,7 @@ void Vehicle::UnknownVirtualSlot49(int frame)
             field_0x64 = g_VehZeroVec3;
             field_0xbc = 0.0f;
         }
-        field_0x218->Method_004FC9A0(0, &field_0x18);
+        ((VehicleXform*)field_0x218)->Method_004FC9A0(0, &field_0x18);
         float t53 = UnknownVirtualSlot53();
         Method_00528EB0();
         float& timer = (float&)field_0x4f4;      // float timer kept in an int-typed field (raw copy in slot 50)
@@ -1014,7 +1025,7 @@ void Vehicle::UnknownVirtualSlot49(int frame)
         VehVec3 basis = *UnknownVirtualSlot55(&a, &b);
         UnknownVirtualSlot56(&basis, 1, 0);
         res = UnknownVirtualSlot5(0);
-        res = VehContactsA(field_0x444 || (steps == 1 && res), &field_0x1cc, field_0x130, field_0x12c,
+        res = VehContactsA(field_0x444 || (steps == 1 && res), &field_0x1cc, field_0x130, ((VehicleContact**)field_0x12c),
                            field_0x1f4, &field_0x18, field_0x1c4, field_0x160);
         if (res)
             field_0x1d0 = field_0x1cc > 0;
@@ -1040,7 +1051,7 @@ void Vehicle::UnknownVirtualSlot49(int frame)
             }
             if (field_0x1d0) {
                 if (!res)
-                    VehContactsC(field_0x130, field_0x12c);
+                    VehContactsC(field_0x130, ((VehicleContact**)field_0x12c));
                 UnknownVirtualSlot31();
             }
         } else {
@@ -1060,9 +1071,9 @@ void Vehicle::UnknownVirtualSlot49(int frame)
                 scale.z = 0.3f;
             }
             VehVec3 o1, o2, o3;
-            VehContactsB(field_0x130, field_0x12c, &scale, &field_0xcc, &field_0x64, &field_0x18,
+            VehContactsB(field_0x130, ((VehicleContact**)field_0x12c), &scale, &field_0xcc, &field_0x64, &field_0x18,
                          &field_0x0c, &o3, &o2, &o1);
-            UnknownVirtualSlot3(&o2, &o1, &o3, &scale, 0x67, 0, &tmp);
+            UnknownVirtualSlot3(&o2, &o1, &o3, &scale, 0x67, 0, &tmp.x);
             if (field_0xb8 * 1.3f < field_0xbc && field_0xbc > 5.0f) {
                 float r = field_0xb8 / field_0xbc;
                 field_0x64.x *= r;
@@ -1098,7 +1109,7 @@ void Vehicle::UnknownVirtualSlot49(int frame)
         UnknownVirtualSlot26();
         UnknownVirtualSlot48();
         UnknownVirtualSlot85();
-        field_0x3bc->Method_004FC660(&field_0x0c);
+        ((VehicleXform*)d3d_field_0x1a0)->Method_004FC660(&field_0x0c);
         UnknownVirtualSlot95();
         if (field_0x444) {
             UnknownVirtualSlot87();
@@ -1111,18 +1122,18 @@ void Vehicle::UnknownVirtualSlot49(int frame)
                     if (aq < 0.0001f) {
                         if (VehAbs(k) > 0.0001f) {
                             field_0x1ac = *UnknownVirtualSlot54(&tmp);
-                            field_0x4c0 = *field_0x3bc->Method_004FD710(&a, &field_0x1ac);
+                            field_0x4c0 = *((VehicleXform*)d3d_field_0x1a0)->Method_004FD710(&a, &field_0x1ac);
                         } else {
                             doit = false;
                         }
                     } else {
-                        field_0x4c0 = *field_0x3bc->Method_004FD710(&b, &lift);
+                        field_0x4c0 = *((VehicleXform*)d3d_field_0x1a0)->Method_004FD710(&b, &lift);
                     }
                     if (doit) {
                         if (k != 0.0f && aq < 0.003f)
-                            field_0x3bc->Method_004FD1F0(aim, field_0x4c0, k);
+                            ((VehicleXform*)d3d_field_0x1a0)->Method_004FD1F0(aim, field_0x4c0, k);
                         else
-                            field_0x3bc->Method_004FD1F0(aim, field_0x4c0, k + field_0x4b8);
+                            ((VehicleXform*)d3d_field_0x1a0)->Method_004FD1F0(aim, field_0x4c0, k + field_0x4b8);
                         field_0xd8.x *= 0.85f;
                         field_0xd8.y *= 0.85f;
                         field_0xd8.z *= 0.85f;
@@ -1133,9 +1144,9 @@ void Vehicle::UnknownVirtualSlot49(int frame)
             }
             UnknownVirtualSlot90(&steps, frame);
         }
-        field_0x3bc->Method_004FC970(&field_0x0c);
-        field_0x218->Method_004FC9A0(0, &field_0x18);
-        field_0xcc = *field_0x3bc->Method_004FD5C0(&tmp, &field_0xd8);
+        ((VehicleXform*)d3d_field_0x1a0)->Method_004FC970(&field_0x0c);
+        ((VehicleXform*)field_0x218)->Method_004FC9A0(0, &field_0x18);
+        field_0xcc = *((VehicleXform*)d3d_field_0x1a0)->Method_004FD5C0(&tmp, &field_0xd8);
         steps = UnknownVirtualSlot28(steps) - 1;
         field_0x1e8 = field_0x13c;
         if (steps == 0 && field_0x1e0 > 0.0001f) {
@@ -1145,14 +1156,14 @@ void Vehicle::UnknownVirtualSlot49(int frame)
             field_0x1e0 = 0.0f;
         }
         UnknownVirtualSlot34();
-        VehBasisToBlock(field_0x88, field_0x94, &field_0x2c.f[2], &field_0x2c.f[1], &field_0x2c.f[0],
-                        &field_0x2c.f[3], &field_0x2c.f[4], &field_0x2c.f[6], &field_0x2c.f[5]);
+        VehBasisToBlock(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c,
+                        &field_0x38, &field_0x3c, &field_0x44, &field_0x40);
         field_0x7c = field_0x64;
         field_0x5b4 = field_0x444;
         UnknownVirtualSlot29(steps == 0);
     }
     UnknownVirtualSlot21();
-    field_0x1ac = *field_0x3bc->Method_004FD710(&tmp, &field_0x64);
+    field_0x1ac = *((VehicleXform*)d3d_field_0x1a0)->Method_004FD710(&tmp, &field_0x64);
     VehSmooth(field_0x598, field_0x144, (field_0x1ac.z - field_0x594) / field_0x144);
     field_0x590 = field_0x598->field_0x00;
     field_0x594 = field_0x1ac.z;
@@ -1178,7 +1189,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     VehVec3 s;                     // scale/mask vector (1,1,1)
     VehVec3 p;                     // lever vector (1,1,1)
     VehVec3 v30, v3c, v48;
-    int l10 = 0;
+    float l10 = 0;                 // the other body's field_0x24 (float) or 0
     int l14;
     int ctx = 0;
     int hasBody;
@@ -1192,7 +1203,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     if (b == 0x6a) {
         hasBody = 0;
         if (field_0x124 && (((char*)field_0x124)[0x25] & 1)) {
-            VehVec3 pos = field_0x128->field_0xa0;
+            VehVec3 pos = ((VehicleContactSet*)field_0x128)->field_0xa0;
             ((VehicleImpactSink*)field_0x5ac)->Method_004B9DC0(pos);
             p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
             ((VehicleImpactSink*)field_0x5ac)->field_0x74 = p;
@@ -1206,12 +1217,12 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         l10 = other->field_0x24;
         otherVel = &other->field_0x64;
         otherAng = &other->field_0xd8;
-        v3c.x = field_0x128->field_0xa0.x - other->field_0x18.x;
-        v3c.y = field_0x128->field_0xa0.y - other->field_0x18.y;
-        v3c.z = field_0x128->field_0xa0.z - other->field_0x18.z;
+        v3c.x = ((VehicleContactSet*)field_0x128)->field_0xa0.x - other->field_0x18.x;
+        v3c.y = ((VehicleContactSet*)field_0x128)->field_0xa0.y - other->field_0x18.y;
+        v3c.z = ((VehicleContactSet*)field_0x128)->field_0xa0.z - other->field_0x18.z;
         v48 = other->field_0xcc;
         v30 = other->field_0xe4;
-        ctx = (int)other->field_0x3bc;
+        ctx = (int)other->d3d_field_0x1a0;
     } else if (b == 0x69 || b == 0x2711) {
         other = ((VehicleCollisionEvent*)c)->field_0x60;
         hasBody = 1;
@@ -1224,18 +1235,18 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         goto tail;
     }
 
-    rel.x = field_0x128->field_0xa0.x - field_0x18.x;
-    rel.y = field_0x128->field_0xa0.y - field_0x18.y;
-    rel.z = field_0x128->field_0xa0.z - field_0x18.z;
+    rel.x = ((VehicleContactSet*)field_0x128)->field_0xa0.x - field_0x18.x;
+    rel.y = ((VehicleContactSet*)field_0x128)->field_0xa0.y - field_0x18.y;
+    rel.z = ((VehicleContactSet*)field_0x128)->field_0xa0.z - field_0x18.z;
     if (hasBody) {
         l14 = (b == 0x2711 || b == 0x69) ? 0 : (int)otherVel;
-        UnknownVirtualSlot4((int)&field_0x128->field_0xac, &field_0x64, &field_0xcc, &rel, l10, b, ctx,
-                            otherVel, otherAng, &v48, (int)&v3c, (int)&v30, l14, (int)&l10, 1.0f);
+        UnknownVirtualSlot4(&((VehicleContactSet*)field_0x128)->field_0xac, &field_0x64, &field_0xcc, &rel, l10, b, ctx,
+                            otherVel, otherAng, &v48, &v3c, &v30, l14, &l10, 1.0f);
         if (other) {
             *((char*)other + 0x10a) = 0;
             float len2 = otherVel->x * otherVel->x + otherVel->y * otherVel->y + otherVel->z * otherVel->z;
             field_0xbc = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
-            field_0xcc = *other->field_0x3bc->Method_004FD5C0(&v48, (VehVec3*)c);
+            field_0xcc = *((VehicleXform*)other->d3d_field_0x1a0)->Method_004FD5C0(&v48, (VehVec3*)c);
         }
     } else {
         VehVec3 t;
@@ -1246,7 +1257,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         p.x = field_0x64.x + field_0x1ac.x;
         p.y = field_0x64.y + field_0x1ac.y;
         p.z = field_0x64.z + field_0x1ac.z;
-        UnknownVirtualSlot3(&field_0x128->field_0xac, &p, &rel, &s, b, 0, (VehVec3*)&l10);
+        UnknownVirtualSlot3(&((VehicleContactSet*)field_0x128)->field_0xac, &p, &rel, &s, b, 0, &l10);
     }
 tail:
     if (field_0xb8 < 0.001f && field_0xbc < 0.1f) {

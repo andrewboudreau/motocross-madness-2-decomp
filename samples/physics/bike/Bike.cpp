@@ -12,7 +12,7 @@ float Bike::UnknownVirtualSlot32()
 
 float Bike::UnknownVirtualSlot47(float)
 {
-    return 1.05f - field_0x508 * 0.25f;
+    return 1.05f - field_0x504.y * 0.25f;
 }
 
 int Bike::UnknownVirtualSlot98()
@@ -53,7 +53,7 @@ float Bike::UnknownVirtualSlot53()
 {
     if (field_0x444 == 0) {
         float f = field_0x4bc * field_0x13c;
-        field_0x47c->Method_0x00504ec0(f, (int)field_0x42c);
+        field_0x47c->Method_00504EC0(f, field_0x42c);
         return 1.0f;
     }
     return 1.0f - Method_0x0040a520();
@@ -61,13 +61,13 @@ float Bike::UnknownVirtualSlot53()
 
 void Bike::UnknownVirtualSlot96()
 {
-    field_0x524 = 0.675f;
+    field_0x524[0] = 0.675f;
     field_0x63c = 1.0f;
-    field_0x528 = 1.0f;
-    field_0x52c = 1.0f;
-    field_0x530 = 1.0f;
-    field_0x534 = 1.0f;
-    field_0x538 = 1.0f;
+    field_0x524[1] = 1.0f;
+    field_0x524[2] = 1.0f;
+    field_0x524[3] = 1.0f;
+    field_0x524[4] = 1.0f;
+    field_0x524[5] = 1.0f;
 }
 
 int Bike::UnknownVirtualSlot5(int arg)
@@ -114,7 +114,7 @@ void Bike::UnknownVirtualSlot71(int arg)
         } else if (arg) {
             field_0x720 = 1;
             field_0x718 = (field_0x48 < 0.0f) ? -1.0f : 1.0f;
-            field_0x71c = field_0xe0;
+            field_0x71c = field_0xd8.z;
         }
     }
     Vehicle::UnknownVirtualSlot71(arg);
@@ -124,7 +124,7 @@ float Bike::UnknownVirtualSlot57()
 {
     if (field_0x444 == 0 && field_0xb8 < field_0x724)
         return field_0x48;
-    float a = field_0x47c->j_0x4;
+    float a = field_0x47c->field_0x04;
     if (a < 0.0f)
         a = -a;
     float r = field_0x4ac;
@@ -133,7 +133,7 @@ float Bike::UnknownVirtualSlot57()
     return r;
 }
 
-void Bike::UnknownVirtualSlot56(int a, int b, int c)
+void Bike::UnknownVirtualSlot56(BikeVec3* a, int b, BikeVec3* c)
 {
     Vehicle::UnknownVirtualSlot56(a, b, c);
     if (b) {
@@ -145,13 +145,13 @@ void Bike::UnknownVirtualSlot56(int a, int b, int c)
 float Bike::UnknownVirtualSlot59()
 {
     if (field_0x658 == 10)
-        return field_0x47c->j_0x8;
-    float a = field_0x47c->j_0x8;
+        return field_0x47c->field_0x08;
+    float a = field_0x47c->field_0x08;
     float r = a - BikeMath_0x00460b50(field_0xb8 / field_0x438 * (a * a));
     if (r < 0.0f)
         r = 0.0f;
-    if (field_0x47c->j_0x8 < r)
-        r = field_0x47c->j_0x8;
+    if (field_0x47c->field_0x08 < r)
+        r = field_0x47c->field_0x08;
     return r;
 }
 
@@ -159,7 +159,7 @@ void Bike::UnknownVirtualSlot67()
 {
     int i;
     for (i = 0; i < field_0x130; i++) {
-        BikeElem* e = field_0x12c[i];
+        BikeElem* e = ((BikeElem**)field_0x12c)[i];
         if (e->h_0x4 != 0)
             e->h_0xa4 = 0;
     }
@@ -185,22 +185,22 @@ void Bike::UnknownVirtualSlot90(int* flag, float arg)
     }
 }
 
-BikeVec3 Bike::UnknownVirtualSlot16(const BikeVec3& v)
+BikeVec3 Bike::UnknownVirtualSlot16(const BikeVec3* v)
 {
     BikeVec3 r;
     if (field_0x444 == 0) {
-        r.x = field_0xe4.x * v.x;
+        r.x = field_0xe4.x * v->x;
         r.y = 0.0f;
         r.z = 0.0f;
     } else {
-        r.x = field_0xf0.x * v.x;
-        r.y = field_0xf0.y * v.y;
-        r.z = field_0xf0.z * v.z;
+        r.x = field_0xf0.x * v->x;
+        r.y = field_0xf0.y * v->y;
+        r.z = field_0xf0.z * v->z;
     }
     return r;
 }
 
-void Bike::UnknownVirtualSlot1(int arg)
+void Bike::UnknownVirtualSlot1(float arg)
 {
     Vehicle::UnknownVirtualSlot1(arg);
     BikeA644* p = field_0x644;
@@ -234,14 +234,15 @@ void Bike::UnknownVirtualSlot1(int arg)
     field_0x700 = 0;
 }
 
-int Bike::UnknownVirtualSlot33(int a, int b, int c, int d, int e, int f)
+int Bike::UnknownVirtualSlot33(const BikeVec3* a, const BikeVec3* b, const BikeVec3* c,
+                               const BikeVec3* d, int e, float f)
 {
     float tmp[16];
-    Method_0x00525c60();
+    Method_00525C60();
     int r = Vehicle::UnknownVirtualSlot33(a, b, c, d, e, f);
     int mode = field_0x604->a_0x44;
     if (mode == 0 || mode == 1) {
-        field_0x3bc->Method_0x004fca80(0, tmp);
+        ((BikeXform*)d3d_field_0x1a0)->Method_0x004fca80(0, tmp);
         field_0x5c4->c_0x1a0->Method_0x004fb8c0(0, tmp);
     }
     field_0x604->a_0x38->Method_0x00435fe0();
@@ -269,7 +270,7 @@ int Bike::UnknownVirtualSlot62(float arg)
 int Bike::UnknownVirtualSlot100(float a, int b, float c)
 {
     float thr = 0.766f;
-    if (field_0x1f4->i_0xbe8 != 1)
+    if (((BikeA1F4*)field_0x1f4)->i_0xbe8 != 1)
         thr = 0.342f;
     field_0x444 = UnknownVirtualSlot99(a, thr, b, c);
     if (field_0x444) {
@@ -299,35 +300,43 @@ static inline BikeVec3 BikeNormalized(const BikeVec3& v)
     return r;
 }
 
-BikeVec3 Bike::UnknownVirtualSlot55(BikeVec3* pos)
+BikeVec3* Bike::UnknownVirtualSlot55(BikeVec3* out, BikeVec3* pos)
 {
     BikeVec3 tmp;
-    *pos = *field_0x3bc->Method_0x004fd7f0(&tmp, &field_0x5f4->w_0xcc);
+    *pos = *((BikeXform*)d3d_field_0x1a0)->Method_0x004fd7f0(&tmp, &field_0x5f4->w_0xcc);
     const BikeVec3* a = &field_0x5f0->w_0xcc;
     const BikeVec3* b = &field_0x5f4->w_0xcc;
     BikeVec3 d;
     d.x = a->x - b->x;
     d.y = a->y - b->y;
     d.z = a->z - b->z;
-    return BikeNormalized(d);
+    *out = BikeNormalized(d);
+    return out;
 }
 
-BikeVec3 Bike::UnknownVirtualSlot54()
+BikeVec3* Bike::UnknownVirtualSlot54(BikeVec3* out)
 {
-    if (field_0x4a8 == 0)
-        return field_0x5f4->w_0xe4;
+    if (field_0x4a8 == 0) {
+        *out = field_0x5f4->w_0xe4;
+        return out;
+    }
     BikeWheel* a = field_0x5f0;
-    if (a->w_0x260 == 0)
-        return field_0x5f4->w_0xe4;
+    if (a->w_0x260 == 0) {
+        *out = field_0x5f4->w_0xe4;
+        return out;
+    }
     BikeWheel* b = field_0x5f4;
-    if (b->w_0x260 == 0)
-        return b->w_0xe4;
+    if (b->w_0x260 == 0) {
+        *out = b->w_0xe4;
+        return out;
+    }
     BikeVec3 s(a->w_0xe4.x + b->w_0xe4.x, a->w_0xe4.y + b->w_0xe4.y, a->w_0xe4.z + b->w_0xe4.z);
     BikeVec3 mid(s.x * 0.5f, s.y * 0.5f, s.z * 0.5f);
-    return BikeNormalized(mid);
+    *out = BikeNormalized(mid);
+    return out;
 }
 
-int Bike::UnknownVirtualSlot39(int arg)
+int Bike::UnknownVirtualSlot39(float arg)
 {
     int r = Vehicle::UnknownVirtualSlot39(arg);
     if (r)
@@ -361,8 +370,8 @@ void Bike::UnknownVirtualSlot65(float arg)
     BikeWheel* rear = field_0x5f4;
     if (rear->w_0x268 == 0 && field_0x5f0->w_0x268 == 0)
         return;
-    arg = (field_0x508 - field_0x514) / arg;
-    if (field_0x508 <= 0.4f || arg <= 11.0f)
+    arg = (field_0x504.y - field_0x510.y) / arg;
+    if (field_0x504.y <= 0.4f || arg <= 11.0f)
         return;
     float t = field_0x588 * 0.6f;
     t = BIKE_MIN(t, 100.0f);
@@ -380,25 +389,25 @@ void Bike::UnknownVirtualSlot65(float arg)
 void Bike::UnknownVirtualSlot8()
 {
     BikeVec3 tmp;
-    field_0x1a0 = *field_0x42c->Method_0x004fd7f0(&tmp, &field_0x18);
+    field_0x1a0 = *((BikeXform*)field_0x42c)->Method_0x004fd7f0(&tmp, &field_0x18);
     if (field_0x444 == 0 && field_0x640) {
         float steer = (field_0x640->l_0x0 - 0.5f) * 4.0f;
         field_0x1a0.x = 0.0f;
         field_0x1a0.z += steer;
-        field_0x18 = *field_0x42c->Method_0x004fd660(&tmp, &field_0x1a0);
+        field_0x18 = *((BikeXform*)field_0x42c)->Method_0x004fd660(&tmp, &field_0x1a0);
     }
     field_0x194 = field_0x1a0;
     field_0x700 = (field_0x4a8 > 0 && field_0x5f0->w_0x150 < -2.5f);
 }
 
-BikeVec3 Bike::UnknownVirtualSlot76(int a, int b)
+BikeVec3 Bike::UnknownVirtualSlot76(const BikeVec3* a, const BikeVec3* b)
 {
     BikeVec3 v = Vehicle::UnknownVirtualSlot76(a, b);
     if (field_0xbc < 10.0f && field_0x4c > 0.8727f && field_0x5f0->w_0x260) {
         v = g_BikeVec3_005778a8;
-        if (field_0xd8 < 0.0f)
-            field_0xd8 = 0;
-    } else if (field_0xd8 < -1.0f) {
+        if (field_0xd8.x < 0.0f)
+            field_0xd8.x = 0;
+    } else if (field_0xd8.x < -1.0f) {
         v.x *= 0.2f;
         v.y *= 0.2f;
         v.z *= 0.2f;
@@ -407,7 +416,7 @@ BikeVec3 Bike::UnknownVirtualSlot76(int a, int b)
         if (lean < 0.0f)
             lean = -lean;
         lean = BIKE_MIN(lean, 1.0f);
-        float k = -(field_0x508 + 0.125f);
+        float k = -(field_0x504.y + 0.125f);
         k = (0.0f > k) ? 0.0f : k;
         k = (1.4f - lean) * k * 1.6f;
         v.x *= k;
@@ -430,14 +439,14 @@ void Bike::UnknownVirtualSlot29(int)
         field_0x60 = field_0x44;
         field_0x5c = field_0x40;
     } else {
-        field_0x42c->Method_0x004fc540(0, &field_0xa0, &field_0xac);
+        ((BikeXform*)field_0x42c)->Method_0x004fc540(0, &field_0xa0, &field_0xac);
         BikeFunc_0x004b5a60(field_0xa0, field_0xac, &field_0x50, &field_0x4c, &field_0x48,
                             &field_0x54, &field_0x58, &field_0x60, &field_0x5c);
     }
     int mode = field_0x604->a_0x44;
     if (mode == 0 || mode == 1) {
         float tmp[16];
-        field_0x3bc->Method_0x004fca80(0, tmp);
+        ((BikeXform*)d3d_field_0x1a0)->Method_0x004fca80(0, tmp);
         field_0x5c4->c_0x1a0->Method_0x004fb8c0(0, tmp);
     }
 }
@@ -446,9 +455,9 @@ void Bike::UnknownVirtualSlot41()
 {
     if (field_0x6fc == 0 && field_0x430 == 0)
         return;
-    field_0x42c->Method_0x004fc540(0, &field_0xa0, &field_0xac);
-    field_0x3bc->Method_0x004fc050(0, &field_0xa0, &field_0xac, 1, 0);
-    D3IMSoultreeCharacter::Method_0x004a8b00();
+    ((BikeXform*)field_0x42c)->Method_0x004fc540(0, &field_0xa0, &field_0xac);
+    ((BikeXform*)d3d_field_0x1a0)->Method_0x004fc050(0, &field_0xa0, &field_0xac, 1, 0);
+    D3DIMSoultreeCharacter::Method_0x004a8b00();
     field_0x430 = 0;
     UnknownVirtualSlot34();
     BikeFunc_0x004b5a60(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c,
@@ -463,7 +472,7 @@ void Bike::UnknownVirtualSlot41()
     field_0x60 = field_0x44;
     field_0x5c = field_0x40;
     field_0x6fc = 0;
-    float s = field_0x504;
+    float s = field_0x504.x;
     if (s <= 0.0f) {
         if (s < -0.9f)
             field_0x520 = 2;
@@ -480,20 +489,20 @@ void Bike::UnknownVirtualSlot41()
             field_0x520 = 5;
     }
     for (int i = 0; i < field_0x544; i++)
-        field_0x53c[i]->Method_0x00515660();
+        field_0x53c[i]->Method_00515660();
 }
 
 void Bike::UnknownVirtualSlot102(float)
 {
     if (field_0x444) {
-        float t = -(field_0x47c->j_0x4 / field_0x47c->j_0x8) + 1.0f;
+        float t = -(field_0x47c->field_0x04 / field_0x47c->field_0x08) + 1.0f;
         t = t * 0.25f + 0.25f;
         if (t > 0.25f)
             t = BIKE_MIN(t, 0.75f);
         else
             t = 0.25f;
         field_0x65c = t;
-        D3IMSoultreeCharacter::Method_0x004a8bf0(field_0x6b4[1], t);
+        D3DIMSoultreeCharacter::Method_0x004a8bf0(field_0x6b4[1], t);
         return;
     }
     if (field_0x430)
@@ -522,16 +531,16 @@ void Bike::UnknownVirtualSlot102(float)
     }
     float w = 1.0f - field_0x654;
     field_0x5c4->Method_0x004a8c50(field_0x66c[idx], field_0x66c[next], field_0x65c, w);
-    D3IMSoultreeCharacter::Method_0x004a8c50(field_0x6b4[idx], field_0x6b4[next], field_0x65c, w);
+    D3DIMSoultreeCharacter::Method_0x004a8c50(field_0x6b4[idx], field_0x6b4[next], field_0x65c, w);
     int mode = field_0x604->a_0x44;
     if (mode == 0 || mode == 1) {
         float tmp[16];
-        field_0x3bc->Method_0x004fca80(0, tmp);
+        ((BikeXform*)d3d_field_0x1a0)->Method_0x004fca80(0, tmp);
         field_0x5c4->c_0x1a0->Method_0x004fb8c0(0, tmp);
     }
 }
 
-void Bike::UnknownVirtualSlot72(BikeVec3* out, int)
+void Bike::UnknownVirtualSlot72(BikeVec3* out, VehicleWheel*)
 {
     if (field_0x444)
         return;
@@ -684,9 +693,9 @@ static inline void BikeAttachBone(BikeA604* rider, const char* name, float x, fl
 void Bike::UnknownVirtualSlot97()
 {
     field_0x604 = new(__FILE__, 2023) BikeA604(1);
-    if (field_0x604->Method_0x00530190(go_0x1c, field_0x5c4, "rider.col")) {
-        BikeGameObject::field_0x4.Method_0x00469190(field_0x604, -1);
-        field_0x604->a_0x38->n_0xe4 = field_0x1f4;
+    if (field_0x604->Method_0x00530190(GameObject::field_0x18, field_0x5c4, "rider.col")) {
+        GameObject::Method_0x00469190(field_0x604, -1);
+        field_0x604->a_0x38->n_0xe4 = ((BikeA1F4*)field_0x1f4);
         field_0x604->a_0x38->n_0x64 = 0x65;
         BikeAttachBone(field_0x604, "Pelvis", 0.0f, 0.0f, -0.35f);
         BikeAttachBone(field_0x604, "UprTorso", 0.0f, 0.0f, 0.0f);
@@ -739,7 +748,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
     }
     // front wheel planted, rear wheel not: nose-over crash
     if ((field_0x108 || field_0x6fc == 0) && field_0x5f0->w_0x260 && !field_0x5f4->w_0x260
-        && field_0x4b4 < b && field_0xd8 > 0.0f) {
+        && field_0x4b4 < b && field_0xd8.x > 0.0f) {
         field_0x448 = 1;
         field_0x460 = 7;
         return 1;
@@ -797,7 +806,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         return 1;
     }
     if (c && a * field_0x44c < d * field_0x24) {
-        if (field_0xe0 > 0.0f) {
+        if (field_0xd8.z > 0.0f) {
             field_0x448 = 4;
             field_0x460 = 10;
             return 1;
@@ -810,9 +819,9 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         // collision with another vehicle: compare headings
         Vehicle* other = field_0x608;
         float inv = 1.0f / field_0xbc;
-        BikeVec3 u1(inv * field_0x64, inv * field_0x68, inv * field_0x6c);
+        BikeVec3 u1(inv * field_0x64.x, inv * field_0x64.y, inv * field_0x64.z);
         float inv2 = 1.0f / other->field_0xbc;
-        BikeVec3 u2(inv2 * other->field_0x64, inv2 * other->field_0x68, inv2 * other->field_0x6c);
+        BikeVec3 u2(inv2 * other->field_0x64.x, inv2 * other->field_0x64.y, inv2 * other->field_0x64.z);
         float dot = BikeDot(&u1, &u2);
         if (dot > 0.707f) {
             field_0x448 = 1;
@@ -824,7 +833,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
             field_0x460 = 2;
             return 1;
         }
-        if (field_0xe0 > 0.0f) {
+        if (field_0xd8.z > 0.0f) {
             field_0x448 = 4;
             field_0x460 = 2;
             return 1;
@@ -849,7 +858,7 @@ void Bike::UnknownVirtualSlot7(const BikeVec3* dir)
         int last = 0;
         int i;
         for (i = 0; i < field_0x130; i++) {
-            BikeElem* e = field_0x12c[i];
+            BikeElem* e = ((BikeElem**)field_0x12c)[i];
             if (e->h_0xa4) {
                 BikeVec3 dv(field_0x18.x - e->h_0x14.x, field_0x18.y - e->h_0x14.y, field_0x18.z - e->h_0x14.z);
                 float len = BikeLength(BikeDot(&dv, &dv));
@@ -863,12 +872,12 @@ void Bike::UnknownVirtualSlot7(const BikeVec3* dir)
             }
         }
         if (active == 1) {
-            field_0x12c[last]->h_0xa0 = 1.0f;
-            field_0x12c[last]->h_0x44 = *dir;
+            ((BikeElem**)field_0x12c)[last]->h_0xa0 = 1.0f;
+            ((BikeElem**)field_0x12c)[last]->h_0x44 = *dir;
             return;
         }
         for (i = 0; active > 0; i++) {
-            BikeElem* e = field_0x12c[i];
+            BikeElem* e = ((BikeElem**)field_0x12c)[i];
             if (e->h_0xa4) {
                 float w = 1.0f - dist[i] / sum;
                 e->h_0xa0 = w;
@@ -892,7 +901,7 @@ void Bike::UnknownVirtualSlot7(const BikeVec3* dir)
         field_0x5f0->w_0xfc = BikeVec3(field_0x5f0->w_0x158 * dir->x, field_0x5f0->w_0x158 * dir->y, field_0x5f0->w_0x158 * dir->z);
         return;
     }
-    float target = field_0x508 * 0.25f + 0.5f;
+    float target = field_0x504.y * 0.25f + 0.5f;
     int mode = field_0x4a8;
     {
         float f = field_0x13c;
@@ -940,7 +949,7 @@ void Bike::UnknownVirtualSlot7(const BikeVec3* dir)
 void Bike::UnknownVirtualSlot91()
 {
     float dt = field_0x13c * 0.83f;
-    float f = field_0x528 * field_0x508 * dt;
+    float f = field_0x524[1] * field_0x504.y * dt;
     float fx, fy, fz;
     if (field_0x430) {
         fx = f * 0.5f;
@@ -948,16 +957,16 @@ void Bike::UnknownVirtualSlot91()
         fz = 0.0f;
     } else {
         fx = f;
-        fy = field_0x504 * field_0x13c * -0.2f;
+        fy = field_0x504.x * field_0x13c * -0.2f;
         fz = 0.0f;
     }
     if (field_0x6fc && field_0x5f4->w_0x150 < -2.0f) {
         if (field_0x5c0 && field_0x5f4->w_0x29c > 0.0f)
             fx = dt * field_0x5f4->w_0x29c + fx;
-        if (field_0x5bc && field_0x478 && *field_0x480 > 0.0f && !field_0x479)
-            fx = fx - dt * *field_0x480;
+        if (field_0x5bc && field_0x478 && field_0x480->field_0x00 > 0.0f && !field_0x479)
+            fx = fx - dt * field_0x480->field_0x00;
         float inv = 1.0f / field_0xbc;
-        field_0x1ac = BikeVec3(inv * field_0x64, inv * field_0x68, inv * field_0x6c);
+        field_0x1ac = BikeVec3(inv * field_0x64.x, inv * field_0x64.y, inv * field_0x64.z);
         float d = field_0xa0.y * field_0x1ac.y + field_0x1ac.x * field_0xa0.x + field_0xa0.z * field_0x1ac.z;
         if (d > 0.55f && d < 0.984f) {
             // steer the velocity toward the lean plane
@@ -967,14 +976,14 @@ void Bike::UnknownVirtualSlot91()
             float kx = k * field_0x1b8.x;
             float ky = k * field_0x1b8.y;
             float kz = k * field_0x1b8.z;
-            field_0x64 = kx + field_0x64;
-            field_0x68 = ky + field_0x68;
-            field_0x6c = kz + field_0x6c;
+            field_0x64.x = kx + field_0x64.x;
+            field_0x64.y = ky + field_0x64.y;
+            field_0x64.z = kz + field_0x64.z;
             float scale = field_0xbc / (k + field_0xbc);
-            field_0x64 = scale * field_0x64;
-            field_0x68 = scale * field_0x68;
-            field_0x6c = scale * field_0x6c;
-            float lenSq = field_0x68 * field_0x68 + field_0x64 * field_0x64 + field_0x6c * field_0x6c;
+            field_0x64.x = scale * field_0x64.x;
+            field_0x64.y = scale * field_0x64.y;
+            field_0x64.z = scale * field_0x64.z;
+            float lenSq = field_0x64.y * field_0x64.y + field_0x64.x * field_0x64.x + field_0x64.z * field_0x64.z;
             field_0xbc = (lenSq == 1.0f) ? 1.0f : (float)sqrt(lenSq);
         }
     }
@@ -988,12 +997,12 @@ void Bike::UnknownVirtualSlot91()
             float rs = BikeMath_0x00460c00(forceSq);
             dir = BikeVec3(rs * fx, rs * fy, rs * fz);
         }
-        field_0x3bc->Method_0x004fd1f0(field_0x194, dir, mag);
+        ((BikeXform*)d3d_field_0x1a0)->Method_0x004fd1f0(field_0x194, dir, mag);
     }
-    field_0xd8 = field_0xd8 * 0.9f;
-    field_0xdc = field_0xdc * 0.9f;
-    field_0xe0 = field_0xe0 * 0.9f;
-    // wobble: ramps a short-lived oscillation on field_0xe0 (cnt 1..2)
+    field_0xd8.x = field_0xd8.x * 0.9f;
+    field_0xd8.y = field_0xd8.y * 0.9f;
+    field_0xd8.z = field_0xd8.z * 0.9f;
+    // wobble: ramps a short-lived oscillation on field_0xd8.z (cnt 1..2)
     float t = field_0x714 + field_0x13c;
     int cnt = field_0x720;
     field_0x714 = t;
@@ -1005,14 +1014,14 @@ void Bike::UnknownVirtualSlot91()
         float cube = t * t * t * 0.357792467f;
         if (cube < v)
             v = cube;
-        field_0xe0 = sgn * v + field_0x71c;
+        field_0xd8.z = sgn * v + field_0x71c;
         field_0x71c = field_0x71c * 0.9f;
         if (sgn != field_0x718) {
             field_0x720 = cnt + 1;
             if (field_0x720 > 2)
                 field_0x720 = 1;
             field_0x718 = sgn;
-            field_0x71c = field_0xe0;
+            field_0x71c = field_0xd8.z;
             field_0x714 = t * 0.5f;
         }
     }
@@ -1022,38 +1031,41 @@ void Bike::UnknownVirtualSlot91()
 // bikes return the stored anchor (field_0x194); otherwise it is the front
 // wheel position (t != 0) or a blend toward the rear wheel, relative to the
 // body, mapped through the transform.
-BikeVec3 Bike::UnknownVirtualSlot46(float t)
+BikeVec3* Bike::UnknownVirtualSlot46(BikeVec3* out, float t)
 {
-    if (field_0x108 || field_0x1d0)
-        return field_0x194;
+    if (field_0x108 || field_0x1d0) {
+        *out = field_0x194;
+        return out;
+    }
     BikeWheel* front = field_0x5f0;
     BikeWheel* rear = field_0x5f4;
     BikeVec3 tmp;
     if (field_0x4a8 == 2) {
         if (t != 0.0f) {
-            field_0x1ac = BikeVec3(front->w_0xcc.x - field_0xc, front->w_0xcc.y - field_0x10, front->w_0xcc.z - field_0x14);
+            field_0x1ac = BikeVec3(front->w_0xcc.x - field_0x0c.x, front->w_0xcc.y - field_0x0c.y, front->w_0xcc.z - field_0x0c.z);
         } else if (rear->w_0x2b8 < 0.9f) {
             float s = rear->w_0x2b8 - 0.4f;
             if (!(s > 0.0f))
                 s = 0.0f;
             BikeVec3 d(rear->w_0xcc.x - front->w_0xcc.x, rear->w_0xcc.y - front->w_0xcc.y, rear->w_0xcc.z - front->w_0xcc.z);
             BikeVec3 p(d.x * s + front->w_0xcc.x, d.y * s + front->w_0xcc.y, d.z * s + front->w_0xcc.z);
-            field_0x1ac = BikeVec3(p.x - field_0xc, p.y - field_0x10, p.z - field_0x14);
+            field_0x1ac = BikeVec3(p.x - field_0x0c.x, p.y - field_0x0c.y, p.z - field_0x0c.z);
         } else {
             BikeVec3 d(rear->w_0xcc.x - front->w_0xcc.x, rear->w_0xcc.y - front->w_0xcc.y, rear->w_0xcc.z - front->w_0xcc.z);
             BikeVec3 half(d.x * 0.5f, d.y * 0.5f, d.z * 0.5f);
             BikeVec3 mid(half.x + front->w_0xcc.x, half.y + front->w_0xcc.y, half.z + front->w_0xcc.z);
-            field_0x1ac = BikeVec3(mid.x - field_0xc, mid.y - field_0x10, mid.z - field_0x14);
+            field_0x1ac = BikeVec3(mid.x - field_0x0c.x, mid.y - field_0x0c.y, mid.z - field_0x0c.z);
         }
     } else {
         BikeVec3 d(rear->w_0xcc.x - front->w_0xcc.x, rear->w_0xcc.y - front->w_0xcc.y, rear->w_0xcc.z - front->w_0xcc.z);
         BikeVec3 half(d.x * 0.5f, d.y * 0.5f, d.z * 0.5f);
         BikeVec3 mid, rel;
         BikeVecAdd_0x00421cb0(&mid, &front->w_0xcc, &half);
-        BikeVecSub_0x00421d00(&rel, &mid, (const BikeVec3*)&field_0xc);
+        BikeVecSub_0x00421d00(&rel, &mid, &field_0x0c);
         field_0x1ac = rel;
     }
-    return *field_0x3bc->Method_0x004fd710(&tmp, &field_0x1ac);
+    *out = *((BikeXform*)d3d_field_0x1a0)->Method_0x004fd710(&tmp, &field_0x1ac);
+    return out;
 }
 
 // Moves a stored value toward zero by 1.5 * delta without crossing zero.
@@ -1080,7 +1092,7 @@ static inline void BikeCancelToward(float* value, float delta)
 // transform, then bleeds off the accumulated lean impulses.
 void Bike::UnknownVirtualSlot92(const BikeVec3* worldDir, const BikeVec3* point)
 {
-    float target = (field_0x47c->j_0x4 * 0.05f + field_0x43c * 0.2f) * field_0x4b4;
+    float target = (field_0x47c->field_0x04 * 0.05f + field_0x43c * 0.2f) * field_0x4b4;
     field_0x4e0 = target;
     if (target < 0.0f)
         target = -target;
@@ -1111,20 +1123,20 @@ void Bike::UnknownVirtualSlot92(const BikeVec3* worldDir, const BikeVec3* point)
             field_0x4e4 = ((field_0x4e4 < 0.0f) ? -1.0f : 1.0f) * field_0x13c * lim;
         if (field_0x5a4) {
             BikeVec3 tmp;
-            BikeVec3 w = *field_0x3bc->Method_0x004fd710(&tmp, worldDir);
+            BikeVec3 w = *((BikeXform*)d3d_field_0x1a0)->Method_0x004fd710(&tmp, worldDir);
             float az = (w.z < 0.0f) ? -w.z : w.z;
             float ay = (w.y < 0.0f) ? -w.y : w.y;
             float ax = (w.x < 0.0f) ? -w.x : w.x;
             if (az > 0.001f || ay > 0.001f || ax > 0.001f) {
-                field_0x3bc->Method_0x004fd1f0(w, *point, field_0x4e4);
+                ((BikeXform*)d3d_field_0x1a0)->Method_0x004fd1f0(w, *point, field_0x4e4);
                 float k = field_0x4e4;
                 float tx = k * w.x;
                 float ty = k * w.y;
                 float tz = k * w.z;
                 field_0x1b8 = BikeVec3(tx * field_0x140, ty * field_0x140, tz * field_0x140);
-                BikeCancelToward(&field_0xd8, field_0x1b8.x);
-                BikeCancelToward(&field_0xdc, field_0x1b8.y);
-                BikeCancelToward(&field_0xe0, field_0x1b8.z);
+                BikeCancelToward(&field_0xd8.x, field_0x1b8.x);
+                BikeCancelToward(&field_0xd8.y, field_0x1b8.y);
+                BikeCancelToward(&field_0xd8.z, field_0x1b8.z);
             }
         }
     }

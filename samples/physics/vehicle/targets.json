@@ -185,8 +185,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot64@Vehicle",
     "target_va": "0x00528e50",
     "target_size": 81,
-    "expect": "partial",
-    "notes": "slot 64 (introduced); ~94.2% match: return-zero hoisted to xor eax,eax (matched with a local); the Vec3 copy from 0x68a6e8 differs in store/lea ordering (same cause as slot 55)"
+    "expect": "exact",
+    "notes": "slot 64 (introduced); exact under vc6_o2_ml once declared void (no return value is materialised in retail)"
   },
   {
     "class": "Vehicle",
@@ -481,7 +481,7 @@
     "source": "Vehicle.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot38@Vehicle",
     "target_va": "0x5268d0",
-    "target_size": 1455,
+    "target_size": 1472,
     "expect": "partial",
     "notes": "5.1% (1101/1455 B). Collision-response dispatch on event code (0/1, 0x69, 0x2711 with body -> slot 4; 0x6a/0x3e9 no body -> slot 3). Retail duplicates per-case vector setup and copies vecs via int stack temps; ours is shared/smaller."
   }

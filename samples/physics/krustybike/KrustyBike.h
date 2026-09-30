@@ -2,9 +2,10 @@
 //
 // Confirmed (tier 1): RTTI base Bike; three vtables: +0 0x00554548 (103 slots),
 // +540 0x00554514, +5644 0x005544a4 (rtti_classes vtable_records / COLs).
-// Provisional (tier 3): Bike is a stand-in (see KrustyBikeTypes.h); the secondary
-// vtables at +540 and +5644 are not modelled here, only the primary vtable slots
-// that this translation unit overrides (analysis vtable_overrides.json).
+// Bases are canonical (bike/Bike.h -> vehicle/Vehicle.h -> hierarchy/...), so the
+// +540 (D3DIMSoultreeCharacter) and +5644 (virtual GameObject, vtordisp at +0x1608)
+// subobjects are real.  KrustyBike's own data is 0x734..0x1608.  Overrides use the
+// canonical slot signatures.
 #ifndef KRUSTYBIKE_H
 #define KRUSTYBIKE_H
 
@@ -12,48 +13,61 @@
 
 class KrustyBike : public Bike {
 public:
-    virtual void UnknownVirtualSlot1(int a);
-    virtual void UnknownVirtualSlot3(int a0, int a1, int a2, int a3, int a4, int a5, int* a6);
-    virtual void UnknownVirtualSlot4(int a0, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10, int a11, int a12, int* a13, int a14);
+    KrustyBike();
+    virtual ~KrustyBike();
+    virtual int GameObjectVirtualSlot10(float dt);   // 0x004977a0 (vbase vtable slot 10)
+
+    virtual void UnknownVirtualSlot1(float a);
+    virtual void UnknownVirtualSlot3(const KbVec3* a0, const KbVec3* a1, const KbVec3* a2,
+                                     const KbVec3* a3, int a4, int a5, float* a6);
+    virtual void UnknownVirtualSlot4(const KbVec3* a0, KbVec3* a1, const KbVec3* a2,
+                                     const KbVec3* a3, float a4, int a5, int a6,
+                                     const KbVec3* a7, const KbVec3* a8, const KbVec3* a9,
+                                     KbVec3* a10, KbVec3* a11, int a12, float* a13, float a14);
     virtual void UnknownVirtualSlot8();
     virtual int UnknownVirtualSlot12(int a);
-    virtual void UnknownVirtualSlot14(KbVec3* a, KbVec3* b, KbVec3* c);
-    virtual void UnknownVirtualSlot15(KbVec3* v, float* out);
-    virtual KbVec3 UnknownVirtualSlot16(KbVec3* v);
+    virtual void UnknownVirtualSlot14(KbVec3* a, const KbVec3* b, const KbVec3* c);
+    virtual void UnknownVirtualSlot15(const KbVec3* v, KbVec3* out);
+    virtual KbVec3 UnknownVirtualSlot16(const KbVec3* v);
     virtual int UnknownVirtualSlot22();
     virtual int UnknownVirtualSlot23();
     virtual int UnknownVirtualSlot24();
     virtual int UnknownVirtualSlot25();
     virtual void UnknownVirtualSlot27();
-    virtual int UnknownVirtualSlot33(int a0, int a1, int a2, int a3, int a4, int a5);
-    virtual int UnknownVirtualSlot39(int a);
+    virtual int UnknownVirtualSlot33(const KbVec3* a0, const KbVec3* a1, const KbVec3* a2,
+                                     const KbVec3* a3, int a4, float a5);
+    virtual int UnknownVirtualSlot39(float a);
     virtual int UnknownVirtualSlot42();
     virtual void UnknownVirtualSlot44();
     virtual float UnknownVirtualSlot45();
     virtual void UnknownVirtualSlot48();
     virtual int UnknownVirtualSlot52();
-    virtual void UnknownVirtualSlot63(int a);
-    virtual void UnknownVirtualSlot64(int a);
+    virtual int UnknownVirtualSlot63(float a);
+    virtual void UnknownVirtualSlot64(float a);
     virtual int UnknownVirtualSlot66();
     virtual void UnknownVirtualSlot67();
     virtual int UnknownVirtualSlot68(int* out);
     virtual void UnknownVirtualSlot69();
     virtual int UnknownVirtualSlot70(float a);
     virtual void UnknownVirtualSlot71(int a);
-    virtual KbVec3 UnknownVirtualSlot76(int a, int b);
+    virtual KbVec3 UnknownVirtualSlot76(const KbVec3* a, const KbVec3* b);
     virtual int UnknownVirtualSlot80();
     virtual int UnknownVirtualSlot81();
     virtual int UnknownVirtualSlot82();
-    virtual int UnknownVirtualSlot83(KbInput* input);
+    virtual int UnknownVirtualSlot83(VehicleWheel* wheel);
     virtual int UnknownVirtualSlot84(int a, int b);
     virtual void UnknownVirtualSlot96();
     virtual void UnknownVirtualSlot101();
 
-    void Fn_00414370(int a);
+    int Fn_00414370(float dt);   // slot 63 returns its result (0x004924c0)
     void Fn_0048D8B0();
     void Fn_00496DA0();
 
 public:
+    char field_0x734; // 0x734  first KrustyBike field (Bike's own data ends at 0x734)
+    char field_0x735; // 0x735
+    char field_0x736; // 0x736
+    char pad_0x0737[0x9];
     KbRace* field_0x740; // 0x740
     char pad_0x0744[0x14];
     float field_0x758; // 0x758
@@ -92,6 +106,9 @@ public:
     int field_0x155c; // 0x155C
     char pad_0x1560[0x85];
     char field_0x15e5; // 0x15E5
+    char pad_0x15E6[0x22];   // own data ends at 0x1608; the compiler places the vtordisp there
 };
+
+typedef char kb_assert_sizeof[(sizeof(KrustyBike) == 0x160c + 0x2c) ? 1 : -1];
 
 #endif

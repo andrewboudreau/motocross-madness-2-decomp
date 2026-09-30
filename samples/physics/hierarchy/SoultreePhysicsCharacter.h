@@ -31,14 +31,13 @@ class SoultreePhysicsCharacter : public SoultreePhysicsBaseObject, public D3DIMS
 public:
     SoultreePhysicsCharacter();
     virtual ~SoultreePhysicsCharacter();        // core 0x00503d40, deleting 0x005042f0
-    virtual void GameObjectVirtualSlot10();     // 0x00504210 via vtordisp thunk 0x00504350
-                                                // (ret 4: takes one dword; the shared
-                                                // GameObject declaration is still void())
+    virtual int GameObjectVirtualSlot10(float dt);  // 0x00504210 via vtordisp thunk 0x00504350 (ret 4)
     // --- vtable 0x005580a8 (offset 0) ---
     virtual void UnknownVirtualSlot1(float value);                // 0x005040c0
     virtual void UnknownVirtualSlot8();                           // 0x005041c0
     virtual int UnknownVirtualSlot33(const SoultreeVec3* a1, const SoultreeVec3* a2,
-                                     const SoultreeVec3* a3, int a4, int a5, float a6); // 0x005040f0
+                                     const SoultreeVec3* a3, const SoultreeVec3* a4, int a5,
+                                     float a6);                  // 0x005040f0
     virtual void UnknownVirtualSlot40(int a1, int a2, int a3);   // 0x00503de0 (signature provisional)
     virtual void UnknownVirtualSlot41();                          // 0x00504360
     virtual int UnknownVirtualSlot42();                           // 0x00504470

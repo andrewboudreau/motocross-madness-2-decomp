@@ -131,8 +131,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot14@SoultreePhysicsBaseObject",
     "target_va": "0x00502080",
     "target_size": 373,
-    "expect": "partial",
-    "notes": "10.39% match under vc6_o2_ml; scheduling"
+    "expect": "exact",
+    "notes": "Exact under vc6_o2_ml once slots 15/16 take Vec3 pointers (field_0xc0 = slot16(a2); slot15(a3, &field_0xc0))."
   },
   {
     "class": "SoultreePhysicsBaseObject",

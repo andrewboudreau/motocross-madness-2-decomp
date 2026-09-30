@@ -22,6 +22,25 @@
 
 In every class below, the byte range that holds the vtordisp must not be covered by padding. If it is, the GameObject base ends up 4 bytes too high.
 
+## Status (soultree_base, vehicle, bike, krustybike migrated)
+
+**The generators are retired.** These files moved to `work/<area>/retired/`:
+
+- `work/c_vehicle/{gen.py,Vehicle.h.tpl,fields.py,slots.py,heavy.cpp,build.sh}`
+- `work/d_bike/{gen.py,Bike.h.in,btypes.py}`
+- `work/e_krustybike/spec.py`
+- `work/a_soultree_base/merge.py`
+
+The committed files under `samples/physics/` are now the hand-edited source of truth.
+
+- **Base classes.** Vehicle, Bike and KrustyBike derive from the canonical classes. All three vtable_counts checks print `ok` (97/12/27 for Vehicle; 103/12/27 for Bike and KrustyBike). `sizeof` is asserted in each header.
+- **Slot conflicts (table below).** All 12 are resolved in `SoultreePhysicsBaseObject.h`, and each carries a tier comment. Slot 14's `a1` is non-const, because KrustyBike 0x004965e0 writes `a1->x` and `a1->z`.
+- **Vehicle slot 64 is `void(float)`.** Retail 0x00528e50 materialises no return value, and it is byte-exact as `void`. Slot 63 keeps `int(float)`.
+- **`field_0x1f8` is `float`.** Tier 1: KrustyBike slot 12 (0x0048de20) does `fld`/`fmul` on it.
+- **Cast at the use site.** Do not use inline accessor functions for rule 6. VC6 schedules the load differently when the cast is inside an inline accessor. Bike slot 8 lost its exact match that way, and Vehicle slots 4, 19, 35 and 49 lost bytes.
+- **Collision must follow the current signatures.** Its overrides need `int GameObjectVirtualSlot10(float dt)` and a `const SoultreeVec3*` in slot 33's `a4`.
+- **Open item: SoultreePhysicsCharacter slot 40 (0x00503de0).** It is declared `(int,int,int)`, but the body ends in `ret 0x6c`, which is 27 dword arguments.
+
 ## General rules
 
 1. **No `field_0x04`.** Offset +4 is the vbptr. Never declare it or a stand-in for it.

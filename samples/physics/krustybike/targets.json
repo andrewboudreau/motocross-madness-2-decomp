@@ -149,8 +149,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot63@KrustyBike",
     "target_va": "0x004924c0",
     "target_size": 50,
-    "expect": "partial",
-    "notes": "Semantics reconstructed; 85.7% byte match. Retail stores 0x804/0x808 after loading arg into edx and before push; ordering differs."
+    "expect": "exact",
+    "notes": "Exact under vc6_o2_ml with the canonical int(float) signature and two separate stores (0x804, then 0x808)."
   },
   {
     "class": "KrustyBike",

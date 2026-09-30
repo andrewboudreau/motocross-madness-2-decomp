@@ -128,7 +128,7 @@
  {
   "class": "Bike",
   "source": "LayoutProbe.cpp",
-  "candidate_symbol_contains": "?GameObjectVirtualSlot10@Vehicle@@$4PPPPPPPM@BHI@AEXXZ",
+  "candidate_symbol_contains": "?GameObjectVirtualSlot10@Vehicle@@$4PPPPPPPM@BHI@AEHM@Z",
   "target_va": "0x0040cab0",
   "target_size": 14,
   "expect": "exact",

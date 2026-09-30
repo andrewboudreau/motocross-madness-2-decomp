@@ -31,18 +31,20 @@ void Fn_4cb6e0(SoultreeVec3* a, SoultreeVec3* b, SoultreeVec3* c, float d, int e
 
 class SoultreeBody;
 // 0x004b0df0 (17 args)
-int Fn_4b0df0(SoultreeBody* a, int b, SoultreeVec3* c, int d, int e, int f, int g, int h,
-              float i, int j, SoultreeVec3* k, int l, int m, int n, int o, int p, int q);
+int Fn_4b0df0(SoultreeBody* a, int b, SoultreeVec3* c, float d, int e, int f, int g, int h,
+              float i, int j, SoultreeVec3* k, int l, int m, SoultreeVec3* n, SoultreeVec3* o,
+              SoultreeVec3* p, int* q);
 }
 
 
 // TU-local solver helpers (cdecl), 0x00500220 (12 args) and 0x005004a0 (17 args).
-void Fn_500220(float a, float b, SoultreeNode* node, int a1, int a2, int a3, SoultreeVec3* e4,
-               int a4, SoultreeVec3* d8, SoultreeVec3* v64, int a7, int a6);
-void Fn_5004a0(float a, int a1, float b, SoultreeNode* node, SoultreeVec3* l1,
+void Fn_500220(float a, float b, SoultreeNode* node, const SoultreeVec3* a1, const SoultreeVec3* a2,
+               const SoultreeVec3* a3, SoultreeVec3* e4, const SoultreeVec3* a4, SoultreeVec3* d8,
+               SoultreeVec3* v64, float* a7, int a6);
+void Fn_5004a0(float a, const SoultreeVec3* a1, float b, SoultreeNode* node, SoultreeVec3* l1,
                const SoultreeVec3* a4, SoultreeVec3* e4, SoultreeVec3* d8, SoultreeVec3* a2,
-               int a6, int a7, SoultreeVec3* l2, const SoultreeVec3* a10, int a11, int a12,
-               int a13, int a14);
+               int a6, int a7, SoultreeVec3* l2, const SoultreeVec3* a10, SoultreeVec3* a11,
+               SoultreeVec3* a12, int a13, float* a14);
 
 
 // 0x005015b0: out-of-line TU-local helper, cdecl: *out = *v * s, returns out.  Defined at the
