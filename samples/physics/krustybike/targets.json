@@ -312,7 +312,7 @@
     "target_va": "0x004965e0",
     "target_size": 431,
     "expect": "partial",
-    "notes": "57.5% (size 431/431). Matches through the a->x/a->z stores. First divergence: Vec3(0, field_0x24*a->y, 0) - retail materialises the pooled 0.0f via fld/fst (x and z share one FPU value) while VC6 emits hoisted immediate stores. Also the squared-length loads come in order y,x,z in retail (z,y,x here). Tail (d==1.0f shortcut returning pooled 1.0f) matches via the KbLength helper."
+    "notes": "59.7% (size 431/431). Matches through the a->x/a->z stores. First divergence: Vec3(0, field_0x24*a->y, 0) - retail materialises the pooled 0.0f via fld/fst (x and z share one FPU value) while VC6 emits hoisted immediate stores. Also the squared-length loads come in order y,x,z in retail (z,y,x here). Tail (d==1.0f shortcut returning pooled 1.0f) matches via the KbLength helper."
   },
   {
     "class": "KrustyBike",
@@ -340,5 +340,32 @@
     "target_size": 298,
     "expect": "exact",
     "notes": "Exact. Wheel-force step: ramp from field_0x664 (float in retail), wheel query call, halve force when g_kbGame flag set. Needs KbFloat identity inline to get fld/fstp [esp] arg pattern."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot28@KrustyBike",
+    "target_va": "0x0048da50",
+    "target_size": 416,
+    "expect": "exact",
+    "notes": "Exact. Mode-4 (tier 3) player re-target plus airborne random jitter of 0x7ac/0x7b0. rand()*(1/32768) must go through a local float (KbRandUnit), else VC6 folds the two constants into one fmul."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot99@KrustyBike",
+    "target_va": "0x004916a0",
+    "target_size": 757,
+    "expect": "exact",
+    "notes": "Exact. Off-track recovery (tier 3). Lessons: squared length must be accumulated term by term (d=x*x; d+=y*y; d+=z*z); the random kick needs plain rand()*(1/32768) locals rx, ry (a KbRandUnit inline with a local moves the temp slot)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot11@KrustyBike",
+    "target_va": "0x00491d10",
+    "target_size": 1296,
+    "expect": "partial",
+    "notes": "11.9% (candidate 1288 vs 1296). Tier-3: camera/target ray query per game mode. First divergence: retail loads game ptr before sub esp,0x20 and merges call tails; mine spills lim and hoists a4/a5 loads."
   }
 ]

@@ -2,18 +2,27 @@
 // Translation unit: KrustyBike.cpp (literal __FILE__ xrefs near 0x0048FE58; tier 2).
 // Member and helper names are provisional (tier 3); see KrustyBikeTypes.h.
 #include <math.h>
+#include <stdlib.h>
 #include "KrustyBike.h"
 
 // Provisional: identity on a float.  Passing a member straight to a float parameter makes
 // VC6 push the raw dword; retail instead loads the value on the FPU (fld / fstp [esp]),
 // which is what a float-returning inline (an accessor) produces.
+// KbFloat: identity inline. Forces the fld/fstp [esp] argument pattern retail shows; the original
+// likely used inline float getters on the owning class (Provisional, tier 3).
 static inline float KbFloat(float v) { return v; }
 
 // Provisional: square root with an exact-one shortcut (slot 14 tail; retail returns the
 // pooled 1.0f through the FPU, which a plain member store of 1.0f does not reproduce).
+// Provisional: rand() scaled to [0,1) (1/32768); kept as a float-returning inline so the
+// later scale factor is not constant-folded into it (a plain return folds; the local does not).
+static inline float KbRandUnit() { float r = rand() * (1.0f / 32768.0f); return r; }
+
 static inline float KbLength(const KbVec3& v)
 {
-    float d = v.y * v.y + v.x * v.x + v.z * v.z;
+    float d = v.x * v.x;   // accumulated term by term: a one-line sum loads in a different order
+    d += v.y * v.y;
+    d += v.z * v.z;
     if (d == 1.0f)
         return 1.0f;
     return (float)sqrt(d);
@@ -506,4 +515,148 @@ void KrustyBike::UnknownVirtualSlot96()
             float pct = g_kbGame->field_0xff8 * 0.01f;
             field_0x524[5] = pct * 0.4f + 0.8f;
         }
+}
+
+// Slot 28 (0x0048da50): per-frame hook.  In mode 4 (tier 3: a spectator/replay mode) it
+// re-targets the session's player record onto this bike, then runs the base update and,
+// while airborne (field_0x444 set, field_0x5b4 clear), jitters the two 0x7ac/0x7b0
+// accumulators with random noise (0.15 scale for the field_0x734 variant, 0.667 otherwise).
+int KrustyBike::UnknownVirtualSlot28(int a)
+{
+    field_0x134 = 0;
+    if (field_0x736) return a;
+    if (g_kbGame->field_0x2d74 == 4) {
+        KbPlayer* p = g_kbGame->field_0x570->Fn_0045D2B0();
+        if (this != p->field_0xa8 && this == field_0x740->field_0x38) {
+            Vehicle* v = p->field_0xa8;
+            if (v) {
+                if (((KbBody*)field_0x128)->Fn_004392C0((KbBody*)v->field_0x128))
+                    Fn_004925A0(this, 1);
+            } else if (p->field_0xdc) {
+                if (((KbBody*)field_0x128)->Fn_004392C0((KbBody*)p->field_0xdc->field_0x128)) {
+                    if (g_kbGame->field_0x8->field_0x10) p->Fn_004A9E80(this, 0, 1);
+                    else Fn_004925A0(this, 1);
+                }
+            }
+        }
+        if (field_0x735) return a;
+    }
+    int r = Vehicle::UnknownVirtualSlot28(a);
+    if (field_0x444 && !field_0x5b4) {
+        if (field_0x734) {
+            field_0x7ac += KbRandUnit() * 0.15f;
+            field_0x7b0 += KbRandUnit() * 0.15f;
+        } else {
+            field_0x7ac += KbRandUnit() * 0.667f;
+            field_0x7b0 += KbRandUnit() * 0.667f;
+        }
+    }
+    return r;
+}
+
+// Slot 99 (0x004916a0): tier 3 -- out-of-bounds / off-track recovery.  When slot 12 reports
+// the bike outside the track box it aims field_0x1ac at the track centre (20 units up),
+// sets velocity to a 0.055 fraction of the offset, and gives a small random kick to
+// field_0xd8; otherwise it may enter recovery states 2 (both wheels loaded past -3.5)
+// or 1/3/4/5/9, and falls through to the base handler when nothing applies.
+int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
+{
+    if (field_0x444) return field_0x444;
+    if (UnknownVirtualSlot12(field_0x5a4)) {
+        KbTrackB* t = ((KbTrackA*)field_0x1f0)->field_0xa4;
+        field_0x1ac = KbVec3(t->field_0x394 * field_0x1f8 * 128.0f, 20.0f,
+                             t->field_0x398 * field_0x1f8 * 128.0f);
+        KbVec3 off = field_0x1ac - field_0x0c;
+        field_0x64 = off * 0.055f;
+        field_0x64.y = 120.0f;
+        field_0xb8 = field_0xbc = KbLength(field_0x64);
+        float rx = rand() * (1.0f / 32768.0f);
+        float ry = rand() * (1.0f / 32768.0f);
+        field_0xd8 = KbVec3(rx, ry, 0.02f);
+        field_0x448 = 1;
+        field_0x460 = 12;
+        return 1;
+    }
+    if (!field_0x430 && field_0x468 && field_0x468->UnknownVirtualSlot2(8, 0x3f)) {
+        if (field_0x108 && !field_0x444 && field_0x5f0->w_0x150 < -3.5f && field_0x5f4->w_0x150 < -3.5f) {
+            field_0x448 = 2;
+            field_0x460 = 1;
+            return 1;
+        }
+    }
+    if (!field_0x108 && field_0x430) {
+        if (field_0x5f0->w_0x260) {
+            if (field_0xbc > 30.0f) field_0x448 = 1;
+            else if (field_0xd8.z > 0.0f) field_0x448 = 4;
+            else field_0x448 = 5;
+        } else field_0x448 = 3;
+        field_0x460 = 9;
+        Fn_0048D8B0();
+        return 1;
+    }
+    if (UnknownVirtualSlot51()) return 0;
+    return Bike::UnknownVirtualSlot99(a, b, c, d);
+}
+
+// Slot 11 (0x00491d10): tier 3 -- camera / target ray query.  Fills a2 (origin) and a3
+// (unit direction) according to the game mode (g->0x2d74: 0..5), then issues the same
+// collision query as the base class with per-mode ranges.  The two "copy the stored
+// vectors" paths fall off the end without setting a result (retail leaves eax as is).
+int KrustyBike::UnknownVirtualSlot11(int a1, KbVec3* a2, KbVec3* a3, KbVec3* a4, int* a5)
+{
+    int flag = g_kbGame->field_0x578.Fn_00524100() == 3 || g_kbGame->field_0x578.Fn_00524100() == 4;
+    int lim = (g_kbGame->field_0x578.Fn_00524100() == 5 || g_kbGame->field_0x578.Fn_00524100() == 4) ? 0x7fffffff : 0x66;
+    unsigned char hit = 0;
+    if (g_kbGame->field_0x578.Fn_00524100() == 5)
+        hit = Kb_004B0AC0(&field_0x0c, 2.0f, 2.0f, 2.0f, field_0x1f8, 0, 0, 0, 0);
+    KbGame* g = g_kbGame;
+    switch (g->field_0x2d74) {
+    case 2:
+    case 3:
+        if (g->field_0x2d70 || field_0x78c || field_0x734 || field_0x736 || a1 == 2 ||
+            g->field_0xc50) {
+            *a2 = field_0x10c;
+            *a3 = field_0x118;
+            field_0x0c = field_0x10c;
+        } else {
+            KbVec3 v = field_0x10c;
+            *a2 = field_0x0c;
+            *a3 = KbVec3(v.x - a2->x, -a2->y, v.z - a2->z);
+            float d = a3->x * a3->x;
+            d += a3->y * a3->y;
+            d += a3->z * a3->z;
+            if (d == 0.0f) *a3 = g_kbZeroVec;
+            else *a3 *= BikeMath_0x00460c00(d);
+            return Kb_004B0DF0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, 0x64,
+                               0x65, hit, 3.0f, 8, 0, &field_0x10c, !field_0x109, a2, a3, a4, a5);
+        }
+    case 0: {
+        const KbVec3* p = field_0x109 ? &field_0x118 : &field_0x88;
+        return Kb_004B0DF0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, lim, lim,
+                           hit, 6.0f, 8, p, 0, !field_0x109, a2, a3, a4, a5);
+    }
+    case 4: {
+        KbPlayer* r = (KbPlayer*)g->field_0x568;
+        const KbVec3* l = 0;
+        const KbVec3* k = 0;
+        if (r->field_0xdc) l = &r->field_0xdc->field_0x0c;
+        else if (r->field_0xa8 == this) { *a3 = field_0x88; k = &field_0x88; }
+        else l = &r->field_0xa8->field_0x0c;
+        float i = 9.0f;
+        if (((KbPlayer*)g->field_0x568)->field_0xa8 != this) i = 3.0f;
+        return Kb_004B0DF0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, lim, lim,
+                           hit, i, 8, k, l, !field_0x109, a2, a3, a4, a5);
+    }
+    case 1:
+    case 5: {
+        if (field_0x109) field_0x1ac = field_0x118 + field_0x10c;
+        else field_0x1ac = g->field_0x560[field_0x7b8 + 9].field_0x00;
+        return Kb_004B0DF0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, lim,
+                           field_0x109 ? 0x64 : 0x7fffffff, field_0x109 ? 0x65 : 0x7fffffff,
+                           3.0f, 8, 0, &field_0x1ac, !field_0x109, a2, a3, a4, a5);
+    }
+    default:
+        *a2 = field_0x0c;
+        *a3 = field_0x88;
+    }
 }

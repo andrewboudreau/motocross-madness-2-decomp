@@ -25,6 +25,7 @@ public:
                                      const KbVec3* a7, const KbVec3* a8, const KbVec3* a9,
                                      KbVec3* a10, KbVec3* a11, int a12, float* a13, float a14);
     virtual void UnknownVirtualSlot8();
+    virtual int UnknownVirtualSlot11(int a1, KbVec3* a2, KbVec3* a3, KbVec3* a4, int* a5);
     virtual int UnknownVirtualSlot12(int a);
     virtual void UnknownVirtualSlot14(KbVec3* a, const KbVec3* b, const KbVec3* c);
     virtual void UnknownVirtualSlot15(const KbVec3* v, KbVec3* out);
@@ -34,6 +35,7 @@ public:
     virtual int UnknownVirtualSlot24();
     virtual int UnknownVirtualSlot25();
     virtual void UnknownVirtualSlot27();
+    virtual int UnknownVirtualSlot28(int a);
     virtual int UnknownVirtualSlot33(const KbVec3* a0, const KbVec3* a1, const KbVec3* a2,
                                      const KbVec3* a3, int a4, float a5);
     virtual int UnknownVirtualSlot39(float a);
@@ -58,10 +60,12 @@ public:
     virtual void UnknownVirtualSlot86();
     virtual int UnknownVirtualSlot84(int a, int b);
     virtual void UnknownVirtualSlot96();
+    virtual int UnknownVirtualSlot99(float a, float b, int c, float d);
     virtual void UnknownVirtualSlot101();
 
     int Fn_00414370(float dt);   // slot 63 returns its result (0x004924c0)
     void Fn_0048D8B0();
+    void Fn_004925A0(Vehicle* who, int flag);
     void Fn_00496DA0();
 
 public:
@@ -80,7 +84,11 @@ public:
     char field_0x7a4; // 0x7A4
     char pad_0x07A5[0x3];
     float field_0x7a8; // 0x7A8
-    char pad_0x07AC[0x58];
+    float field_0x7ac; // 0x7AC
+    float field_0x7b0; // 0x7B0
+    char pad_0x07B4[0x4];
+    int field_0x7b8; // 0x7B8
+    char pad_0x07BC[0x48];
     float field_0x804; // 0x804
     float field_0x808; // 0x808
     char pad_0x080C[0x8];

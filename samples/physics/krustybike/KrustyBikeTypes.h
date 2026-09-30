@@ -10,6 +10,9 @@
 #define KRUSTYBIKE_TYPES_H
 
 struct KbRacer;
+struct KbSession;
+struct KbPlayer;
+struct KbBody;
 struct KbRace;
 struct KbRaceHandler;
 struct KbSink;
@@ -30,14 +33,26 @@ typedef Vec3 KbVec3;
 extern KbVec3 g_kbZeroVec;
 
 // Object reached through the global at 0x0056E26C (game/session singleton).
+struct KbTrackRec { KbVec3 field_0x00; char pad_0x0C[0xC]; };
+struct KbMode { char pad_0x00[0x94]; int Fn_00524100(); };
+struct KbGameCfg { char pad_0x0000[0x10]; int field_0x10; };
 struct KbGame {
-    char pad_0x0000[0x18];
+    char pad_0x0000[0x8];
+    KbGameCfg* field_0x8; // 0x8
+    char pad_0x000C[0xC];
     int field_0x18; // 0x18
-    char pad_0x001C[0x54C];
+    char pad_0x001C[0x544];
+    KbTrackRec* field_0x560; // 0x560: array of 24-byte records (first member is a Vec3)
+    char pad_0x0564[0x4];
     KbRacer* field_0x568; // 0x568
-    char pad_0x056C[0xA0];
+    char pad_0x056C[0x4];
+    KbSession* field_0x570; // 0x570
+    char pad_0x0574[0x4];
+    KbMode field_0x578; // 0x578: game-mode state object (0x00524100 returns the mode number)
     int field_0x60c; // 0x60C
-    char pad_0x0610[0x9D0];
+    char pad_0x0610[0x640];
+    int field_0xc50; // 0xC50
+    char pad_0x0C54[0x38C];
     int field_0xfe0; // 0xFE0
     int field_0xfe4; // 0xFE4
     int field_0xfe8; // 0xFE8
@@ -50,7 +65,6 @@ struct KbGame {
     int field_0x2d74; // 0x2D74
     char pad_0x2D78[0xC];
     int field_0x2d84; // 0x2D84
-    int Fn_00524100();
 };
 extern KbGame* g_kbGame;
 
@@ -151,5 +165,28 @@ struct KbWheel {
     KbWheelQ* w_0x2a8;
     void Fn_00513F90(void* owner);   // 0x00513F90
 };
+
+// Session object at KbGame+0x570; 0x0045D2B0 returns the local player record (tier 3 names).
+struct KbSession { KbPlayer* Fn_0045D2B0(); };
+class Vehicle;
+struct KbPlayer {
+    char pad_0x0000[0xA8];
+    Vehicle* field_0xa8;   // 0xA8: vehicle this player is bound to
+    char pad_0x00AC[0x30];
+    Vehicle* field_0xdc;   // 0xDC
+    void Fn_004A9E80(Vehicle* who, int a, int b);
+};
+// Bounds/collision body at Vehicle::field_0x128 (canonical: CollisionObject::Fn_004392c0).
+struct KbBody { int Fn_004392C0(KbBody* other); };
+
+// Non-virtual callees of slot 11 (cdecl; call targets are relocation-masked).  Tier 3 names.
+// 0x004B0AC0: probe at a position with three radii and a scale; returns a byte flag.
+unsigned char Kb_004B0AC0(KbVec3* pos, float r0, float r1, float r2, float scale,
+                          int a, int b, int c, int d);
+// 0x004B0DF0: the query the base slot 11 issues (SoulTreePhysics.cpp Fn_4b0df0).  This
+// override passes different constants, so k and l are declared as nullable Vec3 pointers.
+int Kb_004B0DF0(void* body, int obj, KbVec3* pos, float scale, int e, int f, int g, int h,
+                float i, int j, const KbVec3* k, const KbVec3* l, int m, KbVec3* n, KbVec3* o,
+                KbVec3* p, int* q);
 
 #endif
