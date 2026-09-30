@@ -84,10 +84,11 @@ void FollowCamera::UnknownVirtualSlot67() {
 // Strong ABI reconstruction: slot 57 returns a 12-byte aggregate by value.
 // MSVC uses a hidden return buffer and returns that buffer in EAX; retail then
 // copies three dwords into this+0x2A8 and passes the cache to virtual slot 43.
+// Retail forms the cache address before the call and copies straight from the
+// returned buffer, i.e. the call result is assigned directly to the cache.
 void FollowCamera::UnknownVirtualSlot69() {
-    CameraValue12 value = UnknownVirtualSlot57(0);
     CameraValue12* cached = reinterpret_cast<CameraValue12*>(reinterpret_cast<char*>(this) + 0x2A8);
-    *cached = value;
+    *cached = UnknownVirtualSlot57(0);
     UnknownVirtualSlot43(*cached);
 }
 

@@ -121,8 +121,8 @@ CASES = [
         'source': 'samples/camera/FollowCameraProbe.cpp',
         'symbol': 'UnknownVirtualSlot71@FollowCamera',
         'target_va': '0x00466e50',
-        'target_size': 171,
-        'reason': 'state 0-4 virtual dispatch plus camera-preset snapshot is strongly reconstructed; clang /GS- emits 151 bytes with different VC6-era switch/register scheduling',
+        'target_size': 192,
+        'reason': 'state 0-4 virtual dispatch plus camera-preset snapshot is strongly reconstructed; clang /GS- emits 151 bytes with different VC6-era switch/register scheduling. Extent is 171 code bytes + 1 alignment NOP + the 5-entry jump table (retail entries 0x466e77..0x466eb3 all point into this function)',
     },
     {
         'name': 'FollowCamera::slot72 cyclic state-list advance',

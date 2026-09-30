@@ -90,8 +90,42 @@ Paired compilations with and without `/Z7` of 12 sample source files had identic
 code sections, including padding, and identical relocation destinations. Local
 compiler label names were compared by section and offset because debug metadata
 can renumber them. `/Z7` is measurement metadata, not evidence that the game used
-that flag. For example, FollowCamera slot 71 still has a 192-byte declared extent,
-including its jump table; it is not accepted by clipping to the 171-byte target.
+that flag. For example, FollowCamera slot 71 has a 192-byte declared extent
+including its jump table; it is not accepted by clipping to a 171-byte target.
+Retail has the same table after the code, so its calibration target is now the
+full 192 bytes (see below).
+
+## Calibration pass: all 16 exact without `/G6` — 2026-09-30
+
+Linux/Wine, same pinned bundle and executable. Four kinds of change, each
+checked against retail bytes:
+
+| Target | Change | Kind |
+|---|---|---|
+| BaseObject constructor `0x405120` | `{ refCount = 1; }` in the body: retail stores the vptr first; an initializer list stores `refCount` first | source shape |
+| Scalar deleting destructor `0x405130` | byte-identical already; its length (30) now comes from the CodeView `S_GPROC32` record, since compiler-generated functions have no aux `TotalSize` | matcher extent |
+| BaseObject::Release `0x405170` | single exit returning the loaded count (no separate `return 0`) | source shape + profile |
+| UIControl slots 61/62 | none | profile |
+| FollowCamera slot 69 `0x466a80` | assign the call result straight into the `+0x2A8` cache | source shape + profile |
+| FollowCamera slot 71 `0x466e50` | target extent 171 → 192 (code + NOP + 5-entry jump table); all 6 internal relocations resolve to the retail addresses | target extent |
+| FollowCamera slot 72 | none | profile |
+
+Profile comparison (`tools/vc6_profile_matrix.py`, then `tools/run_calibration.py`
+after the slot 69/71 changes):
+
+| Profile | Easy exact | Manual exact | Calibration exact |
+| --- | ---: | ---: | ---: |
+| `vc6_o2_ml_g6` | 39/39 | 19/19 | 11/16 |
+| `vc6_o2_ml` (no `/G6`) | 39/39 | 19/19 | 16/16 |
+
+The five targets that fail under `/G6` differ only in instruction selection or
+scheduling (e.g. `sub eax,[mem]` vs load-then-`sub eax,edx`, and where
+`push esi` is placed). Explicit `/G5` gives the same result as VC6's default.
+`/O1` is ruled out by the same targets.
+
+This is strong (tier 2) evidence that these translation units were built
+without `/G6`; it does not by itself establish `/ML` vs `/MT` (both give the
+same code here) or every other project flag.
 
 ## Reproduce
 

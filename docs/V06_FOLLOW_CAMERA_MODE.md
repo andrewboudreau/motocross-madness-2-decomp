@@ -133,10 +133,13 @@ virtual void UnknownVirtualSlot43(const CameraValue12& value);
 and slot 69 becomes:
 
 ```cpp
-CameraValue12 value = UnknownVirtualSlot57(0);
-field_2A8 = value;
+field_2A8 = UnknownVirtualSlot57(0);
 UnknownVirtualSlot43(field_2A8);
 ```
+
+(Retail forms the `this+0x2A8` address before the call and copies straight from
+the returned buffer; a named temporary produces a different VC6 shape. This
+form is exact under VC6 SP3 `/O2` without `/G6`; see `docs/VC6_MATCHING.md`.)
 
 The 12-byte type is intentionally **not** called `Vector3` yet. The size,
 copy behavior, hidden-return-buffer convention, and cache offset are strong
@@ -158,7 +161,9 @@ but it is not enough yet to call it distance/FOV/angle.
 
 ## Slot 71 — state dispatch
 
-Retail address `0x00466E50`, size 171 bytes.
+Retail address `0x00466E50`: 171 code bytes, one alignment NOP, then a
+5-entry jump table (192 bytes in total; every table entry points into the
+function).
 
 The machine behavior reconstructs cleanly as ordinary C++:
 
