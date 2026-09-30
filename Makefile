@@ -2,6 +2,7 @@ PYTHON ?= python3
 INSTALLER ?= MCM2PCG.exe
 EXE ?= work/game/mcm2.exe
 VC6_ROOT ?=
+SKELETON_ROOT ?= src/krusty2
 PRIVATE_ROOT ?= $(HOME)/.cache/mcm2-private
 PRIVATE_BUNDLE ?=
 
@@ -14,7 +15,7 @@ extract:
 	PYTHONPATH=. $(PYTHON) tools/extract_installer.py "$(INSTALLER)"
 
 analyze: ensure-work
-	PYTHONPATH=. $(PYTHON) tools/analyze.py "$(EXE)" --out analysis --skeleton-root src/krusty2
+	PYTHONPATH=. $(PYTHON) tools/analyze.py "$(EXE)" --out analysis --skeleton-root "$(SKELETON_ROOT)"
 	PYTHONPATH=. $(PYTHON) tools/build_class_evidence.py
 	PYTHONPATH=. $(PYTHON) tools/analyze_msvc_artifacts.py
 	PYTHONPATH=. $(PYTHON) tools/find_vtable_writes.py

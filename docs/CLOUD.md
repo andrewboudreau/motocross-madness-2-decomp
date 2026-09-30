@@ -1,53 +1,60 @@
 # Cloud / container environment
 
 `tools/cloud_setup.sh` provisions a fresh Ubuntu container (Claude Code on the
-web, CI, a throwaway VM) with everything needed for VC6 byte matching. The
-repository still ships no proprietary bytes: the two private inputs are fetched
-from locations you configure outside Git.
+web, a throwaway VM) for VC6 byte matching. In Claude Code on the web it runs
+on every session start and resume through `.claude/hooks/session-start.sh`.
 
-| Variable | Required | Meaning |
-|---|---|---|
-| `MCM2_PRIVATE_BUNDLE_URL` | preferred | URL or local path of the private bundle ZIP (`toolchains/vc6sp3/VC98` + `work/game/mcm2.exe` + `work/private-inputs/SHA256SUMS.json`) |
-| `MCM2_PRIVATE_BUNDLE_SHA256` | no | overrides the bundle hash pinned in `config/private_bundle_expected.json` |
-| `MCM2_PRIVATE_ROOT` | no | install location for the bundle, default `~/.cache/mcm2-private` |
-| `MCM2_INSTALLER_URL` | yes* | URL or local path of your `MCM2PCG.exe` |
-| `MCM2_INSTALLER_SHA256` | no | expected hash of the installer; download is rejected on mismatch |
-| `VC6_ARCHIVE_URL` | yes* | URL or local path of an archive (`.zip`, `.tar.*`, `.7z`) containing an SP3-patched `VC98` tree |
-| `VC6_ARCHIVE_SHA256` | no | expected hash of that archive |
-| `DOWNLOAD_AUTH_HEADER` | no | extra curl header for private hosting, e.g. `Authorization: Bearer …` |
+It uses the same private bundle and tooling as `docs/PRIVATE_TOOLCHAIN.md`;
+the repository still ships no proprietary bytes.
 
-The bundle replaces the installer + VC6 archive pair below. It is downloaded
-with curl and installed by `tools/install_private_bundle.py` (archive hash,
-every manifest entry, target `mcm2.exe` hash; see `docs/PRIVATE_TOOLCHAIN.md`),
-so `tools/with_private_env.py` and `make private-ready` see the same install. It
-lives outside the checkout, and symlinked into `toolchains/vc6sp3`
-and `work/game`, so a git worktree gets the same files by running the script
-again. With the bundle present the script also runs `make analyze` (restoring
-the two tracked summary docs it rewrites).
+## Configure the environment once
 
-\* Alternatively pre-place `input/MCM2PCG.exe` / `toolchains/vc6sp3/VC98`.
+In the cloud environment's settings:
 
-What it does (idempotent; missing inputs warn, never fail):
+1. Environment variable (quoted, because signed URLs contain `&` and `%`):
+   ```
+   MCM2_PRIVATE_BUNDLE_URL="https://…signed bundle URL…"
+   ```
+2. Network access: allow the bundle's host.
 
-1. apt: `wine`, `wine32:i386`, `clang` (+ `clang-cl` symlink), `lld`, `cabextract`, `p7zip-full`, `unzip`, `libarchive-dev`;
-2. 32-bit Wine prefix at `work/wine-vc6`;
-3. fetch installer → `input/MCM2PCG.exe` → `tools/bootstrap.py` (extraction, analysis, clang gates), then checks `work/game/mcm2.exe` against the documented SHA-256;
-4. fetch VC6 archive → `tools/import_vc6.py` → `toolchains/vc6sp3` → `tools/probe_vc6.py` → `analysis/vc6_probe.json`;
-5. writes `work/cloud-env.sh` (and `$CLAUDE_ENV_FILE` when run as a hook) exporting `PYTHONPATH`, `WINEPREFIX`, `WINEARCH`, `VC6_ROOT`.
+Settings reach sessions started after the change, not the current one.
 
-## Claude Code on the web
+Optional variables: `MCM2_PRIVATE_ROOT` (install location, default
+`~/.cache/mcm2-private`) and `MCM2_PRIVATE_BUNDLE_SHA256` (overrides the hash
+pinned in `config/private_bundle_expected.json`).
 
-`.claude/hooks/session-start.sh` runs the script on every remote session start
-(synchronously). Set the variables above in the cloud environment's settings,
-and make sure the environment's network access allows the host(s) serving the
-two files. Package installs use the Ubuntu archive, which the default policy
-allows. Afterwards:
+## What a session start does
+
+Every step warns and continues on failure; the environment is written first.
+
+1. Writes `work/cloud-env.sh` and the session environment (once):
+   `PYTHONPATH`, `MCM2_PRIVATE_ROOT`, `VC6_ROOT`, `MCM2_EXE`, `WINEPREFIX`,
+   `WINEARCH`, `WINEDEBUG`. The paths match `tools/with_private_env.py`.
+2. apt: `wine`, `wine32:i386`, `clang` (+ `clang-cl` symlink), `lld`, `unzip`,
+   `binutils`, `make`, only when missing.
+3. If the bundle is not installed: downloads it with curl (URL passed on stdin,
+   never printed) and installs it with `tools/install_private_bundle.py`, which
+   checks the archive hash, every manifest entry and the `mcm2.exe` hash.
+4. Symlinks `toolchains/vc6sp3` and `work/game` to the install, so the Makefile
+   defaults and every git worktree use the same verified files. A real
+   directory at either path is left alone with a warning.
+5. Once per install: `tools/vc6_acceptance.py`, a real `CL.EXE` compile under
+   Wine (this also creates the Wine prefix). Result in `work/vc6-acceptance.json`.
+6. Once per checkout: `make analyze`, with the translation-unit skeletons
+   written to `generated/krusty2-skeletons` so `src/krusty2` only holds
+   promoted code, and the two tracked summary docs it rewrites restored.
+   `analysis/` and `generated/` are added to the local `.git/info/exclude`.
+
+A first start takes about 45 seconds; later starts and resumes take well under
+a second.
+
+Afterwards:
 
 ```bash
 make status
 make vc6-gate VC6_ROOT="$VC6_ROOT"
+make private-ready          # same acceptance check, through with_private_env.py
 ```
 
-Host the archives somewhere private to you (a private release asset, a
-presigned bucket URL, etc.); the Microsoft and game binaries must not be
-published or committed (see `docs/REPOSITORY_POLICY.md`).
+Treat the container's cache as private: it holds the compiler and game binary
+(see `docs/REPOSITORY_POLICY.md`).
