@@ -6,7 +6,7 @@
     "target_va": "0x0040c4c0",
     "target_size": 118,
     "expect": "partial",
-    "notes": "slot 34 (override); ~48% match: cross product loads/FPU ops correct; VC6 prologue push order and fld scheduling differ"
+    "notes": "slot 34 (override); ~78.1% match: cross product loads/FPU ops correct; VC6 prologue push order and fld scheduling differ"
   },
   {
     "class": "Vehicle",
@@ -15,7 +15,7 @@
     "target_va": "0x0040c540",
     "target_size": 130,
     "expect": "partial",
-    "notes": "slot 35 (override); ~48% match: same cause as slot 34 (shape of Vec3 cross temp scheduling)"
+    "notes": "slot 35 (override); ~80.2% match: same cause as slot 34 (shape of Vec3 cross temp scheduling)"
   },
   {
     "class": "Vehicle",
@@ -24,7 +24,7 @@
     "target_va": "0x0040c880",
     "target_size": 7,
     "expect": "exact",
-    "notes": "slot 45 (introduced); "
+    "notes": "slot 45 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -33,7 +33,7 @@
     "target_va": "0x0040c890",
     "target_size": 7,
     "expect": "exact",
-    "notes": "slot 51 (introduced); "
+    "notes": "slot 51 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -42,7 +42,7 @@
     "target_va": "0x0040c8a0",
     "target_size": 14,
     "expect": "exact",
-    "notes": "slot 52 (introduced); "
+    "notes": "slot 52 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -51,7 +51,7 @@
     "target_va": "0x0040cac0",
     "target_size": 18,
     "expect": "exact",
-    "notes": "slot 68 (introduced); "
+    "notes": "slot 68 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -60,7 +60,7 @@
     "target_va": "0x0040cae0",
     "target_size": 13,
     "expect": "exact",
-    "notes": "slot 69 (introduced); "
+    "notes": "slot 69 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -69,7 +69,7 @@
     "target_va": "0x0040caf0",
     "target_size": 38,
     "expect": "exact",
-    "notes": "slot 23 (override); "
+    "notes": "slot 23 (override); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -78,7 +78,7 @@
     "target_va": "0x0040cb20",
     "target_size": 59,
     "expect": "exact",
-    "notes": "slot 24 (override); "
+    "notes": "slot 24 (override); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -87,7 +87,7 @@
     "target_va": "0x0040cb60",
     "target_size": 59,
     "expect": "exact",
-    "notes": "slot 25 (override); "
+    "notes": "slot 25 (override); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -95,8 +95,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot78@Vehicle",
     "target_va": "0x00492220",
     "target_size": 76,
-    "expect": "partial",
-    "notes": "slot 78 (introduced); 75% match: logic right; retail loads the InputMap vtable (mov eax,[ecx]) after the arg pushes, VC6 hoists it in our build"
+    "expect": "exact",
+    "notes": "slot 78 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -104,8 +104,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot79@Vehicle",
     "target_va": "0x00492270",
     "target_size": 76,
-    "expect": "partial",
-    "notes": "slot 79 (introduced); 75% match: same cause as slot 78"
+    "expect": "exact",
+    "notes": "slot 79 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -114,7 +114,7 @@
     "target_va": "0x004a6ba0",
     "target_size": 3,
     "expect": "exact",
-    "notes": "slot 92 (introduced); "
+    "notes": "slot 92 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -123,7 +123,16 @@
     "target_va": "0x00525520",
     "target_size": 45,
     "expect": "exact",
-    "notes": "slot 0 (override); "
+    "notes": "slot 0 (override); exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot43@Vehicle",
+    "target_va": "0x005256d0",
+    "target_size": 199,
+    "expect": "partial",
+    "notes": "slot 43 (introduced); 49.1% match: semantics decoded (copy pos, heading=field_0xa0 with y=0, normalise via FastInvSqrt 0x460c00, zero if degenerate); retail keeps the length^2 sum in an x87 register dance and copies via lea/edx that the source shape does not reproduce"
   },
   {
     "class": "Vehicle",
@@ -132,7 +141,7 @@
     "target_va": "0x00526800",
     "target_size": 44,
     "expect": "exact",
-    "notes": "slot 70 (introduced); "
+    "notes": "slot 70 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -141,7 +150,7 @@
     "target_va": "0x005276c0",
     "target_size": 11,
     "expect": "exact",
-    "notes": "slot 89 (introduced); "
+    "notes": "slot 89 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -149,8 +158,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot71@Vehicle",
     "target_va": "0x00527d90",
     "target_size": 154,
-    "expect": "partial",
-    "notes": "slot 71 (introduced); 72.1% match, same size and control flow: struct copies (Vec3 field_0x494=field_0x64, field_0x488=field_0xc) interleave loads/stores differently; retail does lea/lea then sequential ld/st"
+    "expect": "exact",
+    "notes": "slot 71 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -159,7 +168,7 @@
     "target_va": "0x00528170",
     "target_size": 60,
     "expect": "exact",
-    "notes": "slot 73 (introduced); "
+    "notes": "slot 73 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -168,7 +177,7 @@
     "target_va": "0x005289b0",
     "target_size": 7,
     "expect": "exact",
-    "notes": "slot 57 (introduced); "
+    "notes": "slot 57 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -177,7 +186,7 @@
     "target_va": "0x00528e50",
     "target_size": 81,
     "expect": "partial",
-    "notes": "slot 64 (introduced); ~60% match: return-zero hoisted to xor eax,eax (matched with a local); the Vec3 copy from 0x68a6e8 differs in store/lea ordering (same cause as slot 55)"
+    "notes": "slot 64 (introduced); ~94.2% match: return-zero hoisted to xor eax,eax (matched with a local); the Vec3 copy from 0x68a6e8 differs in store/lea ordering (same cause as slot 55)"
   },
   {
     "class": "Vehicle",
@@ -185,8 +194,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot82@Vehicle",
     "target_va": "0x005290b0",
     "target_size": 26,
-    "expect": "partial",
-    "notes": "slot 82 (introduced); 76.9% match: same cause as slot 81"
+    "expect": "exact",
+    "notes": "slot 82 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -194,8 +203,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot81@Vehicle",
     "target_va": "0x005290d0",
     "target_size": 26,
-    "expect": "partial",
-    "notes": "slot 81 (introduced); 76.9% match: vtable load (mov eax,[ecx]) is placed after the constant pushes in target"
+    "expect": "exact",
+    "notes": "slot 81 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -204,7 +213,7 @@
     "target_va": "0x00529200",
     "target_size": 67,
     "expect": "exact",
-    "notes": "slot 77 (introduced); "
+    "notes": "slot 77 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -212,8 +221,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot84@Vehicle",
     "target_va": "0x00529250",
     "target_size": 24,
-    "expect": "partial",
-    "notes": "slot 84 (introduced); 70.8% match: same cause as 81 - vtable load placed after arg loads in target"
+    "expect": "exact",
+    "notes": "slot 84 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -222,7 +231,7 @@
     "target_va": "0x00529270",
     "target_size": 11,
     "expect": "exact",
-    "notes": "slot 93 (introduced); "
+    "notes": "slot 93 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -230,8 +239,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot85@Vehicle",
     "target_va": "0x00529360",
     "target_size": 128,
-    "expect": "partial",
-    "notes": "slot 85 (introduced); 93.5% match, same size: only the placement of `push edi` (before the 0x440 test in retail) differs"
+    "expect": "exact",
+    "notes": "slot 85 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -240,7 +249,7 @@
     "target_va": "0x00529b40",
     "target_size": 93,
     "expect": "partial",
-    "notes": "slot 76 (introduced); 39.6% match: cross product of (a,b) via out; retail loads/multiplies in a different operand order that source multiplicand order did not change in any of 64 tried permutations (free and member form)"
+    "notes": "slot 76 (introduced); 37.4% match: cross product of (a,b) via out; retail loads/multiplies in a different operand order that source multiplicand order did not change in any of 64 tried permutations (free and member form)"
   },
   {
     "class": "Vehicle",
@@ -249,7 +258,7 @@
     "target_va": "0x00529ba0",
     "target_size": 127,
     "expect": "partial",
-    "notes": "slot 86 (introduced); 36.5% match: retail passes the two float args through the x87 stack (fld/fstp [esp]) while we push them as integer bit copies; callee 0x4d31b0 signature or float source expression unknown"
+    "notes": "slot 86 (introduced); 47.0% match: retail passes the two float args through the x87 stack (fld/fstp [esp]) while we push them as integer bit copies; callee 0x4d31b0 signature or float source expression unknown"
   },
   {
     "class": "Vehicle",
@@ -258,7 +267,7 @@
     "target_va": "0x00529d60",
     "target_size": 83,
     "expect": "exact",
-    "notes": "slot 90 (introduced); "
+    "notes": "slot 90 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -267,7 +276,7 @@
     "target_va": "0x0052a500",
     "target_size": 24,
     "expect": "exact",
-    "notes": "slot 21 (override); "
+    "notes": "slot 21 (override); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -276,7 +285,7 @@
     "target_va": "0x0052a520",
     "target_size": 10,
     "expect": "exact",
-    "notes": "slot 59 (introduced); "
+    "notes": "slot 59 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -285,7 +294,7 @@
     "target_va": "0x0052a530",
     "target_size": 126,
     "expect": "partial",
-    "notes": "slot 60 (introduced); 83.3% match, same size: remaining diff is fmul/`mov eax,[ecx+0x47c]` order and fcom placed before the store of t"
+    "notes": "slot 60 (introduced); 92.1% match, same size: remaining diff is fmul/`mov eax,[ecx+0x47c]` order and fcom placed before the store of t"
   },
   {
     "class": "Vehicle",
@@ -294,7 +303,7 @@
     "target_va": "0x0052a5b0",
     "target_size": 9,
     "expect": "exact",
-    "notes": "slot 61 (introduced); "
+    "notes": "slot 61 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -303,7 +312,7 @@
     "target_va": "0x0052a5c0",
     "target_size": 33,
     "expect": "exact",
-    "notes": "slot 62 (introduced); "
+    "notes": "slot 62 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -311,8 +320,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot48@Vehicle",
     "target_va": "0x0052a890",
     "target_size": 171,
-    "expect": "partial",
-    "notes": "slot 48 (introduced); 89.1% match, same size: only the placement of the `mov eax,[ecx+0x13c]` (dt copy) relative to the first fmul differs"
+    "expect": "exact",
+    "notes": "slot 48 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -321,7 +330,7 @@
     "target_va": "0x0052b600",
     "target_size": 23,
     "expect": "exact",
-    "notes": "slot 50 (introduced); "
+    "notes": "slot 50 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -329,8 +338,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot53@Vehicle",
     "target_va": "0x0052b6a0",
     "target_size": 41,
-    "expect": "partial",
-    "notes": "slot 53 (introduced); 87.9% match: only the ecx/eax load order before fmul differs (scheduling)"
+    "expect": "exact",
+    "notes": "slot 53 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -339,7 +348,7 @@
     "target_va": "0x0052b6d0",
     "target_size": 63,
     "expect": "partial",
-    "notes": "slot 55 (introduced); 10% match: Vec3 copy of out=zero then out=field_0xa0; target reloads out from stack and copies via a temp; source shape not found"
+    "notes": "slot 55 (introduced); 12.8% match: Vec3 copy of out=zero then out=field_0xa0; target reloads out from stack and copies via a temp; source shape not found"
   },
   {
     "class": "Vehicle",
@@ -348,7 +357,7 @@
     "target_va": "0x0052b710",
     "target_size": 39,
     "expect": "exact",
-    "notes": "slot 42 (override); "
+    "notes": "slot 42 (override); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -357,7 +366,7 @@
     "target_va": "0x0052b740",
     "target_size": 66,
     "expect": "exact",
-    "notes": "slot 67 (introduced); "
+    "notes": "slot 67 (introduced); exact under vc6_o2_ml (no /G6)"
   },
   {
     "class": "Vehicle",
@@ -366,6 +375,6 @@
     "target_va": "0x0052b8f0",
     "target_size": 42,
     "expect": "exact",
-    "notes": "slot 96 (introduced); "
+    "notes": "slot 96 (introduced); exact under vc6_o2_ml (no /G6)"
   }
 ]

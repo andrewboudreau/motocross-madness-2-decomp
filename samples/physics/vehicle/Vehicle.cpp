@@ -298,3 +298,23 @@ void Vehicle::UnknownVirtualSlot71(int arg)
         field_0x488 = field_0x0c;
     }
 }
+
+extern float FastInvSqrt(float v);   // retail 0x00460c00 (float in, ~1/sqrt out)
+
+// Provisional: snapshot position (0x10c) and a horizontal heading vector (0x118 = field_0xa0
+// with y forced to 0), normalised with FastInvSqrt; zero vector if degenerate.
+void Vehicle::UnknownVirtualSlot43()
+{
+    field_0x10c = field_0x0c;
+    field_0x118 = field_0xa0;
+    field_0x118.y = 0.0f;
+    float len2 = field_0x118.x * field_0x118.x + field_0x118.y * field_0x118.y + field_0x118.z * field_0x118.z;
+    if (len2 == 0.0f) {
+        field_0x118 = g_VehZeroVec3;
+        return;
+    }
+    float inv = FastInvSqrt(len2);
+    field_0x118.x *= inv;
+    field_0x118.y *= inv;
+    field_0x118.z *= inv;
+}
