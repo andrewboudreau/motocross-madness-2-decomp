@@ -107,6 +107,12 @@ static inline SoultreeVec3 SoultreeCross(const SoultreeVec3& a, const SoultreeVe
     return r;
 }
 
+// Dot product with the z term first, the shape the retail code uses.
+static inline float SoultreeDot(const SoultreeVec3& a, const SoultreeVec3& b)
+{
+    return a.z * b.z + (a.x * b.x + a.y * b.y);
+}
+
 // slot 3 (0x00501310): runs the TU-local solver helper, then refreshes cached values.
 void SoultreePhysicsBaseObject::UnknownVirtualSlot3(const SoultreeVec3* a1, const SoultreeVec3* a2,
                                                     const SoultreeVec3* a3, const SoultreeVec3* a4,
@@ -539,14 +545,15 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot13(SoultreeVec3* a1, SoultreeV
         t.x = w * a1->x;
         t.y = w * a1->y;
         t.z = w * a1->z;
-        float d = DotProduct(t, c->field_0x2c);
+        float d = SoultreeDot(t, c->field_0x2c);
         c->field_0x74 = d;
         if (d >= 0.0f) {
             c->field_0x74 = 0.0f;
             c->field_0x68 = SoultreeVec3(0.0f, 0.0f, 0.0f);
         } else {
             c->field_0x74 = -d;
-            c->field_0x68 = *SoultreeScaleVec3(&t, &c->field_0x2c, -d);
+            SoultreeVec3 scaled;
+            c->field_0x68 = *SoultreeScaleVec3(&scaled, &c->field_0x2c, -d);
         }
         c->UnknownVirtualSlot1();
         *a1 += c->field_0x78;
@@ -617,7 +624,7 @@ struct SoultreeCollisionEvent {
 
 static inline SoultreeVec3 Scale3(SoultreeVec3 v, const SoultreeVec3& s)
 {
-    return SoultreeVec3(v.x * s.x, v.y * s.y, v.z * s.z);
+    return SoultreeVec3(s.x * v.x, s.y * v.y, s.z * v.z);
 }
 
 // slot 38 (0x00501600): collision response for one contact.  Tier 3 reading: a2 is the
@@ -636,8 +643,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int a1, int a2, void* a3)
     s = SoultreeVec3(1.0f, 1.0f, 1.0f);
     l10 = 1.0f;
     SoultreeNode* node;
-    SoultreePhysicsBaseObject* other = 0;
     SoultreeVec3* otherVel = 0;
+    SoultreePhysicsBaseObject* other = 0;
     SoultreeVec3 v48, v54, v60;
     int hasBody;
 
@@ -675,7 +682,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int a1, int a2, void* a3)
         }
     } else {
         SoultreeVec3 t = Scale3(field_0xcc, s);
-        field_0x1ac = SoultreeCross(t, r);
+        field_0x1ac = CrossProduct(t, r);
         SoultreeVec3 p = field_0x64 + field_0x1ac;
         UnknownVirtualSlot3(&field_0x128->field_0xac, &p, &r, &s, a2, 0, (float*)&a2);
     }
@@ -756,20 +763,22 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
         hit = field_0x1f4->Fn_506e90(&pos, dir, &out, 0, 0, 0);
         if (hit != (unsigned char)field_0x1fc) {
             for (int i = 0; i < field_0x1dc; i++) {
-                SoultreeAttachment* a = &field_0x1d4[i];
-                if (a->type == 1) {
+                switch (field_0x1d4[i].type) {
+                case 1:
                     if (hit) {
-                        a->field_0x04->Fn_4b8dd0(0x40, 0x40, 0x40);
-                        a->field_0x04->field_0x74 |= 0x800;
+                        field_0x1d4[i].field_0x04->Fn_4b8dd0(0x40, 0x40, 0x40);
+                        field_0x1d4[i].field_0x04->field_0x74 |= 0x800;
                     } else {
-                        a->field_0x04->Fn_4b8dd0(0xff, 0xff, 0xff);
-                        a->field_0x04->field_0x74 &= ~0x800;
+                        field_0x1d4[i].field_0x04->Fn_4b8dd0(0xff, 0xff, 0xff);
+                        field_0x1d4[i].field_0x04->field_0x74 &= ~0x800;
                     }
-                } else if (a->type == 4) {
+                    break;
+                case 4:
                     if (hit)
-                        ((SoultreeSinkObject*)a->field_0x14)->Fn_4ba360(0x80, 0x80, 0x80);
+                        ((SoultreeSinkObject*)field_0x1d4[i].field_0x14)->Fn_4ba360(0x80, 0x80, 0x80);
                     else
-                        ((SoultreeSinkObject*)a->field_0x14)->Fn_4ba360(0xff, 0xff, 0xff);
+                        ((SoultreeSinkObject*)field_0x1d4[i].field_0x14)->Fn_4ba360(0xff, 0xff, 0xff);
+                    break;
                 }
             }
             field_0x1fc = (char)hit;
