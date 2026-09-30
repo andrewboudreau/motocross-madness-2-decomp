@@ -35,7 +35,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug `new`/`delete`/realloc), `MemTag.h` |
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.h`, `CollisionTypes.h` |
-| `broadphase/` | `Quadtree.cpp` and `Quadtree.h` |
+| `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
 
 Include shared headers by their path under this folder, e.g. `#include "core/GameObject.h"`.
 `tools/run_physics_samples.py` puts `src/krusty2` on the include path.
@@ -47,8 +47,26 @@ Include shared headers by their path under this folder, e.g. `#include "core/Gam
   `Quantize.cpp` (first xref 0x4dde47). Quadtree.cpp's own xrefs span 0x4dc729..0x4ddce6.
 - All 27 QuadTree/QuadTreeNode targets (0x4dc620..0x4ddd90) are inside the bracket;
   22 match exactly, and 5 are documented partials in `broadphase/targets.json`.
-- The 5-byte Terrain stub at 0x4dc4c0 sits in the same range but is a Terrain virtual
-  (likely a folded COMDAT), so it stays with Terrain in samples.
+- The 5-byte stub at 0x4dc4c0 (`xor eax,eax; ret 8`) also sits in this stretch, but it is
+  Terrain's slot 22 and is shared with the ProjectedShadow and StatsOverlay vtables.
+  Identical code folding makes its address useless for attribution. It is reconstructed
+  in Terrain.cpp.
+
+## Evidence: Terrain.cpp
+
+- Name: `D:\aardvark\VC\krusty2\Terrain.cpp`, string at 0x00574720, with debug deletes
+  at lines 0x4b3 and 0x4d0.
+- Code bracket: after `SteeringControl.cpp` (last xref 0x504bd2) and before `Texmap.cpp`
+  (first xref 0x50a6bc). Terrain.cpp's own xrefs span 0x50567c..0x507b38.
+- 11 of the 12 targets (0x505830..0x508964) are inside the bracket. The 12th is the shared
+  0x4dc4c0 stub described above. 7 match exactly.
+- Terrain derives from `GameObject` and `GroundFogableObject`, as the RTTI says (mdisp 0,
+  and 0x2c for GroundFogableObject, which has no vfptr). Both bases are kept.
+- Out of reach under the no-asm rule: `QueryGround` 0x507c10 inlines an `__asm` fistp helper.
+- The helper types (`TerrainVec3`, `TerrainMatrix`, `TerrainShutdownObject`,
+  `TerrainComObject`, `TerrainOwned` and others) are provisional stand-ins with tier 3 names.
+  `TerrainVec3` stays separate from the shared Vec3 because including `Math3D.h` would add
+  static initializers that Terrain.cpp does not have.
 
 ## Gate
 

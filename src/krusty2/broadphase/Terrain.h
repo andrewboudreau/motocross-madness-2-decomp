@@ -18,7 +18,8 @@
 #include "core/MemTag.h"
 #include "core/DebugAlloc.h"
 
-// PROVISIONAL stand-in: the 0x004aae20 ctor only stores 0 in its first dword.
+// Second direct base of Terrain at mdisp 0x2c (RTTI .?AVGroundFogableObject@@, tier 1); it has no
+// vfptr.  Its contents are PROVISIONAL: the 0x004aae20 ctor only stores 0 in its first dword.
 class GroundFogableObject {
 public:
     GroundFogableObject();                      // 0x004aae20: stores 0 in field_0x00
@@ -141,7 +142,7 @@ extern TerrainVec3 g_terrainRefDir;                              // 0x0068a058 (
 TerrainVec3 TerrainClipRayToPlaneY(TerrainVec3* origin, const TerrainVec3* dir, float y);
 TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3* origin, const TerrainVec3* dir, float z);
 
-class Terrain : public GameObject {
+class Terrain : public GameObject, public GroundFogableObject {
 public:
     // 0x00507c10 (thiscall, ret 0x10; 58 callers).  Snaps pos->y to the terrain surface under
     // (pos->x, pos->z), optionally writes the surface normal and a per-cell surface byte.
@@ -163,7 +164,6 @@ public:
     explicit Terrain(int a);                                    // 0x00505830 (ret 4), forwards a to GameObject(int)
     virtual ~Terrain();                                         // 0x005059b0 -> core 0x005079f0
 
-    GroundFogableObject fogBase;                                // +0x2c (non-polymorphic base at mdisp 0x2c)
     BaseObject* field_0x30;                                     // slot 2 called (0x005079f0)
     TerrainComObject* field_0x34;                               // Release()d, then zeroed
     int field_0x38;
