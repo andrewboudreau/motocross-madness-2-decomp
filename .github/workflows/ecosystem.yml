@@ -1,0 +1,19 @@
+name: EcoSystem reconstruction tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  algorithm-and-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Native candidate, verifier, and existing regressions
+        run: make ecosystem-test category-pilots-test categories-test category-contexts-test allocation-test

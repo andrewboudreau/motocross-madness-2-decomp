@@ -154,3 +154,23 @@ vc6-profile-matrix:
 
 vc6-profile-matrix-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_vc6_profile_matrix.py' -v
+
+.PHONY: category-pilots category-pilots-probe category-pilots-test
+category-pilots: ensure-work
+	$(PYTHON) tools/review_category_pilots.py --exe "$(EXE)"
+
+category-pilots-probe: ensure-work
+	$(PYTHON) tools/review_category_pilots.py --exe "$(EXE)" --compile-probe
+
+category-pilots-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_category_pilots.py' -v
+
+.PHONY: ecosystem ecosystem-probes ecosystem-test
+ecosystem: ensure-work
+	$(PYTHON) tools/review_ecosystem.py --exe "$(EXE)"
+
+ecosystem-probes: ensure-work
+	$(PYTHON) tools/review_ecosystem.py --exe "$(EXE)" --compile-probes
+
+ecosystem-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_ecosystem.py' -v

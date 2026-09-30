@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "input_sha256": "31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874",
+  "analysis_scope": "normal control flow and local boundary call history; not callee effects or exception unwinding",
+  "boundaries": {
+    "select": {
+      "va": "0x004a2d00",
+      "size": 27,
+      "sha256": "d1e518211f0a0c0160ac51e2588f80b7c3cbeb5071dfd28345f89b4d59305ea6"
+    },
+    "restore": {
+      "va": "0x004a2d90",
+      "size": 10,
+      "sha256": "b994e2bd1bc262c5b463fca225534224134549b75fddcc1f700f38a59510b90e"
+    }
+  },
+  "pilots": [
+    {
+      "va": "0x0045aad0",
+      "size": 771,
+      "sha256": "137cc95f31ad02e221cc897d880d1f59b1807449092d01aaffd7e4a144b3030f",
+      "name": "EcoSystem primary slot 12",
+      "class_name": "EcoSystem",
+      "primary_vtable": "0x00552508",
+      "slot": 12,
+      "category": {
+        "literal_va": "0x0056a410",
+        "label": "EcoSystem",
+        "call_va": "0x0045aaf4"
+      },
+      "saved_previous": {
+        "save_va": "0x0045aaf9",
+        "reload_va": "0x0045adb1",
+        "restore_call_va": "0x0045adc3",
+        "reviewed_entry_sp_offset": -16,
+        "note": "manual caller-frame review; analyzer verifies instruction bytes but does not solve stack/alias equivalence"
+      },
+      "exits": {
+        "0x0045aae8": "global gate is zero: no local selection",
+        "0x0045ab16": "member +0x34 is zero after selection/counter sample: no local restore",
+        "0x0045add2": "main body completes and locally restores"
+      },
+      "opaque_model_range": [
+        "0x0045ab17",
+        "0x0045ada8"
+      ]
+    },
+    {
+      "va": "0x005079f0",
+      "size": 441,
+      "sha256": "9b5a693548d1e3a89d6864aec53ef908c2808197f2c032fe71b5d92a88ff285d",
+      "name": "Terrain destructor core",
+      "class_name": "Terrain",
+      "primary_vtable": "0x0055825c",
+      "slot": 0,
+      "deleting_wrapper": {
+        "va": "0x005059b0",
+        "size": 30,
+        "sha256": "da5154e8be3011af38d0bbec1f72510370a3238845e307c38e23fd8de9c44b32"
+      },
+      "base_destructor": {
+        "class_name": "GameObject",
+        "wrapper": {
+          "va": "0x00468d40",
+          "size": 30,
+          "sha256": "23782ef7adc0c6c2dbf64d46a0d74f1115677a88e19b708ec4a90d137fcad2e5"
+        },
+        "core_va": "0x00468d60",
+        "call_va": "0x00507b93"
+      },
+      "category": {
+        "literal_va": "0x005722e0",
+        "label": "Terrain",
+        "call_va": "0x00507a29"
+      },
+      "saved_previous": {
+        "save_va": "0x00507a2e",
+        "reload_va": "0x00507b79",
+        "restore_call_va": "0x00507b84",
+        "reviewed_entry_sp_offset": -20,
+        "note": "manual caller-frame review; not an exception-safety guarantee"
+      },
+      "exits": {
+        "0x00507ba8": "cleanup returns after local restore and GameObject base cleanup"
+      },
+      "field_offsets": [
+        "0x30",
+        "0x34",
+        "0x44",
+        "0x540",
+        "0x544",
+        "0xc10",
+        "0xc14",
+        "0xc3c",
+        "0xc84",
+        "0xc88",
+        "0xcb8",
+        "0xcbc"
+      ]
+    }
+  ],
+  "timer": {
+    "va": "0x004bfa80",
+    "size": 29,
+    "sha256": "822de94873fca5bffdbc87a3330c4945a58dbc81e3c7a22898b0cb606c6aacaf",
+    "source": "samples/category_pilots/TimerProbe.cpp",
+    "symbol": "_ProbeSampleMilliseconds",
+    "imports": [
+      {
+        "name": "timeBeginPeriod",
+        "stack_bytes": 4
+      },
+      {
+        "name": "timeGetTime",
+        "stack_bytes": 0
+      },
+      {
+        "name": "timeEndPeriod",
+        "stack_bytes": 4
+      }
+    ]
+  }
+}
