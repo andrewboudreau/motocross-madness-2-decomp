@@ -1,0 +1,11 @@
+[
+  {"class": "CollisionObject", "source": "CollisionObjectSetup.cpp", "candidate_symbol_contains": "Fn_004320f0",
+   "target_va": "0x004320f0", "target_size": 40, "expect": "exact",
+   "notes": "Stores b,c,d into field_0x80/0x6c/0x70 then tail-calls GameObject slot 8 (0x4692f0)."},
+  {"class": "ContactSolveImpulse", "source": "ContactImpulse.cpp", "candidate_symbol_contains": "ContactSolveImpulse",
+   "target_va": "0x005004a0", "target_size": 1062, "expect": "partial",
+   "notes": "Impulse solver, semantics fully decoded (tier 3). 983 vs 1062 bytes, ~11% match. Causes: x87 stack-slot allocation/colouring order, cross-product y/z load order, retail copies out-of-line ctor results through extra locals (naming them changed frame 0x60 to 0x48)."},
+  {"class": "ObjectPlacement", "source": "ObjectPlacement.cpp", "candidate_symbol_contains": "Fn_4b0df0",
+   "target_va": "0x004b0df0", "target_size": 3971, "expect": "partial",
+   "notes": "Full reconstruction: loop, five probes, CollisionObject temp block, hit exit, worst-probe chain, m refinement, k/l output branches and the 0x4b0b80 tail call are all present with real constants (globals 0x688738/48/58/68 = (0,0,1)/(0,0,0)/(1,0,0)/(0,1,0), decoded from the static initialisers 0x4b1d80..0x4b1e70). 3569 vs 3971 bytes, ~13.6% match. Causes: frame 0x1c4 vs 0x1ac (VC6 shares fewer Vec3 temporaries in retail), offset vectors spilled in different order, several hot flags kept in memory in retail; exits other than the tail call leave eax uncontrolled in retail (TODO returns 0). Tier-3 TU ownership."}
+]
