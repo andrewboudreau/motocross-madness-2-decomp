@@ -39,11 +39,29 @@ public:
     // --- vtable 0x00557d90 (offset 0), slots 0..39, all introduced here ---
     virtual void UnknownVirtualSlot0(float value);
     virtual void UnknownVirtualSlot1(float value);
-    virtual void UnknownVirtualSlot2(
-        int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9,
-        int a10, int a11, int a12, int a13, int a14, int a15, int a16, int a17,
-        int a18, int a19, int a20, int a21, int a22, int a23, int a24, int a25,
-        int a26);
+    // Slot 2 (0x00500c50): `ret 0x68` = 26 argument dwords (tier 1).  Grouping and types
+    // are tier 2, from the body's stores and the struct-copy shape at both callers
+    // (SoultreePhysicsCharacter slot 40 0x00503de0, SoultreePhysicsObject slot 40 0x00503970):
+    //   a1 -> field_0x128->Fn_004320f0(a1, 0, 1, 1) after the CollisionObject is created
+    //   a2 != 0: new node (0x1a4 bytes, ctor 0x004fb2b0(1)) stored in field_0x218
+    //   a3 -> field_0x10c and the node position (field_0x08->Fn_4fc630(a3.x, a3.y, a3.z))
+    //   a4 -> field_0x118 and field_0x88;  a5 -> field_0x94
+    //   a6 -> field_0x1f4 (pointer: if non-null, its float at +0x40 goes to field_0x1f8)
+    //   a7 -> field_0x124;  a8 -> field_0x150
+    //   a9 -> field_0x1c8 (count; field_0x12c = zeroed array of a9 dwords)
+    //   a10 -> field_0x1d8 (count; field_0x1d4 = a10 records of 40 bytes)
+    //   a11 -> field_0x1f0;  a12 -> field_0x1e4;  a13 -> field_0x1ec
+    //   a14 -> field_0x148;  a15 -> field_0x14c
+    //   a16 -> field_0x160 (squared as the radius when a17 == 1: 1/(0.4*m*r*r))
+    //   a17 -> field_0x1c4 (1 = sphere inertia, else box from the node extents)
+    //   a18 -> field_0x210;  a19 -> byte field_0x20f
+    //   a20 != 0: new CollisionObject (0xb8 bytes, ctor 0x00431e70(1)) stored in field_0x128
+    // Returns the GameObject virtual base (`this ? vbase : 0` at 0x005011f0).
+    virtual GameObject* UnknownVirtualSlot2(int a1, int a2, SoultreeVec3 a3, SoultreeVec3 a4,
+                                            SoultreeVec3 a5, void* a6, void* a7, float a8,
+                                            int a9, int a10, SoultreeSlot1f0* a11, float a12,
+                                            int a13, float a14, float a15, float a16, int a17,
+                                            int a18, unsigned char a19, int a20);
     // Slot 3 (ret 0x1c).  Pointer types are tier 2: Vehicle callers (slots 38, 49) pass
     // Vec3 addresses for a1..a4; a5 is the event code KrustyBike 0x0048dbf0 compares with
     // 1000 and 0x67.  a7 is the address of the same local whose value Vehicle slot 38
@@ -111,6 +129,10 @@ public:
     // Slot 39 (ret 4): argument unused here; Vehicle slot 49 0x0052a940 passes it the same
     // dword it passes to slot 9 (float dt), so float (tier 2).
     virtual int UnknownVirtualSlot39(float dt);
+
+    // Non-virtual helper 0x00501230 (thiscall, no args): installs the two TU-local contact
+    // callbacks 0x00500c00/0x00500c30 into field_0x128 (+0x88/+0x8c).  Tier 2; called by slot 2.
+    void Fn_501230();
 
     // --- data members (offsets confirmed by decoded accesses; names provisional) ---
     // vfptr at +0, vbptr at +4 (compiler generated)

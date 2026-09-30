@@ -24,7 +24,7 @@
     "target_va": "0x00500c50",
     "target_size": 1500,
     "expect": "partial",
-    "notes": "0.00% match under vc6_o2_ml; not reconstructed (1500 bytes, SEH init; decoded notes only)"
+    "notes": "16.89% under vc6_o2_ml; readable initializer (SEH new/ctor, inertia, orientation). First divergence: prologue register allocation (retail hoists xor ebx,ebx and keeps a17 in memory; ours loads a17 into edi), then the same stores shifted by one instruction."
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -184,9 +184,9 @@
     "source": "SoulTreePhysics.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot21@SoultreePhysicsBaseObject",
     "target_va": "0x005024f0",
-    "target_size": 1083,
+    "target_size": 1116,
     "expect": "partial",
-    "notes": "0.00% match under vc6_o2_ml; not reconstructed (jump-table attachment loop)"
+    "notes": "7.86% under vc6_o2_ml (target_size = extent_with_tables 1116); attachment refresh with probe. First divergence: frame 0x4c vs 0x3c (retail shares one Vec3 temp between the probe segment end and the slot 17 return temp) and cmp-memory vs load/test of field_0x1dc."
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -321,7 +321,7 @@
     "target_va": "0x00501600",
     "target_size": 925,
     "expect": "partial",
-    "notes": "0.00% match under vc6_o2_ml; not reconstructed (switch on 0x66/0x6a/0x3e9)"
+    "notes": "70.24% under vc6_o2_ml; contact response (body contact via slot 4, static contact via slot 3). First divergence: retail builds the (1,1,1) vector through per-component temps before loading a2, and loads/stores field_0x08 before field_0x24 (l10) in the 0x68 case; the static path multiplies field_0xcc*s via a by-value temp with s.x first."
   },
   {
     "class": "SoultreePhysicsBaseObject",

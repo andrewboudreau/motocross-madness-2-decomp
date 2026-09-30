@@ -44,6 +44,11 @@ public:
     char field_0x00[0x58];
     int field_0x58;
     SoultreeVec3* field_0x5c;
+    char field_0x60[0x40];
+    SoultreeVec3 field_0xa0;    // contact point (slot 38 subtracts the body position)
+    SoultreeVec3 field_0xac;    // contact normal (first argument of slot 3/4)
+    SoultreeBody(int a);                        // 0x00431e70 (thiscall, callee pops 4)
+    void Fn_4320f0(int a, int b, int c, int d); // slot 2: (a1, 0, 1, 1)
     void Fn_435fb0();
     void Fn_435fe0();
     void Fn_438e70();
@@ -57,7 +62,10 @@ public:
     SoultreeVec3 field_0x50;
     int field_0x5c_pad;     // placeholder so +0x60 below lines up
     int field_0x60;
+    char field_0x64[0x10];
+    int field_0x74;                          // flag word (slot 21 sets/clears bit 0x800)
     void Fn_4b8d90(SoultreeVec3 v, int a);   // thiscall, callee pops 0x10
+    void Fn_4b8dd0(int a, int b, int c);     // thiscall, callee pops 0xc (slot 21: 0x40/0xff tint)
 };
 
 // Object at SoultreeAttachment::field_0x10 (slot 17 sums its Vec3 at +0x20).

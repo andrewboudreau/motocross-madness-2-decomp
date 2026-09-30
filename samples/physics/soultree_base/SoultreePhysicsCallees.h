@@ -13,6 +13,11 @@
 // 0x4fd7f0 WorldToLocalPoint).  Declared here with only the members this TU needs.
 class SoultreeNode {
 public:
+    char pad_0x00[0x1a4];                                // sizeof, from the slot 2 allocation (0x1a4)
+    SoultreeNode(int a);                                 // 0x004fb2b0 (thiscall, callee pops 4)
+    void Fn_4fe850(SoultreeVec3* center, SoultreeVec3* extents); // bounds query (tier 3)
+    void Fn_4fbd10(float a, float b, float c, float d, float e, float f, float g, int h);
+    void Fn_4fd910(SoultreeNode* child);
     int Fn_4fc540(int a, SoultreeVec3& b, SoultreeVec3& c);
     int Fn_4fc050(int a, SoultreeVec3* b, SoultreeVec3* c, int d, int e);
     void Fn_4fc630(float x, float y, float z);           // SetPosition(x,y,z)
@@ -22,6 +27,7 @@ public:
     SoultreeVec3 Fn_4fd7f0(const SoultreeVec3* v);       // WorldToLocalPoint
     SoultreeVec3 Fn_4fd5c0(const SoultreeVec3* v);       // LocalToWorldDirection
     SoultreeVec3 Fn_4fd710(const SoultreeVec3* v);       // WorldToLocalDirection
+    SoultreeVec3 Fn_4fd660(const SoultreeVec3* v);       // LocalToWorldPoint (tier 3, sibling of 4fd5c0)
 };
 
 // cdecl helpers outside this class.

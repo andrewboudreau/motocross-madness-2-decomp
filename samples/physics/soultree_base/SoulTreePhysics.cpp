@@ -3,6 +3,7 @@
 // Translation-unit ownership of the neighbouring functions is tier 2 (proximity
 // plus the same __FILE__ string).
 #include <math.h>
+#include <string.h>
 #include "SoultreePhysicsBaseObject.h"
 #include "SoultreePhysicsCallees.h"
 #include "SoultreePhysicsContact.h"
@@ -597,3 +598,377 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     field_0x50 = field_0x34;
 }
 
+
+// Event record handed to slot 38 as a3; +0x60 is the other body (tier 1, decoded).
+struct SoultreeCollisionEvent {
+    char pad_0x00[0x60];
+    SoultreePhysicsBaseObject* other;
+};
+
+static inline SoultreeVec3 Scale3(SoultreeVec3 v, const SoultreeVec3& s)
+{
+    return SoultreeVec3(v.x * s.x, v.y * s.y, v.z * s.z);
+}
+
+// slot 38 (0x00501600): collision response for one contact.  Tier 3 reading: a2 is the
+// event/surface kind (0x68 = contact with another physics body, 0x66/0x6a/0x3e9 = static
+// or world contact, anything else ignored).  For a body contact the relative contact
+// positions and the other body's velocity/angular state are gathered and slot 4 (the impulse
+// solver) is run; the other body's speed and world angular velocity are then refreshed.  For
+// a static contact the lever arm r = contact - position gives torque-like field_0x1ac = r x
+// (field_0xcc * s), and slot 3 (the static solver) is run with velocity + that term.  Finally
+// a nearly resting body (small field_0xb8 and speed) is snapped to zero velocity.
+// a2's address is passed on as a float* to slots 3/4 (retail does that), and the two dwords
+// that slot 4 declares float/int are forwarded as raw dwords.
+void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int a1, int a2, void* a3)
+{
+    SoultreeVec3 s;
+    float l10;
+    s = SoultreeVec3(1.0f, 1.0f, 1.0f);
+    l10 = 1.0f;
+    SoultreeNode* node;
+    SoultreePhysicsBaseObject* other = 0;
+    SoultreeVec3* otherVel = 0;
+    SoultreeVec3 v48, v54, v60;
+    int hasBody;
+
+    switch (a2) {
+    case 0x68:
+        other = ((SoultreeCollisionEvent*)a3)->other;
+        l10 = other->field_0x24;
+        node = other->field_0x08;
+        otherVel = &other->field_0x64;
+        v54 = field_0x128->field_0xa0 - other->field_0x18;
+        v60 = other->field_0xcc;
+        a3 = &other->field_0xd8;
+        v48 = other->field_0xe4;
+        hasBody = 1;
+        break;
+    case 0x66:
+    case 0x6a:
+    case 0x3e9:
+        s = SoultreeVec3(1.0f, 1.0f, 1.0f);
+        hasBody = 0;
+        break;
+    default:
+        return;
+    }
+
+    SoultreeVec3 r = field_0x128->field_0xa0 - field_0x18;
+    if (hasBody) {
+        UnknownVirtualSlot4(&field_0x128->field_0xac, &field_0x64, &field_0xcc, &r,
+                            *(float*)&a2, *(int*)&l10, (int)node, otherVel, &v60, &v54, &v48,
+                            (SoultreeVec3*)a3, (int)otherVel, (float*)&a2, 1.0f);
+        if (other) {
+            other->field_0x10a = 0;
+            other->field_0xbc = VecLength(*otherVel);
+            other->field_0xcc = other->field_0x08->Fn_4fd5c0((SoultreeVec3*)a3);
+        }
+    } else {
+        SoultreeVec3 t = Scale3(field_0xcc, s);
+        field_0x1ac = SoultreeCross(t, r);
+        SoultreeVec3 p = field_0x64 + field_0x1ac;
+        UnknownVirtualSlot3(&field_0x128->field_0xac, &p, &r, &s, a2, 0, (float*)&a2);
+    }
+    if (field_0xb8 < 0.001f && field_0xbc < 0.1f) {
+        field_0x64 = g_Zero;
+        field_0xbc = 0.0f;
+    }
+}
+
+// ---- slot 21 (0x005024f0) -------------------------------------------------------------
+// Local views of objects reached through the attachment records / probe (tier 3 names,
+// offsets decoded from slot 21 only).
+struct SoultreeNodeList {          // field_0x08->+0x1bc: count at +0x2c, items from +0x30
+    char pad_0x00[0x2c];
+    int count;
+    struct SoultreeHeldObject* items[1];
+};
+struct SoultreeHeldObject {        // entries of the list above
+    char pad_0x00[0x2c];
+    int kind;                      // 2 or 4 qualify as the tracked object (tier 3)
+    char pad_0x30[0x34];
+    SoultreeVec3 field_0x64;
+    float field_0x70, field_0x74, field_0x78;
+};
+struct SoultreeProbe {             // field_0x1f4 (also read by slots 2/11)
+    char pad_0x00[0x40];
+    float field_0x40;              // copied to field_0x1f8 by slot 2
+    // thiscall, callee pops 6 args
+    int Fn_506e90(const SoultreeVec3* from, const SoultreeVec3* to, SoultreeVec3* out, int a, int b,
+                  int c);
+};
+struct SoultreePadObject {         // attachment field_0x08 / field_0x0c targets: only +0x60 is written
+    char pad_0x00[0x60];
+    int field_0x60;
+};
+struct SoultreeSinkObject {        // attachment field_0x14 target (type 4)
+    char pad_0x00[0x48];
+    SoultreeVec3 field_0x48;
+    SoultreeVec3 field_0x54;
+    void Fn_4ba2c0(SoultreeVec3 v);    // thiscall, callee pops 0xc
+    void Fn_4ba300();
+    void Fn_4ba320();
+    void Fn_4ba340();
+    void Fn_4ba360(int a, int b, int c);
+};
+
+// Per-frame refresh of the attachment records (field_0x1d4, field_0x1dc of them).  Tier 3
+// reading: (1) pick a tracked object from the node's list (kind 2 or 4); (2) on the
+// slot 22 cadence, probe from the body position (+1.5 up) along the tracked object's
+// velocity * -3000 (kind 2) or its own position, and when the probe result flips relative to
+// field_0x1fc retint every type 1/4 attachment (0x40 vs 0xff) and toggle flag 0x800;
+// (3) advance the field_0x208 cadence counter (wraps after 5); (4) reset each attachment,
+// re-running the slot 18/19/20 updaters, or for type 4 moving the sink to the node-local
+// point and calling its 4ba300/4ba320 depending on slots 24/25; (5) finally clear field_0x60
+// of every attachment when field_0x20c was set.
+void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
+{
+    if (!field_0x1dc)
+        return;
+    if (!field_0x124 || !(((char*)field_0x124)[0x25] & 1))
+        return;
+    if (!field_0x200) {
+        SoultreeNodeList* list = *(SoultreeNodeList**)((char*)field_0x08 + 0x1bc);
+        for (int i = 0; i < list->count; i++) {
+            SoultreeHeldObject* h = list->items[i];
+            if (h->kind == 2 || h->kind == 4)
+                field_0x200 = h;
+        }
+    }
+    if (UnknownVirtualSlot22()) {
+        int hit;
+        SoultreeVec3 pos = UnknownVirtualSlot17();
+        pos.y += 1.5f;
+        SoultreeHeldObject* h = (SoultreeHeldObject*)field_0x200;
+        SoultreeVec3 out;
+        SoultreeVec3 to;
+        const SoultreeVec3* dir;
+        if (h->kind == 2) {
+            to = pos + SoultreeVec3(h->field_0x70 * -3000.0f, h->field_0x74 * -3000.0f,
+                                    h->field_0x78 * -3000.0f);
+            dir = &to;
+        } else {
+            dir = &h->field_0x64;
+        }
+        hit = ((SoultreeProbe*)field_0x1f4)->Fn_506e90(&pos, dir, &out, 0, 0, 0);
+        if (hit != (unsigned char)field_0x1fc) {
+            for (int i = 0; i < field_0x1dc; i++) {
+                SoultreeAttachment* a = &field_0x1d4[i];
+                if (a->type == 1) {
+                    if (hit) {
+                        a->field_0x04->Fn_4b8dd0(0x40, 0x40, 0x40);
+                        a->field_0x04->field_0x74 |= 0x800;
+                    } else {
+                        a->field_0x04->Fn_4b8dd0(0xff, 0xff, 0xff);
+                        a->field_0x04->field_0x74 &= ~0x800;
+                    }
+                } else if (a->type == 4) {
+                    if (hit)
+                        ((SoultreeSinkObject*)a->field_0x14)->Fn_4ba360(0x80, 0x80, 0x80);
+                    else
+                        ((SoultreeSinkObject*)a->field_0x14)->Fn_4ba360(0xff, 0xff, 0xff);
+                }
+            }
+            field_0x1fc = (char)hit;
+        }
+    }
+    if (++field_0x208 > 5)
+        field_0x208 = 0;
+    int moving = UnknownVirtualSlot23();
+    int settled = UnknownVirtualSlot24();
+    for (int i = 0; i < field_0x1dc; i++) {
+        SoultreeAttachment* a = &field_0x1d4[i];
+        a->field_0x24 = (field_0x20d || a->field_0x24) ? 1 : 0;
+        switch (a->type) {
+        case 1:
+            a->field_0x04->field_0x60 = 0;
+            if (moving)
+                UnknownVirtualSlot18(a);
+            break;
+        case 2:
+            ((SoultreePadObject*)a->field_0x08)->field_0x60 = 0;
+            if (moving)
+                UnknownVirtualSlot19(a);
+            break;
+        case 3:
+            ((SoultreePadObject*)a->field_0x0c)->field_0x60 = 0;
+            if (moving)
+                UnknownVirtualSlot20(a);
+            break;
+        case 4:
+            if (!field_0x20d) {
+                SoultreeVec3 w = field_0x08->Fn_4fd660(&a->field_0x18);
+                SoultreeSinkObject* sink = (SoultreeSinkObject*)a->field_0x14;
+                field_0x1ac = w;
+                sink->Fn_4ba2c0(w);
+                if (a->field_0x24) {
+                    sink->field_0x54 = sink->field_0x48;
+                    a->field_0x24 = 0;
+                }
+                if (settled && !field_0x20e)
+                    sink->Fn_4ba300();
+                else if (UnknownVirtualSlot25())
+                    sink->Fn_4ba320();
+            }
+            break;
+        }
+    }
+    field_0x20e = (char)settled;
+    if (field_0x20c) {
+        field_0x20c = 0;
+        for (int i = 0; i < field_0x1dc; i++) {
+            SoultreeAttachment* a = &field_0x1d4[i];
+            switch (a->type) {
+            case 1:
+                a->field_0x04->field_0x60 = 0;
+                break;
+            case 2:
+                ((SoultreePadObject*)a->field_0x08)->field_0x60 = 0;
+                break;
+            case 3:
+                ((SoultreePadObject*)a->field_0x0c)->field_0x60 = 0;
+                break;
+            case 4:
+                ((SoultreeSinkObject*)a->field_0x14)->Fn_4ba340();
+                break;
+            }
+        }
+    }
+}
+
+// ---- slot 2 (0x00500c50) --------------------------------------------------------------
+// Debug allocator entry (0x004a3010: size, __FILE__, line); the retail source is
+// D:\aardvark\VC\krusty2\SoulTreePhysics.cpp, so the file argument is that literal.
+void* operator new(unsigned int size, const char* file, int line);
+void operator delete(void* p, const char* file, int line);   // matching form: unwinds a failed ctor
+#define SP_FILE "D:\\aardvark\\VC\\krusty2\\SoulTreePhysics.cpp"
+
+struct SoultreeMemTag {            // global at 0x0056df04: allocation-category tracker
+    int Fn_4a2d00(const char* tag);
+    void Fn_4a2d90(int previous);
+};
+extern SoultreeMemTag* g_SoultreeMemTag;   // 0x0056df04
+extern int g_SoultreeInstanceCounter;      // 0x00689f14: cycles 0..5 (field_0x204 takes the old value)
+
+// cdecl 0x004b5a60: builds the 3x3 orientation from forward/up (by value) and writes nine floats
+// through the pointers (0x2c..0x44).  Tier 3 reading.
+void Fn_4b5a60(SoultreeVec3 fwd, SoultreeVec3 up, float* m34, float* m30, float* m2c, float* m38,
+               float* m3c, float* m44, float* m40);
+
+// Initializer (tier 3 reading): stores the construction parameters (a3 position, a4 forward,
+// a5 up, a8 mass, a9/a10 contact and attachment capacities, a16/a17 sphere radius or box
+// inertia mode, ...), allocates the contact pointer array and attachment records, derives the
+// inverse inertia diagonal (sphere: 1/(0.4 m r^2), otherwise a box from the node extents with
+// m/12 (h^2 + d^2)), builds the collision body (a20) and orientation matrix, and optionally
+// creates a child node (a2).  Returns the GameObject virtual base (`this ? vbase : 0`).
+GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, SoultreeVec3 a3,
+                                                           SoultreeVec3 a4, SoultreeVec3 a5,
+                                                           void* a6, void* a7, float a8, int a9,
+                                                           int a10, SoultreeSlot1f0* a11, float a12,
+                                                           int a13, float a14, float a15, float a16,
+                                                           int a17, int a18, unsigned char a19,
+                                                           int a20)
+{
+    field_0x210 = a18;
+    field_0x124 = a7;
+    field_0x1f4 = (int)a6;
+    field_0x150 = a8;
+    field_0x1f0 = a11;
+    field_0x1e4 = a12;
+    field_0x1ec = a13;
+    field_0x148 = a14;
+    field_0x14c = a15;
+    field_0x1c4 = a17;
+    field_0x160 = a16;
+    field_0x10c = a3;
+    field_0x118 = a4;
+    field_0x20f = a19;
+    if (a6)
+        field_0x1f8 = ((SoultreeProbe*)a6)->field_0x40;
+    field_0x1c8 = a9;
+    if (a9 > 0) {
+        field_0x12c = new(SP_FILE, 0x202) SoultreeContact*[a9];
+        for (int i = 0; i < field_0x1c8; i++)
+            field_0x12c[i] = 0;
+    }
+    field_0x1d8 = a10;
+    if (a10 > 0)
+        field_0x1d4 = new(SP_FILE, 0x20d) SoultreeAttachment[a10];
+    field_0x204 = g_SoultreeInstanceCounter;
+    field_0x208 = 0;
+    if (++g_SoultreeInstanceCounter > 5)
+        g_SoultreeInstanceCounter = 0;
+    field_0x109 = 0;
+    field_0x1e0 = 0.0f;
+    UnknownVirtualSlot1(0.0f);
+    field_0x08->Fn_4fc630(0.0f, 0.0f, 0.0f);
+    field_0x08->Fn_4fbd10(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+    field_0x1a0 = g_Zero;
+    field_0x194 = g_Zero;
+
+    SoultreeVec3 extents;
+    SoultreeVec3 center;
+    field_0x08->Fn_4fe850(&center, &extents);
+    float ident[9] = { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+    SoultreeVec3* inertia = &field_0xf0;   // inverse inertia diagonal (tier 3)
+    if (inertia) {
+        if (a17 == 1) {
+            float inv = 1.0f / (0.4f * field_0x158 * (a16 * a16));
+            inertia->x = inertia->y = inertia->z = inv;
+        } else {
+            float sx = extents.x + extents.x;
+            float sy = extents.y + extents.y;
+            float sz = extents.z + extents.z;
+            float yy = sy * sy;
+            float zz = sz * sz;
+            float k = field_0x158 * (1.0f / 12.0f);
+            float xx = sx * sx;
+            inertia->x = 1.0f / ((yy + zz) * k);
+            inertia->y = 1.0f / ((xx + zz) * k);
+            inertia->z = 1.0f / ((xx + yy) * k);
+        }
+    }
+    memcpy(field_0x164, ident, sizeof(ident));
+    field_0xe4 = field_0xf0;
+
+    int prevTag = g_SoultreeMemTag->Fn_4a2d00("Collision");
+    if (a20) {
+        field_0x128 = new(SP_FILE, 0x245) SoultreeBody(1);
+        Fn_501230();
+        field_0x128->Fn_4320f0(a1, 0, 1, 1);
+    } else {
+        field_0x128 = 0;
+    }
+    g_SoultreeMemTag->Fn_4a2d90(prevTag);
+
+    field_0x88 = a4;
+    field_0x94 = a5;
+    field_0x08->Fn_4fc630(a3.x, a3.y, a3.z);
+    field_0x08->Fn_4fc970(&field_0x0c);
+    UnknownVirtualSlot35(1, 0);
+    UnknownVirtualSlot34();
+    Fn_4b5a60(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c, &field_0x38,
+              &field_0x3c, &field_0x44, &field_0x40);
+    field_0xa0 = field_0x88;
+    field_0xac = field_0x94;
+    field_0x50 = field_0x34;
+    field_0x54 = field_0x38;
+    field_0x5c = field_0x40;
+    field_0x4c = field_0x30;
+    field_0x48 = field_0x2c;
+    field_0x58 = field_0x3c;
+    field_0x60 = field_0x44;
+    if (a2) {
+        field_0x218 = new(SP_FILE, 0x266) SoultreeNode(1);
+        field_0x08->Fn_4fd910(field_0x218);
+        field_0x218->Fn_4fc660(&center);
+        field_0x218->Fn_4fc9a0(0, &field_0x18);
+    } else {
+        field_0x08->Fn_4fc9a0(0, &field_0x18);
+    }
+    field_0x20d = 1;
+    field_0x109 = 0;
+    field_0x20c = 1;
+    return this;
+}
