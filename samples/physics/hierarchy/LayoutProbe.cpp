@@ -8,10 +8,10 @@
 //     thunks (`sub ecx,N` encodes vbase - (D3DIM base + 0x214), i.e. the 540 secondary
 //     base offset) must match retail byte for byte.
 //
-// Vehicle, Bike and KrustyBike are LAYOUT STUBS here: only their member-block sizes
-// (read from vehicle/Vehicle.h, bike/Bike.h and krustybike/KrustyBike.h, corrected for
-// the vtordisp) and the GameObject virtuals they override (from the vbase vtables) are
-// modelled.  The real classes live in those directories.
+// Vehicle, Bike and KrustyBike are reduced probe classes here: only their member-block
+// sizes (read from vehicle/Vehicle.h, bike/Bike.h and krustybike/KrustyBike.h, corrected
+// for the vtordisp) and the GameObject virtuals they override (from the vbase vtables)
+// are modelled.  The full reconstructions live in those directories.
 //
 // The constructors defined here are probe-only empty bodies whose sole purpose is to
 // make VC6 emit the vtables, ??_G and thunks; they are not reconstructions of the
@@ -78,8 +78,8 @@ HIER_CHECK(kb_size, sizeof(KrustyBike) == 5644 + 0x2c);
 
 // --- probe-only constructors (emit vtables, ??_G and thunks) ---------------------------
 Character::Character() {}
-D3DIMSoultreeCharacter::D3DIMSoultreeCharacter() {}
-SoultreePhysicsCharacter::SoultreePhysicsCharacter() {}
+D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int) {}
+SoultreePhysicsCharacter::SoultreePhysicsCharacter() : D3DIMSoultreeCharacter(0) {}
 Vehicle::Vehicle() {}
 Bike::Bike() {}
 KrustyBike::KrustyBike() {}

@@ -7,11 +7,22 @@
 
 #include "CollisionTypes.h"
 
+// The object a contact point belongs to (CollisionPoint::field_0x04).  Only one method
+// is used: 0x004fd660 (thiscall, ret 8), which the scene node class (SoultreeObject)
+// also has, so this is a provisional view of that node.  Tier 3 name.
+class CollisionContactOwner {
+public:
+    // Returns a pointer to a temporary vector computed from the owner and a point.
+    CollisionVec3* Fn_004fd660(CollisionVec3* tmp, const CollisionVec3* p);
+};
+
 class CollisionPoint {
 public:
     CollisionPoint(float a, int b);
     virtual ~CollisionPoint() {}               // slot 0 (deleting destructor 0x0043b300; core inlined)
-    virtual void UnknownVirtualSlot1();      // slot 1 (0x0043b240)
+    // slot 1 (0x0043b240).  Named apart from QuadTreeObject::UnknownVirtualSlot1 so that
+    // Tire, which derives from both, can override this one alone.
+    virtual void CollisionPointVirtualSlot1();
 
     // Not vtable slots: table-management helpers in CollisionPoint.cpp.
     // 0x0043a640 (thiscall, ret 0x14).  Recomputes the relative position (field_0x38) and the
@@ -20,7 +31,7 @@ public:
     void Fn_0043a640(const CollisionVec3* a1, const CollisionVec3* a2, const CollisionVec3* a3,
                      const CollisionVec3* a4, float a5);
 
-    int field_0x04;
+    CollisionContactOwner* field_0x04;       // owner; may be null (set by AddCollisionPoint)
     CollisionVec3 field_0x08;
     CollisionVec3 field_0x14;
     CollisionVec3 field_0x20;
@@ -59,6 +70,7 @@ CollisionVec3* Fn_005087b0(CollisionVec3* out, const CollisionVec3* src);       
 
 // 0x0043a330 (cdecl).  Allocates a CollisionPoint into points[*count] if *count < capacity.
 CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const CollisionVec3* position,
-                                  int a3, float a4, int* count, float a6, int a7);
+                                  CollisionContactOwner* owner, float a4, int* count, float a6,
+                                  int a7);
 
 #endif

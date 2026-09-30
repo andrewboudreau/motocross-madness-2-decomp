@@ -31,7 +31,7 @@ public:
     virtual int GameObjectVirtualSlot11(float dt);           // 0x0043ba70
     virtual void GameObjectVirtualSlot14();                  // 0x0043c880 (tail jump)
 
-    void SetBody(ConBody* b, int useNodeModel, int arg);     // 0x0043b9e0
+    void SetBody(ConBody* b, int useNodeModel, const char* arg);     // 0x0043b9e0
     void AddProbePoint(ConVec3 point, ConNode* node);   // 0x0043c7f0
     // 0x0043bdb0: impulse response for a contact; see the header comment in the .cpp.
     void ApplyContactImpulse(ConBody* other, float t, ConVec3 offset, ConVec3 base, ConVec3 normal);

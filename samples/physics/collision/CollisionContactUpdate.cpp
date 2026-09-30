@@ -2,16 +2,12 @@
 // Provisional TU: proximity to CollisionPoint.cpp is not evidence of the retail file split.
 #include "CollisionPoint.h"
 
-// Provisional helper types for the two out-of-line callees (thiscall, unknown owner classes).
+// Provisional helper type for the out-of-line frame callee (thiscall, unknown owner class).
+// The contact owner view (0x004fd660) is in CollisionPoint.h.
 class CollisionFrameHelper {
 public:
     // 0x00507c10, ret 0x10: transforms/projects a vector by the frame; last arg receives a small flag byte.
     void Fn_00507c10(CollisionVec3* v, const CollisionVec3* n, int a, char* flagOut);
-};
-class CollisionContactOwner {
-public:
-    // 0x004fd660, ret 8: returns a pointer to a temporary vector computed from the owner and a point.
-    CollisionVec3* Fn_004fd660(CollisionVec3* tmp, const CollisionVec3* p);
 };
 
 // Recomputes the contact position/penetration field_0x98 and tallies the contacts that
@@ -58,7 +54,7 @@ int Fn_0043ad80(void* a1, int* penetrating, int count, CollisionPoint** points,
         CollisionPoint* p = points[i];
         if (p->field_0x04) {
             CollisionVec3 tmp;
-            CollisionVec3* r = ((CollisionContactOwner*)p->field_0x04)->Fn_004fd660(&tmp, &p->field_0x08);
+            CollisionVec3* r = p->field_0x04->Fn_004fd660(&tmp, &p->field_0x08);
             p->field_0x14 = *r;
             p->field_0x20 = *r;
             CollisionRefreshContact(p, frame, penetrating);

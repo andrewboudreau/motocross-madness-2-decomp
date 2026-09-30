@@ -63,9 +63,19 @@ public:
     char chr_field_0x08[0x198];
 };
 
+// Descriptor passed to the D3DIM loaders (D3DIMSoultreeCharacter slot 11, D3DIMSoultreeObject
+// slot 9) and tested by both slot 40 loaders: `test byte [p+0x25],1` selects a
+// field_0x08->Fn_4444c0(1) call (tier 1 offset; the type and its meaning are tier 3).
+struct SoultreeLoadDesc {
+    char field_0x00[0x25];
+    unsigned char field_0x25;
+};
+
 class D3DIMSoultreeCharacter : public Character {
 public:
-    D3DIMSoultreeCharacter();
+    // ctor 0x004455b0 takes one argument plus the hidden most-derived flag (callers push
+    // `a, 1` or `a, 0` before the call, e.g. 0x00418b52, 0x00503cec).  Type is tier 3.
+    D3DIMSoultreeCharacter(int a);
     virtual ~D3DIMSoultreeCharacter();          // core 0x004459a0, deleting 0x00446680
     virtual void GameObjectVirtualSlot4();      // 0x00446640 via vtordisp thunk 0x004466c0
     virtual void GameObjectVirtualSlot5();      // 0x00446620 via vtordisp thunk 0x004466d0
@@ -80,7 +90,10 @@ public:
     virtual void CharacterVirtualSlot9(int a);    // 0x00445ec0
     virtual void CharacterVirtualSlot10();        // 0x00446520
     // --- slot 11, introduced here ---
-    virtual void D3DIMVirtualSlot11(int a1, int a2, int a3, int a4, int a5, int a6); // 0x00445680 (ret 0x18)
+    // a2/a3 types follow SoultreePhysicsCharacter slot 40, which passes its name string and
+    // descriptor here (tier 2).
+    virtual void D3DIMVirtualSlot11(int a1, const char* a2, const SoultreeLoadDesc* a3, int a4,
+                                    int a5, int a6); // 0x00445680 (ret 0x18)
 
     // D3DIM's own data 0x1a0..0x210 (then vtordisp at 0x210, GameObject at 0x214).
     // d3d_field_0x1a0 is the pointer that SoultreePhysicsCharacter code reads at the

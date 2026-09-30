@@ -24,6 +24,9 @@ class CollisionModelSource;   // scene-graph node source used by shape setup 0x0
 struct CollisionHullBody;      // CollisionShapeTests.h
 struct CollisionModelBody;
 struct CollisionSweepQuery;
+struct CollisionTreeNode;      // CollisionDebugDraw.cpp
+struct Vec3;                   // ../common/Math3D.h
+struct Matrix4;
 
 // BaseObject/GameObject are the canonical classes (MIGRATION.md).  GraphicsTest derives
 // from GameObject non-virtually (pdisp -1), so there is no vbptr/vtordisp here and
@@ -40,6 +43,16 @@ public:
     void Fn_0047c6f0();
     void Fn_0047c0b0(void* a, int b, int c);
     void Fn_00469ce0(GraphicsTest* owner);   // 0x00469ce0, registers the object (thiscall, 1 arg)
+    // Debug line drawing, used by CollisionDebugDraw.cpp.  Names are tier 3.
+    //  * 0x0047c690 (ret 0xc) packs 0xff000000 | r<<16 | g<<8 | b into field_0x2c (decoded).
+    //  * 0x0047c4f0 (ret 8): a line between two world points.
+    //  * 0x0047c570 (ret 8): a small marker; it halves `size` and offsets the point by it.
+    //  * 0x0047c270 (ret 0xc): an oriented box from center, half extents and a transform
+    //    (callers pass CollisionBoxBounds-style center/half-extent pairs).
+    void SetDrawColor(int r, int g, int b);                                      // 0x0047c690
+    void DrawBox(const Vec3* center, const Vec3* halfExtents, const Matrix4* xf); // 0x0047c270
+    void DrawLine(const Vec3* a, const Vec3* b);                                 // 0x0047c4f0
+    void DrawMarker(const Vec3* p, float size);                                  // 0x0047c570
 
     // GraphicsTest's own data: GameObject ends at 0x2c and CollisionObject's fields start
     // at 0x50 - 12, so GraphicsTest owns 0x2c..0x44 (tier 2: extent only).
@@ -90,12 +103,18 @@ struct CollisionSphereShape {              // type 4, 0x5c bytes (0x004329a0)
     CollisionMatrix4 field_0x1c;           // identity
 };
 
+// Code pointers at CollisionObject+0x88/+0x8c (tier 1: 0x0043b9a0 stores the addresses
+// 0x0043b800 and 0x00464e90 there).  The argument list comes from the one known target,
+// 0x0043b800 (cdecl: this object, the other object); tier 3.
+class CollisionObject;
+typedef void (*CollisionCallback)(CollisionObject* self, CollisionObject* other);
+
 class CollisionObject : public QuadTreeObject, public GraphicsTest {
 public:
     CollisionObject(int a);                     // 0x00431e70
     virtual ~CollisionObject();                 // slot 0 @12: 0x00431fd0 -> core 0x00432000
     virtual int GameObjectVirtualSlot10(float dt);    // 0x00499ae0
-    virtual void GameObjectVirtualSlot14();           // 0x00434540 (draw; also overridden by Tire)
+    virtual void GameObjectVirtualSlot14();           // 0x00434540 (draw; CollisionCharacter overrides it again)
     virtual void GameObjectVirtualSlot23(int a, int b); // 0x00434970 (ret 8)
 
     // Non-virtual members (this == complete object).
@@ -105,10 +124,14 @@ public:
     void SetSphereShape(CollisionVec3 center, float radius); // 0x004329a0 (type 4)
     void SetCapsuleShape(CollisionVec3 p0, CollisionVec3 p1, float radius);  // 0x00432a20 (type 3)
     void Fn_004324b0(void* node, int a, int b, int c, int d); // 0x004324b0, shape setup from a node
-    void Fn_00432800(void* node, int a);                      // 0x00432800
+    void Fn_00432720(void* node, int a, int b, int c, int d); // 0x00432720 (ret 0x14)
+    void Fn_00432800(void* node, const char* path);           // 0x00432800, shape from a .col file path
+    void Fn_00432ab0(int count, void* points);                // 0x00432ab0 (ret 8), polyline shape setter
     void Fn_00435fb0();                                       // 0x00435fb0
     void Fn_00435fe0();                                       // 0x00435fe0
     int Fn_00438e70();                                        // 0x00438e70
+    // 0x004394d0 (ret 8): stores field_0x60 and field_0x64 (tier 1); name tier 3.
+    void SetOwner(void* owner, int tag);
 
     // Narrow phase (CollisionShapeTests.cpp, names tier 3).  These are thiscall members that
     // mostly ignore `this`: the 0x00438b90 dispatchers forward ecx unchanged down the chain.
@@ -131,11 +154,27 @@ public:
     int Fn_004392c0(CollisionObject* other);                             // 0x004392c0 (bounds test used by TestMeshAgainst)
     int TestMeshAgainst(CollisionObject* other);                         // 0x00438c90 (this is type 2)
 
+    // Debug drawing of the bounding-volume trees (CollisionDebugDraw.cpp, names tier 3).
+    // DrawHull / DrawModel pass a hull's tree (+0x188 triangles or +0x18c points), its
+    // transform (+0x48), the second matrix (+0x08) and its vertex array (+0x190).
+    void DrawTree(CollisionTreeNode* node, int depth, const Matrix4* xf,
+                  const Vec3* verts);                                    // 0x00433240
+    void DrawTreeMotion(CollisionTreeNode* node, int depth, const Matrix4* xf,
+                        const Matrix4* motion, const Vec3* verts);       // 0x004334c0
+    void DrawPointTree(CollisionTreeNode* node, const Matrix4* xf,
+                       const Matrix4* motion);                           // 0x00433930
+    void DrawTreeNormals(CollisionTreeNode* node, const Vec3* verts,
+                         const Matrix4* xf);                             // 0x00433be0
+    void DrawBoxTree(CollisionTreeNode* node, int depth, const Matrix4* xf); // 0x00434040
+    void DrawHull(CollisionHullBody* hull, int depth, int mode);         // 0x00432d30
+    void DrawModel(CollisionModelBody* model, int depth, int mode);      // 0x00432b30
+
     int field_0x50;                             // shape type 0..4
     void* field_0x54;                           // shape payload (see shape structs)
     int field_0x58;
     void* field_0x5c;                           // contact record pointer (constraint solver)
-    int field_0x60;
+    void* field_0x60;                           // owner: SoulTreePhysics slot 40 loaders store their `this`,
+                                                // ConstraintMethodCollisionModel stores itself (tier 2)
     int field_0x64;                             // type tag; 0x3ea (1002) = has a body at +0xc4
     int field_0x68;
     int field_0x6c;
@@ -145,8 +184,8 @@ public:
     int field_0x7c;
     int field_0x80;
     int field_0x84;
-    int field_0x88;                             // callback (0x0043b9a0 stores 0x0043b800)
-    int field_0x8c;                             // callback (0x0043b9a0 stores 0x00464e90)
+    CollisionCallback field_0x88;               // 0x0043b9a0 stores 0x0043b800
+    CollisionCallback field_0x8c;               // 0x0043b9a0 stores 0x00464e90 (empty function)
     int field_0x90;
     int field_0x94;
     int field_0x98;

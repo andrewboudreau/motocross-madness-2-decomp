@@ -10,12 +10,38 @@
 // out[i][j] = sum_k b[i][k] * a[k][j].  Operand naming is tier 3.
 void CollisionMatrixMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b)
 {
-#define CM_ROW(i)     out->m[i][0] = b->m[i][0] * a->m[0][0] + b->m[i][1] * a->m[1][0] + b->m[i][2] * a->m[2][0] + b->m[i][3] * a->m[3][0];     out->m[i][1] = b->m[i][0] * a->m[0][1] + b->m[i][1] * a->m[1][1] + b->m[i][2] * a->m[2][1] + b->m[i][3] * a->m[3][1];     out->m[i][2] = b->m[i][0] * a->m[0][2] + b->m[i][1] * a->m[1][2] + b->m[i][2] * a->m[2][2] + b->m[i][3] * a->m[3][2];     out->m[i][3] = b->m[i][0] * a->m[0][3] + b->m[i][1] * a->m[1][3] + b->m[i][2] * a->m[2][3] + b->m[i][3] * a->m[3][3];
-    CM_ROW(0)
-    CM_ROW(1)
-    CM_ROW(2)
-    CM_ROW(3)
-#undef CM_ROW
+    out->m[0][0] = b->m[0][0] * a->m[0][0] + b->m[0][1] * a->m[1][0] +
+                   b->m[0][2] * a->m[2][0] + b->m[0][3] * a->m[3][0];
+    out->m[0][1] = b->m[0][0] * a->m[0][1] + b->m[0][1] * a->m[1][1] +
+                   b->m[0][2] * a->m[2][1] + b->m[0][3] * a->m[3][1];
+    out->m[0][2] = b->m[0][0] * a->m[0][2] + b->m[0][1] * a->m[1][2] +
+                   b->m[0][2] * a->m[2][2] + b->m[0][3] * a->m[3][2];
+    out->m[0][3] = b->m[0][0] * a->m[0][3] + b->m[0][1] * a->m[1][3] +
+                   b->m[0][2] * a->m[2][3] + b->m[0][3] * a->m[3][3];
+    out->m[1][0] = b->m[1][0] * a->m[0][0] + b->m[1][1] * a->m[1][0] +
+                   b->m[1][2] * a->m[2][0] + b->m[1][3] * a->m[3][0];
+    out->m[1][1] = b->m[1][0] * a->m[0][1] + b->m[1][1] * a->m[1][1] +
+                   b->m[1][2] * a->m[2][1] + b->m[1][3] * a->m[3][1];
+    out->m[1][2] = b->m[1][0] * a->m[0][2] + b->m[1][1] * a->m[1][2] +
+                   b->m[1][2] * a->m[2][2] + b->m[1][3] * a->m[3][2];
+    out->m[1][3] = b->m[1][0] * a->m[0][3] + b->m[1][1] * a->m[1][3] +
+                   b->m[1][2] * a->m[2][3] + b->m[1][3] * a->m[3][3];
+    out->m[2][0] = b->m[2][0] * a->m[0][0] + b->m[2][1] * a->m[1][0] +
+                   b->m[2][2] * a->m[2][0] + b->m[2][3] * a->m[3][0];
+    out->m[2][1] = b->m[2][0] * a->m[0][1] + b->m[2][1] * a->m[1][1] +
+                   b->m[2][2] * a->m[2][1] + b->m[2][3] * a->m[3][1];
+    out->m[2][2] = b->m[2][0] * a->m[0][2] + b->m[2][1] * a->m[1][2] +
+                   b->m[2][2] * a->m[2][2] + b->m[2][3] * a->m[3][2];
+    out->m[2][3] = b->m[2][0] * a->m[0][3] + b->m[2][1] * a->m[1][3] +
+                   b->m[2][2] * a->m[2][3] + b->m[2][3] * a->m[3][3];
+    out->m[3][0] = b->m[3][0] * a->m[0][0] + b->m[3][1] * a->m[1][0] +
+                   b->m[3][2] * a->m[2][0] + b->m[3][3] * a->m[3][0];
+    out->m[3][1] = b->m[3][0] * a->m[0][1] + b->m[3][1] * a->m[1][1] +
+                   b->m[3][2] * a->m[2][1] + b->m[3][3] * a->m[3][1];
+    out->m[3][2] = b->m[3][0] * a->m[0][2] + b->m[3][1] * a->m[1][2] +
+                   b->m[3][2] * a->m[2][2] + b->m[3][3] * a->m[3][2];
+    out->m[3][3] = b->m[3][0] * a->m[0][3] + b->m[3][1] * a->m[1][3] +
+                   b->m[3][2] * a->m[2][3] + b->m[3][3] * a->m[3][3];
 }
 
 // 0x00436430: can this object collide with `other`, and if so run the shape test.
@@ -32,28 +58,32 @@ int CollisionObject::TestAgainst(CollisionObject* other)
     if ((other->field_0x1c[9] & 1) == 0)
         return 0;
 
-    int** list = (int**)field_0x78;
+    // The partner list is re-read inside the loop (retail loads +0x78 after the count
+    // test), and a found flag rather than an index test decides the mode check.
     if (field_0x7c > 0) {
-        int i;
-        for (i = 0; i < field_0x7c; i++) {
-            if ((CollisionObject*)list[i] == other)
+        int found = 0;
+        for (int i = 0; i < field_0x7c; i++) {
+            if ((CollisionObject*)((int**)field_0x78)[i] == other) {
+                found = 1;
                 break;
+            }
         }
-        if (i < field_0x7c) {
+        if (found) {
             if (field_0x74 == 1)
                 return 0;
         } else if (field_0x74 == 0) {
             return 0;
         }
     }
-    int** otherList = (int**)other->field_0x78;
     if (other->field_0x7c > 0) {
-        int i;
-        for (i = 0; i < other->field_0x7c; i++) {
-            if ((CollisionObject*)otherList[i] == this)
+        int found = 0;
+        for (int i = 0; i < other->field_0x7c; i++) {
+            if ((CollisionObject*)((int**)other->field_0x78)[i] == this) {
+                found = 1;
                 break;
+            }
         }
-        if (i < other->field_0x7c) {
+        if (found) {
             if (other->field_0x74 == 1)
                 return 0;
         } else if (other->field_0x74 == 0) {
@@ -120,7 +150,8 @@ int CollisionObject::HullVsSphere(CollisionHullBody* hull, CollisionSphereShape*
     world.y = c.z * m[9] + c.y * m[5] + c.x * m[1] + m[13];
     world.z = c.z * m[10] + c.y * m[6] + c.x * m[2] + m[14];
     float r = sphere->field_0x14 * sphere->radius;
-    return Fn_00429570(&world, sphere, r * r, hull->field_0x18c, &hull->field_0x48, 0);
+    float rr = r * r;
+    return Fn_00429570(&world, r, rr, hull->field_0x18c, &hull->field_0x48, 0);
 }
 
 // 0x00437aa0: hull vs capsule.  Both capsule endpoints are scaled by capsule->field_0x24 and
@@ -130,16 +161,18 @@ int CollisionObject::HullVsCapsule(CollisionHullBody* hull, CollisionCapsuleShap
 {
     CollisionVec3 ends[2];
     CollisionVec3 a = capsule->p0 * capsule->field_0x24;
+    ends[0] = a;
     CollisionVec3 b = capsule->p1 * capsule->field_0x24;
+    ends[1] = b;
     const float* m = capsule->field_0x28.m;
-    ends[0].x = a.z * m[8] + a.y * m[4] + a.x * m[0] + m[12];
-    ends[0].y = a.z * m[9] + a.y * m[5] + a.x * m[1] + m[13];
-    ends[0].z = a.z * m[10] + a.y * m[6] + a.x * m[2] + m[14];
-    ends[1].x = b.z * m[8] + b.y * m[4] + b.x * m[0] + m[12];
-    ends[1].y = b.z * m[9] + b.y * m[5] + b.x * m[1] + m[13];
-    ends[1].z = b.z * m[10] + b.y * m[6] + b.x * m[2] + m[14];
+    ends[0].x = (a.z * m[8] + a.y * m[4]) + a.x * m[0] + m[12];
+    ends[0].y = (a.z * m[9] + a.y * m[5]) + a.x * m[1] + m[13];
+    ends[0].z = (a.z * m[10] + a.y * m[6]) + a.x * m[2] + m[14];
+    ends[1].x = (b.z * m[8] + b.y * m[4]) + b.x * m[0] + m[12];
+    ends[1].y = (b.z * m[9] + b.y * m[5]) + b.x * m[1] + m[13];
+    ends[1].z = (b.z * m[10] + b.y * m[6]) + b.x * m[2] + m[14];
     float r = capsule->field_0x20 * capsule->radius;
-    return Fn_00429890(ends, capsule, r * r, hull->field_0x18c, &hull->field_0x48, 0, hull->field_0x190);
+    return Fn_00429890(ends, r, r * r, hull->field_0x18c, &hull->field_0x48, 0, hull->field_0x190);
 }
 
 // 0x00438860: model vs sphere.  Same world-space sphere as HullVsSphere; the model's bounds
@@ -157,8 +190,8 @@ int CollisionObject::ModelVsSphere(CollisionModelBody* model, CollisionSphereSha
     float rr = r * r;
     if (Fn_00425750(&model->center, &model->halfExtents, world, r, rr, &model->field_0x88)) {
         for (int i = 0; i < model->elementCount; i++) {
-            CollisionHullBody* e = &model->elements[i];
-            if (Fn_00429570(&world, sphere, rr, e->field_0x18c, &e->field_0x48, 0))
+            if (Fn_00429570(&world, r, rr, model->elements[i].field_0x18c,
+                            &model->elements[i].field_0x48, 0))
                 return 1;
         }
     }
@@ -171,20 +204,22 @@ int CollisionObject::ModelVsCapsule(CollisionModelBody* model, CollisionCapsuleS
 {
     CollisionVec3 ends[2];
     CollisionVec3 a = capsule->p0 * capsule->field_0x24;
+    ends[0] = a;
     CollisionVec3 b = capsule->p1 * capsule->field_0x24;
+    ends[1] = b;
     const float* m = capsule->field_0x28.m;
-    ends[0].x = a.z * m[8] + a.y * m[4] + a.x * m[0] + m[12];
-    ends[0].y = a.z * m[9] + a.y * m[5] + a.x * m[1] + m[13];
-    ends[0].z = a.z * m[10] + a.y * m[6] + a.x * m[2] + m[14];
-    ends[1].x = b.z * m[8] + b.y * m[4] + b.x * m[0] + m[12];
-    ends[1].y = b.z * m[9] + b.y * m[5] + b.x * m[1] + m[13];
-    ends[1].z = b.z * m[10] + b.y * m[6] + b.x * m[2] + m[14];
+    ends[0].x = (a.z * m[8] + a.y * m[4]) + a.x * m[0] + m[12];
+    ends[0].y = (a.z * m[9] + a.y * m[5]) + a.x * m[1] + m[13];
+    ends[0].z = (a.z * m[10] + a.y * m[6]) + a.x * m[2] + m[14];
+    ends[1].x = (b.z * m[8] + b.y * m[4]) + b.x * m[0] + m[12];
+    ends[1].y = (b.z * m[9] + b.y * m[5]) + b.x * m[1] + m[13];
+    ends[1].z = (b.z * m[10] + b.y * m[6]) + b.x * m[2] + m[14];
     float r = capsule->field_0x20 * capsule->radius;
     float rr = r * r;
     if (Fn_00425900(&model->center, &model->halfExtents, ends, r, rr, &model->field_0x88)) {
         for (int i = 0; i < model->elementCount; i++) {
-            CollisionHullBody* e = &model->elements[i];
-            if (Fn_00429890(ends, capsule, rr, e->field_0x18c, &e->field_0x48, 0, e->field_0x190))
+            if (Fn_00429890(ends, r, rr, model->elements[i].field_0x18c,
+                            &model->elements[i].field_0x48, 0, model->elements[i].field_0x190))
                 return 1;
         }
     }
@@ -430,6 +465,7 @@ int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* 
         Vec3 sum(0.0f, 0.0f, 0.0f);
         CollisionVec3 nodePos(0.0f, 0.0f, 0.0f);
         int count = 0;
+        // Retail makes this call (0x004fc9a0); nodePos is never read.
         ((CollisionSceneNode*)a->field_0x04)->GetPositionRelativeTo(0, &nodePos);
         for (int i = 0; i < b->elementCount; i++) {
             if (b->elementEnabled[i] && HullVsHullSwept(a, &b->elements[i], q)) {
@@ -472,9 +508,11 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
         CollisionContactSum sum;
         CollisionVec3 nodePos(0.0f, 0.0f, 0.0f);
         int count = 0;
+        // Retail makes this call (0x004fc9a0); nodePos is never read.
         ((CollisionSceneNode*)a->field_0x04)->GetPositionRelativeTo(0, &nodePos);
         for (int i = 0; i < b->elementCount; i++) {
             CollisionHullBody* e = &b->elements[i];
+            // Retail makes this call too, for each element; the result is not read.
             ((CollisionSceneNode*)e->field_0x04)->GetPositionRelativeTo(0, &nodePos);
             if (!b->elementEnabled[i])
                 continue;
@@ -605,11 +643,16 @@ void CollisionRelativeTransform(Matrix4* out, const Matrix4* from, const Matrix4
 // frames m2 and m3 (t = m1 * inverse(frame)) and returns the transform between those two
 // results.  Which of the two temporaries is the "from" side is read from the push order of
 // the final 0x00432180 call and is tier 2; the geometric meaning is tier 3.
+// Retail inlines the first two relative transforms (two copies of the inverse, then
+// 0x00436500) and calls 0x00432180 only for the last one, so they are written out here.
 void CollisionRelativeFrame(Matrix4* out, const Matrix4* m1, const Matrix4* m2, const Matrix4* m3)
 {
+    Matrix4 inv;
     Matrix4 t1;
     Matrix4 t2;
-    CollisionRelativeTransform(&t1, m2, m1);
-    CollisionRelativeTransform(&t2, m3, m1);
+    CollisionInvertRigid(&inv, m2);
+    CollisionMatrixMultiply(&t1, &inv, m1);
+    CollisionInvertRigid(&inv, m3);
+    CollisionMatrixMultiply(&t2, &inv, m1);
     CollisionRelativeTransform(out, &t1, &t2);
 }

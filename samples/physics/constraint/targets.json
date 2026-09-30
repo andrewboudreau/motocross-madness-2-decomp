@@ -5,8 +5,8 @@
     "candidate_symbol_contains": "BlendArgb4444",
     "target_va": "0x43b320",
     "target_size": 278,
-    "expect": "partial",
-    "notes": "static ARGB4444 alpha blend. 96.2% byte-similarity; size 288 vs 278. Local byte array + loop instead of the retail unrolled/scheduled channel code; readable, not contorted."
+    "expect": "exact",
+    "notes": "ARGB4444 alpha blend, result written in place over B (retail stores the blended bytes back into the B array). External linkage (called from 0x0050b637), so the function has its own COMDAT and its /Z7 size record; target_size is the code extent (278, without the 10 padding bytes)."
   },
   {
     "class": "PixelBlend",
@@ -14,8 +14,8 @@
     "candidate_symbol_contains": "BlendArgb1555",
     "target_va": "0x43b440",
     "target_size": 274,
-    "expect": "partial",
-    "notes": "static ARGB1555 alpha blend. 94.7%; size 288 vs 274. Same cause as 4444 blend (channel extraction scheduling)."
+    "expect": "exact",
+    "notes": "ARGB1555 blend, in place over B. External linkage (called from 0x0050b937); code extent 274."
   },
   {
     "class": "PixelBlend",
@@ -23,8 +23,8 @@
     "candidate_symbol_contains": "BlendArgb8888",
     "target_va": "0x43b560",
     "target_size": 243,
-    "expect": "partial",
-    "notes": "static ARGB8888 alpha blend. 93.9%; size 256 vs 243. Same cause."
+    "expect": "exact",
+    "notes": "ARGB8888 blend, in place over B. External linkage (called from 0x0050b338); code extent 243."
   },
   {
     "class": "PixelBlend",
@@ -32,8 +32,8 @@
     "candidate_symbol_contains": "PackColor",
     "target_va": "0x43b660",
     "target_size": 409,
-    "expect": "partial",
-    "notes": "static colour pack for formats 0x115c/0x613. 66.8%; size 416 vs 409. Retail keeps channel bytes at [esp+8..10] and converts via _ftol per channel; register allocation differs."
+    "expect": "exact",
+    "notes": "surface-format colour pack. Alpha/red/green live in a 3-byte array ([esp+8..0xa]) and the 1555 alpha bit is an unsigned char (seta). External linkage (called from 0x0050b0bd/0x0050b0fb); code extent 409."
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -50,8 +50,8 @@
     "candidate_symbol_contains": "??0ConstraintMethodCollisionModel",
     "target_va": "0x43b8d0",
     "target_size": 121,
-    "expect": "partial",
-    "notes": "constructor. 40.4%, same size 121. Retail writes both vptrs AFTER the member zeroing and before the 0.9f/1/1 stores (it also loads ecx=1 early); VC6 here writes the primary vptr first. Init-list variant tried (worse, 68% insn ratio)."
+    "expect": "exact",
+    "notes": "constructor. Exact with the body statement order bc, ec, b8, 108, then the zeroed fields (found by a placement search; VC6 schedules the vptr stores after the member stores)."
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -105,7 +105,7 @@
     "target_va": "0x43ba70",
     "target_size": 829,
     "expect": "partial",
-    "notes": "slot 11: probe / ground query. 11.5% (positional byte match; insn-level ratio ~0.4). Structure and semantics decoded; 2 variants tried. Retail hoists bestNormal/bestPoint uninitialised locals into ebx/ebp/[esp+30] and calls LocalToWorldPoint with the probe address; frame 0x48 vs 0x54, so every offset shifts. The push-out uses inline *1.005 temporaries (no ctor)."
+    "notes": "slot 11: probe / ground query. 13.2% (positional byte match; insn-level ratio ~0.4). Structure and semantics decoded; 2 variants tried. Retail hoists bestNormal/bestPoint uninitialised locals into ebx/ebp/[esp+30] and calls LocalToWorldPoint with the probe address; frame 0x48 vs 0x54, so every offset shifts. The push-out uses inline *1.005 temporaries (no ctor)."
   },
   {
     "class": "ConstraintMethodCollisionModel",

@@ -40,13 +40,15 @@ struct CollisionHullBody {
     CollisionBoxBounds* field_0x188;
     void* field_0x18c;             // convex geometry handed to the box test 0x00428950
     void* field_0x190;
+    int field_0x194;               // not read here; the element stride is 0x198 (add edi,0x198 at 0x0043898a)
 };
 
 // View of a type-1 "model" payload: an array of hulls plus its own bounds.
 struct CollisionModelBody {
     int elementCount;              // +0x00
     int* elementEnabled;           // +0x04, one flag per element
-    int field_0x08;
+    int* field_0x08;               // +0x08, one flag per element (0x00432b30 draws a set
+                                   // element green)
     int swept;                     // +0x0c, nonzero selects the swept element test
     int field_0x10;
     CollisionHullBody* elements;   // +0x14, elements are 0x198 bytes apart
@@ -78,11 +80,13 @@ struct CollisionMeshBody {
 // and their count in g_CollisionScratchCount.
 int Fn_00428950(void* geomA, void* geomB, const Matrix4* xfA, const Matrix4* xfB,
                 int mode, void* aux, void* out);
-// 0x00429570: hull vs sphere (world center, r*r).  0x00429890: hull vs capsule (two
-// world endpoints, r*r).  Same trailing arguments as the box test.
-int Fn_00429570(CollisionVec3* worldCenter, void* sphere, float radiusSq, void* geom,
+// 0x00429570: hull vs sphere (world center, r, r*r).  0x00429890: hull vs capsule (two
+// world endpoints, r, r*r).  Same trailing arguments as the box test.  The second
+// argument is the radius: every caller stores r into a dead argument slot and pushes that
+// dword (0x004379c0 +0xaf..+0xc9), so it is a float, not the shape pointer.
+int Fn_00429570(CollisionVec3* worldCenter, float radius, float radiusSq, void* geom,
                 const Matrix4* xf, int mode);
-int Fn_00429890(CollisionVec3* worldEnds, void* capsule, float radiusSq, void* geom,
+int Fn_00429890(CollisionVec3* worldEnds, float radius, float radiusSq, void* geom,
                 const Matrix4* xf, int mode, void* aux);
 // 0x00424730: broad-phase box overlap in a relative frame (center/half extents of box A by
 // value, box B by pointer, relative transform, transform of A).
@@ -142,9 +146,13 @@ inline void CollisionInvertRigid(Matrix4* out, const Matrix4* src)
     t = out->m[0][1]; out->m[0][1] = out->m[1][0]; out->m[1][0] = t;
     t = out->m[0][2]; out->m[0][2] = out->m[2][0]; out->m[2][0] = t;
     t = out->m[1][2]; out->m[1][2] = out->m[2][1]; out->m[2][1] = t;
-    out->m[3][0] = -(src->m[3][2] * out->m[2][0] + src->m[3][1] * out->m[1][0] + src->m[3][0] * out->m[0][0]);
-    out->m[3][1] = -(src->m[3][2] * out->m[2][1] + src->m[3][1] * out->m[1][1] + src->m[3][0] * out->m[0][1]);
-    out->m[3][2] = -(src->m[3][2] * out->m[2][2] + src->m[3][1] * out->m[1][2] + src->m[3][0] * out->m[0][2]);
+    CollisionVec3 p;
+    p.x = -((out->m[3][2] * out->m[2][0] + out->m[3][1] * out->m[1][0]) + out->m[3][0] * out->m[0][0]);
+    p.y = -((out->m[3][2] * out->m[2][1] + out->m[3][1] * out->m[1][1]) + out->m[3][0] * out->m[0][1]);
+    p.z = -((out->m[3][2] * out->m[2][2] + out->m[3][1] * out->m[1][2]) + out->m[3][0] * out->m[0][2]);
+    out->m[3][0] = p.x;
+    out->m[3][1] = p.y;
+    out->m[3][2] = p.z;
 }
 
 // Inline forms of the vector/matrix helpers the shape tests use in row-vector convention

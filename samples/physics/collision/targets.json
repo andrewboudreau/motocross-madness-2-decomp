@@ -2,11 +2,11 @@
   {
     "class": "CollisionPoint",
     "source": "CollisionPoint.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot1@CollisionPoint",
+    "candidate_symbol_contains": "CollisionPointVirtualSlot1@CollisionPoint",
     "target_va": "0x0043b240",
     "target_size": 186,
     "expect": "partial",
-    "notes": "81.48%: same size, scheduling differs (sub esp placement / fld order)"
+    "notes": "95.7%: same size, scheduling differs (sub esp placement / fld order)"
   },
   {
     "class": "CollisionPoint",
@@ -23,8 +23,8 @@
     "candidate_symbol_contains": "AddCollisionPoint",
     "target_va": "0x0043a330",
     "target_size": 565,
-    "expect": "partial",
-    "notes": "21%: ctor inlined; retail keeps the failure return at the function tail (jge to xor eax,eax) and writes vptr before the 0x88/0xc0 stores"
+    "expect": "exact",
+    "notes": "AddCollisionPoint with the inlined CollisionPoint ctor. Exact with the capacity test as `if (*count < capacity) {...} return 0;` (retail puts the return 0 at the end) and field_0x04 = 0 after field_0x08 in the ctor."
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -40,9 +40,9 @@
     "source": "CollisionObject.cpp",
     "candidate_symbol_contains": "FreeShape@CollisionObject",
     "target_va": "0x00432430",
-    "target_size": 98,
-    "expect": "partial",
-    "notes": "91.43%: prologue order of push edi/xor edi differs"
+    "target_size": 120,
+    "expect": "exact",
+    "notes": "FreeShape. target_size is extent_with_tables (98 code + 2 pad + 5-entry jump table 0x00432494)"
   },
   {
     "class": "CollisionObject",
@@ -86,8 +86,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot41@SoultreePhysicsCharacter",
     "target_va": "0x00504360",
     "target_size": 262,
-    "expect": "partial",
-    "notes": "62%: same size; prologue register-push order differs; 96.75% under vc6_o2_ml"
+    "expect": "exact",
+    "notes": "exact: node reset via 0x4fc540/0x4fc050, slot 34, Fn_4b5a60, then copies 0x88/0x94 to 0xa0/0xac and 0x2c..0x44 to 0x48..0x60"
   },
   {
     "class": "SoultreePhysicsCharacter",
@@ -104,8 +104,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot40@SoultreePhysicsObject",
     "target_va": "0x00503970",
     "target_size": 724,
-    "expect": "partial",
-    "notes": "not reconstructed: SEH loader with ~27 stack args, .col path build, 0x4a3010 alloc(0x134,line 0x84e), 0x4e9cd0 parse; see notes in report"
+    "expect": "exact",
+    "notes": "slot 40 loader: D3DIM base load, slot 2 setup, .col path build, SoultreeFile + 0x4e9cd0 lookup, CollisionObject shape setup"
   },
   {
     "class": "SoultreePhysicsCharacter",
@@ -113,8 +113,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot40@SoultreePhysicsCharacter",
     "target_va": "0x00503de0",
     "target_size": 731,
-    "expect": "partial",
-    "notes": "not reconstructed: same loader as SoultreePhysicsObject slot 40 (line 0x8cd)"
+    "expect": "exact",
+    "notes": "slot 40 loader: D3DIM base load, slot 2 setup, .col path build, SoultreeFile + 0x4e9cd0 lookup, CollisionObject shape setup"
   },
   {
     "class": "CollisionQueries",
@@ -149,8 +149,8 @@
     "candidate_symbol_contains": "CollisionLength",
     "target_va": "0x00435ec0",
     "target_size": 74,
-    "expect": "partial",
-    "notes": "82% under vc6_o2_ml"
+    "expect": "exact",
+    "notes": "exact"
   },
   {
     "class": "CollisionVectorHelpers",
@@ -185,8 +185,8 @@
     "candidate_symbol_contains": "TestAgainst@CollisionObject",
     "target_va": "0x00436430",
     "target_size": 208,
-    "expect": "partial",
-    "notes": "32.5%: filter other!=this, other+0x70, byte other+0x31&1, per-side lists then switch to TestHull/Model/MeshAgainst; branch layout/regalloc differ (214 vs 208)"
+    "expect": "exact",
+    "notes": "exact: filter other!=this, other+0x70, byte other+0x31&1, per-side lists then switch to TestHull/Model/MeshAgainst"
   },
   {
     "class": "CollisionObject",
@@ -212,8 +212,8 @@
     "candidate_symbol_contains": "HullVsSphere",
     "target_va": "0x004379c0",
     "target_size": 214,
-    "expect": "partial",
-    "notes": "40%: oriented box vs sphere via 0x429570; extra stack spill of radius product and slightly different scheduling"
+    "expect": "exact",
+    "notes": "exact: oriented box vs sphere via 0x429570"
   },
   {
     "class": "CollisionObject",
@@ -221,8 +221,8 @@
     "candidate_symbol_contains": "HullVsCapsule",
     "target_va": "0x00437aa0",
     "target_size": 369,
-    "expect": "partial",
-    "notes": "7.1%: capsule endpoints scaled+transformed then 0x429890; retail keeps endpoints in registers-with-temps differently (299 vs 369)"
+    "expect": "exact",
+    "notes": "exact: capsule endpoints scaled+transformed then 0x429890"
   },
   {
     "class": "CollisionObject",
@@ -230,8 +230,8 @@
     "candidate_symbol_contains": "ModelVsSphere",
     "target_va": "0x00438860",
     "target_size": 335,
-    "expect": "partial",
-    "notes": "53.5%: same size; bounds pre-test 0x425750 then per-hull 0x429570; register allocation differs"
+    "expect": "exact",
+    "notes": "exact: bounds pre-test 0x425750 then per-hull 0x429570"
   },
   {
     "class": "CollisionObject",
@@ -239,8 +239,8 @@
     "candidate_symbol_contains": "ModelVsCapsule",
     "target_va": "0x004389b0",
     "target_size": 470,
-    "expect": "partial",
-    "notes": "7.5%: bounds pre-test 0x425900 then per-hull 0x429890; retail spills more (410 vs 470)"
+    "expect": "exact",
+    "notes": "exact: bounds pre-test 0x425900 then per-hull 0x429890"
   },
   {
     "class": "CollisionObject",
@@ -249,7 +249,7 @@
     "target_va": "0x00437c20",
     "target_size": 716,
     "expect": "partial",
-    "notes": "15.3%: rel = inv(A+0x88)*B+0x48 (retail inlines the 4x4 product and rigid inverse; mine calls helpers, 582 vs 716), loop calls HullVsHull"
+    "notes": "28.4%: rel = inv(A+0x88)*B+0x48 (retail inlines the 4x4 product and rigid inverse; mine calls helpers, 582 vs 716), loop calls HullVsHull"
   },
   {
     "class": "CollisionObject",
@@ -258,7 +258,7 @@
     "target_va": "0x00437ef0",
     "target_size": 906,
     "expect": "partial",
-    "notes": "6.6%: swept variant (B+0xc8, 0x4290d0 ranges, HullVsHullSwept); retail inlines matrix products (639 vs 906)"
+    "notes": "9.4%: swept variant (B+0xc8, 0x4290d0 ranges, HullVsHullSwept); retail inlines matrix products (639 vs 906)"
   },
   {
     "class": "CollisionObject",
@@ -267,7 +267,7 @@
     "target_va": "0x00438280",
     "target_size": 710,
     "expect": "partial",
-    "notes": "16.7%: rel = inv(A+0x88)*B+0x88, loop over B hulls calling ModelVsHull; inlined-matrix-product gap"
+    "notes": "27.6%: rel = inv(A+0x88)*B+0x88, loop over B hulls calling ModelVsHull; inlined-matrix-product gap"
   },
   {
     "class": "CollisionObject",
@@ -276,7 +276,7 @@
     "target_va": "0x00438550",
     "target_size": 783,
     "expect": "partial",
-    "notes": "8.8%: swept form of ModelVsModel (4290d0, ModelVsHullSwept); inlined-matrix-product gap"
+    "notes": "8.1%: swept form of ModelVsModel (4290d0, ModelVsHullSwept); inlined-matrix-product gap"
   },
   {
     "class": "CollisionObject",
@@ -303,7 +303,7 @@
     "target_va": "0x004376f0",
     "target_size": 707,
     "expect": "partial",
-    "notes": "11.4%: rel = inv(A+0xc8)*B+0x88, dead GetPositionRelativeTo(0,&v), loop calling HullVsHullSwept"
+    "notes": "27.0%: rel = inv(A+0xc8)*B+0x88, dead GetPositionRelativeTo(0,&v), loop calling HullVsHullSwept"
   },
   {
     "class": "CollisionObject",
@@ -312,7 +312,7 @@
     "target_va": "0x00436e50",
     "target_size": 2205,
     "expect": "partial",
-    "notes": "8.2%: per-element inline non-swept sequence with 0x42a4b0/0x42a510/0x42a450/0x43c890/0x428060; retail inlines all matrix products (1122 vs 2205)"
+    "notes": "9.5%: per-element inline non-swept sequence with 0x42a4b0/0x42a510/0x42a450/0x43c890/0x428060; retail inlines all matrix products (1122 vs 2205)"
   },
   {
     "class": "CollisionObject",
@@ -338,8 +338,8 @@
     "candidate_symbol_contains": "CollisionRelativeTransform",
     "target_va": "0x00432180",
     "target_size": 215,
-    "expect": "partial",
-    "notes": "10.2%: out = to*inv(from) with inlined rigid inverse (transpose + -(T.z,T.y,T.x) row); retail is larger (190 vs 215); mine is a free helper rather than the retail function shape"
+    "expect": "exact",
+    "notes": "exact: out = to*inv(from) with inlined rigid inverse (transpose + -(T.z,T.y,T.x) row)"
   },
   {
     "class": "CollisionObject",
@@ -348,7 +348,7 @@
     "target_va": "0x00432260",
     "target_size": 458,
     "expect": "partial",
-    "notes": "4.2%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform(t1,t2); retail inlines everything (83 vs 458); which temp is 'from' is tier 2"
+    "notes": "91.3%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform(t1,t2) with the inverses inlined"
   },
   {
     "class": "CollisionPoint",
@@ -367,5 +367,68 @@
     "target_size": 615,
     "expect": "partial",
     "notes": "8.3%: refreshes contact points (single-point and N-point paths via 0x4fd660 and 0x507c10), tallies penetrating contacts; retail duplicates the tail for both paths (331 vs 615)"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionDebugDraw.cpp",
+    "candidate_symbol_contains": "DrawTree@CollisionObject",
+    "target_va": "0x00433240",
+    "target_size": 633,
+    "expect": "exact",
+    "notes": "exact: depth-limited tree draw (box red / triangle blue); VC6 tail-recursion elimination turns the second child call into a loop"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionDebugDraw.cpp",
+    "candidate_symbol_contains": "DrawTreeMotion@CollisionObject",
+    "target_va": "0x004334c0",
+    "target_size": 1130,
+    "expect": "partial",
+    "notes": "98.1%: remaining diff is FPU operand order in the q (motion) transform rows y/z (retail sums z,y then x)"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionDebugDraw.cpp",
+    "candidate_symbol_contains": "DrawPointTree@CollisionObject",
+    "target_va": "0x00433930",
+    "target_size": 674,
+    "expect": "exact",
+    "notes": "exact: point-tree leaf markers, with motion line when a motion matrix is given"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionDebugDraw.cpp",
+    "candidate_symbol_contains": "DrawTreeNormals@CollisionObject",
+    "target_va": "0x00433be0",
+    "target_size": 1107,
+    "expect": "exact",
+    "notes": "exact: triangle corners/edges plus 0.1 normal from centroid; needs _RC matrix names (VC6 inline budget) and the n slot reuse"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionDebugDraw.cpp",
+    "candidate_symbol_contains": "DrawBoxTree@CollisionObject",
+    "target_va": "0x00434040",
+    "target_size": 357,
+    "expect": "exact",
+    "notes": "exact: depth-limited point-tree draw (box red, leaf point magenta marker 0.25)"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionDebugDraw.cpp",
+    "candidate_symbol_contains": "DrawHull@CollisionObject",
+    "target_va": "0x00432d30",
+    "target_size": 1294,
+    "expect": "exact",
+    "notes": "exact: per-hull draw modes 1..7; mode 4 writes out field_0x88*field_0x108 in the body through local references (an inline helper gives another FPU order)"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionDebugDraw.cpp",
+    "candidate_symbol_contains": "DrawModel@CollisionObject",
+    "target_va": "0x00432b30",
+    "target_size": 507,
+    "expect": "exact",
+    "notes": "exact: model bounds then per-element draw modes 1..7; element fields are read as model->elements[i] each time (no cached pointer)"
   }
 ]

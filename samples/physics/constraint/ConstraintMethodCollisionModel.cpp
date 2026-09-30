@@ -11,10 +11,15 @@
 //     2. For every probe point (32-byte records, AddProbePoint 0x0043c7f0): transform the
 //        local point to world space, ask the ground query object (+0xe4, 0x507c10) for the
 //        surface height/normal below it. A probe whose world y is below the surface
-//        is "hit"; the deepest penetration (and its normal / point) is kept.
+//        is "hit"; the deepest penetration, its normal and the surface point the query
+//        returned are kept (retail copies the queried point, not the probe position, at
+//        0x0043bc19).  A hit probe records the best normal so far; a missed probe only
+//        clears its hit flag.
 //     3. If any probe hit (and +0x108 is set): call ApplyContactImpulse once, with the
 //        deepest probe, offset = normal * -penetration, then project the body out of the
-//        surface again (position -= v * 1.005) and mark +0x58 dirty.
+//        surface by that offset (position -= offset * 1.005, 0x0043bd23) and mark +0x58
+//        dirty.  1.005f is a literal: the constant-pool operand order (fld v; fmul k)
+//        only matches with a literal.
 //   ApplyContactImpulse (0x0043bdb0) accumulates nothing across iterations; per call it
 //   computes  j = -(1+e) * (vA - vB).n / (1/mA + 1/mB + n.((Iinv (rA x n)) x rA) + ...),
 //   scales j by (1 - field_0xf4), clamps to maxImpulse (+0xf8, 0 = unlimited), updates ONLY body A's linear
@@ -26,12 +31,20 @@
 //
 #include "ConstraintMethodCollisionModel.h"
 
-// Debug allocator entry (ptr, size, __FILE__, __LINE__), cdecl, 0x004a2ec0.
-void* DebugRealloc(void* p, unsigned int size, const char* file, int line);
+#include "../common/DebugAlloc.h"   // DebugRealloc
+
+// The two callbacks slot 8 installs (CollisionObject.h, CollisionCallback).
+void ConstraintContactCallback(CollisionObject* self, CollisionObject* other);  // 0x0043b800, below
+void CollisionEmptyCallback(CollisionObject* self, CollisionObject* other);     // 0x00464e90, shared empty function
 
 ConstraintMethodCollisionModel::ConstraintMethodCollisionModel(int a) : CollisionObject(a)
 {
+    // Statement order found by a placement search against the retail store schedule
+    // (0x0043b8d0); the order of these independent stores has no semantic meaning.
+    field_0xbc = 0.9f;
+    field_0xec = 1;
     field_0xb8 = 0;
+    field_0x108 = 1;
     body = 0;
     probeCount = 0;
     groundQuery = 0;
@@ -41,9 +54,6 @@ ConstraintMethodCollisionModel::ConstraintMethodCollisionModel(int a) : Collisio
     field_0xf4 = 0;
     maxImpulse = 0;
     maxSpeed = 0;
-    field_0xbc = 0.9f;
-    field_0xec = 1;
-    field_0x108 = 1;
 }
 
 void ConstraintMethodCollisionModel::UnknownVirtualSlot2()
@@ -57,9 +67,9 @@ ConstraintMethodCollisionModel::~ConstraintMethodCollisionModel()
 GameObject* ConstraintMethodCollisionModel::GameObjectVirtualSlot8(int a)
 {
     Fn_004320f0(a, 1, 1, 1);
-    field_0x88 = 0x43b800;
-    field_0x8c = 0x464e90;
-    field_0x60 = (int)this;
+    field_0x88 = ConstraintContactCallback;
+    field_0x8c = CollisionEmptyCallback;
+    field_0x60 = this;
     return this;
 }
 
@@ -75,7 +85,7 @@ void ConstraintMethodCollisionModel::GameObjectVirtualSlot14()
     CollisionObject::GameObjectVirtualSlot14();
 }
 
-void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, int arg)
+void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const char* arg)
 {
     body = b;
     if (useNodeModel && !arg)
@@ -96,7 +106,6 @@ void ConstraintMethodCollisionModel::AddProbePoint(ConVec3 point, ConNode* node)
 
 // ---- Slot 11 / contact solver --------------------------------------------------
 
-static const float kPushOut = 1.005f;   // 0x00551070
 
 static inline float Dot3(const ConVec3& a, const ConVec3& b)
 {
@@ -117,42 +126,57 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
             const ConVec3* n = (const ConVec3*)field_0x5c;
             ConVec3 pos;
             body->node->GetPositionIn(0, &pos);
-            float dx = n->x * kPushOut, dy = n->y * kPushOut, dz = n->z * kPushOut;
-            pos.x -= dx; pos.y -= dy; pos.z -= dz;
+            ConVec3 d;
+            d.x = n->x * 1.005f;
+            d.y = n->y * 1.005f;
+            d.z = n->z * 1.005f;
+            pos.x -= d.x;
+            pos.y -= d.y;
+            pos.z -= d.z;
             body->node->SetPositionIn(0, &pos);
             Fn_00435fb0();
         }
     }
     if (groundQuery) {
+        float maxPen = 0.0f;
         int anyHit = 0;
-        float maxPen = 0;
-        ConVec3 bestNormal, bestPoint;
+        ConVec3 bestNormal;
+        ConVec3 bestPoint;
         for (int i = 0; i < probeCount; i++) {
-            ConstraintProbe& pr = probes[i];
-            ConVec3 orig = pr.node->LocalToWorldPoint(pr.localPoint);
-            ConVec3 p = orig;
+            ConVec3 p = probes[i].node->LocalToWorldPoint(probes[i].localPoint);
+            float probeY = p.y;
             ConVec3 n;
             groundQuery->QueryPoint(&p, &n, 0, 0);
-            if (orig.y < p.y) {
+            if (probeY < p.y) {
                 anyHit = 1;
-                pr.hit = 1;
-                float pen = p.y - orig.y;
+                probes[i].hit = 1;
+                float pen = p.y - probeY;
                 if (pen > maxPen) {
                     maxPen = pen;
                     bestNormal = n;
-                    bestPoint = orig;
+                    bestPoint = p;
                 }
+                probes[i].normal = bestNormal;
             } else {
-                pr.hit = 0;
+                probes[i].hit = 0;
             }
-            pr.normal = bestNormal;
         }
         if (anyHit && field_0x108) {
-            ApplyContactImpulse(0, 1.0f, bestNormal * -maxPen, bestPoint, bestNormal);
+            float d = -maxPen;
+            ConVec3 offset;
+            offset.x = bestNormal.x * d;
+            offset.y = bestNormal.y * d;
+            offset.z = bestNormal.z * d;
+            ApplyContactImpulse(0, 1.0f, offset, bestPoint, bestNormal);
             ConVec3 pos;
             body->node->GetPositionIn(0, &pos);
-            float dx = bestNormal.x * kPushOut, dy = bestNormal.y * kPushOut, dz = bestNormal.z * kPushOut;
-            pos.x -= dx; pos.y -= dy; pos.z -= dz;
+            ConVec3 step;
+            step.x = offset.x * 1.005f;
+            step.y = offset.y * 1.005f;
+            step.z = offset.z * 1.005f;
+            pos.x -= step.x;
+            pos.y -= step.y;
+            pos.z -= step.z;
             body->node->SetPositionIn(0, &pos);
             Fn_00435fb0();
             field_0x58 = 1;
@@ -222,7 +246,7 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
 }
 
 // ---- Contact callback (0x0043b800) ----------------------------------------------
-// Stored into field_0x88 by slot 8 (with 0x464e90 in field_0x8c). cdecl; a is the
+// Stored into field_0x88 by slot 8 (with 0x464e90 in field_0x8c). cdecl; self is the
 // constraint model, b the other collision object. The contact record at a->field_0x5c
 // holds three Vec3 (+0x00, +0x0c, +0x18) and a float (+0x24); tier 3 semantics.
 struct ConContactRecord {
@@ -232,8 +256,9 @@ struct ConContactRecord {
     float t;          // +0x24 time fraction
 };
 
-void ConstraintContactCallback(ConstraintMethodCollisionModel* a, CollisionObject* b)
+void ConstraintContactCallback(CollisionObject* self, CollisionObject* b)
 {
+    ConstraintMethodCollisionModel* a = (ConstraintMethodCollisionModel*)self;
     ConContactRecord* rec = (ConContactRecord*)a->field_0x5c;
     if (b->field_0x64 == 0x3ea)
         a->ApplyContactImpulse(*(ConBody**)((char*)b + 0xc4), rec->t, rec->v0, rec->v18, rec->v0c);

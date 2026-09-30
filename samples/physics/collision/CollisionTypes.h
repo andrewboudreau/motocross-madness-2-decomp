@@ -1,8 +1,11 @@
 // PROVISIONAL shared types for the collision translation units (tier 3).
-// Replace CollisionVec3 with ../common/Math3D.h when the shared math header lands.
+// CollisionVec3 is kept apart from the Math3D Vec3 because these translation units call
+// the Vec3 constructor out of line (0x00404e60); see the constructor comment below.
 // Only the 12-byte {x,y,z} float layout is confirmed (three dword moves / fld+fmul at +0,+4,+8).
 #ifndef COLLISION_TYPES_H
 #define COLLISION_TYPES_H
+
+#include "../common/DebugAlloc.h"
 
 struct CollisionVec3 {
     float x, y, z;
@@ -56,11 +59,7 @@ extern CollisionVec3 g_CollisionVec3_5797b0;
 // Second global vec3 at 0x00579810 (source of CollisionPoint::field_0x2c initial value; value unknown).
 extern CollisionVec3 g_CollisionVec3_579810;
 
-// Debug-allocation form of operator new: (size, __FILE__, __LINE__), cdecl,
-// call target 0x004a3010.  The (size,file,line) push order is confirmed at 0x0043a344.
-void* operator new(unsigned int size, const char* file, int line);
-// Matching debug free: (ptr, file, line), cdecl, call target 0x004a2e60.
-void operator delete(void* p, const char* file, int line);
+// The debug operator new/delete (size or ptr, __FILE__, __LINE__) are in DebugAlloc.h.
 
 // 4x4 float matrix, 16 dwords (rep movsd 0x10 in the shape setups); row-major guess.
 struct CollisionMatrix4 {

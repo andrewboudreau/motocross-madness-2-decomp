@@ -8,7 +8,7 @@
 // Returns 0 when the result is exactly the zero vector, else out.
 CollisionVec3* CollisionRejectFrom(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b)
 {
-    float d = CollisionDot(*a, *b);
+    float d = CollisionDot(*b, *a);
     CollisionVec3 t = *b * d;
     *out = *a - t;
     if (out->x == 0.0f && out->y == 0.0f && out->z == 0.0f)
@@ -19,10 +19,9 @@ CollisionVec3* CollisionRejectFrom(CollisionVec3* out, const CollisionVec3* a, c
 // 0x00435ec0 (cdecl): vector length; returns 1.0f without a square root when |v|^2 == 1.
 float CollisionLength(const CollisionVec3* v)
 {
-    float s = CollisionDot(*v, *v);
-    if (s == 1.0f)
-        return 1.0f;
-    return FastSqrt(s);
+    // Written out rather than CollisionDot(*v, *v): the inline form schedules z*z first.
+    float s = (v->x * v->x + v->y * v->y) + v->z * v->z;
+    return s == 1.0f ? 1.0f : FastSqrt(s);
 }
 
 // 0x0043c890 (cdecl): *out = *v * (1 / len); returns out.
