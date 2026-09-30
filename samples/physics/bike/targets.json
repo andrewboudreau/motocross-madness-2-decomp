@@ -6,7 +6,7 @@
     "target_va": "0x00405db0",
     "target_size": 724,
     "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 5.12%] [latest 4.4% match under vc6_o2_ml]"
+    "notes": "slot 72: candidate 730 vs 724 bytes; first divergence at the prologue, retail tests [edi+0x444] via eax without the extra xor ebx,ebx (register allocation differs) [4.4% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -24,7 +24,7 @@
     "target_va": "0x004060c0",
     "target_size": 1678,
     "expect": "partial",
-    "notes": "Distributes an applied force direction over the contacts: per-element inverse-distance weights (field_0x1d0 mode) or front/rear wheel split by wheel distance/contact flag. Semantics decoded; branch layout and FPU scheduling differ (inlined vec ops, spilled temporaries). [vc6_o2_ml match 8.29%] [latest 8.4% match under vc6_o2_ml]"
+    "notes": "slot 7: frame is 0x214 in retail vs 0x204; first divergence at insn 0 and the field_0x4a8 + field_0x1cc sum (0x570) load order; body 1580/1678 bytes [8.4% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -42,7 +42,7 @@
     "target_va": "0x00406840",
     "target_size": 395,
     "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 57.79%] [latest 57.8% match under vc6_o2_ml]"
+    "notes": "slot 76: first divergence at the BikeNormalized scale step (FPU dup vs fld mem; fmul st(1)), then a shifted branch [57.8% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -69,7 +69,7 @@
     "target_va": "0x00407440",
     "target_size": 485,
     "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 14.14%] [latest 16.4% match under vc6_o2_ml]"
+    "notes": "slot 102: first divergence at insn 17 (retail keeps a value in [esp+4] memory local, ours forward-substitutes on the FPU) [16.4% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -86,8 +86,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot97@Bike",
     "target_va": "0x00409420",
     "target_size": 1516,
-    "expect": "partial",
-    "notes": "Rider ragdoll setup: debug-new 0x53c object (Bike.cpp line 2023), loads \"rider.col\", attaches 15 named bones. Blocked on GameObject stand-in layout (hidden +4 shift for virtual-base field offsets 0x4/0x1c) and SEH/new-expression shape. [vc6_o2_ml match 5.77%] [latest 5.8% match under vc6_o2_ml]"
+    "expect": "exact",
+    "notes": "Exact. Needs the placement operator delete declaration (EH unwind frame) and the bone-attach helper as __forceinline so all 15 bones expand inline."
   },
   {
     "class": "Bike",
@@ -96,7 +96,7 @@
     "target_va": "0x00409b30",
     "target_size": 1374,
     "expect": "partial",
-    "notes": "Crash test: classifies attitude/impact (rider transform y>1, nose-over, on side, roll >110deg, other vehicle heading) and stores crash direction 0x448 and reason 0x460. Semantics decoded; abs/fcompp compare form and jump layout differ. [vc6_o2_ml match 39.14%] [latest 39.3% match under vc6_o2_ml]"
+    "notes": "slot 99: first divergence at insn 107, retail dot order is y*0xa4, x*0xa0, z*0xa8 (ours differs) and the next compare is fld;fxch;fcompp instead of fcomp mem [39.3% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -186,7 +186,7 @@
     "target_va": "0x0040aec0",
     "target_size": 1353,
     "expect": "partial",
-    "notes": "Per-step drive/lateral force: throttle force, velocity turned toward lean plane, force applied via xform 0x4fd1f0 with normalized dir and length, decay of 0xd8/0xdc/0xe0 by 0.9, wobble ramp on 0xe0. Semantics decoded; temp/spill layout differs. [vc6_o2_ml match 8.16%] [latest 8.2% match under vc6_o2_ml]"
+    "notes": "slot 91: frame 0x20 vs ours 0x24; first divergence is the spill slot of the first fstp ([esp+8] vs [esp+0x10]) [8.2% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -195,7 +195,7 @@
     "target_va": "0x0040b600",
     "target_size": 1066,
     "expect": "partial",
-    "notes": "Bike anchor/focus point mapped through the transform: stored anchor (0x194) when flagged, else front wheel pos or front/rear blend (0.9 threshold on wheel 0x2b8). Uses vec helpers 0x421cb0/0x421d00 and ctor 0x404e60 (not reproduced as thiscall ctor, so inline vec ops differ). [vc6_o2_ml match 4.89%] [latest 4.9% match under vc6_o2_ml]"
+    "notes": "slot 46: SEMANTICALLY COMPLETE (all four paths, out-of-line Vec3 ctor 0x404e60 modelled), 1025/1066 bytes; first divergence is retail pushing edi and keeping 12 extra bytes of frame (0x48 vs 0x3c) [5.6% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -204,7 +204,7 @@
     "target_va": "0x0040ba30",
     "target_size": 1157,
     "expect": "partial",
-    "notes": "Steering-torque limiter: target angle from 0x47c/0x43c*0x4b4, clamped by lean 0x628 and 0x580, residual vs slot 57, force applied via xform, then cancel-toward-zero of 0xd8/0xdc/0xe0. Semantics decoded; FPU stack/ordering differs. [vc6_o2_ml match 5.65%] [latest 5.7% match under vc6_o2_ml]"
+    "notes": "slot 92: frame 0x18 vs ours 0x1c, ours pushes edi; first divergence at prologue register use [5.7% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -222,7 +222,7 @@
     "target_va": "0x0040c000",
     "target_size": 1015,
     "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 16.83%] [latest 16.8% match under vc6_o2_ml]"
+    "notes": "slot 61: retail has an ebp frame (push ebp; mov ebp,esp), ours does not; first divergence at insn 0 [16.8% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -249,7 +249,7 @@
     "target_va": "0x0040c8b0",
     "target_size": 354,
     "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 23.65%] [latest 23.4% match under vc6_o2_ml]"
+    "notes": "slot 54: ours 386 vs 354 bytes; first divergence at insn 19, retail tests wheel->w_0x260 twice with reloaded pointers, ours differs, and the normalize scale pattern also differs [23.4% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",
@@ -321,7 +321,7 @@
     "target_va": "0x0040ce60",
     "target_size": 244,
     "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 46.88%] [latest 81.1% match under vc6_o2_ml]"
+    "notes": "slot 55: only the BikeNormalized scale differs: retail x=fld st0;fmul mem, y/z=fld mem;fmul st(1), pops s with fstp st(0); ours consumes s on the last multiply. All natural forms compile identically [81.1% match under vc6_o2_ml]"
   },
   {
     "class": "Bike",

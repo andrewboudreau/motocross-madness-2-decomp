@@ -207,6 +207,7 @@ extern BikeVec3 g_BikeVec3_005778c8;
 BikeVec3* BikeVecAdd_0x00421cb0(BikeVec3* out, const BikeVec3* a, const BikeVec3* b);   // cdecl
 BikeVec3* BikeVecSub_0x00421d00(BikeVec3* out, const BikeVec3* a, const BikeVec3* b);   // cdecl
 void* operator new(unsigned int size, const char* file, int line);   // debug allocator at 0x004a3010
+void operator delete(void* p, const char* file, int line);
 
 class Bike : public Vehicle {
 public:

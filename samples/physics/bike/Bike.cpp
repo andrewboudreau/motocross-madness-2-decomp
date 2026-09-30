@@ -692,11 +692,14 @@ static inline float BikeLength(float lenSq)
 
 // Slot 97: builds the rider ragdoll ("rider.col") and attaches the 15 body
 // bones by name (Pelvis, UprTorso, Head, arms, legs, feet) with local offsets.
-static inline void BikeAttachBone(BikeA604* rider, const char* name, float x, float y, float z)
+static __forceinline void BikeAttachBone(Bike* self, const char* name, float x, float y, float z)
 {
-    BikeVec3 offset(x, y, z);
-    int bone = rider->a_0x34->r_0x1a0->Method_0x004fdae0(name);
-    rider->Method_0x00532900(offset, bone);
+    BikeVec3 offset;
+    offset.x = x;
+    offset.y = y;
+    offset.z = z;
+    int bone = self->field_0x604->a_0x34->r_0x1a0->Method_0x004fdae0(name);
+    self->field_0x604->Method_0x00532900(offset, bone);
 }
 
 void Bike::UnknownVirtualSlot97()
@@ -706,21 +709,21 @@ void Bike::UnknownVirtualSlot97()
         GameObject::Method_0x00469190(field_0x604, -1);
         field_0x604->a_0x38->n_0xe4 = ((BikeA1F4*)field_0x1f4);
         field_0x604->a_0x38->n_0x64 = 0x65;
-        BikeAttachBone(field_0x604, "Pelvis", 0.0f, 0.0f, -0.35f);
-        BikeAttachBone(field_0x604, "UprTorso", 0.0f, 0.0f, 0.0f);
-        BikeAttachBone(field_0x604, "Head", 0.0f, 0.75f, 0.0f);
-        BikeAttachBone(field_0x604, "UprArmL", 0.0f, 0.0f, 0.0f);
-        BikeAttachBone(field_0x604, "UprArmR", 0.0f, 0.0f, 0.0f);
-        BikeAttachBone(field_0x604, "LwrArmL", 0.0f, 0.0f, 0.0f);
-        BikeAttachBone(field_0x604, "HandL", 0.0f, -0.5f, 0.0f);
-        BikeAttachBone(field_0x604, "LwrArmR", 0.0f, 0.0f, 0.0f);
-        BikeAttachBone(field_0x604, "HandR", 0.0f, -0.5f, 0.0f);
-        BikeAttachBone(field_0x604, "LwrLegL", 0.0f, 0.0f, 0.0f);
-        BikeAttachBone(field_0x604, "FootL", 0.0f, -0.5f, 0.75f);
-        BikeAttachBone(field_0x604, "FootL", 0.0f, -1.0f, 0.0f);
-        BikeAttachBone(field_0x604, "LwrLegR", 0.0f, 0.0f, 0.0f);
-        BikeAttachBone(field_0x604, "FootR", 0.0f, -0.5f, 0.75f);
-        BikeAttachBone(field_0x604, "FootR", 0.0f, -1.0f, 0.0f);
+        BikeAttachBone(this, "Pelvis", 0.0f, 0.0f, -0.35f);
+        BikeAttachBone(this, "UprTorso", 0.0f, 0.0f, 0.0f);
+        BikeAttachBone(this, "Head", 0.0f, 0.75f, 0.0f);
+        BikeAttachBone(this, "UprArmL", 0.0f, 0.0f, 0.0f);
+        BikeAttachBone(this, "UprArmR", 0.0f, 0.0f, 0.0f);
+        BikeAttachBone(this, "LwrArmL", 0.0f, 0.0f, 0.0f);
+        BikeAttachBone(this, "HandL", 0.0f, -0.5f, 0.0f);
+        BikeAttachBone(this, "LwrArmR", 0.0f, 0.0f, 0.0f);
+        BikeAttachBone(this, "HandR", 0.0f, -0.5f, 0.0f);
+        BikeAttachBone(this, "LwrLegL", 0.0f, 0.0f, 0.0f);
+        BikeAttachBone(this, "FootL", 0.0f, -0.5f, 0.75f);
+        BikeAttachBone(this, "FootL", 0.0f, -1.0f, 0.0f);
+        BikeAttachBone(this, "LwrLegR", 0.0f, 0.0f, 0.0f);
+        BikeAttachBone(this, "FootR", 0.0f, -0.5f, 0.75f);
+        BikeAttachBone(this, "FootR", 0.0f, -1.0f, 0.0f);
         field_0x604->a_0x11c = field_0x124;
     }
 }
@@ -1037,6 +1040,26 @@ void Bike::UnknownVirtualSlot91()
     }
 }
 
+// Vec3 whose (x, y, z) constructor is out of line in retail (0x00404e60,
+// thiscall, ret 0xc); declared only, so VC6 emits the call instead of inlining.
+struct BikeOolVec3 : public BikeVec3 {
+    BikeOolVec3() {}
+    BikeOolVec3(float x_, float y_, float z_);
+};
+
+static inline BikeOolVec3 BikeOolSub(const BikeVec3& a, const BikeVec3& b)
+{
+    return BikeOolVec3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+static inline BikeOolVec3 BikeOolAdd(const BikeVec3& a, const BikeVec3& b)
+{
+    return BikeOolVec3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+static inline BikeOolVec3 BikeOolHalf(const BikeVec3& v)
+{
+    return BikeOolVec3(v.x * 0.5f, v.y * 0.5f, v.z * 0.5f);
+}
+
 // Slot 46: focus/anchor point of the bike in local space.  Airborne or flagged
 // bikes return the stored anchor (field_0x194); otherwise it is the front
 // wheel position (t != 0) or a blend toward the rear wheel, relative to the
@@ -1047,35 +1070,37 @@ BikeVec3* Bike::UnknownVirtualSlot46(BikeVec3* out, float t)
         *out = field_0x194;
         return out;
     }
-    BikeWheel* front = field_0x5f0;
-    BikeWheel* rear = field_0x5f4;
     BikeVec3 tmp;
     if (field_0x4a8 == 2) {
         if (t != 0.0f) {
-            field_0x1ac = BikeVec3(front->w_0xcc.x - field_0x0c.x, front->w_0xcc.y - field_0x0c.y, front->w_0xcc.z - field_0x0c.z);
-        } else if (rear->w_0x2b8 < 0.9f) {
-            float s = rear->w_0x2b8 - 0.4f;
+            *out = *((BikeXform*)d3d_field_0x1a0)->Method_0x004fd710(&tmp, &(field_0x1ac = field_0x5f0->w_0xcc - field_0x0c));
+            return out;
+        } else if (field_0x5f4->w_0x2b8 < 0.9f) {
+            float s = field_0x5f4->w_0x2b8 - 0.4f;
             if (!(s > 0.0f))
                 s = 0.0f;
-            BikeVec3 d(rear->w_0xcc.x - front->w_0xcc.x, rear->w_0xcc.y - front->w_0xcc.y, rear->w_0xcc.z - front->w_0xcc.z);
-            BikeVec3 p(d.x * s + front->w_0xcc.x, d.y * s + front->w_0xcc.y, d.z * s + front->w_0xcc.z);
-            field_0x1ac = BikeVec3(p.x - field_0x0c.x, p.y - field_0x0c.y, p.z - field_0x0c.z);
+            BikeVec3 d = field_0x5f4->w_0xcc - field_0x5f0->w_0xcc;
+            BikeVec3 p = d * s + field_0x5f0->w_0xcc;
+            *out = *((BikeXform*)d3d_field_0x1a0)->Method_0x004fd710(&tmp, &(field_0x1ac = p - field_0x0c));
+            return out;
         } else {
-            BikeVec3 d(rear->w_0xcc.x - front->w_0xcc.x, rear->w_0xcc.y - front->w_0xcc.y, rear->w_0xcc.z - front->w_0xcc.z);
-            BikeVec3 half(d.x * 0.5f, d.y * 0.5f, d.z * 0.5f);
-            BikeVec3 mid(half.x + front->w_0xcc.x, half.y + front->w_0xcc.y, half.z + front->w_0xcc.z);
-            field_0x1ac = BikeVec3(mid.x - field_0x0c.x, mid.y - field_0x0c.y, mid.z - field_0x0c.z);
+            // the midpoint chain goes through the out-of-line Vec3 constructor
+            BikeVec3 d = BikeOolSub(field_0x5f4->w_0xcc, field_0x5f0->w_0xcc);
+            BikeVec3 half = BikeOolHalf(d);
+            BikeVec3 mid = BikeOolAdd(half, field_0x5f0->w_0xcc);
+            BikeVec3 rel = BikeOolSub(mid, field_0x0c);
+            *out = *((BikeXform*)d3d_field_0x1a0)->Method_0x004fd710(&tmp, &(field_0x1ac = rel));
+            return out;
         }
     } else {
-        BikeVec3 d(rear->w_0xcc.x - front->w_0xcc.x, rear->w_0xcc.y - front->w_0xcc.y, rear->w_0xcc.z - front->w_0xcc.z);
-        BikeVec3 half(d.x * 0.5f, d.y * 0.5f, d.z * 0.5f);
+        BikeVec3 d = BikeOolSub(field_0x5f4->w_0xcc, field_0x5f0->w_0xcc);
+        BikeVec3 half = BikeOolHalf(d);
         BikeVec3 mid, rel;
-        BikeVecAdd_0x00421cb0(&mid, &front->w_0xcc, &half);
+        BikeVecAdd_0x00421cb0(&mid, &field_0x5f0->w_0xcc, &half);
         BikeVecSub_0x00421d00(&rel, &mid, &field_0x0c);
-        field_0x1ac = rel;
+        *out = *((BikeXform*)d3d_field_0x1a0)->Method_0x004fd710(&tmp, &(field_0x1ac = rel));
+        return out;
     }
-    *out = *((BikeXform*)d3d_field_0x1a0)->Method_0x004fd710(&tmp, &field_0x1ac);
-    return out;
 }
 
 // Moves a stored value toward zero by 1.5 * delta without crossing zero.
