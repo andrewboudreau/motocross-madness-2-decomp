@@ -140,3 +140,17 @@ vc6-private-gate:
 
 private-bundle-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_private_bundle.py' -v
+
+.PHONY: vc6-crt-atlas vc6-crt-atlas-test
+vc6-crt-atlas:
+	$(PYTHON) tools/with_private_env.py --root "$(PRIVATE_ROOT)" -- $(PYTHON) tools/build_vc6_crt_atlas.py
+
+vc6-crt-atlas-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_crt_atlas.py' -v
+
+.PHONY: vc6-profile-matrix vc6-profile-matrix-test
+vc6-profile-matrix:
+	$(PYTHON) tools/with_private_env.py --root "$(PRIVATE_ROOT)" -- $(PYTHON) tools/vc6_profile_matrix.py
+
+vc6-profile-matrix-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_vc6_profile_matrix.py' -v
