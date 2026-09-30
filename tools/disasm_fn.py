@@ -85,6 +85,11 @@ def disassemble(pe: PEImage, va: int, max_size: int = 0x4000):
     insns = []
     max_target = va
     tables: list[tuple[int, list[int]]] = []
+    # byte index tables of sparse switches: (va, length); VC6 emits
+    # `cmp eax,N; ja default; mov cl,[eax+idx]; jmp [ecx*4+tbl]` and places the
+    # N+1 index bytes right after the dword jump table
+    index_tables: list[tuple[int, int]] = []
+    last_cmp_imm = None
     end = None
     pos = 0
     while pos < len(code):
@@ -94,12 +99,23 @@ def disassemble(pe: PEImage, va: int, max_size: int = 0x4000):
             t, e = next((t, e) for t, e in tables if t <= cur < t + 4 * len(e))
             pos = t + 4 * len(e) - va
             continue
+        if any(t <= cur < t + n for t, n in index_tables):
+            t, n = next((t, n) for t, n in index_tables if t <= cur < t + n)
+            pos = t + n - va
+            continue
         batch = list(md.disasm(code[pos:pos + 16], cur, 1))
         if not batch:
             break
         ins = batch[0]
         insns.append(ins)
         pos += ins.size
+        if ins.mnemonic == 'cmp' and len(ins.operands) == 2 and ins.operands[1].type == x86.X86_OP_IMM:
+            last_cmp_imm = ins.operands[1].imm
+        if (ins.mnemonic in ('mov', 'movzx') and len(ins.operands) == 2
+                and ins.operands[1].type == x86.X86_OP_MEM and ins.operands[1].size == 1):
+            m = ins.operands[1].mem
+            if (m.base or m.index) and va < m.disp < va + max_size and last_cmp_imm is not None                     and 0 <= last_cmp_imm < 256:
+                index_tables.append((m.disp, last_cmp_imm + 1))
         grp_jump = ins.group(capstone.CS_GRP_JUMP)
         if grp_jump and ins.operands and ins.operands[0].type == x86.X86_OP_IMM:
             tgt = ins.operands[0].imm
@@ -123,7 +139,7 @@ def disassemble(pe: PEImage, va: int, max_size: int = 0x4000):
         if (is_ret or is_jmp) and va + pos > max_target:
             end = va + pos
             break
-    return insns, (end or va + pos), tables
+    return insns, (end or va + pos), tables, index_tables
 
 
 def main() -> int:
@@ -139,10 +155,11 @@ def main() -> int:
     analysis = Path(a.analysis)
     slots = load_slot_map(analysis)
     sources = load_source_strings(analysis)
-    insns, end, tables = disassemble(pe, va)
+    insns, end, tables, index_tables = disassemble(pe, va)
     size = end - va
     # trailing tables that sit after the last instruction extend the COFF extent
-    table_end = max((t + 4 * len(e) for t, e in tables if t >= end), default=end)
+    table_end = max([t + 4 * len(e) for t, e in tables if t >= end]
+                    + [t + n for t, n in index_tables if t >= end], default=end)
     pad = pe.data[pe.va_to_offset(end):pe.va_to_offset(end) + 16]
     npad = 0
     for b in pad:
@@ -162,6 +179,7 @@ def main() -> int:
             'padding_after': npad, 'next_candidate_start': f'0x{end + npad:08x}',
             'vtable_slots': slots.get(va, []),
             'jump_tables': [{'va': f'0x{t:08x}', 'entries': [f'0x{x:08x}' for x in e]} for t, e in tables],
+            'index_tables': [{'va': f'0x{t:08x}', 'length': n} for t, n in index_tables],
         }, indent=2))
         return 0
     print(f'; function 0x{va:08x}  size={size} (0x{size:x})  end=0x{end:08x}  padding_after={npad}  next_start~0x{end + npad:08x}')
@@ -169,6 +187,8 @@ def main() -> int:
         print(f';   vtable: {s}')
     for t, e in tables:
         print(f';   jump table @0x{t:08x}: {len(e)} entries')
+    for t, n in index_tables:
+        print(f';   byte index table @0x{t:08x}: {n} entries')
     for ins in insns:
         note = []
         for op in ins.operands:
