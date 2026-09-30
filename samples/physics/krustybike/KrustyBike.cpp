@@ -443,24 +443,24 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
 // two force accumulators are halved; the wheel is then always updated.
 void KrustyBike::UnknownVirtualSlot86()
 {
-    KbWheel* w = (KbWheel*)field_0x5f4;
+    BikeWheel* w = field_0x5f4;
     if (!w->w_0x260)
         return;
     if (field_0x740->field_0x18a) {
         float ramp;
-        if (field_0x47a && *(float*)&field_0x664 >= 0.12f && *(float*)&field_0x664 < 0.4762f)
-            ramp = (0.4762f - *(float*)&field_0x664) * 1010.668f;
+        if (field_0x47a && field_0x664 >= 0.12f && field_0x664 < 0.4762f)
+            ramp = (0.4762f - field_0x664) * 1010.668f;
         else
             ramp = 0;
         if (w->w_0x2a8)
             w->w_0x2a8->Fn_004D31B0(KbFloat(field_0xbc), &w->w_0x230, KbFloat(field_0x4a4), field_0x47a, ramp,
                                     &w->w_0x248, &w->w_0x280);
         if (g_kbGame->field_0x2d70 && !field_0x78c) {
-            ((KbWheel*)field_0x5f4)->w_0x248 *= 0.5f;
-            ((KbWheel*)field_0x5f4)->w_0x280 *= 0.5f;
+            field_0x5f4->w_0x248 *= 0.5f;
+            field_0x5f4->w_0x280 *= 0.5f;
         }
     }
-    ((KbWheel*)field_0x5f4)->Fn_00513F90(this);
+    field_0x5f4->Fn_00513F90(this);
 }
 
 // Slot 96: tuning constants derived from the game-settings integers (0xfe0..0xff8).
@@ -604,8 +604,12 @@ int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
 // vectors" paths fall off the end without setting a result (retail leaves eax as is).
 int KrustyBike::UnknownVirtualSlot11(int a1, KbVec3* a2, KbVec3* a3, KbVec3* a4, int* a5)
 {
-    int flag = g_kbGame->field_0x578.Fn_00524100() == 3 || g_kbGame->field_0x578.Fn_00524100() == 4;
-    int lim = (g_kbGame->field_0x578.Fn_00524100() == 5 || g_kbGame->field_0x578.Fn_00524100() == 4) ? 0x7fffffff : 0x66;
+    int flag = 0;
+    if (g_kbGame->field_0x578.Fn_00524100() == 3 || g_kbGame->field_0x578.Fn_00524100() == 4)
+        flag = 1;
+    int lim = 0x66;
+    if (g_kbGame->field_0x578.Fn_00524100() == 5 || g_kbGame->field_0x578.Fn_00524100() == 4)
+        lim = 0x7fffffff;
     unsigned char hit = 0;
     if (g_kbGame->field_0x578.Fn_00524100() == 5)
         hit = Kb_004B0AC0(&field_0x0c, 2.0f, 2.0f, 2.0f, field_0x1f8, 0, 0, 0, 0);

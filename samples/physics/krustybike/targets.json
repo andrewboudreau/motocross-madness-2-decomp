@@ -366,6 +366,6 @@
     "target_va": "0x00491d10",
     "target_size": 1296,
     "expect": "partial",
-    "notes": "11.9% (candidate 1288 vs 1296). Tier-3: camera/target ray query per game mode. First divergence: retail loads game ptr before sub esp,0x20 and merges call tails; mine spills lim and hoists a4/a5 loads."
+    "notes": "17.9% (candidate 1280 vs 1296; if-form prologue beats ternary). Tier-3: camera/target ray query per game mode. First divergence: retail loads game ptr before sub esp,0x20 and merges call tails; mine spills lim and hoists a4/a5 loads."
   }
 ]
