@@ -6,7 +6,7 @@
     "target_va": "0x00405db0",
     "target_size": 724,
     "expect": "partial",
-    "notes": "slot 72: candidate 730 vs 724 bytes; first divergence at the prologue, retail tests [edi+0x444] via eax without the extra xor ebx,ebx (register allocation differs) [4.4% match under vc6_o2_ml]"
+    "notes": "88.7% (714 vs 724). Restructured branch; remaining: cross-product c.y/c.z second-product operand order (retail keeps literal order, VC6 here canonicalizes; source swaps do not change it), then compare/store layout around weight=BikeMin tail."
   },
   {
     "class": "Bike",
@@ -42,7 +42,7 @@
     "target_va": "0x00406840",
     "target_size": 395,
     "expect": "partial",
-    "notes": "slot 76: first divergence at the BikeNormalized scale step (FPU dup vs fld mem; fmul st(1)), then a shifted branch [57.8% match under vc6_o2_ml]"
+    "notes": "98.4% (395/395). v *= scalar form; remaining small diff in the tail branch layout after BikeNormalized scaling."
   },
   {
     "class": "Bike",

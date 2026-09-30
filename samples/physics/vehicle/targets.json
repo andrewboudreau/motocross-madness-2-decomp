@@ -6,7 +6,7 @@
     "target_va": "0x0040c4c0",
     "target_size": 118,
     "expect": "partial",
-    "notes": "78.9% (118/118). Cross of field_0x88 x field_0x94 stored to field_0x4cc; first divergence: fld operand order/prologue of the cross terms (VC6 commutes the multiplicands)."
+    "notes": "90.4% (118/118). Cross via VehV3::CrossB member helper; remaining divergence: load order of the last product (b.x*y) in r.z."
   },
   {
     "class": "Vehicle",
@@ -15,7 +15,7 @@
     "target_va": "0x0040c540",
     "target_size": 130,
     "expect": "partial",
-    "notes": "93.65% (130/130). Same cross as slot 34 after Method_004FC050; first divergence: fld operand order in the cross terms."
+    "notes": "94.4% (130/130). Same CrossB helper as slot 34; remaining divergence: load order of the last product in r.z."
   },
   {
     "class": "Vehicle",

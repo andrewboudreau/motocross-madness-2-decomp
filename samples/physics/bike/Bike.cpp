@@ -421,9 +421,7 @@ BikeVec3 Bike::UnknownVirtualSlot76(const BikeVec3* a, const BikeVec3* b)
         if (field_0xd8.x < 0.0f)
             field_0xd8.x = 0;
     } else if (field_0xd8.x < -1.0f) {
-        v.x *= 0.2f;
-        v.y *= 0.2f;
-        v.z *= 0.2f;
+        v *= 0.2f;
     } else {
         float lean = field_0x4c;
         if (lean < 0.0f)
@@ -432,9 +430,7 @@ BikeVec3 Bike::UnknownVirtualSlot76(const BikeVec3* a, const BikeVec3* b)
         float k = -(field_0x504.y + 0.125f);
         k = (0.0f > k) ? 0.0f : k;
         k = (1.4f - lean) * k * 1.6f;
-        v.x *= k;
-        v.y *= k;
-        v.z *= k;
+        v *= k;
     }
     return v;
 }
@@ -556,49 +552,48 @@ void Bike::UnknownVirtualSlot72(BikeVec3* out, VehicleWheel*)
     BikeWheel* a = field_0x5f0;
     if (!(a->w_0x260 || (field_0x5f4->w_0x260 && a->w_0x150 > -0.2f) || field_0x700)) {
         *out = field_0x5f4->w_0xe4;
-        field_0x4b8 = 0.0f;
-        field_0x43c = 0.0f;
-        return;
-    }
-    *out = a->w_0xe4;
-    BikeWheel* b = field_0x5f4;
-    float weight = field_0x5f0->w_0x144;
-    if (b->w_0x150 <= -0.2f) {
-        field_0x4b8 = 0.0f;
-        field_0x43c = 0.0f;
-        return;
-    }
-    out->x += b->w_0xe4.x;
-    out->y += b->w_0xe4.y;
-    out->z += b->w_0xe4.z;
-    weight += field_0x5f4->w_0x144;
-    float lenSq = out->y * out->y + out->x * out->x + out->z * out->z;
-    if (lenSq == 0.0f) {
-        *out = g_BikeVec3_005778a8;
     } else {
-        float s = BikeMath_0x00460c00(lenSq);
-        out->x *= s;
-        out->y *= s;
-        out->z *= s;
+        *out = a->w_0xe4;
+        BikeWheel* b = field_0x5f4;
+        float weight = field_0x5f0->w_0x144;
+        if (b->w_0x150 > -0.2f) {
+            out->x += b->w_0xe4.x;
+            out->y += b->w_0xe4.y;
+            out->z += b->w_0xe4.z;
+            weight += field_0x5f4->w_0x144;
+            float lenSq = out->y * out->y + out->x * out->x;
+            lenSq += out->z * out->z;
+            if (lenSq == 0.0f) {
+                *out = g_BikeVec3_005778a8;
+            } else {
+                float s = BikeMath_0x00460c00(lenSq);
+                out->x *= s;
+                out->y *= s;
+                out->z *= s;
+            }
+            weight *= 0.5f;
+            const BikeVec3* n = &field_0x5f0->w_0x230;
+            BikeVec3 c;
+            c.x = out->z * n->y - out->y * n->z;
+            c.y = out->x * n->z - n->x * out->z;
+            c.z = n->x * out->y - out->x * n->y;
+            BikeVec3 perp = BikeNormalized(c);
+            float scale;
+            if (field_0x700) {
+                float k = field_0x60 * 0.35f;
+                k = (0.001f > k) ? 0.001f : k;
+                scale = 1.0f / k;
+            } else {
+                scale = 1.0f;
+            }
+            weight = BikeMin(weight, 1.0f);
+            field_0x4b8 = UnknownVirtualSlot74(&field_0x5f0->w_0x23c, &perp, weight, scale);
+            field_0x43c = field_0x4b8 * field_0x140;
+            return;
+        }
     }
-    weight *= 0.5f;
-    const BikeVec3* n = &field_0x5f0->w_0x230;
-    BikeVec3 c;
-    c.x = out->z * n->y - out->y * n->z;
-    c.y = out->x * n->z - n->x * out->z;
-    c.z = n->x * out->y - out->x * n->y;
-    BikeVec3 perp = BikeNormalized(c);
-    float scale;
-    if (field_0x700) {
-        float k = field_0x60 * 0.35f;
-        k = (0.001f > k) ? 0.001f : k;
-        scale = 1.0f / k;
-    } else {
-        scale = 1.0f;
-    }
-    weight = BikeMin(weight, 1.0f);
-    field_0x4b8 = UnknownVirtualSlot74(&field_0x5f0->w_0x23c, &perp, weight, scale);
-    field_0x43c = field_0x4b8 * field_0x140;
+    field_0x4b8 = 0.0f;
+    field_0x43c = 0.0f;
 }
 
 float Bike::UnknownVirtualSlot61(float threshold)

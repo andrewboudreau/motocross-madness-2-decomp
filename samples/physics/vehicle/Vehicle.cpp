@@ -18,30 +18,27 @@ struct VehV3 : VehVec3
         r.z = x * b.y - b.x * y;
         return r;
     }
+    // Same cross product with the y-component written b.x * z (member order is honoured).
+    VehVec3 CrossB(const VehVec3& b) const
+    {
+        VehVec3 r;
+        r.x = y * b.z - z * b.y;
+        r.y = b.x * z - x * b.z;
+        r.z = x * b.y - b.x * y;
+        return r;
+    }
 };
 
 void Vehicle::UnknownVirtualSlot34()
 {
-    VehVec3* p = &field_0x94;
-    VehVec3* q = &field_0x88;
-    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC540(0, q, p);
-    VehVec3 r;
-    r.x = (q->y * p->z) - (q->z * p->y);
-    r.y = (p->x * q->z) - (q->x * p->z);
-    r.z = (q->x * p->y) - (p->x * q->y);
-    field_0x4cc = r;
+    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC540(0, &field_0x88, &field_0x94);
+    field_0x4cc = ((VehV3&)field_0x88).CrossB(field_0x94);
 }
 
 void Vehicle::UnknownVirtualSlot35(int a, int b)
 {
-    VehVec3* p = &field_0x94;
-    VehVec3* q = &field_0x88;
-    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC050(0, q, p, a, b);
-    VehVec3 r;
-    r.x = (q->y * p->z) - (q->z * p->y);
-    r.y = (p->x * q->z) - (q->x * p->z);
-    r.z = (q->x * p->y) - (p->x * q->y);
-    field_0x4cc = r;
+    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC050(0, &field_0x88, &field_0x94, a, b);
+    field_0x4cc = ((VehV3&)field_0x88).CrossB(field_0x94);
 }
 
 float Vehicle::UnknownVirtualSlot45() { return 3.0f; }
@@ -565,8 +562,7 @@ void Vehicle::UnknownVirtualSlot58(VehVec3* a, int b)
             for (int i = 1; i < field_0x544; i++) {
                 VehicleWheel* w = field_0x53c[i];
                 if (w->field_0xd8.y > top->field_0xd8.y) {
-                    second = top;
-                    top = w;
+                    second = top = w;
                 } else if (w->field_0xd8.y > second->field_0xd8.y) {
                     second = w;
                 }
@@ -809,7 +805,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
 void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
 {
     VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
-    VehicleWheel* w = 0;
+    VehicleWheel* w;
     int i;
     for (i = 0; i < field_0x544; i++) {
         w = field_0x53c[i];
