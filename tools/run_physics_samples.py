@@ -27,7 +27,8 @@ def main() -> int:
     ap.add_argument('--exe', default=str(ROOT / 'work/game/mcm2.exe'))
     ap.add_argument('--compiler', choices=['clang-cl', 'vc6'], default='vc6')
     ap.add_argument('--vc6-root', default=os.environ.get('VC6_ROOT'))
-    ap.add_argument('--profile', default='vc6_o2_ml_g6')
+    ap.add_argument('--profile', default='vc6_o2_ml',
+                    help='vc6_o2_ml (no /G6) matched 139/194 physics targets vs 76/194 with /G6, with no target exact only under /G6')
     ap.add_argument('--root', default=str(ROOT / 'samples/physics'), help='directory to scan')
     ap.add_argument('--out', default=str(ROOT / 'work/physics-objs'))
     ap.add_argument('--json', action='store_true', help='print full per-target JSON')
