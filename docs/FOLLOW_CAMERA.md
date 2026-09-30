@@ -12,7 +12,7 @@ Canonical candidate: `samples/camera/FollowCameraProbe.cpp`.
 | 65 | `0x00466cd0` | 31 | Exact preset stores |
 | 66 | `0x00466cf0` | 41 | Exact preset stores |
 | 67 | `0x00466d20` | 41 | Exact preset stores |
-| 68 | `0x00466d50` | — | Bounded float-like update; no matching candidate |
+| 68 | `0x00466d50` | 241 | Exact without `/G6`, all relocations resolved; distance-derived +0x258 clamped to [10, 70] |
 | 69 | `0x00466a80` | 65 | Exact without `/G6`; slot 57 result assigned straight into +0x2a8 |
 | 70 | `0x00467040` | 101 | Exact mode/state save and restore |
 | 71 | `0x00466e50` | 192 | Exact; 171 code bytes, one NOP, 5-entry jump table |
@@ -21,7 +21,20 @@ Canonical candidate: `samples/camera/FollowCameraProbe.cpp`.
 These are function matches, not a completed class. Fields, enum names and the
 12-byte aggregate's semantic type remain provisional.
 
-## Notes on slots 69 and 71
+## Notes on slots 68, 69 and 71
+
+Slot 68 copies the 12-byte float triple at +0x2b4, adds 3.0 to its second
+component, takes the absolute differences between +0x170/+0x178 and the
+triple's first/third components, and calls `0x00460b50` (a cdecl
+`float(float)` that returns 0 for 0 and otherwise approximates a square root
+by halving the exponent and looking up a table) on the sum of their squares.
++0x258 becomes `((200 - r) / 180) * 60 + 10`, clamped to [10, 70], and the
+triple is passed by value to slot 29. `samples/camera/FollowCamera.bindings.json`
+binds each VC6 float literal to a retail constant whose value was checked
+against the literal, plus the direct call. Names, the triple's type and the
+helper's identity remain provisional. Writing `/ 180.0f * 60.0f` without the
+inner parentheses lets VC6 fold the two constants into one multiply, which
+retail does not do.
 
 Slot 69 calls virtual slot 57 with a hidden stack return buffer for a 12-byte
 aggregate, copies three dwords into +0x2a8/+0x2ac/+0x2b0, then passes the cache
@@ -42,6 +55,7 @@ retail addresses when each label is placed at its function offset.
 
 | Offset | Observed role |
 |---|---|
+| +0x170, +0x178 | Floats compared with the +0x2b4 triple in slot 68 |
 | +0x220, +0x22c, +0x234 | Preset parameters |
 | +0x244, +0x248 | Current/saved state candidates |
 | +0x24c | Saved copy of +0x258 |
@@ -49,6 +63,7 @@ retail addresses when each label is placed at its function offset.
 | +0x268 | Low input byte stored as a dword |
 | +0x26c | Reset on enabling temporary state |
 | +0x2a8 | 12-byte cached aggregate |
+| +0x2b4 | 12-byte float triple copied by slot 68 and passed to slot 29 |
 | +0x2c4, +0x2c8, +0x2cc | Snapshot of the three preset parameters |
 | +0x2f0 | State-specific saved copy of +0x258 |
 | +0x30c, +0x310, +0x314 | Cyclic index, count, inline dword table |

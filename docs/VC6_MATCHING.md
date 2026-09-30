@@ -10,17 +10,17 @@ game remains a separate, unverified gate.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default), `vc6_o2_ml` | 39/39 | 19/19 | 16/16 |
-| `vc6_o2_ml_g6`, `vc6_o2_mt_g6` | 39/39 | 19/19 | 11/16 |
-| `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 8/16 |
+| `vc6_o2_mt` (default), `vc6_o2_ml` | 39/39 | 19/19 | 17/17 |
+| `vc6_o2_ml_g6`, `vc6_o2_mt_g6` | 39/39 | 19/19 | 11/17 |
+| `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 8/17 |
 
 Passing manual samples mask no bytes. Generated probes resolve both global-load
 addresses. Summaries prefer strict results when available.
 
 The default is `vc6_o2_mt`: `/O2` without `/G6` is the only tested family that
-matches every calibration target, and no target prefers `/G6`. The five `/G6`
-misses (Release, UIControl 61/62, FollowCamera 69/72) differ only in instruction
-selection and scheduling; explicit `/G5` behaves like VC6's default. `/ML` and
+matches every calibration target, and no target prefers `/G6`. The six `/G6`
+misses (Release, UIControl 61/62, FollowCamera 68/69/72) differ only in
+instruction selection and scheduling; explicit `/G5` behaves like VC6's default. `/ML` and
 `/MT` emit identical code for every tested target; `/MT` follows the
 [runtime identity](VC6_CRT_ATLAS.md). This is the best-supported working
 hypothesis, not proof of original per-file flags; test others with `--profile`.
@@ -51,10 +51,11 @@ RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 
 ## Next targets
 
-All 16 calibration targets match the default profile, including
-[FollowCamera](FOLLOW_CAMERA.md) slots 69 (`0x00466a80`, source shape) and 71
-(`0x00466e50`, 192-byte extent including its jump table). FollowCamera slot 68
-has no candidate yet.
+All 17 calibration targets match the default profile, including
+[FollowCamera](FOLLOW_CAMERA.md) slots 68 (`0x00466d50`, x87 distance/clamp,
+every relocation resolved), 69 (`0x00466a80`, source shape) and 71
+(`0x00466e50`, 192-byte extent including its jump table). Every FollowCamera
+slot 63–72 now has an exact candidate.
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation

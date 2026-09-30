@@ -104,6 +104,15 @@ CASES = [
         'reason': 'retail VC6 zeros EAX once and fans it out to three fields; clang emits repeated immediate-zero stores',
     },
     {
+        'name': 'FollowCamera::slot68 distance-derived +0x258 parameter',
+        'bindings': 'samples/camera/FollowCamera.bindings.json',
+        'source': 'samples/camera/FollowCameraProbe.cpp',
+        'symbol': 'UnknownVirtualSlot68@FollowCamera',
+        'target_va': '0x00466d50',
+        'target_size': 241,
+        'reason': 'x87 distance/clamp path; every float constant binding is checked against the retail literal and the call resolves to 0x460b50',
+    },
+    {
         'name': 'FollowCamera::slot69 cached 12-byte aggregate',
         'source': 'samples/camera/FollowCameraProbe.cpp',
         'symbol': 'UnknownVirtualSlot69@FollowCamera',

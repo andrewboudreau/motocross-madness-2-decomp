@@ -8,6 +8,12 @@
 // Semantic field names remain unknown; preserve raw offsets until call-site
 // evidence improves them.
 struct CameraValue12 { unsigned int a; unsigned int b; unsigned int c; };
+// 12-byte value at +0x2B4 used with float arithmetic in slot 68.
+struct CameraFloat3 { float a; float b; float c; };
+
+// cdecl float(float) at 0x00460b50: returns 0 for 0, otherwise an
+// exponent-halving table approximation (square-root-like). Name provisional.
+float UnknownFunction460b50(float value);
 
 class FollowCamera {
 public:
@@ -18,7 +24,7 @@ public:
     virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19();
     virtual void v20(); virtual void v21(); virtual void v22(); virtual void v23();
     virtual void v24(); virtual void v25(); virtual void v26(); virtual void v27();
-    virtual void v28(); virtual void v29(); virtual void v30(); virtual void v31();
+    virtual void v28(); virtual void UnknownVirtualSlot29(CameraFloat3 value); virtual void v30(); virtual void v31();
     virtual void v32(); virtual void v33(); virtual void v34(); virtual void v35();
     virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39();
     virtual void v40(); virtual void v41(); virtual void v42();
@@ -35,7 +41,7 @@ public:
     virtual void UnknownVirtualSlot65();
     virtual void UnknownVirtualSlot66();
     virtual void UnknownVirtualSlot67();
-    virtual void v68();
+    virtual void UnknownVirtualSlot68();
     virtual void UnknownVirtualSlot69();
     virtual void UnknownVirtualSlot70(int value);
     virtual void UnknownVirtualSlot71(int value);
@@ -177,4 +183,24 @@ void FollowCamera::UnknownVirtualSlot72() {
 
     *reinterpret_cast<int*>(p + 0x244) = value;
     UnknownVirtualSlot71(value);
+}
+
+// Copies the +0x2B4 triple, raises its second component by 3, derives +0x258
+// from the horizontal distance between +0x170/+0x178 and that triple, clamps it
+// to [10, 70] and passes the triple by value to slot 29. The parenthesized
+// division matters: VC6 folds `/ 180.0f * 60.0f` into one multiply, while retail
+// multiplies by 1/180 and then by 60.
+void FollowCamera::UnknownVirtualSlot68() {
+    char* p = reinterpret_cast<char*>(this);
+    CameraFloat3 target = *reinterpret_cast<CameraFloat3*>(p + 0x2B4);
+    target.b += 3.0f;
+    float dx = *reinterpret_cast<float*>(p + 0x170) - target.a;
+    if (dx < 0.0f) dx = -dx;
+    float dz = *reinterpret_cast<float*>(p + 0x178) - target.c;
+    if (dz < 0.0f) dz = -dz;
+    float& param = *reinterpret_cast<float*>(p + 0x258);
+    param = ((200.0f - UnknownFunction460b50(dx * dx + dz * dz)) / 180.0f) * 60.0f + 10.0f;
+    if (param < 10.0f) param = 10.0f;
+    if (param > 70.0f) param = 70.0f;
+    UnknownVirtualSlot29(target);
 }
