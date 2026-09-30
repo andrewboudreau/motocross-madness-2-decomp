@@ -22,16 +22,26 @@ struct VehV3 : VehVec3
 
 void Vehicle::UnknownVirtualSlot34()
 {
-    VehV3& a = (VehV3&)field_0x88;
-    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC540(0, &a, &field_0x94);
-    field_0x4cc = a.Cross(field_0x94);
+    VehVec3* p = &field_0x94;
+    VehVec3* q = &field_0x88;
+    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC540(0, q, p);
+    VehVec3 r;
+    r.x = (q->y * p->z) - (q->z * p->y);
+    r.y = (p->x * q->z) - (q->x * p->z);
+    r.z = (q->x * p->y) - (p->x * q->y);
+    field_0x4cc = r;
 }
 
 void Vehicle::UnknownVirtualSlot35(int a, int b)
 {
-    VehV3& v = (VehV3&)field_0x88;
-    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC050(0, &v, &field_0x94, a, b);
-    field_0x4cc = v.Cross(field_0x94);
+    VehVec3* p = &field_0x94;
+    VehVec3* q = &field_0x88;
+    ((VehicleXform*)d3d_field_0x1a0)->Method_004FC050(0, q, p, a, b);
+    VehVec3 r;
+    r.x = (q->y * p->z) - (q->z * p->y);
+    r.y = (p->x * q->z) - (q->x * p->z);
+    r.z = (q->x * p->y) - (p->x * q->y);
+    field_0x4cc = r;
 }
 
 float Vehicle::UnknownVirtualSlot45() { return 3.0f; }
@@ -88,7 +98,9 @@ float Vehicle::UnknownVirtualSlot53()
 
 VehVec3* Vehicle::UnknownVirtualSlot55(VehVec3* unused, VehVec3* out)
 {
-    *out = g_VehZeroVec3;
+    out->x = g_VehZeroVec3.x;
+    out->y = g_VehZeroVec3.y;
+    out->z = g_VehZeroVec3.z;
     *out = field_0xa0;
     return out;
 }
@@ -209,7 +221,12 @@ void Vehicle::UnknownVirtualSlot64(float arg)
 // Provisional semantics: a cross product returned through out (a x b).
 VehVec3 Vehicle::UnknownVirtualSlot76(const VehVec3* a, const VehVec3* b)
 {
-    return ((const VehV3*)a)->Cross(*b);
+    VehVec3 r;
+    const VehVec3& p = *b; const VehVec3& q = *a;
+    r.x = p.z * q.y - p.y * q.z;
+    r.y = p.x * q.z - p.z * q.x;
+    r.z = p.y * q.x - p.x * q.y;
+    return r;
 }
 
 void Vehicle::UnknownVirtualSlot90(int* a, float b)
@@ -228,16 +245,16 @@ void Vehicle::UnknownVirtualSlot90(int* a, float b)
 void Vehicle::UnknownVirtualSlot60(float a, float b, int c)
 {
     if (field_0x444 == 0) {
-        float t = -(a * b) - field_0x47c->field_0x04;
-        field_0x4bc = t;
-        float m = t < 0.0f ? -t : t;
+        field_0x4bc = -(a * b) - field_0x47c->field_0x04;
+        float m = field_0x4bc;
+        if (m < 0.0f) m = -m;
         if (m < 0.00001f) {
             field_0x4bc = 0.0f;
         } else {
             if (field_0x1e0 > 0.0001f)
-                field_0x4bc = t / ((float)c * field_0x13c + field_0x1e0);
+                field_0x4bc = field_0x4bc / ((float)c * field_0x13c + field_0x1e0);
             else
-                field_0x4bc = t / ((float)c * field_0x13c);
+                field_0x4bc = field_0x4bc / ((float)c * field_0x13c);
         }
     } else {
         field_0x4bc = 0.0f;
@@ -257,9 +274,12 @@ void Vehicle::UnknownVirtualSlot86()
     for (int i = 0; i < field_0x544; i++) {
         VehicleWheel* w = field_0x53c[i];
         if (w->field_0x260) {
-            if (w->field_0x2a8)
-                w->field_0x2a8->Method_004D31B0(field_0xbc, &w->field_0x230, field_0x4a4,
-                                                field_0x47a, 100.0f, &w->field_0x248, &w->field_0x280);
+            if (w->field_0x2a8) {
+                float sp = field_0xbc;
+                float dt = field_0x4a4;
+                w->field_0x2a8->Method_004D31B0(sp, &w->field_0x230, dt, field_0x47a, 100.0f,
+                                                &w->field_0x248, &w->field_0x280);
+            }
             w->Method_00513F90(this);
         }
     }
@@ -306,12 +326,13 @@ extern float FastInvSqrt(float v);   // retail 0x00460c00 (float in, ~1/sqrt out
 
 // Provisional: snapshot position (0x10c) and a horizontal heading vector (0x118 = field_0xa0
 // with y forced to 0), normalised with FastInvSqrt; zero vector if degenerate.
+static inline float VehLen2(const VehVec3& v) { return (v.x * v.x + v.y * v.y) + v.z * v.z; }
 void Vehicle::UnknownVirtualSlot43()
 {
     field_0x10c = field_0x0c;
     field_0x118 = field_0xa0;
     field_0x118.y = 0.0f;
-    float len2 = field_0x118.x * field_0x118.x + field_0x118.y * field_0x118.y + field_0x118.z * field_0x118.z;
+    float len2 = VehLen2(field_0x118);
     if (len2 == 0.0f) {
         field_0x118 = g_VehZeroVec3;
         return;
@@ -453,6 +474,22 @@ static inline float VehAbs(float x)
 // (arg c, or the average wheel contact normal) is projected perpendicular to the axis and
 // normalised; the angle is asin(|axis-perp-normal x right-vector-side|) signed by the
 // handedness, stored in field_0x4ac; its cosine goes to field_0x4b0 when b is set.
+static inline float VehDotI(const VehVec3* a, const VehVec3* b)
+{
+    return a->y * b->y + a->x * b->x + a->z * b->z;
+}
+static inline VehVec3 VehNormalizedD(const VehVec3& v)
+{
+    float len2 = VehDot(&v, &v);
+    if (len2 == 1.0f)
+        return v;
+    float inv = VehFastInvSqrt(len2);
+    VehVec3 r;
+    r.x = inv * v.x;
+    r.y = inv * v.y;
+    r.z = inv * v.z;
+    return r;
+}
 void Vehicle::UnknownVirtualSlot56(VehVec3* a, int b, VehVec3* c)
 {
     if (field_0x544 == 0) {
@@ -469,29 +506,29 @@ void Vehicle::UnknownVirtualSlot56(VehVec3* a, int b, VehVec3* c)
     VehVec3 proj = *VehScaleVec(&t, a, VehDot(&n, a));
     VehVec3* perp = &field_0x1b8;
     *perp = *VehSubVec(&t, &n, &proj);
-    if ((perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) || !perp) {
-        field_0x4ac = field_0x48;
-        field_0x4b0 = field_0x3c;
+    if (!(perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) && perp) {
+        *perp = *VehNormalize(&t, perp);
+        field_0x1ac = ((VehV3&)field_0x4cc).Cross(*a);
+        VehVec3 side = VehNormalizedD(field_0x1ac);
+        field_0x1ac = ((VehV3&)field_0x1b8).Cross(side);
+        float sign = -1.0f;
+        if (VehDotI(&field_0x1ac, a) < 0.0f)
+            sign = 1.0f;
+        float len2 = VehDotI(&field_0x1ac, &field_0x1ac);
+        float len = 1.0f;
+        if (len2 != 1.0f) {
+            len = (float)sqrt(len2);
+            if (!(len < 1.0f))
+                len = 1.0f;
+        }
+        double angle = asin(len * sign);
+        field_0x4ac = (float)angle;
+        if (b)
+            field_0x4b0 = (float)cos(angle);
         return;
     }
-    *perp = *VehNormalize(&t, perp);
-    field_0x1ac = ((VehV3&)field_0x4cc).Cross(*a);
-    VehVec3 side = *VehNormalize(&t, &field_0x1ac);
-    field_0x1ac = ((VehV3&)field_0x1b8).Cross(side);
-    float sign = -1.0f;
-    if (VehDot(&field_0x1ac, a) < 0.0f)
-        sign = 1.0f;
-    float len2 = VehDot(&field_0x1ac, &field_0x1ac);
-    float len = 1.0f;
-    if (len2 != 1.0f) {
-        len = (float)sqrt(len2);
-        if (!(len < 1.0f))
-            len = 1.0f;
-    }
-    double angle = asin(len * sign);
-    field_0x4ac = (float)angle;
-    if (b)
-        field_0x4b0 = (float)cos(angle);
+    field_0x4ac = field_0x48;
+    field_0x4b0 = field_0x3c;
 }
 
 // Snaps the body pose to the wheel contact state (tier 3): with one wheel only the height
@@ -499,6 +536,8 @@ void Vehicle::UnknownVirtualSlot56(VehVec3* a, int b, VehVec3* c)
 // normal (or the supplied direction a), the highest wheel sets the height, and a two-wheel
 // bike additionally re-aims the frame by the lean angle (field_0x4ac). Finally the 7-float
 // orientation block is rebuilt from the basis vectors and the previous copy is refreshed.
+static inline float VehAbsT(float x) { return x < 0.0f ? -x : x; }
+
 void Vehicle::UnknownVirtualSlot58(VehVec3* a, int b)
 {
     if (field_0x544 < 1)
@@ -522,8 +561,8 @@ void Vehicle::UnknownVirtualSlot58(VehVec3* a, int b)
             for (int i = 1; i < field_0x544; i++) {
                 VehicleWheel* w = field_0x53c[i];
                 if (w->field_0xd8.y > top->field_0xd8.y) {
-                    top = w;
                     second = top;
+                    top = w;
                 } else if (w->field_0xd8.y > second->field_0xd8.y) {
                     second = w;
                 }
@@ -543,11 +582,11 @@ void Vehicle::UnknownVirtualSlot58(VehVec3* a, int b)
             VehVec3 v2;
             t = *UnknownVirtualSlot55(&v0, &field_0x194);
             UnknownVirtualSlot56(&t, 0, &dir);
-            float lean = field_0x4ac;
             v0 = *((VehicleXform*)d3d_field_0x1a0)->Method_004FD710(&v2, &t);
-            if (VehAbs(lean) > 0.001f) {
-                if (VehAbs(v0.z) > 0.001f || VehAbs(v0.y) > 0.001f || VehAbs(v0.x) > 0.001f) {
-                    ((VehicleXform*)d3d_field_0x1a0)->Method_004FD1F0(v0, field_0x194, lean);
+            float lean = field_0x4ac;
+            if (VehAbsT(lean) > 0.001f) {
+                if (VehAbsT(v0.z) > 0.001f || VehAbsT(v0.y) > 0.001f || VehAbsT(v0.x) > 0.001f) {
+                    ((VehicleXform*)d3d_field_0x1a0)->Method_004FD1F0(field_0x194, v0, lean);
                     UnknownVirtualSlot34();
                     ((VehicleXform*)d3d_field_0x1a0)->Method_004FC9A0(0, &field_0x0c);
                 }

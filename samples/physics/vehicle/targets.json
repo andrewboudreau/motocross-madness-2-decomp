@@ -6,7 +6,7 @@
     "target_va": "0x0040c4c0",
     "target_size": 118,
     "expect": "partial",
-    "notes": "slot 34 (override); ~78.1% match: cross product loads/FPU ops correct; VC6 prologue push order and fld scheduling differ"
+    "notes": "slot 34 (override); ~78.1% match: cross product loads/FPU ops correct; VC6 prologue push order and fld scheduling differ | UPDATE: 93.6->78.9% (34) cross product fld order differs"
   },
   {
     "class": "Vehicle",
@@ -15,7 +15,7 @@
     "target_va": "0x0040c540",
     "target_size": 130,
     "expect": "partial",
-    "notes": "slot 35 (override); ~80.2% match: same cause as slot 34 (shape of Vec3 cross temp scheduling)"
+    "notes": "slot 35 (override); ~80.2% match: same cause as slot 34 (shape of Vec3 cross temp scheduling) | UPDATE: 93.65%: cross fld operand order differs"
   },
   {
     "class": "Vehicle",
@@ -131,8 +131,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot43@Vehicle",
     "target_va": "0x005256d0",
     "target_size": 199,
-    "expect": "partial",
-    "notes": "slot 43 (introduced); 49.1% match: semantics decoded (copy pos, heading=field_0xa0 with y=0, normalise via FastInvSqrt 0x460c00, zero if degenerate); retail keeps the length^2 sum in an x87 register dance and copies via lea/edx that the source shape does not reproduce"
+    "expect": "exact",
+    "notes": "slot 43 (introduced); 49.1% match: semantics decoded (copy pos, heading=field_0xa0 with y=0, normalise via FastInvSqrt 0x460c00, zero if degenerate); retail keeps the length^2 sum in an x87 register dance and copies via lea/edx that the source shape does not reproduce | now exact (see Vehicle.cpp)"
   },
   {
     "class": "Vehicle",
@@ -248,8 +248,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot76@Vehicle",
     "target_va": "0x00529b40",
     "target_size": 93,
-    "expect": "partial",
-    "notes": "slot 76 (introduced); 37.4% match: cross product of (a,b) via out; retail loads/multiplies in a different operand order that source multiplicand order did not change in any of 64 tried permutations (free and member form)"
+    "expect": "exact",
+    "notes": "slot 76 (introduced); 37.4% match: cross product of (a,b) via out; retail loads/multiplies in a different operand order that source multiplicand order did not change in any of 64 tried permutations (free and member form) | now exact (see Vehicle.cpp)"
   },
   {
     "class": "Vehicle",
@@ -257,8 +257,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot86@Vehicle",
     "target_va": "0x00529ba0",
     "target_size": 127,
-    "expect": "partial",
-    "notes": "slot 86 (introduced); 47.0% match: retail passes the two float args through the x87 stack (fld/fstp [esp]) while we push them as integer bit copies; callee 0x4d31b0 signature or float source expression unknown"
+    "expect": "exact",
+    "notes": "slot 86 (introduced); 47.0% match: retail passes the two float args through the x87 stack (fld/fstp [esp]) while we push them as integer bit copies; callee 0x4d31b0 signature or float source expression unknown | now exact (see Vehicle.cpp)"
   },
   {
     "class": "Vehicle",
@@ -293,8 +293,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot60@Vehicle",
     "target_va": "0x0052a530",
     "target_size": 126,
-    "expect": "partial",
-    "notes": "slot 60 (introduced); 92.1% match, same size: remaining diff is fmul/`mov eax,[ecx+0x47c]` order and fcom placed before the store of t"
+    "expect": "exact",
+    "notes": "slot 60 (introduced); 92.1% match, same size: remaining diff is fmul/`mov eax,[ecx+0x47c]` order and fcom placed before the store of t | now exact (see Vehicle.cpp)"
   },
   {
     "class": "Vehicle",
@@ -384,7 +384,7 @@
     "target_va": "0x005286a0",
     "target_size": 784,
     "expect": "partial",
-    "notes": "slot 56 (introduced); ~30% byte match: tilt-angle computation fully decoded (project reference normal perpendicular to axis via Dot/ScaleVec/SubVec/Normalize helpers, side = right x axis, angle = asin(min(1,|perp x side|)*sign), cos stored on request); diffs are local stack layout (retail temps at esp+0xc/0x18/0x24) and esi/edi register roles"
+    "notes": "slot 56 (introduced); ~30% byte match: tilt-angle computation fully decoded (project reference normal perpendicular to axis via Dot/ScaleVec/SubVec/Normalize helpers, side = right x axis, angle = asin(min(1,|perp x side|)*sign), cos stored on request); diffs are local stack layout (retail temps at esp+0xc/0x18/0x24) and esi/edi register roles | UPDATE: 32.7%, 782/784B: structure right, esi/edi/ebx/ebp role swap (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac)"
   },
   {
     "class": "Vehicle",
@@ -393,7 +393,7 @@
     "target_va": "0x005289c0",
     "target_size": 938,
     "expect": "partial",
-    "notes": "slot 58 (introduced); ~22% byte match (esi/edi role swap shifts everything): snaps pose to wheels; control flow matches instruction-for-instruction up to register naming. Retail keeps a dead 'second highest wheel' (edx) alive which flips this/lead-wheel register assignment; we drop it as dead"
+    "notes": "slot 58 (introduced); ~22% byte match (esi/edi role swap shifts everything): snaps pose to wheels; control flow matches instruction-for-instruction up to register naming. Retail keeps a dead 'second highest wheel' (edx) alive which flips this/lead-wheel register assignment; we drop it as dead | UPDATE: 99.77% (938/938B): only mov edx,edi ordering at +0xbd differs; ternary abs helper VehAbsT needed"
   },
   {
     "class": "Vehicle",
@@ -402,7 +402,7 @@
     "target_va": "0x0052b6d0",
     "target_size": 63,
     "expect": "partial",
-    "notes": "slot 55 (introduced); returns out (eax) - decoded; see match %"
+    "notes": "slot 55 (introduced); returns out (eax) - decoded; see match % | UPDATE: 42.6%: retail first copy from global uses edx dword moves with out reload"
   },
   {
     "class": "Vehicle",

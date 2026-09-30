@@ -161,7 +161,7 @@ struct VehicleAxis;                  // objects at Vehicle+0x4f8/0x4fc/0x500
 struct VehicleCamera;                // object at Vehicle+0x5ac
 class Vehicle;
 struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional)
-    void Method_004D31B0(float a, VehVec3* b, float c, int d, float e, VehVec3* f, VehVec3* g);
+    void Method_004D31B0(float a, VehVec3* b, float c, bool d, float e, VehVec3* f, VehVec3* g);
 };
 // Elements of Vehicle+0x53c (provisional: only touched offsets are named).
 struct VehicleWheel {
