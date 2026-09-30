@@ -1,9 +1,0 @@
-{
-  "candidate": "BaseObjectReleaseCandidate.cpp",
-  "candidate_symbol_contains": "Release@BaseObject",
-  "target_va": "0x00405170",
-  "target_size": 32,
-  "status": "vc6-exact-profile-dependent",
-  "validated_profiles": ["vc6_o2_ml", "vc6_o2_mt"],
-  "purpose": "32/32 bytes match VC6 SP3 /O2 without /G6, with zero relocations or ignored bytes. The default /G6 profile remains nonmatching. Semantic method/member names remain provisional; see docs/VC6_MATCHING.md."
-}

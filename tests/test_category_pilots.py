@@ -138,12 +138,12 @@ class ReviewValidationTests(unittest.TestCase):
 
 class NativeModels(unittest.TestCase):
     @unittest.skipUnless(shutil.which('clang++') or shutil.which('g++'),'native C++ compiler unavailable')
-    def test_nineteen_native_behavior_scenarios(self):
+    def test_terrain_native_behavior_scenarios(self):
         compiler=shutil.which('clang++') or shutil.which('g++')
         with tempfile.TemporaryDirectory() as temp:
             exe=Path(temp)/'pilots'
             subprocess.run([compiler,'-std=c++98','-Wall','-Wextra','-pedantic',str(ROOT/'samples/category_pilots/test_models.cpp'),'-o',str(exe)],check=True,capture_output=True,text=True,timeout=45)
             r=subprocess.run([str(exe)],check=True,capture_output=True,text=True,timeout=10)
-            self.assertIn('19 native pilot model scenarios passed',r.stdout)
+            self.assertIn('15 native pilot model scenarios passed',r.stdout)
 
 if __name__=='__main__':unittest.main()

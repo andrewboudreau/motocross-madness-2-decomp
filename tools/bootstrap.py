@@ -9,7 +9,7 @@ def main():
  ap=argparse.ArgumentParser();ap.add_argument('installer');ap.add_argument('--skip-smoke',action='store_true');a=ap.parse_args()
  root=Path(__file__).resolve().parents[1]; os.chdir(root); env={**os.environ,'PYTHONPATH':str(root)}
  run([sys.executable,'tools/extract_installer.py',a.installer],env)
- run([sys.executable,'tools/analyze.py','work/game/mcm2.exe','--out','analysis','--skeleton-root','src/krusty2'],env)
+ run([sys.executable,'tools/analyze.py','work/game/mcm2.exe','--out','analysis'],env)
  run([sys.executable,'tools/build_class_evidence.py'],env)
  run([sys.executable,'tools/analyze_msvc_artifacts.py'],env)
  run([sys.executable,'tools/find_vtable_writes.py'],env)

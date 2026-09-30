@@ -8,7 +8,6 @@ __pycache__/
 .git/
 input/
 toolchains/
-analysis/provenance/
 **/*.exe
 **/*.dll
 **/*.cab
@@ -18,6 +17,6 @@ analysis/provenance/
 **/*.zip
 **/*.7z
 **/*.rar
-analysis/allocation/
-analysis/categories/
-analysis/category_contexts/
+analysis/
+generated/
+.claude/settings.local.json

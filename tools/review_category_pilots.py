@@ -92,7 +92,7 @@ def build_review(pe, config, instructions):
             'limits':['Normal control-flow only: exceptions and callee effects are not modeled.',
                       'Branch outcomes are explored structurally, not solved symbolically.',
                       'Saved-value stack equivalence is a documented manual review, not an automatic proof.',
-                      'Terrain is a normal-path behavior model; EcoSystem has an explicitly opaque main body.',
+                      'Terrain is a normal-path model; review_ecosystem.py reviews the complete EcoSystem algorithm separately.',
                       'No new original translation-unit or full-function byte match is claimed.']}
 
 
@@ -124,8 +124,8 @@ def report(data):
             'EcoSystem slot 12 has an early return after category selection without a local restore. '
             'The latter is not by itself proof of a runtime bug or active-category state across unknown callees.','',
             '## Models','',
-            'PilotModels.h reconstructs Terrain normal cleanup and the EcoSystem scope shell. '
-            'The Terrain model excludes vptr/EH machinery. The EcoSystem iteration/math body is explicitly opaque. '
+            'PilotModels.h reconstructs Terrain normal cleanup. '
+            'The Terrain model excludes vptr/EH machinery; the EcoSystem algorithm is in samples/ecosystem/. '
             'Native tests do not execute the game.','', '## Timer helper','']
     for api in data['timer']['import_calls']:
         lines.append(f"- `{api['site_va']}` calls `{api['module']}!{api['name']}` through local IAT `{api['iat_va']}`.")

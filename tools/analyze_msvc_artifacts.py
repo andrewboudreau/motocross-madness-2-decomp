@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import json
+import os, json
 from collections import defaultdict
 from pathlib import Path
 from mcm2tool.pe import PEImage
@@ -8,7 +8,7 @@ from mcm2tool.msvc import scalar_deleting_destructor,this_adjustor_thunk
 
 
 def main():
-    pe=PEImage('work/game/mcm2.exe')
+    pe=PEImage(os.environ.get('MCM2_EXE', 'work/game/mcm2.exe'))
     vtables=json.loads(Path('analysis/vtables.json').read_text())
     refs=defaultdict(list)
     for v in vtables:

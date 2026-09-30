@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import json
+import os, json
 from collections import Counter
 from pathlib import Path
 
@@ -29,7 +29,7 @@ def main():
     vtwrites = load('analysis/vtable_write_xrefs.json') or []
     exact = [r for r in smoke if r.get('exact_after_relocation_mask')]
     easy_exact = [r for r in easy_probe if r.get('exact_after_relocation_mask')]
-    workspace_ready = Path('work/game/mcm2.exe').exists()
+    workspace_ready = Path(os.environ.get('MCM2_EXE', 'work/game/mcm2.exe')).exists()
     kinds = Counter(r['kind'] for r in easy)
 
     print('MCM2 decomp bootstrap status')

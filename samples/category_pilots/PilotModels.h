@@ -4,7 +4,6 @@
 // These are testable behavior models, NOT original declarations or byte matches.
 // View/operations boundaries keep unknown types and x86 ABI out of host tests.
 // Terrain: complete reviewed NORMAL cleanup body, excluding vptr/EH machinery.
-// EcoSystem: scope shell only; its large iteration/math body is explicitly opaque.
 
 namespace mcm2_pilots {
 
@@ -44,20 +43,6 @@ void TerrainNormalCleanup(View& self, Operations& ops) {
     if (item) { ops.destroy_401020(item); ops.tracked_delete(item); }
     ops.restore(previous);
     ops.base_cleanup(); // GameObject destructor body, AFTER category restoration.
-}
-
-template<class View, class Operations>
-int EcoSystemScopeShell(View& self, Operations& ops) {
-    if (!ops.global_enabled()) return 1;
-    int previous = ops.select_ecosystem();
-    unsigned int before = ops.sample_counter();
-    // Read at this point, not before the counter helper. Do not add RAII restore.
-    if (!self.member_034_nonzero()) return 1;
-    ops.unreconstructed_ecosystem_body();
-    unsigned int after = ops.sample_counter();
-    ops.store_elapsed(after - before); // 32-bit wraparound on the target.
-    ops.restore(previous);
-    return 1;
 }
 
 } // namespace mcm2_pilots

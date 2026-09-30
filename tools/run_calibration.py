@@ -6,8 +6,8 @@ from pathlib import Path
 CASES = [
     {
         'name': 'BaseObject::BaseObject constructor',
-        'bindings': 'samples/base_object/special_member_bindings.json',
-        'source': 'samples/base_object/BaseObjectSpecialMembers.cpp',
+        'bindings': 'src/reconstructed/BaseObject.bindings.json',
+        'source': 'src/reconstructed/BaseObject.cpp',
         'symbol': '??0BaseObject',
         'target_va': '0x00405120',
         'target_size': 16,
@@ -15,8 +15,8 @@ CASES = [
     },
     {
         'name': 'BaseObject scalar deleting destructor',
-        'bindings': 'samples/base_object/special_member_bindings.json',
-        'source': 'samples/base_object/BaseObjectSpecialMembers.cpp',
+        'bindings': 'src/reconstructed/BaseObject.bindings.json',
+        'source': 'src/reconstructed/BaseObject.cpp',
         'symbol': '??_GBaseObject',
         'target_va': '0x00405130',
         'target_size': 30,
@@ -24,8 +24,8 @@ CASES = [
     },
     {
         'name': 'BaseObject::~BaseObject destructor core',
-        'bindings': 'samples/base_object/special_member_bindings.json',
-        'source': 'samples/base_object/BaseObjectSpecialMembers.cpp',
+        'bindings': 'src/reconstructed/BaseObject.bindings.json',
+        'source': 'src/reconstructed/BaseObject.cpp',
         'symbol': '??1BaseObject',
         'target_va': '0x00405150',
         'target_size': 7,
@@ -33,7 +33,7 @@ CASES = [
     },
     {
         'name': 'BaseObject::Release',
-        'source': 'samples/base_object/BaseObjectReleaseCandidate.cpp',
+        'source': 'src/reconstructed/BaseObject.cpp',
         'symbol': 'Release@BaseObject',
         'target_va': '0x00405170',
         'target_size': 32,
