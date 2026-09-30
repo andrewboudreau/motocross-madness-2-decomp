@@ -1,0 +1,38 @@
+[
+  {
+    "class": "Math3D",
+    "source": "Math3D.cpp",
+    "candidate_symbol_contains": "?MatrixZero@@",
+    "target_va": "0x004a13e0",
+    "target_size": 41,
+    "expect": "exact",
+    "notes": "returns an all-zero Matrix4 (memset intrinsic -> rep stosd, then copy to the hidden result)"
+  },
+  {
+    "class": "Math3D",
+    "source": "Math3D.cpp",
+    "candidate_symbol_contains": "?IntegrateAdamsBashforth2@@",
+    "target_va": "0x004a1d10",
+    "target_size": 71,
+    "expect": "exact",
+    "notes": "default PhysicsBody integrator: state += (3*d - d_prev)*dt*0.5; d_prev = d"
+  },
+  {
+    "class": "Math3D",
+    "source": "Math3D.cpp",
+    "candidate_symbol_contains": "?QuatDerivative@@",
+    "target_va": "0x004a1f90",
+    "target_size": 169,
+    "expect": "exact",
+    "notes": "dq/dt = 0.5 * q (x) (0,w), Quat {w,x,y,z}"
+  },
+  {
+    "class": "Math3D",
+    "source": "Math3D.cpp",
+    "candidate_symbol_contains": "?Vec3Normalize@@",
+    "target_va": "0x005087b0",
+    "target_size": 150,
+    "expect": "exact",
+    "notes": "unit vector via FastInvSqrt (0x00460c00), early return when |v|^2 == 1.0f"
+  }
+]

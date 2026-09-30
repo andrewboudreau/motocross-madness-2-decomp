@@ -1,0 +1,335 @@
+[
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot0@SoultreePhysicsBaseObject",
+    "target_va": "0x005008d0",
+    "target_size": 54,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot1@SoultreePhysicsBaseObject",
+    "target_va": "0x00500910",
+    "target_size": 399,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot2@SoultreePhysicsBaseObject",
+    "target_va": "0x00500c50",
+    "target_size": 1500,
+    "expect": "partial",
+    "notes": "16.89% under vc6_o2_ml; readable initializer (SEH new/ctor, inertia, orientation). First divergence: prologue register allocation (retail hoists xor ebx,ebx and keeps a17 in memory; ours loads a17 into edi), then the same stores shifted by one instruction."
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot3@SoultreePhysicsBaseObject",
+    "target_va": "0x00501310",
+    "target_size": 185,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot4@SoultreePhysicsBaseObject",
+    "target_va": "0x005013d0",
+    "target_size": 473,
+    "expect": "partial",
+    "notes": "69.37% under vc6_o2_ml; the two cross products get different x87 operand order than retail (permuting source order has no effect); minor fld scheduling"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot5@SoultreePhysicsBaseObject",
+    "target_va": "0x004aa150",
+    "target_size": 14,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot6@SoultreePhysicsBaseObject",
+    "target_va": "0x0040b410",
+    "target_size": 432,
+    "expect": "partial",
+    "notes": "65.10% under vc6_o2_ml; retail reads lenSq components via an esi pointer, stores lenSq with fstp then reloads it, and keeps a fst of the FastSqrt result"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot7@SoultreePhysicsBaseObject",
+    "target_va": "0x005019e0",
+    "target_size": 485,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml; uninitialized int last frees a register, contact cached in a local, VecLengthFast sums z*z+(x*x+y*y)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot8@SoultreePhysicsBaseObject",
+    "target_va": "0x00501bd0",
+    "target_size": 76,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml; chained assignment field_0x194 = field_0x1a0 = f()"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot9@SoultreePhysicsBaseObject",
+    "target_va": "0x00501ce0",
+    "target_size": 187,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml; ternary clamp of *steps, if/else on dt"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot10@SoultreePhysicsBaseObject",
+    "target_va": "0x0040b5c0",
+    "target_size": 28,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot11@SoultreePhysicsBaseObject",
+    "target_va": "0x00501da0",
+    "target_size": 105,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml; Fn_4b0df0 j is unsigned char"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot12@SoultreePhysicsBaseObject",
+    "target_va": "0x00507920",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot13@SoultreePhysicsBaseObject",
+    "target_va": "0x00501e90",
+    "target_size": 483,
+    "expect": "partial",
+    "notes": "25.05% under vc6_o2_ml; negative-branch temp layout, frame 0x4c vs 0x40; tried local temp/declaration variants without gain"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot14@SoultreePhysicsBaseObject",
+    "target_va": "0x00502080",
+    "target_size": 373,
+    "expect": "exact",
+    "notes": "Exact under vc6_o2_ml once slots 15/16 take Vec3 pointers (field_0xc0 = slot16(a2); slot15(a3, &field_0xc0))."
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot15@SoultreePhysicsBaseObject",
+    "target_va": "0x00502200",
+    "target_size": 174,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot16@SoultreePhysicsBaseObject",
+    "target_va": "0x005022b0",
+    "target_size": 127,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot17@SoultreePhysicsBaseObject",
+    "target_va": "0x00502330",
+    "target_size": 239,
+    "expect": "partial",
+    "notes": "96.41% under vc6_o2_ml; residual x87 operand order in the y term of the normalized sum"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot18@SoultreePhysicsBaseObject",
+    "target_va": "0x00502420",
+    "target_size": 193,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot19@SoultreePhysicsBaseObject",
+    "target_va": "0x00464e80",
+    "target_size": 3,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot21@SoultreePhysicsBaseObject",
+    "target_va": "0x005024f0",
+    "target_size": 1116,
+    "expect": "partial",
+    "notes": "7.86% under vc6_o2_ml (target_size = extent_with_tables 1116); attachment refresh with probe. First divergence: frame 0x4c vs 0x3c (retail shares one Vec3 temp between the probe segment end and the slot 17 return temp) and cmp-memory vs load/test of field_0x1dc."
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot22@SoultreePhysicsBaseObject",
+    "target_va": "0x0040b5e0",
+    "target_size": 24,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot23@SoultreePhysicsBaseObject",
+    "target_va": "0x004aa160",
+    "target_size": 38,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot24@SoultreePhysicsBaseObject",
+    "target_va": "0x004aa190",
+    "target_size": 3,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot26@SoultreePhysicsBaseObject",
+    "target_va": "0x00464e90",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot28@SoultreePhysicsBaseObject",
+    "target_va": "0x00502950",
+    "target_size": 120,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot29@SoultreePhysicsBaseObject",
+    "target_va": "0x005029d0",
+    "target_size": 103,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot30@SoultreePhysicsBaseObject",
+    "target_va": "0x00502f10",
+    "target_size": 76,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot31@SoultreePhysicsBaseObject",
+    "target_va": "0x00501e10",
+    "target_size": 127,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot32@SoultreePhysicsBaseObject",
+    "target_va": "0x004aa1a0",
+    "target_size": 28,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot33@SoultreePhysicsBaseObject",
+    "target_va": "0x00501c20",
+    "target_size": 186,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot34@SoultreePhysicsBaseObject",
+    "target_va": "0x004aa1c0",
+    "target_size": 25,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot35@SoultreePhysicsBaseObject",
+    "target_va": "0x004aa1e0",
+    "target_size": 37,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot36@SoultreePhysicsBaseObject",
+    "target_va": "0x004aa210",
+    "target_size": 305,
+    "expect": "partial",
+    "notes": "76.19% under vc6_o2_ml; store interleaving of constants vs field_0xa0/0xac copies still differs"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot37@SoultreePhysicsBaseObject",
+    "target_va": "0x00502a40",
+    "target_size": 272,
+    "expect": "exact",
+    "notes": "Exact under vc6_o2_ml; target_size 272 = extent_with_tables (code 256 + inline switch jump table 16)."
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot38@SoultreePhysicsBaseObject",
+    "target_va": "0x00501600",
+    "target_size": 925,
+    "expect": "partial",
+    "notes": "70.24% under vc6_o2_ml; contact response (body contact via slot 4, static contact via slot 3). First divergence: retail builds the (1,1,1) vector through per-component temps before loading a2, and loads/stores field_0x08 before field_0x24 (l10) in the 0x68 case; the static path multiplies field_0xcc*s via a by-value temp with s.x first."
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot39@SoultreePhysicsBaseObject",
+    "target_va": "0x005019a0",
+    "target_size": 63,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml (no /G6)"
+  }
+]

@@ -1,0 +1,218 @@
+[
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "??_GPhysicsBody@@",
+    "target_va": "0x004cbdc0",
+    "target_size": 32,
+    "expect": "exact",
+    "notes": "slot 0 scalar deleting destructor (compiler generated)"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "?SetNode@PhysicsBody@@",
+    "target_va": "0x004cbdf0",
+    "target_size": 17,
+    "expect": "exact",
+    "notes": "slot 28"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "?SetMass@PhysicsBody@@",
+    "target_va": "0x004cbe10",
+    "target_size": 46,
+    "expect": "exact",
+    "notes": "slot 29"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "?SetInertia@PhysicsBody@@",
+    "target_va": "0x004cbe40",
+    "target_size": 78,
+    "expect": "exact",
+    "notes": "slot 30"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "?GetLocalVelocity@PhysicsBody@@",
+    "target_va": "0x004cbe90",
+    "target_size": 58,
+    "expect": "exact",
+    "notes": "slot 42"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "?GetWorldAngularVelocity@PhysicsBody@@",
+    "target_va": "0x004cbed0",
+    "target_size": 58,
+    "expect": "exact",
+    "notes": "slot 43"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot14@PhysicsBody@@",
+    "target_va": "0x004cbf10",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "slot 14"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?SetName@PhysicsBody@@",
+    "target_va": "0x004cc060",
+    "target_size": 61,
+    "expect": "exact",
+    "notes": "slot 27"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot31@PhysicsBody@@",
+    "target_va": "0x004cc0a0",
+    "target_size": 13,
+    "expect": "exact",
+    "notes": "slot 31"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot32@PhysicsBody@@",
+    "target_va": "0x004cc0b0",
+    "target_size": 29,
+    "expect": "exact",
+    "notes": "slot 32"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?SetInitialVelocity@PhysicsBody@@",
+    "target_va": "0x004cc0d0",
+    "target_size": 29,
+    "expect": "exact",
+    "notes": "slot 33"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?SetInitialAngularVelocity@PhysicsBody@@",
+    "target_va": "0x004cc0f0",
+    "target_size": 29,
+    "expect": "exact",
+    "notes": "slot 34"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot35@PhysicsBody@@",
+    "target_va": "0x004cc110",
+    "target_size": 15,
+    "expect": "exact",
+    "notes": "slot 35"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "??_GPhysicsRigidBody@@",
+    "target_va": "0x004cc1c0",
+    "target_size": 32,
+    "expect": "exact",
+    "notes": "slot 0 scalar deleting destructor"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?AddWorldForce@PhysicsRigidBody@@",
+    "target_va": "0x004cc1f0",
+    "target_size": 51,
+    "expect": "exact",
+    "notes": "slot 37"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?AddWorldForceAtWorldPoint@PhysicsRigidBody@@",
+    "target_va": "0x004cc230",
+    "target_size": 247,
+    "expect": "exact",
+    "notes": "slot 36"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?AddWorldTorque@PhysicsRigidBody@@",
+    "target_va": "0x004cc330",
+    "target_size": 82,
+    "expect": "exact",
+    "notes": "slot 38"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?AddLocalForce@PhysicsRigidBody@@",
+    "target_va": "0x004cc390",
+    "target_size": 82,
+    "expect": "exact",
+    "notes": "slot 40"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?AddLocalForceAtLocalPoint@PhysicsRigidBody@@",
+    "target_va": "0x004cc3f0",
+    "target_size": 206,
+    "expect": "exact",
+    "notes": "slot 39"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?AddLocalTorque@PhysicsRigidBody@@",
+    "target_va": "0x004cc4c0",
+    "target_size": 51,
+    "expect": "exact",
+    "notes": "slot 41"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?ResetState@PhysicsRigidBody@@",
+    "target_va": "0x004cc500",
+    "target_size": 256,
+    "expect": "exact",
+    "notes": "slot 44"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@PhysicsRigidBody@@",
+    "target_va": "0x004cc600",
+    "target_size": 37,
+    "expect": "exact",
+    "notes": "slot 10"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot11@PhysicsRigidBody@@",
+    "target_va": "0x004cc630",
+    "target_size": 1102,
+    "expect": "partial",
+    "notes": "95.44% under vc6_o2_ml (983/1030 unmasked bytes, same 1102-byte size, same 0xbc frame). Exactly two divergent regions, both a hoisted argument-address lea into edx; all else identical. (1) Retail has lea edx,[esp+0x3c] (&position, integrate arg 1) at +0x24f, after the netTorque.y fstp and before the z-term fsubr; ours emits it at +0x267, four instructions later (FPU stream otherwise byte-identical). (2) After QuatToMatrix retail emits add esp,0x10 right after the call, then mov ecx,0x10 / mov esi,eax / lea edi,[esp+0x4c] / lea edx,[esp+0x4c] / rep movsd (copy dest and SetMatrixIn arg are the same post-cleanup address); ours defers add esp past lea edi (lea edi,[esp+0x5c], add esp,0x10, rep movsd) and emits lea edx after the rep movsd. Tried with bit-identical output (95.4369): named netTorque temp, declared-then-assigned alpha, inlined L, pointer locals for &position.x, Matrix4* / Matrix4& alias for rotation, SetMatrixIn(&(rotation = ...)), disjoint block scopes for get/set matrix. Fusing QuatToMatrix(QuatNormalize()) and named temps regress (72-79%). Suspect the original IL shares one CSE'd &rotation node for copy dest and call arg; no source form found that reproduces it. Semantics and data flow are identical. Under vc6_o2_ml_g6 it is further off because of /G6 scheduling."
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot14@PhysicsRigidBody@@",
+    "target_va": "0x004cca80",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "slot 14"
+  }
+]
