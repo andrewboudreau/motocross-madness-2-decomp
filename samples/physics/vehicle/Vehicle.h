@@ -65,7 +65,7 @@ extern VehVec3* __cdecl VehNormalize(VehVec3* out, const VehVec3* v);           
 // Same function as SoultreePhysicsCallees.h Fn_5004a0; parameter types follow slot 4.
 extern void __cdecl VehSlot4Helper(float a, const VehVec3* b, float c, VehicleXform* xf, VehVec3* p,
                                    const VehVec3* q, VehVec3* normal, VehVec3* out, VehVec3* d,
-                                   int e, int f, VehVec3* g, const VehVec3* h, VehVec3* i,
+                                   float e, int f, VehVec3* g, const VehVec3* h, VehVec3* i,
                                    VehVec3* j, int k, float* l);
 struct VehicleContact;
 // 0x0043ad80 / 0x0043aa30 / 0x0043aff0: contact-array helpers used by slot 49 (provisional).
@@ -220,7 +220,7 @@ public:
     virtual void UnknownVirtualSlot3(const VehVec3* a, const VehVec3* b, const VehVec3* c,
                                      const VehVec3* d, int e, int f, float* g); // 0x005264c0
     virtual void UnknownVirtualSlot4(const VehVec3* a0, VehVec3* a1, const VehVec3* a2,
-                                     const VehVec3* a3, float a4, int a5, int a6,
+                                     const VehVec3* a3, int a4, float a5, int a6,
                                      const VehVec3* a7, const VehVec3* a8, const VehVec3* a9,
                                      VehVec3* a10, VehVec3* a11, int a12, float* a13, float a14);
     virtual void UnknownVirtualSlot7(const VehVec3* arg);

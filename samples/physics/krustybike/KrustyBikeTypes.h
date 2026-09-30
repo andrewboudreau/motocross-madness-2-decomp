@@ -91,7 +91,6 @@ struct KbRacer {
 
 struct KbRaceHandler {
     void Fn_004DE580(void* who, float a, int b);
-    void Fn_004DE580(void* who, float a, float b);   // slot 4 forwards its float a4 unchanged (same callee)   // a: *slot 3/4 float* result
 };
 
 // Object reached through KrustyBike+0x740 (event/race context).

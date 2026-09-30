@@ -71,10 +71,11 @@ public:
                                      int a5, int a6, float* a7);
     // Slot 4 (ret 0x3c).  a2..a4/a8..a10 are dereferenced as Vec3 by this body (tier 1);
     // a1, a11, a12 receive Vec3 addresses at the Vehicle slot 38 call site (tier 2).  That
-    // caller passes the other body's field_0x24 (a float, 1/field_0x158) as a5 and the
-    // address of the local holding it as a14; KrustyBike 0x0048dc60 reads *a14 (tier 2).
+    // call (0x00526c59..0x00526cb1) pushes the event kind (its own a2) as a5 and the local
+    // holding the other body's field_0x24 (a float, 1/field_0x158) as a6, with that local's
+    // address as a14 (tier 1 push order); KrustyBike 0x0048dc60 reads *a14 (tier 2).
     virtual void UnknownVirtualSlot4(const SoultreeVec3* a1, SoultreeVec3* a2, const SoultreeVec3* a3,
-                                     const SoultreeVec3* a4, float a5, int a6, int a7,
+                                     const SoultreeVec3* a4, int a5, float a6, int a7,
                                      const SoultreeVec3* a8, const SoultreeVec3* a9,
                                      const SoultreeVec3* a10, SoultreeVec3* a11, SoultreeVec3* a12,
                                      int a13, float* a14, float a15);

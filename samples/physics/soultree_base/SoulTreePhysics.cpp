@@ -120,7 +120,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot3(const SoultreeVec3* a1, cons
 
 // slot 4 (0x005013d0)
 void SoultreePhysicsBaseObject::UnknownVirtualSlot4(const SoultreeVec3* a1, SoultreeVec3* a2, const SoultreeVec3* a3,
-                                                    const SoultreeVec3* a4, float a5, int a6, int a7,
+                                                    const SoultreeVec3* a4, int a5, float a6, int a7,
                                                     const SoultreeVec3* a8, const SoultreeVec3* a9,
                                                     const SoultreeVec3* a10, SoultreeVec3* a11,
                                                     SoultreeVec3* a12, int a13, float* a14, float a15)
@@ -618,8 +618,7 @@ static inline SoultreeVec3 Scale3(SoultreeVec3 v, const SoultreeVec3& s)
 // a static contact the lever arm r = contact - position gives torque-like field_0x1ac = r x
 // (field_0xcc * s), and slot 3 (the static solver) is run with velocity + that term.  Finally
 // a nearly resting body (small field_0xb8 and speed) is snapped to zero velocity.
-// a2's address is passed on as a float* to slots 3/4 (retail does that), and the two dwords
-// that slot 4 declares float/int are forwarded as raw dwords.
+// a2's address is passed on as a float* to slots 3/4 (retail does that).
 void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int a1, int a2, void* a3)
 {
     SoultreeVec3 s;
@@ -657,7 +656,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int a1, int a2, void* a3)
     SoultreeVec3 r = field_0x128->field_0xa0 - field_0x18;
     if (hasBody) {
         UnknownVirtualSlot4(&field_0x128->field_0xac, &field_0x64, &field_0xcc, &r,
-                            *(float*)&a2, *(int*)&l10, (int)node, otherVel, &v60, &v54, &v48,
+                            a2, l10, (int)node, otherVel, &v60, &v54, &v48,
                             (SoultreeVec3*)a3, (int)otherVel, (float*)&a2, 1.0f);
         if (other) {
             other->field_0x10a = 0;

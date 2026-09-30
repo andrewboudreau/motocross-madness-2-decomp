@@ -49,7 +49,7 @@ void Fn_500220(float a, float b, SoultreeNode* node, const SoultreeVec3* a1, con
                SoultreeVec3* v64, float* a7, int a6);
 void Fn_5004a0(float a, const SoultreeVec3* a1, float b, SoultreeNode* node, SoultreeVec3* l1,
                const SoultreeVec3* a4, SoultreeVec3* e4, SoultreeVec3* d8, SoultreeVec3* a2,
-               int a6, int a7, SoultreeVec3* l2, const SoultreeVec3* a10, SoultreeVec3* a11,
+               float a6, int a7, SoultreeVec3* l2, const SoultreeVec3* a10, SoultreeVec3* a11,
                SoultreeVec3* a12, int a13, float* a14);
 
 

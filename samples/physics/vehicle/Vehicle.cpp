@@ -916,7 +916,7 @@ static inline VehVec3 VehCrossB(const VehVec3& a, const VehVec3& b)
 // them with the frame data to helper 0x5004a0. Afterwards it caches |*a1| in field_0xbc and
 // field_0xcc = the frame transform of field_0xd8 (tier 3).
 void Vehicle::UnknownVirtualSlot4(const VehVec3* a0, VehVec3* a1, const VehVec3* a2,
-                                  const VehVec3* a3, float a4, int a5, int a6, const VehVec3* a7,
+                                  const VehVec3* a3, int a4, float a5, int a6, const VehVec3* a7,
                                   const VehVec3* a8, const VehVec3* a9, VehVec3* a10, VehVec3* a11,
                                   int a12, float* a13, float a14)
 {
@@ -1319,7 +1319,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     rel = VehOffset(((VehicleContactSet*)field_0x128)->field_0xa0, field_0x18);
     if (hasBody) {
         l14 = (b == 0x2711 || b == 0x69) ? 0 : (int)otherVel;
-        UnknownVirtualSlot4(&((VehicleContactSet*)field_0x128)->field_0xac, &field_0x64, &field_0xcc, &rel, l10, b, ctx,
+        UnknownVirtualSlot4(&((VehicleContactSet*)field_0x128)->field_0xac, &field_0x64, &field_0xcc, &rel, b, l10, ctx,
                             otherVel, (VehVec3*)c, &v48, &v3c, &v30, l14, &l10, 1.0f);
         if (other) {
             *((char*)other + 0x10a) = 0;

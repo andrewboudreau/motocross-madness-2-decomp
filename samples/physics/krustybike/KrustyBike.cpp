@@ -65,7 +65,7 @@ void KrustyBike::UnknownVirtualSlot3(const KbVec3* a0, const KbVec3* a1, const K
 }
 
 void KrustyBike::UnknownVirtualSlot4(const KbVec3* a0, KbVec3* a1, const KbVec3* a2,
-                                     const KbVec3* a3, float a4, int a5, int a6,
+                                     const KbVec3* a3, int a4, float a5, int a6,
                                      const KbVec3* a7, const KbVec3* a8, const KbVec3* a9,
                                      KbVec3* a10, KbVec3* a11, int a12, float* a13, float a14)
 {
