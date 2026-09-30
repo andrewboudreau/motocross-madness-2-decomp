@@ -7,11 +7,21 @@ from locations you configure outside Git.
 
 | Variable | Required | Meaning |
 |---|---|---|
+| `MCM2_PRIVATE_BUNDLE_URL` | preferred | URL or local path of the private bundle ZIP (`toolchains/vc6sp3/VC98` + `work/game/mcm2.exe` + `work/private-inputs/SHA256SUMS.json`) |
+| `MCM2_PRIVATE_BUNDLE_SHA256` | no | overrides the pinned bundle hash (`ce25eecd…`) |
+| `MCM2_PRIVATE_ROOT` | no | install location for the bundle, default `~/.cache/mcm2-private` |
 | `MCM2_INSTALLER_URL` | yes* | URL or local path of your `MCM2PCG.exe` |
 | `MCM2_INSTALLER_SHA256` | no | expected hash of the installer; download is rejected on mismatch |
 | `VC6_ARCHIVE_URL` | yes* | URL or local path of an archive (`.zip`, `.tar.*`, `.7z`) containing an SP3-patched `VC98` tree |
 | `VC6_ARCHIVE_SHA256` | no | expected hash of that archive |
 | `DOWNLOAD_AUTH_HEADER` | no | extra curl header for private hosting, e.g. `Authorization: Bearer …` |
+
+The bundle replaces the installer + VC6 archive pair below. It is verified
+(archive hash, every file in `SHA256SUMS.json`, target `mcm2.exe` hash),
+installed once outside the checkout, and symlinked into `toolchains/vc6sp3`
+and `work/game`, so a git worktree gets the same files by running the script
+again. With the bundle present the script also runs `make analyze` (restoring
+the two tracked summary docs it rewrites).
 
 \* Alternatively pre-place `input/MCM2PCG.exe` / `toolchains/vc6sp3/VC98`.
 
