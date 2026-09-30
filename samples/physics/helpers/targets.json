@@ -259,5 +259,50 @@
     "target_size": 225,
     "expect": "exact",
     "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeMatrix.cpp",
+    "candidate_symbol_contains": "GetMatrixIn",
+    "target_va": "0x4fca80",
+    "target_size": 494,
+    "expect": "partial",
+    "notes": "partial ~67%: structure right; retail keeps by-value copy of translation delta and schedules x-sum before out transposition. Inliner budget differs."
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeMatrix.cpp",
+    "candidate_symbol_contains": "SetAxesIn",
+    "target_va": "0x4fc050",
+    "target_size": 1171,
+    "expect": "partial",
+    "notes": "partial (~69% sim): this/frame register assignment swapped (retail this=ebp, frame=ebx) and z/y/r temp slot placement differs."
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeMatrix.cpp",
+    "candidate_symbol_contains": "SetMatrixIn",
+    "target_va": "0x4fb8c0",
+    "target_size": 1096,
+    "expect": "partial",
+    "notes": "partial (~37% sim): copy slots of *m/world reversed (0x10 vs 0x50), frame 0x9c vs 0x90, register assignment differs."
+  },
+  {
+    "class": "SoultreeNode",
+    "source": "SoultreeRotate.cpp",
+    "candidate_symbol_contains": "RotateAboutPoint",
+    "target_va": "0x4fd1f0",
+    "target_size": 334,
+    "expect": "partial",
+    "notes": "partial 84.8%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs."
+  },
+  {
+    "class": "(free)",
+    "source": "OrientationAngles.cpp",
+    "candidate_symbol_contains": "OrientationAnglesFromVectors",
+    "target_va": "0x4b5a60",
+    "target_size": 657,
+    "expect": "partial",
+    "notes": "partial 95.7%: provisional semantics; remaining diffs in fmul operand order/temp slots in the pitch/roll rotation."
   }
 ]

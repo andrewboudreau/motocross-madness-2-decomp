@@ -27,6 +27,15 @@ public:
     // child's world matrix is invalidated first.
     void RemoveChild(SoultreeNode* child);
 
+    // 0x004fceb0. thiscall, ret 0x10. Applies a rotation of 'angle' about 'axis' to the local
+    // matrix (arguments: Vec3 by value, then a float). Only its call signature is known
+    // (tier 2, from the pushes in 0x004fd1f0); the body has not been reconstructed.
+    void Rotate(Vec3 axis, float angle);
+
+    // 0x004fd1f0. thiscall, ret 0x1c. Rotates this node about the local-space point 'pivot'
+    // so that the pivot stays where it was in the parent's space. Tier 3 name.
+    void RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle);
+
     // 0x004fdae0 is FindByName (declared in SoultreeObject.h).
 };
 
