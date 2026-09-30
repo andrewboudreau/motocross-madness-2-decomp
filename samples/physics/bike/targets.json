@@ -1,362 +1,362 @@
 [
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot72@Bike",
-  "target_va": "0x00405db0",
-  "target_size": 724,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 5.12%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot73@Bike",
-  "target_va": "0x00406090",
-  "target_size": 44,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 67.50%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot7@Bike",
-  "target_va": "0x004060c0",
-  "target_size": 1678,
-  "expect": "partial",
-  "notes": "Distributes an applied force direction over the contacts: per-element inverse-distance weights (field_0x1d0 mode) or front/rear wheel split by wheel distance/contact flag. Semantics decoded; branch layout and FPU scheduling differ (inlined vec ops, spilled temporaries). [vc6_o2_ml match 8.29%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot8@Bike",
-  "target_va": "0x00406750",
-  "target_size": 231,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot76@Bike",
-  "target_va": "0x00406840",
-  "target_size": 395,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 57.79%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot16@Bike",
-  "target_va": "0x004069d0",
-  "target_size": 121,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot33@Bike",
-  "target_va": "0x00406a50",
-  "target_size": 135,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot102@Bike",
-  "target_va": "0x00407440",
-  "target_size": 485,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 14.14%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot1@Bike",
-  "target_va": "0x00407630",
-  "target_size": 205,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 15.71%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot97@Bike",
-  "target_va": "0x00409420",
-  "target_size": 1516,
-  "expect": "partial",
-  "notes": "Rider ragdoll setup: debug-new 0x53c object (Bike.cpp line 2023), loads \"rider.col\", attaches 15 named bones. Blocked on GameObject stand-in layout (hidden +4 shift for virtual-base field offsets 0x4/0x1c) and SEH/new-expression shape. [vc6_o2_ml match 5.77%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot99@Bike",
-  "target_va": "0x00409b30",
-  "target_size": 1374,
-  "expect": "partial",
-  "notes": "Crash test: classifies attitude/impact (rider transform y>1, nose-over, on side, roll >110deg, other vehicle heading) and stores crash direction 0x448 and reason 0x460. Semantics decoded; abs/fcompp compare form and jump layout differ. [vc6_o2_ml match 39.14%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot100@Bike",
-  "target_va": "0x0040a090",
-  "target_size": 232,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot67@Bike",
-  "target_va": "0x0040a180",
-  "target_size": 103,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot39@Bike",
-  "target_va": "0x0040a1f0",
-  "target_size": 306,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 44.05%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot59@Bike",
-  "target_va": "0x0040a330",
-  "target_size": 125,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 28.44%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot56@Bike",
-  "target_va": "0x0040a3b0",
-  "target_size": 71,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 50.85%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot57@Bike",
-  "target_va": "0x0040a400",
-  "target_size": 117,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 41.90%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot71@Bike",
-  "target_va": "0x0040a480",
-  "target_size": 124,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot44@Bike",
-  "target_va": "0x0040a500",
-  "target_size": 27,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot90@Bike",
-  "target_va": "0x0040ae50",
-  "target_size": 99,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot91@Bike",
-  "target_va": "0x0040aec0",
-  "target_size": 1353,
-  "expect": "partial",
-  "notes": "Per-step drive/lateral force: throttle force, velocity turned toward lean plane, force applied via xform 0x4fd1f0 with normalized dir and length, decay of 0xd8/0xdc/0xe0 by 0.9, wobble ramp on 0xe0. Semantics decoded; temp/spill layout differs. [vc6_o2_ml match 8.16%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot46@Bike",
-  "target_va": "0x0040b600",
-  "target_size": 1066,
-  "expect": "partial",
-  "notes": "Bike anchor/focus point mapped through the transform: stored anchor (0x194) when flagged, else front wheel pos or front/rear blend (0.9 threshold on wheel 0x2b8). Uses vec helpers 0x421cb0/0x421d00 and ctor 0x404e60 (not reproduced as thiscall ctor, so inline vec ops differ). [vc6_o2_ml match 4.89%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot92@Bike",
-  "target_va": "0x0040ba30",
-  "target_size": 1157,
-  "expect": "partial",
-  "notes": "Steering-torque limiter: target angle from 0x47c/0x43c*0x4b4, clamped by lean 0x628 and 0x580, residual vs slot 57, force applied via xform, then cancel-toward-zero of 0xd8/0xdc/0xe0. Semantics decoded; FPU stack/ordering differs. [vc6_o2_ml match 5.65%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot29@Bike",
-  "target_va": "0x0040bec0",
-  "target_size": 306,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot61@Bike",
-  "target_va": "0x0040c000",
-  "target_size": 1015,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 16.83%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot62@Bike",
-  "target_va": "0x0040c400",
-  "target_size": 189,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot65@Bike",
-  "target_va": "0x0040c5d0",
-  "target_size": 307,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot54@Bike",
-  "target_va": "0x0040c8b0",
-  "target_size": 354,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 23.65%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot49@Bike",
-  "target_va": "0x0040ca20",
-  "target_size": 30,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot32@Bike",
-  "target_va": "0x0040cba0",
-  "target_size": 7,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot47@Bike",
-  "target_va": "0x0040cbb0",
-  "target_size": 21,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot41@Bike",
-  "target_va": "0x0040cbd0",
-  "target_size": 486,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 65.51%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot98@Bike",
-  "target_va": "0x0040cdc0",
-  "target_size": 32,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot42@Bike",
-  "target_va": "0x0040cde0",
-  "target_size": 52,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot75@Bike",
-  "target_va": "0x0040ce20",
-  "target_size": 64,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 66.10%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot55@Bike",
-  "target_va": "0x0040ce60",
-  "target_size": 244,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 46.88%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot5@Bike",
-  "target_va": "0x0040cf60",
-  "target_size": 103,
-  "expect": "partial",
-  "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 24.14%]"
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot66@Bike",
-  "target_va": "0x0040cfd0",
-  "target_size": 29,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot53@Bike",
-  "target_va": "0x0040cff0",
-  "target_size": 63,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- },
- {
-  "class": "Bike",
-  "source": "Bike.cpp",
-  "candidate_symbol_contains": "UnknownVirtualSlot96@Bike",
-  "target_va": "0x0040d030",
-  "target_size": 52,
-  "expect": "exact",
-  "notes": "Byte-exact under vc6_o2_ml."
- }
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot72@Bike",
+    "target_va": "0x00405db0",
+    "target_size": 724,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 5.12%] [latest 4.4% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot73@Bike",
+    "target_va": "0x00406090",
+    "target_size": 44,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 67.50%]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot7@Bike",
+    "target_va": "0x004060c0",
+    "target_size": 1678,
+    "expect": "partial",
+    "notes": "Distributes an applied force direction over the contacts: per-element inverse-distance weights (field_0x1d0 mode) or front/rear wheel split by wheel distance/contact flag. Semantics decoded; branch layout and FPU scheduling differ (inlined vec ops, spilled temporaries). [vc6_o2_ml match 8.29%] [latest 8.4% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot8@Bike",
+    "target_va": "0x00406750",
+    "target_size": 231,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot76@Bike",
+    "target_va": "0x00406840",
+    "target_size": 395,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 57.79%] [latest 57.8% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot16@Bike",
+    "target_va": "0x004069d0",
+    "target_size": 121,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot33@Bike",
+    "target_va": "0x00406a50",
+    "target_size": 135,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot102@Bike",
+    "target_va": "0x00407440",
+    "target_size": 485,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 14.14%] [latest 16.4% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot1@Bike",
+    "target_va": "0x00407630",
+    "target_size": 205,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 15.71%]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot97@Bike",
+    "target_va": "0x00409420",
+    "target_size": 1516,
+    "expect": "partial",
+    "notes": "Rider ragdoll setup: debug-new 0x53c object (Bike.cpp line 2023), loads \"rider.col\", attaches 15 named bones. Blocked on GameObject stand-in layout (hidden +4 shift for virtual-base field offsets 0x4/0x1c) and SEH/new-expression shape. [vc6_o2_ml match 5.77%] [latest 5.8% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot99@Bike",
+    "target_va": "0x00409b30",
+    "target_size": 1374,
+    "expect": "partial",
+    "notes": "Crash test: classifies attitude/impact (rider transform y>1, nose-over, on side, roll >110deg, other vehicle heading) and stores crash direction 0x448 and reason 0x460. Semantics decoded; abs/fcompp compare form and jump layout differ. [vc6_o2_ml match 39.14%] [latest 39.3% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot100@Bike",
+    "target_va": "0x0040a090",
+    "target_size": 232,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot67@Bike",
+    "target_va": "0x0040a180",
+    "target_size": 103,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot39@Bike",
+    "target_va": "0x0040a1f0",
+    "target_size": 306,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 44.05%]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot59@Bike",
+    "target_va": "0x0040a330",
+    "target_size": 125,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 28.44%]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot56@Bike",
+    "target_va": "0x0040a3b0",
+    "target_size": 71,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 50.85%]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot57@Bike",
+    "target_va": "0x0040a400",
+    "target_size": 117,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 41.90%]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot71@Bike",
+    "target_va": "0x0040a480",
+    "target_size": 124,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot44@Bike",
+    "target_va": "0x0040a500",
+    "target_size": 27,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot90@Bike",
+    "target_va": "0x0040ae50",
+    "target_size": 99,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot91@Bike",
+    "target_va": "0x0040aec0",
+    "target_size": 1353,
+    "expect": "partial",
+    "notes": "Per-step drive/lateral force: throttle force, velocity turned toward lean plane, force applied via xform 0x4fd1f0 with normalized dir and length, decay of 0xd8/0xdc/0xe0 by 0.9, wobble ramp on 0xe0. Semantics decoded; temp/spill layout differs. [vc6_o2_ml match 8.16%] [latest 8.2% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot46@Bike",
+    "target_va": "0x0040b600",
+    "target_size": 1066,
+    "expect": "partial",
+    "notes": "Bike anchor/focus point mapped through the transform: stored anchor (0x194) when flagged, else front wheel pos or front/rear blend (0.9 threshold on wheel 0x2b8). Uses vec helpers 0x421cb0/0x421d00 and ctor 0x404e60 (not reproduced as thiscall ctor, so inline vec ops differ). [vc6_o2_ml match 4.89%] [latest 4.9% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot92@Bike",
+    "target_va": "0x0040ba30",
+    "target_size": 1157,
+    "expect": "partial",
+    "notes": "Steering-torque limiter: target angle from 0x47c/0x43c*0x4b4, clamped by lean 0x628 and 0x580, residual vs slot 57, force applied via xform, then cancel-toward-zero of 0xd8/0xdc/0xe0. Semantics decoded; FPU stack/ordering differs. [vc6_o2_ml match 5.65%] [latest 5.7% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot29@Bike",
+    "target_va": "0x0040bec0",
+    "target_size": 306,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot61@Bike",
+    "target_va": "0x0040c000",
+    "target_size": 1015,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 16.83%] [latest 16.8% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot62@Bike",
+    "target_va": "0x0040c400",
+    "target_size": 189,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot65@Bike",
+    "target_va": "0x0040c5d0",
+    "target_size": 307,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot54@Bike",
+    "target_va": "0x0040c8b0",
+    "target_size": 354,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 23.65%] [latest 23.4% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot49@Bike",
+    "target_va": "0x0040ca20",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot32@Bike",
+    "target_va": "0x0040cba0",
+    "target_size": 7,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot47@Bike",
+    "target_va": "0x0040cbb0",
+    "target_size": 21,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot41@Bike",
+    "target_va": "0x0040cbd0",
+    "target_size": 486,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 65.51%]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot98@Bike",
+    "target_va": "0x0040cdc0",
+    "target_size": 32,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot42@Bike",
+    "target_va": "0x0040cde0",
+    "target_size": 52,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot75@Bike",
+    "target_va": "0x0040ce20",
+    "target_size": 64,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 66.10%]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot55@Bike",
+    "target_va": "0x0040ce60",
+    "target_size": 244,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 46.88%] [latest 81.1% match under vc6_o2_ml]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot5@Bike",
+    "target_va": "0x0040cf60",
+    "target_size": 103,
+    "expect": "partial",
+    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 24.14%]"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot66@Bike",
+    "target_va": "0x0040cfd0",
+    "target_size": 29,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot53@Bike",
+    "target_va": "0x0040cff0",
+    "target_size": 63,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot96@Bike",
+    "target_va": "0x0040d030",
+    "target_size": 52,
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml."
+  }
 ]

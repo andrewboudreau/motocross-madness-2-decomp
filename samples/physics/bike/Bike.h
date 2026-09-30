@@ -23,6 +23,7 @@
 typedef Vec3 BikeVec3;   // the shared Math3D vector (same as VehVec3/SoultreeVec3)
 
 struct BikeWheel;
+struct BikeWheelQ;
 struct BikeA604;
 struct BikeA34;
 struct BikeA5C4;
@@ -70,13 +71,20 @@ struct BikeWheel {
     char pad_0x298[4];
     float w_0x29c;
     char pad_0x2a0[4];
-    int w_0x2a4;
-    char pad_0x2a8[4];
+    float w_0x2a4;
+    BikeWheelQ* w_0x2a8;
     BikeQ* w_0x2ac;
     BikeQ* w_0x2b0;
     char pad_0x2b4[4];
     float w_0x2b8;
     float w_0x2bc;
+    void Fn_00513F90(void* owner);   // 0x00513F90 (KrustyBike; purpose unknown)
+};
+
+// Query object at BikeWheel+0x2a8.
+struct BikeWheelQ {
+    // 0x004D31B0: per-frame update fed with the wheel vectors (purpose unknown).
+    void Fn_004D31B0(float a, BikeVec3* b, float c, bool d, float e, BikeVec3* f, float* g);
 };
 
 struct BikeA604 {
@@ -284,7 +292,7 @@ public:
     int field_0x658;
     float field_0x65c;
     float field_0x660;
-    int field_0x664;
+    float field_0x664;                // retail does fld/fcomp on it (KrustyBike request)
     int field_0x668;
     int field_0x66c[18];
     int field_0x6b4[18];

@@ -38,7 +38,9 @@ int Bike::UnknownVirtualSlot66()
 
 static inline float BikeDot(const BikeVec3* a, const BikeVec3* b)
 {
-    return a->y * b->y + a->x * b->x + a->z * b->z;
+    float d = a->y * b->y + a->x * b->x;
+    d += a->z * b->z;
+    return d;
 }
 
 float Bike::UnknownVirtualSlot75()
@@ -70,24 +72,19 @@ void Bike::UnknownVirtualSlot96()
     field_0x524[5] = 1.0f;
 }
 
+static inline float BikeAbsRef(const float& x)
+{
+    float r = x;
+    if (r < 0.0f)
+        r = -r;
+    return r;
+}
+
 int Bike::UnknownVirtualSlot5(int arg)
 {
-    float a = field_0x48;
-    if (a < 0.0f)
-        a = -a;
-    if (arg) {
-        if (a > 0.2618f)
-            return 1;
-        return 0;
-    }
-    if (a > 0.2618f)
-        return 1;
-    float b = field_0x4c;
-    if (b < 0.0f)
-        b = -b;
-    if (b > 1.05f)
-        return 1;
-    return 0;
+    if (arg)
+        return BikeAbsRef(field_0x48) > 0.2618f;
+    return BikeAbsRef(field_0x48) > 0.2618f || BikeAbsRef(field_0x4c) > 1.05f;
 }
 
 void Bike::UnknownVirtualSlot49(float arg)
@@ -120,13 +117,19 @@ void Bike::UnknownVirtualSlot71(int arg)
     Vehicle::UnknownVirtualSlot71(arg);
 }
 
+static inline float BikeAbs(float x)
+{
+    if (x < 0.0f)
+        x = -x;
+    return x;
+}
+
 float Bike::UnknownVirtualSlot57()
 {
     if (field_0x444 == 0 && field_0xb8 < field_0x724)
         return field_0x48;
-    float a = field_0x47c->field_0x04;
-    if (a < 0.0f)
-        a = -a;
+    float t = field_0x47c->field_0x04;
+    float a = (t < 0.0f) ? -t : t;
     float r = field_0x4ac;
     if (a < 0.5236f)
         r = r - (field_0x4ac - field_0x48) * ((0.5236f - a) * 1.9098593f);
@@ -146,13 +149,11 @@ float Bike::UnknownVirtualSlot59()
 {
     if (field_0x658 == 10)
         return field_0x47c->field_0x08;
-    float a = field_0x47c->field_0x08;
-    float r = a - BikeMath_0x00460b50(field_0xb8 / field_0x438 * (a * a));
-    if (r < 0.0f)
-        r = 0.0f;
-    if (field_0x47c->field_0x08 < r)
-        r = field_0x47c->field_0x08;
-    return r;
+    float r = field_0x47c->field_0x08 -
+              BikeMath_0x00460b50(field_0xb8 / field_0x438 * (field_0x47c->field_0x08 * field_0x47c->field_0x08));
+    r = (0.0f > r) ? 0.0f : r;
+    float m = field_0x47c->field_0x08;
+    return (m < r) ? m : r;
 }
 
 void Bike::UnknownVirtualSlot67()
@@ -172,7 +173,10 @@ void Bike::UnknownVirtualSlot67()
 
 float Bike::UnknownVirtualSlot73(const BikeVec3* a, const BikeVec3* b)
 {
-    return Vehicle::UnknownVirtualSlot73(a, b) * (a->y * b->y + a->x * b->x + a->z * b->z);
+    float r = Vehicle::UnknownVirtualSlot73(a, b);
+    float d = a->y * b->y + a->x * b->x;
+    d += a->z * b->z;
+    return r * d;
 }
 
 void Bike::UnknownVirtualSlot90(int* flag, float arg)
@@ -205,9 +209,10 @@ void Bike::UnknownVirtualSlot1(float arg)
     Vehicle::UnknownVirtualSlot1(arg);
     BikeA644* p = field_0x644;
     if (p) {
+        float v = field_0x704;
         p->m_0x0 = 0;
-        if (field_0x704 != FLT_MAX) {
-            p->m_0x4 = field_0x704;
+        if (v != FLT_MAX) {
+            p->m_0x4 = v;
             p->m_0x8 = 1.0f;
         }
         p->m_0xc = 1.0f;
@@ -289,14 +294,18 @@ int Bike::UnknownVirtualSlot100(float a, int b, float c)
 
 static inline BikeVec3 BikeNormalized(const BikeVec3& v)
 {
-    float lenSq = v.y * v.y + v.x * v.x + v.z * v.z;
+    float lenSq = v.y * v.y + v.x * v.x;
+    lenSq += v.z * v.z;
     if (lenSq == 1.0f)
         return v;
     float s = BikeMath_0x00460c00(lenSq);
     BikeVec3 r;
-    r.x = v.x * s;
-    r.y = v.y * s;
-    r.z = v.z * s;
+    r.x = v.x;
+    r.y = v.y;
+    r.z = v.z;
+    r.x *= s;
+    r.y *= s;
+    r.z *= s;
     return r;
 }
 
@@ -304,8 +313,8 @@ BikeVec3* Bike::UnknownVirtualSlot55(BikeVec3* out, BikeVec3* pos)
 {
     BikeVec3 tmp;
     *pos = *((BikeXform*)d3d_field_0x1a0)->Method_0x004fd7f0(&tmp, &field_0x5f4->w_0xcc);
-    const BikeVec3* a = &field_0x5f0->w_0xcc;
     const BikeVec3* b = &field_0x5f4->w_0xcc;
+    const BikeVec3* a = &field_0x5f0->w_0xcc;
     BikeVec3 d;
     d.x = a->x - b->x;
     d.y = a->y - b->y;
@@ -349,7 +358,11 @@ int Bike::UnknownVirtualSlot39(float arg)
             } else if (field_0x454 <= 0.0f) {
                 if (field_0x454 == 0.0f)
                     field_0x454 = -0.1f;
-                if (field_0x5f4->w_0xe4.y > 0.866 || field_0xb8 < 1.0f || field_0x454 <= -2.0f) {
+                if (field_0x5f4->w_0xe4.y > 0.866 || field_0xb8 < 1.0f) {
+                    UnknownVirtualSlot67();
+                    return 1;
+                }
+                if (field_0x454 <= -2.0f) {
                     UnknownVirtualSlot67();
                     return 1;
                 }
@@ -472,18 +485,17 @@ void Bike::UnknownVirtualSlot41()
     field_0x60 = field_0x44;
     field_0x5c = field_0x40;
     field_0x6fc = 0;
-    float s = field_0x504.x;
-    if (s <= 0.0f) {
-        if (s < -0.9f)
+    if (field_0x504.x <= 0.0f) {
+        if (field_0x504.x < -0.9f)
             field_0x520 = 2;
-        else if (s > -0.032f)
+        else if (field_0x504.x > -0.032f)
             field_0x520 = 1;
         else
             field_0x520 = 3;
     } else {
-        if (s > 0.9f)
+        if (field_0x504.x > 0.9f)
             field_0x520 = 4;
-        else if (s < 0.032f)
+        else if (field_0x504.x < 0.032f)
             field_0x520 = 1;
         else
             field_0x520 = 5;
@@ -495,21 +507,19 @@ void Bike::UnknownVirtualSlot41()
 void Bike::UnknownVirtualSlot102(float)
 {
     if (field_0x444) {
-        float t = -(field_0x47c->field_0x04 / field_0x47c->field_0x08) + 1.0f;
-        t = t * 0.25f + 0.25f;
-        if (t > 0.25f)
-            t = BIKE_MIN(t, 0.75f);
-        else
-            t = 0.25f;
+        float t = -(field_0x47c->field_0x04 / field_0x47c->field_0x08);
+        t = (t + 1.0f) * 0.25f;
+        t += 0.25f;
+        t = (t > 0.25f) ? BIKE_MIN(t, 0.75f) : 0.25f;
         field_0x65c = t;
         D3DIMSoultreeCharacter::Method_0x004a8bf0(field_0x6b4[1], t);
         return;
     }
     if (field_0x430)
         return;
+    int cnt = field_0x658;
     int step = field_0x6fc;
     int idx = field_0x650;
-    int cnt = field_0x658;
     int next;
     if (step) {
         next = idx + 1;
@@ -518,8 +528,7 @@ void Bike::UnknownVirtualSlot102(float)
     } else if (idx > 2) {
         if (!(cnt == 10 && idx == 5)) {
             float sp = field_0x588;
-            sp = BIKE_MIN(sp, 32.2f);
-            sp = (sp > -32.2f) ? sp : -32.2f;
+            sp = (sp < 32.2f) ? ((sp > -32.2f) ? sp : -32.2f) : 32.2f;
             field_0x660 = (sp * 0.0310559f + 1.0f) * 0.5f;
         }
         next = idx + 2;
@@ -753,7 +762,8 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         field_0x460 = 7;
         return 1;
     }
-    float d1 = g_BikeVec3_005778c8.y * field_0xa0.y + g_BikeVec3_005778c8.x * field_0xa0.x + g_BikeVec3_005778c8.z * field_0xa0.z;
+    float d1 = g_BikeVec3_005778c8.y * field_0xa0.y + g_BikeVec3_005778c8.x * field_0xa0.x;
+    d1 += g_BikeVec3_005778c8.z * field_0xa0.z;
     if (d1 < 0.0f)
         d1 = -d1;
     if (field_0x708 < d1) {
