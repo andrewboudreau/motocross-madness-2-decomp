@@ -6,6 +6,7 @@
 #define COLLISION_TYPES_H
 
 #include "../common/DebugAlloc.h"
+#include "../common/FastMath.h"
 
 struct CollisionVec3 {
     float x, y, z;

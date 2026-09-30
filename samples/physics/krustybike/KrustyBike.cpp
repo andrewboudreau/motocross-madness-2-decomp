@@ -17,7 +17,7 @@ static inline float KbRandUnit() { float r = rand() * (1.0f / 32768.0f); return 
 
 // Provisional: square root with an exact-one shortcut (slot 14 tail; retail returns the
 // pooled 1.0f through the FPU, which a plain member store of 1.0f does not reproduce).
-static inline float KbLength(const KbVec3& v)
+static inline float KbLength(const Vec3& v)
 {
     float d = v.x * v.x;   // accumulated term by term: a one-line sum loads in a different order
     d += v.y * v.y;
@@ -51,8 +51,8 @@ void KrustyBike::UnknownVirtualSlot1(float a)
     field_0x814 = 0;
 }
 
-void KrustyBike::UnknownVirtualSlot3(const KbVec3* a0, const KbVec3* a1, const KbVec3* a2,
-                                     const KbVec3* a3, int a4, int a5, float* a6)
+void KrustyBike::UnknownVirtualSlot3(const Vec3* a0, const Vec3* a1, const Vec3* a2,
+                                     const Vec3* a3, int a4, int a5, float* a6)
 {
     if (a4 == 1000) {
         field_0x740->handler->Fn_004DE580(this, 0, a4);
@@ -63,10 +63,10 @@ void KrustyBike::UnknownVirtualSlot3(const KbVec3* a0, const KbVec3* a1, const K
         field_0x740->handler->Fn_004DE580(this, *a6, a4);
 }
 
-void KrustyBike::UnknownVirtualSlot4(const KbVec3* a0, KbVec3* a1, const KbVec3* a2,
-                                     const KbVec3* a3, int a4, float a5, int a6,
-                                     const KbVec3* a7, const KbVec3* a8, const KbVec3* a9,
-                                     KbVec3* a10, KbVec3* a11, int a12, float* a13, float a14)
+void KrustyBike::UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
+                                     const Vec3* a3, int a4, float a5, int a6,
+                                     const Vec3* a7, const Vec3* a8, const Vec3* a9,
+                                     Vec3* a10, Vec3* a11, int a12, float* a13, float a14)
 {
     Bike::UnknownVirtualSlot4(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
     field_0x740->handler->Fn_004DE580(this, *a13, a4);
@@ -134,8 +134,8 @@ int KrustyBike::UnknownVirtualSlot25()
     return 0;
 }
 
-int KrustyBike::UnknownVirtualSlot33(const KbVec3* a0, const KbVec3* a1, const KbVec3* a2,
-                                     const KbVec3* a3, int a4, float a5)
+int KrustyBike::UnknownVirtualSlot33(const Vec3* a0, const Vec3* a1, const Vec3* a2,
+                                     const Vec3* a3, int a4, float a5)
 {
     int result = Bike::UnknownVirtualSlot33(a0, a1, a2, a3, a4, a5);
     field_0x1540 = field_0x0c;
@@ -245,7 +245,7 @@ void KrustyBike::UnknownVirtualSlot71(int a)
     Bike::UnknownVirtualSlot71(a);
 }
 
-KbVec3 KrustyBike::UnknownVirtualSlot76(const KbVec3* a, const KbVec3* b)
+Vec3 KrustyBike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
 {
     if (field_0x734)
         return g_kbZeroVec;
@@ -344,7 +344,7 @@ void KrustyBike::UnknownVirtualSlot101()
 {
     field_0x1414->field_0xc.UnknownVirtualSlot4();
     g_kbDirector->Fn_004DCF20(field_0x1414, field_0x1414->field_0x84);
-    field_0x128 = (SoultreeBody*)field_0x1418;
+    field_0x128 = (CollisionObject*)field_0x1418;
     if (g_kbGame->field_0x18 > 1 && !g_kbGame->field_0x2d84)
         ((KbObj128*)field_0x128)->field_0xc.UnknownVirtualSlot4();
     else
@@ -355,9 +355,9 @@ void KrustyBike::UnknownVirtualSlot101()
 // ---- physics ----
 
 // Slot 16: per-axis scale of v by one of two Vec3 tables (0xe4 or 0xf0), chosen by field_0x444.
-KbVec3 KrustyBike::UnknownVirtualSlot16(const KbVec3* v)
+Vec3 KrustyBike::UnknownVirtualSlot16(const Vec3* v)
 {
-    KbVec3 r;
+    Vec3 r;
     if (!field_0x444) {
         r.x = field_0xe4.x * v->x;
         r.y = field_0xe4.y * v->y;
@@ -372,10 +372,10 @@ KbVec3 KrustyBike::UnknownVirtualSlot16(const KbVec3* v)
 
 // Slot 15: transform v by the matrix at +0x3bc, scale per axis as slot 16, then hand to 0x4CB6E0
 // (which looks like a clamp/settle step on the accumulator at +0xd8).
-void KrustyBike::UnknownVirtualSlot15(const KbVec3* v, KbVec3* out)
+void KrustyBike::UnknownVirtualSlot15(const Vec3* v, Vec3* out)
 {
-    KbVec3 s;
-    KbVec3 t = ((KbXform*)d3d_field_0x1a0)->Fn_004FD710(v);
+    Vec3 s;
+    Vec3 t = ((KbXform*)d3d_field_0x1a0)->Fn_004FD710(v);
     if (!field_0x444) {
         s.x = t.x * field_0xe4.x;
         s.y = t.y * field_0xe4.y;
@@ -389,7 +389,7 @@ void KrustyBike::UnknownVirtualSlot15(const KbVec3* v, KbVec3* out)
 }
 
 // Slot 14: apply an impulse. field_0x13c behaves as an inverse mass (dv = k * impulse).
-void KrustyBike::UnknownVirtualSlot14(KbVec3* a, const KbVec3* b, const KbVec3* c)
+void KrustyBike::UnknownVirtualSlot14(Vec3* a, const Vec3* b, const Vec3* c)
 {
     if (field_0x740->field_0x18a) {
         Bike::UnknownVirtualSlot14(a, b, c);
@@ -401,7 +401,7 @@ void KrustyBike::UnknownVirtualSlot14(KbVec3* a, const KbVec3* b, const KbVec3* 
     field_0xd8 *= 0.999f;
     a->x = 0;
     a->z = 0;
-    field_0x70 = KbVec3(0.0f, field_0x24 * a->y, 0.0f);
+    field_0x70 = Vec3(0.0f, field_0x24 * a->y, 0.0f);
     field_0x64 += field_0x13c * field_0x70;
     field_0xbc = KbLength(field_0x64);
 }
@@ -413,8 +413,8 @@ void KrustyBike::UnknownVirtualSlot48()
         Bike::UnknownVirtualSlot48();
         return;
     }
-    KbVec3 v = field_0x64 * 3.0f;
-    KbVec3 d = (v - field_0x7c) * 0.5f;
+    Vec3 v = field_0x64 * 3.0f;
+    Vec3 d = (v - field_0x7c) * 0.5f;
     field_0x0c += d * field_0x13c;
     field_0x5f4->w_0x248 = g_kbZeroVec;
     field_0x5f4->w_0x280 = 0;
@@ -563,15 +563,15 @@ int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
     if (field_0x444) return field_0x444;
     if (UnknownVirtualSlot12(field_0x5a4)) {
         KbTrackB* t = ((KbTrackA*)field_0x1f0)->field_0xa4;
-        field_0x1ac = KbVec3(t->field_0x394 * field_0x1f8 * 128.0f, 20.0f,
+        field_0x1ac = Vec3(t->field_0x394 * field_0x1f8 * 128.0f, 20.0f,
                              t->field_0x398 * field_0x1f8 * 128.0f);
-        KbVec3 off = field_0x1ac - field_0x0c;
+        Vec3 off = field_0x1ac - field_0x0c;
         field_0x64 = off * 0.055f;
         field_0x64.y = 120.0f;
         field_0xb8 = field_0xbc = KbLength(field_0x64);
         float rx = rand() * (1.0f / 32768.0f);
         float ry = rand() * (1.0f / 32768.0f);
-        field_0xd8 = KbVec3(rx, ry, 0.02f);
+        field_0xd8 = Vec3(rx, ry, 0.02f);
         field_0x448 = 1;
         field_0x460 = 12;
         return 1;
@@ -601,7 +601,7 @@ int KrustyBike::UnknownVirtualSlot99(float a, float b, int c, float d)
 // (unit direction) according to the game mode (g->0x2d74: 0..5), then issues the same
 // collision query as the base class with per-mode ranges.  The two "copy the stored
 // vectors" paths fall off the end without setting a result (retail leaves eax as is).
-int KrustyBike::UnknownVirtualSlot11(int a1, KbVec3* a2, KbVec3* a3, KbVec3* a4, int* a5)
+int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5)
 {
     int flag = 0;
     if (g_kbGame->field_0x578.Fn_00524100() == 3 || g_kbGame->field_0x578.Fn_00524100() == 4)
@@ -622,39 +622,39 @@ int KrustyBike::UnknownVirtualSlot11(int a1, KbVec3* a2, KbVec3* a3, KbVec3* a4,
             *a3 = field_0x118;
             field_0x0c = field_0x10c;
         } else {
-            KbVec3 v = field_0x10c;
+            Vec3 v = field_0x10c;
             *a2 = field_0x0c;
-            *a3 = KbVec3(v.x - a2->x, -a2->y, v.z - a2->z);
+            *a3 = Vec3(v.x - a2->x, -a2->y, v.z - a2->z);
             float d = a3->x * a3->x;
             d += a3->y * a3->y;
             d += a3->z * a3->z;
             if (d == 0.0f) *a3 = g_kbZeroVec;
-            else *a3 *= BikeMath_0x00460c00(d);
-            return Kb_004B0DF0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, 0x64,
+            else *a3 *= FastInvSqrt(d);
+            return Fn_4b0df0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, 0x64,
                                0x65, hit, 3.0f, 8, 0, &field_0x10c, !field_0x109, a2, a3, a4, a5);
         }
     case 0: {
-        const KbVec3* p = field_0x109 ? &field_0x118 : &field_0x88;
-        return Kb_004B0DF0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, lim, lim,
+        const Vec3* p = field_0x109 ? &field_0x118 : &field_0x88;
+        return Fn_4b0df0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, lim, lim,
                            hit, 6.0f, 8, p, 0, !field_0x109, a2, a3, a4, a5);
     }
     case 4: {
         KbPlayer* r = (KbPlayer*)g->field_0x568;
-        const KbVec3* l = 0;
-        const KbVec3* k = 0;
+        const Vec3* l = 0;
+        const Vec3* k = 0;
         if (r->field_0xdc) l = &r->field_0xdc->field_0x0c;
         else if (r->field_0xa8 == this) { *a3 = field_0x88; k = &field_0x88; }
         else l = &r->field_0xa8->field_0x0c;
         float i = 9.0f;
         if (((KbPlayer*)g->field_0x568)->field_0xa8 != this) i = 3.0f;
-        return Kb_004B0DF0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, lim, lim,
+        return Fn_4b0df0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, lim, lim,
                            hit, i, 8, k, l, !field_0x109, a2, a3, a4, a5);
     }
     case 1:
     case 5: {
         if (field_0x109) field_0x1ac = field_0x118 + field_0x10c;
         else field_0x1ac = g->field_0x560[field_0x7b8 + 9].field_0x00;
-        return Kb_004B0DF0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, lim,
+        return Fn_4b0df0(field_0x128, field_0x1f4, &field_0x0c, field_0x1f8, flag, lim,
                            field_0x109 ? 0x64 : 0x7fffffff, field_0x109 ? 0x65 : 0x7fffffff,
                            3.0f, 8, 0, &field_0x1ac, !field_0x109, a2, a3, a4, a5);
     }

@@ -1,13 +1,13 @@
 // SoultreeRotate.cpp -- SoultreeObject (soultree.cpp) pivot rotation. Class attribution tier 2;
 // names tier 3.
-#include "SoultreeNode.h"
+#include "../common/Math3D.h"
 
 // 0x004fd1f0. Semantics (tier 3, from the arithmetic): the point 'pivot' in local space is
 // converted to the parent's space (p = pivot * local, translation included) and stored as the
 // position; the node is then rotated by (axis, angle) via 0x004fceb0; finally the position is
 // set to p - pivot * R(new local), i.e. translation + (-pivot) * rotation, so that the pivot
 // keeps its place after the rotation.
-void SoultreeNode::RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle)
+void SoultreeObject::RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle)
 {
     Vec3 p;
     p.x = pivot.y * localMatrix._21;

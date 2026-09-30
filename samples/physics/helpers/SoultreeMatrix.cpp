@@ -52,9 +52,8 @@ static inline void TransposeRotation3(Matrix4& m)
 
 static inline Vec3 TranslationOf(const Matrix4& m) { return Vec3(m._41, m._42, m._43); }
 
-// 0x00515600 (VectorOps.cpp): the out-of-line CrossProduct. Declared under another name so
-// this TU calls it instead of expanding the inline helper from Math3D.h.
-Vec3 CrossProductCall(const Vec3& a, const Vec3& b);
+// 0x00515600 is reached through CrossProductCall (Math3D.h out-of-line call views), so this
+// TU calls it instead of expanding the inline helper.
 
 // (y x z) written as retail orders it: the first vector's components are the left factors.
 static inline Vec3 CrossOfYAndZ(const Vec3& z, const Vec3& y)

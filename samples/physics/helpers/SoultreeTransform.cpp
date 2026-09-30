@@ -108,10 +108,13 @@ void SoultreeObject::SetPosition(const Vec3& p)
     InvalidateWorldMatrix();
 }
 
-// 0x004fc970. Returns the local translation.
-Vec3 SoultreeObject::GetPosition()
+// 0x004fc970. Writes the local translation to *out and returns out.
+Vec3* SoultreeObject::GetPosition(Vec3* out)
 {
-    return *(Vec3*)&localMatrix._41;
+    out->x = localMatrix._41;
+    out->y = localMatrix._42;
+    out->z = localMatrix._43;
+    return out;
 }
 
 // 0x004fc9a0. Position expressed in 'frame' space: the local translation when frame == this,

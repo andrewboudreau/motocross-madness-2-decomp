@@ -44,7 +44,7 @@ static void PlacementNormalizeInPlace(Vec3* v)
         *v *= FastInvSqrt(lenSq);
 }
 
-int Fn_4b0df0(SoultreeBody* a, SoultreeProbe* b, Vec3* c, float d, int e, int f, int g, int h,
+int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int f, int g, int h,
               float i, unsigned char j, const Vec3* k, const Vec3* l, int m, Vec3* n, Vec3* o,
               Vec3* p, int* q)
 {
@@ -80,8 +80,8 @@ int Fn_4b0df0(SoultreeBody* a, SoultreeProbe* b, Vec3* c, float d, int e, int f,
                 CollisionObject* obj = new(__FILE__, 0x172) CollisionObject(1);
                 obj->Fn_004320f0(0, 1, 1, 0);
                 obj->field_0x68 = 1;
-                ((PlacementBodyOps*)obj)->SetField_0x74(1);
-                ((PlacementBodyOps*)obj)->AddIgnoredOwner(a);
+                obj->SetField_0x74(1);
+                obj->AddIgnoredOwner(a);
 
                 // two-point vertical sweep: (0,1,0) and (0,-1,0)
                 Vec3 sweep[2];
@@ -95,22 +95,22 @@ int Fn_4b0df0(SoultreeBody* a, SoultreeProbe* b, Vec3* c, float d, int e, int f,
                 Vec3 forward = g_PlacementAxisZ;
                 Vec3 upRef = g_PlacementAxisY;
                 Vec3 side = CrossProduct(upRef, forward);
-                Vec3 t = PlacementCross(forward, side);
-                float tLenSq = PlacementDot(&t, &t);
+                Vec3 t = CrossProductCall(forward, side);
+                float tLenSq = Vec3DotCall(&t, &t);
                 Vec3 up;
                 if (tLenSq == 1.0f)
                     up = upRef;
                 else
-                    up = *SoultreeScaleVec3(&t, &upRef, FastInvSqrt(tLenSq));
+                    up = *Vec3ScaleCall(&t, &upRef, FastInvSqrt(tLenSq));
                 forward = Vec3Normalize(forward);
-                Vec3 right = PlacementCross(up, forward);
+                Vec3 right = CrossProductCall(up, forward);
 
                 Matrix4 xf;
                 xf._11 = right.x;   xf._12 = right.y;   xf._13 = right.z;   xf._14 = 0.0f;
                 xf._21 = up.x;      xf._22 = up.y;      xf._23 = up.z;      xf._24 = 0.0f;
                 xf._31 = forward.x; xf._32 = forward.y; xf._33 = forward.z; xf._34 = 0.0f;
                 xf._41 = c->x;      xf._42 = c->y;      xf._43 = c->z;      xf._44 = 1.0f;
-                ((PlacementBodyOps*)obj)->SetTransform(&xf);
+                obj->SetTransform(&xf);
                 obj->Fn_00438e70();
 
                 if (obj->field_0x58 != 0) {

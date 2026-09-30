@@ -20,10 +20,8 @@
 
 #include "../collision/CollisionObject.h"   // QuadTreeObject (canonical)
 
-// Debug allocation forms (size/ptr, __FILE__, __LINE__): 0x004a3010 / 0x004a2e60.
-void* operator new(unsigned int size, const char* file, int line);
-void operator delete(void* p, const char* file, int line);
-void* DebugRealloc(void* p, unsigned int size, const char* file, int line);   // 0x004a2ec0 (cdecl)
+// Debug allocation forms (size/ptr, __FILE__, __LINE__): ../common/DebugAlloc.h.
+#include "../common/DebugAlloc.h"
 
 // Fixed-size block pool (retail 0x00423f70 ctor(elemSize, count), 0x00423fb0 dtor,
 // 0x00423fc0 Alloc, 0x00424050 Free, 0x00424110 Reset; object size 0x28 from the

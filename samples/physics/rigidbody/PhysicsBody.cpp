@@ -11,8 +11,8 @@
 #include "PhysicsBody.h"
 
 // 0x004cbc50 (not a target; kept to emit the vtable and document the defaults).
-PhysicsBody::PhysicsBody(SoultreeObject* n)
-    : GraphicsTest(n)
+PhysicsBody::PhysicsBody(int flags)
+    : GraphicsTest(flags)
 {
     active = 1;
     initialVelocity = kVec3Zero;
@@ -72,8 +72,8 @@ Vec3 PhysicsBody::GetWorldAngularVelocity()
 }
 
 // slot 14, 0x004cbf10.
-int PhysicsBody::UnknownVirtualSlot14()
+int PhysicsBody::GameObjectVirtualSlot14()
 {
-    GraphicsTest::UnknownVirtualSlot14();
+    GraphicsTest::GameObjectVirtualSlot14();
     return 1;
 }

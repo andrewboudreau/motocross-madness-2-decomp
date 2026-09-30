@@ -1,9 +1,8 @@
 // Terrain.cpp -- reconstruction of D:\aardvark\VC\krusty2\Terrain.cpp.
 #include "Terrain.h"
 
-TerrainScopeMgr* g_pTerrainScopeMgr;
-
 Terrain::Terrain(int a)
+    : GameObject(a)
 {
     field_0x40 = 1.0f;
     field_0x3c = 0;
@@ -57,7 +56,7 @@ Terrain::Terrain(int a)
 
 Terrain::~Terrain()
 {
-    void* scope = g_pTerrainScopeMgr->Enter("Terrain");
+    int scope = g_MemTagStack->Push("Terrain");
     if (field_0xcb8) {
         for (int i = 0; i < field_0xcbc; i++)
             field_0xcb8[i]->BaseObjectVirtualSlot2();
@@ -93,19 +92,19 @@ Terrain::~Terrain()
         delete field_0xc84;
     if (field_0xc88)
         delete field_0xc88;
-    g_pTerrainScopeMgr->Leave(scope);
+    g_MemTagStack->Pop(scope);
 }
 
 TerrainQualityEntry* g_pTerrainQualityTable;
 int g_terrainQualityValue;
 
 // Slot 19 (0x00507920) and slot 22 (0x004dc4c0) are the shared "return 0" stubs.
-int Terrain::UnknownVirtualSlot19(int)
+int Terrain::GameObjectVirtualSlot19(int)
 {
     return 0;
 }
 
-int Terrain::UnknownVirtualSlot22(int, int)
+int Terrain::GameObjectVirtualSlot22(int, int)
 {
     return 0;
 }
@@ -137,7 +136,7 @@ int g_terrainToggle718;
 
 // Slot 23 (0x00508850): debug key handler.  The three TestInputEvent kinds 0x43, 2 and 3
 // each flip one toggle and return 1 (tier 3 semantics).
-int Terrain::HandleInput(int event, int)
+int Terrain::GameObjectVirtualSlot23(int event, int)
 {
     if (TestInputEvent(0x43, 0, event, 0x80)) {
         g_terrainToggle314 = 1 - g_terrainToggle314;
@@ -208,7 +207,7 @@ static inline TerrainVec3 TerrainNormalize(const TerrainVec3& v)
     float lenSq = TerrainDot(v, v);
     if (lenSq == 1.0f)
         return v;
-    return v * TerrainInvSqrt(lenSq);
+    return v * FastInvSqrt(lenSq);
 }
 
 // 0x00507c10 (tier 3 names throughout).  x/z are scaled by field_0xc30 (grid units per world

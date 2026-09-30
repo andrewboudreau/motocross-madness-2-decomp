@@ -4,6 +4,7 @@
 #define SOULTREE_PHYSICS_CONTACT_H
 
 #include "SoultreePhysicsTypes.h"
+#include "../collision/CollisionObject.h"
 
 // Element of SoultreePhysicsBaseObject::field_0x12c (count in field_0x130).
 // Has a vfptr at +0 (slot 1 is called with no arguments by slot 13).  Tier 3 names.
@@ -13,15 +14,15 @@ public:
     virtual void UnknownVirtualSlot1();
     void* field_0x04;
     char field_0x08[0x0c];
-    SoultreeVec3 field_0x14;
-    SoultreeVec3 field_0x20;
-    SoultreeVec3 field_0x2c;
-    SoultreeVec3 field_0x38;
-    SoultreeVec3 field_0x44;
+    Vec3 field_0x14;
+    Vec3 field_0x20;
+    Vec3 field_0x2c;
+    Vec3 field_0x38;
+    Vec3 field_0x44;
     char field_0x50[0x18];
-    SoultreeVec3 field_0x68;
+    Vec3 field_0x68;
     float field_0x74;
-    SoultreeVec3 field_0x78;
+    Vec3 field_0x78;
     char field_0x84[0x14];
     float field_0x98;
     char field_0x9c[4];
@@ -35,36 +36,25 @@ public:
     char field_0xbc;
 
     // 0x0043a640, thiscall, callee pops 5 args
-    void Fn_43a640(SoultreeVec3* a, SoultreeVec3* b, SoultreeVec3* c, SoultreeVec3* d, float e);
+    void Fn_43a640(Vec3* a, Vec3* b, Vec3* c, Vec3* d, float e);
 };
 
-// Object at SoultreePhysicsBaseObject::field_0x128 (0xb8 bytes, ctor 0x431e70).  Tier 3.
-class SoultreeBody {
-public:
-    char field_0x00[0x58];
-    int field_0x58;
-    SoultreeVec3* field_0x5c;
-    char field_0x60[0x40];
-    SoultreeVec3 field_0xa0;    // contact point (slot 38 subtracts the body position)
-    SoultreeVec3 field_0xac;    // contact normal (first argument of slot 3/4)
-    SoultreeBody(int a);                        // 0x00431e70 (thiscall, callee pops 4)
-    void Fn_4320f0(int a, int b, int c, int d); // slot 2: (a1, 0, 1, 1)
-    void Fn_435fb0();
-    void Fn_435fe0();
-    void Fn_438e70();
-};
+// The object at SoultreePhysicsBaseObject::field_0x128 is a CollisionObject (0xb8 bytes,
+// ctor 0x00431e70; tier 1) -- see ../collision/CollisionObject.h.  Its field_0xa0 (contact
+// point) and field_0xac (contact normal) are CollisionVec3 there, which slots 28/38 view
+// as Vec3 until the collision vector type is unified with Vec3.
 
 // Object at SoultreeAttachment::field_0x04 (slot 18: position at +0x44/+0x50).
 class SoultreeAttachedObject {
 public:
     char field_0x00[0x44];
-    SoultreeVec3 field_0x44;
-    SoultreeVec3 field_0x50;
+    Vec3 field_0x44;
+    Vec3 field_0x50;
     int pad_0x5c;     // placeholder so +0x60 below lines up
     int field_0x60;
     char field_0x64[0x10];
     int field_0x74;                          // flag word (slot 21 sets/clears bit 0x800)
-    void Fn_4b8d90(SoultreeVec3 v, int a);   // thiscall, callee pops 0x10
+    void Fn_4b8d90(Vec3 v, int a);   // thiscall, callee pops 0x10
     void Fn_4b8dd0(int a, int b, int c);     // thiscall, callee pops 0xc (slot 21: 0x40/0xff tint)
 };
 
@@ -72,7 +62,7 @@ public:
 class SoultreeAttachTarget {
 public:
     char field_0x00[0x20];
-    SoultreeVec3 field_0x20;
+    Vec3 field_0x20;
 };
 
 // 40-byte record of SoultreePhysicsBaseObject::field_0x1d4 (slot 37 builds them).
@@ -85,7 +75,7 @@ public:
     void* field_0x0c;
     SoultreeAttachTarget* field_0x10;
     void* field_0x14;
-    SoultreeVec3 field_0x18;
+    Vec3 field_0x18;
     char field_0x24;
 };
 

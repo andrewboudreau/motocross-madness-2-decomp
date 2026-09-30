@@ -18,26 +18,26 @@ public:
     virtual int GameObjectVirtualSlot10(float dt);   // 0x004977a0 (vbase vtable slot 10)
 
     virtual void UnknownVirtualSlot1(float a);
-    virtual void UnknownVirtualSlot3(const KbVec3* a0, const KbVec3* a1, const KbVec3* a2,
-                                     const KbVec3* a3, int a4, int a5, float* a6);
-    virtual void UnknownVirtualSlot4(const KbVec3* a0, KbVec3* a1, const KbVec3* a2,
-                                     const KbVec3* a3, int a4, float a5, int a6,
-                                     const KbVec3* a7, const KbVec3* a8, const KbVec3* a9,
-                                     KbVec3* a10, KbVec3* a11, int a12, float* a13, float a14);
+    virtual void UnknownVirtualSlot3(const Vec3* a0, const Vec3* a1, const Vec3* a2,
+                                     const Vec3* a3, int a4, int a5, float* a6);
+    virtual void UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
+                                     const Vec3* a3, int a4, float a5, int a6,
+                                     const Vec3* a7, const Vec3* a8, const Vec3* a9,
+                                     Vec3* a10, Vec3* a11, int a12, float* a13, float a14);
     virtual void UnknownVirtualSlot8();
-    virtual int UnknownVirtualSlot11(int a1, KbVec3* a2, KbVec3* a3, KbVec3* a4, int* a5);
+    virtual int UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5);
     virtual int UnknownVirtualSlot12(int a);
-    virtual void UnknownVirtualSlot14(KbVec3* a, const KbVec3* b, const KbVec3* c);
-    virtual void UnknownVirtualSlot15(const KbVec3* v, KbVec3* out);
-    virtual KbVec3 UnknownVirtualSlot16(const KbVec3* v);
+    virtual void UnknownVirtualSlot14(Vec3* a, const Vec3* b, const Vec3* c);
+    virtual void UnknownVirtualSlot15(const Vec3* v, Vec3* out);
+    virtual Vec3 UnknownVirtualSlot16(const Vec3* v);
     virtual int UnknownVirtualSlot22();
     virtual int UnknownVirtualSlot23();
     virtual int UnknownVirtualSlot24();
     virtual int UnknownVirtualSlot25();
     virtual void UnknownVirtualSlot27();
     virtual int UnknownVirtualSlot28(int a);
-    virtual int UnknownVirtualSlot33(const KbVec3* a0, const KbVec3* a1, const KbVec3* a2,
-                                     const KbVec3* a3, int a4, float a5);
+    virtual int UnknownVirtualSlot33(const Vec3* a0, const Vec3* a1, const Vec3* a2,
+                                     const Vec3* a3, int a4, float a5);
     virtual int UnknownVirtualSlot39(float a);
     virtual int UnknownVirtualSlot42();
     virtual void UnknownVirtualSlot44();
@@ -52,7 +52,7 @@ public:
     virtual void UnknownVirtualSlot69();
     virtual int UnknownVirtualSlot70(float a);
     virtual void UnknownVirtualSlot71(int a);
-    virtual KbVec3 UnknownVirtualSlot76(const KbVec3* a, const KbVec3* b);
+    virtual Vec3 UnknownVirtualSlot76(const Vec3* a, const Vec3* b);
     virtual int UnknownVirtualSlot80();
     virtual int UnknownVirtualSlot81();
     virtual int UnknownVirtualSlot82();
@@ -109,7 +109,7 @@ public:
     unsigned char field_0x153d; // 0x153D
     char field_0x153e; // 0x153E
     char field_0x153f; // 0x153F
-    KbVec3 field_0x1540; // 0x1540
+    Vec3 field_0x1540; // 0x1540
     char pad_0x154C[0x1];
     char field_0x154d; // 0x154D
     char field_0x154e; // 0x154E

@@ -33,7 +33,7 @@
 
 #include "../soultree_base/SoultreePhysicsBaseObject.h"
 
-class SoultreeNode;
+class SoultreeObject;
 
 class Character : public virtual GameObject {
 public:
@@ -99,7 +99,7 @@ public:
     // d3d_field_0x1a0 is the pointer that SoultreePhysicsCharacter code reads at the
     // absolute offset 0x3bc (0x21c + 0x1a0); its type is shared with
     // SoultreePhysicsBaseObject::field_0x08 in the collision area (tier 3).
-    SoultreeNode* d3d_field_0x1a0;
+    SoultreeObject* d3d_field_0x1a0;
     char d3d_field_0x1a4[0x6c];
 };
 

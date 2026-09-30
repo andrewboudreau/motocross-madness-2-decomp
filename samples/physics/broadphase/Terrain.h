@@ -14,8 +14,9 @@
 #define BROADPHASE_TERRAIN_H
 
 #include "../soultree_base/GameObject.h"
-
-void operator delete(void* p, const char* file, int line);   // 0x004a2e60
+#include "../common/FastMath.h"
+#include "../common/MemTag.h"
+#include "../common/DebugAlloc.h"
 
 // PROVISIONAL stand-in: the 0x004aae20 ctor only stores 0 in its first dword.
 class GroundFogableObject {
@@ -67,14 +68,8 @@ public:
     unsigned char field_0x29;                                   // log2 shift: grid edge = 16 << field_0x29 cells
 };
 
-// PROVISIONAL: 0x0056df04 holds a pointer to an object whose 0x004a2d00(const char*) / 0x004a2d90(x)
-// bracket the Terrain dtor body (named scope enter/leave; tier 3 semantics).
-class TerrainScopeMgr {
-public:
-    void* Enter(const char* name);                              // 0x004a2d00
-    void Leave(void* token);                                    // 0x004a2d90
-};
-extern TerrainScopeMgr* g_pTerrainScopeMgr;                     // 0x0056df04
+// 0x0056df04 / 0x004a2d00 / 0x004a2d90 bracket the Terrain dtor body: MemTagStack in
+// ../common/MemTag.h.
 
 // 16-dword block copied into +0xc44 from 0x004a1410's return value (a 4x4 matrix, tier 2:
 // 0x40 bytes).  Provisional.
@@ -136,7 +131,6 @@ inline TerrainVec3 operator*(const TerrainVec3& v, float s)
 inline TerrainVec3 operator/(const TerrainVec3& v, float s) { return v * (1.0f / s); }
 
 float TerrainDot(const TerrainVec3& a, const TerrainVec3& b);   // 0x0040ae30 (cdecl, out of line)
-float TerrainInvSqrt(float x);                                   // 0x00460c00 (table rsqrt, see Math3D.h FastInvSqrt)
 // 0x004a11e0 (cdecl): unit normal of the triangle (a, b, c) written to *out; the fifth
 // argument, when non-null, receives the plane offset (tier 3: the tail is `-dot(n, a)`).
 void TerrainTriangleNormal(const TerrainVec3* a, const TerrainVec3* b, const TerrainVec3* c,
@@ -158,12 +152,15 @@ public:
     // rescales to grid space (1 / field_0x40), clips it to the grid box, hands it to
     // field_0x44->CastSegment, and on a hit returns the world-space hit point in *out.
     int CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out, int a, int b, int c);
-    int HandleInput(int event, int unused);                     // 0x00508850 (slot 23 override, ret 8)
-    int UnknownVirtualSlot19(int a);                            // 0x00507920 returns 0 (shared stub)
-    int UnknownVirtualSlot22(int a, int b);                     // 0x004dc4c0 returns 0 (shared stub)
+    // GameObject slot overrides (vtable 0x0055825c, tier 1 addresses).
+    virtual int GameObjectVirtualSlot19(int a);                 // 0x00507920 returns 0
+    virtual int GameObjectVirtualSlot22(int a, int b);          // 0x004dc4c0 returns 0 (shared stub)
+    // Slot 23 (0x00508850, ret 8): debug key handler; tier 3 name kept in the comment only
+    // so the override has the base's name.  First argument is the input event.
+    virtual int GameObjectVirtualSlot23(int event, int unused);
     void SetField0xbec(int value);                              // 0x00507930 (ret 4)
     void SelectQuality(int index);                              // 0x00507960 (ret 4)
-    Terrain(int a);                                             // 0x00505830 (ret 4)
+    explicit Terrain(int a);                                    // 0x00505830 (ret 4), forwards a to GameObject(int)
     virtual ~Terrain();                                         // 0x005059b0 -> core 0x005079f0
 
     GroundFogableObject fogBase;                                // +0x2c (non-polymorphic base at mdisp 0x2c)

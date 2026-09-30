@@ -119,7 +119,7 @@
  {
   "class": "CollisionCharacter",
   "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@$4PPPPPPPM@A@AEXXZ",
+  "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@$4PPPPPPPM@A@AEHXZ",
   "target_va": "0x00431d90",
   "target_size": 8,
   "expect": "exact",
@@ -128,7 +128,7 @@
  {
   "class": "CollisionCharacter",
   "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@UAEXXZ",
+  "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@UAEHXZ",
   "target_va": "0x00431cf0",
   "target_size": 21,
   "expect": "exact",
@@ -158,8 +158,8 @@
   "candidate_symbol_contains": "??0CollisionCharacter@@QAE@H@Z",
   "target_va": "0x004318d0",
   "target_size": 162,
-  "expect": "partial",
-  "notes": "32.5% : D3DIMSoultreeCharacter(a) is forwarded now; remaining gap is the hidden-flag GameObject(1) vbase ctor call, which needs a GameObject(int) declaration in the canonical header"
+  "expect": "exact",
+  "notes": "CollisionCharacter(int a) : GameObject(1), D3DIMSoultreeCharacter(a): vbase ctor 0x00468ca0(1) under the hidden most-derived flag, D3DIM ctor 0x004455b0(a, 0), vptr/vtordisp writes, field_0x210 = 0."
  },
  {
   "class": "Tire",

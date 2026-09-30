@@ -13,11 +13,19 @@
 // This declaration is PROVISIONAL and deliberately minimal: it has no virtual
 // functions and represents the two vptrs and the base-class bodies as padding, so
 // that member offsets are right for the physics code. Do not derive from it.
+//
+// It is the single declaration of the node for every physics area (the former
+// stand-ins helpers/SoultreeNode.h and the SoultreeNode class of
+// soultree_base/SoultreePhysicsCallees.h are merged here).
 #ifndef MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 #define MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 
 class SoultreeObject {
 public:
+    // 0x004fb2b0, thiscall, ret 4 (tier 1). SoultreePhysicsBaseObject slot 2 passes 1.
+    // The argument's meaning is unknown.
+    explicit SoultreeObject(int a);
+
     // ---- transform helpers (all __thiscall, callee pops) --------------------
 
     // 0x004fb4f0. Recomputes worldMatrix = localMatrix * parent->worldMatrix
@@ -48,8 +56,11 @@ public:
     void SetPosition(float x, float y, float z);
     void SetPosition(const Vec3& p);
 
-    // 0x004fc970. Returns the local translation (+0xe8..+0xf0).
-    Vec3 GetPosition();
+    // 0x004fc970, thiscall, ret 4: writes the local translation (+0xe8..+0xf0) to *out
+    // and returns out in eax (tier 1). Declared with an explicit out pointer because the
+    // callers (0x00501c20, 0x005040f0) pass the destination member's address directly,
+    // which a by-value return does not reproduce under VC6 (tier 2).
+    Vec3* GetPosition(Vec3* out);
 
     // 0x004fc9a0. Position of this node expressed in 'frame' space: the local
     // translation when frame == this, else the world translation, transformed by
@@ -96,6 +107,44 @@ public:
     void SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const Vec3* axisY,
                    int orthogonalize, int keepZ);
 
+    // ---- hierarchy helpers (formerly helpers/SoultreeNode.h; names tier 3) ----
+
+    // 0x004fdab0. Sets subtreeDirty (+0x18c) on this node and on every ancestor.
+    void MarkSubtreeDirty();
+
+    // 0x004fb880. Clears worldValid on this node and everything below it: recurses along
+    // nextSibling first, then walks down firstChild while the flag was set.
+    void InvalidateSiblingChain();
+
+    // 0x004fd910. Makes 'child' the last child of this node, detaching it from its old parent.
+    void AddChild(SoultreeObject* child);
+
+    // 0x004fd960. Appends 'node' at the end of this node's sibling list (walks nextSibling).
+    void AppendSibling(SoultreeObject* node);
+
+    // 0x004fd990. Unlinks 'child' from this node's child list and clears its links. The
+    // child's world matrix is invalidated first.
+    void RemoveChild(SoultreeObject* child);
+
+    // 0x004fceb0. thiscall, ret 0x10. Applies a rotation of 'angle' about 'axis' to the local
+    // matrix (arguments: Vec3 by value, then a float). Only its call signature is known
+    // (tier 2, from the pushes in 0x004fd1f0); the body has not been reconstructed.
+    void Rotate(Vec3 axis, float angle);
+
+    // 0x004fd1f0. thiscall, ret 0x1c. Rotates this node about the local-space point 'pivot'
+    // so that the pivot stays where it was in the parent's space. Tier 3 name.
+    void RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle);
+
+    // ---- callees of SoultreePhysicsBaseObject (formerly SoultreePhysicsCallees.h) ----
+
+    // 0x004fe850. thiscall, two Vec3 out pointers (center, extents); a bounds query
+    // (tier 3 role; SoultreePhysicsBaseObject slot 2 derives the box inertia from extents).
+    void Fn_004fe850(Vec3* center, Vec3* extents);
+
+    // 0x004fbd10. thiscall, 7 floats and an int (tier 1 argument shape); the caller
+    // (SoultreePhysicsBaseObject slot 2) passes 0,0,1, 0,1,0, 0.0f, 1 (roles tier 3).
+    void Fn_004fbd10(float a, float b, float c, float d, float e, float f, float g, int h);
+
     // ---- layout (offsets tier 1 from the constructor/helpers; names tier 3) ----
     char pad_0x000[0x38];          // QuadTreeObject vptr (+0), GameObject vptr (+12)...
     char name[0x80];               // 0x038, compared by FindByName (size unknown)
@@ -112,6 +161,8 @@ public:
     int field_0x194;               // 0x194
     int field_0x198;               // 0x198, 0xf after construction
     int field_0x19c;               // 0x19c
+    int field_0x1a0;               // 0x1a0; sizeof 0x1a4 from the operator new in
+                                   // SoultreePhysicsBaseObject slot 2 (tier 1)
 };
 
 #endif

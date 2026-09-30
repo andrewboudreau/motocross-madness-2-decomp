@@ -14,11 +14,11 @@
 //   outJ         receives the impulse magnitude j.
 // j = -(1 + e) * (dispA - dispB).n / (n.S + invMassA + invMassB) with
 // S = ((I^-1 (rA x n)) x rA) + ((I^-1 (rB x n)) x rB).  Names are tier 3.
-void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, SoultreeNode* nodeA,
+void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, SoultreeObject* nodeA,
                          const Vec3* dispA, const Vec3* rA, const Vec3* invInertiaA,
-                         ContactVec3* angVelA, Vec3* velA, float invMassB, SoultreeNode* nodeB,
+                         Vec3* angVelA, Vec3* velA, float invMassB, SoultreeObject* nodeB,
                          const Vec3* dispB, const Vec3* rB, const Vec3* invInertiaB,
-                         ContactVec3* angVelB, ContactVec3* velB, float* outJ)
+                         Vec3* angVelB, Vec3* velB, float* outJ)
 {
     Vec3 rel = *dispA - *dispB;
     float closingZ = rel.z * n->z;
@@ -28,20 +28,20 @@ void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, Soult
     Vec3 angA, angB, uA;
     {
         Vec3 torque = ContactCross(*n, *rA);
-        Vec3 local = nodeA->Fn_4fd710(&torque);
+        Vec3 local = nodeA->WorldToLocalDirection(torque);
         angA.x = local.x * invInertiaA->x;
         angA.y = local.y * invInertiaA->y;
         angA.z = local.z * invInertiaA->z;
-        Vec3 world = nodeA->Fn_4fd5c0(&angA);
+        Vec3 world = nodeA->LocalToWorldDirection(angA);
         uA = CrossProduct(world, *rA);
     }
     {
         Vec3 torque = ContactCross(*n, *rB);
-        Vec3 local = nodeB->Fn_4fd710(&torque);
+        Vec3 local = nodeB->WorldToLocalDirection(torque);
         angB.x = local.x * invInertiaB->x;
         angB.y = local.y * invInertiaB->y;
         angB.z = local.z * invInertiaB->z;
-        Vec3 world = nodeB->Fn_4fd5c0(&angB);
+        Vec3 world = nodeB->LocalToWorldDirection(angB);
         Vec3 uB = CrossProduct(world, *rB);
         sumN = DotProduct(ContactVec3(uA.x + uB.x, uA.y + uB.y, uA.z + uB.z), *n);
     }
@@ -50,10 +50,10 @@ void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, Soult
     ContactVec3 J(*outJ * n->x, *outJ * n->y, *outJ * n->z);
     ContactVec3 dvA(J.x * invMassA, J.y * invMassA, J.z * invMassA);
     *velA += dvA;
-    angVelA->operator+=(ContactVec3(angA.x * *outJ, angA.y * *outJ, angA.z * *outJ));
+    ((ContactVec3*)angVelA)->operator+=(ContactVec3(angA.x * *outJ, angA.y * *outJ, angA.z * *outJ));
     if (velB) {
         ContactVec3 dvB(-J.x * invMassB, -J.y * invMassB, -J.z * invMassB);
-        *velB += dvB;
-        angVelB->operator+=(ContactVec3(angB.x * *outJ, angB.y * *outJ, angB.z * *outJ));
+        *(ContactVec3*)velB += dvB;
+        ((ContactVec3*)angVelB)->operator+=(ContactVec3(angB.x * *outJ, angB.y * *outJ, angB.z * *outJ));
     }
 }

@@ -245,11 +245,11 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "??0Terrain",
+    "candidate_symbol_contains": "??0Terrain@@",
     "target_va": "0x00505830",
     "target_size": 370,
-    "expect": "partial",
-    "notes": "Verified 100% exact when GameObject has an out-of-line `explicit GameObject(int)` ctor (0x00468ca0) - tested on a scratch copy of the headers in work/h_broadphase/tmp. The shared GameObject.h does not declare it, so the base-ctor call with its argument is missing here (8.4% match). REQUEST: add `explicit GameObject(int flag);` to soultree_base/GameObject.h and `: GameObject(a)` to Terrain::Terrain."
+    "expect": "exact",
+    "notes": "Terrain(int a) : GameObject(a): base ctor 0x00468ca0 with the forwarded argument, GroundFogableObject member ctor, field inits and the 0x004a1410 identity-matrix copy."
   },
   {
     "class": "Terrain",
@@ -272,7 +272,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot19",
+    "candidate_symbol_contains": "GameObjectVirtualSlot19@Terrain",
     "target_va": "0x00507920",
     "target_size": 5,
     "expect": "exact",
@@ -281,7 +281,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot22",
+    "candidate_symbol_contains": "GameObjectVirtualSlot22@Terrain",
     "target_va": "0x004dc4c0",
     "target_size": 5,
     "expect": "exact",
@@ -308,7 +308,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "HandleInput",
+    "candidate_symbol_contains": "GameObjectVirtualSlot23@Terrain",
     "target_va": "0x00508850",
     "target_size": 276,
     "expect": "exact",

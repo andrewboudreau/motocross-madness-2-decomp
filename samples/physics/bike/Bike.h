@@ -19,8 +19,8 @@
 #define MCM2_PHYSICS_BIKE_H
 
 #include "../vehicle/Vehicle.h"
+#include "../common/DebugAlloc.h"
 
-typedef Vec3 BikeVec3;   // the shared Math3D vector (same as VehVec3/SoultreeVec3)
 
 struct BikeWheel;
 struct BikeWheelQ;
@@ -35,17 +35,16 @@ struct BikeA640;
 struct BikeA644;
 struct BikeQ;
 struct BikeA38;
-struct BikeXform;
 
 // Objects reached through Bike fields.  Layout is only known where accessed.
 struct BikeWheel {
     char pad_0x000[204];
-    BikeVec3 w_0xcc;
+    Vec3 w_0xcc;
     char pad_0x0d8[12];
-    BikeVec3 w_0xe4;
+    Vec3 w_0xe4;
     char pad_0x0f0[12];
-    BikeVec3 w_0xfc;
-    BikeVec3 w_0x108;
+    Vec3 w_0xfc;
+    Vec3 w_0x108;
     char pad_0x114[48];
     float w_0x144;
     float w_0x148;
@@ -54,9 +53,9 @@ struct BikeWheel {
     char pad_0x154[4];
     float w_0x158;
     char pad_0x15c[212];
-    BikeVec3 w_0x230;
-    BikeVec3 w_0x23c;
-    BikeVec3 w_0x248;             // KrustyBike slot 48 (0x004964e0) zeroes it
+    Vec3 w_0x230;
+    Vec3 w_0x23c;
+    Vec3 w_0x248;             // KrustyBike slot 48 (0x004964e0) zeroes it
     char pad_0x254[12];
     int w_0x260;
     char pad_0x264[4];
@@ -83,7 +82,7 @@ struct BikeWheel {
 // Query object at BikeWheel+0x2a8.
 struct BikeWheelQ {
     // 0x004D31B0: per-frame update fed with the wheel vectors (purpose unknown).
-    void Fn_004D31B0(float a, BikeVec3* b, float c, bool d, float e, BikeVec3* f, float* g);
+    void Fn_004D31B0(float a, Vec3* b, float c, bool d, float e, Vec3* f, float* g);
 };
 
 struct BikeA604 {
@@ -96,7 +95,7 @@ struct BikeA604 {
     int a_0xac;
     char pad_0x0b0[40];
     int a_0xd8;
-    BikeVec3 a_0xdc;
+    Vec3 a_0xdc;
     char pad_0x0e8[52];
     void* a_0x11c;           // receives SoultreePhysicsBaseObject::field_0x124
     BikeA604(int a);
@@ -108,7 +107,7 @@ struct BikeA604 {
     void Method_0x00532310();
     void Method_0x005327c0();
     int Method_0x00530190(void* a, BikeA5C4* b, const char* name);
-    void Method_0x00532900(BikeVec3 offset, int bone);
+    void Method_0x00532900(Vec3 offset, int bone);
 };
 
 struct BikeA34 {
@@ -126,10 +125,10 @@ struct BikeA5C4 {
 
 struct BikeA1A0 {
     char pad_0x000[320];
-    BikeXform* d_0x140;
+    SoultreeObject* d_0x140;           // SoultreeObject::firstChild
     int Method_0x004fdae0(const char* name);
     void Method_0x004444e0();
-    void Method_0x004fb8c0(int a, float* b);
+    void Method_0x004fb8c0(int a, Matrix4* b);
 };
 
 struct BikeA128 {
@@ -141,9 +140,9 @@ struct BikeElem {
     char pad_0x000[4];
     int h_0x4;
     char pad_0x008[12];
-    BikeVec3 h_0x14;
+    Vec3 h_0x14;
     char pad_0x020[36];
-    BikeVec3 h_0x44;
+    Vec3 h_0x44;
     char pad_0x050[80];
     float h_0xa0;
     int h_0xa4;
@@ -181,27 +180,13 @@ struct BikeA38 {
     void Method_0x00435fe0();
 };
 
-struct BikeXform {
-    void Method_0x004fc050(int a, BikeVec3* b, BikeVec3* c, int d, int e);
-    void Method_0x004fc540(int a, BikeVec3* b, BikeVec3* c);
-    BikeVec3* Method_0x004fd7f0(BikeVec3* out, const BikeVec3* in);
-    BikeVec3* Method_0x004fd660(BikeVec3* out, const BikeVec3* in);
-    void Method_0x004fca80(int a, float* b);
-    BikeVec3* Method_0x004fd710(BikeVec3* out, const BikeVec3* in);
-    void Method_0x004fd1f0(BikeVec3 pos, BikeVec3 dir, float mag);
-};
+// The scene node (d3d_field_0x1a0, field_0x42c, BikeA1A0::d_0x140) is SoultreeObject
+// (../common/SoultreeObject.h).
 
-float BikeMath_0x00460b50(float x);            // cdecl, returns float in st0
-void BikeFunc_0x004b5a60(BikeVec3 a, BikeVec3 b, float* p1, float* p2, float* p3, float* p4, float* p5, float* p6, float* p7);   // cdecl
-float BikeMath_0x00460c00(float x);            // cdecl; used to scale a vector by 1/length (provisional)
 struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };
 extern BikeGlobal_0056e26c* g_Bike_0056e26c;    // pointer read at 0x0056e26c (frame delta / time step; provisional)
-extern BikeVec3 g_BikeVec3_005778a8;
-extern BikeVec3 g_BikeVec3_005778c8;
-BikeVec3* BikeVecAdd_0x00421cb0(BikeVec3* out, const BikeVec3* a, const BikeVec3* b);   // cdecl
-BikeVec3* BikeVecSub_0x00421d00(BikeVec3* out, const BikeVec3* a, const BikeVec3* b);   // cdecl
-void* operator new(unsigned int size, const char* file, int line);   // debug allocator at 0x004a3010
-void operator delete(void* p, const char* file, int line);
+extern Vec3 g_BikeVec3_005778a8;
+extern Vec3 g_BikeVec3_005778c8;
 
 class Bike : public Vehicle {
 public:
@@ -211,24 +196,24 @@ public:
     // overrides of Vehicle slots (signatures: SoultreePhysicsBaseObject.h, Vehicle.h)
     virtual void UnknownVirtualSlot1(float value);
     virtual int UnknownVirtualSlot5(int arg);
-    virtual void UnknownVirtualSlot7(const BikeVec3* dir);
+    virtual void UnknownVirtualSlot7(const Vec3* dir);
     virtual void UnknownVirtualSlot8();
-    virtual BikeVec3 UnknownVirtualSlot16(const BikeVec3* v);
+    virtual Vec3 UnknownVirtualSlot16(const Vec3* v);
     virtual void UnknownVirtualSlot29(int arg);
     virtual float UnknownVirtualSlot32();
-    virtual int UnknownVirtualSlot33(const BikeVec3* a, const BikeVec3* b, const BikeVec3* c,
-                                     const BikeVec3* d, int e, float f);
+    virtual int UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
+                                     const Vec3* d, int e, float f);
     virtual int UnknownVirtualSlot39(float dt);
     virtual void UnknownVirtualSlot41();
     virtual int UnknownVirtualSlot42();
     virtual void UnknownVirtualSlot44();
-    virtual BikeVec3* UnknownVirtualSlot46(BikeVec3* out, float t);
+    virtual Vec3* UnknownVirtualSlot46(Vec3* out, float t);
     virtual float UnknownVirtualSlot47(float arg);
     virtual void UnknownVirtualSlot49(float arg);
     virtual float UnknownVirtualSlot53();
-    virtual BikeVec3* UnknownVirtualSlot54(BikeVec3* out);
-    virtual BikeVec3* UnknownVirtualSlot55(BikeVec3* out, BikeVec3* pos);
-    virtual void UnknownVirtualSlot56(BikeVec3* a, int b, BikeVec3* c);
+    virtual Vec3* UnknownVirtualSlot54(Vec3* out);
+    virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
+    virtual void UnknownVirtualSlot56(Vec3* a, int b, Vec3* c);
     virtual float UnknownVirtualSlot57();
     virtual float UnknownVirtualSlot59();
     virtual float UnknownVirtualSlot61(float arg);
@@ -237,13 +222,13 @@ public:
     virtual int UnknownVirtualSlot66();
     virtual void UnknownVirtualSlot67();
     virtual void UnknownVirtualSlot71(int arg);
-    virtual void UnknownVirtualSlot72(BikeVec3* out, VehicleWheel* wheel);
-    virtual float UnknownVirtualSlot73(const BikeVec3* a, const BikeVec3* b);
+    virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
+    virtual float UnknownVirtualSlot73(const Vec3* a, const Vec3* b);
     virtual float UnknownVirtualSlot75();
-    virtual BikeVec3 UnknownVirtualSlot76(const BikeVec3* a, const BikeVec3* b);
+    virtual Vec3 UnknownVirtualSlot76(const Vec3* a, const Vec3* b);
     virtual void UnknownVirtualSlot90(int* flag, float arg);
     virtual void UnknownVirtualSlot91();
-    virtual void UnknownVirtualSlot92(const BikeVec3* a, const BikeVec3* b);
+    virtual void UnknownVirtualSlot92(const Vec3* a, const Vec3* b);
     virtual void UnknownVirtualSlot96();
     
     // slots introduced by Bike
@@ -257,8 +242,8 @@ public:
     float Method_0x0040a520();
 
     // Inherited members whose canonical types are still generic are viewed through
-    // casts at the use site (MIGRATION.md rule 6): d3d_field_0x1a0 and field_0x42c as
-    // BikeXform*, field_0x12c as BikeElem**, field_0x1f4 as BikeA1F4*.  Inline accessor
+    // casts at the use site (MIGRATION.md rule 6): field_0x12c as BikeElem**, field_0x1f4
+    // as BikeA1F4*.  Inline accessor
     // functions were tried and cost the exact match of slot 8 (0x00406750): VC6 then
     // loads field_0x42c before the float arguments instead of after them.
 
@@ -272,7 +257,7 @@ public:
     BikeA604* field_0x604;
     Vehicle* field_0x608;
     char pad_0x60c[16];
-    BikeVec3 field_0x61c;
+    Vec3 field_0x61c;
     float field_0x628;
     float field_0x62c;
     int field_0x630;

@@ -91,9 +91,6 @@ public:
     void UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity, float angle,
                                float radiusScale, float a5, const CollisionVec3* a6,
                                const CollisionVec3* a7, TireNode* a8);
-    // 0x00435830 (thiscall, one Matrix* argument): a CollisionObject member in retail; declared
-    // here until collision/CollisionObject.h has it (header request).
-    void Fn_00435830(const CollisionMatrix4* m);
     // 0x00515c90 (thiscall, three vector pointers and a hidden result pointer first).
     CollisionVec3* Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
                                const CollisionVec3* c);

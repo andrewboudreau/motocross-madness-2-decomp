@@ -18,78 +18,24 @@
 #define MCM2_PHYSICS_RIGIDBODY_PHYSICSBODY_H
 
 #include "../common/Math3D.h"
+#include "../soultree_base/GraphicsTest.h"
 
-// ---------------------------------------------------------------------------
-// NOTE: soultree_base/GameObject.h is the canonical GameObject.  This stand-in is kept
-// because PhysicsBody overrides slot 14 as `int` (0x004cbf10 returns a value) while the
-// canonical GameObjectVirtualSlot14 is declared `void`, and the collision/tire agents
-// override it as void; the canonical stub cannot switch without touching their areas.
-// Slot layout and field offsets (0x04..0x2f, enabled bit at +0x25) are identical.
-// Provisional GameObject / GraphicsTest stand-ins: 27 virtual slots (the
-// GraphicsTest vtable 0x00553de4 shape). Only the slots PhysicsBody overrides have
-// meaningful signatures. Arguments of slots 10/11 are 4-byte values (ret 4). The
-// rigid body forwards the slot 10 argument to its integrator as the float time
-// step, so it is declared as float dt here (tier 3).
-// ---------------------------------------------------------------------------
-class GameObject {
-public:
-    virtual ~GameObject();                              // slot 0
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8(int a);
-    virtual void UnknownVirtualSlot9(int a);
-    // 0x004693d0: when (flags 0x20 & 2), calls slot 10 on each child whose flag
-    // byte +0x25 has bit 0 set and bits 2/3 clear. Returns 1.
-    virtual int UnknownVirtualSlot10(float dt);
-    // 0x004da540: return 1.
-    virtual int UnknownVirtualSlot11(float dt);
-    virtual void UnknownVirtualSlot12();
-    virtual void UnknownVirtualSlot13();
-    // 0x00469360.
-    virtual int UnknownVirtualSlot14();
-    virtual void UnknownVirtualSlot15();
-    virtual void UnknownVirtualSlot16(int a);
-    virtual void UnknownVirtualSlot17();
-    virtual void UnknownVirtualSlot18();
-    virtual void UnknownVirtualSlot19(int a);
-    virtual void UnknownVirtualSlot20(int a);
-    virtual void UnknownVirtualSlot21(int a);
-    virtual void UnknownVirtualSlot22(int a, int b);
-    virtual void UnknownVirtualSlot23(int a, int b);
-    virtual void UnknownVirtualSlot24(int a, int b, int c, int d, int e);
-    virtual void UnknownVirtualSlot25(int a);
-    virtual void UnknownVirtualSlot26();
-
-    int field_0x04[7];                // 0x04..0x1f (+0x10 first child, +0x0c next sibling)
-    unsigned char field_0x20;         // bit 1: update children (GameObject slot 10)
-    unsigned char field_0x21[4];
-    unsigned char field_0x25;         // bit 0: object enabled (read by PhysicsBody slot 35)
-    unsigned char field_0x26[10];     // 0x26..0x2f
-};
-
-class GraphicsTest : public GameObject {
-public:
-    GraphicsTest(SoultreeObject* node);                 // 0x0047bc70
-    virtual ~GraphicsTest();                            // 0x0047bd00
-
-    int field_0x30;                   // zeroed by the GraphicsTest constructor
-    int field_0x34;                   // zeroed by the PhysicsRigidBody constructor
-};
+// GameObject and GraphicsTest are the canonical classes (../soultree_base/GraphicsTest.h).
+// GameObject slot 14 returns int there (0x00469360; PhysicsBody's 0x004cbf10 returns 1).
+// Arguments of slots 10/11 are 4-byte values (ret 4).  The rigid body forwards the slot 10
+// argument to its integrator as the float time step (tier 3).
 
 // ---------------------------------------------------------------------------
 // PhysicsBody: vtable 0x00556e0c, object size >= 0x23c.
 // ---------------------------------------------------------------------------
 class PhysicsBody : public GraphicsTest {
 public:
-    PhysicsBody(SoultreeObject* node);                  // 0x004cbc50
+    // 0x004cbc50.  The argument goes straight to GraphicsTest(int) -> GameObject(int) flags
+    // (tier 1 decoded: 0x0047bc70 pushes it to 0x00468ca0); it is not the scene node.
+    explicit PhysicsBody(int flags);
     virtual ~PhysicsBody();                             // 0x004cbde0 (scalar deleting 0x004cbdc0)
 
-    virtual int UnknownVirtualSlot14();                 // 0x004cbf10
+    virtual int GameObjectVirtualSlot14();              // 0x004cbf10
 
     // slot 27, 0x004cc060: copies at most 255 chars into name and terminates it.
     virtual void SetName(const char* s);
@@ -154,12 +100,12 @@ public:
 // ---------------------------------------------------------------------------
 class PhysicsRigidBody : public PhysicsBody {
 public:
-    PhysicsRigidBody(SoultreeObject* node);             // 0x004cc120
+    explicit PhysicsRigidBody(int flags);               // 0x004cc120, forwards flags
     virtual ~PhysicsRigidBody();                        // 0x004cc1e0 (scalar deleting 0x004cc1c0)
 
-    virtual int UnknownVirtualSlot10(float dt);         // 0x004cc600
-    virtual int UnknownVirtualSlot11(float dt);         // 0x004cc630, the integration step
-    virtual int UnknownVirtualSlot14();                 // 0x004cca80
+    virtual int GameObjectVirtualSlot10(float dt);      // 0x004cc600
+    virtual int GameObjectVirtualSlot11(float dt);      // 0x004cc630, the integration step
+    virtual int GameObjectVirtualSlot14();              // 0x004cca80
 
     virtual void AddWorldForceAtWorldPoint(Vec3 force, Vec3 point);   // 0x004cc230
     virtual void AddWorldForce(Vec3 force);                           // 0x004cc1f0

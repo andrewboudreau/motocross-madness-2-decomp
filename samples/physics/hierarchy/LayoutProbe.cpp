@@ -77,12 +77,16 @@ HIER_CHECK(kb_block, offsetof(KrustyBike, kb_block_0x734) == 0x734);
 HIER_CHECK(kb_size, sizeof(KrustyBike) == 5644 + 0x2c);
 
 // --- probe-only constructors (emit vtables, ??_G and thunks) ---------------------------
-Character::Character() {}
-D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int) {}
-SoultreePhysicsCharacter::SoultreePhysicsCharacter() : D3DIMSoultreeCharacter(0) {}
-Vehicle::Vehicle() {}
-Bike::Bike() {}
-KrustyBike::KrustyBike() {}
+// GameObject has only the explicit GameObject(int) ctor (0x00468ca0), so each most-derived
+// probe ctor names the virtual-base initializer.  D3DIMSoultreeCharacter's retail ctor
+// 0x004455b0 passes 1 (tier 1); the other arguments are probe-only.
+Character::Character() : GameObject(0) {}
+D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int) : GameObject(1) {}
+SoultreePhysicsCharacter::SoultreePhysicsCharacter()
+    : GameObject(0), SoultreePhysicsBaseObject(0), D3DIMSoultreeCharacter(0) {}
+Vehicle::Vehicle() : GameObject(0) {}
+Bike::Bike() : GameObject(0) {}
+KrustyBike::KrustyBike() : GameObject(0) {}
 
 // Secondary-base offset probe: the D3DIM subobject of a SoultreePhysicsCharacter.
 // VC6 emits `lea eax,[ecx+0x21c]` guarded by a null test; kept for disassembly review.

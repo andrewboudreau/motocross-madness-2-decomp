@@ -3,18 +3,14 @@
 #include "CollisionCharacter.h"
 #include "../soultree_base/SoultreePhysicsCallees.h"
 #include "../collision/CollisionShapeTests.h"
+#include "../common/MemTag.h"
 
 #define CC_FILE "D:\\aardvark\\VC\\krusty2\\CollisionCharacter.cpp"
 
-struct CollisionMemTag {            // global at 0x0056df04: allocation-category tracker
-    int Fn_4a2d00(const char* tag);
-    void Fn_4a2d90(int previous);
-};
-extern CollisionMemTag* g_CollisionMemTag;   // 0x0056df04
 
 typedef char cc_check_own[(offsetof(CollisionCharacter, field_0x260) == 0x260) ? 1 : -1];
 
-CollisionCharacter::CollisionCharacter(int a) : D3DIMSoultreeCharacter(a)
+CollisionCharacter::CollisionCharacter(int a) : GameObject(1), D3DIMSoultreeCharacter(a)
 {
     field_0x210 = 0;
 }
@@ -24,9 +20,9 @@ CollisionCharacter::~CollisionCharacter()
 }
 
 // Slot 14 (0x00431cf0): tail call to the base implementation (0x00469360).
-void CollisionCharacter::GameObjectVirtualSlot14()
+int CollisionCharacter::GameObjectVirtualSlot14()
 {
-    GameObject::GameObjectVirtualSlot14();
+    return GameObject::GameObjectVirtualSlot14();
 }
 
 // Slot 10 (0x00431b30, ret 4): per-frame update.  Tier 3 semantics:
@@ -40,15 +36,15 @@ int CollisionCharacter::GameObjectVirtualSlot10(float dt)
     if (field_0x210)
         field_0x210->Fn_00435fb0();
 
-    SoultreeVec3 pos;
-    field_0x214->Fn_4fc9a0(0, &pos);
-    SoultreeVec3 delta = pos - field_0x218;
+    Vec3 pos;
+    field_0x214->GetPositionIn(0, &pos);
+    Vec3 delta = pos - field_0x218;
     float invDt = 1.0f / dt;
     field_0x224 = invDt * delta;
     field_0x218 = pos;
 
     if (field_0x210 && field_0x210->Fn_00438e70()) {
-        const SoultreeVec3* rec = (const SoultreeVec3*)field_0x210->field_0x5c;
+        const Vec3* rec = (const Vec3*)field_0x210->field_0x5c;
         field_0x248 = rec[2];
         field_0x254 = rec[1];
         if (field_0x210->field_0x50 == 1) {
@@ -79,12 +75,12 @@ GameObject* CollisionCharacter::Load(int a1, const char* name, const char* colPa
                                      const SoultreeLoadDesc* desc, int a5, int a6, int a7)
 {
     D3DIMSoultreeCharacter::D3DIMVirtualSlot11(a1, name, desc, a5, a6, a7);
-    int prevTag = g_CollisionMemTag->Fn_4a2d00("Collision");
+    int prevTag = g_MemTagStack->Push("Collision");
     field_0x210 = new(CC_FILE, 27) CollisionObject(1);
     field_0x210->Fn_004320f0(a1, 1, 0, 1);
     field_0x210->field_0x68 = 1;
     // node + 0x140 is the scene node whose position slot 10 tracks (tier 3)
-    field_0x214 = *(SoultreeNode**)((char*)d3d_field_0x1a0 + 0x140);
+    field_0x214 = *(SoultreeObject**)((char*)d3d_field_0x1a0 + 0x140);
     GameObject::Method_0x00469190((GraphicsTest*)field_0x210, -1);
     if (colPath && *colPath)
         field_0x210->Fn_00432800(d3d_field_0x1a0, colPath);
@@ -92,6 +88,6 @@ GameObject* CollisionCharacter::Load(int a1, const char* name, const char* colPa
         field_0x210->Fn_004324b0(d3d_field_0x1a0, 1, 1, 0, 0);
     field_0x210->Fn_00435fe0();
     field_0x210->SetOwner(this, 0x2711);
-    g_CollisionMemTag->Fn_4a2d90(prevTag);
+    g_MemTagStack->Pop(prevTag);
     return GameObject::GameObjectVirtualSlot8(a1);
 }

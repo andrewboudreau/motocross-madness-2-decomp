@@ -87,7 +87,7 @@
     "target_va": "0x00504360",
     "target_size": 262,
     "expect": "exact",
-    "notes": "exact: node reset via 0x4fc540/0x4fc050, slot 34, Fn_4b5a60, then copies 0x88/0x94 to 0xa0/0xac and 0x2c..0x44 to 0x48..0x60"
+    "notes": "exact: node reset via 0x4fc540/0x4fc050, slot 34, OrientationAnglesFromVectors (0x4b5a60), then copies 0x88/0x94 to 0xa0/0xac and 0x2c..0x44 to 0x48..0x60"
   },
   {
     "class": "SoultreePhysicsCharacter",

@@ -28,7 +28,7 @@ public:
     CollisionCharacter(int a);                  // 0x004318d0 (ret 8: a + hidden vbase flag)
     virtual ~CollisionCharacter();              // core 0x00431980, deleting 0x00431d20
     virtual int GameObjectVirtualSlot10(float dt);   // 0x00431b30 (ret 4), thunk 0x00431d80
-    virtual void GameObjectVirtualSlot14();          // 0x00431cf0, thunk 0x00431d90
+    virtual int GameObjectVirtualSlot14();           // 0x00431cf0, thunk 0x00431d90
 
     // 0x004319c0 (ret 0x1c), non-virtual.  Not a vtable slot: it is absent from every
     // vtable, and the 0x00445680 call is a direct call.  Tier 3 name/argument roles.
@@ -36,12 +36,12 @@ public:
                      int a5, int a6, int a7);
 
     CollisionObject* field_0x210;   // allocated 0xb8 bytes (CollisionObject), created by Load
-    SoultreeNode* field_0x214;      // scene node (D3DIM::d3d_field_0x1a0 copy), tier 3
-    SoultreeVec3 field_0x218;       // last node position (updated by slot 10)
-    SoultreeVec3 field_0x224;        // velocity = (position - last position) / dt
+    SoultreeObject* field_0x214;      // scene node (D3DIM::d3d_field_0x1a0 copy), tier 3
+    Vec3 field_0x218;       // last node position (updated by slot 10)
+    Vec3 field_0x224;        // velocity = (position - last position) / dt
     char field_0x230[0x18];         // not accessed by any target in this file
-    SoultreeVec3 field_0x248;       // copy of *(Vec3*)(contact record + 0x18)
-    SoultreeVec3 field_0x254;       // copy of *(Vec3*)(contact record + 0x0c)
+    Vec3 field_0x248;       // copy of *(Vec3*)(contact record + 0x18)
+    Vec3 field_0x254;       // copy of *(Vec3*)(contact record + 0x0c)
     int field_0x260;
 };
 

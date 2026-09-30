@@ -18,7 +18,7 @@
 #define COLLISION_OBJECT_H
 
 #include "CollisionTypes.h"
-#include "../soultree_base/GameObject.h"   // canonical BaseObject, GameObject
+#include "../soultree_base/GraphicsTest.h"   // canonical BaseObject, GameObject, GraphicsTest
 
 class CollisionModelSource;   // scene-graph node source used by shape setup 0x004324b0
 struct CollisionHullBody;      // CollisionShapeTests.h
@@ -28,36 +28,9 @@ struct CollisionTreeNode;      // CollisionDebugDraw.cpp
 struct Vec3;                   // ../common/Math3D.h
 struct Matrix4;
 
-// BaseObject/GameObject are the canonical classes (MIGRATION.md).  GraphicsTest derives
-// from GameObject non-virtually (pdisp -1), so there is no vbptr/vtordisp here and
-// GameObject members are at their plain offsets from the GraphicsTest subobject.
-// Retail GraphicsTest vtable 0x00553de4 differs from GameObject's 0x00552a2c only in
-// slot 0 (dtor 0x0047bce0); slot 10 is inherited (0x004693d0), so GraphicsTest does not
-// override it (tier 1, analysis/vtables.json).
-class GraphicsTest : public GameObject {
-public:
-    GraphicsTest(int a);                        // 0x0047bc70
-    virtual ~GraphicsTest();                    // slot 0: 0x0047bce0
-    // Non-virtual GraphicsTest methods used by CollisionObject::GameObjectVirtualSlot14.
-    void Fn_0047c6c0(int a, int b, int c, int d);
-    void Fn_0047c6f0();
-    void Fn_0047c0b0(void* a, int b, int c);
-    void Fn_00469ce0(GraphicsTest* owner);   // 0x00469ce0, registers the object (thiscall, 1 arg)
-    // Debug line drawing, used by CollisionDebugDraw.cpp.  Names are tier 3.
-    //  * 0x0047c690 (ret 0xc) packs 0xff000000 | r<<16 | g<<8 | b into field_0x2c (decoded).
-    //  * 0x0047c4f0 (ret 8): a line between two world points.
-    //  * 0x0047c570 (ret 8): a small marker; it halves `size` and offsets the point by it.
-    //  * 0x0047c270 (ret 0xc): an oriented box from center, half extents and a transform
-    //    (callers pass CollisionBoxBounds-style center/half-extent pairs).
-    void SetDrawColor(int r, int g, int b);                                      // 0x0047c690
-    void DrawBox(const Vec3* center, const Vec3* halfExtents, const Matrix4* xf); // 0x0047c270
-    void DrawLine(const Vec3* a, const Vec3* b);                                 // 0x0047c4f0
-    void DrawMarker(const Vec3* p, float size);                                  // 0x0047c570
-
-    // GraphicsTest's own data: GameObject ends at 0x2c and CollisionObject's fields start
-    // at 0x50 - 12, so GraphicsTest owns 0x2c..0x44 (tier 2: extent only).
-    char field_0x2c[0x18];
-};
+// GraphicsTest (: GameObject, non-virtual) is declared once in ../soultree_base/GraphicsTest.h.
+// No vbptr/vtordisp here; GameObject members are at their plain offsets from the GraphicsTest
+// subobject at +12.
 
 class QuadTreeObject {
 public:
@@ -114,8 +87,8 @@ public:
     CollisionObject(int a);                     // 0x00431e70
     virtual ~CollisionObject();                 // slot 0 @12: 0x00431fd0 -> core 0x00432000
     virtual int GameObjectVirtualSlot10(float dt);    // 0x00499ae0
-    virtual void GameObjectVirtualSlot14();           // 0x00434540 (draw; CollisionCharacter overrides it again)
-    virtual void GameObjectVirtualSlot23(int a, int b); // 0x00434970 (ret 8)
+    virtual int GameObjectVirtualSlot14();            // 0x00434540 (draw, then returns GameObject slot 14; ConstraintMethodCollisionModel overrides it again)
+    virtual int GameObjectVirtualSlot23(int a, int b);  // 0x00434970 (ret 8, returns GameObject slot 23)
 
     // Non-virtual members (this == complete object).
     void FreeShape();                                        // 0x00432430
@@ -130,6 +103,18 @@ public:
     void Fn_00435fb0();                                       // 0x00435fb0
     void Fn_00435fe0();                                       // 0x00435fe0
     int Fn_00438e70();                                        // 0x00438e70
+    // 0x00435830, thiscall, ret 4 (tier 1): switches on the shape type field_0x50 (0..4,
+    // jump table 0x435ea8), copies the 16 floats of *m into the shape payload at
+    // field_0x54 and derives values from them. Name tier 3. Callers: ObjectPlacement
+    // 0x004b0df0 and Tire 0x00514550.
+    void SetTransform(const Matrix4* m);
+    // 0x00439400, thiscall, ret 4: field_0x74 = v (tier 1).
+    void SetField_0x74(int v);
+    // 0x00439410, thiscall, ret 4 (tier 1 body): unique-add of owner into the growable
+    // pointer array field_0x78 (data) / field_0x7c (count): returns if already present,
+    // reuses a NULL slot, else reallocs through 0x004a2ec0 (line 0x843) and appends.
+    // Name tier 3.
+    void AddIgnoredOwner(void* owner);
     // 0x004394d0 (ret 8): stores field_0x60 and field_0x64 (tier 1); name tier 3.
     void SetOwner(void* owner, int tag);
 
@@ -169,6 +154,7 @@ public:
     void DrawHull(CollisionHullBody* hull, int depth, int mode);         // 0x00432d30
     void DrawModel(CollisionModelBody* model, int depth, int mode);      // 0x00432b30
 
+    char field_0x44[0xc];                       // own bytes 0x44..0x4f, not accessed by any target
     int field_0x50;                             // shape type 0..4
     void* field_0x54;                           // shape payload (see shape structs)
     int field_0x58;
@@ -194,7 +180,6 @@ public:
     CollisionVec3 field_0xac;
 };
 
-typedef char collision_graphics_test_assert_sizeof[(sizeof(GraphicsTest) == 0x44) ? 1 : -1];
 typedef char collision_object_assert_sizeof[(sizeof(CollisionObject) == 0xb8) ? 1 : -1];
 
 #endif

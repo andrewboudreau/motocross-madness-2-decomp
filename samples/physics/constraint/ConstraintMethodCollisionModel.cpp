@@ -80,9 +80,9 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot10(float t)
     return CollisionObject::GameObjectVirtualSlot10(t);
 }
 
-void ConstraintMethodCollisionModel::GameObjectVirtualSlot14()
+int ConstraintMethodCollisionModel::GameObjectVirtualSlot14()
 {
-    CollisionObject::GameObjectVirtualSlot14();
+    return CollisionObject::GameObjectVirtualSlot14();
 }
 
 void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const char* arg)

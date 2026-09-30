@@ -57,8 +57,8 @@ public:
     //  * Returns the D3DIMSoultreeObject GameObject (+0x228), not the virtual one: the tail
     //    0x00503c16 null-checks `this`, then this+0x21c, then adds 12.
     virtual GameObject* UnknownVirtualSlot40(int a1, const char* a2, const SoultreeLoadDesc* a3,
-                                             int a4, SoultreeVec3 a5, SoultreeVec3 a6,
-                                             SoultreeVec3 a7, void* a8, void* a9, float a10,
+                                             int a4, Vec3 a5, Vec3 a6,
+                                             Vec3 a7, void* a8, void* a9, float a10,
                                              int a11, int a12, SoultreeSlot1f0* a13, float a14,
                                              int a15, float a16, float a17, float a18, int a19,
                                              int a20, unsigned char a21, int a22);

@@ -29,7 +29,7 @@ public:
     virtual GameObject* GameObjectVirtualSlot8(int a);       // 0x0043b9a0
     virtual int GameObjectVirtualSlot10(float dt);           // 0x0043ba40
     virtual int GameObjectVirtualSlot11(float dt);           // 0x0043ba70
-    virtual void GameObjectVirtualSlot14();                  // 0x0043c880 (tail jump)
+    virtual int GameObjectVirtualSlot14();                   // 0x0043c880 (tail jump)
 
     void SetBody(ConBody* b, int useNodeModel, const char* arg);     // 0x0043b9e0
     void AddProbePoint(ConVec3 point, ConNode* node);   // 0x0043c7f0

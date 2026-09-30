@@ -63,9 +63,6 @@ int Fn_0043ad80(void* a1, int* penetrating, int count, CollisionPoint** points,
     return 1;
 }
 
-// 0x00460c00 (cdecl): returns 1/sqrt(x) (see CollisionPoint.cpp; provisional prototype).
-float FastInvSqrt(float x);
-
 // 0x0043aa30 (cdecl, provisional signature).  Merges the penetrating contacts of a manifold
 // (tier 3 semantics): mean position, summed and normalised normal, deepest penetration, and
 // the resulting linear (out1/out2) and angular (out3) response terms.  Returns the merged count.

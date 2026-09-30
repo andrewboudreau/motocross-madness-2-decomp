@@ -1,6 +1,6 @@
 // ContactTypes.h -- shared declarations for the contact/impulse translation unit
 // (PROVISIONAL: tier 3 names; offsets and calling conventions are decoded from the
-// target bytes).  Reuses Vec3 (../common/Math3D.h) and SoultreeNode
+// target bytes).  Reuses Vec3 (../common/Math3D.h) and SoultreeObject
 // (../soultree_base/SoultreePhysicsCallees.h); nothing about their layout is duplicated.
 #ifndef CONTACT_TYPES_H
 #define CONTACT_TYPES_H
@@ -28,13 +28,7 @@ static inline Vec3 ContactCross(const Vec3& a, const Vec3& b)
     return r;
 }
 
-// 0x005004a0 with pointer-typed nodeB (arg 11) and velB (arg 16).  The shared header
-// SoultreePhysicsCallees.h declares those two as int (Fn_5004a0); the unification pass
-// should switch them to SoultreeNode* / SoultreeVec3*.
-void ContactSolveImpulse(float restitution, const Vec3* n, float invMassA, SoultreeNode* nodeA,
-                         const Vec3* dispA, const Vec3* rA, const Vec3* invInertiaA,
-                         ContactVec3* angVelA, Vec3* velA, float invMassB, SoultreeNode* nodeB,
-                         const Vec3* dispB, const Vec3* rB, const Vec3* invInertiaB,
-                         ContactVec3* angVelB, ContactVec3* velB, float* outJ);
+// 0x005004a0 (ContactSolveImpulse) is declared once in ContactImpulse.h, included through
+// SoultreePhysicsCallees.h.
 
 #endif

@@ -61,8 +61,8 @@ void PhysicsBody::UnknownVirtualSlot35(int)
 // ---------------------------------------------------------------------------
 
 // 0x004cc120 (not a target; emits the vtable and the scalar deleting destructor).
-PhysicsRigidBody::PhysicsRigidBody(SoultreeObject* n)
-    : PhysicsBody(n)
+PhysicsRigidBody::PhysicsRigidBody(int flags)
+    : PhysicsBody(flags)
 {
     field_0x34 = 0;
     force = kVec3Zero;
@@ -143,11 +143,11 @@ void PhysicsRigidBody::ResetState()
 }
 
 // slot 10, 0x004cc600.
-int PhysicsRigidBody::UnknownVirtualSlot10(float dt)
+int PhysicsRigidBody::GameObjectVirtualSlot10(float dt)
 {
     if (!field_0x2a4)
-        UnknownVirtualSlot11(dt);
-    return GraphicsTest::UnknownVirtualSlot10(dt);
+        GameObjectVirtualSlot11(dt);
+    return GraphicsTest::GameObjectVirtualSlot10(dt);
 }
 
 // slot 11, 0x004cc630: one rigid-body integration step of length dt.
@@ -167,9 +167,9 @@ int PhysicsRigidBody::UnknownVirtualSlot10(float dt)
 //  * 'float m = mass;' gives the retail 'fld mass; fdivr 1.0f' operand order.
 //  * The normalised quaternion is written back into 'orientation'. A separate named
 //    Quat adds 16 bytes of frame (0xcc instead of 0xbc).
-int PhysicsRigidBody::UnknownVirtualSlot11(float dt)
+int PhysicsRigidBody::GameObjectVirtualSlot11(float dt)
 {
-    GraphicsTest::UnknownVirtualSlot10(dt);
+    GraphicsTest::GameObjectVirtualSlot10(dt);
     if (node && active) {
         prevVelocity = velocity;
 
@@ -219,7 +219,7 @@ int PhysicsRigidBody::UnknownVirtualSlot11(float dt)
 }
 
 // slot 14, 0x004cca80.
-int PhysicsRigidBody::UnknownVirtualSlot14()
+int PhysicsRigidBody::GameObjectVirtualSlot14()
 {
-    return PhysicsBody::UnknownVirtualSlot14();
+    return PhysicsBody::GameObjectVirtualSlot14();
 }

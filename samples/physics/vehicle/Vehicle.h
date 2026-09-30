@@ -18,62 +18,39 @@
 //   0x434..0x5bc.  Overrides of slots 0..39 use the reconciled SoultreePhysicsBaseObject
 //   signatures (see the tier notes there); slots 43..96 are declared here and are the
 //   canonical signatures for Bike and KrustyBike.
-//   * VehVec3 is the shared Math3D Vec3.
+//   * Vectors use the shared Math3D Vec3.
 #ifndef MCM2_PHYSICS_VEHICLE_H
 #define MCM2_PHYSICS_VEHICLE_H
 
 #include <stddef.h>
 #include "../hierarchy/SoultreePhysicsCharacter.h"
+#include "../contact/ContactImpulse.h"
 
 #define VEH_CHECK_OFFSET(cls, member, off) \
     typedef char veh_assert_##member##_##off[(offsetof(cls, member) == (off)) ? 1 : -1]
 
-typedef Vec3 VehVec3;
 struct VehBlock7 { float f[7]; };   // 28-byte state block (pose/orientation values, provisional)
 
 // Global vector at 0x0068a6e8 (three floats, all zero at rest): copied whole into
 // vector members when they are reset.
-extern VehVec3 g_VehZeroVec3;
+extern Vec3 g_VehZeroVec3;
 
-// 0x00460b50: table-driven sqrt (returns 0 for 0); 0x00460c00: table-driven 1/sqrt.
-extern float __cdecl VehFastSqrt(float x);
-extern float __cdecl VehFastInvSqrt(float x);
+// 0x00460b50 FastSqrt / 0x00460c00 FastInvSqrt are declared in ../common/FastMath.h.
 
 // ---- provisional collaborator types (layout only what the code touches) ----
 
-// Object at Vehicle+0x3bc: transform/matrix helper. Methods are non-virtual thiscall
-// (callee pops); names are the retail addresses.
-struct VehicleXform {
-    void  Method_004FC540(int a, VehVec3* b, VehVec3* c);
-    void  Method_004FC050(int a, VehVec3* b, VehVec3* c, int d, int e);
-    void  Method_004FC630(float x, float y, float z);
-    void  Method_004FC660(VehVec3* v);
-    void  Method_004FC970(VehVec3* v);
-    void  Method_004FC9A0(int a, VehVec3* v);
-    VehVec3* Method_004FD5C0(VehVec3* out, VehVec3* in);
-    VehVec3* Method_004FD710(VehVec3* out, VehVec3* in);
-    void  Method_004FD1F0(VehVec3 a, VehVec3 b, float c);
-    void  Method_004444E0();
-};
+// The scene node (d3d_field_0x1a0, field_0x218, VehicleSteerState::field_0x00) is
+// SoultreeObject (../common/SoultreeObject.h).
 // Free helpers (cdecl) used by the vehicle code. Retail addresses; names are tier 3.
-extern float    __cdecl VehDot(const VehVec3* a, const VehVec3* b);                 // 0x0040ae30 dot product
-extern VehVec3* __cdecl VehScaleVec(VehVec3* out, const VehVec3* v, float k);       // 0x005015b0 out = v * k
-extern VehVec3* __cdecl VehSubVec(VehVec3* out, const VehVec3* a, const VehVec3* b);// 0x00421d00 out = a - b
-extern VehVec3* __cdecl VehNormalize(VehVec3* out, const VehVec3* v);              // 0x005087b0 out = v / |v|
-// 0x004b5a60: builds seven scalars from two basis vectors (orientation block); provisional.
-// 0x005004a0: 17-argument cdecl helper used by slot 4 (provisional; arg roles unknown).
-// Same function as SoultreePhysicsCallees.h Fn_5004a0; parameter types follow slot 4.
-extern void __cdecl VehSlot4Helper(float a, const VehVec3* b, float c, VehicleXform* xf, VehVec3* p,
-                                   const VehVec3* q, VehVec3* normal, VehVec3* out, VehVec3* d,
-                                   float e, int f, VehVec3* g, const VehVec3* h, VehVec3* i,
-                                   VehVec3* j, int k, float* l);
+// 0x005004a0 (slot 4's solver helper) is ContactSolveImpulse, declared in
+// ../contact/ContactImpulse.h.
 struct VehicleContact;
 // 0x0043ad80 / 0x0043aa30 / 0x0043aff0: contact-array helpers used by slot 49 (provisional).
-extern int  __cdecl VehContactsA(int a, int* count, int n, VehicleContact** arr, SoultreeProbe* b, VehVec3* pos, int c, float d);
-extern void __cdecl VehContactsB(int n, VehicleContact** arr, VehVec3* scale, VehVec3* p, VehVec3* v,
-                                 VehVec3* pos18, VehVec3* pos0c, VehVec3* o1, VehVec3* o2, VehVec3* o3);
+extern int  __cdecl VehContactsA(int a, int* count, int n, VehicleContact** arr, SoultreeProbe* b, Vec3* pos, int c, float d);
+extern void __cdecl VehContactsB(int n, VehicleContact** arr, Vec3* scale, Vec3* p, Vec3* v,
+                                 Vec3* pos18, Vec3* pos0c, Vec3* o1, Vec3* o2, Vec3* o3);
 extern void __cdecl VehContactsC(int n, VehicleContact** arr);
-extern void __cdecl VehBasisToBlock(VehVec3 a, VehVec3 b, float* p0, float* p1, float* p2,
+extern void __cdecl VehBasisToBlock(Vec3 a, Vec3 b, float* p0, float* p1, float* p2,
                                     float* p3, float* p4, float* p5, float* p6);
 
 // Object at Vehicle+0x468: control/input map with two virtual queries.
@@ -98,10 +75,10 @@ struct VehicleContact {              // elements of Vehicle+0x12c
     char pad_0x00[4];
     int  field_0x04;
     char pad_0x08[0xC];
-    VehVec3 field_0x14;              // contact position (distance source in slot 7)
-    VehVec3 field_0x20;              // second contact point (impact position in slot 18)
+    Vec3 field_0x14;              // contact position (distance source in slot 7)
+    Vec3 field_0x20;              // second contact point (impact position in slot 18)
     char pad_0x2C[0x18];
-    VehVec3 field_0x44;              // per-contact share of the applied vector
+    Vec3 field_0x44;              // per-contact share of the applied vector
     char pad_0x50[0x50];
     float field_0xa0;                // blend weight
     int  field_0xa4;                 // contact active flag
@@ -117,14 +94,14 @@ struct VehicleMaterialSet {
 // Sink at VehicleImpactEvent+0x04 (provisional): fields 0x44/0x50/0x60 are touched by slot 18.
 struct VehicleImpactSink {
     char pad_0x00[0x44];
-    VehVec3 field_0x44;
-    VehVec3 field_0x50;
+    Vec3 field_0x44;
+    Vec3 field_0x50;
     char pad_0x5C[4];
     int field_0x60;
     char pad_0x64[0x10];
-    VehVec3 field_0x74;
-    void Method_004B8D90(VehVec3 pos, float intensity);   // 0x004b8d90, purpose unknown (impact/sound post)
-    void Method_004B9DC0(VehVec3 pos);                    // 0x004b9dc0, purpose unknown (impact/sound post)
+    Vec3 field_0x74;
+    void Method_004B8D90(Vec3 pos, float intensity);   // 0x004b8d90, purpose unknown (impact/sound post)
+    void Method_004B9DC0(Vec3 pos);                    // 0x004b9dc0, purpose unknown (impact/sound post)
 };
 struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
     char pad_0x00[4];
@@ -152,25 +129,25 @@ struct VehicleSmoother {
 struct VehicleContactSet;            // object at SoultreePhysicsCharacter+0x128
 // Object at Vehicle+0x47c (provisional layout: only what Vehicle touches).
 struct VehicleSteerState {
-    VehicleXform* field_0x00;
+    SoultreeObject* field_0x00;
     float field_0x04;
     float field_0x08;
-    void Method_00504EC0(float value, SoultreeNode* node);   // 0x00504ec0, purpose unknown
+    void Method_00504EC0(float value, SoultreeObject* node);   // 0x00504ec0, purpose unknown
 };
 struct VehicleAxis;                  // objects at Vehicle+0x4f8/0x4fc/0x500
 struct VehicleCamera;                // object at Vehicle+0x5ac
 class Vehicle;
 struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional)
-    void Method_004D31B0(float a, VehVec3* b, float c, bool d, float e, VehVec3* f, VehVec3* g);
+    void Method_004D31B0(float a, Vec3* b, float c, bool d, float e, Vec3* f, Vec3* g);
 };
 // Elements of Vehicle+0x53c (provisional: only touched offsets are named).
 struct VehicleWheel {
     char pad_0x00[0xCC];
-    VehVec3 field_0xcc;              // wheel contact position (slot 7 distance source)
-    VehVec3 field_0xd8;              // (y at +0xdc is read as a height by slot 58)
-    VehVec3 field_0xe4;              // contact normal (averaged by Method_00528400)
+    Vec3 field_0xcc;              // wheel contact position (slot 7 distance source)
+    Vec3 field_0xd8;              // (y at +0xdc is read as a height by slot 58)
+    Vec3 field_0xe4;              // contact normal (averaged by Method_00528400)
     char pad_0xF0[0xC];
-    VehVec3 field_0xfc;              // per-wheel share of the applied vector
+    Vec3 field_0xfc;              // per-wheel share of the applied vector
     char pad_0x108[0x3C];
     float field_0x144;
     char pad_0x148[8];
@@ -188,13 +165,13 @@ struct VehicleWheel {
     char pad_0x1C4[0x64];
     float field_0x228;
     char pad_0x22C[4];
-    VehVec3 field_0x230;
-    VehVec3 field_0x23c;
-    VehVec3 field_0x248;
+    Vec3 field_0x230;
+    Vec3 field_0x23c;
+    Vec3 field_0x248;
     char pad_0x254[0xC];
     int field_0x260;
     char pad_0x264[0x1C];
-    VehVec3 field_0x280;
+    Vec3 field_0x280;
     float field_0x28c;
     float field_0x290;
     float field_0x294;
@@ -217,13 +194,13 @@ public:
     // ---- overrides of inherited slots (order as in the vtable) ----
     virtual void UnknownVirtualSlot0(float dt);
     virtual void UnknownVirtualSlot1(float value);                               // 0x00525550
-    virtual void UnknownVirtualSlot3(const VehVec3* a, const VehVec3* b, const VehVec3* c,
-                                     const VehVec3* d, int e, int f, float* g); // 0x005264c0
-    virtual void UnknownVirtualSlot4(const VehVec3* a0, VehVec3* a1, const VehVec3* a2,
-                                     const VehVec3* a3, int a4, float a5, int a6,
-                                     const VehVec3* a7, const VehVec3* a8, const VehVec3* a9,
-                                     VehVec3* a10, VehVec3* a11, int a12, float* a13, float a14);
-    virtual void UnknownVirtualSlot7(const VehVec3* arg);
+    virtual void UnknownVirtualSlot3(const Vec3* a, const Vec3* b, const Vec3* c,
+                                     const Vec3* d, int e, int f, float* g); // 0x005264c0
+    virtual void UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
+                                     const Vec3* a3, int a4, float a5, int a6,
+                                     const Vec3* a7, const Vec3* a8, const Vec3* a9,
+                                     Vec3* a10, Vec3* a11, int a12, float* a13, float a14);
+    virtual void UnknownVirtualSlot7(const Vec3* arg);
     // Slots 18..20 take the canonical 40-byte record; the bodies view it as
     // VehicleImpactEvent (same offsets: +0x04/+0x08/+0x0c sinks, +0x24 flag).
     virtual void UnknownVirtualSlot18(SoultreeAttachment* arg);
@@ -234,8 +211,8 @@ public:
     virtual int  UnknownVirtualSlot24();
     virtual int  UnknownVirtualSlot25();
     virtual int  UnknownVirtualSlot28(int arg);
-    virtual int  UnknownVirtualSlot33(const VehVec3* a, const VehVec3* b, const VehVec3* c,
-                                      const VehVec3* d, int e, float f);   // 0x00527430
+    virtual int  UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
+                                      const Vec3* d, int e, float f);   // 0x00527430
     virtual void UnknownVirtualSlot34();
     virtual void UnknownVirtualSlot35(int a, int b);
     virtual void UnknownVirtualSlot36();
@@ -247,7 +224,7 @@ public:
     virtual void UnknownVirtualSlot43();
     virtual void UnknownVirtualSlot44();
     virtual float UnknownVirtualSlot45();
-    virtual VehVec3* UnknownVirtualSlot46(VehVec3* out, float arg);
+    virtual Vec3* UnknownVirtualSlot46(Vec3* out, float arg);
     // pure virtual: entry is _purecall (0x00534cfe).  Bike's override 0x0040cbb0 is
     // `ret 4` and returns a float (tier 1 via its byte match), hence float(float).
     virtual float UnknownVirtualSlot47(float arg) = 0;
@@ -259,11 +236,11 @@ public:
     virtual int UnknownVirtualSlot51();
     virtual int UnknownVirtualSlot52();
     virtual float UnknownVirtualSlot53();
-    virtual VehVec3* UnknownVirtualSlot54(VehVec3* out);
-    virtual VehVec3* UnknownVirtualSlot55(VehVec3* unused, VehVec3* out);
-    virtual void UnknownVirtualSlot56(VehVec3* a, int b, VehVec3* c);
+    virtual Vec3* UnknownVirtualSlot54(Vec3* out);
+    virtual Vec3* UnknownVirtualSlot55(Vec3* unused, Vec3* out);
+    virtual void UnknownVirtualSlot56(Vec3* a, int b, Vec3* c);
     virtual float UnknownVirtualSlot57();
-    virtual void UnknownVirtualSlot58(VehVec3* a, int b);
+    virtual void UnknownVirtualSlot58(Vec3* a, int b);
     virtual float UnknownVirtualSlot59();
     virtual void UnknownVirtualSlot60(float a, float b, int c);
     virtual float UnknownVirtualSlot61(float arg);
@@ -279,13 +256,13 @@ public:
     virtual void UnknownVirtualSlot69();
     virtual int UnknownVirtualSlot70(float arg);
     virtual void UnknownVirtualSlot71(int arg);
-    virtual void UnknownVirtualSlot72(VehVec3* out, VehicleWheel* wheel);
-    virtual float UnknownVirtualSlot73(const VehVec3* a, const VehVec3* b);  // only read (Bike 0x00406090)
-    virtual float UnknownVirtualSlot74(VehVec3* point, VehVec3* dir, float c, float d);
+    virtual void UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel);
+    virtual float UnknownVirtualSlot73(const Vec3* a, const Vec3* b);  // only read (Bike 0x00406090)
+    virtual float UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d);
     virtual float UnknownVirtualSlot75();
     // ret 0xc = hidden result pointer + two arguments; KrustyBike 0x00491ca0 byte-matches
     // as a by-value Vec3 return (tier 1 for the ABI shape, tier 2 for the Vec3 pointers).
-    virtual VehVec3 UnknownVirtualSlot76(const VehVec3* a, const VehVec3* b);
+    virtual Vec3 UnknownVirtualSlot76(const Vec3* a, const Vec3* b);
     virtual int UnknownVirtualSlot77(int arg);
     virtual int UnknownVirtualSlot78();
     virtual int UnknownVirtualSlot79();
@@ -303,7 +280,7 @@ public:
     virtual int UnknownVirtualSlot89(float arg);      // Bike 0x0040ae50 passes a float (tier 2)
     virtual void UnknownVirtualSlot90(int* a, float b);
     virtual void UnknownVirtualSlot91();  // entry is the shared empty stub 0x00464e90
-    virtual void UnknownVirtualSlot92(const VehVec3* a, const VehVec3* b);
+    virtual void UnknownVirtualSlot92(const Vec3* a, const Vec3* b);
     virtual void UnknownVirtualSlot93();
     virtual void UnknownVirtualSlot94();  // entry is the shared empty stub 0x00464e90
     virtual void UnknownVirtualSlot95();
@@ -312,20 +289,20 @@ public:
     // non-virtual helper (retail 0x00526830, next to slot 70; tier 3 name)
     int Method_00526830();
     // 0x00528400: normalized average of the wheels' contact normals (+0xe4); returns out.
-    VehVec3* Method_00528400(VehVec3* out);
+    Vec3* Method_00528400(Vec3* out);
     int   Method_00529280();                                     // 0x00529280
     void  Method_00528EB0();                                     // 0x00528eb0
     void  Method_00529A20();                                     // 0x00529a20
-    void  Method_00527A20(float* speed, VehVec3* zero, VehVec3* up);   // 0x00527a20
+    void  Method_00527A20(float* speed, Vec3* zero, Vec3* up);   // 0x00527a20
     void  Method_005293E0(float* speed);                         // 0x005293e0
-    void  Method_00529450(VehVec3* up, VehVec3* zero);           // 0x00529450
-    void  Method_00529C20(VehVec3* up, VehVec3* zero, float d);  // 0x00529c20
+    void  Method_00529450(Vec3* up, Vec3* zero);           // 0x00529450
+    void  Method_00529C20(Vec3* up, Vec3* zero, float d);  // 0x00529c20
     // 0x00525c60: calls virtual slot 0 of every object in the two owned arrays (+0x554/+0x55c, +0x560/+0x568).
     void Method_00525C60();
 
     // Inherited members whose canonical types are still separate classes are viewed
-    // through casts at the use site (MIGRATION.md rule 6): d3d_field_0x1a0 and
-    // field_0x218 as VehicleXform*, field_0x12c as VehicleContact**, field_0x128 as
+    // through casts at the use site (MIGRATION.md rule 6): field_0x12c as
+    // VehicleContact**, field_0x128 as
     // VehicleContactSet*, field_0x1f0 as VehicleMaterialSet*.  Inline accessor functions
     // were tried; VC6 schedules their loads differently (slots 4, 19, 35 and 49 lost
     // bytes, Bike slot 8 lost its exact match), so the casts are written out.
@@ -356,8 +333,8 @@ public:
     VehicleSteerState* field_0x47c;
     VehicleSpeedState* field_0x480;
     int field_0x484;
-    VehVec3 field_0x488;
-    VehVec3 field_0x494;
+    Vec3 field_0x488;
+    Vec3 field_0x494;
     char pad_0x4A0[0x4];
     float field_0x4a4;
     int field_0x4a8;
@@ -366,8 +343,8 @@ public:
     float field_0x4b4;
     float field_0x4b8;
     float field_0x4bc;
-    VehVec3 field_0x4c0;
-    VehVec3 field_0x4cc;
+    Vec3 field_0x4c0;
+    Vec3 field_0x4cc;
     float field_0x4d8;
     float field_0x4dc;
     float field_0x4e0;
@@ -379,8 +356,8 @@ public:
     VehicleAxis* field_0x4f8;
     VehicleAxis* field_0x4fc;
     VehicleAxis* field_0x500;
-    VehVec3 field_0x504;
-    VehVec3 field_0x510;
+    Vec3 field_0x504;
+    Vec3 field_0x510;
     float field_0x51c;
     int field_0x520;
     float field_0x524[6];
@@ -391,7 +368,7 @@ public:
     VehicleWheel* field_0x54c;
     char pad_0x550[0x20];
     int field_0x570;
-    VehVec3 field_0x574;      // Bike slot 100 (0x0040a090) builds (a0.x, 0, a0.z) here
+    Vec3 field_0x574;      // Bike slot 100 (0x0040a090) builds (a0.x, 0, a0.z) here
     float field_0x580;
     float field_0x584;
     float field_0x588;

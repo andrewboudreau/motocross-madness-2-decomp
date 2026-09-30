@@ -58,9 +58,6 @@ CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const C
     return 0;
 }
 
-float FastSqrt(float x);      // 0x00460b50
-float FastInvSqrt(float x);   // 0x00460c00
-
 // 0x0043a640.  Tier 3 semantics.  Given the contact normal n = field_0x2c:
 //   field_0x38 = field_0x14 - a1                      (position relative to a1)
 //   c          = (n * (n . a2)) x a4                   (normal component of a2 crossed with a4)

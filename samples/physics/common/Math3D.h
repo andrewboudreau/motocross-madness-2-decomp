@@ -87,16 +87,8 @@ struct Matrix4 {
 // Free helpers (cdecl, float result in st(0)).
 // ---------------------------------------------------------------------------
 
-// 0x00460b50, 85 bytes. Table-driven square root: returns 0 for x == 0, otherwise
-// builds the result from the halved exponent and a 256-entry mantissa table at
-// 0x005dafe0 (top 7 mantissa bits + exponent parity). No Newton step. Tier 2
-// semantics (decoded bit arithmetic), tier 3 name.
-float FastSqrt(float x);
-
-// 0x00460c00, 107 bytes. Reciprocal square root: table estimate (0x005daf5c,
-// 128 entries, exponent 0x5f000000 - (e << 22)) refined by two Newton steps
-// y = 0.5 * y * (3 - x*y*y). Tier 2 semantics, tier 3 name.
-float FastInvSqrt(float x);
+// 0x00460b50 FastSqrt and 0x00460c00 FastInvSqrt: see FastMath.h.
+#include "FastMath.h"
 
 // ---------------------------------------------------------------------------
 // Quaternions and matrix helpers (added after the first release; append-only).
@@ -208,16 +200,13 @@ Vec3 Vec3Normalize(const Vec3& v);
 // Operand order and naming are tier 3: out = a * b in the row-vector convention.
 void MatrixMultiply(Matrix4* out, Matrix4 a, Matrix4 b);
 
-// 0x004b5a60, 657 bytes, __cdecl: (Vec3 a, Vec3 b, float* out0 ... ) with seven
-// pointer arguments after the two by-value vectors. It returns at once if any of
-// the first three pointers is null. It derives three angles with the CRT x87
-// intrinsic at 0x00535240 (an _CIacos/_CIasin-style helper, argument in st(0)).
-// The first angle comes from (a.x, a.z) / sqrt(a.x^2 + a.z^2), with a fallback of
-// (1, 0) at zero length. Not reconstructed: the exact pointer roles and the second
-// vector's role are open. The name and parameters are provisional (tier 3).
-void UnknownVectorsToAngles_4b5a60(Vec3 a, Vec3 b, float* out0, float* out1,
-                                   float* out2, float* out3, float* out4,
-                                   float* out5, float* out6);
+// 0x004b5a60, 657 bytes, __cdecl: angle extraction from a "forward" vector a and an
+// "up" vector b (both by value), writing through seven pointers; returns 0 when any of
+// the first three pointers is null, else 1 (tier 1 control flow). Body in
+// ../helpers/OrientationAngles.cpp; names are tier 3. The callers ignore the result.
+int OrientationAnglesFromVectors(Vec3 a, Vec3 b, float* yaw, float* pitch, float* roll,
+                                 float* sinRoll, float* cosRoll, float* cosPitch,
+                                 float* sinPitch);
 
 // 0x004cb6e0, 892 bytes, __cdecl: per-axis settle/clamp of two accumulators.
 // Arguments: (float* a, float* b, const float* c, float dt, unsigned char mask), each
@@ -232,6 +221,30 @@ void UnknownVectorsToAngles_4b5a60(Vec3 a, Vec3 b, float* out0, float* out1,
 // name and parameter roles are tier 3.
 void UnknownAxisSettle_4cb6e0(float* a, float* b, const float* c, float dt,
                               unsigned char mask);
+
+// ---------------------------------------------------------------------------
+// Out-of-line call views. At some call sites VC6 calls the non-inlined COMDAT copy
+// of an inline Vec3 helper instead of expanding it (inline budget). Those sites are
+// reconstructed through these plain declarations, which VC6 cannot inline. One
+// declaration per retail address; the pointer/reference form follows the callers
+// (the ABI is the same). Bodies: ../helpers/VectorOps.cpp (tier 2: decoded bodies
+// identical to the inline formulas).
+// ---------------------------------------------------------------------------
+
+// 0x0040ae30, __cdecl, result in st(0): a.b.
+float Vec3DotCall(const Vec3* a, const Vec3* b);
+
+// 0x005015b0, __cdecl: *out = s * *v, returns out (operator*(const Vec3&, float)).
+Vec3* Vec3ScaleCall(Vec3* out, const Vec3* v, float s);
+
+// 0x00421cb0, __cdecl: *out = *a + *b, returns out (operator+(const Vec3&, const Vec3&)).
+Vec3* Vec3AddCall(Vec3* out, const Vec3* a, const Vec3* b);
+
+// 0x00421d00, __cdecl: *out = *a - *b, returns out (operator-(const Vec3&, const Vec3&)).
+Vec3* Vec3SubtractCall(Vec3* out, const Vec3* a, const Vec3* b);
+
+// 0x00515600, __cdecl, hidden result pointer first: CrossProduct(a, b).
+Vec3 CrossProductCall(const Vec3& a, const Vec3& b);
 
 // Scene-graph node helpers (local/world transforms) are SoultreeObject methods;
 // see SoultreeObject.h, which physics code reaches through node pointers.

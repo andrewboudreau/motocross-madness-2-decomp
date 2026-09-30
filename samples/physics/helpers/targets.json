@@ -117,7 +117,7 @@
     "notes": ""
   },
   {
-    "class": "SoultreeNode",
+    "class": "SoultreeObject",
     "source": "SoultreeHierarchy.cpp",
     "candidate_symbol_contains": "InvalidateWorldMatrix",
     "target_va": "0x004fb850",
@@ -126,7 +126,7 @@
     "notes": ""
   },
   {
-    "class": "SoultreeNode",
+    "class": "SoultreeObject",
     "source": "SoultreeHierarchy.cpp",
     "candidate_symbol_contains": "InvalidateSiblingChain",
     "target_va": "0x004fb880",
@@ -144,7 +144,7 @@
     "notes": ""
   },
   {
-    "class": "SoultreeNode",
+    "class": "SoultreeObject",
     "source": "SoultreeHierarchy.cpp",
     "candidate_symbol_contains": "AddChild",
     "target_va": "0x004fd910",
@@ -153,7 +153,7 @@
     "notes": ""
   },
   {
-    "class": "SoultreeNode",
+    "class": "SoultreeObject",
     "source": "SoultreeHierarchy.cpp",
     "candidate_symbol_contains": "AppendSibling",
     "target_va": "0x004fd960",
@@ -162,7 +162,7 @@
     "notes": "97.56%; register choice differs"
   },
   {
-    "class": "SoultreeNode",
+    "class": "SoultreeObject",
     "source": "SoultreeHierarchy.cpp",
     "candidate_symbol_contains": "RemoveChild",
     "target_va": "0x004fd990",
@@ -236,11 +236,11 @@
   {
     "class": "SoultreeObject",
     "source": "SoultreeTransform.cpp",
-    "candidate_symbol_contains": "GetPosition@SoultreeObject@@QAE?AU",
+    "candidate_symbol_contains": "GetPosition@SoultreeObject@@QAEPAU",
     "target_va": "0x004fc970",
     "target_size": 33,
-    "expect": "partial",
-    "notes": "direct-copy shape differs (retail copies via registers into hidden result)"
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml as Vec3* GetPosition(Vec3* out) (explicit out pointer; the soultree_base/collision callers pass &field_0x0c directly)"
   },
   {
     "class": "SoultreeObject",
@@ -288,7 +288,7 @@
     "notes": "partial (~37% sim): copy slots of *m/world reversed (0x10 vs 0x50), frame 0x9c vs 0x90, register assignment differs."
   },
   {
-    "class": "SoultreeNode",
+    "class": "SoultreeObject",
     "source": "SoultreeRotate.cpp",
     "candidate_symbol_contains": "RotateAboutPoint",
     "target_va": "0x4fd1f0",

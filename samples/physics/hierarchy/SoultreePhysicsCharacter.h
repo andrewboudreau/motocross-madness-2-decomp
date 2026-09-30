@@ -35,8 +35,8 @@ public:
     // --- vtable 0x005580a8 (offset 0) ---
     virtual void UnknownVirtualSlot1(float value);                // 0x005040c0
     virtual void UnknownVirtualSlot8();                           // 0x005041c0
-    virtual int UnknownVirtualSlot33(const SoultreeVec3* a1, const SoultreeVec3* a2,
-                                     const SoultreeVec3* a3, const SoultreeVec3* a4, int a5,
+    virtual int UnknownVirtualSlot33(const Vec3* a1, const Vec3* a2,
+                                     const Vec3* a3, const Vec3* a4, int a5,
                                      float a6);                  // 0x005040f0
     // Slot 40 (0x00503de0, `ret 0x6c` = 27 argument dwords, tier 1).  Grouping (tier 2):
     //  * a6..a8 (dwords 5..13, 0-based) are three Vec3 by value.  Both the body and the one direct caller
@@ -58,14 +58,14 @@ public:
     //    SceneManager caller 0x004ed3bf passes the result to GameObject::Method_0x00469190.
     virtual GameObject* UnknownVirtualSlot40(int a1, int a2, const char* a3,
                                              const SoultreeLoadDesc* a4, int a5,
-                                             SoultreeVec3 a6, SoultreeVec3 a7, SoultreeVec3 a8,
+                                             Vec3 a6, Vec3 a7, Vec3 a8,
                                              void* a9, void* a10, float a11, int a12, int a13,
                                              SoultreeSlot1f0* a14, float a15, int a16, float a17,
                                              float a18, int a19, unsigned char a20, int a21);
     virtual void UnknownVirtualSlot41();                          // 0x00504360
     virtual int UnknownVirtualSlot42();                           // 0x00504470
 
-    SoultreeNode* field_0x42c;
+    SoultreeObject* field_0x42c;
     char field_0x430;
     char field_0x431;
     char field_0x432;

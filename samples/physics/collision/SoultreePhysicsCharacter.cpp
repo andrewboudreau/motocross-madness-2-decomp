@@ -5,18 +5,12 @@
 #include "../soultree_base/SoultreePhysicsCallees.h"
 #include "SoultreePhysicsObject.h"
 
-extern void Fn_4b5a60(SoultreeVec3 a, SoultreeVec3 b, float* c, float* d, float* e, float* f,
-                      float* g, float* h, float* i);
-
 // SoultreePhysicsBaseObject::field_0x128 is the CollisionObject that slot 2 creates
-// (`new` of 0xb8 bytes, ctor 0x00431e70, tier 1).  The SoultreePhysicsBaseObject header only
-// forward-declares it as SoultreeBody, so this TU defines that name as a thin CollisionObject.
-class SoultreeBody : public CollisionObject {
-};
+// (`new` of 0xb8 bytes, ctor 0x00431e70, tier 1).
 
 // The scene node at field_0x08 is the D3DIM object (SoultreePhysicsCharacter copies
 // d3d_field_0x1a0 into it).  0x004444c0 (thiscall, `ret 4`) is one of that object's methods.
-// SoultreeNode (soultree_base/SoultreePhysicsCallees.h) does not declare it, so it is
+// SoultreeObject (common/SoultreeObject.h) does not declare it, so it is
 // reached through this view (tier 3 name).
 class SoultreeD3DNode {
 public:
@@ -60,7 +54,7 @@ void SoultreePhysicsCharacter::UnknownVirtualSlot1(float value)
 // slot 8 (0x005041c0)
 void SoultreePhysicsCharacter::UnknownVirtualSlot8()
 {
-    field_0x194 = field_0x1a0 = field_0x42c->Fn_4fd7f0(&field_0x18);
+    field_0x194 = field_0x1a0 = field_0x42c->WorldToLocalPoint(field_0x18);
 }
 
 // slot 42 (0x00504470)
@@ -73,20 +67,20 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot42()
 }
 
 // slot 33 (0x005040f0), retail `ret 0x18`
-int SoultreePhysicsCharacter::UnknownVirtualSlot33(const SoultreeVec3* a1, const SoultreeVec3* a2,
-                                                   const SoultreeVec3* a3, const SoultreeVec3* a4,
+int SoultreePhysicsCharacter::UnknownVirtualSlot33(const Vec3* a1, const Vec3* a2,
+                                                   const Vec3* a3, const Vec3* a4,
                                                    int a5, float a6)
 {
     UnknownVirtualSlot1(a6);
     field_0x88 = *a2;
     field_0x94 = *a3;
-    field_0x08->Fn_4fc630(a1->x, a1->y, a1->z);
-    field_0x08->Fn_4fc970(&field_0x0c);
+    field_0x08->SetPosition(a1->x, a1->y, a1->z);
+    field_0x08->GetPosition(&field_0x0c);
     UnknownVirtualSlot36();
     if (field_0x218) {
-        field_0x218->Fn_4fc9a0(0, &field_0x18);
+        field_0x218->GetPositionIn(0, &field_0x18);
     } else {
-        field_0x08->Fn_4fc9a0(0, &field_0x18);
+        field_0x08->GetPositionIn(0, &field_0x18);
     }
     Method_0x004a8b00();
     field_0x128->Fn_00435fe0();
@@ -99,12 +93,12 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot33(const SoultreeVec3* a1, const
 // slot 41 (0x00504360)
 void SoultreePhysicsCharacter::UnknownVirtualSlot41()
 {
-    field_0x42c->Fn_4fc540(0, field_0xa0, field_0xac);
-    d3d_field_0x1a0->Fn_4fc050(0, &field_0xa0, &field_0xac, 1, 0);
+    field_0x42c->GetAxesIn(0, &field_0xa0, &field_0xac);
+    d3d_field_0x1a0->SetAxesIn(0, &field_0xa0, &field_0xac, 1, 0);
     Method_0x004a8b00();
     field_0x430 = 0;
     UnknownVirtualSlot34();
-    Fn_4b5a60(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c, &field_0x38,
+    OrientationAnglesFromVectors(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c, &field_0x38,
               &field_0x3c, &field_0x44, &field_0x40);
     field_0xa0 = field_0x88;
     field_0xac = field_0x94;
@@ -122,8 +116,8 @@ void SoultreePhysicsCharacter::UnknownVirtualSlot41()
 // found it becomes the collision shape, otherwise the shape comes from the node.
 GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const char* a3,
                                                            const SoultreeLoadDesc* a4, int a5,
-                                                           SoultreeVec3 a6, SoultreeVec3 a7,
-                                                           SoultreeVec3 a8, void* a9, void* a10,
+                                                           Vec3 a6, Vec3 a7,
+                                                           Vec3 a8, void* a9, void* a10,
                                                            float a11, int a12, int a13,
                                                            SoultreeSlot1f0* a14, float a15,
                                                            int a16, float a17, float a18,
@@ -174,8 +168,8 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
 // GameObjects, so field_0x08 and the GameObject call are qualified.
 GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
                                                         const SoultreeLoadDesc* a3, int a4,
-                                                        SoultreeVec3 a5, SoultreeVec3 a6,
-                                                        SoultreeVec3 a7, void* a8, void* a9,
+                                                        Vec3 a5, Vec3 a6,
+                                                        Vec3 a7, void* a8, void* a9,
                                                         float a10, int a11, int a12,
                                                         SoultreeSlot1f0* a13, float a14,
                                                         int a15, float a16, float a17,

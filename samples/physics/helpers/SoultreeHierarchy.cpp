@@ -1,9 +1,9 @@
 // SoultreeHierarchy.cpp -- scene-graph node hierarchy/dirty-flag helpers of SoultreeObject
 // (soultree.cpp, 0x004fb4f0..0x004fdb31). Class attribution tier 2 (see SoultreeObject.h).
-#include "SoultreeNode.h"
+#include "../common/Math3D.h"
 
 // 0x004fdab0.
-void SoultreeNode::MarkSubtreeDirty()
+void SoultreeObject::MarkSubtreeDirty()
 {
     subtreeDirty = 1;
     for (SoultreeObject* p = parent; p; p = p->parent)
@@ -11,16 +11,16 @@ void SoultreeNode::MarkSubtreeDirty()
 }
 
 // 0x004fb880.
-void SoultreeNode::InvalidateSiblingChain()
+void SoultreeObject::InvalidateSiblingChain()
 {
-    SoultreeNode* n = this;
+    SoultreeObject* n = this;
     for (;;) {
         if (n->nextSibling)
-            ((SoultreeNode*)n->nextSibling)->InvalidateSiblingChain();
+            n->nextSibling->InvalidateSiblingChain();
         if (!n->worldValid)
             break;
         n->worldValid = 0;
-        n = (SoultreeNode*)n->firstChild;
+        n = n->firstChild;
         if (!n)
             break;
     }
@@ -30,16 +30,16 @@ void SoultreeNode::InvalidateSiblingChain()
 // descendants if the world matrix was valid. (The siblings of THIS node are not touched.)
 void SoultreeObject::InvalidateWorldMatrix()
 {
-    ((SoultreeNode*)this)->MarkSubtreeDirty();
+    MarkSubtreeDirty();
     if (worldValid) {
         worldValid = 0;
         if (firstChild)
-            ((SoultreeNode*)firstChild)->InvalidateSiblingChain();
+            firstChild->InvalidateSiblingChain();
     }
 }
 
 // 0x004fd960.
-void SoultreeNode::AppendSibling(SoultreeNode* node)
+void SoultreeObject::AppendSibling(SoultreeObject* node)
 {
     SoultreeObject* last = this;
     SoultreeObject* next = last->nextSibling;
@@ -52,20 +52,20 @@ void SoultreeNode::AppendSibling(SoultreeNode* node)
 }
 
 // 0x004fd910.
-void SoultreeNode::AddChild(SoultreeNode* child)
+void SoultreeObject::AddChild(SoultreeObject* child)
 {
     if (child->parent)
-        ((SoultreeNode*)parent)->RemoveChild(child);
+        parent->RemoveChild(child);
     child->parent = this;
     if (!firstChild)
         firstChild = child;
     else
-        ((SoultreeNode*)firstChild)->AppendSibling(child);
+        firstChild->AppendSibling(child);
 }
 
 // 0x004fd990. Unlinks 'child' from this node's child list. The list search has no null
 // check (the child is assumed to be present). Each link is cleared only if it is set.
-void SoultreeNode::RemoveChild(SoultreeNode* child)
+void SoultreeObject::RemoveChild(SoultreeObject* child)
 {
     child->InvalidateWorldMatrix();
     SoultreeObject* n = firstChild;
@@ -74,7 +74,7 @@ void SoultreeNode::RemoveChild(SoultreeNode* child)
     if (n == firstChild)
         firstChild = n->nextSibling;
     if (n->nextSibling)
-        ((SoultreeNode*)n->nextSibling)->field_0x148 = n->field_0x148;
+        n->nextSibling->field_0x148 = n->field_0x148;
     if (n->field_0x148)
         ((SoultreeObject*)n->field_0x148)->nextSibling = n->nextSibling;
     if (n->parent)

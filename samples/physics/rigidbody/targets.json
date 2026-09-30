@@ -56,7 +56,7 @@
   {
     "class": "PhysicsBody",
     "source": "PhysicsBody.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot14@PhysicsBody@@",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot14@PhysicsBody@@",
     "target_va": "0x004cbf10",
     "target_size": 11,
     "expect": "exact",
@@ -191,7 +191,7 @@
   {
     "class": "PhysicsRigidBody",
     "source": "PhysicsRigidBody.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot10@PhysicsRigidBody@@",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@PhysicsRigidBody@@",
     "target_va": "0x004cc600",
     "target_size": 37,
     "expect": "exact",
@@ -200,7 +200,7 @@
   {
     "class": "PhysicsRigidBody",
     "source": "PhysicsRigidBody.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot11@PhysicsRigidBody@@",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot11@PhysicsRigidBody@@",
     "target_va": "0x004cc630",
     "target_size": 1102,
     "expect": "partial",
@@ -209,7 +209,7 @@
   {
     "class": "PhysicsRigidBody",
     "source": "PhysicsRigidBody.cpp",
-    "candidate_symbol_contains": "?UnknownVirtualSlot14@PhysicsRigidBody@@",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot14@PhysicsRigidBody@@",
     "target_va": "0x004cca80",
     "target_size": 5,
     "expect": "exact",

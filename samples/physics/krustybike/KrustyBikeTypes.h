@@ -22,15 +22,15 @@ struct KbXform;
 struct KbChild;
 struct KbObj128;
 
-// KbVec3 is the shared Math3D Vec3 (12 bytes: x,y,z at +0,+4,+8; tier 1 layout).
+// Vectors use the shared Math3D Vec3 (12 bytes: x,y,z at +0,+4,+8; tier 1 layout).
 #include "../bike/Bike.h"
-typedef Vec3 KbVec3;
+#include "../contact/ObjectPlacement.h"
 
 // 0x0067C348: a global zero vector copied by several overrides (three dword loads).
-extern KbVec3 g_kbZeroVec;
+extern Vec3 g_kbZeroVec;
 
 // Object reached through the global at 0x0056E26C (game/session singleton).
-struct KbTrackRec { KbVec3 field_0x00; char pad_0x0C[0xC]; };
+struct KbTrackRec { Vec3 field_0x00; char pad_0x0C[0xC]; };
 struct KbMode { char pad_0x00[0x94]; int Fn_00524100(); };
 struct KbGameCfg { char pad_0x0000[0x10]; int field_0x10; };
 struct KbGame {
@@ -120,7 +120,7 @@ struct KbSink {
 // Matrix-like helper at +0x3bc (D3DIMSoultreeCharacter::d3d_field_0x1a0); 0x004FD710
 // transforms a vector.
 struct KbXform {
-    KbVec3 Fn_004FD710(const KbVec3* v);
+    Vec3 Fn_004FD710(const Vec3* v);
 };
 // Element of the array at Bike+0x12c (count at +0x130).
 struct KbChild {
@@ -157,12 +157,9 @@ struct KbBody { int Fn_004392C0(KbBody* other); };
 
 // Non-virtual callees of slot 11 (cdecl; call targets are relocation-masked).  Tier 3 names.
 // 0x004B0AC0: probe at a position with three radii and a scale; returns a byte flag.
-unsigned char Kb_004B0AC0(KbVec3* pos, float r0, float r1, float r2, float scale,
+unsigned char Kb_004B0AC0(Vec3* pos, float r0, float r1, float r2, float scale,
                           int a, int b, int c, int d);
-// 0x004B0DF0: the query the base slot 11 issues (SoulTreePhysics.cpp Fn_4b0df0).  This
-// override passes different constants, so k and l are declared as nullable Vec3 pointers.
-int Kb_004B0DF0(void* body, SoultreeProbe* obj, KbVec3* pos, float scale, int e, int f, int g, int h,
-                float i, int j, const KbVec3* k, const KbVec3* l, int m, KbVec3* n, KbVec3* o,
-                KbVec3* p, int* q);
+// 0x004B0DF0 (the query the base slot 11 issues) is Fn_4b0df0, declared in
+// ../contact/ObjectPlacement.h.
 
 #endif

@@ -19,8 +19,6 @@ static void TireCollisionCallback(CollisionObject* a, CollisionObject* b)
     }
 }
 
-// 0x00460c00 (cdecl): reciprocal square root, shared with the collision TUs.
-float FastInvSqrt(float x);
 // 0x0040ae30 (cdecl, out of line): dot product of two vectors, result in st(0).
 float TireDot(const CollisionVec3* a, const CollisionVec3* b);
 
@@ -210,9 +208,6 @@ void Tire::CollisionPointVirtualSlot1()
             CollisionPoint::field_0x84 = -CollisionPoint::field_0x84;
     }
 }
-
-// 0x00460b50 (cdecl): square root.
-float FastSqrt(float x);
 
 // Length from a squared length, as inlined in 0x005135f0 (1.0 is special-cased).
 static inline float TireLengthFromSq(float lenSq)
@@ -552,7 +547,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
 
     CollisionMatrix4 frame;
     TireBuildFrame(&frame, &origin, &up, &lateral, 1, 1);
-    Fn_00435830(&frame);
+    SetTransform((const Matrix4*)&frame);   // CollisionObject 0x00435830
     Fn_00438e70();
 
     if (CollisionObject::field_0x58) {
