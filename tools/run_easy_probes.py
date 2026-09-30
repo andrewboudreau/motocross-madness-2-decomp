@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse,json,os,subprocess,sys,tempfile
 from pathlib import Path
 from mcm2tool.pe import PEImage
-from mcm2tool.coff import CoffObject, relocation_mask
+from mcm2tool.coff import CoffObject, relocation_mask, alignment_padding
 
 def run(cmd):
     r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
@@ -15,7 +15,10 @@ def match_one(pe, obj, target):
     va=int(target['target_va'],16); size=int(target['target_size'])
     sym=obj.find_symbol(target['symbol_contains'])
     cand,csize,rels=obj.symbol_extent(sym)
-    retail=pe.bytes_at_va(va,size); mask=relocation_mask(obj,sym,len(cand),rels)
+    retail=pe.bytes_at_va(va,size)
+    pad=alignment_padding(cand,len(retail),sym.value)
+    if pad: cand=cand[:-pad]
+    mask=relocation_mask(obj,sym,len(cand),rels)
     n=min(len(retail),len(cand)); mism=[]; comparable=0; matching=0
     for i in range(n):
         if mask[i]: continue
@@ -23,7 +26,7 @@ def match_one(pe, obj, target):
         if retail[i]==cand[i]: matching+=1
         elif len(mism)<64: mism.append({'offset':i,'target':retail[i],'candidate':cand[i]})
     exact=(len(retail)==len(cand) and matching==comparable)
-    return {'target_va':f'0x{va:08x}','target_size':len(retail),'candidate_size':len(cand),'symbol':sym.name,'relocations_masked':sum(mask),'comparable_bytes':comparable,'matching_bytes':matching,'match_percent':round(100*matching/comparable,4) if comparable else 100.0,'exact_after_relocation_mask':exact,'mismatches':mism,'probe':target}
+    return {'target_va':f'0x{va:08x}','target_size':len(retail),'candidate_size':len(cand),'symbol':sym.name,'relocations_masked':sum(mask),'comparable_bytes':comparable,'matching_bytes':matching,'match_percent':round(100*matching/comparable,4) if comparable else 100.0,'exact_after_relocation_mask':exact,'alignment_padding_bytes':pad,'mismatches':mism,'probe':target}
 
 def main():
     ap=argparse.ArgumentParser()

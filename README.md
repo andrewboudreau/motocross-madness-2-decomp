@@ -93,7 +93,7 @@ make probe-vc6 VC6_ROOT="$VC6_ROOT"
 make vc6-gate VC6_ROOT="$VC6_ROOT"
 ```
 
-See `docs/TOOLCHAIN.md`.
+See `docs/TOOLCHAIN.md`. For a fresh cloud container, see `docs/CLOUD.md` (`tools/cloud_setup.sh`).
 
 ## Evidence policy
 
