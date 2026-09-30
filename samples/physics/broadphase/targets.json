@@ -331,5 +331,23 @@
     "target_size": 127,
     "expect": "partial",
     "notes": "23.5% match, same cause as the Y variant."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "QueryGround",
+    "target_va": "0x00507c10",
+    "target_size": 2963,
+    "expect": "partial",
+    "notes": "Height/normal query (58 callers). Checkerboard triangle split, inverse-squared-distance corner weights. Retail uses an EBP frame and inline fistp through pointer-aliased int locals (inline __asm in original source, not reproducible under rules); inherent partial. Also VC6 inline budget differs on Vec3 helpers."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "CastSegment",
+    "target_va": "0x00506e90",
+    "target_size": 1654,
+    "expect": "partial",
+    "notes": "Clips segment to grid box slab-by-slab (X,Z,Y) then calls grid vtable slot 1. ~34.7% match, candidate 1550 bytes. Differences: inline-budget decisions at TerrainVec3 ctor/unary-minus sites, register allocation."
   }
 ]

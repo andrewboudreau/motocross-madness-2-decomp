@@ -39,12 +39,32 @@ public:
     ~TerrainOwned();                                            // 0x00401020
 };
 
+struct TerrainVec3;
+
 // PROVISIONAL: object destroyed through its scalar deleting dtor (vtable slot 0) after a
 // call to 0x0047edb0(1).
 class TerrainShutdownObject {
 public:
     virtual ~TerrainShutdownObject();
+    // vtable slot 1 (called `mov ecx,[obj]; call [ecx+4]` at 0x005074d1, callee pops 6 args):
+    // casts the grid-space segment (a, b) against the terrain; on a hit writes the grid-space hit
+    // point to *out.  The last three ints are forwarded from Terrain::CastSegment (tier 3 role).
+    virtual int CastSegment(TerrainVec3* a, TerrainVec3* b, TerrainVec3* out, int p3, int p4, int p5);
     void Shutdown(int flag);                                    // 0x0047edb0
+    // 0x00483910 (thiscall, ret 0x14; tier 2: field_0x44 is the same object the dtor shuts
+    // down).  Fetches the four corners of grid cell (ix, iz): heights[4], optional normals[4]
+    // and per-corner surface bytes[4] (three output arrays, see Terrain::QueryGround).
+    void GetCellCorners(int ix, int iz, float* heights, TerrainVec3* normals,
+                        unsigned char* surface);
+
+    // Members read by Terrain::CastSegment (tier 2 offsets, tier 3 names).
+    void* field_0x04;                                           // cell table read by 0x00483910
+    char pad_0x08[0x18 - 0x08];
+    float field_0x18;                                           // lower height bound of the grid (compared with segment y)
+    float field_0x1c;                                           // upper height bound
+    char pad_0x20[0x28 - 0x20];
+    unsigned char field_0x28;
+    unsigned char field_0x29;                                   // log2 shift: grid edge = 16 << field_0x29 cells
 };
 
 // PROVISIONAL: 0x0056df04 holds a pointer to an object whose 0x004a2d00(const char*) / 0x004a2d90(x)
@@ -90,16 +110,54 @@ extern int g_terrainToggle314;                                  // 0x0068a314
 extern int g_terrainToggle718;                                  // 0x00574718
 
 // PROVISIONAL stand-in for the shared Vec3 (Math3D.h is not included: its static const
-// objects would add $E initializers that Terrain.cpp does not have).
+// objects would add $E initializers that Terrain.cpp does not have).  The out-of-line
+// copies 0x00404e60 (ctor), 0x00421cb0 (+), 0x0043c890 (/ scalar), 0x005015b0 (* scalar)
+// exist in retail as COMDATs; VC6 inlines them at most call sites of QueryGround.
 struct TerrainVec3 {
     float x, y, z;
+    TerrainVec3() {}
+    TerrainVec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
+    TerrainVec3& operator*=(float s);                            // 0x0040ae00 (out of line at its one call site)
 };
+inline TerrainVec3 operator-(const TerrainVec3& a, const TerrainVec3& b)
+{
+    return TerrainVec3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+inline TerrainVec3 operator+(const TerrainVec3& a, const TerrainVec3& b)
+{
+    return TerrainVec3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+inline TerrainVec3 operator-(const TerrainVec3& v) { return TerrainVec3(-v.x, -v.y, -v.z); }
+inline TerrainVec3 operator*(const TerrainVec3& v, float s)
+{
+    return TerrainVec3(s * v.x, s * v.y, s * v.z);
+}
+// 0x0043c890 multiplies by the reciprocal (fld 1.0; fdiv s; then three fmul).
+inline TerrainVec3 operator/(const TerrainVec3& v, float s) { return v * (1.0f / s); }
+
+float TerrainDot(const TerrainVec3& a, const TerrainVec3& b);   // 0x0040ae30 (cdecl, out of line)
+float TerrainInvSqrt(float x);                                   // 0x00460c00 (table rsqrt, see Math3D.h FastInvSqrt)
+// 0x004a11e0 (cdecl): unit normal of the triangle (a, b, c) written to *out; the fifth
+// argument, when non-null, receives the plane offset (tier 3: the tail is `-dot(n, a)`).
+void TerrainTriangleNormal(const TerrainVec3* a, const TerrainVec3* b, const TerrainVec3* c,
+                           TerrainVec3* out, float* planeD);
+extern TerrainVec3 g_terrainRefDir;                              // 0x0068a058 (dotted with the face normal to orient it)
+
 // 0x00507510 / 0x00507590: file-static cdecl helpers (tier 2: no ecx, `ret`; the by-value TerrainVec3 return is the hidden out pointer in arg 0).
 TerrainVec3 TerrainClipRayToPlaneY(TerrainVec3* origin, const TerrainVec3* dir, float y);
 TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3* origin, const TerrainVec3* dir, float z);
 
 class Terrain : public GameObject {
 public:
+    // 0x00507c10 (thiscall, ret 0x10; 58 callers).  Snaps pos->y to the terrain surface under
+    // (pos->x, pos->z), optionally writes the surface normal and a per-cell surface byte.
+    // The third argument is 0 at nearly every caller and 1 at one (0x004b1567): tier 3 name
+    // "flatShaded" = use the triangle's face normal instead of blending corner normals.
+    void QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded, unsigned char* surface);
+    // 0x00506e90 (thiscall, ret 0x18).  Casts the world segment from->to against the terrain grid:
+    // rescales to grid space (1 / field_0x40), clips it to the grid box, hands it to
+    // field_0x44->CastSegment, and on a hit returns the world-space hit point in *out.
+    int CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out, int a, int b, int c);
     int HandleInput(int event, int unused);                     // 0x00508850 (slot 23 override, ret 8)
     int UnknownVirtualSlot19(int a);                            // 0x00507920 returns 0 (shared stub)
     int UnknownVirtualSlot22(int a, int b);                     // 0x004dc4c0 returns 0 (shared stub)
