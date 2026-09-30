@@ -1,0 +1,146 @@
+[
+  {
+    "class": "PixelBlend",
+    "source": "PixelBlend.cpp",
+    "candidate_symbol_contains": "BlendArgb4444",
+    "target_va": "0x43b320",
+    "target_size": 278,
+    "expect": "partial",
+    "notes": "static ARGB4444 alpha blend. 96.2% byte-similarity; size 288 vs 278. Local byte array + loop instead of the retail unrolled/scheduled channel code; readable, not contorted."
+  },
+  {
+    "class": "PixelBlend",
+    "source": "PixelBlend.cpp",
+    "candidate_symbol_contains": "BlendArgb1555",
+    "target_va": "0x43b440",
+    "target_size": 274,
+    "expect": "partial",
+    "notes": "static ARGB1555 alpha blend. 94.7%; size 288 vs 274. Same cause as 4444 blend (channel extraction scheduling)."
+  },
+  {
+    "class": "PixelBlend",
+    "source": "PixelBlend.cpp",
+    "candidate_symbol_contains": "BlendArgb8888",
+    "target_va": "0x43b560",
+    "target_size": 243,
+    "expect": "partial",
+    "notes": "static ARGB8888 alpha blend. 93.9%; size 256 vs 243. Same cause."
+  },
+  {
+    "class": "PixelBlend",
+    "source": "PixelBlend.cpp",
+    "candidate_symbol_contains": "PackColor",
+    "target_va": "0x43b660",
+    "target_size": 409,
+    "expect": "partial",
+    "notes": "static colour pack for formats 0x115c/0x613. 66.8%; size 416 vs 409. Retail keeps channel bytes at [esp+8..10] and converts via _ftol per channel; register allocation differs."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "ConstraintContactCallback",
+    "target_va": "0x43b800",
+    "target_size": 202,
+    "expect": "exact",
+    "notes": "cdecl callback stored in field_0x88. exact."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "??0ConstraintMethodCollisionModel",
+    "target_va": "0x43b8d0",
+    "target_size": 121,
+    "expect": "partial",
+    "notes": "constructor. 40.4%, same size 121. Retail writes both vptrs AFTER the member zeroing and before the 0.9f/1/1 stores (it also loads ecx=1 early); VC6 here writes the primary vptr first. Init-list variant tried (worse, 68% insn ratio)."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "??_GConstraintMethodCollisionModel",
+    "target_va": "0x43b950",
+    "target_size": 48,
+    "expect": "exact",
+    "notes": "scalar deleting destructor. Compiler-generated ??_G has no /Z7 function size record, so the extent is the COFF section including alignment padding; retail next function is 0x43b980, so the 48-byte extent (34 code + 14 padding) is compared and matches byte-for-byte."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "??1ConstraintMethodCollisionModel",
+    "target_va": "0x43b980",
+    "target_size": 18,
+    "expect": "exact",
+    "notes": "destructor core. exact (dtor core: writes both vptrs then jmp base dtor)."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot8",
+    "target_va": "0x43b9a0",
+    "target_size": 59,
+    "expect": "exact",
+    "notes": "slot 8 (secondary vtable). exact."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "SetBody",
+    "target_va": "0x43b9e0",
+    "target_size": 85,
+    "expect": "exact",
+    "notes": "SetBody. exact."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot10",
+    "target_va": "0x43ba40",
+    "target_size": 37,
+    "expect": "exact",
+    "notes": "slot 10. exact."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot11",
+    "target_va": "0x43ba70",
+    "target_size": 829,
+    "expect": "partial",
+    "notes": "slot 11: probe / ground query. 11.5% (positional byte match; insn-level ratio ~0.4). Structure and semantics decoded; 2 variants tried. Retail hoists bestNormal/bestPoint uninitialised locals into ebx/ebp/[esp+30] and calls LocalToWorldPoint with the probe address; frame 0x48 vs 0x54, so every offset shifts. The push-out uses inline *1.005 temporaries (no ctor)."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "ApplyContactImpulse",
+    "target_va": "0x43bdb0",
+    "target_size": 2619,
+    "expect": "partial",
+    "notes": "impulse solver. 5.4%. Semantic reconstruction (impulse) from the decoded steps; retail frame 0xb8 vs 0xd4, the retail code copies Vec3 args through sub esp,0xc blocks and duplicates WorldToLocalDirection(J); the translation-row term of body B (+0x200..0x208 of invInertia) is not modelled. Not byte-close."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "AddProbePoint",
+    "target_va": "0x43c7f0",
+    "target_size": 139,
+    "expect": "exact",
+    "notes": "AddProbePoint. exact (signature is Vec3 by value + node: same stack layout as three floats)."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot14",
+    "target_va": "0x43c880",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "slot 14 tail jump. exact."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "$E1",
+    "target_va": "0x43c8e0",
+    "target_size": 76,
+    "expect": "partial",
+    "notes": "TU static initializer for 0x579830. TU dynamic initializer for the Vec3 at 0x579830 (built from an inline 3-float ctor, then stored)."
+  }
+]
