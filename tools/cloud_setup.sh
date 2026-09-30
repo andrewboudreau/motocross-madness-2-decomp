@@ -7,7 +7,7 @@
 #   * apt: wine + wine32 (i386), clang-cl/lld, unzip, binutils, make
 #   * private bundle (VC98 tree + mcm2.exe) from MCM2_PRIVATE_BUNDLE_URL,
 #     verified and installed by tools/install_private_bundle.py into
-#     $MCM2_PRIVATE_ROOT (default ~/.cache/mcm2-private) - see docs/PRIVATE_TOOLCHAIN.md
+#     $MCM2_PRIVATE_ROOT (default ~/.cache/mcm2-private) - see docs/TOOLCHAIN.md
 #   * toolchains/vc6sp3 and work/game symlinked into this checkout/worktree
 #   * tools/vc6_acceptance.py: real CL.EXE compile under Wine (creates the prefix)
 #   * make analyze, so analysis/ exists when the session starts
@@ -108,7 +108,7 @@ if [ -n "${MCM2_PRIVATE_BUNDLE_URL:-}" ] && ! installed; then
   fi
   rm -f "$zip"
 elif [ -z "${MCM2_PRIVATE_BUNDLE_URL:-}" ] && ! installed; then
-  warn "MCM2_PRIVATE_BUNDLE_URL is not set; VC6 and mcm2.exe unavailable (docs/CLOUD.md)"
+  warn "MCM2_PRIVATE_BUNDLE_URL is not set; VC6 and mcm2.exe unavailable (docs/TOOLCHAIN.md)"
 fi
 
 if installed; then
@@ -132,23 +132,12 @@ if installed; then
     fi
   fi
 
-  # Analysis, once per checkout. Translation-unit skeletons go to generated/
-  # so src/krusty2 holds only promoted code. make analyze also rewrites two
-  # tracked summary docs; restore them unless they already had local edits.
+  # Generated reports and filename skeletons stay outside tracked docs/source.
   if [ ! -f analysis/.cloud-analyze-ok ]; then
     log "generating analysis from mcm2.exe"
-    docs=(docs/CLASS_DOSSIERS.md docs/WORK_QUEUE.md)
-    clean=0; git diff --quiet -- "${docs[@]}" 2>/dev/null && clean=1
-    if make -s analyze SKELETON_ROOT=generated/krusty2-skeletons >/dev/null 2>&1; then touch analysis/.cloud-analyze-ok
+    if make -s analyze >/dev/null 2>&1; then touch analysis/.cloud-analyze-ok
     else warn "make analyze failed"; fi
-    [ "$clean" = 1 ] && git checkout -q -- "${docs[@]}" 2>/dev/null
   fi
-fi
-
-# Generated output stays out of `git status` (local .git/info/exclude only).
-if excl="$(git rev-parse --git-path info/exclude 2>/dev/null)"; then
-  mkdir -p "$(dirname "$excl")" && touch "$excl"
-  for line in /analysis/ /generated/; do grep -qxF "$line" "$excl" || echo "$line" >> "$excl"; done
 fi
 
 log "done. Next: make status; make vc6-gate VC6_ROOT=\"\$VC6_ROOT\""

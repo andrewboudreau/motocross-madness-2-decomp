@@ -6,7 +6,6 @@ from mcm2tool.pe import PEImage
 from mcm2tool.coff import CoffObject, relocation_mask
 from mcm2tool.resolved_match import match_object, RelocationError
 
-def hx(b):return ' '.join(f'{x:02x}' for x in b)
 def main():
  ap=argparse.ArgumentParser(description='Compare a COFF function with mcm2.exe; --bindings resolves relocation fields instead of masking them.')
  ap.add_argument('--exe',required=True);ap.add_argument('--target-va',required=True,type=lambda x:int(x,0));ap.add_argument('--target-size',required=True,type=lambda x:int(x,0))

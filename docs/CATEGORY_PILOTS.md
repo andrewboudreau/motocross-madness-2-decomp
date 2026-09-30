@@ -1,8 +1,7 @@
-# First category-guided reconstruction pilots
+# Terrain cleanup and category lifetimes
 
-This change turns the EcoSystem and Terrain category/source/class leads into
-reviewed normal-control-flow evidence and executable C++98 behavior models.
-It extends the category-context branch without replacing either existing mapper.
+Reviewed normal-control-flow evidence and C++98 candidates. The tool re-decodes
+retail bytes; host models do not establish binary equivalence.
 
 ## What is actually established
 
@@ -19,11 +18,9 @@ restore helper ranges, the RTTI/table chain, the literal category strings, and
 relevant call destinations. It re-decodes the input instead of consuming the
 old context-map heuristics as authoritative function extents.
 
-## Terrain: cleanup, not construction
+## Terrain destructor
 
-The category clue at `0x005079f0` originally only established a Terrain-related
-routine with a Terrain vptr write. That write alone could be construction or
-destruction. The chain now establishes the latter:
+The RTTI/wrapper chain identifies `0x005079f0` as the destructor core:
 
 ```text
 Terrain RTTI -> primary vtable 0x0055825c
@@ -91,7 +88,7 @@ category after unknown callees execute.
 
 ### Timer helper
 
-The helper at `0x004bfa80` is now traced through its three named imports:
+The helper at `0x004bfa80` calls three named imports:
 
 ```text
 timeBeginPeriod(1)
@@ -108,28 +105,18 @@ With local clang-cl 17 targeting i686 MSVC ABI, it produces 29 bytes, equal in
 length to retail, but matches only **23/29 positions (79.3103%)** after applying
 all **three DIR32 relocations** to verified local import slots. **No bytes are
 ignored. This is not an exact match.** Differences are register-move encoding
-and instruction scheduling. VC6 is still needed for historical calibration.
+and instruction scheduling. This helper still needs authentic VC6 calibration.
 
-## What the code delivers, and what it does not
+## Reconstruction scope
 
-`PilotModels.h` contains:
+`PilotModels.h` holds the Terrain normal-cleanup model. It excludes vptr setup,
+exception machinery and actual base destruction. Member acquisition sites/types
+remain unresolved. The full EcoSystem algorithm and its lifetime scenarios are
+in [ECOSYSTEM.md](ECOSYSTEM.md); it is not yet an exact VC6 match.
 
-- `TerrainNormalCleanup`: the reviewed normal cleanup sequence with explicit
-  View/Operations boundaries for still-unknown field types and callees.
-- `EcoSystemScopeShell`: the entry gates, sampling and restore behavior; the
-  iteration/math region `0x0045ab17..0x0045ada8` is explicitly an opaque callback.
-
-These are executable behavioral models, **not** complete original class
-implementations. Terrain's vptr setup, compiler-generated exception machinery,
-and real base-destructor execution are not reproduced by the native model.
-The main EcoSystem routine has not been fully decompiled. No new whole-function
-byte match or original translation-unit assignment is claimed.
-
-`category_lifetimes.py` walks the reviewed normal CFG and retains a witness path
-for each return/history pair. Its finite state records local select/restore
-calls, not global runtime category state. It does not solve branch feasibility,
-callee effects, exception unwinding, or restoration argument equivalence. A
-stop/limit/unknown branch is reported, not silently treated as completion.
+`category_lifetimes.py` retains witness paths for normal select/restore exits.
+It does not solve branch feasibility, callee effects, exceptions or stack-alias
+proof. Unknown branches and limits remain explicit.
 
 ## Reproduce
 
@@ -151,36 +138,8 @@ ignored by Git/Docker. The JSON includes input/config/tool hashes, reviewed
 instructions, source references, RTTI/wrapper checks, exit witnesses and strict
 timer-probe results. The config is specific to this one reviewed build.
 
-## Validation performed
+## Next work
 
-- **26 new tests pass**, including a native C++98 executable running **19 model
-  scenarios**. Those 19 are inside one unittest, not 19 extra unit tests.
-- **95 existing tests pass**: 28 category-anchor, 34 category-context and 33
-  allocation tests. Total across the four suites: **121 passing tests**.
-- Two independent live pilot runs (including timer compilation) produce
-  byte-identical JSON and Markdown. All reviewed hashes and RTTI checks pass.
-- Tested PE, RTTI, MSVC-artifact, allocation, COFF, resolved-matcher and context
-  modules match their Git blob hashes on PR #2 at `24c107e`.
-- Original game, installer and DLL code was not executed. The native executable
-  runs only our models and stubbed callbacks.
-
-No historical VC6 run, complete-bootstrap rerun, exception-equivalence test or
-new exact decomp percentage is implied. The new workflow runs the four
-input-free suites; hosted workflow status must be checked separately.
-
-## Next reconstruction gate
-
-Use the cleanup responsibilities to identify member types and their acquisition
-sites in Terrain's constructor/loading routines. For EcoSystem, reconstruct the
-opaque iteration/math body while preserving the gate and lifetime observations.
-Keep the normal model as a regression oracle for intended behavior, not a
-substitute for original-binary equivalence. Match the helper and real class
-functions under privately supplied VC6 when available.
-
-## Primary ABI references
-
-- https://learn.microsoft.com/en-us/cpp/cpp/thiscall
-- https://learn.microsoft.com/en-us/cpp/cpp/stdcall
-- https://learn.microsoft.com/en-us/windows/win32/api/unknwn/nn-unknwn-iunknown
-
-These explain ABI/interface patterns, not MCM2-specific symbol identities.
+Identify Terrain member types and acquisition sites in constructor/loading code.
+Match its real cleanup function and the timer helper under VC6. Keep the normal
+model as a behavior regression check, not proof of original-binary equivalence.

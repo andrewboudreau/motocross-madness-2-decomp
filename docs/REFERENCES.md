@@ -5,7 +5,6 @@ These resources may be useful, but they are **not ground truth** for the MCM2 co
 ## Motocross Madness file formats
 
 - Repository: https://github.com/AlexKimov/motocross-madness-file-formats
-- Status: archived/read-only upstream.
 - Scope: community reverse engineering of Motocross Madness series data formats.
 - Potential MCM2 value: `DAT2.bt` plus `DecodeRES.1sc` / `unpackDAT2.1sc` for resource data.
 - Policy: keep this as a light-touch asset/data-format reference; do not import its assumptions into C++ class/layout/function reconstruction without binary evidence.

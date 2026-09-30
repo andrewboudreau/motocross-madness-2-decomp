@@ -71,7 +71,7 @@ def main():
     for r in sorted(validated,key=lambda x:int(x['target_va'],16)):
         classes=', '.join(r.get('classes',[])[:3]) or r.get('provisional_class') or '—'
         lines.append(f"- `{r['target_va']}` — {r.get('target_size','?')} B — {r.get('kind') or r.get('status')} — {classes}")
-    Path('docs/WORK_QUEUE.md').write_text('\n'.join(lines)+'\n')
+    Path('analysis/WORK_QUEUE.md').write_text('\n'.join(lines)+'\n')
     print(json.dumps({'next_targets':len(next_rows),'validated_targets':len(validated),'output':'analysis/work_queue.json'},indent=2))
 
 if __name__=='__main__': main()

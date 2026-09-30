@@ -1,13 +1,13 @@
 # Allocation subsystem: separating accounting from runtime
 
-## Result
+## Application accounting
 
 The common target of the 145 recognized scalar deleting-destructor wrappers,
 `0x004a30c0`, is not just a jump into a generic free implementation. It performs
 category-based allocation accounting first. Treating that entire function as
 replaceable Microsoft CRT code would lose observable behavior.
 
-This pass reviews 21 functions in the supplied executable, with a SHA-256 check
+The analyzer reviews 21 functions in the supplied executable, with a SHA-256 check
 for the input and for every selected function range. All behavioral labels,
 record names and candidate symbol names below are ours; none is claimed to be
 an original Rainbow source symbol. No original translation unit has been
@@ -24,7 +24,7 @@ Application-side category accounting
     | size query                 | deallocation
     v                            v
   0x005351f0                   0x00537929
-  allocation-size-like         free-like
+  LIBCMT __msize               LIBCMT _free
     | small-block lookup / indexed locking / heap fallback
     v
 Windows imports: HeapSize, HeapFree
@@ -33,8 +33,9 @@ Windows imports: HeapSize, HeapFree
 Allocation follows a corresponding path through `0x0053789d`, its helper
 `0x005378db`, and the Windows `HeapAlloc` fallback. The lower-level routines
 have behavior consistent with a statically linked malloc/free/_msize family,
-but **the exact CRT library/object identities remain unverified**. We have not
-compared them with authentic VC6 library objects.
+and their identities are now confirmed by fully relocation-resolved comparisons
+with the supplied VC6 multithread CRT. See [runtime evidence](VC6_CRT_ATLAS.md).
+The application accounting layer remains separate.
 
 The API-boundary evidence is specific, not just a vague DLL attribution:
 
@@ -94,7 +95,7 @@ candidates for the index setter, tracked deallocation, two allocation wrappers,
 and a calloc-like wrapper. It neither overrides the host's real global delete
 operator nor executes the original game.
 
-**New exact match:** the category-index setter at `0x004a2d90` is **10/10 bytes**
+**Exact clang match:** the category-index setter at `0x004a2d90` is **10/10 bytes**
 under clang-cl's i686 MSVC ABI. It has no relocations and no ignored bytes.
 The original method/class names and signedness remain unproved.
 
@@ -129,21 +130,11 @@ allocation attempt, even when that attempt fails. Deallocation subtracts the
 backend-reported size, not necessarily the original request size. The
 reconstruction preserves these details rather than correcting them.
 
-## Stronger comparison contract
+## Matching contract
 
-`mcm2tool/resolved_match.py` applies i386 DIR32 and REL32 relocations using an
-explicit address-binding map. It includes addends and the relocation-site VA,
-then compares every resulting byte. Unknown symbols, unsupported relocations,
-overlaps, and out-of-range relocations fail closed. A length mismatch cannot
-produce a 100% score merely because the common prefix matches.
-
-The binding map is itself reviewed evidence, not a symbol-identity proof. In
-particular, binding a candidate called `probe_size_005351F0` to an address does
-not establish that the original symbol was `_msize`.
-
-This is an additive, stricter matcher for the new pass. The older mask-based
-smoke tools are unchanged and their historical results are not silently
-reclassified as fully resolved comparisons.
+Use [strict relocation-resolved comparison](VC6_MATCHING.md). An address binding
+alone does not establish a library symbol's identity; the lower CRT functions
+have independent object evidence in [the runtime proof](VC6_CRT_ATLAS.md).
 
 ## Reproduce
 
@@ -167,38 +158,8 @@ addresses, direct callers, literal category arguments, API edges, same-body
 comparisons, exact probe results and code/config hashes. `--probe-object` accepts
 a separately built i386 COFF candidate; it does not authenticate its compiler.
 
-## Validation completed locally
+## Next work
 
-- **33 tests passed**, including **14 native candidate-behavior scenarios** in
-  one C++ test executable.
-- All **21 reviewed target ranges** passed their individual SHA-256 checks
-  against the known executable.
-- Two independent complete runs, including candidate compilation, produced
-  **byte-identical JSON and Markdown**.
-- The PE, RTTI, MSVC-artifact and COFF modules used locally have the same Git
-  blob hashes as their versions on `main` at `5d9f135`.
-- No original game/installer/DLL was executed. The native test runs only our
-  reconstructed C++ with stubbed allocation backends.
-
-The native scenarios test candidate intent, not equivalence to an executed
-original. VC6 has not been run, the old whole-project smoke suite was not rerun,
-and no static-library signature identification is claimed here. The dedicated
-GitHub workflow runs the input-free tests; its actual run status is separate
-from these local results.
-
-## Next gate
-
-Compare the lower-level allocation family against privately supplied VC6
-library objects using symbol, relocation-target and surrounding-call evidence.
-Then promote only corroborated runtime identities into the provenance map.
-The application-side accounting wrapper must remain in scope regardless.
-
-## Primary API references
-
-- HeapSize: https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsize
-- HeapFree: https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapfree
-- HeapAlloc: https://learn.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapalloc
-- _msize: https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/msize
-
-These contracts support interpreting named imports; they do not authenticate
-the historical runtime library version or original source spelling.
+Match the six remaining application-accounting candidates with authentic VC6.
+The library family is established; caller field types, original source ownership
+and the application wrappers still require reconstruction.

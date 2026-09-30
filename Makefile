@@ -1,12 +1,12 @@
 PYTHON ?= python3
 INSTALLER ?= MCM2PCG.exe
-EXE ?= work/game/mcm2.exe
+EXE ?= $(if $(MCM2_EXE),$(MCM2_EXE),work/game/mcm2.exe)
 VC6_ROOT ?=
-SKELETON_ROOT ?= src/krusty2
+SKELETON_ROOT ?= generated/krusty2-skeletons
 PRIVATE_ROOT ?= $(HOME)/.cache/mcm2-private
 PRIVATE_BUNDLE ?=
 
-.PHONY: bootstrap extract analyze class-evidence msvc-artifacts ensure-work smoke smoke-vc6 easy-smoke easy-smoke-vc6 calibration calibration-vc6 status easy manifest work-queue selftest static-check wine-init import-vc6 probe-vc6 vc6-gate clean-work
+.PHONY: bootstrap extract analyze class-evidence msvc-artifacts ensure-work smoke smoke-vc6 easy-smoke easy-smoke-vc6 calibration calibration-vc6 status easy manifest work-queue selftest static-check test wine-init import-vc6 probe-vc6 vc6-gate
 
 bootstrap:
 	PYTHONPATH=. $(PYTHON) tools/bootstrap.py "$(INSTALLER)"
@@ -17,8 +17,8 @@ extract:
 analyze: ensure-work
 	PYTHONPATH=. $(PYTHON) tools/analyze.py "$(EXE)" --out analysis --skeleton-root "$(SKELETON_ROOT)"
 	PYTHONPATH=. $(PYTHON) tools/build_class_evidence.py
-	PYTHONPATH=. $(PYTHON) tools/analyze_msvc_artifacts.py
-	PYTHONPATH=. $(PYTHON) tools/find_vtable_writes.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/analyze_msvc_artifacts.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/find_vtable_writes.py
 	PYTHONPATH=. $(PYTHON) tools/build_function_manifest.py
 	PYTHONPATH=. $(PYTHON) tools/build_class_dossiers.py
 	PYTHONPATH=. $(PYTHON) tools/build_work_queue.py
@@ -28,8 +28,8 @@ class-evidence: ensure-work
 	PYTHONPATH=. $(PYTHON) tools/build_class_dossiers.py
 
 msvc-artifacts: ensure-work
-	PYTHONPATH=. $(PYTHON) tools/analyze_msvc_artifacts.py
-	PYTHONPATH=. $(PYTHON) tools/find_vtable_writes.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/analyze_msvc_artifacts.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/find_vtable_writes.py
 	PYTHONPATH=. $(PYTHON) tools/build_class_dossiers.py
 
 ensure-work:
@@ -71,7 +71,7 @@ work-queue:
 	PYTHONPATH=. $(PYTHON) tools/build_work_queue.py
 
 selftest: ensure-work
-	PYTHONPATH=. $(PYTHON) tools/selftest.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/selftest.py
 
 wine-init:
 	PYTHONPATH=. $(PYTHON) tools/init_wine_prefix.py
@@ -88,11 +88,11 @@ vc6-gate: ensure-work
 	@test -n "$(VC6_ROOT)" || (echo 'VC6_ROOT is required' && exit 2)
 	PYTHONPATH=. $(PYTHON) tools/vc6_gate.py --vc6-root "$(VC6_ROOT)" --exe "$(EXE)"
 
-clean-work:
-	rm -rf work
-
 static-check:
 	PYTHONPATH=. $(PYTHON) tools/static_check.py
+
+test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -v
 
 .PHONY: provenance provenance-test
 provenance: ensure-work

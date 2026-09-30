@@ -1,4 +1,4 @@
-name: Static bootstrap checks
+name: Repository checks
 
 on:
   push:
@@ -17,3 +17,5 @@ jobs:
           python-version: '3.12'
       - name: Validate committed evidence and binary guardrails
         run: make static-check
+      - name: Run all input-free regression tests
+        run: make test

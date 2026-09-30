@@ -72,7 +72,7 @@ def report(snapshot: dict, components: list[dict], imports: list[dict]) -> str:
     for row in snapshot['functions']:
         if 'runtime_hypothesis' in row:
             h = row['runtime_hypothesis']
-            lines.append(f"`{row['entry_va']}` is the common delete target of {h['wrapper_callers']} recognized wrappers. The operator-delete role is a strong hypothesis; Microsoft CRT identity remains **unverified** until library/signature comparison.")
+            lines.append(f"`{row['entry_va']}` is the common delete target of {h['wrapper_callers']} recognized wrappers. This role observation does not assign a CRT provider. See docs/ALLOCATION.md for application accounting and docs/VC6_CRT_ATLAS.md for independently identified CRT callees.")
     lines += ['', '## Coverage accounting', '',
               f"Executable-section file-backed virtual bytes: **{s['executable_section_bytes']}**.",
               f"Union of instructions reached from candidate entries: **{s['candidate_reachable_instruction_bytes']}** bytes.",

@@ -16,7 +16,7 @@ struct View {
     void* member_c3c(){return c3c;} void* member_030(){return p30;}
     int count_540(){return n540;} void* inline_item_544(int i){return in544[i];}
     void* member_044(){return p44;} void* member_034(){return p34;}
-    void clear_034(){p34=0;} bool member_034_nonzero(){return p34!=0;}
+    void clear_034(){p34=0;}
     void** table_c14(){return c14;} int count_c10(){return c10;}
     void* member_c84(){return c84;} void* member_c88(){return c88;}
 };
@@ -26,13 +26,12 @@ struct Event {
 };
 struct Operations {
     View& v; std::vector<Event> events; int category,previous;
-    bool enabled,throw_release,clear_prepare,shrink_count,change_table,clear_on_sample,mutate_destroy;
-    void** replacement; unsigned int elapsed; int samples;
-    Operations(View& x):v(x),category(7),previous(-1),enabled(true),throw_release(false),clear_prepare(false),
-      shrink_count(false),change_table(false),clear_on_sample(false),mutate_destroy(false),replacement(0),elapsed(0),samples(0){}
+    bool throw_release,clear_prepare,shrink_count,change_table,mutate_destroy;
+    void** replacement;
+    Operations(View& x):v(x),category(7),previous(-1),throw_release(false),clear_prepare(false),
+      shrink_count(false),change_table(false),mutate_destroy(false),replacement(0){}
     void log(const char* n,void* p=0,int value=0){events.push_back(Event(n,p,value));}
     int select_terrain(){log("select");previous=category;category=42;return previous;}
-    int select_ecosystem(){log("select_eco");previous=category;category=43;return previous;}
     void release_ecx_slot2(void* p){
         log("release_ecx",p);
         if(throw_release)throw std::runtime_error("stub");
@@ -47,10 +46,6 @@ struct Operations {
     void destroy_401020(void* p){log("destroy",p);if(mutate_destroy)v.c84=v.c88=0;}
     void restore(int value){log("restore",0,value);category=value;}
     void base_cleanup(){log("base",0,category);}
-    bool global_enabled(){log("global_gate");return enabled;}
-    unsigned int sample_counter(){log("sample");if(clear_on_sample)v.p34=0;return samples++ ? 5u : 0xfffffff0u;}
-    void unreconstructed_ecosystem_body(){log("opaque_body");}
-    void store_elapsed(unsigned int value){log("elapsed");elapsed=value;}
     int count(const char* name)const{int n=0;for(unsigned i=0;i<events.size();++i)if(events[i].name==name)++n;return n;}
 };
 static int objects[8];
@@ -74,9 +69,5 @@ int main(){
     {View v;Operations o(v);void* list[]={p(0),p(1)};v.cb8=list;v.cbc=2;o.shrink_count=true;terrain(v,o);assert(o.count("release_ecx")==1);++scenarios;}
     {View v;Operations o(v);void* list[]={p(0),p(1)};void* list2[]={p(2),p(3)};v.cb8=list;v.cbc=2;o.change_table=true;o.replacement=list2;terrain(v,o);assert(o.events[2].pointer==p(3)&&o.events[3].pointer==list2);++scenarios;}
     {View v;Operations o(v);v.p30=p(0);o.throw_release=true;try{terrain(v,o);assert(false);}catch(const std::runtime_error&){}assert(o.count("restore")==0&&o.count("base")==0);++scenarios;} // Native model only; does NOT emulate the retail EH handler.
-    {View v;Operations o(v);o.enabled=false;assert(mcm2_pilots::EcoSystemScopeShell(v,o)==1);assert(o.count("select_eco")==0&&o.samples==0&&o.category==7);++scenarios;}
-    {View v;Operations o(v);assert(mcm2_pilots::EcoSystemScopeShell(v,o)==1);assert(o.samples==1&&o.count("restore")==0&&o.category==43);++scenarios;}
-    {View v;Operations o(v);v.p34=p(0);assert(mcm2_pilots::EcoSystemScopeShell(v,o)==1);assert(o.samples==2&&o.elapsed==21u&&o.category==7&&o.count("opaque_body")==1);++scenarios;}
-    {View v;Operations o(v);v.p34=p(0);o.clear_on_sample=true;mcm2_pilots::EcoSystemScopeShell(v,o);assert(o.count("opaque_body")==0&&o.count("restore")==0);++scenarios;}
     std::printf("%d native pilot model scenarios passed; original code not executed\n",scenarios);
 }

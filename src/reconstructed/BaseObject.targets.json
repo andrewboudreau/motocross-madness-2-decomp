@@ -6,7 +6,7 @@
     "target_size": 8,
     "confidence": "high",
     "status": "exact-byte-match",
-    "notes": "8/8 bytes match with clang-cl 17 MSVC x86 ABI and VC6 SP3 /O2 /GR /GX /ML /G6 /Z7. No relocations masked; COFF function-size metadata excludes alignment. See docs/VC6_MATCHING.md."
+    "notes": "8/8 bytes under clang-cl MSVC x86 ABI and VC6 SP3. No relocations."
   },
   {
     "class": "BaseObject",
@@ -15,6 +15,6 @@
     "target_size": 4,
     "confidence": "high",
     "status": "exact-byte-match",
-    "notes": "4/4 bytes match with clang-cl 17 MSVC x86 ABI and VC6 SP3 /O2 /GR /GX /ML /G6 /Z7. No relocations masked; COFF function-size metadata excludes alignment. See docs/VC6_MATCHING.md."
+    "notes": "4/4 bytes under clang-cl MSVC x86 ABI and VC6 SP3. No relocations."
   }
 ]

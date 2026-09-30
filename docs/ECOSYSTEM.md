@@ -1,9 +1,8 @@
-# EcoSystem: the opaque loop is now a C++ candidate
+# EcoSystem reconstruction
 
-This extends the category pilots. The old `EcoSystemScopeShell` remains as a
-small lifecycle regression; the new shared algorithm implements the entire
-normal top-level body at `0x0045aad0`, not just its entry and exit shell.
-This is not a complete implementation of its callees or a running game port.
+The shared C++98 candidate implements the normal top-level body at `0x0045aad0`.
+Its callees, floating-point equivalence and historical byte matching remain
+unfinished; it is not a running game implementation.
 
 ## Deliverable
 
@@ -11,13 +10,13 @@ This is not a complete implementation of its callees or a running game port.
   top-level branch, iteration, list update, and category/timer exit.
 - `EcoSystemProbe.cpp`: a 32-bit MSVC-ABI adapter using explicit field offsets,
   typed helper declarations and external globals; it compiles the same algorithm.
-- `EpochProbe.cpp`: a newly exact helper from that call chain.
+- `EpochProbe.cpp`: an exact clang helper from that call chain.
 - `test_pass.cpp`: 33 native scenarios against the shared algorithm.
 - `config/ecosystem_pass.json` and `tools/review_ecosystem.py`: hash-bound review
   blocks, literal/constant checks, RTTI slot validation, call/binding checks,
   and strict resolved-relocation comparison.
 
-All newly coined class/member/helper names are provisional. `RecordPrefix`,
+All reconstructed class/member/helper names are provisional. `RecordPrefix`,
 `DefinitionPrefix`, and `FramePrefix` assert only observed offset prefixes,
 not original classes, inheritance, full sizes, or original field names.
 
@@ -88,7 +87,7 @@ extended-precision intermediate values.
 
 The native model uses a wider accumulator type and explicit float stores; the
 MSVC-ABI candidate currently uses double. These choices preserve reviewed
-numeric intent but do **not** prove retail floating-point equivalence. Modern
+numeric intent but do do not prove retail floating-point equivalence. Modern
 compiler options and long-double behavior are not evidence of VC6 settings.
 
 ## Two work lists, and a subtle growth rule
@@ -111,14 +110,14 @@ unchanged in this caller. This is a static observation, not a demonstrated
 runtime bug. Tests use real backing arrays larger than their simulated
 capacities so they can check the branch safely without claiming allocator safety.
 
-## Previously reviewed lifetime behavior is retained
+## Category lifetime behavior
 
 The global-disabled path returns before selecting. The missing-ready-member
 path returns after selection and the first timer sample without a local
 restore. The full path stores the elapsed 32-bit difference and restores.
-The new algorithm does not insert an RAII restore on the early path.
+The algorithm does not insert an RAII restore on the early path.
 
-## Actual compile results
+## Match state
 
 Local clang-cl 17, i686 MSVC ABI:
 
@@ -127,7 +126,7 @@ Local clang-cl 17, i686 MSVC ABI:
 | EcoSystem slot 12, `0x0045aad0` | 771 | 782 | **34/782** | 33 | **Not exact** |
 | Age/generation increment helper, `0x00401040` | 3 | 3 | **3/3** | 0 | **Exact** |
 
-The larger routine is close in size, **not close in byte identity**. Its result
+The larger routine remains nonmatching. Its result
 is calibration data, not a new large-function match. Every supported relocation
 is applied through the explicit 26-symbol binding map; no bytes are ignored.
 The helper is ordinary `++tick` C++, not inline assembly or a machine-code array.
@@ -137,7 +136,7 @@ The probe forces the shared template into the member-function wrapper so the
 comparison does not accidentally compare a tiny delegation stub with the whole
 retail routine. `/GS-` avoids modern security-cookie helpers; `/arch:IA32` selects
 a baseline appropriate for the old x87 code. These are **modern probe settings**,
-not claimed original compiler flags. No VC6 run has occurred.
+not claimed original compiler flags. This candidate has not yet been matched with VC6.
 
 ## Reproduce
 
@@ -157,24 +156,6 @@ python3 /path/to/repo/tools/review_ecosystem.py \
 Generated JSON and report go to ignored `work/ecosystem/`. The report retains
 input/config/tool hashes, all reviewed instructions, block-to-algorithm labels,
 call sites, constants, normal-exit witnesses, bindings and actual match results.
-
-## Validation completed locally
-
-- **13 new unit tests**, including 33 native algorithm scenarios run at both
-  `-O0` and `-O2`, and i386 compilation/binding checks. The scenarios are inside
-  one unittest, not 66 additional unit tests.
-- **121 existing tests** passed: 26 category-pilot, 28 anchor, 34 context, and
-  33 allocation tests. **134 passing tests** across these five suites.
-- The original installer was extracted as data; the EXE matches the known hash.
-- All ten review-block hashes, both target/helper hashes, RTTI slot, literals,
-  constants, and 17 direct-call sites were checked against that EXE.
-- Two complete review/compile runs produced byte-identical JSON and Markdown.
-- Core analysis dependencies match their Git blob hashes at PR #3's `41f450f`.
-
-Original EXE/DLL code was not executed. There is no binary differential emulator,
-full-game runtime test, VC6 run, or proof of floating-point equivalence. The older
-whole-bootstrap smoke suite was not rerun. Its global match counts are unchanged;
-the new helper match is recorded in this dedicated report.
 
 ## Next targets
 

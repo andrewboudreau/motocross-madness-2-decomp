@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN_SUFFIXES = {'.exe','.dll','.cab','.iso','.msi','.lib','.pdb','.idb','.ilk','.zip','.7z','.rar'}
-IGNORED_DIRS = {'.git','work','toolchains','input','__pycache__'}
+IGNORED_DIRS = {'.git','work','toolchains','input','analysis','generated','__pycache__'}
 REQUIRED = [
     'tools/bootstrap.py','tools/extract_installer.py','tools/analyze.py',
     'tools/build_class_evidence.py','tools/analyze_msvc_artifacts.py','tools/find_vtable_writes.py',

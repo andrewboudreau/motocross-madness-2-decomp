@@ -28,7 +28,7 @@ def main():
     ap=argparse.ArgumentParser()
     ap.add_argument('exe')
     ap.add_argument('--out',default='analysis')
-    ap.add_argument('--skeleton-root',default='src/krusty2')
+    ap.add_argument('--skeleton-root',default='generated/krusty2-skeletons')
     args=ap.parse_args()
     exe=Path(args.exe); out=Path(args.out); out.mkdir(parents=True,exist_ok=True)
     pe=PEImage(exe)
