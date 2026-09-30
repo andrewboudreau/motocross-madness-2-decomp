@@ -195,7 +195,9 @@ def main():
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(payload, indent=2) + '\n')
     print(json.dumps(payload, indent=2))
-    if gate and gate['returncode'] not in (0, 1):
+    # Readiness stays true in the report, but an explicitly requested matching
+    # gate must propagate its failure to make/CI/the caller.
+    if gate and gate['returncode'] != 0:
         raise SystemExit(gate['returncode'])
 
 if __name__ == '__main__':

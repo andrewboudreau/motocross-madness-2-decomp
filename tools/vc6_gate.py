@@ -18,6 +18,15 @@ def all_exact(rows):
     return bool(isinstance(rows,list) and rows and all(r.get('exact_after_relocation_mask') for r in rows))
 
 
+def acceptance(probe, smoke, easy):
+    identity = bool(probe.get('sp3_core_match') and probe.get('compiler_probe_returncode') == 0)
+    manual = all_exact(smoke) and all(r.get('relocations_masked') == 0 for r in smoke)
+    generated = bool(isinstance(easy, list) and easy and all(r.get('strict_exact') is True for r in easy))
+    return {'toolchain_identity_passed': identity, 'manual_smoke_all_exact': manual,
+            'generated_easy_probes_all_exact': generated,
+            'all_exact': identity and manual and generated}
+
+
 def main():
     ap=argparse.ArgumentParser(description='Run the authoritative VC6 compiler gate and write one machine-readable report.')
     ap.add_argument('--vc6-root',default=os.environ.get('VC6_ROOT'))
@@ -29,12 +38,11 @@ def main():
     smoke=run_json([sys.executable,'tools/run_samples.py','--exe',a.exe,'--compiler','vc6','--vc6-root',a.vc6_root])
     easy=run_json([sys.executable,'tools/run_easy_probes.py','--exe',a.exe,'--compiler','vc6','--vc6-root',a.vc6_root])
     calibration=run_json([sys.executable,'tools/run_calibration.py','--exe',a.exe,'--compiler','vc6','--vc6-root',a.vc6_root])
-    smoke_exact=all_exact(smoke); easy_exact=all_exact(easy)
     report={
         'toolchain':probe,
-        'manual_smoke':smoke,'manual_smoke_all_exact':smoke_exact,
-        'generated_easy_probes':easy,'generated_easy_probes_all_exact':easy_exact,
-        'all_exact':smoke_exact and easy_exact,
+        'manual_smoke':smoke,
+        'generated_easy_probes':easy,
+        **acceptance(probe, smoke, easy),
         'calibration':calibration,
     }
     out=Path(a.out); out.parent.mkdir(parents=True,exist_ok=True); out.write_text(json.dumps(report,indent=2)+'\n')

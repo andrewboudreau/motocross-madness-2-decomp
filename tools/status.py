@@ -60,7 +60,7 @@ def main():
         for c in calibration:
             r=c.get('result',{})
             print(f"  {c['name']}: {r.get('match_percent','?')}% bytes, target={r.get('target_size','?')}B candidate={r.get('candidate_size','?')}B")
-    print(f"\nVC6 gate:         {'present' if vc6_gate else 'not run (private VC6 SP3 tree not present)'}")
+    print(f"\nVC6 gate:         {'present' if vc6_gate else 'not run (no report; compiler availability not inferred)'}")
     print('VC6 SP3 remains the authoritative compiler oracle; clang smoke matches validate plumbing/layout only.')
 
 if __name__ == '__main__':

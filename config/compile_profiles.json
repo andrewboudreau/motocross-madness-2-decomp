@@ -1,5 +1,5 @@
 {
-  "notes": "Flag sets are hypotheses. RTTI (/GR) is confirmed by the retail binary; optimization/runtime/CPU flags still need empirical matching. clang_probe disables /GS so modern stack-cookie codegen does not contaminate comparisons with the VC6-era retail binary.",
+  "notes": "Flag sets are hypotheses. RTTI (/GR) is confirmed by the retail binary; optimization/runtime/CPU flags still need empirical matching. clang_probe disables /GS so modern stack-cookie codegen does not contaminate comparisons with the VC6-era retail binary. VC6 /Z7 supplies COFF function-size metadata for matching; it is a measurement setting, not a claim about the original build.",
   "profiles": {
     "vc6_o2_ml_g6": [
       "/nologo",
@@ -8,7 +8,8 @@
       "/GR",
       "/GX",
       "/ML",
-      "/G6"
+      "/G6",
+      "/Z7"
     ],
     "vc6_o2_mt_g6": [
       "/nologo",
@@ -17,7 +18,8 @@
       "/GR",
       "/GX",
       "/MT",
-      "/G6"
+      "/G6",
+      "/Z7"
     ],
     "vc6_o2_ml": [
       "/nologo",
@@ -25,7 +27,8 @@
       "/O2",
       "/GR",
       "/GX",
-      "/ML"
+      "/ML",
+      "/Z7"
     ],
     "vc6_o2_mt": [
       "/nologo",
@@ -33,7 +36,8 @@
       "/O2",
       "/GR",
       "/GX",
-      "/MT"
+      "/MT",
+      "/Z7"
     ],
     "vc6_o1_ml": [
       "/nologo",
@@ -41,7 +45,8 @@
       "/O1",
       "/GR",
       "/GX",
-      "/ML"
+      "/ML",
+      "/Z7"
     ],
     "vc6_o1_mt": [
       "/nologo",
@@ -49,7 +54,8 @@
       "/O1",
       "/GR",
       "/GX",
-      "/MT"
+      "/MT",
+      "/Z7"
     ],
     "clang_probe": [
       "/nologo",

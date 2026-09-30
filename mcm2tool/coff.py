@@ -10,6 +10,7 @@ class CoffSection:
 @dataclass
 class CoffSymbol:
     index:int; name:str; value:int; section_number:int; type:int; storage_class:int; aux_count:int
+    function_size:int|None = None
 
 @dataclass
 class CoffRelocation:
@@ -43,7 +44,15 @@ class CoffObject:
             name8=self.data[off:off+8]
             value,secnum,typ,sc,aux=struct.unpack_from('<IhHBB',self.data,off+8)
             name=self._decode_symbol_name(name8)
-            self.symbols.append(CoffSymbol(i,name,value,secnum,typ,sc,aux))
+            function_size = None
+            if i + aux >= self.sym_count:
+                raise CoffError('truncated auxiliary symbol records')
+            # PE/COFF auxiliary format 1: TotalSize excludes section alignment.
+            # VC6 emits this record with /Z7. Do not guess by trimming NOPs or
+            # by borrowing the retail function's requested size.
+            if secnum > 0 and typ == 0x20 and sc == 2 and aux:
+                function_size = struct.unpack_from('<I', self.data, off + 18 + 4)[0]
+            self.symbols.append(CoffSymbol(i,name,value,secnum,typ,sc,aux,function_size))
             i += 1+aux
         self.symbol_by_index={s.index:s for s in self.symbols}
         self.relocations=[]
@@ -82,13 +91,21 @@ class CoffObject:
         sec=self.section(s.section_number)
         starts=sorted({x.value for x in self.symbols if x.section_number==s.section_number and x.value>s.value and x.storage_class in (2,3,105)})
         end=starts[0] if starts else sec.raw_size
+        if s.function_size is not None:
+            declared_end = s.value + s.function_size
+            if s.function_size <= 0 or declared_end > min(end, sec.raw_size):
+                raise CoffError(f'invalid function size for {s.name}: {s.function_size}')
+            end = declared_end
         if end<s.value: raise CoffError('bad symbol extent')
         raw=self.data[sec.raw_ptr+s.value:sec.raw_ptr+end]
         rel=[r for r in self.relocations if r.section_number==sec.index and s.value<=r.virtual_address<end]
         return raw,end-s.value,rel
 
 def alignment_padding(cand:bytes,target_size:int,sym_offset:int,align:int=16,fill:int=0x90)->int:
-    """Count trailing section-alignment filler after a candidate function.
+    """Diagnose a possible alignment tail; never use this as a match boundary.
+
+    Target-dependent NOP trimming is not proof of a function's extent. Matchers
+    use symbol_extent and its compiler-emitted auxiliary length instead.
 
     Without COMDAT sections, VC6 pads each function in .text to a 16-byte
     boundary with NOPs, so a symbol's extent (up to the next symbol or section

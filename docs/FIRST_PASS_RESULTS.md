@@ -1,4 +1,8 @@
-# Current decomp results — bootstrap v0.5
+# Historical decomp results — bootstrap v0.5
+
+This is an earlier snapshot, not the current counts or compiler status. See
+[VC6_MATCHING.md](VC6_MATCHING.md) for the executed SP3 pass and README.md for
+the v0.6 bootstrap inventory. The evidence and older results below are retained.
 
 ## Recovered project surface
 

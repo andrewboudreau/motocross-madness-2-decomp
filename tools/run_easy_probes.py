@@ -3,7 +3,8 @@ from __future__ import annotations
 import argparse,json,os,subprocess,sys,tempfile
 from pathlib import Path
 from mcm2tool.pe import PEImage
-from mcm2tool.coff import CoffObject, relocation_mask, alignment_padding
+from mcm2tool.coff import CoffObject, relocation_mask
+from mcm2tool.easy_match import match_easy_strict
 
 def run(cmd):
     r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
@@ -16,8 +17,6 @@ def match_one(pe, obj, target):
     sym=obj.find_symbol(target['symbol_contains'])
     cand,csize,rels=obj.symbol_extent(sym)
     retail=pe.bytes_at_va(va,size)
-    pad=alignment_padding(cand,len(retail),sym.value)
-    if pad: cand=cand[:-pad]
     mask=relocation_mask(obj,sym,len(cand),rels)
     n=min(len(retail),len(cand)); mism=[]; comparable=0; matching=0
     for i in range(n):
@@ -26,7 +25,8 @@ def match_one(pe, obj, target):
         if retail[i]==cand[i]: matching+=1
         elif len(mism)<64: mism.append({'offset':i,'target':retail[i],'candidate':cand[i]})
     exact=(len(retail)==len(cand) and matching==comparable)
-    return {'target_va':f'0x{va:08x}','target_size':len(retail),'candidate_size':len(cand),'symbol':sym.name,'relocations_masked':sum(mask),'comparable_bytes':comparable,'matching_bytes':matching,'match_percent':round(100*matching/comparable,4) if comparable else 100.0,'exact_after_relocation_mask':exact,'alignment_padding_bytes':pad,'mismatches':mism,'probe':target}
+    strict = match_easy_strict(pe, obj, target)
+    return {'target_va':f'0x{va:08x}','target_size':len(retail),'candidate_size':len(cand),'symbol':sym.name,'relocations_masked':sum(mask),'comparable_bytes':comparable,'matching_bytes':matching,'match_percent':round(100*matching/comparable,4) if comparable else 100.0,'exact_after_relocation_mask':exact,'mismatches':mism,'probe':target,'strict_exact':strict['strict_exact'],'strict_match':strict}
 
 def main():
     ap=argparse.ArgumentParser()
@@ -49,5 +49,5 @@ def main():
         pe=PEImage(a.exe); obj=CoffObject(obj_path)
         results=[match_one(pe,obj,t) for t in manifest]
     print(json.dumps(results,indent=2))
-    if not all(r.get('exact_after_relocation_mask') for r in results): raise SystemExit(1)
+    if not results or not all(r.get('strict_exact') for r in results): raise SystemExit(1)
 if __name__=='__main__': main()

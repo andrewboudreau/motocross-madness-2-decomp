@@ -2,7 +2,7 @@
 from __future__ import annotations
 import argparse,json
 from mcm2tool.pe import PEImage
-from mcm2tool.coff import CoffObject, relocation_mask, alignment_padding
+from mcm2tool.coff import CoffObject, relocation_mask
 
 def hx(b):return ' '.join(f'{x:02x}' for x in b)
 def main():
@@ -12,9 +12,8 @@ def main():
  a=ap.parse_args();pe=PEImage(a.exe);obj=CoffObject(a.obj);sym=obj.find_symbol(a.symbol);cand,csize,rels=obj.symbol_extent(sym)
  # Use requested target function size. A COMDAT section normally gives exact candidate size.
  target=pe.bytes_at_va(a.target_va,a.target_size)
- # VC6 .text alignment NOPs after the function are not part of it.
- pad=alignment_padding(cand,len(target),sym.value)
- if pad: cand=cand[:-pad]
+ # Function extents come from COFF metadata, never the requested target size.
+ pad=0
  mask=relocation_mask(obj,sym,len(cand),rels)
  n=min(len(target),len(cand));mism=[];comparable=0;matching=0
  for i in range(n):

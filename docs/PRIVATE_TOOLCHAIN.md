@@ -105,6 +105,12 @@ A failed MCM2 byte match does not mean the private environment is broken. It is
 compiler/profile/source-shape evidence. Conversely, a successful static bundle
 check does not claim the compiler has executed.
 
+When `--full-gate` is requested, its failing exit status propagates to the
+caller while the report can still say `ready: true`. Run the analysis bootstrap
+before the full gate: generated probes require `analysis/easy_targets.json`.
+The historical gate now requires executed SP3 identity and strict generated
+probe comparisons, including resolution of both global-load addresses.
+
 ## Current bundle facts verified outside Wine
 
 The supplied archive was independently verified before these scripts were added:
@@ -118,6 +124,9 @@ The supplied archive was independently verified before these scripts were added:
 - `LINK.EXE` SHA-256 `df858ec7...5e837`.
 - Both `LIBC.LIB` and `LIBCMT.LIB` are present for later runtime-object analysis.
 
-This current Linux sandbox has no Wine, so it can prove bundle integrity but not
-claim an authentic VC6 execution. `vc6_acceptance.py` reports that state as not
-ready instead of silently falling back to clang.
+The initial Linux verification environment had no Wine, so that pass established
+bundle integrity only. A subsequent native Windows run passed installation,
+real compiler readiness, and the full manual/generated gate with the local COFF
+function-length and strict-relocation changes. See `VC6_MATCHING.md` for the
+results and remaining calibration failures. Linux/Wine execution is still
+unverified; the acceptance script reports a missing Wine environment as not ready.

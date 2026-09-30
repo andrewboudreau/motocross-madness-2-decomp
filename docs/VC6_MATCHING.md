@@ -1,0 +1,129 @@
+# VC6 SP3 matching check — 2026-09-29
+
+The private VC6 SP3 compiler now runs natively on Windows. No further compiler
+download is needed for this matching pass. The target executable has SHA-256
+`31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
+
+## Results
+
+Using the existing readable candidates and `vc6_o2_ml_g6`:
+
+| Corpus | Result | Scope of the comparison |
+| --- | --- | --- |
+| Hand-written smoke samples | 19/19 exact | Complete function bodies; zero masked relocation bytes |
+| Generated easy probes | 39/39 strict exact | 37 without relocations; two global-load probes resolve all address bytes |
+| Calibration | 8/16 pass | Seven without relocations; the destructor core masks its vtable address |
+
+These are function-level results, not a whole-game rebuild. Semantic names and
+translation-unit ownership retain their existing evidence tiers. The masked
+comparisons in calibration do not prove relocation destinations. The main gate
+now requires SP3 identity and successful compiler execution, manual matches with
+no masked bytes, and strict generated-probe results. Calibration remains a
+separate, partially matching corpus.
+
+The two global-load addresses were re-decoded from the current executable and
+bound to the generated external symbols before applying the COFF relocations:
+
+| Probe VA | Observed load address | Strict result |
+| --- | --- | --- |
+| `0x0040c880` | `0x00550774` | 7/7 bytes, zero ignored |
+| `0x0052a5b0` | `0x00550484` | 9/9 bytes, zero ignored |
+
+These bindings establish the operands of these two generated probes, not the
+original global variable names or library identity. Stale address/return-pop
+evidence and unexpected external symbols fail closed. Legacy masked metrics
+remain in the report for comparison, but cannot accept a generated probe.
+
+After updating to main `e464030`, the private installer verified the pinned ZIP
+and its 1,463 payload files into a cache outside the checkout. The new runner
+passed its real native CL readiness compilation and full gate with the local
+matching changes. A negative integration check changed one generated probe's
+address evidence: readiness remained true, strict matching failed, and the
+`--full-gate` process exited 1. Restoring the evidence restored a passing gate.
+
+The eight passing calibration candidates are the BaseObject destructor core,
+UIStatic slot 30, UIMultiState slots 34–37, and FollowCamera slots 63 and 70.
+Unresolved candidates are the BaseObject constructor, scalar deleting destructor
+and Release; UIControl slots 61/62; and FollowCamera slots 69/71/72. A mismatch
+alone does not establish a different compiler: source shape and flags remain
+under investigation. Linux/Wine execution was not tested in this pass.
+
+## What simple matching looks like
+
+The existing BaseObject probe expresses the directly observed field behavior:
+
+```cpp
+int BaseObject::AddRef() {
+    return ++refCount;
+}
+
+int BaseObject::GetRefCount() {
+    return refCount;
+}
+```
+
+RTTI confirms the class; the field is at `this+4`. The method and member names
+remain semantic inferences. Both methods match without relocation masking:
+
+| Candidate | Target VA | Compiler and target bytes |
+| --- | --- | --- |
+| AddRef | `0x00405160` | `8b 41 04 40 89 41 04 c3` |
+| GetRefCount | `0x00401940` | `8b 41 04 c3` |
+
+For AddRef these instructions load the field, increment EAX, write it back, and
+return the new value. No C++ changes were needed to obtain these matches.
+
+## Function lengths and alignment
+
+VC6 places these 8-byte and 4-byte functions in 16-byte COFF sections, with
+trailing NOP alignment. The previous parser compared the whole section against
+the function and reported a length mismatch despite matching instruction bytes.
+
+VC6 profiles now include `/Z7`, which emits the function-definition auxiliary
+record. The parser uses its `TotalSize`, defined by the
+[Microsoft PE/COFF specification](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#auxiliary-format-1-function-definitions).
+It rejects zero or out-of-bounds sizes. Objects without that record retain the
+previous section/next-symbol extent; NOPs are never guessed away, and the target
+length does not determine the candidate length.
+
+Paired compilations with and without `/Z7` of 12 sample source files had identical
+code sections, including padding, and identical relocation destinations. Local
+compiler label names were compared by section and offset because debug metadata
+can renumber them. `/Z7` is measurement metadata, not evidence that the game used
+that flag. For example, FollowCamera slot 71 still has a 192-byte declared extent,
+including its jump table; it is not accepted by clipping to the 171-byte target.
+
+## Reproduce
+
+From a checkout with the private input bundle extracted (see TOOLCHAIN.md), in
+PowerShell:
+
+```powershell
+$env:PYTHONPATH = '.'
+$env:VC6_ROOT = (Resolve-Path 'toolchains/vc6sp3').Path
+python tools/probe_vc6.py --vc6-root $env:VC6_ROOT
+python tools/compile.py samples/base_object/BaseObject.cpp -o work/base-object.obj --compiler vc6 --vc6-root $env:VC6_ROOT
+python tools/match.py --exe work/game/mcm2.exe --target-va 0x00405160 --target-size 8 --obj work/base-object.obj --symbol AddRef@BaseObject --json
+python tools/match.py --exe work/game/mcm2.exe --target-va 0x00401940 --target-size 4 --obj work/base-object.obj --symbol GetRefCount@BaseObject --json
+python -m unittest discover -s tests -p test_coff.py -v
+```
+
+After generating analysis, run `tools/vc6_gate.py --vc6-root $env:VC6_ROOT` for
+both smoke corpora and calibration. Local evidence from this pass is stored in
+`work/vc6-simple-matching/gate.json` and `metadata-codegen-check.json`; those
+generated/private-input reports are not committed. The subsequent strict pass
+is recorded in `work/vc6-simple-matching/strict-gate.json`; private-runner
+readiness/full-gate and negative-check reports are under `work/private-runner-*.json`.
+
+## Documentation review
+
+- README, TOOLCHAIN, ROADMAP, RECONSTRUCTION_STATUS and AGENTS now point to the
+  executed SP3 checks instead of treating compiler acquisition as the next task.
+- FIRST_PASS_RESULTS is retained as a historical v0.5 snapshot, with its older
+  counts explicitly marked. CHANGELOG remains historical by design.
+- Allocation, provenance, category and class-model documents still describe
+  separate evidence workflows. Their dated non-execution statements concern
+  those earlier passes; these function tests do not establish CRT attribution,
+  source ownership, Linux execution, or GitHub CI results for them.
+
+No evidence document was deleted solely because the compiler became available.

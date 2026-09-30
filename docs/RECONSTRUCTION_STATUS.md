@@ -1,5 +1,9 @@
 # Reconstruction status
 
+Current compiler evidence: [VC6 SP3 matching check](VC6_MATCHING.md).
+Native Windows SP3 now passes 19/19 manual samples; the larger calibration set
+remains partially matching. The earlier clang results below are retained.
+
 ## BaseObject — promoted
 
 Confirmed binary evidence:
@@ -9,9 +13,9 @@ Confirmed binary evidence:
 - 32-bit field at `this+0x04`
 - constructor `0x00405120` writes the BaseObject vptr and initializes the field to 1
 - scalar deleting destructor `0x00405130` wraps destructor core `0x00405150`
-- `0x00405160` (provisional `AddRef`) is an 8/8 exact clang/MSVC-ABI match
+- `0x00405160` (provisional `AddRef`) is an 8/8 exact clang/MSVC-ABI and VC6 SP3 match
 - `0x00405170` (provisional `Release`) remains a VC6 calibration target
-- `0x00401940` (provisional `GetRefCount`) is a 4/4 exact clang/MSVC-ABI match
+- `0x00401940` (provisional `GetRefCount`) is a 4/4 exact clang/MSVC-ABI and VC6 SP3 match
 
 The names `AddRef`, `Release`, `GetRefCount`, and `refCount` are semantic/provisional. The class identity, layout, vtable, and machine behavior are evidence-backed.
 

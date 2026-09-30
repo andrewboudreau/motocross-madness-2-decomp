@@ -62,9 +62,11 @@ Do not hand-maintain trivial getter/setter probes. The analyzer classifies conse
 make easy-smoke
 ```
 
-Current gate: 34/34 high-confidence probes exact under clang-cl's 32-bit MSVC ABI.
+The v0.6 clang baseline is 39/39. The executed native VC6 SP3 pass also reaches
+39/39 generated probes with address relocations resolved and 19/19 manual
+samples without masking. See `docs/VC6_MATCHING.md` for calibration gaps and reproduction.
 
-When VC6 is available:
+With the private VC6 SP3 tree configured:
 
 ```bash
 make easy-smoke-vc6 VC6_ROOT="$VC6_ROOT"

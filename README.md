@@ -15,6 +15,11 @@ retail installer
 
 ## Current verified state
 
+Native Windows VC6 SP3 matching now passes **19/19 hand-written samples** without
+relocation masking and **39/39 generated probes** with address relocations resolved.
+Calibration passes **8/16**. See [the executed checks and remaining gaps](docs/VC6_MATCHING.md).
+The bootstrap inventory below also includes earlier clang results.
+
 For the supplied installer:
 
 - 104 shipped files recovered from the embedded CAB
@@ -49,6 +54,10 @@ make bootstrap INSTALLER=/path/to/MCM2PCG.exe
 ```
 
 The bootstrap extracts the retail files, analyzes the executable, generates class evidence, recognizes MSVC destructor/thunk artifacts, finds vtable writes, runs the hand-written and generated clang gates, records compiler-calibration baselines, and rebuilds the agent function manifest.
+
+If you already have the private input ZIP, extract it into the checkout and use
+its `work/private-inputs/README.md` and `bootstrap_analysis.py`. It contains the
+target EXE and compiler inputs; the full installer is unnecessary for analysis.
 
 ## Fast status / gates
 

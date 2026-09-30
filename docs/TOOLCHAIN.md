@@ -1,5 +1,33 @@
 # Toolchain fingerprint and VC6 import
 
+## Verified local setup
+
+For new workers, use the pinned installer and process wrapper described in
+[PRIVATE_TOOLCHAIN.md](PRIVATE_TOOLCHAIN.md). This verifies the archive into a
+private cache outside the checkout and proves that the authentic compiler runs.
+The older manual import and bundle-overlay workflows below remain usable.
+
+The assembled SP3 tree has passed native Windows compile/link/run checks and
+the function checks in [VC6_MATCHING.md](VC6_MATCHING.md). Compiler acquisition
+is complete for this pass; remaining work is source/profile calibration and
+relocation validation. Linux/Wine execution remains a separate check.
+
+The private `mcm2-vc6sp3-private-inputs.zip` overlays an existing checkout with
+`toolchains/vc6sp3/`, `work/game/mcm2.exe`, setup helpers, and per-file hashes.
+Read `work/private-inputs/README.md` after extraction. No installer is needed
+when this exact extracted EXE is already present. Do not use the default Docker
+Compose command with this bundle: it invokes the installer-based bootstrap;
+override it with the analysis helper or a gate command.
+
+The SP3 disc stores the full compiler backend as `os/system/msvcep.dll`:
+its original filename is `C2.DLL`, version `12.0.8447.0`. The installer selects
+this file for the full compiler; `msse.dll` and `intro.dll` are different edition
+variants. The verified tree combines the Professional build-8168 disc with its
+German SP3 update and places `MSPDB60.DLL` beside `CL.EXE` for DLL discovery.
+The unchanged driver banner is 8168; C1/C1XX are 8472 and C2 is 8447.
+The German LINK text version is stale (8168), while its fixed version/build
+and banner identify 8447. Inspect the components, not just a single string.
+
 ## Retail executable evidence
 
 The MCM2 executable contains a Microsoft Rich header. Relevant records include:
@@ -112,3 +140,7 @@ Only `/GR` is strongly indicated by the abundant MSVC RTTI. The initial profiles
 - inlining and frame-pointer behavior.
 
 Do not select these from convention alone; use byte-match evidence.
+
+VC6 profiles also include `/Z7` to expose COFF function lengths to the matcher.
+This is measurement metadata, not a claimed original flag. See VC6_MATCHING.md
+for the paired codegen checks and the distinction between code and alignment.

@@ -33,9 +33,14 @@ Completed:
 - promoted `BaseObject` reconstruction under `src/reconstructed/`;
 - FollowCamera exact preset slice plus state-toggle/cyclic-list/hidden-return-buffer/state-dispatch calibration targets.
 
-## Next hard gate — authentic VC6 SP3 oracle
+## Next hard gate — remaining VC6 source/profile calibration
 
-With a privately owned SP3-patched `VC98` tree:
+Native Windows SP3 execution is verified: 19/19 manual samples match without
+relocation masking, 39/39 generated probes pass with their relocations resolved,
+and calibration passes 8/16. Compiler acquisition is complete for this pass.
+See [VC6_MATCHING.md](VC6_MATCHING.md) for the exact scope and remaining failures.
+
+To reproduce on another machine with a privately owned SP3-patched `VC98` tree:
 
 ```bash
 make import-vc6 VC6_SOURCE=/path/to/vc98-or-archive
@@ -43,17 +48,17 @@ make wine-init
 make vc6-gate VC6_ROOT=$PWD/toolchains/vc6sp3
 ```
 
-Highest-value outcomes:
+Calibration checklist (passing entries remain regression checks):
 
-1. all 39 generated high-confidence probes stay exact under VC6;
-2. all 19 hand-written smoke samples stay exact;
+1. preserve 39/39 strict generated probe results (both global addresses are now validated);
+2. preserve 19/19 hand-written exact smoke samples;
 3. `BaseObject::BaseObject()` reproduces the retail `mov eax,ecx` / vptr / `refCount=1` shape;
 4. the BaseObject scalar deleting destructor reproduces the 30-byte canonical VC6 wrapper;
-5. `BaseObject::~BaseObject()` reproduces the retail vptr reset;
+5. validate the vptr destination in the currently masked-exact destructor core;
 6. `BaseObject::Release()` becomes exact;
 7. UI slots 61/62 reproduce VC6's two-register subtraction;
-8. return-zero functions settle the `33 C0` encoder/profile behavior;
-9. UIMultiState slots 34–37 settle VC6 SIB/LEA codegen for indexed 32-byte elements.
+8. preserve the exact UIStatic return-zero `33 C0 C3` encoding;
+9. preserve the four exact UIMultiState indexed-element methods.
 
 Treat failures first as compiler-version/profile evidence, not permission to distort readable source.
 

@@ -5,7 +5,7 @@ Unlike masking, every supported relocation is applied and every byte compared.
 """
 from __future__ import annotations
 import struct
-from .coff import CoffObject, alignment_padding
+from .coff import CoffObject
 
 
 class RelocationError(ValueError):
@@ -68,10 +68,8 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
     section = obj.section(sym.section_number)
     if sym.value < 0 or sym.value + len(raw) > section.raw_size or section.raw_ptr + section.raw_size > len(obj.data):
         raise RelocationError('truncated COFF function storage')
-    padding = alignment_padding(raw, len(retail), sym.value)
-    if padding:
-        raw = raw[:-padding]
-        rels = [r for r in rels if r.virtual_address - sym.value < len(raw)]
+    # No target-sized trimming: symbol_extent owns the candidate boundary.
+    padding = 0
     converted = []
     for rel in rels:
         record = obj.symbol_by_index.get(rel.symbol_index)
