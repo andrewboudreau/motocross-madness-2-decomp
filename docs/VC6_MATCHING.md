@@ -240,12 +240,17 @@ With both changes, `tools/run_calibration.py`:
 | --- | ---: |
 | `vc6_o2_ml_g6` | 11/16 |
 | `vc6_o2_ml` | 16/16 |
+| `vc6_o2_mt` | 16/16 |
 
 The generated (39/39) and manual (19/19) corpora are unchanged in both profiles
 (`tools/vc6_profile_matrix.py`). The five `/G6` misses — Release, UIControl
 61/62, FollowCamera 69/72 — differ only in instruction selection and
 scheduling; explicit `/G5` behaves like VC6's default, and `/O1` fails the same
 targets. No calibrated target prefers `/G6`.
+
+`vc6_o2_mt` gives the same 16/16. On this evidence the `tools/compile.py` VC6
+default is now `vc6_o2_mt` (see `VC6_PROFILE_MATRIX.md`); the earlier "default
+is unchanged" note above predates the slot 69/71 results.
 
 ## Reproduce
 

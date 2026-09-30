@@ -80,5 +80,16 @@ selection. FollowCamera slots 69 and 71 remain nonmatching under both leading
 profiles. The default remains unchanged pending broader per-TU evidence. See
 `VC6_MATCHING.md`.
 
+### Default profile — 2026-09-30
+
+With FollowCamera slot 69's source shape and slot 71's 192-byte extent
+(`VC6_MATCHING.md`), `vc6_o2_ml` and `vc6_o2_mt` reach 16/16 calibration while
+`/G6` stays at 11/16; no calibrated target prefers `/G6`. The `tools/compile.py`
+default (and so the gate) is now `vc6_o2_mt`: `/ML` and `/MT` emit identical code
+for every tested target, and `/MT` is the runtime supported by the LIBCMT proof.
+This is the best-supported working hypothesis, not a confirmed per-TU project
+setting; pass `--profile` to test others, and keep treating a new mismatch as
+evidence about flags or source shape.
+
 Summaries prefer `strict_exact` when present. A wrong relocation binding cannot
 be counted as exact merely because the legacy masked comparison passes.
