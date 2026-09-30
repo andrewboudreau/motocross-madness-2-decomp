@@ -169,6 +169,14 @@ if [ -f "$PRIVATE_ROOT/.installed-$BUNDLE_SHA256" ]; then
     clean=0; git diff --quiet -- "${docs[@]}" 2>/dev/null && clean=1
     make -s analyze >/dev/null || warn "make analyze failed"
     [ "$clean" = 1 ] && git checkout -q -- "${docs[@]}" 2>/dev/null || true
+    # Keep generated output out of `git status` (local .git/info/exclude only):
+    # analysis/, generated/ (easy probes), and the src/krusty2 skeleton files that exist right now,
+    # listed one by one so later hand-written files there still show up.
+    if excl="$(git rev-parse --git-path info/exclude 2>/dev/null)"; then
+      mkdir -p "$(dirname "$excl")"; touch "$excl"
+      { echo /analysis/; echo /generated/; git ls-files --others --exclude-standard -- src/krusty2 | sed 's|^|/|'; } \
+        | while read -r line; do grep -qxF "$line" "$excl" || echo "$line" >> "$excl"; done
+    fi
   fi
 fi
 
