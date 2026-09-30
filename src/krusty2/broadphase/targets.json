@@ -1,0 +1,245 @@
+[
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??0QuadTreeNode",
+    "target_va": "0x004dd070",
+    "target_size": 48,
+    "expect": "exact",
+    "notes": "node ctor (vptr, list/children null, node count++, y interval 0/-FLT_MAX)"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??_GQuadTreeNode",
+    "target_va": "0x004dd0a0",
+    "target_size": 32,
+    "expect": "exact",
+    "notes": "scalar deleting dtor wrapper (includes 2 padding bytes)"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??1QuadTreeNode",
+    "target_va": "0x004dd0c0",
+    "target_size": 101,
+    "expect": "exact",
+    "notes": "dtor core"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??_GQuadTree@",
+    "target_va": "0x004dda90",
+    "target_size": 32,
+    "expect": "exact",
+    "notes": "scalar deleting dtor wrapper (includes 2 padding bytes)"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??1QuadTree@@",
+    "target_va": "0x004dc840",
+    "target_size": 116,
+    "expect": "exact",
+    "notes": "dtor core"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot1@QuadTree@@",
+    "target_va": "0x004dc7e0",
+    "target_size": 94,
+    "expect": "exact",
+    "notes": "slot 1 node factory (operator new 0x14, Quadtree.cpp line 0x7a; ctor inlined only if defined after it)"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Reset@QuadTree",
+    "target_va": "0x004dc620",
+    "target_size": 70,
+    "expect": "exact",
+    "notes": "reset pools/root"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "ComputeCode",
+    "target_va": "0x004dc8c0",
+    "target_size": 504,
+    "expect": "exact",
+    "notes": "world rect -> 8 bit (depth, quadrant) code"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "UpdateRange",
+    "target_va": "0x004dcd40",
+    "target_size": 477,
+    "expect": "exact",
+    "notes": "move an object within the tree when its code/Y range changes"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "RemoveObject",
+    "target_va": "0x004dd1b0",
+    "target_size": 177,
+    "expect": "exact",
+    "notes": "unlink object from the node item list"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "BeginQuery",
+    "target_va": "0x004dd270",
+    "target_size": 354,
+    "expect": "exact",
+    "notes": "start a rectangle query"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Gather@QuadTreeNode",
+    "target_va": "0x004dd3e0",
+    "target_size": 258,
+    "expect": "exact",
+    "notes": "collect nodes overlapping a rectangle"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "GatherAll",
+    "target_va": "0x004dd4f0",
+    "target_size": 65,
+    "expect": "exact",
+    "notes": "collect a node and all children"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "NextObject@QuadTree@@QAEPAV",
+    "target_va": "0x004dd540",
+    "target_size": 144,
+    "expect": "exact",
+    "notes": "iterate query results, stamp-deduplicated"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "CompareObjectKey",
+    "target_va": "0x004dd5d0",
+    "target_size": 48,
+    "expect": "exact",
+    "notes": "qsort comparator; target_size 48 includes the 6 padding bytes the retail linker left after the 42-byte body"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "RestartQuery",
+    "target_va": "0x004dd750",
+    "target_size": 22,
+    "expect": "exact",
+    "notes": "rewind the query"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "EndQuery",
+    "target_va": "0x004dd770",
+    "target_size": 44,
+    "expect": "exact",
+    "notes": "end the query"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot2@QuadTreeNode",
+    "target_va": "0x004dd7a0",
+    "target_size": 740,
+    "expect": "exact",
+    "notes": "slot 2 back-to-front gather (returns result list)"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot1@QuadTreeNode@@",
+    "target_va": "0x004ddab0",
+    "target_size": 551,
+    "expect": "exact",
+    "notes": "slot 1 back-to-front traversal"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Grow",
+    "target_va": "0x004ddce0",
+    "target_size": 50,
+    "expect": "exact",
+    "notes": "realloc node to hold inline child array"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "CollectItems",
+    "target_va": "0x004ddd20",
+    "target_size": 104,
+    "expect": "exact",
+    "notes": "append a node's item blocks to the result array"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "IsValidCode",
+    "target_va": "0x004ddd90",
+    "target_size": 58,
+    "expect": "exact",
+    "notes": "validate a code against the depth"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Init@QuadTree",
+    "target_va": "0x004dc670",
+    "target_size": 365,
+    "expect": "partial",
+    "notes": "18.4% match under vc6_o2_ml. Readable reconstruction of cell-size table, world rect, pools, root. Diverges at the SEH state/handler push and store ordering: retail stores field_0x5c later and reloads args differently (register allocation of the float extent computation)."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Insert@QuadTree",
+    "target_va": "0x004dcac0",
+    "target_size": 627,
+    "expect": "partial",
+    "notes": "3.6% match. Same control flow; retail keeps `this` in ecx->esp+8 spill and a different register assignment (ebp/ebx swap) and a different prologue ordering of the code test and arg loads."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Remove@QuadTree",
+    "target_va": "0x004dcf20",
+    "target_size": 331,
+    "expect": "partial",
+    "notes": "11.3% match. Same control flow; retail holds this in ebp and code in ecx, candidate holds code in esi (register allocation)."
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "AddObject",
+    "target_va": "0x004dd130",
+    "target_size": 117,
+    "expect": "partial",
+    "notes": "2.8% match. Retail walks the block list with edi=this and zeroes a freshly allocated block through a copied pointer; candidate uses ebx/ebp and Clear() order differs."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "NextObjectSorted",
+    "target_va": "0x004dd600",
+    "target_size": 330,
+    "expect": "partial",
+    "notes": "27.5% match. Same sorted-stack algorithm (qsort with CompareObjectKey); retail differs in branch layout after the drain check and in register assignment."
+  }
+]

@@ -1,6 +1,6 @@
 // GraphicsTest.h -- GraphicsTest : GameObject, shared by every GraphicsTest-derived physics
 // class (CollisionObject in collision/, PhysicsBody in rigidbody/).  Split out of
-// collision/CollisionObject.h and rigidbody/PhysicsBody.h (which each carried a copy) so the
+// collision/CollisionObject.h and samples/physics/rigidbody/PhysicsBody.h (which each carried a copy) so the
 // class has one declaration.
 //
 // Evidence:

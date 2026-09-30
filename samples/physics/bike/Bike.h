@@ -19,7 +19,7 @@
 #define MCM2_PHYSICS_BIKE_H
 
 #include "../vehicle/Vehicle.h"
-#include "../common/DebugAlloc.h"
+#include "core/DebugAlloc.h"
 
 
 struct BikeWheel;

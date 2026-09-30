@@ -1,5 +1,5 @@
-// QuadTree.cpp -- reconstruction of D:\aardvark\VC\krusty2\Quadtree.cpp (broad phase).
-#include "QuadTree.h"
+// Quadtree.cpp -- reconstruction of D:\aardvark\VC\krusty2\Quadtree.cpp (broad phase).
+#include "Quadtree.h"
 
 extern "C" void qsort(void* base, unsigned int num, unsigned int width,
                       int (*compare)(const void*, const void*));   // 0x00534426

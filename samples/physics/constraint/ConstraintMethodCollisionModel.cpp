@@ -31,7 +31,7 @@
 //
 #include "ConstraintMethodCollisionModel.h"
 
-#include "../common/DebugAlloc.h"   // DebugRealloc
+#include "core/DebugAlloc.h"   // DebugRealloc
 
 // The two callbacks slot 8 installs (CollisionObject.h, CollisionCallback).
 void ConstraintContactCallback(CollisionObject* self, CollisionObject* other);  // 0x0043b800, below

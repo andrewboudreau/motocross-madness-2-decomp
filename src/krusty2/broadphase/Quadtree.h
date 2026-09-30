@@ -1,4 +1,4 @@
-// QuadTree.h -- collision broad phase: QuadTree / QuadTreeNode (Quadtree.cpp).
+// Quadtree.h -- collision broad phase: QuadTree / QuadTreeNode (Quadtree.cpp).
 //
 // Evidence (tier 1 unless noted; analysis/*.json + target bytes):
 //  * RTTI .?AVQuadTree@@ (vtable 0x0055763c, 2 slots) and .?AVQuadTreeNode@@
@@ -18,10 +18,10 @@
 #ifndef BROADPHASE_QUADTREE_H
 #define BROADPHASE_QUADTREE_H
 
-#include "../collision/CollisionObject.h"   // QuadTreeObject (canonical)
+#include "collision/CollisionObject.h"   // QuadTreeObject (canonical)
 
-// Debug allocation forms (size/ptr, __FILE__, __LINE__): ../common/DebugAlloc.h.
-#include "../common/DebugAlloc.h"
+// Debug allocation forms (size/ptr, __FILE__, __LINE__): core/DebugAlloc.h.
+#include "core/DebugAlloc.h"
 
 // Fixed-size block pool (retail 0x00423f70 ctor(elemSize, count), 0x00423fb0 dtor,
 // 0x00423fc0 Alloc, 0x00424050 Free, 0x00424110 Reset; object size 0x28 from the
