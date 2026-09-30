@@ -344,15 +344,6 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot55@Vehicle",
-    "target_va": "0x0052b6d0",
-    "target_size": 63,
-    "expect": "partial",
-    "notes": "slot 55 (introduced); 12.8% match: Vec3 copy of out=zero then out=field_0xa0; target reloads out from stack and copies via a temp; source shape not found"
-  },
-  {
-    "class": "Vehicle",
-    "source": "Vehicle.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot42@Vehicle",
     "target_va": "0x0052b710",
     "target_size": 39,
@@ -376,5 +367,122 @@
     "target_size": 42,
     "expect": "exact",
     "notes": "slot 96 (introduced); exact under vc6_o2_ml (no /G6)"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot7@Vehicle",
+    "target_va": "0x00526fa0",
+    "target_size": 1161,
+    "expect": "partial",
+    "notes": "slot 7 (override); ~9% byte match (position-shifted): control flow and FPU ops decoded and reproduced (inverse-distance blend of *arg over active contacts/wheels); remaining diff is local layout (retail keeps the share temp at esp+0x10 and the running total at 0x1c, we swap them) and x87 term order of the squared-distance sum"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot56@Vehicle",
+    "target_va": "0x005286a0",
+    "target_size": 784,
+    "expect": "partial",
+    "notes": "slot 56 (introduced); ~30% byte match: tilt-angle computation fully decoded (project reference normal perpendicular to axis via Dot/ScaleVec/SubVec/Normalize helpers, side = right x axis, angle = asin(min(1,|perp x side|)*sign), cos stored on request); diffs are local stack layout (retail temps at esp+0xc/0x18/0x24) and esi/edi register roles"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot58@Vehicle",
+    "target_va": "0x005289c0",
+    "target_size": 938,
+    "expect": "partial",
+    "notes": "slot 58 (introduced); ~22% byte match (esi/edi role swap shifts everything): snaps pose to wheels; control flow matches instruction-for-instruction up to register naming. Retail keeps a dead 'second highest wheel' (edx) alive which flips this/lead-wheel register assignment; we drop it as dead"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot55@Vehicle",
+    "target_va": "0x0052b6d0",
+    "target_size": 63,
+    "expect": "partial",
+    "notes": "slot 55 (introduced); returns out (eax) - decoded; see match %"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot74@Vehicle",
+    "target_va": "0x005281b0",
+    "target_size": 539,
+    "expect": "partial",
+    "notes": "slot 74 (introduced); ~9% byte match: velocity-deflection decoded (impulse dir*(m^2/-k*dt) scaled by min(1.5c,1) added to velocity, renormalised to old speed, returns signed acos angle; 0 if negligible/non-finite). Diffs: retail keeps k live in x87 and uses esi=dir/edi=this; our register roles and FPU temp order differ"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot72@Vehicle",
+    "target_va": "0x00527e30",
+    "target_size": 831,
+    "expect": "partial",
+    "notes": "slot 72 (introduced); ~4% byte match: contact/wheel normal accumulation + slot-74 call decoded (sum of flagged wheels' +0x230 crossed with normal sum gives the push axis). Diffs: retail keeps this in ebx/out in esi and pushes ebp late; our register allocation differs and shifts all bytes"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot18@Vehicle",
+    "target_va": "0x529dc0",
+    "target_size": 529,
+    "expect": "partial",
+    "notes": "Impact post: 3 passes (aux wheels, wheels, contacts) gated by material table; 6.25% (size 528/529). Cause: retail keeps the found wheel/contact loop index/pointer in different regs and emits the common tail once (shared), ours inlines it per pass."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot19@Vehicle",
+    "target_va": "0x529fe0",
+    "target_size": 679,
+    "expect": "partial",
+    "notes": "Scrape impact w/ clamped vector into sink+0x74; 8.3% (size 681/679). Cause: retail hoists loop pointers (esi/edi) and shares tail; x87 sign select (-1/1 * w280.z) ordering."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot20@Vehicle",
+    "target_va": "0x52a290",
+    "target_size": 614,
+    "expect": "partial",
+    "notes": "Same as 19 without material gate, sink at event+0xc, flag 0x168; 4.5% (size 602/614). Cause: loop/register allocation, tail sharing."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot4@Vehicle",
+    "target_va": "0x5265d0",
+    "target_size": 555,
+    "expect": "partial",
+    "notes": "Two lever-arm offsets (a1+a2xa3, a7+a8xa9)*a14 fed to 17-arg cdecl helper 0x5004a0, then |a1| -> field_0xbc, field_0xcc = xform(field_0xd8); 10.8% (size 487/555). Cause: retail stores cross/scale temps via stack int copies and keeps edi/ebp shuffles; arg roles of 5004a0 unknown."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot46@Vehicle",
+    "target_va": "0x5276d0",
+    "target_size": 523,
+    "expect": "partial",
+    "notes": "Look-at offset from vehicle pos toward lead wheel / midpoint of two wheels, rotated by xform 4FD710, else field_0x194; 8.3% (size 479/523). Cause: retail routes each branch through stack temps + int copies; register roles differ."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot49@Vehicle",
+    "target_va": "0x52a940",
+    "target_size": 3254,
+    "expect": "partial",
+    "notes": "Per-frame vehicle step: substep loop (slot9 count, contacts, speed/lean smoothing, wheel-derived transform, basis block refresh); 9.5% (size 3248/3254). Cause: block/stack-temp layout (retail keeps hit/res in ebp, sequences vec copies via int movs) shifts most offsets; structure and call sequence match."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot38@Vehicle",
+    "target_va": "0x5268d0",
+    "target_size": 1455,
+    "expect": "partial",
+    "notes": "5.1% (1101/1455 B). Collision-response dispatch on event code (0/1, 0x69, 0x2711 with body -> slot 4; 0x6a/0x3e9 no body -> slot 3). Retail duplicates per-case vector setup and copies vecs via int stack temps; ours is shared/smaller."
   }
 ]
