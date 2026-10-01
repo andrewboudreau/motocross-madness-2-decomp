@@ -13,8 +13,8 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall UnknownMethod6();
-    virtual long __stdcall UnknownMethod7();
+    virtual long __stdcall UnknownMethod6(int property, struct UnknownInputProperty* value); // SetProperty
+    virtual long __stdcall UnknownMethod7();   // Acquire
     virtual long __stdcall UnknownMethod8();   // Unacquire
     virtual long __stdcall UnknownMethod9();
     virtual long __stdcall UnknownMethod10();
@@ -26,7 +26,8 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall UnknownMethod17();
     virtual long __stdcall UnknownMethod18();
-    virtual long __stdcall UnknownMethod19();
+    virtual long __stdcall UnknownMethod19(int (__stdcall* callback)(const struct UnknownEffectInfo*, void*),
+                                           void* context, unsigned long type); // EnumEffects
     virtual long __stdcall UnknownMethod20();
     virtual long __stdcall UnknownMethod21();
     virtual long __stdcall UnknownMethod22(int command); // SendForceFeedbackCommand
@@ -46,6 +47,57 @@ struct UnknownInputEntry {
     unsigned int field_0x10;
 };
 
+// 20-byte property block passed to interface method 6; the layout matches
+// DIPROPDWORD (a 16-byte header, then one value).
+struct UnknownInputProperty {
+    unsigned long size;
+    unsigned long headerSize;
+    unsigned long object;
+    unsigned long how;
+    unsigned long data;
+};
+
+// 16-byte GUID (Win32 GUID layout).
+struct UnknownGuid {
+    unsigned long data1;
+    unsigned short data2;
+    unsigned short data3;
+    unsigned char data4[8];
+};
+
+// 0x244-byte device description at PCInputDevice+0x18. Its size and the
+// offsets used (type at +0x24, product name at +0x12c) match DIDEVICEINSTANCEA.
+struct UnknownDeviceInstance {
+    unsigned long size;
+    UnknownGuid instanceGuid;
+    UnknownGuid productGuid;
+    unsigned long deviceType;      // subtype in bits 8-15
+    char instanceName[260];
+    char productName[260];
+    UnknownGuid driverGuid;
+    unsigned short usagePage;
+    unsigned short usage;
+};
+
+// Device subtype: bits 8-15 of the type, spelled like Windows HIBYTE (as in
+// DirectInput's GET_DIDEVICE_SUBTYPE). The cast chain is what makes VC6 load
+// the byte and then mask it again, as retail does.
+#define DEVICE_SUBTYPE(type) ((unsigned char)(((unsigned short)(type) >> 8) & 0xff))
+
+// 0x124-byte effect description filled by interface method 19's callback; the
+// layout matches DIEFFECTINFOA.
+struct UnknownEffectInfo {
+    unsigned long size;
+    UnknownGuid guid;
+    unsigned long effectType;
+    unsigned long staticParams;
+    unsigned long dynamicParams;
+    char name[260];
+};
+
+// cdecl 0x004beef0: writes a name for a known effect GUID; nonzero if known.
+int UnknownFunction4beef0(UnknownGuid guid, char* name);
+
 // RTTI: PCInputDevice : InputDevice. PCInputDeviceType.cpp is the nearest
 // source reference; the TU is not established.
 class PCInputDevice : public InputDevice {
@@ -53,7 +105,13 @@ public:
     explicit PCInputDevice(int id); // 0x004c25f0
     virtual ~PCInputDevice();       // 0x004c2650 (deleting wrapper 0x004c2630)
 
+    // 0x004c26d0: interface method 7 when nonzero, else method 8; 1 on success.
+    int UnknownMethod4c26d0(int acquire);
+    // 0x004c2710: sets a one-value property through interface method 6.
+    int UnknownMethod4c2710(int property, unsigned long object, unsigned long how,
+                            unsigned long data);
+
 protected:
-    unsigned char field_0x18[0x244];   // cleared by the constructor
+    UnknownDeviceInstance field_0x18;   // cleared by the constructor
     UnknownInputInterface* field_0x25c;
 };

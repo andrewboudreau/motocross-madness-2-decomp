@@ -14,18 +14,18 @@ public:
     virtual void UnknownVirtualSlot0(); // 0x00489b70, not reconstructed
     virtual ~JoystickDevice();          // 0x00489920 (deleting wrapper 0x00489900)
     virtual void UnknownVirtualSlot2(); // 0x00489980, not reconstructed
-    virtual void UnknownVirtualSlot3() = 0;
-    virtual void UnknownVirtualSlot4() = 0;
-    virtual void UnknownVirtualSlot5() = 0;
+    virtual int UnknownVirtualSlot3(int index, float* angle) = 0;
+    virtual int UnknownVirtualSlot4(int index, float* x, float* y) = 0;
+    virtual int UnknownVirtualSlot5(int enable) = 0;
     virtual void UnknownVirtualSlot6() = 0;
     virtual void UnknownVirtualSlot7() = 0;
     virtual void UnknownVirtualSlot8() = 0;
     virtual void UnknownVirtualSlot9() = 0;
     virtual void UnknownVirtualSlot10() = 0;
-    virtual void UnknownVirtualSlot11() = 0;
-    virtual void UnknownVirtualSlot12() = 0;
-    virtual void UnknownVirtualSlot13() = 0;
-    virtual void UnknownVirtualSlot14() = 0;
+    virtual int UnknownVirtualSlot11(int effect) = 0;
+    virtual int UnknownVirtualSlot12(int effect, unsigned long iterations, unsigned long flags) = 0;
+    virtual int UnknownVirtualSlot13(int effect) = 0;
+    virtual int UnknownVirtualSlot14(UnknownEffectInfo* effects, int* count) = 0;
     virtual void UnknownVirtualSlot15() = 0;
     virtual int UnknownVirtualSlot16() = 0;
     virtual int UnknownVirtualSlot17(int command) = 0;

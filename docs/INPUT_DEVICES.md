@@ -8,8 +8,7 @@ Canonical source is `src/reconstructed/InputDevice`, `PCInputDevice`,
 and the template header `ContainerList.h`. Translation units are not
 established, apart from ContainerList.h, which retail names through
 `__FILE__`. Names are provisional. All functions listed are strict exact under
-the default profile, except one near miss in
-`samples/inputdevice/PCJoystickDeviceNearMisses.cpp`.
+the default profile.
 
 ## Classes
 
@@ -18,9 +17,12 @@ the default profile, except one near miss in
   sets +0x10 to -1 and clears a six-bit bitfield at +0x14. The helper
   `0x004897e0` tests +0x10.
 - **PCInputDevice** (`0x004c25f0`, destructor `0x004c2650`): clears a
-  0x244-byte block at +0x18. It owns a COM-style device at +0x25c that the
-  destructor shuts down with method 8 then a guarded release, consistent with
-  IDirectInputDevice Unacquire/Release.
+  0x244-byte device description at +0x18. Its size and the offsets used (type
+  at +0x24, product name at +0x12c) match DIDEVICEINSTANCEA. It owns a
+  COM-style device at +0x25c that the destructor shuts down with method 8 then
+  a guarded release, consistent with IDirectInputDevice Unacquire/Release.
+  `0x004c26d0` calls method 7 or 8 (Acquire/Unacquire). `0x004c2710` sets a
+  one-value property through method 6 with a DIPROPDWORD-shaped block.
 - **KeyboardDevice** (`0x00489e30`): `PCInputDevice(0)`, 256 20-byte input
   entries stamped from cdecl `0x004bfa80`, and `ContainerList<int>[6]` at
   +0x1660, each `Init(1, 1)`.
@@ -36,14 +38,33 @@ the default profile, except one near miss in
   Both destructors (`0x004c4400`, `0x004c4910`) are compiler-generated.
 - **PCJoystickDevice** (`0x004c2770`) repeats JoystickDevice's
   initialisation, including the `"JoyDirectionFlipped"` read. Its own fields
-  are interleaved with it: five interfaces at +0x578, six-int arrays at +0x58c
-  and +0x5a4, four -1 values at +0x5d8 (only a loop matches), +0x5e8, and bits
-  at +0x5d4. Its destructor (`0x004c28d0`) calls slots 15 and 16. Slots 15-18
-  release the +0x578 interfaces and send force-feedback commands 1, 4 and 8
-  through method 22 of the +0x25c device, only for device type 3 (+0x0c).
-  Slot 19 (`0x004c3af0`, records states 4-7 from the byte at +0x3d in +0x10)
-  is a near miss: retail repeats the zero-extension with `and eax, 0xff`, and
-  no tested form reproduces it.
+  are interleaved with it:
+  - five effect objects at +0x578;
+  - six-int arrays at +0x58c and +0x5a4;
+  - four POV values at +0x5d8, set to -1 (only a loop matches);
+  - the POV count at +0x5e8;
+  - bits at +0x5d4.
+
+  Its destructor (`0x004c28d0`) calls slots 15 and 16. The slots below are
+  strict exact; slots 6–10 (effect creation) and 20 are not reconstructed yet.
+
+  | Slot | VA | Behaviour |
+  |---|---|---|
+  | 3 | `0x004c3b20` | POV value (hundredths of a degree) in radians; -1 when centred |
+  | 4 | `0x004c3ba0` | Slot 3's angle as a sine/cosine direction |
+  | 5 | `0x004c3c10` | Property 9 (consistent with DIPROP_AUTOCENTER) |
+  | 11–13 | | Stop, start and playing status of an effect (effect methods 8, 7, 9) |
+  | 14 | `0x004c4190` | Enumerates effects through method 19 with the static callback `0x004c4260`; the callback copies 0x124-byte (DIEFFECTINFOA-shaped) entries, counting in `.bss` `0x00689958` |
+  | 15 | | Releases the effects |
+  | 16–18 | | Send force-feedback commands 1, 4 and 8 through method 22 |
+  | 19 | `0x004c3af0` | Records joystick subtypes 4–7 from bits 8–15 of the device type |
+
+  Effect-related slots act only for device type 3 (+0x0c). Slot 19 matches
+  only with the Windows `HIBYTE` cast chain used by `GET_DIDEVICE_SUBTYPE`,
+  which is what produces retail's byte load followed by a redundant
+  `and eax, 0xff`. Both `sprintf` buffers (`0x00534aaf` is the CRT's
+  `sprintf`) are formatted and never used again, so their output is
+  presumably a compiled-out debug print.
 
 Only JoystickDevice stores its vptr in its destructor (`0x00489920`). The
 keyboard and mouse destructors (`0x00489f20`, `0x0048a3c0`) are

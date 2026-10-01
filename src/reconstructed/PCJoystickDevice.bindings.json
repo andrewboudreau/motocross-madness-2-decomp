@@ -12,11 +12,20 @@
   "??3@YAXPAX@Z": "0x004a30c0",
   "??_7PCJoystickDevice@@6B@": "0x00555ef8",
   "??_C@_0BE@BJOM@JoyDirectionFlipped?$AA@": "0x0056c738",
+  "??_C@_0EE@PGFF@ForceFeedback?5Joystick?5Detected?6@": "0x005703dc",
+  "??_C@_0N@KGCP@?7?5?8?$CFs?8?5?8?$CFs?8?6?$AA@": "0x00570420",
   "??_L@YGXPAXIHP6EX0@Z1@Z": "0x00536234",
   "??_M@YGXPAXIHP6EX0@Z@Z": "0x00536140",
+  "?UnknownEnumEffectsCallback@@YGHPBUUnknownEffectInfo@@PAX@Z": "0x004c4260",
+  "?UnknownFunction4beef0@@YAHUUnknownGuid@@PAD@Z": "0x004beef0",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?UnknownMethod4c2710@PCInputDevice@@QAEHHKKK@Z": "0x004c2710",
   "?UnknownVirtualSlot15@PCJoystickDevice@@UAEXXZ": "0x004c4320",
   "?UnknownVirtualSlot16@PCJoystickDevice@@UAEHXZ": "0x004c4350",
   "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
-  "__FILE__:containerlist.h": "0x005666e4"
+  "__FILE__:containerlist.h": "0x005666e4",
+  "__real@4@3ff2b702d20000000000": "0x00555f50",
+  "__real@4@bfff8000000000000000": "0x00550810",
+  "_s_UnknownEffectCount": "0x00689958",
+  "_sprintf": "0x00534aaf"
 }
