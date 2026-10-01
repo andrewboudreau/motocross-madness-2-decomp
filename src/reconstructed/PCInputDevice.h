@@ -4,7 +4,8 @@
 
 // COM-style device at PCInputDevice+0x25c (`this` on the stack). Method 8 is
 // called before Release when the device is destroyed, consistent with
-// IDirectInputDevice::Unacquire; the identity is inference.
+// IDirectInputDevice::Unacquire, and PCJoystickDevice uses method 22 like
+// IDirectInputDevice2::SendForceFeedbackCommand; the identity is inference.
 struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
@@ -15,6 +16,20 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod6();
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();   // Unacquire
+    virtual long __stdcall UnknownMethod9();
+    virtual long __stdcall UnknownMethod10();
+    virtual long __stdcall UnknownMethod11();
+    virtual long __stdcall UnknownMethod12();
+    virtual long __stdcall UnknownMethod13();
+    virtual long __stdcall UnknownMethod14();
+    virtual long __stdcall UnknownMethod15();
+    virtual long __stdcall UnknownMethod16();
+    virtual long __stdcall UnknownMethod17();
+    virtual long __stdcall UnknownMethod18();
+    virtual long __stdcall UnknownMethod19();
+    virtual long __stdcall UnknownMethod20();
+    virtual long __stdcall UnknownMethod21();
+    virtual long __stdcall UnknownMethod22(int command); // SendForceFeedbackCommand
 };
 
 // cdecl 0x004bfa80: the value the keyboard and mouse stamp into their input

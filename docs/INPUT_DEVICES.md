@@ -3,11 +3,13 @@
 RTTI: `InputDevice` → `PCInputDevice` → `JoystickDevice` / `KeyboardDevice` /
 `MouseDevice` → `PCJoystickDevice` / `PCKeyboardDevice` / `PCMouseDevice`.
 Canonical source is `src/reconstructed/InputDevice`, `PCInputDevice`,
-`KeyboardDevice`, `MouseDevice`, `JoystickDevice` (`.h`/`.cpp` and bindings)
+`KeyboardDevice`, `MouseDevice`, `JoystickDevice`, `PCKeyboardDevice`,
+`PCMouseDevice`, `PCJoystickDevice` (`.h`/`.cpp` and bindings)
 and the template header `ContainerList.h`. Translation units are not
 established, apart from ContainerList.h, which retail names through
 `__FILE__`. Names are provisional. All functions listed are strict exact under
-the default profile.
+the default profile, except one near miss in
+`samples/inputdevice/PCJoystickDeviceNearMisses.cpp`.
 
 ## Classes
 
@@ -28,6 +30,20 @@ the default profile.
   +0x260, 32 entries at +0x264, six counters at +0x4e4, `ContainerList<int>[6]`
   at +0x4fc, and bit 0 of +0x574 from the global object's virtual slot 22 with
   `"JoyDirectionFlipped"`.
+
+- **PCKeyboardDevice** (`0x004c43c0`) has an empty constructor body.
+  **PCMouseDevice** (`0x004c48c0`) clears four ints at +0x2d8 with `memset`.
+  Both destructors (`0x004c4400`, `0x004c4910`) are compiler-generated.
+- **PCJoystickDevice** (`0x004c2770`) repeats JoystickDevice's
+  initialisation, including the `"JoyDirectionFlipped"` read. Its own fields
+  are interleaved with it: five interfaces at +0x578, six-int arrays at +0x58c
+  and +0x5a4, four -1 values at +0x5d8 (only a loop matches), +0x5e8, and bits
+  at +0x5d4. Its destructor (`0x004c28d0`) calls slots 15 and 16. Slots 15-18
+  release the +0x578 interfaces and send force-feedback commands 1, 4 and 8
+  through method 22 of the +0x25c device, only for device type 3 (+0x0c).
+  Slot 19 (`0x004c3af0`, records states 4-7 from the byte at +0x3d in +0x10)
+  is a near miss: retail repeats the zero-extension with `and eax, 0xff`, and
+  no tested form reproduces it.
 
 Only JoystickDevice stores its vptr in its destructor (`0x00489920`). The
 keyboard and mouse destructors (`0x00489f20`, `0x0048a3c0`) are
