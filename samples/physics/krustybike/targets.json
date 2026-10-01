@@ -1,0 +1,371 @@
+[
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot27@KrustyBike",
+    "target_va": "0x0048da00",
+    "target_size": 75,
+    "expect": "exact",
+    "notes": "vtable slot 27 override of Bike (base function 0x00464e90)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot3@KrustyBike",
+    "target_va": "0x0048dbf0",
+    "target_size": 109,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 87.6% byte match. Retail loads [eax...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot4@KrustyBike",
+    "target_va": "0x0048dc60",
+    "target_size": 112,
+    "expect": "exact",
+    "notes": "vtable slot 4 override of Bike (base 0x005265d0). Exact: forwards float a4 unchanged to the handler (Fn_004DE580 float overload)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot12@KrustyBike",
+    "target_va": "0x0048de20",
+    "target_size": 191,
+    "expect": "exact",
+    "notes": "vtable slot 12 override of Bike (base function 0x00507920)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot33@KrustyBike",
+    "target_va": "0x0048e130",
+    "target_size": 87,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 54.2% byte match. Retail keeps eax ...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot1@KrustyBike",
+    "target_va": "0x0048fa10",
+    "target_size": 74,
+    "expect": "exact",
+    "notes": "vtable slot 1 override of Bike (base function 0x00407630)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot8@KrustyBike",
+    "target_va": "0x00491600",
+    "target_size": 40,
+    "expect": "exact",
+    "notes": "vtable slot 8 override of Bike (base function 0x00406750)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot84@KrustyBike",
+    "target_va": "0x00491630",
+    "target_size": 103,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 96.0% byte match. mov edx,[ecx] loa...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot70@KrustyBike",
+    "target_va": "0x004919a0",
+    "target_size": 229,
+    "expect": "partial",
+    "notes": "66.5% (size 230/229). Only register allocation differs: retail keeps the KbGame pointer in eax and the 60c index in edx in the else arm (a1 form), and loads 60c before the setne in the true arm; every source form tried compiles to the same bytes."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot67@KrustyBike",
+    "target_va": "0x00491a90",
+    "target_size": 121,
+    "expect": "exact",
+    "notes": "vtable slot 67 override of Bike (base function 0x0040a180)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot39@KrustyBike",
+    "target_va": "0x00491b10",
+    "target_size": 83,
+    "expect": "exact",
+    "notes": "vtable slot 39 override of Bike (base function 0x0040a1f0)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot76@KrustyBike",
+    "target_va": "0x00491ca0",
+    "target_size": 103,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 73.6% byte match. Struct-return tem...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot80@KrustyBike",
+    "target_va": "0x004922c0",
+    "target_size": 155,
+    "expect": "exact",
+    "notes": "vtable slot 80 override of Bike (base function 0x005290f0)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot83@KrustyBike",
+    "target_va": "0x00492360",
+    "target_size": 100,
+    "expect": "exact",
+    "notes": "vtable slot 83 override of Bike (base function 0x00529180)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot81@KrustyBike",
+    "target_va": "0x004923d0",
+    "target_size": 88,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 96.6% byte match. push eax vs mov e...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot82@KrustyBike",
+    "target_va": "0x00492430",
+    "target_size": 134,
+    "expect": "exact",
+    "notes": "vtable slot 82 override of Bike (base function 0x005290b0)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot63@KrustyBike",
+    "target_va": "0x004924c0",
+    "target_size": 50,
+    "expect": "exact",
+    "notes": "Exact under vc6_o2_ml with the canonical int(float) signature and two separate stores (0x804, then 0x808)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot64@KrustyBike",
+    "target_va": "0x00492500",
+    "target_size": 37,
+    "expect": "exact",
+    "notes": "vtable slot 64 override of Bike (base function 0x00528e50)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot71@KrustyBike",
+    "target_va": "0x00492530",
+    "target_size": 105,
+    "expect": "exact",
+    "notes": "vtable slot 71 override of Bike (base 0x0040a480). Exact with a single trailing base call after if/else."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot45@KrustyBike",
+    "target_va": "0x004957d0",
+    "target_size": 37,
+    "expect": "exact",
+    "notes": "vtable slot 45 override of Bike (base function 0x0040c880)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot52@KrustyBike",
+    "target_va": "0x00495800",
+    "target_size": 29,
+    "expect": "exact",
+    "notes": "vtable slot 52 override of Bike (base function 0x0040c8a0)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot42@KrustyBike",
+    "target_va": "0x00495820",
+    "target_size": 164,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 25.3% byte match. Retail uses cmp b...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot24@KrustyBike",
+    "target_va": "0x004958d0",
+    "target_size": 123,
+    "expect": "exact",
+    "notes": "vtable slot 24 override of Bike. Exact with separate return 0 in each arm (duplicated tail)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot25@KrustyBike",
+    "target_va": "0x00495950",
+    "target_size": 123,
+    "expect": "exact",
+    "notes": "vtable slot 25 override of Bike (base function 0x0040cb60)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot69@KrustyBike",
+    "target_va": "0x004959d0",
+    "target_size": 85,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 88.3% byte match. Store order of 0x...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot68@KrustyBike",
+    "target_va": "0x00495a30",
+    "target_size": 49,
+    "expect": "exact",
+    "notes": "vtable slot 68 override of Bike (base function 0x0040cac0)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot66@KrustyBike",
+    "target_va": "0x00495a70",
+    "target_size": 44,
+    "expect": "exact",
+    "notes": "vtable slot 66 override of Bike (base function 0x0040cfd0)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot96@KrustyBike",
+    "target_va": "0x00495aa0",
+    "target_size": 352,
+    "expect": "exact",
+    "notes": "vtable slot 96 override of Bike (base function 0x0040d030)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot44@KrustyBike",
+    "target_va": "0x00495ca0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "vtable slot 44 override of Bike (base function 0x0040a500)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot15@KrustyBike",
+    "target_va": "0x00495cb0",
+    "target_size": 176,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 86.9% byte match. Instruction sched...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot16@KrustyBike",
+    "target_va": "0x00495d60",
+    "target_size": 124,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 95.2% byte match. Only store order ...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot22@KrustyBike",
+    "target_va": "0x00495de0",
+    "target_size": 42,
+    "expect": "exact",
+    "notes": "Exact (was partial: Semantics reconstructed; 27.5% byte match. Retail compares [...)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot23@KrustyBike",
+    "target_va": "0x00495e10",
+    "target_size": 56,
+    "expect": "exact",
+    "notes": "vtable slot 23 override of Bike (base function 0x0040caf0)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot48@KrustyBike",
+    "target_va": "0x004964e0",
+    "target_size": 249,
+    "expect": "exact",
+    "notes": "vtable slot 48 override of Bike (base 0x0052a890). Exact: dt passed straight from field_0x13c (no local copy)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot14@KrustyBike",
+    "target_va": "0x004965e0",
+    "target_size": 431,
+    "expect": "partial",
+    "notes": "59.7% (size 431/431). Matches through the a->x/a->z stores. First divergence: Vec3(0, field_0x24*a->y, 0) - retail materialises the pooled 0.0f via fld/fst (x and z share one FPU value) while VC6 emits hoisted immediate stores. Also the squared-length loads come in order y,x,z in retail (z,y,x here). Tail (d==1.0f shortcut returning pooled 1.0f) matches via the KbLength helper."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot101@KrustyBike",
+    "target_va": "0x00496d10",
+    "target_size": 135,
+    "expect": "partial",
+    "notes": "Body (from 0x496d20) 61.6%; the whole function cannot match: retail starts with jmp +11 and 11 nops (patch-point padding, not expressible in C++). Body divergence: retail computes the KbSink pointer (lea ecx,[eax+0xc]) after loading the game global in ecx and derefs the vptr through it."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_0048D8B0@KrustyBike",
+    "target_va": "0x0048d8b0",
+    "target_size": 85,
+    "expect": "exact",
+    "notes": "non-virtual state reset called from slot 1"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot86@KrustyBike",
+    "target_va": "0x00491b70",
+    "target_size": 298,
+    "expect": "exact",
+    "notes": "Exact. Wheel-force step: ramp from field_0x664 (float in retail), wheel query call, halve force when g_kbGame flag set. Needs KbFloat identity inline to get fld/fstp [esp] arg pattern."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot28@KrustyBike",
+    "target_va": "0x0048da50",
+    "target_size": 416,
+    "expect": "exact",
+    "notes": "Exact. Mode-4 (tier 3) player re-target plus airborne random jitter of 0x7ac/0x7b0. rand()*(1/32768) must go through a local float (KbRandUnit), else VC6 folds the two constants into one fmul."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot99@KrustyBike",
+    "target_va": "0x004916a0",
+    "target_size": 757,
+    "expect": "exact",
+    "notes": "Exact. Off-track recovery (tier 3). Lessons: squared length must be accumulated term by term (d=x*x; d+=y*y; d+=z*z); the random kick needs plain rand()*(1/32768) locals rx, ry (a KbRandUnit inline with a local moves the temp slot)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot11@KrustyBike",
+    "target_va": "0x00491d10",
+    "target_size": 1296,
+    "expect": "partial",
+    "notes": "17.9% (candidate 1280 vs 1296; if-form prologue beats ternary). Tier-3: camera/target ray query per game mode. First divergence: retail loads game ptr before sub esp,0x20 and merges call tails; mine spills lim and hoists a4/a5 loads."
+  }
+]
