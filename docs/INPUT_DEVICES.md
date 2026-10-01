@@ -8,7 +8,8 @@ Canonical source is `src/reconstructed/InputDevice`, `PCInputDevice`,
 and the template header `ContainerList.h`. Translation units are not
 established, apart from ContainerList.h, which retail names through
 `__FILE__`. Names are provisional. All functions listed are strict exact under
-the default profile.
+the default profile, except one near miss in
+`samples/inputdevice/PCJoystickDeviceNearMisses.cpp`.
 
 ## Classes
 
@@ -45,19 +46,34 @@ the default profile.
   - the POV count at +0x5e8;
   - bits at +0x5d4.
 
-  Its destructor (`0x004c28d0`) calls slots 15 and 16. The slots below are
-  strict exact; slots 6–10 (effect creation) and 20 are not reconstructed yet.
+  Its destructor (`0x004c28d0`) calls slots 15 and 16. Every slot it
+  defines (3–20) is strict exact.
 
   | Slot | VA | Behaviour |
   |---|---|---|
   | 3 | `0x004c3b20` | POV value (hundredths of a degree) in radians; -1 when centred |
   | 4 | `0x004c3ba0` | Slot 3's angle as a sine/cosine direction |
   | 5 | `0x004c3c10` | Property 9 (consistent with DIPROP_AUTOCENTER) |
+  | 6 | `0x004c3c40` | Creates a constant-force effect (device method 18, DIEFFECT-shaped block) |
+  | 7, 8 | `0x004c3d20`, `0x004c3db0` | Set an effect's magnitude and direction (effect method 6) |
+  | 9 | `0x004c3e40` | Constant force with an envelope and an optional trigger button |
+  | 10 | `0x004c3f70` | Square wave with an envelope and an optional trigger button |
   | 11–13 | | Stop, start and playing status of an effect (effect methods 8, 7, 9) |
   | 14 | `0x004c4190` | Enumerates effects through method 19 with the static callback `0x004c4260`; the callback copies 0x124-byte (DIEFFECTINFOA-shaped) entries, counting in `.bss` `0x00689958` |
   | 15 | | Releases the effects |
   | 16–18 | | Send force-feedback commands 1, 4 and 8 through method 22 |
   | 19 | `0x004c3af0` | Records joystick subtypes 4–7 from bits 8–15 of the device type |
+  | 20 | `0x004c3960` | Polls (method 25), re-acquiring after input-lost/not-acquired errors, then runs the buffered (`0x004c3100`) or immediate (`0x004c3790`) reader |
+
+  The effect GUIDs are named by the literals that `0x004beef0` reports for
+  them: `GUID_ConstantForce` (`0x00556b90`) and `GUID_Square`
+  (`0x00556bb0`). Slot 20 and `0x004c3a10` pass the literal `__FILE__`
+  `PCInputDeviceType.cpp` (lines 540, 544 and 590), so at least they were
+  compiled in that TU. In slot 20 the poll check must be an inline member
+  (`CheckPollResult`); written in place, VC6 merges the null-device return
+  with the error returns. `0x004c3a10` (switch buffered input) is the near
+  miss: only its final acquire test differs. Retail keeps separate
+  `return 0`/`return 1` paths, and VC6 here emits `setge`.
 
   Effect-related slots act only for device type 3 (+0x0c). Slot 19 matches
   only with the Windows `HIBYTE` cast chain used by `GET_DIDEVICE_SUBTYPE`,

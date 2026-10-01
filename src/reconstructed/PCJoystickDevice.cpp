@@ -76,6 +76,147 @@ int PCJoystickDevice::UnknownVirtualSlot5(int enable) {
     return 0;
 }
 
+// 0x004c3c40: creates effect `effect` as a constant force on the X and Y
+// axes (gain 9000, no trigger).
+int PCJoystickDevice::UnknownVirtualSlot6(int effect, long magnitude, unsigned long duration) {
+    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+        unsigned long axes[2];
+        long direction[2];
+        UnknownEffectParams params;
+        long force = magnitude;
+        direction[0] = 0;
+        direction[1] = 0;
+        axes[0] = 0;
+        axes[1] = 4;
+        params.size = sizeof(params);
+        params.flags = 0x22;
+        params.duration = duration;
+        params.samplePeriod = 0;
+        params.gain = 9000;
+        params.triggerButton = (unsigned long)-1;
+        params.triggerRepeatInterval = 0;
+        params.axisCount = 2;
+        params.axes = axes;
+        params.direction = direction;
+        params.envelope = 0;
+        params.typeSpecificSize = sizeof(force);
+        params.typeSpecific = &force;
+        return field_0x25c->UnknownMethod18(GUID_ConstantForce, &params, &field_0x578[effect], 0) >= 0;
+    }
+    return 0;
+}
+
+// 0x004c3d20: sets the direction (slot 8), then the magnitude.
+int PCJoystickDevice::UnknownVirtualSlot7(int effect, long* direction, long magnitude) {
+    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+        long force = magnitude;
+        UnknownVirtualSlot8(effect, direction);
+        UnknownEffectParams params = { sizeof(params) };
+        params.typeSpecificSize = sizeof(force);
+        params.typeSpecific = &force;
+        return field_0x578[effect]->UnknownMethod6(&params, 0x100) >= 0;
+    }
+    return 0;
+}
+
+// 0x004c3db0: sets a two-value direction.
+int PCJoystickDevice::UnknownVirtualSlot8(int effect, long* direction) {
+    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+        long value[2];
+        value[0] = direction[0];
+        value[1] = direction[1];
+        UnknownEffectParams params = { sizeof(params) };
+        params.flags = 0x22;
+        params.axisCount = 2;
+        params.axes = 0;
+        params.direction = value;
+        return field_0x578[effect]->UnknownMethod6(&params, 0x40) >= 0;
+    }
+    return 0;
+}
+
+// 0x004c3e40: creates a constant force with an envelope; `button` (or -1)
+// triggers it.
+int PCJoystickDevice::UnknownVirtualSlot9(int effect, unsigned long duration, long direction,
+                                          long magnitude, unsigned long attackTime,
+                                          unsigned long attackLevel, unsigned long fadeTime,
+                                          unsigned long fadeLevel, int button) {
+    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+        unsigned long axes[2];
+        long directions[2];
+        UnknownEnvelope envelope;
+        UnknownEffectParams params;
+        long force = magnitude;
+        envelope.size = sizeof(envelope);
+        envelope.attackTime = attackTime;
+        envelope.attackLevel = attackLevel;
+        envelope.fadeTime = fadeTime;
+        envelope.fadeLevel = fadeLevel;
+        axes[0] = 0;
+        axes[1] = 4;
+        directions[0] = direction;
+        directions[1] = 0;
+        params.size = sizeof(params);
+        params.flags = 0x22;
+        params.duration = duration;
+        params.samplePeriod = 10000;
+        params.gain = 10000;
+        params.triggerButton = button == -1 ? -1 : button + 0x30;
+        params.triggerRepeatInterval = 0;
+        params.axisCount = 2;
+        params.axes = axes;
+        params.direction = directions;
+        params.envelope = &envelope;
+        params.typeSpecificSize = sizeof(force);
+        params.typeSpecific = &force;
+        return field_0x25c->UnknownMethod18(GUID_ConstantForce, &params, &field_0x578[effect], 0) >= 0;
+    }
+    return 0;
+}
+
+// 0x004c3f70: creates a square wave with an envelope; `button` (or -1)
+// triggers it.
+int PCJoystickDevice::UnknownVirtualSlot10(int effect, unsigned long duration, unsigned long period,
+                                           unsigned long magnitude, unsigned long attackTime,
+                                           unsigned long attackLevel, unsigned long fadeTime,
+                                           unsigned long fadeLevel, int button) {
+    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+        unsigned long axes[2];
+        long direction[2];
+        UnknownPeriodic wave;
+        UnknownEnvelope envelope;
+        UnknownEffectParams params;
+        wave.magnitude = magnitude;
+        wave.offset = 0;
+        wave.phase = 0;
+        wave.period = period;
+        envelope.size = sizeof(envelope);
+        envelope.attackTime = attackTime;
+        envelope.attackLevel = attackLevel;
+        envelope.fadeTime = fadeTime;
+        envelope.fadeLevel = fadeLevel;
+        axes[0] = 0;
+        axes[1] = 4;
+        direction[0] = 0;
+        direction[1] = 0;
+        params.size = sizeof(params);
+        params.flags = 0x22;
+        params.duration = duration;
+        params.samplePeriod = 0;
+        params.gain = 10000;
+        params.triggerButton = button == -1 ? -1 : button + 0x30;
+        params.triggerRepeatInterval = 0;
+        params.axisCount = 2;
+        params.axes = axes;
+        params.direction = direction;
+        params.envelope = &envelope;
+        params.typeSpecificSize = sizeof(wave);
+        params.typeSpecific = &wave;
+        return field_0x25c->UnknownMethod18(GUID_Square, &params, &field_0x578[effect], 0) >= 0;
+    }
+    return 0;
+}
+
 // 0x004c40b0: stops effect `effect`.
 int PCJoystickDevice::UnknownVirtualSlot11(int effect) {
     if (field_0x25c && effect < 5 && field_0x578[effect] && field_0x0c == 3)
@@ -151,6 +292,48 @@ int PCJoystickDevice::UnknownVirtualSlot14(UnknownEffectInfo* effects, int* coun
         return 0;
     *count = s_UnknownEffectCount;
     return 1;
+}
+
+// Inline (no retail body of its own): a failed poll is retried by
+// re-acquiring a lost (0x8007001e) or unacquired (0x8007000c) device; any
+// other failure is reported. Nonzero when reading can go ahead.
+inline int PCJoystickDevice::CheckPollResult(long result) {
+    if (result < 0) {
+        if (result == (long)0x8007001e || result == (long)0x8007000c) {
+            if (field_0x25c->UnknownMethod7() < 0) {
+                UnknownReportError(result, __FILE__, 540);
+                return 0;
+            }
+        } else {
+            UnknownReportError(result, __FILE__, 544);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+// 0x004c3960: polls the device (see CheckPollResult), then reads it with
+// the buffered (bit 0 of +0x5d4) or immediate reader. Gamepads with bit 1 also run
+// 0x004c2d90 for each of the six lists.
+int PCJoystickDevice::UnknownVirtualSlot20(int value) {
+    if (!field_0x25c)
+        return 0;
+    if (!CheckPollResult(field_0x25c->UnknownMethod25()))
+        return 0;
+    if (field_0x5d4_bit0)
+        UnknownMethod4c3100(value);
+    else
+        UnknownMethod4c3790(value);
+    if (DEVICE_SUBTYPE(field_0x18.deviceType) == 4 && field_0x5d4_bit1) {
+        for (int i = 0; i < 6; i++)
+            UnknownMethod4c2d90(i, value);
+    }
+    return 1;
+}
+
+// 0x004c3ae0
+void PCJoystickDevice::UnknownMethod4c3ae0(unsigned char value) {
+    field_0x5d5 = value;
 }
 
 // 0x004c4320

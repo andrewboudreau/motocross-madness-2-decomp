@@ -17,11 +17,17 @@ public:
     virtual int UnknownVirtualSlot3(int index, float* angle) = 0;
     virtual int UnknownVirtualSlot4(int index, float* x, float* y) = 0;
     virtual int UnknownVirtualSlot5(int enable) = 0;
-    virtual void UnknownVirtualSlot6() = 0;
-    virtual void UnknownVirtualSlot7() = 0;
-    virtual void UnknownVirtualSlot8() = 0;
-    virtual void UnknownVirtualSlot9() = 0;
-    virtual void UnknownVirtualSlot10() = 0;
+    virtual int UnknownVirtualSlot6(int effect, long magnitude, unsigned long duration) = 0;
+    virtual int UnknownVirtualSlot7(int effect, long* direction, long magnitude) = 0;
+    virtual int UnknownVirtualSlot8(int effect, long* direction) = 0;
+    virtual int UnknownVirtualSlot9(int effect, unsigned long duration, long direction,
+                                    long magnitude, unsigned long attackTime,
+                                    unsigned long attackLevel, unsigned long fadeTime,
+                                    unsigned long fadeLevel, int button) = 0;
+    virtual int UnknownVirtualSlot10(int effect, unsigned long duration, unsigned long period,
+                                     unsigned long magnitude, unsigned long attackTime,
+                                     unsigned long attackLevel, unsigned long fadeTime,
+                                     unsigned long fadeLevel, int button) = 0;
     virtual int UnknownVirtualSlot11(int effect) = 0;
     virtual int UnknownVirtualSlot12(int effect, unsigned long iterations, unsigned long flags) = 0;
     virtual int UnknownVirtualSlot13(int effect) = 0;
@@ -31,7 +37,7 @@ public:
     virtual int UnknownVirtualSlot17(int command) = 0;
     virtual int UnknownVirtualSlot18(int paused) = 0;
     virtual void UnknownVirtualSlot19() = 0;
-    virtual void UnknownVirtualSlot20() = 0;
+    virtual int UnknownVirtualSlot20(int value) = 0;
 
 protected:
     int field_0x260;                     // constructor argument

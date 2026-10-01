@@ -25,12 +25,18 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod15();
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall UnknownMethod17();
-    virtual long __stdcall UnknownMethod18();
+    virtual long __stdcall UnknownMethod18(const struct UnknownGuid& type,
+                                           const struct UnknownEffectParams* params,
+                                           struct UnknownEffectInterface** effect,
+                                           void* outer); // CreateEffect
     virtual long __stdcall UnknownMethod19(int (__stdcall* callback)(const struct UnknownEffectInfo*, void*),
                                            void* context, unsigned long type); // EnumEffects
     virtual long __stdcall UnknownMethod20();
     virtual long __stdcall UnknownMethod21();
     virtual long __stdcall UnknownMethod22(int command); // SendForceFeedbackCommand
+    virtual long __stdcall UnknownMethod23();
+    virtual long __stdcall UnknownMethod24();
+    virtual long __stdcall UnknownMethod25(); // Poll
 };
 
 // cdecl 0x004bfa80: the value the keyboard and mouse stamp into their input
@@ -97,6 +103,10 @@ struct UnknownEffectInfo {
 
 // cdecl 0x004beef0: writes a name for a known effect GUID; nonzero if known.
 int UnknownFunction4beef0(UnknownGuid guid, char* name);
+
+// cdecl 0x004bf6a0: reports a failed result with the caller's __FILE__ and
+// __LINE__ (it maps DirectX error codes to text).
+void UnknownReportError(long result, const char* file, int line);
 
 // RTTI: PCInputDevice : InputDevice. PCInputDeviceType.cpp is the nearest
 // source reference; the TU is not established.
