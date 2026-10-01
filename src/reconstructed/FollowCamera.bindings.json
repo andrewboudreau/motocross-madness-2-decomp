@@ -1,4 +1,9 @@
 {
+  "??1Camera@@UAE@XZ": "0x0042f020",
+  "??1FollowCamera@@UAE@XZ": "0x00463350",
+  "??1FollowCamera@@UAE@XZ$ehhandler": "0x0054ab88",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7FollowCamera@@6B@": "0x0055282c",
   "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
   "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
   "__real@4@00000000000000000000": "0x00550484",

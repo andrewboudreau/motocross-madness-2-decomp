@@ -1,5 +1,28 @@
 #include "FollowCamera.h"
 
+// 0x00463350 (scalar deleting wrapper 0x00463120): frees the owned values,
+// then the Camera destructor (PCCamera's is implicit).
+FollowCamera::~FollowCamera() {
+    if (field_0x2e4)
+        delete field_0x2e4;
+    if (field_0x27c)
+        delete field_0x27c;
+    if (field_0x280)
+        delete field_0x280;
+    if (field_0x284)
+        delete field_0x284;
+    if (field_0x288)
+        delete field_0x288;
+    if (field_0x28c)
+        delete field_0x28c;
+    if (field_0x290)
+        delete field_0x290;
+    if (field_0x294)
+        delete field_0x294;
+    if (field_0x298)
+        delete field_0x298;
+}
+
 // Strong ABI reconstruction: slot 57 returns a 12-byte aggregate by value.
 // MSVC uses a hidden return buffer and returns that buffer in EAX; retail then
 // copies three dwords into this+0x2A8 and passes the cache to virtual slot 43.

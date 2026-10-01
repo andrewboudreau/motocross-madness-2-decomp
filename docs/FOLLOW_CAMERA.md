@@ -2,8 +2,13 @@
 
 `FollowCamera : PCCamera` introduces slots 33–75; slots 33, 35, 39, 41, 42,
 50, 51, 57 and 74 are `_purecall` in its vtable and are declared pure.
-VehicleCamera, BikeCamera and KrustyBikeCamera inherit many entries. FollowCam.cpp is a source-file candidate
-supported by name overlap and nearby references, not a proven TU assignment.
+VehicleCamera, BikeCamera and KrustyBikeCamera inherit many entries.
+
+The initializer at `0x00463140`, which sits between the constructor and the
+destructor, cites `D:\aardvark\VC\krusty2\FollowCam.cpp` through `__FILE__`
+when it allocates the +0x27c values. That is literal evidence for the file
+name of this region.
+
 Canonical source: `src/reconstructed/FollowCamera.h` and `.cpp`, built on
 `PCCamera`, `Camera` and `GameObject` in the same directory.
 
@@ -26,12 +31,20 @@ Canonical source: `src/reconstructed/FollowCamera.h` and `.cpp`, built on
 | 55, 56 | `0x00464ea0`, `0x00464ec0` | 23 each | Exact; slot 5 of the interface at (`0x0056e26c` object)->+0x14->+0x34 with 0x38 / 0x2a |
 | 75 | `0x00404fc0` | 25 | Exact; state +0x244 is 5 or 2 |
 
-FollowCamera's members (+0x220 onward) are declared in `FollowCamera.h`; the
+| Destructor core | `0x00463350` | 245 | Exact; null-checked `delete` of +0x2e4 and the eight +0x27c..+0x298 values, then `~Camera` |
+| Scalar deleting destructor | `0x00463120` | 30 | Exact canonical wrapper |
+
+FollowCamera's members (+0x220 to +0x343) are declared in `FollowCamera.h`
+from the constructor's stores; +0x2a8 is assigned from a `Vector3` global, so
+the old 12-byte aggregate is typed `Vector3`. the
 slot 63–67 presets store floats (for example 0x40490fdb = π, 0x42aa0000 =
-85.0) written as float literals. The remaining FollowCamera functions
-(destructor `0x00463120`, slots 10, 23, 36, 38, 40, 43–49 and 73) are not yet
-reconstructed. Enum names and the 12-byte aggregate's type remain
-provisional.
+85.0) written as float literals. The constructor (`0x00462ee0`, 564 bytes) is a near miss kept in
+`samples/camera/FollowCameraConstructor.cpp`. Every value and offset is
+right, and the virtual call to slot 71 binds statically to `0x00466e50`.
+About 141 bytes differ: VC6 schedules the +0x274/+0x2dc zero stores into a
+load-delay slot where retail used +0x2e4/+0x276. Moving those statements does
+not fix it. Slots 10, 23, 36, 38, 40, 43–49 and 73 and the initializer
+`0x00463140` are not yet reconstructed. Enum names remain provisional.
 
 ## Notes on slots 68, 69 and 71
 
@@ -48,12 +61,12 @@ helper's identity remain provisional. Writing `/ 180.0f * 60.0f` without the
 inner parentheses lets VC6 fold the two constants into one multiply, which
 retail does not do.
 
-Slot 69 calls virtual slot 57 with a hidden stack return buffer for a 12-byte
-aggregate, copies three dwords into +0x2a8/+0x2ac/+0x2b0, then passes the cache
+Slot 69 calls virtual slot 57 with a hidden stack return buffer for a
+`Vector3`, copies three dwords into +0x2a8/+0x2ac/+0x2b0, then passes the cache
 to slot 43. Retail forms the cache address before the call and copies straight
 from the returned buffer, so the candidate assigns the call result directly
 (`field_0x2a8 = UnknownVirtualSlot57(0);`); a named temporary kept the copy in
-extra registers. Size alone does not establish a vector type.
+extra registers.
 
 Slot 71 stores the input at +0x244, calls slot 58, dispatches states 0–4 to
 slots 66/65/64/63/60, then snapshots +0x220/+0x22c/+0x234 into
@@ -74,7 +87,7 @@ retail addresses when each label is placed at its function offset.
 | +0x258 | Float-like parameter, bounded around 10–70 in slot 68 |
 | +0x268 | Low input byte stored as a dword |
 | +0x26c | Reset on enabling temporary state |
-| +0x2a8 | 12-byte cached aggregate |
+| +0x2a8 | Cached slot 57 `Vector3` |
 | +0x2b4 | 12-byte float triple copied by slot 68 and passed to slot 29 |
 | +0x2c4, +0x2c8, +0x2cc | Snapshot of the three preset parameters |
 | +0x2f0 | State-specific saved copy of +0x258 |
