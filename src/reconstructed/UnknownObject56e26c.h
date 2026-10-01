@@ -48,13 +48,20 @@ public:
     int UnknownFunction524100(); // 0x00524100
 };
 
+struct UnknownObject56e26cSettings {
+    unsigned char field_0x00[0x6c];
+    int field_0x6c;      // freezes RenderTarget's frame index (0x004e8cc0)
+};
+
 class UnknownObject56e26c {
 public:
     void UnknownFunction468880(); // 0x00468880 (PCCamera slot 27)
     // 0x00521970: copies string `id` into buffer (size bytes).
     void UnknownFunction521970(int id, char* buffer, int size);
 
-    unsigned char field_0x0000[0x14];
+    unsigned char field_0x0000[0x0c];
+    UnknownObject56e26cSettings* field_0x0c;
+    int field_0x10;
     UnknownObject56e26cPart* field_0x14;
     int field_0x18;      // KrustyBikeCamera slot 42 tests > 1
     unsigned char field_0x001c[0x558 - 0x1c];

@@ -2,6 +2,7 @@
 
 #include "GameObject.h"
 #include "MatrixUtil.h"
+#include "RenderTarget.h"
 
 // RTTI: Camera : GameObject : BaseObject. Camera introduces primary slots 27-32
 // and overrides (among others) slots 5, 13 and 18. Names are provisional; the
@@ -11,46 +12,11 @@
 // cdecl 0x0043caa0, called by Camera slot 23 as (0xb7, 0, a, 0x80000000).
 int UnknownFunction43caa0(int code, int value, int a, unsigned int flags);
 
-struct CameraRect { int left; int top; int right; int bottom; };
-
 // .rdata floats just before Camera's vtable, loaded by the constructor.
 extern const float g_UnknownFloat550f6c; // 1.0f
 extern const float g_UnknownFloat550f70; // 100000.0f
 
 struct _iobuf; // FILE
-
-class Camera;
-struct UnknownRenderInterface; // PCCamera.h
-
-// Object referenced from Camera+0x18. Its +0x08 is compared with the camera,
-// +0x14 is read by slots 5/18, +0x50 holds the render interface used by
-// PCCamera, and virtual slot 12 receives a rectangle.
-class UnknownCameraOwner {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12(const CameraRect* rect, int flag);
-    void UnknownFunction4e8cf0(Camera* camera); // retail 0x004e8cf0
-    void UnknownFunction4c5d00();               // retail 0x004c5d00 (PCCamera slot 27)
-
-    void* field_0x04;
-    Camera* field_0x08;                // compared with the camera by PCCamera slot 13
-    int field_0x0c;
-    int field_0x10;
-    int field_0x14;                    // read by Camera slots 5 and 18
-    unsigned char field_0x18[0x38];
-    UnknownRenderInterface* field_0x50;
-};
 
 class Camera : public GameObject {
 public:
@@ -82,7 +48,10 @@ public:
     int UnknownFunction42e550(); // 0x0042e550, called by slot 8
 
 protected:
-    UnknownCameraOwner* Owner() const { return static_cast<UnknownCameraOwner*>(field_0x18); }
+    // field_0x18 (GameObject's owner slot) holds the camera's RenderTarget.
+    RenderTarget* Owner() const { return static_cast<RenderTarget*>(field_0x18); }
+
+    friend class RenderTarget;
 
     Matrix4 field_0x2c;      // set by slot 30 (PCCamera: kind 1)
     Matrix4 field_0x6c;      // set by slot 32 (kind 3)

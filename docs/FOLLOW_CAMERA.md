@@ -153,12 +153,13 @@ begin.
 | PCCamera 13 | `0x004bee80` | 65 | Camera 13; if owner+0x08 is this camera, interface method 11 with kinds 2 (+0xac) and 3 (+0x6c) |
 | PCCamera 30/31/32 | `0x004bedc0`/`0x004bee00`/`0x004bee40` | 54 each | Camera version, then optional interface method 11 with kind 1/2/3 |
 
-The owner is the object at Camera+0x18; its +0x50 holds a COM-style interface
-(`this` on the stack). Method 11 taking kind 1/2/3 and a 64-byte block is
-consistent with `IDirect3DDevice7::SetTransform` for world/view/projection,
-which would make +0x2c/+0xac/+0x6c the world/view/projection matrices. That is
-inference from call shape only; names stay neutral until the interface is
-identified from creation/import evidence.
+The owner is the object at Camera+0x18, a `RenderTarget`; for PCCamera it is a
+`PCRenderTarget` whose +0x50 holds a COM-style device (`this` on the stack; see
+[RenderTarget](RENDER_TARGET.md)). Method 11 taking kind 1/2/3 and a 64-byte
+block is consistent with `IDirect3DDevice7::SetTransform` for
+world/view/projection, which would make +0x2c/+0xac/+0x6c the
+world/view/projection matrices. That is inference from call shape only; names
+stay neutral until the interface is identified from creation/import evidence.
 
 Destructor evidence. `analysis/deleting_destructors.json` pairs each wrapper
 with its destructor core. Camera's vptr is written in its constructor
