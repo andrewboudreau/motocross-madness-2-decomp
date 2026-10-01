@@ -11,6 +11,11 @@ Archive, EXE and component hashes are pinned in `config/private_bundle_expected.
 and `config/vc6_sp3_expected.json`. Installation checks archive membership, all
 1,463 payload hashes and the EXE, and rejects path traversal/symlinks. The bundle
 contains an installed VC98 tree plus the target EXE, so no full installer is needed.
+The bundle keeps six standard C++ headers under their 8.3 CD names (`XCEPTION`,
+`ALGRITHM`, `FCTIONAL`, `STDXCEPT`, `STREAMBF`, `STRSTREM`). VC6 setup installs
+them as `exception`, `algorithm`, etc., which `<typeinfo.h>` and the STL
+include, so the installer (and `tools/cloud_setup.sh`, for older installs)
+adds byte-identical long-name copies next to the verified files.
 
 Windows:
 

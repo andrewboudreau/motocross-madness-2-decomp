@@ -140,6 +140,32 @@ def download(url: str, destination: Path, token: str | None = None) -> None:
         shutil.copyfileobj(response, out, length=1024 * 1024)
 
 
+# The bundle's VC98\INCLUDE keeps six standard C++ headers under their 8.3 CD
+# names; VC6 setup installs them under the long names that <typeinfo.h>,
+# <stdexcpt.h> and the STL headers include. Byte-identical copies restore an
+# installed layout without touching the hash-verified payload files.
+LONG_HEADER_NAMES = {
+    "ALGRITHM": "ALGORITHM",
+    "FCTIONAL": "FUNCTIONAL",
+    "STDXCEPT": "STDEXCEPT",
+    "STREAMBF": "STREAMBUF",
+    "STRSTREM": "STRSTREAM",
+    "XCEPTION": "EXCEPTION",
+}
+
+
+def restore_long_header_names(vc6_root: Path) -> list[str]:
+    """Create missing long-name header copies; return the names created."""
+    include = Path(vc6_root) / "VC98" / "INCLUDE"
+    created = []
+    for short, long in sorted(LONG_HEADER_NAMES.items()):
+        source, dest = include / short, include / long
+        if source.is_file() and not dest.exists():
+            shutil.copyfile(source, dest)
+            created.append(long)
+    return created
+
+
 def install_archive(archive: Path, root: Path, expected_archive_sha256: str | None = None,
                     overwrite: bool = False) -> BundleInstall:
     result = verify_archive(archive, expected_archive_sha256)
@@ -182,6 +208,8 @@ def install_archive(archive: Path, root: Path, expected_archive_sha256: str | No
             "exe": str((root / "work/game/mcm2.exe").resolve()),
             "provenance": result["provenance"],
         }
+        state["derived_files"] = [f"toolchains/vc6sp3/VC98/INCLUDE/{name}" for name in
+                                  restore_long_header_names(stage / "toolchains/vc6sp3")]
         (stage / "private-inputs-state.json").write_text(json.dumps(state, indent=2) + "\n")
         if root.exists():
             shutil.rmtree(root)

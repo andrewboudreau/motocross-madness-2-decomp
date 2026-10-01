@@ -16,14 +16,38 @@ child's bit flags at +0x25.
 | +0x0c | Next sibling |
 | +0x10 | First child |
 | +0x14 | Parent |
-| +0x18 | Owner object (set by slot 8; Camera's owner) |
-| +0x20 | Flag word gating slots 9-23 |
-| +0x25 | Bit flags: bits 0/1 cleared by slot 4, bit 2 set by slot 16, bit 3 = skip/detached |
+| +0x18 | Owner object (set by slots 8 and 25; Camera's owner) |
+| +0x20 | Flag word gating slots 9-24 |
+| +0x24 | Byte, initialised to 0xff |
+| +0x25 | Bitfield: bits 0/1 from the constructor argument (set by slot 5, cleared by slot 4), bit 2 set by slot 16, bit 3 = skip/detached |
+| +0x28 | Heap string of RTTI class names, one per constructor level, comma-terminated |
+
+The constructor's single merged store of bits 0-3 (`and al,0f0h; xor al,dl;
+or al,cl`) is VC6's code for four consecutive one-bit bitfield assignments; a
+mask expression produces a different sequence, so +0x25 is declared as
+bitfields. The other methods compile identically either way.
 
 ## Matches
 
-All 20 bodies are strict exact under the default profile (`vc6_o2_mt`) with
-every relocation bound; 14 of them do not match under `/G6`.
+Every GameObject function is reconstructed: 29 bodies, all strict exact under
+the default profile (`vc6_o2_mt`) with every relocation bound; 21 of them do
+not match under `/G6`.
+
+| Function | Retail VA | Bytes | Behavior |
+|---|---|---:|---|
+| Constructor | `0x00468ca0` | 149 | `/GX` frame for the BaseObject subobject; clears links, sets +0x25 bits; `DebugMalloc(1, __FILE__, 31)` into +0x28; then `0x00469ce0(this)` |
+| Scalar deleting destructor | `0x00468d40` | 30 | Destructor core, then `operator delete` `0x004a30c0` |
+| Destructor core | `0x00468d60` | 97 | `/GX` frame; frees +0x28 with `operator delete(p, __FILE__, 40)` (`0x004a2e60`); `~BaseObject` |
+| `0x00469680` | `0x00469680` | 58 | Recurses to the last next-sibling, unlinks each from its predecessor, virtual `Release` |
+| `0x00469ce0` | `0x00469ce0` | 201 | Appends `typeid(*object).name()` minus `"class "` and a comma to +0x28 (`DebugRealloc`, line 1163) |
+
+The `typeid`, `type_info::name` and `strstr` calls bind to LIBCMT
+(`rtti.obj`, `typname.obj`, `strstr.obj` in the [CRT atlas](VC6_CRT_ATLAS.md)).
+The `__FILE__` operand binds to `0x0056b6c8`; the matcher keys any
+absolute-path source literal as `__FILE__` because its pooled name embeds the
+build path. `/GX` frame handlers bind as `<symbol>$ehhandler` (here
+`0x0054ad48` and `0x0054ad68`, both `mov eax, funcinfo; jmp
+___CxxFrameHandler` stubs).
 
 | Slot | Retail VA | Bytes | Behavior |
 |---:|---|---:|---|
@@ -43,12 +67,14 @@ every relocation bound; 14 of them do not match under `/G6`.
 | 17 | `0x00469500` | 42 | +0x20 bit 6; children without bit 3 |
 | 18 | `0x004694d0` | 42 | +0x20 bit 7; children without bit 3 |
 | 19 | `0x00469530` | 68 | +0x20 bit 8; returns 1 at the first child returning nonzero |
+| 5 | `0x004690b0` | 13 | Set +0x25 bits 0-1, tail-call slot 7 |
 | 20 | `0x00469c00` | 60 | Ungated search, as slot 19 |
+| 21 | `0x00469c40` | 60 | Ungated search, as slot 20 |
 | 22 | `0x00469580` | 76 | +0x20 bit 9; two-argument search |
 | 23 | `0x004695d0` | 76 | +0x20 bit 10; two-argument search |
+| 24 | `0x00469620` | 94 | +0x20 bit 11; children with bit 1 (not bit 0), without bit 3; five-argument search |
+| 25 | `0x00469720` | 68 | Slot 25 on every child without bit 3 (next read first), then +0x18 = argument |
 | 26 | `0x004692c0` | 36 | Slot 26 on every child, then set own bit 3 |
 
 Unless noted, walks call the slot on children with +0x25 bit 0 set and bit 3
-clear, and return 1. Remaining GameObject work: the constructor
-(`0x00468ca0`, exception-handling frame), destructor core (`0x00468d60`) and
-scalar deleting wrapper (`0x00468d40`), and slots 5, 21, 24 and 25.
+clear, and return 1.

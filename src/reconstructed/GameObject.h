@@ -33,14 +33,17 @@ public:
     virtual int UnknownVirtualSlot18();
     virtual int UnknownVirtualSlot19(int value);
     virtual int UnknownVirtualSlot20(int value);
-    virtual void UnknownVirtualSlot21();
+    virtual int UnknownVirtualSlot21(int value);
     virtual int UnknownVirtualSlot22(int a, int b);
     virtual int UnknownVirtualSlot23(int a, int b);
-    virtual void UnknownVirtualSlot24();
-    virtual void UnknownVirtualSlot25();
+    virtual int UnknownVirtualSlot24(int a, int b, int c, int d, int e);
+    virtual int UnknownVirtualSlot25(void* value);
     virtual void UnknownVirtualSlot26();
 
-    void UnknownFunction469680(); // 0x00469680, called on the first child by Release
+    // 0x00469680: releases this object and every later sibling, back to front.
+    int UnknownFunction469680();
+    // 0x00469ce0: appends the RTTI class name of `object` to field_0x28.
+    void UnknownFunction469ce0(GameObject* object);
 
 protected:
     // Offsets and widths are evidenced by the reconstructed methods; names are
@@ -50,10 +53,17 @@ protected:
     GameObject* field_0x0C;    // next sibling
     GameObject* field_0x10;    // first child
     GameObject* field_0x14;    // parent
-    void* field_0x18;          // set by slot 8; Camera's owner object
+    void* field_0x18;          // set by slots 8 and 25; Camera's owner object
     int field_0x1C;
     unsigned int field_0x20;   // flag word gating slots 12-18
     unsigned char field_0x24;
-    unsigned char field_0x25;  // bit 0/1 cleared by slot 4; bit 2 set by slot 16;
-                               // bit 3 skips traversal
+    // Byte +0x25 is a bitfield: the constructor's single merged store of all
+    // four low bits is VC6's bitfield code shape. Bit 0 enables the gated child
+    // walks, bit 3 excludes a child from every walk; bit 2 is set by slot 16
+    // and also excludes a child from slots 9 and 10.
+    unsigned char field_0x25_bit0 : 1;
+    unsigned char field_0x25_bit1 : 1;
+    unsigned char field_0x25_bit2 : 1;
+    unsigned char field_0x25_bit3 : 1;
+    char* field_0x28;          // DebugMalloc'd string, starts empty; see 0x00469ce0
 };

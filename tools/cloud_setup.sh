@@ -126,6 +126,11 @@ if installed; then
     else warn "$link is a real directory, not the verified install; remove it to use $target"; fi
   done
 
+  # Long-name STL headers (e.g. <exception>) for installs made before the
+  # installer restored them; idempotent.
+  python3 -c 'import sys; from pathlib import Path; from mcm2tool.private_bundle import restore_long_header_names as r; r(Path(sys.argv[1]))' \
+    "$PRIVATE_ROOT/toolchains/vc6sp3" || warn "could not restore long-name VC98 headers"
+
   # Real compiler acceptance (also initialises the Wine prefix). Once per install.
   if [ ! -f "$PRIVATE_ROOT/.accepted-$BUNDLE_SHA256" ]; then
     log "VC6 acceptance compile"

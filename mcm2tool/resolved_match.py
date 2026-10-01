@@ -60,6 +60,16 @@ def compare_bytes(retail: bytes, candidate: bytes) -> dict:
                            if i >= len(retail) or i >= len(candidate) or retail[i] != candidate[i]][:64]}
 
 
+def _is_source_path_literal(obj: CoffObject, record) -> bool:
+    if record.section_number <= 0:
+        return False
+    section = obj.section(record.section_number)
+    data = obj.data[section.raw_ptr + record.value:section.raw_ptr + section.raw_size]
+    text = data.split(b'\0', 1)[0].decode('latin-1').lower()
+    return (len(text) > 3 and text[1:3] in (':\\', ':/')
+            and text.endswith(('.cpp', '.c', '.h')))
+
+
 def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bindings: dict[str, int]) -> dict:
     if obj.machine != 0x14c:
         raise RelocationError('only i386 COFF supported')
@@ -88,7 +98,22 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
             if record.name in bindings and bindings[record.name] != address:
                 raise RelocationError(f'binding contradicts internal label: {record.name}')
             internal[record.name] = address
-        converted.append({'offset': rel.virtual_address - sym.value, 'type': rel.type, 'symbol': record.name})
+        offset = rel.virtual_address - sym.value
+        name = record.name
+        # /GX frame prologue `push -1; push offset handler`: the handler stub is
+        # a compiler label in .text$x whose number shifts with unrelated edits,
+        # so it is bound under the stable key '<function symbol>$ehhandler'.
+        if (offset == 3 and raw[:3] == b'\x6a\xff\x68' and record.storage_class == 6
+                and obj.section(record.section_number).name.startswith('.text$x')):
+            name = f'{sym.name}$ehhandler'
+        # __except_list is the CRT's absolute symbol for the fs:[0] SEH chain head.
+        if name == '__except_list' and rel.type == 0x0006 and record.section_number in (0, -1):
+            internal[name] = 0
+        # A __FILE__ literal embeds the build path, so its pooled ??_C@ name is not
+        # stable; it is bound under the key '__FILE__' instead.
+        elif name.startswith('??_C@') and _is_source_path_literal(obj, record):
+            name = '__FILE__'
+        converted.append({'offset': offset, 'type': rel.type, 'symbol': name})
     patched, audit = apply_relocations(raw, converted, {**bindings, **internal}, target_va)
     for row in audit:
         row['internal_label'] = row['symbol'] in internal
