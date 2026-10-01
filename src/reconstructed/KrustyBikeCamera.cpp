@@ -24,6 +24,23 @@ int KrustyBikeCamera::UnknownVirtualSlot23(int a, int b) {
     return BikeCamera::UnknownVirtualSlot23(a, b);
 }
 
+// 0x00497fa0: keeps the point at least 3.5 above the subject's ground height
+// (easing +0x22c when it lifts it), and in modes 3 and 4 no higher than 400.
+void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
+    bool capped = g_UnknownGlobal56e26c->field_0x578.UnknownFunction524100() == 3 ||
+                  g_UnknownGlobal56e26c->field_0x578.UnknownFunction524100() == 4;
+    Vector3 ground = *point;
+    field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
+    float minimum = ground.y + 3.5f;
+    if (minimum > point->y) {
+        if (field_0x22c < 0.0f)
+            field_0x22c = (minimum - point->y) / field_0x220 + field_0x22c;
+        point->y = minimum;
+    } else if (capped && point->y > 400.0f) {
+        point->y = 400.0f;
+    }
+}
+
 // 0x00498080
 void KrustyBikeCamera::UnknownVirtualSlot55() {
     g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot2(0x0B, 0x3F);
@@ -102,4 +119,26 @@ void KrustyBikeCamera::UnknownVirtualSlot58() {
         UnknownMessage message(text, 1.5f);
         target->UnknownFunction51b540(&message);
     }
+}
+
+// 0x004985b0: FollowCamera slot 48 plus a raw-target case while the +0x3b8
+// view flags are set.
+Vector3 KrustyBikeCamera::UnknownVirtualSlot48(int a, bool flag, int b) {
+    Vector3 result;
+    if (field_0x244 == 5) {
+        if (field_0x268)
+            result = field_0x2a8;
+        else
+            result = UnknownVirtualSlot34(b);
+    } else if (field_0x244 == 7) {
+        result = field_0x2b4;
+        result.y += 3.0f;
+    } else if (field_0x3b8->field_0x3f8 || field_0x3b8->field_0x3f9) {
+        result = field_0x2b4;
+    } else if (flag) {
+        result = UnknownVirtualSlot35(a, b);
+    } else {
+        result = UnknownVirtualSlot37();
+    }
+    return result;
 }

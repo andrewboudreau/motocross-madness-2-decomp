@@ -239,6 +239,8 @@ are strict exact.
 | Destructor / wrapper | `0x00497d80` / `0x00497d60` | 11 / 30 | Explicit empty destructor |
 | 23 | `0x00497df0` | 38 | Returns 0 while global +0x3430 is set, else FollowCamera slot 23 |
 | 42 | `0x00498130` | 148 | +0x308 = fov/zoom ratio × bike +0x43c × 0.42 (0.55 in state 3), 0 otherwise |
+| 48 | `0x004985b0` | 249 | FollowCamera slot 48 plus the raw target while view +0x3f8/+0x3f9 are set |
+| 52 | `0x00497fa0` | 217 | Keeps a point 3.5 above the subject's ground probe (easing +0x22c), capped at 400 in global modes 3 and 4 |
 | 55 | `0x00498080` | 18 | Global +0x14 virtual slot 2 with (0x0b, 0x3f) |
 | 56 | `0x004980a0` | 134 | Input 0x0a test; outside state 7 also bike +0x108, axis < -2 and not +0x735 in vehicle mode |
 | 58 | `0x004982c0` | 116 | Unless state 6, shows string 0x13b9 + state for 1.5 s through the global +0x570 object |
@@ -247,3 +249,11 @@ are strict exact.
 
 Slot 58's frame holds a 0x8c-byte message object and a `char[260]` text
 buffer (MAX_PATH), although it asks for at most 0x80 characters.
+
+Slot 10 (`0x00497e20`, 352 bytes plus a 6-entry jump table) is a near miss in
+`samples/camera/KrustyBikeCameraNearMisses.cpp`, with 35 of 376 bytes
+differing. It picks its view from the global's +0x558..+0x568 objects by
++0x2d74 (case order 2, 3, 0, 1/5, 4 in the code). While the view is available
+it drives FollowCamera slots 46 and 47 from it, using file-scope statics at
+`0x0067c3e8` and `0x0067c3f4` (no initialisation guard). Only the register
+choice in its second `0x004210f0` call differs.

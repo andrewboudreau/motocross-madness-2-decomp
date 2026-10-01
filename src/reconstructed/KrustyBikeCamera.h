@@ -35,6 +35,26 @@ struct UnknownKrustyBike {
     bool field_0x7a4;
 };
 
+struct UnknownKrustyBikeViewPart {
+    unsigned char field_0x00[0x10];
+    float field_0x10;                    // slot 10 adds 2 for the height
+};
+
+// Object at KrustyBikeCamera+0x3b8 (chosen by slot 10 from the global's
+// +0x558..+0x568 objects); slot 48 tests two flags.
+struct UnknownKrustyBikeView {
+    // 0x004210f0: writes two positions relative to `reference`.
+    void UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, int flags);
+
+    unsigned char field_0x000[0x38];
+    UnknownKrustyBikeViewPart* field_0x38;
+    unsigned char field_0x03c[0x18e - 0x3c];
+    bool field_0x18e;                    // slot 10: view available
+    unsigned char field_0x18f[0x3f8 - 0x18f];
+    bool field_0x3f8;
+    bool field_0x3f9;
+};
+
 // RTTI: KrustyBikeCamera : BikeCamera. KrustyBike.cpp is a candidate for its
 // translation unit (name overlap and nearby references), not established.
 // It keeps the camera state and presets in the 0x0056e26c object so they
@@ -44,8 +64,12 @@ public:
     explicit KrustyBikeCamera(int flags); // 0x00497cb0
     virtual ~KrustyBikeCamera();          // 0x00497d80 (deleting wrapper 0x00497d60)
 
+    virtual int UnknownVirtualSlot10(int value); // 0x00497e20 (near miss: samples/camera)
+
     virtual int UnknownVirtualSlot23(int a, int b);
     virtual void UnknownVirtualSlot42(bool flag);
+    virtual Vector3 UnknownVirtualSlot48(int a, bool flag, int b);
+    virtual void UnknownVirtualSlot52(Vector3* point);
     virtual void UnknownVirtualSlot55();
     virtual bool UnknownVirtualSlot56();
     virtual void UnknownVirtualSlot58();
@@ -56,5 +80,5 @@ public:
 
 protected:
     UnknownKrustyBike* field_0x3b4;
-    int field_0x3b8;
+    UnknownKrustyBikeView* field_0x3b8;
 };

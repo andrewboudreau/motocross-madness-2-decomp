@@ -35,6 +35,19 @@ public:
     UnknownMessageTarget* UnknownFunction45d340(); // 0x0045d340
 };
 
+struct UnknownKrustyBikeView;
+
+struct UnknownObject56e26cViewOwner {
+    unsigned char field_0x00[0x34];
+    UnknownKrustyBikeView* field_0x34;
+};
+
+// Object embedded at +0x578; KrustyBikeCamera slot 52 reads its mode.
+class UnknownObject56e26cMode {
+public:
+    int UnknownFunction524100(); // 0x00524100
+};
+
 class UnknownObject56e26c {
 public:
     void UnknownFunction468880(); // 0x00468880 (PCCamera slot 27)
@@ -44,15 +57,27 @@ public:
     unsigned char field_0x0000[0x14];
     UnknownObject56e26cPart* field_0x14;
     int field_0x18;      // KrustyBikeCamera slot 42 tests > 1
-    unsigned char field_0x001c[0x570 - 0x1c];
+    unsigned char field_0x001c[0x558 - 0x1c];
+    // Objects whose +0x34 KrustyBikeCamera slot 10 takes as its view, by
+    // field_0x2d74.
+    UnknownObject56e26cViewOwner* field_0x558;
+    UnknownObject56e26cViewOwner* field_0x55c;
+    UnknownObject56e26cViewOwner* field_0x560;
+    UnknownObject56e26cViewOwner* field_0x564;
+    UnknownObject56e26cViewOwner* field_0x568;
+    int field_0x56c;
     UnknownObject56e26cList* field_0x570;
-    unsigned char field_0x0574[0x2930 - 0x574];
+    int field_0x574;
+    UnknownObject56e26cMode field_0x578;
+    unsigned char field_0x0579[0x2930 - 0x579];
     int field_0x2930;    // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x2934;  // saved KrustyBikeCamera presets (slots 59, 60)
     float field_0x2938;
     float field_0x293c;
     float field_0x2940;
-    unsigned char field_0x2944[0x3430 - 0x2944];
+    unsigned char field_0x2944[0x2d74 - 0x2944];
+    int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
+    unsigned char field_0x2d78[0x3430 - 0x2d78];
     int field_0x3430;    // blocks KrustyBikeCamera slot 23
 };
 

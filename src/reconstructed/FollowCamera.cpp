@@ -248,7 +248,7 @@ Vector3 FollowCamera::UnknownVirtualSlot34(int) {
 }
 
 // 0x00464e80 and 0x00464e90 (slots 53, 54 and 58-62 share the empty body).
-void FollowCamera::UnknownVirtualSlot52(int) {}
+void FollowCamera::UnknownVirtualSlot52(Vector3*) {}
 void FollowCamera::UnknownVirtualSlot53() {}
 void FollowCamera::UnknownVirtualSlot54() {}
 void FollowCamera::UnknownVirtualSlot58() {}
