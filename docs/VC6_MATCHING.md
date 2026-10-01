@@ -10,17 +10,17 @@ game remains a separate, unverified gate.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default), `vc6_o2_ml` | 39/39 | 19/19 | 32/32 |
-| `vc6_o2_ml_g6`, `vc6_o2_mt_g6` | 39/39 | 19/19 | 19/32 |
+| `vc6_o2_mt` (default), `vc6_o2_ml` | 39/39 | 19/19 | 52/52 |
+| `vc6_o2_ml_g6`, `vc6_o2_mt_g6` | 39/39 | 19/19 | 25/52 |
 | `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 8/17 (camera cases not rerun) |
 
 Passing manual samples mask no bytes. Generated probes resolve both global-load
 addresses. Summaries prefer strict results when available.
 
 The default is `vc6_o2_mt`: `/O2` without `/G6` is the only tested family that
-matches every calibration target, and no target prefers `/G6`. The thirteen `/G6`
-misses (Release, UIControl 61/62, FollowCamera 68/69/72, Camera 13/18/30–32,
-`~Camera`, PCCamera 13) differ only in
+matches every calibration target, and no target prefers `/G6`. The 27 `/G6`
+misses (BaseObject Release, UIControl 61/62, FollowCamera 68/69/72, Camera
+13/18/30–32, `~Camera`, PCCamera 13 and 14 [GameObject](GAMEOBJECT.md) methods) differ only in
 instruction selection and scheduling; explicit `/G5` behaves like VC6's default. `/ML` and
 `/MT` emit identical code for every tested target; `/MT` follows the
 [runtime identity](VC6_CRT_ATLAS.md). This is the best-supported working

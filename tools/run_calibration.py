@@ -105,6 +105,186 @@ CASES = [
         'reason': 'retail VC6 zeros EAX once and fans it out to three fields; clang emits repeated immediate-zero stores',
     },
     {
+        'name': 'GameObject::Release override',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'Release@GameObject',
+        'target_va': '0x004696c0',
+        'target_size': 81,
+        'reason': 'blocked by global 0x65b548; first child 0x469680; sibling/parent unlink; BaseObject::Release',
+    },
+    {
+        'name': 'GameObject::slot4 clear bits + slot 6',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot4@GameObject',
+        'target_va': '0x004690a0',
+        'target_size': 13,
+        'reason': 'clears field_0x25 bits 0-1 then tail-calls slot 6',
+    },
+    {
+        'name': 'GameObject::slot6 child walk',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot6@GameObject',
+        'target_va': '0x00469050',
+        'target_size': 30,
+        'reason': 'calls slot 6 on each child without bit 3',
+    },
+    {
+        'name': 'GameObject::slot7 child walk',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot7@GameObject',
+        'target_va': '0x00469070',
+        'target_size': 35,
+        'reason': 'calls slot 7 on each child with bit 0 and without bit 3',
+    },
+    {
+        'name': 'GameObject::slot8 set +0x18',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot8@GameObject',
+        'target_va': '0x004692f0',
+        'target_size': 12,
+        'reason': 'stores the argument at +0x18 and returns this',
+    },
+    {
+        'name': 'GameObject::slot9 gated walk',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot9@GameObject',
+        'target_va': '0x00469430',
+        'target_size': 65,
+        'reason': 'field_0x20 bit 0; children with bit 0 and without bits 2/3',
+    },
+    {
+        'name': 'GameObject::slot10 gated walk + owner part',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot10@GameObject',
+        'target_va': '0x004693d0',
+        'target_size': 94,
+        'reason': 'field_0x20 bit 1; after each child, owner+4 part slot 4 when its +0x70 bit 2 is set',
+    },
+    {
+        'name': 'GameObject::slot11 return one',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot11@GameObject',
+        'target_va': '0x004da540',
+        'target_size': 8,
+        'reason': 'shared return-1 body (identical-code folding)',
+    },
+    {
+        'name': 'GameObject::slot12 gated walk',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot12@GameObject',
+        'target_va': '0x00469300',
+        'target_size': 48,
+        'reason': 'field_0x20 bit 12',
+    },
+    {
+        'name': 'GameObject::slot13 gated walk',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot13@GameObject',
+        'target_va': '0x00469330',
+        'target_size': 47,
+        'reason': 'field_0x20 bit 2',
+    },
+    {
+        'name': 'GameObject::slot14 gated walk, stop on 0',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot14@GameObject',
+        'target_va': '0x00469360',
+        'target_size': 55,
+        'reason': 'field_0x20 bit 3; returns 0 at the first failing child',
+    },
+    {
+        'name': 'GameObject::slot15 gated walk',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot15@GameObject',
+        'target_va': '0x004693a0',
+        'target_size': 47,
+        'reason': 'field_0x20 bit 4',
+    },
+    {
+        'name': 'GameObject::slot16 set bit 2 + gated walk',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot16@GameObject',
+        'target_va': '0x00469480',
+        'target_size': 74,
+        'reason': 'bitfield-style store of the argument low bit, then field_0x20 bit 5 walk',
+    },
+    {
+        'name': 'GameObject::slot17 gated walk',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot17@GameObject',
+        'target_va': '0x00469500',
+        'target_size': 42,
+        'reason': 'field_0x20 bit 6; children without bit 3',
+    },
+    {
+        'name': 'GameObject::slot18 gated walk',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot18@GameObject',
+        'target_va': '0x004694d0',
+        'target_size': 42,
+        'reason': 'field_0x20 bit 7; children without bit 3',
+    },
+    {
+        'name': 'GameObject::slot19 gated search',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot19@GameObject',
+        'target_va': '0x00469530',
+        'target_size': 68,
+        'reason': 'field_0x20 bit 8; returns 1 at the first child returning nonzero',
+    },
+    {
+        'name': 'GameObject::slot20 search',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot20@GameObject',
+        'target_va': '0x00469c00',
+        'target_size': 60,
+        'reason': 'ungated; returns 1 at the first child returning nonzero',
+    },
+    {
+        'name': 'GameObject::slot22 gated search',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot22@GameObject',
+        'target_va': '0x00469580',
+        'target_size': 76,
+        'reason': 'field_0x20 bit 9; two arguments',
+    },
+    {
+        'name': 'GameObject::slot23 gated search',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot23@GameObject',
+        'target_va': '0x004695d0',
+        'target_size': 76,
+        'reason': 'field_0x20 bit 10; two arguments',
+    },
+    {
+        'name': 'GameObject::slot26 walk + set bit 3',
+        'bindings': 'src/reconstructed/GameObject.bindings.json',
+        'source': 'src/reconstructed/GameObject.cpp',
+        'symbol': 'UnknownVirtualSlot26@GameObject',
+        'target_va': '0x004692c0',
+        'target_size': 36,
+        'reason': 'slot 26 on every child, then sets its own bit 3',
+    },
+    {
         'name': 'Camera::~Camera destructor core',
         'bindings': 'src/reconstructed/Camera.bindings.json',
         'source': 'src/reconstructed/Camera.cpp',
@@ -295,16 +475,21 @@ def main():
     args=ap.parse_args()
     rows=[]
     with tempfile.TemporaryDirectory() as td:
+        # Each source is compiled once per run; cases sharing a file reuse it.
+        compiled={}
         for i,c in enumerate(CASES):
-            obj=Path(td)/f'cal{i}.obj'
-            cmd=[sys.executable,'tools/compile.py',c['source'],'-o',str(obj),'--compiler',args.compiler]
-            if args.profile: cmd += ['--profile',args.profile]
-            if args.compiler=='vc6':
-                if not args.vc6_root: raise SystemExit('VC6 run requested: set VC6_ROOT or pass --vc6-root')
-                cmd += ['--vc6-root',args.vc6_root]
-            cr=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-            if cr.returncode:
-                rows.append({**c,'compile_error':cr.stdout}); continue
+            if c['source'] not in compiled:
+                obj=Path(td)/f'cal{len(compiled)}.obj'
+                cmd=[sys.executable,'tools/compile.py',c['source'],'-o',str(obj),'--compiler',args.compiler]
+                if args.profile: cmd += ['--profile',args.profile]
+                if args.compiler=='vc6':
+                    if not args.vc6_root: raise SystemExit('VC6 run requested: set VC6_ROOT or pass --vc6-root')
+                    cmd += ['--vc6-root',args.vc6_root]
+                cr=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+                compiled[c['source']]=(obj,cr.returncode,cr.stdout)
+            obj,rc,out=compiled[c['source']]
+            if rc:
+                rows.append({**c,'compile_error':out}); continue
             match_cmd=[sys.executable,'tools/match.py','--exe',args.exe,'--target-va',c['target_va'],'--target-size',str(c['target_size']),'--obj',str(obj),'--symbol',c['symbol'],'--json']
             if c.get('bindings'): match_cmd += ['--bindings',c['bindings']]
             mr=subprocess.run(match_cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
