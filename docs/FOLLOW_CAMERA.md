@@ -72,3 +72,28 @@ Slot 70 saves the previous state/parameter before entering literal state 5 and
 restores them on disable. Slot 72 increments/wraps the index, selects a table
 value, stores it at +0x244 and calls slot 71. Reproduce with the
 [calibration/profile commands](VC6_MATCHING.md).
+
+## Camera and PCCamera
+
+RTTI: `PCCamera : Camera : GameObject : BaseObject`. Candidate:
+`samples/camera/CameraProbe.cpp`; call bindings in
+`samples/camera/Camera.bindings.json` come from the GameObject/Camera vtables
+and decoded direct calls. All ten bodies are strict exact under the default
+profile with zero ignored bytes.
+
+| Class/slot | Retail VA | Bytes | Behavior |
+|---|---|---:|---|
+| Camera 5 | `0x0042f050` | 32 | GameObject slot 5, owner helper `0x004e8cf0(this)`, +0x1d0 = owner+0x14 + 1 |
+| Camera 13 | `0x0042e630` | 92 | If +0x1cc: rectangle from x/y/width/height at +0x1a0 to owner slot 12; then `0x0042e8e0`; returns 1 |
+| Camera 18 | `0x0042f070` | 28 | GameObject slot 18, +0x1d0 = owner+0x14 + 1, returns 1 |
+| Camera 30/31/32 | `0x0042edd0`/`0x0042edf0`/`0x0042ee10` | 26/29/26 | Copy a 64-byte block into +0x2c/+0xac/+0x6c, return 1 |
+| PCCamera 13 | `0x004bee80` | 65 | Camera 13; if owner+0x08 is this camera, interface method 11 with kinds 2 (+0xac) and 3 (+0x6c) |
+| PCCamera 30/31/32 | `0x004bedc0`/`0x004bee00`/`0x004bee40` | 54 each | Camera version, then optional interface method 11 with kind 1/2/3 |
+
+The owner is the object at Camera+0x18; its +0x50 holds a COM-style interface
+(`this` on the stack). Method 11 taking kind 1/2/3 and a 64-byte block is
+consistent with `IDirect3DDevice7::SetTransform` for world/view/projection,
+which would make +0x2c/+0xac/+0x6c the world/view/projection matrices. That is
+inference from call shape only; names stay neutral until the interface is
+identified from creation/import evidence.
+
