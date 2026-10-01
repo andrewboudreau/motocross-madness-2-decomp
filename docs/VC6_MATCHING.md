@@ -24,6 +24,9 @@ instruction selection and scheduling; explicit `/G5` behaves like VC6's default.
 `/MT` emit identical code for every tested target; `/MT` follows the
 [runtime identity](VC6_CRT_ATLAS.md). This is the best-supported working
 hypothesis, not proof of original per-file flags; test others with `--profile`.
+The physics samples (`tools/run_physics_samples.py`) independently show the
+same split: 139/194 targets match without `/G6` versus 76/194 with it, and none
+match only under `/G6`.
 
 ## BaseObject
 
