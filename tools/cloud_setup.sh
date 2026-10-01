@@ -86,6 +86,11 @@ if [ "$DO_APT" = 1 ]; then
   fi
 fi
 
+# tools/disasm_fn.py needs capstone (PyPI is reachable through the proxy).
+if [ "$DO_APT" = 1 ] && ! python3 -c 'import capstone' 2>/dev/null; then
+  python3 -m pip install -q capstone >/dev/null 2>&1 || warn "pip install capstone failed"
+fi
+
 # Ubuntu ships clang-cl only as clang-cl-<N>; expose an unversioned name.
 if ! command -v clang-cl >/dev/null; then
   cc="$(ls /usr/bin/clang-cl-* 2>/dev/null | sort -V | tail -1)"

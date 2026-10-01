@@ -51,7 +51,10 @@ def main():
     ap.add_argument('--profile',default=None); ap.add_argument('--profiles',default='config/compile_profiles.json')
     ap.add_argument('--extra',action='append',default=[],help='additional compiler flag (repeatable)')
     a=ap.parse_args(); profiles=load_profiles(Path(a.profiles))
-    profile=a.profile or ('clang_probe' if a.compiler=='clang-cl' else 'vc6_o2_ml_g6')
+    # VC6 default: /O2 without /G6 is the only tested profile that matches every
+    # calibration target (docs/VC6_MATCHING.md); /MT follows the LIBCMT runtime
+    # proof. A working hypothesis, not a confirmed project setting.
+    profile=a.profile or ('clang_probe' if a.compiler=='clang-cl' else 'vc6_o2_mt')
     if profile not in profiles: raise SystemExit(f'unknown profile {profile}; choices={list(profiles)}')
     src=Path(a.source); out=Path(a.out); flags=profiles[profile]
     if a.compiler=='clang-cl': run_clang(src,out,flags,a.extra)

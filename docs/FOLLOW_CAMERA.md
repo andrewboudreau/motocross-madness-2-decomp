@@ -3,7 +3,8 @@
 `FollowCamera : PCCamera` introduces slots 63–72. VehicleCamera, BikeCamera and
 KrustyBikeCamera inherit many entries. FollowCam.cpp is a source-file candidate
 supported by name overlap and nearby references, not a proven TU assignment.
-Canonical candidate: `samples/camera/FollowCameraProbe.cpp`.
+Canonical source: `src/reconstructed/FollowCamera.h` and `.cpp`, built on
+`PCCamera`, `Camera` and `GameObject` in the same directory.
 
 | Slot | Retail VA | Bytes | VC6 SP3 status / behavior |
 |---:|---|---:|---|
@@ -12,31 +13,50 @@ Canonical candidate: `samples/camera/FollowCameraProbe.cpp`.
 | 65 | `0x00466cd0` | 31 | Exact preset stores |
 | 66 | `0x00466cf0` | 41 | Exact preset stores |
 | 67 | `0x00466d20` | 41 | Exact preset stores |
-| 68 | `0x00466d50` | — | Bounded float-like update; no matching candidate |
-| 69 | `0x00466a80` | 65 | Nonmatching aggregate-return/cache path |
+| 68 | `0x00466d50` | 241 | Exact without `/G6`, all relocations resolved; distance-derived +0x258 clamped to [10, 70] |
+| 69 | `0x00466a80` | 65 | Exact without `/G6`; slot 57 result assigned straight into +0x2a8 |
 | 70 | `0x00467040` | 101 | Exact mode/state save and restore |
-| 71 | `0x00466e50` | 171 | Nonmatching state dispatcher |
+| 71 | `0x00466e50` | 192 | Exact; 171 code bytes, one NOP, 5-entry jump table |
 | 72 | `0x00466fb0` | 62 | Exact cyclic advance without `/G6` |
 
 These are function matches, not a completed class. Fields, enum names and the
 12-byte aggregate's semantic type remain provisional.
 
-## Remaining targets
+## Notes on slots 68, 69 and 71
+
+Slot 68 copies the 12-byte float triple at +0x2b4, adds 3.0 to its second
+component, takes the absolute differences between +0x170/+0x178 and the
+triple's first/third components, and calls `0x00460b50` (a cdecl
+`float(float)` that returns 0 for 0 and otherwise approximates a square root
+by halving the exponent and looking up a table) on the sum of their squares.
++0x258 becomes `((200 - r) / 180) * 60 + 10`, clamped to [10, 70], and the
+triple is passed by value to slot 29. `src/reconstructed/FollowCamera.bindings.json`
+binds each VC6 float literal to a retail constant whose value was checked
+against the literal, plus the direct call. Names, the triple's type and the
+helper's identity remain provisional. Writing `/ 180.0f * 60.0f` without the
+inner parentheses lets VC6 fold the two constants into one multiply, which
+retail does not do.
 
 Slot 69 calls virtual slot 57 with a hidden stack return buffer for a 12-byte
 aggregate, copies three dwords into +0x2a8/+0x2ac/+0x2b0, then passes the cache
-to slot 43. The ABI interpretation is strong; copy/register scheduling remains
-nonmatching. Size alone does not establish a vector type.
+to slot 43. Retail forms the cache address before the call and copies straight
+from the returned buffer, so the candidate assigns the call result directly
+(`*cached = UnknownVirtualSlot57(0);`); a named temporary kept the copy in extra
+registers. Size alone does not establish a vector type.
 
 Slot 71 stores the input at +0x244, calls slot 58, dispatches states 0–4 to
 slots 66/65/64/63/60, then snapshots +0x220/+0x22c/+0x234 into
 +0x2c4/+0x2c8/+0x2cc before slot 61. State 3 restores +0x258 from +0x2f0;
-state 4 saves it. Switch lowering, extent and scheduling need further work.
+state 4 saves it. The code already matched; the function's extent includes one
+alignment NOP and the 5-entry jump table. Retail has the same layout: all five
+entries (`0x00466e77`–`0x00466eb3`) and the table reference resolve to the
+retail addresses when each label is placed at its function offset.
 
 ## Field behavior
 
 | Offset | Observed role |
 |---|---|
+| +0x170, +0x178 | Floats compared with the +0x2b4 triple in slot 68 |
 | +0x220, +0x22c, +0x234 | Preset parameters |
 | +0x244, +0x248 | Current/saved state candidates |
 | +0x24c | Saved copy of +0x258 |
@@ -44,6 +64,7 @@ state 4 saves it. Switch lowering, extent and scheduling need further work.
 | +0x268 | Low input byte stored as a dword |
 | +0x26c | Reset on enabling temporary state |
 | +0x2a8 | 12-byte cached aggregate |
+| +0x2b4 | 12-byte float triple copied by slot 68 and passed to slot 29 |
 | +0x2c4, +0x2c8, +0x2cc | Snapshot of the three preset parameters |
 | +0x2f0 | State-specific saved copy of +0x258 |
 | +0x30c, +0x310, +0x314 | Cyclic index, count, inline dword table |
@@ -52,3 +73,28 @@ Slot 70 saves the previous state/parameter before entering literal state 5 and
 restores them on disable. Slot 72 increments/wraps the index, selects a table
 value, stores it at +0x244 and calls slot 71. Reproduce with the
 [calibration/profile commands](VC6_MATCHING.md).
+
+## Camera and PCCamera
+
+RTTI: `PCCamera : Camera : GameObject : BaseObject`. Canonical source:
+`src/reconstructed/Camera.{h,cpp}` and `PCCamera.{h,cpp}`; call bindings in
+`src/reconstructed/Camera.bindings.json` come from the GameObject/Camera vtables
+and decoded direct calls. All ten bodies are strict exact under the default
+profile with zero ignored bytes.
+
+| Class/slot | Retail VA | Bytes | Behavior |
+|---|---|---:|---|
+| Camera 5 | `0x0042f050` | 32 | GameObject slot 5, owner helper `0x004e8cf0(this)`, +0x1d0 = owner+0x14 + 1 |
+| Camera 13 | `0x0042e630` | 92 | If +0x1cc: rectangle from x/y/width/height at +0x1a0 to owner slot 12; then `0x0042e8e0`; returns 1 |
+| Camera 18 | `0x0042f070` | 28 | GameObject slot 18, +0x1d0 = owner+0x14 + 1, returns 1 |
+| Camera 30/31/32 | `0x0042edd0`/`0x0042edf0`/`0x0042ee10` | 26/29/26 | Copy a 64-byte block into +0x2c/+0xac/+0x6c, return 1 |
+| PCCamera 13 | `0x004bee80` | 65 | Camera 13; if owner+0x08 is this camera, interface method 11 with kinds 2 (+0xac) and 3 (+0x6c) |
+| PCCamera 30/31/32 | `0x004bedc0`/`0x004bee00`/`0x004bee40` | 54 each | Camera version, then optional interface method 11 with kind 1/2/3 |
+
+The owner is the object at Camera+0x18; its +0x50 holds a COM-style interface
+(`this` on the stack). Method 11 taking kind 1/2/3 and a 64-byte block is
+consistent with `IDirect3DDevice7::SetTransform` for world/view/projection,
+which would make +0x2c/+0xac/+0x6c the world/view/projection matrices. That is
+inference from call shape only; names stay neutral until the interface is
+identified from creation/import evidence.
+

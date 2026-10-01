@@ -1,0 +1,10 @@
+{
+  "?UnknownFunction42e8e0@Camera@@QAEXXZ": "0x0042e8e0",
+  "?UnknownFunction4e8cf0@UnknownCameraOwner@@QAEXPAVCamera@@@Z": "0x004e8cf0",
+  "?UnknownVirtualSlot13@Camera@@UAEHXZ": "0x0042e630",
+  "?UnknownVirtualSlot18@GameObject@@UAEHXZ": "0x004694d0",
+  "?UnknownVirtualSlot30@Camera@@UAEHPBUCameraMatrix16@@@Z": "0x0042edd0",
+  "?UnknownVirtualSlot31@Camera@@UAEHPBUCameraMatrix16@@@Z": "0x0042edf0",
+  "?UnknownVirtualSlot32@Camera@@UAEHPBUCameraMatrix16@@@Z": "0x0042ee10",
+  "?UnknownVirtualSlot5@GameObject@@UAEXXZ": "0x004690b0"
+}

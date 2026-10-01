@@ -2,21 +2,32 @@
 
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
-Results use native Windows VC6 SP3. Linux/Wine and a complete linked game remain
-separate, unverified gates.
+Results use VC6 SP3 natively on Windows; the 2026-09-30 calibration and full
+gate were repeated under Linux/Wine with the same results. A complete linked
+game remains a separate, unverified gate.
 
 ## Compiler profiles
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_ml_g6` (default), `vc6_o2_mt_g6` | 39/39 | 19/19 | 10/16 |
-| `vc6_o2_ml`, `vc6_o2_mt` | 39/39 | 19/19 | 14/16 |
-| `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 8/16 |
+| `vc6_o2_mt` (default), `vc6_o2_ml` | 39/39 | 19/19 | 27/27 |
+| `vc6_o2_ml_g6`, `vc6_o2_mt_g6` | 39/39 | 19/19 | 15/27 |
+| `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 8/17 (camera cases not rerun) |
 
 Passing manual samples mask no bytes. Generated probes resolve both global-load
-addresses. Summaries prefer strict results when available. The default remains
-unchanged: useful profiles are not proof of original per-file flags. `/ML` versus
-`/MT` does not change these counts; [runtime identity](VC6_CRT_ATLAS.md) is separate.
+addresses. Summaries prefer strict results when available.
+
+The default is `vc6_o2_mt`: `/O2` without `/G6` is the only tested family that
+matches every calibration target, and no target prefers `/G6`. The twelve `/G6`
+misses (Release, UIControl 61/62, FollowCamera 68/69/72, Camera 13/18/30–32,
+PCCamera 13) differ only in
+instruction selection and scheduling; explicit `/G5` behaves like VC6's default. `/ML` and
+`/MT` emit identical code for every tested target; `/MT` follows the
+[runtime identity](VC6_CRT_ATLAS.md). This is the best-supported working
+hypothesis, not proof of original per-file flags; test others with `--profile`.
+The physics samples (`tools/run_physics_samples.py`) independently show the
+same split: 139/194 targets match without `/G6` versus 76/194 with it, and none
+match only under `/G6`.
 
 ## BaseObject
 
@@ -44,10 +55,14 @@ RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 
 ## Next targets
 
-[FollowCamera](FOLLOW_CAMERA.md) slots 69 (`0x00466a80`) and 71 (`0x00466e50`)
-remain nonmatching under all tested profiles. Slots 63/70, UIStatic slot 30 and
-UIMultiState slots 34–37 match the default. UIControl slots 61/62 and FollowCamera
-slot 72 additionally match without `/G6`.
+All 17 calibration targets match the default profile, including
+[FollowCamera](FOLLOW_CAMERA.md) slots 68 (`0x00466d50`, x87 distance/clamp,
+every relocation resolved), 69 (`0x00466a80`, source shape) and 71
+(`0x00466e50`, 192-byte extent including its jump table). Every FollowCamera
+slot 63–72 now has an exact candidate. Ten Camera/PCCamera bodies
+(`src/reconstructed/Camera.cpp`, `PCCamera.cpp`) also match strictly with every
+call bound;
+see [FollowCamera](FOLLOW_CAMERA.md#camera-and-pccamera).
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
