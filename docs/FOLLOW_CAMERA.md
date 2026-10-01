@@ -40,16 +40,24 @@ Canonical source: `src/reconstructed/FollowCamera.h` and `.cpp`, built on
 | Scalar deleting destructor | `0x00463120` | 30 | Exact canonical wrapper |
 
 FollowCamera's members (+0x220 to +0x343) are declared in `FollowCamera.h`
-from the constructor's stores; +0x2a8 is assigned from a `Vector3` global, so
-the old 12-byte aggregate is typed `Vector3`. the
-slot 63–67 presets store floats (for example 0x40490fdb = π, 0x42aa0000 =
-85.0) written as float literals. The constructor (`0x00462ee0`, 564 bytes) is a near miss kept in
-`samples/camera/FollowCameraConstructor.cpp`. Every value and offset is
-right, and the virtual call to slot 71 binds statically to `0x00466e50`.
-About 141 bytes differ: VC6 schedules the +0x274/+0x2dc zero stores into a
-load-delay slot where retail used +0x2e4/+0x276. Moving those statements does
-not fix it. Slots 10, 23, 36, 38, 45–47 and 49 and the initializer
-`0x00463140` are not yet reconstructed.
+from the constructor's stores. +0x2a8 is assigned from a `Vector3` global, so
+the old 12-byte aggregate is typed `Vector3`. The slot 63–67 presets store
+floats (for example 0x40490fdb = π, 0x42aa0000 = 85.0) written as float
+literals.
+
+Two near misses are kept in `samples/camera/FollowCameraNearMisses.cpp`:
+
+- Slot 36 (`0x00465000`, 209 bytes) differs by 12 bytes. Retail ends its
+  disabled path with one zero register for the +0x277 store and the return,
+  which no source form tried so far reproduces.
+- The constructor (`0x00462ee0`, 564 bytes) has every value and offset right,
+  and its virtual call to slot 71 binds statically to `0x00466e50`. About 141
+  bytes differ: VC6 schedules the +0x274/+0x2dc zero stores into a load-delay
+  slot where retail used +0x2e4/+0x276. Moving those statements does not fix
+  it.
+
+Slots 10, 23, 38, 45–47 and 49 and the initializer `0x00463140` are not yet
+reconstructed.
 
 Two shapes are evidence for helper functions in the original. The 20-byte
 values at +0x27c..+0x298 have an inline `Set` (the rate is skipped when it is

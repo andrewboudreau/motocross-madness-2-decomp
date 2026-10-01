@@ -22,6 +22,13 @@ inline float FollowCameraMin(float a, float b) {
     return (a < b) ? a : b;
 }
 
+// Inline absolute value (fcom 0 / fchs, not the fabs intrinsic).
+inline float FollowCameraAbs(float value) {
+    if (value < 0.0f)
+        value = -value;
+    return value;
+}
+
 // 20-byte object allocated by 0x00463140 (FollowCam.cpp lines 0x78 onward).
 // Set() is inlined by slots 43 and 44: the value always changes, the rate (and
 // a 1.0 scale) only when one is given.
@@ -74,13 +81,14 @@ extern Vector3 g_UnknownVector65b448;
 
 class FollowCamera : public PCCamera {
 public:
-    explicit FollowCamera(int flags); // 0x00462ee0 (near-miss in samples/camera)
+    explicit FollowCamera(int flags); // 0x00462ee0 (near miss: samples/camera)
     virtual ~FollowCamera();          // destructor core 0x00463350
 
     virtual void UnknownVirtualSlot33() = 0;
     virtual Vector3 UnknownVirtualSlot34(int unused);
     virtual Vector3 UnknownVirtualSlot35(int a, int b) = 0;
-    virtual void UnknownVirtualSlot36();
+    // 0x00465000 (near miss: samples/camera)
+    virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
     virtual Vector3 UnknownVirtualSlot37();
     virtual void UnknownVirtualSlot38(int a, int b, int c);
     virtual void UnknownVirtualSlot39() = 0;
@@ -151,7 +159,7 @@ protected:
     unsigned char field_0x274;
     unsigned char field_0x275;
     unsigned char field_0x276;
-    unsigned char field_0x277;
+    bool field_0x277;           // set when slot 36 ran with enable
     unsigned char field_0x278;
     unsigned char field_0x279;
     UnknownFollowCameraValue* field_0x27c; // owned values (allocated by 0x00463140, deleted by the destructor)

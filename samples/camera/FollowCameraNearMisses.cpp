@@ -1,10 +1,17 @@
-// Near-miss candidate for FollowCamera::FollowCamera (0x00462ee0, 564 bytes).
-// Every store value, offset and the static slot-71 call are right, but VC6
-// schedules two zero stores (+0x274, +0x2dc) into the load-delay slot of the
+// Near-miss FollowCamera candidates, kept out of src/reconstructed until they
+// match. See docs/FOLLOW_CAMERA.md.
+//
+// FollowCamera::FollowCamera (0x00462ee0, 564 bytes): every store value,
+// offset and the static slot-71 call are right, but VC6 schedules two zero
+// stores (+0x274, +0x2dc) into the load-delay slot of the
 // +0x29c global-vector copy, where retail placed +0x2e4/+0x276. About 141
 // bytes differ, all instruction order; moving those two statements anywhere
-// earlier does not help. See docs/FOLLOW_CAMERA.md. Kept out of
-// src/reconstructed until it matches.
+// earlier does not help.
+//
+// FollowCamera::UnknownVirtualSlot36 (0x00465000, 209 bytes): 12 bytes differ.
+// Retail's disabled exit is `xor al, al; mov [esi+0x277], al` (one zero for
+// the store and the return); every source form tried so far emits an
+// immediate store followed by `xor al, al`.
 #include "../../src/reconstructed/FollowCamera.h"
 
 // 0x00462ee0. Virtual calls in a constructor bind statically, so slot 71 is a
@@ -62,4 +69,24 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x2f8 = 280.0f;
     field_0x2fc = 70.0f;
     field_0x300 = 20.0f;
+}
+
+// 0x00465000: when enabled and not forced, a point the +0x288..+0x290 values
+// already sit on (within 0.01) is fed through slot 44 and reported as
+// settled; +0x277 records that the check ran.
+bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool force) {
+    if (enable) {
+        if (!force && !field_0x274 &&
+            FollowCameraAbs(field_0x288->value - point.x) < 0.01f &&
+            FollowCameraAbs(field_0x290->value - point.z) < 0.01f &&
+            FollowCameraAbs(field_0x28c->value - point.y) < 0.01f) {
+            UnknownVirtualSlot44(point);
+            field_0x277 = true;
+            return true;
+        }
+        field_0x277 = true;
+        return false;
+    }
+    field_0x277 = false;
+    return false;
 }
