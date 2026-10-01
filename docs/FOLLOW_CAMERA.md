@@ -220,3 +220,25 @@ Several shapes record source structure:
   `setne al` to land straight in the return register.
 - **BikeCamera's "Head" lookup.** The lookup is its own statement. Nesting it
   inside the position call makes VC6 push the outer call's arguments first.
+
+## KrustyBikeCamera
+
+RTTI: `KrustyBikeCamera : BikeCamera`. Canonical source:
+`src/reconstructed/KrustyBikeCamera.{h,cpp}`. KrustyBike.cpp is a candidate
+TU (name overlap, nearby references). The camera keeps its state and presets
+in the object behind the global pointer `0x0056e26c` (declared in
+`UnknownObject56e26c.h`), so they survive between cameras. All bodies below
+are strict exact.
+
+| Function | Retail VA | Bytes | Behavior |
+|---|---|---:|---|
+| Constructor | `0x00497cb0` | 170 | `/GX` frame; slot 62 (restore state) and slot 71 bound statically; resets and copies |
+| Destructor / wrapper | `0x00497d80` / `0x00497d60` | 11 / 30 | Explicit empty destructor |
+| 23 | `0x00497df0` | 38 | Returns 0 while global +0x3430 is set, else FollowCamera slot 23 |
+| 55 | `0x00498080` | 18 | Global +0x14 virtual slot 2 with (0x0b, 0x3f) |
+| 58 | `0x004982c0` | 116 | Unless state 6, shows string 0x13b9 + state for 1.5 s through the global +0x570 object |
+| 59, 60 | `0x004981d0`, `0x00498230` | 96 / 69 | Save / restore presets in global +0x2934..+0x2940 |
+| 61, 62 | `0x004982a0`, `0x00498280` | 19 / 18 | Save / restore the state in global +0x2930 |
+
+Slot 58's frame holds a 0x8c-byte message object and a `char[260]` text
+buffer (MAX_PATH), although it asks for at most 0x80 characters.

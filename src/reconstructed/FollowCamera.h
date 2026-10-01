@@ -84,6 +84,8 @@ public:
     explicit FollowCamera(int flags); // 0x00462ee0 (near miss: samples/camera)
     virtual ~FollowCamera();          // destructor core 0x00463350
 
+    virtual int UnknownVirtualSlot23(int a, int b); // 0x00466ad0, not reconstructed
+
     virtual void UnknownVirtualSlot33() = 0;
     virtual Vector3 UnknownVirtualSlot34(int unused);
     virtual Vector3 UnknownVirtualSlot35(int a, int b) = 0;
