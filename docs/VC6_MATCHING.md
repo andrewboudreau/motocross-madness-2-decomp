@@ -60,7 +60,8 @@ All 17 calibration targets match the default profile, including
 every relocation resolved), 69 (`0x00466a80`, source shape) and 71
 (`0x00466e50`, 192-byte extent including its jump table). Every FollowCamera
 slot 63–72 now has an exact candidate. Ten Camera/PCCamera bodies
-(`samples/camera/CameraProbe.cpp`) also match strictly with every call bound;
+(`src/reconstructed/Camera.cpp`, `PCCamera.cpp`) also match strictly with every
+call bound;
 see [FollowCamera](FOLLOW_CAMERA.md#camera-and-pccamera).
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile

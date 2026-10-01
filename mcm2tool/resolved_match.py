@@ -71,12 +71,27 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
     # No target-sized trimming: symbol_extent owns the candidate boundary.
     padding = 0
     converted = []
+    # Labels inside this function's own extent (e.g. switch jump-table targets)
+    # have a fixed address: the function's retail VA plus the label offset. They
+    # are resolved here instead of requiring hand-written bindings; anything
+    # outside the extent must still be bound explicitly.
+    internal: dict[str, int] = {}
     for rel in rels:
         record = obj.symbol_by_index.get(rel.symbol_index)
         if record is None:
             raise RelocationError('relocation references missing/auxiliary symbol')
+        if (record.section_number == sym.section_number
+                and sym.value <= record.value < sym.value + len(raw)):
+            address = target_va + (record.value - sym.value)
+            if internal.get(record.name, address) != address:
+                raise RelocationError(f'ambiguous internal symbol: {record.name}')
+            if record.name in bindings and bindings[record.name] != address:
+                raise RelocationError(f'binding contradicts internal label: {record.name}')
+            internal[record.name] = address
         converted.append({'offset': rel.virtual_address - sym.value, 'type': rel.type, 'symbol': record.name})
-    patched, audit = apply_relocations(raw, converted, bindings, target_va)
+    patched, audit = apply_relocations(raw, converted, {**bindings, **internal}, target_va)
+    for row in audit:
+        row['internal_label'] = row['symbol'] in internal
     return {**compare_bytes(retail, patched), 'symbol': sym.name,
             'extent_source': sym.extent_source,
             'target_va': f'0x{target_va:08x}', 'relocations_applied': audit,

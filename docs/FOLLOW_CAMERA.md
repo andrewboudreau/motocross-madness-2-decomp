@@ -3,7 +3,8 @@
 `FollowCamera : PCCamera` introduces slots 63–72. VehicleCamera, BikeCamera and
 KrustyBikeCamera inherit many entries. FollowCam.cpp is a source-file candidate
 supported by name overlap and nearby references, not a proven TU assignment.
-Canonical candidate: `samples/camera/FollowCameraProbe.cpp`.
+Canonical source: `src/reconstructed/FollowCamera.h` and `.cpp`, built on
+`PCCamera`, `Camera` and `GameObject` in the same directory.
 
 | Slot | Retail VA | Bytes | VC6 SP3 status / behavior |
 |---:|---|---:|---|
@@ -29,7 +30,7 @@ triple's first/third components, and calls `0x00460b50` (a cdecl
 `float(float)` that returns 0 for 0 and otherwise approximates a square root
 by halving the exponent and looking up a table) on the sum of their squares.
 +0x258 becomes `((200 - r) / 180) * 60 + 10`, clamped to [10, 70], and the
-triple is passed by value to slot 29. `samples/camera/FollowCamera.bindings.json`
+triple is passed by value to slot 29. `src/reconstructed/FollowCamera.bindings.json`
 binds each VC6 float literal to a retail constant whose value was checked
 against the literal, plus the direct call. Names, the triple's type and the
 helper's identity remain provisional. Writing `/ 180.0f * 60.0f` without the
@@ -75,9 +76,9 @@ value, stores it at +0x244 and calls slot 71. Reproduce with the
 
 ## Camera and PCCamera
 
-RTTI: `PCCamera : Camera : GameObject : BaseObject`. Candidate:
-`samples/camera/CameraProbe.cpp`; call bindings in
-`samples/camera/Camera.bindings.json` come from the GameObject/Camera vtables
+RTTI: `PCCamera : Camera : GameObject : BaseObject`. Canonical source:
+`src/reconstructed/Camera.{h,cpp}` and `PCCamera.{h,cpp}`; call bindings in
+`src/reconstructed/Camera.bindings.json` come from the GameObject/Camera vtables
 and decoded direct calls. All ten bodies are strict exact under the default
 profile with zero ignored bytes.
 
