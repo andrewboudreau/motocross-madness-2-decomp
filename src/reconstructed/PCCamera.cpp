@@ -1,5 +1,11 @@
 #include "PCCamera.h"
 
+// Forwards its argument to Camera and installs the PCCamera vptr. Emitting the
+// vtable here also emits the compiler-generated destructor (0x004624d0, a tail
+// jump to ~Camera) and the scalar deleting wrapper 0x004beda0, which retail
+// shares between PCCamera and ShadowCamera slot 0.
+PCCamera::PCCamera(int flags) : Camera(flags) {}
+
 inline UnknownRenderInterface* CameraRenderInterface(PCCamera* camera) {
     char* owner = *reinterpret_cast<char**>(reinterpret_cast<char*>(camera) + 0x18);
     return *reinterpret_cast<UnknownRenderInterface**>(owner + 0x50);

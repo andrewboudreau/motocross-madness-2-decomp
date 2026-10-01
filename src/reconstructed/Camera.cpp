@@ -1,4 +1,15 @@
+#include <stdio.h>
+
 #include "Camera.h"
+
+// Destructor core 0x0042f020: Camera vptr, close the +0x1e4 file if any, then
+// the GameObject destructor. VC6 also emits the scalar deleting wrapper
+// 0x0042e4e0 (Camera slot 0).
+Camera::~Camera() {
+    FILE* file = *reinterpret_cast<FILE**>(reinterpret_cast<char*>(this) + 0x1E4);
+    if (file)
+        fclose(file);
+}
 
 // If +0x1cc is set, passes the rectangle at +0x1a0 (x, y, width, height as
 // ints) to the owner's slot 12, then calls the non-virtual 0x0042e8e0.

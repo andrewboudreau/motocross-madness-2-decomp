@@ -8,6 +8,10 @@
 // vtable. No GameObject bodies are reconstructed yet.
 class GameObject : public BaseObject {
 public:
+    // 0x00468ca0 (gameobj.cpp); only the low bit of the argument is used.
+    explicit GameObject(int flags);
+    virtual ~GameObject(); // destructor core 0x00468d60
+
     virtual void UnknownVirtualSlot4();
     virtual void UnknownVirtualSlot5();
     virtual void UnknownVirtualSlot6();

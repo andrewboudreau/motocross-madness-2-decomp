@@ -79,11 +79,16 @@ value, stores it at +0x244 and calls slot 71. Reproduce with the
 RTTI: `PCCamera : Camera : GameObject : BaseObject`. Canonical source:
 `src/reconstructed/Camera.{h,cpp}` and `PCCamera.{h,cpp}`; call bindings in
 `src/reconstructed/Camera.bindings.json` come from the GameObject/Camera vtables
-and decoded direct calls. All ten bodies are strict exact under the default
+and decoded direct calls. All fifteen bodies are strict exact under the default
 profile with zero ignored bytes.
 
 | Class/slot | Retail VA | Bytes | Behavior |
 |---|---|---:|---|
+| Camera destructor core | `0x0042f020` | 37 | Camera vptr; `fclose(+0x1e4)` when set; GameObject destructor `0x00468d60` |
+| Camera scalar deleting destructor | `0x0042e4e0` | 30 | Canonical wrapper (slot 0) |
+| PCCamera constructor | `0x004bed80` | 25 | `Camera(flags)` (`0x0042e340`), then the PCCamera vptr |
+| PCCamera destructor | `0x004624d0` | 5 | Compiler-generated: tail jump to `~Camera`, no PCCamera vptr store |
+| PCCamera scalar deleting destructor | `0x004beda0` | 30 | Shared with ShadowCamera slot 0 |
 | Camera 5 | `0x0042f050` | 32 | GameObject slot 5, owner helper `0x004e8cf0(this)`, +0x1d0 = owner+0x14 + 1 |
 | Camera 13 | `0x0042e630` | 92 | If +0x1cc: rectangle from x/y/width/height at +0x1a0 to owner slot 12; then `0x0042e8e0`; returns 1 |
 | Camera 18 | `0x0042f070` | 28 | GameObject slot 18, +0x1d0 = owner+0x14 + 1, returns 1 |
@@ -97,4 +102,17 @@ consistent with `IDirect3DDevice7::SetTransform` for world/view/projection,
 which would make +0x2c/+0xac/+0x6c the world/view/projection matrices. That is
 inference from call shape only; names stay neutral until the interface is
 identified from creation/import evidence.
+
+Destructor evidence. `analysis/deleting_destructors.json` pairs each wrapper
+with its destructor core. Camera's vptr is written in its constructor
+(`0x0042e36e`) and destructor (`0x0042f029`); PCCamera's only in its
+constructor (`0x004bed8d`). That, the tail-jump body and the wrapper shared
+with ShadowCamera fit a compiler-generated PCCamera destructor, so
+`PCCamera.h` declares none. `0x00534c3d` is LIBCMT's multithreaded `fclose`
+(`tools/build_vc6_crt_atlas.py`: `mt_obj\fclose.obj`, 37/37 compared bytes),
+so Camera+0x1e4 is a `FILE*`. GameObject's constructor (`0x00468ca0`) cites
+`D:\aardvark\VC\krusty2\gameobj.cpp` via `__FILE__` and uses only the low bit
+of its argument; the `int flags` parameter type is provisional. Camera's
+402-byte constructor (`0x0042e340`, with an exception-handling frame) is not
+reconstructed yet.
 

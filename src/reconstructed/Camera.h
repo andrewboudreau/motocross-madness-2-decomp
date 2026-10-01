@@ -11,6 +11,7 @@
 //   +0x1a0..+0x1ac  x, y, width, height (ints) used by slot 13
 //   +0x1cc  enables the slot 13 rectangle
 //   +0x1d0  owner+0x14 plus one, refreshed by slots 5 and 18
+//   +0x1e4  FILE* closed by the destructor (call resolves to LIBCMT fclose)
 
 struct CameraMatrix16 { float m[16]; };
 struct CameraRect { int left; int top; int right; int bottom; };
@@ -42,6 +43,9 @@ public:
 
 class Camera : public GameObject {
 public:
+    explicit Camera(int flags); // 0x0042e340, not reconstructed yet
+    virtual ~Camera();
+
     virtual void UnknownVirtualSlot5();
     virtual int UnknownVirtualSlot13();
     virtual int UnknownVirtualSlot18();

@@ -28,6 +28,10 @@ struct UnknownRenderInterface {
 
 class PCCamera : public Camera {
 public:
+    // No destructor is declared: retail's 0x004624d0 is the compiler-generated
+    // one (a tail jump to ~Camera with no PCCamera vptr store).
+    explicit PCCamera(int flags); // 0x004bed80
+
     virtual int UnknownVirtualSlot13();
     virtual int UnknownVirtualSlot30(const CameraMatrix16* value);
     virtual int UnknownVirtualSlot31(const CameraMatrix16* value);
