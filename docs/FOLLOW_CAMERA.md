@@ -31,7 +31,12 @@ Canonical source: `src/reconstructed/FollowCamera.h` and `.cpp`, built on
 | 55, 56 | `0x00464ea0`, `0x00464ec0` | 23 each | Exact; slot 5 of the interface at (`0x0056e26c` object)->+0x14->+0x34 with 0x38 / 0x2a |
 | 75 | `0x00404fc0` | 25 | Exact; state +0x244 is 5 or 2 |
 
-| Destructor core | `0x00463350` | 245 | Exact; null-checked `delete` of +0x2e4 and the eight +0x27c..+0x298 values, then `~Camera` |
+| 40 | `0x004639f0` | 60 | Exact; with a non-empty +0x2e4 table, entry 0 takes the target, then slot 38 |
+| 43, 44 | `0x00464ee0`, `0x00464f70` | 144 each | Exact; feed a vector into +0x27c..+0x284 / +0x288..+0x290 values (inlined `Set`, rate 0.25 or 0.3 by subject+0xbe8) |
+| 48 | `0x00464a80` | 175 | Exact; follow point by state (5: cache or slot 34, 7: raised target, else slot 35 or 37) |
+| 73 | `0x00463620` | 192 | Exact; eases +0x220 toward a height-dependent target via the +0x298 value, minimum 20 |
+| `0x00463450` | `0x00463450` | 201 | Exact; writes entry `index` of the +0x2e4 table of 44-byte records |
+| Destructor core | `0x00463350` | 245 | Exact; null-checked `delete[]` of the +0x2e4 table and `delete` of the eight +0x27c..+0x298 values, then `~Camera` |
 | Scalar deleting destructor | `0x00463120` | 30 | Exact canonical wrapper |
 
 FollowCamera's members (+0x220 to +0x343) are declared in `FollowCamera.h`
@@ -43,8 +48,15 @@ slot 63–67 presets store floats (for example 0x40490fdb = π, 0x42aa0000 =
 right, and the virtual call to slot 71 binds statically to `0x00466e50`.
 About 141 bytes differ: VC6 schedules the +0x274/+0x2dc zero stores into a
 load-delay slot where retail used +0x2e4/+0x276. Moving those statements does
-not fix it. Slots 10, 23, 36, 38, 40, 43–49 and 73 and the initializer
-`0x00463140` are not yet reconstructed. Enum names remain provisional.
+not fix it. Slots 10, 23, 36, 38, 45–47 and 49 and the initializer
+`0x00463140` are not yet reconstructed.
+
+Two shapes are evidence for helper functions in the original. The 20-byte
+values at +0x27c..+0x298 have an inline `Set` (the rate is skipped when it is
+FLT_MAX) and an inline `Update` that eases toward a target by
+min(dt, rate) / rate. Slot 73 and `Update` also need a minimum written as an
+inline function: a ternary or a `__min`-style macro reloads the chosen operand,
+whereas retail keeps it on the FPU stack. Enum names remain provisional.
 
 ## Notes on slots 68, 69 and 71
 

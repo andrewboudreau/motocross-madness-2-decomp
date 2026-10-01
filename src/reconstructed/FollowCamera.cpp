@@ -4,7 +4,7 @@
 // then the Camera destructor (PCCamera's is implicit).
 FollowCamera::~FollowCamera() {
     if (field_0x2e4)
-        delete field_0x2e4;
+        delete[] field_0x2e4;
     if (field_0x27c)
         delete field_0x27c;
     if (field_0x280)
@@ -21,6 +21,85 @@ FollowCamera::~FollowCamera() {
         delete field_0x294;
     if (field_0x298)
         delete field_0x298;
+}
+
+// 0x00463620: only while the two points are within a tenth of Camera's
+// +0x1c4/+0x1c8 in x and y, eases +0x220 toward a target that shrinks with
+// the source height (capped at 335), keeping it at 20 or more.
+void FollowCamera::UnknownVirtualSlot73(const Vector3& from, const Vector3& to, float dt) {
+    if (to.x - from.x < field_0x1c4 * 0.1f && to.y - from.y < field_0x1c8 * 0.1f) {
+        float height = FollowCameraMin(from.z, 335.0f);
+        float target = field_0x220 - (height - 15.0f) * dt * 0.028f;
+        field_0x220 = field_0x298->Update(target, dt);
+        if (field_0x220 < 20.0f)
+            field_0x220 = 20.0f;
+    }
+}
+
+// 0x00463450
+bool FollowCamera::UnknownFunction463450(int index, const Vector3* position, const float* a,
+                                         const float* b, const float* c, const float* d,
+                                         const float* e) {
+    if (index < field_0x2e0) {
+        if (position)
+            field_0x2e4[index].position = *position;
+        if (a)
+            field_0x2e4[index].field_0x0c = *a;
+        if (b)
+            field_0x2e4[index].field_0x10 = *b;
+        if (c)
+            field_0x2e4[index].field_0x14 = *c;
+        if (d)
+            field_0x2e4[index].field_0x18 = *d;
+        if (e)
+            field_0x2e4[index].field_0x1c = *e;
+        return true;
+    }
+    return false;
+}
+
+// 0x004639f0: with a non-empty table, entry 0 takes the target point before
+// slot 38 runs.
+void FollowCamera::UnknownVirtualSlot40(int a) {
+    if (field_0x2e0 > 0) {
+        UnknownFunction463450(0, &field_0x2b4, 0, 0, 0, 0, 0);
+        UnknownVirtualSlot38(a, 0, 0);
+    }
+}
+
+// 0x00464a80: the point the camera follows, by state.
+Vector3 FollowCamera::UnknownVirtualSlot48(int a, bool flag, int b) {
+    Vector3 result;
+    if (field_0x244 == 5) {
+        if (field_0x268)
+            result = field_0x2a8;
+        else
+            result = UnknownVirtualSlot34(b);
+    } else if (field_0x244 == 7) {
+        result = field_0x2b4;
+        result.y += 3.0f;
+    } else if (flag) {
+        result = UnknownVirtualSlot35(a, b);
+    } else {
+        result = UnknownVirtualSlot37();
+    }
+    return result;
+}
+
+// 0x00464ee0 and 0x00464f70: feed a vector into the +0x27c..+0x284 and
+// +0x288..+0x290 values with a rate chosen by the subject's +0xbe8.
+void FollowCamera::UnknownVirtualSlot43(const Vector3& value) {
+    float rate = (field_0x240->field_0xbe8 == 1) ? 0.25f : 0.3f;
+    field_0x27c->Set(value.x, rate);
+    field_0x280->Set(value.y, rate);
+    field_0x284->Set(value.z, rate);
+}
+
+void FollowCamera::UnknownVirtualSlot44(const Vector3& value) {
+    float rate = (field_0x240->field_0xbe8 == 1) ? 0.25f : 0.3f;
+    field_0x288->Set(value.x, rate);
+    field_0x28c->Set(value.y, rate);
+    field_0x290->Set(value.z, rate);
 }
 
 // Strong ABI reconstruction: slot 57 returns a 12-byte aggregate by value.
