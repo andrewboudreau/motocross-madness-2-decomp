@@ -1,0 +1,18 @@
+{
+  "??0?$ContainerList@H@@QAE@XZ": "0x005109c0",
+  "??0JoystickDevice@@QAE@H@Z$ehhandler": "0x0054ba60",
+  "??0PCInputDevice@@QAE@H@Z": "0x004c25f0",
+  "??1?$ContainerList@H@@QAE@XZ": "0x00402040",
+  "??1JoystickDevice@@UAE@XZ": "0x00489920",
+  "??1JoystickDevice@@UAE@XZ$ehhandler": "0x0054ba78",
+  "??1PCInputDevice@@UAE@XZ": "0x004c2650",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7JoystickDevice@@6B@": "0x005541fc",
+  "??_C@_0BE@BJOM@JoyDirectionFlipped?$AA@": "0x0056c738",
+  "??_L@YGXPAXIHP6EX0@Z1@Z": "0x00536234",
+  "??_M@YGXPAXIHP6EX0@Z@Z": "0x00536140",
+  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "__FILE__:containerlist.h": "0x005666e4"
+}

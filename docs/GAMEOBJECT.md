@@ -43,9 +43,9 @@ not match under `/G6`.
 
 The `typeid`, `type_info::name` and `strstr` calls bind to LIBCMT
 (`rtti.obj`, `typname.obj`, `strstr.obj` in the [CRT atlas](VC6_CRT_ATLAS.md)).
-The `__FILE__` operand binds to `0x0056b6c8`; the matcher keys any
-absolute-path source literal as `__FILE__` because its pooled name embeds the
-build path. `/GX` frame handlers bind as `<symbol>$ehhandler` (here
+The `__FILE__` operand binds to `0x0056b6c8`. Pooled source-path literals
+embed the build path, so the matcher keys them as `__FILE__:<basename>`,
+falling back to plain `__FILE__`. `/GX` frame handlers bind as `<symbol>$ehhandler` (here
 `0x0054ad48` and `0x0054ad68`, both `mov eax, funcinfo; jmp
 ___CxxFrameHandler` stubs).
 

@@ -60,14 +60,17 @@ def compare_bytes(retail: bytes, candidate: bytes) -> dict:
                            if i >= len(retail) or i >= len(candidate) or retail[i] != candidate[i]][:64]}
 
 
-def _is_source_path_literal(obj: CoffObject, record) -> bool:
+def _source_path_literal(obj: CoffObject, record) -> str | None:
+    """Lower-cased basename of an absolute source-path literal, else None."""
     if record.section_number <= 0:
-        return False
+        return None
     section = obj.section(record.section_number)
     data = obj.data[section.raw_ptr + record.value:section.raw_ptr + section.raw_size]
     text = data.split(b'\0', 1)[0].decode('latin-1').lower()
-    return (len(text) > 3 and text[1:3] in (':\\', ':/')
-            and text.endswith(('.cpp', '.c', '.h')))
+    if (len(text) > 3 and text[1:3] in (':\\', ':/')
+            and text.endswith(('.cpp', '.c', '.h'))):
+        return text.replace('/', '\\').rsplit('\\', 1)[-1]
+    return None
 
 
 def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bindings: dict[str, int]) -> dict:
@@ -110,9 +113,12 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
         if name == '__except_list' and rel.type == 0x0006 and record.section_number in (0, -1):
             internal[name] = 0
         # A __FILE__ literal embeds the build path, so its pooled ??_C@ name is not
-        # stable; it is bound under the key '__FILE__' instead.
-        elif name.startswith('??_C@') and _is_source_path_literal(obj, record):
-            name = '__FILE__'
+        # stable. It is bound as '__FILE__:<basename>' (a .cpp and a header can
+        # both appear in one object), falling back to plain '__FILE__'.
+        elif name.startswith('??_C@') and _source_path_literal(obj, record):
+            name = f'__FILE__:{_source_path_literal(obj, record)}'
+            if name not in bindings and '__FILE__' in bindings:
+                name = '__FILE__'
         converted.append({'offset': offset, 'type': rel.type, 'symbol': name})
     patched, audit = apply_relocations(raw, converted, {**bindings, **internal}, target_va)
     for row in audit:

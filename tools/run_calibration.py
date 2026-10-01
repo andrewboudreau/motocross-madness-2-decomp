@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 import argparse, json, os, subprocess, sys, tempfile
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from mcm2tool.coff import CoffObject  # noqa: E402
+from mcm2tool.pe import PEImage  # noqa: E402
+from match import compare  # noqa: E402
 
 CASES = [
     {
@@ -906,6 +913,168 @@ CASES = [
         'reason': 'three unforced slot 8 calls',
     },
     {
+        'name': 'InputDevice constructor',
+        'bindings': 'src/reconstructed/InputDevice.bindings.json',
+        'source': 'src/reconstructed/InputDevice.cpp',
+        'symbol': '??0InputDevice@@QAE@H@Z',
+        'target_va': '0x00489780',
+        'target_size': 42,
+        'reason': 'six-bit bitfield clear merged into one and; -1 sentinel',
+    },
+    {
+        'name': 'InputDevice scalar deleting destructor',
+        'bindings': 'src/reconstructed/InputDevice.bindings.json',
+        'source': 'src/reconstructed/InputDevice.cpp',
+        'symbol': '??_GInputDevice@@UAEPAXI@Z',
+        'target_va': '0x004897b0',
+        'target_size': 30,
+        'reason': 'canonical wrapper',
+    },
+    {
+        'name': 'InputDevice destructor',
+        'bindings': 'src/reconstructed/InputDevice.bindings.json',
+        'source': 'src/reconstructed/InputDevice.cpp',
+        'symbol': '??1InputDevice@@UAE@XZ',
+        'target_va': '0x004897d0',
+        'target_size': 7,
+        'reason': 'empty destructor',
+    },
+    {
+        'name': 'InputDevice 0x4897e0',
+        'bindings': 'src/reconstructed/InputDevice.bindings.json',
+        'source': 'src/reconstructed/InputDevice.cpp',
+        'symbol': '?UnknownFunction4897e0@InputDevice@@QAEHH@Z',
+        'target_va': '0x004897e0',
+        'target_size': 17,
+        'reason': '+0x10 == value',
+    },
+    {
+        'name': 'PCInputDevice constructor',
+        'bindings': 'src/reconstructed/PCInputDevice.bindings.json',
+        'source': 'src/reconstructed/PCInputDevice.cpp',
+        'symbol': '??0PCInputDevice@@QAE@H@Z',
+        'target_va': '0x004c25f0',
+        'target_size': 49,
+        'reason': 'memset of the 0x244-byte block',
+    },
+    {
+        'name': 'PCInputDevice scalar deleting destructor',
+        'bindings': 'src/reconstructed/PCInputDevice.bindings.json',
+        'source': 'src/reconstructed/PCInputDevice.cpp',
+        'symbol': '??_GPCInputDevice@@UAEPAXI@Z',
+        'target_va': '0x004c2630',
+        'target_size': 30,
+        'reason': 'canonical wrapper',
+    },
+    {
+        'name': 'PCInputDevice destructor',
+        'bindings': 'src/reconstructed/PCInputDevice.bindings.json',
+        'source': 'src/reconstructed/PCInputDevice.cpp',
+        'symbol': '??1PCInputDevice@@UAE@XZ',
+        'target_va': '0x004c2650',
+        'target_size': 116,
+        'reason': '/GX frame; device method 8 then a guarded release',
+    },
+    {
+        'name': 'KeyboardDevice constructor',
+        'bindings': 'src/reconstructed/KeyboardDevice.bindings.json',
+        'source': 'src/reconstructed/KeyboardDevice.cpp',
+        'symbol': '??0KeyboardDevice@@QAE@XZ',
+        'target_va': '0x00489e30',
+        'target_size': 205,
+        'reason': 'eh vector constructor for ContainerList[6]; 256 stamped entries; inline Init(1, 1)',
+    },
+    {
+        'name': 'KeyboardDevice scalar deleting destructor',
+        'bindings': 'src/reconstructed/KeyboardDevice.bindings.json',
+        'source': 'src/reconstructed/KeyboardDevice.cpp',
+        'symbol': '??_GKeyboardDevice@@UAEPAXI@Z',
+        'target_va': '0x00489f00',
+        'target_size': 30,
+        'reason': 'canonical wrapper',
+    },
+    {
+        'name': 'KeyboardDevice destructor (implicit)',
+        'bindings': 'src/reconstructed/KeyboardDevice.bindings.json',
+        'source': 'src/reconstructed/KeyboardDevice.cpp',
+        'symbol': '??1KeyboardDevice@@UAE@XZ',
+        'target_va': '0x00489f20',
+        'target_size': 89,
+        'reason': 'compiler-generated: vector destructor and base, no vptr store',
+    },
+    {
+        'name': 'ContainerList default constructor',
+        'bindings': 'src/reconstructed/KeyboardDevice.bindings.json',
+        'source': 'src/reconstructed/KeyboardDevice.cpp',
+        'symbol': '??0?$ContainerList@H@@QAE@XZ',
+        'target_va': '0x005109c0',
+        'target_size': 20,
+        'reason': 'template member shared by all instantiations',
+    },
+    {
+        'name': 'ContainerList destructor',
+        'bindings': 'src/reconstructed/KeyboardDevice.bindings.json',
+        'source': 'src/reconstructed/KeyboardDevice.cpp',
+        'symbol': '??1?$ContainerList@H@@QAE@XZ',
+        'target_va': '0x00402040',
+        'target_size': 11,
+        'reason': 'delete of the data pointer',
+    },
+    {
+        'name': 'MouseDevice constructor',
+        'bindings': 'src/reconstructed/MouseDevice.bindings.json',
+        'source': 'src/reconstructed/MouseDevice.cpp',
+        'symbol': '??0MouseDevice@@QAE@XZ',
+        'target_va': '0x0048a2d0',
+        'target_size': 198,
+        'reason': 'ContainerList[2] then four stamped button entries',
+    },
+    {
+        'name': 'MouseDevice scalar deleting destructor',
+        'bindings': 'src/reconstructed/MouseDevice.bindings.json',
+        'source': 'src/reconstructed/MouseDevice.cpp',
+        'symbol': '??_GMouseDevice@@UAEPAXI@Z',
+        'target_va': '0x0048a3a0',
+        'target_size': 30,
+        'reason': 'canonical wrapper',
+    },
+    {
+        'name': 'MouseDevice destructor (implicit)',
+        'bindings': 'src/reconstructed/MouseDevice.bindings.json',
+        'source': 'src/reconstructed/MouseDevice.cpp',
+        'symbol': '??1MouseDevice@@UAE@XZ',
+        'target_va': '0x0048a3c0',
+        'target_size': 89,
+        'reason': 'compiler-generated',
+    },
+    {
+        'name': 'JoystickDevice constructor',
+        'bindings': 'src/reconstructed/JoystickDevice.bindings.json',
+        'source': 'src/reconstructed/JoystickDevice.cpp',
+        'symbol': '??0JoystickDevice@@QAE@H@Z',
+        'target_va': '0x00489800',
+        'target_size': 253,
+        'reason': 'lists with zeroed counters; JoyDirectionFlipped setting into a bitfield',
+    },
+    {
+        'name': 'JoystickDevice scalar deleting destructor',
+        'bindings': 'src/reconstructed/JoystickDevice.bindings.json',
+        'source': 'src/reconstructed/JoystickDevice.cpp',
+        'symbol': '??_GJoystickDevice@@UAEPAXI@Z',
+        'target_va': '0x00489900',
+        'target_size': 30,
+        'reason': 'canonical wrapper',
+    },
+    {
+        'name': 'JoystickDevice destructor',
+        'bindings': 'src/reconstructed/JoystickDevice.bindings.json',
+        'source': 'src/reconstructed/JoystickDevice.cpp',
+        'symbol': '??1JoystickDevice@@UAE@XZ',
+        'target_va': '0x00489920',
+        'target_size': 95,
+        'reason': 'user-declared: vptr store, vector destructor, base',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',
@@ -1354,29 +1523,36 @@ def main():
     ap.add_argument('--compiler',choices=['clang-cl','vc6'],default='clang-cl')
     ap.add_argument('--vc6-root',default=os.environ.get('VC6_ROOT'))
     ap.add_argument('--profile')
+    ap.add_argument('--jobs',type=int,default=4,help='parallel compiles')
     args=ap.parse_args()
+    if args.compiler=='vc6' and not args.vc6_root:
+        raise SystemExit('VC6 run requested: set VC6_ROOT or pass --vc6-root')
     rows=[]
     with tempfile.TemporaryDirectory() as td:
-        # Each source is compiled once per run; cases sharing a file reuse it.
-        compiled={}
-        for i,c in enumerate(CASES):
-            if c['source'] not in compiled:
-                obj=Path(td)/f'cal{len(compiled)}.obj'
-                cmd=[sys.executable,'tools/compile.py',c['source'],'-o',str(obj),'--compiler',args.compiler]
-                if args.profile: cmd += ['--profile',args.profile]
-                if args.compiler=='vc6':
-                    if not args.vc6_root: raise SystemExit('VC6 run requested: set VC6_ROOT or pass --vc6-root')
-                    cmd += ['--vc6-root',args.vc6_root]
-                cr=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-                compiled[c['source']]=(obj,cr.returncode,cr.stdout)
+        # Each source is compiled once per run (in parallel); cases sharing a
+        # file reuse the object, and matching runs in-process.
+        sources=list(dict.fromkeys(c['source'] for c in CASES))
+        def build(item):
+            index,source=item
+            obj=Path(td)/f'cal{index}.obj'
+            cmd=[sys.executable,'tools/compile.py',source,'-o',str(obj),'--compiler',args.compiler]
+            if args.profile: cmd += ['--profile',args.profile]
+            if args.compiler=='vc6': cmd += ['--vc6-root',args.vc6_root]
+            cr=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            return source,(obj,cr.returncode,cr.stdout)
+        with ThreadPoolExecutor(max_workers=max(1,args.jobs)) as pool:
+            compiled=dict(pool.map(build,enumerate(sources)))
+        pe=PEImage(args.exe)
+        objects={}
+        for c in CASES:
             obj,rc,out=compiled[c['source']]
             if rc:
                 rows.append({**c,'compile_error':out}); continue
-            match_cmd=[sys.executable,'tools/match.py','--exe',args.exe,'--target-va',c['target_va'],'--target-size',str(c['target_size']),'--obj',str(obj),'--symbol',c['symbol'],'--json']
-            if c.get('bindings'): match_cmd += ['--bindings',c['bindings']]
-            mr=subprocess.run(match_cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-            try: result=json.loads(mr.stdout)
-            except Exception: result={'match_error':mr.stdout}
+            if obj not in objects: objects[obj]=CoffObject(obj)
+            try:
+                result=compare(pe,objects[obj],c['symbol'],int(c['target_va'],16),c['target_size'],c.get('bindings'))
+            except Exception as exc:
+                result={'match_error':str(exc)}
             rows.append({**c,'compiler':args.compiler,'result':result})
     print(json.dumps(rows,indent=2))
 

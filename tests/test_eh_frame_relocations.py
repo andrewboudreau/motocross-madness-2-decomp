@@ -77,6 +77,13 @@ class EhFrameRelocationTests(unittest.TestCase):
         with self.assertRaises(RelocationError):
             match_object(self.load(prologue=b'\x90\x90\x68'), 'func', TARGET_VA, retail(), self.bindings)
 
+    def test_file_literal_prefers_basename_key(self):
+        bindings = {'func$ehhandler': HANDLER_VA, '__FILE__': FILE_VA + 0x40,
+                    '__FILE__:gameobj.cpp': FILE_VA}
+        result = match_object(self.load(), 'func', TARGET_VA, retail(), bindings)
+        self.assertTrue(result['strict_exact'])
+        self.assertEqual(result['relocations_applied'][2]['symbol'], '__FILE__:gameobj.cpp')
+
     def test_non_path_literal_keeps_its_own_name(self):
         with self.assertRaises(RelocationError):
             match_object(self.load(literal=b'class \0'), 'func', TARGET_VA, retail(), self.bindings)

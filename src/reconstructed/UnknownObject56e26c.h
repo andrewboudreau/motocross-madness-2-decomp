@@ -1,8 +1,9 @@
 #pragma once
 
 // The object behind the global pointer at 0x0056e26c, used throughout the
-// camera code. Its class is not established; only members that reconstructed
-// functions touch are declared, at their observed offsets.
+// camera and input code. It is polymorphic (virtual slot 22 is called). Its
+// class is not established; only members that reconstructed functions touch
+// are declared, at their observed offsets.
 
 // Interface at (+0x14)->+0x34; FollowCamera slots 55 and 56 call its slot 5.
 class UnknownInterface56e26c {
@@ -55,11 +56,36 @@ struct UnknownObject56e26cSettings {
 
 class UnknownObject56e26c {
 public:
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6();
+    virtual void UnknownVirtualSlot7();
+    virtual void UnknownVirtualSlot8();
+    virtual void UnknownVirtualSlot9();
+    virtual void UnknownVirtualSlot10();
+    virtual void UnknownVirtualSlot11();
+    virtual void UnknownVirtualSlot12();
+    virtual void UnknownVirtualSlot13();
+    virtual void UnknownVirtualSlot14();
+    virtual void UnknownVirtualSlot15();
+    virtual void UnknownVirtualSlot16();
+    virtual void UnknownVirtualSlot17();
+    virtual void UnknownVirtualSlot18();
+    virtual void UnknownVirtualSlot19();
+    virtual void UnknownVirtualSlot20();
+    virtual void UnknownVirtualSlot21();
+    // Named boolean setting (JoystickDevice asks for "JoyDirectionFlipped").
+    virtual bool UnknownVirtualSlot22(const char* name, int defaultValue);
+
     void UnknownFunction468880(); // 0x00468880 (PCCamera slot 27)
     // 0x00521970: copies string `id` into buffer (size bytes).
     void UnknownFunction521970(int id, char* buffer, int size);
 
-    unsigned char field_0x0000[0x0c];
+    unsigned char field_0x0004[0x0c - 4];
     UnknownObject56e26cSettings* field_0x0c;
     int field_0x10;
     UnknownObject56e26cPart* field_0x14;
