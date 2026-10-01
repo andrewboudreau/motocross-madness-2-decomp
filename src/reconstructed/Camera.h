@@ -8,6 +8,9 @@
 // member offsets are confirmed by the strict-exact constructor (0x0042e340)
 // and methods, and the class ends at +0x220 where FollowCamera's fields begin.
 
+// cdecl 0x0043caa0, called by Camera slot 23 as (0xb7, 0, a, 0x80000000).
+int UnknownFunction43caa0(int code, int value, int a, unsigned int flags);
+
 struct CameraRect { int left; int top; int right; int bottom; };
 
 // .rdata floats just before Camera's vtable, loaded by the constructor.
@@ -54,9 +57,13 @@ public:
     explicit Camera(int flags); // 0x0042e340
     virtual ~Camera();
 
+    virtual void UnknownVirtualSlot4();
     virtual void UnknownVirtualSlot5();
+    virtual GameObject* UnknownVirtualSlot8(void* value);
     virtual int UnknownVirtualSlot13();
+    virtual int UnknownVirtualSlot14();
     virtual int UnknownVirtualSlot18();
+    virtual int UnknownVirtualSlot23(int a, int b);
 
     // Pure: Camera's vtable holds LIBCMT _purecall (0x00534cfe) in slot 27.
     virtual void UnknownVirtualSlot27() = 0;
@@ -72,6 +79,7 @@ public:
     // 0x0042e960: +0x1bc = max(minimum, g_UnknownFloat550f6c),
     // +0x1c0 = min(maximum, g_UnknownFloat550f70).
     void UnknownFunction42e960(float minimum, float maximum);
+    int UnknownFunction42e550(); // 0x0042e550, called by slot 8
 
 protected:
     UnknownCameraOwner* Owner() const { return static_cast<UnknownCameraOwner*>(field_0x18); }

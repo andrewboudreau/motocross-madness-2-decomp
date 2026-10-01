@@ -43,6 +43,27 @@ Camera::~Camera() {
         fclose(field_0x1e4);
 }
 
+// 0x00499ad0 (an identical forwarding body in another class shares the
+// address).
+void Camera::UnknownVirtualSlot4() {
+    GameObject::UnknownVirtualSlot4();
+}
+
+// 0x0042e500: after the GameObject version, 0x0042e550 must succeed or the
+// camera releases itself and returns 0; otherwise slot 28 runs and, when
+// bit 0 is set, the owner is handed the camera.
+GameObject* Camera::UnknownVirtualSlot8(void* value) {
+    GameObject::UnknownVirtualSlot8(value);
+    if (!UnknownFunction42e550()) {
+        Release();
+        return 0;
+    }
+    UnknownVirtualSlot28();
+    if (field_0x25_bit0)
+        Owner()->UnknownFunction4e8cf0(this);
+    return this;
+}
+
 // If +0x1cc is set, passes the rectangle at +0x1a0 (x, y, width, height) to
 // the owner's slot 12, then calls the non-virtual 0x0042e8e0.
 int Camera::UnknownVirtualSlot13() {
@@ -78,6 +99,11 @@ void Camera::UnknownFunction42e960(float minimum, float maximum) {
         field_0x1c0 = maximum;
 }
 
+// 0x00467ae0 (shared return-1 body)
+int Camera::UnknownVirtualSlot14() {
+    return 1;
+}
+
 int Camera::UnknownVirtualSlot30(const Matrix4* value) {
     field_0x2c = *value;
     return 1;
@@ -105,4 +131,16 @@ int Camera::UnknownVirtualSlot18() {
     GameObject::UnknownVirtualSlot18();
     field_0x1d0 = Owner()->field_0x14 + 1;
     return 1;
+}
+
+// 0x0042f090: only when no child handled the GameObject search does it
+// consult 0x0043caa0; a nonzero answer runs slot 27.
+int Camera::UnknownVirtualSlot23(int a, int b) {
+    if (!GameObject::UnknownVirtualSlot23(a, b)) {
+        if (UnknownFunction43caa0(0xB7, 0, a, 0x80000000)) {
+            UnknownVirtualSlot27();
+            return 1;
+        }
+    }
+    return 0;
 }

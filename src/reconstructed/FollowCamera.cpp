@@ -6,67 +6,61 @@
 // Retail forms the cache address before the call and copies straight from the
 // returned buffer, i.e. the call result is assigned directly to the cache.
 void FollowCamera::UnknownVirtualSlot69() {
-    CameraValue12* cached = reinterpret_cast<CameraValue12*>(reinterpret_cast<char*>(this) + 0x2A8);
-    *cached = UnknownVirtualSlot57(0);
-    UnknownVirtualSlot43(*cached);
+    field_0x2a8 = UnknownVirtualSlot57(0);
+    UnknownVirtualSlot43(field_0x2a8);
 }
 
 // Semantically strong but compiler-sensitive: retail VC6 zeros EAX once and
 // reuses it. Modern clang emits immediate-zero stores instead.
 void FollowCamera::UnknownVirtualSlot63() {
-    char* p = reinterpret_cast<char*>(this);
-    *reinterpret_cast<int*>(p + 0x22C) = 0;
-    *reinterpret_cast<int*>(p + 0x234) = 0;
-    *reinterpret_cast<int*>(p + 0x220) = 0;
+    field_0x22c = 0.0f;
+    field_0x234 = 0.0f;
+    field_0x220 = 0.0f;
 }
 
+// Slots 64-67 load fixed presets (retail stores the float bit patterns as
+// immediates).
 void FollowCamera::UnknownVirtualSlot64() {
-    char* p = reinterpret_cast<char*>(this);
-    *reinterpret_cast<unsigned int*>(p + 0x22C) = 0x3F76FE4Eu;
-    *reinterpret_cast<unsigned int*>(p + 0x234) = 0xBE832E86u;
-    *reinterpret_cast<unsigned int*>(p + 0x220) = 0x4297F5C3u;
+    field_0x22c = 0.9648179f;
+    field_0x234 = -0.25621432f;
+    field_0x220 = 75.98f;
 }
 
 void FollowCamera::UnknownVirtualSlot65() {
-    char* p = reinterpret_cast<char*>(this);
-    *reinterpret_cast<unsigned int*>(p + 0x22C) = 0x3F2EEC82u;
-    *reinterpret_cast<unsigned int*>(p + 0x234) = 0xBF1C1D07u;
-    *reinterpret_cast<unsigned int*>(p + 0x220) = 0x41B570A4u;
+    field_0x22c = 0.6832963f;
+    field_0x234 = -0.6098179f;
+    field_0x220 = 22.68f;
 }
 
 void FollowCamera::UnknownVirtualSlot66() {
-    char* p = reinterpret_cast<char*>(this);
-    *reinterpret_cast<unsigned int*>(p + 0x22C) = 0x3F860A91u;
-    *reinterpret_cast<unsigned int*>(p + 0x234) = 0x00000000u;
-    *reinterpret_cast<unsigned int*>(p + 0x220) = 0x413B851Fu;
-    *reinterpret_cast<unsigned int*>(p + 0x258) = 0x42AA0000u;
+    field_0x22c = 1.0471975f;
+    field_0x234 = 0.0f;
+    field_0x220 = 11.72f;
+    field_0x258 = 85.0f;
 }
 
 void FollowCamera::UnknownVirtualSlot67() {
-    char* p = reinterpret_cast<char*>(this);
-    *reinterpret_cast<unsigned int*>(p + 0x22C) = 0x3F333333u;
-    *reinterpret_cast<unsigned int*>(p + 0x234) = 0x40490FDBu;
-    *reinterpret_cast<unsigned int*>(p + 0x220) = 0x41700000u;
-    *reinterpret_cast<unsigned int*>(p + 0x258) = 0x42AA0000u;
+    field_0x22c = 0.7f;
+    field_0x234 = 3.1415927f;
+    field_0x220 = 15.0f;
+    field_0x258 = 85.0f;
 }
 
 // Copies the +0x2B4 triple, raises its second component by 3, derives +0x258
-// from the horizontal (x/z) distance between Camera's +0x170 and that triple, clamps it
-// to [10, 70] and passes the triple by value to slot 29. The parenthesized
-// division matters: VC6 folds `/ 180.0f * 60.0f` into one multiply, while retail
-// multiplies by 1/180 and then by 60.
+// from the horizontal (x/z) distance between Camera's +0x170 and that triple,
+// clamps it to [10, 70] and passes the triple by value to slot 29. The
+// parenthesized division matters: VC6 folds `/ 180.0f * 60.0f` into one
+// multiply, while retail multiplies by 1/180 and then by 60.
 void FollowCamera::UnknownVirtualSlot68() {
-    char* p = reinterpret_cast<char*>(this);
-    Vector3 target = *reinterpret_cast<Vector3*>(p + 0x2B4);
+    Vector3 target = field_0x2b4;
     target.y += 3.0f;
     float dx = field_0x170.x - target.x;
     if (dx < 0.0f) dx = -dx;
     float dz = field_0x170.z - target.z;
     if (dz < 0.0f) dz = -dz;
-    float& param = *reinterpret_cast<float*>(p + 0x258);
-    param = ((200.0f - UnknownFunction460b50(dx * dx + dz * dz)) / 180.0f) * 60.0f + 10.0f;
-    if (param < 10.0f) param = 10.0f;
-    if (param > 70.0f) param = 70.0f;
+    field_0x258 = ((200.0f - UnknownFunction460b50(dx * dx + dz * dz)) / 180.0f) * 60.0f + 10.0f;
+    if (field_0x258 < 10.0f) field_0x258 = 10.0f;
+    if (field_0x258 > 70.0f) field_0x258 = 70.0f;
     UnknownVirtualSlot29(target);
 }
 
@@ -74,12 +68,10 @@ void FollowCamera::UnknownVirtualSlot68() {
 // States 0-4 dispatch through FollowCamera virtuals, then snapshot the exact
 // preset triplet before a final update virtual.
 void FollowCamera::UnknownVirtualSlot71(int value) {
-    char* p = reinterpret_cast<char*>(this);
-
-    *reinterpret_cast<int*>(p + 0x244) = value;
+    field_0x244 = value;
     UnknownVirtualSlot58();
 
-    switch (*reinterpret_cast<unsigned int*>(p + 0x244)) {
+    switch (static_cast<unsigned int>(field_0x244)) {
         case 0:
             UnknownVirtualSlot66();
             break;
@@ -90,23 +82,18 @@ void FollowCamera::UnknownVirtualSlot71(int value) {
             UnknownVirtualSlot64();
             break;
         case 3:
-            *reinterpret_cast<int*>(p + 0x258) =
-                *reinterpret_cast<int*>(p + 0x2F0);
+            field_0x258 = field_0x2f0;
             UnknownVirtualSlot63();
             break;
         case 4:
-            *reinterpret_cast<int*>(p + 0x2F0) =
-                *reinterpret_cast<int*>(p + 0x258);
+            field_0x2f0 = field_0x258;
             UnknownVirtualSlot60();
             break;
     }
 
-    *reinterpret_cast<int*>(p + 0x2C4) =
-        *reinterpret_cast<int*>(p + 0x220);
-    *reinterpret_cast<int*>(p + 0x2C8) =
-        *reinterpret_cast<int*>(p + 0x22C);
-    *reinterpret_cast<int*>(p + 0x2CC) =
-        *reinterpret_cast<int*>(p + 0x234);
+    field_0x2c4 = field_0x220;
+    field_0x2c8 = field_0x22c;
+    field_0x2cc = field_0x234;
 
     UnknownVirtualSlot61();
 }
@@ -116,43 +103,69 @@ void FollowCamera::UnknownVirtualSlot71(int value) {
 // folds the wrap through CMOV on P6+ CPU targets, making this another useful
 // historical compiler/profile calibration target.
 void FollowCamera::UnknownVirtualSlot72() {
-    char* p = reinterpret_cast<char*>(this);
+    field_0x30c = field_0x30c + 1;
+    if (field_0x30c >= field_0x310)
+        field_0x30c = 0;
 
-    int index = *reinterpret_cast<int*>(p + 0x30C) + 1;
-    *reinterpret_cast<int*>(p + 0x30C) = index;
-
-    if (index >= *reinterpret_cast<int*>(p + 0x310)) {
-        *reinterpret_cast<int*>(p + 0x30C) = 0;
-    }
-
-    index = *reinterpret_cast<int*>(p + 0x30C);
-    int value = *reinterpret_cast<int*>(p + 0x314 + index * 4);
-
-    *reinterpret_cast<int*>(p + 0x244) = value;
+    int value = field_0x314[field_0x30c];
+    field_0x244 = value;
     UnknownVirtualSlot71(value);
 }
 
 // Strong semantic reconstruction, but not a clang smoke target.
 void FollowCamera::UnknownVirtualSlot70(int value) {
-    char* p = reinterpret_cast<char*>(this);
-
-    *reinterpret_cast<int*>(p + 0x268) = value & 0xFF;
+    field_0x268 = value & 0xFF;
 
     if (static_cast<unsigned char>(value) != 0) {
-        int current = *reinterpret_cast<int*>(p + 0x244);
+        int current = field_0x244;
 
         if (current != 5) {
-            *reinterpret_cast<int*>(p + 0x248) = current;
-            *reinterpret_cast<int*>(p + 0x24C) =
-                *reinterpret_cast<int*>(p + 0x258);
-            *reinterpret_cast<int*>(p + 0x244) = 5;
+            field_0x248 = current;
+            field_0x24c = field_0x258;
+            field_0x244 = 5;
         }
 
-        *reinterpret_cast<int*>(p + 0x26C) = 0;
+        field_0x26c = 0;
     } else {
-        *reinterpret_cast<int*>(p + 0x244) =
-            *reinterpret_cast<int*>(p + 0x248);
-        *reinterpret_cast<int*>(p + 0x258) =
-            *reinterpret_cast<int*>(p + 0x24C);
+        field_0x244 = field_0x248;
+        field_0x258 = field_0x24c;
     }
+}
+
+// 0x00464a10: the target point.
+Vector3 FollowCamera::UnknownVirtualSlot37() {
+    Vector3 result = field_0x2b4;
+    return result;
+}
+
+// 0x00464a40: the target point raised by 3 (as slot 68 uses it).
+Vector3 FollowCamera::UnknownVirtualSlot34(int) {
+    Vector3 result = field_0x2b4;
+    result.y += 3.0f;
+    return result;
+}
+
+// 0x00464e80 and 0x00464e90 (slots 53, 54 and 58-62 share the empty body).
+void FollowCamera::UnknownVirtualSlot52(int) {}
+void FollowCamera::UnknownVirtualSlot53() {}
+void FollowCamera::UnknownVirtualSlot54() {}
+void FollowCamera::UnknownVirtualSlot58() {}
+void FollowCamera::UnknownVirtualSlot59() {}
+void FollowCamera::UnknownVirtualSlot60() {}
+void FollowCamera::UnknownVirtualSlot61() {}
+void FollowCamera::UnknownVirtualSlot62() {}
+
+// 0x00464ea0 and 0x00464ec0: slot 5 of the interface behind the 0x0056e26c
+// object, with codes 0x38 and 0x2a.
+void FollowCamera::UnknownVirtualSlot55() {
+    g_UnknownGlobal56e26c->field_0x14->field_0x34->UnknownVirtualSlot5(0x38, 0x3F, 0);
+}
+
+void FollowCamera::UnknownVirtualSlot56() {
+    g_UnknownGlobal56e26c->field_0x14->field_0x34->UnknownVirtualSlot5(0x2A, 0x3F, 0);
+}
+
+// 0x00404fc0: states 5 and 2.
+int FollowCamera::UnknownVirtualSlot75() {
+    return field_0x244 == 5 || field_0x244 == 2;
 }

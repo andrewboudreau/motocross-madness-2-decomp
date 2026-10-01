@@ -1,7 +1,8 @@
 # FollowCamera reconstruction
 
-`FollowCamera : PCCamera` introduces slots 63–72. VehicleCamera, BikeCamera and
-KrustyBikeCamera inherit many entries. FollowCam.cpp is a source-file candidate
+`FollowCamera : PCCamera` introduces slots 33–75; slots 33, 35, 39, 41, 42,
+50, 51, 57 and 74 are `_purecall` in its vtable and are declared pure.
+VehicleCamera, BikeCamera and KrustyBikeCamera inherit many entries. FollowCam.cpp is a source-file candidate
 supported by name overlap and nearby references, not a proven TU assignment.
 Canonical source: `src/reconstructed/FollowCamera.h` and `.cpp`, built on
 `PCCamera`, `Camera` and `GameObject` in the same directory.
@@ -18,9 +19,19 @@ Canonical source: `src/reconstructed/FollowCamera.h` and `.cpp`, built on
 | 70 | `0x00467040` | 101 | Exact mode/state save and restore |
 | 71 | `0x00466e50` | 192 | Exact; 171 code bytes, one NOP, 5-entry jump table |
 | 72 | `0x00466fb0` | 62 | Exact cyclic advance without `/G6` |
+| 34 | `0x00464a40` | 63 | Exact; returns +0x2b4 with y + 3 (`Vector3` by hidden pointer) |
+| 37 | `0x00464a10` | 37 | Exact; returns +0x2b4 (named local copy) |
+| 52 | `0x00464e80` | 3 | Exact empty body (`ret 4`) |
+| 53, 54, 58–62 | `0x00464e90` | 1 | Exact shared empty body |
+| 55, 56 | `0x00464ea0`, `0x00464ec0` | 23 each | Exact; slot 5 of the interface at (`0x0056e26c` object)->+0x14->+0x34 with 0x38 / 0x2a |
+| 75 | `0x00404fc0` | 25 | Exact; state +0x244 is 5 or 2 |
 
-These are function matches, not a completed class. Fields, enum names and the
-12-byte aggregate's semantic type remain provisional.
+FollowCamera's members (+0x220 onward) are declared in `FollowCamera.h`; the
+slot 63–67 presets store floats (for example 0x40490fdb = π, 0x42aa0000 =
+85.0) written as float literals. The remaining FollowCamera functions
+(destructor `0x00463120`, slots 10, 23, 36, 38, 40, 43–49 and 73) are not yet
+reconstructed. Enum names and the 12-byte aggregate's type remain
+provisional.
 
 ## Notes on slots 68, 69 and 71
 
@@ -41,8 +52,8 @@ Slot 69 calls virtual slot 57 with a hidden stack return buffer for a 12-byte
 aggregate, copies three dwords into +0x2a8/+0x2ac/+0x2b0, then passes the cache
 to slot 43. Retail forms the cache address before the call and copies straight
 from the returned buffer, so the candidate assigns the call result directly
-(`*cached = UnknownVirtualSlot57(0);`); a named temporary kept the copy in extra
-registers. Size alone does not establish a vector type.
+(`field_0x2a8 = UnknownVirtualSlot57(0);`); a named temporary kept the copy in
+extra registers. Size alone does not establish a vector type.
 
 Slot 71 stores the input at +0x244, calls slot 58, dispatches states 0–4 to
 slots 66/65/64/63/60, then snapshots +0x220/+0x22c/+0x234 into
@@ -56,7 +67,7 @@ retail addresses when each label is placed at its function offset.
 
 | Offset | Observed role |
 |---|---|
-| +0x170, +0x178 | Floats compared with the +0x2b4 triple in slot 68 |
+| Camera +0x170 (x, z) | Compared with the +0x2b4 triple in slot 68 |
 | +0x220, +0x22c, +0x234 | Preset parameters |
 | +0x244, +0x248 | Current/saved state candidates |
 | +0x24c | Saved copy of +0x258 |
@@ -74,12 +85,13 @@ restores them on disable. Slot 72 increments/wraps the index, selects a table
 value, stores it at +0x244 and calls slot 71. Reproduce with the
 [calibration/profile commands](VC6_MATCHING.md).
 
-## Camera and PCCamera
+## Camera, PCCamera and ShadowCamera
 
-RTTI: `PCCamera : Camera : GameObject : BaseObject`. Canonical source:
-`src/reconstructed/Camera.{h,cpp}` and `PCCamera.{h,cpp}`; call bindings in
+RTTI: `PCCamera : Camera : GameObject : BaseObject`; `ShadowCamera : PCCamera`.
+Canonical source: `src/reconstructed/Camera.{h,cpp}`, `PCCamera.{h,cpp}` and
+`ShadowCamera.{h,cpp}`; call bindings in
 `src/reconstructed/Camera.bindings.json` come from the GameObject/Camera vtables
-and decoded direct calls. All nineteen bodies are strict exact under the
+and decoded direct calls. All twenty-six bodies are strict exact under the
 default profile with zero ignored bytes. Camera's members (+0x2c..+0x21f) are
 declared in `Camera.h`; the class ends at +0x220, where FollowCamera's fields
 begin.
@@ -89,6 +101,12 @@ begin.
 | Camera constructor | `0x0042e340` | 402 | `/GX` frame; GameObject constructor; scalar defaults; `IdentityMatrix()` ([matrix helpers](MATRIX_UTIL.md)) into +0x2c; vectors (0,0,1), (0,1,0), (0,0,0) at +0x17c/+0x188/+0x170; +0x214/+0x208 copied from +0x17c/+0x170 |
 | Camera 0x42e8e0 | `0x0042e8e0` | 75 | If +0x1c0/+0x1bc differ from the `.rdata` limits: `0x0042e960(limits)` then slot 28; returns 1 |
 | Camera 0x42e960 | `0x0042e960` | 79 | +0x1bc = max(argument, 1.0 limit), +0x1c0 = min(argument, 100000.0 limit) |
+| Camera 4 | `0x00499ad0` | 5 | Tail jump to GameObject slot 4 (address shared by folding) |
+| Camera 8 | `0x0042e500` | 65 | GameObject slot 8; if `0x0042e550` fails, `Release` and return 0; else slot 28, owner notify on +0x25 bit 0, return `this` |
+| Camera 14 | `0x00467ae0` | 6 | Returns 1 (shared body) |
+| Camera 23 | `0x0042f090` | 71 | If GameObject slot 23 finds nothing: cdecl `0x0043caa0(0xb7, 0, a, 0x80000000)`, then slot 27 and return 1 |
+| ShadowCamera constructor | `0x004da520` | 25 | `PCCamera(flags)`, then the ShadowCamera vptr |
+| ShadowCamera 19, 22 | `0x004da550`, `0x004da560` | 5 each | Return 0 |
 | PCCamera 27 | `0x004beed0` | 19 | Owner helper `0x004c5d00`, then `0x00468880` on the object at `0x0056e26c`; Camera's slot 27 is `_purecall` |
 | Camera destructor core | `0x0042f020` | 37 | Camera vptr; `fclose(+0x1e4)` when set; GameObject destructor `0x00468d60` |
 | Camera scalar deleting destructor | `0x0042e4e0` | 30 | Canonical wrapper (slot 0) |
