@@ -263,6 +263,6 @@ void FollowCamera::UnknownVirtualSlot55() {
     g_UnknownGlobal56e26c->field_0x14->field_0x34->UnknownVirtualSlot5(0x38, 0x3F, 0);
 }
 
-void FollowCamera::UnknownVirtualSlot56() {
-    g_UnknownGlobal56e26c->field_0x14->field_0x34->UnknownVirtualSlot5(0x2A, 0x3F, 0);
+bool FollowCamera::UnknownVirtualSlot56() {
+    return g_UnknownGlobal56e26c->field_0x14->field_0x34->UnknownVirtualSlot5(0x2A, 0x3F, 0);
 }

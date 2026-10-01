@@ -12,5 +12,9 @@
   "?UnknownVirtualSlot23@FollowCamera@@UAEHHH@Z": "0x00466ad0",
   "?UnknownVirtualSlot62@KrustyBikeCamera@@UAEXXZ": "0x00498280",
   "?UnknownVirtualSlot71@FollowCamera@@UAEXH@Z": "0x00466e50",
-  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c"
+  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3ffdd70a3d0000000000": "0x00554884",
+  "__real@4@3ffe8ccccd0000000000": "0x00550b1c",
+  "__real@4@c0008000000000000000": "0x00550aec"
 }

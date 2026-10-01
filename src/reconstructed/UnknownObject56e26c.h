@@ -12,7 +12,7 @@ public:
     virtual void UnknownVirtualSlot2();
     virtual void UnknownVirtualSlot3();
     virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5(int a, int b, int c);
+    virtual bool UnknownVirtualSlot5(int a, int b, int c);
 };
 
 // Object at +0x14. KrustyBikeCamera slot 55 calls its virtual slot 2.
@@ -20,7 +20,7 @@ class UnknownObject56e26cPart {
 public:
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2(int a, int b);
+    virtual int UnknownVirtualSlot2(int a, int b);
 
     unsigned char field_0x04[0x30];
     UnknownInterface56e26c* field_0x34;
@@ -43,7 +43,8 @@ public:
 
     unsigned char field_0x0000[0x14];
     UnknownObject56e26cPart* field_0x14;
-    unsigned char field_0x0018[0x570 - 0x18];
+    int field_0x18;      // KrustyBikeCamera slot 42 tests > 1
+    unsigned char field_0x001c[0x570 - 0x1c];
     UnknownObject56e26cList* field_0x570;
     unsigned char field_0x0574[0x2930 - 0x574];
     int field_0x2930;    // saved KrustyBikeCamera state (slots 61, 62)

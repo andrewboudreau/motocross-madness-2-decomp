@@ -8,6 +8,9 @@
   "?UnknownVirtualSlot72@FollowCamera@@UAEXXZ": "0x00466fb0",
   "?g_UnknownFloat558d60@@3MB": "0x00558d60",
   "?g_UnknownVector68a728@@3UVector3@@A": "0x0068a728",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3ffd99999a0000000000": "0x00550bac",
+  "__real@4@3ffdcccccd0000000000": "0x00550b24",
   "__real@4@4000c90fdb0000000000": "0x005507e4",
   "__real@4@4001a000000000000000": "0x00550794",
   "__real@4@4004f000000000000000": "0x00550768"

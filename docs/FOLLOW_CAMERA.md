@@ -194,6 +194,8 @@ references. All bodies below are strict exact under the default profile.
 |---|---|---:|---|
 | VehicleCamera constructor | `0x0052b920` | 137 | `FollowCamera(flags)`; +0x390 = true; +0x398/+0x3a4 from the `.bss` vector `0x0068a728` |
 | VehicleCamera destructor / wrapper | `0x0052b9d0` / `0x0052b9b0` | 11 / 30 | Explicit empty destructor (vptr store, jump to `~FollowCamera`) |
+| VehicleCamera 33 | `0x0052ba30` | 142 | Tracked point: vehicle +0x64 in vehicle mode, else target +0x384 (+0x224) or +0x388 (+0x40), else the global default |
+| VehicleCamera 42 | `0x0052cc00` | 122 | +0x308 = fov/zoom ratio × vehicle +0x43c × 0.3 (0.4 in state 3), 0 otherwise |
 | VehicleCamera 39 | `0x0052cbd0` | 41 | Returns vehicle +0x45c; +0x23c += π when vehicle +0x464 is set |
 | VehicleCamera 50 | `0x0052cb80` | 73 | Vehicle part position 0, raised by 5 |
 | VehicleCamera 51 | `0x0052cec0` | 10 | Vehicle +0x48 |
@@ -203,6 +205,7 @@ references. All bodies below are strict exact under the default profile.
 | VehicleCamera 75 | `0x0052d010` | 58 | FollowCamera slot 75, else not vehicle mode or vehicle +0x444 clear |
 | BikeCamera constructor | `0x00416e20` | 35 | `VehicleCamera(flags)`; +0x3b0 = 0 |
 | BikeCamera destructor / wrapper | `0x00416e70` / `0x00416e50` | 11 / 30 | Explicit empty destructor |
+| BikeCamera 40 | `0x00416ed0` | 211 | Table entries 0 (rider head) and 1 (target) with values 2.5/4 or 5/5, then slot 38 |
 | BikeCamera 37 | `0x00416fb0` | 153 | 38% of the way from the rider's `"Head"` part to the target point |
 | BikeCamera 50 | `0x00417290` | 77 | The rider's `"Head"` position |
 | BikeCamera 51 | `0x00417340` | 13 | Bike +0x58 × +0x48 |
@@ -235,7 +238,9 @@ are strict exact.
 | Constructor | `0x00497cb0` | 170 | `/GX` frame; slot 62 (restore state) and slot 71 bound statically; resets and copies |
 | Destructor / wrapper | `0x00497d80` / `0x00497d60` | 11 / 30 | Explicit empty destructor |
 | 23 | `0x00497df0` | 38 | Returns 0 while global +0x3430 is set, else FollowCamera slot 23 |
+| 42 | `0x00498130` | 148 | +0x308 = fov/zoom ratio × bike +0x43c × 0.42 (0.55 in state 3), 0 otherwise |
 | 55 | `0x00498080` | 18 | Global +0x14 virtual slot 2 with (0x0b, 0x3f) |
+| 56 | `0x004980a0` | 134 | Input 0x0a test; outside state 7 also bike +0x108, axis < -2 and not +0x735 in vehicle mode |
 | 58 | `0x004982c0` | 116 | Unless state 6, shows string 0x13b9 + state for 1.5 s through the global +0x570 object |
 | 59, 60 | `0x004981d0`, `0x00498230` | 96 / 69 | Save / restore presets in global +0x2934..+0x2940 |
 | 61, 62 | `0x004982a0`, `0x00498280` | 19 / 18 | Save / restore the state in global +0x2930 |

@@ -29,6 +29,41 @@ void KrustyBikeCamera::UnknownVirtualSlot55() {
     g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot2(0x0B, 0x3F);
 }
 
+// 0x004980a0: input 0x0a (unless +0x38c) clears +0x391/+0x392 when absent;
+// outside state 7 it also needs the bike's +0x108, its axis below -2 and no
+// +0x735 in vehicle mode.
+bool KrustyBikeCamera::UnknownVirtualSlot56() {
+    bool pressed;
+    if (!field_0x38c && g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot2(0x0A, 0x3F)) {
+        pressed = true;
+    } else {
+        pressed = false;
+        field_0x391 = pressed;
+        field_0x392 = pressed;
+    }
+    if (field_0x244 == 7)
+        return pressed;
+    if (pressed && (!field_0x390 || (field_0x3b4->field_0x108 &&
+                                     field_0x3b4->field_0x5f4->field_0x150 < -2.0f &&
+                                     !field_0x3b4->field_0x735)))
+        return true;
+    return false;
+}
+
+// 0x00498130: +0x308 from the fov/zoom ratio and the bike's +0x43c.
+void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
+    float ratio = field_0x16c / field_0x1dc;
+    if (field_0x244 != 3) {
+        if (field_0x390 && !flag &&
+            (!field_0x3b4->field_0x7a4 || g_UnknownGlobal56e26c->field_0x18 > 1))
+            field_0x308 = ratio * field_0x3b4->field_0x43c * 0.42f;
+        else
+            field_0x308 = 0.0f;
+    } else {
+        field_0x308 = ratio * field_0x3b4->field_0x43c * 0.55f;
+    }
+}
+
 // 0x004981d0: saves the presets while in vehicle mode with the bike idle.
 void KrustyBikeCamera::UnknownVirtualSlot59() {
     if (field_0x390 && !field_0x3b0->field_0x444) {

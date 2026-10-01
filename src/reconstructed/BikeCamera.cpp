@@ -8,6 +8,27 @@ BikeCamera::BikeCamera(int flags) : VehicleCamera(flags) {
 // 0x00416e70: an explicit empty destructor.
 BikeCamera::~BikeCamera() {}
 
+// 0x00416ed0: table entries 0 (rider's head) and 1 (target point) with two
+// values that depend on bike state 6, then slot 38.
+void BikeCamera::UnknownVirtualSlot40(int a) {
+    bool special = field_0x3b0->field_0x460 == 6;
+    float value10;
+    float value14;
+    if (special) {
+        value10 = 2.5f;
+        value14 = 4.0f;
+    } else {
+        value10 = 5.0f;
+        value14 = 5.0f;
+    }
+    UnknownVehiclePart* headPart = field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdae0("Head");
+    Vector3 head;
+    headPart->UnknownFunction4fc9a0(0, &head);
+    UnknownFunction463450(0, &head, 0, &value10, &value14, 0, 0);
+    UnknownFunction463450(1, &field_0x2b4, 0, &value10, &value14, 0, 0);
+    UnknownVirtualSlot38(a, field_0x3b0->field_0x604->field_0x44 != 1, special);
+}
+
 // 0x00416fb0: 38% of the way from the rider's head to the target point.
 Vector3 BikeCamera::UnknownVirtualSlot37() {
     UnknownVehiclePart* headPart = field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdae0("Head");

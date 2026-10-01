@@ -86,17 +86,17 @@ public:
 
     virtual int UnknownVirtualSlot23(int a, int b); // 0x00466ad0, not reconstructed
 
-    virtual void UnknownVirtualSlot33() = 0;
+    virtual Vector3 UnknownVirtualSlot33() = 0;
     virtual Vector3 UnknownVirtualSlot34(int unused);
     virtual Vector3 UnknownVirtualSlot35(int a, int b) = 0;
     // 0x00465000 (near miss: samples/camera)
     virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
     virtual Vector3 UnknownVirtualSlot37();
-    virtual void UnknownVirtualSlot38(int a, int b, int c);
+    virtual void UnknownVirtualSlot38(int a, bool b, bool c);
     virtual float UnknownVirtualSlot39() = 0;
     virtual void UnknownVirtualSlot40(int a);
     virtual void UnknownVirtualSlot41() = 0;
-    virtual void UnknownVirtualSlot42() = 0;
+    virtual void UnknownVirtualSlot42(bool flag) = 0;
     virtual void UnknownVirtualSlot43(const Vector3& value);
     virtual void UnknownVirtualSlot44(const Vector3& value);
     virtual void UnknownVirtualSlot45();
@@ -110,7 +110,7 @@ public:
     virtual void UnknownVirtualSlot53();
     virtual void UnknownVirtualSlot54();
     virtual void UnknownVirtualSlot55();
-    virtual void UnknownVirtualSlot56();
+    virtual bool UnknownVirtualSlot56();
     virtual Vector3 UnknownVirtualSlot57(int mode) = 0;
     virtual void UnknownVirtualSlot58();
     virtual void UnknownVirtualSlot59();
@@ -195,7 +195,7 @@ protected:
     float field_0x2fc;          // 70.0f
     float field_0x300;          // 20.0f
     int field_0x304;
-    int field_0x308;
+    float field_0x308;          // set by KrustyBikeCamera slot 42
     int field_0x30c;            // cyclic index into field_0x314 (slot 72)
     int field_0x310;            // number of entries in field_0x314
     int field_0x314[11];        // state table (slot 72)

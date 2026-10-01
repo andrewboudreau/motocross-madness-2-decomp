@@ -17,14 +17,29 @@ public:
 struct UnknownCameraVehicle {
     unsigned char field_0x000[0x48];
     float field_0x48;                    // VehicleCamera slot 51
-    unsigned char field_0x04c[0x3bc - 0x4c];
+    unsigned char field_0x04c[0x64 - 0x4c];
+    Vector3 field_0x64;                  // VehicleCamera slot 33
+    unsigned char field_0x070[0x3bc - 0x70];
     UnknownVehiclePart* field_0x3bc;     // VehicleCamera slot 50
-    unsigned char field_0x3c0[0x444 - 0x3c0];
+    unsigned char field_0x3c0[0x43c - 0x3c0];
+    float field_0x43c;                   // VehicleCamera slot 42 scale
+    int field_0x440;
     int field_0x444;                     // VehicleCamera slots 72, 74, 75
     unsigned char field_0x448[0x45c - 0x448];
     float field_0x45c;                   // VehicleCamera slot 39
     int field_0x460;                     // BikeCamera slot 75 tests 6
     int field_0x464;                     // VehicleCamera slot 39
+};
+
+// Optional targets at VehicleCamera+0x384 / +0x388 (slot 33).
+struct UnknownCameraTargetA {
+    unsigned char field_0x000[0x224];
+    Vector3 field_0x224;
+};
+
+struct UnknownCameraTargetB {
+    unsigned char field_0x00[0x40];
+    Vector3 field_0x40;
 };
 
 // .rdata float next to VehicleCamera's vtable, loaded by slot 67 (17.0f).
@@ -40,7 +55,10 @@ public:
     explicit VehicleCamera(int flags); // 0x0052b920
     virtual ~VehicleCamera();          // 0x0052b9d0 (deleting wrapper 0x0052b9b0)
 
+    virtual Vector3 UnknownVirtualSlot33();
+
     virtual float UnknownVirtualSlot39();
+    virtual void UnknownVirtualSlot42(bool flag);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float UnknownVirtualSlot51();
     virtual void UnknownVirtualSlot67();
@@ -64,8 +82,8 @@ public:
 
 protected:
     int field_0x344[16];
-    int field_0x384;
-    int field_0x388;
+    UnknownCameraTargetA* field_0x384;
+    UnknownCameraTargetB* field_0x388;
     int field_0x38c;
     bool field_0x390;                    // vehicle mode
     unsigned char field_0x391;

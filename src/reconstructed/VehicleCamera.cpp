@@ -16,6 +16,18 @@ VehicleCamera::VehicleCamera(int flags) : FollowCamera(flags) {
 // 0x0052b9d0: an explicit empty destructor (vptr store, then FollowCamera's).
 VehicleCamera::~VehicleCamera() {}
 
+// 0x0052ba30: the tracked point: the vehicle's in vehicle mode, else the
+// first set target, else the global default.
+Vector3 VehicleCamera::UnknownVirtualSlot33() {
+    if (field_0x390)
+        return field_0x394->field_0x64;
+    if (field_0x384)
+        return field_0x384->field_0x224;
+    if (field_0x388)
+        return field_0x388->field_0x40;
+    return g_UnknownVector68a728;
+}
+
 // 0x0052bfa0: preset; distance 17 in vehicle mode, else 60.
 void VehicleCamera::UnknownVirtualSlot67() {
     field_0x22c = 0.75f;
@@ -52,6 +64,19 @@ float VehicleCamera::UnknownVirtualSlot39() {
     if (field_0x394->field_0x464)
         field_0x23c += 3.1415927f;
     return value;
+}
+
+// 0x0052cc00: +0x308 from the fov/zoom ratio and the vehicle's +0x43c.
+void VehicleCamera::UnknownVirtualSlot42(bool flag) {
+    float ratio = field_0x16c / field_0x1dc;
+    if (field_0x244 != 3) {
+        if (!flag && field_0x390)
+            field_0x308 = ratio * field_0x394->field_0x43c * 0.3f;
+        else
+            field_0x308 = 0.0f;
+    } else {
+        field_0x308 = ratio * field_0x394->field_0x43c * 0.4f;
+    }
 }
 
 // 0x0052cec0
