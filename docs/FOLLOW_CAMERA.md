@@ -181,3 +181,42 @@ temporaries and reuses the registers holding +0x17c's and +0x170's
 components for +0x214 and +0x208, which is what member copies compile to;
 constructing fresh vectors there adds stack temporaries.
 
+
+## VehicleCamera and BikeCamera
+
+RTTI: `BikeCamera : VehicleCamera : FollowCamera`. Canonical source:
+`src/reconstructed/VehicleCamera.{h,cpp}` and `BikeCamera.{h,cpp}` with their
+bindings files. Neither translation unit is established. VehicleCamera.cpp
+overlaps with Vehicle.cpp by name only; BikeCamera's code sits near BikeAI.cpp
+references. All bodies below are strict exact under the default profile.
+
+| Function | Retail VA | Bytes | Behavior |
+|---|---|---:|---|
+| VehicleCamera constructor | `0x0052b920` | 137 | `FollowCamera(flags)`; +0x390 = true; +0x398/+0x3a4 from the `.bss` vector `0x0068a728` |
+| VehicleCamera destructor / wrapper | `0x0052b9d0` / `0x0052b9b0` | 11 / 30 | Explicit empty destructor (vptr store, jump to `~FollowCamera`) |
+| VehicleCamera 39 | `0x0052cbd0` | 41 | Returns vehicle +0x45c; +0x23c += π when vehicle +0x464 is set |
+| VehicleCamera 50 | `0x0052cb80` | 73 | Vehicle part position 0, raised by 5 |
+| VehicleCamera 51 | `0x0052cec0` | 10 | Vehicle +0x48 |
+| VehicleCamera 67 | `0x0052bfa0` | 76 | Preset: distance 17 (`.rdata` `0x00558d60`) in vehicle mode, else 60 |
+| VehicleCamera 72 | `0x0052bff0` | 62 | Hold while vehicle +0x444; else FollowCamera slot 72 or reset to state 0 |
+| VehicleCamera 74 | `0x00417490` | 31 | Inline in the header; vehicle mode and vehicle +0x444 |
+| VehicleCamera 75 | `0x0052d010` | 58 | FollowCamera slot 75, else not vehicle mode or vehicle +0x444 clear |
+| BikeCamera constructor | `0x00416e20` | 35 | `VehicleCamera(flags)`; +0x3b0 = 0 |
+| BikeCamera destructor / wrapper | `0x00416e70` / `0x00416e50` | 11 / 30 | Explicit empty destructor |
+| BikeCamera 37 | `0x00416fb0` | 153 | 38% of the way from the rider's `"Head"` part to the target point |
+| BikeCamera 50 | `0x00417290` | 77 | The rider's `"Head"` position |
+| BikeCamera 51 | `0x00417340` | 13 | Bike +0x58 × +0x48 |
+| BikeCamera 53, 54 | `0x004172e0`, `0x00417310` | 45 each | `0x004444e0` / `0x004fdb50` on the bike part and the rider |
+| BikeCamera 75 | `0x004174b0` | 72 | FollowCamera slot 75, mode and bike state tests |
+
+Several shapes record source structure:
+
+- **FollowCamera slot 75 is inline.** Its body is inlined into both
+  overrides, and its out-of-line copy sits far away at `0x00404fc0`.
+  VehicleCamera slot 74 is also inline, emitted next to BikeCamera code.
+- **VehicleCamera slot 75's helper.** It needs a two-return inline helper:
+  only that makes VC6 materialise the `sete` result before testing it.
+- **VehicleCamera slot 74's local.** It needs a named `bool` local for
+  `setne al` to land straight in the return register.
+- **BikeCamera's "Head" lookup.** The lookup is its own statement. Nesting it
+  inside the position call makes VC6 push the outer call's arguments first.

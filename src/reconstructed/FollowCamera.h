@@ -91,7 +91,7 @@ public:
     virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
     virtual Vector3 UnknownVirtualSlot37();
     virtual void UnknownVirtualSlot38(int a, int b, int c);
-    virtual void UnknownVirtualSlot39() = 0;
+    virtual float UnknownVirtualSlot39() = 0;
     virtual void UnknownVirtualSlot40(int a);
     virtual void UnknownVirtualSlot41() = 0;
     virtual void UnknownVirtualSlot42() = 0;
@@ -102,8 +102,8 @@ public:
     virtual void UnknownVirtualSlot47();
     virtual Vector3 UnknownVirtualSlot48(int a, bool flag, int b);
     virtual void UnknownVirtualSlot49();
-    virtual void UnknownVirtualSlot50() = 0;
-    virtual void UnknownVirtualSlot51() = 0;
+    virtual Vector3 UnknownVirtualSlot50() = 0;
+    virtual float UnknownVirtualSlot51() = 0;
     virtual void UnknownVirtualSlot52(int value);
     virtual void UnknownVirtualSlot53();
     virtual void UnknownVirtualSlot54();
@@ -126,8 +126,10 @@ public:
     virtual void UnknownVirtualSlot71(int value);
     virtual void UnknownVirtualSlot72();
     virtual void UnknownVirtualSlot73(const Vector3& from, const Vector3& to, float dt);
-    virtual void UnknownVirtualSlot74() = 0;
-    virtual int UnknownVirtualSlot75();
+    virtual bool UnknownVirtualSlot74() = 0;
+    // Inline: retail's copy sits at 0x00404fc0, far from FollowCam.cpp, and
+    // VehicleCamera slot 75 inlines the same test.
+    virtual int UnknownVirtualSlot75() { return field_0x244 == 5 || field_0x244 == 2; }
 
     // 0x00463450: writes entry `index` of the +0x2e4 table; each non-null
     // pointer supplies one field. Returns false when index >= +0x2e0.
@@ -144,7 +146,7 @@ protected:
     float field_0x230;          // copy of field_0x22c
     float field_0x234;          // preset angle-like value (slots 63-67)
     float field_0x238;          // copy of field_0x234
-    int field_0x23c;
+    float field_0x23c;          // advanced by pi in VehicleCamera slot 39
     UnknownFollowCameraSubject* field_0x240;
     int field_0x244;            // current state (slots 70-72, 75)
     int field_0x248;            // saved state (slot 70)

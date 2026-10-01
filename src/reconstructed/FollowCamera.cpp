@@ -266,8 +266,3 @@ void FollowCamera::UnknownVirtualSlot55() {
 void FollowCamera::UnknownVirtualSlot56() {
     g_UnknownGlobal56e26c->field_0x14->field_0x34->UnknownVirtualSlot5(0x2A, 0x3F, 0);
 }
-
-// 0x00404fc0: states 5 and 2.
-int FollowCamera::UnknownVirtualSlot75() {
-    return field_0x244 == 5 || field_0x244 == 2;
-}

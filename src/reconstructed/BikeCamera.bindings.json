@@ -1,0 +1,13 @@
+{
+  "??0VehicleCamera@@QAE@H@Z": "0x0052b920",
+  "??1BikeCamera@@UAE@XZ": "0x00416e70",
+  "??1VehicleCamera@@UAE@XZ": "0x0052b9d0",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7BikeCamera@@6B@": "0x00550bc0",
+  "??_C@_04JHAH@Head?$AA@": "0x00566ebc",
+  "?UnknownFunction4444e0@UnknownVehiclePart@@QAEXXZ": "0x004444e0",
+  "?UnknownFunction4fc9a0@UnknownVehiclePart@@QAEXHPAUVector3@@@Z": "0x004fc9a0",
+  "?UnknownFunction4fdae0@UnknownVehiclePart@@QAEPAV1@PBD@Z": "0x004fdae0",
+  "?UnknownFunction4fdb50@UnknownVehiclePart@@QAEXXZ": "0x004fdb50",
+  "__real@4@3ffdc28f5c0000000000": "0x00550cf0"
+}
