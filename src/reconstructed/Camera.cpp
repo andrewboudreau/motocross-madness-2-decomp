@@ -18,10 +18,10 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x1cc = 0;
     field_0x1d0 = 0;
     memset(field_0x1a0, 0, sizeof(field_0x1a0));
-    field_0x2c = UnknownFunction4a1410();
-    field_0x17c = CameraFloat3(0.0f, 0.0f, 1.0f);
-    field_0x188 = CameraFloat3(0.0f, 1.0f, 0.0f);
-    field_0x170 = CameraFloat3(0.0f, 0.0f, 0.0f);
+    field_0x2c = IdentityMatrix();
+    field_0x17c = Vector3(0.0f, 0.0f, 1.0f);
+    field_0x188 = Vector3(0.0f, 1.0f, 0.0f);
+    field_0x170 = Vector3(0.0f, 0.0f, 0.0f);
     field_0x194 = 0;
     field_0x1f0 = 0;
     field_0x1fc = 0;
@@ -60,17 +60,35 @@ int Camera::UnknownVirtualSlot13() {
     return 1;
 }
 
-int Camera::UnknownVirtualSlot30(const CameraMatrix16* value) {
+// 0x0042e8e0
+int Camera::UnknownFunction42e8e0() {
+    if (field_0x1c0 != g_UnknownFloat550f70 || field_0x1bc != g_UnknownFloat550f6c) {
+        UnknownFunction42e960(g_UnknownFloat550f6c, g_UnknownFloat550f70);
+        UnknownVirtualSlot28();
+    }
+    return 1;
+}
+
+// 0x0042e960
+void Camera::UnknownFunction42e960(float minimum, float maximum) {
+    field_0x1bc = (g_UnknownFloat550f6c > minimum) ? g_UnknownFloat550f6c : minimum;
+    if (g_UnknownFloat550f70 < maximum)
+        field_0x1c0 = g_UnknownFloat550f70;
+    else
+        field_0x1c0 = maximum;
+}
+
+int Camera::UnknownVirtualSlot30(const Matrix4* value) {
     field_0x2c = *value;
     return 1;
 }
 
-int Camera::UnknownVirtualSlot31(const CameraMatrix16* value) {
+int Camera::UnknownVirtualSlot31(const Matrix4* value) {
     field_0xac = *value;
     return 1;
 }
 
-int Camera::UnknownVirtualSlot32(const CameraMatrix16* value) {
+int Camera::UnknownVirtualSlot32(const Matrix4* value) {
     field_0x6c = *value;
     return 1;
 }

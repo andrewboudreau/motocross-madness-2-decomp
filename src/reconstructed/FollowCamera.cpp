@@ -57,7 +57,7 @@ void FollowCamera::UnknownVirtualSlot67() {
 // multiplies by 1/180 and then by 60.
 void FollowCamera::UnknownVirtualSlot68() {
     char* p = reinterpret_cast<char*>(this);
-    CameraFloat3 target = *reinterpret_cast<CameraFloat3*>(p + 0x2B4);
+    Vector3 target = *reinterpret_cast<Vector3*>(p + 0x2B4);
     target.y += 3.0f;
     float dx = field_0x170.x - target.x;
     if (dx < 0.0f) dx = -dx;

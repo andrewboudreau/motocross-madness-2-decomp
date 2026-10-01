@@ -3,7 +3,7 @@
 #include "Camera.h"
 
 // RTTI: PCCamera : Camera. PCCamera introduces no primary slots; it overrides
-// (among others) slots 13 and 30-32.
+// (among others) slots 13, 27 (pure in Camera) and 30-32.
 //
 // The overrides forward Camera's 64-byte blocks to method 11 of the COM-style
 // interface at owner(+0x18)->+0x50 with kind 1, 2 or 3. That call shape is
@@ -23,8 +23,16 @@ struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod8();
     virtual long __stdcall UnknownMethod9();
     virtual long __stdcall UnknownMethod10();
-    virtual long __stdcall UnknownMethod11(int kind, const CameraMatrix16* value);
+    virtual long __stdcall UnknownMethod11(int kind, const Matrix4* value);
 };
+
+// Object behind the global pointer at 0x0056e26c; PCCamera slot 27 calls its
+// non-virtual 0x00468880.
+class UnknownObject56e26c {
+public:
+    void UnknownFunction468880();
+};
+extern UnknownObject56e26c* g_UnknownGlobal56e26c;
 
 class PCCamera : public Camera {
 public:
@@ -33,7 +41,8 @@ public:
     explicit PCCamera(int flags); // 0x004bed80
 
     virtual int UnknownVirtualSlot13();
-    virtual int UnknownVirtualSlot30(const CameraMatrix16* value);
-    virtual int UnknownVirtualSlot31(const CameraMatrix16* value);
-    virtual int UnknownVirtualSlot32(const CameraMatrix16* value);
+    virtual void UnknownVirtualSlot27();
+    virtual int UnknownVirtualSlot30(const Matrix4* value);
+    virtual int UnknownVirtualSlot31(const Matrix4* value);
+    virtual int UnknownVirtualSlot32(const Matrix4* value);
 };

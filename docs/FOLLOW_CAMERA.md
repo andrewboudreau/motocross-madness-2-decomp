@@ -79,15 +79,17 @@ value, stores it at +0x244 and calls slot 71. Reproduce with the
 RTTI: `PCCamera : Camera : GameObject : BaseObject`. Canonical source:
 `src/reconstructed/Camera.{h,cpp}` and `PCCamera.{h,cpp}`; call bindings in
 `src/reconstructed/Camera.bindings.json` come from the GameObject/Camera vtables
-and decoded direct calls. All seventeen bodies are strict exact under the
+and decoded direct calls. All nineteen bodies are strict exact under the
 default profile with zero ignored bytes. Camera's members (+0x2c..+0x21f) are
 declared in `Camera.h`; the class ends at +0x220, where FollowCamera's fields
 begin.
 
 | Class/slot | Retail VA | Bytes | Behavior |
 |---|---|---:|---|
-| Camera constructor | `0x0042e340` | 402 | `/GX` frame; GameObject constructor; scalar defaults; identity matrix into +0x2c; vectors (0,0,1), (0,1,0), (0,0,0) at +0x17c/+0x188/+0x170; +0x214/+0x208 copied from +0x17c/+0x170 |
-| Identity matrix | `0x004a1410` | 71 | Free function returning a 4x4 identity by value (`MatrixIdentity.cpp`; TU unattributed) |
+| Camera constructor | `0x0042e340` | 402 | `/GX` frame; GameObject constructor; scalar defaults; `IdentityMatrix()` ([matrix helpers](MATRIX_UTIL.md)) into +0x2c; vectors (0,0,1), (0,1,0), (0,0,0) at +0x17c/+0x188/+0x170; +0x214/+0x208 copied from +0x17c/+0x170 |
+| Camera 0x42e8e0 | `0x0042e8e0` | 75 | If +0x1c0/+0x1bc differ from the `.rdata` limits: `0x0042e960(limits)` then slot 28; returns 1 |
+| Camera 0x42e960 | `0x0042e960` | 79 | +0x1bc = max(argument, 1.0 limit), +0x1c0 = min(argument, 100000.0 limit) |
+| PCCamera 27 | `0x004beed0` | 19 | Owner helper `0x004c5d00`, then `0x00468880` on the object at `0x0056e26c`; Camera's slot 27 is `_purecall` |
 | Camera destructor core | `0x0042f020` | 37 | Camera vptr; `fclose(+0x1e4)` when set; GameObject destructor `0x00468d60` |
 | Camera scalar deleting destructor | `0x0042e4e0` | 30 | Canonical wrapper (slot 0) |
 | PCCamera constructor | `0x004bed80` | 25 | `Camera(flags)` (`0x0042e340`), then the PCCamera vptr |
