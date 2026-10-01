@@ -1,5 +1,7 @@
 {
   "??0Camera@@QAE@H@Z": "0x0042e340",
+  "??0Camera@@QAE@H@Z$ehhandler": "0x00549d68",
+  "??0GameObject@@QAE@H@Z": "0x00468ca0",
   "??1Camera@@UAE@XZ": "0x0042f020",
   "??1GameObject@@UAE@XZ": "0x00468d60",
   "??1PCCamera@@UAE@XZ": "0x004624d0",
@@ -7,6 +9,7 @@
   "??_7Camera@@6B@": "0x00550f78",
   "??_7PCCamera@@6B@": "0x00555da4",
   "?UnknownFunction42e8e0@Camera@@QAEXXZ": "0x0042e8e0",
+  "?UnknownFunction4a1410@@YA?AUCameraMatrix16@@XZ": "0x004a1410",
   "?UnknownFunction4e8cf0@UnknownCameraOwner@@QAEXPAVCamera@@@Z": "0x004e8cf0",
   "?UnknownVirtualSlot13@Camera@@UAEHXZ": "0x0042e630",
   "?UnknownVirtualSlot18@GameObject@@UAEHXZ": "0x004694d0",
@@ -14,5 +17,9 @@
   "?UnknownVirtualSlot31@Camera@@UAEHPBUCameraMatrix16@@@Z": "0x0042edf0",
   "?UnknownVirtualSlot32@Camera@@UAEHPBUCameraMatrix16@@@Z": "0x0042ee10",
   "?UnknownVirtualSlot5@GameObject@@UAEXXZ": "0x004690b0",
+  "?g_UnknownFloat550f6c@@3MB": "0x00550f6c",
+  "?g_UnknownFloat550f70@@3MB": "0x00550f70",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3fff8000000000000000": "0x00550748",
   "_fclose": "0x00534c3d"
 }

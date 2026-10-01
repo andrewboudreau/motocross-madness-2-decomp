@@ -51,17 +51,17 @@ void FollowCamera::UnknownVirtualSlot67() {
 }
 
 // Copies the +0x2B4 triple, raises its second component by 3, derives +0x258
-// from the horizontal distance between +0x170/+0x178 and that triple, clamps it
+// from the horizontal (x/z) distance between Camera's +0x170 and that triple, clamps it
 // to [10, 70] and passes the triple by value to slot 29. The parenthesized
 // division matters: VC6 folds `/ 180.0f * 60.0f` into one multiply, while retail
 // multiplies by 1/180 and then by 60.
 void FollowCamera::UnknownVirtualSlot68() {
     char* p = reinterpret_cast<char*>(this);
     CameraFloat3 target = *reinterpret_cast<CameraFloat3*>(p + 0x2B4);
-    target.b += 3.0f;
-    float dx = *reinterpret_cast<float*>(p + 0x170) - target.a;
+    target.y += 3.0f;
+    float dx = field_0x170.x - target.x;
     if (dx < 0.0f) dx = -dx;
-    float dz = *reinterpret_cast<float*>(p + 0x178) - target.c;
+    float dz = field_0x170.z - target.z;
     if (dz < 0.0f) dz = -dz;
     float& param = *reinterpret_cast<float*>(p + 0x258);
     param = ((200.0f - UnknownFunction460b50(dx * dx + dz * dz)) / 180.0f) * 60.0f + 10.0f;

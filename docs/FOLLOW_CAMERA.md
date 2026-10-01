@@ -79,11 +79,15 @@ value, stores it at +0x244 and calls slot 71. Reproduce with the
 RTTI: `PCCamera : Camera : GameObject : BaseObject`. Canonical source:
 `src/reconstructed/Camera.{h,cpp}` and `PCCamera.{h,cpp}`; call bindings in
 `src/reconstructed/Camera.bindings.json` come from the GameObject/Camera vtables
-and decoded direct calls. All fifteen bodies are strict exact under the default
-profile with zero ignored bytes.
+and decoded direct calls. All seventeen bodies are strict exact under the
+default profile with zero ignored bytes. Camera's members (+0x2c..+0x21f) are
+declared in `Camera.h`; the class ends at +0x220, where FollowCamera's fields
+begin.
 
 | Class/slot | Retail VA | Bytes | Behavior |
 |---|---|---:|---|
+| Camera constructor | `0x0042e340` | 402 | `/GX` frame; GameObject constructor; scalar defaults; identity matrix into +0x2c; vectors (0,0,1), (0,1,0), (0,0,0) at +0x17c/+0x188/+0x170; +0x214/+0x208 copied from +0x17c/+0x170 |
+| Identity matrix | `0x004a1410` | 71 | Free function returning a 4x4 identity by value (`MatrixIdentity.cpp`; TU unattributed) |
 | Camera destructor core | `0x0042f020` | 37 | Camera vptr; `fclose(+0x1e4)` when set; GameObject destructor `0x00468d60` |
 | Camera scalar deleting destructor | `0x0042e4e0` | 30 | Canonical wrapper (slot 0) |
 | PCCamera constructor | `0x004bed80` | 25 | `Camera(flags)` (`0x0042e340`), then the PCCamera vptr |
@@ -112,7 +116,15 @@ with ShadowCamera fit a compiler-generated PCCamera destructor, so
 (`tools/build_vc6_crt_atlas.py`: `mt_obj\fclose.obj`, 37/37 compared bytes),
 so Camera+0x1e4 is a `FILE*`. GameObject's constructor (`0x00468ca0`) cites
 `D:\aardvark\VC\krusty2\gameobj.cpp` via `__FILE__` and uses only the low bit
-of its argument; the `int flags` parameter type is provisional. Camera's
-402-byte constructor (`0x0042e340`, with an exception-handling frame) is not
-reconstructed yet.
+of its argument; the `int flags` parameter type is provisional.
+
+Constructor evidence. The two `.rdata` floats loaded into +0x1bc/+0x1c0
+(`0x00550f6c` = 1.0, `0x00550f70` = 100000.0) sit just before Camera's
+vtable and are loaded from memory, not as immediates, so they are declared as
+external `const float` objects. The matrix type needs an empty user-declared
+default constructor (as D3DMATRIX has under `D3D_OVERLOADS`) for VC6 to copy
+the returned identity straight into +0x2c. Retail builds only three vector
+temporaries and reuses the registers holding +0x17c's and +0x170's
+components for +0x214 and +0x208, which is what member copies compile to;
+constructing fresh vectors there adds stack temporaries.
 

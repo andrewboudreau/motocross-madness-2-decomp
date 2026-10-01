@@ -8,7 +8,7 @@
 // not a proven translation-unit assignment. Names are provisional.
 //
 // Observed fields:
-//   +0x170, +0x178  floats compared with the +0x2b4 triple (slot 68)
+//   Camera +0x170 (x, z) compared with the +0x2b4 triple (slot 68)
 //   +0x220, +0x22c, +0x234  preset parameters (slots 63-67)
 //   +0x244, +0x248  current/saved state
 //   +0x24c  saved copy of +0x258
