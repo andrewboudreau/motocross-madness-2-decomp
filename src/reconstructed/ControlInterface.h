@@ -65,16 +65,32 @@ struct UnknownControlEvent {
     int modifiers;            // 0x3f when queued; the keyboard's state when dispatched
 };
 
-// Mapping table at ControlInterface+0xcbc (installed by 0x0043ce70).
+// Mapping table at ControlInterface+0xcbc (installed by 0x0043ce70): the
+// keyboard key, joystick button (per joystick) and mouse button for each of
+// 50 controls, -1 when unmapped.
 class UnknownControlMapping {
 public:
-    // 0x0043cbd0: control `control` of device `device`, or -1.
-    void UnknownFunction43cbd0(int control, int* result, int device);
-    // 0x0043cba0: the keyboard key for `control`, or -1.
-    void UnknownFunction43cba0(int control, int* result);
-    // 0x0043cc10: the mouse button for `control`, or -1.
-    void UnknownFunction43cc10(int control, int* result);
+    UnknownControlMapping();                                       // 0x0043cae0
+    void UnknownFunction43caf0();                                  // 0x0043caf0: clear
+    void UnknownFunction43cb30(int control, int key);              // 0x0043cb30
+    void UnknownFunction43cb50(int control, int button, int device); // 0x0043cb50
+    void UnknownFunction43cb80(int control, int button);           // 0x0043cb80
+    void UnknownFunction43cba0(int control, int* result);          // 0x0043cba0
+    void UnknownFunction43cbd0(int control, int* result, int device); // 0x0043cbd0
+    void UnknownFunction43cc10(int control, int* result);          // 0x0043cc10
+
+    int keys[50];
+    int joystickButtons[8][50];
+    int mouseButtons[50];
 };
+
+// cdecl 0x0043caa0: whether `event` is control `control` of device kind
+// `kind` with `modifier` held (when there is a keyboard).
+int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* event, int modifier);
+
+// cdecl 0x0043d080: maps the 2-bit field `index` of byte `byteIndex` of
+// `bits` to 0x200, 0x40, 0x80 or 0x100.
+int UnknownFunction43d080(int bits, int index, int byteIndex);
 
 // RTTI: ControlInterface (root; PCControlInterface derives from it). Slot 0
 // is the deleting destructor and slots 1-4 are _purecall. The global object

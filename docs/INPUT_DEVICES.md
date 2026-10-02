@@ -186,6 +186,13 @@ modifier stamp's null handling differs. It has every device read, then
 hands each queued event, with the keyboard's modifier mask and the device's
 entry, to the global object's slot 13 (release) or slot 14 (press).
 
+The mapping table (`0x0043cae0`–`0x0043cc10`) holds, for each of 50
+controls, a keyboard key, a button for each of 8 joysticks and a mouse
+button (-1 when unmapped). It is cleared by the constructor, with
+range-checked setters and getters. `0x0043caa0` matches an event against a
+control and device kind (with a keyboard modifier test), and `0x0043d080`
+maps a 2-bit field to 0x200/0x40/0x80/0x100. All of these are strict exact.
+
 The 0x3c-byte, non-polymorphic `UnknownControlBinding` helpers sit just
 before it (`0x0043cc40`–`0x0043cde0`). They cover the default and full
 constructors, reset, and a value mapper with a dead zone and min/max clamp.

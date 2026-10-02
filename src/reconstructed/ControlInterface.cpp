@@ -1,5 +1,6 @@
 #include "ControlInterface.h"
 #include "InputDevice.h"
+#include "KeyboardDevice.h"
 #include "UnknownObject56e26c.h"
 
 // Two-value helpers; inline functions keep their operands as spilled
@@ -10,6 +11,72 @@ static inline float BindingMax(float a, float b) {
 
 static inline float BindingMin(float a, float b) {
     return a < b ? a : b;
+}
+
+// 0x0043caa0
+int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* event, int modifier) {
+    if (event->control == control && event->kind == kind &&
+        (!g_UnknownGlobal56e26c->field_0x14->field_0x34 ||
+         g_UnknownGlobal56e26c->field_0x14->field_0x34->UnknownFunction48a240(modifier)))
+        return 1;
+    return 0;
+}
+
+// 0x0043cae0
+UnknownControlMapping::UnknownControlMapping() {
+    UnknownFunction43caf0();
+}
+
+// 0x0043caf0
+void UnknownControlMapping::UnknownFunction43caf0() {
+    for (int i = 0; i < 50; i++) {
+        keys[i] = -1;
+        for (int j = 0; j < 8; j++)
+            joystickButtons[j][i] = -1;
+        mouseButtons[i] = -1;
+    }
+}
+
+// 0x0043cb30
+void UnknownControlMapping::UnknownFunction43cb30(int control, int key) {
+    if (control >= 0 && control < 50)
+        keys[control] = key;
+}
+
+// 0x0043cb50
+void UnknownControlMapping::UnknownFunction43cb50(int control, int button, int device) {
+    if (control >= 0 && control < 50 && device < 8)
+        joystickButtons[device][control] = button;
+}
+
+// 0x0043cb80
+void UnknownControlMapping::UnknownFunction43cb80(int control, int button) {
+    if (control >= 0 && control < 50)
+        mouseButtons[control] = button;
+}
+
+// 0x0043cba0
+void UnknownControlMapping::UnknownFunction43cba0(int control, int* result) {
+    if (control >= 0 && control < 50)
+        *result = keys[control];
+    else
+        *result = -1;
+}
+
+// 0x0043cbd0
+void UnknownControlMapping::UnknownFunction43cbd0(int control, int* result, int device) {
+    if (control >= 0 && control < 50 && device < 8)
+        *result = joystickButtons[device][control];
+    else
+        *result = -1;
+}
+
+// 0x0043cc10
+void UnknownControlMapping::UnknownFunction43cc10(int control, int* result) {
+    if (control >= 0 && control < 50)
+        *result = mouseButtons[control];
+    else
+        *result = -1;
 }
 
 // 0x0043cc40
@@ -119,4 +186,19 @@ void ControlInterface::UnknownFunction43cea0(int control, int kind, int pressed,
     field_0x3c[field_0x38].pressed = pressed;
     field_0x3c[field_0x38].modifiers = 0x3f;
     field_0x38++;
+}
+
+// 0x0043d080
+int UnknownFunction43d080(int bits, int index, int byteIndex) {
+    switch (bits >> (index * 2) >> (byteIndex * 8) & 3) {
+    case 0:
+        return 0x200;
+    case 1:
+        return 0x40;
+    case 2:
+        return 0x80;
+    case 3:
+        return 0x100;
+    }
+    return 0;
 }
