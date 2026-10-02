@@ -18,14 +18,18 @@ struct UnknownInputEntry;
 
 // Object returned by (+0x570)->0x0045d340; KrustyBikeCamera slot 58 hands it
 // a message.
-class UnknownMessageTarget;
 
 
-struct UnknownKrustyBikeView;
+#include "RaceView.h"
 
-struct TrackGameViewOwner {
-    unsigned char field_0x00[0x34];
+// The race-mode objects at TrackGame+0x558..+0x568 (EventManager uses the
+// first one present). They are GameObjects (slots 4 and 5, the +0x25 flag
+// bits); their classes are not established.
+struct TrackGameViewOwner : public GameObject {
+    unsigned char field_0x2c[0x34 - 0x2c];
     UnknownKrustyBikeView* field_0x34;
+    unsigned char field_0x38[0x6c - 0x38];
+    UnknownMessageTarget* field_0x6c;
 };
 
 // Object embedded at +0x578; KrustyBikeCamera slot 52 reads its mode.
