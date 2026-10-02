@@ -17,6 +17,13 @@ struct UnknownEventRanking {
     float value;
 };
 
+// 8-byte record sorted with TrackOverlay's 0x005199f0 (lower value first).
+struct UnknownEventScore {
+    float value;
+    UnknownEventRacer* racer;
+};
+int UnknownFunction5199f0(const void* a, const void* b); // cdecl 0x005199f0
+
 // 16-byte record sorted with 0x0045d3d0.
 struct UnknownEventStanding {
     int field_0x00;
@@ -61,9 +68,14 @@ struct UnknownEventEntry {
     UnknownEventEntry();                           // 0x0045c830 (resets through 0x0045c840)
     void UnknownFunction45c840();                  // 0x0045c840: reset
 
+    void UnknownFunction45c8b0(UnknownEventRacer* racer); // 0x0045c8b0: copies the racer's id and name
+
     int field_0x00;                                // network player id
-    unsigned char field_0x04[0x30 - 0x04];
-    char field_0x30;                               // counted in TrackGame+0x3424 (else Game+0x18)
+    int field_0x04;                                // finishing position
+    unsigned char field_0x08[0x28 - 0x08];
+    int field_0x28;                                // championship points
+    unsigned char field_0x2c[0x30 - 0x2c];
+    unsigned char field_0x30;                      // counted in TrackGame+0x3424 (else Game+0x18)
     unsigned char field_0x31[0x50 - 0x31];
 };
 

@@ -21,7 +21,7 @@ struct UnknownEventRacerMessage {                  // type 0x86
     int field_0x00;
     char field_0x04;                               // the sender's racer index
     char field_0x05;                               // finished
-    int field_0x08;
+    float field_0x08;
     float field_0x0c;
     int field_0x10;
     int field_0x14;
@@ -610,4 +610,147 @@ void EventManager::UnknownFunction45eef0(float frameTime) {
     }
     UnknownFunction45f9a0();
     UnknownFunction45e600();
+}
+
+// 0x0045e9d0: ranks the racers by mode, copies them into the entries and
+// awards points; in mode 2 it also orders the standings and copies each
+// racer's place to its player's entry.
+void EventManager::UnknownFunction45e9d0() {
+    UnknownKrustyBikeView* view = UnknownFunction45d2f0();
+    switch (g_UnknownGlobal56e26c->field_0x2d70) { // a one-case switch: `sub eax, 2; jne`
+    case 2:
+        field_0x48++;
+    }
+    int count = 0;
+    int iterator = 0;
+    UnknownEventRacer* racer;
+    switch (g_UnknownGlobal56e26c->field_0x2d74) {
+    case 1:
+    case 2:
+    case 3:
+    case 5: {
+        if (g_UnknownGlobal56e26c->field_0x18 > 1) {
+            UnknownEventRanking rankings[11];
+            int ranked = 0;
+            int next = 0;
+            while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+                if (!racer->field_0x4a0) {
+                    rankings[ranked].value = racer->field_0x754;
+                    rankings[ranked].racer = racer;
+                    ranked++;
+                }
+            }
+            qsort(rankings, ranked, sizeof(rankings[0]), UnknownFunction45e930);
+            for (int i = 0; i < ranked; i++)
+                rankings[i].racer->field_0x784 = i + 1;
+        }
+        iterator = 0;
+        for (racer = view->UnknownFunction4204e0(&iterator); racer; racer = view->UnknownFunction4204e0(&iterator)) {
+            field_0x50[count].UnknownFunction45c8b0(racer);
+            if ((g_UnknownGlobal56e26c->field_0x2d70 == 2 || g_UnknownGlobal56e26c->field_0x3444) &&
+                !racer->field_0x4a0)
+                UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
+            count++;
+        }
+        break;
+    }
+    case 0: {
+        UnknownEventScore scores[11];
+        int scored = 0;
+        int next = 0;
+        while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+            if (!racer->field_0x4a0) {
+                scores[scored].value = racer->field_0x768;
+                scores[scored].racer = racer;
+                scored++;
+            }
+        }
+        qsort(scores, scored, sizeof(scores[0]), UnknownFunction5199f0);
+        for (int i = 0; i < scored; i++)
+            scores[i].racer->field_0x784 = i + 1;
+        next = 0;
+        for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
+            field_0x50[count].UnknownFunction45c8b0(racer);
+            if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !racer->field_0x4a0)
+                UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
+            count++;
+        }
+        break;
+    }
+    case 4:
+        if (g_UnknownGlobal56e26c->field_0x2eb8) {
+            UnknownEventScore scores[11];
+            int scored = 0;
+            int next = 0;
+            while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+                if (!racer->field_0x4a0) {
+                    scores[scored].value = racer->field_0x768;
+                    scores[scored].racer = racer;
+                    scored++;
+                }
+            }
+            qsort(scores, scored, sizeof(scores[0]), UnknownFunction5199f0);
+            for (int i = 0; i < scored; i++)
+                scores[i].racer->field_0x784 = i + 1;
+            next = 0;
+            for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
+                field_0x50[count].UnknownFunction45c8b0(racer);
+                if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !racer->field_0x4a0)
+                    UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
+                count++;
+            }
+        } else {
+            UnknownEventScore scores[11];
+            int scored = 0;
+            int next = 0;
+            while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+                if (!racer->field_0x4a0) {
+                    scores[scored].value = racer->field_0x764;
+                    scores[scored].racer = racer;
+                    scored++;
+                }
+            }
+            qsort(scores, scored, sizeof(scores[0]), UnknownFunction5199f0);
+            for (int i = 0; i < scored; i++)
+                scores[i].racer->field_0x784 = i + 1;
+            next = 0;
+            for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
+                field_0x50[count].UnknownFunction45c8b0(racer);
+                if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !racer->field_0x4a0)
+                    UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
+                count++;
+            }
+        }
+        break;
+    }
+    field_0x4c = count;
+    if (g_UnknownGlobal56e26c->field_0x2d70 == 2) {
+        UnknownEventStanding standings[11];
+        int next = 0;
+        int standing = 0;
+        while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+            if (!racer->field_0x4a0) {
+                standings[standing].field_0x00 = field_0x50[standing].field_0x28;
+                standings[standing].racer = racer;
+                standing++;
+            }
+        }
+        qsort(standings, standing, sizeof(standings[0]), UnknownFunction45d3d0);
+        next = 0;
+        while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
+            int i;
+            for (i = 0; i < standing; i++) {
+                if (standings[i].racer == racer) {
+                    racer->field_0x784 = i + 1;
+                    break;
+                }
+            }
+            for (i = 0; i < standing; i++) {
+                if (field_0x50[i].field_0x00 == racer->field_0x11bc && field_0x50[i].field_0x30 == racer->field_0x11c0) {
+                    field_0x50[i].field_0x04 = racer->field_0x784;
+                    break;
+                }
+            }
+        }
+    }
 }

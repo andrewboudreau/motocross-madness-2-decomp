@@ -2956,6 +2956,15 @@ CASES = [
         'reason': 'case 1/2/3/5 body first; duplicated finish calls tail-merged; jump table',
     },
     {
+        'name': 'EventManager rank racers 0x45e9d0',
+        'bindings': 'src/reconstructed/EventManager.bindings.json',
+        'source': 'src/reconstructed/EventManager.cpp',
+        'symbol': '?UnknownFunction45e9d0@EventManager@@QAEXXZ',
+        'target_va': '0x0045e9d0',
+        'target_size': 1308,
+        'reason': 'block-scoped arrays share the frame; indexed entries; one-case switch; jump table',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

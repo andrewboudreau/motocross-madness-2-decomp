@@ -42,7 +42,7 @@ struct UnknownEventRacer {
     float field_0x75c;
     float field_0x760;                             // best of +0x75c
     float field_0x764;                             // sum of +0x75c
-    int field_0x768;
+    float field_0x768;                             // a score (sorted with TrackOverlay's 0x005199f0)
     unsigned char field_0x76c[0x784 - 0x76c];
     int field_0x784;                               // finishing position (1-based)
     int field_0x788;
@@ -52,7 +52,8 @@ struct UnknownEventRacer {
     unsigned short field_0x7a0;
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
     char field_0x7a4;                              // finished
-    unsigned char field_0x7a5[0x11c0 - 0x7a5];
+    unsigned char field_0x7a5[0x11bc - 0x7a5];
+    int field_0x11bc;                              // network player id
     char field_0x11c0;                             // AI racer's index in its messages
 };
 

@@ -255,7 +255,9 @@ public:
     char field_0x2da6[0x20];                   // track name (length not established)
     unsigned char field_0x2dc6[0x2eb0 - 0x2dc6];
     float field_0x2eb0;
-    unsigned char field_0x2eb4[0x3338 - 0x2eb4];
+    unsigned char field_0x2eb4[0x2eb8 - 0x2eb4];
+    int field_0x2eb8;                          // mode 4 ranks by +0x768 (else +0x764) (EventManager 0x0045e9d0)
+    unsigned char field_0x2ebc[0x3338 - 0x2ebc];
     DirectoryList* profileDirectory;
     int menuIsOpen;
     UnknownTrackGameObject3340* field_0x3340;
