@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "PCControl.h"
 
 #include "DebugAlloc.h"
@@ -5,6 +7,61 @@
 #include "PCKeyboardDevice.h"
 #include "PCMouseDevice.h"
 #include "UnknownObject56e26c.h"
+
+// 0x004beef0: the effect GUID's name in `name` (empty and 0 when unknown).
+// Placed here by address only: it directly precedes PCControlInterface.
+int UnknownFunction4beef0(UnknownGuid guid, char* name) {
+    strcpy(name, "");
+    if (!memcmp(&GUID_ConstantForce, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_ConstantForce");
+        return 1;
+    }
+    if (!memcmp(&GUID_RampForce, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_RampForce");
+        return 1;
+    }
+    if (!memcmp(&GUID_Square, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_Square");
+        return 1;
+    }
+    if (!memcmp(&GUID_Sine, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_Sine");
+        return 1;
+    }
+    if (!memcmp(&GUID_Triangle, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_Triangle");
+        return 1;
+    }
+    if (!memcmp(&GUID_SawtoothUp, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_SawtoothUp");
+        return 1;
+    }
+    if (!memcmp(&GUID_SawtoothDown, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_SawtoothDown");
+        return 1;
+    }
+    if (!memcmp(&GUID_Spring, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_Spring");
+        return 1;
+    }
+    if (!memcmp(&GUID_Damper, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_Damper");
+        return 1;
+    }
+    if (!memcmp(&GUID_Inertia, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_Inertia");
+        return 1;
+    }
+    if (!memcmp(&GUID_Friction, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_Friction");
+        return 1;
+    }
+    if (!memcmp(&GUID_CustomForce, &guid, sizeof(guid))) {
+        strcpy(name, "GUID_CustomForce");
+        return 1;
+    }
+    return 0;
+}
 
 // 0x004bf1f0
 PCControlInterface::PCControlInterface() {

@@ -2,10 +2,6 @@
 
 #include "JoystickDevice.h"
 
-// Effect type GUIDs; the names are the literals 0x004beef0 reports for them.
-extern "C" const UnknownGuid GUID_ConstantForce; // 0x00556b90
-extern "C" const UnknownGuid GUID_Square;        // 0x00556bb0
-
 // 0x38-byte effect parameter block passed to device method 18 and effect
 // method 6; the layout matches DIEFFECT (DirectX 6 size).
 struct UnknownEffectParams {

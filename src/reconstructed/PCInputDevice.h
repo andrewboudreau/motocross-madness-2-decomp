@@ -104,6 +104,20 @@ struct UnknownEffectInfo {
     char name[260];
 };
 
+// Effect type GUIDs; the names are the literals 0x004beef0 reports for them.
+extern "C" const UnknownGuid GUID_ConstantForce;  // 0x00556b90
+extern "C" const UnknownGuid GUID_RampForce;      // 0x00556ba0
+extern "C" const UnknownGuid GUID_Square;         // 0x00556bb0
+extern "C" const UnknownGuid GUID_Sine;           // 0x00556bc0
+extern "C" const UnknownGuid GUID_Triangle;       // 0x00556bd0
+extern "C" const UnknownGuid GUID_SawtoothUp;     // 0x00556be0
+extern "C" const UnknownGuid GUID_SawtoothDown;   // 0x00556bf0
+extern "C" const UnknownGuid GUID_Spring;         // 0x00556c00
+extern "C" const UnknownGuid GUID_Damper;         // 0x00556c10
+extern "C" const UnknownGuid GUID_Inertia;        // 0x00556c20
+extern "C" const UnknownGuid GUID_Friction;       // 0x00556c30
+extern "C" const UnknownGuid GUID_CustomForce;    // 0x00556c40
+
 // cdecl 0x004beef0: writes a name for a known effect GUID; nonzero if known.
 int UnknownFunction4beef0(UnknownGuid guid, char* name);
 

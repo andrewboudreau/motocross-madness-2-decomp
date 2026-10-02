@@ -1786,6 +1786,15 @@ CASES = [
         'reason': 'null pointer reused as the zero return',
     },
     {
+        'name': 'PCControl 0x4beef0 effect GUID name',
+        'bindings': 'src/reconstructed/PCControl.bindings.json',
+        'source': 'src/reconstructed/PCControl.cpp',
+        'symbol': '?UnknownFunction4beef0@@YAHUUnknownGuid@@PAD@Z',
+        'target_va': '0x004beef0',
+        'target_size': 765,
+        'reason': 'GUID by value; IsEqualGUID-order memcmp (constant first) and strcpy intrinsics',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',
