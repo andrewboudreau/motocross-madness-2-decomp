@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, json, os, shutil, subprocess
+import argparse, json, os, subprocess
 from pathlib import Path
 from mcm2tool.toolchain import find_vc6_bin, find_child_ci, fingerprint_toolchain
-from compile import winepath
+from mcm2tool.vc6_runtime import executable_command, runner_kind
 
 
 def main():
@@ -27,14 +27,15 @@ def main():
     payload['sp3_core_match']=bool(checks) and all(c['present'] and c['matches_sp3'] for c in checks)
     payload['compiler_banner']=None
     payload['wine_available']=False
-    if os.name=='nt':
-        cmd=[str(cl)]
-    else:
-        wine=shutil.which('wine')
-        cmd=[wine,winepath(cl)] if wine and shutil.which('winepath') else None
-        payload['wine_available']=bool(cmd)
+    runner = runner_kind()
+    payload['runner'] = runner
+    try:
+        cmd = executable_command(cl, runner)
+    except FileNotFoundError:
+        cmd = None
+    payload['wine_available'] = runner == 'wine' and bool(cmd)
     if cmd:
-        r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env={**os.environ,'WINEDEBUG':'-all'})
+        r=subprocess.run(cmd,text=True,encoding='latin-1',stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env={**os.environ,'WINEDEBUG':'-all'})
         payload['compiler_banner']=r.stdout.strip()
         payload['compiler_probe_returncode']=r.returncode
     if a.json:
@@ -42,7 +43,7 @@ def main():
     if payload['compiler_banner']:
         print(payload['compiler_banner'])
     else:
-        print('Compiler execution probe skipped: Wine/winepath not available on this host. Static toolchain fingerprint follows.')
+        print(f'Compiler execution probe skipped: {runner} unavailable. Static toolchain fingerprint follows.')
     print('Tool files:')
     for f in payload['files']:
         versions=', '.join(f['version_strings'][:6]) or '-'

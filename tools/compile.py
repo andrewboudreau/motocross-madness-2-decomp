@@ -3,14 +3,9 @@ from __future__ import annotations
 import argparse, json, os, shutil, subprocess
 from pathlib import Path
 from mcm2tool.toolchain import find_vc6_bin, find_child_ci, infer_vc98_root
+from mcm2tool.vc6_runtime import executable_command, runner_kind, windows_path
 
 def load_profiles(path: Path): return json.loads(path.read_text())['profiles']
-
-def winepath(path: Path) -> str:
-    wp=shutil.which('winepath')
-    if not wp: raise SystemExit('winepath not found; install 32-bit Wine (wine + wine32)')
-    r=subprocess.run([wp,'-w',str(path.resolve())],check=True,text=True,capture_output=True)
-    return r.stdout.strip()
 
 def run_vc6(root:Path,src:Path,out:Path,flags:list[str],extra:list[str]):
     bindir=find_vc6_bin(root); cl=find_child_ci(bindir,'cl.exe')
@@ -23,12 +18,10 @@ def run_vc6(root:Path,src:Path,out:Path,flags:list[str],extra:list[str]):
         mi=find_child_ci(mfc,'Include')
         if mi and mi.is_dir(): includes.append(mi)
     out.parent.mkdir(parents=True,exist_ok=True)
-    if os.name=='nt':
-        cmd=[str(cl),*flags,*[f'/I{p}' for p in includes],*extra,str(src.resolve()),f'/Fo{out.resolve()}']
-    else:
-        wine=shutil.which('wine')
-        if not wine: raise SystemExit('wine not found; install Wine with 32-bit support')
-        cmd=[wine,winepath(cl),*flags,*[f'/I{winepath(p)}' for p in includes],*extra,winepath(src),f'/Fo{winepath(out)}']
+    runner = runner_kind()
+    cmd = [*executable_command(cl, runner), *flags,
+           *[f'/I{windows_path(p, runner)}' for p in includes], *extra,
+           windows_path(src, runner), f'/Fo{windows_path(out, runner)}']
     env=os.environ.copy(); env.setdefault('WINEDEBUG','-all')
     print('+',' '.join(cmd))
     # VC6 diagnostics are in the installation's ANSI code page, not UTF-8.
