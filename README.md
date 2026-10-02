@@ -4,7 +4,8 @@ Reconstruct readable C++ that reproduces the retail x86 executable under VC6 SP3
 The project is at function/class reconstruction, not a complete game build.
 
 [Current matches and next targets](docs/VC6_MATCHING.md) ·
-[Setup](docs/TOOLCHAIN.md) · [Agent workflow](AGENTS.md)
+[Setup](docs/TOOLCHAIN.md) · [Codex Cloud](docs/TOOLCHAIN.md#codex-cloud) ·
+[Agent workflow](AGENTS.md)
 
 ## Project layout
 
