@@ -55,8 +55,12 @@ def main():
     profile=a.profile or ('clang_probe' if a.compiler=='clang-cl' else 'vc6_o2_ml_g6')
     if profile not in profiles: raise SystemExit(f'unknown profile {profile}; choices={list(profiles)}')
     src=Path(a.source); out=Path(a.out); flags=profiles[profile]
+    # never leave a stale object behind: a failed compile must not let match.py
+    # silently compare the previous build's code
+    out.unlink(missing_ok=True)
     if a.compiler=='clang-cl': run_clang(src,out,flags,a.extra+[f'/I{Path(p).resolve()}' for p in a.include])
     else:
         if not a.vc6_root: raise SystemExit('set VC6_ROOT or pass --vc6-root; Microsoft VC6 files are intentionally not bundled')
         run_vc6(Path(a.vc6_root),src,out,flags,a.extra,[Path(p).resolve() for p in a.include])
+    if not out.is_file(): raise SystemExit(f'compiler exited 0 but wrote no object: {out}')
 if __name__=='__main__': main()
