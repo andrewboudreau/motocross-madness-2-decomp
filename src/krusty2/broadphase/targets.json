@@ -13,9 +13,9 @@
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "??_GQuadTreeNode",
     "target_va": "0x004dd0a0",
-    "target_size": 32,
+    "target_size": 30,
     "expect": "exact",
-    "notes": "scalar deleting dtor wrapper (includes 2 padding bytes)"
+    "notes": "scalar deleting dtor wrapper (CodeView extent; the 2 padding bytes after it are not compared)"
   },
   {
     "class": "QuadTreeNode",
@@ -31,9 +31,9 @@
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "??_GQuadTree@",
     "target_va": "0x004dda90",
-    "target_size": 32,
+    "target_size": 30,
     "expect": "exact",
-    "notes": "scalar deleting dtor wrapper (includes 2 padding bytes)"
+    "notes": "scalar deleting dtor wrapper (CodeView extent; the 2 padding bytes after it are not compared)"
   },
   {
     "class": "QuadTree",
@@ -130,9 +130,9 @@
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "CompareObjectKey",
     "target_va": "0x004dd5d0",
-    "target_size": 48,
+    "target_size": 42,
     "expect": "exact",
-    "notes": "qsort comparator; target_size 48 includes the 6 padding bytes the retail linker left after the 42-byte body"
+    "notes": "qsort comparator; 42-byte body (the 6 padding bytes after it are not compared)"
   },
   {
     "class": "QuadTree",
@@ -247,72 +247,72 @@
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "_$E2",
     "target_va": "0x004dc4d0",
-    "target_size": 16,
+    "target_size": 5,
     "expect": "exact",
-    "notes": "static const Vec3 (0,0,0) dynamic initializer jmp thunk; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+    "notes": "static const Vec3 (0,0,0) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
   },
   {
     "class": "QuadTree",
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "_$E1",
     "target_va": "0x004dc4e0",
-    "target_size": 64,
+    "target_size": 60,
     "expect": "exact",
-    "notes": "static const Vec3 (0,0,0) dynamic initializer body; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+    "notes": "static const Vec3 (0,0,0) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
   },
   {
     "class": "QuadTree",
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "_$E5",
     "target_va": "0x004dc520",
-    "target_size": 16,
+    "target_size": 5,
     "expect": "exact",
-    "notes": "static const Vec3 (1,0,0) dynamic initializer jmp thunk; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+    "notes": "static const Vec3 (1,0,0) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
   },
   {
     "class": "QuadTree",
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "_$E4",
     "target_va": "0x004dc530",
-    "target_size": 64,
+    "target_size": 60,
     "expect": "exact",
-    "notes": "static const Vec3 (1,0,0) dynamic initializer body; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+    "notes": "static const Vec3 (1,0,0) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
   },
   {
     "class": "QuadTree",
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "_$E8",
     "target_va": "0x004dc570",
-    "target_size": 16,
+    "target_size": 5,
     "expect": "exact",
-    "notes": "static const Vec3 (0,1,0) dynamic initializer jmp thunk; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+    "notes": "static const Vec3 (0,1,0) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
   },
   {
     "class": "QuadTree",
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "_$E7",
     "target_va": "0x004dc580",
-    "target_size": 64,
+    "target_size": 60,
     "expect": "exact",
-    "notes": "static const Vec3 (0,1,0) dynamic initializer body; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+    "notes": "static const Vec3 (0,1,0) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
   },
   {
     "class": "QuadTree",
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "_$E11",
     "target_va": "0x004dc5c0",
-    "target_size": 16,
+    "target_size": 5,
     "expect": "exact",
-    "notes": "static const Vec3 (0,0,1) dynamic initializer jmp thunk; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+    "notes": "static const Vec3 (0,0,1) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
   },
   {
     "class": "QuadTree",
     "source": "Quadtree.cpp",
     "candidate_symbol_contains": "_$E10",
     "target_va": "0x004dc5d0",
-    "target_size": 64,
+    "target_size": 60,
     "expect": "exact",
-    "notes": "static const Vec3 (0,0,1) dynamic initializer body; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+    "notes": "static const Vec3 (0,0,1) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
   },
   {
     "class": "Terrain",
@@ -328,9 +328,9 @@
     "source": "Terrain.cpp",
     "candidate_symbol_contains": "??_GTerrain",
     "target_va": "0x005059b0",
-    "target_size": 32,
+    "target_size": 30,
     "expect": "exact",
-    "notes": "slot 0 scalar deleting dtor (includes 2 padding bytes)"
+    "notes": "slot 0 scalar deleting dtor (CodeView extent; the 2 padding bytes after it are not compared)"
   },
   {
     "class": "Terrain",

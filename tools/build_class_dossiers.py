@@ -167,7 +167,7 @@ def main():
             for v in d['vtables']:
                 lines.append(f"- `{v['vtable_va']}` at object offset `+0x{int(v.get('object_offset',0)):x}` ({len(v.get('entries',[]))} slots)")
         lines.append('')
-    Path('docs/CLASS_DOSSIERS.md').write_text('\n'.join(lines)+'\n')
+    Path('analysis/CLASS_DOSSIERS.md').write_text('\n'.join(lines)+'\n')
     print(json.dumps({'class_dossiers':len(out),'classes_with_source_candidates':sum(bool(x['source_candidates']) for x in out),'output':'analysis/class_dossiers.json'},indent=2))
 
 if __name__=='__main__': main()

@@ -1,0 +1,20 @@
+[
+  {
+    "class": "BaseObject",
+    "candidate_symbol_contains": "AddRef@BaseObject",
+    "target_va": "0x00405160",
+    "target_size": 8,
+    "confidence": "high",
+    "status": "exact-byte-match",
+    "notes": "8/8 bytes under clang-cl MSVC x86 ABI and VC6 SP3. No relocations."
+  },
+  {
+    "class": "BaseObject",
+    "candidate_symbol_contains": "GetRefCount@BaseObject",
+    "target_va": "0x00401940",
+    "target_size": 4,
+    "confidence": "high",
+    "status": "exact-byte-match",
+    "notes": "4/4 bytes under clang-cl MSVC x86 ABI and VC6 SP3. No relocations."
+  }
+]

@@ -1,114 +1,150 @@
-# Toolchain fingerprint and VC6 import
+# Build and private inputs
 
-## Retail executable evidence
+Use Python 3.10+ and authentic VC6 SP3. Native Windows and x86-64 Linux/wibo
+execution are verified. Linux setup installs the pinned wibo runner. Wine remains
+an alternative on hosts that support 32-bit Linux executables. GNU `objdump` is
+needed for disassembly tools. Clang is optional for bootstrap comparisons; a
+native C++ compiler enables behavior-model tests.
 
-The MCM2 executable contains a Microsoft Rich header. Relevant records include:
+## Private bundle
 
-| Product | Build | Count |
-|---|---:|---:|
-| Utc12_CPP | 8168 | 15 |
-| Utc12_C | 8168 | 153 |
-| Masm613 | 7299 | 36 |
-| Linker600 | 8447 | 2 |
-| **Utc12_CPP** | **8447** | **197** |
-| Cvtres500 | 1735 | 1 |
+Archive, EXE and component hashes are pinned in `config/private_bundle_expected.json`
+and `config/vc6_sp3_expected.json`. Installation checks archive membership, all
+1,463 payload hashes and the EXE, and rejects path traversal/symlinks. The bundle
+contains an installed VC98 tree plus the target EXE, so no full installer is needed.
+The bundle keeps six standard C++ headers under their 8.3 CD names (`XCEPTION`,
+`ALGRITHM`, `FCTIONAL`, `STDXCEPT`, `STREAMBF`, `STRSTREM`). VC6 setup installs
+them as `exception`, `algorithm`, etc., which `<typeinfo.h>` and the STL
+include, so the installer (and `tools/cloud_setup.sh`, for older installs)
+adds byte-identical long-name copies next to the verified files.
 
-The dominant game C++ record is therefore `Utc12_CPP / 8447`, strongly identifying the **Visual C++ 6.0 SP3 toolchain generation**.
+Windows:
 
-Archived Microsoft KB **Q230733**, “Visual Studio 6.0 SP3 Readme: Part 9 - File Versions,” lists these key Visual C++ SP3 files:
+```powershell
+$env:PYTHONPATH = '.'
+$env:MCM2_PRIVATE_ROOT = Join-Path $env:LOCALAPPDATA 'mcm2-private'
+powershell -ExecutionPolicy Bypass -File tools/setup_vc6_windows.ps1 -Archive C:\private\mcm2-vc6sp3-private-inputs.zip
+$env:VC6_ROOT = Join-Path $env:MCM2_PRIVATE_ROOT 'toolchains/vc6sp3'
+$env:MCM2_EXE = Join-Path $env:MCM2_PRIVATE_ROOT 'work/game/mcm2.exe'
+python tools/analyze.py $env:MCM2_EXE
+python tools/build_class_evidence.py
+python tools/analyze_msvc_artifacts.py
+python tools/find_vtable_writes.py
+python tools/build_function_manifest.py
+python tools/build_class_dossiers.py
+python tools/build_work_queue.py
+python tools/vc6_gate.py --exe $env:MCM2_EXE --vc6-root $env:VC6_ROOT
+```
 
-- `c1.dll` -> `12.0.8472.0`
-- `c1xx.dll` -> `12.0.8472.0`
-- `c2.dll` -> `12.0.8447.0`
-- `cvtres.exe` -> `5.0.1736.1`
-
-MCM2's own Rich header independently records linker build `8447`. The `cl.exe` driver/banner alone is not a reliable SP-level discriminator, so the bootstrap fingerprints the component files and then uses emitted-code matching as the final authority.
-
-Historical reference: https://helparchive.huntertur.net/document/104797
-
-## Import a privately owned VC6 installation
-
-Microsoft compiler binaries are intentionally **not** included in this repository or Docker image.
-
-If you have a VC6 installation already patched to SP3, copy/archive the `VC98` tree and import it:
+Linux, with `MCM2_PRIVATE_BUNDLE_URL` in the setup environment:
 
 ```bash
-make import-vc6 VC6_SOURCE=/path/to/vc6-or-vc98.zip
+bash tools/setup_vc6_linux.sh
+make vc6-private-gate
 ```
 
-Equivalent direct command:
+For a local archive: `make private-install PRIVATE_BUNDLE=/private/inputs.zip`.
+Linux defaults to `~/.cache/mcm2-private`; use `MCM2_PRIVATE_ROOT` or `--root`
+to select another cache. The wrapper supplies EXE, compiler and Wine paths to
+child processes. Never store signed URLs/tokens in tracked files or logs.
+
+Readiness requires authenticated SP3 components and a real compiler process
+producing nonempty i386 COFF. `--full-gate` additionally propagates byte-gate
+failure. Source mismatch and environment failure are separate; no clang fallback
+is allowed when VC6 acceptance fails.
+
+## Cloud and containers
+
+### Codex Cloud
+
+Create an environment for this GitHub repository on `main`. Use an x86-64 Ubuntu
+worker with Python 3.10+ and root/sudo package-install access. Keep the environment
+private: its prepared filesystem includes the game EXE and Microsoft toolchain.
+
+| Setting | Value |
+|---|---|
+| Install script | `bash tools/cloud_setup.sh --strict` |
+| Start skill instructions | Run `bash tools/cloud_setup.sh --strict --no-apt`, then `python3 tools/with_private_env.py -- make status` from the repository root. |
+| Direct environment variable | `MCM2_PRIVATE_BUNDLE_URL`: the private ZIP download URL |
+| Network | Allow Ubuntu package repositories, PyPI, GitHub release downloads and the ZIP host during installation. |
+
+The current [Codex Cloud interface](https://learn.chatgpt.com/docs/environments/cloud-environments)
+uses **Install script** and **Start skill**. Configure the full signed URL as a
+direct variable (optionally from Personal vault); the downloader must read a real
+URL, not a network-secret placeholder. This value is accessible to environment
+processes. The setup script does not print it or save it in its generated exports.
+Review the setup results and publish the prepared environment. After changing
+installed dependencies, edit and republish it for new tasks.
+
+If your interface instead shows the [legacy setup/maintenance fields](https://learn.chatgpt.com/docs/environments/cloud-environment),
+put `bash tools/cloud_setup.sh --strict` in **Setup script**,
+`bash tools/cloud_setup.sh --strict --no-apt` in **Maintenance script**, and the
+URL in a **Secret** named `MCM2_PRIVATE_BUNDLE_URL`. A cached startup uses installed
+inputs without requiring the download secret again.
+
+Setup installs x86-64 wibo, Clang, GNU disassembly/build tools, Capstone and a native
+C++ compiler; verifies and installs the pinned private bundle; runs a real VC6
+readiness compile; and generates analysis. `--strict` returns failure when a
+required step fails. Logs are `work/vc6-acceptance.log` and
+`work/cloud-analyze.log`; compiler details are in `work/vc6-acceptance.json`.
+Readiness does not claim every reconstructed function matches. For byte checks:
 
 ```bash
-PYTHONPATH=. python3 tools/import_vc6.py /path/to/source \
-  --out toolchains/vc6sp3
+python3 tools/with_private_env.py -- make vc6-gate
+make static-check test
 ```
 
-The importer accepts an installed Visual Studio directory, a `VC98` directory, or a normal archive containing one. It normalizes the private cache to:
+Setup exports do not carry into a separate task shell. Use the wrapper above,
+or `source work/cloud-env.sh` in each shell before direct `make` commands. The
+default cache is `~/.cache/mcm2-private`; set `MCM2_PRIVATE_ROOT` in environment
+settings if a different persistent location is needed. Startup regenerates
+analysis instead of trusting reports from the previously checked-out revision.
 
-```text
-toolchains/vc6sp3/
-  VC98/
-    Bin/
-      CL.EXE
-      C1.DLL
-      C1XX.DLL
-      C2.DLL
-      LINK.EXE
-      ...
-    Include/
-    Lib/
-  toolchain-fingerprint.json
-```
+The Claude remote-session hook uses the same script in best-effort mode. Its
+completion alone is not readiness; inspect the acceptance report. Linux setup
+through `tools/setup_vc6_linux.sh` delegates to strict mode.
 
-`toolchains/` is ignored by Git and Docker build context.
+### Runner compatibility
 
-A practical workflow, also used by modern MSVC-under-Wine wrapper projects, is to install Visual Studio on a licensed Windows machine/VM and copy the installed compiler tree to Linux rather than fighting the old IDE installer under Wine. See https://github.com/fekir/wine-cl and https://github.com/mstorsjo/msvc-wine for modern examples of the general pattern.
+If an older setup reports `/usr/lib/wine/wine: Exec format error`, update to
+current `main` and reset the environment cache, then rerun the same setup script.
+That failure occurs while launching the 32-bit Linux Wine executable, before
+CL.EXE runs. Setup now uses [wibo 1.2.0](https://github.com/decompals/wibo/releases/tag/1.2.0),
+an x86-64 host runner for the authentic 32-bit Windows compiler. Its download
+hash is pinned in `tools/cloud_setup.sh`. Allow `github.com` and
+`release-assets.githubusercontent.com` if setup networking is restricted.
+`VC6_RUNNER=wine` retains the Wine route on compatible hosts; set it in environment
+settings if needed. No clang fallback is used for VC6 checks.
 
-## Probe and verify
+### Docker
+
+Docker accepts an owned installer and a mounted compiler tree:
 
 ```bash
-export VC6_ROOT=$PWD/toolchains/vc6sp3
-PYTHONPATH=. python3 tools/probe_vc6.py --vc6-root "$VC6_ROOT"
+docker compose build decomp
+VC6_ROOT_HOST=/private/vc6sp3 docker compose run --rm decomp
+VC6_ROOT_HOST=/private/vc6sp3 docker compose run --rm decomp make vc6-gate VC6_ROOT=/toolchains/vc6sp3
 ```
 
-The probe records SHA-256 hashes and embedded version strings for the important compiler components, and executes `cl.exe` through Wine when Wine is available.
+Its default command reads `input/MCM2PCG.exe`; override it for an extracted EXE.
+Workers/caches containing private inputs must remain private.
 
-Initialize a dedicated 32-bit Wine prefix on a Linux host:
+## Existing installations and toolchain identity
 
-```bash
-make wine-init
-export WINEPREFIX=$PWD/work/wine-vc6
-export WINEARCH=win32
-```
+`tools/import_vc6.py /path/to/VC98 --out toolchains/vc6sp3` accepts an installed
+tree or archive. On Linux use `tools/init_wine_prefix.py`; inspect components
+with `tools/probe_vc6.py --vc6-root ...`.
 
-Or use Docker Compose, which already configures a private VC6 mount at `/toolchains/vc6sp3`.
+`python tools/bootstrap.py /path/to/MCM2PCG.exe` extracts game files as data and
+runs analysis. Filename skeletons go to `generated/krusty2-skeletons/`, not `src/`.
+Clang comparisons run only when available.
 
-## One-command historical compiler gate
+Retail Rich records include `Utc12_CPP / 8447 / 197` and `Linker600 / 8447 / 2`.
+The supplied SP3 frontend is build 8472; backend and linker are build 8447.
+The CL driver banner alone is insufficient. On the SP3 disc, the full backend
+is `os/system/msvcep.dll` (original filename C2.DLL); `msse.dll` and `intro.dll`
+are different edition variants.
 
-After bootstrap + VC6 import:
-
-```bash
-make vc6-gate VC6_ROOT=$PWD/toolchains/vc6sp3
-```
-
-That writes `analysis/vc6_gate.json` containing:
-
-1. toolchain hashes/version probe;
-2. all hand-written smoke targets compiled with VC6;
-3. all generated high-confidence easy probes compiled with VC6;
-4. compiler-calibration results including BaseObject special members and `BaseObject::Release`.
-
-The gate fails if either the hand-written smoke corpus or generated high-confidence probe corpus is not exact. Calibration mismatches remain data until the source shape/profile is resolved.
-
-## Flags
-
-Only `/GR` is strongly indicated by the abundant MSVC RTTI. The initial profiles are hypotheses. Larger matching functions should empirically settle:
-
-- `/O2` vs `/O1`;
-- `/G5` vs `/G6`;
-- `/ML` vs `/MT`;
-- `/GX` on/off;
-- `/Gy` function-level linking;
-- inlining and frame-pointer behavior.
-
-Do not select these from convention alone; use byte-match evidence.
+[CRT object matching](VC6_CRT_ATLAS.md) corroborates toolchain family and linked
+runtime. [Function matching](VC6_MATCHING.md) constrains compiler profiles;
+original per-file switches are not established by a matching banner.

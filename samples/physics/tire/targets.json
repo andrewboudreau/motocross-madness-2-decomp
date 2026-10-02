@@ -13,7 +13,7 @@
   "source": "Tire.cpp",
   "candidate_symbol_contains": "??_GTire@@UAEPAXI@Z",
   "target_va": "0x005133a0",
-  "target_size": 48,
+  "target_size": 34,
   "expect": "exact",
   "notes": "scalar deleting destructor; 34 code bytes + 14 padding"
  },
@@ -76,7 +76,7 @@
   "source": "CollisionCharacter.cpp",
   "candidate_symbol_contains": "??_GCollisionCharacter@@UAEPAXI@Z",
   "target_va": "0x00431d20",
-  "target_size": 64,
+  "target_size": 51,
   "expect": "exact",
   "notes": "vbase deleting destructor: lea esi,[ecx-0x268] proves GameObject vbase at 616; 51 code bytes + 13 padding"
  },

@@ -10,6 +10,14 @@ class CoffSection:
 @dataclass
 class CoffSymbol:
     index:int; name:str; value:int; section_number:int; type:int; storage_class:int; aux_count:int
+    function_size:int|None = None
+    codeview_size:int|None = None
+
+    @property
+    def extent_source(self):
+        if self.function_size is not None: return 'coff_function_aux'
+        if self.codeview_size is not None: return 'codeview_proc'
+        return 'symbol_or_section_boundary'
 
 @dataclass
 class CoffRelocation:
@@ -43,7 +51,15 @@ class CoffObject:
             name8=self.data[off:off+8]
             value,secnum,typ,sc,aux=struct.unpack_from('<IhHBB',self.data,off+8)
             name=self._decode_symbol_name(name8)
-            self.symbols.append(CoffSymbol(i,name,value,secnum,typ,sc,aux))
+            function_size = None
+            if i + aux >= self.sym_count:
+                raise CoffError('truncated auxiliary symbol records')
+            # PE/COFF auxiliary format 1: TotalSize excludes section alignment.
+            # VC6 emits this record with /Z7. Do not guess by trimming NOPs or
+            # by borrowing the retail function's requested size.
+            if secnum > 0 and typ == 0x20 and sc == 2 and aux:
+                function_size = struct.unpack_from('<I', self.data, off + 18 + 4)[0]
+            self.symbols.append(CoffSymbol(i,name,value,secnum,typ,sc,aux,function_size))
             i += 1+aux
         self.symbol_by_index={s.index:s for s in self.symbols}
         self.relocations=[]
@@ -52,6 +68,61 @@ class CoffObject:
                 off=sec.reloc_ptr+r*10
                 va,si,typ=struct.unpack_from('<IIH',self.data,off)
                 self.relocations.append(CoffRelocation(sec.index,va,si,typ))
+        self._read_codeview_sizes()
+
+    def _read_codeview_sizes(self):
+        """Read legacy VC6 procedure records, bound by i386 COFF relocations.
+
+        VC6 omits function auxiliary records for generated deleting destructors,
+        but /Z7 still emits S_[GL]PROC32_ST with an independent procedure length.
+        Layout: microsoft/microsoft-pdb include/cvinfo.h, PROCSYM32. No retail
+        bytes, target lengths, debug display names, or padding heuristics enter
+        this association. Other CodeView generations are deliberately ignored.
+        """
+        if self.machine != 0x14c:
+            return
+        sections = [sec for sec in self.sections if sec.name == '.debug$S']
+        signature = struct.pack('<I', 2)  # CV_SIGNATURE_C11
+        if not any(self.data[sec.raw_ptr:sec.raw_ptr+4] == signature for sec in sections):
+            return
+        for sec in sections:
+            raw = self.data[sec.raw_ptr:sec.raw_ptr+sec.raw_size]
+            if len(raw) != sec.raw_size:
+                raise CoffError('truncated CodeView section')
+            pos = 4 if raw.startswith(signature) else 0
+            rels = [r for r in self.relocations if r.section_number == sec.index]
+            while pos < len(raw):
+                if pos + 4 > len(raw):
+                    raise CoffError('truncated CodeView record header')
+                length, kind = struct.unpack_from('<HH', raw, pos)
+                end = pos + 2 + length
+                if length < 2 or end > len(raw):
+                    raise CoffError('invalid CodeView record length')
+                if kind in (0x100a, 0x100b):  # S_LPROC32_ST, S_GPROC32_ST
+                    if length < 38 or pos + 40 + raw[pos+39] > end:
+                        raise CoffError('truncated CodeView procedure record')
+                    offsets = [r for r in rels if r.virtual_address == pos+32]
+                    segments = [r for r in rels if r.virtual_address == pos+36]
+                    if (len(offsets) == len(segments) == 1 and
+                            offsets[0].type == 0x000b and segments[0].type == 0x000a and
+                            offsets[0].symbol_index == segments[0].symbol_index and
+                            raw[pos+32:pos+38] == b'\0' * 6):
+                        ref = self.symbol_by_index.get(offsets[0].symbol_index)
+                        if ref is None:
+                            raise CoffError('CodeView references missing/auxiliary symbol')
+                        # VC6 may reference an undefined duplicate of the defined
+                        # function symbol. Require a unique exact COFF name.
+                        matches = [s for s in self.symbols if s.name == ref.name and
+                                   s.section_number > 0 and s.type == 0x20]
+                        if len(matches) != 1:
+                            raise CoffError('ambiguous or missing CodeView function definition')
+                        sym = matches[0]
+                        size = struct.unpack_from('<I', raw, pos+16)[0]
+                        if ((sym.function_size is not None and sym.function_size != size) or
+                                (sym.codeview_size is not None and sym.codeview_size != size)):
+                            raise CoffError(f'conflicting function lengths for {sym.name}')
+                        sym.codeview_size = size
+                pos = end
 
     def _str(self,offset:int)->str:
         pos=self._str_off+offset
@@ -82,6 +153,12 @@ class CoffObject:
         sec=self.section(s.section_number)
         starts=sorted({x.value for x in self.symbols if x.section_number==s.section_number and x.value>s.value and x.storage_class in (2,3,105)})
         end=starts[0] if starts else sec.raw_size
+        size = s.function_size if s.function_size is not None else s.codeview_size
+        if size is not None:
+            declared_end = s.value + size
+            if size <= 0 or declared_end > min(end, sec.raw_size):
+                raise CoffError(f'invalid function size for {s.name}: {size}')
+            end = declared_end
         if end<s.value: raise CoffError('bad symbol extent')
         raw=self.data[sec.raw_ptr+s.value:sec.raw_ptr+end]
         rel=[r for r in self.relocations if r.section_number==sec.index and s.value<=r.virtual_address<end]

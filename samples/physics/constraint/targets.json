@@ -58,9 +58,9 @@
     "source": "ConstraintMethodCollisionModel.cpp",
     "candidate_symbol_contains": "??_GConstraintMethodCollisionModel",
     "target_va": "0x43b950",
-    "target_size": 48,
+    "target_size": 34,
     "expect": "exact",
-    "notes": "scalar deleting destructor. Compiler-generated ??_G has no /Z7 function size record, so the extent is the COFF section including alignment padding; retail next function is 0x43b980, so the 48-byte extent (34 code + 14 padding) is compared and matches byte-for-byte."
+    "notes": "scalar deleting destructor. Extent is the CodeView function size; the alignment padding after it is not compared; retail next function is 0x43b980, so the 48-byte extent (34 code + 14 padding) is compared and matches byte-for-byte."
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -139,16 +139,16 @@
     "source": "ConstraintMethodCollisionModel.cpp",
     "candidate_symbol_contains": "_$E2",
     "target_va": "0x0043c8e0",
-    "target_size": 16,
+    "target_size": 5,
     "expect": "exact",
-    "notes": "Dynamic-initializer thunk for the TU zero vector 0x579830 (jmp to the body plus nop padding, which VC6 also emits)."
+    "notes": "Dynamic-initializer thunk for the TU zero vector 0x579830 (a 5-byte jmp to the body; target_size is the CodeView extent, without the alignment padding)."
   },
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
     "candidate_symbol_contains": "_$E1",
     "target_va": "0x0043c8f0",
-    "target_size": 64,
+    "target_size": 60,
     "expect": "exact",
     "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary, then copies it to 0x579830. Exact with copy-initialization `static const ConZeroVec g_ConZero = ConZeroVec(0,0,0);`; direct initialization gives three direct stores instead."
   }

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import hashlib,json,sys
+import hashlib,json,os,sys
 from pathlib import Path
 
 EXPECTED_SHA='31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874'
@@ -17,7 +17,7 @@ def main():
     checks=[]
     def ok(msg): checks.append(msg)
 
-    exe=Path('work/game/mcm2.exe')
+    exe=Path(os.environ.get('MCM2_EXE', 'work/game/mcm2.exe'))
     check(exe.exists(),'work/game/mcm2.exe missing; run make bootstrap INSTALLER=/path/to/MCM2PCG.exe')
     sha=hashlib.sha256(exe.read_bytes()).hexdigest()
     check(sha==EXPECTED_SHA,f'unexpected mcm2.exe SHA-256: {sha}')
@@ -32,7 +32,7 @@ def main():
     th=load('analysis/vtable_thunks.json'); check(len(th)==28,'expected 28 this-adjustor thunks'); ok('28 this-adjustor thunks')
     vw=load('analysis/vtable_write_xrefs.json'); check(len(vw)==492,'expected 492 vtable-write sites'); ok('492 vtable-write sites')
     easy=load('analysis/easy_targets.json'); check(len(easy)>=57,f'expected at least 57 easy targets, got {len(easy)}'); ok(f'{len(easy)} easy targets classified')
-    layout=load('analysis/class_layout_hints.json'); check(len(layout)>=14,'expected layout evidence for at least 14 classes'); check(sum(len(x.get('fields',[])) for x in layout)>=39,'expected at least 39 direct field offsets'); ok('class layout evidence meets v0.6 floor')
+    layout=load('analysis/class_layout_hints.json'); check(len(layout)>=14,'expected layout evidence for at least 14 classes'); check(sum(len(x.get('fields',[])) for x in layout)>=39,'expected at least 39 direct field offsets'); ok('class layout evidence meets the known-input floor')
     dossiers=load('analysis/class_dossiers.json'); check(len(dossiers)==249,'expected a dossier for each logical RTTI class'); ok('249 class dossiers generated')
     funcs=load('analysis/function_manifest.json'); check(len(funcs)>=56,'expected at least 56 function queue records'); ok(f'{len(funcs)} function manifest records')
     queue=load('analysis/work_queue.json'); check(len(queue.get('validated',[]))>=35,'expected at least 35 validated targets'); ok(f"{len(queue.get('validated',[]))} validated targets / {len(queue.get('next',[]))} next targets")

@@ -203,7 +203,7 @@ class AtlasTests(unittest.TestCase):
     def test_json_and_packet_output_deterministic(self):
         r=self.run_atlas(); a=Path(self.temp.name)/'a'; b=Path(self.temp.name)/'b'
         write_snapshot(r,a);write_snapshot(self.run_atlas(),b)
-        names=[str(p.relative_to(a)) for p in a.rglob('*') if p.is_file()]
+        names=[p.relative_to(a).as_posix() for p in a.rglob('*') if p.is_file()]
         self.assertIn('packets/00_Terrain.json',names)
         self.assertTrue(all((a/n).read_bytes()==(b/n).read_bytes() for n in names))
         self.assertEqual(json.loads((a/'work_queue.json').read_text())[0]['owner_assignment'],None)

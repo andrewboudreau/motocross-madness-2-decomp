@@ -18,15 +18,11 @@ toolchains/
 *.iso
 *.msi
 *.lib
-*.pdb
-*.idb
-*.ilk
 *.zip
 *.7z
 *.rar
 
-# Reproducible provenance snapshots are generated from private local inputs.
-analysis/provenance/
-analysis/allocation/
-analysis/categories/
-analysis/category_contexts/
+# Reproducible outputs and local agent settings
+/analysis/
+/generated/
+.claude/settings.local.json

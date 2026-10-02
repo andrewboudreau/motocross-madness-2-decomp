@@ -111,7 +111,7 @@ def parse_rtti(pe: PEImage) -> list[RTTIClass]:
 
     # A single RTTI type can have several CompleteObjectLocators when the class
     # participates in multiple inheritance. The COL offset is the byte offset of
-    # the polymorphic base subobject. v0.3 collapsed these; retain all of them.
+    # the polymorphic base subobject. Retain every subobject record.
     col_by_type: dict[int,list[tuple[int,int,int,int,int]]] = {}
     for sec in pe.sections:
         if sec.raw_size < 20: continue

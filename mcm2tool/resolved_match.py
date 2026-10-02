@@ -60,6 +60,19 @@ def compare_bytes(retail: bytes, candidate: bytes) -> dict:
                            if i >= len(retail) or i >= len(candidate) or retail[i] != candidate[i]][:64]}
 
 
+def _source_path_literal(obj: CoffObject, record) -> str | None:
+    """Lower-cased basename of an absolute source-path literal, else None."""
+    if record.section_number <= 0:
+        return None
+    section = obj.section(record.section_number)
+    data = obj.data[section.raw_ptr + record.value:section.raw_ptr + section.raw_size]
+    text = data.split(b'\0', 1)[0].decode('latin-1').lower()
+    if (len(text) > 3 and text[1:3] in (':\\', ':/')
+            and text.endswith(('.cpp', '.c', '.h'))):
+        return text.replace('/', '\\').rsplit('\\', 1)[-1]
+    return None
+
+
 def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bindings: dict[str, int]) -> dict:
     if obj.machine != 0x14c:
         raise RelocationError('only i386 COFF supported')
@@ -68,13 +81,50 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
     section = obj.section(sym.section_number)
     if sym.value < 0 or sym.value + len(raw) > section.raw_size or section.raw_ptr + section.raw_size > len(obj.data):
         raise RelocationError('truncated COFF function storage')
+    # No target-sized trimming: symbol_extent owns the candidate boundary.
+    padding = 0
     converted = []
+    # Labels inside this function's own extent (e.g. switch jump-table targets)
+    # have a fixed address: the function's retail VA plus the label offset. They
+    # are resolved here instead of requiring hand-written bindings; anything
+    # outside the extent must still be bound explicitly.
+    internal: dict[str, int] = {}
     for rel in rels:
         record = obj.symbol_by_index.get(rel.symbol_index)
         if record is None:
             raise RelocationError('relocation references missing/auxiliary symbol')
-        converted.append({'offset': rel.virtual_address - sym.value, 'type': rel.type, 'symbol': record.name})
-    patched, audit = apply_relocations(raw, converted, bindings, target_va)
+        if (record.section_number == sym.section_number
+                and sym.value <= record.value < sym.value + len(raw)):
+            address = target_va + (record.value - sym.value)
+            if internal.get(record.name, address) != address:
+                raise RelocationError(f'ambiguous internal symbol: {record.name}')
+            if record.name in bindings and bindings[record.name] != address:
+                raise RelocationError(f'binding contradicts internal label: {record.name}')
+            internal[record.name] = address
+        offset = rel.virtual_address - sym.value
+        name = record.name
+        # /GX frame prologue `push -1; push offset handler`: the handler stub is
+        # a compiler label in .text$x whose number shifts with unrelated edits,
+        # so it is bound under the stable key '<function symbol>$ehhandler'.
+        if (offset == 3 and raw[:3] == b'\x6a\xff\x68' and record.storage_class == 6
+                and obj.section(record.section_number).name.startswith('.text$x')):
+            name = f'{sym.name}$ehhandler'
+        # __except_list is the CRT's absolute symbol for the fs:[0] SEH chain head.
+        if name == '__except_list' and rel.type == 0x0006 and record.section_number in (0, -1):
+            internal[name] = 0
+        # A __FILE__ literal embeds the build path, so its pooled ??_C@ name is not
+        # stable. It is bound as '__FILE__:<basename>' (a .cpp and a header can
+        # both appear in one object), falling back to plain '__FILE__'.
+        elif name.startswith('??_C@') and _source_path_literal(obj, record):
+            name = f'__FILE__:{_source_path_literal(obj, record)}'
+            if name not in bindings and '__FILE__' in bindings:
+                name = '__FILE__'
+        converted.append({'offset': offset, 'type': rel.type, 'symbol': name})
+    patched, audit = apply_relocations(raw, converted, {**bindings, **internal}, target_va)
+    for row in audit:
+        row['internal_label'] = row['symbol'] in internal
     return {**compare_bytes(retail, patched), 'symbol': sym.name,
+            'extent_source': sym.extent_source,
             'target_va': f'0x{target_va:08x}', 'relocations_applied': audit,
+            'alignment_padding_bytes': padding,
             'bindings_are_identity_proof': False}

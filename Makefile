@@ -1,11 +1,12 @@
 PYTHON ?= python3
 INSTALLER ?= MCM2PCG.exe
-EXE ?= work/game/mcm2.exe
+EXE ?= $(if $(MCM2_EXE),$(MCM2_EXE),work/game/mcm2.exe)
 VC6_ROOT ?=
-PRIVATE_ROOT ?= $(HOME)/.cache/mcm2-private
+SKELETON_ROOT ?= generated/krusty2-skeletons
+PRIVATE_ROOT ?= $(if $(MCM2_PRIVATE_ROOT),$(MCM2_PRIVATE_ROOT),$(HOME)/.cache/mcm2-private)
 PRIVATE_BUNDLE ?=
 
-.PHONY: bootstrap extract analyze class-evidence msvc-artifacts ensure-work smoke smoke-vc6 easy-smoke easy-smoke-vc6 calibration calibration-vc6 status easy manifest work-queue selftest static-check wine-init import-vc6 probe-vc6 vc6-gate clean-work
+.PHONY: bootstrap extract analyze class-evidence msvc-artifacts ensure-work smoke smoke-vc6 easy-smoke easy-smoke-vc6 calibration calibration-vc6 status easy manifest work-queue selftest static-check test wine-init import-vc6 probe-vc6 vc6-gate
 
 bootstrap:
 	PYTHONPATH=. $(PYTHON) tools/bootstrap.py "$(INSTALLER)"
@@ -14,10 +15,10 @@ extract:
 	PYTHONPATH=. $(PYTHON) tools/extract_installer.py "$(INSTALLER)"
 
 analyze: ensure-work
-	PYTHONPATH=. $(PYTHON) tools/analyze.py "$(EXE)" --out analysis --skeleton-root src/krusty2
+	PYTHONPATH=. $(PYTHON) tools/analyze.py "$(EXE)" --out analysis --skeleton-root "$(SKELETON_ROOT)"
 	PYTHONPATH=. $(PYTHON) tools/build_class_evidence.py
-	PYTHONPATH=. $(PYTHON) tools/analyze_msvc_artifacts.py
-	PYTHONPATH=. $(PYTHON) tools/find_vtable_writes.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/analyze_msvc_artifacts.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/find_vtable_writes.py
 	PYTHONPATH=. $(PYTHON) tools/build_function_manifest.py
 	PYTHONPATH=. $(PYTHON) tools/build_class_dossiers.py
 	PYTHONPATH=. $(PYTHON) tools/build_work_queue.py
@@ -27,8 +28,8 @@ class-evidence: ensure-work
 	PYTHONPATH=. $(PYTHON) tools/build_class_dossiers.py
 
 msvc-artifacts: ensure-work
-	PYTHONPATH=. $(PYTHON) tools/analyze_msvc_artifacts.py
-	PYTHONPATH=. $(PYTHON) tools/find_vtable_writes.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/analyze_msvc_artifacts.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/find_vtable_writes.py
 	PYTHONPATH=. $(PYTHON) tools/build_class_dossiers.py
 
 ensure-work:
@@ -70,7 +71,7 @@ work-queue:
 	PYTHONPATH=. $(PYTHON) tools/build_work_queue.py
 
 selftest: ensure-work
-	PYTHONPATH=. $(PYTHON) tools/selftest.py
+	MCM2_EXE="$(EXE)" PYTHONPATH=. $(PYTHON) tools/selftest.py
 
 wine-init:
 	PYTHONPATH=. $(PYTHON) tools/init_wine_prefix.py
@@ -87,11 +88,11 @@ vc6-gate: ensure-work
 	@test -n "$(VC6_ROOT)" || (echo 'VC6_ROOT is required' && exit 2)
 	PYTHONPATH=. $(PYTHON) tools/vc6_gate.py --vc6-root "$(VC6_ROOT)" --exe "$(EXE)"
 
-clean-work:
-	rm -rf work
-
 static-check:
 	PYTHONPATH=. $(PYTHON) tools/static_check.py
+
+test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -v
 
 .PHONY: provenance provenance-test
 provenance: ensure-work
@@ -140,3 +141,37 @@ vc6-private-gate:
 
 private-bundle-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_private_bundle.py' -v
+
+.PHONY: vc6-crt-atlas vc6-crt-atlas-test
+vc6-crt-atlas:
+	$(PYTHON) tools/with_private_env.py --root "$(PRIVATE_ROOT)" -- $(PYTHON) tools/build_vc6_crt_atlas.py
+
+vc6-crt-atlas-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_crt_atlas.py' -v
+
+.PHONY: vc6-profile-matrix vc6-profile-matrix-test
+vc6-profile-matrix:
+	$(PYTHON) tools/with_private_env.py --root "$(PRIVATE_ROOT)" -- $(PYTHON) tools/vc6_profile_matrix.py
+
+vc6-profile-matrix-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_vc6_profile_matrix.py' -v
+
+.PHONY: category-pilots category-pilots-probe category-pilots-test
+category-pilots: ensure-work
+	$(PYTHON) tools/review_category_pilots.py --exe "$(EXE)"
+
+category-pilots-probe: ensure-work
+	$(PYTHON) tools/review_category_pilots.py --exe "$(EXE)" --compile-probe
+
+category-pilots-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_category_pilots.py' -v
+
+.PHONY: ecosystem ecosystem-probes ecosystem-test
+ecosystem: ensure-work
+	$(PYTHON) tools/review_ecosystem.py --exe "$(EXE)"
+
+ecosystem-probes: ensure-work
+	$(PYTHON) tools/review_ecosystem.py --exe "$(EXE)" --compile-probes
+
+ecosystem-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_ecosystem.py' -v

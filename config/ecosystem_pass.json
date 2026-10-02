@@ -1,0 +1,334 @@
+{
+  "schema_version": 1,
+  "input_sha256": "31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874",
+  "target": {
+    "va": "0x0045aad0",
+    "size": 771,
+    "sha256": "137cc95f31ad02e221cc897d880d1f59b1807449092d01aaffd7e4a144b3030f",
+    "class": "EcoSystem",
+    "vtable": "0x00552508",
+    "slot": 12,
+    "source": "samples/ecosystem/EcoSystemProbe.cpp",
+    "symbol": "?RunCandidate@EcoSystemProbe@@QAEHXZ"
+  },
+  "blocks": [
+    {
+      "id": "E00",
+      "va": "0x0045aad0",
+      "end": "0x0045ab17",
+      "label": "gates_category_and_timer",
+      "sha256": "655bc8749da1fffd462e4416457d2da406af0a455365302cc3017094d8507b10"
+    },
+    {
+      "id": "E01",
+      "va": "0x0045ab17",
+      "end": "0x0045ab50",
+      "label": "age_budget_and_tick",
+      "sha256": "7328ab59e9e9ee701d4488fe1bf582842a05a4eef7c405011727227c5f375ac2"
+    },
+    {
+      "id": "E02",
+      "va": "0x0045ab50",
+      "end": "0x0045abaf",
+      "label": "frame_scales_and_reset",
+      "sha256": "1cd9019d52a53681684f163b98df5be2c62212474d41282f6a6194d902749a6d"
+    },
+    {
+      "id": "E03",
+      "va": "0x0045abaf",
+      "end": "0x0045ac10",
+      "label": "iterate_filter_evaluate",
+      "sha256": "919dfd2e63cd1ab5e9a31cee0dbd4df948f11fcc4f65b7aa2dea62dc4671d7a1"
+    },
+    {
+      "id": "E04",
+      "va": "0x0045ac10",
+      "end": "0x0045ac41",
+      "label": "metric_bound_and_lift",
+      "sha256": "56d18d147fb1ca501a77cb80af9dad92bf2515a7bb6407411142c282497bb7c3"
+    },
+    {
+      "id": "E05",
+      "va": "0x0045ac41",
+      "end": "0x0045acbf",
+      "label": "coordinate_geometry_test",
+      "sha256": "7f9cad99a142da6bf5bb9d9ee5597d8e8f377e23c82871e8264a04b02bba3d60"
+    },
+    {
+      "id": "E06",
+      "va": "0x0045acbf",
+      "end": "0x0045acd7",
+      "label": "apply_and_state_test",
+      "sha256": "fc1a87ea0881dbb9a68bf706ccd4251135fe5a3f45405fabae83a8e7cc016c3d"
+    },
+    {
+      "id": "E07",
+      "va": "0x0045acd7",
+      "end": "0x0045ad2c",
+      "label": "work_list_a",
+      "sha256": "d0c5a64f32b4a51ffe9b8e1fea7d9e35ab1cdff8052da88c14421b7d4377d9d2"
+    },
+    {
+      "id": "E08",
+      "va": "0x0045ad2c",
+      "end": "0x0045ad91",
+      "label": "work_list_b",
+      "sha256": "dad15a96d1a0df0196a47985ad72ca7b51664400f386d3f5332966596d2578d9"
+    },
+    {
+      "id": "E09",
+      "va": "0x0045ad91",
+      "end": "0x0045add3",
+      "label": "advance_timer_and_restore",
+      "sha256": "a5dc148b5e65a90986da758e6b740e72ceb1cbc5448ed42ea0850133c4ba940d"
+    }
+  ],
+  "expected_calls": [
+    {
+      "site": "0x0045aaf4",
+      "target": "0x004a2d00"
+    },
+    {
+      "site": "0x0045aafd",
+      "target": "0x004bfa80"
+    },
+    {
+      "site": "0x0045ab26",
+      "target": "0x00401130"
+    },
+    {
+      "site": "0x0045ab40",
+      "target": "0x004011b0"
+    },
+    {
+      "site": "0x0045ab4b",
+      "target": "0x00401040"
+    },
+    {
+      "site": "0x0045abaa",
+      "target": "0x004dd750"
+    },
+    {
+      "site": "0x0045abb5",
+      "target": "0x004dd600"
+    },
+    {
+      "site": "0x0045abf6",
+      "target": "0x00456890"
+    },
+    {
+      "site": "0x0045ac16",
+      "target": "0x00455ff0"
+    },
+    {
+      "site": "0x0045ac25",
+      "target": "0x00455f90"
+    },
+    {
+      "site": "0x0045acb2",
+      "target": "0x0052fbb0"
+    },
+    {
+      "site": "0x0045accb",
+      "target": "0x00456a10"
+    },
+    {
+      "site": "0x0045acfd",
+      "target": "0x004a2ec0"
+    },
+    {
+      "site": "0x0045ad62",
+      "target": "0x004a2ec0"
+    },
+    {
+      "site": "0x0045ad97",
+      "target": "0x004dd600"
+    },
+    {
+      "site": "0x0045ada8",
+      "target": "0x004bfa80"
+    },
+    {
+      "site": "0x0045adc3",
+      "target": "0x004a2d90"
+    }
+  ],
+  "bindings": [
+    {
+      "symbol": "?Select@LedgerProbe@@QAEHPBD@Z",
+      "va": "0x004a2d00",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "_eco_sample_time",
+      "va": "0x004bfa80",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Totals@EpochProbe@@QAEIPAH@Z",
+      "va": "0x00401130",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Trim@EpochProbe@@QAEXI@Z",
+      "va": "0x004011b0",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Advance@EpochProbe@@QAEXXZ",
+      "va": "0x00401040",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Reset@IteratorProbe@@QAEXXZ",
+      "va": "0x004dd750",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Next@IteratorProbe@@QAEPAURecordPrefix@mcm2_eco@@XZ",
+      "va": "0x004dd600",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Evaluate@RecordPrefix@mcm2_eco@@QAEXPAH0@Z",
+      "va": "0x00456890",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Metric15@DefinitionPrefix@mcm2_eco@@QAEME@Z",
+      "va": "0x00455ff0",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Metric14@DefinitionPrefix@mcm2_eco@@QAEME@Z",
+      "va": "0x00455f90",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Test@GeometryProbe@@QAEHPAUFramePrefix@mcm2_eco@@PAXPAUPosition@3@MH@Z",
+      "va": "0x0052fbb0",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Apply@RecordPrefix@mcm2_eco@@QAEXHH@Z",
+      "va": "0x00456a10",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "_eco_reallocate",
+      "va": "0x004a2ec0",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "?Restore@LedgerProbe@@QAEXH@Z",
+      "va": "0x004a2d90",
+      "kind": "direct_call"
+    },
+    {
+      "symbol": "_eco_enabled",
+      "va": "0x0056a12c",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_ledger",
+      "va": "0x0056df04",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_category",
+      "va": "0x0056a410",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_published_frame",
+      "va": "0x0059af00",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_constant_65535",
+      "va": "0x00551090",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_constant_inverse",
+      "va": "0x00551094",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_iterator",
+      "va": "0x0068aba4",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_constant_half",
+      "va": "0x00550d18",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_global_instance",
+      "va": "0x0059aebc",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_geometry",
+      "va": "0x00575a98",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_source_path",
+      "va": "0x0056a130",
+      "kind": "address_reference"
+    },
+    {
+      "symbol": "_eco_elapsed",
+      "va": "0x0059aee8",
+      "kind": "address_reference"
+    }
+  ],
+  "literals": [
+    {
+      "va": "0x0056a410",
+      "value": "EcoSystem"
+    },
+    {
+      "va": "0x0056a130",
+      "value": "D:\\aardvark\\VC\\krusty2\\EcoSystem.cpp"
+    }
+  ],
+  "constants": [
+    {
+      "va": "0x00551090",
+      "format": "f",
+      "hex": "00ff7f47"
+    },
+    {
+      "va": "0x00551094",
+      "format": "f",
+      "hex": "80008037"
+    },
+    {
+      "va": "0x00550d18",
+      "format": "d",
+      "hex": "000000000000e03f"
+    }
+  ],
+  "helper": {
+    "va": "0x00401040",
+    "size": 3,
+    "sha256": "d9c16bab017a765a337c2e10b62c1a59dee9d7ba9276ce832b2b5e7772d39de9",
+    "source": "samples/ecosystem/EpochProbe.cpp",
+    "symbol": "?Advance@EpochProbe@@QAEXXZ"
+  },
+  "compile_flags": [
+    "--target=i686-pc-windows-msvc",
+    "/nologo",
+    "/c",
+    "/O2",
+    "/GR",
+    "/EHsc",
+    "/GS-",
+    "/arch:IA32"
+  ],
+  "numeric_equivalence_proven": false,
+  "original_symbol_names_recovered": false
+}

@@ -1,0 +1,674 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "PCGame.h"
+
+#include "Camera.h"
+#include "DebugAlloc.h"
+#include "ControlInterface.h"
+#include "UnknownObject56e26c.h"
+
+// USER32, KERNEL32, OLE32 and WINMM imports.
+extern "C" __declspec(dllimport) long __stdcall CoInitialize(void* reserved);
+extern "C" __declspec(dllimport) void __stdcall CoUninitialize();
+extern "C" __declspec(dllimport) int __stdcall GetVersionExA(UnknownOSVersionInfo* info);
+extern "C" __declspec(dllimport) unsigned int __stdcall timeBeginPeriod(unsigned int period);
+extern "C" __declspec(dllimport) unsigned int __stdcall timeEndPeriod(unsigned int period);
+extern "C" __declspec(dllimport) unsigned long __stdcall timeGetTime();
+extern "C" __declspec(dllimport) unsigned long __stdcall GetCurrentDirectoryA(unsigned long size,
+                                                                            char* buffer);
+extern "C" __declspec(dllimport) void* __stdcall LoadLibraryA(const char* name);
+extern "C" __declspec(dllimport) int __stdcall ShowCursor(int show);
+extern "C" __declspec(dllimport) void* __stdcall GetActiveWindow();
+extern "C" __declspec(dllimport) int __stdcall GetWindowRect(void* window, UnknownRect* rect);
+
+extern "C" __declspec(dllimport) long __stdcall RegOpenKeyExA(void* key, const char* subKey,
+                                                             unsigned long options,
+                                                             unsigned long access, void** result);
+extern "C" __declspec(dllimport) long __stdcall RegQueryValueExA(void* key, const char* name,
+                                                                unsigned long* reserved,
+                                                                unsigned long* type,
+                                                                unsigned char* data,
+                                                                unsigned long* size);
+extern "C" __declspec(dllimport) long __stdcall RegCloseKey(void* key);
+extern "C" __declspec(dllimport) long __stdcall RegDeleteKeyA(void* key, const char* subKey);
+extern "C" __declspec(dllimport) long __stdcall RegEnumKeyA(void* key, unsigned long index,
+                                                           char* name, unsigned long size);
+extern "C" __declspec(dllimport) long __stdcall RegQueryInfoKeyA(
+    void* key, char* className, unsigned long* classSize, unsigned long* reserved,
+    unsigned long* subKeys, unsigned long* maxSubKeyLength, unsigned long* maxClassLength,
+    unsigned long* values, unsigned long* maxValueNameLength, unsigned long* maxValueLength,
+    unsigned long* securityDescriptorSize, void* lastWriteTime);
+extern "C" __declspec(dllimport) long __stdcall RegCreateKeyExA(void* key, const char* subKey,
+                                                               unsigned long reserved,
+                                                               const char* className,
+                                                               unsigned long options,
+                                                               unsigned long access,
+                                                               void* security, void** result,
+                                                               unsigned long* disposition);
+extern "C" __declspec(dllimport) long __stdcall RegSetValueExA(void* key, const char* name,
+                                                              unsigned long reserved,
+                                                              unsigned long type,
+                                                              const unsigned char* data,
+                                                              unsigned long size);
+
+#define UNKNOWN_HKEY_LOCAL_MACHINE ((void*)0x80000002)
+#define UNKNOWN_KEY_READ 0x20019
+#define UNKNOWN_KEY_ALL_ACCESS 0xf003f
+#define UNKNOWN_REG_SZ 1
+#define UNKNOWN_REG_BINARY 3
+#define UNKNOWN_REG_DWORD 4
+
+// IMM32, called through the linker's import thunks.
+extern "C" void* __stdcall ImmCreateContext();
+extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
+
+// 0x00689940: a FILTERKEYS-sized structure (24 bytes) cleared by the
+// constructor.
+struct UnknownFilterKeys {
+    unsigned int size;
+    unsigned int flags;
+    unsigned int waitMSec;
+    unsigned int delayMSec;
+    unsigned int repeatMSec;
+    unsigned int bounceMSec;
+};
+UnknownFilterKeys g_UnknownFilterKeys689940;
+
+// 0x004bfa80: the current time in milliseconds, read at 1 ms timer
+// resolution. It sits just before PCGame's constructor; its TU is inferred
+// from that position only.
+unsigned int UnknownFunction4bfa80() {
+    timeBeginPeriod(1);
+    unsigned int time = timeGetTime();
+    timeEndPeriod(1);
+    return time;
+}
+
+// 0x004bfaa0
+PCGame::PCGame() {
+    field_0x318 = 0;
+    field_0x31c = 0;
+    CoInitialize(0);
+    field_0x548_bit0 = 0;
+    field_0x424.size = sizeof(field_0x424);
+    GetVersionExA(&field_0x424);
+    timeBeginPeriod(1);
+    timeEndPeriod(1);
+    strcpy(field_0x320, "Rainbow Studios");
+    strcpy(field_0x3a0, "Rainbow Demo");
+    strcpy(field_0x4b8, "SOFTWARE\\Rainbow Studios\\Demo");
+    GetCurrentDirectoryA(0x104, field_0x1cc);
+    field_0x420 = 0;
+    field_0x538 = LoadLibraryA("IMM32.DLL");
+    field_0x53c = ImmCreateContext();
+    if (field_0x53c) {
+        field_0x540 = ImmAssociateContext(field_0x31c, field_0x53c);
+    } else {
+        field_0x540 = 0;
+        field_0x53c = 0;
+        field_0x538 = 0;
+    }
+    memset(&g_UnknownFilterKeys689940, 0, sizeof(g_UnknownFilterKeys689940));
+    g_UnknownFilterKeys689940.size = sizeof(g_UnknownFilterKeys689940);
+}
+
+// 0x004bfc20
+PCGame::~PCGame() {
+    CoUninitialize();
+}
+
+// 0x004bfc40
+int PCGame::UnknownVirtualSlot2() {
+    return Game::UnknownVirtualSlot2();
+}
+
+// 0x004c0230
+int PCGame::UnknownVirtualSlot15() {
+    int result = Game::UnknownVirtualSlot15();
+    ShowCursor(1);
+    return result;
+}
+
+// 0x004c0250: while the window is active, hides the cursor (full screen),
+// restores lost surfaces and runs the root object's slot 18.
+int PCGame::UnknownVirtualSlot5() {
+    if (field_0x0c && GetActiveWindow() == field_0x31c) {
+        if (field_0x2d4_bit1)
+            while (ShowCursor(0) >= 0)
+                ;
+        if ((field_0x0c && field_0x0c->field_0x19c &&
+             field_0x0c->field_0x19c->UnknownMethod24() &&
+             field_0x0c->field_0x19c->UnknownMethod27()) ||
+            (field_0x2d5_bit3 && field_0x10 && PCTarget()->field_0x4c &&
+             PCTarget()->field_0x4c->UnknownMethod24() &&
+             PCTarget()->field_0x4c->UnknownMethod27()))
+            return 0;
+        if (field_0x2f4)
+            field_0x2f4->UnknownVirtualSlot18();
+    }
+    return 1;
+}
+
+// 0x004c0310
+int PCGame::UnknownVirtualSlot6() {
+    if (field_0x2f4)
+        field_0x2f4->UnknownVirtualSlot17();
+    if (field_0x2d4_bit1)
+        ShowCursor(1);
+    return 1;
+}
+
+// 0x004c0340
+int PCGame::UnknownVirtualSlot35(int value) {
+    if (field_0x2d5_bit0)
+        return 1;
+    return field_0x2f4->UnknownVirtualSlot20(value);
+}
+
+// 0x004c0370
+int PCGame::UnknownVirtualSlot36(int value) {
+    if (field_0x2d5_bit0)
+        return 1;
+    return field_0x2f4->UnknownVirtualSlot21(value);
+}
+
+// 0x004c03a0: control 0xb7 released (kind 0) triggers the +0x10 object.
+int PCGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (Game::UnknownVirtualSlot13(event, entry))
+        return 1;
+    if (event->kind == 0 && event->control == 0xb7) {
+        if (field_0x10 && !field_0x10->field_0x08)
+            PCTarget()->UnknownFunction4c5d00();
+        return 1;
+    }
+    return 0;
+}
+
+// 0x004c0400: with the debug bit, control 0x41 toggles the +0x10 object's
+// +0x250 between 2 and 3.
+int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (Game::UnknownVirtualSlot14(event, entry))
+        return 1;
+    if (field_0x2d4_bit2 && UnknownFunction43caa0(0x41, 0, event, 3)) {
+        PCTarget()->field_0x250 = PCTarget()->field_0x250 == 3 ? 2 : 3;
+        return 1;
+    }
+    return 0;
+}
+
+// 0x004c04a0: switches to display mode `mode` (full screen) or back to
+// 640x480 (windowed), recreating the render target through slot 33, then
+// reattaches the camera.
+int PCGame::UnknownVirtualSlot19(int mode) {
+    Camera* camera = 0;
+    if (field_0x10)
+        camera = field_0x10->field_0x08;
+    if (field_0x2d4_bit1) {
+        if (mode != field_0x0c->field_0x0c) {
+            if (field_0x10) {
+                delete field_0x10;
+                field_0x10 = 0;
+            }
+            field_0x0c->UnknownFunction4ca900(mode, field_0x2d0 == 0);
+            if (!UnknownVirtualSlot33())
+                return 0;
+        }
+    } else if (field_0x308.bottom - field_0x308.top != 480) {
+        if (field_0x10) {
+            delete field_0x10;
+            field_0x10 = 0;
+        }
+        field_0x0c->UnknownFunction4ca790(640, 480, field_0x2d0 == 0);
+        if (!UnknownVirtualSlot33())
+            return 0;
+    }
+    if (field_0x10 && camera) {
+        camera->field_0x18 = field_0x10;
+        field_0x10->UnknownFunction4e8cf0(camera);
+        field_0x10->UnknownVirtualSlot14(camera->field_0x1a0);
+    }
+    return 1;
+}
+
+// 0x004c0470
+void PCGame::UnknownFunction4c0470(const UnknownRect* rect) {
+    field_0x308 = *rect;
+}
+
+// 0x004c05a0: in full screen, drops duplicate modes ("HighestRefreshOnly"
+// keeps the last of each), modes other than 16-bit, and modes the video
+// memory cannot hold with "MinimumTextureMB" left over.
+int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
+    int reserve = g_UnknownGlobal56e26c->UnknownVirtualSlot20("MinimumTextureMB", 2) << 20;
+    if (field_0x2d4_bit1 && !display->field_0xb74_bit1) {
+        int i;
+        if (UnknownVirtualSlot22("HighestRefreshOnly", 1)) {
+            for (i = 0; i < display->field_0x08; i++) {
+                if (i > 0 && display->field_0x10[i].width == display->field_0x10[i - 1].width &&
+                    display->field_0x10[i].height == display->field_0x10[i - 1].height &&
+                    display->field_0x10[i].bitDepth == display->field_0x10[i - 1].bitDepth &&
+                    display->field_0x10[i].field_0x10 == display->field_0x10[i - 1].field_0x10) {
+                    display->field_0x10[i - 1].field_0x14 = 0;
+                    display->field_0x10[i - 1].field_0x18 = 0;
+                }
+            }
+        } else {
+            for (i = 0; i < display->field_0x08; i++) {
+                if (i > 0 && display->field_0x10[i].width == display->field_0x10[i - 1].width &&
+                    display->field_0x10[i].height == display->field_0x10[i - 1].height &&
+                    display->field_0x10[i].bitDepth == display->field_0x10[i - 1].bitDepth &&
+                    display->field_0x10[i].field_0x10 == display->field_0x10[i - 1].field_0x10) {
+                    display->field_0x10[i].field_0x14 = 0;
+                    display->field_0x10[i].field_0x18 = 0;
+                }
+            }
+        }
+        for (i = 0; i < display->field_0x08; i++) {
+            if (display->field_0x10[i].bitDepth != 16) {
+                display->field_0x10[i].field_0x14 = 0;
+                display->field_0x10[i].field_0x18 = 0;
+            }
+            if (display->field_0x10[i].field_0x14 &&
+                display->field_0x54 - display->field_0x10[i].bitDepth / 8 *
+                    display->field_0x10[i].height * display->field_0x10[i].width * 3 < reserve &&
+                display->field_0x10[i].width > 640)
+                display->field_0x10[i].field_0x14 = 0;
+            if (display->field_0x10[i].field_0x18 &&
+                display->field_0x54 < display->field_0x10[i].bitDepth / 8 *
+                    display->field_0x10[i].height * display->field_0x10[i].width * 2)
+                display->field_0x10[i].field_0x18 = 0;
+        }
+    }
+    return 1;
+}
+
+// 0x004c07d0: sets the render target's states (slot 8; the numbers line
+// up with Direct3D's render state IDs) and the device's texture stage 0
+// states, choosing the filters from the +0x2d4 bits and the capabilities.
+int PCGame::UnknownVirtualSlot7() {
+    field_0x10->UnknownVirtualSlot8(0x1a, field_0x2d4_bit3 && (PCTarget()->field_0x1a8 & 1), 1);
+    field_0x10->UnknownVirtualSlot8(0x28, 0, 1);
+    field_0x10->UnknownVirtualSlot8(2, 0, 1);
+    if (field_0x2d4_bit6 && (PCTarget()->field_0x1a8 & 0x800))
+        field_0x10->UnknownVirtualSlot8(2, 2, 1);
+    field_0x10->UnknownVirtualSlot8(0x1c, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x30, 0, 1);
+    field_0x10->UnknownVirtualSlot8(8, PCTarget()->field_0x250, 1);
+    field_0x10->UnknownVirtualSlot8(7, field_0x2d5_bit3, 1);
+    field_0x10->UnknownVirtualSlot8(0xe, field_0x2d5_bit3, 1);
+    field_0x10->UnknownVirtualSlot8(0x1b, 0, 1);
+    field_0x10->UnknownVirtualSlot10(7, 0);
+    if (field_0x2d0) {
+        field_0x10->UnknownVirtualSlot8(9, 1, 1);
+        field_0x10->UnknownVirtualSlot8(4, 0, 1);
+    } else {
+        field_0x10->UnknownVirtualSlot8(9, 2, 1);
+        field_0x10->UnknownVirtualSlot8(4, 1, 1);
+    }
+    PCTarget()->field_0x50->UnknownMethod37(0, 0xc, 1);
+    field_0x10->UnknownVirtualSlot8(0x17, 4, 1);
+    field_0x10->UnknownVirtualSlot8(0x1d, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x1e, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x10, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x21, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0xf, 1, 1);
+    field_0x10->UnknownVirtualSlot8(0x18, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x19, 5, 1);
+    field_0x54c = field_0x2d4_bit5 && (PCTarget()->field_0x1c4 & 2) ? 2 : 1;
+    field_0x550 = field_0x2d4_bit5 && (PCTarget()->field_0x1c4 & 2) ? 2 : 1;
+    field_0x554 = 1;
+    if (field_0x2d4_bit4) {
+        if (field_0x2d4_bit7 && (PCTarget()->field_0x1c4 & 0x20))
+            field_0x554 = 3;
+        else
+            field_0x554 = 2;
+    }
+    PCTarget()->field_0x50->UnknownMethod37(0, 0x10, field_0x54c);
+    PCTarget()->field_0x50->UnknownMethod37(0, 0x11, field_0x550);
+    PCTarget()->field_0x50->UnknownMethod37(0, 0x12, field_0x554);
+    PCTarget()->field_0x50->UnknownMethod37(0, 1, 1);
+    PCTarget()->field_0x50->UnknownMethod37(0, 4, 1);
+    field_0x10->UnknownVirtualSlot8(0x89, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x17, 4, 1);
+    return 1;
+}
+
+// 0x004c0760
+int PCGame::UnknownFunction4c0760(UnknownDisplay* display, int width, int height) {
+    if (field_0x2d4_bit1 && !display->field_0xb74_bit1) {
+        for (int i = 0; i < display->field_0x08; i++) {
+            UnknownDisplayMode* mode = &display->field_0x10[i];
+            if (mode->width > width || mode->height > height)
+                mode->field_0x14 = 0;
+        }
+    }
+    return 1;
+}
+
+// 0x004c0a90: creates the PCRenderTarget on the display's surface and
+// records the display's two mode values (+0x58, +0x5c).
+RenderTarget* PCGame::UnknownVirtualSlot31() {
+    int frames = field_0x0c->field_0x1a8 ? 1 : field_0x0c->field_0x78;
+    UnknownSurfaceInterface* surface =
+        field_0x0c->field_0x1a8 ? field_0x0c->field_0x1a8 : field_0x0c->field_0x1a0;
+    RenderTarget* target = (new(__FILE__, 984) PCRenderTarget)
+        ->UnknownFunction4c4f80(field_0x0c, &field_0x2f8, surface, field_0x2d5_bit3, frames);
+    if (!target)
+        return 0;
+    if (field_0x2d4_bit1) {
+        field_0x0c->field_0x58 = field_0x0c->field_0x10[field_0x0c->field_0x0c].field_0x1c;
+        field_0x0c->field_0x5c = field_0x0c->field_0x10[field_0x0c->field_0x0c].field_0x20;
+    } else {
+        int value;
+        if (field_0x0c->UnknownFunction4ca5a0(&value, field_0x10)) {
+            field_0x0c->field_0x5c = value;
+            PCTarget()->UnknownFunction4c5950(&value);
+            field_0x0c->field_0x58 = value;
+        } else {
+            field_0x0c->field_0x5c = 0;
+            PCTarget()->UnknownFunction4c5950(&value);
+            field_0x0c->field_0x58 = value;
+        }
+    }
+    return target;
+}
+
+// 0x004c0c10: "lobby" on the command line (last match wins) starts the
+// network object in mode 4.
+int PCGame::UnknownVirtualSlot37() {
+    if (__argc >= 2) {
+        int i = __argc;
+        while (i > 0) {
+            i--;
+            if (!_stricmp(__argv[i], "lobby")) {
+                if (!UnknownVirtualSlot16(4))
+                    return 0;
+                break;
+            }
+        }
+    }
+    return 1;
+}
+
+// 0x004c0c60: records the window rectangle, then sets 640x480x16 (hiding
+// the cursor in full screen) and runs slot 33.
+int PCGame::UnknownVirtualSlot32() {
+    GetWindowRect(field_0x31c, &field_0x308);
+    if (field_0x2d4_bit1) {
+        if (!field_0x0c->UnknownFunction4c9c90())
+            return 0;
+        while (ShowCursor(0) >= 0)
+            ;
+    } else {
+        if (!field_0x0c->UnknownFunction4c9d20(0, 0, 640, 480))
+            return 0;
+    }
+    if (!field_0x0c->UnknownVirtualSlot2(640, 480, 16, 2, 0, field_0x2d0 == 0, 1))
+        return 0;
+    return UnknownVirtualSlot33() != 0;
+}
+
+// Builds the registry key path for a setting: the game's key, plus the
+// subkey part of a "Sub\\Value" name, which is then reduced to Value.
+#define UNKNOWN_SETTING_PATH(path, name)          \
+    const char* slash = strrchr(name, '\\');      \
+    strcpy(path, field_0x4b8);                     \
+    if (slash) {                                   \
+        strcat(path, "\\");                         \
+        strcat(path, name);                        \
+        *strrchr(path, '\\') = 0;                   \
+        name = slash + 1;                          \
+    }
+
+// 0x004c1610: records the display's identifier under "DriverInfo\\<name>"
+// and marks it profiled (version 7).
+int PCGame::UnknownFunction4c1610(UnknownDisplay* display) {
+    char name[256];
+    sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", display->field_0x4bc);
+    UnknownVirtualSlot29(name, &display->field_0x5c0, sizeof(display->field_0x5c0));
+    sprintf(name, "DriverInfo\\%s\\ProfiledCard", display->field_0x4bc);
+    UnknownVirtualSlot27(name, 0);
+    sprintf(name, "DriverInfo\\%s\\ProfileVersion", display->field_0x4bc);
+    UnknownVirtualSlot25(name, 7);
+    return 1;
+}
+
+// 0x004c1410: whether any display lacks a current profile (version 7 with
+// an identical saved identifier).
+int PCGame::UnknownFunction4c1410() {
+    for (int i = 0; i < g_UnknownDisplayCount68a764; i++) {
+        char name[256];
+        UnknownDeviceIdentifier saved;
+        unsigned long size = sizeof(saved);
+        sprintf(name, "DriverInfo\\%s\\ProfileVersion", g_UnknownDisplays68a754[i]->field_0x4bc);
+        if (UnknownVirtualSlot20(name, 0) != 7)
+            return 1;
+        sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", g_UnknownDisplays68a754[i]->field_0x4bc);
+        if (!UnknownVirtualSlot24(name, &saved, &size) || size != sizeof(saved) ||
+            strcmp(g_UnknownDisplays68a754[i]->field_0x5c0.driver, saved.driver) ||
+            strcmp(g_UnknownDisplays68a754[i]->field_0x5c0.description, saved.description) ||
+            memcmp(g_UnknownDisplays68a754[i]->field_0x5c0.driverVersion, saved.driverVersion,
+                   sizeof(saved.driverVersion)) ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.vendorId != saved.vendorId ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.deviceId != saved.deviceId ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.subSysId != saved.subSysId ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.revision != saved.revision ||
+            memcmp(g_UnknownDisplays68a754[i]->field_0x5c0.deviceGuid, saved.deviceGuid,
+                   sizeof(saved.deviceGuid)) ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.whqlLevel != saved.whqlLevel)
+            return 1;
+    }
+    return 0;
+}
+
+// 0x004c16b0
+int PCGame::UnknownFunction4c16b0() {
+    for (int i = 0; i < g_UnknownDisplayCount68a764; i++)
+        UnknownFunction4c1610(g_UnknownDisplays68a754[i]);
+    return 1;
+}
+
+// 0x004c1a00: deletes every display's cached data under DriverInfo (the
+// mode lists, "PartialTextureBlt" and the 32 "BltSpeed" entries), then the
+// display keys themselves.
+int PCGame::UnknownFunction4c1a00() {
+    char path[256];
+    char display[256];
+    char name[16];
+    void* driverInfo;
+    void* key;
+    unsigned long count = 0;
+    strcpy(path, field_0x4b8);
+    strcat(path, "\\DriverInfo");
+    if (RegOpenKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, UNKNOWN_KEY_ALL_ACCESS, &driverInfo) != 0)
+        return 1;
+    if (RegQueryInfoKeyA(driverInfo, 0, 0, 0, &count, 0, 0, 0, 0, 0, 0, 0) != 0)
+        return 1;
+    while (count) {
+        if (RegEnumKeyA(driverInfo, count - 1, display, sizeof(display)) != 0)
+            break;
+        count--;
+        strcpy(path, field_0x4b8);
+        strcat(path, "\\DriverInfo\\");
+        strcat(path, display);
+        if (RegOpenKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, UNKNOWN_KEY_ALL_ACCESS, &key) == 0) {
+            RegDeleteKeyA(key, "NumberOfModes");
+            RegDeleteKeyA(key, "Modes");
+            RegDeleteKeyA(key, "PartialTextureBlt");
+            for (int i = 0; i < 32; i++) {
+                sprintf(name, "BltSpeed%d", i);
+                RegDeleteKeyA(key, name);
+            }
+            RegCloseKey(key);
+        }
+        RegDeleteKeyA(driverInfo, display);
+    }
+    RegCloseKey(driverInfo);
+    return 1;
+}
+
+// 0x004c1c20: a DWORD setting.
+int PCGame::UnknownVirtualSlot20(const char* name, int defaultValue) {
+    unsigned long size = sizeof(int);
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long type;
+    int value;
+    if (RegOpenKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, UNKNOWN_KEY_READ, &key) != 0 ||
+        RegQueryValueExA(key, name, 0, &type, (unsigned char*)&value, &size) != 0 ||
+        type != UNKNOWN_REG_DWORD)
+        value = defaultValue;
+    RegCloseKey(key);
+    return value;
+}
+
+// 0x004c1d50: a float setting, stored as a DWORD.
+float PCGame::UnknownVirtualSlot21(const char* name, float defaultValue) {
+    unsigned long size = sizeof(float);
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long type;
+    float value;
+    if (RegOpenKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, UNKNOWN_KEY_READ, &key) != 0 ||
+        RegQueryValueExA(key, name, 0, &type, (unsigned char*)&value, &size) != 0 ||
+        type != UNKNOWN_REG_DWORD)
+        value = defaultValue;
+    RegCloseKey(key);
+    return value;
+}
+
+// 0x004c1e80: a boolean setting.
+int PCGame::UnknownVirtualSlot22(const char* name, int defaultValue) {
+    unsigned long size = sizeof(int);
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long type;
+    int value;
+    if (RegOpenKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, UNKNOWN_KEY_READ, &key) == 0 &&
+        RegQueryValueExA(key, name, 0, &type, (unsigned char*)&value, &size) == 0 &&
+        type == UNKNOWN_REG_DWORD)
+        value = value != 0;
+    else
+        value = defaultValue;
+    RegCloseKey(key);
+    return value;
+}
+
+// 0x004c1fc0: a string setting; copies the default when it is missing.
+int PCGame::UnknownVirtualSlot23(const char* name, const char* defaultValue, char* buffer,
+                                 unsigned long* size) {
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long type;
+    int result;
+    if (RegOpenKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, UNKNOWN_KEY_READ, &key) == 0 &&
+        RegQueryValueExA(key, name, 0, &type, (unsigned char*)buffer, size) == 0 &&
+        type == UNKNOWN_REG_SZ) {
+        result = 1;
+    } else {
+        strcpy(buffer, defaultValue);
+        result = 0;
+    }
+    RegCloseKey(key);
+    return result;
+}
+
+// 0x004c2110: a binary setting.
+int PCGame::UnknownVirtualSlot24(const char* name, void* data, unsigned long* size) {
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long type;
+    int result;
+    if (RegOpenKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, UNKNOWN_KEY_READ, &key) == 0 &&
+        RegQueryValueExA(key, name, 0, &type, (unsigned char*)data, size) == 0 &&
+        type == UNKNOWN_REG_BINARY)
+        result = 1;
+    else
+        result = 0;
+    RegCloseKey(key);
+    return result;
+}
+
+// 0x004c2240 (slots 25-27 fold to this body): writes a DWORD setting.
+int PCGame::UnknownVirtualSlot25(const char* name, int value) {
+    int result = 1;
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long disposition;
+    if (RegCreateKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, "", 0, UNKNOWN_KEY_ALL_ACCESS, 0,
+                        &key, &disposition) != 0 ||
+        RegSetValueExA(key, name, 0, UNKNOWN_REG_DWORD, (const unsigned char*)&value,
+                       sizeof(value)) != 0)
+        result = 0;
+    RegCloseKey(key);
+    return result;
+}
+
+int PCGame::UnknownVirtualSlot26(const char* name, int value) {
+    int result = 1;
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long disposition;
+    if (RegCreateKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, "", 0, UNKNOWN_KEY_ALL_ACCESS, 0,
+                        &key, &disposition) != 0 ||
+        RegSetValueExA(key, name, 0, UNKNOWN_REG_DWORD, (const unsigned char*)&value,
+                       sizeof(value)) != 0)
+        result = 0;
+    RegCloseKey(key);
+    return result;
+}
+
+int PCGame::UnknownVirtualSlot27(const char* name, int value) {
+    int result = 1;
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long disposition;
+    if (RegCreateKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, "", 0, UNKNOWN_KEY_ALL_ACCESS, 0,
+                        &key, &disposition) != 0 ||
+        RegSetValueExA(key, name, 0, UNKNOWN_REG_DWORD, (const unsigned char*)&value,
+                       sizeof(value)) != 0)
+        result = 0;
+    RegCloseKey(key);
+    return result;
+}
+
+// 0x004c2370: writes a string setting.
+int PCGame::UnknownVirtualSlot28(const char* name, const char* value) {
+    int result = 1;
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long disposition;
+    if (RegCreateKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, "", 0, UNKNOWN_KEY_ALL_ACCESS, 0,
+                        &key, &disposition) != 0 ||
+        RegSetValueExA(key, name, 0, UNKNOWN_REG_SZ, (const unsigned char*)value,
+                       strlen(value) + 1) != 0)
+        result = 0;
+    RegCloseKey(key);
+    return result;
+}
+
+// 0x004c24b0: writes a binary setting.
+int PCGame::UnknownVirtualSlot29(const char* name, const void* data, unsigned long size) {
+    int result = 1;
+    char path[256];
+    UNKNOWN_SETTING_PATH(path, name)
+    void* key;
+    unsigned long disposition;
+    if (RegCreateKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, "", 0, UNKNOWN_KEY_ALL_ACCESS, 0,
+                        &key, &disposition) != 0 ||
+        RegSetValueExA(key, name, 0, UNKNOWN_REG_BINARY, (const unsigned char*)data, size) != 0)
+        result = 0;
+    RegCloseKey(key);
+    return result;
+}

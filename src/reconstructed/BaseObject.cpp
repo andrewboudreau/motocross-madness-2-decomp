@@ -1,6 +1,6 @@
 #include "BaseObject.h"
 
-BaseObject::BaseObject() : refCount(1) {}
+BaseObject::BaseObject() { refCount = 1; }
 BaseObject::~BaseObject() {}
 
 int BaseObject::AddRef() {
@@ -8,14 +8,13 @@ int BaseObject::AddRef() {
 }
 
 int BaseObject::Release() {
-    if (refCount != 0) {
-        int remaining = refCount - 1;
-        refCount = remaining;
+    int remaining = refCount;
+    if (remaining != 0) {
+        remaining = --refCount;
         if (remaining == 0)
             delete this;
-        return remaining;
     }
-    return 0;
+    return remaining;
 }
 
 int BaseObject::GetRefCount() {

@@ -1,186 +1,79 @@
 # Agent workflow
 
-## Objective
+## Objective and evidence
 
-Reconstruct readable C++ that reproduces retail MCM2 x86 under the historically correct VC6 SP3-generation toolchain.
+Reconstruct readable C++ that reproduces retail MCM2 x86 under VC6 SP3.
 
-## Evidence tiers
+1. Confirmed: literal RTTI/source strings, COL/vtable addresses and offsets,
+   target bytes, PE/import metadata, decoded direct instruction behavior.
+2. Strong inference: repeated offsets, parsed base relations, canonical compiler
+   artifacts, source attribution supported by independent context.
+3. Provisional: semantic names, unproven C++ types/signatures and TU ownership
+   inferred only from proximity.
 
-1. **Confirmed:** literal RTTI/source-path string, COL/vtable address and object offset, target bytes, PE/import metadata, decoded direct instruction behavior.
-2. **Strong inference:** repeated member offsets, parsed base relation, canonical MSVC destructor/thunk shape, source attribution supported by several xrefs/context clues.
-3. **Provisional:** semantic method/member names, exact C++ types/signatures not proven by ABI/body, translation-unit ownership from proximity alone.
+Never silently promote inference to confirmed evidence. Preserve multiple and
+virtual inheritance, secondary object offsets and adjustor thunks. A type can
+have several vtables; always use `object_offset`. Shared tiny addresses alone
+do not prove method identity. Prefer UnknownVirtualSlotN/field_0xNN names.
 
-Never silently promote tier 2/3 claims to tier 1.
+## Work loop
 
-## Start here
+Start with `make status`, [setup](docs/TOOLCHAIN.md) and
+[current matches/next targets](docs/VC6_MATCHING.md).
 
-```bash
-make status
-```
-
-Primary evidence/work files:
-
-```text
-analysis/function_manifest.json
-analysis/work_queue.json
-analysis/class_dossiers.json
-analysis/rtti_classes.json
-analysis/vtables.json
-analysis/vtable_overrides.json
-analysis/class_layout_hints.json
-analysis/deleting_destructors.json
-analysis/vtable_thunks.json
-analysis/vtable_write_xrefs.json
-analysis/source_xrefs.json
-```
-
-Class dossiers are a join layer for convenience; always trace a claim back to the underlying evidence file before promoting a semantic name/type.
-
-Important: a C++ type can have multiple vtables. Always use `object_offset`; do not assume the first vtable address seen for a class is the complete-object/primary vtable.
-
-## Function iteration loop
-
-1. Pick a target with defensible VA/extent.
-2. Inspect class/slot and source hints:
-   ```bash
-   PYTHONPATH=. python3 tools/inspect_target.py --class UIControl --slot 34
-   PYTHONPATH=. python3 tools/nearest_source.py 0x4703c0
-   ```
-3. Check whether the slot is inherited/overridden/introduced in `vtable_overrides.json`.
-4. Check destructor/thunk/vptr-write evidence before reconstructing special members.
-5. Keep uncertain code under `samples/`; promote into `src/krusty2/` only with strong translation-unit evidence.
-6. Compile with VC6 SP3 when available; clang is only a bootstrap/code-shape oracle.
-7. Match using relocation-aware function comparison.
-8. If semantics are strong but shape differs, calibrate compiler/profile before contorting C++.
-9. Regenerate `analysis/function_manifest.json` after adding candidates.
-
-## Generated easy-probe gate
-
-Do not hand-maintain trivial getter/setter probes. The analyzer classifies conservative patterns and generates C++98 automatically:
+1. Select a target with defensible VA and extent. Inspect RTTI/slot, inheritance,
+   source hints, destructor/thunk and vptr-write evidence before naming it.
+2. Use `analysis/class_dossiers.json` as a join view, then trace claims back to
+   `rtti_classes.json`, `vtables.json`, `vtable_overrides.json`,
+   `class_layout_hints.json`, `deleting_destructors.json`, `vtable_thunks.json`,
+   `vtable_write_xrefs.json` and `source_xrefs.json`.
+3. Keep uncertain candidates in `samples/`. Reconstructed class source belongs
+   in `src/reconstructed/`; use original TU paths only with strong ownership
+   evidence. Filename-only skeletons belong in ignored `generated/`.
+4. Compile with authentic VC6 SP3 and compare all bytes with relocations resolved.
+   Clang is an ABI/code-shape check, not the historical compiler authority.
+5. Calibrate flags before distorting readable source. No inline assembly, naked
+   functions, copied machine-code arrays, .byte directives or matching-only
+   linker tricks. Do not trim function extents to the requested target length.
+6. Regenerate the function manifest/dossiers/queue after adding candidates.
+   The legacy queue does not ingest VC6 reports; consult the actual matrix.
+7. Run the affected checks and publish completed, validated slices to main.
+   Fetch remote changes first and preserve unrelated local work.
 
 ```bash
-make easy-smoke
-```
-
-Current gate: 34/34 high-confidence probes exact under clang-cl's 32-bit MSVC ABI.
-
-When VC6 is available:
-
-```bash
-make easy-smoke-vc6 VC6_ROOT="$VC6_ROOT"
-```
-
-A generated-probe failure under VC6 is toolchain/profile evidence first.
-
-## Historical compiler gate
-
-```bash
-make probe-vc6 VC6_ROOT="$VC6_ROOT"
+python3 tools/find_class.py UIControl
+python3 tools/discover_easy_targets.py --class UIControl
+python3 tools/nearest_source.py 0x4703c0
+make static-check test
 make vc6-gate VC6_ROOT="$VC6_ROOT"
+make vc6-profile-matrix
 ```
 
-High-value calibration targets:
+Do not hand-maintain trivial generated accessor probes. `make easy-smoke-vc6`
+regenerates and checks them; a failure is compiler/profile evidence first.
 
-- BaseObject constructor `0x00405120`
-- BaseObject scalar deleting destructor `0x00405130`
-- BaseObject destructor core `0x00405150`
-- BaseObject::Release `0x00405170`
-- UIControl slots 61/62
-- UIStatic return-zero slot
-- UIMultiState slots 34–37 (indexed 32-byte element access / SIB encoding)
+## Category and library evidence
 
-## Constructors/destructors
+Read [CATEGORIES.md](docs/CATEGORIES.md) and [PROVENANCE.md](docs/PROVENANCE.md).
+Categories describe accounting contexts, not exclusive source/class ownership.
+Inspect literal selectors, source-reference instructions and non-inherited
+primary RTTI slots. Do not propagate labels to callees, sibling methods, derived
+classes or whole files. Mixed-category orchestration remains many-to-many.
+External references are context until independently checked against retail.
 
-Use `analysis/vtable_write_xrefs.json` and `analysis/deleting_destructors.json` together. A canonical scalar deleting-destructor wrapper gives the core destructor address directly. Vptr writes near that core help reconstruct base/derived destructor order.
+## Private inputs and verification
 
-For constructors, clusters of writes to all class subobject vtables are especially strong leads. Do not infer function start solely from a raw vtable immediate occurrence.
+Never commit VC6 binaries/headers/libraries, game data, generated objects,
+signed bundle URLs or tokens. Use the verified installer and wrapper in
+[TOOLCHAIN.md](docs/TOOLCHAIN.md). A static fingerprint is not compiler execution:
+readiness requires authentic CL.EXE to emit nonempty i386 COFF. Keep readiness,
+byte matching, source quality and library identity as separate claims.
 
-## Multiple inheritance
+## Repository hygiene
 
-Use `analysis/rtti_classes.json` `vtable_records` and `analysis/vtable_thunks.json`. Preserve:
-
-- secondary base offsets;
-- virtual-base indicators (`pdisp`/`vdisp`);
-- adjustor thunks.
-
-Do not flatten a complex class to single inheritance merely because it makes source easier.
-
-## Naming
-
-Prefer `UnknownVirtualSlotN`, `field_0xNN`, etc. until behavior/callers/strings/assets support a semantic name. An identical tiny function address may be shared through inheritance or linker identical-COMDAT folding; address equality alone does not prove semantic method identity.
-
-## Do not cheat matching
-
-No inline assembly, naked functions, copied machine-code arrays, `.byte`, or linker tricks whose purpose is just to reproduce target bytes. We want readable C/C++ reconstruction.
-
-## Useful commands
-
-```bash
-make status
-make selftest
-make easy
-make smoke
-make easy-smoke
-make calibration
-make class-evidence
-make msvc-artifacts
-make manifest
-make work-queue
-
-PYTHONPATH=. python3 tools/discover_easy_targets.py --class UIControl
-PYTHONPATH=. python3 tools/inspect_target.py --class UIControl --slot 34
-PYTHONPATH=. python3 tools/nearest_source.py 0x4703c0
-```
-
-## External references
-
-`docs/REFERENCES.md` contains community resources such as the archived Motocross Madness file-format repository. Treat them as context, not ground truth for code/class reconstruction unless independently verified against the retail binary.
-
-## Category-driven source triage
-
-```bash
-make categories
-make categories-test
-python3 tools/build_categories.py --query Terrain
-python3 tools/build_categories.py --query QuarryStuntEvent.cpp
-```
-
-Read `docs/CATEGORIES.md` and the generated `analysis/categories/review_queue.json`.
-Category selections are allocation-context evidence, not exclusive source or
-class ownership. Keep a many-to-many relationship: the loading/orchestration
-candidates select several different labels. A matching filename is not needed
-for a category label, and a category name does not establish a filename.
-
-Inspect the exact selector call, literal argument, source-reference instructions,
-and non-inherited primary RTTI slots before promoting any semantic name. The
-category tool re-decodes these facts against the input hash; provenance supplies
-candidate ranges only. It does not propagate labels to callees, sibling methods,
-derived classes, or whole translation units. No source files should be moved
-based solely on this report.
-
-The category review queue is an additive triage view. It does not change the
-existing byte-match manifest or count semantic similarity as an exact match.
-
-
-## Private historical compiler environment
-
-The repository must never contain the VC6 binaries, libraries, headers, signed
-bundle URL, access token, or retail executable. See `docs/PRIVATE_TOOLCHAIN.md`.
-
-Use the verified private installer and wrapper:
-
-```bash
-make private-install PRIVATE_BUNDLE=/path/to/mcm2-vc6sp3-private-inputs.zip
-make private-ready
-make vc6-private-gate
-```
-
-In a Linux/cloud worker, put `MCM2_PRIVATE_BUNDLE_URL` in the environment's
-setup-only secret store and run `bash tools/setup_vc6_linux.sh`. Do not echo or
-commit the URL. Native Windows may use `tools/setup_vc6_windows.ps1`.
-
-A static fingerprint is not proof that VC6 executed. `private-ready` requires
-the authentic CL.EXE process to emit a nonempty i386 COFF object. Never fall
-back to clang when that acceptance step fails. Keep environment readiness
-separate from byte-match success: a real VC6 mismatch is compiler/profile/source
-evidence, not permission to alter readable C++ or claim the worker is broken.
+Current docs record facts, remaining uncertainty and reproduction commands.
+Remove superseded stage reports, solved speculation and duplicate candidates;
+Git history holds the chronology. Route checks through canonical source after
+promotion. Retain regression tests that protect matching/evidence behavior.
+Generated reports stay in ignored analysis/work directories and must not rewrite
+tracked documentation. Do not delete private inputs as routine build cleanup.

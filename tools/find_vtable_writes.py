@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import json,struct
+import os, json,struct
 from collections import defaultdict
 from pathlib import Path
 from mcm2tool.pe import PEImage
@@ -39,7 +39,7 @@ def decode_c7(blob:bytes,i:int):
     return {'end':end,'imm_offset':j,'immediate':imm,'base_register':base,'index_register':index,'scale':scale,'displacement':disp}
 
 def main():
-    pe=PEImage('work/game/mcm2.exe')
+    pe=PEImage(os.environ.get('MCM2_EXE', 'work/game/mcm2.exe'))
     vtables=json.loads(Path('analysis/vtables.json').read_text())
     byva=defaultdict(list)
     for v in vtables: byva[int(v['vtable_va'],16)].append({'class':v['class'],'object_offset':int(v.get('object_offset',0)),'vtable_va':v['vtable_va']})

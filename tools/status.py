@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import json
+import os, json
 from collections import Counter
 from pathlib import Path
 
@@ -29,7 +29,7 @@ def main():
     vtwrites = load('analysis/vtable_write_xrefs.json') or []
     exact = [r for r in smoke if r.get('exact_after_relocation_mask')]
     easy_exact = [r for r in easy_probe if r.get('exact_after_relocation_mask')]
-    workspace_ready = Path('work/game/mcm2.exe').exists()
+    workspace_ready = Path(os.environ.get('MCM2_EXE', 'work/game/mcm2.exe')).exists()
     kinds = Counter(r['kind'] for r in easy)
 
     print('MCM2 decomp bootstrap status')
@@ -60,7 +60,7 @@ def main():
         for c in calibration:
             r=c.get('result',{})
             print(f"  {c['name']}: {r.get('match_percent','?')}% bytes, target={r.get('target_size','?')}B candidate={r.get('candidate_size','?')}B")
-    print(f"\nVC6 gate:         {'present' if vc6_gate else 'not run (private VC6 SP3 tree not present)'}")
+    print(f"\nVC6 gate:         {'present' if vc6_gate else 'not run (no report; compiler availability not inferred)'}")
     print('VC6 SP3 remains the authoritative compiler oracle; clang smoke matches validate plumbing/layout only.')
 
 if __name__ == '__main__':
