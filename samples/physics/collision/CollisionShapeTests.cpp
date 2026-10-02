@@ -53,45 +53,45 @@ int CollisionObject::TestAgainst(CollisionObject* other)
 {
     if (other == this)
         return 0;
-    if (other->field_0x70 == 0)
+    if (other->collidable == 0)
         return 0;
     if ((other->field_0x1c[9] & 1) == 0)
         return 0;
 
     // The partner list is re-read inside the loop (retail loads +0x78 after the count
     // test), and a found flag rather than an index test decides the mode check.
-    if (field_0x7c > 0) {
+    if (ignoreCount > 0) {
         int found = 0;
-        for (int i = 0; i < field_0x7c; i++) {
-            if ((CollisionObject*)((int**)field_0x78)[i] == other) {
+        for (int i = 0; i < ignoreCount; i++) {
+            if ((CollisionObject*)((int**)ignoreList)[i] == other) {
                 found = 1;
                 break;
             }
         }
         if (found) {
-            if (field_0x74 == 1)
+            if (ignoreListMode == 1)
                 return 0;
-        } else if (field_0x74 == 0) {
+        } else if (ignoreListMode == 0) {
             return 0;
         }
     }
-    if (other->field_0x7c > 0) {
+    if (other->ignoreCount > 0) {
         int found = 0;
-        for (int i = 0; i < other->field_0x7c; i++) {
-            if ((CollisionObject*)((int**)other->field_0x78)[i] == this) {
+        for (int i = 0; i < other->ignoreCount; i++) {
+            if ((CollisionObject*)((int**)other->ignoreList)[i] == this) {
                 found = 1;
                 break;
             }
         }
         if (found) {
-            if (other->field_0x74 == 1)
+            if (other->ignoreListMode == 1)
                 return 0;
-        } else if (other->field_0x74 == 0) {
+        } else if (other->ignoreListMode == 0) {
             return 0;
         }
     }
 
-    switch (field_0x50) {
+    switch (shapeType) {
     case 0:
         return TestHullAgainst(other);
     case 1:
@@ -106,16 +106,16 @@ int CollisionObject::TestAgainst(CollisionObject* other)
 // (jump table 0x00438bf0: 0 hull, 1 model, 2 none, 3 capsule, 4 sphere).
 int CollisionObject::TestHullAgainst(CollisionObject* other)
 {
-    CollisionHullBody* mine = (CollisionHullBody*)field_0x54;
-    switch (other->field_0x50) {
+    CollisionHullBody* mine = (CollisionHullBody*)shape;
+    switch (other->shapeType) {
     case 0:
-        return HullVsHull(mine, (CollisionHullBody*)other->field_0x54, (CollisionSweepQuery*)field_0x5c);
+        return HullVsHull(mine, (CollisionHullBody*)other->shape, (CollisionSweepQuery*)contactRecord);
     case 1:
-        return HullVsModel(mine, (CollisionModelBody*)other->field_0x54, (CollisionSweepQuery*)field_0x5c);
+        return HullVsModel(mine, (CollisionModelBody*)other->shape, (CollisionSweepQuery*)contactRecord);
     case 3:
-        return HullVsCapsule(mine, (CollisionCapsuleShape*)other->field_0x54);
+        return HullVsCapsule(mine, (CollisionCapsuleShape*)other->shape);
     case 4:
-        return HullVsSphere(mine, (CollisionSphereShape*)other->field_0x54);
+        return HullVsSphere(mine, (CollisionSphereShape*)other->shape);
     }
     return 0;
 }
@@ -124,16 +124,16 @@ int CollisionObject::TestHullAgainst(CollisionObject* other)
 // (jump table 0x00438c70).
 int CollisionObject::TestModelAgainst(CollisionObject* other)
 {
-    CollisionModelBody* mine = (CollisionModelBody*)field_0x54;
-    switch (other->field_0x50) {
+    CollisionModelBody* mine = (CollisionModelBody*)shape;
+    switch (other->shapeType) {
     case 0:
-        return ModelVsHull(mine, (CollisionHullBody*)other->field_0x54, (CollisionSweepQuery*)field_0x5c);
+        return ModelVsHull(mine, (CollisionHullBody*)other->shape, (CollisionSweepQuery*)contactRecord);
     case 1:
-        return ModelVsModel(mine, (CollisionModelBody*)other->field_0x54, (CollisionSweepQuery*)field_0x5c);
+        return ModelVsModel(mine, (CollisionModelBody*)other->shape, (CollisionSweepQuery*)contactRecord);
     case 3:
-        return ModelVsCapsule(mine, (CollisionCapsuleShape*)other->field_0x54);
+        return ModelVsCapsule(mine, (CollisionCapsuleShape*)other->shape);
     case 4:
-        return ModelVsSphere(mine, (CollisionSphereShape*)other->field_0x54);
+        return ModelVsSphere(mine, (CollisionSphereShape*)other->shape);
     }
     return 0;
 }
@@ -143,15 +143,15 @@ int CollisionObject::TestModelAgainst(CollisionObject* other)
 // field_0x14 * radius.  The contact generator 0x00429570 does the rest.
 int CollisionObject::HullVsSphere(CollisionHullBody* hull, CollisionSphereShape* sphere)
 {
-    CollisionVec3 c = sphere->center * sphere->field_0x18;
+    CollisionVec3 c = sphere->center * sphere->centerScale;
     CollisionVec3 world = c;
-    const float* m = sphere->field_0x1c.m;
+    const float* m = sphere->transform.m;
     world.x = c.z * m[8] + c.y * m[4] + c.x * m[0] + m[12];
     world.y = c.z * m[9] + c.y * m[5] + c.x * m[1] + m[13];
     world.z = c.z * m[10] + c.y * m[6] + c.x * m[2] + m[14];
-    float r = sphere->field_0x14 * sphere->radius;
+    float r = sphere->radiusScale * sphere->radius;
     float rr = r * r;
-    return Fn_00429570(&world, r, rr, hull->field_0x18c, &hull->field_0x48, 0);
+    return Fn_00429570(&world, r, rr, hull->pointTree, &hull->worldTransform, 0);
 }
 
 // 0x00437aa0: hull vs capsule.  Both capsule endpoints are scaled by capsule->field_0x24 and
@@ -160,19 +160,19 @@ int CollisionObject::HullVsSphere(CollisionHullBody* hull, CollisionSphereShape*
 int CollisionObject::HullVsCapsule(CollisionHullBody* hull, CollisionCapsuleShape* capsule)
 {
     CollisionVec3 ends[2];
-    CollisionVec3 a = capsule->p0 * capsule->field_0x24;
+    CollisionVec3 a = capsule->p0 * capsule->endpointScale;
     ends[0] = a;
-    CollisionVec3 b = capsule->p1 * capsule->field_0x24;
+    CollisionVec3 b = capsule->p1 * capsule->endpointScale;
     ends[1] = b;
-    const float* m = capsule->field_0x28.m;
+    const float* m = capsule->transform.m;
     ends[0].x = (a.z * m[8] + a.y * m[4]) + a.x * m[0] + m[12];
     ends[0].y = (a.z * m[9] + a.y * m[5]) + a.x * m[1] + m[13];
     ends[0].z = (a.z * m[10] + a.y * m[6]) + a.x * m[2] + m[14];
     ends[1].x = (b.z * m[8] + b.y * m[4]) + b.x * m[0] + m[12];
     ends[1].y = (b.z * m[9] + b.y * m[5]) + b.x * m[1] + m[13];
     ends[1].z = (b.z * m[10] + b.y * m[6]) + b.x * m[2] + m[14];
-    float r = capsule->field_0x20 * capsule->radius;
-    return Fn_00429890(ends, r, r * r, hull->field_0x18c, &hull->field_0x48, 0, hull->field_0x190);
+    float r = capsule->radiusScale * capsule->radius;
+    return Fn_00429890(ends, r, r * r, hull->pointTree, &hull->worldTransform, 0, hull->vertices);
 }
 
 // 0x00438860: model vs sphere.  Same world-space sphere as HullVsSphere; the model's bounds
@@ -180,18 +180,18 @@ int CollisionObject::HullVsCapsule(CollisionHullBody* hull, CollisionCapsuleShap
 // with 0x00429570 until one reports a contact.
 int CollisionObject::ModelVsSphere(CollisionModelBody* model, CollisionSphereShape* sphere)
 {
-    CollisionVec3 c = sphere->center * sphere->field_0x18;
+    CollisionVec3 c = sphere->center * sphere->centerScale;
     CollisionVec3 world = c;
-    const float* m = sphere->field_0x1c.m;
+    const float* m = sphere->transform.m;
     world.x = c.z * m[8] + c.y * m[4] + c.x * m[0] + m[12];
     world.y = c.z * m[9] + c.y * m[5] + c.x * m[1] + m[13];
     world.z = c.z * m[10] + c.y * m[6] + c.x * m[2] + m[14];
-    float r = sphere->field_0x14 * sphere->radius;
+    float r = sphere->radiusScale * sphere->radius;
     float rr = r * r;
     if (Fn_00425750(&model->center, &model->halfExtents, world, r, rr, &model->field_0x88)) {
         for (int i = 0; i < model->elementCount; i++) {
-            if (Fn_00429570(&world, r, rr, model->elements[i].field_0x18c,
-                            &model->elements[i].field_0x48, 0))
+            if (Fn_00429570(&world, r, rr, model->elements[i].pointTree,
+                            &model->elements[i].worldTransform, 0))
                 return 1;
         }
     }
@@ -203,23 +203,23 @@ int CollisionObject::ModelVsSphere(CollisionModelBody* model, CollisionSphereSha
 int CollisionObject::ModelVsCapsule(CollisionModelBody* model, CollisionCapsuleShape* capsule)
 {
     CollisionVec3 ends[2];
-    CollisionVec3 a = capsule->p0 * capsule->field_0x24;
+    CollisionVec3 a = capsule->p0 * capsule->endpointScale;
     ends[0] = a;
-    CollisionVec3 b = capsule->p1 * capsule->field_0x24;
+    CollisionVec3 b = capsule->p1 * capsule->endpointScale;
     ends[1] = b;
-    const float* m = capsule->field_0x28.m;
+    const float* m = capsule->transform.m;
     ends[0].x = (a.z * m[8] + a.y * m[4]) + a.x * m[0] + m[12];
     ends[0].y = (a.z * m[9] + a.y * m[5]) + a.x * m[1] + m[13];
     ends[0].z = (a.z * m[10] + a.y * m[6]) + a.x * m[2] + m[14];
     ends[1].x = (b.z * m[8] + b.y * m[4]) + b.x * m[0] + m[12];
     ends[1].y = (b.z * m[9] + b.y * m[5]) + b.x * m[1] + m[13];
     ends[1].z = (b.z * m[10] + b.y * m[6]) + b.x * m[2] + m[14];
-    float r = capsule->field_0x20 * capsule->radius;
+    float r = capsule->radiusScale * capsule->radius;
     float rr = r * r;
     if (Fn_00425900(&model->center, &model->halfExtents, ends, r, rr, &model->field_0x88)) {
         for (int i = 0; i < model->elementCount; i++) {
-            if (Fn_00429890(ends, r, rr, model->elements[i].field_0x18c,
-                            &model->elements[i].field_0x48, 0, model->elements[i].field_0x190))
+            if (Fn_00429890(ends, r, rr, model->elements[i].pointTree,
+                            &model->elements[i].worldTransform, 0, model->elements[i].vertices))
                 return 1;
         }
     }
@@ -244,10 +244,10 @@ int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, Co
     Matrix4 inv;
     CollisionInvertRigid(&inv, &a->field_0x88);
     Matrix4 rel;
-    MatrixMultiply(&rel, inv, b->field_0x48);
+    MatrixMultiply(&rel, inv, b->worldTransform);
     int hit = 0;
-    if (Fn_00424730(a->center, a->halfExtents, &b->field_0x188->center,
-                    &b->field_0x188->halfExtents, &rel, &a->field_0xc8)) {
+    if (Fn_00424730(a->center, a->halfExtents, &b->triangleTree->center,
+                    &b->triangleTree->halfExtents, &rel, &a->field_0xc8)) {
         Vec3 sum(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
@@ -278,11 +278,11 @@ int CollisionObject::ModelVsHullSwept(CollisionModelBody* a, CollisionHullBody* 
     Matrix4 inv;
     CollisionInvertRigid(&inv, &a->field_0x88);
     Matrix4 rel;
-    MatrixMultiply(&rel, inv, b->field_0xc8);
-    Fn_004290d0(&a->field_0x108, &a->field_0x114, a->field_0x30, a->field_0x3c, &a->field_0xc8);
+    MatrixMultiply(&rel, inv, b->bodyTransform);
+    Fn_004290d0(&a->sweptCenter, &a->sweptHalfExtents, a->field_0x30, a->field_0x3c, &a->field_0xc8);
     int hit = 0;
-    if (Fn_00424730(a->field_0x108, a->field_0x114, &b->field_0x188->center,
-                    &b->field_0x188->halfExtents, &rel, &a->field_0xc8)) {
+    if (Fn_00424730(a->sweptCenter, a->sweptHalfExtents, &b->triangleTree->center,
+                    &b->triangleTree->halfExtents, &rel, &a->field_0xc8)) {
         Vec3 sum(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
@@ -349,9 +349,9 @@ int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody
     CollisionInvertRigid(&inv, &a->field_0x88);
     Matrix4 rel;
     MatrixMultiply(&rel, inv, b->field_0x88);
-    Fn_004290d0(&a->field_0x108, &a->field_0x114, a->field_0x30, a->field_0x3c, &a->field_0xc8);
+    Fn_004290d0(&a->sweptCenter, &a->sweptHalfExtents, a->field_0x30, a->field_0x3c, &a->field_0xc8);
     int hit = 0;
-    if (Fn_00424730(a->field_0x108, a->field_0x114, &b->center, &b->halfExtents, &rel, &a->field_0xc8)) {
+    if (Fn_00424730(a->sweptCenter, a->sweptHalfExtents, &b->center, &b->halfExtents, &rel, &a->field_0xc8)) {
         Vec3 sum(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < b->elementCount; i++) {
@@ -386,19 +386,19 @@ int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody
 // and transformed back; the vectors/points are always rotated back afterwards.
 int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
-    if (a->field_0x00)
+    if (a->swept)
         return HullVsHullSwept(a, b, q);
 
-    const Matrix4* xf = &b->field_0x48;
-    q->field_0x00 = CollisionRotateRows(q->field_0x00, xf);
-    q->field_0x0c = CollisionRotateRows(q->field_0x0c, xf);
+    const Matrix4* xf = &b->worldTransform;
+    q->contactOffset = CollisionRotateRows(q->contactOffset, xf);
+    q->contactNormal = CollisionRotateRows(q->contactNormal, xf);
     q->contact = CollisionVec3(0.0f, 0.0f, 0.0f);
     q->contactCount = 0;
     for (int i = 0; i < g_CollisionScratchCount; i++)
         g_CollisionScratchPoints[i] = CollisionRotateRows(g_CollisionScratchPoints[i], xf);
 
-    int hit = Fn_00428950(a->field_0x18c, b->field_0x188, &a->field_0x48, xf, 2, b->field_0x190,
-                          &a->field_0x08);
+    int hit = Fn_00428950(a->pointTree, b->triangleTree, &a->worldTransform, xf, 2, b->vertices,
+                          &a->motionTransform);
     if (hit) {
         float s = 1.0f / q->contactCount;
         CollisionVec3 c = q->contact;
@@ -407,8 +407,8 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
         c.z *= s;
         q->contact = CollisionTransformPoint(c, xf);
     }
-    q->field_0x00 = CollisionRotateCols(q->field_0x00, xf);
-    q->field_0x0c = CollisionRotateCols(q->field_0x0c, xf);
+    q->contactOffset = CollisionRotateCols(q->contactOffset, xf);
+    q->contactNormal = CollisionRotateCols(q->contactNormal, xf);
     for (int j = 0; j < g_CollisionScratchCount; j++)
         Fn_0042a450(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
     return hit;
@@ -421,29 +421,29 @@ int CollisionObject::HullVsHull(CollisionHullBody* a, CollisionHullBody* b, Coll
 // a's matrix; the query vectors and scratch points are always rotated back.
 int CollisionObject::HullVsHullSwept(CollisionHullBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
-    const Matrix4* xf = &a->field_0x48;
+    const Matrix4* xf = &a->worldTransform;
     for (int i = 0; i < g_CollisionScratchCount; i++) {
         CollisionVec3 p = g_CollisionScratchPoints[i];
         g_CollisionScratchPoints[i].x = p.x * xf->m[0][0] + p.z * xf->m[0][2] + p.y * xf->m[0][1];
         g_CollisionScratchPoints[i].y = p.z * xf->m[1][2] + p.y * xf->m[1][1] + p.x * xf->m[1][0];
         g_CollisionScratchPoints[i].z = p.z * xf->m[2][2] + p.y * xf->m[2][1] + p.x * xf->m[2][0];
     }
-    q->field_0x00 = CollisionRotateRows(CollisionVec3(-q->field_0x00.x, -q->field_0x00.y, -q->field_0x00.z), xf);
-    q->field_0x0c = CollisionRotateRows(CollisionVec3(-q->field_0x0c.x, -q->field_0x0c.y, -q->field_0x0c.z), xf);
+    q->contactOffset = CollisionRotateRows(CollisionVec3(-q->contactOffset.x, -q->contactOffset.y, -q->contactOffset.z), xf);
+    q->contactNormal = CollisionRotateRows(CollisionVec3(-q->contactNormal.x, -q->contactNormal.y, -q->contactNormal.z), xf);
     q->contact = CollisionVec3(0.0f, 0.0f, 0.0f);
     q->contactCount = 0;
-    CollisionRelativeFrame(&b->field_0x148, &b->field_0x48, &a->field_0xc8, &a->field_0x108);
+    CollisionRelativeFrame(&b->relativeFrame, &b->worldTransform, &a->bodyTransform, &a->prevBodyTransform);
 
     int hit = 0;
-    if (Fn_00428950(b->field_0x18c, a->field_0x188, &b->field_0x48, xf, 2, a->field_0x190,
-                    &b->field_0x148)) {
+    if (Fn_00428950(b->pointTree, a->triangleTree, &b->worldTransform, xf, 2, a->vertices,
+                    &b->relativeFrame)) {
         hit = 1;
         float s = 1.0f / q->contactCount;
         q->contact = CollisionVec3(q->contact.x * s, q->contact.y * s, q->contact.z * s);
         q->contact = CollisionTransformPoint(q->contact, xf);
     }
-    q->field_0x00 = CollisionRotateCols(CollisionVec3(-q->field_0x00.x, -q->field_0x00.y, -q->field_0x00.z), xf);
-    q->field_0x0c = CollisionRotateCols(CollisionVec3(-q->field_0x0c.x, -q->field_0x0c.y, -q->field_0x0c.z), xf);
+    q->contactOffset = CollisionRotateCols(CollisionVec3(-q->contactOffset.x, -q->contactOffset.y, -q->contactOffset.z), xf);
+    q->contactNormal = CollisionRotateCols(CollisionVec3(-q->contactNormal.x, -q->contactNormal.y, -q->contactNormal.z), xf);
     for (int j = 0; j < g_CollisionScratchCount; j++)
         Fn_0042a450(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
     return hit;
@@ -456,17 +456,17 @@ int CollisionObject::HullVsHullSwept(CollisionHullBody* a, CollisionHullBody* b,
 int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* b, CollisionSweepQuery* q)
 {
     Matrix4 inv;
-    CollisionInvertRigid(&inv, &a->field_0xc8);
+    CollisionInvertRigid(&inv, &a->bodyTransform);
     Matrix4 rel;
     MatrixMultiply(&rel, inv, b->field_0x88);
     int hit = 0;
-    if (Fn_00424730(a->field_0x188->center, a->field_0x188->halfExtents, &b->center,
-                    &b->halfExtents, &rel, &a->field_0x08)) {
+    if (Fn_00424730(a->triangleTree->center, a->triangleTree->halfExtents, &b->center,
+                    &b->halfExtents, &rel, &a->motionTransform)) {
         Vec3 sum(0.0f, 0.0f, 0.0f);
         CollisionVec3 nodePos(0.0f, 0.0f, 0.0f);
         int count = 0;
         // Retail makes this call (0x004fc9a0); nodePos is never read.
-        ((CollisionSceneNode*)a->field_0x04)->GetPositionRelativeTo(0, &nodePos);
+        ((CollisionSceneNode*)a->sceneNode)->GetPositionRelativeTo(0, &nodePos);
         for (int i = 0; i < b->elementCount; i++) {
             if (b->elementEnabled[i] && HullVsHullSwept(a, &b->elements[i], q)) {
                 sum.x += q->contact.x;
@@ -495,36 +495,36 @@ int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* 
 // 0x00428060 accumulate).  The element-node position call 0x004fc9a0 stores to a dead local.
 int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, CollisionSweepQuery* q)
 {
-    if (a->field_0x00)
+    if (a->swept)
         return HullVsModelSwept(a, b, q);
 
     Matrix4 inv;
-    CollisionInvertRigid(&inv, &a->field_0xc8);
+    CollisionInvertRigid(&inv, &a->bodyTransform);
     Matrix4 rel;
     MatrixMultiply(&rel, inv, b->field_0x88);
     int hit = 0;
-    if (Fn_00424730(a->field_0x188->center, a->field_0x188->halfExtents, &b->center,
-                    &b->halfExtents, &rel, &a->field_0x08)) {
+    if (Fn_00424730(a->triangleTree->center, a->triangleTree->halfExtents, &b->center,
+                    &b->halfExtents, &rel, &a->motionTransform)) {
         CollisionContactSum sum;
         CollisionVec3 nodePos(0.0f, 0.0f, 0.0f);
         int count = 0;
         // Retail makes this call (0x004fc9a0); nodePos is never read.
-        ((CollisionSceneNode*)a->field_0x04)->GetPositionRelativeTo(0, &nodePos);
+        ((CollisionSceneNode*)a->sceneNode)->GetPositionRelativeTo(0, &nodePos);
         for (int i = 0; i < b->elementCount; i++) {
             CollisionHullBody* e = &b->elements[i];
             // Retail makes this call too, for each element; the result is not read.
-            ((CollisionSceneNode*)e->field_0x04)->GetPositionRelativeTo(0, &nodePos);
+            ((CollisionSceneNode*)e->sceneNode)->GetPositionRelativeTo(0, &nodePos);
             if (!b->elementEnabled[i])
                 continue;
-            const Matrix4* xf = &e->field_0x48;
-            Fn_0042a4b0(&q->field_0x00, q->field_0x00, xf);
-            Fn_0042a4b0(&q->field_0x0c, q->field_0x0c, xf);
+            const Matrix4* xf = &e->worldTransform;
+            Fn_0042a4b0(&q->contactOffset, q->contactOffset, xf);
+            Fn_0042a4b0(&q->contactNormal, q->contactNormal, xf);
             q->contact = CollisionVec3(0.0f, 0.0f, 0.0f);
             q->contactCount = 0;
             for (int j = 0; j < g_CollisionScratchCount; j++)
                 Fn_0042a4b0(&g_CollisionScratchPoints[j], g_CollisionScratchPoints[j], xf);
-            if (Fn_00428950(a->field_0x18c, e->field_0x188, &a->field_0x48, xf, 2, e->field_0x190,
-                            &a->field_0x08)) {
+            if (Fn_00428950(a->pointTree, e->triangleTree, &a->worldTransform, xf, 2, e->vertices,
+                            &a->motionTransform)) {
                 CollisionVec3 mean;
                 q->contact = *CollisionDivide(&mean, &q->contact, (float)q->contactCount);
                 Fn_0042a510(&q->contact, q->contact, xf);
@@ -532,8 +532,8 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
                 hit = 1;
                 count++;
             }
-            Fn_0042a450(&q->field_0x00, q->field_0x00, xf);
-            Fn_0042a450(&q->field_0x0c, q->field_0x0c, xf);
+            Fn_0042a450(&q->contactOffset, q->contactOffset, xf);
+            Fn_0042a450(&q->contactNormal, q->contactNormal, xf);
             for (int k = 0; k < g_CollisionScratchCount; k++)
                 Fn_0042a450(&g_CollisionScratchPoints[k], g_CollisionScratchPoints[k], xf);
         }
@@ -557,23 +557,23 @@ void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMa
     Matrix4 m;
     const CollisionVec3* c;
     const CollisionVec3* h;
-    switch (field_0x50) {
+    switch (shapeType) {
     case 0: {
-        CollisionHullBody* hull = (CollisionHullBody*)field_0x54;
-        m = hull->field_0x48;
-        c = &hull->field_0x188->center;
-        h = &hull->field_0x188->halfExtents;
+        CollisionHullBody* hull = (CollisionHullBody*)shape;
+        m = hull->worldTransform;
+        c = &hull->triangleTree->center;
+        h = &hull->triangleTree->halfExtents;
         break;
     }
     case 1: {
-        CollisionModelBody* model = (CollisionModelBody*)field_0x54;
+        CollisionModelBody* model = (CollisionModelBody*)shape;
         m = model->field_0x88;
         c = &model->center;
         h = &model->halfExtents;
         break;
     }
     case 2: {
-        CollisionMeshBody* mesh = (CollisionMeshBody*)field_0x54;
+        CollisionMeshBody* mesh = (CollisionMeshBody*)shape;
         m = mesh->field_0x08;
         c = &mesh->field_0x04->center;
         h = &mesh->field_0x04->halfExtents;
@@ -598,28 +598,28 @@ void CollisionObject::GetWorldBounds(CollisionVec3* outMin, CollisionVec3* outMa
 // For a model, 0x004392c0 rejects first and every enabled element is tested.
 int CollisionObject::TestMeshAgainst(CollisionObject* other)
 {
-    CollisionMeshBody* mesh = (CollisionMeshBody*)field_0x54;
-    switch (other->field_0x50) {
+    CollisionMeshBody* mesh = (CollisionMeshBody*)shape;
+    switch (other->shapeType) {
     case 0: {
-        CollisionHullBody* hull = (CollisionHullBody*)other->field_0x54;
-        if (Fn_00428950(mesh->field_0x04, hull->field_0x188, &mesh->field_0x08, &hull->field_0x48, 1,
-                        hull->field_0x190, 0)) {
-            g_CollisionBoxResult->field_0x08 = CollisionRotateCols(g_CollisionBoxResult->field_0x08, &hull->field_0x48);
+        CollisionHullBody* hull = (CollisionHullBody*)other->shape;
+        if (Fn_00428950(mesh->field_0x04, hull->triangleTree, &mesh->field_0x08, &hull->worldTransform, 1,
+                        hull->vertices, 0)) {
+            g_CollisionBoxResult->field_0x08 = CollisionRotateCols(g_CollisionBoxResult->field_0x08, &hull->worldTransform);
             return 1;
         }
         break;
     }
     case 1: {
-        CollisionModelBody* model = (CollisionModelBody*)other->field_0x54;
+        CollisionModelBody* model = (CollisionModelBody*)other->shape;
         int hit = 0;
         if (Fn_004392c0(other)) {
             for (int i = 0; i < model->elementCount; i++) {
                 if (model->elementEnabled[i]) {
                     CollisionHullBody* e = &model->elements[i];
-                    if (Fn_00428950(mesh->field_0x04, e->field_0x188, &mesh->field_0x08, &e->field_0x48, 1,
-                                    e->field_0x190, 0)) {
+                    if (Fn_00428950(mesh->field_0x04, e->triangleTree, &mesh->field_0x08, &e->worldTransform, 1,
+                                    e->vertices, 0)) {
                         hit = 1;
-                        g_CollisionBoxResult->field_0x08 = CollisionRotateCols(g_CollisionBoxResult->field_0x08, &e->field_0x48);
+                        g_CollisionBoxResult->field_0x08 = CollisionRotateCols(g_CollisionBoxResult->field_0x08, &e->worldTransform);
                     }
                 }
             }

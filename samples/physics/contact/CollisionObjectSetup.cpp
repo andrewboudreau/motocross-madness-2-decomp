@@ -7,8 +7,8 @@
 
 void CollisionObject::Fn_004320f0(int a, int b, int c, int d)
 {
-    field_0x80 = b;
-    field_0x6c = c;
-    field_0x70 = d;
+    useBroadphase = b;
+    collisionEnabled = c;
+    collidable = d;
     GameObject::GameObjectVirtualSlot8(a);
 }

@@ -34,7 +34,7 @@ public:
     void Fn_0047c0b0(void* a, int b, int c);
     void Fn_00469ce0(GraphicsTest* owner);   // 0x00469ce0, registers the object (thiscall, 1 arg)
     // Debug line drawing, used by collision/CollisionDebugDraw.cpp.  Names are tier 3.
-    //  * 0x0047c690 (ret 0xc) packs 0xff000000 | r<<16 | g<<8 | b into field_0x2c (decoded).
+    //  * 0x0047c690 (ret 0xc) packs 0xff000000 | r<<16 | g<<8 | b into drawColor (decoded).
     //  * 0x0047c4f0 (ret 8): a line between two world points.
     //  * 0x0047c570 (ret 8): a small marker; it halves `size` and offsets the point by it.
     //  * 0x0047c270 (ret 0xc): an oriented box from center, half extents and a transform
@@ -44,7 +44,7 @@ public:
     void DrawLine(const Vec3* a, const Vec3* b);                                 // 0x0047c4f0
     void DrawMarker(const Vec3* p, float size);                                  // 0x0047c570
 
-    int field_0x2c;                   // packed draw color (SetDrawColor)
+    int drawColor;                   // +0x2c packed draw color (SetDrawColor)
     int field_0x30;                   // zeroed by the GraphicsTest constructor
     int field_0x34;                   // zeroed by the PhysicsRigidBody constructor
 };

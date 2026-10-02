@@ -15,7 +15,7 @@ public:
     virtual void BaseObjectVirtualSlot1();
     virtual void BaseObjectVirtualSlot2();
     virtual int BaseObjectVirtualSlot3();
-    int field_0x04;
+    int refCount;  // +0x04 ctor 0x00405120 sets 1; slot 1 0x00405160 increments; slot 2 0x00405170 (Release) decrements and deletes at 0; slot 3 0x00401940 returns it (tier 1 decoded behaviour)
 };
 
 // GameObject: RTTI .?AVGameObject@@ (COL 0x0055c248), direct base BaseObject, vtable
@@ -29,7 +29,7 @@ public:
 class GameObject : public BaseObject {
 public:
     // 0x00468ca0 (thiscall, ret 4; tier 1 decoded body).  Bit 0 of the argument goes to bit 0
-    // of field_0x25 and to bit 1 (shl 1); it also zeroes +0x08..+0x20, sets +0x24 to 0xff,
+    // of statusFlags and to bit 1 (shl 1); it also zeroes +0x08..+0x20, sets +0x24 to 0xff,
     // allocates the 0x28 block and registers the object (0x00469ce0).  Terrain's ctor
     // (0x00505830) forwards its own argument; CollisionCharacter (0x004318d0) passes 1 as the
     // virtual-base initializer.  Parameter name tier 3.  Declared explicit and without a
@@ -41,8 +41,8 @@ public:
     // GameObject bodies in vtable 0x00552a2c; parameter types beyond "4-byte value" and every
     // name are tier 3.  Most slots forward the call to the child list (+0x10, next +0x0c)
     // and return 1 (0 when a child returns 0).
-    virtual void GameObjectVirtualSlot4();       // 0x004690a0: clears bits 0/1 of field_0x25, tail-calls slot 6
-    virtual void GameObjectVirtualSlot5();       // 0x004690b0: sets bits 0/1 of field_0x25, tail-calls slot 7
+    virtual void GameObjectVirtualSlot4();       // 0x004690a0: clears bits 0/1 of statusFlags, tail-calls slot 6
+    virtual void GameObjectVirtualSlot5();       // 0x004690b0: sets bits 0/1 of statusFlags, tail-calls slot 7
     virtual void GameObjectVirtualSlot6();       // 0x00469050: calls slot 6 on each child, ret
     virtual void GameObjectVirtualSlot7();       // 0x00469070: calls slot 7 on each enabled child, ret
     // Slot 8: 0x004692f0 `mov eax,ecx; mov ecx,[esp+4]; mov [eax+0x18],ecx; ret 4` ->
@@ -73,15 +73,15 @@ public:
     virtual int GameObjectVirtualSlot23(int a, int b);
     virtual int GameObjectVirtualSlot24(int a, int b, int c, int d, int e);  // 0x00469620: ret 0x14
     virtual int GameObjectVirtualSlot25(int a);  // 0x00469720: ret 4, returns 1
-    virtual void GameObjectVirtualSlot26();      // 0x004692c0: ret, sets bit 3 of field_0x25
+    virtual void GameObjectVirtualSlot26();      // 0x004692c0: ret, sets bit 3 of statusFlags
     // Non-virtual, this == the GameObject subobject (Bike slot 97 0x00409420 computes
     // `lea ecx,[vbase]` before calling it).  Argument types tier 3.
     void Method_0x00469190(void* a, int b);
 
-    char field_0x08[0x10];
+    char treeLinks[0x10];  // +0x08 previous/next sibling, first child, parent (src/reconstructed/GameObject.h)
     void* field_0x18;                   // written by slot 8 (0x004692f0)
     char field_0x1c[9];
-    unsigned char field_0x25;           // bit 0 tested by SoultreePhysicsBaseObject slot 21 and Vehicle
+    unsigned char statusFlags;           // +0x25 bit 0 tested by SoultreePhysicsBaseObject slot 21 and Vehicle
                                         // slot 38 through field_0x124 (tier 3: "enabled" flag)
     char field_0x26[6];                 // GameObject ends at 0x2c (ctor 0x00468ca0 extent)
 };

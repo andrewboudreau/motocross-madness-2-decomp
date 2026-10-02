@@ -421,5 +421,23 @@
     "target_size": 1654,
     "expect": "partial",
     "notes": "56.6% (1659 vs 1654). The first 0x3b7 bytes are identical. The Clip helpers are now `inline` with reference params, `-dir` is passed as a temporary, and operator/ builds the result with a direct constructor call. What remains is VC6's inline budget: retail does not inline the ClipZ for the Z end point and inlines the next `-dir`, but this source inlines that ClipZ and so runs out of budget one site early. See the comment above CastSegment."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "RetireOwnedObject",
+    "target_va": "0x005057d0",
+    "target_size": 83,
+    "expect": "exact",
+    "notes": "linear search of field_0xcb8[] (count field_0xcbc); the match is swapped with the last live element, the count shrinks and the object is stored behind the new end. Exact first try; adjacent to the Terrain ctor 0x00505830, uses Terrain fields 0xcb8/0xcbc."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "ComputeRatios",
+    "target_va": "0x00507bb0",
+    "target_size": 96,
+    "expect": "exact",
+    "notes": "derives a/b, a^2/b^2 and their reciprocals from ints at 0x6c/0x70 into floats 0x74/0x78/0x7c/0x80 (called by slot 12 0x507610 after storing the new 0x6c). Exact with the source order b^2 ratio first then a/b (fidiv with int temporaries)."
   }
 ]

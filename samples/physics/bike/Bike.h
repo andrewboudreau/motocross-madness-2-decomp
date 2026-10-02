@@ -39,25 +39,25 @@ struct BikeA38;
 // Objects reached through Bike fields.  Layout is only known where accessed.
 struct BikeWheel {
     char pad_0x000[204];
-    Vec3 w_0xcc;
+    Vec3 wheelPosition;
     char pad_0x0d8[12];
-    Vec3 w_0xe4;
+    Vec3 groundNormal;
     char pad_0x0f0[12];
-    Vec3 w_0xfc;
+    Vec3 appliedShare;
     Vec3 w_0x108;
     char pad_0x114[48];
-    float w_0x144;
+    float contactLoad;
     float w_0x148;
     char pad_0x14c[4];
     float w_0x150;
     char pad_0x154[4];
-    float w_0x158;
+    float loadWeight;
     char pad_0x15c[212];
     Vec3 w_0x230;
     Vec3 w_0x23c;
     Vec3 w_0x248;             // KrustyBike slot 48 (0x004964e0) zeroes it
     char pad_0x254[12];
-    int w_0x260;
+    int inContact;
     char pad_0x264[4];
     int w_0x268;
     char pad_0x26c[16];
@@ -155,17 +155,17 @@ struct BikeA1F4 {
 };
 
 struct BikeA640 {
-    float l_0x0;
+    float steerValue;
     float l_0x4;
     float l_0x8;
 };
 
 struct BikeA644 {
-    int m_0x0;
-    float m_0x4;
-    float m_0x8;
-    float m_0xc;
-    float m_0x10;
+    int smoothedValue;
+    float smoothTime;
+    float smoothRatio;
+    float maxRise;
+    float maxFall;
 };
 
 struct BikeQ {
@@ -252,13 +252,13 @@ public:
 
     int field_0x5bc;              // first Bike field (Vehicle's own data ends at 0x5bc)
     int field_0x5c0;
-    BikeA5C4* field_0x5c4;
+    BikeA5C4* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls Method_0x004a8c50(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
     char pad_0x5c8[40];
-    BikeWheel* field_0x5f0;
-    BikeWheel* field_0x5f4;
+    BikeWheel* frontWheel;       // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3
+    BikeWheel* rearWheel;       // +0x5f4 rear wheel (smallest config z, 0x408728); tier 3
     char pad_0x5f8[12];
     BikeA604* field_0x604;
-    Vehicle* field_0x608;
+    Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
     char pad_0x60c[16];
     Vec3 field_0x61c;
     float field_0x628;
@@ -267,29 +267,29 @@ public:
     int field_0x634;
     int field_0x638;
     float field_0x63c;
-    BikeA640* field_0x640;
-    BikeA644* field_0x644;
-    float field_0x648;
-    float field_0x64c;
-    int field_0x650;
-    float field_0x654;
-    int field_0x658;
-    float field_0x65c;
-    float field_0x660;
+    BikeA640* steerAxis;  // +0x640 slot 41 region: steer = (steerAxis->l_0x0 - 0.5f) * 4.0f; slot 89 maps (0.75 - l_0x0)*3.99 to a pose index
+    BikeA644* poseSmoother;  // +0x644 slot 1 and slot 89: object with value/rate/ratio/limits that is advanced toward field_0x504 each frame with rate limiting (see BikeA644)
+    float leanPoseMin;  // +0x648 slot 89: lean > leanPoseMin selects pose; poseLeanBlend = (lean - leanPoseMin) / (leanPoseMax - leanPoseMin)
+    float leanPoseMax;  // +0x64c slot 89: upper lean bound; divisor (leanPoseMax - leanPoseMin) of the pose lean blend
+    int poseIndex;  // +0x650 slot 89/61: current pose index (set to 10/11+idx, used to index riderPoseHandles[] and bikePoseHandles[], clamped to 13)
+    float poseBlend;  // +0x654 slot 89: fractional part of the pose parameter ((0.75-l)*3.99 - idx); slot 61 weight w = 1 - poseBlend
+    int poseState;  // +0x658 slot 89/61: paired with poseIndex (10 = lean pose); compared against 10 in slot 61 and set to idx*2+4
+    float poseParam;  // +0x65c slot 61: passed as time/weight arg to Method_0x004a8c50 and Method_0x004a8bf0; slot 89 state machine writes it from the smoothed value (x = t * -0.25)
+    float poseLeanBlend;  // +0x660 slot 89: (lean - min)/(max - min) pose lean blend; slot 61: (speed*0.0310559+1)*0.5
     float field_0x664;                // retail does fld/fcomp on it (KrustyBike request)
     int field_0x668;
-    int field_0x66c[18];
-    int field_0x6b4[18];
+    int riderPoseHandles[18];  // +0x66c slot 61: riderPoseHandles[idx], riderPoseHandles[next] passed to riderCharacter->Method_0x004a8c50 (rider-side pose ids, 18 entries)
+    int bikePoseHandles[18];  // +0x6b4 slot 61: bikePoseHandles[idx], [next] passed to D3DIMSoultreeCharacter::Method_0x004a8c50 (bike-side pose ids, 18 entries)
     int field_0x6fc;
     int field_0x700;
     float field_0x704;
-    float field_0x708;
+    float sideLieThreshold;  // +0x708 slot 38 tail: compared with |dot(g_BikeVec3_005778c8, field_0xa0)|; if smaller 'bike is lying on its side' branch
     char pad_0x70c[4];
     float field_0x710;
-    float field_0x714;
-    float field_0x718;
-    float field_0x71c;
-    int field_0x720;
+    float wobbleTime;  // +0x714 slot 91 wobble: wobbleTime += field_0x13c each frame, cubed (t*t*t*0.3578) to cap amplitude, halved on sign flip, zeroed by slot 71
+    float wobbleSign;  // +0x718 slot 91 wobble: sign of field_0x2c; compared with new sign to detect flip; set in slot 71 from sign of field_0x48
+    float wobbleOffset;  // +0x71c slot 91 wobble: added into field_0xd8.z, decays *0.9 per frame, reloaded from field_0xd8.z on flip/slot 71
+    int wobbleStage;  // +0x720 slot 91 wobble: cycles 1..2 on each sign flip, loop active only while 1..2; slot 71 sets to 1
     float field_0x724;
     char pad_0x728[12];           // own data ends at 0x734; the compiler places the vtordisp there
 };

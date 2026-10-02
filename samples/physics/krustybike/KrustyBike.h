@@ -72,8 +72,12 @@ public:
 
     int Fn_00414370(float dt);   // called by slot 63 (0x004924c0); the result is unused
     void Fn_0048D8B0();
-    void Fn_004925A0(Vehicle* who, int flag);
+    void Fn_004925A0(Vehicle* who, bool flag);
+    void Fn_00496E20(KbRecorder* a);
+    int Fn_00495C00();
     void Fn_00496DA0();
+    void Fn_00496F90(KrustyBike* other);
+    void Fn_00497370(KrustyBike* other);
     float Fn_00495FF0();
     void Fn_00496E30(int a);
     void Fn_00413200(float dt);
@@ -97,7 +101,9 @@ public:
     float field_0x76c; // 0x76C
     int field_0x770; // 0x770
     int field_0x774; // 0x774
-    char pad_0x0778[0xC];
+    char pad_0x0778[0x4];
+    void* heapBufferA; // 0x77C  heap buffer released in the destructor (tier 3: type unknown)
+    void* heapBufferB; // 0x780  heap buffer released in the destructor
     int field_0x784; // 0x784
     int field_0x788; // 0x788
     int field_0x78c; // 0x78C
@@ -126,14 +132,14 @@ public:
     int field_0x138c; // 0x138C
     char pad_0x1390[0x68];
     int field_0x13f8; // 0x13F8
-    char pad_0x13FC[0x4];
+    KbRecorder* netRecorder; // 0x13FC
     int field_0x1400; // 0x1400
     int field_0x1404; // 0x1404
     int field_0x1408; // 0x1408
     int field_0x140c; // 0x140C
     char pad_0x1410[0x4];
-    KbObj128* field_0x1414; // 0x1414
-    KbObj128* field_0x1418; // 0x1418
+    KbObj128* altBodyA; // 0x1414
+    KbObj128* altBodyB; // 0x1418
     float field_0x141c; // 0x141C
     char pad_0x1420[0x100];
     float field_0x1520; // 0x1520

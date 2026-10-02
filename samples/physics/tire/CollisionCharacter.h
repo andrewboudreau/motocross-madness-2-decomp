@@ -35,10 +35,10 @@ public:
     GameObject* Load(int a1, const char* name, const char* colPath, const SoultreeLoadDesc* desc,
                      int a5, int a6, int a7);
 
-    CollisionObject* field_0x210;   // allocated 0xb8 bytes (CollisionObject), created by Load
-    SoultreeObject* field_0x214;      // scene node (D3DIM::d3d_field_0x1a0 copy), tier 3
-    Vec3 field_0x218;       // last node position (updated by slot 10)
-    Vec3 field_0x224;        // velocity = (position - last position) / dt
+    CollisionObject* collisionObject;   // +0x210 allocated 0xb8 bytes (CollisionObject), created by Load
+    SoultreeObject* sceneNode;      // +0x214 scene node (D3DIM::d3d_field_0x1a0 copy), tier 3
+    Vec3 lastNodePosition;       // +0x218 last node position (updated by slot 10)
+    Vec3 nodeVelocity;        // +0x224 velocity = (position - last position) / dt
     char field_0x230[0x18];         // not accessed by any target in this file
     Vec3 field_0x248;       // copy of *(Vec3*)(contact record + 0x18)
     Vec3 field_0x254;       // copy of *(Vec3*)(contact record + 0x0c)
