@@ -15,28 +15,13 @@
 // base-pointer, assignment-in-argument and declaration-placement forms do
 // not change it.
 #include "../../src/reconstructed/DebugAlloc.h"
+#include "../../src/reconstructed/GameUi.h"
 #include "../../src/reconstructed/SoundInterface.h"
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/UIDialog.h"
 
 // IMM32, called through the linker's import thunk.
 extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
-
-// A control found by name (its +0x1f0 is a progress bar's value). Declaring
-// these two classes in KrustyUI.h changes VC6's register choice in
-// TrackGame slot 1, so they stay here.
-class UnknownGameUiControl {
-public:
-    unsigned char field_0x000[0x1f0];
-    int field_0x1f0;
-};
-
-// Page object at KrustyUI+0x490; 0x0046ebf0 sits among gameui.cpp's literals.
-class UnknownGameUiPage {
-public:
-    UnknownGameUiControl* UnknownFunction46ebf0(const char* name, int flags); // 0x0046ebf0
-};
-
 
 // 0x0045cb20: adds *step to KrustyUI's "ProgressBar"; without a step it
 // calls KrustyUI 0x0049b530.

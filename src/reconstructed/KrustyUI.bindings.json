@@ -1,0 +1,17 @@
+{
+  "??0GameObject@@QAE@H@Z": "0x00468ca0",
+  "??1GameObject@@UAE@XZ": "0x00468d60",
+  "??1KrustyUI@@UAE@XZ": "0x0049b470",
+  "??1KrustyUI@@UAE@XZ$ehhandler": "0x0054c258",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "??_7KrustyUI@@6B@": "0x0055488c",
+  "??_C@_0M@CEIO@ProgressBar?$AA@": "0x00569d9c",
+  "?UnknownFunction46ebf0@UnknownGameUiPage@@QAEPAVUnknownGameUiControl@@PBDH@Z": "0x0046ebf0",
+  "?UnknownFunction47b370@UnknownGameUiControl@@QAEXH@Z": "0x0047b370",
+  "?UnknownFunction485d50@UnknownKrustyUIGui@@QAEXXZ": "0x00485d50",
+  "?UnknownFunction4999b0@KrustyUI@@QAEXXZ": "0x004999b0",
+  "?UnknownFunction5053b0@@YAXH@Z": "0x005053b0",
+  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "__FILE__": "0x0056d67c"
+}
