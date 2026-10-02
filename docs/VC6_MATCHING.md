@@ -10,7 +10,7 @@ game remains a separate, unverified gate.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 400/400 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 414/414 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |

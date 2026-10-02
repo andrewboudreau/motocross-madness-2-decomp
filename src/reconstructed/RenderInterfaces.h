@@ -7,6 +7,7 @@
 // so the names stay neutral. Indices noted on the known methods.
 
 struct Matrix4;
+struct UnknownSurfaceDesc;
 
 // Device at PCRenderTarget+0x50 (IDirect3DDevice7-shaped).
 struct UnknownRenderInterface {
@@ -78,7 +79,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod22();
     virtual long __stdcall UnknownMethod23();
     virtual long __stdcall UnknownMethod24();                             // IsLost
-    virtual long __stdcall UnknownMethod25();
+    virtual long __stdcall UnknownMethod25(void* rect, UnknownSurfaceDesc* desc, int flags, void* event); // Lock
     virtual long __stdcall UnknownMethod26();
     virtual long __stdcall UnknownMethod27();                             // Restore
     virtual long __stdcall UnknownMethod28();
@@ -102,7 +103,10 @@ struct UnknownSurfaceDesc {
     unsigned long flags;
     unsigned long height;
     unsigned long width;
-    unsigned char field_0x10[0x48 - 0x10];
+    long pitch;
+    unsigned char field_0x14[0x24 - 0x14];
+    void* surface;                                // the locked bits
+    unsigned char field_0x28[0x48 - 0x28];
     unsigned char pixelFormat[0x20];
     unsigned long caps[4];
     unsigned long textureStage;

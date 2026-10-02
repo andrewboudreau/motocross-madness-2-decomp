@@ -7,6 +7,7 @@
 class TextureMapManager : public GameObject {
 public:
     TextureMapManager();                      // 0x00510bd0
+    void UnknownFunction511580();             // 0x00511580 (PCTextureMap slot 12 and destructor)
 
     unsigned char field_0x2c[0x7c - 0x2c];
 };
