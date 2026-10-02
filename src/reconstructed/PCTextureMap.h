@@ -46,7 +46,7 @@ int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int for
 // Shared texture surfaces reused across textures: 0x0068a36c by mip level
 // count, 0x0068a394 for single-level textures.
 extern UnknownSurfaceInterface* g_UnknownSharedMipSurfaces68a36c[10];
-extern UnknownSurfaceInterface* g_UnknownSharedSurfaces68a394[2];
+extern UnknownSurfaceInterface* g_UnknownSharedSurfaces68a394[10];
 
 // Global at 0x00689968: when set, slot 4 refills the first level.
 extern int g_UnknownGlobal689968;
@@ -108,14 +108,6 @@ public:
     UnknownSurfaceInterface* field_0x74;      // texture surface
     void* field_0x78;                         // palette for 8-bit textures
     UnknownVideoDecoder* field_0x7c;
-};
-
-class CacheTexture;
-
-// Texture cache at CacheTexture+0x90 (TextureCache.cpp).
-class UnknownTextureCache {
-public:
-    void UnknownFunction50c6c0(CacheTexture* texture); // 0x0050c6c0: adds a texture
 };
 
 // RTTI: CacheTexture : PCTextureMap (vtable 0x00558430; 0xbc bytes). Its

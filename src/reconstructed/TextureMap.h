@@ -75,8 +75,8 @@ public:
     // alpha texture; 0 for other formats.
     int UnknownFunction50abd0(int addressU, int addressV);
 
-    int field_0x08;
-    int field_0x0c;
+    TextureMap* field_0x08;                   // next in the manager's list
+    TextureMap* field_0x0c;                   // previous in the manager's list
     TextureMapManager* field_0x10;            // manager (constructor argument)
     int field_0x14;                           // width
     int field_0x18;                           // height
