@@ -62,3 +62,18 @@ int PCTextureMap::UnknownVirtualSlot20() {
     return 1;
 }
 
+// 0x004c7e30: converts a 24-bit colour to the texture's format (555, 565 or
+// a palette index) and stores it as the colour key.
+void PCTextureMap::UnknownFunction4c7e30(unsigned int color) {
+    int key;
+    if (field_0x20 == 0x22b)
+        key = (color >> 9) & 0x7c00 | (color >> 6) & 0x3e0 | (color >> 3) & 0x1f;
+    else if (field_0x20 == 0x235)
+        key = (color >> 8) & 0xf800 | (color >> 5) & 0x7e0 | (color >> 3) & 0x1f;
+    else if (field_0x20 == 8)
+        key = field_0x2c->field_0x710[(color >> 9) & 0x7c00 | (color >> 6) & 0x3e0 | (color >> 3) & 0x1f];
+    else
+        key = color;
+    field_0x34 = field_0x38 = key;
+}
+

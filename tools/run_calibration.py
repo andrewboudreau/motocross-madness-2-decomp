@@ -3298,6 +3298,15 @@ CASES = [
         'reason': 'lock 0x811, fill, unlock',
     },
     {
+        'name': 'PCTextureMap slot8 create texture',
+        'bindings': 'src/reconstructed/PCTextureMap.bindings.json',
+        'source': 'src/reconstructed/PCTextureMap.cpp',
+        'symbol': '?UnknownVirtualSlot8@PCTextureMap@@UAEHHHH@Z',
+        'target_va': '0x004c7480',
+        'target_size': 394,
+        'reason': 'goto done/failed; VC6 lays labelled returns out in reverse source order',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

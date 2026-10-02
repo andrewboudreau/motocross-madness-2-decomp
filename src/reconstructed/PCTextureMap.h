@@ -5,6 +5,13 @@
 #include "RenderInterfaces.h"
 #include "TextureMapManager.h"
 
+// Palette object at TextureMap+0x2c: +0x710 maps 555 colours to palette
+// indices.
+struct UnknownTexturePalette {
+    unsigned char field_0x000[0x710];
+    unsigned char field_0x710[0x8000];
+};
+
 // A render state and its value (RenderTarget slot 8).
 struct UnknownRenderStatePair {
     int state;
@@ -23,7 +30,7 @@ public:
     virtual void UnknownVirtualSlot6() = 0;
     virtual int UnknownVirtualSlot7() = 0;
     virtual int UnknownVirtualSlot8(int a, int b, int c) = 0;
-    virtual void UnknownVirtualSlot9() = 0;
+    virtual void UnknownVirtualSlot9(int a, int b) = 0;
     virtual void UnknownVirtualSlot10() = 0;
     virtual int UnknownVirtualSlot11() = 0;
     virtual void UnknownVirtualSlot12() = 0;
@@ -44,7 +51,12 @@ public:
     int field_0x1c;
     int field_0x20;                           // pixel format
     int field_0x24;                           // 1: no mip levels
-    unsigned char field_0x28[0x44 - 0x28];
+    unsigned char field_0x28[0x2c - 0x28];
+    UnknownTexturePalette* field_0x2c;
+    unsigned char field_0x30[0x34 - 0x30];
+    int field_0x34;                           // colour key (also +0x38)
+    int field_0x38;
+    unsigned char field_0x3c[0x44 - 0x3c];
     int field_0x44;                           // render-state pair count
     UnknownRenderStatePair field_0x48[4];     // applied by slot 19 (length not established)
     unsigned char field_0x68[0x70 - 0x68];
@@ -78,8 +90,9 @@ public:
     virtual void UnknownVirtualSlot5();       // 0x004c6080
     virtual void UnknownVirtualSlot6();       // 0x004c71c0
     virtual int UnknownVirtualSlot7();        // 0x004c7470: whether +0x74 exists
-    virtual int UnknownVirtualSlot8(int a, int b, int c); // 0x004c7480
-    virtual void UnknownVirtualSlot9();       // 0x004c7640
+    // 0x004c7480: creates the texture surface from +0x70 (or shares it).
+    virtual int UnknownVirtualSlot8(int a, int b, int c);
+    virtual void UnknownVirtualSlot9(int a, int b); // 0x004c7640
     virtual void UnknownVirtualSlot10();      // 0x004c7610: releases the texture surface
     virtual int UnknownVirtualSlot11();       // 0x004c7970: sets it as texture stage 0
     virtual void UnknownVirtualSlot12();      // 0x004c6040: restores a lost surface
@@ -99,10 +112,11 @@ public:
     // 0x004c83a0: the mip level whose width is `width`, or 0.
     UnknownSurfaceInterface* UnknownFunction4c83a0(int width);
     int UnknownFunction4c84e0(UnknownSurfaceInterface* surface, int value); // 0x004c84e0: fills a level
+    void UnknownFunction4c7e30(unsigned int color); // 0x004c7e30: sets the colour key
     void UnknownFunction4c8550(UnknownSurfaceDesc* desc, int value);        // 0x004c8550
 
     UnknownSurfaceInterface* field_0x70;      // system-memory surface (counted in DirectX memory)
     UnknownSurfaceInterface* field_0x74;      // texture surface
-    int field_0x78;
+    void* field_0x78;                         // palette for 8-bit textures
     UnknownVideoDecoder* field_0x7c;
 };

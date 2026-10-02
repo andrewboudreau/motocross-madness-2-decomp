@@ -147,3 +147,46 @@ int PCTextureMap::UnknownFunction4c84e0(UnknownSurfaceInterface* surface, int va
     surface->UnknownMethod32(0);
     return 1;
 }
+
+// 0x004c7480: creates the texture surface from +0x70 (or shares +0x70 when
+// it is already in video memory and `c` is clear, or when Game+0x2d0 is
+// set); `a` then asks slot 9 to upload it.
+int PCTextureMap::UnknownVirtualSlot8(int a, int b, int c) {
+    if (field_0x74)
+        goto done;
+    if (field_0x70) {
+        UnknownSurfaceCaps caps;
+        if (field_0x70->UnknownMethod14(&caps))
+            goto failed;
+        if (caps.caps & 0x20000000 && !c || g_UnknownGlobal56e26c->field_0x2d0) {
+            field_0x74 = field_0x70;
+            field_0x70->UnknownMethod1();
+        } else {
+            UnknownSurfaceDesc desc;
+            memset(&desc, 0, sizeof(desc));
+            desc.size = sizeof(desc);
+            if (field_0x70->UnknownMethod22(&desc))
+                goto failed;
+            desc.flags &= 0x3f087;
+            desc.caps[0] = desc.caps[0] & 0xcffff7ff | (b ? 0x2000 : 0) | 0x4000;
+            if (g_UnknownGlobal56e26c->field_0x0c->field_0x9f0 && c)
+                desc.caps[0] |= 0x10000000;
+            desc.pitch = 0;
+            if (!field_0x74 &&
+                g_UnknownGlobal56e26c->field_0x0c->field_0x190->UnknownMethod6(&desc, &field_0x74, 0))
+                goto failed;
+            if (field_0x78 && field_0x20 == 8 && field_0x74->UnknownMethod31(field_0x78))
+                goto failed;
+            if (g_UnknownGlobal689964)
+                field_0x10->UnknownFunction511580();
+        }
+    }
+    if (a && field_0x74 != field_0x70)
+        UnknownVirtualSlot9(0, -1);
+    if (!field_0x74)
+        goto failed;
+done:
+    return 1;
+failed:
+    return 0;
+}

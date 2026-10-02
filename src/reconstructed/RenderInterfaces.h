@@ -55,7 +55,7 @@ struct UnknownRenderInterface {
 // Surface at PCRenderTarget+0x48 (IDirectDrawSurface7-shaped).
 struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod0();
-    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall UnknownMethod1();                              // AddRef
     virtual long __stdcall UnknownMethod2();
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
@@ -69,7 +69,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod11();
     virtual long __stdcall UnknownMethod12(UnknownSurfaceCaps* caps, UnknownSurfaceInterface** surface); // GetAttachedSurface
     virtual long __stdcall UnknownMethod13();
-    virtual long __stdcall UnknownMethod14();
+    virtual long __stdcall UnknownMethod14(UnknownSurfaceCaps* caps);      // GetCaps
     virtual long __stdcall UnknownMethod15();
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall UnknownMethod17();
@@ -77,7 +77,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod19();
     virtual long __stdcall UnknownMethod20();
     virtual long __stdcall UnknownMethod21();
-    virtual long __stdcall UnknownMethod22();
+    virtual long __stdcall UnknownMethod22(UnknownSurfaceDesc* desc);      // GetSurfaceDesc
     virtual long __stdcall UnknownMethod23();
     virtual long __stdcall UnknownMethod24();                             // IsLost
     virtual long __stdcall UnknownMethod25(void* rect, UnknownSurfaceDesc* desc, int flags, void* event); // Lock
@@ -86,7 +86,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod28();
     virtual long __stdcall UnknownMethod29();
     virtual long __stdcall UnknownMethod30();
-    virtual long __stdcall UnknownMethod31();
+    virtual long __stdcall UnknownMethod31(void* palette);                 // SetPalette
     virtual long __stdcall UnknownMethod32(void* rect);                   // Unlock
 };
 
