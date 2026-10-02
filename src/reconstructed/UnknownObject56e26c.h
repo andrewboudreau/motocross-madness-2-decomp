@@ -1,13 +1,15 @@
 #pragma once
 
 #include "ControlInterface.h"
+#include "Game.h"
 
 struct UnknownInputEntry;
 
 // The object behind the global pointer at 0x0056e26c, used throughout the
-// camera and input code. It is polymorphic (virtual slot 22 is called). Its
-// class is not established; only members that reconstructed functions touch
-// are declared, at their observed offsets.
+// camera and input code. It is a Game (see Game.h); its most-derived class
+// is not established (RTTI's PCGame : Game and TrackGame : PCGame are the
+// candidates), so the members past Game that reconstructed functions touch
+// are declared here, at their observed offsets.
 
 // Object returned by (+0x570)->0x0045d340; KrustyBikeCamera slot 58 hands it
 // a message.
@@ -31,53 +33,12 @@ public:
     int UnknownFunction524100(); // 0x00524100
 };
 
-struct UnknownObject56e26cSettings {
-    unsigned char field_0x00[0x6c];
-    int field_0x6c;      // freezes RenderTarget's frame index (0x004e8cc0)
-};
-
-class UnknownObject56e26c {
+class UnknownObject56e26c : public Game {
 public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12();
-    // Input events from ControlInterface 0x0043cf00: released, pressed.
-    virtual void UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual void UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual void UnknownVirtualSlot15();
-    virtual void UnknownVirtualSlot16();
-    virtual void UnknownVirtualSlot17();
-    virtual void UnknownVirtualSlot18();
-    virtual void UnknownVirtualSlot19();
-    virtual void UnknownVirtualSlot20();
-    virtual void UnknownVirtualSlot21();
-    // Named boolean setting (JoystickDevice asks for "JoyDirectionFlipped").
-    virtual int UnknownVirtualSlot22(const char* name, int defaultValue);
-
-    void UnknownFunction468880(); // 0x00468880 (PCCamera slot 27)
     // 0x00521970: copies string `id` into buffer (size bytes).
     void UnknownFunction521970(int id, char* buffer, int size);
 
-    unsigned char field_0x0004[0x0c - 4];
-    UnknownObject56e26cSettings* field_0x0c;
-    int field_0x10;
-    ControlInterface* field_0x14;
-    int field_0x18;      // KrustyBikeCamera slot 42 tests > 1
-    unsigned char field_0x001c[0x2d4 - 0x1c];
-    unsigned char field_0x2d4;   // bit 2 tested by KeyboardDevice 0x0048a240
-    unsigned char field_0x02d5[0x2f0 - 0x2d5];
-    float field_0x2f0;           // frame time (KeyboardDevice 0x0048a0c0)
-    unsigned char field_0x02f4[0x318 - 0x2f4];
+    unsigned char field_0x02f8[0x318 - 0x2f8];
     void* field_0x318;           // instance handle passed to DirectInputCreateEx
     void* field_0x31c;           // window handle passed to cooperative-level calls
     unsigned char field_0x0320[0x558 - 0x320];
