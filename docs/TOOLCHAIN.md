@@ -39,8 +39,6 @@ Linux, with `MCM2_PRIVATE_BUNDLE_URL` in the setup environment:
 
 ```bash
 bash tools/setup_vc6_linux.sh
-python3 tools/with_private_env.py -- make analyze
-make private-ready
 make vc6-private-gate
 ```
 
@@ -56,11 +54,56 @@ is allowed when VC6 acceptance fails.
 
 ## Cloud and containers
 
-`tools/cloud_setup.sh` provisions Ubuntu workers and generates analysis. The
-Claude remote-session hook calls it automatically. Configure the private bundle
-URL and allow its host. Steps warn on failure, so inspect
-`work/vc6-acceptance.json`; hook completion alone is not readiness. Reusable path
-settings are in `work/cloud-env.sh`. Outputs stay outside tracked docs/source.
+### Codex Cloud
+
+Create an environment for this GitHub repository on `main`. Use an x86-64 Ubuntu
+worker with Python 3.10+ and root/sudo package-install access. Keep the environment
+private: its prepared filesystem includes the game EXE and Microsoft toolchain.
+
+| Setting | Value |
+|---|---|
+| Install script | `bash tools/cloud_setup.sh --strict` |
+| Start skill instructions | Run `bash tools/cloud_setup.sh --strict --no-apt`, then `python3 tools/with_private_env.py -- make status` from the repository root. |
+| Direct environment variable | `MCM2_PRIVATE_BUNDLE_URL`: the private ZIP download URL |
+| Network | Allow Ubuntu package repositories, PyPI and the ZIP host during installation. |
+
+The current [Codex Cloud interface](https://learn.chatgpt.com/docs/environments/cloud-environments)
+uses **Install script** and **Start skill**. Configure the full signed URL as a
+direct variable (optionally from Personal vault); the downloader must read a real
+URL, not a network-secret placeholder. This value is accessible to environment
+processes. The setup script does not print it or save it in its generated exports.
+Review the setup results and publish the prepared environment. After changing
+installed dependencies, edit and republish it for new tasks.
+
+If your interface instead shows the [legacy setup/maintenance fields](https://learn.chatgpt.com/docs/environments/cloud-environment),
+put `bash tools/cloud_setup.sh --strict` in **Setup script**,
+`bash tools/cloud_setup.sh --strict --no-apt` in **Maintenance script**, and the
+URL in a **Secret** named `MCM2_PRIVATE_BUNDLE_URL`. A cached startup uses installed
+inputs without requiring the download secret again.
+
+Setup installs 32-bit Wine, Clang, GNU disassembly/build tools, Capstone and a native
+C++ compiler; verifies and installs the pinned private bundle; runs a real VC6
+readiness compile; and generates analysis. `--strict` returns failure when a
+required step fails. Logs are `work/vc6-acceptance.log` and
+`work/cloud-analyze.log`; compiler details are in `work/vc6-acceptance.json`.
+Readiness does not claim every reconstructed function matches. For byte checks:
+
+```bash
+python3 tools/with_private_env.py -- make vc6-gate
+make static-check test
+```
+
+Setup exports do not carry into a separate task shell. Use the wrapper above,
+or `source work/cloud-env.sh` in each shell before direct `make` commands. The
+default cache is `~/.cache/mcm2-private`; set `MCM2_PRIVATE_ROOT` in environment
+settings if a different persistent location is needed. Startup regenerates
+analysis instead of trusting reports from the previously checked-out revision.
+
+The Claude remote-session hook uses the same script in best-effort mode. Its
+completion alone is not readiness; inspect the acceptance report. Linux setup
+through `tools/setup_vc6_linux.sh` delegates to strict mode.
+
+### Docker
 
 Docker accepts an owned installer and a mounted compiler tree:
 
