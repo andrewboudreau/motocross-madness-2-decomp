@@ -44,12 +44,17 @@ public:
     virtual int UnknownVirtualSlot25(void* value);
     virtual void UnknownVirtualSlot26();
 
+    // 0x00469190: appends `child` (and its later siblings) to the children;
+    // not reconstructed.
+    int UnknownFunction469190(GameObject* child, int value);
     // 0x00469680: releases this object and every later sibling, back to front.
     int UnknownFunction469680();
     // 0x00469ce0: appends the RTTI class name of `object` to field_0x28.
     void UnknownFunction469ce0(GameObject* object);
 
 protected:
+    friend class Game; // reads the +0x25 bits of its DebugOverlay
+
     // Offsets and widths are evidenced by the reconstructed methods; names are
     // placeholders. Children are reached through field_0x10 and chained through
     // their field_0x0C (traversal by slots 6, 7, 12-18 and 26).

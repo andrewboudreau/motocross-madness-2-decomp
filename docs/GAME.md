@@ -50,7 +50,20 @@ candidates.
 
 The members at +0x2f4 and +0x34 are GameObjects (the root objects). The
 non-virtual initialiser `0x00467b70` constructs them with GameObject's
-constructor. Game's forwarding calls also line up with GameObject's slots
+constructor and links +0x34 under +0x2f4 (`0x00469190`). It then creates:
+- the PCSoundInterface (+0x04, `0x004be370`, 0x478 bytes);
+- the random seed: `srand` with the time stamp, then 1-256 `rand` calls.
+
+It also reads the `TestKey` DWORD under
+HKEY_LOCAL_MACHINE\SOFTWARE\Rainbow Studios into bit 2 of +0x2d4. When
+slot 32 allows, it then creates:
+- the TextureMapManager (+0x3c, `0x00510bd0`), with the +0x1c..+0x30 block;
+- with bit 2 only, the DebugOverlay (+0x38, `0x00447920`/`0x00447de0`,
+  under the "DebugOverlay" memory tag);
+- the "AllowFreezeCamera" setting, stored into bit 0 of +0x2d4.
+
+It is a near miss (761/775, `samples/game/GameNearMisses.cpp`). Only the
+frame slots of the registry locals and the `new` temporary differ. Game's forwarding calls also line up with GameObject's slots
 16, 19, 22–25 and `Release`. Input events therefore travel down the
 GameObject tree: GameObject slots 22 and 23 take ControlInterface's
 (event, entry) pair, and Camera slot 23 matches control 0xb7 against it.

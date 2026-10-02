@@ -1,12 +1,17 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "DebugAlloc.h"
 #include "Game.h"
 
 #include "ControlInterface.h"
+#include "DebugOverlay.h"
 #include "GameObject.h"
+#include "MemTag.h"
 #include "PCControl.h"
+#include "SoundInterface.h"
+#include "TextureMapManager.h"
 
 // 0x0065b4ac: a file cleared by the constructor and closed by the
 // destructor (0x00534c3d is the CRT's fclose).
@@ -27,7 +32,8 @@ static inline void DecodeString(char* text) {
 Game::Game() {
     UnknownFunction460ad0();
     field_0x2d5_bit3 = 1;
-    field_0x2d4 = field_0x2d4 & ~4 | 2;
+    field_0x2d4_bit2 = 0;
+    field_0x2d4_bit1 = 1;
     field_0x04 = 0;
     field_0x08 = 0;
     field_0x0c = 0;
@@ -44,7 +50,11 @@ Game::Game() {
     field_0x2dc = 0;
     field_0x2d8 = 0;
     field_0x2e0 = 1.0f;
-    field_0x2d4 = field_0x2d4 & 7 | 0x38;
+    field_0x2d4_bit3 = 1;
+    field_0x2d4_bit4 = 1;
+    field_0x2d4_bit5 = 1;
+    field_0x2d4_bit6 = 0;
+    field_0x2d4_bit7 = 0;
     field_0x1c4 = 0;
     field_0x1c8 = 0;
     field_0x2d5_bit0 = 0;
@@ -126,7 +136,7 @@ int Game::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* en
 int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (field_0x2d5_bit0)
         return 1;
-    if ((field_0x2d4 & 4) && field_0x38 && UnknownFunction43caa0(0x20, 0, event, 0x80)) {
+    if (field_0x2d4_bit2 && field_0x38 && UnknownFunction43caa0(0x20, 0, event, 0x80)) {
         if (field_0x38->field_0x25_bit0) {
             if (field_0x38->UnknownFunction4484f0())
                 field_0x38->UnknownVirtualSlot4();
@@ -134,7 +144,7 @@ int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* en
             field_0x38->UnknownVirtualSlot5();
         }
     }
-    if (field_0x2d4 & 1) {
+    if (field_0x2d4_bit0) {
         if (field_0x14->UnknownVirtualSlot3(0x21, 0, 0xc, 0)) {
             field_0x1c4 = 1 - field_0x1c4;
         } else if (field_0x14->UnknownVirtualSlot3(0x12, 0, 0x3f, 0) && field_0x1c4) {

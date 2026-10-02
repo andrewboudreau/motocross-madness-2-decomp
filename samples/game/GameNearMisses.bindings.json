@@ -33,6 +33,8 @@
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_UnknownGlobal56c470@@3PAVUnknownGlobal56c470@@A": "0x0056c470",
   "?g_UnknownStatic65b478@@3VUnknownStatic65b478@@A": "0x0065b478",
+  "?s_UnknownEncoded56b334@@3PADA": "0x0056b334",
+  "?s_UnknownEncoded56b350@@3PADA": "0x0056b350",
   "__FILE__": "0x0056b36c",
   "__imp__RegCloseKey@4": "0x00550018",
   "__imp__RegOpenKeyExA@20": "0x00550008",

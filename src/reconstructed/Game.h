@@ -1,7 +1,11 @@
 #pragma once
 
+#include "GameObject.h"
+
 class ControlInterface;
-class GameObject;
+class DebugOverlay;
+class SoundInterface;
+class TextureMapManager;
 class UnknownGameOwned;
 struct UnknownControlEvent;
 struct UnknownInputEntry;
@@ -28,18 +32,21 @@ public:
     unsigned char field_0x00[0x128];
 };
 
-// Owner at Game+0x04 and the objects at +0x10; deleted through slot 0.
+// Object at Game+0x10 (slot 31's result); deleted through slot 0.
 class UnknownGameOwned {
 public:
     virtual ~UnknownGameOwned();
+
+    unsigned char field_0x04[0x28 - 4];
+    int field_0x28;                           // copied to Game+0x28
 };
 
-// Global at 0x0056c470 (its code is near gameobj.cpp's literals).
-class UnknownGlobal56c470 {
+// Global at 0x0056c470: a GameObject (Game's initialiser adds it as a child
+// of the root and calls its slot 5), with a flag byte at +0x2c.
+class UnknownGlobal56c470 : public GameObject {
 public:
     void UnknownFunction4691f0();             // 0x004691f0
 
-    unsigned char field_0x00[0x2c];
     unsigned char field_0x2c;
 };
 extern UnknownGlobal56c470* g_UnknownGlobal56c470;
@@ -60,23 +67,6 @@ unsigned int UnknownFunction4bfa80();
 
 // cdecl 0x0052d0d0, called last on shutdown.
 void UnknownFunction52d0d0();
-
-// Object at Game+0x38; slot 14 drives it with control 0x20. The class is not
-// established.
-class UnknownGameObject38 {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-
-    int UnknownFunction4484f0();              // 0x004484f0
-
-    unsigned char field_0x04[0x25 - 4];
-    unsigned char field_0x25_bit0 : 1;
-};
 
 // RTTI: Game (root; PCGame : Game and TrackGame : PCGame derive from it).
 // Its functions pass the literal __FILE__ "D:\\aardvark\\VC\\krusty2\\Game.cpp".
@@ -121,28 +111,43 @@ public:
     virtual void UnknownVirtualSlot29() = 0;
     virtual int UnknownVirtualSlot30(int id, char* text);                                 // 0x00468c60
     virtual UnknownGameOwned* UnknownVirtualSlot31() = 0;
-    virtual void UnknownVirtualSlot32() = 0;
+    virtual int UnknownVirtualSlot32() = 0;
     virtual int UnknownVirtualSlot33();       // 0x00467e80
     virtual void UnknownVirtualSlot34() = 0;
 
+    // 0x00467b70: creates the root objects, sound, textures and (with the
+    // "DebugOverlay" registry flag) the debug overlay.
+    int UnknownFunction467b70(int value);
     void UnknownFunction468880();             // 0x00468880 (PCCamera slot 27)
 
-    UnknownGameOwned* field_0x04;
+    SoundInterface* field_0x04;               // a PCSoundInterface (initialiser)
     UnknownNetObject* field_0x08;
     UnknownObject56e26cSettings* field_0x0c;
     UnknownGameOwned* field_0x10;
     ControlInterface* field_0x14;
     int field_0x18;                           // 1 initially; KrustyBikeCamera slot 42 tests > 1
-    unsigned char field_0x001c[0x34 - 0x1c];
+    TextureMapManager* field_0x1c;
+    int field_0x20;
+    int field_0x24;
+    int field_0x28;
+    int field_0x2c;                           // 0x115c after initialisation
+    int field_0x30;
     GameObject* field_0x34;                   // second root object (initialiser 0x00467b70)
-    UnknownGameObject38* field_0x38;
-    int field_0x3c;
+    DebugOverlay* field_0x38;                 // with "DebugOverlay" set
+    TextureMapManager* field_0x3c;
     char field_0x40[0x1c4 - 0x40];            // empty string initially
     int field_0x1c4;
     int field_0x1c8;
     char field_0x1cc[0x2d0 - 0x1cc];          // directory for slot 18
     int field_0x2d0;
-    unsigned char field_0x2d4;                // flag bits (bit 2: KeyboardDevice 0x0048a240)
+    unsigned char field_0x2d4_bit0 : 1;       // "AllowFreezeCamera"; slot 14 key handling
+    unsigned char field_0x2d4_bit1 : 1;
+    unsigned char field_0x2d4_bit2 : 1;       // registry "TestKey" (debug input, overlay)
+    unsigned char field_0x2d4_bit3 : 1;
+    unsigned char field_0x2d4_bit4 : 1;
+    unsigned char field_0x2d4_bit5 : 1;
+    unsigned char field_0x2d4_bit6 : 1;
+    unsigned char field_0x2d4_bit7 : 1;
     unsigned char field_0x2d5_bit0 : 1;       // slots 11 and 13
     unsigned char field_0x2d5_bit1 : 1;       // set on shutdown
     unsigned char field_0x2d5_bit2 : 1;       // set by the constructor

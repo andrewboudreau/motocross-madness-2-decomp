@@ -67,12 +67,11 @@ void KeyboardDevice::UnknownFunction48a0c0(int list, int value) {
 // states with bit 7 never do. 0x80 also holds while key 0x29 is down,
 // 0x80000000 means no modifier, and bit 6 asks for an exact match.
 int KeyboardDevice::UnknownFunction48a240(int modifier) {
-    unsigned char flag = g_UnknownGlobal56e26c->field_0x2d4 & 4;
-    if (!flag && (modifier & 0x80))
+    if (!g_UnknownGlobal56e26c->field_0x2d4_bit2 && (modifier & 0x80))
         return 0;
     if (modifier == 0x3f)
         return 1;
-    if (flag && modifier == 0x80 && field_0x260[0x29].state == 1)
+    if (g_UnknownGlobal56e26c->field_0x2d4_bit2 && modifier == 0x80 && field_0x260[0x29].state == 1)
         return 1;
     if (modifier == (int)0x80000000)
         return field_0x16d8 == 0;
