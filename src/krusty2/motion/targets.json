@@ -1,0 +1,479 @@
+[
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x00504940",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "jmp thunk of the g_pSphereManager = new(__FILE__, 4) SphereManager(1) initialiser"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x00504950",
+    "target_size": 109,
+    "expect": "exact",
+    "notes": "dynamic initialiser body: debug new(__FILE__,4), ctor call, store to global"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "??0SphereManager@@QAE@H@Z",
+    "target_va": "0x005049c0",
+    "target_size": 35,
+    "expect": "exact",
+    "notes": "ctor: GameObject(a) plus field_0x414 = 0; one-argument source signature (ret 4 vbase ctor)"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "??_GSphereManager@@UAEPAXI@Z",
+    "target_va": "0x005049f0",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "slot 0 scalar deleting destructor (RTTI vtable 0x005581d8)"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "??1SphereManager@@UAE@XZ",
+    "target_va": "0x00504a10",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "destructor body: vptr store then tail jmp to GameObject dtor"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00504a20",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser jmp thunk (per-TU Math3D.h copy)"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00504a30",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser body (copy-init); target_size is the CodeView extent"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00504a70",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser jmp thunk (per-TU Math3D.h copy)"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x00504a80",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser body (copy-init); target_size is the CodeView extent"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x00504ac0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser jmp thunk (per-TU Math3D.h copy)"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x00504ad0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser body (copy-init); target_size is the CodeView extent"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x00504b10",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser jmp thunk (per-TU Math3D.h copy)"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00504b20",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser body (copy-init); target_size is the CodeView extent"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00504f70",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "vector constant initialiser jmp thunk (set 1 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00504f80",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "vector constant initialiser body (copy-init), set 1 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00504fc0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "vector constant initialiser jmp thunk (set 1 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x00504fd0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "vector constant initialiser body (copy-init), set 1 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x00505010",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "vector constant initialiser jmp thunk (set 1 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x00505020",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "vector constant initialiser body (copy-init), set 1 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x00505060",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "vector constant initialiser jmp thunk (set 1 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00505070",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "vector constant initialiser body (copy-init), set 1 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x005050b0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "vector constant initialiser jmp thunk (set 2 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x005050c0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "vector constant initialiser body (copy-init), set 2 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E17",
+    "target_va": "0x00505100",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "vector constant initialiser jmp thunk (set 2 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E16",
+    "target_va": "0x00505110",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "vector constant initialiser body (copy-init), set 2 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E20",
+    "target_va": "0x00505150",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "vector constant initialiser jmp thunk (set 2 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E19",
+    "target_va": "0x00505160",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "vector constant initialiser body (copy-init), set 2 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E23",
+    "target_va": "0x005051a0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "vector constant initialiser jmp thunk (set 2 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E22",
+    "target_va": "0x005051b0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "vector constant initialiser body (copy-init), set 2 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "??0SteeringControl@@QAE@MMPBUVec3@@0@Z",
+    "target_va": "0x00504b60",
+    "target_size": 235,
+    "expect": "exact",
+    "notes": "ctor: clamp t to [0,1], scale, debug new(__FILE__,0x17) SoultreeObject, SetPosition(0), SetAxesPtr"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?Release@SteeringControl@@QAEXXZ",
+    "target_va": "0x00504c50",
+    "target_size": 26,
+    "expect": "exact",
+    "notes": "releases the node"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?SetAxisFromDirection@SteeringControl@@QAEHPBUVec3@@PAVSoultreeObject@@@Z",
+    "target_va": "0x00504c70",
+    "target_size": 182,
+    "expect": "exact",
+    "notes": "axis from world direction in frame"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?SetAngle@SteeringControl@@QAEXMPAVSoultreeObject@@@Z",
+    "target_va": "0x00504e20",
+    "target_size": 150,
+    "expect": "exact",
+    "notes": "set angle then RotateAbout"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?AddAngle@SteeringControl@@QAEXMPAVSoultreeObject@@@Z",
+    "target_va": "0x00504ec0",
+    "target_size": 165,
+    "expect": "exact",
+    "notes": "add delta to angle then RotateAbout"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?SetAxisFromPoints@SteeringControl@@QAEHPAVSoultreeObject@@00@Z",
+    "target_va": "0x00504d30",
+    "target_size": 234,
+    "expect": "partial",
+    "notes": "60.7% (230 vs 234 bytes). Same algorithm (axis from two nodes' world positions in a frame, _finite guard); retail keeps y in a stack slot where VC6 keeps it in a register, so register allocation and FPU ordering diverge."
+  },
+  {
+    "class": "(free)",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?FillNodeNames@@YAHHPAUNodeNameEntry@@PAVSoultreeObject@@@Z",
+    "target_va": "0x00445460",
+    "target_size": 327,
+    "expect": "exact",
+    "notes": "recursive node-name table fill; first row peeled"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot8@D3DIMSoultreeCharacter",
+    "target_va": "0x00445e70",
+    "target_size": 78,
+    "expect": "exact",
+    "notes": "name copy then Character slot 8"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot6@D3DIMSoultreeCharacter",
+    "target_va": "0x00446480",
+    "target_size": 153,
+    "expect": "exact",
+    "notes": "Character virtual slot 6 override"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot3@D3DIMSoultreeCharacter",
+    "target_va": "0x00446110",
+    "target_size": 249,
+    "expect": "exact",
+    "notes": "Character virtual slot 3 override"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot5@D3DIMSoultreeCharacter",
+    "target_va": "0x00446300",
+    "target_size": 376,
+    "expect": "exact",
+    "notes": "mirror map, negated x"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot10@D3DIMSoultreeCharacter",
+    "target_va": "0x00446520",
+    "target_size": 246,
+    "expect": "exact",
+    "notes": "sprintf Position/Orientation Data into dead local buffer"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot4@D3DIMSoultreeCharacter",
+    "target_va": "0x00446210",
+    "target_size": 235,
+    "expect": "partial",
+    "notes": "98.63%: retail puts the 0x3c flag in ecx where ours uses eax (one register difference); separate nodeNames[idx] reads"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot2@D3DIMSoultreeCharacter",
+    "target_va": "0x00445fc0",
+    "target_size": 331,
+    "expect": "partial",
+    "notes": "99.68%: single SIB base/index order byte differs ([ecx+eax+0x74] vs [eax+ecx+0x74])"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "??1D3DIMSoultreeCharacter@@UAE@XZ",
+    "target_va": "0x004459a0",
+    "target_size": 200,
+    "expect": "exact",
+    "notes": "destructor core; this = GameObject vbase"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@UAEXXZ",
+    "target_va": "0x00446640",
+    "target_size": 40,
+    "expect": "exact",
+    "notes": "GameObject slot 4 override, clears 4 dwords"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@UAEXXZ",
+    "target_va": "0x00446620",
+    "target_size": 21,
+    "expect": "exact",
+    "notes": "GameObject slot 5 override, forwards"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
+    "target_va": "0x004466c0",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
+    "target_va": "0x004466d0",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "??_ED3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEPAXI@Z",
+    "target_va": "0x00446670",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk of scalar deleting dtor"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "??0D3DIMSoultreeCharacter@@QAE@H@Z",
+    "target_va": "0x004455b0",
+    "target_size": 195,
+    "expect": "exact",
+    "notes": "constructor(int)"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot9@D3DIMSoultreeCharacter",
+    "target_va": "0x00445ec0",
+    "target_size": 248,
+    "expect": "exact",
+    "notes": "D3DIM slot 9"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot0@D3DIMSoultreeCharacter",
+    "target_va": "0x00445a70",
+    "target_size": 1021,
+    "expect": "exact",
+    "notes": "Character slot 0"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?D3DIMVirtualSlot11@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBUSoultreeLoadDesc@@HHH@Z",
+    "target_va": "0x00445680",
+    "target_size": 788,
+    "expect": "partial",
+    "notes": "39.6%, 789 bytes vs 788: retail keeps registry entry in esi, reloads a2 from stack, frame 0x308; ours caches a2 in esi, spills entry, frame 0x30c"
+  }
+]

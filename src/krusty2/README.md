@@ -32,10 +32,20 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 
 | Folder | Contents |
 |---|---|
-| `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug `new`/`delete`/realloc), `MemTag.h` |
+| `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug malloc/`new`/`delete`/realloc), `MemTag.h` |
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.h`, `CollisionTypes.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
+| `bvh/` | `BoundingBoxTreeBuild.cpp`/`.h`: collision box-tree build (21 of 23 exact) |
+| `effects/` | `Particles.cpp`, `NormalDistribution.cpp`, `Nulls.cpp` (17 of 17 exact) |
+| `motion/` | `D3DIMSoultreeMotnctrl.cpp`, `Spheres.cpp`, `SteeringControl.cpp` (49 of 53 exact) |
+| `shadow/` | `ProjectedShadow.cpp`/`.h` (11 of 18 exact) |
+| `suspension/` | `SelectiveGravityModel.cpp` with the Shock classes (26 of 30 exact) |
+| `visibility/` | `VisibilityQuadTree.cpp`/`.h` (16 of 17 exact) |
+
+Each wave 4 folder has a `README.md` with its `__FILE__` string, bracket and ownership evidence.
+Code that sits in a bracket without `__FILE__` or class evidence lives in the matching
+`samples/physics/<folder>/` instead.
 
 Include shared headers by their path under this folder, e.g. `#include "core/GameObject.h"`.
 `tools/run_physics_samples.py` puts `src/krusty2` on the include path.
@@ -45,8 +55,8 @@ Include shared headers by their path under this folder, e.g. `#include "core/Gam
 - Name: `D:\aardvark\VC\krusty2\Quadtree.cpp`, string at 0x00572040.
 - Code bracket: after `ProjectedShadow.cpp` (last xref 0x4dacbc) and before
   `Quantize.cpp` (first xref 0x4dde47). Quadtree.cpp's own xrefs span 0x4dc729..0x4ddce6.
-- All 27 QuadTree/QuadTreeNode targets (0x4dc620..0x4ddd90) are inside the bracket;
-  22 match exactly, and 5 are documented partials in `broadphase/targets.json`.
+- All 35 QuadTree/QuadTreeNode targets (0x4dc4d0..0x4ddd90) are inside the bracket;
+  32 match exactly, and 3 are documented partials in `broadphase/targets.json`.
 - The 5-byte stub at 0x4dc4c0 (`xor eax,eax; ret 8`) also sits in this stretch, but it is
   Terrain's slot 22 and is shared with the ProjectedShadow and StatsOverlay vtables.
   Identical code folding makes its address useless for attribution. It is reconstructed
@@ -58,8 +68,8 @@ Include shared headers by their path under this folder, e.g. `#include "core/Gam
   at lines 0x4b3 and 0x4d0.
 - Code bracket: after `SteeringControl.cpp` (last xref 0x504bd2) and before `Texmap.cpp`
   (first xref 0x50a6bc). Terrain.cpp's own xrefs span 0x50567c..0x507b38.
-- 11 of the 12 targets (0x505830..0x508964) are inside the bracket. The 12th is the shared
-  0x4dc4c0 stub described above. 7 match exactly.
+- 13 of the 14 targets (0x5057d0..0x508850) are inside the bracket. The 14th is the shared
+  0x4dc4c0 stub described above. 12 match exactly.
 - Terrain derives from `GameObject` and `GroundFogableObject`, as the RTTI says (mdisp 0,
   and 0x2c for GroundFogableObject, which has no vfptr). Both bases are kept.
 - Out of reach under the no-asm rule: `QueryGround` 0x507c10 inlines an `__asm` fistp helper.

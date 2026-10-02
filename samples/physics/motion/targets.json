@@ -1,0 +1,56 @@
+[
+ {
+  "class": "SurfaceMap",
+  "source": "SurfaceMap.cpp",
+  "candidate_symbol_contains": "??0SurfaceMap@@QAE@PAVSurfaceTexture@@PBUSurfaceMaterial@@@Z",
+  "target_va": "0x005051f0",
+  "target_size": 169,
+  "expect": "exact",
+  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+ },
+ {
+  "class": "SurfaceMap",
+  "source": "SurfaceMap.cpp",
+  "candidate_symbol_contains": "??_GSurfaceMap@@UAEPAXI@Z",
+  "target_va": "0x005052a0",
+  "target_size": 30,
+  "expect": "exact",
+  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+ },
+ {
+  "class": "SurfaceMap",
+  "source": "SurfaceMap.cpp",
+  "candidate_symbol_contains": "?SetTexture@SurfaceMap@@QAEXPAVSurfaceTexture@@@Z",
+  "target_va": "0x005052c0",
+  "target_size": 42,
+  "expect": "exact",
+  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+ },
+ {
+  "class": "SurfaceMap",
+  "source": "SurfaceMap.cpp",
+  "candidate_symbol_contains": "?Apply@SurfaceMap@@QAEHXZ",
+  "target_va": "0x005052f0",
+  "target_size": 27,
+  "expect": "exact",
+  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+ },
+ {
+  "class": "SurfaceMap",
+  "source": "SurfaceMap.cpp",
+  "candidate_symbol_contains": "?Select@SurfaceMap@@QAEXXZ",
+  "target_va": "0x00505310",
+  "target_size": 61,
+  "expect": "exact",
+  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+ },
+ {
+  "class": "SurfaceMap",
+  "source": "SurfaceMap.cpp",
+  "candidate_symbol_contains": "??1SurfaceMap@@UAE@XZ",
+  "target_va": "0x00505350",
+  "target_size": 86,
+  "expect": "exact",
+  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+ }
+]

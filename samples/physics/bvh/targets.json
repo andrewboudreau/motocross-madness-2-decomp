@@ -1,0 +1,119 @@
+[
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?BoxTreeQueryA@@",
+    "target_va": "0x00429540",
+    "target_size": 48,
+    "expect": "exact",
+    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?BoxTreeQueryB@@",
+    "target_va": "0x00429890",
+    "target_size": 48,
+    "expect": "exact",
+    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?BoxTreeQueryC@@",
+    "target_va": "0x00429e60",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?FreeBoxTree@@",
+    "target_va": "0x0042a160",
+    "target_size": 52,
+    "expect": "exact",
+    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?TransformPointPtr@@",
+    "target_va": "0x0042a580",
+    "target_size": 92,
+    "expect": "exact",
+    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?InverseTransformPoint@@",
+    "target_va": "0x0042a5e0",
+    "target_size": 92,
+    "expect": "exact",
+    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
+  },
+  {
+    "class": "BoundingBoxTreeBuild",
+    "source": "BoundingBoxTreeSplit.cpp",
+    "candidate_symbol_contains": "?SplitTriangles@@",
+    "target_va": "0x0042ad30",
+    "target_size": 313,
+    "expect": "exact",
+    "notes": "triangle partition helper; uncertain ownership (see file header)"
+  },
+  {
+    "class": "BoundingBoxTreeBuild",
+    "source": "BoundingBoxTreeSplit.cpp",
+    "candidate_symbol_contains": "?SplitBoxes@@",
+    "target_va": "0x0042ae70",
+    "target_size": 378,
+    "expect": "exact",
+    "notes": "box-tree partition helper; uncertain ownership (see file header)"
+  },
+  {
+    "class": "BoundingBoxTreeBuild",
+    "source": "BoundingBoxTreeSplit.cpp",
+    "candidate_symbol_contains": "?ComputePointBounds@@",
+    "target_va": "0x0042aff0",
+    "target_size": 684,
+    "expect": "exact",
+    "notes": "AABB of a point set (optional transform); uncertain ownership (see file header)"
+  },
+  {
+    "class": "BoundingBoxTreeBuild",
+    "source": "BoundingBoxTreeSplit.cpp",
+    "candidate_symbol_contains": "?ComputeTriangleBounds@@",
+    "target_va": "0x0042b2a0",
+    "target_size": 743,
+    "expect": "exact",
+    "notes": "AABB of the corners of a triangle set; uncertain ownership (see file header)"
+  },
+  {
+    "class": "BoundingBoxTreeBuild",
+    "source": "BoundingBoxTreeSplit.cpp",
+    "candidate_symbol_contains": "?TriangleBoundsVolume@@",
+    "target_va": "0x0042b590",
+    "target_size": 48,
+    "expect": "exact",
+    "notes": "split cost wrapper over ComputeTriangleBounds; uncertain ownership (see file header)"
+  },
+  {
+    "class": "BoundingBoxTreeBuild",
+    "source": "BoundingBoxTreeSplit.cpp",
+    "candidate_symbol_contains": "?PointBoundsVolume@@",
+    "target_va": "0x0042b5c0",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "split cost wrapper over ComputePointBounds; uncertain ownership (see file header)"
+  },
+  {
+    "class": "BoundingBoxTreeBuild",
+    "source": "RigidTransform.cpp",
+    "candidate_symbol_contains": "?InvertRigidTransform@@",
+    "target_va": "0x0042e2b0",
+    "target_size": 144,
+    "expect": "exact",
+    "notes": "no __FILE__; after ReadPointNode, before Camera.cpp; called only from CollisionObject.cpp 0x004399be/0x00439a47; same body as the InvertRigid inline in BuildModelBoxTree"
+  }
+]
