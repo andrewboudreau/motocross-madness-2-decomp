@@ -6,8 +6,8 @@ Results use VC6 SP3 natively on Windows; the 2026-09-30 calibration and full
 gate were repeated under Linux/Wine with the same results. A complete linked
 game remains a separate, unverified gate.
 
-The VC6 gate currently checks byte-exact functions from 34 handwritten C++
-candidate files: all 27 files in `src/reconstructed/` and seven focused probes
+The VC6 gate currently checks byte-exact functions from 41 handwritten C++
+candidate files: all 34 files in `src/reconstructed/` and seven focused probes
 in `samples/`. This is a count of source files represented by at least one
 checked function, not a claim that complete object files or a linked game match.
 
@@ -15,7 +15,7 @@ checked function, not a claim that complete object files or a linked game match.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 362/362 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 487/487 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
@@ -61,6 +61,11 @@ RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 [application allocation accounting](ALLOCATION.md). Wrong bindings fail comparison.
 
 ## Next targets
+
+The seven emitted fixed-size `BlockAllocator` bodies are now exact under the
+default profile, including the five-byte destructor tail jump and the two
+fully resolved `BlockAllocator.cpp` debug-allocation calls. See
+[allocation evidence](ALLOCATION.md#fixed-size-block-allocator).
 
 All 17 calibration targets match the default profile, including
 [FollowCamera](FOLLOW_CAMERA.md) slots 68 (`0x00466d50`, x87 distance/clamp,

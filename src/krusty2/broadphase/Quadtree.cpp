@@ -35,56 +35,56 @@ QuadTreeNode* QuadTree::UnknownVirtualSlot1()
 
 QuadTreeNode::QuadTreeNode()
 {
-    field_0x08 = 0;
-    field_0x04 = 0;
-    g_pQuadTree->field_0x854++;
-    field_0x0c = 0.0f;
-    field_0x10 = -3.402823466e+38f;
+    itemList = 0;
+    children = 0;
+    g_pQuadTree->liveNodeCount++;
+    yCenter = 0.0f;
+    yHalfExtent = -3.402823466e+38f;
 }
 
 QuadTreeNode::~QuadTreeNode()
 {
-    QuadTreeItemLink* link = field_0x08;
-    if (field_0x04) {
+    QuadTreeItemLink* link = itemList;
+    if (children) {
         for (int i = 0; i < 4; i++) {
-            if (field_0x04[i])
-                delete field_0x04[i];
+            if (children[i])
+                delete children[i];
         }
     }
-    if (!(g_pQuadTree->field_0x68 & 2)) {
+    if (!(g_pQuadTree->stateFlags & 2)) {
         while (link) {
             QuadTreeItemLink* next = link->next;
-            g_pQuadTree->field_0x60->Free(link);
+            g_pQuadTree->itemPool->Free(link);
             link = next;
         }
     }
-    g_pQuadTree->field_0x854--;
+    g_pQuadTree->liveNodeCount--;
 }
 
 QuadTree::~QuadTree()
 {
     g_pQuadTree = this;
-    field_0x68 |= 2;
-    if (field_0x864)
-        operator delete(field_0x864, __FILE__, 0x85);
-    if (field_0x5c)
-        delete field_0x5c;
-    delete field_0x60;
-    delete field_0x64;
+    stateFlags |= 2;
+    if (resultArray)
+        operator delete(resultArray, __FILE__, 0x85);
+    if (rootNode)
+        delete rootNode;
+    delete itemPool;
+    delete resultPool;
 }
 
 void QuadTree::Reset()
 {
     g_pQuadTree = this;
-    field_0x854 = 0;
+    liveNodeCount = 0;
     field_0x858 = -1;
-    field_0x68 &= ~2;
-    field_0x85c = 0;
+    stateFlags &= ~2;
+    objectCount = 0;
     field_0x860 = 0;
-    field_0x864 = 0;
-    field_0x86c = 0;
+    resultArray = 0;
+    resultCount = 0;
     field_0x868 = 0;
-    field_0x870 = 0;
+    resultCapacity = 0;
 }
 
 // Tier 3 semantics: field_0x40..0x4c = world rectangle (x0, x1, z0, z1), field_0x50/0x54
@@ -92,38 +92,38 @@ void QuadTree::Reset()
 // size per depth (0x4000 >> depth) until the cell is no larger than minCell in grid units.
 void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
 {
-    field_0x5c = UnknownVirtualSlot1();
-    field_0x40 = x0;
-    field_0x44 = x1;
-    field_0x48 = z0;
-    field_0x4c = z1;
+    rootNode = UnknownVirtualSlot1();
+    worldMinX = x0;
+    worldMaxX = x1;
+    worldMinZ = z0;
+    worldMaxZ = z1;
     // The extents are kept in locals as well (chained assignment): retail stores z1 - z0 with
     // fst into field_0x54 and spills the same value for the compare (0x4dc6c0).
-    float w = field_0x50 = x1 - x0;
-    float h = field_0x54 = z1 - z0;
+    float w = extentX = x1 - x0;
+    float h = extentZ = z1 - z0;
 
-    field_0x0c = 32768.0f / (w > h ? w : h);
-    g_quadTreeInvScale = 1.0f / field_0x0c;
+    quantScale = 32768.0f / (w > h ? w : h);
+    g_quadTreeInvScale = 1.0f / quantScale;
 
-    int limit = (int)(minCell * field_0x0c);
+    int limit = (int)(minCell * quantScale);
     int cell = 0x8000;
-    field_0x04 = 0;
+    maxDepth = 0;
     do {
         cell >>= 1;
-        field_0x10[field_0x04] = cell;
-        field_0x04++;
-    } while (field_0x04 < 12 && cell > limit);
-    field_0x04--;
-    field_0x08 = field_0x10[field_0x04];
+        cellSizes[maxDepth] = cell;
+        maxDepth++;
+    } while (maxDepth < 12 && cell > limit);
+    maxDepth--;
+    leafCellSize = cellSizes[maxDepth];
 
-    field_0x68 &= ~1;
-    field_0x6c = 0;
-    field_0x74 = 0;
-    field_0x70 = 0;
-    field_0x78 = 0;
-    field_0x80 = 0;
-    field_0x64 = new(__FILE__, 0x73) QuadTreePool(8, 0x1000);
-    field_0x60 = new(__FILE__, 0x74) QuadTreePool(0x14, 0x1000);
+    stateFlags &= ~1;
+    queryStamp = 0;
+    queryCursor = 0;
+    queryListHead = 0;
+    itemSlotIndex = 0;
+    sortedCount = 0;
+    resultPool = new(__FILE__, 0x73) BlockAllocator(8, 0x1000);
+    itemPool = new(__FILE__, 0x74) BlockAllocator(0x14, 0x1000);
 }
 
 // Tier 3 name: turns a world rectangle (x0, z0)-(x1, z1) into a "locational code" (0xf =
@@ -136,40 +136,40 @@ void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
 // already origin-relative; reproduced as decoded.
 unsigned int QuadTree::ComputeCode(float x0, float z0, float x1, float z1)
 {
-    x0 -= field_0x40;
-    z0 -= field_0x48;
-    x1 -= field_0x40;
-    z1 -= field_0x48;
+    x0 -= worldMinX;
+    z0 -= worldMinZ;
+    x1 -= worldMinX;
+    z1 -= worldMinZ;
 
-    if (x1 < 0.0f || x0 > field_0x50 || z1 < 0.0f || z0 > field_0x54)
+    if (x1 < 0.0f || x0 > extentX || z1 < 0.0f || z0 > extentZ)
         return 0xf;
 
-    if (x0 < field_0x40)
-        x0 = field_0x40;
-    if (x1 > field_0x44)
-        x1 = field_0x44;
-    if (z0 < field_0x48)
-        z0 = field_0x48;
-    if (z1 > field_0x4c)
-        z1 = field_0x4c;
+    if (x0 < worldMinX)
+        x0 = worldMinX;
+    if (x1 > worldMaxX)
+        x1 = worldMaxX;
+    if (z0 < worldMinZ)
+        z0 = worldMinZ;
+    if (z1 > worldMaxZ)
+        z1 = worldMaxZ;
 
-    int ix0 = (int)(x0 * field_0x0c);
-    int iz0 = (int)(z0 * field_0x0c);
-    int ix1 = (int)(x1 * field_0x0c) + 1;
-    int iz1 = (int)(z1 * field_0x0c) + 1;
+    int ix0 = (int)(x0 * quantScale);
+    int iz0 = (int)(z0 * quantScale);
+    int ix1 = (int)(x1 * quantScale) + 1;
+    int iz1 = (int)(z1 * quantScale) + 1;
     int w = ix1 - ix0;
     int h = iz1 - iz0;
 
     int depth = 0;
-    for (; depth <= field_0x04; depth++) {
-        int cell = field_0x10[depth];
+    for (; depth <= maxDepth; depth++) {
+        int cell = cellSizes[depth];
         if (w >= cell || h >= cell)
             break;
     }
-    if (depth > field_0x04)
-        depth = field_0x04;
+    if (depth > maxDepth)
+        depth = maxDepth;
 
-    int size = field_0x10[depth];
+    int size = cellSizes[depth];
     int mask = ~(size - 1);
     ix1 &= mask;
     ix0 &= mask;
@@ -205,14 +205,14 @@ unsigned int QuadTree::ComputeCode(float x0, float z0, float x1, float z1)
 inline void QuadTreeNode::ExtendY(float y0, float y1)
 {
     if (y0 < y1) {
-        float lo = field_0x0c - field_0x10;
-        float hi = field_0x10 + field_0x0c;
+        float lo = yCenter - yHalfExtent;
+        float hi = yHalfExtent + yCenter;
         if (y0 < lo)
             lo = y0;
         if (y1 > hi)
             hi = y1;
-        field_0x0c = (hi + lo) * 0.5f;
-        field_0x10 = (hi - lo) * 0.5f;
+        yCenter = (hi + lo) * 0.5f;
+        yHalfExtent = (hi - lo) * 0.5f;
     }
 }
 
@@ -220,16 +220,16 @@ inline void QuadTreeNode::ExtendY(float y0, float y1)
 // last store (0x4dce17), which is reproduced by writing the store through field_0x5c.
 inline void QuadTree::ExtendRootY(float y0, float y1)
 {
-    QuadTreeNode* node = field_0x5c;
+    QuadTreeNode* node = rootNode;
     if (y0 < y1) {
-        float lo = node->field_0x0c - node->field_0x10;
-        float hi = node->field_0x10 + node->field_0x0c;
+        float lo = node->yCenter - node->yHalfExtent;
+        float hi = node->yHalfExtent + node->yCenter;
         if (y0 < lo)
             lo = y0;
         if (y1 > hi)
             hi = y1;
-        node->field_0x0c = (hi + lo) * 0.5f;
-        field_0x5c->field_0x10 = (hi - lo) * 0.5f;
+        node->yCenter = (hi + lo) * 0.5f;
+        rootNode->yHalfExtent = (hi - lo) * 0.5f;
     }
 }
 
@@ -241,12 +241,12 @@ void QuadTree::Insert(QuadTreeObject* obj, unsigned int code, float y0, float y1
     if (code == 0xf)
         return;
 
-    field_0x85c++;
+    objectCount++;
     g_pQuadTree = this;
-    obj->field_0x04 = 0;
+    obj->queryStamp = 0;
 
     int depth = code & 0xf;
-    int cell = field_0x10[depth];
+    int cell = cellSizes[depth];
     int x = (code >> 17) & 0x7ff8;
     int z = (code >> 5) & 0x7ff8;
 
@@ -255,7 +255,7 @@ void QuadTree::Insert(QuadTreeObject* obj, unsigned int code, float y0, float y1
         if (!(code & bit))
             continue;
 
-        QuadTreeNode* node = field_0x5c;
+        QuadTreeNode* node = rootNode;
         QuadTreeNode* parent = 0;
         ExtendRootY(y0, y1);
 
@@ -266,20 +266,20 @@ void QuadTree::Insert(QuadTreeObject* obj, unsigned int code, float y0, float y1
         for (int level = depth + 1; level > 0; level--) {
             int index = ((cx & mask) ? 1 : 0) * 2 + ((cz & mask) ? 1 : 0);
             QuadTreeNode* child;
-            if (!node->field_0x04) {
-                if (node == field_0x5c)
-                    field_0x5c = node = node->Grow();
+            if (!node->children) {
+                if (node == rootNode)
+                    rootNode = node = node->Grow();
                 else
                     node = node->Grow();
                 if (parent)
-                    parent->field_0x04[parentIndex] = node;
+                    parent->children[parentIndex] = node;
                 child = UnknownVirtualSlot1();
-                node->field_0x04[index] = child;
+                node->children[index] = child;
             } else {
-                child = node->field_0x04[index];
+                child = node->children[index];
                 if (!child) {
                     child = UnknownVirtualSlot1();
-                    node->field_0x04[index] = child;
+                    node->children[index] = child;
                 }
             }
             child->ExtendY(y0, y1);
@@ -305,21 +305,21 @@ void QuadTree::UpdateRange(QuadTreeObject* obj, unsigned int code, float y0, flo
     int depth = code & 0xf;
     int x = (code >> 17) & 0x7ff8;
     int z = (code >> 5) & 0x7ff8;
-    int cell = field_0x10[depth];
+    int cell = cellSizes[depth];
 
     unsigned int bit = 0x10;
     for (int i = 0; i < 4; i++, bit <<= 1) {
         if (!(code & bit))
             continue;
 
-        QuadTreeNode* node = field_0x5c;
+        QuadTreeNode* node = rootNode;
         ExtendRootY(y0, y1);
 
         int cx = x + ((i & 2) ? cell : 0);
         int cz = z + ((i & 1) ? cell : 0);
         int mask = 0x4000;
         for (int level = 0; level <= depth; level++, mask >>= 1) {
-            QuadTreeNode** kids = node->field_0x04;
+            QuadTreeNode** kids = node->children;
             if (!kids)
                 break;
             int index = ((cx & mask) ? 1 : 0) * 2 + ((cz & mask) ? 1 : 0);
@@ -336,20 +336,20 @@ void QuadTree::Remove(QuadTreeObject* obj, unsigned int code)
     if (code == 0xf)
         return;
 
-    field_0x85c--;
+    objectCount--;
     g_pQuadTree = this;
 
     int depth = code & 0xf;
     int x = (code >> 17) & 0x7ff8;
     int z = (code >> 5) & 0x7ff8;
-    int cell = field_0x10[depth];
+    int cell = cellSizes[depth];
 
     unsigned int bit = 0x10;
     for (int i = 0; i < 4; i++, bit <<= 1) {
         if (!(code & bit))
             continue;
 
-        QuadTreeNode* node = field_0x5c;
+        QuadTreeNode* node = rootNode;
         QuadTreeNode* parent = 0;
         int cx = x + ((i & 2) ? cell : 0);
         int cz = z + ((i & 1) ? cell : 0);
@@ -359,7 +359,7 @@ void QuadTree::Remove(QuadTreeObject* obj, unsigned int code)
         for (int level = 0; level <= depth; level++, mask >>= 1) {
             index = ((cx & mask) ? 1 : 0) * 2 + ((cz & mask) ? 1 : 0);
             parent = node;
-            QuadTreeNode** kids = node->field_0x04;
+            QuadTreeNode** kids = node->children;
             if (!kids || !(node = kids[index])) {
                 found = false;
                 break;
@@ -372,7 +372,7 @@ void QuadTree::Remove(QuadTreeObject* obj, unsigned int code)
             if (node)
                 delete node;
             if (parent)
-                parent->field_0x04[index] = 0;
+                parent->children[index] = 0;
         }
     }
 }
@@ -386,7 +386,7 @@ void QuadTreeNode::AddObject(QuadTreeObject* obj)
 {
     QuadTreeItemLink* prev;
     QuadTreeItemLink* link;
-    for (link = field_0x08; link; link = link->next) {
+    for (link = itemList; link; link = link->next) {
         for (int i = 0; i < 4; i++) {
             if (!link->objects[i]) {
                 link->objects[i] = obj;
@@ -396,11 +396,11 @@ void QuadTreeNode::AddObject(QuadTreeObject* obj)
         prev = link;
     }
 
-    QuadTreeItemLink* fresh = (QuadTreeItemLink*)g_pQuadTree->field_0x60->Alloc();
+    QuadTreeItemLink* fresh = (QuadTreeItemLink*)g_pQuadTree->itemPool->Alloc();
     memset(fresh, 0, sizeof(QuadTreeItemLink));
     fresh->objects[0] = obj;
-    if (!field_0x08)
-        field_0x08 = fresh;
+    if (!itemList)
+        itemList = fresh;
     else
         prev->next = fresh;
 }
@@ -410,7 +410,7 @@ void QuadTreeNode::AddObject(QuadTreeObject* obj)
 int QuadTreeNode::RemoveObject(QuadTreeObject* obj)
 {
     QuadTreeItemLink* prev;
-    QuadTreeItemLink* link = field_0x08;
+    QuadTreeItemLink* link = itemList;
     if (link) {
         do {
             int empty = 1;
@@ -425,11 +425,11 @@ int QuadTreeNode::RemoveObject(QuadTreeObject* obj)
                 }
             }
             if (empty) {
-                if (link == field_0x08)
-                    field_0x08 = link->next;
+                if (link == itemList)
+                    itemList = link->next;
                 else
                     prev->next = link->next;
-                g_pQuadTree->field_0x60->Free(link);
+                g_pQuadTree->itemPool->Free(link);
             }
             if (found)
                 break;
@@ -437,8 +437,8 @@ int QuadTreeNode::RemoveObject(QuadTreeObject* obj)
             link = link->next;
         } while (link);
     }
-    if (!field_0x08) {
-        QuadTreeNode** kids = field_0x04;
+    if (!itemList) {
+        QuadTreeNode** kids = children;
         if (!kids || (!kids[0] && !kids[1] && !kids[2] && !kids[3]))
             return 0;
     }
@@ -450,11 +450,11 @@ int QuadTreeNode::RemoveObject(QuadTreeObject* obj)
 QuadTreeNode* QuadTreeNode::Grow()
 {
     QuadTreeNode* node = (QuadTreeNode*)DebugRealloc(this, 0x24, __FILE__, 0x690);
-    node->field_0x04 = (QuadTreeNode**)((char*)node + 0x14);
-    node->field_0x04[0] = 0;
-    node->field_0x04[1] = 0;
-    node->field_0x04[2] = 0;
-    node->field_0x04[3] = 0;
+    node->children = (QuadTreeNode**)((char*)node + 0x14);
+    node->children[0] = 0;
+    node->children[1] = 0;
+    node->children[2] = 0;
+    node->children[3] = 0;
     return node;
 }
 
@@ -468,9 +468,9 @@ QuadTreeResultLink* QuadTreeNode::Gather(QuadTreeResultLink* tail, int x0, int z
     QuadTreeNode* self = this;
     if (size >= minSize) {
         for (int i = 0; i < 4; i++) {
-            if (!field_0x04)
+            if (!children)
                 continue;
-            QuadTreeNode* child = field_0x04[i];
+            QuadTreeNode* child = children[i];
             if (!child)
                 continue;
             int cx = ((i & 2) ? size : 0) + nodeX;
@@ -483,7 +483,7 @@ QuadTreeResultLink* QuadTreeNode::Gather(QuadTreeResultLink* tail, int x0, int z
                 tail = child->Gather(tail, x0, z0, x1, z1, cx, cz, size >> 1, minSize);
         }
     }
-    QuadTreeResultLink* cell = (QuadTreeResultLink*)g_pQuadTree->field_0x64->Alloc();
+    QuadTreeResultLink* cell = (QuadTreeResultLink*)g_pQuadTree->resultPool->Alloc();
     cell->item = self;
     cell->next = tail;
     return cell;
@@ -493,10 +493,10 @@ QuadTreeResultLink* QuadTreeNode::GatherAll(QuadTreeResultLink* tail)
 {
     QuadTreeNode* self = this;
     for (int i = 0; i < 4; i++) {
-        if (field_0x04 && field_0x04[i])
-            tail = field_0x04[i]->GatherAll(tail);
+        if (children && children[i])
+            tail = children[i]->GatherAll(tail);
     }
-    QuadTreeResultLink* cell = (QuadTreeResultLink*)g_pQuadTree->field_0x64->Alloc();
+    QuadTreeResultLink* cell = (QuadTreeResultLink*)g_pQuadTree->resultPool->Alloc();
     cell->item = self;
     cell->next = tail;
     return cell;
@@ -507,10 +507,10 @@ QuadTreeResultLink* QuadTreeNode::GatherAll(QuadTreeResultLink* tail)
 // rectangle misses the tree or a query is already active (flag bit 0).
 int QuadTree::BeginQuery(float x0, float z0, float x1, float z1)
 {
-    x0 -= field_0x40;
-    x1 -= field_0x40;
-    z0 -= field_0x48;
-    z1 -= field_0x48;
+    x0 -= worldMinX;
+    x1 -= worldMinX;
+    z0 -= worldMinZ;
+    z1 -= worldMinZ;
     if (x1 < x0) {
         float t = x1;
         x1 = x0;
@@ -521,27 +521,27 @@ int QuadTree::BeginQuery(float x0, float z0, float x1, float z1)
         z1 = z0;
         z0 = t;
     }
-    if (x1 < 0.0f || x0 > field_0x50 || z1 < 0.0f || z0 > field_0x54)
+    if (x1 < 0.0f || x0 > extentX || z1 < 0.0f || z0 > extentZ)
         return 0;
-    if (field_0x68 & 1)
+    if (stateFlags & 1)
         return 0;
 
-    field_0x6c++;
-    field_0x864 = 0;
-    field_0x68 |= 1;
+    queryStamp++;
+    resultArray = 0;
+    stateFlags |= 1;
     g_pQuadTree = this;
 
-    int ix0 = (int)(x0 * field_0x0c);
-    int iz0 = (int)(z0 * field_0x0c);
-    int ix1 = (int)(x1 * field_0x0c);
-    int iz1 = (int)(z1 * field_0x0c);
-    field_0x74 = 0;
-    field_0x7c = 0;
-    field_0x78 = 0;
-    field_0x80 = 0;
-    if (field_0x5c)
-        field_0x74 = field_0x5c->Gather(0, ix0, iz0, ix1, iz1, 0, 0, 0x4000, field_0x08);
-    field_0x70 = field_0x74;
+    int ix0 = (int)(x0 * quantScale);
+    int iz0 = (int)(z0 * quantScale);
+    int ix1 = (int)(x1 * quantScale);
+    int iz1 = (int)(z1 * quantScale);
+    queryCursor = 0;
+    itemCursor = 0;
+    itemSlotIndex = 0;
+    sortedCount = 0;
+    if (rootNode)
+        queryCursor = rootNode->Gather(0, ix0, iz0, ix1, iz1, 0, 0, 0x4000, leafCellSize);
+    queryListHead = queryCursor;
     return 1;
 }
 
@@ -549,33 +549,33 @@ int QuadTree::BeginQuery(float x0, float z0, float x1, float z1)
 // once (the per-query stamp in QuadTreeObject::field_0x04 is compared with field_0x6c).
 QuadTreeObject* QuadTree::NextObject()
 {
-    if (!(field_0x68 & 1))
+    if (!(stateFlags & 1))
         return 0;
-    if (field_0x864 != 0)
+    if (resultArray != 0)
         return 0;
     g_pQuadTree = this;
-    while (field_0x74) {
-        if (!field_0x7c) {
-            field_0x7c = field_0x74->item->field_0x08;
-            if (!field_0x7c) {
-                field_0x74 = field_0x74->next;
+    while (queryCursor) {
+        if (!itemCursor) {
+            itemCursor = queryCursor->item->itemList;
+            if (!itemCursor) {
+                queryCursor = queryCursor->next;
                 continue;
             }
         }
         for (;;) {
-            while (field_0x78 < 4) {
-                QuadTreeObject* obj = field_0x7c->objects[field_0x78++];
-                if (obj && obj->field_0x04 != (short)field_0x6c) {
-                    obj->field_0x04 = field_0x6c;
+            while (itemSlotIndex < 4) {
+                QuadTreeObject* obj = itemCursor->objects[itemSlotIndex++];
+                if (obj && obj->queryStamp != (short)queryStamp) {
+                    obj->queryStamp = queryStamp;
                     return obj;
                 }
             }
-            field_0x78 = 0;
-            field_0x7c = field_0x7c->next;
-            if (!field_0x7c)
+            itemSlotIndex = 0;
+            itemCursor = itemCursor->next;
+            if (!itemCursor)
                 break;
         }
-        field_0x74 = field_0x74->next;
+        queryCursor = queryCursor->next;
     }
     return 0;
 }
@@ -583,8 +583,8 @@ QuadTreeObject* QuadTree::NextObject()
 // qsort comparator for NextObjectSorted: orders objects by QuadTreeObject::field_0x06.
 static int CompareObjectKey(const void* a, const void* b)
 {
-    int d = (unsigned short)(*(QuadTreeObject**)a)->field_0x06 -
-            (unsigned short)(*(QuadTreeObject**)b)->field_0x06;
+    int d = (unsigned short)(*(QuadTreeObject**)a)->sortKey -
+            (unsigned short)(*(QuadTreeObject**)b)->sortKey;
     if (d < 0)
         return -1;
     return d != 0;
@@ -594,72 +594,75 @@ static int CompareObjectKey(const void* a, const void* b)
 // sorted stack field_0x84 (sorted by field_0x06) and pops them from the back.
 QuadTreeObject* QuadTree::NextObjectSorted()
 {
-    if (!(field_0x68 & 1))
+    if (!(stateFlags & 1))
         return 0;
-    if (field_0x80)
-        return field_0x84[--field_0x80];
+    if (sortedCount)
+        return sortedStack[--sortedCount];
     g_pQuadTree = this;
-    if (field_0x80 != 0)
+    if (sortedCount != 0)
         return 0;
-    QuadTreeResultLink* cell;
-    while ((cell = field_0x74) != 0) {
-        if (!field_0x7c) {
-            field_0x7c = cell->item->field_0x08;
-            if (field_0x7c) {
+    QuadTreeResultLink* cell = queryCursor;
+    if (!cell)
+        return 0;
+    do {
+        if (!itemCursor) {
+            itemCursor = cell->item->itemList;
+            if (itemCursor) {
                 do {
-                    while (field_0x78 < 4) {
-                        QuadTreeObject* obj = field_0x7c->objects[field_0x78++];
-                        if (obj && obj->field_0x04 != (short)field_0x6c) {
-                            obj->field_0x04 = field_0x6c;
-                            if (field_0x80 < 500) {
-                                field_0x84[field_0x80] = obj;
-                                field_0x80++;
+                    while (itemSlotIndex < 4) {
+                        QuadTreeObject* obj = itemCursor->objects[itemSlotIndex++];
+                        if (obj && obj->queryStamp != (short)queryStamp) {
+                            obj->queryStamp = queryStamp;
+                            if (sortedCount < 500) {
+                                sortedStack[sortedCount] = obj;
+                                sortedCount++;
                                 obj->UnknownVirtualSlot0();
                             }
                         }
                     }
-                    field_0x78 = 0;
-                    field_0x7c = field_0x7c->next;
-                } while (field_0x7c);
-                int n = field_0x80;
+                    itemSlotIndex = 0;
+                    itemCursor = itemCursor->next;
+                } while (itemCursor);
+                int n = sortedCount;
                 if (n < 0 || n > 1) {
                     if (n == 2) {
-                        if ((unsigned short)field_0x84[0]->field_0x06 >
-                            (unsigned short)field_0x84[1]->field_0x06) {
-                            QuadTreeObject* t = field_0x84[0];
-                            field_0x84[0] = field_0x84[1];
-                            field_0x84[1] = t;
+                        if ((unsigned short)sortedStack[0]->sortKey >
+                            (unsigned short)sortedStack[1]->sortKey) {
+                            QuadTreeObject* t = sortedStack[0];
+                            sortedStack[0] = sortedStack[1];
+                            sortedStack[1] = t;
                         }
                     } else {
-                        qsort(field_0x84, n, 4, CompareObjectKey);
+                        qsort(sortedStack, n, 4, CompareObjectKey);
                     }
                 }
             }
         }
-        field_0x74 = field_0x74->next;
-        if (field_0x80)
-            return field_0x84[--field_0x80];
-    }
+        cell = queryCursor->next;
+        queryCursor = cell;
+        if (sortedCount)
+            return sortedStack[--sortedCount];
+    } while (cell);
     return 0;
 }
 
 void QuadTree::RestartQuery()
 {
-    field_0x74 = field_0x70;
-    field_0x78 = 0;
-    field_0x6c++;
-    field_0x80 = 0;
+    queryCursor = queryListHead;
+    itemSlotIndex = 0;
+    queryStamp++;
+    sortedCount = 0;
 }
 
 void QuadTree::EndQuery()
 {
-    if (field_0x68 & 1) {
-        field_0x64->Reset();
-        field_0x70 = 0;
-        field_0x74 = 0;
-        field_0x78 = 0;
-        field_0x80 = 0;
-        field_0x68 &= ~1;
+    if (stateFlags & 1) {
+        resultPool->Reset();
+        queryListHead = 0;
+        queryCursor = 0;
+        itemSlotIndex = 0;
+        sortedCount = 0;
+        stateFlags &= ~1;
     }
 }
 
@@ -670,13 +673,13 @@ void QuadTree::CollectItems(QuadTreeItemLink* link)
     for (; link; link = link->next) {
         QuadTreeObject** slot = link->objects;
         for (int i = 0; i < 4; i++) {
-            if (field_0x86c >= field_0x870)
+            if (resultCount >= resultCapacity)
                 return;
             QuadTreeObject* obj = *slot++;
-            if (obj && obj->field_0x04 != (short)field_0x6c) {
-                obj->field_0x04 = field_0x6c;
-                field_0x864[field_0x86c] = obj;
-                field_0x86c++;
+            if (obj && obj->queryStamp != (short)queryStamp) {
+                obj->queryStamp = queryStamp;
+                resultArray[resultCount] = obj;
+                resultCount++;
             }
         }
     }
@@ -688,7 +691,7 @@ int QuadTree::IsValidCode(unsigned int code)
 {
     int depth = code & 0xf;
     int flags = code & 0xf0;
-    if (depth == field_0x04 && (flags == 0x10 || flags == 0x20 || flags == 0x40 || flags == 0x80))
+    if (depth == maxDepth && (flags == 0x10 || flags == 0x20 || flags == 0x40 || flags == 0x80))
         return 1;
     return 0;
 }
@@ -702,32 +705,32 @@ void QuadTreeNode::UnknownVirtualSlot1(int x0, int z0, int nodeX, int nodeZ, int
     int midX = nodeX + size;
     int midZ = nodeZ + size;
     size >>= 1;
-    if (field_0x04) {
+    if (children) {
         if (x0 >= midX) {
             if (z0 >= midZ) {
-                if (field_0x04[0]) field_0x04[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
-                if (field_0x04[1]) field_0x04[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
-                if (field_0x04[2]) field_0x04[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
-                if (field_0x04[3]) field_0x04[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
+                if (children[0]) children[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
+                if (children[1]) children[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
+                if (children[2]) children[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
+                if (children[3]) children[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
             } else {
-                if (field_0x04[1]) field_0x04[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
-                if (field_0x04[0]) field_0x04[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
-                if (field_0x04[3]) field_0x04[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
-                if (field_0x04[2]) field_0x04[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
+                if (children[1]) children[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
+                if (children[0]) children[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
+                if (children[3]) children[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
+                if (children[2]) children[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
             }
         } else if (z0 >= midZ) {
-            if (field_0x04[2]) field_0x04[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
-            if (field_0x04[3]) field_0x04[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
-            if (field_0x04[0]) field_0x04[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
-            if (field_0x04[1]) field_0x04[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
+            if (children[2]) children[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
+            if (children[3]) children[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
+            if (children[0]) children[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
+            if (children[1]) children[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
         } else {
-            if (field_0x04[3]) field_0x04[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
-            if (field_0x04[2]) field_0x04[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
-            if (field_0x04[1]) field_0x04[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
-            if (field_0x04[0]) field_0x04[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
+            if (children[3]) children[3]->UnknownVirtualSlot1(x0, z0, midX, midZ, size);
+            if (children[2]) children[2]->UnknownVirtualSlot1(x0, z0, midX, nodeZ, size);
+            if (children[1]) children[1]->UnknownVirtualSlot1(x0, z0, nodeX, midZ, size);
+            if (children[0]) children[0]->UnknownVirtualSlot1(x0, z0, nodeX, nodeZ, size);
         }
     }
-    g_pQuadTree->CollectItems(field_0x08);
+    g_pQuadTree->CollectItems(itemList);
 }
 
 QuadTreeResultLink* QuadTreeNode::UnknownVirtualSlot2(int x0, int z0, QuadTreeResultLink* tail,
@@ -736,33 +739,33 @@ QuadTreeResultLink* QuadTreeNode::UnknownVirtualSlot2(int x0, int z0, QuadTreeRe
     int midX = nodeX + size;
     int midZ = nodeZ + size;
     size >>= 1;
-    if (field_0x04) {
+    if (children) {
         if (x0 >= midX) {
             if (z0 >= midZ) {
-                if (field_0x04[0]) tail = field_0x04[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
-                if (field_0x04[1]) tail = field_0x04[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
-                if (field_0x04[2]) tail = field_0x04[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
-                if (field_0x04[3]) tail = field_0x04[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
+                if (children[0]) tail = children[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
+                if (children[1]) tail = children[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
+                if (children[2]) tail = children[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
+                if (children[3]) tail = children[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
             } else {
-                if (field_0x04[1]) tail = field_0x04[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
-                if (field_0x04[0]) tail = field_0x04[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
-                if (field_0x04[3]) tail = field_0x04[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
-                if (field_0x04[2]) tail = field_0x04[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
+                if (children[1]) tail = children[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
+                if (children[0]) tail = children[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
+                if (children[3]) tail = children[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
+                if (children[2]) tail = children[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
             }
         } else if (z0 >= midZ) {
-            if (field_0x04[2]) tail = field_0x04[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
-            if (field_0x04[3]) tail = field_0x04[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
-            if (field_0x04[0]) tail = field_0x04[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
-            if (field_0x04[1]) tail = field_0x04[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
+            if (children[2]) tail = children[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
+            if (children[3]) tail = children[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
+            if (children[0]) tail = children[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
+            if (children[1]) tail = children[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
         } else {
-            if (field_0x04[3]) tail = field_0x04[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
-            if (field_0x04[2]) tail = field_0x04[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
-            if (field_0x04[1]) tail = field_0x04[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
-            if (field_0x04[0]) tail = field_0x04[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
+            if (children[3]) tail = children[3]->UnknownVirtualSlot2(x0, z0, tail, midX, midZ, size);
+            if (children[2]) tail = children[2]->UnknownVirtualSlot2(x0, z0, tail, midX, nodeZ, size);
+            if (children[1]) tail = children[1]->UnknownVirtualSlot2(x0, z0, tail, nodeX, midZ, size);
+            if (children[0]) tail = children[0]->UnknownVirtualSlot2(x0, z0, tail, nodeX, nodeZ, size);
         }
     }
-    if (field_0x08) {
-        QuadTreeResultLink* cell = (QuadTreeResultLink*)g_pQuadTree->field_0x64->Alloc();
+    if (itemList) {
+        QuadTreeResultLink* cell = (QuadTreeResultLink*)g_pQuadTree->resultPool->Alloc();
         if (tail)
             tail->next = cell;
         cell->next = 0;

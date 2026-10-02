@@ -42,16 +42,16 @@ ConstraintMethodCollisionModel::ConstraintMethodCollisionModel(int a) : Collisio
     // Statement order found by a placement search against the retail store schedule
     // (0x0043b8d0); the order of these independent stores has no semantic meaning.
     field_0xbc = 0.9f;
-    field_0xec = 1;
-    field_0xb8 = 0;
-    field_0x108 = 1;
+    shapeCollisionEnabled = 1;
+    restitution = 0;
+    applyImpulses = 1;
     body = 0;
     probeCount = 0;
     groundQuery = 0;
     probes = 0;
-    field_0xe8 = 0;
+    manualStep = 0;
     damping = 0;
-    field_0xf4 = 0;
+    impulseLoss = 0;
     maxImpulse = 0;
     maxSpeed = 0;
 }
@@ -67,15 +67,15 @@ ConstraintMethodCollisionModel::~ConstraintMethodCollisionModel()
 GameObject* ConstraintMethodCollisionModel::GameObjectVirtualSlot8(int a)
 {
     Fn_004320f0(a, 1, 1, 1);
-    field_0x88 = ConstraintContactCallback;
-    field_0x8c = CollisionEmptyCallback;
-    field_0x60 = this;
+    onHitCallback = ConstraintContactCallback;
+    onHitByCallback = CollisionEmptyCallback;
+    ownerObject = this;
     return this;
 }
 
 int ConstraintMethodCollisionModel::GameObjectVirtualSlot10(float t)
 {
-    if (!field_0xe8)
+    if (!manualStep)
         GameObjectVirtualSlot11(t);
     return CollisionObject::GameObjectVirtualSlot10(t);
 }
@@ -115,15 +115,15 @@ static inline float Dot3(const ConVec3& a, const ConVec3& b)
 int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
 {
     dt = t;
-    if (field_0xec) {
-        if (field_0xc8) {
+    if (shapeCollisionEnabled) {
+        if (refreshPending) {
             Fn_00435fe0();
-            field_0xc8 = 0;
+            refreshPending = 0;
         } else {
             Fn_00435fb0();
         }
-        if (field_0xec && Fn_00438e70()) {
-            const ConVec3* n = (const ConVec3*)field_0x5c;
+        if (shapeCollisionEnabled && Fn_00438e70()) {
+            const ConVec3* n = (const ConVec3*)contactRecord;
             ConVec3 pos;
             body->node->GetPositionIn(0, &pos);
             ConVec3 d;
@@ -161,7 +161,7 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
                 probes[i].hit = 0;
             }
         }
-        if (anyHit && field_0x108) {
+        if (anyHit && applyImpulses) {
             float d = -maxPen;
             ConVec3 offset;
             offset.x = bestNormal.x * d;
@@ -179,7 +179,7 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
             pos.z -= step.z;
             body->node->SetPositionIn(0, &pos);
             Fn_00435fb0();
-            field_0x58 = 1;
+            hasContact = 1;
         }
     }
     return 1;
@@ -218,7 +218,7 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
     }
     ConVec3 vRel(vA.x - vB.x, vA.y - vB.y, vA.z - vB.z);
     float vn = Dot3(vRel, c);
-    float num = -(1.0f + field_0xb8) * vn;
+    float num = -(1.0f + restitution) * vn;
 
     ConVec3 nl = body->node->WorldToLocalDirection(c);
     ConVec3 rl = body->node->WorldToLocalDirection(rA);
@@ -231,7 +231,7 @@ void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t
         denom += other->invMass + Dot3(nlB, CrossProduct(axisB, rlB));
     }
     float j = num / denom;
-    j *= 1.0f - field_0xf4;
+    j *= 1.0f - impulseLoss;
     if (maxImpulse != 0 && j > maxImpulse)
         j = maxImpulse;
 
@@ -261,8 +261,8 @@ struct ConContactRecord {
 void ConstraintContactCallback(CollisionObject* self, CollisionObject* b)
 {
     ConstraintMethodCollisionModel* a = (ConstraintMethodCollisionModel*)self;
-    ConContactRecord* rec = (ConContactRecord*)a->field_0x5c;
-    if (b->field_0x64 == 0x3ea)
+    ConContactRecord* rec = (ConContactRecord*)a->contactRecord;
+    if (b->ownerType == 0x3ea)
         a->ApplyContactImpulse(*(ConBody**)((char*)b + 0xc4), rec->t, rec->v0, rec->v18, rec->v0c);
     else
         a->ApplyContactImpulse(0, rec->t, rec->v0, rec->v18, rec->v0c);

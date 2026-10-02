@@ -20,45 +20,78 @@
 //   CollisionObject owns shapes (ctor 0x431e70, FreeShape 0x432430).
 
 #include "collision/CollisionObject.h"
+#include "broadphase/Quadtree.h"
+
+extern QuadTree* g_pQuadTree;                    // 0x0068aba4
 
 // Retail helpers reached by direct call (addresses are the call targets).
 void Fn_0042a160(void* p);                       // shape sub-object destructor (cdecl, 1 arg)
 void CollisionHullShape_Free(CollisionHullShape* s);   // 0x00431da0
+struct CollisionHullElement { char bytes[0x198]; };
+struct CollisionModelShapeData {   // type 1: count + array of CollisionHullShape (stride 0x198)
+    int hullCount;
+    void* field_0x04;
+    void* field_0x08;
+    char field_0x0c[8];
+    CollisionHullElement* hulls;   // hull elements, 0x198 bytes each
+};
+struct CollisionMeshShapeData {    // type 2
+    int field_0x00;
+    void* field_0x04;
+};
 void CollisionModelShape_Free(void* s);                // 0x00431df0
 void CollisionMeshShape_Free(void* s);                 // 0x00431e50
+void Fn_004a30c0(void* p);                             // free()
 
 void CollisionHullShape_Free(CollisionHullShape* s) {
-    if (s->field_0x188)
-        Fn_0042a160(s->field_0x188);
-    if (s->field_0x18c)
-        Fn_0042a160(s->field_0x18c);
-    if (s->field_0x190)
-        operator delete(s->field_0x190, __FILE__, 36);
+    if (s->triangleTree)
+        Fn_0042a160(s->triangleTree);
+    if (s->pointTree)
+        Fn_0042a160(s->pointTree);
+    if (s->vertices)
+        operator delete(s->vertices, __FILE__, 36);
+}
+
+void CollisionModelShape_Free(void* shape) {
+    CollisionModelShapeData* s = (CollisionModelShapeData*)shape;
+    for (int i = 0; i < s->hullCount; i++)
+        CollisionHullShape_Free((CollisionHullShape*)&s->hulls[i]);
+    Fn_004a30c0(s->hulls);
+    Fn_004a30c0(s->field_0x04);
+    Fn_004a30c0(s->field_0x08);
+    Fn_004a30c0(s);
+}
+
+void CollisionMeshShape_Free(void* shape) {
+    CollisionMeshShapeData* s = (CollisionMeshShapeData*)shape;
+    if (s->field_0x04)
+        Fn_0042a160(s->field_0x04);
+    Fn_004a30c0(s);
 }
 
 void CollisionObject::FreeShape() {
-    if (field_0x54 != 0) {
-        switch (field_0x50) {
+    if (shape != 0) {
+        switch (shapeType) {
         case 0:
-            CollisionHullShape_Free((CollisionHullShape*)field_0x54);
-            delete field_0x54;
+            CollisionHullShape_Free((CollisionHullShape*)shape);
+            delete shape;
             break;
         case 1:
-            CollisionModelShape_Free(field_0x54);
+            CollisionModelShape_Free(shape);
             break;
         case 2:
-            CollisionMeshShape_Free(field_0x54);
+            CollisionMeshShape_Free(shape);
             break;
         case 3:
         case 4:
-            delete field_0x54;
+            delete shape;
             break;
         }
     }
-    if (field_0x5c != 0)
-        delete field_0x5c;
-    field_0x54 = 0;
-    field_0x5c = 0;
+    if (contactRecord != 0)
+        delete contactRecord;
+    shape = 0;
+    contactRecord = 0;
 }
 
 // Type-id registry (TypeRegistry.cpp): 0x00521ea0 looks a type name up and returns its id.
@@ -80,26 +113,54 @@ CollisionObject::CollisionObject(int a)
     if (g_VegetationTypeId == (char)0xff)
         g_VegetationTypeId = g_TypeRegistry->FindTypeId("Vegetation");
     Fn_00469ce0(this);
-    QuadTreeObject::field_0x08 = g_TypeRegistry->FindTypeId("CollisionObject");
-    field_0x50 = 0;
-    field_0x54 = 0;
-    field_0x5c = 0;
-    field_0x58 = 0;
-    field_0x88 = 0;
-    field_0x8c = 0;
-    field_0x90 = 0;
-    field_0x94 = 0;
-    field_0x84 = 15;
-    field_0x68 = 0;
-    field_0x6c = 1;
-    field_0x70 = 1;
-    field_0x74 = 1;
-    field_0x78 = 0;
-    field_0x7c = 0;
-    field_0x60 = 0;
-    field_0x64 = 0;
+    QuadTreeObject::objectTypeId = g_TypeRegistry->FindTypeId("CollisionObject");
+    shapeType = 0;
+    shape = 0;
+    contactRecord = 0;
+    hasContact = 0;
+    onHitCallback = 0;
+    onHitByCallback = 0;
+    debugTreeDepth = 0;
+    debugDrawMode = 0;
+    quadtreeCell = 15;
+    ignoreVegetation = 0;
+    collisionEnabled = 1;
+    collidable = 1;
+    ignoreListMode = 1;
+    ignoreList = 0;
+    ignoreCount = 0;
+    ownerObject = 0;
+    ownerType = 0;
     field_0x98 = 0;
-    field_0x9c = 0;
-    field_0xa0 = g_CollisionVec3_5797b0;
-    field_0xac = g_CollisionVec3_5797b0;
+    hitObject = 0;
+    hitPoint = g_CollisionVec3_5797b0;
+    hitNormal = g_CollisionVec3_5797b0;
+}
+
+// 0x00431fd0 (deleting) -> 0x00432000 (core)
+CollisionObject::~CollisionObject()
+{
+    if (g_pQuadTree && useBroadphase)
+        g_pQuadTree->Remove(this, quadtreeCell);
+    FreeShape();
+    if (ignoreList)
+        operator delete((void*)ignoreList, __FILE__, 0x6c);
+    if (shape) {
+        switch (shapeType) {
+        case 0:
+            CollisionHullShape_Free((CollisionHullShape*)shape);
+            delete shape;
+            break;
+        case 1:
+            CollisionModelShape_Free(shape);
+            break;
+        case 2:
+            CollisionMeshShape_Free(shape);
+            break;
+        case 3:
+        case 4:
+            delete shape;
+            break;
+        }
+    }
 }

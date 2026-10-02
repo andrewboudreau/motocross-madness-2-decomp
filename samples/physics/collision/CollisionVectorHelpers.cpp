@@ -30,3 +30,12 @@ CollisionVec3* CollisionDivide(CollisionVec3* out, const CollisionVec3* v, float
     *out = *v * (1.0f / len);
     return out;
 }
+
+// 0x0043ca20 (cdecl): out = v * M3x3 (rotate by the matrix rows, no translation), same result as 0x0042a450.
+// It sits in the 0x0043c8xx..0x0043cax run (not CollisionObject/CollisionPoint code); tier 3 name.
+void CollisionRotateVector(CollisionVec3* out, const CollisionVec3* v, const Matrix4* m)
+{
+    *(Vec3*)out = Vec3(v->z * m->_31 + v->y * m->_21 + v->x * m->_11,
+                       v->z * m->_32 + v->y * m->_22 + v->x * m->_12,
+                       v->z * m->_33 + v->y * m->_23 + v->x * m->_13);
+}

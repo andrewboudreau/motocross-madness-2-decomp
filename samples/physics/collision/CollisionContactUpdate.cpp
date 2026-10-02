@@ -14,18 +14,18 @@ public:
 // penetrate (field_0xa4). Both the 1-contact and N-contact shapes exist in retail.
 static void CollisionRefreshContact(CollisionPoint* p, CollisionFrameHelper* frame, int* penetrating)
 {
-    frame->Fn_00507c10(&p->field_0x20, &p->field_0x2c, 0, &p->field_0xbc);
-    p->field_0x98 = (p->field_0x20.y - p->field_0x14.y) * p->field_0x2c.y;
-    p->field_0xbc &= 7;
-    p->field_0xa4 = (p->field_0x98 >= p->field_0x9c) ? 1.0f : 0.0f;
-    if (p->field_0xa4 != 0.0f)
+    frame->Fn_00507c10(&p->surfacePosition, &p->surfaceNormal, 0, &p->surfaceType);
+    p->penetration = (p->surfacePosition.y - p->worldPosition.y) * p->surfaceNormal.y;
+    p->surfaceType &= 7;
+    p->inContact = (p->penetration >= p->penetrationThreshold) ? 1.0f : 0.0f;
+    if (p->inContact != 0.0f)
         ++*penetrating;
-    if (p->field_0xc0) {
+    if (p->surfaceOwner) {
         // field_0xc0 -> object whose +0xa4 table holds per-surface values at +0x3a0 (tier 3: surface friction/grip).
-        char* table = *(char**)(p->field_0xc0 + 0xa4);
-        p->field_0x8c = ((float*)(table + 0x3a0))[(unsigned char)p->field_0xbc];
+        char* table = *(char**)(p->surfaceOwner + 0xa4);
+        p->surfaceGrip = ((float*)(table + 0x3a0))[(unsigned char)p->surfaceType];
     } else {
-        p->field_0x8c = 1.0f;
+        p->surfaceGrip = 1.0f;
     }
 }
 
@@ -39,24 +39,24 @@ int Fn_0043ad80(void* a1, int* penetrating, int count, CollisionPoint** points,
     if (mode == 1 && count == 1) {
         // Single contact: the position is offset - k * normal instead of coming from the owner.
         CollisionPoint* p = points[0];
-        if (p->field_0x04) {
+        if (p->ownerNode) {
             CollisionVec3 tmp = *offset;
-            frame->Fn_00507c10(&tmp, &p->field_0x2c, 0, 0);
-            p->field_0x14.x = -k * p->field_0x2c.x + offset->x;
-            p->field_0x14.y = -k * p->field_0x2c.y + offset->y;
-            p->field_0x14.z = -k * p->field_0x2c.z + offset->z;
-            p->field_0x20 = p->field_0x14;
+            frame->Fn_00507c10(&tmp, &p->surfaceNormal, 0, 0);
+            p->worldPosition.x = -k * p->surfaceNormal.x + offset->x;
+            p->worldPosition.y = -k * p->surfaceNormal.y + offset->y;
+            p->worldPosition.z = -k * p->surfaceNormal.z + offset->z;
+            p->surfacePosition = p->worldPosition;
             CollisionRefreshContact(p, frame, penetrating);
         }
         return 1;
     }
     for (int i = 0; i < count; ++i) {
         CollisionPoint* p = points[i];
-        if (p->field_0x04) {
+        if (p->ownerNode) {
             CollisionVec3 tmp;
-            CollisionVec3* r = p->field_0x04->Fn_004fd660(&tmp, &p->field_0x08);
-            p->field_0x14 = *r;
-            p->field_0x20 = *r;
+            CollisionVec3* r = p->ownerNode->Fn_004fd660(&tmp, &p->localPosition);
+            p->worldPosition = *r;
+            p->surfacePosition = *r;
             CollisionRefreshContact(p, frame, penetrating);
         }
     }
@@ -74,10 +74,10 @@ int Fn_0043aa30(int count, CollisionPoint** points, const CollisionVec3* scaleA,
     float deepest;
     int merged = 0;
     CollisionPoint* first = points[0];
-    if (first->field_0xa4 != 0.0f) {
-        deepest = first->field_0x98 > 0.0f ? first->field_0x98 : 0.0f;
-        sum = first->field_0x14;
-        *normal = first->field_0x2c;
+    if (first->inContact != 0.0f) {
+        deepest = first->penetration > 0.0f ? first->penetration : 0.0f;
+        sum = first->worldPosition;
+        *normal = first->surfaceNormal;
         merged = 1;
     } else {
         sum = g_CollisionZeroVec3;
@@ -86,16 +86,16 @@ int Fn_0043aa30(int count, CollisionPoint** points, const CollisionVec3* scaleA,
     }
     for (int i = 1; i < count; ++i) {
         CollisionPoint* p = points[i];
-        if (p->field_0xa4 != 0.0f) {
-            if (p->field_0x98 > 0.0f && p->field_0x98 > deepest)
-                deepest = p->field_0x98;
-            sum.x += p->field_0x14.x;
-            sum.y += p->field_0x14.y;
-            sum.z += p->field_0x14.z;
+        if (p->inContact != 0.0f) {
+            if (p->penetration > 0.0f && p->penetration > deepest)
+                deepest = p->penetration;
+            sum.x += p->worldPosition.x;
+            sum.y += p->worldPosition.y;
+            sum.z += p->worldPosition.z;
             ++merged;
-            normal->x += p->field_0x2c.x;
-            normal->y += p->field_0x2c.y;
-            normal->z += p->field_0x2c.z;
+            normal->x += p->surfaceNormal.x;
+            normal->y += p->surfaceNormal.y;
+            normal->z += p->surfaceNormal.z;
         }
     }
     if (merged <= 0)

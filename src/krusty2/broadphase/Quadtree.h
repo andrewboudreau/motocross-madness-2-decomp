@@ -23,19 +23,7 @@
 // Debug allocation forms (size/ptr, __FILE__, __LINE__): core/DebugAlloc.h.
 #include "core/DebugAlloc.h"
 
-// Fixed-size block pool (retail 0x00423f70 ctor(elemSize, count), 0x00423fb0 dtor,
-// 0x00423fc0 Alloc, 0x00424050 Free, 0x00424110 Reset; object size 0x28 from the
-// operator new at 0x4dc751).  Owned by another TU: PROVISIONAL declaration only.
-class QuadTreePool {
-public:
-    QuadTreePool(unsigned int elemSize, unsigned int count);
-    ~QuadTreePool();
-    void* Alloc();
-    void Free(void* p);
-    void Reset();
-private:
-    char field_0x00[0x28];
-};
+#include "../../reconstructed/BlockAllocator.h"
 
 class QuadTreeNode;
 
@@ -71,10 +59,10 @@ public:
     QuadTreeNode* Grow();                                        // 0x004ddce0
     void ExtendY(float y0, float y1);                            // inlined at 0x4dcb58 / 0x4dcc3f
 
-    QuadTreeNode** field_0x04;       // child array [4]
-    QuadTreeItemLink* field_0x08;    // object list head
-    float field_0x0c;                // ctor 0
-    float field_0x10;                // ctor -FLT_MAX (0xff7fffff)
+    QuadTreeNode** children;       // +0x04 child array [4]
+    QuadTreeItemLink* itemList;    // +0x08 object list head
+    float yCenter;                // +0x0c ctor 0
+    float yHalfExtent;                // +0x10 ctor -FLT_MAX (0xff7fffff)
 };
 
 class QuadTree {
@@ -98,37 +86,37 @@ public:
     void Init(float x0, float z0, float x1, float z1, float minCell); // 0x004dc670 (ret 0x14)
 
     // Layout (tier 2: offsets seen in the bodies; names tier 3 where commented).
-    int field_0x04;
-    int field_0x08;
-    float field_0x0c;
-    int field_0x10[12];
-    float field_0x40;                // world rectangle min x (Init arg 1)
-    float field_0x44;                // max x (Init arg 3)
-    float field_0x48;                // min z (Init arg 2)
-    float field_0x4c;                // max z (Init arg 4)
-    float field_0x50;                // x extent
-    float field_0x54;                // z extent
+    int maxDepth;  // +0x04 Init loop count-1 of the cell table; ComputeCode clamps depth to it; IsValidCode compares depth with it
+    int leafCellSize;  // +0x08 Init: = cellSizes[maxDepth]; passed as minSize to root Gather in BeginQuery
+    float quantScale;  // +0x0c Init: 32768 / max(extentX, extentZ); multiplies world coords into the 15-bit grid
+    int cellSizes[12];  // +0x10 Init: cellSizes[d] = 0x4000 >> d; indexed by depth in Insert/Remove/ComputeCode
+    float worldMinX;                // +0x40 world rectangle min x (Init arg 1)
+    float worldMaxX;                // +0x44 max x (Init arg 3)
+    float worldMinZ;                // +0x48 min z (Init arg 2)
+    float worldMaxZ;                // +0x4c max z (Init arg 4)
+    float extentX;                // +0x50 x extent
+    float extentZ;                // +0x54 z extent
     int field_0x58;
-    QuadTreeNode* field_0x5c;        // root node (dtor calls its deleting dtor)
-    QuadTreePool* field_0x60;        // pool of QuadTreeItemLink (0x14 elements)
-    QuadTreePool* field_0x64;        // pool of QuadTreeResultLink (8 byte elements)
-    unsigned int field_0x68;         // bit 1 (2) = tree is being torn down
-    unsigned short field_0x6c;
+    QuadTreeNode* rootNode;        // +0x5c root node (dtor calls its deleting dtor)
+    BlockAllocator* itemPool;        // +0x60 pool of QuadTreeItemLink (0x14 elements)
+    BlockAllocator* resultPool;        // +0x64 pool of QuadTreeResultLink (8 byte elements)
+    unsigned int stateFlags;         // +0x68 bit 1 (2) = tree is being torn down
+    unsigned short queryStamp;  // +0x6c ++ in BeginQuery/RestartQuery; compared with QuadTreeObject stamp (maxDepth) to return each object once
     unsigned short field_0x6e;
-    QuadTreeResultLink* field_0x70;
-    QuadTreeResultLink* field_0x74;
-    int field_0x78;
-    QuadTreeItemLink* field_0x7c;
-    int field_0x80;
-    QuadTreeObject* field_0x84[500]; // sorted-query object stack (0x1f4 entries max)
-    int field_0x854;                 // live node count (QuadTreeNode ctor++/dtor--)
+    QuadTreeResultLink* queryListHead;  // +0x70 BeginQuery stores the Gather result; RestartQuery copies it to the cursor
+    QuadTreeResultLink* queryCursor;  // +0x74 current result cell iterated by NextObject/NextObjectSorted
+    int itemSlotIndex;  // +0x78 0..3 index into the current item block, reset to 0 per block
+    QuadTreeItemLink* itemCursor;  // +0x7c current QuadTreeItemLink block of the cell being iterated
+    int sortedCount;  // +0x80 number of entries in the sorted stack sortedStack; popped with --
+    QuadTreeObject* sortedStack[500]; // +0x84 sorted-query object stack (0x1f4 entries max)
+    int liveNodeCount;                 // +0x854 live node count (QuadTreeNode ctor++/dtor--)
     int field_0x858;
-    int field_0x85c;
+    int objectCount;  // +0x85c Insert ++ / Remove -- (once per call, not per cell)
     int field_0x860;
-    QuadTreeObject** field_0x864;    // result array, freed with debug delete (line 0x85) by the dtor
+    QuadTreeObject** resultArray;    // +0x864 result array, freed with debug delete (line 0x85) by the dtor
     int field_0x868;
-    int field_0x86c;                 // result count
-    int field_0x870;                 // result capacity
+    int resultCount;                 // +0x86c result count
+    int resultCapacity;                 // +0x870 result capacity
 };
 
 extern float g_quadTreeInvScale;     // 0x00689b74: 1 / field_0x0c set by Init

@@ -96,10 +96,10 @@ public:
                                     int a5, int a6); // 0x00445680 (ret 0x18)
 
     // D3DIM's own data 0x1a0..0x210 (then vtordisp at 0x210, GameObject at 0x214).
-    // d3d_field_0x1a0 is the pointer that SoultreePhysicsCharacter code reads at the
+    // modelNode is the pointer that SoultreePhysicsCharacter code reads at the
     // absolute offset 0x3bc (0x21c + 0x1a0); its type is shared with
     // SoultreePhysicsBaseObject::field_0x08 in the collision area (tier 3).
-    SoultreeObject* d3d_field_0x1a0;
+    SoultreeObject* modelNode;
     char d3d_field_0x1a4[0x6c];
 };
 

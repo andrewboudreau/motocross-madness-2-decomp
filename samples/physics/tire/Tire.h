@@ -43,8 +43,8 @@ public:
     ~MovingPart();                          // 0x00464e90, an empty out-of-line dtor
 
     char field_0x00[0x40];
-    void* field_0x40;                       // result of 0x004fdae0(b)
-    int field_0x44;                         // ctor arg c
+    void* sceneNode;                       // +0x40 result of 0x004fdae0(b)
+    int ownerRef;                         // +0x44 ctor arg c
     int field_0x48;                         // 0
 };
 
@@ -85,7 +85,7 @@ public:
     // Non-virtual members (this == complete object).
     void HandleContact(int a, int tag, CollisionObject* other);   // 0x00512e80 (ret 0xc)
     // 0x00514550 (thiscall, ret 0x20), tier 3 name: places the wheel on the ground.  Recomputes
-    // the wheel axes (field_0x20c/0x230/0x23c), probes the world/terrain for the contact point
+    // the wheel axes (wheelUpAxis/0x230/0x23c), probes the world/terrain for the contact point
     // and normal, builds the wheel frame and reports the contact through CollisionPoint's
     // field_0x98 (penetration/drop).  Callers 0x00528f65 and 0x00528fd8.
     void UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity, float angle,
@@ -96,41 +96,41 @@ public:
                                const CollisionVec3* c);
     // 0x005135f0 (thiscall, ret 0x28), tier 3 name: contact-patch update.  Recomputes the
     // relative position/lever vectors and the tangent direction, length and slip-like scalar
-    // field_0x27c; see Tire.cpp.  Single caller 0x00529aa7.
+    // slipSpeed; see Tire.cpp.  Single caller 0x00529aa7.
     void UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, CollisionVec3 ref,
                             float minLength, float* outValue, int* outSign);
 
     // --- Tire's own data 0x1c8..0x2c0 (MovingPart ends at 0x1c8) ---
-    float field_0x1c8;
-    float field_0x1cc;
-    float field_0x1d0;
-    float field_0x1d4;
+    float invWheelRadius;  // +0x1c8 ctor: 1.0f / extentB.y (wheelRadius is the radius)
+    float sideFriction;  // +0x1cc ctor arg a4; slot 1 uses it times sideFrictionScale times sin of the tangent angle (sideways grip)
+    float rollFrictionScale;  // +0x1d0 ctor arg a8; multiplies rollFriction in the cos term of the slot 1 friction
+    float sideFrictionScale;  // +0x1d4 ctor arg a9; multiplies sideFriction in the sin term
     float field_0x1d8;
     float field_0x1dc;
     float field_0x1e0;
-    int field_0x1e4;
-    CollisionVec3 field_0x1e8;
-    CollisionVec3 field_0x1f4;
-    CollisionVec3 field_0x200;
-    CollisionVec3 field_0x20c;
-    CollisionVec3 field_0x218;
-    CollisionVec3 field_0x224;
-    CollisionVec3 field_0x230;
-    CollisionVec3 field_0x23c;
+    int hasContactObjectVelocity;  // +0x1e4 HandleContact: set 1 when a vector was captured, 0 for tag 0x65/other
+    CollisionVec3 slipVector;  // +0x1e8 UpdateContactPatch: axis*field_0x90 + normalLeverCross, normalised into CollisionPoint::field_0x50
+    CollisionVec3 contactObjectVelocity;  // +0x1f4 HandleContact: copy of other owner vector at +0x224 (CollisionCharacter::wheelVelocity is its velocity), +0x40 or +0x64
+    CollisionVec3 wheelCenter;  // +0x200 UpdateSuspensionProbe: world position of the scene node (0x004fc9a0); probes are offset from it by the radius
+    CollisionVec3 wheelUpAxis;  // +0x20c UpdateSuspensionProbe: node-rotated direction g_TireVec3_68a3c0; fallback and frame axis passed to TireBuildFrame
+    CollisionVec3 normalLeverCross;  // +0x218 UpdateContactPatch: cross(n*(axis.n), relativePos) with n = contact normal; fallback tangent source when the projected dot <= 0.001; ctor zero vector
+    CollisionVec3 wheelVelocity;  // +0x224 UpdateSuspensionProbe: copy of its velocity argument (*velocity) at the end; ctor zero vector
+    CollisionVec3 rollDirection;  // +0x230 normalise(cross(normal, side)); slot 1 and UpdateContactPatch dot it with the tangent
+    CollisionVec3 sideAxis;  // +0x23c cross(up, node axis) normalised; the wheel axle direction used for the probes
     CollisionVec3 field_0x248;
     CollisionVec3 field_0x254;
-    int field_0x260;
-    int field_0x264;
+    int inContact;  // +0x260 UpdateSuspensionProbe: depth >= CollisionPoint::field_0x9c ? 1 : 0
+    int reportContactOutputs;  // +0x264 UpdateContactPatch writes *outValue and *outSign only when it is nonzero; ctor 0 (tier 3: meaning of the flag)
     int field_0x268;
     int field_0x26c;
-    float field_0x270;
-    float field_0x274;
+    float rollFriction;  // +0x270 ctor arg a3; cos term factor in slot 1
+    float wheelRadius;  // +0x274 ctor: y extent of the node; slot 8 builds the 8-point rim polyline with it; probes offset by it
     int field_0x278;
-    float field_0x27c;                      // written by UpdateContactPatch (float, tier 2)
+    float slipSpeed;                      // +0x27c written by UpdateContactPatch (float, tier 2)
     int field_0x280;
-    float field_0x284;                      // 1.0f default or a surface table entry (tier 2)
-    float field_0x288;
-    float field_0x28c;
+    float surfaceScaleB;                      // +0x284 1.0f default or a surface table entry (tier 2)
+    float tangentSin;  // +0x288 slot 1: sqrt(1 - cos^2)
+    float tangentCos;  // +0x28c slot 1: |tangent . rollDirection| clamped to 1
     int field_0x290;
     float field_0x294;
     int field_0x298;
@@ -149,7 +149,7 @@ public:
 // the dtor core 0x005133d0 / deleting dtor 0x005133a0 and the vtable record Tire+184 (tier 1/2).
 // The polymorphic CollisionPoint is placed before the non-polymorphic MovingPart by the compiler
 // (so the declaration order of the two bases above does not matter for the layout).
-typedef char tire_assert_first_field[(offsetof(Tire, field_0x1c8) == 0x1c8) ? 1 : -1];
+typedef char tire_assert_first_field[(offsetof(Tire, invWheelRadius) == 0x1c8) ? 1 : -1];
 typedef char tire_assert_last_field[(offsetof(Tire, field_0x2bc) == 0x2bc) ? 1 : -1];
 typedef char tire_assert_sizeof[(sizeof(Tire) == 0x2c0) ? 1 : -1];
 typedef char tire_assert_collision_point[(sizeof(CollisionPoint) == 0xc4) ? 1 : -1];

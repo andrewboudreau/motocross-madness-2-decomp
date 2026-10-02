@@ -6,32 +6,32 @@
 #include "CollisionPoint.h"
 
 inline CollisionPoint::CollisionPoint(float a, int b)
-    : field_0x88(a), field_0xc0(b) {
-    field_0x08 = g_CollisionZeroVec3;
-    field_0x04 = 0;
-    field_0x14 = g_CollisionZeroVec3;
-    field_0x20 = g_CollisionZeroVec3;
-    field_0x2c = g_CollisionVec3_579810;
-    field_0x38 = g_CollisionZeroVec3;
+    : normalForce(a), surfaceOwner(b) {
+    localPosition = g_CollisionZeroVec3;
+    ownerNode = 0;
+    worldPosition = g_CollisionZeroVec3;
+    surfacePosition = g_CollisionZeroVec3;
+    surfaceNormal = g_CollisionVec3_579810;
+    relativePosition = g_CollisionZeroVec3;
     field_0x44 = g_CollisionZeroVec3;
-    field_0x50 = g_CollisionZeroVec3;
+    frictionDirection = g_CollisionZeroVec3;
     field_0x5c = g_CollisionZeroVec3;
-    field_0x90 = 0;
-    field_0x94 = 0;
+    tangentSpeed = 0;
+    spinSpeed = 0;
     field_0xb8 = 1.0f;
-    field_0x8c = 1.0f;
-    field_0x98 = -999.0f;               // 0xc479c000 at 0x0043a48c
-    field_0x9c = 0;
-    field_0xa4 = 0;
+    surfaceGrip = 1.0f;
+    penetration = -999.0f;               // 0xc479c000 at 0x0043a48c
+    penetrationThreshold = 0;
+    inContact = 0;
     field_0xa8 = 0;
     field_0xac = 0;
     field_0xb0 = 0;
     field_0xb4 = 0;
     field_0xa0 = 0.5f;
-    field_0xbc = 0;
-    field_0x84 = 0;
-    field_0x78 = g_CollisionZeroVec3;
-    field_0x74 = 0;
+    surfaceType = 0;
+    frictionMagnitude = 0;
+    frictionForce = g_CollisionZeroVec3;
+    frictionCoefficient = 0;
     field_0x68 = g_CollisionZeroVec3;
 }
 

@@ -54,7 +54,7 @@ void SoultreePhysicsCharacter::UnknownVirtualSlot1(float value)
 // slot 8 (0x005041c0)
 void SoultreePhysicsCharacter::UnknownVirtualSlot8()
 {
-    field_0x194 = field_0x1a0 = field_0x42c->WorldToLocalPoint(field_0x18);
+    rotationPivot = localCenterOfMass = poseNode->WorldToLocalPoint(centerOfMass);
 }
 
 // slot 42 (0x00504470)
@@ -72,43 +72,43 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot33(const Vec3* a1, const Vec3* a
                                                    int a5, float a6)
 {
     UnknownVirtualSlot1(a6);
-    field_0x88 = *a2;
-    field_0x94 = *a3;
-    field_0x08->SetPosition(a1->x, a1->y, a1->z);
-    field_0x08->GetPosition(&field_0x0c);
+    bodyForward = *a2;
+    bodyUp = *a3;
+    sceneNode->SetPosition(a1->x, a1->y, a1->z);
+    sceneNode->GetPosition(&position);
     UnknownVirtualSlot36();
-    if (field_0x218) {
-        field_0x218->GetPositionIn(0, &field_0x18);
+    if (centerNode) {
+        centerNode->GetPositionIn(0, &centerOfMass);
     } else {
-        field_0x08->GetPositionIn(0, &field_0x18);
+        sceneNode->GetPositionIn(0, &centerOfMass);
     }
     Method_0x004a8b00();
-    field_0x128->Fn_00435fe0();
-    field_0x109 = 0;
-    field_0x20d = 1;
-    field_0x20c = 1;
+    collisionObject->Fn_00435fe0();
+    respawnPending = 0;
+    justReset = 1;
+    attachmentResetPending = 1;
     return 0;
 }
 
 // slot 41 (0x00504360)
 void SoultreePhysicsCharacter::UnknownVirtualSlot41()
 {
-    field_0x42c->GetAxesIn(0, &field_0xa0, &field_0xac);
-    d3d_field_0x1a0->SetAxesIn(0, &field_0xa0, &field_0xac, 1, 0);
+    poseNode->GetAxesIn(0, &savedForward, &savedUp);
+    modelNode->SetAxesIn(0, &savedForward, &savedUp, 1, 0);
     Method_0x004a8b00();
     field_0x430 = 0;
     UnknownVirtualSlot34();
-    OrientationAnglesFromVectors(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c, &field_0x38,
-              &field_0x3c, &field_0x44, &field_0x40);
-    field_0xa0 = field_0x88;
-    field_0xac = field_0x94;
-    field_0x50 = field_0x34;
-    field_0x4c = field_0x30;
-    field_0x48 = field_0x2c;
-    field_0x54 = field_0x38;
-    field_0x58 = field_0x3c;
-    field_0x60 = field_0x44;
-    field_0x5c = field_0x40;
+    OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll, &bodySinRoll,
+              &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+    savedForward = bodyForward;
+    savedUp = bodyUp;
+    savedYaw = bodyYaw;
+    savedPitch = bodyPitch;
+    savedRoll = bodyRoll;
+    savedSinRoll = bodySinRoll;
+    savedCosRoll = bodyCosRoll;
+    savedCosPitch = bodyCosPitch;
+    savedSinPitch = bodySinPitch;
 }
 
 // slot 40 (0x00503de0, `ret 0x6c`).  Loads the character through the D3DIM base and runs the
@@ -127,12 +127,12 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
     char colPath[0x104];
 
     D3DIMSoultreeCharacter::D3DIMVirtualSlot11(a1, a3, a4, a5, 1, 1);
-    field_0x42c = field_0x08 = d3d_field_0x1a0;
+    poseNode = sceneNode = modelNode;
     SoultreePhysicsBaseObject::UnknownVirtualSlot2(a1, a2, a6, a7, a8, a9, a10, a11, a12, a13,
                                                    a14, a15, a16, a17, a18, 0.0f, 0, a19, a20,
                                                    a21);
     if (a4 && (a4->field_0x25 & 1)) {
-        ((SoultreeD3DNode*)field_0x08)->Fn_4444c0(1);
+        ((SoultreeD3DNode*)sceneNode)->Fn_4444c0(1);
     }
 
     int len = strlen(a3);
@@ -147,16 +147,16 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
     }
     delete file;
 
-    if (field_0x128) {
+    if (collisionObject) {
         if (colPath[0]) {
-            field_0x128->Fn_00432800(field_0x08, colPath);
+            collisionObject->Fn_00432800(sceneNode, colPath);
         } else {
-            field_0x128->Fn_004324b0(field_0x08, 1, 0, 0, 0);
+            collisionObject->Fn_004324b0(sceneNode, 1, 0, 0, 0);
         }
-        field_0x128->field_0x64 = 0;
-        field_0x128->field_0x60 = this;
-        field_0x128->Fn_00435fe0();
-        GameObject* child = field_0x128;
+        collisionObject->ownerType = 0;
+        collisionObject->ownerObject = this;
+        collisionObject->Fn_00435fe0();
+        GameObject* child = collisionObject;
         GameObject::Method_0x00469190(child, -1);
     }
     return this;
@@ -184,7 +184,7 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
                                                    a13, a14, a15, a16, a17, a18, a19, a20,
                                                    a21, a22);
     if (a3 && (a3->field_0x25 & 1)) {
-        ((SoultreeD3DNode*)SoultreePhysicsBaseObject::field_0x08)->Fn_4444c0(1);
+        ((SoultreeD3DNode*)SoultreePhysicsBaseObject::sceneNode)->Fn_4444c0(1);
     }
 
     int len = strlen(a2);
@@ -199,16 +199,16 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
     }
     delete file;
 
-    if (field_0x128) {
+    if (collisionObject) {
         if (colPath[0]) {
-            field_0x128->Fn_00432800(SoultreePhysicsBaseObject::field_0x08, colPath);
+            collisionObject->Fn_00432800(SoultreePhysicsBaseObject::sceneNode, colPath);
         } else {
-            field_0x128->Fn_00432720(SoultreePhysicsBaseObject::field_0x08, 1, 0, 0, 0);
+            collisionObject->Fn_00432720(SoultreePhysicsBaseObject::sceneNode, 1, 0, 0, 0);
         }
-        field_0x128->field_0x64 = 0;
-        field_0x128->field_0x60 = this;
-        field_0x128->Fn_00435fe0();
-        GameObject* child = field_0x128;
+        collisionObject->ownerType = 0;
+        collisionObject->ownerObject = this;
+        collisionObject->Fn_00435fe0();
+        GameObject* child = collisionObject;
         D3DIMSoultreeObject::Method_0x00469190(child, -1);
     }
     return static_cast<D3DIMSoultreeObject*>(this);

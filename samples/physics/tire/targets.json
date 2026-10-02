@@ -33,7 +33,7 @@
   "target_va": "0x00513490",
   "target_size": 201,
   "expect": "partial",
-  "notes": "24.3%: identical structure and loop; retail keeps i and the zero Vec3 in a single int register (mov [0x10..0x1c],ecx and edx/edi/ebx copies) while we reload the zero vector from the stack; chained assignment and declaration order did not change it"
+  "notes": "98.87% at exact size 201: zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap"
  },
  {
   "class": "Tire",
@@ -149,8 +149,8 @@
   "candidate_symbol_contains": "GameObjectVirtualSlot10@CollisionCharacter@@UAEHM@Z",
   "target_va": "0x00431b30",
   "target_size": 438,
-  "expect": "partial",
-  "notes": "95% : diverges only in the x87 scheduling of the velocity = delta * (1/dt) Vec3 temp (retail keeps 1/dt in st0 with fst then fmul st(1); VC6 stores it with fstp and re-reads) Wave 2: also tried inline (1.0f/dt)*delta, delta*(1.0f/dt), delta*k, per-component divide/multiply: named float temp stays best (95.43); inline forms change the size."
+  "expect": "exact",
+  "notes": "velocity = (pos - last) / dt written through a reciprocal-multiply Vec3 divide (the shared out-of-line helper 0x0043c890: inv = 1/dt, then three multiplies on the Vec3 temporary). That form leaves the x component on the x87 stack as retail does; operator* by a float temp or per-component divide did not."
  },
  {
   "class": "CollisionCharacter",
@@ -168,7 +168,7 @@
   "target_va": "0x00515880",
   "target_size": 703,
   "expect": "partial",
-  "notes": "3.7% (tier 3 name): rotation-frame builder (pos, z axis, y axis, orthogonalize, keepZ); every branch/store present. First divergence is the frame: retail 0x30 locals + push esi (keeps B.z in esi) vs ours 0x24; temp ordering differs (Vec3 ctor-result temp at esp+0x34)"
+  "notes": "7.35% (tier 3 name): rotation-frame builder; 677 bytes vs 703 target. Uses TireNormalizeZ helper. Retail has 0x30 locals + push esi (B.z in esi); ours has an extra Vec3 temp and caches y in registers"
  },
  {
   "class": "Tire",

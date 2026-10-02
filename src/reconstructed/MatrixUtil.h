@@ -29,7 +29,19 @@ struct Vector3 {
     float x;
     float y;
     float z;
+
+    Vector3 operator*(float scale) const { return Vector3(x * scale, y * scale, z * scale); }
+    Vector3& operator+=(const Vector3& other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+        return *this;
+    }
 };
+
+inline Vector3 operator*(float scale, const Vector3& v) {
+    return Vector3(scale * v.x, scale * v.y, scale * v.z);
+}
 
 Matrix4 ZeroMatrix();                          // 0x004a13e0
 Matrix4 IdentityMatrix();                      // 0x004a1410
