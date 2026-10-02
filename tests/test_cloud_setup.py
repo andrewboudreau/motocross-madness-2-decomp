@@ -26,6 +26,7 @@ class CloudSetupTests(unittest.TestCase):
         self.env = {k: v for k, v in os.environ.items()
                     if not k.startswith(('MCM2_', 'VC6_', 'WINE'))}
         self.env.update(HOME=str(Path(self.temp.name) / 'home'),
+                        VC6_RUNNER='wine',
                         MCM2_PRIVATE_ROOT=str(self.private),
                         PATH=str(self.root / 'bin') + os.pathsep + os.environ['PATH'])
         for name in ('wine', 'winepath', 'objdump', 'g++', 'clang-cl'):
@@ -51,7 +52,7 @@ class CloudSetupTests(unittest.TestCase):
             'archive_sha256': archive_sha or 'a' * 64,
             'unrelated': 'a' * 64,
         }))
-        (self.private / ('.accepted-' + 'a' * 64)).touch()
+        (self.private / ('.accepted-wine-' + 'a' * 64)).touch()
         (self.root / 'analysis/.cloud-analyze-ok').touch()
 
     def run_setup(self, *args):
@@ -111,6 +112,14 @@ class CloudSetupTests(unittest.TestCase):
         result = self.run_setup('--env-file')
         self.assertEqual(result.returncode, 2)
         self.assertIn('requires a path', result.stderr)
+
+    def test_cached_startup_requires_pinned_wibo_even_if_wine_exists(self):
+        self.installed()
+        self.env['VC6_RUNNER'] = 'wibo'
+        result = self.run_setup('--strict')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('pinned wibo missing or changed', result.stderr)
+        self.assertFalse((self.root / 'calls').exists())
 
 
 if __name__ == '__main__':

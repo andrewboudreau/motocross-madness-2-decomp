@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from mcm2tool.coff import CoffObject
 from mcm2tool.toolchain import fingerprint_toolchain
+from mcm2tool.vc6_runtime import runner_kind
 
 EXPECTED_EXE_SHA = '31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874'
 
@@ -82,14 +83,14 @@ def main():
         if not actual.exists() or sha(actual) != expected_hash:
             raise SystemExit(f'private core file hash mismatch: {relative}')
 
-    platform = 'windows' if os.name == 'nt' else 'wine'
-    if os.name != 'nt' and not (
-        shutil.which('wine') and shutil.which('winepath')
-    ):
+    platform = runner_kind()
+    required = {'windows': (), 'wine': ('wine', 'winepath'), 'wibo': ('wibo',)}[platform]
+    missing = [tool for tool in required if not shutil.which(tool)]
+    if missing:
         payload = {
             'ready': False,
             'stage': 'compiler_execution',
-            'reason': 'wine/winepath unavailable',
+            'reason': '/'.join(missing) + ' unavailable',
             'platform': platform,
             'toolchain': fp,
             'sp3_checks': checks,
@@ -110,7 +111,7 @@ def main():
         }
     )
 
-    if os.name != 'nt' and not (root / 'wine-vc6').exists():
+    if platform == 'wine' and not (root / 'wine-vc6').exists():
         init = run(
             [
                 sys.executable,

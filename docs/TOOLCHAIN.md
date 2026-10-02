@@ -1,9 +1,10 @@
 # Build and private inputs
 
-Use Python 3.10+ and authentic VC6 SP3. Native Windows execution is verified;
-Linux requires 32-bit Wine and the same readiness check. GNU `objdump` is needed
-for disassembly tools. Clang is optional for bootstrap comparisons; a native
-C++ compiler enables behavior-model tests.
+Use Python 3.10+ and authentic VC6 SP3. Native Windows and x86-64 Linux/wibo
+execution are verified. Linux setup installs the pinned wibo runner. Wine remains
+an alternative on hosts that support 32-bit Linux executables. GNU `objdump` is
+needed for disassembly tools. Clang is optional for bootstrap comparisons; a
+native C++ compiler enables behavior-model tests.
 
 ## Private bundle
 
@@ -65,7 +66,7 @@ private: its prepared filesystem includes the game EXE and Microsoft toolchain.
 | Install script | `bash tools/cloud_setup.sh --strict` |
 | Start skill instructions | Run `bash tools/cloud_setup.sh --strict --no-apt`, then `python3 tools/with_private_env.py -- make status` from the repository root. |
 | Direct environment variable | `MCM2_PRIVATE_BUNDLE_URL`: the private ZIP download URL |
-| Network | Allow Ubuntu package repositories, PyPI and the ZIP host during installation. |
+| Network | Allow Ubuntu package repositories, PyPI, GitHub release downloads and the ZIP host during installation. |
 
 The current [Codex Cloud interface](https://learn.chatgpt.com/docs/environments/cloud-environments)
 uses **Install script** and **Start skill**. Configure the full signed URL as a
@@ -81,7 +82,7 @@ put `bash tools/cloud_setup.sh --strict` in **Setup script**,
 URL in a **Secret** named `MCM2_PRIVATE_BUNDLE_URL`. A cached startup uses installed
 inputs without requiring the download secret again.
 
-Setup installs 32-bit Wine, Clang, GNU disassembly/build tools, Capstone and a native
+Setup installs x86-64 wibo, Clang, GNU disassembly/build tools, Capstone and a native
 C++ compiler; verifies and installs the pinned private bundle; runs a real VC6
 readiness compile; and generates analysis. `--strict` returns failure when a
 required step fails. Logs are `work/vc6-acceptance.log` and
@@ -102,6 +103,18 @@ analysis instead of trusting reports from the previously checked-out revision.
 The Claude remote-session hook uses the same script in best-effort mode. Its
 completion alone is not readiness; inspect the acceptance report. Linux setup
 through `tools/setup_vc6_linux.sh` delegates to strict mode.
+
+### Runner compatibility
+
+If an older setup reports `/usr/lib/wine/wine: Exec format error`, update to
+current `main` and reset the environment cache, then rerun the same setup script.
+That failure occurs while launching the 32-bit Linux Wine executable, before
+CL.EXE runs. Setup now uses [wibo 1.2.0](https://github.com/decompals/wibo/releases/tag/1.2.0),
+an x86-64 host runner for the authentic 32-bit Windows compiler. Its download
+hash is pinned in `tools/cloud_setup.sh`. Allow `github.com` and
+`release-assets.githubusercontent.com` if setup networking is restricted.
+`VC6_RUNNER=wine` retains the Wine route on compatible hosts; set it in environment
+settings if needed. No clang fallback is used for VC6 checks.
 
 ### Docker
 

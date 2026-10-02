@@ -3,12 +3,12 @@
 # --strict fails setup on errors and refreshes readiness/analysis on every run.
 # The Claude session hook uses the default best-effort mode.
 #
-#   * apt: wine + wine32 (i386), clang-cl/lld, unzip, binutils, make
+#   * pinned x86-64 wibo; apt: clang-cl/lld, unzip, binutils, make, g++
 #   * private bundle (VC98 tree + mcm2.exe) from MCM2_PRIVATE_BUNDLE_URL,
 #     verified and installed by tools/install_private_bundle.py into
 #     $MCM2_PRIVATE_ROOT (default ~/.cache/mcm2-private) - see docs/TOOLCHAIN.md
 #   * toolchains/vc6sp3 and work/game symlinked into this checkout/worktree
-#   * tools/vc6_acceptance.py: real CL.EXE compile under Wine (creates the prefix)
+#   * tools/vc6_acceptance.py: real CL.EXE compile under the selected runner
 #   * make analyze, so analysis/ exists when the session starts
 #
 # The bundle URL is a secret: set it in the environment settings, never in git.
@@ -43,6 +43,12 @@ warn() { printf '[cloud-setup] WARNING: %s\n' "$*" >&2; }
 fail() { warn "$*"; if [ "$STRICT" = 1 ]; then exit 1; fi; }
 
 PRIVATE_ROOT="${MCM2_PRIVATE_ROOT:-$HOME/.cache/mcm2-private}"
+RUNNER="${VC6_RUNNER:-wibo}"
+case "$RUNNER" in
+  auto) RUNNER=wibo ;;
+  wibo|wine) ;;
+  *) echo 'VC6_RUNNER must be auto, wibo or wine' >&2; exit 2 ;;
+esac
 MARKER="$PRIVATE_ROOT/private-inputs-state.json"
 BUNDLE_SHA256="${MCM2_PRIVATE_BUNDLE_SHA256:-$(python3 -c 'import json;print(json.load(open("config/private_bundle_expected.json"))["archive_sha256"])' 2>/dev/null)}"
 installed() {
@@ -68,6 +74,7 @@ exports=(
   "export PYTHONPATH=$(printf '%q' "$ROOT")"
   "export MCM2_PRIVATE_ROOT=$(printf '%q' "$PRIVATE_ROOT")"
   "export VC6_ROOT=$(printf '%q' "$PRIVATE_ROOT/toolchains/vc6sp3")"
+  "export VC6_RUNNER=$RUNNER"
   "export MCM2_EXE=$(printf '%q' "$PRIVATE_ROOT/work/game/mcm2.exe")"
   "export WINEPREFIX=$(printf '%q' "$PRIVATE_ROOT/wine-vc6")"
   "export WINEARCH=win32"
@@ -85,9 +92,11 @@ fi
 # ------------------------------------------------------------------- packages --
 if [ "$DO_APT" = 1 ]; then
   need=()
-  command -v wine >/dev/null             || need+=(wine)
-  dpkg -s wine32:i386 >/dev/null 2>&1    || need+=(wine32:i386)
-  command -v winepath >/dev/null         || need+=(wine)
+  if [ "$RUNNER" = wine ]; then
+    command -v wine >/dev/null          || need+=(wine)
+    dpkg -s wine32:i386 >/dev/null 2>&1 || need+=(wine32:i386)
+    command -v winepath >/dev/null      || need+=(wine)
+  fi
   command -v unzip >/dev/null            || need+=(unzip)
   command -v objdump >/dev/null          || need+=(binutils)
   command -v make >/dev/null             || need+=(make)
@@ -99,15 +108,46 @@ if [ "$DO_APT" = 1 ]; then
   if [ ${#need[@]} -gt 0 ]; then
     SUDO=""; [ "$(id -u)" = 0 ] || SUDO="sudo"
     log "installing: ${need[*]}"
-    dpkg --print-foreign-architectures | grep -qx i386 || $SUDO dpkg --add-architecture i386
+    if [ "$RUNNER" = wine ]; then
+      dpkg --print-foreign-architectures | grep -qx i386 || $SUDO dpkg --add-architecture i386
+    fi
     # Third-party PPAs on the image may be unreachable behind the proxy.
     $SUDO apt-get update -qq >/dev/null 2>&1 || true
     apt_install() { $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends "$@" >/dev/null; }
     # A newer amd64 libgd3 from a PPA (e.g. ondrej/php) can block wine32:i386;
     # installing the archive's libgd3:i386 first lets apt settle both arches.
-    apt_install "${need[@]}" || { apt_install libgd3:i386 && apt_install "${need[@]}"; } \
-      || fail "apt install failed: ${need[*]}"
+    if ! apt_install "${need[@]}"; then
+      if [ "$RUNNER" = wine ]; then
+        { apt_install libgd3:i386 && apt_install "${need[@]}"; } || fail "apt install failed: ${need[*]}"
+      else
+        fail "apt install failed: ${need[*]}"
+      fi
+    fi
   fi
+fi
+
+# This is a 64-bit Linux executable running the original 32-bit Windows CL.EXE.
+# It avoids the 32-bit Linux ELF loader rejected by some cloud kernels.
+if [ "$RUNNER" = wibo ]; then
+  [ "$(uname -m)" = x86_64 ] || { echo 'cloud wibo runner requires x86_64' >&2; exit 2; }
+  wibo="$HOME/.local/bin/wibo"
+  wibo_sha=13f86a2d618f0dbe67179d349625345eabf9b46450295cb4c904e49f6aff85af
+  wibo_ok() { [ -f "$wibo" ] && printf '%s  %s\n' "$wibo_sha" "$wibo" | sha256sum -c --status; }
+  if ! wibo_ok; then
+    if [ "$DO_APT" = 0 ]; then
+      echo 'pinned wibo missing or changed; rerun setup without --no-apt' >&2; exit 1
+    fi
+    log 'installing verified wibo 1.2.0 (x86-64 host runner)'
+    mkdir -p "$(dirname "$wibo")"
+    if ! curl -fsSL --retry 4 https://github.com/decompals/wibo/releases/download/1.2.0/wibo-x86_64 -o "$wibo.download" \
+       || ! printf '%s  %s\n' "$wibo_sha" "$wibo.download" | sha256sum -c --status; then
+      rm -f "$wibo.download"
+      echo 'wibo download/verification failed' >&2; exit 1
+    fi
+    chmod +x "$wibo.download"
+    mv -f "$wibo.download" "$wibo"
+  fi
+  "$wibo" --version || { echo '64-bit wibo cannot execute on this host' >&2; exit 1; }
 fi
 
 # tools/disasm_fn.py needs capstone (PyPI is reachable through the proxy).
@@ -124,7 +164,9 @@ if ! command -v clang-cl >/dev/null; then
 fi
 
 if [ "$STRICT" = 1 ]; then
-  for command in wine winepath objdump make g++ curl clang-cl; do
+  commands=(objdump make g++ curl clang-cl)
+  if [ "$RUNNER" = wine ]; then commands+=(wine winepath); else commands+=(wibo); fi
+  for command in "${commands[@]}"; do
     command -v "$command" >/dev/null || fail "missing $command; rerun without --no-apt"
   done
 fi
@@ -164,11 +206,11 @@ if installed; then
     "$PRIVATE_ROOT/toolchains/vc6sp3" || warn "could not restore long-name VC98 headers"
 
   # Strict startup rechecks execution; a cached marker is not current evidence.
-  if [ "$STRICT" = 1 ] || [ ! -f "$PRIVATE_ROOT/.accepted-$BUNDLE_SHA256" ]; then
+  if [ "$STRICT" = 1 ] || [ ! -f "$PRIVATE_ROOT/.accepted-$RUNNER-$BUNDLE_SHA256" ]; then
     log "VC6 acceptance compile"
     if python3 tools/with_private_env.py --root "$PRIVATE_ROOT" -- \
          python3 tools/vc6_acceptance.py --root "$PRIVATE_ROOT" --out work/vc6-acceptance.json >work/vc6-acceptance.log 2>&1; then
-      touch "$PRIVATE_ROOT/.accepted-$BUNDLE_SHA256"
+      touch "$PRIVATE_ROOT/.accepted-$RUNNER-$BUNDLE_SHA256"
     else
       tail -n 20 work/vc6-acceptance.log >&2
       fail "VC6 acceptance failed; see work/vc6-acceptance.log and work/vc6-acceptance.json"
