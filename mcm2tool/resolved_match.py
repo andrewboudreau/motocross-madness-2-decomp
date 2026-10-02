@@ -2,10 +2,6 @@
 
 User-reviewed address bindings are not proof of symbol or library identity.
 Unlike masking, every supported relocation is applied and every byte compared.
-
-Relocations whose final target is demonstrably inside the selected function
-extent may be resolved from the function's own section mapping. This covers
-compiler-emitted jump tables without inventing addresses for other functions.
 """
 from __future__ import annotations
 import struct
@@ -16,9 +12,7 @@ class RelocationError(ValueError):
     pass
 
 
-def apply_relocations(code: bytes, relocations: list[dict],
-                      bindings: dict[str, int] | None, target_va: int):
-    bindings = bindings or {}
+def apply_relocations(code: bytes, relocations: list[dict], bindings: dict[str, int], target_va: int):
     patched, audit, occupied = bytearray(code), [], set()
     if not 0 <= target_va <= 0xffffffff or target_va + len(code) > 0x100000000:
         raise RelocationError('function address outside i386 address space')
@@ -34,16 +28,9 @@ def apply_relocations(code: bytes, relocations: list[dict],
         if occupied & span:
             raise RelocationError('overlapping relocations')
         occupied |= span
-
-        if row.get('bound_va') is not None:
-            address = row['bound_va']
-            source = row.get('binding_source', 'internal')
-        else:
-            if symbol not in bindings:
-                raise RelocationError(f'unresolved symbol: {symbol}')
-            address = bindings[symbol]
-            source = 'explicit'
-
+        if symbol not in bindings and 'internal_bound_va' not in row:
+            raise RelocationError(f'unresolved symbol: {symbol}')
+        address = row['internal_bound_va'] if 'internal_bound_va' in row else bindings[symbol]
         if not isinstance(address, int) or not 0 <= address <= 0xffffffff:
             raise RelocationError(f'invalid symbol address: {symbol}')
         addend = struct.unpack_from('<I', code, offset)[0]
@@ -52,15 +39,10 @@ def apply_relocations(code: bytes, relocations: list[dict],
             value -= target_va + offset + 4
         value &= 0xffffffff
         struct.pack_into('<I', patched, offset, value)
-        audit.append({
-            'offset': offset,
-            'type': kind,
-            'symbol': symbol,
-            'bound_va': f'0x{address:08x}',
-            'binding_source': source,
-            'addend_u32': addend,
-            'written_u32': value,
-        })
+        audit.append({'offset': offset, 'type': kind, 'symbol': symbol,
+                      'bound_va': f'0x{address:08x}', 'addend_u32': addend,
+                      'written_u32': value,
+                      'internal_label': 'internal_bound_va' in row})
     return bytes(patched), audit
 
 
@@ -79,63 +61,94 @@ def compare_bytes(retail: bytes, candidate: bytes) -> dict:
                            if i >= len(retail) or i >= len(candidate) or retail[i] != candidate[i]][:64]}
 
 
-def _internal_bound_va(obj: CoffObject, function, record, raw: bytes,
-                       relocation, target_va: int) -> int | None:
-    """Map a same-section relocation only when S+A stays in this function.
+_EH_PROLOGUES = {
+    3: (b'\x6a\xff\x68',),
+    9: (b'\x64\xa1\x00\x00\x00\x00\x6a\xff\x68',),
+}
 
-    A VC6 switch table commonly relocates both the table base and each table
-    entry against the containing .text section. Mapping the selected function's
-    section offset to target_va is sufficient for those references. References
-    outside the independently measured function extent remain unresolved and
-    therefore still require reviewed external bindings.
-    """
+
+def _source_path_literal(obj: CoffObject, record) -> str | None:
+    """Lower-cased basename of an absolute source-path literal, else None."""
+    if record.section_number <= 0:
+        return None
+    section = obj.section(record.section_number)
+    data = obj.data[section.raw_ptr + record.value:section.raw_ptr + section.raw_size]
+    text = data.split(b'\0', 1)[0].decode('latin-1').lower()
+    if (len(text) > 3 and text[1:3] in (':\\', ':/')
+            and text.endswith(('.cpp', '.c', '.h'))):
+        return text.replace('/', '\\').rsplit('\\', 1)[-1]
+    return None
+
+
+def _internal_bound_va(function, record, raw: bytes, relocation, target_va: int) -> int | None:
+    """Resolve only same-section S+A destinations within the measured extent."""
     if record.section_number != function.section_number:
         return None
     offset = relocation.virtual_address - function.value
-    if offset < 0 or offset + 4 > len(raw):
+    if relocation.type not in (0x0006, 0x0014) or offset < 0 or offset + 4 > len(raw):
         return None
     addend = struct.unpack_from('<I', raw, offset)[0]
-    section_base = target_va - function.value
-    bound = (section_base + record.value) & 0xffffffff
-    absolute = (bound + addend) & 0xffffffff
-    if not (target_va <= absolute < target_va + len(raw)):
-        return None
-    return bound
+    bound = (target_va - function.value + record.value) & 0xffffffff
+    destination = (bound + addend) & 0xffffffff
+    if target_va <= destination < target_va + len(raw):
+        return bound
+    return None
 
 
-def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes,
-                 bindings: dict[str, int] | None = None) -> dict:
+def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bindings: dict[str, int]) -> dict:
     if obj.machine != 0x14c:
         raise RelocationError('only i386 COFF supported')
-    bindings = bindings or {}
     sym = obj.find_symbol(symbol)
     raw, _, rels = obj.symbol_extent(sym)
     section = obj.section(sym.section_number)
     if sym.value < 0 or sym.value + len(raw) > section.raw_size or section.raw_ptr + section.raw_size > len(obj.data):
         raise RelocationError('truncated COFF function storage')
-
+    # No target-sized trimming: symbol_extent owns the candidate boundary.
+    padding = 0
     converted = []
+    # Labels inside this function's own extent (e.g. switch jump-table targets)
+    # have a fixed address: the function's retail VA plus the label offset. They
+    # are resolved here instead of requiring hand-written bindings; anything
+    # outside the extent must still be bound explicitly.
     for rel in rels:
         record = obj.symbol_by_index.get(rel.symbol_index)
         if record is None:
             raise RelocationError('relocation references missing/auxiliary symbol')
-        row = {
-            'offset': rel.virtual_address - sym.value,
-            'type': rel.type,
-            'symbol': record.name,
-        }
-        # Explicit evidence always wins. Otherwise resolve only an address whose
-        # S+A is demonstrably inside this measured function extent.
-        if record.name not in bindings:
-            internal = _internal_bound_va(obj, sym, record, raw, rel, target_va)
-            if internal is not None:
-                row['bound_va'] = internal
-                row['binding_source'] = 'internal_same_function'
+        address = _internal_bound_va(sym, record, raw, rel, target_va)
+        if address is not None:
+            if record.name in bindings and bindings[record.name] != address:
+                raise RelocationError(f'binding contradicts internal label: {record.name}')
+        offset = rel.virtual_address - sym.value
+        name = record.name
+        # /GX frame prologue `push -1; push offset handler`: the handler stub is
+        # a compiler label in .text$x whose number shifts with unrelated edits,
+        # so it is bound under the stable key '<function symbol>$ehhandler'.
+        # VC6 may also schedule the fs:[0] load first:
+        # `mov eax, fs:[0]; push -1; push offset handler` (handler at +9).
+        if (raw[:offset] in _EH_PROLOGUES.get(offset, ()) and record.storage_class == 6
+                and obj.section(record.section_number).name.startswith('.text$x')):
+            name = f'{sym.name}$ehhandler'
+        # __except_list is the CRT's absolute symbol for the fs:[0] SEH chain head.
+        if name == '__except_list' and rel.type == 0x0006 and record.section_number in (0, -1):
+            if name in bindings and bindings[name] != 0:
+                raise RelocationError('binding contradicts __except_list')
+            address = 0
+        # A __FILE__ literal embeds the build path, so its pooled ??_C@ name is not
+        # stable. It is bound as '__FILE__:<basename>' (a .cpp and a header can
+        # both appear in one object), falling back to plain '__FILE__'.
+        elif name.startswith('??_C@') and _source_path_literal(obj, record):
+            name = f'__FILE__:{_source_path_literal(obj, record)}'
+            if name not in bindings and '__FILE__' in bindings:
+                name = '__FILE__'
+        row = {'offset': offset, 'type': rel.type, 'symbol': name}
+        # Keep inferred addresses per relocation: another reference to the same
+        # section symbol may have an addend that escapes this function.
+        if address is not None:
+            row['internal_bound_va'] = address
         converted.append(row)
-
     patched, audit = apply_relocations(raw, converted, bindings, target_va)
     return {**compare_bytes(retail, patched), 'symbol': sym.name,
             'extent_source': sym.extent_source,
             'target_va': f'0x{target_va:08x}', 'relocations_applied': audit,
-            'alignment_padding_bytes': 0,
+            'alignment_padding_bytes': padding,
             'bindings_are_identity_proof': False}

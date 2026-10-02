@@ -52,12 +52,12 @@ class InternalRelocationTests(unittest.TestCase):
         record = SimpleNamespace(name='case0', value=0x28, section_number=1)
         obj = FakeObject(code(0xa1), record)
         retail = code(0xa1, 0x00401008)
-        result = match_object(obj, 'func', 0x00401000, retail)
+        result = match_object(obj, 'func', 0x00401000, retail, {})
         self.assertTrue(result['strict_exact'])
         self.assertEqual(result['ignored_bytes'], 0)
         self.assertEqual(
-            result['relocations_applied'][0]['binding_source'],
-            'internal_same_function',
+            result['relocations_applied'][0]['internal_label'],
+            True,
         )
         self.assertEqual(
             result['relocations_applied'][0]['bound_va'],
@@ -70,7 +70,7 @@ class InternalRelocationTests(unittest.TestCase):
         record = SimpleNamespace(name='.text', value=0, section_number=1)
         obj = FakeObject(code(0xa1, 0x28), record)
         retail = code(0xa1, 0x00401008)
-        result = match_object(obj, 'func', 0x00401000, retail)
+        result = match_object(obj, 'func', 0x00401000, retail, {})
         self.assertTrue(result['strict_exact'])
         self.assertEqual(
             result['relocations_applied'][0]['bound_va'],
@@ -81,7 +81,7 @@ class InternalRelocationTests(unittest.TestCase):
         record = SimpleNamespace(name='case0', value=0x28, section_number=1)
         obj = FakeObject(code(0xe8), record, relocation_type=0x0014)
         retail = code(0xe8, 3)
-        result = match_object(obj, 'func', 0x00401000, retail)
+        result = match_object(obj, 'func', 0x00401000, retail, {})
         self.assertTrue(result['strict_exact'])
         self.assertEqual(result['relocations_applied'][0]['written_u32'], 3)
 
@@ -89,13 +89,13 @@ class InternalRelocationTests(unittest.TestCase):
         record = SimpleNamespace(name='other', value=0x50, section_number=1)
         obj = FakeObject(code(0xa1), record)
         with self.assertRaisesRegex(RelocationError, 'unresolved symbol'):
-            match_object(obj, 'func', 0x00401000, code(0xa1))
+            match_object(obj, 'func', 0x00401000, code(0xa1), {})
 
     def test_external_reference_still_requires_binding(self):
         record = SimpleNamespace(name='external', value=0, section_number=0)
         obj = FakeObject(code(0xa1), record)
         with self.assertRaisesRegex(RelocationError, 'unresolved symbol'):
-            match_object(obj, 'func', 0x00401000, code(0xa1))
+            match_object(obj, 'func', 0x00401000, code(0xa1), {})
 
         retail = code(0xa1, 0x00402000)
         result = match_object(
@@ -103,20 +103,30 @@ class InternalRelocationTests(unittest.TestCase):
         )
         self.assertTrue(result['strict_exact'])
         self.assertEqual(
-            result['relocations_applied'][0]['binding_source'], 'explicit'
+            result['relocations_applied'][0]['internal_label'], False
         )
 
-    def test_explicit_binding_overrides_same_section_auto_mapping(self):
+    def test_internal_symbol_with_escaping_addend_requires_binding(self):
+        record = SimpleNamespace(name='case0', value=0x28, section_number=1)
+        obj = FakeObject(code(0xa1, 0x10), record)
+        with self.assertRaisesRegex(RelocationError, 'unresolved symbol'):
+            match_object(obj, 'func', 0x00401000, code(0xa1), {})
+
+    def test_internal_mapping_does_not_leak_to_another_relocation(self):
+        record = SimpleNamespace(name='.text', value=0, section_number=1)
+        raw = code(0xa1, 0x28)[:5] + code(0xa1, 0x40)[:5] + b'\x90' * 6
+        obj = FakeObject(raw, record)
+        second = SimpleNamespace(section_number=1, virtual_address=0x26,
+                                 symbol_index=7, type=0x0006)
+        obj.symbol_extent = lambda symbol: (raw, len(raw), [obj.relocation, second])
+        with self.assertRaisesRegex(RelocationError, 'unresolved symbol'):
+            match_object(obj, 'func', 0x00401000, raw, {})
+
+    def test_contradicting_explicit_binding_remains_rejected(self):
         record = SimpleNamespace(name='case0', value=0x28, section_number=1)
         obj = FakeObject(code(0xa1), record)
-        retail = code(0xa1, 0x00401008)
-        result = match_object(
-            obj, 'func', 0x00401000, retail, {'case0': 0x00401009}
-        )
-        self.assertFalse(result['strict_exact'])
-        self.assertEqual(
-            result['relocations_applied'][0]['binding_source'], 'explicit'
-        )
+        with self.assertRaisesRegex(RelocationError, 'contradicts internal label'):
+            match_object(obj, 'func', 0x00401000, code(0xa1), {'case0': 0x00401009})
 
 
 if __name__ == '__main__':

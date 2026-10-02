@@ -1,0 +1,308 @@
+[
+  {
+    "class": "Vec3",
+    "source": "VectorOps.cpp",
+    "candidate_symbol_contains": "??0Vec3",
+    "target_va": "0x00404e60",
+    "target_size": 25,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Vec3",
+    "source": "VectorOps.cpp",
+    "candidate_symbol_contains": "??H@",
+    "target_va": "0x00421cb0",
+    "target_size": 69,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Vec3",
+    "source": "VectorOps.cpp",
+    "candidate_symbol_contains": "??G@",
+    "target_va": "0x00421d00",
+    "target_size": 69,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Vec3",
+    "source": "VectorOps.cpp",
+    "candidate_symbol_contains": "??D@YA?AUVec3@@ABU0@M",
+    "target_va": "0x005015b0",
+    "target_size": 69,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Vec3",
+    "source": "VectorOps.cpp",
+    "candidate_symbol_contains": "??D@YA?AUVec3@@MABU0@",
+    "target_va": "0x00428090",
+    "target_size": 69,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Vec3",
+    "source": "VectorOps.cpp",
+    "candidate_symbol_contains": "??YVec3",
+    "target_va": "0x00428060",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Vec3",
+    "source": "CrossProduct.cpp",
+    "candidate_symbol_contains": "CrossProductCall",
+    "target_va": "0x00515600",
+    "target_size": 91,
+    "expect": "exact",
+    "notes": "Out-of-line COMDAT of the cross product. Compound form (r.x = a*b; r.x -= c*d) fixes VC6 operand order; single-expression form does not."
+  },
+  {
+    "class": "Math",
+    "source": "FastMath.cpp",
+    "candidate_symbol_contains": "FastSqrt@@",
+    "target_va": "0x00460b50",
+    "target_size": 85,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Math",
+    "source": "FastMath.cpp",
+    "candidate_symbol_contains": "FastInvSqrt@@",
+    "target_va": "0x00460c00",
+    "target_size": 107,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Math",
+    "source": "MatrixOps.cpp",
+    "candidate_symbol_contains": "MatrixMultiply",
+    "target_va": "0x0042a1a0",
+    "target_size": 684,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Math",
+    "source": "MatrixVec.cpp",
+    "candidate_symbol_contains": "Vec3TransformNormal@@",
+    "target_va": "0x0042a450",
+    "target_size": 91,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Math",
+    "source": "MatrixVec.cpp",
+    "candidate_symbol_contains": "Vec3TransformNormalTranspose",
+    "target_va": "0x0042a4b0",
+    "target_size": 91,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "Math",
+    "source": "MatrixVec.cpp",
+    "candidate_symbol_contains": "Vec3TransformPoint",
+    "target_va": "0x0042a510",
+    "target_size": 100,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeHierarchy.cpp",
+    "candidate_symbol_contains": "InvalidateWorldMatrix",
+    "target_va": "0x004fb850",
+    "target_size": 45,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeHierarchy.cpp",
+    "candidate_symbol_contains": "InvalidateSiblingChain",
+    "target_va": "0x004fb880",
+    "target_size": 50,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeHierarchy.cpp",
+    "candidate_symbol_contains": "MarkSubtreeDirty",
+    "target_va": "0x004fdab0",
+    "target_size": 38,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeHierarchy.cpp",
+    "candidate_symbol_contains": "AddChild",
+    "target_va": "0x004fd910",
+    "target_size": 68,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeHierarchy.cpp",
+    "candidate_symbol_contains": "AppendSibling",
+    "target_va": "0x004fd960",
+    "target_size": 41,
+    "expect": "partial",
+    "notes": "97.56%; register choice differs"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeHierarchy.cpp",
+    "candidate_symbol_contains": "RemoveChild",
+    "target_va": "0x004fd990",
+    "target_size": 148,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeHierarchy.cpp",
+    "candidate_symbol_contains": "UpdateWorldMatrix",
+    "target_va": "0x004fb4f0",
+    "target_size": 858,
+    "expect": "partial",
+    "notes": "78.7%; inlined matrix product term/operand order differs from retail (retail loads parent element first for some rows) and worldValid store placement"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeTransform.cpp",
+    "candidate_symbol_contains": "LocalToWorldDirection",
+    "target_va": "0x004fd5c0",
+    "target_size": 150,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeTransform.cpp",
+    "candidate_symbol_contains": "LocalToWorldPoint",
+    "target_va": "0x004fd660",
+    "target_size": 168,
+    "expect": "partial",
+    "notes": "97.56%; z-component x87 scheduling differs"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeTransform.cpp",
+    "candidate_symbol_contains": "WorldToLocalDirection",
+    "target_va": "0x004fd710",
+    "target_size": 209,
+    "expect": "partial",
+    "notes": "99.02%; one commuted fmul"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeTransform.cpp",
+    "candidate_symbol_contains": "WorldToLocalPoint",
+    "target_va": "0x004fd7f0",
+    "target_size": 285,
+    "expect": "partial",
+    "notes": "~88%; term order and negation temporaries differ"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeTransform.cpp",
+    "candidate_symbol_contains": "SetPosition@SoultreeObject@@QAEXMMM",
+    "target_va": "0x004fc630",
+    "target_size": 38,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeTransform.cpp",
+    "candidate_symbol_contains": "SetPosition@SoultreeObject@@QAEXABU",
+    "target_va": "0x004fc660",
+    "target_size": 38,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeTransform.cpp",
+    "candidate_symbol_contains": "GetPosition@SoultreeObject@@QAEPAU",
+    "target_va": "0x004fc970",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml as Vec3* GetPosition(Vec3* out) (explicit out pointer; the soultree_base/collision callers pass &field_0x0c directly)"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeTransform.cpp",
+    "candidate_symbol_contains": "GetPositionIn",
+    "target_va": "0x004fc9a0",
+    "target_size": 134,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeTransform.cpp",
+    "candidate_symbol_contains": "GetAxesIn",
+    "target_va": "0x004fc540",
+    "target_size": 225,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeMatrix.cpp",
+    "candidate_symbol_contains": "GetMatrixIn",
+    "target_va": "0x4fca80",
+    "target_size": 494,
+    "expect": "partial",
+    "notes": "partial ~67%: structure right; retail keeps by-value copy of translation delta and schedules x-sum before out transposition. Inliner budget differs."
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeMatrix.cpp",
+    "candidate_symbol_contains": "SetAxesIn",
+    "target_va": "0x4fc050",
+    "target_size": 1171,
+    "expect": "partial",
+    "notes": "partial (~69% sim): this/frame register assignment swapped (retail this=ebp, frame=ebx) and z/y/r temp slot placement differs."
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeMatrix.cpp",
+    "candidate_symbol_contains": "SetMatrixIn",
+    "target_va": "0x4fb8c0",
+    "target_size": 1096,
+    "expect": "partial",
+    "notes": "partial (~37% sim): copy slots of *m/world reversed (0x10 vs 0x50), frame 0x9c vs 0x90, register assignment differs."
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeRotate.cpp",
+    "candidate_symbol_contains": "RotateAboutPoint",
+    "target_va": "0x4fd1f0",
+    "target_size": 334,
+    "expect": "partial",
+    "notes": "partial 84.8%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs."
+  },
+  {
+    "class": "(free)",
+    "source": "OrientationAngles.cpp",
+    "candidate_symbol_contains": "OrientationAnglesFromVectors",
+    "target_va": "0x4b5a60",
+    "target_size": 657,
+    "expect": "partial",
+    "notes": "partial 97.1%: provisional semantics; sqrt(a.x*a.x+a.z*a.z) order fixed. Remaining: fmul operand order in the b rotation sums (source term order has no effect) and one extra live FPU stack value before the pitch sqrt."
+  }
+]

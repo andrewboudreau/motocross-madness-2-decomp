@@ -1,0 +1,506 @@
+[
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot0@SoultreePhysicsBaseObject",
+  "target_va": "0x005008d0",
+  "target_size": 54,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot1@SoultreePhysicsBaseObject",
+  "target_va": "0x00500910",
+  "target_size": 399,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot2@SoultreePhysicsBaseObject",
+  "target_va": "0x00500c50",
+  "target_size": 1500,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (wave 3: was 16.89%). Made it match: the 3x3 identity is zero-filled with memset (rep stosd, which also frees edi so a17 stays in memory) and then ident[0]=ident[4]=ident[8]=1; field_0x158 is read into a local before that; sphere inverse inertia is (mass*0.4f)*(a16*a16) with three separate stores; box mode computes zz before yy and xx after the x store; the orientation copies are ordered 50,4c,48,54,58,60,5c."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot3@SoultreePhysicsBaseObject",
+  "target_va": "0x00501310",
+  "target_size": 185,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot4@SoultreePhysicsBaseObject",
+  "target_va": "0x005013d0",
+  "target_size": 473,
+  "expect": "partial",
+  "notes": "87.53% under vc6_o2_ml (wave 3: was 69.37%). The speed is computed as s = SoultreeDot(*a2,*a2); (s == 1.0f) ? 1.0f : sqrt(s) (?: form, not if/else), and the crosses use the three-float constructor form SoultreeCrossCtor (+2.4%). Remaining: the fmul operand load order in both cross products (retail loads a3 first in every term of the first cross) and lea ebx,[edi+0xd8] scheduled earlier."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot5@SoultreePhysicsBaseObject",
+  "target_va": "0x004aa150",
+  "target_size": 14,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot6@SoultreePhysicsBaseObject",
+  "target_va": "0x0040b410",
+  "target_size": 432,
+  "expect": "partial",
+  "notes": "68.07% under vc6_o2_ml (wave 3: was 65.10%; same size). The else branch charges *b before copying field_0x1ac into v (+3%). Remaining: retail reads lenSq components y,x,z through an esi pointer (a helper with y/x/z locals reproduces that but drops to 35.7%, size 426), stores lenSq with fstp and reloads it after popping, keeps a dead fst of the FastSqrt result, loads 0x158 before 0x13c and uses fcom [b] for the t clamp. /Op makes it much worse (13.8%)."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot7@SoultreePhysicsBaseObject",
+  "target_va": "0x005019e0",
+  "target_size": 485,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml; uninitialized int last frees a register, contact cached in a local, VecLengthFast sums z*z+(x*x+y*y)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot8@SoultreePhysicsBaseObject",
+  "target_va": "0x00501bd0",
+  "target_size": 76,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml; chained assignment field_0x194 = field_0x1a0 = f()"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot9@SoultreePhysicsBaseObject",
+  "target_va": "0x00501ce0",
+  "target_size": 187,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml; ternary clamp of *steps, if/else on dt"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot10@SoultreePhysicsBaseObject",
+  "target_va": "0x0040b5c0",
+  "target_size": 28,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot11@SoultreePhysicsBaseObject",
+  "target_va": "0x00501da0",
+  "target_size": 105,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml; Fn_4b0df0 j is unsigned char"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot12@SoultreePhysicsBaseObject",
+  "target_va": "0x00507920",
+  "target_size": 5,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot13@SoultreePhysicsBaseObject",
+  "target_va": "0x00501e90",
+  "target_size": 483,
+  "expect": "partial",
+  "notes": "33.97% under vc6_o2_ml (size 487 vs 483; the low % is mostly misalignment). Retail stores both field_0x68 copies directly to [esi+0x68..0x70] where VC6 emits lea + [reg]; a member-wise copy helper fixes the else branch (485 bytes, 34.8%) but constant-folds the zero branch, so it is not applied. The cross of field_0x38 x field_0x78 and *a1 += field_0x78 get different fmul/fadd operand loads (source permutations are canonicalised; the result changes only with unrelated edits)."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot14@SoultreePhysicsBaseObject",
+  "target_va": "0x00502080",
+  "target_size": 373,
+  "expect": "exact",
+  "notes": "Exact under vc6_o2_ml once slots 15/16 take Vec3 pointers (field_0xc0 = slot16(a2); slot15(a3, &field_0xc0))."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot15@SoultreePhysicsBaseObject",
+  "target_va": "0x00502200",
+  "target_size": 174,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot16@SoultreePhysicsBaseObject",
+  "target_va": "0x005022b0",
+  "target_size": 127,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot17@SoultreePhysicsBaseObject",
+  "target_va": "0x00502330",
+  "target_size": 239,
+  "expect": "partial",
+  "notes": "96.41% under vc6_o2_ml; residual x87 operand order in the y term of the normalized sum. Waves 2-3: all 8 operand orders of s*v vs v*s, named vs inline 1.0f/n, in-place *=, temp Vec3, operator* and /n forms tried; none reach retail's mixed 'fld st0 / fld mem' form."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot18@SoultreePhysicsBaseObject",
+  "target_va": "0x00502420",
+  "target_size": 193,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot19@SoultreePhysicsBaseObject",
+  "target_va": "0x00464e80",
+  "target_size": 3,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot21@SoultreePhysicsBaseObject",
+  "target_va": "0x005024f0",
+  "target_size": 1116,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (target_size = extent_with_tables 1116; wave 3: was 8.47%). Made it match: the probe is two separate Fn_506e90 calls (VC6 cross-jumps their common tail), so there is no dir pointer local; the type-4 sink is reloaded from a->field_0x14 at every use (AttachmentSink accessor, no cached local); field_0x1ac is assigned the LocalToWorldPoint result and then passed by value; the final clear loop indexes field_0x1d4[i] directly without an attachment pointer local."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot22@SoultreePhysicsBaseObject",
+  "target_va": "0x0040b5e0",
+  "target_size": 24,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot23@SoultreePhysicsBaseObject",
+  "target_va": "0x004aa160",
+  "target_size": 38,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot24@SoultreePhysicsBaseObject",
+  "target_va": "0x004aa190",
+  "target_size": 3,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot26@SoultreePhysicsBaseObject",
+  "target_va": "0x00464e90",
+  "target_size": 1,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot28@SoultreePhysicsBaseObject",
+  "target_va": "0x00502950",
+  "target_size": 120,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot29@SoultreePhysicsBaseObject",
+  "target_va": "0x005029d0",
+  "target_size": 103,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot30@SoultreePhysicsBaseObject",
+  "target_va": "0x00502f10",
+  "target_size": 76,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot31@SoultreePhysicsBaseObject",
+  "target_va": "0x00501e10",
+  "target_size": 127,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot32@SoultreePhysicsBaseObject",
+  "target_va": "0x004aa1a0",
+  "target_size": 28,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot33@SoultreePhysicsBaseObject",
+  "target_va": "0x00501c20",
+  "target_size": 186,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot34@SoultreePhysicsBaseObject",
+  "target_va": "0x004aa1c0",
+  "target_size": 25,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot35@SoultreePhysicsBaseObject",
+  "target_va": "0x004aa1e0",
+  "target_size": 37,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot36@SoultreePhysicsBaseObject",
+  "target_va": "0x004aa210",
+  "target_size": 305,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (wave 3: was 85.35%). Made it match: field_0x50 = field_0x34 is placed after the 0x4c/0x48 stores and before 0x54..0x5c."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot37@SoultreePhysicsBaseObject",
+  "target_va": "0x00502a40",
+  "target_size": 272,
+  "expect": "exact",
+  "notes": "Exact under vc6_o2_ml; target_size 272 = extent_with_tables (code 256 + inline switch jump table 16)."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot38@SoultreePhysicsBaseObject",
+  "target_va": "0x00501600",
+  "target_size": 925,
+  "expect": "partial",
+  "notes": "71.70% under vc6_o2_ml (wave 3: was 70.46%; size 919 vs 925). Everything up to the static path matches. Scale3 now assigns r.x = v.x * s.x (etc.) member-wise. Remaining: retail keeps all three t components on the x87 stack through the cross product (fld r.c; fmul st(i), never consuming a t value in place, three fstp st(0) at the end), and p = field_0x64 + field_0x1ac loads 0x64 first; cross helper choice (CrossProduct/SoultreeCross/ctor) does not change the bytes."
+ },
+ {
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot39@SoultreePhysicsBaseObject",
+  "target_va": "0x005019a0",
+  "target_size": 63,
+  "expect": "exact",
+  "notes": "exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "candidate_symbol_contains": "?SoultreeCollisionCallback@@",
+  "target_va": "0x00500c00",
+  "target_size": 35,
+  "notes": "Exact. TU-local collision callback installed at CollisionObject+0x88; needs the type tag in a local (one load, kept for the field store and the slot 38 argument).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "?SoultreeStaticCollisionCallback@@",
+  "target_va": "0x00500c30",
+  "target_size": 25,
+  "notes": "Exact. TU-local callback at CollisionObject+0x8c: forwards to 0x00500c00 unless the other object's tag is 0x68 (body).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "?Fn_501230@SoultreePhysicsBaseObject@@",
+  "target_va": "0x00501230",
+  "target_size": 33,
+  "notes": "Exact. Installs the two collision callbacks.",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "??0SoultreePhysicsBaseObject@@",
+  "target_va": "0x00500aa0",
+  "target_size": 348,
+  "notes": "Exact. Constructor (virtual base GameObject(flags), EH frame); field stores in retail order, then the direct slot 1 call.",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "??1SoultreePhysicsBaseObject@@",
+  "target_va": "0x00501260",
+  "target_size": 164,
+  "notes": "Exact. Destructor core (this = GameObject vbase): deletes contacts (virtual deleting dtor, slot 0 of SoultreeContact) and frees both arrays.",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "??_GSoultreePhysicsBaseObject@@",
+  "target_va": "0x00504290",
+  "target_size": 51,
+  "notes": "Exact. Compiler-generated vbase deleting destructor (emitted because the ctor/dtor are defined).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "??_ESoultreePhysicsBaseObject@@$4PPPPPPPM@A@AEPAXI@Z",
+  "target_va": "0x00504280",
+  "target_size": 8,
+  "notes": "Exact. vtordisp thunk for the deleting destructor (GameObject vbase vtable slot 0).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsBaseObject@@$4PPPPPPPM@A@AEHM@Z",
+  "target_va": "0x005042d0",
+  "target_size": 8,
+  "notes": "Exact. vtordisp thunk for the GameObject slot 10 override.",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsBaseObject@@UAEHM@Z",
+  "target_va": "0x005036f0",
+  "target_size": 202,
+  "notes": "Exact. Per-frame update. Declaring `refreshed = 0` at the top (before the field_0x20d store) gives retail's xor ebx,ebx / mov [..],bl.",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "?Fn_502c40@SoultreePhysicsBaseObject@@",
+  "target_va": "0x00502c40",
+  "target_size": 632,
+  "notes": "Exact. Rest/settle check. Needed field_0x214 typed float (it was int); abs written as an inline `if (v < 0) v = -v`.",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "_$E2",
+  "target_va": "0x00502b50",
+  "target_size": 5,
+  "notes": "Exact. kVec3Zero (Math3D.h) dynamic initializer jmp thunk; this TU's zero vector is 0x00689ee8 (g_SoultreeZeroVec3).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "_$E1",
+  "target_va": "0x00502b60",
+  "target_size": 60,
+  "notes": "Exact. kVec3Zero dynamic initializer body (stores 0x00689ee8).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "_$E5",
+  "target_va": "0x00502ba0",
+  "target_size": 5,
+  "notes": "Exact. kVec3XAxis initializer jmp thunk.",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "_$E4",
+  "target_va": "0x00502bb0",
+  "target_size": 60,
+  "notes": "Exact. kVec3XAxis initializer body (stores 0x00689ef8).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "_$E8",
+  "target_va": "0x00502bf0",
+  "target_size": 5,
+  "notes": "Exact. kVec3YAxis initializer jmp thunk.",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "_$E7",
+  "target_va": "0x00502c00",
+  "target_size": 60,
+  "notes": "Exact. kVec3YAxis initializer body (stores 0x00689f08).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "_$E11",
+  "target_va": "0x00502ec0",
+  "target_size": 5,
+  "notes": "Exact. kVec3ZAxis initializer jmp thunk (placed after 0x00502c40 in retail).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "_$E10",
+  "target_va": "0x00502ed0",
+  "target_size": 60,
+  "notes": "Exact. kVec3ZAxis initializer body (stores 0x00689ed8).",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp",
+  "expect": "exact"
+ },
+ {
+  "candidate_symbol_contains": "?Fn_500220@@YAXMMPAVSoultreeObject@@",
+  "target_va": "0x00500220",
+  "target_size": 639,
+  "expect": "partial",
+  "notes": "Partial (~44% bytewise, 647 vs 639 bytes). Contact impulse helper called by slot 3. Dot (SoultreeDot), both cross products, numerator/denominator order, the scale branch and velocity update match instruction-for-instruction; remaining differences are stack-slot assignment (retail gives the WorldToLocal result the 0x10 slot and the I^-1 product the cross-temp slot; VC6 here swaps them), operand load order in the first cross product (x and z terms), and the angular tail (retail copies j*scaled through a temporary). Twelfth argument is a float that slot 3 forwards as int a6.",
+  "class": "SoultreePhysicsBaseObject",
+  "source": "SoulTreePhysics.cpp"
+ }
+]

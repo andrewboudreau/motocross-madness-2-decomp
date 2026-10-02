@@ -2,21 +2,34 @@
 
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
-Results use native Windows VC6 SP3. Linux/Wine and a complete linked game remain
-separate, unverified gates.
+Results use VC6 SP3 natively on Windows; the 2026-09-30 calibration and full
+gate were repeated under Linux/Wine with the same results. A complete linked
+game remains a separate, unverified gate.
 
 ## Compiler profiles
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_ml_g6` (default), `vc6_o2_mt_g6` | 39/39 | 19/19 | 10/16 |
-| `vc6_o2_ml`, `vc6_o2_mt` | 39/39 | 19/19 | 14/16 |
-| `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 8/16 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 487/487 |
+| `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
+| `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
+| `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
+| `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 8/17 (camera cases not rerun) |
 
 Passing manual samples mask no bytes. Generated probes resolve both global-load
-addresses. Summaries prefer strict results when available. The default remains
-unchanged: useful profiles are not proof of original per-file flags. `/ML` versus
-`/MT` does not change these counts; [runtime identity](VC6_CRT_ATLAS.md) is separate.
+addresses. Summaries prefer strict results when available.
+
+The default is `vc6_o2_mt`: `/O2` without `/G6` is the only tested family that
+matches every calibration target, and no target prefers `/G6`. The 34 `/G6`
+misses (BaseObject Release, UIControl 61/62, FollowCamera 68/69/72, Camera
+13/18/30–32, `~Camera`, PCCamera 13 and 21 [GameObject](GAMEOBJECT.md) functions) differ only in
+instruction selection and scheduling; explicit `/G5` behaves like VC6's default. `/ML` and
+`/MT` emit identical code for every tested target; `/MT` follows the
+[runtime identity](VC6_CRT_ATLAS.md). This is the best-supported working
+hypothesis, not proof of original per-file flags; test others with `--profile`.
+The physics samples (`tools/run_physics_samples.py`) independently show the
+same split: 139/194 targets match without `/G6` versus 76/194 with it, and none
+match only under `/G6`.
 
 ## BaseObject
 
@@ -44,29 +57,20 @@ RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 
 ## Next targets
 
-[FollowCamera](FOLLOW_CAMERA.md) slots 69 (`0x00466a80`) and 71 (`0x00466e50`)
-remain the two nonmatching cases in the last executed best-profile matrix. The
-published counts above therefore remain **14/16** until authentic VC6 is rerun.
+The seven emitted fixed-size `BlockAllocator` bodies are now exact under the
+default profile, including the five-byte destructor tail jump and the two
+fully resolved `BlockAllocator.cpp` debug-allocation calls. See
+[allocation evidence](ALLOCATION.md#fixed-size-block-allocator).
 
-The next rerun is now better constrained. Slot 69's candidate computes the
-`this+0x2a8` cache address before the hidden-return-buffer virtual call, matching
-the retail lifetime that keeps this address live across that call. Slot 71 now
-uses its independently measured **192-byte compiler extent**: 171 bytes through
-the RET, one alignment NOP, and the five-entry absolute switch table at
-`0x00466efc..0x00466f0f`; the next routine begins at `0x00466f10`. The old
-171-byte target incorrectly omitted compiler-owned table bytes.
-
-Strict matching can now resolve a COFF relocation without an external binding
-only when the relocation symbol is in the selected function's section **and its
-final S+A address falls inside that independently measured function extent**.
-This is intended for compiler-emitted switch tables. Same-section references
-outside the function and all external references still fail closed unless they
-have explicit reviewed bindings. These changes are calibration preparation, not
-a claim that either slot has newly matched.
-
-Slots 63/70, UIStatic slot 30 and UIMultiState slots 34–37 match the default.
-UIControl slots 61/62 and FollowCamera slot 72 additionally match without
-`/G6`.
+All 17 calibration targets match the default profile, including
+[FollowCamera](FOLLOW_CAMERA.md) slots 68 (`0x00466d50`, x87 distance/clamp,
+every relocation resolved), 69 (`0x00466a80`, source shape) and 71
+(`0x00466e50`, 192-byte extent including its jump table). Every FollowCamera
+slot 63–72 now has an exact candidate. Fifteen Camera/PCCamera bodies, including their destructors and the PCCamera
+constructor,
+(`src/reconstructed/Camera.cpp`, `PCCamera.cpp`) also match strictly with every
+call bound;
+see [FollowCamera](FOLLOW_CAMERA.md#camera-and-pccamera).
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
@@ -85,14 +89,16 @@ paired compilations preserve code sections and relocations. It is not a claimed
 original flag. Format references: [PE/COFF](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#auxiliary-format-1-function-definitions)
 and [CodeView](https://github.com/microsoft/microsoft-pdb/blob/master/include/cvinfo.h).
 
+Same-section relocations are inferred only when their final symbol-plus-addend
+destination is inside the independently measured function extent. This includes
+section-symbol references into jump tables; an internal label plus an escaping
+addend still needs an explicit binding. Inference is per relocation, so a local
+reference cannot authorize another reference outside the function.
+
 `tools/match.py --bindings` applies DIR32/REL32 relocations and compares every byte.
-Bindings require independent address evidence. `tools/match.py --strict` also
-allows only provably same-function internal relocations: the relocation's
-section must match the selected function and its final S+A target must lie
-inside the independently measured candidate extent. This supports switch tables
-without manufacturing external addresses. Without either option the tool keeps
-legacy relocation-masked diagnostics; they are strict only when no bytes were
-masked. Unsupported or unresolved relocations fail strict matching.
+Bindings require independent address evidence. Without bindings the tool masks
+relocation fields; that is strict only when no bytes were masked. Unsupported or
+unresolved relocations fail strict matching.
 
 ## Reproduce
 

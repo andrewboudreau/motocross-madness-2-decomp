@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import ast, json, sys
+import ast, json, re, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +20,11 @@ def fail(msg: str) -> None:
     print(f'[fail] {msg}', file=sys.stderr)
     raise SystemExit(1)
 
+def absolute_includes(text: str) -> list[str]:
+    includes = re.findall(r'^\s*#\s*include\s*[<"]([^>"\n]+)[>"]', text, re.M)
+    return [p for p in includes if p.startswith(('/', '\\')) or re.match(r'^[A-Za-z]:', p)]
+
+
 def main() -> None:
     missing=[p for p in REQUIRED if not (ROOT/p).is_file()]
     if missing: fail('missing required repository files: '+', '.join(missing))
@@ -34,6 +39,9 @@ def main() -> None:
         if p.suffix.lower() in FORBIDDEN_SUFFIXES: forbidden.append(rel.as_posix())
         if p.suffix.lower()=='.py': py_files.append(p)
         if p.suffix.lower()=='.json' and 'analysis' not in rel.parts: json_files.append(p)
+        if p.suffix.lower() in {'.cpp', '.h', '.hpp'}:
+            if absolute_includes(p.read_text(encoding='utf-8')):
+                fail(f'absolute include path in {rel.as_posix()}')
     if forbidden: fail('proprietary/binary archive extensions committed: '+', '.join(forbidden))
 
     for p in py_files:

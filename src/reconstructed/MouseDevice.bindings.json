@@ -1,0 +1,18 @@
+{
+  "??0?$ContainerList@PAUUnknownControlBinding@@@@QAE@XZ": "0x005109c0",
+  "??0MouseDevice@@QAE@XZ$ehhandler": "0x0054bb00",
+  "??0PCInputDevice@@QAE@H@Z": "0x004c25f0",
+  "??1?$ContainerList@PAUUnknownControlBinding@@@@QAE@XZ": "0x00402040",
+  "??1MouseDevice@@UAE@XZ": "0x0048a3c0",
+  "??1MouseDevice@@UAE@XZ$ehhandler": "0x0054bb18",
+  "??1PCInputDevice@@UAE@XZ": "0x004c2650",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7MouseDevice@@6B@": "0x00554278",
+  "??_L@YGXPAXIHP6EX0@Z1@Z": "0x00536234",
+  "??_M@YGXPAXIHP6EX0@Z@Z": "0x00536140",
+  "?UnknownFunction43cd90@UnknownControlBinding@@QAEXM@Z": "0x0043cd90",
+  "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
+  "__FILE__:containerlist.h": "0x005666e4",
+  "__real@4@3ff6aec33e0000000000": "0x00554294"
+}

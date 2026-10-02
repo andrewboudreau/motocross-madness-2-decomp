@@ -19,6 +19,11 @@ def main():
         raise SystemExit(f'private bundle not installed: {state_path}')
     json.loads(state_path.read_text())
     env = os.environ.copy()
+    repo = Path(__file__).resolve().parents[1]
+    env['PYTHONPATH'] = str(repo) + os.pathsep + env.get('PYTHONPATH', '')
+    # Cloud setup installs the pinned host runner here. Setup-shell exports do
+    # not survive into a fresh task shell.
+    env['PATH'] = str(Path.home() / '.local/bin') + os.pathsep + env.get('PATH', '')
     env.update({
         'MCM2_PRIVATE_ROOT': str(root),
         'VC6_ROOT': str(root / 'toolchains/vc6sp3'),

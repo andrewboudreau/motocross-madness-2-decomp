@@ -1,0 +1,722 @@
+[
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot34@Vehicle",
+  "target_va": "0x0040c4c0",
+  "target_size": 118,
+  "expect": "partial",
+  "notes": "90.4% (118/118). Cross via VehV3::CrossB member helper; remaining divergence: load order of the last product (b.x*y) in r.z."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot35@Vehicle",
+  "target_va": "0x0040c540",
+  "target_size": 130,
+  "expect": "partial",
+  "notes": "94.4% (130/130). Same CrossB helper as slot 34; remaining divergence: load order of the last product in r.z."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot45@Vehicle",
+  "target_va": "0x0040c880",
+  "target_size": 7,
+  "expect": "exact",
+  "notes": "slot 45 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot51@Vehicle",
+  "target_va": "0x0040c890",
+  "target_size": 7,
+  "expect": "exact",
+  "notes": "slot 51 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot52@Vehicle",
+  "target_va": "0x0040c8a0",
+  "target_size": 14,
+  "expect": "exact",
+  "notes": "slot 52 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot68@Vehicle",
+  "target_va": "0x0040cac0",
+  "target_size": 18,
+  "expect": "exact",
+  "notes": "slot 68 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot69@Vehicle",
+  "target_va": "0x0040cae0",
+  "target_size": 13,
+  "expect": "exact",
+  "notes": "slot 69 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot23@Vehicle",
+  "target_va": "0x0040caf0",
+  "target_size": 38,
+  "expect": "exact",
+  "notes": "slot 23 (override); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot24@Vehicle",
+  "target_va": "0x0040cb20",
+  "target_size": 59,
+  "expect": "exact",
+  "notes": "slot 24 (override); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot25@Vehicle",
+  "target_va": "0x0040cb60",
+  "target_size": 59,
+  "expect": "exact",
+  "notes": "slot 25 (override); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot78@Vehicle",
+  "target_va": "0x00492220",
+  "target_size": 76,
+  "expect": "exact",
+  "notes": "slot 78 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot79@Vehicle",
+  "target_va": "0x00492270",
+  "target_size": 76,
+  "expect": "exact",
+  "notes": "slot 79 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot92@Vehicle",
+  "target_va": "0x004a6ba0",
+  "target_size": 3,
+  "expect": "exact",
+  "notes": "slot 92 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot0@Vehicle",
+  "target_va": "0x00525520",
+  "target_size": 45,
+  "expect": "exact",
+  "notes": "slot 0 (override); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot43@Vehicle",
+  "target_va": "0x005256d0",
+  "target_size": 199,
+  "expect": "exact",
+  "notes": "slot 43 (introduced); 49.1% match: semantics decoded (copy pos, heading=field_0xa0 with y=0, normalise via FastInvSqrt 0x460c00, zero if degenerate); retail keeps the length^2 sum in an x87 register dance and copies via lea/edx that the source shape does not reproduce | now exact (see Vehicle.cpp)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot70@Vehicle",
+  "target_va": "0x00526800",
+  "target_size": 44,
+  "expect": "exact",
+  "notes": "slot 70 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot89@Vehicle",
+  "target_va": "0x005276c0",
+  "target_size": 11,
+  "expect": "exact",
+  "notes": "slot 89 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot71@Vehicle",
+  "target_va": "0x00527d90",
+  "target_size": 154,
+  "expect": "exact",
+  "notes": "slot 71 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot73@Vehicle",
+  "target_va": "0x00528170",
+  "target_size": 60,
+  "expect": "exact",
+  "notes": "slot 73 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot57@Vehicle",
+  "target_va": "0x005289b0",
+  "target_size": 7,
+  "expect": "exact",
+  "notes": "slot 57 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot64@Vehicle",
+  "target_va": "0x00528e50",
+  "target_size": 81,
+  "expect": "exact",
+  "notes": "slot 64 (introduced); exact under vc6_o2_ml once declared void (no return value is materialised in retail)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot82@Vehicle",
+  "target_va": "0x005290b0",
+  "target_size": 26,
+  "expect": "exact",
+  "notes": "slot 82 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot81@Vehicle",
+  "target_va": "0x005290d0",
+  "target_size": 26,
+  "expect": "exact",
+  "notes": "slot 81 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot77@Vehicle",
+  "target_va": "0x00529200",
+  "target_size": 67,
+  "expect": "exact",
+  "notes": "slot 77 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot84@Vehicle",
+  "target_va": "0x00529250",
+  "target_size": 24,
+  "expect": "exact",
+  "notes": "slot 84 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot93@Vehicle",
+  "target_va": "0x00529270",
+  "target_size": 11,
+  "expect": "exact",
+  "notes": "slot 93 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot85@Vehicle",
+  "target_va": "0x00529360",
+  "target_size": 128,
+  "expect": "exact",
+  "notes": "slot 85 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot76@Vehicle",
+  "target_va": "0x00529b40",
+  "target_size": 93,
+  "expect": "exact",
+  "notes": "slot 76 (introduced); 37.4% match: cross product of (a,b) via out; retail loads/multiplies in a different operand order that source multiplicand order did not change in any of 64 tried permutations (free and member form) | now exact (see Vehicle.cpp)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot86@Vehicle",
+  "target_va": "0x00529ba0",
+  "target_size": 127,
+  "expect": "exact",
+  "notes": "slot 86 (introduced); 47.0% match: retail passes the two float args through the x87 stack (fld/fstp [esp]) while we push them as integer bit copies; callee 0x4d31b0 signature or float source expression unknown | now exact (see Vehicle.cpp)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot90@Vehicle",
+  "target_va": "0x00529d60",
+  "target_size": 83,
+  "expect": "exact",
+  "notes": "slot 90 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot21@Vehicle",
+  "target_va": "0x0052a500",
+  "target_size": 24,
+  "expect": "exact",
+  "notes": "slot 21 (override); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot59@Vehicle",
+  "target_va": "0x0052a520",
+  "target_size": 10,
+  "expect": "exact",
+  "notes": "slot 59 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot60@Vehicle",
+  "target_va": "0x0052a530",
+  "target_size": 126,
+  "expect": "exact",
+  "notes": "slot 60 (introduced); 92.1% match, same size: remaining diff is fmul/`mov eax,[ecx+0x47c]` order and fcom placed before the store of t | now exact (see Vehicle.cpp)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot61@Vehicle",
+  "target_va": "0x0052a5b0",
+  "target_size": 9,
+  "expect": "exact",
+  "notes": "slot 61 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot62@Vehicle",
+  "target_va": "0x0052a5c0",
+  "target_size": 33,
+  "expect": "exact",
+  "notes": "slot 62 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot48@Vehicle",
+  "target_va": "0x0052a890",
+  "target_size": 171,
+  "expect": "exact",
+  "notes": "slot 48 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot50@Vehicle",
+  "target_va": "0x0052b600",
+  "target_size": 23,
+  "expect": "exact",
+  "notes": "slot 50 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot53@Vehicle",
+  "target_va": "0x0052b6a0",
+  "target_size": 41,
+  "expect": "exact",
+  "notes": "slot 53 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot42@Vehicle",
+  "target_va": "0x0052b710",
+  "target_size": 39,
+  "expect": "exact",
+  "notes": "slot 42 (override); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot67@Vehicle",
+  "target_va": "0x0052b740",
+  "target_size": 66,
+  "expect": "exact",
+  "notes": "slot 67 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot96@Vehicle",
+  "target_va": "0x0052b8f0",
+  "target_size": 42,
+  "expect": "exact",
+  "notes": "slot 96 (introduced); exact under vc6_o2_ml (no /G6)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot7@Vehicle",
+  "target_va": "0x00526fa0",
+  "target_size": 1161,
+  "expect": "partial",
+  "notes": "8.8% (1155/1161). Inverse-distance blend of *arg over active contacts/wheels. First divergence +0x2a: branch distance (frame 0x214 matches); retail keeps the share temp at esp+0x10 and running total at 0x1c (we swap them) and the x87 term order of the squared-distance sum differs."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot56@Vehicle",
+  "target_va": "0x005286a0",
+  "target_size": 784,
+  "expect": "partial",
+  "notes": "32.7% (782/784). Tilt angle: project reference normal perpendicular to axis, side = right x axis, angle = asin(min(1,|perp x side|))*sign, cos to field_0x4b0 on request. First divergence: register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac; we swap them); declaration order/locals did not change it."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot58@Vehicle",
+  "target_va": "0x005289c0",
+  "target_size": 938,
+  "expect": "partial",
+  "notes": "99.77% (938/938). Snap pose to wheels. Only divergence: ordering of one mov edx,edi at +0xbd (retail mov edi,ecx; mov edx,edi). Needs ternary abs (VehAbsT); the reordered second=top/top=w form regresses to 23%."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot55@Vehicle",
+  "target_va": "0x0052b6d0",
+  "target_size": 63,
+  "expect": "partial",
+  "notes": "42.6% (59/63). Returns out (eax). First divergence: the copy from the global vec uses edx dword moves and reloads out in retail."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot74@Vehicle",
+  "target_va": "0x005281b0",
+  "target_size": 539,
+  "expect": "partial",
+  "notes": "8.4% (547/539). Velocity deflection, returns signed acos angle. First divergence +0x4: retail esi=dir(arg) / edi=this, we swap (esi=this); retail keeps k live in x87."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot72@Vehicle",
+  "target_va": "0x00527e30",
+  "target_size": 831,
+  "expect": "partial",
+  "notes": "4.1% (814/831). Normal accumulation + slot-74 call. First divergence +0x0: frame sub esp,0x2c vs our 0x28 (one extra local); retail keeps this in ebx and out in esi and pushes ebp late, so all later bytes shift."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot18@Vehicle",
+  "target_va": "0x529dc0",
+  "target_size": 529,
+  "expect": "partial",
+  "notes": "7.9% (482/529). Impact post over 3 passes (aux wheels, wheels, contacts). First divergence +0x0f: retail places the found-action block right after each loop (loop back-edge is cmp/jge exit/jmp top); we place it after all loops (jl top). Retail also holds constant 1 in edi across the sink call. Shared commit tail is reproduced via goto commit."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot19@Vehicle",
+  "target_va": "0x529fe0",
+  "target_size": 679,
+  "expect": "partial",
+  "notes": "8.4% (681/679). Scrape impact with clamped vector into sink+0x74. First divergence +0x0: frame 0xc (retail) vs 0x10 and register roles (retail ebp=this, esi=wheel list; we edi=this); retail hoists loop pointers and shares the tail."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot20@Vehicle",
+  "target_va": "0x52a290",
+  "target_size": 614,
+  "expect": "partial",
+  "notes": "4.5% (602/614). Slot 19 without material gate, sink at event+0xc, flag 0x168. First divergence +0x3: retail counts up in eax with 'cmp eax,ecx' and compares wheel fields via loaded regs; we cache zero in ebx (cmp mem,ebx)."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot4@Vehicle",
+  "target_va": "0x5265d0",
+  "target_size": 555,
+  "expect": "partial",
+  "notes": "10.8% (487/555). Two lever-arm offsets (a1+a2xa3, a7+a8xa9)*a14 into helper 0x5004a0, then |a1| -> field_0xbc, field_0xcc = xform(field_0xd8). First divergence +0x3: retail loads a2 into eax and a3 into ecx (cross a3.z*a2.y with regs swapped vs ours); locals go through int stack copies; retail mid-body pushes are in a different order."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot46@Vehicle",
+  "target_va": "0x5276d0",
+  "target_size": 523,
+  "expect": "partial",
+  "notes": "8.3% (479/523). Look-at offset toward lead wheel / midpoint of two wheels rotated by 4FD710, else field_0x194. First divergence +0x0: retail tests flag in al and has frame 0x24 (ours 0x18, dl): retail keeps d.x on the x87 stack across the midpoint temp and routes vecs through int stack temps."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot49@Vehicle",
+  "target_va": "0x52a940",
+  "target_size": 3254,
+  "expect": "partial",
+  "notes": "9.5% (3248/3254). Per-frame step. All 72 calls (vtable slots and direct) match retail in order. First divergence +0x0: frame sub esp,0x104 vs ours 0xb8 (76 bytes of extra retail temps); retail also CSEs constant 0 into ebx (xor ebx,ebx at +0x94), so hit/res sit in ebp and every 0 compare/store uses ebx."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot38@Vehicle",
+  "target_va": "0x5268d0",
+  "target_size": 1578,
+  "expect": "partial",
+  "notes": "17.0% (1534/1578 with the 106-byte jump index table). Collision-response dispatch as a switch: cases 0/1 (event body), 0x66/0x6a (impact sink), 0x69, 0x2711, 0x3e9, default returns without the tail. First divergence +0x4: retail builds s=(1,1,1) through a struct temp at esp+0x3c and stores it at esp+0x14 (locals E+8); ours lands at E+0x14; hasBody is in ebp/otherVel in ebx in retail, swapped in ours."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot44@Vehicle",
+  "target_va": "0x005283d0",
+  "target_size": 43,
+  "expect": "exact",
+  "notes": "Wave 2. Tiny slot."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot80@Vehicle",
+  "target_va": "0x005290f0",
+  "target_size": 137,
+  "expect": "exact",
+  "notes": "Wave 2. Single merged || condition (separate returns change the branch layout)."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot83@Vehicle",
+  "target_va": "0x00529180",
+  "target_size": 114,
+  "expect": "exact",
+  "notes": "Wave 2."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot28@Vehicle",
+  "target_va": "0x0052a5f0",
+  "target_size": 173,
+  "expect": "exact",
+  "notes": "Wave 2."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot39@Vehicle",
+  "target_va": "0x00526f00",
+  "target_size": 150,
+  "expect": "exact",
+  "notes": "Wave 2."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot63@Vehicle",
+  "target_va": "0x00528d70",
+  "target_size": 209,
+  "expect": "exact",
+  "notes": "Wave 2. Falls off the end with C4716 disabled by pragma (KrustyBike overrides it with an int return); v*v*field_0x474 temp order matters."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot36@Vehicle",
+  "target_va": "0x0040c710",
+  "target_size": 368,
+  "expect": "exact",
+  "notes": "Wave 2. Sign chosen as y >= 0 ? -1 : 1 to get the branch polarity."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot88@Vehicle",
+  "target_va": "0x005275a0",
+  "target_size": 288,
+  "expect": "exact",
+  "notes": "Wave 2."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot1@Vehicle",
+  "target_va": "0x00525550",
+  "target_size": 372,
+  "expect": "exact",
+  "notes": "Wave 2. (float)rand() * 3.05175781e-05f kept in a named temporary (stops ebx hoisting)."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot3@Vehicle",
+  "target_va": "0x005264c0",
+  "target_size": 264,
+  "expect": "exact",
+  "notes": "Wave 2. VehLengthAcc helper + Fn_500220 solver call."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot33@Vehicle",
+  "target_va": "0x00527430",
+  "target_size": 365,
+  "expect": "exact",
+  "notes": "Wave 2. Re-pose from position/axes: slots 1,36,58 (twice),50,45 (twice) plus Method_00528EB0 twice; wheel node positions and body node refreshed."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot75@Vehicle",
+  "target_va": "0x0052b790",
+  "target_size": 337,
+  "expect": "partial",
+  "notes": "94.4% (337/337). x87 order of the squared terms and the z term of the dot product differ; operand permutations had no effect."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot54@Vehicle",
+  "target_va": "0x00528530",
+  "target_size": 358,
+  "expect": "partial",
+  "notes": "95.4% (358/358). Retail does fld st(0); fmul mem for k*sum and inv*avg; ours emits fld mem; fmul st(1)."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00528400",
+  "target_va": "0x00528400",
+  "target_size": 291,
+  "expect": "partial",
+  "notes": "94.3% (291/291). Helper shared with slot 54: normalized average; same fld st(0)/fmul mem difference."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "UnknownVirtualSlot95@Vehicle",
+  "target_va": "0x0052a6a0",
+  "target_size": 399,
+  "expect": "partial",
+  "notes": "5.7% (387/399). Rotate scene node about field_0x194 by |v|*dt. Retail loads y,x,z then does the three squares with the lenSq kept in memory and no ebx; all source permutations of the sum (fields, locals, helpers) compile to the same z,y,x load order."
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00525C60",
+  "target_va": "0x00525c60",
+  "target_size": 79,
+  "expect": "exact",
+  "notes": "wave3: ticker arrays, virtual slot 0 on each"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00525CB0",
+  "target_va": "0x00525cb0",
+  "target_size": 57,
+  "expect": "exact",
+  "notes": "wave3: bounded append to ticker array 0x560"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00525CF0",
+  "target_va": "0x00525cf0",
+  "target_size": 57,
+  "expect": "exact",
+  "notes": "wave3: bounded append to ticker array 0x554"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00525D30",
+  "target_va": "0x00525d30",
+  "target_size": 160,
+  "expect": "exact",
+  "notes": "wave3: add wheel + register collision point"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00526830",
+  "target_va": "0x00526830",
+  "target_size": 150,
+  "expect": "exact",
+  "notes": "wave3: crash check, records heading/state"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "VehVec3Equal",
+  "target_va": "0x005299e0",
+  "target_size": 54,
+  "expect": "exact",
+  "notes": "wave3: Vec3 equality, free function"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00529280",
+  "target_va": "0x00529280",
+  "target_size": 221,
+  "expect": "exact",
+  "notes": "wave3: ramp wheel 0x29c level; if (level >= 1.0f) shape gives retail's test ah,1"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_005293E0",
+  "target_va": "0x005293e0",
+  "target_size": 104,
+  "expect": "partial",
+  "notes": "wave3: 88%; retail picks edx for field_0x1e8 then eax for load weight; ours loads in a different register order"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00529A20",
+  "target_va": "0x00529a20",
+  "target_size": 273,
+  "expect": "exact",
+  "notes": "wave3: per-wheel update; (unsigned char) cast on the char flag gives retail's xor ecx,ecx; mov cl"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00525A90",
+  "target_va": "0x00525a90",
+  "target_size": 461,
+  "expect": "exact",
+  "notes": "wave3: wheel state reset; statement order follows retail store order; field 0x150 = -999.0f"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "Method_00529C20",
+  "target_va": "0x00529c20",
+  "target_size": 320,
+  "expect": "partial",
+  "notes": "wave3: 63.9% (322/320). Retail copies slot-76 result through a pointer held in ebx but pushes a fresh lea for the &field_0x1b8 argument; ours reuses ebx. Add operand order (fld up.x; fadd w.x) is canonicalised by VC6 and cannot be forced."
+ }
+]
