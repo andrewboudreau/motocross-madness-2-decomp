@@ -47,6 +47,7 @@ public:
     void UnknownFunction522680();             // 0x00522680 (TrackGame slot 4)
     void UnknownFunction522d00();             // 0x00522d00 (TrackGame slot 4)
     int UnknownFunction5231f0();              // 0x005231f0 (TrackGame slot 4)
+    void UnknownFunction523e50();             // 0x00523e50 (KrustyUI 0x004988a0)
     // 0x00523a60 (near uiinfo.cpp's literals): builds the path of `name`'s
     // `kind` file (EventManager 0x0045cb70 asks for "env").
     void UnknownFunction523a60(int value, char* name, const char* kind, char* path);
@@ -54,13 +55,18 @@ public:
     char field_0x00[16];                      // name; slot 4 sets it from the network object
     unsigned char field_0x10[0x6a0 - 0x10];
     int field_0x6a0;                          // EventManager 0x0045cb70 passes it to 0x00523a60
-    unsigned char field_0x6a4[0x6d4 - 0x6a4];
+    unsigned char field_0x6a4[0x6c8 - 0x6a4];
+    int field_0x6c8;                          // copied to the GUI's +0xec (KrustyUI 0x004988a0)
+    unsigned char field_0x6cc[0x6d4 - 0x6cc];
     int field_0x6d4;                          // copied into GUI layer 0 (EventManager 0x0045e710)
     unsigned char field_0x6d8[0xa20 - 0x6d8];
     int field_0xa20;                          // EventManager 0x0045e710 calls TrackGame 0x00521a40 when clear
-    unsigned char field_0xa24[0xa34 - 0xa24];
+    int field_0xa24;                          // selects +0xa3c for the GUI's +0x34c (KrustyUI 0x004988a0)
+    unsigned char field_0xa28[0xa34 - 0xa28];
     int field_0xa34;                          // TrackGame slot 4 audio argument
-    unsigned char field_0xa38[0xa48 - 0xa38];
+    unsigned char field_0xa38[0xa3c - 0xa38];
+    int field_0xa3c;
+    unsigned char field_0xa40[0xa48 - 0xa40];
     int field_0xa48;                          // selects 16 (else 8) in TrackGame slot 4
 };
 

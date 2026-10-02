@@ -14,12 +14,26 @@ struct UnknownKrustyUIGuiLayerItem {
 
 // One of the GUI's four layers (+0x330).
 struct UnknownKrustyUIGuiLayer {
+    void UnknownFunction487c30(int value);    // 0x00487c30
+    void UnknownFunction487d60();             // 0x00487d60
+
     unsigned char field_0x00[0xc0];
     UnknownKrustyUIGuiLayerItem* field_0xc0;
 };
 
+class TextureMapManager;
+
 class UnknownKrustyUIGui {
 public:
+    explicit UnknownKrustyUIGui(int flags);                  // 0x00485190 (0x3e0 bytes; GUIManager.cpp)
+    // 0x004853b0: sets the GUI up (font, cursor, progress callback); returns
+    // the object KrustyUI adds as its child.
+    GameObject* UnknownFunction4853b0(void* owner, int a, TextureMapManager* textures, int b, int c,
+                                      int d, const char* font, int fontSize, const char* cursor,
+                                      void (*progress)(), int e);
+    void UnknownFunction485d70(const char* directory);       // 0x00485d70 ("ui")
+    void UnknownFunction486560(const char* image);           // 0x00486560 ("ui\\wait.tga")
+    void UnknownFunction4866c0(char* font);                  // 0x004866c0
     void UnknownFunction486630(int value);                   // 0x00486630
     void UnknownFunction485d50();                            // 0x00485d50 (KrustyUI 0x004999b0)
     UnknownTrackGameObject56cItem* UnknownFunction485df0();  // 0x00485df0
@@ -29,6 +43,17 @@ public:
     // 0x00485a70: shows `dialog` (EventManager 0x0045e710 passes 0, 2, 0, 0,
     // 0, 0, 1).
     void UnknownFunction485a70(GameObject* dialog, int a, int b, int c, int d, int e, int f, int g);
+
+    unsigned char field_0x000[0xec];
+    int field_0x0ec;                          // from TrackGame+0xc40 (KrustyUI 0x004988a0)
+    unsigned char field_0x0f0[0x30c - 0xf0];
+    int field_0x30c;
+    unsigned char field_0x310[0x34c - 0x310];
+    int field_0x34c;
+    unsigned char field_0x350[0x3d0 - 0x350];
+    float field_0x3d0;                        // string 0xfed's value when nonzero
+    int field_0x3d4;                          // string 0x1469's value
+    unsigned char field_0x3d8[0x3e0 - 0x3d8];
 };
 
 
@@ -53,6 +78,8 @@ public:
     virtual ~KrustyUI();                      // 0x0049b470 (deleting wrapper 0x00498880)
     void UnknownFunction4999b0();             // 0x004999b0: shutdown (the destructor's first step)
     void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
+    void UnknownFunction49a540();             // 0x0049a540
+    void UnknownFunction49a8b0();             // 0x0049a8b0
     GameObject* UnknownFunction4988a0(RenderTarget* target, int value); // 0x004988a0
     void UnknownFunction498cf0(int value);                         // 0x00498cf0
     void UnknownFunction499b20(int menu);                          // 0x00499b20: opens a menu

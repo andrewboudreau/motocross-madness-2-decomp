@@ -3028,6 +3028,15 @@ CASES = [
         'reason': 'line 1453 debug free',
     },
     {
+        'name': 'KrustyUI progress callback 0x49bda0',
+        'bindings': 'src/reconstructed/KrustyUI.bindings.json',
+        'source': 'src/reconstructed/KrustyUI.cpp',
+        'symbol': '?UnknownFunction49bda0@@YAXXZ',
+        'target_va': '0x0049bda0',
+        'target_size': 16,
+        'reason': 'cdecl tail call into the mode object',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

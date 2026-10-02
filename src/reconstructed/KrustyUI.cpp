@@ -7,6 +7,11 @@
 // cdecl 0x005053b0, called first on shutdown with 0.
 void UnknownFunction5053b0(int value);
 
+// cdecl 0x0049bda0: the GUI's progress callback.
+void UnknownFunction49bda0() {
+    g_UnknownGlobal56e26c->mode.UnknownFunction523580();
+}
+
 // 0x004987f0
 KrustyUI::KrustyUI(int flags) : GameObject(flags) {
     field_0x2c = 0;
