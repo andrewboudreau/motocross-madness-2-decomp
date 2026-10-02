@@ -26,8 +26,24 @@ the default profile, except the near misses in
   `0x004c26d0` calls method 7 or 8 (Acquire/Unacquire). `0x004c2710` sets a
   one-value property through method 6 with a DIPROPDWORD-shaped block.
 - **KeyboardDevice** (`0x00489e30`): `PCInputDevice(0)`, 256 20-byte input
-  entries stamped from cdecl `0x004bfa80`, and `ContainerList<int>[6]` at
-  +0x1660, each `Init(1, 1)`.
+  entries stamped from cdecl `0x004bfa80`, six binding lists
+  `ContainerList<UnknownControlBinding*>` at +0x1660 (each `Init(1, 1)`),
+  and a modifier state at +0x16d8. Its other functions:
+  - Slot 0 (`0x0048a030`) drops bindings by id, like the joystick's.
+  - `0x0048a0c0` steps bindings while their keys are held, using float
+    repeat timers in the binding and the global frame time at +0x2f0.
+  - `0x0048a240` tests a modifier state. 0x3f always holds and 0x80000000
+    means none; bit 7 needs bit 2 of the global's +0x2d4 (0x80 also holds
+    while key 0x29 is down); bit 6 asks for an exact match.
+
+  PCKeyboardDevice slot 4 (`0x004c4520`) maps a control to a key and asks
+  slot 5. Slot 5 (`0x004c4570`) tests a key with a modifier and copies its
+  entry; it matches only as one `&&` condition sharing the failure return.
+  Slot 5's return type is contradictory across callers. KeyboardDevice
+  tests the full eax, so it is `int`. FollowCamera slot 56 returns it
+  unconverted as `bool`, and KrustyBikeCamera overrides slot 56 as `bool`.
+  ControlInterface therefore keeps a separate `bool` view of the keyboard
+  (`UnknownInterface56e26c`).
 - **MouseDevice** (`0x0048a2d0`): `PCInputDevice(1)`, `ContainerList<int>[2]`
   at +0x2b0 and four entries at +0x260.
 - **JoystickDevice** (`0x00489800`): `PCInputDevice(2)` and the index at

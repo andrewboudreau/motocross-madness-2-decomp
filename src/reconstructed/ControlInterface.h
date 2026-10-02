@@ -2,10 +2,13 @@
 
 class InputDevice;
 
-// Interface at ControlInterface+0x34. FollowCamera slots 55 and 56 call its
-// slot 5 with 0x38 and 0x2a, the DirectInput key codes of left Alt and left
-// Shift, so it is consistent with the keyboard device (PCKeyboardDevice slot
-// 5 is 0x004c4570); that identity is inference.
+// The keyboard at ControlInterface+0x34, as FollowCamera slots 55 and 56 see
+// it: they call slot 5 with 0x38 and 0x2a (DirectInput left Alt and left
+// Shift), and JoystickDevice calls KeyboardDevice's 0x0048a240 on it.
+// KeyboardDevice itself is not used for this member because the two views
+// conflict: KeyboardDevice 0x0048a0c0 tests slot 5's full eax (int), while
+// FollowCamera slot 56 returns it unconverted as bool (KrustyBikeCamera's
+// override of slot 56 is bool).
 class UnknownInterface56e26c {
 public:
     virtual void UnknownVirtualSlot0();
@@ -29,8 +32,11 @@ struct UnknownControlBinding {
     UnknownControlBinding(float minimum, float maximum, float center, int id,
                           int axis, float deadZone);         // 0x0043cc50
 
+    ~UnknownControlBinding();                                 // 0x0043cd00: unbinds
+
     void UnknownFunction43cca0();                             // 0x0043cca0: reset
     void UnknownFunction43cce0(int a, int b);                 // 0x0043cce0
+    void UnknownFunction43cd10();                             // 0x0043cd10: recentre
     void UnknownFunction43cd20(float value, float range);     // 0x0043cd20
     void UnknownFunction43cd90(float delta);                  // 0x0043cd90
     void UnknownFunction43cde0();                             // 0x0043cde0: unbind
@@ -40,10 +46,10 @@ struct UnknownControlBinding {
     int field_0x08;           // axis or list index; -1 when reset
     int field_0x0c;           // -1 when reset
     int field_0x10;           // -1 when reset
-    int field_0x14;
-    int field_0x18;
-    int field_0x1c;
-    int field_0x20;
+    float field_0x14;         // KeyboardDevice 0x0048a0c0: timer for key +0x0c
+    float field_0x18;         // timer for key +0x10
+    float field_0x1c;         // step per repeat
+    float field_0x20;         // repeat interval
     float field_0x24;         // current value, kept within [min, max]
     float field_0x28;         // centre; used inside the dead zone
     float field_0x2c;         // minimum
@@ -66,6 +72,8 @@ class UnknownControlMapping {
 public:
     // 0x0043cbd0: control `control` of device `device`, or -1.
     void UnknownFunction43cbd0(int control, int* result, int device);
+    // 0x0043cba0: the keyboard key for `control`, or -1.
+    void UnknownFunction43cba0(int control, int* result);
 };
 
 // RTTI: ControlInterface (root; PCControlInterface derives from it). Slot 0

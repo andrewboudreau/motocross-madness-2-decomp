@@ -22,10 +22,11 @@ JoystickDevice::~JoystickDevice() {}
 // has no retail body of its own.
 // 0x00489a20: axis n's binding reports controls -(2n + 2) (low) and
 // -(2n + 3) (high).
-int JoystickDevice::UnknownFunction489a20(UnknownControlBinding* binding, int a, int b) {
-    binding->field_0x1c = a;
+int JoystickDevice::UnknownFunction489a20(UnknownControlBinding* binding, float step,
+                                          float interval) {
     binding->field_0x00 = this;
-    binding->field_0x20 = b;
+    binding->field_0x1c = step;
+    binding->field_0x20 = interval;
     field_0x4fc[binding->field_0x08].Add(binding);
     switch (binding->field_0x08) {
     case 0:

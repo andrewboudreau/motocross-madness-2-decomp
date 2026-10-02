@@ -9,4 +9,7 @@ public:
     // No destructor is declared: retail's 0x004c4400 is compiler-generated
     // (wrapper 0x004c43e0).
     PCKeyboardDevice();           // 0x004c43c0
+
+    virtual int UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry);
+    virtual int UnknownVirtualSlot5(int key, int modifier, UnknownInputEntry* entry);
 };

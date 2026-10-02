@@ -56,6 +56,16 @@ void UnknownControlBinding::UnknownFunction43cce0(int a, int b) {
     field_0x10 = b;
 }
 
+// 0x0043cd00
+UnknownControlBinding::~UnknownControlBinding() {
+    UnknownFunction43cde0();
+}
+
+// 0x0043cd10
+void UnknownControlBinding::UnknownFunction43cd10() {
+    field_0x24 = field_0x28;
+}
+
 // 0x0043cd20: maps value/range onto [min, max]; inside the dead zone the
 // value snaps to the centre.
 void UnknownControlBinding::UnknownFunction43cd20(float value, float range) {

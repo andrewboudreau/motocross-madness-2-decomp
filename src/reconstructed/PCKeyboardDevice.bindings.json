@@ -1,10 +1,13 @@
 {
   "??0KeyboardDevice@@QAE@XZ": "0x00489e30",
-  "??1?$ContainerList@H@@QAE@XZ": "0x00402040",
+  "??1?$ContainerList@PAUUnknownControlBinding@@@@QAE@XZ": "0x00402040",
   "??1PCInputDevice@@UAE@XZ": "0x004c2650",
   "??1PCKeyboardDevice@@UAE@XZ": "0x004c4400",
   "??1PCKeyboardDevice@@UAE@XZ$ehhandler": "0x0054cc88",
   "??3@YAXPAX@Z": "0x004a30c0",
   "??_7PCKeyboardDevice@@6B@": "0x00555f58",
-  "??_M@YGXPAXIHP6EX0@Z@Z": "0x00536140"
+  "??_M@YGXPAXIHP6EX0@Z@Z": "0x00536140",
+  "?UnknownFunction43cba0@UnknownControlMapping@@QAEXHPAH@Z": "0x0043cba0",
+  "?UnknownFunction48a240@KeyboardDevice@@QAEHH@Z": "0x0048a240",
+  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c"
 }
