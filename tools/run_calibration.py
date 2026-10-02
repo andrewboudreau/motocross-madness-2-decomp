@@ -2569,6 +2569,15 @@ CASES = [
         'reason': 'while (count) with RegEnumKeyA(count - 1)',
     },
     {
+        'name': 'PCGame start-up 0x4bfc50',
+        'bindings': 'src/reconstructed/PCGame.bindings.json',
+        'source': 'src/reconstructed/PCGame.cpp',
+        'symbol': '?UnknownFunction4bfc50@PCGame@@QAEHPAD@Z',
+        'target_va': '0x004bfc50',
+        'target_size': 1504,
+        'reason': 'renderer GUID else-if chain of struct copies; argument locals fix the call order; bitfield read-modify-write per setting',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

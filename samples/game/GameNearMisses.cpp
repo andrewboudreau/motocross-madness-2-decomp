@@ -41,7 +41,7 @@ extern "C" __declspec(dllimport) long __stdcall RegCloseKey(void* key);
 // value under HKEY_LOCAL_MACHINE\\SOFTWARE\\Rainbow Studios into bit 2 of
 // +0x2d4, then (when slot 32 allows) the texture manager, the debug overlay
 // (only with that bit) and the "AllowFreezeCamera" setting.
-int Game::UnknownFunction467b70(int) {
+int Game::UnknownFunction467b70(char*) {
     field_0x2f4 = new(__FILE__, 222) GameObject(1);
     field_0x34 = new(__FILE__, 227) GameObject(1);
     field_0x2f4->UnknownFunction469190(field_0x34, -1);

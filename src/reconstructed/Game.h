@@ -99,7 +99,7 @@ public:
 
     // 0x00467b70: creates the root objects, sound, textures and (with the
     // "DebugOverlay" registry flag) the debug overlay.
-    int UnknownFunction467b70(int value);
+    int UnknownFunction467b70(char* message);
     void UnknownFunction468880();             // 0x00468880 (PCCamera slot 27)
 
     SoundInterface* field_0x04;               // a PCSoundInterface (initialiser)

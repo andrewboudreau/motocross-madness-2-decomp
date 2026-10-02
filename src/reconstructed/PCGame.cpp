@@ -22,6 +22,10 @@ extern "C" __declspec(dllimport) void* __stdcall LoadLibraryA(const char* name);
 extern "C" __declspec(dllimport) int __stdcall ShowCursor(int show);
 extern "C" __declspec(dllimport) void* __stdcall GetActiveWindow();
 extern "C" __declspec(dllimport) int __stdcall GetWindowRect(void* window, UnknownRect* rect);
+extern "C" __declspec(dllimport) int __stdcall LoadStringA(void* instance, unsigned int id,
+                                                          char* buffer, int size);
+extern "C" __declspec(dllimport) int __stdcall MessageBoxA(void* window, const char* text,
+                                                          const char* caption, unsigned int type);
 
 extern "C" __declspec(dllimport) long __stdcall RegOpenKeyExA(void* key, const char* subKey,
                                                              unsigned long options,
@@ -63,6 +67,22 @@ extern "C" __declspec(dllimport) long __stdcall RegSetValueExA(void* key, const 
 // IMM32, called through the linker's import thunks.
 extern "C" void* __stdcall ImmCreateContext();
 extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
+
+// Direct3D device GUIDs (their values are the DirectX IIDs of the same
+// names); 0x00556040 is the "Blade" renderer's, which is not a DirectX one.
+extern "C" const UnknownGuid IID_IDirect3DRampDevice;   // 0x00556190
+extern "C" const UnknownGuid IID_IDirect3DRGBDevice;    // 0x005561a0
+extern "C" const UnknownGuid IID_IDirect3DHALDevice;    // 0x005561b0
+extern "C" const UnknownGuid IID_IDirect3DMMXDevice;    // 0x005561c0
+extern "C" const UnknownGuid IID_IDirect3DRefDevice;    // 0x005561d0
+extern "C" const UnknownGuid IID_IDirect3DNullDevice;   // 0x005561e0
+extern const UnknownGuid g_UnknownBladeDevice556040;
+
+// Display set-up outside PCGame (cdecl; names provisional).
+int UnknownFunction4c9600(void* window);                // 0x004c9600: enumerates the displays
+// 0x004ccd60: chooses the display (and whether the Blade renderer is used).
+UnknownDisplay* UnknownFunction4ccd60(int flag, int useLast, int* blade);
+int UnknownFunction4cd610(int useLast);                 // 0x004cd610: chooses the joystick
 
 // 0x00689940: a FILTERKEYS-sized structure (24 bytes) cleared by the
 // constructor.
@@ -122,6 +142,90 @@ PCGame::~PCGame() {
 // 0x004bfc40
 int PCGame::UnknownVirtualSlot2() {
     return Game::UnknownVirtualSlot2();
+}
+
+// 0x004bfc50: PCGame's start-up. Chooses the Direct3D device from the
+// "Renderer" setting, enumerates and (re)profiles the displays, picks the
+// display and its feature flags and the joystick, then runs Game's
+// initialiser.
+int PCGame::UnknownFunction4bfc50(char* message) {
+    char name[256];
+    char renderer[260];
+    char text[512];
+    unsigned long size;
+    if (!field_0x420)
+        field_0x420 = field_0x318;
+    size = sizeof(renderer);
+    UnknownVirtualSlot23("Renderer", "HAL", renderer, &size);
+    field_0x2d0 = 0;
+    if (!_stricmp(renderer, "RGB")) {
+        field_0x2f8 = IID_IDirect3DRGBDevice;
+    } else if (!_stricmp(renderer, "MMX")) {
+        field_0x2f8 = IID_IDirect3DMMXDevice;
+    } else if (!_stricmp(renderer, "Ramp")) {
+        field_0x2f8 = IID_IDirect3DRampDevice;
+    } else if (!_stricmp(renderer, "Null")) {
+        field_0x2f8 = IID_IDirect3DNullDevice;
+    } else if (!_stricmp(renderer, "Ref")) {
+        field_0x2f8 = IID_IDirect3DRefDevice;
+    } else if (!_stricmp(renderer, "Blade")) {
+        field_0x2f8 = g_UnknownBladeDevice556040;
+        field_0x2d0 = 1;
+    } else {
+        field_0x2f8 = IID_IDirect3DHALDevice;
+    }
+    field_0x2d4_bit1 = UnknownVirtualSlot22("FullScreen", field_0x2d4_bit1);
+    if (!UnknownVirtualSlot37()) {
+        if (message)
+            LoadStringA(field_0x420, 0x13d6, message, 0x100);
+        return 0;
+    }
+    if (!UnknownFunction4c9600(field_0x31c))
+        return 0;
+    for (int i = 0; i < g_UnknownDisplayCount68a764; i++)
+        g_UnknownDisplays68a754[i]->UnknownFunction4c9d20(0, 0, 0, 0);
+    field_0x548_bit0 = UnknownFunction4c1410();
+    if (field_0x548_bit0) {
+        if (LoadStringA(field_0x420, 0x13d8, text, sizeof(text))) {
+            ShowCursor(1);
+            if (MessageBoxA(field_0x31c, text, field_0x3a0, 0x1041) == 2)
+                return 0;
+            ShowCursor(0);
+        }
+        UnknownFunction4c1a00();
+        UnknownVirtualSlot27("UseLastVideoCard", 0);
+        UnknownFunction4c16b0();
+    }
+    UnknownFunction4c0d10();
+    field_0x0c = g_UnknownDisplays68a754[0];
+    int flag = field_0x2d5_bit3 && !field_0x544;
+    int useLast = UnknownVirtualSlot22("UseLastVideoCard", 0);
+    field_0x0c = UnknownFunction4ccd60(flag, useLast, &field_0x2d0);
+    if (!field_0x0c) {
+        *message = 0;
+        return 0;
+    }
+    if (field_0x2d0)
+        field_0x2f8 = g_UnknownBladeDevice556040;
+    sprintf(name, "DriverInfo\\%s\\AllowDither", field_0x0c->field_0x4bc);
+    field_0x2d4_bit3 = UnknownVirtualSlot22(name, field_0x2d4_bit3);
+    sprintf(name, "DriverInfo\\%s\\AllowMipMapping", field_0x0c->field_0x4bc);
+    field_0x2d4_bit4 = UnknownVirtualSlot22(name, field_0x2d4_bit4);
+    sprintf(name, "DriverInfo\\%s\\AllowBiLinear", field_0x0c->field_0x4bc);
+    field_0x2d4_bit5 = UnknownVirtualSlot22(name, field_0x2d4_bit5);
+    sprintf(name, "DriverInfo\\%s\\AllowSortIndependantAntiAliasing", field_0x0c->field_0x4bc);
+    field_0x2d4_bit6 = UnknownVirtualSlot22(name, field_0x2d4_bit6);
+    sprintf(name, "DriverInfo\\%s\\AllowTriLinear", field_0x0c->field_0x4bc);
+    field_0x2d4_bit7 = UnknownVirtualSlot22(name, field_0x2d4_bit7);
+    int joystick = UnknownFunction4cd610(UnknownVirtualSlot22("UseLastController", 0));
+    if (joystick >= 0) {
+        field_0x14->field_0x08 = joystick;
+        field_0x14->field_0x0c = field_0x14->field_0x10[joystick];
+    } else if (joystick == -2) {
+        *message = 0;
+        return 0;
+    }
+    return Game::UnknownFunction467b70(message);
 }
 
 // 0x004c0230

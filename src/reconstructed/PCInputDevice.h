@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Guid.h"
+
 #include "InputDevice.h"
 
 // COM-style device at PCInputDevice+0x25c (`this` on the stack). Method 8 is
@@ -64,14 +66,6 @@ struct UnknownInputProperty {
     unsigned long object;
     unsigned long how;
     unsigned long data;
-};
-
-// 16-byte GUID (Win32 GUID layout).
-struct UnknownGuid {
-    unsigned long data1;
-    unsigned short data2;
-    unsigned short data3;
-    unsigned char data4[8];
 };
 
 // 0x244-byte device description at PCInputDevice+0x18. Its size and the
