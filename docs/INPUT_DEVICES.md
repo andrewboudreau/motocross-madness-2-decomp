@@ -241,9 +241,11 @@ identical-code folding:
 - **Default constructor:** `0x005109c0`.
 - **Destructor:** `0x00402040`, which deletes the data.
 - **`Reserve`:** `0x005109e0`, which allocates at ContainerList.h line 71 and
-  copies with `memcpy`. Its out-of-line copy is not matched yet, but its
-  inlined copy matches inside JoystickDevice `0x00489a20`. That copy shows
-  the new buffer is stored before the old one is deleted.
+  copies with `memcpy`. The 109-byte out-of-line pointer specialization now
+  matches strictly under VC6 SP3 with its file literal, debug `operator new`,
+  and delete relocations resolved. Its inlined copy also matches inside
+  JoystickDevice `0x00489a20`. Both show the new buffer is stored before the
+  old one is deleted.
 
 `Get`, `Add` and `Remove` (swap with last) are inlined into the joystick
 binding functions.

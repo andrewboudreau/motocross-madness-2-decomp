@@ -22,20 +22,7 @@
 
 // Debug allocation forms (size/ptr, __FILE__, __LINE__): ../common/DebugAlloc.h.
 #include "../common/DebugAlloc.h"
-
-// Fixed-size block pool (retail 0x00423f70 ctor(elemSize, count), 0x00423fb0 dtor,
-// 0x00423fc0 Alloc, 0x00424050 Free, 0x00424110 Reset; object size 0x28 from the
-// operator new at 0x4dc751).  Owned by another TU: PROVISIONAL declaration only.
-class QuadTreePool {
-public:
-    QuadTreePool(unsigned int elemSize, unsigned int count);
-    ~QuadTreePool();
-    void* Alloc();
-    void Free(void* p);
-    void Reset();
-private:
-    char field_0x00[0x28];
-};
+#include "../../../src/reconstructed/BlockAllocator.h"
 
 class QuadTreeNode;
 
@@ -117,8 +104,8 @@ public:
     float field_0x54;                // z extent
     int field_0x58;
     QuadTreeNode* field_0x5c;        // root node (dtor calls its deleting dtor)
-    QuadTreePool* field_0x60;        // pool of QuadTreeItemLink (0x14 elements)
-    QuadTreePool* field_0x64;        // pool of QuadTreeResultLink (8 byte elements)
+    BlockAllocator* field_0x60;      // pool of QuadTreeItemLink (0x14 elements)
+    BlockAllocator* field_0x64;      // pool of QuadTreeResultLink (8 byte elements)
     unsigned int field_0x68;         // bit 1 (2) = tree is being torn down
     unsigned short field_0x6c;
     unsigned short field_0x6e;

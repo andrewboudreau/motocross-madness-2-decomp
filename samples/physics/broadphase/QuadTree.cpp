@@ -99,8 +99,8 @@ void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
     field_0x70 = 0;
     field_0x78 = 0;
     field_0x80 = 0;
-    field_0x64 = new(__FILE__, 0x73) QuadTreePool(8, 0x1000);
-    field_0x60 = new(__FILE__, 0x74) QuadTreePool(0x14, 0x1000);
+    field_0x64 = new(__FILE__, 0x73) BlockAllocator(8, 0x1000);
+    field_0x60 = new(__FILE__, 0x74) BlockAllocator(0x14, 0x1000);
 }
 
 // Tier 3 name: turns a world rectangle (x0, z0)-(x1, z1) into a "locational code" (0xf =
