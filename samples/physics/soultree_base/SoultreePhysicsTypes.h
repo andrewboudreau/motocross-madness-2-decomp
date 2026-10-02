@@ -4,7 +4,7 @@
 #ifndef SOULTREE_PHYSICS_TYPES_H
 #define SOULTREE_PHYSICS_TYPES_H
 
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // Global Vec3 constants in .data used to reset vectors (0x00689ee8 is all zero
 // bits; 0x00685190 is the vector loaded by slot 36).

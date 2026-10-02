@@ -25,7 +25,7 @@ struct ShockVec3 {
 inline float ShockDot(const ShockVec3& a, const ShockVec3& b) { return a.z * b.z + (a.x * b.x + a.y * b.y); }
 
 // Out-of-line vector helpers (cdecl).  Same entries as Vec3DotCall / Vec3ScaleCall in
-// samples/physics/common/Math3D.h.
+// src/krusty2/math/Math3D.h.
 float ShockDotCall(const ShockVec3& a, const ShockVec3& b);                  // 0x0040ae30
 ShockVec3 ShockScaleCall(const ShockVec3& v, float s);                       // 0x005015b0 (hidden return pointer)
 ShockVec3 ShockAddCall(const ShockVec3& a, const ShockVec3& b);              // 0x00421cb0 (hidden return pointer)

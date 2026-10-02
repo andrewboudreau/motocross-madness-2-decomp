@@ -12,8 +12,10 @@ Each subdirectory may hold a ``targets.json`` list. Every entry needs
 chosen compiler profile; each target is matched with tools/match.py.
 
 Exit status is nonzero when any entry with ``"expect": "exact"`` (the default)
-fails to match. Entries marked ``"expect": "partial"`` are reported but do not
-fail the run; use that for readable reconstructions whose codegen is still off.
+fails the relocation-masked diagnostic comparison. This is not strict proof.
+Use --strict for merge acceptance: every required target must match after all
+relocations are resolved. An optional ``bindings`` path is relative to targets.json.
+Entries marked ``"expect": "partial"`` are reported but do not fail the run.
 """
 from __future__ import annotations
 
@@ -25,6 +27,33 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from mcm2tool.coff import CoffObject
+from mcm2tool.pe import PEImage
+from mcm2tool.resolved_match import RelocationError, match_object
+from tools.match import compare
+
+
+def compare_target(pe, obj, target, manifest):
+    bindings_path = manifest.parent / target['bindings'] if target.get('bindings') else None
+    result = compare(pe, obj, target['candidate_symbol_contains'],
+                     int(target['target_va'], 0), target['target_size'], bindings_path)
+    if bindings_path is None:
+        try:
+            strict = match_object(obj, target['candidate_symbol_contains'],
+                                  int(target['target_va'], 0),
+                                  pe.bytes_at_va(int(target['target_va'], 0), target['target_size']), {})
+        except RelocationError as exc:
+            strict = {'strict_exact': False, 'ignored_bytes': 0, 'error': str(exc)}
+        result.update(strict_exact=strict['strict_exact'], strict_match=strict)
+    return result
+
+
+def required_failures(results, strict=False):
+    key = 'strict_exact' if strict else 'exact_after_relocation_mask'
+    return [r for r in results if r['expected'].get('expect', 'exact') == 'exact'
+            and r.get(key) is not True]
 
 
 def main() -> int:
@@ -40,6 +69,8 @@ def main() -> int:
                     help='project include directory (repeatable; default: src/krusty2)')
     ap.add_argument('--out', default=str(ROOT / 'work/physics-objs'))
     ap.add_argument('--json', action='store_true', help='print full per-target JSON')
+    ap.add_argument('--json-out', type=Path, help='write the complete per-target report')
+    ap.add_argument('--strict', action='store_true', help='require resolved relocations for every required match')
     a = ap.parse_args()
     roots = a.root or [str(ROOT / 'samples/physics'), str(ROOT / 'src/krusty2')]
     include_dirs = a.include or [str(ROOT / 'src/krusty2')]
@@ -49,6 +80,8 @@ def main() -> int:
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     results = []
+    pe = PEImage(a.exe)
+    objects = {}
     compiled: dict[Path, Path | None] = {}
     tjsons = sorted({t for r in roots if Path(r).is_dir() for t in Path(r).rglob('targets.json')})
     for tjson in tjsons:
@@ -73,30 +106,35 @@ def main() -> int:
             if obj is None:
                 payload = {'error': 'compile failed', 'exact_after_relocation_mask': False}
             else:
-                m = [sys.executable, str(ROOT / 'tools/match.py'), '--exe', a.exe, '--target-va', t['target_va'],
-                     '--target-size', str(t['target_size']), '--obj', str(obj),
-                     '--symbol', t['candidate_symbol_contains'], '--json']
-                r = subprocess.run(m, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=ROOT)
                 try:
-                    payload = json.loads(r.stdout)
-                except ValueError:
-                    payload = {'error': r.stdout.strip()[-400:], 'exact_after_relocation_mask': False}
+                    if obj not in objects:
+                        objects[obj] = CoffObject(obj)
+                    payload = compare_target(pe, objects[obj], t, tjson)
+                except (ValueError, OSError) as exc:
+                    payload = {'error': str(exc), 'exact_after_relocation_mask': False, 'strict_exact': False}
             payload['source'] = str(src.relative_to(ROOT))
             payload['expected'] = t
             results.append(payload)
     if a.json:
         print(json.dumps(results, indent=2))
+    if a.json_out:
+        a.json_out.parent.mkdir(parents=True, exist_ok=True)
+        a.json_out.write_text(json.dumps(results, indent=2) + '\n')
     exact = [r for r in results if r.get('exact_after_relocation_mask')]
-    required = [r for r in results if r['expected'].get('expect', 'exact') == 'exact']
-    failed = [r for r in required if not r.get('exact_after_relocation_mask')]
+    strict_exact = [r for r in results if r.get('strict_exact') is True]
+    failed = required_failures(results, a.strict)
     for r in results:
         e = r['expected']
-        tag = 'EXACT' if r.get('exact_after_relocation_mask') else ('FAIL ' if r in failed else 'part ')
+        tag = 'EXACT' if r.get('strict_exact') else ('MASK ' if r.get('exact_after_relocation_mask') else 'part ')
+        if r in failed:
+            tag = 'FAIL '
         pct = r.get('match_percent', 0)
         sizes = f"{r.get('candidate_size', '?')}/{e['target_size']}"
         print(f"{tag} {e['target_va']} {pct:6.2f}% size {sizes:>9}  {e['candidate_symbol_contains']}  [{r['source']}]"
               + (f"  ERR {r['error'][:120]}" if 'error' in r else ''))
-    print(f'\n{len(exact)}/{len(results)} exact; {len(failed)} required failures')
+    mode = 'strict' if a.strict else 'diagnostic'
+    print(f'\n{len(exact)}/{len(results)} relocation-masked matches; '
+          f'{len(strict_exact)}/{len(results)} strict exact; {len(failed)} required failures ({mode})')
     return 1 if failed else 0
 
 

@@ -1,5 +1,5 @@
 // MatrixOps.cpp -- 4x4 matrix helpers declared in ../common/Math3D.h (tier 3 file grouping).
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // 0x0042a1a0. Full 4x4 product; both matrices are passed by value (retail pushes 2 x 64
 // bytes, callers do "add esp,0x84"). Decoded: out[i][j] = sum_k a[k][j] * b[i][k], i.e. in the

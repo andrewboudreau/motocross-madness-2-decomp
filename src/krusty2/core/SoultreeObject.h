@@ -1,6 +1,6 @@
 // SoultreeObject.h -- scene-graph node (soultree.cpp) as seen by the physics code.
 //
-// Owner: opus_rigidbody (samples/physics/common). Included by Math3D.h.
+// Shared declaration included by math/Math3D.h.
 //
 // Class identity: RTTI .?AVSoultreeObject@@ (tier 1), bases QuadTreeObject (+0)
 // and GameObject (+12). The constructor at 0x004fb2b0 writes both vptrs

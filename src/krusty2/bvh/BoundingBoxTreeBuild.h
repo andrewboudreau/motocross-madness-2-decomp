@@ -121,7 +121,7 @@ public:
 void TriangleNormal(const TreeVec3* a, const TreeVec3* b, const TreeVec3* c, TreeVec3* normal,
                     float* planeOffset);
 
-// Scene-graph node (soultree.cpp's SoultreeObject; see samples/physics/common/SoultreeObject.h,
+// Scene-graph node (soultree.cpp's SoultreeObject; see src/krusty2/core/SoultreeObject.h,
 // which promoted code may not include).  Local stand-in with only the methods called here.
 // Method names follow that header (tier 3).
 class TreeSceneNode {

@@ -31,7 +31,8 @@
 #ifndef SOULTREE_D3DIM_SOULTREE_CHARACTER_H
 #define SOULTREE_D3DIM_SOULTREE_CHARACTER_H
 
-#include "../soultree_base/SoultreePhysicsBaseObject.h"
+#include "core/GameObject.h"
+#include "math/Math3D.h"
 
 class SoultreeObject;
 struct CharacterPose;   // 0x2c-byte pose record; defined by users that need the layout (src/krusty2/motion/MotionPose.h)

@@ -1,7 +1,7 @@
 // SteeringControl.cpp -- reconstruction of D:\aardvark\VC\krusty2\SteeringControl.cpp.
 #include "core/GameObject.h"
 #include "core/DebugAlloc.h"
-#include "../../../samples/physics/common/Math3D.h"
+#include "math/Math3D.h"
 #include "SteeringControl.h"
 #include <math.h>
 

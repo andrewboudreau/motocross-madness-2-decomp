@@ -2,7 +2,7 @@
 // Their true translation unit is unknown: 0x0043b190 and 0x0043c890 sit inside the
 // CollisionPoint/ConstraintMethodCollisionModel range, 0x00435ec0 inside CollisionObject.
 #include "collision/CollisionTypes.h"
-#include "../common/Math3D.h"   // FastSqrt (0x00460b50)
+#include "math/Math3D.h"   // FastSqrt (0x00460b50)
 
 // 0x0043b190 (cdecl): out = a - b * (a . b), the part of a perpendicular to the (unit) vector b.
 // Returns 0 when the result is exactly the zero vector, else out.

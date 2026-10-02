@@ -1,1 +1,272 @@
-[]
+[
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??0SelectiveGravityModel",
+    "target_va": "0x004f9760",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "constructor"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??_GSelectiveGravityModel",
+    "target_va": "0x004f9790",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "scalar deleting dtor"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??1SelectiveGravityModel",
+    "target_va": "0x004f97b0",
+    "target_size": 97,
+    "expect": "exact",
+    "notes": "dtor core"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "AddBody@SelectiveGravityModel",
+    "target_va": "0x004f9820",
+    "target_size": 57,
+    "expect": "exact",
+    "notes": "slot 27"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot10@SelectiveGravityModel",
+    "target_va": "0x004f9860",
+    "target_size": 39,
+    "expect": "exact",
+    "notes": "slot 10"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot11@SelectiveGravityModel",
+    "target_va": "0x004f9890",
+    "target_size": 113,
+    "expect": "partial",
+    "notes": "slot 11 (partial: stack-temp shape)"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "SetGravity@SelectiveGravityModel",
+    "target_va": "0x004f9a50",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": "slot 28"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??0Shock@@",
+    "target_va": "0x004f9a60",
+    "target_size": 275,
+    "expect": "exact",
+    "notes": "ctor"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??1Shock@@",
+    "target_va": "0x004f9b80",
+    "target_size": 22,
+    "expect": "exact",
+    "notes": "dtor"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "?Reset@Shock",
+    "target_va": "0x004f9ba0",
+    "target_size": 206,
+    "expect": "exact",
+    "notes": "slot 0"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "?ClearForces@Shock",
+    "target_va": "0x004f9c70",
+    "target_size": 180,
+    "expect": "exact",
+    "notes": "slot 1"
+  },
+  {
+    "class": "InlineShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??0InlineShock",
+    "target_va": "0x004f9ee0",
+    "target_size": 153,
+    "expect": "exact",
+    "notes": "ctor"
+  },
+  {
+    "class": "InlineShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??1InlineShock",
+    "target_va": "0x004f9f80",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "dtor"
+  },
+  {
+    "class": "InlineShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "?Reset@InlineShock",
+    "target_va": "0x004fa2f0",
+    "target_size": 26,
+    "expect": "exact",
+    "notes": "slot 0"
+  },
+  {
+    "class": "RotatingShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??1RotatingShock",
+    "target_va": "0x004fa8a0",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "dtor"
+  },
+  {
+    "class": "RotatingShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "?Reset@RotatingShock",
+    "target_va": "0x004fab30",
+    "target_size": 34,
+    "expect": "exact",
+    "notes": "slot 0"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "ApplyDamping@Shock",
+    "target_va": "0x004f9d30",
+    "target_size": 428,
+    "expect": "exact",
+    "notes": "spring/damper"
+  },
+  {
+    "class": "InlineShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "UpdateAxis@InlineShock",
+    "target_va": "0x004f9f90",
+    "target_size": 250,
+    "expect": "partial",
+    "notes": "partial 98.7%: 1.0f/len gives fld;fdiv instead of fld st0;fdivr"
+  },
+  {
+    "class": "InlineShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "ClampAndStep@InlineShock",
+    "target_va": "0x004fa090",
+    "target_size": 605,
+    "expect": "exact",
+    "notes": "clamp and step"
+  },
+  {
+    "class": "InlineShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "Retract@InlineShock",
+    "target_va": "0x004fa310",
+    "target_size": 239,
+    "expect": "exact",
+    "notes": "retract"
+  },
+  {
+    "class": "InlineShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "SolveContact@InlineShock",
+    "target_va": "0x004fa400",
+    "target_size": 764,
+    "expect": "partial",
+    "notes": "partial 68%: 758 of 764 bytes; projection temporary lands in a separate slot"
+  },
+  {
+    "class": "RotatingShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??0RotatingShock",
+    "target_va": "0x004fa700",
+    "target_size": 411,
+    "expect": "exact",
+    "notes": "ctor"
+  },
+  {
+    "class": "RotatingShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "ClampAndStep@RotatingShock",
+    "target_va": "0x004fa8b0",
+    "target_size": 631,
+    "expect": "exact",
+    "notes": "clamp and step"
+  },
+  {
+    "class": "RotatingShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "Retract@RotatingShock",
+    "target_va": "0x004fab60",
+    "target_size": 255,
+    "expect": "exact",
+    "notes": "retract"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "ShockProject",
+    "target_va": "0x004fb110",
+    "target_size": 200,
+    "expect": "exact",
+    "notes": "static projection helper"
+  },
+  {
+    "class": "RotatingShock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "SolveContact@RotatingShock",
+    "target_va": "0x004fac60",
+    "target_size": 880,
+    "expect": "partial",
+    "notes": "partial 94%: jump-table extent; only the scheduling of the cross-product struct copies differs"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004fafe0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kShockZero dynamic initializer (jmp thunk at 0x4fafd0)"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004fb030",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kShockAxisX dynamic initializer (thunk 0x4fb020)"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004fb080",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kShockAxisY dynamic initializer (thunk 0x4fb070)"
+  },
+  {
+    "class": "Shock",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004fb0d0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kShockAxisZ dynamic initializer (thunk 0x4fb0c0)"
+  }
+]

@@ -5,7 +5,7 @@
 #ifndef CONTACT_IMPULSE_H
 #define CONTACT_IMPULSE_H
 
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 class SoultreeObject;
 

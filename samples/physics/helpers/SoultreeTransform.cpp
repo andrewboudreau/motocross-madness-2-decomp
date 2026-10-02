@@ -1,7 +1,7 @@
 // SoultreeTransform.cpp -- SoultreeObject (soultree.cpp) transform helpers declared in
 // ../common/SoultreeObject.h. Class attribution is tier 2 (see that header); all
 // method names are tier 3.
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // 0x004fd5c0. v * R(world): the upper 3x3 of the world matrix, no translation.
 Vec3 SoultreeObject::LocalToWorldDirection(const Vec3& v)

@@ -1,5 +1,9 @@
 # VisibilityQuadTree.cpp
 
+Validation: counts labeled "exact" below are historical relocation-masked
+diagnostics, not strict acceptance. Use `tools/run_physics_samples.py --strict`
+with reviewed bindings before accepting these candidates.
+
 - `__FILE__` string at 0x575a3c, xref 0x52d4c9 (node factory, `new(__FILE__, 0x4f)`).
 - Bracket 0x52d22a..0x5300f8. The front (0x52d240, 0x52d250, 0x52d2f0) is VideoCard;
   0x52ff90/0x5300a0/0x5300c0 are Wrecker; 0x52ff00/0x52ff20 are not VisibilityQuadTree.

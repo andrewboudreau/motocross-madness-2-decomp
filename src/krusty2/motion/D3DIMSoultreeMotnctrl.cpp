@@ -3,14 +3,14 @@
 // The retail __FILE__ string 'D:\aardvark\VC\krusty2\D3DIMSoultreeMotnctrl.cpp' is at 0x00568b70; it is
 // used by the debug allocator calls in D3DIMSoultreeCharacter's slot 11 (0x00445680), destructor core
 // (0x004459a0), slot 0 (0x00445a70) and slot 9 (0x00445ec0).  The class shape comes from
-// samples/physics/hierarchy/D3DIMSoultreeCharacter.h, which is included, not redeclared.
+// src/krusty2/motion/D3DIMSoultreeCharacter.h, which is included, not redeclared.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "core/DebugAlloc.h"
 #include "collision/CollisionObject.h"
-#include "../../../samples/physics/hierarchy/D3DIMSoultreeCharacter.h"
-#include "../../../samples/physics/common/SoultreeObject.h"
+#include "motion/D3DIMSoultreeCharacter.h"
+#include "core/SoultreeObject.h"
 #include "MotionPose.h"
 
 extern "C" char* _strupr(char*);   // 0x00535d3d (case-maps with 0x20; locale-aware CRT strupr)

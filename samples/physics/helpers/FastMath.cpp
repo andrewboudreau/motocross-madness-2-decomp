@@ -1,7 +1,7 @@
 // FastMath.cpp -- table-driven float helpers declared in ../common/Math3D.h
 // (0x00460b50 FastSqrt, 0x00460c00 FastInvSqrt). They sit in the EventManager.cpp range by
 // proximity only (tier 3 for the file).
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // 256 x uint32 mantissa table at 0x005dafe0 (sqrt) and 128 x uint8 table at 0x005daf5c
 // (rsqrt), both filled at run time, so they are extern here.

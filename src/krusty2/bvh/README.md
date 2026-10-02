@@ -1,5 +1,9 @@
 # BoundingBoxTreeBuild.cpp (bvh)
 
+Validation: counts labeled "exact" below are historical relocation-masked
+diagnostics, not strict acceptance. Use `tools/run_physics_samples.py --strict`
+with reviewed bindings before accepting these candidates.
+
 Evidence
 - `__FILE__` string `D:\aardvark\VC\krusty2\BoundingBoxTreeBuild.cpp` at VA 0x005682bc. Its own
   xrefs span 0x42b75e..0x42e257: DebugMalloc / debug-delete line numbers 0x24d..0x59e.
@@ -42,4 +46,4 @@ Notes
 - The matrix code only matches when it goes through pointer-taking inline helpers
   (`InvertRigid(&m)`, `TransformPoint(&out, v, &m)`). Writing the same statements on a local
   matrix makes VC6 order the x87 operands differently.
-- DebugMalloc 0x4a2e20 is declared locally because core/DebugAlloc.h lacks it.
+- DebugMalloc 0x4a2e20 uses the shared declaration in core/DebugAlloc.h.
