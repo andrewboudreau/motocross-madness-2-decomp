@@ -8,7 +8,9 @@
 // Palette object at TextureMap+0x2c: +0x710 maps 555 colours to palette
 // indices.
 struct UnknownTexturePalette {
-    unsigned char field_0x000[0x710];
+    unsigned char field_0x000[0x10];
+    unsigned char field_0x010[256][3];             // RGB entries
+    unsigned char field_0x310[0x710 - 0x310];
     unsigned char field_0x710[0x8000];
 };
 
@@ -25,9 +27,12 @@ class TextureMap : public BaseObject {
 public:
     TextureMap(TextureMapManager* manager, int value); // 0x0050a4e0
     virtual ~TextureMap();                            // 0x0050ab40 (deleting wrapper 0x0050a570)
-    virtual void UnknownVirtualSlot4() = 0;
+    virtual int UnknownVirtualSlot4(void* bits, int width, int height, int stride, int a, int format,
+                                    int sourceFormat, UnknownTexturePalette* palette, int flags,
+                                    void* surfacePalette, int b, int c, int d, int e, int f, int g,
+                                    unsigned int key) = 0;
     virtual void UnknownVirtualSlot5() = 0;
-    virtual void UnknownVirtualSlot6() = 0;
+    virtual TextureMap* UnknownVirtualSlot6() = 0;
     virtual int UnknownVirtualSlot7() = 0;
     virtual int UnknownVirtualSlot8(int a, int b, int c) = 0;
     virtual int UnknownVirtualSlot9(struct UnknownRect* rect, int mode) = 0;
@@ -59,7 +64,8 @@ public:
     unsigned char field_0x3c[0x44 - 0x3c];
     int field_0x44;                           // render-state pair count
     UnknownRenderStatePair field_0x48[4];     // applied by slot 19 (length not established)
-    unsigned char field_0x68[0x70 - 0x68];
+    int field_0x68;                           // bit 0: a CacheTexture
+    unsigned char field_0x6c[0x70 - 0x6c];
 };
 
 // Object at PCTextureMap+0x7c; its destructor 0x0052d050 sits among
@@ -91,9 +97,13 @@ class PCTextureMap : public TextureMap {
 public:
     PCTextureMap(TextureMapManager* manager, int value); // 0x004c5f00
     virtual ~PCTextureMap();                  // 0x004c5f50 (deleting wrapper 0x004c5f30)
-    virtual void UnknownVirtualSlot4();       // 0x004c69c0
+    // 0x004c69c0: creates the surfaces from `bits`.
+    virtual int UnknownVirtualSlot4(void* bits, int width, int height, int stride, int a, int format,
+                                    int sourceFormat, UnknownTexturePalette* palette, int flags,
+                                    void* surfacePalette, int b, int c, int d, int e, int f, int g,
+                                    unsigned int key);
     virtual void UnknownVirtualSlot5();       // 0x004c6080
-    virtual void UnknownVirtualSlot6();       // 0x004c71c0
+    virtual TextureMap* UnknownVirtualSlot6(); // 0x004c71c0: a copy of the texture
     virtual int UnknownVirtualSlot7();        // 0x004c7470: whether +0x74 exists
     // 0x004c7480: creates the texture surface from +0x70 (or shares it).
     virtual int UnknownVirtualSlot8(int a, int b, int c);
@@ -127,3 +137,23 @@ public:
     void* field_0x78;                         // palette for 8-bit textures
     UnknownVideoDecoder* field_0x7c;
 };
+
+class CacheTexture;
+
+// Texture cache at CacheTexture+0x90 (TextureCache.cpp).
+class UnknownTextureCache {
+public:
+    void UnknownFunction50c6c0(CacheTexture* texture); // 0x0050c6c0: adds a texture
+};
+
+// RTTI: CacheTexture : PCTextureMap (vtable 0x00558430; 0xbc bytes). Its
+// constructor 0x00510500 sets TextureMap+0x68 bit 0.
+class CacheTexture : public PCTextureMap {
+public:
+    explicit CacheTexture(TextureMapManager* manager); // 0x00510500
+
+    unsigned char field_0x80[0x90 - 0x80];
+    UnknownTextureCache* field_0x90;
+    unsigned char field_0x94[0xbc - 0x94];
+};
+
