@@ -28,6 +28,14 @@ public:
     int m_count;
 };
 
+// qsort comparators of ManagedTexture pointers (TextureCache.cpp).
+int UnknownCompare50ee70(const void* first, const void* second);
+int UnknownCompare50eeb0(const void* first, const void* second);
+int UnknownCompare50ef00(const void* first, const void* second);
+
+// 0x0050d800 (cdecl): fits a size list's planned levels into `budget` texels.
+int UnknownFunction50d800(ContainerList<ManagedTexture*>* list, int budget);
+
 // Interval timer (PCVideoCard.cpp; constructor 0x004cb670 records the
 // current time and the interval), 12 bytes.
 class UnknownTimer {

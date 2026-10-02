@@ -89,13 +89,19 @@ system surface of one PCTextureMap at +0x1c0. Sixteen
 five more) sort the textures by size during repacking; three PCVideoCard.cpp
 timers (`0x004cb670`, 5000 ms) and a GDI object (+0x1f8) are also owned.
 
-Exact (9 calibration cases): the constructor, scalar deleting destructor and
+Exact (14 calibration cases): the constructor, scalar deleting destructor and
 destructor; `0x0050c4a0` (sets the page count); `0x0050c6c0` (adds a texture,
 taking the palette of an 8-bit group from it); `0x0050c760` (clears the
 textures' use records); `0x0050c790` (restores lost pages); `0x0050c7e0`
 (appends a report to `C:\temp\TM_debug.txt` through `0x00461d40`); and
-`0x0050c8c0` (empties the size lists and repacks).
+`0x0050c8c0` (empties the size lists and repacks); the qsort comparators
+`0x0050ee70`, `0x0050eeb0` and `0x0050ef00`; and `0x0050d800`, which lowers
+the planned levels in one size list until its texels fit a budget, keeping
+the list sorted (ContainerList's inline ordered remove and insert). Its
+position search is an inline helper: with it VC6 runs out of inline budget
+and calls `ContainerList::Reserve` (`0x005109e0`, also exact) out of line,
+as retail does.
 
 Not reconstructed: the repacking itself, `0x0050c960` (about 3.2 KB) and
-`0x0050dad0` (with partial texture blits), and `0x0050d800`, `0x0050e730`,
-`0x0050ee70`–`0x0050ef70` and `0x0050f070`.
+`0x0050dad0` (with partial texture blits), `0x0050e730` and the debug
+display `0x0050ef70` (manager slot 15).

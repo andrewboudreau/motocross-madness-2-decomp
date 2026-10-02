@@ -35,6 +35,9 @@
   "?Release@BaseObject@@UAEHXZ": "0x00405170",
   "?Remove@UnknownTextureMapList@@QAEXPAVTextureMap@@@Z": "0x00510b30",
   "?Reserve@?$ContainerList@PAVManagedTexture@@@@QAEHH@Z": "0x005109e0",
+  "?UnknownCompare50ee70@@YAHPBX0@Z": "0x0050ee70",
+  "?UnknownCompare50eeb0@@YAHPBX0@Z": "0x0050eeb0",
+  "?UnknownCompare50ef00@@YAHPBX0@Z": "0x0050ef00",
   "?UnknownFunction461d40@@YAXPAU_iobuf@@PBDZZ": "0x00461d40",
   "?UnknownFunction50c4a0@ManagedTextureGroup@@QAEHH@Z": "0x0050c4a0",
   "?UnknownFunction50c4a0@ManagedTextureGroup@@QAEHH@Z$ehhandler": "0x0054e9d8",
@@ -44,6 +47,7 @@
   "?UnknownFunction50c7e0@ManagedTextureGroup@@QAEXXZ": "0x0050c7e0",
   "?UnknownFunction50c8c0@ManagedTextureGroup@@QAEXXZ": "0x0050c8c0",
   "?UnknownFunction50c960@ManagedTextureGroup@@QAEXXZ": "0x0050c960",
+  "?UnknownFunction50d800@@YAHPAV?$ContainerList@PAVManagedTexture@@@@H@Z": "0x0050d800",
   "?UnknownFunction50dad0@ManagedTextureGroup@@QAEXXZ": "0x0050dad0",
   "?UnknownFunction50fc40@CacheTexture@@QAEXXZ": "0x0050fc40",
   "?UnknownFunction5109b0@ManagedTexture@@QAEMXZ": "0x005109b0",
@@ -54,5 +58,7 @@
   "__imp__DeleteObject@4": "0x00550054",
   "__real@4@00000000000000000000": "0x00550484",
   "_fclose": "0x00534c3d",
-  "_fopen": "0x00534ceb"
+  "_fopen": "0x00534ceb",
+  "_memmove": "0x00536d00",
+  "_qsort": "0x00534426"
 }

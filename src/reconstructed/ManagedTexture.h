@@ -69,7 +69,8 @@ public:
     int field_0xa0;                           // uses (0x00510820)
     float field_0xa4;                         // largest recorded value (0x00510820)
     int field_0xa8;                           // region +0x18
-    int field_0xac;
-    unsigned char field_0xb0[0xb8 - 0xb0];
+    int field_0xac;                           // planned level (repacking)
+    int field_0xb0;                           // wanted level
+    int field_0xb4;
     int field_0xb8;                           // manager frame of the last use
 };

@@ -1,6 +1,7 @@
 #include "TextureMapManager.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "DebugAlloc.h"
@@ -177,4 +178,97 @@ void ManagedTextureGroup::UnknownFunction50c8c0() {
         UnknownFunction50c960();
     else
         UnknownFunction50dad0();
+}
+
+// 0x0050ee70: qsort order of ManagedTexture pointers, by +0xac descending,
+// then by address.
+int UnknownCompare50ee70(const void* first, const void* second) {
+    ManagedTexture* a = *(ManagedTexture**)first;
+    ManagedTexture* b = *(ManagedTexture**)second;
+    int difference = b->field_0xac - a->field_0xac;
+    if (difference)
+        return difference;
+    return a - b;
+}
+
+// 0x0050eeb0: by (+0xa8 - +0xac) descending, then by address.
+int UnknownCompare50eeb0(const void* first, const void* second) {
+    ManagedTexture* a = *(ManagedTexture**)first;
+    ManagedTexture* b = *(ManagedTexture**)second;
+    int difference = b->field_0xa8 - b->field_0xac - a->field_0xa8 + a->field_0xac;
+    if (difference)
+        return difference;
+    return a - b;
+}
+
+// 0x0050ef00: by 0x005109b0 descending, then by address (descending).
+int UnknownCompare50ef00(const void* first, const void* second) {
+    ManagedTexture* a = *(ManagedTexture**)first;
+    ManagedTexture* b = *(ManagedTexture**)second;
+    float difference = -(a->UnknownFunction5109b0() - b->UnknownFunction5109b0());
+    if (difference == 0.0f)
+        return b - a;
+    if (difference > 0.0f)
+        return 1;
+    return -1;
+}
+
+// Texels of a square level-`level` texture (1 for level 0, none below).
+static inline int LevelArea(int level) {
+    if (level == 0)
+        return 1;
+    if (level < 0)
+        return 0;
+    int side = 2 << (level - 1);
+    return side * side;
+}
+
+// Where `texture` goes in `list`, kept in descending 0x005109b0 order.
+static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedTexture* texture) {
+    int position = 0;
+    for (int j = list->m_count - 1; j >= 0; j--) {
+        if (texture->UnknownFunction5109b0() < list->Get(j)->UnknownFunction5109b0()) {
+            position = j + 1;
+            break;
+        }
+    }
+    return position;
+}
+
+// 0x0050d800: sorts `list` by 0x005109b0 and lowers the planned level (+0xac)
+// of the least needy texture until the planned texels fit `budget`; a
+// texture already at level 5 is dropped (level -1). Returns the texels.
+int UnknownFunction50d800(ContainerList<ManagedTexture*>* list, int budget) {
+    qsort(list->m_data, list->m_count, sizeof(ManagedTexture*), UnknownCompare50ef00);
+    int area = 0;
+    for (int i = 0; i < list->m_count; i++)
+        area += LevelArea(list->Get(i)->field_0xac);
+    while (list->m_count > 0 && area > budget) {
+        int index = list->m_count - 1;
+        ManagedTexture* texture = list->Get(index);
+        while (list->m_count > 0 && texture->field_0xac == 5) {
+            if (--index == 0) {
+                texture->field_0xac = -1;
+                area -= 0x400;
+                list->RemoveOrdered(texture);
+                index = list->m_count - 1;
+            }
+            if (index < 0)
+                return area;
+            texture = list->Get(index);
+        }
+        int level = texture->field_0xac;
+        if (texture->UnknownFunction5109b0() < 0.0f)
+            texture->field_0xac = texture->field_0xb0;
+        else
+            texture->field_0xac--;
+        int newLevel = texture->field_0xac;
+        area -= LevelArea(level);
+        area += LevelArea(newLevel);
+        if (list->m_count > 1) {
+            list->RemoveOrdered(texture);
+            list->Insert(texture, FindPosition(list, texture));
+        }
+    }
+    return area;
 }
