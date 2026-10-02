@@ -1,8 +1,29 @@
-// QuadTree.cpp -- reconstruction of D:\aardvark\VC\krusty2\Quadtree.cpp (broad phase).
-#include "QuadTree.h"
+// Quadtree.cpp -- reconstruction of D:\aardvark\VC\krusty2\Quadtree.cpp (broad phase).
+#include "Quadtree.h"
+
+#include <string.h>
 
 extern "C" void qsort(void* base, unsigned int num, unsigned int width,
                       int (*compare)(const void*, const void*));   // 0x00534426
+
+// Per-TU vector constants.  Tier 2: this TU begins (0x004dc4d0..0x004dc60b) with the same four
+// VC6 dynamic initializers that open about 73 retail TUs.  Each one is a `jmp` thunk ($E2, $E5,
+// $E8, $E11) into a body ($E1, $E4, $E7, $E10) that builds (0,0,0), (1,0,0), (0,1,0) or
+// (0,0,1) in a stack temporary and then copies it into a TU-private 12-byte global
+// (0x00689b48, 0x00689b58, 0x00689b68, 0x00689b38).  In the original source they come from
+// a widely included header (common/Math3D.h, which this TU does not include yet).  So they
+// are reproduced here with a TU-local stand-in type.  The names are tier 3.
+// Codegen: the temporary followed by a copy comes from copy-initialisation, `= Vec3(a, b, c)`.
+// Direct initialisation, `k(a, b, c)`, makes VC6 store the constants straight into the global
+// (3 x `mov [g], imm`, 32 bytes).
+struct QuadTreeConstVec3 {
+    float x, y, z;
+    QuadTreeConstVec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
+};
+static const QuadTreeConstVec3 kVec3Zero = QuadTreeConstVec3(0.0f, 0.0f, 0.0f);
+static const QuadTreeConstVec3 kVec3XAxis = QuadTreeConstVec3(1.0f, 0.0f, 0.0f);
+static const QuadTreeConstVec3 kVec3YAxis = QuadTreeConstVec3(0.0f, 1.0f, 0.0f);
+static const QuadTreeConstVec3 kVec3ZAxis = QuadTreeConstVec3(0.0f, 0.0f, 1.0f);
 
 QuadTree* g_pQuadTree;
 float g_quadTreeInvScale;
@@ -73,13 +94,15 @@ void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
 {
     field_0x5c = UnknownVirtualSlot1();
     field_0x40 = x0;
-    field_0x48 = z0;
     field_0x44 = x1;
+    field_0x48 = z0;
     field_0x4c = z1;
-    field_0x50 = x1 - x0;
-    field_0x54 = z1 - z0;
+    // The extents are kept in locals as well (chained assignment): retail stores z1 - z0 with
+    // fst into field_0x54 and spills the same value for the compare (0x4dc6c0).
+    float w = field_0x50 = x1 - x0;
+    float h = field_0x54 = z1 - z0;
 
-    field_0x0c = 32768.0f / (field_0x50 > field_0x54 ? field_0x50 : field_0x54);
+    field_0x0c = 32768.0f / (w > h ? w : h);
     g_quadTreeInvScale = 1.0f / field_0x0c;
 
     int limit = (int)(minCell * field_0x0c);
@@ -356,27 +379,25 @@ void QuadTree::Remove(QuadTreeObject* obj, unsigned int code)
 
 // Tier 3 semantics.  Adds obj to the first free slot of this node's item-block list,
 // appending a new zeroed block (pool element 0x14) when every block is full.
+// The block is cleared with memset (VC6 inlines it as xor ecx,ecx + five stores through
+// a copy of the pointer).  `prev` is uninitialised when the list is empty; retail loads
+// an unrelated stack slot into it on that path (0x4dd165), which VC6 reproduces as is.
 void QuadTreeNode::AddObject(QuadTreeObject* obj)
 {
     QuadTreeItemLink* prev;
-    QuadTreeItemLink* link = field_0x08;
-    if (link) {
-        do {
-            for (int i = 0; i < 4; i++) {
-                if (!link->objects[i]) {
-                    link->objects[i] = obj;
-                    return;
-                }
+    QuadTreeItemLink* link;
+    for (link = field_0x08; link; link = link->next) {
+        for (int i = 0; i < 4; i++) {
+            if (!link->objects[i]) {
+                link->objects[i] = obj;
+                return;
             }
-            prev = link;
-            link = link->next;
-        } while (link);
-    } else {
-        prev = (QuadTreeItemLink*)obj;
+        }
+        prev = link;
     }
 
     QuadTreeItemLink* fresh = (QuadTreeItemLink*)g_pQuadTree->field_0x60->Alloc();
-    fresh->Clear();
+    memset(fresh, 0, sizeof(QuadTreeItemLink));
     fresh->objects[0] = obj;
     if (!field_0x08)
         field_0x08 = fresh;
@@ -580,37 +601,38 @@ QuadTreeObject* QuadTree::NextObjectSorted()
     g_pQuadTree = this;
     if (field_0x80 != 0)
         return 0;
-    while (field_0x74) {
+    QuadTreeResultLink* cell;
+    while ((cell = field_0x74) != 0) {
         if (!field_0x7c) {
-            field_0x7c = field_0x74->item->field_0x08;
-        }
-        if (field_0x7c) {
-            do {
-                while (field_0x78 < 4) {
-                    QuadTreeObject* obj = field_0x7c->objects[field_0x78++];
-                    if (obj && obj->field_0x04 != (short)field_0x6c) {
-                        obj->field_0x04 = field_0x6c;
-                        if (field_0x80 < 500) {
-                            field_0x84[field_0x80] = obj;
-                            field_0x80++;
-                            obj->UnknownVirtualSlot0();
+            field_0x7c = cell->item->field_0x08;
+            if (field_0x7c) {
+                do {
+                    while (field_0x78 < 4) {
+                        QuadTreeObject* obj = field_0x7c->objects[field_0x78++];
+                        if (obj && obj->field_0x04 != (short)field_0x6c) {
+                            obj->field_0x04 = field_0x6c;
+                            if (field_0x80 < 500) {
+                                field_0x84[field_0x80] = obj;
+                                field_0x80++;
+                                obj->UnknownVirtualSlot0();
+                            }
                         }
                     }
-                }
-                field_0x78 = 0;
-                field_0x7c = field_0x7c->next;
-            } while (field_0x7c);
-            int n = field_0x80;
-            if (n < 0 || n > 1) {
-                if (n == 2) {
-                    QuadTreeObject* a = field_0x84[0];
-                    QuadTreeObject* b = field_0x84[1];
-                    if ((unsigned short)a->field_0x06 > (unsigned short)b->field_0x06) {
-                        field_0x84[0] = b;
-                        field_0x84[1] = a;
+                    field_0x78 = 0;
+                    field_0x7c = field_0x7c->next;
+                } while (field_0x7c);
+                int n = field_0x80;
+                if (n < 0 || n > 1) {
+                    if (n == 2) {
+                        if ((unsigned short)field_0x84[0]->field_0x06 >
+                            (unsigned short)field_0x84[1]->field_0x06) {
+                            QuadTreeObject* t = field_0x84[0];
+                            field_0x84[0] = field_0x84[1];
+                            field_0x84[1] = t;
+                        }
+                    } else {
+                        qsort(field_0x84, n, 4, CompareObjectKey);
                     }
-                } else {
-                    qsort(field_0x84, n, 4, CompareObjectKey);
                 }
             }
         }

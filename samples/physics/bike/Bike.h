@@ -19,7 +19,7 @@
 #define MCM2_PHYSICS_BIKE_H
 
 #include "../vehicle/Vehicle.h"
-#include "../common/DebugAlloc.h"
+#include "core/DebugAlloc.h"
 
 
 struct BikeWheel;
@@ -60,7 +60,8 @@ struct BikeWheel {
     int w_0x260;
     char pad_0x264[4];
     int w_0x268;
-    char pad_0x26c[20];
+    char pad_0x26c[16];
+    float w_0x27c;
     float w_0x280;
     char pad_0x284[4];
     float w_0x288;
@@ -203,6 +204,7 @@ public:
     virtual float UnknownVirtualSlot32();
     virtual int UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
                                      const Vec3* d, int e, float f);
+    virtual void UnknownVirtualSlot38(int a, int b, void* c);
     virtual int UnknownVirtualSlot39(float dt);
     virtual void UnknownVirtualSlot41();
     virtual int UnknownVirtualSlot42();
@@ -226,6 +228,7 @@ public:
     virtual float UnknownVirtualSlot73(const Vec3* a, const Vec3* b);
     virtual float UnknownVirtualSlot75();
     virtual Vec3 UnknownVirtualSlot76(const Vec3* a, const Vec3* b);
+    virtual int UnknownVirtualSlot89(float arg);
     virtual void UnknownVirtualSlot90(int* flag, float arg);
     virtual void UnknownVirtualSlot91();
     virtual void UnknownVirtualSlot92(const Vec3* a, const Vec3* b);
@@ -266,7 +269,8 @@ public:
     float field_0x63c;
     BikeA640* field_0x640;
     BikeA644* field_0x644;
-    char pad_0x648[8];
+    float field_0x648;
+    float field_0x64c;
     int field_0x650;
     float field_0x654;
     int field_0x658;

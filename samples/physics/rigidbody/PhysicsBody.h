@@ -18,9 +18,9 @@
 #define MCM2_PHYSICS_RIGIDBODY_PHYSICSBODY_H
 
 #include "../common/Math3D.h"
-#include "../soultree_base/GraphicsTest.h"
+#include "core/GraphicsTest.h"
 
-// GameObject and GraphicsTest are the canonical classes (../soultree_base/GraphicsTest.h).
+// GameObject and GraphicsTest are the canonical classes (core/GraphicsTest.h).
 // GameObject slot 14 returns int there (0x00469360; PhysicsBody's 0x004cbf10 returns 1).
 // Arguments of slots 10/11 are 4-byte values (ret 4).  The rigid body forwards the slot 10
 // argument to its integrator as the float time step (tier 3).

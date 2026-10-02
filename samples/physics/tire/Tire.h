@@ -31,7 +31,7 @@
 #define TIRE_H
 
 #include <stddef.h>
-#include "../collision/CollisionObject.h"
+#include "collision/CollisionObject.h"
 
 #include "../collision/CollisionPoint.h"
 

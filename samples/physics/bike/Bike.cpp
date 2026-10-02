@@ -299,14 +299,7 @@ static inline Vec3 BikeNormalized(const Vec3& v)
     if (lenSq == 1.0f)
         return v;
     float s = FastInvSqrt(lenSq);
-    Vec3 r;
-    r.x = v.x;
-    r.y = v.y;
-    r.z = v.z;
-    r.x *= s;
-    r.y *= s;
-    r.z *= s;
-    return r;
+    return v * s;
 }
 
 Vec3* Bike::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
@@ -411,6 +404,13 @@ void Bike::UnknownVirtualSlot8()
     field_0x700 = (field_0x4a8 > 0 && field_0x5f0->w_0x150 < -2.5f);
 }
 
+static inline void BikeScale(Vec3* v, float s)
+{
+    v->x *= s;
+    v->y *= s;
+    v->z *= s;
+}
+
 Vec3 Bike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
 {
     Vec3 v = Vehicle::UnknownVirtualSlot76(a, b);
@@ -427,8 +427,7 @@ Vec3 Bike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
         lean = BikeMin(lean, 1.0f);
         float k = -(field_0x504.y + 0.125f);
         k = (0.0f > k) ? 0.0f : k;
-        k = (1.4f - lean) * k * 1.6f;
-        v *= k;
+        BikeScale(&v, (1.4f - lean) * k * 1.6f);
     }
     return v;
 }
@@ -543,6 +542,17 @@ void Bike::UnknownVirtualSlot102(float)
     }
 }
 
+// Member-form cross product: VC6 keeps source multiplicand order here, where the free
+// function form canonicalises it (same observation as Vehicle.cpp's VehV3).
+static inline Vec3 BikeCrossMixed(const Vec3& a, const Vec3& n)
+{
+    Vec3 c;
+    c.x = a.z * n.y - a.y * n.z;
+    c.y = a.x * n.z - n.x * a.z;
+    c.z = n.x * a.y - a.x * n.y;
+    return c;
+}
+
 void Bike::UnknownVirtualSlot72(Vec3* out, VehicleWheel*)
 {
     if (field_0x444)
@@ -584,8 +594,8 @@ void Bike::UnknownVirtualSlot72(Vec3* out, VehicleWheel*)
             } else {
                 scale = 1.0f;
             }
-            weight = BikeMin(weight, 1.0f);
-            field_0x4b8 = UnknownVirtualSlot74(&field_0x5f0->w_0x23c, &perp, weight, scale);
+            float w = (weight < 1.0f) ? weight : 1.0f;
+            field_0x4b8 = UnknownVirtualSlot74(&field_0x5f0->w_0x23c, &perp, w, scale);
             field_0x43c = field_0x4b8 * field_0x140;
             return;
         }
@@ -1168,4 +1178,455 @@ void Bike::UnknownVirtualSlot92(const Vec3* worldDir, const Vec3* point)
             }
         }
     }
+}
+
+// ---- slot 38: collision-response dispatch (tier 3 names) ----
+// Bike's version of Vehicle slot 38 (0x005268d0).  `b` is the collision kind, `c` the event
+// record whose +0x60 member is the other party.  The kind selects what the other party looks
+// like (another vehicle, a static body, a terrain node) and how the contact is described; the
+// tail then hands the contact to the impulse solver (slot 4 with a body, slot 3 without) and
+// optionally notifies via slot 100.  Kind 0x67 and unknown kinds return immediately.
+struct BikeContactSet {
+    char pad_0x00[0xA0];
+    Vec3 field_0xa0;            // contact point
+    Vec3 field_0xac;            // contact normal
+};
+struct BikeCollisionEvent {
+    char pad_0x00[0x60];
+    Vehicle* field_0x60;        // other party
+};
+// Polymorphic body reached through the other party's +0xc4 (kind 0x3ea); slot 43 (+0xac)
+// returns a velocity vector.  The placeholder slots only exist to number it.
+struct BikeBodyObj {
+    virtual void S0(); virtual void S1(); virtual void S2(); virtual void S3();
+    virtual void S4(); virtual void S5(); virtual void S6(); virtual void S7();
+    virtual void S8(); virtual void S9(); virtual void S10(); virtual void S11();
+    virtual void S12(); virtual void S13(); virtual void S14(); virtual void S15();
+    virtual void S16(); virtual void S17(); virtual void S18(); virtual void S19();
+    virtual void S20(); virtual void S21(); virtual void S22(); virtual void S23();
+    virtual void S24(); virtual void S25(); virtual void S26(); virtual void S27();
+    virtual void S28(); virtual void S29(); virtual void S30(); virtual void S31();
+    virtual void S32(); virtual void S33(); virtual void S34(); virtual void S35();
+    virtual void S36(); virtual void S37(); virtual void S38(); virtual void S39();
+    virtual void S40(); virtual void S41(); virtual void S42();
+    virtual Vec3* UnknownVirtualSlot43(Vec3* out);
+    char pad_0x004[0x150];
+    Vec3 f154;                  // current point
+    char pad_0x160[0x0c];
+    Vec3 f16c;
+    float f17c;
+    char pad_0x180[0x50];
+    float f1d0;
+    char pad_0x1d4[0x10];
+    float f1e4;
+    char pad_0x1e8[0x0c];
+    float f1f8;
+    char pad_0x1fc[0x2c];
+    Vec3 f228;
+    SoultreeObject* f234;
+    Vec3 f23c;                  // previous point
+};
+struct BikeKindInfo {           // reached through the other party's +0x5c
+    char pad_0x00[0x24];
+    float field_0x24;
+};
+
+void Bike::UnknownVirtualSlot38(int a, int b, void* c)
+{
+    float out;                  // slot 3/4 result, forwarded to slot 100
+    Vec3 s;                     // contact mask / scale (1,1,1 for static parties)
+    Vec3 velA;                  // other party's linear velocity (field_0xcc)
+    Vec3 velB;                  // other party's second vector (field_0xe4/0xf0)
+    Vec3 leverC;                // contact point relative to the other party
+    Vec3 rel;                   // contact point relative to us
+    Vec3 blend;                 // kind 0x3ea: other point interpolated by its kind info
+    Vec3 tmp;
+    float k = 1.0f;             // angle-based response scale (kind 100)
+    float l10 = 0.0f;           // other party's field_0x24
+    int hasBody = 0;
+    int notifyOther = 0;
+    Vehicle* other = 0;
+    int ctx = 0;
+    Vec3* otherVel = 0;
+    Vec3* velPtr = 0;
+
+    switch (b) {
+    case 100: {
+        notifyOther = 1;
+        other = ((BikeCollisionEvent*)c)->field_0x60;
+        l10 = other->field_0x24;
+        velA = other->field_0xcc;
+        velB = other->field_0x444 ? other->field_0xf0 : other->field_0xe4;
+        hasBody = 1;
+        otherVel = &other->field_0x64;
+        ctx = *(int*)((char*)other + 0x3bc);
+        Vec3 cp = ((BikeContactSet*)field_0x128)->field_0xa0;
+        leverC.x = cp.x - other->field_0x0c.x;
+        leverC.y = cp.y - other->field_0x0c.y;
+        leverC.z = cp.z - other->field_0x0c.z;
+        velPtr = &other->field_0xd8;
+        if (other->field_0x0c.y - field_0x0c.y > 1.5f)
+            field_0x608 = other;
+        else if (field_0x0c.y - other->field_0x0c.y > 1.5f)
+            ((Bike*)other)->field_0x608 = this;
+        {
+            Vec3 w = ((BikeContactSet*)field_0x128)->field_0xa0;
+            float ang = (float)atan2(w.x - field_0x0c.x, w.z - field_0x0c.z) - field_0x50;
+            if (ang < 0.0f)
+                ang = -ang;
+            if (ang > 3.1415927f)
+                ang -= 6.2831853f;
+            if (ang > 2.62f)
+                k = 0.2f;
+            else if (ang > 2.09f)
+                k = 0.6f;
+            else if (ang > 0.5236f)
+                k = 0.8f;
+            else
+                k = 1.0f;
+        }
+        if (field_0x124 && (field_0x124->field_0x25 & 1)) {
+            Vec3 pos = ((BikeContactSet*)field_0x128)->field_0xa0;
+            ((VehicleImpactSink*)field_0x5ac)->Method_004B9DC0(pos);
+            Vec3 p;
+            p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
+            ((VehicleImpactSink*)field_0x5ac)->field_0x74 = p;
+            ((VehicleImpactSink*)field_0x5ac)->field_0x60 = 1;
+        }
+        break;
+    }
+    case 0x68:
+        notifyOther = 1;
+        other = ((BikeCollisionEvent*)c)->field_0x60;
+        hasBody = 1;
+        l10 = other->field_0x24;
+        ctx = (int)other->field_0x08;
+        otherVel = &other->field_0x64;
+        {
+            Vec3 cp = ((BikeContactSet*)field_0x128)->field_0xa0;
+            leverC.x = cp.x - other->field_0x18.x;
+            leverC.y = cp.y - other->field_0x18.y;
+            leverC.z = cp.z - other->field_0x18.z;
+        }
+        velA = other->field_0xcc;
+        velPtr = &other->field_0xd8;
+        velB = other->field_0xe4;
+        break;
+    case 0x65:
+        break;
+    case 0:
+    case 1:
+    case 0x66:
+    case 0x6a:
+        s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
+        if (field_0x124 && (field_0x124->field_0x25 & 1)) {
+            Vec3 pos = ((BikeContactSet*)field_0x128)->field_0xa0;
+            ((VehicleImpactSink*)field_0x5ac)->Method_004B9DC0(pos);
+            Vec3 p;
+            p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
+            ((VehicleImpactSink*)field_0x5ac)->field_0x74 = p;
+            ((VehicleImpactSink*)field_0x5ac)->field_0x60 = 1;
+        }
+        break;
+    case 0x69: {
+        char* obj = (char*)((BikeCollisionEvent*)c)->field_0x60;
+        ctx = *(int*)(obj + 0x34);
+        velA = g_BikeVec3_005778a8; velB = g_BikeVec3_005778a8; leverC = g_BikeVec3_005778a8;
+        s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
+        l10 = 0.0f;
+        velPtr = 0;
+        otherVel = (Vec3*)(obj + 0x40);
+        hasBody = 1;
+        break;
+    }
+    case 0x3e8: {
+        Vec3 r;
+        r.x = ((BikeContactSet*)field_0x128)->field_0xa0.x - field_0x18.x;
+        r.y = ((BikeContactSet*)field_0x128)->field_0xa0.y - field_0x18.y;
+        r.z = ((BikeContactSet*)field_0x128)->field_0xa0.z - field_0x18.z;
+        UnknownVirtualSlot3(&((BikeContactSet*)field_0x128)->field_0xac, &field_0x64, &r, &s, 0x3e8, 0, &out);
+        return;
+    }
+    case 0x3e9:
+        s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
+        break;
+    case 0x3ea: {
+        Vehicle* o = ((BikeCollisionEvent*)c)->field_0x60;
+        BikeKindInfo* kind = *(BikeKindInfo**)((char*)o + 0x5c);
+        BikeBodyObj* body = *(BikeBodyObj**)((char*)o + 0xc4);
+        velA = *body->UnknownVirtualSlot43(&tmp);
+        // other point: interpolate body->f23c toward body->f154 by kind->field_0x24
+        float t = kind->field_0x24;
+        float dx = body->f154.x - body->f23c.x;
+        float dy = body->f154.y - body->f23c.y;
+        float dz = body->f154.z - body->f23c.z;
+        blend.x = dx * t + body->f23c.x;
+        blend.y = dy * t + body->f23c.y;
+        blend.z = dz * t + body->f23c.z;
+        otherVel = &blend;
+        velB.x = body->f1d0;
+        velB.y = body->f1e4;
+        velB.z = body->f1f8;
+        l10 = body->f17c;
+        velPtr = &body->f16c;
+        Vec3 wp = body->f234->LocalToWorldPoint(body->f228);
+        Vec3 cp = ((BikeContactSet*)field_0x128)->field_0xa0;
+        leverC.x = cp.x - wp.x;
+        leverC.y = cp.y - wp.y;
+        leverC.z = cp.z - wp.z;
+        ctx = (int)body->f234;
+        hasBody = 1;
+        break;
+    }
+    case 0x2711: {
+        char* obj = (char*)((BikeCollisionEvent*)c)->field_0x60;
+        ctx = *(int*)(obj + 0x1a0);
+        velA = g_BikeVec3_005778a8; velB = g_BikeVec3_005778a8; leverC = g_BikeVec3_005778a8;
+        s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
+        l10 = 0.0f;
+        velPtr = 0;
+        otherVel = (Vec3*)(obj + 0x224);
+        hasBody = 1;
+        break;
+    }
+    default:
+        return;
+    }
+
+    rel.x = ((BikeContactSet*)field_0x128)->field_0xa0.x - field_0x18.x;
+    rel.y = ((BikeContactSet*)field_0x128)->field_0xa0.y - field_0x18.y;
+    rel.z = ((BikeContactSet*)field_0x128)->field_0xa0.z - field_0x18.z;
+    if (hasBody) {
+        int l14 = (b == 0x2711 || b == 0x69 || b == 0x3ea) ? 0 : (int)otherVel;
+        UnknownVirtualSlot4(&((BikeContactSet*)field_0x128)->field_0xac, &field_0x64, &field_0xcc, &rel, b, l10,
+                            ctx, otherVel, &velA, &leverC, &velB, velPtr, l14, &out, k);
+        if (other) {
+            other->field_0x10a = 0;
+            float len2 = otherVel->x * otherVel->x + otherVel->y * otherVel->y + otherVel->z * otherVel->z;
+            other->field_0xbc = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
+            other->field_0xcc = other->field_0x08->LocalToWorldDirection(*velPtr);
+        }
+    } else {
+        Vec3 t = field_0xcc;
+        field_0x1ac.x = t.y * rel.z - t.z * rel.y;
+        field_0x1ac.y = t.z * rel.x - rel.z * t.x;
+        field_0x1ac.z = rel.y * t.x - t.y * rel.x;
+        Vec3 p;
+        p.x = field_0x1ac.x + field_0x64.x;
+        p.y = field_0x64.y + field_0x1ac.y;
+        p.z = field_0x64.z + field_0x1ac.z;
+        UnknownVirtualSlot3(&((BikeContactSet*)field_0x128)->field_0xac, &p, &rel, &s, b, 0, &out);
+        if (field_0xb8 < 0.001f && field_0xbc < 0.1f) {
+            field_0x64 = g_BikeVec3_005778a8;
+            field_0xd8.y = 0.0f;
+            field_0xbc = 0.0f;
+        }
+        out = 0.0f;
+    }
+    if (a)
+        UnknownVirtualSlot100(field_0x1e4, hasBody, out);
+    if (notifyOther && other->UnknownVirtualSlot52())
+        ((Bike*)other)->UnknownVirtualSlot100(((Bike*)other)->field_0x1e4, 1, out);
+}
+
+// ---- slot 89: rider pose blend (tier 3 names) ----
+// Reached from slot 90 (and Vehicle's per-frame code) with the frame time.  Derives a lean
+// value from the wheel state, picks a pose pair (field_0x650/field_0x658) with a blend weight
+// (field_0x654/field_0x660) from the animation parameter at field_0x640, then advances a
+// smoothed value (field_0x644) toward field_0x504 and maps it through a small 5-state machine
+// (field_0x520) to field_0x65c.  Retail converts the pose index with an inlined fistp helper
+// (round-to-nearest after the -0.5); plain (int) is used here.
+static inline float BikeRange(float x, float lo, float hi)
+{
+    if (x <= lo)
+        return lo;
+    return x < hi ? x : hi;
+}
+
+int Bike::UnknownVirtualSlot89(float t)
+{
+    int r = UnknownVirtualSlot66();
+    if (r)
+        return r;
+
+    float lean;
+    if (field_0x108 || field_0x5f4->w_0x260)
+        lean = -field_0x5f0->w_0x150;
+    else
+        lean = 0.0f;
+
+    if (field_0x108 && lean > 2.0f && field_0x5f4->w_0x150 < -1.0f) {
+        float u = (0.75f - field_0x640->l_0x0) * 3.99f;
+        field_0x650 = (int)(u - 0.5f);
+        int idx = field_0x650;
+        field_0x650 = idx + 11;
+        field_0x654 = (0.75f - field_0x640->l_0x0) * 3.99f - idx;
+        if (field_0x6fc == 0) {
+            BikeA644* p = field_0x644;
+            float v = field_0x704;
+            *(float*)&p->m_0x0 = 0.0f;
+            if (v != FLT_MAX) {
+                p->m_0x4 = v;
+                p->m_0x8 = 1.0f;
+            }
+            p->m_0xc = 1.0f;
+            p->m_0x10 = -1.0f;
+            field_0x520 = 1;
+        }
+        field_0x6fc = 1;
+    } else {
+        UnknownVirtualSlot41();
+        if (!field_0x108 && lean > field_0x64c) {
+            field_0x654 = 1.0f;
+            field_0x650 = 10;
+            field_0x658 = 10;
+        } else if (!field_0x108 && lean > field_0x648) {
+            field_0x650 = 5;
+            field_0x658 = 10;
+            field_0x654 = (field_0x504.y + 1.0f) * 0.5f;
+            field_0x660 = (lean - field_0x648) / (field_0x64c - field_0x648);
+        } else if (field_0x5f4->w_0x27c > 14.0f) {
+            field_0x650 = (int)((0.75f - field_0x640->l_0x0) * 3.99f - 0.5f);
+            int idx = field_0x650;
+            if (idx == 2) {
+                if (field_0x5f4->w_0x27c > 32.0f)
+                    field_0x654 = (0.75f - field_0x640->l_0x0) * 3.99f - 2.0f;
+                else
+                    field_0x654 = (field_0x5f4->w_0x27c - 14.0f) * 0.0555f;
+            } else {
+                field_0x654 = (0.75f - field_0x640->l_0x0) * 3.99f - idx;
+            }
+            field_0x658 = idx * 2 + 4;
+            field_0x650 = field_0x658 - 1;
+        } else {
+            field_0x650 = (int)((0.75f - field_0x640->l_0x0) * 3.99f - 0.5f);
+            int idx = field_0x650;
+            field_0x658 = idx * 2 + 3;
+            field_0x654 = (0.75f - field_0x640->l_0x0) * 3.99f - idx;
+            field_0x660 = (14.0f - field_0x5f4->w_0x27c) * 0.0714285746f;
+        }
+    }
+
+    float p = field_0x504.x;
+    float x;
+    if (field_0x6fc) {
+        // advance the smoothed value toward p, limited by its rate m_0x4
+        BikeA644* q = field_0x644;
+        float d = p - *(float*)&q->m_0x0;
+        if (d < 0.0f) {
+            if (d <= q->m_0x10)
+                d = q->m_0x10;
+        } else if (d >= q->m_0xc) {
+            d = q->m_0xc;
+        }
+        float step = t < q->m_0x4 ? t : q->m_0x4;
+        q->m_0x8 = step / q->m_0x4;
+        *(float*)&q->m_0x0 = d * q->m_0x8 + *(float*)&q->m_0x0;
+        t = *(float*)&q->m_0x0;
+        switch (field_0x520) {
+        case 1:
+            x = t * -0.25f;
+            field_0x65c = x;
+            if (x < 0.0f) {
+                field_0x520 = 3;
+                field_0x65c = 0.5f - x;
+            } else if (x > 0.225f) {
+                field_0x520 = 2;
+                field_0x65c = 0.5f - x;
+            }
+            break;
+        case 2:
+            x = t * 0.25f + 0.5f;
+            field_0x65c = x;
+            if (x > 0.5f)
+                field_0x520 = 3;
+            break;
+        case 3:
+            x = t * 0.25f + 0.5f;
+            field_0x65c = x;
+            if (x < 0.5f) {
+                field_0x65c = 0.5f - x;
+                field_0x520 = 1;
+            } else if (x > 0.725f) {
+                field_0x65c = 1.5f - x;
+                field_0x520 = 4;
+            }
+            break;
+        case 4:
+            x = t * -0.25f + 1.0f;
+            field_0x65c = x;
+            if (x > 1.0f) {
+                field_0x65c = x - 1.0f;
+                field_0x520 = 1;
+            }
+            break;
+        }
+    } else {
+        switch (field_0x520) {
+        case 1:
+            if (p < 0.0f) {
+                if (p < -0.9f)
+                    field_0x520 = 2;
+                x = p * -0.25f;
+                field_0x65c = BikeRange(x, 0.0f, 0.25f);
+            } else {
+                if (p > 0.9f)
+                    field_0x520 = 4;
+                x = p * 0.25f + 0.5f;
+                field_0x65c = BikeRange(x, 0.5f, 0.75f);
+            }
+            break;
+        case 2:
+            if (p > field_0x510.x) {
+                field_0x520 = 3;
+                x = p * 0.25f + 0.5f;
+                field_0x65c = BikeRange(x, 0.25f, 0.5f);
+            } else {
+                x = p * -0.25f;
+                field_0x65c = BikeRange(x, 0.0f, 0.25f);
+            }
+            break;
+        case 3:
+            if (p > -0.032f) {
+                field_0x520 = 1;
+                if (p < 0.0f) {
+                    x = p * -0.25f;
+                    field_0x65c = BikeRange(x, 0.0f, 0.25f);
+                } else {
+                    x = p * 0.25f + 0.5f;
+                    field_0x65c = BikeRange(x, 0.5f, 0.75f);
+                }
+            } else {
+                x = p * 0.25f + 0.5f;
+                field_0x65c = BikeRange(x, 0.25f, 0.5f);
+            }
+            break;
+        case 4:
+            if (p < field_0x510.x) {
+                field_0x520 = 5;
+                x = p * -0.25f + 1.0f;
+                field_0x65c = BikeRange(x, 0.75f, 1.0f);
+            } else {
+                x = p * 0.25f + 0.5f;
+                field_0x65c = BikeRange(x, 0.5f, 0.75f);
+            }
+            break;
+        case 5:
+            if (p < 0.032f) {
+                field_0x520 = 1;
+                if (p < 0.0f) {
+                    x = p * 0.25f + 0.5f;
+                    field_0x65c = BikeRange(x, 0.5f, 0.75f);
+                } else {
+                    x = p * -0.25f;
+                    field_0x65c = BikeRange(x, 0.0f, 0.25f);
+                }
+            } else {
+                x = p * -0.25f + 1.0f;
+                field_0x65c = BikeRange(x, 0.75f, 1.0f);
+            }
+            break;
+        }
+    }
+    return 0;
 }

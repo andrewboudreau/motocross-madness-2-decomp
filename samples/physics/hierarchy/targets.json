@@ -4,7 +4,7 @@
   "source": "LayoutProbe.cpp",
   "candidate_symbol_contains": "??_GCharacter@@UAEPAXI@Z",
   "target_va": "0x004a68d0",
-  "target_size": 64,
+  "target_size": 51,
   "expect": "exact",
   "notes": "vbase deleting dtor: lea esi,[ecx-0x1a0] proves GameObject virtual base at 416 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
  },
@@ -13,7 +13,7 @@
   "source": "LayoutProbe.cpp",
   "candidate_symbol_contains": "??_GD3DIMSoultreeCharacter@@UAEPAXI@Z",
   "target_va": "0x00446680",
-  "target_size": 64,
+  "target_size": 51,
   "expect": "exact",
   "notes": "vbase deleting dtor: lea esi,[ecx-0x214] proves GameObject virtual base at 532 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
  },
@@ -22,7 +22,7 @@
   "source": "LayoutProbe.cpp",
   "candidate_symbol_contains": "??_GSoultreePhysicsCharacter@@UAEPAXI@Z",
   "target_va": "0x005042f0",
-  "target_size": 64,
+  "target_size": 51,
   "expect": "exact",
   "notes": "vbase deleting dtor: lea esi,[ecx-0x438] proves GameObject virtual base at 1080 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
  },
@@ -31,7 +31,7 @@
   "source": "LayoutProbe.cpp",
   "candidate_symbol_contains": "??_GVehicle@@UAEPAXI@Z",
   "target_va": "0x0052b630",
-  "target_size": 64,
+  "target_size": 51,
   "expect": "exact",
   "notes": "vbase deleting dtor: lea esi,[ecx-0x5c0] proves GameObject virtual base at 1472 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
  },
@@ -40,7 +40,7 @@
   "source": "LayoutProbe.cpp",
   "candidate_symbol_contains": "??_GBike@@UAEPAXI@Z",
   "target_va": "0x0040ca50",
-  "target_size": 64,
+  "target_size": 51,
   "expect": "exact",
   "notes": "vbase deleting dtor: lea esi,[ecx-0x738] proves GameObject virtual base at 1848 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
  },
@@ -49,7 +49,7 @@
   "source": "LayoutProbe.cpp",
   "candidate_symbol_contains": "??_GKrustyBike@@UAEPAXI@Z",
   "target_va": "0x00497c40",
-  "target_size": 64,
+  "target_size": 51,
   "expect": "exact",
   "notes": "vbase deleting dtor: lea esi,[ecx-0x160c] proves GameObject virtual base at 5644 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
  },

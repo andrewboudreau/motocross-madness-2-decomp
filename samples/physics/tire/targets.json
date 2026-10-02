@@ -13,7 +13,7 @@
   "source": "Tire.cpp",
   "candidate_symbol_contains": "??_GTire@@UAEPAXI@Z",
   "target_va": "0x005133a0",
-  "target_size": 48,
+  "target_size": 34,
   "expect": "exact",
   "notes": "scalar deleting destructor; 34 code bytes + 14 padding"
  },
@@ -42,7 +42,7 @@
   "target_va": "0x00515b50",
   "target_size": 316,
   "expect": "partial",
-  "notes": "48.7%: retail keeps s=sqrt(1-c*c) on the x87 stack (fmul st(2)) and multiplies each term by field_0x74 separately (term with field_0x270 first); VC6 here factors field_0x74 out of the sum and reloads s. Clamp is `c >= 1.0f`"
+  "notes": "48.7%: retail keeps s=sqrt(1-c*c) on the x87 stack (fmul st(2)) and multiplies each term by field_0x74 separately (term with field_0x270 first); VC6 here factors field_0x74 out of the sum and reloads s. Clamp is `c >= 1.0f` Wave 2: swapping term order, naming s as a local, re-reading s from field_0x288 all compile to identical bytes (VC6 factors the shared field_0x74 multiply and evaluates the field_0x1cc term first); retail multiplies field_0x74 into each term."
  },
  {
   "class": "Tire",
@@ -76,7 +76,7 @@
   "source": "CollisionCharacter.cpp",
   "candidate_symbol_contains": "??_GCollisionCharacter@@UAEPAXI@Z",
   "target_va": "0x00431d20",
-  "target_size": 64,
+  "target_size": 51,
   "expect": "exact",
   "notes": "vbase deleting destructor: lea esi,[ecx-0x268] proves GameObject vbase at 616; 51 code bytes + 13 padding"
  },
@@ -150,7 +150,7 @@
   "target_va": "0x00431b30",
   "target_size": 438,
   "expect": "partial",
-  "notes": "95% : diverges only in the x87 scheduling of the velocity = delta * (1/dt) Vec3 temp (retail keeps 1/dt in st0 with fst then fmul st(1); VC6 stores it with fstp and re-reads)"
+  "notes": "95% : diverges only in the x87 scheduling of the velocity = delta * (1/dt) Vec3 temp (retail keeps 1/dt in st0 with fst then fmul st(1); VC6 stores it with fstp and re-reads) Wave 2: also tried inline (1.0f/dt)*delta, delta*(1.0f/dt), delta*k, per-component divide/multiply: named float temp stays best (95.43); inline forms change the size."
  },
  {
   "class": "CollisionCharacter",
