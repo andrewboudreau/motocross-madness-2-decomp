@@ -83,6 +83,8 @@ int UnknownFunction4c9600(void* window);                // 0x004c9600: enumerate
 // 0x004ccd60: chooses the display (and whether the Blade renderer is used).
 UnknownDisplay* UnknownFunction4ccd60(int flag, int useLast, int* blade);
 int UnknownFunction4cd610(int useLast);                 // 0x004cd610: chooses the joystick
+// 0x005119c0: fills a pixel format for texture format `format`.
+void UnknownFunction5119c0(int format, void* pixelFormat);
 
 // 0x00689940: a FILTERKEYS-sized structure (24 bytes) cleared by the
 // constructor.

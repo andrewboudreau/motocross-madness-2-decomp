@@ -71,8 +71,14 @@ Near miss: the profile loader `0x004c16f0` (767/771,
 `samples/game/PCGameNearMisses.cpp`). Its copy loop swaps the SIB base and
 index registers.
 
-Not reconstructed: the profiling pass `0x004c0d10` (1790 bytes, with an EH
-frame).
+Near miss: the profiling pass `0x004c0d10` (1790 bytes,
+`samples/game/PCGameNearMisses.cpp`). Its control flow and calls line up, but
+the frame layout and register assignment do not (notes in the sample). The
+pass uses the display's DirectDraw-shaped interface (+0x190) for the
+following, which are inference:
+- SetDisplayMode (method 21);
+- GetAvailableVidMem (method 23);
+- CreateSurface (method 6), to test whether ten 256x256 textures fit.
 
 
 ## Start-up (`0x004bfc50`)

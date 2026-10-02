@@ -38,6 +38,8 @@ struct UnknownDisplay {
     void UnknownFunction4ca790(int width, int height, int windowed); // 0x004ca790
     void UnknownFunction4ca900(int mode, int windowed);              // 0x004ca900
     int UnknownFunction4ca5a0(int* value, RenderTarget* target);     // 0x004ca5a0
+    void UnknownFunction4c9b50();                                    // 0x004c9b50
+    void UnknownFunction4cab00(RenderTarget* target);                // 0x004cab00: blit timing
 
     int field_0x04;
     int field_0x08;                               // display mode count
@@ -56,12 +58,16 @@ struct UnknownDisplay {
     unsigned char field_0x70_bits : 5;
     unsigned char field_0x71[0x78 - 0x71];
     int field_0x78;
-    unsigned char field_0x7c[0x19c - 0x7c];
+    unsigned char field_0x7c[0x190 - 0x7c];
+    UnknownDirectDrawInterface* field_0x190;
+    unsigned char field_0x194[0x19c - 0x194];
     UnknownSurfaceInterface* field_0x19c;     // PCGame slot 5: IsLost/Restore
     UnknownSurfaceInterface* field_0x1a0;     // PCGame slot 31's surface without +0x1a8
     int field_0x1a4;
     UnknownSurfaceInterface* field_0x1a8;
-    unsigned char field_0x1ac[0x4bc - 0x1ac];
+    unsigned char field_0x1ac[0x1b8 - 0x1ac];
+    unsigned int field_0x1b8;                     // capability bits (PCGame 0x004c0d10: 0x1, 0x400)
+    unsigned char field_0x1bc[0x4bc - 0x1bc];
     char field_0x4bc[0x100];                      // driver name (PCGame 0x004c1610)
     int field_0x5bc;                              // "PartialTexBlt"
     UnknownDeviceIdentifier field_0x5c0;

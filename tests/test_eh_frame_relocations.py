@@ -12,9 +12,14 @@ HANDLER_VA = 0x54ad68
 FILE_VA = 0x56b6c8
 
 
-def frame_fixture(literal=b'D:\\aardvark\\VC\\krusty2\\gameobj.cpp\0', prologue=b'\x6a\xff\x68'):
-    """func: push -1; push $L1; mov eax, fs:[__except_list]; push ??_C@str; ret."""
+def frame_fixture(literal=b'D:\\aardvark\\VC\\krusty2\\gameobj.cpp\0', prologue=b'\x6a\xff\x68',
+                  scheduled=False):
+    """func: push -1; push $L1; mov eax, fs:[__except_list]; push ??_C@str; ret.
+
+    With `scheduled`, the fs:[0] load comes first (handler push at +9)."""
     text = prologue + b'\0' * 4 + b'\x64\xa1' + b'\0' * 4 + b'\x68' + b'\0' * 4 + b'\xc3'
+    if scheduled:
+        text = b'\x64\xa1' + b'\0' * 4 + b'\x6a\xff\x68' + b'\0' * 4 + b'\x68' + b'\0' * 4 + b'\xc3'
     textx = b'\xb8\0\0\0\0\xc3'
     sections = [(b'.text', text, 0x60501020), (b'.text$x', textx, 0x60501020),
                 (b'.data', literal, 0xc0300040)]
@@ -30,6 +35,8 @@ def frame_fixture(literal=b'D:\\aardvark\\VC\\krusty2\\gameobj.cpp\0', prologue=
     symbols += struct.pack('<8sIhHBB', long_name(b'__except_list'), 0, 0, 0, 2, 0)
     symbols += struct.pack('<8sIhHBB', long_name(b'??_C@_0CD@ABC@D?3?2aardvark@'), 0, 3, 0, 2, 0)
     relocs = struct.pack('<IIH', 3, 2, 6) + struct.pack('<IIH', 9, 3, 6) + struct.pack('<IIH', 14, 4, 6)
+    if scheduled:
+        relocs = struct.pack('<IIH', 2, 3, 6) + struct.pack('<IIH', 9, 2, 6) + struct.pack('<IIH', 14, 4, 6)
     header_size = 20 + 40 * len(sections)
     ptr = header_size
     headers, blobs = bytearray(), bytearray()
@@ -68,6 +75,14 @@ class EhFrameRelocationTests(unittest.TestCase):
         self.assertTrue(result['strict_exact'])
         self.assertEqual([row['symbol'] for row in result['relocations_applied']],
                          ['func$ehhandler', '__except_list', '__FILE__'])
+
+    def test_scheduled_prologue_handler_resolves(self):
+        retail_bytes = (b'\x64\xa1' + b'\0' * 4 + b'\x6a\xff\x68' + struct.pack('<I', HANDLER_VA)
+                        + b'\x68' + struct.pack('<I', FILE_VA) + b'\xc3')
+        result = match_object(self.load(scheduled=True), 'func', TARGET_VA, retail_bytes, self.bindings)
+        self.assertTrue(result['strict_exact'])
+        self.assertEqual([row['symbol'] for row in result['relocations_applied']],
+                         ['__except_list', 'func$ehhandler', '__FILE__'])
 
     def test_wrong_handler_address_fails(self):
         result = match_object(self.load(), 'func', TARGET_VA, retail(handler=HANDLER_VA + 0x20), self.bindings)

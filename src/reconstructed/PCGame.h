@@ -65,7 +65,7 @@ public:
     // 0x004bfc50: PCGame's start-up before Game's initialiser; fills
     // `message` on failure.
     int UnknownFunction4bfc50(char* message);
-    void UnknownFunction4c0d10();                        // 0x004c0d10: profiles the displays
+    void UnknownFunction4c0d10();                        // 0x004c0d10: profiles the displays (near miss, samples/game)
     int UnknownFunction4c1610(UnknownDisplay* display);  // 0x004c1610: saves its profile
     int UnknownFunction4c16b0();                         // 0x004c16b0: profiles every display
     int UnknownFunction4c1410();                         // 0x004c1410: 1 if any profile is stale

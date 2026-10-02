@@ -57,7 +57,9 @@ public:
     UnknownSurfaceInterface* field_0x4c; // released by the destructor; PCGame slot 5 restores it
     UnknownRenderInterface* field_0x50; // the device
     UnknownGuid field_0x54;             // Direct3D device GUID (PCGame +0x2f8); cleared by the constructor
-    unsigned char field_0x64[0x1a8 - 0x64];
+    unsigned char field_0x64[0x164 - 0x64];
+    unsigned int field_0x164;            // capability bits (0x4000: 800x600, PCGame 0x004c0d10)
+    unsigned char field_0x168[0x1a8 - 0x168];
     unsigned int field_0x1a8;            // capability bits (PCGame slot 7 tests 0x1, 0x800)
     unsigned char field_0x1ac[0x1c4 - 0x1ac];
     unsigned int field_0x1c4;            // texture filter capability bits (0x2, 0x20)
