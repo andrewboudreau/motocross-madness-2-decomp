@@ -137,6 +137,55 @@ int PCTextureMap::UnknownFunction4c7b00(void* destinationRect, UnknownSurfaceInt
     return 0;
 }
 
+// 0x004c83a0: follows the attached mip surfaces, halving the width, until it
+// reaches `width`. (`next` shares the dead parameter's stack slot, as in
+// retail.)
+UnknownSurfaceInterface* PCTextureMap::UnknownFunction4c83a0(int width) {
+    UnknownSurfaceCaps caps;
+    memset(&caps, 0, sizeof(caps));
+    int size = field_0x14;
+    UnknownSurfaceInterface* surface = field_0x70;
+    caps.caps = 0x401000;
+    long result = 0;
+    while (size != width) {
+        UnknownSurfaceInterface* next;
+        result = surface->UnknownMethod12(&caps, &next);
+        if (result)
+            break;
+        surface = next;
+        size /= 2;
+    }
+    if (result && result != (long)0x887600ff)
+        UnknownReportDirectDrawError(result, __FILE__, 2034);
+    else if (size == width)
+        return surface;
+    return 0;
+}
+
+// 0x004c8430: fills every mip level.
+int PCTextureMap::UnknownVirtualSlot20() {
+    if (field_0x70) {
+        UnknownFunction4c84e0(field_0x70, 0);
+        if (field_0x24 > 1) {
+            UnknownSurfaceInterface* surface;
+            UnknownSurfaceCaps caps;
+            UnknownSurfaceInterface* top = field_0x70;
+            memset(&caps, 0, sizeof(caps));
+            caps.caps = 0x401000;
+            long result = top->UnknownMethod12(&caps, &surface);
+            while (!result) {
+                UnknownFunction4c84e0(surface, 0);
+                result = surface->UnknownMethod12(&caps, &surface);
+            }
+            if (result != (long)0x887600ff) {
+                UnknownReportDirectDrawError(result, __FILE__, 2084);
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 // 0x004c84e0
 int PCTextureMap::UnknownFunction4c84e0(UnknownSurfaceInterface* surface, int value) {
     UnknownSurfaceDesc desc;
@@ -189,4 +238,105 @@ done:
     return 1;
 failed:
     return 0;
+}
+
+// 0x004c77d0: fills each mip level by downsampling the level above it.
+int PCTextureMap::UnknownVirtualSlot15(int filter) {
+    UnknownSurfaceInterface* level;
+    void* sourceBits;
+    int bytesPerPixel;
+    int stride;
+    long result;
+    UnknownSurfaceCaps caps;
+    UnknownSurfaceDesc desc;
+    memset(&caps, 0, sizeof(caps));
+    caps.caps = 0x401000;
+    bytesPerPixel = UnknownFunction511970(field_0x20);
+    UnknownSurfaceInterface* parent = field_0x70;
+    memset(&desc, 0, sizeof(desc));
+    desc.size = sizeof(desc);
+    if (parent->UnknownMethod25(0, &desc, 0x801, 0))
+        goto failed;
+    stride = desc.pitch / bytesPerPixel;
+    sourceBits = desc.surface;
+    result = parent->UnknownMethod12(&caps, &level);
+    while (!result) {
+        memset(&desc, 0, sizeof(desc));
+        desc.size = sizeof(desc);
+        if (level->UnknownMethod25(0, &desc, 0x801, 0))
+            goto failed;
+        int sourceStride = stride;
+        stride = desc.pitch / bytesPerPixel;
+        UnknownFunction4d1b90(desc.surface, sourceBits, desc.width, desc.height, stride, sourceStride, 1,
+                              field_0x20, field_0x2c, filter);
+        if (parent->UnknownMethod32(0))
+            goto failed;
+        sourceBits = desc.surface;
+        parent = level;
+        result = parent->UnknownMethod12(&caps, &level);
+    }
+    if (result != (long)0x887600ff) {
+        UnknownReportDirectDrawError(result, __FILE__, 1421);
+        return 0;
+    }
+    if (parent->UnknownMethod32(0))
+        goto failed;
+    return 1;
+failed:
+    return 0;
+}
+
+// Sets render state `state` to `value` in the texture's list, appending it
+// when absent.
+static inline void SetRenderStatePair(TextureMap* map, int state, int value) {
+    int i;
+    for (i = 0; i < map->field_0x44; i++) {
+        if (map->field_0x48[i].state == state)
+            break;
+    }
+    if (i < map->field_0x44) {
+        map->field_0x48[i].value = value;
+    } else {
+        map->field_0x48[map->field_0x44].state = state;
+        map->field_0x48[map->field_0x44].value = value;
+        map->field_0x44++;
+    }
+}
+
+// 0x004c81d0: for 16-bit and 0x613 formats, applies colour `color` as the
+// key on every level (0x004c7ef0), re-uploads, sets the surfaces' colour key
+// and records render states 0x29 = 1 and 0x1b = 0.
+int PCTextureMap::UnknownVirtualSlot18(unsigned int color) {
+    if (field_0x20 != 0x22b && field_0x20 != 0x235 && field_0x20 != 0x378 && field_0x20 != 0x613)
+        return 0;
+    if (field_0x70) {
+        UnknownFunction4c7ef0(field_0x70, color);
+        if (field_0x24 > 1) {
+            UnknownSurfaceInterface* surface;
+            UnknownSurfaceCaps caps;
+            UnknownSurfaceInterface* top = field_0x70;
+            memset(&caps, 0, sizeof(caps));
+            caps.caps = 0x401000;
+            long result = top->UnknownMethod12(&caps, &surface);
+            while (!result) {
+                UnknownFunction4c7ef0(surface, color);
+                result = surface->UnknownMethod12(&caps, &surface);
+            }
+            if (result != (long)0x887600ff) {
+                UnknownReportDirectDrawError(result, __FILE__, 1811);
+                return 0;
+            }
+        }
+    }
+    if ((color != 0xff00ff || field_0x20 == 0x22b8) && field_0x74)
+        UnknownVirtualSlot9(0, -1);
+    if (field_0x20 == 0x613)
+        return 1;
+    if (field_0x70 && field_0x70->UnknownMethod29(8, &field_0x34) ||
+        field_0x74 && field_0x74->UnknownMethod29(8, &field_0x34))
+        return 0;
+    field_0x30 = 1;
+    SetRenderStatePair(this, 0x29, 1);
+    SetRenderStatePair(this, 0x1b, 0);
+    return 1;
 }

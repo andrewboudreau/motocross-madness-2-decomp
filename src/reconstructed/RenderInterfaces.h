@@ -50,6 +50,14 @@ struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod35(int stage, void* texture);     // SetTexture
     virtual long __stdcall UnknownMethod36(int stage, int type, int* value); // GetTextureStageState
     virtual long __stdcall UnknownMethod37(int stage, int type, int value);  // SetTextureStageState
+    virtual long __stdcall UnknownMethod38();
+    virtual long __stdcall UnknownMethod39();
+    virtual long __stdcall UnknownMethod40();
+    virtual long __stdcall UnknownMethod41();
+    virtual long __stdcall UnknownMethod42();
+    virtual long __stdcall UnknownMethod43(struct UnknownSurfaceInterface* destination, void* point,
+                                           struct UnknownSurfaceInterface* source, void* rect,
+                                           int flags);                       // Load
 };
 
 // Surface at PCRenderTarget+0x48 (IDirectDrawSurface7-shaped).
@@ -62,7 +70,8 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod5(void* destination, UnknownSurfaceInterface* source,
                                           void* sourceRect, int flags, void* effects); // Blt
     virtual long __stdcall UnknownMethod6();
-    virtual long __stdcall UnknownMethod7();
+    virtual long __stdcall UnknownMethod7(long x, long y, UnknownSurfaceInterface* source, void* rect,
+                                          int flags);                       // BltFast
     virtual long __stdcall UnknownMethod8();
     virtual long __stdcall UnknownMethod9();
     virtual long __stdcall UnknownMethod10();
@@ -84,7 +93,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod26();
     virtual long __stdcall UnknownMethod27();                             // Restore
     virtual long __stdcall UnknownMethod28();
-    virtual long __stdcall UnknownMethod29();
+    virtual long __stdcall UnknownMethod29(int flags, void* key);         // SetColorKey
     virtual long __stdcall UnknownMethod30();
     virtual long __stdcall UnknownMethod31(void* palette);                 // SetPalette
     virtual long __stdcall UnknownMethod32(void* rect);                   // Unlock

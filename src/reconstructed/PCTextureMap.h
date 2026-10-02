@@ -30,16 +30,16 @@ public:
     virtual void UnknownVirtualSlot6() = 0;
     virtual int UnknownVirtualSlot7() = 0;
     virtual int UnknownVirtualSlot8(int a, int b, int c) = 0;
-    virtual void UnknownVirtualSlot9(int a, int b) = 0;
+    virtual int UnknownVirtualSlot9(struct UnknownRect* rect, int mode) = 0;
     virtual void UnknownVirtualSlot10() = 0;
     virtual int UnknownVirtualSlot11() = 0;
     virtual void UnknownVirtualSlot12() = 0;
     virtual void* UnknownVirtualSlot13(void* rect, long* pitch, int flags) = 0;
     virtual int UnknownVirtualSlot14(void* rect) = 0;
-    virtual void UnknownVirtualSlot15() = 0;
+    virtual int UnknownVirtualSlot15(int filter) = 0;
     virtual void* UnknownVirtualSlot16(int level) = 0;
     virtual int UnknownVirtualSlot17(int level) = 0;
-    virtual void UnknownVirtualSlot18() = 0;
+    virtual int UnknownVirtualSlot18(unsigned int color) = 0;
     virtual void UnknownVirtualSlot19() = 0;
     virtual int UnknownVirtualSlot20() = 0;
 
@@ -53,7 +53,7 @@ public:
     int field_0x24;                           // 1: no mip levels
     unsigned char field_0x28[0x2c - 0x28];
     UnknownTexturePalette* field_0x2c;
-    unsigned char field_0x30[0x34 - 0x30];
+    int field_0x30;                           // has a colour key
     int field_0x34;                           // colour key (also +0x38)
     int field_0x38;
     unsigned char field_0x3c[0x44 - 0x3c];
@@ -76,6 +76,11 @@ int UnknownFunction511970(int format);
 // (0x00511580) about lost or released surfaces.
 extern int g_UnknownGlobal689964;
 
+// cdecl 0x004d1b90: downsamples `source` (stride in pixels) into the
+// width x height `destination`.
+void UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
+                           int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter);
+
 // cdecl 0x004c86e0: formats a DirectDraw result with the caller's __FILE__
 // and __LINE__.
 void UnknownReportDirectDrawError(long result, const char* file, int line);
@@ -92,16 +97,17 @@ public:
     virtual int UnknownVirtualSlot7();        // 0x004c7470: whether +0x74 exists
     // 0x004c7480: creates the texture surface from +0x70 (or shares it).
     virtual int UnknownVirtualSlot8(int a, int b, int c);
-    virtual void UnknownVirtualSlot9(int a, int b); // 0x004c7640
+    // 0x004c7640: uploads +0x70 into +0x74, level by level.
+    virtual int UnknownVirtualSlot9(struct UnknownRect* rect, int mode);
     virtual void UnknownVirtualSlot10();      // 0x004c7610: releases the texture surface
     virtual int UnknownVirtualSlot11();       // 0x004c7970: sets it as texture stage 0
     virtual void UnknownVirtualSlot12();      // 0x004c6040: restores a lost surface
     virtual void* UnknownVirtualSlot13(void* rect, long* pitch, int flags); // 0x004c79e0: locks +0x70
     virtual int UnknownVirtualSlot14(void* rect); // 0x004c7a50: unlocks +0x70
-    virtual void UnknownVirtualSlot15();      // 0x004c77d0
+    virtual int UnknownVirtualSlot15(int filter); // 0x004c77d0: builds the mip levels
     virtual void* UnknownVirtualSlot16(int level); // 0x004c7a70: locks a mip level
     virtual int UnknownVirtualSlot17(int level); // 0x004c7ad0: unlocks it
-    virtual void UnknownVirtualSlot18();      // 0x004c81d0
+    virtual int UnknownVirtualSlot18(unsigned int color); // 0x004c81d0: colour-keys every level
     virtual void UnknownVirtualSlot19();      // 0x004c79a0: binds and applies the render states
     virtual int UnknownVirtualSlot20();       // 0x004c8430: fills every mip level
 
@@ -113,6 +119,7 @@ public:
     UnknownSurfaceInterface* UnknownFunction4c83a0(int width);
     int UnknownFunction4c84e0(UnknownSurfaceInterface* surface, int value); // 0x004c84e0: fills a level
     void UnknownFunction4c7e30(unsigned int color); // 0x004c7e30: sets the colour key
+    void UnknownFunction4c7ef0(UnknownSurfaceInterface* surface, unsigned int color); // 0x004c7ef0
     void UnknownFunction4c8550(UnknownSurfaceDesc* desc, int value);        // 0x004c8550
 
     UnknownSurfaceInterface* field_0x70;      // system-memory surface (counted in DirectX memory)

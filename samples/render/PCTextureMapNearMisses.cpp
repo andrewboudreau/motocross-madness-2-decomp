@@ -1,66 +1,24 @@
 // Near-miss PCTextureMap candidates, kept out of src/reconstructed until
 // they match. See docs/PCTEXTUREMAP.md.
 //
-// PCTextureMap::UnknownFunction4c83a0 (0x004c83a0, 142 bytes): retail keeps
-// the attached surface in the dead `width` parameter's stack slot (its frame
-// is 4 bytes smaller) and clears the capabilities in another order.
+// PCTextureMap::UnknownFunction4c7e30 (0x004c7e30, 189 bytes): the colour
+// key conversion. Retail packs each component as `(color >> n) & mask`
+// joined with `or`. VC6 here factors the common shift out of every `|`
+// form tried (grouping, order, mask-first, component and inline-helper
+// forms); `+` keeps retail's shape but emits `add`.
 //
-// PCTextureMap::UnknownVirtualSlot20 (0x004c8430, 161 bytes): the
-// capabilities are cleared as caps = 0, caps = 0x401000, then the other
-// three, after +0x70 is loaded. memset, `= {0}` and field-by-field forms
-// place the stores differently.
+// PCTextureMap::UnknownVirtualSlot9 (0x004c7640, 385 bytes): the upload.
+// With separate `next` surfaces VC6 packs them into the dead parameter
+// slots as retail does (the frame matches), but retail keeps `this` in ebp
+// from the start, the area in registers across the level loop and tests
+// the loop at the top on every pass; VC6 here rotates the loop and pushes
+// ebp late. while, for(;;) and goto loops compile alike. 117 of 385 bytes.
 #include <string.h>
 
+#include "../../src/reconstructed/PCRenderTarget.h"
+#include "../../src/reconstructed/TrackGame.h"
+
 #include "../../src/reconstructed/PCTextureMap.h"
-
-// 0x004c83a0: follows the attached mip surfaces, halving the width, until it
-// reaches `width`.
-UnknownSurfaceInterface* PCTextureMap::UnknownFunction4c83a0(int width) {
-    UnknownSurfaceCaps caps;
-    memset(&caps, 0, sizeof(caps));
-    int size = field_0x14;
-    UnknownSurfaceInterface* surface = field_0x70;
-    caps.caps = 0x401000;
-    if (size != width) {
-        long result;
-        do {
-            result = surface->UnknownMethod12(&caps, &surface);
-            if (result)
-                break;
-            size /= 2;
-        } while (size != width);
-        if (result && result != (long)0x887600ff) {
-            UnknownReportDirectDrawError(result, __FILE__, 2034);
-            return 0;
-        }
-        if (size != width)
-            return 0;
-    }
-    return surface;
-}
-
-// 0x004c8430
-int PCTextureMap::UnknownVirtualSlot20() {
-    if (field_0x70) {
-        UnknownFunction4c84e0(field_0x70, 0);
-        if (field_0x24 > 1) {
-            UnknownSurfaceInterface* surface;
-            UnknownSurfaceCaps caps;
-            memset(&caps, 0, sizeof(caps));
-            caps.caps = 0x401000;
-            long result = field_0x70->UnknownMethod12(&caps, &surface);
-            while (!result) {
-                UnknownFunction4c84e0(surface, 0);
-                result = surface->UnknownMethod12(&caps, &surface);
-            }
-            if (result != (long)0x887600ff) {
-                UnknownReportDirectDrawError(result, __FILE__, 2084);
-                return 0;
-            }
-        }
-    }
-    return 1;
-}
 
 // 0x004c7e30: converts a 24-bit colour to the texture's format (555, 565 or
 // a palette index) and stores it as the colour key.
@@ -77,3 +35,51 @@ void PCTextureMap::UnknownFunction4c7e30(unsigned int color) {
     field_0x34 = field_0x38 = key;
 }
 
+// 0x004c7640: with partial texture blits (Display+0x5bc) or a positive
+// `mode`, copies `rect` (or the whole texture) down the mip chain with
+// BltFast, halving it per level; otherwise lets the device Load it. Then
+// applies the colour key.
+int PCTextureMap::UnknownVirtualSlot9(UnknownRect* rect, int mode) {
+    UnknownSurfaceInterface* source = field_0x70;
+    UnknownSurfaceInterface* destination = field_0x74;
+    if (!source || !destination)
+        return 0;
+    if (mode > 0 || mode == -1 && g_UnknownGlobal56e26c->field_0x0c->field_0x5bc > 0 ||
+        g_UnknownGlobal56e26c->field_0x0c->field_0x5bc <= 0) {
+        UnknownRect area;
+        if (rect && g_UnknownGlobal56e26c->field_0x0c->field_0x5bc > 0) {
+            area = *rect;
+        } else {
+            area.left = 0;
+            area.top = 0;
+            area.right = field_0x14;
+            area.bottom = field_0x18;
+        }
+        UnknownSurfaceCaps caps;
+        memset(&caps, 0, sizeof(caps));
+        caps.caps = 0x401000;
+        while (area.right - area.left > 0 && area.bottom - area.top > 0) {
+            if (destination->UnknownMethod7(area.left, area.top, source, &area, 0x10))
+                return 0;
+            UnknownSurfaceInterface* nextSource;
+            UnknownSurfaceInterface* nextDestination;
+            long sourceResult = source->UnknownMethod12(&caps, &nextSource);
+            long destinationResult = destination->UnknownMethod12(&caps, &nextDestination);
+            if (sourceResult || destinationResult)
+                break;
+            source = nextSource;
+            destination = nextDestination;
+            area.top >>= 1;
+            area.left >>= 1;
+            area.bottom >>= 1;
+            area.right >>= 1;
+        }
+        if (field_0x30 && field_0x74->UnknownMethod29(8, &field_0x34))
+            return 0;
+        return 1;
+    }
+    if (destination != source)
+        ((PCRenderTarget*)g_UnknownGlobal56e26c->field_0x10)
+            ->field_0x50->UnknownMethod43(destination, 0, source, 0, 0);
+    return 0;
+}

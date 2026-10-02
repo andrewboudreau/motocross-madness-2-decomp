@@ -14,7 +14,7 @@ at +0x74. An object at +0x7c is destroyed through vfwdeco.cpp's
 
 ## Status
 
-Exact (16 calibration cases):
+Exact (20 calibration cases):
 - the constructor `0x004c5f00` (TextureMap's `0x0050a4e0`, then clears
   +0x70..+0x7c);
 - the scalar deleting destructor `0x004c5f30` and the destructor
@@ -39,6 +39,22 @@ Exact (16 calibration cases):
 - `0x004c7420`, which recreates a lost texture through slot 8;
 - `0x004c7b00`, which blits +0x70 into another surface unless told to
   skip. The `if (!skip)` form puts the blit first, as retail does;
+- `0x004c83a0`, which finds the mip level of a given width through
+  GetAttachedSurface (method 12), reporting errors other than `0x887600ff`
+  (line 2034). Retail keeps the attached surface in the dead `width`
+  parameter's stack slot: a separate `next` local reproduces that, since
+  VC6 packs it into the slot;
+- slot 15, which builds the mip chain by downsampling each level from its
+  parent through Pixtrans.cpp's `0x004d1b90` (error line 1421). One
+  `stride` variable carries the parent's stride; the lock and unlock
+  failures share one `return 0` through `goto failed`;
+- slot 18, which colour-keys the 16-bit (and `0x613`) formats on every
+  level (`0x004c7ef0`, error line 1811), re-uploads, sets the surfaces'
+  colour key and records render states 0x29 = 1 and 0x1b = 0 through an
+  inline find-or-append helper. Retail compares the format with `0x22b8`
+  in the re-upload test (sic);
+- slot 20, which fills every mip level (error line 2084). Loading +0x70
+  into a local before the caps memset reproduces retail's store order;
 - `0x004c84e0`, which locks a level (flags 0x811), fills it through
   `0x004c8550` and unlocks it.
 
@@ -46,14 +62,11 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
 - `0x004c7e30`, the colour key: a 24-bit colour packed as 555 or 565, or
   looked up in the palette's 555 table (+0x2c, +0x710). VC6 factors the
   common shift out of every `|` form tried;
-- `0x004c83a0`, which finds the mip level of a given width through
-  GetAttachedSurface (method 12) and reports errors other than
-  `0x887600ff` with `0x004c86e0` (line 2034). Retail keeps the surface in
-  the dead parameter's stack slot;
-- slot 20, which fills every mip level (error line 2084). Retail clears the
-  capabilities in an order that the memset, `= {0}` and field-by-field
-  forms all fail to reproduce.
+- slot 9 (117 of 385 bytes), the upload: BltFast down the mip chain with
+  partial texture blits or a positive mode, otherwise the device's Load.
+  The frame matches with separate `next` surfaces. Retail keeps `this` in
+  ebp and tests the level loop at the top on every pass.
 
-Not reconstructed: slots 4, 5, 6, 9, 15 and 18, the TextureMap base
+Not reconstructed: slots 4, 5 and 6, the TextureMap base
 (`0x0050a4e0`, `0x0050ab40`), `0x004c7b40`, `0x004c7e30`, `0x004c7ef0`,
 `0x004c8550` and the error reporter `0x004c86e0`.
