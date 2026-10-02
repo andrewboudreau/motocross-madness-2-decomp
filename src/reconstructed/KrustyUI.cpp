@@ -2,6 +2,7 @@
 
 #include "DebugAlloc.h"
 #include "GameUi.h"
+#include "RenderTarget.h"
 #include "TrackGame.h"
 
 // cdecl 0x005053b0, called first on shutdown with 0.
@@ -75,4 +76,76 @@ void KrustyUI::UnknownFunction49bb80() {
         operator delete(field_0x60, __FILE__, 1453);
     field_0x60 = 0;
     field_0x64 = 0;
+}
+
+// 0x00499ad0
+void KrustyUI::UnknownVirtualSlot4() {
+    GameObject::UnknownVirtualSlot4();
+}
+
+// 0x00499ac0
+void KrustyUI::UnknownVirtualSlot5() {
+    GameObject::UnknownVirtualSlot5();
+}
+
+// 0x00499ae0
+int KrustyUI::UnknownVirtualSlot10(float frameTime) {
+    return GameObject::UnknownVirtualSlot10(frameTime);
+}
+
+// 0x00499af0
+int KrustyUI::UnknownVirtualSlot18() {
+    GameObject::UnknownVirtualSlot18();
+    return 1;
+}
+
+// 0x00499a40
+int KrustyUI::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    field_0x4a4 = 0;
+    return GameObject::UnknownVirtualSlot23(event, entry) != 0;
+}
+
+// 0x00499a70: network message 0x101 sets the network object's +0x10.
+int KrustyUI::UnknownVirtualSlot24(int type, void* data, int c, int d, int e) {
+    if (GameObject::UnknownVirtualSlot24(type, data, c, d, e))
+        return 1;
+    if (type == 0x101)
+        g_UnknownGlobal56e26c->field_0x08->field_0x10 = 1;
+    return 0;
+}
+
+// 0x00499980: also hands the value to the +0x464 scene.
+int KrustyUI::UnknownVirtualSlot25(void* value) {
+    GameObject::UnknownVirtualSlot25(value);
+    if (field_0x464)
+        field_0x464->UnknownVirtualSlot25(value);
+    return 1;
+}
+
+// 0x004999f0
+void KrustyUI::UnknownFunction4999f0(GameObject* parent) {
+    if (field_0x464) {
+        parent->UnknownFunction469190(field_0x464, -1);
+        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(field_0x468);
+    }
+}
+
+// 0x00499a20
+void KrustyUI::UnknownFunction499a20() {
+    if (field_0x464) {
+        field_0x464->UnknownFunction4691f0();
+        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
+    }
+}
+
+// 0x00499b00
+void KrustyUI::UnknownFunction499b00() {
+    if (field_0x2c)
+        field_0x2c->UnknownFunction486630(1);
+}
+
+// 0x00499b10
+void KrustyUI::UnknownFunction499b10() {
+    if (field_0x2c)
+        field_0x2c->UnknownFunction486630(0);
 }

@@ -9,7 +9,7 @@ TrackGame keeps it at +0x56c (`ui`).
 
 ## Status
 
-Exact (7 calibration cases):
+Exact (18 calibration cases):
 - the constructor `0x004987f0`. Eight 8-byte `{int, char}` records at
   +0x634 have an inline constructor, so VC6 emits the clearing loop before
   the vtable store; the body then clears the other fields in retail order;
@@ -23,7 +23,14 @@ Exact (7 calibration cases):
 - `0x0049b530`: tells the "ProgressBar" control of the +0x490 page 1;
 - `0x0049bb80`: frees +0x60 (line 1453) and clears it and +0x64;
 - the cdecl GUI progress callback `0x0049bda0`, which tail-calls the mode
-  object's `0x00523580`.
+  object's `0x00523580`;
+- the overrides of slots 4 and 5 (base tail calls), 10, 18 (returns 1),
+  23 (clears +0x4a4), 24 (message 0x101 sets the network object's +0x10)
+  and 25 (also forwards the value to the +0x464 scene);
+- `0x004999f0` and `0x00499a20`, which show and hide the +0x464 scene and
+  set the owner render target's camera (+0x468, or none);
+- `0x00499b00` and `0x00499b10`, which call the GUI's `0x00486630` with 1 and
+  0.
 
 Near miss (`samples/ui/KrustyUINearMisses.cpp`): `0x004988a0`, TrackGame
 slot 4's initialiser (872 of 1104 bytes). It loads 36 short strings
@@ -39,6 +46,7 @@ The GUI page and control classes are declared in
 that TrackGame.cpp includes disturbs TrackGame slot 1 (see
 [TrackGame](TRACKGAME.md)).
 
-Not reconstructed: `0x00498cf0` (3114 bytes, with function-local statics),
-`0x00499b20` (2432 bytes, opens a menu) and the other helpers in
-`0x00499980`–`0x0049bc50`.
+Not reconstructed: `0x00498cf0` (3114 bytes, with function-local statics;
+the empty `0x00499920`–`0x00499970` are their exit destructors),
+`0x00499b20` (2432 bytes, opens a menu) and `0x0049a4a0`–`0x0049bc50`
+except those above.

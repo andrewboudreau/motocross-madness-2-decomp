@@ -2,6 +2,7 @@
 
 #include "GameObject.h"
 
+class Camera;
 class RenderTarget;
 
 // Object at KrustyUI+0x2c (its methods sit among GUIManager.cpp's literals).
@@ -76,6 +77,17 @@ class KrustyUI : public GameObject {
 public:
     explicit KrustyUI(int flags);                                  // 0x004987f0
     virtual ~KrustyUI();                      // 0x0049b470 (deleting wrapper 0x00498880)
+    virtual void UnknownVirtualSlot4();       // 0x00499ad0
+    virtual void UnknownVirtualSlot5();       // 0x00499ac0
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x00499ae0
+    virtual int UnknownVirtualSlot18();       // 0x00499af0
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00499a40
+    virtual int UnknownVirtualSlot24(int type, void* data, int c, int d, int e); // 0x00499a70
+    virtual int UnknownVirtualSlot25(void* value); // 0x00499980
+    void UnknownFunction4999f0(GameObject* parent); // 0x004999f0: shows the +0x464 scene
+    void UnknownFunction499a20();             // 0x00499a20: hides it
+    void UnknownFunction499b00();             // 0x00499b00
+    void UnknownFunction499b10();             // 0x00499b10
     void UnknownFunction4999b0();             // 0x004999b0: shutdown (the destructor's first step)
     void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
     void UnknownFunction49a540();             // 0x0049a540
@@ -103,7 +115,8 @@ public:
     int field_0x64;
     unsigned char field_0x68[0x464 - 0x68];
     GameObject* field_0x464;                  // released by 0x004999b0
-    unsigned char field_0x468[0x48c - 0x468];
+    Camera* field_0x468;                      // made current while +0x464 is shown
+    unsigned char field_0x46c[0x48c - 0x46c];
     int field_0x48c;
     UnknownGameUiPage* field_0x490;
     void* field_0x494;                        // input context, restored to the window (EventManager 0x0045e710)
