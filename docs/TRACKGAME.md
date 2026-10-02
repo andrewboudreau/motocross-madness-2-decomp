@@ -17,9 +17,9 @@ derives from PCGame.
 
 ## Status
 
-Exact (15 calibration cases):
+Exact (17 calibration cases):
 - the constructor and both destructors;
-- slots 2, 5, 10, 13, 14, 15 and 18;
+- slots 1, 2, 3, 5, 10, 13, 14, 15 and 18;
 - the menu toggle `0x00521860`;
 - the string-resource loader `0x00521970`;
 - the helpers `0x00521a30`, `0x00521a40` and `0x00521cd0`.
@@ -46,4 +46,15 @@ The destructor:
 - frees `lang.dll`;
 - on Windows NT, re-enables the screen saver.
 
-Not reconstructed: slots 1, 3 and 4.
+Slot 1 runs the start-up checks:
+- the +0x578 object's two checks (the second retried from a message box);
+- a warning below 64 MB of available memory;
+- on NT, turns the screen saver off;
+- runs EBUEula.dll's `EBUEula` entry point on `EULA.rtf`.
+
+Slot 3 adds ten `Res\*.res` archives to the resource manager at
+`0x00572b44`. Its code sits among ResourceManager.cpp's literals; no RTTI
+names it.
+
+Not reconstructed: slot 4, the 1543-byte game set-up that creates the menus,
+input mapping, network and race objects.

@@ -28,6 +28,28 @@ extern "C" __declspec(dllimport) int __stdcall SystemParametersInfoA(unsigned in
 extern "C" __declspec(dllimport) int __stdcall LoadStringA(void* instance, unsigned int id,
                                                           char* buffer, int size);
 
+extern "C" __declspec(dllimport) int __stdcall ShowCursor(int show);
+extern "C" __declspec(dllimport) int __stdcall MessageBoxA(void* window, const char* text,
+                                                          const char* caption, unsigned int type);
+extern "C" __declspec(dllimport) void* __stdcall GetProcAddress(void* module, const char* name);
+
+// KERNEL32 MEMORYSTATUS.
+struct UnknownMemoryStatus {
+    unsigned long length;
+    unsigned long memoryLoad;
+    unsigned long totalPhys;
+    unsigned long availPhys;
+    unsigned long totalPageFile;
+    unsigned long availPageFile;
+    unsigned long totalVirtual;
+    unsigned long availVirtual;
+};
+extern "C" __declspec(dllimport) void __stdcall GlobalMemoryStatus(UnknownMemoryStatus* status);
+
+// EBUEula.dll's entry point: shows the EULA for the registry key; nonzero
+// when accepted.
+typedef int (*UnknownEulaProc)(const char* key, const char* path, int a, int b);
+
 // IMM32, called through the linker's import thunks.
 extern "C" void* __stdcall ImmGetContext(void* window);
 extern "C" int __stdcall ImmGetOpenStatus(void* context);
@@ -107,6 +129,87 @@ TrackGame::~TrackGame() {
     delete g_UnknownGlobal68a48c;
     if (field_0x424.platformId == 2 && field_0x34c8)
         SystemParametersInfoA(0x11, 1, 0, 2);
+}
+
+// 0x00520ab0: start-up checks: the first +0x578 check (error 0x13b3), the
+// second, retried until it passes or is cancelled (0x13b5), a warning below
+// 64 MB of available memory (0x14bb), then the EULA through EBUEula.dll.
+// On NT it also turns the screen saver off, remembering the setting.
+int TrackGame::UnknownVirtualSlot1() {
+    UnknownMemoryStatus status;
+    char text[128];
+    if (!field_0x578.UnknownFunction523c90() &&
+        LoadStringA(field_0x420, 0x13b3, text, sizeof(text))) {
+        ShowCursor(1);
+        MessageBoxA(0, text, field_0x3a0, 0x10);
+        return 0;
+    }
+    while (!field_0x578.UnknownFunction523bf0()) {
+        if (LoadStringA(field_0x420, 0x13b5, text, sizeof(text))) {
+            ShowCursor(1);
+            if (MessageBoxA(0, text, field_0x3a0, 0x15) == 2)
+                return 0;
+        }
+    }
+    GlobalMemoryStatus(&status);
+    if (status.availPhys + status.availPageFile < 0x4000000 &&
+        LoadStringA(field_0x420, 0x14bb, text, sizeof(text))) {
+        ShowCursor(1);
+        int answer = MessageBoxA(0, text, field_0x3a0, 0x23);
+        if (answer == 2 || answer == 7)
+            return 0;
+    }
+    if (field_0x424.platformId == 2) {
+        SystemParametersInfoA(0x10, 0, &field_0x34c8, 0);
+        if (field_0x34c8)
+            SystemParametersInfoA(0x11, 0, 0, 2);
+    }
+    void* library = LoadLibraryA("EBUEula.dll");
+    if (!library)
+        return 0;
+    UnknownEulaProc eula = (UnknownEulaProc)GetProcAddress(library, "EBUEula");
+    if (!eula) {
+        FreeLibrary(library);
+        return 0;
+    }
+    char name[260];
+    char path[260];
+    int count = strlen("EULA.rtf");
+    int length = count > 0x103 ? 0x103 : count;
+    strncpy(name, "EULA.rtf", length);
+    name[length] = 0;
+    if (!UnknownVirtualSlot18(name, path))
+        return 0;
+    int accepted = eula(field_0x4b8, path, 0, 1);
+    FreeLibrary(library);
+    if (!accepted)
+        return 0;
+    return Game::UnknownVirtualSlot1();
+}
+
+// Resolves Res\\<file> through slot 18 and adds it to the resource manager;
+// fails the caller when the path cannot be resolved.
+#define UNKNOWN_ADD_ARCHIVE(file)                                    \
+    sprintf(name, "%s\\%s", "Res", file);                          \
+    if (!UnknownVirtualSlot18(name, path))                           \
+        return 0;                                                    \
+    g_UnknownResourceManager572b44->UnknownFunction4e9030(path, 0);
+
+// 0x00520d10
+int TrackGame::UnknownVirtualSlot3() {
+    char name[260];
+    char path[260];
+    UNKNOWN_ADD_ARCHIVE("Bike.res")
+    UNKNOWN_ADD_ARCHIVE("Objects.res")
+    UNKNOWN_ADD_ARCHIVE("Models.res")
+    UNKNOWN_ADD_ARCHIVE("ProcVUE.res")
+    UNKNOWN_ADD_ARCHIVE("ColSeg.res")
+    UNKNOWN_ADD_ARCHIVE("Audio.res")
+    UNKNOWN_ADD_ARCHIVE("Engine.res")
+    UNKNOWN_ADD_ARCHIVE("Skies.res")
+    UNKNOWN_ADD_ARCHIVE("Global.res")
+    UNKNOWN_ADD_ARCHIVE("Eco.res")
+    return 1;
 }
 
 // 0x00520d00

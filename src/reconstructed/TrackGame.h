@@ -35,6 +35,8 @@ struct TrackGameViewOwner {
 class TrackGameMode {
 public:
     TrackGameMode();             // 0x00522060
+    int UnknownFunction523bf0(); // 0x00523bf0 (TrackGame slot 1 retries until it passes)
+    int UnknownFunction523c90(); // 0x00523c90 (TrackGame slot 1)
     ~TrackGameMode();            // 0x005225f0
     int UnknownFunction524100(); // 0x00524100
     void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
@@ -123,6 +125,14 @@ public:
     ~UnknownTrackGameObject3444();            // 0x004d39f0
 };
 
+// Global at 0x00572b44; its code is among ResourceManager.cpp's literals.
+// No RTTI names it.
+class UnknownResourceManager {
+public:
+    void UnknownFunction4e9030(const char* path, int flags);  // 0x004e9030: adds an archive
+};
+extern UnknownResourceManager* g_UnknownResourceManager572b44;
+
 // Global object at 0x0068a48c, deleted by TrackGame's destructor.
 class UnknownTrackGameGlobal68a48c {
 public:
@@ -134,7 +144,9 @@ class TrackGame : public PCGame {
 public:
     TrackGame();                              // 0x00520870
     virtual ~TrackGame();                     // 0x00521ae0 (deleting wrapper 0x00520a90)
+    virtual int UnknownVirtualSlot1();        // 0x00520ab0: start-up checks and the EULA
     virtual int UnknownVirtualSlot2();        // 0x00520d00: PCGame's slot 2
+    virtual int UnknownVirtualSlot3();        // 0x00520d10: opens the resource archives
     virtual int UnknownVirtualSlot5();        // 0x00521a50
     virtual int UnknownVirtualSlot10();       // 0x00521660: Game's slot 10 as a flag
     virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00521840
