@@ -6,6 +6,7 @@
 #include "KrustyUI.h"
 #include "MemTag.h"
 #include "PCGame.h"
+#include "RaceView.h"
 
 struct UnknownInputEntry;
 
@@ -15,12 +16,6 @@ struct UnknownInputEntry;
 // 0x00520870 (it writes TrackGame's vtable) and destroys at exit with
 // 0x00521ae0. The camera and input code reads it throughout. Only members
 // that reconstructed functions touch are declared; names are provisional.
-
-// Object returned by (+0x570)->0x0045d340; KrustyBikeCamera slot 58 hands it
-// a message.
-
-
-#include "RaceView.h"
 
 // The race-mode objects at TrackGame+0x558..+0x568 (EventManager uses the
 // first one present). They are GameObjects (slots 4 and 5, the +0x25 flag
@@ -203,10 +198,10 @@ public:
     TrackGameViewOwner* field_0x560;
     TrackGameViewOwner* field_0x564;
     TrackGameViewOwner* field_0x568;
-    KrustyUI* field_0x56c;
-    EventManager* field_0x570;
-    UnknownTrackGameObject574* field_0x574;
-    TrackGameMode field_0x578;
+    KrustyUI* ui;
+    EventManager* eventManager;
+    UnknownTrackGameObject574* sceneObject;
+    TrackGameMode mode;
     unsigned char field_0xfc4[0x2930 - 0xfc4];
     int field_0x2930;    // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x2934;  // saved KrustyBikeCamera presets (slots 59, 60)
@@ -216,33 +211,33 @@ public:
     unsigned char field_0x2944[0x2d74 - 0x2944];
     int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
     unsigned char field_0x2d78[0x3338 - 0x2d78];
-    DirectoryList* field_0x3338;          // "ui\\profile" listing
-    int field_0x333c;
+    DirectoryList* profileDirectory;
+    int menuIsOpen;
     UnknownTrackGameObject3340* field_0x3340;
     UnknownControlBinding field_0x3344;
     UnknownControlBinding field_0x3380;
     UnknownControlBinding field_0x33bc;
-    UnknownControlMapping* field_0x33f8;     // installed on the ControlInterface
+    UnknownControlMapping* controlMapping;
     UnknownTrackGameObject33fc* field_0x33fc;
     UnknownTrackGameObject3400* field_0x3400;
-    char field_0x3404[8];      // saved decimal separator, restored on shutdown
-    void* field_0x340c;        // "lang.dll", the string resource instance when present
-    UnknownTrackGameObject3410* field_0x3410;
-    float field_0x3414;        // "IntervalBetweenFullNetPacketsMS", in seconds
-    float field_0x3418;        // "IntervalBetweenShortNetPacketsMS"
-    float field_0x341c;        // "IntervalBetweenFullRecordPacketsMS"
-    float field_0x3420;        // "IntervalBetweenShortRecordPacketsMS"
+    char savedDecimalSeparator[8];
+    void* languageModule;
+    UnknownTrackGameObject3410* networkGameObject;
+    float fullNetPacketIntervalSeconds;
+    float shortNetPacketIntervalSeconds;
+    float fullRecordPacketIntervalSeconds;
+    float shortRecordPacketIntervalSeconds;
     int field_0x3424;
     int field_0x3428;
     int field_0x342c;
-    int field_0x3430;    // blocks KrustyBikeCamera slot 23
+    int uiInteractionBlocked;
     int field_0x3434;
     int field_0x3438;
-    int field_0x343c;          // opens a web page (string 0x14df) on destruction
-    int field_0x3440;          // opens the store page on destruction
+    int openLocalizedWebPageOnExit;
+    int openStorePageOnExit;
     UnknownTrackGameObject3444* field_0x3444;
     unsigned char field_0x3448[0x34c8 - 0x3448];
-    int field_0x34c8;          // re-enables the screen saver on destruction (NT)
+    int screenSaverWasActive;
 };
 
 extern TrackGame* g_UnknownGlobal56e26c;
