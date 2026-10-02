@@ -6,6 +6,11 @@ Results use VC6 SP3 natively on Windows; the 2026-09-30 calibration and full
 gate were repeated under Linux/Wine with the same results. A complete linked
 game remains a separate, unverified gate.
 
+The VC6 gate currently checks byte-exact functions from 41 handwritten C++
+candidate files: all 34 files in `src/reconstructed/` and seven focused probes
+in `samples/`. This is a count of source files represented by at least one
+checked function, not a claim that complete object files or a linked game match.
+
 ## Compiler profiles
 
 | Profiles | Strict generated | Manual | Calibration |
