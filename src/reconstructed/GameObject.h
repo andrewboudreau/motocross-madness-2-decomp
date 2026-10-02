@@ -25,7 +25,7 @@ public:
     virtual void UnknownVirtualSlot7();
     virtual GameObject* UnknownVirtualSlot8(void* value);
     virtual int UnknownVirtualSlot9(int value);
-    virtual int UnknownVirtualSlot10(int value);
+    virtual int UnknownVirtualSlot10(float frameTime);
     virtual int UnknownVirtualSlot11(int value);
     virtual int UnknownVirtualSlot12();
     virtual int UnknownVirtualSlot13();

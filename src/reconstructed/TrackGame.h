@@ -231,7 +231,7 @@ public:
     int field_0x3428;
     int field_0x342c;
     int uiInteractionBlocked;
-    int field_0x3434;
+    float field_0x3434;        // seconds UI interaction has been blocked (EventManager slot 10)
     int field_0x3438;
     int openLocalizedWebPageOnExit;
     int openStorePageOnExit;

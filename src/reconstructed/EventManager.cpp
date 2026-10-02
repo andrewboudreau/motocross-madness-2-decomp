@@ -1,5 +1,7 @@
 #include "EventManager.h"
 
+#include "Camera.h"
+#include "ControlInterface.h"
 #include "TrackGame.h"
 
 // 0x0045c9e0
@@ -94,4 +96,60 @@ int EventManager::UnknownFunction45d390() {
         g_UnknownGlobal56e26c->field_0x568)
         return 1;
     return 0;
+}
+
+// 0x0045f3a0
+int EventManager::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (GameObject::UnknownVirtualSlot22(event, entry))
+        return 1;
+    if (g_UnknownGlobal56e26c->uiInteractionBlocked && !g_UnknownGlobal56e26c->field_0x08 &&
+        (event->kind == 2 || event->kind == 0 && event->control == 1 ||
+         event->kind == 0 && event->control == 0x1c || event->kind == 0 && event->control == 0x39) &&
+        field_0x440) {
+        field_0x440 = 0;
+        g_UnknownGlobal56e26c->uiInteractionBlocked = 0;
+        g_UnknownGlobal56e26c->field_0x3438 = 1;
+        UnknownFunction45e600();
+        return 1;
+    }
+    return 0;
+}
+
+// 0x0045f440
+int EventManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (GameObject::UnknownVirtualSlot23(event, entry))
+        return 1;
+    if (g_UnknownGlobal56e26c->uiInteractionBlocked)
+        field_0x440 = 1;
+    return 0;
+}
+
+// 0x0045f200: per-frame update. While UI interaction is blocked it advances
+// the block timer, ticks the listeners and pans the camera; after 7 seconds
+// it lifts the block.
+int EventManager::UnknownVirtualSlot10(float frameTime) {
+    GameObject::UnknownVirtualSlot10(frameTime);
+    if (field_0x3c) {
+        UnknownFunction4aef40();
+        field_0x3c = 0;
+    }
+    if (field_0x34)
+        UnknownFunction45e550(frameTime);
+    else if (!g_UnknownGlobal56e26c->field_0x3428 && !g_UnknownGlobal56e26c->uiInteractionBlocked &&
+             UnknownFunction45d390())
+        UnknownFunction45eef0(frameTime);
+    if (g_UnknownGlobal56e26c->uiInteractionBlocked) {
+        g_UnknownGlobal56e26c->field_0x3434 += frameTime;
+        for (int i = 0; i < field_0x420; i++)
+            field_0x424[i]->UnknownVirtualSlot7(frameTime, 0, 0);
+        field_0x3e4 += frameTime * field_0x414 * (1.0f / 7);
+        field_0x3d4->UnknownFunction42e9b0(&field_0x3e4, 0, 0, 0, 0);
+        field_0x3d4->UnknownVirtualSlot29(field_0x3d8);
+        if (!g_UnknownGlobal56e26c->field_0x3438 && g_UnknownGlobal56e26c->field_0x3434 > 7.0f) {
+            g_UnknownGlobal56e26c->uiInteractionBlocked = 0;
+            g_UnknownGlobal56e26c->field_0x3438 = 1;
+            UnknownFunction45e600();
+        }
+    }
+    return 1;
 }

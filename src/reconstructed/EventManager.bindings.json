@@ -7,9 +7,20 @@
   "??3@YAXPAX@Z": "0x004a30c0",
   "??_7EventManager@@6B@": "0x0055259c",
   "??_C@_0BB@LFOC@KeepAliveTimeout?$AA@": "0x0056a92c",
+  "?UnknownFunction42e9b0@Camera@@QAEXPAUVector3@@HHHH@Z": "0x0042e9b0",
   "?UnknownFunction45d2b0@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
   "?UnknownFunction45d2f0@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",
   "?UnknownFunction45d340@EventManager@@QAEPAVUnknownMessageTarget@@XZ": "0x0045d340",
+  "?UnknownFunction45d390@EventManager@@QAEHXZ": "0x0045d390",
+  "?UnknownFunction45e550@EventManager@@QAEXM@Z": "0x0045e550",
+  "?UnknownFunction45e600@EventManager@@QAEXXZ": "0x0045e600",
+  "?UnknownFunction45eef0@EventManager@@QAEXM@Z": "0x0045eef0",
+  "?UnknownFunction4aef40@@YAXXZ": "0x004aef40",
+  "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
+  "?UnknownVirtualSlot22@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00469580",
+  "?UnknownVirtualSlot23@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x004695d0",
   "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c"
+  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "__real@4@3ffc9249250000000000": "0x005526ac",
+  "__real@4@4001e000000000000000": "0x00550778"
 }

@@ -8,6 +8,25 @@ struct TrackGameViewOwner;
 struct UnknownKrustyBikeView;
 
 // 0x50-byte entry; EventManager keeps 11 at +0x50.
+class Camera;
+
+// Objects in EventManager's +0x424 list; slot 10 calls their slot 7.
+class UnknownEventListener {
+public:
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6();
+    virtual void UnknownVirtualSlot7(float frameTime, int a, int b);
+};
+
+// cdecl 0x004aef40 (near Net.cpp's literals); EventManager slot 10 calls it
+// once when +0x3c is set.
+void UnknownFunction4aef40();
+
 struct UnknownEventEntry {
     UnknownEventEntry();                           // 0x0045c830 (resets through 0x0045c840)
 
@@ -22,6 +41,11 @@ public:
     explicit EventManager(int flags);              // 0x0045c9e0
     virtual ~EventManager();                       // 0x0045cae0 (deleting wrapper 0x0045cac0)
     virtual GameObject* UnknownVirtualSlot8(void* value); // 0x0045caf0
+    virtual int UnknownVirtualSlot10(float frameTime);     // 0x0045f200: per-frame update
+    // 0x0045f3a0: while UI interaction is blocked (TrackGame+0x3430), control 1,
+    // 0x1c or 0x39 (keyboard) or any joystick press resumes it.
+    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0045f440
 
     // The first race-mode object of TrackGame+0x558..+0x568 present, its
     // +0x34 view and its +0x6c target.
@@ -30,6 +54,9 @@ public:
     UnknownMessageTarget* UnknownFunction45d340(); // 0x0045d340
     void UnknownFunction45d270();                  // 0x0045d270: slot 5 on all three
     int UnknownFunction45d390();                   // 0x0045d390: whether any mode is present
+    void UnknownFunction45e550(float frameTime);   // 0x0045e550
+    void UnknownFunction45e600();                  // 0x0045e600
+    void UnknownFunction45eef0(float frameTime);   // 0x0045eef0
 
     float field_0x2c;                              // "KeepAliveTimeout" (slot 8)
     float field_0x30;
@@ -44,8 +71,13 @@ public:
     int field_0x3c0;
     Vector3 field_0x3c4;
     int field_0x3d0;
-    int field_0x3d4;
-    unsigned char field_0x3d8[0x440 - 0x3d8];
-    int field_0x440;
+    Camera* field_0x3d4;                           // panned while UI interaction is blocked
+    Vector3 field_0x3d8;
+    Vector3 field_0x3e4;
+    unsigned char field_0x3f0[0x414 - 0x3f0];
+    Vector3 field_0x414;                           // pan speed (per 7 seconds)
+    int field_0x420;
+    UnknownEventListener* field_0x424[7];
+    int field_0x440;                               // armed by slot 23, consumed by slot 22
     unsigned char field_0x444[0xd08 - 0x444];
 };

@@ -19,7 +19,7 @@ static Vector3 s_UnknownVector67c3e8;
 // is available it drives FollowCamera slots 46 (once) and 47 from it;
 // otherwise it leaves that mode, restoring the state, and runs FollowCamera
 // slot 10.
-int KrustyBikeCamera::UnknownVirtualSlot10(int value) {
+int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
     if (!field_0x3b8) {
         switch (g_UnknownGlobal56e26c->field_0x2d74) {
             case 2:
@@ -50,7 +50,7 @@ int KrustyBikeCamera::UnknownVirtualSlot10(int value) {
         }
         field_0x3b8->UnknownFunction4210f0(&first, &second, g_UnknownGlobal56e26c->field_0x560, 0);
         first.y = field_0x3b8->field_0x38->field_0x10 + 2.0f;
-        FollowCamera::UnknownVirtualSlot47(value, &first);
+        FollowCamera::UnknownVirtualSlot47(frameTime, &first);
         return 1;
     }
     if (s_UnknownActive67c3f4) {
@@ -58,6 +58,6 @@ int KrustyBikeCamera::UnknownVirtualSlot10(int value) {
         UnknownVirtualSlot62();
         UnknownVirtualSlot71(field_0x244);
     }
-    FollowCamera::UnknownVirtualSlot10(value);
+    FollowCamera::UnknownVirtualSlot10(frameTime);
     return 1;
 }
