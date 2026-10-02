@@ -10,8 +10,10 @@
 #include "GameObject.h"
 #include "MemTag.h"
 #include "PCControl.h"
+#include "PeakHold.h"
 #include "SoundInterface.h"
 #include "TextureMapManager.h"
+#include "UnknownObject56e26c.h"
 
 // 0x0065b4ac: a file cleared by the constructor and closed by the
 // destructor (0x00534c3d is the CRT's fclose).
@@ -22,6 +24,40 @@ static FILE* s_UnknownFile65b4ac;
 static char s_UnknownEncoded56b334[] =
     "\x08\x14\x1d\x0f\x0c\x1a\x09\x1e\x07\x09\x3a\x32\x35\x39\x34\x2c\x7b\x08\x2f\x2e\x3f\x32\x34\x28\x07";
 static char s_UnknownEncoded56b350[] = "\x0f\x3e\x28\x2f\x10\x3e\x22";
+
+// KERNEL32 MEMORYSTATUS and its import (slot 8's memory page).
+struct UnknownMemoryStatus {
+    unsigned long length;
+    unsigned long memoryLoad;
+    unsigned long totalPhys;
+    unsigned long availPhys;
+    unsigned long totalPageFile;
+    unsigned long availPageFile;
+    unsigned long totalVirtual;
+    unsigned long availVirtual;
+};
+extern "C" __declspec(dllimport) void __stdcall GlobalMemoryStatus(UnknownMemoryStatus* status);
+
+// 0x0065b490..0x0065b528: peak-held frame timings for slot 8's profile page,
+// constructed in this order (0x00467860..0x00467980).
+static UnknownPeakHold s_NetPeak(5000);              // 0x0065b518
+static UnknownPeakHold s_TickPeak(5000);             // 0x0065b4c8
+static UnknownPeakHold s_PrepFramePeak(5000);        // 0x0065b528
+static UnknownPeakHold s_UpdateScreenPeak(5000);     // 0x0065b4e8
+static UnknownPeakHold s_PrepareGeometryPeak(5000);  // 0x0065b490
+static UnknownPeakHold s_WaitForFlipPeak(5000);      // 0x0065b4b8
+static UnknownPeakHold s_RenderPre3DPeak(5000);      // 0x0065b4f8
+static UnknownPeakHold s_Render3DPeak(5000);         // 0x0065b4d8
+static UnknownPeakHold s_RenderPost3DPeak(5000);     // 0x0065b4a0
+static UnknownPeakHold s_ElapsedPeak(5000);          // 0x0065b508
+
+// 0x0065b534..0x0065b540: phase times measured by slot 10; 0x0065b544 is
+// the time of the previous frame.
+int g_UnknownTickTime;                               // 0x0065b534
+int g_UnknownPrepFrameTime;                          // 0x0065b538
+int g_UnknownUpdateScreenTime;                       // 0x0065b53c
+int g_UnknownNetTime;                                // 0x0065b540
+static unsigned int s_LastFrameTime;                 // 0x0065b544
 
 static inline void DecodeString(char* text) {
     for (; *text; text++)
@@ -94,6 +130,137 @@ int Game::UnknownVirtualSlot33() {
         return 0;
     if (field_0x2f4)
         field_0x2f4->UnknownVirtualSlot25(field_0x10);
+    return 1;
+}
+
+// 0x00467eb0: renders a frame, timing each phase, and with bit 2 of +0x2d4
+// fills the debug overlay's profile and memory pages.
+int Game::UnknownVirtualSlot8() {
+    if (field_0x0c->field_0x70 & 4)
+        field_0x0c->UnknownVirtualSlot4(0);
+    unsigned int last = UnknownFunction4bfa80();
+    field_0x2f4->UnknownVirtualSlot12();
+    unsigned int now = UnknownFunction4bfa80();
+    int prepareGeometry = now - last;
+    last = now;
+    if (field_0x0c->field_0x70 & 4)
+        field_0x0c->UnknownVirtualSlot4(1);
+    now = UnknownFunction4bfa80();
+    int waitForFlip = now - last;
+    last = now;
+    field_0x2f4->UnknownVirtualSlot13();
+    now = UnknownFunction4bfa80();
+    int renderPre3D = now - last;
+    int render3D = 0;
+    if (field_0x2d5_bit3) {
+        if (!field_0x10->UnknownVirtualSlot1())
+            goto failed;
+        field_0x10->UnknownVirtualSlot12(0, 0);
+        UnknownVirtualSlot7();
+        last = UnknownFunction4bfa80();
+        field_0x2f4->UnknownVirtualSlot14();
+        render3D = UnknownFunction4bfa80() - last;
+        if (!field_0x10->UnknownVirtualSlot2()) {
+        failed:
+            return 0;
+        }
+    }
+    last = UnknownFunction4bfa80();
+    field_0x2f4->UnknownVirtualSlot15();
+    now = UnknownFunction4bfa80();
+    int renderPost3D = now - last;
+    int elapsed = now - s_LastFrameTime;
+    if (field_0x2d4_bit2) {
+        if (field_0x38) {
+            static int profilePage = -1;
+            if (profilePage < 0)
+                profilePage = field_0x38->NewPage();
+            s_NetPeak.UnknownFunction4cb6b0(g_UnknownNetTime);
+            s_TickPeak.UnknownFunction4cb6b0(g_UnknownTickTime);
+            s_PrepFramePeak.UnknownFunction4cb6b0(g_UnknownPrepFrameTime);
+            s_UpdateScreenPeak.UnknownFunction4cb6b0(g_UnknownUpdateScreenTime);
+            s_PrepareGeometryPeak.UnknownFunction4cb6b0(prepareGeometry);
+            s_WaitForFlipPeak.UnknownFunction4cb6b0(waitForFlip);
+            s_RenderPre3DPeak.UnknownFunction4cb6b0(renderPre3D);
+            s_Render3DPeak.UnknownFunction4cb6b0(render3D);
+            s_RenderPost3DPeak.UnknownFunction4cb6b0(renderPost3D);
+            s_ElapsedPeak.UnknownFunction4cb6b0(elapsed);
+            if (field_0x38->field_0x25_bit0 && field_0x38->field_0x26c4 == profilePage) {
+                UnknownDisplayMode* mode = &field_0x0c->field_0x10[field_0x0c->field_0x0c];
+                field_0x38->UnknownFunction447fa0(profilePage, "%c %d x %d %d bit(x%d)", 'R',
+                                                  mode->width, mode->height, mode->bitDepth,
+                                                  field_0x0c->field_0x78);
+                field_0x38->UnknownFunction447f40(profilePage, "%s", field_0x0c->field_0x7c0);
+                field_0x38->UnknownFunction447f40(profilePage, "ElapsedTime:   % 3d (%d)",
+                                                  elapsed, s_ElapsedPeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "PrepFrameTime: % 3d (%d)",
+                                                  g_UnknownPrepFrameTime,
+                                                  s_PrepFramePeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "UpdateScrnTime:% 3d (%d)",
+                                                  g_UnknownUpdateScreenTime,
+                                                  s_UpdateScreenPeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "Net            % 3d (%d)",
+                                                  g_UnknownNetTime, s_NetPeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "Tick           % 3d (%d)",
+                                                  g_UnknownTickTime, s_TickPeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "PrepareGeometry% 3d (%d)",
+                                                  prepareGeometry,
+                                                  s_PrepareGeometryPeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "WaitForFlip    % 3d (%d)",
+                                                  waitForFlip, s_WaitForFlipPeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "RenderPre3D    % 3d (%d)",
+                                                  renderPre3D, s_RenderPre3DPeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "Render3D       % 3d (%d)",
+                                                  render3D, s_Render3DPeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "   [this overlay %d]",
+                                                  field_0x38->field_0x36dc);
+                field_0x38->UnknownFunction447f40(profilePage, "RenderPost3D   % 3d (%d)",
+                                                  renderPost3D, s_RenderPost3DPeak.UnknownFunction4cb690());
+                field_0x38->UnknownFunction447f40(profilePage, "TotalTransforms% 5d", field_0x10->field_0x38);
+                field_0x38->UnknownFunction447f40(profilePage, "TotalPoints    % 5d", field_0x10->field_0x3c);
+                field_0x38->UnknownFunction447f40(profilePage, "TotalLines     % 5d", field_0x10->field_0x40);
+                field_0x38->UnknownFunction447f40(profilePage, "TotalTriangles % 5d", field_0x10->field_0x44);
+            }
+            static int memoryPage = -1;
+            if (memoryPage < 0)
+                memoryPage = field_0x38->NewPage();
+            if (field_0x38->field_0x25_bit0 && field_0x38->field_0x26c4 == memoryPage) {
+                UnknownMemoryStatus status;
+                GlobalMemoryStatus(&status);
+                field_0x38->UnknownFunction447fa0(memoryPage, "Memory");
+                field_0x38->UnknownFunction447f40(memoryPage, "  Ours   in DirectX       Area");
+                int count = g_MemTagStack->count;
+                int ours = 0;
+                int directx = 0;
+                for (int i = 0; i < count; i++) {
+                    field_0x38->UnknownFunction447f40(memoryPage, "%8d %8d %12s",
+                                                      g_MemTagStack->ours[i],
+                                                      g_MemTagStack->directx[i],
+                                                      g_MemTagStack->names[i]);
+                    ours += g_MemTagStack->ours[i];
+                    directx += g_MemTagStack->directx[i];
+                }
+                field_0x38->UnknownFunction447f40(memoryPage, "%8d %8d %12s", ours, directx, "Totals");
+                field_0x38->UnknownFunction447f40(memoryPage, "Grand Total    %10d", ours + directx);
+                field_0x38->UnknownFunction447f40(memoryPage, "TotalPhys       %10d", status.totalPhys);
+                field_0x38->UnknownFunction447f40(memoryPage, "AvailPhys       %10d", status.availPhys);
+                field_0x38->UnknownFunction447f40(memoryPage, "TotalVirtual    %10d", status.totalVirtual);
+                field_0x38->UnknownFunction447f40(memoryPage, "AvailVirtual    %10d", status.availVirtual);
+                field_0x38->UnknownFunction447f40(memoryPage, "Memory Load     %8d %%", status.memoryLoad);
+                field_0x38->UnknownFunction447f40(memoryPage, "%s", field_0x0c->field_0x7c0);
+                field_0x38->UnknownFunction447f40(memoryPage, "Total VidMem    %10d", field_0x0c->field_0x54);
+                field_0x38->UnknownFunction447f40(memoryPage, "IsAGP           %s",
+                                                  field_0x0c->field_0x9f0 ? "TRUE" : "FALSE");
+                field_0x38->UnknownFunction447f40(memoryPage, "VideoMemoryMB   %d",
+                                                  UnknownVirtualSlot20("VideoMemoryMB", -1));
+                field_0x38->UnknownFunction447f40(memoryPage, "PartialTexBlt   %s",
+                                                  g_UnknownGlobal56e26c->field_0x0c->field_0x5bc ? "Yes" : "No");
+                field_0x38->UnknownFunction447f40(memoryPage, "TexturesCached  %s",
+                                                  g_UnknownGlobal56e26c->field_0x2d5_bit2 ? "Yes" : "No");
+            }
+        }
+        s_LastFrameTime = now;
+    }
     return 1;
 }
 

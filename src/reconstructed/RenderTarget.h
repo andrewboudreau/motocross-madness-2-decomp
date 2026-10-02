@@ -5,18 +5,13 @@
 // implements it. This is the object Camera keeps at +0x18. The code sits just
 // before ResourceManager.cpp references; RenderTarget.cpp is not attested.
 
+#include "DisplayMode.h"
+
 class Camera;
 
 struct CameraRect { int left; int top; int right; int bottom; };
 
-// Display-mode table reached through RenderTarget+0x04 (Camera 0x0042e550
-// reads the current mode's width and height).
-struct UnknownDisplayMode {
-    int width;
-    int height;
-    int field_0x08[7];
-};
-
+// Display-mode table reached through RenderTarget+0x04.
 struct UnknownDisplay {
     unsigned char field_0x00[0x0c];
     int field_0x0c;                      // current mode index

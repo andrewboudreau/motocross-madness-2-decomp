@@ -46,7 +46,8 @@ candidates.
 | 33 | `0x00467e80` | Exact |
 | 7, 19–29, 31, 32, 34 | | `_purecall` |
 | 2 | `0x00467af0` | Exact. Creates the PCControlInterface (`new` at line 187) and calls its slot 1 |
-| 8, 10 | | Not reconstructed |
+| 8 | `0x00467eb0` | Exact. Renders a frame, timing each phase, and fills the debug overlay's profile and memory pages |
+| 10 | `0x004685d0` | Not reconstructed: it reads the time stamp counter with `rdtsc`, which VC6 can only emit from inline assembly |
 
 The members at +0x2f4 and +0x34 are GameObjects (the root objects). The
 non-virtual initialiser `0x00467b70` constructs them with GameObject's
@@ -79,3 +80,30 @@ The constructor (`0x00467990`) is exact. It:
 
 `0x00468880` (called by PCCamera slot 27) stamps +0x2d8/+0x2dc with the
 time from `0x004bfa80`.
+
+## Slot 8 and the profile pages
+
+Slot 8 (`0x00467eb0`) times the root object's slots 12-15 (prepare geometry,
+pre-3D, 3D, post-3D) and the gap around the display object's slot 4 (wait for
+flip). It runs the 3D phase through the +0x10 object's slots 1, 12 and 2 only
+with bit 3 of +0x2d5. With bit 2 of +0x2d4 and a DebugOverlay at +0x38, it
+feeds ten peak-hold values and prints two overlay pages:
+- the profile page: mode, timings with peaks, and transform/primitive counts;
+- the memory page: the MemTagStack categories, `GlobalMemoryStatus` and
+  video memory.
+
+Each page number is a function-local static (`0x0056b32c`, `0x0056b330`,
+initially -1) allocated from DebugOverlay+0x26c0.
+
+Matching depends on these source shapes:
+- A running `last` time stamp, rather than separate start/end variables.
+- One `failed:` block shared by both 3D-phase failures, reached by `goto`.
+- An inline `DebugOverlay::NewPage()` for the page allocation.
+
+The overlay row printers (`0x00447f40`, `0x00447fa0`) are cdecl varargs
+members.
+
+The peak-hold class (`src/reconstructed/PeakHold.cpp`, `0x004cb670`..
+`0x004cb6d8`) is exact. Its TU is not established; the nearest source literal
+is PCVideoCard.cpp's. Game.cpp's ten statics of it are constructed by the
+dynamic initializers at `0x00467850`..`0x0046798f`, which are also exact.
