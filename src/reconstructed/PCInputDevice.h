@@ -17,7 +17,8 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod7();   // Acquire
     virtual long __stdcall UnknownMethod8();   // Unacquire
     virtual long __stdcall UnknownMethod9(unsigned long size, void* state); // GetDeviceState
-    virtual long __stdcall UnknownMethod10();
+    virtual long __stdcall UnknownMethod10(unsigned long size, struct UnknownDeviceObjectData* data,
+                                           long* count, unsigned long flags); // GetDeviceData
     virtual long __stdcall UnknownMethod11(const struct UnknownDataFormat* format); // SetDataFormat
     virtual long __stdcall UnknownMethod12();
     virtual long __stdcall UnknownMethod13(void* window, unsigned long flags); // SetCooperativeLevel
@@ -155,6 +156,14 @@ extern "C" const UnknownGuid GUID_SysKeyboard;           // 0x00556b30
 extern "C" const UnknownGuid IID_IDirectInputDevice7A;   // 0x00556a50
 extern "C" const UnknownDataFormat c_dfDIKeyboard;       // 0x00558f18
 extern "C" const UnknownDataFormat c_dfDIMouse;          // 0x00558f30
+
+// 16-byte buffered input event (DIDEVICEOBJECTDATA layout).
+struct UnknownDeviceObjectData {
+    unsigned long offset;      // key or object
+    unsigned long data;        // bit 7: pressed
+    unsigned long timeStamp;
+    unsigned long sequence;
+};
 
 // RTTI: PCInputDevice : InputDevice. PCInputDeviceType.cpp is the nearest
 // source reference; the TU is not established.

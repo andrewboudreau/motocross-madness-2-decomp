@@ -13,6 +13,7 @@ public:
     virtual void UnknownVirtualSlot3();
     virtual int UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot5(int button, int modifier, UnknownInputEntry* entry);
+    virtual int UnknownVirtualSlot6(int value);
 
 protected:
     int field_0x2d8[4];           // movement (+0x2d8 x, +0x2dc y); cleared by the constructor

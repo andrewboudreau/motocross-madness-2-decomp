@@ -11,6 +11,8 @@
   "??_7MouseDevice@@6B@": "0x00554278",
   "??_L@YGXPAXIHP6EX0@Z1@Z": "0x00536234",
   "??_M@YGXPAXIHP6EX0@Z@Z": "0x00536140",
+  "?UnknownFunction43cd90@UnknownControlBinding@@QAEXM@Z": "0x0043cd90",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
-  "__FILE__:containerlist.h": "0x005666e4"
+  "__FILE__:containerlist.h": "0x005666e4",
+  "__real@4@3ff6aec33e0000000000": "0x00554294"
 }

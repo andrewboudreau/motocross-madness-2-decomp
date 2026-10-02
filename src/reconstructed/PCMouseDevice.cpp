@@ -128,3 +128,65 @@ int PCMouseDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInputEn
         return 0;
     return UnknownVirtualSlot5(control, modifier, entry);
 }
+
+// 0x004c4cf0: reads the buffered button events (offsets 12-15, re-acquiring
+// a lost device) and queues them on the ControlInterface, then reads the
+// movement into +0x2d8 and feeds x and y to the bindings.
+int PCMouseDevice::UnknownVirtualSlot6(int value) {
+    UnknownDeviceObjectData events[16];
+    long count;
+    int i;
+    if (!field_0x25c)
+        return 0;
+    count = -1;
+    long result;
+    result = field_0x25c->UnknownMethod10(sizeof(UnknownDeviceObjectData), 0, &count, 1);
+    if (result == (long)0x8007001e || result == (long)0x8007000c) {
+        if (field_0x25c->UnknownMethod7() < 0) {
+            UnknownReportError(result, __FILE__, 1316);
+            return 0;
+        }
+        result = field_0x25c->UnknownMethod10(sizeof(UnknownDeviceObjectData), 0, &count, 1);
+    }
+    if (result < 0)
+        goto failed;
+    if (field_0x25c->UnknownMethod10(sizeof(UnknownDeviceObjectData), events, &count, 0) < 0)
+        goto failed;
+    for (i = 0; i < count; i++) {
+        int button;
+        switch (events[i].offset) {
+        case 12:
+            button = 0;
+            break;
+        case 13:
+            button = 1;
+            break;
+        case 14:
+            button = 2;
+            break;
+        case 15:
+            button = 3;
+            break;
+        default:
+            continue;
+        }
+        if (events[i].data & 0x80) {
+            field_0x260[button].state = 1;
+            field_0x260[button].field_0x10 = field_0x260[button].field_0x08;
+            field_0x260[button].field_0x08 = events[i].timeStamp;
+            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(button, field_0x0c, 1, 0);
+        } else {
+            field_0x260[button].state = 0;
+            field_0x260[button].field_0x0c = field_0x260[button].field_0x04;
+            field_0x260[button].field_0x04 = events[i].timeStamp;
+            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(button, field_0x0c, 0, 0);
+        }
+    }
+    if (field_0x25c->UnknownMethod9(sizeof(field_0x2d8), field_0x2d8) < 0)
+        goto failed;
+    UnknownFunction48a550(0, (float)field_0x2d8[0]);
+    UnknownFunction48a550(1, (float)field_0x2d8[1]);
+    return 1;
+failed:
+    return 0;
+}

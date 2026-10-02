@@ -24,3 +24,11 @@ void MouseDevice::UnknownVirtualSlot0(int id) {
         }
     }
 }
+
+// 0x0048a550
+void MouseDevice::UnknownFunction48a550(int axis, float amount) {
+    for (int i = 0; i < field_0x2b0[axis].m_count; i++) {
+        UnknownControlBinding* binding = field_0x2b0[axis].Get(i);
+        binding->UnknownFunction43cd90(amount * binding->field_0x30 * (1.0f / 375.0f));
+    }
+}

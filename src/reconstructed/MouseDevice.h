@@ -19,6 +19,10 @@ public:
     virtual int UnknownVirtualSlot5(int button, int modifier, UnknownInputEntry* entry) = 0;
     virtual int UnknownVirtualSlot6(int value) = 0;
 
+    // 0x0048a550: moves every binding on `axis` by `amount` scaled to its
+    // maximum.
+    void UnknownFunction48a550(int axis, float amount);
+
 protected:
     UnknownInputEntry field_0x260[4];
     ContainerList<UnknownControlBinding*> field_0x2b0[2]; // bindings per axis

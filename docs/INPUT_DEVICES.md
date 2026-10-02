@@ -37,7 +37,13 @@ the default profile, except one near miss in
     while key 0x29 is down); bit 6 asks for an exact match.
 
   PCKeyboardDevice slot 2 (`0x004c4460`) creates the device and releases it
-  on failure. PCKeyboardDevice slot 4 (`0x004c4520`) maps a control to a key and asks
+  on failure. Slot 6 (`0x004c45e0`) reads the keyboard:
+  - NumLock (0x45) comes from the immediate state.
+  - Other keys come from up to 16 buffered events, which are queued on the
+    ControlInterface. A lost device is re-acquired, with errors reported at
+    lines 1090, 1096 and 1113.
+  - Then the key repeat runs and `0x004c4830` rebuilds the modifier mask:
+    Shift bits 0 and 1, Ctrl 2 and 3, Alt 4 and 5, the grave key 7. PCKeyboardDevice slot 4 (`0x004c4520`) maps a control to a key and asks
   slot 5. Slot 5 (`0x004c4570`) tests a key with a modifier and copies its
   entry; it matches only as one `&&` condition sharing the failure return.
   Slot 5's return type is contradictory across callers. KeyboardDevice
@@ -55,6 +61,7 @@ the default profile, except one near miss in
   | 3 | `0x004c4a50` | Maps subtypes 3–5 to modes 0–2 |
   | 4 | `0x004c4b10` | Control query: movement directions (beyond ±30), double clicks (presses under 175 apart), directions with button 0 down, else the mapping table |
   | 5 | `0x004c4a90` | Button state |
+  | 6 | `0x004c4cf0` | Reads buffered button events (offsets 12–15), then the movement; x and y feed the bindings through MouseDevice `0x0048a550`, scaled by maximum / 375 |
 - **JoystickDevice** (`0x00489800`): `PCInputDevice(2)` and the index at
   +0x260, 32 button entries at +0x264, six axis values (floats) at +0x4e4,
   six binding lists `ContainerList<UnknownControlBinding*>` at +0x4fc, and

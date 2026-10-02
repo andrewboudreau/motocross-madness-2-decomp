@@ -15,4 +15,8 @@ public:
     virtual void UnknownVirtualSlot3() {}
     virtual int UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot5(int key, int modifier, UnknownInputEntry* entry);
+    virtual int UnknownVirtualSlot6(int value);
+
+    // 0x004c4830: rebuilds the modifier state at +0x16d8 from the keys.
+    void UnknownFunction4c4830();
 };
