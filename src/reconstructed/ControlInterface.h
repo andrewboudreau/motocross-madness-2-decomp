@@ -1,6 +1,8 @@
 #pragma once
 
 class InputDevice;
+class JoystickDevice;
+class MouseDevice;
 
 // The keyboard at ControlInterface+0x34, as FollowCamera slots 55 and 56 see
 // it: they call slot 5 with 0x38 and 0x2a (DirectInput left Alt and left
@@ -64,7 +66,7 @@ struct UnknownControlEvent {
     int kind;
     int device;
     int pressed;
-    int field_0x10;           // always 0x3f
+    int modifiers;            // 0x3f when queued; the keyboard's state when dispatched
 };
 
 // Mapping table at ControlInterface+0xcbc (installed by 0x0043ce70).
@@ -94,12 +96,13 @@ public:
 
     int UnknownFunction43ce70(UnknownControlMapping* mapping);           // 0x0043ce70
     void UnknownFunction43cea0(int control, int kind, int pressed, int device); // 0x0043cea0
+    int UnknownFunction43cf00(int value);   // 0x0043cf00, near miss in samples/control
 
     int field_0x04;
     int field_0x08;
     int field_0x0c;
-    InputDevice* field_0x10[8];            // joysticks
-    InputDevice* field_0x30;
+    JoystickDevice* field_0x10[8];
+    MouseDevice* field_0x30;
     UnknownInterface56e26c* field_0x34;    // keyboard (see above)
     int field_0x38;                        // queued events
     UnknownControlEvent field_0x3c[160];

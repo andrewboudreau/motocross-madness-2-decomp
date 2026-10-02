@@ -23,6 +23,8 @@ public:
     // maximum.
     void UnknownFunction48a550(int axis, float amount);
 
+    friend class ControlInterface; // reads the input entries
+
 protected:
     UnknownInputEntry field_0x260[4];
     ContainerList<UnknownControlBinding*> field_0x2b0[2]; // bindings per axis

@@ -48,6 +48,8 @@ public:
     // 0x00489c60: state of `control` (negative: an axis direction).
     int UnknownFunction489c60(int control, int modifier, UnknownInputEntry* entry);
 
+    friend class ControlInterface; // reads the input entries
+
 protected:
     int field_0x260;                     // constructor argument
     UnknownInputEntry field_0x264[32];

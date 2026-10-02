@@ -24,6 +24,8 @@ public:
     // 0x0048a240: whether modifier state `modifier` holds.
     int UnknownFunction48a240(int modifier);
 
+    friend class ControlInterface; // reads the input entries
+
 protected:
     UnknownInputEntry field_0x260[256];
     ContainerList<UnknownControlBinding*> field_0x1660[6];

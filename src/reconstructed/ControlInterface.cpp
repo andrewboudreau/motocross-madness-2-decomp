@@ -117,6 +117,6 @@ void ControlInterface::UnknownFunction43cea0(int control, int kind, int pressed,
     field_0x3c[field_0x38].device = device;
     field_0x3c[field_0x38].kind = kind;
     field_0x3c[field_0x38].pressed = pressed;
-    field_0x3c[field_0x38].field_0x10 = 0x3f;
+    field_0x3c[field_0x38].modifiers = 0x3f;
     field_0x38++;
 }

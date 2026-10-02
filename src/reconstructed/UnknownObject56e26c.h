@@ -2,6 +2,8 @@
 
 #include "ControlInterface.h"
 
+struct UnknownInputEntry;
+
 // The object behind the global pointer at 0x0056e26c, used throughout the
 // camera and input code. It is polymorphic (virtual slot 22 is called). Its
 // class is not established; only members that reconstructed functions touch
@@ -49,8 +51,9 @@ public:
     virtual void UnknownVirtualSlot10();
     virtual void UnknownVirtualSlot11();
     virtual void UnknownVirtualSlot12();
-    virtual void UnknownVirtualSlot13();
-    virtual void UnknownVirtualSlot14();
+    // Input events from ControlInterface 0x0043cf00: released, pressed.
+    virtual void UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual void UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual void UnknownVirtualSlot15();
     virtual void UnknownVirtualSlot16();
     virtual void UnknownVirtualSlot17();
