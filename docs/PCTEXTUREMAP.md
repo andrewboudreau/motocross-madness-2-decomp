@@ -72,7 +72,17 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   PCTextureMap. It fills the copy through slot 4 and copies the colour key
   through slot 18. The structure lines up; retail's register assignment
   (constant 1 in ebx, the copy in ebp) does not.
+- slot 4 (2031 bytes), the setup: it picks the format (through the
+  optional +0x0c/+0x10 choice when the format has alpha), counts mip
+  levels by halving both sides down to `minimumSize`, reuses a shared
+  surface (`0x0068a394` plain, `0x0068a36c` mipmapped, indexed by level
+  count) or creates one through `0x004c68e0`'s format fallbacks, converts
+  the bits (Pixtrans.cpp `0x004d1d20`), measures alpha (`0x004d24d0`),
+  builds the mips through slot 15 and appends render states 0x29/0x1b
+  (+0x13/0x14 address modes when the format has alpha) through an inline
+  append helper. Only the non-mip fallback chain differs: VC6 cross-jumps
+  its identical call tails into the first case, retail into the last.
 
-Not reconstructed: slots 4 and 5 (about 2 KB each), the TextureMap base
+Not reconstructed: slot 5 (about 2 KB), the TextureMap base
 (`0x0050a4e0`, `0x0050ab40`), `0x004c7b40`, `0x004c7e30`, `0x004c7ef0`,
 `0x004c8550` and the error reporter `0x004c86e0`.

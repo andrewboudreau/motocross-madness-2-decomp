@@ -114,7 +114,9 @@ struct UnknownSurfaceDesc {
     unsigned long height;
     unsigned long width;
     long pitch;
-    unsigned char field_0x14[0x24 - 0x14];
+    unsigned long field_0x14;
+    unsigned long mipMapCount;
+    unsigned char field_0x1c[0x24 - 0x1c];
     void* surface;                                // the locked bits
     unsigned char field_0x28[0x48 - 0x28];
     unsigned char pixelFormat[0x20];

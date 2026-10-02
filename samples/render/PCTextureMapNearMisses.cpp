@@ -20,6 +20,16 @@
 // constant 1 in ebx and the copy in ebp, and also stores `field_0x68 & 1`
 // to a frame slot. With a `cached` local VC6 here stores it but loses the
 // ebx constant; without it, it keeps the constant but drops the store.
+//
+// PCTextureMap::UnknownVirtualSlot4 (0x004c69c0, 2031 bytes): the setup.
+// Everything but the non-mip format fallback chain lines up, including
+// the mip chain (same source shape). VC6 cross-jumps the identical
+// UnknownFunction4c68e0 call tails of that chain into the first case
+// (0x115c); retail merges them into the last (0x235) in mirror order, which
+// also changes which blocks interleave their array stores with the pushes.
+// if/else, nested negated ifs, switch, goto-to-label, return/goto mixes,
+// aggregate initializers and an inline helper all keep VC6's order.
+
 #include <string.h>
 
 #include "../../src/reconstructed/DebugAlloc.h"
@@ -140,5 +150,237 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
         }
     }
     delete copy;
+    return 0;
+}
+
+// Appends a render-state pair for slot 19 to apply.
+static inline void AppendRenderStatePair(TextureMap* map, int state, int value) {
+    map->field_0x48[map->field_0x44].state = state;
+    map->field_0x48[map->field_0x44].value = value;
+    map->field_0x44++;
+}
+
+// 0x004c69c0: sets the texture up from `bits` (or empty): picks the format,
+// counts the mip levels down to `minimumSize`, reuses a shared surface or
+// creates one (trying formats in order), converts the bits into it, builds
+// the mip levels and records the alpha or colour-key render states.
+int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int stride, int minimumSize,
+                                      int sourceFormat, int format, UnknownTexturePalette* palette,
+                                      int flags, void* surfacePalette, int checkMemory, int unused,
+                                      int addressU, int addressV, UnknownTextureFormatChoice* choice,
+                                      int alphaThreshold, unsigned int key) {
+    int formats[5];
+    int mipmapped;
+    UnknownSurfaceDesc desc;
+    unsigned char pixelFormat[0x20];
+    UnknownSurfaceCaps caps;
+    int shared;
+    field_0x14 = width;
+    field_0x18 = height;
+    field_0x1c = minimumSize;
+    field_0x2c = palette;
+    field_0x78 = surfacePalette;
+    if (choice)
+        format = UnknownFunction511ad0(format) ? choice->field_0x10 : choice->field_0x0c;
+    field_0x20 = format;
+    UnknownFunction5119c0(format, pixelFormat);
+    mipmapped = flags & 2;
+    field_0x24 = 1;
+    if (!mipmapped) {
+        field_0x1c = width;
+        if (!field_0x70) {
+            memset(&desc, 0, sizeof(desc));
+            desc.size = sizeof(desc);
+            desc.height = height;
+            desc.width = width;
+            memcpy(desc.pixelFormat, pixelFormat, sizeof(pixelFormat));
+            desc.flags = (~flags & 4) << 10 | 7;
+            shared = 0;
+            if (flags & 4) {
+                desc.caps[0] = 0x800;
+            } else {
+                desc.caps[0] = 0x1000;
+                if (!(flags & 8) && !g_UnknownGlobal56e26c->field_0x2d0 &&
+                    !(g_UnknownGlobal56e26c->field_0x2d5_bit2) &&
+                    (field_0x20 == 0x22b || field_0x20 == 0x235)) {
+                    shared = 1;
+                    if (g_UnknownSharedSurfaces68a394[field_0x24]) {
+                        field_0x70 = g_UnknownSharedSurfaces68a394[field_0x24];
+                        field_0x70->UnknownMethod1();
+                    } else {
+                        desc.caps[0] = 0x1800;
+                    }
+                } else {
+                    desc.caps[0] = 0x1800;
+                }
+            }
+            if (!field_0x70) {
+                if (field_0x20 == 0x115c) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x613;
+                    formats[2] = 0x22b;
+                    formats[3] = 0x235;
+                    formats[4] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                } else if (field_0x20 == 0x613) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x22b;
+                    formats[2] = 0x235;
+                    formats[3] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                } else if (field_0x20 == 8) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x22b;
+                    formats[2] = 0x235;
+                    formats[3] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                } else if (field_0x20 == 0x22b) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x235;
+                    formats[2] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                } else if (field_0x20 == 0x235) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x22b;
+                    formats[2] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                } else if (g_UnknownGlobal56e26c->field_0x0c->field_0x190->UnknownMethod6(&desc, &field_0x70, 0)) {
+                    goto failed;
+                }
+            }
+            if (shared) {
+                g_UnknownSharedSurfaces68a394[field_0x24] = field_0x70;
+                field_0x70->UnknownMethod1();
+            }
+            if (field_0x78 && field_0x20 == 8 && field_0x70->UnknownMethod31(field_0x78))
+                goto failed;
+        }
+    } else {
+        int levelWidth = width;
+        int levelHeight = height;
+        for (;;) {
+            levelWidth >>= 1;
+            levelHeight >>= 1;
+            if (levelWidth < minimumSize && levelHeight < minimumSize)
+                break;
+            field_0x24++;
+        }
+        if (bits && sourceFormat != field_0x20 &&
+            (!checkMemory || UnknownFunction511970(0x235) > UnknownFunction511970(sourceFormat)) &&
+            !field_0x10->UnknownFunction511370(UnknownFunction511970(0x235) * width * height))
+            return 0;
+        if (!field_0x70) {
+            memset(&desc, 0, sizeof(desc));
+            desc.size = sizeof(desc);
+            desc.height = height;
+            desc.width = width;
+            desc.mipMapCount = field_0x24;
+            memcpy(desc.pixelFormat, pixelFormat, sizeof(pixelFormat));
+            shared = 0;
+            desc.flags = 0x21007;
+            if (flags & 4) {
+                desc.caps[0] = 0x400808;
+            } else {
+                desc.caps[0] = 0x401008;
+                if (!(flags & 8) && !g_UnknownGlobal56e26c->field_0x2d0 &&
+                    !(g_UnknownGlobal56e26c->field_0x2d5_bit2) &&
+                    (field_0x20 == 0x22b || field_0x20 == 0x235)) {
+                    shared = 1;
+                    if (g_UnknownSharedMipSurfaces68a36c[field_0x24]) {
+                        field_0x70 = g_UnknownSharedMipSurfaces68a36c[field_0x24];
+                        field_0x70->UnknownMethod1();
+                    } else {
+                        desc.caps[0] = 0x401808;
+                    }
+                } else {
+                    desc.caps[0] = 0x401808;
+                }
+            }
+            if (!field_0x70) {
+                if (field_0x20 == 0x115c) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x613;
+                    formats[2] = 0x22b;
+                    formats[3] = 0x235;
+                    formats[4] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                } else if (field_0x20 == 0x613) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x22b;
+                    formats[2] = 0x235;
+                    formats[3] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                } else if (field_0x20 == 8) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x22b;
+                    formats[2] = 0x235;
+                    formats[3] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                } else if (field_0x20 == 0x22b) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x235;
+                    formats[2] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                } else if (field_0x20 == 0x235) {
+                    formats[0] = field_0x20;
+                    formats[1] = 0x22b;
+                    formats[2] = 0;
+                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                        goto failed;
+                }
+            }
+            if (shared) {
+                g_UnknownSharedMipSurfaces68a36c[field_0x24] = field_0x70;
+                field_0x70->UnknownMethod1();
+            }
+            if (field_0x78 && field_0x20 == 8 && field_0x70->UnknownMethod31(field_0x78))
+                goto failed;
+        }
+    }
+    if (field_0x70->UnknownMethod14(&caps))
+        goto failed;
+    if (bits) {
+        memset(&desc, 0, sizeof(desc));
+        desc.size = sizeof(desc);
+        if (field_0x70->UnknownMethod25(0, &desc, 0x801, 0))
+            goto failed;
+        void* destination = desc.surface;
+        int bytesPerPixel = UnknownFunction511970(field_0x20);
+        UnknownFunction4d1d20(destination, bits, width, height, desc.pitch / bytesPerPixel, stride, field_0x20,
+                              sourceFormat, 0, palette, alphaThreshold, key);
+        if (!(flags & 4))
+            field_0x3c = UnknownFunction4d24d0(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
+                                               field_0x20, palette);
+        if (field_0x70->UnknownMethod32(0))
+            goto failed;
+        if (mipmapped && !UnknownVirtualSlot15(2))
+            goto failed;
+    }
+    if (g_UnknownGlobal689968)
+        UnknownFunction4c84e0(field_0x70, 0);
+    if (UnknownFunction511ad0(format) & !UnknownFunction511ad0(field_0x20)) {
+        UnknownVirtualSlot18(0xff00ff);
+        return 1;
+    }
+    if (UnknownFunction511ad0(field_0x20)) {
+        AppendRenderStatePair(this, 0x29, 0);
+        AppendRenderStatePair(this, 0x1b, 1);
+        AppendRenderStatePair(this, 0x13, addressU);
+        AppendRenderStatePair(this, 0x14, addressV);
+    } else {
+        AppendRenderStatePair(this, 0x29, 0);
+        AppendRenderStatePair(this, 0x1b, 0);
+    }
+    return 1;
+failed:
     return 0;
 }

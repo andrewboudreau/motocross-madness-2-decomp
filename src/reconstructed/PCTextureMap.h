@@ -14,6 +14,15 @@ struct UnknownTexturePalette {
     unsigned char field_0x710[0x8000];
 };
 
+// Formats slot 4 picks between: +0x0c without alpha, +0x10 with alpha.
+struct UnknownTextureFormatChoice {
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;
+    int field_0x0c;
+    int field_0x10;
+};
+
 // A render state and its value (RenderTarget slot 8).
 struct UnknownRenderStatePair {
     int state;
@@ -27,10 +36,11 @@ class TextureMap : public BaseObject {
 public:
     TextureMap(TextureMapManager* manager, int value); // 0x0050a4e0
     virtual ~TextureMap();                            // 0x0050ab40 (deleting wrapper 0x0050a570)
-    virtual int UnknownVirtualSlot4(void* bits, int width, int height, int stride, int a, int format,
-                                    int sourceFormat, UnknownTexturePalette* palette, int flags,
-                                    void* surfacePalette, int b, int c, int d, int e, int f, int g,
-                                    unsigned int key) = 0;
+    virtual int UnknownVirtualSlot4(void* bits, int width, int height, int stride, int minimumSize,
+                                    int sourceFormat, int format, UnknownTexturePalette* palette,
+                                    int flags, void* surfacePalette, int checkMemory, int unused,
+                                    int addressU, int addressV, UnknownTextureFormatChoice* choice,
+                                    int alphaThreshold, unsigned int key) = 0;
     virtual void UnknownVirtualSlot5() = 0;
     virtual TextureMap* UnknownVirtualSlot6() = 0;
     virtual int UnknownVirtualSlot7() = 0;
@@ -61,7 +71,8 @@ public:
     int field_0x30;                           // has a colour key
     int field_0x34;                           // colour key (also +0x38)
     int field_0x38;
-    unsigned char field_0x3c[0x44 - 0x3c];
+    int field_0x3c;                           // from Pixtrans 0x004d24d0 (slot 4)
+    unsigned char field_0x40[0x44 - 0x40];
     int field_0x44;                           // render-state pair count
     UnknownRenderStatePair field_0x48[4];     // applied by slot 19 (length not established)
     int field_0x68;                           // bit 0: a CacheTexture
@@ -87,6 +98,27 @@ extern int g_UnknownGlobal689964;
 void UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
                            int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter);
 
+// Tgafile.cpp helpers (cdecl): whether a format has alpha, and its
+// DirectDraw pixel format.
+int UnknownFunction511ad0(int format);
+void UnknownFunction5119c0(int format, void* pixelFormat);
+
+// Pixtrans.cpp converters (cdecl): 0x004d1d20 copies `source` into
+// `destination`; 0x004d24d0 inspects the converted bits.
+void UnknownFunction4d1d20(void* destination, void* source, int width, int height, int destinationStride,
+                           int sourceStride, int format, int sourceFormat, int a,
+                           UnknownTexturePalette* palette, int alphaThreshold, unsigned int key);
+int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int format,
+                          UnknownTexturePalette* palette);
+
+// Shared texture surfaces reused across textures: 0x0068a36c by mip level
+// count, 0x0068a394 for single-level textures.
+extern UnknownSurfaceInterface* g_UnknownSharedMipSurfaces68a36c[10];
+extern UnknownSurfaceInterface* g_UnknownSharedSurfaces68a394[2];
+
+// Global at 0x00689968: when set, slot 4 refills the first level.
+extern int g_UnknownGlobal689968;
+
 // cdecl 0x004c86e0: formats a DirectDraw result with the caller's __FILE__
 // and __LINE__.
 void UnknownReportDirectDrawError(long result, const char* file, int line);
@@ -98,10 +130,11 @@ public:
     PCTextureMap(TextureMapManager* manager, int value); // 0x004c5f00
     virtual ~PCTextureMap();                  // 0x004c5f50 (deleting wrapper 0x004c5f30)
     // 0x004c69c0: creates the surfaces from `bits`.
-    virtual int UnknownVirtualSlot4(void* bits, int width, int height, int stride, int a, int format,
-                                    int sourceFormat, UnknownTexturePalette* palette, int flags,
-                                    void* surfacePalette, int b, int c, int d, int e, int f, int g,
-                                    unsigned int key);
+    virtual int UnknownVirtualSlot4(void* bits, int width, int height, int stride, int minimumSize,
+                                    int sourceFormat, int format, UnknownTexturePalette* palette,
+                                    int flags, void* surfacePalette, int checkMemory, int unused,
+                                    int addressU, int addressV, UnknownTextureFormatChoice* choice,
+                                    int alphaThreshold, unsigned int key);
     virtual void UnknownVirtualSlot5();       // 0x004c6080
     virtual TextureMap* UnknownVirtualSlot6(); // 0x004c71c0: a copy of the texture
     virtual int UnknownVirtualSlot7();        // 0x004c7470: whether +0x74 exists
@@ -130,6 +163,9 @@ public:
     int UnknownFunction4c84e0(UnknownSurfaceInterface* surface, int value); // 0x004c84e0: fills a level
     void UnknownFunction4c7e30(unsigned int color); // 0x004c7e30: sets the colour key
     void UnknownFunction4c7ef0(UnknownSurfaceInterface* surface, unsigned int color); // 0x004c7ef0
+    // 0x004c68e0: creates +0x70 with the first of `formats` (0-terminated)
+    // the device accepts.
+    int UnknownFunction4c68e0(UnknownSurfaceDesc* desc, int flags, int* formats);
     void UnknownFunction4c8550(UnknownSurfaceDesc* desc, int value);        // 0x004c8550
 
     UnknownSurfaceInterface* field_0x70;      // system-memory surface (counted in DirectX memory)
