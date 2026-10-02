@@ -25,7 +25,7 @@ public:
     virtual void UnknownVirtualSlot7();
     virtual GameObject* UnknownVirtualSlot8(void* value);
     virtual int UnknownVirtualSlot9(int value);
-    virtual int UnknownVirtualSlot10(int value);
+    virtual int UnknownVirtualSlot10(float frameTime);
     virtual int UnknownVirtualSlot11(int value);
     virtual int UnknownVirtualSlot12();
     virtual int UnknownVirtualSlot13();
@@ -40,13 +40,15 @@ public:
     // Input events from Game slots 13 and 14, passed down the children.
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot24(int a, int b, int c, int d, int e);
+    virtual int UnknownVirtualSlot24(int type, void* data, int c, int d, int e);
     virtual int UnknownVirtualSlot25(void* value);
     virtual void UnknownVirtualSlot26();
 
     // 0x00469190: appends `child` (and its later siblings) to the children;
     // not reconstructed.
     int UnknownFunction469190(GameObject* child, int value);
+    int UnknownFunction469130(GameObject* child); // 0x00469130 (KrustyUI 0x004988a0)
+    void UnknownFunction4691f0();          // 0x004691f0
     // 0x00469680: releases this object and every later sibling, back to front.
     int UnknownFunction469680();
     // 0x00469ce0: appends the RTTI class name of `object` to field_0x28.
@@ -60,6 +62,7 @@ protected:
 
     friend class Game;      // reads the +0x25 bits of its DebugOverlay
     friend class TrackGame; // reads the +0x25 bits of its UI objects (0x00521860)
+    friend class EventManager; // reads a race-mode object's +0x25 bit 0 (0x0045eef0)
 
     // Offsets and widths are evidenced by the reconstructed methods; names are
     // placeholders. Children are reached through field_0x10 and chained through

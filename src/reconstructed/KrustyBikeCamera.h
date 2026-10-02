@@ -33,7 +33,7 @@ public:
     explicit KrustyBikeCamera(int flags); // 0x00497cb0
     virtual ~KrustyBikeCamera();          // 0x00497d80 (deleting wrapper 0x00497d60)
 
-    virtual int UnknownVirtualSlot10(int value); // 0x00497e20 (near miss: samples/camera)
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x00497e20 (near miss: samples/camera)
 
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual void UnknownVirtualSlot42(bool flag);

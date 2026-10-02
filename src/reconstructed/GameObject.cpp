@@ -134,11 +134,11 @@ int GameObject::UnknownVirtualSlot15() {
 }
 
 // 0x004693d0
-int GameObject::UnknownVirtualSlot10(int value) {
+int GameObject::UnknownVirtualSlot10(float frameTime) {
     if (field_0x20 & 0x02) {
         for (GameObject* child = field_0x10; child; child = child->field_0x0C) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit2 && !child->field_0x25_bit3) {
-                child->UnknownVirtualSlot10(value);
+                child->UnknownVirtualSlot10(frameTime);
                 char* owner = static_cast<char*>(field_0x18);
                 if (owner) {
                     UnknownGameObjectOwnerPart* part = *reinterpret_cast<UnknownGameObjectOwnerPart**>(owner + 0x04);
@@ -236,11 +236,11 @@ int GameObject::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEnt
 }
 
 // 0x00469620: gated by flag 0x800 and child bit 1 (not bit 0).
-int GameObject::UnknownVirtualSlot24(int a, int b, int c, int d, int e) {
+int GameObject::UnknownVirtualSlot24(int type, void* data, int c, int d, int e) {
     if (field_0x20 & 0x800) {
         for (GameObject* child = field_0x10; child; child = child->field_0x0C) {
             if (child->field_0x25_bit1 && !child->field_0x25_bit3) {
-                if (child->UnknownVirtualSlot24(a, b, c, d, e))
+                if (child->UnknownVirtualSlot24(type, data, c, d, e))
                     return 1;
             }
         }

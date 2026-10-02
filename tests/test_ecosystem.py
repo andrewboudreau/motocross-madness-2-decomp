@@ -128,7 +128,11 @@ class CandidateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             for key in ['target','helper']:
                 spec=cfg[key];p=Path(temp)/(key+'.obj')
-                subprocess.run([shutil.which('clang-cl'),*cfg['compile_flags'],str(ROOT/spec['source']),'/Fo'+str(p)],check=True,capture_output=True,text=True,timeout=45)
+                # clang-cl treats a leading slash as an option, so an absolute
+                # POSIX source path is reported as "no input files".  Compile
+                # from the repository root and retain the configured relative
+                # path; Windows continues to receive the same source spelling.
+                subprocess.run([shutil.which('clang-cl'),*cfg['compile_flags'],spec['source'],'/Fo'+str(p)],cwd=ROOT,check=True,capture_output=True,text=True,timeout=45)
                 obj=CoffObject(p)
                 # Synthetic comparator target, not game bytes or a reported match.
                 r=match_object(obj,spec['symbol'],int(spec['va'],16),b'\0',bindings)

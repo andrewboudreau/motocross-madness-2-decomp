@@ -90,6 +90,60 @@ all useful application structures.
 
 ## Source reconstruction and matching
 
+### Fixed-size block allocator
+
+`src/reconstructed/BlockAllocator.cpp` reconstructs the fixed-size pool whose
+retail bodies span `0x00423f70` through `0x0042413c`. The pooled source literal
+is `BlockAllocator.cpp`; the class name remains a strong source-supported
+inference rather than RTTI evidence because the class is nonpolymorphic. All
+seven emitted bodies match authentic VC6 SP3 `/O2 /MT` output with every
+relocation resolved:
+
+| Body | Retail VA | Bytes |
+|---|---:|---:|
+| Constructor | `0x00423f70` | 52 |
+| Destructor tail jump | `0x00423fb0` | 5 |
+| `Alloc` | `0x00423fc0` | 135 |
+| `Free` | `0x00424050` | 32 |
+| Allocate-block helper | `0x00424070` | 78 |
+| Clear helper | `0x004240c0` | 65 |
+| `Reset` | `0x00424110` | 44 |
+
+The 40-byte object maintains typed active and spare `Block` chains, an
+intrusive `FreeElement` list, element/block sizes, the next sequential element
+index, and byte counters. `Alloc` tries the current block, free list, spare
+chain, then a new
+block in that order. `Free` only links elements larger than four bytes into the
+intrusive list. `Reset` retains blocks for reuse; the clear helper releases the
+active chain through the application accounting wrapper. QuadTree candidates
+now consume this canonical declaration instead of their earlier local
+`QuadTreePool` placeholder.
+
+The reconstruction uses descriptive member names while retaining explicit
+offset comments in the header:
+
+| Offset | Reconstructed name | Directly observed role |
+|---|---|---|
+| `+0x00` | `elementsPerBlock` | `(blockSize - 4) / elementSize` and sequential-allocation limit |
+| `+0x04` / `+0x08` | `firstBlock` / `lastBlock` | Active block-chain head and tail |
+| `+0x0c` | `spareBlocks` | Chain populated by `Reset` and reused by `Alloc` |
+| `+0x10` | `nextElementIndex` | Next sequential slot within `lastBlock` |
+| `+0x14` / `+0x18` | `elementSize` / `blockSize` | Allocation stride and debug-allocation size |
+| `+0x1c` | `freeElements` | Intrusive free-list head |
+| `+0x20` | `reservedBytes` | Increased by `blockSize` when a block is allocated |
+| `+0x24` | `allocatedBytes` | Increased/decreased by `elementSize` in `Alloc`/`Free` |
+
+The helper's allocation and deallocation source-line operands are confirmed as
+132 and 156. These member names and the `Clear` helper name are strong semantic
+descriptions of the decoded accesses, but remain reconstructed identifiers;
+exact code shape does not establish their original spelling.
+
+The constructor does not initialize `allocatedBytes` (+0x24), and `Clear`
+releases only the active chain, not the spare chain. These are decoded retail
+behaviors retained by the reconstruction, not recommended allocator semantics.
+
+### Application accounting probes
+
 `samples/allocation/AllocationAccountingProbe.cpp` contains ordinary C++98
 candidates for the index setter, tracked deallocation, two allocation wrappers,
 and a calloc-like wrapper. It neither overrides the host's real global delete

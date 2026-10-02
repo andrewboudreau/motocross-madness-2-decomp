@@ -7,6 +7,8 @@
 // so the names stay neutral. Indices noted on the known methods.
 
 struct Matrix4;
+struct UnknownSurfaceDesc;
+struct UnknownSurfaceCaps;
 
 // Device at PCRenderTarget+0x50 (IDirect3DDevice7-shaped).
 struct UnknownRenderInterface {
@@ -48,26 +50,35 @@ struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod35(int stage, void* texture);     // SetTexture
     virtual long __stdcall UnknownMethod36(int stage, int type, int* value); // GetTextureStageState
     virtual long __stdcall UnknownMethod37(int stage, int type, int value);  // SetTextureStageState
+    virtual long __stdcall UnknownMethod38();
+    virtual long __stdcall UnknownMethod39();
+    virtual long __stdcall UnknownMethod40();
+    virtual long __stdcall UnknownMethod41();
+    virtual long __stdcall UnknownMethod42();
+    virtual long __stdcall UnknownMethod43(struct UnknownSurfaceInterface* destination, void* point,
+                                           struct UnknownSurfaceInterface* source, void* rect,
+                                           int flags);                       // Load
 };
 
 // Surface at PCRenderTarget+0x48 (IDirectDrawSurface7-shaped).
 struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod0();
-    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall UnknownMethod1();                              // AddRef
     virtual long __stdcall UnknownMethod2();
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5(void* destination, UnknownSurfaceInterface* source,
                                           void* sourceRect, int flags, void* effects); // Blt
     virtual long __stdcall UnknownMethod6();
-    virtual long __stdcall UnknownMethod7();
+    virtual long __stdcall UnknownMethod7(long x, long y, UnknownSurfaceInterface* source, void* rect,
+                                          int flags);                       // BltFast
     virtual long __stdcall UnknownMethod8();
     virtual long __stdcall UnknownMethod9();
     virtual long __stdcall UnknownMethod10();
     virtual long __stdcall UnknownMethod11();
-    virtual long __stdcall UnknownMethod12();
+    virtual long __stdcall UnknownMethod12(UnknownSurfaceCaps* caps, UnknownSurfaceInterface** surface); // GetAttachedSurface
     virtual long __stdcall UnknownMethod13();
-    virtual long __stdcall UnknownMethod14();
+    virtual long __stdcall UnknownMethod14(UnknownSurfaceCaps* caps);      // GetCaps
     virtual long __stdcall UnknownMethod15();
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall UnknownMethod17();
@@ -75,16 +86,16 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod19();
     virtual long __stdcall UnknownMethod20();
     virtual long __stdcall UnknownMethod21();
-    virtual long __stdcall UnknownMethod22();
+    virtual long __stdcall UnknownMethod22(UnknownSurfaceDesc* desc);      // GetSurfaceDesc
     virtual long __stdcall UnknownMethod23();
     virtual long __stdcall UnknownMethod24();                             // IsLost
-    virtual long __stdcall UnknownMethod25();
+    virtual long __stdcall UnknownMethod25(void* rect, UnknownSurfaceDesc* desc, int flags, void* event); // Lock
     virtual long __stdcall UnknownMethod26();
     virtual long __stdcall UnknownMethod27();                             // Restore
     virtual long __stdcall UnknownMethod28();
-    virtual long __stdcall UnknownMethod29();
+    virtual long __stdcall UnknownMethod29(int flags, void* key);         // SetColorKey
     virtual long __stdcall UnknownMethod30();
-    virtual long __stdcall UnknownMethod31();
+    virtual long __stdcall UnknownMethod31(void* palette);                 // SetPalette
     virtual long __stdcall UnknownMethod32(void* rect);                   // Unlock
 };
 
@@ -102,7 +113,12 @@ struct UnknownSurfaceDesc {
     unsigned long flags;
     unsigned long height;
     unsigned long width;
-    unsigned char field_0x10[0x48 - 0x10];
+    long pitch;
+    unsigned long field_0x14;
+    unsigned long mipMapCount;
+    unsigned char field_0x1c[0x24 - 0x1c];
+    void* surface;                                // the locked bits
+    unsigned char field_0x28[0x48 - 0x28];
     unsigned char pixelFormat[0x20];
     unsigned long caps[4];
     unsigned long textureStage;
