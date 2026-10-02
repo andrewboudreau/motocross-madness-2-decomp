@@ -10,7 +10,7 @@ TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
 ## Status
 
-Exact (18 calibration cases):
+Exact (19 calibration cases):
 - the constructor (11 0x50-byte entries at +0x50; -1000 in each component
   of +0x3c4) and both destructors;
 - slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c;
@@ -31,6 +31,14 @@ Exact (18 calibration cases):
   `blocked && !pending` early return between the two main branches; the
   source keeps it because the branch layout depends on it;
 - `0x0045f180`: awards points from a table by position;
+- slot 24, the network messages (`type`, `data`, sender `player`): types
+  5 and 0x89 mark a player ready (and in mode 2 without a race-mode object
+  call `0x0045fbd0`); 0x86 copies a remote racer's state into the view's
+  racer array; 0xcc shows "<name> <text>" (string 0x13d7) and drops the
+  player; 0x8e, from the local player id, shows string 0x13d1 or resets the
+  entries. The buffers are function-scope (0x8e reuses the 260-byte one
+  with a 128-byte limit), and the best-lap update compares through two
+  float locals (`fld; fld; fcompp`);
 - the cdecl comparators `0x0045e930` (standings) and `0x0045d3d0` (racer
   names, through the inline `strcmp` intrinsic).
 
@@ -44,6 +52,15 @@ it fits KrustyBike's primary base chain for the views. Their classes are not
 established; `src/reconstructed/RaceView.h` declares them.
 
 Not reconstructed:
-- slot 24 (`0x0045f490`);
 - `0x0045cb20`, `0x0045cb70`, `0x0045cdc0`, `0x0045d480`, `0x0045e710`,
-  `0x0045e9d0` and `0x0045eef0`.
+  `0x0045e9d0`, `0x0045eef0`, `0x0045f9a0` and `0x0045fbd0`.
+
+Slot 24's message layouts live in `EventManager.cpp`. Declaring them in the
+header changed VC6's register choice in TrackGame slot 1 (an unrelated
+`availPhys + availPageFile` sum), so header-only type additions can disturb
+other translation units; re-run the full calibration after header edits.
+
+GameObject slot 24 (and Game slot 17, which forwards to it) now take
+`(int type, void* data, int c, int d, int e)`; the change is code-neutral.
+The view's +0x38 and +0x3c are racers (`UnknownEventRacer`, in
+`RaceView.h`); TrackGame's racer records start at +0x2224.

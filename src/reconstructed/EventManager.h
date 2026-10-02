@@ -2,6 +2,7 @@
 
 #include "GameObject.h"
 #include "MatrixUtil.h"
+#include "RaceView.h"
 
 class UnknownMessageTarget;
 struct TrackGameViewOwner;
@@ -9,24 +10,6 @@ struct UnknownKrustyBikeView;
 
 // 0x50-byte entry; EventManager keeps 11 at +0x50.
 class Camera;
-
-// Racer object ranked by 0x0045e930 (TU and class not established).
-struct UnknownEventRacerPart {
-    unsigned char field_0x00[0x0c];
-    float field_0x0c;
-};
-struct UnknownEventRacer {
-    unsigned char field_0x000[0x5e0];
-    char field_0x5e0[0x744 - 0x5e0];               // name
-
-    UnknownEventRacerPart* field_0x744;
-    unsigned char field_0x748[0x784 - 0x748];
-    int field_0x784;                               // finishing position (1-based)
-    unsigned char field_0x788[0x790 - 0x788];
-    int field_0x790;
-    unsigned char field_0x794[0x7a0 - 0x794];
-    unsigned short field_0x7a0;
-};
 
 // 8-byte record sorted with 0x0045e930.
 struct UnknownEventRanking {
@@ -87,6 +70,8 @@ public:
     // 0x1c or 0x39 (keyboard) or any joystick press resumes it.
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0045f440
+    // 0x0045f490: network messages from `player`.
+    virtual int UnknownVirtualSlot24(int type, void* data, int player, int d, int e);
 
     // The first race-mode object of TrackGame+0x558..+0x568 present, its
     // +0x34 view and its +0x6c target.
@@ -108,6 +93,8 @@ public:
     void UnknownFunction45e710(int menu);          // 0x0045e710
     void UnknownFunction45e9d0();                  // 0x0045e9d0
     void UnknownFunction45eef0(float frameTime);   // 0x0045eef0
+    void UnknownFunction45f9a0();                  // 0x0045f9a0
+    void UnknownFunction45fbd0(int player);        // 0x0045fbd0
 
     float field_0x2c;                              // "KeepAliveTimeout" (slot 8)
     float field_0x30;

@@ -40,7 +40,7 @@ public:
     // Input events from Game slots 13 and 14, passed down the children.
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot24(int a, int b, int c, int d, int e);
+    virtual int UnknownVirtualSlot24(int type, void* data, int c, int d, int e);
     virtual int UnknownVirtualSlot25(void* value);
     virtual void UnknownVirtualSlot26();
 

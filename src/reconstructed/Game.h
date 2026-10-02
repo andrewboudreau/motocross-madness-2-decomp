@@ -18,7 +18,7 @@ public:
     UnknownNetObject();                       // 0x004ab480
     ~UnknownNetObject();                      // 0x004ab570
     long UnknownFunction4ab6b0(int value);    // 0x004ab6b0
-    void UnknownFunction4ac720(int index, char* name);  // 0x004ac720 (TrackGame slot 4)
+    int UnknownFunction4ac720(int player, char* name);  // 0x004ac720: the player's name; 0 if none
     int UnknownFunction4ac800(int player);    // 0x004ac800 (EventManager 0x0045e550)
     void UnknownFunction4ac950();             // 0x004ac950
     void UnknownFunction4ac510(int value);    // 0x004ac510
@@ -86,7 +86,7 @@ public:
     virtual int UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468930
     virtual int UnknownVirtualSlot15();       // 0x00468a30: shutdown
     virtual int UnknownVirtualSlot16(int value); // 0x00468ae0: network object
-    virtual int UnknownVirtualSlot17(int a, int b, int c, int d, int e);                  // 0x00468ba0
+    virtual int UnknownVirtualSlot17(int type, void* data, int c, int d, int e);                  // 0x00468ba0
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00468bd0
     virtual int UnknownVirtualSlot19(int mode) = 0;
     virtual int UnknownVirtualSlot20(const char* name, int defaultValue) = 0; // "VideoMemoryMB"

@@ -25,6 +25,8 @@ struct TrackGameViewOwner : public GameObject {
     UnknownKrustyBikeView* field_0x34;
     unsigned char field_0x38[0x6c - 0x38];
     UnknownMessageTarget* field_0x6c;
+    unsigned char field_0x70[0xa8 - 0x70];
+    UnknownEventRacer* field_0xa8;
 };
 
 // Object embedded at +0x578; KrustyBikeCamera slot 52 reads its mode.
@@ -120,13 +122,15 @@ public:
     unsigned char field_0x00[0x384];
 };
 
-// Per-racer record in TrackGame (0xf8 bytes, from +0x2228; the array's true
+// Per-racer record in TrackGame (0xf8 bytes, from +0x2224; the array's true
 // start and length are not established).
 struct UnknownTrackGameRacerSlot {
-    int field_0x00;                           // ready
-    int field_0x04;
-    int field_0x08;                           // network player id
-    unsigned char field_0x0c[0xf8 - 0x0c];
+    int field_0x00;
+    int field_0x04;                           // ready
+    int field_0x08;
+    int field_0x0c;                           // network player id
+    int field_0x10;                           // player's racer index (EventManager slot 24)
+    unsigned char field_0x14[0xf8 - 0x14];
 };
 
 // Base of the +0x3410 object; its constructor sits among
@@ -214,9 +218,9 @@ public:
     TrackGameMode mode;
     unsigned char field_0xfc4[0x2158 - 0xfc4];
     int field_0x2158;                         // racer count (EventManager 0x0045e550)
-    unsigned char field_0x215c[0x2228 - 0x215c];
-    UnknownTrackGameRacerSlot field_0x2228[7]; // 0xf8 apart (EventManager 0x0045e550)
-    unsigned char field_0x28f0[0x2930 - 0x28f0];
+    unsigned char field_0x215c[0x2224 - 0x215c];
+    UnknownTrackGameRacerSlot field_0x2224[7]; // 0xf8 apart (EventManager 0x0045e550)
+    unsigned char field_0x28ec[0x2930 - 0x28ec];
     int field_0x2930;    // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x2934;  // saved KrustyBikeCamera presets (slots 59, 60)
     float field_0x2938;

@@ -1,10 +1,31 @@
 #include "EventManager.h"
 
+#include <float.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "Camera.h"
 #include "ControlInterface.h"
 #include "TrackGame.h"
+
+// Network messages handled by slot 24 (the layout depends on the type).
+struct UnknownEventPlayerMessage {
+    int field_0x00;
+    int field_0x04;                                // player (types 0xcc and 0x8e)
+    int field_0x08;                                // player (type 5)
+};
+struct UnknownEventRacerMessage {                  // type 0x86
+    int field_0x00;
+    char field_0x04;                               // the sender's racer index
+    char field_0x05;                               // finished
+    int field_0x08;
+    float field_0x0c;
+    int field_0x10;
+    int field_0x14;
+    int field_0x18;
+    float field_0x1c;
+    float field_0x20;
+};
 
 // 0x0045c9e0
 EventManager::EventManager(int flags) : GameObject(flags) {
@@ -171,10 +192,10 @@ void EventManager::UnknownFunction45e550(float) {
     int ready = 1;
     int local = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
     for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-        int player = g_UnknownGlobal56e26c->field_0x2228[i].field_0x08;
+        int player = g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c;
         if (player != local) {
             int connected = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac800(player);
-            if (!g_UnknownGlobal56e26c->field_0x2228[i].field_0x00 && connected)
+            if (!g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 && connected)
                 ready = 0;
         }
     }
@@ -275,4 +296,117 @@ void EventManager::UnknownFunction45e600() {
         UnknownFunction45cdc0(2);
         UnknownFunction45e710(g_UnknownGlobal56e26c->field_0x18 == 1 ? 0x88e : 0x868);
     }
+}
+
+// 0x0045f490: network messages. Type 5 and 0x89 mark a player ready (and
+// in mode 2 without a race-mode object start it), 0x86 updates a remote
+// racer, 0xcc reports a player leaving and 0x8e the host ending the event.
+int EventManager::UnknownVirtualSlot24(int type, void* data, int player, int d, int e) {
+    if (GameObject::UnknownVirtualSlot24(type, data, player, d, e))
+        return 1;
+    UnknownEventPlayerMessage* message = (UnknownEventPlayerMessage*)data;
+    char name[16];
+    char text[128];
+    char line[260];
+    if (type == 5) {
+        for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
+            if (g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c == message->field_0x08)
+                g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 = 1;
+        }
+        if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !UnknownFunction45d2b0())
+            UnknownFunction45fbd0(message->field_0x08);
+    } else if (player) {
+        if (type == 0x89) {
+            for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
+                if (g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c == player)
+                    g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 = 1;
+            }
+            if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !UnknownFunction45d2b0())
+                UnknownFunction45fbd0(player);
+        } else if (type == 0x86) {
+            UnknownEventRacerMessage* update = (UnknownEventRacerMessage*)data;
+            UnknownKrustyBikeView* view = UnknownFunction45d2f0();
+            if (!view || g_UnknownGlobal56e26c->uiInteractionBlocked)
+                return 0;
+            for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
+                if (g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c == player &&
+                    g_UnknownGlobal56e26c->field_0x2224[i].field_0x10 == update->field_0x04) {
+                    g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 = 1;
+                    if (view->field_0x3c[i]) {
+                        view->field_0x3c[i]->field_0x768 = update->field_0x08;
+                        view->field_0x3c[i]->field_0x750 = update->field_0x10;
+                        view->field_0x3c[i]->field_0x7a4 = update->field_0x05;
+                        view->field_0x3c[i]->field_0x788 = update->field_0x14;
+                        view->field_0x3c[i]->field_0x758 = update->field_0x18;
+                        view->field_0x3c[i]->field_0x760 = update->field_0x1c;
+                        view->field_0x3c[i]->field_0x764 = update->field_0x20;
+                        if (view->field_0x3c[i]->field_0x7a4) {
+                            view->field_0x3c[i]->field_0x754 = update->field_0x0c;
+                            // Always false here; retail still tests it.
+                            if (!view->field_0x3c[i]->field_0x7a4)
+                                view->field_0x3c[i]->field_0x748 = UnknownFunction4bfa80();
+                        } else {
+                            view->field_0x3c[i]->field_0x754 = FLT_MAX;
+                            view->field_0x3c[i]->field_0x748 = 0x7ffffffe;
+                        }
+                    }
+                }
+            }
+            if (field_0x38)
+                return 0;
+            if (g_UnknownGlobal56e26c->field_0x2d74 == 4) {
+                TrackGameViewOwner* owner = UnknownFunction45d2b0();
+                if (owner->field_0xa8 == owner->field_0x34->field_0x38) {
+                    owner->field_0xa8->field_0x764 += owner->field_0xa8->field_0x75c;
+                    // Compared through locals, kept as the best of +0x75c.
+                    float best = owner->field_0xa8->field_0x760;
+                    float lap = owner->field_0xa8->field_0x75c;
+                    owner->field_0xa8->field_0x760 = best > lap ? owner->field_0xa8->field_0x760
+                                                                : owner->field_0xa8->field_0x75c;
+                    owner->field_0xa8->field_0x75c = 0;
+                }
+            }
+            UnknownFunction45f9a0();
+            UnknownFunction45e600();
+        } else if (type == 0xcc) {
+            UnknownMessageTarget* target = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
+            if (target) {
+                g_UnknownGlobal56e26c->UnknownFunction521970(0x13d7, text, sizeof(text));
+                if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac720(message->field_0x04, name)) {
+                    sprintf(line, "%s %s", name, text);
+                    UnknownMessage notice(line, 3.25f);
+                    target->UnknownFunction51b540(&notice);
+                }
+            }
+            if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x08->field_0x0c) {
+                g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac950();
+                field_0x3c = 1;
+            } else {
+                for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
+                    if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c) {
+                        g_UnknownGlobal56e26c->field_0x2224[i].field_0x00 = 1;
+                        g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 = 1;
+                    }
+                }
+            }
+            UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
+            if (view)
+                view->UnknownFunction420590(message->field_0x04);
+        } else if (type == 0x8e) {
+            if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x08->field_0x0c) {
+                if (UnknownFunction45d2b0()) {
+                    UnknownMessageTarget* target = UnknownFunction45d340();
+                    if (target) {
+                        g_UnknownGlobal56e26c->UnknownFunction521970(0x13d1, line, 128); // capped like `text`
+                        UnknownMessage notice(line, 3.25f);
+                        target->UnknownFunction51b540(&notice);
+                    }
+                } else {
+                    UnknownFunction45e520();
+                }
+                field_0x3c = 1;
+            }
+        }
+    }
+    return 0;
 }
