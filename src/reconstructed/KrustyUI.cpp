@@ -1,9 +1,15 @@
 #include "KrustyUI.h"
 
+#include <string.h>
+
 #include "DebugAlloc.h"
 #include "GameUi.h"
+#include "UIDialog.h"
 #include "RenderTarget.h"
 #include "TrackGame.h"
+
+// cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block.
+void* UnknownFunction47b570(void* block, unsigned int size);
 
 // cdecl 0x005053b0, called first on shutdown with 0.
 void UnknownFunction5053b0(int value);
@@ -148,4 +154,26 @@ void KrustyUI::UnknownFunction499b00() {
 void KrustyUI::UnknownFunction499b10() {
     if (field_0x2c)
         field_0x2c->UnknownFunction486630(0);
+}
+
+// 0x0049a4a0: turns "MediaControl" on, hides the GUI and opens Exit1Dlg.
+void KrustyUI::UnknownFunction49a4a0() {
+    UnknownFunction468dd0("MediaControl");
+    field_0x2c->UnknownFunction486630(0);
+    field_0x2c->UnknownFunction485a70(new(__FILE__, 836) Exit1Dlg, 0, 2, 0, 0, 0, 0, 1);
+}
+
+// 0x0049ba70
+int KrustyUI::UnknownFunction49ba70(int a, int b, int c, const char* name, int d, int e) {
+    field_0x60 = (UnknownKrustyUIEntry*)UnknownFunction47b570(field_0x60, (field_0x64 + 1) * sizeof(UnknownKrustyUIEntry));
+    field_0x60[field_0x64].field_0x00 = a;
+    field_0x60[field_0x64].field_0x04 = b;
+    field_0x60[field_0x64].field_0x08 = c;
+    int length = strlen(name);
+    int count = length > 63 ? 63 : length;
+    strncpy(field_0x60[field_0x64].field_0x14, name, count);
+    field_0x60[field_0x64].field_0x14[count] = 0;
+    field_0x60[field_0x64].field_0x0c = d;
+    field_0x60[field_0x64].field_0x10 = e;
+    return ++field_0x64 - 1;
 }

@@ -70,6 +70,16 @@ struct UnknownKrustyUISlot {
     char field_0x04;
 };
 
+// 0x54-byte record in KrustyUI's +0x60 list (appended by 0x0049ba70).
+struct UnknownKrustyUIEntry {
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;
+    int field_0x0c;
+    int field_0x10;
+    char field_0x14[64];
+};
+
 // RTTI: KrustyUI : GameObject (vtable 0x0055488c; 0x1364 bytes, the size
 // TrackGame slot 4 allocates). Its constructor 0x004987f0 writes the vtable.
 // Only the members TrackGame calls are declared.
@@ -88,6 +98,9 @@ public:
     void UnknownFunction499a20();             // 0x00499a20: hides it
     void UnknownFunction499b00();             // 0x00499b00
     void UnknownFunction499b10();             // 0x00499b10
+    void UnknownFunction49a4a0();             // 0x0049a4a0: opens the exit dialog
+    // 0x0049ba70: appends an entry to +0x60; returns its index.
+    int UnknownFunction49ba70(int a, int b, int c, const char* name, int d, int e);
     void UnknownFunction4999b0();             // 0x004999b0: shutdown (the destructor's first step)
     void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
     void UnknownFunction49a540();             // 0x0049a540
@@ -111,8 +124,8 @@ public:
     int field_0x54;
     void* field_0x58;
     int field_0x5c;
-    void* field_0x60;                         // also freed by 0x0049bb80
-    int field_0x64;
+    UnknownKrustyUIEntry* field_0x60;         // also freed by 0x0049bb80
+    int field_0x64;                           // entry count
     unsigned char field_0x68[0x464 - 0x68];
     GameObject* field_0x464;                  // released by 0x004999b0
     Camera* field_0x468;                      // made current while +0x464 is shown

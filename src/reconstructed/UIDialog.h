@@ -29,3 +29,12 @@ public:
 
     unsigned char field_0x2c[0x7f5c - 0x2c];
 };
+
+// RTTI: Exit1Dlg : UIDialog (vtable 0x0055503c; 0x7f68 bytes, the size
+// KrustyUI 0x0049a4a0 allocates). Its constructor is inline.
+class Exit1Dlg : public UIDialog {
+public:
+    Exit1Dlg() : UIDialog(1, "Exit1.dtm") {}
+
+    unsigned char field_0x2c[0x7f68 - 0x2c];
+};
