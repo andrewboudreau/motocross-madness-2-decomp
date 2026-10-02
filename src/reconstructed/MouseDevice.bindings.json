@@ -1,8 +1,8 @@
 {
-  "??0?$ContainerList@H@@QAE@XZ": "0x005109c0",
+  "??0?$ContainerList@PAUUnknownControlBinding@@@@QAE@XZ": "0x005109c0",
   "??0MouseDevice@@QAE@XZ$ehhandler": "0x0054bb00",
   "??0PCInputDevice@@QAE@H@Z": "0x004c25f0",
-  "??1?$ContainerList@H@@QAE@XZ": "0x00402040",
+  "??1?$ContainerList@PAUUnknownControlBinding@@@@QAE@XZ": "0x00402040",
   "??1MouseDevice@@UAE@XZ": "0x0048a3c0",
   "??1MouseDevice@@UAE@XZ$ehhandler": "0x0054bb18",
   "??1PCInputDevice@@UAE@XZ": "0x004c2650",

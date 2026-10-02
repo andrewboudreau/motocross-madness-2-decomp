@@ -9,5 +9,9 @@
   "??_M@YGXPAXIHP6EX0@Z@Z": "0x00536140",
   "?UnknownFunction43cba0@UnknownControlMapping@@QAEXHPAH@Z": "0x0043cba0",
   "?UnknownFunction48a240@KeyboardDevice@@QAEHH@Z": "0x0048a240",
-  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c"
+  "?UnknownMethod4c2710@PCInputDevice@@QAEHHKKK@Z": "0x004c2710",
+  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "_GUID_SysKeyboard": "0x00556b30",
+  "_IID_IDirectInputDevice7A": "0x00556a50",
+  "_c_dfDIKeyboard": "0x00558f18"
 }

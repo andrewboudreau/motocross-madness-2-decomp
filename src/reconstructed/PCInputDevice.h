@@ -10,7 +10,7 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall UnknownMethod2();   // Release
-    virtual long __stdcall UnknownMethod3();
+    virtual long __stdcall UnknownMethod3(struct UnknownDeviceCaps* caps); // GetCapabilities
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();
     virtual long __stdcall UnknownMethod6(int property, struct UnknownInputProperty* value); // SetProperty
@@ -18,11 +18,11 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod8();   // Unacquire
     virtual long __stdcall UnknownMethod9(unsigned long size, void* state); // GetDeviceState
     virtual long __stdcall UnknownMethod10();
-    virtual long __stdcall UnknownMethod11();
+    virtual long __stdcall UnknownMethod11(const struct UnknownDataFormat* format); // SetDataFormat
     virtual long __stdcall UnknownMethod12();
-    virtual long __stdcall UnknownMethod13();
+    virtual long __stdcall UnknownMethod13(void* window, unsigned long flags); // SetCooperativeLevel
     virtual long __stdcall UnknownMethod14();
-    virtual long __stdcall UnknownMethod15();
+    virtual long __stdcall UnknownMethod15(struct UnknownDeviceInstance* info); // GetDeviceInfo
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall UnknownMethod17();
     virtual long __stdcall UnknownMethod18(const struct UnknownGuid& type,
@@ -107,6 +107,54 @@ int UnknownFunction4beef0(UnknownGuid guid, char* name);
 // cdecl 0x004bf6a0: reports a failed result with the caller's __FILE__ and
 // __LINE__ (it maps DirectX error codes to text).
 void UnknownReportError(long result, const char* file, int line);
+
+// DirectInput object at ControlInterface+0xcc0; method 9 creates devices like
+// IDirectInput7::CreateDeviceEx.
+struct UnknownDirectInput {
+    virtual long __stdcall UnknownMethod0();
+    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall UnknownMethod2();
+    virtual long __stdcall UnknownMethod3();
+    virtual long __stdcall UnknownMethod4();
+    virtual long __stdcall UnknownMethod5();
+    virtual long __stdcall UnknownMethod6();
+    virtual long __stdcall UnknownMethod7();
+    virtual long __stdcall UnknownMethod8();
+    virtual long __stdcall UnknownMethod9(const UnknownGuid& device, const UnknownGuid& iid,
+                                          UnknownInputInterface** result, void* outer);
+};
+
+// 24-byte data format descriptor (DIDATAFORMAT layout).
+struct UnknownDataFormat {
+    unsigned long size;
+    unsigned long objectSize;
+    unsigned long flags;
+    unsigned long dataSize;
+    unsigned long objectCount;
+    const void* objects;
+};
+
+// 0x2c-byte device capabilities (DIDEVCAPS layout).
+struct UnknownDeviceCaps {
+    unsigned long size;
+    unsigned long flags;
+    unsigned long deviceType;
+    unsigned long axes;
+    unsigned long buttons;
+    unsigned long povs;
+    unsigned long field_0x18[5];
+};
+
+// GUID and data-format constants. The GUID values decoded from retail are
+// the standard GUID_SysMouse ({6F1D2B60-D5A0-11CF-BFC7-444553540000}),
+// GUID_SysKeyboard (...2B61...) and IID_IDirectInputDevice7A
+// ({57D7C6BC-2356-11D3-8E9D-00C04F6844AE}); the data formats have the sizes
+// of c_dfDIKeyboard (256 objects, 256 bytes) and c_dfDIMouse (7, 16).
+extern "C" const UnknownGuid GUID_SysMouse;              // 0x00556b20
+extern "C" const UnknownGuid GUID_SysKeyboard;           // 0x00556b30
+extern "C" const UnknownGuid IID_IDirectInputDevice7A;   // 0x00556a50
+extern "C" const UnknownDataFormat c_dfDIKeyboard;       // 0x00558f18
+extern "C" const UnknownDataFormat c_dfDIMouse;          // 0x00558f30
 
 // RTTI: PCInputDevice : InputDevice. PCInputDeviceType.cpp is the nearest
 // source reference; the TU is not established.

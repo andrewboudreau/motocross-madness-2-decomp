@@ -20,6 +20,25 @@ JoystickDevice::~JoystickDevice() {}
 // Modifier test shared by the button queries: through the keyboard when
 // there is one, else only "none" (0, 0x80000000 or 0x3f) holds. Inline: it
 // has no retail body of its own.
+// 0x00489980: with a keyboard, `modifier` must hold on it; without one,
+// only "none" (0, 0x80000000 or 0x3f) is accepted.
+int JoystickDevice::UnknownVirtualSlot2(int button, int modifier, UnknownInputEntry* entry) {
+    UnknownInterface56e26c* keyboard = g_UnknownGlobal56e26c->field_0x14->field_0x34;
+    if (((keyboard && keyboard->UnknownFunction48a240(modifier)) ||
+         (!keyboard && (modifier == 0 || modifier == (int)0x80000000 || modifier == 0x3f))) &&
+        field_0x264[button].state == 1) {
+        if (entry) {
+            entry->state = 1;
+            entry->field_0x04 = field_0x264[button].field_0x04;
+            entry->field_0x08 = field_0x264[button].field_0x08;
+            entry->field_0x0c = field_0x264[button].field_0x0c;
+            entry->field_0x10 = field_0x264[button].field_0x10;
+        }
+        return 1;
+    }
+    return 0;
+}
+
 // 0x00489a20: axis n's binding reports controls -(2n + 2) (low) and
 // -(2n + 3) (high).
 int JoystickDevice::UnknownFunction489a20(UnknownControlBinding* binding, float step,

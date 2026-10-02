@@ -14,8 +14,7 @@ public:
 
     virtual void UnknownVirtualSlot0(int id); // 0x00489b70
     virtual ~JoystickDevice();          // 0x00489920 (deleting wrapper 0x00489900)
-    // 0x00489980: copies the state of a pressed button into `entry`
-    // (near miss in samples/inputdevice).
+    // 0x00489980: copies the state of a pressed button into `entry`.
     virtual int UnknownVirtualSlot2(int button, int modifier, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot3(int index, float* angle) = 0;
     virtual int UnknownVirtualSlot4(int index, float* x, float* y) = 0;

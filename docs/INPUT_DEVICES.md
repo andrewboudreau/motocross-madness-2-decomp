@@ -9,7 +9,7 @@ Canonical source is `src/reconstructed/InputDevice`, `PCInputDevice`,
 and the template header `ContainerList.h`. Translation units are not
 established, apart from ContainerList.h, which retail names through
 `__FILE__`. Names are provisional. All functions listed are strict exact under
-the default profile, except the near misses in
+the default profile, except one near miss in
 `samples/inputdevice/PCJoystickDeviceNearMisses.cpp`.
 
 ## Classes
@@ -36,7 +36,8 @@ the default profile, except the near misses in
     means none; bit 7 needs bit 2 of the global's +0x2d4 (0x80 also holds
     while key 0x29 is down); bit 6 asks for an exact match.
 
-  PCKeyboardDevice slot 4 (`0x004c4520`) maps a control to a key and asks
+  PCKeyboardDevice slot 2 (`0x004c4460`) creates the device and releases it
+  on failure. PCKeyboardDevice slot 4 (`0x004c4520`) maps a control to a key and asks
   slot 5. Slot 5 (`0x004c4570`) tests a key with a modifier and copies its
   entry; it matches only as one `&&` condition sharing the failure return.
   Slot 5's return type is contradictory across callers. KeyboardDevice
@@ -44,8 +45,16 @@ the default profile, except the near misses in
   unconverted as `bool`, and KrustyBikeCamera overrides slot 56 as `bool`.
   ControlInterface therefore keeps a separate `bool` view of the keyboard
   (`UnknownInterface56e26c`).
-- **MouseDevice** (`0x0048a2d0`): `PCInputDevice(1)`, `ContainerList<int>[2]`
-  at +0x2b0 and four entries at +0x260.
+- **MouseDevice** (`0x0048a2d0`): `PCInputDevice(1)`, two binding lists at
+  +0x2b0 and four button entries at +0x260. Slot 0 (`0x0048a4c0`) drops
+  bindings by id. PCMouseDevice implements the rest:
+
+  | Slot | VA | Behaviour |
+  |---|---|---|
+  | 2 | `0x004c4970` | Creates the device and records the axis and button counts |
+  | 3 | `0x004c4a50` | Maps subtypes 3–5 to modes 0–2 |
+  | 4 | `0x004c4b10` | Control query: movement directions (beyond ±30), double clicks (presses under 175 apart), directions with button 0 down, else the mapping table |
+  | 5 | `0x004c4a90` | Button state |
 - **JoystickDevice** (`0x00489800`): `PCInputDevice(2)` and the index at
   +0x260, 32 button entries at +0x264, six axis values (floats) at +0x4e4,
   six binding lists `ContainerList<UnknownControlBinding*>` at +0x4fc, and
@@ -59,7 +68,7 @@ the default profile, except the near misses in
     directions: below 16384 or above 49152, for axes enabled by the six bits
     at +0x14. Other controls go through the mapping table to slot 2.
 
-  Slot 2 (`0x00489980`) is a near miss.
+  Slot 2 (`0x00489980`) is the button query.
 
 - **PCKeyboardDevice** (`0x004c43c0`) has an empty constructor body.
   **PCMouseDevice** (`0x004c48c0`) clears four ints at +0x2d8 with `memset`.
@@ -98,14 +107,11 @@ the default profile, except the near misses in
   `PCInputDeviceType.cpp` (lines 540, 544 and 590), so at least they were
   compiled in that TU. In slot 20 the poll check must be an inline member
   (`CheckPollResult`); written in place, VC6 merges the null-device return
-  with the error returns. Two neighbours are near misses:
-  - `0x004c3a10` (switch buffered input): only its final acquire test
-    differs. Retail keeps separate `return 0`/`return 1` paths, and VC6 here
-    emits `setge`.
-  - `0x004c3790` (the immediate reader): it reads a DIJOYSTATE-shaped state,
-    feeds axes through `0x00489c00`, queues button changes on the
-    ControlInterface, and keeps the POV values. 373 of 452 bytes match; the
-    rest is register rotation.
+  with the error returns. `0x004c3a10` (switch buffered input) matches with
+  `goto failed`. `0x004c3790`, the immediate reader, is a near miss. It
+  reads a DIJOYSTATE-shaped state, feeds axes through `0x00489c00`, queues
+  button changes on the ControlInterface, and keeps the POV values. 373 of
+  452 bytes match; the rest is register rotation.
 
   Effect-related slots act only for device type 3 (+0x0c). Slot 19 matches
   only with the Windows `HIBYTE` cast chain used by `GET_DIDEVICE_SUBTYPE`,
@@ -118,6 +124,23 @@ Only JoystickDevice stores its vptr in its destructor (`0x00489920`). The
 keyboard and mouse destructors (`0x00489f20`, `0x0048a3c0`) are
 compiler-generated, so their classes declare none. Each has a scalar
 deleting wrapper (`0x00489900`, `0x00489f00`, `0x0048a3a0`).
+
+## Source shapes
+
+Several functions match only in a specific source shape:
+
+- **Device creation** (PCMouseDevice and PCKeyboardDevice slot 2, and
+  PCJoystickDevice `0x004c3a10`) needs `goto failed` with one failure block
+  placed before the final `return 1`. Early returns, nested ifs and result
+  variables all lay the blocks out differently, or fold the last test into
+  `setge`.
+- **Button queries** need a single `&&`/`||` condition so that every failure
+  shares one `return 0`.
+
+The device-creation calls use GUIDs that decode to GUID_SysMouse,
+GUID_SysKeyboard and IID_IDirectInputDevice7A, and data formats with the
+layout of c_dfDIMouse and c_dfDIKeyboard. The DirectInput object is at
+ControlInterface +0xcc0.
 
 ## ControlInterface
 

@@ -1,10 +1,17 @@
 {
   "??0MouseDevice@@QAE@XZ": "0x0048a2d0",
-  "??1?$ContainerList@H@@QAE@XZ": "0x00402040",
+  "??1?$ContainerList@PAUUnknownControlBinding@@@@QAE@XZ": "0x00402040",
   "??1PCInputDevice@@UAE@XZ": "0x004c2650",
   "??1PCMouseDevice@@UAE@XZ": "0x004c4910",
   "??1PCMouseDevice@@UAE@XZ$ehhandler": "0x0054cca8",
   "??3@YAXPAX@Z": "0x004a30c0",
   "??_7PCMouseDevice@@6B@": "0x00555f78",
-  "??_M@YGXPAXIHP6EX0@Z@Z": "0x00536140"
+  "??_M@YGXPAXIHP6EX0@Z@Z": "0x00536140",
+  "?UnknownFunction43cc10@UnknownControlMapping@@QAEXHPAH@Z": "0x0043cc10",
+  "?UnknownFunction48a240@UnknownInterface56e26c@@QAEHH@Z": "0x0048a240",
+  "?UnknownMethod4c2710@PCInputDevice@@QAEHHKKK@Z": "0x004c2710",
+  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "_GUID_SysMouse": "0x00556b20",
+  "_IID_IDirectInputDevice7A": "0x00556a50",
+  "_c_dfDIMouse": "0x00558f30"
 }

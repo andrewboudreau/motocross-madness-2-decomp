@@ -1,9 +1,10 @@
 #pragma once
 
 #include "ContainerList.h"
+#include "ControlInterface.h"
 #include "PCInputDevice.h"
 
-// RTTI: MouseDevice : PCInputDevice. Slots 2-6 are _purecall here
+// RTTI: MouseDevice : PCInputDevice. It overrides slot 0; slots 2-6 are _purecall here
 // (PCMouseDevice implements them). TU not established.
 class MouseDevice : public PCInputDevice {
 public:
@@ -11,7 +12,14 @@ public:
     // (wrapper 0x0048a3a0).
     MouseDevice();                // 0x0048a2d0
 
+    virtual void UnknownVirtualSlot0(int id);  // 0x0048a4c0
+    virtual int UnknownVirtualSlot2() = 0;
+    virtual void UnknownVirtualSlot3() = 0;
+    virtual int UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry) = 0;
+    virtual int UnknownVirtualSlot5(int button, int modifier, UnknownInputEntry* entry) = 0;
+    virtual int UnknownVirtualSlot6(int value) = 0;
+
 protected:
     UnknownInputEntry field_0x260[4];
-    ContainerList<int> field_0x2b0[2];
+    ContainerList<UnknownControlBinding*> field_0x2b0[2]; // bindings per axis
 };

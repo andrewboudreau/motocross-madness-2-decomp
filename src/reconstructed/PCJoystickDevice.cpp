@@ -331,6 +331,32 @@ int PCJoystickDevice::UnknownVirtualSlot20(int value) {
     return 1;
 }
 
+// 0x004c3a10: switches buffered input on (16 entries) or off. Property 1 is
+// consistent with DIPROP_BUFFERSIZE; the device is unacquired around it.
+int PCJoystickDevice::UnknownMethod4c3a10(int buffered) {
+    if (!field_0x25c)
+        return 0;
+    field_0x25c->UnknownMethod8();
+    UnknownInputProperty property;
+    memset(&property, 0, sizeof(property));
+    property.size = sizeof(property);
+    property.headerSize = 0x10;
+    property.object = 0;
+    property.how = 0;
+    property.data = buffered ? 16 : 0;
+    long result = field_0x25c->UnknownMethod6(1, &property);
+    if (result < 0) {
+        UnknownReportError(result, __FILE__, 590);
+        goto failed;
+    }
+    field_0x5d4_bit0 = buffered;
+    if (field_0x25c->UnknownMethod7() < 0)
+        goto failed;
+    return 1;
+failed:
+    return 0;
+}
+
 // 0x004c3ae0
 void PCJoystickDevice::UnknownMethod4c3ae0(unsigned char value) {
     field_0x5d5 = value;

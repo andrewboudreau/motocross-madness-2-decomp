@@ -74,6 +74,8 @@ public:
     void UnknownFunction43cbd0(int control, int* result, int device);
     // 0x0043cba0: the keyboard key for `control`, or -1.
     void UnknownFunction43cba0(int control, int* result);
+    // 0x0043cc10: the mouse button for `control`, or -1.
+    void UnknownFunction43cc10(int control, int* result);
 };
 
 // RTTI: ControlInterface (root; PCControlInterface derives from it). Slot 0
@@ -102,4 +104,5 @@ public:
     int field_0x38;                        // queued events
     UnknownControlEvent field_0x3c[160];
     UnknownControlMapping* field_0xcbc;
+    struct UnknownDirectInput* field_0xcc0;
 };

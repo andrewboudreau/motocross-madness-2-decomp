@@ -106,7 +106,7 @@ public:
     int UnknownMethod4c2d90(int index, int value); // not reconstructed
     int UnknownMethod4c3100(int value);            // not reconstructed
     int UnknownMethod4c3790(int value);            // near miss in samples/inputdevice
-    int UnknownMethod4c3a10(int buffered);         // near miss in samples/inputdevice
+    int UnknownMethod4c3a10(int buffered);
     int CheckPollResult(long result);              // inline
     void UnknownMethod4c3ae0(unsigned char value);
 
