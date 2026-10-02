@@ -2,6 +2,7 @@
 
 #include <float.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "Camera.h"
@@ -192,10 +193,10 @@ void EventManager::UnknownFunction45e550(float) {
     int ready = 1;
     int local = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
     for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-        int player = g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c;
+        int player = g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4;
         if (player != local) {
             int connected = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac800(player);
-            if (!g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 && connected)
+            if (!g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc && connected)
                 ready = 0;
         }
     }
@@ -310,16 +311,16 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int player, int d, 
     char line[260];
     if (type == 5) {
         for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-            if (g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c == message->field_0x08)
-                g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 = 1;
+            if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == message->field_0x08)
+                g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
         }
         if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !UnknownFunction45d2b0())
             UnknownFunction45fbd0(message->field_0x08);
     } else if (player) {
         if (type == 0x89) {
             for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-                if (g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c == player)
-                    g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 = 1;
+                if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == player)
+                    g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
             }
             if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !UnknownFunction45d2b0())
                 UnknownFunction45fbd0(player);
@@ -329,9 +330,9 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int player, int d, 
             if (!view || g_UnknownGlobal56e26c->uiInteractionBlocked)
                 return 0;
             for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-                if (g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c == player &&
-                    g_UnknownGlobal56e26c->field_0x2224[i].field_0x10 == update->field_0x04) {
-                    g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 = 1;
+                if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == player &&
+                    g_UnknownGlobal56e26c->field_0x215c[i].field_0xd8 == update->field_0x04) {
+                    g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
                     if (view->field_0x3c[i]) {
                         view->field_0x3c[i]->field_0x768 = update->field_0x08;
                         view->field_0x3c[i]->field_0x750 = update->field_0x10;
@@ -383,9 +384,9 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int player, int d, 
                 field_0x3c = 1;
             } else {
                 for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-                    if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x2224[i].field_0x0c) {
-                        g_UnknownGlobal56e26c->field_0x2224[i].field_0x00 = 1;
-                        g_UnknownGlobal56e26c->field_0x2224[i].field_0x04 = 1;
+                    if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4) {
+                        g_UnknownGlobal56e26c->field_0x215c[i].field_0xc8 = 1;
+                        g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
                     }
                 }
             }
@@ -409,4 +410,35 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int player, int d, 
         }
     }
     return 0;
+}
+
+// 0x0045fbb0
+int UnknownFunction45fbb0(const void* a, const void* b) {
+    unsigned int first = *(const unsigned int*)a;
+    unsigned int second = *(const unsigned int*)b;
+    if (first < second)
+        return -1;
+    return first != second;
+}
+
+// 0x0045fbd0: removes `player`, moving the last entry and record into its
+// place, then re-sorts the entries.
+void EventManager::UnknownFunction45fbd0(int player) {
+    if (g_UnknownGlobal56e26c->field_0x18 < 2)
+        return;
+    for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
+        if (field_0x50[i].field_0x00 == player) {
+            if (!field_0x50[i].field_0x30)
+                g_UnknownGlobal56e26c->field_0x18--;
+            else
+                g_UnknownGlobal56e26c->field_0x3424--;
+            field_0x50[i] = field_0x50[g_UnknownGlobal56e26c->field_0x2158 - 1];
+            if (UnknownFunction45d2b0())
+                g_UnknownGlobal56e26c->field_0x215c[i] =
+                    g_UnknownGlobal56e26c->field_0x215c[g_UnknownGlobal56e26c->field_0x2158 - 1];
+            g_UnknownGlobal56e26c->field_0x2da5--;
+        }
+    }
+    if (g_UnknownGlobal56e26c->field_0x2158)
+        qsort(field_0x50, g_UnknownGlobal56e26c->field_0x2158 - 1, sizeof(UnknownEventEntry), UnknownFunction45fbb0);
 }

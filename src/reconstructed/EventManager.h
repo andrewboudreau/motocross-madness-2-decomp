@@ -33,6 +33,9 @@ int UnknownFunction45d3d0(const void* a, const void* b);
 // higher +0x7a0, +0x790 and +0x744->+0x0c).
 int UnknownFunction45e930(const void* a, const void* b);
 
+// cdecl 0x0045fbb0: qsort order for unsigned values.
+int UnknownFunction45fbb0(const void* a, const void* b);
+
 // Objects in EventManager's +0x424 list; slot 10 calls their slot 7.
 class UnknownEventListener {
 public:
@@ -54,7 +57,10 @@ struct UnknownEventEntry {
     UnknownEventEntry();                           // 0x0045c830 (resets through 0x0045c840)
     void UnknownFunction45c840();                  // 0x0045c840: reset
 
-    unsigned char field_0x00[0x50];
+    int field_0x00;                                // network player id
+    unsigned char field_0x04[0x30 - 0x04];
+    char field_0x30;                               // counted in TrackGame+0x3424 (else Game+0x18)
+    unsigned char field_0x31[0x50 - 0x31];
 };
 
 // RTTI: EventManager : GameObject (vtable 0x0055259c; 0xd08 bytes, the size

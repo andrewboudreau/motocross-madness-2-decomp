@@ -10,7 +10,7 @@ TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
 ## Status
 
-Exact (19 calibration cases):
+Exact (21 calibration cases):
 - the constructor (11 0x50-byte entries at +0x50; -1000 in each component
   of +0x3c4) and both destructors;
 - slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c;
@@ -39,6 +39,9 @@ Exact (19 calibration cases):
   entries. The buffers are function-scope (0x8e reuses the 260-byte one
   with a 128-byte limit), and the best-lap update compares through two
   float locals (`fld; fld; fcompp`);
+- `0x0045fbd0`: removes a player, moving the last entry (and, with a
+  race-mode object, TrackGame's last 0xf8-byte record) into its place, then
+  qsorts the entries with the unsigned comparator `0x0045fbb0`;
 - the cdecl comparators `0x0045e930` (standings) and `0x0045d3d0` (racer
   names, through the inline `strcmp` intrinsic).
 
@@ -52,15 +55,19 @@ it fits KrustyBike's primary base chain for the views. Their classes are not
 established; `src/reconstructed/RaceView.h` declares them.
 
 Not reconstructed:
-- `0x0045cb20`, `0x0045cb70`, `0x0045cdc0`, `0x0045d480`, `0x0045e710`,
-  `0x0045e9d0`, `0x0045eef0`, `0x0045f9a0` and `0x0045fbd0`.
+- `0x0045cb70`, `0x0045cdc0`, `0x0045d480`, `0x0045e710`, `0x0045e9d0`,
+  `0x0045eef0` and `0x0045f9a0`.
 
-Slot 24's message layouts live in `EventManager.cpp`. Declaring them in the
+Near miss (`samples/game/EventManagerNearMisses.cpp`): the cdecl progress
+callback `0x0045cb20` (63 of 67 bytes; retail swaps two registers).
+
+Slot 24's message layouts live in `EventManager.cpp`, and the GUI page and
+control classes in the near-miss sample. Declaring either in a shared
 header changed VC6's register choice in TrackGame slot 1 (an unrelated
-`availPhys + availPageFile` sum), so header-only type additions can disturb
-other translation units; re-run the full calibration after header edits.
+`availPhys + availPageFile` sum): header-only type additions can disturb
+other translation units, so re-run the full calibration after header edits.
 
 GameObject slot 24 (and Game slot 17, which forwards to it) now take
 `(int type, void* data, int c, int d, int e)`; the change is code-neutral.
 The view's +0x38 and +0x3c are racers (`UnknownEventRacer`, in
-`RaceView.h`); TrackGame's racer records start at +0x2224.
+`RaceView.h`); TrackGame's 0xf8-byte racer records start at +0x215c, after their count.

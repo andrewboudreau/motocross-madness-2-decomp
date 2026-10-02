@@ -122,15 +122,17 @@ public:
     unsigned char field_0x00[0x384];
 };
 
-// Per-racer record in TrackGame (0xf8 bytes, from +0x2224; the array's true
-// start and length are not established).
+// Per-racer record in TrackGame (0xf8 bytes from +0x215c, after the count at
+// +0x2158; EventManager 0x0045fbd0 copies whole records). The array's
+// length is not established.
 struct UnknownTrackGameRacerSlot {
-    int field_0x00;
-    int field_0x04;                           // ready
-    int field_0x08;
-    int field_0x0c;                           // network player id
-    int field_0x10;                           // player's racer index (EventManager slot 24)
-    unsigned char field_0x14[0xf8 - 0x14];
+    unsigned char field_0x00[0xc8];
+    int field_0xc8;                           // set when the player leaves (EventManager slot 24)
+    int field_0xcc;                           // ready
+    int field_0xd0;
+    int field_0xd4;                           // network player id
+    int field_0xd8;                           // player's racer index (EventManager slot 24)
+    unsigned char field_0xdc[0xf8 - 0xdc];
 };
 
 // Base of the +0x3410 object; its constructor sits among
@@ -218,9 +220,8 @@ public:
     TrackGameMode mode;
     unsigned char field_0xfc4[0x2158 - 0xfc4];
     int field_0x2158;                         // racer count (EventManager 0x0045e550)
-    unsigned char field_0x215c[0x2224 - 0x215c];
-    UnknownTrackGameRacerSlot field_0x2224[7]; // 0xf8 apart (EventManager 0x0045e550)
-    unsigned char field_0x28ec[0x2930 - 0x28ec];
+    UnknownTrackGameRacerSlot field_0x215c[8];
+    unsigned char field_0x291c[0x2930 - 0x291c];
     int field_0x2930;    // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x2934;  // saved KrustyBikeCamera presets (slots 59, 60)
     float field_0x2938;
@@ -231,7 +232,9 @@ public:
     int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
     unsigned char field_0x2d78[0x2d7c - 0x2d78];
     int field_0x2d7c;                         // cleared by EventManager 0x0045e520
-    unsigned char field_0x2d80[0x3338 - 0x2d80];
+    unsigned char field_0x2d80[0x2da5 - 0x2d80];
+    unsigned char field_0x2da5;                // decremented when a player leaves (EventManager 0x0045fbd0)
+    unsigned char field_0x2da6[0x3338 - 0x2da6];
     DirectoryList* profileDirectory;
     int menuIsOpen;
     UnknownTrackGameObject3340* field_0x3340;

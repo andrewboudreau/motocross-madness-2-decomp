@@ -25,6 +25,7 @@
   "?UnknownFunction45e9d0@EventManager@@QAEXXZ": "0x0045e9d0",
   "?UnknownFunction45eef0@EventManager@@QAEXM@Z": "0x0045eef0",
   "?UnknownFunction45f9a0@EventManager@@QAEXXZ": "0x0045f9a0",
+  "?UnknownFunction45fbb0@@YAHPBX0@Z": "0x0045fbb0",
   "?UnknownFunction45fbd0@EventManager@@QAEXH@Z": "0x0045fbd0",
   "?UnknownFunction49c770@UnknownTrackGameObject3410@@QAEXXZ": "0x0049c770",
   "?UnknownFunction4ac510@UnknownNetObject@@QAEXH@Z": "0x004ac510",
@@ -43,5 +44,6 @@
   "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
   "__real@4@3ffc9249250000000000": "0x005526ac",
   "__real@4@4001e000000000000000": "0x00550778",
+  "_qsort": "0x00534426",
   "_sprintf": "0x00534aaf"
 }
