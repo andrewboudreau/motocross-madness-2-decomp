@@ -17,5 +17,7 @@ jobs:
           python-version: '3.12'
       - name: Validate committed evidence and binary guardrails
         run: make static-check
+      - name: Check decompilation progress document
+        run: make progress-check
       - name: Run all input-free regression tests
         run: make test
