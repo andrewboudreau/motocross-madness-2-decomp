@@ -1,5 +1,8 @@
 #pragma once
 
+struct UnknownControlEvent;
+struct UnknownInputEntry;
+
 #include "BaseObject.h"
 
 // Global read by GameObject::Release (0x0065b548); nonzero blocks release.
@@ -34,8 +37,9 @@ public:
     virtual int UnknownVirtualSlot19(int value);
     virtual int UnknownVirtualSlot20(int value);
     virtual int UnknownVirtualSlot21(int value);
-    virtual int UnknownVirtualSlot22(int a, int b);
-    virtual int UnknownVirtualSlot23(int a, int b);
+    // Input events from Game slots 13 and 14, passed down the children.
+    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot24(int a, int b, int c, int d, int e);
     virtual int UnknownVirtualSlot25(void* value);
     virtual void UnknownVirtualSlot26();

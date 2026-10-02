@@ -135,9 +135,9 @@ int Camera::UnknownVirtualSlot18() {
 
 // 0x0042f090: only when no child handled the GameObject search does it
 // consult 0x0043caa0; a nonzero answer runs slot 27.
-int Camera::UnknownVirtualSlot23(int a, int b) {
-    if (!GameObject::UnknownVirtualSlot23(a, b)) {
-        if (UnknownFunction43caa0(0xB7, 0, a, 0x80000000)) {
+int Camera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (!GameObject::UnknownVirtualSlot23(event, entry)) {
+        if (UnknownFunction43caa0(0xB7, 0, event, 0x80000000)) {
             UnknownVirtualSlot27();
             return 1;
         }

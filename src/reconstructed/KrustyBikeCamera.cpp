@@ -18,10 +18,10 @@ KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
 KrustyBikeCamera::~KrustyBikeCamera() {}
 
 // 0x00497df0: the FollowCamera search, unless the global +0x3430 blocks it.
-int KrustyBikeCamera::UnknownVirtualSlot23(int a, int b) {
+int KrustyBikeCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (g_UnknownGlobal56e26c->field_0x3430)
         return 0;
-    return BikeCamera::UnknownVirtualSlot23(a, b);
+    return BikeCamera::UnknownVirtualSlot23(event, entry);
 }
 
 // 0x00497fa0: keeps the point at least 3.5 above the subject's ground height

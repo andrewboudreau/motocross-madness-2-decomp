@@ -11,7 +11,7 @@
   "?UnknownFunction51b540@UnknownMessageTarget@@QAEXPAVUnknownMessage@@@Z": "0x0051b540",
   "?UnknownFunction521970@UnknownObject56e26c@@QAEXHPADH@Z": "0x00521970",
   "?UnknownFunction524100@UnknownObject56e26cMode@@QAEHXZ": "0x00524100",
-  "?UnknownVirtualSlot23@FollowCamera@@UAEHHH@Z": "0x00466ad0",
+  "?UnknownVirtualSlot23@FollowCamera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00466ad0",
   "?UnknownVirtualSlot62@KrustyBikeCamera@@UAEXXZ": "0x00498280",
   "?UnknownVirtualSlot71@FollowCamera@@UAEXH@Z": "0x00466e50",
   "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",

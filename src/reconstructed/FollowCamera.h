@@ -88,7 +88,7 @@ public:
     virtual ~FollowCamera();          // destructor core 0x00463350
 
     virtual int UnknownVirtualSlot10(int value);     // 0x00465c20, not reconstructed
-    virtual int UnknownVirtualSlot23(int a, int b); // 0x00466ad0, not reconstructed
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00466ad0, not reconstructed
 
     virtual Vector3 UnknownVirtualSlot33() = 0;
     virtual Vector3 UnknownVirtualSlot34(int unused);

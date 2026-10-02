@@ -5,6 +5,8 @@
 #include "Game.h"
 
 #include "ControlInterface.h"
+#include "GameObject.h"
+#include "PCControl.h"
 
 // 0x0065b4ac: a file cleared by the constructor and closed by the
 // destructor (0x00534c3d is the CRT's fclose).
@@ -67,6 +69,12 @@ int Game::UnknownVirtualSlot5() {
 
 int Game::UnknownVirtualSlot6() {
     return 1;
+}
+
+// 0x00467af0: creates the PC control interface and sets it up (slot 1).
+int Game::UnknownVirtualSlot2() {
+    field_0x14 = new(__FILE__, 187) PCControlInterface;
+    return field_0x14->UnknownVirtualSlot1() != 0;
 }
 
 // 0x00467e80: slot 31's result is kept at +0x10 and handed to the interface.
@@ -151,7 +159,7 @@ int Game::UnknownVirtualSlot15() {
         g_UnknownGlobal56c470->UnknownFunction4691f0();
     g_UnknownStatic65b478.UnknownFunction4677c0();
     if (field_0x2f4) {
-        field_0x2f4->UnknownVirtualSlot2();
+        field_0x2f4->Release();
         field_0x2f4 = 0;
     }
     if (field_0x08) {

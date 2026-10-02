@@ -1,6 +1,7 @@
 #pragma once
 
 class ControlInterface;
+class GameObject;
 class UnknownGameOwned;
 struct UnknownControlEvent;
 struct UnknownInputEntry;
@@ -14,38 +15,6 @@ struct UnknownObject56e26cSettings {
     virtual void UnknownVirtualSlot3();
     unsigned char field_0x04[0x6c - 4];
     int field_0x6c;      // freezes RenderTarget's frame index (0x004e8cc0)
-};
-
-// Interface at Game+0x2f4; most Game slots forward to it. Released (slot 2)
-// on shutdown. The class is not established.
-class UnknownGameInterface {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12();
-    virtual void UnknownVirtualSlot13();
-    virtual void UnknownVirtualSlot14();
-    virtual void UnknownVirtualSlot15();
-    virtual void UnknownVirtualSlot16(int value);
-    virtual void UnknownVirtualSlot17();
-    virtual void UnknownVirtualSlot18();
-    virtual int UnknownVirtualSlot19(int value);
-    virtual void UnknownVirtualSlot20();
-    virtual void UnknownVirtualSlot21();
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
-    virtual int UnknownVirtualSlot24(int a, int b, int c, int d, int e);
-    virtual void UnknownVirtualSlot25(UnknownGameOwned* value);
 };
 
 // Network object at Game+0x08 (0x128 bytes; its code is near Net.cpp's
@@ -121,7 +90,7 @@ public:
     Game();                                   // 0x00467990
     virtual ~Game();                          // 0x00468a10 (deleting wrapper 0x00467ac0)
     virtual int UnknownVirtualSlot1();        // 0x00467ae0 (shared "return 1" body)
-    virtual void UnknownVirtualSlot2();       // 0x00467af0, not reconstructed
+    virtual int UnknownVirtualSlot2();        // 0x00467af0: creates the controls
     virtual int UnknownVirtualSlot3();        // 0x00468c90 (shared "return 1" body)
     virtual int UnknownVirtualSlot4();        // 0x00468c90
     virtual int UnknownVirtualSlot5();        // 0x00467ae0
@@ -165,7 +134,7 @@ public:
     ControlInterface* field_0x14;
     int field_0x18;                           // 1 initially; KrustyBikeCamera slot 42 tests > 1
     unsigned char field_0x001c[0x34 - 0x1c];
-    int field_0x34;
+    GameObject* field_0x34;                   // second root object (initialiser 0x00467b70)
     UnknownGameObject38* field_0x38;
     int field_0x3c;
     char field_0x40[0x1c4 - 0x40];            // empty string initially
@@ -187,5 +156,5 @@ public:
     float field_0x2e8;
     float field_0x2ec;
     float field_0x2f0;                        // frame time (KeyboardDevice 0x0048a0c0)
-    UnknownGameInterface* field_0x2f4;
+    GameObject* field_0x2f4;                  // root object; most slots forward to it
 };

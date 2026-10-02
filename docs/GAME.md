@@ -45,7 +45,15 @@ candidates.
 | 30 | `0x00468c60` | Exact ("No Strings Available") |
 | 33 | `0x00467e80` | Exact |
 | 7, 19–29, 31, 32, 34 | | `_purecall` |
-| 2, 8, 10 | | Not reconstructed |
+| 2 | `0x00467af0` | Exact. Creates the PCControlInterface (`new` at line 187) and calls its slot 1 |
+| 8, 10 | | Not reconstructed |
+
+The members at +0x2f4 and +0x34 are GameObjects (the root objects). The
+non-virtual initialiser `0x00467b70` constructs them with GameObject's
+constructor. Game's forwarding calls also line up with GameObject's slots
+16, 19, 22–25 and `Release`. Input events therefore travel down the
+GameObject tree: GameObject slots 22 and 23 take ControlInterface's
+(event, entry) pair, and Camera slot 23 matches control 0xb7 against it.
 
 The constructor (`0x00467990`) is exact. It:
 - calls the table setup `0x00460ad0`;

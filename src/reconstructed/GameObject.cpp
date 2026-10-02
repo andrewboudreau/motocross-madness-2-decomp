@@ -210,11 +210,11 @@ int GameObject::UnknownVirtualSlot19(int value) {
 }
 
 // 0x00469580
-int GameObject::UnknownVirtualSlot22(int a, int b) {
+int GameObject::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (field_0x20 & 0x200) {
         for (GameObject* child = field_0x10; child; child = child->field_0x0C) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3) {
-                if (child->UnknownVirtualSlot22(a, b))
+                if (child->UnknownVirtualSlot22(event, entry))
                     return 1;
             }
         }
@@ -223,11 +223,11 @@ int GameObject::UnknownVirtualSlot22(int a, int b) {
 }
 
 // 0x004695d0
-int GameObject::UnknownVirtualSlot23(int a, int b) {
+int GameObject::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (field_0x20 & 0x400) {
         for (GameObject* child = field_0x10; child; child = child->field_0x0C) {
             if (child->field_0x25_bit0 && !child->field_0x25_bit3) {
-                if (child->UnknownVirtualSlot23(a, b))
+                if (child->UnknownVirtualSlot23(event, entry))
                     return 1;
             }
         }

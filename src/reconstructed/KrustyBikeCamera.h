@@ -66,7 +66,7 @@ public:
 
     virtual int UnknownVirtualSlot10(int value); // 0x00497e20 (near miss: samples/camera)
 
-    virtual int UnknownVirtualSlot23(int a, int b);
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual void UnknownVirtualSlot42(bool flag);
     virtual Vector3 UnknownVirtualSlot48(int a, bool flag, int b);
     virtual void UnknownVirtualSlot52(Vector3* point);

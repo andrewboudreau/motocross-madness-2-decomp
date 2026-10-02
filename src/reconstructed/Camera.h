@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ControlInterface.h"
 #include "GameObject.h"
 #include "MatrixUtil.h"
 #include "RenderTarget.h"
@@ -9,8 +10,6 @@
 // member offsets are confirmed by the strict-exact constructor (0x0042e340)
 // and methods, and the class ends at +0x220 where FollowCamera's fields begin.
 
-// cdecl 0x0043caa0, called by Camera slot 23 as (0xb7, 0, a, 0x80000000).
-int UnknownFunction43caa0(int code, int value, int a, unsigned int flags);
 
 // .rdata floats just before Camera's vtable, loaded by the constructor.
 extern const float g_UnknownFloat550f6c; // 1.0f
@@ -29,7 +28,7 @@ public:
     virtual int UnknownVirtualSlot13();
     virtual int UnknownVirtualSlot14();
     virtual int UnknownVirtualSlot18();
-    virtual int UnknownVirtualSlot23(int a, int b);
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // Pure: Camera's vtable holds LIBCMT _purecall (0x00534cfe) in slot 27.
     virtual void UnknownVirtualSlot27() = 0;
