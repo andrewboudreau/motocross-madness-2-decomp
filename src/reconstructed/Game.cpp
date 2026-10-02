@@ -372,8 +372,8 @@ int Game::UnknownVirtualSlot16(int value) {
 }
 
 // 0x00468ba0
-int Game::UnknownVirtualSlot17(int a, int b, int c, int d, int e) {
-    return field_0x2f4->UnknownVirtualSlot24(a, b, c, d, e) != 0;
+int Game::UnknownVirtualSlot17(int type, void* data, int c, int d, int e) {
+    return field_0x2f4->UnknownVirtualSlot24(type, data, c, d, e) != 0;
 }
 
 // 0x00468bd0: `path` = the +0x1cc directory, "\\" and `name`.
