@@ -10,6 +10,52 @@
 // destructor (0x00534c3d is the CRT's fclose).
 static FILE* s_UnknownFile65b4ac;
 
+// 0x0056b334 and 0x0056b350: stored XOR 0x5b and decoded by the constructor
+// ("SOFTWARE\\Rainbow Studios\\" and "TestKey").
+static char s_UnknownEncoded56b334[] =
+    "\x08\x14\x1d\x0f\x0c\x1a\x09\x1e\x07\x09\x3a\x32\x35\x39\x34\x2c\x7b\x08\x2f\x2e\x3f\x32\x34\x28\x07";
+static char s_UnknownEncoded56b350[] = "\x0f\x3e\x28\x2f\x10\x3e\x22";
+
+static inline void DecodeString(char* text) {
+    for (; *text; text++)
+        *text ^= 0x5b;
+}
+
+// 0x00467990
+Game::Game() {
+    UnknownFunction460ad0();
+    field_0x2d5_bit3 = 1;
+    field_0x2d4 = field_0x2d4 & ~4 | 2;
+    field_0x04 = 0;
+    field_0x08 = 0;
+    field_0x0c = 0;
+    field_0x10 = 0;
+    field_0x14 = 0;
+    field_0x34 = 0;
+    field_0x2f4 = 0;
+    field_0x3c = 0;
+    field_0x18 = 1;
+    field_0x2d0 = 0;
+    field_0x38 = 0;
+    s_UnknownFile65b4ac = 0;
+    strcpy(field_0x40, "");
+    field_0x2dc = 0;
+    field_0x2d8 = 0;
+    field_0x2e0 = 1.0f;
+    field_0x2d4 = field_0x2d4 & 7 | 0x38;
+    field_0x1c4 = 0;
+    field_0x1c8 = 0;
+    field_0x2d5_bit0 = 0;
+    field_0x2d5_bit1 = 0;
+    field_0x2d5_bit2 = 1;
+    field_0x2e4 = 1.0f;
+    field_0x2e8 = 0;
+    field_0x2ec = 0.05f;
+    field_0x2f0 = 0;
+    DecodeString(s_UnknownEncoded56b334);
+    DecodeString(s_UnknownEncoded56b350);
+}
+
 // 0x00467ae0 (identical code for slots 5 and 6)
 int Game::UnknownVirtualSlot1() {
     return 1;
@@ -37,6 +83,11 @@ int Game::UnknownVirtualSlot33() {
 int Game::UnknownVirtualSlot9() {
     field_0x0c->UnknownVirtualSlot3();
     return 1;
+}
+
+// 0x00468880
+void Game::UnknownFunction468880() {
+    field_0x2d8 = field_0x2dc = UnknownFunction4bfa80();
 }
 
 // 0x004688a0

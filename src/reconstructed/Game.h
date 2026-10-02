@@ -83,6 +83,12 @@ public:
 };
 extern UnknownStatic65b478 g_UnknownStatic65b478;
 
+// cdecl 0x00460ad0: fills math lookup tables (called by the constructor).
+void UnknownFunction460ad0();
+
+// cdecl 0x004bfa80: the current time stamp.
+unsigned int UnknownFunction4bfa80();
+
 // cdecl 0x0052d0d0, called last on shutdown.
 void UnknownFunction52d0d0();
 
@@ -170,10 +176,12 @@ public:
     unsigned char field_0x2d4;                // flag bits (bit 2: KeyboardDevice 0x0048a240)
     unsigned char field_0x2d5_bit0 : 1;       // slots 11 and 13
     unsigned char field_0x2d5_bit1 : 1;       // set on shutdown
-    unsigned char field_0x2d5_bits : 6;
+    unsigned char field_0x2d5_bit2 : 1;       // set by the constructor
+    unsigned char field_0x2d5_bit3 : 1;       // set by the constructor
+    unsigned char field_0x2d5_bits : 4;
     unsigned char field_0x02d6[2];
-    int field_0x2d8;
-    int field_0x2dc;
+    unsigned int field_0x2d8;                 // time stamps (0x00468880)
+    unsigned int field_0x2dc;
     float field_0x2e0;
     float field_0x2e4;
     float field_0x2e8;

@@ -47,7 +47,14 @@ candidates.
 | 7, 19–29, 31, 32, 34 | | `_purecall` |
 | 2, 8, 10 | | Not reconstructed |
 
-The constructor (`0x00467990`) is not reconstructed yet. It sets the +0x2d4
-and +0x2d5 bit groups, copies an empty string to +0x40, sets 1.0 at
-+0x2e0/+0x2e4 and 0.05 at +0x2ec, and decodes two static strings in place
-(XOR 0x5b).
+The constructor (`0x00467990`) is exact. It:
+- calls the table setup `0x00460ad0`;
+- sets the +0x2d4 bits (masked byte stores) and the +0x2d5 bits (merged
+  bitfield stores);
+- copies an empty string to +0x40;
+- sets 1.0 at +0x2e0/+0x2e4 and 0.05 at +0x2ec;
+- decodes two static strings in place (XOR 0x5b): "SOFTWARE\Rainbow
+  Studios\" and "TestKey".
+
+`0x00468880` (called by PCCamera slot 27) stamps +0x2d8/+0x2dc with the
+time from `0x004bfa80`.
