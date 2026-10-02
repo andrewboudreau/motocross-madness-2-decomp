@@ -3343,6 +3343,15 @@ CASES = [
         'reason': 'top surface loaded before the caps memset',
     },
     {
+        'name': 'PCTextureMap slot5 stream load',
+        'bindings': 'src/reconstructed/PCTextureMap.bindings.json',
+        'source': 'src/reconstructed/PCTextureMap.cpp',
+        'symbol': '?UnknownVirtualSlot5@PCTextureMap@@UAEHPAVUnknownTextureStream@@HHHHHHPAUUnknownTexturePalette@@HPAXHHPAUUnknownTextureFormatChoice@@HI@Z',
+        'target_va': '0x004c6080',
+        'target_size': 2129,
+        'reason': 'index-based offset table (VC6 strength-reduces it); max-style double evaluation; inline row read',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

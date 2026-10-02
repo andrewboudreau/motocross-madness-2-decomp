@@ -14,13 +14,24 @@ struct UnknownTexturePalette {
     unsigned char field_0x710[0x8000];
 };
 
-// Formats slot 4 picks between: +0x0c without alpha, +0x10 with alpha.
+// Formats slots 4 and 5 pick between: +0x0c without alpha, +0x10 with
+// alpha. +0x14 is how many times slot 5 halves textures wider than 32.
 struct UnknownTextureFormatChoice {
     int field_0x00;
     int field_0x04;
     int field_0x08;
     int field_0x0c;
     int field_0x10;
+    int field_0x14;
+};
+
+// The stream textures load from: 0x00461600 returns the read position,
+// 0x00461640 reads `count` items of `size` bytes and returns how many it
+// read. Both follow +0x1c to the innermost stream first.
+class UnknownTextureStream {
+public:
+    int UnknownFunction461600();
+    int UnknownFunction461640(void* buffer, int size, int count);
 };
 
 // A render state and its value (RenderTarget slot 8).
@@ -41,7 +52,10 @@ public:
                                     int flags, void* surfacePalette, int checkMemory, int unused,
                                     int addressU, int addressV, UnknownTextureFormatChoice* choice,
                                     int alphaThreshold, unsigned int key) = 0;
-    virtual void UnknownVirtualSlot5() = 0;
+    virtual int UnknownVirtualSlot5(UnknownTextureStream* stream, int width, int height, int minimumSize,
+                                    int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
+                                    int flags, void* surfacePalette, int addressU, int addressV,
+                                    UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key) = 0;
     virtual TextureMap* UnknownVirtualSlot6() = 0;
     virtual int UnknownVirtualSlot7() = 0;
     virtual int UnknownVirtualSlot8(int a, int b, int c) = 0;
@@ -76,7 +90,7 @@ public:
     int field_0x44;                           // render-state pair count
     UnknownRenderStatePair field_0x48[4];     // applied by slot 19 (length not established)
     int field_0x68;                           // bit 0: a CacheTexture
-    unsigned char field_0x6c[0x70 - 0x6c];
+    int field_0x6c;                           // format choice +0x14 (slot 5)
 };
 
 // Object at PCTextureMap+0x7c; its destructor 0x0052d050 sits among
@@ -94,14 +108,26 @@ int UnknownFunction511970(int format);
 extern int g_UnknownGlobal689964;
 
 // cdecl 0x004d1b90: downsamples `source` (stride in pixels) into the
-// width x height `destination`.
-void UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
-                           int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter);
+// width x height `destination`; 0 on failure.
+int UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter);
 
 // Tgafile.cpp helpers (cdecl): whether a format has alpha, and its
 // DirectDraw pixel format.
 int UnknownFunction511ad0(int format);
 void UnknownFunction5119c0(int format, void* pixelFormat);
+
+// Tgafile.cpp file-format helpers (cdecl): the pixel format a file format
+// decodes to (0x005118a0), whether it stores mip levels (0x00511850),
+// whether it is compressed (0x00511800) and its bytes per pixel
+// (0x00511740).
+int UnknownFunction5118a0(int fileFormat);
+int UnknownFunction511850(int fileFormat);
+int UnknownFunction511800(int fileFormat);
+int UnknownFunction511740(int fileFormat);
+
+// Lzw.cpp (cdecl 0x004a03d0): expands `source` into `size` bytes.
+void UnknownFunction4a03d0(void* destination, void* source, int size);
 
 // Pixtrans.cpp converters (cdecl): 0x004d1d20 copies `source` into
 // `destination`; 0x004d24d0 inspects the converted bits.
@@ -135,7 +161,11 @@ public:
                                     int flags, void* surfacePalette, int checkMemory, int unused,
                                     int addressU, int addressV, UnknownTextureFormatChoice* choice,
                                     int alphaThreshold, unsigned int key);
-    virtual void UnknownVirtualSlot5();       // 0x004c6080
+    // 0x004c6080: reads the texture from `stream`, then creates it through slot 4.
+    virtual int UnknownVirtualSlot5(UnknownTextureStream* stream, int width, int height, int minimumSize,
+                                    int fileFormat, int dataSize, int format, UnknownTexturePalette* palette,
+                                    int flags, void* surfacePalette, int addressU, int addressV,
+                                    UnknownTextureFormatChoice* choice, int alphaThreshold, unsigned int key);
     virtual TextureMap* UnknownVirtualSlot6(); // 0x004c71c0: a copy of the texture
     virtual int UnknownVirtualSlot7();        // 0x004c7470: whether +0x74 exists
     // 0x004c7480: creates the texture surface from +0x70 (or shares it).

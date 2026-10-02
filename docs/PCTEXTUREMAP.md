@@ -14,7 +14,7 @@ at +0x74. An object at +0x7c is destroyed through vfwdeco.cpp's
 
 ## Status
 
-Exact (20 calibration cases):
+Exact (21 calibration cases):
 - the constructor `0x004c5f00` (TextureMap's `0x0050a4e0`, then clears
   +0x70..+0x7c);
 - the scalar deleting destructor `0x004c5f30` and the destructor
@@ -36,6 +36,24 @@ Exact (20 calibration cases):
   Retail's shared `return 0` / `return 1` exits come from `goto failed` /
   `goto done`, with `done:` first in the source: VC6 lays labelled return
   blocks out in reverse order;
+- slot 5 (2129 bytes), which loads a texture from a stream (`0x00461600`
+  position, `0x00461640` read). Tgafile.cpp's file-format helpers give the
+  decoded format (`0x005118a0`), whether mip levels are stored
+  (`0x00511850`), whether data is compressed (`0x00511800`) and the stored
+  bytes per pixel (`0x00511740`). Two manager scratch buffers
+  (`0x00511310`, `0x00511370`) hold the read and decoded bits; Lzw.cpp's
+  `0x004a03d0` expands file formats 6–12 / 0x15–0x1b. Mipmapped files hold
+  an offset table (each entry relative to where it was read) and the levels
+  from 1x1 up; levels at least `minimumSize` wide are converted into the
+  surfaces slot 4 creates (GetAttachedSurface, then Pixtrans `0x004d1d20`)
+  and the levels the format choice's +0x14 drops are read past. Other files
+  are halved (Pixtrans `0x004d1b90`) up to +0x14 times while wider than 32
+  and handed to slot 4. Indexing the offset table (`offsets[level]`) rather
+  than walking a pointer is what reproduces retail's registers: VC6
+  strength-reduces the index itself. The pixel-size maximum is evaluated
+  max-macro style (the larger size is recomputed), and the raw-level reads
+  go through an inline helper, which makes VC6 compute the row size before
+  pushing the row count;
 - `0x004c7420`, which recreates a lost texture through slot 8;
 - `0x004c7b00`, which blits +0x70 into another surface unless told to
   skip. The `if (!skip)` form puts the blit first, as retail does;
@@ -83,6 +101,6 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   append helper. Only the non-mip fallback chain differs: VC6 cross-jumps
   its identical call tails into the first case, retail into the last.
 
-Not reconstructed: slot 5 (about 2 KB), the TextureMap base
+Not reconstructed: the TextureMap base
 (`0x0050a4e0`, `0x0050ab40`), `0x004c7b40`, `0x004c7e30`, `0x004c7ef0`,
 `0x004c8550` and the error reporter `0x004c86e0`.
