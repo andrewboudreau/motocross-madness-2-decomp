@@ -3,14 +3,14 @@
 // decoded from the target bytes (tier 1); the names are guesses.
 //
 // The CollisionObject members 0x00435830 SetTransform, 0x00439400 SetField_0x74 and
-// 0x00439410 AddIgnoredOwner are declared in ../collision/CollisionObject.h.
+// 0x00439410 AddIgnoredOwner are declared in collision/CollisionObject.h (src/krusty2).
 // Virtual: slot 2 of the GraphicsTest subobject at +0xc (BaseObjectVirtualSlot2, the
 // Release-style slot, called through [ [obj+0xc] + 8 ]) is invoked after use.
 #ifndef OBJECT_PLACEMENT_TYPES_H
 #define OBJECT_PLACEMENT_TYPES_H
 
 #include "ContactTypes.h"
-#include "../collision/CollisionObject.h"
+#include "collision/CollisionObject.h"
 
 // Ground/probe query object (SoultreeProbe in SoultreePhysicsCallees.h is only forward
 // declared).  0x00507c10 is thiscall, ret 0x10: (point, out point, 1, out flag byte).

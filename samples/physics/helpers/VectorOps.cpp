@@ -19,6 +19,3 @@ Vec3 g_ProbeVec3MulSV(float s, const Vec3& v) { return s * v; }
 
 // 0x00428060. Vec3::operator+=(const Vec3&), __thiscall ret 4, returns this.
 void g_ProbeVec3AddAssign(Vec3& a, const Vec3& b) { a += b; }
-
-// 0x00515600. CrossProduct(const Vec3&, const Vec3&), cdecl, hidden result first.
-Vec3 g_ProbeVec3Cross(const Vec3& a, const Vec3& b) { return CrossProduct(a, b); }

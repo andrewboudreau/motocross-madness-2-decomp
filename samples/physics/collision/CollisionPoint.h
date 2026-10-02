@@ -5,7 +5,7 @@
 #ifndef COLLISION_POINT_H
 #define COLLISION_POINT_H
 
-#include "CollisionTypes.h"
+#include "collision/CollisionTypes.h"
 
 // The object a contact point belongs to (CollisionPoint::field_0x04).  Only one method
 // is used: 0x004fd660 (thiscall, ret 8), which the scene node class (SoultreeObject)
@@ -25,40 +25,40 @@ public:
     virtual void CollisionPointVirtualSlot1();
 
     // Not vtable slots: table-management helpers in CollisionPoint.cpp.
-    // 0x0043a640 (thiscall, ret 0x14).  Recomputes the relative position (field_0x38) and the
-    // tangent direction/magnitude pair (field_0x50/field_0x94) from the contact normal
-    // field_0x2c (tier 3 semantics, see CollisionPoint.cpp).
+    // 0x0043a640 (thiscall, ret 0x14).  Recomputes the relative position (relativePosition) and the
+    // tangent direction/magnitude pair (frictionDirection/spinSpeed) from the contact normal
+    // surfaceNormal (tier 3 semantics, see CollisionPoint.cpp).
     void Fn_0043a640(const CollisionVec3* a1, const CollisionVec3* a2, const CollisionVec3* a3,
                      const CollisionVec3* a4, float a5);
 
-    CollisionContactOwner* field_0x04;       // owner; may be null (set by AddCollisionPoint)
-    CollisionVec3 field_0x08;
-    CollisionVec3 field_0x14;
-    CollisionVec3 field_0x20;
-    CollisionVec3 field_0x2c;
-    CollisionVec3 field_0x38;
+    CollisionContactOwner* ownerNode;       // +0x04 owner; may be null (set by AddCollisionPoint)
+    CollisionVec3 localPosition;  // +0x08 AddCollisionPoint stores its position argument here; 0x0043ad80 converts it with ownerNode->LocalToWorldPoint
+    CollisionVec3 worldPosition;  // +0x14 result of the LocalToWorldPoint in 0x0043ad80 (or offset - k*normal for a single contact); Fn_0043a640 computes relativePosition = this - a1
+    CollisionVec3 surfacePosition;  // +0x20 copy of worldPosition passed in/out to the ground query 0x00507c10 which snaps it to the surface; penetration uses (surfacePosition.y - worldPosition.y)
+    CollisionVec3 surfaceNormal;  // +0x2c normal output of the ground query 0x00507c10 (2nd argument); projection axis in Fn_0043a640, summed in 0x0043aa30
+    CollisionVec3 relativePosition;  // +0x38 Fn_0043a640: = worldPosition - a1 (position relative to the body); Tire computes the same
     CollisionVec3 field_0x44;
-    CollisionVec3 field_0x50;                // scaled by field_0x84 into field_0x78 (slot 1)
+    CollisionVec3 frictionDirection;                // +0x50 scaled by frictionMagnitude into frictionForce (slot 1)
     CollisionVec3 field_0x5c;
     CollisionVec3 field_0x68;
-    float field_0x74;
-    CollisionVec3 field_0x78;
-    float field_0x84;
-    float field_0x88;
-    float field_0x8c;
-    float field_0x90;
-    float field_0x94;
-    float field_0x98;
-    float field_0x9c;
+    float frictionCoefficient;  // +0x74 slot 1: frictionMagnitude = -normalForce * surfaceGrip * frictionCoefficient; Tire overrides the same expression with its own coefficients
+    CollisionVec3 frictionForce;  // +0x78 slot 1: = frictionDirection * frictionMagnitude (zero when both slip terms are below 0.001)
+    float frictionMagnitude;  // +0x84 slot 1: = -normalForce*surfaceGrip*coefficient, then made non-negative
+    float normalForce;  // +0x88 inlined ctor argument a (AddCollisionPoint a6); slot 1 negates it, so it holds a negative load
+    float surfaceGrip;  // +0x8c 0x0043ad80: = surface table[surfaceType] (table at owner+0xa4, +0x3a0) or 1.0f without an owner; slot 1 multiplies it in
+    float tangentSpeed;  // +0x90 Fn_0043a640: dot(tangent, a3), the slip component along the surface; slot 1 tests it against 0.001
+    float spinSpeed;  // +0x94 Fn_0043a640: |cross(n*(n.a2), a4)|, contact speed from rotation about the normal; slot 1 tests it against 0.001
+    float penetration;  // +0x98 0x0043ad80: = (surfacePosition.y - worldPosition.y) * surfaceNormal.y; AddCollisionPoint initialises it to threshold - 999
+    float penetrationThreshold;  // +0x9c AddCollisionPoint a4; 0x0043ad80: inContact = (penetration >= penetrationThreshold)
     float field_0xa0;
-    float field_0xa4;
+    float inContact;  // +0xa4 0x0043ad80 sets 1.0f/0.0f from the penetration test and counts it; 0x0043aa30 only merges points with it set
     float field_0xa8;
     float field_0xac;
     float field_0xb0;
     float field_0xb4;
     float field_0xb8;
-    char field_0xbc;
-    int field_0xc0;
+    char surfaceType;  // +0xbc low three bits of the flag byte written by the ground query (&= 7 in 0x0043ad80); indexes the per-surface grip table
+    int surfaceOwner;  // +0xc0 inlined ctor argument b (AddCollisionPoint a7); 0x0043ad80 reads the surface table from [this+0xa4]+0x3a0 when nonzero
 };
 
 // Vector helpers used by the collision code (see CollisionVectorHelpers.cpp / CollisionPoint.cpp).

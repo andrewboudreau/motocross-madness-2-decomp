@@ -6,7 +6,7 @@
 #include "PCJoystickDevice.h"
 #include "PCKeyboardDevice.h"
 #include "PCMouseDevice.h"
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // 0x004beef0: the effect GUID's name in `name` (empty and 0 when unknown).
 // Placed here by address only: it directly precedes PCControlInterface.
@@ -65,7 +65,7 @@ int UnknownFunction4beef0(UnknownGuid guid, char* name) {
 
 // 0x004bf1f0
 PCControlInterface::PCControlInterface() {
-    field_0xcc0 = 0;
+    directInput = 0;
     field_0xcc4 = 1;
 }
 
@@ -74,21 +74,21 @@ PCControlInterface::PCControlInterface() {
 // anyway. The first joystick becomes the active one.
 int PCControlInterface::UnknownVirtualSlot1() {
     if (DirectInputCreateEx(g_UnknownGlobal56e26c->field_0x318, 0x700, IID_IDirectInput7A,
-                            (void**)&field_0xcc0, 0) < 0)
+                            (void**)&directInput, 0) < 0)
         return 0;
-    field_0x34 = new(__FILE__, 107) PCKeyboardDevice;
-    if (!field_0x34)
+    keyboard = new(__FILE__, 107) PCKeyboardDevice;
+    if (!keyboard)
         return 0;
-    field_0x34->UnknownVirtualSlot2();
-    field_0x30 = new(__FILE__, 114) PCMouseDevice;
-    if (!field_0x30)
+    keyboard->UnknownVirtualSlot2();
+    mouse = new(__FILE__, 114) PCMouseDevice;
+    if (!mouse)
         return 0;
-    field_0x30->UnknownVirtualSlot2();
-    field_0x04 = 0;
-    field_0xcc0->UnknownMethod4(4, UnknownEnumDevicesCallback, this, 1);
-    if (!field_0x04)
-        field_0x10[0] = new(__FILE__, 125) PCJoystickDevice(field_0x04);
-    field_0x0c = field_0x10[0];
+    mouse->UnknownVirtualSlot2();
+    joystickCount = 0;
+    directInput->EnumDevices(4, UnknownEnumDevicesCallback, this, 1);
+    if (!joystickCount)
+        joysticks[0] = new(__FILE__, 125) PCJoystickDevice(joystickCount);
+    activeJoystick = joysticks[0];
     return 1;
 }
 
@@ -97,15 +97,15 @@ int PCControlInterface::UnknownVirtualSlot1() {
 int __stdcall PCControlInterface::UnknownEnumDevicesCallback(const UnknownDeviceInstance* instance,
                                                              void* context) {
     PCControlInterface* control = (PCControlInterface*)context;
-    control->field_0x10[control->field_0x04] = new(__FILE__, 73) PCJoystickDevice(control->field_0x04);
-    if (control->field_0x10[control->field_0x04] &&
-        ((PCJoystickDevice*)control->field_0x10[control->field_0x04])->UnknownFunction4c2930(instance)) {
-        control->field_0x04++;
-        if (control->field_0x04 == 8)
+    control->joysticks[control->joystickCount] = new(__FILE__, 73) PCJoystickDevice(control->joystickCount);
+    if (control->joysticks[control->joystickCount] &&
+        ((PCJoystickDevice*)control->joysticks[control->joystickCount])->UnknownFunction4c2930(instance)) {
+        control->joystickCount++;
+        if (control->joystickCount == 8)
             return 0;
     } else {
-        delete control->field_0x10[control->field_0x04];
-        control->field_0x10[control->field_0x04] = 0;
+        delete control->joysticks[control->joystickCount];
+        control->joysticks[control->joystickCount] = 0;
     }
     return 1;
 }
@@ -113,42 +113,42 @@ int __stdcall PCControlInterface::UnknownEnumDevicesCallback(const UnknownDevice
 // 0x004bf490
 void PCControlInterface::UnknownFunction4bf490(int acquire) {
     field_0xcc4 = acquire;
-    if (field_0x34)
-        field_0x34->UnknownMethod4c26d0(field_0xcc4);
-    if (field_0x30)
-        field_0x30->UnknownMethod4c26d0(field_0xcc4);
+    if (keyboard)
+        keyboard->UnknownMethod4c26d0(field_0xcc4);
+    if (mouse)
+        mouse->UnknownMethod4c26d0(field_0xcc4);
     for (int i = 0; i < 8; i++) {
-        if (field_0x10[i])
-            field_0x10[i]->UnknownMethod4c26d0(field_0xcc4);
+        if (joysticks[i])
+            joysticks[i]->UnknownMethod4c26d0(field_0xcc4);
     }
 }
 
 // 0x004bf560: `control` on the keyboard, the active joystick or the mouse.
 int PCControlInterface::UnknownVirtualSlot2(int control, int modifier) {
-    if (field_0x34 && field_0x34->UnknownVirtualSlot4(control, modifier, 0))
+    if (keyboard && keyboard->UnknownVirtualSlot4(control, modifier, 0))
         return 1;
-    if (field_0x10[field_0x08] && field_0x10[field_0x08]->UnknownFunction489c60(control, modifier, 0))
+    if (joysticks[activeJoystickIndex] && joysticks[activeJoystickIndex]->UnknownFunction489c60(control, modifier, 0))
         return 1;
-    if (field_0x30 && field_0x30->UnknownVirtualSlot4(control, modifier, 0))
+    if (mouse && mouse->UnknownVirtualSlot4(control, modifier, 0))
         return 1;
     return 0;
 }
 
 // 0x004bf5e0
 int PCControlInterface::UnknownVirtualSlot4(int modifier) {
-    if (field_0x34)
-        return field_0x34->UnknownFunction48a240(modifier);
+    if (keyboard)
+        return keyboard->UnknownFunction48a240(modifier);
     return 0;
 }
 
 // 0x004bf600
 PCControlInterface::~PCControlInterface() {
-    delete field_0x34;
+    delete keyboard;
     for (int i = 0; i < 8; i++)
-        delete field_0x10[i];
-    delete field_0x30;
-    if (field_0xcc0) {
-        field_0xcc0->UnknownMethod2();
-        field_0xcc0 = 0;
+        delete joysticks[i];
+    delete mouse;
+    if (directInput) {
+        directInput->Release();
+        directInput = 0;
     }
 }

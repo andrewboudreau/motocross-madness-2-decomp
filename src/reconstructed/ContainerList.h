@@ -48,6 +48,12 @@ public:
         return 1;
     }
 
+    // Zeroes the elements and empties the list.
+    void Clear() {
+        memset(m_data, 0, m_count * sizeof(T));
+        m_count = 0;
+    }
+
     // Element `index`, or 0 when out of range.
     T Get(int index) {
         if (m_count > 0 && m_data && index < m_count)
@@ -76,6 +82,30 @@ public:
             }
         }
         return 0;
+    }
+
+    // Removes the first `item`, keeping the order of the rest.
+    void RemoveOrdered(T item) {
+        if (m_count > 0) {
+            for (int i = 0; i < m_count; i++) {
+                if (m_data[i] == item) {
+                    memmove(&m_data[i], &m_data[i + 1], (m_count - (i + 1)) * sizeof(T));
+                    m_count--;
+                    return;
+                }
+            }
+        }
+    }
+
+    // Inserts `item` before element `index`, growing when full.
+    int Insert(T item, int index) {
+        if (m_count >= m_capacity && !Reserve(m_growBy + m_count))
+            return 0;
+        if (index != m_count)
+            memmove(&m_data[index + 1], &m_data[index], (m_count - index) * sizeof(T));
+        m_data[index] = item;
+        m_count++;
+        return 1;
     }
 
     int m_count;

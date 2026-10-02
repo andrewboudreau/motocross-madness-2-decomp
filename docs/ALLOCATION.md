@@ -138,6 +138,10 @@ The helper's allocation and deallocation source-line operands are confirmed as
 descriptions of the decoded accesses, but remain reconstructed identifiers;
 exact code shape does not establish their original spelling.
 
+The constructor does not initialize `allocatedBytes` (+0x24), and `Clear`
+releases only the active chain, not the spare chain. These are decoded retail
+behaviors retained by the reconstruction, not recommended allocator semantics.
+
 ### Application accounting probes
 
 `samples/allocation/AllocationAccountingProbe.cpp` contains ordinary C++98

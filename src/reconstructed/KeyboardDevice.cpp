@@ -1,30 +1,30 @@
 #include "KeyboardDevice.h"
 
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // 0x00489e30
 KeyboardDevice::KeyboardDevice() : PCInputDevice(0) {
     unsigned int stamp = UnknownFunction4bfa80();
-    field_0x08 = 256;
+    buttonCount = 256;
     for (int i = 0; i < 256; i++) {
-        field_0x260[i].state = 0;
-        field_0x260[i].field_0x04 = stamp;
-        field_0x260[i].field_0x08 = stamp;
-        field_0x260[i].field_0x0c = stamp;
-        field_0x260[i].field_0x10 = stamp;
+        keyStates[i].state = 0;
+        keyStates[i].releaseTime = stamp;
+        keyStates[i].pressTime = stamp;
+        keyStates[i].previousReleaseTime = stamp;
+        keyStates[i].previousPressTime = stamp;
     }
     for (int j = 0; j < 6; j++)
-        field_0x1660[j].Init(1, 1);
-    field_0x16d8 = 0;
+        axisBindings[j].Init(1, 1);
+    modifierState = 0;
 }
 
 // 0x0048a030: drops every binding with id `id`.
 void KeyboardDevice::UnknownVirtualSlot0(int id) {
     for (int list = 0; list < 6; list++) {
-        for (int i = 0; i < field_0x1660[list].m_count; i++) {
-            UnknownControlBinding* binding = field_0x1660[list].Get(i);
+        for (int i = 0; i < axisBindings[list].m_count; i++) {
+            UnknownControlBinding* binding = axisBindings[list].Get(i);
             if (binding->field_0x04 == id)
-                field_0x1660[list].Remove(binding);
+                axisBindings[list].Remove(binding);
         }
     }
 }
@@ -33,8 +33,8 @@ void KeyboardDevice::UnknownVirtualSlot0(int id) {
 // the frame time and every elapsed interval steps the binding down (or up);
 // with neither key held the binding recentres.
 void KeyboardDevice::UnknownFunction48a0c0(int list, int value) {
-    for (int i = 0; i < field_0x1660[list].m_count; i++) {
-        UnknownControlBinding* binding = field_0x1660[list].Get(i);
+    for (int i = 0; i < axisBindings[list].m_count; i++) {
+        UnknownControlBinding* binding = axisBindings[list].Get(i);
         binding->field_0x18 += g_UnknownGlobal56e26c->field_0x2f0;
         binding->field_0x14 += g_UnknownGlobal56e26c->field_0x2f0;
         if (UnknownVirtualSlot5(binding->field_0x0c, 0x3f, 0)) {
@@ -71,11 +71,11 @@ int KeyboardDevice::UnknownFunction48a240(int modifier) {
         return 0;
     if (modifier == 0x3f)
         return 1;
-    if (g_UnknownGlobal56e26c->field_0x2d4_bit2 && modifier == 0x80 && field_0x260[0x29].state == 1)
+    if (g_UnknownGlobal56e26c->field_0x2d4_bit2 && modifier == 0x80 && keyStates[0x29].state == 1)
         return 1;
     if (modifier == (int)0x80000000)
-        return field_0x16d8 == 0;
+        return modifierState == 0;
     if (modifier & 0x40)
-        return (field_0x16d8 | 0x40) == modifier;
-    return (field_0x16d8 & modifier) != 0;
+        return (modifierState | 0x40) == modifier;
+    return (modifierState & modifier) != 0;
 }

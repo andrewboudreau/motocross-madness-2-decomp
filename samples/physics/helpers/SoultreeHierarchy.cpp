@@ -42,10 +42,10 @@ void SoultreeObject::InvalidateWorldMatrix()
 void SoultreeObject::AppendSibling(SoultreeObject* node)
 {
     SoultreeObject* last = this;
-    SoultreeObject* next = last->nextSibling;
-    while (next) {
-        last = next;
-        next = last->nextSibling;
+    if (last->nextSibling) {
+        do {
+            last = last->nextSibling;
+        } while (last->nextSibling);
     }
     last->nextSibling = node;
     node->field_0x148 = (int)last;   // previous sibling (tier 3 role)

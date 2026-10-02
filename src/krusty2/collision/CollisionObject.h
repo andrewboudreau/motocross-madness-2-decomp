@@ -18,7 +18,7 @@
 #define COLLISION_OBJECT_H
 
 #include "CollisionTypes.h"
-#include "../soultree_base/GraphicsTest.h"   // canonical BaseObject, GameObject, GraphicsTest
+#include "core/GraphicsTest.h"   // canonical BaseObject, GameObject, GraphicsTest
 
 class CollisionModelSource;   // scene-graph node source used by shape setup 0x004324b0
 struct CollisionHullBody;      // CollisionShapeTests.h
@@ -28,7 +28,7 @@ struct CollisionTreeNode;      // CollisionDebugDraw.cpp
 struct Vec3;                   // ../common/Math3D.h
 struct Matrix4;
 
-// GraphicsTest (: GameObject, non-virtual) is declared once in ../soultree_base/GraphicsTest.h.
+// GraphicsTest (: GameObject, non-virtual) is declared once in core/GraphicsTest.h.
 // No vbptr/vtordisp here; GameObject members are at their plain offsets from the GraphicsTest
 // subobject at +12.
 
@@ -37,24 +37,24 @@ public:
     virtual void UnknownVirtualSlot0();         // 0x004dc610 (ret)
     virtual int UnknownVirtualSlot1();          // 0x00434ce0 (returns 15)
 
-    QuadTreeObject() { field_0x04 = 0; field_0x08 = (char)0xff; }
-    short field_0x04;
-    short field_0x06;                           // not touched by the inlined ctor; keeps field_0x08 at +8
-    char field_0x08;
+    QuadTreeObject() { queryStamp = 0; objectTypeId = (char)0xff; }
+    short queryStamp;  // +0x04 Quadtree query code (NextObject) skips an object whose short at +4 equals the query counter (field_0x6c) and otherwise stores the counter there (Quadtree.cpp lines 568/612/676); Insert zeroes it
+    short sortKey;                           // +0x06 not touched by the inlined ctor; keeps objectTypeId at +8
+    char objectTypeId;  // +0x08 ctor 0x00431e70 stores TypeRegistry::FindTypeId(CollisionObject) (0x00521ea0) here; 0x00438e70 compares [candidate+8] with the cached CollisionObject (0x568610) and Vegetation (0x568611) ids
 };
 
 // Shape payloads hung off CollisionObject::field_0x54, discriminated by field_0x50.
 // Sizes come from the allocation sizes in the shape setup functions; member names
 // are provisional (tier 3).
 struct CollisionHullShape {                // type 0, 0x198 bytes (0x004328b0, 0x00432720)
-    int field_0x00;
-    int field_0x04;
+    int swept;  // +0x00 same payload as CollisionHullBody: HullVsHull 0x00436720 forwards to HullVsHullSwept when nonzero
+    int sceneNode;  // +0x04 scene node whose world position 0x004fc9a0 reads (CollisionHullBody view)
     char field_0x08[0x80];
     char field_0x88[0xc0];                 // filled by 0x0042cc60 / 0x0042c8c0
-    CollisionMatrix4 field_0x148;          // copy of the matrix returned by 0x004a1410
-    void* field_0x188;                     // freed with 0x0042a160
-    void* field_0x18c;                     // freed with 0x0042a160
-    CollisionVec3* field_0x190;            // vertex array (0x24-byte tagged block)
+    CollisionMatrix4 relativeFrame;          // +0x148 copy of the matrix returned by 0x004a1410
+    void* triangleTree;                     // +0x188 freed with 0x0042a160
+    void* pointTree;                     // +0x18c freed with 0x0042a160
+    CollisionVec3* vertices;            // +0x190 vertex array (0x24-byte tagged block)
 };
 
 struct CollisionCapsuleShape {             // type 3, 0x68 bytes (0x00432a20)
@@ -62,18 +62,18 @@ struct CollisionCapsuleShape {             // type 3, 0x68 bytes (0x00432a20)
     CollisionVec3 p1;                      // arguments 3..5
     float radius;                          // argument 6
     float radiusSquared;
-    float field_0x20;                      // 1.0f
-    float field_0x24;                      // 1.0f
-    CollisionMatrix4 field_0x28;           // identity
+    float radiusScale;                      // +0x20 1.0f
+    float endpointScale;                      // +0x24 1.0f
+    CollisionMatrix4 transform;           // +0x28 identity
 };
 
 struct CollisionSphereShape {              // type 4, 0x5c bytes (0x004329a0)
     CollisionVec3 center;
     float radius;
     float radiusSquared;
-    float field_0x14;                      // 1.0f
-    float field_0x18;                      // 1.0f
-    CollisionMatrix4 field_0x1c;           // identity
+    float radiusScale;                      // +0x14 1.0f
+    float centerScale;                      // +0x18 1.0f
+    CollisionMatrix4 transform;           // +0x1c identity
 };
 
 // Code pointers at CollisionObject+0x88/+0x8c (tier 1: 0x0043b9a0 stores the addresses
@@ -100,22 +100,32 @@ public:
     void Fn_00432720(void* node, int a, int b, int c, int d); // 0x00432720 (ret 0x14)
     void Fn_00432800(void* node, const char* path);           // 0x00432800, shape from a .col file path
     void Fn_00432ab0(int count, void* points);                // 0x00432ab0 (ret 8), polyline shape setter
+    // 0x00436000 (ret 4): copies the translation row of the shape's current transform into *out:
+    // hull +0xf8, model +0xb8, mesh +0x38; types 3/4 leave *out untouched (tier 1 body).
+    void GetShapePosition(CollisionVec3* out);
+    void Fn_00434a10();                                       // 0x00434a10, resets the hit state and per-object query record
+    void Fn_00434bb0();                                       // 0x00434bb0, publishes hitPoint/hitNormal after a hull/model test
+    void Fn_00434cf0();                                       // 0x00434cf0, normal-only variant of Fn_00434bb0
+    void Fn_00435f10();                                       // 0x00435f10, re-applies the shape's own matrix via SetTransform
     void Fn_00435fb0();                                       // 0x00435fb0
+    void Fn_00436080();                                       // 0x00436080, refreshes the quadtree cell from the world bounds
     void Fn_00435fe0();                                       // 0x00435fe0
     int Fn_00438e70();                                        // 0x00438e70
-    // 0x00435830, thiscall, ret 4 (tier 1): switches on the shape type field_0x50 (0..4,
+    // 0x00435830, thiscall, ret 4 (tier 1): switches on the shape type shapeType (0..4,
     // jump table 0x435ea8), copies the 16 floats of *m into the shape payload at
-    // field_0x54 and derives values from them. Name tier 3. Callers: ObjectPlacement
+    // shape and derives values from them. Name tier 3. Callers: ObjectPlacement
     // 0x004b0df0 and Tire 0x00514550.
     void SetTransform(const Matrix4* m);
-    // 0x00439400, thiscall, ret 4: field_0x74 = v (tier 1).
+    // 0x00439400, thiscall, ret 4: ignoreListMode = v (tier 1).
     void SetField_0x74(int v);
     // 0x00439410, thiscall, ret 4 (tier 1 body): unique-add of owner into the growable
-    // pointer array field_0x78 (data) / field_0x7c (count): returns if already present,
+    // pointer array ignoreList (data) / ignoreCount (count): returns if already present,
     // reuses a NULL slot, else reallocs through 0x004a2ec0 (line 0x843) and appends.
     // Name tier 3.
     void AddIgnoredOwner(void* owner);
-    // 0x004394d0 (ret 8): stores field_0x60 and field_0x64 (tier 1); name tier 3.
+    // 0x00439490 (ret 4): finds owner in the ignoreList array and NULLs that slot (tier 1 body).
+    void RemoveIgnoredOwner(void* owner);
+    // 0x004394d0 (ret 8): stores ownerObject and ownerType (tier 1); name tier 3.
     void SetOwner(void* owner, int tag);
 
     // Narrow phase (CollisionShapeTests.cpp, names tier 3).  These are thiscall members that
@@ -154,30 +164,34 @@ public:
     void DrawHull(CollisionHullBody* hull, int depth, int mode);         // 0x00432d30
     void DrawModel(CollisionModelBody* model, int depth, int mode);      // 0x00432b30
 
-    char field_0x44[0xc];                       // own bytes 0x44..0x4f, not accessed by any target
-    int field_0x50;                             // shape type 0..4
-    void* field_0x54;                           // shape payload (see shape structs)
-    int field_0x58;
-    void* field_0x5c;                           // contact record pointer (constraint solver)
-    void* field_0x60;                           // owner: SoulTreePhysics slot 40 loaders store their `this`,
+    // +0x40 is a world bounding-sphere centre (Vec3, written by SetTransform 0x00435830 via
+    // 0x00428db0/0x0042a510 and read by BoundingSpheresOverlap 0x0043a270); its first float
+    // overlaps GraphicsTest::field_0x34 in the stand-in GraphicsTest layout.
+    char field_0x44[8];                         // bounding-sphere centre y, z
+    float boundRadius;                           // bounding-sphere radius (fstp [this+0x4c] in 0x00435830)
+    int shapeType;                             // +0x50 shape type 0..4
+    void* shape;                           // +0x54 shape payload (see shape structs)
+    int hasContact;  // +0x58 cleared at entry of 0x00434a10 and 0x00438e70, set to 1 right after a successful TestAgainst (0x00438f6d), returned by 0x00438e70 and tested by ObjectPlacement and ConstraintMethodCollisionModel slot 11
+    void* contactRecord;                           // +0x5c contact record pointer (constraint solver)
+    void* ownerObject;                           // +0x60 owner: SoulTreePhysics slot 40 loaders store their `this`,
                                                 // ConstraintMethodCollisionModel stores itself (tier 2)
-    int field_0x64;                             // type tag; 0x3ea (1002) = has a body at +0xc4
-    int field_0x68;
-    int field_0x6c;
-    int field_0x70;
-    int field_0x74;
-    int field_0x78;
-    int field_0x7c;
-    int field_0x80;
-    int field_0x84;
-    CollisionCallback field_0x88;               // 0x0043b9a0 stores 0x0043b800
-    CollisionCallback field_0x8c;               // 0x0043b9a0 stores 0x00464e90 (empty function)
-    int field_0x90;
-    int field_0x94;
+    int ownerType;                             // +0x64 type tag; 0x3ea (1002) = has a body at +0xc4
+    int ignoreVegetation;  // +0x68 0x00438fef: the branch for a candidate whose objectTypeId == Vegetation (0x568611) is taken only when this is 0; ObjectPlacement temp object and the tire collision character set it to 1
+    int collisionEnabled;  // +0x6c 0x00438e8b: when 0, 0x00438e70 clears hasContact and returns 0 without querying; Fn_004320f0 stores its 3rd argument here; ctor sets 1
+    int collidable;  // +0x70 TestAgainst 0x00436430 rejects other when other+0x70 == 0; Fn_004320f0 stores its 4th argument; ctor sets 1
+    int ignoreListMode;  // +0x74 TestAgainst: with a listed partner mode 1 rejects, with an unlisted partner mode 0 rejects (exclusion vs inclusion list); SetField_0x74 0x00439400 writes it; ctor sets 1
+    int ignoreList;  // +0x78 growable pointer array searched by TestAgainst; AddIgnoredOwner 0x00439410 appends (realloc through 0x004a2ec0)
+    int ignoreCount;  // +0x7c element count of the array at +0x78 (loop bound in TestAgainst and AddIgnoredOwner)
+    int useBroadphase;  // +0x80 0x00435fb0 (-> 0x00436080) and 0x00438e70 only touch the global quadtree 0x68aba4 when it is nonzero, otherwise 0x00438e70 takes the non-quadtree path; Fn_004320f0 stores its 2nd argument
+    int quadtreeCell;  // +0x84 0x00436080: cell code from the world bounds (0x4dc8c0); when it differs from this field the object is removed from the old cell (0x4dcf20) and reinserted (0x4dcac0), then the new code is stored; ctor sets 15
+    CollisionCallback onHitCallback;               // +0x88 0x0043b9a0 stores 0x0043b800
+    CollisionCallback onHitByCallback;               // +0x8c 0x0043b9a0 stores 0x00464e90 (empty function)
+    int debugTreeDepth;  // +0x90 slot 23 (0x00434970) decrements it (clamped at 0) on key 10 and increments it on key 11; slot 14 (0x00434540) passes it as the depth argument of DrawHull 0x00432d30 / DrawModel 0x00432b30 and DrawBoxTree
+    int debugDrawMode;  // +0x94 slot 23 (0x00434970) increments it on key 0x2e and wraps to 0 above 7; slot 14 (0x00434540) passes it as the mode argument of DrawHull / DrawModel
     int field_0x98;
-    int field_0x9c;
-    CollisionVec3 field_0xa0;
-    CollisionVec3 field_0xac;
+    int hitObject;  // +0x9c 0x00438e70 stores each broad-phase candidate here before TestAgainst(candidate) and then passes it to the callbacks
+    CollisionVec3 hitPoint;  // +0xa0 0x00434bb0 fills it from the contact record +0x18, 0x00438e70 copies it into the hit object +0xa0; SoultreePhysics slots 28/38 read it as contact point
+    CollisionVec3 hitNormal;  // +0xac 0x00434bb0 fills it from the normalised accumulated scratch points; 0x00438e70 copies it into the hit object +0xac; read as contact normal by SoultreePhysics
 };
 
 typedef char collision_object_assert_sizeof[(sizeof(CollisionObject) == 0xb8) ? 1 : -1];

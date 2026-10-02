@@ -1,0 +1,443 @@
+[
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??0QuadTreeNode",
+    "target_va": "0x004dd070",
+    "target_size": 48,
+    "expect": "exact",
+    "notes": "node ctor (vptr, list/children null, node count++, y interval 0/-FLT_MAX)"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??_GQuadTreeNode",
+    "target_va": "0x004dd0a0",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "scalar deleting dtor wrapper (CodeView extent; the 2 padding bytes after it are not compared)"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??1QuadTreeNode",
+    "target_va": "0x004dd0c0",
+    "target_size": 101,
+    "expect": "exact",
+    "notes": "dtor core"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??_GQuadTree@",
+    "target_va": "0x004dda90",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "scalar deleting dtor wrapper (CodeView extent; the 2 padding bytes after it are not compared)"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "??1QuadTree@@",
+    "target_va": "0x004dc840",
+    "target_size": 116,
+    "expect": "exact",
+    "notes": "dtor core"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot1@QuadTree@@",
+    "target_va": "0x004dc7e0",
+    "target_size": 94,
+    "expect": "exact",
+    "notes": "slot 1 node factory (operator new 0x14, Quadtree.cpp line 0x7a; ctor inlined only if defined after it)"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Reset@QuadTree",
+    "target_va": "0x004dc620",
+    "target_size": 70,
+    "expect": "exact",
+    "notes": "reset pools/root"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "ComputeCode",
+    "target_va": "0x004dc8c0",
+    "target_size": 504,
+    "expect": "exact",
+    "notes": "world rect -> 8 bit (depth, quadrant) code"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "UpdateRange",
+    "target_va": "0x004dcd40",
+    "target_size": 477,
+    "expect": "exact",
+    "notes": "move an object within the tree when its code/Y range changes"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "RemoveObject",
+    "target_va": "0x004dd1b0",
+    "target_size": 177,
+    "expect": "exact",
+    "notes": "unlink object from the node item list"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "BeginQuery",
+    "target_va": "0x004dd270",
+    "target_size": 354,
+    "expect": "exact",
+    "notes": "start a rectangle query"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Gather@QuadTreeNode",
+    "target_va": "0x004dd3e0",
+    "target_size": 258,
+    "expect": "exact",
+    "notes": "collect nodes overlapping a rectangle"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "GatherAll",
+    "target_va": "0x004dd4f0",
+    "target_size": 65,
+    "expect": "exact",
+    "notes": "collect a node and all children"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "NextObject@QuadTree@@QAEPAV",
+    "target_va": "0x004dd540",
+    "target_size": 144,
+    "expect": "exact",
+    "notes": "iterate query results, stamp-deduplicated"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "CompareObjectKey",
+    "target_va": "0x004dd5d0",
+    "target_size": 42,
+    "expect": "exact",
+    "notes": "qsort comparator; 42-byte body (the 6 padding bytes after it are not compared)"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "RestartQuery",
+    "target_va": "0x004dd750",
+    "target_size": 22,
+    "expect": "exact",
+    "notes": "rewind the query"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "EndQuery",
+    "target_va": "0x004dd770",
+    "target_size": 44,
+    "expect": "exact",
+    "notes": "end the query"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot2@QuadTreeNode",
+    "target_va": "0x004dd7a0",
+    "target_size": 740,
+    "expect": "exact",
+    "notes": "slot 2 back-to-front gather (returns result list)"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot1@QuadTreeNode@@",
+    "target_va": "0x004ddab0",
+    "target_size": 551,
+    "expect": "exact",
+    "notes": "slot 1 back-to-front traversal"
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Grow",
+    "target_va": "0x004ddce0",
+    "target_size": 50,
+    "expect": "exact",
+    "notes": "realloc node to hold inline child array"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "CollectItems",
+    "target_va": "0x004ddd20",
+    "target_size": 104,
+    "expect": "exact",
+    "notes": "append a node's item blocks to the result array"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "IsValidCode",
+    "target_va": "0x004ddd90",
+    "target_size": 58,
+    "expect": "exact",
+    "notes": "validate a code against the depth"
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Init@QuadTree",
+    "target_va": "0x004dc670",
+    "target_size": 365,
+    "expect": "exact",
+    "notes": "cell-size table, world rect, pools, root. Exact: the extents are written as chained assignments (`float w = field_0x50 = x1 - x0;`), which gives retail's `fst [field]` plus the spill temporary; reading the field back after a separate store does not."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Insert@QuadTree",
+    "target_va": "0x004dcac0",
+    "target_size": 627,
+    "expect": "partial",
+    "notes": "3.6% match. Same control flow. Register allocation differs: retail has a 0x34 frame, spills `this` to esp+8, keeps depth in ebp, x in edx and z in ebx, and moves the Grow path out of line. The candidate has a 0x30 frame with `this` in ebx. Loop-form variants (count-down, 0..depth, if/else order) stay between 2% and 4%."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "Remove@QuadTree",
+    "target_va": "0x004dcf20",
+    "target_size": 331,
+    "expect": "partial",
+    "notes": "11.3% match. Same control flow. Retail keeps `this` in ebp and code, i and bit in memory; the candidate holds code in esi and i in ebp. Tried without success: a goto/flag-free form, an if-body without continue, `0x10 << i`, recomputing x/z/cell in the loop, and moving cell inside the loop."
+  },
+  {
+    "class": "QuadTreeNode",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "AddObject",
+    "target_va": "0x004dd130",
+    "target_size": 117,
+    "expect": "exact",
+    "notes": "append obj to the node's first free item slot, allocating a 0x14 block from the pool. Exact: the fresh block is cleared with memset(p, 0, sizeof) (VC6 inlines it as `mov edx,eax; xor ecx,ecx; mov [edx],ecx` x5; field stores give `mov [eax+N],0`), and `prev` is left uninitialised on the empty-list path, which reproduces retail's dead load at 0x4dd165."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "NextObjectSorted",
+    "target_va": "0x004dd600",
+    "target_size": 330,
+    "expect": "partial",
+    "notes": "88.0% (329 vs 330 bytes). Same algorithm (qsort with CompareObjectKey, 2-element swap inline). Exact up to the outer loop's bottom: retail ends the loop with `cmp eax,edi; je ret0; jmp top` and puts the return-0 block last, but VC6 rotates every while/for(;;) loop whose top is a conditional exit into a bottom `jne body`. That shape has not been reproduced yet."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004dc4d0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004dc4e0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004dc520",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004dc530",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004dc570",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004dc580",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004dc5c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004dc5d0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "??0Terrain@@",
+    "target_va": "0x00505830",
+    "target_size": 370,
+    "expect": "exact",
+    "notes": "Terrain(int a) : GameObject(a): base ctor 0x00468ca0 with the forwarded argument, GroundFogableObject member ctor, field inits and the 0x004a1410 identity-matrix copy."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "??_GTerrain",
+    "target_va": "0x005059b0",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "slot 0 scalar deleting dtor (CodeView extent; the 2 padding bytes after it are not compared)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "??1Terrain",
+    "target_va": "0x005079f0",
+    "target_size": 441,
+    "expect": "exact",
+    "notes": "dtor core: profiling scope, releases owned sub-objects"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot19@Terrain",
+    "target_va": "0x00507920",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "slot 19 return-0 stub (declared non-virtual here: GameObject.h placeholder slot 19 has a different signature)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot22@Terrain",
+    "target_va": "0x004dc4c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "slot 22 return-0 stub shared with ProjectedShadow/StatsOverlay (non-virtual here, same reason)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "SetField0xbec",
+    "target_va": "0x00507930",
+    "target_size": 37,
+    "expect": "exact",
+    "notes": "clamp >= 0 and set dirty flag field_0xbf4"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "SelectQuality",
+    "target_va": "0x00507960",
+    "target_size": 129,
+    "expect": "exact",
+    "notes": "select the quality table entry (row 9 when field_0xcb0 is set). Exact: the store is written as if/else, not as `field = cond ? a : b;`. In the if/else form VC6 tail-merges the two stores, and the joined value lands in edx."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot23@Terrain",
+    "target_va": "0x00508850",
+    "target_size": 276,
+    "expect": "exact",
+    "notes": "slot 23 debug key handler (three toggle keys)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "TerrainClipRayToPlaneY",
+    "target_va": "0x00507510",
+    "target_size": 127,
+    "expect": "exact",
+    "notes": "inline helper; retail keeps this out-of-line COMDAT copy because CastSegment ran out of inline budget. Exact: the early `return origin` (two return statements) keeps `push esi` in the prologue; a single return after the if makes VC6 sink it into the tail block. The reference parameters are ABI-identical to pointers."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "TerrainClipRayToPlaneZ",
+    "target_va": "0x00507590",
+    "target_size": 127,
+    "expect": "exact",
+    "notes": "Z sibling of 0x00507510, same shape and the same cause of the exact match."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "QueryGround",
+    "target_va": "0x00507c10",
+    "target_size": 2963,
+    "expect": "partial",
+    "notes": "Height/normal query (58 callers). Checkerboard triangle split, inverse-squared-distance corner weights. Retail uses an EBP frame and inline fistp through pointer-aliased int locals (inline __asm in original source, not reproducible under rules); inherent partial. Also VC6 inline budget differs on Vec3 helpers."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "CastSegment",
+    "target_va": "0x00506e90",
+    "target_size": 1654,
+    "expect": "partial",
+    "notes": "56.6% (1659 vs 1654). The first 0x3b7 bytes are identical. The Clip helpers are now `inline` with reference params, `-dir` is passed as a temporary, and operator/ builds the result with a direct constructor call. What remains is VC6's inline budget: retail does not inline the ClipZ for the Z end point and inlines the next `-dir`, but this source inlines that ClipZ and so runs out of budget one site early. See the comment above CastSegment."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "RetireOwnedObject",
+    "target_va": "0x005057d0",
+    "target_size": 83,
+    "expect": "exact",
+    "notes": "linear search of field_0xcb8[] (count field_0xcbc); the match is swapped with the last live element, the count shrinks and the object is stored behind the new end. Exact first try; adjacent to the Terrain ctor 0x00505830, uses Terrain fields 0xcb8/0xcbc."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "ComputeRatios",
+    "target_va": "0x00507bb0",
+    "target_size": 96,
+    "expect": "exact",
+    "notes": "derives a/b, a^2/b^2 and their reciprocals from ints at 0x6c/0x70 into floats 0x74/0x78/0x7c/0x80 (called by slot 12 0x507610 after storing the new 0x6c). Exact with the source order b^2 ratio first then a/b (fidiv with int temporaries)."
+  }
+]

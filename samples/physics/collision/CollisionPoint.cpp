@@ -1,44 +1,16 @@
 #include "CollisionPoint.h"
 
-inline CollisionPoint::CollisionPoint(float a, int b)
-    : field_0x88(a), field_0xc0(b) {
-    field_0x08 = g_CollisionZeroVec3;
-    field_0x04 = 0;
-    field_0x14 = g_CollisionZeroVec3;
-    field_0x20 = g_CollisionZeroVec3;
-    field_0x2c = g_CollisionVec3_579810;
-    field_0x38 = g_CollisionZeroVec3;
-    field_0x44 = g_CollisionZeroVec3;
-    field_0x50 = g_CollisionZeroVec3;
-    field_0x5c = g_CollisionZeroVec3;
-    field_0x90 = 0;
-    field_0x94 = 0;
-    field_0xb8 = 1.0f;
-    field_0x8c = 1.0f;
-    field_0x98 = -999.0f;               // 0xc479c000 at 0x0043a48c
-    field_0x9c = 0;
-    field_0xa4 = 0;
-    field_0xa8 = 0;
-    field_0xac = 0;
-    field_0xb0 = 0;
-    field_0xb4 = 0;
-    field_0xa0 = 0.5f;
-    field_0xbc = 0;
-    field_0x84 = 0;
-    field_0x78 = g_CollisionZeroVec3;
-    field_0x74 = 0;
-    field_0x68 = g_CollisionZeroVec3;
-}
+#include "CollisionPointCtor.h"
 
 void CollisionPoint::CollisionPointVirtualSlot1() {
-    if (!(field_0x90 > 0.001f) && !(field_0x94 > 0.001f)) {
-        field_0x84 = 0.0f;
-        field_0x78 = g_CollisionZeroVec3;
+    if (!(tangentSpeed > 0.001f) && !(spinSpeed > 0.001f)) {
+        frictionMagnitude = 0.0f;
+        frictionForce = g_CollisionZeroVec3;
     } else {
-        field_0x84 = (-field_0x88) * field_0x8c * field_0x74;
-        field_0x78 = field_0x50 * field_0x84;
-        if (field_0x84 < 0.0f)
-            field_0x84 = -field_0x84;
+        frictionMagnitude = (-normalForce) * surfaceGrip * frictionCoefficient;
+        frictionForce = frictionDirection * frictionMagnitude;
+        if (frictionMagnitude < 0.0f)
+            frictionMagnitude = -frictionMagnitude;
     }
 }
 
@@ -48,10 +20,10 @@ CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const C
     if (*count < capacity) {
         points[*count] = new(__FILE__, 27) CollisionPoint(a6, a7);
         CollisionPoint* p = points[*count];
-        p->field_0x08 = *position;
-        p->field_0x98 = a4 - 999.0f;
-        p->field_0x04 = owner;
-        p->field_0x9c = a4;
+        p->localPosition = *position;
+        p->penetration = a4 - 999.0f;
+        p->ownerNode = owner;
+        p->penetrationThreshold = a4;
         (*count)++;
         return p;
     }
@@ -69,20 +41,20 @@ CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const C
 void CollisionPoint::Fn_0043a640(const CollisionVec3* a1, const CollisionVec3* a2, const CollisionVec3* a3,
                                  const CollisionVec3* a4, float a5)
 {
-    field_0x38 = field_0x14 - *a1;
+    relativePosition = worldPosition - *a1;
 
-    float s = field_0x2c.y * a2->y + field_0x2c.x * a2->x + field_0x2c.z * a2->z;
-    CollisionVec3 u = field_0x2c * s;
+    float s = surfaceNormal.y * a2->y + surfaceNormal.x * a2->x + surfaceNormal.z * a2->z;
+    CollisionVec3 u = surfaceNormal * s;
     CollisionVec3 c = CollisionCross(u, *a4);
 
     if (a5 > 0.001f) {
         CollisionVec3 t;
-        if (CollisionRejectFrom(&t, a3, &field_0x2c)) {
+        if (CollisionRejectFrom(&t, a3, &surfaceNormal)) {
             CollisionVec3 n;
             t = *Fn_005087b0(&n, &t);
         }
         float f = Fn_0040ae30(&t, a3);
-        field_0x90 = f;
+        tangentSpeed = f;
         if (f > 0.001f) {
             CollisionVec3 v1 = CollisionVec3(t.x * f, t.y * f, t.z * f);
             CollisionVec3 w = CollisionVec3(v1.x + c.x, v1.y + c.y, v1.z + c.z);
@@ -95,39 +67,83 @@ void CollisionPoint::Fn_0043a640(const CollisionVec3* a1, const CollisionVec3* a
             else
                 len = 1.0f / FastInvSqrt(m);
             float k = 1.0f / len;
-            field_0x50 = CollisionVec3(w.x * k, w.y * k, w.z * k);
+            frictionDirection = CollisionVec3(w.x * k, w.y * k, w.z * k);
             float cm = Fn_0040ae30(&c, &c);
             if (cm == 1.0f)
-                field_0x94 = 1.0f;
+                spinSpeed = 1.0f;
             else
-                field_0x94 = FastSqrt(cm);
+                spinSpeed = FastSqrt(cm);
         } else {
-            field_0x90 = 0.0f;
+            tangentSpeed = 0.0f;
             float cm = Fn_0040ae30(&c, &c);
             float len;
             if (cm == 1.0f)
                 len = 1.0f;
             else
                 len = FastSqrt(cm);
-            field_0x94 = len;
+            spinSpeed = len;
             if (len > 0.001f) {
                 float k = 1.0f / len;
-                field_0x50 = CollisionVec3(c.x * k, c.y * k, c.z * k);
+                frictionDirection = CollisionVec3(c.x * k, c.y * k, c.z * k);
             } else {
-                field_0x50 = g_CollisionZeroVec3;
-                field_0x94 = 0.0f;
+                frictionDirection = g_CollisionZeroVec3;
+                spinSpeed = 0.0f;
             }
         }
     } else {
-        field_0x90 = 0.0f;
+        tangentSpeed = 0.0f;
         float len = CollisionLength(&c);
-        field_0x94 = len;
+        spinSpeed = len;
         if (len > 0.001f) {
             CollisionVec3 d;
-            field_0x50 = *CollisionDivide(&d, &c, len);
+            frictionDirection = *CollisionDivide(&d, &c, len);
         } else {
-            field_0x50 = g_CollisionZeroVec3;
-            field_0x94 = 0.0f;
+            frictionDirection = g_CollisionZeroVec3;
+            spinSpeed = 0.0f;
+        }
+    }
+}
+
+// 0x0043a570: AddCollisionPoint for a point the caller already owns (`point` may be null to reuse the
+// slot's current pointer): resets its position to zero and records the penetration threshold.
+CollisionPoint* AddExistingCollisionPoint(int capacity, CollisionPoint** points, float a4, int* count,
+                                          CollisionPoint* point) {
+    if (*count < capacity) {
+        if (point)
+            points[*count] = point;
+        CollisionPoint* p = points[*count];
+        p->localPosition = g_CollisionZeroVec3;
+        p->penetration = a4 - 999.0f;
+        p->ownerNode = 0;
+        p->penetrationThreshold = a4;
+        (*count)++;
+        return p;
+    }
+    return 0;
+}
+
+// 0x0043a5e0: removes `point` from the pointer list by shifting the tail down; the vacated last slot is cleared.
+void RemoveCollisionPoint(CollisionPoint** points, CollisionPoint* point, int* count) {
+    for (int i = 0; i < *count; i++) {
+        if (points[i] == point) {
+            for (int j = i; j < *count - 1; j++)
+                points[j] = points[j + 1];
+            (*count)--;
+            points[*count] = 0;
+            return;
+        }
+    }
+}
+
+// 0x0043aff0: refreshes the world position (field_0x14) of every owned, active contact point from the
+// owner's transform of its local position (field_0x08).
+void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {
+    CollisionVec3 tmp;
+    for (int i = count; i > 0; i--, points++) {
+        CollisionPoint* p = *points;
+        if (p->ownerNode && *(int*)&p->inContact) {
+            CollisionVec3* world = p->ownerNode->Fn_004fd660(&tmp, &p->localPosition);
+            (*points)->worldPosition = *world;
         }
     }
 }

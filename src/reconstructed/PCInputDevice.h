@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Guid.h"
+
 #include "InputDevice.h"
 
 // COM-style device at PCInputDevice+0x25c (`this` on the stack). Method 8 is
@@ -9,37 +11,37 @@
 struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();   // Release
-    virtual long __stdcall UnknownMethod3(struct UnknownDeviceCaps* caps); // GetCapabilities
-    virtual long __stdcall UnknownMethod4(int (__stdcall* callback)(const struct UnknownObjectInstance*, void*),
+    virtual long __stdcall Release();
+    virtual long __stdcall GetCapabilities(struct UnknownDeviceCaps* caps);
+    virtual long __stdcall EnumObjects(int (__stdcall* callback)(const struct UnknownObjectInstance*, void*),
                                           void* context, unsigned long flags); // EnumObjects
-    virtual long __stdcall UnknownMethod5(int property, void* value); // GetProperty
-    virtual long __stdcall UnknownMethod6(int property, struct UnknownInputProperty* value); // SetProperty
-    virtual long __stdcall UnknownMethod7();   // Acquire
-    virtual long __stdcall UnknownMethod8();   // Unacquire
-    virtual long __stdcall UnknownMethod9(unsigned long size, void* state); // GetDeviceState
-    virtual long __stdcall UnknownMethod10(unsigned long size, struct UnknownDeviceObjectData* data,
+    virtual long __stdcall GetProperty(int property, void* value);
+    virtual long __stdcall SetProperty(int property, struct UnknownInputProperty* value);
+    virtual long __stdcall Acquire();
+    virtual long __stdcall Unacquire();
+    virtual long __stdcall GetDeviceState(unsigned long size, void* state);
+    virtual long __stdcall GetDeviceData(unsigned long size, struct UnknownDeviceObjectData* data,
                                            long* count, unsigned long flags); // GetDeviceData
-    virtual long __stdcall UnknownMethod11(const struct UnknownDataFormat* format); // SetDataFormat
+    virtual long __stdcall SetDataFormat(const struct UnknownDataFormat* format);
     virtual long __stdcall UnknownMethod12();
-    virtual long __stdcall UnknownMethod13(void* window, unsigned long flags); // SetCooperativeLevel
-    virtual long __stdcall UnknownMethod14(struct UnknownObjectInstance* info, unsigned long object,
+    virtual long __stdcall SetCooperativeLevel(void* window, unsigned long flags);
+    virtual long __stdcall GetObjectInfo(struct UnknownObjectInstance* info, unsigned long object,
                                            unsigned long how); // GetObjectInfo
-    virtual long __stdcall UnknownMethod15(struct UnknownDeviceInstance* info); // GetDeviceInfo
+    virtual long __stdcall GetDeviceInfo(struct UnknownDeviceInstance* info);
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall UnknownMethod17();
-    virtual long __stdcall UnknownMethod18(const struct UnknownGuid& type,
+    virtual long __stdcall CreateEffect(const struct UnknownGuid& type,
                                            const struct UnknownEffectParams* params,
                                            struct UnknownEffectInterface** effect,
                                            void* outer); // CreateEffect
-    virtual long __stdcall UnknownMethod19(int (__stdcall* callback)(const struct UnknownEffectInfo*, void*),
+    virtual long __stdcall EnumEffects(int (__stdcall* callback)(const struct UnknownEffectInfo*, void*),
                                            void* context, unsigned long type); // EnumEffects
     virtual long __stdcall UnknownMethod20();
     virtual long __stdcall UnknownMethod21();
-    virtual long __stdcall UnknownMethod22(int command); // SendForceFeedbackCommand
+    virtual long __stdcall SendForceFeedbackCommand(int command);
     virtual long __stdcall UnknownMethod23();
     virtual long __stdcall UnknownMethod24();
-    virtual long __stdcall UnknownMethod25(); // Poll
+    virtual long __stdcall Poll();
 };
 
 // cdecl 0x004bfa80: the value the keyboard and mouse stamp into their input
@@ -50,10 +52,10 @@ unsigned int UnknownFunction4bfa80();
 // MouseDevice+0x260): a state and four stamped values.
 struct UnknownInputEntry {
     int state;
-    unsigned int field_0x04;
-    unsigned int field_0x08;
-    unsigned int field_0x0c;
-    unsigned int field_0x10;
+    unsigned int releaseTime;
+    unsigned int pressTime;
+    unsigned int previousReleaseTime;
+    unsigned int previousPressTime;
 };
 
 // 20-byte property block passed to interface method 6; the layout matches
@@ -64,14 +66,6 @@ struct UnknownInputProperty {
     unsigned long object;
     unsigned long how;
     unsigned long data;
-};
-
-// 16-byte GUID (Win32 GUID layout).
-struct UnknownGuid {
-    unsigned long data1;
-    unsigned short data2;
-    unsigned short data3;
-    unsigned char data4[8];
 };
 
 // 0x244-byte device description at PCInputDevice+0x18. Its size and the
@@ -130,16 +124,16 @@ void UnknownReportError(long result, const char* file, int line);
 struct UnknownDirectInput {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();
+    virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4(unsigned long type,
+    virtual long __stdcall EnumDevices(unsigned long type,
                                           int (__stdcall* callback)(const struct UnknownDeviceInstance*, void*),
                                           void* context, unsigned long flags); // EnumDevices
-    virtual long __stdcall UnknownMethod5(const UnknownGuid& device); // GetDeviceStatus
+    virtual long __stdcall GetDeviceStatus(const UnknownGuid& device);
     virtual long __stdcall UnknownMethod6();
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();
-    virtual long __stdcall UnknownMethod9(const UnknownGuid& device, const UnknownGuid& iid,
+    virtual long __stdcall CreateDeviceEx(const UnknownGuid& device, const UnknownGuid& iid,
                                           UnknownInputInterface** result, void* outer);
 };
 
@@ -235,6 +229,6 @@ public:
                             unsigned long data);
 
 protected:
-    UnknownDeviceInstance field_0x18;   // cleared by the constructor
-    UnknownInputInterface* field_0x25c;
+    UnknownDeviceInstance deviceInfo;   // +0x18; cleared by the constructor
+    UnknownInputInterface* device;      // +0x25c
 };

@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Compile and match every physics reconstruction under samples/physics/.
 
+Promoted translation units live under src/krusty2/ (retail file names, backed by
+__FILE__ and link-order evidence); experimental reconstructions stay under
+samples/physics/. Both trees are scanned by default, and src/krusty2 is on the
+include path so shared headers are included as e.g. "core/GameObject.h".
+
 Each subdirectory may hold a ``targets.json`` list. Every entry needs
 ``source`` (path relative to that directory), ``candidate_symbol_contains``,
 ``target_va`` and ``target_size``. Sources are compiled once each with the
@@ -29,10 +34,15 @@ def main() -> int:
     ap.add_argument('--vc6-root', default=os.environ.get('VC6_ROOT'))
     ap.add_argument('--profile', default='vc6_o2_ml',
                     help='vc6_o2_ml (no /G6) matched 139/194 physics targets vs 76/194 with /G6, with no target exact only under /G6')
-    ap.add_argument('--root', default=str(ROOT / 'samples/physics'), help='directory to scan')
+    ap.add_argument('--root', action='append', default=None,
+                    help='directory to scan (repeatable; default: samples/physics and src/krusty2)')
+    ap.add_argument('--include', action='append', default=None,
+                    help='project include directory (repeatable; default: src/krusty2)')
     ap.add_argument('--out', default=str(ROOT / 'work/physics-objs'))
     ap.add_argument('--json', action='store_true', help='print full per-target JSON')
     a = ap.parse_args()
+    roots = a.root or [str(ROOT / 'samples/physics'), str(ROOT / 'src/krusty2')]
+    include_dirs = a.include or [str(ROOT / 'src/krusty2')]
     if a.compiler == 'vc6' and not a.vc6_root:
         raise SystemExit('set VC6_ROOT or pass --vc6-root')
     os.environ['PYTHONPATH'] = str(ROOT) + os.pathsep + os.environ.get('PYTHONPATH', '')
@@ -40,7 +50,8 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
     results = []
     compiled: dict[Path, Path | None] = {}
-    for tjson in sorted(Path(a.root).rglob('targets.json')):
+    tjsons = sorted({t for r in roots if Path(r).is_dir() for t in Path(r).rglob('targets.json')})
+    for tjson in tjsons:
         for t in json.loads(tjson.read_text()):
             if 'source' not in t:
                 continue
@@ -50,6 +61,7 @@ def main() -> int:
                 obj = out / (str(rel.with_suffix('')).replace('\\', '_').replace('/', '_') + '.obj')
                 cmd = [sys.executable, str(ROOT / 'tools/compile.py'), str(src), '-o', str(obj),
                        '--compiler', a.compiler, '--profile', a.profile]
+                cmd += [f'--include={d}' for d in include_dirs]
                 if a.compiler == 'vc6':
                     cmd += ['--vc6-root', a.vc6_root]
                 r = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=ROOT)

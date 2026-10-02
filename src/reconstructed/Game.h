@@ -18,15 +18,27 @@ public:
     UnknownNetObject();                       // 0x004ab480
     ~UnknownNetObject();                      // 0x004ab570
     long UnknownFunction4ab6b0(int value);    // 0x004ab6b0
+    int UnknownFunction4ac720(int player, char* name);  // 0x004ac720: the player's name; 0 if none
+    int UnknownFunction4ac800(int player);    // 0x004ac800 (EventManager 0x0045e550)
+    void UnknownFunction4ac950();             // 0x004ac950
+    void UnknownFunction4ac510(int value);    // 0x004ac510
+    // 0x004ac830: sends a message of `type` (EventManager 0x0045f9a0).
+    void UnknownFunction4ac830(int type, void* data, int size, int player, int flags);
+    void UnknownFunction4ac8d0(float a, float b); // 0x004ac8d0
 
-    unsigned char field_0x00[0x128];
+    unsigned char field_0x00[4];
+    int field_0x04;
+    int field_0x08;
+    int field_0x0c;                           // local player index
+    int field_0x10;                           // set by KrustyUI slot 24 for message 0x101
+    int field_0x14;                           // set once connected (TrackGame slot 4)
+    unsigned char field_0x18[0x128 - 0x18];
 };
 
 // Global at 0x0056c470: a GameObject (Game's initialiser adds it as a child
 // of the root and calls its slot 5), with a flag byte at +0x2c.
 class UnknownGlobal56c470 : public GameObject {
 public:
-    void UnknownFunction4691f0();             // 0x004691f0
 
     unsigned char field_0x2c;
 };
@@ -69,14 +81,14 @@ public:
     virtual int UnknownVirtualSlot7() = 0;   // render state setup (PCGame)
     virtual int UnknownVirtualSlot8();        // 0x00467eb0: renders a frame
     virtual int UnknownVirtualSlot9();        // 0x004685c0
-    virtual void UnknownVirtualSlot10();      // 0x004685d0, not reconstructed (rdtsc)
+    virtual int UnknownVirtualSlot10();       // 0x004685d0, not reconstructed (rdtsc)
     virtual int UnknownVirtualSlot11(int value);                                          // 0x004688a0
     virtual int UnknownVirtualSlot12(int value);                                          // 0x004688e0
     virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468900
     virtual int UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468930
     virtual int UnknownVirtualSlot15();       // 0x00468a30: shutdown
     virtual int UnknownVirtualSlot16(int value); // 0x00468ae0: network object
-    virtual int UnknownVirtualSlot17(int a, int b, int c, int d, int e);                  // 0x00468ba0
+    virtual int UnknownVirtualSlot17(int type, void* data, int c, int d, int e);                  // 0x00468ba0
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00468bd0
     virtual int UnknownVirtualSlot19(int mode) = 0;
     virtual int UnknownVirtualSlot20(const char* name, int defaultValue) = 0; // "VideoMemoryMB"
@@ -99,7 +111,7 @@ public:
 
     // 0x00467b70: creates the root objects, sound, textures and (with the
     // "DebugOverlay" registry flag) the debug overlay.
-    int UnknownFunction467b70(int value);
+    int UnknownFunction467b70(char* message);
     void UnknownFunction468880();             // 0x00468880 (PCCamera slot 27)
 
     SoundInterface* field_0x04;               // a PCSoundInterface (initialiser)

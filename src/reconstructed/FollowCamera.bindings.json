@@ -6,7 +6,7 @@
   "??_7FollowCamera@@6B@": "0x0055282c",
   "?UnknownFunction460b50@@YAMM@Z": "0x00460b50",
   "?UnknownFunction463450@FollowCamera@@QAE_NHPBUVector3@@PBM1111@Z": "0x00463450",
-  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@3ff7b60b60b60b60b800": "0x0055076c",
   "__real@4@3ff9e560420000000000": "0x0055295c",

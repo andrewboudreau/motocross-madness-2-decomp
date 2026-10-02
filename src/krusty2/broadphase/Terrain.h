@@ -13,12 +13,13 @@
 #ifndef BROADPHASE_TERRAIN_H
 #define BROADPHASE_TERRAIN_H
 
-#include "../soultree_base/GameObject.h"
-#include "../common/FastMath.h"
-#include "../common/MemTag.h"
-#include "../common/DebugAlloc.h"
+#include "core/GameObject.h"
+#include "math/FastMath.h"
+#include "core/MemTag.h"
+#include "core/DebugAlloc.h"
 
-// PROVISIONAL stand-in: the 0x004aae20 ctor only stores 0 in its first dword.
+// Second direct base of Terrain at mdisp 0x2c (RTTI .?AVGroundFogableObject@@, tier 1); it has no
+// vfptr.  Its contents are PROVISIONAL: the 0x004aae20 ctor only stores 0 in its first dword.
 class GroundFogableObject {
 public:
     GroundFogableObject();                      // 0x004aae20: stores 0 in field_0x00
@@ -59,17 +60,17 @@ public:
                         unsigned char* surface);
 
     // Members read by Terrain::CastSegment (tier 2 offsets, tier 3 names).
-    void* field_0x04;                                           // cell table read by 0x00483910
+    void* cellTable;                                           // +0x04 cell table read by 0x00483910
     char pad_0x08[0x18 - 0x08];
-    float field_0x18;                                           // lower height bound of the grid (compared with segment y)
-    float field_0x1c;                                           // upper height bound
+    float heightMin;                                           // +0x18 lower height bound of the grid (compared with segment y)
+    float heightMax;                                           // +0x1c upper height bound
     char pad_0x20[0x28 - 0x20];
     unsigned char field_0x28;
-    unsigned char field_0x29;                                   // log2 shift: grid edge = 16 << field_0x29 cells
+    unsigned char gridShift;                                   // +0x29 log2 shift: grid edge = 16 << gridShift cells
 };
 
 // 0x0056df04 / 0x004a2d00 / 0x004a2d90 bracket the Terrain dtor body: MemTagStack in
-// ../common/MemTag.h.
+// core/MemTag.h.
 
 // 16-dword block copied into +0xc44 from 0x004a1410's return value (a 4x4 matrix, tier 2:
 // 0x40 bytes).  Provisional.
@@ -81,7 +82,7 @@ TerrainMatrix* GetIdentityMatrix(TerrainMatrix* out);           // 0x004a1410 (f
 // PROVISIONAL: 16-byte entries of the table at *0x0068a32c indexed by Terrain::field_0xbf0
 // (`shl eax,4`, fields at +0, +4, +8, +0xc read by 0x00507960; tier 2 layout, tier 3 use).
 struct TerrainQualityEntry {
-    int field_0x00;
+    int drawDistanceSetting;  // +0x00 SelectQuality passes it to SetField0xbec (the >=0 clamped value stored in Terrain::field_0xbec, ctor 1000)
     int field_0x04;
     int field_0x08;
     int field_0x0c;
@@ -98,7 +99,7 @@ struct TerrainSharedState { int words[0x88]; };
 struct TerrainHost {
     int field_0x00;
     int field_0x04;
-    TerrainSharedState* field_0x08;
+    TerrainSharedState* sharedState;  // +0x08 pointer to the 0x220-byte block copied to g_terrainSharedState by slot 23
 };
 extern TerrainSharedState g_terrainSharedState;                 // 0x0068a090
 extern int g_terrainToggle314;                                  // 0x0068a314
@@ -127,8 +128,15 @@ inline TerrainVec3 operator*(const TerrainVec3& v, float s)
 {
     return TerrainVec3(s * v.x, s * v.y, s * v.z);
 }
-// 0x0043c890 multiplies by the reciprocal (fld 1.0; fdiv s; then three fmul).
-inline TerrainVec3 operator/(const TerrainVec3& v, float s) { return v * (1.0f / s); }
+// 0x0043c890 multiplies by the reciprocal (fld 1.0; fdiv s; then three fmul).  Written with a
+// direct constructor call (not via operator*) so the constructor is one inline level below the
+// call site: CastSegment's prologue keeps it inlined, as retail does (see the inline-budget
+// note above Terrain::CastSegment).
+inline TerrainVec3 operator/(const TerrainVec3& v, float s)
+{
+    float inv = 1.0f / s;
+    return TerrainVec3(inv * v.x, inv * v.y, inv * v.z);
+}
 
 float TerrainDot(const TerrainVec3& a, const TerrainVec3& b);   // 0x0040ae30 (cdecl, out of line)
 // 0x004a11e0 (cdecl): unit normal of the triangle (a, b, c) written to *out; the fifth
@@ -137,11 +145,15 @@ void TerrainTriangleNormal(const TerrainVec3* a, const TerrainVec3* b, const Ter
                            TerrainVec3* out, float* planeD);
 extern TerrainVec3 g_terrainRefDir;                              // 0x0068a058 (dotted with the face normal to orient it)
 
-// 0x00507510 / 0x00507590: file-static cdecl helpers (tier 2: no ecx, `ret`; the by-value TerrainVec3 return is the hidden out pointer in arg 0).
-TerrainVec3 TerrainClipRayToPlaneY(TerrainVec3* origin, const TerrainVec3* dir, float y);
-TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3* origin, const TerrainVec3* dir, float z);
+// 0x00507510 / 0x00507590: inline helpers whose out-of-line COMDAT copies retail kept because
+// CastSegment's inline budget ran out (tier 2: cdecl, no ecx, `ret`; the by-value TerrainVec3
+// return is the hidden out pointer in arg 0).  References are ABI-identical to pointers here;
+// they let CastSegment pass the `-dir` temporary straight through (retail `push eax` after the
+// out-of-line operator- at 0x005073a2).
+inline TerrainVec3 TerrainClipRayToPlaneY(TerrainVec3& origin, const TerrainVec3& dir, float y);
+inline TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3& origin, const TerrainVec3& dir, float z);
 
-class Terrain : public GameObject {
+class Terrain : public GameObject, public GroundFogableObject {
 public:
     // 0x00507c10 (thiscall, ret 0x10; 58 callers).  Snaps pos->y to the terrain surface under
     // (pos->x, pos->z), optionally writes the surface normal and a per-cell surface byte.
@@ -149,8 +161,8 @@ public:
     // "flatShaded" = use the triangle's face normal instead of blending corner normals.
     void QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded, unsigned char* surface);
     // 0x00506e90 (thiscall, ret 0x18).  Casts the world segment from->to against the terrain grid:
-    // rescales to grid space (1 / field_0x40), clips it to the grid box, hands it to
-    // field_0x44->CastSegment, and on a hit returns the world-space hit point in *out.
+    // rescales to grid space (1 / gridCellSize), clips it to the grid box, hands it to
+    // heightField->CastSegment, and on a hit returns the world-space hit point in *out.
     int CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out, int a, int b, int c);
     // GameObject slot overrides (vtable 0x0055825c, tier 1 addresses).
     virtual int GameObjectVirtualSlot19(int a);                 // 0x00507920 returns 0
@@ -158,25 +170,32 @@ public:
     // Slot 23 (0x00508850, ret 8): debug key handler; tier 3 name kept in the comment only
     // so the override has the base's name.  First argument is the input event.
     virtual int GameObjectVirtualSlot23(int event, int unused);
+    // 0x00507bb0 (plain thiscall, no args): derives four floats from the ints at 0x6c / 0x70
+    // (tier 3: a = appliedDrawDistance, b = field_0x70): 0x74 = a/b, 0x78 = (a*a)/(b*b), 0x7c = 1/0x78,
+    // 0x80 = 1/0x74.
+    void ComputeRatios();
+    // 0x005057d0 (ret 4, tier 3 name): when `object` is in the ownedObjectArray[] array, swaps the last
+    // element into its place, decrements the count at ownedObjectArrayCount and stores `object` in the freed
+    // last slot, i.e. moves it behind the live prefix.
+    void RetireOwnedObject(BaseObject* object);
     void SetField0xbec(int value);                              // 0x00507930 (ret 4)
     void SelectQuality(int index);                              // 0x00507960 (ret 4)
     explicit Terrain(int a);                                    // 0x00505830 (ret 4), forwards a to GameObject(int)
     virtual ~Terrain();                                         // 0x005059b0 -> core 0x005079f0
 
-    GroundFogableObject fogBase;                                // +0x2c (non-polymorphic base at mdisp 0x2c)
     BaseObject* field_0x30;                                     // slot 2 called (0x005079f0)
     TerrainComObject* field_0x34;                               // Release()d, then zeroed
     int field_0x38;
     int field_0x3c;
-    float field_0x40;                                           // ctor 1.0f
-    TerrainShutdownObject* field_0x44;
+    float gridCellSize;                                           // +0x40 ctor 1.0f
+    TerrainShutdownObject* heightField;  // +0x44 object with CastSegment slot and GetCellCorners; QueryGround returns early when null; dtor Shutdown(1) then deletes
     char field_0x48[0x24];
-    int field_0x6c;
+    int appliedDrawDistance;  // +0x6c slot 12 (0x507610) compares drawDistance with it, sets a dirty flag when different, then stores drawDistance into it; appliedDrawDistance is also the int a of ComputeRatios
     int field_0x70;
-    int field_0x74;
-    int field_0x78;
-    int field_0x7c;
-    int field_0x80;
+    float field_0x74;                                           // ratio of the two ints (0x507bb0)
+    float field_0x78;                                           // ratio squared
+    float field_0x7c;                                           // 1 / ratio squared
+    float field_0x80;                                           // 1 / ratio
     int field_0x84;
     int field_0x88;
     int field_0x8c;
@@ -192,37 +211,37 @@ public:
     int field_0xb4;
     char field_0xb8[0x53c - 0xb8];
     int field_0x53c;
-    int field_0x540;                                            // count of field_0x544[]
-    BaseObject* field_0x544[(0xbec - 0x544) / 4];
-    int field_0xbec;                                            // ctor 1000
-    int field_0xbf0;
-    int field_0xbf4;
+    int ownedObjectCount;                                            // +0x540 count of ownedObjects[]
+    BaseObject* ownedObjects[(0xbec - 0x544) / 4];
+    int drawDistance;                                            // +0xbec ctor 1000
+    int qualityIndex;  // +0xbf0 SelectQuality arg; indexes g_pTerrainQualityTable
+    int drawDistanceDirty;  // +0xbf4 set to 1 when SetField0xbec changes the value
     int field_0xbf8;
     int field_0xbfc;
     int field_0xc00;
     int field_0xc04;
     int field_0xc08;
     int field_0xc0c;
-    int field_0xc10;                                            // count of field_0xc14[]
-    void** field_0xc14;                                         // array of plain-new pointers
+    int blockCount;                                            // +0xc10 count of blocks[]
+    void** blocks;                                         // +0xc14 array of plain-new pointers
     char field_0xc18[0x18];
-    float field_0xc30;                                          // ctor 1.0f
+    float invGridCellSize;                                          // +0xc30 ctor 1.0f
     int field_0xc34;
     int field_0xc38;
     BaseObject* field_0xc3c;                                    // slot 2 called
     int field_0xc40;
-    TerrainMatrix field_0xc44;                                  // copy of the matrix from 0x004a1410
+    TerrainMatrix transform;                                  // +0xc44 copy of the matrix from 0x004a1410
     TerrainOwned* field_0xc84;
     TerrainOwned* field_0xc88;
     int field_0xc8c;
     char field_0xc90[0xca4 - 0xc90];
-    int field_0xca4;
-    int field_0xca8;
+    int qualityParamA;  // +0xca4 SelectQuality: table[index].field_0x04 (or table[9] when lowestQualityOverride)
+    int qualityParamB;  // +0xca8 SelectQuality: table[index].field_0x08
     int field_0xcac;
-    int field_0xcb0;
+    int lowestQualityOverride;  // +0xcb0 slot 23 key 2 toggles it; when set qualityParamA comes from table[9]
     int field_0xcb4;
-    BaseObject** field_0xcb8;                                   // array; each element slot 2 called
-    int field_0xcbc;                                            // count of field_0xcb8[]
+    BaseObject** ownedObjectArray;                                   // +0xcb8 array; each element slot 2 called
+    int ownedObjectArrayCount;                                            // +0xcbc count of ownedObjectArray[]
     int field_0xcc0;
 };
 

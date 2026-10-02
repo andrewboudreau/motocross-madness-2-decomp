@@ -55,12 +55,12 @@
   },
   {
     "class": "Vec3",
-    "source": "VectorOps.cpp",
-    "candidate_symbol_contains": "?CrossProduct@@",
+    "source": "CrossProduct.cpp",
+    "candidate_symbol_contains": "CrossProductCall",
     "target_va": "0x00515600",
     "target_size": 91,
-    "expect": "partial",
-    "notes": "CrossProduct; 86.8% instruction match; second-product x87 load order differs"
+    "expect": "exact",
+    "notes": "Out-of-line COMDAT of the cross product. Compound form (r.x = a*b; r.x -= c*d) fixes VC6 operand order; single-expression form does not."
   },
   {
     "class": "Math",

@@ -8,7 +8,7 @@
 #ifndef CONSTRAINT_METHOD_COLLISION_MODEL_H
 #define CONSTRAINT_METHOD_COLLISION_MODEL_H
 
-#include "../collision/CollisionObject.h"   // canonical CollisionObject chain (MIGRATION.md)
+#include "collision/CollisionObject.h"   // canonical CollisionObject chain (MIGRATION.md)
 #include "ConstraintTypes.h"
 
 // One probe point (32 bytes), see AddProbePoint / GameObjectVirtualSlot11.
@@ -36,25 +36,25 @@ public:
     // 0x0043bdb0: impulse response for a contact; see the header comment in the .cpp.
     void ApplyContactImpulse(ConBody* other, float t, ConVec3 offset, ConVec3 base, ConVec3 normal);
 
-    float field_0xb8;                // restitution e in -(1+e) v.n
+    float restitution;                // +0xb8 restitution e in -(1+e) v.n
     float field_0xbc;                // 0.9f in the constructor
     float dt;                        // 0xc0, slot 11 argument
     ConBody* body;                   // 0xc4
-    int field_0xc8;
+    int refreshPending;  // +0xc8 slot 11 0x0043ba70: when set it runs 0x00435fe0 (double refresh) instead of 0x00435fb0 and clears it
     ConVec3 contactPoint;            // 0xcc, world contact point of the last impulse
     int field_0xd8;
     int field_0xdc;
     int field_0xe0;
     ConGroundQuery* groundQuery;     // 0xe4
-    int field_0xe8;
-    int field_0xec;                  // 1 after the constructor
+    int manualStep;  // +0xe8 slot 10 0x0043ba40 only calls slot 11 itself when this is 0
+    int shapeCollisionEnabled;                  // +0xec 1 after the constructor
     float damping;                   // 0xf0, velocity *= 1 - dt*damping
-    float field_0xf4;                // impulse *= 1 - field_0xf4
+    float impulseLoss;                // +0xf4 impulse *= 1 - impulseLoss
     float maxImpulse;                // 0xf8, 0 = unlimited
     float maxSpeed;                  // 0xfc, 0 = unlimited
     int probeCount;                  // 0x100
     ConstraintProbe* probes;         // 0x104
-    int field_0x108;                 // 1 after the constructor
+    int applyImpulses;                 // +0x108 1 after the constructor
 };
 
 #endif

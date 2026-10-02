@@ -106,18 +106,18 @@ public:
     virtual int UnknownVirtualSlot3(int control, int kind, int modifier, int device) = 0;
     virtual int UnknownVirtualSlot4(int modifier) = 0;           // modifier test
 
-    int UnknownFunction43ce70(UnknownControlMapping* mapping);           // 0x0043ce70
+    int UnknownFunction43ce70(UnknownControlMapping* newMapping);           // 0x0043ce70
     void UnknownFunction43cea0(int control, int kind, int pressed, int device); // 0x0043cea0
     int UnknownFunction43cf00(int value);   // 0x0043cf00, near miss in samples/control
 
-    int field_0x04;                        // joystick count
-    int field_0x08;                        // active joystick index
-    JoystickDevice* field_0x0c;            // active joystick
-    JoystickDevice* field_0x10[8];
-    MouseDevice* field_0x30;
-    KeyboardDevice* field_0x34;    // keyboard (see above)
-    int field_0x38;                        // queued events
-    UnknownControlEvent field_0x3c[160];
-    UnknownControlMapping* field_0xcbc;
-    struct UnknownDirectInput* field_0xcc0;
+    int joystickCount;                        // joystick count
+    int activeJoystickIndex;                        // active joystick index
+    JoystickDevice* activeJoystick;            // active joystick
+    JoystickDevice* joysticks[8];
+    MouseDevice* mouse;
+    KeyboardDevice* keyboard;    // keyboard (see above)
+    int queuedEventCount;                        // queued events
+    UnknownControlEvent events[160];
+    UnknownControlMapping* mapping;
+    struct UnknownDirectInput* directInput;
 };

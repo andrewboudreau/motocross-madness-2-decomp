@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Guid.h"
 #include "RenderInterfaces.h"
 #include "RenderTarget.h"
 
@@ -46,17 +47,19 @@ public:
     virtual void UnknownVirtualSlot19();
 
     void UnknownFunction4c5d00();        // 0x004c5d00 (PCCamera slot 27)
-    // 0x004c4f80: attaches the display (+0x04), the rectangle (+0x54), the
+    // 0x004c4f80: attaches the display (+0x04), the device GUID (+0x54), the
     // surface (+0x48) and the frame modulus (+0x14); returns the target or 0.
-    RenderTarget* UnknownFunction4c4f80(UnknownDisplay* display, const CameraRect* rect,
+    RenderTarget* UnknownFunction4c4f80(UnknownDisplay* display, const UnknownGuid* device,
                                         UnknownSurfaceInterface* surface, int flag, int frames);
     void UnknownFunction4c5950(int* value);   // 0x004c5950 (PCGame slot 31)
 
     UnknownSurfaceInterface* field_0x48;
     UnknownSurfaceInterface* field_0x4c; // released by the destructor; PCGame slot 5 restores it
     UnknownRenderInterface* field_0x50; // the device
-    CameraRect field_0x54;              // cleared by the constructor
-    unsigned char field_0x64[0x1a8 - 0x64];
+    UnknownGuid field_0x54;             // Direct3D device GUID (PCGame +0x2f8); cleared by the constructor
+    unsigned char field_0x64[0x164 - 0x64];
+    unsigned int field_0x164;            // capability bits (0x4000: 800x600, PCGame 0x004c0d10)
+    unsigned char field_0x168[0x1a8 - 0x168];
     unsigned int field_0x1a8;            // capability bits (PCGame slot 7 tests 0x1, 0x800)
     unsigned char field_0x1ac[0x1c4 - 0x1ac];
     unsigned int field_0x1c4;            // texture filter capability bits (0x2, 0x20)

@@ -1,7 +1,7 @@
 #include "ControlInterface.h"
 #include "InputDevice.h"
 #include "KeyboardDevice.h"
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // Two-value helpers; inline functions keep their operands as spilled
 // arguments, as retail does.
@@ -16,8 +16,8 @@ static inline float BindingMin(float a, float b) {
 // 0x0043caa0
 int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* event, int modifier) {
     if (event->control == control && event->kind == kind &&
-        (!g_UnknownGlobal56e26c->field_0x14->field_0x34 ||
-         g_UnknownGlobal56e26c->field_0x14->field_0x34->UnknownFunction48a240(modifier)))
+        (!g_UnknownGlobal56e26c->field_0x14->keyboard ||
+         g_UnknownGlobal56e26c->field_0x14->keyboard->UnknownFunction48a240(modifier)))
         return 1;
     return 0;
 }
@@ -156,36 +156,36 @@ void UnknownControlBinding::UnknownFunction43cde0() {
 
 // 0x0043ce00
 ControlInterface::ControlInterface() {
-    field_0x04 = 0;
-    field_0x08 = 0;
-    field_0x0c = 0;
+    joystickCount = 0;
+    activeJoystickIndex = 0;
+    activeJoystick = 0;
     for (int i = 0; i < 8; i++)
-        field_0x10[i] = 0;
-    field_0x30 = 0;
-    field_0x34 = 0;
-    field_0xcbc = 0;
-    field_0x38 = 0;
+        joysticks[i] = 0;
+    mouse = 0;
+    keyboard = 0;
+    mapping = 0;
+    queuedEventCount = 0;
 }
 
 // 0x0043ce60
 ControlInterface::~ControlInterface() {}
 
 // 0x0043ce70
-int ControlInterface::UnknownFunction43ce70(UnknownControlMapping* mapping) {
-    if (!mapping)
+int ControlInterface::UnknownFunction43ce70(UnknownControlMapping* newMapping) {
+    if (!newMapping)
         return 0;
-    field_0xcbc = mapping;
+    mapping = newMapping;
     return 1;
 }
 
 // 0x0043cea0
 void ControlInterface::UnknownFunction43cea0(int control, int kind, int pressed, int device) {
-    field_0x3c[field_0x38].control = control;
-    field_0x3c[field_0x38].device = device;
-    field_0x3c[field_0x38].kind = kind;
-    field_0x3c[field_0x38].pressed = pressed;
-    field_0x3c[field_0x38].modifiers = 0x3f;
-    field_0x38++;
+    events[queuedEventCount].control = control;
+    events[queuedEventCount].device = device;
+    events[queuedEventCount].kind = kind;
+    events[queuedEventCount].pressed = pressed;
+    events[queuedEventCount].modifiers = 0x3f;
+    queuedEventCount++;
 }
 
 // 0x0043d080

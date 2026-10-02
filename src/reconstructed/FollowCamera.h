@@ -87,7 +87,7 @@ public:
     explicit FollowCamera(int flags); // 0x00462ee0 (near miss: samples/camera)
     virtual ~FollowCamera();          // destructor core 0x00463350
 
-    virtual int UnknownVirtualSlot10(int value);     // 0x00465c20, not reconstructed
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x00465c20, not reconstructed
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00466ad0, not reconstructed
 
     virtual Vector3 UnknownVirtualSlot33() = 0;
@@ -105,7 +105,7 @@ public:
     virtual void UnknownVirtualSlot44(const Vector3& value);
     virtual void UnknownVirtualSlot45();
     virtual void UnknownVirtualSlot46(Vector3* a, Vector3* b); // 0x004654e0, not reconstructed
-    virtual void UnknownVirtualSlot47(int a, Vector3* b);      // 0x00465720, not reconstructed
+    virtual void UnknownVirtualSlot47(float frameTime, Vector3* b); // 0x00465720, not reconstructed
     virtual Vector3 UnknownVirtualSlot48(int a, bool flag, int b);
     virtual void UnknownVirtualSlot49();
     virtual Vector3 UnknownVirtualSlot50() = 0;

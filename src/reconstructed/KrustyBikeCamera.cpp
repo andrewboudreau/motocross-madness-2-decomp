@@ -19,7 +19,7 @@ KrustyBikeCamera::~KrustyBikeCamera() {}
 
 // 0x00497df0: the FollowCamera search, unless the global +0x3430 blocks it.
 int KrustyBikeCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (g_UnknownGlobal56e26c->field_0x3430)
+    if (g_UnknownGlobal56e26c->uiInteractionBlocked)
         return 0;
     return BikeCamera::UnknownVirtualSlot23(event, entry);
 }
@@ -27,8 +27,8 @@ int KrustyBikeCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownIn
 // 0x00497fa0: keeps the point at least 3.5 above the subject's ground height
 // (easing +0x22c when it lifts it), and in modes 3 and 4 no higher than 400.
 void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
-    bool capped = g_UnknownGlobal56e26c->field_0x578.UnknownFunction524100() == 3 ||
-                  g_UnknownGlobal56e26c->field_0x578.UnknownFunction524100() == 4;
+    bool capped = g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 3 ||
+                  g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 4;
     Vector3 ground = *point;
     field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
     float minimum = ground.y + 3.5f;
@@ -112,7 +112,7 @@ void KrustyBikeCamera::UnknownVirtualSlot61() {
 // 0x004982c0: shows the state's name (string 0x13b9 + state) for 1.5 s,
 // except in state 6.
 void KrustyBikeCamera::UnknownVirtualSlot58() {
-    UnknownMessageTarget* target = g_UnknownGlobal56e26c->field_0x570->UnknownFunction45d340();
+    UnknownMessageTarget* target = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
     if (target && field_0x244 != 6) {
         char text[260];
         g_UnknownGlobal56e26c->UnknownFunction521970(field_0x244 + 0x13B9, text, 0x80);

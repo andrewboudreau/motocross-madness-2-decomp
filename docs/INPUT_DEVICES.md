@@ -12,6 +12,17 @@ established, apart from ContainerList.h, which retail names through
 the default profile, except two near misses in
 `samples/inputdevice/PCJoystickDeviceNearMisses.cpp`.
 
+## Readable member names
+
+The matched source uses semantic names where decoded behavior establishes the
+role without claiming an original identifier: device capability counts and
+kind, DirectInput device/info pointers, key/button timestamps, modifier state,
+axis values and binding lists, and the ControlInterface device/event members.
+DirectInput-style virtual calls are named for the independently decoded method
+slots (for example `Acquire`, `GetDeviceData`, and `CreateDeviceEx`). Remaining
+uncertain virtuals and force-feedback fields retain slot/address names. These
+are reconstruction names, not recovered retail symbols.
+
 ## Classes
 
 - **InputDevice:** slot 0 is `_purecall` and slot 1 its destructor, so a pure

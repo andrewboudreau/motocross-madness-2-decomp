@@ -4,7 +4,7 @@
     "source": "PhysicsBody.cpp",
     "candidate_symbol_contains": "??_GPhysicsBody@@",
     "target_va": "0x004cbdc0",
-    "target_size": 32,
+    "target_size": 30,
     "expect": "exact",
     "notes": "slot 0 scalar deleting destructor (compiler generated)"
   },
@@ -121,7 +121,7 @@
     "source": "PhysicsRigidBody.cpp",
     "candidate_symbol_contains": "??_GPhysicsRigidBody@@",
     "target_va": "0x004cc1c0",
-    "target_size": 32,
+    "target_size": 30,
     "expect": "exact",
     "notes": "slot 0 scalar deleting destructor"
   },

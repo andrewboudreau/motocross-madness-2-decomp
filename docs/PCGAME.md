@@ -6,6 +6,7 @@ derives from it). The literal `__FILE__` `D:\aardvark\VC\krusty2\PCGame.cpp`
 `src/reconstructed/PCGame.h` / `PCGame.cpp`. Names are provisional.
 
 PCGame is the Windows layer. It holds:
+- the Direct3D device GUID (+0x2f8);
 - the window rectangle (+0x308);
 - the instance and window handles (+0x318, +0x31c);
 - the registry names "Rainbow Studios", "Rainbow Demo" and
@@ -32,7 +33,7 @@ inference.
 
 ## Status
 
-The following are exact (34 calibration cases):
+The following are exact (35 calibration cases):
 - the constructor, both destructors and the time stamp function
   `0x004bfa80`;
 - slots 2, 5, 6, 7, 13, 14, 15, 19, 31, 32, 34, 35, 36 and 37 (every
@@ -70,7 +71,28 @@ Near miss: the profile loader `0x004c16f0` (767/771,
 `samples/game/PCGameNearMisses.cpp`). Its copy loop swaps the SIB base and
 index registers.
 
-Not reconstructed:
-- the profiling pass `0x004c0d10` (1790 bytes, with an EH frame);
-- the start-up function `0x004bfc50` (1504 bytes), which calls the profile
-  helpers.
+Near miss: the profiling pass `0x004c0d10` (1790 bytes,
+`samples/game/PCGameNearMisses.cpp`). Its control flow and calls line up, but
+the frame layout and register assignment do not (notes in the sample). The
+pass uses the display's DirectDraw-shaped interface (+0x190) for the
+following, which are inference:
+- SetDisplayMode (method 21);
+- GetAvailableVidMem (method 23);
+- CreateSurface (method 6), to test whether ten 256x256 textures fit.
+
+
+## Start-up (`0x004bfc50`)
+
+The start-up function runs before Game's initialiser `0x00467b70`, which it
+calls last; its argument is the failure message buffer. In order, it:
+1. Maps the "Renderer" setting to a device GUID. HAL, RGB, MMX, Ramp, Null and
+   Ref are confirmed by their values, which equal the DirectX IIDs of those
+   names. "Blade" (`0x00556040`) is not a DirectX GUID and sets +0x2d0.
+2. Runs slot 37 and enumerates the displays (`0x004c9600`).
+3. When any profile is stale, asks through a message box (string 0x13d8),
+   then re-profiles.
+4. Runs the profiling pass and chooses the display (`0x004ccd60`).
+5. Reads its `Allow*` flags into +0x2d4 bits 3-7.
+6. Selects the joystick (`0x004cd610`) on the ControlInterface.
+
+PCRenderTarget+0x54 receives that GUID.

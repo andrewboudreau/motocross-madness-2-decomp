@@ -45,6 +45,7 @@ public:
     // +0x1c0 = min(maximum, g_UnknownFloat550f70).
     void UnknownFunction42e960(float minimum, float maximum);
     int UnknownFunction42e550(); // 0x0042e550, called by slot 8
+    void UnknownFunction42e9b0(Vector3* position, int a, int b, int c, int d); // 0x0042e9b0 (EventManager slot 10)
 
 protected:
     // field_0x18 (GameObject's owner slot) holds the camera's RenderTarget.

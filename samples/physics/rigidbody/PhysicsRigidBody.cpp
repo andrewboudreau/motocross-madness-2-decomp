@@ -53,7 +53,7 @@ void PhysicsBody::SetInitialAngularVelocity(const Vec3& w)
 // slot 35, 0x004cc110.
 void PhysicsBody::UnknownVirtualSlot35(int)
 {
-    active = field_0x25 & 1;
+    active = statusFlags & 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ PhysicsRigidBody::PhysicsRigidBody(int flags)
     force = kVec3Zero;
     torque = kVec3Zero;
     ResetState();
-    field_0x2a4 = 0;
+    stepDisabled = 0;
 }
 
 // 0x004cc1e0: vptr = 0x00556ec0; tail-jumps to PhysicsBody::~PhysicsBody.
@@ -145,7 +145,7 @@ void PhysicsRigidBody::ResetState()
 // slot 10, 0x004cc600.
 int PhysicsRigidBody::GameObjectVirtualSlot10(float dt)
 {
-    if (!field_0x2a4)
+    if (!stepDisabled)
         GameObjectVirtualSlot11(dt);
     return GraphicsTest::GameObjectVirtualSlot10(dt);
 }

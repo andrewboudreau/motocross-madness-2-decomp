@@ -60,6 +60,12 @@ def compare_bytes(retail: bytes, candidate: bytes) -> dict:
                            if i >= len(retail) or i >= len(candidate) or retail[i] != candidate[i]][:64]}
 
 
+_EH_PROLOGUES = {
+    3: (b'\x6a\xff\x68',),
+    9: (b'\x64\xa1\x00\x00\x00\x00\x6a\xff\x68',),
+}
+
+
 def _source_path_literal(obj: CoffObject, record) -> str | None:
     """Lower-cased basename of an absolute source-path literal, else None."""
     if record.section_number <= 0:
@@ -106,7 +112,9 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
         # /GX frame prologue `push -1; push offset handler`: the handler stub is
         # a compiler label in .text$x whose number shifts with unrelated edits,
         # so it is bound under the stable key '<function symbol>$ehhandler'.
-        if (offset == 3 and raw[:3] == b'\x6a\xff\x68' and record.storage_class == 6
+        # VC6 may also schedule the fs:[0] load first:
+        # `mov eax, fs:[0]; push -1; push offset handler` (handler at +9).
+        if (raw[:offset] in _EH_PROLOGUES.get(offset, ()) and record.storage_class == 6
                 and obj.section(record.section_number).name.startswith('.text$x')):
             name = f'{sym.name}$ehhandler'
         # __except_list is the CRT's absolute symbol for the fs:[0] SEH chain head.

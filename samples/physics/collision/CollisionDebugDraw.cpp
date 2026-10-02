@@ -231,25 +231,25 @@ void CollisionObject::DrawBoxTree(CollisionTreeNode* node, int depth, const Matr
 void CollisionObject::DrawHull(CollisionHullBody* hull, int depth, int mode)
 {
     if (mode == 1) {
-        DrawTree((CollisionTreeNode*)hull->field_0x188, depth, &hull->field_0x48,
-                 (const Vec3*)hull->field_0x190);
+        DrawTree((CollisionTreeNode*)hull->triangleTree, depth, &hull->worldTransform,
+                 (const Vec3*)hull->vertices);
     } else if (mode == 2) {
-        if (hull->field_0x18c) {
-            DrawBoxTree((CollisionTreeNode*)hull->field_0x18c, depth, &hull->field_0x48);
+        if (hull->pointTree) {
+            DrawBoxTree((CollisionTreeNode*)hull->pointTree, depth, &hull->worldTransform);
         }
     } else if (mode == 3) {
-        DrawTreeMotion((CollisionTreeNode*)hull->field_0x188, depth, &hull->field_0x48,
-                       &hull->field_0x08, (const Vec3*)hull->field_0x190);
+        DrawTreeMotion((CollisionTreeNode*)hull->triangleTree, depth, &hull->worldTransform,
+                       &hull->motionTransform, (const Vec3*)hull->vertices);
     } else if (mode == 4) {
-        DrawTreeMotion((CollisionTreeNode*)hull->field_0x188, depth, &hull->field_0x48,
-                       &hull->field_0x08, (const Vec3*)hull->field_0x190);
+        DrawTreeMotion((CollisionTreeNode*)hull->triangleTree, depth, &hull->worldTransform,
+                       &hull->motionTransform, (const Vec3*)hull->vertices);
         // m = field_0x88 * field_0x108 (row vectors), written out here.  Retail's term
         // order comes out only with the product in this function through local
         // references declared after m; an inline helper, or m declared last, gives a
         // different FPU order.
         Matrix4 m;
-        const Matrix4& a = hull->field_0x88;
-        const Matrix4& b = hull->field_0x108;
+        const Matrix4& a = hull->localTransform;
+        const Matrix4& b = hull->prevBodyTransform;
         m._11 = a._11 * b._11 + a._12 * b._21 + a._13 * b._31 + a._14 * b._41;
         m._12 = a._11 * b._12 + a._12 * b._22 + a._13 * b._32 + a._14 * b._42;
         m._13 = a._11 * b._13 + a._12 * b._23 + a._13 * b._33 + a._14 * b._43;
@@ -266,21 +266,21 @@ void CollisionObject::DrawHull(CollisionHullBody* hull, int depth, int mode)
         m._42 = a._41 * b._12 + a._42 * b._22 + a._43 * b._32 + a._44 * b._42;
         m._43 = a._41 * b._13 + a._42 * b._23 + a._43 * b._33 + a._44 * b._43;
         m._44 = a._41 * b._14 + a._42 * b._24 + a._43 * b._34 + a._44 * b._44;
-        DrawTree((CollisionTreeNode*)hull->field_0x188, depth, &m,
-                 (const Vec3*)hull->field_0x190);
+        DrawTree((CollisionTreeNode*)hull->triangleTree, depth, &m,
+                 (const Vec3*)hull->vertices);
     } else if (mode == 5) {
-        if (hull->field_0x18c) {
-            DrawPointTree((CollisionTreeNode*)hull->field_0x18c, &hull->field_0x48,
-                          &hull->field_0x08);
+        if (hull->pointTree) {
+            DrawPointTree((CollisionTreeNode*)hull->pointTree, &hull->worldTransform,
+                          &hull->motionTransform);
         }
     } else if (mode == 6) {
-        if (hull->field_0x18c) {
-            DrawPointTree((CollisionTreeNode*)hull->field_0x18c, &hull->field_0x48,
-                          &hull->field_0x148);
+        if (hull->pointTree) {
+            DrawPointTree((CollisionTreeNode*)hull->pointTree, &hull->worldTransform,
+                          &hull->relativeFrame);
         }
     } else if (mode == 7) {
-        DrawTreeNormals((CollisionTreeNode*)hull->field_0x188, (const Vec3*)hull->field_0x190,
-                        &hull->field_0x48);
+        DrawTreeNormals((CollisionTreeNode*)hull->triangleTree, (const Vec3*)hull->vertices,
+                        &hull->worldTransform);
     }
 }
 
@@ -292,41 +292,41 @@ void CollisionObject::DrawModel(CollisionModelBody* model, int depth, int mode)
     DrawBox((const Vec3*)&model->center, (const Vec3*)&model->halfExtents, &model->field_0x88);
     for (int i = 0; i < model->elementCount; i++) {
         if (mode == 1) {
-            if (model->elements[i].field_0x18c) {
+            if (model->elements[i].pointTree) {
                 SetDrawColor(0, 0, 0xff);
                 if (!model->elementEnabled[i]) {
                     SetDrawColor(0xff, 0, 0);
                 }
-                if (model->field_0x08[i]) {
+                if (model->elementHighlight[i]) {
                     SetDrawColor(0, 0xff, 0);
                 }
-                CollisionTreeNode* box = (CollisionTreeNode*)model->elements[i].field_0x18c;
-                DrawBox(&box->center, &box->halfExtents, &model->elements[i].field_0x48);
+                CollisionTreeNode* box = (CollisionTreeNode*)model->elements[i].pointTree;
+                DrawBox(&box->center, &box->halfExtents, &model->elements[i].worldTransform);
             }
         } else if (mode == 2) {
-            if (model->elements[i].field_0x18c) {
-                DrawTree((CollisionTreeNode*)model->elements[i].field_0x188, depth, &model->elements[i].field_0x48,
-                         (const Vec3*)model->elements[i].field_0x190);
+            if (model->elements[i].pointTree) {
+                DrawTree((CollisionTreeNode*)model->elements[i].triangleTree, depth, &model->elements[i].worldTransform,
+                         (const Vec3*)model->elements[i].vertices);
             }
         } else if (mode == 3) {
-            if (model->elements[i].field_0x18c) {
-                DrawBoxTree((CollisionTreeNode*)model->elements[i].field_0x18c, depth, &model->elements[i].field_0x48);
+            if (model->elements[i].pointTree) {
+                DrawBoxTree((CollisionTreeNode*)model->elements[i].pointTree, depth, &model->elements[i].worldTransform);
             }
         } else if (mode == 4) {
-            DrawTreeMotion((CollisionTreeNode*)model->elements[i].field_0x188, depth, &model->elements[i].field_0x48,
-                           &model->elements[i].field_0x08, (const Vec3*)model->elements[i].field_0x190);
+            DrawTreeMotion((CollisionTreeNode*)model->elements[i].triangleTree, depth, &model->elements[i].worldTransform,
+                           &model->elements[i].motionTransform, (const Vec3*)model->elements[i].vertices);
         } else if (mode == 5) {
-            if (model->elements[i].field_0x18c) {
-                DrawPointTree((CollisionTreeNode*)model->elements[i].field_0x18c, &model->elements[i].field_0x48,
-                              &model->elements[i].field_0x08);
+            if (model->elements[i].pointTree) {
+                DrawPointTree((CollisionTreeNode*)model->elements[i].pointTree, &model->elements[i].worldTransform,
+                              &model->elements[i].motionTransform);
             }
         } else if (mode == 6) {
-            if (model->elements[i].field_0x18c) {
-                DrawPointTree((CollisionTreeNode*)model->elements[i].field_0x18c, &model->elements[i].field_0x48, 0);
+            if (model->elements[i].pointTree) {
+                DrawPointTree((CollisionTreeNode*)model->elements[i].pointTree, &model->elements[i].worldTransform, 0);
             }
         } else if (mode == 7) {
-            DrawTreeNormals((CollisionTreeNode*)model->elements[i].field_0x188,
-                            (const Vec3*)model->elements[i].field_0x190, &model->elements[i].field_0x48);
+            DrawTreeNormals((CollisionTreeNode*)model->elements[i].triangleTree,
+                            (const Vec3*)model->elements[i].vertices, &model->elements[i].worldTransform);
         }
     }
 }

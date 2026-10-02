@@ -25,51 +25,51 @@
 #include "../../src/reconstructed/JoystickDevice.h"
 #include "../../src/reconstructed/KeyboardDevice.h"
 #include "../../src/reconstructed/MouseDevice.h"
-#include "../../src/reconstructed/UnknownObject56e26c.h"
+#include "../../src/reconstructed/TrackGame.h"
 
 // 0x0043cf00: has the keyboard, mouse and joysticks read their input, then
 // passes each queued event, stamped with the keyboard's modifier state, to
 // the global object (slot 13 for releases, 14 for presses) with the
 // device's entry for that control.
 int ControlInterface::UnknownFunction43cf00(int value) {
-    field_0x38 = 0;
-    if (field_0x34)
-        field_0x34->UnknownVirtualSlot6(value);
-    if (field_0x30)
-        field_0x30->UnknownVirtualSlot6(value);
+    queuedEventCount = 0;
+    if (keyboard)
+        keyboard->UnknownVirtualSlot6(value);
+    if (mouse)
+        mouse->UnknownVirtualSlot6(value);
     for (int i = 0; i < 8; i++) {
-        if (field_0x10[i])
-            field_0x10[i]->UnknownVirtualSlot20(value);
+        if (joysticks[i])
+            joysticks[i]->UnknownVirtualSlot20(value);
     }
-    for (int j = 0; j < field_0x38; j++) {
-        UnknownControlEvent* event = &field_0x3c[j];
-        if (field_0x34)
-            event->modifiers = field_0x34->field_0x16d8;
+    for (int j = 0; j < queuedEventCount; j++) {
+        UnknownControlEvent* event = &events[j];
+        if (keyboard)
+            event->modifiers = keyboard->modifierState;
         else
             event->modifiers = 0;
         switch (event->kind) {
         case 0:
             if (event->pressed == 0)
                 g_UnknownGlobal56e26c->UnknownVirtualSlot13(
-                    event, &field_0x34->field_0x260[event->control]);
+                    event, &keyboard->keyStates[event->control]);
             if (event->pressed == 1)
                 g_UnknownGlobal56e26c->UnknownVirtualSlot14(
-                    event, &field_0x34->field_0x260[event->control]);
+                    event, &keyboard->keyStates[event->control]);
             break;
         case 1:
             if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(event, &field_0x30->field_0x260[event->control]);
+                g_UnknownGlobal56e26c->UnknownVirtualSlot13(event, &mouse->buttonStates[event->control]);
             if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(event, &field_0x30->field_0x260[event->control]);
+                g_UnknownGlobal56e26c->UnknownVirtualSlot14(event, &mouse->buttonStates[event->control]);
             break;
         case 2:
         case 3:
             if (event->pressed == 0)
                 g_UnknownGlobal56e26c->UnknownVirtualSlot13(
-                    event, &field_0x10[event->device]->field_0x264[event->control]);
+                    event, &joysticks[event->device]->buttonStates[event->control]);
             if (event->pressed == 1)
                 g_UnknownGlobal56e26c->UnknownVirtualSlot14(
-                    event, &field_0x10[event->device]->field_0x264[event->control]);
+                    event, &joysticks[event->device]->buttonStates[event->control]);
             break;
         }
     }
@@ -81,17 +81,17 @@ int ControlInterface::UnknownFunction43cf00(int value) {
 int PCControlInterface::UnknownVirtualSlot3(int control, int kind, int modifier, int device) {
     switch (kind) {
     case 0:
-        if (field_0x34)
-            return field_0x34->UnknownVirtualSlot5(control, modifier, 0);
+        if (keyboard)
+            return keyboard->UnknownVirtualSlot5(control, modifier, 0);
         break;
     case 1:
-        if (field_0x30)
-            return field_0x30->UnknownVirtualSlot5(control, modifier, 0);
+        if (mouse)
+            return mouse->UnknownVirtualSlot5(control, modifier, 0);
         break;
     case 2:
     case 3:
-        if (field_0x10[device])
-            return field_0x10[device]->UnknownVirtualSlot2(control, modifier, 0);
+        if (joysticks[device])
+            return joysticks[device]->UnknownVirtualSlot2(control, modifier, 0);
         break;
     }
     return 0;
