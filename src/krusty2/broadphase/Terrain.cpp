@@ -4,7 +4,7 @@
 Terrain::Terrain(int a)
     : GameObject(a)
 {
-    field_0x40 = 1.0f;
+    gridCellSize = 1.0f;
     field_0x3c = 0;
     field_0x84 = 0;
     field_0x88 = 0;
@@ -19,11 +19,11 @@ Terrain::Terrain(int a)
     field_0xb0 = 0;
     field_0x34 = 0;
     field_0xb4 = 0;
-    field_0x540 = 0;
+    ownedObjectCount = 0;
     field_0x53c = 0;
-    field_0x44 = 0;
-    field_0xbec = 1000;
-    field_0xbf4 = 0;
+    heightField = 0;
+    drawDistance = 1000;
+    drawDistanceDirty = 0;
     field_0x30 = 0;
     field_0xbf8 = 0;
     field_0x8c = 0;
@@ -32,61 +32,61 @@ Terrain::Terrain(int a)
     field_0xc04 = 0;
     field_0xc08 = 0;
     field_0xc0c = 0;
-    field_0x6c = 0;
+    appliedDrawDistance = 0;
     field_0x70 = 0;
     field_0x78 = 0;
     field_0x74 = 0;
     field_0x7c = 0;
     field_0x80 = 0;
-    field_0xc10 = 0;
-    field_0xc14 = 0;
-    field_0xc30 = 1.0f;
+    blockCount = 0;
+    blocks = 0;
+    invGridCellSize = 1.0f;
     field_0xc34 = 0;
     field_0xc38 = 0;
     field_0xc3c = 0;
     TerrainMatrix tmp;
-    field_0xc44 = *GetIdentityMatrix(&tmp);
-    field_0xcb8 = 0;
-    field_0xcbc = 0;
+    transform = *GetIdentityMatrix(&tmp);
+    ownedObjectArray = 0;
+    ownedObjectArrayCount = 0;
     field_0xcc0 = 0;
     field_0xcac = 0;
-    field_0xcb0 = 0;
+    lowestQualityOverride = 0;
     field_0xcb4 = 0;
 }
 
 Terrain::~Terrain()
 {
     int scope = g_MemTagStack->Push("Terrain");
-    if (field_0xcb8) {
-        for (int i = 0; i < field_0xcbc; i++)
-            field_0xcb8[i]->BaseObjectVirtualSlot2();
-        operator delete(field_0xcb8, __FILE__, 0x4b3);
+    if (ownedObjectArray) {
+        for (int i = 0; i < ownedObjectArrayCount; i++)
+            ownedObjectArray[i]->BaseObjectVirtualSlot2();
+        operator delete(ownedObjectArray, __FILE__, 0x4b3);
     }
     if (field_0xc3c)
         field_0xc3c->BaseObjectVirtualSlot2();
     if (field_0x30)
         field_0x30->BaseObjectVirtualSlot2();
-    if (field_0x540) {
-        for (int i = 0; i < field_0x540; i++) {
-            if (field_0x544[i])
-                field_0x544[i]->BaseObjectVirtualSlot2();
+    if (ownedObjectCount) {
+        for (int i = 0; i < ownedObjectCount; i++) {
+            if (ownedObjects[i])
+                ownedObjects[i]->BaseObjectVirtualSlot2();
         }
     }
-    if (field_0x44) {
-        field_0x44->Shutdown(1);
-        if (field_0x44)
-            delete field_0x44;
+    if (heightField) {
+        heightField->Shutdown(1);
+        if (heightField)
+            delete heightField;
     }
     if (field_0x34) {
         field_0x34->Release();
         field_0x34 = 0;
     }
-    if (field_0xc14) {
-        for (int i = 0; i < field_0xc10; i++) {
-            if (field_0xc14[i])
-                delete field_0xc14[i];
+    if (blocks) {
+        for (int i = 0; i < blockCount; i++) {
+            if (blocks[i])
+                delete blocks[i];
         }
-        operator delete(field_0xc14, __FILE__, 0x4d0);
+        operator delete(blocks, __FILE__, 0x4d0);
     }
     if (field_0xc84)
         delete field_0xc84;
@@ -99,12 +99,12 @@ Terrain::~Terrain()
 // element, shrink the live count), keeping the pointer just behind the new end.
 void Terrain::RetireOwnedObject(BaseObject* object)
 {
-    if (field_0xcbc) {
-        for (int i = 0; i < field_0xcbc; i++) {
-            if (field_0xcb8[i] == object) {
-                field_0xcbc--;
-                field_0xcb8[i] = field_0xcb8[field_0xcbc];
-                field_0xcb8[field_0xcbc] = object;
+    if (ownedObjectArrayCount) {
+        for (int i = 0; i < ownedObjectArrayCount; i++) {
+            if (ownedObjectArray[i] == object) {
+                ownedObjectArrayCount--;
+                ownedObjectArray[i] = ownedObjectArray[ownedObjectArrayCount];
+                ownedObjectArray[ownedObjectArrayCount] = object;
                 return;
             }
         }
@@ -114,7 +114,7 @@ void Terrain::RetireOwnedObject(BaseObject* object)
 // 0x00507bb0.
 void Terrain::ComputeRatios()
 {
-    int a = field_0x6c;
+    int a = appliedDrawDistance;
     int b = field_0x70;
     field_0x78 = (float)(a * a) / (b * b);
     field_0x74 = (float)a / b;
@@ -141,24 +141,24 @@ void Terrain::SetField0xbec(int value)
 {
     if (value < 0)
         value = 0;
-    if (field_0xbec != value) {
-        field_0xbec = value;
-        field_0xbf4 = 1;
+    if (drawDistance != value) {
+        drawDistance = value;
+        drawDistanceDirty = 1;
     }
 }
 
 void Terrain::SelectQuality(int index)
 {
-    field_0xbf0 = index;
+    qualityIndex = index;
     g_terrainQualityValue = g_pTerrainQualityTable[index].field_0x0c;
-    SetField0xbec(g_pTerrainQualityTable[field_0xbf0].field_0x00);
+    SetField0xbec(g_pTerrainQualityTable[qualityIndex].drawDistanceSetting);
     // if/else, not a ?: expression: VC6 merges the two stores but allocates the joined value
     // to edx only in this form (retail 0x5079a3).
-    if (field_0xcb0)
-        field_0xca4 = g_pTerrainQualityTable[9].field_0x04;
+    if (lowestQualityOverride)
+        qualityParamA = g_pTerrainQualityTable[9].field_0x04;
     else
-        field_0xca4 = g_pTerrainQualityTable[field_0xbf0].field_0x04;
-    field_0xca8 = g_pTerrainQualityTable[field_0xbf0].field_0x08;
+        qualityParamA = g_pTerrainQualityTable[qualityIndex].field_0x04;
+    qualityParamB = g_pTerrainQualityTable[qualityIndex].field_0x08;
 }
 
 TerrainSharedState g_terrainSharedState;
@@ -172,17 +172,17 @@ int Terrain::GameObjectVirtualSlot23(int event, int)
     if (TestInputEvent(0x43, 0, event, 0x80)) {
         g_terrainToggle314 = 1 - g_terrainToggle314;
         if (g_terrainToggle314)
-            g_terrainSharedState = *((TerrainHost*)field_0x18)->field_0x08;
+            g_terrainSharedState = *((TerrainHost*)field_0x18)->sharedState;
         return 1;
     }
     if (TestInputEvent(2, 0, event, 0x80)) {
         if (g_terrainQualityValue && field_0xcac) {
-            field_0xcb0 = 1 - field_0xcb0;
-            if (field_0xcb0) {
-                field_0xca4 = g_pTerrainQualityTable[9].field_0x04;
+            lowestQualityOverride = 1 - lowestQualityOverride;
+            if (lowestQualityOverride) {
+                qualityParamA = g_pTerrainQualityTable[9].field_0x04;
                 return 1;
             }
-            field_0xca4 = g_pTerrainQualityTable[field_0xbf0].field_0x04;
+            qualityParamA = g_pTerrainQualityTable[qualityIndex].field_0x04;
         }
         g_terrainQualityValue = 1 - g_terrainQualityValue;
         return 1;
@@ -255,11 +255,11 @@ static inline TerrainVec3 TerrainNormalize(const TerrainVec3& v)
 void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
                           unsigned char* surface)
 {
-    if (!field_0x44)
+    if (!heightField)
         return;
 
-    float fx = pos->x * field_0xc30;
-    float fz = pos->z * field_0xc30;
+    float fx = pos->x * invGridCellSize;
+    float fz = pos->z * invGridCellSize;
     if (fx < 0.0f)
         fx = 0.0f;
     if (fz < 0.0f)
@@ -283,12 +283,12 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
     TerrainVec3* cornerNormals = 0;
     if (normal)
         cornerNormals = n;
-    field_0x44->GetCellCorners(ix, iz, heights, cornerNormals, kinds);
+    heightField->GetCellCorners(ix, iz, heights, cornerNormals, kinds);
 
-    float y0 = heights[0] * field_0x40;
-    float y1 = heights[1] * field_0x40;
-    float y2 = heights[2] * field_0x40;
-    float y3 = heights[3] * field_0x40;
+    float y0 = heights[0] * gridCellSize;
+    float y1 = heights[1] * gridCellSize;
+    float y2 = heights[2] * gridCellSize;
+    float y3 = heights[3] * gridCellSize;
     TerrainVec3 v[4];
     v[0] = TerrainVec3(x0, y0, z0);
     v[1] = TerrainVec3(x1, y1, z0);
@@ -422,13 +422,13 @@ inline TerrainVec3 TerrainClipRayToPlaneX(TerrainVec3& origin, const TerrainVec3
 int Terrain::CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out,
                          int a, int b, int c)
 {
-    TerrainVec3 start = *from / field_0x40;
-    TerrainVec3 end = *to / field_0x40;
+    TerrainVec3 start = *from / gridCellSize;
+    TerrainVec3 end = *to / gridCellSize;
     TerrainVec3 dir = end - start;
 
-    float size = (float)(16 << field_0x44->field_0x29);
-    float yLo = field_0x44->field_0x18;
-    float yHi = field_0x44->field_0x1c;
+    float size = (float)(16 << heightField->gridShift);
+    float yLo = heightField->heightMin;
+    float yHi = heightField->heightMax;
 
     // x slab
     if (dir.x > 0.0f) {
@@ -477,12 +477,12 @@ int Terrain::CastSegment(const TerrainVec3* from, const TerrainVec3* to, Terrain
     t = end.y;
     end.y = end.z;
     end.z = t;
-    if (!field_0x44->CastSegment(&start, &end, out, a, b, c))
+    if (!heightField->CastSegment(&start, &end, out, a, b, c))
         return 0;
 
     t = out->y;
     out->y = out->z;
     out->z = t;
-    *out *= field_0x40;
+    *out *= gridCellSize;
     return 1;
 }

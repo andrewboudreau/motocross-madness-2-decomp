@@ -59,15 +59,15 @@ HIER_CHECK(gameobject_size, sizeof(GameObject) == 0x2c);
 // Character: non-virtual 0x1a0, no vtordisp, GameObject at 0x1a0 (416).
 HIER_CHECK(character_size, sizeof(Character) == 0x1a0 + 0x2c);
 // D3DIM: non-virtual 0x210, vtordisp 0x210, GameObject at 0x214 (532).
-HIER_CHECK(d3dim_field, offsetof(D3DIMSoultreeCharacter, d3d_field_0x1a0) == 0x1a0);
+HIER_CHECK(d3dim_field, offsetof(D3DIMSoultreeCharacter, modelNode) == 0x1a0);
 HIER_CHECK(d3dim_size, sizeof(D3DIMSoultreeCharacter) == 0x214 + 0x2c);
 // SoultreePhysicsBaseObject: GameObject at 0x220 (544), non-virtual part 0x21c.
 HIER_CHECK(spbo_size, sizeof(SoultreePhysicsBaseObject) == 0x220 + 0x2c);
-HIER_CHECK(spbo_last, offsetof(SoultreePhysicsBaseObject, field_0x218) == 0x218);
+HIER_CHECK(spbo_last, offsetof(SoultreePhysicsBaseObject, centerNode) == 0x218);
 // SoultreePhysicsCharacter: D3DIM at 540 (0x21c) ends at 0x42c, own fields, GameObject at 1080.
-HIER_CHECK(spc_node, offsetof(SoultreePhysicsCharacter, field_0x42c) == 0x42c);
+HIER_CHECK(spc_node, offsetof(SoultreePhysicsCharacter, poseNode) == 0x42c);
 HIER_CHECK(spc_flags, offsetof(SoultreePhysicsCharacter, field_0x433) == 0x433);
-HIER_CHECK(spc_d3d, offsetof(SoultreePhysicsCharacter, d3d_field_0x1a0) == 0x3bc);
+HIER_CHECK(spc_d3d, offsetof(SoultreePhysicsCharacter, modelNode) == 0x3bc);
 HIER_CHECK(spc_size, sizeof(SoultreePhysicsCharacter) == 1080 + 0x2c);
 HIER_CHECK(veh_block, offsetof(Vehicle, veh_block_0x434) == 0x434);
 HIER_CHECK(veh_size, sizeof(Vehicle) == 1472 + 0x2c);
@@ -100,7 +100,7 @@ D3DIMSoultreeCharacter* LayoutProbe_SpcToD3DIM(SoultreePhysicsCharacter* p)
 SoultreePhysicsCharacter::SoultreePhysicsCharacter(int flags)
     : GameObject(1), SoultreePhysicsBaseObject(flags), D3DIMSoultreeCharacter(flags)
 {
-    field_0x42c = 0;
+    poseNode = 0;
 }
 
 // Destructor core (0x00503d40): no own cleanup; VC6 restores the vptrs/vtordisp and runs

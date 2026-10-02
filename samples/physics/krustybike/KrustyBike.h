@@ -102,8 +102,8 @@ public:
     int field_0x770; // 0x770
     int field_0x774; // 0x774
     char pad_0x0778[0x4];
-    void* field_0x77c; // 0x77C  heap buffer released in the destructor (tier 3: type unknown)
-    void* field_0x780; // 0x780  heap buffer released in the destructor
+    void* heapBufferA; // 0x77C  heap buffer released in the destructor (tier 3: type unknown)
+    void* heapBufferB; // 0x780  heap buffer released in the destructor
     int field_0x784; // 0x784
     int field_0x788; // 0x788
     int field_0x78c; // 0x78C
@@ -132,14 +132,14 @@ public:
     int field_0x138c; // 0x138C
     char pad_0x1390[0x68];
     int field_0x13f8; // 0x13F8
-    KbRecorder* field_0x13fc; // 0x13FC
+    KbRecorder* netRecorder; // 0x13FC
     int field_0x1400; // 0x1400
     int field_0x1404; // 0x1404
     int field_0x1408; // 0x1408
     int field_0x140c; // 0x140C
     char pad_0x1410[0x4];
-    KbObj128* field_0x1414; // 0x1414
-    KbObj128* field_0x1418; // 0x1418
+    KbObj128* altBodyA; // 0x1414
+    KbObj128* altBodyB; // 0x1418
     float field_0x141c; // 0x141C
     char pad_0x1420[0x100];
     float field_0x1520; // 0x1520

@@ -77,25 +77,25 @@ struct VehicleInputMap {
     virtual int  UnknownVirtualSlot2(int a, int b);
     virtual int  UnknownVirtualSlot3(int a, int b, int c, int d);
     char pad_0x04[0x8];
-    VehicleValueSource* field_0x0c;
+    VehicleValueSource* valueSource;  // +0x0c float query used by slot 77
     char pad_0x10[0x24];
-    VehicleKeyTable* field_0x34;
+    VehicleKeyTable* keyTable;  // +0x34 slot 39 asks it to accept the code from slot 68
 };
 
 struct VehicleContact {              // elements of Vehicle+0x12c
     char pad_0x00[4];
     int  field_0x04;
     char pad_0x08[0xC];
-    Vec3 field_0x14;              // contact position (distance source in slot 7)
-    Vec3 field_0x20;              // second contact point (impact position in slot 18)
+    Vec3 contactPosition;              // +0x14 contact position (distance source in slot 7)
+    Vec3 impactPosition;              // +0x20 second contact point (impact position in slot 18)
     char pad_0x2C[0x18];
-    Vec3 field_0x44;              // per-contact share of the applied vector
+    Vec3 appliedShare;              // +0x44 per-contact share of the applied vector
     char pad_0x50[0x50];
-    float field_0xa0;                // blend weight
-    int  field_0xa4;                 // contact active flag
-    int  field_0xa8;                 // impact-handled flag (slot 18)
+    float blendWeight;                // +0xa0 blend weight
+    int  contactActive;                 // +0xa4 contact active flag
+    int  impactPosted;                 // +0xa8 impact-handled flag (slot 18)
     char pad_0xAC[0x10];
-    unsigned char field_0xbc;        // surface material id
+    unsigned char surfaceMaterial;        // +0xbc surface material id
 };
 // Table object at Vehicle+0x1f0: field_0xa4 points at a byte table (+0x400) indexed by material id.
 struct VehicleMaterialSet {
@@ -105,20 +105,20 @@ struct VehicleMaterialSet {
 // Sink at VehicleImpactEvent+0x04 (provisional): fields 0x44/0x50/0x60 are touched by slot 18.
 struct VehicleImpactSink {
     char pad_0x00[0x44];
-    Vec3 field_0x44;
-    Vec3 field_0x50;
+    Vec3 currentVector;  // +0x44 slots 18-20 commit copies it to previousVector
+    Vec3 previousVector;  // +0x50 latched copy made by VehCommitImpact
     char pad_0x5C[4];
-    int field_0x60;
+    int updatePending;  // +0x60 set to 1 by VehCommitImpact
     char pad_0x64[0x10];
-    Vec3 field_0x74;
+    Vec3 scrapeVector;  // +0x74 slots 19/20 write the clamped scrape vector
     void Method_004B8D90(Vec3 pos, float intensity);   // 0x004b8d90, purpose unknown (impact/sound post)
     void Method_004B9DC0(Vec3 pos);                    // 0x004b9dc0, purpose unknown (impact/sound post)
 };
 struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
     char pad_0x00[4];
-    VehicleImpactSink* field_0x04;
-    VehicleImpactSink* field_0x08;
-    VehicleImpactSink* field_0x0c;
+    VehicleImpactSink* impactSink;  // +0x04 slot 18 target
+    VehicleImpactSink* slideSink;  // +0x08 slot 19 target
+    VehicleImpactSink* scrapeSink;  // +0x0c slot 20 target
     char pad_0x10[0x14];
     char field_0x24;
 };
@@ -128,12 +128,12 @@ struct VehicleSpeedState {
     float field_0x00;
     int field_0x04;
     int field_0x08;
-    float field_0x0c;                // countdown timer
-    unsigned char field_0x10;        // table index (slot 1)
+    float gearTimer;                // +0x0c countdown timer
+    unsigned char gear;        // +0x10 table index (slot 1)
     char pad_0x11[0x1F];
     VehicleSpeedEntry field_0x30[6];
     float field_0x60[6];
-    float field_0x78;                // randomised start value (slot 1)
+    float randomStart;                // +0x78 randomised start value (slot 1)
     char pad_0x7C[0x8];
     int field_0x84;
     void Method_004D2F50(float dt, int a, int b);   // 0x004d2f50, purpose unknown
@@ -141,28 +141,28 @@ struct VehicleSpeedState {
 };
 // Exponential smoother objects at Vehicle+0x58c / +0x598 (provisional): f0 is the smoothed value.
 struct VehicleSmoother {
-    float field_0x00;
-    float field_0x04;                // time constant / cap
-    float field_0x08;                // last blend factor
+    float smoothedValue;  // +0x00 slot 49 VehSmooth: x += (target-x)*blend
+    float timeConstant;                // +0x04 time constant / cap
+    float blendFactor;                // +0x08 last blend factor
 };
 struct VehicleContactSet;            // object at SoultreePhysicsCharacter+0x128
 // Object at Vehicle+0x47c (provisional layout: only what Vehicle touches).
 struct VehicleSteerState {
-    SoultreeObject* field_0x00;
-    float field_0x04;
+    SoultreeObject* steerNode;  // +0x00 scene node positioned/oriented in slots 36/58
+    float steerAngle;  // +0x04 slot 60 subtracts it; slot 73 uses sin(it) and |it|
     float field_0x08;
     void Method_00504EC0(float value, SoultreeObject* node);   // 0x00504ec0, purpose unknown
     void Method_00504E20(int a, SoultreeObject* node);         // 0x00504e20, purpose unknown
 };
 struct VehicleAxisSource {           // object at VehicleAxis+0x00 (provisional)
     char pad_0x00[0xC];
-    int field_0x0c;                  // kind code (2 and 3 are tested by slot 63)
+    int kindCode;                  // +0x0c kind code (2 and 3 are tested by slot 63)
     int Method_004897E0(int a);      // 0x004897e0, purpose unknown
 };
 struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (provisional)
-    VehicleAxisSource* field_0x00;
+    VehicleAxisSource* axisSource;  // +0x00 VehicleAxisSource queried in slot 63
     char pad_0x04[0x20];
-    float field_0x24;                // axis value (slot 63 reads it)
+    float axisValue;                // +0x24 axis value (slot 63 reads it)
 };
 struct VehicleCamera;                // object at Vehicle+0x5ac
 struct VehicleTicker {               // elements of Vehicle+0x554/+0x560 (provisional): only virtual slot 0 is called
@@ -182,11 +182,11 @@ struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisiona
 // Elements of Vehicle+0x53c (provisional: only touched offsets are named).
 struct VehicleWheel {
     char pad_0x00[0xCC];
-    Vec3 field_0xcc;              // wheel contact position (slot 7 distance source)
-    Vec3 field_0xd8;              // (y at +0xdc is read as a height by slot 58)
-    Vec3 field_0xe4;              // contact normal (averaged by Method_00528400)
+    Vec3 wheelPosition;              // +0xcc wheel contact position (slot 7 distance source)
+    Vec3 groundPoint;              // +0xd8 (y at +0xdc is read as a height by slot 58)
+    Vec3 groundNormal;              // +0xe4 contact normal (averaged by Method_00528400)
     Vec3 field_0xf0;
-    Vec3 field_0xfc;              // per-wheel share of the applied vector
+    Vec3 appliedShare;              // +0xfc per-wheel share of the applied vector
     Vec3 field_0x108;
     Vec3 field_0x114;
     Vec3 field_0x120;
@@ -194,29 +194,29 @@ struct VehicleWheel {
     Vec3 field_0x130;
     float field_0x13c;
     char pad_0x140[4];
-    float field_0x144;
+    float contactLoad;  // +0x144 slot 72 accumulates it over wheels and averages by the contact count
     int field_0x148;
     int field_0x14c;
     float field_0x150;
     char pad_0x154[4];
-    float field_0x158;               // blend weight
+    float loadWeight;               // +0x158 blend weight
     int field_0x15c;
-    int field_0x160;                 // impact-handled flag (slot 18)
-    int field_0x164;                 // impact-handled flag (slot 19)
-    int field_0x168;                 // impact-handled flag (slot 20)
+    int impactPosted;                 // +0x160 impact-handled flag (slot 18)
+    int slidePosted;                 // +0x164 impact-handled flag (slot 19)
+    int scrapePosted;                 // +0x168 impact-handled flag (slot 20)
     int field_0x16c;
     char pad_0x170[4];
-    unsigned char field_0x174;       // surface material id
+    unsigned char surfaceMaterial;       // +0x174 surface material id
     char pad_0x175[0x47];
-    SoultreeObject* field_0x1bc;     // wheel scene node (slot 33 reads its position)
+    SoultreeObject* sceneNode;     // +0x1bc wheel scene node (slot 33 reads its position)
     int field_0x1c0;
     char pad_0x1C4[0x18];
-    float field_0x1dc;               // +0x29c ramp-up rate (Method_00529280)
-    float field_0x1e0;               // +0x29c ramp-down rate
+    float levelRiseRate;               // +0x1dc +0x29c ramp-up rate (Method_00529280)
+    float levelFallRate;               // +0x1e0 +0x29c ramp-down rate
     char pad_0x1E4[4];
     Vec3 field_0x1e8;
     char pad_0x1F4[0xC];
-    Vec3 field_0x200;                // wheel node position (written by slot 33)
+    Vec3 nodePosition;                // +0x200 wheel node position (written by slot 33)
     char pad_0x20C[0x1C];
     float field_0x228;
     char pad_0x22C[4];
@@ -224,7 +224,7 @@ struct VehicleWheel {
     Vec3 field_0x23c;
     Vec3 field_0x248;
     Vec3 field_0x254;
-    int field_0x260;
+    int inContact;  // +0x260 selects wheels touching the ground (slots 7, 54, 72, 75-86); count equals Vehicle::wheelsInContact
     char pad_0x264[0x4];
     int field_0x268;
     int field_0x26c;
@@ -236,12 +236,12 @@ struct VehicleWheel {
     float field_0x290;
     float field_0x294;
     char pad_0x298[0x4];
-    float field_0x29c;               // 0 selects a flag passed to slot 77 (slot 83)
+    float rampLevel;               // +0x29c 0 selects a flag passed to slot 77 (slot 83)
     char pad_0x2A0[4];
     float field_0x2a4;
     VehicleWheelAux* field_0x2a8;
-    int field_0x2ac;
-    int field_0x2b0;
+    int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (Method_00529A20, 005293E0)
+    int primaryAux;  // +0x2b0 Method_00525D30 stores an attachment here; Method_00529A20 treats it as an object whose +0x8c is reset from +0x90
     char pad_0x2B4[0x4];
     float field_0x2b8;
     float field_0x2bc;
@@ -356,8 +356,8 @@ public:
     // non-virtual helper (retail 0x00526830, next to slot 70; tier 3 name)
     int Method_00526830();
     int Method_00478FE0();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from Method_00526830)
-    int Method_00525CB0(VehicleTicker* t);                       // 0x00525cb0, append to field_0x560
-    int Method_00525CF0(VehicleTicker* t);                       // 0x00525cf0, append to field_0x554
+    int Method_00525CB0(VehicleTicker* t);                       // 0x00525cb0, append to earlyTickers
+    int Method_00525CF0(VehicleTicker* t);                       // 0x00525cf0, append to lateTickers
     int Method_00525D30(VehicleWheel* wheel, int a2, int a3, int a4, VehicleWheelAux* aux);   // 0x00525d30, add a wheel
     // 0x00528400: normalized average of the wheels' contact normals (+0xe4); returns out.
     Vec3* Method_00528400(Vec3* out);
@@ -381,151 +381,151 @@ public:
 
     float field_0x434;
     float field_0x438;        // read by Bike slot 59 (0x0040a330) as a float divisor
-    float field_0x43c;
-    int field_0x440;
-    int field_0x444;
-    int field_0x448;          // Bike slot 99 (0x00409b30) stores small codes (1..5)
+    float turnRate;  // +0x43c = turnAngle * field_0x140 (1/dt) in slot 72: velocity deflection angle per second; reset to 0 whenever no wheel drives it
+    int movingForward;  // +0x440 slot 85 passes +dt when set and -dt when clear to every wheel; slot 74 flips the sign of its result on it; slot 1 resets it to 1
+    int crashState;  // +0x444 nonzero disables input (slots 52/62/64/60 test ==0), switches solver vectors (+0xf0, 0.1 scale, 1,1,1 mask); Bike slot 99 writes it and runs the crash timer 0x454 while set
+    int crashDirection;          // +0x448 Bike slot 99 (0x00409b30) stores small codes (1..5)
     float field_0x44c;        // Bike slot 99 (0x00409b30) multiplies it (float)
-    float field_0x450;
+    float speedGainLimit;  // +0x450 slot 70: true when (speed field_0xbc - previous speed field_0xb8) < arg * speedGainLimit
     // 0x454/0x458: Bike slot 39 (0x0040a1f0) decrements 0x454 by the frame time and
     // compares it with 0.0f/-2.0f, so both are floats (tier 2; slot 69 copies 0x458).
-    float field_0x454;
-    float field_0x458;
+    float crashTimer;  // +0x454 Bike slot 39 decrements it by the frame time while crashed and compares with 0/-0.1/-2.0; slots 1/67 clear it
+    float crashTimerReload;  // +0x458 slot 69 copies it into crashTimer
     float field_0x45c;        // Bike slot 100 (0x0040a090) stores field_0x50 here
-    int field_0x460;
+    int crashReason;  // +0x460 Bike slot 99 stores reason codes (2,4,6,7,8,10,11,13) beside crashDirection
     int field_0x464;
-    VehicleInputMap* field_0x468;
-    void* field_0x46c;
-    float field_0x470;
-    float field_0x474;
+    VehicleInputMap* inputMap;  // +0x468 object whose virtual slots 2/3 are queried with action ids 0x0e/0x1d/0x1f/0x2d/0xc8/0xd0 (slots 77-84); slot 39 also uses its key table
+    void* inputDevice;  // +0x46c tested non-null together with throttleAxis before the throttle axis is latched in slot 63 (-1 when absent)
+    float throttleInput;  // +0x470 slot 63 latches axis 0x500 value (dead zone 0.2, else -1 when no device); slot 80 tests it > 0.33
+    float steerInput;  // +0x474 slot 63: = -axis(0x4f8).value; slot 88 classifies it with 0x504.y into 8 stick sectors; slot 64 zeroes it when crashed
     bool field_0x478;
     bool field_0x479;
     bool field_0x47a;
     char pad_0x47B[0x1];
-    VehicleSteerState* field_0x47c;
-    VehicleSpeedState* field_0x480;
-    int field_0x484;
-    Vec3 field_0x488;
-    Vec3 field_0x494;
+    VehicleSteerState* steerState;  // +0x47c VehicleSteerState*: node plus steer angle; slots 53/60/73/36 use it
+    VehicleSpeedState* engineState;  // +0x480 VehicleSpeedState*: 6-entry per-gear tables, advanced by Method_004D2F50/004D3030 with throttle/brake flags and speed in slot 49 (provisional)
+    int justLanded;  // +0x484 slot 49 clears it per frame; slot 71 sets it to 1 when the airborne flag 0x108 drops (landing)
+    Vec3 takeoffPosition;  // +0x488 slot 71 copies position field_0x0c here when the vehicle leaves the ground
+    Vec3 takeoffVelocity;  // +0x494 slot 71 copies velocity field_0x64 here when the vehicle leaves the ground
     int field_0x4a0;          // set to 1 by slot 44
     float field_0x4a4;
-    int field_0x4a8;
-    float field_0x4ac;
-    float field_0x4b0;
+    int wheelsInContact;  // +0x4a8 slot 54 divides the wheel normal sum by it; slot 49: 0x5a8 = (it == wheel count), 0x5a4 = (it != 0); slots 46/7 branch on 0/1/2
+    float leanAngle;  // +0x4ac slot 56 stores asin(...) of the ground normal against the forward axis; slot 57 returns it; Bike rotates the body by it
+    float leanCos;  // +0x4b0 slot 56 stores cos(leanAngle) there
     float field_0x4b4;
-    float field_0x4b8;
-    float field_0x4bc;
-    Vec3 field_0x4c0;
-    Vec3 field_0x4cc;
+    float turnAngle;  // +0x4b8 result of slot 74 (signed deflection angle of the velocity), see turnRate
+    float steerRate;  // +0x4bc slot 60: -(a*b) - steerAngle divided by (c*dt+...); slot 53 feeds steerRate*dt to the steer state
+    Vec3 tiltAxisLocal;  // +0x4c0 slot 49: WorldToLocalDirection of the lift axis, used as the RotateAboutPoint axis
+    Vec3 sideAxis;  // +0x4cc slots 34/35: cross product of the two basis vectors field_0x88 and field_0x94
     float field_0x4d8;
     float field_0x4dc;
-    float field_0x4e0;
-    float field_0x4e4;        // Bike slot 92 (0x0040ba30): _finite()/fabs on it (float, tier 2)
+    float targetLeanAngle;  // +0x4e0 Bike clamps it to +-maxLeanAngle and subtracts it from the current lean (slot 57)
+    float leanError;        // +0x4e4 Bike slot 92 (0x0040ba30): _finite()/fabs on it (float, tier 2)
     float field_0x4e8;
-    float field_0x4ec;
-    int field_0x4f0;
-    float field_0x4f4;   // tier 2: countdown; slot 49 tests > 0 and subtracts field_0x13c (frame dt), slot 50 stores it
-    VehicleAxis* field_0x4f8;
-    VehicleAxis* field_0x4fc;
-    VehicleAxis* field_0x500;
-    Vec3 field_0x504;
-    Vec3 field_0x510;
+    float wheelBase;  // +0x4ec slot 73 returns wheelBase / sin(steer angle) (bicycle-model turn radius)
+    int spawnProtected;  // +0x4f0 slot 50 stores arg a here, slot 51 returns it; slot 33 (respawn) sets it using slot 45 (3.0)
+    float spawnProtectTimer;   // +0x4f4 tier 2: countdown; slot 49 tests > 0 and subtracts field_0x13c (frame dt), slot 50 stores it
+    VehicleAxis* steerAxis;  // +0x4f8 slot 63 reads its value into steerInput and 0x504.x
+    VehicleAxis* leanAxis;  // +0x4fc slot 63 reads -value into controlInput.y
+    VehicleAxis* throttleAxis;  // +0x500 slot 63 reads its value into throttleInput (dead zone 0.2)
+    Vec3 controlInput;  // +0x504 slot 63 writes x = steer (cubed for axis kinds 2/3), y = -lean axis; slot 64 zeroes it when crashed
+    Vec3 prevControlInput;  // +0x510 slot 49 copies controlInput here before slot 64 refreshes it
     float field_0x51c;
     int field_0x520;
     float field_0x524[6];
-    VehicleWheel** field_0x53c;
-    int field_0x540;               // wheel capacity (Method_00525D30)
-    int field_0x544;
-    VehicleWheel* field_0x548;
-    VehicleWheel* field_0x54c;
+    VehicleWheel** wheelList;  // +0x53c array of VehicleWheel*, iterated up to wheelCount in slots 7/54/72/75/85/86
+    int wheelCapacity;               // +0x540 wheel capacity (Method_00525D30)
+    int wheelCount;  // +0x544 loop bound over wheelList in every wheel loop
+    VehicleWheel* primaryWheel;  // +0x548 slot 7 (single contact) and slot 58 (single wheel) use it as the lead wheel; slot 46 pairs it with secondaryWheel
+    VehicleWheel* secondaryWheel;  // +0x54c partner of primaryWheel in slot 46 (two-wheel case)
     int field_0x550;
-    VehicleTicker** field_0x554;   // owned arrays of objects with a virtual slot 0 (Method_00525C60)
-    int field_0x558;               // capacity of field_0x554
-    int field_0x55c;               // count of field_0x554
-    VehicleTicker** field_0x560;
-    int field_0x564;               // capacity of field_0x560
-    int field_0x568;               // count of field_0x560
-    int field_0x56c;               // wheels added with an aux object (Method_00525D30)
-    int field_0x570;
+    VehicleTicker** lateTickers;   // +0x554 owned arrays of objects with a virtual slot 0 (Method_00525C60)
+    int lateTickerCapacity;               // +0x558 capacity of lateTickers
+    int lateTickerCount;               // +0x55c count of lateTickers
+    VehicleTicker** earlyTickers;  // +0x560 array of objects whose virtual slot 0 is called first by Method_00525C60; Method_00525CB0 appends to it
+    int earlyTickerCapacity;               // +0x564 capacity of earlyTickers
+    int earlyTickerCount;               // +0x568 count of earlyTickers
+    int auxWheelCount;               // +0x56c wheels added with an aux object (Method_00525D30)
+    int contactTotal;  // +0x570 = field_0x1cc + wheelsInContact (body contacts plus wheels in contact) in slot 7; slot 49 branches on > 0
     Vec3 field_0x574;      // Bike slot 100 (0x0040a090) builds (a0.x, 0, a0.z) here
-    float field_0x580;
-    float field_0x584;
-    float field_0x588;
-    VehicleSmoother* field_0x58c;
-    float field_0x590;
-    float field_0x594;
-    VehicleSmoother* field_0x598;
-    int field_0x59c;
+    float maxLeanAngle;  // +0x580 Bike clamps the target lean to +-maxLeanAngle
+    float maxLeanRate;  // +0x584 Bike limits the lean error change to maxLeanRate * dt
+    float smoothedVerticalAccel;  // +0x588 slot 49: = verticalAccelSmoother->value, fed with (vy - prev vy) * (1/dt)
+    VehicleSmoother* verticalAccelSmoother;  // +0x58c VehicleSmoother fed in slot 49 with the per-step change of velocity.y
+    float smoothedForwardAccel;  // +0x590 slot 49: = forwardAccelSmoother->value
+    float prevLocalForwardVelocity;  // +0x594 slot 49: stores local velocity z after smoothing (previous-step value for the next difference)
+    VehicleSmoother* forwardAccelSmoother;  // +0x598 VehicleSmoother fed with (local vel z - prevLocalForwardVelocity)/dt
+    int landingLatched;  // +0x59c slot 71: set when landing while not yet latched, cleared in slot 49 while airborne
     int field_0x5a0;
-    int field_0x5a4;
-    int field_0x5a8;
+    int anyWheelInContact;  // +0x5a4 slot 49: = (wheelsInContact != 0)
+    int allWheelsInContact;  // +0x5a8 slot 49: = (wheelsInContact == wheelCount)
     VehicleCamera* field_0x5ac;
     float field_0x5b0;
-    int field_0x5b4;
+    int prevCrashState;  // +0x5b4 slot 49 stores crashState there at the end of each step; slots 1/67 clear it
     char pad_0x5B8[0x4];      // own data ends at 0x5bc; the compiler places the vtordisp there
 };
 
 VEH_CHECK_OFFSET(Vehicle, field_0x434, 0x434);
-VEH_CHECK_OFFSET(Vehicle, field_0x43c, 0x43C);
-VEH_CHECK_OFFSET(Vehicle, field_0x440, 0x440);
-VEH_CHECK_OFFSET(Vehicle, field_0x444, 0x444);
-VEH_CHECK_OFFSET(Vehicle, field_0x450, 0x450);
-VEH_CHECK_OFFSET(Vehicle, field_0x454, 0x454);
-VEH_CHECK_OFFSET(Vehicle, field_0x458, 0x458);
-VEH_CHECK_OFFSET(Vehicle, field_0x468, 0x468);
-VEH_CHECK_OFFSET(Vehicle, field_0x46c, 0x46C);
-VEH_CHECK_OFFSET(Vehicle, field_0x470, 0x470);
-VEH_CHECK_OFFSET(Vehicle, field_0x474, 0x474);
+VEH_CHECK_OFFSET(Vehicle, turnRate, 0x43C);
+VEH_CHECK_OFFSET(Vehicle, movingForward, 0x440);
+VEH_CHECK_OFFSET(Vehicle, crashState, 0x444);
+VEH_CHECK_OFFSET(Vehicle, speedGainLimit, 0x450);
+VEH_CHECK_OFFSET(Vehicle, crashTimer, 0x454);
+VEH_CHECK_OFFSET(Vehicle, crashTimerReload, 0x458);
+VEH_CHECK_OFFSET(Vehicle, inputMap, 0x468);
+VEH_CHECK_OFFSET(Vehicle, inputDevice, 0x46C);
+VEH_CHECK_OFFSET(Vehicle, throttleInput, 0x470);
+VEH_CHECK_OFFSET(Vehicle, steerInput, 0x474);
 VEH_CHECK_OFFSET(Vehicle, field_0x478, 0x478);
 VEH_CHECK_OFFSET(Vehicle, field_0x479, 0x479);
 VEH_CHECK_OFFSET(Vehicle, field_0x47a, 0x47A);
-VEH_CHECK_OFFSET(Vehicle, field_0x47c, 0x47C);
-VEH_CHECK_OFFSET(Vehicle, field_0x480, 0x480);
-VEH_CHECK_OFFSET(Vehicle, field_0x484, 0x484);
-VEH_CHECK_OFFSET(Vehicle, field_0x488, 0x488);
-VEH_CHECK_OFFSET(Vehicle, field_0x494, 0x494);
+VEH_CHECK_OFFSET(Vehicle, steerState, 0x47C);
+VEH_CHECK_OFFSET(Vehicle, engineState, 0x480);
+VEH_CHECK_OFFSET(Vehicle, justLanded, 0x484);
+VEH_CHECK_OFFSET(Vehicle, takeoffPosition, 0x488);
+VEH_CHECK_OFFSET(Vehicle, takeoffVelocity, 0x494);
 VEH_CHECK_OFFSET(Vehicle, field_0x4a4, 0x4A4);
-VEH_CHECK_OFFSET(Vehicle, field_0x4a8, 0x4A8);
-VEH_CHECK_OFFSET(Vehicle, field_0x4ac, 0x4AC);
-VEH_CHECK_OFFSET(Vehicle, field_0x4b0, 0x4B0);
+VEH_CHECK_OFFSET(Vehicle, wheelsInContact, 0x4A8);
+VEH_CHECK_OFFSET(Vehicle, leanAngle, 0x4AC);
+VEH_CHECK_OFFSET(Vehicle, leanCos, 0x4B0);
 VEH_CHECK_OFFSET(Vehicle, field_0x4b4, 0x4B4);
-VEH_CHECK_OFFSET(Vehicle, field_0x4b8, 0x4B8);
-VEH_CHECK_OFFSET(Vehicle, field_0x4bc, 0x4BC);
-VEH_CHECK_OFFSET(Vehicle, field_0x4c0, 0x4C0);
-VEH_CHECK_OFFSET(Vehicle, field_0x4cc, 0x4CC);
+VEH_CHECK_OFFSET(Vehicle, turnAngle, 0x4B8);
+VEH_CHECK_OFFSET(Vehicle, steerRate, 0x4BC);
+VEH_CHECK_OFFSET(Vehicle, tiltAxisLocal, 0x4C0);
+VEH_CHECK_OFFSET(Vehicle, sideAxis, 0x4CC);
 VEH_CHECK_OFFSET(Vehicle, field_0x4d8, 0x4D8);
 VEH_CHECK_OFFSET(Vehicle, field_0x4dc, 0x4DC);
-VEH_CHECK_OFFSET(Vehicle, field_0x4e0, 0x4E0);
-VEH_CHECK_OFFSET(Vehicle, field_0x4e4, 0x4E4);
+VEH_CHECK_OFFSET(Vehicle, targetLeanAngle, 0x4E0);
+VEH_CHECK_OFFSET(Vehicle, leanError, 0x4E4);
 VEH_CHECK_OFFSET(Vehicle, field_0x4e8, 0x4E8);
-VEH_CHECK_OFFSET(Vehicle, field_0x4ec, 0x4EC);
-VEH_CHECK_OFFSET(Vehicle, field_0x4f0, 0x4F0);
-VEH_CHECK_OFFSET(Vehicle, field_0x4f4, 0x4F4);
-VEH_CHECK_OFFSET(Vehicle, field_0x4f8, 0x4F8);
-VEH_CHECK_OFFSET(Vehicle, field_0x4fc, 0x4FC);
-VEH_CHECK_OFFSET(Vehicle, field_0x500, 0x500);
-VEH_CHECK_OFFSET(Vehicle, field_0x504, 0x504);
-VEH_CHECK_OFFSET(Vehicle, field_0x510, 0x510);
+VEH_CHECK_OFFSET(Vehicle, wheelBase, 0x4EC);
+VEH_CHECK_OFFSET(Vehicle, spawnProtected, 0x4F0);
+VEH_CHECK_OFFSET(Vehicle, spawnProtectTimer, 0x4F4);
+VEH_CHECK_OFFSET(Vehicle, steerAxis, 0x4F8);
+VEH_CHECK_OFFSET(Vehicle, leanAxis, 0x4FC);
+VEH_CHECK_OFFSET(Vehicle, throttleAxis, 0x500);
+VEH_CHECK_OFFSET(Vehicle, controlInput, 0x504);
+VEH_CHECK_OFFSET(Vehicle, prevControlInput, 0x510);
 VEH_CHECK_OFFSET(Vehicle, field_0x51c, 0x51C);
 VEH_CHECK_OFFSET(Vehicle, field_0x520, 0x520);
 VEH_CHECK_OFFSET(Vehicle, field_0x524, 0x524);
-VEH_CHECK_OFFSET(Vehicle, field_0x53c, 0x53C);
-VEH_CHECK_OFFSET(Vehicle, field_0x544, 0x544);
-VEH_CHECK_OFFSET(Vehicle, field_0x548, 0x548);
-VEH_CHECK_OFFSET(Vehicle, field_0x54c, 0x54C);
-VEH_CHECK_OFFSET(Vehicle, field_0x570, 0x570);
-VEH_CHECK_OFFSET(Vehicle, field_0x588, 0x588);
-VEH_CHECK_OFFSET(Vehicle, field_0x58c, 0x58C);
-VEH_CHECK_OFFSET(Vehicle, field_0x590, 0x590);
-VEH_CHECK_OFFSET(Vehicle, field_0x594, 0x594);
-VEH_CHECK_OFFSET(Vehicle, field_0x598, 0x598);
-VEH_CHECK_OFFSET(Vehicle, field_0x59c, 0x59C);
+VEH_CHECK_OFFSET(Vehicle, wheelList, 0x53C);
+VEH_CHECK_OFFSET(Vehicle, wheelCount, 0x544);
+VEH_CHECK_OFFSET(Vehicle, primaryWheel, 0x548);
+VEH_CHECK_OFFSET(Vehicle, secondaryWheel, 0x54C);
+VEH_CHECK_OFFSET(Vehicle, contactTotal, 0x570);
+VEH_CHECK_OFFSET(Vehicle, smoothedVerticalAccel, 0x588);
+VEH_CHECK_OFFSET(Vehicle, verticalAccelSmoother, 0x58C);
+VEH_CHECK_OFFSET(Vehicle, smoothedForwardAccel, 0x590);
+VEH_CHECK_OFFSET(Vehicle, prevLocalForwardVelocity, 0x594);
+VEH_CHECK_OFFSET(Vehicle, forwardAccelSmoother, 0x598);
+VEH_CHECK_OFFSET(Vehicle, landingLatched, 0x59C);
 VEH_CHECK_OFFSET(Vehicle, field_0x5a0, 0x5A0);
-VEH_CHECK_OFFSET(Vehicle, field_0x5a4, 0x5A4);
-VEH_CHECK_OFFSET(Vehicle, field_0x5a8, 0x5A8);
+VEH_CHECK_OFFSET(Vehicle, anyWheelInContact, 0x5A4);
+VEH_CHECK_OFFSET(Vehicle, allWheelsInContact, 0x5A8);
 VEH_CHECK_OFFSET(Vehicle, field_0x5ac, 0x5AC);
 VEH_CHECK_OFFSET(Vehicle, field_0x5b0, 0x5B0);
-VEH_CHECK_OFFSET(Vehicle, field_0x5b4, 0x5B4);
+VEH_CHECK_OFFSET(Vehicle, prevCrashState, 0x5B4);
 typedef char veh_assert_sizeof[(sizeof(Vehicle) == 0x5ec) ? 1 : -1];
 
 #endif

@@ -122,7 +122,7 @@ public:
     Vec3 dVelocity[2];                // 0x254, d(velocity)/dt = force * invMass
     Quat dOrientation[2];             // 0x26c, QuatDerivative(orientation, angularVelocity)
     Vec3 dAngularVelocity[2];         // 0x28c, invInertia * (torque - w x (I w))
-    int field_0x2a4;                  // 0x2a4, nonzero: slot 10 skips the step
+    int stepDisabled;                  // 0x2a4, nonzero: slot 10 skips the step
 };
 
 #endif

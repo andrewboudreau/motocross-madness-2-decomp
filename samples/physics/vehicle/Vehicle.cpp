@@ -34,19 +34,19 @@ struct VehV3 : Vec3
 
 void Vehicle::UnknownVirtualSlot34()
 {
-    d3d_field_0x1a0->GetAxesIn(0, &field_0x88, &field_0x94);
-    field_0x4cc = ((VehV3&)field_0x88).CrossB(field_0x94);
+    modelNode->GetAxesIn(0, &bodyForward, &bodyUp);
+    sideAxis = ((VehV3&)bodyForward).CrossB(bodyUp);
 }
 
 void Vehicle::UnknownVirtualSlot35(int a, int b)
 {
-    d3d_field_0x1a0->SetAxesIn(0, &field_0x88, &field_0x94, a, b);
-    field_0x4cc = ((VehV3&)field_0x88).CrossB(field_0x94);
+    modelNode->SetAxesIn(0, &bodyForward, &bodyUp, a, b);
+    sideAxis = ((VehV3&)bodyForward).CrossB(bodyUp);
 }
 
 float Vehicle::UnknownVirtualSlot45() { return 3.0f; }
-int Vehicle::UnknownVirtualSlot51() { return field_0x4f0; }
-int Vehicle::UnknownVirtualSlot52() { return field_0x444 == 0; }
+int Vehicle::UnknownVirtualSlot51() { return spawnProtected; }
+int Vehicle::UnknownVirtualSlot52() { return crashState == 0; }
 
 int Vehicle::UnknownVirtualSlot68(int* out)
 {
@@ -54,21 +54,21 @@ int Vehicle::UnknownVirtualSlot68(int* out)
     return 1;
 }
 
-void Vehicle::UnknownVirtualSlot69() { field_0x454 = field_0x458; }
+void Vehicle::UnknownVirtualSlot69() { crashTimer = crashTimerReload; }
 
 int Vehicle::UnknownVirtualSlot23()
 {
-    return !field_0x108 && field_0x434 >= 0.2f;
+    return !airborne && field_0x434 >= 0.2f;
 }
 
 int Vehicle::UnknownVirtualSlot24()
 {
-    return field_0x5b0 < field_0x480->field_0x00 && field_0x444 == 0 && field_0xbc < 22.0f;
+    return field_0x5b0 < engineState->field_0x00 && crashState == 0 && linearSpeed < 22.0f;
 }
 
 int Vehicle::UnknownVirtualSlot25()
 {
-    return field_0x5b0 > field_0x480->field_0x00 && field_0x444 == 0 && field_0xbc < 22.0f;
+    return field_0x5b0 > engineState->field_0x00 && crashState == 0 && linearSpeed < 22.0f;
 }
 
 void Vehicle::UnknownVirtualSlot92(const Vec3*, const Vec3*) {}
@@ -76,23 +76,23 @@ void Vehicle::UnknownVirtualSlot92(const Vec3*, const Vec3*) {}
 void Vehicle::UnknownVirtualSlot0(float dt)
 {
     SoultreePhysicsCharacter::UnknownVirtualSlot0(dt);
-    field_0x4dc = (field_0x4d8 * field_0x150 + dt) * 0.0310558993f;   // 1/32.2
+    field_0x4dc = (field_0x4d8 * baseWeight + dt) * 0.0310558993f;   // 1/32.2
 }
 
 int Vehicle::UnknownVirtualSlot42()
 {
-    return field_0x444 == 0 && field_0x433 >= 0 && field_0x430;
+    return crashState == 0 && field_0x433 >= 0 && field_0x430;
 }
 
 void Vehicle::UnknownVirtualSlot50(int a, float b, int c)
 {
-    field_0x4f0 = a;
-    field_0x4f4 = b;
+    spawnProtected = a;
+    spawnProtectTimer = b;
 }
 
 float Vehicle::UnknownVirtualSlot53()
 {
-    field_0x47c->Method_00504EC0(field_0x4bc * field_0x13c, field_0x42c);
+    steerState->Method_00504EC0(steerRate * stepTime, poseNode);
     return 1.0f;
 }
 
@@ -101,17 +101,17 @@ Vec3* Vehicle::UnknownVirtualSlot55(Vec3* unused, Vec3* out)
     out->x = g_VehZeroVec3.x;
     out->y = g_VehZeroVec3.y;
     out->z = g_VehZeroVec3.z;
-    *out = field_0xa0;
+    *out = savedForward;
     return out;
 }
 
-float Vehicle::UnknownVirtualSlot57() { return field_0x4ac; }
-float Vehicle::UnknownVirtualSlot59() { return field_0x47c->field_0x08; }
+float Vehicle::UnknownVirtualSlot57() { return leanAngle; }
+float Vehicle::UnknownVirtualSlot59() { return steerState->field_0x08; }
 float Vehicle::UnknownVirtualSlot61(float arg) { return 0.0f; }
 
 int Vehicle::UnknownVirtualSlot62(float arg)
 {
-    return field_0x5a4 && field_0x444 == 0;
+    return anyWheelInContact && crashState == 0;
 }
 
 int Vehicle::UnknownVirtualSlot89(float arg)
@@ -134,53 +134,53 @@ void Vehicle::UnknownVirtualSlot96()
 void Vehicle::UnknownVirtualSlot21()
 {
     SoultreePhysicsCharacter::UnknownVirtualSlot21();
-    field_0x5b0 = field_0x480->field_0x00;
+    field_0x5b0 = engineState->field_0x00;
 }
 
 int Vehicle::UnknownVirtualSlot82()
 {
-    return field_0x468->UnknownVirtualSlot3(0xe, 0, 0x3f, 0) != 0;
+    return inputMap->UnknownVirtualSlot3(0xe, 0, 0x3f, 0) != 0;
 }
 
 int Vehicle::UnknownVirtualSlot81()
 {
-    return field_0x468->UnknownVirtualSlot3(0x1d, 0, 0x3f, 0) != 0;
+    return inputMap->UnknownVirtualSlot3(0x1d, 0, 0x3f, 0) != 0;
 }
 
 int Vehicle::UnknownVirtualSlot84(int a, int b)
 {
-    return field_0x468->UnknownVirtualSlot2(a, b);
+    return inputMap->UnknownVirtualSlot2(a, b);
 }
 
 // Provisional semantics: true when the accumulated travel (0xbc - 0xb8) is less than arg * 0x450.
 int Vehicle::UnknownVirtualSlot70(float arg)
 {
-    return field_0xbc - field_0xb8 < arg * field_0x450;
+    return linearSpeed - prevSpeed < arg * speedGainLimit;
 }
 
 // Provisional: field_0x4ec / sin(steer angle), zero when the angle is zero.
 float Vehicle::UnknownVirtualSlot73(const Vec3* a, const Vec3* b)
 {
-    VehicleSteerState* s = field_0x47c;
-    float m = s->field_0x04;
+    VehicleSteerState* s = steerState;
+    float m = s->steerAngle;
     if (m < 0.0f)
         m = -m;
     if (m == 0.0f)
         return 0.0f;
-    return field_0x4ec / sinf(s->field_0x04);
+    return wheelBase / sinf(s->steerAngle);
 }
 
 // Clears the per-contact flag at +0xa4 for contacts whose +4 field is set, then resets state.
 void Vehicle::UnknownVirtualSlot67()
 {
-    for (int i = 0; i < field_0x130; i++) {
-        VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
+    for (int i = 0; i < collisionPointCount; i++) {
+        VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
         if (c->field_0x04 != 0)
-            c->field_0xa4 = 0;
+            c->contactActive = 0;
     }
-    field_0x444 = 0;
-    field_0x454 = 0.0f;
-    field_0x5b4 = 0;
+    crashState = 0;
+    crashTimer = 0.0f;
+    prevCrashState = 0;
 }
 
 // Reads a float through the input map's value source (written back into the argument slot).
@@ -190,8 +190,8 @@ void Vehicle::UnknownVirtualSlot67()
 // 77-83, so it stays int with the (float*)&arg pun.
 int Vehicle::UnknownVirtualSlot77(int arg)
 {
-    if (arg && field_0x468->field_0x0c
-        && field_0x468->field_0x0c->UnknownVirtualSlot3(0, (float*)&arg)
+    if (arg && inputMap->valueSource
+        && inputMap->valueSource->UnknownVirtualSlot3(0, (float*)&arg)
         && *(float*)&arg != -1.0f)
         return 1;
     return 0;
@@ -199,27 +199,27 @@ int Vehicle::UnknownVirtualSlot77(int arg)
 
 int Vehicle::UnknownVirtualSlot78()
 {
-    if (field_0x468->UnknownVirtualSlot3(3, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
+    if (inputMap->UnknownVirtualSlot3(3, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
         return 1;
-    return field_0x468->UnknownVirtualSlot3(0x1f, 0, 0x3f, 0) != 0;
+    return inputMap->UnknownVirtualSlot3(0x1f, 0, 0x3f, 0) != 0;
 }
 
 int Vehicle::UnknownVirtualSlot79()
 {
-    if (field_0x468->UnknownVirtualSlot3(4, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
+    if (inputMap->UnknownVirtualSlot3(4, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
         return 1;
-    return field_0x468->UnknownVirtualSlot3(0x2d, 0, 0x3f, 0) != 0;
+    return inputMap->UnknownVirtualSlot3(0x2d, 0, 0x3f, 0) != 0;
 }
 
 void Vehicle::UnknownVirtualSlot64(float arg)
 {
-    if (field_0x444 == 0) {
+    if (crashState == 0) {
         UnknownVirtualSlot63(arg);
         return;
     }
-    field_0x504 = g_VehZeroVec3;
-    field_0x474 = 0.0f;
-    field_0x470 = 0.0f;
+    controlInput = g_VehZeroVec3;
+    steerInput = 0.0f;
+    throttleInput = 0.0f;
 }
 
 // Provisional semantics: a cross product returned through out (a x b).
@@ -237,10 +237,10 @@ void Vehicle::UnknownVirtualSlot90(int* a, float b)
 {
     if (Method_00526830()) {
         *a = 1;
-        field_0x1e0 = 0.0f;
+        stepRemainder = 0.0f;
         return;
     }
-    if (*a == 1 && field_0x1e0 <= 0.0001f)
+    if (*a == 1 && stepRemainder <= 0.0001f)
         UnknownVirtualSlot89(b);
 }
 
@@ -248,38 +248,38 @@ void Vehicle::UnknownVirtualSlot90(int* a, float b)
 // unless |t| is tiny or the vehicle is in state 0x444.
 void Vehicle::UnknownVirtualSlot60(float a, float b, int c)
 {
-    if (field_0x444 == 0) {
-        field_0x4bc = -(a * b) - field_0x47c->field_0x04;
-        float m = field_0x4bc;
+    if (crashState == 0) {
+        steerRate = -(a * b) - steerState->steerAngle;
+        float m = steerRate;
         if (m < 0.0f) m = -m;
         if (m < 0.00001f) {
-            field_0x4bc = 0.0f;
+            steerRate = 0.0f;
         } else {
-            if (field_0x1e0 > 0.0001f)
-                field_0x4bc = field_0x4bc / ((float)c * field_0x13c + field_0x1e0);
+            if (stepRemainder > 0.0001f)
+                steerRate = steerRate / ((float)c * stepTime + stepRemainder);
             else
-                field_0x4bc = field_0x4bc / ((float)c * field_0x13c);
+                steerRate = steerRate / ((float)c * stepTime);
         }
     } else {
-        field_0x4bc = 0.0f;
+        steerRate = 0.0f;
     }
 }
 
 void Vehicle::UnknownVirtualSlot85()
 {
-    float v = field_0x440 ? field_0x13c : -field_0x13c;
-    int flag = field_0x4a8 == 0;
-    for (int i = 0; i < field_0x544; i++)
-        field_0x53c[i]->Method_005143D0(field_0x13c, v, flag, field_0x5a8, field_0x444, field_0x24);
+    float v = movingForward ? stepTime : -stepTime;
+    int flag = wheelsInContact == 0;
+    for (int i = 0; i < wheelCount; i++)
+        wheelList[i]->Method_005143D0(stepTime, v, flag, allWheelsInContact, crashState, invMass);
 }
 
 void Vehicle::UnknownVirtualSlot86()
 {
-    for (int i = 0; i < field_0x544; i++) {
-        VehicleWheel* w = field_0x53c[i];
-        if (w->field_0x260) {
+    for (int i = 0; i < wheelCount; i++) {
+        VehicleWheel* w = wheelList[i];
+        if (w->inContact) {
             if (w->field_0x2a8) {
-                float sp = field_0xbc;
+                float sp = linearSpeed;
                 float dt = field_0x4a4;
                 w->field_0x2a8->Method_004D31B0(sp, &w->field_0x230, dt, field_0x47a, 100.0f,
                                                 &w->field_0x248, &w->field_0x280);
@@ -300,29 +300,29 @@ struct VehVecOps : Vec3
 // field_0x64 = velocity, field_0x7c = previous velocity, field_0x0c = position).
 void Vehicle::UnknownVirtualSlot48()
 {
-    Vec3 a = ((VehVecOps&)field_0x64) * 3.0f;
-    float dt = field_0x13c;
-    Vec3 d = ((VehVecOps&)a) - field_0x7c;
+    Vec3 a = ((VehVecOps&)velocity) * 3.0f;
+    float dt = stepTime;
+    Vec3 d = ((VehVecOps&)a) - prevVelocity;
     Vec3 e = ((VehVecOps&)d) * 0.5f;
     Vec3 f = ((VehVecOps&)e) * dt;
-    field_0x0c.x += f.x;
-    field_0x0c.y += f.y;
-    field_0x0c.z += f.z;
+    position.x += f.x;
+    position.y += f.y;
+    position.z += f.z;
 }
 
 void Vehicle::UnknownVirtualSlot71(int arg)
 {
-    if (field_0x444) {
-        field_0x59c = 0;
-        if (field_0x108 && !arg)
-            field_0x484 = 1;
-    } else if (field_0x108 && !arg && !field_0x59c) {
-        field_0x59c = 1;
-        field_0x484 = 1;
+    if (crashState) {
+        landingLatched = 0;
+        if (airborne && !arg)
+            justLanded = 1;
+    } else if (airborne && !arg && !landingLatched) {
+        landingLatched = 1;
+        justLanded = 1;
     }
-    if (!field_0x108 && arg) {
-        field_0x494 = field_0x64;
-        field_0x488 = field_0x0c;
+    if (!airborne && arg) {
+        takeoffVelocity = velocity;
+        takeoffPosition = position;
     }
 }
 
@@ -331,18 +331,18 @@ void Vehicle::UnknownVirtualSlot71(int arg)
 static inline float VehLen2(const Vec3& v) { return (v.x * v.x + v.y * v.y) + v.z * v.z; }
 void Vehicle::UnknownVirtualSlot43()
 {
-    field_0x10c = field_0x0c;
-    field_0x118 = field_0xa0;
-    field_0x118.y = 0.0f;
-    float len2 = VehLen2(field_0x118);
+    respawnPosition = position;
+    respawnHeading = savedForward;
+    respawnHeading.y = 0.0f;
+    float len2 = VehLen2(respawnHeading);
     if (len2 == 0.0f) {
-        field_0x118 = g_VehZeroVec3;
+        respawnHeading = g_VehZeroVec3;
         return;
     }
     float inv = FastInvSqrt(len2);
-    field_0x118.x *= inv;
-    field_0x118.y *= inv;
-    field_0x118.z *= inv;
+    respawnHeading.x *= inv;
+    respawnHeading.y *= inv;
+    respawnHeading.z *= inv;
 }
 
 // ---- heavy dynamics ----
@@ -380,87 +380,87 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
     int i;
     int active;
 
-    field_0x570 = field_0x1cc + field_0x4a8;
-    if (field_0x1d0) {
+    contactTotal = touchingPointCount + wheelsInContact;
+    if (pointsTouching) {
         active = 0;
         total = 0.0f;
         int last = 0;
-        for (i = 0; i < field_0x130; i++) {
-            VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
-            if (c->field_0xa4) {
-                dist[i] = VehDistance(field_0x18, c->field_0x14);
+        for (i = 0; i < collisionPointCount; i++) {
+            VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
+            if (c->contactActive) {
+                dist[i] = VehDistance(centerOfMass, c->contactPosition);
                 total += dist[i];
                 active++;
                 last = i;
             } else {
-                c->field_0xa0 = 0.0f;
-                c->field_0x44 = g_VehZeroVec3;
+                c->blendWeight = 0.0f;
+                c->appliedShare = g_VehZeroVec3;
             }
         }
         if (active == 1) {
-            ((VehicleContact**)field_0x12c)[last]->field_0xa0 = 1.0f;
-            ((VehicleContact**)field_0x12c)[last]->field_0x44 = *arg;
+            ((VehicleContact**)collisionPoints)[last]->blendWeight = 1.0f;
+            ((VehicleContact**)collisionPoints)[last]->appliedShare = *arg;
             return;
         }
         for (i = 0; active > 0; i++) {
-            VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
-            if (c->field_0xa4) {
+            VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
+            if (c->contactActive) {
                 float w = 1.0f - dist[i] / total;
                 active--;
-                c->field_0xa0 = w;
+                c->blendWeight = w;
                 share.x = arg->x * w;
                 share.y = arg->y * w;
                 share.z = arg->z * w;
-                c->field_0x44 = share;
+                c->appliedShare = share;
             }
         }
         return;
     }
     if (field_0x430) {
-        for (i = 0; i < field_0x544; i++) {
-            field_0x53c[i]->field_0x158 = field_0x53c[i]->field_0x294;
-            float w = field_0x53c[i]->field_0x158;
+        for (i = 0; i < wheelCount; i++) {
+            wheelList[i]->loadWeight = wheelList[i]->field_0x294;
+            float w = wheelList[i]->loadWeight;
             share.x = arg->x * w;
             share.y = arg->y * w;
             share.z = arg->z * w;
-            field_0x53c[i]->field_0xfc = share;
+            wheelList[i]->appliedShare = share;
         }
         return;
     }
-    if (field_0x4a8 > 1) {
+    if (wheelsInContact > 1) {
         total = 0.0f;
-        for (i = 0; i < field_0x544; i++) {
-            VehicleWheel* w = field_0x53c[i];
-            if (w->field_0x260) {
-                dist[i] = VehDistance(field_0x18, w->field_0xcc);
+        for (i = 0; i < wheelCount; i++) {
+            VehicleWheel* w = wheelList[i];
+            if (w->inContact) {
+                dist[i] = VehDistance(centerOfMass, w->wheelPosition);
                 total += dist[i];
             } else {
-                w->field_0x158 = 0.0f;
-                w->field_0xfc = g_VehZeroVec3;
+                w->loadWeight = 0.0f;
+                w->appliedShare = g_VehZeroVec3;
             }
         }
-        for (i = 0; i < field_0x544; i++) {
-            VehicleWheel* w = field_0x53c[i];
-            if (w->field_0x260) {
+        for (i = 0; i < wheelCount; i++) {
+            VehicleWheel* w = wheelList[i];
+            if (w->inContact) {
                 float k = 1.0f - dist[i] / total;
-                w->field_0x158 = k;
+                w->loadWeight = k;
                 share.x = arg->x * k;
                 share.y = arg->y * k;
                 share.z = arg->z * k;
-                w->field_0xfc = share;
+                w->appliedShare = share;
             }
         }
-    } else if (field_0x4a8 == 1) {
-        for (i = 0; i < field_0x544; i++) {
-            field_0x53c[i]->field_0x158 = 0.0f;
-            field_0x53c[i]->field_0xfc = g_VehZeroVec3;
+    } else if (wheelsInContact == 1) {
+        for (i = 0; i < wheelCount; i++) {
+            wheelList[i]->loadWeight = 0.0f;
+            wheelList[i]->appliedShare = g_VehZeroVec3;
         }
-        field_0x548->field_0x158 = 1.0f;
-        field_0x548->field_0xfc = *arg;
+        primaryWheel->loadWeight = 1.0f;
+        primaryWheel->appliedShare = *arg;
     } else {
-        for (i = 0; i < field_0x544; i++) {
-            field_0x53c[i]->field_0x158 = 0.0f;
-            field_0x53c[i]->field_0xfc = g_VehZeroVec3;
+        for (i = 0; i < wheelCount; i++) {
+            wheelList[i]->loadWeight = 0.0f;
+            wheelList[i]->appliedShare = g_VehZeroVec3;
         }
     }
 }
@@ -494,9 +494,9 @@ static inline Vec3 VehNormalizedD(const Vec3& v)
 }
 void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
 {
-    if (field_0x544 == 0) {
-        field_0x4ac = field_0x48;
-        field_0x4b0 = field_0x3c;
+    if (wheelCount == 0) {
+        leanAngle = savedRoll;
+        leanCos = bodyCosRoll;
         return;
     }
     Vec3 n;
@@ -506,17 +506,17 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
     else
         n = *c;
     Vec3 proj = *Vec3ScaleCall(&t, a, Vec3DotCall(&n, a));
-    Vec3* perp = &field_0x1b8;
+    Vec3* perp = &scratchVector2;
     *perp = *Vec3SubtractCall(&t, &n, &proj);
     if (!(perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) && perp) {
         *perp = Vec3Normalize(*perp);
-        field_0x1ac = ((VehV3&)field_0x4cc).Cross(*a);
-        Vec3 side = VehNormalizedD(field_0x1ac);
-        field_0x1ac = ((VehV3&)field_0x1b8).Cross(side);
+        scratchVector = ((VehV3&)sideAxis).Cross(*a);
+        Vec3 side = VehNormalizedD(scratchVector);
+        scratchVector = ((VehV3&)scratchVector2).Cross(side);
         float sign = -1.0f;
-        if (VehDotI(&field_0x1ac, a) < 0.0f)
+        if (VehDotI(&scratchVector, a) < 0.0f)
             sign = 1.0f;
-        float len2 = VehDotI(&field_0x1ac, &field_0x1ac);
+        float len2 = VehDotI(&scratchVector, &scratchVector);
         float len = 1.0f;
         if (len2 != 1.0f) {
             len = (float)sqrt(len2);
@@ -524,13 +524,13 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
                 len = 1.0f;
         }
         double angle = asin(len * sign);
-        field_0x4ac = (float)angle;
+        leanAngle = (float)angle;
         if (b)
-            field_0x4b0 = (float)cos(angle);
+            leanCos = (float)cos(angle);
         return;
     }
-    field_0x4ac = field_0x48;
-    field_0x4b0 = field_0x3c;
+    leanAngle = savedRoll;
+    leanCos = bodyCosRoll;
 }
 
 // Snaps the body pose to the wheel contact state (tier 3): with one wheel only the height
@@ -542,70 +542,70 @@ static inline float VehAbsT(float x) { return x < 0.0f ? -x : x; }
 
 void Vehicle::UnknownVirtualSlot58(Vec3* a, int b)
 {
-    if (field_0x544 < 1)
+    if (wheelCount < 1)
         return;
     Method_00525C60();
-    if (field_0x544 == 1) {
+    if (wheelCount == 1) {
         if (b == 0) {
-            float y = field_0x548->field_0xd8.y;
-            field_0x0c.y = y;
-            d3d_field_0x1a0->SetPosition(field_0x0c.x, y, field_0x0c.z);
+            float y = primaryWheel->groundPoint.y;
+            position.y = y;
+            modelNode->SetPosition(position.x, y, position.z);
         }
-        field_0x548->field_0x150 = 0.0f;
+        primaryWheel->field_0x150 = 0.0f;
     } else {
-        VehicleWheel* top = field_0x53c[0];
+        VehicleWheel* top = wheelList[0];
         Vec3 dir;
         Vec3 t;
         if (b) {
             dir = *a;
         } else {
-            VehicleWheel* second = field_0x53c[1];
-            for (int i = 1; i < field_0x544; i++) {
-                VehicleWheel* w = field_0x53c[i];
-                if (w->field_0xd8.y > top->field_0xd8.y) {
+            VehicleWheel* second = wheelList[1];
+            for (int i = 1; i < wheelCount; i++) {
+                VehicleWheel* w = wheelList[i];
+                if (w->groundPoint.y > top->groundPoint.y) {
                     second = top = w;
-                } else if (w->field_0xd8.y > second->field_0xd8.y) {
+                } else if (w->groundPoint.y > second->groundPoint.y) {
                     second = w;
                 }
             }
             dir = *Method_00528400(&t);
         }
-        d3d_field_0x1a0->SetAxesIn(0, &field_0x88, &dir, 1, 0);
+        modelNode->SetAxesIn(0, &bodyForward, &dir, 1, 0);
         UnknownVirtualSlot34();
-        d3d_field_0x1a0->GetPositionIn(0, &field_0x0c);
+        modelNode->GetPositionIn(0, &position);
         if (b == 0) {
-            float y = top->field_0x228 - top->field_0xcc.y + top->field_0xd8.y;
-            field_0x0c.y = y;
-            d3d_field_0x1a0->SetPosition(field_0x0c.x, y, field_0x0c.z);
+            float y = top->field_0x228 - top->wheelPosition.y + top->groundPoint.y;
+            position.y = y;
+            modelNode->SetPosition(position.x, y, position.z);
         }
-        if (field_0x544 == 2) {
+        if (wheelCount == 2) {
             Vec3 v0;
-            t = *UnknownVirtualSlot55(&v0, &field_0x194);
+            t = *UnknownVirtualSlot55(&v0, &rotationPivot);
             UnknownVirtualSlot56(&t, 0, &dir);
-            v0 = d3d_field_0x1a0->WorldToLocalDirection(t);
-            float lean = field_0x4ac;
+            v0 = modelNode->WorldToLocalDirection(t);
+            float lean = leanAngle;
             if (VehAbsT(lean) > 0.001f) {
                 if (VehAbsT(v0.z) > 0.001f || VehAbsT(v0.y) > 0.001f || VehAbsT(v0.x) > 0.001f) {
-                    d3d_field_0x1a0->RotateAboutPoint(field_0x194, v0, lean);
+                    modelNode->RotateAboutPoint(rotationPivot, v0, lean);
                     UnknownVirtualSlot34();
-                    d3d_field_0x1a0->GetPositionIn(0, &field_0x0c);
+                    modelNode->GetPositionIn(0, &position);
                 }
             }
         }
     }
-    field_0x47c->field_0x00->SetAxesIn(0, &field_0x88, &field_0x94, 0, 1);
-    field_0x108 = false;
-    VehBasisToBlock(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c,
-                    &field_0x38, &field_0x3c, &field_0x44, &field_0x40);
-    field_0xa0 = field_0x88;
-    field_0xac = field_0x94;
-    field_0x50 = field_0x34;
-    field_0x4c = field_0x30;
-    field_0x48 = field_0x2c;
-    field_0x54 = field_0x38;
-    field_0x58 = field_0x3c;
-    field_0x60 = field_0x44;
-    field_0x5c = field_0x40;
+    steerState->steerNode->SetAxesIn(0, &bodyForward, &bodyUp, 0, 1);
+    airborne = false;
+    VehBasisToBlock(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
+                    &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+    savedForward = bodyForward;
+    savedUp = bodyUp;
+    savedYaw = bodyYaw;
+    savedPitch = bodyPitch;
+    savedRoll = bodyRoll;
+    savedSinRoll = bodySinRoll;
+    savedCosRoll = bodyCosRoll;
+    savedCosPitch = bodyCosPitch;
+    savedSinPitch = bodySinPitch;
 }
 
 static inline Vec3 VehNormalized(const Vec3& v)
@@ -636,7 +636,7 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
     if (VehAbs(k) <= 0.0f)
         return 0.0f;
     float m = field_0x434;
-    float r = (m * m) / -k * field_0x13c;
+    float r = (m * m) / -k * stepTime;
     Vec3 t;
     t.x = r * dir->x;
     t.y = r * dir->y;
@@ -649,11 +649,11 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
     u.y = t.y * s;
     u.z = t.z * s;
     Vec3 sumv;
-    sumv.x = u.x + field_0x64.x;
-    sumv.y = u.y + field_0x64.y;
-    sumv.z = u.z + field_0x64.z;
-    field_0x1ac = sumv;
-    Vec3* nv = &field_0x1ac;
+    sumv.x = u.x + velocity.x;
+    sumv.y = u.y + velocity.y;
+    sumv.z = u.z + velocity.z;
+    scratchVector = sumv;
+    Vec3* nv = &scratchVector;
     float len2 = nv->y * nv->y + nv->x * nv->x + nv->z * nv->z;
     float len;
     if (len2 == 1.0f)
@@ -665,15 +665,15 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
     float sign = -1.0f;
     if (!(k < 0.0f))
         sign = 1.0f;
-    float dot = nv->y * field_0x64.y + nv->x * field_0x64.x + nv->z * field_0x64.z;
-    sign = VehAbs((float)acos(dot / (len * field_0xbc))) * sign;
+    float dot = nv->y * velocity.y + nv->x * velocity.x + nv->z * velocity.z;
+    sign = VehAbs((float)acos(dot / (len * linearSpeed))) * sign;
     if (!_finite(sign))
         return 0.0f;
-    float scale = field_0xbc / len;
-    field_0x64.x = scale * nv->x;
-    field_0x64.y = scale * nv->y;
-    field_0x64.z = scale * nv->z;
-    if (field_0x440)
+    float scale = linearSpeed / len;
+    velocity.x = scale * nv->x;
+    velocity.y = scale * nv->y;
+    velocity.z = scale * nv->z;
+    if (movingForward)
         return sign;
     return -sign;
 }
@@ -687,7 +687,7 @@ float Vehicle::UnknownVirtualSlot74(Vec3* point, Vec3* dir, float c, float d)
 // of slot 74 (deflection angle and angle*dt) using the last flagged wheel's point (+0x23c).
 void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 {
-    if (field_0x444 != 0)
+    if (crashState != 0)
         return;
     Vec3 sum = g_VehZeroVec3;
     *out = g_VehZeroVec3;
@@ -695,33 +695,33 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
     int mixed = 0;
     int flagged = 0;
     int plain = 0;
-    for (int i = 0; i < field_0x544; i++) {
-        VehicleWheel* w = field_0x53c[i];
-        if (w->field_0x260 || wheel) {
+    for (int i = 0; i < wheelCount; i++) {
+        VehicleWheel* w = wheelList[i];
+        if (w->inContact || wheel) {
             if (w->field_0x1c0) {
                 wheel = w;
                 flagged++;
                 sum.x += w->field_0x230.x;
                 sum.y += w->field_0x230.y;
                 sum.z += w->field_0x230.z;
-                out->x += w->field_0xe4.x;
-                out->y += w->field_0xe4.y;
-                out->z += w->field_0xe4.z;
-                load += w->field_0x144;
+                out->x += w->groundNormal.x;
+                out->y += w->groundNormal.y;
+                out->z += w->groundNormal.z;
+                load += w->contactLoad;
                 if (plain > 0)
                     mixed = 1;
             } else {
                 plain++;
-                out->x += w->field_0xe4.x;
-                out->y += w->field_0xe4.y;
-                out->z += w->field_0xe4.z;
-                load += field_0x53c[i]->field_0x144;
+                out->x += w->groundNormal.x;
+                out->y += w->groundNormal.y;
+                out->z += w->groundNormal.z;
+                load += wheelList[i]->contactLoad;
                 if (flagged > 0)
                     mixed = 1;
             }
         }
     }
-    if (field_0x4a8 > 1) {
+    if (wheelsInContact > 1) {
         float len2 = out->y * out->y + out->x * out->x + out->z * out->z;
         if (len2 == 0.0f) {
             *out = g_VehZeroVec3;
@@ -731,13 +731,13 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
             out->y = inv * out->y;
             out->z = inv * out->z;
         }
-        load = load / field_0x4a8;
+        load = load / wheelsInContact;
     }
     if (mixed == 0 && wheel == 0) {
-        field_0x4b8 = 0.0f;
-        field_0x43c = 0.0f;
-        if (field_0x4a8 < 1)
-            *out = field_0x53c[0]->field_0xe4;
+        turnAngle = 0.0f;
+        turnRate = 0.0f;
+        if (wheelsInContact < 1)
+            *out = wheelList[0]->groundNormal;
         return;
     }
     Vec3 c = ((VehV3&)sum).Cross(*out);
@@ -745,8 +745,8 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
     float mag = load;
     if (!(mag < 1.0f))
         mag = 1.0f;
-    field_0x4b8 = UnknownVirtualSlot74(&wheel->field_0x23c, &axis, mag, 1.0f);
-    field_0x43c = field_0x4b8 * field_0x140;
+    turnAngle = UnknownVirtualSlot74(&wheel->field_0x23c, &axis, mag, 1.0f);
+    turnRate = turnAngle * invStepTime;
 }
 
 // ---- impact handlers (slots 18..20) ----
@@ -754,8 +754,8 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink** sink)
 {
     if (ev->field_0x24)
-        (*sink)->field_0x50 = (*sink)->field_0x44;
-    (*sink)->field_0x60 = 1;
+        (*sink)->previousVector = (*sink)->currentVector;
+    (*sink)->updatePending = 1;
     ev->field_0x24 = 0;
 }
 
@@ -766,39 +766,39 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
     VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
     VehicleWheel* w;
     int i;
-    for (i = 0; i < field_0x544; i++) {
-        w = field_0x53c[i];
-        if (w->field_0x2a8 && w->field_0x260 && !w->field_0x160 &&
-            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174]))
+    for (i = 0; i < wheelCount; i++) {
+        w = wheelList[i];
+        if (w->field_0x2a8 && w->inContact && !w->impactPosted &&
+            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial]))
             break;
     }
-    if (i < field_0x544) {
-        w->field_0x160 = 1;
+    if (i < wheelCount) {
+        w->impactPosted = 1;
         float v = w->field_0x2bc * 20.0f;
         v = (v > 1.0f) ? v : 1.0f;
-        ev->field_0x04->Method_004B8D90(w->field_0xd8, v);
-        VehCommitImpact(ev, &ev->field_0x04);
+        ev->impactSink->Method_004B8D90(w->groundPoint, v);
+        VehCommitImpact(ev, &ev->impactSink);
         return;
     }
-    for (i = 0; i < field_0x544; i++) {
-        w = field_0x53c[i];
-        if (w->field_0x260 && !w->field_0x160 &&
-            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174]))
+    for (i = 0; i < wheelCount; i++) {
+        w = wheelList[i];
+        if (w->inContact && !w->impactPosted &&
+            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial]))
             break;
     }
-    if (i < field_0x544) {
-        w->field_0x160 = 1;
-        ev->field_0x04->Method_004B8D90(w->field_0xd8, 0.0f);
-        VehCommitImpact(ev, &ev->field_0x04);
+    if (i < wheelCount) {
+        w->impactPosted = 1;
+        ev->impactSink->Method_004B8D90(w->groundPoint, 0.0f);
+        VehCommitImpact(ev, &ev->impactSink);
         return;
     }
-    for (i = 0; i < field_0x130; i++) {
-        VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
-        if (c->field_0xa4 && !c->field_0xa8 &&
-            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + c->field_0xbc])) {
-            c->field_0xa8 = 1;
-            ev->field_0x04->Method_004B8D90(c->field_0x20, 0.0f);
-            VehCommitImpact(ev, &ev->field_0x04);
+    for (i = 0; i < collisionPointCount; i++) {
+        VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
+        if (c->contactActive && !c->impactPosted &&
+            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + c->surfaceMaterial])) {
+            c->impactPosted = 1;
+            ev->impactSink->Method_004B8D90(c->impactPosition, 0.0f);
+            VehCommitImpact(ev, &ev->impactSink);
             return;
         }
     }
@@ -811,46 +811,46 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
     VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
     VehicleWheel* w;
     int i;
-    for (i = 0; i < field_0x544; i++) {
-        w = field_0x53c[i];
-        if (w->field_0x2a8 && w->field_0x260 && !w->field_0x164 &&
-            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x408 + w->field_0x174]))
+    for (i = 0; i < wheelCount; i++) {
+        w = wheelList[i];
+        if (w->field_0x2a8 && w->inContact && !w->slidePosted &&
+            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial]))
             break;
     }
-    if (i < field_0x544) {
+    if (i < wheelCount) {
         if (!(w->field_0x2b8 < 0.95f))
             return;
-        w->field_0x164 = 1;
-        ev->field_0x08->Method_004B9DC0(w->field_0xd8);
-        VehCommitImpact(ev, &ev->field_0x08);
-        field_0x1b8.x = (field_0x4b8 < 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
-        field_0x1b8.y = 0.0f;
-        field_0x1b8.z = -w->field_0x28c;
-        field_0x1ac = d3d_field_0x1a0->LocalToWorldDirection(field_0x1b8);
-        field_0x1ac.y = w->field_0x2bc * 3.0f;
-        float s = w->field_0x290 * field_0x140;
-        field_0x1ac.x *= s;
-        field_0x1ac.y *= s;
-        field_0x1ac.z *= s;
-        if (!(field_0x1ac.x < 15.0f))
-            field_0x1ac.x = 15.0f;
-        if (!(field_0x1ac.y < 18.0f))
-            field_0x1ac.y = 18.0f;
-        if (!(field_0x1ac.z < 15.0f))
-            field_0x1ac.z = 15.0f;
-        ev->field_0x08->field_0x74 = field_0x1ac;
+        w->slidePosted = 1;
+        ev->slideSink->Method_004B9DC0(w->groundPoint);
+        VehCommitImpact(ev, &ev->slideSink);
+        scratchVector2.x = (turnAngle < 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
+        scratchVector2.y = 0.0f;
+        scratchVector2.z = -w->field_0x28c;
+        scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
+        scratchVector.y = w->field_0x2bc * 3.0f;
+        float s = w->field_0x290 * invStepTime;
+        scratchVector.x *= s;
+        scratchVector.y *= s;
+        scratchVector.z *= s;
+        if (!(scratchVector.x < 15.0f))
+            scratchVector.x = 15.0f;
+        if (!(scratchVector.y < 18.0f))
+            scratchVector.y = 18.0f;
+        if (!(scratchVector.z < 15.0f))
+            scratchVector.z = 15.0f;
+        ev->slideSink->scrapeVector = scratchVector;
         return;
     }
-    for (i = 0; i < field_0x544; i++) {
-        w = field_0x53c[i];
-        if (w->field_0x260 && !w->field_0x164 &&
-            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x408 + w->field_0x174]))
+    for (i = 0; i < wheelCount; i++) {
+        w = wheelList[i];
+        if (w->inContact && !w->slidePosted &&
+            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial]))
             break;
     }
-    if (i < field_0x544) {
-        w->field_0x164 = 1;
+    if (i < wheelCount) {
+        w->slidePosted = 1;
         if (w->field_0x280.z > 0.2f) {
-            VehCommitImpact(ev, &ev->field_0x08);
+            VehCommitImpact(ev, &ev->slideSink);
         }
     }
 }
@@ -862,44 +862,44 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
     VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
     VehicleWheel* w = 0;
     int i;
-    for (i = 0; i < field_0x544; i++) {
-        w = field_0x53c[i];
-        if (w->field_0x2a8 && w->field_0x260 && !w->field_0x168)
+    for (i = 0; i < wheelCount; i++) {
+        w = wheelList[i];
+        if (w->field_0x2a8 && w->inContact && !w->scrapePosted)
             break;
     }
-    if (i < field_0x544) {
+    if (i < wheelCount) {
         if (!(w->field_0x2b8 < 0.95f))
             return;
-        w->field_0x168 = 1;
-        ev->field_0x0c->Method_004B9DC0(w->field_0xd8);
-        VehCommitImpact(ev, &ev->field_0x0c);
-        field_0x1b8.x = (field_0x4b8 < 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
-        field_0x1b8.y = 0.0f;
-        field_0x1b8.z = -w->field_0x28c;
-        field_0x1ac = d3d_field_0x1a0->LocalToWorldDirection(field_0x1b8);
-        field_0x1ac.y = w->field_0x2bc * 3.0f;
-        float s = w->field_0x290 * field_0x140;
-        field_0x1ac.x *= s;
-        field_0x1ac.y *= s;
-        field_0x1ac.z *= s;
-        if (!(field_0x1ac.x < 15.0f))
-            field_0x1ac.x = 15.0f;
-        if (!(field_0x1ac.y < 18.0f))
-            field_0x1ac.y = 18.0f;
-        if (!(field_0x1ac.z < 15.0f))
-            field_0x1ac.z = 15.0f;
-        ev->field_0x0c->field_0x74 = field_0x1ac;
+        w->scrapePosted = 1;
+        ev->scrapeSink->Method_004B9DC0(w->groundPoint);
+        VehCommitImpact(ev, &ev->scrapeSink);
+        scratchVector2.x = (turnAngle < 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
+        scratchVector2.y = 0.0f;
+        scratchVector2.z = -w->field_0x28c;
+        scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
+        scratchVector.y = w->field_0x2bc * 3.0f;
+        float s = w->field_0x290 * invStepTime;
+        scratchVector.x *= s;
+        scratchVector.y *= s;
+        scratchVector.z *= s;
+        if (!(scratchVector.x < 15.0f))
+            scratchVector.x = 15.0f;
+        if (!(scratchVector.y < 18.0f))
+            scratchVector.y = 18.0f;
+        if (!(scratchVector.z < 15.0f))
+            scratchVector.z = 15.0f;
+        ev->scrapeSink->scrapeVector = scratchVector;
         return;
     }
-    for (i = 0; i < field_0x544; i++) {
-        w = field_0x53c[i];
-        if (w->field_0x260 && !w->field_0x168)
+    for (i = 0; i < wheelCount; i++) {
+        w = wheelList[i];
+        if (w->inContact && !w->scrapePosted)
             break;
     }
-    if (i < field_0x544) {
-        w->field_0x168 = 1;
+    if (i < wheelCount) {
+        w->scrapePosted = 1;
         if (w->field_0x280.z > 0.2f) {
-            VehCommitImpact(ev, &ev->field_0x0c);
+            VehCommitImpact(ev, &ev->scrapeSink);
         }
     }
 }
@@ -929,22 +929,22 @@ void Vehicle::UnknownVirtualSlot4(const Vec3* a0, Vec3* a1, const Vec3* a2,
                                   const Vec3* a8, const Vec3* a9, Vec3* a10, Vec3* a11,
                                   int a12, float* a13, float a14)
 {
-    field_0x1ac = VehCrossA(*a2, *a3);
+    scratchVector = VehCrossA(*a2, *a3);
     Vec3 p;
-    p.x = (a1->x + field_0x1ac.x) * a14;
-    p.y = (field_0x1ac.y + a1->y) * a14;
-    p.z = (field_0x1ac.z + a1->z) * a14;
-    field_0x1ac = VehCrossB(*a8, *a9);
+    p.x = (a1->x + scratchVector.x) * a14;
+    p.y = (scratchVector.y + a1->y) * a14;
+    p.z = (scratchVector.z + a1->z) * a14;
+    scratchVector = VehCrossB(*a8, *a9);
     Vec3 q;
-    q.x = (field_0x1ac.x + a7->x) * a14;
-    q.y = (field_0x1ac.y + a7->y) * a14;
-    q.z = (field_0x1ac.z + a7->z) * a14;
-    ContactSolveImpulse(field_0x14c, a0, field_0x24, d3d_field_0x1a0, &p, a3,
-                        field_0x444 ? &field_0xf0 : &field_0xe4, &field_0xd8, a1, a5,
+    q.x = (scratchVector.x + a7->x) * a14;
+    q.y = (scratchVector.y + a7->y) * a14;
+    q.z = (scratchVector.z + a7->z) * a14;
+    ContactSolveImpulse(restitution, a0, invMass, modelNode, &p, a3,
+                        crashState ? &shapeInvInertia : &invInertia, &angularVelocity, a1, a5,
                         (SoultreeObject*)a6, &q, a9, a10, a11, (Vec3*)a12, a13);
     float len2 = a1->x * a1->x + a1->y * a1->y + a1->z * a1->z;
-    field_0xbc = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
-    field_0xcc = d3d_field_0x1a0->LocalToWorldDirection(field_0xd8);
+    linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
+    worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
 }
 
 static inline Vec3 VehOffset(const Vec3& a, const Vec3& b)
@@ -961,41 +961,41 @@ static inline Vec3 VehOffset(const Vec3& a, const Vec3& b)
 // rotated by the frame transform; falls back to field_0x194 when disabled or > 2 wheels.
 Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
 {
-    Vec3* src = &field_0x194;
+    Vec3* src = &rotationPivot;
     Vec3 t;
-    if (!field_0x108 && !field_0x1d0 && field_0x4a8 <= 2) {
-        if (field_0x4a8 == 2) {
-            VehicleWheel* a = field_0x54c;
-            VehicleWheel* b = field_0x548;
+    if (!airborne && !pointsTouching && wheelsInContact <= 2) {
+        if (wheelsInContact == 2) {
+            VehicleWheel* a = secondaryWheel;
+            VehicleWheel* b = primaryWheel;
             if (!a->field_0x2a8) {
-                a = field_0x548;
+                a = primaryWheel;
                 if (!a->field_0x2a8) {
                     *out = *src;
                     return out;
                 }
-                b = field_0x54c;
+                b = secondaryWheel;
             } else {
-                b = field_0x548;
+                b = primaryWheel;
             }
             // a has the aux object, b is the other wheel
             if (a->field_0x2b8 < 0.9f) {
-                field_0x1ac = VehOffset(b->field_0xcc, field_0x0c);
+                scratchVector = VehOffset(b->wheelPosition, position);
             } else {
-                Vec3 d = VehOffset(a->field_0xcc, b->field_0xcc);
+                Vec3 d = VehOffset(a->wheelPosition, b->wheelPosition);
                 Vec3 mid;
                 mid.x = d.x * 0.5f;
                 mid.y = d.y * 0.5f;
                 mid.z = d.z * 0.5f;
-                mid.x += b->field_0xcc.x;
-                mid.y += b->field_0xcc.y;
-                mid.z += b->field_0xcc.z;
-                field_0x1ac = VehOffset(mid, field_0x0c);
+                mid.x += b->wheelPosition.x;
+                mid.y += b->wheelPosition.y;
+                mid.z += b->wheelPosition.z;
+                scratchVector = VehOffset(mid, position);
             }
         } else {
-            Vec3* p = &field_0x548->field_0xcc;
-            field_0x1ac = VehOffset(*p, field_0x0c);
+            Vec3* p = &primaryWheel->wheelPosition;
+            scratchVector = VehOffset(*p, position);
         }
-        t = d3d_field_0x1a0->WorldToLocalDirection(field_0x1ac);
+        t = modelNode->WorldToLocalDirection(scratchVector);
         src = &t;
     }
     *out = *src;
@@ -1026,10 +1026,10 @@ Vec3* Vehicle::UnknownVirtualSlot46(Vec3* out, float arg)
 static inline void VehSmooth(VehicleSmoother* s, float dt, float target)
 {
     float step = dt;
-    if (!(step < s->field_0x04))
-        step = s->field_0x04;
-    s->field_0x08 = step / s->field_0x04;
-    s->field_0x00 = (target - s->field_0x00) * s->field_0x08 + s->field_0x00;
+    if (!(step < s->timeConstant))
+        step = s->timeConstant;
+    s->blendFactor = step / s->timeConstant;
+    s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;
 }
 
 void Vehicle::UnknownVirtualSlot49(float frame)
@@ -1041,108 +1041,108 @@ void Vehicle::UnknownVirtualSlot49(float frame)
     int hit;
     int res;
 
-    field_0x20d = 0;
+    justReset = 0;
     UnknownVirtualSlot9(frame, &steps);
     UnknownVirtualSlot30();
-    field_0x510 = field_0x504;
+    prevControlInput = controlInput;
     UnknownVirtualSlot64(frame);
-    UnknownVirtualSlot60(field_0x504.x, UnknownVirtualSlot59(), steps);
+    UnknownVirtualSlot60(controlInput.x, UnknownVirtualSlot59(), steps);
     UnknownVirtualSlot65(frame);
-    field_0x1d0 = 0;
+    pointsTouching = 0;
     hit = UnknownVirtualSlot39(frame);
-    if (!hit && !field_0x444 && steps != 1) {
-        VehContactsA(UnknownVirtualSlot5(0), &field_0x1cc, field_0x130, ((VehicleContact**)field_0x12c), field_0x1f4,
-                     &field_0x18, field_0x1c4, field_0x160);
-        field_0x1d0 = field_0x1cc > 0;
+    if (!hit && !crashState && steps != 1) {
+        VehContactsA(UnknownVirtualSlot5(0), &touchingPointCount, collisionPointCount, ((VehicleContact**)collisionPoints), terrain,
+                     &centerOfMass, collisionShape, collisionRadius);
+        pointsTouching = touchingPointCount > 0;
     }
-    field_0x484 = 0;
+    justLanded = 0;
     while (steps > 0) {
-        VehicleSpeedState* ss = field_0x480;
-        if (ss->field_0x0c != 0.0f) {
-            ss->field_0x0c -= field_0x13c;
-            if (ss->field_0x0c < 0.0f)
-                ss->field_0x0c = 0.0f;
+        VehicleSpeedState* ss = engineState;
+        if (ss->gearTimer != 0.0f) {
+            ss->gearTimer -= stepTime;
+            if (ss->gearTimer < 0.0f)
+                ss->gearTimer = 0.0f;
         }
         Vec3 zero = g_VehZeroVec3;
-        if (field_0x444 == 0) {
+        if (crashState == 0) {
             if (Method_00529280())
-                field_0x480->field_0x08 = 1;
-        } else if (field_0x154 != field_0x150) {
+                engineState->field_0x08 = 1;
+        } else if (totalWeight != baseWeight) {
             if (UnknownVirtualSlot10())
                 UnknownVirtualSlot0(0.0f);
         }
         field_0x47a = UnknownVirtualSlot82() != 0;
-        field_0x479 = field_0x444 == 0 && (field_0x47a || UnknownVirtualSlot81());
-        field_0x478 = field_0x444 == 0 && UnknownVirtualSlot80();
-        field_0x480->Method_004D2F50(field_0x13c, field_0x478, field_0x479);
-        field_0x480->Method_004D3030(field_0x478, field_0xbc);
+        field_0x479 = crashState == 0 && (field_0x47a || UnknownVirtualSlot81());
+        field_0x478 = crashState == 0 && UnknownVirtualSlot80();
+        engineState->Method_004D2F50(stepTime, field_0x478, field_0x479);
+        engineState->Method_004D3030(field_0x478, linearSpeed);
         if (hit) {
             int dummy = 0;
             UnknownVirtualSlot11(hit, &up, &zero, &tmp, &dummy);
-            UnknownVirtualSlot33(&up, &tmp, &field_0x94, &zero, dummy, UnknownVirtualSlot32());
+            UnknownVirtualSlot33(&up, &tmp, &bodyUp, &zero, dummy, UnknownVirtualSlot32());
             steps = 0;
-            field_0x1e0 = 0.0f;
+            stepRemainder = 0.0f;
             break;
         }
-        field_0xb8 = field_0xbc;
-        if (field_0xbc < 0.001f || !_finite(field_0xbc)) {
-            field_0xb8 = 0.0f;
-            field_0x64 = g_VehZeroVec3;
-            field_0xbc = 0.0f;
+        prevSpeed = linearSpeed;
+        if (linearSpeed < 0.001f || !_finite(linearSpeed)) {
+            prevSpeed = 0.0f;
+            velocity = g_VehZeroVec3;
+            linearSpeed = 0.0f;
         }
-        field_0x218->GetPositionIn(0, &field_0x18);
+        centerNode->GetPositionIn(0, &centerOfMass);
         float t53 = UnknownVirtualSlot53();
         Method_00528EB0();
-        if (field_0x4f4 > 0.0f) {
-            field_0x4f4 -= field_0x13c;
-            if (field_0x4f4 <= 0.0f)
+        if (spawnProtectTimer > 0.0f) {
+            spawnProtectTimer -= stepTime;
+            if (spawnProtectTimer <= 0.0f)
                 UnknownVirtualSlot50(0, 0, 0);
         }
-        field_0x5a8 = field_0x4a8 == field_0x544;
-        field_0x5a4 = field_0x4a8 != 0;
-        speed = field_0xb8;
-        up = field_0x188;
+        allWheelsInContact = wheelsInContact == wheelCount;
+        anyWheelInContact = wheelsInContact != 0;
+        speed = prevSpeed;
+        up = weightForce;
         Vec3 a, b;
         Vec3 basis = *UnknownVirtualSlot55(&a, &b);
         UnknownVirtualSlot56(&basis, 1, 0);
         res = UnknownVirtualSlot5(0);
-        res = VehContactsA(field_0x444 || (steps == 1 && res), &field_0x1cc, field_0x130, ((VehicleContact**)field_0x12c),
-                           field_0x1f4, &field_0x18, field_0x1c4, field_0x160);
+        res = VehContactsA(crashState || (steps == 1 && res), &touchingPointCount, collisionPointCount, ((VehicleContact**)collisionPoints),
+                           terrain, &centerOfMass, collisionShape, collisionRadius);
         if (res)
-            field_0x1d0 = field_0x1cc > 0;
+            pointsTouching = touchingPointCount > 0;
         Method_00529A20();
         UnknownVirtualSlot8();
         UnknownVirtualSlot6(&up, &speed);
         UnknownVirtualSlot7(&up);
         field_0x4b4 = UnknownVirtualSlot75();
-        bool settled = !field_0x5a4 && !field_0x1d0;
+        bool settled = !anyWheelInContact && !pointsTouching;
         UnknownVirtualSlot71(settled);
-        field_0x108 = settled;
+        airborne = settled;
         if (settled)
-            field_0x59c = 0;
+            landingLatched = 0;
         Vec3 lift;
-        if (field_0x570 > 0) {
-            if (field_0x5a4) {
+        if (contactTotal > 0) {
+            if (anyWheelInContact) {
                 UnknownVirtualSlot72(&lift, 0);
                 UnknownVirtualSlot86();
             } else {
                 field_0x5a0 = 0;
-                field_0x4b8 = 0.0f;
-                field_0x43c = 0.0f;
+                turnAngle = 0.0f;
+                turnRate = 0.0f;
             }
-            if (field_0x1d0) {
+            if (pointsTouching) {
                 if (!res)
-                    VehContactsC(field_0x130, ((VehicleContact**)field_0x12c));
+                    VehContactsC(collisionPointCount, ((VehicleContact**)collisionPoints));
                 UnknownVirtualSlot31();
             }
         } else {
             field_0x5a0 = 0;
-            field_0x4b8 = 0.0f;
-            field_0x43c = 0.0f;
+            turnAngle = 0.0f;
+            turnRate = 0.0f;
         }
-        if (field_0x5a0 || (field_0x1d0 && (!field_0x5a4 || field_0x444))) {
+        if (field_0x5a0 || (pointsTouching && (!anyWheelInContact || crashState))) {
             Vec3 scale;
-            if (field_0x444) {
+            if (crashState) {
                 scale.x = 1.0f;
                 scale.y = 1.0f;
                 scale.z = 1.0f;
@@ -1152,72 +1152,72 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                 scale.z = 0.3f;
             }
             Vec3 o1, o2, o3;
-            VehContactsB(field_0x130, ((VehicleContact**)field_0x12c), &scale, &field_0xcc, &field_0x64, &field_0x18,
-                         &field_0x0c, &o3, &o2, &o1);
+            VehContactsB(collisionPointCount, ((VehicleContact**)collisionPoints), &scale, &worldAngularVelocity, &velocity, &centerOfMass,
+                         &position, &o3, &o2, &o1);
             UnknownVirtualSlot3(&o2, &o1, &o3, &scale, 0x67, 0, &tmp.x);
-            if (field_0xb8 * 1.3f < field_0xbc && field_0xbc > 5.0f) {
-                float r = field_0xb8 / field_0xbc;
-                field_0x64.x *= r;
-                field_0x64.y *= r;
-                field_0x64.z *= r;
-                field_0xbc = field_0xb8;
+            if (prevSpeed * 1.3f < linearSpeed && linearSpeed > 5.0f) {
+                float r = prevSpeed / linearSpeed;
+                velocity.x *= r;
+                velocity.y *= r;
+                velocity.z *= r;
+                linearSpeed = prevSpeed;
             }
-            if (field_0xb8 < 0.001f && field_0xbc < 0.1f) {
-                field_0x64 = g_VehZeroVec3;
-                field_0xd8.y = 0.0f;
-                field_0xbc = 0.0f;
+            if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
+                velocity = g_VehZeroVec3;
+                angularVelocity.y = 0.0f;
+                linearSpeed = 0.0f;
             }
         }
-        float aq = field_0x4b8;
+        float aq = turnAngle;
         if (aq < 0.0f)
             aq = -aq;
         Vec3 zeroB = g_VehZeroVec3;
         UnknownVirtualSlot13(&up, &zeroB, t53);
-        if (field_0x5a4) {
+        if (anyWheelInContact) {
             Method_00527A20(&speed, &zero, &up);
-            if (field_0x444 == 0 || !field_0x1d0) {
+            if (crashState == 0 || !pointsTouching) {
                 Method_005293E0(&speed);
                 Method_00529450(&up, &zeroB);
             }
             Method_00529C20(&up, &zeroB, t53);
         }
         UnknownVirtualSlot14(&up, &zeroB, &zero);
-        VehSmooth(field_0x58c, field_0x13c, (field_0x64.y - field_0x7c.y) * field_0x140);
-        field_0x588 = field_0x58c->field_0x00;
+        VehSmooth(verticalAccelSmoother, stepTime, (velocity.y - prevVelocity.y) * invStepTime);
+        smoothedVerticalAccel = verticalAccelSmoother->smoothedValue;
         float k = UnknownVirtualSlot61(aq);
         Vec3 aim = *UnknownVirtualSlot46(&tmp, k);
         int mode = UnknownVirtualSlot62(k);
         UnknownVirtualSlot26();
         UnknownVirtualSlot48();
         UnknownVirtualSlot85();
-        d3d_field_0x1a0->SetPosition(field_0x0c);
+        modelNode->SetPosition(position);
         UnknownVirtualSlot95();
-        if (field_0x444) {
+        if (crashState) {
             UnknownVirtualSlot87();
         } else {
-            if (field_0x108) {
+            if (airborne) {
                 UnknownVirtualSlot91();
             } else if (mode) {
                 if (mode == 1 || mode == 2) {
                     bool doit = true;
                     if (aq < 0.0001f) {
                         if (VehAbs(k) > 0.0001f) {
-                            field_0x1ac = *UnknownVirtualSlot54(&tmp);
-                            field_0x4c0 = d3d_field_0x1a0->WorldToLocalDirection(field_0x1ac);
+                            scratchVector = *UnknownVirtualSlot54(&tmp);
+                            tiltAxisLocal = modelNode->WorldToLocalDirection(scratchVector);
                         } else {
                             doit = false;
                         }
                     } else {
-                        field_0x4c0 = d3d_field_0x1a0->WorldToLocalDirection(lift);
+                        tiltAxisLocal = modelNode->WorldToLocalDirection(lift);
                     }
                     if (doit) {
                         if (k != 0.0f && aq < 0.003f)
-                            d3d_field_0x1a0->RotateAboutPoint(aim, field_0x4c0, k);
+                            modelNode->RotateAboutPoint(aim, tiltAxisLocal, k);
                         else
-                            d3d_field_0x1a0->RotateAboutPoint(aim, field_0x4c0, k + field_0x4b8);
-                        field_0xd8.x *= 0.85f;
-                        field_0xd8.y *= 0.85f;
-                        field_0xd8.z *= 0.85f;
+                            modelNode->RotateAboutPoint(aim, tiltAxisLocal, k + turnAngle);
+                        angularVelocity.x *= 0.85f;
+                        angularVelocity.y *= 0.85f;
+                        angularVelocity.z *= 0.85f;
                     }
                 }
                 if (mode == 1 || mode == 3)
@@ -1225,29 +1225,29 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             }
             UnknownVirtualSlot90(&steps, frame);
         }
-        d3d_field_0x1a0->GetPosition(&field_0x0c);
-        field_0x218->GetPositionIn(0, &field_0x18);
-        field_0xcc = d3d_field_0x1a0->LocalToWorldDirection(field_0xd8);
+        modelNode->GetPosition(&position);
+        centerNode->GetPositionIn(0, &centerOfMass);
+        worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
         steps = UnknownVirtualSlot28(steps) - 1;
-        field_0x1e8 = field_0x13c;
-        if (steps == 0 && field_0x1e0 > 0.0001f) {
+        lastStepTime = stepTime;
+        if (steps == 0 && stepRemainder > 0.0001f) {
             steps = 1;
-            field_0x13c = field_0x1e0;
-            field_0x140 = 1.0f / field_0x13c;
-            field_0x1e0 = 0.0f;
+            stepTime = stepRemainder;
+            invStepTime = 1.0f / stepTime;
+            stepRemainder = 0.0f;
         }
         UnknownVirtualSlot34();
-        VehBasisToBlock(field_0x88, field_0x94, &field_0x34, &field_0x30, &field_0x2c,
-                        &field_0x38, &field_0x3c, &field_0x44, &field_0x40);
-        field_0x7c = field_0x64;
-        field_0x5b4 = field_0x444;
+        VehBasisToBlock(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
+                        &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+        prevVelocity = velocity;
+        prevCrashState = crashState;
         UnknownVirtualSlot29(steps == 0);
     }
     UnknownVirtualSlot21();
-    field_0x1ac = d3d_field_0x1a0->WorldToLocalDirection(field_0x64);
-    VehSmooth(field_0x598, field_0x144, (field_0x1ac.z - field_0x594) / field_0x144);
-    field_0x590 = field_0x598->field_0x00;
-    field_0x594 = field_0x1ac.z;
+    scratchVector = modelNode->WorldToLocalDirection(velocity);
+    VehSmooth(forwardAccelSmoother, frameTime, (scratchVector.z - prevLocalForwardVelocity) / frameTime);
+    smoothedForwardAccel = forwardAccelSmoother->smoothedValue;
+    prevLocalForwardVelocity = scratchVector.z;
 }
 
 // ---- slot 38: collision response dispatch (tier 3 names) ----
@@ -1265,12 +1265,12 @@ static inline Vec3 VehOnes()
 }
 struct VehicleContactSet {
     char pad_0x00[0xA0];
-    Vec3 field_0xa0;            // contact point
-    Vec3 field_0xac;            // contact normal
+    Vec3 contactPoint;            // +0xa0 contact point
+    Vec3 contactNormal;            // +0xac contact normal
 };
 struct VehicleCollisionEvent {     // 'c' argument (provisional)
     char pad_0x00[0x60];
-    Vehicle* field_0x60;           // other body
+    Vehicle* otherBody;           // +0x60 other body
 };
 
 void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
@@ -1294,12 +1294,12 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     case 0x6a:
         s = VehOnes();
         hasBody = 0;
-        if (field_0x124 && (field_0x124->field_0x25 & 1)) {
-            Vec3 pos = ((VehicleContactSet*)field_0x128)->field_0xa0;
+        if (field_0x124 && (field_0x124->statusFlags & 1)) {
+            Vec3 pos = ((VehicleContactSet*)collisionObject)->contactPoint;
             ((VehicleImpactSink*)field_0x5ac)->Method_004B9DC0(pos);
             p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
-            ((VehicleImpactSink*)field_0x5ac)->field_0x74 = p;
-            ((VehicleImpactSink*)field_0x5ac)->field_0x60 = 1;
+            ((VehicleImpactSink*)field_0x5ac)->scrapeVector = p;
+            ((VehicleImpactSink*)field_0x5ac)->updatePending = 1;
         }
         break;
     case 0x3e9:
@@ -1309,18 +1309,18 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     case 0:
     case 1:
         hasBody = 1;
-        other = ((VehicleCollisionEvent*)c)->field_0x60;
-        l10 = other->field_0x24;
-        otherVel = &other->field_0x64;
-        ctx = (int)other->d3d_field_0x1a0;
-        v3c = VehOffset(((VehicleContactSet*)field_0x128)->field_0xa0, other->field_0x18);
-        v48 = other->field_0xcc;
-        c = &other->field_0xd8;
-        v30 = other->field_0xe4;
+        other = ((VehicleCollisionEvent*)c)->otherBody;
+        l10 = other->invMass;
+        otherVel = &other->velocity;
+        ctx = (int)other->modelNode;
+        v3c = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, other->centerOfMass);
+        v48 = other->worldAngularVelocity;
+        c = &other->angularVelocity;
+        v30 = other->invInertia;
         break;
     case 0x69:
         hasBody = 1;
-        ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->field_0x60 + 0x34);
+        ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->otherBody + 0x34);
         v30 = g_VehZeroVec3; v3c = g_VehZeroVec3; v48 = g_VehZeroVec3;
         l10 = 0;
         p.x = 1.0f; p.y = 1.0f; p.z = 1.0f;
@@ -1330,7 +1330,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         break;
     case 0x2711:
         hasBody = 1;
-        ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->field_0x60 + 0x1a0);
+        ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->otherBody + 0x1a0);
         v30 = g_VehZeroVec3; v3c = g_VehZeroVec3; v48 = g_VehZeroVec3;
         l10 = 0;
         p.x = 1.0f; p.y = 1.0f; p.z = 1.0f;
@@ -1342,32 +1342,32 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         return;
     }
 
-    rel = VehOffset(((VehicleContactSet*)field_0x128)->field_0xa0, field_0x18);
+    rel = VehOffset(((VehicleContactSet*)collisionObject)->contactPoint, centerOfMass);
     if (hasBody) {
         l14 = (b == 0x2711 || b == 0x69) ? 0 : (int)otherVel;
-        UnknownVirtualSlot4(&((VehicleContactSet*)field_0x128)->field_0xac, &field_0x64, &field_0xcc, &rel, b, l10, ctx,
+        UnknownVirtualSlot4(&((VehicleContactSet*)collisionObject)->contactNormal, &velocity, &worldAngularVelocity, &rel, b, l10, ctx,
                             otherVel, (Vec3*)c, &v48, &v3c, &v30, l14, &l10, 1.0f);
         if (other) {
             *((char*)other + 0x10a) = 0;
             float len2 = otherVel->x * otherVel->x + otherVel->y * otherVel->y + otherVel->z * otherVel->z;
-            field_0xbc = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
-            field_0xcc = other->d3d_field_0x1a0->LocalToWorldDirection(*(Vec3*)c);
+            linearSpeed = (len2 == 1.0f) ? 1.0f : (float)sqrt(len2);
+            worldAngularVelocity = other->modelNode->LocalToWorldDirection(*(Vec3*)c);
         }
     } else {
         Vec3 t;
-        t.x = field_0xcc.x * s.x; t.y = field_0xcc.y * s.y; t.z = field_0xcc.z * s.z;
-        field_0x1ac.x = rel.z * t.y - rel.y * t.z;
-        field_0x1ac.y = rel.x * t.z - rel.z * t.x;
-        field_0x1ac.z = rel.y * t.x - rel.x * t.y;
-        p.x = field_0x64.x + field_0x1ac.x;
-        p.y = field_0x64.y + field_0x1ac.y;
-        p.z = field_0x64.z + field_0x1ac.z;
-        UnknownVirtualSlot3(&((VehicleContactSet*)field_0x128)->field_0xac, &p, &rel, &s, b, 0, &l10);
+        t.x = worldAngularVelocity.x * s.x; t.y = worldAngularVelocity.y * s.y; t.z = worldAngularVelocity.z * s.z;
+        scratchVector.x = rel.z * t.y - rel.y * t.z;
+        scratchVector.y = rel.x * t.z - rel.z * t.x;
+        scratchVector.z = rel.y * t.x - rel.x * t.y;
+        p.x = velocity.x + scratchVector.x;
+        p.y = velocity.y + scratchVector.y;
+        p.z = velocity.z + scratchVector.z;
+        UnknownVirtualSlot3(&((VehicleContactSet*)collisionObject)->contactNormal, &p, &rel, &s, b, 0, &l10);
     }
-    if (field_0xb8 < 0.001f && field_0xbc < 0.1f) {
-        field_0x64 = g_VehZeroVec3;
-        field_0xd8.y = 0.0f;
-        field_0xbc = 0;
+    if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
+        velocity = g_VehZeroVec3;
+        angularVelocity.y = 0.0f;
+        linearSpeed = 0;
     }
     if (a)
         Method_00526830();
@@ -1386,41 +1386,41 @@ void Vehicle::UnknownVirtualSlot44()
 {
     field_0x4a0 = 1;
     GameObjectVirtualSlot4();
-    ((VehSceneNodeView*)d3d_field_0x1a0)->Method_004444E0();
+    ((VehSceneNodeView*)modelNode)->Method_004444E0();
 }
 
 // Input-map driven state test (provisional): the 0x46c/0x470 pair short-circuits to "true".
 int Vehicle::UnknownVirtualSlot80()
 {
-    if ((field_0x46c && field_0x470 > 0.33f)
-        || (field_0x468->UnknownVirtualSlot3(0, 2, 0x3f, 0)
-            && !UnknownVirtualSlot77(field_0x480->field_0x00 == 0.0f)))
+    if ((inputDevice && throttleInput > 0.33f)
+        || (inputMap->UnknownVirtualSlot3(0, 2, 0x3f, 0)
+            && !UnknownVirtualSlot77(engineState->field_0x00 == 0.0f)))
         return 1;
-    return field_0x468->UnknownVirtualSlot3(200, 0, 0x3f, 0) != 0;
+    return inputMap->UnknownVirtualSlot3(200, 0, 0x3f, 0) != 0;
 }
 
 int Vehicle::UnknownVirtualSlot83(VehicleWheel* wheel)
 {
-    if (field_0x468->UnknownVirtualSlot3(1, 2, 0x3f, 0)
-        && !UnknownVirtualSlot77(wheel->field_0x29c == 0.0f))
+    if (inputMap->UnknownVirtualSlot3(1, 2, 0x3f, 0)
+        && !UnknownVirtualSlot77(wheel->rampLevel == 0.0f))
         return 1;
-    return field_0x468->UnknownVirtualSlot3(0xd0, 0, 0x3f, 0) != 0;
+    return inputMap->UnknownVirtualSlot3(0xd0, 0, 0x3f, 0) != 0;
 }
 
 // Tier 3 reading: re-seats the collision object (0x00435fb0 before and after), removes the
 // contact offset from the position when one is recorded, and clears the dirty byte at 0x138.
 int Vehicle::UnknownVirtualSlot28(int arg)
 {
-    field_0x128->Fn_00435fb0();
-    int wasSet = field_0x444 != 0;
-    field_0x128->Fn_00438e70();
-    if (field_0x128->field_0x58) {
-        field_0x0c -= *(const Vec3*)field_0x128->field_0x5c;
-        d3d_field_0x1a0->SetPosition(field_0x0c);
-        field_0x128->Fn_00435fb0();
-        if (field_0x444 && !wasSet) {
+    collisionObject->Fn_00435fb0();
+    int wasSet = crashState != 0;
+    collisionObject->Fn_00438e70();
+    if (collisionObject->hasContact) {
+        position -= *(const Vec3*)collisionObject->contactRecord;
+        modelNode->SetPosition(position);
+        collisionObject->Fn_00435fb0();
+        if (crashState && !wasSet) {
             arg = 1;
-            field_0x1e0 = 0.0f;
+            stepRemainder = 0.0f;
         }
     }
     if (field_0x138) {
@@ -1435,14 +1435,14 @@ int Vehicle::UnknownVirtualSlot28(int arg)
 int Vehicle::UnknownVirtualSlot39(float dt)
 {
     int code;
-    if (field_0x109) {
+    if (respawnPending) {
         UnknownVirtualSlot67();
-        field_0x0c = field_0x10c;
-        d3d_field_0x1a0->SetPosition(field_0x0c);
+        position = respawnPosition;
+        modelNode->SetPosition(position);
         return 1;
     }
-    if (UnknownVirtualSlot68(&code) && field_0x468
-        && field_0x468->field_0x34->UnknownVirtualSlot5(code, 0x3f, 0)) {
+    if (UnknownVirtualSlot68(&code) && inputMap
+        && inputMap->keyTable->UnknownVirtualSlot5(code, 0x3f, 0)) {
         UnknownVirtualSlot67();
         return 2;
     }
@@ -1454,29 +1454,29 @@ int Vehicle::UnknownVirtualSlot39(float dt)
 // writes the 0x504 vector (cubed lean for axis kinds 2 and 3).
 void Vehicle::UnknownVirtualSlot63(float dt)
 {
-    if (field_0x46c && field_0x500) {
-        float v = field_0x500->field_0x24;
+    if (inputDevice && throttleAxis) {
+        float v = throttleAxis->axisValue;
         if (v > 0.2f)
-            field_0x470 = v;
+            throttleInput = v;
         else
-            field_0x470 = 0.0f;
+            throttleInput = 0.0f;
     } else {
-        field_0x470 = -1.0f;
+        throttleInput = -1.0f;
     }
-    field_0x504.y = -field_0x4fc->field_0x24;
-    field_0x474 = -field_0x4f8->field_0x24;
-    VehicleAxisSource* src = field_0x4f8->field_0x00;
+    controlInput.y = -leanAxis->axisValue;
+    steerInput = -steerAxis->axisValue;
+    VehicleAxisSource* src = steerAxis->axisSource;
     // Retail never sets eax on any path, so the slot returns void (KrustyBike's override
     // likewise only calls through).
     if (src && !src->Method_004897E0(4)
-        && (field_0x4f8->field_0x00->field_0x0c == 2 || field_0x4f8->field_0x00->field_0x0c == 3)) {
-        float v = field_0x474;
+        && (steerAxis->axisSource->kindCode == 2 || steerAxis->axisSource->kindCode == 3)) {
+        float v = steerInput;
         float sq = v * v;
-        field_0x504.z = 0.0f;
-        field_0x504.x = sq * field_0x474;
+        controlInput.z = 0.0f;
+        controlInput.x = sq * steerInput;
     } else {
-        field_0x504.z = 0.0f;
-        field_0x504.x = field_0x474;
+        controlInput.z = 0.0f;
+        controlInput.x = steerInput;
     }
 }
 
@@ -1485,32 +1485,32 @@ void Vehicle::UnknownVirtualSlot63(float dt)
 // identity-like values and pushed to the scene node.
 void Vehicle::UnknownVirtualSlot36()
 {
-    if (field_0x88.x == 0.0f && field_0x88.z == 0.0f) {
-        float s = field_0x88.y >= 0.0f ? -1.0f : 1.0f;
-        field_0x88 = s * field_0x94;
+    if (bodyForward.x == 0.0f && bodyForward.z == 0.0f) {
+        float s = bodyForward.y >= 0.0f ? -1.0f : 1.0f;
+        bodyForward = s * bodyUp;
     }
-    field_0x94 = g_VehZeroVec3_005778c8;
-    field_0x88.y = 0.0f;
+    bodyUp = g_VehZeroVec3_005778c8;
+    bodyForward.y = 0.0f;
     UnknownVirtualSlot35(1, 0);
     UnknownVirtualSlot34();
-    field_0x3c = 1.0f;
-    field_0x44 = 1.0f;
-    field_0x2c = 0.0f;
-    field_0x30 = 0.0f;
-    field_0x38 = 0.0f;
-    field_0x40 = 0.0f;
-    field_0xa0 = field_0x88;
-    field_0xac = field_0x94;
-    field_0x50 = field_0x34;
-    field_0x4c = field_0x30;
-    field_0x48 = field_0x2c;
-    field_0x54 = field_0x38;
-    field_0x58 = field_0x3c;
-    field_0x60 = field_0x44;
-    field_0x5c = field_0x40;
-    field_0x47c->field_0x00->SetPosition(g_VehZeroVec3_005778a8);
-    ((VehSceneNodeView*)field_0x47c->field_0x00)->Method_004FBD70(&field_0x88, &field_0x94, 0, 1);
-    field_0x47c->Method_00504E20(0, field_0x42c);
+    bodyCosRoll = 1.0f;
+    bodyCosPitch = 1.0f;
+    bodyRoll = 0.0f;
+    bodyPitch = 0.0f;
+    bodySinRoll = 0.0f;
+    bodySinPitch = 0.0f;
+    savedForward = bodyForward;
+    savedUp = bodyUp;
+    savedYaw = bodyYaw;
+    savedPitch = bodyPitch;
+    savedRoll = bodyRoll;
+    savedSinRoll = bodySinRoll;
+    savedCosRoll = bodyCosRoll;
+    savedCosPitch = bodyCosPitch;
+    savedSinPitch = bodySinPitch;
+    steerState->steerNode->SetPosition(g_VehZeroVec3_005778a8);
+    ((VehSceneNodeView*)steerState->steerNode)->Method_004FBD70(&bodyForward, &bodyUp, 0, 1);
+    steerState->Method_00504E20(0, poseNode);
 }
 
 // Tier 3 reading: classifies the (field_0x504.y, field_0x474) input pair into one of eight
@@ -1518,25 +1518,25 @@ void Vehicle::UnknownVirtualSlot36()
 // the band +-0.52057 * |v| (0..7).
 int Vehicle::UnknownVirtualSlot88()
 {
-    float m2 = field_0x474 * field_0x474 + field_0x504.y * field_0x504.y;
+    float m2 = steerInput * steerInput + controlInput.y * controlInput.y;
     if (m2 > 0.25f) {
         float m = FastSqrt(m2) * 0.52057f;
-        if (field_0x504.y > m) {
-            if (field_0x474 > m)
+        if (controlInput.y > m) {
+            if (steerInput > m)
                 return 3;
-            if (-m > field_0x474)
+            if (-m > steerInput)
                 return 0;
             return 4;
         }
         float n = -m;
-        if (field_0x504.y < n) {
-            if (field_0x474 > m)
+        if (controlInput.y < n) {
+            if (steerInput > m)
                 return 2;
-            if (field_0x474 < n)
+            if (steerInput < n)
                 return 1;
             return 6;
         }
-        if (field_0x474 > 0.0f)
+        if (steerInput > 0.0f)
             return 7;
         return 5;
     }
@@ -1550,8 +1550,8 @@ float Vehicle::UnknownVirtualSlot75()
 {
     Vec3 sum = g_VehZeroVec3;
     int n = 0;
-    for (int i = 0; i < field_0x544; i++) {
-        VehicleWheel* w = field_0x53c[i];
+    for (int i = 0; i < wheelCount; i++) {
+        VehicleWheel* w = wheelList[i];
         if (!w->field_0x1c0) {
             sum += w->field_0x230;
             n++;
@@ -1570,7 +1570,7 @@ float Vehicle::UnknownVirtualSlot75()
     } else if (n == 0) {
         return 1.0f;
     }
-    float d = sum.y * field_0xa0.y + sum.x * field_0xa0.x + sum.z * field_0xa0.z;
+    float d = sum.y * savedForward.y + sum.x * savedForward.x + sum.z * savedForward.z;
     if (d < 0.0f)
         d = -d;
     return d;
@@ -1579,10 +1579,10 @@ float Vehicle::UnknownVirtualSlot75()
 // 0x00528400: average of the wheels' contact normals (+0xe4), normalised (tier 3 reading).
 Vec3* Vehicle::Method_00528400(Vec3* out)
 {
-    Vec3 sum = field_0x53c[0]->field_0xe4;
-    int n = field_0x544;
+    Vec3 sum = wheelList[0]->groundNormal;
+    int n = wheelCount;
     for (int i = 1; i < n; i++)
-        sum += field_0x53c[i]->field_0xe4;
+        sum += wheelList[i]->groundNormal;
     float k = 1.0f / n;
     Vec3 avg = sum * k;
     *out = VehNormalized(avg);
@@ -1593,21 +1593,21 @@ Vec3* Vehicle::Method_00528400(Vec3* out)
 // field_0x4a8; with no contacts the first wheel's normal is returned unchanged.
 Vec3* Vehicle::UnknownVirtualSlot54(Vec3* out)
 {
-    int count = field_0x4a8;
+    int count = wheelsInContact;
     if (count == 0) {
-        *out = field_0x53c[0]->field_0xe4;
+        *out = wheelList[0]->groundNormal;
         return out;
     }
     Vec3 sum;
     int first = 1;
-    for (int i = 0; i < field_0x544; i++) {
-        VehicleWheel* w = field_0x53c[i];
-        if (w->field_0x260) {
+    for (int i = 0; i < wheelCount; i++) {
+        VehicleWheel* w = wheelList[i];
+        if (w->inContact) {
             if (first) {
-                sum = w->field_0xe4;
+                sum = w->groundNormal;
                 first = 0;
             } else {
-                sum += w->field_0xe4;
+                sum += w->groundNormal;
             }
         }
     }
@@ -1626,45 +1626,45 @@ void Vehicle::UnknownVirtualSlot1(float value)
     SoultreePhysicsCharacter::UnknownVirtualSlot1(value);
     field_0x4e8 = 0.0f;
     field_0x434 = 0.0f;
-    field_0x440 = 1;
-    for (int i = 0; i < field_0x130; i++) {
-        VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
+    movingForward = 1;
+    for (int i = 0; i < collisionPointCount; i++) {
+        VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
         if (c->field_0x04 != 0)
-            c->field_0xa4 = 0;
+            c->contactActive = 0;
     }
-    field_0x444 = 0;
-    field_0x454 = 0.0f;
-    field_0x5b4 = 0;
+    crashState = 0;
+    crashTimer = 0.0f;
+    prevCrashState = 0;
     field_0x5a0 = 0;
-    field_0x59c = 0;
-    field_0x588 = 0.0f;
-    field_0x590 = 0.0f;
-    field_0x594 = 0.0f;
-    field_0x4c0 = g_VehZeroVec3;
-    field_0x4e4 = 0.0f;
-    field_0x43c = 0.0f;
-    field_0x4bc = 0.0f;
-    field_0x4ac = 0.0f;
-    field_0x4b0 = 1.0f;
+    landingLatched = 0;
+    smoothedVerticalAccel = 0.0f;
+    smoothedForwardAccel = 0.0f;
+    prevLocalForwardVelocity = 0.0f;
+    tiltAxisLocal = g_VehZeroVec3;
+    leanError = 0.0f;
+    turnRate = 0.0f;
+    steerRate = 0.0f;
+    leanAngle = 0.0f;
+    leanCos = 1.0f;
     field_0x4b4 = 1.0f;
-    field_0x4e0 = 0.0f;
-    field_0x570 = 0;
+    targetLeanAngle = 0.0f;
+    contactTotal = 0;
     field_0x520 = 1;
-    field_0x470 = 0.0f;
-    field_0x510 = g_VehZeroVec3;
+    throttleInput = 0.0f;
+    prevControlInput = g_VehZeroVec3;
     field_0x478 = false;
     field_0x479 = false;
     field_0x47a = false;
-    VehicleSpeedState* s = field_0x480;
+    VehicleSpeedState* s = engineState;
     if (s) {
-        s->field_0x10 = 0;
+        s->gear = 0;
         s->field_0x04 = 0;
         s->field_0x84 = 0;
         s->field_0x00 = 0.0f;
-        s->field_0x0c = 0.0f;
+        s->gearTimer = 0.0f;
         s->field_0x08 = 1;
         float unit = (float)rand() * 3.05175781e-05f;
-        s->field_0x78 = unit * s->field_0x60[s->field_0x10] + s->field_0x30[s->field_0x10].a;
+        s->randomStart = unit * s->field_0x60[s->gear] + s->field_0x30[s->gear].a;
     }
     Method_00525C60();
     Method_00525A90();
@@ -1688,15 +1688,15 @@ static inline float VehLengthAcc(const Vec3& v)
 void Vehicle::UnknownVirtualSlot3(const Vec3* a, const Vec3* b, const Vec3* c, const Vec3* d,
                                   int e, int f, float* g)
 {
-    if (field_0x444)
-        Fn_500220(0.1f, field_0x24, d3d_field_0x1a0, a, b, c, &field_0xf0, d, &field_0xd8,
-                  &field_0x64, g, 0);
+    if (crashState)
+        Fn_500220(0.1f, invMass, modelNode, a, b, c, &shapeInvInertia, d, &angularVelocity,
+                  &velocity, g, 0);
     else
-        Fn_500220(field_0x14c, field_0x24, d3d_field_0x1a0, a, b, c, &field_0xe4, d, &field_0xd8,
-                  &field_0x64, g, f);
-    field_0xbc = VehLengthAcc(field_0x64);
+        Fn_500220(restitution, invMass, modelNode, a, b, c, &invInertia, d, &angularVelocity,
+                  &velocity, g, f);
+    linearSpeed = VehLengthAcc(velocity);
     if (e != 0x67)
-        field_0xcc = d3d_field_0x1a0->LocalToWorldDirection(field_0xd8);
+        worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
 }
 
 // Tier 3 reading: places the vehicle at a (with its y forced to -1000 when e is zero), takes
@@ -1706,31 +1706,31 @@ int Vehicle::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c, c
                                   int e, float f)
 {
     UnknownVirtualSlot1(f);
-    field_0x88 = *b;
-    field_0x94 = *c;
+    bodyForward = *b;
+    bodyUp = *c;
     float y;
     if (e)
         y = a->y;
     else
         y = -1000.0f;
-    d3d_field_0x1a0->SetPosition(a->x, y, a->z);
-    d3d_field_0x1a0->GetPosition(&field_0x0c);
+    modelNode->SetPosition(a->x, y, a->z);
+    modelNode->GetPosition(&position);
     UnknownVirtualSlot36();
     Method_00528EB0();
     UnknownVirtualSlot58((Vec3*)d, e);
     Method_00528EB0();
     UnknownVirtualSlot58((Vec3*)d, e);
-    for (int i = 0; i < field_0x544; i++) {
-        VehicleWheel* w = field_0x53c[i];
-        w->field_0x1bc->GetPositionIn(0, &w->field_0x200);
+    for (int i = 0; i < wheelCount; i++) {
+        VehicleWheel* w = wheelList[i];
+        w->sceneNode->GetPositionIn(0, &w->nodePosition);
     }
-    field_0x218->GetPositionIn(0, &field_0x18);
+    centerNode->GetPositionIn(0, &centerOfMass);
     Method_0x004a8b00();
-    if (field_0x128)
-        field_0x128->Fn_00435fe0();
-    field_0x20d = 1;
-    field_0x20c = 1;
-    field_0x109 = 0;
+    if (collisionObject)
+        collisionObject->Fn_00435fe0();
+    justReset = 1;
+    attachmentResetPending = 1;
+    respawnPending = 0;
     int flag = 1;
     if (UnknownVirtualSlot45() == 0.0f)
         flag = 0;
@@ -1747,7 +1747,7 @@ static inline float VehLenSq(const Vec3& v)
 // direction in field_0x1ac and rotates the scene node about field_0x194 by |v| * dt.
 void Vehicle::UnknownVirtualSlot95()
 {
-    float lenSq = SquareMagnitude(field_0xd8);
+    float lenSq = SquareMagnitude(angularVelocity);
     float len;
     if (lenSq == 0.0f)
         len = 0.0f;
@@ -1755,19 +1755,19 @@ void Vehicle::UnknownVirtualSlot95()
         len = 1.0f;
     else
         len = 1.0f / FastInvSqrt(lenSq);
-    float mag = len * field_0x13c;
+    float mag = len * stepTime;
     if (_finite(mag) && lenSq >= 0.0001f) {
-        field_0x1ac = field_0xd8;
-        float sq = VehLenSq(field_0x1ac);
+        scratchVector = angularVelocity;
+        float sq = VehLenSq(scratchVector);
         if (sq == 0.0f) {
-            field_0x1ac = g_VehZeroVec3;
+            scratchVector = g_VehZeroVec3;
         } else {
             float s = FastInvSqrt(sq);
-            field_0x1ac.x = s * field_0x1ac.x;
-            field_0x1ac.y = s * field_0x1ac.y;
-            field_0x1ac.z = s * field_0x1ac.z;
+            scratchVector.x = s * scratchVector.x;
+            scratchVector.y = s * scratchVector.y;
+            scratchVector.z = s * scratchVector.z;
         }
-        d3d_field_0x1a0->RotateAboutPoint(field_0x194, field_0x1ac, lenSq);
+        modelNode->RotateAboutPoint(rotationPivot, scratchVector, lenSq);
     }
 }
 
@@ -1779,15 +1779,15 @@ void Vehicle::UnknownVirtualSlot95()
 int Vehicle::Method_00526830()
 {
     int crashed = Method_00478FE0();
-    field_0x444 = crashed;
+    crashState = crashed;
     if (crashed) {
-        Vec3 heading(field_0x88.x, 0.0f, field_0x88.z);
+        Vec3 heading(bodyForward.x, 0.0f, bodyForward.z);
         field_0x430 = 0;
         field_0x431 = 0;
         field_0x433 = 0;
         field_0x574 = heading;
-        field_0x464 = field_0xac.y < 0.0f;
-        field_0x45c = field_0x50;
+        field_0x464 = savedUp.y < 0.0f;
+        field_0x45c = savedYaw;
         field_0x138 = 1;
     }
     return crashed;
@@ -1796,17 +1796,17 @@ int Vehicle::Method_00526830()
 // 0x00525c60: runs virtual slot 0 of every object in the two owned arrays.
 void Vehicle::Method_00525C60()
 {
-    for (int i = 0; i < field_0x568; i++)
-        field_0x560[i]->UnknownVirtualSlot0();
-    for (int j = 0; j < field_0x55c; j++)
-        field_0x554[j]->UnknownVirtualSlot0();
+    for (int i = 0; i < earlyTickerCount; i++)
+        earlyTickers[i]->UnknownVirtualSlot0();
+    for (int j = 0; j < lateTickerCount; j++)
+        lateTickers[j]->UnknownVirtualSlot0();
 }
 
 int Vehicle::Method_00525CB0(VehicleTicker* t)
 {
-    if (field_0x568 < field_0x564) {
-        field_0x560[field_0x568] = t;
-        field_0x568++;
+    if (earlyTickerCount < earlyTickerCapacity) {
+        earlyTickers[earlyTickerCount] = t;
+        earlyTickerCount++;
         return 1;
     }
     return 0;
@@ -1814,9 +1814,9 @@ int Vehicle::Method_00525CB0(VehicleTicker* t)
 
 int Vehicle::Method_00525CF0(VehicleTicker* t)
 {
-    if (field_0x55c < field_0x558) {
-        field_0x554[field_0x55c] = t;
-        field_0x55c++;
+    if (lateTickerCount < lateTickerCapacity) {
+        lateTickers[lateTickerCount] = t;
+        lateTickerCount++;
         return 1;
     }
     return 0;
@@ -1826,16 +1826,16 @@ int Vehicle::Method_00525CF0(VehicleTicker* t)
 // its collision point (wheel + 0xb8) with the owner's contact array.
 int Vehicle::Method_00525D30(VehicleWheel* wheel, int a2, int a3, int a4, VehicleWheelAux* aux)
 {
-    if (field_0x544 < field_0x540) {
-        wheel->field_0x2b0 = a3;
-        wheel->field_0x2ac = a4;
+    if (wheelCount < wheelCapacity) {
+        wheel->primaryAux = a3;
+        wheel->secondaryAux = a4;
         wheel->field_0x2a8 = aux;
-        field_0x53c[field_0x544] = wheel;
+        wheelList[wheelCount] = wheel;
         void* contact = wheel ? (char*)wheel + 0xb8 : 0;
-        VehAddContact(field_0x1c8, field_0x12c, a2, &field_0x130, contact);
-        field_0x544++;
+        VehAddContact(collisionPointCapacity, collisionPoints, a2, &collisionPointCount, contact);
+        wheelCount++;
         if (aux)
-            field_0x56c++;
+            auxWheelCount++;
         return 1;
     }
     return 0;
@@ -1844,10 +1844,10 @@ int Vehicle::Method_00525D30(VehicleWheel* wheel, int a2, int a3, int a4, Vehicl
 // 0x005293e0: for every wheel that has an attachment value, apply its load weight.
 void Vehicle::Method_005293E0(float* speed)
 {
-    for (int i = 0; i < field_0x544; i++) {
-        VehicleWheel* wheel = field_0x53c[i];
-        if (wheel->field_0x268 && (wheel->field_0x2b0 || wheel->field_0x2ac))
-            VehWheelApply(wheel->field_0x158, field_0x4dc, field_0x1e8, speed);
+    for (int i = 0; i < wheelCount; i++) {
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->field_0x268 && (wheel->primaryAux || wheel->secondaryAux))
+            VehWheelApply(wheel->loadWeight, field_0x4dc, lastStepTime, speed);
     }
 }
 
@@ -1864,26 +1864,26 @@ int __cdecl VehVec3Equal(const Vec3* a, const Vec3* b)
 int Vehicle::Method_00529280()
 {
     int first = 0;
-    for (int i = 0; i < field_0x544; i++) {
-        int answer = UnknownVirtualSlot83(field_0x53c[i]);
+    for (int i = 0; i < wheelCount; i++) {
+        int answer = UnknownVirtualSlot83(wheelList[i]);
         if (!first)
             first = answer;
-        float step = field_0x13c;
-        VehicleWheel* wheel = field_0x53c[i];
+        float step = stepTime;
+        VehicleWheel* wheel = wheelList[i];
         if (answer) {
-            if (wheel->field_0x29c < 1.0f) {
-                float level = wheel->field_0x29c + step * wheel->field_0x1dc;
-                wheel->field_0x29c = level;
+            if (wheel->rampLevel < 1.0f) {
+                float level = wheel->rampLevel + step * wheel->levelRiseRate;
+                wheel->rampLevel = level;
                 if (level >= 1.0f)
                     level = 1.0f;
-                wheel->field_0x29c = level;
+                wheel->rampLevel = level;
             }
-        } else if (wheel->field_0x29c > 0.0f) {
-            float level = wheel->field_0x29c - step * wheel->field_0x1e0;
-            wheel->field_0x29c = level;
+        } else if (wheel->rampLevel > 0.0f) {
+            float level = wheel->rampLevel - step * wheel->levelFallRate;
+            wheel->rampLevel = level;
             if (level <= 0.0f)
                 level = 0.0f;
-            wheel->field_0x29c = level;
+            wheel->rampLevel = level;
         }
     }
     return first;
@@ -1894,18 +1894,18 @@ void Vehicle::Method_00529A20()
 {
     int i = 0;
     field_0x5a0 = 0;
-    for (; i < field_0x544; i++) {
-        VehicleWheel* wheel = field_0x53c[i];
-        if (wheel->field_0x260) {
-            wheel->Method_005135F0(&field_0x18, field_0xcc, field_0x64, field_0xbc, &field_0x434, &field_0x440);
-            wheel->Method_00513C70(field_0x1e8, (unsigned char)field_0x1d0, field_0x444, field_0xbc, &field_0x64, &field_0xa0);
+    for (; i < wheelCount; i++) {
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->inContact) {
+            wheel->Method_005135F0(&centerOfMass, worldAngularVelocity, velocity, linearSpeed, &field_0x434, &movingForward);
+            wheel->Method_00513C70(lastStepTime, (unsigned char)pointsTouching, crashState, linearSpeed, &velocity, &savedForward);
             if (wheel->field_0x15c)
                 field_0x5a0 = 1;
-        } else if (wheel->field_0x2b0) {
-            VehicleWheelAux* aux = (VehicleWheelAux*)wheel->field_0x2b0;
+        } else if (wheel->primaryAux) {
+            VehicleWheelAux* aux = (VehicleWheelAux*)wheel->primaryAux;
             aux->field_0x8c = aux->field_0x90;
         } else {
-            VehicleWheelAux* aux = (VehicleWheelAux*)wheel->field_0x2ac;
+            VehicleWheelAux* aux = (VehicleWheelAux*)wheel->secondaryAux;
             if (aux)
                 aux->field_0x8c = aux->field_0x90;
         }
@@ -1915,10 +1915,10 @@ void Vehicle::Method_00529A20()
 // 0x00529c20: folds each in-contact wheel's contact vectors into the two accumulators.
 void Vehicle::Method_00529C20(Vec3* up, Vec3* zero, float d)
 {
-    if (!field_0x108) {
-        for (int i = 0; i < field_0x544; i++) {
-            VehicleWheel* wheel = field_0x53c[i];
-            if (wheel->field_0x260) {
+    if (!airborne) {
+        for (int i = 0; i < wheelCount; i++) {
+            VehicleWheel* wheel = wheelList[i];
+            if (wheel->inContact) {
                 if (wheel->field_0x16c == 2) {
                     zero->x = d * zero->x;
                     zero->y = d * zero->y;
@@ -1930,10 +1930,10 @@ void Vehicle::Method_00529C20(Vec3* up, Vec3* zero, float d)
                     Vec3* force = &wheel->field_0x248;
                     up->y = force->y + up->y;
                     up->z = force->z + up->z;
-                    Vec3* world = &field_0x1b8;
-                    Vec3* local = &field_0x1ac;
+                    Vec3* world = &scratchVector2;
+                    Vec3* local = &scratchVector;
                     *world = UnknownVirtualSlot76(&wheel->field_0xf0, force);
-                    *local = d3d_field_0x1a0->WorldToLocalDirection(*world);
+                    *local = modelNode->WorldToLocalDirection(*world);
                     zero->x = zero->x + local->x;
                     zero->y = local->y + zero->y;
                     zero->z = local->z + zero->z;
@@ -1946,8 +1946,8 @@ void Vehicle::Method_00529C20(Vec3* up, Vec3* zero, float d)
 // 0x00525a90: resets every wheel's contact state and vectors to defaults.
 void Vehicle::Method_00525A90()
 {
-    for (int i = 0; i < field_0x544; i++) {
-        VehicleWheel* wheel = field_0x53c[i];
+    for (int i = 0; i < wheelCount; i++) {
+        VehicleWheel* wheel = wheelList[i];
         wheel->field_0x2a4 = 1.0f;
         wheel->field_0x1e8 = g_VehZeroVec3;
         wheel->field_0x248 = g_VehZeroVec3;
@@ -1956,21 +1956,21 @@ void Vehicle::Method_00525A90()
         wheel->field_0x2b8 = 1.0f;
         wheel->field_0x280.z = 1.0f;
         wheel->field_0x2bc = 0.0f;
-        wheel->field_0x29c = 0.0f;
+        wheel->rampLevel = 0.0f;
         wheel->field_0x290 = 0.0f;
         wheel->field_0x278 = 0;
         wheel->field_0x27c = 0;
-        wheel->field_0x260 = 0;
+        wheel->inContact = 0;
         wheel->field_0x28c = 0.0f;
         wheel->field_0x26c = 0;
-        wheel->field_0x1bc->GetPositionIn(0, &wheel->field_0x200);
+        wheel->sceneNode->GetPositionIn(0, &wheel->nodePosition);
         wheel->field_0x16c = 0;
         wheel->field_0x108 = g_VehZeroVec3;
         wheel->field_0x114 = g_VehZeroVec3;
         wheel->field_0x150 = -999.0f;
         wheel->field_0x148 = 0;
         wheel->field_0x14c = 0;
-        wheel->field_0xfc = g_VehZeroVec3;
+        wheel->appliedShare = g_VehZeroVec3;
         wheel->field_0x15c = 0;
         wheel->field_0x13c = 0.0f;
         wheel->field_0x130 = g_VehZeroVec3;

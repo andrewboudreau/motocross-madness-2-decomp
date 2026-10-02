@@ -32,14 +32,14 @@ void CollisionObject::SetSphereShape(CollisionVec3 center, float radius)
 {
     FreeShape();
     CollisionSphereShape* s = (CollisionSphereShape*)operator new(0x5c, __FILE__, 0x15b);
-    field_0x50 = 4;
-    field_0x54 = s;
+    shapeType = 4;
+    shape = s;
     s->center = center;
     s->radius = radius;
     s->radiusSquared = radius * radius;
-    s->field_0x14 = 1.0f;
-    s->field_0x18 = 1.0f;
-    SetIdentity(&s->field_0x1c);
+    s->radiusScale = 1.0f;
+    s->centerScale = 1.0f;
+    SetIdentity(&s->transform);
 }
 
 // 0x00432a20
@@ -47,15 +47,15 @@ void CollisionObject::SetCapsuleShape(CollisionVec3 p0, CollisionVec3 p1, float 
 {
     FreeShape();
     CollisionCapsuleShape* s = (CollisionCapsuleShape*)operator new(0x68, __FILE__, 0x16e);
-    field_0x50 = 3;
-    field_0x54 = s;
+    shapeType = 3;
+    shape = s;
     s->p0 = p0;
     s->radiusSquared = radius * radius;
-    s->field_0x20 = 1.0f;
-    s->field_0x24 = 1.0f;
+    s->radiusScale = 1.0f;
+    s->endpointScale = 1.0f;
     s->p1 = p1;
     s->radius = radius;
-    SetIdentity(&s->field_0x28);
+    SetIdentity(&s->transform);
 }
 
 // 0x00432ab0
@@ -63,8 +63,8 @@ void CollisionObject::Fn_00432ab0(int count, void* points)
 {
     FreeShape();
     CollisionMeshShapeBlock* s = (CollisionMeshShapeBlock*)operator new(0x48, __FILE__, 0x183);
-    field_0x50 = 2;
-    field_0x54 = s;
+    shapeType = 2;
+    shape = s;
     s->field_0x00 = 0;
     s->field_0x04 = operator new(0x24, __FILE__, 0x18a);
     SetIdentity(&s->field_0x08);
@@ -75,21 +75,21 @@ void CollisionObject::Fn_00432ab0(int count, void* points)
 void CollisionObject::Fn_00432120(int a)
 {
     if (g_pQuadTree) {
-        int wasSet = field_0x80;
+        int wasSet = useBroadphase;
         int enable = a;
         if (wasSet) {
             if (!enable) {
-                g_pQuadTree->Remove(this, field_0x84);
-                field_0x80 = enable;
+                g_pQuadTree->Remove(this, quadtreeCell);
+                useBroadphase = enable;
                 return;
             }
             Fn_00436080();
         } else if (enable) {
             Fn_00436080();
         }
-        field_0x80 = enable;
+        useBroadphase = enable;
     } else {
-        field_0x80 = a;
+        useBroadphase = a;
     }
 }
 
@@ -97,7 +97,7 @@ void CollisionObject::Fn_00432120(int a)
 void CollisionObject::Fn_00435fb0()
 {
     Fn_00435f10();
-    if (g_pQuadTree && field_0x80)
+    if (g_pQuadTree && useBroadphase)
         Fn_00436080();
 }
 
@@ -115,9 +115,9 @@ void CollisionObject::Fn_00436080()
     CollisionVec3 minBounds;
     GetWorldBounds(&minBounds, &maxBounds);
     unsigned int code = g_pQuadTree->ComputeCode(minBounds.x, minBounds.z, maxBounds.x, maxBounds.z);
-    if (code != (unsigned int)field_0x84) {
-        g_pQuadTree->Remove(this, field_0x84);
-        field_0x84 = code;
+    if (code != (unsigned int)quadtreeCell) {
+        g_pQuadTree->Remove(this, quadtreeCell);
+        quadtreeCell = code;
         g_pQuadTree->Insert(this, code, minBounds.y, maxBounds.y);
     }
 }
@@ -125,41 +125,41 @@ void CollisionObject::Fn_00436080()
 // 0x00439400
 void CollisionObject::SetField_0x74(int v)
 {
-    field_0x74 = v;
+    ignoreListMode = v;
 }
 
 // 0x004394d0
 void CollisionObject::SetOwner(void* owner, int tag)
 {
-    field_0x60 = owner;
-    field_0x64 = tag;
+    ownerObject = owner;
+    ownerType = tag;
 }
 
 // 0x00439410
 void CollisionObject::AddIgnoredOwner(void* owner)
 {
     int i;
-    for (i = 0; i < field_0x7c; i++) {
-        if (((void**)field_0x78)[i] == owner)
+    for (i = 0; i < ignoreCount; i++) {
+        if (((void**)ignoreList)[i] == owner)
             return;
     }
-    for (i = 0; i < field_0x7c; i++) {
-        if (((void**)field_0x78)[i] == 0) {
-            ((void**)field_0x78)[i] = owner;
+    for (i = 0; i < ignoreCount; i++) {
+        if (((void**)ignoreList)[i] == 0) {
+            ((void**)ignoreList)[i] = owner;
             return;
         }
     }
-    field_0x78 = (int)DebugRealloc((void*)field_0x78, (field_0x7c + 1) * 4, __FILE__, 0x843);
-    ((void**)field_0x78)[field_0x7c] = owner;
-    field_0x7c++;
+    ignoreList = (int)DebugRealloc((void*)ignoreList, (ignoreCount + 1) * 4, __FILE__, 0x843);
+    ((void**)ignoreList)[ignoreCount] = owner;
+    ignoreCount++;
 }
 
 // 0x00439490
 void CollisionObject::RemoveIgnoredOwner(void* owner)
 {
-    for (int i = 0; i < field_0x7c; i++) {
-        if (((void**)field_0x78)[i] == owner) {
-            ((void**)field_0x78)[i] = 0;
+    for (int i = 0; i < ignoreCount; i++) {
+        if (((void**)ignoreList)[i] == owner) {
+            ((void**)ignoreList)[i] = 0;
             return;
         }
     }
@@ -172,10 +172,10 @@ struct MeshPositionView { char pad[0x38]; CollisionVec3 position; };
 // 0x00436000
 void CollisionObject::GetShapePosition(CollisionVec3* out)
 {
-    switch (field_0x50) {
+    switch (shapeType) {
     case 0:
         {
-            HullPositionView* v = (HullPositionView*)field_0x54;
+            HullPositionView* v = (HullPositionView*)shape;
             out->x = v->position.x;
             out->y = v->position.y;
             out->z = v->position.z;
@@ -183,7 +183,7 @@ void CollisionObject::GetShapePosition(CollisionVec3* out)
         break;
     case 1:
         {
-            ModelPositionView* v = (ModelPositionView*)field_0x54;
+            ModelPositionView* v = (ModelPositionView*)shape;
             out->x = v->position.x;
             out->y = v->position.y;
             out->z = v->position.z;
@@ -191,7 +191,7 @@ void CollisionObject::GetShapePosition(CollisionVec3* out)
         break;
     case 2:
         {
-            MeshPositionView* v = (MeshPositionView*)field_0x54;
+            MeshPositionView* v = (MeshPositionView*)shape;
             out->x = v->position.x;
             out->y = v->position.y;
             out->z = v->position.z;
@@ -210,17 +210,17 @@ struct MeshNodeView { CollisionSceneNode* node; };                      // mesh:
 void CollisionObject::Fn_00435f10()
 {
     Matrix4 m;
-    switch (field_0x50) {
+    switch (shapeType) {
     case 0:
-        ((HullNodeView*)field_0x54)->node->GetMatrixIn(0, &m);
+        ((HullNodeView*)shape)->node->GetMatrixIn(0, &m);
         SetTransform(&m);
         break;
     case 1:
-        ((ModelNodeView*)field_0x54)->node->GetMatrixIn(0, &m);
+        ((ModelNodeView*)shape)->node->GetMatrixIn(0, &m);
         SetTransform(&m);
         break;
     case 2:
-        ((MeshNodeView*)field_0x54)->node->GetMatrixIn(0, &m);
+        ((MeshNodeView*)shape)->node->GetMatrixIn(0, &m);
         SetTransform(&m);
         break;
     case 4:
@@ -237,16 +237,16 @@ int Fn_0043caa0(int code, int sub, void* event, int mask);
 int CollisionObject::GameObjectVirtualSlot23(int a, int b)
 {
     if (Fn_0043caa0(10, 0, (void*)a, 0x80)) {
-        field_0x90--;
-        if (field_0x90 < 0)
-            field_0x90 = 0;
+        debugTreeDepth--;
+        if (debugTreeDepth < 0)
+            debugTreeDepth = 0;
     }
     if (Fn_0043caa0(11, 0, (void*)a, 0x80))
-        field_0x90++;
+        debugTreeDepth++;
     if (Fn_0043caa0(0x2e, 0, (void*)a, 0x80)) {
-        field_0x94++;
-        if (field_0x94 > 7)
-            field_0x94 = 0;
+        debugDrawMode++;
+        if (debugDrawMode > 7)
+            debugDrawMode = 0;
     }
     return GameObject::GameObjectVirtualSlot23(a, b);
 }
@@ -258,37 +258,37 @@ void Fn_00439e00(CollisionBoxResult* record);    // sets g_CollisionBoxResult
 
 void CollisionObject::Fn_00434a10()
 {
-    field_0x58 = 0;
+    hasContact = 0;
     g_CollisionScratchCount = 0;
     g_CollisionScratchHits = 0;
-    switch (field_0x50) {
+    switch (shapeType) {
     case 0: {
-        if (field_0x5c == 0)
-            field_0x5c = operator new(0x2c, __FILE__, 0x34b);
-        Fn_00439e00((CollisionBoxResult*)field_0x5c);
-        CollisionSweepQuery* q = (CollisionSweepQuery*)field_0x5c;
-        *(Vec3*)&q->field_0x00 = Vec3(0.0f, 0.0f, 0.0f);
-        *(Vec3*)&q->field_0x0c = Vec3(0.0f, 0.0f, 0.0f);
+        if (contactRecord == 0)
+            contactRecord = operator new(0x2c, __FILE__, 0x34b);
+        Fn_00439e00((CollisionBoxResult*)contactRecord);
+        CollisionSweepQuery* q = (CollisionSweepQuery*)contactRecord;
+        *(Vec3*)&q->contactOffset = Vec3(0.0f, 0.0f, 0.0f);
+        *(Vec3*)&q->contactNormal = Vec3(0.0f, 0.0f, 0.0f);
         q->contactCount = 0;
-        *(float*)&q->field_0x24 = 1.0f;
+        *(float*)&q->fraction = 1.0f;
         break;
     }
     case 1: {
-        if (field_0x5c == 0)
-            field_0x5c = operator new(0x2c, __FILE__, 0x35a);
-        Fn_00439e00((CollisionBoxResult*)field_0x5c);
-        CollisionSweepQuery* q = (CollisionSweepQuery*)field_0x5c;
-        *(Vec3*)&q->field_0x00 = Vec3(0.0f, 0.0f, 0.0f);
-        *(Vec3*)&q->field_0x0c = Vec3(0.0f, 0.0f, 0.0f);
+        if (contactRecord == 0)
+            contactRecord = operator new(0x2c, __FILE__, 0x35a);
+        Fn_00439e00((CollisionBoxResult*)contactRecord);
+        CollisionSweepQuery* q = (CollisionSweepQuery*)contactRecord;
+        *(Vec3*)&q->contactOffset = Vec3(0.0f, 0.0f, 0.0f);
+        *(Vec3*)&q->contactNormal = Vec3(0.0f, 0.0f, 0.0f);
         q->contactCount = 0;
-        *(float*)&q->field_0x24 = 1.0f;
+        *(float*)&q->fraction = 1.0f;
         break;
     }
     case 2: {
-        if (field_0x5c == 0)
-            field_0x5c = operator new(0x14, __FILE__, 0x369);
-        Fn_00439e00((CollisionBoxResult*)field_0x5c);
-        int* r = (int*)field_0x5c;
+        if (contactRecord == 0)
+            contactRecord = operator new(0x14, __FILE__, 0x369);
+        Fn_00439e00((CollisionBoxResult*)contactRecord);
+        int* r = (int*)contactRecord;
         r[1] = 0;
         *(float*)&r[0] = 1.0f;
         break;
@@ -310,11 +310,11 @@ static inline Vec3 ContactNormalized(const Vec3& v)
 
 void CollisionObject::Fn_00434bb0()
 {
-    if ((unsigned int)field_0x50 > 1)
+    if ((unsigned int)shapeType > 1)
         return;
-    CollisionSweepQuery* q = (CollisionSweepQuery*)field_0x5c;
-    field_0xa0 = q->contact;
-    Vec3* sum = (Vec3*)&q->field_0x0c;
+    CollisionSweepQuery* q = (CollisionSweepQuery*)contactRecord;
+    hitPoint = q->contact;
+    Vec3* sum = (Vec3*)&q->contactNormal;
     *sum = Vec3(0.0f, 0.0f, 0.0f);
     for (int i = g_CollisionScratchHits; i < g_CollisionScratchCount; i++) {
         sum->x += g_CollisionScratchPoints[i].x;
@@ -323,7 +323,7 @@ void CollisionObject::Fn_00434bb0()
     }
     Vec3 normal = ContactNormalized(*sum);
     *sum = normal;
-    *(Vec3*)&field_0xac = normal;
+    *(Vec3*)&hitNormal = normal;
     g_CollisionScratchHits = g_CollisionScratchCount;
 }
 
@@ -331,10 +331,10 @@ void CollisionObject::Fn_00434bb0()
 // the record, then pushes the record's contact offset out along its own direction by 0.075.
 void CollisionObject::Fn_00434cf0()
 {
-    if ((unsigned int)field_0x50 > 1)
+    if ((unsigned int)shapeType > 1)
         return;
-    CollisionSweepQuery* q = (CollisionSweepQuery*)field_0x5c;
-    Vec3* sum = (Vec3*)&q->field_0x0c;
+    CollisionSweepQuery* q = (CollisionSweepQuery*)contactRecord;
+    Vec3* sum = (Vec3*)&q->contactNormal;
     *sum = Vec3(0.0f, 0.0f, 0.0f);
     if (g_CollisionScratchCount > 0) {
         for (int i = 0; i < g_CollisionScratchCount; i++) {
@@ -344,7 +344,7 @@ void CollisionObject::Fn_00434cf0()
         }
         *sum = ContactNormalized(*sum);
     }
-    Vec3* offset = (Vec3*)&q->field_0x00;
+    Vec3* offset = (Vec3*)&q->contactOffset;
     Vec3 direction = ContactNormalized(*offset);
     Vec3 push = Vec3(direction.x * 0.075f, direction.y * 0.075f, direction.z * 0.075f);
     offset->x += push.x;
@@ -367,15 +367,15 @@ int CollisionObject::Fn_004392c0(CollisionObject* other)
     CollisionBoxBounds* boundsB;
     const Matrix4* xfB;
 
-    switch (field_0x50) {
+    switch (shapeType) {
     case 0: {
-        CollisionHullBody* hull = (CollisionHullBody*)field_0x54;
-        boundsA = hull->field_0x188;
-        xfA = &hull->field_0xc8;
+        CollisionHullBody* hull = (CollisionHullBody*)shape;
+        boundsA = hull->triangleTree;
+        xfA = &hull->bodyTransform;
         break;
     }
     case 1: {
-        CollisionModelBody* model = (CollisionModelBody*)field_0x54;
+        CollisionModelBody* model = (CollisionModelBody*)shape;
         modelBoundsA.center = model->center;
         modelBoundsA.halfExtents = model->halfExtents;
         boundsA = &modelBoundsA;
@@ -383,21 +383,21 @@ int CollisionObject::Fn_004392c0(CollisionObject* other)
         break;
     }
     case 2: {
-        CollisionMeshBody* mesh = (CollisionMeshBody*)field_0x54;
+        CollisionMeshBody* mesh = (CollisionMeshBody*)shape;
         boundsA = mesh->field_0x04;
         xfA = &mesh->field_0x08;
         break;
     }
     }
-    switch (other->field_0x50) {
+    switch (other->shapeType) {
     case 0: {
-        CollisionHullBody* hull = (CollisionHullBody*)other->field_0x54;
-        boundsB = hull->field_0x188;
-        xfB = &hull->field_0xc8;
+        CollisionHullBody* hull = (CollisionHullBody*)other->shape;
+        boundsB = hull->triangleTree;
+        xfB = &hull->bodyTransform;
         break;
     }
     case 1: {
-        CollisionModelBody* model = (CollisionModelBody*)other->field_0x54;
+        CollisionModelBody* model = (CollisionModelBody*)other->shape;
         modelBoundsB.center = model->center;
         modelBoundsB.halfExtents = model->halfExtents;
         boundsB = &modelBoundsB;
@@ -405,7 +405,7 @@ int CollisionObject::Fn_004392c0(CollisionObject* other)
         break;
     }
     case 2: {
-        CollisionMeshBody* mesh = (CollisionMeshBody*)other->field_0x54;
+        CollisionMeshBody* mesh = (CollisionMeshBody*)other->shape;
         boundsB = mesh->field_0x04;
         xfB = &mesh->field_0x08;
         break;

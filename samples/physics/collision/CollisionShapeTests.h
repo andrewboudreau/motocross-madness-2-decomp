@@ -29,17 +29,17 @@ struct CollisionBoxBounds {
 // +0x108, +0x148 (six 0x40-byte slots); the tests use +0x48 as the current transform and
 // +0xc8 / +0x108 as history.  field_0x00 is a mode flag selecting the swept variant.
 struct CollisionHullBody {
-    int field_0x00;                // nonzero: use the swept/matrix-history test
-    void* field_0x04;              // scene node; 0x004fc9a0 reads its world position
-    Matrix4 field_0x08;
-    Matrix4 field_0x48;
-    Matrix4 field_0x88;
-    Matrix4 field_0xc8;
-    Matrix4 field_0x108;
-    Matrix4 field_0x148;
-    CollisionBoxBounds* field_0x188;
-    void* field_0x18c;             // convex geometry handed to the box test 0x00428950
-    void* field_0x190;
+    int swept;                // +0x00 nonzero: use the swept/matrix-history test
+    void* sceneNode;              // +0x04 scene node; 0x004fc9a0 reads its world position
+    Matrix4 motionTransform;  // +0x08 SetTransform 0x00435830 builds it with CollisionRelativeTransform 0x00432180 from the current and previous body matrices; DrawTreeMotion receives it as the motion matrix
+    Matrix4 worldTransform;  // +0x48 SetTransform: 3x3 of localTransform (+0x88) times the body matrix plus translation; used as the frame by every hull test (Fn_00428950, 0x00429570/890)
+    Matrix4 localTransform;  // +0x88 SetTransform multiplies it by the new body matrix to produce +0x48
+    Matrix4 bodyTransform;  // +0xc8 SetTransform copies the argument matrix here after moving the old one to +0x108; the swept tests use it as the current frame
+    Matrix4 prevBodyTransform;  // +0x108 SetTransform: rep movsd +0xc8 -> +0x108 before the new matrix is stored in +0xc8
+    Matrix4 relativeFrame;  // +0x148 written by HullVsHullSwept (0x00432260 output), passed to DrawPointTree as the motion frame
+    CollisionBoxBounds* triangleTree;  // +0x188 DrawHull -> DrawTree(+0x188, ..., verts +0x190); root node carries the bounds read through CollisionBoxBounds
+    void* pointTree;             // +0x18c convex geometry handed to the box test 0x00428950
+    void* vertices;  // +0x190 vertex array passed to DrawTree / 0x00429890
     int field_0x194;               // not read here; the element stride is 0x198 (add edi,0x198 at 0x0043898a)
 };
 
@@ -47,7 +47,7 @@ struct CollisionHullBody {
 struct CollisionModelBody {
     int elementCount;              // +0x00
     int* elementEnabled;           // +0x04, one flag per element
-    int* field_0x08;               // +0x08, one flag per element (0x00432b30 draws a set
+    int* elementHighlight;               // +0x08, one flag per element (0x00432b30 draws a set
                                    // element green)
     int swept;                     // +0x0c, nonzero selects the swept element test
     int field_0x10;
@@ -59,8 +59,8 @@ struct CollisionModelBody {
     char field_0x48[0x40];
     Matrix4 field_0x88;
     Matrix4 field_0xc8;
-    CollisionVec3 field_0x108;     // written by the swept variants (0x00437ef0)
-    CollisionVec3 field_0x114;
+    CollisionVec3 sweptCenter;     // +0x108 written by the swept variants (0x00437ef0)
+    CollisionVec3 sweptHalfExtents;  // +0x114 second output of Fn_004290d0, passed as A half extents to 0x00424730
 };
 
 // View of a type-2 static-mesh payload (only the parts 0x00436100 / 0x00438c90 read).
@@ -130,10 +130,10 @@ extern CollisionVec3 g_CollisionScratchPoints[];  // 0x00579068, 12 bytes each
 // Contact/sweep record passed to the hull-vs-hull family (tier 3 layout): two input
 // vectors, an accumulated contact position and a contact counter.
 struct CollisionSweepQuery {
-    CollisionVec3 field_0x00;
-    CollisionVec3 field_0x0c;
+    CollisionVec3 contactOffset;  // +0x00 rotated as a direction (CollisionRotateRows) into the other hull frame in HullVsHull 0x00436720; ConstraintContactCallback 0x0043b800 passes record+0 as ApplyContactImpulse's offset argument
+    CollisionVec3 contactNormal;  // +0x0c rotated as a direction like +0x00; ConstraintContactCallback passes record+0xc as the normal argument of ApplyContactImpulse
     CollisionVec3 contact;         // +0x18
-    int field_0x24;
+    int fraction;  // +0x24 ConstraintContactCallback 0x0043b800 passes record+0x24 as ApplyContactImpulse's interpolation factor t (prev velocity .. velocity)
     int contactCount;              // +0x28
 };
 

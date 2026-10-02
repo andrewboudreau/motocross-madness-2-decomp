@@ -31,7 +31,7 @@ class SoultreePhysicsCharacter : public SoultreePhysicsBaseObject, public D3DIMS
 public:
     // 0x00503c70 (thiscall, ret 8 = flags + the compiler's hidden most-derived flag; tier 1):
     // GameObject(1) when most-derived, then SoultreePhysicsBaseObject(flags) (0x00500aa0) and
-    // D3DIMSoultreeCharacter(flags) (0x004455b0), vptrs/vtordisp, field_0x42c = 0.
+    // D3DIMSoultreeCharacter(flags) (0x004455b0), vptrs/vtordisp, poseNode = 0.
     // Vehicle's ctor 0x005257a0 calls it as (arg, 0), i.e. SoultreePhysicsCharacter(arg).
     explicit SoultreePhysicsCharacter(int flags);
     virtual ~SoultreePhysicsCharacter();        // core 0x00503d40, deleting 0x005042f0
@@ -69,7 +69,7 @@ public:
     virtual void UnknownVirtualSlot41();                          // 0x00504360
     virtual int UnknownVirtualSlot42();                           // 0x00504470
 
-    SoultreeObject* field_0x42c;
+    SoultreeObject* poseNode;  // +0x42c slot 40 sets it to the model node (same as sceneNode); Bike reads the rider/pose axes from it
     char field_0x430;
     char field_0x431;
     char field_0x432;

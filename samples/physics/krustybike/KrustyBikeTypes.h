@@ -89,8 +89,8 @@ struct KbGame {
     char pad_0x2D88[0x5AC];
     int field_0x3334; // 0x3334
     char pad_0x3338[0xDC];
-    int field_0x3414; // 0x3414
-    int field_0x3418; // 0x3418
+    int fullNetPacketIntervalSec; // 0x3414
+    int shortNetPacketIntervalSec; // 0x3418
     char pad_0x341C[0xC];
     int field_0x3428; // 0x3428
 };

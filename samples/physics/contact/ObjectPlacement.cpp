@@ -79,7 +79,7 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
             if (q && !centerHit) {
                 CollisionObject* obj = new(__FILE__, 0x172) CollisionObject(1);
                 obj->Fn_004320f0(0, 1, 1, 0);
-                obj->field_0x68 = 1;
+                obj->ignoreVegetation = 1;
                 obj->SetField_0x74(1);
                 obj->AddIgnoredOwner(a);
 
@@ -113,9 +113,9 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
                 obj->SetTransform(&xf);
                 obj->Fn_00438e70();
 
-                if (obj->field_0x58 != 0) {
+                if (obj->hasContact != 0) {
                     // contact: rec[0] = fraction, rec + 8 = contact normal (tier 3)
-                    float* rec = (float*)obj->field_0x5c;
+                    float* rec = (float*)obj->contactRecord;
                     c->y += (1.0f - rec[0]) * 2.0f - 1.0f;
                     *n = *c;
                     if (l) {
