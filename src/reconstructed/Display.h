@@ -47,12 +47,13 @@ struct UnknownDisplay {
     int field_0x08;                               // display mode count
     int field_0x0c;                               // current display mode
     UnknownDisplayMode* field_0x10;
-    unsigned char field_0x14[0x54 - 0x14];
+    int field_0x14[16];                           // per texture kind (TextureMapManager 0x00511580)
     int field_0x54;                               // "Total VidMem"
     int field_0x58;
     int field_0x5c;
     int field_0x60;                               // "TextureCacheLimit" (0x7fffffff if unset)
-    unsigned char field_0x64[0x6c - 0x64];
+    int field_0x64;                               // passed to the GUI setup (KrustyUI 0x004988a0)
+    unsigned char field_0x68[0x6c - 0x68];
     int field_0x6c;      // freezes RenderTarget's frame index (0x004e8cc0)
     unsigned char field_0x70_bit0 : 1;            // "Use8BitTextures"
     unsigned char field_0x70_bit1 : 1;

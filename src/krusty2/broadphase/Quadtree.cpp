@@ -1,5 +1,5 @@
 // Quadtree.cpp -- reconstruction of D:\aardvark\VC\krusty2\Quadtree.cpp (broad phase).
-#include "broadphase/Quadtree.h"
+#include "Quadtree.h"
 
 #include <string.h>
 
@@ -122,8 +122,8 @@ void QuadTree::Init(float x0, float z0, float x1, float z1, float minCell)
     queryListHead = 0;
     itemSlotIndex = 0;
     sortedCount = 0;
-    resultPool = new(__FILE__, 0x73) QuadTreePool(8, 0x1000);
-    itemPool = new(__FILE__, 0x74) QuadTreePool(0x14, 0x1000);
+    resultPool = new(__FILE__, 0x73) BlockAllocator(8, 0x1000);
+    itemPool = new(__FILE__, 0x74) BlockAllocator(0x14, 0x1000);
 }
 
 // Tier 3 name: turns a world rectangle (x0, z0)-(x1, z1) into a "locational code" (0xf =

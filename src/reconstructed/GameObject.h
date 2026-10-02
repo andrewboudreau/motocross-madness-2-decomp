@@ -47,6 +47,7 @@ public:
     // 0x00469190: appends `child` (and its later siblings) to the children;
     // not reconstructed.
     int UnknownFunction469190(GameObject* child, int value);
+    int UnknownFunction469130(GameObject* child); // 0x00469130 (KrustyUI 0x004988a0)
     void UnknownFunction4691f0();          // 0x004691f0
     // 0x00469680: releases this object and every later sibling, back to front.
     int UnknownFunction469680();

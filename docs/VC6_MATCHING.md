@@ -10,7 +10,7 @@ game remains a separate, unverified gate.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 385/385 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 487/487 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
@@ -57,6 +57,11 @@ RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 
 ## Next targets
 
+The seven emitted fixed-size `BlockAllocator` bodies are now exact under the
+default profile, including the five-byte destructor tail jump and the two
+fully resolved `BlockAllocator.cpp` debug-allocation calls. See
+[allocation evidence](ALLOCATION.md#fixed-size-block-allocator).
+
 All 17 calibration targets match the default profile, including
 [FollowCamera](FOLLOW_CAMERA.md) slots 68 (`0x00466d50`, x87 distance/clamp,
 every relocation resolved), 69 (`0x00466a80`, source shape) and 71
@@ -83,6 +88,12 @@ retains the symbol/section extent. Target sizes and NOPs never determine lengths
 paired compilations preserve code sections and relocations. It is not a claimed
 original flag. Format references: [PE/COFF](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#auxiliary-format-1-function-definitions)
 and [CodeView](https://github.com/microsoft/microsoft-pdb/blob/master/include/cvinfo.h).
+
+Same-section relocations are inferred only when their final symbol-plus-addend
+destination is inside the independently measured function extent. This includes
+section-symbol references into jump tables; an internal label plus an escaping
+addend still needs an explicit binding. Inference is per relocation, so a local
+reference cannot authorize another reference outside the function.
 
 `tools/match.py --bindings` applies DIR32/REL32 relocations and compares every byte.
 Bindings require independent address evidence. Without bindings the tool masks

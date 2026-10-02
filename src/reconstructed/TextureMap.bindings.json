@@ -1,0 +1,18 @@
+{
+  "??0BaseObject@@QAE@XZ": "0x00405120",
+  "??0TextureMap@@QAE@PAVTextureMapManager@@H@Z": "0x0050a4e0",
+  "??0TextureMap@@QAE@PAVTextureMapManager@@H@Z$ehhandler": "0x0054e6d8",
+  "??1BaseObject@@UAE@XZ": "0x00405150",
+  "??1TextureMap@@UAE@XZ": "0x0050ab40",
+  "??1TextureMap@@UAE@XZ$ehhandler": "0x0054e738",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7TextureMap@@6B@": "0x00558354",
+  "??_GTextureMap@@UAEPAXI@Z": "0x0050a570",
+  "?UnknownFunction4e9010@UnknownResourceManager@@QAEXPAXH@Z": "0x004e9010",
+  "?UnknownFunction4e93f0@UnknownResourceManager@@QAEPAXPAX@Z": "0x004e93f0",
+  "?UnknownFunction50abd0@TextureMap@@QAEHHH@Z": "0x0050abd0",
+  "?UnknownFunction5112f0@TextureMapManager@@QAEXPAVTextureMap@@@Z": "0x005112f0",
+  "?UnknownFunction511300@TextureMapManager@@QAEXPAVTextureMap@@@Z": "0x00511300",
+  "?UnknownFunction511ad0@@YAHH@Z": "0x00511ad0",
+  "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44"
+}

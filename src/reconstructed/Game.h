@@ -30,7 +30,7 @@ public:
     int field_0x04;
     int field_0x08;
     int field_0x0c;                           // local player index
-    unsigned char field_0x10[0x14 - 0x10];
+    int field_0x10;                           // set by KrustyUI slot 24 for message 0x101
     int field_0x14;                           // set once connected (TrackGame slot 4)
     unsigned char field_0x18[0x128 - 0x18];
 };
