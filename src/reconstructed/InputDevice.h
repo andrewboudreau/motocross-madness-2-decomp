@@ -15,10 +15,10 @@ public:
     int UnknownFunction4897e0(int value); // 0x004897e0
 
 protected:
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;               // id passed to the constructor
-    int field_0x10;               // -1 initially
+    int axisCount;                  // +0x04
+    int buttonCount;                // +0x08
+    int deviceKind;                 // +0x0c; id passed to the constructor
+    int deviceSubtype;              // +0x10; -1 initially
     unsigned char field_0x14_axis0 : 1;  // axis enable bits; JoystickDevice
     unsigned char field_0x14_axis1 : 1;  // 0x00489c60 tests one per axis
     unsigned char field_0x14_axis2 : 1;

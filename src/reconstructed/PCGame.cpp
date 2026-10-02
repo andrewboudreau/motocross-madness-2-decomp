@@ -221,8 +221,8 @@ int PCGame::UnknownFunction4bfc50(char* message) {
     field_0x2d4_bit7 = UnknownVirtualSlot22(name, field_0x2d4_bit7);
     int joystick = UnknownFunction4cd610(UnknownVirtualSlot22("UseLastController", 0));
     if (joystick >= 0) {
-        field_0x14->field_0x08 = joystick;
-        field_0x14->field_0x0c = field_0x14->field_0x10[joystick];
+        field_0x14->activeJoystickIndex = joystick;
+        field_0x14->activeJoystick = field_0x14->joysticks[joystick];
     } else if (joystick == -2) {
         *message = 0;
         return 0;

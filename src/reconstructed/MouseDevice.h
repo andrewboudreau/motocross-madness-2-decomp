@@ -26,6 +26,6 @@ public:
     friend class ControlInterface; // reads the input entries
 
 protected:
-    UnknownInputEntry field_0x260[4];
-    ContainerList<UnknownControlBinding*> field_0x2b0[2]; // bindings per axis
+    UnknownInputEntry buttonStates[4];
+    ContainerList<UnknownControlBinding*> axisBindings[2]; // bindings per axis
 };

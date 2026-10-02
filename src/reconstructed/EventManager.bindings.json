@@ -1,0 +1,15 @@
+{
+  "??0EventManager@@QAE@H@Z$ehhandler": "0x0054aa48",
+  "??0GameObject@@QAE@H@Z": "0x00468ca0",
+  "??0UnknownEventEntry@@QAE@XZ": "0x0045c830",
+  "??1EventManager@@UAE@XZ": "0x0045cae0",
+  "??1GameObject@@UAE@XZ": "0x00468d60",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7EventManager@@6B@": "0x0055259c",
+  "??_C@_0BB@LFOC@KeepAliveTimeout?$AA@": "0x0056a92c",
+  "?UnknownFunction45d2b0@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
+  "?UnknownFunction45d2f0@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",
+  "?UnknownFunction45d340@EventManager@@QAEPAVUnknownMessageTarget@@XZ": "0x0045d340",
+  "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
+  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c"
+}

@@ -16,5 +16,5 @@ public:
     virtual int UnknownVirtualSlot6(int value);
 
 protected:
-    int field_0x2d8[4];           // movement (+0x2d8 x, +0x2dc y); cleared by the constructor
+    int movement[4];           // movement (+0x2d8 x, +0x2dc y); cleared by the constructor
 };
