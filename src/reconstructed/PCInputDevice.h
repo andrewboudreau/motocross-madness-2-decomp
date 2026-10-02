@@ -11,8 +11,9 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall UnknownMethod2();   // Release
     virtual long __stdcall UnknownMethod3(struct UnknownDeviceCaps* caps); // GetCapabilities
-    virtual long __stdcall UnknownMethod4();
-    virtual long __stdcall UnknownMethod5();
+    virtual long __stdcall UnknownMethod4(int (__stdcall* callback)(const struct UnknownObjectInstance*, void*),
+                                          void* context, unsigned long flags); // EnumObjects
+    virtual long __stdcall UnknownMethod5(int property, void* value); // GetProperty
     virtual long __stdcall UnknownMethod6(int property, struct UnknownInputProperty* value); // SetProperty
     virtual long __stdcall UnknownMethod7();   // Acquire
     virtual long __stdcall UnknownMethod8();   // Unacquire
@@ -22,7 +23,8 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod11(const struct UnknownDataFormat* format); // SetDataFormat
     virtual long __stdcall UnknownMethod12();
     virtual long __stdcall UnknownMethod13(void* window, unsigned long flags); // SetCooperativeLevel
-    virtual long __stdcall UnknownMethod14();
+    virtual long __stdcall UnknownMethod14(struct UnknownObjectInstance* info, unsigned long object,
+                                           unsigned long how); // GetObjectInfo
     virtual long __stdcall UnknownMethod15(struct UnknownDeviceInstance* info); // GetDeviceInfo
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall UnknownMethod17();
@@ -117,7 +119,7 @@ struct UnknownDirectInput {
     virtual long __stdcall UnknownMethod2();
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
-    virtual long __stdcall UnknownMethod5();
+    virtual long __stdcall UnknownMethod5(const UnknownGuid& device); // GetDeviceStatus
     virtual long __stdcall UnknownMethod6();
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();
@@ -140,9 +142,9 @@ struct UnknownDeviceCaps {
     unsigned long size;
     unsigned long flags;
     unsigned long deviceType;
-    unsigned long axes;
-    unsigned long buttons;
-    unsigned long povs;
+    int axes;
+    int buttons;
+    int povs;
     unsigned long field_0x18[5];
 };
 
@@ -164,6 +166,38 @@ struct UnknownDeviceObjectData {
     unsigned long timeStamp;
     unsigned long sequence;
 };
+
+// 0x13c-byte object description (DIDEVICEOBJECTINSTANCEA layout).
+struct UnknownObjectInstance {
+    unsigned long size;
+    UnknownGuid guidType;
+    unsigned long offset;
+    unsigned long type;
+    unsigned long flags;
+    char name[260];
+    unsigned char field_0x124[0x18];
+};
+
+// 24-byte range property (DIPROPRANGE layout).
+struct UnknownInputPropertyRange {
+    unsigned long size;
+    unsigned long headerSize;
+    unsigned long object;
+    unsigned long how;
+    long minimum;
+    long maximum;
+};
+
+// Axis GUIDs, decoded from retail as the standard GUID_XAxis, GUID_YAxis,
+// GUID_ZAxis, GUID_RxAxis, GUID_RyAxis and GUID_RzAxis; the joystick data
+// format has the layout of c_dfDIJoystick (44 objects, 80 bytes).
+extern "C" const UnknownGuid GUID_XAxis;                 // 0x00556a70
+extern "C" const UnknownGuid GUID_YAxis;                 // 0x00556a80
+extern "C" const UnknownGuid GUID_ZAxis;                 // 0x00556a90
+extern "C" const UnknownGuid GUID_RxAxis;                // 0x00556aa0
+extern "C" const UnknownGuid GUID_RyAxis;                // 0x00556ab0
+extern "C" const UnknownGuid GUID_RzAxis;                // 0x00556ac0
+extern "C" const UnknownDataFormat c_dfDIJoystick;       // 0x00558f00
 
 // RTTI: PCInputDevice : InputDevice. PCInputDeviceType.cpp is the nearest
 // source reference; the TU is not established.

@@ -103,7 +103,18 @@ public:
     virtual void UnknownVirtualSlot19();
     virtual int UnknownVirtualSlot20(int value);
 
-    int UnknownMethod4c2d90(int index, int value); // not reconstructed
+    // 0x004c2930: opens the device described by `instance`.
+    int UnknownFunction4c2930(const UnknownDeviceInstance* instance);
+    // 0x004c2cb0: object enumeration callback; marks the axes present.
+    static int __stdcall UnknownEnumObjectsCallback(const UnknownObjectInstance* object,
+                                                    void* context);
+    // 0x004c2d90: key-repeat stepping driven by an axis direction (gamepads).
+    void UnknownMethod4c2d90(int axis, int value);
+    // 0x004c3090: applies the axis dead-zone scale around 32768, clamped to
+    // 0..65535.
+    int UnknownFunction4c3090(int axis, int value);
+    // 0x004c2ef0: button index for a joystick state offset, or -1.
+    int UnknownFunction4c2ef0(int offset);
     int UnknownMethod4c3100(int value);            // not reconstructed
     int UnknownMethod4c3790(int value);            // near miss in samples/inputdevice
     int UnknownMethod4c3a10(int buffered);
@@ -114,7 +125,7 @@ protected:
     UnknownEffectInterface* field_0x578[5]; // released by slot 15
     float field_0x58c[6];                  // axis ranges (flip base for axes 1, 2)
     int field_0x5a4[6];
-    int field_0x5bc[6];
+    float field_0x5bc[6];                  // dead-zone scale per axis
     unsigned char field_0x5d4_bit0 : 1;
     unsigned char field_0x5d4_bit1 : 1;
     unsigned char field_0x5d5;

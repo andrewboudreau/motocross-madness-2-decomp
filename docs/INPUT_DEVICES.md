@@ -120,6 +120,17 @@ the default profile, except one near miss in
   button changes on the ControlInterface, and keeps the POV values. 373 of
   452 bytes match; the rest is register rotation.
 
+  Device setup and helpers:
+  - `0x004c2930` opens a device from its description. It reads the
+    capabilities (force feedback makes the device type 3), enumerates the
+    axes through the static callback `0x004c2cb0` (GUID_XAxis–GUID_RzAxis),
+    and reads each axis range into +0x58c, with the 5% dead-zone scale in
+    +0x5bc.
+  - `0x004c3090` applies that scale around 32768 and clamps to 0–65535.
+  - `0x004c2d90` is the gamepad's axis-driven key repeat.
+  - `0x004c2ef0` maps state offsets 0x30–0x4f to button indices.
+  - Slot 20 uses the "BufferedJoystick" setting through `0x004c3a10`.
+
   Effect-related slots act only for device type 3 (+0x0c). Slot 19 matches
   only with the Windows `HIBYTE` cast chain used by `GET_DIDEVICE_SUBTYPE`,
   which is what produces retail's byte load followed by a redundant

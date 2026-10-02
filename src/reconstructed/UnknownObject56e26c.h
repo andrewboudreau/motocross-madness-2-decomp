@@ -59,7 +59,7 @@ public:
     virtual void UnknownVirtualSlot20();
     virtual void UnknownVirtualSlot21();
     // Named boolean setting (JoystickDevice asks for "JoyDirectionFlipped").
-    virtual bool UnknownVirtualSlot22(const char* name, int defaultValue);
+    virtual int UnknownVirtualSlot22(const char* name, int defaultValue);
 
     void UnknownFunction468880(); // 0x00468880 (PCCamera slot 27)
     // 0x00521970: copies string `id` into buffer (size bytes).
