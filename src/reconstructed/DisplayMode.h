@@ -8,8 +8,10 @@ struct UnknownDisplayMode {
     int width;
     int height;
     int bitDepth;
-    int field_0x0c;
+    int refreshRate;          // the field PCGame slot 34's duplicate test ignores
     int field_0x10;
-    int field_0x14;           // usable; PCGame 0x004c0760 clears it for oversized modes
-    int field_0x18[3];
+    int field_0x14;           // usable; PCGame slot 34 and 0x004c0760 clear it
+    int field_0x18;           // usable; PCGame slot 34 clears it
+    int field_0x1c;           // PCGame slot 31 copies it to Display+0x58
+    int field_0x20;           // and this to Display+0x5c
 };

@@ -31,11 +31,11 @@ public:
     virtual int UnknownVirtualSlot2();        // 0x004bfc40: Game's slot 2
     virtual int UnknownVirtualSlot5();        // 0x004c0250: restores lost surfaces, then the root's slot 18
     virtual int UnknownVirtualSlot6();        // 0x004c0310
-    virtual void UnknownVirtualSlot7();       // 0x004c07d0, not reconstructed
+    virtual int UnknownVirtualSlot7();        // 0x004c07d0: sets the render states
     virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004c03a0
     virtual int UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004c0400
     virtual int UnknownVirtualSlot15();       // 0x004c0230: shutdown, then shows the cursor
-    virtual void UnknownVirtualSlot19();      // 0x004c04a0, not reconstructed
+    virtual int UnknownVirtualSlot19(int mode); // 0x004c04a0: changes the display mode
     // Settings under HKEY_LOCAL_MACHINE\<+0x4b8>; "Sub\\Value" names a subkey.
     virtual int UnknownVirtualSlot20(const char* name, int defaultValue);     // 0x004c1c20: DWORD
     virtual float UnknownVirtualSlot21(const char* name, float defaultValue); // 0x004c1d50: float
@@ -48,9 +48,9 @@ public:
     virtual int UnknownVirtualSlot27(const char* name, int value);            // 0x004c2240 (folded)
     virtual int UnknownVirtualSlot28(const char* name, const char* value);    // 0x004c2370: write string
     virtual int UnknownVirtualSlot29(const char* name, const void* data, unsigned long size); // 0x004c24b0
-    virtual RenderTarget* UnknownVirtualSlot31(); // 0x004c0a90, not reconstructed
+    virtual RenderTarget* UnknownVirtualSlot31(); // 0x004c0a90: creates the render target
     virtual int UnknownVirtualSlot32();       // 0x004c0c60: sets the display mode
-    virtual void UnknownVirtualSlot34();      // 0x004c05a0, not reconstructed
+    virtual int UnknownVirtualSlot34(UnknownDisplay* display); // 0x004c05a0: filters display modes
     virtual int UnknownVirtualSlot35(int value); // 0x004c0340: root slot 20 unless input is held
     virtual int UnknownVirtualSlot36(int value); // 0x004c0370: root slot 21 unless input is held
     virtual int UnknownVirtualSlot37();       // 0x004c0c10: the "lobby" command-line switch
@@ -63,7 +63,7 @@ public:
     // unusable (unless the display keeps them).
     int UnknownFunction4c0760(UnknownDisplay* display, int width, int height);
 
-    unsigned char field_0x2f8[0x308 - 0x2f8];
+    CameraRect field_0x2f8;                   // the render target's rectangle (slot 31)
     UnknownRect field_0x308;                  // window rectangle (slot 32)
     void* field_0x318;                        // instance handle
     void* field_0x31c;                        // window handle
@@ -77,4 +77,7 @@ public:
     void* field_0x540;                        // previous input context
     int field_0x544;
     unsigned char field_0x548_bit0 : 1;
+    int field_0x54c;                          // texture stage 0 state 0x10 (slot 7)
+    int field_0x550;                          // state 0x11
+    int field_0x554;                          // state 0x12
 };

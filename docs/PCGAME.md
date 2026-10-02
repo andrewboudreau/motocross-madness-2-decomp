@@ -32,10 +32,11 @@ inference.
 
 ## Status
 
-The following are exact (26 calibration cases):
+The following are exact (30 calibration cases):
 - the constructor, both destructors and the time stamp function
   `0x004bfa80`;
-- slots 2, 5, 6, 13, 14, 15, 32, 35, 36 and 37;
+- slots 2, 5, 6, 7, 13, 14, 15, 19, 31, 32, 34, 35, 36 and 37 (every
+  override);
 - the non-virtual `0x004c0470` and `0x004c0760`;
 - every registry slot, 20-29.
 
@@ -47,6 +48,10 @@ them repeats. Slots 25-27 are one folded body.
 `0x004bfa80` is placed in PCGame.cpp by position only: it sits immediately
 before the constructor.
 
-Not reconstructed:
-- slots 7, 19, 31 and 34;
-- the helpers `0x004c0d10`..`0x004c1a00`.
+Slot 7 sets the render target's states (numbers matching Direct3D render
+state IDs) and texture stage 0's filters. Slot 34 filters the display modes:
+- duplicates that differ only in refresh rate ("HighestRefreshOnly");
+- modes other than 16-bit;
+- modes that do not fit video memory with "MinimumTextureMB" spare.
+
+Not reconstructed: the helpers `0x004c0d10`..`0x004c1a00`.

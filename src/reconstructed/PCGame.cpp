@@ -3,7 +3,10 @@
 
 #include "PCGame.h"
 
+#include "Camera.h"
+#include "DebugAlloc.h"
 #include "ControlInterface.h"
+#include "UnknownObject56e26c.h"
 
 // USER32, KERNEL32, OLE32 and WINMM imports.
 extern "C" __declspec(dllimport) long __stdcall CoInitialize(void* reserved);
@@ -186,9 +189,141 @@ int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* 
     return 0;
 }
 
+// 0x004c04a0: switches to display mode `mode` (full screen) or back to
+// 640x480 (windowed), recreating the render target through slot 33, then
+// reattaches the camera.
+int PCGame::UnknownVirtualSlot19(int mode) {
+    Camera* camera = 0;
+    if (field_0x10)
+        camera = field_0x10->field_0x08;
+    if (field_0x2d4_bit1) {
+        if (mode != field_0x0c->field_0x0c) {
+            if (field_0x10) {
+                delete field_0x10;
+                field_0x10 = 0;
+            }
+            field_0x0c->UnknownFunction4ca900(mode, field_0x2d0 == 0);
+            if (!UnknownVirtualSlot33())
+                return 0;
+        }
+    } else if (field_0x308.bottom - field_0x308.top != 480) {
+        if (field_0x10) {
+            delete field_0x10;
+            field_0x10 = 0;
+        }
+        field_0x0c->UnknownFunction4ca790(640, 480, field_0x2d0 == 0);
+        if (!UnknownVirtualSlot33())
+            return 0;
+    }
+    if (field_0x10 && camera) {
+        camera->field_0x18 = field_0x10;
+        field_0x10->UnknownFunction4e8cf0(camera);
+        field_0x10->UnknownVirtualSlot14(camera->field_0x1a0);
+    }
+    return 1;
+}
+
 // 0x004c0470
 void PCGame::UnknownFunction4c0470(const UnknownRect* rect) {
     field_0x308 = *rect;
+}
+
+// 0x004c05a0: in full screen, drops duplicate modes ("HighestRefreshOnly"
+// keeps the last of each), modes other than 16-bit, and modes the video
+// memory cannot hold with "MinimumTextureMB" left over.
+int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
+    int reserve = g_UnknownGlobal56e26c->UnknownVirtualSlot20("MinimumTextureMB", 2) << 20;
+    if (field_0x2d4_bit1 && !(display->field_0xb74 & 2)) {
+        int i;
+        if (UnknownVirtualSlot22("HighestRefreshOnly", 1)) {
+            for (i = 0; i < display->field_0x08; i++) {
+                if (i > 0 && display->field_0x10[i].width == display->field_0x10[i - 1].width &&
+                    display->field_0x10[i].height == display->field_0x10[i - 1].height &&
+                    display->field_0x10[i].bitDepth == display->field_0x10[i - 1].bitDepth &&
+                    display->field_0x10[i].field_0x10 == display->field_0x10[i - 1].field_0x10) {
+                    display->field_0x10[i - 1].field_0x14 = 0;
+                    display->field_0x10[i - 1].field_0x18 = 0;
+                }
+            }
+        } else {
+            for (i = 0; i < display->field_0x08; i++) {
+                if (i > 0 && display->field_0x10[i].width == display->field_0x10[i - 1].width &&
+                    display->field_0x10[i].height == display->field_0x10[i - 1].height &&
+                    display->field_0x10[i].bitDepth == display->field_0x10[i - 1].bitDepth &&
+                    display->field_0x10[i].field_0x10 == display->field_0x10[i - 1].field_0x10) {
+                    display->field_0x10[i].field_0x14 = 0;
+                    display->field_0x10[i].field_0x18 = 0;
+                }
+            }
+        }
+        for (i = 0; i < display->field_0x08; i++) {
+            if (display->field_0x10[i].bitDepth != 16) {
+                display->field_0x10[i].field_0x14 = 0;
+                display->field_0x10[i].field_0x18 = 0;
+            }
+            if (display->field_0x10[i].field_0x14 &&
+                display->field_0x54 - display->field_0x10[i].bitDepth / 8 *
+                    display->field_0x10[i].height * display->field_0x10[i].width * 3 < reserve &&
+                display->field_0x10[i].width > 640)
+                display->field_0x10[i].field_0x14 = 0;
+            if (display->field_0x10[i].field_0x18 &&
+                display->field_0x54 < display->field_0x10[i].bitDepth / 8 *
+                    display->field_0x10[i].height * display->field_0x10[i].width * 2)
+                display->field_0x10[i].field_0x18 = 0;
+        }
+    }
+    return 1;
+}
+
+// 0x004c07d0: sets the render target's states (slot 8; the numbers line
+// up with Direct3D's render state IDs) and the device's texture stage 0
+// states, choosing the filters from the +0x2d4 bits and the capabilities.
+int PCGame::UnknownVirtualSlot7() {
+    field_0x10->UnknownVirtualSlot8(0x1a, field_0x2d4_bit3 && (PCTarget()->field_0x1a8 & 1), 1);
+    field_0x10->UnknownVirtualSlot8(0x28, 0, 1);
+    field_0x10->UnknownVirtualSlot8(2, 0, 1);
+    if (field_0x2d4_bit6 && (PCTarget()->field_0x1a8 & 0x800))
+        field_0x10->UnknownVirtualSlot8(2, 2, 1);
+    field_0x10->UnknownVirtualSlot8(0x1c, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x30, 0, 1);
+    field_0x10->UnknownVirtualSlot8(8, PCTarget()->field_0x250, 1);
+    field_0x10->UnknownVirtualSlot8(7, field_0x2d5_bit3, 1);
+    field_0x10->UnknownVirtualSlot8(0xe, field_0x2d5_bit3, 1);
+    field_0x10->UnknownVirtualSlot8(0x1b, 0, 1);
+    field_0x10->UnknownVirtualSlot10(7, 0);
+    if (field_0x2d0) {
+        field_0x10->UnknownVirtualSlot8(9, 1, 1);
+        field_0x10->UnknownVirtualSlot8(4, 0, 1);
+    } else {
+        field_0x10->UnknownVirtualSlot8(9, 2, 1);
+        field_0x10->UnknownVirtualSlot8(4, 1, 1);
+    }
+    PCTarget()->field_0x50->UnknownMethod37(0, 0xc, 1);
+    field_0x10->UnknownVirtualSlot8(0x17, 4, 1);
+    field_0x10->UnknownVirtualSlot8(0x1d, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x1e, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x10, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x21, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0xf, 1, 1);
+    field_0x10->UnknownVirtualSlot8(0x18, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x19, 5, 1);
+    field_0x54c = field_0x2d4_bit5 && (PCTarget()->field_0x1c4 & 2) ? 2 : 1;
+    field_0x550 = field_0x2d4_bit5 && (PCTarget()->field_0x1c4 & 2) ? 2 : 1;
+    field_0x554 = 1;
+    if (field_0x2d4_bit4) {
+        if (field_0x2d4_bit7 && (PCTarget()->field_0x1c4 & 0x20))
+            field_0x554 = 3;
+        else
+            field_0x554 = 2;
+    }
+    PCTarget()->field_0x50->UnknownMethod37(0, 0x10, field_0x54c);
+    PCTarget()->field_0x50->UnknownMethod37(0, 0x11, field_0x550);
+    PCTarget()->field_0x50->UnknownMethod37(0, 0x12, field_0x554);
+    PCTarget()->field_0x50->UnknownMethod37(0, 1, 1);
+    PCTarget()->field_0x50->UnknownMethod37(0, 4, 1);
+    field_0x10->UnknownVirtualSlot8(0x89, 0, 1);
+    field_0x10->UnknownVirtualSlot8(0x17, 4, 1);
+    return 1;
 }
 
 // 0x004c0760
@@ -201,6 +336,34 @@ int PCGame::UnknownFunction4c0760(UnknownDisplay* display, int width, int height
         }
     }
     return 1;
+}
+
+// 0x004c0a90: creates the PCRenderTarget on the display's surface and
+// records the display's two mode values (+0x58, +0x5c).
+RenderTarget* PCGame::UnknownVirtualSlot31() {
+    int frames = field_0x0c->field_0x1a8 ? 1 : field_0x0c->field_0x78;
+    UnknownSurfaceInterface* surface =
+        field_0x0c->field_0x1a8 ? field_0x0c->field_0x1a8 : field_0x0c->field_0x1a0;
+    RenderTarget* target = (new(__FILE__, 984) PCRenderTarget)
+        ->UnknownFunction4c4f80(field_0x0c, &field_0x2f8, surface, field_0x2d5_bit3, frames);
+    if (!target)
+        return 0;
+    if (field_0x2d4_bit1) {
+        field_0x0c->field_0x58 = field_0x0c->field_0x10[field_0x0c->field_0x0c].field_0x1c;
+        field_0x0c->field_0x5c = field_0x0c->field_0x10[field_0x0c->field_0x0c].field_0x20;
+    } else {
+        int value;
+        if (field_0x0c->UnknownFunction4ca5a0(&value, field_0x10)) {
+            field_0x0c->field_0x5c = value;
+            PCTarget()->UnknownFunction4c5950(&value);
+            field_0x0c->field_0x58 = value;
+        } else {
+            field_0x0c->field_0x5c = 0;
+            PCTarget()->UnknownFunction4c5950(&value);
+            field_0x0c->field_0x58 = value;
+        }
+    }
+    return target;
 }
 
 // 0x004c0c10: "lobby" on the command line (last match wins) starts the

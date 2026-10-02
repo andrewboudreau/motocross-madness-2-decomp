@@ -66,7 +66,7 @@ public:
     virtual int UnknownVirtualSlot4();        // 0x00468c90
     virtual int UnknownVirtualSlot5();        // 0x00467ae0
     virtual int UnknownVirtualSlot6();        // 0x00467ae0
-    virtual void UnknownVirtualSlot7() = 0;
+    virtual int UnknownVirtualSlot7() = 0;   // render state setup (PCGame)
     virtual int UnknownVirtualSlot8();        // 0x00467eb0: renders a frame
     virtual int UnknownVirtualSlot9();        // 0x004685c0
     virtual void UnknownVirtualSlot10();      // 0x004685d0, not reconstructed (rdtsc)
@@ -78,7 +78,7 @@ public:
     virtual int UnknownVirtualSlot16(int value); // 0x00468ae0: network object
     virtual int UnknownVirtualSlot17(int a, int b, int c, int d, int e);                  // 0x00468ba0
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00468bd0
-    virtual void UnknownVirtualSlot19() = 0;
+    virtual int UnknownVirtualSlot19(int mode) = 0;
     virtual int UnknownVirtualSlot20(const char* name, int defaultValue) = 0; // "VideoMemoryMB"
     virtual float UnknownVirtualSlot21(const char* name, float defaultValue) = 0;
     // Named setting (JoystickDevice asks for "JoyDirectionFlipped").
@@ -95,7 +95,7 @@ public:
     virtual RenderTarget* UnknownVirtualSlot31() = 0;
     virtual int UnknownVirtualSlot32() = 0;
     virtual int UnknownVirtualSlot33();       // 0x00467e80
-    virtual void UnknownVirtualSlot34() = 0;
+    virtual int UnknownVirtualSlot34(UnknownDisplay* display) = 0; // filters display modes
 
     // 0x00467b70: creates the root objects, sound, textures and (with the
     // "DebugOverlay" registry flag) the debug overlay.

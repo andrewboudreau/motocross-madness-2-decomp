@@ -51,6 +51,7 @@ protected:
     RenderTarget* Owner() const { return static_cast<RenderTarget*>(field_0x18); }
 
     friend class RenderTarget;
+    friend class PCGame;           // slot 19 reattaches the camera (+0x18, +0x1a0)
 
     Matrix4 field_0x2c;      // set by slot 30 (PCCamera: kind 1)
     Matrix4 field_0x6c;      // set by slot 32 (kind 3)
