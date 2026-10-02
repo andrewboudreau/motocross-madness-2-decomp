@@ -2731,6 +2731,15 @@ CASES = [
         'reason': 'ten repeated sprintf/slot 18/add blocks',
     },
     {
+        'name': 'TrackGame slot4 game set-up',
+        'bindings': 'src/reconstructed/TrackGame.bindings.json',
+        'source': 'src/reconstructed/TrackGame.cpp',
+        'symbol': '?UnknownVirtualSlot4@TrackGame@@UAEHXZ',
+        'target_va': '0x00521050',
+        'target_size': 1543,
+        'reason': 'ten new() under /GX; implicit derived constructor keeps the allocation pointer',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

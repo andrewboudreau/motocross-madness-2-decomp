@@ -1,6 +1,9 @@
 #pragma once
 
 #include "ControlInterface.h"
+#include "DirectoryList.h"
+#include "EventManager.h"
+#include "KrustyUI.h"
 #include "MemTag.h"
 #include "PCGame.h"
 
@@ -17,12 +20,6 @@ struct UnknownInputEntry;
 // a message.
 class UnknownMessageTarget;
 
-class TrackGameList {
-public:
-    GameObject* UnknownFunction45d2b0();           // 0x0045d2b0
-    GameObject* UnknownFunction45d2f0();           // 0x0045d2f0
-    UnknownMessageTarget* UnknownFunction45d340(); // 0x0045d340
-};
 
 struct UnknownKrustyBikeView;
 
@@ -41,6 +38,15 @@ public:
     int UnknownFunction524100(); // 0x00524100
     void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
+    void UnknownFunction522680();             // 0x00522680 (TrackGame slot 4)
+    void UnknownFunction522d00();             // 0x00522d00 (TrackGame slot 4)
+    int UnknownFunction5231f0();              // 0x005231f0 (TrackGame slot 4)
+
+    char field_0x00[16];                      // name; slot 4 sets it from the network object
+    unsigned char field_0x10[0xa34 - 0x10];
+    int field_0xa34;                          // TrackGame slot 4 audio argument
+    unsigned char field_0xa38[0xa48 - 0xa38];
+    int field_0xa48;                          // selects 16 (else 8) in TrackGame slot 4
 };
 
 // Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0.
@@ -75,48 +81,62 @@ public:
     virtual void UnknownVirtualSlot26();
 };
 
-class UnknownTrackGameObject56cOwner {
-public:
-    UnknownTrackGameObject56cItem* UnknownFunction485df0();  // 0x00485df0
-};
-
-// Object at TrackGame+0x56c; 0x00521cd0 tests its +0x4a8.
-class UnknownTrackGameObject56c {
-public:
-    void UnknownFunction499b20(int value);    // 0x00499b20
-
-    unsigned char field_0x00[0x2c];
-    UnknownTrackGameObject56cOwner* field_0x2c;
-    unsigned char field_0x30[0x3c - 0x30];
-    int field_0x3c;
-    unsigned char field_0x40[0x4a8 - 0x40];
-    int field_0x4a8;
-};
-
 // Object at TrackGame+0x574, deleted by slot 15. Its destructor is
 // out-of-line and empty (the shared body 0x00464e90).
 class UnknownTrackGameObject574 {
 public:
+    UnknownTrackGameObject574();              // 0x004e99d0 (near SceneManager.cpp's literals)
     ~UnknownTrackGameObject574();             // 0x00464e90
+
+    unsigned char field_0x00[0x394];
 };
 
 // Object at TrackGame+0x3338, deleted through its virtual destructor.
-class UnknownTrackGameObject3338 {
-public:
-    virtual ~UnknownTrackGameObject3338();
-};
-
 // Object at TrackGame+0x3340 (0x00521a40 calls 0x004310e0 on it).
 class UnknownTrackGameObject3340 {
 public:
+    UnknownTrackGameObject3340();             // 0x00431050
     ~UnknownTrackGameObject3340();            // 0x004310b0
+    void UnknownFunction4310c0();             // 0x004310c0
     void UnknownFunction4310e0();             // 0x004310e0
+
+    unsigned char field_0x00[0x10];
 };
 
 // Object at TrackGame+0x3400.
 class UnknownTrackGameObject3400 {
 public:
+    UnknownTrackGameObject3400();             // 0x0051ef30
     ~UnknownTrackGameObject3400();            // 0x0051efc0
+
+    unsigned char field_0x00[0xe8];
+};
+
+// Object at TrackGame+0x33fc (constructor near DebugOverlay.cpp's literals;
+// no destructor).
+class UnknownTrackGameObject33fc {
+public:
+    UnknownTrackGameObject33fc();             // 0x00448960
+
+    unsigned char field_0x00[0x384];
+};
+
+// Base of the +0x3410 object; its constructor sits among
+// FontTextureManager.cpp's literals.
+class UnknownTrackGameObject3410Base {
+public:
+    UnknownTrackGameObject3410Base();         // 0x004676a0
+
+    unsigned char field_0x00[0x32c];
+};
+
+// Object at TrackGame+0x3410, created for network games. It has no
+// constructor of its own: `new` calls the base constructor directly and uses
+// the allocation (not the constructor's result), and its method sits among
+// MSZoneInterface.cpp's literals.
+class UnknownTrackGameObject3410 : public UnknownTrackGameObject3410Base {
+public:
+    void UnknownFunction4aa350(int a, int b); // 0x004aa350
 };
 
 // Object at TrackGame+0x3444 (0x00521cd0 tests that it exists).
@@ -124,6 +144,9 @@ class UnknownTrackGameObject3444 {
 public:
     ~UnknownTrackGameObject3444();            // 0x004d39f0
 };
+
+// cdecl 0x00520820 (near TrackRecord.cpp's literals): logs a message.
+void UnknownFunction520820(const char* message);
 
 // Global at 0x00572b44; its code is among ResourceManager.cpp's literals.
 // No RTTI names it.
@@ -136,7 +159,11 @@ extern UnknownResourceManager* g_UnknownResourceManager572b44;
 // Global object at 0x0068a48c, deleted by TrackGame's destructor.
 class UnknownTrackGameGlobal68a48c {
 public:
+    UnknownTrackGameGlobal68a48c();           // 0x004ad3b0 (near Net.cpp's literals)
     ~UnknownTrackGameGlobal68a48c();          // 0x004ad3d0
+    int UnknownFunction4ad3e0(const char* address, int port); // 0x004ad3e0: 1 on failure
+
+    unsigned char field_0x00[0x14];
 };
 extern UnknownTrackGameGlobal68a48c* g_UnknownGlobal68a48c;
 
@@ -147,6 +174,7 @@ public:
     virtual int UnknownVirtualSlot1();        // 0x00520ab0: start-up checks and the EULA
     virtual int UnknownVirtualSlot2();        // 0x00520d00: PCGame's slot 2
     virtual int UnknownVirtualSlot3();        // 0x00520d10: opens the resource archives
+    virtual int UnknownVirtualSlot4();        // 0x00521050: creates the game objects
     virtual int UnknownVirtualSlot5();        // 0x00521a50
     virtual int UnknownVirtualSlot10();       // 0x00521660: Game's slot 10 as a flag
     virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00521840
@@ -171,11 +199,11 @@ public:
     TrackGameViewOwner* field_0x560;
     TrackGameViewOwner* field_0x564;
     TrackGameViewOwner* field_0x568;
-    UnknownTrackGameObject56c* field_0x56c;
-    TrackGameList* field_0x570;
+    KrustyUI* field_0x56c;
+    EventManager* field_0x570;
     UnknownTrackGameObject574* field_0x574;
     TrackGameMode field_0x578;
-    unsigned char field_0x0579[0x2930 - 0x579];
+    unsigned char field_0xfc4[0x2930 - 0xfc4];
     int field_0x2930;    // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x2934;  // saved KrustyBikeCamera presets (slots 59, 60)
     float field_0x2938;
@@ -184,18 +212,18 @@ public:
     unsigned char field_0x2944[0x2d74 - 0x2944];
     int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
     unsigned char field_0x2d78[0x3338 - 0x2d78];
-    UnknownTrackGameObject3338* field_0x3338;
+    DirectoryList* field_0x3338;          // "ui\\profile" listing
     int field_0x333c;
     UnknownTrackGameObject3340* field_0x3340;
     UnknownControlBinding field_0x3344;
     UnknownControlBinding field_0x3380;
     UnknownControlBinding field_0x33bc;
-    char* field_0x33f8;
-    char* field_0x33fc;
+    UnknownControlMapping* field_0x33f8;     // installed on the ControlInterface
+    UnknownTrackGameObject33fc* field_0x33fc;
     UnknownTrackGameObject3400* field_0x3400;
     char field_0x3404[8];      // saved decimal separator, restored on shutdown
     void* field_0x340c;        // "lang.dll", the string resource instance when present
-    int field_0x3410;
+    UnknownTrackGameObject3410* field_0x3410;
     float field_0x3414;        // "IntervalBetweenFullNetPacketsMS", in seconds
     float field_0x3418;        // "IntervalBetweenShortNetPacketsMS"
     float field_0x341c;        // "IntervalBetweenFullRecordPacketsMS"

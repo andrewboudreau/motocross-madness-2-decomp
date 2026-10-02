@@ -18,8 +18,15 @@ public:
     UnknownNetObject();                       // 0x004ab480
     ~UnknownNetObject();                      // 0x004ab570
     long UnknownFunction4ab6b0(int value);    // 0x004ab6b0
+    void UnknownFunction4ac720(int index, char* name);  // 0x004ac720 (TrackGame slot 4)
 
-    unsigned char field_0x00[0x128];
+    unsigned char field_0x00[4];
+    int field_0x04;
+    int field_0x08;
+    int field_0x0c;                           // local player index
+    unsigned char field_0x10[0x14 - 0x10];
+    int field_0x14;                           // set once connected (TrackGame slot 4)
+    unsigned char field_0x18[0x128 - 0x18];
 };
 
 // Global at 0x0056c470: a GameObject (Game's initialiser adds it as a child

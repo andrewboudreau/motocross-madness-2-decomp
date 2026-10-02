@@ -32,6 +32,10 @@ extern "C" __declspec(dllimport) int __stdcall ShowCursor(int show);
 extern "C" __declspec(dllimport) int __stdcall MessageBoxA(void* window, const char* text,
                                                           const char* caption, unsigned int type);
 extern "C" __declspec(dllimport) void* __stdcall GetProcAddress(void* module, const char* name);
+extern "C" __declspec(dllimport) long __stdcall SendMessageA(void* window, unsigned int message,
+                                                            unsigned int wParam, long lParam);
+extern "C" __declspec(dllimport) int __stdcall PostMessageA(void* window, unsigned int message,
+                                                           unsigned int wParam, long lParam);
 
 // KERNEL32 MEMORYSTATUS.
 struct UnknownMemoryStatus {
@@ -209,6 +213,90 @@ int TrackGame::UnknownVirtualSlot3() {
     UNKNOWN_ADD_ARCHIVE("Skies.res")
     UNKNOWN_ADD_ARCHIVE("Global.res")
     UNKNOWN_ADD_ARCHIVE("Eco.res")
+    return 1;
+}
+
+// 0x00521050: creates the scene, profile list, record, audio (giving up
+// with a message when the sound device is unavailable), collision, input
+// mapping, KrustyUI and EventManager objects, and for network games the
+// debug connection and the race set-up.
+int TrackGame::UnknownVirtualSlot4() {
+    int category = g_MemTagStack->Push("Scene");
+    field_0x574 = new(__FILE__, 305) UnknownTrackGameObject574;
+    g_MemTagStack->Push("UI");
+    field_0x3338 = new(__FILE__, 309) DirectoryList;
+    field_0x3338->UnknownFunction44a1d0("ui\\profile");
+    field_0x3338->UnknownFunction44a220("*.*", 1);
+    field_0x3338->UnknownVirtualSlot1();
+    field_0x3400 = new(__FILE__, 313) UnknownTrackGameObject3400;
+    field_0x578.UnknownFunction522d00();
+    field_0x578.UnknownFunction522680();
+    g_MemTagStack->Push("Audio");
+    if (((PCSoundInterface*)field_0x04)->UnknownFunction4be5a0(22050, 1, field_0x578.field_0xa48 ? 16 : 8,
+                                                              4000000, field_0x578.field_0xa34) ==
+        (long)0x8878000a) {
+        char text[256];
+        SendMessageA(field_0x31c, 0x112, 0xf020, 0);
+        ShowCursor(1);
+        LoadStringA(field_0x420, 0x13d3, text, sizeof(text));
+        MessageBoxA(field_0x31c, text, field_0x3a0, 0x10);
+        PostMessageA(field_0x31c, 0x10, 0, 0);
+        return 1;
+    }
+    field_0x3340 = new(__FILE__, 343) UnknownTrackGameObject3340;
+    field_0x3340->UnknownFunction4310c0();
+    g_MemTagStack->Push("Startup");
+    field_0x33f8 = new(__FILE__, 350) UnknownControlMapping;
+    if (!field_0x33f8)
+        return 0;
+    field_0x14->UnknownFunction43ce70(field_0x33f8);
+    field_0x33fc = new(__FILE__, 360) UnknownTrackGameObject33fc;
+    if (!field_0x33fc)
+        return 0;
+    g_MemTagStack->Push("UI");
+    field_0x56c = new(__FILE__, 379) KrustyUI(1);
+    if (!field_0x34->UnknownFunction469190(field_0x56c->UnknownFunction4988a0(field_0x10, 1), -1))
+        return 0;
+    field_0x570 = new(__FILE__, 382) EventManager(1);
+    if (!field_0x34->UnknownFunction469190(field_0x570->UnknownVirtualSlot8(field_0x10), -1))
+        return 0;
+    if (field_0x08) {
+        char address[32];
+        unsigned long size = sizeof(address);
+        UnknownVirtualSlot23("debugIP", "", address, &size);
+        int port = UnknownVirtualSlot20("debugPort", 2001);
+        if (address[0]) {
+            g_UnknownGlobal68a48c = new(__FILE__, 395) UnknownTrackGameGlobal68a48c;
+            if (g_UnknownGlobal68a48c) {
+                if (g_UnknownGlobal68a48c->UnknownFunction4ad3e0(address, port) == 1) {
+                    delete g_UnknownGlobal68a48c;
+                    g_UnknownGlobal68a48c = 0;
+                }
+                UnknownFunction520820("Connected! to MCM2\n");
+            }
+        }
+        if (field_0x08->field_0x14) {
+            field_0x56c->field_0x2c->UnknownFunction486630(1);
+            field_0x56c->UnknownFunction498cf0(-1);
+            char name[16];
+            field_0x08->UnknownFunction4ac720(field_0x08->field_0x0c, name);
+            if (strcmp(field_0x578.field_0x00, name)) {
+                int count = strlen(name);
+                int length = count > 15 ? 15 : count;
+                strncpy(field_0x578.field_0x00, name, length);
+                field_0x578.field_0x00[length] = 0;
+                if (!field_0x578.UnknownFunction5231f0())
+                    field_0x56c->UnknownFunction499b20(0xbbb);
+            }
+            field_0x3410 = new(__FILE__, 430) UnknownTrackGameObject3410;
+            if (field_0x3410)
+                field_0x3410->UnknownFunction4aa350(field_0x08->field_0x04, field_0x08->field_0x08);
+            field_0x56c->UnknownFunction499b20(0x866);
+        }
+    }
+    g_MemTagStack->Push("Audio");
+    UnknownFunction521a30();
+    g_MemTagStack->Pop(category);
     return 1;
 }
 
