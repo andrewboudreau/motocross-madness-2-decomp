@@ -1,0 +1,10 @@
+{
+  "as_of": "2026-09-30",
+  "retail_sha256": "31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874",
+  "retail_text_bytes": 1368518,
+  "retail_source_paths": 111,
+  "rtti_types": 252,
+  "vc6_selected_targets": 484,
+  "vc6_exact_targets": 388,
+  "notes": "The VC6 figures are unique, selected function targets from the latest reviewed profile-matrix run. They are not a census of every retail function. The .text size includes third-party libraries, CRT code, thunks, padding, and other non-game code."
+}

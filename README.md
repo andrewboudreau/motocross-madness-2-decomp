@@ -4,8 +4,16 @@ Reconstruct readable C++ that reproduces the retail x86 executable under VC6 SP3
 The project is at function/class reconstruction, not a complete game build.
 
 [Current matches and next targets](docs/VC6_MATCHING.md) ·
+[Decompilation progress](docs/DECOMPILATION_PROGRESS.md) ·
 [Setup](docs/TOOLCHAIN.md) · [Codex Cloud](docs/TOOLCHAIN.md#codex-cloud) ·
 [Agent workflow](AGENTS.md)
+
+As of the latest reviewed VC6 matrix, **388 of 484 selected function targets
+(80.2%)** reproduce the retail bytes exactly. This is not a whole-game
+percentage: the targets are deliberately selected and a complete retail
+function inventory does not exist yet. The [progress page](docs/DECOMPILATION_PROGRESS.md)
+tracks this result alongside source, RTTI, and executable-size indicators and
+explains their limitations.
 
 ## Project layout
 
