@@ -7,10 +7,10 @@ from mcm2tool.vc6_runtime import executable_command, runner_kind, windows_path
 
 def load_profiles(path: Path): return json.loads(path.read_text())['profiles']
 
-def run_vc6(root:Path,src:Path,out:Path,flags:list[str],extra:list[str]):
+def run_vc6(root:Path,src:Path,out:Path,flags:list[str],extra:list[str],user_includes:list[Path]=()):
     bindir=find_vc6_bin(root); cl=find_child_ci(bindir,'cl.exe')
     vc98=infer_vc98_root(root)
-    includes=[]
+    includes=[Path(p) for p in user_includes]
     inc=find_child_ci(vc98,'Include')
     if inc and inc.is_dir(): includes.append(inc)
     mfc=find_child_ci(vc98,'MFC')
@@ -44,6 +44,7 @@ def main():
     ap.add_argument('--vc6-root',default=os.environ.get('VC6_ROOT'))
     ap.add_argument('--profile',default=None); ap.add_argument('--profiles',default='config/compile_profiles.json')
     ap.add_argument('--extra',action='append',default=[],help='additional compiler flag (repeatable)')
+    ap.add_argument('--include',action='append',default=[],help='project include directory, searched before the VC6 headers (repeatable)')
     a=ap.parse_args(); profiles=load_profiles(Path(a.profiles))
     # VC6 default: /O2 without /G6 is the only tested profile that matches every
     # calibration target (docs/VC6_MATCHING.md); /MT follows the LIBCMT runtime
@@ -51,8 +52,12 @@ def main():
     profile=a.profile or ('clang_probe' if a.compiler=='clang-cl' else 'vc6_o2_mt')
     if profile not in profiles: raise SystemExit(f'unknown profile {profile}; choices={list(profiles)}')
     src=Path(a.source); out=Path(a.out); flags=profiles[profile]
-    if a.compiler=='clang-cl': run_clang(src,out,flags,a.extra)
+    # never leave a stale object behind: a failed compile must not let match.py
+    # silently compare the previous build's code
+    out.unlink(missing_ok=True)
+    if a.compiler=='clang-cl': run_clang(src,out,flags,a.extra+[f'/I{Path(p).resolve()}' for p in a.include])
     else:
         if not a.vc6_root: raise SystemExit('set VC6_ROOT or pass --vc6-root; Microsoft VC6 files are intentionally not bundled')
-        run_vc6(Path(a.vc6_root),src,out,flags,a.extra)
+        run_vc6(Path(a.vc6_root),src,out,flags,a.extra,[Path(p).resolve() for p in a.include])
+    if not out.is_file(): raise SystemExit(f'compiler exited 0 but wrote no object: {out}')
 if __name__=='__main__': main()

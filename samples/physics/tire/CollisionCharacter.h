@@ -21,7 +21,7 @@
 #define TIRE_COLLISION_CHARACTER_H
 
 #include "../hierarchy/D3DIMSoultreeCharacter.h"
-#include "../collision/CollisionObject.h"
+#include "collision/CollisionObject.h"
 
 class CollisionCharacter : public D3DIMSoultreeCharacter {
 public:

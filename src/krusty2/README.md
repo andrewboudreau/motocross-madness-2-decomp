@@ -1,0 +1,79 @@
+# src/krusty2: promoted translation units
+
+The retail game was built from one flat folder, `D:\aardvark\VC\krusty2\`, recovered
+from the `__FILE__` strings in the binary (`analysis/source_paths.txt`). This tree
+holds reconstructed code whose **retail file is known**. It is grouped into area
+subfolders to keep things organised; the byte match doesn't depend on the folder.
+
+- `__FILE__` strings are only reached through relocated addresses, and the matcher
+  masks those, so the path text never enters the comparison.
+- Line numbers do enter the code (`push 0x7a`), so sources pass them as literals,
+  e.g. `new(__FILE__, 0x7a)`. Moving a file never changes them.
+
+Experimental reconstructions, layout probes and code with unknown or weakly
+attributed files stay under `samples/physics/`.
+
+## Promotion rule
+
+A `.cpp` is promoted under its retail name when:
+
+1. The name is in `analysis/source_paths.txt` (tier 1).
+2. Every promoted function lies inside that file's code bracket (tier 2). The linker
+   placed the `.cpp` objects in alphabetical order, so a file's code sits between the
+   last `__FILE__` xref of its alphabetical predecessor and the first xref of its
+   successor. EH funclets at `0x54xxxx` are excluded.
+3. The function either references the file's own `__FILE__` string, or is a method
+   of a class whose other methods do and sits contiguously with them.
+
+Headers have no retail names beyond a few `.h` strings, so their names are ours
+(tier 3). Shared headers live here so promoted code never includes from `samples/`.
+
+## Layout
+
+| Folder | Contents |
+|---|---|
+| `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug `new`/`delete`/realloc), `MemTag.h` |
+| `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
+| `collision/` | `CollisionObject.h`, `CollisionTypes.h` |
+| `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
+
+Include shared headers by their path under this folder, e.g. `#include "core/GameObject.h"`.
+`tools/run_physics_samples.py` puts `src/krusty2` on the include path.
+
+## Evidence: Quadtree.cpp
+
+- Name: `D:\aardvark\VC\krusty2\Quadtree.cpp`, string at 0x00572040.
+- Code bracket: after `ProjectedShadow.cpp` (last xref 0x4dacbc) and before
+  `Quantize.cpp` (first xref 0x4dde47). Quadtree.cpp's own xrefs span 0x4dc729..0x4ddce6.
+- All 27 QuadTree/QuadTreeNode targets (0x4dc620..0x4ddd90) are inside the bracket;
+  22 match exactly, and 5 are documented partials in `broadphase/targets.json`.
+- The 5-byte stub at 0x4dc4c0 (`xor eax,eax; ret 8`) also sits in this stretch, but it is
+  Terrain's slot 22 and is shared with the ProjectedShadow and StatsOverlay vtables.
+  Identical code folding makes its address useless for attribution. It is reconstructed
+  in Terrain.cpp.
+
+## Evidence: Terrain.cpp
+
+- Name: `D:\aardvark\VC\krusty2\Terrain.cpp`, string at 0x00574720, with debug deletes
+  at lines 0x4b3 and 0x4d0.
+- Code bracket: after `SteeringControl.cpp` (last xref 0x504bd2) and before `Texmap.cpp`
+  (first xref 0x50a6bc). Terrain.cpp's own xrefs span 0x50567c..0x507b38.
+- 11 of the 12 targets (0x505830..0x508964) are inside the bracket. The 12th is the shared
+  0x4dc4c0 stub described above. 7 match exactly.
+- Terrain derives from `GameObject` and `GroundFogableObject`, as the RTTI says (mdisp 0,
+  and 0x2c for GroundFogableObject, which has no vfptr). Both bases are kept.
+- Out of reach under the no-asm rule: `QueryGround` 0x507c10 inlines an `__asm` fistp helper.
+- The helper types (`TerrainVec3`, `TerrainMatrix`, `TerrainShutdownObject`,
+  `TerrainComObject`, `TerrainOwned` and others) are provisional stand-ins with tier 3 names.
+  `TerrainVec3` stays separate from the shared Vec3 because including `Math3D.h` would add
+  static initializers that Terrain.cpp does not have.
+
+## Gate
+
+```bash
+python tools/run_physics_samples.py                             # samples/physics + src/krusty2
+python tools/run_physics_samples.py --root src/krusty2/broadphase
+```
+
+`tools/analyze.py` writes a flat placeholder `src/krusty2/<RetailName>.cpp` for each
+known name, and skips any name already present somewhere in this tree.

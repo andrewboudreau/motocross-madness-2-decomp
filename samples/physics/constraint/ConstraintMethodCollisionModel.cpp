@@ -31,7 +31,7 @@
 //
 #include "ConstraintMethodCollisionModel.h"
 
-#include "../common/DebugAlloc.h"   // DebugRealloc
+#include "core/DebugAlloc.h"   // DebugRealloc
 
 // The two callbacks slot 8 installs (CollisionObject.h, CollisionCallback).
 void ConstraintContactCallback(CollisionObject* self, CollisionObject* other);  // 0x0043b800, below
@@ -185,13 +185,15 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
     return 1;
 }
 
-// TU-private zero vector at 0x00579830; the dynamic initializer 0x0043c8e0 builds it
-// from an inline three-float constructor (tier 2: only the stores are visible).
+// TU-private zero vector at 0x00579830.  The dynamic initializer (thunk 0x0043c8e0, body
+// 0x0043c8f0) builds it in a stack temporary and copies it out, which is the shape VC6 gives
+// copy-initialization from a constructor call (direct initialization stores the floats
+// straight into the global).
 struct ConZeroVec {
     float x, y, z;
     ConZeroVec(float a, float b, float c) : x(a), y(b), z(c) {}
 };
-static ConZeroVec g_ConZero(0.0f, 0.0f, 0.0f);
+static const ConZeroVec g_ConZero = ConZeroVec(0.0f, 0.0f, 0.0f);
 
 void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t,
                                                          ConVec3 a, ConVec3 b, ConVec3 c)

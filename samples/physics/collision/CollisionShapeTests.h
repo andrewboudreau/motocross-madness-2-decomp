@@ -11,7 +11,7 @@
 #ifndef COLLISION_SHAPE_TESTS_H
 #define COLLISION_SHAPE_TESTS_H
 
-#include "CollisionObject.h"
+#include "collision/CollisionObject.h"
 #include "CollisionPoint.h"
 #include "../common/Math3D.h"
 

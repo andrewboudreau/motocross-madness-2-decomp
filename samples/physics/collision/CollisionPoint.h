@@ -5,7 +5,7 @@
 #ifndef COLLISION_POINT_H
 #define COLLISION_POINT_H
 
-#include "CollisionTypes.h"
+#include "collision/CollisionTypes.h"
 
 // The object a contact point belongs to (CollisionPoint::field_0x04).  Only one method
 // is used: 0x004fd660 (thiscall, ret 8), which the scene node class (SoultreeObject)

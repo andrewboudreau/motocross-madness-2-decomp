@@ -6,8 +6,8 @@
 #include <string.h>
 #include "SoultreePhysicsBaseObject.h"
 #include "SoultreePhysicsCallees.h"
-#include "../common/DebugAlloc.h"
-#include "../common/MemTag.h"
+#include "core/DebugAlloc.h"
+#include "core/MemTag.h"
 #include "SoultreePhysicsContact.h"
 
 #define g_Zero g_SoultreeZeroVec3
@@ -596,6 +596,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     field_0x30 = 0.0f;
     field_0x38 = 0.0f;
     field_0x3c = 1.0f;
+    field_0xa0 = field_0x88;
+    field_0xac = field_0x94;
     field_0x40 = 0.0f;
     field_0x44 = 1.0f;
     field_0x4c = 0.0f;
@@ -604,8 +606,6 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     field_0x58 = 1.0f;
     field_0x60 = 1.0f;
     field_0x5c = 0.0f;
-    field_0xa0 = field_0x88;
-    field_0xac = field_0x94;
     field_0x50 = field_0x34;
 }
 
@@ -843,7 +843,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
 }
 
 // ---- slot 2 (0x00500c50) --------------------------------------------------------------
-// Debug allocator (../common/DebugAlloc.h, 0x004a3010: size, __FILE__, line); the retail source is
+// Debug allocator (core/DebugAlloc.h, 0x004a3010: size, __FILE__, line); the retail source is
 // D:\aardvark\VC\krusty2\SoulTreePhysics.cpp, so the file argument is that literal.
 #define SP_FILE "D:\\aardvark\\VC\\krusty2\\SoulTreePhysics.cpp"
 

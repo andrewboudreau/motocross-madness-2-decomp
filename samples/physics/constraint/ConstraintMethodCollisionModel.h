@@ -8,7 +8,7 @@
 #ifndef CONSTRAINT_METHOD_COLLISION_MODEL_H
 #define CONSTRAINT_METHOD_COLLISION_MODEL_H
 
-#include "../collision/CollisionObject.h"   // canonical CollisionObject chain (MIGRATION.md)
+#include "collision/CollisionObject.h"   // canonical CollisionObject chain (MIGRATION.md)
 #include "ConstraintTypes.h"
 
 // One probe point (32 bytes), see AddProbePoint / GameObjectVirtualSlot11.

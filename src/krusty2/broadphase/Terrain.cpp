@@ -125,8 +125,12 @@ void Terrain::SelectQuality(int index)
     field_0xbf0 = index;
     g_terrainQualityValue = g_pTerrainQualityTable[index].field_0x0c;
     SetField0xbec(g_pTerrainQualityTable[field_0xbf0].field_0x00);
-    field_0xca4 = field_0xcb0 ? g_pTerrainQualityTable[9].field_0x04
-                              : g_pTerrainQualityTable[field_0xbf0].field_0x04;
+    // if/else, not a ?: expression: VC6 merges the two stores but allocates the joined value
+    // to edx only in this form (retail 0x5079a3).
+    if (field_0xcb0)
+        field_0xca4 = g_pTerrainQualityTable[9].field_0x04;
+    else
+        field_0xca4 = g_pTerrainQualityTable[field_0xbf0].field_0x04;
     field_0xca8 = g_pTerrainQualityTable[field_0xbf0].field_0x08;
 }
 
@@ -166,26 +170,30 @@ int Terrain::GameObjectVirtualSlot23(int event, int)
 // 0x00507510 (Y) and 0x00507590 (Z): advance `origin` along `dir` to the plane coordinate
 // `limit` when the ray is heading toward it from the outside, then return the result by value
 // (tier 3 names: t = (limit - origin.c) / dir.c and the other two components step by t*dir).
-TerrainVec3 TerrainClipRayToPlaneY(TerrainVec3* origin, const TerrainVec3* dir, float limit)
+// Both are `inline`: retail emits these copies right after CastSegment because some of its call
+// sites were not inlined.  The early `return origin` matters: with a single return after the if, VC6 sinks the
+// `push esi` used by the struct copy into the tail block; with two return statements it
+// stays in the prologue as in retail.
+inline TerrainVec3 TerrainClipRayToPlaneY(TerrainVec3& origin, const TerrainVec3& dir, float limit)
 {
-    if ((dir->y > 0.0f && origin->y < limit) || (dir->y < 0.0f && origin->y > limit)) {
-        float t = (limit - origin->y) / dir->y;
-        origin->x += t * dir->x;
-        origin->y = limit;
-        origin->z += t * dir->z;
-    }
-    return *origin;
+    if (!((dir.y > 0.0f && origin.y < limit) || (dir.y < 0.0f && origin.y > limit)))
+        return origin;
+    float t = (limit - origin.y) / dir.y;
+    origin.x += t * dir.x;
+    origin.y = limit;
+    origin.z += t * dir.z;
+    return origin;
 }
 
-TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3* origin, const TerrainVec3* dir, float limit)
+inline TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3& origin, const TerrainVec3& dir, float limit)
 {
-    if ((dir->z > 0.0f && origin->z < limit) || (dir->z < 0.0f && origin->z > limit)) {
-        float t = (limit - origin->z) / dir->z;
-        origin->x += t * dir->x;
-        origin->y += t * dir->y;
-        origin->z = limit;
-    }
-    return *origin;
+    if (!((dir.z > 0.0f && origin.z < limit) || (dir.z < 0.0f && origin.z > limit)))
+        return origin;
+    float t = (limit - origin.z) / dir.z;
+    origin.x += t * dir.x;
+    origin.y += t * dir.y;
+    origin.z = limit;
+    return origin;
 }
 
 TerrainVec3 g_terrainRefDir;
@@ -356,16 +364,17 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
 }
 
 // X-axis sibling of TerrainClipRayToPlaneY/Z (0x00507510 / 0x00507590): retail has no
-// out-of-line copy, it is inlined into CastSegment (tier 2: the same disjunction is visible
-// inline at 0x00506f6d..0x00506ffb).
-static inline void TerrainClipRayToPlaneX(TerrainVec3* origin, const TerrainVec3* dir, float limit)
+// out-of-line copy, every call site in CastSegment is inlined (tier 2: the same disjunction is
+// visible inline at 0x00506f6d..0x00506ffb).  Same shape as Y/Z (tier 3).
+inline TerrainVec3 TerrainClipRayToPlaneX(TerrainVec3& origin, const TerrainVec3& dir, float limit)
 {
-    if ((dir->x > 0.0f && origin->x < limit) || (dir->x < 0.0f && origin->x > limit)) {
-        float t = (limit - origin->x) / dir->x;
-        origin->x = limit;
-        origin->y += t * dir->y;
-        origin->z += t * dir->z;
-    }
+    if (!((dir.x > 0.0f && origin.x < limit) || (dir.x < 0.0f && origin.x > limit)))
+        return origin;
+    float t = (limit - origin.x) / dir.x;
+    origin.x = limit;
+    origin.y += t * dir.y;
+    origin.z += t * dir.z;
+    return origin;
 }
 
 // 0x00506e90 (tier 3 names).  Callers: SoultreePhysicsBaseObject slot 21 (0x00502632) and
@@ -374,6 +383,15 @@ static inline void TerrainClipRayToPlaneX(TerrainVec3* origin, const TerrainVec3
 // (W = 16 << shift; the start point is advanced along the direction, the end point along the
 // reversed direction), trivially rejected if both ends are on the outside of a face, then y and
 // z are swapped (the grid stores (x, z, height)) and the grid's slot 1 does the actual cast.
+//
+// Inline budget (VC6 SP3 /O2, measured with probes): VC6 expands inline calls breadth-first --
+// every direct call site in source order first (greedy: a callee that does not fit the remaining
+// budget is skipped, later smaller ones may still fit), then the calls inside the inlined bodies
+// (here the TerrainVec3 constructors), and the budget grows with the caller's own code size.
+// Retail inlines ClipX x4, ClipZ for the start point, and every `-dir` but the last; the
+// constructor is inlined only in the two scalings, `end - start` and the first `-dir`.  The
+// first 0x3b7 bytes match; from the Z end-point clip on, this source still inlines one ClipZ
+// too many (PARTIAL: the budget arithmetic, not the statement shapes, is the remaining gap).
 int Terrain::CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out,
                          int a, int b, int c)
 {
@@ -387,44 +405,38 @@ int Terrain::CastSegment(const TerrainVec3* from, const TerrainVec3* to, Terrain
 
     // x slab
     if (dir.x > 0.0f) {
-        TerrainClipRayToPlaneX(&start, &dir, 0.0f);
+        TerrainClipRayToPlaneX(start, dir, 0.0f);
     } else if (dir.x < 0.0f) {
-        TerrainClipRayToPlaneX(&start, &dir, size);
+        TerrainClipRayToPlaneX(start, dir, size);
     }
     if (dir.x < 0.0f) {
-        TerrainVec3 back = -dir;
-        TerrainClipRayToPlaneX(&end, &back, 0.0f);
+        TerrainClipRayToPlaneX(end, -dir, 0.0f);
     } else if (dir.x > 0.0f) {
-        TerrainVec3 back = -dir;
-        TerrainClipRayToPlaneX(&end, &back, size);
+        TerrainClipRayToPlaneX(end, -dir, size);
     }
 
     // z slab
     if (dir.z > 0.0f) {
-        TerrainClipRayToPlaneZ(&start, &dir, 0.0f);
+        TerrainClipRayToPlaneZ(start, dir, 0.0f);
     } else if (dir.z < 0.0f) {
-        TerrainClipRayToPlaneZ(&start, &dir, size);
+        TerrainClipRayToPlaneZ(start, dir, size);
     }
     if (dir.z < 0.0f) {
-        TerrainVec3 back = -dir;
-        TerrainClipRayToPlaneZ(&end, &back, 0.0f);
+        TerrainClipRayToPlaneZ(end, -dir, 0.0f);
     } else if (dir.z > 0.0f) {
-        TerrainVec3 back = -dir;
-        TerrainClipRayToPlaneZ(&end, &back, size);
+        TerrainClipRayToPlaneZ(end, -dir, size);
     }
 
     // y slab
     if (dir.y > 0.0f) {
-        TerrainClipRayToPlaneY(&start, &dir, yLo);
+        TerrainClipRayToPlaneY(start, dir, yLo);
     } else if (dir.y < 0.0f) {
-        TerrainClipRayToPlaneY(&start, &dir, yHi);
+        TerrainClipRayToPlaneY(start, dir, yHi);
     }
     if (dir.y < 0.0f) {
-        TerrainVec3 back = -dir;
-        TerrainClipRayToPlaneY(&end, &back, yLo);
+        TerrainClipRayToPlaneY(end, -dir, yLo);
     } else if (dir.y > 0.0f) {
-        TerrainVec3 back = -dir;
-        TerrainClipRayToPlaneY(&end, &back, yHi);
+        TerrainClipRayToPlaneY(end, -dir, yHi);
     }
 
     if ((start.x <= 0.0f && end.x <= 0.0f) || (start.x >= size && end.x >= size) ||

@@ -3,7 +3,7 @@
 #include "CollisionCharacter.h"
 #include "../soultree_base/SoultreePhysicsCallees.h"
 #include "../collision/CollisionShapeTests.h"
-#include "../common/MemTag.h"
+#include "core/MemTag.h"
 
 #define CC_FILE "D:\\aardvark\\VC\\krusty2\\CollisionCharacter.cpp"
 

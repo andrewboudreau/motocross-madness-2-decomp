@@ -18,7 +18,7 @@
 #define COLLISION_OBJECT_H
 
 #include "CollisionTypes.h"
-#include "../soultree_base/GraphicsTest.h"   // canonical BaseObject, GameObject, GraphicsTest
+#include "core/GraphicsTest.h"   // canonical BaseObject, GameObject, GraphicsTest
 
 class CollisionModelSource;   // scene-graph node source used by shape setup 0x004324b0
 struct CollisionHullBody;      // CollisionShapeTests.h
@@ -28,7 +28,7 @@ struct CollisionTreeNode;      // CollisionDebugDraw.cpp
 struct Vec3;                   // ../common/Math3D.h
 struct Matrix4;
 
-// GraphicsTest (: GameObject, non-virtual) is declared once in ../soultree_base/GraphicsTest.h.
+// GraphicsTest (: GameObject, non-virtual) is declared once in core/GraphicsTest.h.
 // No vbptr/vtordisp here; GameObject members are at their plain offsets from the GraphicsTest
 // subobject at +12.
 
