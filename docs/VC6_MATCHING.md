@@ -10,7 +10,7 @@ game remains a separate, unverified gate.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 480/480 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 487/487 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
@@ -56,6 +56,11 @@ RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 [application allocation accounting](ALLOCATION.md). Wrong bindings fail comparison.
 
 ## Next targets
+
+The seven emitted fixed-size `BlockAllocator` bodies are now exact under the
+default profile, including the five-byte destructor tail jump and the two
+fully resolved `BlockAllocator.cpp` debug-allocation calls. See
+[allocation evidence](ALLOCATION.md#fixed-size-block-allocator).
 
 All 17 calibration targets match the default profile, including
 [FollowCamera](FOLLOW_CAMERA.md) slots 68 (`0x00466d50`, x87 distance/clamp,
