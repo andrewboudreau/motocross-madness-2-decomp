@@ -8,10 +8,10 @@ InputDevice::InputDevice(int id) {
     field_0x14_axis3 = 0;
     field_0x14_axis4 = 0;
     field_0x14_axis5 = 0;
-    field_0x10 = -1;
-    field_0x04 = 0;
-    field_0x08 = 0;
-    field_0x0c = id;
+    deviceSubtype = -1;
+    axisCount = 0;
+    buttonCount = 0;
+    deviceKind = id;
 }
 
 // 0x004897d0
@@ -19,5 +19,5 @@ InputDevice::~InputDevice() {}
 
 // 0x004897e0
 int InputDevice::UnknownFunction4897e0(int value) {
-    return field_0x10 == value;
+    return deviceSubtype == value;
 }

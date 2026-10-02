@@ -52,15 +52,15 @@ struct UnknownJoystickState {
 struct UnknownEffectInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();   // Release
+    virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall UnknownMethod6(const struct UnknownEffectParams* params,
+    virtual long __stdcall SetParameters(const struct UnknownEffectParams* params,
                                           unsigned long flags); // SetParameters
-    virtual long __stdcall UnknownMethod7(unsigned long iterations, unsigned long flags); // Start
-    virtual long __stdcall UnknownMethod8();   // Stop
-    virtual long __stdcall UnknownMethod9(unsigned long* status); // GetEffectStatus
+    virtual long __stdcall Start(unsigned long iterations, unsigned long flags);
+    virtual long __stdcall Stop();
+    virtual long __stdcall GetEffectStatus(unsigned long* status);
 };
 
 // RTTI: PCJoystickDevice : JoystickDevice. Slot 20 and 0x004c3a10 pass the
