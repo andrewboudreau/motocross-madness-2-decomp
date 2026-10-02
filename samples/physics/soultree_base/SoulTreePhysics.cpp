@@ -596,6 +596,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     field_0x30 = 0.0f;
     field_0x38 = 0.0f;
     field_0x3c = 1.0f;
+    field_0xa0 = field_0x88;
+    field_0xac = field_0x94;
     field_0x40 = 0.0f;
     field_0x44 = 1.0f;
     field_0x4c = 0.0f;
@@ -604,8 +606,6 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     field_0x58 = 1.0f;
     field_0x60 = 1.0f;
     field_0x5c = 0.0f;
-    field_0xa0 = field_0x88;
-    field_0xac = field_0x94;
     field_0x50 = field_0x34;
 }
 

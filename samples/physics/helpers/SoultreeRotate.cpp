@@ -24,18 +24,9 @@ void SoultreeObject::RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle)
     p.z += localMatrix._43;
     SetPosition(p);
     Rotate(axis, angle);
-    Vec3 n = -pivot;
-    p.x = n.z * localMatrix._31;
-    p.x += n.y * localMatrix._21;
-    p.x += n.x * localMatrix._11;
-    p.x += localMatrix._41;
-    p.y = n.z * localMatrix._32;
-    p.y += n.y * localMatrix._22;
-    p.y += n.x * localMatrix._12;
-    p.y += localMatrix._42;
-    p.z = n.z * localMatrix._33;
-    p.z += n.y * localMatrix._23;
-    p.z += n.x * localMatrix._13;
-    p.z += localMatrix._43;
+    float nx = -pivot.x, ny = -pivot.y, nz = -pivot.z;
+    p.x = nz * localMatrix._31 + ny * localMatrix._21 + nx * localMatrix._11 + localMatrix._41;
+    p.y = nz * localMatrix._32 + ny * localMatrix._22 + nx * localMatrix._12 + localMatrix._42;
+    p.z = nz * localMatrix._33 + ny * localMatrix._23 + nx * localMatrix._13 + localMatrix._43;
     SetPosition(p);
 }

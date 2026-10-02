@@ -203,8 +203,8 @@
     "candidate_symbol_contains": "Init@QuadTree",
     "target_va": "0x004dc670",
     "target_size": 365,
-    "expect": "partial",
-    "notes": "18.4% match under vc6_o2_ml. Readable reconstruction of cell-size table, world rect, pools, root. Diverges at the SEH state/handler push and store ordering: retail stores field_0x5c later and reloads args differently (register allocation of the float extent computation)."
+    "expect": "exact",
+    "notes": "cell-size table, world rect, pools, root. Exact: the extents are written as chained assignments (`float w = field_0x50 = x1 - x0;`), which gives retail's `fst [field]` plus the spill temporary; reading the field back after a separate store does not."
   },
   {
     "class": "QuadTree",
@@ -213,7 +213,7 @@
     "target_va": "0x004dcac0",
     "target_size": 627,
     "expect": "partial",
-    "notes": "3.6% match. Same control flow; retail keeps `this` in ecx->esp+8 spill and a different register assignment (ebp/ebx swap) and a different prologue ordering of the code test and arg loads."
+    "notes": "3.6% match. Same control flow. Register allocation differs: retail has a 0x34 frame, spills `this` to esp+8, keeps depth in ebp, x in edx and z in ebx, and moves the Grow path out of line. The candidate has a 0x30 frame with `this` in ebx. Loop-form variants (count-down, 0..depth, if/else order) stay between 2% and 4%."
   },
   {
     "class": "QuadTree",
@@ -222,7 +222,7 @@
     "target_va": "0x004dcf20",
     "target_size": 331,
     "expect": "partial",
-    "notes": "11.3% match. Same control flow; retail holds this in ebp and code in ecx, candidate holds code in esi (register allocation)."
+    "notes": "11.3% match. Same control flow. Retail keeps `this` in ebp and code, i and bit in memory; the candidate holds code in esi and i in ebp. Tried without success: a goto/flag-free form, an if-body without continue, `0x10 << i`, recomputing x/z/cell in the loop, and moving cell inside the loop."
   },
   {
     "class": "QuadTreeNode",
@@ -230,8 +230,8 @@
     "candidate_symbol_contains": "AddObject",
     "target_va": "0x004dd130",
     "target_size": 117,
-    "expect": "partial",
-    "notes": "2.8% match. Retail walks the block list with edi=this and zeroes a freshly allocated block through a copied pointer; candidate uses ebx/ebp and Clear() order differs."
+    "expect": "exact",
+    "notes": "append obj to the node's first free item slot, allocating a 0x14 block from the pool. Exact: the fresh block is cleared with memset(p, 0, sizeof) (VC6 inlines it as `mov edx,eax; xor ecx,ecx; mov [edx],ecx` x5; field stores give `mov [eax+N],0`), and `prev` is left uninitialised on the empty-list path, which reproduces retail's dead load at 0x4dd165."
   },
   {
     "class": "QuadTree",
@@ -240,7 +240,79 @@
     "target_va": "0x004dd600",
     "target_size": 330,
     "expect": "partial",
-    "notes": "27.5% match. Same sorted-stack algorithm (qsort with CompareObjectKey); retail differs in branch layout after the drain check and in register assignment."
+    "notes": "88.0% (329 vs 330 bytes). Same algorithm (qsort with CompareObjectKey, 2-element swap inline). Exact up to the outer loop's bottom: retail ends the loop with `cmp eax,edi; je ret0; jmp top` and puts the return-0 block last, but VC6 rotates every while/for(;;) loop whose top is a conditional exit into a bottom `jne body`. That shape has not been reproduced yet."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004dc4d0",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer jmp thunk; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004dc4e0",
+    "target_size": 64,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer body; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004dc520",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer jmp thunk; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004dc530",
+    "target_size": 64,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer body; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004dc570",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer jmp thunk; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004dc580",
+    "target_size": 64,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer body; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004dc5c0",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer jmp thunk; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
+  },
+  {
+    "class": "QuadTree",
+    "source": "Quadtree.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004dc5d0",
+    "target_size": 64,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer body; target_size includes the nop padding up to the next 16-byte boundary, which VC6 also emits. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
   },
   {
     "class": "Terrain",
@@ -302,8 +374,8 @@
     "candidate_symbol_contains": "SelectQuality",
     "target_va": "0x00507960",
     "target_size": 129,
-    "expect": "partial",
-    "notes": "63.5% match. Same statements; retail indexes the table with [eax+ecx+4] (index reg + base reg) where the candidate emits [edx+eax]; register assignment of the reloaded index only."
+    "expect": "exact",
+    "notes": "select the quality table entry (row 9 when field_0xcb0 is set). Exact: the store is written as if/else, not as `field = cond ? a : b;`. In the if/else form VC6 tail-merges the two stores, and the joined value lands in edx."
   },
   {
     "class": "Terrain",
@@ -320,8 +392,8 @@
     "candidate_symbol_contains": "TerrainClipRayToPlaneY",
     "target_va": "0x00507510",
     "target_size": 127,
-    "expect": "partial",
-    "notes": "23.5% match. Same instruction sequence; retail pushes esi in the prologue, candidate emits push esi immediately before its first use (VC6 prologue placement differs for by-value struct return)."
+    "expect": "exact",
+    "notes": "inline helper; retail keeps this out-of-line COMDAT copy because CastSegment ran out of inline budget. Exact: the early `return origin` (two return statements) keeps `push esi` in the prologue; a single return after the if makes VC6 sink it into the tail block. The reference parameters are ABI-identical to pointers."
   },
   {
     "class": "Terrain",
@@ -329,8 +401,8 @@
     "candidate_symbol_contains": "TerrainClipRayToPlaneZ",
     "target_va": "0x00507590",
     "target_size": 127,
-    "expect": "partial",
-    "notes": "23.5% match, same cause as the Y variant."
+    "expect": "exact",
+    "notes": "Z sibling of 0x00507510, same shape and the same cause of the exact match."
   },
   {
     "class": "Terrain",
@@ -348,6 +420,6 @@
     "target_va": "0x00506e90",
     "target_size": 1654,
     "expect": "partial",
-    "notes": "Clips segment to grid box slab-by-slab (X,Z,Y) then calls grid vtable slot 1. ~34.7% match, candidate 1550 bytes. Differences: inline-budget decisions at TerrainVec3 ctor/unary-minus sites, register allocation."
+    "notes": "56.6% (1659 vs 1654). The first 0x3b7 bytes are identical. The Clip helpers are now `inline` with reference params, `-dir` is passed as a temporary, and operator/ builds the result with a direct constructor call. What remains is VC6's inline budget: retail does not inline the ClipZ for the Z end point and inlines the next `-dir`, but this source inlines that ClipZ and so runs out of budget one site early. See the comment above CastSegment."
   }
 ]

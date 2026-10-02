@@ -137,10 +137,19 @@
   {
     "class": "ConstraintMethodCollisionModel",
     "source": "ConstraintMethodCollisionModel.cpp",
-    "candidate_symbol_contains": "$E1",
-    "target_va": "0x43c8e0",
-    "target_size": 76,
-    "expect": "partial",
-    "notes": "TU static initializer for 0x579830. TU dynamic initializer for the Vec3 at 0x579830 (built from an inline 3-float ctor, then stored)."
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x0043c8e0",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the TU zero vector 0x579830 (jmp to the body plus nop padding, which VC6 also emits)."
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x0043c8f0",
+    "target_size": 64,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary, then copies it to 0x579830. Exact with copy-initialization `static const ConZeroVec g_ConZero = ConZeroVec(0,0,0);`; direct initialization gives three direct stores instead."
   }
 ]

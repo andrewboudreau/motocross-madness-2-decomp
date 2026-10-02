@@ -34,6 +34,9 @@ struct VehBlock7 { float f[7]; };   // 28-byte state block (pose/orientation val
 // Global vector at 0x0068a6e8 (three floats, all zero at rest): copied whole into
 // vector members when they are reset.
 extern Vec3 g_VehZeroVec3;
+// Zero vectors in the retail data section at 0x005778a8 / 0x005778c8 (read-only copies).
+extern Vec3 g_VehZeroVec3_005778a8;
+extern Vec3 g_VehZeroVec3_005778c8;
 
 // 0x00460b50 FastSqrt / 0x00460c00 FastInvSqrt are declared in math/FastMath.h.
 
@@ -60,6 +63,14 @@ struct VehicleValueSource {          // object at VehicleInputMap+0x0c (provisio
     virtual void UnknownVirtualSlot2();
     virtual int  UnknownVirtualSlot3(int a, float* out);
 };
+struct VehicleKeyTable {             // object at VehicleInputMap+0x34 (provisional)
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual int  UnknownVirtualSlot5(int a, int b, int c);
+};
 struct VehicleInputMap {
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
@@ -68,7 +79,7 @@ struct VehicleInputMap {
     char pad_0x04[0x8];
     VehicleValueSource* field_0x0c;
     char pad_0x10[0x24];
-    void* field_0x34;
+    VehicleKeyTable* field_0x34;
 };
 
 struct VehicleContact {              // elements of Vehicle+0x12c
@@ -112,11 +123,19 @@ struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
     char field_0x24;
 };
 // Object at Vehicle+0x480 (provisional): lean/speed state; field_0x00 is read by slots 42/57 as a float.
+struct VehicleSpeedEntry { float a; float b; };   // 8-byte table entry (slot 1 reads .a)
 struct VehicleSpeedState {
     float field_0x00;
-    char pad_0x04[4];
+    int field_0x04;
     int field_0x08;
     float field_0x0c;                // countdown timer
+    unsigned char field_0x10;        // table index (slot 1)
+    char pad_0x11[0x1F];
+    VehicleSpeedEntry field_0x30[6];
+    float field_0x60[6];
+    float field_0x78;                // randomised start value (slot 1)
+    char pad_0x7C[0x8];
+    int field_0x84;
     void Method_004D2F50(float dt, int a, int b);   // 0x004d2f50, purpose unknown
     void Method_004D3030(int a, float speed);       // 0x004d3030, purpose unknown
 };
@@ -133,8 +152,18 @@ struct VehicleSteerState {
     float field_0x04;
     float field_0x08;
     void Method_00504EC0(float value, SoultreeObject* node);   // 0x00504ec0, purpose unknown
+    void Method_00504E20(int a, SoultreeObject* node);         // 0x00504e20, purpose unknown
 };
-struct VehicleAxis;                  // objects at Vehicle+0x4f8/0x4fc/0x500
+struct VehicleAxisSource {           // object at VehicleAxis+0x00 (provisional)
+    char pad_0x00[0xC];
+    int field_0x0c;                  // kind code (2 and 3 are tested by slot 63)
+    int Method_004897E0(int a);      // 0x004897e0, purpose unknown
+};
+struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (provisional)
+    VehicleAxisSource* field_0x00;
+    char pad_0x04[0x20];
+    float field_0x24;                // axis value (slot 63 reads it)
+};
 struct VehicleCamera;                // object at Vehicle+0x5ac
 class Vehicle;
 struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional)
@@ -160,9 +189,12 @@ struct VehicleWheel {
     int field_0x168;                 // impact-handled flag (slot 20)
     char pad_0x16C[8];
     unsigned char field_0x174;       // surface material id
-    char pad_0x175[0x4B];
+    char pad_0x175[0x47];
+    SoultreeObject* field_0x1bc;     // wheel scene node (slot 33 reads its position)
     int field_0x1c0;
-    char pad_0x1C4[0x64];
+    char pad_0x1C4[0x3C];
+    Vec3 field_0x200;                // wheel node position (written by slot 33)
+    char pad_0x20C[0x1C];
     float field_0x228;
     char pad_0x22C[4];
     Vec3 field_0x230;
@@ -175,7 +207,9 @@ struct VehicleWheel {
     float field_0x28c;
     float field_0x290;
     float field_0x294;
-    char pad_0x298[0x10];
+    char pad_0x298[0x4];
+    float field_0x29c;               // 0 selects a flag passed to slot 77 (slot 83)
+    char pad_0x2A0[0x8];
     VehicleWheelAux* field_0x2a8;
     char pad_0x2AC[0xC];
     float field_0x2b8;
@@ -245,7 +279,7 @@ public:
     virtual void UnknownVirtualSlot60(float a, float b, int c);
     virtual float UnknownVirtualSlot61(float arg);
     virtual int UnknownVirtualSlot62(float arg);
-    virtual int UnknownVirtualSlot63(float dt);
+    virtual void UnknownVirtualSlot63(float dt);
     // void: 0x00528e50 leaves eax as whatever the last store used (no return value is
     // materialised) and the only caller, slot 49, ignores eax; byte-exact as void (tier 2).
     virtual void UnknownVirtualSlot64(float dt);
@@ -299,6 +333,7 @@ public:
     void  Method_00529C20(Vec3* up, Vec3* zero, float d);  // 0x00529c20
     // 0x00525c60: calls virtual slot 0 of every object in the two owned arrays (+0x554/+0x55c, +0x560/+0x568).
     void Method_00525C60();
+    void Method_00525A90();                                      // 0x00525a90, purpose unknown
 
     // Inherited members whose canonical types are still separate classes are viewed
     // through casts at the use site (MIGRATION.md rule 6): field_0x12c as
@@ -335,7 +370,7 @@ public:
     int field_0x484;
     Vec3 field_0x488;
     Vec3 field_0x494;
-    char pad_0x4A0[0x4];
+    int field_0x4a0;          // set to 1 by slot 44
     float field_0x4a4;
     int field_0x4a8;
     float field_0x4ac;

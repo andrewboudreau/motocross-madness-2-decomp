@@ -190,13 +190,15 @@ int KrustyBike::UnknownVirtualSlot52()
     return 1;
 }
 
-int KrustyBike::UnknownVirtualSlot63(float a)
+void KrustyBike::UnknownVirtualSlot63(float a)
 {
-    if (field_0x734)
-        return Fn_00414370(a);
+    if (field_0x734) {
+        Fn_00414370(a);
+        return;
+    }
     field_0x804 = 0;
     field_0x808 = 0;
-    return Bike::UnknownVirtualSlot63(a);
+    Bike::UnknownVirtualSlot63(a);
 }
 
 void KrustyBike::UnknownVirtualSlot64(float a)
@@ -427,7 +429,8 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
     float a[3] = { 1.15f, 1.05f, 1.0f };
     if (field_0x734) {
         int mode = g_kbGame->field_0x2d74;
-        if ((field_0xbc - field_0xb8) * b[mode != 3][g_kbGame->field_0x60c - 1] < arg * field_0x450)
+        float* row = b[mode != 3];
+        if ((field_0xbc - field_0xb8) * row[g_kbGame->field_0x60c - 1] < arg * field_0x450)
             return 1;
         return 0;
     }
@@ -662,4 +665,325 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
         *a2 = field_0x0c;
         *a3 = field_0x88;
     }
+}
+
+// Slot 93: when the pad device (input map +0x0c) is in mode 3, reset one effect channel and
+// re-arm another with a time-scaled value, then derive field_0x51c from the same game value.
+void KrustyBike::UnknownVirtualSlot93()
+{
+    KbPad* pad = (KbPad*)field_0x468->field_0x0c;
+    if (pad && pad->field_0xc == 3) {
+        pad->UnknownVirtualSlot6(1, 10000, -1);
+        pad = (KbPad*)field_0x468->field_0x0c;
+        pad->UnknownVirtualSlot6(0, (int)(g_kbGame->field_0xffc * 83.333336f), 70000);
+        field_0x51c = g_kbGame->field_0xffc * 0.04f;
+    }
+}
+
+// Slot 94: pad effect update; the force term is field_0x590 * field_0x51c * 180 clamped to
+// [-10000, 10000] while not in state 1, then the effect is toggled on slot 80's result.
+void KrustyBike::UnknownVirtualSlot94()
+{
+    KbPad* pad = (KbPad*)field_0x468->field_0x0c;
+    if (pad && pad->field_0xc == 3) {
+        if (field_0x444 != 1) {
+            KbEffectParams params = { 0x4650, 0 };
+            int force = (int)(field_0x590 * field_0x51c * 180.0f);
+            if (force <= -10000)
+                force = -10000;
+            else if (force >= 10000)
+                force = 10000;
+            pad = (KbPad*)field_0x468->field_0x0c;
+            pad->UnknownVirtualSlot7(1, &params, force);
+            if (UnknownVirtualSlot80())
+                ((KbPad*)field_0x468->field_0x0c)->UnknownVirtualSlot12(1, 1, 0);
+            else
+                ((KbPad*)field_0x468->field_0x0c)->UnknownVirtualSlot11(1);
+        }
+        if (field_0x108) {
+            g_kbPadActive = 1;
+            return;
+        }
+        if (g_kbPadActive) {
+            ((KbPad*)field_0x468->field_0x0c)->UnknownVirtualSlot12(0, 1, 0);
+            g_kbPadActive = 0;
+        }
+    }
+}
+
+// Slot 29: refresh the previous/current orientation angles (0x48..0x60 from 0x2c..0x44).
+// Normally they are recomputed from the node's world axes; while neither field_0x6fc nor
+// field_0x430 is set the old values are just copied.  Then the bike's matrix is mirrored
+// onto the 0x5c4 node when field_0x604's mode is 0 or 1, and the 0x141c timer is advanced.
+void KrustyBike::UnknownVirtualSlot29(int a)
+{
+    if (!field_0x6fc && !field_0x430) {
+        field_0xa0 = field_0x88;
+        field_0xac = field_0x94;
+        field_0x50 = field_0x34;
+        field_0x4c = field_0x30;
+        field_0x48 = field_0x2c;
+        field_0x54 = field_0x38;
+        field_0x58 = field_0x3c;
+        field_0x60 = field_0x44;
+        field_0x5c = field_0x40;
+    } else {
+        field_0x42c->GetAxesIn(0, &field_0xa0, &field_0xac);
+        OrientationAnglesFromVectors(field_0xa0, field_0xac, &field_0x50, &field_0x4c, &field_0x48,
+                                     &field_0x54, &field_0x58, &field_0x60, &field_0x5c);
+    }
+    int mode = field_0x604->a_0x44;
+    if (!mode || mode == 1) {
+        Matrix4 m;
+        d3d_field_0x1a0->GetMatrixIn(0, &m);
+        field_0x5c4->c_0x1a0->Method_0x004fb8c0(0, &m);
+    }
+    if (field_0x431 && !field_0x7a4 && field_0x59c) {
+        if (field_0x141c < 0.0f) {
+            field_0x768 += Fn_00495FF0();
+            return;
+        }
+        field_0x141c -= field_0x13c;
+    }
+}
+
+// Slot 50: switch the 0x4f0 state (and the attached 0x15e8 object) on or off.  The base slot
+// only runs for the forced (c != 0) case; otherwise the state is latched here with b stored
+// as the countdown at 0x4f4.
+void KrustyBike::UnknownVirtualSlot50(int a, float b, int c)
+{
+    if (field_0x740->field_0x18e)
+        return;
+    if (c) {
+        if (a) {
+            if (!field_0x4f0) {
+                if (field_0x736) {
+                    ((KbXform*)d3d_field_0x1a0)->Fn_00444D80(field_0x15e8);
+                    ((KbXform*)field_0x5c4->c_0x1a0)->Fn_00444D80(field_0x15e8);
+                    field_0x15e8->Fn_0047BBF0(0);
+                }
+                Fn_00496E30(1);
+            }
+            field_0x15e6 = 1;
+            field_0x4f0 = 1;
+            field_0x4f4 = 0;
+        } else {
+            field_0x15e6 = 0;
+            if (field_0x4f0)
+                field_0x7a5 = 1;
+        }
+        Vehicle::UnknownVirtualSlot50(a, 0, 0);
+        return;
+    }
+    if (field_0x15e6)
+        return;
+    if (a) {
+        if (!field_0x4f0) {
+            if (field_0x736) {
+                ((KbXform*)d3d_field_0x1a0)->Fn_00444D80(field_0x15e8);
+                ((KbXform*)field_0x5c4->c_0x1a0)->Fn_00444D80(field_0x15e8);
+                field_0x15e8->Fn_0047BBF0(b);
+            }
+            Fn_00496E30(1);
+        }
+        field_0x4f0 = 1;
+        field_0x4f4 = b;
+    } else if (field_0x4f0) {
+        field_0x7a5 = 1;
+    }
+}
+
+// Slot 43: reset of the per-bike state (runs the Vehicle reset, then clears the 0x74c..0x7c0
+// block, the field_0x744 record and a few late fields).  The record's 0x44 vector is taken from
+// the race context (0xf8..0x100, or from the object at +0x48 when no 0x144 object exists).
+void KrustyBike::UnknownVirtualSlot43()
+{
+    Vehicle::UnknownVirtualSlot43();
+    field_0x78c = 1;
+    field_0x76c = 0;
+    field_0x7a0 = 0;
+    field_0x7a2 = 0;
+    field_0x790 = 0;
+    field_0x74c = 0;
+    field_0x774 = 0;
+    field_0x770 = 0;
+    field_0x784 = 0;
+    field_0x7a4 = 0;
+    field_0x750 = 0;
+    field_0x754 = 0;
+    field_0x788 = 0;
+    field_0x758 = 0;
+    field_0x760 = 0;
+    field_0x764 = 0;
+    field_0x794 = 0;
+    field_0x798 = 0;
+    field_0x768 = 0;
+    field_0x1400 = 0;
+    field_0x1404 = 0;
+    field_0x1408 = 0;
+    field_0x140c = 0;
+    field_0x804 = 0;
+    field_0x808 = 0;
+    field_0x7b8 = 0;
+    field_0x7c0 = 0;
+    field_0x7bc = 1;
+    if (field_0x744) {
+        KbRaceSub* p = field_0x740->field_0x48;
+        if (p) {
+            if (field_0x740->field_0x144) {
+                field_0x744->field_0x44.a = field_0x740->field_0xf8;
+                field_0x744->field_0x44.b = field_0x740->field_0xfc;
+                field_0x744->field_0x44.c = field_0x740->field_0x100;
+            } else {
+                field_0x744->field_0x44.a = (int)p->field_0x0;
+                field_0x744->field_0x44.b = field_0x740->field_0x48->field_0x0[2];
+                field_0x744->field_0x44.c = 0;
+            }
+            field_0x744->field_0x38 = field_0x744->field_0x44;
+        }
+        field_0x744->field_0x34 = field_0x740->field_0xc8;
+        field_0x744->field_0x08 = 0;
+        field_0x744->field_0x0c = 0;
+        field_0x744->field_0x10 = 0;
+        field_0x744->field_0x14 = 0;
+        field_0x744->field_0x18 = 0;
+        field_0x744->field_0x1c = Vec3(0.0f, 0.0f, 0.0f);
+        field_0x744->field_0x28 = Vec3(0.0f, 0.0f, 0.0f);
+    }
+    field_0x15c8 = g_kbGame->field_0x3414;
+    field_0x15d0 = g_kbGame->field_0x3418;
+    field_0x138c = 0;
+    field_0x13f8 = 0x7effffff;
+}
+
+// Slot 97: after the Bike set-up, registers the rider's animation clips (by name) with the
+// field_0x604 object, binds both wheels and attaches the scene node (tier 3 semantics).
+void KrustyBike::UnknownVirtualSlot97()
+{
+    Bike::UnknownVirtualSlot97();
+    ((KbA604*)field_0x604)->Fn_005305F0(((KbA5C4*)field_0x5c4)->Fn_004A6B30("Fall01", 1));
+    ((KbA604*)field_0x604)->Fn_005305F0(((KbA5C4*)field_0x5c4)->Fn_004A6B30("Fall02", 1));
+    ((KbA604*)field_0x604)->Fn_005305F0(((KbA5C4*)field_0x5c4)->Fn_004A6B30("Fall03", 1));
+    ((KbA604*)field_0x604)->Fn_005305F0(((KbA5C4*)field_0x5c4)->Fn_004A6B30("Fall04", 1));
+    ((KbA604*)field_0x604)->Fn_005305B0(((KbA5C4*)field_0x5c4)->Fn_004A6B30("LeftHit", 1));
+    ((KbA604*)field_0x604)->Fn_005305B0(((KbA5C4*)field_0x5c4)->Fn_004A6B30("RightHit", 1));
+    ((KbA604*)field_0x604)->Fn_005305B0(((KbA5C4*)field_0x5c4)->Fn_004A6B30("FeetHitL", 1));
+    ((KbA604*)field_0x604)->Fn_005305B0(((KbA5C4*)field_0x5c4)->Fn_004A6B30("FeetHitR", 1));
+    ((KbA604*)field_0x604)->Fn_005305B0(((KbA5C4*)field_0x5c4)->Fn_004A6B30("HeadHit", 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)field_0x5c4)->Fn_004A6B30("BackOver", 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)field_0x5c4)->Fn_004A6B30("Endo", 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)field_0x5c4)->Fn_004A6B30("Kahuna", 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)field_0x5c4)->Fn_004A6B30("BackOver", 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)field_0x5c4)->Fn_004A6B30("LeftOver", 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)field_0x5c4)->Fn_004A6B30("RightOver", 1));
+    ((KbA604*)field_0x604)->Fn_00530680(field_0x5f0);
+    ((KbA604*)field_0x604)->Fn_00530680(field_0x5f4);
+    ((KbA604*)field_0x604)->Fn_005328B0(d3d_field_0x1a0->firstChild, Vec3(0.0f, 2.0f, 0.0f), Vec3(0.5f, 1.5f, 3.0f));
+}
+
+// Slot 49: per-frame update.  Keeps the 0x154c "pinned" copy of the placement in sync, posts
+// on-screen messages to the local player (string ids 0x1481.. / 0x14d6 / 0x14d7 / 0x14e1; tier 3
+// semantics), advances the 0x7a4 state, and runs the Bike update unless the race context
+// takes over.
+void KrustyBike::UnknownVirtualSlot49(float dt)
+{
+    if (field_0x154c) {
+        d3d_field_0x1a0->SetPosition(field_0x0c);
+        ((SoultreeObject*)field_0x5c4->c_0x1a0)->SetPosition(field_0x0c);
+    }
+    if (field_0x740->field_0x38 == this && g_kbGame->field_0x2d70 == 4) {
+        KbMsgSink* sink = g_kbGame->field_0x570->Fn_0045D340();
+        KbMessage* msg = 0;
+        if (sink) {
+            char text[0x100];
+            if (field_0x754 == 0) {
+                if (field_0x740->field_0x189)
+                    g_kbGame->Fn_00521970(0x14d6, text, 0x80);
+                else
+                    g_kbGame->Fn_00521970(0x14d7, text, 0x80);
+                msg = new(__FILE__, 0x11c6) KbMessage(text, 3.25f);
+                if (msg) {
+                    sink->Fn_0051B540(msg);
+                    delete msg;
+                }
+            } else if (field_0x7a0 != field_0x7a2 && field_0x7a0 == 1 && field_0x740->field_0x189) {
+                g_kbGame->Fn_00521970(0x14d7, text, 0x80);
+                msg = new(__FILE__, 0x11d0) KbMessage(text, 3.25f);
+                if (msg) {
+                    sink->Fn_0051B540(msg);
+                    delete msg;
+                }
+            }
+        }
+    }
+    if (field_0x7a4) {
+        if (field_0x7a4 == 1) {
+            KbMsgSink* sink = g_kbGame->field_0x570->Fn_0045D340();
+            if (field_0x740->field_0x38 == this && sink) {
+                char text[0x100];
+                KbMessage* msg = 0;
+                if (g_kbGame->field_0x18 == 1) {
+                    switch (field_0x784) {
+                    case 1: g_kbGame->Fn_00521970(0x1481, text, 0x80); break;
+                    case 2: g_kbGame->Fn_00521970(0x1482, text, 0x80); break;
+                    case 3: g_kbGame->Fn_00521970(0x1483, text, 0x80); break;
+                    case 4: g_kbGame->Fn_00521970(0x1484, text, 0x80); break;
+                    case 5: g_kbGame->Fn_00521970(0x1485, text, 0x80); break;
+                    case 6: g_kbGame->Fn_00521970(0x1486, text, 0x80); break;
+                    case 7: g_kbGame->Fn_00521970(0x1487, text, 0x80); break;
+                    case 8: g_kbGame->Fn_00521970(0x1488, text, 0x80); break;
+                    case 9: g_kbGame->Fn_00521970(0x1489, text, 0x80); break;
+                    case 10: g_kbGame->Fn_00521970(0x148a, text, 0x80); break;
+                    case 11: g_kbGame->Fn_00521970(0x148b, text, 0x80); break;
+                    default: g_kbGame->Fn_00521970(0x148c, text, 0x80); break;
+                    }
+                    msg = new(__FILE__, 0x1206) KbMessage(text, 3.25f);
+                    if (msg) {
+                        sink->Fn_0051B540(msg);
+                        delete msg;
+                    }
+                } else {
+                    g_kbGame->Fn_00521970(0x14e1, text, 0x80);
+                    msg = new(__FILE__, 0x120d) KbMessage(text, 3.25f);
+                    if (msg) {
+                        sink->Fn_0051B540(msg);
+                        delete msg;
+                    }
+                }
+            }
+            if (field_0x784 == 1) {
+                if (g_kbGame->field_0x2d74) {
+                    UnknownVirtualSlot41();
+                    field_0x431 = 0;
+                    ((KbA5C4*)field_0x5c4)->Fn_004A8B40(field_0x66c[15]);
+                    ((KbA5C4*)field_0x5c4)->field_0x10 = 0;
+                    field_0x7a4 = 3;
+                } else {
+                    field_0x7a4 = 3;
+                    UnknownVirtualSlot41();
+                    field_0x431 = 0;
+                }
+            } else {
+                field_0x7a4 = 3;
+                UnknownVirtualSlot41();
+                field_0x431 = 0;
+            }
+        }
+    }
+    if (!field_0x444 && (field_0x734 || field_0x740->field_0xb8)) {
+        if (field_0x740->field_0x18a)
+            Fn_00413200(dt);
+    } else {
+        Bike::UnknownVirtualSlot49(dt);
+    }
+    if (field_0x740->field_0x50->field_0x244 == 3 && field_0x740->field_0x50->field_0x3b0 == this) {
+        d3d_field_0x1a0->SetPosition(field_0x1540);
+        ((SoultreeObject*)field_0x5c4->c_0x1a0)->SetPosition(field_0x1540);
+        field_0x154c = 1;
+    } else {
+        field_0x154c = 0;
+    }
+    field_0x1540 = field_0x0c;
+    field_0x153e = field_0x153c;
+    field_0x7a2 = field_0x7a0;
 }

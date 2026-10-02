@@ -484,5 +484,140 @@
     "target_size": 1578,
     "expect": "partial",
     "notes": "17.0% (1534/1578 with the 106-byte jump index table). Collision-response dispatch as a switch: cases 0/1 (event body), 0x66/0x6a (impact sink), 0x69, 0x2711, 0x3e9, default returns without the tail. First divergence +0x4: retail builds s=(1,1,1) through a struct temp at esp+0x3c and stores it at esp+0x14 (locals E+8); ours lands at E+0x14; hasBody is in ebp/otherVel in ebx in retail, swapped in ours."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot44@Vehicle",
+    "target_va": "0x005283d0",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "Wave 2. Tiny slot."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot80@Vehicle",
+    "target_va": "0x005290f0",
+    "target_size": 137,
+    "expect": "exact",
+    "notes": "Wave 2. Single merged || condition (separate returns change the branch layout)."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot83@Vehicle",
+    "target_va": "0x00529180",
+    "target_size": 114,
+    "expect": "exact",
+    "notes": "Wave 2."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot28@Vehicle",
+    "target_va": "0x0052a5f0",
+    "target_size": 173,
+    "expect": "exact",
+    "notes": "Wave 2."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot39@Vehicle",
+    "target_va": "0x00526f00",
+    "target_size": 150,
+    "expect": "exact",
+    "notes": "Wave 2."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot63@Vehicle",
+    "target_va": "0x00528d70",
+    "target_size": 209,
+    "expect": "exact",
+    "notes": "Wave 2. Falls off the end with C4716 disabled by pragma (KrustyBike overrides it with an int return); v*v*field_0x474 temp order matters."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot36@Vehicle",
+    "target_va": "0x0040c710",
+    "target_size": 368,
+    "expect": "exact",
+    "notes": "Wave 2. Sign chosen as y >= 0 ? -1 : 1 to get the branch polarity."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot88@Vehicle",
+    "target_va": "0x005275a0",
+    "target_size": 288,
+    "expect": "exact",
+    "notes": "Wave 2."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot1@Vehicle",
+    "target_va": "0x00525550",
+    "target_size": 372,
+    "expect": "exact",
+    "notes": "Wave 2. (float)rand() * 3.05175781e-05f kept in a named temporary (stops ebx hoisting)."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot3@Vehicle",
+    "target_va": "0x005264c0",
+    "target_size": 264,
+    "expect": "exact",
+    "notes": "Wave 2. VehLengthAcc helper + Fn_500220 solver call."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot33@Vehicle",
+    "target_va": "0x00527430",
+    "target_size": 365,
+    "expect": "exact",
+    "notes": "Wave 2. Re-pose from position/axes: slots 1,36,58 (twice),50,45 (twice) plus Method_00528EB0 twice; wheel node positions and body node refreshed."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot75@Vehicle",
+    "target_va": "0x0052b790",
+    "target_size": 337,
+    "expect": "partial",
+    "notes": "94.4% (337/337). x87 order of the squared terms and the z term of the dot product differ; operand permutations had no effect."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot54@Vehicle",
+    "target_va": "0x00528530",
+    "target_size": 358,
+    "expect": "partial",
+    "notes": "95.4% (358/358). Retail does fld st(0); fmul mem for k*sum and inv*avg; ours emits fld mem; fmul st(1)."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "Method_00528400",
+    "target_va": "0x00528400",
+    "target_size": 291,
+    "expect": "partial",
+    "notes": "94.3% (291/291). Helper shared with slot 54: normalized average; same fld st(0)/fmul mem difference."
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot95@Vehicle",
+    "target_va": "0x0052a6a0",
+    "target_size": 399,
+    "expect": "partial",
+    "notes": "5.7% (387/399). Rotate scene node about field_0x194 by |v|*dt. Retail loads y,x,z then does the three squares with the lenSq kept in memory and no ebx; all source permutations of the sum (fields, locals, helpers) compile to the same z,y,x load order."
   }
 ]

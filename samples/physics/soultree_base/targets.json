@@ -159,7 +159,7 @@
     "target_va": "0x00502330",
     "target_size": 239,
     "expect": "partial",
-    "notes": "96.41% under vc6_o2_ml; residual x87 operand order in the y term of the normalized sum"
+    "notes": "96.41% under vc6_o2_ml; residual x87 operand order in the y term of the normalized sum Wave 2: tried all 8 operand orders of s*v vs v*s, named vs inline 1.0f/n, in-place *=, and temp Vec3; all give identical bytes (VC6 canonicalises commutative operands), so retail's mixed 'fld st0 / fld mem' form for x vs y is not reachable from these forms."
   },
   {
     "class": "SoultreePhysicsBaseObject",
@@ -303,7 +303,7 @@
     "target_va": "0x004aa210",
     "target_size": 305,
     "expect": "partial",
-    "notes": "76.19% under vc6_o2_ml; store interleaving of constants vs field_0xa0/0xac copies still differs"
+    "notes": "85.35% under vc6_o2_ml (was 76.19): placing the 0xa0/0xac vector copies between the 0x40 and 0x44 constant stores raised the match; VC6 schedules the 0/1.0f constant stores (ebx/eax) and the copy loads itself, and no source ordering tried (copies at every position, split/merged) reproduces retail's per-element interleave (2c, a0.x, 30, 38, a0.y, 3c, 40, a0.z, ...)."
   },
   {
     "class": "SoultreePhysicsBaseObject",

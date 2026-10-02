@@ -128,8 +128,15 @@ inline TerrainVec3 operator*(const TerrainVec3& v, float s)
 {
     return TerrainVec3(s * v.x, s * v.y, s * v.z);
 }
-// 0x0043c890 multiplies by the reciprocal (fld 1.0; fdiv s; then three fmul).
-inline TerrainVec3 operator/(const TerrainVec3& v, float s) { return v * (1.0f / s); }
+// 0x0043c890 multiplies by the reciprocal (fld 1.0; fdiv s; then three fmul).  Written with a
+// direct constructor call (not via operator*) so the constructor is one inline level below the
+// call site: CastSegment's prologue keeps it inlined, as retail does (see the inline-budget
+// note above Terrain::CastSegment).
+inline TerrainVec3 operator/(const TerrainVec3& v, float s)
+{
+    float inv = 1.0f / s;
+    return TerrainVec3(inv * v.x, inv * v.y, inv * v.z);
+}
 
 float TerrainDot(const TerrainVec3& a, const TerrainVec3& b);   // 0x0040ae30 (cdecl, out of line)
 // 0x004a11e0 (cdecl): unit normal of the triangle (a, b, c) written to *out; the fifth
@@ -138,9 +145,13 @@ void TerrainTriangleNormal(const TerrainVec3* a, const TerrainVec3* b, const Ter
                            TerrainVec3* out, float* planeD);
 extern TerrainVec3 g_terrainRefDir;                              // 0x0068a058 (dotted with the face normal to orient it)
 
-// 0x00507510 / 0x00507590: file-static cdecl helpers (tier 2: no ecx, `ret`; the by-value TerrainVec3 return is the hidden out pointer in arg 0).
-TerrainVec3 TerrainClipRayToPlaneY(TerrainVec3* origin, const TerrainVec3* dir, float y);
-TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3* origin, const TerrainVec3* dir, float z);
+// 0x00507510 / 0x00507590: inline helpers whose out-of-line COMDAT copies retail kept because
+// CastSegment's inline budget ran out (tier 2: cdecl, no ecx, `ret`; the by-value TerrainVec3
+// return is the hidden out pointer in arg 0).  References are ABI-identical to pointers here;
+// they let CastSegment pass the `-dir` temporary straight through (retail `push eax` after the
+// out-of-line operator- at 0x005073a2).
+inline TerrainVec3 TerrainClipRayToPlaneY(TerrainVec3& origin, const TerrainVec3& dir, float y);
+inline TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3& origin, const TerrainVec3& dir, float z);
 
 class Terrain : public GameObject, public GroundFogableObject {
 public:

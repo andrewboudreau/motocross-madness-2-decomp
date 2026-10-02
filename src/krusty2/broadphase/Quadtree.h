@@ -41,13 +41,6 @@ class QuadTreeNode;
 
 // One block of a node's object list: next link + 4 object slots (pool element 0x14).
 struct QuadTreeItemLink {
-    void Clear() {
-        next = 0;
-        objects[0] = 0;
-        objects[1] = 0;
-        objects[2] = 0;
-        objects[3] = 0;
-    }
     QuadTreeItemLink* next;
     QuadTreeObject* objects[4];
 };

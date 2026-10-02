@@ -166,15 +166,17 @@ inline Vec3 RotateVector(Vec3 v, const Matrix4& m)
 // (0x00403c20 ... 0x00533000) begin with the same four VC6 dynamic initializers,
 // which build (0,0,0), (1,0,0), (0,1,0) and (0,0,1) in a stack temporary and copy
 // it to a TU-private 12-byte .bss global. That shape is a namespace-scope
-// 'static const Vec3 name(a,b,c);' in a widely included header: the user-declared
+// 'static const Vec3 name = Vec3(a,b,c);' in a widely included header: the user-declared
 // constructor forces dynamic initialization, and VC6 emits $E initializers before
-// the TU's own functions (verified by compiling a probe). PhysicsBody uses its TU's
+// the TU's own functions. Copy-initialization is what gives the stack-temporary copy;
+// direct initialization 'name(a,b,c)' stores the floats straight into the global
+// (verified against Quadtree.cpp's exact $E targets and constraint's 0x0043c8f0). PhysicsBody uses its TU's
 // zero at 0x006899c0 and PhysicsRigidBody uses its TU's zero at 0x00689a00. Names
 // are tier 3.
-static const Vec3 kVec3Zero(0.0f, 0.0f, 0.0f);
-static const Vec3 kVec3XAxis(1.0f, 0.0f, 0.0f);
-static const Vec3 kVec3YAxis(0.0f, 1.0f, 0.0f);
-static const Vec3 kVec3ZAxis(0.0f, 0.0f, 1.0f);
+static const Vec3 kVec3Zero = Vec3(0.0f, 0.0f, 0.0f);
+static const Vec3 kVec3XAxis = Vec3(1.0f, 0.0f, 0.0f);
+static const Vec3 kVec3YAxis = Vec3(0.0f, 1.0f, 0.0f);
+static const Vec3 kVec3ZAxis = Vec3(0.0f, 0.0f, 1.0f);
 
 // ---------------------------------------------------------------------------
 // More out-of-line helpers (added in the third revision; append-only).

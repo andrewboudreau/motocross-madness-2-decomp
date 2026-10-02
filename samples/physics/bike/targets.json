@@ -6,7 +6,7 @@
     "target_va": "0x00405db0",
     "target_size": 724,
     "expect": "partial",
-    "notes": "88.7% (714 vs 724). Restructured branch; remaining: cross-product c.y/c.z second-product operand order (retail keeps literal order, VC6 here canonicalizes; source swaps do not change it), then compare/store layout around weight=BikeMin tail."
+    "notes": "98.9% (724/724). Weight clamp now matches (separate float w = ternary). Remaining 7 bytes: retail loads n.x first in the 2nd/3rd cross-product terms (fld [n]; fmul [out+8]) while VC6 canonicalises to out first; free function, member (this=out / this=n) and component forms all give the same."
   },
   {
     "class": "Bike",
@@ -42,7 +42,7 @@
     "target_va": "0x00406840",
     "target_size": 395,
     "expect": "partial",
-    "notes": "98.4% (395/395). v *= scalar form; remaining small diff in the tail branch layout after BikeNormalized scaling."
+    "notes": "98.4% (395/395). Only diff: retail scales the vector with the FPU-resident scalar as 'fld st(0); fmul [x]; fld [y]; fmul st(1); fld [z]; fmul st(1); fstp st(0)' (scalar kept live), VC6 here emits fld [x]; fmul st(1) ... consuming it. Tried *=, inline helper, k*v.x, repeated inline expression."
   },
   {
     "class": "Bike",
@@ -321,7 +321,7 @@
     "target_va": "0x0040ce60",
     "target_size": 244,
     "expect": "partial",
-    "notes": "slot 55: only the BikeNormalized scale differs: retail x=fld st0;fmul mem, y/z=fld mem;fmul st(1), pops s with fstp st(0); ours consumes s on the last multiply. All natural forms compile identically [81.1% match under vc6_o2_ml]"
+    "notes": "81.1% (240 vs 244). Normalisation tail: same scalar-kept-live pattern as slot 76 (retail ends with fstp st(0) after fld st(0)/fmul, fld/fmul st(1) x2); ours consumes the scalar on the last multiply (4 bytes shorter). Tried *=, operator*, Vec3 ctor, component order."
   },
   {
     "class": "Bike",
@@ -358,5 +358,23 @@
     "target_size": 52,
     "expect": "exact",
     "notes": "Byte-exact under vc6_o2_ml."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot38@Bike",
+    "target_va": "0x00405190",
+    "target_size": 2746,
+    "expect": "partial",
+    "notes": "5.8% (2509 vs 2746 incl. jump table). Collision-response dispatch (Bike override of Vehicle slot 38): switch on kind 0/1/0x66/0x6a (impact sink), 100 and 0x68 (other vehicle), 0x65, 0x69, 0x3e8 (direct slot 3, returns), 0x3e9, 0x3ea (body via +0xc4), 0x2711; tail calls slot 4 (body) or slot 3, then slot 100 notifications. All decoded; frame is 0xac in retail vs smaller here (retail builds vectors through struct temps), so every offset diverges early."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot89@Bike",
+    "target_va": "0x00406ae0",
+    "target_size": 2359,
+    "expect": "partial",
+    "notes": "5.0% (1984 vs 2359). Rider-pose blend state machine (field_0x520 states 1..5, field_0x65c output, field_0x644 smoothing). Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule); plain (int) calls __ftol here. Clamp/branch layout also differs."
   }
 ]

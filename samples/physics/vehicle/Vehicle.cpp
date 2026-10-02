@@ -2,7 +2,10 @@
 // (__FILE__ xrefs near 0x00525e98). See Vehicle.h for the evidence/provisional notes.
 #include "Vehicle.h"
 #include <math.h>
+#include <stdlib.h>
 #include <float.h>
+#include "collision/CollisionObject.h"
+#include "../soultree_base/SoultreePhysicsCallees.h"
 
 // ---- small vector helpers (stand-ins for common/Math3D.h) ----
 
@@ -1364,4 +1367,402 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     }
     if (a)
         Method_00526830();
+}
+
+// ---- wave 2 ----
+
+// Scene-node method 0x004444e0 (purpose unknown) is not in SoultreeObject yet; view the
+// node through a local stand-in that declares it.
+struct VehSceneNodeView {
+    void Method_004444E0();
+    void Method_004FBD70(const Vec3* axisZ, const Vec3* axisY, int a, int b);   // 0x004fbd70, purpose unknown
+};
+
+void Vehicle::UnknownVirtualSlot44()
+{
+    field_0x4a0 = 1;
+    GameObjectVirtualSlot4();
+    ((VehSceneNodeView*)d3d_field_0x1a0)->Method_004444E0();
+}
+
+// Input-map driven state test (provisional): the 0x46c/0x470 pair short-circuits to "true".
+int Vehicle::UnknownVirtualSlot80()
+{
+    if ((field_0x46c && field_0x470 > 0.33f)
+        || (field_0x468->UnknownVirtualSlot3(0, 2, 0x3f, 0)
+            && !UnknownVirtualSlot77(field_0x480->field_0x00 == 0.0f)))
+        return 1;
+    return field_0x468->UnknownVirtualSlot3(200, 0, 0x3f, 0) != 0;
+}
+
+int Vehicle::UnknownVirtualSlot83(VehicleWheel* wheel)
+{
+    if (field_0x468->UnknownVirtualSlot3(1, 2, 0x3f, 0)
+        && !UnknownVirtualSlot77(wheel->field_0x29c == 0.0f))
+        return 1;
+    return field_0x468->UnknownVirtualSlot3(0xd0, 0, 0x3f, 0) != 0;
+}
+
+// Tier 3 reading: re-seats the collision object (0x00435fb0 before and after), removes the
+// contact offset from the position when one is recorded, and clears the dirty byte at 0x138.
+int Vehicle::UnknownVirtualSlot28(int arg)
+{
+    field_0x128->Fn_00435fb0();
+    int wasSet = field_0x444 != 0;
+    field_0x128->Fn_00438e70();
+    if (field_0x128->field_0x58) {
+        field_0x0c -= *(const Vec3*)field_0x128->field_0x5c;
+        d3d_field_0x1a0->SetPosition(field_0x0c);
+        field_0x128->Fn_00435fb0();
+        if (field_0x444 && !wasSet) {
+            arg = 1;
+            field_0x1e0 = 0.0f;
+        }
+    }
+    if (field_0x138) {
+        UnknownVirtualSlot27();
+        field_0x138 = 0;
+    }
+    return arg;
+}
+
+// Tier 3: with the 0x109 flag the saved position is restored; otherwise slot 68 supplies a
+// code that the key table at input-map+0x34 must accept before slot 67 runs again.
+int Vehicle::UnknownVirtualSlot39(float dt)
+{
+    int code;
+    if (field_0x109) {
+        UnknownVirtualSlot67();
+        field_0x0c = field_0x10c;
+        d3d_field_0x1a0->SetPosition(field_0x0c);
+        return 1;
+    }
+    if (UnknownVirtualSlot68(&code) && field_0x468
+        && field_0x468->field_0x34->UnknownVirtualSlot5(code, 0x3f, 0)) {
+        UnknownVirtualSlot67();
+        return 2;
+    }
+    return 0;
+}
+
+// Tier 3 reading: latches the throttle-like axis (+0x500) into field_0x470 (dead zone 0.2,
+// -1 when there is no control), mirrors the two other axes into the steer/lean members and
+// writes the 0x504 vector (cubed lean for axis kinds 2 and 3).
+void Vehicle::UnknownVirtualSlot63(float dt)
+{
+    if (field_0x46c && field_0x500) {
+        float v = field_0x500->field_0x24;
+        if (v > 0.2f)
+            field_0x470 = v;
+        else
+            field_0x470 = 0.0f;
+    } else {
+        field_0x470 = -1.0f;
+    }
+    field_0x504.y = -field_0x4fc->field_0x24;
+    field_0x474 = -field_0x4f8->field_0x24;
+    VehicleAxisSource* src = field_0x4f8->field_0x00;
+    // Retail never sets eax on any path, so the slot returns void (KrustyBike's override
+    // likewise only calls through).
+    if (src && !src->Method_004897E0(4)
+        && (field_0x4f8->field_0x00->field_0x0c == 2 || field_0x4f8->field_0x00->field_0x0c == 3)) {
+        float v = field_0x474;
+        float sq = v * v;
+        field_0x504.z = 0.0f;
+        field_0x504.x = sq * field_0x474;
+    } else {
+        field_0x504.z = 0.0f;
+        field_0x504.x = field_0x474;
+    }
+}
+
+// Tier 3 reading: when the facing vector (0x88) has no horizontal part it is rebuilt from the
+// previous up vector (0x94) with the sign of its y, then the basis block is reset to the
+// identity-like values and pushed to the scene node.
+void Vehicle::UnknownVirtualSlot36()
+{
+    if (field_0x88.x == 0.0f && field_0x88.z == 0.0f) {
+        float s = field_0x88.y >= 0.0f ? -1.0f : 1.0f;
+        field_0x88 = s * field_0x94;
+    }
+    field_0x94 = g_VehZeroVec3_005778c8;
+    field_0x88.y = 0.0f;
+    UnknownVirtualSlot35(1, 0);
+    UnknownVirtualSlot34();
+    field_0x3c = 1.0f;
+    field_0x44 = 1.0f;
+    field_0x2c = 0.0f;
+    field_0x30 = 0.0f;
+    field_0x38 = 0.0f;
+    field_0x40 = 0.0f;
+    field_0xa0 = field_0x88;
+    field_0xac = field_0x94;
+    field_0x50 = field_0x34;
+    field_0x4c = field_0x30;
+    field_0x48 = field_0x2c;
+    field_0x54 = field_0x38;
+    field_0x58 = field_0x3c;
+    field_0x60 = field_0x44;
+    field_0x5c = field_0x40;
+    field_0x47c->field_0x00->SetPosition(g_VehZeroVec3_005778a8);
+    ((VehSceneNodeView*)field_0x47c->field_0x00)->Method_004FBD70(&field_0x88, &field_0x94, 0, 1);
+    field_0x47c->Method_00504E20(0, field_0x42c);
+}
+
+// Tier 3 reading: classifies the (field_0x504.y, field_0x474) input pair into one of eight
+// directions: -1 inside the dead zone (|v|^2 <= 0.25), else the sector of the pair relative to
+// the band +-0.52057 * |v| (0..7).
+int Vehicle::UnknownVirtualSlot88()
+{
+    float m2 = field_0x474 * field_0x474 + field_0x504.y * field_0x504.y;
+    if (m2 > 0.25f) {
+        float m = FastSqrt(m2) * 0.52057f;
+        if (field_0x504.y > m) {
+            if (field_0x474 > m)
+                return 3;
+            if (-m > field_0x474)
+                return 0;
+            return 4;
+        }
+        float n = -m;
+        if (field_0x504.y < n) {
+            if (field_0x474 > m)
+                return 2;
+            if (field_0x474 < n)
+                return 1;
+            return 6;
+        }
+        if (field_0x474 > 0.0f)
+            return 7;
+        return 5;
+    }
+    return -1;
+}
+
+// Tier 3 reading: sums the +0x230 vectors of the wheels without the +0x1c0 flag, normalises
+// the sum when more than one wheel contributed (zero stays zero) and returns |sum . field_0xa0|;
+// 1.0 when no wheel contributed.
+float Vehicle::UnknownVirtualSlot75()
+{
+    Vec3 sum = g_VehZeroVec3;
+    int n = 0;
+    for (int i = 0; i < field_0x544; i++) {
+        VehicleWheel* w = field_0x53c[i];
+        if (!w->field_0x1c0) {
+            sum += w->field_0x230;
+            n++;
+        }
+    }
+    if (n > 1) {
+        float scale = sum.x * sum.x + sum.z * sum.z + sum.y * sum.y;
+        if (scale == 0.0f) {
+            sum = g_VehZeroVec3;
+        } else {
+            scale = FastInvSqrt(scale);
+            sum.x = sum.x * scale;
+            sum.y = sum.y * scale;
+            sum.z = sum.z * scale;
+        }
+    } else if (n == 0) {
+        return 1.0f;
+    }
+    float d = sum.y * field_0xa0.y + sum.x * field_0xa0.x + sum.z * field_0xa0.z;
+    if (d < 0.0f)
+        d = -d;
+    return d;
+}
+
+// 0x00528400: average of the wheels' contact normals (+0xe4), normalised (tier 3 reading).
+Vec3* Vehicle::Method_00528400(Vec3* out)
+{
+    Vec3 sum = field_0x53c[0]->field_0xe4;
+    int n = field_0x544;
+    for (int i = 1; i < n; i++)
+        sum += field_0x53c[i]->field_0xe4;
+    float k = 1.0f / n;
+    Vec3 avg = sum * k;
+    *out = VehNormalized(avg);
+    return out;
+}
+
+// Same average restricted to the wheels in contact (+0x260), divided by the contact count
+// field_0x4a8; with no contacts the first wheel's normal is returned unchanged.
+Vec3* Vehicle::UnknownVirtualSlot54(Vec3* out)
+{
+    int count = field_0x4a8;
+    if (count == 0) {
+        *out = field_0x53c[0]->field_0xe4;
+        return out;
+    }
+    Vec3 sum;
+    int first = 1;
+    for (int i = 0; i < field_0x544; i++) {
+        VehicleWheel* w = field_0x53c[i];
+        if (w->field_0x260) {
+            if (first) {
+                sum = w->field_0xe4;
+                first = 0;
+            } else {
+                sum += w->field_0xe4;
+            }
+        }
+    }
+    float k = 1.0f / count;
+    Vec3 avg = sum * k;
+    *out = VehNormalized(avg);
+    return out;
+}
+
+// Tier 3 reading: resets the vehicle state after the base reset.  The contact flags and the
+// state counters are cleared exactly as in slot 67, the lean/steer/wheel members get their
+// defaults, and the speed state at +0x480 is re-seeded with a random start value
+// (rand() / 32768 scaled by a table entry).
+void Vehicle::UnknownVirtualSlot1(float value)
+{
+    SoultreePhysicsCharacter::UnknownVirtualSlot1(value);
+    field_0x4e8 = 0.0f;
+    field_0x434 = 0.0f;
+    field_0x440 = 1;
+    for (int i = 0; i < field_0x130; i++) {
+        VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
+        if (c->field_0x04 != 0)
+            c->field_0xa4 = 0;
+    }
+    field_0x444 = 0;
+    field_0x454 = 0.0f;
+    field_0x5b4 = 0;
+    field_0x5a0 = 0;
+    field_0x59c = 0;
+    field_0x588 = 0.0f;
+    field_0x590 = 0.0f;
+    field_0x594 = 0.0f;
+    field_0x4c0 = g_VehZeroVec3;
+    field_0x4e4 = 0.0f;
+    field_0x43c = 0.0f;
+    field_0x4bc = 0.0f;
+    field_0x4ac = 0.0f;
+    field_0x4b0 = 1.0f;
+    field_0x4b4 = 1.0f;
+    field_0x4e0 = 0.0f;
+    field_0x570 = 0;
+    field_0x520 = 1;
+    field_0x470 = 0.0f;
+    field_0x510 = g_VehZeroVec3;
+    field_0x478 = false;
+    field_0x479 = false;
+    field_0x47a = false;
+    VehicleSpeedState* s = field_0x480;
+    if (s) {
+        s->field_0x10 = 0;
+        s->field_0x04 = 0;
+        s->field_0x84 = 0;
+        s->field_0x00 = 0.0f;
+        s->field_0x0c = 0.0f;
+        s->field_0x08 = 1;
+        float unit = (float)rand() * 3.05175781e-05f;
+        s->field_0x78 = unit * s->field_0x60[s->field_0x10] + s->field_0x30[s->field_0x10].a;
+    }
+    Method_00525C60();
+    Method_00525A90();
+}
+
+// Length helper in the shape SoultreePhysicsBaseObject uses: x*x accumulated, 1.0f for a unit
+// squared length, otherwise the square root.
+static inline float VehLengthAcc(const Vec3& v)
+{
+    float s = v.x * v.x;
+    s += v.y * v.y;
+    s += v.z * v.z;
+    if (s == 1.0f)
+        return 1.0f;
+    return (float)sqrt(s);
+}
+
+// Same solver call as SoultreePhysicsBaseObject slot 3, but while the vehicle is in state
+// 0x444 it uses a fixed 0.1 time scale, the vector at +0xf0 and no a6 (tier 3 reading).
+// The world-space copy of the local velocity (+0xcc) is skipped for the event code 0x67.
+void Vehicle::UnknownVirtualSlot3(const Vec3* a, const Vec3* b, const Vec3* c, const Vec3* d,
+                                  int e, int f, float* g)
+{
+    if (field_0x444)
+        Fn_500220(0.1f, field_0x24, d3d_field_0x1a0, a, b, c, &field_0xf0, d, &field_0xd8,
+                  &field_0x64, g, 0);
+    else
+        Fn_500220(field_0x14c, field_0x24, d3d_field_0x1a0, a, b, c, &field_0xe4, d, &field_0xd8,
+                  &field_0x64, g, f);
+    field_0xbc = VehLengthAcc(field_0x64);
+    if (e != 0x67)
+        field_0xcc = d3d_field_0x1a0->LocalToWorldDirection(field_0xd8);
+}
+
+// Tier 3 reading: places the vehicle at a (with its y forced to -1000 when e is zero), takes
+// the orientation vectors b/c, settles the wheels twice via slot 58 (d, e), refreshes the wheel
+// and body node positions and finishes with slot 50 (flag, slot 45 value, 0).
+int Vehicle::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c, const Vec3* d,
+                                  int e, float f)
+{
+    UnknownVirtualSlot1(f);
+    field_0x88 = *b;
+    field_0x94 = *c;
+    float y;
+    if (e)
+        y = a->y;
+    else
+        y = -1000.0f;
+    d3d_field_0x1a0->SetPosition(a->x, y, a->z);
+    d3d_field_0x1a0->GetPosition(&field_0x0c);
+    UnknownVirtualSlot36();
+    Method_00528EB0();
+    UnknownVirtualSlot58((Vec3*)d, e);
+    Method_00528EB0();
+    UnknownVirtualSlot58((Vec3*)d, e);
+    for (int i = 0; i < field_0x544; i++) {
+        VehicleWheel* w = field_0x53c[i];
+        w->field_0x1bc->GetPositionIn(0, &w->field_0x200);
+    }
+    field_0x218->GetPositionIn(0, &field_0x18);
+    Method_0x004a8b00();
+    if (field_0x128)
+        field_0x128->Fn_00435fe0();
+    field_0x20d = 1;
+    field_0x20c = 1;
+    field_0x109 = 0;
+    int flag = 1;
+    if (UnknownVirtualSlot45() == 0.0f)
+        flag = 0;
+    UnknownVirtualSlot50(flag, UnknownVirtualSlot45(), 0);
+    return 0;
+}
+
+static inline float VehLenSq(const Vec3& v)
+{
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+// Tier 3 reading: when field_0xd8 (a velocity-like vector) is long enough, remembers its
+// direction in field_0x1ac and rotates the scene node about field_0x194 by |v| * dt.
+void Vehicle::UnknownVirtualSlot95()
+{
+    float lenSq = SquareMagnitude(field_0xd8);
+    float len;
+    if (lenSq == 0.0f)
+        len = 0.0f;
+    else if (lenSq == 1.0f)
+        len = 1.0f;
+    else
+        len = 1.0f / FastInvSqrt(lenSq);
+    float mag = len * field_0x13c;
+    if (_finite(mag) && lenSq >= 0.0001f) {
+        field_0x1ac = field_0xd8;
+        float sq = VehLenSq(field_0x1ac);
+        if (sq == 0.0f) {
+            field_0x1ac = g_VehZeroVec3;
+        } else {
+            float s = FastInvSqrt(sq);
+            field_0x1ac.x = s * field_0x1ac.x;
+            field_0x1ac.y = s * field_0x1ac.y;
+            field_0x1ac.z = s * field_0x1ac.z;
+        }
+        d3d_field_0x1a0->RotateAboutPoint(field_0x194, field_0x1ac, lenSq);
+    }
 }
