@@ -94,6 +94,12 @@ paired compilations preserve code sections and relocations. It is not a claimed
 original flag. Format references: [PE/COFF](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#auxiliary-format-1-function-definitions)
 and [CodeView](https://github.com/microsoft/microsoft-pdb/blob/master/include/cvinfo.h).
 
+Same-section relocations are inferred only when their final symbol-plus-addend
+destination is inside the independently measured function extent. This includes
+section-symbol references into jump tables; an internal label plus an escaping
+addend still needs an explicit binding. Inference is per relocation, so a local
+reference cannot authorize another reference outside the function.
+
 `tools/match.py --bindings` applies DIR32/REL32 relocations and compares every byte.
 Bindings require independent address evidence. Without bindings the tool masks
 relocation fields; that is strict only when no bytes were masked. Unsupported or
