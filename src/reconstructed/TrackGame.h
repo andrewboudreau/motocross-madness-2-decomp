@@ -25,7 +25,8 @@ struct TrackGameViewOwner : public GameObject {
     UnknownKrustyBikeView* field_0x34;
     unsigned char field_0x38[0x6c - 0x38];
     UnknownMessageTarget* field_0x6c;
-    unsigned char field_0x70[0xa8 - 0x70];
+    float field_0x70;                         // compared with TrackGame+0x2eb0 (EventManager 0x0045eef0)
+    unsigned char field_0x74[0xa8 - 0x74];
     UnknownEventRacer* field_0xa8;
 };
 
@@ -49,7 +50,11 @@ public:
     char field_0x00[16];                      // name; slot 4 sets it from the network object
     unsigned char field_0x10[0x6a0 - 0x10];
     int field_0x6a0;                          // EventManager 0x0045cb70 passes it to 0x00523a60
-    unsigned char field_0x6a4[0xa34 - 0x6a4];
+    unsigned char field_0x6a4[0x6d4 - 0x6a4];
+    int field_0x6d4;                          // copied into GUI layer 0 (EventManager 0x0045e710)
+    unsigned char field_0x6d8[0xa20 - 0x6d8];
+    int field_0xa20;                          // EventManager 0x0045e710 calls TrackGame 0x00521a40 when clear
+    unsigned char field_0xa24[0xa34 - 0xa24];
     int field_0xa34;                          // TrackGame slot 4 audio argument
     unsigned char field_0xa38[0xa48 - 0xa38];
     int field_0xa48;                          // selects 16 (else 8) in TrackGame slot 4
@@ -58,6 +63,7 @@ public:
 // Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0.
 class UnknownTrackGameObject56cItem {
 public:
+    void UnknownFunction46ff30(int value);    // 0x0046ff30 (EventManager 0x0045e710)
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
     virtual void UnknownVirtualSlot2();
@@ -225,7 +231,8 @@ public:
     EventManager* eventManager;
     UnknownTrackGameObject574* sceneObject;
     TrackGameMode mode;
-    unsigned char field_0xfc4[0x2158 - 0xfc4];
+    int field_0xfc4;                          // display mode index (EventManager 0x0045e710)
+    unsigned char field_0xfc8[0x2158 - 0xfc8];
     int field_0x2158;                         // racer count (EventManager 0x0045e550)
     UnknownTrackGameRacerSlot field_0x215c[8];
     unsigned char field_0x291c[0x2930 - 0x291c];
@@ -239,12 +246,16 @@ public:
     int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
     unsigned char field_0x2d78[0x2d7c - 0x2d78];
     int field_0x2d7c;                         // cleared by EventManager 0x0045e520
-    unsigned char field_0x2d80[0x2d94 - 0x2d80];
+    unsigned char field_0x2d80[0x2d88 - 0x2d80];
+    int field_0x2d88;                          // selects a 30 (else 120) second limit (EventManager 0x0045eef0)
+    unsigned char field_0x2d8c[0x2d94 - 0x2d8c];
     int field_0x2d94;                          // AI racer count (EventManager 0x0045f9a0)
     unsigned char field_0x2d98[0x2da5 - 0x2d98];
     unsigned char field_0x2da5;                // decremented when a player leaves (EventManager 0x0045fbd0)
     char field_0x2da6[0x20];                   // track name (length not established)
-    unsigned char field_0x2dc6[0x3338 - 0x2dc6];
+    unsigned char field_0x2dc6[0x2eb0 - 0x2dc6];
+    float field_0x2eb0;
+    unsigned char field_0x2eb4[0x3338 - 0x2eb4];
     DirectoryList* profileDirectory;
     int menuIsOpen;
     UnknownTrackGameObject3340* field_0x3340;

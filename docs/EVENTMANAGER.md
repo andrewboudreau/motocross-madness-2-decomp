@@ -12,7 +12,7 @@ TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
 ## Status
 
-Exact (23 calibration cases):
+Exact (24 calibration cases):
 - the constructor (11 0x50-byte entries at +0x50; -1000 in each component
   of +0x3c4) and both destructors;
 - slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c;
@@ -48,6 +48,12 @@ Exact (23 calibration cases):
   returns whether a race-mode object exists;
 - `0x0045f9a0`: sends the local racer's state and each AI racer's (type
   0x86, 0x24 bytes), then starts the network wait;
+- `0x0045eef0`: the per-frame race-end check. It always finishes after 315
+  seconds (a float global at `0x0059af54` that advances while no GUI item is
+  open); otherwise it finishes by mode: the event object's +0x70 against
+  TrackGame+0x2eb0 (modes 0 and 4), all network racers done or a 30/120
+  second grace (1, 2, 3, 5 online), or the local racer's finish (offline).
+  The online branch's own finish calls are tail-merged with the shared ones;
 - `0x0045fbd0`: removes a player, moving the last entry (and, with a
   race-mode object, TrackGame's last 0xf8-byte record) into its place, then
   qsorts the entries with the unsigned comparator `0x0045fbb0`;
@@ -68,10 +74,15 @@ it fits KrustyBike's primary base chain for the views. Their classes are not
 established; `src/reconstructed/RaceView.h` declares them.
 
 Not reconstructed:
-- `0x0045cdc0`, `0x0045d480`, `0x0045e710`, `0x0045e9d0` and `0x0045eef0`.
+- `0x0045cdc0`, `0x0045d480` and `0x0045e9d0`.
 
-Near miss (`samples/game/EventManagerNearMisses.cpp`): the cdecl progress
-callback `0x0045cb20` (63 of 67 bytes; retail swaps two registers).
+Near misses (`samples/game/EventManagerNearMisses.cpp`):
+- the cdecl progress callback `0x0045cb20` (63 of 67 bytes; retail swaps
+  two registers);
+- `0x0045e710`, which leaves the race for a menu: it restores the UI and
+  640x480x16 and shows a `TransDlg` ("Trans.dtm", retail line 1064).
+  454 of 533 bytes; retail picks eax/edx where VC6 here picks ecx/eax
+  after the `new`.
 
 Slot 24's message layouts live in `EventManager.cpp`, and the GUI page and
 control classes in the near-miss sample. Declaring either in a shared

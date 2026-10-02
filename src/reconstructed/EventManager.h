@@ -117,7 +117,7 @@ public:
     unsigned char field_0x48;
     int field_0x4c;
     UnknownEventEntry field_0x50[11];
-    int field_0x3c0;
+    float field_0x3c0;                             // seconds since a racer finished (0x0045eef0)
     Vector3 field_0x3c4;
     int field_0x3d0;
     Camera* field_0x3d4;                           // panned while UI interaction is blocked

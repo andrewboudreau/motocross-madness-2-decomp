@@ -29,7 +29,9 @@ struct UnknownEventRacerPart {
 struct UnknownEventRacer {
     unsigned char field_0x000[0x10];
     float field_0x010;                             // KrustyBikeCamera slot 10 adds 2 for the height
-    unsigned char field_0x014[0x5e0 - 0x14];
+    unsigned char field_0x014[0x4a0 - 0x14];
+    int field_0x4a0;                               // EventManager 0x0045eef0: counts as done when set
+    unsigned char field_0x4a4[0x5e0 - 0x4a4];
     char field_0x5e0[0x744 - 0x5e0];               // name
     UnknownEventRacerPart* field_0x744;
     int field_0x748;                               // time stamp; 0x7ffffffe until finished
@@ -60,6 +62,8 @@ struct UnknownEventRacer {
 // fits KrustyBike's primary base chain; its class is not established.
 struct UnknownKrustyBikeView : public GameObject {
     void UnknownFunction420590(int player);  // 0x00420590 (EventManager slot 24)
+    // 0x004204e0: the next racer after `*iterator` (advancing it), or 0.
+    UnknownEventRacer* UnknownFunction4204e0(int* iterator);
     // 0x004210f0: writes two positions relative to `reference`.
     void UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, int flags);
 
@@ -67,7 +71,9 @@ struct UnknownKrustyBikeView : public GameObject {
     UnknownEventRacer* field_0x38;                // its own racer
     UnknownEventRacer** field_0x3c;               // all racers, by racer slot
     UnknownEventRacer** field_0x40;               // AI racers (TrackGame+0x2d94 of them)
-    unsigned char field_0x044[0x18e - 0x44];
+    unsigned char field_0x044[0x18a - 0x44];
+    bool field_0x18a;                    // racing (EventManager 0x0045eef0)
+    unsigned char field_0x18b[0x18e - 0x18b];
     bool field_0x18e;                    // slot 10: view available
     unsigned char field_0x18f[0x3f8 - 0x18f];
     bool field_0x3f8;

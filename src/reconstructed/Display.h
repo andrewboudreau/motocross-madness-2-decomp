@@ -40,6 +40,8 @@ struct UnknownDisplay {
     int UnknownFunction4ca5a0(int* value, RenderTarget* target);     // 0x004ca5a0
     void UnknownFunction4c9b50();                                    // 0x004c9b50
     void UnknownFunction4cab00(RenderTarget* target);                // 0x004cab00: blit timing
+    // 0x0052d250: sorts the modes and returns the index of the matching one.
+    int UnknownFunction52d250(int width, int height, int bitDepth, int a, int b);
 
     int field_0x04;
     int field_0x08;                               // display mode count

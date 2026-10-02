@@ -531,3 +531,83 @@ int EventManager::UnknownFunction45cb70() {
     }
     return UnknownFunction45d2b0() != 0;
 }
+
+// 0x0045eef0: decides when the race is over (the frame time argument is
+// unused; Game+0x2f0 is read instead). After 315 seconds without an open
+// menu item it always ends; otherwise by mode (TrackGame+0x2d74).
+void EventManager::UnknownFunction45eef0(float frameTime) {
+    if (!g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485df0())
+        g_UnknownGlobal59af54 += g_UnknownGlobal56e26c->field_0x2f0;
+    if (g_UnknownGlobal59af54 >= 315.0f) {
+        UnknownFunction45f9a0();
+        UnknownFunction45e600();
+    }
+    TrackGameViewOwner* owner = UnknownFunction45d2b0();
+    if (g_UnknownGlobal56e26c->field_0x2d70 == 0 || g_UnknownGlobal56e26c->field_0x2d70 == 4 || !owner ||
+        !owner->field_0x25_bit0)
+        return;
+    UnknownKrustyBikeView* view = UnknownFunction45d2f0();
+    if (!view || !view->field_0x18a)
+        return;
+    switch (g_UnknownGlobal56e26c->field_0x2d74) {
+    case 1:
+    case 2:
+    case 3:
+    case 5:
+        if (g_UnknownGlobal56e26c->field_0x08) {
+            field_0x40 = 0;
+            field_0x44 = 1;
+            int iterator = 0;
+            UnknownEventRacer* racer;
+            while ((racer = view->UnknownFunction4204e0(&iterator)) != 0) {
+                if (racer->field_0x7a4)
+                    field_0x40 = 1;
+                else if (!racer->field_0x4a0)
+                    field_0x44 = 0;
+            }
+            if (field_0x40)
+                field_0x3c0 += g_UnknownGlobal56e26c->field_0x2f0;
+            // VC6 merges this call pair with the one after the switch.
+            float limit = g_UnknownGlobal56e26c->field_0x2d88 ? 30.0f : 120.0f;
+            if (field_0x44 || limit < field_0x3c0) {
+                UnknownFunction45f9a0();
+                UnknownFunction45e600();
+            }
+            return;
+        } else {
+            UnknownEventRacer* racer = view->field_0x38;
+            if (!racer->field_0x7a4)
+                return;
+            if (racer->field_0x784 == 1) {
+                if (racer->field_0x7a4 >= 3)
+                    UnknownFunction45e600();
+                return;
+            }
+            if (racer->field_0x7a4 >= 3 && UnknownFunction4bfa80() - racer->field_0x748 >= 3000)
+                UnknownFunction45e600();
+            return;
+        }
+        break;
+    case 0:
+        if (g_UnknownGlobal56e26c->field_0x55c->field_0x70 < g_UnknownGlobal56e26c->field_0x2eb0)
+            return;
+        break;
+    case 4:
+        if (g_UnknownGlobal56e26c->field_0x568->field_0x70 < g_UnknownGlobal56e26c->field_0x2eb0)
+            return;
+        if (owner->field_0xa8 == owner->field_0x34->field_0x38) {
+            owner->field_0xa8->field_0x764 += owner->field_0xa8->field_0x75c;
+            // Compared through locals, kept as the best of +0x75c.
+            float best = owner->field_0xa8->field_0x760;
+            float lap = owner->field_0xa8->field_0x75c;
+            owner->field_0xa8->field_0x760 = best > lap ? owner->field_0xa8->field_0x760
+                                                        : owner->field_0xa8->field_0x75c;
+            owner->field_0xa8->field_0x75c = 0;
+        }
+        break;
+    default:
+        return;
+    }
+    UnknownFunction45f9a0();
+    UnknownFunction45e600();
+}

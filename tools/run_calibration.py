@@ -2947,6 +2947,15 @@ CASES = [
         'reason': 'type 0x86 racer messages',
     },
     {
+        'name': 'EventManager race end check 0x45eef0',
+        'bindings': 'src/reconstructed/EventManager.bindings.json',
+        'source': 'src/reconstructed/EventManager.cpp',
+        'symbol': '?UnknownFunction45eef0@EventManager@@QAEXM@Z',
+        'target_va': '0x0045eef0',
+        'target_size': 652,
+        'reason': 'case 1/2/3/5 body first; duplicated finish calls tail-merged; jump table',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',
