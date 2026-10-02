@@ -20,8 +20,9 @@ observations:
   - +0x14, which Game uses as a ControlInterface (slot 3 queries).
   - The +0x2d4 bits.
   - The float at +0x2f0.
-- The named-setting slot (22) is `_purecall` in Game and implemented by
-  PCGame (`0x004c1e80`).
+- The setting slots (20-29) are `_purecall` in Game and implemented by
+  PCGame (see [PCGAME.md](PCGAME.md)). +0x0c is the display and +0x10 a
+  PCRenderTarget.
 
 `UnknownObject56e26c` therefore derives from `Game`. It declares only the
 members past Game's layout that other code reads, such as the instance and

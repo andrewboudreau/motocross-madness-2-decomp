@@ -8,5 +8,8 @@ struct UnknownDisplayMode {
     int width;
     int height;
     int bitDepth;
-    int field_0x0c[6];
+    int field_0x0c;
+    int field_0x10;
+    int field_0x14;           // usable; PCGame 0x004c0760 clears it for oversized modes
+    int field_0x18[3];
 };

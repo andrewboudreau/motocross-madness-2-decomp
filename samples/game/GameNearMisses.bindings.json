@@ -18,7 +18,7 @@
   "?Pop@MemTagStack@@QAEXH@Z": "0x004a2d90",
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
   "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
-  "?UnknownFunction447de0@DebugOverlay@@QAEPAV1@PAVUnknownGameOwned@@PAVTextureMapManager@@HHH@Z": "0x00447de0",
+  "?UnknownFunction447de0@DebugOverlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMapManager@@HHH@Z": "0x00447de0",
   "?UnknownFunction4484f0@DebugOverlay@@QAEHXZ": "0x004484f0",
   "?UnknownFunction460ad0@@YAXXZ": "0x00460ad0",
   "?UnknownFunction4677c0@UnknownStatic65b478@@QAEXXZ": "0x004677c0",

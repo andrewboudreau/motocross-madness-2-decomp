@@ -1,40 +1,15 @@
 #pragma once
 
-#include "DisplayMode.h"
+#include "Display.h"
 #include "GameObject.h"
+#include "RenderTarget.h"
 
 class ControlInterface;
 class DebugOverlay;
 class SoundInterface;
 class TextureMapManager;
-class UnknownGameOwned;
 struct UnknownControlEvent;
 struct UnknownInputEntry;
-
-// Object at Game+0x0c. Game slot 9 calls its slot 3; RenderTarget 0x004e8cc0
-// reads +0x6c. Game slot 8 prints its mode and memory members.
-struct UnknownObject56e26cSettings {
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4(int value);  // called with 0 and 1 around a frame
-    unsigned char field_0x04[0x0c - 4];
-    int field_0x0c;                               // current display mode
-    UnknownDisplayMode* field_0x10;
-    unsigned char field_0x14[0x54 - 0x14];
-    int field_0x54;                               // "Total VidMem"
-    unsigned char field_0x58[0x6c - 0x58];
-    int field_0x6c;      // freezes RenderTarget's frame index (0x004e8cc0)
-    unsigned char field_0x70;                     // bit 2 gates slot 4
-    unsigned char field_0x71[0x78 - 0x71];
-    int field_0x78;
-    unsigned char field_0x7c[0x5bc - 0x7c];
-    int field_0x5bc;                              // "PartialTexBlt"
-    unsigned char field_0x5c0[0x7c0 - 0x5c0];
-    char field_0x7c0[0x9f0 - 0x7c0];              // description string
-    int field_0x9f0;                              // "IsAGP"
-};
 
 // Network object at Game+0x08 (0x128 bytes; its code is near Net.cpp's
 // literals). The class is not established.
@@ -45,32 +20,6 @@ public:
     long UnknownFunction4ab6b0(int value);    // 0x004ab6b0
 
     unsigned char field_0x00[0x128];
-};
-
-// Object at Game+0x10 (slot 31's result); deleted through slot 0.
-class UnknownGameOwned {
-public:
-    virtual ~UnknownGameOwned();
-    virtual int UnknownVirtualSlot1();        // Game slot 8: begins the 3D frame
-    virtual int UnknownVirtualSlot2();        // ends it
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    virtual void UnknownVirtualSlot9();
-    virtual void UnknownVirtualSlot10();
-    virtual void UnknownVirtualSlot11();
-    virtual void UnknownVirtualSlot12(int a, int b);
-
-    unsigned char field_0x04[0x28 - 4];
-    int field_0x28;                           // copied to Game+0x28
-    unsigned char field_0x2c[0x38 - 0x2c];
-    int field_0x38;                           // "TotalTransforms"
-    int field_0x3c;                           // "TotalPoints"
-    int field_0x40;                           // "TotalLines"
-    int field_0x44;                           // "TotalTriangles"
 };
 
 // Global at 0x0056c470: a GameObject (Game's initialiser adds it as a child
@@ -131,18 +80,19 @@ public:
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00468bd0
     virtual void UnknownVirtualSlot19() = 0;
     virtual int UnknownVirtualSlot20(const char* name, int defaultValue) = 0; // "VideoMemoryMB"
-    virtual void UnknownVirtualSlot21() = 0;
+    virtual float UnknownVirtualSlot21(const char* name, float defaultValue) = 0;
     // Named setting (JoystickDevice asks for "JoyDirectionFlipped").
     virtual int UnknownVirtualSlot22(const char* name, int defaultValue) = 0;
-    virtual void UnknownVirtualSlot23() = 0;
-    virtual void UnknownVirtualSlot24() = 0;
-    virtual void UnknownVirtualSlot25() = 0;
-    virtual void UnknownVirtualSlot26() = 0;
-    virtual void UnknownVirtualSlot27() = 0;
-    virtual void UnknownVirtualSlot28() = 0;
-    virtual void UnknownVirtualSlot29() = 0;
+    virtual int UnknownVirtualSlot23(const char* name, const char* defaultValue, char* buffer,
+                                     unsigned long* size) = 0;
+    virtual int UnknownVirtualSlot24(const char* name, void* data, unsigned long* size) = 0;
+    virtual int UnknownVirtualSlot25(const char* name, int value) = 0;
+    virtual int UnknownVirtualSlot26(const char* name, int value) = 0;
+    virtual int UnknownVirtualSlot27(const char* name, int value) = 0;
+    virtual int UnknownVirtualSlot28(const char* name, const char* value) = 0;
+    virtual int UnknownVirtualSlot29(const char* name, const void* data, unsigned long size) = 0;
     virtual int UnknownVirtualSlot30(int id, char* text);                                 // 0x00468c60
-    virtual UnknownGameOwned* UnknownVirtualSlot31() = 0;
+    virtual RenderTarget* UnknownVirtualSlot31() = 0;
     virtual int UnknownVirtualSlot32() = 0;
     virtual int UnknownVirtualSlot33();       // 0x00467e80
     virtual void UnknownVirtualSlot34() = 0;
@@ -154,8 +104,8 @@ public:
 
     SoundInterface* field_0x04;               // a PCSoundInterface (initialiser)
     UnknownNetObject* field_0x08;
-    UnknownObject56e26cSettings* field_0x0c;
-    UnknownGameOwned* field_0x10;
+    UnknownDisplay* field_0x0c;
+    RenderTarget* field_0x10;                 // a PCRenderTarget (PCGame slot 31)
     ControlInterface* field_0x14;
     int field_0x18;                           // 1 initially; KrustyBikeCamera slot 42 tests > 1
     TextureMapManager* field_0x1c;

@@ -77,10 +77,10 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod21();
     virtual long __stdcall UnknownMethod22();
     virtual long __stdcall UnknownMethod23();
-    virtual long __stdcall UnknownMethod24();
+    virtual long __stdcall UnknownMethod24();                             // IsLost
     virtual long __stdcall UnknownMethod25();
     virtual long __stdcall UnknownMethod26();
-    virtual long __stdcall UnknownMethod27();
+    virtual long __stdcall UnknownMethod27();                             // Restore
     virtual long __stdcall UnknownMethod28();
     virtual long __stdcall UnknownMethod29();
     virtual long __stdcall UnknownMethod30();

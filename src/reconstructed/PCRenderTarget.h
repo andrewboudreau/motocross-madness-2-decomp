@@ -48,7 +48,7 @@ public:
     void UnknownFunction4c5d00();        // 0x004c5d00 (PCCamera slot 27)
 
     UnknownSurfaceInterface* field_0x48;
-    UnknownRenderInterface* field_0x4c; // released by the destructor
+    UnknownSurfaceInterface* field_0x4c; // released by the destructor; PCGame slot 5 restores it
     UnknownRenderInterface* field_0x50; // the device
     CameraRect field_0x54;              // cleared by the constructor
     unsigned char field_0x64[0x250 - 0x64];
