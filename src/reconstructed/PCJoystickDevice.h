@@ -115,7 +115,8 @@ public:
     int UnknownFunction4c3090(int axis, int value);
     // 0x004c2ef0: button index for a joystick state offset, or -1.
     int UnknownFunction4c2ef0(int offset);
-    int UnknownMethod4c3100(int value);            // not reconstructed
+    int UnknownMethod4c3100(int value);            // near miss in samples/inputdevice
+    int FilterAxisSpike(int axis, unsigned long value); // inline (near miss sample)
     int UnknownMethod4c3790(int value);            // near miss in samples/inputdevice
     int UnknownMethod4c3a10(int buffered);
     int CheckPollResult(long result);              // inline
@@ -124,7 +125,7 @@ public:
 protected:
     UnknownEffectInterface* field_0x578[5]; // released by slot 15
     float field_0x58c[6];                  // axis ranges (flip base for axes 1, 2)
-    int field_0x5a4[6];
+    float field_0x5a4[6];                  // previous raw axis values
     float field_0x5bc[6];                  // dead-zone scale per axis
     unsigned char field_0x5d4_bit0 : 1;
     unsigned char field_0x5d4_bit1 : 1;
