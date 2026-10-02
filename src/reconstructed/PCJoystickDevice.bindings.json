@@ -1,9 +1,9 @@
 {
-  "??0?$ContainerList@H@@QAE@XZ": "0x005109c0",
+  "??0?$ContainerList@PAUUnknownControlBinding@@@@QAE@XZ": "0x005109c0",
   "??0JoystickDevice@@QAE@H@Z": "0x00489800",
   "??0PCInputDevice@@QAE@H@Z": "0x004c25f0",
   "??0PCJoystickDevice@@QAE@H@Z$ehhandler": "0x0054cc48",
-  "??1?$ContainerList@H@@QAE@XZ": "0x00402040",
+  "??1?$ContainerList@PAUUnknownControlBinding@@@@QAE@XZ": "0x00402040",
   "??1JoystickDevice@@UAE@XZ": "0x00489920",
   "??1PCInputDevice@@UAE@XZ": "0x004c2650",
   "??1PCJoystickDevice@@UAE@XZ": "0x004c28d0",

@@ -2,7 +2,12 @@
 
 // 0x00489780
 InputDevice::InputDevice(int id) {
-    field_0x14_bits = 0;
+    field_0x14_axis0 = 0;
+    field_0x14_axis1 = 0;
+    field_0x14_axis2 = 0;
+    field_0x14_axis3 = 0;
+    field_0x14_axis4 = 0;
+    field_0x14_axis5 = 0;
     field_0x10 = -1;
     field_0x04 = 0;
     field_0x08 = 0;

@@ -3,6 +3,7 @@
 RTTI: `InputDevice` → `PCInputDevice` → `JoystickDevice` / `KeyboardDevice` /
 `MouseDevice` → `PCJoystickDevice` / `PCKeyboardDevice` / `PCMouseDevice`.
 Canonical source is `src/reconstructed/InputDevice`, `PCInputDevice`,
+`ControlInterface`,
 `KeyboardDevice`, `MouseDevice`, `JoystickDevice`, `PCKeyboardDevice`,
 `PCMouseDevice`, `PCJoystickDevice` (`.h`/`.cpp` and bindings)
 and the template header `ContainerList.h`. Translation units are not
@@ -30,9 +31,19 @@ the default profile, except one near miss in
 - **MouseDevice** (`0x0048a2d0`): `PCInputDevice(1)`, `ContainerList<int>[2]`
   at +0x2b0 and four entries at +0x260.
 - **JoystickDevice** (`0x00489800`): `PCInputDevice(2)` and the index at
-  +0x260, 32 entries at +0x264, six counters at +0x4e4, `ContainerList<int>[6]`
-  at +0x4fc, and bit 0 of +0x574 from the global object's virtual slot 22 with
-  `"JoyDirectionFlipped"`.
+  +0x260, 32 button entries at +0x264, six axis values (floats) at +0x4e4,
+  six binding lists `ContainerList<UnknownControlBinding*>` at +0x4fc, and
+  bit 0 of +0x574 from the global object's virtual slot 22 with
+  `"JoyDirectionFlipped"`. Its other functions:
+  - Slot 0 (`0x00489b70`) drops bindings by id.
+  - `0x00489a20` attaches a binding to its axis list. Axis n reports controls
+    -(2n + 2) and -(2n + 3).
+  - `0x00489c00` feeds an axis value to that axis's bindings.
+  - `0x00489c60` answers a control query. Controls -2 to -13 are axis
+    directions: below 16384 or above 49152, for axes enabled by the six bits
+    at +0x14. Other controls go through the mapping table to slot 2.
+
+  Slot 2 (`0x00489980`) is a near miss.
 
 - **PCKeyboardDevice** (`0x004c43c0`) has an empty constructor body.
   **PCMouseDevice** (`0x004c48c0`) clears four ints at +0x2d8 with `memset`.
@@ -87,6 +98,30 @@ keyboard and mouse destructors (`0x00489f20`, `0x0048a3c0`) are
 compiler-generated, so their classes declare none. Each has a scalar
 deleting wrapper (`0x00489900`, `0x00489f00`, `0x0048a3a0`).
 
+## ControlInterface
+
+RTTI ControlInterface is a root class with PCControlInterface derived from
+it. Slot 0 is the deleting destructor (`0x0043ce40`) and slots 1–4 are
+`_purecall`. The global object at `0x0056e26c` holds one at +0x14; the
+evidence is the members the constructor (`0x0043ce00`) initialises and the
+input code uses. Its layout:
+
+| Offset | Member |
+|---|---|
+| +0x10 | Eight joysticks (ControlInterface `0x0043cf00` calls their slot 20) |
+| +0x30 | Mouse |
+| +0x34 | Keyboard (FollowCamera queries left Alt and left Shift, 0x38 and 0x2a, through its slot 5) |
+| +0x38 | Event count |
+| +0x3c | 160 queued 20-byte events, added by `0x0043cea0` |
+| +0xcbc | Mapping table, set by `0x0043ce70` |
+
+The 0x3c-byte, non-polymorphic `UnknownControlBinding` helpers sit just
+before it (`0x0043cc40`–`0x0043cde0`). They cover the default and full
+constructors, reset, and a value mapper with a dead zone and min/max clamp.
+The clamp matches only as inline helper functions, and the mapper unbinds
+through the device's slot 0. All 12 are strict exact. The TU is not
+established.
+
 ## ContainerList.h
 
 A growable array template. Its layout:
@@ -105,8 +140,12 @@ identical-code folding:
 - **Default constructor:** `0x005109c0`.
 - **Destructor:** `0x00402040`, which deletes the data.
 - **`Reserve`:** `0x005109e0`, which allocates at ContainerList.h line 71 and
-  copies with `memcpy`. It is written but not yet matched, because no
-  reconstructed caller emits it.
+  copies with `memcpy`. Its out-of-line copy is not matched yet, but its
+  inlined copy matches inside JoystickDevice `0x00489a20`. That copy shows
+  the new buffer is stored before the old one is deleted.
+
+`Get`, `Add` and `Remove` (swap with last) are inlined into the joystick
+binding functions.
 
 `Init(capacity, growBy)` is inlined into its callers and allocates at line
 59. Its statements must run data, grow step, capacity, then allocated bit;

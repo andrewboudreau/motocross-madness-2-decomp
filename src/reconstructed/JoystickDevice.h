@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ContainerList.h"
+#include "ControlInterface.h"
 #include "PCInputDevice.h"
 
 // RTTI: JoystickDevice : PCInputDevice. It overrides slot 0, introduces
@@ -11,9 +12,11 @@ class JoystickDevice : public PCInputDevice {
 public:
     explicit JoystickDevice(int index); // 0x00489800
 
-    virtual void UnknownVirtualSlot0(); // 0x00489b70, not reconstructed
+    virtual void UnknownVirtualSlot0(int id); // 0x00489b70
     virtual ~JoystickDevice();          // 0x00489920 (deleting wrapper 0x00489900)
-    virtual void UnknownVirtualSlot2(); // 0x00489980, not reconstructed
+    // 0x00489980: copies the state of a pressed button into `entry`
+    // (near miss in samples/inputdevice).
+    virtual int UnknownVirtualSlot2(int button, int modifier, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot3(int index, float* angle) = 0;
     virtual int UnknownVirtualSlot4(int index, float* x, float* y) = 0;
     virtual int UnknownVirtualSlot5(int enable) = 0;
@@ -39,10 +42,17 @@ public:
     virtual void UnknownVirtualSlot19() = 0;
     virtual int UnknownVirtualSlot20(int value) = 0;
 
+    // 0x00489a20: attaches `binding` to the list for its axis.
+    int UnknownFunction489a20(UnknownControlBinding* binding, int a, int b);
+    // 0x00489c00: feeds an axis value to every binding on that axis.
+    void UnknownFunction489c00(int axis, float value, float range);
+    // 0x00489c60: state of `control` (negative: an axis direction).
+    int UnknownFunction489c60(int control, int modifier, UnknownInputEntry* entry);
+
 protected:
     int field_0x260;                     // constructor argument
     UnknownInputEntry field_0x264[32];
-    int field_0x4e4[6];
-    ContainerList<int> field_0x4fc[6];
+    float field_0x4e4[6];                // axis values
+    ContainerList<UnknownControlBinding*> field_0x4fc[6]; // bindings per axis
     unsigned char field_0x574_bit0 : 1;  // "JoyDirectionFlipped" setting
 };

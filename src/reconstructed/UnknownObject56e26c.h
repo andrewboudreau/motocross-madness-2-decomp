@@ -1,31 +1,11 @@
 #pragma once
 
+#include "ControlInterface.h"
+
 // The object behind the global pointer at 0x0056e26c, used throughout the
 // camera and input code. It is polymorphic (virtual slot 22 is called). Its
 // class is not established; only members that reconstructed functions touch
 // are declared, at their observed offsets.
-
-// Interface at (+0x14)->+0x34; FollowCamera slots 55 and 56 call its slot 5.
-class UnknownInterface56e26c {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual bool UnknownVirtualSlot5(int a, int b, int c);
-};
-
-// Object at +0x14. KrustyBikeCamera slot 55 calls its virtual slot 2.
-class UnknownObject56e26cPart {
-public:
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual int UnknownVirtualSlot2(int a, int b);
-
-    unsigned char field_0x04[0x30];
-    UnknownInterface56e26c* field_0x34;
-};
 
 // Object returned by (+0x570)->0x0045d340; KrustyBikeCamera slot 58 hands it
 // a message.
@@ -88,7 +68,7 @@ public:
     unsigned char field_0x0004[0x0c - 4];
     UnknownObject56e26cSettings* field_0x0c;
     int field_0x10;
-    UnknownObject56e26cPart* field_0x14;
+    ControlInterface* field_0x14;
     int field_0x18;      // KrustyBikeCamera slot 42 tests > 1
     unsigned char field_0x001c[0x558 - 0x1c];
     // Objects whose +0x34 KrustyBikeCamera slot 10 takes as its view, by
