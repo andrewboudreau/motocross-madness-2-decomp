@@ -10,7 +10,7 @@ TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
 ## Status
 
-Exact (12 calibration cases):
+Exact (18 calibration cases):
 - the constructor (11 0x50-byte entries at +0x50; -1000 in each component
   of +0x3c4) and both destructors;
 - slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c;
@@ -23,7 +23,16 @@ Exact (12 calibration cases):
   listeners, and pans the camera at +0x3d4 by `frameTime * speed / 7`;
   after 7 seconds it lifts the block;
 - slots 22 and 23: a press of control 1, 0x1c or 0x39, or any joystick
-  button, ends the block once slot 23 has armed it.
+  button, ends the block once slot 23 has armed it;
+- `0x0045e520`: resets the 11 entries;
+- `0x0045e550`: the race-start wait; it scans TrackGame's racer slots
+  (+0x2228, 0xf8 apart) for readiness and drives the network object;
+- `0x0045e600`: finishes an event. Retail keeps a redundant
+  `blocked && !pending` early return between the two main branches; the
+  source keeps it because the branch layout depends on it;
+- `0x0045f180`: awards points from a table by position;
+- the cdecl comparators `0x0045e930` (standings) and `0x0045d3d0` (racer
+  names, through the inline `strcmp` intrinsic).
 
 GameObject's slot 10 takes a float frame time. EventManager adds and scales
 it, and retyping the declaration leaves GameObject's and KrustyBikeCamera's
@@ -36,5 +45,5 @@ established; `src/reconstructed/RaceView.h` declares them.
 
 Not reconstructed:
 - slot 24 (`0x0045f490`);
-- `0x0045cb20`, `0x0045cb70`, `0x0045cdc0`, and the comparison
-  `0x0045d3d0`.
+- `0x0045cb20`, `0x0045cb70`, `0x0045cdc0`, `0x0045d480`, `0x0045e710`,
+  `0x0045e9d0` and `0x0045eef0`.

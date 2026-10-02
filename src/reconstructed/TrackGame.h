@@ -120,6 +120,15 @@ public:
     unsigned char field_0x00[0x384];
 };
 
+// Per-racer record in TrackGame (0xf8 bytes, from +0x2228; the array's true
+// start and length are not established).
+struct UnknownTrackGameRacerSlot {
+    int field_0x00;                           // ready
+    int field_0x04;
+    int field_0x08;                           // network player id
+    unsigned char field_0x0c[0xf8 - 0x0c];
+};
+
 // Base of the +0x3410 object; its constructor sits among
 // FontTextureManager.cpp's literals.
 class UnknownTrackGameObject3410Base {
@@ -136,6 +145,7 @@ public:
 class UnknownTrackGameObject3410 : public UnknownTrackGameObject3410Base {
 public:
     void UnknownFunction4aa350(int a, int b); // 0x004aa350
+    void UnknownFunction49c770();             // 0x0049c770 (EventManager 0x0045e550)
 };
 
 // Object at TrackGame+0x3444 (0x00521cd0 tests that it exists).
@@ -202,15 +212,22 @@ public:
     EventManager* eventManager;
     UnknownTrackGameObject574* sceneObject;
     TrackGameMode mode;
-    unsigned char field_0xfc4[0x2930 - 0xfc4];
+    unsigned char field_0xfc4[0x2158 - 0xfc4];
+    int field_0x2158;                         // racer count (EventManager 0x0045e550)
+    unsigned char field_0x215c[0x2228 - 0x215c];
+    UnknownTrackGameRacerSlot field_0x2228[7]; // 0xf8 apart (EventManager 0x0045e550)
+    unsigned char field_0x28f0[0x2930 - 0x28f0];
     int field_0x2930;    // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x2934;  // saved KrustyBikeCamera presets (slots 59, 60)
     float field_0x2938;
     float field_0x293c;
     float field_0x2940;
-    unsigned char field_0x2944[0x2d74 - 0x2944];
+    unsigned char field_0x2944[0x2d70 - 0x2944];
+    int field_0x2d70;    // EventManager 0x0045e600 compares it with 2
     int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
-    unsigned char field_0x2d78[0x3338 - 0x2d78];
+    unsigned char field_0x2d78[0x2d7c - 0x2d78];
+    int field_0x2d7c;                         // cleared by EventManager 0x0045e520
+    unsigned char field_0x2d80[0x3338 - 0x2d80];
     DirectoryList* profileDirectory;
     int menuIsOpen;
     UnknownTrackGameObject3340* field_0x3340;

@@ -19,6 +19,9 @@ public:
     ~UnknownNetObject();                      // 0x004ab570
     long UnknownFunction4ab6b0(int value);    // 0x004ab6b0
     void UnknownFunction4ac720(int index, char* name);  // 0x004ac720 (TrackGame slot 4)
+    int UnknownFunction4ac800(int player);    // 0x004ac800 (EventManager 0x0045e550)
+    void UnknownFunction4ac950();             // 0x004ac950
+    void UnknownFunction4ac510(int value);    // 0x004ac510
 
     unsigned char field_0x00[4];
     int field_0x04;

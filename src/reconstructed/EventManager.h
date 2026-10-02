@@ -10,6 +10,46 @@ struct UnknownKrustyBikeView;
 // 0x50-byte entry; EventManager keeps 11 at +0x50.
 class Camera;
 
+// Racer object ranked by 0x0045e930 (TU and class not established).
+struct UnknownEventRacerPart {
+    unsigned char field_0x00[0x0c];
+    float field_0x0c;
+};
+struct UnknownEventRacer {
+    unsigned char field_0x000[0x5e0];
+    char field_0x5e0[0x744 - 0x5e0];               // name
+
+    UnknownEventRacerPart* field_0x744;
+    unsigned char field_0x748[0x784 - 0x748];
+    int field_0x784;                               // finishing position (1-based)
+    unsigned char field_0x788[0x790 - 0x788];
+    int field_0x790;
+    unsigned char field_0x794[0x7a0 - 0x794];
+    unsigned short field_0x7a0;
+};
+
+// 8-byte record sorted with 0x0045e930.
+struct UnknownEventRanking {
+    UnknownEventRacer* racer;
+    float value;
+};
+
+// 16-byte record sorted with 0x0045d3d0.
+struct UnknownEventStanding {
+    int field_0x00;
+    float field_0x04;
+    float field_0x08;
+    UnknownEventRacer* racer;                      // its +0x5e0 name breaks ties
+};
+
+// cdecl 0x0045d3d0: qsort order for standings (higher +0x00 first, then
+// lower +0x04 and +0x08, then the racer's name).
+int UnknownFunction45d3d0(const void* a, const void* b);
+
+// cdecl 0x0045e930: qsort order for rankings (higher value first, then
+// higher +0x7a0, +0x790 and +0x744->+0x0c).
+int UnknownFunction45e930(const void* a, const void* b);
+
 // Objects in EventManager's +0x424 list; slot 10 calls their slot 7.
 class UnknownEventListener {
 public:
@@ -29,6 +69,7 @@ void UnknownFunction4aef40();
 
 struct UnknownEventEntry {
     UnknownEventEntry();                           // 0x0045c830 (resets through 0x0045c840)
+    void UnknownFunction45c840();                  // 0x0045c840: reset
 
     unsigned char field_0x00[0x50];
 };
@@ -54,8 +95,18 @@ public:
     UnknownMessageTarget* UnknownFunction45d340(); // 0x0045d340
     void UnknownFunction45d270();                  // 0x0045d270: slot 5 on all three
     int UnknownFunction45d390();                   // 0x0045d390: whether any mode is present
-    void UnknownFunction45e550(float frameTime);   // 0x0045e550
-    void UnknownFunction45e600();                  // 0x0045e600
+    void UnknownFunction45e520();                  // 0x0045e520: resets the entries
+    // 0x0045e550: once every remote racer is ready, ends the network wait.
+    void UnknownFunction45e550(float frameTime);
+    // 0x0045f180: adds the championship points for `racer`'s position.
+    void UnknownFunction45f180(UnknownEventRacer* racer, int* points);
+    // 0x0045e600: starts the end-of-race block (or finishes at once), and
+    // once it has run its course clears it and moves to the results.
+    void UnknownFunction45e600();
+    void UnknownFunction45cdc0(int value);         // 0x0045cdc0
+    int UnknownFunction45d480();                   // 0x0045d480
+    void UnknownFunction45e710(int menu);          // 0x0045e710
+    void UnknownFunction45e9d0();                  // 0x0045e9d0
     void UnknownFunction45eef0(float frameTime);   // 0x0045eef0
 
     float field_0x2c;                              // "KeepAliveTimeout" (slot 8)

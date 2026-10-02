@@ -1,5 +1,7 @@
 #include "EventManager.h"
 
+#include <string.h>
+
 #include "Camera.h"
 #include "ControlInterface.h"
 #include "TrackGame.h"
@@ -152,4 +154,125 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
         }
     }
     return 1;
+}
+
+// 0x0045e520
+void EventManager::UnknownFunction45e520() {
+    for (int i = 0; i < 11; i++)
+        field_0x50[i].UnknownFunction45c840();
+    field_0x48 = 0;
+    g_UnknownGlobal56e26c->field_0x2d7c = 0;
+}
+
+// 0x0045e550
+void EventManager::UnknownFunction45e550(float) {
+    if (!field_0x34)
+        return;
+    int ready = 1;
+    int local = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
+    for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
+        int player = g_UnknownGlobal56e26c->field_0x2228[i].field_0x08;
+        if (player != local) {
+            int connected = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac800(player);
+            if (!g_UnknownGlobal56e26c->field_0x2228[i].field_0x00 && connected)
+                ready = 0;
+        }
+    }
+    if (ready) {
+        g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac950();
+        field_0x34 = 0;
+        UnknownFunction45e600();
+        if (g_UnknownGlobal56e26c->networkGameObject)
+            g_UnknownGlobal56e26c->networkGameObject->UnknownFunction49c770();
+    }
+}
+
+// 0x0045e930
+int UnknownFunction45e930(const void* a, const void* b) {
+    const UnknownEventRanking* first = (const UnknownEventRanking*)a;
+    const UnknownEventRanking* second = (const UnknownEventRanking*)b;
+    if (first->value < second->value)
+        return -1;
+    if (first->value == second->value) {
+        if (first->racer->field_0x7a0 > second->racer->field_0x7a0)
+            return -1;
+        if (first->racer->field_0x7a0 == second->racer->field_0x7a0) {
+            if (first->racer->field_0x790 > second->racer->field_0x790)
+                return -1;
+            if (first->racer->field_0x790 == second->racer->field_0x790) {
+                if (first->racer->field_0x744->field_0x0c < second->racer->field_0x744->field_0x0c)
+                    return -1;
+                if (first->racer->field_0x744->field_0x0c == second->racer->field_0x744->field_0x0c)
+                    return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+// 0x0045f180
+void EventManager::UnknownFunction45f180(UnknownEventRacer* racer, int* points) {
+    int table[10];
+    table[0] = 20;
+    table[1] = 17;
+    table[2] = 15;
+    table[3] = 12;
+    table[4] = 10;
+    table[5] = 8;
+    table[6] = 6;
+    table[7] = 5;
+    table[8] = 3;
+    table[9] = 1;
+    if (racer->field_0x784 >= 1 && racer->field_0x784 <= 10)
+        *points += table[racer->field_0x784 - 1];
+}
+
+// 0x0045d3d0
+int UnknownFunction45d3d0(const void* a, const void* b) {
+    const UnknownEventStanding* first = (const UnknownEventStanding*)a;
+    const UnknownEventStanding* second = (const UnknownEventStanding*)b;
+    if (first->field_0x00 > second->field_0x00)
+        return -1;
+    if (first->field_0x00 == second->field_0x00) {
+        if (first->field_0x04 < second->field_0x04)
+            return -1;
+        if (first->field_0x04 == second->field_0x04) {
+            if (first->field_0x08 < second->field_0x08)
+                return -1;
+            if (first->field_0x08 == second->field_0x08)
+                return strcmp(first->racer->field_0x5e0, second->racer->field_0x5e0);
+        }
+    }
+    return 1;
+}
+
+// 0x0045e600
+void EventManager::UnknownFunction45e600() {
+    if (g_UnknownGlobal56e26c->field_0x08 && field_0x34)
+        return;
+    if (!g_UnknownGlobal56e26c->uiInteractionBlocked && !g_UnknownGlobal56e26c->field_0x3438) {
+        UnknownFunction45e9d0();
+        UnknownKrustyBikeView* view = UnknownFunction45d2f0();
+        if (view)
+            view->UnknownVirtualSlot5();
+        if (UnknownFunction45d480()) {
+            g_UnknownGlobal56e26c->uiInteractionBlocked = 1;
+            g_UnknownGlobal56e26c->field_0x3434 = 0;
+            return;
+        }
+        g_UnknownGlobal56e26c->field_0x3438 = 1;
+        g_UnknownGlobal56e26c->uiInteractionBlocked = 0;
+        return;
+    }
+    if (g_UnknownGlobal56e26c->uiInteractionBlocked && !g_UnknownGlobal56e26c->field_0x3438)
+        return;
+    if (!g_UnknownGlobal56e26c->uiInteractionBlocked && g_UnknownGlobal56e26c->field_0x3438) {
+        g_UnknownGlobal56e26c->field_0x3438 = 0;
+        if (g_UnknownGlobal56e26c->field_0x08 &&
+            (g_UnknownGlobal56e26c->field_0x2d70 != 2 || field_0x48 > g_UnknownGlobal56e26c->field_0x2d7c))
+            g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac510(1);
+        field_0x34 = 0;
+        UnknownFunction45cdc0(2);
+        UnknownFunction45e710(g_UnknownGlobal56e26c->field_0x18 == 1 ? 0x88e : 0x868);
+    }
 }
