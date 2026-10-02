@@ -14,9 +14,9 @@ OUTPUT = ROOT / "docs" / "DECOMPILATION_PROGRESS.md"
 
 
 def repository_counts(root: Path) -> dict[str, int]:
-    source_root = root / "src" / "reconstructed"
-    cpp_files = sorted(source_root.glob("*.cpp"))
-    header_files = sorted(source_root.glob("*.h"))
+    source_roots = [root / "src" / "reconstructed", root / "src" / "krusty2"]
+    cpp_files = sorted(p for source_root in source_roots for p in source_root.rglob("*.cpp"))
+    header_files = sorted(p for source_root in source_roots for p in source_root.rglob("*.h"))
     source_lines = sum(
         len(path.read_text(encoding="utf-8").splitlines())
         for path in cpp_files + header_files
@@ -31,8 +31,9 @@ def repository_counts(root: Path) -> dict[str, int]:
 def render(config: dict[str, object], counts: dict[str, int]) -> str:
     exact = int(config["vc6_exact_targets"])
     selected = int(config["vc6_selected_targets"])
+    if selected <= 0 or not 0 <= exact <= selected:
+        raise ValueError("expected 0 <= exact <= selected and selected > 0")
     exact_percent = exact * 100 / selected
-    unit_percent = counts["cpp_files"] * 100 / int(config["retail_source_paths"])
     text_mib = int(config["retail_text_bytes"]) / (1024 * 1024)
     return f"""# Decompilation progress
 
@@ -40,7 +41,9 @@ def render(config: dict[str, object], counts: dict[str, int]) -> str:
 
 There is not yet a defensible whole-game percentage. The best reproducible
 headline is that **{exact} of {selected} selected function targets ({exact_percent:.1f}%)**
-have strict, byte-for-byte matches from readable C++ compiled with VC6 SP3.
+have strict, byte-for-byte matches in the reviewed calibration suite, compiled
+with VC6 SP3. The suite contains **{config['vc6_case_count']} cases**; repeated
+retail address/extent pairs count once.
 That percentage measures the active target set, **not {exact_percent:.1f}% of MCM2**:
 targets are chosen because they are useful or tractable, and the executable's
 complete function inventory has not been established.
@@ -49,11 +52,11 @@ complete function inventory has not been established.
 
 | Indicator | Current value | What it means |
 |---|---:|---|
-| Strict VC6 exact targets | **{exact} / {selected} ({exact_percent:.1f}%)** | Unique selected functions reproduced byte-for-byte in the latest reviewed matrix |
-| Canonical reconstructed implementation files | **{counts['cpp_files']}** | `.cpp` files promoted to `src/reconstructed/`; a file may still contain incomplete classes |
+| Strict VC6 exact targets | **{exact} / {selected} ({exact_percent:.1f}%)** | Unique retail address/extent pairs in the reviewed calibration run |
+| Canonical reconstructed implementation files | **{counts['cpp_files']}** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
 | Canonical reconstructed headers | **{counts['header_files']}** | Layout and interface declarations, including support-only headers |
 | Canonical C++ source lines | **{counts['source_lines']:,}** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
-| Reconstructed files / retail source-path strings | **{counts['cpp_files']} / {config['retail_source_paths']} ({unit_percent:.1f}%)** | A rough navigation proxy only; paths do not prove TU ownership or completeness |
+| Retail source-path strings | **{config['retail_source_paths']}** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **{config['rtti_types']}** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **{config['retail_text_bytes']:,} bytes ({text_mib:.2f} MiB)** | Broad code-section denominator; includes library code, thunks and padding |
 
@@ -67,13 +70,15 @@ CRT and third-party/library code. Until function boundaries and ownership cover
 the entire image, the table deliberately keeps these measures separate.
 
 “Exact” means all bytes in a defensible function extent match after independently
-supported relocations are resolved. Near matches, clang-only checks, generated
-accessor probes, skeletons, and semantic-only reconstructions do not qualify.
+supported relocations are resolved. This snapshot covers `tools/run_calibration.py`
+under `{config['vc6_profile']}`. The separate manual suite, generated probes and
+physics diagnostics are not added to this count. Relocation-masked matches, near
+matches, clang-only checks and skeletons do not qualify.
 See [the match contract](VC6_MATCHING.md#match-contract) for details.
 
 ## Updating this page
 
-After a reviewed VC6 profile-matrix run, update
+After a reviewed strict calibration run, update
 `config/decompilation_progress.json`, then run:
 
 ```bash
@@ -85,6 +90,17 @@ The repository-check GitHub Action runs `make progress-check`, so changes to
 canonical reconstructed sources or the snapshot cannot silently leave this page
 stale. The action uses no proprietary executable or compiler; the reviewed VC6
 numbers remain an explicit checked-in snapshot.
+
+Reproduce the calibration with the [private-input setup](TOOLCHAIN.md):
+
+```bash
+python3 tools/run_calibration.py --compiler vc6 --profile {config['vc6_profile']} --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+Inspect every result: the runner reports nonmatches as data and its exit status
+alone does not prove strict matching. Reviewed code revision:
+`{config['reviewed_commit']}`. Source inventory counts reflect the current tree
+and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot
 

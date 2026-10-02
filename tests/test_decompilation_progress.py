@@ -1,5 +1,6 @@
 import importlib.util
 import unittest
+import tempfile
 from pathlib import Path
 
 
@@ -13,11 +14,16 @@ SPEC.loader.exec_module(MODULE)
 
 
 class DecompilationProgressTests(unittest.TestCase):
-    def test_repository_counts_only_canonical_cpp_and_headers(self):
-        counts = MODULE.repository_counts(ROOT)
-        self.assertGreater(counts["cpp_files"], 0)
-        self.assertGreater(counts["header_files"], 0)
-        self.assertGreater(counts["source_lines"], 0)
+    def test_repository_counts_both_canonical_trees_and_excludes_samples(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ('src/reconstructed/A.cpp', 'src/krusty2/nested/B.cpp',
+                         'src/krusty2/core/B.h', 'samples/C.cpp', 'generated/D.cpp'):
+                p = root / name
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text('// one line\n', encoding='utf-8')
+            self.assertEqual(MODULE.repository_counts(root),
+                             {'cpp_files': 2, 'header_files': 1, 'source_lines': 3})
 
     def test_render_labels_selected_target_percentage(self):
         config = {
@@ -28,6 +34,9 @@ class DecompilationProgressTests(unittest.TestCase):
             "rtti_types": 20,
             "vc6_selected_targets": 4,
             "vc6_exact_targets": 3,
+            "vc6_case_count": 5,
+            "vc6_profile": "vc6_o2_mt",
+            "reviewed_commit": "abc",
             "notes": "Test note.",
         }
         text = MODULE.render(
@@ -36,6 +45,13 @@ class DecompilationProgressTests(unittest.TestCase):
         self.assertIn("3 of 4 selected function targets (75.0%)", text)
         self.assertIn("not 75.0% of MCM2", text)
         self.assertIn("1.00 MiB", text)
+        self.assertIn("5 cases", text)
+        self.assertNotIn("Reconstructed files / retail", text)
+        for exact, selected in ((1, 0), (5, 4), (-1, 4)):
+            with self.subTest(exact=exact, selected=selected):
+                config.update(vc6_exact_targets=exact, vc6_selected_targets=selected)
+                with self.assertRaises(ValueError):
+                    MODULE.render(config, {})
 
 
 if __name__ == "__main__":
