@@ -54,6 +54,15 @@ public:
         m_count = 0;
     }
 
+    // Whether `item` is in the list.
+    int Contains(T item) {
+        for (int i = 0; i < m_count; i++) {
+            if (m_data[i] == item)
+                return 1;
+        }
+        return 0;
+    }
+
     // Element `index`, or 0 when out of range.
     T Get(int index) {
         if (m_count > 0 && m_data && index < m_count)

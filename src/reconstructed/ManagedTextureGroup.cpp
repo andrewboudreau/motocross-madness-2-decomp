@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "DebugAlloc.h"
+#include "DebugOverlay.h"
 #include "ManagedTexture.h"
 #include "TrackGame.h"
 
@@ -12,6 +13,16 @@ extern "C" __declspec(dllimport) int __stdcall DeleteObject(void* object);
 
 // cdecl 0x00461d40: formatted output to `file`.
 void UnknownFunction461d40(FILE* file, const char* format, ...);
+
+// Texels of a square level-`level` texture (1 for level 0, none below).
+static inline int LevelArea(int level) {
+    if (level == 0)
+        return 1;
+    if (level < 0)
+        return 0;
+    int side = 2 << (level - 1);
+    return side * side;
+}
 
 // 0x0050bed0
 ManagedTextureGroup::ManagedTextureGroup(TextureMapManager* manager, int format, int addressU, int addressV)
@@ -213,15 +224,6 @@ int UnknownCompare50ef00(const void* first, const void* second) {
     return -1;
 }
 
-// Texels of a square level-`level` texture (1 for level 0, none below).
-static inline int LevelArea(int level) {
-    if (level == 0)
-        return 1;
-    if (level < 0)
-        return 0;
-    int side = 2 << (level - 1);
-    return side * side;
-}
 
 // Where `texture` goes in `list`, kept in descending 0x005109b0 order.
 static inline int FindPosition(ContainerList<ManagedTexture*>* list, ManagedTexture* texture) {

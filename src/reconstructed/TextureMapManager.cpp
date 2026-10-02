@@ -5,6 +5,7 @@
 
 #include "DebugAlloc.h"
 #include "ManagedTexture.h"
+#include "PCRenderTarget.h"
 #include "TrackGame.h"
 
 // 0x00510a50
@@ -168,7 +169,7 @@ int TextureMapManager::UnknownVirtualSlot15() {
         for (int i = 0; i < field_0x44.m_count; i++) {
             ManagedTextureGroup* cache = field_0x44.Get(i);
             if (cache)
-                cache->UnknownFunction50ef70(field_0x18);
+                cache->UnknownFunction50ef70(static_cast<PCRenderTarget*>(field_0x18));
         }
     }
     return GameObject::UnknownVirtualSlot15();

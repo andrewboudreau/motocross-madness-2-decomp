@@ -29,7 +29,7 @@ public:
     virtual int UnknownVirtualSlot1();
     virtual int UnknownVirtualSlot2();
     virtual int UnknownVirtualSlot3(void* destination, void* source, void* sourceRect, int flags);
-    virtual int UnknownVirtualSlot4(int a, int b, int c);              // 0x004c5420, not reconstructed
+    virtual void* UnknownVirtualSlot4(void* rect, long* pitch, int flags);              // 0x004c5420: locks +0x48, not reconstructed
     virtual int UnknownVirtualSlot5(void* rect);
     virtual long UnknownVirtualSlot6(int stage, int type, int* value);
     virtual long UnknownVirtualSlot7(int stage, int type, int value);

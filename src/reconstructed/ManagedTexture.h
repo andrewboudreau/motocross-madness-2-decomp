@@ -12,12 +12,18 @@ class CacheTexture : public PCTextureMap {
 public:
     // 0x0050f6a0
     CacheTexture(TextureMapManager* manager, ManagedTextureGroup* group, int value);
+    // 0x0050f890: lists the textures placed on the page in `textures`.
+    void UnknownFunction50f890(ContainerList<ManagedTexture*>* textures);
+    void UnknownFunction50f9b0(int* levels, int count); // 0x0050f9b0
+    // 0x0050fdb0: places textures from `textures` on the page.
+    int UnknownFunction50fdb0(ContainerList<ManagedTexture*>* textures, int value);
     void UnknownFunction50fc40();             // 0x0050fc40 (after restoring a lost page)
     void UnknownFunction5102b0(ManagedTexture* texture); // 0x005102b0: takes `texture` off the page
 
     unsigned char field_0x80[0x184 - 0x80];
     int field_0x184;                          // memory
-    unsigned char field_0x188[0x190 - 0x188];
+    unsigned char field_0x188[0x18c - 0x188];
+    int field_0x18c;                          // texels wanted on the page less its size (repacking)
 };
 
 // The part of a CacheTexture page (ManagedTexture+0x94) a texture occupies.
