@@ -10,6 +10,14 @@
 
 typedef char cc_check_own[(offsetof(CollisionCharacter, field_0x260) == 0x260) ? 1 : -1];
 
+// 0x0043c890 (shared out-of-line copy, inlined here): v / s computed as one reciprocal and three
+// multiplies (same helper the Terrain code uses).
+static inline Vec3 CharacterDivide(const Vec3& v, float s)
+{
+    float inv = 1.0f / s;
+    return Vec3(inv * v.x, inv * v.y, inv * v.z);
+}
+
 CollisionCharacter::CollisionCharacter(int a) : GameObject(1), D3DIMSoultreeCharacter(a)
 {
     field_0x210 = 0;
@@ -38,9 +46,7 @@ int CollisionCharacter::GameObjectVirtualSlot10(float dt)
 
     Vec3 pos;
     field_0x214->GetPositionIn(0, &pos);
-    Vec3 delta = pos - field_0x218;
-    float invDt = 1.0f / dt;
-    field_0x224 = invDt * delta;
+    field_0x224 = CharacterDivide(pos - field_0x218, dt);
     field_0x218 = pos;
 
     if (field_0x210 && field_0x210->Fn_00438e70()) {

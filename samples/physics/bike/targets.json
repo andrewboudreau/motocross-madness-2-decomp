@@ -6,7 +6,7 @@
     "target_va": "0x00405db0",
     "target_size": 724,
     "expect": "partial",
-    "notes": "98.9% (724/724). Weight clamp now matches (separate float w = ternary). Remaining 7 bytes: retail loads n.x first in the 2nd/3rd cross-product terms (fld [n]; fmul [out+8]) while VC6 canonicalises to out first; free function, member (this=out / this=n) and component forms all give the same."
+    "notes": "98.9% (724/724). Only diff: retail loads n.x first in the 2nd/3rd cross-product terms (fld [n]; fmul [out+x]) while VC6 loads out first. Tried: pointer/reference/direct member forms and operand swaps; direct member expression flips ALL three terms to n-first (and loses the add eax,0x230 CSE), so retail's shape is neither."
   },
   {
     "class": "Bike",
@@ -42,7 +42,7 @@
     "target_va": "0x00406840",
     "target_size": 395,
     "expect": "partial",
-    "notes": "98.4% (395/395). Only diff: retail scales the vector with the FPU-resident scalar as 'fld st(0); fmul [x]; fld [y]; fmul st(1); fld [z]; fmul st(1); fstp st(0)' (scalar kept live), VC6 here emits fld [x]; fmul st(1) ... consuming it. Tried *=, inline helper, k*v.x, repeated inline expression."
+    "notes": "98.4% (395/395). Only diff: retail scales with the FPU-resident scalar as fld st(0); fmul [x]; fld [y]; fmul st(1); fld [z]; fmul st(1); fstp st(0) (the final pop shows the scalar had one more use). Ours emits fld [x]; fmul st(1) ... and consumes. Tried *=, operator*, ctor, double scalar, by-value copy, ternary; same family as slots 54/55."
   },
   {
     "class": "Bike",
@@ -69,7 +69,7 @@
     "target_va": "0x00407440",
     "target_size": 485,
     "expect": "partial",
-    "notes": "slot 102: first divergence at insn 17 (retail keeps a value in [esp+4] memory local, ours forward-substitutes on the FPU) [16.4% match under vc6_o2_ml]"
+    "notes": "456/485. Structure right except (1) the clamp t=(t>0.25)?min(t,0.75):0.25: retail spills t to [esp+4] right after the sum and reloads it twice, merges both arms on the FPU into one fst; ours stores the constants in each arm (mov [t], imm); and (2) register roles: retail idx=edi, next=ebx, step=eax, cnt=ecx; ours reversed, declaration order has no effect."
   },
   {
     "class": "Bike",
@@ -96,7 +96,7 @@
     "target_va": "0x00409b30",
     "target_size": 1374,
     "expect": "partial",
-    "notes": "slot 99: first divergence at insn 107, retail dot order is y*0xa4, x*0xa0, z*0xa8 (ours differs) and the next compare is fld;fxch;fcompp instead of fcomp mem [39.3% match under vc6_o2_ml]"
+    "notes": "65.6% (1356/1374). Dot order, fdivr (float local before 1/x), lieLimit local (fcompp) and d*field_0x24 > a*field_0x44c compare order now match. Remaining diff: retail self-copies the parameter a (mov ecx,[a]; mov [a],ecx on both arms of the clamp at 0x409e90/0x409e9c), 18 bytes; every ternary/if/helper/local form tried only reproduces the stores that matter."
   },
   {
     "class": "Bike",
@@ -249,7 +249,7 @@
     "target_va": "0x0040c8b0",
     "target_size": 354,
     "expect": "partial",
-    "notes": "slot 54: ours 386 vs 354 bytes; first divergence at insn 19, retail tests wheel->w_0x260 twice with reloaded pointers, ours differs, and the normalize scale pattern also differs [23.4% match under vc6_o2_ml]"
+    "notes": "Wheel-normal selector. Third branch fixed to copy front (a) normal, matching retail's shared tail; branches restructured so only two copy blocks remain. Remaining diffs: register roles in the midpoint sum (retail a=eax) and the same scalar-kept-live normalise pattern (retail all fld [mem]; fmul st(1) + fstp st(0))."
   },
   {
     "class": "Bike",
@@ -321,7 +321,7 @@
     "target_va": "0x0040ce60",
     "target_size": 244,
     "expect": "partial",
-    "notes": "81.1% (240 vs 244). Normalisation tail: same scalar-kept-live pattern as slot 76 (retail ends with fstp st(0) after fld st(0)/fmul, fld/fmul st(1) x2); ours consumes the scalar on the last multiply (4 bytes shorter). Tried *=, operator*, Vec3 ctor, component order."
+    "notes": "81.1% (240 vs 244). Same scalar-kept-live normalise tail as slot 76 (retail ends with fstp st(0)); ours consumes the scalar on the last multiply (4 bytes shorter)."
   },
   {
     "class": "Bike",
@@ -376,5 +376,23 @@
     "target_size": 2359,
     "expect": "partial",
     "notes": "5.0% (1984 vs 2359). Rider-pose blend state machine (field_0x520 states 1..5, field_0x65c output, field_0x644 smoothing). Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule); plain (int) calls __ftol here. Clamp/branch layout also differs."
+  },
+  {
+    "class": "BikeVec3Ops",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "ScaleBy@BikeVec3Ops",
+    "target_va": "0x0040ae00",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "Out-of-line Vec3 *= float returning this (thiscall, ret 4). Return value is what makes retail's mov eax,ecx appear."
+  },
+  {
+    "class": "BikeVec3Ops",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "BikeDotProduct",
+    "target_va": "0x0040ae30",
+    "target_size": 29,
+    "expect": "exact",
+    "notes": "Out-of-line cdecl dot product of two Vec3 pointers; y*y + x*x first, then += z*z."
   }
 ]

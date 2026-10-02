@@ -126,6 +126,13 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot3(const Vec3* a1, const Vec3* 
     field_0xcc = field_0x08->LocalToWorldDirection(field_0xd8);
 }
 
+// Cross product built with the three-float constructor.  Slot 4 matches better with this
+// form than with SoultreeCross (87.5% vs 85.1%); some fmul operand loads still differ.
+static inline Vec3 SoultreeCrossCtor(const Vec3& a, const Vec3& b)
+{
+    return Vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+}
+
 // slot 4 (0x005013d0)
 void SoultreePhysicsBaseObject::UnknownVirtualSlot4(const Vec3* a1, Vec3* a2, const Vec3* a3,
                                                     const Vec3* a4, int a5, float a6, int a7,
@@ -133,11 +140,12 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot4(const Vec3* a1, Vec3* a2, co
                                                     const Vec3* a10, Vec3* a11,
                                                     Vec3* a12, int a13, float* a14, float a15)
 {
-    Vec3 l1 = (SoultreeCross(*a3, *a4) + *a2) * a15;
-    Vec3 l2 = (SoultreeCross(*a9, *a10) + *a8) * a15;
+    Vec3 l1 = (SoultreeCrossCtor(*a3, *a4) + *a2) * a15;
+    Vec3 l2 = (SoultreeCrossCtor(*a9, *a10) + *a8) * a15;
     ContactSolveImpulse(field_0x14c, a1, field_0x24, field_0x08, &l1, a4, &field_0xe4, &field_0xd8,
                         a2, a6, (SoultreeObject*)a7, &l2, a10, a11, a12, (Vec3*)a13, a14);
-    field_0xbc = VecLength(*a2);
+    float s = SoultreeDot(*a2, *a2);
+    field_0xbc = (s == 1.0f) ? 1.0f : (float)sqrt(s);
     field_0xcc = field_0x08->LocalToWorldDirection(field_0xd8);
 }
 
@@ -468,8 +476,8 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot6(Vec3* a, float* b)
         v = field_0x1ac * (r / lenSq);
         *b -= t;
     } else {
-        v = field_0x1ac;
         *b -= lenSq / q;
+        v = field_0x1ac;
     }
     field_0x1b8 = v;
     *a += field_0x1b8;
@@ -602,11 +610,11 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot36()
     field_0x44 = 1.0f;
     field_0x4c = 0.0f;
     field_0x48 = 0.0f;
+    field_0x50 = field_0x34;
     field_0x54 = 0.0f;
     field_0x58 = 1.0f;
     field_0x60 = 1.0f;
     field_0x5c = 0.0f;
-    field_0x50 = field_0x34;
 }
 
 
@@ -618,7 +626,11 @@ struct SoultreeCollisionEvent {
 
 static inline Vec3 Scale3(Vec3 v, const Vec3& s)
 {
-    return Vec3(s.x * v.x, s.y * v.y, s.z * v.z);
+    Vec3 r;
+    r.x = v.x * s.x;
+    r.y = v.y * s.y;
+    r.z = v.z * s.z;
+    return r;
 }
 
 // slot 38 (0x00501600): collision response for one contact.  Tier 3 reading: a2 is the
@@ -689,12 +701,12 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot38(int a1, int a2, void* a3)
 // ---- slot 21 (0x005024f0) -------------------------------------------------------------
 // Local views of objects reached through the attachment records / probe (tier 3 names,
 // offsets decoded from slot 21 only).
-struct SoultreeNodeList {          // field_0x08->+0x1bc: count at +0x2c, items from +0x30
+struct SoultreeLightList {          // field_0x08->+0x1bc: count at +0x2c, items from +0x30
     char pad_0x00[0x2c];
     int count;
-    struct SoultreeHeldObject* items[1];
+    struct SoultreeLight* items[1];
 };
-struct SoultreeHeldObject {        // entries of the list above
+struct SoultreeLight {        // entries of the list above; tier 3: a light (kind 2 directional, 4 positional)
     char pad_0x00[0x2c];
     int kind;                      // 2 or 4 qualify as the tracked object (tier 3)
     char pad_0x30[0x34];
@@ -716,6 +728,13 @@ struct SoultreeSinkObject {        // attachment field_0x14 target (type 4)
     void Fn_4ba360(int a, int b, int c);
 };
 
+// The type-4 attachment target (field_0x14).  Slot 21 reloads it at every use; caching it
+// in a local changes register allocation.
+static inline SoultreeSinkObject* AttachmentSink(const SoultreeAttachment* a)
+{
+    return (SoultreeSinkObject*)a->field_0x14;
+}
+
 // Per-frame refresh of the attachment records (field_0x1d4, field_0x1dc of them).  Tier 3
 // reading: (1) pick a tracked object from the node's list (kind 2 or 4); (2) on the
 // slot 22 cadence, probe from the body position (+1.5 up) along the tracked object's
@@ -732,9 +751,9 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
     if (!field_0x124 || !(field_0x124->field_0x25 & 1))
         return;
     if (!field_0x200) {
-        SoultreeNodeList* list = *(SoultreeNodeList**)((char*)field_0x08 + 0x1bc);
+        SoultreeLightList* list = *(SoultreeLightList**)((char*)field_0x08 + 0x1bc);
         for (int i = 0; i < list->count; i++) {
-            SoultreeHeldObject* h = list->items[i];
+            SoultreeLight* h = list->items[i];
             if (h->kind == 2 || h->kind == 4)
                 field_0x200 = h;
         }
@@ -743,18 +762,15 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
         int hit;
         Vec3 pos = UnknownVirtualSlot17();
         pos.y += 1.5f;
-        SoultreeHeldObject* h = field_0x200;
+        SoultreeLight* h = field_0x200;
         Vec3 out;
-        Vec3 to;
-        const Vec3* dir;
         if (h->kind == 2) {
-            to = pos + Vec3(h->field_0x70 * -3000.0f, h->field_0x74 * -3000.0f,
-                                    h->field_0x78 * -3000.0f);
-            dir = &to;
+            Vec3 to = pos + Vec3(h->field_0x70 * -3000.0f, h->field_0x74 * -3000.0f,
+                                 h->field_0x78 * -3000.0f);
+            hit = field_0x1f4->Fn_506e90(&pos, &to, &out, 0, 0, 0);
         } else {
-            dir = &h->field_0x64;
+            hit = field_0x1f4->Fn_506e90(&pos, &h->field_0x64, &out, 0, 0, 0);
         }
-        hit = field_0x1f4->Fn_506e90(&pos, dir, &out, 0, 0, 0);
         if (hit != (unsigned char)field_0x1fc) {
             for (int i = 0; i < field_0x1dc; i++) {
                 switch (field_0x1d4[i].type) {
@@ -769,9 +785,9 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
                     break;
                 case 4:
                     if (hit)
-                        ((SoultreeSinkObject*)field_0x1d4[i].field_0x14)->Fn_4ba360(0x80, 0x80, 0x80);
+                        AttachmentSink(&field_0x1d4[i])->Fn_4ba360(0x80, 0x80, 0x80);
                     else
-                        ((SoultreeSinkObject*)field_0x1d4[i].field_0x14)->Fn_4ba360(0xff, 0xff, 0xff);
+                        AttachmentSink(&field_0x1d4[i])->Fn_4ba360(0xff, 0xff, 0xff);
                     break;
                 }
             }
@@ -803,18 +819,16 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
             break;
         case 4:
             if (!field_0x20d) {
-                Vec3 w = field_0x08->LocalToWorldPoint(a->field_0x18);
-                SoultreeSinkObject* sink = (SoultreeSinkObject*)a->field_0x14;
-                field_0x1ac = w;
-                sink->Fn_4ba2c0(w);
+                field_0x1ac = field_0x08->LocalToWorldPoint(a->field_0x18);
+                AttachmentSink(a)->Fn_4ba2c0(field_0x1ac);
                 if (a->field_0x24) {
-                    sink->field_0x54 = sink->field_0x48;
+                    AttachmentSink(a)->field_0x54 = AttachmentSink(a)->field_0x48;
                     a->field_0x24 = 0;
                 }
                 if (settled && !field_0x20e)
-                    sink->Fn_4ba300();
+                    AttachmentSink(a)->Fn_4ba300();
                 else if (UnknownVirtualSlot25())
-                    sink->Fn_4ba320();
+                    AttachmentSink(a)->Fn_4ba320();
             }
             break;
         }
@@ -823,19 +837,18 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
     if (field_0x20c) {
         field_0x20c = 0;
         for (int i = 0; i < field_0x1dc; i++) {
-            SoultreeAttachment* a = &field_0x1d4[i];
-            switch (a->type) {
+            switch (field_0x1d4[i].type) {
             case 1:
-                a->field_0x04->field_0x60 = 0;
+                field_0x1d4[i].field_0x04->field_0x60 = 0;
                 break;
             case 2:
-                ((SoultreePadObject*)a->field_0x08)->field_0x60 = 0;
+                ((SoultreePadObject*)field_0x1d4[i].field_0x08)->field_0x60 = 0;
                 break;
             case 3:
-                ((SoultreePadObject*)a->field_0x0c)->field_0x60 = 0;
+                ((SoultreePadObject*)field_0x1d4[i].field_0x0c)->field_0x60 = 0;
                 break;
             case 4:
-                ((SoultreeSinkObject*)a->field_0x14)->Fn_4ba340();
+                AttachmentSink(&field_0x1d4[i])->Fn_4ba340();
                 break;
             }
         }
@@ -905,24 +918,29 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     Vec3 extents;
     Vec3 center;
     field_0x08->Fn_004fe850(&center, &extents);
-    float ident[9] = { 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+    float mass = field_0x158;
+    Vec3* inertia = &field_0xf0;   // always non-null; the test only steers codegen
+    float ident[9];
+    memset(ident, 0, sizeof(ident));
+    ident[0] = ident[4] = ident[8] = 1.0f;
     // Inverse inertia diagonal (tier 3 names; the formulas are decoded).  Sphere mode
     // (a17 == 1): I = 0.4 * m * r^2 (solid sphere), stored as 1/I on all three axes.  Otherwise a
     // solid box of full sizes (sx,sy,sz) = 2 * extents: I_x = m/12 * (sy^2 + sz^2), etc.
-    Vec3* inertia = &field_0xf0;   // always non-null; the test only steers codegen
     if (inertia) {
         if (a17 == 1) {
-            float inv = 1.0f / (0.4f * field_0x158 * (a16 * a16));
-            inertia->x = inertia->y = inertia->z = inv;
+            float inv = 1.0f / ((mass * 0.4f) * (a16 * a16));
+            inertia->x = inv;
+            inertia->y = inv;
+            inertia->z = inv;
         } else {
             float sx = extents.x + extents.x;
             float sy = extents.y + extents.y;
             float sz = extents.z + extents.z;
-            float yy = sy * sy;
             float zz = sz * sz;
-            float k = field_0x158 * (1.0f / 12.0f);
-            float xx = sx * sx;
+            float yy = sy * sy;
+            float k = mass * (1.0f / 12.0f);
             inertia->x = 1.0f / ((yy + zz) * k);
+            float xx = sx * sx;
             inertia->y = 1.0f / ((xx + zz) * k);
             inertia->z = 1.0f / ((xx + yy) * k);
         }
@@ -951,12 +969,12 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     field_0xa0 = field_0x88;
     field_0xac = field_0x94;
     field_0x50 = field_0x34;
-    field_0x54 = field_0x38;
-    field_0x5c = field_0x40;
     field_0x4c = field_0x30;
     field_0x48 = field_0x2c;
+    field_0x54 = field_0x38;
     field_0x58 = field_0x3c;
     field_0x60 = field_0x44;
+    field_0x5c = field_0x40;
     if (a2) {
         field_0x218 = new(SP_FILE, 0x266) SoultreeObject(1);
         field_0x08->AddChild(field_0x218);
@@ -969,4 +987,213 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     field_0x109 = 0;
     field_0x20c = 1;
     return this;
+}
+
+// ==== wave 3 (fork B): constructor, destructor, collision callbacks, frame step ====
+
+// ---- collision callbacks (0x00500c00, 0x00500c30) ----------------------------------------
+// Installed into the CollisionObject at field_0x128 by Fn_501230 (+0x88 / +0x8c).  The
+// collision object's field_0x60 is its owner (this body) and the other object's field_0x64
+// its type tag (0x68 = another physics body).  The tag is recorded in field_0x134 and
+// forwarded to slot 38 together with the other collision object (tier 1 data flow).
+static void SoultreeCollisionCallback(CollisionObject* self, CollisionObject* other)
+{
+    SoultreePhysicsBaseObject* body = (SoultreePhysicsBaseObject*)self->field_0x60;
+    int kind = other->field_0x64;
+    body->field_0x134 = kind;
+    body->UnknownVirtualSlot38(0, kind, other);
+}
+
+// Second callback: the same response, except for body-to-body contacts (tag 0x68).
+static void SoultreeStaticCollisionCallback(CollisionObject* self, CollisionObject* other)
+{
+    if (other->field_0x64 != 0x68)
+        SoultreeCollisionCallback(self, other);
+}
+
+// 0x00501230
+void SoultreePhysicsBaseObject::Fn_501230()
+{
+    field_0x128->field_0x88 = SoultreeCollisionCallback;
+    field_0x128->field_0x8c = SoultreeStaticCollisionCallback;
+}
+
+// ---- constructor (0x00500aa0) / destructor (0x00501260) ---------------------------------
+// Defining them here also makes VC6 emit the vbase deleting destructor 0x00504290, its
+// vtordisp thunk 0x00504280 and the GameObject slot 10 vtordisp thunk 0x005042d0.
+SoultreePhysicsBaseObject::SoultreePhysicsBaseObject(int flags)
+    : GameObject(flags)
+{
+    field_0x210 = 1;
+    field_0x10a = 0;
+    field_0x28 = 1.0f;
+    field_0x15c = 0.0f;
+    field_0x188 = g_Zero;
+    field_0x1f8 = 1.0f;
+    field_0x1f4 = 0;
+    field_0x124 = 0;
+    field_0x1fc = 0;
+    field_0x200 = 0;
+    field_0x20c = 0;
+    field_0x218 = 0;
+    field_0x1d4 = 0;
+    field_0x1dc = 0;
+    field_0x1d8 = 0;
+    field_0x13c = 0.025f;          // default step 1/40 s ...
+    field_0x140 = 40.0f;           // ... and its reciprocal
+    field_0x144 = 0.0f;
+    field_0x1e8 = 0.025f;
+    field_0x1f0 = 0;
+    field_0x12c = 0;
+    field_0x1c8 = 0;
+    field_0x130 = 0;
+    field_0x1cc = 0;
+    field_0x20e = 0;
+    field_0x20d = 0;
+    field_0x20f = 0;
+    UnknownVirtualSlot1(0.0f);
+}
+
+SoultreePhysicsBaseObject::~SoultreePhysicsBaseObject()
+{
+    if (field_0x12c) {
+        for (int i = 0; i < field_0x1c8; i++) {
+            if (field_0x12c[i] && field_0x12c[i]->field_0x04)
+                delete field_0x12c[i];
+        }
+        delete field_0x12c;
+        field_0x12c = 0;
+    }
+    if (field_0x1d4) {
+        delete field_0x1d4;
+        field_0x1d4 = 0;
+    }
+}
+
+// ---- rest / settle check (0x00502c40) ------------------------------------------------------
+// Called once per frame by Fn_502f60.  Tier 3 reading: when the body is slow (speed
+// field_0xbc < 2) and its angular velocity field_0xd8 is small on every axis, with at least
+// field_0x210 - 1 active contacts (field_0x1cc), the timer field_0x214 runs; after 0.5 s,
+// on more than one contact or on a single near-flat one (normal y > 0.95), the body is put
+// to sleep: velocities zeroed and field_0x10a set (GameObject slot 10 then skips the step).
+// A body slower than 5 with enough contacts is damped instead (angular 0.95 per frame, and
+// after 3 s angular 0.5 and linear 0.95).
+static inline float AbsF(float v)
+{
+    if (v < 0.0f)
+        v = -v;
+    return v;
+}
+
+void SoultreePhysicsBaseObject::Fn_502c40()
+{
+    int spinSlow;
+    if (field_0xbc < 5.0f && AbsF(field_0xd8.y) < 0.98f && AbsF(field_0xd8.x) < 0.98f &&
+        AbsF(field_0xd8.z) < 0.98f)
+        spinSlow = 1;
+    else
+        spinSlow = 0;
+    if (field_0xbc < 2.0f && spinSlow && !field_0x108) {
+        if (field_0x1cc < field_0x210 && field_0x214 <= 0.5f) {
+            if (field_0x1cc >= field_0x210 - 1)
+                field_0x214 += field_0x13c;
+            return;
+        }
+        if (field_0x130 > 1 || field_0x12c[0]->field_0x2c.y > 0.95f) {
+            field_0x64 = g_Zero;
+            field_0xbc = 0.0f;
+            field_0xb8 = 0.0f;
+            field_0xd8 = g_Zero;
+            field_0xcc = g_Zero;
+            field_0x214 = 0.0f;
+            field_0x10a = 1;
+        }
+        return;
+    }
+    if (field_0xbc > 5.0f) {
+        field_0x214 = 0.0f;
+        return;
+    }
+    if (field_0x1cc < field_0x210 - 1)
+        return;
+    field_0x214 += field_0x13c;
+    if (field_0x214 > 3.0f) {
+        field_0xd8 *= 0.5f;
+        field_0x64 *= 0.95f;
+    } else {
+        field_0xd8 *= 0.95f;
+    }
+}
+
+// ---- GameObject slot 10 override (0x005036f0, via vtordisp thunk 0x005042d0) ---------------
+// 0x0043ad80 (cdecl, collision/CollisionContactUpdate.cpp): refreshes every contact point
+// from its owner node, counts the penetrating ones into *activeCount and returns nonzero
+// when it ran (first argument zero: nothing done).  Parameter names tier 3.
+int SoultreeRefreshContacts(int enabled, int* activeCount, int count, SoultreeContact** contacts,
+                            SoultreeProbe* terrain, Vec3* center, int mode, float radius);
+
+// Per-frame update: skipped while asleep (field_0x10a); otherwise slot 9 splits dt into
+// fixed steps, slot 30 clears the contact flags, slot 39 handles a pending reset, the
+// contacts are refreshed (field_0x1d0 = any contact active), Fn_502f60 runs the steps and
+// slot 21 refreshes the attachments.  Tier 2 for the call structure.
+int SoultreePhysicsBaseObject::GameObjectVirtualSlot10(float dt)
+{
+    int steps;
+    int refreshed = 0;
+    field_0x20d = 0;
+    if (field_0x10a)
+        return 1;
+    UnknownVirtualSlot9(dt, &steps);
+    UnknownVirtualSlot30();
+    field_0x1d0 = 0;
+    int held = UnknownVirtualSlot39(dt);
+    if (!held) {
+        refreshed = SoultreeRefreshContacts(UnknownVirtualSlot5(1), &field_0x1cc, field_0x130,
+                                            field_0x12c, field_0x1f4, &field_0x18, field_0x1c4,
+                                            field_0x160);
+        if (refreshed)
+            field_0x1d0 = field_0x1cc > 0;
+    }
+    Fn_502f60(steps, held, refreshed);
+    UnknownVirtualSlot21();
+    return 1;
+}
+
+// 0x00500220 (cdecl, called by slot 3): impulse response of one contact.  Tier 3 reading
+// (decoded arithmetic, tier 1): normal = contact normal, relVel = relative contact
+// velocity, arm = contact point relative to the centre of mass.  When the contact is
+// approaching (relVel . normal < 0) the impulse j = -(1 + restitution) * approach /
+// (invMass + n . ((I^-1 (arm x n)) x arm)) is written to *impulseOut, the linear velocity
+// gains n * j * invMass (j scaled first when the scale argument is non-zero), and the
+// body-space angular velocity gains I^-1 (arm x n) * j, scaled per axis by *angScale.
+// Slot 3 passes field_0x14c, field_0x24, field_0x08, &field_0xe4 (body-space inverse
+// inertia diagonal), &field_0xd8 and &field_0x64.
+void Fn_500220(float restitution, float invMass, SoultreeObject* node, const Vec3* normal,
+               const Vec3* relVel, const Vec3* arm, Vec3* invInertia, const Vec3* angScale,
+               Vec3* angVel, Vec3* velocity, float* impulseOut, int scaleBits)
+{
+    // The last argument holds a float (fcomp/fmul as a single); slot 3 forwards it as
+    // its int a6, so it is reinterpreted here.
+    float scale = *(float*)&scaleBits;
+    float approach = SoultreeDot(*relVel, *normal);
+    if (approach < 0.0) {
+        Vec3 axis = CrossProduct(*arm, *normal);
+        Vec3 local = node->WorldToLocalDirection(axis);
+        Vec3 scaled(local.x * invInertia->x, local.y * invInertia->y, local.z * invInertia->z);
+        Vec3 world = node->LocalToWorldDirection(scaled);
+        Vec3 c = CrossProduct(world, *arm);
+        float j = ((restitution + 1.0f) * -approach) / (DotProduct(c, *normal) + invMass);
+        *impulseOut = j;
+        Vec3 impulse;
+        if (scale != 0.0f)
+            impulse = *normal * (j * scale);
+        else
+            impulse = *normal * j;
+        *velocity += impulse * invMass;
+        Vec3 spin = *impulseOut * scaled;
+        spin.x *= angScale->x;
+        spin.y *= angScale->y;
+        spin.z *= angScale->z;
+        *angVel += spin;
+    }
 }

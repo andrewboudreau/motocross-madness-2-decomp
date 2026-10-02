@@ -170,6 +170,14 @@ public:
     // Slot 23 (0x00508850, ret 8): debug key handler; tier 3 name kept in the comment only
     // so the override has the base's name.  First argument is the input event.
     virtual int GameObjectVirtualSlot23(int event, int unused);
+    // 0x00507bb0 (plain thiscall, no args): derives four floats from the ints at 0x6c / 0x70
+    // (tier 3: a = field_0x6c, b = field_0x70): 0x74 = a/b, 0x78 = (a*a)/(b*b), 0x7c = 1/0x78,
+    // 0x80 = 1/0x74.
+    void ComputeRatios();
+    // 0x005057d0 (ret 4, tier 3 name): when `object` is in the field_0xcb8[] array, swaps the last
+    // element into its place, decrements the count at field_0xcbc and stores `object` in the freed
+    // last slot, i.e. moves it behind the live prefix.
+    void RetireOwnedObject(BaseObject* object);
     void SetField0xbec(int value);                              // 0x00507930 (ret 4)
     void SelectQuality(int index);                              // 0x00507960 (ret 4)
     explicit Terrain(int a);                                    // 0x00505830 (ret 4), forwards a to GameObject(int)
@@ -184,10 +192,10 @@ public:
     char field_0x48[0x24];
     int field_0x6c;
     int field_0x70;
-    int field_0x74;
-    int field_0x78;
-    int field_0x7c;
-    int field_0x80;
+    float field_0x74;                                           // ratio of the two ints (0x507bb0)
+    float field_0x78;                                           // ratio squared
+    float field_0x7c;                                           // 1 / ratio squared
+    float field_0x80;                                           // 1 / ratio
     int field_0x84;
     int field_0x88;
     int field_0x8c;

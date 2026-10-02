@@ -25,7 +25,7 @@
 
 class SoultreeContact;    // elements of the field_0x12c array
 class CollisionObject;    // pointed to by field_0x128 (collision/CollisionObject.h (src/krusty2))
-struct SoultreeHeldObject; // defined in SoulTreePhysics.cpp (slot 21)
+struct SoultreeLight; // defined in SoulTreePhysics.cpp (slot 21)
 // Object probed for ray hits (field_0x1f4); only the members the base uses are modelled.
 struct SoultreeProbe {
     char pad_0x00[0x40];
@@ -145,6 +145,11 @@ public:
     // Non-virtual helper 0x00501230 (thiscall, no args): installs the two TU-local contact
     // callbacks 0x00500c00/0x00500c30 into field_0x128 (+0x88/+0x8c).  Tier 2; called by slot 2.
     void Fn_501230();
+    // Non-virtual helpers reached from the GameObject slot 10 override 0x005036f0 (tier 1 call
+    // shapes): 0x00502f60 (thiscall, ret 0xc) is the per-frame step, 0x00502c40 (thiscall, no
+    // arguments) the rest/settle check it calls.
+    void Fn_502f60(int steps, int held, int refreshed);
+    void Fn_502c40();
 
     // --- data members (offsets confirmed by decoded accesses; names provisional) ---
     // vfptr at +0, vbptr at +4 (compiler generated)
@@ -226,7 +231,7 @@ public:
                                         // slot 21 calls thiscall 0x00506e90 on it; passed as 'obj' to 0x004b0df0
     float field_0x1f8;                  // fld/fmul in KrustyBike slot 12 (0x0048de20), tier 1
     char field_0x1fc;
-    SoultreeHeldObject* field_0x200;    // tier 3: tracked object picked from the node list by slot 21 (only user)
+    SoultreeLight* field_0x200;    // tier 3: light (kind 2 or 4) picked from the node list by slot 21; shadow probe target
     int field_0x204;
     int field_0x208;
     char field_0x20c;
@@ -234,7 +239,7 @@ public:
     char field_0x20e;
     unsigned char field_0x20f;
     int field_0x210;
-    int field_0x214;
+    float field_0x214;                  // float timer: Fn_502c40 adds field_0x13c and compares with 0.5/3.0 (tier 1)
     SoultreeObject* field_0x218;
 };
 

@@ -430,5 +430,77 @@
     "target_size": 1400,
     "expect": "exact",
     "notes": "Slot 49 (Bike override; EH frame, 4 debug new expressions for on-screen messages, jump table). target_size 1400 = extent_with_tables (1354 code + 2 pad + 11-entry jump table). Exact needed: per-arm if(msg){send;delete} duplicated in source (VC6 cross-jumps them), switch with the string-fetch call inside each case, nested if for the 0x784/0x7a4 tail."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "??1KrustyBike",
+    "target_va": "0x00491540",
+    "target_size": 192,
+    "expect": "exact",
+    "notes": "Destructor body (reached through the vbase-adjusted deleting destructor 0x00497c40): releases two debug-heap buffers (__FILE__ lines 0x8bb/0x8be), then runs Bike's destructor body. Exact with operator delete(p, __FILE__, line) calls."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_004925A0",
+    "target_va": "0x004925a0",
+    "target_size": 197,
+    "expect": "exact",
+    "notes": "Non-virtual: network/recorder notification (Net.cpp send at 0x004ac830, recorder 0x004e8720). Exact once the net pointer is read through g_kbGame->field_0x8 at both the test and the call (a local KbGame* CSEs it) and the message type is (unsigned char)(flag ? 0x13 : 0x87)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00496E20",
+    "target_va": "0x00496e20",
+    "target_size": 13,
+    "expect": "exact",
+    "notes": "Setter for the recorder pointer at +0x13fc."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00495C00",
+    "target_va": "0x00495c00",
+    "target_size": 151,
+    "expect": "exact",
+    "notes": "Non-virtual: compares the integer x/z of the two cells at +0x11c8/+0x11cc (tier 3 semantics)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00496F90",
+    "target_va": "0x00496f90",
+    "target_size": 981,
+    "expect": "exact",
+    "notes": "mutual AddIgnoredOwner (0x439410) over 5 collision objects each"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00497370",
+    "target_va": "0x00497370",
+    "target_size": 692,
+    "expect": "exact",
+    "notes": "mutual RemoveIgnoredOwner (0x439490) with racer/slot51 guards"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00496DA0",
+    "target_va": "0x00496da0",
+    "target_size": 119,
+    "expect": "partial",
+    "notes": "61.6% (121 vs 119 bytes): retail hoists lea ecx,[o+0xc] after the game-global load and derefs the vptr through it; local KbSink* variants hoist it earlier (50%), nested ifs duplicate paths (78.8% but 138 bytes)"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00496E30",
+    "target_va": "0x00496e30",
+    "target_size": 350,
+    "expect": "exact",
+    "notes": "toggle mutual collision ignoring against other bikes (0x496f90/0x497370) and part colliders; matched with items[i].flags test then a separate part pointer"
   }
 ]

@@ -95,6 +95,33 @@ Terrain::~Terrain()
     g_MemTagStack->Pop(scope);
 }
 
+// 0x005057d0.  Moves `object` out of the live prefix of field_0xcb8[] (swap with the last live
+// element, shrink the live count), keeping the pointer just behind the new end.
+void Terrain::RetireOwnedObject(BaseObject* object)
+{
+    if (field_0xcbc) {
+        for (int i = 0; i < field_0xcbc; i++) {
+            if (field_0xcb8[i] == object) {
+                field_0xcbc--;
+                field_0xcb8[i] = field_0xcb8[field_0xcbc];
+                field_0xcb8[field_0xcbc] = object;
+                return;
+            }
+        }
+    }
+}
+
+// 0x00507bb0.
+void Terrain::ComputeRatios()
+{
+    int a = field_0x6c;
+    int b = field_0x70;
+    field_0x78 = (float)(a * a) / (b * b);
+    field_0x74 = (float)a / b;
+    field_0x7c = 1.0f / field_0x78;
+    field_0x80 = 1.0f / field_0x74;
+}
+
 TerrainQualityEntry* g_pTerrainQualityTable;
 int g_terrainQualityValue;
 

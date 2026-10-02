@@ -430,5 +430,248 @@
     "target_size": 507,
     "expect": "exact",
     "notes": "exact: model bounds then per-element draw modes 1..7; element fields are read as model->elements[i] each time (no cached pointer)"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "CollisionHullShape_Free",
+    "target_va": "0x00431da0",
+    "target_size": 71,
+    "expect": "exact",
+    "notes": "free of the hull payload: tree pointers via 0x42a160, vertices via debug delete line 36"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "CollisionModelShape_Free",
+    "target_va": "0x00431df0",
+    "target_size": 85,
+    "expect": "partial",
+    "notes": "83 vs 85 bytes: retail pushes ebx only inside the loop and builds eax = ebx + edx (edx = hull array reloaded each pass); not reproduced"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "CollisionMeshShape_Free",
+    "target_va": "0x00431e50",
+    "target_size": 32,
+    "expect": "exact",
+    "notes": "plain null-check free"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "SetSphereShape@CollisionObject",
+    "target_va": "0x004329a0",
+    "target_size": 120,
+    "expect": "exact",
+    "notes": "inline identity via the memset intrinsic (rep stosd) then diagonal stores in reverse order"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "SetCapsuleShape@CollisionObject",
+    "target_va": "0x00432a20",
+    "target_size": 143,
+    "expect": "exact",
+    "notes": "same shape as the sphere setter; radiusSquared and the two scales stored between the p0 and p1 copies"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_00432ab0@CollisionObject",
+    "target_va": "0x00432ab0",
+    "target_size": 122,
+    "expect": "exact",
+    "notes": "polyline shape: two debug allocations (lines 0x183, 0x18a)"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_00432120@CollisionObject",
+    "target_va": "0x00432120",
+    "target_size": 93,
+    "expect": "exact",
+    "notes": "single tail store shared by the update paths; remove path and no-tree path keep their own stores"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_00435f10@CollisionObject",
+    "target_va": "0x00435f10",
+    "target_size": 160,
+    "expect": "exact",
+    "notes": "switch on shape type: scene node GetMatrixIn(0) then SetTransform; extent includes the 5-entry jump table (139 code + 20)"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_00435fb0@CollisionObject",
+    "target_va": "0x00435fb0",
+    "target_size": 36,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_00435fe0@CollisionObject",
+    "target_va": "0x00435fe0",
+    "target_size": 17,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "GetShapePosition@CollisionObject",
+    "target_va": "0x00436000",
+    "target_size": 113,
+    "expect": "exact",
+    "notes": "component-wise copy through typed views; a Vec3 struct copy emits add reg,disp instead of direct displacements"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_00436080@CollisionObject",
+    "target_va": "0x00436080",
+    "target_size": 115,
+    "expect": "exact",
+    "notes": "world bounds, ComputeCode, remove/insert when the cell changed"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "SetField_0x74@CollisionObject",
+    "target_va": "0x00439400",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "AddIgnoredOwner@CollisionObject",
+    "target_va": "0x00439410",
+    "target_size": 118,
+    "expect": "exact",
+    "notes": "two index loops over a void* array then DebugRealloc"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "RemoveIgnoredOwner@CollisionObject",
+    "target_va": "0x00439490",
+    "target_size": 49,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "SetOwner@CollisionObject",
+    "target_va": "0x004394d0",
+    "target_size": 17,
+    "expect": "exact",
+    "notes": ""
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "??1CollisionObject",
+    "target_va": "0x00432000",
+    "target_size": 240,
+    "expect": "exact",
+    "notes": "dtor core: quadtree remove, FreeShape, ignore list delete, then a second shape switch (dead after FreeShape but present in retail); extent includes the jump table plus 2 bytes of alignment"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "??_GCollisionObject",
+    "target_va": "0x00431fd0",
+    "target_size": 34,
+    "expect": "exact",
+    "notes": "scalar deleting destructor, adjusts this by -0xc"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot23@CollisionObject",
+    "target_va": "0x00434970",
+    "target_size": 153,
+    "expect": "exact",
+    "notes": "debug-key handler: three Fn_0043caa0 tests then the GameObject base slot; natural source shape"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_00434a10@CollisionObject",
+    "target_va": "0x00434a10",
+    "target_size": 407,
+    "expect": "exact",
+    "notes": "Math3D Vec3(0,0,0) temporaries reproduce the stack-spilled zero stores; one case per record type with its own debug-alloc line"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_00434bb0@CollisionObject",
+    "target_va": "0x00434bb0",
+    "target_size": 303,
+    "expect": "partial",
+    "notes": "retail accumulates z as sum.z + p.z but x,y as p + sum and loads the dot product operands y,x,z; commutative order is canonicalised by VC6 so source permutations do not move it"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_00434cf0@CollisionObject",
+    "target_va": "0x00434cf0",
+    "target_size": 446,
+    "expect": "partial",
+    "notes": "same normalise-inline difference as Fn_00434bb0"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectMethods.cpp",
+    "candidate_symbol_contains": "Fn_004392c0@CollisionObject",
+    "target_va": "0x004392c0",
+    "target_size": 311,
+    "expect": "partial",
+    "notes": "structure matches (uninitialised default arm even reads `other` like retail) but retail reserves 0x48 stack bytes vs 0x38 and copies the model bounds Vec3s through an lea-based sequence; local layout not reproduced"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "AddExistingCollisionPoint",
+    "target_va": "0x0043a570",
+    "target_size": 109,
+    "expect": "exact",
+    "notes": "AddCollisionPoint without the allocation: optional caller-supplied point stored into the slot, position reset from the zero vector"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "RemoveCollisionPoint",
+    "target_va": "0x0043a5e0",
+    "target_size": 85,
+    "expect": "exact",
+    "notes": "search loop with the shift nested inside the match; returning from inside the loop keeps the separate not-found return"
+  },
+  {
+    "class": "CollisionVectorHelpers",
+    "source": "CollisionVectorHelpers.cpp",
+    "candidate_symbol_contains": "CollisionRotateVector",
+    "target_va": "0x0043ca20",
+    "target_size": 115,
+    "expect": "partial",
+    "notes": "113 vs 115 bytes: retail copies the result through an extra register (mov ecx,eax) and loads the first component early; struct temp vs Vec3 temporary both give the same 113-byte form"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "UpdateCollisionPointWorldPositions",
+    "target_va": "0x0043aff0",
+    "target_size": 88,
+    "expect": "partial",
+    "notes": "85 vs 88 bytes: control flow, loop and the reload of *points after the call match; operand order of the thiscall setup (lea ecx before mov ecx,[eax+4]) and the register used for the +0xa4 test differ"
   }
 ]

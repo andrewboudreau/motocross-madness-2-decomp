@@ -112,6 +112,7 @@ void Fn_0042a510(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
 class CollisionSceneNode {
 public:
     void GetPositionRelativeTo(CollisionSceneNode* parent, CollisionVec3* out);
+    void GetMatrixIn(CollisionSceneNode* frame, Matrix4* out);   // 0x004fca80
 };
 
 // Result record of the last box test (global pointer at 0x00579058); the mesh tests read a

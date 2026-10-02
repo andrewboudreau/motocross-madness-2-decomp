@@ -103,3 +103,47 @@ void CollisionPoint::Fn_0043a640(const CollisionVec3* a1, const CollisionVec3* a
         }
     }
 }
+
+// 0x0043a570: AddCollisionPoint for a point the caller already owns (`point` may be null to reuse the
+// slot's current pointer): resets its position to zero and records the penetration threshold.
+CollisionPoint* AddExistingCollisionPoint(int capacity, CollisionPoint** points, float a4, int* count,
+                                          CollisionPoint* point) {
+    if (*count < capacity) {
+        if (point)
+            points[*count] = point;
+        CollisionPoint* p = points[*count];
+        p->field_0x08 = g_CollisionZeroVec3;
+        p->field_0x98 = a4 - 999.0f;
+        p->field_0x04 = 0;
+        p->field_0x9c = a4;
+        (*count)++;
+        return p;
+    }
+    return 0;
+}
+
+// 0x0043a5e0: removes `point` from the pointer list by shifting the tail down; the vacated last slot is cleared.
+void RemoveCollisionPoint(CollisionPoint** points, CollisionPoint* point, int* count) {
+    for (int i = 0; i < *count; i++) {
+        if (points[i] == point) {
+            for (int j = i; j < *count - 1; j++)
+                points[j] = points[j + 1];
+            (*count)--;
+            points[*count] = 0;
+            return;
+        }
+    }
+}
+
+// 0x0043aff0: refreshes the world position (field_0x14) of every owned, active contact point from the
+// owner's transform of its local position (field_0x08).
+void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {
+    CollisionVec3 tmp;
+    for (int i = count; i > 0; i--, points++) {
+        CollisionPoint* p = *points;
+        if (p->field_0x04 && *(int*)&p->field_0xa4) {
+            CollisionVec3* world = p->field_0x04->Fn_004fd660(&tmp, &p->field_0x08);
+            (*points)->field_0x14 = *world;
+        }
+    }
+}

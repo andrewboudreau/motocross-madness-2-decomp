@@ -4,6 +4,7 @@
 #include "Bike.h"
 
 static inline float BikeMin(float a, float b) { return a < b ? a : b; }
+static inline float BikeMaxF(float a, float b) { return a > b ? a : b; }
 
 float Bike::UnknownVirtualSlot32()
 {
@@ -317,23 +318,21 @@ Vec3* Bike::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
 
 Vec3* Bike::UnknownVirtualSlot54(Vec3* out)
 {
-    if (field_0x4a8 == 0) {
-        *out = field_0x5f4->w_0xe4;
-        return out;
+    if (field_0x4a8 != 0) {
+        BikeWheel* a = field_0x5f0;
+        if (a->w_0x260 != 0) {
+            BikeWheel* b = field_0x5f4;
+            if (b->w_0x260 != 0) {
+                Vec3 s(a->w_0xe4.x + b->w_0xe4.x, a->w_0xe4.y + b->w_0xe4.y, a->w_0xe4.z + b->w_0xe4.z);
+                Vec3 mid(s.x * 0.5f, s.y * 0.5f, s.z * 0.5f);
+                *out = BikeNormalized(mid);
+                return out;
+            }
+            *out = a->w_0xe4;
+            return out;
+        }
     }
-    BikeWheel* a = field_0x5f0;
-    if (a->w_0x260 == 0) {
-        *out = field_0x5f4->w_0xe4;
-        return out;
-    }
-    BikeWheel* b = field_0x5f4;
-    if (b->w_0x260 == 0) {
-        *out = b->w_0xe4;
-        return out;
-    }
-    Vec3 s(a->w_0xe4.x + b->w_0xe4.x, a->w_0xe4.y + b->w_0xe4.y, a->w_0xe4.z + b->w_0xe4.z);
-    Vec3 mid(s.x * 0.5f, s.y * 0.5f, s.z * 0.5f);
-    *out = BikeNormalized(mid);
+    *out = field_0x5f4->w_0xe4;
     return out;
 }
 
@@ -580,11 +579,11 @@ void Bike::UnknownVirtualSlot72(Vec3* out, VehicleWheel*)
                 out->z *= s;
             }
             weight *= 0.5f;
-            const Vec3* n = &field_0x5f0->w_0x230;
+            const Vec3& n = field_0x5f0->w_0x230;
             Vec3 c;
-            c.x = out->z * n->y - out->y * n->z;
-            c.y = out->x * n->z - n->x * out->z;
-            c.z = n->x * out->y - out->x * n->y;
+            c.x = out->z * n.y - out->y * n.z;
+            c.y = out->x * n.z - n.x * out->z;
+            c.z = n.x * out->y - out->x * n.y;
             Vec3 perp = BikeNormalized(c);
             float scale;
             if (field_0x700) {
@@ -693,6 +692,25 @@ static inline float BikeLength(float lenSq)
     return 1.0f / FastInvSqrt(lenSq);
 }
 
+static inline float BikeMagnitude(const Vec3& v)
+{
+    float lenSq = BikeDot(&v, &v);
+    if (lenSq == 0.0f)
+        return 0.0f;
+    if (lenSq == 1.0f)
+        return 1.0f;
+    return 1.0f / FastInvSqrt(lenSq);
+}
+
+static inline Vec3 BikeDirection(const Vec3& v)
+{
+    float lenSq = BikeDot(&v, &v);
+    if (lenSq == 0.0f)
+        return g_BikeVec3_005778a8;
+    float s = FastInvSqrt(lenSq);
+    return Vec3(s * v.x, s * v.y, s * v.z);
+}
+
 // Slot 97: builds the rider ragdoll ("rider.col") and attaches the 15 body
 // bones by name (Pelvis, UprTorso, Head, arms, legs, feet) with local offsets.
 // BikeAttachBone is __forceinline because retail expands the same sequence at each of the 15
@@ -770,11 +788,11 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         field_0x460 = 7;
         return 1;
     }
-    float d1 = g_BikeVec3_005778c8.y * field_0xa0.y + g_BikeVec3_005778c8.x * field_0xa0.x;
-    d1 += g_BikeVec3_005778c8.z * field_0xa0.z;
+    float d1 = BikeDot(&g_BikeVec3_005778c8, &field_0xa0);
     if (d1 < 0.0f)
         d1 = -d1;
-    if (field_0x708 < d1) {
+    float lieLimit = field_0x708;
+    if (d1 > lieLimit) {
         // bike is lying on its side
         if (field_0xa0.y > 0.0f) {
             field_0x448 = 3;
@@ -823,7 +841,7 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
         field_0x460 = 4;
         return 1;
     }
-    if (c && a * field_0x44c < d * field_0x24) {
+    if (c && d * field_0x24 > a * field_0x44c) {
         if (field_0xd8.z > 0.0f) {
             field_0x448 = 4;
             field_0x460 = 10;
@@ -836,9 +854,11 @@ int Bike::UnknownVirtualSlot99(float a, float b, int c, float d)
     if (field_0x608) {
         // collision with another vehicle: compare headings
         Vehicle* other = field_0x608;
-        float inv = 1.0f / field_0xbc;
+        float speed = field_0xbc;
+        float inv = 1.0f / speed;
         Vec3 u1(inv * field_0x64.x, inv * field_0x64.y, inv * field_0x64.z);
-        float inv2 = 1.0f / other->field_0xbc;
+        float otherSpeed = other->field_0xbc;
+        float inv2 = 1.0f / otherSpeed;
         Vec3 u2(inv2 * other->field_0x64.x, inv2 * other->field_0x64.y, inv2 * other->field_0x64.z);
         float dot = BikeDot(&u1, &u2);
         if (dot > 0.707f) {
@@ -968,55 +988,35 @@ void Bike::UnknownVirtualSlot91()
 {
     float dt = field_0x13c * 0.83f;
     float f = field_0x524[1] * field_0x504.y * dt;
-    float fx, fy, fz;
-    if (field_0x430) {
-        fx = f * 0.5f;
-        fy = 0.0f;
-        fz = 0.0f;
-    } else {
-        fx = f;
-        fy = field_0x504.x * field_0x13c * -0.2f;
-        fz = 0.0f;
-    }
+    Vec3 force;
+    if (field_0x430)
+        force = Vec3(f * 0.5f, 0.0f, 0.0f);
+    else
+        force = Vec3(f, field_0x504.x * field_0x13c * -0.2f, 0.0f);
     if (field_0x6fc && field_0x5f4->w_0x150 < -2.0f) {
         if (field_0x5c0 && field_0x5f4->w_0x29c > 0.0f)
-            fx = dt * field_0x5f4->w_0x29c + fx;
+            force.x += dt * field_0x5f4->w_0x29c;
         if (field_0x5bc && field_0x478 && field_0x480->field_0x00 > 0.0f && !field_0x479)
-            fx = fx - dt * field_0x480->field_0x00;
-        float inv = 1.0f / field_0xbc;
-        field_0x1ac = Vec3(inv * field_0x64.x, inv * field_0x64.y, inv * field_0x64.z);
-        float d = field_0xa0.y * field_0x1ac.y + field_0x1ac.x * field_0xa0.x + field_0xa0.z * field_0x1ac.z;
+            force.x -= dt * field_0x480->field_0x00;
+        float speed = field_0xbc;
+        float inv = 1.0f / speed;
+        Vec3* heading = &field_0x1ac;
+        *heading = Vec3(inv * field_0x64.x, inv * field_0x64.y, inv * field_0x64.z);
+        float d = BikeDot(&field_0xa0, heading);
         if (d > 0.55f && d < 0.984f) {
             // steer the velocity toward the lean plane
-            field_0x1b8 = Vec3(field_0x1ac.z, 0.0f, -field_0x1ac.x);
+            field_0x1b8 = Vec3(field_0x1ac.z, 0.0f, -heading->x);
             float s = (field_0x65c < 0.5f) ? 1.0f : -1.0f;
             float k = s * ((1.0f - d) * 3.41296911f * field_0xbc * 0.075f) * field_0x13c;
-            float kx = k * field_0x1b8.x;
-            float ky = k * field_0x1b8.y;
-            float kz = k * field_0x1b8.z;
-            field_0x64.x = kx + field_0x64.x;
-            field_0x64.y = ky + field_0x64.y;
-            field_0x64.z = kz + field_0x64.z;
-            float scale = field_0xbc / (k + field_0xbc);
-            field_0x64.x = scale * field_0x64.x;
-            field_0x64.y = scale * field_0x64.y;
-            field_0x64.z = scale * field_0x64.z;
-            float lenSq = field_0x64.y * field_0x64.y + field_0x64.x * field_0x64.x + field_0x64.z * field_0x64.z;
+            field_0x64 += field_0x1b8 * k;
+            field_0x64 *= field_0xbc / (k + field_0xbc);
+            float lenSq = BikeDot(&field_0x64, &field_0x64);
             field_0xbc = (lenSq == 1.0f) ? 1.0f : (float)sqrt(lenSq);
         }
     }
-    float forceSq = fy * fy + fx * fx + fz * fz;
-    float mag = BikeLength(forceSq);
-    if (_finite(mag) && ((mag < 0.0f) ? -mag : mag) >= 0.0001f) {
-        Vec3 dir;
-        if (forceSq == 0.0f) {
-            dir = g_BikeVec3_005778a8;
-        } else {
-            float rs = FastInvSqrt(forceSq);
-            dir = Vec3(rs * fx, rs * fy, rs * fz);
-        }
-        d3d_field_0x1a0->RotateAboutPoint(field_0x194, dir, mag);
-    }
+    float mag = BikeMagnitude(force);
+    if (_finite(mag) && ((mag < 0.0f) ? -mag : mag) >= 0.0001f)
+        d3d_field_0x1a0->RotateAboutPoint(field_0x194, BikeDirection(force), mag);
     field_0xd8.x = field_0xd8.x * 0.9f;
     field_0xd8.y = field_0xd8.y * 0.9f;
     field_0xd8.z = field_0xd8.z * 0.9f;
@@ -1629,4 +1629,28 @@ int Bike::UnknownVirtualSlot89(float t)
         }
     }
     return 0;
+}
+
+// Out-of-line vector helpers (retail 0x40ae00 / 0x40ae30). The scale helper is
+// a thiscall member of a three-float vector; the dot product is a cdecl free
+// function taking two pointers.
+struct BikeVec3Ops
+{
+    float x, y, z;
+    BikeVec3Ops& ScaleBy(float factor);
+};
+
+BikeVec3Ops& BikeVec3Ops::ScaleBy(float factor)
+{
+    x *= factor;
+    y *= factor;
+    z *= factor;
+    return *this;
+}
+
+float BikeDotProduct(const BikeVec3Ops* lhs, const BikeVec3Ops* rhs)
+{
+    float sum = lhs->y * rhs->y + lhs->x * rhs->x;
+    sum += lhs->z * rhs->z;
+    return sum;
 }

@@ -8,9 +8,12 @@
 
 // Element of SoultreePhysicsBaseObject::field_0x12c (count in field_0x130).
 // Has a vfptr at +0 (slot 1 is called with no arguments by slot 13).  Tier 3 names.
+// Slot 0 is the deleting destructor: the SoultreePhysicsBaseObject destructor 0x00501260
+// deletes each element with `push 1; call [vptr]` (tier 1).  This is a stand-in view of
+// collision/CollisionPoint.h's CollisionPoint (vtable 0x005511d8, slot 0 = 0x0043b300).
 class SoultreeContact {
 public:
-    virtual void UnknownVirtualSlot0();
+    virtual ~SoultreeContact();
     virtual void UnknownVirtualSlot1();
     void* field_0x04;
     char field_0x08[0x0c];

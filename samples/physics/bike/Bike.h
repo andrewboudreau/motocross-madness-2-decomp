@@ -254,8 +254,8 @@ public:
     int field_0x5c0;
     BikeA5C4* field_0x5c4;
     char pad_0x5c8[40];
-    BikeWheel* field_0x5f0;
-    BikeWheel* field_0x5f4;
+    BikeWheel* field_0x5f0;       // front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3
+    BikeWheel* field_0x5f4;       // rear wheel (smallest config z, 0x408728); tier 3
     char pad_0x5f8[12];
     BikeA604* field_0x604;
     Vehicle* field_0x608;

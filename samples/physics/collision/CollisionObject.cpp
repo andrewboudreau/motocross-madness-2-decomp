@@ -20,12 +20,28 @@
 //   CollisionObject owns shapes (ctor 0x431e70, FreeShape 0x432430).
 
 #include "collision/CollisionObject.h"
+#include "broadphase/Quadtree.h"
+
+extern QuadTree* g_pQuadTree;                    // 0x0068aba4
 
 // Retail helpers reached by direct call (addresses are the call targets).
 void Fn_0042a160(void* p);                       // shape sub-object destructor (cdecl, 1 arg)
 void CollisionHullShape_Free(CollisionHullShape* s);   // 0x00431da0
+struct CollisionHullElement { char bytes[0x198]; };
+struct CollisionModelShapeData {   // type 1: count + array of CollisionHullShape (stride 0x198)
+    int hullCount;
+    void* field_0x04;
+    void* field_0x08;
+    char field_0x0c[8];
+    CollisionHullElement* hulls;   // hull elements, 0x198 bytes each
+};
+struct CollisionMeshShapeData {    // type 2
+    int field_0x00;
+    void* field_0x04;
+};
 void CollisionModelShape_Free(void* s);                // 0x00431df0
 void CollisionMeshShape_Free(void* s);                 // 0x00431e50
+void Fn_004a30c0(void* p);                             // free()
 
 void CollisionHullShape_Free(CollisionHullShape* s) {
     if (s->field_0x188)
@@ -34,6 +50,23 @@ void CollisionHullShape_Free(CollisionHullShape* s) {
         Fn_0042a160(s->field_0x18c);
     if (s->field_0x190)
         operator delete(s->field_0x190, __FILE__, 36);
+}
+
+void CollisionModelShape_Free(void* shape) {
+    CollisionModelShapeData* s = (CollisionModelShapeData*)shape;
+    for (int i = 0; i < s->hullCount; i++)
+        CollisionHullShape_Free((CollisionHullShape*)&s->hulls[i]);
+    Fn_004a30c0(s->hulls);
+    Fn_004a30c0(s->field_0x04);
+    Fn_004a30c0(s->field_0x08);
+    Fn_004a30c0(s);
+}
+
+void CollisionMeshShape_Free(void* shape) {
+    CollisionMeshShapeData* s = (CollisionMeshShapeData*)shape;
+    if (s->field_0x04)
+        Fn_0042a160(s->field_0x04);
+    Fn_004a30c0(s);
 }
 
 void CollisionObject::FreeShape() {
@@ -102,4 +135,32 @@ CollisionObject::CollisionObject(int a)
     field_0x9c = 0;
     field_0xa0 = g_CollisionVec3_5797b0;
     field_0xac = g_CollisionVec3_5797b0;
+}
+
+// 0x00431fd0 (deleting) -> 0x00432000 (core)
+CollisionObject::~CollisionObject()
+{
+    if (g_pQuadTree && field_0x80)
+        g_pQuadTree->Remove(this, field_0x84);
+    FreeShape();
+    if (field_0x78)
+        operator delete((void*)field_0x78, __FILE__, 0x6c);
+    if (field_0x54) {
+        switch (field_0x50) {
+        case 0:
+            CollisionHullShape_Free((CollisionHullShape*)field_0x54);
+            delete field_0x54;
+            break;
+        case 1:
+            CollisionModelShape_Free(field_0x54);
+            break;
+        case 2:
+            CollisionMeshShape_Free(field_0x54);
+            break;
+        case 3:
+        case 4:
+            delete field_0x54;
+            break;
+        }
+    }
 }

@@ -22,6 +22,8 @@ struct KbXform;
 struct KbChild;
 struct KbObj128;
 struct KbGhost;
+struct KbCollider;
+class KrustyBike;
 
 // Vectors use the shared Math3D Vec3 (12 bytes: x,y,z at +0,+4,+8; tier 1 layout).
 #include "../bike/Bike.h"
@@ -33,7 +35,24 @@ extern Vec3 g_kbZeroVec;
 // Object reached through the global at 0x0056E26C (game/session singleton).
 struct KbTrackRec { Vec3 field_0x00; char pad_0x0C[0xC]; };
 struct KbMode { char pad_0x00[0x94]; int Fn_00524100(); };
-struct KbGameCfg { char pad_0x0000[0x10]; int field_0x10; };
+struct KbGameCfg {
+    char pad_0x0000[0x10]; int field_0x10;
+    // 0x004AC830 (Net.cpp): send a message (type, data, size, destination id, flags); returns 1 on success.
+    int Fn_004AC830(int type, void* data, int size, int dest, int flags);
+};
+// Object behind KrustyBike+0x13fc (tier 3); 0x004E8720 appends a record (type, id, data, flag).
+struct KbRecorder { int Fn_004E8720(int type, int id, void* data, int flag); };
+// Entity-level view used for the id at +0x11bc of any bike (tier 3, offset confirmed by decoded loads).
+struct KbCell { char pad_0x00[8]; float field_0x8; char pad_0xc[4]; float field_0x10; };
+struct KbNetBike {
+    char pad_0x0000[0x11bc];
+    int field_0x11bc;
+    char pad_0x11c0[8];
+    KbCell* field_0x11c8;
+    KbCell* field_0x11cc;
+};
+// 12-byte message built by KrustyBike::Fn_004925A0 (tier 3: the leading dword is never written).
+struct KbNetPacket { int field_0x0; char field_0x4; char pad_0x5[3]; int field_0x8; };
 // On-screen message object (0x8C bytes; ctor 0x0051B200 takes the text and a display time).
 struct KbMessage { char data[0x8C]; KbMessage(const char* text, float seconds); };
 struct KbGame {
@@ -67,15 +86,26 @@ struct KbGame {
     int field_0x2d74; // 0x2D74
     char pad_0x2D78[0xC];
     int field_0x2d84; // 0x2D84
-    char pad_0x2D88[0x68C];
+    char pad_0x2D88[0x5AC];
+    int field_0x3334; // 0x3334
+    char pad_0x3338[0xDC];
     int field_0x3414; // 0x3414
     int field_0x3418; // 0x3418
+    char pad_0x341C[0xC];
+    int field_0x3428; // 0x3428
 };
 extern KbGame* g_kbGame;
 
+// Part table at Vehicle+0x1f0 -> +0xb4 (tier 3): count at +0, 0x44-byte records at +4.  A record
+// with flag bit 3 clear owns a collision object at record+8 -> +0x3c.
+struct KbPartObj { char pad_0x00[0x3C]; KbCollider* collider; };
+struct KbPart { unsigned char flags; char pad_0x01[7]; KbPartObj* obj; char pad_0x0C[0x38]; };
+struct KbPartList { int count; KbPart* items; };
 struct KbTrackA {
     char pad_0x0000[0xA4];
     KbTrackB* field_0xa4; // 0xA4
+    char pad_0x00A8[0xC];
+    KbPartList* field_0xb4; // 0xB4
 };
 struct KbTrackB {
     char pad_0x0000[0x394];
@@ -104,6 +134,7 @@ struct KbRaceHandler {
 // Object reached through KrustyBike+0x740 (event/race context).
 struct KbRaceSub { int* field_0x0; };
 struct KbRace {
+    KrustyBike* Fn_004204E0(int* cursor);   // 0x004204E0: next bike of the race (cursor starts at 0)
     char pad_0x0000[0x38];
     void* field_0x38; // 0x38
     char pad_0x003C[0x8];
@@ -162,6 +193,11 @@ struct KbChild {
     int field_0x4;
     char pad_8[0x9c];
     int field_0xa4;
+};
+// CollisionObject (collision/) viewed by address: ignore list at +0x78/+0x7c.
+struct KbCollider {
+    void AddIgnoredOwner(void* owner);      // 0x00439410
+    void RemoveIgnoredOwner(void* owner);   // 0x00439490
 };
 struct KbObj128 {
     char pad_0[0xc];

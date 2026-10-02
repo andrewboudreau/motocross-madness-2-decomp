@@ -27,6 +27,16 @@ static inline float KbLength(const Vec3& v)
     return (float)sqrt(d);
 }
 
+// Destructor body (0x00491540, reached through the vbase-adjusted scalar deleting
+// destructor 0x00497c40): releases two debug-heap buffers (__FILE__ lines 0x8bb, 0x8be).
+KrustyBike::~KrustyBike()
+{
+    if (field_0x77c)
+        operator delete(field_0x77c, __FILE__, 0x8bb);
+    if (field_0x780)
+        operator delete(field_0x780, __FILE__, 0x8be);
+}
+
 void KrustyBike::UnknownVirtualSlot27()
 {
     if (field_0x460 == 9 || field_0x430) {
@@ -306,6 +316,41 @@ int KrustyBike::UnknownVirtualSlot84(int a, int b)
     return 0;
 }
 
+// 0x004925A0: tell the other peers (and the recorder) that this bike was hit by `who`.
+void KrustyBike::Fn_004925A0(Vehicle* who, bool flag)
+{
+    if (g_kbGame->field_0x8 && !field_0x735) {
+        KbNetPacket pkt;
+        pkt.field_0x8 = who ? ((KbNetBike*)who)->field_0x11bc : 0;
+        pkt.field_0x4 = flag;
+        g_kbGame->field_0x8->Fn_004AC830((unsigned char)(flag ? 0x13 : 0x87), &pkt, 12, ((KbNetBike*)this)->field_0x11bc, 0);
+        if (!flag && field_0x13fc && g_kbGame->field_0x3334 && !g_kbGame->field_0x3428)
+            field_0x13fc->Fn_004E8720(0x87, who ? ((KbNetBike*)who)->field_0x11bc : 0, &pkt, 1);
+    }
+}
+
+// 0x00495C00: true when the two cells referenced at +0x11c8/+0x11cc (both fully set) differ in
+// their integer x or z (tier 3 semantics).
+int KrustyBike::Fn_00495C00()
+{
+    if (field_0x735) {
+        KbCell* a = ((KbNetBike*)this)->field_0x11c8;
+        if (a->field_0x8 != 0 && a->field_0x10 != 0) {
+            KbCell* b = ((KbNetBike*)this)->field_0x11cc;
+            if (b->field_0x8 != 0 && b->field_0x10 != 0) {
+                if ((int)a->field_0x8 != (int)b->field_0x8 || (int)a->field_0x10 != (int)b->field_0x10)
+                    return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+void KrustyBike::Fn_00496E20(KbRecorder* a)
+{
+    field_0x13fc = a;
+}
+
 // ---- non-virtual state reset (0x0048D8B0) ----
 void KrustyBike::Fn_0048D8B0()
 {
@@ -338,6 +383,19 @@ void KrustyBike::UnknownVirtualSlot67()
     field_0x608 = 0;
     field_0x604->Method_0x005327c0();
     field_0x61c = g_kbZeroVec;
+}
+
+// Back-camera swap: like slot 101 with the two scene objects exchanged.
+void KrustyBike::Fn_00496DA0()
+{
+    field_0x1418->field_0xc.UnknownVirtualSlot4();
+    g_kbDirector->Fn_004DCF20(field_0x1418, field_0x1418->field_0x84);
+    field_0x128 = (CollisionObject*)field_0x1414;
+    if (g_kbGame->field_0x18 > 1 && !g_kbGame->field_0x2d84)
+        ((KbObj128*)field_0x128)->field_0xc.UnknownVirtualSlot4();
+    else
+        ((KbObj128*)field_0x128)->field_0xc.UnknownVirtualSlot5();
+    ((KbObj128*)field_0x128)->Fn_00435FE0();
 }
 
 // Retail begins with a 16-byte 'jmp +11' followed by 11 nops before the real prologue;
@@ -428,9 +486,8 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
     float b[2][3] = { { 4.0f, 3.25f, 2.5f }, { 3.75f, 3.25f, 2.5f } };
     float a[3] = { 1.15f, 1.05f, 1.0f };
     if (field_0x734) {
-        int mode = g_kbGame->field_0x2d74;
-        float* row = b[mode != 3];
-        if ((field_0xbc - field_0xb8) * row[g_kbGame->field_0x60c - 1] < arg * field_0x450)
+        float speedGain = field_0xbc - field_0xb8;
+        if (speedGain * b[g_kbGame->field_0x2d74 != 3][g_kbGame->field_0x60c - 1] < arg * field_0x450)
             return 1;
         return 0;
     }
@@ -986,4 +1043,142 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
     field_0x1540 = field_0x0c;
     field_0x153e = field_0x153c;
     field_0x7a2 = field_0x7a0;
+}
+
+// 0x00496F90: both bikes' collision objects ignore each other (AddIgnoredOwner = 0x00439410).
+void KrustyBike::Fn_00496F90(KrustyBike* other)
+{
+    if (field_0x1418) {
+        ((KbCollider*)other->field_0x1418)->AddIgnoredOwner((void*)field_0x1418);
+        ((KbCollider*)other->field_0x1418)->AddIgnoredOwner((void*)field_0x1414);
+        ((KbCollider*)other->field_0x1418)->AddIgnoredOwner((void*)field_0x5f0);
+        ((KbCollider*)other->field_0x1418)->AddIgnoredOwner((void*)field_0x5f4);
+        ((KbCollider*)other->field_0x1418)->AddIgnoredOwner((void*)field_0x604->a_0x38);
+        ((KbCollider*)other->field_0x1414)->AddIgnoredOwner((void*)field_0x1418);
+        ((KbCollider*)other->field_0x1414)->AddIgnoredOwner((void*)field_0x1414);
+        ((KbCollider*)other->field_0x1414)->AddIgnoredOwner((void*)field_0x5f0);
+        ((KbCollider*)other->field_0x1414)->AddIgnoredOwner((void*)field_0x5f4);
+        ((KbCollider*)other->field_0x1414)->AddIgnoredOwner((void*)field_0x604->a_0x38);
+        ((KbCollider*)other->field_0x5f0)->AddIgnoredOwner((void*)field_0x1418);
+        ((KbCollider*)other->field_0x5f0)->AddIgnoredOwner((void*)field_0x1414);
+        ((KbCollider*)other->field_0x5f0)->AddIgnoredOwner((void*)field_0x5f0);
+        ((KbCollider*)other->field_0x5f0)->AddIgnoredOwner((void*)field_0x5f4);
+        ((KbCollider*)other->field_0x5f0)->AddIgnoredOwner((void*)field_0x604->a_0x38);
+        ((KbCollider*)other->field_0x5f4)->AddIgnoredOwner((void*)field_0x1418);
+        ((KbCollider*)other->field_0x5f4)->AddIgnoredOwner((void*)field_0x1414);
+        ((KbCollider*)other->field_0x5f4)->AddIgnoredOwner((void*)field_0x5f0);
+        ((KbCollider*)other->field_0x5f4)->AddIgnoredOwner((void*)field_0x5f4);
+        ((KbCollider*)other->field_0x5f4)->AddIgnoredOwner((void*)field_0x604->a_0x38);
+        ((KbCollider*)other->field_0x604->a_0x38)->AddIgnoredOwner((void*)field_0x1418);
+        ((KbCollider*)other->field_0x604->a_0x38)->AddIgnoredOwner((void*)field_0x1414);
+        ((KbCollider*)other->field_0x604->a_0x38)->AddIgnoredOwner((void*)field_0x5f0);
+        ((KbCollider*)other->field_0x604->a_0x38)->AddIgnoredOwner((void*)field_0x5f4);
+        ((KbCollider*)other->field_0x604->a_0x38)->AddIgnoredOwner((void*)field_0x604->a_0x38);
+        ((KbCollider*)field_0x1418)->AddIgnoredOwner((void*)other->field_0x1418);
+        ((KbCollider*)field_0x1418)->AddIgnoredOwner((void*)other->field_0x1414);
+        ((KbCollider*)field_0x1418)->AddIgnoredOwner((void*)other->field_0x5f0);
+        ((KbCollider*)field_0x1418)->AddIgnoredOwner((void*)other->field_0x5f4);
+        ((KbCollider*)field_0x1418)->AddIgnoredOwner((void*)other->field_0x604->a_0x38);
+        ((KbCollider*)field_0x1414)->AddIgnoredOwner((void*)other->field_0x1418);
+        ((KbCollider*)field_0x1414)->AddIgnoredOwner((void*)other->field_0x1414);
+        ((KbCollider*)field_0x1414)->AddIgnoredOwner((void*)other->field_0x5f0);
+        ((KbCollider*)field_0x1414)->AddIgnoredOwner((void*)other->field_0x5f4);
+        ((KbCollider*)field_0x1414)->AddIgnoredOwner((void*)other->field_0x604->a_0x38);
+        ((KbCollider*)field_0x5f0)->AddIgnoredOwner((void*)other->field_0x1418);
+        ((KbCollider*)field_0x5f0)->AddIgnoredOwner((void*)other->field_0x1414);
+        ((KbCollider*)field_0x5f0)->AddIgnoredOwner((void*)other->field_0x5f0);
+        ((KbCollider*)field_0x5f0)->AddIgnoredOwner((void*)other->field_0x5f4);
+        ((KbCollider*)field_0x5f0)->AddIgnoredOwner((void*)other->field_0x604->a_0x38);
+        ((KbCollider*)field_0x5f4)->AddIgnoredOwner((void*)other->field_0x1418);
+        ((KbCollider*)field_0x5f4)->AddIgnoredOwner((void*)other->field_0x1414);
+        ((KbCollider*)field_0x5f4)->AddIgnoredOwner((void*)other->field_0x5f0);
+        ((KbCollider*)field_0x5f4)->AddIgnoredOwner((void*)other->field_0x5f4);
+        ((KbCollider*)field_0x5f4)->AddIgnoredOwner((void*)other->field_0x604->a_0x38);
+        ((KbCollider*)field_0x604->a_0x38)->AddIgnoredOwner((void*)other->field_0x1418);
+        ((KbCollider*)field_0x604->a_0x38)->AddIgnoredOwner((void*)other->field_0x1414);
+        ((KbCollider*)field_0x604->a_0x38)->AddIgnoredOwner((void*)other->field_0x5f0);
+        ((KbCollider*)field_0x604->a_0x38)->AddIgnoredOwner((void*)other->field_0x5f4);
+        ((KbCollider*)field_0x604->a_0x38)->AddIgnoredOwner((void*)other->field_0x604->a_0x38);
+    }
+}
+
+// 0x00497370: undo the mutual ignore unless one of them is the camera-followed racer.
+void KrustyBike::Fn_00497370(KrustyBike* other)
+{
+    if (g_kbGame->field_0x568) {
+        void* current = g_kbGame->field_0x568->field_0xa8;
+        if (other == current || this == current)
+            return;
+    }
+    ((KbCollider*)other->field_0x128)->RemoveIgnoredOwner((void*)field_0x128);
+    ((KbCollider*)other->field_0x128)->RemoveIgnoredOwner((void*)field_0x5f0);
+    ((KbCollider*)other->field_0x128)->RemoveIgnoredOwner((void*)field_0x5f4);
+    ((KbCollider*)other->field_0x128)->RemoveIgnoredOwner((void*)field_0x604->a_0x38);
+    ((KbCollider*)other->field_0x5f0)->RemoveIgnoredOwner((void*)field_0x128);
+    ((KbCollider*)other->field_0x5f0)->RemoveIgnoredOwner((void*)field_0x5f0);
+    ((KbCollider*)other->field_0x5f0)->RemoveIgnoredOwner((void*)field_0x5f4);
+    ((KbCollider*)other->field_0x5f0)->RemoveIgnoredOwner((void*)field_0x604->a_0x38);
+    ((KbCollider*)other->field_0x5f4)->RemoveIgnoredOwner((void*)field_0x128);
+    ((KbCollider*)other->field_0x5f4)->RemoveIgnoredOwner((void*)field_0x5f0);
+    ((KbCollider*)other->field_0x5f4)->RemoveIgnoredOwner((void*)field_0x5f4);
+    ((KbCollider*)other->field_0x5f4)->RemoveIgnoredOwner((void*)field_0x604->a_0x38);
+    ((KbCollider*)other->field_0x604->a_0x38)->RemoveIgnoredOwner((void*)field_0x128);
+    ((KbCollider*)other->field_0x604->a_0x38)->RemoveIgnoredOwner((void*)field_0x5f0);
+    ((KbCollider*)other->field_0x604->a_0x38)->RemoveIgnoredOwner((void*)field_0x5f4);
+    ((KbCollider*)other->field_0x604->a_0x38)->RemoveIgnoredOwner((void*)field_0x604->a_0x38);
+    if (other->UnknownVirtualSlot51())
+        return;
+    ((KbCollider*)field_0x128)->RemoveIgnoredOwner((void*)other->field_0x128);
+    ((KbCollider*)field_0x128)->RemoveIgnoredOwner((void*)other->field_0x5f0);
+    ((KbCollider*)field_0x128)->RemoveIgnoredOwner((void*)other->field_0x5f4);
+    ((KbCollider*)field_0x128)->RemoveIgnoredOwner((void*)other->field_0x604->a_0x38);
+    ((KbCollider*)field_0x5f0)->RemoveIgnoredOwner((void*)other->field_0x128);
+    ((KbCollider*)field_0x5f0)->RemoveIgnoredOwner((void*)other->field_0x5f0);
+    ((KbCollider*)field_0x5f0)->RemoveIgnoredOwner((void*)other->field_0x5f4);
+    ((KbCollider*)field_0x5f0)->RemoveIgnoredOwner((void*)other->field_0x604->a_0x38);
+    ((KbCollider*)field_0x5f4)->RemoveIgnoredOwner((void*)other->field_0x128);
+    ((KbCollider*)field_0x5f4)->RemoveIgnoredOwner((void*)other->field_0x5f0);
+    ((KbCollider*)field_0x5f4)->RemoveIgnoredOwner((void*)other->field_0x5f4);
+    ((KbCollider*)field_0x5f4)->RemoveIgnoredOwner((void*)other->field_0x604->a_0x38);
+    ((KbCollider*)field_0x604->a_0x38)->RemoveIgnoredOwner((void*)other->field_0x128);
+    ((KbCollider*)field_0x604->a_0x38)->RemoveIgnoredOwner((void*)other->field_0x5f0);
+    ((KbCollider*)field_0x604->a_0x38)->RemoveIgnoredOwner((void*)other->field_0x5f4);
+    ((KbCollider*)field_0x604->a_0x38)->RemoveIgnoredOwner((void*)other->field_0x604->a_0x38);
+}
+
+// 0x00496E30: a != 0 makes this bike's collision objects ignore every other bike (0x00496F90)
+// and stops the part collision objects ignoring its main body; a == 0 does the reverse
+// (0x00497370) and makes the part collision objects ignore both of its scene bodies.
+void KrustyBike::Fn_00496E30(int a)
+{
+    int cursor = 0;
+    KrustyBike* other;
+    if (a) {
+        for (other = field_0x740->Fn_004204E0(&cursor); other; other = field_0x740->Fn_004204E0(&cursor)) {
+            if (other != this)
+                Fn_00496F90(other);
+        }
+        if (((KbTrackA*)field_0x1f0)->field_0xb4 && !field_0x735) {
+            for (int i = 0; i < ((KbTrackA*)field_0x1f0)->field_0xb4->count; i++) {
+                KbPart* part = ((KbTrackA*)field_0x1f0)->field_0xb4->items + i;
+                if (!(part->flags & 8))
+                    part->obj->collider->RemoveIgnoredOwner((void*)field_0x128);
+            }
+        }
+    } else {
+        for (other = field_0x740->Fn_004204E0(&cursor); other; other = field_0x740->Fn_004204E0(&cursor)) {
+            if (other != this && (!field_0x735 || !other->field_0x735))
+                Fn_00497370(other);
+        }
+        if (((KbTrackA*)field_0x1f0)->field_0xb4 && !field_0x735) {
+            for (int i = 0; i < ((KbTrackA*)field_0x1f0)->field_0xb4->count; i++) {
+                if (!(((KbTrackA*)field_0x1f0)->field_0xb4->items[i].flags & 8)) {
+                    KbPart* part = ((KbTrackA*)field_0x1f0)->field_0xb4->items + i;
+                    KbPartObj* obj = part->obj;
+                    obj->collider->AddIgnoredOwner((void*)field_0x1418);
+                    obj->collider->AddIgnoredOwner((void*)field_0x1414);
+                }
+            }
+        }
+    }
 }

@@ -1,5 +1,5 @@
 // Quadtree.cpp -- reconstruction of D:\aardvark\VC\krusty2\Quadtree.cpp (broad phase).
-#include "Quadtree.h"
+#include "C:/tmp/mcm2-physics/src/krusty2/broadphase/Quadtree.h"
 
 #include <string.h>
 
@@ -601,8 +601,10 @@ QuadTreeObject* QuadTree::NextObjectSorted()
     g_pQuadTree = this;
     if (field_0x80 != 0)
         return 0;
-    QuadTreeResultLink* cell;
-    while ((cell = field_0x74) != 0) {
+    QuadTreeResultLink* cell = field_0x74;
+    if (!cell)
+        return 0;
+    do {
         if (!field_0x7c) {
             field_0x7c = cell->item->field_0x08;
             if (field_0x7c) {
@@ -636,10 +638,11 @@ QuadTreeObject* QuadTree::NextObjectSorted()
                 }
             }
         }
-        field_0x74 = field_0x74->next;
+        cell = field_0x74->next;
+        field_0x74 = cell;
         if (field_0x80)
             return field_0x84[--field_0x80];
-    }
+    } while (cell);
     return 0;
 }
 

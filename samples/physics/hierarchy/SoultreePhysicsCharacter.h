@@ -29,7 +29,11 @@
 
 class SoultreePhysicsCharacter : public SoultreePhysicsBaseObject, public D3DIMSoultreeCharacter {
 public:
-    SoultreePhysicsCharacter();
+    // 0x00503c70 (thiscall, ret 8 = flags + the compiler's hidden most-derived flag; tier 1):
+    // GameObject(1) when most-derived, then SoultreePhysicsBaseObject(flags) (0x00500aa0) and
+    // D3DIMSoultreeCharacter(flags) (0x004455b0), vptrs/vtordisp, field_0x42c = 0.
+    // Vehicle's ctor 0x005257a0 calls it as (arg, 0), i.e. SoultreePhysicsCharacter(arg).
+    explicit SoultreePhysicsCharacter(int flags);
     virtual ~SoultreePhysicsCharacter();        // core 0x00503d40, deleting 0x005042f0
     virtual int GameObjectVirtualSlot10(float dt);  // 0x00504210 via vtordisp thunk 0x00504350 (ret 4)
     // --- vtable 0x005580a8 (offset 0) ---

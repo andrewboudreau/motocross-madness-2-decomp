@@ -165,8 +165,18 @@ struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (pr
     float field_0x24;                // axis value (slot 63 reads it)
 };
 struct VehicleCamera;                // object at Vehicle+0x5ac
+struct VehicleTicker {               // elements of Vehicle+0x554/+0x560 (provisional): only virtual slot 0 is called
+    virtual void UnknownVirtualSlot0();
+};
+class SoultreeContact;
+// 0x0043a570: appends a contact to the owner's contact array (provisional).
+extern void __cdecl VehAddContact(int capacity, SoultreeContact** arr, int a2, int* count, void* contact);
+extern void __stdcall VehWheelApply(float weight, float a, float b, float* speed);
 class Vehicle;
 struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional)
+    char pad_0x00[0x8C];
+    int field_0x8c;
+    int field_0x90;
     void Method_004D31B0(float a, Vec3* b, float c, bool d, float e, Vec3* f, Vec3* g);
 };
 // Elements of Vehicle+0x53c (provisional: only touched offsets are named).
@@ -175,24 +185,37 @@ struct VehicleWheel {
     Vec3 field_0xcc;              // wheel contact position (slot 7 distance source)
     Vec3 field_0xd8;              // (y at +0xdc is read as a height by slot 58)
     Vec3 field_0xe4;              // contact normal (averaged by Method_00528400)
-    char pad_0xF0[0xC];
+    Vec3 field_0xf0;
     Vec3 field_0xfc;              // per-wheel share of the applied vector
-    char pad_0x108[0x3C];
+    Vec3 field_0x108;
+    Vec3 field_0x114;
+    Vec3 field_0x120;
+    int field_0x12c;
+    Vec3 field_0x130;
+    float field_0x13c;
+    char pad_0x140[4];
     float field_0x144;
-    char pad_0x148[8];
+    int field_0x148;
+    int field_0x14c;
     float field_0x150;
     char pad_0x154[4];
     float field_0x158;               // blend weight
-    char pad_0x15C[4];
+    int field_0x15c;
     int field_0x160;                 // impact-handled flag (slot 18)
     int field_0x164;                 // impact-handled flag (slot 19)
     int field_0x168;                 // impact-handled flag (slot 20)
-    char pad_0x16C[8];
+    int field_0x16c;
+    char pad_0x170[4];
     unsigned char field_0x174;       // surface material id
     char pad_0x175[0x47];
     SoultreeObject* field_0x1bc;     // wheel scene node (slot 33 reads its position)
     int field_0x1c0;
-    char pad_0x1C4[0x3C];
+    char pad_0x1C4[0x18];
+    float field_0x1dc;               // +0x29c ramp-up rate (Method_00529280)
+    float field_0x1e0;               // +0x29c ramp-down rate
+    char pad_0x1E4[4];
+    Vec3 field_0x1e8;
+    char pad_0x1F4[0xC];
     Vec3 field_0x200;                // wheel node position (written by slot 33)
     char pad_0x20C[0x1C];
     float field_0x228;
@@ -200,21 +223,31 @@ struct VehicleWheel {
     Vec3 field_0x230;
     Vec3 field_0x23c;
     Vec3 field_0x248;
-    char pad_0x254[0xC];
+    Vec3 field_0x254;
     int field_0x260;
-    char pad_0x264[0x1C];
+    char pad_0x264[0x4];
+    int field_0x268;
+    int field_0x26c;
+    char pad_0x270[8];
+    int field_0x278;
+    int field_0x27c;
     Vec3 field_0x280;
     float field_0x28c;
     float field_0x290;
     float field_0x294;
     char pad_0x298[0x4];
     float field_0x29c;               // 0 selects a flag passed to slot 77 (slot 83)
-    char pad_0x2A0[0x8];
+    char pad_0x2A0[4];
+    float field_0x2a4;
     VehicleWheelAux* field_0x2a8;
-    char pad_0x2AC[0xC];
+    int field_0x2ac;
+    int field_0x2b0;
+    char pad_0x2B4[0x4];
     float field_0x2b8;
     float field_0x2bc;
     void Method_005143D0(float a, float b, int c, int d, int e, float f);   // 0x005143d0
+    void Method_005135F0(Vec3* origin, Vec3 position, Vec3 velocity, float speed, float* outA, int* outB);   // 0x005135f0
+    void Method_00513C70(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70
     void Method_00513F90(Vehicle* owner);                                 // 0x00513f90
     void Method_00515660();                    // 0x00515660, called per wheel by Bike slot 41 (0x0040cbd0)
 };
@@ -322,6 +355,10 @@ public:
 
     // non-virtual helper (retail 0x00526830, next to slot 70; tier 3 name)
     int Method_00526830();
+    int Method_00478FE0();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from Method_00526830)
+    int Method_00525CB0(VehicleTicker* t);                       // 0x00525cb0, append to field_0x560
+    int Method_00525CF0(VehicleTicker* t);                       // 0x00525cf0, append to field_0x554
+    int Method_00525D30(VehicleWheel* wheel, int a2, int a3, int a4, VehicleWheelAux* aux);   // 0x00525d30, add a wheel
     // 0x00528400: normalized average of the wheels' contact normals (+0xe4); returns out.
     Vec3* Method_00528400(Vec3* out);
     int   Method_00529280();                                     // 0x00529280
@@ -397,11 +434,18 @@ public:
     int field_0x520;
     float field_0x524[6];
     VehicleWheel** field_0x53c;
-    char pad_0x540[0x4];
+    int field_0x540;               // wheel capacity (Method_00525D30)
     int field_0x544;
     VehicleWheel* field_0x548;
     VehicleWheel* field_0x54c;
-    char pad_0x550[0x20];
+    int field_0x550;
+    VehicleTicker** field_0x554;   // owned arrays of objects with a virtual slot 0 (Method_00525C60)
+    int field_0x558;               // capacity of field_0x554
+    int field_0x55c;               // count of field_0x554
+    VehicleTicker** field_0x560;
+    int field_0x564;               // capacity of field_0x560
+    int field_0x568;               // count of field_0x560
+    int field_0x56c;               // wheels added with an aux object (Method_00525D30)
     int field_0x570;
     Vec3 field_0x574;      // Bike slot 100 (0x0040a090) builds (a0.x, 0, a0.z) here
     float field_0x580;

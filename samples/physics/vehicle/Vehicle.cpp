@@ -751,11 +751,11 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 
 // ---- impact handlers (slots 18..20) ----
 // Commit an impact to a sink: latch the current vector into the previous one, mark it dirty.
-static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink* sink)
+static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink** sink)
 {
     if (ev->field_0x24)
-        sink->field_0x50 = sink->field_0x44;
-    sink->field_0x60 = 1;
+        (*sink)->field_0x50 = (*sink)->field_0x44;
+    (*sink)->field_0x60 = 1;
     ev->field_0x24 = 0;
 }
 
@@ -764,29 +764,33 @@ static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink* si
 void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
 {
     VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
+    VehicleWheel* w;
     int i;
     for (i = 0; i < field_0x544; i++) {
-        VehicleWheel* w = field_0x53c[i];
+        w = field_0x53c[i];
         if (w->field_0x2a8 && w->field_0x260 && !w->field_0x160 &&
-            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174])) {
-            w->field_0x160 = 1;
-            float v = w->field_0x2bc * 20.0f;
-            if (!(v > 1.0f))
-                v = 1.0f;
-            ev->field_0x04->Method_004B8D90(w->field_0xd8, v);
-            VehCommitImpact(ev, ev->field_0x04);
-            return;
-        }
+            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174]))
+            break;
+    }
+    if (i < field_0x544) {
+        w->field_0x160 = 1;
+        float v = w->field_0x2bc * 20.0f;
+        v = (v > 1.0f) ? v : 1.0f;
+        ev->field_0x04->Method_004B8D90(w->field_0xd8, v);
+        VehCommitImpact(ev, &ev->field_0x04);
+        return;
     }
     for (i = 0; i < field_0x544; i++) {
-        VehicleWheel* w = field_0x53c[i];
+        w = field_0x53c[i];
         if (w->field_0x260 && !w->field_0x160 &&
-            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174])) {
-            w->field_0x160 = 1;
-            ev->field_0x04->Method_004B8D90(w->field_0xd8, 0.0f);
-            VehCommitImpact(ev, ev->field_0x04);
-            return;
-        }
+            (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + w->field_0x174]))
+            break;
+    }
+    if (i < field_0x544) {
+        w->field_0x160 = 1;
+        ev->field_0x04->Method_004B8D90(w->field_0xd8, 0.0f);
+        VehCommitImpact(ev, &ev->field_0x04);
+        return;
     }
     for (i = 0; i < field_0x130; i++) {
         VehicleContact* c = ((VehicleContact**)field_0x12c)[i];
@@ -794,7 +798,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
             (!field_0x1f0 || ((VehicleMaterialSet*)field_0x1f0)->field_0xa4[0x400 + c->field_0xbc])) {
             c->field_0xa8 = 1;
             ev->field_0x04->Method_004B8D90(c->field_0x20, 0.0f);
-            VehCommitImpact(ev, ev->field_0x04);
+            VehCommitImpact(ev, &ev->field_0x04);
             return;
         }
     }
@@ -818,7 +822,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
             return;
         w->field_0x164 = 1;
         ev->field_0x08->Method_004B9DC0(w->field_0xd8);
-        VehCommitImpact(ev, ev->field_0x08);
+        VehCommitImpact(ev, &ev->field_0x08);
         field_0x1b8.x = (field_0x4b8 < 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
         field_0x1b8.y = 0.0f;
         field_0x1b8.z = -w->field_0x28c;
@@ -846,7 +850,7 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
     if (i < field_0x544) {
         w->field_0x164 = 1;
         if (w->field_0x280.z > 0.2f) {
-            VehCommitImpact(ev, ev->field_0x08);
+            VehCommitImpact(ev, &ev->field_0x08);
         }
     }
 }
@@ -868,7 +872,7 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
             return;
         w->field_0x168 = 1;
         ev->field_0x0c->Method_004B9DC0(w->field_0xd8);
-        VehCommitImpact(ev, ev->field_0x0c);
+        VehCommitImpact(ev, &ev->field_0x0c);
         field_0x1b8.x = (field_0x4b8 < 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
         field_0x1b8.y = 0.0f;
         field_0x1b8.z = -w->field_0x28c;
@@ -895,7 +899,7 @@ void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
     if (i < field_0x544) {
         w->field_0x168 = 1;
         if (w->field_0x280.z > 0.2f) {
-            VehCommitImpact(ev, ev->field_0x0c);
+            VehCommitImpact(ev, &ev->field_0x0c);
         }
     }
 }
@@ -1764,5 +1768,213 @@ void Vehicle::UnknownVirtualSlot95()
             field_0x1ac.z = s * field_0x1ac.z;
         }
         d3d_field_0x1a0->RotateAboutPoint(field_0x194, field_0x1ac, lenSq);
+    }
+}
+
+// ---- wave 3: non-virtual helpers ----
+
+// 0x00526830: asks the shared stub 0x00478fe0 (always zero here) whether the vehicle crashed; when it
+// did, the control state is cleared and the horizontal heading is recorded (tier 3 reading;
+// field_0x444 is the crash state, see Bike slot 99).
+int Vehicle::Method_00526830()
+{
+    int crashed = Method_00478FE0();
+    field_0x444 = crashed;
+    if (crashed) {
+        Vec3 heading(field_0x88.x, 0.0f, field_0x88.z);
+        field_0x430 = 0;
+        field_0x431 = 0;
+        field_0x433 = 0;
+        field_0x574 = heading;
+        field_0x464 = field_0xac.y < 0.0f;
+        field_0x45c = field_0x50;
+        field_0x138 = 1;
+    }
+    return crashed;
+}
+
+// 0x00525c60: runs virtual slot 0 of every object in the two owned arrays.
+void Vehicle::Method_00525C60()
+{
+    for (int i = 0; i < field_0x568; i++)
+        field_0x560[i]->UnknownVirtualSlot0();
+    for (int j = 0; j < field_0x55c; j++)
+        field_0x554[j]->UnknownVirtualSlot0();
+}
+
+int Vehicle::Method_00525CB0(VehicleTicker* t)
+{
+    if (field_0x568 < field_0x564) {
+        field_0x560[field_0x568] = t;
+        field_0x568++;
+        return 1;
+    }
+    return 0;
+}
+
+int Vehicle::Method_00525CF0(VehicleTicker* t)
+{
+    if (field_0x55c < field_0x558) {
+        field_0x554[field_0x55c] = t;
+        field_0x55c++;
+        return 1;
+    }
+    return 0;
+}
+
+// 0x00525d30: appends a wheel (with its two attachment values and optional aux object) and registers
+// its collision point (wheel + 0xb8) with the owner's contact array.
+int Vehicle::Method_00525D30(VehicleWheel* wheel, int a2, int a3, int a4, VehicleWheelAux* aux)
+{
+    if (field_0x544 < field_0x540) {
+        wheel->field_0x2b0 = a3;
+        wheel->field_0x2ac = a4;
+        wheel->field_0x2a8 = aux;
+        field_0x53c[field_0x544] = wheel;
+        void* contact = wheel ? (char*)wheel + 0xb8 : 0;
+        VehAddContact(field_0x1c8, field_0x12c, a2, &field_0x130, contact);
+        field_0x544++;
+        if (aux)
+            field_0x56c++;
+        return 1;
+    }
+    return 0;
+}
+
+// 0x005293e0: for every wheel that has an attachment value, apply its load weight.
+void Vehicle::Method_005293E0(float* speed)
+{
+    for (int i = 0; i < field_0x544; i++) {
+        VehicleWheel* wheel = field_0x53c[i];
+        if (wheel->field_0x268 && (wheel->field_0x2b0 || wheel->field_0x2ac))
+            VehWheelApply(wheel->field_0x158, field_0x4dc, field_0x1e8, speed);
+    }
+}
+
+// 0x005299e0: exact component-wise equality of two vectors.
+int __cdecl VehVec3Equal(const Vec3* a, const Vec3* b)
+{
+    if (a->x == b->x && a->y == b->y && a->z == b->z)
+        return 1;
+    return 0;
+}
+
+// 0x00529280: asks every wheel (slot 83) and ramps its +0x29c level toward 1 when the answer is
+// non-zero, toward 0 otherwise. Returns the first non-zero answer.
+int Vehicle::Method_00529280()
+{
+    int first = 0;
+    for (int i = 0; i < field_0x544; i++) {
+        int answer = UnknownVirtualSlot83(field_0x53c[i]);
+        if (!first)
+            first = answer;
+        float step = field_0x13c;
+        VehicleWheel* wheel = field_0x53c[i];
+        if (answer) {
+            if (wheel->field_0x29c < 1.0f) {
+                float level = wheel->field_0x29c + step * wheel->field_0x1dc;
+                wheel->field_0x29c = level;
+                if (level >= 1.0f)
+                    level = 1.0f;
+                wheel->field_0x29c = level;
+            }
+        } else if (wheel->field_0x29c > 0.0f) {
+            float level = wheel->field_0x29c - step * wheel->field_0x1e0;
+            wheel->field_0x29c = level;
+            if (level <= 0.0f)
+                level = 0.0f;
+            wheel->field_0x29c = level;
+        }
+    }
+    return first;
+}
+
+// 0x00529a20: updates every wheel in contact against the body, otherwise resets its aux ramp.
+void Vehicle::Method_00529A20()
+{
+    int i = 0;
+    field_0x5a0 = 0;
+    for (; i < field_0x544; i++) {
+        VehicleWheel* wheel = field_0x53c[i];
+        if (wheel->field_0x260) {
+            wheel->Method_005135F0(&field_0x18, field_0xcc, field_0x64, field_0xbc, &field_0x434, &field_0x440);
+            wheel->Method_00513C70(field_0x1e8, (unsigned char)field_0x1d0, field_0x444, field_0xbc, &field_0x64, &field_0xa0);
+            if (wheel->field_0x15c)
+                field_0x5a0 = 1;
+        } else if (wheel->field_0x2b0) {
+            VehicleWheelAux* aux = (VehicleWheelAux*)wheel->field_0x2b0;
+            aux->field_0x8c = aux->field_0x90;
+        } else {
+            VehicleWheelAux* aux = (VehicleWheelAux*)wheel->field_0x2ac;
+            if (aux)
+                aux->field_0x8c = aux->field_0x90;
+        }
+    }
+}
+
+// 0x00529c20: folds each in-contact wheel's contact vectors into the two accumulators.
+void Vehicle::Method_00529C20(Vec3* up, Vec3* zero, float d)
+{
+    if (!field_0x108) {
+        for (int i = 0; i < field_0x544; i++) {
+            VehicleWheel* wheel = field_0x53c[i];
+            if (wheel->field_0x260) {
+                if (wheel->field_0x16c == 2) {
+                    zero->x = d * zero->x;
+                    zero->y = d * zero->y;
+                    zero->z = d * zero->z;
+                    wheel->field_0x16c = 0;
+                }
+                if (wheel->field_0x2a8) {
+                    up->x = up->x + wheel->field_0x248.x;
+                    Vec3* force = &wheel->field_0x248;
+                    up->y = force->y + up->y;
+                    up->z = force->z + up->z;
+                    Vec3* world = &field_0x1b8;
+                    Vec3* local = &field_0x1ac;
+                    *world = UnknownVirtualSlot76(&wheel->field_0xf0, force);
+                    *local = d3d_field_0x1a0->WorldToLocalDirection(*world);
+                    zero->x = zero->x + local->x;
+                    zero->y = local->y + zero->y;
+                    zero->z = local->z + zero->z;
+                }
+            }
+        }
+    }
+}
+
+// 0x00525a90: resets every wheel's contact state and vectors to defaults.
+void Vehicle::Method_00525A90()
+{
+    for (int i = 0; i < field_0x544; i++) {
+        VehicleWheel* wheel = field_0x53c[i];
+        wheel->field_0x2a4 = 1.0f;
+        wheel->field_0x1e8 = g_VehZeroVec3;
+        wheel->field_0x248 = g_VehZeroVec3;
+        wheel->field_0x280.x = 0.0f;
+        wheel->field_0x254 = g_VehZeroVec3;
+        wheel->field_0x2b8 = 1.0f;
+        wheel->field_0x280.z = 1.0f;
+        wheel->field_0x2bc = 0.0f;
+        wheel->field_0x29c = 0.0f;
+        wheel->field_0x290 = 0.0f;
+        wheel->field_0x278 = 0;
+        wheel->field_0x27c = 0;
+        wheel->field_0x260 = 0;
+        wheel->field_0x28c = 0.0f;
+        wheel->field_0x26c = 0;
+        wheel->field_0x1bc->GetPositionIn(0, &wheel->field_0x200);
+        wheel->field_0x16c = 0;
+        wheel->field_0x108 = g_VehZeroVec3;
+        wheel->field_0x114 = g_VehZeroVec3;
+        wheel->field_0x150 = -999.0f;
+        wheel->field_0x148 = 0;
+        wheel->field_0x14c = 0;
+        wheel->field_0xfc = g_VehZeroVec3;
+        wheel->field_0x15c = 0;
+        wheel->field_0x13c = 0.0f;
+        wheel->field_0x130 = g_VehZeroVec3;
+        wheel->field_0x12c = 0;
+        wheel->field_0x120 = g_VehZeroVec3;
     }
 }

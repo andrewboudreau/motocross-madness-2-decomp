@@ -100,7 +100,15 @@ public:
     void Fn_00432720(void* node, int a, int b, int c, int d); // 0x00432720 (ret 0x14)
     void Fn_00432800(void* node, const char* path);           // 0x00432800, shape from a .col file path
     void Fn_00432ab0(int count, void* points);                // 0x00432ab0 (ret 8), polyline shape setter
+    // 0x00436000 (ret 4): copies the translation row of the shape's current transform into *out:
+    // hull +0xf8, model +0xb8, mesh +0x38; types 3/4 leave *out untouched (tier 1 body).
+    void GetShapePosition(CollisionVec3* out);
+    void Fn_00434a10();                                       // 0x00434a10, resets the hit state and per-object query record
+    void Fn_00434bb0();                                       // 0x00434bb0, publishes hitPoint/hitNormal after a hull/model test
+    void Fn_00434cf0();                                       // 0x00434cf0, normal-only variant of Fn_00434bb0
+    void Fn_00435f10();                                       // 0x00435f10, re-applies the shape's own matrix via SetTransform
     void Fn_00435fb0();                                       // 0x00435fb0
+    void Fn_00436080();                                       // 0x00436080, refreshes the quadtree cell from the world bounds
     void Fn_00435fe0();                                       // 0x00435fe0
     int Fn_00438e70();                                        // 0x00438e70
     // 0x00435830, thiscall, ret 4 (tier 1): switches on the shape type field_0x50 (0..4,
@@ -115,6 +123,8 @@ public:
     // reuses a NULL slot, else reallocs through 0x004a2ec0 (line 0x843) and appends.
     // Name tier 3.
     void AddIgnoredOwner(void* owner);
+    // 0x00439490 (ret 4): finds owner in the field_0x78 array and NULLs that slot (tier 1 body).
+    void RemoveIgnoredOwner(void* owner);
     // 0x004394d0 (ret 8): stores field_0x60 and field_0x64 (tier 1); name tier 3.
     void SetOwner(void* owner, int tag);
 
@@ -154,7 +164,11 @@ public:
     void DrawHull(CollisionHullBody* hull, int depth, int mode);         // 0x00432d30
     void DrawModel(CollisionModelBody* model, int depth, int mode);      // 0x00432b30
 
-    char field_0x44[0xc];                       // own bytes 0x44..0x4f, not accessed by any target
+    // +0x40 is a world bounding-sphere centre (Vec3, written by SetTransform 0x00435830 via
+    // 0x00428db0/0x0042a510 and read by BoundingSpheresOverlap 0x0043a270); its first float
+    // overlaps GraphicsTest::field_0x34 in the stand-in GraphicsTest layout.
+    char field_0x44[8];                         // bounding-sphere centre y, z
+    float field_0x4c;                           // bounding-sphere radius (fstp [this+0x4c] in 0x00435830)
     int field_0x50;                             // shape type 0..4
     void* field_0x54;                           // shape payload (see shape structs)
     int field_0x58;

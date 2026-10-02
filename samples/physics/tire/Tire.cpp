@@ -22,6 +22,15 @@ static void TireCollisionCallback(CollisionObject* a, CollisionObject* b)
 // 0x0040ae30 (cdecl, out of line): dot product of two vectors, result in st(0).
 float TireDot(const CollisionVec3* a, const CollisionVec3* b);
 
+// Normalised copy of v (returned unchanged when |v|^2 is exactly 1); retail's z-axis path.
+static inline CollisionVec3 TireNormalizeZ(const CollisionVec3& v)
+{
+    float lenSq = TireDot(&v, &v);
+    if (lenSq == 1.0f)
+        return v;
+    return v * FastInvSqrt(lenSq);
+}
+
 // 0x00515880 (cdecl, 703 bytes; single caller 0x00515376 inside 0x00514550).  Tier 3 name.
 // Builds a rotation frame (row-vector convention, translation in row 3) from two axes:
 //   row 2 = yAxis, row 3 = zAxis, row 1 = yAxis x zAxis, row 4 = pos, last column 0,0,0,1.
@@ -59,16 +68,7 @@ void TireBuildFrame(CollisionMatrix4* out, const CollisionVec3* pos, const Colli
         y = CollisionVec3(y.x * s, y.y * s, y.z * s);
     }
 
-    CollisionVec3 n;
-    lenSq = TireDot(&z, &z);
-    if (lenSq == 1.0f) {
-        n = z;
-    } else {
-        float s = FastInvSqrt(lenSq);
-        n.x = z.x * s;
-        n.y = z.y * s;
-        n.z = z.z * s;
-    }
+    CollisionVec3 n = TireNormalizeZ(z);
 
     float tx = y.y * n.z - y.z * n.y;
     float ty = n.x * y.z - y.x * n.z;
@@ -154,12 +154,15 @@ GameObject* Tire::GameObjectVirtualSlot8(int a)
     TirePoint pts[8];
 
     Fn_004320f0(a, 1, 1, 1);
-    int i;
+    // The zero vector is built from a zero float (not three literals): VC6 then keeps the
+    // zero in registers across the loop instead of reloading it from the stack.
+    float zeroValue = 0.0f;
+    int i = 0;
     CollisionVec3 zero;
-    zero.x = 0.0f;
-    zero.y = 0.0f;
-    zero.z = 0.0f;
-    for (i = 0; i < 8; i++) {
+    zero.x = zeroValue;
+    zero.y = zeroValue;
+    zero.z = zeroValue;
+    for (; i < 8; i++) {
         float t = i * 0.142857149f;
         float angle = t * TIRE_PI + 1.57079637f;
         pts[i].origin = zero;
