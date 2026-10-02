@@ -102,6 +102,20 @@ position search is an inline helper: with it VC6 runs out of inline budget
 and calls `ContainerList::Reserve` (`0x005109e0`, also exact) out of line,
 as retail does.
 
-Not reconstructed: the repacking itself, `0x0050c960` (about 3.2 KB) and
-`0x0050dad0` (with partial texture blits), `0x0050e730` and the debug
-display `0x0050ef70` (manager slot 15).
+Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
+- `0x0050c960` (3742 bytes), the repack: plans each used texture's level from
+  its recorded use (at least 5), drops unused ones, empties the pages the
+  planned textures want least until the textures that need a place fit,
+  refills them largest level first (CacheTexture `0x0050f9b0`, `0x0050fdb0`,
+  slot 9) and writes its figures to the debug overlay's "TextureManager no
+  partial" page. Control flow, calls and VC6's inlining choices match: VC6
+  inlines `ContainerList::Reserve` only in the last two `Add` calls, as
+  retail does, once three small helpers carry part of the work (its inline
+  budget scales with the function's size). Stack-slot packing differs;
+- `0x0050ef70` (1832 bytes), the debug display for manager slot 15: the
+  selected texture copied into the top right of the render target with
+  its use and Un/Hi/Lo state, or the selected page with its textures and an
+  outline (GDI pen, MoveToEx/LineTo, TextOutA on the surface's DC). Retail
+  saves ebx/esi only after the first early return.
+
+Not reconstructed: `0x0050dad0` (the repack with partial texture blits).

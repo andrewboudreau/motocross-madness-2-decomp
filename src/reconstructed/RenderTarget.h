@@ -19,7 +19,7 @@ public:
     virtual int UnknownVirtualSlot1() = 0;
     virtual int UnknownVirtualSlot2() = 0;
     virtual int UnknownVirtualSlot3(void* a, void* b, void* c, int d) = 0;
-    virtual int UnknownVirtualSlot4(int a, int b, int c) = 0;
+    virtual void* UnknownVirtualSlot4(void* rect, long* pitch, int flags) = 0; // locks the surface
     virtual int UnknownVirtualSlot5(void* rect) = 0;
     virtual long UnknownVirtualSlot6(int stage, int type, int* value) = 0;
     virtual long UnknownVirtualSlot7(int stage, int type, int value) = 0;

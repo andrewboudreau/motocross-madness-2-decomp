@@ -6,7 +6,7 @@ SKELETON_ROOT ?= generated/krusty2-skeletons
 PRIVATE_ROOT ?= $(if $(MCM2_PRIVATE_ROOT),$(MCM2_PRIVATE_ROOT),$(HOME)/.cache/mcm2-private)
 PRIVATE_BUNDLE ?=
 
-.PHONY: bootstrap extract analyze class-evidence msvc-artifacts ensure-work smoke smoke-vc6 easy-smoke easy-smoke-vc6 calibration calibration-vc6 status easy manifest work-queue selftest static-check test wine-init import-vc6 probe-vc6 vc6-gate
+.PHONY: bootstrap extract analyze class-evidence msvc-artifacts ensure-work smoke smoke-vc6 easy-smoke easy-smoke-vc6 calibration calibration-vc6 status easy manifest work-queue selftest static-check test wine-init import-vc6 probe-vc6 vc6-gate progress progress-check
 
 bootstrap:
 	PYTHONPATH=. $(PYTHON) tools/bootstrap.py "$(INSTALLER)"
@@ -58,6 +58,12 @@ calibration-vc6: ensure-work
 
 status:
 	PYTHONPATH=. $(PYTHON) tools/status.py
+
+progress:
+	PYTHONPATH=. $(PYTHON) tools/decompilation_progress.py
+
+progress-check:
+	PYTHONPATH=. $(PYTHON) tools/decompilation_progress.py --check
 
 easy:
 	PYTHONPATH=. $(PYTHON) tools/discover_easy_targets.py

@@ -41,6 +41,8 @@ int UnknownFunction50d800(ContainerList<ManagedTexture*>* list, int budget);
 class UnknownTimer {
 public:
     explicit UnknownTimer(int interval);
+    int UnknownFunction4cb690();              // 0x004cb690: the largest recent sample
+    void UnknownFunction4cb6b0(int sample);   // 0x004cb6b0: records a sample
 
     int field_0x00;                           // start time
     int field_0x04;
@@ -48,6 +50,7 @@ public:
 };
 
 class CacheTexture;
+class PCRenderTarget;
 class PCTextureMap;
 
 // RTTI: ManagedTextureGroup : BaseObject (vtable 0x005583c0), 0x258 bytes.
@@ -68,7 +71,9 @@ public:
     void UnknownFunction50c8c0();             // 0x0050c8c0: repacks the pages
     void UnknownFunction50c960();             // 0x0050c960 (not reconstructed)
     void UnknownFunction50dad0();             // 0x0050dad0 (not reconstructed)
-    void UnknownFunction50ef70(void* value);  // 0x0050ef70 (manager slot 15)
+    // 0x0050ef70 (manager slot 15): draws the debug-key selection into
+    // `target`; 0 unless this is the manager's selected group.
+    int UnknownFunction50ef70(PCRenderTarget* target);
 
     unsigned char field_0x08;                 // toggled by debug key 0x21; set: no repacking
     int field_0x0c;                           // pixel format

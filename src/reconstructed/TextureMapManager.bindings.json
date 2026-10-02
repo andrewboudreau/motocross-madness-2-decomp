@@ -34,7 +34,7 @@
   "?UnknownFunction50c790@ManagedTextureGroup@@QAEXXZ": "0x0050c790",
   "?UnknownFunction50c7e0@ManagedTextureGroup@@QAEXXZ": "0x0050c7e0",
   "?UnknownFunction50c8c0@ManagedTextureGroup@@QAEXXZ": "0x0050c8c0",
-  "?UnknownFunction50ef70@ManagedTextureGroup@@QAEXPAX@Z": "0x0050ef70",
+  "?UnknownFunction50ef70@ManagedTextureGroup@@QAEHPAVPCRenderTarget@@@Z": "0x0050ef70",
   "?UnknownFunction510760@ManagedTexture@@QAEHHHH@Z": "0x00510760",
   "?UnknownFunction511180@TextureMapManager@@QAEPAVManagedTextureGroup@@HHHH@Z": "0x00511180",
   "?UnknownFunction511180@TextureMapManager@@QAEPAVManagedTextureGroup@@HHHH@Z$ehhandler": "0x0054eb27",
