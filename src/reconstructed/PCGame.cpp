@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -31,6 +32,14 @@ extern "C" __declspec(dllimport) long __stdcall RegQueryValueExA(void* key, cons
                                                                 unsigned char* data,
                                                                 unsigned long* size);
 extern "C" __declspec(dllimport) long __stdcall RegCloseKey(void* key);
+extern "C" __declspec(dllimport) long __stdcall RegDeleteKeyA(void* key, const char* subKey);
+extern "C" __declspec(dllimport) long __stdcall RegEnumKeyA(void* key, unsigned long index,
+                                                           char* name, unsigned long size);
+extern "C" __declspec(dllimport) long __stdcall RegQueryInfoKeyA(
+    void* key, char* className, unsigned long* classSize, unsigned long* reserved,
+    unsigned long* subKeys, unsigned long* maxSubKeyLength, unsigned long* maxClassLength,
+    unsigned long* values, unsigned long* maxValueNameLength, unsigned long* maxValueLength,
+    unsigned long* securityDescriptorSize, void* lastWriteTime);
 extern "C" __declspec(dllimport) long __stdcall RegCreateKeyExA(void* key, const char* subKey,
                                                                unsigned long reserved,
                                                                const char* className,
@@ -233,7 +242,7 @@ void PCGame::UnknownFunction4c0470(const UnknownRect* rect) {
 // memory cannot hold with "MinimumTextureMB" left over.
 int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
     int reserve = g_UnknownGlobal56e26c->UnknownVirtualSlot20("MinimumTextureMB", 2) << 20;
-    if (field_0x2d4_bit1 && !(display->field_0xb74 & 2)) {
+    if (field_0x2d4_bit1 && !display->field_0xb74_bit1) {
         int i;
         if (UnknownVirtualSlot22("HighestRefreshOnly", 1)) {
             for (i = 0; i < display->field_0x08; i++) {
@@ -328,7 +337,7 @@ int PCGame::UnknownVirtualSlot7() {
 
 // 0x004c0760
 int PCGame::UnknownFunction4c0760(UnknownDisplay* display, int width, int height) {
-    if (field_0x2d4_bit1 && !(display->field_0xb74 & 2)) {
+    if (field_0x2d4_bit1 && !display->field_0xb74_bit1) {
         for (int i = 0; i < display->field_0x08; i++) {
             UnknownDisplayMode* mode = &display->field_0x10[i];
             if (mode->width > width || mode->height > height)
@@ -412,6 +421,93 @@ int PCGame::UnknownVirtualSlot32() {
         *strrchr(path, '\\') = 0;                   \
         name = slash + 1;                          \
     }
+
+// 0x004c1610: records the display's identifier under "DriverInfo\\<name>"
+// and marks it profiled (version 7).
+int PCGame::UnknownFunction4c1610(UnknownDisplay* display) {
+    char name[256];
+    sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", display->field_0x4bc);
+    UnknownVirtualSlot29(name, &display->field_0x5c0, sizeof(display->field_0x5c0));
+    sprintf(name, "DriverInfo\\%s\\ProfiledCard", display->field_0x4bc);
+    UnknownVirtualSlot27(name, 0);
+    sprintf(name, "DriverInfo\\%s\\ProfileVersion", display->field_0x4bc);
+    UnknownVirtualSlot25(name, 7);
+    return 1;
+}
+
+// 0x004c1410: whether any display lacks a current profile (version 7 with
+// an identical saved identifier).
+int PCGame::UnknownFunction4c1410() {
+    for (int i = 0; i < g_UnknownDisplayCount68a764; i++) {
+        char name[256];
+        UnknownDeviceIdentifier saved;
+        unsigned long size = sizeof(saved);
+        sprintf(name, "DriverInfo\\%s\\ProfileVersion", g_UnknownDisplays68a754[i]->field_0x4bc);
+        if (UnknownVirtualSlot20(name, 0) != 7)
+            return 1;
+        sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", g_UnknownDisplays68a754[i]->field_0x4bc);
+        if (!UnknownVirtualSlot24(name, &saved, &size) || size != sizeof(saved) ||
+            strcmp(g_UnknownDisplays68a754[i]->field_0x5c0.driver, saved.driver) ||
+            strcmp(g_UnknownDisplays68a754[i]->field_0x5c0.description, saved.description) ||
+            memcmp(g_UnknownDisplays68a754[i]->field_0x5c0.driverVersion, saved.driverVersion,
+                   sizeof(saved.driverVersion)) ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.vendorId != saved.vendorId ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.deviceId != saved.deviceId ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.subSysId != saved.subSysId ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.revision != saved.revision ||
+            memcmp(g_UnknownDisplays68a754[i]->field_0x5c0.deviceGuid, saved.deviceGuid,
+                   sizeof(saved.deviceGuid)) ||
+            g_UnknownDisplays68a754[i]->field_0x5c0.whqlLevel != saved.whqlLevel)
+            return 1;
+    }
+    return 0;
+}
+
+// 0x004c16b0
+int PCGame::UnknownFunction4c16b0() {
+    for (int i = 0; i < g_UnknownDisplayCount68a764; i++)
+        UnknownFunction4c1610(g_UnknownDisplays68a754[i]);
+    return 1;
+}
+
+// 0x004c1a00: deletes every display's cached data under DriverInfo (the
+// mode lists, "PartialTextureBlt" and the 32 "BltSpeed" entries), then the
+// display keys themselves.
+int PCGame::UnknownFunction4c1a00() {
+    char path[256];
+    char display[256];
+    char name[16];
+    void* driverInfo;
+    void* key;
+    unsigned long count = 0;
+    strcpy(path, field_0x4b8);
+    strcat(path, "\\DriverInfo");
+    if (RegOpenKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, UNKNOWN_KEY_ALL_ACCESS, &driverInfo) != 0)
+        return 1;
+    if (RegQueryInfoKeyA(driverInfo, 0, 0, 0, &count, 0, 0, 0, 0, 0, 0, 0) != 0)
+        return 1;
+    while (count) {
+        if (RegEnumKeyA(driverInfo, count - 1, display, sizeof(display)) != 0)
+            break;
+        count--;
+        strcpy(path, field_0x4b8);
+        strcat(path, "\\DriverInfo\\");
+        strcat(path, display);
+        if (RegOpenKeyExA(UNKNOWN_HKEY_LOCAL_MACHINE, path, 0, UNKNOWN_KEY_ALL_ACCESS, &key) == 0) {
+            RegDeleteKeyA(key, "NumberOfModes");
+            RegDeleteKeyA(key, "Modes");
+            RegDeleteKeyA(key, "PartialTextureBlt");
+            for (int i = 0; i < 32; i++) {
+                sprintf(name, "BltSpeed%d", i);
+                RegDeleteKeyA(key, name);
+            }
+            RegCloseKey(key);
+        }
+        RegDeleteKeyA(driverInfo, display);
+    }
+    RegCloseKey(driverInfo);
+    return 1;
+}
 
 // 0x004c1c20: a DWORD setting.
 int PCGame::UnknownVirtualSlot20(const char* name, int defaultValue) {

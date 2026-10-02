@@ -32,7 +32,7 @@ inference.
 
 ## Status
 
-The following are exact (30 calibration cases):
+The following are exact (34 calibration cases):
 - the constructor, both destructors and the time stamp function
   `0x004bfa80`;
 - slots 2, 5, 6, 7, 13, 14, 15, 19, 31, 32, 34, 35, 36 and 37 (every
@@ -54,4 +54,23 @@ state IDs) and texture stage 0's filters. Slot 34 filters the display modes:
 - modes other than 16-bit;
 - modes that do not fit video memory with "MinimumTextureMB" spare.
 
-Not reconstructed: the helpers `0x004c0d10`..`0x004c1a00`.
+Display profiles live under `DriverInfo\<driver name>`. They hold a
+display's saved device identifier, its mode list and per-mode flags, video
+memory, and the disabled/partial-blit settings. The following are exact:
+- `0x004c1610` saves a profile and `0x004c16b0` saves one for every display
+  in the global array `0x0068a754` (count `0x0068a764`);
+- `0x004c1410` reports whether any profile is stale;
+- `0x004c1a00` deletes them all.
+
+The display's identifier (+0x5c0) is 0x430 bytes, the size of
+DDDEVICEIDENTIFIER2 (inference). Its description at +0x7c0 is what Game
+slot 8 prints.
+
+Near miss: the profile loader `0x004c16f0` (767/771,
+`samples/game/PCGameNearMisses.cpp`). Its copy loop swaps the SIB base and
+index registers.
+
+Not reconstructed:
+- the profiling pass `0x004c0d10` (1790 bytes, with an EH frame);
+- the start-up function `0x004bfc50` (1504 bytes), which calls the profile
+  helpers.

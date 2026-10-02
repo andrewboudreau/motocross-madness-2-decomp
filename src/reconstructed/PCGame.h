@@ -62,6 +62,11 @@ public:
     // 0x004c0760: in full screen, marks modes larger than width x height
     // unusable (unless the display keeps them).
     int UnknownFunction4c0760(UnknownDisplay* display, int width, int height);
+    int UnknownFunction4c1610(UnknownDisplay* display);  // 0x004c1610: saves its profile
+    int UnknownFunction4c16b0();                         // 0x004c16b0: profiles every display
+    int UnknownFunction4c1410();                         // 0x004c1410: 1 if any profile is stale
+    int UnknownFunction4c1a00();                         // 0x004c1a00: deletes the profiles
+    int UnknownFunction4c16f0(UnknownDisplay* display);  // 0x004c16f0: loads its profile (near miss, samples/game)
 
     CameraRect field_0x2f8;                   // the render target's rectangle (slot 31)
     UnknownRect field_0x308;                  // window rectangle (slot 32)

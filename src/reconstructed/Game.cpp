@@ -136,14 +136,14 @@ int Game::UnknownVirtualSlot33() {
 // 0x00467eb0: renders a frame, timing each phase, and with bit 2 of +0x2d4
 // fills the debug overlay's profile and memory pages.
 int Game::UnknownVirtualSlot8() {
-    if (field_0x0c->field_0x70 & 4)
+    if (field_0x0c->field_0x70_bit2)
         field_0x0c->UnknownVirtualSlot4(0);
     unsigned int last = UnknownFunction4bfa80();
     field_0x2f4->UnknownVirtualSlot12();
     unsigned int now = UnknownFunction4bfa80();
     int prepareGeometry = now - last;
     last = now;
-    if (field_0x0c->field_0x70 & 4)
+    if (field_0x0c->field_0x70_bit2)
         field_0x0c->UnknownVirtualSlot4(1);
     now = UnknownFunction4bfa80();
     int waitForFlip = now - last;
@@ -190,7 +190,7 @@ int Game::UnknownVirtualSlot8() {
                 field_0x38->UnknownFunction447fa0(profilePage, "%c %d x %d %d bit(x%d)", 'R',
                                                   mode->width, mode->height, mode->bitDepth,
                                                   field_0x0c->field_0x78);
-                field_0x38->UnknownFunction447f40(profilePage, "%s", field_0x0c->field_0x7c0);
+                field_0x38->UnknownFunction447f40(profilePage, "%s", field_0x0c->field_0x5c0.description);
                 field_0x38->UnknownFunction447f40(profilePage, "ElapsedTime:   % 3d (%d)",
                                                   elapsed, s_ElapsedPeak.UnknownFunction4cb690());
                 field_0x38->UnknownFunction447f40(profilePage, "PrepFrameTime: % 3d (%d)",
@@ -247,7 +247,7 @@ int Game::UnknownVirtualSlot8() {
                 field_0x38->UnknownFunction447f40(memoryPage, "TotalVirtual    %10d", status.totalVirtual);
                 field_0x38->UnknownFunction447f40(memoryPage, "AvailVirtual    %10d", status.availVirtual);
                 field_0x38->UnknownFunction447f40(memoryPage, "Memory Load     %8d %%", status.memoryLoad);
-                field_0x38->UnknownFunction447f40(memoryPage, "%s", field_0x0c->field_0x7c0);
+                field_0x38->UnknownFunction447f40(memoryPage, "%s", field_0x0c->field_0x5c0.description);
                 field_0x38->UnknownFunction447f40(memoryPage, "Total VidMem    %10d", field_0x0c->field_0x54);
                 field_0x38->UnknownFunction447f40(memoryPage, "IsAGP           %s",
                                                   field_0x0c->field_0x9f0 ? "TRUE" : "FALSE");

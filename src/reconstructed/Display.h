@@ -5,6 +5,21 @@
 
 class RenderTarget;
 
+// 0x430-byte device identifier, saved whole as "DriverInfo\\<name>\\
+// DeviceIdentifier" (the DDDEVICEIDENTIFIER2 size; inference).
+struct UnknownDeviceIdentifier {
+    char driver[0x200];
+    char description[0x200];                      // Game slot 8 prints it
+    unsigned long driverVersion[2];
+    unsigned long vendorId;
+    unsigned long deviceId;
+    unsigned long subSysId;
+    unsigned long revision;
+    unsigned char deviceGuid[16];
+    unsigned long whqlLevel;
+    unsigned long field_0x42c;
+};
+
 // The display object: Game+0x0c, also kept at RenderTarget+0x04 (PCGame
 // slot 31 hands it to PCRenderTarget 0x004c4f80, which stores it through
 // 0x004e8ca0). Game slot 9 calls its slot 3; RenderTarget 0x004e8cc0 reads
@@ -32,9 +47,13 @@ struct UnknownDisplay {
     int field_0x54;                               // "Total VidMem"
     int field_0x58;
     int field_0x5c;
-    unsigned char field_0x60[0x6c - 0x60];
+    int field_0x60;                               // "TextureCacheLimit" (0x7fffffff if unset)
+    unsigned char field_0x64[0x6c - 0x64];
     int field_0x6c;      // freezes RenderTarget's frame index (0x004e8cc0)
-    unsigned char field_0x70;                     // bit 2 gates slot 4
+    unsigned char field_0x70_bit0 : 1;            // "Use8BitTextures"
+    unsigned char field_0x70_bit1 : 1;
+    unsigned char field_0x70_bit2 : 1;            // gates slot 4 (Game slot 8)
+    unsigned char field_0x70_bits : 5;
     unsigned char field_0x71[0x78 - 0x71];
     int field_0x78;
     unsigned char field_0x7c[0x19c - 0x7c];
@@ -42,11 +61,18 @@ struct UnknownDisplay {
     UnknownSurfaceInterface* field_0x1a0;     // PCGame slot 31's surface without +0x1a8
     int field_0x1a4;
     UnknownSurfaceInterface* field_0x1a8;
-    unsigned char field_0x1ac[0x5bc - 0x1ac];
+    unsigned char field_0x1ac[0x4bc - 0x1ac];
+    char field_0x4bc[0x100];                      // driver name (PCGame 0x004c1610)
     int field_0x5bc;                              // "PartialTexBlt"
-    unsigned char field_0x5c0[0x7c0 - 0x5c0];
-    char field_0x7c0[0x9f0 - 0x7c0];              // description string
+    UnknownDeviceIdentifier field_0x5c0;
     int field_0x9f0;                              // "IsAGP"
     unsigned char field_0x9f4[0xb74 - 0x9f4];
-    unsigned char field_0xb74;                    // bit 1: keep oversized modes (0x004c0760)
+    unsigned char field_0xb74_bit0 : 1;
+    unsigned char field_0xb74_bit1 : 1;           // disabled in this mode; keeps all modes
+    unsigned char field_0xb74_bits : 6;
 };
+
+// 0x0068a754 / 0x0068a764: the enumerated displays (PCGame 0x004c16b0
+// profiles each one).
+extern UnknownDisplay* g_UnknownDisplays68a754[4];
+extern int g_UnknownDisplayCount68a764;
