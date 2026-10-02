@@ -112,10 +112,22 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
   inlines `ContainerList::Reserve` only in the last two `Add` calls, as
   retail does, once three small helpers carry part of the work (its inline
   budget scales with the function's size). Stack-slot packing differs;
+- `0x0050dad0` (5020 bytes), the repack with partial texture blits (chosen
+  by `0x0050c8c0` when the display's +0x5bc is positive): plans and lowers
+  the used textures' levels to fit the group, turns the level counts into
+  the page plan (+0x18), sets aside pages whose whole region (CacheTexture
+  +0x84, a `0x00423fc0` block) holds one texture, re-plans the rest
+  (`0x0050f9b0`, returning whether the page is full), places the textures
+  still needing room (`0x0050fdb0`, which also lists them in +0x144; when
+  every page is tried it calls the shared empty body `0x00464e90`) and
+  spreads their blits (`0x005102d0`) over up to two passes within +0x74
+  texels, then fills the overlay's "TextureManager partial blts" page.
+  Control flow, calls, inlining and the scalar stack slots match (one
+  `managed` variable across the loops, `while (pass < 3 && ...)` for the
+  blit passes); two of the five 9-entry arrays (0x8c/0xb0) are swapped and
+  the overlay rows rotate eax/ecx/edx, about 145 of 1600 instructions;
 - `0x0050ef70` (1832 bytes), the debug display for manager slot 15: the
   selected texture copied into the top right of the render target with
   its use and Un/Hi/Lo state, or the selected page with its textures and an
   outline (GDI pen, MoveToEx/LineTo, TextOutA on the surface's DC). Retail
   saves ebx/esi only after the first early return.
-
-Not reconstructed: `0x0050dad0` (the repack with partial texture blits).
