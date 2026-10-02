@@ -42,9 +42,14 @@ public:
     void UnknownFunction522680();             // 0x00522680 (TrackGame slot 4)
     void UnknownFunction522d00();             // 0x00522d00 (TrackGame slot 4)
     int UnknownFunction5231f0();              // 0x005231f0 (TrackGame slot 4)
+    // 0x00523a60 (near uiinfo.cpp's literals): builds the path of `name`'s
+    // `kind` file (EventManager 0x0045cb70 asks for "env").
+    void UnknownFunction523a60(int value, char* name, const char* kind, char* path);
 
     char field_0x00[16];                      // name; slot 4 sets it from the network object
-    unsigned char field_0x10[0xa34 - 0x10];
+    unsigned char field_0x10[0x6a0 - 0x10];
+    int field_0x6a0;                          // EventManager 0x0045cb70 passes it to 0x00523a60
+    unsigned char field_0x6a4[0xa34 - 0x6a4];
     int field_0xa34;                          // TrackGame slot 4 audio argument
     unsigned char field_0xa38[0xa48 - 0xa38];
     int field_0xa48;                          // selects 16 (else 8) in TrackGame slot 4
@@ -88,6 +93,8 @@ class UnknownTrackGameObject574 {
 public:
     UnknownTrackGameObject574();              // 0x004e99d0 (near SceneManager.cpp's literals)
     ~UnknownTrackGameObject574();             // 0x00464e90
+    void UnknownFunction4e9b80(char* path);   // 0x004e9b80 (EventManager 0x0045cb70)
+    void UnknownFunction4e9e30(char* name, const char* kind, int value); // 0x004e9e30
 
     unsigned char field_0x00[0x394];
 };
@@ -232,9 +239,12 @@ public:
     int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
     unsigned char field_0x2d78[0x2d7c - 0x2d78];
     int field_0x2d7c;                         // cleared by EventManager 0x0045e520
-    unsigned char field_0x2d80[0x2da5 - 0x2d80];
+    unsigned char field_0x2d80[0x2d94 - 0x2d80];
+    int field_0x2d94;                          // AI racer count (EventManager 0x0045f9a0)
+    unsigned char field_0x2d98[0x2da5 - 0x2d98];
     unsigned char field_0x2da5;                // decremented when a player leaves (EventManager 0x0045fbd0)
-    unsigned char field_0x2da6[0x3338 - 0x2da6];
+    char field_0x2da6[0x20];                   // track name (length not established)
+    unsigned char field_0x2dc6[0x3338 - 0x2dc6];
     DirectoryList* profileDirectory;
     int menuIsOpen;
     UnknownTrackGameObject3340* field_0x3340;

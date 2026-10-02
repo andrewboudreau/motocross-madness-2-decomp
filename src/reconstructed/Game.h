@@ -22,6 +22,9 @@ public:
     int UnknownFunction4ac800(int player);    // 0x004ac800 (EventManager 0x0045e550)
     void UnknownFunction4ac950();             // 0x004ac950
     void UnknownFunction4ac510(int value);    // 0x004ac510
+    // 0x004ac830: sends a message of `type` (EventManager 0x0045f9a0).
+    void UnknownFunction4ac830(int type, void* data, int size, int player, int flags);
+    void UnknownFunction4ac8d0(float a, float b); // 0x004ac8d0
 
     unsigned char field_0x00[4];
     int field_0x04;

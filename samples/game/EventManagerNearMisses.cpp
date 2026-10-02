@@ -23,7 +23,6 @@ public:
     UnknownGameUiControl* UnknownFunction46ebf0(const char* name, int flags); // 0x0046ebf0
 };
 
-void UnknownFunction45cb20(int* step);
 
 // 0x0045cb20: adds *step to KrustyUI's "ProgressBar"; without a step it
 // calls KrustyUI 0x0049b530.

@@ -4,13 +4,15 @@ RTTI: `EventManager : GameObject : BaseObject` (vtable `0x0055259c`;
 0xd08 bytes, the size TrackGame slot 4 allocates). Its constructor
 `0x0045c9e0` writes the vtable. Canonical source is
 `src/reconstructed/EventManager.h` / `EventManager.cpp`; the TU is not
-established. Names are provisional.
+established. Names are provisional. Its `new` calls pass
+`D:\aardvark\VC\krusty2\EventManager.cpp` as `__FILE__` (`0x0056a940`),
+which confirms the original translation unit's name.
 
 TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
 ## Status
 
-Exact (21 calibration cases):
+Exact (23 calibration cases):
 - the constructor (11 0x50-byte entries at +0x50; -1000 in each component
   of +0x3c4) and both destructors;
 - slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c;
@@ -39,6 +41,13 @@ Exact (21 calibration cases):
   entries. The buffers are function-scope (0x8e reuses the 260-byte one
   with a 128-byte limit), and the best-lap update compares through two
   float locals (`fld; fld; fcompp`);
+- `0x0045cb70`: resets the event, loads the track's "env" and "scn" data
+  and creates the race object for mode 0 (`BaseQuarryEvent`, retail
+  `__LINE__` 252) or 2 (`NationalRace`, line 270). It clears three listener
+  slots in a loop that VC6 fully unrolls (a fresh zero register), and
+  returns whether a race-mode object exists;
+- `0x0045f9a0`: sends the local racer's state and each AI racer's (type
+  0x86, 0x24 bytes), then starts the network wait;
 - `0x0045fbd0`: removes a player, moving the last entry (and, with a
   race-mode object, TrackGame's last 0xf8-byte record) into its place, then
   qsorts the entries with the unsigned comparator `0x0045fbb0`;
@@ -49,14 +58,17 @@ GameObject's slot 10 takes a float frame time. EventManager adds and scales
 it, and retyping the declaration leaves GameObject's and KrustyBikeCamera's
 code unchanged.
 
-The race-mode objects, their views and targets are treated as GameObjects.
+The race-mode objects are `BaseQuarryEvent`s. 0x0045cb70 stores a new
+`BaseQuarryEvent` at TrackGame+0x55c and a `NationalRace` (RTTI
+`NationalRace : BaseQuarryEvent`) at +0x564. Both are declared in
+`src/reconstructed/QuarryEvent.h`. Their views and targets are treated as
+GameObjects.
 That is inference from their use (slots 4 and 5, the +0x25 flag bits), and
 it fits KrustyBike's primary base chain for the views. Their classes are not
 established; `src/reconstructed/RaceView.h` declares them.
 
 Not reconstructed:
-- `0x0045cb70`, `0x0045cdc0`, `0x0045d480`, `0x0045e710`, `0x0045e9d0`,
-  `0x0045eef0` and `0x0045f9a0`.
+- `0x0045cdc0`, `0x0045d480`, `0x0045e710`, `0x0045e9d0` and `0x0045eef0`.
 
 Near miss (`samples/game/EventManagerNearMisses.cpp`): the cdecl progress
 callback `0x0045cb20` (63 of 67 bytes; retail swaps two registers).

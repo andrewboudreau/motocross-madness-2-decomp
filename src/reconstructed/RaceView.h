@@ -50,6 +50,8 @@ struct UnknownEventRacer {
     unsigned short field_0x7a0;
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
     char field_0x7a4;                              // finished
+    unsigned char field_0x7a5[0x11c0 - 0x7a5];
+    char field_0x11c0;                             // AI racer's index in its messages
 };
 
 // Object at KrustyBikeCamera+0x3b8 (chosen by slot 10 from the global's
@@ -64,7 +66,8 @@ struct UnknownKrustyBikeView : public GameObject {
     unsigned char field_0x02c[0x38 - 0x2c];
     UnknownEventRacer* field_0x38;                // its own racer
     UnknownEventRacer** field_0x3c;               // all racers, by racer slot
-    unsigned char field_0x040[0x18e - 0x40];
+    UnknownEventRacer** field_0x40;               // AI racers (TrackGame+0x2d94 of them)
+    unsigned char field_0x044[0x18e - 0x44];
     bool field_0x18e;                    // slot 10: view available
     unsigned char field_0x18f[0x3f8 - 0x18f];
     bool field_0x3f8;

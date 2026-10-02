@@ -24,6 +24,14 @@ Every TrackGame function is exact (18 calibration cases):
 - the string-resource loader `0x00521970`;
 - the helpers `0x00521a30`, `0x00521a40` and `0x00521cd0`.
 
+Slot 1 is sensitive to unrelated header content. VC6's register choice for
+its `availPhys + availPageFile` sum (edx/eax) changes when declarations are
+added to headers TrackGame.cpp includes. The sensitivity is not tied to
+names or to the build path; adding unused probe declarations flips it at
+irregular counts. After a header edit, re-run the full calibration. If slot 1
+regresses, keep new types local to the file that uses them (as
+EventManager.cpp and the EventManager near-miss sample do).
+
 Slot 14 ignores input while an IME is open, then:
 - control 0x1d (with modifier 0x45) or controls 0x3d/0xc5 toggle menu 0x190;
 - control 1 opens menu 0x191.

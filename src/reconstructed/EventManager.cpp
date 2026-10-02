@@ -6,7 +6,9 @@
 #include <string.h>
 
 #include "Camera.h"
+#include "DebugAlloc.h"
 #include "ControlInterface.h"
+#include "QuarryEvent.h"
 #include "TrackGame.h"
 
 // Network messages handled by slot 24 (the layout depends on the type).
@@ -441,4 +443,91 @@ void EventManager::UnknownFunction45fbd0(int player) {
     }
     if (g_UnknownGlobal56e26c->field_0x2158)
         qsort(field_0x50, g_UnknownGlobal56e26c->field_0x2158 - 1, sizeof(UnknownEventEntry), UnknownFunction45fbb0);
+}
+
+// 0x0045f9a0: once, sends the local racer's state and then each AI racer's
+// (type 0x86), and starts the network wait.
+void EventManager::UnknownFunction45f9a0() {
+    if (!g_UnknownGlobal56e26c->field_0x08 || field_0x38)
+        return;
+    UnknownKrustyBikeView* view = UnknownFunction45d2f0();
+    if (!view->field_0x38->field_0x7a4) {
+        view->field_0x38->field_0x754 = FLT_MAX;
+        view->field_0x38->field_0x748 = 0x7ffffffe;
+    }
+    UnknownEventRacerMessage message;
+    message.field_0x08 = view->field_0x38->field_0x768;
+    message.field_0x0c = view->field_0x38->field_0x754;
+    message.field_0x10 = view->field_0x38->field_0x750;
+    message.field_0x05 = view->field_0x38->field_0x7a4;
+    message.field_0x14 = view->field_0x38->field_0x788;
+    message.field_0x18 = view->field_0x38->field_0x758;
+    message.field_0x1c = view->field_0x38->field_0x760;
+    message.field_0x20 = view->field_0x38->field_0x764;
+    message.field_0x04 = 0;
+    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(
+        0x86, &message, sizeof(message), g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
+    for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2d94; i++) {
+        if (!view->field_0x40[i]->field_0x7a4) {
+            view->field_0x40[i]->field_0x754 = FLT_MAX;
+            view->field_0x40[i]->field_0x748 = 0x7ffffffe;
+        }
+        message.field_0x08 = view->field_0x40[i]->field_0x768;
+        message.field_0x0c = view->field_0x40[i]->field_0x754;
+        message.field_0x10 = view->field_0x40[i]->field_0x750;
+        message.field_0x05 = view->field_0x40[i]->field_0x7a4;
+        message.field_0x14 = view->field_0x40[i]->field_0x788;
+        message.field_0x18 = view->field_0x40[i]->field_0x758;
+        message.field_0x1c = view->field_0x40[i]->field_0x760;
+        message.field_0x20 = view->field_0x40[i]->field_0x764;
+        message.field_0x04 = view->field_0x40[i]->field_0x11c0;
+        g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(
+            0x86, &message, sizeof(message), g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
+    }
+    field_0x38 = 1;
+    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac8d0(field_0x2c, field_0x30);
+    view->UnknownVirtualSlot4();
+    field_0x34 = 1;
+}
+
+// Global at 0x0059af54; 0x0045cb70 clears it first.
+float g_UnknownGlobal59af54;
+
+// 0x0045cb70: resets the event, loads the track's environment and scene
+// and, for mode 0 (BaseQuarryEvent) or 2 (NationalRace), creates the race
+// object and adds it to the second root; 1 when a race-mode object exists.
+int EventManager::UnknownFunction45cb70() {
+    char path[260];
+    g_UnknownGlobal59af54 = 0;
+    field_0x3c0 = 0;
+    field_0x38 = 0;
+    field_0x34 = 0;
+    for (int i = 0; i < 8; i++)
+        g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 0;
+    field_0x420 = 0;
+    for (int j = 0; j < 3; j++)
+        field_0x424[j] = 0;
+    field_0x3d4 = 0;
+    field_0x3d0 = 0;
+    g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
+    g_UnknownGlobal56e26c->mode.UnknownFunction523a60(g_UnknownGlobal56e26c->mode.field_0x6a0,
+                                                      g_UnknownGlobal56e26c->field_0x2da6, "env", path);
+    g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9b80(path);
+    switch (g_UnknownGlobal56e26c->field_0x2d74) {
+    case 0:
+        g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9e30(g_UnknownGlobal56e26c->field_0x2da6, "scn", 0);
+        g_UnknownGlobal56e26c->field_0x55c = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
+            ->UnknownFunction4de3b0(g_UnknownGlobal56e26c->field_0x10, UnknownFunction45cb20);
+        if (!g_UnknownGlobal56e26c->field_0x34->UnknownFunction469190(g_UnknownGlobal56e26c->field_0x55c, -1))
+            return 0;
+        break;
+    case 2:
+        g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9e30(g_UnknownGlobal56e26c->field_0x2da6, "scn", 0);
+        g_UnknownGlobal56e26c->field_0x564 = (TrackGameViewOwner*)(new(__FILE__, 270) NationalRace(1))
+            ->UnknownFunction4aa850(g_UnknownGlobal56e26c->field_0x10, UnknownFunction45cb20);
+        if (!g_UnknownGlobal56e26c->field_0x34->UnknownFunction469190(g_UnknownGlobal56e26c->field_0x564, -1))
+            return 0;
+        break;
+    }
+    return UnknownFunction45d2b0() != 0;
 }

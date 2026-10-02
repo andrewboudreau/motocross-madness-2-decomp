@@ -33,6 +33,10 @@ int UnknownFunction45d3d0(const void* a, const void* b);
 // higher +0x7a0, +0x790 and +0x744->+0x0c).
 int UnknownFunction45e930(const void* a, const void* b);
 
+// cdecl 0x0045cb20: progress callback that 0x0045cb70 and 0x0045cdc0 pass
+// by address (near miss: samples/game/EventManagerNearMisses.cpp).
+void UnknownFunction45cb20(int* step);
+
 // cdecl 0x0045fbb0: qsort order for unsigned values.
 int UnknownFunction45fbb0(const void* a, const void* b);
 
@@ -100,6 +104,7 @@ public:
     void UnknownFunction45e9d0();                  // 0x0045e9d0
     void UnknownFunction45eef0(float frameTime);   // 0x0045eef0
     void UnknownFunction45f9a0();                  // 0x0045f9a0
+    int UnknownFunction45cb70();                   // 0x0045cb70
     void UnknownFunction45fbd0(int player);        // 0x0045fbd0
 
     float field_0x2c;                              // "KeepAliveTimeout" (slot 8)
