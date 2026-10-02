@@ -36,7 +36,7 @@
 #include "../../src/reconstructed/PCRenderTarget.h"
 #include "../../src/reconstructed/TrackGame.h"
 
-#include "../../src/reconstructed/PCTextureMap.h"
+#include "../../src/reconstructed/ManagedTexture.h"
 
 // 0x004c7e30: converts a 24-bit colour to the texture's format (555, 565 or
 // a palette index) and stores it as the colour key.

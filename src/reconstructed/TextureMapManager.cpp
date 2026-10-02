@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "DebugAlloc.h"
-#include "PCTextureMap.h"
+#include "ManagedTexture.h"
 #include "TrackGame.h"
 
 // 0x00510a50

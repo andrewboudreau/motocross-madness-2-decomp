@@ -110,17 +110,3 @@ public:
     UnknownVideoDecoder* field_0x7c;
 };
 
-// RTTI: ManagedTexture : PCTextureMap (vtable 0x00558430, 0xbc bytes; it
-// overrides slots 0, 7, 8, 11 and 19). Its constructor 0x00510500 sets
-// TextureMap+0x68 bit 0; a ManagedTextureGroup (+0x90) owns it.
-class ManagedTexture : public PCTextureMap {
-public:
-    explicit ManagedTexture(TextureMapManager* manager); // 0x00510500
-    // 0x00510760: PCTextureMap slot 8, called directly.
-    int UnknownFunction510760(int a, int b, int c);
-
-    unsigned char field_0x80[0x90 - 0x80];
-    ManagedTextureGroup* field_0x90;
-    unsigned char field_0x94[0xbc - 0x94];
-};
-

@@ -52,3 +52,24 @@ Exact (25 calibration cases, every function in the file's range):
   local buffer that is never output;
 - `0x005112f0` / `0x00511300` (register / unregister a texture) and the
   scratch buffers `0x00511310` / `0x00511370`.
+
+## ManagedTexture
+
+RTTI: `ManagedTexture : PCTextureMap` (vtable `0x00558430`, 0xbc bytes; it
+overrides slots 0, 7, 8, 11 and 19). Its code sits between
+TextureMapManager.cpp's functions (`0x00510500`–`0x005109bc`). Canonical
+source: `src/reconstructed/ManagedTexture.h` / `ManagedTexture.cpp`.
+
+A ManagedTextureGroup (+0x90) owns each ManagedTexture. While one is placed
+on a CacheTexture page (+0x80, RTTI `CacheTexture : PCTextureMap`, vtable
+`0x005583d8`), it records its region (+0x94), its scale and u/v offset
+within the page (+0x84..+0x8c), binds the page instead of itself (slots 11
+and 19) and maps texture coordinates into the page (`0x00510780`,
+`0x00510910`). Slot 8 (create the surface) does nothing; `0x00510760` calls
+PCTextureMap's slot 8 directly.
+
+Exact (16 calibration cases, every function in that range): the constructor,
+scalar deleting destructor and destructor, slots 7, 8, 11 and 19, and
+`0x00510610`, `0x00510670`, `0x00510700`, `0x00510760`, `0x00510780`,
+`0x00510820` (records a use: count, largest value up to 9, manager frame),
+`0x00510910`, `0x00510990` (log2 of the width) and `0x005109b0`.
