@@ -1,5 +1,5 @@
 // Quadtree.cpp -- reconstruction of D:\aardvark\VC\krusty2\Quadtree.cpp (broad phase).
-#include "C:/tmp/mcm2-physics/src/krusty2/broadphase/Quadtree.h"
+#include "broadphase/Quadtree.h"
 
 #include <string.h>
 
