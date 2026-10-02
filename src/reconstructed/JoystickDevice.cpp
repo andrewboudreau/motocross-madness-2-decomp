@@ -1,5 +1,6 @@
 #include "JoystickDevice.h"
 
+#include "KeyboardDevice.h"
 #include "UnknownObject56e26c.h"
 
 // 0x00489800
@@ -23,7 +24,7 @@ JoystickDevice::~JoystickDevice() {}
 // 0x00489980: with a keyboard, `modifier` must hold on it; without one,
 // only "none" (0, 0x80000000 or 0x3f) is accepted.
 int JoystickDevice::UnknownVirtualSlot2(int button, int modifier, UnknownInputEntry* entry) {
-    UnknownInterface56e26c* keyboard = g_UnknownGlobal56e26c->field_0x14->field_0x34;
+    KeyboardDevice* keyboard = g_UnknownGlobal56e26c->field_0x14->field_0x34;
     if (((keyboard && keyboard->UnknownFunction48a240(modifier)) ||
          (!keyboard && (modifier == 0 || modifier == (int)0x80000000 || modifier == 0x3f))) &&
         field_0x264[button].state == 1) {

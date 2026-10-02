@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "PCMouseDevice.h"
+#include "KeyboardDevice.h"
 #include "UnknownObject56e26c.h"
 
 // 0x004c48c0
@@ -51,7 +52,7 @@ void PCMouseDevice::UnknownVirtualSlot3() {
 // 0x004c4a90: whether `button` is down (with `modifier` held, when there is
 // a keyboard); copies its entry.
 int PCMouseDevice::UnknownVirtualSlot5(int button, int modifier, UnknownInputEntry* entry) {
-    UnknownInterface56e26c* keyboard = g_UnknownGlobal56e26c->field_0x14->field_0x34;
+    KeyboardDevice* keyboard = g_UnknownGlobal56e26c->field_0x14->field_0x34;
     if ((!keyboard || keyboard->UnknownFunction48a240(modifier)) &&
         field_0x260[button].state == 1) {
         if (entry) {

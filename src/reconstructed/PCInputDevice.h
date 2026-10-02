@@ -118,7 +118,9 @@ struct UnknownDirectInput {
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall UnknownMethod2();
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4();
+    virtual long __stdcall UnknownMethod4(unsigned long type,
+                                          int (__stdcall* callback)(const struct UnknownDeviceInstance*, void*),
+                                          void* context, unsigned long flags); // EnumDevices
     virtual long __stdcall UnknownMethod5(const UnknownGuid& device); // GetDeviceStatus
     virtual long __stdcall UnknownMethod6();
     virtual long __stdcall UnknownMethod7();
@@ -156,6 +158,12 @@ struct UnknownDeviceCaps {
 extern "C" const UnknownGuid GUID_SysMouse;              // 0x00556b20
 extern "C" const UnknownGuid GUID_SysKeyboard;           // 0x00556b30
 extern "C" const UnknownGuid IID_IDirectInputDevice7A;   // 0x00556a50
+extern "C" const UnknownGuid IID_IDirectInput7A;         // 0x005569e0 ({9A4CB684-236D-11D3-8E9D-00C04F6844AE})
+
+// dinput.dll import (thunk 0x005330e8).
+extern "C" long __stdcall DirectInputCreateEx(void* instance, unsigned long version,
+                                              const UnknownGuid& iid, void** result,
+                                              void* outer);
 extern "C" const UnknownDataFormat c_dfDIKeyboard;       // 0x00558f18
 extern "C" const UnknownDataFormat c_dfDIMouse;          // 0x00558f30
 

@@ -1,0 +1,23 @@
+{
+  "??0ControlInterface@@QAE@XZ": "0x0043ce00",
+  "??0PCJoystickDevice@@QAE@H@Z": "0x004c2770",
+  "??0PCKeyboardDevice@@QAE@XZ": "0x004c43c0",
+  "??0PCMouseDevice@@QAE@XZ": "0x004c48c0",
+  "??1ControlInterface@@UAE@XZ": "0x0043ce60",
+  "??1PCControlInterface@@UAE@XZ": "0x004bf600",
+  "??1PCControlInterface@@UAE@XZ$ehhandler": "0x0054cba8",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7PCControlInterface@@6B@": "0x00555e2c",
+  "?UnknownEnumDevicesCallback@PCControlInterface@@SGHPBUUnknownDeviceInstance@@PAX@Z": "0x004bf3c0",
+  "?UnknownEnumDevicesCallback@PCControlInterface@@SGHPBUUnknownDeviceInstance@@PAX@Z$ehhandler": "0x0054cb94",
+  "?UnknownFunction489c60@JoystickDevice@@QAEHHHPAUUnknownInputEntry@@@Z": "0x00489c60",
+  "?UnknownFunction48a240@KeyboardDevice@@QAEHH@Z": "0x0048a240",
+  "?UnknownFunction4c2930@PCJoystickDevice@@QAEHPBUUnknownDeviceInstance@@@Z": "0x004c2930",
+  "?UnknownMethod4c26d0@PCInputDevice@@QAEHH@Z": "0x004c26d0",
+  "?UnknownVirtualSlot1@PCControlInterface@@UAEHXZ$ehhandler": "0x0054cb6c",
+  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "_DirectInputCreateEx@20": "0x005330e8",
+  "_IID_IDirectInput7A": "0x005569e0",
+  "__FILE__": "0x0056fc5c"
+}

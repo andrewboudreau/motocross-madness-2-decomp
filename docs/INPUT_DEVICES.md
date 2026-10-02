@@ -49,8 +49,8 @@ the default profile, except two near misses in
   Slot 5's return type is contradictory across callers. KeyboardDevice
   tests the full eax, so it is `int`. FollowCamera slot 56 returns it
   unconverted as `bool`, and KrustyBikeCamera overrides slot 56 as `bool`.
-  ControlInterface therefore keeps a separate `bool` view of the keyboard
-  (`UnknownInterface56e26c`).
+  ControlInterface types the keyboard as `KeyboardDevice*`, and FollowCamera
+  reads it through a separate `bool` view (`UnknownKeyboardBoolView`).
 - **MouseDevice** (`0x0048a2d0`): `PCInputDevice(1)`, two binding lists at
   +0x2b0 and four button entries at +0x260. Slot 0 (`0x0048a4c0`) drops
   bindings by id. PCMouseDevice implements the rest:
@@ -192,6 +192,25 @@ constructors, reset, and a value mapper with a dead zone and min/max clamp.
 The clamp matches only as inline helper functions, and the mapper unbinds
 through the device's slot 0. All 12 are strict exact. The TU is not
 established.
+
+## PCControlInterface (PCControl.cpp)
+
+RTTI PCControlInterface : ControlInterface. Its functions pass the literal
+`__FILE__` `PCControl.cpp`, so the TU is named, and canonical source is
+`src/reconstructed/PCControl.cpp`. It adds the DirectInput object at
++0xcc0 (`DirectInputCreateEx`, version 0x700, IID_IDirectInput7A) and an
+acquired flag at +0xcc4.
+
+| VA | Function |
+|---|---|
+| `0x004bf240` | Slot 1: creates DirectInput, the keyboard (`new` at line 107) and the mouse (line 114), then enumerates attached joysticks through `0x004bf3c0` (line 73, up to 8). Without any joystick it creates one anyway (line 125). The first joystick becomes the active one (+0x0c). |
+| `0x004bf560` | Slot 2: control state on the keyboard, the active joystick, then the mouse |
+| `0x004bf5e0` | Slot 4: modifier test |
+| `0x004bf490` | (Un)acquires every device |
+| `0x004bf600` | Destructor: deletes the devices, releases DirectInput |
+
+All are strict exact except slot 3 (`0x004bf4f0`, per-device state), which
+is a near miss in `samples/control`.
 
 ## ContainerList.h
 

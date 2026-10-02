@@ -31,7 +31,8 @@ def run_vc6(root:Path,src:Path,out:Path,flags:list[str],extra:list[str]):
         cmd=[wine,winepath(cl),*flags,*[f'/I{winepath(p)}' for p in includes],*extra,winepath(src),f'/Fo{winepath(out)}']
     env=os.environ.copy(); env.setdefault('WINEDEBUG','-all')
     print('+',' '.join(cmd))
-    r=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env=env)
+    # VC6 diagnostics are in the installation's ANSI code page, not UTF-8.
+    r=subprocess.run(cmd,text=True,encoding='latin-1',stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env=env)
     print(r.stdout,end='')
     if r.returncode: raise SystemExit(r.returncode)
 

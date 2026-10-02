@@ -1,28 +1,24 @@
 #pragma once
 
 class InputDevice;
+class KeyboardDevice;
 class JoystickDevice;
 class MouseDevice;
 
-// The keyboard at ControlInterface+0x34, as FollowCamera slots 55 and 56 see
-// it: they call slot 5 with 0x38 and 0x2a (DirectInput left Alt and left
-// Shift), and JoystickDevice calls KeyboardDevice's 0x0048a240 on it.
-// KeyboardDevice itself is not used for this member because the two views
-// conflict: KeyboardDevice 0x0048a0c0 tests slot 5's full eax (int), while
-// FollowCamera slot 56 returns it unconverted as bool (KrustyBikeCamera's
-// override of slot 56 is bool).
-class UnknownInterface56e26c {
+// FollowCamera's view of the keyboard at ControlInterface+0x34. FollowCamera
+// slots 55 and 56 call slot 5 with 0x38 and 0x2a (DirectInput left Alt and
+// left Shift) and return its result unconverted as bool (KrustyBikeCamera's
+// override of slot 56 is bool), while KeyboardDevice's own callers test the
+// full eax (int). The two declarations cannot be one type, so FollowCamera
+// reads the member through this view.
+class UnknownKeyboardBoolView {
 public:
     virtual void UnknownVirtualSlot0();
     virtual void UnknownVirtualSlot1();
     virtual void UnknownVirtualSlot2();
     virtual void UnknownVirtualSlot3();
     virtual void UnknownVirtualSlot4();
-    virtual bool UnknownVirtualSlot5(int a, int b, int c);
-
-    // 0x0048a240 (in KeyboardDevice's code): whether modifier state
-    // `modifier` currently holds.
-    int UnknownFunction48a240(int modifier);
+    virtual bool UnknownVirtualSlot5(int key, int modifier, void* entry);
 };
 
 // 0x3c-byte binding of a control to an input device (not polymorphic). The
@@ -89,21 +85,21 @@ class ControlInterface {
 public:
     ControlInterface();                    // 0x0043ce00
     virtual ~ControlInterface();           // 0x0043ce60 (deleting wrapper 0x0043ce40)
-    virtual void UnknownVirtualSlot1() = 0;
-    virtual int UnknownVirtualSlot2(int a, int b) = 0;
-    virtual void UnknownVirtualSlot3() = 0;
-    virtual void UnknownVirtualSlot4() = 0;
+    virtual int UnknownVirtualSlot1() = 0;                       // set up the devices
+    virtual int UnknownVirtualSlot2(int control, int modifier) = 0; // control state
+    virtual int UnknownVirtualSlot3(int control, int kind, int modifier, int device) = 0;
+    virtual int UnknownVirtualSlot4(int modifier) = 0;           // modifier test
 
     int UnknownFunction43ce70(UnknownControlMapping* mapping);           // 0x0043ce70
     void UnknownFunction43cea0(int control, int kind, int pressed, int device); // 0x0043cea0
     int UnknownFunction43cf00(int value);   // 0x0043cf00, near miss in samples/control
 
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;
+    int field_0x04;                        // joystick count
+    int field_0x08;                        // active joystick index
+    JoystickDevice* field_0x0c;            // active joystick
     JoystickDevice* field_0x10[8];
     MouseDevice* field_0x30;
-    UnknownInterface56e26c* field_0x34;    // keyboard (see above)
+    KeyboardDevice* field_0x34;    // keyboard (see above)
     int field_0x38;                        // queued events
     UnknownControlEvent field_0x3c[160];
     UnknownControlMapping* field_0xcbc;

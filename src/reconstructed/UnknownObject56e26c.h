@@ -77,7 +77,8 @@ public:
     unsigned char field_0x2d4;   // bit 2 tested by KeyboardDevice 0x0048a240
     unsigned char field_0x02d5[0x2f0 - 0x2d5];
     float field_0x2f0;           // frame time (KeyboardDevice 0x0048a0c0)
-    unsigned char field_0x02f4[0x31c - 0x2f4];
+    unsigned char field_0x02f4[0x318 - 0x2f4];
+    void* field_0x318;           // instance handle passed to DirectInputCreateEx
     void* field_0x31c;           // window handle passed to cooperative-level calls
     unsigned char field_0x0320[0x558 - 0x320];
     // Objects whose +0x34 KrustyBikeCamera slot 10 takes as its view, by
