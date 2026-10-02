@@ -189,7 +189,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
                 field_0x58 = 0;
             if (!field_0x3c->field_0x44.m_count && field_0x58 == 1)
                 field_0x58 = 2;
-            if (!field_0x3c->field_0x60 && field_0x58 == 2)
+            if (!field_0x3c->field_0x54.m_count && field_0x58 == 2)
                 field_0x58 = 0;
         } else if (UnknownFunction43caa0(0x21, 0, event, 0x80)) {
             field_0x3c->field_0x08 ^= 1;
@@ -198,7 +198,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
                 if (++field_0x3c->field_0x1c8 >= field_0x3c->field_0x44.m_count)
                     field_0x3c->field_0x1c8 = 0;
             } else if (field_0x58 == 2) {
-                if (++field_0x3c->field_0x1c4 >= field_0x3c->field_0x60)
+                if (++field_0x3c->field_0x1c4 >= field_0x3c->field_0x54.m_count)
                     field_0x3c->field_0x1c4 = 0;
             } else if (field_0x58 == 0) {
                 if (++field_0x40 >= field_0x44.m_count)
@@ -211,7 +211,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
                     field_0x3c->field_0x1c8 = field_0x3c->field_0x44.m_count - 1;
             } else if (field_0x58 == 2) {
                 if (--field_0x3c->field_0x1c4 < 0)
-                    field_0x3c->field_0x1c4 = field_0x3c->field_0x60 - 1;
+                    field_0x3c->field_0x1c4 = field_0x3c->field_0x54.m_count - 1;
             } else if (field_0x58 == 0) {
                 if (--field_0x40 < 0)
                     field_0x40 = field_0x44.m_count;
@@ -228,9 +228,9 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
 }
 
 // 0x00511180
-ManagedTextureGroup* TextureMapManager::UnknownFunction511180(int a, int b, int c, int d) {
-    ManagedTextureGroup* cache = new(__FILE__, 431) ManagedTextureGroup(this, a, c, d);
-    cache->UnknownFunction50c4a0(b);
+ManagedTextureGroup* TextureMapManager::UnknownFunction511180(int format, int pages, int addressU, int addressV) {
+    ManagedTextureGroup* cache = new(__FILE__, 431) ManagedTextureGroup(this, format, addressU, addressV);
+    cache->UnknownFunction50c4a0(pages);
     field_0x44.Add(cache);
     if (!field_0x3c)
         field_0x3c = cache;

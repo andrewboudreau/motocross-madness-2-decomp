@@ -5,11 +5,19 @@
 class ManagedTexture;
 
 // RTTI: CacheTexture : PCTextureMap (vtable 0x005583d8; deleting wrapper
-// 0x0050f810, destructor 0x0050f830). A page that ManagedTextures are placed
-// on; only what ManagedTexture uses is declared.
+// 0x0050f810, destructor 0x0050f830), 0x190 bytes. A page that a
+// ManagedTextureGroup packs its ManagedTextures onto; only what those
+// classes use is declared.
 class CacheTexture : public PCTextureMap {
 public:
+    // 0x0050f6a0
+    CacheTexture(TextureMapManager* manager, ManagedTextureGroup* group, int value);
+    void UnknownFunction50fc40();             // 0x0050fc40 (after restoring a lost page)
     void UnknownFunction5102b0(ManagedTexture* texture); // 0x005102b0: takes `texture` off the page
+
+    unsigned char field_0x80[0x184 - 0x80];
+    int field_0x184;                          // memory
+    unsigned char field_0x188[0x190 - 0x188];
 };
 
 // The part of a CacheTexture page (ManagedTexture+0x94) a texture occupies.

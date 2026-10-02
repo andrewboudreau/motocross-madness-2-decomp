@@ -48,6 +48,12 @@ public:
         return 1;
     }
 
+    // Zeroes the elements and empties the list.
+    void Clear() {
+        memset(m_data, 0, m_count * sizeof(T));
+        m_count = 0;
+    }
+
     // Element `index`, or 0 when out of range.
     T Get(int index) {
         if (m_count > 0 && m_data && index < m_count)

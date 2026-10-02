@@ -73,3 +73,29 @@ scalar deleting destructor and destructor, slots 7, 8, 11 and 19, and
 `0x00510610`, `0x00510670`, `0x00510700`, `0x00510760`, `0x00510780`,
 `0x00510820` (records a use: count, largest value up to 9, manager frame),
 `0x00510910`, `0x00510990` (log2 of the width) and `0x005109b0`.
+
+## ManagedTextureGroup
+
+RTTI: `ManagedTextureGroup : BaseObject` (vtable `0x005583c0`, 0x258 bytes).
+Its code cites `D:\aardvark\VC\krusty2\TextureCache.cpp` (`0x00574b84`).
+Canonical source: `src/reconstructed/ManagedTextureGroup.cpp` (declared in
+`TextureMapManager.h`).
+
+A group holds ManagedTextures of one pixel format (+0x0c; address modes at
++0x10/+0x14) in +0x44 and packs them onto 256x256 CacheTexture pages
+(+0x54, 0x190 bytes each, constructor `0x0050f6a0`). The pages share the
+system surface of one PCTextureMap at +0x1c0. Sixteen
+`ContainerList<ManagedTexture*>` members (+0x7c, nine at +0x90, +0x144 and
+five more) sort the textures by size during repacking; three PCVideoCard.cpp
+timers (`0x004cb670`, 5000 ms) and a GDI object (+0x1f8) are also owned.
+
+Exact (9 calibration cases): the constructor, scalar deleting destructor and
+destructor; `0x0050c4a0` (sets the page count); `0x0050c6c0` (adds a texture,
+taking the palette of an 8-bit group from it); `0x0050c760` (clears the
+textures' use records); `0x0050c790` (restores lost pages); `0x0050c7e0`
+(appends a report to `C:\temp\TM_debug.txt` through `0x00461d40`); and
+`0x0050c8c0` (empties the size lists and repacks).
+
+Not reconstructed: the repacking itself, `0x0050c960` (about 3.2 KB) and
+`0x0050dad0` (with partial texture blits), and `0x0050d800`, `0x0050e730`,
+`0x0050ee70`–`0x0050ef70` and `0x0050f070`.

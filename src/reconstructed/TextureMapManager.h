@@ -28,31 +28,77 @@ public:
     int m_count;
 };
 
-// RTTI: ManagedTextureGroup : BaseObject (vtable 0x005583c0; constructor
-// 0x0050bed0 writes it, destructor 0x0050c2e0, deleting wrapper 0x0050c2c0),
-// 0x258 bytes. Its code sits among TextureCache.cpp's literals. The manager
-// keeps them in +0x44 and steps through them with debug keys (slot 23).
+// Interval timer (PCVideoCard.cpp; constructor 0x004cb670 records the
+// current time and the interval), 12 bytes.
+class UnknownTimer {
+public:
+    explicit UnknownTimer(int interval);
+
+    int field_0x00;                           // start time
+    int field_0x04;
+    int field_0x08;                           // interval
+};
+
+class CacheTexture;
+class PCTextureMap;
+
+// RTTI: ManagedTextureGroup : BaseObject (vtable 0x005583c0), 0x258 bytes.
+// Its code cites TextureCache.cpp. It owns ManagedTextures (+0x44) of one
+// format and the CacheTexture pages (+0x54) they are packed onto; the
+// manager keeps the groups in its +0x44 and steps through them with debug
+// keys (slot 23).
 class ManagedTextureGroup : public BaseObject {
 public:
-    ManagedTextureGroup(TextureMapManager* manager, int a, int b, int c);
-    virtual ~ManagedTextureGroup();
-    int UnknownFunction50c4a0(int value);     // 0x0050c4a0: 0 on failure
+    // 0x0050bed0
+    ManagedTextureGroup(TextureMapManager* manager, int format, int addressU, int addressV);
+    virtual ~ManagedTextureGroup();           // 0x0050c2e0 (deleting wrapper 0x0050c2c0)
+    int UnknownFunction50c4a0(int count);     // 0x0050c4a0: sets the page count; 0 on failure
     void UnknownFunction50c6c0(ManagedTexture* texture); // 0x0050c6c0: adds a texture
-    void UnknownFunction50c760();             // 0x0050c760 (manager slot 12)
-    void UnknownFunction50c790();             // 0x0050c790 (manager slot 18)
-    void UnknownFunction50c7e0();             // 0x0050c7e0 (debug key 0x15)
-    void UnknownFunction50c8c0();             // 0x0050c8c0 (manager slot 13)
+    void UnknownFunction50c760();             // 0x0050c760: clears the textures' use records
+    void UnknownFunction50c790();             // 0x0050c790: restores lost pages
+    void UnknownFunction50c7e0();             // 0x0050c7e0: appends a report to C:\temp\TM_debug.txt
+    void UnknownFunction50c8c0();             // 0x0050c8c0: repacks the pages
+    void UnknownFunction50c960();             // 0x0050c960 (not reconstructed)
+    void UnknownFunction50dad0();             // 0x0050dad0 (not reconstructed)
     void UnknownFunction50ef70(void* value);  // 0x0050ef70 (manager slot 15)
 
-    unsigned char field_0x08;                 // toggled by debug key 0x21
-    unsigned char field_0x09[0x44 - 0x09];
-    UnknownTextureMapList field_0x44;         // its textures (ManagedTextures), stepped through by +0x1c8
-    unsigned char field_0x54[0x60 - 0x54];
-    int field_0x60;                           // count stepped through by +0x1c4
-    unsigned char field_0x64[0x1c4 - 0x64];
-    int field_0x1c4;
-    int field_0x1c8;
-    unsigned char field_0x1cc[0x258 - 0x1cc];
+    unsigned char field_0x08;                 // toggled by debug key 0x21; set: no repacking
+    int field_0x0c;                           // pixel format
+    int field_0x10;                           // address mode u
+    int field_0x14;                           // address mode v
+    int field_0x18[9];
+    int field_0x3c;                           // pages' memory
+    TextureMapManager* field_0x40;
+    UnknownTextureMapList field_0x44;         // ManagedTextures, stepped through by +0x1c8
+    UnknownTextureMapList field_0x54;         // CacheTexture pages, stepped through by +0x1c4
+    UnknownTextureMapList field_0x64;
+    int field_0x74;
+    int field_0x78;                           // 6 / bytes per pixel
+    ContainerList<ManagedTexture*> field_0x7c;
+    ContainerList<ManagedTexture*> field_0x90[9];
+    ContainerList<ManagedTexture*> field_0x144;
+    ContainerList<ManagedTexture*> field_0x158;
+    ContainerList<ManagedTexture*> field_0x16c;
+    ContainerList<ManagedTexture*> field_0x180;
+    ContainerList<ManagedTexture*> field_0x194;
+    ContainerList<ManagedTexture*> field_0x1a8;
+    void* field_0x1bc;                        // palette of 8-bit groups
+    PCTextureMap* field_0x1c0;                // 256x256 texture whose system surface the pages share
+    int field_0x1c4;                          // debug key cursor (pages)
+    int field_0x1c8;                          // debug key cursor (textures)
+    int field_0x1cc;
+    int field_0x1d0;
+    UnknownTimer field_0x1d4;
+    UnknownTimer field_0x1e0;
+    UnknownTimer field_0x1ec;
+    void* field_0x1f8;                        // GDI object (DeleteObject)
+    int field_0x1fc[9];
+    int field_0x220[9];
+    int field_0x244;
+    int field_0x248;
+    int field_0x24c;
+    int field_0x250;
+    int field_0x254;
 };
 
 // Fixed-size block pool (BlockAllocator.cpp; constructor 0x00423f70 takes the
@@ -80,8 +126,8 @@ public:
     // 0x00510ee0: debug keys stepping through the texture caches.
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
 
-    // 0x00511180: creates and registers a texture cache.
-    ManagedTextureGroup* UnknownFunction511180(int a, int b, int c, int d);
+    // 0x00511180: creates and registers a texture group with `pages` pages.
+    ManagedTextureGroup* UnknownFunction511180(int format, int pages, int addressU, int addressV);
     void UnknownFunction5112f0(TextureMap* texture); // 0x005112f0: registers a texture
     void UnknownFunction511300(TextureMap* texture); // 0x00511300: unregisters it
     // 0x005113d0: shares the texture cache limit out among the groups (on
