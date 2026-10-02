@@ -24,10 +24,13 @@ struct UnknownEventRacerPart {
 };
 
 // A racer: a view's +0x38 (its own) and +0x3c (all, by racer slot), and the
-// object EventManager ranks and updates from network messages. The class is
-// not established.
-struct UnknownEventRacer {
-    unsigned char field_0x000[0x10];
+// object EventManager ranks and updates from network messages. It reaches
+// GameObject through a vbptr at +0x04 (EventManager 0x0045cdc0 calls slot 4
+// through it), as KrustyBike's RTTI shows (virtual GameObject base, pdisp 4).
+// The class is not established; only the vbase access path is modelled.
+struct UnknownEventRacer : virtual public GameObject {
+    virtual void UnknownVirtualSlot0();            // gives the racer its own vfptr at +0
+    unsigned char field_0x008[0x10 - 0x08];
     float field_0x010;                             // KrustyBikeCamera slot 10 adds 2 for the height
     unsigned char field_0x014[0x4a0 - 0x14];
     int field_0x4a0;                               // EventManager 0x0045eef0: counts as done when set
@@ -61,8 +64,17 @@ struct UnknownEventRacer {
 // +0x558..+0x568 objects); slot 48 tests two flags. TrackGame and
 // EventManager use it as a GameObject (slot 5, the +0x25 flag bits), which
 // fits KrustyBike's primary base chain; its class is not established.
+// Recording file object (its code sits among VCRfile.cpp's literals).
+class UnknownVcrFile {
+public:
+    void UnknownFunction524d00(char* path);  // 0x00524d00: saves to `path`
+};
+
 struct UnknownKrustyBikeView : public GameObject {
     void UnknownFunction420590(int player);  // 0x00420590 (EventManager slot 24)
+    // 0x00420b00 (near bikerace.cpp's literals): saves the replay to `path`
+    // with `description`.
+    void UnknownFunction420b00(char* path, char* description);
     // 0x004204e0: the next racer after `*iterator` (advancing it), or 0.
     UnknownEventRacer* UnknownFunction4204e0(int* iterator);
     // 0x004210f0: writes two positions relative to `reference`.
@@ -72,11 +84,18 @@ struct UnknownKrustyBikeView : public GameObject {
     UnknownEventRacer* field_0x38;                // its own racer
     UnknownEventRacer** field_0x3c;               // all racers, by racer slot
     UnknownEventRacer** field_0x40;               // AI racers (TrackGame+0x2d94 of them)
-    unsigned char field_0x044[0x18a - 0x44];
+    GameObject* field_0x44;
+    unsigned char field_0x048[0x50 - 0x48];
+    GameObject* field_0x50;
+    unsigned char field_0x054[0x60 - 0x54];
+    GameObject* field_0x60;
+    unsigned char field_0x064[0x18a - 0x64];
     bool field_0x18a;                    // racing (EventManager 0x0045eef0)
     unsigned char field_0x18b[0x18e - 0x18b];
     bool field_0x18e;                    // slot 10: view available
-    unsigned char field_0x18f[0x3f8 - 0x18f];
+    unsigned char field_0x18f[0x1a8 - 0x18f];
+    UnknownVcrFile* field_0x1a8;         // ghost recording (EventManager 0x0045cdc0)
+    unsigned char field_0x1ac[0x3f8 - 0x1ac];
     bool field_0x3f8;
     bool field_0x3f9;
 };

@@ -23,7 +23,11 @@ struct UnknownInputEntry;
 struct TrackGameViewOwner : public GameObject {
     unsigned char field_0x2c[0x34 - 0x2c];
     UnknownKrustyBikeView* field_0x34;
-    unsigned char field_0x38[0x6c - 0x38];
+    unsigned char field_0x38[0x5c - 0x38];
+    GameObject* field_0x5c;                   // EventManager 0x0045cdc0 calls slot 4 on 0x5c..0x68
+    GameObject* field_0x60;
+    GameObject* field_0x64;
+    GameObject* field_0x68;
     UnknownMessageTarget* field_0x6c;
     float field_0x70;                         // compared with TrackGame+0x2eb0 (EventManager 0x0045eef0)
     unsigned char field_0x74[0xa8 - 0x74];
@@ -101,8 +105,12 @@ public:
     ~UnknownTrackGameObject574();             // 0x00464e90
     void UnknownFunction4e9b80(char* path);   // 0x004e9b80 (EventManager 0x0045cb70)
     void UnknownFunction4e9e30(char* name, const char* kind, int value); // 0x004e9e30
+    // 0x004ea390: writes the scene name for `field_0x24c` into `name`.
+    void UnknownFunction4ea390(char* name, char* scene, int value);
 
-    unsigned char field_0x00[0x394];
+    unsigned char field_0x00[0x24c];
+    char field_0x24c[0x40];                   // length not established
+    unsigned char field_0x28c[0x394 - 0x28c];
 };
 
 // Object at TrackGame+0x3338, deleted through its virtual destructor.
@@ -241,7 +249,9 @@ public:
     float field_0x2938;
     float field_0x293c;
     float field_0x2940;
-    unsigned char field_0x2944[0x2d70 - 0x2944];
+    unsigned char field_0x2944[0x2c68 - 0x2944];
+    int field_0x2c68;                          // mode 4 saves a ghost (EventManager 0x0045cdc0)
+    unsigned char field_0x2c6c[0x2d70 - 0x2c6c];
     int field_0x2d70;    // EventManager 0x0045e600 compares it with 2
     int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
     unsigned char field_0x2d78[0x2d7c - 0x2d78];
@@ -257,7 +267,8 @@ public:
     float field_0x2eb0;
     unsigned char field_0x2eb4[0x2eb8 - 0x2eb4];
     int field_0x2eb8;                          // mode 4 ranks by +0x768 (else +0x764) (EventManager 0x0045e9d0)
-    unsigned char field_0x2ebc[0x3338 - 0x2ebc];
+    unsigned char field_0x2ebc[0x3334 - 0x2ebc];
+    int field_0x3334;                          // saves a replay (EventManager 0x0045cdc0)
     DirectoryList* profileDirectory;
     int menuIsOpen;
     UnknownTrackGameObject3340* field_0x3340;

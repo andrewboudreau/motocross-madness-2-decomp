@@ -39,7 +39,6 @@ public:
 // of the root and calls its slot 5), with a flag byte at +0x2c.
 class UnknownGlobal56c470 : public GameObject {
 public:
-    void UnknownFunction4691f0();             // 0x004691f0
 
     unsigned char field_0x2c;
 };

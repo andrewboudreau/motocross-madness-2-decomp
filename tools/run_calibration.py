@@ -2965,6 +2965,15 @@ CASES = [
         'reason': 'block-scoped arrays share the frame; indexed entries; one-case switch; jump table',
     },
     {
+        'name': 'EventManager end race 0x45cdc0',
+        'bindings': 'src/reconstructed/EventManager.bindings.json',
+        'source': 'src/reconstructed/EventManager.cpp',
+        'symbol': '?UnknownFunction45cdc0@EventManager@@QAEXH@Z',
+        'target_va': '0x0045cdc0',
+        'target_size': 1194,
+        'reason': 'GetDate/TimeFormatA names; racer slot 4 through the virtual GameObject base',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

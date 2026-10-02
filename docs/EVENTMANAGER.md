@@ -12,7 +12,7 @@ TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
 ## Status
 
-Exact (25 calibration cases):
+Exact (26 calibration cases):
 - the constructor (11 0x50-byte entries at +0x50; -1000 in each component
   of +0x3c4) and both destructors;
 - slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c;
@@ -54,6 +54,13 @@ Exact (25 calibration cases):
   TrackGame+0x2eb0 (modes 0 and 4), all network racers done or a 30/120
   second grace (1, 2, 3, 5 online), or the local racer's finish (offline).
   The online branch's own finish calls are tail-merged with the shared ones;
+- `0x0045cdc0`: ends the race. With 1 it only calls slot 4 on the race
+  objects and racers. Otherwise it saves the replay as
+  `Record\<scene>_<racer>_<yyyyMMdd>_<HHmm>.vcr`, keeping only file-name
+  characters and adding a "M/d/yyyy h:mm tt" description. In mode 4 it
+  saves the `.gho` ghost through the view's `0x00524d00`. Then it releases
+  the first race-mode object. The racers' slot 4 goes through their virtual
+  GameObject base (vbptr at +0x04, matching KrustyBike's RTTI);
 - `0x0045e9d0`: ranks the racers into positions (+0x784), by +0x754 with
   `0x0045e930` in modes 1, 2, 3 and 5 online, else by +0x768 or +0x764
   with TrackOverlay's float comparator `0x005199f0`. It copies them into
@@ -81,7 +88,7 @@ it fits KrustyBike's primary base chain for the views. Their classes are not
 established; `src/reconstructed/RaceView.h` declares them.
 
 Not reconstructed:
-- `0x0045cdc0` and `0x0045d480`.
+- `0x0045d480` (4247 bytes).
 
 Near misses (`samples/game/EventManagerNearMisses.cpp`):
 - the cdecl progress callback `0x0045cb20` (63 of 67 bytes; retail swaps

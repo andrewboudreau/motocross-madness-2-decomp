@@ -49,7 +49,9 @@ public:
     UnknownKrustyUIGui* field_0x2c;
     unsigned char field_0x30[0x3c - 0x30];
     int field_0x3c;                           // current menu
-    unsigned char field_0x40[0x490 - 0x40];
+    unsigned char field_0x40[0x44 - 0x40];
+    int field_0x44;                           // cleared by EventManager 0x0045cdc0
+    unsigned char field_0x48[0x490 - 0x48];
     UnknownGameUiPage* field_0x490;
     void* field_0x494;                        // input context, restored to the window (EventManager 0x0045e710)
     int field_0x498;

@@ -11,6 +11,16 @@
 #include "QuarryEvent.h"
 #include "TrackGame.h"
 
+extern "C" __declspec(dllimport) int __stdcall GetDateFormatA(unsigned long locale, unsigned long flags,
+                                                              const void* date, const char* format,
+                                                              char* buffer, int size);
+extern "C" __declspec(dllimport) int __stdcall GetTimeFormatA(unsigned long locale, unsigned long flags,
+                                                              const void* time, const char* format,
+                                                              char* buffer, int size);
+
+// Characters kept in recording file names.
+#define FILE_NAME_CHARACTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-()$#"
+
 // Network messages handled by slot 24 (the layout depends on the type).
 struct UnknownEventPlayerMessage {
     int field_0x00;
@@ -752,5 +762,107 @@ void EventManager::UnknownFunction45e9d0() {
                 }
             }
         }
+    }
+}
+
+// 0x0045cdc0: ends the race. With `abort` 1 it only calls slot 4 on the race
+// objects and racers. Otherwise it saves the replay (Record\\<scene>_<racer>_
+// <date>_<time>.vcr, filtered to file-name characters) and, in mode 4, the
+// ghost (.gho), then releases the first race-mode object.
+void EventManager::UnknownFunction45cdc0(int abort) {
+    char date[32];
+    char scene[64];
+    char name[260];
+    char filtered[260];
+    g_UnknownGlobal56e26c->ui->field_0x44 = 0;
+    UnknownKrustyBikeView* view = UnknownFunction45d2f0();
+    TrackGameViewOwner* owner = UnknownFunction45d2b0();
+    g_UnknownGlobal56e26c->mode.UnknownFunction523580();
+    if (abort == 1) {
+        if (owner) {
+            if (owner->field_0x60)
+                owner->field_0x60->UnknownVirtualSlot4();
+            if (owner->field_0x5c)
+                owner->field_0x5c->UnknownVirtualSlot4();
+            if (owner->field_0x68)
+                owner->field_0x68->UnknownVirtualSlot4();
+            if (owner->field_0x64)
+                owner->field_0x64->UnknownVirtualSlot4();
+        }
+        view->field_0x50->UnknownVirtualSlot4();
+        if (view->field_0x44)
+            view->field_0x44->UnknownVirtualSlot4();
+        if (view->field_0x60)
+            view->field_0x60->UnknownVirtualSlot4();
+        int iterator = 0;
+        UnknownEventRacer* racer;
+        while ((racer = view->UnknownFunction4204e0(&iterator)) != 0)
+            racer->UnknownVirtualSlot4();
+        return;
+    }
+    if (view) {
+        if (g_UnknownGlobal56e26c->field_0x3334 && !g_UnknownGlobal56e26c->field_0x3428 &&
+            g_UnknownGlobal56e26c->field_0x2d70 != 4) {
+            char description[32];
+            char time[32];
+            g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea390(
+                scene, g_UnknownGlobal56e26c->sceneObject->field_0x24c, 0);
+            GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
+            GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));
+            sprintf(name, "%s_%s_%s_%s", scene, view->field_0x38->field_0x5e0, date, time);
+            int length = strlen(name);
+            int count = 0;
+            filtered[0] = 0;
+            for (int i = 0; i < length; i++) {
+                if (strchr(FILE_NAME_CHARACTERS, name[i]))
+                    filtered[count++] = name[i];
+            }
+            filtered[count] = 0;
+            sprintf(name, "Record\\%s.vcr", filtered);
+            GetDateFormatA(0, 0, 0, "M/d/yyyy", date, sizeof(date));
+            GetTimeFormatA(0, 0, 0, "h:mm tt", time, sizeof(time));
+            sprintf(description, "%s %s", date, time);
+            view->UnknownFunction420b00(name, description);
+        }
+        if (g_UnknownGlobal56e26c->field_0x2d70 == 4 && g_UnknownGlobal56e26c->field_0x2c68) {
+            char time[32];
+            g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea390(
+                scene, g_UnknownGlobal56e26c->sceneObject->field_0x24c, 0);
+            GetDateFormatA(0, 0, 0, "yyyyMMdd", date, sizeof(date));
+            GetTimeFormatA(0, 0, 0, "HHmm", time, sizeof(time));
+            sprintf(name, "%s_%s_%s_%s", scene, view->field_0x38->field_0x5e0, date, time);
+            int length = strlen(name);
+            int count = 0;
+            filtered[0] = 0;
+            for (int i = 0; i < length; i++) {
+                if (strchr(FILE_NAME_CHARACTERS, name[i]))
+                    filtered[count++] = name[i];
+            }
+            filtered[count] = 0;
+            sprintf(name, "Record\\%s.gho", filtered);
+            if (view->field_0x1a8)
+                view->field_0x1a8->UnknownFunction524d00(name);
+        }
+    }
+    if (g_UnknownGlobal56e26c->field_0x558) {
+        g_UnknownGlobal56e26c->field_0x558->UnknownFunction4691f0();
+        g_UnknownGlobal56e26c->field_0x558->Release();
+        g_UnknownGlobal56e26c->field_0x558 = 0;
+    } else if (g_UnknownGlobal56e26c->field_0x55c) {
+        g_UnknownGlobal56e26c->field_0x55c->UnknownFunction4691f0();
+        g_UnknownGlobal56e26c->field_0x55c->Release();
+        g_UnknownGlobal56e26c->field_0x55c = 0;
+    } else if (g_UnknownGlobal56e26c->field_0x560) {
+        g_UnknownGlobal56e26c->field_0x560->UnknownFunction4691f0();
+        g_UnknownGlobal56e26c->field_0x560->Release();
+        g_UnknownGlobal56e26c->field_0x560 = 0;
+    } else if (g_UnknownGlobal56e26c->field_0x564) {
+        g_UnknownGlobal56e26c->field_0x564->UnknownFunction4691f0();
+        g_UnknownGlobal56e26c->field_0x564->Release();
+        g_UnknownGlobal56e26c->field_0x564 = 0;
+    } else if (g_UnknownGlobal56e26c->field_0x568) {
+        g_UnknownGlobal56e26c->field_0x568->UnknownFunction4691f0();
+        g_UnknownGlobal56e26c->field_0x568->Release();
+        g_UnknownGlobal56e26c->field_0x568 = 0;
     }
 }

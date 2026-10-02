@@ -47,6 +47,7 @@ public:
     // 0x00469190: appends `child` (and its later siblings) to the children;
     // not reconstructed.
     int UnknownFunction469190(GameObject* child, int value);
+    void UnknownFunction4691f0();          // 0x004691f0
     // 0x00469680: releases this object and every later sibling, back to front.
     int UnknownFunction469680();
     // 0x00469ce0: appends the RTTI class name of `object` to field_0x28.
