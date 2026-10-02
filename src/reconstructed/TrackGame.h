@@ -6,6 +6,7 @@
 #include "KrustyUI.h"
 #include "MemTag.h"
 #include "PCGame.h"
+#include "UnknownResourceManager.h"
 #include "RaceView.h"
 
 struct UnknownInputEntry;
@@ -189,14 +190,6 @@ public:
 
 // cdecl 0x00520820 (near TrackRecord.cpp's literals): logs a message.
 void UnknownFunction520820(const char* message);
-
-// Global at 0x00572b44; its code is among ResourceManager.cpp's literals.
-// No RTTI names it.
-class UnknownResourceManager {
-public:
-    void UnknownFunction4e9030(const char* path, int flags);  // 0x004e9030: adds an archive
-};
-extern UnknownResourceManager* g_UnknownResourceManager572b44;
 
 // Global object at 0x0068a48c, deleted by TrackGame's destructor.
 class UnknownTrackGameGlobal68a48c {
