@@ -6,7 +6,7 @@
 
 // 0x004c48c0
 PCMouseDevice::PCMouseDevice() {
-    memset(field_0x2d8, 0, sizeof(field_0x2d8));
+    memset(movement, 0, sizeof(movement));
 }
 
 // 0x004c4970: creates the system mouse device, records its axis and button
@@ -14,24 +14,24 @@ PCMouseDevice::PCMouseDevice() {
 // buffer, then acquires it.
 int PCMouseDevice::UnknownVirtualSlot2() {
     UnknownDeviceCaps caps;
-    if (g_UnknownGlobal56e26c->field_0x14->field_0xcc0->UnknownMethod9(
-            GUID_SysMouse, IID_IDirectInputDevice7A, &field_0x25c, 0) < 0)
+    if (g_UnknownGlobal56e26c->field_0x14->directInput->CreateDeviceEx(
+            GUID_SysMouse, IID_IDirectInputDevice7A, &device, 0) < 0)
         goto failed;
     caps.size = sizeof(caps);
-    if (field_0x25c->UnknownMethod3(&caps) < 0)
+    if (device->GetCapabilities(&caps) < 0)
         goto failed;
-    field_0x08 = caps.buttons;
-    field_0x04 = caps.axes;
-    if (field_0x25c->UnknownMethod11(&c_dfDIMouse) < 0)
+    buttonCount = caps.buttons;
+    axisCount = caps.axes;
+    if (device->SetDataFormat(&c_dfDIMouse) < 0)
         goto failed;
-    if (field_0x25c->UnknownMethod13(g_UnknownGlobal56e26c->field_0x31c, 5) < 0)
+    if (device->SetCooperativeLevel(g_UnknownGlobal56e26c->field_0x31c, 5) < 0)
         goto failed;
-    field_0x18.size = sizeof(field_0x18);
-    field_0x25c->UnknownMethod15(&field_0x18);
+    deviceInfo.size = sizeof(deviceInfo);
+    device->GetDeviceInfo(&deviceInfo);
     UnknownVirtualSlot3();
     if (!UnknownMethod4c2710(1, 0, 0, 16))
         goto failed;
-    if (field_0x25c->UnknownMethod7() < 0)
+    if (device->Acquire() < 0)
         goto failed;
     return 1;
 failed:
@@ -40,27 +40,27 @@ failed:
 
 // 0x004c4a50: mouse subtypes 3-5 select modes 0-2 in +0x10.
 void PCMouseDevice::UnknownVirtualSlot3() {
-    int subtype = DEVICE_SUBTYPE(field_0x18.deviceType);
+    int subtype = DEVICE_SUBTYPE(deviceInfo.deviceType);
     if (subtype == 3)
-        field_0x10 = 0;
+        deviceSubtype = 0;
     else if (subtype == 4)
-        field_0x10 = 1;
+        deviceSubtype = 1;
     else if (subtype == 5)
-        field_0x10 = 2;
+        deviceSubtype = 2;
 }
 
 // 0x004c4a90: whether `button` is down (with `modifier` held, when there is
 // a keyboard); copies its entry.
 int PCMouseDevice::UnknownVirtualSlot5(int button, int modifier, UnknownInputEntry* entry) {
-    KeyboardDevice* keyboard = g_UnknownGlobal56e26c->field_0x14->field_0x34;
+    KeyboardDevice* keyboard = g_UnknownGlobal56e26c->field_0x14->keyboard;
     if ((!keyboard || keyboard->UnknownFunction48a240(modifier)) &&
-        field_0x260[button].state == 1) {
+        buttonStates[button].state == 1) {
         if (entry) {
             entry->state = 1;
-            entry->field_0x04 = field_0x260[button].field_0x04;
-            entry->field_0x08 = field_0x260[button].field_0x08;
-            entry->field_0x0c = field_0x260[button].field_0x0c;
-            entry->field_0x10 = field_0x260[button].field_0x10;
+            entry->releaseTime = buttonStates[button].releaseTime;
+            entry->pressTime = buttonStates[button].pressTime;
+            entry->previousReleaseTime = buttonStates[button].previousReleaseTime;
+            entry->previousPressTime = buttonStates[button].previousPressTime;
         }
         return 1;
     }
@@ -75,53 +75,53 @@ int PCMouseDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInputEn
     if (control < 0) {
         switch (control) {
         case -2:
-            if (field_0x2d8[0] < -30)
+            if (movement[0] < -30)
                 return 1;
             break;
         case -3:
-            if (field_0x2d8[0] > 30)
+            if (movement[0] > 30)
                 return 1;
             break;
         case -4:
-            if (field_0x2d8[1] < -30)
+            if (movement[1] < -30)
                 return 1;
             break;
         case -5:
-            if (field_0x2d8[1] > 30)
+            if (movement[1] > 30)
                 return 1;
             break;
         case -14:
-            if (field_0x260[0].field_0x08 != field_0x260[0].field_0x10 &&
-                field_0x260[0].state == 1 &&
-                field_0x260[0].field_0x08 - field_0x260[0].field_0x10 < 175)
+            if (buttonStates[0].pressTime != buttonStates[0].previousPressTime &&
+                buttonStates[0].state == 1 &&
+                buttonStates[0].pressTime - buttonStates[0].previousPressTime < 175)
                 return 1;
             break;
         case -15:
-            if (field_0x260[1].field_0x08 != field_0x260[1].field_0x10 &&
-                field_0x260[1].state == 1 &&
-                field_0x260[1].field_0x08 - field_0x260[1].field_0x10 < 175)
+            if (buttonStates[1].pressTime != buttonStates[1].previousPressTime &&
+                buttonStates[1].state == 1 &&
+                buttonStates[1].pressTime - buttonStates[1].previousPressTime < 175)
                 return 1;
             break;
         case -16:
-            if (field_0x260[0].state == 1 && UnknownVirtualSlot4(-2, 0x3f, 0))
+            if (buttonStates[0].state == 1 && UnknownVirtualSlot4(-2, 0x3f, 0))
                 return 1;
             break;
         case -17:
-            if (field_0x260[0].state == 1 && UnknownVirtualSlot4(-3, 0x3f, 0))
+            if (buttonStates[0].state == 1 && UnknownVirtualSlot4(-3, 0x3f, 0))
                 return 1;
             break;
         case -18:
-            if (field_0x260[0].state == 1 && UnknownVirtualSlot4(-4, 0x3f, 0))
+            if (buttonStates[0].state == 1 && UnknownVirtualSlot4(-4, 0x3f, 0))
                 return 1;
             break;
         case -19:
-            if (field_0x260[0].state == 1 && UnknownVirtualSlot4(-5, 0x3f, 0))
+            if (buttonStates[0].state == 1 && UnknownVirtualSlot4(-5, 0x3f, 0))
                 return 1;
             break;
         }
         return 0;
     }
-    UnknownControlMapping* mapping = g_UnknownGlobal56e26c->field_0x14->field_0xcbc;
+    UnknownControlMapping* mapping = g_UnknownGlobal56e26c->field_0x14->mapping;
     if (!mapping)
         return 0;
     mapping->UnknownFunction43cc10(control, &control);
@@ -137,21 +137,21 @@ int PCMouseDevice::UnknownVirtualSlot6(int value) {
     UnknownDeviceObjectData events[16];
     long count;
     int i;
-    if (!field_0x25c)
+    if (!device)
         return 0;
     count = -1;
     long result;
-    result = field_0x25c->UnknownMethod10(sizeof(UnknownDeviceObjectData), 0, &count, 1);
+    result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, 1);
     if (result == (long)0x8007001e || result == (long)0x8007000c) {
-        if (field_0x25c->UnknownMethod7() < 0) {
+        if (device->Acquire() < 0) {
             UnknownReportError(result, __FILE__, 1316);
             return 0;
         }
-        result = field_0x25c->UnknownMethod10(sizeof(UnknownDeviceObjectData), 0, &count, 1);
+        result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, 1);
     }
     if (result < 0)
         goto failed;
-    if (field_0x25c->UnknownMethod10(sizeof(UnknownDeviceObjectData), events, &count, 0) < 0)
+    if (device->GetDeviceData(sizeof(UnknownDeviceObjectData), events, &count, 0) < 0)
         goto failed;
     for (i = 0; i < count; i++) {
         int button;
@@ -172,21 +172,21 @@ int PCMouseDevice::UnknownVirtualSlot6(int value) {
             continue;
         }
         if (events[i].data & 0x80) {
-            field_0x260[button].state = 1;
-            field_0x260[button].field_0x10 = field_0x260[button].field_0x08;
-            field_0x260[button].field_0x08 = events[i].timeStamp;
-            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(button, field_0x0c, 1, 0);
+            buttonStates[button].state = 1;
+            buttonStates[button].previousPressTime = buttonStates[button].pressTime;
+            buttonStates[button].pressTime = events[i].timeStamp;
+            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(button, deviceKind, 1, 0);
         } else {
-            field_0x260[button].state = 0;
-            field_0x260[button].field_0x0c = field_0x260[button].field_0x04;
-            field_0x260[button].field_0x04 = events[i].timeStamp;
-            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(button, field_0x0c, 0, 0);
+            buttonStates[button].state = 0;
+            buttonStates[button].previousReleaseTime = buttonStates[button].releaseTime;
+            buttonStates[button].releaseTime = events[i].timeStamp;
+            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(button, deviceKind, 0, 0);
         }
     }
-    if (field_0x25c->UnknownMethod9(sizeof(field_0x2d8), field_0x2d8) < 0)
+    if (device->GetDeviceState(sizeof(movement), movement) < 0)
         goto failed;
-    UnknownFunction48a550(0, (float)field_0x2d8[0]);
-    UnknownFunction48a550(1, (float)field_0x2d8[1]);
+    UnknownFunction48a550(0, (float)movement[0]);
+    UnknownFunction48a550(1, (float)movement[1]);
     return 1;
 failed:
     return 0;

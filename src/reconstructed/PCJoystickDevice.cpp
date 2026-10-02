@@ -9,24 +9,24 @@
 // 0x004c2770: repeats JoystickDevice's initialisation with PCJoystickDevice's
 // own fields interleaved.
 PCJoystickDevice::PCJoystickDevice(int index) : JoystickDevice(index) {
-    field_0x260 = index;
+    joystickIndex = index;
     for (int k = 0; k < 5; k++)
         field_0x578[k] = 0;
     for (int i = 0; i < 6; i++) {
         field_0x58c[i] = 0;
-        field_0x4e4[i] = 0;
+        axisValues[i] = 0;
         field_0x5a4[i] = 0;
-        field_0x4fc[i].Init(1, 1);
+        axisBindings[i].Init(1, 1);
     }
     for (int j = 0; j < 32; j++)
-        field_0x264[j].state = 0;
+        buttonStates[j].state = 0;
     for (int n = 0; n < 4; n++)
         field_0x5d8[n] = -1;
     field_0x5e8 = 0;
     field_0x5d4_bit0 = 1;
     field_0x5d4_bit1 = 1;
     field_0x5d5 = 0;
-    field_0x574_bit0 = g_UnknownGlobal56e26c->UnknownVirtualSlot22("JoyDirectionFlipped", 0);
+    directionFlipped = g_UnknownGlobal56e26c->UnknownVirtualSlot22("JoyDirectionFlipped", 0);
 }
 
 // 0x004c28d0: releases the effects and resets the device (calls bind
@@ -44,34 +44,34 @@ int PCJoystickDevice::UnknownFunction4c2930(const UnknownDeviceInstance* instanc
     UnknownDeviceCaps caps;
     int half;
     const UnknownGuid& guid = instance->instanceGuid;
-    if (g_UnknownGlobal56e26c->field_0x14->field_0xcc0->UnknownMethod9(
-            guid, IID_IDirectInputDevice7A, &field_0x25c, 0) < 0)
+    if (g_UnknownGlobal56e26c->field_0x14->directInput->CreateDeviceEx(
+            guid, IID_IDirectInputDevice7A, &device, 0) < 0)
         goto failed;
-    field_0x18 = *instance;
-    field_0x18.size = sizeof(field_0x18);
-    field_0x25c->UnknownMethod15(&field_0x18);
+    deviceInfo = *instance;
+    deviceInfo.size = sizeof(deviceInfo);
+    device->GetDeviceInfo(&deviceInfo);
     UnknownVirtualSlot19();
-    if (g_UnknownGlobal56e26c->field_0x14->field_0xcc0->UnknownMethod5(guid) < 0)
+    if (g_UnknownGlobal56e26c->field_0x14->directInput->GetDeviceStatus(guid) < 0)
         goto failed;
-    if (field_0x25c->UnknownMethod11(&c_dfDIJoystick) < 0)
+    if (device->SetDataFormat(&c_dfDIJoystick) < 0)
         goto failed;
-    if (field_0x25c->UnknownMethod13(g_UnknownGlobal56e26c->field_0x31c, 5) < 0)
+    if (device->SetCooperativeLevel(g_UnknownGlobal56e26c->field_0x31c, 5) < 0)
         goto failed;
     caps.size = sizeof(caps);
-    if (field_0x25c->UnknownMethod3(&caps) < 0)
+    if (device->GetCapabilities(&caps) < 0)
         goto failed;
-    field_0x08 = caps.buttons;
-    field_0x04 = caps.axes;
+    buttonCount = caps.buttons;
+    axisCount = caps.axes;
     if (caps.flags & 0x100)
-        field_0x0c = 3;
+        deviceKind = 3;
     field_0x5e8 = caps.povs > 1 ? caps.povs : 1;
-    field_0x25c->UnknownMethod4(UnknownEnumObjectsCallback, this, 3);
+    device->EnumObjects(UnknownEnumObjectsCallback, this, 3);
     range.size = sizeof(range);
     range.headerSize = 0x10;
     range.how = 1;
     if (field_0x14_axis0) {
         range.object = 0;
-        if (field_0x25c->UnknownMethod5(4, &range) < 0)
+        if (device->GetProperty(4, &range) < 0)
             goto failed;
         field_0x58c[0] = (float)range.maximum;
         half = (range.maximum + 1) / 2;
@@ -79,7 +79,7 @@ int PCJoystickDevice::UnknownFunction4c2930(const UnknownDeviceInstance* instanc
     }
     if (field_0x14_axis1) {
         range.object = 4;
-        if (field_0x25c->UnknownMethod5(4, &range) < 0)
+        if (device->GetProperty(4, &range) < 0)
             goto failed;
         field_0x58c[1] = (float)range.maximum;
         half = (range.maximum + 1) / 2;
@@ -87,7 +87,7 @@ int PCJoystickDevice::UnknownFunction4c2930(const UnknownDeviceInstance* instanc
     }
     if (field_0x14_axis2) {
         range.object = 8;
-        if (field_0x25c->UnknownMethod5(4, &range) < 0)
+        if (device->GetProperty(4, &range) < 0)
             goto failed;
         field_0x58c[2] = (float)range.maximum;
         half = (range.maximum + 1) / 2;
@@ -95,7 +95,7 @@ int PCJoystickDevice::UnknownFunction4c2930(const UnknownDeviceInstance* instanc
     }
     if (field_0x14_axis3) {
         range.object = 12;
-        if (field_0x25c->UnknownMethod5(4, &range) < 0)
+        if (device->GetProperty(4, &range) < 0)
             goto failed;
         field_0x58c[3] = (float)range.maximum;
         half = (range.maximum + 1) / 2;
@@ -103,7 +103,7 @@ int PCJoystickDevice::UnknownFunction4c2930(const UnknownDeviceInstance* instanc
     }
     if (field_0x14_axis4) {
         range.object = 16;
-        if (field_0x25c->UnknownMethod5(4, &range) < 0)
+        if (device->GetProperty(4, &range) < 0)
             goto failed;
         field_0x58c[4] = (float)range.maximum;
         half = (range.maximum + 1) / 2;
@@ -111,20 +111,20 @@ int PCJoystickDevice::UnknownFunction4c2930(const UnknownDeviceInstance* instanc
     }
     if (field_0x14_axis5) {
         range.object = 20;
-        if (field_0x25c->UnknownMethod5(4, &range) < 0)
+        if (device->GetProperty(4, &range) < 0)
             goto failed;
         field_0x58c[5] = (float)range.maximum;
         half = (range.maximum + 1) / 2;
         field_0x5bc[5] = half / (half - half * 0.05f);
     }
-    if (field_0x0c == 3)
+    if (deviceKind == 3)
         UnknownVirtualSlot5(0);
     UnknownMethod4c3a10(g_UnknownGlobal56e26c->UnknownVirtualSlot22("BufferedJoystick", 1));
     return 1;
 failed:
-    if (field_0x25c) {
-        field_0x25c->UnknownMethod2();
-        field_0x25c = 0;
+    if (device) {
+        device->Release();
+        device = 0;
     }
     return 0;
 }
@@ -135,7 +135,7 @@ int __stdcall PCJoystickDevice::UnknownEnumObjectsCallback(const UnknownObjectIn
     PCJoystickDevice* device = (PCJoystickDevice*)context;
     UnknownObjectInstance info;
     info.size = sizeof(info);
-    if (device->field_0x25c->UnknownMethod14(&info, object->type, 2) >= 0) {
+    if (device->device->GetObjectInfo(&info, object->type, 2) >= 0) {
         if (!memcmp(&object->guidType, &GUID_XAxis, sizeof(UnknownGuid)))
             device->field_0x14_axis0 = 1;
         if (!memcmp(&object->guidType, &GUID_YAxis, sizeof(UnknownGuid)))
@@ -155,11 +155,11 @@ int __stdcall PCJoystickDevice::UnknownEnumObjectsCallback(const UnknownObjectIn
 // 0x004c2d90: like KeyboardDevice 0x0048a0c0, with the axis below 16384
 // stepping the bindings down and above 49152 stepping them up.
 void PCJoystickDevice::UnknownMethod4c2d90(int axis, int value) {
-    for (int i = 0; i < field_0x4fc[axis].m_count; i++) {
-        UnknownControlBinding* binding = field_0x4fc[axis].Get(i);
+    for (int i = 0; i < axisBindings[axis].m_count; i++) {
+        UnknownControlBinding* binding = axisBindings[axis].Get(i);
         binding->field_0x18 += g_UnknownGlobal56e26c->field_0x2f0;
         binding->field_0x14 += g_UnknownGlobal56e26c->field_0x2f0;
-        if (field_0x4e4[axis] < 16384.0f) {
+        if (axisValues[axis] < 16384.0f) {
             if (binding->field_0x14 - g_UnknownGlobal56e26c->field_0x2f0 > binding->field_0x20) {
                 binding->UnknownFunction43cd10();
                 binding->field_0x14 = 0;
@@ -168,7 +168,7 @@ void PCJoystickDevice::UnknownMethod4c2d90(int axis, int value) {
                 binding->UnknownFunction43cd90(-binding->field_0x1c);
                 binding->field_0x14 -= binding->field_0x20;
             }
-        } else if (field_0x4e4[axis] > 49152.0f) {
+        } else if (axisValues[axis] > 49152.0f) {
             if (binding->field_0x18 - g_UnknownGlobal56e26c->field_0x2f0 > binding->field_0x20) {
                 binding->UnknownFunction43cd10();
                 binding->field_0x18 = 0;
@@ -305,7 +305,7 @@ int PCJoystickDevice::UnknownVirtualSlot4(int index, float* x, float* y) {
 
 // 0x004c3c10: property 9 (consistent with DIPROP_AUTOCENTER) for device type 3.
 int PCJoystickDevice::UnknownVirtualSlot5(int enable) {
-    if (field_0x0c == 3)
+    if (deviceKind == 3)
         return UnknownMethod4c2710(9, 0, 0, enable != 0);
     return 0;
 }
@@ -313,7 +313,7 @@ int PCJoystickDevice::UnknownVirtualSlot5(int enable) {
 // 0x004c3c40: creates effect `effect` as a constant force on the X and Y
 // axes (gain 9000, no trigger).
 int PCJoystickDevice::UnknownVirtualSlot6(int effect, long magnitude, unsigned long duration) {
-    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+    if (device && deviceKind == 3 && effect < 5) {
         unsigned long axes[2];
         long direction[2];
         UnknownEffectParams params;
@@ -335,27 +335,27 @@ int PCJoystickDevice::UnknownVirtualSlot6(int effect, long magnitude, unsigned l
         params.envelope = 0;
         params.typeSpecificSize = sizeof(force);
         params.typeSpecific = &force;
-        return field_0x25c->UnknownMethod18(GUID_ConstantForce, &params, &field_0x578[effect], 0) >= 0;
+        return device->CreateEffect(GUID_ConstantForce, &params, &field_0x578[effect], 0) >= 0;
     }
     return 0;
 }
 
 // 0x004c3d20: sets the direction (slot 8), then the magnitude.
 int PCJoystickDevice::UnknownVirtualSlot7(int effect, long* direction, long magnitude) {
-    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+    if (device && deviceKind == 3 && effect < 5) {
         long force = magnitude;
         UnknownVirtualSlot8(effect, direction);
         UnknownEffectParams params = { sizeof(params) };
         params.typeSpecificSize = sizeof(force);
         params.typeSpecific = &force;
-        return field_0x578[effect]->UnknownMethod6(&params, 0x100) >= 0;
+        return field_0x578[effect]->SetParameters(&params, 0x100) >= 0;
     }
     return 0;
 }
 
 // 0x004c3db0: sets a two-value direction.
 int PCJoystickDevice::UnknownVirtualSlot8(int effect, long* direction) {
-    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+    if (device && deviceKind == 3 && effect < 5) {
         long value[2];
         value[0] = direction[0];
         value[1] = direction[1];
@@ -364,7 +364,7 @@ int PCJoystickDevice::UnknownVirtualSlot8(int effect, long* direction) {
         params.axisCount = 2;
         params.axes = 0;
         params.direction = value;
-        return field_0x578[effect]->UnknownMethod6(&params, 0x40) >= 0;
+        return field_0x578[effect]->SetParameters(&params, 0x40) >= 0;
     }
     return 0;
 }
@@ -375,7 +375,7 @@ int PCJoystickDevice::UnknownVirtualSlot9(int effect, unsigned long duration, lo
                                           long magnitude, unsigned long attackTime,
                                           unsigned long attackLevel, unsigned long fadeTime,
                                           unsigned long fadeLevel, int button) {
-    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+    if (device && deviceKind == 3 && effect < 5) {
         unsigned long axes[2];
         long directions[2];
         UnknownEnvelope envelope;
@@ -403,7 +403,7 @@ int PCJoystickDevice::UnknownVirtualSlot9(int effect, unsigned long duration, lo
         params.envelope = &envelope;
         params.typeSpecificSize = sizeof(force);
         params.typeSpecific = &force;
-        return field_0x25c->UnknownMethod18(GUID_ConstantForce, &params, &field_0x578[effect], 0) >= 0;
+        return device->CreateEffect(GUID_ConstantForce, &params, &field_0x578[effect], 0) >= 0;
     }
     return 0;
 }
@@ -414,7 +414,7 @@ int PCJoystickDevice::UnknownVirtualSlot10(int effect, unsigned long duration, u
                                            unsigned long magnitude, unsigned long attackTime,
                                            unsigned long attackLevel, unsigned long fadeTime,
                                            unsigned long fadeLevel, int button) {
-    if (field_0x25c && field_0x0c == 3 && effect < 5) {
+    if (device && deviceKind == 3 && effect < 5) {
         unsigned long axes[2];
         long direction[2];
         UnknownPeriodic wave;
@@ -446,31 +446,31 @@ int PCJoystickDevice::UnknownVirtualSlot10(int effect, unsigned long duration, u
         params.envelope = &envelope;
         params.typeSpecificSize = sizeof(wave);
         params.typeSpecific = &wave;
-        return field_0x25c->UnknownMethod18(GUID_Square, &params, &field_0x578[effect], 0) >= 0;
+        return device->CreateEffect(GUID_Square, &params, &field_0x578[effect], 0) >= 0;
     }
     return 0;
 }
 
 // 0x004c40b0: stops effect `effect`.
 int PCJoystickDevice::UnknownVirtualSlot11(int effect) {
-    if (field_0x25c && effect < 5 && field_0x578[effect] && field_0x0c == 3)
-        return field_0x578[effect]->UnknownMethod8() >= 0;
+    if (device && effect < 5 && field_0x578[effect] && deviceKind == 3)
+        return field_0x578[effect]->Stop() >= 0;
     return 0;
 }
 
 // 0x004c40f0: starts effect `effect`.
 int PCJoystickDevice::UnknownVirtualSlot12(int effect, unsigned long iterations,
                                            unsigned long flags) {
-    if (field_0x25c && effect < 5 && field_0x578[effect] && field_0x0c == 3)
-        return field_0x578[effect]->UnknownMethod7(iterations, flags) >= 0;
+    if (device && effect < 5 && field_0x578[effect] && deviceKind == 3)
+        return field_0x578[effect]->Start(iterations, flags) >= 0;
     return 0;
 }
 
 // 0x004c4140: nonzero while effect `effect` reports status 1 (playing).
 int PCJoystickDevice::UnknownVirtualSlot13(int effect) {
-    if (field_0x25c && effect < 5 && field_0x578[effect] && field_0x0c == 3) {
+    if (device && effect < 5 && field_0x578[effect] && deviceKind == 3) {
         unsigned long status;
-        field_0x578[effect]->UnknownMethod9(&status);
+        field_0x578[effect]->GetEffectStatus(&status);
         return status == 1;
     }
     return 0;
@@ -478,15 +478,15 @@ int PCJoystickDevice::UnknownVirtualSlot13(int effect) {
 
 // 0x004c3af0: joystick subtypes 4-7 are recorded in +0x10.
 void PCJoystickDevice::UnknownVirtualSlot19() {
-    int subtype = DEVICE_SUBTYPE(field_0x18.deviceType);
+    int subtype = DEVICE_SUBTYPE(deviceInfo.deviceType);
     if (subtype == 4)
-        field_0x10 = subtype;
+        deviceSubtype = subtype;
     else if (subtype == 5)
-        field_0x10 = subtype;
+        deviceSubtype = subtype;
     else if (subtype == 6)
-        field_0x10 = subtype;
+        deviceSubtype = subtype;
     else if (subtype == 7)
-        field_0x10 = subtype;
+        deviceSubtype = subtype;
 }
 
 // 0x00689958: effects stored by the enumeration callback.
@@ -510,19 +510,19 @@ static int __stdcall UnknownEnumEffectsCallback(const UnknownEffectInfo* info, v
 // 0x004c4190: clears five entries, then enumerates the device's effects into
 // `effects` and stores how many were found.
 int PCJoystickDevice::UnknownVirtualSlot14(UnknownEffectInfo* effects, int* count) {
-    if (field_0x0c != 3)
+    if (deviceKind != 3)
         return 0;
     for (int i = 0; i < 5; i++) {
         memset(&effects[i], 0, sizeof(effects[i]));
         effects[i].size = sizeof(effects[i]);
     }
-    if (!field_0x25c)
+    if (!device)
         return 0;
     char text[256];
     sprintf(text, "ForceFeedback Joystick Detected\nJoystickDevice::EnumEffects ('%s')\n",
-            field_0x18.productName);
+            deviceInfo.productName);
     s_UnknownEffectCount = 0;
-    if (field_0x25c->UnknownMethod19(UnknownEnumEffectsCallback, effects, 0) < 0)
+    if (device->EnumEffects(UnknownEnumEffectsCallback, effects, 0) < 0)
         return 0;
     *count = s_UnknownEffectCount;
     return 1;
@@ -534,7 +534,7 @@ int PCJoystickDevice::UnknownVirtualSlot14(UnknownEffectInfo* effects, int* coun
 inline int PCJoystickDevice::CheckPollResult(long result) {
     if (result < 0) {
         if (result == (long)0x8007001e || result == (long)0x8007000c) {
-            if (field_0x25c->UnknownMethod7() < 0) {
+            if (device->Acquire() < 0) {
                 UnknownReportError(result, __FILE__, 540);
                 return 0;
             }
@@ -550,15 +550,15 @@ inline int PCJoystickDevice::CheckPollResult(long result) {
 // the buffered (bit 0 of +0x5d4) or immediate reader. Gamepads with bit 1 also run
 // 0x004c2d90 for each of the six lists.
 int PCJoystickDevice::UnknownVirtualSlot20(int value) {
-    if (!field_0x25c)
+    if (!device)
         return 0;
-    if (!CheckPollResult(field_0x25c->UnknownMethod25()))
+    if (!CheckPollResult(device->Poll()))
         return 0;
     if (field_0x5d4_bit0)
         UnknownMethod4c3100(value);
     else
         UnknownMethod4c3790(value);
-    if (DEVICE_SUBTYPE(field_0x18.deviceType) == 4 && field_0x5d4_bit1) {
+    if (DEVICE_SUBTYPE(deviceInfo.deviceType) == 4 && field_0x5d4_bit1) {
         for (int i = 0; i < 6; i++)
             UnknownMethod4c2d90(i, value);
     }
@@ -568,9 +568,9 @@ int PCJoystickDevice::UnknownVirtualSlot20(int value) {
 // 0x004c3a10: switches buffered input on (16 entries) or off. Property 1 is
 // consistent with DIPROP_BUFFERSIZE; the device is unacquired around it.
 int PCJoystickDevice::UnknownMethod4c3a10(int buffered) {
-    if (!field_0x25c)
+    if (!device)
         return 0;
-    field_0x25c->UnknownMethod8();
+    device->Unacquire();
     UnknownInputProperty property;
     memset(&property, 0, sizeof(property));
     property.size = sizeof(property);
@@ -578,13 +578,13 @@ int PCJoystickDevice::UnknownMethod4c3a10(int buffered) {
     property.object = 0;
     property.how = 0;
     property.data = buffered ? 16 : 0;
-    long result = field_0x25c->UnknownMethod6(1, &property);
+    long result = device->SetProperty(1, &property);
     if (result < 0) {
         UnknownReportError(result, __FILE__, 590);
         goto failed;
     }
     field_0x5d4_bit0 = buffered;
-    if (field_0x25c->UnknownMethod7() < 0)
+    if (device->Acquire() < 0)
         goto failed;
     return 1;
 failed:
@@ -600,7 +600,7 @@ void PCJoystickDevice::UnknownMethod4c3ae0(unsigned char value) {
 void PCJoystickDevice::UnknownVirtualSlot15() {
     for (int i = 0; i < 5; i++) {
         if (field_0x578[i]) {
-            field_0x578[i]->UnknownMethod2();
+            field_0x578[i]->Release();
             field_0x578[i] = 0;
         }
     }
@@ -608,21 +608,21 @@ void PCJoystickDevice::UnknownVirtualSlot15() {
 
 // 0x004c4350: command 1.
 int PCJoystickDevice::UnknownVirtualSlot16() {
-    if (field_0x25c && field_0x0c == 3)
+    if (device && deviceKind == 3)
         return UnknownVirtualSlot17(1);
     return 0;
 }
 
 // 0x004c4370
 int PCJoystickDevice::UnknownVirtualSlot17(int command) {
-    if (field_0x25c && field_0x0c == 3)
-        field_0x25c->UnknownMethod22(command);
+    if (device && deviceKind == 3)
+        device->SendForceFeedbackCommand(command);
     return 0;
 }
 
 // 0x004c4390: command 4 when paused, 8 when resumed.
 int PCJoystickDevice::UnknownVirtualSlot18(int paused) {
-    if (field_0x0c == 3) {
+    if (deviceKind == 3) {
         if (paused)
             return UnknownVirtualSlot17(4);
         return UnknownVirtualSlot17(8);

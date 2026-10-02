@@ -27,7 +27,7 @@ public:
     friend class ControlInterface; // reads the input entries
 
 protected:
-    UnknownInputEntry field_0x260[256];
-    ContainerList<UnknownControlBinding*> field_0x1660[6];
-    int field_0x16d8;             // current modifier state
+    UnknownInputEntry keyStates[256];
+    ContainerList<UnknownControlBinding*> axisBindings[6];
+    int modifierState;             // current modifier state
 };

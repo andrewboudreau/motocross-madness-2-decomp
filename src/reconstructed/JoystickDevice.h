@@ -51,9 +51,9 @@ public:
     friend class ControlInterface; // reads the input entries
 
 protected:
-    int field_0x260;                     // constructor argument
-    UnknownInputEntry field_0x264[32];
-    float field_0x4e4[6];                // axis values
-    ContainerList<UnknownControlBinding*> field_0x4fc[6]; // bindings per axis
-    unsigned char field_0x574_bit0 : 1;  // "JoyDirectionFlipped" setting
+    int joystickIndex;                     // constructor argument
+    UnknownInputEntry buttonStates[32];
+    float axisValues[6];                // axis values
+    ContainerList<UnknownControlBinding*> axisBindings[6]; // bindings per axis
+    unsigned char directionFlipped : 1;  // "JoyDirectionFlipped" setting
 };
