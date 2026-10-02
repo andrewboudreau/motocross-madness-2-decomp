@@ -1,5 +1,6 @@
 #include "KrustyUI.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "DebugAlloc.h"
@@ -10,6 +11,10 @@
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block.
 void* UnknownFunction47b570(void* block, unsigned int size);
+
+// Global at 0x0068a498: 36 short strings loaded from string resources
+// 5000-5035 (KrustyUI 0x004988a0).
+char g_UnknownStrings68a498[36][16];
 
 // cdecl 0x005053b0, called first on shutdown with 0.
 void UnknownFunction5053b0(int value);
@@ -176,4 +181,32 @@ int KrustyUI::UnknownFunction49ba70(int a, int b, int c, const char* name, int d
     field_0x60[field_0x64].field_0x0c = d;
     field_0x60[field_0x64].field_0x10 = e;
     return ++field_0x64 - 1;
+}
+
+// A random value in [0, 1).
+static inline float RandomUnit() {
+    return rand() * (1.0f / 32768);
+}
+
+// 0x0049b020
+void KrustyUI::UnknownFunction49b020(const char** names, int count) {
+    int* used = (int*)DebugCalloc(36, sizeof(int), __FILE__, 1120);
+    srand(UnknownFunction4bfa80());
+    for (int i = count; i > 0; i--) {
+        // Through a float local: VC6 otherwise folds the two scales into one.
+        float unit = RandomUnit();
+        int index = (int)(unit * 36);
+        if (index >= 35)
+            index = 35;
+        int start = index;
+        while (used[index]) {
+            if (++index == 36)
+                index = 0;
+            if (index == start)
+                break;
+        }
+        used[index] = 1;
+        *names++ = g_UnknownStrings68a498[index];
+    }
+    operator delete(used, __FILE__, 1157);
 }

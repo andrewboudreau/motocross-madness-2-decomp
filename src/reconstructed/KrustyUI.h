@@ -99,6 +99,8 @@ public:
     void UnknownFunction499b00();             // 0x00499b00
     void UnknownFunction499b10();             // 0x00499b10
     void UnknownFunction49a4a0();             // 0x0049a4a0: opens the exit dialog
+    // 0x0049b020: fills `names` with `count` distinct random short strings.
+    void UnknownFunction49b020(const char** names, int count);
     // 0x0049ba70: appends an entry to +0x60; returns its index.
     int UnknownFunction49ba70(int a, int b, int c, const char* name, int d, int e);
     void UnknownFunction4999b0();             // 0x004999b0: shutdown (the destructor's first step)

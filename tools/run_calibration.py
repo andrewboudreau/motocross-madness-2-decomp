@@ -3154,6 +3154,15 @@ CASES = [
         'reason': 'realloc wrapper; return ++count - 1',
     },
     {
+        'name': 'KrustyUI random names 0x49b020',
+        'bindings': 'src/reconstructed/KrustyUI.bindings.json',
+        'source': 'src/reconstructed/KrustyUI.cpp',
+        'symbol': '?UnknownFunction49b020@KrustyUI@@QAEXPAPBDH@Z',
+        'target_va': '0x0049b020',
+        'target_size': 168,
+        'reason': 'float local keeps rand scale and 36 as two multiplies; DebugCalloc',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

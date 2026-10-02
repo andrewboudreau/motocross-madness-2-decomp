@@ -8,6 +8,9 @@
 // 0x004a2e20: malloc(size, file, line) with category accounting.
 void* DebugMalloc(unsigned int size, const char* file, int line);
 
+// 0x004a2fc0: calloc(count, size, file, line) with category accounting.
+void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);
+
 // 0x004a3010: operator new(size, __FILE__, __LINE__).
 void* operator new(unsigned int size, const char* file, int line);
 

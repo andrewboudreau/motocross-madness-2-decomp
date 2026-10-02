@@ -19,9 +19,8 @@
 
 void UnknownFunction49bda0();
 
-// Global at 0x0068a498: 36 short strings loaded from string resources
-// 5000-5035.
-char g_UnknownStrings68a498[36][16];
+// Global at 0x0068a498 (defined in KrustyUI.cpp).
+extern char g_UnknownStrings68a498[36][16];
 
 // Zero-filled global at 0x00577738, the "MRUProfile" default.
 extern char g_UnknownString577738[];
