@@ -1,6 +1,7 @@
 #pragma once
 
 class ControlInterface;
+class UnknownGameOwned;
 struct UnknownControlEvent;
 struct UnknownInputEntry;
 
@@ -44,7 +45,62 @@ public:
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot24(int a, int b, int c, int d, int e);
-    virtual void UnknownVirtualSlot25(int value);
+    virtual void UnknownVirtualSlot25(UnknownGameOwned* value);
+};
+
+// Network object at Game+0x08 (0x128 bytes; its code is near Net.cpp's
+// literals). The class is not established.
+class UnknownNetObject {
+public:
+    UnknownNetObject();                       // 0x004ab480
+    ~UnknownNetObject();                      // 0x004ab570
+    long UnknownFunction4ab6b0(int value);    // 0x004ab6b0
+
+    unsigned char field_0x00[0x128];
+};
+
+// Owner at Game+0x04 and the objects at +0x10; deleted through slot 0.
+class UnknownGameOwned {
+public:
+    virtual ~UnknownGameOwned();
+};
+
+// Global at 0x0056c470 (its code is near gameobj.cpp's literals).
+class UnknownGlobal56c470 {
+public:
+    void UnknownFunction4691f0();             // 0x004691f0
+
+    unsigned char field_0x00[0x2c];
+    unsigned char field_0x2c;
+};
+extern UnknownGlobal56c470* g_UnknownGlobal56c470;
+
+// Static object at 0x0065b478 (its code is near FontTextureManager.cpp's
+// literals).
+class UnknownStatic65b478 {
+public:
+    void UnknownFunction4677c0();             // 0x004677c0
+};
+extern UnknownStatic65b478 g_UnknownStatic65b478;
+
+// cdecl 0x0052d0d0, called last on shutdown.
+void UnknownFunction52d0d0();
+
+// Object at Game+0x38; slot 14 drives it with control 0x20. The class is not
+// established.
+class UnknownGameObject38 {
+public:
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+
+    int UnknownFunction4484f0();              // 0x004484f0
+
+    unsigned char field_0x04[0x25 - 4];
+    unsigned char field_0x25_bit0 : 1;
 };
 
 // RTTI: Game (root; PCGame : Game and TrackGame : PCGame derive from it).
@@ -72,10 +128,10 @@ public:
     virtual int UnknownVirtualSlot12(int value);                                          // 0x004688e0
     virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468900
     virtual int UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468930
-    virtual void UnknownVirtualSlot15();      // 0x00468a30, not reconstructed
-    virtual void UnknownVirtualSlot16();      // 0x00468ae0, not reconstructed
+    virtual int UnknownVirtualSlot15();       // 0x00468a30: shutdown
+    virtual int UnknownVirtualSlot16(int value); // 0x00468ae0: network object
     virtual int UnknownVirtualSlot17(int a, int b, int c, int d, int e);                  // 0x00468ba0
-    virtual void UnknownVirtualSlot18();      // 0x00468bd0, not reconstructed
+    virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00468bd0
     virtual void UnknownVirtualSlot19() = 0;
     virtual void UnknownVirtualSlot20() = 0;
     virtual void UnknownVirtualSlot21() = 0;
@@ -89,31 +145,32 @@ public:
     virtual void UnknownVirtualSlot28() = 0;
     virtual void UnknownVirtualSlot29() = 0;
     virtual int UnknownVirtualSlot30(int id, char* text);                                 // 0x00468c60
-    virtual int UnknownVirtualSlot31() = 0;
+    virtual UnknownGameOwned* UnknownVirtualSlot31() = 0;
     virtual void UnknownVirtualSlot32() = 0;
     virtual int UnknownVirtualSlot33();       // 0x00467e80
     virtual void UnknownVirtualSlot34() = 0;
 
     void UnknownFunction468880();             // 0x00468880 (PCCamera slot 27)
 
-    int field_0x04;
-    void* field_0x08;
+    UnknownGameOwned* field_0x04;
+    UnknownNetObject* field_0x08;
     UnknownObject56e26cSettings* field_0x0c;
-    int field_0x10;
+    UnknownGameOwned* field_0x10;
     ControlInterface* field_0x14;
     int field_0x18;                           // 1 initially; KrustyBikeCamera slot 42 tests > 1
     unsigned char field_0x001c[0x34 - 0x1c];
     int field_0x34;
-    void* field_0x38;
+    UnknownGameObject38* field_0x38;
     int field_0x3c;
     char field_0x40[0x1c4 - 0x40];            // empty string initially
     int field_0x1c4;
     int field_0x1c8;
-    unsigned char field_0x01cc[0x2d0 - 0x1cc];
+    char field_0x1cc[0x2d0 - 0x1cc];          // directory for slot 18
     int field_0x2d0;
     unsigned char field_0x2d4;                // flag bits (bit 2: KeyboardDevice 0x0048a240)
     unsigned char field_0x2d5_bit0 : 1;       // slots 11 and 13
-    unsigned char field_0x2d5_bits : 7;
+    unsigned char field_0x2d5_bit1 : 1;       // set on shutdown
+    unsigned char field_0x2d5_bits : 6;
     unsigned char field_0x02d6[2];
     int field_0x2d8;
     int field_0x2dc;

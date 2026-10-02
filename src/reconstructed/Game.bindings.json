@@ -1,8 +1,22 @@
 {
+  "??0UnknownNetObject@@QAE@XZ": "0x004ab480",
   "??1Game@@UAE@XZ": "0x00468a10",
+  "??1UnknownNetObject@@QAE@XZ": "0x004ab570",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
   "??3@YAXPAX@Z": "0x004a30c0",
   "??_7Game@@6B@": "0x0055299c",
+  "??_C@_01PCFE@?2?$AA@": "0x00568c24",
   "??_C@_0BF@DCOA@No?5Strings?5Available?$AA@": "0x0056b6b0",
+  "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
+  "?UnknownFunction4484f0@UnknownGameObject38@@QAEHXZ": "0x004484f0",
+  "?UnknownFunction4677c0@UnknownStatic65b478@@QAEXXZ": "0x004677c0",
+  "?UnknownFunction4691f0@UnknownGlobal56c470@@QAEXXZ": "0x004691f0",
+  "?UnknownFunction4ab6b0@UnknownNetObject@@QAEJH@Z": "0x004ab6b0",
+  "?UnknownFunction52d0d0@@YAXXZ": "0x0052d0d0",
+  "?UnknownVirtualSlot16@Game@@UAEHH@Z$ehhandler": "0x0054ad27",
+  "?g_UnknownGlobal56c470@@3PAVUnknownGlobal56c470@@A": "0x0056c470",
+  "?g_UnknownStatic65b478@@3VUnknownStatic65b478@@A": "0x0065b478",
+  "__FILE__": "0x0056b36c",
   "_fclose": "0x00534c3d",
   "_s_UnknownFile65b4ac": "0x0065b4ac"
 }

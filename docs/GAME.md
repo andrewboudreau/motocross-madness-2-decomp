@@ -38,10 +38,14 @@ candidates.
 | 3, 4 | `0x00468c90` | Exact (`return 1`) |
 | 9 | `0x004685c0` | Exact |
 | 11, 12, 13, 17 | | Exact (forwards to the interface at +0x2f4) |
+| 14 | `0x00468930` | Exact. Input presses: control 0x20 drives the +0x38 object; Ctrl+F (key 0x21, modifier 0xc) toggles +0x1c4 and E (0x12) clears it |
+| 15 | `0x00468a30` | Exact. Shutdown: releases the interface, deletes the network object (+0x08), the owners (+0x04, +0x10) and the ControlInterface |
+| 16 | `0x00468ae0` | Exact. Creates the network object (`new` at Game.cpp line 979) |
+| 18 | `0x00468bd0` | Exact. Builds `<+0x1cc>\<name>` |
 | 30 | `0x00468c60` | Exact ("No Strings Available") |
 | 33 | `0x00467e80` | Exact |
 | 7, 19–29, 31, 32, 34 | | `_purecall` |
-| 2, 8, 10, 14, 15, 16, 18 | | Not reconstructed |
+| 2, 8, 10 | | Not reconstructed |
 
 The constructor (`0x00467990`) is not reconstructed yet. It sets the +0x2d4
 and +0x2d5 bit groups, copies an empty string to +0x40, sets 1.0 at
