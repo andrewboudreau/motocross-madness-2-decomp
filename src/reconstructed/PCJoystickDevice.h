@@ -42,6 +42,14 @@ struct UnknownPeriodic {
     unsigned long period;
 };
 
+// 0x50-byte immediate joystick state (DIJOYSTATE layout).
+struct UnknownJoystickState {
+    long axes[6];
+    long sliders[2];
+    unsigned long pov[4];
+    unsigned char buttons[32];
+};
+
 // COM-style effect object held at PCJoystickDevice+0x578. Methods 7-9 are used
 // like IDirectInputEffect::Start, Stop and GetEffectStatus; the identity is
 // inference.
@@ -97,14 +105,14 @@ public:
 
     int UnknownMethod4c2d90(int index, int value); // not reconstructed
     int UnknownMethod4c3100(int value);            // not reconstructed
-    int UnknownMethod4c3790(int value);            // not reconstructed
+    int UnknownMethod4c3790(int value);            // near miss in samples/inputdevice
     int UnknownMethod4c3a10(int buffered);         // near miss in samples/inputdevice
     int CheckPollResult(long result);              // inline
     void UnknownMethod4c3ae0(unsigned char value);
 
 protected:
     UnknownEffectInterface* field_0x578[5]; // released by slot 15
-    int field_0x58c[6];
+    float field_0x58c[6];                  // axis ranges (flip base for axes 1, 2)
     int field_0x5a4[6];
     int field_0x5bc[6];
     unsigned char field_0x5d4_bit0 : 1;

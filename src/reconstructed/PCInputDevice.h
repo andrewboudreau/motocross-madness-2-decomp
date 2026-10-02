@@ -16,7 +16,7 @@ struct UnknownInputInterface {
     virtual long __stdcall UnknownMethod6(int property, struct UnknownInputProperty* value); // SetProperty
     virtual long __stdcall UnknownMethod7();   // Acquire
     virtual long __stdcall UnknownMethod8();   // Unacquire
-    virtual long __stdcall UnknownMethod9();
+    virtual long __stdcall UnknownMethod9(unsigned long size, void* state); // GetDeviceState
     virtual long __stdcall UnknownMethod10();
     virtual long __stdcall UnknownMethod11();
     virtual long __stdcall UnknownMethod12();

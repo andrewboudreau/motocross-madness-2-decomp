@@ -9,7 +9,7 @@ Canonical source is `src/reconstructed/InputDevice`, `PCInputDevice`,
 and the template header `ContainerList.h`. Translation units are not
 established, apart from ContainerList.h, which retail names through
 `__FILE__`. Names are provisional. All functions listed are strict exact under
-the default profile, except one near miss in
+the default profile, except the near misses in
 `samples/inputdevice/PCJoystickDeviceNearMisses.cpp`.
 
 ## Classes
@@ -82,9 +82,14 @@ the default profile, except one near miss in
   `PCInputDeviceType.cpp` (lines 540, 544 and 590), so at least they were
   compiled in that TU. In slot 20 the poll check must be an inline member
   (`CheckPollResult`); written in place, VC6 merges the null-device return
-  with the error returns. `0x004c3a10` (switch buffered input) is the near
-  miss: only its final acquire test differs. Retail keeps separate
-  `return 0`/`return 1` paths, and VC6 here emits `setge`.
+  with the error returns. Two neighbours are near misses:
+  - `0x004c3a10` (switch buffered input): only its final acquire test
+    differs. Retail keeps separate `return 0`/`return 1` paths, and VC6 here
+    emits `setge`.
+  - `0x004c3790` (the immediate reader): it reads a DIJOYSTATE-shaped state,
+    feeds axes through `0x00489c00`, queues button changes on the
+    ControlInterface, and keeps the POV values. 373 of 452 bytes match; the
+    rest is register rotation.
 
   Effect-related slots act only for device type 3 (+0x0c). Slot 19 matches
   only with the Windows `HIBYTE` cast chain used by `GET_DIDEVICE_SUBTYPE`,
