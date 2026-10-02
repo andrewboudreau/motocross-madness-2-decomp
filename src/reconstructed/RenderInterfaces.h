@@ -8,6 +8,7 @@
 
 struct Matrix4;
 struct UnknownSurfaceDesc;
+struct UnknownSurfaceCaps;
 
 // Device at PCRenderTarget+0x50 (IDirect3DDevice7-shaped).
 struct UnknownRenderInterface {
@@ -66,7 +67,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod9();
     virtual long __stdcall UnknownMethod10();
     virtual long __stdcall UnknownMethod11();
-    virtual long __stdcall UnknownMethod12();
+    virtual long __stdcall UnknownMethod12(UnknownSurfaceCaps* caps, UnknownSurfaceInterface** surface); // GetAttachedSurface
     virtual long __stdcall UnknownMethod13();
     virtual long __stdcall UnknownMethod14();
     virtual long __stdcall UnknownMethod15();

@@ -14,7 +14,7 @@ at +0x74. An object at +0x7c is destroyed through vfwdeco.cpp's
 
 ## Status
 
-Exact (14 calibration cases):
+Exact (15 calibration cases):
 - the constructor `0x004c5f00` (TextureMap's `0x0050a4e0`, then clears
   +0x70..+0x7c);
 - the scalar deleting destructor `0x004c5f30` and the destructor
@@ -30,7 +30,19 @@ Exact (14 calibration cases):
   pairs at +0x48 through RenderTarget slot 8);
 - `0x004c7420`, which recreates a lost texture through slot 8;
 - `0x004c7b00`, which blits +0x70 into another surface unless told to
-  skip. The `if (!skip)` form puts the blit first, as retail does.
+  skip. The `if (!skip)` form puts the blit first, as retail does;
+- `0x004c84e0`, which locks a level (flags 0x811), fills it through
+  `0x004c8550` and unlocks it.
 
-Not reconstructed: slots 4, 5, 6, 8, 9, 15, 18 and 20, the TextureMap base
-(`0x0050a4e0`, `0x0050ab40`), and the helpers `0x004c7b40`–`0x004c86e0`.
+Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
+- `0x004c83a0`, which finds the mip level of a given width through
+  GetAttachedSurface (method 12) and reports errors other than
+  `0x887600ff` with `0x004c86e0` (line 2034). Retail keeps the surface in
+  the dead parameter's stack slot;
+- slot 20, which fills every mip level (error line 2084). Retail clears the
+  capabilities in an order that the memset, `= {0}` and field-by-field
+  forms all fail to reproduce.
+
+Not reconstructed: slots 4, 5, 6, 8, 9, 15 and 18, the TextureMap base
+(`0x0050a4e0`, `0x0050ab40`), `0x004c7b40`, `0x004c7e30`, `0x004c7ef0`,
+`0x004c8550` and the error reporter `0x004c86e0`.

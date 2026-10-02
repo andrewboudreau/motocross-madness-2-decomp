@@ -8,10 +8,14 @@
   "??_7PCTextureMap@@6B@": "0x00555fec",
   "?UnknownFunction4a2e00@MemTagStack@@QAEXH@Z": "0x004a2e00",
   "?UnknownFunction4c83a0@PCTextureMap@@QAEPAUUnknownSurfaceInterface@@H@Z": "0x004c83a0",
+  "?UnknownFunction4c84e0@PCTextureMap@@QAEHPAUUnknownSurfaceInterface@@H@Z": "0x004c84e0",
+  "?UnknownFunction4c8550@PCTextureMap@@QAEXPAUUnknownSurfaceDesc@@H@Z": "0x004c8550",
   "?UnknownFunction511580@TextureMapManager@@QAEXXZ": "0x00511580",
   "?UnknownFunction511970@@YAHH@Z": "0x00511970",
+  "?UnknownReportDirectDrawError@@YAXJPBDH@Z": "0x004c86e0",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownGlobal689964@@3HA": "0x00689964",
+  "__FILE__": "0x00570524",
   "__ftol": "0x00534a88"
 }

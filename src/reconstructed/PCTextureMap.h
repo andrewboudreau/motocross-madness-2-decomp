@@ -34,7 +34,7 @@ public:
     virtual int UnknownVirtualSlot17(int level) = 0;
     virtual void UnknownVirtualSlot18() = 0;
     virtual void UnknownVirtualSlot19() = 0;
-    virtual void UnknownVirtualSlot20() = 0;
+    virtual int UnknownVirtualSlot20() = 0;
 
     int field_0x08;
     int field_0x0c;
@@ -64,6 +64,10 @@ int UnknownFunction511970(int format);
 // (0x00511580) about lost or released surfaces.
 extern int g_UnknownGlobal689964;
 
+// cdecl 0x004c86e0: formats a DirectDraw result with the caller's __FILE__
+// and __LINE__.
+void UnknownReportDirectDrawError(long result, const char* file, int line);
+
 // RTTI: PCTextureMap : TextureMap (vtable 0x00555fec; its code sits among
 // PCTexMap.cpp's literals). Names are provisional.
 class PCTextureMap : public TextureMap {
@@ -86,13 +90,16 @@ public:
     virtual int UnknownVirtualSlot17(int level); // 0x004c7ad0: unlocks it
     virtual void UnknownVirtualSlot18();      // 0x004c81d0
     virtual void UnknownVirtualSlot19();      // 0x004c79a0: binds and applies the render states
-    virtual void UnknownVirtualSlot20();      // 0x004c8430
+    virtual int UnknownVirtualSlot20();       // 0x004c8430: fills every mip level
 
     int UnknownFunction4c7420();              // 0x004c7420: recreates a lost texture surface
     // 0x004c7b00: blits +0x70 into `destination` unless `skip`.
     int UnknownFunction4c7b00(void* destinationRect, UnknownSurfaceInterface* destination,
                               void* sourceRect, int flags, int skip);
-    UnknownSurfaceInterface* UnknownFunction4c83a0(int level); // 0x004c83a0: mip level surface
+    // 0x004c83a0: the mip level whose width is `width`, or 0.
+    UnknownSurfaceInterface* UnknownFunction4c83a0(int width);
+    int UnknownFunction4c84e0(UnknownSurfaceInterface* surface, int value); // 0x004c84e0: fills a level
+    void UnknownFunction4c8550(UnknownSurfaceDesc* desc, int value);        // 0x004c8550
 
     UnknownSurfaceInterface* field_0x70;      // system-memory surface (counted in DirectX memory)
     UnknownSurfaceInterface* field_0x74;      // texture surface
