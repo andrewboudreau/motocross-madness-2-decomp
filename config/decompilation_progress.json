@@ -9,5 +9,5 @@
   "notes": "483 unique retail address/extent pairs passed strict comparison in 487 calibration cases using authentic VC6 SP3 on Windows. Every relocation was resolved, or the function had no relocation bytes. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.",
   "vc6_case_count": 487,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "365016d7f96549bafec0973ebcdf596f4a8a68eb"
+  "reviewed_commit": "57d55d7e5df4a88d001b2f86752c29509bb7692d"
 }

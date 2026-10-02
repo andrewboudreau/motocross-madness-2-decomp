@@ -18,7 +18,7 @@ complete function inventory has not been established.
 | Strict VC6 exact targets | **483 / 483 (100.0%)** | Unique retail address/extent pairs in the reviewed calibration run |
 | Canonical reconstructed implementation files | **36** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
 | Canonical reconstructed headers | **57** | Layout and interface declarations, including support-only headers |
-| Canonical C++ source lines | **12,996** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
+| Canonical C++ source lines | **13,019** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
 | Retail source-path strings | **111** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **252** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **1,368,518 bytes (1.31 MiB)** | Broad code-section denominator; includes library code, thunks and padding |
@@ -62,7 +62,7 @@ python3 tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt --vc6-root "
 
 Inspect every result: the runner reports nonmatches as data and its exit status
 alone does not prove strict matching. Reviewed code revision:
-`365016d7f96549bafec0973ebcdf596f4a8a68eb`. Source inventory counts reflect the current tree
+`57d55d7e5df4a88d001b2f86752c29509bb7692d`. Source inventory counts reflect the current tree
 and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot
