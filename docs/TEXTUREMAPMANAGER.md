@@ -11,8 +11,8 @@ Layout (from the constructor and the methods below):
   TextureMap+0x08 (next) and +0x0c (previous), with head, tail, cursor and
   count. Its methods are out of line (`0x00510a50`–`0x00510b70`); the class
   has no RTTI and its name is unknown;
-- +0x3c / +0x40: the texture cache selected by the debug keys and its index;
-- +0x44: `ContainerList<UnknownTextureCache*>` (ContainerList.h), initialised
+- +0x3c / +0x40: the ManagedTextureGroup selected by the debug keys and its index;
+- +0x44: `ContainerList<ManagedTextureGroup*>` (ContainerList.h), initialised
   to 4 entries growing by 4;
 - +0x58: debug key mode; +0x5c / +0x60 two grow-only scratch buffers with
   sizes at +0x64 / +0x68 (used by PCTextureMap slot 5);
@@ -25,23 +25,30 @@ releases them.
 
 ## Status
 
-Exact (23 calibration cases):
+Exact (25 calibration cases, every function in the file's range):
 - the list: constructor, destructor (unlinks every texture), First, Last,
   Next, Previous, Append, Remove and AppendList;
 - the constructor `0x00510bd0`, scalar deleting destructor `0x00510cd0` and
   destructor `0x00510cf0`;
 - slots 10 (counts frames), 12, 13 (skipped on AGP displays) and 15 (with
-  the "TestKey" debug bit), which forward to every texture cache before the
+  the "TestKey" debug bit), which forward to every ManagedTextureGroup before the
   GameObject base; slot 18 (`0x00511290`), which calls slot 12 of every
   texture, then the caches;
 - slot 23 (`0x00510ee0`), the "TestKey" debug keys: 0x14 cycles a mode,
   0x21 toggles the selected cache's +0x08, 0x1b / 0x1a step forwards /
   backwards through the cache's +0x1c8 or +0x1c4 entries or through the
   caches, 0x15 runs the cache's `0x0050c7e0`;
-- `0x00511180`, which creates a 0x258-byte texture cache (TextureCache.cpp
-  `0x0050bed0`) and adds it through ContainerList's inline Add;
+- `0x00511180`, which creates a ManagedTextureGroup (RTTI
+  `ManagedTextureGroup : BaseObject`, 0x258 bytes, constructor `0x0050bed0`
+  among TextureCache.cpp's literals) and adds it through ContainerList's
+  inline Add;
+- `0x005113d0`, which on AGP displays restores every grouped
+  ManagedTexture (`0x00510760`, a direct PCTextureMap slot 8 call) and
+  otherwise hands the display's "TextureCacheLimit" (+0x60) out in
+  0x2aaaa-byte steps, each to the group with the fewest steps per texture;
+- `0x00511580`, which counts the 32–256 pixel textures, their bytes with
+  mip levels and the display's per-kind figure (+0x14 table, accumulated
+  but unused), and formats them and GetAvailableVidMem's totals into a
+  local buffer that is never output;
 - `0x005112f0` / `0x00511300` (register / unregister a texture) and the
   scratch buffers `0x00511310` / `0x00511370`.
-
-Not reconstructed: `0x005113d0` (shares texture memory out among the caches)
-and `0x00511580` (formats texture memory statistics into local buffers).

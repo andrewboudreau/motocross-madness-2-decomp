@@ -3,7 +3,7 @@
 #include "ContainerList.h"
 #include "GameObject.h"
 
-class CacheTexture;
+class ManagedTexture;
 class TextureMap;
 class TextureMapManager;
 
@@ -28,24 +28,25 @@ public:
     int m_count;
 };
 
-// Texture cache (TextureCache.cpp; no RTTI), 0x258 bytes. The manager
+// RTTI: ManagedTextureGroup : BaseObject (vtable 0x005583c0; constructor
+// 0x0050bed0 writes it, destructor 0x0050c2e0, deleting wrapper 0x0050c2c0),
+// 0x258 bytes. Its code sits among TextureCache.cpp's literals. The manager
 // keeps them in +0x44 and steps through them with debug keys (slot 23).
-class UnknownTextureCache {
+class ManagedTextureGroup : public BaseObject {
 public:
-    // 0x0050bed0
-    UnknownTextureCache(TextureMapManager* manager, int a, int b, int c);
-    void UnknownFunction50c4a0(int value);    // 0x0050c4a0
-    void UnknownFunction50c6c0(CacheTexture* texture); // 0x0050c6c0: adds a texture
+    ManagedTextureGroup(TextureMapManager* manager, int a, int b, int c);
+    virtual ~ManagedTextureGroup();
+    int UnknownFunction50c4a0(int value);     // 0x0050c4a0: 0 on failure
+    void UnknownFunction50c6c0(ManagedTexture* texture); // 0x0050c6c0: adds a texture
     void UnknownFunction50c760();             // 0x0050c760 (manager slot 12)
     void UnknownFunction50c790();             // 0x0050c790 (manager slot 18)
     void UnknownFunction50c7e0();             // 0x0050c7e0 (debug key 0x15)
     void UnknownFunction50c8c0();             // 0x0050c8c0 (manager slot 13)
     void UnknownFunction50ef70(void* value);  // 0x0050ef70 (manager slot 15)
 
-    unsigned char field_0x00[0x08];
     unsigned char field_0x08;                 // toggled by debug key 0x21
-    unsigned char field_0x09[0x50 - 0x09];
-    int field_0x50;                           // count stepped through by +0x1c8
+    unsigned char field_0x09[0x44 - 0x09];
+    UnknownTextureMapList field_0x44;         // its textures (ManagedTextures), stepped through by +0x1c8
     unsigned char field_0x54[0x60 - 0x54];
     int field_0x60;                           // count stepped through by +0x1c4
     unsigned char field_0x64[0x1c4 - 0x64];
@@ -80,9 +81,12 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     // 0x00511180: creates and registers a texture cache.
-    UnknownTextureCache* UnknownFunction511180(int a, int b, int c, int d);
+    ManagedTextureGroup* UnknownFunction511180(int a, int b, int c, int d);
     void UnknownFunction5112f0(TextureMap* texture); // 0x005112f0: registers a texture
     void UnknownFunction511300(TextureMap* texture); // 0x00511300: unregisters it
+    // 0x005113d0: shares the texture cache limit out among the groups (on
+    // AGP displays it restores every grouped texture instead).
+    int UnknownFunction5113d0();
     void UnknownFunction511580();             // 0x00511580 (PCTextureMap slot 12 and destructor)
     // 0x00511310 / 0x00511370: grow-only scratch buffers of at least
     // `bytes`; 0 when the allocation fails.
@@ -90,9 +94,9 @@ public:
     void* UnknownFunction511370(unsigned int bytes);
 
     UnknownTextureMapList field_0x2c;         // every registered texture
-    UnknownTextureCache* field_0x3c;          // cache selected by the debug keys
+    ManagedTextureGroup* field_0x3c;          // cache selected by the debug keys
     int field_0x40;                           // its index in +0x44
-    ContainerList<UnknownTextureCache*> field_0x44;
+    ContainerList<ManagedTextureGroup*> field_0x44;
     int field_0x58;                           // debug key mode (0-2)
     void* field_0x5c;                         // scratch buffer (0x00511310)
     void* field_0x60;                         // scratch buffer (0x00511370)

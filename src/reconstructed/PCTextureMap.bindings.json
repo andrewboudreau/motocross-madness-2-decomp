@@ -1,5 +1,5 @@
 {
-  "??0CacheTexture@@QAE@PAVTextureMapManager@@@Z": "0x00510500",
+  "??0ManagedTexture@@QAE@PAVTextureMapManager@@@Z": "0x00510500",
   "??0PCTextureMap@@QAE@PAVTextureMapManager@@H@Z": "0x004c5f00",
   "??0TextureMap@@QAE@PAVTextureMapManager@@H@Z": "0x0050a4e0",
   "??1PCTextureMap@@UAE@XZ": "0x004c5f50",
@@ -22,7 +22,7 @@
   "?UnknownFunction4d1b90@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
   "?UnknownFunction4d1d20@@YAXPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
   "?UnknownFunction4d24d0@@YAHPAXHHHHPAUUnknownTexturePalette@@@Z": "0x004d24d0",
-  "?UnknownFunction50c6c0@UnknownTextureCache@@QAEXPAVCacheTexture@@@Z": "0x0050c6c0",
+  "?UnknownFunction50c6c0@ManagedTextureGroup@@QAEXPAVManagedTexture@@@Z": "0x0050c6c0",
   "?UnknownFunction511310@TextureMapManager@@QAEPAXI@Z": "0x00511310",
   "?UnknownFunction511370@TextureMapManager@@QAEPAXI@Z": "0x00511370",
   "?UnknownFunction511580@TextureMapManager@@QAEXXZ": "0x00511580",

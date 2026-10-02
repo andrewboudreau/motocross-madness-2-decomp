@@ -92,7 +92,7 @@ public:
     int field_0x40;
     int field_0x44;                           // render-state pair count
     UnknownRenderStatePair field_0x48[4];     // applied by slot 19 (length not established)
-    int field_0x68;                           // bit 0: a CacheTexture
+    int field_0x68;                           // bit 0: a ManagedTexture
     int field_0x6c;                           // format choice +0x14 (slot 5)
 };
 

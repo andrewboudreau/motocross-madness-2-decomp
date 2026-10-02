@@ -84,9 +84,9 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   partial texture blits or a positive mode, otherwise the device's Load.
   The frame matches with separate `next` surfaces. Retail keeps `this` in
   ebp and tests the level loop at the top on every pass;
-- slot 6 (61 of 600 bytes), the copy. It makes a `CacheTexture` (RTTI
-  `CacheTexture : PCTextureMap`, 0xbc bytes, registered with the source's
-  +0x90 texture cache) when TextureMap+0x68 bit 0 is set, else a
+- slot 6 (61 of 600 bytes), the copy. It makes a `ManagedTexture` (RTTI
+  `ManagedTexture : PCTextureMap`, 0xbc bytes, registered with the source's
+  +0x90 ManagedTextureGroup) when TextureMap+0x68 bit 0 is set, else a
   PCTextureMap. It fills the copy through slot 4 and copies the colour key
   through slot 18. The structure lines up; retail's register assignment
   (constant 1 in ebx, the copy in ebp) does not.
@@ -121,4 +121,4 @@ literals). Exact (4 calibration cases):
 Not reconstructed: `0x0050a590` (1442 bytes, cdecl), which looks a texture
 up through the resource manager (`0x004e9360`), returns its existing map or
 reads a header from the entry's stream and creates a PCTextureMap or
-CacheTexture through slots 4/5.
+ManagedTexture through slots 4/5.

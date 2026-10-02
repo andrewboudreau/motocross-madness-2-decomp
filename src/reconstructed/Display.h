@@ -47,7 +47,7 @@ struct UnknownDisplay {
     int field_0x08;                               // display mode count
     int field_0x0c;                               // current display mode
     UnknownDisplayMode* field_0x10;
-    unsigned char field_0x14[0x54 - 0x14];
+    int field_0x14[16];                           // per texture kind (TextureMapManager 0x00511580)
     int field_0x54;                               // "Total VidMem"
     int field_0x58;
     int field_0x5c;

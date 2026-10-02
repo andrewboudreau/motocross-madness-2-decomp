@@ -102,7 +102,7 @@ int PCTextureMap::UnknownVirtualSlot9(UnknownRect* rect, int mode) {
     return 0;
 }
 
-// 0x004c71c0: a copy of the texture (a CacheTexture registered with this
+// 0x004c71c0: a copy of the texture (a ManagedTexture registered with this
 // one's cache, or a PCTextureMap of the game's manager), filled from +0x70
 // through its slot 4 and given the same colour key; 0 on failure.
 TextureMap* PCTextureMap::UnknownVirtualSlot6() {
@@ -111,9 +111,9 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
     int cached = field_0x68 & 1;
     if (cached) {
         manager = field_0x10;
-        CacheTexture* cache = new(__FILE__, 976) CacheTexture(manager);
+        ManagedTexture* cache = new(__FILE__, 976) ManagedTexture(manager);
         cache->field_0x68 |= 1;
-        ((CacheTexture*)this)->field_0x90->UnknownFunction50c6c0(cache);
+        ((ManagedTexture*)this)->field_0x90->UnknownFunction50c6c0(cache);
         copy = cache;
     } else {
         manager = g_UnknownGlobal56e26c->field_0x3c;
