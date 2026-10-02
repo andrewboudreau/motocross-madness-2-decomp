@@ -11,6 +11,7 @@ public:
 class PCSoundInterface : public SoundInterface {
 public:
     PCSoundInterface();                       // 0x004be370
+    void UnknownFunction4be9b0(int value);    // 0x004be9b0 (TrackGame 0x00521a30)
 
     unsigned char field_0x04[0x478 - 4];
 };

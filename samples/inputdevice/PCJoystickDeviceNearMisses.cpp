@@ -18,7 +18,7 @@
 #include <string.h>
 
 #include "../../src/reconstructed/PCJoystickDevice.h"
-#include "../../src/reconstructed/UnknownObject56e26c.h"
+#include "../../src/reconstructed/TrackGame.h"
 
 // 0x004c3790: reads the immediate state. Non-gamepads feed the six axes to
 // their bindings (axis 1 flipped by the JoyDirectionFlipped bit, axis 2

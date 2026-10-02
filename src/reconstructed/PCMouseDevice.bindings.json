@@ -13,7 +13,7 @@
   "?UnknownFunction48a550@MouseDevice@@QAEXHM@Z": "0x0048a550",
   "?UnknownMethod4c2710@PCInputDevice@@QAEHHKKK@Z": "0x004c2710",
   "?UnknownReportError@@YAXJPBDH@Z": "0x004bf6a0",
-  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
   "_GUID_SysMouse": "0x00556b20",
   "_IID_IDirectInputDevice7A": "0x00556a50",
   "__FILE__": "0x005703ac",

@@ -6,7 +6,7 @@
 #include "PCJoystickDevice.h"
 #include "PCKeyboardDevice.h"
 #include "PCMouseDevice.h"
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // 0x004beef0: the effect GUID's name in `name` (empty and 0 when unknown).
 // Placed here by address only: it directly precedes PCControlInterface.

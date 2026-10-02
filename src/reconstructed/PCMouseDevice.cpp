@@ -2,7 +2,7 @@
 
 #include "PCMouseDevice.h"
 #include "KeyboardDevice.h"
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // 0x004c48c0
 PCMouseDevice::PCMouseDevice() {

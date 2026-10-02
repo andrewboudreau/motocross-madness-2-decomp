@@ -24,7 +24,7 @@ observations:
   PCGame (see [PCGAME.md](PCGAME.md)). +0x0c is the display and +0x10 a
   PCRenderTarget.
 
-`UnknownObject56e26c` therefore derives from `Game`. It declares only the
+`TrackGame` therefore derives from `Game`. It declares only the
 members past Game's layout that other code reads, such as the instance and
 window handles at +0x318/+0x31c and the camera state at +0x558 onward. Its
 most-derived class is not established; TrackGame and PCGame are the

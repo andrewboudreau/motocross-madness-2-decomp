@@ -1,7 +1,7 @@
 #include "ControlInterface.h"
 #include "InputDevice.h"
 #include "KeyboardDevice.h"
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // Two-value helpers; inline functions keep their operands as spilled
 // arguments, as retail does.

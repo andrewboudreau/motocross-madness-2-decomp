@@ -1,7 +1,7 @@
 #include "RenderTarget.h"
 
 #include "Camera.h"
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // 0x004e8c50
 RenderTarget::RenderTarget() {

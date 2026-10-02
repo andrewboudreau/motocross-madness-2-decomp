@@ -25,7 +25,7 @@
 #include "../../src/reconstructed/JoystickDevice.h"
 #include "../../src/reconstructed/KeyboardDevice.h"
 #include "../../src/reconstructed/MouseDevice.h"
-#include "../../src/reconstructed/UnknownObject56e26c.h"
+#include "../../src/reconstructed/TrackGame.h"
 
 // 0x0043cf00: has the keyboard, mouse and joysticks read their input, then
 // passes each queued event, stamped with the keyboard's modifier state, to

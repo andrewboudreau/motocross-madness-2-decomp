@@ -87,7 +87,7 @@
   "?g_UnknownDisplayCount68a764@@3HA": "0x0068a764",
   "?g_UnknownDisplays68a754@@3PAPAUUnknownDisplay@@A": "0x0068a754",
   "?g_UnknownFilterKeys689940@@3UUnknownFilterKeys@@A": "0x00689940",
-  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
   "_IID_IDirect3DHALDevice": "0x005561b0",
   "_IID_IDirect3DMMXDevice": "0x005561c0",
   "_IID_IDirect3DNullDevice": "0x005561e0",

@@ -13,7 +13,7 @@
 #include "PeakHold.h"
 #include "SoundInterface.h"
 #include "TextureMapManager.h"
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // 0x0065b4ac: a file cleared by the constructor and closed by the
 // destructor (0x00534c3d is the CRT's fclose).

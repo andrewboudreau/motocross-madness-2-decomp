@@ -69,7 +69,7 @@ public:
     virtual int UnknownVirtualSlot7() = 0;   // render state setup (PCGame)
     virtual int UnknownVirtualSlot8();        // 0x00467eb0: renders a frame
     virtual int UnknownVirtualSlot9();        // 0x004685c0
-    virtual void UnknownVirtualSlot10();      // 0x004685d0, not reconstructed (rdtsc)
+    virtual int UnknownVirtualSlot10();       // 0x004685d0, not reconstructed (rdtsc)
     virtual int UnknownVirtualSlot11(int value);                                          // 0x004688a0
     virtual int UnknownVirtualSlot12(int value);                                          // 0x004688e0
     virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468900

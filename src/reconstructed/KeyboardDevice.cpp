@@ -1,6 +1,6 @@
 #include "KeyboardDevice.h"
 
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // 0x00489e30
 KeyboardDevice::KeyboardDevice() : PCInputDevice(0) {

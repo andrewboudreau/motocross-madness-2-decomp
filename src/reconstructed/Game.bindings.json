@@ -74,7 +74,7 @@
   "?UnknownVirtualSlot2@Game@@UAEHXZ$ehhandler": "0x0054ac77",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
   "?g_UnknownGlobal56c470@@3PAVUnknownGlobal56c470@@A": "0x0056c470",
-  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownNetTime@@3HA": "0x0065b540",
   "?g_UnknownPrepFrameTime@@3HA": "0x0065b538",
   "?g_UnknownStatic65b478@@3VUnknownStatic65b478@@A": "0x0065b478",

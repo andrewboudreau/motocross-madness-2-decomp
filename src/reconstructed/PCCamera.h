@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 #include "PCRenderTarget.h"
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // RTTI: PCCamera : Camera. PCCamera introduces no primary slots; it overrides
 // (among others) slots 13, 27 (pure in Camera) and 30-32.

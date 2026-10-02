@@ -7,7 +7,7 @@
 #include "Camera.h"
 #include "DebugAlloc.h"
 #include "ControlInterface.h"
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // USER32, KERNEL32, OLE32 and WINMM imports.
 extern "C" __declspec(dllimport) long __stdcall CoInitialize(void* reserved);

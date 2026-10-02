@@ -28,6 +28,6 @@
   "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?g_UnknownFloat550f6c@@3MB": "0x00550f6c",
   "?g_UnknownFloat550f70@@3MB": "0x00550f70",
-  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
   "_fclose": "0x00534c3d"
 }

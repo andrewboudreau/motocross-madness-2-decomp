@@ -231,7 +231,7 @@ RTTI: `KrustyBikeCamera : BikeCamera`. Canonical source:
 `src/reconstructed/KrustyBikeCamera.{h,cpp}`. KrustyBike.cpp is a candidate
 TU (name overlap, nearby references). The camera keeps its state and presets
 in the object behind the global pointer `0x0056e26c` (declared in
-`UnknownObject56e26c.h`), so they survive between cameras. All bodies below
+`TrackGame.h`), so they survive between cameras. All bodies below
 are strict exact.
 
 | Function | Retail VA | Bytes | Behavior |

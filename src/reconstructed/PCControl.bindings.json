@@ -29,7 +29,7 @@
   "?UnknownFunction4c2930@PCJoystickDevice@@QAEHPBUUnknownDeviceInstance@@@Z": "0x004c2930",
   "?UnknownMethod4c26d0@PCInputDevice@@QAEHH@Z": "0x004c26d0",
   "?UnknownVirtualSlot1@PCControlInterface@@UAEHXZ$ehhandler": "0x0054cb6c",
-  "?g_UnknownGlobal56e26c@@3PAVUnknownObject56e26c@@A": "0x0056e26c",
+  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
   "_DirectInputCreateEx@20": "0x005330e8",
   "_GUID_ConstantForce": "0x00556b90",
   "_GUID_CustomForce": "0x00556c40",

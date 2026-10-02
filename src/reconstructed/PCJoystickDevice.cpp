@@ -4,7 +4,7 @@
 
 #include "PCJoystickDevice.h"
 
-#include "UnknownObject56e26c.h"
+#include "TrackGame.h"
 
 // 0x004c2770: repeats JoystickDevice's initialisation with PCJoystickDevice's
 // own fields interleaved.
