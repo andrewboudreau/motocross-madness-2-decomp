@@ -53,7 +53,13 @@ public:
     void UnknownFunction469ce0(GameObject* object);
 
 protected:
-    friend class Game; // reads the +0x25 bits of its DebugOverlay
+    // 0x00468dd0 / 0x00468f10: TrackGame turns the "RaceSound" child on and
+    // off through these.
+    void UnknownFunction468dd0(const char* name);
+    void UnknownFunction468f10(const char* name);
+
+    friend class Game;      // reads the +0x25 bits of its DebugOverlay
+    friend class TrackGame; // reads the +0x25 bits of its UI objects (0x00521860)
 
     // Offsets and widths are evidenced by the reconstructed methods; names are
     // placeholders. Children are reached through field_0x10 and chained through

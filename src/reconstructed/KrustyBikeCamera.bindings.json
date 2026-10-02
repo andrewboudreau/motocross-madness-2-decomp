@@ -9,7 +9,7 @@
   "?UnknownFunction45d340@TrackGameList@@QAEPAVUnknownMessageTarget@@XZ": "0x0045d340",
   "?UnknownFunction507c10@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
   "?UnknownFunction51b540@UnknownMessageTarget@@QAEXPAVUnknownMessage@@@Z": "0x0051b540",
-  "?UnknownFunction521970@TrackGame@@QAEXHPADH@Z": "0x00521970",
+  "?UnknownFunction521970@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction524100@TrackGameMode@@QAEHXZ": "0x00524100",
   "?UnknownVirtualSlot23@FollowCamera@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00466ad0",
   "?UnknownVirtualSlot62@KrustyBikeCamera@@UAEXXZ": "0x00498280",

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ControlInterface.h"
+#include "MemTag.h"
 #include "PCGame.h"
 
 struct UnknownInputEntry;
@@ -18,6 +19,8 @@ class UnknownMessageTarget;
 
 class TrackGameList {
 public:
+    GameObject* UnknownFunction45d2b0();           // 0x0045d2b0
+    GameObject* UnknownFunction45d2f0();           // 0x0045d2f0
     UnknownMessageTarget* UnknownFunction45d340(); // 0x0045d340
 };
 
@@ -38,9 +41,53 @@ public:
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
 };
 
+// Object returned by (TrackGame+0x56c)->+0x2c->0x00485df0.
+class UnknownTrackGameObject56cItem {
+public:
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6();
+    virtual void UnknownVirtualSlot7();
+    virtual void UnknownVirtualSlot8();
+    virtual void UnknownVirtualSlot9();
+    virtual void UnknownVirtualSlot10();
+    virtual void UnknownVirtualSlot11();
+    virtual void UnknownVirtualSlot12();
+    virtual void UnknownVirtualSlot13();
+    virtual void UnknownVirtualSlot14();
+    virtual void UnknownVirtualSlot15();
+    virtual void UnknownVirtualSlot16();
+    virtual void UnknownVirtualSlot17();
+    virtual void UnknownVirtualSlot18();
+    virtual void UnknownVirtualSlot19();
+    virtual void UnknownVirtualSlot20();
+    virtual void UnknownVirtualSlot21();
+    virtual void UnknownVirtualSlot22();
+    virtual void UnknownVirtualSlot23();
+    virtual void UnknownVirtualSlot24();
+    virtual void UnknownVirtualSlot25();
+    virtual void UnknownVirtualSlot26();
+};
+
+class UnknownTrackGameObject56cOwner {
+public:
+    UnknownTrackGameObject56cItem* UnknownFunction485df0();  // 0x00485df0
+};
+
 // Object at TrackGame+0x56c; 0x00521cd0 tests its +0x4a8.
-struct UnknownTrackGameObject56c {
-    unsigned char field_0x00[0x4a8];
+class UnknownTrackGameObject56c {
+public:
+    void UnknownFunction499b20(int value);    // 0x00499b20
+
+    unsigned char field_0x00[0x2c];
+    UnknownTrackGameObject56cOwner* field_0x2c;
+    unsigned char field_0x30[0x3c - 0x30];
+    int field_0x3c;
+    unsigned char field_0x40[0x4a8 - 0x40];
     int field_0x4a8;
 };
 
@@ -91,6 +138,7 @@ public:
     virtual int UnknownVirtualSlot5();        // 0x00521a50
     virtual int UnknownVirtualSlot10();       // 0x00521660: Game's slot 10 as a flag
     virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00521840
+    virtual int UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00521670
     virtual int UnknownVirtualSlot15();       // 0x00521a70: shutdown
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00521cb0
 
@@ -98,8 +146,11 @@ public:
     void UnknownFunction521a40();             // 0x00521a40
     int UnknownFunction521cd0();              // 0x00521cd0
 
-    // 0x00521970: copies string `id` into buffer (size bytes).
-    void UnknownFunction521970(int id, char* buffer, int size);
+    // 0x00521970: loads string resource `id` into buffer (size bytes), or
+    // "Resource String Unavailable"; 1 when loaded.
+    int UnknownFunction521970(int id, char* buffer, int size);
+    // 0x00521860: opens (`open`) or closes the in-game menu `id`.
+    void UnknownFunction521860(int open, int id, int sound);
 
     // Objects whose +0x34 KrustyBikeCamera slot 10 takes as its view, by
     // field_0x2d74.

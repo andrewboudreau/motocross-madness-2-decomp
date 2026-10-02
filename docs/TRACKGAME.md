@@ -17,10 +17,19 @@ derives from PCGame.
 
 ## Status
 
-Exact (12 calibration cases):
+Exact (15 calibration cases):
 - the constructor and both destructors;
-- slots 2, 5, 10, 13, 15 and 18;
-- the non-virtual helpers `0x00521a30`, `0x00521a40` and `0x00521cd0`.
+- slots 2, 5, 10, 13, 14, 15 and 18;
+- the menu toggle `0x00521860`;
+- the string-resource loader `0x00521970`;
+- the helpers `0x00521a30`, `0x00521a40` and `0x00521cd0`.
+
+Slot 14 ignores input while an IME is open, then:
+- control 0x1d (with modifier 0x45) or controls 0x3d/0xc5 toggle menu 0x190;
+- control 1 opens menu 0x191.
+
+Its two `goto` labels reproduce retail's shared blocks: the toggle, and the
+`return 1` it shares.
 
 The constructor:
 - loads `lang.dll` (it becomes the string resource instance);
@@ -37,4 +46,4 @@ The destructor:
 - frees `lang.dll`;
 - on Windows NT, re-enables the screen saver.
 
-Not reconstructed: slots 1, 3, 4 and 14, plus `0x00521860` and `0x00521970`.
+Not reconstructed: slots 1, 3 and 4.

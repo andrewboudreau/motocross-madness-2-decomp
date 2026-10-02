@@ -7,6 +7,7 @@ class MemTagStack {
 public:
     int Push(const char* tag);      // 0x004a2d00: returns the previous category
     void Pop(int previous);         // 0x004a2d90
+    void UnknownFunction4a2bc0(const char* tag);  // 0x004a2bc0 (TrackGame slot 14: "In Game")
 
     int count;                      // categories
     char (*names)[0x80];            // category names

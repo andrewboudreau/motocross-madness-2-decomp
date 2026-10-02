@@ -1,8 +1,10 @@
+#include <stdio.h>
 #include <string.h>
 
 #include "TrackGame.h"
 
 #include "DebugAlloc.h"
+#include "KeyboardDevice.h"
 #include "SoundInterface.h"
 
 // KERNEL32, SHELL32 and USER32 imports.
@@ -22,6 +24,14 @@ extern "C" __declspec(dllimport) int __stdcall SystemParametersInfoA(unsigned in
                                                                     unsigned int param,
                                                                     void* data,
                                                                     unsigned int flags);
+
+extern "C" __declspec(dllimport) int __stdcall LoadStringA(void* instance, unsigned int id,
+                                                          char* buffer, int size);
+
+// IMM32, called through the linker's import thunks.
+extern "C" void* __stdcall ImmGetContext(void* window);
+extern "C" int __stdcall ImmGetOpenStatus(void* context);
+extern "C" int __stdcall ImmReleaseContext(void* window, void* context);
 
 #define UNKNOWN_LOCALE_USER_DEFAULT 0x400
 #define UNKNOWN_LOCALE_SDECIMAL 0xe
@@ -112,6 +122,113 @@ int TrackGame::UnknownVirtualSlot10() {
 // 0x00521840
 int TrackGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry) {
     return PCGame::UnknownVirtualSlot13(event, entry);
+}
+
+// 0x00521670: input presses. With an IME open nothing happens. Control 0x1d
+// with modifier 0x45 or control 0x3d/0xc5 toggles menu 0x190, and control 1
+// opens menu 0x191 (in-game).
+int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (event->kind == 0) {
+        void* context = ImmGetContext(field_0x31c);
+        if (context) {
+            int closed;
+            if (field_0x538 && ImmGetOpenStatus(context))
+                closed = 0;
+            else
+                closed = 1;
+            ImmReleaseContext(field_0x31c, context);
+            if (!closed)
+                return 0;
+        }
+        if (event->kind == 0 && event->control == 0x1d &&
+            field_0x14->field_0x34->UnknownVirtualSlot5(0x45, 0x3f, 0) && field_0x56c) {
+            if (field_0x08)
+                goto handled;
+            goto toggle;
+        }
+    }
+    {
+        int previous = field_0x1c4;
+        if (PCGame::UnknownVirtualSlot14(event, entry))
+            return 0;
+        if (field_0x2d4_bit0 && field_0x1c4 != previous) {
+            if (field_0x1c4)
+                field_0x34->UnknownFunction468dd0("RaceSound");
+            else
+                field_0x34->UnknownFunction468f10("RaceSound");
+        }
+    }
+    if (!field_0x56c)
+        return 0;
+    if (UnknownFunction43caa0(1, 0, event, 0x3f)) {
+        g_MemTagStack->UnknownFunction4a2bc0("In Game");
+        if (!field_0x333c) {
+            int category = g_MemTagStack->Push("UI");
+            UnknownFunction521860(1, 0x191, 1);
+            g_MemTagStack->Pop(category);
+        }
+        return 1;
+    }
+    if (!field_0x08 && (UnknownFunction43caa0(0x3d, 0, event, 0x80000000) ||
+                        UnknownFunction43caa0(0xc5, 0, event, 0x80000000))) {
+toggle:
+        if (field_0x333c)
+            UnknownFunction521860(0, 0x190, 1);
+        else
+            UnknownFunction521860(1, 0x190, 1);
+handled:
+        return 1;
+    }
+    return 0;
+}
+
+// 0x00521860
+void TrackGame::UnknownFunction521860(int open, int id, int sound) {
+    GameObject* menu = field_0x570->UnknownFunction45d2b0();
+    if (!field_0x56c || !menu || field_0x3430)
+        return;
+    if (open) {
+        GameObject* other = field_0x570->UnknownFunction45d2f0();
+        if (other && !other->field_0x25_bit0)
+            return;
+        if (field_0x333c)
+            return;
+        field_0x56c->UnknownFunction499b20(id);
+        if (!menu->field_0x25_bit0)
+            return;
+        menu->UnknownVirtualSlot4();
+        field_0x333c = 1;
+        field_0x34->UnknownFunction468dd0("RaceSound");
+    } else {
+        if (!field_0x333c)
+            return;
+        if (!field_0x56c->field_0x2c->UnknownFunction485df0())
+            return;
+        if (id != field_0x56c->field_0x3c)
+            return;
+        field_0x56c->field_0x2c->UnknownFunction485df0()->UnknownVirtualSlot26();
+        GameObject* current = field_0x570->UnknownFunction45d2b0();
+        if (current)
+            current->UnknownVirtualSlot5();
+        field_0x333c = 0;
+        if (sound)
+            field_0x34->UnknownFunction468f10("RaceSound");
+    }
+}
+
+// 0x00521970
+int TrackGame::UnknownFunction521970(int id, char* buffer, int size) {
+    if (!field_0x420) {
+        strcpy(buffer, "Resource String Unavailable");
+        return 0;
+    }
+    if (!LoadStringA(field_0x420, id, buffer, size)) {
+        char message[128];
+        sprintf(message, "Resource string '%d' load fail\n", id);
+        strcpy(buffer, "Resource String Unavailable");
+        return 0;
+    }
+    return 1;
 }
 
 // 0x00521a30
