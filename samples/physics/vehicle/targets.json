@@ -718,5 +718,68 @@
   "target_size": 320,
   "expect": "partial",
   "notes": "wave3: 63.9% (322/320). Retail copies slot-76 result through a pointer held in ebx but pushes a fresh lea for the &field_0x1b8 argument; ours reuses ebx. Add operand order (fld up.x; fadd w.x) is canonicalised by VC6 and cannot be forced."
+ },
+ {
+  "class": "Vehicle",
+  "source": "../hierarchy/LayoutProbe.cpp",
+  "candidate_symbol_contains": "??_EVehicle@@$4PPPPPPPM@A@AEPAXI@Z",
+  "target_va": "0x0052b620",
+  "target_size": 8,
+  "expect": "exact",
+  "notes": "wave5: vtordisp adjustor thunk (sub ecx,[ecx-4]; jmp ??_G) for the scalar deleting dtor in the GameObject virtual-base vtable; emitted by the compiler from LayoutProbe.cpp. owner: Vehicle.cpp (vtable slot 0 of Vehicle+1472)"
+ },
+ {
+  "class": "StreamTable",
+  "source": "FileSlots.cpp",
+  "candidate_symbol_contains": "Seek@StreamTable",
+  "target_va": "0x005253d0",
+  "target_size": 107,
+  "expect": "exact",
+  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp"
+ },
+ {
+  "class": "StreamTable",
+  "source": "FileSlots.cpp",
+  "candidate_symbol_contains": "Tell@StreamTable",
+  "target_va": "0x00525440",
+  "target_size": 93,
+  "expect": "exact",
+  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp"
+ },
+ {
+  "class": "StreamTable",
+  "source": "FileSlots.cpp",
+  "candidate_symbol_contains": "Eof@StreamTable",
+  "target_va": "0x005254a0",
+  "target_size": 117,
+  "expect": "exact",
+  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "VehicleHit@@YA",
+  "target_va": "0x00525dd0",
+  "target_size": 46,
+  "expect": "exact",
+  "notes": "wave5: CollisionObject onHitCallback (stored at +0x88 by 0x00525e20): owner->field_0x134 = other->ownerType; owner->slot38(owner->slot52(tag, other)). owner: Vehicle.cpp by contiguity (tier 2)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "VehicleHitBy@@YA",
+  "target_va": "0x00525e00",
+  "target_size": 19,
+  "expect": "exact",
+  "notes": "wave5: CollisionObject onHitByCallback (+0x8c): forwards to 0x00525dd0. owner: Vehicle.cpp by contiguity (tier 2)"
+ },
+ {
+  "class": "Vehicle",
+  "source": "Vehicle.cpp",
+  "candidate_symbol_contains": "??0Vehicle@@QAE@H@Z",
+  "target_va": "0x005257a0",
+  "target_size": 745,
+  "expect": "partial",
+  "notes": "90.89% (745/745). Remaining: compiler hoists leanAxis/throttleAxis (0x4fc/0x500) stores ahead of retail's 0x4b0/0x4b4 around the weightForce copy."
  }
 ]

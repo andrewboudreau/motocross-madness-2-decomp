@@ -255,6 +255,7 @@ struct VehicleWheel {
 class Vehicle : public SoultreePhysicsCharacter {
 public:
     Vehicle();
+    explicit Vehicle(int flags);                 // 0x005257a0 (ret 8: flags + hidden most-derived flag)
     virtual ~Vehicle();                          // vbase deleting dtor 0x0052b630
     virtual int GameObjectVirtualSlot10(float dt);  // 0x0052a830 via vtordisp thunk 0x0040cab0
 

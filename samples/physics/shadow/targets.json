@@ -1,1 +1,119 @@
-[]
+[
+  {
+    "class": "TerrainShadow",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "??0TerrainShadow",
+    "target_va": "0x508ae0",
+    "target_size": 142,
+    "expect": "exact",
+    "notes": "ctor: caster/index table/min-max sentinels; min/max stores in natural source order give retail's schedule"
+  },
+  {
+    "class": "TerrainShadow",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "?Attach@TerrainShadow",
+    "target_va": "0x508b80",
+    "target_size": 58,
+    "expect": "exact",
+    "notes": "Attach(host,caster,shadow), same nested-if shape as D3DIM Attach"
+  },
+  {
+    "class": "ShadowReceiver",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "??1ShadowReceiver",
+    "target_va": "0x508b70",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "empty ~ShadowReceiver COMDAT copy for this TU"
+  },
+  {
+    "class": "Terrain",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x5089a0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser jmp thunk (copy-init)"
+  },
+  {
+    "class": "Terrain",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x5089b0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser body (copy-init)"
+  },
+  {
+    "class": "Terrain",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x5089f0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser jmp thunk (copy-init)"
+  },
+  {
+    "class": "Terrain",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x508a00",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser body (copy-init)"
+  },
+  {
+    "class": "Terrain",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x508a40",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser jmp thunk (copy-init)"
+  },
+  {
+    "class": "Terrain",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x508a50",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser body (copy-init)"
+  },
+  {
+    "class": "Terrain",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x508a90",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser jmp thunk (copy-init)"
+  },
+  {
+    "class": "Terrain",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x508aa0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser body (copy-init)"
+  },
+  {
+    "class": "TerrainShadow",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot29@TerrainShadow",
+    "target_va": "0x005099c0",
+    "target_size": 215,
+    "expect": "exact",
+    "notes": "slot 29: scans the cell rectangle in steps of 16, de-duplicates cell keys (cell reassigned to cell->key in place, as retail keeps it in eax); lists up to 0x40 then resets"
+  },
+  {
+    "class": "TerrainShadow",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot28@TerrainShadow",
+    "target_va": "0x005097d0",
+    "target_size": 486,
+    "expect": "partial",
+    "notes": "slot 28 light matrix setup, 23.8% (499/486). Retail keeps extent=max(x,z) in memory ([esp+0xc], redundant reload), reloads [ecx+0x54] for the 2nd texture->size read and uses frame 0x48; none of the source shapes tried reproduce these"
+  }
+]

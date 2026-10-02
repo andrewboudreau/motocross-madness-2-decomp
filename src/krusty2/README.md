@@ -35,11 +35,11 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug malloc/`new`/`delete`/realloc), `MemTag.h` |
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.h`, `CollisionTypes.h` |
-| `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
+| `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` (69 of 74 exact) |
 | `bvh/` | `BoundingBoxTreeBuild.cpp`/`.h`: collision box-tree build (21 of 23 exact) |
 | `effects/` | `Particles.cpp`, `NormalDistribution.cpp`, `Nulls.cpp` (17 of 17 exact) |
-| `motion/` | `D3DIMSoultreeMotnctrl.cpp`, `Spheres.cpp`, `SteeringControl.cpp` (49 of 53 exact) |
-| `shadow/` | `ProjectedShadow.cpp`/`.h` (11 of 18 exact) |
+| `motion/` | `D3DIMSoultreeMotnctrl.cpp`, `Motnctrl.cpp`, `Spheres.cpp`, `SteeringControl.cpp` (82 of 90 exact) |
+| `shadow/` | `ProjectedShadow.cpp`/`.h`, `D3DIMSoultreeShadow.cpp`/`.h` (26 of 33 exact) |
 | `suspension/` | `SelectiveGravityModel.cpp` with the Shock classes (26 of 30 exact) |
 | `visibility/` | `VisibilityQuadTree.cpp`/`.h` (16 of 17 exact) |
 
@@ -68,8 +68,11 @@ Include shared headers by their path under this folder, e.g. `#include "core/Gam
   at lines 0x4b3 and 0x4d0.
 - Code bracket: after `SteeringControl.cpp` (last xref 0x504bd2) and before `Texmap.cpp`
   (first xref 0x50a6bc). Terrain.cpp's own xrefs span 0x50567c..0x507b38.
-- 13 of the 14 targets (0x5057d0..0x508850) are inside the bracket. The 14th is the shared
-  0x4dc4c0 stub described above. 12 match exactly.
+- 38 of the 39 targets (0x505490..0x508970) are inside the bracket. The 39th is the shared
+  0x4dc4c0 stub described above. 37 match exactly.
+- TerrainShadow (0x5089a0..0x50a58f) follows the last Terrain.cpp xref but has no `__FILE__` of
+  its own, and it opens with the per-TU vector `$E` block that starts other retail files. It is
+  kept in `samples/physics/shadow/TerrainShadow.cpp` until its file is known.
 - Terrain derives from `GameObject` and `GroundFogableObject`, as the RTTI says (mdisp 0,
   and 0x2c for GroundFogableObject, which has no vfptr). Both bases are kept.
 - Out of reach under the no-asm rule: `QueryGround` 0x507c10 inlines an `__asm` fistp helper.

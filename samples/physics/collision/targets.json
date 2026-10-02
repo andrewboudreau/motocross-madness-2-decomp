@@ -348,7 +348,7 @@
     "target_va": "0x00432260",
     "target_size": 458,
     "expect": "partial",
-    "notes": "91.3%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform(t1,t2) with the inverses inlined"
+    "notes": "96.2%: t1=m1*inv(m2), t2=m1*inv(m3), out=CollisionRelativeTransform; inverse p.y sum order fixed; remaining diff is one store-schedule move"
   },
   {
     "class": "CollisionPoint",
@@ -673,5 +673,86 @@
     "target_size": 88,
     "expect": "partial",
     "notes": "85 vs 88 bytes: control flow, loop and the reload of *points after the call match; operand order of the thiscall setup (lea ecx before mov ecx,[eax+4]) and the register used for the +0xa4 test differ"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectGlobals.cpp",
+    "candidate_symbol_contains": "SetCollisionBoxResult",
+    "target_va": "0x00439e00",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": "store of g_CollisionBoxResult; owner: bracket only"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectGlobals.cpp",
+    "candidate_symbol_contains": "NextCollisionCounter",
+    "target_va": "0x0043ce90",
+    "target_size": 12,
+    "expect": "exact",
+    "notes": "return ++g gives mov/inc/mov; owner: bracket only"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectGlobals.cpp",
+    "candidate_symbol_contains": "CollisionVec3Min",
+    "target_va": "0x00435610",
+    "target_size": 112,
+    "expect": "exact",
+    "notes": "by-value struct return with inline-ctor struct, pointer ternaries; owner: bracket only"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectGlobals.cpp",
+    "candidate_symbol_contains": "CollisionVec3Max",
+    "target_va": "0x00435680",
+    "target_size": 112,
+    "expect": "exact",
+    "notes": "same as Min with > ; owner: bracket only"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionShapeSetup.cpp",
+    "candidate_symbol_contains": "Fn_00432720",
+    "target_va": "0x00432720",
+    "target_size": 214,
+    "expect": "exact",
+    "notes": "shape setup from node list; owner: bracket only"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionShapeSetup.cpp",
+    "candidate_symbol_contains": "Fn_004328b0",
+    "target_va": "0x004328b0",
+    "target_size": 231,
+    "expect": "exact",
+    "notes": "triangle-mesh tree setup; owner: bracket only"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionShapeSetup.cpp",
+    "candidate_symbol_contains": "Fn_00432800",
+    "target_va": "0x00432800",
+    "target_size": 164,
+    "expect": "exact",
+    "notes": "point-tree setup; owner: bracket only"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionShapeSetup.cpp",
+    "candidate_symbol_contains": "Fn_00439e10",
+    "target_va": "0x00439e10",
+    "target_size": 178,
+    "expect": "exact",
+    "notes": "thiscall member loaders on CollisionFileStream; owner: bracket only"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionShapeSetup.cpp",
+    "candidate_symbol_contains": "Fn_004324b0",
+    "target_va": "0x004324b0",
+    "target_size": 615,
+    "expect": "exact",
+    "notes": "two loops over node list, elements re-read each time, __FILE__ line literals 0xf3..0x107; owner: CollisionObject.cpp (__FILE__ 0x568614)"
   }
 ]

@@ -20,6 +20,7 @@
 #include "CollisionTypes.h"
 #include "core/GraphicsTest.h"   // canonical BaseObject, GameObject, GraphicsTest
 
+class CollisionFileStream;     // .col file stream (CollisionShapeSetup.cpp, stand-in)
 class CollisionModelSource;   // scene-graph node source used by shape setup 0x004324b0
 struct CollisionHullBody;      // CollisionShapeTests.h
 struct CollisionModelBody;
@@ -99,6 +100,10 @@ public:
     void Fn_004324b0(void* node, int a, int b, int c, int d); // 0x004324b0, shape setup from a node
     void Fn_00432720(void* node, int a, int b, int c, int d); // 0x00432720 (ret 0x14)
     void Fn_00432800(void* node, const char* path);           // 0x00432800, shape from a .col file path
+    void Fn_004328b0(const CollisionVec3* verts, const int* indices, int triCount, int vertCount);  // 0x004328b0 (ret 0x10), static mesh hull from arrays
+    void Fn_00439ed0(CollisionFileStream* stream, CollisionHullBody* hull);                          // 0x00439ed0 (ret 8), reads a hull payload
+    void Fn_0043a050(void* node, CollisionFileStream* stream, CollisionModelBody* model);            // 0x0043a050 (ret 0xc), reads a model payload
+    void Fn_00439e10(void* node, CollisionFileStream* stream);  // 0x00439e10 (ret 8), shape payload read from a .col stream
     void Fn_00432ab0(int count, void* points);                // 0x00432ab0 (ret 8), polyline shape setter
     // 0x00436000 (ret 4): copies the translation row of the shape's current transform into *out:
     // hull +0xf8, model +0xb8, mesh +0x38; types 3/4 leave *out untouched (tier 1 body).

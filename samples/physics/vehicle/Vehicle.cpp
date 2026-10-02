@@ -1978,3 +1978,110 @@ void Vehicle::Method_00525A90()
         wheel->field_0x120 = g_VehZeroVec3;
     }
 }
+
+// ---- hit callbacks installed by Vehicle's init 0x00525e20 (tier 2 contiguity) ----
+// 0x00525dd0 / 0x00525e00 are stored at CollisionObject +0x88 (onHitCallback) and +0x8c
+// (onHitByCallback) by 0x00525e20 (stores at 0x0052632b / 0x0052633b).  owner: Vehicle.cpp
+// by contiguity (its own __FILE__ xrefs start at 0x00525e98) -- tier 2.
+// The owner behind CollisionObject::ownerObject (+0x60) is NOT shown to be a Vehicle: its
+// vtable slot 52 takes (int, CollisionObject*) and slot 38 one int, unlike Vehicle's own
+// slots 52 and 38, so only the used slots are declared (provisional view; hitTag +0x134).
+struct HitOwner {
+    virtual void s0(); virtual void s1(); virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6(); virtual void s7(); virtual void s8(); virtual void s9();
+    virtual void s10(); virtual void s11(); virtual void s12(); virtual void s13(); virtual void s14(); virtual void s15(); virtual void s16(); virtual void s17(); virtual void s18(); virtual void s19();
+    virtual void s20(); virtual void s21(); virtual void s22(); virtual void s23(); virtual void s24(); virtual void s25(); virtual void s26(); virtual void s27(); virtual void s28(); virtual void s29();
+    virtual void s30(); virtual void s31(); virtual void s32(); virtual void s33(); virtual void s34(); virtual void s35(); virtual void s36(); virtual void s37();
+    virtual void Slot38(int a);
+    virtual void s39(); virtual void s40(); virtual void s41(); virtual void s42(); virtual void s43(); virtual void s44(); virtual void s45(); virtual void s46(); virtual void s47(); virtual void s48(); virtual void s49();
+    virtual void s50(); virtual void s51();
+    virtual int Slot52(int a, CollisionObject* b);
+    char pad[0x134-4];
+    int hitTag;
+};
+void VehicleHit(CollisionObject* a, CollisionObject* b)
+{
+    HitOwner* owner = (HitOwner*)a->ownerObject;
+    int tag = b->ownerType;
+    owner->hitTag = tag;
+    owner->Slot38(owner->Slot52(tag, b));
+}
+void VehicleHitBy(CollisionObject* a, CollisionObject* b)
+{
+    VehicleHit(a, b);
+}
+
+// owner: Vehicle.cpp (__FILE__ 0x005257a0 region), PARTIAL 90.89%: remaining diff is store
+// scheduling of the 0x4b0/0x4b4 vs 0x4fc/0x500 float stores around the weightForce copy.
+Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
+{
+    field_0x28 = 1.0f;
+    loadWeight = 0;
+    engineState = 0;
+    auxWheelCount = 0;
+    steerState = 0;
+    verticalAccelSmoother = 0;
+    forwardAccelSmoother = 0;
+    weightForce = g_VehZeroVec3;
+    leanCos = 1.0f;
+    field_0x4b4 = 1.0f;
+    field_0x124 = 0;
+    field_0x5ac = 0;
+    inShadow = 0;
+    shadowLight = 0;
+    attachmentResetPending = 0;
+    field_0x45c = 0;
+    field_0x464 = 0;
+    pointsTouching = 0;
+    field_0x4a0 = 0;
+    wheelList = 0;
+    wheelCapacity = 0;
+    wheelCount = 0;
+    lateTickers = 0;
+    lateTickerCapacity = 0;
+    lateTickerCount = 0;
+    earlyTickers = 0;
+    earlyTickerCapacity = 0;
+    earlyTickerCount = 0;
+    collisionPoints = 0;
+    collisionPointCapacity = 0;
+    collisionPointCount = 0;
+    attachments = 0;
+    attachmentCount = 0;
+    attachmentCapacity = 0;
+    terrainScale = 1.0f;
+    steerAxis = 0;
+    field_0x4a4 = 1.0f;
+    inputMap = 0;
+    leanAxis = 0;
+    throttleAxis = 0;
+    anyWheelInContact = 0;
+    field_0x5a0 = 0;
+    turnAngle = 0;
+    turnRate = 0;
+    primaryWheel = 0;
+    secondaryWheel = 0;
+    wheelsInContact = 0;
+    field_0x550 = 0;
+    steerRate = 0;
+    stepTime = 0.025f;
+    invStepTime = 40.0f;
+    frameTime = 0;
+    lastStepTime = 0.025f;
+    allWheelsInContact = 0;
+    prevCrashState = 0;
+    field_0x5b0 = 0;
+    controlInput = g_VehZeroVec3;
+    prevControlInput = g_VehZeroVec3;
+    steerInput = 0;
+    contactTotal = 0;
+    touchingPointCount = 0;
+    track = 0;
+    inputDevice = 0;
+    throttleInput = 0;
+    field_0x520 = 1;
+    *(int*)&pad_0x5B8 = 0;
+    Vehicle::UnknownVirtualSlot1(165.0f);
+    spawnProtected = 0;
+    takeoffVelocity = g_VehZeroVec3;
+    takeoffPosition = g_VehZeroVec3;
+}

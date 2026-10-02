@@ -326,7 +326,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "??_GTerrain",
+    "candidate_symbol_contains": "??_GTerrain@@",
     "target_va": "0x005059b0",
     "target_size": 30,
     "expect": "exact",
@@ -335,7 +335,7 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
-    "candidate_symbol_contains": "??1Terrain",
+    "candidate_symbol_contains": "??1Terrain@@",
     "target_va": "0x005079f0",
     "target_size": 441,
     "expect": "exact",
@@ -439,5 +439,230 @@
     "target_size": 96,
     "expect": "exact",
     "notes": "derives a/b, a^2/b^2 and their reciprocals from ints at 0x6c/0x70 into floats 0x74/0x78/0x7c/0x80 (called by slot 12 0x507610 after storing the new 0x6c). Exact with the source order b^2 ratio first then a/b (fidiv with int temporaries)."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x505490",
+    "target_size": 13,
+    "expect": "exact",
+    "notes": "static PCCamera-sized g_terrainSharedState(1) initialiser (ctor 0x4bed80)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E3",
+    "target_va": "0x5054a0",
+    "target_size": 12,
+    "expect": "exact",
+    "notes": "atexit(dtor stub) for the camera static"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x5054b0",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": "camera dtor stub: mov ecx,&g; jmp ~Camera 0x4624d0"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x5054c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #0"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E6",
+    "target_va": "0x5054d0",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #0 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x5054e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #1"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E9",
+    "target_va": "0x5054f0",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #1 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x505500",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #2"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E12",
+    "target_va": "0x505510",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #2 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E16",
+    "target_va": "0x505520",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #3"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E15",
+    "target_va": "0x505530",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #3 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E19",
+    "target_va": "0x505540",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #4"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E18",
+    "target_va": "0x505550",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #4 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E22",
+    "target_va": "0x505560",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #5"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E21",
+    "target_va": "0x505570",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #5 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E25",
+    "target_va": "0x505580",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #6"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E24",
+    "target_va": "0x505590",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #6 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E28",
+    "target_va": "0x5055a0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #7"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E27",
+    "target_va": "0x5055b0",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #7 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E31",
+    "target_va": "0x5055c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #8"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E30",
+    "target_va": "0x5055d0",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #8 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E34",
+    "target_va": "0x5055e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser jmp thunk #9"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E33",
+    "target_va": "0x5055f0",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "static TerrainPeakHold(5000) initialiser body #9 (ctor 0x4cb670)"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "GetHeightRange",
+    "target_va": "0x508970",
+    "target_size": 41,
+    "expect": "exact",
+    "notes": "heightField->heightMin/heightMax (+0x18/+0x1c) * gridCellSize, null-checked out pointers; exact first try"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "AcquireOwnedObject",
+    "target_va": "0x00505600",
+    "target_size": 455,
+    "expect": "exact",
+    "notes": "pool acquire / surface create (SEH, 2 new paths on field_0x38). Needed the epilogue-order: field_0xcc0++ before the array store, then count++"
   }
 ]

@@ -123,7 +123,11 @@ public:
     char pad_0x2c[0xac - 0x2c];
     ShadowMatrix matrix_0xac;                             // +0xac pushed by value by 0x004db0d0 in mode 3
     ShadowMatrix matrix_0xec;                             // +0xec pushed by value by 0x004db0d0 in mode 1
-    char pad_0x12c[0x220 - 0x12c];                        // allocated with operator new(0x220) in Init
+    char pad_0x12c[0x170 - 0x12c];
+    ShadowVec3 eyePosition;                               // +0x170 TerrainShadow slot 28 passes its address as the first SetLookAt argument
+    char pad_0x17c[0x198 - 0x17c];
+    float field_0x198;                                    // +0x198 TerrainShadow slot 28 feeds it to atan2 as x (tier 3)
+    char pad_0x19c[0x220 - 0x19c];                        // allocated with operator new(0x220) in Init
 };
 
 // Settings object at *0x0056e26c; slot 22 (0x58) reads a named flag.  PROVISIONAL.
@@ -241,14 +245,28 @@ struct ShadowRect {
     void Set(int l, int t, int r, int b) { left = l; top = t; right = r; bottom = b; }
 };
 
-// Objects in the receiver list at ProjectedShadow+0x12c.  PROVISIONAL: GameObject-derived (their
-// slots 27..30 follow GameObject's 27 slots) with four extra virtuals used by slot 12.
+// Objects in the receiver list at ProjectedShadow+0x12c (RTTI .?AVShadowReceiver@@ COL via
+// vtable 0x005515ec: direct base GameObject, 31 slots).  Slots 14/27/28/29/30 point at the
+// shared stubs 0x00468c90 (return 1), 0x004aa190 (return 0), 0x0044d710 (ret); slot 0 is the
+// deleting dtor 0x004477a0 over the ~ShadowReceiver body 0x004477c0 (set vptr, jmp 0x00468d60),
+// slot 8 is 0x00447780 (calls GameObject slot 8 non-virtually, returns this).  All of that is
+// inline code, so it is written here in the header (VC6 emits a COMDAT copy per using TU).
+// Slot 28 returns int: the stub 0x004aa190 is `xor eax,eax; ret` and the D3DIM override
+// returns 0 in eax.  Names tier 3.
 class ShadowReceiver : public GameObject {
 public:
-    virtual int UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
-    virtual int UnknownVirtualSlot29();
-    virtual void UnknownVirtualSlot30();
+    explicit ShadowReceiver(int flags) : GameObject(flags) {}
+    virtual ~ShadowReceiver() {}
+    virtual GameObject* GameObjectVirtualSlot8(int a)
+    {
+        GameObject::GameObjectVirtualSlot8(a);
+        return this;
+    }
+    virtual int GameObjectVirtualSlot14() { return 1; }
+    virtual int UnknownVirtualSlot27() { return 1; }
+    virtual int UnknownVirtualSlot28() { return 0; }
+    virtual int UnknownVirtualSlot29() { return 1; }
+    virtual void UnknownVirtualSlot30() {}
 };
 
 class ProjectedShadow : public GameObject {

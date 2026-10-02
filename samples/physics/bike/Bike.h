@@ -36,9 +36,15 @@ struct BikeA644;
 struct BikeQ;
 struct BikeA38;
 
+// Object at Bike+0x60c.  ~Bike deletes it through an out-of-line empty destructor (0x00464e90).
+struct BikeA60C {
+    ~BikeA60C();
+};
+
 // Objects reached through Bike fields.  Layout is only known where accessed.
 struct BikeWheel {
-    char pad_0x000[204];
+    char pad_0x000[184];
+    char contactPoint_0x0b8[20];   // registered in the owner's collisionPoints list; ~Bike removes it (0x00409a10)
     Vec3 wheelPosition;
     char pad_0x0d8[12];
     Vec3 groundNormal;
@@ -186,12 +192,13 @@ struct BikeA38 {
 
 struct BikeGlobal_0056e26c { char pad_0x000[0x2f0]; float g_0x2f0; };
 extern BikeGlobal_0056e26c* g_Bike_0056e26c;    // pointer read at 0x0056e26c (frame delta / time step; provisional)
+extern char g_BikeString_00577738[];
 extern Vec3 g_BikeVec3_005778a8;
 extern Vec3 g_BikeVec3_005778c8;
 
 class Bike : public Vehicle {
 public:
-    Bike();
+    explicit Bike(int flags);       // 0x00407700, ret 8 = flags + hidden most-derived flag
     virtual ~Bike();              // vbase vtable 0x0055085c slot 0 -> 0x0040ca40
 
     // overrides of Vehicle slots (signatures: SoultreePhysicsBaseObject.h, Vehicle.h)
@@ -253,13 +260,17 @@ public:
     int field_0x5bc;              // first Bike field (Vehicle's own data ends at 0x5bc)
     int field_0x5c0;
     BikeA5C4* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls Method_0x004a8c50(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
-    char pad_0x5c8[40];
+    char pad_0x5c8[24];
+    char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
     BikeWheel* frontWheel;       // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3
     BikeWheel* rearWheel;       // +0x5f4 rear wheel (smallest config z, 0x408728); tier 3
-    char pad_0x5f8[12];
+    int field_0x5f8;               // +0x5f8 cleared in the ctor (0x00407700)
+    int field_0x5fc;               // +0x5fc cleared in the ctor
+    int field_0x600;               // +0x600 cleared in the ctor
     BikeA604* field_0x604;
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
-    char pad_0x60c[16];
+    BikeA60C* field_0x60c;         // +0x60c cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
+    char pad_0x610[12];
     Vec3 field_0x61c;
     float field_0x628;
     float field_0x62c;
@@ -291,7 +302,9 @@ public:
     float wobbleOffset;  // +0x71c slot 91 wobble: added into field_0xd8.z, decays *0.9 per frame, reloaded from field_0xd8.z on flip/slot 71
     int wobbleStage;  // +0x720 slot 91 wobble: cycles 1..2 on each sign flip, loop active only while 1..2; slot 71 sets to 1
     float field_0x724;
-    char pad_0x728[12];           // own data ends at 0x734; the compiler places the vtordisp there
+    int field_0x728;               // +0x728 cleared in the ctor
+    int field_0x72c;               // +0x72c cleared in the ctor
+    int field_0x730;               // +0x730 cleared in the ctor; own data ends at 0x734, the compiler places the vtordisp there
 };
 
 typedef char bike_assert_sizeof[(sizeof(Bike) == 0x738 + 0x2c) ? 1 : -1];

@@ -78,7 +78,12 @@ public:
     // `lea ecx,[vbase]` before calling it).  Argument types tier 3.
     void Method_0x00469190(void* a, int b);
 
-    char treeLinks[0x10];  // +0x08 previous/next sibling, first child, parent (src/reconstructed/GameObject.h)
+    // +0x08..+0x14: previous sibling, next sibling, first child, parent (src/reconstructed/GameObject.h;
+    // the parent link is walked to the root by 0x005046e0, children are chained through +0x0c).
+    GameObject* prevSibling;   // +0x08
+    GameObject* nextSibling;   // +0x0c
+    GameObject* firstChild;    // +0x10
+    GameObject* parent;        // +0x14
     void* field_0x18;                   // written by slot 8 (0x004692f0)
     char field_0x1c[9];
     unsigned char statusFlags;           // +0x25 bit 0 tested by SoultreePhysicsBaseObject slot 21 and Vehicle

@@ -1,6 +1,7 @@
 // Bike.cpp: reconstruction of the motorcycle physics layer (see Bike.h).
 #include <float.h>
 #include <math.h>
+#include <string.h>
 #include "Bike.h"
 
 static inline float BikeMin(float a, float b) { return a < b ? a : b; }
@@ -240,6 +241,54 @@ void Bike::UnknownVirtualSlot1(float arg)
     field_0x700 = 0;
 }
 
+// Retail 0x00409a10 is ~Bike's body (reached through the vbase-adjusted deleting destructor
+// 0x0040ca40); ~Vehicle (0x00526380) runs after it.  0x0043a5e0 is CollisionPoint.cpp's
+// RemoveCollisionPoint (collision agent's file): removes a point from a pointer list.
+// owner: bracket only (not xref-anchored)
+void BikeRemoveCollisionPoint(SoultreeContact** points, void* point, int* count);   // 0x0043a5e0
+
+Bike::~Bike()
+{
+    if (steerAxis)
+        delete steerAxis;
+    if (poseSmoother)
+        delete poseSmoother;
+    if (frontWheel)
+        BikeRemoveCollisionPoint(collisionPoints, frontWheel->contactPoint_0x0b8, &collisionPointCount);
+    if (field_0x60c)
+        delete field_0x60c;
+    if (rearWheel)
+        BikeRemoveCollisionPoint(collisionPoints, rearWheel->contactPoint_0x0b8, &collisionPointCount);
+}
+
+// owner: Bike.cpp (neighbour of slot 1 0x00407630; Bike's __FILE__ xrefs start at 0x00407c3a)
+// 0x00407700, ret 8 = flags + the hidden most-derived flag.  Retail passes the flags to
+// Vehicle's ctor 0x005257a0 as (flags, 0) and runs GameObject(1) first when most-derived.
+Bike::Bike(int flags) : GameObject(1), Vehicle(flags)
+{
+    frontWheel = 0;
+    rearWheel = 0;
+    field_0x60c = 0;
+    steerAxis = 0;
+    poseSmoother = 0;
+    Bike::UnknownVirtualSlot1(165.0f);
+    field_0x5bc = 0;
+    field_0x5c0 = 1;
+    field_0x604 = 0;
+    riderCharacter = 0;
+    strcpy(riderName, g_BikeString_00577738);
+    field_0x704 = 0.55f;
+    field_0x600 = 0;
+    field_0x5f8 = 0;
+    field_0x5fc = 0;
+    field_0x724 = 32.0f;
+    field_0x728 = 0;
+    field_0x72c = 0;
+    field_0x730 = 0;
+    field_0x61c = g_BikeVec3_005778a8;
+    field_0x700 = 0;
+}
+
 int Bike::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
                                const Vec3* d, int e, float f)
 {
@@ -318,19 +367,19 @@ Vec3* Bike::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
 
 Vec3* Bike::UnknownVirtualSlot54(Vec3* out)
 {
-    if (wheelsInContact != 0) {
-        BikeWheel* a = frontWheel;
-        if (a->inContact != 0) {
-            BikeWheel* b = rearWheel;
-            if (b->inContact != 0) {
-                Vec3 s(a->groundNormal.x + b->groundNormal.x, a->groundNormal.y + b->groundNormal.y, a->groundNormal.z + b->groundNormal.z);
-                Vec3 mid(s.x * 0.5f, s.y * 0.5f, s.z * 0.5f);
-                *out = BikeNormalized(mid);
-                return out;
-            }
-            *out = a->groundNormal;
+    if (wheelsInContact == 0) {
+        *out = rearWheel->groundNormal;
+        return out;
+    }
+    if (frontWheel->inContact != 0) {
+        if (rearWheel->inContact != 0) {
+            Vec3 s(frontWheel->groundNormal.x + rearWheel->groundNormal.x, frontWheel->groundNormal.y + rearWheel->groundNormal.y, frontWheel->groundNormal.z + rearWheel->groundNormal.z);
+            Vec3 mid(s.x * 0.5f, s.y * 0.5f, s.z * 0.5f);
+            *out = BikeNormalized(mid);
             return out;
         }
+        *out = frontWheel->groundNormal;
+        return out;
     }
     *out = rearWheel->groundNormal;
     return out;
@@ -580,10 +629,7 @@ void Bike::UnknownVirtualSlot72(Vec3* out, VehicleWheel*)
             }
             weight *= 0.5f;
             const Vec3& n = frontWheel->w_0x230;
-            Vec3 c;
-            c.x = out->z * n.y - out->y * n.z;
-            c.y = out->x * n.z - n.x * out->z;
-            c.z = n.x * out->y - out->x * n.y;
+            Vec3 c = CrossProduct(n, *out);
             Vec3 perp = BikeNormalized(c);
             float scale;
             if (field_0x700) {
