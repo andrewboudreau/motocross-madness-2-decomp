@@ -1,0 +1,9 @@
+[
+  {"candidate_symbol_contains":"??0BlockAllocator", "target_va":"0x00423f70", "target_size":52},
+  {"candidate_symbol_contains":"?Alloc@BlockAllocator", "target_va":"0x00423fc0", "target_size":135},
+  {"candidate_symbol_contains":"?Free@BlockAllocator", "target_va":"0x00424050", "target_size":32},
+  {"candidate_symbol_contains":"?AllocateBlock@BlockAllocator", "target_va":"0x00424070", "target_size":78},
+  {"candidate_symbol_contains":"??1BlockAllocator", "target_va":"0x00423fb0", "target_size":5},
+  {"candidate_symbol_contains":"?Clear@BlockAllocator", "target_va":"0x004240c0", "target_size":65},
+  {"candidate_symbol_contains":"?Reset@BlockAllocator", "target_va":"0x00424110", "target_size":44}
+]

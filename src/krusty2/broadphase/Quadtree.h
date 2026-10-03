@@ -23,19 +23,7 @@
 // Debug allocation forms (size/ptr, __FILE__, __LINE__): core/DebugAlloc.h.
 #include "core/DebugAlloc.h"
 
-// Fixed-size block pool (retail 0x00423f70 ctor(elemSize, count), 0x00423fb0 dtor,
-// 0x00423fc0 Alloc, 0x00424050 Free, 0x00424110 Reset; object size 0x28 from the
-// operator new at 0x4dc751).  Owned by another TU: PROVISIONAL declaration only.
-class QuadTreePool {
-public:
-    QuadTreePool(unsigned int elemSize, unsigned int count);
-    ~QuadTreePool();
-    void* Alloc();
-    void Free(void* p);
-    void Reset();
-private:
-    char field_0x00[0x28];
-};
+#include "../../reconstructed/BlockAllocator.h"
 
 class QuadTreeNode;
 
@@ -110,8 +98,8 @@ public:
     float extentZ;                // +0x54 z extent
     int field_0x58;
     QuadTreeNode* rootNode;        // +0x5c root node (dtor calls its deleting dtor)
-    QuadTreePool* itemPool;        // +0x60 pool of QuadTreeItemLink (0x14 elements)
-    QuadTreePool* resultPool;        // +0x64 pool of QuadTreeResultLink (8 byte elements)
+    BlockAllocator* itemPool;        // +0x60 pool of QuadTreeItemLink (0x14 elements)
+    BlockAllocator* resultPool;        // +0x64 pool of QuadTreeResultLink (8 byte elements)
     unsigned int stateFlags;         // +0x68 bit 1 (2) = tree is being torn down
     unsigned short queryStamp;  // +0x6c ++ in BeginQuery/RestartQuery; compared with QuadTreeObject stamp (maxDepth) to return each object once
     unsigned short field_0x6e;
@@ -132,6 +120,8 @@ public:
 };
 
 extern float g_quadTreeInvScale;     // 0x00689b74: 1 / field_0x0c set by Init
+// The persistent collision tree and the current traversal can differ.
+extern QuadTree* g_collisionQuadTree; // 0x0068aba4; VisibilityQuadTree lifetime
 extern QuadTree* g_pQuadTree;        // 0x00689b78: the "current" tree
 
 #endif

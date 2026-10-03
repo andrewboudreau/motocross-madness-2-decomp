@@ -1,6 +1,6 @@
 // SoultreeRotate.cpp -- SoultreeObject (soultree.cpp) pivot rotation. Class attribution tier 2;
 // names tier 3.
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // 0x004fd1f0. Semantics (tier 3, from the arithmetic): the point 'pivot' in local space is
 // converted to the parent's space (p = pivot * local, translation included) and stored as the

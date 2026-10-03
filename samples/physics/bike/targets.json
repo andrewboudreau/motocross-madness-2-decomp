@@ -249,7 +249,7 @@
     "target_va": "0x0040c8b0",
     "target_size": 354,
     "expect": "partial",
-    "notes": "Wheel-normal selector. Third branch fixed to copy front (a) normal, matching retail's shared tail; branches restructured so only two copy blocks remain. Remaining diffs: register roles in the midpoint sum (retail a=eax) and the same scalar-kept-live normalise pattern (retail all fld [mem]; fmul st(1) + fstp st(0))."
+    "notes": "98.5%. Wheel-normal selector: nesting wheelsInContact==0, then front inContact, then rear inContact gives retail's control flow. Remaining diff is the normalise tail: retail scales some components with fld [mem]; fmul st(1), VC6 emits fld st(0); fmul [mem] (same cause as slots 55, 72 and 76)."
   },
   {
     "class": "Bike",
@@ -394,5 +394,32 @@
     "target_size": 29,
     "expect": "exact",
     "notes": "Out-of-line cdecl dot product of two Vec3 pointers; y*y + x*x first, then += z*z."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "??0Bike@@QAE@H@Z",
+    "target_va": "0x00407700",
+    "target_size": 374,
+    "expect": "exact",
+    "notes": "ctor; exact with explicit Vehicle(int flags) (0x005257a0, vehicle agent's Vehicle.h). Stores in retail order: wheel pointers, 0x60c, steerAxis/poseSmoother, Bike::UnknownVirtualSlot1(165.0f) (direct call), flags, strcpy(riderName, global 0x00577738), constants."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "??1Bike@@UAE@XZ",
+    "target_va": "0x00409a10",
+    "target_size": 276,
+    "expect": "exact",
+    "notes": "Bike destructor body (reached via the vbase-adjusted deleting destructor): deletes steerAxis and poseSmoother, removes both wheels' contact points from collisionPoints (0x0043a5e0), deletes the +0x60c object through its out-of-line empty destructor (0x00464e90); ~Vehicle follows implicitly. Exact."
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "??_GBike@@UAEPAXI@Z",
+    "target_va": "0x0040ca50",
+    "target_size": 51,
+    "expect": "exact",
+    "notes": "Bike scalar deleting destructor core (vtordisp entry thunk ??_E at 0x0040ca40 is the 8-byte sub/jmp before it). Exact."
   }
 ]

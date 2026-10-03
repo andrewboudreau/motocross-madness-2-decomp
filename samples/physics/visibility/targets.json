@@ -1,0 +1,65 @@
+[
+  {
+    "class": "(free)",
+    "source": "VisibilityHelpers.cpp",
+    "candidate_symbol_contains": "VisTransformVectors",
+    "target_va": "0x0052f0a0",
+    "target_size": 156,
+    "expect": "exact",
+    "notes": "vec3 array x 4x4 matrix; ownership uncertain (no __FILE__ ref)"
+  },
+  {
+    "class": "(free)",
+    "source": "VisibilityHelpers.cpp",
+    "candidate_symbol_contains": "VisTestDot",
+    "target_va": "0x0052f140",
+    "target_size": 72,
+    "expect": "exact",
+    "notes": "dot vs camera threshold; ownership uncertain"
+  },
+  {
+    "class": "(free)",
+    "source": "VisibilityHelpers.cpp",
+    "candidate_symbol_contains": "VisProjectPoint",
+    "target_va": "0x0052f340",
+    "target_size": 389,
+    "expect": "partial",
+    "notes": "69.7% (385/389 bytes): retail reloads camera ptr [esp+0x30] and schedules fld 1.0 before it in the if(screen) block; register allocation differs"
+  },
+  {
+    "class": "(free)",
+    "source": "VisibilityHelpers.cpp",
+    "candidate_symbol_contains": "VisCullPolygon",
+    "target_va": "0x0052fac0",
+    "target_size": 234,
+    "expect": "exact",
+    "notes": "outcode cull of polygon vs camera; ownership uncertain"
+  },
+  {
+    "class": "(free)",
+    "source": "VisibilityHelpers.cpp",
+    "candidate_symbol_contains": "VisCullQuad",
+    "target_va": "0x0052f4d0",
+    "target_size": 160,
+    "expect": "partial",
+    "notes": "~12%: retail uses push esi and different register allocation"
+  },
+  {
+    "class": "(free)",
+    "source": "VisibilityHelpers.cpp",
+    "candidate_symbol_contains": "VisSphereInFrustum",
+    "target_va": "0x0052fbb0",
+    "target_size": 526,
+    "expect": "partial",
+    "notes": "~4% at 514 bytes (51% variant at 516 lost); retail compares far twice via fcom/fcomp, two fail tails, 0x20 frame with dead-param slot reuse"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTreeTraversal.cpp",
+    "candidate_symbol_contains": "Traverse@VisibilityQuadTreeNode",
+    "target_va": "0x0052d610",
+    "target_size": 3027,
+    "expect": "partial",
+    "notes": "72.7%, 3026 vs 3027 bytes: call-site argument-load scheduling in recursive/slot-2 call blocks"
+  }
+]

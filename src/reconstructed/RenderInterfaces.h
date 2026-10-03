@@ -81,7 +81,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod14(UnknownSurfaceCaps* caps);      // GetCaps
     virtual long __stdcall UnknownMethod15();
     virtual long __stdcall UnknownMethod16();
-    virtual long __stdcall UnknownMethod17();
+    virtual long __stdcall UnknownMethod17(void** dc);                     // GetDC
     virtual long __stdcall UnknownMethod18();
     virtual long __stdcall UnknownMethod19();
     virtual long __stdcall UnknownMethod20();
@@ -90,7 +90,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod23();
     virtual long __stdcall UnknownMethod24();                             // IsLost
     virtual long __stdcall UnknownMethod25(void* rect, UnknownSurfaceDesc* desc, int flags, void* event); // Lock
-    virtual long __stdcall UnknownMethod26();
+    virtual long __stdcall UnknownMethod26(void* dc);                      // ReleaseDC
     virtual long __stdcall UnknownMethod27();                             // Restore
     virtual long __stdcall UnknownMethod28();
     virtual long __stdcall UnknownMethod29(int flags, void* key);         // SetColorKey

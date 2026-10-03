@@ -1,0 +1,162 @@
+[
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "??0VisibilityQuadTree@@",
+    "target_va": "0x0052d340",
+    "target_size": 138,
+    "expect": "exact",
+    "notes": "ctor: inlined QuadTree ctor, GameObject(int) on +0x874, resets 16-entry global array",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "??_GVisibilityQuadTree@@",
+    "target_va": "0x0052d3d0",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "scalar deleting dtor (primary vtable slot 0)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "??1VisibilityQuadTree@@",
+    "target_va": "0x0052d3f0",
+    "target_size": 103,
+    "expect": "exact",
+    "notes": "dtor core: clears the persistent collision tree at 0x0068aba4",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "Setup",
+    "target_va": "0x0052d460",
+    "target_size": 74,
+    "expect": "exact",
+    "notes": "Setup: slot8 on GameObject, Reset, Init",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot1",
+    "target_va": "0x0052d4b0",
+    "target_size": 94,
+    "expect": "exact",
+    "notes": "node factory new(__FILE__, 0x4f)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTreeNode",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "??0VisibilityQuadTreeNode",
+    "target_va": "0x0052d510",
+    "target_size": 18,
+    "expect": "exact",
+    "notes": "node ctor",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTreeNode",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "??_GVisibilityQuadTreeNode",
+    "target_va": "0x0052d530",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "node deleting dtor",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTreeNode",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "??1VisibilityQuadTreeNode",
+    "target_va": "0x0052d550",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "node dtor core (jmp QuadTreeNode dtor)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "Query",
+    "target_va": "0x0052d560",
+    "target_size": 170,
+    "expect": "exact",
+    "notes": "frustum query over the tree",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot14",
+    "target_va": "0x0052e3b0",
+    "target_size": 148,
+    "expect": "exact",
+    "notes": "secondary slot 14: debug draw",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot23",
+    "target_va": "0x0052eec0",
+    "target_size": 135,
+    "expect": "exact",
+    "notes": "secondary slot 23: debug keys",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot12",
+    "target_va": "0x0052ef50",
+    "target_size": 252,
+    "expect": "exact",
+    "notes": "secondary slot 12: per-frame query with profiling",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot15",
+    "target_va": "0x0052f050",
+    "target_size": 17,
+    "expect": "exact",
+    "notes": "secondary slot 15: EndQuery",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "??_EVisibilityQuadTree",
+    "target_va": "0x0052f070",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "secondary vtable slot-0 adjustor thunk",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "DrawBox@VisibilityQuadTreeNode",
+    "target_va": "0x0052e1f0",
+    "target_size": 437,
+    "expect": "exact",
+    "notes": "16-vertex box outline via renderer slot 16",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "DebugDraw@VisibilityQuadTreeNode",
+    "target_va": "0x0052e450",
+    "target_size": 2657,
+    "expect": "exact",
+    "notes": "4-child walk with __forceinline DrawChild",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  }
+]

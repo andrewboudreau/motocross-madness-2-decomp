@@ -4,8 +4,13 @@ Reconstruct readable C++ that reproduces the retail x86 executable under VC6 SP3
 The project is at function/class reconstruction, not a complete game build.
 
 [Current matches and next targets](docs/VC6_MATCHING.md) ·
+[Decompilation progress](docs/DECOMPILATION_PROGRESS.md) ·
 [Setup](docs/TOOLCHAIN.md) · [Codex Cloud](docs/TOOLCHAIN.md#codex-cloud) ·
 [Agent workflow](AGENTS.md)
+
+The [progress page](docs/DECOMPILATION_PROGRESS.md) records reviewed strict
+calibration results alongside source, RTTI and executable-size indicators.
+Selected-target matching is not a whole-game completion percentage.
 
 ## Project layout
 

@@ -1,0 +1,371 @@
+[
+  {
+    "class": "DustParticleEmitter",
+    "source": "DustParticleEmitter.cpp",
+    "candidate_symbol_contains": "??0DustParticleEmitter",
+    "target_va": "0x004b8a00",
+    "target_size": 122,
+    "expect": "partial",
+    "notes": "19.1% (118 vs 122 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor; store order differs from retail (retail interleaves the zero stores of position/previousPosition through a shared register; a member-zeroing Vec3 was tried and does not reproduce it)"
+  },
+  {
+    "class": "DustParticleEmitter",
+    "source": "DustParticleEmitter.cpp",
+    "candidate_symbol_contains": "??_GDustParticleEmitter",
+    "target_va": "0x004b8a80",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor"
+  },
+  {
+    "class": "DustParticleEmitter",
+    "source": "DustParticleEmitter.cpp",
+    "candidate_symbol_contains": "??1DustParticleEmitter",
+    "target_va": "0x004b8aa0",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor"
+  },
+  {
+    "class": "DustParticleEmitter",
+    "source": "DustParticleEmitter.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot27@DustParticleEmitter",
+    "target_va": "0x004ba040",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, shared by all five emitters (ICF-folded): GameObject slot 8, then stores the manager or releases"
+  },
+  {
+    "class": "DustParticleEmitter",
+    "source": "DustParticleEmitter.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@DustParticleEmitter",
+    "target_va": "0x004b8ab0",
+    "target_size": 732,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: speed from distance/dt clamps the rate, spawns AddParticle calls along the segment; the dead dt slot holds the particle count"
+  },
+  {
+    "class": "DustParticleEmitter",
+    "source": "DustParticleEmitter.cpp",
+    "candidate_symbol_contains": "?SetPosition@DustParticleEmitter",
+    "target_va": "0x004b8d90",
+    "target_size": 58,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). SetPosition(Vec3 by value, float): previous = position; position = p"
+  },
+  {
+    "class": "DustParticleEmitter",
+    "source": "DustParticleEmitter.cpp",
+    "candidate_symbol_contains": "?SetColor@DustParticleEmitter",
+    "target_va": "0x004b8dd0",
+    "target_size": 31,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). packs r, g, b into color"
+  },
+  {
+    "class": "DirtChunkParticleEmitter",
+    "source": "DirtChunkParticleEmitter.cpp",
+    "candidate_symbol_contains": "??0DirtChunkParticleEmitter",
+    "target_va": "0x004b8df0",
+    "target_size": 287,
+    "expect": "partial",
+    "notes": "7.2% (299 vs 287 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops"
+  },
+  {
+    "class": "DirtChunkParticleEmitter",
+    "source": "DirtChunkParticleEmitter.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@DirtChunkParticleEmitter",
+    "target_va": "0x004b8f40",
+    "target_size": 970,
+    "expect": "partial",
+    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: writes particles straight into the manager table (inlined AddParticle-like code). Only the first component of each r-scaled vector differs (retail fld mem; fmul st(1), VC6 emits fld st(0); fmul mem)"
+  },
+  {
+    "class": "DirtChunkParticleEmitter",
+    "source": "DirtChunkParticleEmitter.cpp",
+    "candidate_symbol_contains": "??_GDirtChunkParticleEmitter",
+    "target_va": "0x004b8f10",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor"
+  },
+  {
+    "class": "DirtChunkParticleEmitter",
+    "source": "DirtChunkParticleEmitter.cpp",
+    "candidate_symbol_contains": "??1DirtChunkParticleEmitter",
+    "target_va": "0x004b8f30",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor"
+  },
+  {
+    "class": "DirtSprayParticleEmitter",
+    "source": "DirtSprayParticleEmitter.cpp",
+    "candidate_symbol_contains": "??0DirtSprayParticleEmitter",
+    "target_va": "0x004b9310",
+    "target_size": 281,
+    "expect": "partial",
+    "notes": "12.8% (271 vs 281 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops"
+  },
+  {
+    "class": "DirtSprayParticleEmitter",
+    "source": "DirtSprayParticleEmitter.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@DirtSprayParticleEmitter",
+    "target_va": "0x004b9460",
+    "target_size": 970,
+    "expect": "partial",
+    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: same shape as DirtChunk (initial age 375, frame wraps at 13); same residual first-component fld st(0) difference"
+  },
+  {
+    "class": "DirtSprayParticleEmitter",
+    "source": "DirtSprayParticleEmitter.cpp",
+    "candidate_symbol_contains": "??_GDirtSprayParticleEmitter",
+    "target_va": "0x004b9430",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor"
+  },
+  {
+    "class": "DirtSprayParticleEmitter",
+    "source": "DirtSprayParticleEmitter.cpp",
+    "candidate_symbol_contains": "??1DirtSprayParticleEmitter",
+    "target_va": "0x004b9450",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor"
+  },
+  {
+    "class": "SparkParticleEmitter",
+    "source": "SparkParticleEmitter.cpp",
+    "candidate_symbol_contains": "??0SparkParticleEmitter",
+    "target_va": "0x004b9830",
+    "target_size": 307,
+    "expect": "partial",
+    "notes": "11.9% (279 vs 307 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with two rand() fill loops"
+  },
+  {
+    "class": "SparkParticleEmitter",
+    "source": "SparkParticleEmitter.cpp",
+    "candidate_symbol_contains": "??_GSparkParticleEmitter",
+    "target_va": "0x004b9970",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor"
+  },
+  {
+    "class": "SparkParticleEmitter",
+    "source": "SparkParticleEmitter.cpp",
+    "candidate_symbol_contains": "??1SparkParticleEmitter",
+    "target_va": "0x004b9990",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor"
+  },
+  {
+    "class": "SparkParticleEmitter",
+    "source": "SparkParticleEmitter.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SparkParticleEmitter",
+    "target_va": "0x004b99a0",
+    "target_size": 1055,
+    "expect": "partial",
+    "notes": "98.4% (1055 vs 1055 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: DirtChunk-like direct particle fill that switches itself off once the manager table is full or the burst ends; residual is the same first-component fld st(0) difference as DirtChunk/DirtSpray"
+  },
+  {
+    "class": "SparkParticleEmitter",
+    "source": "SparkParticleEmitter.cpp",
+    "candidate_symbol_contains": "?SetPosition@SparkParticleEmitter",
+    "target_va": "0x004b9dc0",
+    "target_size": 49,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). SetPosition(Vec3 by value)"
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "??0SteamParticleEmitter",
+    "target_va": "0x004b9f40",
+    "target_size": 199,
+    "expect": "partial",
+    "notes": "12.8% (184 vs 199 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor with one rand() fill loop"
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "??_GSteamParticleEmitter",
+    "target_va": "0x004ba010",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). scalar deleting destructor"
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "??1SteamParticleEmitter",
+    "target_va": "0x004ba030",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). dtor"
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SteamParticleEmitter",
+    "target_va": "0x004ba070",
+    "target_size": 590,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: spawns particles along the movement segment; lenSq is written z*z + (y*y + x*x), which is the term order VC6 needs"
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "?SetPosition@SteamParticleEmitter",
+    "target_va": "0x004ba2c0",
+    "target_size": 49,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). SetPosition(Vec3 by value)"
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "?Restart@SteamParticleEmitter",
+    "target_va": "0x004ba300",
+    "target_size": 18,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). "
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "?Burst@SteamParticleEmitter",
+    "target_va": "0x004ba320",
+    "target_size": 19,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). "
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "?StopEmitting@SteamParticleEmitter",
+    "target_va": "0x004ba340",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). "
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "?SetColor@SteamParticleEmitter",
+    "target_va": "0x004ba360",
+    "target_size": 34,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). packs r, g, b into color"
+  },
+  {
+    "class": "DirtChunkParticleEmitter",
+    "source": "DirtChunkParticleEmitter.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot27@DirtChunkParticleEmitter",
+    "target_va": "0x004ba040",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, ICF-folded with the other emitters"
+  },
+  {
+    "class": "DirtSprayParticleEmitter",
+    "source": "DirtSprayParticleEmitter.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot27@DirtSprayParticleEmitter",
+    "target_va": "0x004ba040",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, ICF-folded with the other emitters"
+  },
+  {
+    "class": "SparkParticleEmitter",
+    "source": "SparkParticleEmitter.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot27@SparkParticleEmitter",
+    "target_va": "0x004ba040",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, ICF-folded with the other emitters"
+  },
+  {
+    "class": "SteamParticleEmitter",
+    "source": "SteamParticleEmitter.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot27@SteamParticleEmitter",
+    "target_va": "0x004ba040",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). slot 27, ICF-folded with the other emitters"
+  },
+  {
+    "class": "EmitterConstVec3",
+    "source": "EmitterVec3Constants.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004b9e00",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "(0,0,0) thunk; the vector-constant initialisers that open about 73 retail TUs; TU start between Spark and Steam with no __FILE__ string. Copy-initialisation gives the stack temporary plus copy."
+  },
+  {
+    "class": "EmitterConstVec3",
+    "source": "EmitterVec3Constants.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004b9e10",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "(0,0,0) body; the vector-constant initialisers that open about 73 retail TUs; TU start between Spark and Steam with no __FILE__ string. Copy-initialisation gives the stack temporary plus copy."
+  },
+  {
+    "class": "EmitterConstVec3",
+    "source": "EmitterVec3Constants.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004b9e50",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "(1,0,0) thunk; the vector-constant initialisers that open about 73 retail TUs; TU start between Spark and Steam with no __FILE__ string. Copy-initialisation gives the stack temporary plus copy."
+  },
+  {
+    "class": "EmitterConstVec3",
+    "source": "EmitterVec3Constants.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004b9e60",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "(1,0,0) body; the vector-constant initialisers that open about 73 retail TUs; TU start between Spark and Steam with no __FILE__ string. Copy-initialisation gives the stack temporary plus copy."
+  },
+  {
+    "class": "EmitterConstVec3",
+    "source": "EmitterVec3Constants.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004b9ea0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "(0,1,0) thunk; the vector-constant initialisers that open about 73 retail TUs; TU start between Spark and Steam with no __FILE__ string. Copy-initialisation gives the stack temporary plus copy."
+  },
+  {
+    "class": "EmitterConstVec3",
+    "source": "EmitterVec3Constants.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004b9eb0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "(0,1,0) body; the vector-constant initialisers that open about 73 retail TUs; TU start between Spark and Steam with no __FILE__ string. Copy-initialisation gives the stack temporary plus copy."
+  },
+  {
+    "class": "EmitterConstVec3",
+    "source": "EmitterVec3Constants.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004b9ef0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "(0,0,1) thunk; the vector-constant initialisers that open about 73 retail TUs; TU start between Spark and Steam with no __FILE__ string. Copy-initialisation gives the stack temporary plus copy."
+  },
+  {
+    "class": "EmitterConstVec3",
+    "source": "EmitterVec3Constants.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004b9f00",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "(0,0,1) body; the vector-constant initialisers that open about 73 retail TUs; TU start between Spark and Steam with no __FILE__ string. Copy-initialisation gives the stack temporary plus copy."
+  }
+]

@@ -6,14 +6,20 @@ Results use VC6 SP3 natively on Windows. The full gate and profile matrix were
 repeated on 2026-10-02 under Linux/wibo. A complete linked game remains a
 separate, unverified gate.
 
+The VC6 gate currently checks byte-exact functions from 41 handwritten C++
+candidate files: all 34 files in `src/reconstructed/` and seven focused probes
+in `samples/`. This is a count of source files represented by at least one
+checked function, not a claim that complete object files or a linked game match.
+
 ## Compiler profiles
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 480/480 |
-| `vc6_o2_ml` | 39/39 | 19/19 | 480/480 |
-| `vc6_o2_mt_g6`, `vc6_o2_ml_g6` | 39/39 | 19/19 | 217/480 |
-| `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 87/480 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 487/487 |
+| `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
+| `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
+| `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
+| `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 8/17 (camera cases not rerun) |
 
 Passing manual samples mask no bytes. Generated probes resolve both global-load
 addresses. Summaries prefer strict results when available.
@@ -56,8 +62,12 @@ RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 
 ## Validated slices
 
-The original 17 compiler-shape calibration targets match the default profile,
-including
+The seven emitted fixed-size `BlockAllocator` bodies are now exact under the
+default profile, including the five-byte destructor tail jump and the two
+fully resolved `BlockAllocator.cpp` debug-allocation calls. See
+[allocation evidence](ALLOCATION.md#fixed-size-block-allocator).
+
+All 17 calibration targets match the default profile, including
 [FollowCamera](FOLLOW_CAMERA.md) slots 68 (`0x00466d50`, x87 distance/clamp,
 every relocation resolved), 69 (`0x00466a80`, source shape) and 71
 (`0x00466e50`, 192-byte extent including its jump table). Every FollowCamera
@@ -194,6 +204,12 @@ retains the symbol/section extent. Target sizes and NOPs never determine lengths
 paired compilations preserve code sections and relocations. It is not a claimed
 original flag. Format references: [PE/COFF](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#auxiliary-format-1-function-definitions)
 and [CodeView](https://github.com/microsoft/microsoft-pdb/blob/master/include/cvinfo.h).
+
+Same-section relocations are inferred only when their final symbol-plus-addend
+destination is inside the independently measured function extent. This includes
+section-symbol references into jump tables; an internal label plus an escaping
+addend still needs an explicit binding. Inference is per relocation, so a local
+reference cannot authorize another reference outside the function.
 
 `tools/match.py --bindings` applies DIR32/REL32 relocations and compares every byte.
 Bindings require independent address evidence. Without bindings the tool masks

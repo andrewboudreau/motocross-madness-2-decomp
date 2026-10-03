@@ -20,7 +20,7 @@ public:
 
 // GameObject: RTTI .?AVGameObject@@ (COL 0x0055c248), direct base BaseObject, vtable
 // 0x00552a2c with 27 slots (slots 1 and 3 are inherited from BaseObject; 0, 2 and 4..26
-// are GameObject's own).  Ctor 0x00468ca0 (D:ardvark\VC\krusty2\gameobj.cpp) writes
+// are GameObject's own).  Ctor 0x00468ca0 (D:\aardvark\VC\krusty2\gameobj.cpp) writes
 // fields +0x08..+0x28 and ends the object at 0x2c (tier 2: ctor/dtor field extent;
 // the 0x28 field is an allocation of 0x28 bytes released by the dtor 0x00468d60).
 // Slot names are placeholders (tier 3); the signatures carry the decoded ABI.  This is a
@@ -78,7 +78,12 @@ public:
     // `lea ecx,[vbase]` before calling it).  Argument types tier 3.
     void Method_0x00469190(void* a, int b);
 
-    char treeLinks[0x10];  // +0x08 previous/next sibling, first child, parent (src/reconstructed/GameObject.h)
+    // +0x08..+0x14: previous sibling, next sibling, first child, parent (src/reconstructed/GameObject.h;
+    // the parent link is walked to the root by 0x005046e0, children are chained through +0x0c).
+    GameObject* prevSibling;   // +0x08
+    GameObject* nextSibling;   // +0x0c
+    GameObject* firstChild;    // +0x10
+    GameObject* parent;        // +0x14
     void* field_0x18;                   // written by slot 8 (0x004692f0)
     char field_0x1c[9];
     unsigned char statusFlags;           // +0x25 bit 0 tested by SoultreePhysicsBaseObject slot 21 and Vehicle

@@ -17,7 +17,7 @@
 #ifndef MCM2_PHYSICS_RIGIDBODY_PHYSICSBODY_H
 #define MCM2_PHYSICS_RIGIDBODY_PHYSICSBODY_H
 
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 #include "core/GraphicsTest.h"
 
 // GameObject and GraphicsTest are the canonical classes (core/GraphicsTest.h).

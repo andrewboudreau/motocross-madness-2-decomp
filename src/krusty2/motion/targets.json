@@ -1,0 +1,142 @@
+[
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x00504940",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "jmp thunk of the g_pSphereManager = new(__FILE__, 4) SphereManager(1) initialiser",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x00504950",
+    "target_size": 109,
+    "expect": "exact",
+    "notes": "dynamic initialiser body: debug new(__FILE__,4), ctor call, store to global",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "??0SphereManager@@QAE@H@Z",
+    "target_va": "0x005049c0",
+    "target_size": 35,
+    "expect": "exact",
+    "notes": "ctor: GameObject(a) plus field_0x414 = 0; one-argument source signature (ret 4 vbase ctor)",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "??_GSphereManager@@UAEPAXI@Z",
+    "target_va": "0x005049f0",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "slot 0 scalar deleting destructor (RTTI vtable 0x005581d8)",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "??1SphereManager@@UAE@XZ",
+    "target_va": "0x00504a10",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "destructor body: vptr store then tail jmp to GameObject dtor",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00504a20",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser jmp thunk (per-TU Math3D.h copy)",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00504a30",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser body (copy-init); target_size is the CodeView extent",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00504a70",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser jmp thunk (per-TU Math3D.h copy)",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x00504a80",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser body (copy-init); target_size is the CodeView extent",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x00504ac0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser jmp thunk (per-TU Math3D.h copy)",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x00504ad0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser body (copy-init); target_size is the CodeView extent",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x00504b10",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser jmp thunk (per-TU Math3D.h copy)",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00504b20",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser body (copy-init); target_size is the CodeView extent",
+    "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SphereManager",
+    "source": "Spheres.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot8@SphereManager",
+    "target_va": "0x00462e30",
+    "target_size": 19,
+    "expect": "exact",
+    "notes": "Non-inherited RTTI slot 8: call GameObject slot 8 and return this; shared retail body, not evidence of original TU ownership.",
+    "bindings": "Spheres.bindings.json"
+  }
+]

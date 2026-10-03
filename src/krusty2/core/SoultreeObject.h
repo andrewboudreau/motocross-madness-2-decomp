@@ -1,6 +1,6 @@
 // SoultreeObject.h -- scene-graph node (soultree.cpp) as seen by the physics code.
 //
-// Owner: opus_rigidbody (samples/physics/common). Included by Math3D.h.
+// Shared declaration included by math/Math3D.h.
 //
 // Class identity: RTTI .?AVSoultreeObject@@ (tier 1), bases QuadTreeObject (+0)
 // and GameObject (+12). The constructor at 0x004fb2b0 writes both vptrs
@@ -134,6 +134,41 @@ public:
     // 0x004fd1f0. thiscall, ret 0x1c. Rotates this node about the local-space point 'pivot'
     // so that the pivot stays where it was in the parent's space. Tier 3 name.
     void RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle);
+
+    // ---- added in wave 4 (motion): methods called by SteeringControl / D3DIMSoultreeMotnctrl ----
+
+    // 0x004fbd70, thiscall, ret 0x10: SetAxesIn-style setter taking the two axes by pointer
+    // (axisZ, axisY, orthogonalize, keepZ); the pose/steering callers pass them straight through
+    // (tier 2 for the signature, role tier 3).
+    void SetAxesPtr(const Vec3* axisZ, const Vec3* axisY, int orthogonalize, int keepZ);
+
+    // 0x004fcce0, thiscall, ret 0x10: rotate the local matrix about the axis (x, y, z) by 'angle'
+    // (tier 2 signature; the axis is passed as three loose floats by SteeringControl).
+    void RotateAbout(float x, float y, float z, float angle);
+
+    // 0x004fc690, thiscall, ret 0x10: adds 'delta' (given in 'frame' space) to the node position;
+    // for frame == this it adds to the local translation +0xe8..+0xf0 and invalidates the world
+    // matrix (tier 2).
+    void TranslateIn(SoultreeObject* frame, Vec3 delta);
+
+    // 0x004fc4f0, thiscall, ret 8: local rotation rows 2 and 1 (the frame-less form of GetAxesIn
+    // at 0x004fc540). Names tier 3.
+    void GetAxes(Vec3* axisZ, Vec3* axisY);
+
+    // 0x004fc630 again, spelled with the position by value: the pose callers in D3DIMSoultreeMotnctrl slots 4
+    // and 6 copy a Vec3 to the argument area dword by dword (tier 2). The float overload above is the same
+    // function; this declaration exists only so those callers keep that call shape.
+    void SetPositionVec3(Vec3 p);
+
+    // 0x004fedb0, thiscall, plain ret (soultree.cpp, __FILE__ line 0x49b): appends this node to the global node
+    // array (0x00689ec4, count 0x00689ec8, capacity 0x00689ecc) unless it is already listed. Name tier 3.
+    void RegisterNode();
+
+    // 0x004fee30, thiscall, plain ret: removes this node from the same global array (name tier 3).
+    void UnregisterNode();
+
+    // 0x004fda30, thiscall: node count of the subtree (tier 3 role; signature from the callers).
+    int CountNodes();
 
     // ---- callees of SoultreePhysicsBaseObject (formerly SoultreePhysicsCallees.h) ----
 

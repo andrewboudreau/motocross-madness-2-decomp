@@ -1,0 +1,182 @@
+[
+  {
+    "class": "NormalDistribution",
+    "source": "NormalDistribution.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004aff90",
+    "target_size": 13,
+    "expect": "exact",
+    "notes": "static initialiser body: pushes the resolution 100 and calls the ctor on the global",
+    "bindings": "NormalDistribution.bindings.json"
+  },
+  {
+    "class": "NormalDistribution",
+    "source": "NormalDistribution.cpp",
+    "candidate_symbol_contains": "_$E3",
+    "target_va": "0x004affa0",
+    "target_size": 12,
+    "expect": "exact",
+    "notes": "registers the dtor wrapper with atexit",
+    "bindings": "NormalDistribution.bindings.json"
+  },
+  {
+    "class": "NormalDistribution",
+    "source": "NormalDistribution.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004affb0",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": "atexit dtor wrapper (mov ecx, global; jmp dtor)",
+    "bindings": "NormalDistribution.bindings.json"
+  },
+  {
+    "class": "NormalDistribution",
+    "source": "NormalDistribution.cpp",
+    "candidate_symbol_contains": "??0NormalDistribution",
+    "target_va": "0x004affc0",
+    "target_size": 129,
+    "expect": "exact",
+    "notes": "builds the 1 - 0.948667x + 0.2964x^2 - 0.030333x^3 table",
+    "bindings": "NormalDistribution.bindings.json"
+  },
+  {
+    "class": "NormalDistribution",
+    "source": "NormalDistribution.cpp",
+    "candidate_symbol_contains": "??1NormalDistribution",
+    "target_va": "0x004b0050",
+    "target_size": 23,
+    "expect": "exact",
+    "notes": "frees the table with the debug delete (__FILE__ line 0x1e)",
+    "bindings": "NormalDistribution.bindings.json"
+  },
+  {
+    "class": "NormalDistribution",
+    "source": "NormalDistribution.cpp",
+    "candidate_symbol_contains": "?Lookup@NormalDistribution",
+    "target_va": "0x004b0070",
+    "target_size": 100,
+    "expect": "exact",
+    "notes": "table lookup of |value-mean|/sigma over 0..3 sigma",
+    "bindings": "NormalDistribution.bindings.json"
+  },
+  {
+    "class": "NullManager",
+    "source": "Nulls.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004b00e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "jmp thunk to the static initialiser",
+    "bindings": "Nulls.bindings.json"
+  },
+  {
+    "class": "NullManager",
+    "source": "Nulls.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004b00f0",
+    "target_size": 109,
+    "expect": "exact",
+    "notes": "g_nullManager = new(__FILE__, 5) NullManager(1)",
+    "bindings": "Nulls.bindings.json"
+  },
+  {
+    "class": "NullManager",
+    "source": "Nulls.cpp",
+    "candidate_symbol_contains": "??0NullManager",
+    "target_va": "0x004b0160",
+    "target_size": 35,
+    "expect": "exact",
+    "notes": "ctor",
+    "bindings": "Nulls.bindings.json"
+  },
+  {
+    "class": "NullManager",
+    "source": "Nulls.cpp",
+    "candidate_symbol_contains": "??_GNullManager",
+    "target_va": "0x004b0190",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "scalar deleting destructor",
+    "bindings": "Nulls.bindings.json"
+  },
+  {
+    "class": "NullManager",
+    "source": "Nulls.cpp",
+    "candidate_symbol_contains": "??1NullManager",
+    "target_va": "0x004b01b0",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "dtor",
+    "bindings": "Nulls.bindings.json"
+  },
+  {
+    "class": "ParticleManager",
+    "source": "Particles.cpp",
+    "candidate_symbol_contains": "??0ParticleManager",
+    "target_va": "0x004ba390",
+    "target_size": 103,
+    "expect": "exact",
+    "notes": "ctor; the particles[] zeroing loop becomes rep stosd",
+    "bindings": "Particles.bindings.json"
+  },
+  {
+    "class": "ParticleManager",
+    "source": "Particles.cpp",
+    "candidate_symbol_contains": "??_GParticleManager",
+    "target_va": "0x004ba400",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "scalar deleting destructor",
+    "bindings": "Particles.bindings.json"
+  },
+  {
+    "class": "ParticleManager",
+    "source": "Particles.cpp",
+    "candidate_symbol_contains": "??1ParticleManager",
+    "target_va": "0x004ba420",
+    "target_size": 173,
+    "expect": "exact",
+    "notes": "dtor (SEH frame from the member releases)",
+    "bindings": "Particles.bindings.json"
+  },
+  {
+    "class": "ParticleManager",
+    "source": "Particles.cpp",
+    "candidate_symbol_contains": "?AddParticle@ParticleManager",
+    "target_va": "0x004baa50",
+    "target_size": 158,
+    "expect": "exact",
+    "notes": "spawn: fills the next free particle, returns 0 when all 1000 are in use",
+    "bindings": "Particles.bindings.json"
+  },
+  {
+    "class": "ParticleManager",
+    "source": "Particles.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@ParticleManager",
+    "target_va": "0x004baaf0",
+    "target_size": 296,
+    "expect": "exact",
+    "notes": "update: ages, recycles dead particles and integrates size, position and velocity",
+    "bindings": "Particles.bindings.json"
+  },
+  {
+    "class": "ParticleManager",
+    "source": "Particles.cpp",
+    "candidate_symbol_contains": "?CompareParticleDepth",
+    "target_va": "0x004bac20",
+    "target_size": 57,
+    "expect": "exact",
+    "notes": "qsort comparator used by slot 14 (nearer vertex first)",
+    "bindings": "Particles.bindings.json"
+  },
+  {
+    "class": "NullManager",
+    "source": "Nulls.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot8@NullManager",
+    "target_va": "0x00462e30",
+    "target_size": 19,
+    "expect": "exact",
+    "notes": "Non-inherited RTTI slot 8: call GameObject slot 8 and return this; shared retail body, not evidence of original TU ownership.",
+    "bindings": "Nulls.bindings.json"
+  }
+]

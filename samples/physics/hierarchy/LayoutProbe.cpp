@@ -80,8 +80,8 @@ HIER_CHECK(kb_size, sizeof(KrustyBike) == 5644 + 0x2c);
 // GameObject has only the explicit GameObject(int) ctor (0x00468ca0), so each most-derived
 // probe ctor names the virtual-base initializer.  D3DIMSoultreeCharacter's retail ctor
 // 0x004455b0 passes 1 (tier 1); the other arguments are probe-only.
-Character::Character() : GameObject(0) {}
-D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int) : GameObject(1) {}
+Character::Character(int a) : GameObject(0) {}
+D3DIMSoultreeCharacter::D3DIMSoultreeCharacter(int a) : GameObject(1), Character(a) {}
 Vehicle::Vehicle() : GameObject(0), SoultreePhysicsCharacter(0) {}
 Bike::Bike() : GameObject(0) {}
 KrustyBike::KrustyBike() : GameObject(0) {}

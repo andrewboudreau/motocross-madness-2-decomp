@@ -13,7 +13,7 @@
 
 #include "collision/CollisionObject.h"
 #include "CollisionPoint.h"
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // Box bounds object at CollisionHullShape::field_0x188: two vec3s read as
 // (+4, +0x10) by every caller of the broad-phase test 0x00424730 (center, half extents;
@@ -150,6 +150,23 @@ inline void CollisionInvertRigid(Matrix4* out, const Matrix4* src)
     CollisionVec3 p;
     p.x = -((out->m[3][2] * out->m[2][0] + out->m[3][1] * out->m[1][0]) + out->m[3][0] * out->m[0][0]);
     p.y = -((out->m[3][2] * out->m[2][1] + out->m[3][1] * out->m[1][1]) + out->m[3][0] * out->m[0][1]);
+    p.z = -((out->m[3][2] * out->m[2][2] + out->m[3][1] * out->m[1][2]) + out->m[3][0] * out->m[0][2]);
+    out->m[3][0] = p.x;
+    out->m[3][1] = p.y;
+    out->m[3][2] = p.z;
+}
+
+// Variant whose p.y sum order matches CollisionRelativeFrame (0x432260).
+inline void CollisionInvertRigidRelFrame(Matrix4* out, const Matrix4* src)
+{
+    *out = *src;
+    float t;
+    t = out->m[0][1]; out->m[0][1] = out->m[1][0]; out->m[1][0] = t;
+    t = out->m[0][2]; out->m[0][2] = out->m[2][0]; out->m[2][0] = t;
+    t = out->m[1][2]; out->m[1][2] = out->m[2][1]; out->m[2][1] = t;
+    CollisionVec3 p;
+    p.x = -((out->m[3][2] * out->m[2][0] + out->m[3][1] * out->m[1][0]) + out->m[3][0] * out->m[0][0]);
+    p.y = -((out->m[3][1] * out->m[1][1] + out->m[3][0] * out->m[0][1]) + out->m[3][2] * out->m[2][1]);
     p.z = -((out->m[3][2] * out->m[2][2] + out->m[3][1] * out->m[1][2]) + out->m[3][0] * out->m[0][2]);
     out->m[3][0] = p.x;
     out->m[3][1] = p.y;
