@@ -161,7 +161,6 @@ void Terrain::SelectQuality(int index)
     qualityParamB = g_pTerrainQualityTable[qualityIndex].field_0x08;
 }
 
-TerrainSharedState g_terrainSharedState;
 int g_terrainToggle314;
 int g_terrainToggle718;
 

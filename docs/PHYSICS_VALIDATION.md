@@ -37,9 +37,35 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
+## Reviewed wave-5 slice
+
+A further 41 cases pass strict VC6 SP3 comparison under the same profile:
+
+- `src/krusty2/shadow/D3DIMSoultreeShadow.cpp`: 16 cases, including the
+  generated destructor core selected by its deleting wrapper.
+- `src/reconstructed/TerrainSupport.cpp`: 25 cases covering global camera/timer
+  initialization, owned-texture acquisition, and the height-range getter.
+
+These two sources have adjacent reviewed bindings. TerrainSupport is our slice
+filename, not a recovered retail TU name; the source attribution is Terrain.cpp.
+Its timers reuse the canonical UnknownPeakHold type, and the texture constructor
+arguments use TextureMapManager pointers. The remaining Terrain implementation
+is unchanged in scope and is not included in this strict claim.
+
+```bash
+python tools/run_physics_samples.py --strict \
+  --source src/krusty2/shadow/D3DIMSoultreeShadow.cpp \
+  --source src/reconstructed/TerrainSupport.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+Across the two reviewed slices there are 89 cases, or 88 unique retail
+address/extent pairs. Full-corpus totals also include older targets and are
+not additive to the calibration progress snapshot.
+
 ## Preserved candidates
 
-The tree builder, D3DIMSoultree motion control, steering, projected shadow,
+The tree builder, D3DIMSoultree motion control, Motnctrl loaders/playback, steering, projected shadow,
 and the visibility traversal remain under `samples/physics/` until their
 remaining byte/relocation evidence is complete. Shared layout headers remain
 under `src/krusty2/` for both verified source and samples; a header alone does

@@ -1,0 +1,23 @@
+{
+  "??0GameObject@@QAE@H@Z": "0x468ca0",
+  "??1D3DIMSoultreeShadow@@UAE@XZ": "0x508b70",
+  "??1GameObject@@UAE@XZ": "0x468d60",
+  "??1ShadowReceiver@@UAE@XZ": "0x4477c0",
+  "??3@YAXPAX@Z": "0x4a30c0",
+  "??_7D3DIMSoultreeShadow@@6B@": "0x55156c",
+  "??_7ShadowReceiver@@6B@": "0x5515ec",
+  "?AddReceiver@ProjectedShadow@@QAEXPAVShadowReceiver@@@Z": "0x4daba0",
+  "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x4692f0",
+  "?g_d3dimShadowIndexTable@@3PAFA": "0x5995b8",
+  "?g_d3dimShadowTexel@@3MA": "0x57efa4",
+  "_$E1": "0x4477e0",
+  "_$E10": "0x4478d0",
+  "_$E4": "0x447830",
+  "_$E7": "0x447880",
+  "__real@4@3ffe8000000000000000": "0x5507f4",
+  "__real@4@3fff8000000000000000": "0x550748",
+  "_kVec3XAxis": "0x57efb8",
+  "_kVec3YAxis": "0x57efc8",
+  "_kVec3ZAxis": "0x57ef98",
+  "_kVec3Zero": "0x57efa8"
+}

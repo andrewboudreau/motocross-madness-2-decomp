@@ -12,11 +12,11 @@ static void TireCollisionCallback(CollisionObject* a, CollisionObject* b)
     int tag = b->ownerType;
     if (tag == 0x64) {
         // virtual call, vtable offset 0xcc, on b's owner
-        if (!(*(int (__fastcall**)(void*))(**(int**)&b->ownerObject + 0xcc))(b->ownerObject))
-            tire->HandleContact(1, tag, b);
-    } else if (tag != 0x65) {
-        tire->HandleContact(1, tag, b);
-    }
+        if ((*(int (__fastcall**)(void*))(**(int**)&b->ownerObject + 0xcc))(b->ownerObject))
+            return;
+    } else if (tag == 0x65)
+        return;
+    tire->HandleContact(1, tag, b);
 }
 
 // 0x0040ae30 (cdecl, out of line): dot product of two vectors, result in st(0).
@@ -596,7 +596,9 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
 // CollisionPoint.cpp but with this translation unit's zero/unit vector globals (tier 2:
 // the stores read 0x0068a3d0 / 0x0068a3f0, not the collision globals).
 inline CollisionPoint::CollisionPoint(float a, int b)
-    : normalForce(a), surfaceOwner(b) {
+{
+    normalForce = a;
+    surfaceOwner = b;
     localPosition = g_TireZeroVec3;
     ownerNode = 0;
     worldPosition = g_TireZeroVec3;

@@ -1,0 +1,162 @@
+[
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "??0D3DIMSoultreeShadow",
+    "target_va": "0x446840",
+    "target_size": 67,
+    "expect": "exact",
+    "notes": "ctor: zero caster/shadow/+0x34..+0x44, fill 3000-short index table; vtable 0x55156c",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "?Attach@D3DIM",
+    "target_va": "0x4468b0",
+    "target_size": 58,
+    "expect": "exact",
+    "notes": "Attach(host, caster, shadow): nested if/return 0 shares one epilogue",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot28@D3DIM",
+    "target_va": "0x446bf0",
+    "target_size": 63,
+    "expect": "exact",
+    "notes": "slot 28: shared float k set by if/else gives fld const/fild/fdivr",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "??_GD3DIM",
+    "target_va": "0x446890",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "scalar deleting dtor (ICF-shared with TerrainShadow)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "ShadowReceiver",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "??_GShadowReceiver",
+    "target_va": "0x4477a0",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "scalar deleting dtor, D3DIM copy",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "ShadowReceiver",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot8@ShadowReceiver",
+    "target_va": "0x447780",
+    "target_size": 19,
+    "expect": "exact",
+    "notes": "slot 8: GameObject::slot8 then return this",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "ShadowReceiver",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "??1ShadowReceiver",
+    "target_va": "0x4477c0",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "empty destructor core",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x4477d0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initializer jmp thunk (copy-init)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x4477e0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initializer body (copy-init)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x447820",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initializer jmp thunk (copy-init)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x447830",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initializer body (copy-init)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x447870",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initializer jmp thunk (copy-init)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x447880",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initializer body (copy-init)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x4478c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initializer jmp thunk (copy-init)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x4478d0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initializer body (copy-init)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "??1D3DIMSoultreeShadow@@",
+    "target_va": "0x00508b70",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "Generated destructor core selected by the RTTI-backed deleting wrapper at 0x00446890; identical base teardown is shared with TerrainShadow.",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  }
+]

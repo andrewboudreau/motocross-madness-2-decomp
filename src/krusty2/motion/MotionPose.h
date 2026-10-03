@@ -14,10 +14,6 @@ struct CharacterPose {
     Vec3 position;            // +0x20 passed to SetPosition/TranslateIn
 };
 
-// Argument of slot 3: an array of pose records (names tier 3).
-struct MotionPoseList {
-    int field_0x00;
-    CharacterPose* poses;        // +0x04 array of 0x2c-byte records
-    int count;                // +0x08 element count
-};
+// MotionPoseList (the {int, records, count} list) is declared with Character in
+// src/krusty2/motion/D3DIMSoultreeCharacter.h.
 #endif

@@ -40,7 +40,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `bvh/` | Shared box-tree layouts; builder candidate in `samples/physics/bvh/` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
 | `motion/` | SphereManager: 14 strict cases; shared motion layouts |
-| `shadow/` | Shared shadow layouts; candidates in `samples/physics/shadow/` |
+| `shadow/` | D3DIMSoultreeShadow: 16 strict cases; other shadow candidates in samples |
 | `visibility/` | VisibilityQuadTree: 16 strict cases; partial traversal in samples |
 
 The earlier broad-phase counts are masked diagnostics. The new reviewed slices

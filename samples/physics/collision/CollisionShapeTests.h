@@ -156,6 +156,23 @@ inline void CollisionInvertRigid(Matrix4* out, const Matrix4* src)
     out->m[3][2] = p.z;
 }
 
+// Variant whose p.y sum order matches CollisionRelativeFrame (0x432260).
+inline void CollisionInvertRigidRelFrame(Matrix4* out, const Matrix4* src)
+{
+    *out = *src;
+    float t;
+    t = out->m[0][1]; out->m[0][1] = out->m[1][0]; out->m[1][0] = t;
+    t = out->m[0][2]; out->m[0][2] = out->m[2][0]; out->m[2][0] = t;
+    t = out->m[1][2]; out->m[1][2] = out->m[2][1]; out->m[2][1] = t;
+    CollisionVec3 p;
+    p.x = -((out->m[3][2] * out->m[2][0] + out->m[3][1] * out->m[1][0]) + out->m[3][0] * out->m[0][0]);
+    p.y = -((out->m[3][1] * out->m[1][1] + out->m[3][0] * out->m[0][1]) + out->m[3][2] * out->m[2][1]);
+    p.z = -((out->m[3][2] * out->m[2][2] + out->m[3][1] * out->m[1][2]) + out->m[3][0] * out->m[0][2]);
+    out->m[3][0] = p.x;
+    out->m[3][1] = p.y;
+    out->m[3][2] = p.z;
+}
+
 // Inline forms of the vector/matrix helpers the shape tests use in row-vector convention
 // (component sums are ordered z, y, x as the retail x87 code evaluates them).
 //   CollisionRotateRows:   M3x3 * v   (dot each ROW with v; same result as 0x0042a4b0)

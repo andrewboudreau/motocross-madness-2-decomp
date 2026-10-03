@@ -62,3 +62,60 @@ bodies at `0x00504a30`, `0x00504a80`, `0x00504ad0`, `0x00504b20`.
 Those decoded writes distinguish TU-local constants from similarly named
 constants in other files. `Spheres.bindings.json` records this reviewed mapping.
 The other motion-source counts above remain historical masked diagnostics.
+
+## Motnctrl.cpp
+Wave 5 candidate: `samples/physics/motion/Motnctrl.cpp`.
+- `__FILE__` string `D:\aardvark\VC\krusty2\Motnctrl.cpp` at `0x0056e034`. Its xrefs run from `0x4a5659` (the
+  MotionManager `$E` initialiser, line 9) to `0x4a9a87` (FreeMotion, line 0x5a7). The line numbers rise with the
+  address. The link-order bracket is `0x4a5447..0x4aa36c`.
+- Functions that reference the string carry `// owner: Motnctrl.cpp (__FILE__ 0x56e034)` (12 of them). The others carry
+  `// owner: bracket only` (24): they are inside the bracket, between own-xref functions, with no string use.
+- **Classes and layouts** (offsets are tier 1 from reads and writes; names are tier 3):
+  - **MotionManager**: 0x18 bytes, global pointer at `0x0068512c`. It is a cache of `Motion` records (0xcc bytes)
+    loaded from `.MOT` (binary) or `.VUE` (text) files and reference-counted at `+0xc8`.
+  - **Motion frames**: `MotionPoseList {int; CharacterPose* poses; int count}` (0xc bytes).
+  - **CharacterPose**: 0x2c bytes, laid out as `{u8 nodeIndex; int hasPose; Vec3 axisZ +8; Vec3 axisY +0x14;
+    Vec3 position +0x20}`. It is declared in `MotionPose.h`.
+  - **Character**: the playback state is at `+0x0c..+0x38`:
+    - `+0x0c` finished
+    - `+0x10` time
+    - `+0x14` motionCount
+    - `+0x18` currentMotion
+    - `+0x1c` currentFrame
+    - `+0x20` blendFromMotion
+    - `+0x2c` blendFromTime
+    - `+0x30` blendDuration
+    - `+0x34` blendActive
+
+    The paths are at `+0x3c/+0x8c/+0xdc/+0x12c`. `motions` is at `+0x180`, the `MotionPoseList` is at `+0x190` and
+    `vutLoaded` is at `+0x19c`. These fields are named in `src/krusty2/motion/D3DIMSoultreeCharacter.h`.
+- **Coverage**: 37 targets, 33 exact and 4 partial.
+  - The exact targets are:
+    - two `$E` initialisers
+    - the pose comparator and the two frame-advance helpers
+    - the MotionManager ctor, Release, Load, LoadMot and Find
+    - the Character ctor and dtor core
+    - Character slots 1, 4 and 8
+    - LoadMotions, CaptureMotion, SortMotion, FindMotion and FindNode
+    - ApplyPoseList (slots 4 and 6), SetMotion and SetMotionByName
+    - both BlendToMotion overloads
+    - FreeMotion
+    - ClampFloat
+  - The partial targets are:
+    - **LoadVue `0x4a5e40`, 48%**: the structure and calls are identical, but the registers are permuted (ebx/ebp and
+      esi/edi).
+    - **RotatePose `0x4a7dc0`, 90.66%**: the Vec3Normalize temporaries use a different stack slot.
+    - **PoseRotation `0x4a7fd0`, ~27%**: the inline budget differs.
+    - **InterpolatePose `0x4a8470`, 10.65%**: VC6 inlines the first CrossProduct, where retail calls `0x515600`.
+- **Inline budget**: VC6 spends its per-function inline budget breadth-first over call sites in source order. The
+  calls inside inlined bodies are considered after all direct call sites. In these FPU helpers retail calls the
+  out-of-line COMDAT copies of `Vec3::Vec3` (`0x404e60`), DotProduct (`0x40ae30`), `operator*` (`0x5015b0`),
+  `operator+`/`operator-` (`0x421cb0`/`0x421d00`) and CrossProduct (`0x515600`) at specific sites. Moving the identity
+  branch of PoseRotation last gave the biggest gain. Helper spellings and dummy preceding functions had no effect.
+- **Not reconstructed**:
+  - `0x4a6bb0` (1293 bytes): the per-frame motion advance and blend. It advances the time, returns early when
+    finished, smoothsteps the blend weight, lerps the poses and dispatches slot 4/5.
+  - Slot 7 `0x4a70c0` (3327 bytes).
+  - `0x4a9050` (2138 bytes).
+  - The `$E` set at `0x4a8930..` and the functions after `0x4a9aa0`.
+  - `0x4a8bf0` and `0x4a8c50`, which contain inline fistp instructions; the original source mechanism is unproven.

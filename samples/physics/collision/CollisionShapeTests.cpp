@@ -650,9 +650,9 @@ void CollisionRelativeFrame(Matrix4* out, const Matrix4* m1, const Matrix4* m2, 
     Matrix4 inv;
     Matrix4 t1;
     Matrix4 t2;
-    CollisionInvertRigid(&inv, m2);
+    CollisionInvertRigidRelFrame(&inv, m2);
     CollisionMatrixMultiply(&t1, &inv, m1);
-    CollisionInvertRigid(&inv, m3);
+    CollisionInvertRigidRelFrame(&inv, m3);
     CollisionMatrixMultiply(&t2, &inv, m1);
     CollisionRelativeTransform(out, &t1, &t2);
 }

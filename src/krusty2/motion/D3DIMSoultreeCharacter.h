@@ -35,7 +35,18 @@
 #include "math/Math3D.h"
 
 class SoultreeObject;
+class SltFile;          // .slt section/key reader (0x5c4 bytes); declared by its users
+struct Motion;          // 0xcc-byte motion record of the MotionManager (src/krusty2/motion/Motnctrl.cpp)
 struct CharacterPose;   // 0x2c-byte pose record; defined by users that need the layout (src/krusty2/motion/MotionPose.h)
+
+// {int, records, count} list of pose records: Character's rest pose list (+0x190) and each frame of a
+// Motion (0xc-byte elements of Motion::frames).  field_0x00 is the frame number in motion frames
+// (the advance helpers 0x004a56d0/0x004a5750 read it).  Names tier 3.
+struct MotionPoseList {
+    int field_0x00;              // +0x00 frame number
+    CharacterPose* poses;        // +0x04 array of 0x2c-byte records
+    int count;                   // +0x08 element count
+};
 
 // One 0x40-byte row of Character's per-node name table (written by FillNodeNames 0x00445460; names tier 3).
 struct NodeNameEntry {
@@ -79,19 +90,49 @@ public:
     void Method_0x004a62d0();
     void Method_0x004a6500();
     void Method_0x004a8b00();                               // ret
+    // Motion control (src/krusty2/motion/Motnctrl.cpp; names tier 3, ABI from each body's ret N).
+    int LoadMotions();                                      // 0x004a66c0
+    void CaptureMotion(Motion* motion);                     // 0x004a6a60, ret 4
+    void SortMotion(Motion* motion);                        // 0x004a6ab0, ret 4
+    Motion* FindMotion(const char* name, int a);            // 0x004a6b30, ret 8
+    unsigned char FindNode(const char* name);               // 0x004a6b50, ret 4
+    void ApplyPoseListSlot4(MotionPoseList* list, int mask);  // 0x004a8a80, ret 8
+    void ApplyPoseListSlot6(MotionPoseList* list, int mask);  // 0x004a8ac0, ret 8
+    void SetMotionByName(const char* name);                 // 0x004a8b10, ret 4
+    void SetMotion(Motion* motion);                         // 0x004a8b40, ret 4
+    void BlendToMotion(Motion* motion);                     // 0x004a8b60, ret 4
+    void BlendToMotion(Motion* motion, float time);         // 0x004a8b80, ret 8
     void Method_0x004a8bf0(int a, float b);                 // ret 8
     void Method_0x004a8c50(int a, int b, float c, float d); // ret 0x10
 
     // vfptr +0, vbptr +4 (compiler generated); Character's own data up to 0x1a0.
-    // Named fields (tier 3) come from D3DIM slots 2/3/4/5/9/10 (src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp).
-    char chr_field_0x08[0x17c];     // +0x008..0x183 (name strings at +0x8c/+0xdc/+0x12c are read by 0x004a62d0/0x004a6500)
+    // Offsets are tier 1 (ctor 0x004a6780 stores, slot 8 0x004a98b0 copies, Motnctrl.cpp users);
+    // names are tier 3.  See src/krusty2/motion/Motnctrl.cpp.
+    SltFile* sltFile;               // +0x008 set by D3DIM slot 11 around the slot 1 call; slot 1 reads the "General info" keys through it
+    int chr_field_0x0c;             // +0x00c ctor 1; SetMotion (0x004a8b40) clears it
+    float chr_field_0x10;           // +0x010 copied to blendFromTime by BlendToMotion (0x004a8b80)
+    int motionCount;                // +0x014 "NumberOfMotions" (slot 1); loop bound of LoadMotions and the dtor
+    Motion* currentMotion;          // +0x018 SetMotion stores the motion; cleared by LoadMotions and the dtor
+    MotionPoseList* currentFrame;   // +0x01c SetMotion stores the motion's first frame; cleared by the dtor
+    Motion* blendFromMotion;        // +0x020 BlendToMotion saves currentMotion here before switching
+    int chr_field_0x24;             // +0x024 BlendToMotion only blends when it is nonzero
+    int chr_field_0x28;             // +0x028 ctor 0; not copied by slot 8
+    float blendFromTime;            // +0x02c BlendToMotion: chr_field_0x10 at the switch
+    float blendDuration;            // +0x030 BlendToMotion: the transition time argument
+    int blendActive;                // +0x034 BlendToMotion sets 1; SetMotion clears it
+    int chr_field_0x38;             // +0x038 ctor 0; copied by slot 8
+    char sltPath[0x50];             // +0x03c D3DIM slot 11 copies the resource name (at most 0x4f chars)
+    char vutFilename[0x50];         // +0x08c "VUTFilename" (slot 1); read by LoadVUT (0x004a62d0)
+    char mirFilename[0x50];         // +0x0dc "MIRFilename" (slot 1); read by LoadMIR (0x004a6500)
+    char contentDirectory[0x50];    // +0x12c "ContentDirectory" (slot 1); path prefix of the motion and VUT/MIR files
+    int keepMotions;                // +0x17c ctor 1; LoadMotions allocates and fills motions only when set
+    Motion** motions;               // +0x180 motionCount entries (LoadMotions line 0x2d2); released by the dtor
     int nodeCount;                  // +0x184 rows in nodeNames; slot 10 loops to it, slot 2 sizes the pose array from it
     NodeNameEntry* nodeNames;       // +0x188 FillNodeNames table; index = pose nodeIndex (slots 2..6, 10)
     int* mirrorMap;                 // +0x18c slot 5 maps a pose's node index through it
-    int field_0x190;                // +0x190 start of the {int, elements, count} list that slot 2 passes by address to 0x004a6b10
-    CharacterPose* poses;           // +0x194 pose array allocated by slot 2 (line 0x12d); 0x004a6b10 reads it at list+4
-    int poseCount;                  // +0x198 slot 2 stores nodeCount - 1; read at list+8 by 0x004a6b10
-    int field_0x19c;                // +0x19c tested against 0 by 0x004a62d0
+    MotionPoseList poseList;        // +0x190 rest pose list: slot 2 allocates poses (line 0x12d) and sorts it via 0x004a6b10;
+                                    // slot 8 copies it by value; 0x004a8b00 applies it through slot 6
+    int vutLoaded;                  // +0x19c tested by LoadVUT; slot 8 sets 1
 };
 
 // Descriptor passed to the D3DIM loaders (D3DIMSoultreeCharacter slot 11, D3DIMSoultreeObject

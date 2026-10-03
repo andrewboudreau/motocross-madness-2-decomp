@@ -185,17 +185,17 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot10()
     }
 }
 
-// slot 2 (0x00445fc0): captures the current pose of every node but the root into the pose array at
-// +0x194 (allocated on first use, line 0x12d), in each node's parent space.
+// slot 2 (0x00445fc0): captures the current pose of every node but the root into
+// poseList (+0x190; poses allocated on first use, line 0x12d), in each node's parent space.
 void D3DIMSoultreeCharacter::CharacterVirtualSlot2()
 {
     int count = nodeCount;
-    poseCount = count - 1;
-    if (poses == 0)
-        poses = (CharacterPose*)DebugMalloc(count * 0x2c - 1, __FILE__, 0x12d);
+    poseList.count = count - 1;
+    if (poseList.poses == 0)
+        poseList.poses = (CharacterPose*)DebugMalloc(count * 0x2c - 1, __FILE__, 0x12d);
     for (int i = 0; i < nodeCount - 1; i++) {
-        poses[i].nodeIndex = i + 1;
-        poses[i].hasPose = 1;
+        poseList.poses[i].nodeIndex = i + 1;
+        poseList.poses[i].hasPose = 1;
         SoultreeObject* node = nodeNames[i + 1].node;
         SoultreeObject* parent = node->parent;
         Vec3 position;
@@ -203,11 +203,11 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot2()
         Vec3 axisY;
         node->GetPositionIn(parent, &position);
         node->GetAxesIn(parent, &axisZ, &axisY);
-        poses[i].position = position;
-        poses[i].axisZ = axisZ;
-        poses[i].axisY = axisY;
+        poseList.poses[i].position = position;
+        poseList.poses[i].axisZ = axisZ;
+        poseList.poses[i].axisY = axisY;
     }
-    Method_0x004a6b10(&field_0x190);
+    Method_0x004a6b10(&poseList);
 }
 
 // Global registry (pointer at 0x00572b44): a list of entries keyed by an owner pointer at entry+0x10.
@@ -339,9 +339,9 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot9(int a)
 void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
 {
     char name[0x104];
-    int len = strlen(chr_field_0x08 + 0x124);
+    int len = strlen(contentDirectory);
     int n = len > 0x103 ? 0x103 : len;
-    strncpy(name, chr_field_0x08 + 0x124, n);
+    strncpy(name, contentDirectory, n);
     name[n] = 0;
     strcat(name, d3d_field_0x1a4);
 
@@ -456,15 +456,15 @@ GameObject* D3DIMSoultreeCharacter::D3DIMVirtualSlot11(int a1, const char* a2, c
     file->SetBufferSize(0x4000);
     int len = strlen(a2);
     int n = len > 0x4f ? 0x4f : len;
-    strncpy(chr_field_0x08 + 0x34, a2, n);
-    chr_field_0x08[0x34 + n] = 0;
+    strncpy(sltPath, a2, n);
+    sltPath[n] = 0;
     SltFile* slt = new(__FILE__, 0xa5) SltFile();
-    *(SltFile**)chr_field_0x08 = slt;
+    sltFile = slt;
     slt->Attach(file, 0, 1);
     slt->SelectSection("General info");
     slt->ReadString("SLTFile", d3d_field_0x1a4, -1);
     CharacterVirtualSlot1();
-    delete *(SltFile**)chr_field_0x08;
+    delete sltFile;
     g_pOwnerRegistry->SetOwner(entry, this);
     delete file;
     BusyCursor();
