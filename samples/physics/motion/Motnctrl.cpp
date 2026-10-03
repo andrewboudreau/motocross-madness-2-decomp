@@ -583,12 +583,14 @@ inline void ClampFloat(float low, float high, float* value)
 // Unit vector through the inline Vec3 helpers (DotProduct, operator*).  0x004a7fd0 expands it six
 // times; VC6 calls the out-of-line copies of DotProduct (0x0040ae30), operator* (0x005015b0) and
 // Vec3::Vec3 (0x00404e60) at some of the sites.
+// Retail stores the inverse length to a stack temp before scaling; the named local reproduces it.
 inline Vec3 UnitVector(const Vec3& v)
 {
     float lengthSquared = DotProduct(v, v);
     if (lengthSquared == 1.0f)
         return v;
-    return v * FastInvSqrt(lengthSquared);
+    float inverseLength = FastInvSqrt(lengthSquared);
+    return v * inverseLength;
 }
 
 // 0x0042de90 (BoundingBoxTreeBuild.cpp): rotation of 'angle' radians about (x, y, z), row-vector
