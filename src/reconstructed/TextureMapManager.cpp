@@ -113,7 +113,7 @@ TextureMapManager::TextureMapManager() : GameObject(1) {
     field_0x44.Init(4, 4);
     field_0x3c = 0;
     field_0x40 = 0;
-    field_0x70 = new(__FILE__, 125) UnknownBlockAllocator(0x30, 0x1800);
+    field_0x70 = new(__FILE__, 125) BlockAllocator(0x30, 0x1800);
     memset(g_UnknownSharedMipSurfaces68a36c, 0, sizeof(g_UnknownSharedMipSurfaces68a36c));
     memset(g_UnknownSharedSurfaces68a394, 0, sizeof(g_UnknownSharedSurfaces68a394));
 }

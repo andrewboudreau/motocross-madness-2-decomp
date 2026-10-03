@@ -450,7 +450,7 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
     while (whole && texture) {
         TextureMap* next = texture->field_0x08;
         UnknownTextureRegion* region = static_cast<CacheTexture*>(texture)->field_0x84;
-        if (region && region->field_0x2c && !region->field_0x00) {
+        if (region && region->field_0x2c && !region->field_0x00[0]) {
             field_0x54.Remove(texture);
             emptied.Append(texture);
             whole--;

@@ -115,9 +115,9 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
 - `0x0050dad0` (5020 bytes), the repack with partial texture blits (chosen
   by `0x0050c8c0` when the display's +0x5bc is positive): plans and lowers
   the used textures' levels to fit the group, turns the level counts into
-  the page plan (+0x18), sets aside pages whose whole region (CacheTexture
-  +0x84, a `0x00423fc0` block) holds one texture, re-plans the rest
-  (`0x0050f9b0`, returning whether the page is full), places the textures
+  the page plan (+0x18), sets aside pages whose root region (CacheTexture
+  +0x84) is one reserved leaf, re-plans the rest (`0x0050f9b0`, returning
+  whether everything fitted), places the textures
   still needing room (`0x0050fdb0`, which also lists them in +0x144; when
   every page is tried it calls the shared empty body `0x00464e90`) and
   spreads their blits (`0x005102d0`) over up to two passes within +0x74
@@ -131,3 +131,41 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
   its use and Un/Hi/Lo state, or the selected page with its textures and an
   outline (GDI pen, MoveToEx/LineTo, TextOutA on the surface's DC). Retail
   saves ebx/esi only after the first early return.
+
+## CacheTexture
+
+RTTI `CacheTexture : PCTextureMap` (vtable `0x005583d8`, 0x190 bytes) is
+the page a ManagedTextureGroup packs its ManagedTextures onto. Its code
+(`0x0050f6a0`-`0x005104fb`) sits between ManagedTextureGroup's and
+ManagedTexture's. Canonical source: `src/reconstructed/CacheTexture.h` /
+`CacheTexture.cpp`; 14 functions are exact.
+
+The page is a quadtree of 0x30-byte regions taken from the manager's
+`BlockAllocator` (TextureMapManager+0x70): four quarters, parent, occupant,
+level, the u/v rectangle and a reserved flag. The page keeps free (+0x88)
+and reserved (+0xac) leaf counts per level and a list of reserved leaves
+per level (+0xd0, nine `ContainerList`s of 32). Exact:
+
+- the constructor `0x0050f6a0` (one free root of the given level), the
+  implicit destructor `0x0050f830` (it does not reset the vtable pointer;
+  an explicit empty destructor would) and deleting wrapper `0x0050f810`;
+- `0x0050f890`/`0x0050f8e0` (list the occupants), `0x0050fc40` (empty
+  the page), `0x0050fc60` (first quarter, splitting on demand),
+  `0x0050fc90` (evict and unreserve a leaf), `0x0050fd60` (collapse a
+  subtree back into the pool), `0x0050fdb0` (place textures on reserved
+  leaves, blitting them when no list is given), `0x0050ffa0` (split),
+  `0x00510120` (unplace, merging empty parents), `0x00510250` (occupy)
+  and `0x005102b0` (take a texture off).
+
+Two recurring VC6 shapes: chained assignments (`a = b = 0`) give retail's
+reversed store order, and the region `Init` helper is inlined wherever a
+block is taken.
+
+Near misses (`samples/render/CacheTextureNearMisses.cpp`):
+- `0x0050f9b0` (646 bytes), reserve the leaves a level plan wants: only
+  two register choices differ (11 instructions);
+- `0x005102d0` (558 bytes), blit the occupant's mip levels into its
+  region (DirectDraw `GetAttachedSurface`/`Blt`, then slot 9 or +0x188):
+  retail places the shared `return 0` block before the final branch
+  (18 instructions).
+

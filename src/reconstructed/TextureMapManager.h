@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BlockAllocator.h"
+
 #include "ContainerList.h"
 #include "GameObject.h"
 
@@ -115,16 +117,6 @@ public:
     int field_0x254;
 };
 
-// Fixed-size block pool (BlockAllocator.cpp; constructor 0x00423f70 takes the
-// block size and count, destructor 0x00423fb0), 0x28 bytes.
-class UnknownBlockAllocator {
-public:
-    UnknownBlockAllocator(unsigned int blockSize, unsigned int count);
-    ~UnknownBlockAllocator();
-
-    unsigned char field_0x00[0x28];
-};
-
 // RTTI: TextureMapManager : GameObject (vtable 0x0055848c; 0x7c bytes, the
 // size Game's initialiser allocates). Its code sits among
 // TextureMapManager.cpp's literals. Names are provisional.
@@ -163,7 +155,7 @@ public:
     unsigned int field_0x64;                  // +0x5c's size
     unsigned int field_0x68;                  // +0x60's size
     int field_0x6c;
-    UnknownBlockAllocator* field_0x70;
+    BlockAllocator* field_0x70;                 // 0x30-byte region blocks
     int field_0x74;                           // frame count (slot 10)
     int field_0x78;
 };
