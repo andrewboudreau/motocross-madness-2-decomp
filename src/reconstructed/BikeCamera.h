@@ -48,5 +48,5 @@ public:
     virtual int UnknownVirtualSlot75();
 
 protected:
-    UnknownCameraBike* field_0x3b0;
+    UnknownCameraBike* bike; // +0x3b0
 };

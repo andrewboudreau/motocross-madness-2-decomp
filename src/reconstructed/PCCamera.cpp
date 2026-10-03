@@ -37,8 +37,8 @@ int PCCamera::UnknownVirtualSlot13() {
     if (!Camera::UnknownVirtualSlot13())
         return 0;
     if (Owner()->field_0x08 == this) {
-        PCOwner()->field_0x50->UnknownMethod11(2, &field_0xac);
-        PCOwner()->field_0x50->UnknownMethod11(3, &field_0x6c);
+        PCOwner()->field_0x50->UnknownMethod11(2, &viewMatrix);
+        PCOwner()->field_0x50->UnknownMethod11(3, &projectionMatrix);
     }
     return 1;
 }
