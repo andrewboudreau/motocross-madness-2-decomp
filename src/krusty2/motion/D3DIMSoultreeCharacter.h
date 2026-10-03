@@ -31,7 +31,8 @@
 #ifndef SOULTREE_D3DIM_SOULTREE_CHARACTER_H
 #define SOULTREE_D3DIM_SOULTREE_CHARACTER_H
 
-#include "../soultree_base/SoultreePhysicsBaseObject.h"
+#include "core/GameObject.h"
+#include "math/Math3D.h"
 
 class SoultreeObject;
 class SltFile;          // .slt section/key reader (0x5c4 bytes); declared by its users

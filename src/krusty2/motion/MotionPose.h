@@ -2,7 +2,7 @@
 #ifndef KRUSTY2_MOTION_MOTIONPOSE_H
 #define KRUSTY2_MOTION_MOTIONPOSE_H
 
-#include "../../../samples/physics/common/Math3D.h"
+#include "math/Math3D.h"
 
 // One 0x2c-byte pose record (names tier 3): the node it targets (row index into the character's
 // node table), a flag selecting between the two apply paths and the node pose.
@@ -15,5 +15,5 @@ struct CharacterPose {
 };
 
 // MotionPoseList (the {int, records, count} list) is declared with Character in
-// samples/physics/hierarchy/D3DIMSoultreeCharacter.h.
+// src/krusty2/motion/D3DIMSoultreeCharacter.h.
 #endif

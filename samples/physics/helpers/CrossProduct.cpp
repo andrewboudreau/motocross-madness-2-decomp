@@ -1,6 +1,6 @@
 // CrossProduct.cpp -- kept out of VectorOps.cpp: that file uses inline_depth(0), which would turn
 // the Vec3 default constructor into a call.
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // 0x00515600. CrossProduct(const Vec3&, const Vec3&), cdecl, hidden result first.
 // Retail's body is the out-of-line COMDAT of d3dvec.inl-style CrossProduct. The

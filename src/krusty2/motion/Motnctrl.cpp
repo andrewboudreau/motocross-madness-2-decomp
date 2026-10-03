@@ -4,13 +4,13 @@
 // The retail __FILE__ string 'D:\aardvark\VC\krusty2\Motnctrl.cpp' is at 0x0056e034; its xrefs run
 // from 0x004a5659 (the manager initialiser, line 9) to 0x004a9a87 (FreeMotion, line 0x5a7) with the
 // line numbers rising with the address.  Character's shape comes from
-// samples/physics/hierarchy/D3DIMSoultreeCharacter.h, which is included, not redeclared.  See
+// src/krusty2/motion/D3DIMSoultreeCharacter.h, which is included, not redeclared.  See
 // src/krusty2/motion/README.md for the evidence summary.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "core/DebugAlloc.h"
-#include "../../../samples/physics/hierarchy/D3DIMSoultreeCharacter.h"
+#include "motion/D3DIMSoultreeCharacter.h"
 #include "MotionPose.h"   // Math3D.h: the four per-TU Vec3 initialisers at 0x004a54f0..0x004a562c
 
 extern "C" char* _strupr(char*);   // 0x00535d3d

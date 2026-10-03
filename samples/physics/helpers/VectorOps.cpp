@@ -1,7 +1,7 @@
 // VectorOps.cpp -- out-of-line instances of the Vec3 operators declared inline in
 // ../common/Math3D.h. Retail emitted them as separate COMDAT functions (tier 2:
 // decoded bodies equal the inline formulas; callers use a hidden result pointer).
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // Suppress expansion so the inline members/operators get out-of-line bodies.
 #pragma inline_depth(0)

@@ -2,11 +2,12 @@
 
 The retail game was built from one flat folder, `D:\aardvark\VC\krusty2\`, recovered
 from the `__FILE__` strings in the binary (`analysis/source_paths.txt`). This tree
-holds reconstructed code whose **retail file is known**. It is grouped into area
+holds reconstructed code with reviewed or explicitly provisional retail-file attribution. It is grouped into area
 subfolders to keep things organised; the byte match doesn't depend on the folder.
 
 - `__FILE__` strings are only reached through relocated addresses, and the matcher
-  masks those, so the path text never enters the comparison.
+  masks those in diagnostic mode. Strict mode requires a reviewed file-literal
+  binding and compares the relocated address.
 - Line numbers do enter the code (`push 0x7a`), so sources pass them as literals,
   e.g. `new(__FILE__, 0x7a)`. Moving a file never changes them.
 
@@ -38,10 +39,13 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` (69 of 74 exact) |
 | `bvh/` | `BoundingBoxTreeBuild.cpp`/`.h`: collision box-tree build (21 of 23 exact) |
 | `effects/` | `Particles.cpp`, `NormalDistribution.cpp`, `Nulls.cpp` (17 of 17 exact) |
-| `motion/` | `D3DIMSoultreeMotnctrl.cpp`, `Motnctrl.cpp`, `Spheres.cpp`, `SteeringControl.cpp` (82 of 90 exact) |
-| `shadow/` | `ProjectedShadow.cpp`/`.h`, `D3DIMSoultreeShadow.cpp`/`.h` (26 of 33 exact) |
-| `suspension/` | `SelectiveGravityModel.cpp` with the Shock classes (26 of 30 exact) |
+| `motion/` | `D3DIMSoultreeMotnctrl.cpp`, `Motnctrl.cpp`, `Spheres.cpp`, `SteeringControl.cpp` (82 of 90 masked matches) |
+| `shadow/` | `ProjectedShadow.cpp`/`.h`, `D3DIMSoultreeShadow.cpp`/`.h` (26 of 33 masked matches) |
 | `visibility/` | `VisibilityQuadTree.cpp`/`.h` (16 of 17 exact) |
+
+The table's exact counts are relocation-masked diagnostics, not strict byte proof.
+The combined SelectiveGravityModel/Shock candidate remains in
+`samples/physics/suspension/`: Shock TU ownership has only proximity evidence.
 
 Each wave 4 folder has a `README.md` with its `__FILE__` string, bracket and ownership evidence.
 Code that sits in a bracket without `__FILE__` or class evidence lives in the matching
@@ -75,7 +79,8 @@ Include shared headers by their path under this folder, e.g. `#include "core/Gam
   kept in `samples/physics/shadow/TerrainShadow.cpp` until its file is known.
 - Terrain derives from `GameObject` and `GroundFogableObject`, as the RTTI says (mdisp 0,
   and 0x2c for GroundFogableObject, which has no vfptr). Both bases are kept.
-- Out of reach under the no-asm rule: `QueryGround` 0x507c10 inlines an `__asm` fistp helper.
+- `QueryGround` 0x507c10 contains inline fistp instructions not reproduced by the
+  tested C++ casts. The original source mechanism is unproven.
 - The helper types (`TerrainVec3`, `TerrainMatrix`, `TerrainShutdownObject`,
   `TerrainComObject`, `TerrainOwned` and others) are provisional stand-ins with tier 3 names.
   `TerrainVec3` stays separate from the shared Vec3 because including `Math3D.h` would add
@@ -85,8 +90,12 @@ Include shared headers by their path under this folder, e.g. `#include "core/Gam
 
 ```bash
 python tools/run_physics_samples.py                             # samples/physics + src/krusty2
-python tools/run_physics_samples.py --root src/krusty2/broadphase
+python tools/run_physics_samples.py --strict --root src/krusty2/broadphase
 ```
 
-`tools/analyze.py` writes a flat placeholder `src/krusty2/<RetailName>.cpp` for each
-known name, and skips any name already present somewhere in this tree.
+`tools/analyze.py` writes filename-only placeholders under ignored
+`generated/krusty2-skeletons/`, never into this source tree.
+
+The default physics run is a masked diagnostic regression check. `--strict` is
+the acceptance check; it fails until every required target has independently
+reviewed relocation bindings (a `bindings` path relative to its targets.json).

@@ -19,7 +19,7 @@
 #include "math/FastMath.h"
 #include "core/DebugAlloc.h"
 
-// Stand-in for the shared Vec3 (the real one lives in samples/physics/common/Math3D.h, which
+// Stand-in for the shared Vec3 (the real one lives in src/krusty2/math/Math3D.h, which
 // must not be included here: its static const Vec3 objects would add $E initializers that
 // ProjectedShadow.cpp does not have).  The zero vector read by the ctor is a shared global
 // at 0x00689b48, written by another translation unit.

@@ -1,6 +1,6 @@
 // SelectiveGravityModel.cpp -- reconstruction of D:\aardvark\VC\krusty2\SelectiveGravityModel.cpp
 // (SelectiveGravityModel, Shock, InlineShock, RotatingShock).
-#include "suspension/Suspension.h"
+#include "Suspension.h"
 #include "core/DebugAlloc.h"
 #include "math/FastMath.h"
 #include <math.h>

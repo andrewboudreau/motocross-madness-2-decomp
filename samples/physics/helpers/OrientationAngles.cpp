@@ -6,7 +6,7 @@
 // and an "up" vector b (both by value, 3 floats each). It returns 0 if any of the first three
 // pointers is null, otherwise 1.
 #include <math.h>
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 static inline float AbsF(float x) { return x < 0.0f ? -x : x; }
 

@@ -1,5 +1,9 @@
 # effects: Particles.cpp, NormalDistribution.cpp, Nulls.cpp
 
+Validation: counts labeled "exact" below are historical relocation-masked
+diagnostics, not strict acceptance. Use `tools/run_physics_samples.py --strict`
+with reviewed bindings before accepting these candidates.
+
 Retail files (all under `D:\aardvark\VC\krusty2\`):
 
 | file | `__FILE__` string VA | bracket | own `__FILE__` xrefs | exact / partial |

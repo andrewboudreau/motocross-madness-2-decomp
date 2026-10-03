@@ -28,9 +28,9 @@ def apply_relocations(code: bytes, relocations: list[dict], bindings: dict[str, 
         if occupied & span:
             raise RelocationError('overlapping relocations')
         occupied |= span
-        if symbol not in bindings:
+        if symbol not in bindings and 'internal_bound_va' not in row:
             raise RelocationError(f'unresolved symbol: {symbol}')
-        address = bindings[symbol]
+        address = row['internal_bound_va'] if 'internal_bound_va' in row else bindings[symbol]
         if not isinstance(address, int) or not 0 <= address <= 0xffffffff:
             raise RelocationError(f'invalid symbol address: {symbol}')
         addend = struct.unpack_from('<I', code, offset)[0]
@@ -41,7 +41,8 @@ def apply_relocations(code: bytes, relocations: list[dict], bindings: dict[str, 
         struct.pack_into('<I', patched, offset, value)
         audit.append({'offset': offset, 'type': kind, 'symbol': symbol,
                       'bound_va': f'0x{address:08x}', 'addend_u32': addend,
-                      'written_u32': value})
+                      'written_u32': value,
+                      'internal_label': 'internal_bound_va' in row})
     return bytes(patched), audit
 
 
@@ -79,6 +80,21 @@ def _source_path_literal(obj: CoffObject, record) -> str | None:
     return None
 
 
+def _internal_bound_va(function, record, raw: bytes, relocation, target_va: int) -> int | None:
+    """Resolve only same-section S+A destinations within the measured extent."""
+    if record.section_number != function.section_number:
+        return None
+    offset = relocation.virtual_address - function.value
+    if relocation.type not in (0x0006, 0x0014) or offset < 0 or offset + 4 > len(raw):
+        return None
+    addend = struct.unpack_from('<I', raw, offset)[0]
+    bound = (target_va - function.value + record.value) & 0xffffffff
+    destination = (bound + addend) & 0xffffffff
+    if target_va <= destination < target_va + len(raw):
+        return bound
+    return None
+
+
 def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bindings: dict[str, int]) -> dict:
     if obj.machine != 0x14c:
         raise RelocationError('only i386 COFF supported')
@@ -94,19 +110,14 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
     # have a fixed address: the function's retail VA plus the label offset. They
     # are resolved here instead of requiring hand-written bindings; anything
     # outside the extent must still be bound explicitly.
-    internal: dict[str, int] = {}
     for rel in rels:
         record = obj.symbol_by_index.get(rel.symbol_index)
         if record is None:
             raise RelocationError('relocation references missing/auxiliary symbol')
-        if (record.section_number == sym.section_number
-                and sym.value <= record.value < sym.value + len(raw)):
-            address = target_va + (record.value - sym.value)
-            if internal.get(record.name, address) != address:
-                raise RelocationError(f'ambiguous internal symbol: {record.name}')
+        address = _internal_bound_va(sym, record, raw, rel, target_va)
+        if address is not None:
             if record.name in bindings and bindings[record.name] != address:
                 raise RelocationError(f'binding contradicts internal label: {record.name}')
-            internal[record.name] = address
         offset = rel.virtual_address - sym.value
         name = record.name
         # /GX frame prologue `push -1; push offset handler`: the handler stub is
@@ -119,7 +130,9 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
             name = f'{sym.name}$ehhandler'
         # __except_list is the CRT's absolute symbol for the fs:[0] SEH chain head.
         if name == '__except_list' and rel.type == 0x0006 and record.section_number in (0, -1):
-            internal[name] = 0
+            if name in bindings and bindings[name] != 0:
+                raise RelocationError('binding contradicts __except_list')
+            address = 0
         # A __FILE__ literal embeds the build path, so its pooled ??_C@ name is not
         # stable. It is bound as '__FILE__:<basename>' (a .cpp and a header can
         # both appear in one object), falling back to plain '__FILE__'.
@@ -127,10 +140,13 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
             name = f'__FILE__:{_source_path_literal(obj, record)}'
             if name not in bindings and '__FILE__' in bindings:
                 name = '__FILE__'
-        converted.append({'offset': offset, 'type': rel.type, 'symbol': name})
-    patched, audit = apply_relocations(raw, converted, {**bindings, **internal}, target_va)
-    for row in audit:
-        row['internal_label'] = row['symbol'] in internal
+        row = {'offset': offset, 'type': rel.type, 'symbol': name}
+        # Keep inferred addresses per relocation: another reference to the same
+        # section symbol may have an addend that escapes this function.
+        if address is not None:
+            row['internal_bound_va'] = address
+        converted.append(row)
+    patched, audit = apply_relocations(raw, converted, bindings, target_va)
     return {**compare_bytes(retail, patched), 'symbol': sym.name,
             'extent_source': sym.extent_source,
             'target_va': f'0x{target_va:08x}', 'relocations_applied': audit,

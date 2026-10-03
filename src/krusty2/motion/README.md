@@ -1,5 +1,9 @@
 # motion (Spheres.cpp, SteeringControl.cpp, D3DIMSoultreeMotnctrl.cpp, Motnctrl.cpp)
 
+Validation: counts labeled "exact" below are historical relocation-masked
+diagnostics, not strict acceptance. Use `tools/run_physics_samples.py --strict`
+with reviewed bindings before accepting these candidates.
+
 Wave 4. Both files are linked back to back in `0x504940..0x5051ec`; SurfaceMap and the keyboard hooks
 that follow live in `samples/physics/motion/`.
 
