@@ -69,8 +69,9 @@ public:
     void UnknownFunction50c790();             // 0x0050c790: restores lost pages
     void UnknownFunction50c7e0();             // 0x0050c7e0: appends a report to C:\temp\TM_debug.txt
     void UnknownFunction50c8c0();             // 0x0050c8c0: repacks the pages
-    void UnknownFunction50c960();             // 0x0050c960 (not reconstructed)
-    void UnknownFunction50dad0();             // 0x0050dad0 (not reconstructed)
+    void UnknownFunction50c960();             // 0x0050c960 (near miss in samples/render)
+    void UnknownFunction50dad0();             // 0x0050dad0 (near miss in samples/render)
+    void UnknownFunction464e90();             // 0x00464e90 (shared empty body): out of page space
     // 0x0050ef70 (manager slot 15): draws the debug-key selection into
     // `target`; 0 unless this is the manager's selected group.
     int UnknownFunction50ef70(PCRenderTarget* target);
