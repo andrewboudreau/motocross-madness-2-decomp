@@ -18,7 +18,7 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x1cc = 0;
     field_0x1d0 = 0;
     memset(field_0x1a0, 0, sizeof(field_0x1a0));
-    field_0x2c = IdentityMatrix();
+    worldMatrix = IdentityMatrix();
     field_0x17c = Vector3(0.0f, 0.0f, 1.0f);
     field_0x188 = Vector3(0.0f, 1.0f, 0.0f);
     field_0x170 = Vector3(0.0f, 0.0f, 0.0f);
@@ -105,17 +105,17 @@ int Camera::UnknownVirtualSlot14() {
 }
 
 int Camera::UnknownVirtualSlot30(const Matrix4* value) {
-    field_0x2c = *value;
+    worldMatrix = *value;
     return 1;
 }
 
 int Camera::UnknownVirtualSlot31(const Matrix4* value) {
-    field_0xac = *value;
+    viewMatrix = *value;
     return 1;
 }
 
 int Camera::UnknownVirtualSlot32(const Matrix4* value) {
-    field_0x6c = *value;
+    projectionMatrix = *value;
     return 1;
 }
 

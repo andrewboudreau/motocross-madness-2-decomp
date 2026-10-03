@@ -65,8 +65,8 @@ public:
     virtual void UnknownVirtualSlot72();
     // Inline: retail's copy (0x00417490) is emitted next to BikeCamera code.
     virtual bool UnknownVirtualSlot74() {
-        if (field_0x390) {
-            bool active = field_0x394->field_0x444 != 0;
+        if (vehicleMode) {
+            bool active = vehicle->field_0x444 != 0;
             return active;
         }
         return false;
@@ -75,9 +75,9 @@ public:
 
     // Inlined by slot 75: no vehicle mode, or the vehicle's +0x444 is clear.
     int UnknownInlineIdle() {
-        if (!field_0x390)
+        if (!vehicleMode)
             return 1;
-        return field_0x394->field_0x444 == 0;
+        return vehicle->field_0x444 == 0;
     }
 
 protected:
@@ -85,10 +85,10 @@ protected:
     UnknownCameraTargetA* field_0x384;
     UnknownCameraTargetB* field_0x388;
     int field_0x38c;
-    bool field_0x390;                    // vehicle mode
+    bool vehicleMode;                    // +0x390, vehicle mode
     unsigned char field_0x391;
     unsigned char field_0x392;
-    UnknownCameraVehicle* field_0x394;
+    UnknownCameraVehicle* vehicle;       // +0x394
     Vector3 field_0x398;
     Vector3 field_0x3a4;
 };

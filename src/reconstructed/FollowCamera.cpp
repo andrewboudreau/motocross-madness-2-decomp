@@ -3,8 +3,8 @@
 // 0x00463350 (scalar deleting wrapper 0x00463120): frees the owned values,
 // then the Camera destructor (PCCamera's is implicit).
 FollowCamera::~FollowCamera() {
-    if (field_0x2e4)
-        delete[] field_0x2e4;
+    if (points)
+        delete[] points;
     if (field_0x27c)
         delete field_0x27c;
     if (field_0x280)
@@ -40,19 +40,19 @@ void FollowCamera::UnknownVirtualSlot73(const Vector3& from, const Vector3& to, 
 bool FollowCamera::UnknownFunction463450(int index, const Vector3* position, const float* a,
                                          const float* b, const float* c, const float* d,
                                          const float* e) {
-    if (index < field_0x2e0) {
+    if (index < pointCount) {
         if (position)
-            field_0x2e4[index].position = *position;
+            points[index].position = *position;
         if (a)
-            field_0x2e4[index].field_0x0c = *a;
+            points[index].field_0x0c = *a;
         if (b)
-            field_0x2e4[index].field_0x10 = *b;
+            points[index].field_0x10 = *b;
         if (c)
-            field_0x2e4[index].field_0x14 = *c;
+            points[index].field_0x14 = *c;
         if (d)
-            field_0x2e4[index].field_0x18 = *d;
+            points[index].field_0x18 = *d;
         if (e)
-            field_0x2e4[index].field_0x1c = *e;
+            points[index].field_0x1c = *e;
         return true;
     }
     return false;
@@ -61,8 +61,8 @@ bool FollowCamera::UnknownFunction463450(int index, const Vector3* position, con
 // 0x004639f0: with a non-empty table, entry 0 takes the target point before
 // slot 38 runs.
 void FollowCamera::UnknownVirtualSlot40(int a) {
-    if (field_0x2e0 > 0) {
-        UnknownFunction463450(0, &field_0x2b4, 0, 0, 0, 0, 0);
+    if (pointCount > 0) {
+        UnknownFunction463450(0, &targetPoint, 0, 0, 0, 0, 0);
         UnknownVirtualSlot38(a, 0, 0);
     }
 }
@@ -70,13 +70,13 @@ void FollowCamera::UnknownVirtualSlot40(int a) {
 // 0x00464a80: the point the camera follows, by state.
 Vector3 FollowCamera::UnknownVirtualSlot48(int a, bool flag, int b) {
     Vector3 result;
-    if (field_0x244 == 5) {
-        if (field_0x268)
-            result = field_0x2a8;
+    if (cameraState == 5) {
+        if (overrideActive)
+            result = cachedTarget;
         else
             result = UnknownVirtualSlot34(b);
-    } else if (field_0x244 == 7) {
-        result = field_0x2b4;
+    } else if (cameraState == 7) {
+        result = targetPoint;
         result.y += 3.0f;
     } else if (flag) {
         result = UnknownVirtualSlot35(a, b);
@@ -108,8 +108,8 @@ void FollowCamera::UnknownVirtualSlot44(const Vector3& value) {
 // Retail forms the cache address before the call and copies straight from the
 // returned buffer, i.e. the call result is assigned directly to the cache.
 void FollowCamera::UnknownVirtualSlot69() {
-    field_0x2a8 = UnknownVirtualSlot57(0);
-    UnknownVirtualSlot43(field_0x2a8);
+    cachedTarget = UnknownVirtualSlot57(0);
+    UnknownVirtualSlot43(cachedTarget);
 }
 
 // Semantically strong but compiler-sensitive: retail VC6 zeros EAX once and
@@ -154,7 +154,7 @@ void FollowCamera::UnknownVirtualSlot67() {
 // parenthesized division matters: VC6 folds `/ 180.0f * 60.0f` into one
 // multiply, while retail multiplies by 1/180 and then by 60.
 void FollowCamera::UnknownVirtualSlot68() {
-    Vector3 target = field_0x2b4;
+    Vector3 target = targetPoint;
     target.y += 3.0f;
     float dx = field_0x170.x - target.x;
     if (dx < 0.0f) dx = -dx;
@@ -170,10 +170,10 @@ void FollowCamera::UnknownVirtualSlot68() {
 // States 0-4 dispatch through FollowCamera virtuals, then snapshot the exact
 // preset triplet before a final update virtual.
 void FollowCamera::UnknownVirtualSlot71(int value) {
-    field_0x244 = value;
+    cameraState = value;
     UnknownVirtualSlot58();
 
-    switch (static_cast<unsigned int>(field_0x244)) {
+    switch (static_cast<unsigned int>(cameraState)) {
         case 0:
             UnknownVirtualSlot66();
             break;
@@ -205,44 +205,44 @@ void FollowCamera::UnknownVirtualSlot71(int value) {
 // folds the wrap through CMOV on P6+ CPU targets, making this another useful
 // historical compiler/profile calibration target.
 void FollowCamera::UnknownVirtualSlot72() {
-    field_0x30c = field_0x30c + 1;
-    if (field_0x30c >= field_0x310)
-        field_0x30c = 0;
+    stateIndex = stateIndex + 1;
+    if (stateIndex >= stateCount)
+        stateIndex = 0;
 
-    int value = field_0x314[field_0x30c];
-    field_0x244 = value;
+    int value = states[stateIndex];
+    cameraState = value;
     UnknownVirtualSlot71(value);
 }
 
 // Strong semantic reconstruction, but not a clang smoke target.
 void FollowCamera::UnknownVirtualSlot70(int value) {
-    field_0x268 = value & 0xFF;
+    overrideActive = value & 0xFF;
 
     if (static_cast<unsigned char>(value) != 0) {
-        int current = field_0x244;
+        int current = cameraState;
 
         if (current != 5) {
-            field_0x248 = current;
-            field_0x24c = field_0x258;
-            field_0x244 = 5;
+            savedCameraState = current;
+            savedParameter = field_0x258;
+            cameraState = 5;
         }
 
         field_0x26c = 0;
     } else {
-        field_0x244 = field_0x248;
-        field_0x258 = field_0x24c;
+        cameraState = savedCameraState;
+        field_0x258 = savedParameter;
     }
 }
 
 // 0x00464a10: the target point.
 Vector3 FollowCamera::UnknownVirtualSlot37() {
-    Vector3 result = field_0x2b4;
+    Vector3 result = targetPoint;
     return result;
 }
 
 // 0x00464a40: the target point raised by 3 (as slot 68 uses it).
 Vector3 FollowCamera::UnknownVirtualSlot34(int) {
-    Vector3 result = field_0x2b4;
+    Vector3 result = targetPoint;
     result.y += 3.0f;
     return result;
 }
