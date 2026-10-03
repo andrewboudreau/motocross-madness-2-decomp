@@ -2,9 +2,9 @@
 
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
-Results use VC6 SP3 natively on Windows; the 2026-09-30 calibration and full
-gate were repeated under Linux/Wine with the same results. A complete linked
-game remains a separate, unverified gate.
+Results use VC6 SP3 natively on Windows. The full gate and profile matrix were
+repeated on 2026-10-02 under Linux/wibo. A complete linked game remains a
+separate, unverified gate.
 
 The VC6 gate currently checks byte-exact functions from 41 handwritten C++
 candidate files: all 34 files in `src/reconstructed/` and seven focused probes
@@ -60,7 +60,7 @@ translation-unit ownership remain provisional.
 RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 [application allocation accounting](ALLOCATION.md). Wrong bindings fail comparison.
 
-## Next targets
+## Validated slices
 
 The seven emitted fixed-size `BlockAllocator` bodies are now exact under the
 default profile, including the five-byte destructor tail jump and the two
@@ -80,6 +80,117 @@ see [FollowCamera](FOLLOW_CAMERA.md#camera-and-pccamera).
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
+
+## Next matching campaign
+
+The next set should improve both the number of exact bodies and the reliability
+of the progress view. The targets below are a shortlist, not assignments: open
+pull requests may already contain newer candidates than the checked-out branch.
+Use the following order only after the coordination check; do not start with the
+largest unreconstructed UI or event routines merely because their VAs are
+already known.
+
+### 0. Exclude work already in flight
+
+Fetch the target branch and inspect every open pull request before selecting a
+VA. Do not rely only on PR titles: review changed paths and search each diff for
+the candidate VA, class, slot and symbol. Also check overlapping shared headers,
+bindings and calibration-list edits, since two PRs can conflict even when they
+match different functions.
+
+```bash
+git fetch --all --prune
+gh pr list --state open --limit 100 \
+  --json number,title,headRefName,baseRefName,url
+gh pr diff <number> --name-only
+gh pr diff <number> | rg -i '0x004c16f0|PCGame|UnknownVirtualSlot'
+```
+
+Record the reviewed PR numbers and claimed VAs in the work notes. If the GitHub
+remote or credentials are unavailable, do not interpret an empty local branch
+list as evidence that no work is in flight; restore access or coordinate with a
+maintainer before taking a target. Rebase the shortlist on the fetched target
+branch, then choose the highest-ranked unclaimed slice. Repeat this check before
+starting another slice, not merely once per long-running branch.
+
+**Exit criterion:** the selected target and the shared files it needs do not
+overlap any open PR, or the PR authors have explicitly agreed how the work will
+be divided.
+
+### 1. Make VC6 results visible in the inventory
+
+Extend the manifest/queue pipeline to ingest strict results from the canonical
+VC6 calibration run. The current `make status` result of zero validated targets
+contradicts the 480/480 matrix because it only reads the legacy clang reports.
+The importer must key records by target VA, extent, candidate symbol and source,
+retain relocation/binding status, and avoid counting aliases or repeated profile
+runs as new retail functions. Add regression fixtures before changing the status
+totals.
+
+**Exit criterion:** regenerating the manifest, dossiers and queue reports the
+same strict targets as the default-profile calibration, while the existing
+clang-only data remains distinguishable rather than being promoted to VC6
+evidence.
+
+### 2. Close the smallest, best-constrained unclaimed near misses
+
+Use one candidate per commit and run the full calibration after any shared-header
+change, because seemingly harmless declarations have already changed VC6 register
+allocation in other translation units.
+
+Subject to the open-PR check, prefer:
+
+1. `PCGame` profile loader `0x004c16f0` (767/771 bytes): the behavior, extent and
+   calls are already reconstructed; only the copy loop's SIB base/index choice
+   differs.
+2. `ControlInterface` update `0x0043cf00`: the devices, event layout and dispatch
+   are established, and the remaining discrepancy is confined to modifier null
+   handling.
+3. Event progress callback `0x0045cb20` (63/67 bytes): isolate the two-register
+   swap without moving provisional GUI types into shared headers.
+4. `PCTextureMap` colour-key helper `0x004c7e30`: preserve all three 16-bit format
+   paths and test source expressions that prevent VC6 from factoring the common
+   shift.
+
+For each body, first confirm its VA/extent and direct bindings against the current
+retail image, keep experiments in the existing `samples/` near-miss file, and
+promote only a readable strict match into `src/reconstructed/`.
+
+**Exit criterion:** every promoted body has equal candidate/retail extents, zero
+ignored bytes, and all external relocations resolved under `vc6_o2_mt`; nearby
+calibration cases still pass.
+
+### 3. Take bounded helpers before large orchestrators
+
+After the quick wins, reconstruct EcoSystem's two constrained record helpers at
+`0x00456890` and `0x00456a10`. Their call contracts and downstream uses are known,
+so they can replace provisional state interpretations with evidence without
+claiming that the allocation category establishes source ownership. In parallel
+conceptually—but as separate commits—trace Terrain construction/acquisition sites
+before attempting its cleanup, so member types and lifetime order are supported
+independently.
+
+Then revisit the `ViewMatrix` helper at `0x004a14f0`: its math and complete extent
+are known, but store scheduling and floating-point term order remain open. Keep it
+in `samples/` until the full 744 bytes match; do not inline already-established
+retail helper calls to force a local resemblance.
+
+**Exit criterion:** each helper is either promoted with a strict VC6 result or
+left as a documented near miss with the exact differing instruction ranges and
+an evidence-preserving next experiment.
+
+### 4. Expand one subsystem at a time
+
+Prefer `PCTextureMap` slots 9 and 6 next because their frames and high-level flow
+are already understood. Defer its 2031-byte setup (slot 4), EventManager's
+4247-byte routine, and KrustyUI's 2432/3114-byte routines until their callees,
+member layouts and smaller surrounding methods are represented. This keeps a
+failed large match from conflating ABI, register allocation, control flow and
+unknown type errors.
+
+At the end of every slice, regenerate analysis artifacts, run the static/native
+tests and the authoritative gate, then update this section with exact counts and
+remaining uncertainty. Generated `analysis/` and `work/` reports stay untracked.
 
 ## Match contract
 
