@@ -5,7 +5,7 @@
 #ifndef OBJECT_PLACEMENT_H
 #define OBJECT_PLACEMENT_H
 
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 class CollisionObject;
 struct SoultreeProbe;

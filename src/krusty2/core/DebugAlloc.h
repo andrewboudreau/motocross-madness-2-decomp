@@ -3,6 +3,10 @@
 #ifndef DEBUG_ALLOC_H
 #define DEBUG_ALLOC_H
 
+// 0x004a2e20: malloc(size, file, line) with category accounting; the plain-array sibling of
+// operator new (same name as src/reconstructed/DebugAlloc.h).
+void* DebugMalloc(unsigned int size, const char* file, int line);
+
 // 0x004a3010: operator new(size, __FILE__, __LINE__).  The (size, file, line) push order
 // is confirmed at 0x0043a344.
 void* operator new(unsigned int size, const char* file, int line);

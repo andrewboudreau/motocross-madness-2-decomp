@@ -2,11 +2,12 @@
 
 The retail game was built from one flat folder, `D:\aardvark\VC\krusty2\`, recovered
 from the `__FILE__` strings in the binary (`analysis/source_paths.txt`). This tree
-holds reconstructed code whose **retail file is known**. It is grouped into area
+holds reconstructed code with reviewed or explicitly provisional retail-file attribution. It is grouped into area
 subfolders to keep things organised; the byte match doesn't depend on the folder.
 
 - `__FILE__` strings are only reached through relocated addresses, and the matcher
-  masks those, so the path text never enters the comparison.
+  masks those in diagnostic mode. Strict mode requires a reviewed file-literal
+  binding and compares the relocated address.
 - Line numbers do enter the code (`push 0x7a`), so sources pass them as literals,
   e.g. `new(__FILE__, 0x7a)`. Moving a file never changes them.
 
@@ -32,21 +33,32 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 
 | Folder | Contents |
 |---|---|
-| `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug `new`/`delete`/realloc), `MemTag.h` |
+| `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug malloc/`new`/`delete`/realloc), `MemTag.h` |
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.h`, `CollisionTypes.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
+| `bvh/` | Shared box-tree layouts; builder candidate in `samples/physics/bvh/` |
+| `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
+| `motion/` | SphereManager: 14 strict cases; shared motion layouts |
+| `shadow/` | Shared shadow layouts; candidates in `samples/physics/shadow/` |
+| `visibility/` | VisibilityQuadTree: 16 strict cases; partial traversal in samples |
 
-Include shared headers by their path under this folder, e.g. `#include "core/GameObject.h"`.
-`tools/run_physics_samples.py` puts `src/krusty2` on the include path.
+The earlier broad-phase counts are masked diagnostics. The new reviewed slices
+and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
+The combined SelectiveGravityModel/Shock candidate stays in samples: Shock TU
+ownership has only proximity evidence. Motion control, steering and the box-tree
+builder also remain samples pending complete relocation verification.
+
+Shared headers use paths relative to this folder, e.g. `core/GameObject.h`.
+The physics runner adds `src/krusty2` to the include path.
 
 ## Evidence: Quadtree.cpp
 
 - Name: `D:\aardvark\VC\krusty2\Quadtree.cpp`, string at 0x00572040.
 - Code bracket: after `ProjectedShadow.cpp` (last xref 0x4dacbc) and before
   `Quantize.cpp` (first xref 0x4dde47). Quadtree.cpp's own xrefs span 0x4dc729..0x4ddce6.
-- All 27 QuadTree/QuadTreeNode targets (0x4dc620..0x4ddd90) are inside the bracket;
-  22 match exactly, and 5 are documented partials in `broadphase/targets.json`.
+- All 35 QuadTree/QuadTreeNode targets (0x4dc4d0..0x4ddd90) are inside the bracket;
+  32 match exactly, and 3 are documented partials in `broadphase/targets.json`.
 - The 5-byte stub at 0x4dc4c0 (`xor eax,eax; ret 8`) also sits in this stretch, but it is
   Terrain's slot 22 and is shared with the ProjectedShadow and StatsOverlay vtables.
   Identical code folding makes its address useless for attribution. It is reconstructed
@@ -58,11 +70,12 @@ Include shared headers by their path under this folder, e.g. `#include "core/Gam
   at lines 0x4b3 and 0x4d0.
 - Code bracket: after `SteeringControl.cpp` (last xref 0x504bd2) and before `Texmap.cpp`
   (first xref 0x50a6bc). Terrain.cpp's own xrefs span 0x50567c..0x507b38.
-- 11 of the 12 targets (0x505830..0x508964) are inside the bracket. The 12th is the shared
-  0x4dc4c0 stub described above. 7 match exactly.
+- 13 of the 14 targets (0x5057d0..0x508850) are inside the bracket. The 14th is the shared
+  0x4dc4c0 stub described above. 12 match exactly.
 - Terrain derives from `GameObject` and `GroundFogableObject`, as the RTTI says (mdisp 0,
   and 0x2c for GroundFogableObject, which has no vfptr). Both bases are kept.
-- Out of reach under the no-asm rule: `QueryGround` 0x507c10 inlines an `__asm` fistp helper.
+- `QueryGround` 0x507c10 contains inline fistp instructions not reproduced by the
+  tested C++ casts. The original source mechanism is unproven.
 - The helper types (`TerrainVec3`, `TerrainMatrix`, `TerrainShutdownObject`,
   `TerrainComObject`, `TerrainOwned` and others) are provisional stand-ins with tier 3 names.
   `TerrainVec3` stays separate from the shared Vec3 because including `Math3D.h` would add
@@ -72,8 +85,12 @@ Include shared headers by their path under this folder, e.g. `#include "core/Gam
 
 ```bash
 python tools/run_physics_samples.py                             # samples/physics + src/krusty2
-python tools/run_physics_samples.py --root src/krusty2/broadphase
+python tools/run_physics_samples.py --strict --root src/krusty2/broadphase
 ```
 
-`tools/analyze.py` writes a flat placeholder `src/krusty2/<RetailName>.cpp` for each
-known name, and skips any name already present somewhere in this tree.
+`tools/analyze.py` writes filename-only placeholders under ignored
+`generated/krusty2-skeletons/`, never into this source tree.
+
+The default physics run is a masked diagnostic regression check. `--strict` is
+the acceptance check; it fails until every required target has independently
+reviewed relocation bindings (a `bindings` path relative to its targets.json).

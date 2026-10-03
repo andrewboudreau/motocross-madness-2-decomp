@@ -1,6 +1,6 @@
 // MatrixVec.cpp -- vector/matrix product helpers called from the broadphase/collision
 // code (BoundingBoxTreeBuild.cpp range 0x00428xxx-0x0042axxx by proximity; tier 3).
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // 0x0042a450. out = v * R(m): row-vector times the upper 3x3, no translation. cdecl, the Vec3
 // is passed by value (3 floats on the stack, the caller copies it), 5 stack dwords.

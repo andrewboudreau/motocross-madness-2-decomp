@@ -23,7 +23,7 @@
 #ifndef COLLISION_SOULTREE_PHYSICS_OBJECT_H
 #define COLLISION_SOULTREE_PHYSICS_OBJECT_H
 
-#include "../hierarchy/D3DIMSoultreeCharacter.h"   // SoultreePhysicsBaseObject, SoultreeLoadDesc
+#include "motion/D3DIMSoultreeCharacter.h"   // SoultreePhysicsBaseObject, SoultreeLoadDesc
 #include "collision/CollisionObject.h"                       // QuadTreeObject, GameObject
 
 class D3DIMSoultreeObject : public QuadTreeObject, public GameObject {

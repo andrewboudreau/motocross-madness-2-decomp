@@ -5,7 +5,7 @@
 // belong to the matrix/quaternion library, and 0x005087b0 is elsewhere. Which file
 // owned each one is unknown (tier 3).
 #include <string.h>
-#include "Math3D.h"
+#include "math/Math3D.h"
 
 // 0x004a13e0. rep stosd of a zeroed local, then a copy to the hidden result.
 Matrix4 MatrixZero()

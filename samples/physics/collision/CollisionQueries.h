@@ -2,7 +2,7 @@
 #ifndef COLLISION_QUERIES_H
 #define COLLISION_QUERIES_H
 
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // Bounding sphere as read by 0x0043a1e0/0x0043a270: center at +0x40, radius at +0x4c
 // (this is the same location CollisionObject keeps its bounds; tier 3 layout).

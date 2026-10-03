@@ -1,7 +1,7 @@
 // SoultreeMatrix.cpp -- SoultreeObject (soultree.cpp) frame-relative matrix accessors
 // declared in ../common/SoultreeObject.h. Class attribution tier 2; names tier 3.
 #include <string.h>
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // 0x00436500: 4x4 product out = b * a (row-vector convention), owned by the collision area
 // (CollisionMatrixMultiply). Declared here only so the call target is right.

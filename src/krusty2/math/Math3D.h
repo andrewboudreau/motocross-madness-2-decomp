@@ -1,7 +1,7 @@
 // Math3D.h -- shared 3D math types and helpers used by the MCM2 physics code.
 //
-// Owner: opus_rigidbody (samples/physics/common). Other areas include this as
-// "../common/Math3D.h". The API is append-only: names below will not be renamed.
+// Shared by reconstructed source and physics samples as "math/Math3D.h".
+// The type names and original header ownership remain provisional.
 //
 // Evidence summary (see also SoultreeObject.h):
 //  * Vec3 is three consecutive floats (12 bytes). Tier 1: every helper below reads
@@ -250,6 +250,6 @@ Vec3 CrossProductCall(const Vec3& a, const Vec3& b);
 
 // Scene-graph node helpers (local/world transforms) are SoultreeObject methods;
 // see SoultreeObject.h, which physics code reaches through node pointers.
-#include "SoultreeObject.h"
+#include "core/SoultreeObject.h"
 
 #endif

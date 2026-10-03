@@ -1,6 +1,6 @@
 // SoultreeHierarchy.cpp -- scene-graph node hierarchy/dirty-flag helpers of SoultreeObject
 // (soultree.cpp, 0x004fb4f0..0x004fdb31). Class attribution tier 2 (see SoultreeObject.h).
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // 0x004fdab0.
 void SoultreeObject::MarkSubtreeDirty()

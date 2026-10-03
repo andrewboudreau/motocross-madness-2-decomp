@@ -13,7 +13,7 @@
 
 #include "collision/CollisionObject.h"
 #include "CollisionPoint.h"
-#include "../common/Math3D.h"
+#include "math/Math3D.h"
 
 // Box bounds object at CollisionHullShape::field_0x188: two vec3s read as
 // (+4, +0x10) by every caller of the broad-phase test 0x00424730 (center, half extents;

@@ -31,13 +31,25 @@
 #ifndef SOULTREE_D3DIM_SOULTREE_CHARACTER_H
 #define SOULTREE_D3DIM_SOULTREE_CHARACTER_H
 
-#include "../soultree_base/SoultreePhysicsBaseObject.h"
+#include "core/GameObject.h"
+#include "math/Math3D.h"
 
 class SoultreeObject;
+struct CharacterPose;   // 0x2c-byte pose record; defined by users that need the layout (src/krusty2/motion/MotionPose.h)
+
+// One 0x40-byte row of Character's per-node name table (written by FillNodeNames 0x00445460; names tier 3).
+struct NodeNameEntry {
+    char name[0x34];          // +0x00 upper-cased copy of the node name, at most 0x31 chars
+    SoultreeObject* node;     // +0x34 the scene node this row describes
+    int field_0x38;           // +0x38 cleared when the row is written; D3DIM slots 4/5 test it before writing the node position
+    int field_0x3c;           // +0x3c cleared when the row is written; D3DIM slots 4/5 test it before writing the node axes
+};
 
 class Character : public virtual GameObject {
 public:
-    Character();
+    // ctor 0x004455b0's callee 0x004a6780 takes (a, most-derived flag): one source argument plus
+    // the hidden flag (tier 2, from the D3DIM ctor's pushes). The argument's role is tier 3.
+    explicit Character(int a);
     virtual ~Character();                       // core 0x004a69d0, deleting 0x004a68d0
     // --- vtable 0x00555318 (offset 0), slots 0..10, all introduced here ---
     virtual void CharacterVirtualSlot0();         // 0x00464e90 (ret; shared empty stub)
@@ -55,12 +67,31 @@ public:
     // Non-virtual helpers.  Owner class is tier 3 (address proximity to Character's
     // code at 0x004a6930..0x004a98b0; the callers pass the 0x21c subobject pointer,
     // which is both the Character and the D3DIMSoultreeCharacter start).
+    // 0x004a6b10, thiscall, ret 4: takes a pointer to {int, elements, count} and qsorts (0x534426)
+    // the 0x2c-byte records (tier 1 decode); D3DIM slot 2 passes the address of its pose list.
+    void Method_0x004a6b10(void* poseList);
+    // 0x004a6910, thiscall, ret 8: calls GameObject slot 8's body (0x004692f0, stores its argument in
+    // field_0x18) with the first argument; the second argument is unused (tier 1 decode).
+    void Method_0x004a6910(int a, int b);
+    // 0x004a62d0 and 0x004a6500, thiscall, no arguments (plain ret). Both reference Motnctrl.cpp's
+    // __FILE__ (0x0056e034) with debug new (lines 0x26b, 0x29d) and use the name strings at +0x8c / +0xdc /
+    // +0x12c, so they belong to a different TU than D3DIMSoultreeMotnctrl.cpp (tier 1 decode).
+    void Method_0x004a62d0();
+    void Method_0x004a6500();
     void Method_0x004a8b00();                               // ret
     void Method_0x004a8bf0(int a, float b);                 // ret 8
     void Method_0x004a8c50(int a, int b, float c, float d); // ret 0x10
 
     // vfptr +0, vbptr +4 (compiler generated); Character's own data up to 0x1a0.
-    char chr_field_0x08[0x198];
+    // Named fields (tier 3) come from D3DIM slots 2/3/4/5/9/10 (src/krusty2/motion/D3DIMSoultreeMotnctrl.cpp).
+    char chr_field_0x08[0x17c];     // +0x008..0x183 (name strings at +0x8c/+0xdc/+0x12c are read by 0x004a62d0/0x004a6500)
+    int nodeCount;                  // +0x184 rows in nodeNames; slot 10 loops to it, slot 2 sizes the pose array from it
+    NodeNameEntry* nodeNames;       // +0x188 FillNodeNames table; index = pose nodeIndex (slots 2..6, 10)
+    int* mirrorMap;                 // +0x18c slot 5 maps a pose's node index through it
+    int field_0x190;                // +0x190 start of the {int, elements, count} list that slot 2 passes by address to 0x004a6b10
+    CharacterPose* poses;           // +0x194 pose array allocated by slot 2 (line 0x12d); 0x004a6b10 reads it at list+4
+    int poseCount;                  // +0x198 slot 2 stores nodeCount - 1; read at list+8 by 0x004a6b10
+    int field_0x19c;                // +0x19c tested against 0 by 0x004a62d0
 };
 
 // Descriptor passed to the D3DIM loaders (D3DIMSoultreeCharacter slot 11, D3DIMSoultreeObject
@@ -92,7 +123,9 @@ public:
     // --- slot 11, introduced here ---
     // a2/a3 types follow SoultreePhysicsCharacter slot 40, which passes its name string and
     // descriptor here (tier 2).
-    virtual void D3DIMVirtualSlot11(int a1, const char* a2, const SoultreeLoadDesc* a3, int a4,
+    // Returns the GameObject subobject (this converted to GameObject*) on success, 0 when the
+    // resource could not be found and the object released itself (tier 1 decode of 0x00445680).
+    virtual GameObject* D3DIMVirtualSlot11(int a1, const char* a2, const SoultreeLoadDesc* a3, int a4,
                                     int a5, int a6); // 0x00445680 (ret 0x18)
 
     // D3DIM's own data 0x1a0..0x210 (then vtordisp at 0x210, GameObject at 0x214).

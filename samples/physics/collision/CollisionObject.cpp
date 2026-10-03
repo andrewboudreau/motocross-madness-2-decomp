@@ -22,7 +22,6 @@
 #include "collision/CollisionObject.h"
 #include "broadphase/Quadtree.h"
 
-extern QuadTree* g_pQuadTree;                    // 0x0068aba4
 
 // Retail helpers reached by direct call (addresses are the call targets).
 void Fn_0042a160(void* p);                       // shape sub-object destructor (cdecl, 1 arg)
@@ -140,8 +139,8 @@ CollisionObject::CollisionObject(int a)
 // 0x00431fd0 (deleting) -> 0x00432000 (core)
 CollisionObject::~CollisionObject()
 {
-    if (g_pQuadTree && useBroadphase)
-        g_pQuadTree->Remove(this, quadtreeCell);
+    if (g_collisionQuadTree && useBroadphase)
+        g_collisionQuadTree->Remove(this, quadtreeCell);
     FreeShape();
     if (ignoreList)
         operator delete((void*)ignoreList, __FILE__, 0x6c);
