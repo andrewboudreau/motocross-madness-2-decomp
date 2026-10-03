@@ -33,10 +33,18 @@ def main():
     ap.add_argument('--exe',required=True)
     ap.add_argument('--compiler',choices=['clang-cl','vc6'],default='clang-cl')
     ap.add_argument('--vc6-root',default=os.environ.get('VC6_ROOT'))
-    ap.add_argument('--stability',default='high')
+    ap.add_argument(
+        '--stability',
+        action='append',
+        choices=('high', 'medium'),
+        help='compiler-stability tier to check; repeat to select both (default: both)',
+    )
     ap.add_argument('--profile')
     a=ap.parse_args()
-    run([sys.executable,'tools/generate_easy_probes.py','--stability',a.stability])
+    generate = [sys.executable, 'tools/generate_easy_probes.py']
+    for stability in a.stability or ():
+        generate += ['--stability', stability]
+    run(generate)
     manifest=json.loads(Path('generated/easy_probes.json').read_text())
     with tempfile.TemporaryDirectory() as td:
         obj_path=Path(td)/'easy_probes.obj'

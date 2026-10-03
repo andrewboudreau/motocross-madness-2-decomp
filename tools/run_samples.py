@@ -11,7 +11,7 @@ def run(cmd):
 
 def main():
  ap=argparse.ArgumentParser();ap.add_argument('--exe',required=True);ap.add_argument('--compiler',choices=['clang-cl','vc6'],default='clang-cl');ap.add_argument('--vc6-root',default=os.environ.get('VC6_ROOT'));ap.add_argument('--profile');a=ap.parse_args()
- cases=[('src/reconstructed/BaseObject.cpp','src/reconstructed/BaseObject.targets.json'),('samples/game/GameProbe.cpp','samples/game/targets.json'),('samples/gameui/UIControlProbe.cpp','samples/gameui/targets.json'),('samples/dlgprocs/ConnectionInfoTypeProbe.cpp','samples/dlgprocs/targets.json'),('samples/pccontrol/PCKeyboardDeviceProbe.cpp','samples/pccontrol/targets.json'),('samples/physics/PhysicsBodyProbe.cpp','samples/physics/targets.json'),('samples/quadtree/QuadTreeObjectProbe.cpp','samples/quadtree/targets.json'),('src/reconstructed/FollowCamera.cpp','src/reconstructed/FollowCamera.targets.json')]
+ cases=[('src/reconstructed/BaseObject.cpp','src/reconstructed/BaseObject.targets.json'),('samples/game/GameProbe.cpp','samples/game/targets.json'),('samples/gameui/UIControlProbe.cpp','samples/gameui/targets.json'),('samples/dlgprocs/ConnectionInfoTypeProbe.cpp','samples/dlgprocs/targets.json'),('samples/pccontrol/PCKeyboardDeviceProbe.cpp','samples/pccontrol/targets.json'),('samples/physics/PhysicsBodyProbe.cpp','samples/physics/targets.json'),('samples/quadtree/QuadTreeObjectProbe.cpp','samples/quadtree/targets.json'),('samples/class_campaign/TwentyClassProbes.cpp','samples/class_campaign/targets.json'),('src/reconstructed/FollowCamera.cpp','src/reconstructed/FollowCamera.targets.json')]
  results=[]
  with tempfile.TemporaryDirectory() as td:
   for idx,(src,tjson) in enumerate(cases):

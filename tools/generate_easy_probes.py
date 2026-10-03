@@ -75,12 +75,18 @@ def main():
     ap.add_argument('--targets',default='analysis/easy_targets.json')
     ap.add_argument('--out-source',default='generated/easy_probes.cpp')
     ap.add_argument('--out-manifest',default='generated/easy_probes.json')
-    ap.add_argument('--stability',default='high')
+    ap.add_argument(
+        '--stability',
+        action='append',
+        choices=('high', 'medium'),
+        help='compiler-stability tier to emit; repeat to select both (default: both)',
+    )
     a=ap.parse_args()
     rows=json.loads(Path(a.targets).read_text())
     selected=[]; decls=[]; defs=[]; externs=[]
+    stabilities = set(a.stability or ('high', 'medium'))
     for r in rows:
-        if r.get('compiler_stability')!=a.stability: continue
+        if r.get('compiler_stability') not in stabilities: continue
         m=method_for(r)
         if not m: continue
         name,sig,body,ext=m

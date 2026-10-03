@@ -6,8 +6,8 @@ Results use VC6 SP3 natively on Windows; the 2026-09-30 calibration and full
 gate were repeated under Linux/Wine with the same results. A complete linked
 game remains a separate, unverified gate.
 
-The VC6 gate currently checks byte-exact functions from 41 handwritten C++
-candidate files: all 34 files in `src/reconstructed/` and seven focused probes
+The VC6 gate currently checks byte-exact functions from 42 handwritten C++
+candidate files: all 34 files in `src/reconstructed/` and eight focused probes
 in `samples/`. This is a count of source files represented by at least one
 checked function, not a claim that complete object files or a linked game match.
 
@@ -15,14 +15,28 @@ checked function, not a claim that complete object files or a linked game match.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 487/487 |
-| `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
-| `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
-| `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
-| `vc6_o1_ml`, `vc6_o1_mt` | 31/39 | 13/19 | 8/17 (camera cases not rerun) |
+| `vc6_o2_mt` (default) | 44/44 | 39/39 | 487/487 |
+| `vc6_o2_ml` | 44/44 | 39/39 | 487/487 |
+| `vc6_o2_mt_g6`, `vc6_o2_ml_g6` | 44/44 | 39/39 | 219/487 |
+| `vc6_o1_ml`, `vc6_o1_mt` | 36/44 | 26/39 | 89/487 |
 
 Passing manual samples mask no bytes. Generated probes resolve both global-load
-addresses. Summaries prefer strict results when available.
+addresses. The generated gate includes every supported high- and medium-stability
+shape: five medium-stability bodies (one three-field zeroing body and four
+indexed-stride accessors) are now independently strict matches. The remaining
+medium discoveries use shapes not yet emitted by the generator. Summaries prefer
+strict results when available.
+
+## Twenty-class probe campaign
+
+`samples/class_campaign/TwentyClassProbes.cpp` adds one strictly matched body
+for each of 20 RTTI-confirmed classes. The accompanying target manifest records
+the primary-vtable slot and whether the slot is a root, introduction or override;
+no inherited slot is attributed to a derived class. All 20 bodies match their
+complete independently measured extents under VC6 SP3 `/O2`, with no relocation
+bytes ignored. The `UnknownVirtualSlotN` names and argument types remain
+provisional, and the candidates remain in `samples/` rather than being promoted
+to reconstructed translation units.
 
 The default is `vc6_o2_mt`: `/O2` without `/G6` is the only tested family that
 matches every calibration target, and no target prefers `/G6`. The 34 `/G6`
