@@ -1,4 +1,4 @@
-#include "CollisionPoint.h"
+#include "collision/CollisionPoint.h"
 
 #include "CollisionPointCtor.h"
 

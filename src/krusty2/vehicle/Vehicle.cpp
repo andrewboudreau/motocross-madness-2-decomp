@@ -1,77 +1,11 @@
 // Vehicle.cpp - reconstruction of the retail Vehicle translation unit
 // (__FILE__ xrefs near 0x00525e98). See Vehicle.h for the evidence/provisional notes.
-#include "Vehicle.h"
+#include "vehicle/Vehicle.h"
 #include <math.h>
 #include <stdlib.h>
 #include <float.h>
 #include "collision/CollisionObject.h"
-#include "../soultree_base/SoultreePhysicsCallees.h"
-
-// ---- small vector helpers (stand-ins for common/Math3D.h) ----
-
-// Cross product as a member of a Vec3 view: VC6 honours source multiplicand order here
-// (free-function form canonicalises it).
-struct VehV3 : Vec3
-{
-    Vec3 Cross(const Vec3& b) const
-    {
-        Vec3 r;
-        r.x = y * b.z - z * b.y;
-        r.y = z * b.x - x * b.z;
-        r.z = x * b.y - b.x * y;
-        return r;
-    }
-    // Same cross product with the y-component written b.x * z (member order is honoured).
-    Vec3 CrossB(const Vec3& b) const
-    {
-        Vec3 r;
-        r.x = y * b.z - z * b.y;
-        r.y = b.x * z - x * b.z;
-        r.z = x * b.y - b.x * y;
-        return r;
-    }
-};
-
-void Vehicle::UnknownVirtualSlot34()
-{
-    modelNode->GetAxesIn(0, &bodyForward, &bodyUp);
-    sideAxis = ((VehV3&)bodyForward).CrossB(bodyUp);
-}
-
-void Vehicle::UnknownVirtualSlot35(int a, int b)
-{
-    modelNode->SetAxesIn(0, &bodyForward, &bodyUp, a, b);
-    sideAxis = ((VehV3&)bodyForward).CrossB(bodyUp);
-}
-
-float Vehicle::UnknownVirtualSlot45() { return 3.0f; }
-int Vehicle::UnknownVirtualSlot51() { return spawnProtected; }
-int Vehicle::UnknownVirtualSlot52() { return crashState == 0; }
-
-int Vehicle::UnknownVirtualSlot68(int* out)
-{
-    *out = 15;
-    return 1;
-}
-
-void Vehicle::UnknownVirtualSlot69() { crashTimer = crashTimerReload; }
-
-int Vehicle::UnknownVirtualSlot23()
-{
-    return !airborne && field_0x434 >= 0.2f;
-}
-
-int Vehicle::UnknownVirtualSlot24()
-{
-    return field_0x5b0 < engineState->field_0x00 && crashState == 0 && linearSpeed < 22.0f;
-}
-
-int Vehicle::UnknownVirtualSlot25()
-{
-    return field_0x5b0 > engineState->field_0x00 && crashState == 0 && linearSpeed < 22.0f;
-}
-
-void Vehicle::UnknownVirtualSlot92(const Vec3*, const Vec3*) {}
+#include "soultree/SoultreePhysicsCallees.h"
 
 void Vehicle::UnknownVirtualSlot0(float dt)
 {
@@ -98,9 +32,9 @@ float Vehicle::UnknownVirtualSlot53()
 
 Vec3* Vehicle::UnknownVirtualSlot55(Vec3* unused, Vec3* out)
 {
-    out->x = g_VehZeroVec3.x;
-    out->y = g_VehZeroVec3.y;
-    out->z = g_VehZeroVec3.z;
+    out->x = kVec3Zero.x;
+    out->y = kVec3Zero.y;
+    out->z = kVec3Zero.z;
     *out = savedForward;
     return out;
 }
@@ -197,27 +131,13 @@ int Vehicle::UnknownVirtualSlot77(int arg)
     return 0;
 }
 
-int Vehicle::UnknownVirtualSlot78()
-{
-    if (inputMap->UnknownVirtualSlot3(3, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
-        return 1;
-    return inputMap->UnknownVirtualSlot3(0x1f, 0, 0x3f, 0) != 0;
-}
-
-int Vehicle::UnknownVirtualSlot79()
-{
-    if (inputMap->UnknownVirtualSlot3(4, 2, 0x3f, 0) && !UnknownVirtualSlot77(1))
-        return 1;
-    return inputMap->UnknownVirtualSlot3(0x2d, 0, 0x3f, 0) != 0;
-}
-
 void Vehicle::UnknownVirtualSlot64(float arg)
 {
     if (crashState == 0) {
         UnknownVirtualSlot63(arg);
         return;
     }
-    controlInput = g_VehZeroVec3;
+    controlInput = kVec3Zero;
     steerInput = 0.0f;
     throttleInput = 0.0f;
 }
@@ -336,7 +256,7 @@ void Vehicle::UnknownVirtualSlot43()
     respawnHeading.y = 0.0f;
     float len2 = VehLen2(respawnHeading);
     if (len2 == 0.0f) {
-        respawnHeading = g_VehZeroVec3;
+        respawnHeading = kVec3Zero;
         return;
     }
     float inv = FastInvSqrt(len2);
@@ -394,7 +314,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
                 last = i;
             } else {
                 c->blendWeight = 0.0f;
-                c->appliedShare = g_VehZeroVec3;
+                c->appliedShare = kVec3Zero;
             }
         }
         if (active == 1) {
@@ -436,7 +356,7 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
                 total += dist[i];
             } else {
                 w->loadWeight = 0.0f;
-                w->appliedShare = g_VehZeroVec3;
+                w->appliedShare = kVec3Zero;
             }
         }
         for (i = 0; i < wheelCount; i++) {
@@ -453,14 +373,14 @@ void Vehicle::UnknownVirtualSlot7(const Vec3* arg)
     } else if (wheelsInContact == 1) {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = 0.0f;
-            wheelList[i]->appliedShare = g_VehZeroVec3;
+            wheelList[i]->appliedShare = kVec3Zero;
         }
         primaryWheel->loadWeight = 1.0f;
         primaryWheel->appliedShare = *arg;
     } else {
         for (i = 0; i < wheelCount; i++) {
             wheelList[i]->loadWeight = 0.0f;
-            wheelList[i]->appliedShare = g_VehZeroVec3;
+            wheelList[i]->appliedShare = kVec3Zero;
         }
     }
 }
@@ -689,8 +609,8 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 {
     if (crashState != 0)
         return;
-    Vec3 sum = g_VehZeroVec3;
-    *out = g_VehZeroVec3;
+    Vec3 sum = kVec3Zero;
+    *out = kVec3Zero;
     float load = 0.0f;
     int mixed = 0;
     int flagged = 0;
@@ -724,7 +644,7 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
     if (wheelsInContact > 1) {
         float len2 = out->y * out->y + out->x * out->x + out->z * out->z;
         if (len2 == 0.0f) {
-            *out = g_VehZeroVec3;
+            *out = kVec3Zero;
         } else {
             float inv = FastInvSqrt(len2);
             out->x = inv * out->x;
@@ -1063,7 +983,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
             if (ss->gearTimer < 0.0f)
                 ss->gearTimer = 0.0f;
         }
-        Vec3 zero = g_VehZeroVec3;
+        Vec3 zero = kVec3Zero;
         if (crashState == 0) {
             if (Method_00529280())
                 engineState->field_0x08 = 1;
@@ -1087,7 +1007,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         prevSpeed = linearSpeed;
         if (linearSpeed < 0.001f || !_finite(linearSpeed)) {
             prevSpeed = 0.0f;
-            velocity = g_VehZeroVec3;
+            velocity = kVec3Zero;
             linearSpeed = 0.0f;
         }
         centerNode->GetPositionIn(0, &centerOfMass);
@@ -1163,7 +1083,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
                 linearSpeed = prevSpeed;
             }
             if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
-                velocity = g_VehZeroVec3;
+                velocity = kVec3Zero;
                 angularVelocity.y = 0.0f;
                 linearSpeed = 0.0f;
             }
@@ -1171,7 +1091,7 @@ void Vehicle::UnknownVirtualSlot49(float frame)
         float aq = turnAngle;
         if (aq < 0.0f)
             aq = -aq;
-        Vec3 zeroB = g_VehZeroVec3;
+        Vec3 zeroB = kVec3Zero;
         UnknownVirtualSlot13(&up, &zeroB, t53);
         if (anyWheelInContact) {
             Method_00527A20(&speed, &zero, &up);
@@ -1321,7 +1241,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     case 0x69:
         hasBody = 1;
         ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->otherBody + 0x34);
-        v30 = g_VehZeroVec3; v3c = g_VehZeroVec3; v48 = g_VehZeroVec3;
+        v30 = kVec3Zero; v3c = kVec3Zero; v48 = kVec3Zero;
         l10 = 0;
         p.x = 1.0f; p.y = 1.0f; p.z = 1.0f;
         s = p;
@@ -1331,7 +1251,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
     case 0x2711:
         hasBody = 1;
         ctx = *(int*)((char*)((VehicleCollisionEvent*)c)->otherBody + 0x1a0);
-        v30 = g_VehZeroVec3; v3c = g_VehZeroVec3; v48 = g_VehZeroVec3;
+        v30 = kVec3Zero; v3c = kVec3Zero; v48 = kVec3Zero;
         l10 = 0;
         p.x = 1.0f; p.y = 1.0f; p.z = 1.0f;
         s = p;
@@ -1365,7 +1285,7 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
         UnknownVirtualSlot3(&((VehicleContactSet*)collisionObject)->contactNormal, &p, &rel, &s, b, 0, &l10);
     }
     if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
-        velocity = g_VehZeroVec3;
+        velocity = kVec3Zero;
         angularVelocity.y = 0.0f;
         linearSpeed = 0;
     }
@@ -1374,13 +1294,6 @@ void Vehicle::UnknownVirtualSlot38(int a, int b, void* c)
 }
 
 // ---- wave 2 ----
-
-// Scene-node method 0x004444e0 (purpose unknown) is not in SoultreeObject yet; view the
-// node through a local stand-in that declares it.
-struct VehSceneNodeView {
-    void Method_004444E0();
-    void Method_004FBD70(const Vec3* axisZ, const Vec3* axisY, int a, int b);   // 0x004fbd70, purpose unknown
-};
 
 void Vehicle::UnknownVirtualSlot44()
 {
@@ -1480,39 +1393,6 @@ void Vehicle::UnknownVirtualSlot63(float dt)
     }
 }
 
-// Tier 3 reading: when the facing vector (0x88) has no horizontal part it is rebuilt from the
-// previous up vector (0x94) with the sign of its y, then the basis block is reset to the
-// identity-like values and pushed to the scene node.
-void Vehicle::UnknownVirtualSlot36()
-{
-    if (bodyForward.x == 0.0f && bodyForward.z == 0.0f) {
-        float s = bodyForward.y >= 0.0f ? -1.0f : 1.0f;
-        bodyForward = s * bodyUp;
-    }
-    bodyUp = g_VehZeroVec3_005778c8;
-    bodyForward.y = 0.0f;
-    UnknownVirtualSlot35(1, 0);
-    UnknownVirtualSlot34();
-    bodyCosRoll = 1.0f;
-    bodyCosPitch = 1.0f;
-    bodyRoll = 0.0f;
-    bodyPitch = 0.0f;
-    bodySinRoll = 0.0f;
-    bodySinPitch = 0.0f;
-    savedForward = bodyForward;
-    savedUp = bodyUp;
-    savedYaw = bodyYaw;
-    savedPitch = bodyPitch;
-    savedRoll = bodyRoll;
-    savedSinRoll = bodySinRoll;
-    savedCosRoll = bodyCosRoll;
-    savedCosPitch = bodyCosPitch;
-    savedSinPitch = bodySinPitch;
-    steerState->steerNode->SetPosition(g_VehZeroVec3_005778a8);
-    ((VehSceneNodeView*)steerState->steerNode)->Method_004FBD70(&bodyForward, &bodyUp, 0, 1);
-    steerState->Method_00504E20(0, poseNode);
-}
-
 // Tier 3 reading: classifies the (field_0x504.y, field_0x474) input pair into one of eight
 // directions: -1 inside the dead zone (|v|^2 <= 0.25), else the sector of the pair relative to
 // the band +-0.52057 * |v| (0..7).
@@ -1548,7 +1428,7 @@ int Vehicle::UnknownVirtualSlot88()
 // 1.0 when no wheel contributed.
 float Vehicle::UnknownVirtualSlot75()
 {
-    Vec3 sum = g_VehZeroVec3;
+    Vec3 sum = kVec3Zero;
     int n = 0;
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* w = wheelList[i];
@@ -1560,7 +1440,7 @@ float Vehicle::UnknownVirtualSlot75()
     if (n > 1) {
         float scale = sum.x * sum.x + sum.z * sum.z + sum.y * sum.y;
         if (scale == 0.0f) {
-            sum = g_VehZeroVec3;
+            sum = kVec3Zero;
         } else {
             scale = FastInvSqrt(scale);
             sum.x = sum.x * scale;
@@ -1640,7 +1520,7 @@ void Vehicle::UnknownVirtualSlot1(float value)
     smoothedVerticalAccel = 0.0f;
     smoothedForwardAccel = 0.0f;
     prevLocalForwardVelocity = 0.0f;
-    tiltAxisLocal = g_VehZeroVec3;
+    tiltAxisLocal = kVec3Zero;
     leanError = 0.0f;
     turnRate = 0.0f;
     steerRate = 0.0f;
@@ -1651,7 +1531,7 @@ void Vehicle::UnknownVirtualSlot1(float value)
     contactTotal = 0;
     field_0x520 = 1;
     throttleInput = 0.0f;
-    prevControlInput = g_VehZeroVec3;
+    prevControlInput = kVec3Zero;
     field_0x478 = false;
     field_0x479 = false;
     field_0x47a = false;
@@ -1760,7 +1640,7 @@ void Vehicle::UnknownVirtualSlot95()
         scratchVector = angularVelocity;
         float sq = VehLenSq(scratchVector);
         if (sq == 0.0f) {
-            scratchVector = g_VehZeroVec3;
+            scratchVector = kVec3Zero;
         } else {
             float s = FastInvSqrt(sq);
             scratchVector.x = s * scratchVector.x;
@@ -1949,10 +1829,10 @@ void Vehicle::Method_00525A90()
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
         wheel->field_0x2a4 = 1.0f;
-        wheel->field_0x1e8 = g_VehZeroVec3;
-        wheel->field_0x248 = g_VehZeroVec3;
+        wheel->field_0x1e8 = kVec3Zero;
+        wheel->field_0x248 = kVec3Zero;
         wheel->field_0x280.x = 0.0f;
-        wheel->field_0x254 = g_VehZeroVec3;
+        wheel->field_0x254 = kVec3Zero;
         wheel->field_0x2b8 = 1.0f;
         wheel->field_0x280.z = 1.0f;
         wheel->field_0x2bc = 0.0f;
@@ -1965,17 +1845,17 @@ void Vehicle::Method_00525A90()
         wheel->field_0x26c = 0;
         wheel->sceneNode->GetPositionIn(0, &wheel->nodePosition);
         wheel->field_0x16c = 0;
-        wheel->field_0x108 = g_VehZeroVec3;
-        wheel->field_0x114 = g_VehZeroVec3;
+        wheel->field_0x108 = kVec3Zero;
+        wheel->field_0x114 = kVec3Zero;
         wheel->field_0x150 = -999.0f;
         wheel->field_0x148 = 0;
         wheel->field_0x14c = 0;
-        wheel->appliedShare = g_VehZeroVec3;
+        wheel->appliedShare = kVec3Zero;
         wheel->field_0x15c = 0;
         wheel->field_0x13c = 0.0f;
-        wheel->field_0x130 = g_VehZeroVec3;
+        wheel->field_0x130 = kVec3Zero;
         wheel->field_0x12c = 0;
-        wheel->field_0x120 = g_VehZeroVec3;
+        wheel->field_0x120 = kVec3Zero;
     }
 }
 
@@ -2021,7 +1901,7 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     steerState = 0;
     verticalAccelSmoother = 0;
     forwardAccelSmoother = 0;
-    weightForce = g_VehZeroVec3;
+    weightForce = kVec3Zero;
     leanCos = 1.0f;
     field_0x4b4 = 1.0f;
     field_0x124 = 0;
@@ -2070,8 +1950,8 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     allWheelsInContact = 0;
     prevCrashState = 0;
     field_0x5b0 = 0;
-    controlInput = g_VehZeroVec3;
-    prevControlInput = g_VehZeroVec3;
+    controlInput = kVec3Zero;
+    prevControlInput = kVec3Zero;
     steerInput = 0;
     contactTotal = 0;
     touchingPointCount = 0;
@@ -2082,6 +1962,6 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     *(int*)&pad_0x5B8 = 0;
     Vehicle::UnknownVirtualSlot1(165.0f);
     spawnProtected = 0;
-    takeoffVelocity = g_VehZeroVec3;
-    takeoffPosition = g_VehZeroVec3;
+    takeoffVelocity = kVec3Zero;
+    takeoffPosition = kVec3Zero;
 }

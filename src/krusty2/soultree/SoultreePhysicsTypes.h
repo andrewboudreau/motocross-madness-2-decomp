@@ -6,9 +6,8 @@
 
 #include "math/Math3D.h"
 
-// Global Vec3 constants in .data used to reset vectors (0x00689ee8 is all zero
-// bits; 0x00685190 is the vector loaded by slot 36).
-extern Vec3 g_SoultreeZeroVec3;   // 0x00689ee8
+// The zero vector 0x00689ee8 is this TU's Math3D.h kVec3Zero (its `$E` body is 0x00502b60).
+// 0x00685190 is the vector loaded by slot 36.
 extern Vec3 g_SoultreeVec3_685190; // 0x00685190
 
 #endif

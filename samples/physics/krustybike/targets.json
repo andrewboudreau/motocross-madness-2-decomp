@@ -502,5 +502,68 @@
     "target_size": 350,
     "expect": "exact",
     "notes": "toggle mutual collision ignoring against other bikes (0x496f90/0x497370) and part colliders; matched with items[i].flags test then a separate part pointer"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00496D20",
+    "target_va": "0x00496d20",
+    "target_size": 119,
+    "expect": "partial",
+    "notes": "Real body of slot 101 (behind the 16-byte jmp stub at 0x496d10). Same divergence as Fn_00496DA0: retail hoists lea ecx,[eax+0xc] into the compare block and loads the vptr through ecx; ours loads it from [eax+0xc]."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_0048D910",
+    "target_va": "0x0048d910",
+    "target_size": 123,
+    "expect": "exact",
+    "notes": "Rider knock-off animation start (animSetA/B)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_0048D990",
+    "target_va": "0x0048d990",
+    "target_size": 98,
+    "expect": "exact",
+    "notes": "Rider animation start variant (animSetC/D)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "KrustyCollisionCallbackA",
+    "target_va": "0x0048dcd0",
+    "target_size": 165,
+    "expect": "exact",
+    "notes": "Collision callback A (static, cdecl)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "KrustyCollisionCallbackB",
+    "target_va": "0x0048dd80",
+    "target_size": 155,
+    "expect": "exact",
+    "notes": "Collision callback B (static, cdecl)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_0048E190",
+    "target_va": "0x0048e190",
+    "target_size": 225,
+    "expect": "exact",
+    "notes": "Nearest other race bike."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_0048E280",
+    "target_va": "0x0048e280",
+    "target_size": 339,
+    "expect": "partial",
+    "notes": "Bearing to nearest rival, head-turn pose. 25%: retail inlines fpatan keeping dz live on the FPU (fld st0; fxch x3; fpatan; fxch; fstp st0); VC6 emits plain fpatan for atan2(dx,dz) in every source shape tried (locals, Vec3 difference)."
   }
 ]

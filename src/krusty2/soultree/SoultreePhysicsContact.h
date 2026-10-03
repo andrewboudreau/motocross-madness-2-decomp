@@ -3,7 +3,7 @@
 #ifndef SOULTREE_PHYSICS_CONTACT_H
 #define SOULTREE_PHYSICS_CONTACT_H
 
-#include "SoultreePhysicsTypes.h"
+#include "soultree/SoultreePhysicsTypes.h"
 #include "collision/CollisionObject.h"
 
 // Element of SoultreePhysicsBaseObject::field_0x12c (count in field_0x130).
