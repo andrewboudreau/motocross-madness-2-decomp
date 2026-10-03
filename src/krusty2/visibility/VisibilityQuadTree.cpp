@@ -1,6 +1,10 @@
 // VisibilityQuadTree.cpp -- reconstruction of D:\aardvark\VC\krusty2\VisibilityQuadTree.cpp.
 #include "visibility/VisibilityQuadTree.h"
 
+// Installed for CollisionObject broad-phase queries; g_pQuadTree is the
+// separate active traversal context at 0x00689b78. Names are provisional.
+QuadTree* g_collisionQuadTree;  // 0x0068aba4
+
 struct VisibilityGlobalEntry {   // 0x20-byte entries at 0x0068a774, reset by the ctor
     int field_0x00;
     int field_0x04;
@@ -35,7 +39,7 @@ QuadTreeNode* VisibilityQuadTree::UnknownVirtualSlot1()
 VisibilityQuadTree::VisibilityQuadTree(int flags)
     : GameObject(flags)
 {
-    g_pQuadTree = this;
+    g_collisionQuadTree = this;
     liveNodeCount = 0;
     rootNode = 0;
     for (int i = 0; i < 16; i++) {
@@ -47,7 +51,7 @@ VisibilityQuadTree::VisibilityQuadTree(int flags)
 
 VisibilityQuadTree::~VisibilityQuadTree()
 {
-    g_pQuadTree = 0;
+    g_collisionQuadTree = 0;
 }
 
 GameObject* VisibilityQuadTree::Setup(int parentArg, float x0, float z0, float x1, float z1, float minCell)
@@ -140,81 +144,6 @@ int VisibilityQuadTree::GameObjectVirtualSlot14()
     return 1;
 }
 
-// One child of the walk: skipped when absent or outside the frustum, gathered whole when all 8
-// box corners are inside and recursed into otherwise.
-__forceinline QuadTreeResultLink* VisibilityQuadTreeNode::VisitChild(
-    int i, int x, int z, QuadTreeResultLink* tail, int nodeX, int nodeZ, int midX, int midZ,
-    int half, float centerX, float centerZ, float halfExtent, VisibilityCamera* camera,
-    VisibilityBoxVec* center, VisibilityBoxVec* extent, int* cornersInside)
-{
-    if (!children[i])
-        return tail;
-    center->y = children[i]->yCenter;
-    extent->y = children[i]->yHalfExtent;
-    center->x = (i & 2) ? centerX + halfExtent : centerX - halfExtent;
-    center->z = (i & 1) ? centerZ + halfExtent : centerZ - halfExtent;
-    if (!g_visibilityClipper->TestBox(camera, (const float*)((char*)camera + 0xec), &center->x,
-                                      &extent->x, 0, cornersInside, 0))
-        return tail;
-    int childX = (i & 2) ? midX : nodeX;
-    int childZ = (i & 1) ? midZ : nodeZ;
-    if (*cornersInside == 8)
-        return children[i]->UnknownVirtualSlot2(x, z, tail, childX, childZ, half);
-    return ((VisibilityQuadTreeNode*)children[i])->Traverse(x, z, tail, childX, childZ, half, camera);
-}
-
-// Back-to-front walk: the quadrant containing the query point is visited last.
-QuadTreeResultLink* VisibilityQuadTreeNode::Traverse(int x, int z, QuadTreeResultLink* tail,
-                                                     int nodeX, int nodeZ, int size,
-                                                     VisibilityCamera* camera)
-{
-    int midX = nodeX + size;
-    int midZ = nodeZ + size;
-    float centerX = (float)midX * g_quadTreeInvScale;
-    float centerZ = (float)midZ * g_quadTreeInvScale;
-    size >>= 1;
-    float halfExtent = (float)size * g_quadTreeInvScale;
-    VisibilityBoxVec center;
-    VisibilityBoxVec extent;
-    int cornersInside;
-    extent.x = halfExtent;
-    extent.z = halfExtent;
-    if (children) {
-        if (x >= midX) {
-            if (z >= midZ) {
-                tail = VisitChild(0, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-                tail = VisitChild(1, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-                tail = VisitChild(2, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-                tail = VisitChild(3, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-            } else {
-                tail = VisitChild(1, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-                tail = VisitChild(0, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-                tail = VisitChild(3, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-                tail = VisitChild(2, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-            }
-        } else if (z >= midZ) {
-            tail = VisitChild(2, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-            tail = VisitChild(3, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-            tail = VisitChild(0, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-            tail = VisitChild(1, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-        } else {
-            tail = VisitChild(3, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-            tail = VisitChild(2, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-            tail = VisitChild(1, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-            tail = VisitChild(0, x, z, tail, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
-        }
-    }
-    if (itemList) {
-        QuadTreeResultLink* cell = (QuadTreeResultLink*)g_pQuadTree->resultPool->Alloc();
-        if (tail)
-            tail->next = cell;
-        cell->item = this;
-        cell->next = 0;
-        return cell;
-    }
-    return tail;
-}
-
 struct VisibilityBoxVertex {   // 0x20 bytes, 16 of them at 0x0068a768
     float x, y, z;
     char field_0x0c[0x14];
@@ -266,7 +195,7 @@ __forceinline void VisibilityQuadTreeNode::DrawChild(
     if (!g_visibilityClipper->TestBox(camera, (const float*)((char*)camera + 0xec), &center->x,
                                       &extent->x, 0, cornersInside, 0))
         return;
-    DrawBox(*(VisibilityRenderer**)((char*)camera + 0x18), &center->x, &extent->x);
+    DrawBox(camera->renderer, &center->x, &extent->x);
     if (*cornersInside != 8)
         ((VisibilityQuadTreeNode*)children[i])->DebugDraw(x, z, (i & 2) ? midX : nodeX,
                                                           (i & 1) ? midZ : nodeZ, half, camera);

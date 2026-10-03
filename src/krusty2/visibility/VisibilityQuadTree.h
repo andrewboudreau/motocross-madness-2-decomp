@@ -18,8 +18,12 @@
 // Setup() calls with its first argument).  Tier 3 stand-in: only the pieces the slots below
 // touch are declared.  Slot 7 (+0x1c) is called with (0, 1, 1) and (0, 4, 1) by slot 14 and
 // field +0x08 is read as the camera record.
+class VisibilityRenderer;
+
 struct VisibilityCamera {
-    float viewProjection[4][4];   // +0x00 transforms a world point to clip space (0x0052f340, 0x0052f190)
+    char field_0x00[0x18];
+    VisibilityRenderer* renderer; // +0x18 loaded by the verified debug walk
+    char field_0x1c[0x24];
     char field_0x40[0x74];
     float matrixB[4][4];          // +0xb4 second 4x4 (0x0052fbb0 reads +0xb4/+0xc4/+0xd4/+0xe4 as the columns of x/y/z/translation)
     char field_0xf4[0x38];

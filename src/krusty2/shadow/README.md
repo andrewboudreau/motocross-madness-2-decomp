@@ -1,3 +1,7 @@
+ProjectedShadow and TerrainShadow candidates are preserved in `samples/physics/shadow/`.
+D3DIMSoultreeShadow.cpp has 16 strictly verified cases with adjacent bindings.
+Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
+
 # ProjectedShadow.cpp (shadow)
 
 Validation: counts labeled "exact" below are historical relocation-masked
@@ -32,3 +36,29 @@ Notes
 - DebugMalloc(size, file, line) at 0x4a2e20 uses core/DebugAlloc.h.
 - Helper stand-ins (tier 3): ShadowMatrixIdentity 0x4a1410, ShadowMatrixMultiply 0x4a1860,
   ShadowTransformPoints* 0x4a1b00/0x4a1a50, ShadowFillTriangle 0x461e60, caster 0x4433f0/0x445030/0x4fe850/0x4fdab0.
+
+## D3DIMSoultreeShadow binding evidence
+
+RTTI independently identifies the primary tables `0x0055156c` for
+D3DIMSoultreeShadow and `0x005515ec` for ShadowReceiver, both at object offset
+zero. The constructor calls the independently reconstructed GameObject ctor,
+installs its table, zeroes seven fields, and fills 3,000 shorts at `0x005995b8`:
+`mov [eax],cx; add eax,2; inc ecx; cmp eax,0x0059ad28`.
+
+Attach calls GameObject slot 8 and ProjectedShadow::AddReceiver at `0x004daba0`.
+The latter's body grows and appends to its receiver list at +`0x128`/+`0x12c`;
+its own debug allocation references ProjectedShadow.cpp. Slot 28 reads the
+texture size and stores the reciprocal texel value at `0x0057efa4`; the
+`0.5f` and `1.0f` constants were checked at `0x005507f4` and `0x00550748`.
+
+The deleting wrapper at `0x00446890` calls the 11-byte generated core at
+`0x00508b70`, which writes the ShadowReceiver table and tail-calls GameObject's
+destructor. This is the same teardown shape also emitted at `0x004477c0`.
+The RTTI-backed wrapper and decoded vptr/call behavior support the binding;
+a shared tiny address alone is not used to establish exclusive method identity.
+
+Four initializer thunks select the bodies at `0x004477e0`, `0x00447830`,
+`0x00447880`, `0x004478d0`. Their decoded three-component writes establish the
+zero/X/Y/Z constants at `0x0057efa8`, `0x0057efb8`, `0x0057efc8`, `0x0057ef98`.
+All sixteen cases compare complete compiler extents after applying relocations.
+The other declared rendering overrides remain unreconstructed.

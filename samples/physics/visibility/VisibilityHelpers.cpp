@@ -47,6 +47,16 @@ int __stdcall VisTestDot(const VisibilityCamera* camera, const VisVec3* a, const
     return 1;
 }
 
+// The projection probe interprets its argument's prefix as a matrix. Its
+// relationship to VisibilityCamera is unproven; do not overlay that hypothesis
+// onto VisibilityCamera's confirmed renderer pointer at +0x18.
+struct VisProjectionRecord {
+    float viewProjection[4][4];
+    char field_0x40[0x168];
+    unsigned int viewportWidth;
+    unsigned int viewportHeight;
+};
+
 // 0x0052f340 (ret 0x14).  Projects a world point with the camera's first matrix, writes the
 // outcode (x: 1 / 2 for x' < 0 / x' > w, y: 4 / 8, z: 0x10 / 0x20) and, when `screen` is given,
 // the viewport-scaled coordinates.  The first argument is not read (tier 1 decoded).
@@ -58,7 +68,7 @@ struct VisClipPoint {   // frame-size probe: retail reserves 0x20 bytes for the 
     float field_0x10[4];
 };
 
-int __stdcall VisProjectPoint(int unused, const VisibilityCamera* camera, const VisVec3* p,
+int __stdcall VisProjectPoint(int unused, const VisProjectionRecord* camera, const VisVec3* p,
                               VisVec3* screen, unsigned int* outCode)
 {
     unsigned int code = 0;

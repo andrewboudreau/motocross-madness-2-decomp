@@ -51,6 +51,13 @@ struct ParticleVertex {
 // One live sprite.  Offsets come from AddParticle (0x004baa50, which stores the arguments),
 // Update (slot 10, which ages and moves it) and Render (slot 14).  Names are tier 3.
 struct Particle {
+    // Provisional flag names from the three independent tests in slot 10.
+    enum Flags {
+        IntegratePosition = 4,
+        Grow = 8,
+        ApplyGravity = 0x10
+    };
+
     ParticleVec3 position;   // +0x00 copied from AddParticle's vector argument; integrated by velocity (flag 4)
     int color;               // +0x0c AddParticle's last argument (emitters pass 0xffffff or a packed rgb)
     int frame;               // +0x10 AddParticle's third argument (an emitter's cycling sprite index)
@@ -96,5 +103,3 @@ public:
 };
 
 #endif
-
-

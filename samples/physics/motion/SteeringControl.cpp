@@ -1,8 +1,9 @@
+// Candidate: relocation evidence is incomplete; see docs/PHYSICS_VALIDATION.md.
 // SteeringControl.cpp -- reconstruction of D:\aardvark\VC\krusty2\SteeringControl.cpp.
 #include "core/GameObject.h"
 #include "core/DebugAlloc.h"
 #include "math/Math3D.h"
-#include "SteeringControl.h"
+#include "motion/SteeringControl.h"
 #include <math.h>
 
 // Inline absolute value; the `v < 0 ? -v : v` form (not fabs) reproduces retail's fchs sequence.

@@ -1,3 +1,4 @@
+// Candidate: relocation and some function-ownership evidence remain incomplete.
 // Motnctrl.cpp -- reconstruction of D:\aardvark\VC\krusty2\Motnctrl.cpp (motion control: the global
 // motion manager, the .VUE/.MOT motion loaders and Character's motion playback).
 //
@@ -11,7 +12,7 @@
 #include <stdlib.h>
 #include "core/DebugAlloc.h"
 #include "motion/D3DIMSoultreeCharacter.h"
-#include "MotionPose.h"   // Math3D.h: the four per-TU Vec3 initialisers at 0x004a54f0..0x004a562c
+#include "motion/MotionPose.h"   // Math3D.h: the four per-TU Vec3 initialisers at 0x004a54f0..0x004a562c
 
 extern "C" char* _strupr(char*);   // 0x00535d3d
 

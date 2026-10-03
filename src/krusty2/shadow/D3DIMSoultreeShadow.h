@@ -6,7 +6,7 @@
 //  * Ctor 0x00446840 (ret 4, one argument forwarded to the GameObject ctor 0x00468ca0), then
 //    vptr 0x0055156c and seven zero dwords at +0x2c..+0x44 (tier 2 extent).
 //  * Overrides (vtable_overrides.json): slot 0 0x00446890 (deleting dtor; the class has no
-//    user dtor, so it calls ~ShadowReceiver 0x00508b70), 14 0x00447540, 27 0x004468f0,
+//    user dtor; its generated core at 0x00508b70 tears down ShadowReceiver), 14 0x00447540, 27 0x004468f0,
 //    28 0x00446bf0, 29 0x00446c30, 30 0x00446f40.  Slot 8 is ShadowReceiver's 0x00447780.
 //  * ProjectedShadow::AddReceiver (0x004daba0) is called from Attach 0x004468b0 with this.
 // Member names are tier 3 with the evidence on each declaration.
@@ -23,7 +23,7 @@ public:
     virtual int UnknownVirtualSlot27();                            // 0x004468f0
     virtual int UnknownVirtualSlot28();                            // 0x00446bf0
     virtual int UnknownVirtualSlot29();                            // 0x00446c30
-    virtual void UnknownVirtualSlot30();                           // 0x00446f40 (src/krusty2/motion)
+    virtual void UnknownVirtualSlot30();                           // 0x00446f40 (body not reconstructed)
 
     ShadowCaster* caster;          // +0x2c ctor 0; Attach stores its second argument (slot 27 reads +0x14c / calls 0x004fe850 on it)
     ProjectedShadow* shadow;       // +0x30 ctor 0; Attach stores its third argument and registers this with it

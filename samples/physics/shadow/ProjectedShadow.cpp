@@ -1,5 +1,6 @@
+// Candidate: relocation evidence is incomplete; see docs/PHYSICS_VALIDATION.md.
 // ProjectedShadow.cpp -- reconstruction of D:\aardvark\VC\krusty2\ProjectedShadow.cpp.
-#include "ProjectedShadow.h"
+#include "shadow/ProjectedShadow.h"
 
 #include <stdio.h>
 #include <string.h>

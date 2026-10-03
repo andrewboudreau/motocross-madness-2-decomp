@@ -1,4 +1,7 @@
-# motion (Spheres.cpp, SteeringControl.cpp, D3DIMSoultreeMotnctrl.cpp, Motnctrl.cpp)
+Candidate implementations for this area are preserved in `samples/physics/motion/`.
+Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
+
+# motion (Spheres.cpp, SteeringControl.cpp)
 
 Validation: counts labeled "exact" below are historical relocation-masked
 diagnostics, not strict acceptance. Use `tools/run_physics_samples.py --strict`
@@ -44,8 +47,24 @@ are not reconstructed.
 - Not attempted: D3DIMSoultreeShadow `0x446840..0x446f40` (its `__FILE__` xrefs `0x447024/0x447044` straddle the
   bracket end).
 
+## Verified SphereManager slice
+
+Spheres.cpp now has 14 strictly exact cases, including the shared slot-8 override
+at `0x00462e30`. RTTI identifies its primary table `0x005581d8` and that slot;
+the body calls GameObject slot 8 and returns the saved object pointer.
+
+The manager initializer allocates `0x418` bytes, passes 1 to the constructor,
+and writes the result at `0x00689f1c`. Its source-path literal is at `0x00574568`.
+The EH stub `0x0054e524` loads FuncInfo `0x00563b88` (magic `0x19930520`).
+The four independent initializer bodies write the zero/X/Y/Z float triples to
+`0x00689f30`, `0x00689f40`, `0x00689f50`, `0x00689f20`; their thunks target the
+bodies at `0x00504a30`, `0x00504a80`, `0x00504ad0`, `0x00504b20`.
+Those decoded writes distinguish TU-local constants from similarly named
+constants in other files. `Spheres.bindings.json` records this reviewed mapping.
+The other motion-source counts above remain historical masked diagnostics.
+
 ## Motnctrl.cpp
-Wave 5, `Motnctrl.cpp` in this directory.
+Wave 5 candidate: `samples/physics/motion/Motnctrl.cpp`.
 - `__FILE__` string `D:\aardvark\VC\krusty2\Motnctrl.cpp` at `0x0056e034`. Its xrefs run from `0x4a5659` (the
   MotionManager `$E` initialiser, line 9) to `0x4a9a87` (FreeMotion, line 0x5a7). The line numbers rise with the
   address. The link-order bracket is `0x4a5447..0x4aa36c`.
@@ -69,7 +88,7 @@ Wave 5, `Motnctrl.cpp` in this directory.
     - `+0x34` blendActive
 
     The paths are at `+0x3c/+0x8c/+0xdc/+0x12c`. `motions` is at `+0x180`, the `MotionPoseList` is at `+0x190` and
-    `vutLoaded` is at `+0x19c`. These fields are named in `samples/physics/hierarchy/D3DIMSoultreeCharacter.h`.
+    `vutLoaded` is at `+0x19c`. These fields are named in `src/krusty2/motion/D3DIMSoultreeCharacter.h`.
 - **Coverage**: 37 targets, 33 exact and 4 partial.
   - The exact targets are:
     - two `$E` initialisers
@@ -99,4 +118,4 @@ Wave 5, `Motnctrl.cpp` in this directory.
   - Slot 7 `0x4a70c0` (3327 bytes).
   - `0x4a9050` (2138 bytes).
   - The `$E` set at `0x4a8930..` and the functions after `0x4a9aa0`.
-  - `0x4a8bf0` and `0x4a8c50`, which contain the inlined `__asm` fistp pattern.
+  - `0x4a8bf0` and `0x4a8c50`, which contain inline fistp instructions; the original source mechanism is unproven.

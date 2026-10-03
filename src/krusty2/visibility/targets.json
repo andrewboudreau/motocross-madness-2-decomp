@@ -6,7 +6,8 @@
     "target_va": "0x0052d340",
     "target_size": 138,
     "expect": "exact",
-    "notes": "ctor: inlined QuadTree ctor, GameObject(int) on +0x874, resets 16-entry global array"
+    "notes": "ctor: inlined QuadTree ctor, GameObject(int) on +0x874, resets 16-entry global array",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -15,7 +16,8 @@
     "target_va": "0x0052d3d0",
     "target_size": 30,
     "expect": "exact",
-    "notes": "scalar deleting dtor (primary vtable slot 0)"
+    "notes": "scalar deleting dtor (primary vtable slot 0)",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -24,7 +26,8 @@
     "target_va": "0x0052d3f0",
     "target_size": 103,
     "expect": "exact",
-    "notes": "dtor core: clears g_pQuadTree"
+    "notes": "dtor core: clears the persistent collision tree at 0x0068aba4",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -33,7 +36,8 @@
     "target_va": "0x0052d460",
     "target_size": 74,
     "expect": "exact",
-    "notes": "Setup: slot8 on GameObject, Reset, Init"
+    "notes": "Setup: slot8 on GameObject, Reset, Init",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -42,7 +46,8 @@
     "target_va": "0x0052d4b0",
     "target_size": 94,
     "expect": "exact",
-    "notes": "node factory new(__FILE__, 0x4f)"
+    "notes": "node factory new(__FILE__, 0x4f)",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTreeNode",
@@ -51,7 +56,8 @@
     "target_va": "0x0052d510",
     "target_size": 18,
     "expect": "exact",
-    "notes": "node ctor"
+    "notes": "node ctor",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTreeNode",
@@ -60,7 +66,8 @@
     "target_va": "0x0052d530",
     "target_size": 30,
     "expect": "exact",
-    "notes": "node deleting dtor"
+    "notes": "node deleting dtor",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTreeNode",
@@ -69,7 +76,8 @@
     "target_va": "0x0052d550",
     "target_size": 5,
     "expect": "exact",
-    "notes": "node dtor core (jmp QuadTreeNode dtor)"
+    "notes": "node dtor core (jmp QuadTreeNode dtor)",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -78,7 +86,8 @@
     "target_va": "0x0052d560",
     "target_size": 170,
     "expect": "exact",
-    "notes": "frustum query over the tree"
+    "notes": "frustum query over the tree",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -87,7 +96,8 @@
     "target_va": "0x0052e3b0",
     "target_size": 148,
     "expect": "exact",
-    "notes": "secondary slot 14: debug draw"
+    "notes": "secondary slot 14: debug draw",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -96,7 +106,8 @@
     "target_va": "0x0052eec0",
     "target_size": 135,
     "expect": "exact",
-    "notes": "secondary slot 23: debug keys"
+    "notes": "secondary slot 23: debug keys",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -105,7 +116,8 @@
     "target_va": "0x0052ef50",
     "target_size": 252,
     "expect": "exact",
-    "notes": "secondary slot 12: per-frame query with profiling"
+    "notes": "secondary slot 12: per-frame query with profiling",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -114,7 +126,8 @@
     "target_va": "0x0052f050",
     "target_size": 17,
     "expect": "exact",
-    "notes": "secondary slot 15: EndQuery"
+    "notes": "secondary slot 15: EndQuery",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -123,7 +136,8 @@
     "target_va": "0x0052f070",
     "target_size": 11,
     "expect": "exact",
-    "notes": "secondary vtable slot-0 adjustor thunk"
+    "notes": "secondary vtable slot-0 adjustor thunk",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -132,7 +146,8 @@
     "target_va": "0x0052e1f0",
     "target_size": 437,
     "expect": "exact",
-    "notes": "16-vertex box outline via renderer slot 16"
+    "notes": "16-vertex box outline via renderer slot 16",
+    "bindings": "VisibilityQuadTree.bindings.json"
   },
   {
     "class": "VisibilityQuadTree",
@@ -141,15 +156,7 @@
     "target_va": "0x0052e450",
     "target_size": 2657,
     "expect": "exact",
-    "notes": "4-child walk with __forceinline DrawChild"
-  },
-  {
-    "class": "VisibilityQuadTree",
-    "source": "VisibilityQuadTree.cpp",
-    "candidate_symbol_contains": "Traverse@VisibilityQuadTreeNode",
-    "target_va": "0x0052d610",
-    "target_size": 3027,
-    "expect": "partial",
-    "notes": "72.7%, 3026 vs 3027 bytes: call-site argument-load scheduling in recursive/slot-2 call blocks"
+    "notes": "4-child walk with __forceinline DrawChild",
+    "bindings": "VisibilityQuadTree.bindings.json"
   }
 ]

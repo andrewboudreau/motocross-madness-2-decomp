@@ -13,6 +13,8 @@
 #ifndef BROADPHASE_TERRAIN_H
 #define BROADPHASE_TERRAIN_H
 
+#include "../../reconstructed/PeakHold.h"
+
 #include "core/GameObject.h"
 #include "math/FastMath.h"
 #include "core/MemTag.h"
@@ -45,13 +47,16 @@ public:
     int age;                                                    // +0x00 decremented around Purge by Terrain::AcquireOwnedObject
 };
 
-// PROVISIONAL: two nested texture-surface classes created by 0x00505600.  Base ctor 0x004c5f00 (ret 8,
+// Boundary views of PCTextureMap and ManagedTexture, created by 0x00505600.  Base ctor 0x004c5f00 (ret 8,
 // forwards to 0x0050a4e0, vptr 0x00555fec, size 0x80), derived ctor 0x00510500 (ret 4, vptr
 // 0x00558430, size 0xbc).  Virtual slot 4 (+0x10) takes seventeen stack arguments (tier 3 role:
 // create the surface).
+class TextureMapManager;
+
+// ABI view of PCTextureMap; canonical identity is established independently.
 class TerrainSurfaceBase : public BaseObject {
 public:
-    TerrainSurfaceBase(int a, int b);                           // 0x004c5f00
+    TerrainSurfaceBase(TextureMapManager* manager, int flags);                           // 0x004c5f00
     virtual int CreateSurface(int a1, int a2, int a3, int a4, int a5, int a6, int a7, BaseObject* a8,
                               int a9, TerrainComObject* a10, int a11, int a12, int a13, int a14,
                               void* a15, int a16, int a17);     // slot 4, +0x10
@@ -59,16 +64,16 @@ public:
 };
 class TerrainSurface : public TerrainSurfaceBase {
 public:
-    explicit TerrainSurface(int a);                             // 0x00510500
+    explicit TerrainSurface(TextureMapManager* manager);                             // 0x00510500
     char pad_0x80[0xbc - 0x80];
 };
-// +0x38 object: 0x0050c6c0 registers a surface with it.
+// Boundary view of ManagedTextureGroup: 0x0050c6c0 registers a ManagedTexture.
 class TerrainSurfaceRegistry {
 public:
-    void Register(TerrainSurfaceBase* surface);                 // 0x0050c6c0
+    void Register(TerrainSurface* surface);                 // 0x0050c6c0
 };
 struct TerrainSurfaceDesc {
-    int first;                                                  // +0x00 passed to the 0xbc-size ctor
+    TextureMapManager* manager;                                // +0x00 passed to PCTextureMap/ManagedTexture constructors
     char pad_0x04[0x14];
 };
 
@@ -152,15 +157,9 @@ struct TerrainSharedState {
     ~TerrainSharedState();                    // 0x004624d0
 };
 
-// Tier 2: ten file-scope timers constructed with 5000 through 0x004cb670 (UnknownPeakHold(unsigned),
-// src/reconstructed/PeakHold.h); their roles are unknown here.
-class TerrainPeakHold {
-public:
-    explicit TerrainPeakHold(unsigned int hold);   // 0x004cb670
-    unsigned int field_0x00;
-    int field_0x04;
-    unsigned int field_0x08;
-};
+// The timer's identity and layout are already reconstructed in PeakHold.h.
+// Keep the local alias for the unknown roles of these ten Terrain timers.
+typedef UnknownPeakHold TerrainPeakHold;
 struct TerrainHost {
     int field_0x00;
     int field_0x04;

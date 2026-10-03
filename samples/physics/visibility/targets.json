@@ -52,5 +52,14 @@
     "target_size": 526,
     "expect": "partial",
     "notes": "~4% at 514 bytes (51% variant at 516 lost); retail compares far twice via fcom/fcomp, two fail tails, 0x20 frame with dead-param slot reuse"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTreeTraversal.cpp",
+    "candidate_symbol_contains": "Traverse@VisibilityQuadTreeNode",
+    "target_va": "0x0052d610",
+    "target_size": 3027,
+    "expect": "partial",
+    "notes": "72.7%, 3026 vs 3027 bytes: call-site argument-load scheduling in recursive/slot-2 call blocks"
   }
 ]

@@ -1,56 +1,749 @@
 [
- {
-  "class": "SurfaceMap",
-  "source": "SurfaceMap.cpp",
-  "candidate_symbol_contains": "??0SurfaceMap@@QAE@PAVSurfaceTexture@@PBUSurfaceMaterial@@@Z",
-  "target_va": "0x005051f0",
-  "target_size": 169,
-  "expect": "exact",
-  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
- },
- {
-  "class": "SurfaceMap",
-  "source": "SurfaceMap.cpp",
-  "candidate_symbol_contains": "??_GSurfaceMap@@UAEPAXI@Z",
-  "target_va": "0x005052a0",
-  "target_size": 30,
-  "expect": "exact",
-  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
- },
- {
-  "class": "SurfaceMap",
-  "source": "SurfaceMap.cpp",
-  "candidate_symbol_contains": "?SetTexture@SurfaceMap@@QAEXPAVSurfaceTexture@@@Z",
-  "target_va": "0x005052c0",
-  "target_size": 42,
-  "expect": "exact",
-  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
- },
- {
-  "class": "SurfaceMap",
-  "source": "SurfaceMap.cpp",
-  "candidate_symbol_contains": "?Apply@SurfaceMap@@QAEHXZ",
-  "target_va": "0x005052f0",
-  "target_size": 27,
-  "expect": "exact",
-  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
- },
- {
-  "class": "SurfaceMap",
-  "source": "SurfaceMap.cpp",
-  "candidate_symbol_contains": "?Select@SurfaceMap@@QAEXXZ",
-  "target_va": "0x00505310",
-  "target_size": 61,
-  "expect": "exact",
-  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
- },
- {
-  "class": "SurfaceMap",
-  "source": "SurfaceMap.cpp",
-  "candidate_symbol_contains": "??1SurfaceMap@@UAE@XZ",
-  "target_va": "0x00505350",
-  "target_size": 86,
-  "expect": "exact",
-  "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
- }
+  {
+    "class": "SurfaceMap",
+    "source": "SurfaceMap.cpp",
+    "candidate_symbol_contains": "??0SurfaceMap@@QAE@PAVSurfaceTexture@@PBUSurfaceMaterial@@@Z",
+    "target_va": "0x005051f0",
+    "target_size": 169,
+    "expect": "masked",
+    "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+  },
+  {
+    "class": "SurfaceMap",
+    "source": "SurfaceMap.cpp",
+    "candidate_symbol_contains": "??_GSurfaceMap@@UAEPAXI@Z",
+    "target_va": "0x005052a0",
+    "target_size": 30,
+    "expect": "masked",
+    "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+  },
+  {
+    "class": "SurfaceMap",
+    "source": "SurfaceMap.cpp",
+    "candidate_symbol_contains": "?SetTexture@SurfaceMap@@QAEXPAVSurfaceTexture@@@Z",
+    "target_va": "0x005052c0",
+    "target_size": 42,
+    "expect": "masked",
+    "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+  },
+  {
+    "class": "SurfaceMap",
+    "source": "SurfaceMap.cpp",
+    "candidate_symbol_contains": "?Apply@SurfaceMap@@QAEHXZ",
+    "target_va": "0x005052f0",
+    "target_size": 27,
+    "expect": "masked",
+    "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+  },
+  {
+    "class": "SurfaceMap",
+    "source": "SurfaceMap.cpp",
+    "candidate_symbol_contains": "?Select@SurfaceMap@@QAEXXZ",
+    "target_va": "0x00505310",
+    "target_size": 61,
+    "expect": "masked",
+    "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+  },
+  {
+    "class": "SurfaceMap",
+    "source": "SurfaceMap.cpp",
+    "candidate_symbol_contains": "??1SurfaceMap@@UAE@XZ",
+    "target_va": "0x00505350",
+    "target_size": 86,
+    "expect": "masked",
+    "notes": "Ownership uncertain: SurfaceMap has no __FILE__ reference; it sits between SteeringControl.cpp's last $E (0x5051b0) and the keyboard-hook code and has no known retail file name. Stand-in classes (SurfaceTexture/Device/Display/Game) are minimal local layouts."
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00504f70",
+    "target_size": 5,
+    "expect": "masked",
+    "notes": "vector constant initialiser jmp thunk (set 1 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00504f80",
+    "target_size": 60,
+    "expect": "masked",
+    "notes": "vector constant initialiser body (copy-init), set 1 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00504fc0",
+    "target_size": 5,
+    "expect": "masked",
+    "notes": "vector constant initialiser jmp thunk (set 1 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x00504fd0",
+    "target_size": 60,
+    "expect": "masked",
+    "notes": "vector constant initialiser body (copy-init), set 1 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x00505010",
+    "target_size": 5,
+    "expect": "masked",
+    "notes": "vector constant initialiser jmp thunk (set 1 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x00505020",
+    "target_size": 60,
+    "expect": "masked",
+    "notes": "vector constant initialiser body (copy-init), set 1 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x00505060",
+    "target_size": 5,
+    "expect": "masked",
+    "notes": "vector constant initialiser jmp thunk (set 1 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00505070",
+    "target_size": 60,
+    "expect": "masked",
+    "notes": "vector constant initialiser body (copy-init), set 1 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x005050b0",
+    "target_size": 5,
+    "expect": "masked",
+    "notes": "vector constant initialiser jmp thunk (set 2 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x005050c0",
+    "target_size": 60,
+    "expect": "masked",
+    "notes": "vector constant initialiser body (copy-init), set 2 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E17",
+    "target_va": "0x00505100",
+    "target_size": 5,
+    "expect": "masked",
+    "notes": "vector constant initialiser jmp thunk (set 2 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E16",
+    "target_va": "0x00505110",
+    "target_size": 60,
+    "expect": "masked",
+    "notes": "vector constant initialiser body (copy-init), set 2 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E20",
+    "target_va": "0x00505150",
+    "target_size": 5,
+    "expect": "masked",
+    "notes": "vector constant initialiser jmp thunk (set 2 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E19",
+    "target_va": "0x00505160",
+    "target_size": 60,
+    "expect": "masked",
+    "notes": "vector constant initialiser body (copy-init), set 2 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E23",
+    "target_va": "0x005051a0",
+    "target_size": 5,
+    "expect": "masked",
+    "notes": "vector constant initialiser jmp thunk (set 2 of 2)"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E22",
+    "target_va": "0x005051b0",
+    "target_size": 60,
+    "expect": "masked",
+    "notes": "vector constant initialiser body (copy-init), set 2 of 2"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "??0SteeringControl@@QAE@MMPBUVec3@@0@Z",
+    "target_va": "0x00504b60",
+    "target_size": 235,
+    "expect": "masked",
+    "notes": "ctor: clamp t to [0,1], scale, debug new(__FILE__,0x17) SoultreeObject, SetPosition(0), SetAxesPtr"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?Release@SteeringControl@@QAEXXZ",
+    "target_va": "0x00504c50",
+    "target_size": 26,
+    "expect": "masked",
+    "notes": "releases the node"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?SetAxisFromDirection@SteeringControl@@QAEHPBUVec3@@PAVSoultreeObject@@@Z",
+    "target_va": "0x00504c70",
+    "target_size": 182,
+    "expect": "masked",
+    "notes": "axis from world direction in frame"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?SetAngle@SteeringControl@@QAEXMPAVSoultreeObject@@@Z",
+    "target_va": "0x00504e20",
+    "target_size": 150,
+    "expect": "masked",
+    "notes": "set angle then RotateAbout"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?AddAngle@SteeringControl@@QAEXMPAVSoultreeObject@@@Z",
+    "target_va": "0x00504ec0",
+    "target_size": 165,
+    "expect": "masked",
+    "notes": "add delta to angle then RotateAbout"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?SetAxisFromPoints@SteeringControl@@QAEHPAVSoultreeObject@@00@Z",
+    "target_va": "0x00504d30",
+    "target_size": 234,
+    "expect": "partial",
+    "notes": "60.7% (230 vs 234 bytes). Same algorithm (axis from two nodes' world positions in a frame, _finite guard); retail keeps y in a stack slot where VC6 keeps it in a register, so register allocation and FPU ordering diverge."
+  },
+  {
+    "class": "(free)",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?FillNodeNames@@YAHHPAUNodeNameEntry@@PAVSoultreeObject@@@Z",
+    "target_va": "0x00445460",
+    "target_size": 327,
+    "expect": "masked",
+    "notes": "recursive node-name table fill; first row peeled"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot8@D3DIMSoultreeCharacter",
+    "target_va": "0x00445e70",
+    "target_size": 78,
+    "expect": "masked",
+    "notes": "name copy then Character slot 8"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot6@D3DIMSoultreeCharacter",
+    "target_va": "0x00446480",
+    "target_size": 153,
+    "expect": "masked",
+    "notes": "Character virtual slot 6 override"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot3@D3DIMSoultreeCharacter",
+    "target_va": "0x00446110",
+    "target_size": 249,
+    "expect": "masked",
+    "notes": "Character virtual slot 3 override"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot5@D3DIMSoultreeCharacter",
+    "target_va": "0x00446300",
+    "target_size": 376,
+    "expect": "masked",
+    "notes": "mirror map, negated x"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot10@D3DIMSoultreeCharacter",
+    "target_va": "0x00446520",
+    "target_size": 246,
+    "expect": "masked",
+    "notes": "sprintf Position/Orientation Data into dead local buffer"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot4@D3DIMSoultreeCharacter",
+    "target_va": "0x00446210",
+    "target_size": 235,
+    "expect": "partial",
+    "notes": "98.63%: retail puts the 0x3c flag in ecx where ours uses eax (one register difference); separate nodeNames[idx] reads"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot2@D3DIMSoultreeCharacter",
+    "target_va": "0x00445fc0",
+    "target_size": 331,
+    "expect": "partial",
+    "notes": "99.68%: single SIB base/index order byte differs ([ecx+eax+0x74] vs [eax+ecx+0x74])"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "??1D3DIMSoultreeCharacter@@UAE@XZ",
+    "target_va": "0x004459a0",
+    "target_size": 200,
+    "expect": "masked",
+    "notes": "destructor core; this = GameObject vbase"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@UAEXXZ",
+    "target_va": "0x00446640",
+    "target_size": 40,
+    "expect": "masked",
+    "notes": "GameObject slot 4 override, clears 4 dwords"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@UAEXXZ",
+    "target_va": "0x00446620",
+    "target_size": 21,
+    "expect": "masked",
+    "notes": "GameObject slot 5 override, forwards"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
+    "target_va": "0x004466c0",
+    "target_size": 8,
+    "expect": "masked",
+    "notes": "vtordisp thunk"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
+    "target_va": "0x004466d0",
+    "target_size": 8,
+    "expect": "masked",
+    "notes": "vtordisp thunk"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "??_ED3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEPAXI@Z",
+    "target_va": "0x00446670",
+    "target_size": 8,
+    "expect": "masked",
+    "notes": "vtordisp thunk of scalar deleting dtor"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "??0D3DIMSoultreeCharacter@@QAE@H@Z",
+    "target_va": "0x004455b0",
+    "target_size": 195,
+    "expect": "masked",
+    "notes": "constructor(int)"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot9@D3DIMSoultreeCharacter",
+    "target_va": "0x00445ec0",
+    "target_size": 248,
+    "expect": "masked",
+    "notes": "D3DIM slot 9"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot0@D3DIMSoultreeCharacter",
+    "target_va": "0x00445a70",
+    "target_size": 1021,
+    "expect": "masked",
+    "notes": "Character slot 0"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "?D3DIMVirtualSlot11@D3DIMSoultreeCharacter@@UAEPAVGameObject@@HPBDPBUSoultreeLoadDesc@@HHH@Z",
+    "target_va": "0x00445680",
+    "target_size": 788,
+    "expect": "partial",
+    "notes": "39.6%, 789 bytes vs 788: retail keeps registry entry in esi, reloads a2 from stack, frame 0x308; ours caches a2 in esi, spills entry, frame 0x30c"
+  },
+  {
+    "class": "MotionManager",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x004a5630",
+    "target_size": 5,
+    "expect": "masked",
+    "notes": "jmp thunk of g_pMotionManager = new(__FILE__, 9) MotionManager()"
+  },
+  {
+    "class": "MotionManager",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x004a5640",
+    "target_size": 104,
+    "expect": "masked",
+    "notes": "manager initialiser body (EH frame, line 9), stores 0x0068512c"
+  },
+  {
+    "class": "Motion",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?ComparePoses@@",
+    "target_va": "0x004a56b0",
+    "target_size": 25,
+    "expect": "masked",
+    "notes": "qsort callback: descending nodeIndex"
+  },
+  {
+    "class": "Motion",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?AdvanceLooping@@",
+    "target_va": "0x004a56d0",
+    "target_size": 121,
+    "expect": "masked",
+    "notes": "looping frame advance"
+  },
+  {
+    "class": "Motion",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?AdvanceClamped@@",
+    "target_va": "0x004a5750",
+    "target_size": 230,
+    "expect": "masked",
+    "notes": "clamped frame advance with blend weight"
+  },
+  {
+    "class": "MotionManager",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "??0MotionManager@@",
+    "target_va": "0x004a5840",
+    "target_size": 22,
+    "expect": "masked",
+    "notes": "ctor"
+  },
+  {
+    "class": "MotionManager",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Release@MotionManager@@",
+    "target_va": "0x004a5860",
+    "target_size": 152,
+    "expect": "masked",
+    "notes": "line 0x12a"
+  },
+  {
+    "class": "MotionManager",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Load@MotionManager@@",
+    "target_va": "0x004a5900",
+    "target_size": 816,
+    "expect": "masked",
+    "notes": "lines 0x159/0x18c/0x18e"
+  },
+  {
+    "class": "MotionManager",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?LoadMot@MotionManager@@",
+    "target_va": "0x004a5c30",
+    "target_size": 528,
+    "expect": "masked",
+    "notes": "binary .MOT loader, lines 0x19e/0x1b2/0x1b6"
+  },
+  {
+    "class": "MotionManager",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?LoadVue@MotionManager@@",
+    "target_va": "0x004a5e40",
+    "target_size": 1090,
+    "expect": "partial",
+    "notes": "text .VUE loader, lines 0x1c9/0x1ec/0x1f9/0x22a. 48%: identical structure and calls, but register allocation is permuted (retail ebx/ebp and esi/edi swapped relative to ours), which shifts most ModRM bytes"
+  },
+  {
+    "class": "MotionManager",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Find@MotionManager@@",
+    "target_va": "0x004a6290",
+    "target_size": 63,
+    "expect": "masked",
+    "notes": "_stricmp lookup"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a62d0@Character@@",
+    "target_va": "0x004a62d0",
+    "target_size": 555,
+    "expect": "masked",
+    "notes": "LoadVUT, line 0x26b"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a6500@Character@@",
+    "target_va": "0x004a6500",
+    "target_size": 441,
+    "expect": "masked",
+    "notes": "LoadMIR, lines 0x29d/0x2ab"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?LoadMotions@Character@@",
+    "target_va": "0x004a66c0",
+    "target_size": 185,
+    "expect": "masked",
+    "notes": "line 0x2d2"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "??0Character@@",
+    "target_va": "0x004a6780",
+    "target_size": 335,
+    "expect": "masked",
+    "notes": "ctor, ret 8"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a6910@Character@@",
+    "target_va": "0x004a6910",
+    "target_size": 23,
+    "expect": "masked",
+    "notes": "GameObject slot 8 on the vbase"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot1@Character",
+    "target_va": "0x004a6930",
+    "target_size": 145,
+    "expect": "masked",
+    "notes": "slot 1: General info keys"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "??1Character@@",
+    "target_va": "0x004a69d0",
+    "target_size": 141,
+    "expect": "masked",
+    "notes": "dtor core, lines 0x337/0x343"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?CaptureMotion@Character@@",
+    "target_va": "0x004a6a60",
+    "target_size": 76,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?SortMotion@Character@@",
+    "target_va": "0x004a6ab0",
+    "target_size": 89,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a6b10@Character@@",
+    "target_va": "0x004a6b10",
+    "target_size": 30,
+    "expect": "masked",
+    "notes": "qsort of a pose list"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?FindMotion@Character@@",
+    "target_va": "0x004a6b30",
+    "target_size": 24,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?FindNode@Character@@",
+    "target_va": "0x004a6b50",
+    "target_size": 80,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot4@Character",
+    "target_va": "0x004a6ba0",
+    "target_size": 3,
+    "expect": "masked",
+    "notes": "slots 4/5/6 empty (identical-COMDAT folded)"
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?ApplyPoseListSlot4@Character@@",
+    "target_va": "0x004a8a80",
+    "target_size": 59,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?ApplyPoseListSlot6@Character@@",
+    "target_va": "0x004a8ac0",
+    "target_size": 59,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a8b00@Character@@",
+    "target_va": "0x004a8b00",
+    "target_size": 15,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?SetMotionByName@Character@@",
+    "target_va": "0x004a8b10",
+    "target_size": 33,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?SetMotion@Character@@",
+    "target_va": "0x004a8b40",
+    "target_size": 27,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?BlendToMotion@Character@@QAEXPAUMotion@@@Z",
+    "target_va": "0x004a8b60",
+    "target_size": 20,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?BlendToMotion@Character@@QAEXPAUMotion@@M@Z",
+    "target_va": "0x004a8b80",
+    "target_size": 107,
+    "expect": "masked",
+    "notes": ""
+  },
+  {
+    "class": "Character",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot8@Character",
+    "target_va": "0x004a98b0",
+    "target_size": 381,
+    "expect": "masked",
+    "notes": "slot 8, line 0x585"
+  },
+  {
+    "class": "Motion",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?FreeMotion@@",
+    "target_va": "0x004a9a30",
+    "target_size": 112,
+    "expect": "masked",
+    "notes": "lines 0x5a5/0x5a7"
+  },
+  {
+    "class": "CharacterPose",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?RotatePose@@",
+    "target_va": "0x004a7dc0",
+    "target_size": 523,
+    "expect": "partial",
+    "notes": "cdecl; slot 7 helper. 90.66%: the two Vec3Normalize result temporaries sit at a different stack slot (retail esp+0x70/0x7c, ours reuses the axisX/position slot) and one fld is scheduled earlier"
+  },
+  {
+    "class": "Motion",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?ClampFloat@@",
+    "target_va": "0x004a8440",
+    "target_size": 44,
+    "expect": "masked",
+    "notes": "cdecl clamp; slot 7 helper"
+  },
+  {
+    "class": "CharacterPose",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?PoseRotation@@",
+    "target_va": "0x004a7fd0",
+    "target_size": 1121,
+    "expect": "partial",
+    "notes": "cdecl; slot 7 helper. ~27%: same control flow and layout, but VC6 inlines differently: retail calls Vec3::Vec3 for the identity axis and, in the axisY path, calls DotProduct and inlines operator* (calling Vec3::Vec3); ours inlines the ctor and DotProduct and calls operator*. Every later byte shifts"
+  },
+  {
+    "class": "CharacterPose",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?InterpolatePose@@",
+    "target_va": "0x004a8470",
+    "target_size": 1205,
+    "expect": "partial",
+    "notes": "cdecl; slot 7 / 0x4a9050 helper. Same calls in the same order except that VC6 inlines the first CrossProduct (retail calls 0x00515600 twice), which shifts every later byte (inline budget)"
+  }
 ]

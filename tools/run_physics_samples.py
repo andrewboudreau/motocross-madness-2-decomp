@@ -52,8 +52,22 @@ def compare_target(pe, obj, target, manifest):
 
 def required_failures(results, strict=False):
     key = 'strict_exact' if strict else 'exact_after_relocation_mask'
-    return [r for r in results if r['expected'].get('expect', 'exact') == 'exact'
+    return [r for r in results if r['expected'].get('expect', 'exact') in ('exact', 'masked')
             and r.get(key) is not True]
+
+
+def validation_status(result):
+    """Missing address evidence is different from a completed byte mismatch."""
+    if result.get('strict_exact') is True:
+        return 'strict-exact'
+    if result.get('error') == 'compile failed':
+        return 'compile-failed'
+    error = result.get('strict_match', {}).get('error', result.get('error', ''))
+    if error.startswith('unresolved symbol:'):
+        return 'unresolved-relocation'
+    if error:
+        return 'validation-error'
+    return 'byte-mismatch'
 
 
 def main() -> int:
@@ -67,6 +81,8 @@ def main() -> int:
                     help='directory to scan (repeatable; default: samples/physics and src/krusty2)')
     ap.add_argument('--include', action='append', default=None,
                     help='project include directory (repeatable; default: src/krusty2)')
+    ap.add_argument('--source', action='append', type=Path,
+                    help='check only this source file (repeatable; relative to repository root)')
     ap.add_argument('--out', default=str(ROOT / 'work/physics-objs'))
     ap.add_argument('--json', action='store_true', help='print full per-target JSON')
     ap.add_argument('--json-out', type=Path, help='write the complete per-target report')
@@ -84,11 +100,18 @@ def main() -> int:
     objects = {}
     compiled: dict[Path, Path | None] = {}
     tjsons = sorted({t for r in roots if Path(r).is_dir() for t in Path(r).rglob('targets.json')})
+    selected_sources = {(ROOT / p).resolve() for p in a.source or []}
+    seen_sources = set()
     for tjson in tjsons:
         for t in json.loads(tjson.read_text()):
             if 'source' not in t:
                 continue
             src = (tjson.parent / t['source']).resolve()
+            if selected_sources and src not in selected_sources:
+                continue
+            seen_sources.add(src)
+            if t.get('expect', 'exact') not in ('exact', 'masked', 'partial'):
+                raise SystemExit(f'unknown expectation in {tjson}: {t.get("expect")}')
             if src not in compiled:
                 rel = src.relative_to(ROOT)
                 obj = out / (str(rel.with_suffix('')).replace('\\', '_').replace('/', '_') + '.obj')
@@ -114,7 +137,10 @@ def main() -> int:
                     payload = {'error': str(exc), 'exact_after_relocation_mask': False, 'strict_exact': False}
             payload['source'] = str(src.relative_to(ROOT))
             payload['expected'] = t
+            payload['validation_status'] = validation_status(payload)
             results.append(payload)
+    if not results or selected_sources - seen_sources:
+        raise SystemExit('no targets found for one or more requested sources/roots')
     if a.json:
         print(json.dumps(results, indent=2))
     if a.json_out:
@@ -135,6 +161,10 @@ def main() -> int:
     mode = 'strict' if a.strict else 'diagnostic'
     print(f'\n{len(exact)}/{len(results)} relocation-masked matches; '
           f'{len(strict_exact)}/{len(results)} strict exact; {len(failed)} required failures ({mode})')
+    unresolved = sum(r['validation_status'] == 'unresolved-relocation' for r in failed)
+    if unresolved:
+        print(f'{unresolved} required targets lack relocation bindings; '
+              'this is incomplete evidence, not a completed strict byte comparison.')
     return 1 if failed else 0
 
 

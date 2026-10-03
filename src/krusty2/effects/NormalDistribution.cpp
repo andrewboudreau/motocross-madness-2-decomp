@@ -12,14 +12,14 @@ public:
     ~NormalDistribution();
     float Lookup(float mean, float value, float sigma);
 
-    float* table;   // +0x00 allocated in the ctor (new(count*4, __FILE__, 0x11)), freed by the dtor (line 0x1e)
+    float* table;   // +0x00 allocated in the ctor (DebugMalloc(count*4, __FILE__, 0x11)), freed by the dtor (line 0x1e)
     int count;      // +0x04 resolution + 1: table length, loop bound and scale in Lookup
 };
 
 NormalDistribution::NormalDistribution(int resolution)
 {
     count = resolution + 1;
-    table = (float*)operator new(count * 4, __FILE__, 0x11);
+    table = (float*)DebugMalloc(count * sizeof(float), __FILE__, 0x11);
     float x = 0.0f;
     for (int i = 0; i < count; i++) {
         table[i] = 1.0f - 0.948667f * x + 0.2964f * x * x - 0.030333f * x * x * x;

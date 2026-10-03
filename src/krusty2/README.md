@@ -36,23 +36,21 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug malloc/`new`/`delete`/realloc), `MemTag.h` |
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.h`, `CollisionTypes.h` |
-| `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` (69 of 74 exact) |
-| `bvh/` | `BoundingBoxTreeBuild.cpp`/`.h`: collision box-tree build (21 of 23 exact) |
-| `effects/` | `Particles.cpp`, `NormalDistribution.cpp`, `Nulls.cpp` (17 of 17 exact) |
-| `motion/` | `D3DIMSoultreeMotnctrl.cpp`, `Motnctrl.cpp`, `Spheres.cpp`, `SteeringControl.cpp` (82 of 90 masked matches) |
-| `shadow/` | `ProjectedShadow.cpp`/`.h`, `D3DIMSoultreeShadow.cpp`/`.h` (26 of 33 masked matches) |
-| `visibility/` | `VisibilityQuadTree.cpp`/`.h` (16 of 17 exact) |
+| `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
+| `bvh/` | Shared box-tree layouts; builder candidate in `samples/physics/bvh/` |
+| `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
+| `motion/` | SphereManager: 14 strict cases; shared motion layouts |
+| `shadow/` | D3DIMSoultreeShadow: 16 strict cases; other shadow candidates in samples |
+| `visibility/` | VisibilityQuadTree: 16 strict cases; partial traversal in samples |
 
-The table's exact counts are relocation-masked diagnostics, not strict byte proof.
-The combined SelectiveGravityModel/Shock candidate remains in
-`samples/physics/suspension/`: Shock TU ownership has only proximity evidence.
+The earlier broad-phase counts are masked diagnostics. The new reviewed slices
+and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
+The combined SelectiveGravityModel/Shock candidate stays in samples: Shock TU
+ownership has only proximity evidence. Motion control, steering and the box-tree
+builder also remain samples pending complete relocation verification.
 
-Each wave 4 folder has a `README.md` with its `__FILE__` string, bracket and ownership evidence.
-Code that sits in a bracket without `__FILE__` or class evidence lives in the matching
-`samples/physics/<folder>/` instead.
-
-Include shared headers by their path under this folder, e.g. `#include "core/GameObject.h"`.
-`tools/run_physics_samples.py` puts `src/krusty2` on the include path.
+Shared headers use paths relative to this folder, e.g. `core/GameObject.h`.
+The physics runner adds `src/krusty2` to the include path.
 
 ## Evidence: Quadtree.cpp
 
@@ -72,11 +70,8 @@ Include shared headers by their path under this folder, e.g. `#include "core/Gam
   at lines 0x4b3 and 0x4d0.
 - Code bracket: after `SteeringControl.cpp` (last xref 0x504bd2) and before `Texmap.cpp`
   (first xref 0x50a6bc). Terrain.cpp's own xrefs span 0x50567c..0x507b38.
-- 38 of the 39 targets (0x505490..0x508970) are inside the bracket. The 39th is the shared
-  0x4dc4c0 stub described above. 37 match exactly.
-- TerrainShadow (0x5089a0..0x50a58f) follows the last Terrain.cpp xref but has no `__FILE__` of
-  its own, and it opens with the per-TU vector `$E` block that starts other retail files. It is
-  kept in `samples/physics/shadow/TerrainShadow.cpp` until its file is known.
+- 13 of the 14 targets (0x5057d0..0x508850) are inside the bracket. The 14th is the shared
+  0x4dc4c0 stub described above. 12 match exactly.
 - Terrain derives from `GameObject` and `GroundFogableObject`, as the RTTI says (mdisp 0,
   and 0x2c for GroundFogableObject, which has no vfptr). Both bases are kept.
 - `QueryGround` 0x507c10 contains inline fistp instructions not reproduced by the

@@ -1,18 +1,18 @@
 # effects: Particles.cpp, NormalDistribution.cpp, Nulls.cpp
 
-Validation: counts labeled "exact" below are historical relocation-masked
-diagnostics, not strict acceptance. Use `tools/run_physics_samples.py --strict`
-with reviewed bindings before accepting these candidates.
+Validation: the 18 cases in this directory pass strict VC6 SP3 comparison,
+including the added NullManager slot-8 override. Adjacent bindings resolve every
+relocation. Emitter counts below remain masked diagnostics for samples.
 
 Retail files (all under `D:\aardvark\VC\krusty2\`):
 
 | file | `__FILE__` string VA | bracket | own `__FILE__` xrefs | exact / partial |
 |---|---|---|---|---|
 | NormalDistribution.cpp | 0x0056ece4 | 0x4afdea..0x4b0109 | 0x4affcb..0x4b0059 (debug delete, line 0x1e) | 6 / 0 |
-| Nulls.cpp | 0x0056ed14 | 0x4b0059..0x4b0239 | 0x4b0109 (the `new` at line 5) | 5 / 0 |
+| Nulls.cpp | 0x0056ed14 | 0x4b0059..0x4b0239 | 0x4b0109 (the `new` at line 5) | 6 / 0 |
 | Particles.cpp | 0x0056fa00 | 0x4b8584..0x4bb8d8 | 0x004ba4f1 and 0x004ba5c8 (slot 27, line 0x48a and 0x4a8) | 6 / 0 (+ 2 slots unattempted) |
 
-17 exact, 0 partial in this directory. `samples/physics/effects/` adds 33 exact and 8 partial (41 entries) for the
+18 strict cases, 0 partial in this directory. `samples/physics/effects/` adds 33 exact and 8 partial (41 entries) for the
 emitter classes and the vector-constant initialisers, whose ownership is not proven. Gate: 50/58 exact, 0 required failures
 (round 2 added Steam and Dust slot 10 as exact, and DirtChunk, DirtSpray and Spark slot 10 as 98.3% partials).
 
@@ -70,3 +70,27 @@ E1/E3/E2 with the body, atexit registration and dtor wrapper), but no source ord
 * The five emitter constructors are partial: the retail store order interleaves the position/previousPosition zeroing with the
   scalar stores, and Steam's table fill stores one float through a temporary and four ints (a Vec4-like fill); the source shape
   that causes either is not found.
+
+## Reviewed relocation evidence
+
+NormalDistribution's initialization and shutdown wrappers independently use the
+same object at `0x006886e8`; the initializer passes resolution 100 to the constructor
+at `0x004affc0`, and atexit registers `0x004affb0`, which jumps to `0x004b0050`.
+The constructor calls `0x004a2e20` at `0x004affda`: this is DebugMalloc, not the
+placement operator-new entry at `0x004a3010`. The source now uses the shared
+DebugMalloc declaration. The polynomial constants and source-path literal were
+checked against their actual data bytes. `atexit` and `__ftol` are CRT routines.
+
+NullManager's initializer allocates `0x418` bytes, calls its constructor, and
+writes the result at `0x006886f0`. RTTI identifies table `0x0055549c` and its
+non-inherited slot 8 at `0x00462e30`. That 19-byte body explicitly calls
+GameObject slot 8 at `0x004692f0`, then returns the saved `this`; the source now
+models the override. The initializer EH stub at `0x0054c674` loads FuncInfo
+`0x00562350` with magic `0x19930520` and dispatches to the VC6 handler.
+
+ParticleManager's RTTI table is `0x00555d10`; its destructor's EH stub at
+`0x0054c9a8` loads FuncInfo `0x00562628`. The update body reads the context
+pointer at `0x0056e26c` and tests its +`0x1c4` flag before multiplying the time
+step by the checked `1000.0f` literal at `0x00550f44`. Calls to GameObject
+lifetime functions and the allocator agree with their canonical reconstructions.
+Semantic names remain provisional; the bindings record observed destinations.

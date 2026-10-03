@@ -74,12 +74,12 @@ void CollisionObject::Fn_00432ab0(int count, void* points)
 // 0x00432120: toggles field_0x80; the object is only in the quadtree while it is set.
 void CollisionObject::Fn_00432120(int a)
 {
-    if (g_pQuadTree) {
+    if (g_collisionQuadTree) {
         int wasSet = useBroadphase;
         int enable = a;
         if (wasSet) {
             if (!enable) {
-                g_pQuadTree->Remove(this, quadtreeCell);
+                g_collisionQuadTree->Remove(this, quadtreeCell);
                 useBroadphase = enable;
                 return;
             }
@@ -97,7 +97,7 @@ void CollisionObject::Fn_00432120(int a)
 void CollisionObject::Fn_00435fb0()
 {
     Fn_00435f10();
-    if (g_pQuadTree && useBroadphase)
+    if (g_collisionQuadTree && useBroadphase)
         Fn_00436080();
 }
 
@@ -114,11 +114,11 @@ void CollisionObject::Fn_00436080()
     CollisionVec3 maxBounds;
     CollisionVec3 minBounds;
     GetWorldBounds(&minBounds, &maxBounds);
-    unsigned int code = g_pQuadTree->ComputeCode(minBounds.x, minBounds.z, maxBounds.x, maxBounds.z);
+    unsigned int code = g_collisionQuadTree->ComputeCode(minBounds.x, minBounds.z, maxBounds.x, maxBounds.z);
     if (code != (unsigned int)quadtreeCell) {
-        g_pQuadTree->Remove(this, quadtreeCell);
+        g_collisionQuadTree->Remove(this, quadtreeCell);
         quadtreeCell = code;
-        g_pQuadTree->Insert(this, code, minBounds.y, maxBounds.y);
+        g_collisionQuadTree->Insert(this, code, minBounds.y, maxBounds.y);
     }
 }
 

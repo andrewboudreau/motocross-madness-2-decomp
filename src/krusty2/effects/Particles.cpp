@@ -73,24 +73,20 @@ int ParticleManager::GameObjectVirtualSlot10(float dt)
             particles[activeCount - 1] = p;
             activeCount--;
         } else {
-            if (p->flags & 8)
+            if (p->flags & Particle::Grow)
                 p->size += dt * p->growth;
             p = *slot;
-            if (p->flags & 4) {
+            if (p->flags & Particle::IntegratePosition) {
                 p->position += p->velocity * dt;
-
             }
             p = *slot;
-            if (p->flags & 0x10) {
+            if (p->flags & Particle::ApplyGravity) {
                 p->velocity += gravity * dt;
-
             }
         }
     }
     return 1;
 }
-
-
 
 int CompareParticleDepth(const void* a, const void* b)
 {

@@ -1,3 +1,6 @@
+Candidate implementations for this area are preserved in `samples/physics/bvh/`.
+Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
+
 # BoundingBoxTreeBuild.cpp (bvh)
 
 Validation: counts labeled "exact" below are historical relocation-masked

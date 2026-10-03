@@ -1,0 +1,22 @@
+{
+  "??0GameObject@@QAE@H@Z": "0x468ca0",
+  "??0SphereManager@@QAE@H@Z": "0x5049c0",
+  "??1GameObject@@UAE@XZ": "0x468d60",
+  "??1SphereManager@@UAE@XZ": "0x504a10",
+  "??2@YAPAXIPBDH@Z": "0x4a3010",
+  "??3@YAXPAX@Z": "0x4a30c0",
+  "??_7SphereManager@@6B@": "0x5581d8",
+  "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x004692f0",
+  "?g_pSphereManager@@3PAVSphereManager@@A": "0x689f1c",
+  "_$E1": "0x504a30",
+  "_$E10": "0x504b20",
+  "_$E13": "0x504950",
+  "_$E13$ehhandler": "0x54e524",
+  "_$E4": "0x504a80",
+  "_$E7": "0x504ad0",
+  "__FILE__:spheres.cpp": "0x574568",
+  "_kVec3XAxis": "0x689f40",
+  "_kVec3YAxis": "0x689f50",
+  "_kVec3ZAxis": "0x689f20",
+  "_kVec3Zero": "0x689f30"
+}
