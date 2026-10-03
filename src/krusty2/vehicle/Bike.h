@@ -18,7 +18,7 @@
 #ifndef MCM2_PHYSICS_BIKE_H
 #define MCM2_PHYSICS_BIKE_H
 
-#include "../vehicle/Vehicle.h"
+#include "vehicle/Vehicle.h"
 #include "core/DebugAlloc.h"
 
 

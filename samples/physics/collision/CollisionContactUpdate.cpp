@@ -1,6 +1,6 @@
 // Follow-up to CollisionPoint::Fn_0043a640: per-contact refresh (tier 3 semantics).
 // Provisional TU: proximity to CollisionPoint.cpp is not evidence of the retail file split.
-#include "CollisionPoint.h"
+#include "collision/CollisionPoint.h"
 
 // Provisional helper type for the out-of-line frame callee (thiscall, unknown owner class).
 // The contact owner view (0x004fd660) is in CollisionPoint.h.

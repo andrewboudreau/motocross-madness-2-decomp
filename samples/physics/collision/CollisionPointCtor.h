@@ -3,7 +3,7 @@
 #ifndef COLLISION_POINT_CTOR_H
 #define COLLISION_POINT_CTOR_H
 
-#include "CollisionPoint.h"
+#include "collision/CollisionPoint.h"
 
 inline CollisionPoint::CollisionPoint(float a, int b)
     : normalForce(a), surfaceOwner(b) {

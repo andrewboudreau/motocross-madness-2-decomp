@@ -17,7 +17,7 @@
 // make VC6 emit the vtables, ??_G and thunks; they are not reconstructions of the
 // retail constructors.
 #include <stddef.h>
-#include "SoultreePhysicsCharacter.h"
+#include "soultree/SoultreePhysicsCharacter.h"
 
 #define HIER_CHECK(name, cond) typedef char hier_check_##name[(cond) ? 1 : -1]
 

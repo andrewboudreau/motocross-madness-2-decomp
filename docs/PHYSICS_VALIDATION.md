@@ -63,6 +63,27 @@ Across the two reviewed slices there are 89 cases, or 88 unique retail
 address/extent pairs. Full-corpus totals also include older targets and are
 not additive to the calibration progress snapshot.
 
+## Wave-6 promoted slice
+
+Four retail TUs moved from `samples/physics/` into `src/krusty2/`. The ownership and
+binding evidence is in `src/krusty2/README.md`. 169 cases pass strict VC6 SP3
+comparison:
+
+- `src/krusty2/collision/CollisionObject.cpp`: 44 of 61 targets.
+- `src/krusty2/vehicle/Vehicle.cpp`: 57 of 77 targets.
+- `src/krusty2/vehicle/Bike.cpp`: 31 of 45 targets.
+- `src/krusty2/soultree/SoulTreePhysics.cpp`: 37 of 43 targets.
+
+Three targets are `expect: "masked"` because one called constructor or helper has no
+independent identity yet. The rest are documented `partial` code-generation
+mismatches. `tools/propose_bindings.py` drafted the bindings. It refuses to bind a
+symbol away from its own target address, and that refusal found a case-order error
+that the masked check had accepted (TestHullAgainst/TestModelAgainst).
+
+```bash
+python tools/run_physics_samples.py --strict   --root src/krusty2/collision --root src/krusty2/vehicle --root src/krusty2/soultree   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
 ## Preserved candidates
 
 The tree builder, D3DIMSoultree motion control, Motnctrl loaders/playback, steering, projected shadow,

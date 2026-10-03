@@ -2,7 +2,7 @@
 #include <float.h>
 #include <math.h>
 #include <string.h>
-#include "Bike.h"
+#include "vehicle/Bike.h"
 
 static inline float BikeMin(float a, float b) { return a < b ? a : b; }
 static inline float BikeMaxF(float a, float b) { return a > b ? a : b; }
@@ -133,8 +133,8 @@ float Bike::UnknownVirtualSlot57()
     float t = steerState->steerAngle;
     float a = (t < 0.0f) ? -t : t;
     float r = leanAngle;
-    if (a < 0.5236f)
-        r = r - (leanAngle - savedRoll) * ((0.5236f - a) * 1.9098593f);
+    if (a < 0.52359878f)
+        r = r - (leanAngle - savedRoll) * ((0.52359878f - a) * 1.9098593f);
     return r;
 }
 
@@ -1326,7 +1326,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
                 k = 0.2f;
             else if (ang > 2.09f)
                 k = 0.6f;
-            else if (ang > 0.5236f)
+            else if (ang > 0.52359878f)
                 k = 0.8f;
             else
                 k = 1.0f;
@@ -1675,28 +1675,4 @@ int Bike::UnknownVirtualSlot89(float t)
         }
     }
     return 0;
-}
-
-// Out-of-line vector helpers (retail 0x40ae00 / 0x40ae30). The scale helper is
-// a thiscall member of a three-float vector; the dot product is a cdecl free
-// function taking two pointers.
-struct BikeVec3Ops
-{
-    float x, y, z;
-    BikeVec3Ops& ScaleBy(float factor);
-};
-
-BikeVec3Ops& BikeVec3Ops::ScaleBy(float factor)
-{
-    x *= factor;
-    y *= factor;
-    z *= factor;
-    return *this;
-}
-
-float BikeDotProduct(const BikeVec3Ops* lhs, const BikeVec3Ops* rhs)
-{
-    float sum = lhs->y * rhs->y + lhs->x * rhs->x;
-    sum += lhs->z * rhs->z;
-    return sum;
 }

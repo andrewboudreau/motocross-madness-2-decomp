@@ -21,7 +21,7 @@
 #ifndef SOULTREE_PHYSICS_BASE_OBJECT_H
 #define SOULTREE_PHYSICS_BASE_OBJECT_H
 
-#include "SoultreePhysicsTypes.h"
+#include "soultree/SoultreePhysicsTypes.h"
 
 class SoultreeContact;    // elements of the field_0x12c array
 class CollisionObject;    // pointed to by field_0x128 (collision/CollisionObject.h (src/krusty2))

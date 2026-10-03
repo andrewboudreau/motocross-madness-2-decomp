@@ -72,10 +72,15 @@ public:
 
     int Fn_00414370(float dt);   // called by slot 63 (0x004924c0); the result is unused
     void Fn_0048D8B0();
+    void Fn_0048D910(int idx);
+    void Fn_0048D990(int idx);
+    KrustyBike* Fn_0048E190(float* outDistance);
+    void Fn_0048E280();
     void Fn_004925A0(Vehicle* who, bool flag);
     void Fn_00496E20(KbRecorder* a);
     int Fn_00495C00();
     void Fn_00496DA0();
+    void Fn_00496D20();
     void Fn_00496F90(KrustyBike* other);
     void Fn_00497370(KrustyBike* other);
     float Fn_00495FF0();
@@ -141,7 +146,10 @@ public:
     KbObj128* altBodyA; // 0x1414
     KbObj128* altBodyB; // 0x1418
     float field_0x141c; // 0x141C
-    char pad_0x1420[0x100];
+    int animSetA[16]; // 0x1420  Fn_0048D910 indexes it with the argument (rider handle for riderCharacter); tier 3 name
+    int animSetB[16]; // 0x1460  Fn_0048D910: same index, handle for the D3DIMSoultreeCharacter base
+    int animSetC[16]; // 0x14A0  Fn_0048D990: handle for riderCharacter
+    int animSetD[16]; // 0x14E0  Fn_0048D990: handle for the base character
     float field_0x1520; // 0x1520
     float field_0x1524; // 0x1524
     float field_0x1528; // 0x1528
@@ -157,8 +165,11 @@ public:
     char field_0x154c; // 0x154C
     char field_0x154d; // 0x154D
     char field_0x154e; // 0x154E
-    char pad_0x154F[0xD];
-    int field_0x155c; // 0x155C
+    char pad_0x154F[0x1];
+    float field_0x1550; // 0x1550  Fn_0048E280 stores a clamped, scaled bearing to the nearest rival
+    int field_0x1554; // 0x1554  Fn_0048E280 clears it
+    float field_0x1558; // 0x1558  Fn_0048E280: wrapped bearing to the rival relative to heading +0x50, clamped to +-2.7
+    KrustyBike* nearestRival; // 0x155C  Fn_0048E190 result (closest other bike of the race; tier 3 name)
     char pad_0x1560[0x68];
     int field_0x15c8; // 0x15C8
     char pad_0x15CC[0x4];

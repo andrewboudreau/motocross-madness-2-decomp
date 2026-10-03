@@ -4,9 +4,9 @@
 #ifndef SOULTREE_PHYSICS_CALLEES_H
 #define SOULTREE_PHYSICS_CALLEES_H
 
-#include "SoultreePhysicsTypes.h"
-#include "../contact/ContactImpulse.h"
-#include "../contact/ObjectPlacement.h"
+#include "soultree/SoultreePhysicsTypes.h"
+#include "contact/ContactImpulse.h"
+#include "contact/ObjectPlacement.h"
 
 // The node at SoultreePhysicsBaseObject::field_0x08 / field_0x218 is SoultreeObject
 // (../common/SoultreeObject.h, included through Math3D.h).
