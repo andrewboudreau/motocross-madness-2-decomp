@@ -1,3 +1,6 @@
+Candidate implementations for this area are preserved in `samples/physics/motion/`.
+Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
+
 # motion (Spheres.cpp, SteeringControl.cpp)
 
 Validation: counts labeled "exact" below are historical relocation-masked
@@ -43,3 +46,19 @@ are not reconstructed.
   are local, tier 3.
 - Not attempted: D3DIMSoultreeShadow `0x446840..0x446f40` (its `__FILE__` xrefs `0x447024/0x447044` straddle the
   bracket end).
+
+## Verified SphereManager slice
+
+Spheres.cpp now has 14 strictly exact cases, including the shared slot-8 override
+at `0x00462e30`. RTTI identifies its primary table `0x005581d8` and that slot;
+the body calls GameObject slot 8 and returns the saved object pointer.
+
+The manager initializer allocates `0x418` bytes, passes 1 to the constructor,
+and writes the result at `0x00689f1c`. Its source-path literal is at `0x00574568`.
+The EH stub `0x0054e524` loads FuncInfo `0x00563b88` (magic `0x19930520`).
+The four independent initializer bodies write the zero/X/Y/Z float triples to
+`0x00689f30`, `0x00689f40`, `0x00689f50`, `0x00689f20`; their thunks target the
+bodies at `0x00504a30`, `0x00504a80`, `0x00504ad0`, `0x00504b20`.
+Those decoded writes distinguish TU-local constants from similarly named
+constants in other files. `Spheres.bindings.json` records this reviewed mapping.
+The other motion-source counts above remain historical masked diagnostics.

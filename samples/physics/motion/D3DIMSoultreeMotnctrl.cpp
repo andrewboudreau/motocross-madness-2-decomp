@@ -1,3 +1,4 @@
+// Candidate: relocation evidence is incomplete; see docs/PHYSICS_VALIDATION.md.
 // D3DIMSoultreeMotnctrl.cpp -- D3DIMSoultreeCharacter methods (motion-control loading and playback).
 //
 // The retail __FILE__ string 'D:\aardvark\VC\krusty2\D3DIMSoultreeMotnctrl.cpp' is at 0x00568b70; it is
@@ -11,7 +12,7 @@
 #include "collision/CollisionObject.h"
 #include "motion/D3DIMSoultreeCharacter.h"
 #include "core/SoultreeObject.h"
-#include "MotionPose.h"
+#include "motion/MotionPose.h"
 
 extern "C" char* _strupr(char*);   // 0x00535d3d (case-maps with 0x20; locale-aware CRT strupr)
 

@@ -1,3 +1,6 @@
+Candidate implementations for this area are preserved in `samples/physics/shadow/`.
+Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
+
 # ProjectedShadow.cpp (shadow)
 
 Validation: counts labeled "exact" below are historical relocation-masked

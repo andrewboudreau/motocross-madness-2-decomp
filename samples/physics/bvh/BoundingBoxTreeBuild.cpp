@@ -1,3 +1,4 @@
+// Candidate: relocation evidence is incomplete; see docs/PHYSICS_VALIDATION.md.
 // BoundingBoxTreeBuild.cpp -- D:\aardvark\VC\krusty2\BoundingBoxTreeBuild.cpp (string 0x005682bc).
 //
 // Builds and loads the collision bounding-box trees: a binary tree of axis-aligned boxes over

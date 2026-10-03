@@ -37,22 +37,20 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.h`, `CollisionTypes.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
-| `bvh/` | `BoundingBoxTreeBuild.cpp`/`.h`: collision box-tree build (21 of 23 exact) |
-| `effects/` | `Particles.cpp`, `NormalDistribution.cpp`, `Nulls.cpp` (17 of 17 exact) |
-| `motion/` | `D3DIMSoultreeMotnctrl.cpp`, `Spheres.cpp`, `SteeringControl.cpp` (49 of 53 exact) |
-| `shadow/` | `ProjectedShadow.cpp`/`.h` (11 of 18 exact) |
-| `visibility/` | `VisibilityQuadTree.cpp`/`.h` (16 of 17 exact) |
+| `bvh/` | Shared box-tree layouts; builder candidate in `samples/physics/bvh/` |
+| `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
+| `motion/` | SphereManager: 14 strict cases; shared motion layouts |
+| `shadow/` | Shared shadow layouts; candidates in `samples/physics/shadow/` |
+| `visibility/` | VisibilityQuadTree: 16 strict cases; partial traversal in samples |
 
-The table's exact counts are relocation-masked diagnostics, not strict byte proof.
-The combined SelectiveGravityModel/Shock candidate remains in
-`samples/physics/suspension/`: Shock TU ownership has only proximity evidence.
+The earlier broad-phase counts are masked diagnostics. The new reviewed slices
+and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
+The combined SelectiveGravityModel/Shock candidate stays in samples: Shock TU
+ownership has only proximity evidence. Motion control, steering and the box-tree
+builder also remain samples pending complete relocation verification.
 
-Each wave 4 folder has a `README.md` with its `__FILE__` string, bracket and ownership evidence.
-Code that sits in a bracket without `__FILE__` or class evidence lives in the matching
-`samples/physics/<folder>/` instead.
-
-Include shared headers by their path under this folder, e.g. `#include "core/GameObject.h"`.
-`tools/run_physics_samples.py` puts `src/krusty2` on the include path.
+Shared headers use paths relative to this folder, e.g. `core/GameObject.h`.
+The physics runner adds `src/krusty2` to the include path.
 
 ## Evidence: Quadtree.cpp
 

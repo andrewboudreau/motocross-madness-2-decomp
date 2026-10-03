@@ -5,10 +5,26 @@ import unittest
 
 from mcm2tool.coff import CoffObject
 from test_internal_labels import label_fixture, TARGET_VA
-from tools.run_physics_samples import compare_target, required_failures
+from tools.run_physics_samples import compare_target, required_failures, validation_status
 
 
 class PhysicsGateTests(unittest.TestCase):
+    def test_masked_candidate_retains_diagnostic_and_full_strict_audit(self):
+        row = {'expected': {'expect': 'masked'}, 'exact_after_relocation_mask': True,
+               'strict_exact': False}
+        self.assertEqual(required_failures([row]), [])
+        self.assertEqual(required_failures([row], strict=True), [row])
+        row['exact_after_relocation_mask'] = False
+        self.assertEqual(required_failures([row]), [row])
+
+    def test_unresolved_addresses_are_not_reported_as_completed_mismatches(self):
+        self.assertEqual(validation_status({'strict_match': {'error': 'unresolved symbol: callee'}}),
+                         'unresolved-relocation')
+        self.assertEqual(validation_status({'strict_exact': False, 'strict_match': {'mismatches': [1]}}),
+                         'byte-mismatch')
+        self.assertEqual(validation_status({'error': 'compile failed'}), 'compile-failed')
+        self.assertEqual(validation_status({'strict_exact': True}), 'strict-exact')
+
     def test_masked_success_cannot_pass_strict_gate(self):
         rows = [{'expected': {'expect': 'exact'}, 'exact_after_relocation_mask': True,
                  'strict_exact': False}]
