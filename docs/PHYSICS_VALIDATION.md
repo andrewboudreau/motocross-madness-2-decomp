@@ -81,8 +81,16 @@ symbol away from its own target address, and that refusal found a case-order err
 that the masked check had accepted (TestHullAgainst/TestModelAgainst).
 
 ```bash
-python tools/run_physics_samples.py --strict   --root src/krusty2/collision --root src/krusty2/vehicle --root src/krusty2/soultree   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+python tools/run_physics_samples.py --strict \
+  --root src/krusty2/collision \
+  --root src/krusty2/vehicle \
+  --root src/krusty2/soultree \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
+
+This run reports `169/226 strict exact` and exits nonzero. `--strict` counts the three
+`masked` targets as required failures because they lack bindings. Those failures mark
+incomplete evidence, not byte mismatches.
 
 ## Code-generation limits behind the remaining partials
 

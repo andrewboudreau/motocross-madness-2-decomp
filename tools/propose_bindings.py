@@ -3,7 +3,7 @@
 
 Usage:
     python tools/propose_bindings.py --report work/physics.json --objs work/physics-objs \
-        --source samples/physics/vehicle/Vehicle.cpp [--source ...] [--write]
+        --source src/krusty2/vehicle/Vehicle.cpp [--source ...] [--write]
 
 The report and objects come from `tools/run_physics_samples.py --json-out ... --out ...`.
 Only targets whose relocation-masked comparison is exact are used, because only there
