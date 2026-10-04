@@ -63,6 +63,85 @@ Across the two reviewed slices there are 89 cases, or 88 unique retail
 address/extent pairs. Full-corpus totals also include older targets and are
 not additive to the calibration progress snapshot.
 
+## Wave-6 promoted slice
+
+Four retail TUs moved from `samples/physics/` into `src/krusty2/`. The ownership and
+binding evidence is in `src/krusty2/README.md`. 169 cases pass strict VC6 SP3
+comparison:
+
+- `src/krusty2/collision/CollisionObject.cpp`: 44 of 61 targets.
+- `src/krusty2/vehicle/Vehicle.cpp`: 57 of 77 targets.
+- `src/krusty2/vehicle/Bike.cpp`: 31 of 45 targets.
+- `src/krusty2/soultree/SoulTreePhysics.cpp`: 37 of 43 targets.
+
+Three targets are `expect: "masked"` because one called constructor or helper has no
+independent identity yet. The rest are documented `partial` code-generation
+mismatches. `tools/propose_bindings.py` drafted the bindings. It refuses to bind a
+symbol away from its own target address, and that refusal found a case-order error
+that the masked check had accepted (TestHullAgainst/TestModelAgainst).
+
+```bash
+python tools/run_physics_samples.py --strict \
+  --root src/krusty2/collision \
+  --root src/krusty2/vehicle \
+  --root src/krusty2/soultree \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+This run reports `169/226 strict exact` and exits nonzero. `--strict` counts the three
+`masked` targets as required failures because they lack bindings. Those failures mark
+incomplete evidence, not byte mismatches.
+
+## Code-generation limits behind the remaining partials
+
+These were measured with VC6 SP3 `/O2` on the real targets and on small synthetic
+sources. They describe compiler behaviour, not original source.
+
+**x87 operand load order.** Cases include the Vehicle slot 34/35 cross product,
+the inlined cross products in PoseRotation 0x4a7fd0, WorldToLocalDirection
+0x4fd710 and Bike slot 76 0x406840.
+
+- These partials differ only in which memory operand of a product is loaded with
+  `fld` first.
+- The written factor order has no effect: `a*b` and `b*a` emit identical code in
+  every test.
+- The order does move with statement order, parameter order, named temporaries,
+  and whether the result goes to an out-pointer or a return value.
+- About 400 such variants of the cross product were tried; none reproduces
+  retail's order (best 90.35%).
+- No flag fixes it. `/G3`, `/G5`, `/Ob1`, `/Ob2`, `/Oa`, `/Ow`, `/Ot`, `/Ox`, `/Oi-`,
+  `/Gf` and `/Gy` change nothing. `/G6`, `/Op`, `/Og-`, `/Ob0`, `/Oy-`, `/Os`, `/O1`
+  and `/Od` make it worse.
+- Treat operand-order-only partials as low priority. The only remaining approach
+  is a whole-function brute force over statement order, temporaries and
+  destination form.
+- The `fld st0 ... fpatan ... fstp st0` sequence in 0x48e280 (a dead duplicate,
+  popped after the call) was not produced by any source form tried.
+
+**Inline budget.** Motnctrl expands some helpers inline at some sites and calls their
+out-of-line copies at others. Synthetic tests show:
+
+- VC6 gives each caller its own size budget for inline expansion, shared by
+  nested expansions.
+- Expansion degrades in source order. Late sites first lose the nested inline
+  (for example the Vec3 constructor is called), then the outer one.
+- For a helper of about three statements, the limit is about 17–18 expansions
+  per caller. Larger helper bodies lower it. Callers with more than about 15
+  other statements raise it to roughly their own statement count.
+- Earlier uses in the TU, taking the helper's address, `__inline`, `/Ob1` vs
+  `/Ob2` and the `/G`, `/O` variants make no difference.
+- `#pragma inline_depth(1)` only stops nested expansion.
+
+PoseRotation's retail pattern fits this model if DotProduct is a non-inline
+function. All seven of its DotProduct sites are calls. Declaring it out of line
+reproduces the first five operator* sites but still inlines the sixth. It also
+inlines ClampFloat 0x4a8440 at both sites, which removes that matched
+out-of-line copy. So the original source is unresolved.
+
+One change was kept: UnitVector names the inverse length before scaling,
+matching retail's stack temp. PoseRotation went from 26.9% to 55.7% and
+InterpolatePose from 10.7% to 19.4%, with no other motion target changing.
+
 ## Preserved candidates
 
 The tree builder, D3DIMSoultree motion control, Motnctrl loaders/playback, steering, projected shadow,

@@ -1,6 +1,6 @@
 // Small vector helpers reached by direct call from the collision code (tier 3 names).
-// Their true translation unit is unknown: 0x0043b190 and 0x0043c890 sit inside the
-// CollisionPoint/ConstraintMethodCollisionModel range, 0x00435ec0 inside CollisionObject.
+// Their translation unit is unknown: they sit between the CollisionPoint.cpp and cube.cpp
+// __FILE__ references, outside CollisionObject.cpp (src/krusty2/collision).
 #include "collision/CollisionTypes.h"
 #include "math/Math3D.h"   // FastSqrt (0x00460b50)
 
@@ -16,13 +16,6 @@ CollisionVec3* CollisionRejectFrom(CollisionVec3* out, const CollisionVec3* a, c
     return out;
 }
 
-// 0x00435ec0 (cdecl): vector length; returns 1.0f without a square root when |v|^2 == 1.
-float CollisionLength(const CollisionVec3* v)
-{
-    // Written out rather than CollisionDot(*v, *v): the inline form schedules z*z first.
-    float s = (v->x * v->x + v->y * v->y) + v->z * v->z;
-    return s == 1.0f ? 1.0f : FastSqrt(s);
-}
 
 // 0x0043c890 (cdecl): *out = *v * (1 / len); returns out.
 CollisionVec3* CollisionDivide(CollisionVec3* out, const CollisionVec3* v, float len)
@@ -38,4 +31,13 @@ void CollisionRotateVector(CollisionVec3* out, const CollisionVec3* v, const Mat
     *(Vec3*)out = Vec3(v->z * m->_31 + v->y * m->_21 + v->x * m->_11,
                        v->z * m->_32 + v->y * m->_22 + v->x * m->_12,
                        v->z * m->_33 + v->y * m->_23 + v->x * m->_13);
+}
+
+// 0x0043ce90 (cdecl): pre-increments a global counter at 0x0057985c and returns the new value
+// (an id generator; callers unknown).
+// owner: bracket only.
+int g_CollisionCounter;
+int NextCollisionCounter()
+{
+    return ++g_CollisionCounter;
 }

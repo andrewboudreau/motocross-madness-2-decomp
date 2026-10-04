@@ -23,17 +23,16 @@
 #define MCM2_PHYSICS_VEHICLE_H
 
 #include <stddef.h>
-#include "../hierarchy/SoultreePhysicsCharacter.h"
-#include "../contact/ContactImpulse.h"
+#include "soultree/SoultreePhysicsCharacter.h"
+#include "contact/ContactImpulse.h"
 
 #define VEH_CHECK_OFFSET(cls, member, off) \
     typedef char veh_assert_##member##_##off[(offsetof(cls, member) == (off)) ? 1 : -1]
 
 struct VehBlock7 { float f[7]; };   // 28-byte state block (pose/orientation values, provisional)
 
-// Global vector at 0x0068a6e8 (three floats, all zero at rest): copied whole into
-// vector members when they are reset.
-extern Vec3 g_VehZeroVec3;
+// This TU's zero vector (0x0068a6e8) is Math3D.h's per-TU kVec3Zero: the `$E` body at
+// 0x005278f0 writes it, and methods on both sides of that block read it.
 // Zero vectors in the retail data section at 0x005778a8 / 0x005778c8 (read-only copies).
 extern Vec3 g_VehZeroVec3_005778a8;
 extern Vec3 g_VehZeroVec3_005778c8;
@@ -528,5 +527,37 @@ VEH_CHECK_OFFSET(Vehicle, field_0x5ac, 0x5AC);
 VEH_CHECK_OFFSET(Vehicle, field_0x5b0, 0x5B0);
 VEH_CHECK_OFFSET(Vehicle, prevCrashState, 0x5B4);
 typedef char veh_assert_sizeof[(sizeof(Vehicle) == 0x5ec) ? 1 : -1];
+
+// ---- helpers shared by Vehicle.cpp and the out-of-bracket Vehicle inlines (samples) ----
+
+// Cross product as a member of a Vec3 view: VC6 honours source multiplicand order here
+// (free-function form canonicalises it).
+struct VehV3 : Vec3
+{
+    Vec3 Cross(const Vec3& b) const
+    {
+        Vec3 r;
+        r.x = y * b.z - z * b.y;
+        r.y = z * b.x - x * b.z;
+        r.z = x * b.y - b.x * y;
+        return r;
+    }
+    // Same cross product with the y-component written b.x * z (member order is honoured).
+    Vec3 CrossB(const Vec3& b) const
+    {
+        Vec3 r;
+        r.x = y * b.z - z * b.y;
+        r.y = b.x * z - x * b.z;
+        r.z = x * b.y - b.x * y;
+        return r;
+    }
+};
+
+// Scene-node method 0x004444e0 (purpose unknown) is not in SoultreeObject yet; view the
+// node through a local stand-in that declares it.
+struct VehSceneNodeView {
+    void Method_004444E0();
+    void Method_004FBD70(const Vec3* axisZ, const Vec3* axisY, int a, int b);   // 0x004fbd70, purpose unknown
+};
 
 #endif

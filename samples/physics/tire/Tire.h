@@ -33,7 +33,7 @@
 #include <stddef.h>
 #include "collision/CollisionObject.h"
 
-#include "../collision/CollisionPoint.h"
+#include "collision/CollisionPoint.h"
 
 // Provisional (see above).  Constructor args (a, b, c): a is a scene node/name handle
 // handed to 0x004fdae0, c is stored at +0x44.

@@ -35,7 +35,10 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 |---|---|
 | `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug malloc/`new`/`delete`/realloc), `MemTag.h` |
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
-| `collision/` | `CollisionObject.h`, `CollisionTypes.h` |
+| `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionPoint.h`, `CollisionTypes.h`): 44 strict cases |
+| `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts) |
+| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character headers: 37 strict cases |
+| `vehicle/` | `Vehicle.cpp` (57 strict cases) and `Bike.cpp` (31 strict cases), `Vehicle.h`, `Bike.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
 | `bvh/` | Shared box-tree layouts; builder candidate in `samples/physics/bvh/` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
@@ -81,11 +84,73 @@ The physics runner adds `src/krusty2` to the include path.
   `TerrainVec3` stays separate from the shared Vec3 because including `Math3D.h` would add
   static initializers that Terrain.cpp does not have.
 
+## Evidence: CollisionObject.cpp, Vehicle.cpp, Bike.cpp, SoulTreePhysics.cpp (wave 6)
+
+| File | String | Own xrefs | Bracket (predecessor last xref .. successor first xref) |
+|---|---|---|---|
+| CollisionObject.cpp | 0x00568614 | 0x431dd8..0x43a124 (33) | CollisionCharacter.cpp 0x431a12 .. CollisionPoint.cpp 0x43a347 |
+| Vehicle.cpp | 0x00575918 | 0x525e98..0x526261 (13) | VCRfile.cpp 0x5252ed .. vfwdeco.cpp 0x52d07e |
+| Bike.cpp | 0x00566e4c | 0x407c3a..0x40943f (21) | BackgroundImage.cpp 0x404150 .. BikeAI.cpp 0x414847 |
+| SoulTreePhysics.cpp | 0x00574320 | 0x500d6c..0x503f88 (10) | SoultreeMaterial.cpp 0x4ff835 .. SoultreeQuadTreeRenderer.cpp 0x504710 |
+
+- CollisionObject.cpp merges seven wave-5 sample files whose functions all lie in
+  0x431da0..0x439e10. The first, `CollisionHullShape_Free` 0x431da0, contains the first
+  `__FILE__` xref (0x431dd8). The shape setters pass `__FILE__` with lines 0xd8..0x18a.
+  The helpers outside the span (0x43b190, 0x43c890, 0x43ca20, 0x43ce90) stay in
+  `samples/physics/collision/CollisionVectorHelpers.cpp`.
+- Vehicle.cpp and Bike.cpp hold methods of their class that lie contiguously in the
+  bracket. Bike's methods start at 0x405190, before the first xref inside the constructor
+  0x407700. The Vec3 helpers 0x40ae00/0x40ae30 are not Bike methods, so they stay in
+  `samples/physics/bike/BikeVec3Ops.cpp`.
+- Vehicle.cpp also owns the four per-TU `Math3D.h` vector initializers
+  (`_$E1`..`_$E11`, 0x5278e0..0x527a1f). Their constants (zero 0x0068a6e8, X, Y, Z) are this
+  TU's `kVec3Zero`.. `kVec3ZAxis`, and both neighbouring method runs read the zero vector.
+  SoulTreePhysics.cpp's zero vector 0x00689ee8 is its own `kVec3Zero` in the same way.
+- Some Vehicle and SoultreePhysicsBaseObject overrides lie inside *other* TUs:
+  - 0x40b410..0x40cb60 are in Bike.cpp;
+  - 0x464e80 is in FollowCam;
+  - 0x492220 is in KrustyBike;
+  - 0x4aa150 and 0x4a6ba0 are in Motnctrl;
+  - 0x507920 is in Terrain.
+
+  The class tables point at these copies, so they are most likely inline members kept
+  from the first TU that emitted each COMDAT. They stay in
+  `samples/physics/vehicle/VehicleInlines.cpp` and
+  `samples/physics/soultree_base/SoultreePhysicsInlines.cpp` until an inline-in-header
+  reconstruction reproduces that placement.
+
+Bindings (`*.bindings.json` next to each `.cpp`) were proposed by
+`tools/propose_bindings.py` from masked-exact targets only and accepted only on
+independent evidence:
+- reviewed bindings elsewhere;
+- this symbol's own matched target;
+- RTTI tables and vptr writes;
+- decoded `__real` and string bytes;
+- `__FILE__` text;
+- relocation-free data bytes;
+- matched `$E` initializers;
+- EH FuncInfo magic;
+- imports;
+- a retail call target named by address in the source.
+
+A symbol that is itself a target elsewhere is a conflict, never fitted. That rule
+exposed a real error: TestHullAgainst and TestModelAgainst had their capsule (3) and
+sphere (4) cases in the opposite source order to retail's jump table. The masked match
+hid it.
+
+Strict failures that remain are missing evidence, not byte differences:
+- the CollisionFileStream constructor 0x460d10, which has no RTTI;
+- the BikeA604 constructor 0x52ff90, called from Bike slot 97;
+- SoultreeRefreshContacts 0x43ad80, called from GameObjectVirtualSlot10. Its body is still a partial in samples.
+
+These targets are `expect: "masked"`.
+
 ## Gate
 
 ```bash
 python tools/run_physics_samples.py                             # samples/physics + src/krusty2
 python tools/run_physics_samples.py --strict --root src/krusty2/broadphase
+python tools/run_physics_samples.py --strict --root src/krusty2/collision   --root src/krusty2/vehicle --root src/krusty2/soultree
 ```
 
 `tools/analyze.py` writes filename-only placeholders under ignored

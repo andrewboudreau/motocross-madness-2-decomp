@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include "KrustyBike.h"
+#include "math/FastMath.h"
+#include "collision/CollisionObject.h"
 
 // KbFloat: identity inline standing in for the original inline float getters (tier 3).
 // Passing a member straight to a float parameter makes VC6 push the raw dword; retail
@@ -54,7 +56,7 @@ void KrustyBike::UnknownVirtualSlot1(float a)
     field_0x152c = 0;
     field_0x154d = 0;
     field_0x154e = 0;
-    field_0x155c = 0;
+    nearestRival = 0;
     field_0x141c = 0;
     field_0x76c = 0;
     field_0x153e = 0;
@@ -398,9 +400,10 @@ void KrustyBike::Fn_00496DA0()
     ((KbObj128*)collisionObject)->Fn_00435FE0();
 }
 
-// Retail begins with a 16-byte 'jmp +11' followed by 11 nops before the real prologue;
-// that patch-point padding is not reproducible from C++ (no inline asm), so this stays partial.
-void KrustyBike::UnknownVirtualSlot101()
+// owner: bracket only (0x496d20 sits between slot 101's stub and Fn_00496DA0)
+// Real body of slot 101: switch the active scene object from altBodyA to altBodyB.  Retail's
+// slot 101 entry (0x496d10) is a 16-byte stub, `jmp 0x496d20` plus 11 nops, in front of it.
+void KrustyBike::Fn_00496D20()
 {
     altBodyA->field_0xc.UnknownVirtualSlot4();
     g_kbDirector->Fn_004DCF20(altBodyA, altBodyA->field_0x84);
@@ -410,6 +413,13 @@ void KrustyBike::UnknownVirtualSlot101()
     else
         ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
     ((KbObj128*)collisionObject)->Fn_00435FE0();
+}
+
+// The 5-byte `jmp` plus 11 nops of retail's stub cannot be reproduced from C++ (no inline asm
+// or padding tricks), so this stays partial.
+void KrustyBike::UnknownVirtualSlot101()
+{
+    Fn_00496D20();
 }
 
 // ---- physics ----
@@ -1181,4 +1191,164 @@ void KrustyBike::Fn_00496E30(int a)
             }
         }
     }
+}
+
+// ==== wave 6 ====
+
+// owner: bracket only (0x48d910; callers 0x48e584, 0x495276, 0x4955f8 are KrustyBike methods)
+// Start the "knocked off" rider animation number idx: resets the stunt latches and switches both
+// characters (rider and bike body) to the idx-th handle of the animSetA/animSetB tables.
+void KrustyBike::Fn_0048D910(int idx)
+{
+    UnknownVirtualSlot41();
+    field_0x430 = 1;
+    field_0x431 = 0;
+    field_0x432 = 1;
+    field_0x1520 = 0;
+    field_0x1524 = 0;
+    field_0x1528 = 0;
+    field_0x433 = (char)idx;
+    ((KbA5C4*)riderCharacter)->Fn_004A8B40(animSetA[idx]);
+    ((KbA5C4*)riderCharacter)->field_0x10 = 0;
+    D3DIMSoultreeCharacter::SetMotion((Motion*)animSetB[idx]);
+    chr_field_0x10 = 0;
+}
+
+// owner: bracket only (0x48d990; callers 0x48eff2, 0x48f115, 0x49562c are KrustyBike methods)
+// Variant of Fn_0048D910 that keeps the pending score in field_0x1524 and uses animSetC/animSetD.
+void KrustyBike::Fn_0048D990(int idx)
+{
+    field_0x430 = 1;
+    field_0x1524 = field_0x1520;
+    field_0x1520 = 0;
+    field_0x433 = (char)(idx + 0x10);
+    ((KbA5C4*)riderCharacter)->Fn_004A8B40(animSetC[idx]);
+    D3DIMSoultreeCharacter::SetMotion((Motion*)animSetD[idx]);
+    field_0x153f = 1;
+}
+
+// owner: bracket only (0x48dcd0; referenced by pointer from the collision setup, not called)
+// Collision callback: the first object is this bike's collision object (owner at +0x60), the
+// second one the other party (type tag at +0x64).  Mirrors SoultreeCollisionCallback with the
+// KrustyBike filters (slot 51/+0x7a4 gates, type tags 0x64/0x65/0x66/0x6a/0x3e8).
+void KrustyCollisionCallbackA(CollisionObject* self, CollisionObject* other)
+{
+    KrustyBike* bike = (KrustyBike*)self->ownerObject;
+    int kind = other->ownerType;
+    bike->lastCollisionType = kind;
+    if ((bike->UnknownVirtualSlot51() || bike->field_0x7a4) && kind != 0x66 && kind != 0x6a)
+        return;
+    if (kind == 0x64) {
+        KrustyBike* o = (KrustyBike*)other->ownerObject;
+        if (o->UnknownVirtualSlot51() || o->field_0x7a4)
+            return;
+    } else if (kind == 0x65) {
+        return;
+    }
+    bike->UnknownVirtualSlot38(bike->UnknownVirtualSlot52() && kind != 0x3e8, kind, other);
+}
+
+// owner: bracket only (0x48dd80; referenced by pointer from the collision setup)
+// Second collision callback: for type tags 0x2711 / 0x69 the other object's +0x5c vector is added to
+// the bike's position and the bike's collision object is refreshed before the common handling.
+void KrustyCollisionCallbackB(CollisionObject* self, CollisionObject* other)
+{
+    KrustyBike* bike = (KrustyBike*)self->ownerObject;
+    int kind = other->ownerType;
+    if (bike->UnknownVirtualSlot51())
+        return;
+    if (bike->field_0x735)
+        return;
+    if (bike->field_0x7a4)
+        return;
+    if (kind == 0x64 || kind == 0x65)
+        return;
+    if (kind == 0x2711) {
+        Vec3* p = &bike->position;
+        Vec3* d = (Vec3*)other->contactRecord;
+        p->x = p->x + d->x;
+        p->y = d->y + p->y;
+        p->z = d->z + p->z;
+        bike->modelNode->SetPosition(*p);
+        bike->collisionObject->Fn_00435fb0();
+    } else if (kind == 0x69) {
+        Vec3* p = &bike->position;
+        Vec3* d = (Vec3*)other->contactRecord;
+        p->x = d->x + p->x;
+        p->y = d->y + p->y;
+        p->z = d->z + p->z;
+        bike->modelNode->SetPosition(*p);
+        bike->collisionObject->Fn_00435fb0();
+    }
+    KrustyCollisionCallbackA(self, other);
+}
+
+// owner: bracket only (0x48e190; callers 0x48e285 and the camera code)
+// Nearest other bike of the race (squared planar distance), skipping those with field_0x4a0 set;
+// optionally returns the distance.
+KrustyBike* KrustyBike::Fn_0048E190(float* outDistance)
+{
+    int cursor = 0;
+    KrustyBike* b = field_0x740->Fn_004204E0(&cursor);
+    while (b && b->field_0x4a0)
+        b = field_0x740->Fn_004204E0(&cursor);
+    KrustyBike* best = 0;
+    float bestSq = 3.4028235e38f;
+    while (b) {
+        if (b != this) {
+            float dx = b->position.x - position.x;
+            float dz = b->position.z - position.z;
+            float sq = dx * dx;
+            sq += dz * dz;
+            if (sq < bestSq) {
+                bestSq = sq;
+                best = b;
+            }
+        }
+        b = field_0x740->Fn_004204E0(&cursor);
+        while (b && b->field_0x4a0)
+            b = field_0x740->Fn_004204E0(&cursor);
+    }
+    if (outDistance)
+        *outDistance = FastSqrt(bestSq);
+    return best;
+}
+
+// owner: bracket only (0x48e280; callers 0x48e533, 0x495288)
+// Look at the nearest rival: compute the bearing to it relative to the heading (savedYaw +0x50), wrap to
+// +-pi and, when it is more than 0.698 rad off-axis, start the head-turn pose (clamped at +-2.7).
+void KrustyBike::Fn_0048E280()
+{
+    nearestRival = Fn_0048E190(0);
+    if (!nearestRival)
+        return;
+    Vec3 d = nearestRival->position - position;
+    float angle = (float)atan2(d.x, d.z) - savedYaw;
+    if (angle < -3.14159274f)
+        angle += 6.28318548f;
+    else if (angle > 3.14159274f)
+        angle -= 6.28318548f;
+    field_0x1558 = angle;
+    if (angle < 0)
+        angle = -angle;
+    if (angle <= 0.698f)
+        return;
+    UnknownVirtualSlot41();
+    field_0x431 = 0;
+    field_0x430 = 1;
+    field_0x432 = 1;
+    field_0x154d = 1;
+    field_0x433 = (char)0xff;
+    if (field_0x1558 > 2.7f) {
+        field_0x1558 = 2.7f;
+        field_0x1550 = 0.7f;
+    } else if (field_0x1558 < -2.7f) {
+        field_0x1558 = -2.7f;
+        field_0x1550 = -0.7f;
+    } else {
+        field_0x1550 = field_0x1558 * 0.36963f * 0.7f;
+    }
+    field_0x1554 = 0;
+    ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[14], 0.5f);
+    D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], 0.5f);
 }

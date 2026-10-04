@@ -5,7 +5,7 @@
 #ifndef CONTACT_TYPES_H
 #define CONTACT_TYPES_H
 
-#include "../soultree_base/SoultreePhysicsCallees.h"
+#include "soultree/SoultreePhysicsCallees.h"
 
 // Vec3 whose (x, y, z) constructor and operator+= are kept out of line in retail
 // (0x00404e60 thiscall ret 0xc; 0x00428060 thiscall ret 4).  Declared only, so VC6 emits

@@ -26,8 +26,8 @@ struct KbCollider;
 class KrustyBike;
 
 // Vectors use the shared Math3D Vec3 (12 bytes: x,y,z at +0,+4,+8; tier 1 layout).
-#include "../bike/Bike.h"
-#include "../contact/ObjectPlacement.h"
+#include "vehicle/Bike.h"
+#include "contact/ObjectPlacement.h"
 
 // 0x0067C348: a global zero vector copied by several overrides (three dword loads).
 extern Vec3 g_kbZeroVec;
@@ -242,6 +242,7 @@ struct KbA5C4 {
     int field_0x10; // 0x10
     KbAnim* Fn_004A6B30(const char* name, int a);
     void Fn_004A8B40(int a);
+    void Fn_004A8BF0(int a, float b);   // 0x004A8BF0 (ret 8): same as D3DIMSoultreeCharacter::Method_0x004a8bf0
 };
 struct KbA604 {
     void Fn_005305B0(KbAnim* a);
