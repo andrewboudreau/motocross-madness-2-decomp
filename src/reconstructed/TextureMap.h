@@ -2,6 +2,7 @@
 
 #include "BaseObject.h"
 #include "TextureMapManager.h"
+#include "Tgafile.h"
 
 // Palette object at TextureMap+0x2c: +0x710 maps 555 colours to palette
 // indices.
@@ -96,7 +97,3 @@ public:
     int field_0x6c;                           // format choice +0x14 (slot 5)
 };
 
-// Tgafile.cpp helpers (cdecl): whether a format has alpha, and its
-// DirectDraw pixel format.
-int UnknownFunction511ad0(int format);
-void UnknownFunction5119c0(int format, void* pixelFormat);

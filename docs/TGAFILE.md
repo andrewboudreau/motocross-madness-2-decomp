@@ -1,0 +1,39 @@
+# Tgafile.cpp format helpers
+
+`src/reconstructed/Tgafile.h` / `Tgafile.cpp`: the cdecl helpers before
+Tgafile.cpp's literals (`0x00511b54`). PCTextureMap, TextureMap and PCGame
+call them. Names are provisional. File formats are the texture loader's
+codes 1..34; pixel formats are the engine's 8 (palettised), 0x22b (555),
+0x235 (565), 0x378 (24-bit), 0x613 (1555), 0x115c (4444) and 0x22b8 (8888).
+
+Exact (8 calibration cases):
+
+| VA | Size | Role | Source shape |
+|---|---:|---|---|
+| `0x00511740` | 180 | bytes per stored pixel of a file format | grouped switch |
+| `0x00511800` | 79 | whether a file format is compressed | all of 0..34 listed |
+| `0x00511850` | 79 | whether a file format stores mip levels | all of 0..34 listed |
+| `0x005118a0` | 200 | the pixel format a file format decodes to | grouped switch |
+| `0x00511970` | 78 | bytes per pixel of a pixel format | one case per format |
+| `0x005119c0` | 266 | fills a DirectDraw pixel format | switch with fallthroughs |
+| `0x00511ad0` | 30 | whether a pixel format is 4444 or 8888 | inverted first test |
+| `0x00511af0` | 75 | the pixel format of a DirectDraw pixel format | uninitialised local |
+
+Retail details the source keeps:
+
+- `0x00511800`/`0x00511850` index a byte table that starts at format 0.
+  VC6 drops cases that only reach the default, so every format 0..34 is
+  listed; the 0 group then merges with the default return.
+- `0x00511970`'s 16-bit formats return separately. VC6 merges the four
+  identical blocks into the one retail places first; a grouped label puts it
+  last.
+- `0x005119c0` reports 8888 with a 24-bit count (it falls into the 24-bit
+  case after setting the alpha mask) and 1555 through the 555 masks.
+- `0x00511af0` returns its argument's stack slot for 16-bit masks other than
+  555 and 565: `format` is left unset there, and VC6 keeps it in the dead
+  parameter slot as retail does. Formats other than 16, 24 and 32 bits
+  become 8.
+
+Not reconstructed: the readers and writers from `0x00511b40` to
+`0x005128c0`, among them the TGA writer `0x005127f0` (declared in
+`Tgafile.h`).

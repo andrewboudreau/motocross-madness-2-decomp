@@ -11,9 +11,6 @@ public:
     ~UnknownVideoDecoder();                   // 0x0052d050
 };
 
-// cdecl 0x00511970 (Tgafile.cpp): bytes per pixel of a pixel format.
-int UnknownFunction511970(int format);
-
 // Global at 0x00689964; when set, PCTextureMap tells the manager
 // (0x00511580) about lost or released surfaces.
 extern int g_UnknownGlobal689964;
@@ -22,15 +19,6 @@ extern int g_UnknownGlobal689964;
 // width x height `destination`; 0 on failure.
 int UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter);
-
-// Tgafile.cpp file-format helpers (cdecl): the pixel format a file format
-// decodes to (0x005118a0), whether it stores mip levels (0x00511850),
-// whether it is compressed (0x00511800) and its bytes per pixel
-// (0x00511740).
-int UnknownFunction5118a0(int fileFormat);
-int UnknownFunction511850(int fileFormat);
-int UnknownFunction511800(int fileFormat);
-int UnknownFunction511740(int fileFormat);
 
 // Lzw.cpp (cdecl 0x004a03d0): expands `source` into `size` bytes.
 void UnknownFunction4a03d0(void* destination, void* source, int size);
@@ -53,10 +41,6 @@ struct UnknownBitmapFile {
 
 void UnknownFunction4245f0(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width, int height);
 int UnknownFunction424380(UnknownBitmapFile* bitmap);
-
-// Tgafile.cpp (cdecl 0x005127f0): writes width x height pixels of `depth`
-// bits to the TGA file `path`.
-int UnknownFunction5127f0(void* bits, int width, int height, int a, const char* path, int depth);
 
 // Pixels as the Pixtrans.cpp replacers take them by value: 32-bit RGBA
 // (format 0x22b8) and 24-bit RGB (0x378), red first in memory.
