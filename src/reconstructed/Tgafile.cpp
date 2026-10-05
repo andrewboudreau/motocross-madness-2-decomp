@@ -367,6 +367,88 @@ failed:
     return 0;
 }
 
+// Swaps two bytes (red and blue). Retail's load order needs the reference
+// form.
+static inline void SwapBytes(unsigned char& a, unsigned char& b) {
+    unsigned char swap = a;
+    a = b;
+    b = swap;
+}
+
+// 0x00511e80: reads 24-bit pixels, raw (image type 2) or run-length coded,
+// swapping red and blue, then flips bottom-up images through the scratch
+// row and marks them top-down.
+int UnknownFunction511e80(UnknownTgaFile* file, UnknownTextureStream* stream) {
+    int count = file->height * file->width;
+    unsigned int size = count * 3;
+    if (size > file->field_0x18) {
+        if (file->bits)
+            operator delete(file->bits, __FILE__, 40);
+        file->bits = 0;
+        file->field_0x18 = 0;
+    }
+    if (!file->bits) {
+        file->bits = DebugMalloc(size, __FILE__, 49);
+        if (!file->bits)
+            return 0;
+        file->field_0x18 = size;
+    }
+    UnknownPixel24* pixel = (UnknownPixel24*)file->bits;
+    UnknownPixel24* end = (UnknownPixel24*)((unsigned char*)pixel + size);
+    if (file->imageType == 2) {
+        if (stream->UnknownFunction461640(pixel, 3, count) != count)
+            return 0;
+        for (int i = 0; i < count; i++, pixel++)
+            SwapBytes(pixel->red, pixel->blue);
+    } else {
+        UnknownPixel24 color;
+        while (pixel < end) {
+            int packet = stream->UnknownFunction461980();
+            if (packet & 0x80) {
+                packet &= 0x7f;
+                if (stream->UnknownFunction461640(&color, 3, 1) != 1)
+                    return 0;
+                SwapBytes(color.red, color.blue);
+                do
+                    *pixel++ = color;
+                while (packet--);
+            } else {
+                packet++;
+                if (stream->UnknownFunction461640(pixel, 3, packet) != packet)
+                    return 0;
+                for (int i = 0; i < packet; i++)
+                    SwapBytes(pixel[i].red, pixel[i].blue);
+                pixel += packet;
+            }
+        }
+    }
+    if (!(file->descriptor & 0x20)) {
+        unsigned char* top = (unsigned char*)file->bits;
+        unsigned char* bottom = top + (file->height - 1) * file->width * 3;
+        if (file->field_0x120 && file->field_0x124 < (unsigned int)(file->width * 3)) {
+            operator delete(file->field_0x120, __FILE__, 101);
+            file->field_0x124 = 0;
+            file->field_0x120 = 0;
+        }
+        if (!file->field_0x120) {
+            file->field_0x120 = DebugMalloc(file->width * 3, __FILE__, 106);
+            if (!file->field_0x120)
+                return 0;
+            file->field_0x124 = file->width * 3;
+        }
+        void* row = file->field_0x120;
+        for (int i = 0; i < file->height / 2; i++) {
+            memcpy(row, top, file->width * 3);
+            memcpy(top, bottom, file->width * 3);
+            memcpy(bottom, row, file->width * 3);
+            bottom -= file->width * 3;
+            top += file->width * 3;
+        }
+        file->descriptor |= 0x20;
+    }
+    return 1;
+}
+
 // 0x00512720: writes 24-bit `bits` to the TGA file `path`.
 int UnknownFunction512720(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
     UnknownTgaFile file;

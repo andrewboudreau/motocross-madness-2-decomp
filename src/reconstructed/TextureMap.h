@@ -35,6 +35,7 @@ public:
     int UnknownFunction461340(int offset, int a, int origin); // 0x00461340: seeks
     int UnknownFunction461600();
     int UnknownFunction461640(void* buffer, int size, int count);
+    int UnknownFunction461980();              // 0x00461980: reads a byte
 
     unsigned char field_0x000[0x1c];
     UnknownTextureStream* field_0x1c;         // inner stream

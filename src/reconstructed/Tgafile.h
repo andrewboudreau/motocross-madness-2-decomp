@@ -49,10 +49,10 @@ struct UnknownTgaFile {
     unsigned char bitsPerPixel;
     unsigned char descriptor;                 // 0x20: top-left origin
     void* bits;
-    int field_0x18;
+    unsigned int field_0x18;                  // size of `bits`
     char name[0x104];
-    void* field_0x120;
-    int field_0x124;
+    void* field_0x120;                        // scratch row for flipping
+    unsigned int field_0x124;                 // its size
 };
 
 // 0x00512990: writes `file` with descriptor byte `descriptor`; rows lie

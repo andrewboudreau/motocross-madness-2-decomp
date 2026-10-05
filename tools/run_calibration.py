@@ -4252,6 +4252,15 @@ CASES = [
         'reason': 'chained field reads, goto failed frees the file',
     },
     {
+        'name': 'Tgafile read 24-bit pixels 0x511e80',
+        'bindings': 'src/reconstructed/Tgafile.bindings.json',
+        'source': 'src/reconstructed/Tgafile.cpp',
+        'symbol': '?UnknownFunction511e80@@YAHPAUUnknownTgaFile@@PAVUnknownTextureStream@@@Z',
+        'target_va': '0x00511e80',
+        'target_size': 640,
+        'reason': 'SwapBytes reference helper; run colour at loop scope',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

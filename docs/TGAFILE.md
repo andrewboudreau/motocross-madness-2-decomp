@@ -6,7 +6,7 @@ call them. Names are provisional. File formats are the texture loader's
 codes 1..34; pixel formats are the engine's 8 (palettised), 0x22b (555),
 0x235 (565), 0x378 (24-bit), 0x613 (1555), 0x115c (4444) and 0x22b8 (8888).
 
-Exact (18 calibration cases):
+Exact (19 calibration cases):
 
 | VA | Size | Role | Source shape |
 |---|---:|---|---|
@@ -20,6 +20,7 @@ Exact (18 calibration cases):
 | `0x00511af0` | 75 | the pixel format of a DirectDraw pixel format | uninitialised local |
 | `0x00511b40` | 446 | reads a header into a new or given file | chained reads |
 | `0x00511d00` | 207 | opens a path in a new stream and reads the header | `new` under /GX |
+| `0x00511e80` | 640 | reads 24-bit pixels (raw or run-length) | reference swap helper |
 | `0x00511dd0` | 174 | reads a header and the pixels for its depth | per-depth `goto failed` |
 | `0x00512720` | 113 | writes 24-bit pixels to a TGA file | header on the stack |
 | `0x005127a0` | 67 | fills a 24-bit TGA header | field stores |
@@ -68,5 +69,13 @@ a positive offset, and accepts 16, 24 and 32-bit files of image type 2
 (raw) or 10 (run-length). On failure it frees the file (lines 421/422),
 even one the caller passed in.
 
-Not reconstructed: the pixel readers `0x00511e80`, `0x00512100` and
-`0x00512370`, and `0x005125c0`.
+The 24-bit reader grows `bits` (lines 40/49), reads raw rows in one call
+or decodes run-length packets (high bit: one colour repeated, else literal
+pixels), swapping red and blue, and flips bottom-up images through the
++0x120 scratch row (lines 101/106) before setting descriptor bit 0x20.
+Retail's swap order needs an inline `SwapBytes(unsigned char&, unsigned
+char&)`, and the run colour must be declared outside the packet loop or VC6
+hoists its loads out of the copy loop.
+
+Not reconstructed: the pixel readers `0x00512100` (32-bit) and
+`0x00512370` (16-bit), and `0x005125c0`.
