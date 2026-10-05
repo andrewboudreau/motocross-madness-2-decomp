@@ -174,6 +174,71 @@ float Track::UnknownFunction517da0(TrackPos a, TrackPos b)
     return distance;
 }
 
+// 0x00517ea0: moves pos `distance` along a node path (*path, linked through
+// +0x08/+0x0c). Bit 1 of `flags`, combined with each entry's bit 1, picks
+// the direction.
+int Track::UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags)
+{
+    TrackListItem* item;
+    if (!path || (item = *path) == 0 || pos.node != item->field_0x04)
+        return 0;
+    TrackPos cur = pos;
+    float travelled = 0.0f;
+    while (travelled < distance) {
+        if ((item->field_0x00 & 2) && !(flags & 2) || !(item->field_0x00 & 2) && (flags & 2)) {
+            if (cur.t == 0.0f) {
+                if (!cur.segment->field_0x28) {
+                    if (flags & 2)
+                        item = item->field_0x08;
+                    else
+                        item = item->field_0x0c;
+                    if (!item)
+                        break;
+                    cur.node = item->field_0x04;
+                    if ((item->field_0x00 & 2) && !(flags & 2) || !(item->field_0x00 & 2) && (flags & 2))
+                        cur.segment = cur.node->field_0x0c;
+                    else
+                        cur.segment = cur.node->field_0x08;
+                } else {
+                    cur.segment = cur.segment->field_0x28;
+                    travelled += cur.segment->field_0x24;
+                }
+            } else {
+                travelled += cur.t * cur.segment->field_0x24;
+                cur.t = 0.0f;
+            }
+            if (travelled > distance && cur.segment->field_0x24 != 0.0f)
+                cur.t = (travelled - distance) / cur.segment->field_0x24;
+        } else {
+            if (cur.t == 1.0f) {
+                if (!cur.segment->field_0x2c) {
+                    if (flags & 2)
+                        item = item->field_0x08;
+                    else
+                        item = item->field_0x0c;
+                    if (!item)
+                        break;
+                    cur.node = item->field_0x04;
+                    if ((item->field_0x00 & 2) && !(flags & 2) || !(item->field_0x00 & 2) && (flags & 2))
+                        cur.segment = cur.node->field_0x0c;
+                    else
+                        cur.segment = cur.node->field_0x08;
+                } else {
+                    cur.segment = cur.segment->field_0x2c;
+                    travelled += cur.segment->field_0x24;
+                }
+            } else {
+                travelled += (1.0f - cur.t) * cur.segment->field_0x24;
+                cur.t = 1.0f;
+            }
+            if (travelled > distance && cur.segment->field_0x24 != 0.0f)
+                cur.t = 1.0f - (travelled - distance) / cur.segment->field_0x24;
+        }
+    }
+    *out = cur;
+    return 1;
+}
+
 // 0x00518080: the point at pos.
 int Track::UnknownFunction518080(TrackPos pos, TrackVec3* out)
 {

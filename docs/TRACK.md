@@ -39,7 +39,7 @@ to finish at Track+0x04.
 
 ## Status
 
-The following 12 functions are exact under `vc6_o2_mt`, with every
+The following 13 functions are exact under `vc6_o2_mt`, with every
 relocation bound:
 
 | VA | Bytes | Body |
@@ -53,6 +53,7 @@ relocation bound:
 | `0x00517930` | 99 | frees a work list |
 | `0x005179a0` | 67 | whether b is at or after a on the same node |
 | `0x00517da0` | 256 | distance along the track from a to b |
+| `0x00517ea0` | 465 | moves a position a distance along a node path |
 | `0x00518080` | 174 | the point at a position |
 | `0x00518640` | 67 | formats whole seconds as `mm:ss` |
 | `0x00518690` | 134 | formats a lap time, or `--:--.--` when unset |
@@ -62,11 +63,18 @@ Near miss: the segment direction `0x00518130` (246/250 bytes,
 x87 stack until a final `fstp st(0)`; VC6 here consumes it in the last
 multiply.
 
+Near miss: the path search `0x005179f0` (929/929 bytes, two differ). Where
+the walk reaches b's node, retail loads the two addends of
+`length + fromStart` in the other order; no source order tried changes it.
+
+Near miss: the closest position on one node `0x00516ca0` (576/586 bytes).
+VC6 here reuses the projection's `p - segment` differences in two of the
+clamping branches, where retail recomputes them.
+
 Not yet attempted:
 - the loader `0x00515ed0` (2342 bytes);
 - the closest-position search `0x00516980`;
-- the path search `0x005179f0`;
-- `0x00516ca0`, `0x00516ef0`, `0x00517340`, `0x00517ea0` and `0x00518230`.
+- `0x00516ef0`, `0x00517340` and `0x00518230`.
 
 ## Source shapes that mattered
 
@@ -77,6 +85,12 @@ Not yet attempted:
   difference vector.
 - `0x00517da0`: a `goto` to the shared path-search call when the segment
   walk runs out, and a second, separate call for different nodes.
+- `0x00517ea0`: a by-value copy `TrackPos cur = pos` of the parameter.
+  It keeps `cur.t` in memory and the node and segment in registers, while
+  the distance travelled stays on the x87 stack. Separate node, segment and
+  t locals put t on the x87 stack instead.
+- `0x005179f0`: one `TrackPos` local reused for both 0x00517da0 calls (two
+  locals take two stack slots).
 - `0x00518130`: the squared length must be `(y*y + x*x) + z*z`.
 
 ## Reproduce

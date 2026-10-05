@@ -5246,6 +5246,14 @@ CASES = [
         'target_size': 256,
     },
     {
+        'name': 'Track 0x517ea0 move along a node path',
+        'bindings': 'src/reconstructed/Track.bindings.json',
+        'source': 'src/reconstructed/Track.cpp',
+        'symbol': '?UnknownFunction517ea0@Track@@QAEHUTrackPos@@PAU2@PAPAUTrackListItem@@ME@Z',
+        'target_va': '0x00517ea0',
+        'target_size': 465,
+    },
+    {
         'name': 'Track 0x518080 point at position',
         'bindings': 'src/reconstructed/Track.bindings.json',
         'source': 'src/reconstructed/Track.cpp',

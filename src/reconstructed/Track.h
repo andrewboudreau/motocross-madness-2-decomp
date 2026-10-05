@@ -55,9 +55,10 @@ struct TrackVec3 {
 // Work-list entry of the graph walks (calloc(1, 0x10)); only +0x04 and
 // +0x0c are used.
 struct TrackListItem {
-    int field_0x00;
+    unsigned char field_0x00;       // bit 1: walked in reverse (0x00517ea0)
+    unsigned char field_0x01[3];
     TrackNode* field_0x04;
-    int field_0x08;
+    TrackListItem* field_0x08;
     TrackListItem* field_0x0c;
 };
 
@@ -80,11 +81,13 @@ public:
     int UnknownFunction515e70(UnknownStream* stream, TrackNode** nodes, int count);
     int UnknownFunction516800(TrackNode* node);
     int UnknownFunction516870(TrackNode** start);
+    int UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
     int UnknownFunction517310(TrackSegment* segment, TrackNode* node);
     int UnknownFunction517930(TrackListItem** list, int all);
     int UnknownFunction5179a0(TrackPos a, TrackPos b);
     int UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, float* distance);
     float UnknownFunction517da0(TrackPos a, TrackPos b);
+    int UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags);
     int UnknownFunction518080(TrackPos pos, TrackVec3* out);
     int UnknownFunction518130(TrackSegment* segment, TrackVec3* out);
 
