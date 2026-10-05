@@ -2,6 +2,7 @@
 
 #include "MemTag.h"
 #include "RenderInterfaces.h"
+#include "Pixtrans.h"
 #include "TextureMap.h"
 
 // Object at PCTextureMap+0x7c; its destructor 0x0052d050 sits among
@@ -15,21 +16,8 @@ public:
 // (0x00511580) about lost or released surfaces.
 extern int g_UnknownGlobal689964;
 
-// cdecl 0x004d1b90: downsamples `source` (stride in pixels) into the
-// width x height `destination`; 0 on failure.
-int UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter);
-
 // Lzw.cpp (cdecl 0x004a03d0): expands `source` into `size` bytes.
 void UnknownFunction4a03d0(void* destination, void* source, int size);
-
-// Pixtrans.cpp converters (cdecl): 0x004d1d20 copies `source` into
-// `destination`; 0x004d24d0 inspects the converted bits.
-void UnknownFunction4d1d20(void* destination, void* source, int width, int height, int destinationStride,
-                           int sourceStride, int format, int sourceFormat, int a,
-                           UnknownTexturePalette* palette, int alphaThreshold, unsigned int key);
-int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int format,
-                          UnknownTexturePalette* palette);
 
 // bmpfile.cpp (cdecl): 0x004245f0 describes an 8-bit width x height
 // bitmap with a 256-entry RGB palette; 0x00424380 writes it to `name`.
@@ -42,13 +30,6 @@ struct UnknownBitmapFile {
 void UnknownFunction4245f0(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width, int height);
 int UnknownFunction424380(UnknownBitmapFile* bitmap);
 
-// Pixtrans.cpp replacers (cdecl, pixels from RenderInterfaces.h): every `from` pixel in the width x height
-// `bits` (stride in pixels) becomes `to`. 32-bit 0x004d1970, 24-bit
-// 0x004d1a20, 16-bit 0x004d1ac0, 8-bit 0x004d1b40.
-void UnknownFunction4d1970(void* bits, UnknownPixel32 from, UnknownPixel32 to, int width, int height, int stride);
-void UnknownFunction4d1a20(void* bits, UnknownPixel24 from, UnknownPixel24 to, int width, int height, int stride);
-void UnknownFunction4d1ac0(void* bits, unsigned short from, unsigned short to, int width, int height, int stride);
-void UnknownFunction4d1b40(void* bits, unsigned char from, unsigned char to, int width, int height, int stride);
 
 // Shared texture surfaces reused across textures: 0x0068a36c by mip level
 // count, 0x0068a394 for single-level textures.
