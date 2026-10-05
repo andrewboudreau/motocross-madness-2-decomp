@@ -5,18 +5,7 @@
 // `key=value` or comma-separated rows; ';' starts a comment line. Names are
 // provisional (tier 3); behaviour and layout come from 0x004b6f30..0x004b8465.
 
-// 0x00515dc0/0x00515df0: the strtok-style splitter Parameterblocks.cpp uses on
-// the stack (8 bytes, no destructor). Its code sits outside this TU; the same
-// declaration appears in Track.h on the s7/track branch, and the two should be
-// unified when both land.
-class UnknownTokenizer {
-public:
-    UnknownTokenizer(char* text);                          // 0x00515dc0
-    char* UnknownFunction515df0(const char* delimiters);   // 0x00515df0: next token
-
-    char* field_0x00;   // current token
-    char* field_0x04;   // rest of the text, 0 at the end
-};
+#include "UnknownTokenizer.h"
 
 class UnknownParameterStream;
 

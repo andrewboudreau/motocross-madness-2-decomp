@@ -52,8 +52,8 @@ the game's file stream, and archives can redirect that stream.
     Samples under `samples/physics/motion/` call the object "SltFile". Its
     first section there is `General info`.
 - Callees outside the TU, each bound to its own address:
-  - The tokenizer `0x00515dc0`/`0x00515df0`. The same declaration is on the
-    `s7/track` branch's `Track.h`. Unify the two once both land.
+  - The tokenizer `0x00515dc0`/`0x00515df0`, declared in
+    `src/reconstructed/UnknownTokenizer.h` and reconstructed in `Track.cpp`.
   - The stream members `0x00461340`, `0x00461600` and `0x00461aa0`.
   - The archive members `0x004e9360`, `0x004e9030` and `0x004e9430`.
   - The out-of-line copies of three recursive inline stream accessors:

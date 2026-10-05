@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UnknownTokenizer.h"
+
 // Track.cpp (literal __FILE__ "D:\aardvark\VC\krusty2\Track.cpp", 0x0057508c).
 // No RTTI names a class here: the functions are __thiscall members of a
 // non-polymorphic object whose name, Track, is inferred from the file name
@@ -62,17 +64,6 @@ struct TrackListItem {
     TrackListItem* field_0x0c;
 };
 
-// 0x00515dc0/0x00515df0: a strtok-style splitter. Callers are in gameui.cpp,
-// Parameterblocks.cpp and others; it is placed in Track.cpp by position only
-// (it sits directly before 0x00515e70).
-class UnknownTokenizer {
-public:
-    UnknownTokenizer(char* text);           // 0x00515dc0
-    char* UnknownFunction515df0(const char* delimiters);
-
-    char* field_0x00;               // current token
-    char* field_0x04;               // rest of the text
-};
 
 class UnknownStream;
 
