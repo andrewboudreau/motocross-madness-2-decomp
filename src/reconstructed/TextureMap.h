@@ -9,7 +9,8 @@
 struct UnknownTexturePalette {
     unsigned char field_0x000[0x10];
     unsigned char field_0x010[256][3];             // RGB entries
-    unsigned char field_0x310[0x710 - 0x310];
+    unsigned short field_0x310[256];               // 16-bit entries (Pixtrans 0x004d11c0)
+    unsigned short field_0x510[256];               // 16-bit entries (Pixtrans 0x004d1150)
     unsigned char field_0x710[0x8000];
 };
 

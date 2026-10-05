@@ -5,10 +5,24 @@ PCVideoCard.cpp's code (literal `0x004d06e9`). PCTextureMap and
 ManagedTextureGroup call them. Strides are in pixels; names are
 provisional.
 
-Exact (4 calibration cases):
+Exact (18 calibration cases):
 
 | VA | Size | Role |
 |---|---:|---|
+| `0x004d1030` | 114 | 565 to 555 |
+| `0x004d10b0` | 150 | palette indices to 24-bit RGB (+0x10 entries) |
+| `0x004d1150` | 109 | palette indices through the 16-bit table at +0x510 |
+| `0x004d11c0` | 109 | palette indices through the 16-bit table at +0x310 |
+| `0x004d1230` | 152 | 8888 to 4444 |
+| `0x004d12d0` | 157 | 8888 to 1555, opaque at or above an alpha threshold |
+| `0x004d1370` | 208 | 24-bit to 1555; the 0xRRGGBB key becomes 0 |
+| `0x004d1440` | 227 | 4444 to 555; alpha below the threshold becomes a colour |
+| `0x004d1530` | 187 | 4444 to 1555; alpha below the threshold becomes 0 |
+| `0x004d15f0` | 228 | 4444 to 565; alpha below the threshold becomes a colour |
+| `0x004d16e0` | 151 | 555 to 1555, transparent where the pixel is the key |
+| `0x004d1780` | 142 | 1555 to 555; transparent pixels become the key |
+| `0x004d1810` | 170 | 565 to 1555, transparent where the pixel is the key |
+| `0x004d18c0` | 172 | 1555 to 565; transparent pixels become the key |
 | `0x004d1970` | 161 | replaces 32-bit `from` pixels with `to` |
 | `0x004d1a20` | 147 | replaces 24-bit `from` pixels with `to` |
 | `0x004d1ac0` | 115 | replaces 16-bit `from` pixels with `to` |
@@ -21,5 +35,25 @@ moves up (255 moves down), a 16-bit pixel moves one step (down when its low
 five bits are set). The 16-bit nudge is an if/else; a ternary makes VC6 mask
 `to ± 1` to 16 bits.
 
-Not reconstructed: the converters `0x004d1030`–`0x004d18c0`, the
-downsampler `0x004d1b90`, the converter `0x004d1d20` and `0x004d24d0`.
+The converters take `(destination, source, width, height,
+destinationStride, sourceStride[, extra])`, loop rows then pixels and
+return 1. What reproduces retail:
+
+- separate row and pixel pointers, with the source row declared,
+  initialised and advanced first (0x004d1230 and the 16-bit-only converters
+  vary the order per function; see the source);
+- channel packing written as `(c >> 4) << 12 | ...` and `(c >> 3) << 10 |
+  ...`, which VC6 turns into retail's masks and factored shifts;
+- `*to++` in each branch where retail keeps the two pointers apart;
+- the alpha threshold reassigned in place as `(t >> 4) << 12` (it lives in
+  its argument slot), and the 24-bit key's red/green bytes as locals
+  declared just before the row loop;
+- keys from `Pack555`/`Pack565`, now shared through `Pixtrans.h`.
+
+0x004d1780 copies nothing for opaque pixels: it only clears the alpha bit
+of what is already in `destination` (retail behaviour).
+
+The palette's +0x310 and +0x510 regions are 256-entry 16-bit tables.
+
+Not reconstructed: the downsampler `0x004d1b90`, the converter `0x004d1d20`
+and `0x004d24d0`.

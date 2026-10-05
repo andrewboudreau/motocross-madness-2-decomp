@@ -490,15 +490,6 @@ static inline void SetRenderStatePair(TextureMap* map, int state, int value) {
     }
 }
 
-// A 24-bit 0xRRGGBB colour as a 555 or 565 pixel.
-static inline unsigned short Pack555(unsigned int color) {
-    return (unsigned short)(((color >> 3) & 0x1f) | ((color >> 6) & 0x3e0) | ((color >> 9) & 0x7c00));
-}
-
-static inline unsigned short Pack565(unsigned int color) {
-    return (unsigned short)(((color >> 3) & 0x1f) | ((color >> 5) & 0x7e0) | ((color >> 8) & 0xf800));
-}
-
 // 0x004c7e30: converts a 24-bit colour to the texture's format (555, 565 or
 // a palette index) and stores it as the colour key.
 void PCTextureMap::UnknownFunction4c7e30(unsigned int color) {

@@ -4,6 +4,16 @@
 
 struct UnknownTexturePalette;
 
+// A 24-bit 0xRRGGBB colour as a 555 or 565 pixel (blue first, cast as a
+// whole: VC6 then keeps retail's per-component shifts).
+inline unsigned short Pack555(unsigned int color) {
+    return (unsigned short)(((color >> 3) & 0x1f) | ((color >> 6) & 0x3e0) | ((color >> 9) & 0x7c00));
+}
+
+inline unsigned short Pack565(unsigned int color) {
+    return (unsigned short)(((color >> 3) & 0x1f) | ((color >> 5) & 0x7e0) | ((color >> 8) & 0xf800));
+}
+
 // Pixtrans.cpp pixel converters (all cdecl; PCVideoCard.cpp's code comes
 // before them). Strides are in pixels. Names are provisional.
 
@@ -14,6 +24,52 @@ int UnknownFunction4d1970(void* bits, UnknownPixel32 from, UnknownPixel32 to, in
 int UnknownFunction4d1a20(void* bits, UnknownPixel24 from, UnknownPixel24 to, int width, int height, int stride);
 int UnknownFunction4d1ac0(void* bits, unsigned short from, unsigned short to, int width, int height, int stride);
 int UnknownFunction4d1b40(void* bits, unsigned char from, unsigned char to, int width, int height, int stride);
+
+// Converters from `source` into `destination` (width x height, strides in
+// pixels); all return 1.
+// 0x004d1030: 565 to 555.
+int UnknownFunction4d1030(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride);
+// 0x004d10b0: palette indices to 24-bit RGB.
+int UnknownFunction4d10b0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, UnknownTexturePalette* palette);
+// 0x004d1150, 0x004d11c0: palette indices through the palette's 16-bit
+// tables (+0x510, +0x310).
+int UnknownFunction4d1150(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, UnknownTexturePalette* palette);
+int UnknownFunction4d11c0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, UnknownTexturePalette* palette);
+
+// 0x004d1230: 8888 to 4444.
+int UnknownFunction4d1230(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride);
+// 0x004d12d0: 8888 to 1555, opaque where alpha >= `alphaThreshold`.
+int UnknownFunction4d12d0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int alphaThreshold);
+// 0x004d1370: 24-bit to 1555; the 0xRRGGBB `key` becomes transparent 0.
+int UnknownFunction4d1370(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int key);
+// 0x004d1440, 0x004d15f0: 4444 to 555 or 565; pixels with alpha below
+// `alphaThreshold` become `color` (0xRRGGBB).
+int UnknownFunction4d1440(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int alphaThreshold, unsigned int color);
+int UnknownFunction4d15f0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int alphaThreshold, unsigned int color);
+// 0x004d1530: 4444 to 1555; alpha below `alphaThreshold` becomes 0.
+int UnknownFunction4d1530(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int alphaThreshold);
+// 0x004d16e0: 555 to 1555, transparent where the pixel is `key`.
+int UnknownFunction4d16e0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, unsigned int key);
+// 0x004d1780: 1555 to 555; transparent pixels become `key`.
+int UnknownFunction4d1780(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, unsigned int key);
+// 0x004d1810: 565 to 1555, transparent where the pixel is `key`.
+int UnknownFunction4d1810(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, unsigned int key);
+// 0x004d18c0: 1555 to 565; transparent pixels become `key`.
+int UnknownFunction4d18c0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, unsigned int key);
 
 // 0x004d1b90: downsamples `source` into the width x height `destination`;
 // 0 on failure.
