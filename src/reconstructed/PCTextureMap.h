@@ -129,6 +129,10 @@ public:
     virtual int UnknownVirtualSlot20();       // 0x004c8430: dumps every mip level
 
     int UnknownFunction4c7420();              // 0x004c7420: recreates a lost texture surface
+    // 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`,
+    // blending through `table` when given.
+    int UnknownFunction4c7b40(unsigned long x, unsigned long y, UnknownSurfaceInterface* destination,
+                              struct UnknownRect* rect, int flags, unsigned char* table);
     // 0x004c7b00: blits +0x70 into `destination` unless `skip`.
     int UnknownFunction4c7b00(void* destinationRect, UnknownSurfaceInterface* destination,
                               void* sourceRect, int flags, int skip);

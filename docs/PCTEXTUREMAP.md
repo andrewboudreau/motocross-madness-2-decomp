@@ -90,6 +90,11 @@ Exact (23 calibration cases):
   no name, so slot 20 dumps the mip chain.
 
 Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
+- `0x004c7b40` (about half of 750 bytes), the table blit: BltFast without
+  a table; otherwise it locks both surfaces (0x811), clips the rectangle to
+  the destination and sets each pixel to `table[source << 8 | destination]`
+  (8-bit; 16-bit pixels read the destination byte through the pixel value).
+  The loop nest's register assignment differs;
 - `0x004c8550` (391 of 393 bytes), the level dump: the first free
   `C:\temp\<name><nnn>.bmp` (8-bit, through bmpfile.cpp's `0x004245f0`
   and `0x00424380`) or `.tga` (converted to 32-bit by Pixtrans `0x004d1d20`
@@ -117,7 +122,7 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   append helper. Only the non-mip fallback chain differs: VC6 cross-jumps
   its identical call tails into the first case, retail into the last.
 
-Not reconstructed: `0x004c7b40` and the error reporter `0x004c86e0`.
+Not reconstructed: the error reporter `0x004c86e0`.
 
 ## TextureMap
 

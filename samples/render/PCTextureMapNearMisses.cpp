@@ -1,6 +1,15 @@
 // Near-miss PCTextureMap candidates, kept out of src/reconstructed until
 // they match. See docs/PCTEXTUREMAP.md.
 //
+// PCTextureMap::UnknownFunction4c7b40 (0x004c7b40, 750 bytes): the table
+// blit (callers around 0x00404750 pass 0x005777c8 or a per-object table).
+// The early BltFast path, both locks, the clipping arithmetic and the
+// shared failure return line up; about half the instructions differ in the
+// loop nest. Retail keeps left in ebp (with a spilled copy), top in ebx,
+// bottom in edi and right on the stack, and the 8-bit source row in esi;
+// VC6 here swaps left/bottom and the row pointers. Declaration order of the
+// rect locals, row pointers, operand order and indexed loops do not help.
+//
 // PCTextureMap::UnknownFunction4c8550 (0x004c8550, 393 bytes): the level
 // dump. Everything but the 32-bit buffer size matches (391 of 393 bytes):
 // retail loads the height and multiplies by the width, VC6 here the other
@@ -38,6 +47,67 @@
 #include "../../src/reconstructed/TrackGame.h"
 
 #include "../../src/reconstructed/ManagedTexture.h"
+
+// 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`. Without a
+// table this is BltFast; with one, both surfaces are locked and each
+// destination pixel becomes table[source << 8 | destination], clipped to
+// the destination. (16-bit pixels read their destination byte through the
+// pixel value, as retail does.)
+int PCTextureMap::UnknownFunction4c7b40(unsigned long x, unsigned long y, UnknownSurfaceInterface* destination,
+                                        UnknownRect* rect, int flags, unsigned char* table) {
+    UnknownSurfaceDesc source;
+    UnknownSurfaceDesc target;
+    long left, top, right, bottom;
+    if (!table) {
+        if (destination->UnknownMethod7(x, y, field_0x70, rect, flags))
+            goto failed;
+        return 1;
+    }
+    memset(&source, 0, sizeof(source));
+    source.size = sizeof(source);
+    if (field_0x70->UnknownMethod25(0, &source, 0x811, 0))
+        goto failed;
+    memset(&target, 0, sizeof(target));
+    target.size = sizeof(target);
+    if (destination->UnknownMethod25(0, &target, 0x811, 0))
+        goto failed;
+    left = rect->left;
+    top = rect->top;
+    right = rect->right;
+    bottom = rect->bottom;
+    if (x < target.width && y < target.height) {
+        if (right - left + x + 1 >= target.width)
+            right = target.width - x + left - 2;
+        if (bottom - top + y + 1 >= target.height)
+            bottom = target.height - y + top - 2;
+        if (target.pixelFormat.bitCount == 8) {
+            unsigned char* from = (unsigned char*)source.surface + source.pitch * top + left;
+            unsigned char* to = (unsigned char*)target.surface + target.pitch * y + x;
+            for (long row = top; row <= bottom; row++) {
+                unsigned char* pixel = to;
+                for (long column = left; column <= right; column++, pixel++)
+                    *pixel = table[(from[column - left] << 8) + *pixel];
+                from += source.pitch;
+                to += target.pitch;
+            }
+        } else {
+            unsigned short* from = (unsigned short*)source.surface + source.pitch * top / 2 + left;
+            unsigned short* to = (unsigned short*)target.surface + target.pitch * y / 2 + x;
+            for (long row = top; row <= bottom; row++) {
+                unsigned short* pixel = to;
+                for (long column = left; column <= right; column++, pixel++)
+                    *pixel = table[(from[column - left] << 8) + *(unsigned char*)*pixel];
+                from += source.pitch / 2;
+                to += target.pitch / 2;
+            }
+        }
+    }
+    if (destination->UnknownMethod32(0) || field_0x70->UnknownMethod32(0))
+        goto failed;
+    return 1;
+failed:
+    return 0;
+}
 
 // 0x004c8550: writes a locked level to C:\temp\<name><nnn>.bmp (8-bit) or
 // .tga (anything else, converted to 32-bit first), taking the first number
