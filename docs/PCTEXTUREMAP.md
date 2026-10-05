@@ -66,16 +66,16 @@ Exact (23 calibration cases):
   parent through Pixtrans.cpp's `0x004d1b90` (error line 1421). One
   `stride` variable carries the parent's stride; the lock and unlock
   failures share one `return 0` through `goto failed`;
-- slot 18, which colour-keys the 16-bit (and `0x613`) formats on every
-  level (`0x004c7ef0`, error line 1811), re-uploads, sets the surfaces'
+- slot 18, which colour-keys the 555, 565, 24-bit and 1555 formats on
+  every level (`0x004c7ef0`, error line 1811), re-uploads, sets the surfaces'
   colour key and records render states 0x29 = 1 and 0x1b = 0 through an
   inline find-or-append helper. Retail compares the format with `0x22b8`
   in the re-upload test (sic);
 - slot 20, which dumps every mip level (error line 2084). Loading +0x70
   into a local before the caps memset reproduces retail's store order;
 - `0x004c7e30`, the colour key: a 24-bit colour packed as 555 or 565, or
-  looked up in the palette's 555 table (+0x2c, +0x710). The file-local
-  `Pack555`/`Pack565` helpers cast the whole `|` to `unsigned short` and
+  looked up in the palette's 555 table (+0x2c, +0x710). The
+  `Pack555`/`Pack565` helpers (now in `Pixtrans.h`) cast the whole `|` to `unsigned short` and
   list blue first; without the cast VC6 factors the common `>> 3` out of
   the expression, and red-first order swaps two terms in `0x004c7ef0`;
 - `0x004c7ef0`, which locks a level (flags 0x801) and replaces magenta

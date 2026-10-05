@@ -30,7 +30,6 @@ struct UnknownBitmapFile {
 void UnknownFunction4245f0(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width, int height);
 int UnknownFunction424380(UnknownBitmapFile* bitmap);
 
-
 // Shared texture surfaces reused across textures: 0x0068a36c by mip level
 // count, 0x0068a394 for single-level textures.
 extern UnknownSurfaceInterface* g_UnknownSharedMipSurfaces68a36c[10];
@@ -101,4 +100,3 @@ public:
     void* field_0x78;                         // palette for 8-bit textures
     UnknownVideoDecoder* field_0x7c;
 };
-

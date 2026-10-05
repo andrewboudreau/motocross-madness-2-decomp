@@ -1,5 +1,6 @@
-// Tgafile.cpp's format helpers (the functions before its literals at
-// 0x00511b54). Names are provisional; see Tgafile.h for the format codes.
+// Tgafile.cpp: the format helpers before its literals (0x00511b54) and the
+// TGA readers and writers after them (0x00511d00-0x00512dd0). Names are
+// provisional; see Tgafile.h for the format codes.
 
 #include "Tgafile.h"
 

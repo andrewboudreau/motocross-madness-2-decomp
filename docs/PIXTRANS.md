@@ -68,8 +68,9 @@ per-format helper: palette `0x004d05c0` (with the palette), 555
 `0x004d0440` and 565 `0x004d02c0` (with a filter flag), 24-bit
 `0x004cfaf0`, 1555 `0x004d0170`, 4444 `0x004d0020`, 8888 `0x004cfc40`.
 Each copies rows for 0 levels, halves once through a per-format halver
-(24-bit: `0x004cde20`, which indexes the lower row as `top[sourceStride]`) for 1, and otherwise halves through a temporary of
-the first level's size (Pixtrans.cpp lines 1329/1350 in the 24-bit one).
+(24-bit: `0x004cde20`, which indexes the lower row as
+`top[sourceStride]`) for 1, and otherwise halves through a temporary of the
+first level's size (Pixtrans.cpp lines 1329/1350 in the 24-bit one).
 
 Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004cfaf0`, whose
 plain-copy path's hoisted strides land in different argument slots;
@@ -81,9 +82,11 @@ averages colour over the 2x2 pixels with alpha set (the fourth pixel adds
 the third one's alpha in retail) and differs in register assignment.
 
 `0x004d0d40` is hand-written assembly (frame pointer, dead `mov eax, 0`,
-`push ebp` inside the loop) and is out of scope. The 24-bit and 16-bit
-converters at `0x004d0900`–`0x004d0c40` dither through `0x004cf2a0` when
-asked and otherwise map through the 555 tables `0x004de280`/`0x004de290`.
+`push ebp` inside the loop) and is out of scope. The palette-index
+converters `0x004d0aa0`/`0x004d0b90`/`0x004d0c40` (24-bit, 565, 555) dither
+through `0x004cf2a0` when asked and otherwise map through the 555-to-index
+and 565-to-index tables `0x004de280`/`0x004de290`.
 
-Not reconstructed: the other downsamplers and halvers, the converter
-`0x004d1d20` and `0x004d24d0`.
+Not reconstructed: the other downsamplers and halvers, the 555-to-index
+converter `0x004d0c40`, the ditherer `0x004cf2a0`, the table getters
+`0x004de280`/`0x004de290`, the converter `0x004d1d20` and `0x004d24d0`.

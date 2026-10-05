@@ -25,13 +25,13 @@ int UnknownFunction511970(int format);
 // 0x005119c0: fills a DirectDraw pixel format for a pixel format.
 void UnknownFunction5119c0(int format, void* pixelFormat);
 
-// 0x00511ad0: whether a pixel format has an 8-bit or 4-bit alpha channel.
+// 0x00511ad0: whether a pixel format is 4444 or 8888.
 int UnknownFunction511ad0(int format);
 
 // 0x00511af0: the pixel format a DirectDraw pixel format describes.
 int UnknownFunction511af0(UnknownPixelFormat* pixelFormat);
 
-// A TGA file being written: the header fields (unpacked; 0x00512990 writes
+// A TGA file being read or written: the header fields (unpacked; 0x00512990 writes
 // them one by one), the pixels and the file name.
 struct UnknownTgaFile {
     unsigned char idLength;

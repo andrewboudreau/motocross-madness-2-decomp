@@ -567,7 +567,7 @@ failed:
     return 0;
 }
 
-// 0x004c81d0: for 16-bit and 0x613 formats, applies colour `color` as the
+// 0x004c81d0: for 555, 565, 24-bit and 1555 formats, applies colour `color` as the
 // key on every level (0x004c7ef0), re-uploads, sets the surfaces' colour key
 // and records render states 0x29 = 1 and 0x1b = 0.
 int PCTextureMap::UnknownVirtualSlot18(unsigned int color) {

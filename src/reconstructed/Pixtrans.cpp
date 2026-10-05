@@ -433,25 +433,25 @@ int UnknownFunction4d18c0(void* destination, void* source, int width, int height
 
 // 0x004d1b90: hands the downsampling to the helper for `format`.
 int UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter) {
+                          int sourceStride, int levels, int format, UnknownTexturePalette* palette, int filter) {
     switch (format) {
     case 8:
-        return UnknownFunction4d05c0(destination, source, width, height, destinationStride, sourceStride, a,
+        return UnknownFunction4d05c0(destination, source, width, height, destinationStride, sourceStride, levels,
                                      palette);
     case 0x22b:
-        return UnknownFunction4d0440(destination, source, width, height, destinationStride, sourceStride, a,
+        return UnknownFunction4d0440(destination, source, width, height, destinationStride, sourceStride, levels,
                                      filter);
     case 0x235:
-        return UnknownFunction4d02c0(destination, source, width, height, destinationStride, sourceStride, a,
+        return UnknownFunction4d02c0(destination, source, width, height, destinationStride, sourceStride, levels,
                                      filter);
     case 0x378:
-        return UnknownFunction4cfaf0(destination, source, width, height, destinationStride, sourceStride, a);
+        return UnknownFunction4cfaf0(destination, source, width, height, destinationStride, sourceStride, levels);
     case 0x613:
-        return UnknownFunction4d0170(destination, source, width, height, destinationStride, sourceStride, a);
+        return UnknownFunction4d0170(destination, source, width, height, destinationStride, sourceStride, levels);
     case 0x115c:
-        return UnknownFunction4d0020(destination, source, width, height, destinationStride, sourceStride, a);
+        return UnknownFunction4d0020(destination, source, width, height, destinationStride, sourceStride, levels);
     case 0x22b8:
-        return UnknownFunction4cfc40(destination, source, width, height, destinationStride, sourceStride, a);
+        return UnknownFunction4cfc40(destination, source, width, height, destinationStride, sourceStride, levels);
     }
     return 0;
 }

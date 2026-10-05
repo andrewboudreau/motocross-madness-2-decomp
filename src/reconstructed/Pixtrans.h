@@ -125,26 +125,27 @@ int UnknownFunction4cdf10(void* destination, void* source, int width, int height
                           int sourceStride);
 
 // Per-format halving downsamplers behind 0x004d1b90 (8888, 24-bit, 4444,
-// 1555, 565, 555, palette); `a` and `filter` are passed through.
+// 1555, 565, 555, palette); `levels` (the number of halvings) and `filter`
+// are passed through.
 int UnknownFunction4cfaf0(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a);
+                          int sourceStride, int levels);
 int UnknownFunction4cfc40(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a);
+                          int sourceStride, int levels);
 int UnknownFunction4d0020(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a);
+                          int sourceStride, int levels);
 int UnknownFunction4d0170(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a);
+                          int sourceStride, int levels);
 int UnknownFunction4d02c0(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a, int filter);
+                          int sourceStride, int levels, int filter);
 int UnknownFunction4d0440(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a, int filter);
+                          int sourceStride, int levels, int filter);
 int UnknownFunction4d05c0(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a, UnknownTexturePalette* palette);
+                          int sourceStride, int levels, UnknownTexturePalette* palette);
 
 // 0x004d1b90: downsamples `source` into the width x height `destination`
 // with the helper for `format`; 0 for other formats.
 int UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter);
+                          int sourceStride, int levels, int format, UnknownTexturePalette* palette, int filter);
 
 // 0x004d1d20: copies `source` into `destination`, converting the format;
 // 0x004d24d0 inspects the converted bits.

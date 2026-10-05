@@ -1,7 +1,8 @@
 # Tgafile.cpp format helpers
 
-`src/reconstructed/Tgafile.h` / `Tgafile.cpp`: the cdecl helpers before
-Tgafile.cpp's literals (`0x00511b54`). PCTextureMap, TextureMap and PCGame
+`src/reconstructed/Tgafile.h` / `Tgafile.cpp`: the cdecl format helpers
+before Tgafile.cpp's literals (`0x00511b54`) and the TGA readers and writers
+after them (`0x00511d00`–`0x00512dd0`). PCTextureMap, TextureMap and PCGame
 call them. Names are provisional. File formats are the texture loader's
 codes 1..34; pixel formats are the engine's 8 (palettised), 0x22b (555),
 0x235 (565), 0x378 (24-bit), 0x613 (1555), 0x115c (4444) and 0x22b8 (8888).
@@ -52,7 +53,7 @@ unpacked, the pixels at +0x14 and the name at +0x1c), copy the path in and
 return the result of `0x00512990`. The value PCTextureMap's level dump
 passes as 32 is the header's descriptor byte (top-left origin).
 
-Near miss (`samples/render/TgafileNearMisses.cpp`, with `0x005125c0`): the
+Near miss (`samples/render/TgafileNearMisses.cpp`): the
 writer `0x00512990` (1074 bytes). It opens the file "wb", writes the header field
 by field and the pixels: 24-bit one by one with red and blue swapped,
 32-bit swapped in place then in blocks, 16-bit rows as they are for 555
