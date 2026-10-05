@@ -42,22 +42,7 @@ struct UnknownBitmapFile {
 void UnknownFunction4245f0(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width, int height);
 int UnknownFunction424380(UnknownBitmapFile* bitmap);
 
-// Pixels as the Pixtrans.cpp replacers take them by value: 32-bit RGBA
-// (format 0x22b8) and 24-bit RGB (0x378), red first in memory.
-struct UnknownPixel32 {
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-    unsigned char alpha;
-};
-
-struct UnknownPixel24 {
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-};
-
-// Pixtrans.cpp replacers (cdecl): every `from` pixel in the width x height
+// Pixtrans.cpp replacers (cdecl, pixels from RenderInterfaces.h): every `from` pixel in the width x height
 // `bits` (stride in pixels) becomes `to`. 32-bit 0x004d1970, 24-bit
 // 0x004d1a20, 16-bit 0x004d1ac0, 8-bit 0x004d1b40.
 void UnknownFunction4d1970(void* bits, UnknownPixel32 from, UnknownPixel32 to, int width, int height, int stride);

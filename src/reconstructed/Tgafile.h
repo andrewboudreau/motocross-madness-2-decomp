@@ -31,6 +31,41 @@ int UnknownFunction511ad0(int format);
 // 0x00511af0: the pixel format a DirectDraw pixel format describes.
 int UnknownFunction511af0(UnknownPixelFormat* pixelFormat);
 
-// 0x005127f0: writes width x height pixels of `depth` bits to the TGA file
-// `path`.
-int UnknownFunction5127f0(void* bits, int width, int height, int a, const char* path, int depth);
+// A TGA file being written: the header fields (unpacked; 0x00512990 writes
+// them one by one), the pixels and the file name.
+struct UnknownTgaFile {
+    unsigned char idLength;
+    unsigned char colorMapType;
+    unsigned char imageType;                  // 2: uncompressed true colour
+    unsigned char field_0x03;
+    unsigned short colorMapStart;
+    unsigned short colorMapLength;
+    unsigned char colorMapDepth;
+    unsigned char field_0x09;
+    unsigned short x;
+    unsigned short y;
+    short width;
+    short height;
+    unsigned char bitsPerPixel;
+    unsigned char descriptor;                 // 0x20: top-left origin
+    void* bits;
+    int field_0x18;
+    char name[0x104];
+    void* field_0x120;
+    int field_0x124;
+};
+
+// 0x00512990: writes `file` with descriptor byte `descriptor`; rows lie
+// `stride` bytes apart (0: packed). 16-bit pixels are 555 when `greenMask`
+// is 0x3e0, else 565.
+int UnknownFunction512990(UnknownTgaFile* file, unsigned int stride, int greenMask, int descriptor);
+
+// Writers: fill a 24-bit (0x005127a0), 32-bit (0x00512870) or 16-bit
+// (0x00512940) header for `bits`, name it `path` and write it.
+int UnknownFunction512720(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor);
+void UnknownFunction5127a0(UnknownTgaFile* file, void* bits, int width, int height);
+int UnknownFunction5127f0(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor);
+void UnknownFunction512870(UnknownTgaFile* file, void* bits, int width, int height);
+int UnknownFunction5128c0(void* bits, int width, int height, unsigned int stride, int greenMask, const char* path,
+                          int descriptor);
+void UnknownFunction512940(UnknownTgaFile* file, void* bits, int width, int height);

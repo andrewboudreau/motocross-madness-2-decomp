@@ -6,7 +6,7 @@ call them. Names are provisional. File formats are the texture loader's
 codes 1..34; pixel formats are the engine's 8 (palettised), 0x22b (555),
 0x235 (565), 0x378 (24-bit), 0x613 (1555), 0x115c (4444) and 0x22b8 (8888).
 
-Exact (8 calibration cases):
+Exact (14 calibration cases):
 
 | VA | Size | Role | Source shape |
 |---|---:|---|---|
@@ -18,6 +18,12 @@ Exact (8 calibration cases):
 | `0x005119c0` | 266 | fills a DirectDraw pixel format | switch with fallthroughs |
 | `0x00511ad0` | 30 | whether a pixel format is 4444 or 8888 | inverted first test |
 | `0x00511af0` | 75 | the pixel format of a DirectDraw pixel format | uninitialised local |
+| `0x00512720` | 113 | writes 24-bit pixels to a TGA file | header on the stack |
+| `0x005127a0` | 67 | fills a 24-bit TGA header | field stores |
+| `0x005127f0` | 113 | writes 32-bit pixels to a TGA file | header on the stack |
+| `0x00512870` | 67 | fills a 32-bit TGA header | field stores |
+| `0x005128c0` | 119 | writes 16-bit pixels to a TGA file | header on the stack |
+| `0x00512940` | 67 | fills a 16-bit TGA header | field stores |
 
 Retail details the source keeps:
 
@@ -34,6 +40,18 @@ Retail details the source keeps:
   parameter slot as retail does. Formats other than 16, 24 and 32 bits
   become 8.
 
-Not reconstructed: the readers and writers from `0x00511b40` to
-`0x005128c0`, among them the TGA writer `0x005127f0` (declared in
-`Tgafile.h`).
+The writers build an `UnknownTgaFile` on the stack (the TGA header fields
+unpacked, the pixels at +0x14 and the name at +0x1c), copy the path in and
+return the result of `0x00512990`. The value PCTextureMap's level dump
+passes as 32 is the header's descriptor byte (top-left origin).
+
+Near miss (`samples/render/TgafileNearMisses.cpp`): the writer
+`0x00512990` (1074 bytes). It opens the file "wb", writes the header field
+by field and the pixels: 24-bit one by one with red and blue swapped,
+32-bit swapped in place then in blocks, 16-bit rows as they are for 555
+(green mask 0x3e0) or pixel by pixel converted from 565. The 16-bit
+failures return without closing the file. The frame and branches line up;
+the loop variables land in different dead argument slots.
+
+Not reconstructed: the readers from `0x00511b40` to `0x005125c0` and
+`0x00512dd0`, which frees a file's pixels (line 865) and +0x120.

@@ -284,3 +284,79 @@ int UnknownFunction511af0(UnknownPixelFormat* pixelFormat) {
     }
     return format;
 }
+
+// 0x00512720: writes 24-bit `bits` to the TGA file `path`.
+int UnknownFunction512720(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
+    UnknownTgaFile file;
+    UnknownFunction5127a0(&file, bits, width, height);
+    strcpy(file.name, path);
+    return UnknownFunction512990(&file, stride, 0, descriptor);
+}
+
+// 0x005127a0: fills a 24-bit uncompressed true-colour header for `bits`.
+void UnknownFunction5127a0(UnknownTgaFile* file, void* bits, int width, int height) {
+    file->idLength = 0;
+    file->colorMapType = 0;
+    file->imageType = 2;
+    file->colorMapStart = 0;
+    file->colorMapLength = 0;
+    file->colorMapDepth = 0;
+    file->x = 0;
+    file->y = 0;
+    file->width = width;
+    file->height = height;
+    file->bitsPerPixel = 24;
+    file->descriptor = 0;
+    file->bits = bits;
+}
+
+// 0x005127f0: writes 32-bit `bits` to the TGA file `path`.
+int UnknownFunction5127f0(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
+    UnknownTgaFile file;
+    UnknownFunction512870(&file, bits, width, height);
+    strcpy(file.name, path);
+    return UnknownFunction512990(&file, stride, 0, descriptor);
+}
+
+// 0x00512870: fills a 32-bit uncompressed true-colour header for `bits`.
+void UnknownFunction512870(UnknownTgaFile* file, void* bits, int width, int height) {
+    file->idLength = 0;
+    file->colorMapType = 0;
+    file->imageType = 2;
+    file->colorMapStart = 0;
+    file->colorMapLength = 0;
+    file->colorMapDepth = 0;
+    file->x = 0;
+    file->y = 0;
+    file->width = width;
+    file->height = height;
+    file->bitsPerPixel = 32;
+    file->descriptor = 0;
+    file->bits = bits;
+}
+
+// 0x005128c0: writes 16-bit `bits` to the TGA file `path`.
+int UnknownFunction5128c0(void* bits, int width, int height, unsigned int stride, int greenMask, const char* path,
+                          int descriptor) {
+    UnknownTgaFile file;
+    UnknownFunction512940(&file, bits, width, height);
+    strcpy(file.name, path);
+    return UnknownFunction512990(&file, stride, greenMask, descriptor);
+}
+
+// 0x00512940: fills a 16-bit uncompressed true-colour header for `bits`.
+void UnknownFunction512940(UnknownTgaFile* file, void* bits, int width, int height) {
+    file->idLength = 0;
+    file->colorMapType = 0;
+    file->imageType = 2;
+    file->colorMapStart = 0;
+    file->colorMapLength = 0;
+    file->colorMapDepth = 0;
+    file->x = 0;
+    file->y = 0;
+    file->width = width;
+    file->height = height;
+    file->bitsPerPixel = 16;
+    file->descriptor = 0;
+    file->bits = bits;
+}

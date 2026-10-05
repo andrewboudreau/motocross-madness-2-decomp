@@ -116,6 +116,21 @@ struct UnknownPixelFormat {
     unsigned long masks[4];
 };
 
+// 32-bit RGBA (format 0x22b8) and 24-bit RGB (0x378) pixels, red first in
+// memory (Pixtrans.cpp takes them by value; Tgafile.cpp swaps red and blue).
+struct UnknownPixel32 {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+    unsigned char alpha;
+};
+
+struct UnknownPixel24 {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+};
+
 // 0x7c-byte surface description (the DDSURFACEDESC2 layout).
 struct UnknownSurfaceDesc {
     unsigned long size;
