@@ -78,6 +78,9 @@ constructor,
 call bound;
 see [FollowCamera](FOLLOW_CAMERA.md#camera-and-pccamera).
 
+Every function of `Lzw.cpp` (11 bodies, `0x004a01d0..0x004a05da`) matches
+strictly; see [LZW](LZW.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
