@@ -2,8 +2,8 @@
 
 The literal `__FILE__` `D:\aardvark\VC\krusty2\TrackRecord.cpp`
 (`0x0057536c`) is referenced by `0x0051ef30`, `0x0051ff40` and
-`0x0051ffe0`. Canonical source is `src/reconstructed/TrackRecord.h` /
-`TrackRecord.cpp`; every name is provisional.
+`0x0051ffe0`. Canonical source is `src/reconstructed/TrackRecord.h`,
+`TrackRecordDlg.h` and `TrackRecord.cpp`; every name is provisional.
 
 The TU covers at least `0x0051ee90..0x00520692`. ChatOverlay's code ends
 before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
@@ -34,10 +34,22 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
 - `0x0051f0b0` and `0x0051f260` index six 0x100-byte directory names at
   TrackGameMode+0xa0. `0x0051f2c0` passes TrackGameMode+0x6a0 as a string
   pointer, although `EventManager.cpp` uses it as an int.
+- TrackRecordDlg fields: the current series (+0x7f58), the selected tab
+  (+0x7f5c), and a realloc'd array of 8-byte track rows (+0x7f60, count
+  +0x7f64). Each row is a strdup'd file name and an int. The event argument
+  of `0x0051fe80`, `0x00520390`, `0x00520480` and `0x005204e0` carries the
+  dialog pointer at +0x0c.
+- `UIDialog::UnknownFunction46ebf0` looks a control up by name. GameUi.h
+  already declares the same address as `UnknownGameUiPage::FindControl`.
+  The new declaration was added because TrackRecordDlg derives from
+  UIDialog, so the two names are one function, not proven types.
+- `0x00520390` calls control slot 66 (`+0x108`) on the track list. Vtable
+  `0x00553100` (67 slots, probably UIListBox) is the nearest fit, so the
+  cast type `UnknownTrackRecordListBox` stays provisional.
 
 ## Status
 
-The following 12 functions are exact under `vc6_o2_mt`, with every
+The following 18 functions are exact under `vc6_o2_mt`, with every
 relocation bound:
 
 | VA | Bytes | Body |
@@ -54,10 +66,18 @@ relocation bound:
 | `0x0051f260` | 90 | writes to a TrackGameMode directory |
 | `0x0051f2c0` | 253 | reads the table if the directory scan finds it |
 | `0x0051f3c0` | 564 | enters a racer and re-sorts |
+| `0x0051fc40` | 567 | tab captions for the series |
+| `0x0051fe80` | 188 | selects the series tab |
+| `0x0051ff40` | 149 | frees the track rows |
+| `0x00520390` | 240 | shows a series |
+| `0x00520480` | 93 | adds a score row |
+| `0x005204e0` | 437 | shows one track's scores |
 
-The TrackRecordDlg methods have not been attempted yet: `0x0051f600`,
-`0x0051fc40`, `0x0051fe80`, `0x0051ff40`, `0x0051ffe0`, `0x00520390`,
-`0x00520480` and `0x005204e0`.
+`0x0051ffe0` (932 bytes, lists the tracks that have a high-score file) is a
+near miss in `samples/track/TrackNearMisses.cpp`. The candidate is 964
+bytes. Retail cross-jumps its two copies of the digit-suffix branch, and
+VC6 here allocates a different register in the second copy, which blocks
+the merge. `0x0051f600` (slot 29, 1596 bytes) has not been attempted.
 
 ## Source shapes that mattered
 
@@ -70,6 +90,14 @@ The TrackRecordDlg methods have not been attempted yet: `0x0051f600`,
     check swaps case 0's registers.
   - The racer entry must be indexed in every expression. Taking a pointer
     to it changes the address arithmetic.
+- Call order: in `a->Find(...)->Method(args)`, VC6 pushes `args` before it
+  calls `Find`. Storing `Find`'s result in a local first makes it call
+  `Find` first, as `0x00520480` does.
+- `if (!times) f(0x938, ...); else f(0xbc5, ...);` matches `0x005204e0`;
+  the hoisted push of the common arguments is VC6's doing. A ternary
+  argument gives `neg/sbb/and`.
+- `0x0051ffe0`: the frame is 0x350 only with a 260-byte buffer. Declaration
+  order does not change VC6's slot order.
 
 ## Reproduce
 

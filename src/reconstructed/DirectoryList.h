@@ -11,6 +11,8 @@ public:
     void UnknownFunction44a1d0(const char* directory);     // 0x0044a1d0
     void UnknownFunction44a220(const char* pattern, int value); // 0x0044a220
     int UnknownFunction44a910(const char* name);           // 0x0044a910
+    int UnknownFunction44a4c0(char* name);                 // 0x0044a4c0: next listed name
+    int UnknownFunction44a550(char* name);                 // 0x0044a550: first listed name
 
     unsigned char field_0x04[0x21c - 4];
 };

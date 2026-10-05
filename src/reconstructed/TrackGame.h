@@ -44,6 +44,7 @@ public:
     int UnknownFunction523c90(); // 0x00523c90 (TrackGame slot 1)
     ~TrackGameMode();            // 0x005225f0
     int UnknownFunction524100(); // 0x00524100
+    void UnknownFunction5240e0(int series); // 0x005240e0 (TrackRecord.cpp 0x00520390)
     void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
     void UnknownFunction522680();             // 0x00522680 (TrackGame slot 4)
@@ -116,6 +117,8 @@ public:
     void UnknownFunction4e9e30(char* name, const char* kind, int value); // 0x004e9e30
     // 0x004ea390: writes the scene name for `field_0x24c` into `name`.
     void UnknownFunction4ea390(char* name, char* scene, int value);
+    // 0x004ea010 (TrackRecord.cpp 0x0051ffe0): a track's display name.
+    void UnknownFunction4ea010(char* out, char* name, int index, const char* kind, int a, int b);
 
     unsigned char field_0x00[0x24c];
     char field_0x24c[0x40];                   // length not established
@@ -243,7 +246,9 @@ public:
     float field_0x2938;
     float field_0x293c;
     float field_0x2940;
-    unsigned char field_0x2944[0x2c68 - 0x2944];
+    unsigned char field_0x2944[0x2b58 - 0x2944];
+    DirectoryList* field_0x2b58;               // scanned by TrackRecord.cpp 0x00520390
+    unsigned char field_0x2b5c[0x2c68 - 0x2b5c];
     int field_0x2c68;                          // mode 4 saves a ghost (EventManager 0x0045cdc0)
     unsigned char field_0x2c6c[0x2d70 - 0x2c6c];
     int field_0x2d70;    // EventManager 0x0045e600 compares it with 2

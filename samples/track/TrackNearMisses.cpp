@@ -35,8 +35,24 @@
 // plain floats is much further off, because VC6 then loads the segment
 // operands before p; the inline helper with a by-value TrackVec3 and
 // pointers to the edge points fixes that.
+//
+// TrackRecordDlg::UnknownFunction51ffe0 (TrackRecord.cpp, 0x0051ffe0, 932
+// bytes): the candidate is 964 bytes. The frame (0x350, so one buffer is
+// 260 bytes), stack slots, calls and the body of the loop agree. Retail
+// cross-jumps the two copies of the digit-suffix branch: the first-file copy
+// jumps into the later copy's strncpy call, and the later copy then jumps
+// back to the first copy's `track[n] = 0`. VC6 here keeps n in esi in the
+// later copy (edi in retail), which needs a reload of `directory` and blocks
+// the merge, so 32 bytes stay duplicated. A separate or block-scoped n, the
+// branches swapped, `continue`, an `ok` variable and track[n] = 0 in both
+// first-file branches do not move it; a goto into the first copy rearranges
+// the prologue (edi pushed late) and is further off.
+#include <stdio.h>
+#include <string.h>
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/Track.h"
+#include "../../src/reconstructed/TrackGame.h"
+#include "../../src/reconstructed/TrackRecordDlg.h"
 #include "../../src/krusty2/math/FastMath.h"
 
 // 0x00518130: the unit direction of a segment.
@@ -264,4 +280,80 @@ int Track::UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegmen
     if (UnknownEdgeCrosses(p, (TrackVec3*)&next->field_0x18, (TrackVec3*)&next->field_0x00))
         inside = 1 - inside;
     return inside;
+}
+
+// 0x0051ffe0: lists the tracks with a high-score file. For series 1 and 5
+// the name's last character is a digit that selects the variant.
+void TrackRecordDlg::UnknownFunction51ffe0(UnknownGameUiControl* list, DirectoryList* directory, int series)
+{
+    char found[128];
+    char track[128];
+    char display[64];
+    char path[256];
+    char pattern[260];
+    int digit = 0;
+    int count = 0;
+    int prefixed;
+    int n;
+    if (series == 5 || series == 1)
+        prefixed = 1;
+    else
+        prefixed = 0;
+    UnknownFunction51ff40();
+    directory->UnknownFunction44a1d0((const char*)g_UnknownGlobal56e26c->mode.field_0x6a0);
+    sprintf(pattern, "*%s", g_UnknownGlobal56e26c->field_0x3400->field_0x04[g_UnknownGlobal56e26c->field_0x3400->field_0x00]);
+    directory->UnknownFunction44a220(pattern, 1);
+    directory->UnknownVirtualSlot1();
+    if (directory->UnknownFunction44a550(found)) {
+        if (prefixed) {
+            n = strlen(found) - 1;
+            strncpy(track, found, n);
+            digit = found[n] - '0';
+        } else {
+            int length = strlen(found);
+            n = length > 127 ? 127 : length;
+            strncpy(track, found, n);
+        }
+        track[n] = 0;
+        for (;;) {
+            int directoryIndex = g_UnknownGlobal56e26c->mode.UnknownFunction524100();
+            sprintf(path, "%s\\%s%s", (const char*)g_UnknownGlobal56e26c->mode.field_0x6a0, found,
+                    g_UnknownGlobal56e26c->field_0x3400->field_0x04[g_UnknownGlobal56e26c->field_0x3400->field_0x00]);
+            FILE* file = fopen(path, "r");
+            if (file) {
+                fread(&directoryIndex, 4, 1, file);
+                fclose(file);
+            }
+            g_UnknownGlobal56e26c->mode.UnknownFunction523a60((int)g_UnknownGlobal56e26c->mode.field_0xa0[directoryIndex],
+                                                              track, "env", pattern);
+            g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9b80(pattern);
+            g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea010(display, track, digit, "scn", 0, 0);
+            list->UnknownFunction476d80(display, field_0x7f64, 0);
+            count++;
+            field_0x7f60 = (UnknownTrackRecordRow**)DebugRealloc(field_0x7f60, (field_0x7f64 + 1) * 4, __FILE__, 534);
+            field_0x7f60[field_0x7f64] = new(__FILE__, 535) UnknownTrackRecordRow;
+            field_0x7f60[field_0x7f64]->field_0x00 = strdup(found);
+            field_0x7f60[field_0x7f64]->field_0x04 = 0;
+            field_0x7f64++;
+            if (!directory->UnknownFunction44a4c0(found))
+                break;
+            if (prefixed) {
+                n = strlen(found) - 1;
+                strncpy(track, found, n);
+                digit = found[n] - '0';
+                track[n] = 0;
+            } else {
+                digit = 0;
+                strcpy(track, found);
+            }
+        }
+    }
+    list->UnknownFunction477900(1);
+    if (count == 0) {
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x142e, path, 128);
+        list->UnknownFunction476d80(path, 0, 0);
+        list->UnknownFunction477bb0(0);
+    } else {
+        list->UnknownFunction477bb0(1);
+    }
 }
