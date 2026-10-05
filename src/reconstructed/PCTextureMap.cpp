@@ -349,7 +349,7 @@ UnknownSurfaceInterface* PCTextureMap::UnknownFunction4c83a0(int width) {
     return 0;
 }
 
-// 0x004c8430: fills every mip level.
+// 0x004c8430: dumps every mip level (0x004c84e0).
 int PCTextureMap::UnknownVirtualSlot20() {
     if (field_0x70) {
         UnknownFunction4c84e0(field_0x70, 0);
@@ -373,13 +373,13 @@ int PCTextureMap::UnknownVirtualSlot20() {
     return 1;
 }
 
-// 0x004c84e0
-int PCTextureMap::UnknownFunction4c84e0(UnknownSurfaceInterface* surface, int value) {
+// 0x004c84e0: locks a level and writes it to a file (0x004c8550).
+int PCTextureMap::UnknownFunction4c84e0(UnknownSurfaceInterface* surface, const char* name) {
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     surface->UnknownMethod25(0, &desc, 0x811, 0);
-    UnknownFunction4c8550(&desc, value);
+    UnknownFunction4c8550(&desc, name);
     surface->UnknownMethod32(0);
     return 1;
 }

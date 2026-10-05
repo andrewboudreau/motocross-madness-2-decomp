@@ -71,7 +71,7 @@ Exact (23 calibration cases):
   colour key and records render states 0x29 = 1 and 0x1b = 0 through an
   inline find-or-append helper. Retail compares the format with `0x22b8`
   in the re-upload test (sic);
-- slot 20, which fills every mip level (error line 2084). Loading +0x70
+- slot 20, which dumps every mip level (error line 2084). Loading +0x70
   into a local before the caps memset reproduces retail's store order;
 - `0x004c7e30`, the colour key: a 24-bit colour packed as 555 or 565, or
   looked up in the palette's 555 table (+0x2c, +0x710). The file-local
@@ -85,10 +85,17 @@ Exact (23 calibration cases):
   magenta entry +0x710[0x7c1f]), storing the converted key. Magenta itself
   only sets the key (`0x004c7e30`) except in format 0x22b8. Lock and
   unlock failures share one `return 0` through `goto failed`;
-- `0x004c84e0`, which locks a level (flags 0x811), fills it through
-  `0x004c8550` and unlocks it.
+- `0x004c84e0`, which locks a level (flags 0x811), writes it to a file
+  through `0x004c8550` and unlocks it. Slot 20 calls it on every level with
+  no name, so slot 20 dumps the mip chain.
 
 Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
+- `0x004c8550` (391 of 393 bytes), the level dump: the first free
+  `C:\temp\<name><nnn>.bmp` (8-bit, through bmpfile.cpp's `0x004245f0`
+  and `0x00424380`) or `.tga` (converted to 32-bit by Pixtrans `0x004d1d20`
+  into a `DebugMalloc` buffer, lines 2149/2154, and written by Tgafile.cpp's
+  `0x005127f0`). `name` defaults to "tex". Only the buffer size's
+  multiplication operand order differs;
 - slot 9 (117 of 385 bytes), the upload: BltFast down the mip chain with
   partial texture blits or a positive mode, otherwise the device's Load.
   The frame matches with separate `next` surfaces. Retail keeps `this` in
@@ -110,8 +117,7 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   append helper. Only the non-mip fallback chain differs: VC6 cross-jumps
   its identical call tails into the first case, retail into the last.
 
-Not reconstructed: `0x004c7b40`,
-`0x004c8550` and the error reporter `0x004c86e0`.
+Not reconstructed: `0x004c7b40` and the error reporter `0x004c86e0`.
 
 ## TextureMap
 

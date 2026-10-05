@@ -3355,7 +3355,7 @@ CASES = [
         'name': 'PCTextureMap fill level 0x4c84e0',
         'bindings': 'src/reconstructed/PCTextureMap.bindings.json',
         'source': 'src/reconstructed/PCTextureMap.cpp',
-        'symbol': '?UnknownFunction4c84e0@PCTextureMap@@QAEHPAUUnknownSurfaceInterface@@H@Z',
+        'symbol': '?UnknownFunction4c84e0@PCTextureMap@@QAEHPAUUnknownSurfaceInterface@@PBD@Z',
         'target_va': '0x004c84e0',
         'target_size': 101,
         'reason': 'lock 0x811, fill, unlock',

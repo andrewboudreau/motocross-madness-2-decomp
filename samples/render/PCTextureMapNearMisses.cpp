@@ -1,6 +1,12 @@
 // Near-miss PCTextureMap candidates, kept out of src/reconstructed until
 // they match. See docs/PCTEXTUREMAP.md.
 //
+// PCTextureMap::UnknownFunction4c8550 (0x004c8550, 393 bytes): the level
+// dump. Everything but the 32-bit buffer size matches (391 of 393 bytes):
+// retail loads the height and multiplies by the width, VC6 here the other
+// way round in every operand order, cast, `<< 2` and sizeof form tried; a
+// separate size local or swapped branches are much worse.
+//
 // PCTextureMap::UnknownVirtualSlot9 (0x004c7640, 385 bytes): the upload.
 // With separate `next` surfaces VC6 packs them into the dead parameter
 // slots as retail does (the frame matches), but retail keeps `this` in ebp
@@ -24,6 +30,7 @@
 // if/else, nested negated ifs, switch, goto-to-label, return/goto mixes,
 // aggregate initializers and an inline helper all keep VC6's order.
 
+#include <stdio.h>
 #include <string.h>
 
 #include "../../src/reconstructed/DebugAlloc.h"
@@ -31,6 +38,41 @@
 #include "../../src/reconstructed/TrackGame.h"
 
 #include "../../src/reconstructed/ManagedTexture.h"
+
+// 0x004c8550: writes a locked level to C:\temp\<name><nnn>.bmp (8-bit) or
+// .tga (anything else, converted to 32-bit first), taking the first number
+// with no existing file. `name` defaults to "tex".
+void PCTextureMap::UnknownFunction4c8550(UnknownSurfaceDesc* desc, const char* name) {
+    char path[260];
+    UnknownBitmapFile bitmap;
+    const char* extension = desc->pixelFormat.bitCount == 8 ? ".bmp" : ".tga";
+    int number = 0;
+    if (!name)
+        name = "tex";
+    FILE* file = 0;
+    do {
+        if (file)
+            fclose(file);
+        sprintf(path, "C:\\temp\\%s%03d%s", name, number, extension);
+        file = fopen(path, "r");
+        number++;
+    } while (file);
+    if (desc->pixelFormat.bitCount == 8) {
+        UnknownFunction4245f0(&bitmap, desc->surface, field_0x2c->field_0x010, desc->width, desc->height);
+        int length = strlen(path);
+        int count = length > 0x7f ? 0x7f : length;
+        strncpy(bitmap.name, path, count);
+        bitmap.name[count] = 0;
+        UnknownFunction424380(&bitmap);
+    } else {
+        void* pixels = DebugMalloc(desc->width * desc->height * sizeof(unsigned int), __FILE__, 2149);
+        UnknownFunction4d1d20(pixels, desc->surface, desc->width, desc->height, desc->width,
+                              desc->pitch / UnknownFunction511970(field_0x20), 0x22b8, field_0x20, 0, 0, 0x80,
+                              0xff00ff);
+        UnknownFunction5127f0(pixels, desc->width, desc->height, 0, path, 32);
+        operator delete(pixels, __FILE__, 2154);
+    }
+}
 
 // 0x004c7640: with partial texture blits (Display+0x5bc) or a positive
 // `mode`, copies `rect` (or the whole texture) down the mip chain with
@@ -172,7 +214,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
             desc.size = sizeof(desc);
             desc.height = height;
             desc.width = width;
-            memcpy(desc.pixelFormat, pixelFormat, sizeof(pixelFormat));
+            memcpy(&desc.pixelFormat, pixelFormat, sizeof(pixelFormat));
             desc.flags = (~flags & 4) << 10 | 7;
             shared = 0;
             if (flags & 4) {
@@ -259,7 +301,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
             desc.height = height;
             desc.width = width;
             desc.mipMapCount = field_0x24;
-            memcpy(desc.pixelFormat, pixelFormat, sizeof(pixelFormat));
+            memcpy(&desc.pixelFormat, pixelFormat, sizeof(pixelFormat));
             shared = 0;
             desc.flags = 0x21007;
             if (flags & 4) {
