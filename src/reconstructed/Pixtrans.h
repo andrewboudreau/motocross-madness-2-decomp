@@ -42,6 +42,31 @@ int UnknownFunction4d0e40(void* destination, void* source, int width, int height
 // 0x004d0f10: 555 to 24-bit; 555 magenta stays magenta.
 int UnknownFunction4d0f10(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride);
+// 0x004cf2a0: dithers `source` (pixel format `format`) into whichever of
+// the outputs is given: 24-bit, 565, 555 or palette indices (with
+// `palette`).
+int UnknownFunction4cf2a0(void* source, int format, int width, int height, int sourceStride,
+                          int destinationStride, void* output24, void* output565, void* output555,
+                          void* output8, UnknownTexturePalette* palette);
+// 0x004d0900, 0x004d09d0: 24-bit to 565 or 555, dithered when `dither`.
+int UnknownFunction4d0900(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither);
+int UnknownFunction4d09d0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither);
+// 0x004de280, 0x004de290: the 555-to-index and 565-to-index tables.
+unsigned char* UnknownFunction4de280();
+unsigned char* UnknownFunction4de290();
+// 0x004d0aa0, 0x004d0b90, 0x004d0c40: 24-bit, 565 and 555 to palette
+// indices, dithered against `palette` when `dither` and `palette` are set.
+int UnknownFunction4d0aa0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither, UnknownTexturePalette* palette);
+int UnknownFunction4d0b90(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither, UnknownTexturePalette* palette);
+int UnknownFunction4d0c40(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither, UnknownTexturePalette* palette);
+// 0x004d0d40 (hand-written assembly): 555 to indices, eight pixels a step.
+void UnknownFunction4d0d40(void* destination, void* source, int width, int height, int destinationStride,
+                           unsigned char* table);
 // 0x004d0fb0: 555 to 565.
 int UnknownFunction4d0fb0(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride);

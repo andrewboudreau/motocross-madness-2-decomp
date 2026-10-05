@@ -5,11 +5,13 @@ PCVideoCard.cpp's code (literal `0x004d06e9`). PCTextureMap and
 ManagedTextureGroup call them. Strides are in pixels; names are
 provisional.
 
-Exact (23 calibration cases):
+Exact (25 calibration cases):
 
 | VA | Size | Role |
 |---|---:|---|
 | `0x004d0870` | 134 | 4444 to 8888 |
+| `0x004d0900` | 204 | 24-bit to 565, dithered through `0x004cf2a0` when asked |
+| `0x004d09d0` | 204 | 24-bit to 555, dithered through `0x004cf2a0` when asked |
 | `0x004d0e40` | 200 | 555 to 8888; the key becomes opaque magenta |
 | `0x004d0f10` | 156 | 555 to 24-bit; 555 magenta (0x7c1f) stays magenta |
 | `0x004d0fb0` | 114 | 555 to 565 |
@@ -71,7 +73,9 @@ the first level's size (Pixtrans.cpp lines 1329/1350 in the 24-bit one).
 Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004cfaf0`, whose
 plain-copy path's hoisted strides land in different argument slots;
 `0x004d0700` (565 to 8888, keyed; register and slot choice) and
-`0x004d07d0` (1555 to 8888; only the pixel pointer's base offset).
+`0x004d07d0` (1555 to 8888; only the pixel pointer's base offset);
+`0x004d0aa0`/`0x004d0b90` (24-bit/565 to palette indices; only where the
+`palette` argument is loaded).
 
 `0x004d0d40` is hand-written assembly (frame pointer, dead `mov eax, 0`,
 `push ebp` inside the loop) and is out of scope. The 24-bit and 16-bit

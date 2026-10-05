@@ -1,6 +1,12 @@
 // Near-miss Pixtrans.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/PIXTRANS.md.
 //
+// UnknownFunction4d0aa0 (0x004d0aa0, 232 bytes) and UnknownFunction4d0b90
+// (0x004d0b90, 171 bytes): 24-bit and 565 to palette indices. Retail loads
+// both `dither` and `palette` before testing either; VC6 here loads
+// `palette` only after the first test. Comparison and local forms of the
+// condition do not change it; everything else matches.
+//
 // UnknownFunction4d0700 (0x004d0700, 208 bytes): 565 to 8888 with a key.
 // The row pointers and the 0xff constant land in different registers and
 // slots (retail keeps 0xff in dl and both rows in argument slots); about 60
@@ -99,6 +105,50 @@ int UnknownFunction4d07d0(void* destination, void* source, int width, int height
         }
         sourceRow += sourceStride;
         row += destinationStride;
+    }
+    return 1;
+}
+
+// 0x004d0aa0: converts 24-bit to palette indices through the 555 table.
+int UnknownFunction4d0aa0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither, UnknownTexturePalette* palette) {
+    if (dither && palette) {
+        UnknownFunction4cf2a0(source, 0x378, width, height, sourceStride, destinationStride, 0, 0, 0,
+                              destination, palette);
+    } else {
+        UnknownPixel24* sourceRow = (UnknownPixel24*)source;
+        unsigned char* row = (unsigned char*)destination;
+        unsigned char* indices = UnknownFunction4de280();
+        for (int y = 0; y < height; y++) {
+            UnknownPixel24* from = sourceRow;
+            unsigned char* to = row;
+            for (int x = 0; x < width; x++, to++, from++)
+                *to = indices[(unsigned short)((from->red >> 3) << 10 | (from->green >> 3) << 5) | from->blue >> 3];
+            sourceRow += sourceStride;
+            row += destinationStride;
+        }
+    }
+    return 1;
+}
+
+// 0x004d0b90: converts 565 to palette indices through the 565 table.
+int UnknownFunction4d0b90(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither, UnknownTexturePalette* palette) {
+    if (dither && palette) {
+        UnknownFunction4cf2a0(source, 0x235, width, height, sourceStride, destinationStride, 0, 0, 0,
+                              destination, palette);
+    } else {
+        unsigned short* sourceRow = (unsigned short*)source;
+        unsigned char* row = (unsigned char*)destination;
+        unsigned char* indices = UnknownFunction4de290();
+        for (int y = 0; y < height; y++) {
+            unsigned short* from = sourceRow;
+            unsigned char* to = row;
+            for (int x = 0; x < width; x++, to++, from++)
+                *to = indices[*from];
+            sourceRow += sourceStride;
+            row += destinationStride;
+        }
     }
     return 1;
 }

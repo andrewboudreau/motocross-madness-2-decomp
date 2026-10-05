@@ -24,6 +24,48 @@ int UnknownFunction4d0870(void* destination, void* source, int width, int height
     return 1;
 }
 
+// 0x004d0900: converts 24-bit to 565, through the ditherer when asked.
+int UnknownFunction4d0900(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither) {
+    if (dither) {
+        UnknownFunction4cf2a0(source, 0x378, width, height, sourceStride, destinationStride, 0, destination,
+                              0, 0, 0);
+    } else {
+        UnknownPixel24* sourceRow = (UnknownPixel24*)source;
+        unsigned short* row = (unsigned short*)destination;
+        for (int y = 0; y < height; y++) {
+            UnknownPixel24* from = sourceRow;
+            unsigned short* to = row;
+            for (int x = 0; x < width; x++, to++, from++)
+                *to = (from->red >> 3) << 11 | (from->green >> 2) << 5 | from->blue >> 3;
+            sourceRow += sourceStride;
+            row += destinationStride;
+        }
+    }
+    return 1;
+}
+
+// 0x004d09d0: converts 24-bit to 555, through the ditherer when asked.
+int UnknownFunction4d09d0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither) {
+    if (dither) {
+        UnknownFunction4cf2a0(source, 0x378, width, height, sourceStride, destinationStride, 0, 0,
+                              destination, 0, 0);
+    } else {
+        UnknownPixel24* sourceRow = (UnknownPixel24*)source;
+        unsigned short* row = (unsigned short*)destination;
+        for (int y = 0; y < height; y++) {
+            UnknownPixel24* from = sourceRow;
+            unsigned short* to = row;
+            for (int x = 0; x < width; x++, to++, from++)
+                *to = (from->red >> 3) << 10 | (from->green >> 3) << 5 | from->blue >> 3;
+            sourceRow += sourceStride;
+            row += destinationStride;
+        }
+    }
+    return 1;
+}
+
 // 0x004d0e40: converts 555 to 8888; the key colour becomes opaque magenta.
 int UnknownFunction4d0e40(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key) {
