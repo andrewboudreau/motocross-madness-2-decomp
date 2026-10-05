@@ -84,6 +84,8 @@ strictly; see [LZW](LZW.md).
 `Parameterblocks.cpp` matches strictly in 26 of its 27 functions; see
 [PARAMETERBLOCKS](PARAMETERBLOCKS.md).
 
+`Parser.cpp` matches strictly in 13 of its 14 functions; see [PARSER](PARSER.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
