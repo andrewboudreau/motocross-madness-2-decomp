@@ -1,6 +1,7 @@
-# PCAudio.cpp: PCSoundInterface
+# PCAudio.cpp: PCSoundInterface and Sound
 
-`src/reconstructed/PCAudio.cpp` with `SoundInterface.h` and `PCAudio.h`.
+`src/reconstructed/PCAudio.cpp` with `SoundInterface.h` and `PCAudio.h`; the
+file runs from `0x004bb630` to `0x004bed40`.
 Literal evidence: `D:\aardvark\VC\krusty2\PCAudio.cpp` (`0x0056fa28`, the
 `__FILE__` of the allocations at lines 2367, 2574 and 2575), the option names
 `AllowSoundHardware`, `AllowSoundEnumeration` and `AllowEAXExtension`, the
@@ -49,5 +50,47 @@ Near miss (`samples/audio/PCAudioNearMisses.cpp`): `0x004be910`, which sets
 the primary format (108 of 158 bytes; only the zeroing stores are scheduled
 differently against the argument loads).
 
-Not reconstructed: the rest of PCAudio.cpp (`Sound` and the helper's other
-methods, `0x004bb810`–`0x004bde40` and `0x004bdef0`–`0x004be280`).
+## Sound and its helpers
+
+`Sound : BaseObject` (0x1f8 bytes) wraps one DirectSound buffer: +0x0c the
+buffer and +0x10 its 3D interface (IID_IDirectSound3DBuffer bytes at
+`0x00556ca0`), +0x14 its property set (IID_IKsPropertySet, `0x00556ce0`),
++0x18/+0x1c the buffer a streamed sound is being loaded into, +0x20/+0x24
+duplicate buffers, +0x28 the sound a duplicate shares, a fade (+0x2c..+0x38),
+the notifier (+0x3c), the stream (+0x40), a critical section (+0x48), the
+name (+0x60), the time last played (+0x164), the 44-byte RIFF header
+(+0x16a, so the PCM format sits at +0x17e), the buffer size, frequency,
+volume and pan (+0x198..+0x1a4), the cached DS3DBUFFER (+0x1a8, 0x40 bytes)
+and flag words (+0x1e8..+0x1f5). The 0x1c-byte notifier refills a streamed
+buffer's halves from a thread woken through IDirectSoundNotify
+(`0x00556cd0`). PCSoundInterface's +0x46c helper is a sound memory manager:
+its thread creates and fills queued streamed sounds, evicting the least
+recently played idle ones to stay within the budget.
+
+Exact (39 more calibration cases): the notifier's thread, constructor,
+start and destructor (`0x004bb630`–`0x004bb810`); Sound's constructor,
+destructor, play, settings, control flags, property set, stop, playing test,
+positions, restore, pause, fade, release, lock/unlock, buffer creation and
+duplication and the 3D setters (`0x004bba10`–`0x004bdb60`); the qsort
+comparison `0x004bdbd0`; and the manager's start, queue, record, eviction
+and unload (`0x004bdef0`–`0x004be220`).
+
+Source shapes:
+
+- `SoundSystem()` is a macro for `(PCSoundInterface*)Game->field_0x04`; as
+  an inline function VC6 allocates the two loads to other registers.
+- `goto failed` gives the shared failure exit of play, stop and the 3D
+  buffer query.
+- `ContainerList::Init` returns whether it allocated: the manager's start
+  returns the second list's result from the fresh pointer, not a reload.
+- The notifier thread dispatches on the wait result with a `switch`.
+- In the buffer creator the flags are or-ed before the algorithm GUID is
+  copied.
+
+Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there): the
+frequency, volume and pan setters, the streamed buffer creator `0x004bd4b0`,
+`0x004bc4c0`, `0x004bc320`, `0x004bd0c0`, the factory `0x004bb890` and the
+manager's thread `0x004bdc00`.
+
+Not reconstructed: the WAV loader `0x004bbef0`, `0x004bc6b0` and the
+streaming copy `0x004bd260`.

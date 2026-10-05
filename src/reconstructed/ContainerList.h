@@ -10,8 +10,9 @@
 //   0x005109c0  default constructor (shared by every instantiation)
 //   0x00402040  destructor
 //   0x005109e0  Reserve (line 71)
-//   Init is inlined into its callers (line 59); Get, Add (with Reserve) and
-//   Remove are inlined into JoystickDevice's binding functions.
+//   Init is inlined into its callers (line 59) and returns whether it
+//   allocated (PCAudio.cpp 0x004bdef0 returns that value); Get, Add (with
+//   Reserve) and Remove are inlined into JoystickDevice's binding functions.
 template <class T>
 class ContainerList {
 public:
@@ -27,11 +28,13 @@ public:
         delete m_data;
     }
 
-    void Init(int capacity, int growBy) {
+    // Whether the storage was allocated.
+    int Init(int capacity, int growBy) {
         m_data = new(__FILE__, 59) T[capacity];
         m_growBy = growBy;
         m_capacity = capacity;
         m_allocated = 1;
+        return m_data != 0;
     }
 
     int Reserve(int capacity) {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ContainerList.h"
-#include "GameObject.h"
 #include "Guid.h"
 
 // RTTI: SoundInterface (root; its only slot is the destructor) and
@@ -39,7 +38,7 @@ struct UnknownDirectSound {
     virtual long __stdcall CreateSoundBuffer(const UnknownSoundBufferDesc* desc, UnknownSoundBuffer** buffer,
                                              void* outer);
     virtual long __stdcall GetCaps(UnknownSoundCaps* caps);
-    virtual long __stdcall DuplicateSoundBuffer();
+    virtual long __stdcall DuplicateSoundBuffer(UnknownSoundBuffer* original, UnknownSoundBuffer** duplicate);
     virtual long __stdcall SetCooperativeLevel(void* window, unsigned long level);
 };
 
@@ -48,18 +47,24 @@ struct UnknownSoundBuffer {
     virtual unsigned long __stdcall AddRef();
     virtual unsigned long __stdcall Release();
     virtual long __stdcall GetCaps();
-    virtual long __stdcall GetCurrentPosition();
+    virtual long __stdcall GetCurrentPosition(unsigned long* play, unsigned long* write);
     virtual long __stdcall GetFormat();
     virtual long __stdcall GetVolume(long* volume);
     virtual long __stdcall GetPan();
     virtual long __stdcall GetFrequency();
-    virtual long __stdcall GetStatus();
+    virtual long __stdcall GetStatus(unsigned long* status);
     virtual long __stdcall Initialize();
-    virtual long __stdcall Lock();
-    virtual long __stdcall Play();
-    virtual long __stdcall SetCurrentPosition();
+    virtual long __stdcall Lock(unsigned long offset, unsigned long bytes, void** first, unsigned long* firstBytes,
+                                void** second, unsigned long* secondBytes, unsigned long flags);
+    virtual long __stdcall Play(unsigned long reserved, unsigned long priority, unsigned long flags);
+    virtual long __stdcall SetCurrentPosition(unsigned long position);
     virtual long __stdcall SetFormat(const struct UnknownWaveFormat* format);
     virtual long __stdcall SetVolume(long volume);
+    virtual long __stdcall SetPan(long pan);
+    virtual long __stdcall SetFrequency(unsigned long frequency);
+    virtual long __stdcall Stop();
+    virtual long __stdcall Unlock(void* first, unsigned long firstBytes, void* second, unsigned long secondBytes);
+    virtual long __stdcall Restore();
 };
 
 struct UnknownSoundListener {
@@ -156,36 +161,8 @@ struct UnknownSoundDevice {
     UnknownSoundCaps caps;
 };
 
-// RTTI: SoundGroup : ... GameObject (vtable 0x00550500). Only the
-// constructor PCSoundInterface uses is declared.
-class SoundGroup : public GameObject {
-public:
-    explicit SoundGroup(int flags); // 0x00401a30
-
-    unsigned char field_0x2c[0x48 - 0x2c];
-};
-
-// RTTI: Sound : BaseObject (vtable 0x00555d88), 0x1f8 bytes; its methods
-// are in PCAudio.cpp before PCSoundInterface. Only what PCSoundInterface
-// calls is declared.
-class Sound : public BaseObject {
-public:
-    Sound(SoundGroup* group, int flags); // 0x004bba10
-    // 0x004bd540: creates the sound's buffer (PCSoundInterface passes a
-    // 1 KB, 11025 Hz, 16-bit description).
-    int UnknownFunction4bd540(void* field, int bytes, int rate, int bits, int channels, int a, int b, int c,
-                              int d, int e);
-    // 0x004bc5f0 / 0x004bc640: property-set queries and sets on the sound's
-    // buffer.
-    int UnknownFunction4bc5f0(const UnknownGuid* set, unsigned long id, unsigned long support);
-    int UnknownFunction4bc640(const UnknownGuid* set, unsigned long id, void* instance,
-                              unsigned long instanceSize, void* data, unsigned long dataSize);
-
-    SoundGroup* field_0x08;
-    unsigned char field_0x0c[0x1f8 - 0xc];
-};
-
 // Defined in PCAudio.h.
+class SoundGroup;
 class UnknownPCAudioObject;
 
 class PCSoundInterface : public SoundInterface {
