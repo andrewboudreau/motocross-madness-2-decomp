@@ -4,11 +4,11 @@ Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 Results use VC6 SP3 natively on Windows. The full gate and profile matrix were
 repeated on 2026-10-02 under Linux/wibo; the default-profile calibration
-was rerun on 2026-10-05 (631 cases). A complete linked game remains a
+was rerun on 2026-10-05 (655 cases). A complete linked game remains a
 separate, unverified gate.
 
-The VC6 gate currently checks byte-exact functions from 49 handwritten C++
-candidate files: 42 of the 43 files in `src/reconstructed/` (all but
+The VC6 gate currently checks byte-exact functions from 50 handwritten C++
+candidate files: 43 of the 44 files in `src/reconstructed/` (all but
 `TerrainSupport.cpp`) and seven focused probes in `samples/`. This is a count of source files represented by at least one
 checked function, not a claim that complete object files or a linked game match.
 
@@ -16,7 +16,7 @@ checked function, not a claim that complete object files or a linked game match.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 631/631 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 655/655 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
@@ -89,6 +89,9 @@ strictly; see [LZW](LZW.md).
 Track.cpp (tokenizer, node/segment walks, lap-time formatting): see [Track](TRACK.md).
 
 TrackRecord.cpp (the high-score table): see [TrackRecord](TRACKRECORD.md).
+
+PCAudio.cpp matches strictly in 24 functions (PCSoundInterface and its
+helpers); see [PCAudio](PCAUDIO.md).
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
