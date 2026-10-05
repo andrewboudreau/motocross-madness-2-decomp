@@ -14,7 +14,7 @@ at +0x74. An object at +0x7c is destroyed through vfwdeco.cpp's
 
 ## Status
 
-Exact (21 calibration cases):
+Exact (22 calibration cases):
 - the constructor `0x004c5f00` (TextureMap's `0x0050a4e0`, then clears
   +0x70..+0x7c);
 - the scalar deleting destructor `0x004c5f30` and the destructor
@@ -73,13 +73,14 @@ Exact (21 calibration cases):
   in the re-upload test (sic);
 - slot 20, which fills every mip level (error line 2084). Loading +0x70
   into a local before the caps memset reproduces retail's store order;
+- `0x004c7e30`, the colour key: a 24-bit colour packed as 555 or 565, or
+  looked up in the palette's 555 table (+0x2c, +0x710). Each component is
+  an `unsigned short`, as in a pixel word; without the casts VC6 factors
+  the common `>> 3` out of the `|` expression;
 - `0x004c84e0`, which locks a level (flags 0x811), fills it through
   `0x004c8550` and unlocks it.
 
 Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
-- `0x004c7e30`, the colour key: a 24-bit colour packed as 555 or 565, or
-  looked up in the palette's 555 table (+0x2c, +0x710). VC6 factors the
-  common shift out of every `|` form tried;
 - slot 9 (117 of 385 bytes), the upload: BltFast down the mip chain with
   partial texture blits or a positive mode, otherwise the device's Load.
   The frame matches with separate `next` surfaces. Retail keeps `this` in
@@ -101,7 +102,7 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   append helper. Only the non-mip fallback chain differs: VC6 cross-jumps
   its identical call tails into the first case, retail into the last.
 
-Not reconstructed: `0x004c7b40`, `0x004c7e30`, `0x004c7ef0`,
+Not reconstructed: `0x004c7b40`, `0x004c7ef0`,
 `0x004c8550` and the error reporter `0x004c86e0`.
 
 ## TextureMap

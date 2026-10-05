@@ -4,7 +4,7 @@ Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 Results use VC6 SP3 natively on Windows. The full gate and profile matrix were
 repeated on 2026-10-02 under Linux/wibo; the default-profile calibration
-was rerun on 2026-10-03 (501 cases). A complete linked game remains a
+was rerun on 2026-10-05 (502 cases). A complete linked game remains a
 separate, unverified gate.
 
 The VC6 gate currently checks byte-exact functions from 42 handwritten C++
@@ -16,7 +16,7 @@ checked function, not a claim that complete object files or a linked game match.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 501/501 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 502/502 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
@@ -149,9 +149,6 @@ Subject to the open-PR check, prefer:
    handling.
 3. Event progress callback `0x0045cb20` (63/67 bytes): isolate the two-register
    swap without moving provisional GUI types into shared headers.
-4. `PCTextureMap` colour-key helper `0x004c7e30`: preserve all three 16-bit format
-   paths and test source expressions that prevent VC6 from factoring the common
-   shift.
 
 For each body, first confirm its VA/extent and direct bindings against the current
 retail image, keep experiments in the existing `samples/` near-miss file, and

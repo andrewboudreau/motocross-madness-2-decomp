@@ -4072,6 +4072,15 @@ CASES = [
         'reason': 'forwarding call',
     },
     {
+        'name': 'PCTextureMap colour key 0x4c7e30',
+        'bindings': 'src/reconstructed/PCTextureMap.bindings.json',
+        'source': 'src/reconstructed/PCTextureMap.cpp',
+        'symbol': '?UnknownFunction4c7e30@PCTextureMap@@QAEXI@Z',
+        'target_va': '0x004c7e30',
+        'target_size': 189,
+        'reason': 'unsigned short components keep the per-term shifts',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

@@ -1,12 +1,6 @@
 // Near-miss PCTextureMap candidates, kept out of src/reconstructed until
 // they match. See docs/PCTEXTUREMAP.md.
 //
-// PCTextureMap::UnknownFunction4c7e30 (0x004c7e30, 189 bytes): the colour
-// key conversion. Retail packs each component as `(color >> n) & mask`
-// joined with `or`. VC6 here factors the common shift out of every `|`
-// form tried (grouping, order, mask-first, component and inline-helper
-// forms); `+` keeps retail's shape but emits `add`.
-//
 // PCTextureMap::UnknownVirtualSlot9 (0x004c7640, 385 bytes): the upload.
 // With separate `next` surfaces VC6 packs them into the dead parameter
 // slots as retail does (the frame matches), but retail keeps `this` in ebp
@@ -37,21 +31,6 @@
 #include "../../src/reconstructed/TrackGame.h"
 
 #include "../../src/reconstructed/ManagedTexture.h"
-
-// 0x004c7e30: converts a 24-bit colour to the texture's format (555, 565 or
-// a palette index) and stores it as the colour key.
-void PCTextureMap::UnknownFunction4c7e30(unsigned int color) {
-    int key;
-    if (field_0x20 == 0x22b)
-        key = (color >> 9) & 0x7c00 | (color >> 6) & 0x3e0 | (color >> 3) & 0x1f;
-    else if (field_0x20 == 0x235)
-        key = (color >> 8) & 0xf800 | (color >> 5) & 0x7e0 | (color >> 3) & 0x1f;
-    else if (field_0x20 == 8)
-        key = field_0x2c->field_0x710[(color >> 9) & 0x7c00 | (color >> 6) & 0x3e0 | (color >> 3) & 0x1f];
-    else
-        key = color;
-    field_0x34 = field_0x38 = key;
-}
 
 // 0x004c7640: with partial texture blits (Display+0x5bc) or a positive
 // `mode`, copies `rect` (or the whole texture) down the mip chain with

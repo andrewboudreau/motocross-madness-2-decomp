@@ -490,6 +490,26 @@ static inline void SetRenderStatePair(TextureMap* map, int state, int value) {
     }
 }
 
+// 0x004c7e30: converts a 24-bit colour to the texture's format (555, 565 or
+// a palette index) and stores it as the colour key. The 16-bit components
+// are built as unsigned shorts, as a pixel word would be.
+void PCTextureMap::UnknownFunction4c7e30(unsigned int color) {
+    int key;
+    if (field_0x20 == 0x22b)
+        key = (unsigned short)((color >> 9) & 0x7c00) | (unsigned short)((color >> 6) & 0x3e0) |
+              (unsigned short)((color >> 3) & 0x1f);
+    else if (field_0x20 == 0x235)
+        key = (unsigned short)((color >> 8) & 0xf800) | (unsigned short)((color >> 5) & 0x7e0) |
+              (unsigned short)((color >> 3) & 0x1f);
+    else if (field_0x20 == 8)
+        key = field_0x2c->field_0x710[(unsigned short)((color >> 9) & 0x7c00) |
+                                      (unsigned short)((color >> 6) & 0x3e0) |
+                                      (unsigned short)((color >> 3) & 0x1f)];
+    else
+        key = color;
+    field_0x34 = field_0x38 = key;
+}
+
 // 0x004c81d0: for 16-bit and 0x613 formats, applies colour `color` as the
 // key on every level (0x004c7ef0), re-uploads, sets the surfaces' colour key
 // and records render states 0x29 = 1 and 0x1b = 0.
