@@ -14,7 +14,7 @@ at +0x74. An object at +0x7c is destroyed through vfwdeco.cpp's
 
 ## Status
 
-Exact (22 calibration cases):
+Exact (23 calibration cases):
 - the constructor `0x004c5f00` (TextureMap's `0x0050a4e0`, then clears
   +0x70..+0x7c);
 - the scalar deleting destructor `0x004c5f30` and the destructor
@@ -74,9 +74,17 @@ Exact (22 calibration cases):
 - slot 20, which fills every mip level (error line 2084). Loading +0x70
   into a local before the caps memset reproduces retail's store order;
 - `0x004c7e30`, the colour key: a 24-bit colour packed as 555 or 565, or
-  looked up in the palette's 555 table (+0x2c, +0x710). Each component is
-  an `unsigned short`, as in a pixel word; without the casts VC6 factors
-  the common `>> 3` out of the `|` expression;
+  looked up in the palette's 555 table (+0x2c, +0x710). The file-local
+  `Pack555`/`Pack565` helpers cast the whole `|` to `unsigned short` and
+  list blue first; without the cast VC6 factors the common `>> 3` out of
+  the expression, and red-first order swaps two terms in `0x004c7ef0`;
+- `0x004c7ef0`, which locks a level (flags 0x801) and replaces magenta
+  with the key colour through Pixtrans.cpp's replacers (`0x004d1970`
+  32-bit RGBA, `0x004d1a20` 24-bit RGB, both taking pixel structs by
+  value; `0x004d1ac0` 16-bit; `0x004d1b40` 8-bit, from the palette's
+  magenta entry +0x710[0x7c1f]), storing the converted key. Magenta itself
+  only sets the key (`0x004c7e30`) except in format 0x22b8. Lock and
+  unlock failures share one `return 0` through `goto failed`;
 - `0x004c84e0`, which locks a level (flags 0x811), fills it through
   `0x004c8550` and unlocks it.
 
@@ -102,7 +110,7 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   append helper. Only the non-mip fallback chain differs: VC6 cross-jumps
   its identical call tails into the first case, retail into the last.
 
-Not reconstructed: `0x004c7b40`, `0x004c7ef0`,
+Not reconstructed: `0x004c7b40`,
 `0x004c8550` and the error reporter `0x004c86e0`.
 
 ## TextureMap

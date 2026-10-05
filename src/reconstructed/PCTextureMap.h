@@ -43,6 +43,29 @@ void UnknownFunction4d1d20(void* destination, void* source, int width, int heigh
 int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int format,
                           UnknownTexturePalette* palette);
 
+// Pixels as the Pixtrans.cpp replacers take them by value: 32-bit RGBA
+// (format 0x22b8) and 24-bit RGB (0x378), red first in memory.
+struct UnknownPixel32 {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+    unsigned char alpha;
+};
+
+struct UnknownPixel24 {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+};
+
+// Pixtrans.cpp replacers (cdecl): every `from` pixel in the width x height
+// `bits` (stride in pixels) becomes `to`. 32-bit 0x004d1970, 24-bit
+// 0x004d1a20, 16-bit 0x004d1ac0, 8-bit 0x004d1b40.
+void UnknownFunction4d1970(void* bits, UnknownPixel32 from, UnknownPixel32 to, int width, int height, int stride);
+void UnknownFunction4d1a20(void* bits, UnknownPixel24 from, UnknownPixel24 to, int width, int height, int stride);
+void UnknownFunction4d1ac0(void* bits, unsigned short from, unsigned short to, int width, int height, int stride);
+void UnknownFunction4d1b40(void* bits, unsigned char from, unsigned char to, int width, int height, int stride);
+
 // Shared texture surfaces reused across textures: 0x0068a36c by mip level
 // count, 0x0068a394 for single-level textures.
 extern UnknownSurfaceInterface* g_UnknownSharedMipSurfaces68a36c[10];
@@ -98,7 +121,7 @@ public:
     UnknownSurfaceInterface* UnknownFunction4c83a0(int width);
     int UnknownFunction4c84e0(UnknownSurfaceInterface* surface, int value); // 0x004c84e0: fills a level
     void UnknownFunction4c7e30(unsigned int color); // 0x004c7e30: sets the colour key
-    void UnknownFunction4c7ef0(UnknownSurfaceInterface* surface, unsigned int color); // 0x004c7ef0
+    int UnknownFunction4c7ef0(UnknownSurfaceInterface* surface, unsigned int color); // 0x004c7ef0: keys a level
     // 0x004c68e0: creates +0x70 with the first of `formats` (0-terminated)
     // the device accepts.
     int UnknownFunction4c68e0(UnknownSurfaceDesc* desc, int flags, int* formats);
