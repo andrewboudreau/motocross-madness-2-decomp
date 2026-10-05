@@ -287,23 +287,66 @@ int UnknownFunction511af0(UnknownPixelFormat* pixelFormat) {
     return format;
 }
 
+// 0x00511b40: reads the header field by field. Only 16, 24 and 32-bit
+// files of image type 2 (raw) or 10 (run-length) are accepted.
+UnknownTgaFile* UnknownFunction511b40(UnknownTextureStream* stream, UnknownTgaFile* file, int offset) {
+    if (!file) {
+        file = (UnknownTgaFile*)DebugMalloc(sizeof(UnknownTgaFile), __FILE__, 354);
+        if (!file)
+            return 0;
+        file->bits = 0;
+        file->field_0x18 = 0;
+        file->field_0x120 = 0;
+        file->field_0x124 = 0;
+    }
+    file->name[0] = 0;
+    if (offset == 0) {
+        if (stream->field_0x1c)
+            stream->UnknownFunction461340(stream->field_0x130, 0, 0);
+    } else if (offset > 0) {
+        stream->UnknownFunction461340(offset, 0, 1);
+    }
+    if (stream->UnknownFunction461640(&file->idLength, 1, 1) != 1 ||
+        stream->UnknownFunction461640(&file->colorMapType, 1, 1) != 1 ||
+        stream->UnknownFunction461640(&file->imageType, 1, 1) != 1 ||
+        stream->UnknownFunction461640(&file->colorMapStart, 2, 1) != 1 ||
+        stream->UnknownFunction461640(&file->colorMapLength, 2, 1) != 1 ||
+        stream->UnknownFunction461640(&file->colorMapDepth, 1, 1) != 1 ||
+        stream->UnknownFunction461640(&file->x, 2, 1) != 1 || stream->UnknownFunction461640(&file->y, 2, 1) != 1 ||
+        stream->UnknownFunction461640(&file->width, 2, 1) != 1 ||
+        stream->UnknownFunction461640(&file->height, 2, 1) != 1 ||
+        stream->UnknownFunction461640(&file->bitsPerPixel, 1, 1) != 1 ||
+        stream->UnknownFunction461640(&file->descriptor, 1, 1) != 1)
+        goto failed;
+    if ((file->bitsPerPixel == 16 || file->bitsPerPixel == 24 || file->bitsPerPixel == 32) &&
+        (file->imageType == 2 || file->imageType == 10))
+        return file;
+failed:
+    if (file) {
+        if (file->bits)
+            operator delete(file->bits, __FILE__, 421);
+        operator delete(file, __FILE__, 422);
+    }
+    return 0;
+}
+
 // 0x00511d00: opens `path` "rb" in a new stream (Tgafile.cpp line 494) and
 // reads its header; 0 when it cannot be opened.
-UnknownTgaFile* UnknownFunction511d00(const char* path, int a, int b) {
-    UnknownTextureStream* stream = new(__FILE__, 494) UnknownTextureStream(b);
+UnknownTgaFile* UnknownFunction511d00(const char* path, UnknownTgaFile* file, int a) {
+    UnknownTextureStream* stream = new(__FILE__, 494) UnknownTextureStream(a);
     if (!stream->UnknownFunction460f50(path, "rb", 0)) {
         delete stream;
         return 0;
     }
-    UnknownTgaFile* file = UnknownFunction511b40(stream, a, 0);
+    file = UnknownFunction511b40(stream, file, 0);
     delete stream;
     return file;
 }
 
 // 0x00511dd0: reads the header and then the pixels for its depth; frees
 // the file when the pixels cannot be read.
-UnknownTgaFile* UnknownFunction511dd0(UnknownTextureStream* stream, int a, int b) {
-    UnknownTgaFile* file = UnknownFunction511b40(stream, a, b);
+UnknownTgaFile* UnknownFunction511dd0(UnknownTextureStream* stream, UnknownTgaFile* file, int offset) {
+    file = UnknownFunction511b40(stream, file, offset);
     if (!file)
         return 0;
     if (file->bitsPerPixel == 24) {

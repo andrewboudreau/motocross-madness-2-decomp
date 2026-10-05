@@ -32,10 +32,14 @@ public:
     UnknownTextureStream(int a);              // 0x00460d10
     ~UnknownTextureStream();                  // 0x00460d60
     int UnknownFunction460f50(const char* path, const char* mode, int a); // 0x00460f50: opens `path`
+    int UnknownFunction461340(int offset, int a, int origin); // 0x00461340: seeks
     int UnknownFunction461600();
     int UnknownFunction461640(void* buffer, int size, int count);
 
-    unsigned char field_0x000[0x134];
+    unsigned char field_0x000[0x1c];
+    UnknownTextureStream* field_0x1c;         // inner stream
+    unsigned char field_0x020[0x130 - 0x20];
+    int field_0x130;                          // start offset in the inner stream
 };
 
 // A render state and its value (RenderTarget slot 8).
