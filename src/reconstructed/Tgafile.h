@@ -80,6 +80,9 @@ UnknownTgaFile* UnknownFunction511d00(const char* path, UnknownTgaFile* file, in
 // 0x00511dd0: reads a whole file from `stream`; 0 on failure.
 UnknownTgaFile* UnknownFunction511dd0(UnknownTextureStream* stream, UnknownTgaFile* file, int offset);
 
+// 0x005125c0: loads the whole file at `path`, named after it; 0 on failure.
+UnknownTgaFile* UnknownFunction5125c0(const char* path, UnknownTgaFile* file, int a);
+
 // 0x00512dd0: frees a loaded file.
 void UnknownFunction512dd0(UnknownTgaFile* file);
 

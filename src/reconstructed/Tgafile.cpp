@@ -449,6 +449,153 @@ int UnknownFunction511e80(UnknownTgaFile* file, UnknownTextureStream* stream) {
     return 1;
 }
 
+// 0x00512100: reads 32-bit pixels like 0x00511e80; literal run-length
+// pixels are read one at a time.
+int UnknownFunction512100(UnknownTgaFile* file, UnknownTextureStream* stream) {
+    int count = file->height * file->width;
+    unsigned int size = count * 4;
+    if (size > file->field_0x18) {
+        if (file->bits)
+            operator delete(file->bits, __FILE__, 142);
+        file->bits = 0;
+        file->field_0x18 = 0;
+    }
+    if (!file->bits) {
+        file->bits = DebugMalloc(size, __FILE__, 151);
+        if (!file->bits)
+            return 0;
+        file->field_0x18 = size;
+    }
+    UnknownPixel32* pixel = (UnknownPixel32*)file->bits;
+    UnknownPixel32* end = (UnknownPixel32*)((unsigned char*)pixel + size);
+    if (file->imageType == 2) {
+        if (stream->UnknownFunction461640(pixel, 4, count) != count)
+            return 0;
+        for (int i = 0; i < count; i++, pixel++)
+            SwapBytes(pixel->red, pixel->blue);
+    } else {
+        UnknownPixel32 color;
+        while (pixel < end) {
+            int packet = stream->UnknownFunction461980();
+            if (packet & 0x80) {
+                packet &= 0x7f;
+                if (stream->UnknownFunction461640(&color, 4, 1) != 1)
+                    return 0;
+                SwapBytes(color.red, color.blue);
+                do
+                    *pixel++ = color;
+                while (packet--);
+            } else {
+                packet++;
+                do {
+                    if (stream->UnknownFunction461640(pixel, 4, 1) != 1)
+                        return 0;
+                    unsigned char red = pixel->red;
+                    pixel->red = pixel->blue;
+                    pixel->blue = red;
+                    pixel++;
+                } while (--packet);
+            }
+        }
+    }
+    if (!(file->descriptor & 0x20)) {
+        unsigned char* top = (unsigned char*)file->bits;
+        unsigned char* bottom = top + (file->height - 1) * file->width * 4;
+        if (file->field_0x120 && file->field_0x124 < (unsigned int)(file->width * 4)) {
+            operator delete(file->field_0x120, __FILE__, 203);
+            file->field_0x124 = 0;
+            file->field_0x120 = 0;
+        }
+        if (!file->field_0x120) {
+            file->field_0x120 = DebugMalloc(file->width * 4, __FILE__, 208);
+            if (!file->field_0x120)
+                return 0;
+            file->field_0x124 = file->width * 4;
+        }
+        void* row = file->field_0x120;
+        for (int i = 0; i < file->height / 2; i++) {
+            memcpy(row, top, file->width * 4);
+            memcpy(top, bottom, file->width * 4);
+            memcpy(bottom, row, file->width * 4);
+            bottom -= file->width * 4;
+            top += file->width * 4;
+        }
+        file->descriptor |= 0x20;
+    }
+    return 1;
+}
+
+// 0x00512370: reads 16-bit pixels like 0x00511e80, without the colour
+// swap; raw images are read row by row.
+int UnknownFunction512370(UnknownTgaFile* file, UnknownTextureStream* stream) {
+    int count = file->height * file->width;
+    unsigned int size = count * 2;
+    if (size > file->field_0x18) {
+        if (file->bits)
+            operator delete(file->bits, __FILE__, 252);
+        file->bits = 0;
+        file->field_0x18 = 0;
+    }
+    if (!file->bits) {
+        file->bits = DebugMalloc(size, __FILE__, 261);
+        if (!file->bits)
+            return 0;
+        file->field_0x18 = size;
+    }
+    unsigned short* pixel = (unsigned short*)file->bits;
+    unsigned short* end = pixel + count;
+    if (file->imageType == 2) {
+        for (int row = 0; row < file->height; row++) {
+            if (stream->UnknownFunction461640(pixel, 2, file->width) != file->width)
+                return 0;
+            pixel += file->width;
+        }
+    } else {
+        unsigned short color;
+        while (pixel < end) {
+            int packet = stream->UnknownFunction461980();
+            if (packet & 0x80) {
+                packet &= 0x7f;
+                if (stream->UnknownFunction461640(&color, 2, 1) != 1)
+                    return 0;
+                do
+                    *pixel++ = color;
+                while (packet--);
+            } else {
+                packet++;
+                if (stream->UnknownFunction461640(pixel, 2, packet) != packet)
+                    return 0;
+                pixel += packet;
+            }
+        }
+    }
+    if (!(file->descriptor & 0x20)) {
+        unsigned char* top = (unsigned char*)file->bits;
+        unsigned char* bottom = top + (file->height - 1) * file->width * 2;
+        if (file->field_0x120 && file->field_0x124 < (unsigned int)(file->width * 2)) {
+            operator delete(file->field_0x120, __FILE__, 311);
+            file->field_0x124 = 0;
+            file->field_0x120 = 0;
+        }
+        if (!file->field_0x120) {
+            file->field_0x120 = DebugMalloc(file->width * 2, __FILE__, 316);
+            if (!file->field_0x120)
+                return 0;
+            file->field_0x124 = file->width * 2;
+        }
+        void* row = file->field_0x120;
+        for (int i = 0; i < file->height / 2; i++) {
+            memcpy(row, top, file->width * 2);
+            memcpy(top, bottom, file->width * 2);
+            memcpy(bottom, row, file->width * 2);
+            bottom -= file->width * 2;
+            top += file->width * 2;
+        }
+        file->descriptor |= 0x20;
+    }
+    return 1;
+}
+
 // 0x00512720: writes 24-bit `bits` to the TGA file `path`.
 int UnknownFunction512720(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
     UnknownTgaFile file;

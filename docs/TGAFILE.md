@@ -6,7 +6,7 @@ call them. Names are provisional. File formats are the texture loader's
 codes 1..34; pixel formats are the engine's 8 (palettised), 0x22b (555),
 0x235 (565), 0x378 (24-bit), 0x613 (1555), 0x115c (4444) and 0x22b8 (8888).
 
-Exact (19 calibration cases):
+Exact (21 calibration cases):
 
 | VA | Size | Role | Source shape |
 |---|---:|---|---|
@@ -21,6 +21,8 @@ Exact (19 calibration cases):
 | `0x00511b40` | 446 | reads a header into a new or given file | chained reads |
 | `0x00511d00` | 207 | opens a path in a new stream and reads the header | `new` under /GX |
 | `0x00511e80` | 640 | reads 24-bit pixels (raw or run-length) | reference swap helper |
+| `0x00512100` | 623 | reads 32-bit pixels | literal pixels one by one |
+| `0x00512370` | 588 | reads 16-bit pixels | raw rows, no swap |
 | `0x00511dd0` | 174 | reads a header and the pixels for its depth | per-depth `goto failed` |
 | `0x00512720` | 113 | writes 24-bit pixels to a TGA file | header on the stack |
 | `0x005127a0` | 67 | fills a 24-bit TGA header | field stores |
@@ -50,8 +52,8 @@ unpacked, the pixels at +0x14 and the name at +0x1c), copy the path in and
 return the result of `0x00512990`. The value PCTextureMap's level dump
 passes as 32 is the header's descriptor byte (top-left origin).
 
-Near miss (`samples/render/TgafileNearMisses.cpp`): the writer
-`0x00512990` (1074 bytes). It opens the file "wb", writes the header field
+Near miss (`samples/render/TgafileNearMisses.cpp`, with `0x005125c0`): the
+writer `0x00512990` (1074 bytes). It opens the file "wb", writes the header field
 by field and the pixels: 24-bit one by one with red and blue swapped,
 32-bit swapped in place then in blocks, 16-bit rows as they are for 555
 (green mask 0x3e0) or pixel by pixel converted from 565. The 16-bit
@@ -77,5 +79,12 @@ Retail's swap order needs an inline `SwapBytes(unsigned char&, unsigned
 char&)`, and the run colour must be declared outside the packet loop or VC6
 hoists its loads out of the copy loop.
 
-Not reconstructed: the pixel readers `0x00512100` (32-bit) and
-`0x00512370` (16-bit), and `0x005125c0`.
+The 32-bit reader reads literal run-length pixels one call each and swaps
+them with a plain temporary (its other swaps use `SwapBytes`); bits are
+lines 142/151 and the scratch row 203/208. The 16-bit reader does not swap,
+reads raw images row by row and computes its end as `pixel + count`
+(lines 252/261, 311/316).
+
+Near miss: `0x005125c0` (325 of 348 bytes), which loads a whole file from a
+path (stream line 567, frees at 608/609); only the stream and file swap
+ebx and ebp.

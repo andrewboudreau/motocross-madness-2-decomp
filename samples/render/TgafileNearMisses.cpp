@@ -1,5 +1,11 @@
-// Near-miss Tgafile.cpp candidate, kept out of src/reconstructed until it
-// matches. See docs/TGAFILE.md.
+// Near-miss Tgafile.cpp candidates, kept out of src/reconstructed until they
+// match. See docs/TGAFILE.md.
+//
+// UnknownFunction5125c0 (0x005125c0, 348 bytes): loads a whole file from a
+// path. Everything but the register choice matches (325 of 348 bytes):
+// retail keeps the stream in ebx and the file in ebp, VC6 here the other
+// way round. A separate file local, flat gotos, declaration order and a
+// combined condition do not change it.
 //
 // UnknownFunction512990 (0x00512990, 1074 bytes): the TGA writer behind
 // 0x00512720/0x005127f0/0x005128c0. The header writes, the three depth
@@ -12,8 +18,11 @@
 // pixel do not reproduce that.
 
 #include <stdio.h>
+#include <string.h>
 
+#include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/RenderInterfaces.h"
+#include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/Tgafile.h"
 
 // 0x00512990: writes `file` to file->name: the header field by field, then
@@ -98,5 +107,35 @@ int UnknownFunction512990(UnknownTgaFile* file, unsigned int stride, int greenMa
     }
 failed:
     fclose(stream);
+    return 0;
+}
+
+// 0x005125c0: opens `path` "rb" in a new stream (line 567), reads the header
+// and the pixels for its depth and names the file after the path; frees the
+// file when the pixels cannot be read.
+UnknownTgaFile* UnknownFunction5125c0(const char* path, UnknownTgaFile* file, int a) {
+    UnknownTextureStream* stream = new(__FILE__, 567) UnknownTextureStream(a);
+    if (stream->UnknownFunction460f50(path, "rb", 0)) {
+        file = UnknownFunction511b40(stream, file, 0);
+        if (file) {
+            if (file->bitsPerPixel == 24) {
+                if (!UnknownFunction511e80(file, stream))
+                    goto failed;
+            } else if (file->bitsPerPixel == 32) {
+                if (!UnknownFunction512100(file, stream))
+                    goto failed;
+            } else if (!UnknownFunction512370(file, stream)) {
+                goto failed;
+            }
+            strcpy(file->name, path);
+            delete stream;
+            return file;
+        failed:
+            if (file->bits)
+                operator delete(file->bits, __FILE__, 608);
+            operator delete(file, __FILE__, 609);
+        }
+    }
+    delete stream;
     return 0;
 }
