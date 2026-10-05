@@ -5,7 +5,7 @@ PCVideoCard.cpp's code (literal `0x004d06e9`). PCTextureMap and
 ManagedTextureGroup call them. Strides are in pixels; names are
 provisional.
 
-Exact (18 calibration cases):
+Exact (19 calibration cases):
 
 | VA | Size | Role |
 |---|---:|---|
@@ -23,6 +23,7 @@ Exact (18 calibration cases):
 | `0x004d1780` | 142 | 1555 to 555; transparent pixels become the key |
 | `0x004d1810` | 170 | 565 to 1555, transparent where the pixel is the key |
 | `0x004d18c0` | 172 | 1555 to 565; transparent pixels become the key |
+| `0x004d1b90` | 389 | dispatches downsampling by pixel format |
 | `0x004d1970` | 161 | replaces 32-bit `from` pixels with `to` |
 | `0x004d1a20` | 147 | replaces 24-bit `from` pixels with `to` |
 | `0x004d1ac0` | 115 | replaces 16-bit `from` pixels with `to` |
@@ -55,5 +56,16 @@ of what is already in `destination` (retail behaviour).
 
 The palette's +0x310 and +0x510 regions are 256-entry 16-bit tables.
 
-Not reconstructed: the downsampler `0x004d1b90`, the converter `0x004d1d20`
-and `0x004d24d0`.
+The downsampler `0x004d1b90` hands `levels` (the number of halvings) to a
+per-format helper: palette `0x004d05c0` (with the palette), 555
+`0x004d0440` and 565 `0x004d02c0` (with a filter flag), 24-bit
+`0x004cfaf0`, 1555 `0x004d0170`, 4444 `0x004d0020`, 8888 `0x004cfc40`.
+Each copies rows for 0 levels, halves once through a per-format halver
+(24-bit: `0x004cde20`) for 1, and otherwise halves through a temporary of
+the first level's size (Pixtrans.cpp lines 1329/1350 in the 24-bit one).
+
+Near miss (`samples/render/PixtransNearMisses.cpp`): `0x004cfaf0`; only the
+plain-copy path's hoisted strides land in different argument slots.
+
+Not reconstructed: the other downsamplers and halvers, the converter
+`0x004d1d20` and `0x004d24d0`.

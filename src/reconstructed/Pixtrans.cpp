@@ -281,6 +281,31 @@ int UnknownFunction4d18c0(void* destination, void* source, int width, int height
     return 1;
 }
 
+// 0x004d1b90: hands the downsampling to the helper for `format`.
+int UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter) {
+    switch (format) {
+    case 8:
+        return UnknownFunction4d05c0(destination, source, width, height, destinationStride, sourceStride, a,
+                                     palette);
+    case 0x22b:
+        return UnknownFunction4d0440(destination, source, width, height, destinationStride, sourceStride, a,
+                                     filter);
+    case 0x235:
+        return UnknownFunction4d02c0(destination, source, width, height, destinationStride, sourceStride, a,
+                                     filter);
+    case 0x378:
+        return UnknownFunction4cfaf0(destination, source, width, height, destinationStride, sourceStride, a);
+    case 0x613:
+        return UnknownFunction4d0170(destination, source, width, height, destinationStride, sourceStride, a);
+    case 0x115c:
+        return UnknownFunction4d0020(destination, source, width, height, destinationStride, sourceStride, a);
+    case 0x22b8:
+        return UnknownFunction4cfc40(destination, source, width, height, destinationStride, sourceStride, a);
+    }
+    return 0;
+}
+
 // 0x004d1970: replaces 32-bit `from` pixels with `to`; pixels already equal
 // to `to` get their blue byte nudged (255 down, otherwise up) first.
 int UnknownFunction4d1970(void* bits, UnknownPixel32 from, UnknownPixel32 to, int width, int height, int stride) {

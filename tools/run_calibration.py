@@ -4441,6 +4441,15 @@ CASES = [
         'reason': 'per-branch destination increment',
     },
     {
+        'name': 'Pixtrans downsample dispatch 0x4d1b90',
+        'bindings': 'src/reconstructed/Pixtrans.bindings.json',
+        'source': 'src/reconstructed/Pixtrans.cpp',
+        'symbol': '?UnknownFunction4d1b90@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z',
+        'target_va': '0x004d1b90',
+        'target_size': 389,
+        'reason': 'switch on the pixel format, tail results',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

@@ -71,8 +71,29 @@ int UnknownFunction4d1810(void* destination, void* source, int width, int height
 int UnknownFunction4d18c0(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key);
 
-// 0x004d1b90: downsamples `source` into the width x height `destination`;
-// 0 on failure.
+// 0x004cde20: halves 24-bit `source` into the width x height `destination`.
+void UnknownFunction4cde20(void* destination, void* source, int width, int height, int destinationStride,
+                           int sourceStride);
+
+// Per-format halving downsamplers behind 0x004d1b90 (8888, 24-bit, 4444,
+// 1555, 565, 555, palette); `a` and `filter` are passed through.
+int UnknownFunction4cfaf0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int a);
+int UnknownFunction4cfc40(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int a);
+int UnknownFunction4d0020(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int a);
+int UnknownFunction4d0170(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int a);
+int UnknownFunction4d02c0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int a, int filter);
+int UnknownFunction4d0440(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int a, int filter);
+int UnknownFunction4d05c0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int a, UnknownTexturePalette* palette);
+
+// 0x004d1b90: downsamples `source` into the width x height `destination`
+// with the helper for `format`; 0 for other formats.
 int UnknownFunction4d1b90(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int a, int format, UnknownTexturePalette* palette, int filter);
 
