@@ -76,7 +76,9 @@ plain-copy path's hoisted strides land in different argument slots;
 `0x004d0700` (565 to 8888, keyed; register and slot choice) and
 `0x004d07d0` (1555 to 8888; only the pixel pointer's base offset);
 `0x004d0aa0`/`0x004d0b90` (24-bit/565 to palette indices; only where the
-`palette` argument is loaded).
+`palette` argument is loaded); `0x004cdf10`, the 8888 halver, which
+averages colour over the 2x2 pixels with alpha set (the fourth pixel adds
+the third one's alpha in retail) and differs in register assignment.
 
 `0x004d0d40` is hand-written assembly (frame pointer, dead `mov eax, 0`,
 `push ebp` inside the loop) and is out of scope. The 24-bit and 16-bit

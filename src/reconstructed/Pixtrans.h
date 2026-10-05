@@ -119,6 +119,11 @@ int UnknownFunction4d18c0(void* destination, void* source, int width, int height
 int UnknownFunction4cde20(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride);
 
+// 0x004cdf10: halves 8888 pixels, averaging colour over the non-transparent
+// pixels of each 2x2 block; returns 1.
+int UnknownFunction4cdf10(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride);
+
 // Per-format halving downsamplers behind 0x004d1b90 (8888, 24-bit, 4444,
 // 1555, 565, 555, palette); `a` and `filter` are passed through.
 int UnknownFunction4cfaf0(void* destination, void* source, int width, int height, int destinationStride,
