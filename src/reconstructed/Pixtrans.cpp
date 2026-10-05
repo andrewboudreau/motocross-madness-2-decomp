@@ -4,6 +4,95 @@
 
 #include "TextureMap.h"
 
+// 0x004d0870: converts 4444 to 8888.
+int UnknownFunction4d0870(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride) {
+    unsigned short* sourceRow = (unsigned short*)source;
+    UnknownPixel32* row = (UnknownPixel32*)destination;
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        UnknownPixel32* to = row;
+        for (int x = 0; x < width; x++, to++, from++) {
+            to->alpha = (*from >> 8) & 0xf0;
+            to->red = (*from >> 4) & 0xf0;
+            to->green = *from & 0xf0;
+            to->blue = *from << 4;
+        }
+        sourceRow += sourceStride;
+        row += destinationStride;
+    }
+    return 1;
+}
+
+// 0x004d0e40: converts 555 to 8888; the key colour becomes opaque magenta.
+int UnknownFunction4d0e40(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, unsigned int key) {
+    unsigned short* sourceRow = (unsigned short*)source;
+    UnknownPixel32* row = (UnknownPixel32*)destination;
+    unsigned short transparent = Pack555(key);
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        UnknownPixel32* to = row;
+        for (int x = 0; x < width; x++, to++, from++) {
+            if (*from == transparent) {
+                to->red = 0xff;
+                to->green = 0;
+                to->blue = 0xff;
+            } else {
+                to->red = (*from >> 7) & 0xf8;
+                to->green = (*from >> 2) & 0xf8;
+                to->blue = *from << 3;
+            }
+            to->alpha = 0xff;
+        }
+        sourceRow += sourceStride;
+        row += destinationStride;
+    }
+    return 1;
+}
+
+// 0x004d0f10: converts 555 to 24-bit; 555 magenta stays exactly magenta.
+int UnknownFunction4d0f10(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride) {
+    unsigned short* sourceRow = (unsigned short*)source;
+    UnknownPixel24* row = (UnknownPixel24*)destination;
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        UnknownPixel24* to = row;
+        for (int x = 0; x < width; x++, to++, from++) {
+            if (*from == 0x7c1f) {
+                to->red = 0xff;
+                to->green = 0;
+                to->blue = 0xff;
+            } else {
+                to->red = (*from >> 7) & 0xf8;
+                to->green = (*from >> 2) & 0xf8;
+                to->blue = *from << 3;
+            }
+        }
+        sourceRow += sourceStride;
+        row += destinationStride;
+    }
+    return 1;
+}
+
+// 0x004d0fb0: converts 555 to 565.
+int UnknownFunction4d0fb0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride) {
+    unsigned short* sourceRow = (unsigned short*)source;
+    unsigned short* row = (unsigned short*)destination;
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        unsigned short* to = row;
+        for (int x = 0; x < width; x++, to++, from++) {
+            *to = (*from & 0xffe0) << 1 | *from & 0x1f;
+        }
+        sourceRow += sourceStride;
+        row += destinationStride;
+    }
+    return 1;
+}
+
 // 0x004d1030: converts 565 pixels to 555.
 int UnknownFunction4d1030(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {

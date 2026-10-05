@@ -5,10 +5,14 @@ PCVideoCard.cpp's code (literal `0x004d06e9`). PCTextureMap and
 ManagedTextureGroup call them. Strides are in pixels; names are
 provisional.
 
-Exact (19 calibration cases):
+Exact (23 calibration cases):
 
 | VA | Size | Role |
 |---|---:|---|
+| `0x004d0870` | 134 | 4444 to 8888 |
+| `0x004d0e40` | 200 | 555 to 8888; the key becomes opaque magenta |
+| `0x004d0f10` | 156 | 555 to 24-bit; 555 magenta (0x7c1f) stays magenta |
+| `0x004d0fb0` | 114 | 555 to 565 |
 | `0x004d1030` | 114 | 565 to 555 |
 | `0x004d10b0` | 150 | palette indices to 24-bit RGB (+0x10 entries) |
 | `0x004d1150` | 109 | palette indices through the 16-bit table at +0x510 |
@@ -64,8 +68,15 @@ Each copies rows for 0 levels, halves once through a per-format halver
 (24-bit: `0x004cde20`) for 1, and otherwise halves through a temporary of
 the first level's size (Pixtrans.cpp lines 1329/1350 in the 24-bit one).
 
-Near miss (`samples/render/PixtransNearMisses.cpp`): `0x004cfaf0`; only the
-plain-copy path's hoisted strides land in different argument slots.
+Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004cfaf0`, whose
+plain-copy path's hoisted strides land in different argument slots;
+`0x004d0700` (565 to 8888, keyed; register and slot choice) and
+`0x004d07d0` (1555 to 8888; only the pixel pointer's base offset).
+
+`0x004d0d40` is hand-written assembly (frame pointer, dead `mov eax, 0`,
+`push ebp` inside the loop) and is out of scope. The 24-bit and 16-bit
+converters at `0x004d0900`–`0x004d0c40` dither through `0x004cf2a0` when
+asked and otherwise map through the 555 tables `0x004de280`/`0x004de290`.
 
 Not reconstructed: the other downsamplers and halvers, the converter
 `0x004d1d20` and `0x004d24d0`.

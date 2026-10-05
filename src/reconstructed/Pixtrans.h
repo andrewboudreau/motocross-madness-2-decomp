@@ -27,6 +27,24 @@ int UnknownFunction4d1b40(void* bits, unsigned char from, unsigned char to, int 
 
 // Converters from `source` into `destination` (width x height, strides in
 // pixels); all return 1.
+// 0x004d0700: 565 to 8888; the 0xRRGGBB `key` becomes opaque magenta.
+int UnknownFunction4d0700(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, unsigned int key);
+// 0x004d07d0: 1555 to 8888.
+int UnknownFunction4d07d0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride);
+// 0x004d0870: 4444 to 8888.
+int UnknownFunction4d0870(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride);
+// 0x004d0e40: 555 to 8888; the 0xRRGGBB `key` becomes opaque magenta.
+int UnknownFunction4d0e40(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, unsigned int key);
+// 0x004d0f10: 555 to 24-bit; 555 magenta stays magenta.
+int UnknownFunction4d0f10(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride);
+// 0x004d0fb0: 555 to 565.
+int UnknownFunction4d0fb0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride);
 // 0x004d1030: 565 to 555.
 int UnknownFunction4d1030(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride);

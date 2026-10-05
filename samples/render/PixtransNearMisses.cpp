@@ -1,5 +1,14 @@
-// Near-miss Pixtrans.cpp candidate, kept out of src/reconstructed until it
-// matches. See docs/PIXTRANS.md.
+// Near-miss Pixtrans.cpp candidates, kept out of src/reconstructed until they
+// match. See docs/PIXTRANS.md.
+//
+// UnknownFunction4d0700 (0x004d0700, 208 bytes): 565 to 8888 with a key.
+// The row pointers and the 0xff constant land in different registers and
+// slots (retail keeps 0xff in dl and both rows in argument slots); about 60
+// lines differ in every pointer-order and key-placement variant.
+//
+// UnknownFunction4d07d0 (0x004d07d0, 146 bytes): 1555 to 8888. Only the
+// pixel pointer's base offset differs (retail addresses the pixel from its
+// alpha byte, VC6 here from blue); 7 lines.
 //
 // UnknownFunction4cfaf0 (0x004cfaf0, 327 bytes): the 24-bit downsampler
 // behind 0x004d1b90. Everything but the plain-copy path (levels == 0)
@@ -44,6 +53,53 @@ int UnknownFunction4cfaf0(void* destination, void* source, int width, int height
     }
     UnknownFunction4cde20(destination, buffer, width, height, destinationStride, levelWidth);
     operator delete(buffer, __FILE__, 1350);
+    return 1;
+}
+
+// 0x004d0700: converts 565 to 8888; the key colour becomes opaque magenta.
+int UnknownFunction4d0700(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, unsigned int key) {
+    unsigned short transparent = Pack565(key);
+    unsigned short* sourceRow = (unsigned short*)source;
+    UnknownPixel32* row = (UnknownPixel32*)destination;
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        UnknownPixel32* to = row;
+        for (int x = 0; x < width; x++, to++, from++) {
+            if (*from == transparent) {
+                to->red = 0xff;
+                to->green = 0;
+                to->blue = 0xff;
+            } else {
+                to->red = (*from >> 8) & 0xf8;
+                to->green = (*from >> 3) & 0xfc;
+                to->blue = *from << 3;
+            }
+            to->alpha = 0xff;
+        }
+        sourceRow += sourceStride;
+        row += destinationStride;
+    }
+    return 1;
+}
+
+// 0x004d07d0: converts 1555 to 8888.
+int UnknownFunction4d07d0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride) {
+    unsigned short* sourceRow = (unsigned short*)source;
+    UnknownPixel32* row = (UnknownPixel32*)destination;
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        UnknownPixel32* to = row;
+        for (int x = 0; x < width; x++, to++, from++) {
+            to->red = (*from >> 7) & 0xf8;
+            to->green = (*from >> 2) & 0xf8;
+            to->blue = *from << 3;
+            to->alpha = (*from & 0x8000) ? 0xff : 0;
+        }
+        sourceRow += sourceStride;
+        row += destinationStride;
+    }
     return 1;
 }
 
