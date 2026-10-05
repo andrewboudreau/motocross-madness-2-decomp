@@ -86,6 +86,8 @@ strictly; see [LZW](LZW.md).
 
 `Parser.cpp` matches strictly in 13 of its 14 functions; see [PARSER](PARSER.md).
 
+Track.cpp (tokenizer, node/segment walks, lap-time formatting): see [Track](TRACK.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
