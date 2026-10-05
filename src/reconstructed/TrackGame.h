@@ -8,6 +8,7 @@
 #include "PCGame.h"
 #include "UnknownResourceManager.h"
 #include "RaceView.h"
+#include "TrackRecord.h"
 
 struct UnknownInputEntry;
 
@@ -54,8 +55,9 @@ public:
     void UnknownFunction523a60(int value, char* name, const char* kind, char* path);
 
     char field_0x00[16];                      // name; slot 4 sets it from the network object
-    unsigned char field_0x10[0x6a0 - 0x10];
-    int field_0x6a0;                          // EventManager 0x0045cb70 passes it to 0x00523a60
+    unsigned char field_0x10[0xa0 - 0x10];
+    char field_0xa0[6][0x100];                // directories (TrackRecord.cpp 0x0051f0b0)
+    int field_0x6a0;                          // a directory name pointer for TrackRecord.cpp 0x0051f2c0                          // EventManager 0x0045cb70 passes it to 0x00523a60
     unsigned char field_0x6a4[0x6c8 - 0x6a4];
     int field_0x6c8;                          // copied to the GUI's +0xec (KrustyUI 0x004988a0)
     unsigned char field_0x6cc[0x6d4 - 0x6cc];
@@ -132,14 +134,7 @@ public:
     unsigned char field_0x00[0x10];
 };
 
-// Object at TrackGame+0x3400.
-class UnknownTrackGameObject3400 {
-public:
-    UnknownTrackGameObject3400();             // 0x0051ef30
-    ~UnknownTrackGameObject3400();            // 0x0051efc0
-
-    unsigned char field_0x00[0xe8];
-};
+// UnknownTrackGameObject3400, the object at TrackGame+0x3400, is in TrackRecord.h.
 
 // Object at TrackGame+0x33fc (constructor near DebugOverlay.cpp's literals;
 // no destructor).

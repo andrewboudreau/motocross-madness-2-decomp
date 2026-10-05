@@ -72,11 +72,18 @@ struct UnknownEventEntry {
 
     int field_0x00;                                // network player id
     int field_0x04;                                // finishing position
-    unsigned char field_0x08[0x28 - 0x08];
+    float field_0x08;                              // high-score values (TrackRecord.cpp 0x0051f3c0)
+    int field_0x0c;
+    unsigned char field_0x10[0x14 - 0x10];
+    float field_0x14;
+    float field_0x18;
+    float field_0x1c;
+    unsigned char field_0x20[0x28 - 0x20];
     int field_0x28;                                // championship points
-    unsigned char field_0x2c[0x30 - 0x2c];
+    float field_0x2c;
     unsigned char field_0x30;                      // counted in TrackGame+0x3424 (else Game+0x18)
-    unsigned char field_0x31[0x50 - 0x31];
+    unsigned char field_0x31[0x40 - 0x31];
+    char field_0x40[16];                           // racer name
 };
 
 // RTTI: EventManager : GameObject (vtable 0x0055259c; 0xd08 bytes, the size
