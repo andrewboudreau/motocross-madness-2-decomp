@@ -82,6 +82,7 @@ public:
     int UnknownFunction516800(TrackNode* node);
     int UnknownFunction516870(TrackNode** start);
     int UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
+    int UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegment* next);
     int UnknownFunction517310(TrackSegment* segment, TrackNode* node);
     int UnknownFunction517930(TrackListItem** list, int all);
     int UnknownFunction5179a0(TrackPos a, TrackPos b);

@@ -30,7 +30,9 @@ sites:
   segment (+0x08, +0x0c) and its links (count +0x10, array +0x14).
 - **Segment**, 0x30 bytes (line 141). It holds a point (+0x00..+0x08), the
   horizontal distance to the next point (+0x24), and the previous and next
-  segment (+0x28, +0x2c).
+  segment (+0x28, +0x2c). The strip test `0x00516ef0` reads +0x0c..+0x14 and
+  +0x18..+0x20 as two more points, the left and right edges (inferred from
+  how the test pairs them with the centre point).
 - **Work-list entry**, 0x10 bytes. Only +0x04 (node) and +0x0c (next) are used.
 
 A track position (node, segment, t) is passed by value. The loader
@@ -71,10 +73,18 @@ Near miss: the closest position on one node `0x00516ca0` (576/586 bytes).
 VC6 here reuses the projection's `p - segment` differences in two of the
 clamping branches, where retail recomputes them.
 
+Near miss: the strip test `0x00516ef0` (1042/1042 bytes, 98.18%). It is a
+point-in-polygon parity test over six edges of the strip between a segment
+and the next. On two of the edges retail multiplies the cross-product
+factors in the other order. An inline helper that takes the point by value
+and the edge points by pointer gives the other four edges' load order; a
+macro over plain floats loses it.
+
 Not yet attempted:
 - the loader `0x00515ed0` (2342 bytes);
-- the closest-position search `0x00516980`;
-- `0x00516ef0`, `0x00517340` and `0x00518230`.
+- the closest-position search `0x00516980` (its inner loop is the same as
+  `0x00516ca0`'s, so it is likely to hit the same blocker);
+- `0x00517340` and `0x00518230`.
 
 ## Source shapes that mattered
 
@@ -92,6 +102,8 @@ Not yet attempted:
 - `0x005179f0`: one `TrackPos` local reused for both 0x00517da0 calls (two
   locals take two stack slots).
 - `0x00518130`: the squared length must be `(y*y + x*x) + z*z`.
+- Boolean values computed with `fcompp` come out in the inverted sense in
+  retail: `(lhs <= rhs) == (p.z >= a->z)`, not `(lhs > rhs) != ...`.
 
 ## Reproduce
 

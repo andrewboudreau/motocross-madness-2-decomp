@@ -26,6 +26,15 @@
 // branch. Named px/pz locals, TrackVec3 temporaries, an inline Delta helper,
 // a TrackVec3 cast in those branches and reusing dx/dz all keep the CSE
 // (named locals add a second copy and grow the frame to 0x14).
+//
+// Track::UnknownFunction516ef0 (0x00516ef0, 1042 bytes): 1042/1042 bytes,
+// 98.2%. Two of the six inlined edge tests evaluate the two factors of one
+// product in the other order (edge 2: retail computes b.x - a.x before
+// p.z - a.z; edge 6: p.x - a.x before b.z - a.z). The other four match.
+// Factor and comparison order in the source do not move it. A macro over
+// plain floats is much further off, because VC6 then loads the segment
+// operands before p; the inline helper with a by-value TrackVec3 and
+// pointers to the edge points fixes that.
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/Track.h"
 #include "../../src/krusty2/math/FastMath.h"
@@ -225,4 +234,34 @@ int Track::UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, fl
             *outDistance = 0.0f;
     }
     return 1;
+}
+
+// One edge of the crossing-number test in 0x00516ef0: whether the edge a-b
+// crosses the ray from p.
+static inline int UnknownEdgeCrosses(TrackVec3 p, const TrackVec3* a, const TrackVec3* b)
+{
+    return (a->x <= p.x || b->x <= p.x)
+        && (p.z >= a->z && p.z < b->z || p.z >= b->z && p.z < a->z)
+        && ((b->x - a->x) * (p.z - a->z) <= (p.x - a->x) * (b->z - a->z)) == (p.z >= a->z);
+}
+
+// 0x00516ef0: whether p lies, in the horizontal plane, inside the strip
+// between segment and next (edge points at +0x0c and +0x18, centre at
+// +0x00), by the crossing-number rule over six edges.
+int Track::UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegment* next)
+{
+    int inside = 0;
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->field_0x0c, (TrackVec3*)&next->field_0x0c))
+        inside = 1 - inside;
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->field_0x0c, (TrackVec3*)&segment->field_0x00))
+        inside = 1 - inside;
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->field_0x18, (TrackVec3*)&segment->field_0x00))
+        inside = 1 - inside;
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&segment->field_0x18, (TrackVec3*)&next->field_0x18))
+        inside = 1 - inside;
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&next->field_0x0c, (TrackVec3*)&next->field_0x00))
+        inside = 1 - inside;
+    if (UnknownEdgeCrosses(p, (TrackVec3*)&next->field_0x18, (TrackVec3*)&next->field_0x00))
+        inside = 1 - inside;
+    return inside;
 }
