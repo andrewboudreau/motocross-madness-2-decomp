@@ -5,7 +5,9 @@
 
 #include <string.h>
 
+#include "DebugAlloc.h"
 #include "RenderInterfaces.h"
+#include "TextureMap.h"
 
 // 0x00511740: bytes per stored pixel of a file format.
 int UnknownFunction511740(int fileFormat) {
@@ -285,6 +287,43 @@ int UnknownFunction511af0(UnknownPixelFormat* pixelFormat) {
     return format;
 }
 
+// 0x00511d00: opens `path` "rb" in a new stream (Tgafile.cpp line 494) and
+// reads its header; 0 when it cannot be opened.
+UnknownTgaFile* UnknownFunction511d00(const char* path, int a, int b) {
+    UnknownTextureStream* stream = new(__FILE__, 494) UnknownTextureStream(b);
+    if (!stream->UnknownFunction460f50(path, "rb", 0)) {
+        delete stream;
+        return 0;
+    }
+    UnknownTgaFile* file = UnknownFunction511b40(stream, a, 0);
+    delete stream;
+    return file;
+}
+
+// 0x00511dd0: reads the header and then the pixels for its depth; frees
+// the file when the pixels cannot be read.
+UnknownTgaFile* UnknownFunction511dd0(UnknownTextureStream* stream, int a, int b) {
+    UnknownTgaFile* file = UnknownFunction511b40(stream, a, b);
+    if (!file)
+        return 0;
+    if (file->bitsPerPixel == 24) {
+        if (!UnknownFunction511e80(file, stream))
+            goto failed;
+    } else if (file->bitsPerPixel == 32) {
+        if (!UnknownFunction512100(file, stream))
+            goto failed;
+    } else if (!UnknownFunction512370(file, stream)) {
+        goto failed;
+    }
+    strcpy(file->name, g_UnknownGlobal577738);
+    return file;
+failed:
+    if (file->bits)
+        operator delete(file->bits, __FILE__, 553);
+    operator delete(file, __FILE__, 554);
+    return 0;
+}
+
 // 0x00512720: writes 24-bit `bits` to the TGA file `path`.
 int UnknownFunction512720(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
     UnknownTgaFile file;
@@ -359,4 +398,15 @@ void UnknownFunction512940(UnknownTgaFile* file, void* bits, int width, int heig
     file->bitsPerPixel = 16;
     file->descriptor = 0;
     file->bits = bits;
+}
+
+// 0x00512dd0: frees a loaded file, its pixels and +0x120.
+void UnknownFunction512dd0(UnknownTgaFile* file) {
+    if (file) {
+        if (file->bits)
+            operator delete(file->bits, __FILE__, 865);
+        if (file->field_0x120)
+            operator delete(file->field_0x120, __FILE__, 866);
+        operator delete(file, __FILE__, 867);
+    }
 }

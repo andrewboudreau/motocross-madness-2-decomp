@@ -1,6 +1,20 @@
 {
+  "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
+  "??1UnknownTextureStream@@QAE@XZ": "0x00460d60",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "??_C@_02JKAF@rb?$AA@": "0x0056666c",
+  "?UnknownFunction460f50@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
+  "?UnknownFunction511b40@@YAPAUUnknownTgaFile@@PAVUnknownTextureStream@@HH@Z": "0x00511b40",
+  "?UnknownFunction511d00@@YAPAUUnknownTgaFile@@PBDHH@Z$ehhandler": "0x0054eb57",
+  "?UnknownFunction511e80@@YAHPAUUnknownTgaFile@@PAVUnknownTextureStream@@@Z": "0x00511e80",
+  "?UnknownFunction512100@@YAHPAUUnknownTgaFile@@PAVUnknownTextureStream@@@Z": "0x00512100",
+  "?UnknownFunction512370@@YAHPAUUnknownTgaFile@@PAVUnknownTextureStream@@@Z": "0x00512370",
   "?UnknownFunction5127a0@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x005127a0",
   "?UnknownFunction512870@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x00512870",
   "?UnknownFunction512940@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x00512940",
-  "?UnknownFunction512990@@YAHPAUUnknownTgaFile@@IHH@Z": "0x00512990"
+  "?UnknownFunction512990@@YAHPAUUnknownTgaFile@@IHH@Z": "0x00512990",
+  "?g_UnknownGlobal577738@@3PADA": "0x00577738",
+  "__FILE__": "0x00574fc8"
 }

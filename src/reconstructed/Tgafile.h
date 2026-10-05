@@ -60,6 +60,28 @@ struct UnknownTgaFile {
 // is 0x3e0, else 565.
 int UnknownFunction512990(UnknownTgaFile* file, unsigned int stride, int greenMask, int descriptor);
 
+class UnknownTextureStream;
+
+// Global buffer at 0x00577738 copied into a loaded file's name.
+extern char g_UnknownGlobal577738[];
+
+// 0x00511b40: reads a file's header from `stream` into a new UnknownTgaFile.
+UnknownTgaFile* UnknownFunction511b40(UnknownTextureStream* stream, int a, int b);
+
+// Pixel readers for a loaded header (24-bit, 32-bit, 16-bit); 0 on failure.
+int UnknownFunction511e80(UnknownTgaFile* file, UnknownTextureStream* stream);
+int UnknownFunction512100(UnknownTgaFile* file, UnknownTextureStream* stream);
+int UnknownFunction512370(UnknownTgaFile* file, UnknownTextureStream* stream);
+
+// 0x00511d00: opens `path` and reads its header (0x00511b40).
+UnknownTgaFile* UnknownFunction511d00(const char* path, int a, int b);
+
+// 0x00511dd0: reads a whole file from `stream`; 0 on failure.
+UnknownTgaFile* UnknownFunction511dd0(UnknownTextureStream* stream, int a, int b);
+
+// 0x00512dd0: frees a loaded file.
+void UnknownFunction512dd0(UnknownTgaFile* file);
+
 // Writers: fill a 24-bit (0x005127a0), 32-bit (0x00512870) or 16-bit
 // (0x00512940) header for `bits`, name it `path` and write it.
 int UnknownFunction512720(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor);

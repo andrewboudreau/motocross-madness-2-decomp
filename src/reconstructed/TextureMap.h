@@ -29,8 +29,13 @@ struct UnknownTextureFormatChoice {
 // read. Both follow +0x1c to the innermost stream first.
 class UnknownTextureStream {
 public:
+    UnknownTextureStream(int a);              // 0x00460d10
+    ~UnknownTextureStream();                  // 0x00460d60
+    int UnknownFunction460f50(const char* path, const char* mode, int a); // 0x00460f50: opens `path`
     int UnknownFunction461600();
     int UnknownFunction461640(void* buffer, int size, int count);
+
+    unsigned char field_0x000[0x134];
 };
 
 // A render state and its value (RenderTarget slot 8).
