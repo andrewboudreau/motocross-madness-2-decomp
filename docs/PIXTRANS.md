@@ -5,10 +5,11 @@ PCVideoCard.cpp's code (literal `0x004d06e9`). PCTextureMap and
 ManagedTextureGroup call them. Strides are in pixels; names are
 provisional.
 
-Exact (25 calibration cases):
+Exact (26 calibration cases):
 
 | VA | Size | Role |
 |---|---:|---|
+| `0x004cde20` | 234 | halves 24-bit pixels (2x2 average) |
 | `0x004d0870` | 134 | 4444 to 8888 |
 | `0x004d0900` | 204 | 24-bit to 565, dithered through `0x004cf2a0` when asked |
 | `0x004d09d0` | 204 | 24-bit to 555, dithered through `0x004cf2a0` when asked |
@@ -67,7 +68,7 @@ per-format helper: palette `0x004d05c0` (with the palette), 555
 `0x004d0440` and 565 `0x004d02c0` (with a filter flag), 24-bit
 `0x004cfaf0`, 1555 `0x004d0170`, 4444 `0x004d0020`, 8888 `0x004cfc40`.
 Each copies rows for 0 levels, halves once through a per-format halver
-(24-bit: `0x004cde20`) for 1, and otherwise halves through a temporary of
+(24-bit: `0x004cde20`, which indexes the lower row as `top[sourceStride]`) for 1, and otherwise halves through a temporary of
 the first level's size (Pixtrans.cpp lines 1329/1350 in the 24-bit one).
 
 Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004cfaf0`, whose

@@ -4504,6 +4504,15 @@ CASES = [
         'reason': 'if/else around the ditherer shares return 1',
     },
     {
+        'name': 'Pixtrans 24-bit halve 0x4cde20',
+        'bindings': 'src/reconstructed/Pixtrans.bindings.json',
+        'source': 'src/reconstructed/Pixtrans.cpp',
+        'symbol': '?UnknownFunction4cde20@@YAHPAX0HHHH@Z',
+        'target_va': '0x004cde20',
+        'target_size': 234,
+        'reason': 'bottom row indexed as top[sourceStride]',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

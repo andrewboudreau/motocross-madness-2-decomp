@@ -24,6 +24,25 @@ int UnknownFunction4d0870(void* destination, void* source, int width, int height
     return 1;
 }
 
+// 0x004cde20: halves 24-bit pixels, averaging each 2x2 block.
+int UnknownFunction4cde20(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride) {
+    UnknownPixel24* sourceRow = (UnknownPixel24*)source;
+    UnknownPixel24* row = (UnknownPixel24*)destination;
+    for (int y = 0; y < height; y++) {
+        UnknownPixel24* top = sourceRow;
+        UnknownPixel24* to = row;
+        for (int x = 0; x < width; x++, to++, top += 2) {
+            to->red = (top[0].red + top[1].red + top[sourceStride].red + top[sourceStride + 1].red) >> 2;
+            to->green = (top[0].green + top[1].green + top[sourceStride].green + top[sourceStride + 1].green) >> 2;
+            to->blue = (top[0].blue + top[1].blue + top[sourceStride].blue + top[sourceStride + 1].blue) >> 2;
+        }
+        sourceRow += sourceStride * 2;
+        row += destinationStride;
+    }
+    return 1;
+}
+
 // 0x004d0900: converts 24-bit to 565, through the ditherer when asked.
 int UnknownFunction4d0900(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int dither) {

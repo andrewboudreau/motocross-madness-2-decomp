@@ -114,9 +114,10 @@ int UnknownFunction4d1810(void* destination, void* source, int width, int height
 int UnknownFunction4d18c0(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key);
 
-// 0x004cde20: halves 24-bit `source` into the width x height `destination`.
-void UnknownFunction4cde20(void* destination, void* source, int width, int height, int destinationStride,
-                           int sourceStride);
+// 0x004cde20: halves 24-bit `source` into the width x height `destination`
+// (each pixel averages a 2x2 block); returns 1.
+int UnknownFunction4cde20(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride);
 
 // Per-format halving downsamplers behind 0x004d1b90 (8888, 24-bit, 4444,
 // 1555, 565, 555, palette); `a` and `filter` are passed through.
