@@ -3,26 +3,21 @@ Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDAT
 
 # BoundingBoxTreeBuild.cpp (bvh)
 
-Validation: counts labeled "exact" below are historical relocation-masked
-diagnostics, not strict acceptance. Use `tools/run_physics_samples.py --strict`
-with reviewed bindings before accepting these candidates.
+The builder itself is now matched in `src/reconstructed/BoundingBoxTreeBuild.cpp`
+(calibration; see docs/BOUNDINGBOXTREE.md). This header stays here for the
+physics samples.
 
 Evidence
 - `__FILE__` string `D:\aardvark\VC\krusty2\BoundingBoxTreeBuild.cpp` at VA 0x005682bc. Its own
   xrefs span 0x42b75e..0x42e257: DebugMalloc / debug-delete line numbers 0x24d..0x59e.
-- Bracket 0x4245dc..0x42f657: after bmpfile.cpp's last xref and before CarProcedural.cpp. The
-  file has no `__FILE__`-free neighbour of its own, but Camera.cpp (no `__FILE__` string) sorts
-  between the two and starts at 0x42e340. That code belongs to another team.
-- Extent, by evidence:
-  - 0x4245f0..0x42ad21: run-time box/OBB query code. It has no `__FILE__` and is called from
-    CollisionShapeTests, so it is probably a separate file. Six small entry points are in
-    `samples/physics/bvh/BoundingBoxTreeQuery.cpp`; the large workers are not reconstructed.
-  - 0x42ad30..0x42b5eb: partition and bounds helpers. They have no `__FILE__`, but only this
-    file calls them. They are in `samples/physics/bvh/BoundingBoxTreeSplit.cpp`.
-  - 0x42b5f0..0x42e2a3: the file's own functions. Every one references `__FILE__`, or sits between
-    functions that do and uses the same types. All are promoted here.
-  - 0x42e2b0: the out-of-line rigid inverse. It has no `__FILE__` and is called only from
-    CollisionObject, so it is in `samples/physics/bvh/RigidTransform.cpp`.
+- Extent: 0x42ad30..0x42e2a3.
+  - 0x42ad30..0x42b5eb holds the partition and bounds helpers. Only this file
+    calls them.
+  - The code before 0x42ad30 is a separate, unattested unit, with its own kVec3
+    `$E` set at 0x429400 and its own bss. Its six small query entry points are in
+    `samples/physics/bvh/BoundingBoxTreeQuery.cpp`.
+  - 0x42e2b0, the rigid inverse, is called only from CollisionObject. It is in
+    `samples/physics/bvh/RigidTransform.cpp`.
 - RTTI: none. The file has no classes, only free functions over plain structs.
 - Layout (decoded accesses; names are tier 3; see the `// +0xNN` comments in BoundingBoxTreeBuild.h):
   - Interior node: 0x24 bytes, `{volume, center, halfExtents, child[2]}`; volume >= 0 marks an
@@ -37,11 +32,9 @@ Evidence
   but GatherModelTriangles uses them earlier. They are therefore declared `extern` in the header
   and defined midway (tier 3; linkage is not visible in the image).
 
-Counts: 21 exact, 2 partial of 23 targets (8 of the exact ones are the $E thunks and bodies).
-- Partial: BuildModelPointTree 0x42d390, 99.56%. Two operand-order spots: the y row of one inlined
-  TransformPoint, and a base/index order.
-- Partial: GatherModelTriangles 0x42c260, 99.67%. One reload order and one base/index order.
-Samples (`samples/physics/bvh`): 13 exact of 13.
+Partials (`samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp`):
+- GatherModelTriangles 0x42c260: one reload order and one base/index order.
+- BuildModelPointTree 0x42d390: two operand-order spots.
 
 Notes
 - BuildBoxNode 0x42d9e0 keeps a retail bug: the right half's centres are copied back from

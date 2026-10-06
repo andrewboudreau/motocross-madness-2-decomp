@@ -1,15 +1,195 @@
-// Candidate: relocation evidence is incomplete; see docs/PHYSICS_VALIDATION.md.
 // BoundingBoxTreeBuild.cpp -- D:\aardvark\VC\krusty2\BoundingBoxTreeBuild.cpp (string 0x005682bc).
 //
 // Builds and loads the collision bounding-box trees: a binary tree of axis-aligned boxes over
-// triangles (mesh payload), over points, or over element boxes (model tree).  Every function
-// here either passes the file's own __FILE__ string to DebugMalloc / operator delete or sits
-// between two that do; see README.md.  The partition and bounds helpers that precede the first
-// own xref are in samples/physics/bvh/BoundingBoxTreeSplit.cpp.  Function names are ours.
+// triangles (mesh payload), over points, or over element boxes (model tree).  Function names
+// are ours.  Promoted from samples/physics/bvh (BoundingBoxTreeSplit.cpp, BoundingBoxTreeBuild.cpp).
+//
+// Extent 0x0042ad30..0x0042e2a3 (strong inference):
+// - The file's own __FILE__ xrefs span 0x0042b75e..0x0042e257 (DebugMalloc / debug-delete line
+//   numbers 0x24d..0x59e).
+// - 0x0042ad30..0x0042b5eb: partition and bounds helpers without __FILE__; every direct call
+//   to them comes from this file's functions and none from elsewhere.
+// - The code before 0x0042ad30 is another TU: it has its own kVec3 `$E` set (0x00429400..
+//   0x0042953b; .CRT$XCU lists it before the trivial `$E` group 0x00424690..0x0042472f, which
+//   therefore belongs to the same TU) and its .bss (0x00578ea0..0x00579070) is referenced from
+//   0x00424df8..0x0042a0ae; 0x0042a640 and 0x0042ac00 are called from it.
+// - After 0x0042e2a3: the out-of-line rigid inverse 0x0042e2b0 (called only from
+//   CollisionObject; kept in samples/physics/bvh/RigidTransform.cpp), then Camera.cpp 0x0042e340.
+// The four kVec3 `$E` pairs 0x0042d250..0x0042d38b sit mid-file.
+//
+// Near misses (samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp): GatherModelTriangles
+// 0x0042c260 and BuildModelPointTree 0x0042d390.
 #include <math.h>
 #include <string.h>
 
-#include "bvh/BoundingBoxTreeBuild.h"
+#include "BoundingBoxTreeBuild.h"
+#include "TextureMap.h"
+
+// ---------------------------------------------------------------------------------------------
+// Partition and bounds helpers.
+
+// 0x0042ad30.  Partitions triangle records by the centroid against a plane on `axis`: records
+// with centroid > split go to `left`, the rest to `right`.  When either side ends up empty the
+// input is split in half by index instead and 0 is returned (1 = the plane separated them).
+int SplitTriangles(const TreeBuildTriangle* tris, TreeBuildTriangle* left,
+                   TreeBuildTriangle* right, int count, int* leftCount, int* rightCount,
+                   float split, int axis)
+{
+    int i;
+    int toLeft;
+
+    *leftCount = 0;
+    *rightCount = 0;
+    toLeft = 0;
+    for (i = 0; i < count; i++) {
+        switch (axis) {
+        case 0: toLeft = tris[i].centroid.x > split; break;
+        case 1: toLeft = tris[i].centroid.y > split; break;
+        case 2: toLeft = tris[i].centroid.z > split; break;
+        }
+        if (toLeft)
+            left[(*leftCount)++] = tris[i];
+        else
+            right[(*rightCount)++] = tris[i];
+    }
+    if (*rightCount != 0 && *leftCount != 0)
+        return 1;
+
+    *leftCount = count / 2;
+    *rightCount = count - count / 2;
+    for (i = 0; i < *leftCount; i++)
+        left[i] = tris[i];
+    for (i = 0; i < *rightCount; i++)
+        right[i] = tris[*leftCount + i];
+    return 0;
+}
+
+// 0x0042ae70.  The box-tree counterpart of SplitTriangles: element i is the box
+// boxes[2*i], boxes[2*i+1] (two corners) with centre centers[i]; boxes whose centre is > split
+// on `axis` go left.  When either side ends up empty the caller gets the half-and-half counts
+// (no copying here) and 0 is returned.
+int SplitBoxes(const TreeVec3* boxes, const TreeVec3* centers, TreeVec3* leftBoxes,
+               TreeVec3* rightBoxes, TreeVec3* leftCenters, TreeVec3* rightCenters, int count,
+               int* leftCount, int* rightCount, float split, int axis)
+{
+    int i;
+    int toLeft;
+
+    *leftCount = 0;
+    *rightCount = 0;
+    for (i = 0; i < count; i++) {
+        switch (axis) {
+        case 0: toLeft = centers[i].x > split; break;
+        case 1: toLeft = centers[i].y > split; break;
+        case 2: toLeft = centers[i].z > split; break;
+        }
+        if (toLeft) {
+            leftBoxes[2 * *leftCount] = boxes[2 * i];
+            leftBoxes[2 * *leftCount + 1] = boxes[2 * i + 1];
+            leftCenters[*leftCount] = centers[i];
+            (*leftCount)++;
+        } else {
+            rightBoxes[2 * *rightCount] = boxes[2 * i];
+            rightBoxes[2 * *rightCount + 1] = boxes[2 * i + 1];
+            rightCenters[*rightCount] = centers[i];
+            (*rightCount)++;
+        }
+    }
+    if (*rightCount != 0 && *leftCount != 0)
+        return 1;
+
+    *leftCount = count / 2;
+    *rightCount = count - count / 2;
+    return 0;
+}
+
+// Edge of a bounding box used for its volume: never negative and at least 0.01 so flat
+// boxes still have a volume.
+inline float BoxEdge(float halfExtent)
+{
+    float edge = halfExtent * 2.0f;
+    if (edge < 0.0f)
+        edge = -edge;
+    if (edge <= 0.01f)
+        edge = 0.01f;
+    return edge;
+}
+
+// 0x0042aff0.  Axis-aligned bounds of `count` points (optionally transformed by `m` first):
+// writes the centre, the half size and the volume (edges clamped to >= 0.01).
+void ComputePointBounds(const TreeVec3* points, int count, TreeVec3* center,
+                        TreeVec3* halfExtents, float* volume, const TreeMatrix4* m)
+{
+    TreeVec3 max = points[0];
+    TreeVec3 min = points[0];
+    int i;
+
+    for (i = 0; i < count; i++) {
+        TreeVec3 p = points[i];
+        if (m)
+            TransformPoint(&p, p, m);
+        if (p.x > max.x) max.x = p.x;
+        if (p.y > max.y) max.y = p.y;
+        if (p.z > max.z) max.z = p.z;
+        if (p.x < min.x) min.x = p.x;
+        if (p.y < min.y) min.y = p.y;
+        if (p.z < min.z) min.z = p.z;
+    }
+    *center = (min + max) * 0.5f;
+    *halfExtents = (max - min) * 0.5f;
+    *volume = BoxEdge(halfExtents->x) * BoxEdge(halfExtents->y) * BoxEdge(halfExtents->z);
+}
+
+// 0x0042b2a0.  ComputePointBounds over the three corners of each triangle record (vertex
+// indices into `verts`).
+void ComputeTriangleBounds(const TreeBuildTriangle* tris, int count, const TreeVec3* verts,
+                           TreeVec3* center, TreeVec3* halfExtents, float* volume,
+                           const TreeMatrix4* m)
+{
+    TreeVec3 max = verts[tris[0].vertex[0]];
+    TreeVec3 min = verts[tris[0].vertex[0]];
+    int i;
+    int k;
+
+    for (i = 0; i < count; i++) {
+        for (k = 0; k < 3; k++) {
+            TreeVec3 p = verts[tris[i].vertex[k]];
+            if (m)
+                TransformPoint(&p, p, m);
+            if (p.x > max.x) max.x = p.x;
+            if (p.y > max.y) max.y = p.y;
+            if (p.z > max.z) max.z = p.z;
+            if (p.x < min.x) min.x = p.x;
+            if (p.y < min.y) min.y = p.y;
+            if (p.z < min.z) min.z = p.z;
+        }
+    }
+    *center = (min + max) * 0.5f;
+    *halfExtents = (max - min) * 0.5f;
+    *volume = BoxEdge(halfExtents->x) * BoxEdge(halfExtents->y) * BoxEdge(halfExtents->z);
+}
+
+// 0x0042b590.  Bounding-box volume of a triangle set, the split cost the triangle tree uses.
+float TriangleBoundsVolume(const TreeBuildTriangle* tris, const TreeVec3* verts, int count)
+{
+    TreeVec3 center;
+    TreeVec3 halfExtents;
+    float volume;
+
+    ComputeTriangleBounds(tris, count, verts, &center, &halfExtents, &volume, 0);
+    return volume;
+}
+
+// 0x0042b5c0.  Bounding-box volume of a point set (the box tree passes box corners).
+float PointBoundsVolume(const TreeVec3* points, int count)
+{
+    TreeVec3 center;
+    TreeVec3 halfExtents;
+    float volume;
+
+    ComputePointBounds(points, count, &center, &halfExtents, &volume, 0);
+    return volume;
+}
 
 // ---------------------------------------------------------------------------------------------
 // Building.  The partition and bounds helpers are declared in BoundingBoxTreeBuild.h.
@@ -300,188 +480,6 @@ void BuildTriangleNode(BoxTreeNode* node, TreeBuildTriangle* tris, int count,
     BuildTriangleNode(node->child[1], tris + leftCount, rightCount, verts);
 }
 
-// 0x0042c260.  Collects the triangles of `model`'s current LOD for the triangle tree.  The model
-// is put at the origin with identity axes first (and its matrix restored at the end), so the
-// positions come out in model space.  With a `frame`, only triangles whose three corners lie
-// in that frame's vertex range are taken, with positions from the mesh's +0x14 array.  Every
-// corner gets its own position, then equal positions are merged: the result is *verts
-// (*vertCount unique positions) and *indices (three per triangle, *triCount triangles).
-// PARTIAL 99.67%: same size and instructions apart from two spots: before the 0x348 allocation
-// retail reloads numCorners before remap (VC6 gives the other order), and the remap pass reads
-// keep[corners[k]] as [keep + offset] where VC6 gives [offset + keep].  The loop-variable names
-// of the merge passes (j outer, k inner, i for the copy) are the ones that put every local in
-// retail's stack slot; other choices only move slots.
-void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* triCount,
-                          int* vertCount, int** indices, TreeVec3** verts)
-{
-    TreeMatrix4 saved;
-    TreeModelTriangle tri;
-    TreeModelMesh* mesh;
-    TreeModelVertex* source;
-    TreeVec3* positions;
-    TreeVec3* unique;
-    int* corners;
-    int* remap;
-    int* keep;
-    int numTris;
-    int numCorners;
-    int numUnique;
-    int numTaken;
-    int savedField;
-    int inside;
-    int first;
-    int end;
-    int n;
-    int i;
-    int j;
-    int k;
-    int t;
-
-    numTris = 0;
-    model->GetMatrixIn(0, &saved);
-    model->SetAxesIn(0, &kVec3ZAxis, &kVec3YAxis, 0, 1);
-    model->SetPositionIn(0, &kVec3Zero);
-    savedField = model->field_0x1a4;
-    model->field_0x1a4 = 0;
-    model->MarkSubtreeDirty();
-    model->SelectLod(-1);
-    model->field_0x1a4 = savedField;
-    model->MarkSubtreeDirty();
-
-    if (frame == 0) {
-        for (i = 0; i < model->lods[model->currentLod].meshCount; i++)
-            numTris += model->lods[model->currentLod].meshes[i].triangleCount;
-    } else {
-        for (i = 0; i < model->lods[model->currentLod].meshCount; i++) {
-            mesh = &model->lods[model->currentLod].meshes[i];
-            first = 0;
-            end = 0;
-            for (k = 0; k < mesh->partCount; k++) {
-                if (mesh->parts[k].frame == frame) {
-                    first = ((char*)mesh->parts[k].firstVertex - (char*)mesh->vertices) /
-                            sizeof(TreeModelVertex);
-                    end = first + mesh->parts[k].vertexCount;
-                }
-            }
-            for (t = 0; t < mesh->triangleCount; t++) {
-                inside = 1;
-                if (mesh->triangles[t].vertex[0] < first || mesh->triangles[t].vertex[0] >= end)
-                    inside = 0;
-                if (mesh->triangles[t].vertex[1] < first || mesh->triangles[t].vertex[1] >= end)
-                    inside = 0;
-                if (mesh->triangles[t].vertex[2] < first || mesh->triangles[t].vertex[2] >= end)
-                    inside = 0;
-                if (inside)
-                    numTris++;
-            }
-        }
-    }
-
-    numCorners = numTris * 3;
-    corners = (int*)DebugMalloc(numTris * 3 * sizeof(int), __FILE__, 0x2fc);
-    remap = (int*)DebugMalloc(numTris * 3 * sizeof(int), __FILE__, 0x2fd);
-    positions = (TreeVec3*)DebugMalloc(numTris * 3 * sizeof(TreeVec3), __FILE__, 0x2fe);
-
-    // One position per corner; remap starts as the identity.
-    n = 0;
-    numTaken = 0;
-    for (i = 0; i < model->lods[model->currentLod].meshCount; i++) {
-        mesh = &model->lods[model->currentLod].meshes[i];
-        if (frame == 0)
-            source = mesh->vertices;
-        else
-            source = mesh->field_0x14;
-        first = 0;
-        end = 0;
-        if (frame != 0) {
-            for (k = 0; k < mesh->partCount; k++) {
-                if (mesh->parts[k].frame == frame) {
-                    first = ((char*)mesh->parts[k].firstVertex - (char*)mesh->vertices) /
-                            sizeof(TreeModelVertex);
-                    end = first + mesh->parts[k].vertexCount;
-                }
-            }
-        }
-        for (t = 0; t < model->lods[model->currentLod].meshes[i].triangleCount; t++) {
-            tri = model->lods[model->currentLod].meshes[i].triangles[t];
-            inside = 1;
-            if (frame != 0) {
-                if (mesh->triangles[t].vertex[0] < first || mesh->triangles[t].vertex[0] >= end)
-                    inside = 0;
-                if (mesh->triangles[t].vertex[1] < first || mesh->triangles[t].vertex[1] >= end)
-                    inside = 0;
-                if (mesh->triangles[t].vertex[2] < first || mesh->triangles[t].vertex[2] >= end)
-                    inside = 0;
-            }
-            if (inside) {
-                positions[n].x = source[tri.vertex[0]].position.x;
-                positions[n].y = source[tri.vertex[0]].position.y;
-                positions[n].z = source[tri.vertex[0]].position.z;
-                corners[numTaken * 3 + 0] = n;
-                remap[n] = n;
-                n++;
-                positions[n].x = source[tri.vertex[1]].position.x;
-                positions[n].y = source[tri.vertex[1]].position.y;
-                positions[n].z = source[tri.vertex[1]].position.z;
-                corners[numTaken * 3 + 1] = n;
-                remap[n] = n;
-                n++;
-                positions[n].x = source[tri.vertex[2]].position.x;
-                positions[n].y = source[tri.vertex[2]].position.y;
-                positions[n].z = source[tri.vertex[2]].position.z;
-                corners[numTaken * 3 + 2] = n;
-                remap[n] = n;
-                n++;
-                numTaken++;
-            }
-        }
-    }
-
-    // Merge equal positions: a later duplicate is dropped and remapped to the first one.
-    keep = (int*)DebugMalloc(numCorners * sizeof(int), __FILE__, 0x348);
-    for (i = 0; i < numCorners; i++)
-        keep[i] = 1;
-    numUnique = 0;
-    for (j = 0; j < numCorners; j++) {
-        if (keep[j]) {
-            for (k = j + 1; k < numCorners; k++) {
-                if (keep[k] && positions[j].x == positions[k].x &&
-                    positions[j].y == positions[k].y && positions[j].z == positions[k].z) {
-                    keep[k] = 0;
-                    remap[k] = j;
-                }
-            }
-        }
-        if (keep[j])
-            numUnique++;
-    }
-
-    unique = (TreeVec3*)DebugMalloc(numUnique * sizeof(TreeVec3), __FILE__, 0x361);
-    n = 0;
-    for (i = 0; i < numCorners; i++) {
-        if (keep[i]) {
-            unique[n] = positions[i];
-            remap[i] = n;
-            n++;
-        }
-    }
-    for (k = 0; k < numCorners; k++) {
-        if (keep[corners[k]])
-            corners[k] = remap[corners[k]];
-        else
-            corners[k] = remap[remap[corners[k]]];
-    }
-
-    operator delete(remap, __FILE__, 0x376);
-    operator delete(positions, __FILE__, 0x377);
-    operator delete(keep, __FILE__, 0x378);
-    *verts = unique;
-    *indices = corners;
-    *vertCount = numUnique;
-    *triCount = numTris;
-    model->SetMatrixIn(0, &saved);
-}
-
 // 0x0042c8c0.  BuildTriangleMeshTree for a render model: GatherModelTriangles supplies the
 // indices and the vertices (returned through `verts`).  The sixth argument is never read.
 void BuildModelTriangleTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* model,
@@ -634,83 +632,6 @@ const TreeVec3 kVec3XAxis = TreeVec3(1.0f, 0.0f, 0.0f);
 const TreeVec3 kVec3YAxis = TreeVec3(0.0f, 1.0f, 0.0f);
 const TreeVec3 kVec3ZAxis = TreeVec3(0.0f, 0.0f, 1.0f);
 
-// 0x0042d390.  Builds a point tree over a render model's vertices: all vertices of the current
-// LOD when `frame` is null, otherwise only the vertex ranges that belong to `frame`.  Each point
-// goes through the inverse of the model's (or the frame's) GetMatrixIn(0) matrix, then all of
-// them through the inverse of `m`.  Only the frame branch reassigns `total` (retail keeps the
-// summed count in the frame==0 branch and copies the gathered count in the other one).
-// PARTIAL 99.56%: same size; two operand-order spots differ.  In the frame==0 loop retail
-// evaluates the y row of the inlined TransformPoint as _22*y, _32*z (every other row here and in
-// the frame loop is z-term first), and the frame loop's vertex reads use [offset+vertices] where
-// VC6 gives [vertices+offset].  Neither moved with loop-variable, indexing or declaration-order
-// variants.
-void BuildModelPointTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* model,
-                         TreeSceneNode* frame)
-{
-    TreeVec3* points;
-    TreeMatrix4 frameInverse;
-    TreeMatrix4 inverse;
-    TreeModelMesh* mesh;
-    int total;
-    int count;
-    int first;
-    int end;
-    int i;
-    int j;
-    int k;
-
-    model->SelectLod(-1);
-    total = 0;
-    for (i = 0; i < model->lods[model->currentLod].meshCount; i++)
-        total += model->lods[model->currentLod].meshes[i].vertexCount;
-    points = (TreeVec3*)DebugMalloc(total * sizeof(TreeVec3), __FILE__, 0x44f);
-    count = 0;
-    if (frame == 0) {
-        model->GetMatrixIn(0, &frameInverse);
-        InvertRigid(&frameInverse);
-        for (i = 0; i < model->lods[model->currentLod].meshCount; i++) {
-            mesh = &model->lods[model->currentLod].meshes[i];
-            for (j = 0; j < mesh->vertexCount; j++) {
-                points[count].x = mesh->vertices[j].position.x;
-                points[count].y = mesh->vertices[j].position.y;
-                points[count].z = mesh->vertices[j].position.z;
-                TransformPoint(&points[count], points[count], &frameInverse);
-                count++;
-            }
-        }
-    } else {
-        frame->GetMatrixIn(0, &frameInverse);
-        InvertRigid(&frameInverse);
-        for (i = 0; i < model->lods[model->currentLod].meshCount; i++) {
-            mesh = &model->lods[model->currentLod].meshes[i];
-            first = 0;
-            end = 0;
-            for (k = 0; k < mesh->partCount; k++) {
-                if (mesh->parts[k].frame == frame) {
-                    first = ((char*)mesh->parts[k].firstVertex - (char*)mesh->vertices) /
-                            sizeof(TreeModelVertex);
-                    end = first + mesh->parts[k].vertexCount;
-                }
-            }
-            for (j = first; j < end; j++) {
-                points[count].x = mesh->vertices[j].position.x;
-                points[count].y = mesh->vertices[j].position.y;
-                points[count].z = mesh->vertices[j].position.z;
-                TransformPoint(&points[count], points[count], &frameInverse);
-                count++;
-            }
-        }
-        total = count;
-    }
-
-    inverse = *m;
-    InvertRigid(&inverse);
-    for (i = 0; i < total; i++)
-        TransformPoint(&points[i], points[i], &inverse);
-    BuildPointNode(root, points, total);
-    operator delete(points, __FILE__, 0x48a);
-}
-
 // 0x0042d9e0.  BuildTriangleNode for a model (box) tree: element i is the box boxes[2*i],
 // boxes[2*i+1] with centre centers[i]; a leaf holds one box.  Retail copies only the
 // partitioned centres back, not the box corners, and reads the right-hand centres from index
@@ -831,24 +752,24 @@ void AxisAngleMatrix(TreeMatrix4* m, float x, float y, float z, float angle)
 
 // ---------------------------------------------------------------------------------------------
 // Loading.  A node record is one float (>= 0: interior, the value is the box volume; < 0: leaf)
-// followed by the node's fields, each read with its own TreeFile::Read call; interior nodes are
+// followed by the node's fields, each read with its own 0x00461640 read; interior nodes are
 // followed by their two subtrees.
 
 // 0x0042dfa0.  Reads a triangle-tree node and its subtrees.
-void ReadTriangleNode(BoxTreeNode** out, TreeFile* file)
+void ReadTriangleNode(BoxTreeNode** out, UnknownTextureStream* file)
 {
     float flag;
 
-    file->Read(&flag, 4, 1);
+    file->UnknownFunction461640(&flag, 4, 1);
     if (flag >= 0.0f) {
         BoxTreeNode* node = (BoxTreeNode*)DebugMalloc(sizeof(BoxTreeNode), __FILE__, 0x52c);
         node->volume = flag;
-        file->Read(&node->center.x, 4, 1);
-        file->Read(&node->center.y, 4, 1);
-        file->Read(&node->center.z, 4, 1);
-        file->Read(&node->halfExtents.x, 4, 1);
-        file->Read(&node->halfExtents.y, 4, 1);
-        file->Read(&node->halfExtents.z, 4, 1);
+        file->UnknownFunction461640(&node->center.x, 4, 1);
+        file->UnknownFunction461640(&node->center.y, 4, 1);
+        file->UnknownFunction461640(&node->center.z, 4, 1);
+        file->UnknownFunction461640(&node->halfExtents.x, 4, 1);
+        file->UnknownFunction461640(&node->halfExtents.y, 4, 1);
+        file->UnknownFunction461640(&node->halfExtents.z, 4, 1);
         ReadTriangleNode(&node->child[0], file);
         ReadTriangleNode(&node->child[1], file);
         *out = node;
@@ -856,50 +777,50 @@ void ReadTriangleNode(BoxTreeNode** out, TreeFile* file)
         BoxTreeTriangleLeaf* leaf =
             (BoxTreeTriangleLeaf*)DebugMalloc(sizeof(BoxTreeTriangleLeaf), __FILE__, 0x548);
         leaf->marker = flag;
-        file->Read(&leaf->planeOffset, 4, 1);
-        file->Read(&leaf->normal.x, 4, 1);
-        file->Read(&leaf->normal.y, 4, 1);
-        file->Read(&leaf->normal.z, 4, 1);
-        file->Read(&leaf->vertex[0], 2, 1);
-        file->Read(&leaf->vertex[1], 2, 1);
-        file->Read(&leaf->vertex[2], 2, 1);
+        file->UnknownFunction461640(&leaf->planeOffset, 4, 1);
+        file->UnknownFunction461640(&leaf->normal.x, 4, 1);
+        file->UnknownFunction461640(&leaf->normal.y, 4, 1);
+        file->UnknownFunction461640(&leaf->normal.z, 4, 1);
+        file->UnknownFunction461640(&leaf->vertex[0], 2, 1);
+        file->UnknownFunction461640(&leaf->vertex[1], 2, 1);
+        file->UnknownFunction461640(&leaf->vertex[2], 2, 1);
         *out = (BoxTreeNode*)leaf;
     }
 }
 
 // 0x0042e0f0.  Reads a vertex count, the vertices and then the triangle tree over them.
-void ReadTriangleMesh(BoxTreeNode** tree, TreeVec3** verts, TreeFile* file)
+void ReadTriangleMesh(BoxTreeNode** tree, TreeVec3** verts, UnknownTextureStream* file)
 {
     int count;
     TreeVec3* v;
     int i;
 
-    file->Read(&count, 4, 1);
+    file->UnknownFunction461640(&count, 4, 1);
     v = (TreeVec3*)DebugMalloc(count * sizeof(TreeVec3), __FILE__, 0x567);
     for (i = 0; i < count; i++) {
-        file->Read(&v[i].x, 4, 1);
-        file->Read(&v[i].y, 4, 1);
-        file->Read(&v[i].z, 4, 1);
+        file->UnknownFunction461640(&v[i].x, 4, 1);
+        file->UnknownFunction461640(&v[i].y, 4, 1);
+        file->UnknownFunction461640(&v[i].z, 4, 1);
     }
     *verts = v;
     ReadTriangleNode(tree, file);
 }
 
 // 0x0042e190.  Reads a point-tree node and its subtrees.
-void ReadPointNode(BoxTreeNode** out, TreeFile* file)
+void ReadPointNode(BoxTreeNode** out, UnknownTextureStream* file)
 {
     float flag;
 
-    file->Read(&flag, 4, 1);
+    file->UnknownFunction461640(&flag, 4, 1);
     if (flag >= 0.0f) {
         BoxTreeNode* node = (BoxTreeNode*)DebugMalloc(sizeof(BoxTreeNode), __FILE__, 0x582);
         node->volume = flag;
-        file->Read(&node->center.x, 4, 1);
-        file->Read(&node->center.y, 4, 1);
-        file->Read(&node->center.z, 4, 1);
-        file->Read(&node->halfExtents.x, 4, 1);
-        file->Read(&node->halfExtents.y, 4, 1);
-        file->Read(&node->halfExtents.z, 4, 1);
+        file->UnknownFunction461640(&node->center.x, 4, 1);
+        file->UnknownFunction461640(&node->center.y, 4, 1);
+        file->UnknownFunction461640(&node->center.z, 4, 1);
+        file->UnknownFunction461640(&node->halfExtents.x, 4, 1);
+        file->UnknownFunction461640(&node->halfExtents.y, 4, 1);
+        file->UnknownFunction461640(&node->halfExtents.z, 4, 1);
         ReadPointNode(&node->child[0], file);
         ReadPointNode(&node->child[1], file);
         *out = node;
@@ -907,9 +828,9 @@ void ReadPointNode(BoxTreeNode** out, TreeFile* file)
         BoxTreePointLeaf* leaf =
             (BoxTreePointLeaf*)DebugMalloc(sizeof(BoxTreePointLeaf), __FILE__, 0x59e);
         leaf->marker = flag;
-        file->Read(&leaf->point.x, 4, 1);
-        file->Read(&leaf->point.y, 4, 1);
-        file->Read(&leaf->point.z, 4, 1);
+        file->UnknownFunction461640(&leaf->point.x, 4, 1);
+        file->UnknownFunction461640(&leaf->point.y, 4, 1);
+        file->UnknownFunction461640(&leaf->point.z, 4, 1);
         *out = (BoxTreeNode*)leaf;
     }
 }

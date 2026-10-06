@@ -1,0 +1,15 @@
+{
+  "??1GR_BitString@@UAE@XZ": "0x00423dd0",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7GR_BitString@@6B@": "0x00550f50",
+  "?UnknownFunction4238c0@GR_BitString@@QAEXH@Z": "0x004238c0",
+  "?UnknownFunction423940@GR_BitString@@QAEXH@Z": "0x00423940",
+  "?UnknownFunction4239c0@GR_BitString@@QAEXH@Z": "0x004239c0",
+  "?UnknownFunction423b70@GR_BitString@@QAEXH@Z": "0x00423b70",
+  "?g_UnknownBitReverse567f98@@3PAEA": "0x00567f98",
+  "?g_UnknownHighMasks568098@@3PAIA": "0x00568098",
+  "?g_UnknownLowMaskTable568224@@3PAIA": "0x00568224",
+  "?g_UnknownReadBits578e94@@3HA": "0x00578e94",
+  "?g_UnknownReadCursor578e98@@3PAIA": "0x00578e98",
+  "?g_UnknownReadWord578e90@@3IA": "0x00578e90"
+}

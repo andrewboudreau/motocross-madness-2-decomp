@@ -216,6 +216,9 @@ uiinfo.cpp (TrackGameMode) matches strictly in 34 functions; see
 
 Texmap.cpp is fully matched (13 functions); see [TEXMAP](TEXMAP.md).
 
+BoundingBoxTreeBuild.cpp (27) and GR_BitString (8) match strictly; see
+[BOUNDINGBOXTREE](BOUNDINGBOXTREE.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
