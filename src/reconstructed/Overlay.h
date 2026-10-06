@@ -24,6 +24,18 @@ struct UnknownOverlayVertex {
     float tv;
 };
 
+// The text renderer at Overlay+0x38 (Texmap.cpp's font code, not
+// reconstructed); thiscall, names provisional.
+class UnknownOverlayText {
+public:
+    void UnknownFunction50ade0(const char* font);   // 0x0050ade0: selects the font
+    // 0x0050ba00: lays `text` out in `rect` with `color`; returns the laid-out
+    // text, its count in *count.
+    void* UnknownFunction50ba00(const UnknownOverlayRect* rect, const char* text,
+                                unsigned int color, int* count);
+    void UnknownFunction50bd30(RenderTarget* target, void* text, int count); // 0x0050bd30: draws it
+};
+
 class Overlay : public GameObject {
 public:
     // 0x004b5e20: GameObject(flags); `value` is kept at +0x118.
@@ -37,14 +49,15 @@ public:
     Overlay* UnknownFunction4b5f50(RenderTarget* target, TextureMap* texture,
                                    const UnknownOverlayRect* rect, int a4,
                                    const UnknownOverlayRect* source, float depth,
-                                   char a7, int a8, int a9, int a10, int a11, int a12);
+                                   char a7, const char* a8, const char** a9, int a10,
+                                   int a11, int a12);
 
     RenderTarget* Target() const { return (RenderTarget*)field_0x18; }
 
     TextureMap* field_0x2c;                   // released by derived destructors
-    BaseObject* field_0x30;
+    TextureMap* field_0x30;                   // RadarOverlay: the loaded map texture
     BaseObject* field_0x34;
-    void* field_0x38;
+    UnknownOverlayText* field_0x38;
     BaseObject* field_0x3c;
     int field_0x40;
     UnknownOverlayVertex field_0x44[5];       // cleared by the constructor

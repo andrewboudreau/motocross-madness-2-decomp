@@ -183,3 +183,127 @@ public:
     int field_0x44;                           // text y
     char field_0x48[0x80];                    // text
 };
+
+// RTTI: RadarOverlay : Overlay (vtable 0x005587d0): the radar map in a
+// screen corner (radar128.tga, or radar256.tga above 800 pixels) with the
+// racers on it, and an optional frame-rate readout.
+class RadarOverlay : public Overlay {
+public:
+    explicit RadarOverlay(int flags);         // 0x0051b690
+    virtual ~RadarOverlay();                  // 0x0051b7d0 (deleting wrapper 0x0051b7b0)
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x0051bcd0
+    virtual int UnknownVirtualSlot14();       // 0x0051bd20
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0051bb60
+
+    // 0x0051b840: loads the map for the screen rectangle `screen` (only its
+    // top and right edges are read).
+    RadarOverlay* UnknownFunction51b840(RenderTarget* target, TextureMapManager* manager, int a3,
+                                        UnknownOverlayRect screen);
+    int UnknownFunction51baf0(UnknownKrustyBikeView* view, int a2); // 0x0051baf0: collects the racers
+    int UnknownFunction51bc60();              // 0x0051bc60: draws for the view mode
+    void UnknownFunction51bdc0();             // 0x0051bdc0: frame-rate readout
+    int UnknownFunction51bed0(int mode);      // 0x0051bed0 (not reconstructed)
+    // 0x0051c360: maps the world point `point` to the map pixel (*x, *y);
+    // when it lies beyond the map radius, returns 1 with the rim point in
+    // (*rimX, *rimY).
+    int UnknownFunction51c360(Vector3 point, int* x, int* y, float* rimX, float* rimY);
+    // 0x0051c460: the line through a and b (x, y only) as a unit normal
+    // (*nx, *ny) and offset *d; -1 when a and b coincide.
+    int UnknownFunction51c460(const float* a, const float* b, float* nx, float* ny, float* d);
+
+    float field_0x11c;                        // frame time summed
+    float field_0x120;                        // frames summed
+    float field_0x124;                        // average frame time
+    float field_0x128;                        // frame rate summed
+    UnknownKrustyBikeView* field_0x12c;
+    int field_0x130;
+    UnknownEventRacer* field_0x134[11];
+    int field_0x160;                          // racer count
+    int field_0x164;                          // shows the frame rate
+    int field_0x168;                          // readouts so far
+    int field_0x16c;
+    int field_0x170;
+    int field_0x174;
+    int field_0x178;                          // uses the 256-pixel map
+    Vector3 field_0x17c;
+    float field_0x188;
+    float field_0x18c;
+    float field_0x190;
+    float field_0x194;
+    float field_0x198;                        // map scale
+    float field_0x19c;                        // map radius, pixels
+    int field_0x1a0;                          // map centre
+    int field_0x1a4;
+    UnknownOverlayRect field_0x1a8;           // frame-rate text rectangle
+    UnknownOverlayVertex field_0x1b8;
+    UnknownOverlayVertex field_0x1d8;
+    UnknownOverlayRect field_0x1f8;           // map rectangle
+};
+
+// One chat history line (0x5c bytes).
+struct UnknownChatEntry {
+    int field_0x00;
+    char field_0x04[0x58];
+};
+
+// ChatOverlay+0x13c (0x1c4 bytes, no vtable): the line being typed (up to
+// 0x4a characters) and four history entries.
+class UnknownChatInput {
+public:
+    UnknownChatInput();                       // 0x0051ea50
+    void UnknownFunction51ea80(char c);       // 0x0051ea80: appends c
+    void UnknownFunction51eab0();             // 0x0051eab0: removes the last character
+    void UnknownFunction51ead0();             // 0x0051ead0: clears the line
+    char* UnknownFunction51eaf0();            // 0x0051eaf0: the last 0x31 characters
+    char* UnknownFunction51eb10(int index, int* value); // 0x0051eb10: history entry
+    void UnknownFunction51eb40(const char* name, int a2, int a3); // 0x0051eb40 (not reconstructed)
+
+    char field_0x000[0x4c];                   // the line being typed
+    UnknownChatEntry field_0x04c[4];
+    int field_0x1bc;                          // length of field_0x000
+    int field_0x1c0;
+};
+
+// RTTI: ChatOverlay : Overlay (vtable 0x00558854), 0x3e0 bytes (the
+// allocation at 0x004e08e4). Its +0x2d8 holds the racers' name tags.
+class ChatOverlay : public Overlay {
+public:
+    explicit ChatOverlay(int flags);          // 0x0051cda0
+    virtual ~ChatOverlay();                   // 0x0051cee0 (deleting wrapper 0x0051cec0)
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x0051e200
+    virtual int UnknownVirtualSlot14();       // 0x0051e390
+
+    void UnknownFunction51d980(int show);     // 0x0051d980
+    void UnknownFunction51d9c0(float value, const char* name); // 0x0051d9c0
+    // 0x0051dce0: called before GameObject slot 23 with the same event.
+    int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
+    void UnknownFunction51dd10();             // 0x0051dd10: shows the input line
+    void UnknownFunction51dd40();             // 0x0051dd40: hides it
+    void UnknownFunction51dd70(const char* name, int a2, int a3); // 0x0051dd70
+    void UnknownFunction51e7c0();             // 0x0051e7c0
+    void UnknownFunction51e910(int index);    // 0x0051e910 (not reconstructed)
+
+    void* field_0x11c;                        // GDI object (DeleteObject)
+    void* field_0x120;                        // GDI object (DeleteObject)
+    void* field_0x124;                        // GDI object (DeleteObject)
+    int field_0x128;
+    unsigned char field_0x12c[0x130 - 0x12c];
+    float field_0x130;                        // time summed
+    unsigned char field_0x134[0x138 - 0x134];
+    int field_0x138;                          // input line shown
+    UnknownChatInput* field_0x13c;
+    unsigned char field_0x140[0x160 - 0x140];
+    int field_0x160;
+    int field_0x164;
+    int field_0x168;                          // name changed
+    int field_0x16c[11];
+    int field_0x198;                          // name tag index
+    int field_0x19c[11];
+    GameObject* field_0x1c8;
+    GameObject* field_0x1cc;
+    float field_0x1d0;
+    char field_0x1d4[0x104];                  // name
+    NameOverlay* field_0x2d8[13];
+    UnknownTrackOverlayRect field_0x30c[13];
+    int field_0x3dc;
+};
