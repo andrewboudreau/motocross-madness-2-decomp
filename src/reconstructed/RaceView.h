@@ -2,6 +2,7 @@
 
 #include "GameObject.h"
 #include "MatrixUtil.h"
+#include "VCRfile.h"
 
 // Stack object built by KrustyBikeCamera slot 58 (constructor 0x0051b200,
 // no destructor call) and handed to UnknownMessageTarget::0x0051b540.
@@ -75,12 +76,6 @@ struct UnknownEventRacer : virtual public GameObject {
 // +0x558..+0x568 objects); slot 48 tests two flags. TrackGame and
 // EventManager use it as a GameObject (slot 5, the +0x25 flag bits), which
 // fits KrustyBike's primary base chain; its class is not established.
-// Recording file object (its code sits among VCRfile.cpp's literals).
-class UnknownVcrFile {
-public:
-    void UnknownFunction524d00(char* path);  // 0x00524d00: saves to `path`
-};
-
 struct UnknownKrustyBikeView : public GameObject {
     void UnknownFunction420590(int player);  // 0x00420590 (EventManager slot 24)
     // 0x00420b00 (near bikerace.cpp's literals): saves the replay to `path`
