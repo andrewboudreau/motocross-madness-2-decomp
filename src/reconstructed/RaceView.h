@@ -143,6 +143,7 @@ struct UnknownKrustyBikeView : public GameObject {
     void UnknownFunction420650(int a, int b, int c); // 0x00420650 (InGameProcs.cpp ExitDlg)
     void UnknownFunction421050();             // 0x00421050 (dlgprocs.cpp LoadingDlg)
     void UnknownFunction420590(int player);  // 0x00420590 (EventManager slot 24)
+    void UnknownFunction423790(int level);   // 0x00423790: detail level (QuarryStuntEvent.cpp)
     // 0x00420b00 (near bikerace.cpp's literals): saves the replay to `path`
     // with `description`.
     void UnknownFunction420b00(char* path, char* description);

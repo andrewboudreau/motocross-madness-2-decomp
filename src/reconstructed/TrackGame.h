@@ -95,9 +95,10 @@ public:
     char field_0xa0[6][0x100];                // directories (TrackRecord.cpp 0x0051f0b0)
     int field_0x6a0;                          // a directory name pointer for TrackRecord.cpp 0x0051f2c0                          // EventManager 0x0045cb70 passes it to 0x00523a60
     int field_0x6a4;                          // cleared when a network race fails to load (dlgprocs.cpp LoadingDlg)
-    unsigned char field_0x6a8[0x6b0 - 0x6a8];
+    int field_0x6a8;                          // visual cue and runway lights on (QuarryStuntEvent.cpp)
+    int field_0x6ac;                          // instrument overlay on (QuarryStuntEvent.cpp)
     int field_0x6b0;                          // shows the race statistics (TrackOverlay 0x00519980)
-    unsigned char field_0x6b4[0x6b8 - 0x6b4];
+    int field_0x6b4;                          // 1 shows the chat input line (QuarryStuntEvent.cpp)
     int field_0x6b8;                          // shows the racers' name tags (TrackOverlay 0x005190e0)
     int field_0x6bc;                          // TrackOverlay 0x0051e390
     int field_0x6c0;                          // TrackOverlay 0x0051e390
@@ -346,7 +347,13 @@ public:
     UnknownTrackGameObject574* sceneObject;
     TrackGameMode mode;
     int field_0xfc4;                          // display mode index (EventManager 0x0045e710)
-    unsigned char field_0xfc8[0x1010 - 0xfc8];
+    int field_0xfc8;                          // shadows on (QuarryStuntEvent.cpp)
+    int field_0xfcc;                          // particles on (QuarryStuntEvent.cpp)
+    unsigned char field_0xfd0[0xfd4 - 0xfd0];
+    int field_0xfd4;                          // sky cube on (QuarryStuntEvent.cpp)
+    unsigned char field_0xfd8[0xfdc - 0xfd8];
+    int field_0xfdc;                          // detail level 0..9 (QuarryStuntEvent.cpp)
+    unsigned char field_0xfe0[0x1010 - 0xfe0];
     UnknownTrackGameSession field_0x1010[5];   // enumerated sessions (NetProcs.cpp)
     int field_0x154c;                          // selected session (NetProcs.cpp)
     unsigned char field_0x1550[0x5c];          // restored from +0x15ac when a replay is left (InGameProcs.cpp)

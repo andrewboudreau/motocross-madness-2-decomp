@@ -1,25 +1,171 @@
 #pragma once
 
 #include "GameObject.h"
+#include "MatrixUtil.h"
 
+class AuralScape;
+class ChatOverlay;
+class EcoSystem;
+class Fog;
+class InstrumentOverlay;
+class LightEmitter;
+class LightManager;
+class RadarOverlay;
 class RenderTarget;
+class Scene;
+class StatsOverlay;
+class TextQueueOverlay;
+class UnknownTerrain;
+class UnknownTextureStream;
+struct UnknownKrustyBikeView;
 
 // Progress callback the events' initialisers take (EventManager passes the
 // cdecl 0x0045cb20).
 typedef void (*UnknownProgressCallback)(int* step);
 
+// The race camera at BaseQuarryEvent+0x3c (a KrustyBikeCamera: 0x004de590
+// constructs it with 0x00497cb0, which writes vtable 0x00554754) as this file
+// reads it: the listener's position and axes, and the followed bike
+// (velocity at +0x64). These are Camera's protected +0x170..+0x188 and
+// BikeCamera's +0x3b0.
+struct UnknownQuarryCameraSubject {
+    unsigned char field_0x00[0x64];
+    Vector3 field_0x64;
+};
+
+struct UnknownQuarryCamera {
+    unsigned char field_0x000[0x170];
+    Vector3 field_0x170;                      // position
+    Vector3 field_0x17c;                      // forward
+    Vector3 field_0x188;                      // up
+    unsigned char field_0x194[0x3b0 - 0x194];
+    UnknownQuarryCameraSubject* field_0x3b0;  // followed bike
+};
+
+// RTTI: VisualCue : GameObject (vtable 0x00554320; Krusty3DObjects.cpp).
+// 0xfc bytes (the allocation at 0x004e06cd). Only the members
+// QuarryStuntEvent.cpp uses are declared; names are provisional.
+class VisualCue : public GameObject {
+public:
+    explicit VisualCue(int flags);            // 0x0048ad60
+    // 0x0048adf0 (ret 0x34): loads the cue; returns this, or 0.
+    VisualCue* UnknownFunction48adf0(void* target, LightManager* lights, int value, UnknownTerrain* terrain,
+                                     Vector3 offset, UnknownKrustyBikeView* view, int count,
+                                     UnknownQuarryCamera* camera, float a9, float a10, float a11);
+    // 0x0048bc30: the next cue index when it changed, else -1.
+    int UnknownFunction48bc30();
+    // 0x0048bc80: 1 while a cue is active and more than one exists.
+    int UnknownFunction48bc80();
+
+    unsigned char field_0x2c[0x48 - 0x2c];
+    float field_0x48;                         // screen x, fraction of the width
+    float field_0x4c;                         // screen y, fraction of the height
+    unsigned char field_0x50[0xc8 - 0x50];
+    int field_0xc8;
+    unsigned char field_0xcc[0xfc - 0xcc];
+};
+
+// RTTI: EcoSystem (vtable 0x00552508); constructed by 0x004de590 with
+// 0x00457250. Only the methods this file calls.
+class EcoSystem {
+public:
+    void UnknownFunction4594c0(int level);    // 0x004594c0: detail level
+    void UnknownFunction45a9a0();             // 0x0045a9a0: lighting changed
+};
+
+// RTTI: Fog (vtable 0x005526dc), 0x5c bytes; constructed by 0x004de590
+// with 0x00462620. Fields as this file's debug page reads them.
+class Fog {
+public:
+    // 0x004627a0: sets the colour, visibility and haziness.
+    void UnknownFunction4627a0(unsigned int color, float visibility, float haziness);
+    void UnknownFunction462db0(int level);    // 0x00462db0: detail level
+
+    unsigned char field_0x00[0x2c];
+    unsigned int field_0x2c;                  // colour, 0x00RRGGBB
+    unsigned char field_0x30[0x38 - 0x30];
+    float field_0x38;                         // visibility
+    unsigned char field_0x3c[0x40 - 0x3c];
+    float field_0x40;                         // haziness
+    int field_0x44;                           // fog kind: 0x80 vertex, 0x100 table, 0x10000 range
+};
+
 // RTTI: BaseQuarryEvent : GameObject (vtable 0x0055766c; 0xa4 bytes, the
-// size EventManager 0x0045cb70 allocates). Its constructor 0x004de2a0 writes
-// the vtable; its code sits among QuarryStuntEvent.cpp's literals. TrackGame
-// keeps these race-mode objects at +0x558..+0x568.
+// size EventManager 0x0045cb70 allocates). QuarryStuntEvent.cpp
+// (D:\aardvark\VC\krusty2\QuarryStuntEvent.cpp, literal 0x00572154) holds
+// its code, 0x004de2a0..0x004e1fa7; reconstructed in QuarryStuntEvent.cpp.
+// TrackGame keeps these race-mode objects at +0x558..+0x568 (declared there
+// as TrackGameViewOwner). Member names are provisional; 0x004de3b0 is the
+// retail "BaseQuarryEvent::Create" (its MemTag strings).
 class BaseQuarryEvent : public GameObject {
 public:
     explicit BaseQuarryEvent(int flags);      // 0x004de2a0
+    virtual ~BaseQuarryEvent();               // 0x004e1f10 (deleting wrapper 0x004de390)
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x004de410
+    virtual int UnknownVirtualSlot12();       // 0x004e14a0: the "Atmosphere" debug page
+    // Slot 14, 0x004de400: `jmp GameObject slot 14` (folded with the same
+    // body of other classes).
+    virtual int UnknownVirtualSlot14();
+    virtual int UnknownVirtualSlot18();       // 0x00499af0 (folded with KrustyUI's)
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004e0ce0
+    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags);   // 0x004e1cc0
+    // Slots 27-35 are introduced here (NationalRace overrides 27, 29 and 30).
+    virtual int UnknownVirtualSlot27(int value); // 0x004e06a0: creates the visual cue
+    virtual void UnknownVirtualSlot28();      // 0x00464e90 (shared empty body)
+    virtual void UnknownVirtualSlot29();      // 0x004e07c0: creates the overlays
+    virtual void UnknownVirtualSlot30();      // 0x004e0be0: adds the overlays as children
+    virtual int UnknownVirtualSlot31();       // 0x00467ae0 (shared `return 1` body)
+    virtual void UnknownVirtualSlot32(int value); // 0x00464e80 (shared empty body)
+    virtual void UnknownVirtualSlot33(int value); // 0x00464e80
+    virtual void UnknownVirtualSlot34(int a, int b, int c); // 0x004de580 (shared empty body)
+    virtual int UnknownVirtualSlot35();       // 0x00467ae0
+
     // 0x004de3b0: GameObject's slot 8, then loads the event; on failure it
     // releases itself (slot 2) and returns 0, else returns this.
     BaseQuarryEvent* UnknownFunction4de3b0(RenderTarget* target, UnknownProgressCallback progress);
+    // 0x004de590 (about 7.9 KB): loads the scene, terrain, lights, sounds
+    // and race objects; not reconstructed.
+    int UnknownFunction4de590(UnknownProgressCallback progress);
+    // 0x004e04a0, 0x004e04e0, 0x004e04f0, 0x004e0560: memory estimates
+    // (bytes) 0x004de590 sums.
+    int UnknownFunction4e04a0(int value);
+    int UnknownFunction4e04e0();
+    int UnknownFunction4e04f0(int* counts);
+    int UnknownFunction4e0560();
+    // 0x004e0c30: shows "<string id> <on/off>" (strings 0x1407/0x1408) in
+    // the text queue.
+    void UnknownFunction4e0c30(int id, int on);
+    void UnknownFunction4e1f00();             // 0x004e1f00: clears the clock
 
-    unsigned char field_0x2c[0xa4 - 0x2c];
+    Scene* field_0x2c;
+    void* field_0x30;                         // SkyCube
+    UnknownKrustyBikeView* field_0x34;
+    VisualCue* field_0x38;
+    UnknownQuarryCamera* field_0x3c;
+    UnknownTerrain* field_0x40;               // Terrain (src/krusty2/broadphase/Terrain.h)
+    UnknownTextureStream* field_0x44;
+    EcoSystem* field_0x48;
+    void* field_0x4c;
+    void* field_0x50;
+    void* field_0x54;                         // TerrainShadow
+    void* field_0x58;                         // ProjectedShadow
+    StatsOverlay* field_0x5c;
+    RadarOverlay* field_0x60;
+    ChatOverlay* field_0x64;
+    InstrumentOverlay* field_0x68;
+    TextQueueOverlay* field_0x6c;
+    float field_0x70;                         // race clock, minutes
+    float field_0x74;                         // race clock, seconds
+    void* field_0x78;                         // ParticleManager
+    LightManager* field_0x7c;
+    LightEmitter* field_0x80;                 // sun
+    LightEmitter* field_0x84;                 // ambient
+    Fog* field_0x88;
+    unsigned char field_0x8c[0x94 - 0x8c];
+    GameObject* field_0x94;
+    GameObject* field_0x98;
+    AuralScape* field_0x9c;
+    int field_0xa0;                           // AuralScape listener
 };
 
 // RTTI: NationalRace : BaseQuarryEvent (vtable 0x00555354; 0xb0 bytes).

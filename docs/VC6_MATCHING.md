@@ -199,6 +199,9 @@ and its dialogs, match strictly; see [PROCIRCUIT](PROCIRCUIT.md).
 dlgprocs.cpp (the front-end dialogs) matches strictly in 81 functions;
 see [DIALOGPROCS](DIALOGPROCS.md).
 
+QuarryStuntEvent.cpp (BaseQuarryEvent) matches strictly in 25 functions;
+see [QUARRYSTUNTEVENT](QUARRYSTUNTEVENT.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

@@ -146,6 +146,7 @@ public:
     // 0x004eaec0: the entry object named like `path`'s file name.
     UnknownSceneObject* UnknownFunction4eaec0(const char* path, int* index);
     void UnknownFunction4eafd0(int index);
+    void UnknownFunction4eff30(int level);           // 0x004eff30: detail level (QuarryStuntEvent.cpp)
     void UnknownFunction4eb000(float time);
     int UnknownFunction4eb040(int index, float time, int a, int b); // not reconstructed
     // 0x004eb160/0x004eb300/0x004eb480: read "x,y,z", "r,g,b" and a Y/T/1

@@ -72,6 +72,9 @@ public:
 class UnknownTerrain {
 public:
     int UnknownFunction506e90(const Vector3* from, const Vector3* to, Vector3* out, int a4, int a5, int a6);
+    // 0x00507960 (ret 4): selects the detail level (QuarryStuntEvent.cpp;
+    // Terrain::SelectQuality in src/krusty2/broadphase/Terrain.h).
+    void UnknownFunction507960(int level);
 };
 
 class Camera;
@@ -138,6 +141,13 @@ public:
     virtual int UnknownVirtualSlot13();       // 0x00519940
     virtual int UnknownVirtualSlot14();       // 0x00519980
 
+    // 0x005194b0 (QuarryStuntEvent.cpp 0x004e0a9c): loads the panel for the
+    // screen rectangle `screen`; returns this, or 0.
+    StatsOverlay* UnknownFunction5194b0(RenderTarget* target, TextureMapManager* manager, void* camera,
+                                        UnknownOverlayRect screen);
+    // 0x00464e80: the shared empty `ret 4` body (QuarryStuntEvent.cpp
+    // 0x004de4a3 passes the visual cue index).
+    void UnknownFunction464e80(int index);
     int UnknownFunction519880(int value);     // 0x00519880
     int UnknownFunction5198a0();              // 0x005198a0
     int UnknownFunction519a20();              // 0x00519a20
@@ -298,6 +308,10 @@ public:
     virtual int UnknownVirtualSlot13();       // 0x0051e240
     virtual int UnknownVirtualSlot14();       // 0x0051e390
 
+    // 0x0051cf80 (QuarryStuntEvent.cpp 0x004e0965): sets the overlay up for
+    // the screen and the cue rectangle; returns this, or 0.
+    ChatOverlay* UnknownFunction51cf80(RenderTarget* target, TextureMapManager* manager, void* camera,
+                                       UnknownOverlayRect screen, UnknownOverlayRect cue);
     void UnknownFunction51d980(int show);     // 0x0051d980
     void UnknownFunction51d9c0(float value, const char* name); // 0x0051d9c0
     // 0x0051dce0: called before GameObject slot 23 with the same event.
