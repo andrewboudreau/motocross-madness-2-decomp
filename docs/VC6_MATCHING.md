@@ -146,6 +146,9 @@ in 20 functions; see [RECORDER](RECORDER.md).
 TextService.cpp (the bitmap-font text renderer Overlay uses) matches
 strictly in 6 functions; see [TEXTSERVICE](TEXTSERVICE.md).
 
+PCVideoCard.cpp (22) and VideoCard.cpp (6), the DirectDraw display
+object, match strictly; see [PCVIDEOCARD](PCVIDEOCARD.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

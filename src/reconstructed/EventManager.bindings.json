@@ -91,6 +91,7 @@
   "?UnknownFunction523a60@TrackGameMode@@QAEXHPADPBD0@Z": "0x00523a60",
   "?UnknownFunction524d00@UnknownVcrFile@@QAEXPAD@Z": "0x00524d00",
   "?UnknownFunction52d250@UnknownDisplay@@QAEHHHHHH@Z": "0x0052d250",
+  "?UnknownFunction52d250@VideoCard@@QAEHHHHHH@Z": "0x0052d250",
   "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
   "?UnknownVirtualSlot22@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x00469580",
   "?UnknownVirtualSlot23@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x004695d0",
