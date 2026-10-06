@@ -65,6 +65,7 @@ protected:
     friend class EventManager; // reads a race-mode object's +0x25 bit 0 (0x0045eef0)
     friend class Sound;     // reads its SoundGroup's +0x25 bit 2 (0x004bc6b0)
     friend class NameOverlay; // reads its racer's +0x25 bit 0 (0x005190e0)
+    friend class Wrecker;   // clears its rigid body's +0x25 bit 0 (0x005327c0)
     // RaceStatus.cpp 0x004e5ca0 reads a racer's +0x25 bit 0.
     friend int UnknownFunction4e5ca0(struct UnknownEventRacerPart** list);
 
