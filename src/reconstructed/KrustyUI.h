@@ -93,7 +93,7 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00499ae0
     virtual int UnknownVirtualSlot18();       // 0x00499af0
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00499a40
-    virtual int UnknownVirtualSlot24(int type, void* data, int c, int d, int e); // 0x00499a70
+    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x00499a70
     virtual int UnknownVirtualSlot25(void* value); // 0x00499980
     void UnknownFunction4999f0(GameObject* parent); // 0x004999f0: shows the +0x464 scene
     void UnknownFunction499a20();             // 0x00499a20: hides it

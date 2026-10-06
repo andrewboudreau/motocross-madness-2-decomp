@@ -7,6 +7,7 @@
 
 #include "Camera.h"
 #include "DebugAlloc.h"
+#include "DirectPlayMessages.h"
 #include "ControlInterface.h"
 #include "QuarryEvent.h"
 #include "TrackGame.h"
@@ -20,10 +21,6 @@ extern "C" __declspec(dllimport) int __stdcall GetTimeFormatA(unsigned long loca
 
 // Characters kept in recording file names.
 #define FILE_NAME_CHARACTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-()$#"
-
-// DirectPlay system message type (dplay.h). For a system message the
-// NetMessage type is the first dword of the data (0x004aacc0).
-#define DPSYS_DESTROYPLAYERORGROUP 0x0005
 
 // Network messages handled by slot 24 (the layout depends on the type).
 // For DPSYS_DESTROYPLAYERORGROUP the fields are DPMSG_DESTROYPLAYERORGROUP's
@@ -39,12 +36,82 @@ struct UnknownEventRacerMessage {                  // type 0x86
     char field_0x05;                               // finished
     float field_0x08;
     float field_0x0c;
-    int field_0x10;
+    float field_0x10;                              // racer +0x750
     int field_0x14;
     int field_0x18;
     float field_0x1c;
     float field_0x20;
 };
+
+// 0x0045c830
+UnknownEventEntry::UnknownEventEntry() {
+    UnknownFunction45c840();
+}
+
+// 0x0045c840: an empty entry in position 1.
+void UnknownEventEntry::UnknownFunction45c840() {
+    field_0x00 = 0;
+    field_0x04 = 1;
+    field_0x08 = 0;
+    field_0x14 = 0;
+    field_0x28 = 0;
+    field_0x2c = 0;
+    field_0x30 = 0;
+    field_0x0c = 0;
+    field_0x10 = 0;
+    field_0x18 = 0;
+    field_0x1c = 0;
+    field_0x20 = 0;
+    strcpy(field_0x40, "");
+    field_0x24 = 0;
+    field_0x34[0] = 0;
+    field_0x34[1] = 0;
+    field_0x34[2] = 0;
+}
+
+// 0x0045c8b0: the racer's results. A racer with +0x4a0 set is listed in
+// position 99 with nothing else; in modes 0 and 4 every racer counts as
+// finished.
+void UnknownEventEntry::UnknownFunction45c8b0(UnknownEventRacer* racer) {
+    field_0x00 = racer->field_0x11bc;
+    int length = strlen(racer->field_0x5e0);
+    int count = length > 15 ? 15 : length;
+    strncpy(field_0x40, racer->field_0x5e0, count);
+    field_0x40[count] = 0;
+    field_0x24 = racer->field_0x4a0;
+    if (!field_0x24) {
+        field_0x2c = racer->field_0x768;
+        field_0x04 = racer->field_0x784;
+        field_0x08 = racer->field_0x750;
+        field_0x14 = racer->field_0x754;
+        field_0x0c = racer->field_0x788;
+        field_0x10 = racer->field_0x758;
+        field_0x18 = racer->field_0x760;
+        field_0x1c = racer->field_0x764;
+        field_0x30 = racer->field_0x11c0;
+        field_0x34[0] = racer->field_0x7ac[0];
+        field_0x34[1] = racer->field_0x7ac[1];
+        field_0x34[2] = racer->field_0x7ac[2];
+        if (g_UnknownGlobal56e26c->field_0x2d74 == 0 || g_UnknownGlobal56e26c->field_0x2d74 == 4)
+            field_0x20 = 1;
+        else
+            field_0x20 = racer->field_0x7a4;
+    } else {
+        field_0x2c = 0;
+        field_0x04 = 99;
+        field_0x08 = 0;
+        field_0x14 = 0;
+        field_0x0c = 0;
+        field_0x10 = 0;
+        field_0x18 = 0;
+        field_0x1c = 0;
+        field_0x30 = 0;
+        field_0x34[0] = 0;
+        field_0x34[1] = 0;
+        field_0x34[2] = 0;
+        field_0x20 = 0;
+    }
+}
 
 // 0x0045c9e0
 EventManager::EventManager(int flags) : GameObject(flags) {

@@ -62,7 +62,9 @@ public:
     virtual int UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468930
     virtual int UnknownVirtualSlot15();       // 0x00468a30: shutdown
     virtual int UnknownVirtualSlot16(int value); // 0x00468ae0: network object
-    virtual int UnknownVirtualSlot17(int type, void* data, int c, int d, int e);                  // 0x00468ba0
+    // 0x00468ba0: network messages; NetworkInterface 0x004aced0 passes a
+    // NetMessage's type, data, from, to and flags.
+    virtual int UnknownVirtualSlot17(int type, void* data, int from, int to, int flags);
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00468bd0
     virtual int UnknownVirtualSlot19(int mode) = 0;
     virtual int UnknownVirtualSlot20(const char* name, int defaultValue) = 0; // "VideoMemoryMB"

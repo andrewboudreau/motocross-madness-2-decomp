@@ -371,9 +371,9 @@ int Game::UnknownVirtualSlot16(int value) {
     return field_0x08 != 0;
 }
 
-// 0x00468ba0
-int Game::UnknownVirtualSlot17(int type, void* data, int c, int d, int e) {
-    return field_0x2f4->UnknownVirtualSlot24(type, data, c, d, e) != 0;
+// 0x00468ba0: hands a network message to the +0x2f4 object.
+int Game::UnknownVirtualSlot17(int type, void* data, int from, int to, int flags) {
+    return field_0x2f4->UnknownVirtualSlot24(type, data, from, to, flags) != 0;
 }
 
 // 0x00468bd0: `path` = the +0x1cc directory, "\\" and `name`.

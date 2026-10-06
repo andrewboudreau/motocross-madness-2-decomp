@@ -103,7 +103,7 @@ struct UnknownEventRacer : virtual public GameObject {
     UnknownEventRacerPart* field_0x744;
     int field_0x748;                               // time stamp; 0x7ffffffe until finished
     unsigned char field_0x74c[0x750 - 0x74c];
-    int field_0x750;
+    float field_0x750;                             // EventManager 0x0045c8b0 copies it to a float TrackRecord reads
     float field_0x754;                             // FLT_MAX until finished
     int field_0x758;
     float field_0x75c;
@@ -119,7 +119,8 @@ struct UnknownEventRacer : virtual public GameObject {
     unsigned short field_0x7a0;
     unsigned char field_0x7a2[0x7a4 - 0x7a2];
     char field_0x7a4;                              // finished
-    unsigned char field_0x7a5[0x7b8 - 0x7a5];
+    unsigned char field_0x7a5[0x7ac - 0x7a5];
+    int field_0x7ac[3];                            // copied by EventManager 0x0045c8b0
     int field_0x7b8;                               // racesnd.cpp keeps a copy at +0x1294
     unsigned char field_0x7bc[0x11bc - 0x7bc];
     int field_0x11bc;                              // network player id

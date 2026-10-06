@@ -12,7 +12,7 @@ TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
 ## Status
 
-Exact (26 calibration cases):
+Exact (29 calibration cases):
 - the constructor (11 0x50-byte entries at +0x50; -1000 in each component
   of +0x3c4) and both destructors;
 - slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c. With
@@ -77,7 +77,16 @@ Exact (26 calibration cases):
   race-mode object, TrackGame's last 0xf8-byte record) into its place, then
   qsorts the entries with the unsigned comparator `0x0045fbb0`;
 - the cdecl comparators `0x0045e930` (standings) and `0x0045d3d0` (racer
-  names, through the inline `strcmp` intrinsic).
+  names, through the inline `strcmp` intrinsic);
+- `UnknownEventEntry`'s constructor `0x0045c830`, reset `0x0045c840`
+  (position 1, empty name from the shared `""` literal `0x00577738`) and
+  racer copy `0x0045c8b0` (id, name truncated to 15 characters, the fields
+  the header lists; with racer +0x4a0 set it clears them and sets position
+  99; the finished flag is 1 when TrackGame+0x2d74 is 0 or 4). The three
+  +0x34 dwords are written as separate statements: a 3-iteration loop is
+  not unrolled here. Racer +0x750 is declared `float` because the copy
+  moves it unchanged into entry +0x08, which TrackRecord.cpp `0x0051f3c0`
+  loads with `fld`.
 
 GameObject's slot 10 takes a float frame time. EventManager adds and scales
 it, and retyping the declaration leaves GameObject's and KrustyBikeCamera's
@@ -99,9 +108,6 @@ Not reconstructed:
   `0x004455b0`) at +0x424 from "%s\Winner.mcf" (or "Winnerd.mcf") with a
   "Podium3/4/5_%02d" motion kept at +0x430; it also uses "CrowdLoop.wav".
   A nonzero result makes `0x0045e600` block UI interaction for slot 10.
-- `UnknownEventEntry`'s constructor `0x0045c830`, reset `0x0045c840` and
-  racer copy `0x0045c8b0` (the header lists which racer field each entry
-  field comes from).
 
 Near misses (`samples/game/EventManagerNearMisses.cpp`):
 - the cdecl progress callback `0x0045cb20` (63 of 67 bytes; retail swaps
@@ -117,7 +123,12 @@ header changed VC6's register choice in TrackGame slot 1 (an unrelated
 `availPhys + availPageFile` sum): header-only type additions can disturb
 other translation units, so re-run the full calibration after header edits.
 
-GameObject slot 24 (and Game slot 17, which forwards to it) now take
-`(int type, void* data, int c, int d, int e)`; the change is code-neutral.
+GameObject slot 24 (`0x00469620`, passing all five arguments to the
+children in order), Game slot 17 (`0x00468ba0`, forwarding them to +0x2f4's
+slot 24) and KrustyUI slot 24 (`0x00499a70`) take
+`(int type, void* data, int from, int to, int flags)`, the NetMessage
+fields NetworkInterface `0x004aced0` passes. KrustyUI sets the network
+object's +0x10 for type 0x101 (`DPSYS_HOST`). The DirectPlay system message
+constants are shared in `src/reconstructed/DirectPlayMessages.h`.
 The view's +0x38 and +0x3c are racers (`UnknownEventRacer`, in
 `RaceView.h`); TrackGame's 0xf8-byte racer records start at +0x215c, after their count.

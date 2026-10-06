@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "DebugAlloc.h"
+#include "DirectPlayMessages.h"
 #include "GameUi.h"
 #include "UIDialog.h"
 #include "RenderTarget.h"
@@ -116,11 +117,12 @@ int KrustyUI::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
     return GameObject::UnknownVirtualSlot23(event, entry) != 0;
 }
 
-// 0x00499a70: network message 0x101 sets the network object's +0x10.
-int KrustyUI::UnknownVirtualSlot24(int type, void* data, int c, int d, int e) {
-    if (GameObject::UnknownVirtualSlot24(type, data, c, d, e))
+// 0x00499a70: DPSYS_HOST (this player became the session host) sets the
+// network object's +0x10.
+int KrustyUI::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
+    if (GameObject::UnknownVirtualSlot24(type, data, from, to, flags))
         return 1;
-    if (type == 0x101)
+    if (type == DPSYS_HOST)
         g_UnknownGlobal56e26c->field_0x08->field_0x10 = 1;
     return 0;
 }

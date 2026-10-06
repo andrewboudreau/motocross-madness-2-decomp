@@ -236,11 +236,11 @@ int GameObject::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEnt
 }
 
 // 0x00469620: gated by flag 0x800 and child bit 1 (not bit 0).
-int GameObject::UnknownVirtualSlot24(int type, void* data, int c, int d, int e) {
+int GameObject::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
     if (field_0x20 & 0x800) {
         for (GameObject* child = field_0x10; child; child = child->field_0x0C) {
             if (child->field_0x25_bit1 && !child->field_0x25_bit3) {
-                if (child->UnknownVirtualSlot24(type, data, c, d, e))
+                if (child->UnknownVirtualSlot24(type, data, from, to, flags))
                     return 1;
             }
         }

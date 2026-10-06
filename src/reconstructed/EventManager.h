@@ -80,7 +80,8 @@ struct UnknownEventEntry {
     void UnknownFunction45c840();                  // 0x0045c840: reset
 
     // 0x0045c8b0: copies the racer's id, name and the fields noted below
-    // (dword moves; int/float types are from other readers).
+    // (dword moves; int/float types are from other readers). With racer
+    // +0x4a0 set it clears them instead and sets position 99.
     void UnknownFunction45c8b0(UnknownEventRacer* racer);
 
     int field_0x00;                                // network player id
@@ -91,7 +92,7 @@ struct UnknownEventEntry {
     float field_0x14;                              // racer +0x754
     float field_0x18;                              // racer +0x760
     float field_0x1c;                              // racer +0x764
-    int field_0x20;                                // finished: racer +0x7a4 (1 in modes 0 and 4)
+    int field_0x20;                                // finished: racer +0x7a4 (1 when TrackGame+0x2d74 is 0 or 4)
     int field_0x24;                                // racer +0x4a0
     int field_0x28;                                // championship points
     float field_0x2c;                              // racer +0x768
