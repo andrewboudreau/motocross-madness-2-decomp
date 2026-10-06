@@ -17,6 +17,7 @@ public:
 
     // NetProcs.cpp and InGameProcs.cpp (provisional names).
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0046ef00
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0046a780 (SelectGamePicProcs.cpp)
     void UnknownFunction46ecc0(int value);    // 0x0046ecc0
     Sound* UnknownFunction46e9a0(const char* name); // 0x0046e9a0: a dialog sound (OptionProcs.cpp)
     void UnknownFunction46fce0(int a, int time, int b); // 0x0046fce0

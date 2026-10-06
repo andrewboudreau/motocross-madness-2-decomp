@@ -51,7 +51,7 @@ public:
     virtual void UnknownVirtualSlot56();
     virtual void UnknownVirtualSlot57();
     virtual void UnknownVirtualSlot58();
-    virtual void UnknownVirtualSlot59();
+    virtual void UnknownVirtualSlot59(int value); // SelectGamePicProcs.cpp ("ChkRecordRace")
     virtual void UnknownVirtualSlot60();
     virtual void UnknownVirtualSlot61();
     virtual void UnknownVirtualSlot62();
@@ -98,6 +98,15 @@ public:
     void UnknownFunction478860(int count);    // 0x00478860: number of states
     void UnknownFunction478cf0(int value);    // 0x00478cf0
     int UnknownFunction4793f0();              // 0x004793f0 (OptionProcs.cpp)
+    // SelectGamePicProcs.cpp (provisional names).
+    char* UnknownFunction473ef0(char* buffer, int size); // 0x00473ef0: copies an edit field's text
+    void UnknownFunction476860(int row, int a); // 0x00476860
+    void UnknownFunction477490(int row);      // 0x00477490: removes a list row
+    void UnknownFunction477e60(int a);        // 0x00477e60
+    void UnknownFunction477110(const char* image, int a, int b, int c); // 0x00477110: shows an image
+    char* UnknownFunction476d20(int row);     // 0x00476d20: a row's text (-1: the selected one)
+    // Inline: a drop-down list's button.
+    UnknownGameUiControl* UnknownInlineButton() { return field_0x1ec_control; }
 
     unsigned char field_0x02c[0x7c - 0x2c];
     int field_0x7c;                           // control id (UIControl slot 52 sets it; OptionProcs.cpp's SldEQ band)
@@ -105,7 +114,10 @@ public:
     int field_0x1d8;
     unsigned char field_0x1dc[0x1e8 - 0x1dc];
     int field_0x1e8;
-    int field_0x1ec;                          // a list box's visible rows (OptionProcs.cpp)
+    union {
+        int field_0x1ec;                      // a list box's visible rows (OptionProcs.cpp)
+        UnknownGameUiControl* field_0x1ec_control; // a drop-down list's button (SelectGamePicProcs.cpp)
+    };
     int field_0x1f0;
     unsigned char field_0x1f4[0x1fc - 0x1f4];
     UnknownGameUiControl* field_0x1fc;        // a drop-down list's list box (OptionProcs.cpp)

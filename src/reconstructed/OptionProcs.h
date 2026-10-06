@@ -255,6 +255,7 @@ struct UnknownOptKrustyUIRecord {
 // +0x7f58..+0x7f6c are the open page dialogs.
 class OptionsDlg : public UIDialog {
 public:
+    OptionsDlg() : UIDialog(1, "OptBase.dtm") {} // SelectGamePicProcs.cpp 0x004f8047 allocates 0x7f70 bytes
     virtual void UnknownVirtualSlot27();
     virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b4280

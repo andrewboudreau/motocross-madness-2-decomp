@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameObject.h"
+#include "MatrixUtil.h"
 
 class Camera;
 class RenderTarget;
@@ -139,7 +140,9 @@ public:
     int field_0x450[5];                       // slider maximum
     GameObject* field_0x464;                  // released by 0x004999b0
     Camera* field_0x468;                      // made current while +0x464 is shown
-    unsigned char field_0x46c[0x48c - 0x46c];
+    unsigned char field_0x46c[0x474 - 0x46c];
+    Vector3 field_0x474;                      // the +0x464 scene's focus (SelectGamePicProcs.cpp)
+    unsigned char field_0x480[0x48c - 0x480];
     int field_0x48c;
     UnknownGameUiPage* field_0x490;
     void* field_0x494;                        // input context, restored to the window (EventManager 0x0045e710)

@@ -79,6 +79,7 @@ public:
     void UnknownFunction522d00();             // 0x00522d00 (TrackGame slot 4)
     int UnknownFunction5231f0();              // 0x005231f0 (TrackGame slot 4)
     void UnknownFunction523e50();             // 0x00523e50 (KrustyUI 0x004988a0)
+    void UnknownFunction523b70(char* name);   // 0x00523b70 (SelectGamePicProcs.cpp)
     // 0x00523a60 (near uiinfo.cpp's literals): builds the path of `name`'s
     // `kind` file (EventManager 0x0045cb70 asks for "env").
     void UnknownFunction523a60(int value, char* name, const char* kind, char* path);
@@ -86,7 +87,9 @@ public:
     char field_0x00[16];                      // name; slot 4 sets it from the network object
     char field_0x10[0x80];                    // player name (NetProcs.cpp opens sessions with it)
     int field_0x90;                           // cycles 0..5 (TrackOverlay 0x0051e7c0)
-    unsigned char field_0x94[0xa0 - 0x94];
+    int field_0x94;                           // "RadLODEasy" (SelectGamePicProcs.cpp)
+    unsigned char field_0x98[0x9c - 0x98];
+    int field_0x9c;                           // cleared by MPBikeRiderDlg (SelectGamePicProcs.cpp)
     char field_0xa0[6][0x100];                // directories (TrackRecord.cpp 0x0051f0b0)
     int field_0x6a0;                          // a directory name pointer for TrackRecord.cpp 0x0051f2c0                          // EventManager 0x0045cb70 passes it to 0x00523a60
     unsigned char field_0x6a4[0x6b0 - 0x6a4];
@@ -99,7 +102,12 @@ public:
     int field_0x6c8;                          // copied to the GUI's +0xec (KrustyUI 0x004988a0)
     unsigned char field_0x6cc[0x6d4 - 0x6cc];
     int field_0x6d4;                          // copied into GUI layer 0 (EventManager 0x0045e710)
-    unsigned char field_0x6d8[0xa20 - 0x6d8];
+    unsigned char field_0x6d8[0x6dc - 0x6d8];
+    int field_0x6dc;                          // most AI bikes ("EditMaxAIBikes", SelectGamePicProcs.cpp)
+    unsigned char field_0x6e0[0x6f4 - 0x6e0];
+    char field_0x6f4[6][0x80];                // a track name per game type (SelectGamePicProcs.cpp)
+    int field_0x9f4[6];                       // a track index per game type (SelectGamePicProcs.cpp)
+    unsigned char field_0xa0c[0xa20 - 0xa0c];
     int field_0xa20;                          // EventManager 0x0045e710 calls TrackGame 0x00521a40 when clear
     int field_0xa24;                          // selects +0xa3c for the GUI's +0x34c (KrustyUI 0x004988a0)
     int field_0xa28;                          // sound on (racesnd.cpp)
@@ -217,13 +225,19 @@ public:
 // +0x2158; EventManager 0x0045fbd0 copies whole records). The array's
 // length is not established.
 struct UnknownTrackGameRacerSlot {
-    unsigned char field_0x00[0xc8];
+    // 0x00521fb0 (SelectGamePicProcs.cpp passes TrackGame+0x1eec, +0x1f2c and +0x1f6c).
+    void UnknownFunction521fb0(void* a, void* b, void* c);
+
+    unsigned char field_0x00[0xc0];
+    int field_0xc0;                           // SelectGamePicProcs.cpp
+    int field_0xc4;                           // SelectGamePicProcs.cpp
     int field_0xc8;                           // set when the player leaves (EventManager slot 24)
     int field_0xcc;                           // ready
     int field_0xd0;
     int field_0xd4;                           // network player id
     int field_0xd8;                           // player's racer index (EventManager slot 24)
-    unsigned char field_0xdc[0xf8 - 0xdc];
+    char field_0xdc[0x10];                    // player name (SelectGamePicProcs.cpp)
+    unsigned char field_0xec[0xf8 - 0xec];
 };
 
 // One player reported by 0x004aa670 (0x48 bytes).
@@ -244,7 +258,9 @@ public:
     UnknownDirectPlay4A* field_0x00;
     UnknownDirectPlayLobby3A* field_0x04;
     UnknownZonePlayerRecord field_0x08[8];    // reported by 0x004aa670
-    unsigned char field_0x248[0x32c - 0x248];
+    unsigned char field_0x248[0x298 - 0x248];
+    int field_0x298;                          // the lobby's bike model (SelectGamePicProcs.cpp)
+    unsigned char field_0x29c[0x32c - 0x29c];
 };
 
 // Object at TrackGame+0x3410, created for network games. It has no
@@ -332,14 +348,20 @@ public:
     int field_0x154c;                          // selected session (NetProcs.cpp)
     unsigned char field_0x1550[0x5c];          // restored from +0x15ac when a replay is left (InGameProcs.cpp)
     unsigned char field_0x15ac[0x5c];
-    unsigned char field_0x1608[0x1668 - 0x1608];
+    unsigned char field_0x1608[0x1664 - 0x1608];
+    int field_0x1664;                          // SelectGamePicProcs.cpp
     int field_0x1668[5][3][11];                // custom garage curves per bike class (OptionProcs.cpp)
     unsigned char field_0x18fc[0x1ed4 - 0x18fc];
     int field_0x1ed4[5];                       // video settings: forced video memory, then four detail levels (OptionProcs.cpp)
-    unsigned char field_0x1ee8[0x1eec - 0x1ee8];
+    int field_0x1ee8;                          // bit 0 unlocks kind 10 bikes (SelectGamePicProcs.cpp)
     unsigned char field_0x1eec[0xc8];          // restored from +0x1fb4 when a replay is left (InGameProcs.cpp)
     unsigned char field_0x1fb4[0xc8];
-    unsigned char field_0x207c[0x2158 - 0x207c];
+    unsigned char field_0x207c[0x2144 - 0x207c];
+    int field_0x2144;                         // SelectGamePicProcs.cpp
+    int field_0x2148;                         // SelectGamePicProcs.cpp
+    int field_0x214c;                         // SelectGamePicProcs.cpp
+    int field_0x2150;                         // largest opponent count (SelectGamePicProcs.cpp)
+    unsigned char field_0x2154[0x2158 - 0x2154];
     int field_0x2158;                         // racer count (EventManager 0x0045e550)
     UnknownTrackGameRacerSlot field_0x215c[8];
     int field_0x291c;                         // network game (racesnd.cpp 0x004e5780)
@@ -351,24 +373,30 @@ public:
     float field_0x2940;
     unsigned char field_0x2944[0x2b58 - 0x2944];
     DirectoryList* field_0x2b58;               // scanned by TrackRecord.cpp 0x00520390
-    unsigned char field_0x2b5c[0x2c68 - 0x2b5c];
+    DirectoryList* field_0x2b5c;               // track directories (SelectGamePicProcs.cpp)
+    unsigned char field_0x2b60[0x2c68 - 0x2b60];
     int field_0x2c68;                          // mode 4 saves a ghost (EventManager 0x0045cdc0)
     unsigned char field_0x2c6c[0x2d70 - 0x2c6c];
     int field_0x2d70;    // EventManager 0x0045e600 compares it with 2
     int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
-    unsigned char field_0x2d78[0x2d7c - 0x2d78];
+    int field_0x2d78;                          // SelectGamePicProcs.cpp
     int field_0x2d7c;                         // cleared by EventManager 0x0045e520
-    unsigned char field_0x2d80[0x2d88 - 0x2d80];
+    int field_0x2d80;                          // tree collision (SelectGamePicProcs.cpp)
+    int field_0x2d84;                          // rider collision (SelectGamePicProcs.cpp)
     int field_0x2d88;                          // selects a 30 (else 120) second limit (EventManager 0x0045eef0)
-    unsigned char field_0x2d8c[0x2d94 - 0x2d8c];
+    int field_0x2d8c;                          // largest bike class allowed (SelectGamePicProcs.cpp)
+    int field_0x2d90;                          // laps (SelectGamePicProcs.cpp)
     int field_0x2d94;                          // AI racer count (EventManager 0x0045f9a0)
     int field_0x2d98;                          // cleared by NetProcs.cpp 0x004aef40
-    unsigned char field_0x2d9c[0x2da5 - 0x2d9c];
+    unsigned char field_0x2d9c[0x2da4 - 0x2d9c];
+    unsigned char field_0x2da4;                // SelectGamePicProcs.cpp
     unsigned char field_0x2da5;                // decremented when a player leaves (EventManager 0x0045fbd0)
     char field_0x2da6[0x20];                   // track name (length not established)
-    unsigned char field_0x2dc6[0x2eb0 - 0x2dc6];
+    unsigned char field_0x2dc6[0x2ea8 - 0x2dc6];
+    int field_0x2ea8;                          // SelectGamePicProcs.cpp
+    int field_0x2eac;                          // SelectGamePicProcs.cpp
     float field_0x2eb0;
-    unsigned char field_0x2eb4[0x2eb8 - 0x2eb4];
+    int field_0x2eb4;                          // tag ball (SelectGamePicProcs.cpp)
     int field_0x2eb8;                          // mode 4 ranks by +0x768 (else +0x764) (EventManager 0x0045e9d0)
     unsigned char field_0x2ebc[0x2f5c - 0x2ebc];
     unsigned char field_0x2f5c[0x1ec];         // saved +0x2d70..+0x2f5c, restored when a replay is left (InGameProcs.cpp)

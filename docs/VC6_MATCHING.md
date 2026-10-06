@@ -190,6 +190,9 @@ OptionProcs.cpp (the option pages) matches strictly in 34 functions; see
 MorphBastardModifier.cpp (the rider morph) matches strictly in 15
 functions; see [MORPHBASTARDMODIFIER](MORPHBASTARDMODIFIER.md).
 
+SelectGamePicProcs.cpp (the multiplayer lobby dialogs) matches strictly
+in 43 functions; see [SELECTGAMEPICPROCS](SELECTGAMEPICPROCS.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
