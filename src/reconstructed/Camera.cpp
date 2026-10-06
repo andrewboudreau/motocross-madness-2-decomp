@@ -144,3 +144,51 @@ int Camera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* 
     }
     return 0;
 }
+
+// 0x0042f0e0. The width is converted as unsigned and the height compared
+// unsigned against +0x1c8.
+int Camera::UnknownFunction42f0e0(int x, int width, int absolute) {
+    if (absolute) {
+        field_0x1a0[0] = x;
+        field_0x1a0[2] = width;
+    } else {
+        field_0x1a0[0] += x;
+        field_0x1a0[2] += width;
+    }
+    field_0x1a0[3] = (int)((float)(unsigned int)field_0x1a0[2] * field_0x1b8);
+    if ((unsigned int)field_0x1a0[3] > (unsigned int)field_0x1c8)
+        field_0x1a0[3] = field_0x1c8;
+    field_0x1a0[1] = (unsigned int)(field_0x1c8 - field_0x1a0[3]) >> 1;
+    field_0x1cc = field_0x1d0 = Owner()->field_0x14 + 1;
+    return Owner()->UnknownVirtualSlot14(field_0x1a0) != 0;
+}
+
+// 0x0042f190. Retail stores the width before y.
+int Camera::UnknownFunction42f190(int x, int y, int width, int height) {
+    field_0x1a0[0] = x;
+    field_0x1a0[2] = width;
+    field_0x1a0[1] = y;
+    field_0x1a0[3] = height;
+    if ((unsigned int)field_0x1a0[2] > (unsigned int)field_0x1c4)
+        field_0x1a0[2] = field_0x1c4;
+    if ((unsigned int)field_0x1a0[3] > (unsigned int)field_0x1c8)
+        field_0x1a0[3] = field_0x1c8;
+    field_0x1cc = field_0x1d0 = Owner()->field_0x14 + 1;
+    return Owner()->UnknownVirtualSlot14(field_0x1a0) != 0;
+}
+
+// 0x0042f210
+void Camera::UnknownFunction42f210(CameraRect* rect) {
+    rect->left = field_0x1a0[0];
+    rect->right = field_0x1a0[0] + field_0x1a0[2];
+    rect->top = field_0x1a0[1];
+    rect->bottom = field_0x1a0[1] + field_0x1a0[3];
+}
+
+// Retail initialises the usual four vector constants (0x005796c0, 0x005796d0,
+// 0x005796e0, 0x005796b0) with 0x0042f250..0x0042f38b, after every Camera
+// function, so they are defined at the end of the file here.
+static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
+static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
+static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);

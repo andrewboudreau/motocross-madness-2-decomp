@@ -46,6 +46,13 @@ public:
     void UnknownFunction42e960(float minimum, float maximum);
     int UnknownFunction42e550(); // 0x0042e550, called by slot 8
     void UnknownFunction42e9b0(Vector3* position, int a, int b, int c, int d); // 0x0042e9b0 (EventManager slot 10)
+    // 0x0042f0e0: sets (absolute) or offsets the viewport x/width, derives the
+    // height from +0x1b8, centres it vertically in +0x1c8 and resubmits it.
+    int UnknownFunction42f0e0(int x, int width, int absolute);
+    // 0x0042f190: stores the viewport, clamped to +0x1c4/+0x1c8, and resubmits it.
+    int UnknownFunction42f190(int x, int y, int width, int height);
+    // 0x0042f210: the viewport as left/top/right/bottom.
+    void UnknownFunction42f210(CameraRect* rect);
 
 protected:
     // field_0x18 (GameObject's owner slot) holds the camera's RenderTarget.
@@ -70,7 +77,7 @@ protected:
     int field_0x198;
     int field_0x19c;
     int field_0x1a0[6];             // [0..3]: x, y, width, height for slot 13
-    int field_0x1b8;
+    float field_0x1b8;              // height/width ratio (0x0042f0e0)
     float field_0x1bc;              // g_UnknownFloat550f6c (1.0f)
     float field_0x1c0;              // g_UnknownFloat550f70 (100000.0f)
     int field_0x1c4;

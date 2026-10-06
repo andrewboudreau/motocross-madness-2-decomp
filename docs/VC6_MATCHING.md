@@ -178,6 +178,9 @@ CarProcedural.cpp (15) and Grid1.cpp (9) match strictly; see
 SoultreeMaterial.cpp matches strictly in 10 functions; see
 [SOULTREEMATERIAL](SOULTREEMATERIAL.md).
 
+overlay.cpp (10) and the remaining Camera.cpp functions (11) match
+strictly; see [OVERLAY](OVERLAY.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
