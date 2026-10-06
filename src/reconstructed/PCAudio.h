@@ -121,7 +121,7 @@ public:
     void UnknownFunction401b50(Sound* sound); // 0x00401b50: adds a member
     void UnknownFunction401be0(Sound* sound); // 0x00401be0: removes a member
 
-    int field_0x2c;
+    unsigned char field_0x2c_bit0 : 1; // members may play
     long field_0x30; // volume applied to members
     unsigned char field_0x34[0x48 - 0x34];
 };
@@ -161,13 +161,15 @@ public:
 
     int UnknownFunction4bbcd0();        // 0x004bbcd0: plays
     int UnknownFunction4bbdc0();        // 0x004bbdc0: reapplies the cached settings
-    int UnknownFunction4bbef0(UnknownTextureStream* stream, int flags, int a, int b, int c); // 0x004bbef0
+    int UnknownFunction4bbef0(UnknownTextureStream* stream, unsigned long flags, unsigned long controls,
+                              int duplicates, int streamBytes); // 0x004bbef0: loads a .wav
     int UnknownFunction4bc320(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c);
     unsigned long UnknownFunction4bc490(unsigned long flags); // 0x004bc490: control flags
     int UnknownFunction4bc4c0(Sound* source);                 // 0x004bc4c0: duplicates `source`
     int UnknownFunction4bc5f0(const UnknownGuid* set, unsigned long id, unsigned long support);
     int UnknownFunction4bc640(const UnknownGuid* set, unsigned long id, void* instance,
                               unsigned long instanceSize, void* data, unsigned long dataSize);
+    int UnknownFunction4bc6b0(int restart, unsigned long playFlags, int preferHardware);
     int UnknownFunction4bc940(int rewind);                    // 0x004bc940: stops
     int UnknownFunction4bca80();                              // 0x004bca80: whether playing
     int UnknownFunction4bcb30(unsigned long frequency, int force);

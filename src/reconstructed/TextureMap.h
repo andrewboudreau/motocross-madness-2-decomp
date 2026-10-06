@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #include "BaseObject.h"
 #include "TextureMapManager.h"
 #include "Tgafile.h"
@@ -37,10 +39,31 @@ public:
     int UnknownFunction461600();
     int UnknownFunction461640(void* buffer, int size, int count);
     int UnknownFunction461980();              // 0x00461980: reads a byte
+    // 0x00430ff0 (out-of-line copy): whether the stream is at its end: past
+    // its length within the inner stream, else the buffer is drained and the
+    // file is at end-of-file.
+    int UnknownFunction430ff0()
+    {
+        if (field_0x1c) {
+            if (field_0x04 > 0 && UnknownFunction461600() >= field_0x130 + field_0x04)
+                return 1;
+            return field_0x1c->UnknownFunction430ff0();
+        }
+        if (field_0x124 != field_0x128)
+            return 0;
+        return feof(field_0x14);
+    }
 
-    unsigned char field_0x000[0x1c];
+    unsigned char field_0x000[0x04];
+    int field_0x04;                           // length within the inner stream (0: to its end)
+    unsigned char field_0x008[0x14 - 0x08];
+    FILE* field_0x14;                         // the open file
+    unsigned char field_0x018[0x1c - 0x18];
     UnknownTextureStream* field_0x1c;         // inner stream
-    unsigned char field_0x020[0x130 - 0x20];
+    unsigned char field_0x020[0x124 - 0x20];
+    int field_0x124;                          // buffer position
+    int field_0x128;                          // buffer end
+    unsigned char field_0x12c[0x130 - 0x12c];
     int field_0x130;                          // start offset in the inner stream
 };
 

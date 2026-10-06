@@ -248,6 +248,91 @@ int Sound::UnknownFunction4bbdc0() {
     return 1;
 }
 
+// 0x004bbef0: loads a PCM .wav from `stream`: reads the 44-byte header,
+// creates the buffer (looping sounds try hardware first), registers the
+// sound with the interface, fills static ones and makes `duplicates`
+// copies of a one-shot static sound. Streamed sounds (flag 2) get a buffer
+// of `streamBytes` (default 128000); deferred ones (flag 4) stop after the
+// header.
+int Sound::UnknownFunction4bbef0(UnknownTextureStream* stream, unsigned long flags, unsigned long controls,
+                                 int duplicates, int streamBytes) {
+    if (!stream || !SoundSystem() || !SoundSystem()->field_0x2c_bit0)
+        return 0;
+    int is3D = (flags >> 3) & 1;
+    field_0x1ec = UnknownFunction4bc490(controls);
+    field_0x1e8 = flags;
+    field_0x1f5_bit0 = 0;
+    UnknownFunction4bcf50();
+    strcpy(field_0x60, "");
+    if (stream->field_0x1c)
+        stream->UnknownFunction461340(stream->field_0x130, 0, 1);
+    if (stream->UnknownFunction461640(&field_0x16a, 0x2c, 1) != 1)
+        return 0;
+    int stereo = field_0x16a.channels > 1;
+    field_0x198 = field_0x16a.dataSize;
+    if (field_0x1ec & 0x80)
+        UnknownFunction4bcbe0(field_0x08->field_0x30, 0);
+    if (field_0x1e8 & 2) {
+        if (streamBytes == -1)
+            field_0x198 = 0x1f400;
+        else
+            field_0x198 = streamBytes;
+        field_0x44 = field_0x198 / 2;
+    } else if (field_0x1e8 & 4) {
+        return 1;
+    }
+    int isStatic = field_0x1e8 & 1;
+    if (field_0x1e8 & 0x20) {
+        if (!UnknownFunction4bd540(&field_0x0c, field_0x198, field_0x16a.samplesPerSec, field_0x16a.bitsPerSample,
+                                   field_0x16a.blockAlign, stereo, is3D, isStatic, field_0x1ec, 1) &&
+            !UnknownFunction4bd540(&field_0x0c, field_0x198, field_0x16a.samplesPerSec, field_0x16a.bitsPerSample,
+                                   field_0x16a.blockAlign, stereo, is3D, isStatic, field_0x1ec, 0))
+            goto failed;
+    } else if (!UnknownFunction4bd540(&field_0x0c, field_0x198, field_0x16a.samplesPerSec,
+                                      field_0x16a.bitsPerSample, field_0x16a.blockAlign, stereo, is3D, isStatic,
+                                      field_0x1ec, 0)) {
+        goto failed;
+    }
+    if (is3D) {
+        if (!UnknownFunction4bd6e0(field_0x0c, &field_0x10))
+            goto failed;
+        SoundSystem()->field_0x18.Add(this);
+    }
+    SoundSystem()->field_0x04.Add(this);
+    if (!is3D)
+        UnknownFunction4bd790(2);
+    if (field_0x1e8 & 3) {
+        if (!UnknownFunction4bd260(&field_0x0c, stream, 0, field_0x198))
+            goto failed;
+        field_0x1f5_bit0 = 1;
+    }
+    if ((field_0x1e8 & 1) && duplicates > 0) {
+        field_0x20 = new (__FILE__, 496) UnknownSoundBuffer*[duplicates];
+        field_0x24 = duplicates;
+        for (int i = 0; i < field_0x24; i++) {
+            if (SoundSystem()->field_0x460->DuplicateSoundBuffer(field_0x0c, &field_0x20[i]) != 0)
+                goto failed;
+        }
+    }
+    return 1;
+failed:
+    for (int j = 0; j < field_0x24; j++) {
+        if (field_0x20[j]) {
+            field_0x20[j]->Release();
+            field_0x20[j] = 0;
+        }
+    }
+    if (field_0x0c) {
+        field_0x0c->Release();
+        field_0x0c = 0;
+    }
+    if (field_0x10) {
+        field_0x10->Release();
+        field_0x10 = 0;
+    }
+    return 0;
+}
+
 // 0x004bc490: buffer control flags for sound flags 1 (volume), 2 (pan) and
 // 4 (frequency).
 unsigned long Sound::UnknownFunction4bc490(unsigned long flags) {
@@ -466,6 +551,54 @@ int Sound::UnknownFunction4bd080(void* first, unsigned long firstBytes, void* se
     if (field_0x0c && first)
         return field_0x0c->Unlock(first, firstBytes, second, secondBytes) >= 0;
     return 0;
+}
+
+// 0x004bd260: copies `bytes` of the stream into `buffer` at `offset`. At the
+// end of the data a looping sound rewinds to the data start; any other is
+// silenced and stopped.
+int Sound::UnknownFunction4bd260(UnknownSoundBuffer** buffer, UnknownTextureStream* stream, unsigned long offset,
+                                 unsigned long bytes) {
+    void* first;
+    unsigned long firstBytes;
+    void* second;
+    unsigned long secondBytes;
+
+    if (!stream || !buffer)
+        return 0;
+    field_0x1f5_bit2 = 1;
+    if ((*buffer)->Lock(offset, bytes, &first, &firstBytes, &second, &secondBytes, 0) != 0)
+        return 0;
+    if (firstBytes > 0) {
+        if (stream->UnknownFunction430ff0()) {
+            stream->UnknownFunction461340(stream->field_0x130 + 0x2c, 0, 1);
+            if (!field_0x1f4_bit3)
+                goto ended;
+        }
+        stream->UnknownFunction461640(first, firstBytes, 1);
+    }
+    if (secondBytes > 0) {
+        if (stream->UnknownFunction430ff0()) {
+            stream->UnknownFunction461340(stream->field_0x130 + 0x2c, 0, 1);
+            if (!field_0x1f4_bit3) {
+            ended:
+                memset(first, 0, firstBytes);
+                memset(second, 0, secondBytes);
+                field_0x44 = 0;
+                (*buffer)->SetCurrentPosition(0);
+                (*buffer)->Stop();
+            }
+            (*buffer)->Unlock(first, firstBytes, second, secondBytes);
+            field_0x1f5_bit2 = 0;
+            return 1;
+        }
+        stream->UnknownFunction461640(second, secondBytes, 1);
+    }
+    long result = (*buffer)->Unlock(first, firstBytes, second, secondBytes);
+    field_0x1f5_bit2 = 0;
+    if (result != 0)
+        return 0;
+    field_0x1f5_bit0 = 1;
+    return 1;
 }
 
 // 0x004bd540: creates a PCM buffer: static ones in software, others in

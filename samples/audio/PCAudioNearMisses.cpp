@@ -27,6 +27,12 @@
 // and inlines the factory's early `return 0` epilogues; VC6 here folds the
 // archive branch's result into `neg/sbb` and shares the factory's failures.
 //
+// Sound 0x004bc6b0 (starts a sound): the same loop shape as the setters:
+// retail exits the duplicate search with `jge failed; jmp top` and jumps to
+// one shared failure epilogue, where VC6 here copies the epilogue after the
+// loop (goto, break-then-test and a found flag all give that). The prologue
+// also stores the bitfield and play flags in the other order.
+//
 // UnknownPCAudioObject 0x004bdc00 (the loader thread): retail's queue loop is
 // not rotated and spills one local (frame 0xc); here VC6 rotates the loop
 // and keeps everything in registers.
@@ -338,5 +344,90 @@ unsigned __stdcall UnknownPCAudioObject::UnknownThreadProc(void* context) {
     }
 stopped:
     _endthreadex(0);
+    return 0;
+}
+
+// 0x004bc6b0: starts the sound. A sound already playing in the same loop
+// mode starts a free duplicate instead (when `restart`); static sounds
+// play directly, streamed ones get a new notifier first; deferred ones are
+// queued for the loader. Failures after the lock leave the critical section
+// held (retail behaviour).
+int Sound::UnknownFunction4bc6b0(int restart, unsigned long playFlags, int preferHardware) {
+    if (!SoundSystem()->field_0x2c_bit0 || !field_0x08 || !field_0x08->field_0x2c_bit0 ||
+        field_0x08->field_0x25_bit2)
+        return 1;
+    field_0x1f4_bit6 = preferHardware;
+    int looping = playFlags & 1;
+    field_0x1f0 = playFlags;
+    if (field_0x1e8 & 2) {
+        field_0x1f0 = 1;
+    } else if (!(field_0x1e8 & 0x20)) {
+        if (field_0x1f4_bit6 && SoundSystem()->field_0x45c_bit0 &&
+            (long)SoundSystem()->field_0x3fc.freeHw3DAllBuffers > 0)
+            field_0x1f0 = playFlags | 2;
+        else
+            field_0x1f0 = playFlags | 4;
+    }
+    if (field_0x1e8 & 4)
+        EnterCriticalSection(&field_0x48);
+    if (field_0x0c) {
+        unsigned long status;
+        int i = 0;
+        if (field_0x0c->GetStatus(&status) < 0)
+            goto failed;
+        if ((status & 1) == 1 && looping == field_0x1f4_bit3) {
+            if (!restart)
+                goto done;
+            int found = 0;
+            for (; i < field_0x24; i++) {
+                if (field_0x20[i]) {
+                    if (field_0x20[i]->GetStatus(&status) < 0)
+                        goto failed;
+                    if ((status & 1) != 1) {
+                        found = 1;
+                        break;
+                    }
+                }
+            }
+            if (!found)
+                goto failed;
+            if (field_0x20[i]->Play(0, 0, playFlags) < 0)
+                goto failed;
+            return 1;
+        }
+        if (!(field_0x1e8 & 5)) {
+            if (field_0x1e8 & 2) {
+                if (field_0x3c)
+                    delete field_0x3c;
+                field_0x3c = new (__FILE__, 816) UnknownSoundNotifier;
+                if (!field_0x3c || !field_0x3c->UnknownFunction4bb740(this))
+                    goto failed;
+                field_0x44 = field_0x198 / 2;
+                if (!UnknownFunction4bbcd0())
+                    return 0;
+            }
+        } else if (!UnknownFunction4bbcd0()) {
+            goto failed;
+        }
+    }
+done:
+    if (field_0x1e8 & 4)
+        LeaveCriticalSection(&field_0x48);
+    if (field_0x1e8 & 4) {
+        int queue = 0;
+        EnterCriticalSection(&field_0x48);
+        if (!field_0x1f5_bit0 && !field_0x1f4_bit7) {
+            field_0x1f4_bit7 = 1;
+            queue = 1;
+        }
+        LeaveCriticalSection(&field_0x48);
+        if (queue)
+            SoundSystem()->field_0x46c->UnknownFunction4bdfc0(this);
+        EnterCriticalSection(&field_0x48);
+        field_0x1f5_bit1 = 0;
+        LeaveCriticalSection(&field_0x48);
+    }
+    return 1;
+failed:
     return 0;
 }

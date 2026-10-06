@@ -67,7 +67,10 @@ buffer's halves from a thread woken through IDirectSoundNotify
 its thread creates and fills queued streamed sounds, evicting the least
 recently played idle ones to stay within the budget.
 
-Exact (39 more calibration cases): the notifier's thread, constructor,
+Exact (41 more calibration cases): the WAV loader `0x004bbef0` (reads the
+44-byte header, creates the buffer with a hardware-then-software retry for
+looping sounds, registers the sound, fills it and makes duplicates) and the
+streaming copy `0x004bd260`; also the notifier's thread, constructor,
 start and destructor (`0x004bb630`–`0x004bb810`); Sound's constructor,
 destructor, play, settings, control flags, property set, stop, playing test,
 positions, restore, pause, fade, release, lock/unlock, buffer creation and
@@ -86,11 +89,17 @@ Source shapes:
 - The notifier thread dispatches on the wait result with a `switch`.
 - In the buffer creator the flags are or-ed before the algorithm GUID is
   copied.
+- The streaming copy inlines UnknownTextureStream's end-of-stream test
+  (out-of-line copy `0x00430ff0`, now an inline member in TextureMap.h),
+  tests the locked sizes as `> 0` (unsigned, `jbe`) and jumps into the
+  silence block from the first half.
 
 Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there): the
 frequency, volume and pan setters, the streamed buffer creator `0x004bd4b0`,
 `0x004bc4c0`, `0x004bc320`, `0x004bd0c0`, the factory `0x004bb890` and the
-manager's thread `0x004bdc00`.
+manager's thread `0x004bdc00`, and the start-up `0x004bc6b0` (the setters'
+loop shape; in the samples file it also gains an EH frame because the
+notifier's constructor is not defined there).
 
-Not reconstructed: the WAV loader `0x004bbef0`, `0x004bc6b0` and the
-streaming copy `0x004bd260`.
+Every function of PCAudio.cpp (`0x004bb630`–`0x004bed40`) is now either
+exact or a documented near miss.
