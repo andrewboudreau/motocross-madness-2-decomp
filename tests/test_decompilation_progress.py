@@ -53,6 +53,25 @@ class DecompilationProgressTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     MODULE.render(config, {})
 
+    def test_staleness_tracks_canonical_source_changes(self):
+        config = (ROOT / "config" / "decompilation_progress.json").read_text(encoding="utf-8")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name, text in (("config/decompilation_progress.json", config),
+                               ("src/reconstructed/A.cpp", "// one line\n")):
+                p = root / name
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text(text, encoding="utf-8")
+            page = root / "docs" / "DECOMPILATION_PROGRESS.md"
+            page.parent.mkdir(parents=True)
+            self.assertIn("+# Decompilation progress", MODULE.staleness(root))
+            page.write_text(MODULE.expected_document(root), encoding="utf-8")
+            self.assertIsNone(MODULE.staleness(root))
+            (root / "src" / "reconstructed" / "B.h").write_text("// header\n", encoding="utf-8")
+            diff = MODULE.staleness(root)
+            self.assertIn("-| Canonical reconstructed headers | **0**", diff)
+            self.assertIn("+| Canonical reconstructed headers | **1**", diff)
+
 
 if __name__ == "__main__":
     unittest.main()
