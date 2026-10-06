@@ -781,7 +781,7 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     stepRemainder = 0.0f;
     UnknownVirtualSlot1(0.0f);
     sceneNode->SetPosition(0.0f, 0.0f, 0.0f);
-    sceneNode->Fn_004fbd10(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+    sceneNode->Fn_004fbd10(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
     localCenterOfMass = g_Zero;
     rotationPivot = g_Zero;
 

@@ -16,9 +16,9 @@ complete function inventory has not been established.
 | Indicator | Current value | What it means |
 |---|---:|---|
 | Strict VC6 exact targets | **2301 / 2309 (99.7%)** | Unique retail address/extent pairs in the reviewed calibration run |
-| Canonical reconstructed implementation files | **118** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
-| Canonical reconstructed headers | **149** | Layout and interface declarations, including support-only headers |
-| Canonical C++ source lines | **67,648** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
+| Canonical reconstructed implementation files | **120** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
+| Canonical reconstructed headers | **150** | Layout and interface declarations, including support-only headers |
+| Canonical C++ source lines | **69,076** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
 | Retail source-path strings | **111** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **252** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **1,368,518 bytes (1.31 MiB)** | Broad code-section denominator; includes library code, thunks and padding |

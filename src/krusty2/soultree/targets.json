@@ -508,5 +508,565 @@
     "expect": "exact",
     "notes": "inverse walk, dynamic_cast to SoultreeObject (own __FILE__ line 0x7f)",
     "bindings": "SoultreeQuadTreeRenderer.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "??0SoultreeObject@@QAE@H@Z",
+    "target_va": "0x004fb2b0",
+    "target_size": 331,
+    "expect": "exact",
+    "notes": "constructor: inline QuadTreeObject ctor, GameObject(a), both vptrs (0x00557c18/+12 0x00557c40), identity local matrix, FindTypeId(\"SoultreeObject\")",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "??_GSoultreeObject@@UAEPAXI@Z",
+    "target_va": "0x004fb400",
+    "target_size": 34,
+    "expect": "exact",
+    "notes": "scalar deleting destructor, GameObject vtable slot 0",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "??1SoultreeObject@@UAE@XZ",
+    "target_va": "0x004fb430",
+    "target_size": 184,
+    "expect": "exact",
+    "notes": "destructor body (GameObject-subobject this): RemoveChild from parent, releases children, quadtree/array removal, ~GameObject",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?UpdateWorldMatrix@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fb4f0",
+    "target_size": 858,
+    "expect": "exact",
+    "notes": "worldMatrix = local * parent world through an inline by-reference 4x4 product (same text as MatrixMultiply 0x0042a1a0)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?InvalidateWorldMatrix@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fb850",
+    "target_size": 45,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?InvalidateSiblingChain@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fb880",
+    "target_size": 50,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?Fn_004fbd10@SoultreeObject@@QAEXMMMMMMHH@Z",
+    "target_va": "0x004fbd10",
+    "target_size": 82,
+    "expect": "exact",
+    "notes": "loose-float wrapper of SetAxesPtr 0x004fbd70; 7th/8th args are ints",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GetAxes@SoultreeObject@@QAEXPAUVec3@@0@Z",
+    "target_va": "0x004fc4f0",
+    "target_size": 71,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GetAxesIn@SoultreeObject@@QAEXPAV1@PAUVec3@@1@Z",
+    "target_va": "0x004fc540",
+    "target_size": 225,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?SetPosition@SoultreeObject@@QAEXMMM@Z",
+    "target_va": "0x004fc630",
+    "target_size": 38,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?SetPosition@SoultreeObject@@QAEXABUVec3@@@Z",
+    "target_va": "0x004fc660",
+    "target_size": 38,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?TranslateIn@SoultreeObject@@QAEXPAV1@UVec3@@@Z",
+    "target_va": "0x004fc690",
+    "target_size": 175,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?SetPositionInFrame@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z",
+    "target_va": "0x004fc740",
+    "target_size": 265,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?Translate@SoultreeObject@@QAEXPBUVec3@@@Z",
+    "target_va": "0x004fc850",
+    "target_size": 56,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?SetPositionIn@SoultreeObject@@QAEXPAV1@PBUVec3@@@Z",
+    "target_va": "0x004fc890",
+    "target_size": 222,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GetPosition@SoultreeObject@@QAEPAUVec3@@PAU2@@Z",
+    "target_va": "0x004fc970",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z",
+    "target_va": "0x004fc9a0",
+    "target_size": 134,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?SetLocalMatrix@SoultreeObject@@QAEXPBUMatrix4@@@Z",
+    "target_va": "0x004fca30",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GetLocalMatrix@SoultreeObject@@QAEXPAUMatrix4@@@Z",
+    "target_va": "0x004fca60",
+    "target_size": 24,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?ResetMatrices@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fcc70",
+    "target_size": 109,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?RotateAbout@SoultreeObject@@QAEXMMMM@Z",
+    "target_va": "0x004fcce0",
+    "target_size": 450,
+    "expect": "exact",
+    "notes": "axis-angle matrix (inline helper shared with 0x4fceb0/0x4fd090) times local via MatrixMultiply 0x0042a1a0",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?Rotate@SoultreeObject@@QAEXUVec3@@M@Z",
+    "target_va": "0x004fceb0",
+    "target_size": 465,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?SetRotation@SoultreeObject@@QAEXMMMM@Z",
+    "target_va": "0x004fd090",
+    "target_size": 343,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z",
+    "target_va": "0x004fd5c0",
+    "target_size": 150,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?AddChild@SoultreeObject@@QAEXPAV1@@Z",
+    "target_va": "0x004fd910",
+    "target_size": 68,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?AppendSibling@SoultreeObject@@QAEXPAV1@@Z",
+    "target_va": "0x004fd960",
+    "target_size": 41,
+    "expect": "exact",
+    "notes": "AppendSibling: tail-recursive form (VC6 turns it into the retail loop on ecx)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?RemoveChild@SoultreeObject@@QAEXPAV1@@Z",
+    "target_va": "0x004fd990",
+    "target_size": 148,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?CountNodes@SoultreeObject@@QAEHXZ",
+    "target_va": "0x004fda30",
+    "target_size": 46,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?CollectDescendants@SoultreeObject@@QAEXPAHPAPAV1@@Z",
+    "target_va": "0x004fda60",
+    "target_size": 76,
+    "expect": "exact",
+    "notes": "children first, then recursion; count stored after the next-sibling load",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?MarkSubtreeDirty@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fdab0",
+    "target_size": 38,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?FindByName@SoultreeObject@@QAEPAV1@PBD@Z",
+    "target_va": "0x004fdae0",
+    "target_size": 84,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?SetFlag14c@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fdb40",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?ClearFlag14c@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fdb50",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?LoadFromParameters@SoultreeObject@@QAEXPAVUnknownParameterStream@@H@Z",
+    "target_va": "0x004fdb60",
+    "target_size": 159,
+    "expect": "exact",
+    "notes": "parameter block created at __FILE__ line 0x346, slot 3, delete",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot2@SoultreeObject@@UAEXPAVSoultreeFileStream@@@Z",
+    "target_va": "0x004fdc00",
+    "target_size": 433,
+    "expect": "exact",
+    "notes": "slot 2: binary hierarchy load, parent indices allocated at __FILE__ line 0x370",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot3@SoultreeObject@@UAEXXZ",
+    "target_va": "0x004fddc0",
+    "target_size": 605,
+    "expect": "exact",
+    "notes": "slot 3: \"Object Hierarchy\" section of the parameter block, parents by name (\"NONE\" = root)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot4@SoultreeObject@@UAEXPAPAV1@@Z",
+    "target_va": "0x004fe020",
+    "target_size": 118,
+    "expect": "exact",
+    "notes": "slot 4: new(__FILE__, 0x3aa) SoultreeObject(1)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GetLocalBounds@SoultreeObject@@QAEXPAUVec3@@0@Z",
+    "target_va": "0x004fe0a0",
+    "target_size": 74,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?UpdateSubtreeBounds@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fe0f0",
+    "target_size": 483,
+    "expect": "exact",
+    "notes": "subtree box; the zero init is written z,y,x as retail stores it",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?Fn_004fe850@SoultreeObject@@QAEXPAUVec3@@0@Z",
+    "target_va": "0x004fe850",
+    "target_size": 74,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot7@SoultreeObject@@UAEXPAV1@@Z",
+    "target_va": "0x004feb10",
+    "target_size": 24,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot8@SoultreeObject@@UAEXPAV1@0@Z",
+    "target_va": "0x004feb30",
+    "target_size": 252,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot25@SoultreeObject@@UAEHH@Z",
+    "target_va": "0x004fec30",
+    "target_size": 53,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot6@SoultreeObject@@UAEXXZ",
+    "target_va": "0x004fec70",
+    "target_size": 83,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?Fn_4fecd0@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fecd0",
+    "target_size": 154,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?Fn_4fed70@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fed70",
+    "target_size": 61,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?RegisterNode@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fedb0",
+    "target_size": 118,
+    "expect": "exact",
+    "notes": "node array append, DebugRealloc at __FILE__ line 0x49b",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "?UnregisterNode@SoultreeObject@@QAEXXZ",
+    "target_va": "0x004fee30",
+    "target_size": 64,
+    "expect": "exact",
+    "notes": "strict exact under vc6_o2_ml",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004fee70",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Math3D.h vector initializer (this unit's vectors 0x00689e88..0x00689ec0)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004fee80",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Math3D.h vector initializer (this unit's vectors 0x00689e88..0x00689ec0)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004feec0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Math3D.h vector initializer (this unit's vectors 0x00689e88..0x00689ec0)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004feed0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Math3D.h vector initializer (this unit's vectors 0x00689e88..0x00689ec0)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004fef10",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Math3D.h vector initializer (this unit's vectors 0x00689e88..0x00689ec0)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004fef20",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Math3D.h vector initializer (this unit's vectors 0x00689e88..0x00689ec0)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004fef60",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Math3D.h vector initializer (this unit's vectors 0x00689e88..0x00689ec0)",
+    "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004fef70",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Math3D.h vector initializer (this unit's vectors 0x00689e88..0x00689ec0)",
+    "bindings": "soultree.bindings.json"
   }
 ]

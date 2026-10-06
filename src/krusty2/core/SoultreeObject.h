@@ -8,11 +8,18 @@
 // below (tier 1 for offsets). The non-virtual helpers are attributed to this class
 // because they all begin with UpdateWorldMatrix (0x004fb4f0), which reads the
 // +0x138 / +0x13c fields that constructor initializes, and they sit next to the
-// soultree.cpp __FILE__ references (tier 2).
+// soultree.cpp __FILE__ references (tier 2). Their bodies are in
+// soultree/soultree.cpp (the retail soultree.cpp, 0x004fb2b0..0x004fefd8).
 //
-// This declaration is PROVISIONAL and deliberately minimal: it has no virtual
-// functions and represents the two vptrs and the base-class bodies as padding, so
-// that member offsets are right for the physics code. Do not derive from it.
+// Two views of one class:
+//  * Physics code sees a FLAT view: no virtual functions, the two vptrs and the
+//    base-class bodies are padding, so member offsets are right without pulling
+//    GameObject/QuadTreeObject into every Math3D.h user. Do not derive from it.
+//  * soultree.cpp, the unit that defines the class, defines
+//    SOULTREE_OBJECT_WITH_BASES before including Math3D.h. It then sees the real
+//    bases (QuadTreeObject + GameObject, from collision/CollisionObject.h) and the
+//    virtual functions, so the constructor, destructor and vtables are emitted as
+//    in retail. Member offsets are identical in both views.
 //
 // It is the single declaration of the node for every physics area (the former
 // stand-ins helpers/SoultreeNode.h and the SoultreeNode class of
@@ -20,7 +27,38 @@
 #ifndef MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 #define MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
 
+class UnknownParameterBlock;
+class UnknownParameterStream;
+
+#ifdef SOULTREE_OBJECT_WITH_BASES
+#include "collision/CollisionObject.h"   // QuadTreeObject, GameObject
+
+// 0x00461640 (thiscall, ret 0xc): Read(dst, elementSize, count). The stream class is
+// named CollisionFileStream / UnknownTextureStream elsewhere; tier 3 stand-in here.
+class SoultreeFileStream {
+public:
+    int Read(void* dst, int size, int count);
+};
+// src/reconstructed/Parameterblocks.h declares the full class; only the members
+// soultree.cpp calls are listed (same mangled names).
+class UnknownParameterBlock {
+public:
+    UnknownParameterBlock();                                                     // 0x004b7130
+    ~UnknownParameterBlock();                                                    // 0x004b7190
+    void UnknownFunction4b77a0(UnknownParameterStream* stream, int offset, int index); // 0x004b77a0
+    int UnknownFunction4b7f70(const char* name);                                 // 0x004b7f70
+    int UnknownFunction4b8010(char* raw);                                        // 0x004b8010
+    int UnknownFunction4b81c0(int index, float* out);                            // 0x004b81c0
+    int UnknownFunction4b8200(int index, char* out);                             // 0x004b8200
+    char field_0x00[0x5c4];        // operator new(0x5c4) at 0x004fdb83 (tier 1)
+};
+#endif
+
+#ifdef SOULTREE_OBJECT_WITH_BASES
+class SoultreeObject : public QuadTreeObject, public GameObject {
+#else
 class SoultreeObject {
+#endif
 public:
     // 0x004fb2b0, thiscall, ret 4 (tier 1). SoultreePhysicsBaseObject slot 2 passes 1.
     // The argument's meaning is unknown.
@@ -90,8 +128,10 @@ public:
     // converted in place, so m is not const.
     void SetMatrixIn(SoultreeObject* frame, Matrix4* m);
 
-    // 0x004fc890. Sets this node's position so that it equals *p in frame space.
-    // frame == 0 converts through parent->WorldToLocalPoint when there is a parent.
+    // 0x004fc890. Despite the name (kept for the existing callers) this TRANSLATES: it
+    // converts the offset *p from 'frame' space (directions through
+    // frame->LocalToWorldDirection and parent->WorldToLocalDirection; frame == 0 through
+    // parent->WorldToLocalPoint when there is a parent) and adds it with Translate (0x004fc850).
     void SetPositionIn(SoultreeObject* frame, const Vec3* p);
 
     // 0x004fc050, 1171 bytes, ret 0x14. The inverse of GetAxesIn. It builds a
@@ -126,9 +166,9 @@ public:
     // child's world matrix is invalidated first.
     void RemoveChild(SoultreeObject* child);
 
-    // 0x004fceb0. thiscall, ret 0x10. Applies a rotation of 'angle' about 'axis' to the local
-    // matrix (arguments: Vec3 by value, then a float). Only its call signature is known
-    // (tier 2, from the pushes in 0x004fd1f0); the body has not been reconstructed.
+    // 0x004fceb0. thiscall, ret 0x10: localMatrix = localMatrix * R(axis, angle) through
+    // MatrixMultiply (0x0042a1a0), keeping the local translation; the axis is normalized
+    // first (same inline axis-angle matrix as RotateAbout 0x004fcce0 and SetRotation 0x004fd090).
     void Rotate(Vec3 axis, float angle);
 
     // 0x004fd1f0. thiscall, ret 0x1c. Rotates this node about the local-space point 'pivot'
@@ -142,13 +182,14 @@ public:
     // (tier 2 for the signature, role tier 3).
     void SetAxesPtr(const Vec3* axisZ, const Vec3* axisY, int orthogonalize, int keepZ);
 
-    // 0x004fcce0, thiscall, ret 0x10: rotate the local matrix about the axis (x, y, z) by 'angle'
-    // (tier 2 signature; the axis is passed as three loose floats by SteeringControl).
+    // 0x004fcce0, thiscall, ret 0x10: Rotate with the axis passed as three loose floats
+    // (SteeringControl's call shape).
     void RotateAbout(float x, float y, float z, float angle);
 
-    // 0x004fc690, thiscall, ret 0x10: adds 'delta' (given in 'frame' space) to the node position;
-    // for frame == this it adds to the local translation +0xe8..+0xf0 and invalidates the world
-    // matrix (tier 2).
+    // 0x004fc690, thiscall, ret 0x10: for frame == this it adds 'delta' to the local translation
+    // +0xe8..+0xf0 and invalidates the world matrix; otherwise it SETS the position to 'delta'
+    // given in 'frame' space (frame->LocalToWorldPoint, then parent->WorldToLocalPoint; frame == 0
+    // stores it unchanged) through SetPosition (tier 2).
     void TranslateIn(SoultreeObject* frame, Vec3 delta);
 
     // 0x004fc4f0, thiscall, ret 8: local rotation rows 2 and 1 (the frame-less form of GetAxesIn
@@ -167,21 +208,109 @@ public:
     // 0x004fee30, thiscall, plain ret: removes this node from the same global array (name tier 3).
     void UnregisterNode();
 
-    // 0x004fda30, thiscall: node count of the subtree (tier 3 role; signature from the callers).
+    // 0x004fda30, thiscall: 1 + the counts of nextSibling and firstChild, i.e. the nodes of
+    // this node's subtree plus those of its later siblings.
     int CountNodes();
 
     // ---- callees of SoultreePhysicsBaseObject (formerly SoultreePhysicsCallees.h) ----
 
-    // 0x004fe850. thiscall, two Vec3 out pointers (center, extents); a bounds query
-    // (tier 3 role; SoultreePhysicsBaseObject slot 2 derives the box inertia from extents).
+    // 0x004fe850. thiscall, ret 8: *center / *extents = subtreeBoundsA / subtreeBoundsB, after
+    // UpdateSubtreeBounds when subtreeDirty is set (SoultreePhysicsBaseObject slot 2 derives the
+    // box inertia from the extents).
     void Fn_004fe850(Vec3* center, Vec3* extents);
 
-    // 0x004fbd10. thiscall, 7 floats and an int (tier 1 argument shape); the caller
-    // (SoultreePhysicsBaseObject slot 2) passes 0,0,1, 0,1,0, 0.0f, 1 (roles tier 3).
-    void Fn_004fbd10(float a, float b, float c, float d, float e, float f, float g, int h);
+    // 0x004fbd10, thiscall, ret 0x20: SetAxesPtr with the two axes as loose floats. The
+    // seventh and eighth arguments are copied through unchanged into SetAxesPtr's int
+    // 'orthogonalize' and 'keepZ' (mov/push, no conversion), so both are ints (tier 1). The
+    // caller (SoultreePhysicsBaseObject slot 2) passes 0,0,1, 0,1,0, 0, 1.
+    void Fn_004fbd10(float zx, float zy, float zz, float yx, float yy, float yz,
+                     int orthogonalize, int keepZ);
+
+    // ---- soultree.cpp members added with the unit's promotion (names tier 3) ----
+
+    // 0x004fc740, ret 8: places this node so that its position is *p given in 'frame'
+    // space: frame == this adds *p to the local translation; otherwise *p goes through
+    // frame->LocalToWorldPoint (frame != 0) and parent->WorldToLocalPoint, then SetPosition.
+    void SetPositionInFrame(SoultreeObject* frame, const Vec3* p);
+
+    // 0x004fc850, ret 4: adds *d to the local translation and invalidates the world matrix.
+    void Translate(const Vec3* d);
+
+    // 0x004fca30, ret 4: localMatrix = *m, then InvalidateWorldMatrix.
+    void SetLocalMatrix(const Matrix4* m);
+
+    // 0x004fca60, ret 4: *out = localMatrix.
+    void GetLocalMatrix(Matrix4* out);
+
+    // 0x004fcc70: resets the local and world matrices of this node, its later siblings and
+    // its descendants to identity (0x004a1410) and marks the world matrices stale.
+    void ResetMatrices();
+
+    // 0x004fda60, ret 8: appends every descendant to out[] (children first, level by level
+    // per parent), advancing *count.
+    void CollectDescendants(int* count, SoultreeObject** out);
+
+    // 0x004fd090, ret 0x10: replaces the local rotation by the rotation about (x, y, z) by
+    // 'angle' (radians), keeping the local translation.
+    void SetRotation(float x, float y, float z, float angle);
+
+    // 0x004fdb40 / 0x004fdb50: set / clear field_0x14c.
+    void SetFlag14c();
+    void ClearFlag14c();
+
+    // 0x004fdb60, ret 8, EH: creates the parameter block field_0x1a0 (__FILE__ line 0x346),
+    // opens it on 'stream' (0x004b77a0, index 1), loads through slot 3 and deletes the block.
+    // The stream type is the one src/reconstructed/Parameterblocks.h names.
+    void LoadFromParameters(UnknownParameterStream* stream, int offset);
+
+    // 0x004fe0a0, ret 8: *a / *b = localBoundsA / localBoundsB, after slot 5 when
+    // localBoundsValid is 0.
+    void GetLocalBounds(Vec3* a, Vec3* b);
+
+    // 0x004fe0f0: refreshes subtreeBoundsA/B (center and half extents) from this node's
+    // local bounds (when field_0x150 is set) and every child's 0x004fe2e0.
+    void UpdateSubtreeBounds();
+
+    // 0x004fe2e0, ret 0x10: grows the box (*have, *lo, *hi) by this node's subtree, expressed
+    // through 'frame' (a world matrix). Signature from the caller 0x004fe0f0 (tier 2).
+    void AccumulateBounds(int* have, Vec3* lo, Vec3* hi, const Matrix4* frame);
+
+    // 0x004fe8a0, ret 8: world-space box (lo, hi) of the subtree bounds: the center goes through
+    // the world matrix and the half extents through |R(world)| (tier 2).
+    void GetWorldBounds(Vec3* lo, Vec3* hi);
+
+    // 0x004fecd0: inserts this node in the global quadtree (0x0068aba4) or updates its range,
+    // using GetWorldBounds; the quadtree code is kept in field_0x198 (15 = none).
+    void Fn_4fecd0();
+
+    // 0x004fed70: removes this node from the quadtree when field_0x194 is set and resets
+    // field_0x194 / field_0x198.
+    void Fn_4fed70();
+
+    // 0x004fefb0 is the out-of-line copy of an inline 3x3 transpose (cdecl, Matrix4*).
+
+#ifdef SOULTREE_OBJECT_WITH_BASES
+    // ---- virtual functions (soultree.cpp only; see the header comment) ----
+    // GameObject slot 0 (secondary vtable 0x00557c40): scalar deleting dtor 0x004fb400,
+    // body 0x004fb430. 'this' is the GameObject subobject (+12).
+    virtual ~SoultreeObject();
+    // Primary vtable 0x00557c18 (QuadTreeObject's): slots 0/1 inherited, 2..8 introduced.
+    virtual void UnknownVirtualSlot2(SoultreeFileStream* stream);      // 0x004fdc00, ret 4: loads a hierarchy
+    virtual void UnknownVirtualSlot3();                                // 0x004fddc0: loads from field_0x1a0
+    virtual void UnknownVirtualSlot4(SoultreeObject** out);            // 0x004fe020, ret 4: *out = new node
+    virtual void UnknownVirtualSlot5();                                // 0x00464e90 (shared empty body)
+    virtual void UnknownVirtualSlot6();                                // 0x004fec70: identity local matrices
+    virtual void UnknownVirtualSlot7(SoultreeObject* src);             // 0x004feb10, ret 4: clone src's tree into this
+    virtual void UnknownVirtualSlot8(SoultreeObject* src, SoultreeObject* dst); // 0x004feb30, ret 8
+    // GameObject slot 25 override 0x004fec30: forwards to every node of the sibling chain at
+    // +0x140 (GameObject view +0x134) before GameObject's own slot 25 (0x00469720).
+    virtual int GameObjectVirtualSlot25(int a);
+#endif
 
     // ---- layout (offsets tier 1 from the constructor/helpers; names tier 3) ----
+#ifndef SOULTREE_OBJECT_WITH_BASES
     char pad_0x000[0x38];          // QuadTreeObject vptr (+0), GameObject vptr (+12)...
+#endif
     char name[0x80];               // 0x038, compared by FindByName (size unknown)
     Matrix4 localMatrix;           // 0x0b8, identity after construction
     Matrix4 worldMatrix;           // 0x0f8, local * parent world
@@ -189,14 +318,25 @@ public:
     SoultreeObject* parent;        // 0x13c
     SoultreeObject* firstChild;    // 0x140
     SoultreeObject* nextSibling;   // 0x144
-    int field_0x148;               // 0x148
-    char pad_0x14c[0x40];          // 0x14c..0x18b zeroed by the constructor
+    int field_0x148;               // 0x148, previous sibling (AppendSibling/RemoveChild)
+    // 0x14c..0x188 are zeroed by the constructor. The stream load (slot 2,
+    // 0x004fdc00) reads 0x14c, 0x154..0x18b in this order; the clone (slot 8)
+    // copies 0x14c and clears 0x154 (tier 1 offsets, tier 3 roles).
+    int field_0x14c;               // 0x14c, set/cleared by 0x004fdb40 / 0x004fdb50
+    int field_0x150;               // 0x150
+    int localBoundsValid;          // 0x154, 0 makes 0x004fe0a0 call slot 5 first
+    Vec3 localBoundsA;             // 0x158, returned by 0x004fe0a0
+    Vec3 localBoundsB;             // 0x164
+    int field_0x170;               // 0x170
+    Vec3 subtreeBoundsA;           // 0x174, returned by 0x004fe850 (refreshed when subtreeDirty)
+    Vec3 subtreeBoundsB;           // 0x180
     int subtreeDirty;              // 0x18c, set on self and all ancestors by 0x004fdab0
     int field_0x190;               // 0x190, 1 after construction
-    int field_0x194;               // 0x194
-    int field_0x198;               // 0x198, 0xf after construction
-    int field_0x19c;               // 0x19c
-    int field_0x1a0;               // 0x1a0; sizeof 0x1a4 from the operator new in
+    int field_0x194;               // 0x194, nonzero while inserted in the quadtree
+    int field_0x198;               // 0x198, quadtree code (0xf = none) after construction
+    int field_0x19c;               // 0x19c, node count of a loaded hierarchy (slots 2/3)
+    UnknownParameterBlock* field_0x1a0; // 0x1a0, parameter block used by 0x004fdb60/slot 3;
+                                   // sizeof 0x1a4 from the operator new in
                                    // SoultreePhysicsBaseObject slot 2 (tier 1)
 };
 

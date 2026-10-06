@@ -1,59 +1,5 @@
 [
   {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?BoxTreeQueryA@@",
-    "target_va": "0x00429540",
-    "target_size": 48,
-    "expect": "exact",
-    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?BoxTreeQueryB@@",
-    "target_va": "0x00429890",
-    "target_size": 48,
-    "expect": "exact",
-    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?BoxTreeQueryC@@",
-    "target_va": "0x00429e60",
-    "target_size": 33,
-    "expect": "exact",
-    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?FreeBoxTree@@",
-    "target_va": "0x0042a160",
-    "target_size": 52,
-    "expect": "exact",
-    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?TransformPointPtr@@",
-    "target_va": "0x0042a580",
-    "target_size": 92,
-    "expect": "exact",
-    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQuery.cpp",
-    "candidate_symbol_contains": "?InverseTransformPoint@@",
-    "target_va": "0x0042a5e0",
-    "target_size": 92,
-    "expect": "exact",
-    "notes": "no __FILE__; run-time query range 0x004245f0..0x0042ad21 of the BoundingBoxTreeBuild.cpp bracket"
-  },
-  {
     "class": "BoundingBoxTreeBuild",
     "source": "RigidTransform.cpp",
     "candidate_symbol_contains": "?InvertRigidTransform@@",
@@ -61,5 +7,65 @@
     "target_size": 144,
     "expect": "exact",
     "notes": "no __FILE__; after ReadPointNode, before Camera.cpp; called only from CollisionObject.cpp 0x004399be/0x00439a47; same body as the InvertRigid inline in BuildModelBoxTree"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?PointInTriangle@@YAHPBUVec3@@PBUQueryTriangle@@@Z",
+    "target_va": "0x004278d0",
+    "target_size": 830,
+    "expect": "partial",
+    "notes": "near miss: two copies and the lea ebx of the normal pointer scheduled differently",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?SphereTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
+    "target_va": "0x00429570",
+    "target_size": 789,
+    "expect": "partial",
+    "notes": "near miss: retail merges the return-0/return-1 tails; control flow and calls otherwise match",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?LeafPairQuery@@YAHPAUQuerySegmentLeaf@@PAUQueryTriangleLeaf@@@Z",
+    "target_va": "0x004275f0",
+    "target_size": 736,
+    "expect": "partial",
+    "notes": "near miss: instruction-identical, retail frame 12 bytes larger (stack offsets)",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?LeafNodeQuery@@YAHPAUQueryTreeNode@@0H@Z",
+    "target_va": "0x004269e0",
+    "target_size": 509,
+    "expect": "partial",
+    "notes": "near miss: instruction-identical, retail frame 12 bytes larger (stack offsets)",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?MoveBox@@YAXPAUVec3@@0PBUMatrix4@@@Z",
+    "target_va": "0x00428db0",
+    "target_size": 789,
+    "expect": "partial",
+    "notes": "near miss: stack slots of the axis temporaries and the moved centre",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?GrowBoxByTransformedBox@@YAXPAUVec3@@0U1@1PBUMatrix4@@@Z",
+    "target_va": "0x004290d0",
+    "target_size": 805,
+    "expect": "partial",
+    "notes": "near miss: one extra store of the transformed centre x (retail keeps it on the FPU stack)",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   }
 ]

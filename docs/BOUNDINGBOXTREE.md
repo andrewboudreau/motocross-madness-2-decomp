@@ -16,8 +16,9 @@ GatherModelTriangles `0x0042c260` and BuildModelPointTree `0x0042d390`.
 The code before `0x0042ad30` is a separate, unattested unit. It has its
 own kVec3 `$E` set (`0x00429400`), its own bss, and the five empty `$E`
 pairs at `0x00424690`. The `.CRT$XCU` order is bikerace.cpp, `0x00429400`,
-`0x00424690`, then `0x0042d250`. Its box-tree queries stay in
-`samples/physics/bvh/BoundingBoxTreeQuery.cpp`.
+`0x00424690`, then `0x0042d250`. That unit is now
+`src/krusty2/bvh/BoundingBoxTreeQuery.cpp` (its name is ours); see
+[PHYSICS_VALIDATION](PHYSICS_VALIDATION.md).
 
 **GR_BitString** (`0x004238c0..0x00423f6d`, `src/reconstructed/GR_BitString.cpp`;
 file name not recovered). This is a separate unit (strong inference):

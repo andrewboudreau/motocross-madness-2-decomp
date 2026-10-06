@@ -166,6 +166,43 @@ python tools/run_physics_samples.py --strict \
 
 This run reports `23/23 strict exact`.
 
+## Wave-10 soultree and box-tree query slice
+
+Two units are promoted and pass strict comparison.
+
+**`src/krusty2/soultree/soultree.cpp`** (SoultreeObject,
+`0x004fb2b0..0x004fefd8`) passes 56 cases, including the former 78.7%
+partial `UpdateWorldMatrix`.
+- `core/SoultreeObject.h` gives the real QuadTreeObject + GameObject bases
+  only when `SOULTREE_OBJECT_WITH_BASES` is defined. Other physics code
+  keeps the flat view.
+- `Fn_004fbd10`'s seventh argument is an int.
+- The helpers samples keep the near misses: LocalToWorldPoint,
+  WorldToLocalDirection, WorldToLocalPoint, SetAxesPtr, SetMatrixIn,
+  GetMatrixIn, SetAxesIn and RotateAboutPoint.
+
+**`src/krusty2/bvh/BoundingBoxTreeQuery.cpp`** (an unattested unit,
+`0x00424690..0x0042ad2f`) passes 33 cases:
+- its 18 `$E` (the kVec3 set and five empty statics);
+- the segment and sphere box tests;
+- the tree-tree and tree-box queries and the three entry points;
+- the matrix and point helpers.
+
+Dot products need `z*z + (x*x + y*y)`. Near misses are in
+`samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`.
+
+```bash
+python tools/run_physics_samples.py --strict --root src/krusty2/soultree \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+python tools/run_physics_samples.py --strict \
+  --source src/krusty2/bvh/BoundingBoxTreeQuery.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+The second run reports `33/33 strict exact`. The soultree root reports one
+required failure, SoulTreePhysics'
+`0x5036f0`, which predates this slice.
+
 ## Code-generation limits behind the remaining partials
 
 These were measured with VC6 SP3 `/O2` on the real targets and on small synthetic

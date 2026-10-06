@@ -13,9 +13,10 @@ Evidence
 - Extent: 0x42ad30..0x42e2a3.
   - 0x42ad30..0x42b5eb holds the partition and bounds helpers. Only this file
     calls them.
-  - The code before 0x42ad30 is a separate, unattested unit, with its own kVec3
-    `$E` set at 0x429400 and its own bss. Its six small query entry points are in
-    `samples/physics/bvh/BoundingBoxTreeQuery.cpp`.
+  - The code before 0x42ad30 is a separate, unattested unit (0x424690..0x42ad2f), with
+    its own kVec3 `$E` set at 0x429400 and its own bss: the run-time queries in
+    `BoundingBoxTreeQuery.cpp` (file name ours; near misses in
+    `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`).
   - 0x42e2b0, the rigid inverse, is called only from CollisionObject. It is in
     `samples/physics/bvh/RigidTransform.cpp`.
 - RTTI: none. The file has no classes, only free functions over plain structs.

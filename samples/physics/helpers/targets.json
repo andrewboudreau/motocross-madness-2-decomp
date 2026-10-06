@@ -81,121 +81,13 @@
     "notes": ""
   },
   {
-    "class": "Math",
-    "source": "MatrixOps.cpp",
-    "candidate_symbol_contains": "MatrixMultiply",
-    "target_va": "0x0042a1a0",
-    "target_size": 684,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "Math",
-    "source": "MatrixVec.cpp",
-    "candidate_symbol_contains": "Vec3TransformNormal@@",
-    "target_va": "0x0042a450",
-    "target_size": 91,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "Math",
-    "source": "MatrixVec.cpp",
-    "candidate_symbol_contains": "Vec3TransformNormalTranspose",
-    "target_va": "0x0042a4b0",
-    "target_size": 91,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "Math",
-    "source": "MatrixVec.cpp",
-    "candidate_symbol_contains": "Vec3TransformPoint",
-    "target_va": "0x0042a510",
-    "target_size": 100,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeHierarchy.cpp",
-    "candidate_symbol_contains": "InvalidateWorldMatrix",
-    "target_va": "0x004fb850",
-    "target_size": 45,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeHierarchy.cpp",
-    "candidate_symbol_contains": "InvalidateSiblingChain",
-    "target_va": "0x004fb880",
-    "target_size": 50,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeHierarchy.cpp",
-    "candidate_symbol_contains": "MarkSubtreeDirty",
-    "target_va": "0x004fdab0",
-    "target_size": 38,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeHierarchy.cpp",
-    "candidate_symbol_contains": "AddChild",
-    "target_va": "0x004fd910",
-    "target_size": 68,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeHierarchy.cpp",
-    "candidate_symbol_contains": "AppendSibling",
-    "target_va": "0x004fd960",
-    "target_size": 41,
-    "expect": "partial",
-    "notes": "97.56%; register choice differs"
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeHierarchy.cpp",
-    "candidate_symbol_contains": "RemoveChild",
-    "target_va": "0x004fd990",
-    "target_size": 148,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeHierarchy.cpp",
-    "candidate_symbol_contains": "UpdateWorldMatrix",
-    "target_va": "0x004fb4f0",
-    "target_size": 858,
-    "expect": "partial",
-    "notes": "78.7%; inlined matrix product term/operand order differs from retail (retail loads parent element first for some rows) and worldValid store placement"
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeTransform.cpp",
-    "candidate_symbol_contains": "LocalToWorldDirection",
-    "target_va": "0x004fd5c0",
-    "target_size": 150,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
     "class": "SoultreeObject",
     "source": "SoultreeTransform.cpp",
     "candidate_symbol_contains": "LocalToWorldPoint",
     "target_va": "0x004fd660",
     "target_size": 168,
     "expect": "partial",
-    "notes": "97.56%; z-component x87 scheduling differs"
+    "notes": "164/168 bytes: one integer mov ecx,eax scheduled before the last faddp in retail. Exact members of soultree.cpp: src/krusty2/soultree/soultree.cpp"
   },
   {
     "class": "SoultreeObject",
@@ -204,7 +96,7 @@
     "target_va": "0x004fd710",
     "target_size": 209,
     "expect": "partial",
-    "notes": "99.02%; one commuted fmul"
+    "notes": "207/209 bytes: retail loads v.x before m._11 in the last x product"
   },
   {
     "class": "SoultreeObject",
@@ -214,51 +106,6 @@
     "target_size": 285,
     "expect": "partial",
     "notes": "~88%; term order and negation temporaries differ"
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeTransform.cpp",
-    "candidate_symbol_contains": "SetPosition@SoultreeObject@@QAEXMMM",
-    "target_va": "0x004fc630",
-    "target_size": 38,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeTransform.cpp",
-    "candidate_symbol_contains": "SetPosition@SoultreeObject@@QAEXABU",
-    "target_va": "0x004fc660",
-    "target_size": 38,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeTransform.cpp",
-    "candidate_symbol_contains": "GetPosition@SoultreeObject@@QAEPAU",
-    "target_va": "0x004fc970",
-    "target_size": 33,
-    "expect": "exact",
-    "notes": "exact under vc6_o2_ml as Vec3* GetPosition(Vec3* out) (explicit out pointer; the soultree_base/collision callers pass &field_0x0c directly)"
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeTransform.cpp",
-    "candidate_symbol_contains": "GetPositionIn",
-    "target_va": "0x004fc9a0",
-    "target_size": 134,
-    "expect": "exact",
-    "notes": ""
-  },
-  {
-    "class": "SoultreeObject",
-    "source": "SoultreeTransform.cpp",
-    "candidate_symbol_contains": "GetAxesIn",
-    "target_va": "0x004fc540",
-    "target_size": 225,
-    "expect": "exact",
-    "notes": ""
   },
   {
     "class": "SoultreeObject",
@@ -285,7 +132,25 @@
     "target_va": "0x4fb8c0",
     "target_size": 1096,
     "expect": "partial",
-    "notes": "partial (~37% sim): copy slots of *m/world reversed (0x10 vs 0x50), frame 0x9c vs 0x90, register assignment differs."
+    "notes": "same instructions and frame as retail, but the two copied matrices of each block get swapped stack slots (0x50/0x10)"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeMatrix.cpp",
+    "candidate_symbol_contains": "SetAxesPtr",
+    "target_va": "0x4fbd70",
+    "target_size": 733,
+    "expect": "partial",
+    "notes": "701/733 bytes: three integer instructions (keepZ test, two temp stores) scheduled one x87 instruction early"
+  },
+  {
+    "class": "Math",
+    "source": "SoultreeMatrix.cpp",
+    "candidate_symbol_contains": "TransposeRotation3x3",
+    "target_va": "0x4fefb0",
+    "target_size": 41,
+    "expect": "exact",
+    "notes": "out-of-line COMDAT copy of the inline 3x3 transpose that soultree.cpp's SetMatrixIn calls (0x004fbc6f, 0x004fbc85); emitted after the unit's vector initializers"
   },
   {
     "class": "SoultreeObject",
@@ -294,7 +159,7 @@
     "target_va": "0x4fd1f0",
     "target_size": 334,
     "expect": "partial",
-    "notes": "partial 84.8%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs."
+    "notes": "partial 88.5%: final SetPosition lea/push of &p scheduled earlier than retail; z store slot differs. Retail builds both positions in the pushed temporary."
   },
   {
     "class": "(free)",

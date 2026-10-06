@@ -1,5 +1,6 @@
-// SoultreeMatrix.cpp -- SoultreeObject (soultree.cpp) frame-relative matrix accessors
-// declared in ../common/SoultreeObject.h. Class attribution tier 2; names tier 3.
+// SoultreeMatrix.cpp -- near misses of SoultreeObject (soultree.cpp) frame-relative matrix
+// accessors (declared in core/SoultreeObject.h). The exact members of the unit are in
+// src/krusty2/soultree/soultree.cpp. Class attribution tier 2; names tier 3.
 #include <string.h>
 #include "math/Math3D.h"
 
@@ -7,39 +8,41 @@
 // (CollisionMatrixMultiply). Declared here only so the call target is right.
 void MatrixProductRows(Matrix4* out, const Matrix4* a, const Matrix4* b);
 
-// 0x004fefb0 (cdecl): transposes the upper 3x3 of *m in place. Out-of-line COMDAT instance of
-// the same operation that TransposeRotation3 below expands inline in other functions.
-void MatrixTransposeRotation(Matrix4* m);
+// Transposes the upper 3x3 of *m in place. GetMatrixIn and SetAxesIn expand it inline;
+// SetMatrixIn calls the out-of-line COMDAT copy 0x004fefb0 (emitted at the end of the unit,
+// after the vector initializers). This body matches 0x004fefb0 exactly.
+inline void TransposeRotation3x3(Matrix4* m)
+{
+    float t;
+    t = m->_12; m->_12 = m->_21; m->_21 = t;
+    t = m->_13; m->_13 = m->_31; m->_31 = t;
+    t = m->_23; m->_23 = m->_32; m->_32 = t;
+}
 
-// 0x0042a4b0 (MatrixVec.cpp, cdecl): *out = v * transpose(R(*m)).
+// 0x0042a4b0 (src/krusty2/bvh/BoundingBoxTreeQuery.cpp, cdecl): *out = v * transpose(R(*m)).
 void Vec3TransformNormalTranspose(Vec3* out, Vec3 v, const Matrix4* m);
 
-// 0x004fca30 (thiscall, ret 4): copies *m into localMatrix, then InvalidateWorldMatrix.
-// Provisional stand-in declaration (SoultreeObject.h does not declare it).
-class SoultreeMatrixNode : public SoultreeObject {
-public:
-    void SetMatrix(const Matrix4* m);
-};
 
-// Natural row-major product out = a * b (row vectors), expanded inline by retail in SetMatrixIn.
-static inline void MatrixMultiplyInline(Matrix4* out, const Matrix4& a, const Matrix4& b)
+// The 4x4 product of MatrixMultiply (0x0042a1a0) expanded inline, by reference: *out = b * a
+// in the row-vector convention. The same helper makes UpdateWorldMatrix (0x004fb4f0) exact.
+static inline void MatrixProduct(Matrix4* out, const Matrix4& a, const Matrix4& b)
 {
-    out->_11 = a._11 * b._11 + a._12 * b._21 + a._13 * b._31 + a._14 * b._41;
-    out->_12 = a._11 * b._12 + a._12 * b._22 + a._13 * b._32 + a._14 * b._42;
-    out->_13 = a._11 * b._13 + a._12 * b._23 + a._13 * b._33 + a._14 * b._43;
-    out->_14 = a._11 * b._14 + a._12 * b._24 + a._13 * b._34 + a._14 * b._44;
-    out->_21 = a._21 * b._11 + a._22 * b._21 + a._23 * b._31 + a._24 * b._41;
-    out->_22 = a._21 * b._12 + a._22 * b._22 + a._23 * b._32 + a._24 * b._42;
-    out->_23 = a._21 * b._13 + a._22 * b._23 + a._23 * b._33 + a._24 * b._43;
-    out->_24 = a._21 * b._14 + a._22 * b._24 + a._23 * b._34 + a._24 * b._44;
-    out->_31 = a._31 * b._11 + a._32 * b._21 + a._33 * b._31 + a._34 * b._41;
-    out->_32 = a._31 * b._12 + a._32 * b._22 + a._33 * b._32 + a._34 * b._42;
-    out->_33 = a._31 * b._13 + a._32 * b._23 + a._33 * b._33 + a._34 * b._43;
-    out->_34 = a._31 * b._14 + a._32 * b._24 + a._33 * b._34 + a._34 * b._44;
-    out->_41 = a._41 * b._11 + a._42 * b._21 + a._43 * b._31 + a._44 * b._41;
-    out->_42 = a._41 * b._12 + a._42 * b._22 + a._43 * b._32 + a._44 * b._42;
-    out->_43 = a._41 * b._13 + a._42 * b._23 + a._43 * b._33 + a._44 * b._43;
-    out->_44 = a._41 * b._14 + a._42 * b._24 + a._43 * b._34 + a._44 * b._44;
+    out->_11 = a._11 * b._11 + a._21 * b._12 + a._31 * b._13 + a._41 * b._14;
+    out->_12 = a._12 * b._11 + a._22 * b._12 + a._32 * b._13 + a._42 * b._14;
+    out->_13 = a._13 * b._11 + a._23 * b._12 + a._33 * b._13 + a._43 * b._14;
+    out->_14 = a._14 * b._11 + a._24 * b._12 + a._34 * b._13 + a._44 * b._14;
+    out->_21 = a._11 * b._21 + a._21 * b._22 + a._31 * b._23 + a._41 * b._24;
+    out->_22 = a._12 * b._21 + a._22 * b._22 + a._32 * b._23 + a._42 * b._24;
+    out->_23 = a._13 * b._21 + a._23 * b._22 + a._33 * b._23 + a._43 * b._24;
+    out->_24 = a._14 * b._21 + a._24 * b._22 + a._34 * b._23 + a._44 * b._24;
+    out->_31 = a._11 * b._31 + a._21 * b._32 + a._31 * b._33 + a._41 * b._34;
+    out->_32 = a._12 * b._31 + a._22 * b._32 + a._32 * b._33 + a._42 * b._34;
+    out->_33 = a._13 * b._31 + a._23 * b._32 + a._33 * b._33 + a._43 * b._34;
+    out->_34 = a._14 * b._31 + a._24 * b._32 + a._34 * b._33 + a._44 * b._34;
+    out->_41 = a._11 * b._41 + a._21 * b._42 + a._31 * b._43 + a._41 * b._44;
+    out->_42 = a._12 * b._41 + a._22 * b._42 + a._32 * b._43 + a._42 * b._44;
+    out->_43 = a._13 * b._41 + a._23 * b._42 + a._33 * b._43 + a._43 * b._44;
+    out->_44 = a._14 * b._41 + a._24 * b._42 + a._34 * b._43 + a._44 * b._44;
 }
 
 static inline void TransposeRotation3(Matrix4& m)
@@ -176,20 +179,23 @@ void SoultreeObject::SetAxesIn(SoultreeObject* frame, const Vec3* axisZ, const V
 
 // 0x004fb8c0. Inverse direction of GetMatrixIn: makes this node's matrix equal *m given in
 // 'frame' space. frame == this stores *m as the local matrix (0x004fca30); otherwise *m is
-// first carried into world space (m = m * frame->worldMatrix, in place, so *m is modified) and
-// then re-expressed relative to this node's parent (same transpose/multiply sequence as
-// GetMatrixIn) into localMatrix. Tier 2 data flow, tier 3 names.
+// first carried into world space in place (*m = *m * frame->worldMatrix) and then
+// re-expressed relative to this node's parent. Tier 2 data flow, tier 3 names.
+// PARTIAL: same instructions and frame (0x90) as retail, including both out-of-line calls of
+// 0x004fefb0, but VC6 here gives the first copied matrix of each block the 0x50 slot and the
+// second the 0x10 slot; retail has them the other way round. Declaration order, statement
+// order, block- or function-scope matrices and a by-value inline product did not swap them.
 void SoultreeObject::SetMatrixIn(SoultreeObject* frame, Matrix4* m)
 {
     if (frame == this) {
-        ((SoultreeMatrixNode*)this)->SetMatrix(m);
+        SetLocalMatrix(m);
         return;
     }
     if (frame) {
         frame->UpdateWorldMatrix();
-        Matrix4 a = *m;
-        Matrix4 b = frame->worldMatrix;
-        MatrixMultiplyInline(m, a, b);
+        Matrix4 copy = *m;
+        Matrix4 world = frame->worldMatrix;
+        MatrixProduct(m, world, copy);
     }
     Matrix4* local = &localMatrix;
     if (parent) {
@@ -200,16 +206,69 @@ void SoultreeObject::SetMatrixIn(SoultreeObject* frame, Matrix4* m)
         d.x = t._41 - parentWorld._41;
         d.y = t._42 - parentWorld._42;
         d.z = t._43 - parentWorld._43;
-        MatrixTransposeRotation(&t);
+        TransposeRotation3x3(&t);
         MatrixProductRows(local, &t, &parentWorld);
-        MatrixTransposeRotation(local);
-        Vec3 r;
-        Vec3TransformNormalTranspose(&r, d, &parentWorld);
-        local->_41 = r.x;
-        local->_42 = r.y;
-        local->_43 = r.z;
+        TransposeRotation3x3(local);
+        Vec3TransformNormalTranspose(&d, d, &parentWorld);
+        local->_41 = d.x;
+        local->_42 = d.y;
+        local->_43 = d.z;
     } else {
         *local = *m;
     }
+    InvalidateWorldMatrix();
+}
+
+// v / |v| through the out-of-line Vec3 helpers; v itself when |v|^2 is exactly 1.
+static inline Vec3 Normalized(const Vec3& v)
+{
+    float lenSq = Vec3DotCall(&v, &v);
+    if (lenSq == 1.0f)
+        return v;
+    float inv = FastInvSqrt(lenSq);
+    Vec3 r;
+    return *Vec3ScaleCall(&r, &v, inv);
+}
+
+// 0x004fbd70, ret 0x10. Builds the local rotation from row 2 = *axisZ and row 1 = *axisY
+// (row 0 = y x z), keeping the local translation. With 'orthogonalize', r = y x z first
+// replaces y by z x r (keepZ) or z by r x y. Both axes are normalized through the out-of-line
+// helpers (0x0040ae30, 0x00460c00, 0x005015b0); row 0 comes from 0x00515600.
+// PARTIAL 701/733 bytes: three integer instructions (the keepZ test and two stores of the
+// cross-product temporaries) are scheduled one x87 instruction earlier than in retail.
+void SoultreeObject::SetAxesPtr(const Vec3* axisZ, const Vec3* axisY, int orthogonalize, int keepZ)
+{
+    Vec3 pos;
+    pos.x = localMatrix._41;
+    pos.y = localMatrix._42;
+    pos.z = localMatrix._43;
+    Vec3 z = *axisZ;
+    Vec3 y = *axisY;
+    if (orthogonalize) {
+        Vec3 r = CrossProduct(y, z);
+        if (keepZ)
+            y = CrossProduct(z, r);
+        else
+            z = CrossProduct(r, y);
+    }
+    y = Normalized(y);
+    z = Normalized(z);
+    Vec3 x = CrossProductCall(y, z);
+    localMatrix._11 = x.x;
+    localMatrix._12 = x.y;
+    localMatrix._13 = x.z;
+    localMatrix._14 = 0.0f;
+    localMatrix._21 = y.x;
+    localMatrix._22 = y.y;
+    localMatrix._23 = y.z;
+    localMatrix._24 = 0.0f;
+    localMatrix._31 = z.x;
+    localMatrix._32 = z.y;
+    localMatrix._33 = z.z;
+    localMatrix._34 = 0.0f;
+    localMatrix._41 = pos.x;
+    localMatrix._42 = pos.y;
+    localMatrix._43 = pos.z;
+    localMatrix._44 = 1.0f;
     InvalidateWorldMatrix();
 }

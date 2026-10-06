@@ -1,0 +1,332 @@
+[
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x00424690",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty initializer thunk (Matrix4 file static, empty user constructor)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x004246a0",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty initializer body",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E17",
+    "target_va": "0x004246b0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty initializer thunk",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E16",
+    "target_va": "0x004246c0",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty initializer body",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E20",
+    "target_va": "0x004246d0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty initializer thunk",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E19",
+    "target_va": "0x004246e0",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty initializer body",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E23",
+    "target_va": "0x004246f0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty initializer thunk (Vec3 array)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E22",
+    "target_va": "0x00424700",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty initializer body",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E26",
+    "target_va": "0x00424710",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty initializer thunk (Vec3 array)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E25",
+    "target_va": "0x00424720",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty initializer body",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SegmentBoxOverlap@@YAHPBUVec3@@0U1@1PBUMatrix4@@@Z",
+    "target_va": "0x004253b0",
+    "target_size": 924,
+    "expect": "exact",
+    "notes": "segment vs box SAT in a frame; called from LeafNodeQuery 0x4269e0, SegmentTreeQuery 0x429e90 and CollisionObject 0x439a02",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?BoxSphereOverlap@@YAHPBUVec3@@0U1@MMPBUMatrix4@@@Z",
+    "target_va": "0x00425750",
+    "target_size": 419,
+    "expect": "exact",
+    "notes": "sphere vs box in a frame; called from CollisionObject 0x438946/0x439554 and SphereTreeQuery",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?TreeTreeQuery@@YAHPAUQueryTreeNode@@0PBUMatrix4@@1HPAUVec3@@1@Z",
+    "target_va": "0x00428950",
+    "target_size": 708,
+    "expect": "exact",
+    "notes": "tree vs tree entry: relative frames in 0x578ef0/0x578eb0, motion 0x579018",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?TreeBoxOverlap@@YAHPAUQueryTreeNode@@0PBUMatrix4@@1@Z",
+    "target_va": "0x00428c20",
+    "target_size": 395,
+    "expect": "exact",
+    "notes": "root box vs root box; calls BoxOverlap 0x424ab0",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00429400",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3Zero initializer thunk (Math3D.h set, global 0x578f30)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00429410",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3Zero initializer body",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00429450",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3XAxis initializer thunk (0x578f40)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x00429460",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3XAxis initializer body",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004294a0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3YAxis initializer thunk (0x579008)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004294b0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3YAxis initializer body",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004294f0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3ZAxis initializer thunk (0x578ea0)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00429500",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3ZAxis initializer body",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SphereTreeQueryWithVertices@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@HPAU1@@Z",
+    "target_va": "0x00429540",
+    "target_size": 48,
+    "expect": "exact",
+    "notes": "stores the vertex array 0x578f4c, calls 0x429570",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?CapsuleTreeQueryWithVertices@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@HPAU1@@Z",
+    "target_va": "0x00429890",
+    "target_size": 48,
+    "expect": "exact",
+    "notes": "stores the vertex array 0x578f4c, calls 0x4298c0",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SegmentTreeQueryWithVertices@@YAHPBUVec3@@PAUQueryTreeNode@@PBUMatrix4@@PAU1@@Z",
+    "target_va": "0x00429e60",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "stores the vertex array 0x578f4c, calls 0x429e90",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?FreeBoxTree@@YAXPAUQueryTreeNode@@@Z",
+    "target_va": "0x0042a160",
+    "target_size": 52,
+    "expect": "exact",
+    "notes": "recursive free; called from 0x431db0..",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?MatrixMultiply@@YAXPAUMatrix4@@U1@1@Z",
+    "target_va": "0x0042a1a0",
+    "target_size": 684,
+    "expect": "exact",
+    "notes": "4x4 product (moved from samples/physics/helpers/MatrixOps.cpp); called here and from the scene graph",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?Vec3TransformNormal@@YAXPAUVec3@@U1@PBUMatrix4@@@Z",
+    "target_va": "0x0042a450",
+    "target_size": 91,
+    "expect": "exact",
+    "notes": "v * R(m) (moved from samples/physics/helpers/MatrixVec.cpp)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?Vec3TransformNormalTranspose@@YAXPAUVec3@@U1@PBUMatrix4@@@Z",
+    "target_va": "0x0042a4b0",
+    "target_size": 91,
+    "expect": "exact",
+    "notes": "R(m) * v (moved from samples/physics/helpers/MatrixVec.cpp)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?Vec3TransformPoint@@YAXPAUVec3@@U1@PBUMatrix4@@@Z",
+    "target_va": "0x0042a510",
+    "target_size": 100,
+    "expect": "exact",
+    "notes": "v * m + translation (moved from samples/physics/helpers/MatrixVec.cpp)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?TransformPointPtr@@YAXPAUVec3@@PBU1@PBUMatrix4@@@Z",
+    "target_va": "0x0042a580",
+    "target_size": 92,
+    "expect": "exact",
+    "notes": "v*M+t, point by pointer; called from 0x5154d5",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?InverseTransformPoint@@YAXPAUVec3@@U1@PBUMatrix4@@@Z",
+    "target_va": "0x0042a5e0",
+    "target_size": 92,
+    "expect": "exact",
+    "notes": "inverse rigid transform of a point; called from SphereTreeQuery",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?PointSegmentDistance@@YAMPBUVec3@@00@Z",
+    "target_va": "0x0042ac00",
+    "target_size": 289,
+    "expect": "exact",
+    "notes": "point-to-segment distance (FastSqrt 0x460b50)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  }
+]

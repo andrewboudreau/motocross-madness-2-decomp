@@ -120,3 +120,12 @@ The audit itself was a linear capstone pass over `.text`, using
 `mcm2tool.pe.PEImage`. It collected absolute operands in `.data`, and read the
 `.CRT$XCU` table as the zero-delimited pointer array around the registered
 `$E` stub addresses.
+
+## Later additions
+
+| `$E` text | Unit | Readers | Verdict |
+|---|---|---|---|
+| `0x004fee70..0x004fefab` (vectors `0x00689e88..0x00689ec0`) | soultree.cpp | none | consistent; closes the unit |
+| `0x00429400..0x0042953b` + five empty pairs `0x00424690..0x0042472f` | BoundingBoxTreeQuery.cpp (unattested) | this unit | consistent; vectors listed first |
+| `0x00466f10..0x004670fb` (XCU 113-116, vectors `0x0065b438..0x0065b468`) | FollowCam.cpp | FollowCam code only | consistent; closes the unit |
+| `0x00442e00..0x00442f3b` (XCU 82-85) | D3DIMSoulTree.CPP | not traced | mid-file |

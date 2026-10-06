@@ -18,7 +18,7 @@
   "?Fn_00435fb0@CollisionObject@@QAEXXZ": "0x00435fb0",
   "?Fn_00435fe0@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?Fn_00438e70@CollisionObject@@QAEHXZ": "0x00438e70",
-  "?Fn_004fbd10@SoultreeObject@@QAEXMMMMMMMH@Z": "0x004fbd10",
+  "?Fn_004fbd10@SoultreeObject@@QAEXMMMMMMHH@Z": "0x004fbd10",
   "?Fn_004fe850@SoultreeObject@@QAEXPAUVec3@@0@Z": "0x004fe850",
   "?Fn_43a640@SoultreeContact@@QAEXPAUVec3@@000M@Z": "0x0043a640",
   "?Fn_4b0df0@@YAHPAVCollisionObject@@PAUSoultreeProbe@@PAUVec3@@MHHHHMEPBU3@3H222PAH@Z": "0x004b0df0",
