@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Display.h"
+#include "FontTextureManager.h"
 #include "GameObject.h"
 #include "Net.h"
 #include "RenderTarget.h"
@@ -21,12 +22,8 @@ public:
 };
 extern UnknownGlobal56c470* g_UnknownGlobal56c470;
 
-// Static object at 0x0065b478 (its code is near FontTextureManager.cpp's
-// literals).
-class UnknownStatic65b478 {
-public:
-    void UnknownFunction4677c0();             // 0x004677c0
-};
+// Static object at 0x0065b478: the font list (FontTextureManager.h;
+// FontTexture.cpp defines it as FontTexture::s_UnknownManager65b478).
 extern UnknownStatic65b478 g_UnknownStatic65b478;
 
 // cdecl 0x00460ad0: fills math lookup tables (called by the constructor).

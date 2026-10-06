@@ -19,16 +19,9 @@ extern int g_UnknownGlobal689964;
 // Lzw.cpp (cdecl 0x004a03d0): expands `source` into `size` bytes.
 void UnknownFunction4a03d0(void* destination, void* source, int size);
 
-// bmpfile.cpp (cdecl): 0x004245f0 describes an 8-bit width x height
-// bitmap with a 256-entry RGB palette; 0x00424380 writes it to `name`.
-struct UnknownBitmapFile {
-    unsigned char field_0x000[0x438];
-    void* bits;
-    char name[0x80];
-};
-
-void UnknownFunction4245f0(UnknownBitmapFile* bitmap, void* bits, unsigned char (*palette)[3], int width, int height);
-int UnknownFunction424380(UnknownBitmapFile* bitmap);
+// bmpfile.cpp (cdecl): 0x004245f0 describes an 8-bit bitmap and 0x00424380
+// writes it (the level dump).
+#include "bmpfile.h"
 
 // Shared texture surfaces reused across textures: 0x0068a36c by mip level
 // count, 0x0068a394 for single-level textures.

@@ -10,6 +10,8 @@ struct UnknownCameraBikeRider {
 struct UnknownCameraBikeState {
     unsigned char field_0x00[0x44];
     int field_0x44;                      // BikeCamera slot 75 tests 3
+    unsigned char field_0x48[0xb0 - 0x48];
+    int field_0xb0;                      // racesnd.cpp 0x004e39b0
 };
 
 // Object at BikeCamera+0x3b0. It shares UnknownCameraVehicle's offsets

@@ -149,6 +149,14 @@ struct UnknownSurfaceDesc {
     unsigned long textureStage;
 };
 
+// A palette Display+0x190's slot 5 creates (IDirectDrawPalette-shaped;
+// Palette8 releases it through slot 2).
+struct UnknownPaletteInterface {
+    virtual long __stdcall UnknownMethod0();
+    virtual long __stdcall UnknownMethod1();
+    virtual long __stdcall UnknownMethod2();                              // Release
+};
+
 // Interface at Display+0x190 (IDirectDraw7-shaped).
 struct UnknownDirectDrawInterface {
     virtual long __stdcall UnknownMethod0();
@@ -156,7 +164,8 @@ struct UnknownDirectDrawInterface {
     virtual long __stdcall UnknownMethod2();
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
-    virtual long __stdcall UnknownMethod5();
+    virtual long __stdcall UnknownMethod5(unsigned long flags, void* entries, UnknownPaletteInterface** palette,
+                                          void* outer);                    // CreatePalette (Palette8.cpp)
     virtual long __stdcall UnknownMethod6(UnknownSurfaceDesc* desc, UnknownSurfaceInterface** surface,
                                           void* outer);                    // CreateSurface
     virtual long __stdcall UnknownMethod7();

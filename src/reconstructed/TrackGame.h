@@ -22,8 +22,18 @@ struct UnknownInputEntry;
 // The race-mode objects at TrackGame+0x558..+0x568 (EventManager uses the
 // first one present). They are GameObjects (slots 4 and 5, the +0x25 flag
 // bits); their classes are not established.
+struct UnknownTrackGameViewPart {
+    unsigned char field_0x00[0xc4];
+    GameObject* field_0xc4;                   // racesnd.cpp switches it with slot 16
+};
+
 struct TrackGameViewOwner : public GameObject {
-    unsigned char field_0x2c[0x34 - 0x2c];
+    // 0x004e0c30 (among QuarryStuntEvent.cpp's code): shows the on/off
+    // message for string `id` (racesnd.cpp passes 0x1429 and 0x14c3).
+    void UnknownFunction4e0c30(int id, int value);
+
+    UnknownTrackGameViewPart* field_0x2c;
+    unsigned char field_0x30[0x34 - 0x30];
     UnknownKrustyBikeView* field_0x34;
     unsigned char field_0x38[0x5c - 0x38];
     GameObject* field_0x5c;                   // EventManager 0x0045cdc0 calls slot 4 on 0x5c..0x68
@@ -32,7 +42,9 @@ struct TrackGameViewOwner : public GameObject {
     GameObject* field_0x68;
     TextQueueOverlay* field_0x6c;
     float field_0x70;                         // compared with TrackGame+0x2eb0 (EventManager 0x0045eef0)
-    unsigned char field_0x74[0xa8 - 0x74];
+    unsigned char field_0x74[0x9c - 0x74];
+    GameObject* field_0x9c;                   // racesnd.cpp calls slot 4 (sound off) or 5 (on)
+    unsigned char field_0xa0[0xa8 - 0xa0];
     UnknownEventRacer* field_0xa8;
 };
 
@@ -74,11 +86,13 @@ public:
     unsigned char field_0x6d8[0xa20 - 0x6d8];
     int field_0xa20;                          // EventManager 0x0045e710 calls TrackGame 0x00521a40 when clear
     int field_0xa24;                          // selects +0xa3c for the GUI's +0x34c (KrustyUI 0x004988a0)
-    unsigned char field_0xa28[0xa34 - 0xa28];
+    int field_0xa28;                          // sound on (racesnd.cpp)
+    unsigned char field_0xa2c[0xa34 - 0xa2c];
     int field_0xa34;                          // TrackGame slot 4 audio argument
-    unsigned char field_0xa38[0xa3c - 0xa38];
+    int field_0xa38;                          // position sounds on (racesnd.cpp 0x004e39b0)
     int field_0xa3c;
-    unsigned char field_0xa40[0xa48 - 0xa40];
+    int field_0xa40;                          // sound volume (racesnd.cpp 0x004e3430)
+    unsigned char field_0xa44[0xa48 - 0xa44];
     int field_0xa48;                          // selects 16 (else 8) in TrackGame slot 4
 };
 
@@ -126,6 +140,9 @@ public:
     int UnknownFunction4e9ac0(unsigned long* info, char* a, char* b, int c);
     // 0x004e9ba0: opens the scene archive `name` (default field_0x24c).
     UnknownTextureStream* UnknownFunction4e9ba0(const char* name);
+    // 0x004e9cd0: opens `name` from the archive in `stream` (racesnd.cpp
+    // reads Audio.res samples through it); 0 when not found.
+    int UnknownFunction4e9cd0(UnknownTextureStream* stream, const char* name, const char* mode, int a);
     void UnknownFunction4e9f70(const char* name); // 0x004e9f70: derived file names
     void UnknownFunction4e9b80(char* path);   // 0x004e9b80 (EventManager 0x0045cb70)
     void UnknownFunction4e9e30(char* name, const char* kind, int value); // 0x004e9e30
@@ -186,13 +203,25 @@ struct UnknownTrackGameRacerSlot {
     unsigned char field_0xdc[0xf8 - 0xdc];
 };
 
+// One player reported by 0x004aa670 (0x48 bytes).
+struct UnknownZonePlayerRecord {
+    char field_0x00[0x40];                    // name
+    unsigned char field_0x40;                 // 1, other nonzero or zero: flags 2, 4 or 16
+    int field_0x44;                           // score
+};
+
 // Base of the +0x3410 object; its constructor sits among
 // FontTextureManager.cpp's literals.
 class UnknownTrackGameObject3410Base {
 public:
     UnknownTrackGameObject3410Base();         // 0x004676a0
 
-    unsigned char field_0x00[0x32c];
+    // The constructor clears +0 and +4; 0x004aa350 sets them
+    // (MSZoneInterface.cpp).
+    UnknownDirectPlay4A* field_0x00;
+    UnknownDirectPlayLobby3A* field_0x04;
+    UnknownZonePlayerRecord field_0x08[8];    // reported by 0x004aa670
+    unsigned char field_0x248[0x32c - 0x248];
 };
 
 // Object at TrackGame+0x3410, created for network games. It has no
@@ -202,6 +231,12 @@ public:
 class UnknownTrackGameObject3410 : public UnknownTrackGameObject3410Base {
 public:
     void UnknownFunction4aa350(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b); // 0x004aa350
+    // MSZoneInterface.cpp: 0x004aa360 / 0x004aa4e0 ask the lobby for the
+    // preset / rank property and copy it into `buffer` (at most `size`
+    // bytes); 0x004aa670 reports `count` players through a COM object.
+    int UnknownFunction4aa360(char* buffer, unsigned int size);
+    int UnknownFunction4aa4e0(char* buffer, unsigned int size);
+    int UnknownFunction4aa670(unsigned int count, void* a, void* b);
     void UnknownFunction49c770();             // 0x0049c770 (EventManager 0x0045e550)
 };
 
@@ -211,8 +246,9 @@ public:
     ~UnknownTrackGameObject3444();            // 0x004d39f0
 };
 
-// cdecl 0x00520820 (near TrackRecord.cpp's literals): logs a message.
-void UnknownFunction520820(const char* message);
+// cdecl 0x00520820 (near TrackRecord.cpp's literals): formats a message
+// (_vsnprintf into 0x200 bytes) and sends it through 0x0068a48c.
+void UnknownFunction520820(const char* format, ...);
 
 // Global object at 0x0068a48c, deleted by TrackGame's destructor.
 class UnknownTrackGameGlobal68a48c {
@@ -271,7 +307,8 @@ public:
     unsigned char field_0xfc8[0x2158 - 0xfc8];
     int field_0x2158;                         // racer count (EventManager 0x0045e550)
     UnknownTrackGameRacerSlot field_0x215c[8];
-    unsigned char field_0x291c[0x2930 - 0x291c];
+    int field_0x291c;                         // network game (racesnd.cpp 0x004e5780)
+    unsigned char field_0x2920[0x2930 - 0x2920];
     int field_0x2930;    // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x2934;  // saved KrustyBikeCamera presets (slots 59, 60)
     float field_0x2938;

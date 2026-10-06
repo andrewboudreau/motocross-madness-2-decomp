@@ -1123,23 +1123,22 @@ int PCSoundInterface::UnknownFunction4bebd0(float factor) {
     return field_0x464->SetDopplerFactor(factor, 1) >= 0;
 }
 
-int PCSoundInterface::UnknownFunction4bec00(float frontX, float frontY, float frontZ, float topX, float topY,
-                                            float topZ) {
+int PCSoundInterface::UnknownFunction4bec00(Vector3 front, Vector3 top) {
     if (!field_0x2c_bit0)
         return 0;
-    return field_0x464->SetOrientation(frontX, frontY, frontZ, topX, topY, topZ, 1) >= 0;
+    return field_0x464->SetOrientation(front.x, front.y, front.z, top.x, top.y, top.z, 1) >= 0;
 }
 
-int PCSoundInterface::UnknownFunction4bec50(float x, float y, float z) {
+int PCSoundInterface::UnknownFunction4bec50(Vector3 position) {
     if (!field_0x2c_bit0)
         return 0;
-    return field_0x464->SetPosition(x, y, z, 1) >= 0;
+    return field_0x464->SetPosition(position.x, position.y, position.z, 1) >= 0;
 }
 
-int PCSoundInterface::UnknownFunction4bec90(float x, float y, float z) {
+int PCSoundInterface::UnknownFunction4bec90(Vector3 velocity) {
     if (!field_0x2c_bit0)
         return 0;
-    return field_0x464->SetVelocity(x, y, z, 1) >= 0;
+    return field_0x464->SetVelocity(velocity.x, velocity.y, velocity.z, 1) >= 0;
 }
 
 int PCSoundInterface::UnknownFunction4becd0(float factor) {

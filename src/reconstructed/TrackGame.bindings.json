@@ -90,6 +90,7 @@
   "?UnknownFunction4be9b0@PCSoundInterface@@QAEHJ@Z": "0x004be9b0",
   "?UnknownFunction4e9030@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
   "?UnknownFunction520820@@YAXPBD@Z": "0x00520820",
+  "?UnknownFunction520820@@YAXPBDZZ": "0x00520820",
   "?UnknownFunction521860@TrackGame@@QAEXHHH@Z": "0x00521860",
   "?UnknownFunction521970@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction521a30@TrackGame@@QAEXXZ": "0x00521a30",

@@ -120,6 +120,7 @@ public:
     explicit SoundGroup(int flags);           // 0x00401a30
     void UnknownFunction401b50(Sound* sound); // 0x00401b50: adds a member
     void UnknownFunction401be0(Sound* sound); // 0x00401be0: removes a member
+    void UnknownFunction401dd0(long volume);  // 0x00401dd0 (racesnd.cpp music volume)
 
     unsigned char field_0x2c_bit0 : 1; // members may play
     long field_0x30; // volume applied to members

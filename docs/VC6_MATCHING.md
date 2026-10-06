@@ -4,19 +4,19 @@ Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 Results use VC6 SP3 natively on Windows. The full gate and profile matrix were
 repeated on 2026-10-02 under Linux/wibo; the default-profile calibration
-was rerun on 2026-10-06 (1033 cases). A complete linked game remains a
+was rerun on 2026-10-06 (1133 cases). A complete linked game remains a
 separate, unverified gate.
 
-The VC6 gate currently checks byte-exact functions from 60 handwritten C++
-candidate files: 53 of the 54 files in `src/reconstructed/` (all but
-`TerrainSupport.cpp`) and seven focused probes in `samples/`. This is a count of source files represented by at least one
+The VC6 gate currently checks byte-exact functions from 69 handwritten C++
+candidate files: 61 of the 62 files in `src/reconstructed/` (all but
+`TerrainSupport.cpp`) and eight focused probes in `samples/`. This is a count of source files represented by at least one
 checked function, not a claim that complete object files or a linked game match.
 
 ## Compiler profiles
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 1033/1033 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 1133/1133 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
@@ -116,6 +116,16 @@ functions; see [NET](NET.md).
 
 SceneManager.cpp (Scene, its section readers and the track scene-file
 helpers) matches strictly in 46 functions; see [SCENEMANAGER](SCENEMANAGER.md).
+
+racesnd.cpp (RaceSound, the engine, crowd and position sounds) matches
+strictly in 24 functions; see [RACESOUND](RACESOUND.md).
+
+bmpfile.cpp (4), Palette8.cpp (4), FontTexture.cpp (15, two of them via
+`samples/render/FontTextureNearMisses.cpp`) and FontTextureManager.cpp (5)
+match strictly; see [FONTS AND BITMAPS](FONTTEXTURE.md).
+
+LightEmitter.cpp (26), Quantize.cpp (8) and MSZoneInterface.cpp (14) match
+strictly; see [LIGHTS, QUANTIZE AND ZONE](LIGHTEMITTER.md).
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation

@@ -1,0 +1,19 @@
+{
+  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "??_C@_02HGED@BM?$AA@": "0x005682b8",
+  "??_C@_02JKAF@rb?$AA@": "0x0056666c",
+  "??_C@_02NGAF@wb?$AA@": "0x005682b4",
+  "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
+  "?UnknownFunction424140@@YAPAUUnknownBitmapFile@@PBDPAU1@@Z": "0x00424140",
+  "?UnknownFunction424380@@YAHPAUUnknownBitmapFile@@@Z": "0x00424380",
+  "?UnknownFunction4245b0@@YAXPAUUnknownBitmapFile@@@Z": "0x004245b0",
+  "?UnknownFunction4245f0@@YAXPAUUnknownBitmapFile@@PAXPAY02EHH@Z": "0x004245f0",
+  "__FILE__": "0x00568290",
+  "_fclose": "0x00534c3d",
+  "_fgetc": "0x00534e7b",
+  "_fopen": "0x00534ceb",
+  "_fputc": "0x0053507c",
+  "_fread": "0x00534f65",
+  "_fseek": "0x00534eac",
+  "_fwrite": "0x005350b7"
+}

@@ -2,6 +2,7 @@
 
 #include "ContainerList.h"
 #include "Guid.h"
+#include "MatrixUtil.h"
 
 // RTTI: SoundInterface (root; its only slot is the destructor) and
 // PCSoundInterface : SoundInterface (0x478 bytes, the size Game's
@@ -188,9 +189,9 @@ public:
     int UnknownFunction4beb80();
     int UnknownFunction4beba0(float factor);
     int UnknownFunction4bebd0(float factor);
-    int UnknownFunction4bec00(float frontX, float frontY, float frontZ, float topX, float topY, float topZ);
-    int UnknownFunction4bec50(float x, float y, float z);
-    int UnknownFunction4bec90(float x, float y, float z);
+    int UnknownFunction4bec00(Vector3 front, Vector3 top);
+    int UnknownFunction4bec50(Vector3 position);
+    int UnknownFunction4bec90(Vector3 velocity);
     int UnknownFunction4becd0(float factor);
     // 0x004bed00 / 0x004bed40: EAX listener property 1 and 0 (all
     // parameters, 16 bytes).
