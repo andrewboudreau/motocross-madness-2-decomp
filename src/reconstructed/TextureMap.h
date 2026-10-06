@@ -18,10 +18,12 @@ struct UnknownTexturePalette {
 
 // Formats slots 4 and 5 pick between: +0x0c without alpha, +0x10 with
 // alpha. +0x14 is how many times slot 5 halves textures wider than 32.
+// 0x0050a590 also takes the manager (+0x00) and the ManagedTextureGroups
+// for textures without (+0x04) and with (+0x08) alpha from it.
 struct UnknownTextureFormatChoice {
-    int field_0x00;
-    int field_0x04;
-    int field_0x08;
+    TextureMapManager* field_0x00;
+    ManagedTextureGroup* field_0x04;
+    ManagedTextureGroup* field_0x08;
     int field_0x0c;
     int field_0x10;
     int field_0x14;
@@ -44,6 +46,21 @@ public:
     // 0x00460e70: 1 when `path` opens and passes 0x00460db0's check; the
     // file is closed again (ResourceManager.cpp passes it to 0x00460f50).
     int UnknownFunction460e70(const char* path);
+    // 0x0043e9e0 (out-of-line copy): the text-mode byte.
+    char UnknownFunction43e9e0()
+    {
+        if (field_0x1c)
+            return field_0x1c->UnknownFunction43e9e0();
+        return field_0x01;
+    }
+    // 0x0043e9b0 (out-of-line copy): sets the text-mode byte.
+    void UnknownFunction43e9b0(char mode)
+    {
+        if (field_0x1c)
+            field_0x1c->UnknownFunction43e9b0(mode);
+        else
+            field_0x01 = mode;
+    }
     // 0x004e9960 (out-of-line copy after ResourceManager.cpp's code):
     // field_0x08 of the innermost stream.
     int UnknownFunction4e9960()
@@ -67,7 +84,9 @@ public:
         return feof(field_0x14);
     }
 
-    unsigned char field_0x000[0x04];
+    unsigned char field_0x00;
+    char field_0x01;                          // text mode
+    unsigned char field_0x02[0x04 - 0x02];
     int field_0x04;                           // length within the inner stream (0: to its end)
     int field_0x08;
     unsigned char field_0x00c[0x14 - 0x0c];
@@ -145,3 +164,17 @@ public:
     int field_0x6c;                           // format choice +0x14 (slot 5)
 };
 
+class Palette8;
+
+// 0x0050a590 (cdecl): the texture `name` (format `format`), shared through
+// the resource manager (0x00572b44; AddRef on reuse when `addRef`). With an
+// archive entry and `fromArchive` it reads the file format, data size,
+// width, height and a palette name from the entry's stream and loads it
+// through slot 5; otherwise it loads the TGA file (0x005125c0), halves it
+// while wider than 32 up to choice+0x14 times and loads it through slot 4.
+// A ManagedTexture when `choice` has a group for the format, else a
+// PCTextureMap; 0 on failure.
+TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, int format,
+                                  Palette8* palette, int flags, int addressU, int addressV,
+                                  UnknownTextureFormatChoice* choice, int alphaThreshold,
+                                  unsigned int key, int addRef, int fromArchive);
