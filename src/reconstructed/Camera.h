@@ -45,6 +45,12 @@ public:
     // +0x1c0 = min(maximum, g_UnknownFloat550f70).
     void UnknownFunction42e960(float minimum, float maximum);
     int UnknownFunction42e550(); // 0x0042e550, called by slot 8
+    // 0x0042e690 (ret 4): per-frame update from the +0x170/+0x17c vectors
+    // (FollowCamera slot 47).
+    void UnknownFunction42e690(float frameTime);
+    // 0x0042e930: stores a nonzero value in +0x16c and refreshes +0x1d0
+    // (FollowCamera slot 47 passes 66.0f).
+    void UnknownFunction42e930(float value);
     void UnknownFunction42e9b0(Vector3* position, int a, int b, int c, int d); // 0x0042e9b0 (EventManager slot 10)
     // 0x0042f0e0: sets (absolute) or offsets the viewport x/width, derives the
     // height from +0x1b8, centres it vertically in +0x1c8 and resubmits it.

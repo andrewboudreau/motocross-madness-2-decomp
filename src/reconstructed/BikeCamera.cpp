@@ -10,7 +10,7 @@ BikeCamera::~BikeCamera() {}
 
 // 0x00416ed0: table entries 0 (rider's head) and 1 (target point) with two
 // values that depend on bike state 6, then slot 38.
-void BikeCamera::UnknownVirtualSlot40(int a) {
+void BikeCamera::UnknownVirtualSlot40(float a) {
     bool special = bike->field_0x460 == 6;
     float value10;
     float value14;

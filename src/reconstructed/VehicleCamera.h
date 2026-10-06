@@ -83,7 +83,6 @@ public:
     }
 
 protected:
-    int field_0x344[16];
     UnknownCameraTargetA* field_0x384;
     UnknownCameraTargetB* field_0x388;
     int field_0x38c;

@@ -266,3 +266,32 @@ differing. It picks its view from the global's +0x558..+0x568 objects by
 it drives FollowCamera slots 46 and 47 from it, using file-scope statics at
 `0x0067c3e8` and `0x0067c3f4` (no initialisation guard). Only the register
 choice in its second `0x004210f0` call differs.
+
+## FollowCam.cpp extent and the second wave
+
+FollowCam.cpp runs from `0x00462ee0` to `0x004670fb`, and every FollowCam.cpp
+`__FILE__` xref falls inside it. The code before it is FastMath, the text
+stream and Fog/FogOff/FogOn, with its own vector set (`.CRT$XCU` 109-112).
+FontTexture.cpp's `$E` follows at `0x00467100`.
+
+The unit's own kVec3 set (`.CRT$XCU` 113-116, `0x00466f10..0x004670fb`) is
+interleaved with slots 72 and 70. Its vectors `0x0065b438..0x0065b468` are
+read only by FollowCam code, so they are now file statics.
+
+This wave adds 13 calibration cases: the point-table append `0x00463520`,
+set subject `0x00463600`, slot 38 (point-table steering, with its jump
+table), slot 49 (camera position), slot 23 (controls) and the eight `$E`.
+
+Slot 40 takes a float, because slot 38 loads its argument as one. So the
+FollowCamera and BikeCamera slot 40 cases now use the `@@UAEXM@Z` names.
+The 0x344 matrix belongs to FollowCamera, not VehicleCamera.
+
+Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
+- The constructor and slot 36, both already known.
+- Init `0x00463140`: an `offset + points` operand order.
+- Slot 46 `0x004654e0`: two late `fsubp`.
+- Slot 47 `0x00465720`.
+- The CAMERA-file loader `0x004650e0`: retail keeps cross products in memory.
+- Slot 45 `0x00463a30`: joystick pointer reloads.
+
+Slot 10 `0x00465c20` (about 3.6 KB) is not attempted.

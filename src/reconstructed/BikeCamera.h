@@ -42,7 +42,7 @@ public:
     virtual ~BikeCamera();          // 0x00416e70 (deleting wrapper 0x00416e50)
 
     virtual Vector3 UnknownVirtualSlot37();
-    virtual void UnknownVirtualSlot40(int a);
+    virtual void UnknownVirtualSlot40(float a);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float UnknownVirtualSlot51();
     virtual void UnknownVirtualSlot53();

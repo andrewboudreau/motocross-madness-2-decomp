@@ -226,6 +226,9 @@ BoundingBoxTreeBuild.cpp (27) and GR_BitString (8) match strictly; see
 D3DIMSoulTree.CPP (D3DIMSoultreeObject) matches strictly in 43 functions;
 see [D3DIMSOULTREE](D3DIMSOULTREE.md).
 
+FollowCam.cpp gains 13 more strict functions (slots 23, 38 and 49, two
+helpers and its eight `$E`); see [FollowCamera](FOLLOW_CAMERA.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

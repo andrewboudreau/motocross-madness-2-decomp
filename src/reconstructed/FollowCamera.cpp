@@ -1,5 +1,29 @@
 #include "FollowCamera.h"
 
+// FollowCam.cpp's per-file vector constants: 0x0065b448, 0x0065b458,
+// 0x0065b468 and 0x0065b438, initialised by 0x00466f10..0x004670fb
+// (.CRT$XCU entries 113-116). Only FollowCam.cpp code reads them. Not const:
+// slot 49 passes them to D3DRMVectorRotate, which takes LPD3DVECTOR.
+static Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+static Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
+static Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
+static Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
+
+// D3D_OVERLOADS-style D3DVECTOR operators that MatrixUtil.h's Vector3 lacks
+// (file-local, as in BikeRace.cpp and RaceStatus.cpp).
+// Slot 49 needs both: scaling in place (fmul into the same vector) and a sum
+// built through the constructor.
+static inline Vector3& operator*=(Vector3& v, float scale) {
+    v.x *= scale;
+    v.y *= scale;
+    v.z *= scale;
+    return v;
+}
+
+static inline Vector3 operator+(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
 // 0x00463350 (scalar deleting wrapper 0x00463120): frees the owned values,
 // then the Camera destructor (PCCamera's is implicit).
 FollowCamera::~FollowCamera() {
@@ -58,9 +82,97 @@ bool FollowCamera::UnknownFunction463450(int index, const Vector3* position, con
     return false;
 }
 
+// 0x00463520
+bool FollowCamera::UnknownFunction463520(const Vector3& position, float a, float b, float c,
+                                         float d, float e) {
+    if (pointCount < field_0x2dc) {
+        points[pointCount].position = position;
+        points[pointCount].field_0x0c = a;
+        points[pointCount].field_0x10 = b;
+        points[pointCount].field_0x14 = c;
+        points[pointCount].field_0x18 = d;
+        points[pointCount].field_0x1c = e;
+        pointCount++;
+        return true;
+    }
+    return false;
+}
+
+// 0x00463600
+void FollowCamera::UnknownFunction463600(UnknownFollowCameraSubject* subject) {
+    field_0x240 = subject;
+    field_0x2ec = subject->field_0x40;
+}
+
+// Inlined by slot 38: the yaw turns and wraps to [-pi, pi]; the pitch tilts
+// and is clamped to +-1.55. Retail negates the step before adding it, which
+// an argument expression reproduces and `-=` does not.
+inline void FollowCameraTurn(float& angle, float step) {
+    angle += step;
+    if (angle > 3.1415927f)
+        angle -= 6.2831855f;
+    else if (angle < -3.1415927f)
+        angle += 6.2831855f;
+}
+
+inline void FollowCameraTilt(float& angle, float step) {
+    angle += step;
+    if (angle > 1.55f)
+        angle = 1.55f;
+    else if (angle < -1.55f)
+        angle = -1.55f;
+}
+
+// 0x004636e0: projects every table entry. The first one off screen (0x0052f340
+// returns 0) steers the camera: +0x220 grows by its +0x0c rate and eases
+// through the +0x298 value, then the returned code turns the yaw at +0x234
+// (codes 1/2, wrapped to [-pi, pi]), changes +0x2d4 (codes 4/8) and, when
+// `pitch` is set, the pitch at +0x22c (code 4, clamped to +-1.55). With every
+// entry on screen, the two nearest screen points (by depth) go to slot 73.
+void FollowCamera::UnknownVirtualSlot38(float dt, bool blend, bool pitch) {
+    if (pointCount == 0)
+        return;
+    Vector3 nearest = Vector3(0.0f, 0.0f, FLT_MAX);
+    Vector3 second;
+    for (int i = 0; i < pointCount; i++) {
+        int code;
+        if (!g_UnknownFollowCameraProjector575a98->UnknownFunction52f340(
+                this, field_0xec, &points[i].position, &points[i].field_0x20, &code)) {
+            field_0x220 += dt * points[i].field_0x0c;
+            field_0x220 = field_0x298->Update(field_0x220, dt);
+            switch (code) {
+                case 1:
+                    FollowCameraTurn(field_0x234, -(dt * points[i].field_0x1c));
+                    break;
+                case 2:
+                    FollowCameraTurn(field_0x234, dt * points[i].field_0x1c);
+                    break;
+                case 4:
+                    field_0x2d4 += dt * points[i].field_0x10;
+                    if (pitch) {
+                        FollowCameraTilt(field_0x22c, -(dt * points[i].field_0x18));
+                    }
+                    break;
+                case 8:
+                    field_0x2d4 -= dt * points[i].field_0x14;
+                    break;
+            }
+            return;
+        }
+        if (points[i].field_0x20.z <= nearest.z) {
+            second = nearest;
+            nearest = points[i].field_0x20;
+        } else if (points[i].field_0x20.z < second.z) {
+            second = points[i].field_0x20;
+        }
+    }
+    if (pointCount > 1 && blend)
+        UnknownVirtualSlot73(nearest, second, dt);
+}
+
 // 0x004639f0: with a non-empty table, entry 0 takes the target point before
 // slot 38 runs.
-void FollowCamera::UnknownVirtualSlot40(int a) {
+void FollowCamera::UnknownVirtualSlot40(float a) {
     if (pointCount > 0) {
         UnknownFunction463450(0, &targetPoint, 0, 0, 0, 0, 0);
         UnknownVirtualSlot38(a, 0, 0);
@@ -82,6 +194,81 @@ Vector3 FollowCamera::UnknownVirtualSlot48(int a, bool flag, int b) {
         result = UnknownVirtualSlot35(a, b);
     } else {
         result = UnknownVirtualSlot37();
+    }
+    return result;
+}
+
+// 0x00464b30: in states 5 and 7 the camera keeps its position. Orbiting, the
+// +0x29c direction is pitched about its horizontal normal (by +0x22c, scaled
+// by its y and at least 0.8) and turned about y by +0x234 + +0x308, then
+// pushed +0x220 back from the target point (state 3 takes slot 50 instead);
+// outside state 6 that also snapshots the presets and +0x23c. Otherwise
+// +0x23c is re-based when it dropped below -8, then slot 40 runs and the camera
+// sits +0x220 behind `base` at yaw +0x234 + +0x23c, raised by +0x2d4.
+Vector3 FollowCamera::UnknownVirtualSlot49(bool orbit, const Vector3& base, float dt) {
+    Vector3 result;
+    if (cameraState == 5 || cameraState == 7) {
+        result = field_0x170;
+    } else if (orbit) {
+        float yaw = field_0x308 + field_0x234;
+        if (cameraState != 3) {
+            Vector3 axis;
+            axis.x = field_0x29c.z;
+            axis.y = 0.0f;
+            axis.z = -field_0x29c.x;
+            float pitch;
+            if (field_0x29c.y == 0.0f) {
+                pitch = field_0x22c;
+            } else {
+                float scaled = field_0x22c * field_0x29c.y;
+                if (scaled > 0.8f)
+                    pitch = scaled;
+                else
+                    pitch = 0.8f;
+            }
+            D3DRMVectorRotate(&result, &field_0x29c, &axis, pitch);
+            Vector3 turned;
+            D3DRMVectorRotate(&turned, &result, &kVec3YAxis, yaw);
+            turned *= -field_0x220;
+            result = turned + targetPoint;
+        } else {
+            result = UnknownVirtualSlot50();
+        }
+        if (!field_0x276 && cameraState != 6) {
+            field_0x2c4 = field_0x220;
+            field_0x2c8 = field_0x22c;
+            field_0x2cc = field_0x234;
+            field_0x23c = yaw - 16.0f;
+        }
+    } else {
+        if (field_0x23c < -8.0f) {
+            field_0x2d4 = field_0x2d0;
+            field_0x23c = field_0x23c + 16.0f;
+            if (field_0x23c < 0.0f) {
+                field_0x22c = 0.0f;
+                field_0x234 = 0.0f;
+                if (field_0x23c < -1.5707964f)
+                    field_0x23c = field_0x2e8 - 3.1415927f;
+                else
+                    field_0x23c = -field_0x2e8;
+            } else if (field_0x23c > 1.5707964f) {
+                field_0x23c = 3.1415927f - field_0x2e8;
+            } else {
+                field_0x23c = field_0x2e8;
+            }
+            field_0x23c += UnknownVirtualSlot39();
+            if (field_0x23c >= 6.2831855f)
+                field_0x23c -= 6.2831855f;
+            field_0x298->Set(field_0x220, FLT_MAX);
+        }
+        UnknownVirtualSlot40(dt);
+        Vector3 direction;
+        D3DRMVectorRotate(&direction, &kVec3ZAxis, &kVec3YAxis,
+                          field_0x234 + field_0x23c);
+        direction *= -field_0x220;
+        Vector3 position = direction + base;
+        result = position;
+        result.y = position.y + field_0x2d4;
     }
     return result;
 }
@@ -215,10 +402,10 @@ void FollowCamera::UnknownVirtualSlot72() {
 }
 
 // Strong semantic reconstruction, but not a clang smoke target.
-void FollowCamera::UnknownVirtualSlot70(int value) {
-    overrideActive = value & 0xFF;
+void FollowCamera::UnknownVirtualSlot70(unsigned char value) {
+    overrideActive = value;
 
-    if (static_cast<unsigned char>(value) != 0) {
+    if (value) {
         int current = cameraState;
 
         if (current != 5) {
@@ -267,4 +454,59 @@ void FollowCamera::UnknownVirtualSlot55() {
 bool FollowCamera::UnknownVirtualSlot56() {
     return ((UnknownKeyboardBoolView*)g_UnknownGlobal56e26c->field_0x14->keyboard)
         ->UnknownVirtualSlot5(0x2A, 0x3F, 0);
+}
+
+// 0x00466ad0: Camera's controls first; then, with the game's +0x2d4 bit 0,
+// control 0x21 toggles the override (slot 70) and, while it is on, control
+// 0x10 flips +0x26c and calls slot 69. Outside states 6 and 7 the raw keys
+// 0x52 and 0x4c leave or enter state 5 (0x4c otherwise advances, slot 72) and
+// 0x37 calls slot 59 below state 5.
+int FollowCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (Camera::UnknownVirtualSlot23(event, entry) || event->kind)
+        return 0;
+    if (g_UnknownGlobal56e26c->field_0x2d4_bit0) {
+        if (UnknownFunction43caa0(0x21, 0, event, 0xc) && cameraState != 6) {
+            UnknownVirtualSlot70(g_UnknownGlobal56e26c->field_0x1c4);
+            return 1;
+        }
+        if (overrideActive) {
+            if (!UnknownFunction43caa0(0x10, 0, event, 0xc))
+                return 0;
+            field_0x26c = 1 - field_0x26c;
+            if (!field_0x26c)
+                return 0;
+            UnknownVirtualSlot69();
+            return 1;
+        }
+    }
+    if (cameraState == 6 || cameraState == 7)
+        return 0;
+    int control = event->control;
+    if (control == 0x52) {
+        if (cameraState == 5) {
+            cameraState = savedCameraState;
+            field_0x258 = savedParameter;
+        } else {
+            savedCameraState = cameraState;
+            cameraState = 5;
+            savedParameter = field_0x258;
+        }
+        UnknownVirtualSlot58();
+        return 1;
+    }
+    if (control == 0x4c) {
+        if (cameraState == 5) {
+            cameraState = savedCameraState;
+            field_0x258 = savedParameter;
+            UnknownVirtualSlot58();
+            return 1;
+        }
+        UnknownVirtualSlot72();
+        return 1;
+    }
+    if (control == 0x37 && cameraState < 5) {
+        UnknownVirtualSlot59();
+        return 1;
+    }
+    return 0;
 }
