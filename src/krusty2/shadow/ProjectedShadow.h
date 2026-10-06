@@ -20,9 +20,9 @@
 #include "core/DebugAlloc.h"
 
 // Stand-in for the shared Vec3 (the real one lives in src/krusty2/math/Math3D.h, which
-// must not be included here: its static const Vec3 objects would add $E initializers that
-// ProjectedShadow.cpp does not have).  The zero vector read by the ctor is a shared global
-// at 0x00689b48, written by another translation unit.
+// is not included here: every includer would get its static const Vec3 objects and their
+// $E initializers).  The zero vector read by the ctor (0x00689b48) is one of
+// ProjectedShadow.cpp's own four vector constants, defined in that file.
 struct ShadowMatrix {
     float m[4][4];   // row-major, translation in row 3 (caster +0xf8 +0x30 is added by 0x004db0d0)
 };
@@ -35,7 +35,6 @@ ShadowMatrix ShadowMatrixMultiply(ShadowMatrix a, ShadowMatrix b);
 struct ShadowVec3 {
     float x, y, z;
 };
-extern const ShadowVec3 g_vec3Zero;  // 0x00689b48
 
 // DirectDraw-style surface reached through a texture's +0x70 member (tier 2: slot 37 is
 // called with (this, 0) in Init, slot 38 with (this, 0) in the dtor, which fit IDirectDrawSurface7

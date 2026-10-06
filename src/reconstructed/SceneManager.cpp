@@ -762,9 +762,3 @@ int Scene::UnknownFunction4f0ec0(char* path)
     delete stream;
     return 1;
 }
-
-// Seven player records (0x18 bytes each, 0x00689d08). The constructor stub
-// 0x004f1740, its body 0x004f1750, the atexit thunk 0x004f1770 and the
-// destructor 0x004f1780 run the vector constructor/destructor iterators with
-// PlayerInfoType's constructor (0x004adcc0) and destructor (0x00523c80).
-static PlayerInfoType s_UnknownPlayers689d08[7];

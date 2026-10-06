@@ -243,78 +243,6 @@
     "notes": "88.0% (329 vs 330 bytes). Same algorithm (qsort with CompareObjectKey, 2-element swap inline). Exact up to the outer loop's bottom: retail ends the loop with `cmp eax,edi; je ret0; jmp top` and puts the return-0 block last, but VC6 rotates every while/for(;;) loop whose top is a conditional exit into a bottom `jne body`. That shape has not been reproduced yet."
   },
   {
-    "class": "QuadTree",
-    "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "_$E2",
-    "target_va": "0x004dc4d0",
-    "target_size": 5,
-    "expect": "exact",
-    "notes": "static const Vec3 (0,0,0) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
-  },
-  {
-    "class": "QuadTree",
-    "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "_$E1",
-    "target_va": "0x004dc4e0",
-    "target_size": 60,
-    "expect": "exact",
-    "notes": "static const Vec3 (0,0,0) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
-  },
-  {
-    "class": "QuadTree",
-    "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "_$E5",
-    "target_va": "0x004dc520",
-    "target_size": 5,
-    "expect": "exact",
-    "notes": "static const Vec3 (1,0,0) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
-  },
-  {
-    "class": "QuadTree",
-    "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "_$E4",
-    "target_va": "0x004dc530",
-    "target_size": 60,
-    "expect": "exact",
-    "notes": "static const Vec3 (1,0,0) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
-  },
-  {
-    "class": "QuadTree",
-    "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "_$E8",
-    "target_va": "0x004dc570",
-    "target_size": 5,
-    "expect": "exact",
-    "notes": "static const Vec3 (0,1,0) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
-  },
-  {
-    "class": "QuadTree",
-    "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "_$E7",
-    "target_va": "0x004dc580",
-    "target_size": 60,
-    "expect": "exact",
-    "notes": "static const Vec3 (0,1,0) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
-  },
-  {
-    "class": "QuadTree",
-    "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "_$E11",
-    "target_va": "0x004dc5c0",
-    "target_size": 5,
-    "expect": "exact",
-    "notes": "static const Vec3 (0,0,1) dynamic initializer jmp thunk; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
-  },
-  {
-    "class": "QuadTree",
-    "source": "Quadtree.cpp",
-    "candidate_symbol_contains": "_$E10",
-    "target_va": "0x004dc5d0",
-    "target_size": 60,
-    "expect": "exact",
-    "notes": "static const Vec3 (0,0,1) dynamic initializer body; target_size is the CodeView extent; the nop padding up to the next 16-byte boundary is not compared. Copy-initialisation (`= Vec3(...)`) gives the stack temporary plus copy. Relocations are masked, so the destination global is not checked."
-  },
-  {
     "class": "Terrain",
     "source": "Terrain.cpp",
     "candidate_symbol_contains": "??0Terrain@@",
@@ -439,6 +367,86 @@
     "target_size": 96,
     "expect": "exact",
     "notes": "derives a/b, a^2/b^2 and their reciprocals from ints at 0x6c/0x70 into floats 0x74/0x78/0x7c/0x80 (called by slot 12 0x507610 after storing the new 0x6c). Exact with the source order b^2 ratio first then a/b (fidiv with int temporaries)."
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x5089a0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer jmp thunk; closes Terrain.cpp: .CRT$XCU lists it just before the file's own initializers, its .bss is interleaved with theirs, and Terrain code reads the y axis (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x5089b0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer body; closes Terrain.cpp: .CRT$XCU lists it just before the file's own initializers, its .bss is interleaved with theirs, and Terrain code reads the y axis (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x5089f0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer jmp thunk; closes Terrain.cpp: .CRT$XCU lists it just before the file's own initializers, its .bss is interleaved with theirs, and Terrain code reads the y axis (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x508a00",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer body; closes Terrain.cpp: .CRT$XCU lists it just before the file's own initializers, its .bss is interleaved with theirs, and Terrain code reads the y axis (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x508a40",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer jmp thunk; closes Terrain.cpp: .CRT$XCU lists it just before the file's own initializers, its .bss is interleaved with theirs, and Terrain code reads the y axis (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x508a50",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer body; closes Terrain.cpp: .CRT$XCU lists it just before the file's own initializers, its .bss is interleaved with theirs, and Terrain code reads the y axis (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x508a90",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer jmp thunk; closes Terrain.cpp: .CRT$XCU lists it just before the file's own initializers, its .bss is interleaved with theirs, and Terrain code reads the y axis (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x508aa0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer body; closes Terrain.cpp: .CRT$XCU lists it just before the file's own initializers, its .bss is interleaved with theirs, and Terrain code reads the y axis (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",

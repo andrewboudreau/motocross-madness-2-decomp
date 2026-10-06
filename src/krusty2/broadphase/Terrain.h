@@ -207,7 +207,6 @@ float TerrainDot(const TerrainVec3& a, const TerrainVec3& b);   // 0x0040ae30 (c
 // argument, when non-null, receives the plane offset (tier 3: the tail is `-dot(n, a)`).
 void TerrainTriangleNormal(const TerrainVec3* a, const TerrainVec3* b, const TerrainVec3* c,
                            TerrainVec3* out, float* planeD);
-extern TerrainVec3 g_terrainRefDir;                              // 0x0068a058 (dotted with the face normal to orient it)
 
 // 0x00507510 / 0x00507590: inline helpers whose out-of-line COMDAT copies retail kept because
 // CastSegment's inline budget ran out (tier 2: cdecl, no ecx, `ret`; the by-value TerrainVec3

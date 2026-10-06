@@ -27,78 +27,6 @@
     "notes": "empty ~ShadowReceiver COMDAT copy for this TU"
   },
   {
-    "class": "Terrain",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "_$E2",
-    "target_va": "0x5089a0",
-    "target_size": 5,
-    "expect": "masked",
-    "notes": "static const Vec3 (0,0,0) initialiser jmp thunk (copy-init)"
-  },
-  {
-    "class": "Terrain",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "_$E1",
-    "target_va": "0x5089b0",
-    "target_size": 60,
-    "expect": "masked",
-    "notes": "static const Vec3 (0,0,0) initialiser body (copy-init)"
-  },
-  {
-    "class": "Terrain",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "_$E5",
-    "target_va": "0x5089f0",
-    "target_size": 5,
-    "expect": "masked",
-    "notes": "static const Vec3 (1,0,0) initialiser jmp thunk (copy-init)"
-  },
-  {
-    "class": "Terrain",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "_$E4",
-    "target_va": "0x508a00",
-    "target_size": 60,
-    "expect": "masked",
-    "notes": "static const Vec3 (1,0,0) initialiser body (copy-init)"
-  },
-  {
-    "class": "Terrain",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "_$E8",
-    "target_va": "0x508a40",
-    "target_size": 5,
-    "expect": "masked",
-    "notes": "static const Vec3 (0,1,0) initialiser jmp thunk (copy-init)"
-  },
-  {
-    "class": "Terrain",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "_$E7",
-    "target_va": "0x508a50",
-    "target_size": 60,
-    "expect": "masked",
-    "notes": "static const Vec3 (0,1,0) initialiser body (copy-init)"
-  },
-  {
-    "class": "Terrain",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "_$E11",
-    "target_va": "0x508a90",
-    "target_size": 5,
-    "expect": "masked",
-    "notes": "static const Vec3 (0,0,1) initialiser jmp thunk (copy-init)"
-  },
-  {
-    "class": "Terrain",
-    "source": "TerrainShadow.cpp",
-    "candidate_symbol_contains": "_$E10",
-    "target_va": "0x508aa0",
-    "target_size": 60,
-    "expect": "masked",
-    "notes": "static const Vec3 (0,0,1) initialiser body (copy-init)"
-  },
-  {
     "class": "TerrainShadow",
     "source": "TerrainShadow.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot29@TerrainShadow",
@@ -277,5 +205,85 @@
     "target_size": 352,
     "expect": "partial",
     "notes": "9%, 354/352 B: retail converts with an inline fistp helper (fstp/fld float temp, fistp through a local pointer) which is inline asm (same as Terrain QueryGround 0x507c10); source uses (int) casts so __ftol is called instead"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004dc4d0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer jmp thunk; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004dc4e0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) dynamic initializer body; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004dc520",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer jmp thunk; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004dc530",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) dynamic initializer body; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004dc570",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer jmp thunk; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004dc580",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) dynamic initializer body; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004dc5c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer jmp thunk; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "ProjectedShadow",
+    "source": "ProjectedShadow.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004dc5d0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) dynamic initializer body; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
+    "bindings": "ProjectedShadow.bindings.json"
   }
 ]

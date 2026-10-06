@@ -13,6 +13,9 @@ Evidence
   (new at line 0xaa/0xcd in Init, array growth 0xfe/0x102, 0x115/0x119, vertex buffer 0x131/0x134).
 - Bracket 0x4da35c..0x4dc729. The front (0x4da520..0x4da560) is ShadowCamera, not ours;
   ProjectedShadow's ctor starts at 0x4da570. 0x4dc4c0 is Terrain's shared stub (skipped).
+- The vector `$E` set 0x4dc4d0..0x4dc60b closes the file (8 targets, strict with
+  `ProjectedShadow.bindings.json`): only the ctor reads its zero vector 0x689b48, and
+  `.CRT$XCU` lists it after ProCircuitProcs.cpp's set (see docs/INITIALIZERS.md).
 - RTTI: ProjectedShadow : GameObject (vptr at +0). Overrides slots 10 (float dt), 12, 13.
 - Layout: see the `// +0xNN` comments in ProjectedShadow.h. Size >= 0x134.
 

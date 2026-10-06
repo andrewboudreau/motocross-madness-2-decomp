@@ -1,5 +1,6 @@
 // SelectGamePicProcs.cpp (__FILE__ 0x00573c6c): the multiplayer lobby
-// dialogs. Extent 0x004f17a0..0x004f975b: the first __FILE__ user is
+// dialogs. Extent 0x004f1740..0x004f975b: the player-record initializers
+// 0x004f1740..0x004f1793 open it, the first __FILE__ user is
 // 0x004f17a0 (line 0xb4 at 0x004f19f3), the last allocation 0x004f8047;
 // MPEventDlg, MPBikeRiderDlg, MPOptionsDlg and MultiPlayerDlg's vtables
 // point into it, their type descriptors (0x00573e58...) sit in its .data
@@ -33,6 +34,16 @@ static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
+
+// Seven player records (0x18 bytes each, 0x00689d08). The constructor stub
+// 0x004f1740, its body 0x004f1750, the atexit thunk 0x004f1770 and the
+// destructor 0x004f1780 run the vector constructor/destructor iterators with
+// PlayerInfoType's constructor (0x004adcc0) and destructor (0x00523c80).
+// Ownership (docs/INITIALIZERS.md): .CRT$XCU lists 0x004f1740 right after
+// this file's vector initializers 0x004f9620..0x004f9710 and apart from
+// SceneManager.cpp's, the array lies inside this file's .bss block, and
+// only this file's code reads it.
+PlayerInfoType g_UnknownGlobal689d08[7];
 
 int g_UnknownGlobal689df4;
 int g_UnknownGlobal689df8;

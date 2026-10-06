@@ -6,6 +6,21 @@
 #include <string.h>
 #include <math.h>
 
+// The four per-file vector constants (0x00689b48, 0x00689b58, 0x00689b68,
+// 0x00689b38). Their initializers 0x004dc4d0..0x004dc60b follow this file's
+// last function (slot 13, 0x004dc410) and the shared Terrain stub 0x004dc4c0;
+// only this file's code reads them (the constructor at 0x004da591 and
+// 0x004da65f reads the zero vector), and .CRT$XCU lists them right after
+// ProCircuitProcs.cpp's set (see docs/INITIALIZERS.md). In the original source
+// they come from a widely included header; the stand-in type is ours.
+struct ShadowConstVec3 : ShadowVec3 {
+    ShadowConstVec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
+};
+static const ShadowConstVec3 kVec3Zero = ShadowConstVec3(0.0f, 0.0f, 0.0f);
+static const ShadowConstVec3 kVec3XAxis = ShadowConstVec3(1.0f, 0.0f, 0.0f);
+static const ShadowConstVec3 kVec3YAxis = ShadowConstVec3(0.0f, 1.0f, 0.0f);
+static const ShadowConstVec3 kVec3ZAxis = ShadowConstVec3(0.0f, 0.0f, 1.0f);
+
 ProjectedShadow::ProjectedShadow(int flags)
     : GameObject(flags)
 {
@@ -13,8 +28,8 @@ ProjectedShadow::ProjectedShadow(int flags)
     casterCount = 0;
     casterCapacity = 0;
     heightMap = 0;
-    lightDir = g_vec3Zero;
-    lightVec2 = g_vec3Zero;
+    lightDir = kVec3Zero;
+    lightVec2 = kVec3Zero;
     field_0x50 = 0;
     texture = 0;
     camera = 0;
@@ -37,8 +52,8 @@ ProjectedShadow::ProjectedShadow(int flags)
     receiverCapacity = 0;
     prevMinX = 0x7fffffff;
     prevMinY = 0x7fffffff;
-    center = g_vec3Zero;
-    halfExtents = g_vec3Zero;
+    center = kVec3Zero;
+    halfExtents = kVec3Zero;
     dirtyFlags = 0;
     lensScale = 1.0f;
 }

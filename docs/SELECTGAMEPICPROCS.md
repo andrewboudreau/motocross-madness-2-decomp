@@ -4,7 +4,7 @@
 are the multiplayer lobby dialogs, written in the dialog-procedure style
 of [DIALOGPROCS](DIALOGPROCS.md). Names are provisional.
 
-Extent: `0x004f17a0..0x004f975b`. Evidence:
+Extent: `0x004f1740..0x004f975b`. Evidence:
 - **`__FILE__`:** the literal at `0x00573c6c`; its first xref is at
   `0x004f19f3`. SceneManager.cpp's last xref is at `0x004f0ee5`.
 - **RTTI:** the vtables of MPEventDlg (`0x00557a88`), MPBikeRiderDlg
@@ -13,12 +13,13 @@ Extent: `0x004f17a0..0x004f975b`. Evidence:
 - **End:** the unit ends with its four kVec3 `$E` pairs, whose vectors only
   this unit reads. SelectiveGravityModel.cpp starts at `0x004f9760`.
 
-The player-record array at `0x00689d08` and its initializers
-`0x004f1740..0x004f1793` are probably this unit's. Only this code reads
-the array. They are still defined and registered in SceneManager.cpp
-(strong inference, not acted on).
+- **Start:** the player-record array at `0x00689d08` and its initializers
+  `0x004f1740..0x004f1793` open the unit. `.CRT$XCU` lists `0x004f1740`
+  right after this unit's vector initializers, and not next to
+  SceneManager.cpp's. The array lies inside this unit's vector `.bss`
+  block, and only this code reads it (see [INITIALIZERS](INITIALIZERS.md)).
 
-Exact: 43 calibration cases:
+Exact: 47 calibration cases:
 - MultiPlayerDlg: 11 functions.
 - The lobby slot table at MultiPlayerDlg+0x7f68: the constructor, its
   methods and the qsort comparator.
@@ -26,7 +27,7 @@ Exact: 43 calibration cases:
 - MPEventDlg: 8 functions.
 - MPBikeRiderDlg: 6 functions.
 - MPOptionsDlg: 4 functions.
-- The eight `$E`.
+- The eight vector `$E` and the four player-record `$E`.
 
 Source forms needed:
 - A call on `find(...)->field_0x1fc` takes a temporary, because retail

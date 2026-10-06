@@ -6,7 +6,7 @@
 #include "D3DIMSoultreeShadow.h"
 
 // Per-TU vector constants (tier 2): 0x004477d0..0x004478d0 are the four VC6 dynamic initializers
-// that open about 73 retail TUs, as in Quadtree.cpp: jmp thunks $E2/$E5/$E8/$E11 into bodies
+// that many retail TUs have, as in ProjectedShadow.cpp: jmp thunks $E2/$E5/$E8/$E11 into bodies
 // $E1/$E4/$E7/$E10 that build (0,0,0), (1,0,0), (0,1,0), (0,0,1) in a temporary and copy it into
 // private globals (0x0057efa8, 0x0057efb8, 0x0057efc8, 0x0057ef98).  Copy-initialisation gives
 // the temporary-then-copy shape.

@@ -63,8 +63,10 @@ The physics runner adds `src/krusty2` to the include path.
 - Name: `D:\aardvark\VC\krusty2\Quadtree.cpp`, string at 0x00572040.
 - Code bracket: after `ProjectedShadow.cpp` (last xref 0x4dacbc) and before
   `Quantize.cpp` (first xref 0x4dde47). Quadtree.cpp's own xrefs span 0x4dc729..0x4ddce6.
-- All 35 QuadTree/QuadTreeNode targets (0x4dc4d0..0x4ddd90) are inside the bracket;
-  32 match exactly, and 3 are documented partials in `broadphase/targets.json`.
+- All 27 QuadTree/QuadTreeNode targets (0x4dc620..0x4ddd90) are inside the bracket;
+  24 match exactly, and 3 are documented partials in `broadphase/targets.json`.
+  The vector `$E` set at 0x4dc4d0..0x4dc60b is ProjectedShadow.cpp's (only its
+  constructor reads the zero vector; see `docs/INITIALIZERS.md`).
 - The 5-byte stub at 0x4dc4c0 (`xor eax,eax; ret 8`) also sits in this stretch, but it is
   Terrain's slot 22 and is shared with the ProjectedShadow and StatsOverlay vtables.
   Identical code folding makes its address useless for attribution. It is reconstructed
@@ -78,6 +80,9 @@ The physics runner adds `src/krusty2` to the include path.
   (first xref 0x50a6bc). Terrain.cpp's own xrefs span 0x50567c..0x507b38.
 - 13 of the 14 targets (0x5057d0..0x508850) are inside the bracket. The 14th is the shared
   0x4dc4c0 stub described above. 12 match exactly.
+- The vector `$E` set 0x5089a0..0x508adc (8 targets, all exact) closes the unit: `.CRT$XCU`
+  lists it just before the camera and timer initializers of `TerrainSupport.cpp`, and the
+  y axis 0x68a058 is read by Terrain code (see `docs/INITIALIZERS.md`).
 - Terrain derives from `GameObject` and `GroundFogableObject`, as the RTTI says (mdisp 0,
   and 0x2c for GroundFogableObject, which has no vfptr). Both bases are kept.
 - `QueryGround` 0x507c10 contains inline fistp instructions not reproduced by the

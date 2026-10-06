@@ -1,27 +1,14 @@
-// TerrainShadow.cpp -- TerrainShadow (vtable 0x005582d4) and the TU-opening vector constants before it.
-// Ownership is uncertain, so this lives in samples/: no __FILE__ xref lies in 0x005089a0..0x0050a58f
-// (Terrain.cpp's last is 0x00507b38, Texmap.cpp's first 0x0050a6bc). The $E block at 0x005089a0 is
-// the shape that opens a retail TU, so this is probably its own file without a __FILE__ string, sorting
-// between Terrain.cpp and Texmap.cpp (tier 3).
+// TerrainShadow.cpp -- TerrainShadow (vtable 0x005582d4).
+// Ownership is uncertain, so this lives in samples/: no __FILE__ xref lies in 0x00508ae0..0x0050a58f
+// (Terrain.cpp's last is 0x00507b38, Texmap.cpp's first 0x0050a6bc). The vector $E block at
+// 0x005089a0 just before it closes Terrain.cpp (docs/INITIALIZERS.md), so this code starts a unit
+// of its own or continues Terrain.cpp (tier 3).
 #include "TerrainShadow.h"
-
-// Per-TU vector constants emitted between GetHeightRange and TerrainShadow: 0x005089a0..0x00508adc
-// are four thunk/body pairs for (0,0,0), (1,0,0), (0,1,0), (0,0,1) (stores to 0x00689ff8 and
-// the following globals), identical in shape to D3DIMSoultreeShadow.cpp's.  Tier 2.
-struct TerrainConstVec3 {
-    float x, y, z;
-    TerrainConstVec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
-};
-static const TerrainConstVec3 kTerrainVec3Zero = TerrainConstVec3(0.0f, 0.0f, 0.0f);
-static const TerrainConstVec3 kTerrainVec3XAxis = TerrainConstVec3(1.0f, 0.0f, 0.0f);
-static const TerrainConstVec3 kTerrainVec3YAxis = TerrainConstVec3(0.0f, 1.0f, 0.0f);
-static const TerrainConstVec3 kTerrainVec3ZAxis = TerrainConstVec3(0.0f, 0.0f, 1.0f);
 
 // ---------------------------------------------------------------------------------------------
 // TerrainShadow (vtable 0x005582d4).  owner: bracket only.  No __FILE__ xref lies in
-// 0x00508ae0..0x0050a58f (Terrain.cpp's last is 0x00507b38; Texmap.cpp's first is 0x0050a6bc), and
-// the Vec3 $E block at 0x005089a0 precedes it, so the TU is shared with Terrain.cpp only by link
-// adjacency (tier 3).
+// 0x00508ae0..0x0050a58f (Terrain.cpp's last is 0x00507b38; Texmap.cpp's first is 0x0050a6bc).
+// Terrain.cpp's vector $E block at 0x005089a0 precedes it (tier 3).
 #include <math.h>
 
 // 0x00508ae0 (ret 4).

@@ -68,5 +68,5 @@ unit's functions (see CUBE.md). `.CRT$XCU` lists `0x004d3340`, `0x004d49e0`,
 `0x004da3e0` and then `0x004dc4d0` in a row, and their vectors sit in
 ascending `.bss` in that order. Each set's vectors are read only by the code
 before it: `0x004d321a` (gearbox), none (ProCircuit), `0x004d6aba` and
-`0x004d73df`/`0x004d7546` (ProCircuitProcs), and `0x004da591` (ProjectedShadow.cpp reads
-`0x00689b48`, written by the `0x004dc4d0` set).
+`0x004d73df`/`0x004d7546` (ProCircuitProcs), and `0x004da591` (ProjectedShadow.cpp,
+which owns the `0x004dc4d0` set; see [INITIALIZERS](INITIALIZERS.md)).

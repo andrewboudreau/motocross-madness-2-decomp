@@ -16,10 +16,8 @@ class MultiPlayerDlg;
 class PlayerInfoType;
 
 // The seven remote player records at 0x00689d08 (+0x04 the DirectPlay id,
-// +0x08 the name). SceneManager.cpp currently defines them with the
-// initializers 0x004f1740..0x004f1793, but only this file's code reads the
-// array (0x004f212e onwards), so the array and those initializers are
-// probably this file's (strong inference; not moved here).
+// +0x08 the name). Defined in SelectGamePicProcs.cpp with its initializers
+// 0x004f1740..0x004f1793 (see docs/INITIALIZERS.md).
 extern PlayerInfoType g_UnknownGlobal689d08[7];
 
 // 0x00689df4: set while the local player is ready.

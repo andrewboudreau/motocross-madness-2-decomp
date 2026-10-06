@@ -115,7 +115,7 @@ Net.cpp (DirectPlay sessions, players and messages) matches strictly in 81
 functions; see [NET](NET.md).
 
 SceneManager.cpp (Scene, its section readers and the track scene-file
-helpers) matches strictly in 46 functions; see [SCENEMANAGER](SCENEMANAGER.md).
+helpers) matches strictly in 42 functions; see [SCENEMANAGER](SCENEMANAGER.md).
 
 racesnd.cpp (RaceSound, the engine, crowd and position sounds) matches
 strictly in 26 functions; see [RACESOUND](RACESOUND.md).
@@ -191,7 +191,7 @@ MorphBastardModifier.cpp (the rider morph) matches strictly in 15
 functions; see [MORPHBASTARDMODIFIER](MORPHBASTARDMODIFIER.md).
 
 SelectGamePicProcs.cpp (the multiplayer lobby dialogs) matches strictly
-in 43 functions; see [SELECTGAMEPICPROCS](SELECTGAMEPICPROCS.md).
+in 47 functions; see [SELECTGAMEPICPROCS](SELECTGAMEPICPROCS.md).
 
 ProCircuit.cpp (17) and ProCircuitProcs.cpp (31), the pro circuit career
 and its dialogs, match strictly; see [PROCIRCUIT](PROCIRCUIT.md).

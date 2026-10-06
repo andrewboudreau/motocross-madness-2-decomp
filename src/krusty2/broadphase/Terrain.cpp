@@ -222,7 +222,17 @@ inline TerrainVec3 TerrainClipRayToPlaneZ(TerrainVec3& origin, const TerrainVec3
     return origin;
 }
 
-TerrainVec3 g_terrainRefDir;
+// The four per-file vector constants (0x00689ff8, 0x0068a028, 0x0068a058,
+// 0x00689fe8). Their initializers 0x005089a0..0x00508adc follow this file's
+// GetHeightRange (0x00508970). .CRT$XCU lists them just before this file's
+// camera and timer initializers (0x00505480..0x005055e0), their .bss is
+// interleaved with those timers, and this file's code reads the y axis
+// (0x00507f15 onwards: dotted with a face normal to orient it). See
+// docs/INITIALIZERS.md. The original header type is unknown; TerrainVec3 stands in.
+static const TerrainVec3 kVec3Zero = TerrainVec3(0.0f, 0.0f, 0.0f);
+static const TerrainVec3 kVec3XAxis = TerrainVec3(1.0f, 0.0f, 0.0f);
+static const TerrainVec3 kVec3YAxis = TerrainVec3(0.0f, 1.0f, 0.0f);
+static const TerrainVec3 kVec3ZAxis = TerrainVec3(0.0f, 0.0f, 1.0f);
 
 // Truncates v to an int through *dst.  Retail does this with an inline `fistp` (the caller
 // subtracts 0.5 first, so it floors), and the inlined helper materialises both arguments in
@@ -331,7 +341,7 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
             if (flatShaded) {
                 TerrainVec3 face;
                 TerrainTriangleNormal(&v[0], &v[1], &v[2], &face, 0);
-                if (TerrainDot(face, g_terrainRefDir) < 0.0f)
+                if (TerrainDot(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
                     *normal = face;
@@ -346,7 +356,7 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
             if (flatShaded) {
                 TerrainVec3 face;
                 TerrainTriangleNormal(&v[1], &v[3], &v[2], &face, 0);
-                if (TerrainDot(face, g_terrainRefDir) < 0.0f)
+                if (TerrainDot(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
                     *normal = face;
@@ -363,7 +373,7 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
             if (flatShaded) {
                 TerrainVec3 face;
                 TerrainTriangleNormal(&v[0], &v[1], &v[3], &face, 0);
-                if (TerrainDot(face, g_terrainRefDir) < 0.0f)
+                if (TerrainDot(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
                     *normal = face;
@@ -378,7 +388,7 @@ void Terrain::QueryGround(TerrainVec3* pos, TerrainVec3* normal, int flatShaded,
             if (flatShaded) {
                 TerrainVec3 face;
                 TerrainTriangleNormal(&v[0], &v[3], &v[2], &face, 0);
-                if (TerrainDot(face, g_terrainRefDir) < 0.0f)
+                if (TerrainDot(face, kVec3YAxis) < 0.0f)
                     *normal = -face;
                 else
                     *normal = face;

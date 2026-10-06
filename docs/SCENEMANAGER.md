@@ -1,7 +1,7 @@
 # SceneManager.cpp: the track scene loader
 
 `src/reconstructed/SceneManager.cpp` reconstructs part of
-`D:\aardvark\VC\krusty2\SceneManager.cpp`. 46 functions match strictly
+`D:\aardvark\VC\krusty2\SceneManager.cpp`. 42 functions match strictly
 under the default VC6 profile and are registered as calibration cases. The
 only RTTI name is `Scene` (`Scene : GameObject : BaseObject`). All other
 type, member and function names are provisional.
@@ -19,8 +19,9 @@ type, member and function names are provisional.
   - The file starts with the keyword lookup `0x004e9980`, which only
     `0x004eb602` calls. `0x004e9700`..`0x004e9960` are left to
     ResourceManager.cpp.
-  - It ends with the player-record initializers `0x004f1740`..`0x004f1793`.
-    `0x004f17a0` is not reconstructed.
+  - It ends at or before `0x004f173f`. The player-record initializers
+    `0x004f1740`..`0x004f1793` open SelectGamePicProcs.cpp (see
+    [INITIALIZERS](INITIALIZERS.md)).
 - Vtable:
   - `Scene`'s vtable is `0x0055786c`; the object is 0x8cc bytes, from
     `operator new(0x8cc)` at `0x004e9a30`/`0x004e9aea`.
@@ -32,9 +33,7 @@ type, member and function names are provisional.
   bodies. The readers call them directly with what they read, so they are
   declared as provisional `Scene` members.
 - The vector constants `0x00689c98`..`0x00689cc8` are built by the
-  `_$E1`..`_$E11` pairs at `0x004ecb70`..`0x004ecd20`. The
-  seven-record `PlayerInfoType` array at `0x00689d08` produces
-  `_$E13`..`_$E16`.
+  `_$E1`..`_$E11` pairs at `0x004ecb70`..`0x004ecd20`.
 - `0x004f0d20` keeps an unused 0x18-byte resource manager on its stack,
   with constructor `0x004e8e80` and destructor `0x004e8ea0`. It is declared
   as the view `UnknownSceneResourceManager` (see below).

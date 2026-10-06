@@ -6,25 +6,6 @@
 extern "C" void qsort(void* base, unsigned int num, unsigned int width,
                       int (*compare)(const void*, const void*));   // 0x00534426
 
-// Per-TU vector constants.  Tier 2: this TU begins (0x004dc4d0..0x004dc60b) with the same four
-// VC6 dynamic initializers that open about 73 retail TUs.  Each one is a `jmp` thunk ($E2, $E5,
-// $E8, $E11) into a body ($E1, $E4, $E7, $E10) that builds (0,0,0), (1,0,0), (0,1,0) or
-// (0,0,1) in a stack temporary and then copies it into a TU-private 12-byte global
-// (0x00689b48, 0x00689b58, 0x00689b68, 0x00689b38).  In the original source they come from
-// a widely included header (common/Math3D.h, which this TU does not include yet).  So they
-// are reproduced here with a TU-local stand-in type.  The names are tier 3.
-// Codegen: the temporary followed by a copy comes from copy-initialisation, `= Vec3(a, b, c)`.
-// Direct initialisation, `k(a, b, c)`, makes VC6 store the constants straight into the global
-// (3 x `mov [g], imm`, 32 bytes).
-struct QuadTreeConstVec3 {
-    float x, y, z;
-    QuadTreeConstVec3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
-};
-static const QuadTreeConstVec3 kVec3Zero = QuadTreeConstVec3(0.0f, 0.0f, 0.0f);
-static const QuadTreeConstVec3 kVec3XAxis = QuadTreeConstVec3(1.0f, 0.0f, 0.0f);
-static const QuadTreeConstVec3 kVec3YAxis = QuadTreeConstVec3(0.0f, 1.0f, 0.0f);
-static const QuadTreeConstVec3 kVec3ZAxis = QuadTreeConstVec3(0.0f, 0.0f, 1.0f);
-
 QuadTree* g_pQuadTree;
 float g_quadTreeInvScale;
 
