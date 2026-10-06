@@ -4,14 +4,14 @@
 // calls in a constructor bind statically.
 KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
     UnknownVirtualSlot62();
-    UnknownVirtualSlot71(field_0x244);
-    field_0x3b4 = 0;
-    field_0x3b8 = 0;
+    UnknownVirtualSlot71(cameraState);
+    krustyBike = 0;
+    raceView = 0;
     field_0x1d8 = 0;
     field_0x25c = field_0x170;
-    field_0x248 = field_0x244;
-    field_0x250 = field_0x244;
-    field_0x24c = field_0x16c;
+    savedCameraState = cameraState;
+    field_0x250 = cameraState;
+    savedParameter = field_0x16c;
 }
 
 // 0x00497d80: an explicit empty destructor.
@@ -58,11 +58,11 @@ bool KrustyBikeCamera::UnknownVirtualSlot56() {
         field_0x391 = pressed;
         field_0x392 = pressed;
     }
-    if (field_0x244 == 7)
+    if (cameraState == 7)
         return pressed;
-    if (pressed && (!field_0x390 || (field_0x3b4->field_0x108 &&
-                                     field_0x3b4->field_0x5f4->field_0x150 < -2.0f &&
-                                     !field_0x3b4->field_0x735)))
+    if (pressed && (!vehicleMode || (krustyBike->field_0x108 &&
+                                     krustyBike->field_0x5f4->field_0x150 < -2.0f &&
+                                     !krustyBike->field_0x735)))
         return true;
     return false;
 }
@@ -70,20 +70,20 @@ bool KrustyBikeCamera::UnknownVirtualSlot56() {
 // 0x00498130: +0x308 from the fov/zoom ratio and the bike's +0x43c.
 void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
     float ratio = field_0x16c / field_0x1dc;
-    if (field_0x244 != 3) {
-        if (field_0x390 && !flag &&
-            (!field_0x3b4->field_0x7a4 || g_UnknownGlobal56e26c->field_0x18 > 1))
-            field_0x308 = ratio * field_0x3b4->field_0x43c * 0.42f;
+    if (cameraState != 3) {
+        if (vehicleMode && !flag &&
+            (!krustyBike->field_0x7a4 || g_UnknownGlobal56e26c->field_0x18 > 1))
+            field_0x308 = ratio * krustyBike->field_0x43c * 0.42f;
         else
             field_0x308 = 0.0f;
     } else {
-        field_0x308 = ratio * field_0x3b4->field_0x43c * 0.55f;
+        field_0x308 = ratio * krustyBike->field_0x43c * 0.55f;
     }
 }
 
 // 0x004981d0: saves the presets while in vehicle mode with the bike idle.
 void KrustyBikeCamera::UnknownVirtualSlot59() {
-    if (field_0x390 && !field_0x3b0->field_0x444) {
+    if (vehicleMode && !bike->field_0x444) {
         g_UnknownGlobal56e26c->field_0x2938 = field_0x22c;
         g_UnknownGlobal56e26c->field_0x293c = field_0x234;
         g_UnknownGlobal56e26c->field_0x2934 = field_0x220;
@@ -101,21 +101,21 @@ void KrustyBikeCamera::UnknownVirtualSlot60() {
 
 // 0x00498280: restores the saved state.
 void KrustyBikeCamera::UnknownVirtualSlot62() {
-    field_0x244 = g_UnknownGlobal56e26c->field_0x2930;
+    cameraState = g_UnknownGlobal56e26c->field_0x2930;
 }
 
 // 0x004982a0: saves the state.
 void KrustyBikeCamera::UnknownVirtualSlot61() {
-    g_UnknownGlobal56e26c->field_0x2930 = field_0x244;
+    g_UnknownGlobal56e26c->field_0x2930 = cameraState;
 }
 
 // 0x004982c0: shows the state's name (string 0x13b9 + state) for 1.5 s,
 // except in state 6.
 void KrustyBikeCamera::UnknownVirtualSlot58() {
     UnknownMessageTarget* target = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
-    if (target && field_0x244 != 6) {
+    if (target && cameraState != 6) {
         char text[260];
-        g_UnknownGlobal56e26c->UnknownFunction521970(field_0x244 + 0x13B9, text, 0x80);
+        g_UnknownGlobal56e26c->UnknownFunction521970(cameraState + 0x13B9, text, 0x80);
         UnknownMessage message(text, 1.5f);
         target->UnknownFunction51b540(&message);
     }
@@ -125,16 +125,16 @@ void KrustyBikeCamera::UnknownVirtualSlot58() {
 // view flags are set.
 Vector3 KrustyBikeCamera::UnknownVirtualSlot48(int a, bool flag, int b) {
     Vector3 result;
-    if (field_0x244 == 5) {
-        if (field_0x268)
-            result = field_0x2a8;
+    if (cameraState == 5) {
+        if (overrideActive)
+            result = cachedTarget;
         else
             result = UnknownVirtualSlot34(b);
-    } else if (field_0x244 == 7) {
-        result = field_0x2b4;
+    } else if (cameraState == 7) {
+        result = targetPoint;
         result.y += 3.0f;
-    } else if (field_0x3b8->field_0x3f8 || field_0x3b8->field_0x3f9) {
-        result = field_0x2b4;
+    } else if (raceView->field_0x3f8 || raceView->field_0x3f9) {
+        result = targetPoint;
     } else if (flag) {
         result = UnknownVirtualSlot35(a, b);
     } else {

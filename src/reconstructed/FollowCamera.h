@@ -135,7 +135,7 @@ public:
     virtual bool UnknownVirtualSlot74() = 0;
     // Inline: retail's copy sits at 0x00404fc0, far from FollowCam.cpp, and
     // VehicleCamera slot 75 inlines the same test.
-    virtual int UnknownVirtualSlot75() { return field_0x244 == 5 || field_0x244 == 2; }
+    virtual int UnknownVirtualSlot75() { return cameraState == 5 || cameraState == 2; }
 
     // 0x00463450: writes entry `index` of the +0x2e4 table; each non-null
     // pointer supplies one field. Returns false when index >= +0x2e0.
@@ -154,14 +154,14 @@ protected:
     float field_0x238;          // copy of field_0x234
     float field_0x23c;          // advanced by pi in VehicleCamera slot 39
     UnknownFollowCameraSubject* field_0x240;
-    int field_0x244;            // current state (slots 70-72, 75)
-    int field_0x248;            // saved state (slot 70)
-    float field_0x24c;          // saved field_0x258 (slot 70)
+    int cameraState;                 // +0x244, current state (slots 70-72, 75)
+    int savedCameraState;            // +0x248, saved state (slot 70)
+    float savedParameter;            // +0x24c, saved field_0x258 (slot 70)
     int field_0x250;
     float field_0x254;
     float field_0x258;          // clamped to [10, 70] by slot 68
     Vector3 field_0x25c;        // copy of Camera field_0x170
-    int field_0x268;            // slot 70 input byte
+    int overrideActive;              // +0x268, slot 70 input byte
     int field_0x26c;            // reset by slot 70
     float field_0x270;          // 15.0f
     unsigned char field_0x274;
@@ -179,8 +179,8 @@ protected:
     UnknownFollowCameraValue* field_0x294;
     UnknownFollowCameraValue* field_0x298;
     Vector3 field_0x29c;        // g_UnknownVector65b438
-    Vector3 field_0x2a8;        // cached slot 57 result (slot 69)
-    Vector3 field_0x2b4;        // target point (slots 34, 37, 68)
+    Vector3 cachedTarget;             // +0x2a8, cached slot 57 result (slot 69)
+    Vector3 targetPoint;              // +0x2b4, target point (slots 34, 37, 68)
     int field_0x2c0;
     float field_0x2c4;          // snapshot of field_0x220 (slot 71)
     float field_0x2c8;          // snapshot of field_0x22c
@@ -189,8 +189,8 @@ protected:
     float field_0x2d4;          // 7.0f
     int field_0x2d8;
     int field_0x2dc;
-    int field_0x2e0;            // number of entries in field_0x2e4
-    UnknownFollowCameraPoint* field_0x2e4; // owned table; deleted by the destructor
+    int pointCount;                  // +0x2e0, number of entries in points
+    UnknownFollowCameraPoint* points; // +0x2e4, owned table
     int field_0x2e8;
     float field_0x2ec;          // 3.0f
     float field_0x2f0;          // state-4 saved field_0x258 (slot 71)
@@ -200,8 +200,8 @@ protected:
     float field_0x300;          // 20.0f
     int field_0x304;
     float field_0x308;          // set by KrustyBikeCamera slot 42
-    int field_0x30c;            // cyclic index into field_0x314 (slot 72)
-    int field_0x310;            // number of entries in field_0x314
-    int field_0x314[11];        // state table (slot 72)
+    int stateIndex;                  // +0x30c, cyclic index into states (slot 72)
+    int stateCount;                  // +0x310, number of entries in states
+    int states[11];                  // +0x314, state table (slot 72)
     int field_0x340;
 };

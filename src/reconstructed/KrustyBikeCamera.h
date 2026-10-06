@@ -48,6 +48,6 @@ public:
     virtual void UnknownVirtualSlot62();
 
 protected:
-    UnknownKrustyBike* field_0x3b4;
-    UnknownKrustyBikeView* field_0x3b8;
+    UnknownKrustyBike* krustyBike;       // +0x3b4
+    UnknownKrustyBikeView* raceView;     // +0x3b8
 };

@@ -54,9 +54,11 @@ protected:
     friend class RenderTarget;
     friend class PCGame;           // slot 19 reattaches the camera (+0x18, +0x1a0)
 
-    Matrix4 field_0x2c;      // set by slot 30 (PCCamera: kind 1)
-    Matrix4 field_0x6c;      // set by slot 32 (kind 3)
-    Matrix4 field_0xac;      // set by slot 31 (kind 2)
+    // Provisional Direct3D semantics: PCCamera submits these with transform
+    // kinds 1 (world), 3 (projection), and 2 (view), respectively.
+    Matrix4 worldMatrix;       // +0x2c, set by slot 30
+    Matrix4 projectionMatrix;  // +0x6c, set by slot 32
+    Matrix4 viewMatrix;        // +0xac, set by slot 31
     unsigned char field_0xec[0x80]; // not touched by the constructor
     float field_0x16c;              // 77.0f
     Vector3 field_0x170;       // (0, 0, 0); copied to field_0x208
