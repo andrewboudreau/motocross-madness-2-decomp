@@ -74,6 +74,11 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime);                                    // 0x004e3730
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004e44e0
 
+    // 0x004e23f0 (thiscall, ret 0x10; bikerace.cpp 0x00419628 passes its
+    // +0x18, itself, its +0x50 camera and 6): creates the sound groups and
+    // loads every sample; returns this.
+    RaceSound* UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* view, UnknownRaceSoundCamera* camera,
+                                     int racers);
     // 0x004e3430: assigns the racers to channels and resets the listener and
     // the 3D distances.
     void UnknownFunction4e3430();
@@ -107,8 +112,8 @@ public:
     SoundGroup* field_0x3c;
     SoundGroup* field_0x40;
     SoundGroup* field_0x44;
-    int field_0x48;
-    SoundGroup* field_0x4c;
+    SoundGroup* field_0x48;
+    SoundGroup* field_0x4c;               // crowd sounds (network games); slot 23 sets its volume
     long field_0x50;                      // music volume: 0, -500 or -10000
     int field_0x54;                       // EAX environment on
     int field_0x58;
@@ -122,7 +127,14 @@ public:
     UnknownEventRacer* field_0x438;       // racer being updated
     Sound* field_0x43c[4];                // the four engine voices
     int field_0x44c[4];                   // voice in use
-    unsigned char field_0x45c[0x47c - 0x45c];
+    // Engines present in the race (audio_*.ini sections "125", "250", "400",
+    // chosen by racer +0x738/+0x737),
+    // the divisor applied to each engine's sample counts, the listener's
+    // engine and the number of engines present (0x004e23f0).
+    int field_0x45c[3];
+    int field_0x468[3];
+    int field_0x474;
+    int field_0x478;
     // Engine speeds that select the next sample set, per engine.
     int field_0x47c[3];
     int field_0x488[3];

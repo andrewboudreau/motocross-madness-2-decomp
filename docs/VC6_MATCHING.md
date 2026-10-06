@@ -118,7 +118,7 @@ SceneManager.cpp (Scene, its section readers and the track scene-file
 helpers) matches strictly in 46 functions; see [SCENEMANAGER](SCENEMANAGER.md).
 
 racesnd.cpp (RaceSound, the engine, crowd and position sounds) matches
-strictly in 24 functions; see [RACESOUND](RACESOUND.md).
+strictly in 26 functions; see [RACESOUND](RACESOUND.md).
 
 bmpfile.cpp (4), Palette8.cpp (4), FontTexture.cpp (15, two of them via
 `samples/render/FontTextureNearMisses.cpp`) and FontTextureManager.cpp (5)

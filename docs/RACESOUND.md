@@ -23,17 +23,29 @@ sounds: idle effects (+0x11b8, +0x11d0), position/lap cues (+0x11ec..
 camera's protected Camera/BikeCamera fields are read through
 `UnknownRaceSoundCamera`.
 
-Exact (24 calibration cases): constructor, destructor and deleting
-wrapper, the channel reset `0x004e3430`, slots 10 and 23, `0x004e42e0`,
-`0x004e43a0`, `0x004e4460`, `0x004e4a30`, the Audio.res loaders
-`0x004e5500`/`0x004e5660`, the play helper `0x004e5780`, `0x004e57d0`,
-`0x004e5860`, the qsort callback `0x004e5880` and the eight vector
-initializers `0x004e48f0..0x004e4a2b`. Changing PCSoundInterface's
-listener setters (`0x004bec00/50/90`) to take `Vector3` by value keeps
-PCAudio.cpp exact and matches these callers.
+Exact (26 calibration cases): constructor, destructor and deleting
+wrapper, the loader `0x004e23f0`, the channel reset `0x004e3430`, slots
+10 and 23, the per-racer update `0x004e39b0`, `0x004e42e0`, `0x004e43a0`,
+`0x004e4460`, `0x004e4a30`, the Audio.res loaders `0x004e5500` and
+`0x004e5660`, the play helper `0x004e5780`, `0x004e57d0`, `0x004e5860`,
+the qsort callback `0x004e5880` and the eight vector initializers
+`0x004e48f0..0x004e4a2b`. Changing PCSoundInterface's listener setters
+(`0x004bec00/50/90`) to take `Vector3` by value keeps PCAudio.cpp exact
+and matches these callers.
 
-Near misses (`samples/race/RaceSoundNearMisses.cpp`, notes there): the
-per-racer update `0x004e39b0` and the half-buffer refill `0x004e4d10`.
+The loader (thiscall, `ret 0x10`, called only from bikerace.cpp
+`0x00419628`) creates the stream and four SoundGroups (`new` lines 0xcb
+and 0xd5-0xd8). It reads `audio_16.ini` or `audio_08.ini` (16-bit when
+TrackGame+0xfc0 is set, which also sets +0x1298 to 2) and, for each
+engine section `125`/`250`/`400`, the `Total*` counts, the `*_%d` sample
+names and the `*MaxSpeed` limits (20/55/100 by default). It loads the
+crowd sounds only in network games (+0x291c).
 
-Not reconstructed: the 4153-byte loader `0x004e23f0` (creates the sound
-groups and loads every sample).
+`0x004e39b0` matches with two source forms worth knowing. Both "state 6"
+resets are written `if (field_0x10 != 6) ... else ...` with identical
+arms, which reproduces retail's dead `cmp ecx, 6`; the source comments
+this. The wreck and fall cues use `if (!index) f(); else if (!playing) f();`.
+
+Near miss (`samples/race/RaceSoundNearMisses.cpp`, notes there): the
+half-buffer refill `0x004e4d10`, where two register-allocation
+differences remain.
