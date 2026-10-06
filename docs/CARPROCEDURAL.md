@@ -37,9 +37,12 @@ from Grid1's slot 3, so it belongs here.
 
 Exact (9): the constructor, the destructor and its deleting wrapper, slots
 2, 4, 6 and 8, and the two eviction callbacks that slot 3 registers with
-AgeManager. Near miss (`samples/render/Grid1NearMisses.cpp`): slot 7
-`0x0047d370`, which differs in register assignment. Not attempted: slot 3
-`0x0047caa0`, `0x0047d470` and `0x0047d780`.
+AgeManager. Near misses (`samples/render/Grid1NearMisses.cpp`, notes there): slot 7
+`0x0047d370`, slot 3 `0x0047caa0` (the stage switch with retries), and the
+two run-length texture fills `0x0047d470` and `0x0047d780`. All four keep
+retail's control flow and calls and differ in register allocation. Slot 3
+gets retail's ebp arrangement only when `block` is left uninitialised;
+that source is rejected.
 
 TextureMap.h gained `UnknownTextureStream::UnknownFunction461aa0`, which
 reads a line.

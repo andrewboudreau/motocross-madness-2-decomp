@@ -1,3 +1,27 @@
 {
-  "?UnknownFunction401250@GridAgeManager@@QAEXPAUGridAgeEntry@@@Z": "0x00401250"
+  "?AcquireOwnedObject@Grid1Terrain@@QAEPAVManagedTexture@@XZ": "0x00505600",
+  "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
+  "?UnknownFunction401050@GridAgeManager@@QAEXPAUGridAgeEntry@@P6AHPAX@Z1HH@Z": "0x00401050",
+  "?UnknownFunction401250@GridAgeManager@@QAEXPAUGridAgeEntry@@@Z": "0x00401250",
+  "?UnknownFunction47ca00@@YAHPAX@Z": "0x0047ca00",
+  "?UnknownFunction47ca40@@YAHPAXH@Z": "0x0047ca40",
+  "?UnknownFunction47d470@DrawableGridNodeSharedTextures@@QAEHPAVManagedTexture@@@Z": "0x0047d470",
+  "?UnknownFunction47d780@DrawableGridNodeSharedTextures@@QAEHHPAVManagedTexture@@@Z": "0x0047d780",
+  "?UnknownFunction481a20@DrawableGridNode@@QAEHH@Z": "0x00481a20",
+  "?UnknownFunction483040@DrawableGridNode@@QAEHXZ": "0x00483040",
+  "?UnknownFunction483100@DrawableGridNode@@QAEHXZ": "0x00483100",
+  "?UnknownFunction4d1b90@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
+  "?UnknownFunction510670@ManagedTexture@@QAEXXZ": "0x00510670",
+  "?UnknownFunction511970@@YAHH@Z": "0x00511970",
+  "?g_grid1DetailDistance@@3MA": "0x0056c034",
+  "?g_grid1OwnTextureCount@@3HA": "0x0066529c",
+  "__FILE__": "0x0056c0a0",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3ffb8000000000000000": "0x00553e78",
+  "__real@4@3ffd8000000000000000": "0x005507f8",
+  "__real@4@3ffe8000000000000000": "0x005507f4",
+  "__real@4@3fff8000000000000000": "0x00550748",
+  "__real@4@40018000000000000000": "0x00550800",
+  "__real@4@40038000000000000000": "0x00552608",
+  "_g_grid1TextureBuffer": "0x006652a0"
 }

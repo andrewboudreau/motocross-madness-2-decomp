@@ -58,6 +58,7 @@ struct Grid1NodeExtra {
 // method Terrain.h calls RetireOwnedObject.
 struct Grid1Terrain {
     void RetireOwnedObject(BaseObject* object);  // 0x005057d0 (ret 4)
+    ManagedTexture* AcquireOwnedObject();        // 0x00505600 (Terrain.h's name)
 
     unsigned char field_0x000[0x18];
     GridRenderDevice* field_0x18;              // +0x18
@@ -65,8 +66,22 @@ struct Grid1Terrain {
     int field_0x70;                            // +0x70
     unsigned char field_0x074[0x544 - 0x74];
     ManagedTexture* textures[(0xbec - 0x544) / 4];  // +0x544
-    unsigned char field_0xbec[0xc84 - 0xbec];
+    unsigned char field_0xbec[0xc24 - 0xbec];
+    int field_0xc24;                           // +0xc24 pixel format of the node textures
+    unsigned char field_0xc28[0xc84 - 0xc28];
     GridAgeManager* field_0xc84;               // +0xc84 texture AgeManager
+};
+
+// Grid1.cpp's view of the host object at Terrain+0x18 (Terrain.h: its +8
+// is a PCCamera); slot 3 tests the camera's float at +0x200.
+struct Grid1Camera {
+    unsigned char field_0x000[0x200];
+    float field_0x200;
+};
+struct Grid1RenderHost {
+    int field_0x00;
+    int field_0x04;
+    Grid1Camera* camera;                       // +0x08
 };
 
 class DrawableGridNodeSharedTextures : public DrawableGridNode {
@@ -83,6 +98,11 @@ public:
     virtual void UnknownVirtualSlot6();                         // 0x0047d310
     virtual void UnknownVirtualSlot7(int block);                // 0x0047d370
     virtual int UnknownVirtualSlot8(int block);                 // 0x0047d420
+
+    // 0x0047d470 / 0x0047d780: build the node-wide texture (or one block's)
+    // from the node's run-length texture indices (tier 3 names).
+    int UnknownFunction47d470(ManagedTexture* texture);         // 0x0047d470 (ret 4)
+    int UnknownFunction47d780(int block, ManagedTexture* texture);  // 0x0047d780 (ret 8)
 
     Grid1NodeExtra* Extra() { return (Grid1NodeExtra*)extra; }
     Grid1Terrain* Terrain() { return (Grid1Terrain*)terrain; }
