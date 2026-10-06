@@ -330,7 +330,7 @@ NetworkInterface::NetworkInterface()
     field_0x04 = 0;
     field_0x08 = 0;
     field_0x0c = 0;
-    field_0x10 = 0;
+    isHost = 0;
     field_0x14 = 0;
     field_0x18 = 0;
     field_0x1c = 0;
@@ -413,7 +413,7 @@ long NetworkInterface::UnknownFunction4ab6b0(int mode)
             goto failed;
     }
     if (field_0x14) {
-        if (field_0x10) {
+        if (isHost) {
             if (!UnknownFunction4accd0(field_0x0c))
                 goto failed;
         } else {
@@ -425,7 +425,7 @@ long NetworkInterface::UnknownFunction4ab6b0(int mode)
         for (int i = 0; i < count; i++)
             UnknownFunction4ac980(players[i].field_0x04, players[i].field_0x08);
     }
-    if (field_0x18 == 3 && field_0x10)
+    if (field_0x18 == 3 && isHost)
         field_0x100.Init(16, 16);
     field_0x114.Init(2, 1);
     return 0;
@@ -549,7 +549,7 @@ int NetworkInterface::UnknownFunction4ac3c0(char* name, unsigned long flags)
         field_0x04->Close();
         return 0;
     }
-    field_0x10 = 1;
+    isHost = 1;
     return 1;
 }
 
@@ -564,7 +564,7 @@ int NetworkInterface::UnknownFunction4ac480(const GUID* instance, unsigned long 
     *(GUID*)desc.instance = *instance;
     if (field_0x04->Open(&desc, flags | 1))
         goto failed;
-    field_0x10 = 0;
+    isHost = 0;
     if (!UnknownFunction4acd20())
         goto failed;
     return 1;
@@ -578,7 +578,7 @@ int NetworkInterface::UnknownFunction4ac510(int value)
 {
     unsigned long size;
 
-    if (!field_0x04 || !field_0x10)
+    if (!field_0x04 || !isHost)
         return 0;
     NetSessionDesc* desc = 0;
     long result = field_0x04->GetSessionDesc(desc, &size);
@@ -611,7 +611,7 @@ int NetworkInterface::UnknownFunction4ac5e0(char* name)
     if (!UnknownFunction4ac650(name, &player))
         goto failed;
     field_0x0c = player;
-    if (field_0x10) {
+    if (isHost) {
         if (!UnknownFunction4accd0(player))
             goto failed;
     } else {
@@ -644,7 +644,7 @@ int NetworkInterface::UnknownFunction4ac650(char* name, unsigned long* player)
     playerName.size = sizeof(playerName);
     playerName.shortName = name;
     playerName.longName = 0;
-    if (field_0x10 && field_0x18 == 2) {
+    if (isHost && field_0x18 == 2) {
         if (field_0x04->CreatePlayer(player, &playerName, field_0x24, 0, 0, 0x100))
             goto failed;
     } else {
@@ -703,7 +703,7 @@ int NetworkInterface::UnknownFunction4ac830(int type, void* data, int size, int 
         from = field_0x0c;
     if (type & 0x80) {
         UnknownFunction4acbc0(type, data, size, from);
-    } else if (field_0x18 == 3 && !field_0x10) {
+    } else if (field_0x18 == 3 && !isHost) {
         int target = to;
         if (!UnknownFunction4ad280(type, data, size, 0, from, field_0xf8, &target, sizeof(target)))
             return 0;
@@ -925,7 +925,7 @@ int NetworkInterface::UnknownFunction4acde0(int value)
 {
     EnterCriticalSection(NET_LOCK(field_0x48));
     UnknownFunction4aced0(value);
-    if (field_0x18 == 3 && field_0x10)
+    if (field_0x18 == 3 && isHost)
         UnknownVirtualSlot0(value);
     for (int i = 0; i < field_0x114.m_count; i++) {
         NetFile* file = field_0x114.Get(i);

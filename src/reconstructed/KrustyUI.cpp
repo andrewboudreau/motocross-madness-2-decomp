@@ -123,7 +123,7 @@ int KrustyUI::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
     if (GameObject::UnknownVirtualSlot24(type, data, from, to, flags))
         return 1;
     if (type == DPSYS_HOST)
-        g_UnknownGlobal56e26c->field_0x08->field_0x10 = 1;
+        g_UnknownGlobal56e26c->field_0x08->isHost = 1;
     return 0;
 }
 

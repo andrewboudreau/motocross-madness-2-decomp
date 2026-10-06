@@ -28,6 +28,7 @@
 
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/Net.h"
+#include "../../src/reconstructed/DirectPlayMessages.h"
 
 #define NET_LOCK(cs) ((CRITICAL_SECTION*)&(cs))
 #define NET_DPERR_BUFFERTOOSMALL 0x8877001e
@@ -139,9 +140,9 @@ long NetworkInterface::UnknownFunction4ab960()
     }
     EnterCriticalSection(NET_LOCK(field_0x48));
     field_0x04 = directPlay4;
-    field_0x10 = (connection->flags >> 1) & 1;
+    isHost = (connection->flags >> 1) & 1;              // DPLCONNECTION_CREATESESSION
     UnknownFunction4ad180((const GUID*)connection->provider);
-    if (field_0x18 == 2 && field_0x10)
+    if (field_0x18 == 2 && isHost)
         result = field_0x04->CreatePlayer((unsigned long*)&field_0x0c, connection->playerName,
                                           field_0x24, 0, 0, 0x100);
     else
@@ -311,13 +312,13 @@ void NetworkInterface::UnknownFunction4aced0(int value)
                     // DirectPlay system message: type, player type, player id.
                     int* system = (int*)message->field_0x14;
                     switch (message->field_0x00) {
-                    case 3:
+                    case DPSYS_CREATEPLAYERORGROUP:
                         if (system[2] && system[1] == 1) {
                             UnknownFunction4ac720(system[2], systemName);
                             UnknownFunction4ac980(system[2], systemName);
                         }
                         break;
-                    case 5:
+                    case DPSYS_DESTROYPLAYERORGROUP:
                         UnknownFunction4aca80(system[2]);
                         break;
                     }

@@ -71,7 +71,7 @@ public:
     // 0x004695d0: ret 8, returns 1 when a child handles it.  Overrides: CollisionObject
     // 0x00434970, Terrain 0x00508850 (input event handler, tier 3).
     virtual int GameObjectVirtualSlot23(int a, int b);
-    virtual int GameObjectVirtualSlot24(int a, int b, int c, int d, int e);  // 0x00469620: ret 0x14
+    virtual int GameObjectVirtualSlot24(int type, int data, int from, int to, int flags);  // 0x00469620: ret 0x14
     virtual int GameObjectVirtualSlot25(int a);  // 0x00469720: ret 4, returns 1
     virtual void GameObjectVirtualSlot26();      // 0x004692c0: ret, sets bit 3 of statusFlags
     // Non-virtual, this == the GameObject subobject (Bike slot 97 0x00409420 computes

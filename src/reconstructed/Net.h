@@ -404,7 +404,7 @@ public:
     UnknownDirectPlay4A* field_0x04;
     UnknownDirectPlayLobby3A* field_0x08;
     int field_0x0c;                                     // local player id
-    int field_0x10;                                     // hosting (KrustyUI slot 24 sets it)
+    int isHost;                                         // 1 after Open with DPOPEN_CREATE (0x004ac3c0) or DPSYS_HOST (KrustyUI slot 24); 0 after DPOPEN_JOIN
     int field_0x14;                                     // connected (TrackGame slot 4)
     int field_0x18;                                     // connection mode 1..4
     void* field_0x1c;                                   // NetProcs thread (0x004af6a0)
