@@ -20,43 +20,43 @@ static Vector3 s_UnknownVector67c3e8;
 // otherwise it leaves that mode, restoring the state, and runs FollowCamera
 // slot 10.
 int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
-    if (!field_0x3b8) {
+    if (!raceView) {
         switch (g_UnknownGlobal56e26c->field_0x2d74) {
             case 2:
-                field_0x3b8 = g_UnknownGlobal56e26c->field_0x564->field_0x34;
+                raceView = g_UnknownGlobal56e26c->field_0x564->field_0x34;
                 break;
             case 3:
-                field_0x3b8 = g_UnknownGlobal56e26c->field_0x558->field_0x34;
+                raceView = g_UnknownGlobal56e26c->field_0x558->field_0x34;
                 break;
             case 0:
-                field_0x3b8 = g_UnknownGlobal56e26c->field_0x55c->field_0x34;
+                raceView = g_UnknownGlobal56e26c->field_0x55c->field_0x34;
                 break;
             case 1:
             case 5:
-                field_0x3b8 = g_UnknownGlobal56e26c->field_0x560->field_0x34;
+                raceView = g_UnknownGlobal56e26c->field_0x560->field_0x34;
                 break;
             case 4:
-                field_0x3b8 = g_UnknownGlobal56e26c->field_0x568->field_0x34;
+                raceView = g_UnknownGlobal56e26c->field_0x568->field_0x34;
                 break;
         }
     }
-    if (field_0x3b8->field_0x18e) {
+    if (raceView->field_0x18e) {
         Vector3 first;
         Vector3 second;
         if (!s_UnknownActive67c3f4) {
             s_UnknownActive67c3f4 = true;
-            field_0x3b8->UnknownFunction4210f0(&second, &first, g_UnknownGlobal56e26c->field_0x560, 0);
+            raceView->UnknownFunction4210f0(&second, &first, g_UnknownGlobal56e26c->field_0x560, 0);
             FollowCamera::UnknownVirtualSlot46(&first, &s_UnknownVector67c3e8);
         }
-        field_0x3b8->UnknownFunction4210f0(&first, &second, g_UnknownGlobal56e26c->field_0x560, 0);
-        first.y = field_0x3b8->field_0x38->field_0x00c.y + 2.0f;
+        raceView->UnknownFunction4210f0(&first, &second, g_UnknownGlobal56e26c->field_0x560, 0);
+        first.y = raceView->field_0x38->field_0x00c.y + 2.0f;
         FollowCamera::UnknownVirtualSlot47(frameTime, &first);
         return 1;
     }
     if (s_UnknownActive67c3f4) {
         s_UnknownActive67c3f4 = false;
         UnknownVirtualSlot62();
-        UnknownVirtualSlot71(field_0x244);
+        UnknownVirtualSlot71(cameraState);
     }
     FollowCamera::UnknownVirtualSlot10(frameTime);
     return 1;

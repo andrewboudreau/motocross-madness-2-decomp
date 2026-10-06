@@ -45,6 +45,13 @@ the old 12-byte aggregate is typed `Vector3`. The slot 63–67 presets store
 floats (for example 0x40490fdb = π, 0x42aa0000 = 85.0) written as float
 literals.
 
+Members whose roles repeat directly across matched bodies now use semantic
+names: `cameraState` and its saved copy, the target/cache vectors, the owned
+point table, and the cyclic state list. `VehicleCamera`, `BikeCamera`, and
+`KrustyBikeCamera` likewise name their repeatedly dereferenced vehicle, bike,
+and view pointers. These names describe observed use; they do not establish the
+original source identifiers or the pointed-to runtime classes.
+
 Two near misses are kept in `samples/camera/FollowCameraNearMisses.cpp`:
 
 - Slot 36 (`0x00465000`, 209 bytes) differs by 12 bytes. Retail ends its
@@ -85,7 +92,7 @@ Slot 69 calls virtual slot 57 with a hidden stack return buffer for a
 `Vector3`, copies three dwords into +0x2a8/+0x2ac/+0x2b0, then passes the cache
 to slot 43. Retail forms the cache address before the call and copies straight
 from the returned buffer, so the candidate assigns the call result directly
-(`field_0x2a8 = UnknownVirtualSlot57(0);`); a named temporary kept the copy in
+(`cachedTarget = UnknownVirtualSlot57(0);`); a named temporary kept the copy in
 extra registers.
 
 Slot 71 stores the input at +0x244, calls slot 58, dispatches states 0–4 to
@@ -157,9 +164,10 @@ The owner is the object at Camera+0x18, a `RenderTarget`; for PCCamera it is a
 `PCRenderTarget` whose +0x50 holds a COM-style device (`this` on the stack; see
 [RenderTarget](RENDER_TARGET.md)). Method 11 taking kind 1/2/3 and a 64-byte
 block is consistent with `IDirect3DDevice7::SetTransform` for
-world/view/projection, which would make +0x2c/+0xac/+0x6c the
-world/view/projection matrices. That is inference from call shape only; names
-stay neutral until the interface is identified from creation/import evidence.
+world/view/projection. The members at +0x2c/+0xac/+0x6c are therefore named
+`worldMatrix`/`viewMatrix`/`projectionMatrix`. These semantic names remain
+provisional inference from the call shape; identifying the interface from
+creation/import evidence would be needed to confirm them.
 
 Destructor evidence. `analysis/deleting_destructors.json` pairs each wrapper
 with its destructor core. Camera's vptr is written in its constructor
