@@ -76,7 +76,7 @@ struct UnknownSoundListener {
     virtual long __stdcall GetDistanceFactor();
     virtual long __stdcall GetDopplerFactor();
     virtual long __stdcall GetOrientation();
-    virtual long __stdcall GetPosition();
+    virtual long __stdcall GetPosition(Vector3* position);
     virtual long __stdcall GetRolloffFactor();
     virtual long __stdcall GetVelocity();
     virtual long __stdcall SetAllParameters();

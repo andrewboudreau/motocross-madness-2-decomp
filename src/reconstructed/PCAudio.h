@@ -113,18 +113,28 @@ extern "C" const UnknownGuid IID_IKsPropertySet;       // 0x00556ce0
 // 0x00556cf0: the 3D algorithm GUID new 3D buffers request.
 extern "C" const UnknownGuid g_UnknownSound3DAlgorithm;
 
-// RTTI: SoundGroup : ... GameObject (vtable 0x00550500). Only what PCAudio
-// uses is declared.
+// RTTI: SoundGroup : GameObject (vtable 0x00550500, 27 slots). Its code is
+// at 0x00401a30..0x00401f74, reconstructed in AuralScape.cpp.
 class SoundGroup : public GameObject {
 public:
     explicit SoundGroup(int flags);           // 0x00401a30
-    void UnknownFunction401b50(Sound* sound); // 0x00401b50: adds a member
-    void UnknownFunction401be0(Sound* sound); // 0x00401be0: removes a member
+    virtual ~SoundGroup();                    // 0x00401af0 (deleting wrapper 0x00401ad0)
+    // Slots 4-7 call the GameObject slot, then slot 16 with 1, 0, 1, 0.
+    virtual void UnknownVirtualSlot4();       // 0x00401e20
+    virtual void UnknownVirtualSlot5();       // 0x00401e40
+    virtual void UnknownVirtualSlot6();       // 0x00401e60
+    virtual void UnknownVirtualSlot7();       // 0x00401e80
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x00401f30: fades the members
+    virtual int UnknownVirtualSlot16(int value);       // 0x00401ee0: pauses the members
+    virtual int UnknownVirtualSlot18();                // 0x00401ea0: restores the members
+    int UnknownFunction401b50(Sound* sound);  // 0x00401b50: adds a member
+    int UnknownFunction401be0(Sound* sound);  // 0x00401be0: removes a member
+    void UnknownFunction401c30();             // 0x00401c30: releases every member
     void UnknownFunction401dd0(long volume);  // 0x00401dd0 (racesnd.cpp music volume)
 
     unsigned char field_0x2c_bit0 : 1; // members may play
     long field_0x30; // volume applied to members
-    unsigned char field_0x34[0x48 - 0x34];
+    ContainerList<Sound*> field_0x34; // members
 };
 
 // 0x1c-byte notification helper a streaming Sound owns at +0x3c: a thread
