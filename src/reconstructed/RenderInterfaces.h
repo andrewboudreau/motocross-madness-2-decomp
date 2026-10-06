@@ -22,7 +22,8 @@ struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();
     virtual long __stdcall UnknownMethod9();
-    virtual long __stdcall UnknownMethod10();
+    virtual long __stdcall UnknownMethod10(unsigned long count, void* rects, unsigned long flags,
+                                           unsigned long color, int z, unsigned long stencil); // Clear
     virtual long __stdcall UnknownMethod11(int kind, const Matrix4* value); // SetTransform
     virtual long __stdcall UnknownMethod12();
     virtual long __stdcall UnknownMethod13(void* viewport);               // SetViewport
