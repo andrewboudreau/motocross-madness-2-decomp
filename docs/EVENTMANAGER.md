@@ -15,15 +15,18 @@ TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 Exact (26 calibration cases):
 - the constructor (11 0x50-byte entries at +0x50; -1000 in each component
   of +0x3c4) and both destructors;
-- slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c;
+- slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c. With
+  +0x30 (1.0) it goes to NetworkInterface 0x004ac8d0 (+0x7c, +0x80): the
+  keep-alive thread 0x004af6a0 sends 0xcc and drops a player not heard from
+  for +0x7c seconds, and `Sleep`s +0x80 * 1000 ms between 0x4b sends;
 - `0x0045d2b0`, `0x0045d2f0` and `0x0045d340`: the first race-mode object of
   TrackGame+0x558..+0x568 present, its +0x34 view and its +0x6c target;
 - `0x0045d390`: whether any is present;
 - `0x0045d270`: slot 5 on all three;
 - slot 10, the per-frame update: while UI interaction is blocked
-  (TrackGame+0x3430) it advances the block timer, ticks the +0x424
-  listeners, and pans the camera at +0x3d4 by `frameTime * speed / 7`;
-  after 7 seconds it lifts the block;
+  (TrackGame+0x3430) it advances the block timer, calls primary slot 7 of
+  the +0x424 podium characters, and pans the camera at +0x3d4 by
+  `frameTime * speed / 7`; after 7 seconds it lifts the block;
 - slots 22 and 23: a press of control 1, 0x1c or 0x39, or any joystick
   button, ends the block once slot 23 has armed it;
 - `0x0045e520`: resets the 11 entries;
@@ -33,8 +36,10 @@ Exact (26 calibration cases):
   `blocked && !pending` early return between the two main branches; the
   source keeps it because the branch layout depends on it;
 - `0x0045f180`: awards points from a table by position;
-- slot 24, the network messages (`type`, `data`, sender `player`): types
-  5 and 0x89 mark a player ready (and in mode 2 without a race-mode object
+- slot 24, the network messages (`type`, `data`, `from`, `to`, `flags`: the
+  NetMessage fields NetworkInterface 0x004aced0 passes): type 5
+  (`DPSYS_DESTROYPLAYERORGROUP`, whose `dpId` is at +0x08) and 0x89 mark a
+  player done (and in mode 2 without a race-mode object
   call `0x0045fbd0`); 0x86 copies a remote racer's state into the view's
   racer array; 0xcc shows "<name> <text>" (string 0x13d7) and drops the
   player; 0x8e, from the local player id, shows string 0x13d1 or resets the
@@ -43,7 +48,7 @@ Exact (26 calibration cases):
   float locals (`fld; fld; fcompp`);
 - `0x0045cb70`: resets the event, loads the track's "env" and "scn" data
   and creates the race object for mode 0 (`BaseQuarryEvent`, retail
-  `__LINE__` 252) or 2 (`NationalRace`, line 270). It clears three listener
+  `__LINE__` 252) or 2 (`NationalRace`, line 270). It clears three character
   slots in a loop that VC6 fully unrolls (a fresh zero register), and
   returns whether a race-mode object exists;
 - `0x0045f9a0`: sends the local racer's state and each AI racer's (type
@@ -88,7 +93,15 @@ it fits KrustyBike's primary base chain for the views. Their classes are not
 established; `src/reconstructed/RaceView.h` declares them.
 
 Not reconstructed:
-- `0x0045d480` (4247 bytes).
+- `0x0045d480` (4247 bytes): the podium scene. It calls `0x0045cdc0(1)`,
+  creates a `PCCamera` (constructor `0x004bed80`) at +0x3d4 and, for places
+  1 to min(+0x4c, 3), a `D3DIMSoultreeCharacter` (0x240 bytes, constructor
+  `0x004455b0`) at +0x424 from "%s\Winner.mcf" (or "Winnerd.mcf") with a
+  "Podium3/4/5_%02d" motion kept at +0x430; it also uses "CrowdLoop.wav".
+  A nonzero result makes `0x0045e600` block UI interaction for slot 10.
+- `UnknownEventEntry`'s constructor `0x0045c830`, reset `0x0045c840` and
+  racer copy `0x0045c8b0` (the header lists which racer field each entry
+  field comes from).
 
 Near misses (`samples/game/EventManagerNearMisses.cpp`):
 - the cdecl progress callback `0x0045cb20` (63 of 67 bytes; retail swaps

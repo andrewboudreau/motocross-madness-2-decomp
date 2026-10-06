@@ -21,11 +21,17 @@ extern "C" __declspec(dllimport) int __stdcall GetTimeFormatA(unsigned long loca
 // Characters kept in recording file names.
 #define FILE_NAME_CHARACTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-()$#"
 
+// DirectPlay system message type (dplay.h). For a system message the
+// NetMessage type is the first dword of the data (0x004aacc0).
+#define DPSYS_DESTROYPLAYERORGROUP 0x0005
+
 // Network messages handled by slot 24 (the layout depends on the type).
+// For DPSYS_DESTROYPLAYERORGROUP the fields are DPMSG_DESTROYPLAYERORGROUP's
+// dwType, dwPlayerType and dpId.
 struct UnknownEventPlayerMessage {
     int field_0x00;
     int field_0x04;                                // player (types 0xcc and 0x8e)
-    int field_0x08;                                // player (type 5)
+    int field_0x08;                                // dpId (DPSYS_DESTROYPLAYERORGROUP)
 };
 struct UnknownEventRacerMessage {                  // type 0x86
     int field_0x00;
@@ -50,8 +56,8 @@ EventManager::EventManager(int flags) : GameObject(flags) {
     field_0x48 = 0;
     field_0x4c = 0;
     field_0x3c0 = 0;
-    field_0x2c = 20.0f;
-    field_0x30 = 1.0f;
+    keepAliveTimeout = 20.0f;
+    keepAliveInterval = 1.0f;
     field_0x440 = 0;
     field_0x3d4 = 0;
     field_0x3d0 = 0;
@@ -64,7 +70,7 @@ EventManager::~EventManager() {}
 // 0x0045caf0
 GameObject* EventManager::UnknownVirtualSlot8(void* value) {
     GameObject::UnknownVirtualSlot8(value);
-    field_0x2c = (float)g_UnknownGlobal56e26c->UnknownVirtualSlot20("KeepAliveTimeout", 20);
+    keepAliveTimeout = (float)g_UnknownGlobal56e26c->UnknownVirtualSlot20("KeepAliveTimeout", 20);
     return this;
 }
 
@@ -161,8 +167,8 @@ int EventManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
 }
 
 // 0x0045f200: per-frame update. While UI interaction is blocked it advances
-// the block timer, ticks the listeners and pans the camera; after 7 seconds
-// it lifts the block.
+// the block timer, ticks the podium characters and pans the camera; after 7
+// seconds it lifts the block.
 int EventManager::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     if (field_0x3c) {
@@ -176,8 +182,8 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
         UnknownFunction45eef0(frameTime);
     if (g_UnknownGlobal56e26c->uiInteractionBlocked) {
         g_UnknownGlobal56e26c->field_0x3434 += frameTime;
-        for (int i = 0; i < field_0x420; i++)
-            field_0x424[i]->UnknownVirtualSlot7(frameTime, 0, 0);
+        for (int i = 0; i < podiumCharacterCount; i++)
+            podiumCharacters[i]->CharacterVirtualSlot7(frameTime, 0, 0);
         field_0x3e4 += frameTime * field_0x414 * (1.0f / 7);
         field_0x3d4->UnknownFunction42e9b0(&field_0x3e4, 0, 0, 0, 0);
         field_0x3d4->UnknownVirtualSlot29(field_0x3d8);
@@ -311,38 +317,39 @@ void EventManager::UnknownFunction45e600() {
     }
 }
 
-// 0x0045f490: network messages. Type 5 and 0x89 mark a player ready (and
-// in mode 2 without a race-mode object start it), 0x86 updates a remote
-// racer, 0xcc reports a player leaving and 0x8e the host ending the event.
-int EventManager::UnknownVirtualSlot24(int type, void* data, int player, int d, int e) {
-    if (GameObject::UnknownVirtualSlot24(type, data, player, d, e))
+// 0x0045f490: network messages. DPSYS_DESTROYPLAYERORGROUP and 0x89 mark a
+// player done (and in mode 2 without a race-mode object remove it), 0x86
+// updates a remote racer, 0xcc reports a player leaving (NetProcs sends it
+// for a keep-alive timeout) and 0x8e the host ending the event.
+int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
+    if (GameObject::UnknownVirtualSlot24(type, data, from, to, flags))
         return 1;
     UnknownEventPlayerMessage* message = (UnknownEventPlayerMessage*)data;
     char name[16];
     char text[128];
     char line[260];
-    if (type == 5) {
+    if (type == DPSYS_DESTROYPLAYERORGROUP) {
         for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
             if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == message->field_0x08)
                 g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
         }
         if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !UnknownFunction45d2b0())
             UnknownFunction45fbd0(message->field_0x08);
-    } else if (player) {
+    } else if (from) {
         if (type == 0x89) {
             for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-                if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == player)
+                if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == from)
                     g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
             }
             if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !UnknownFunction45d2b0())
-                UnknownFunction45fbd0(player);
+                UnknownFunction45fbd0(from);
         } else if (type == 0x86) {
             UnknownEventRacerMessage* update = (UnknownEventRacerMessage*)data;
             UnknownKrustyBikeView* view = UnknownFunction45d2f0();
             if (!view || g_UnknownGlobal56e26c->uiInteractionBlocked)
                 return 0;
             for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-                if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == player &&
+                if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == from &&
                     g_UnknownGlobal56e26c->field_0x215c[i].field_0xd8 == update->field_0x04) {
                     g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
                     if (view->field_0x3c[i]) {
@@ -495,7 +502,7 @@ void EventManager::UnknownFunction45f9a0() {
             0x86, &message, sizeof(message), g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
     }
     field_0x38 = 1;
-    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac8d0(field_0x2c, field_0x30);
+    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac8d0(keepAliveTimeout, keepAliveInterval);
     view->UnknownVirtualSlot4();
     field_0x34 = 1;
 }
@@ -514,9 +521,9 @@ int EventManager::UnknownFunction45cb70() {
     field_0x34 = 0;
     for (int i = 0; i < 8; i++)
         g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 0;
-    field_0x420 = 0;
+    podiumCharacterCount = 0;
     for (int j = 0; j < 3; j++)
-        field_0x424[j] = 0;
+        podiumCharacters[j] = 0;
     field_0x3d4 = 0;
     field_0x3d0 = 0;
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
@@ -765,11 +772,11 @@ void EventManager::UnknownFunction45e9d0() {
     }
 }
 
-// 0x0045cdc0: ends the race. With `abort` 1 it only calls slot 4 on the race
-// objects and racers. Otherwise it saves the replay (Record\\<scene>_<racer>_
+// 0x0045cdc0: ends the race. With `mode` 1 (0x0045d480, before the podium
+// scene) it only calls slot 4 on the race objects and racers. Otherwise it saves the replay (Record\\<scene>_<racer>_
 // <date>_<time>.vcr, filtered to file-name characters) and, in mode 4, the
 // ghost (.gho), then releases the first race-mode object.
-void EventManager::UnknownFunction45cdc0(int abort) {
+void EventManager::UnknownFunction45cdc0(int mode) {
     char date[32];
     char scene[64];
     char name[260];
@@ -778,7 +785,7 @@ void EventManager::UnknownFunction45cdc0(int abort) {
     UnknownKrustyBikeView* view = UnknownFunction45d2f0();
     TrackGameViewOwner* owner = UnknownFunction45d2b0();
     g_UnknownGlobal56e26c->mode.UnknownFunction523580();
-    if (abort == 1) {
+    if (mode == 1) {
         if (owner) {
             if (owner->field_0x60)
                 owner->field_0x60->UnknownVirtualSlot4();
