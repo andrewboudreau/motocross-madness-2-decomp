@@ -4,6 +4,7 @@
 
 #include "ContainerList.h"
 #include "ControlInterface.h"
+#include "GameCursor.h"
 #include "GameObject.h"
 #include "RenderTarget.h"
 #include "UIDialog.h"
@@ -153,37 +154,6 @@ struct UnknownCursorAnimation {
     int field_0x10;
     unsigned char field_0x14[0x20 - 0x14];
     int field_0x20;
-};
-
-// Cursor position in pixels (0x0043f100's result).
-struct UnknownCursorPosition {
-    int x;
-    int y;
-};
-
-// RTTI: GameCursor : GameObject (vtable 0x0055130c; constructor
-// 0x0043ea00). Only what GUIManager.cpp uses is declared.
-class GameCursor : public GameObject {
-public:
-    explicit GameCursor(int flags);           // 0x0043ea00
-    virtual ~GameCursor();                    // 0x0043eb60 (deleting wrapper 0x0043ea50)
-    virtual int UnknownVirtualSlot15();       // 0x0043ed40
-    // 0x0043ea70: an input-driven cursor following the two bindings.
-    GameObject* UnknownFunction43ea70(void* target, UnknownControlBinding* x, UnknownControlBinding* y,
-                                      const char* image, TextureMapManager* textures,
-                                      BackgroundImage* background, void* palette, Palette8* palette8);
-    // 0x0043eaf0: a cursor without bindings.
-    GameObject* UnknownFunction43eaf0(void* target, const char* image, TextureMapManager* textures,
-                                      BackgroundImage* background, void* palette, Palette8* palette8);
-    // 0x0043f100: the bindings' values (or GetCursorPos's) plus the offset at
-    // +0x2c/+0x30.
-    UnknownCursorPosition UnknownFunction43f100();
-
-    unsigned char field_0x2c[0x38 - 0x2c];
-    int field_0x38;                           // current frame
-    unsigned char field_0x3c[0x54 - 0x3c];
-    int field_0x54;                           // position
-    int field_0x58;
 };
 
 // RTTI: GUICursor : GameCursor (vtable 0x00553ed0; 0x60 bytes, the size

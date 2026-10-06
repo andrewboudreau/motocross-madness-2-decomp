@@ -156,6 +156,9 @@ AgeManager.cpp, ArcadeObject.cpp and Arrow.cpp, the first three units of
 the image, match strictly in all 24 functions; see
 [ARCADEOBJECT](ARCADEOBJECT.md).
 
+cursor.cpp (GameCursor) matches strictly in 15 functions; see
+[GAMECURSOR](GAMECURSOR.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

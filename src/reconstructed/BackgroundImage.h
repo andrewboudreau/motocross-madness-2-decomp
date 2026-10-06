@@ -53,6 +53,9 @@ public:
     int UnknownFunction4043c0();                        // 0x004043c0: clears their depth
     int UnknownFunction404480(PCTextureMap* image, CameraRect* rect, void* sourceRect, int flags, int index,
                               int dirty, int* frames, int skip); // 0x00404480: draws an image
+    // 0x00404700: draws `image` at (x, y) (GameCursor slot 15; not reconstructed).
+    int UnknownFunction404700(PCTextureMap* image, int x, int y, void* sourceRect, int flags, int index,
+                              int dirty, int* frames, int skip);
     int UnknownFunction404c80();                        // 0x00404c80: releases the DC
     void UnknownFunction404cb0(int index);              // 0x00404cb0
     void UnknownFunction404cd0();                       // 0x00404cd0: resets pending rectangles
