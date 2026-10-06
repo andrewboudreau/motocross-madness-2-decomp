@@ -30,6 +30,16 @@ public:
 
     void UnknownFunction4fc630(Vector3 position);  // 0x004fc630: sets the local translation
     void UnknownFunction4fd340(float x, float y, float z); // 0x004fd340
+    // Seen from ArcadeObject.cpp: 0x004fc660 (ret 4) sets the position from
+    // a pointer, 0x004fe850 (ret 8) returns two vectors (the second is the
+    // half extent ArcadeObject doubles), 0x004fbd70 (ret 0x10) takes four
+    // pass-through arguments, 0x004fceb0 (ret 0x10) an axis and an angle,
+    // 0x00444d80 (D3DIMSoulTree.CPP, ret 4) attaches a modifier.
+    void UnknownFunction4fc660(const Vector3* position);
+    void UnknownFunction4fe850(Vector3* a, Vector3* b);
+    void UnknownFunction4fbd70(int a, int b, int c, int d);
+    void UnknownFunction4fceb0(Vector3 axis, float angle);
+    void UnknownFunction444d80(GameObject* modifier);
 
     unsigned char field_0x004[0x2d8 - 4];          // operator new size 0x2d8
 };

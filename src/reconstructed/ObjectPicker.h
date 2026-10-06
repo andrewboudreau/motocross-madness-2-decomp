@@ -42,6 +42,7 @@ struct UnknownPickCamera {
 // QuadTreeObject (+0), GraphicsTest (+0xc) : GameObject; GraphicsTest's own
 // members are not declared here.
 class CollisionObject;
+class D3DIMSoultreeObject;
 typedef void (*UnknownPickCallback)(CollisionObject* self, CollisionObject* other);
 
 class UnknownPickQuadTreeObject {
@@ -58,12 +59,20 @@ public:
     void UnknownFunction432ab0(int count, void* points);      // 0x00432ab0: sets the segment
     void UnknownFunction435fb0();         // 0x00435fb0
     int UnknownFunction438e70();          // 0x00438e70: 1 on a hit
+    // Seen from ArcadeObject.cpp 0x00401540: 0x00432800 (ret 8) builds the
+    // collision from a ".col" file, 0x00432720 (ret 0x14) without one,
+    // 0x004394d0 (ret 8) and 0x00435fe0 (ret 0) follow.
+    void UnknownFunction432800(D3DIMSoultreeObject* model, const char* path);
+    void UnknownFunction432720(D3DIMSoultreeObject* model, int a, int b, int c, int d);
+    void UnknownFunction4394d0(D3DIMSoultreeObject* model, int value);
+    void UnknownFunction435fe0();
 
     unsigned char field_0x38[0x68 - 0x38];
     int field_0x68;                       // ignore vegetation
     unsigned char field_0x6c[0x88 - 0x6c];
     UnknownPickCallback field_0x88;       // on-hit callback
-    unsigned char field_0x8c[0xb8 - 0x8c];
+    void* field_0x8c;                     // set with the callback by ArcadeObject 0x00401540
+    unsigned char field_0x90[0xb8 - 0x90];
 };
 
 class ObjectPicker : public GameObject {

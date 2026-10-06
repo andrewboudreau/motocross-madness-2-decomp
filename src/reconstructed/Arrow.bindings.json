@@ -1,0 +1,17 @@
+{
+  "??0ArrowManager@@QAE@H@Z": "0x004019d0",
+  "??0GameObject@@QAE@H@Z": "0x00468ca0",
+  "??1ArrowManager@@UAE@XZ": "0x00401a20",
+  "??1GameObject@@UAE@XZ": "0x00468d60",
+  "??2@YAPAXIPBDH@Z": "0x004a3010",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "??_7ArrowManager@@6B@": "0x00550490",
+  "??_GArrowManager@@UAEPAXI@Z": "0x00401a00",
+  "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
+  "?g_UnknownArrowManager5776d0@@3PAVArrowManager@@A": "0x005776d0",
+  "_$E1": "0x00401960",
+  "_$E1$ehhandler": "0x00549664",
+  "_$E2": "0x00401950",
+  "__FILE__:arrow.cpp": "0x00566684"
+}
