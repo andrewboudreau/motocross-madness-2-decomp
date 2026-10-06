@@ -58,7 +58,7 @@
   (`0x00481a20`), and frees its vertex buffers when the AgeManager evicts
   them (`0x0047ecc0`, `0x0047edb0`).
 
-## Exact (46 calibration cases)
+## Exact
 
 Gridbase.cpp: `0x0047db60` and the `GridBaseBlock` constructor `0x0047dc20`.
 
@@ -74,6 +74,11 @@ stub `0x004806e0` and slot 3 `0x004806f0` (identical-code folded with
 RenderTarget's slot 18), and `0x00481580`, `0x00481a20`, `0x00481cc0` and
 `0x00481db0`. The rest are `0x004824c0`, `0x004826d0`, `0x00482a40`,
 `0x00482ae0`, `0x00482c90`, `0x00482f00`, `0x00483040` and `0x00483100`.
+
+Also exact, not yet registered in `tools/run_calibration.py`: the buffer
+rebuild `0x0047f840`, the index builders `0x0047fce0`, `0x0047fe70` and
+`0x00480200`, the draw submissions `0x00480c90` and `0x00480fb0`, the
+detail-band re-test `0x00482760` and the border hand-off `0x004835c0`.
 
 ## Source shapes retail needs
 
@@ -103,6 +108,23 @@ RenderTarget's slot 18), and `0x00481580`, `0x00481a20`, `0x00481cc0` and
   field. A range-pointer local turns the float copies into integer moves.
 - `0x004824c0` stores the 0x004815e0 result in a float local before passing
   it to slot 3. Its last parameter is the flag 0x004815e0 tests.
+- `0x00480200` and `0x0047fce0` call each other per subdivision level.
+  Retail's neighbour test is one inline helper per child
+  (`Blocked`), the leaf case is the `else` of `if (children != 0)`, and
+  `a = b = 0` stores b first. Both emitters index through `k = n * 3`.
+- `0x0047fe70` writes the second diagonal flag as `(1 - bit) && ...`; retail
+  computes `1 - (byte & 1)`. Its `else` branch tests `dx == 1`, not `dz`.
+- `0x0047f840` starts each half with `n = 0; m = n;` so the fallback call
+  pushes the returned count, as retail does.
+- `0x00480fb0` tests `block >= 0` first for the slot 7/6 choice. In
+  `0x00480c90` each colour branch has its own draw call (VC6 tail-merges
+  them and places the second one last, as retail does), and the texture
+  coordinate loop writes through `float* uv = &vertices[i].field_0x10`, which
+  makes VC6 base its loop pointer on `packed` (+0xc) as retail does.
+- `0x00482760` scans the curve-sorted vertex list of GridBaseBlock (+0x908
+  start positions per curve value, +0xb08 vertex indices).
+- `0x004835c0` computes the shift with a `shift += 4` loop over
+  `level - 1`; VC6 reduces it to retail's `lea ecx,[eax*4]`.
 - Unsigned shorts: the draw data's +0x122..+0x128 (stored as 0xffff),
   `GridNode::field_0x20` (compared with `ja`), and the sample height.
 
@@ -119,21 +141,27 @@ See the notes at the top of `samples/render/GriddrawNearMisses.cpp`:
 | `0x00481300` (block walk) | 114/216 | child index term order |
 | `0x00482b40` (rectangle re-test) | 292/327 | as `0x0047e430`, plus the zEnd/start order |
 | `0x00482dd0` (direction bit) | 147/333 | the shared notify tail and the early-return placement |
+| `0x0047f210` (per-block rebuild) | 426/1586 | x/count-copy registers, frame slots, minY/maxY load order |
+| `0x00481b30` (block distance) | 139/393 | which floats stay on the x87 stack |
+| `0x00483200` (border walk) | 84/956 | x/z in ebp/ebx (retail ebx/ebp), `level` reload |
 
 ## Not reconstructed
 
-Index and buffer builders `0x0047f210`, `0x0047f840`, `0x0047fce0`,
-`0x0047fe70` and `0x00480200`. Draw submission `0x00480c90` and
-`0x00480fb0`. Detail and visibility `0x004815e0`, `0x00481b30` and
-`0x00481de0`. Neighbour stitching `0x00482760`, `0x00483200` and
-`0x004835c0`. Gridbase's possible `0x0047d780`.
+The detail update `0x004815e0` (1082 bytes of x87 code) and the visibility
+walk `0x00481de0` (1750 bytes, vector temporaries). Gridbase's possible
+`0x0047d780`.
 
 ## Remaining uncertainty
 
 All type, member and function names are provisional. `GridTerrain`,
 `GridCamera`, `GridVisibilityClipper`, `GridAgeManager` and
 `GridVertexSink` are boundary views of classes reconstructed elsewhere, or
-not yet reconstructed. The shared row tables are written as per-TU statics
+not yet reconstructed, as are `GridRenderDevice` (Terrain+0x18, thiscall
+virtuals), `GridVertexLighter` (Terrain+0x2c, `0x00484f10`),
+`GridManagedTexture` (`0x00510910`) and `GridGameSettings` (`0x0056e26c`);
+only their called slots and touched fields are known. The fifth argument of
+`0x00482dd0` is the originating cell (`0x00483200` compares it with cell
+addresses), not a flag. The shared row tables are written as per-TU statics
 because three identical copies exist. The header that supplied them, and
 the vector constants (written as Lzw.cpp's stand-in), is not identified.
 

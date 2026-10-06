@@ -13,7 +13,8 @@ struct GridBaseCell {
     unsigned char field_0x1;                 // +1 index into g_gridBaseCurve (0x00481cc0)
     unsigned short height;                   // +2 (relative to the block's +0xd4c)
     signed char normal[3];                   // +4..+6 (scaled by 1/127)
-    unsigned char field_0x7;
+    unsigned char field_0x7_b0 : 1;          // +7 bit 0 (Griddraw's 0x0047fe70)
+    unsigned char field_0x7_b1 : 7;
 };
 
 // One terrain height-field block. Tier 2: Terrain's loader (0x00505e73)
@@ -25,8 +26,8 @@ public:
     GridBaseBlock(UnknownTextureStream* stream);   // 0x0047dc20 (ret 4)
 
     GridBaseCell cells[17 * 17];             // +0x000 (0x908 bytes)
-    unsigned char field_0x908[0x200];        // +0x908
-    unsigned char field_0xb08[0x244];        // +0xb08
+    short field_0x908[0x100];                // +0x908 first +0xb08 position per curve value (0x00482760)
+    short field_0xb08[0x244 / 2];            // +0xb08 vertex indices in curve order
     int field_0xd4c;                         // +0xd4c (read last, 4 bytes)
 };
 

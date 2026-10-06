@@ -52,6 +52,7 @@ int g_gridQuadOrder[16] = {
 // Defined with Terrain's data (0x0068a300 / 0x0068a304); tier 3 names.
 extern int g_gridDrawMemory;      // bytes held by node vertex buffers
 extern int g_gridDrawFrameCount;  // top-level node visits
+extern int g_gridDrawMemoryPeak;  // 0x0068a2fc, high-water mark of g_gridDrawMemory
 
 int g_gridSize = 1 << (g_gridLevels - 1);               // 0x0067a684 ($E 0x0047ddb0)
 GridVertexCache g_gridVertexCache;                      // 0x00677910 ($E 0x0047dde0)
@@ -314,6 +315,283 @@ int DrawableGridNode::UnknownFunction47ef80(int x, int z, int size, int quad)
     return 1;
 }
 
+// 0x0047f840: rebuilds the vertex and index buffers of a node without
+// per-block ranges: two diagonal halves of the 16 x 16 cell (the diagonal
+// picked by the node's position in its parent), each falling back to one
+// big triangle when nothing finer is drawn. Returns 0 when an allocation
+// fails.
+int DrawableGridNode::UnknownFunction47f840()
+{
+    int closed;
+    int before = data->field_0x12a;
+    int n;
+    int m;
+    terrain->field_0xa4++;
+    g_gridOriginX = 0;
+    g_gridOriginZ = 0;
+    g_gridVertexCache.Reset(this);
+    if ((field_0x2a & 0x11) != 0x11 && (field_0x2a & 0x11) != 0) {
+        n = 0;
+        m = n;
+        n = UnknownFunction47fce0(8, n, 0, 0, 8, 8, &closed);
+        if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+            ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+            n = UnknownFunction480700(n, 0, 0, 16, 16);
+        m = n;
+        n = UnknownFunction47fce0(8, n, 16, 16, -8, -8, &closed);
+        if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+            ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+            n = UnknownFunction480700(n, 16, 16, -16, -16);
+    } else {
+        n = 0;
+        m = n;
+        n = UnknownFunction47fce0(8, n, 0, 16, 8, -8, &closed);
+        if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+            ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+            n = UnknownFunction480700(n, 0, 16, 16, -16);
+        m = n;
+        n = UnknownFunction47fce0(8, n, 16, 0, -8, 8, &closed);
+        if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+            ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+            n = UnknownFunction480700(n, 16, 0, -16, 16);
+    }
+    data->field_0x12a = n;
+    if ((data->field_0x12a == 0 || before == 0) && data->field_0x12a != before && parent)
+        ((DrawableGridNode*)parent)->data->b1 = 1;
+    if (data->field_0x12a == 0) {
+        data->field_0x13c = 0;
+        data->field_0x13e = 0;
+    } else {
+        data->field_0x13c = g_gridVertexCache.count;
+        data->field_0x13e = data->field_0x12a * 3;
+        int vertexBytes = data->field_0x13c * 32;
+        int indexBytes = (data->field_0x13e + data->field_0x13c) * 2;
+        if (data->field_0x134 == 0 || vertexBytes > data->field_0x140) {
+            g_gridDrawMemory -= data->field_0x140;
+            if (data->field_0x134)
+                operator delete(data->field_0x134, __FILE__, 1306);
+            data->field_0x140 = vertexBytes + 0x80;
+            data->field_0x134 = DebugMalloc(data->field_0x140, __FILE__, 1309);
+            if (data->field_0x134 == 0) {
+                data->field_0x140 = 0;
+                data->field_0x13c = 0;
+                data->field_0x13e = 0;
+                return 0;
+            }
+            g_gridDrawMemory += data->field_0x140;
+            if (g_gridDrawMemory > g_gridDrawMemoryPeak)
+                g_gridDrawMemoryPeak = g_gridDrawMemory;
+        }
+        if (data->field_0x138 == 0 || indexBytes > data->field_0x142) {
+            g_gridDrawMemory -= data->field_0x142;
+            if (data->field_0x138)
+                operator delete(data->field_0x138, __FILE__, 1324);
+            data->field_0x142 = indexBytes + 0x20;
+            data->field_0x138 = DebugMalloc(data->field_0x142, __FILE__, 1327);
+            if (data->field_0x138 == 0) {
+                data->field_0x138 = 0;
+                data->field_0x142 = 0;
+                data->field_0x13c = 0;
+                data->field_0x13e = 0;
+                return 0;
+            }
+            g_gridDrawMemory += data->field_0x142;
+            if (g_gridDrawMemory > g_gridDrawMemoryPeak)
+                g_gridDrawMemoryPeak = g_gridDrawMemory;
+        }
+        memcpy(data->field_0x134, g_gridVertexCache.vertices, data->field_0x13c * 32);
+        memcpy(data->field_0x138, g_gridIndices, data->field_0x13e * 2);
+        if (data->ageEntry.size == 0)
+            terrain->field_0xc88->UnknownFunction401050(&data->ageEntry, UnknownFunction47ecc0, this, 0,
+                                                       data->field_0x142 + data->field_0x140);
+        else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
+            data->ageEntry.size = data->field_0x142 + data->field_0x140;
+    }
+    extra->field_0x28 = 1.0f;
+    extra->field_0x2c = 0.0f;
+    extra->field_0x30 = 0.0f;
+    return 1;
+}
+
+// 0x0047fce0: the diagonal counterpart of 0x00480200; *closed reports whether
+// vertex (x + dx, z + dz) is in use.
+int DrawableGridNode::UnknownFunction47fce0(int level, int n, int x, int z, int dx, int dz, int* closed)
+{
+    int a;
+    int b;
+    level--;
+    x += dx;
+    z += dz;
+    if (!(data->field_0x000[g_gridRow17[z] + x] & 0x80)) {
+        *closed = 0;
+        return n;
+    }
+    if (level != 0) {
+        n = UnknownFunction480200(level, n, x, z, -dx, 0, &a);
+        n = UnknownFunction480200(level, n, x, z, 0, -dz, &b);
+    } else {
+        if (children) {
+            *closed = 1;
+            return n;
+        }
+        a = b = 0;
+    }
+    if (!a) {
+        int k = n * 3;
+        g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+        g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x - dx, z - dx);
+        g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - dx, z + dx);
+        n++;
+    }
+    if (!b) {
+        int k = n * 3;
+        g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+        g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x + dz, z - dz);
+        g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - dz, z - dz);
+        n++;
+    }
+    *closed = 1;
+    return n;
+}
+
+// 0x0047fe70: the four triangles around a leaf edge vertex; bit 0 of a
+// cell's +7 byte picks the diagonal (written `1 - bit` as retail computes it).
+void DrawableGridNode::UnknownFunction47fe70(int x, int z, int dx, int dz, int n)
+{
+    int k = n * 3;
+    int i = g_gridRow17[z] + x;
+    int f;
+    if (dx == 0) {
+        if (dz == 1) {
+            f = block->cells[i - 18].field_0x7_b0 && (data->field_0x000[i - 18] & 0x80);
+            g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z - 1);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - 1, z - f);
+            f = (1 - block->cells[i - 17].field_0x7_b0) && (data->field_0x000[i - 16] & 0x80);
+            g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x + 1, z - f);
+            g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z - 1);
+        } else {
+            f = block->cells[i].field_0x7_b0 && (data->field_0x000[i + 18] & 0x80);
+            g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z + 1);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x + 1, z + f);
+            f = (1 - block->cells[i - 1].field_0x7_b0) && (data->field_0x000[i + 16] & 0x80);
+            g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x - 1, z + f);
+            g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z + 1);
+        }
+    } else {
+        if (dx == 1) {
+            f = block->cells[i - 18].field_0x7_b0 && (data->field_0x000[i - 18] & 0x80);
+            g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z - 1);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - 1, z - f);
+            f = (1 - block->cells[i - 1].field_0x7_b0) && (data->field_0x000[i + 16] & 0x80);
+            g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x - 1, z + f);
+            g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z + 1);
+        } else {
+            f = block->cells[i].field_0x7_b0 && (data->field_0x000[i + 18] & 0x80);
+            g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z + 1);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x + 1, z + f);
+            f = (1 - block->cells[i - 17].field_0x7_b0) && (data->field_0x000[i - 16] & 0x80);
+            g_gridIndices[k + 3] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 4] = g_gridVertexCache.GetVertex(x + 1, z - f);
+            g_gridIndices[k + 5] = g_gridVertexCache.GetVertex(x, z - 1);
+        }
+    }
+}
+
+// 0x00480200 helper (inlined): a neighbouring child closes the shared edge
+// unless it exists, draws no triangles of its own and is not empty.
+static inline int Blocked(DrawableGridNode* c)
+{
+    return !(c && c->data->field_0x12a + (c->data->b0 ? 0 : c->data->field_0x12c) == 0 && c->childMask);
+}
+
+// 0x00480200: the triangles on one edge of a cell, split at the edge midpoint
+// while subdivision levels remain (0x0047fce0 handles the diagonal halves).
+// Leaf nodes without children emit the full fan through 0x0047fe70.
+int DrawableGridNode::UnknownFunction480200(int level, int n, int x, int z, int dx, int dz, int* closed)
+{
+    int a;
+    int b;
+    level--;
+    if (dx == 0)
+        z += dz;
+    else
+        x += dx;
+    if (!(data->field_0x000[g_gridRow17[z] + x] & 0x80)) {
+        *closed = 0;
+        return n;
+    }
+    if (level != 0) {
+        if (dx == 0) {
+            int h = dz < 0 ? -dz >> 1 : -(dz >> 1);
+            n = UnknownFunction47fce0(level, n, x, z, h, h, &a);
+            n = UnknownFunction47fce0(level, n, x, z, -h, h, &b);
+        } else {
+            int h = dx < 0 ? -dx >> 1 : -(dx >> 1);
+            n = UnknownFunction47fce0(level, n, x, z, h, h, &a);
+            n = UnknownFunction47fce0(level, n, x, z, h, -h, &b);
+        }
+    } else if (children != 0) {
+        if (data->b0) {
+            a = b = 0;
+        } else {
+            if (dx == 0) {
+                if (dz > 0) {
+                    a = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x - 1]);
+                    b = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x]);
+                } else {
+                    a = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x]);
+                    b = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x - 1]);
+                }
+            } else if (dx > 0) {
+                a = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x - 1]);
+                b = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x - 1]);
+            } else {
+                a = Blocked((DrawableGridNode*)children[g_gridRow16[z] + x]);
+                b = Blocked((DrawableGridNode*)children[g_gridRow16[z - 1] + x]);
+            }
+        }
+    } else {
+        UnknownFunction47fe70(x, z, dx, dz, n);
+        *closed = 1;
+        return n + 2;
+    }
+    if (!a) {
+        int k = n * 3;
+        if (dx == 0) {
+            g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z - dz);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - dz, z);
+        } else {
+            g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x, z - dx);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x - dx, z);
+        }
+        n++;
+    }
+    if (!b) {
+        int k = n * 3;
+        if (dx == 0) {
+            g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x + dz, z);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x, z - dz);
+        } else {
+            g_gridIndices[k] = g_gridVertexCache.GetVertex(x, z);
+            g_gridIndices[k + 1] = g_gridVertexCache.GetVertex(x - dx, z);
+            g_gridIndices[k + 2] = g_gridVertexCache.GetVertex(x, z + dx);
+        }
+        n++;
+    }
+    *closed = 1;
+    return n;
+}
+
 // 0x00480700: appends triangle n of a cell corner: (x, z), (x + dx, z) and
 // (x, z + dz), wound by whether the step signs agree.
 int DrawableGridNode::UnknownFunction480700(int n, int x, int z, int dx, int dz)
@@ -370,6 +648,144 @@ int DrawableGridNode::UnknownFunction480940(void* target, int x, int z, int size
         }
     }
     return 1;
+}
+
+// 0x00480c90: submits a node's or one block's vertex range on the unlit
+// path. With lighting off (Terrain+0xc3c) the vertices get flat colours (white
+// close up, the terrain's unlit colours further away); with it on and `a5`
+// set, close-up ranges get texture coordinates from the packed offsets.
+void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+                                            int indexCount, int block)
+{
+    float detail;
+    if (block == -1)
+        detail = extra->field_0x34;
+    else
+        detail = extra->field_0x38[block].field_0x28;
+    if (g_gridGameSettings->field_0x2d0) {
+        if (terrain->field_0xca8 < detail)
+            terrain->field_0x18->UnknownVirtualSlot8(4, 1, 0);
+        else
+            terrain->field_0x18->UnknownVirtualSlot8(4, 0, 0);
+    }
+    if (terrain->field_0xc3c) {
+        if (a5) {
+            if (terrain->field_0xca4 < detail) {
+                float scale = g_gridDrawNormalScale;
+                if (level)
+                    scale = g_gridDrawNormalScale * 16.0f;
+                for (int i = 0; i < vertexCount; i++) {
+                    unsigned int packed = vertices[i].packed;
+                    float* uv = &vertices[i].field_0x10;
+                    uv[0] = (packed >> 16) * scale;
+                    uv[1] = (packed & 0xffff) * scale;
+                }
+                if (!terrain->field_0x18->UnknownVirtualSlot15(4, 0x222, vertices, vertexCount, indices, indexCount, 0))
+                    return;
+            }
+        } else {
+            terrain->field_0x2c.UnknownFunction484f10(vertices, vertexCount);
+            if (block >= 0)
+                UnknownVirtualSlot7(block);
+            else
+                UnknownVirtualSlot6();
+            if (terrain->field_0x38 && extra->field_0x08 && (extra->field_0x08->field_0x68 & 1)) {
+                if (block >= 0) {
+                    GridBlockRecord* r = &extra->field_0x38[block];
+                    extra->field_0x08->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
+                                                             &vertices->u, &vertices->v, vertexCount, 0x20);
+                } else {
+                    extra->field_0x08->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c,
+                                                             &extra->field_0x30, &vertices->u, &vertices->v,
+                                                             vertexCount, 0x20);
+                }
+            }
+            if (terrain->field_0xca4 < detail) {
+                for (int i = 0; i < vertexCount; i++) {
+                    vertices[i].color = -1;
+                    vertices[i].specular = 0;
+                }
+                if (!terrain->field_0x18->UnknownVirtualSlot15(4, 0x1e2, vertices, vertexCount, indices, indexCount, 0))
+                    return;
+            } else {
+                int color = terrain->unlitColor;
+                int specular = terrain->unlitSpecular;
+                for (int i = 0; i < vertexCount; i++) {
+                    vertices[i].color = color;
+                    vertices[i].specular = specular;
+                }
+                if (!terrain->field_0x18->UnknownVirtualSlot15(4, 0x1e2, vertices, vertexCount, indices, indexCount, 0))
+                    return;
+            }
+        }
+    } else {
+        terrain->field_0x2c.UnknownFunction484f10(vertices, vertexCount);
+        if (block >= 0)
+            UnknownVirtualSlot7(block);
+        else
+            UnknownVirtualSlot6();
+        if (terrain->field_0x38 && extra->field_0x08 && (extra->field_0x08->field_0x68 & 1)) {
+            if (block >= 0) {
+                GridBlockRecord* r = &extra->field_0x38[block];
+                extra->field_0x08->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
+                                                         &vertices->u, &vertices->v, vertexCount, 0x20);
+            } else {
+                extra->field_0x08->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
+                                                         &vertices->u, &vertices->v, vertexCount, 0x20);
+            }
+        }
+        terrain->field_0xc88->UnknownFunction401250(&data->ageEntry);
+        if (!terrain->field_0x18->UnknownVirtualSlot15(4, 0x1e2, vertices, vertexCount, indices, indexCount, 0))
+            return;
+    }
+    terrain->field_0x88 += indexCount;
+    terrain->field_0x8c += vertexCount;
+}
+
+// 0x00480fb0: submits a node's (block == -1) or one block's lit vertex range:
+// selects the texture through slot 6 or 7, lets the managed texture update
+// the texture coordinates, switches the close-up stage states on or off by
+// the detail limit, marks the buffers used and draws.
+void DrawableGridNode::UnknownFunction480fb0(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
+                                            int indexCount, int block)
+{
+    if (g_gridGameSettings->field_0x2d0 || !a5)
+        return;
+    float detail;
+    if (block == -1)
+        detail = extra->field_0x34;
+    else
+        detail = extra->field_0x38[block].field_0x28;
+    if (block >= 0)
+        UnknownVirtualSlot7(block);
+    else
+        UnknownVirtualSlot6();
+    if (terrain->field_0x38 && extra->field_0x08 && (extra->field_0x08->field_0x68 & 1)) {
+        if (block >= 0) {
+            GridBlockRecord* r = &extra->field_0x38[block];
+            extra->field_0x08->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24, &vertices->u,
+                                                     &vertices->v, vertexCount, 0x20);
+        } else {
+            extra->field_0x08->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
+                                                     &vertices->u, &vertices->v, vertexCount, 0x20);
+        }
+    }
+    if (terrain->field_0xca4 < detail) {
+        if (terrain->field_0xcb4 == 0) {
+            terrain->field_0x18->UnknownVirtualSlot7(1, 0x11, 2);
+            terrain->field_0x18->UnknownVirtualSlot7(1, 0x12, 1);
+            terrain->field_0xcb4 = 1;
+        }
+    } else if (terrain->field_0xcb4 != 0) {
+        terrain->field_0x18->UnknownVirtualSlot7(1, 0x11, g_gridGameSettings->field_0x550);
+        terrain->field_0x18->UnknownVirtualSlot7(1, 0x12, g_gridGameSettings->field_0x554);
+        terrain->field_0xcb4 = 0;
+    }
+    terrain->field_0xc88->UnknownFunction401250(&data->ageEntry);
+    if (terrain->field_0x18->UnknownVirtualSlot15(4, 0x222, vertices, vertexCount, indices, indexCount, 0)) {
+        terrain->field_0x88 += indexCount;
+        terrain->field_0x8c += vertexCount;
+    }
 }
 
 // 0x00481170
@@ -493,6 +909,69 @@ void DrawableGridNode::UnknownFunction4826d0()
     data->field_0x122 = 0;
     data->field_0x128 = 0xffff;
     data->field_0x124 = 0xffff;
+}
+
+// 0x00482760: re-tests the vertices whose curve error lies between the
+// node's old and new detail limits (GridBaseBlock keeps the vertices sorted by
+// curve value, +0x908 indexes the sorted list): newly coarse ones are
+// released, newly fine ones pinned, the rest of the band re-tested.
+void DrawableGridNode::UnknownFunction482760()
+{
+    if (childMask == 0)
+        return;
+    if (children && !data->b0) {
+        for (int i = 0; i < 256; i++) {
+            if (children[i]) {
+                if (childMask == 0x200000)
+                    ((DrawableGridNode*)children[i])->childMask = 0x3fffff;
+                ((DrawableGridNode*)children[i])->UnknownFunction482760();
+            }
+        }
+    }
+    terrain->field_0x53c++;
+    int lo = g_gridBaseCurveInverse[data->field_0x122];
+    int cur = g_gridBaseCurveInverse[data->field_0x126];
+    int hi = g_gridBaseCurveInverse[data->field_0x124];
+    if (hi != 0xff)
+        hi++;
+    int hiOld = g_gridBaseCurveInverse[data->field_0x128];
+    if (hiOld != 0xff)
+        hiOld++;
+    int k;
+    for (k = block->field_0x908[cur]; k < 17 * 17 && k < block->field_0x908[lo]; k++) {
+        int i = block->field_0xb08[k];
+        data->field_0x000[i] &= ~0x40;
+        if (!(data->field_0x000[i] & 0xf)) {
+            terrain->field_0xac++;
+            if (!(data->field_0x000[i] & 0x10) && (data->field_0x000[i] & 0x80)) {
+                data->field_0x000[i] &= ~0x80;
+                data->b1 = 1;
+                UnknownFunction482c90(g_gridEdges[i].x, g_gridEdges[i].z, 0);
+            }
+        }
+    }
+    if (hiOld > hi) {
+        for (k = block->field_0x908[hi]; k < 17 * 17 && k <= block->field_0x908[hiOld]; k++) {
+            int i = block->field_0xb08[k];
+            data->field_0x000[i] |= 0x40;
+            if (!(data->field_0x000[i] & 0xf)) {
+                terrain->field_0xa8++;
+                if (!(data->field_0x000[i] & 0x80)) {
+                    data->field_0x000[i] |= 0x80;
+                    data->b1 = 1;
+                    UnknownFunction482c90(g_gridEdges[i].x, g_gridEdges[i].z, 0x80);
+                }
+            }
+        }
+    }
+    for (k = block->field_0x908[lo]; k < 17 * 17 && k < block->field_0x908[hi]; k++) {
+        int i = block->field_0xb08[k];
+        if (data->field_0x000[i] & 0xf)
+            terrain->field_0xb8[i] = terrain->field_0x53c;
+        else
+            UnknownFunction482a40(g_gridEdges[i].x, g_gridEdges[i].z);
+    }
+    data->field_0x130 = terrain->field_0xb4;
 }
 
 // 0x00482a40: re-tests one vertex and flags it (bit 6: failed the test,
@@ -645,6 +1124,77 @@ int DrawableGridNode::UnknownFunction483100()
         }
     }
     return 1;
+}
+
+// 0x004835c0: a vertex on the border of `child` changed; passes the change to
+// the neighbouring children of this node, or for children on this node's own
+// border, down from the root node through 0x00483200.
+void DrawableGridNode::UnknownFunction4835c0(DrawableGridNode* child, int x, int z, int flag, int dir,
+                                            GridBaseCell* cell)
+{
+    DrawableGridNode* n;
+    if ((child->field_0x2a & 0xf) != 0 && (child->field_0x2a & 0xf) != 0xf &&
+        (child->field_0x2a & 0xf0) != 0 && (child->field_0x2a & 0xf0) != 0xf0) {
+        if (x == 0) {
+            n = (DrawableGridNode*)children[child->field_0x2a - 1];
+            if (n)
+                n->UnknownFunction482dd0(16, z, flag, dir, cell);
+            if (z == 0) {
+                n = (DrawableGridNode*)children[child->field_0x2a - 17];
+                if (n)
+                    n->UnknownFunction482dd0(16, 16, flag, dir, cell);
+                n = (DrawableGridNode*)children[child->field_0x2a - 16];
+                if (n)
+                    n->UnknownFunction482dd0(0, 16, flag, dir, cell);
+            } else if (z == 16) {
+                n = (DrawableGridNode*)children[child->field_0x2a + 15];
+                if (n)
+                    n->UnknownFunction482dd0(16, 0, flag, dir, cell);
+                n = (DrawableGridNode*)children[child->field_0x2a + 16];
+                if (n)
+                    n->UnknownFunction482dd0(0, 0, flag, dir, cell);
+            }
+        } else if (x == 16) {
+            n = (DrawableGridNode*)children[child->field_0x2a + 1];
+            if (n)
+                n->UnknownFunction482dd0(0, z, flag, dir, cell);
+            if (z == 0) {
+                n = (DrawableGridNode*)children[child->field_0x2a - 15];
+                if (n)
+                    n->UnknownFunction482dd0(0, 16, flag, dir, cell);
+                n = (DrawableGridNode*)children[child->field_0x2a - 16];
+                if (n)
+                    n->UnknownFunction482dd0(16, 16, flag, dir, cell);
+            } else if (z == 16) {
+                n = (DrawableGridNode*)children[child->field_0x2a + 17];
+                if (n)
+                    n->UnknownFunction482dd0(0, 0, flag, dir, cell);
+                n = (DrawableGridNode*)children[child->field_0x2a + 16];
+                if (n)
+                    n->UnknownFunction482dd0(16, 0, flag, dir, cell);
+            }
+        } else if (z == 0) {
+            n = (DrawableGridNode*)children[child->field_0x2a - 16];
+            if (n)
+                n->UnknownFunction482dd0(x, 16, flag, dir, cell);
+        } else if (z == 16) {
+            n = (DrawableGridNode*)children[child->field_0x2a + 16];
+            if (n)
+                n->UnknownFunction482dd0(x, 0, flag, dir, cell);
+        }
+    } else {
+        GridNode* root = this;
+        if (root) {
+            while (root->parent)
+                root = root->parent;
+            int shift = 0;
+            for (int i = 0; i < level - 1; i++)
+                shift += 4;
+            ((DrawableGridNode*)root)->UnknownFunction483200((child->gridX + x) << shift,
+                                                             (child->gridZ + z) << shift, flag, dir, cell,
+                                                             child->level);
+        }
+    }
 }
 
 // 0x00481a20: frustum test of 4 x 4 block `block` (Z order); records the

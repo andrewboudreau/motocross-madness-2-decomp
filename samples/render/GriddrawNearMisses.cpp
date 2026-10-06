@@ -49,6 +49,31 @@
 // the parent hand-off; VC6 here keeps two copies (they differ in edx/ecx)
 // and places the return check inline. An update flag, gotos, an inverted
 // 0x80 test and the inverted branch order were tried.
+//
+// DrawableGridNode 0x0047f210 (per-block buffer rebuild, 1576 bytes; 426 of
+// 1586): the calls, reallocations, copies and the bookkeeping after the loops
+// match in shape. VC6 here gives x edi and the triangle-count copy esi
+// (retail: esi and edi), swaps the frame slots of z and indexTotal and of bx
+// and the two strength-reduced block offsets, loads minY before maxY for the
+// box centre, re-reads indexTotal for the index byte count and stores a dead
+// vertexStart * 32 (10 bytes longer). Tried: all 24 declaration orders of
+// x, z, indexTotal and bx (no effect), x and bx as one variable (VC6 merges
+// them; retail keeps both, so x steps inside the body), three m/n
+// initialisations and the origin taken from x/z.
+//
+// DrawableGridNode 0x00481b30 (block distance, 391 bytes; 139 of 393): retail
+// keeps the viewer x and the block size on the x87 stack and copies viewer
+// y and z to the frame, then adds the x and z terms before the y test with one
+// FastSqrt call per y case. VC6 here keeps a different value on the x87
+// stack. Tried four axis-distance spellings, three return forms and all six
+// orders of the viewer locals.
+//
+// DrawableGridNode 0x00483200 (border vertex walk, 955 bytes; 84 of 956):
+// control flow, the tail call VC6 turns into a loop and every call match;
+// VC6 gives x ebp and z ebx (retail: ebx and ebp) and re-reads `level` for
+// the shift loop where retail reuses al. Tried the shift and count loop
+// forms, rx as a variable or inline, the cell comparison forms, an explicit
+// node loop (worse) and x reused as the divided column.
 
 #include <float.h>
 #include <string.h>
@@ -57,7 +82,11 @@
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/TextureMap.h"
 
-// Per-TU copy of the shared row table (see Griddraw.cpp).
+// Per-TU copies of the shared row tables (see Griddraw.cpp).
+static int g_gridRow16[17] = {
+    0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80,
+    0x90, 0xa0, 0xb0, 0xc0, 0xd0, 0xe0, 0xf0, 0x100,
+};
 static int g_gridRow17[18] = {
     0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
     0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x110, 0x121,
@@ -69,6 +98,11 @@ extern int g_gridQuadOrder[16];
 extern int g_gridOriginX;
 extern int g_gridOriginZ;
 extern int g_gridExtraBytes;
+extern int g_gridDrawMemory;
+extern int g_gridDrawMemoryPeak;
+extern unsigned short g_gridIndices[0xd8c / 2];
+extern GridVertexCache g_gridVertexCache;
+float FastSqrt(float x);
 
 // 0x0047de90: index of vertex (x, z) of the current node in the vertex
 // list, appending it on first use this frame. The first vertex of a node
@@ -411,7 +445,7 @@ void DrawableGridNode::UnknownFunction482b40(int x0, int z0, int w, int h, int h
 
 // 0x00482dd0: sets or clears direction bit `dir` of a vertex, re-tests it
 // and forwards border vertices to the parent node.
-void DrawableGridNode::UnknownFunction482dd0(int x, int z, int flag, int dir, int noParent)
+void DrawableGridNode::UnknownFunction482dd0(int x, int z, int flag, int dir, GridBaseCell* origin)
 {
     if (x < 0 || z < 0 || x > 16 || z > 16)
         return;
@@ -438,6 +472,261 @@ void DrawableGridNode::UnknownFunction482dd0(int x, int z, int flag, int dir, in
             UnknownFunction482c90(x, z, data->field_0x000[i] & 0x80);
         }
     }
-    if (parent && !noParent && (x == 0 || x == 16 || z == 0 || z == 16))
+    if (parent && !origin && (x == 0 || x == 16 || z == 0 || z == 16))
         ((DrawableGridNode*)parent)->UnknownFunction4835c0(this, x, z, flag, dir, cell);
+}
+
+// 0x0047f210: per-block buffer rebuild (see the note at the top).
+int DrawableGridNode::UnknownFunction47f210()
+{
+    int x;
+    int z = 0;
+    int indexTotal = 0;
+    int before = data->field_0x12a;
+    terrain->field_0xa4++;
+    int b = 0;
+    int vertexTotal = 0;
+    int bz;
+    float saved = data->field_0x160;
+    for (bz = 0; bz < 16; bz += 4) {
+        x = 0;
+        for (int bx = 0; bx < 16; bx += 4) {
+            int closed;
+            int n;
+            int m;
+            int size = UnknownVirtualSlot8(b);
+            data->field_0x160 = saved;
+            if (size == 0x40)
+                data->field_0x160 *= 4.0f;
+            g_gridVertexCache.Reset(this);
+            g_gridOriginX = bx;
+            g_gridOriginZ = bz;
+            int vertexStart = vertexTotal;
+            int indexStart = indexTotal;
+            n = 0;
+            m = n;
+            n = UnknownFunction47fce0(4, n, x, z + 4, 2, -2, &closed);
+            if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+                ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+                n = UnknownFunction480700(n, x, z + 4, 4, -4);
+            m = n;
+            x += 4;
+            n = UnknownFunction47fce0(4, n, x, z, -2, 2, &closed);
+            if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
+                ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+                n = UnknownFunction480700(n, x, z, -4, 4);
+            vertexTotal += g_gridVertexCache.count;
+            indexTotal += n * 3;
+            ((GridBlockRange*)data->field_0x17c)[b].centerY = (g_gridVertexCache.maxY + g_gridVertexCache.minY) * 0.5f;
+            ((GridBlockRange*)data->field_0x17c)[b].extentY =
+                (g_gridVertexCache.maxY - g_gridVertexCache.minY) * terrain->gridCellSize * 0.5f;
+            ((GridBlockRange*)data->field_0x17c)[b].end = vertexTotal;
+            ((GridBlockRange*)data->field_0x17c)[b].indexEnd = indexTotal;
+            extra->field_0x38[b].field_0x1c = 1.0f;
+            extra->field_0x38[b].field_0x20 = 0;
+            extra->field_0x38[b].field_0x24 = 0;
+            if (n != 0) {
+                int vertexBytes = vertexTotal * 32;
+                int indexBytes = (indexTotal + vertexTotal) * 2;
+                if (data->field_0x134 == 0 || vertexBytes > data->field_0x140) {
+                    g_gridDrawMemory -= data->field_0x140;
+                    void* old = data->field_0x134;
+                    int oldSize = data->field_0x140;
+                    data->field_0x140 = vertexBytes + 0x80;
+                    data->field_0x134 = DebugMalloc(data->field_0x140, __FILE__, 1077);
+                    if (data->field_0x134 == 0) {
+                        data->field_0x140 = 0;
+                        data->field_0x13c = 0;
+                        data->field_0x13e = 0;
+                        return 0;
+                    }
+                    if (old) {
+                        memcpy(data->field_0x134, old, oldSize);
+                        operator delete(old, __FILE__, 1085);
+                    }
+                    g_gridDrawMemory += data->field_0x140;
+                    if (g_gridDrawMemory > g_gridDrawMemoryPeak)
+                        g_gridDrawMemoryPeak = g_gridDrawMemory;
+                }
+                if (data->field_0x138 == 0 || indexBytes > data->field_0x142) {
+                    g_gridDrawMemory -= data->field_0x142;
+                    void* old = data->field_0x138;
+                    int oldSize = data->field_0x142;
+                    data->field_0x142 = indexBytes + 0x20;
+                    data->field_0x138 = DebugMalloc(data->field_0x142, __FILE__, 1098);
+                    if (data->field_0x138 == 0) {
+                        data->field_0x138 = 0;
+                        data->field_0x142 = 0;
+                        data->field_0x13c = 0;
+                        data->field_0x13e = 0;
+                        return 0;
+                    }
+                    if (old) {
+                        memcpy(data->field_0x138, old, oldSize);
+                        operator delete(old, __FILE__, 1107);
+                    }
+                    g_gridDrawMemory += data->field_0x142;
+                    if (g_gridDrawMemory > g_gridDrawMemoryPeak)
+                        g_gridDrawMemoryPeak = g_gridDrawMemory;
+                }
+                memcpy((GridVertex*)data->field_0x134 + vertexStart, g_gridVertexCache.vertices,
+                       (vertexTotal - vertexStart) * 32);
+                memcpy((unsigned short*)data->field_0x138 + indexStart, g_gridIndices,
+                       (indexTotal - indexStart) * 2);
+            }
+            b++;
+        }
+        z += 4;
+    }
+    if (data->ageEntry.size == 0)
+        terrain->field_0xc88->UnknownFunction401050(&data->ageEntry, UnknownFunction47ecc0, this, 0,
+                                                   data->field_0x142 + data->field_0x140);
+    else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
+        data->ageEntry.size = data->field_0x142 + data->field_0x140;
+    data->field_0x13c = vertexTotal;
+    data->field_0x13e = indexTotal;
+    data->field_0x12a = indexTotal / 3;
+    if ((data->field_0x12a == 0 || before == 0) && data->field_0x12a != before && parent)
+        ((DrawableGridNode*)parent)->data->b1 = 1;
+    if ((data->field_0x12a == 0 || before == 0) && data->field_0x12a != before && parent)
+        ((DrawableGridNode*)parent)->data->b1 = 1;
+    if (data->field_0x12a == 0) {
+        data->field_0x13c = 0;
+        data->field_0x13e = 0;
+    }
+    data->field_0x160 = saved;
+    return 1;
+}
+
+// 0x00481b30: distance from the viewer to a 4 x 4 block's box.
+float DrawableGridNode::UnknownFunction481b30(int block)
+{
+    float ex = terrain->field_0x60;
+    float ey = terrain->field_0x64;
+    float ez = terrain->field_0x68;
+    float size = (data->field_0x16c - data->field_0x164) * 0.25f;
+    float minX = (block % 4) * size + data->field_0x164;
+    float maxX = minX + size;
+    float minZ = (block / 4) * size + data->field_0x168;
+    float maxZ = minZ + size;
+    float dist;
+    float d = ex - minX;
+    if (d < 0.0f)
+        dist = d * d;
+    else if (ex - maxX > 0.0f)
+        dist = (ex - maxX) * (ex - maxX);
+    else
+        dist = 0.0f;
+    if (ez - minZ < 0.0f)
+        dist += (ez - minZ) * (ez - minZ);
+    else if (ez - maxZ > 0.0f)
+        dist += (ez - maxZ) * (ez - maxZ);
+    else
+        dist += 0.0f;
+    float below = ey - field_0x18;
+    float above = ey - field_0x1c;
+    if (below < 0.0f)
+        return FastSqrt(below * below + dist);
+    if (above > 0.0f)
+        return FastSqrt(above * above + dist);
+    return FastSqrt(0.0f + dist);
+}
+
+// 0x00483200: walks a border vertex down the node tree (VC6 turns the final
+// child call into a loop, as retail does).
+void DrawableGridNode::UnknownFunction483200(int x, int z, int flag, int dir, GridBaseCell* origin, int minLevel)
+{
+    if (level != 0) {
+        int shift = 0;
+        for (int i = 0; i < level; i++)
+            shift += 4;
+        int unit = 1 << shift;
+        int mask = unit - 1;
+        int rx = x & mask;
+        if (rx == 0 && (z & mask) == 0) {
+            GridBaseCell* cell = &block->cells[g_gridRow17[z >> shift] + (x >> shift)];
+            if (cell != origin)
+                UnknownFunction482dd0(x >> shift, z >> shift, flag, dir, origin);
+        }
+        if (children == 0 || level <= minLevel)
+            return;
+        int cx = x;
+        int cz = z;
+        int px = x - 1;
+        int pz = z - 1;
+        int j = level;
+        while (j--) {
+            cx /= 16;
+            cz /= 16;
+            px /= 16;
+            pz /= 16;
+        }
+        DrawableGridNode* child;
+        if (px == cx) {
+            if (cx >= 16)
+                return;
+            if (pz == cz) {
+                if (cz >= 16)
+                    return;
+                child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
+                if (child == 0)
+                    return;
+                child->UnknownFunction483200(rx, z & mask, flag, dir, origin, minLevel);
+            } else {
+                if (cz < 16) {
+                    child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
+                    if (child)
+                        child->UnknownFunction483200(rx, z & mask, flag, dir, origin, minLevel);
+                }
+                if (pz >= 16)
+                    return;
+                child = (DrawableGridNode*)children[g_gridRow16[pz] + cx];
+                if (child == 0)
+                    return;
+                child->UnknownFunction483200(rx, (z & mask) + unit, flag, dir, origin, minLevel);
+            }
+        } else if (pz == cz) {
+            if (cx < 16 && cz < 16) {
+                child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
+                if (child)
+                    child->UnknownFunction483200(rx, z & mask, flag, dir, origin, minLevel);
+            }
+            if (px >= 16 || cz >= 16)
+                return;
+            child = (DrawableGridNode*)children[g_gridRow16[cz] + px];
+            if (child == 0)
+                return;
+            child->UnknownFunction483200(rx + unit, z & mask, flag, dir, origin, minLevel);
+        } else {
+            if (cx < 16) {
+                if (cz < 16) {
+                    child = (DrawableGridNode*)children[g_gridRow16[cz] + cx];
+                    if (child)
+                        child->UnknownFunction483200(rx, z & mask, flag, dir, origin, minLevel);
+                }
+                if (pz < 16) {
+                    child = (DrawableGridNode*)children[g_gridRow16[pz] + cx];
+                    if (child)
+                        child->UnknownFunction483200(rx, z & mask + unit, flag, dir, origin, minLevel);
+                }
+            }
+            if (px >= 16)
+                return;
+            if (cz < 16) {
+                child = (DrawableGridNode*)children[g_gridRow16[cz] + px];
+                if (child)
+                    child->UnknownFunction483200(rx + unit, z & mask, flag, dir, origin, minLevel);
+            }
+            if (pz >= 16)
+                return;
+            child = (DrawableGridNode*)children[g_gridRow16[pz] + px];
+            if (child == 0)
+                return;
+            child->UnknownFunction483200(rx + unit, (z & mask) + unit, flag, dir, origin, minLevel);
+        }
+        return;
+    }
+    GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
+    if (cell != origin)
+        UnknownFunction482dd0(x, z, flag, dir, origin);
 }
