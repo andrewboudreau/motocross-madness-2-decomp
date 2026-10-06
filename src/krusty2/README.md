@@ -39,7 +39,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts) |
 | `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character headers: 37 strict cases; `SoultreeQuadTreeRenderer.cpp`: 8 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
-| `vehicle/` | `Vehicle.cpp` (57 strict cases) and `Bike.cpp` (31 strict cases), `Vehicle.h`, `Bike.h` |
+| `vehicle/` | `Vehicle.cpp` (57 strict cases), `Bike.cpp` (31 strict cases) and `BikeAI.cpp` (23 strict cases), `Vehicle.h`, `Bike.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
 | `bvh/` | Shared box-tree layouts; builder candidate in `samples/physics/bvh/` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |

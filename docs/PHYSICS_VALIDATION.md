@@ -139,6 +139,33 @@ python tools/run_physics_samples.py --strict \
 
 This run reports `23/23 strict exact`.
 
+## Wave-9 BikeAI slice
+
+`src/krusty2/vehicle/BikeAI.cpp` passes 23 strict cases:
+- the filter-static and five empty `$E` pairs;
+- the Math3D kVec3 `$E` set;
+- the Vec3 normalize `0x40d120`;
+- the landing prediction `0x40e370`;
+- the length helper `0x413190`.
+
+Extent: `0x40d070..0x416e1f` (strong inference). Bike.cpp ends at
+`0x40d063`, and the BikeAI `__FILE__` xrefs lie inside `0x414370` and
+`0x415640`. A second Math3D set at `0x417350` means BikeCamera code
+(`0x416e20..0x417aff`) is a separate, unattested unit.
+
+The near miss, steering direction `0x40e510`, is in
+`samples/physics/bikeai`; it differs by an esi/edi swap and frame order.
+The two KrustyBike methods `0x413200` and `0x414370` wait on KrustyBike.h's
+promotion. The five other large functions are not attempted.
+
+```bash
+python tools/run_physics_samples.py --strict \
+  --source src/krusty2/vehicle/BikeAI.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+This run reports `23/23 strict exact`.
+
 ## Code-generation limits behind the remaining partials
 
 These were measured with VC6 SP3 `/O2` on the real targets and on small synthetic

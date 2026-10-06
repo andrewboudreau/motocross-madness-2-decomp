@@ -1218,5 +1218,235 @@
     "expect": "exact",
     "notes": "slot 96 (introduced); exact under vc6_o2_ml (no /G6)",
     "bindings": "Vehicle.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x0040d070",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "BikeAI.cpp file-static filter g_BikeAIFilter_00577ac0 initializer jmp; opens the TU right after Bike.cpp slot 96",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x0040d080",
+    "target_size": 51,
+    "expect": "exact",
+    "notes": "filter constructor inlined: stores 0, 0.5, 1, -1, 1 in member order +0,+4,+0xc,+0x10,+8 (global 0x00577ac0, read by 0x00413200)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E17",
+    "target_va": "0x0040d0c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer jmp (identity unknown)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E16",
+    "target_va": "0x0040d0d0",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer body (bare ret)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E20",
+    "target_va": "0x0040d0e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer jmp (identity unknown)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E19",
+    "target_va": "0x0040d0f0",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer body (bare ret)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E23",
+    "target_va": "0x0040d100",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer jmp (identity unknown)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E22",
+    "target_va": "0x0040d110",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer body (bare ret)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "UnknownFunction40d120",
+    "target_va": "0x0040d120",
+    "target_size": 182,
+    "expect": "exact",
+    "notes": "cdecl Vec3 normalize by value (zero vector returned unchanged); (x*x + y*y) + z*z grouping",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E26",
+    "target_va": "0x0040d1e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer jmp after 0x0040d120",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E25",
+    "target_va": "0x0040d1f0",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer body (bare ret)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "UnknownFunction40e370",
+    "target_va": "0x0040e370",
+    "target_size": 412,
+    "expect": "exact",
+    "notes": "ballistic landing prediction over Terrain::QueryGround; velocity copied first, p += v * 0.1f gives retail's hoisted step temp",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "UnknownFunction413190",
+    "target_va": "0x00413190",
+    "target_size": 106,
+    "expect": "exact",
+    "notes": "cdecl |v| with 0/1 shortcuts; out-of-line copy placed after 0x0040eca0",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00414210",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "math/Math3D.h kVec3Zero initializer jmp (global 0x00577a08)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00414220",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3Zero initializer body (copy-init)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00414260",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3XAxis initializer jmp (global 0x00577ab0)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x00414270",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3XAxis initializer body",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004142b0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3YAxis initializer jmp (global 0x00578db0)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004142c0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3YAxis initializer body",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x00414300",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3ZAxis initializer jmp (global 0x005779f0)",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00414310",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3ZAxis initializer body",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E29",
+    "target_va": "0x00414350",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer jmp after the Math3D set",
+    "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAI.cpp",
+    "candidate_symbol_contains": "_$E28",
+    "target_va": "0x00414360",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "empty-constructor static initializer body (bare ret)",
+    "bindings": "BikeAI.bindings.json"
   }
 ]
