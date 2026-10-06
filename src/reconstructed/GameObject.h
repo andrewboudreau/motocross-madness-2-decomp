@@ -49,6 +49,11 @@ public:
     // not reconstructed.
     int UnknownFunction469190(GameObject* child, int value);
     int UnknownFunction469130(GameObject* child); // 0x00469130 (KrustyUI 0x004988a0)
+    // 0x00469130 takes two arguments (ret 8); GUIManager.cpp passes -1 as the second.
+    int UnknownFunction469130(GameObject* child, int value);
+    int UnknownFunction469260(GameObject* parent, int value); // 0x00469260 (GUIManager.cpp)
+    // 0x00469770: finds a descendant by name (GUIManager.cpp passes 1, "GroundFog").
+    GameObject* UnknownFunction469770(int mode, const char* name);
     void UnknownFunction4691f0();          // 0x004691f0
     // 0x00469680: releases this object and every later sibling, back to front.
     int UnknownFunction469680();
@@ -68,6 +73,8 @@ protected:
     friend class NameOverlay; // reads its racer's +0x25 bit 0 (0x005190e0)
     friend class Wrecker;   // clears its rigid body's +0x25 bit 0 (0x005327c0)
     friend class RaceSound; // turns the "SoundGroup" children off (0x004e3430)
+    friend class GUIManager; // reads a dialog's +0x25 bit 0 (0x00485bd0)
+    friend class GUIUser;   // reads a control's +0x25 bit 3 and +0x28 (0x00487730, 0x00487800)
     // RaceStatus.cpp 0x004e5ca0 reads a racer's +0x25 bit 0.
     friend int UnknownFunction4e5ca0(struct UnknownEventRacerPart** list);
 

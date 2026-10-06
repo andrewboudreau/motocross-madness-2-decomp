@@ -22,6 +22,8 @@ public:
     // 0x0048a550: moves every binding on `axis` by `amount` scaled to its
     // maximum.
     void UnknownFunction48a550(int axis, float amount);
+    // 0x0048a420: attaches `binding` to the list for its axis (GUIManager.cpp).
+    int UnknownFunction48a420(UnknownControlBinding* binding);
 
     friend class ControlInterface; // reads the input entries
 

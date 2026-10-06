@@ -109,6 +109,7 @@ public:
     int UnknownFunction43ce70(UnknownControlMapping* newMapping);           // 0x0043ce70
     void UnknownFunction43cea0(int control, int kind, int pressed, int device); // 0x0043cea0
     int UnknownFunction43cf00(int value);   // 0x0043cf00, near miss in samples/control
+    int UnknownFunction43ce90();            // 0x0043ce90: next binding id (GUIManager.cpp)
 
     int joystickCount;                        // joystick count
     int activeJoystickIndex;                        // active joystick index

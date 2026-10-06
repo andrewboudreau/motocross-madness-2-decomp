@@ -13,6 +13,7 @@ public:
     virtual ~InputDevice();       // 0x004897d0 (deleting wrapper 0x004897b0)
 
     int UnknownFunction4897e0(int value); // 0x004897e0
+    friend class GUIInputDevice;  // reads deviceKind (GUIManager.cpp 0x00487150)
 
 protected:
     int axisCount;                  // +0x04
