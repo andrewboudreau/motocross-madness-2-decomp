@@ -149,7 +149,7 @@ strictly in 6 functions; see [TEXTSERVICE](TEXTSERVICE.md).
 PCVideoCard.cpp (22) and VideoCard.cpp (6), the DirectDraw display
 object, match strictly; see [PCVIDEOCARD](PCVIDEOCARD.md).
 
-ObjectPicker.cpp (the camera pick ray) matches strictly in 12 functions;
+ObjectPicker.cpp (the camera pick ray) matches strictly in all 14 functions;
 see [OBJECTPICKER](OBJECTPICKER.md).
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
