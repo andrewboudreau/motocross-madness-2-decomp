@@ -1618,3 +1618,33 @@ char* UnknownChatInput::UnknownFunction51eb10(int index, int* value)
     }
     return 0;
 }
+
+// 0x0051e910: redraws name tag `index` (all of them for -1) into the shared
+// texture, then colours it with a grey that darkens with the cycle
+// TrackGameMode+0x90.
+void ChatOverlay::UnknownFunction51e910(int index)
+{
+    unsigned char level = 0xff - g_UnknownGlobal56e26c->mode.field_0x90 * 0x33;
+    if (index == -1) {
+        for (int i = 0; i < field_0x198; i++)
+            UnknownFunction4b6710(&field_0x30c[i]);
+    } else {
+        UnknownFunction4b6710(&field_0x30c[index]);
+    }
+    PCTextureMap* texture = (PCTextureMap*)field_0x34;
+    void* dc;
+    if (texture->field_0x70->UnknownMethod17(&dc) == 0) {
+        SetBkColor(dc, 1);
+        SetBkMode(dc, 1);
+        SetTextColor(dc, 0xffffff);
+        if (index == -1) {
+            for (int i = 0; i < field_0x198; i++)
+                UnknownFunction51e3f0(dc, i);
+        } else {
+            UnknownFunction51e3f0(dc, index);
+        }
+        texture->field_0x70->UnknownMethod26(dc);
+    }
+    UnknownFunction4b6880(0x89, 0x46, 0xf000 | ((level & ~0xf) << 4) | (level & ~0xf) | (level >> 4));
+    field_0x2c->UnknownVirtualSlot9(0, -1);
+}

@@ -63,15 +63,15 @@ holds the line being typed and four history entries.
 Their calibration cases are under `# TrackOverlay.cpp` in
 `tools/run_calibration.py`.
 
+`0x0051e910` (redraws one name tag or all) is exact now that
+`Overlay::UnknownFunction4b6880` takes an `unsigned short` colour. Retail
+builds the 4444 grey in 16-bit registers and pushes it without
+zero-extension.
+
 ### Near misses
 
 These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
 
-- `0x0051e910` (redraws one name tag or all, 308 bytes): exact once
-  `Overlay::UnknownFunction4b6880` takes an `unsigned short` colour. Retail
-  builds the 4444 grey in 16-bit registers and pushes it without
-  zero-extension. 0x004b6880 stays exact with that parameter type, but its
-  mangled name, and so its calibration case, changes.
 - `0x0051e3f0` (draws one name tag, 974 bytes, 964 match): the frame matches;
   in the racer-tag branch retail picks eax/ecx/edx for the racer, the buffer
   and the game pointer, VC6 here edx/eax/ecx.

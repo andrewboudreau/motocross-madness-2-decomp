@@ -261,7 +261,7 @@ void Overlay::UnknownFunction4b6380() {
 // 0x004b6710 is a near miss: samples/render/OverlayNearMisses.cpp.
 
 // 0x004b6880
-int Overlay::UnknownFunction4b6880(int row, int count, int color) {
+int Overlay::UnknownFunction4b6880(int row, int count, unsigned short color) {
     long sourcePitch, pitch;
     void* source = field_0x34->UnknownVirtualSlot13(0, &sourcePitch, 0x801);
     void* bits = field_0x2c->UnknownVirtualSlot13(0, &pitch, 0x801);

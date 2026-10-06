@@ -44,7 +44,7 @@ public:
     // 0x004b6880: for `count` rows from `row`, every texel of the shared
     // texture (+0x34) whose low 15 bits are set is replaced by `color` in
     // the overlay texture (16-bit formats 0x115c and 0x613 only) and cleared.
-    int UnknownFunction4b6880(int row, int count, int color);
+    int UnknownFunction4b6880(int row, int count, unsigned short color);
 
     RenderTarget* Target() const { return (RenderTarget*)field_0x18; }
 

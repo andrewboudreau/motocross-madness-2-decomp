@@ -8,14 +8,6 @@
 // here after it. A scale local, a ternary, assigning before the test and an
 // empty or return-only test do not reproduce it.
 
-// ChatOverlay::UnknownFunction51e910 (0x0051e910, 308 bytes): exact except
-// for the colour argument. Retail builds the 4444 grey in 16-bit registers
-// (`xor ax, ax`, `and ax, 0xfff0`, `or ch, 0xff`) and pushes it without
-// zero-extension, so 0x004b6880 takes an `unsigned short` colour there.
-// Overlay.h declares it `int`; with `unsigned short color` in Overlay.h and
-// Overlay.cpp this body is strict-exact and 0x004b6880 stays exact (its
-// mangled name becomes ?UnknownFunction4b6880@Overlay@@QAEHHHG@Z).
-
 // RadarOverlay::UnknownFunction51c4f0 (0x0051c4f0, 560 bytes, 64%): the
 // candidate is 550 bytes. The arithmetic and branch structure match; VC6
 // here assigns the scale, discriminant and intersection temporaries to
@@ -128,36 +120,6 @@ int RadarOverlay::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
         return 1;
     }
     return 0;
-}
-
-// 0x0051e910: redraws name tag `index` (all of them for -1) into the shared
-// texture, then colours it with a grey that darkens with the cycle
-// TrackGameMode+0x90.
-void ChatOverlay::UnknownFunction51e910(int index)
-{
-    unsigned char level = 0xff - g_UnknownGlobal56e26c->mode.field_0x90 * 0x33;
-    if (index == -1) {
-        for (int i = 0; i < field_0x198; i++)
-            UnknownFunction4b6710(&field_0x30c[i]);
-    } else {
-        UnknownFunction4b6710(&field_0x30c[index]);
-    }
-    PCTextureMap* texture = (PCTextureMap*)field_0x34;
-    void* dc;
-    if (texture->field_0x70->UnknownMethod17(&dc) == 0) {
-        SetBkColor(dc, 1);
-        SetBkMode(dc, 1);
-        SetTextColor(dc, 0xffffff);
-        if (index == -1) {
-            for (int i = 0; i < field_0x198; i++)
-                UnknownFunction51e3f0(dc, i);
-        } else {
-            UnknownFunction51e3f0(dc, index);
-        }
-        texture->field_0x70->UnknownMethod26(dc);
-    }
-    UnknownFunction4b6880(0x89, 0x46, 0xf000 | ((level & ~0xf) << 4) | (level & ~0xf) | (level >> 4));
-    field_0x2c->UnknownVirtualSlot9(0, -1);
 }
 
 // 0x0051c4f0

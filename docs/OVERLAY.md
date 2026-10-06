@@ -32,6 +32,8 @@ Overlay.h changes:
 - `0x004b6710` returns int, so TrackOverlay.bindings.json now uses its new
   mangled name.
 - +0x34 is a TextureMap and +0x3c an OverlayIconService.
+- `0x004b6880` takes its colour as `unsigned short`: ChatOverlay `0x0051e910`
+  builds the 4444 grey in 16-bit registers and pushes it unextended.
 
 Near miss (`samples/render/OverlayNearMisses.cpp`): `0x004b6710`. Its
 instructions are the same, but the registers are allocated differently.

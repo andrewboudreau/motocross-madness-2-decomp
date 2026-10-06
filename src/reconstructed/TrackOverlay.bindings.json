@@ -83,7 +83,7 @@
   "?UnknownFunction4ac830@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
   "?UnknownFunction4b5f50@Overlay@@QAEPAV1@PAVRenderTarget@@PAVTextureMap@@PBUUnknownOverlayRect@@H2MDPBDPAPBDHHH@Z": "0x004b5f50",
   "?UnknownFunction4b6710@Overlay@@QAEHPBUUnknownOverlayRect@@@Z": "0x004b6710",
-  "?UnknownFunction4b6880@Overlay@@QAEHHHH@Z": "0x004b6880",
+  "?UnknownFunction4b6880@Overlay@@QAEHHHG@Z": "0x004b6880",
   "?UnknownFunction4fc9a0@UnknownVehiclePart@@QAEXHPAUVector3@@@Z": "0x004fc9a0",
   "?UnknownFunction4fdae0@UnknownVehiclePart@@QAEPAV1@PBD@Z": "0x004fdae0",
   "?UnknownFunction506e90@UnknownTerrain@@QAEHPBUVector3@@0PAU2@HHH@Z": "0x00506e90",
