@@ -39,6 +39,7 @@ public:
     int UnknownFunction461600();
     int UnknownFunction461640(void* buffer, int size, int count);
     int UnknownFunction461980();              // 0x00461980: reads a byte
+    int UnknownFunction461aa0(char* buffer, int size); // 0x00461aa0: reads a line (CarProcedural.cpp)
     void UnknownFunction461cb0(int* a, int* b); // 0x00461cb0 (SceneManager 0x004ea0fd)
     // 0x00460e70: 1 when `path` opens and passes 0x00460db0's check; the
     // file is closed again (ResourceManager.cpp passes it to 0x00460f50).

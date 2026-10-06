@@ -172,6 +172,9 @@ cube.cpp (16) and cubedraw.cpp (22, DrawableCube) match strictly; see
 D3DIMSoultreeModifier.cpp (7) and DebugOverlay.cpp (12) match strictly; see
 [DEBUGOVERLAY](DEBUGOVERLAY.md).
 
+CarProcedural.cpp (15) and Grid1.cpp (9) match strictly; see
+[CARPROCEDURAL](CARPROCEDURAL.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
