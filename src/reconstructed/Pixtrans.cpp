@@ -2,6 +2,7 @@
 
 #include "Pixtrans.h"
 
+#include "DebugAlloc.h"
 #include "TextureMap.h"
 
 // 0x004d0870: converts 4444 to 8888.
@@ -539,4 +540,284 @@ int UnknownFunction4d1b40(void* bits, unsigned char from, unsigned char to, int 
         row += stride;
     }
     return 1;
+}
+
+// 0x004d0aa0: converts 24-bit to palette indices through the 555 table.
+int UnknownFunction4d0aa0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither, UnknownTexturePalette* palette) {
+    if (dither && palette) {
+        UnknownFunction4cf2a0(source, 0x378, width, height, sourceStride, destinationStride, 0, 0, 0,
+                              destination, palette);
+    } else {
+        UnknownPixel24* sourceRow = (UnknownPixel24*)source;
+        unsigned char* row = (unsigned char*)destination;
+        unsigned char* indices = palette->UnknownFunction4de280();
+        for (int y = 0; y < height; y++) {
+            UnknownPixel24* from = sourceRow;
+            unsigned char* to = row;
+            for (int x = 0; x < width; x++, to++, from++)
+                *to = indices[(unsigned short)((from->red >> 3) << 10 | (from->green >> 3) << 5) | from->blue >> 3];
+            sourceRow += sourceStride;
+            row += destinationStride;
+        }
+    }
+    return 1;
+}
+
+// 0x004d0b90: converts 565 to palette indices through the 565 table.
+int UnknownFunction4d0b90(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither, UnknownTexturePalette* palette) {
+    if (dither && palette) {
+        UnknownFunction4cf2a0(source, 0x235, width, height, sourceStride, destinationStride, 0, 0, 0,
+                              destination, palette);
+    } else {
+        unsigned short* sourceRow = (unsigned short*)source;
+        unsigned char* row = (unsigned char*)destination;
+        unsigned char* indices = palette->UnknownFunction4de290();
+        for (int y = 0; y < height; y++) {
+            unsigned short* from = sourceRow;
+            unsigned char* to = row;
+            for (int x = 0; x < width; x++, to++, from++)
+                *to = indices[*from];
+            sourceRow += sourceStride;
+            row += destinationStride;
+        }
+    }
+    return 1;
+}
+
+// 0x004cf980: spreads 24-bit pixels into 16.16 channel triples (the
+// ditherer's row reader).
+void UnknownFunction4cf980(UnknownPixel24* source, int* channels, int count) {
+    do {
+        channels[0] = source->red << 16;
+        channels[1] = source->green << 16;
+        channels[2] = source->blue << 16;
+        channels += 3;
+        source++;
+    } while (--count);
+}
+
+// 0x004cf9c0: the 565 row reader.
+void UnknownFunction4cf9c0(unsigned short* source, int* channels, int count) {
+    do {
+        channels[0] = (*source & 0xf800) << 8;
+        channels[1] = (*source & 0x7e0) << 13;
+        channels[2] = (*(unsigned char*)source & 0x1f) << 19;
+        channels += 3;
+        source++;
+    } while (--count);
+}
+
+// 0x004cfa10: the 555 row reader.
+void UnknownFunction4cfa10(unsigned short* source, int* channels, int count) {
+    do {
+        channels[0] = (*source & 0x7c00) << 9;
+        channels[1] = (*source & 0x3e0) << 14;
+        channels[2] = (*source & 0x1f) << 19;
+        channels += 3;
+        source++;
+    } while (--count);
+}
+
+// 0x004cfa60: converts 565 to 24-bit.
+int UnknownFunction4cfa60(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride) {
+    unsigned short* sourceRow = (unsigned short*)source;
+    UnknownPixel24* row = (UnknownPixel24*)destination;
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        UnknownPixel24* to = row;
+        for (int x = 0; x < width; x++, to++, from++) {
+            to->red = (*from >> 8) & 0xf8;
+            to->green = (*from >> 3) & 0xfc;
+            to->blue = *from << 3;
+        }
+        sourceRow += sourceStride;
+        row += destinationStride;
+    }
+    return 1;
+}
+
+// 0x004cfe70: converts 24-bit to 8888 (0x004cfda0, keyed) at `levels`
+// times the size, then halves it down through 0x004cdf10.
+int UnknownFunction4cfe70(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int levels, unsigned int key) {
+    if (levels == 0) {
+        UnknownFunction4cfda0(destination, source, width, height, destinationStride, sourceStride, key);
+        return 1;
+    }
+    int fullWidth = width << levels;
+    int fullHeight = height << levels;
+    void* full = DebugMalloc(fullWidth * fullHeight * 4, __FILE__, 1484);
+    if (!full)
+        return 0;
+    UnknownFunction4cfda0(full, source, fullWidth, fullHeight, sourceStride, sourceStride, key);
+    if (levels == 1) {
+        UnknownFunction4cdf10(destination, full, width, height, destinationStride, sourceStride);
+    } else {
+        int levelWidth = width << (levels - 1);
+        int levelHeight = height << (levels - 1);
+        void* buffer = DebugMalloc(levelWidth * levelHeight * 4, __FILE__, 1505);
+        if (!buffer) {
+            operator delete(full, __FILE__, 1534);
+            return 0;
+        }
+        UnknownFunction4cdf10(buffer, full, levelWidth, levelHeight, levelWidth, sourceStride);
+        for (int i = 2; i < levels; i++) {
+            levelWidth /= 2;
+            levelHeight /= 2;
+            UnknownFunction4cdf10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
+        }
+        UnknownFunction4cdf10(destination, buffer, width, height, destinationStride, levelWidth);
+        operator delete(buffer, __FILE__, 1527);
+    }
+    operator delete(full, __FILE__, 1529);
+    return 1;
+}
+
+// 0x004d0c40: converts 555 to palette indices: dithered when asked, through
+// the assembly 0x004d0d40 for unpadded rows of a multiple of eight pixels,
+// otherwise through the 555 table.
+int UnknownFunction4d0c40(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int dither, UnknownTexturePalette* palette) {
+    if (dither && palette) {
+        UnknownFunction4cf2a0(source, 0x22b, width, height, sourceStride, destinationStride, 0, 0, 0,
+                              destination, palette);
+    } else if (sourceStride == width && sourceStride % 8 == 0) {
+        UnknownFunction4d0d40(source, destination, destinationStride, width, height,
+                              palette->UnknownFunction4de280());
+    } else {
+        unsigned short* sourceRow = (unsigned short*)source;
+        unsigned char* row = (unsigned char*)destination;
+        unsigned char* indices = palette->UnknownFunction4de280();
+        for (int y = 0; y < height; y++) {
+            unsigned short* from = sourceRow;
+            unsigned char* to = row;
+            for (int x = 0; x < width; x++, to++, from++)
+                *to = indices[*from];
+            sourceRow += sourceStride;
+            row += destinationStride;
+        }
+    }
+    return 1;
+}
+
+// 0x004d1d20: converts `source` (pixel format `sourceFormat`) into
+// `destination` (`format`) with the matching converter; same-format copies
+// go through the downsamplers with no halving. 0 for unsupported pairs.
+int UnknownFunction4d1d20(void* destination, void* source, int width, int height, int destinationStride,
+                           int sourceStride, int format, int sourceFormat, int dither,
+                           UnknownTexturePalette* palette, int alphaThreshold, unsigned int key) {
+    switch (sourceFormat) {
+    case 0x235:
+        switch (format) {
+        case 0x235:
+            return UnknownFunction4d02c0(destination, source, width, height, destinationStride, sourceStride, 0, 2);
+        case 0x22b:
+            return UnknownFunction4d1030(destination, source, width, height, destinationStride, sourceStride);
+        case 8:
+            return UnknownFunction4d0b90(destination, source, width, height, destinationStride, sourceStride, dither,
+                                         palette);
+        case 0x378:
+            return UnknownFunction4cfa60(destination, source, width, height, destinationStride, sourceStride);
+        case 0x22b8:
+            return UnknownFunction4d0700(destination, source, width, height, destinationStride, sourceStride, key);
+        case 0x613:
+            return UnknownFunction4d1810(destination, source, width, height, destinationStride, sourceStride, key);
+        }
+        break;
+    case 0x22b:
+        switch (format) {
+        case 0x235:
+            return UnknownFunction4d0fb0(destination, source, width, height, destinationStride, sourceStride);
+        case 0x22b:
+            return UnknownFunction4d0440(destination, source, width, height, destinationStride, sourceStride, 0, 2);
+        case 8:
+            return UnknownFunction4d0c40(destination, source, width, height, destinationStride, sourceStride, dither,
+                                         palette);
+        case 0x378:
+            return UnknownFunction4d0f10(destination, source, width, height, destinationStride, sourceStride);
+        case 0x22b8:
+            return UnknownFunction4d0e40(destination, source, width, height, destinationStride, sourceStride, key);
+        case 0x613:
+            return UnknownFunction4d16e0(destination, source, width, height, destinationStride, sourceStride, key);
+        }
+        break;
+    case 8:
+        switch (format) {
+        case 0x22b:
+            return UnknownFunction4d11c0(destination, source, width, height, destinationStride, sourceStride, palette);
+        case 8:
+            return UnknownFunction4d05c0(destination, source, width, height, destinationStride, sourceStride, 0,
+                                         palette);
+        case 0x235:
+            return UnknownFunction4d1150(destination, source, width, height, destinationStride, sourceStride, palette);
+        case 0x378:
+            return UnknownFunction4d10b0(destination, source, width, height, destinationStride, sourceStride, palette);
+        }
+        break;
+    case 0x378:
+        switch (format) {
+        case 0x235:
+            return UnknownFunction4d0900(destination, source, width, height, destinationStride, sourceStride, dither);
+        case 0x22b:
+            return UnknownFunction4d09d0(destination, source, width, height, destinationStride, sourceStride, dither);
+        case 8:
+            return UnknownFunction4d0aa0(destination, source, width, height, destinationStride, sourceStride, dither,
+                                         palette);
+        case 0x378:
+            if (dither)
+                return UnknownFunction4cf2a0(source, 0x378, width, height, sourceStride, destinationStride, destination,
+                                             0, 0, 0, 0);
+            else
+                return UnknownFunction4cfaf0(destination, source, width, height, destinationStride, sourceStride, 0);
+        case 0x22b8:
+            return UnknownFunction4cfe70(destination, source, width, height, destinationStride, sourceStride, 0, key);
+        case 0x613:
+            return UnknownFunction4d1370(destination, source, width, height, destinationStride, sourceStride, key);
+        }
+        break;
+    case 0x22b8:
+        switch (format) {
+        case 0x22b8:
+            return UnknownFunction4cfc40(destination, source, width, height, destinationStride, sourceStride, 0);
+        case 0x115c:
+            return UnknownFunction4d1230(destination, source, width, height, destinationStride, sourceStride);
+        case 0x613:
+            return UnknownFunction4d12d0(destination, source, width, height, destinationStride, sourceStride,
+                                         alphaThreshold);
+        }
+        break;
+    case 0x115c:
+        switch (format) {
+        case 0x235:
+            return UnknownFunction4d15f0(destination, source, width, height, destinationStride, sourceStride,
+                                         alphaThreshold, key);
+        case 0x22b:
+            return UnknownFunction4d1440(destination, source, width, height, destinationStride, sourceStride,
+                                         alphaThreshold, key);
+        case 0x613:
+            return UnknownFunction4d1530(destination, source, width, height, destinationStride, sourceStride,
+                                         alphaThreshold);
+        case 0x22b8:
+            return UnknownFunction4d0870(destination, source, width, height, destinationStride, sourceStride);
+        case 0x115c:
+            return UnknownFunction4d0020(destination, source, width, height, destinationStride, sourceStride, 0);
+        }
+        break;
+    case 0x613:
+        switch (format) {
+        case 0x235:
+            return UnknownFunction4d18c0(destination, source, width, height, destinationStride, sourceStride, key);
+        case 0x22b:
+            return UnknownFunction4d1780(destination, source, width, height, destinationStride, sourceStride, key);
+        case 0x613:
+            return UnknownFunction4d0170(destination, source, width, height, destinationStride, sourceStride, 0);
+        case 0x22b8:
+            return UnknownFunction4d07d0(destination, source, width, height, destinationStride, sourceStride);
+        }
+        break;
+    }
+    return 0;
 }

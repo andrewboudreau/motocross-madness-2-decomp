@@ -319,18 +319,22 @@ struct UnknownBikeRaceRacerPart {
 
 
 
-// A 0x3c-byte list node (DebugCalloc'd by 0x0041d0d0, bikerace.cpp line
-// 0x840) chained through +0x38 from BikeRace+0xc8.
+// A 0x3c-byte gate: a box at +0x00 facing +0x0c with half extents +0x18,
+// placed on the track at +0x2c. The course gates are DebugCalloc'd by
+// 0x0041d0d0 (bikerace.cpp line 0x840) and chained through +0x38 from
+// BikeRace+0xc8; the start and finish probes (BikeRace+0xcc and +0x108) are
+// the same structure (BikeRace's constructor clears their +0x38). gameui.cpp
+// 0x0047b670 tests crossings of either kind (RaceStatus.cpp), and slot 14
+// draws the probes' boxes; 0x0041d1e0 measures the track distance between
+// the probes' positions.
 struct UnknownBikeRaceNode {
-    Vector3 field_0x00;                       // copied from the source record
-    Vector3 field_0x0c;
-    float field_0x18;
-    int field_0x1c;
-    float field_0x20;
+    Vector3 field_0x00;                       // centre
+    Vector3 field_0x0c;                       // direction
+    Vector3 field_0x18;                       // half extents (across the direction for gates)
     float field_0x24;
     int field_0x28;
-    unsigned char field_0x2c[0x38 - 0x2c];
-    UnknownBikeRaceNode* field_0x38;
+    TrackPos field_0x2c;
+    UnknownBikeRaceNode* field_0x38;          // next gate
 };
 
 // The 0x18-byte source records 0x0041d0d0 copies.
@@ -383,19 +387,6 @@ void operator delete(void* p, const char* file, int line);
 class UnknownBikeRaceProjector {
 public:
     void UnknownFunction507c10(Vector3* point, int a, int b, int c); // 0x00507c10
-};
-
-// A 0x3c-byte track probe (BikeRace+0xcc and +0x108): slot 14 draws the
-// box at +0x00 with half extents +0x18; 0x0041d1e0 measures the track
-// distance between the two probes' positions (+0x2c). BikeRace's
-// constructor clears +0x38.
-struct UnknownBikeRaceProbe {
-    Vector3 field_0x00;                       // centre
-    unsigned char field_0x0c[0x18 - 0x0c];
-    Vector3 field_0x18;                       // half extents
-    unsigned char field_0x24[0x2c - 0x24];
-    TrackPos field_0x2c;
-    int field_0x38;
 };
 
 // A GameObject's +0x25 flags, which GameObject.h keeps protected
@@ -634,8 +625,8 @@ public:
     int field_0x0c0;
     UnknownEventRacerPart* field_0x0c4;
     UnknownBikeRaceNode* field_0x0c8;
-    UnknownBikeRaceProbe field_0x0cc;
-    UnknownBikeRaceProbe field_0x108;
+    UnknownBikeRaceNode field_0x0cc;          // start probe
+    UnknownBikeRaceNode field_0x108;          // finish probe
     int field_0x144;
     int field_0x148;
     int field_0x14c;

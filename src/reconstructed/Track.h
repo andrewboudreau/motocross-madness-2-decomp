@@ -1,5 +1,6 @@
 #pragma once
 
+#include "MatrixUtil.h"
 #include "UnknownTokenizer.h"
 
 // Track.cpp (literal __FILE__ "D:\aardvark\VC\krusty2\Track.cpp", 0x0057508c).
@@ -72,9 +73,14 @@ public:
     int UnknownFunction515e70(UnknownStream* stream, TrackNode** nodes, int count);
     int UnknownFunction516800(TrackNode* node);
     int UnknownFunction516870(TrackNode** start);
+    // 0x00516980 (RaceStatus.cpp): places `p` on the track.
+    int UnknownFunction516980(Vector3 p, TrackPos* out, int flags);
     int UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
     int UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegment* next);
     int UnknownFunction517310(TrackSegment* segment, TrackNode* node);
+    // 0x00517340 (RaceStatus.cpp): follows `p` from `from` within the two
+    // distances; the result lands in `out`.
+    int UnknownFunction517340(Vector3 p, TrackPos from, float distance, float range, int flags, TrackPos* out);
     int UnknownFunction517930(TrackListItem** list, int all);
     int UnknownFunction5179a0(TrackPos a, TrackPos b);
     int UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, float* distance);

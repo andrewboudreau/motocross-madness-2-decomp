@@ -31,14 +31,6 @@
   "?UnknownFunction524640@UnknownVcr@@QAEXXZ": "0x00524640",
   "?UnknownFunction524910@UnknownVcr@@QAEXXZ": "0x00524910",
   "?UnknownRecorderThread@@YGIPAX@Z": "0x004e6f80",
-  "_$E1": "0x004e6e50",
-  "_$E10": "0x004e6f40",
-  "_$E11": "0x004e6f30",
-  "_$E2": "0x004e6e40",
-  "_$E4": "0x004e6ea0",
-  "_$E5": "0x004e6e90",
-  "_$E7": "0x004e6ef0",
-  "_$E8": "0x004e6ee0",
   "__FILE__": "0x00572b04",
   "__beginthreadex": "0x00537b98",
   "__except_list": "0x00000000",
@@ -51,9 +43,5 @@
   "__imp__SetEvent@4": "0x005500e8",
   "__imp__Sleep@4": "0x005501ac",
   "__imp__WaitForSingleObject@8": "0x005500d4",
-  "__real@4@3ff583126f0000000000": "0x005541e8",
-  "_s_UnknownVector689c00": "0x00689c00",
-  "_s_UnknownVector689c10": "0x00689c10",
-  "_s_UnknownVector689c20": "0x00689c20",
-  "_s_UnknownVector689c60": "0x00689c60"
+  "__real@4@3ff583126f0000000000": "0x005541e8"
 }

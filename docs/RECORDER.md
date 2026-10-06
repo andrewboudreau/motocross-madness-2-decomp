@@ -4,8 +4,9 @@
 literal `D:\aardvark\VC\krusty2\recorder.cpp` (`0x00572b04`; lines 442,
 477, 535), RTTI `VCRInterface : GameObject` (vtable `0x0055778c`,
 overriding slots 0 and 10) and `KrustyVCR : VCRInterface` (`0x00550e9c`),
-and the Win32 imports the code calls. The TU starts at `0x004e6e40` (its
-per-TU vector initializers) after RaceStatus.cpp; the shared
+and the Win32 imports the code calls. The TU starts at `0x004e6f80`. The
+kVec3 initializers just before it belong to RaceStatus.cpp (bss and
+`.CRT$XCU` order; see [RACESTATUS](RACESTATUS.md)); the shared
 `Rectangle2D`/`RenderTarget` code from `0x004e8ad0` follows. Names other
 than the RTTI classes are provisional.
 
@@ -16,8 +17,8 @@ then starts mode 0, 1 or 2; the game queues and takes records
 (`0x004e8720`, `0x004e8810`), seeks, rewinds and flushes by signalling the
 events, and `0x004e7a00` waits for the worker's acknowledgement.
 
-Exact: 20 calibration cases (the eight vector initializers, the
-constructor and destructors and every method above). Near misses
+Exact: 12 calibration cases (the constructor and destructors and every
+method above). Near misses
 (`samples/race/RecorderNearMisses.cpp`, notes there): the worker thread
 `0x004e6f80` (an 11-way `WaitForMultipleObjects` switch over the VCR
 file), whose case bodies and jump table line up; VC6 merges the shared

@@ -141,7 +141,7 @@ TypeRegistry.cpp (the type-name registry krusty2's CollisionObject uses)
 matches strictly in all 14 functions (`src/reconstructed/TypeRegistry.cpp`).
 
 recorder.cpp (VCRInterface, the threaded replay recorder) matches strictly
-in 20 functions; see [RECORDER](RECORDER.md).
+in 12 functions; see [RECORDER](RECORDER.md).
 
 TextService.cpp (the bitmap-font text renderer Overlay uses) matches
 strictly in 6 functions; see [TEXTSERVICE](TEXTSERVICE.md).

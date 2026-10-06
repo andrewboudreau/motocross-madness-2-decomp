@@ -53,3 +53,16 @@ Near misses (`samples/ui/ProCircuitProcsNearMisses.cpp`):
 Not attempted: PCCentralBikeRiderDlg slots 29 and 10 and `0x004d7900`.
 The `UnknownProCircuitSkinned` view is the same object as DlgProcs.h's
 `UnknownModelTexture`; one should eventually replace the other.
+
+**Open attribution question.** The RaceStatus/Pixtrans pass suggests that
+the kVec3 `$E` sets are attributed one unit off:
+- **`0x004d3340`:** belongs to an unnamed gearbox/RPM unit at
+  `0x004d2940..0x004d333f` ("Unable to find optimum shift range for
+  GEAR=%d"). That unit's code reads its zero vector `0x00689a88`.
+- **`0x004d49e0`:** belongs to ProCircuit.cpp.
+- **`0x004da3e0`:** belongs to ProCircuitProcs.cpp. `0x004d6abb` reads
+  `0x00689b08`.
+
+If that holds, ProCircuit.cpp starts after `0x004d347f`, and the 16
+ProCircuit/ProCircuitProcs `$E` cases need re-pointing. Point2D's inline
+methods sit at `0x004d28b0..0x004d2936`. This is not yet acted on.

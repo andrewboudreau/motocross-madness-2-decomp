@@ -5,7 +5,21 @@ PCVideoCard.cpp's code (literal `0x004d06e9`). PCTextureMap and
 ManagedTextureGroup call them. Strides are in pixels; names are
 provisional.
 
-Exact (26 calibration cases):
+Extent: `0x004cde20..0x004d28af` (strong inference; no `$E`). The code
+before it is window code called from PCGame, with its own bss.
+
+Exact: 35 calibration cases. This pass added nine:
+- The three ditherer row readers `0x004cf980`, `0x004cf9c0` and
+  `0x004cfa10`.
+- 565 to 24-bit `0x004cfa60`.
+- The keyed 24-bit downsampler `0x004cfe70`.
+- The 24-bit, 565 and 555 to palette-index converters `0x004d0aa0`,
+  `0x004d0b90` and `0x004d0c40`. These call the palette's thiscall table
+  getters `0x004de280`/`0x004de290`, which TextureMap.h declares.
+- The format-pair dispatcher `0x004d1d20`, which returns int. Its new key is
+  in the PCTextureMap and ManagedTextureGroup bindings.
+
+Earlier cases:
 
 | VA | Size | Role |
 |---|---:|---|

@@ -57,11 +57,13 @@ struct TrackGameViewOwner : public GameObject {
     GameObject* field_0x68;
     TextQueueOverlay* field_0x6c;
     float field_0x70;                         // compared with TrackGame+0x2eb0, settings +0x140 (EventManager 0x0045eef0)
-    unsigned char field_0x74[0x9c - 0x74];
+    float field_0x74;                         // RaceStatus.cpp 0x004e62d0 adds it to 60 times +0x70
+    unsigned char field_0x78[0x9c - 0x78];
     GameObject* field_0x9c;                   // racesnd.cpp calls slot 4 (sound off) or 5 (on)
     unsigned char field_0xa0[0xa8 - 0xa0];
     UnknownEventRacer* field_0xa8;
-    unsigned char field_0xac[0xdc - 0xac];
+    int field_0xac;                           // RaceStatus.cpp 0x004e6a50 wraps a racer's next gate by it
+    unsigned char field_0xb0[0xdc - 0xb0];
     UnknownTrackGameViewOwnerDc* field_0xdc;
 };
 

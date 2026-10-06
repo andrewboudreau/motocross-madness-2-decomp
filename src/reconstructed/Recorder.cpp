@@ -15,14 +15,6 @@
         handle = 0;                   \
     }
 
-// The four per-TU vector constants (see src/krusty2/math/Math3D.h):
-// 0x00689c10, 0x00689c20, 0x00689c60 and 0x00689c00, initialised by
-// 0x004e6e40..0x004e6f7b.
-static const Vector3 s_UnknownVector689c10 = Vector3(0.0f, 0.0f, 0.0f);
-static const Vector3 s_UnknownVector689c20 = Vector3(1.0f, 0.0f, 0.0f);
-static const Vector3 s_UnknownVector689c60 = Vector3(0.0f, 1.0f, 0.0f);
-static const Vector3 s_UnknownVector689c00 = Vector3(0.0f, 0.0f, 1.0f);
-
 unsigned __stdcall UnknownRecorderThread(void* parameters); // 0x004e6f80 (samples/race/RecorderNearMisses.cpp)
 
 // 0x004e77f0

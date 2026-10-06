@@ -223,9 +223,9 @@ int BikeRace::UnknownFunction41d0d0(int index, UnknownBikeRaceNodeSource* source
     node->field_0x0c.z = record->field_0x0c.z;
     node->field_0x24 = scale;
     node->field_0x28 = value;
-    node->field_0x1c = 0;
-    node->field_0x18 = scale * node->field_0x0c.z * 0.5f;
-    node->field_0x20 = scale * node->field_0x0c.x * -0.5f;
+    node->field_0x18.y = 0.0f;
+    node->field_0x18.x = scale * node->field_0x0c.z * 0.5f;
+    node->field_0x18.z = scale * node->field_0x0c.x * -0.5f;
     **tail = node;
     *tail = &node->field_0x38;
     return 1;

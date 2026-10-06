@@ -80,6 +80,7 @@ protected:
     friend class UIDialog;  // reads its control container's first child (0x0046f120)
     // RaceStatus.cpp 0x004e5ca0 reads a racer's +0x25 bit 0.
     friend int UnknownFunction4e5ca0(struct UnknownEventRacerPart** list);
+    friend int UnknownFunction4e62d0(int keepRacing); // and +0x25 bit 0 of the view's racers
 
     // Offsets and widths are evidenced by the reconstructed methods; names are
     // placeholders. Children are reached through field_0x10 and chained through

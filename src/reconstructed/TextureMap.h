@@ -9,6 +9,12 @@
 // Palette object at TextureMap+0x2c: +0x710 maps 555 colours to palette
 // indices.
 struct UnknownTexturePalette {
+    // ColorMapper's table getters (Quantize.h): Pixtrans.cpp calls them on
+    // its palette argument.
+    unsigned char* UnknownFunction4de270();        // 0x004de270: &field_0x010
+    unsigned char* UnknownFunction4de280();        // 0x004de280: &field_0x710 (555 to index)
+    unsigned char* UnknownFunction4de290();        // 0x004de290: &field_0x8710 (565 to index)
+
     unsigned char field_0x000[0x10];
     unsigned char field_0x010[256][3];             // RGB entries
     unsigned short field_0x310[256];               // 16-bit entries (Pixtrans 0x004d11c0)
