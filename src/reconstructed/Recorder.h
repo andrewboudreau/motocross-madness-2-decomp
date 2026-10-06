@@ -17,6 +17,19 @@
 
 class UnknownVcr;
 
+// The record buffer at VCRInterface+0x7c (0x400 bytes): slot 10 reads a time
+// in seconds and a count from its head.
+struct UnknownRecorderRecord {
+    float time;                           // seconds; stored at +0xd4 in ms
+    int field_0x04;
+    int count;
+};
+
+// The function pointer at VCRInterface+0x80 (cdecl, seven arguments). Slot 10
+// passes -2 and -3 as `a` for control calls; the result selects its next step.
+typedef int (*UnknownRecorderCallback)(int a, void* data, int flag, int b, int* keep, int time,
+                                       int* milliseconds);
+
 // What 0x004e7a90 passes to the worker thread (VCRInterface+0x90).
 struct UnknownRecorderThreadParameters {
     int field_0x00;
@@ -26,7 +39,9 @@ struct UnknownRecorderThreadParameters {
 };
 
 // The object at VCRInterface+0xac: its +0x23c selects a 10 ms (else 200 ms)
-// poll interval.
+// poll interval. The worker thread calls UnknownVcrFile (VCRfile.h) methods on
+// it and +0x23c is that class's memory flag, so it is the VCR file object; the
+// type is kept for the 0x004e7a90 symbol.
 struct UnknownRecorderOwner {
     unsigned char field_0x000[0x23c];
     int field_0x23c;
@@ -72,7 +87,7 @@ public:
     CRITICAL_SECTION field_0x60;
     int field_0x78;                       // mode
     void* field_0x7c;                     // 0x400-byte buffer (mode 1)
-    int field_0x80;
+    UnknownRecorderCallback field_0x80;
     int field_0x84;
     int field_0x88;
     unsigned char field_0x8c[0x90 - 0x8c];
@@ -90,4 +105,5 @@ public:
     int field_0xc8;                       // acknowledged by the worker
     int field_0xcc;
     float field_0xd0;                     // seconds
+    int field_0xd4;                       // record time in ms (worker event 5, slot 10)
 };

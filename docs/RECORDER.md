@@ -17,7 +17,10 @@ then starts mode 0, 1 or 2; the game queues and takes records
 events, and `0x004e7a00` waits for the worker's acknowledgement.
 
 Exact: 20 calibration cases (the eight vector initializers, the
-constructor and destructors and every method above). Not yet
-reconstructed: the worker thread `0x004e6f80` (an 11-way
-`WaitForMultipleObjects` switch over the VCR file) and slot 10
-`0x004e7d60`, which KrustyVCR shares.
+constructor and destructors and every method above). Near misses
+(`samples/race/RecorderNearMisses.cpp`, notes there): the worker thread
+`0x004e6f80` (an 11-way `WaitForMultipleObjects` switch over the VCR
+file), whose case bodies and jump table line up; VC6 merges the shared
+tails of cases 1, 2 and 4 differently. Also slot 10 `0x004e7d60`, which
+KrustyVCR shares; its control flow and callback switch order are
+reconstructed, but register and stack-slot assignment differ.

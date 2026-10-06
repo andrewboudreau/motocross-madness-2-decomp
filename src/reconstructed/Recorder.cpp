@@ -23,7 +23,7 @@ static const Vector3 s_UnknownVector689c20 = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 s_UnknownVector689c60 = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 s_UnknownVector689c00 = Vector3(0.0f, 0.0f, 1.0f);
 
-unsigned __stdcall UnknownRecorderThread(void* parameters); // 0x004e6f80
+unsigned __stdcall UnknownRecorderThread(void* parameters); // 0x004e6f80 (samples/race/RecorderNearMisses.cpp)
 
 // 0x004e77f0
 VCRInterface::VCRInterface() : GameObject(1) {
@@ -110,7 +110,7 @@ int VCRInterface::UnknownFunction4e7a90(int a1, int a2, int a3, int mode, int a5
     if (!field_0xb0)
         return 0;
     field_0xac = owner;
-    field_0x80 = a1;
+    field_0x80 = (UnknownRecorderCallback)a1;
     field_0x30 = CreateEventA(0, 0, 0, 0);
     field_0x34 = CreateEventA(0, 0, 0, 0);
     field_0x38 = CreateEventA(0, 0, 0, 0);
