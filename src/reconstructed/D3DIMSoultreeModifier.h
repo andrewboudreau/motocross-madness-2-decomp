@@ -21,12 +21,18 @@
 #include "Wrecker.h"       // GraphicsTest
 #include "LightEmitter.h"  // D3DIMSoultreeObject
 
+struct UnknownSoultreeMesh;      // MorphBastardModifier.h
+
 class D3DIMSoultreeModifier : public GraphicsTest {
 public:
     explicit D3DIMSoultreeModifier(int flags);        // 0x00445240 (ret 4)
     virtual ~D3DIMSoultreeModifier();                 // 0x00445290 (deleting wrapper 0x00445270)
     virtual GameObject* UnknownVirtualSlot8(void* value); // 0x004452e0
-    virtual void UnknownVirtualSlot27() = 0;          // _purecall in this table
+    // _purecall in this table. D3DIMSoultreeObject 0x00440ded calls it for
+    // each modifier with itself, its mesh and the address of the mesh to
+    // draw (MorphBastardModifier 0x004a4c60 gives the signature).
+    virtual void UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
+                                      UnknownSoultreeMesh** out) = 0;
 
     // 0x004452f0 (ret 4): appends `object` (lines 26 and 33).
     void UnknownFunction4452f0(D3DIMSoultreeObject* object);
