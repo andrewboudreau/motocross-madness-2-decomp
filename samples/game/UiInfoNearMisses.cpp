@@ -1,10 +1,10 @@
-// Near-miss and blocked uiinfo.cpp candidates (0x00521f30..0x00524106),
+// Near-miss uiinfo.cpp candidates (0x00521f30..0x00524106),
 // kept out of src/reconstructed/UiInfo.cpp until they match.
 //
 // TrackGameMode::UnknownFunction522440 (0x00522440, 427 bytes): restores the
 // default settings. Calls, constants and stores all match; 355 of 427 bytes.
 // Retail keeps 1 in ecx and 2 in edx from the start (and reuses edx for the
-// final +0x98/+0x94 stores), computes &TrackGame+0x2d70 before the first
+// final +0x98/+0x94 stores), computes &field_0x27f8 before the first
 // stores and places the second 0x1ec-byte copy after the +0x196c store; VC6
 // here picks eax for 1 and schedules the copies and the memset differently.
 // Store-order permutations, struct-assignment copies and memset forms tried.
@@ -20,22 +20,6 @@
 // the found block (mov edx, eax there); the nested/goto/condition forms tried
 // share the epilogue (194 of 353) but still copy the result into edx right
 // after each fopen.
-//
-// Blocked by TrackGame.h's layout (see UiInfo.cpp): TrackGameMode is really
-// 0x2dc0 bytes and owns TrackGame+0xfc4..+0x3337, including five
-// SessionInfoType records at its +0xa98 (eh vector constructor/destructor
-// iterators 0x00536234/0x00536140 with 0x00523b90/0x00523c80) and eight
-// UnknownTrackGameRacerSlot records with a constructor (0x00521f30) at its
-// +0x1be4. Declaring those types with constructors in TrackGame would change
-// TrackGame's own constructor, so these cannot match yet:
-//   0x00521f30 UnknownTrackGameRacerSlot constructor (sketched in a comment below)
-//   0x00522060 TrackGameMode constructor, unwind funclet 0x00522420
-//   0x005225f0 TrackGameMode destructor
-//   0x00522680 TrackGameMode slot-4 reset (temporary racer records)
-//   0x005231f0 profile load (constructs a temporary TrackGameMode)
-//   0x00523b90 SessionInfoType's inline constructor, emitted here
-// The sketches below record their behaviour.
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,53 +28,48 @@
 #include "../../src/reconstructed/SoundInterface.h"
 #include "../../src/reconstructed/TrackGame.h"
 
-static inline TrackGame* UnknownModeOwner(TrackGameMode* mode) {
-    return (TrackGame*)((char*)mode - offsetof(TrackGame, mode));
-}
-
 // 0x00522440: restores the default settings.
 void TrackGameMode::UnknownFunction522440() {
-    TrackGame* owner = UnknownModeOwner(this);
     UnknownFunction522720((UnknownTrackGameModeOptions6ac*)&field_0x6ac);
     UnknownFunction522780((UnknownTrackGameModeOptionsA20*)&field_0xa20);
-    UnknownFunction5227d0((UnknownTrackGameModeOptionsA4c*)&owner->field_0xfc4);
-    g_UnknownGlobal56e26c->mode.UnknownFunction522e20(0, &owner->field_0xfc4);
-    UnknownFunction522800((UnknownTrackGameModeOptionsA68*)owner->field_0xfe0);
-    UnknownFunction522840(owner->field_0x19d4);
-    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)owner->field_0x1550);
-    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)owner->field_0x15ac);
-    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)owner->field_0x1608);
+    UnknownFunction5227d0((UnknownTrackGameModeOptionsA4c*)&field_0xa4c);
+    g_UnknownGlobal56e26c->mode.UnknownFunction522e20(0, &field_0xa4c);
+    UnknownFunction522800((UnknownTrackGameModeOptionsA68*)field_0xa68);
+    UnknownFunction522840(field_0x145c);
+    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0xfd8);
+    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0x1034);
+    UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0x1090);
     UnknownFunction522cd0();
-    owner->field_0x2da0 = 1;
-    owner->field_0x2d80 = 1;
-    owner->field_0x2d84 = 1;
-    owner->field_0x2d7c = 2;
-    owner->field_0x2d70 = 0;
-    owner->field_0x2d90 = 5;
-    owner->field_0x2eb0 = 15.0f;
-    owner->field_0x2d9c = 0;
-    owner->field_0x2d9d = 30;
-    owner->field_0x2d94 = 0;
-    owner->field_0x2d98 = 0;
-    owner->field_0x2d88 = 0;
-    owner->field_0x2d8c = 4;
-    owner->field_0x2930 = 0;
-    memcpy(owner->field_0x3148, &owner->field_0x2d70, sizeof(owner->field_0x3148));
-    memcpy(owner->field_0x2f5c, &owner->field_0x2d70, sizeof(owner->field_0x2f5c));
-    *(unsigned char*)&owner->field_0x1ee8 &= ~1;
-    owner->field_0x2934 = 10.3f;
-    owner->field_0x2938 = 0.47123885f;
-    owner->field_0x293c = 1.0646508f;
-    owner->field_0x2940 = 85.0f;
-    owner->field_0x1ed4[4] = owner->field_0xfdc;
-    owner->field_0x1ed4[3] = owner->field_0xfdc;
-    owner->field_0x1ed4[2] = owner->field_0xfdc;
-    owner->field_0x1ed4[1] = owner->field_0xfdc;
-    owner->field_0x2154 = 0;
+    field_0x27f8.field_0x30 = 1;
+    field_0x27f8.field_0x10 = 1;
+    field_0x27f8.field_0x14 = 1;
+    field_0x27f8.field_0x0c = 2;
+    field_0x27f8.field_0x00 = 0;
+    field_0x27f8.field_0x20 = 5;
+    field_0x27f8.field_0x140 = 15.0f;
+    field_0x27f8.field_0x2c = 0;
+    field_0x27f8.field_0x2d = 30;
+    field_0x27f8.field_0x24 = 0;
+    field_0x27f8.field_0x28 = 0;
+    field_0x27f8.field_0x18 = 0;
+    field_0x27f8.field_0x1c = 4;
+    field_0x23b8 = 0;
+    memcpy(&field_0x2bd0, &field_0x27f8, sizeof(field_0x2bd0));
+    memcpy(&field_0x29e4, &field_0x27f8, sizeof(field_0x29e4));
+    *(unsigned char*)&field_0x1970 &= ~1;
+    field_0x23bc = 10.3f;
+    field_0x23c0 = 0.47123885f;
+    field_0x23c4 = 1.0646508f;
+    field_0x23c8 = 85.0f;
+    field_0x195c[4] = field_0xa64;
+    field_0x195c[3] = field_0xa64;
+    field_0x195c[2] = field_0xa64;
+    field_0x195c[1] = field_0xa64;
+    field_0x1bdc = 0;
     field_0x90 = 0;
-    owner->field_0x3334 = 0;
-    owner->field_0x2144 = 101;
-    memset(owner->field_0x18fc, 0, sizeof(owner->field_0x18fc));
+    field_0x2dbc = 0;
+    field_0x1bcc = 101;
+    memset(field_0x1384, 0, sizeof(field_0x1384));
     field_0x98 = 2;
     field_0x94 = 2;
 }
@@ -121,30 +100,29 @@ void TrackGameMode::UnknownFunction522720(UnknownTrackGameModeOptions6ac* option
 // 0x005238f0 (TrackGame slot 18): finds `name` under the installed data
 // directory, else on the CD.
 int TrackGameMode::UnknownFunction5238f0(const char* name, char* path) {
-    TrackGame* owner = UnknownModeOwner(this);
     char buffer[0x104];
     int skip;
     FILE* file;
 
     strcpy(path, "");
-    skip = strlen(owner->field_0x2948);
-    if (!_strnicmp(name, owner->field_0x2948, skip)) {
+    skip = strlen(field_0x23d0);
+    if (!_strnicmp(name, field_0x23d0, skip)) {
         skip++;
     } else {
-        skip = strlen(owner->field_0x2a4c);
-        if (skip && !_strnicmp(name, owner->field_0x2a4c, skip))
+        skip = strlen(field_0x24d4);
+        if (skip && !_strnicmp(name, field_0x24d4, skip))
             skip++;
         else
             skip = 0;
     }
-    sprintf(buffer, "%s\\%s", owner->field_0x2948, name + skip);
+    sprintf(buffer, "%s\\%s", field_0x23d0, name + skip);
     file = fopen(buffer, "r");
     if (!file) {
-        if (owner->field_0x2944 == 2)
+        if (field_0x23cc == 2)
             return 0;
         if (!UnknownFunction523bf0() && !UnknownFunction523800())
             return 0;
-        sprintf(buffer, "%s\\%s", owner->field_0x2a4c, name + skip);
+        sprintf(buffer, "%s\\%s", field_0x24d4, name + skip);
         file = fopen(buffer, "r");
         if (!file)
             return 0;
@@ -153,86 +131,3 @@ int TrackGameMode::UnknownFunction5238f0(const char* name, char* path) {
     fclose(file);
     return 1;
 }
-
-// 0x00521f30 (UnknownTrackGameRacerSlot's constructor; not declared, see above):
-//     field_0xd4 = 0;
-//     strncpy(field_0xdc, "", 0) with the 15-character cap; field_0xdc[0] = 0;
-//     field_0xc8 = 0; field_0xcc = 0;
-//     field_0x80[0] = 0; field_0x40[0] = 0; field_0x00[0] = 0;
-//     field_0xd0 = FLT_MAX (0x7f7fffff); byte +0xf4 = 1.
-
-// 0x00522060 (sketch; the session array and racer records are missing).
-TrackGameMode::TrackGameMode() {
-    TrackGame* owner = UnknownModeOwner(this);
-    int i;
-
-    // eh vector constructor iterator: owner->field_0x1010[5] (SessionInfoType)
-    // 8 x 0x00521f30 on owner->field_0x215c
-    for (i = 0; i < 8; i++) {
-        owner->field_0x2ebc[i].field_0x00 = 0;
-        owner->field_0x2ebc[i].field_0x04 = 0;
-    }
-    // ... and the same eight-entry arrays at TrackGame+0x30a8 and +0x3294.
-    UnknownFunction522440();
-    owner->field_0x291c = 0;
-    field_0x6a8 = 1;
-    memset(&owner->field_0x2920, 0, sizeof(owner->field_0x2920));
-    owner->field_0x2944 = 2;
-    strcpy(owner->field_0x2948, "");
-    strcpy(owner->field_0x2a4c, "");
-    strcpy(owner->field_0x2b50, "");
-    owner->field_0x2b54 = 0;
-    owner->field_0x2b54 = new(__FILE__, 71) UnknownDriveList;   // the folded two-field reset 0x004676a0
-    if (!owner->field_0x2b54->UnknownFunction449e60()) {
-        delete owner->field_0x2b54;
-        owner->field_0x2b54 = 0;
-    }
-    owner->field_0x2b58 = 0;
-    owner->field_0x2b5c = 0;
-    owner->field_0x2b60 = 0;
-    field_0x9c = 1;
-    owner->field_0x2b64[0] = 0;
-    owner->field_0x2c68 = 0;
-    owner->field_0x2c6c[0] = 0;
-    ((UnknownTrackGameRacerSlot*)owner->field_0x1eec)->field_0xc0 = -1;
-    owner->field_0x2144 = (int)(rand() * (1.0f / 32768.0f) * 999.0f);
-    if (owner->field_0x2144 <= 99)
-        owner->field_0x2144 += 100;
-    for (i = 0; i < 6; i++) {
-        owner->field_0x18fc[i] = 0;
-        owner->field_0x1914[i][0] = 0;
-    }
-    owner->field_0x2148 = -1;
-    owner->field_0x214c = -1;
-    owner->field_0x2150 = 0;
-    owner->field_0x2158 = 0;
-    owner->field_0x1664 = 0;
-    // field_0xa0[0..5] = "Teraform\\Quarries", "Teraform\\Baja",
-    // "Teraform\\National", "Teraform\\SX", "Teraform\\Tag",
-    // "Teraform\\Enduro" (strlen-capped strncpy, at most 255 chars).
-}
-
-// 0x005225f0 (sketch; the session array's destructor iterator is missing).
-TrackGameMode::~TrackGameMode() {
-    TrackGame* owner = UnknownModeOwner(this);
-
-    if (owner->field_0x2b58)
-        delete owner->field_0x2b58;
-    if (owner->field_0x2b5c)
-        delete owner->field_0x2b5c;
-    if (owner->field_0x2b60)
-        delete owner->field_0x2b60;
-}
-
-// 0x005231f0 (sketch): loads the profile; when it is missing, clears the
-// name and builds (and destroys) a temporary TrackGameMode, which needs the
-// real 0x2dc0-byte class. Reads the same blocks 0x00523580 writes, then:
-//     owner->field_0x2da5 = 0;
-//     UnknownFunction522e20(&owner->field_0x2920, &owner->field_0xfc4);
-//     g_UnknownGlobal56e26c->ui->field_0x48c = 1;          (no null test)
-//     UnknownFunction523000();
-//     sound (Game+0x04): bit 3 of +0x45c = field_0xa34 & 1, then
-//         0x004be910(22050, 1, field_0xa48 ? 16 : 8);
-//     +0x2d70 block = +0x2f5c block; field_0x94 = field_0x98;
-//     +0x1550 = +0x15ac (0x5c bytes); +0x1eec = +0x1fb4 (0xc8 bytes);
-//     return strcmp(field_0x00, "") != 0;

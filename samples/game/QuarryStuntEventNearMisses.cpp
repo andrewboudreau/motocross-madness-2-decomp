@@ -65,12 +65,12 @@ int BaseQuarryEvent::UnknownFunction4e0560() {
             opponents = g_UnknownGlobal56e26c->field_0x3444->field_0x460;
     } else {
         if (g_UnknownGlobal56e26c->field_0x18 == 1) {
-            if (g_UnknownGlobal56e26c->field_0x2d70 == 4)
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4)
                 opponents = 1;
             else
-                opponents = g_UnknownGlobal56e26c->field_0x2d94 + 1;
+                opponents = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 + 1;
         } else {
-            opponents = g_UnknownGlobal56e26c->field_0x2d98 + g_UnknownGlobal56e26c->field_0x18;
+            opponents = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
         }
         players = opponents;
     }

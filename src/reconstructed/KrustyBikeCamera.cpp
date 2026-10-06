@@ -84,29 +84,29 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
 // 0x004981d0: saves the presets while in vehicle mode with the bike idle.
 void KrustyBikeCamera::UnknownVirtualSlot59() {
     if (vehicleMode && !bike->field_0x444) {
-        g_UnknownGlobal56e26c->field_0x2938 = field_0x22c;
-        g_UnknownGlobal56e26c->field_0x293c = field_0x234;
-        g_UnknownGlobal56e26c->field_0x2934 = field_0x220;
-        g_UnknownGlobal56e26c->field_0x2940 = field_0x258;
+        g_UnknownGlobal56e26c->mode.field_0x23c0 = field_0x22c;
+        g_UnknownGlobal56e26c->mode.field_0x23c4 = field_0x234;
+        g_UnknownGlobal56e26c->mode.field_0x23bc = field_0x220;
+        g_UnknownGlobal56e26c->mode.field_0x23c8 = field_0x258;
     }
 }
 
 // 0x00498230: restores the saved presets.
 void KrustyBikeCamera::UnknownVirtualSlot60() {
-    field_0x22c = g_UnknownGlobal56e26c->field_0x2938;
-    field_0x234 = g_UnknownGlobal56e26c->field_0x293c;
-    field_0x220 = g_UnknownGlobal56e26c->field_0x2934;
-    field_0x258 = g_UnknownGlobal56e26c->field_0x2940;
+    field_0x22c = g_UnknownGlobal56e26c->mode.field_0x23c0;
+    field_0x234 = g_UnknownGlobal56e26c->mode.field_0x23c4;
+    field_0x220 = g_UnknownGlobal56e26c->mode.field_0x23bc;
+    field_0x258 = g_UnknownGlobal56e26c->mode.field_0x23c8;
 }
 
 // 0x00498280: restores the saved state.
 void KrustyBikeCamera::UnknownVirtualSlot62() {
-    cameraState = g_UnknownGlobal56e26c->field_0x2930;
+    cameraState = g_UnknownGlobal56e26c->mode.field_0x23b8;
 }
 
 // 0x004982a0: saves the state.
 void KrustyBikeCamera::UnknownVirtualSlot61() {
-    g_UnknownGlobal56e26c->field_0x2930 = cameraState;
+    g_UnknownGlobal56e26c->mode.field_0x23b8 = cameraState;
 }
 
 // 0x004982c0: shows the state's name (string 0x13b9 + state) for 1.5 s,

@@ -210,7 +210,7 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case 5: {
         UnknownTrackGameObject3444* current = g_UnknownGlobal56e26c->field_0x3444;
         // TrackGame+0x18fc: an int per series (the bonus track was offered).
-        ((int*)g_UnknownGlobal56e26c->field_0x18fc)[current->field_0x40] = 1;
+        ((int*)g_UnknownGlobal56e26c->mode.field_0x1384)[current->field_0x40] = 1;
         int title;
         int description;
         switch (current->field_0x40) {
@@ -239,21 +239,21 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case 1:
         if (_stricmp("ButAccept", event->field_0x04) == 0) {
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45e520();
-            g_UnknownGlobal56e26c->field_0x2d74 = circuit->field_0x40;
-            g_UnknownGlobal56e26c->field_0x2d70 = 1;
-            g_UnknownGlobal56e26c->field_0x2d90 = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
-            g_UnknownGlobal56e26c->field_0x2d94 = circuit->field_0x460 - 1;
-            g_UnknownGlobal56e26c->field_0x2d80 = 1;
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 = circuit->field_0x40;
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 = 1;
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20 = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 = circuit->field_0x460 - 1;
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10 = 1;
             g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(circuit->field_0x40);
             strcpy(text, circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00);
             char* extension = strrchr(text, '.');
             if (extension)
                 *extension = 0;
-            strcpy(g_UnknownGlobal56e26c->field_0x2da6, text);
+            strcpy(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, text);
             if (circuit->field_0x40 == 1 || circuit->field_0x40 == 5)
-                g_UnknownGlobal56e26c->field_0x2da4 = 1;
+                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34 = 1;
             else
-                g_UnknownGlobal56e26c->field_0x2da4 = 0;
+                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34 = 0;
             g_UnknownGlobal56e26c->mode.field_0x94 = circuit->field_0x50;
             UnknownFunction4536e0();
             UnknownVirtualSlot26();

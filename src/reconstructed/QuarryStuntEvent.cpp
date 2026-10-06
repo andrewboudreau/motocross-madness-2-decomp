@@ -214,9 +214,9 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
         sprintf(message, "TextQueueOverlay not created.\n");
 
     if (field_0x6c) {
-        if (g_UnknownGlobal56e26c->field_0x2d74 == 1 || g_UnknownGlobal56e26c->field_0x2d74 == 5)
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 1 || g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 5)
             g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea390(
-                name, g_UnknownGlobal56e26c->sceneObject->field_0x24c, g_UnknownGlobal56e26c->field_0x2da4);
+                name, g_UnknownGlobal56e26c->sceneObject->field_0x24c, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34);
         else
             g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea390(
                 name, g_UnknownGlobal56e26c->sceneObject->field_0x24c, 0);
@@ -313,17 +313,17 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         return 1;
     }
     if (UnknownFunction43caa0(0x42, 0, event, 0x80000000)) {
-        if (g_UnknownGlobal56e26c->field_0xfd4)
+        if (g_UnknownGlobal56e26c->mode.field_0xa5c)
             UnknownFunction468dd0("SkyCube");
         else
             UnknownFunction468f10("SkyCube");
-        g_UnknownGlobal56e26c->field_0xfd4 = 1 - g_UnknownGlobal56e26c->field_0xfd4;
-        UnknownFunction4e0c30(0x1411, g_UnknownGlobal56e26c->field_0xfd4);
-        ((RenderTarget*)field_0x18)->field_0x34 = !(field_0x30 && g_UnknownGlobal56e26c->field_0xfd4);
+        g_UnknownGlobal56e26c->mode.field_0xa5c = 1 - g_UnknownGlobal56e26c->mode.field_0xa5c;
+        UnknownFunction4e0c30(0x1411, g_UnknownGlobal56e26c->mode.field_0xa5c);
+        ((RenderTarget*)field_0x18)->field_0x34 = !(field_0x30 && g_UnknownGlobal56e26c->mode.field_0xa5c);
         return 1;
     }
     if (UnknownFunction43caa0(0x43, 0, event, 0x80000000)) {
-        if (g_UnknownGlobal56e26c->field_0xfcc) {
+        if (g_UnknownGlobal56e26c->mode.field_0xa54) {
             UnknownFunction468dd0("ParticleManager");
             UnknownFunction468dd0("DirtParticleEmitter");
             UnknownFunction468dd0("DustParticleEmitter");
@@ -336,12 +336,12 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             UnknownFunction468f10("DirtChunkParticleEmitter");
             UnknownFunction468f10("SteamParticleEmitter");
         }
-        g_UnknownGlobal56e26c->field_0xfcc = 1 - g_UnknownGlobal56e26c->field_0xfcc;
-        UnknownFunction4e0c30(0x140f, g_UnknownGlobal56e26c->field_0xfcc);
+        g_UnknownGlobal56e26c->mode.field_0xa54 = 1 - g_UnknownGlobal56e26c->mode.field_0xa54;
+        UnknownFunction4e0c30(0x140f, g_UnknownGlobal56e26c->mode.field_0xa54);
         return 1;
     }
     if (UnknownFunction43caa0(0x44, 0, event, 0x80000000)) {
-        if (g_UnknownGlobal56e26c->field_0xfc8) {
+        if (g_UnknownGlobal56e26c->mode.field_0xa50) {
             UnknownFunction468dd0("ProjectedShadow");
             UnknownFunction468dd0("TerrainShadow");
             UnknownFunction468dd0("D3DIMSoultreeShadow");
@@ -350,19 +350,19 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             UnknownFunction468f10("TerrainShadow");
             UnknownFunction468f10("D3DIMSoultreeShadow");
         }
-        g_UnknownGlobal56e26c->field_0xfc8 = 1 - g_UnknownGlobal56e26c->field_0xfc8;
-        UnknownFunction4e0c30(0x1410, g_UnknownGlobal56e26c->field_0xfc8);
+        g_UnknownGlobal56e26c->mode.field_0xa50 = 1 - g_UnknownGlobal56e26c->mode.field_0xa50;
+        UnknownFunction4e0c30(0x1410, g_UnknownGlobal56e26c->mode.field_0xa50);
         return 1;
     }
     if (UnknownFunction43caa0(0x57, 0, event, 0x80000000)) {
-        int level = g_UnknownGlobal56e26c->field_0xfdc - 1;
+        int level = g_UnknownGlobal56e26c->mode.field_0xa64 - 1;
         if (level < 0)
             level = 0;
-        g_UnknownGlobal56e26c->field_0xfdc = level;
-        g_UnknownGlobal56e26c->field_0x1ed4[3] = level;
-        g_UnknownGlobal56e26c->field_0x1ed4[1] = level;
-        g_UnknownGlobal56e26c->field_0x1ed4[2] = level;
-        g_UnknownGlobal56e26c->field_0x1ed4[4] = level;
+        g_UnknownGlobal56e26c->mode.field_0xa64 = level;
+        g_UnknownGlobal56e26c->mode.field_0x195c[3] = level;
+        g_UnknownGlobal56e26c->mode.field_0x195c[1] = level;
+        g_UnknownGlobal56e26c->mode.field_0x195c[2] = level;
+        g_UnknownGlobal56e26c->mode.field_0x195c[4] = level;
         field_0x40->UnknownFunction507960(level);
         if (field_0x48)
             field_0x48->UnknownFunction4594c0(level);
@@ -381,14 +381,14 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         return 1;
     }
     if (UnknownFunction43caa0(0x58, 0, event, 0x80000000)) {
-        int level = g_UnknownGlobal56e26c->field_0xfdc + 1;
+        int level = g_UnknownGlobal56e26c->mode.field_0xa64 + 1;
         if (level >= 9)
             level = 9;
-        g_UnknownGlobal56e26c->field_0xfdc = level;
-        g_UnknownGlobal56e26c->field_0x1ed4[3] = level;
-        g_UnknownGlobal56e26c->field_0x1ed4[1] = level;
-        g_UnknownGlobal56e26c->field_0x1ed4[2] = level;
-        g_UnknownGlobal56e26c->field_0x1ed4[4] = level;
+        g_UnknownGlobal56e26c->mode.field_0xa64 = level;
+        g_UnknownGlobal56e26c->mode.field_0x195c[3] = level;
+        g_UnknownGlobal56e26c->mode.field_0x195c[1] = level;
+        g_UnknownGlobal56e26c->mode.field_0x195c[2] = level;
+        g_UnknownGlobal56e26c->mode.field_0x195c[4] = level;
         field_0x40->UnknownFunction507960(level);
         if (field_0x48)
             field_0x48->UnknownFunction4594c0(level);
@@ -448,11 +448,11 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         char text[0x80];
         char buffer[0x80];
         strcpy(name, "");
-        for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-            if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == leave->field_0x08) {
-                int n = strlen(g_UnknownGlobal56e26c->field_0x215c[i].field_0xdc);
+        for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+            if (g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4 == leave->field_0x08) {
+                int n = strlen(g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xdc);
                 int length = n > 0x7f ? 0x7f : n;
-                strncpy(name, g_UnknownGlobal56e26c->field_0x215c[i].field_0xdc, length);
+                strncpy(name, g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xdc, length);
                 name[length] = 0;
                 break;
             }
@@ -462,7 +462,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         UnknownMessage message(buffer, 3.25f);
         field_0x6c->UnknownFunction51b5e0(&message);
         field_0x34->UnknownFunction420590(leave->field_0x08);
-        if (g_UnknownGlobal56e26c->field_0x2d70 == 2)
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45fbd0(leave->field_0x08);
     } else if (from && type == 0x89) {
         char text[0x80];
@@ -472,7 +472,7 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         UnknownMessage message(buffer, 3.25f);
         field_0x6c->UnknownFunction51b5e0(&message);
         field_0x34->UnknownFunction420590(from);
-        if (g_UnknownGlobal56e26c->field_0x2d70 == 2)
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45fbd0(from);
     }
     return 0;

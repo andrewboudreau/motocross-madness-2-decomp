@@ -319,14 +319,14 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e5);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e5);
         tab->UnknownFunction470da0(0x12);
-        memcpy(&g_UnknownGlobal56e26c->field_0x2d70, g_UnknownGlobal56e26c->field_0x2f5c,
-               sizeof(g_UnknownGlobal56e26c->field_0x2f5c));
-        memcpy(g_UnknownGlobal56e26c->field_0x1550, g_UnknownGlobal56e26c->field_0x15ac,
-               sizeof(g_UnknownGlobal56e26c->field_0x15ac));
-        memcpy(g_UnknownGlobal56e26c->field_0x1eec, g_UnknownGlobal56e26c->field_0x1fb4,
-               sizeof(g_UnknownGlobal56e26c->field_0x1fb4));
+        memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &g_UnknownGlobal56e26c->mode.field_0x29e4,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
+        memcpy(g_UnknownGlobal56e26c->mode.field_0xfd8, g_UnknownGlobal56e26c->mode.field_0x1034,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x1034));
+        memcpy(&g_UnknownGlobal56e26c->mode.field_0x1974, &g_UnknownGlobal56e26c->mode.field_0x1a3c,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x1a3c));
         g_UnknownGlobal56e26c->mode.field_0x94 = g_UnknownGlobal56e26c->mode.field_0x98;
-        g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->field_0x2d74);
+        g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04);
         if (field_0xc4 == 0x88e) {
             UnknownFunction46ebf0("RaceInfoTab", 4)->UnknownFunction479310(0);
             UnknownFunction44d740(2);
@@ -343,12 +343,12 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             if (field_0x7f5c)
                 field_0x7f5c->UnknownFunction46ecc0(1);
             UnknownFunction46ecc0(1);
-            memcpy(g_UnknownGlobal56e26c->field_0x2f5c, &g_UnknownGlobal56e26c->field_0x2d70,
-                   sizeof(g_UnknownGlobal56e26c->field_0x2f5c));
-            memcpy(g_UnknownGlobal56e26c->field_0x15ac, g_UnknownGlobal56e26c->field_0x1550,
-                   sizeof(g_UnknownGlobal56e26c->field_0x15ac));
-            memcpy(g_UnknownGlobal56e26c->field_0x1fb4, g_UnknownGlobal56e26c->field_0x1eec,
-                   sizeof(g_UnknownGlobal56e26c->field_0x1fb4));
+            memcpy(&g_UnknownGlobal56e26c->mode.field_0x29e4, &g_UnknownGlobal56e26c->mode.field_0x27f8,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
+            memcpy(g_UnknownGlobal56e26c->mode.field_0x1034, g_UnknownGlobal56e26c->mode.field_0xfd8,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1034));
+            memcpy(&g_UnknownGlobal56e26c->mode.field_0x1a3c, &g_UnknownGlobal56e26c->mode.field_0x1974,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1a3c));
             g_UnknownGlobal56e26c->mode.field_0x98 = g_UnknownGlobal56e26c->mode.field_0x94;
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(100);
             event->field_0x0c->UnknownFunction46ff30(0);
@@ -356,7 +356,7 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("Start", event->field_0x04)) {
             if (field_0x7f58)
                 field_0x7f58->UnknownFunction46ecc0(1);
-            if (g_UnknownGlobal56e26c->field_0x2d78 == -1) {
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x08 == -1) {
                 ChoiceDlg* dialog = new(__FILE__, 1274) ChoiceDlg;
                 field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0,
                                                   (UnknownGuiDialog*)this, 0, 0, 1);
@@ -372,33 +372,33 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                                                   (UnknownGuiDialog*)this, 0, 0, 1);
             } else {
                 g_UnknownGlobal56e26c->ui->UnknownFunction499a20();
-                g_UnknownGlobal56e26c->field_0x2d98 = 0;
+                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = 0;
                 if (field_0x7f58)
                     field_0x7f58->UnknownFunction46ecc0(1);
                 if (field_0x7f5c)
                     field_0x7f5c->UnknownFunction46ecc0(1);
                 if (field_0x7f60)
                     field_0x7f60->UnknownFunction46ecc0(1);
-                if (g_UnknownGlobal56e26c->field_0x3334 && g_UnknownGlobal56e26c->field_0x2d70 != 4) {
+                if (g_UnknownGlobal56e26c->mode.field_0x2dbc && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
                     g_UnknownGlobal56e26c->field_0x342c = 1;
                     g_UnknownGlobal56e26c->field_0x3428 = 0;
                 } else {
                     g_UnknownGlobal56e26c->field_0x342c = 0;
                     g_UnknownGlobal56e26c->field_0x3428 = 0;
                 }
-                memcpy(g_UnknownGlobal56e26c->field_0x2f5c, &g_UnknownGlobal56e26c->field_0x2d70,
-                       sizeof(g_UnknownGlobal56e26c->field_0x2f5c));
-                memcpy(g_UnknownGlobal56e26c->field_0x15ac, g_UnknownGlobal56e26c->field_0x1550,
-                       sizeof(g_UnknownGlobal56e26c->field_0x15ac));
-                memcpy(g_UnknownGlobal56e26c->field_0x1fb4, g_UnknownGlobal56e26c->field_0x1eec,
-                       sizeof(g_UnknownGlobal56e26c->field_0x1fb4));
+                memcpy(&g_UnknownGlobal56e26c->mode.field_0x29e4, &g_UnknownGlobal56e26c->mode.field_0x27f8,
+                       sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
+                memcpy(g_UnknownGlobal56e26c->mode.field_0x1034, g_UnknownGlobal56e26c->mode.field_0xfd8,
+                       sizeof(g_UnknownGlobal56e26c->mode.field_0x1034));
+                memcpy(&g_UnknownGlobal56e26c->mode.field_0x1a3c, &g_UnknownGlobal56e26c->mode.field_0x1974,
+                       sizeof(g_UnknownGlobal56e26c->mode.field_0x1a3c));
                 g_UnknownGlobal56e26c->mode.field_0x98 = g_UnknownGlobal56e26c->mode.field_0x94;
-                if (g_UnknownGlobal56e26c->field_0x2d70 == 4 && g_UnknownGlobal56e26c->field_0x2b64[0]) {
+                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4 && g_UnknownGlobal56e26c->mode.field_0x25ec[0]) {
                     // KrustyUI+0x4e8 holds a copy of the race settings.
-                    memcpy(&g_UnknownGlobal56e26c->field_0x2d70, (unsigned char*)g_UnknownGlobal56e26c->ui + 0x4e8,
-                           sizeof(g_UnknownGlobal56e26c->field_0x2f5c));
+                    memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, (unsigned char*)g_UnknownGlobal56e26c->ui + 0x4e8,
+                           sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
                 } else {
-                    g_UnknownGlobal56e26c->field_0x2b64[0] = 0;
+                    g_UnknownGlobal56e26c->mode.field_0x25ec[0] = 0;
                 }
                 UnknownFunction4536e0();
                 UnknownVirtualSlot26();
@@ -607,7 +607,7 @@ void SPBikeRiderDlg::UnknownFunction4500d0() {
 void SPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
     if (!apply)
         return;
-    strcpy((char*)g_UnknownGlobal56e26c->field_0x1eec, "");
+    strcpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00, "");
     UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
     int bike = list->UnknownFunction4768d0(-1);
     {
@@ -615,21 +615,21 @@ void SPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
         char* name = ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[bikes[bike].field_0x00].field_0x40;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
-        strncpy((char*)g_UnknownGlobal56e26c->field_0x1eec, name, count);
-        g_UnknownGlobal56e26c->field_0x1eec[count] = 0;
+        strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00, name, count);
+        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00[count] = 0;
     }
     {
         char* name = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].field_0x48;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
-        strncpy((char*)g_UnknownGlobal56e26c->field_0x1eec + 0x40, name, count);
-        (g_UnknownGlobal56e26c->field_0x1eec + 0x40)[count] = 0;
+        strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x40, name, count);
+        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x40[count] = 0;
     }
     {
         int length = strlen("");
         int count = length > 0x3f ? 0x3f : length;
-        strncpy((char*)g_UnknownGlobal56e26c->field_0x1eec + 0x80, "", count);
-        (g_UnknownGlobal56e26c->field_0x1eec + 0x80)[count] = 0;
+        strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80, "", count);
+        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80[count] = 0;
     }
     list = UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
     int rider = list->UnknownFunction4768d0(-1);
@@ -637,8 +637,8 @@ void SPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
         char* name = ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[rider].field_0x40;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
-        strncpy((char*)g_UnknownGlobal56e26c->field_0x1eec + 0x80, name, count);
-        (g_UnknownGlobal56e26c->field_0x1eec + 0x80)[count] = 0;
+        strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80, name, count);
+        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80[count] = 0;
     }
     g_UnknownGlobal56e26c->mode.UnknownFunction523580();
 }
@@ -749,8 +749,8 @@ int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
             return 1;
         }
         if (g_UnknownGlobal56e26c->field_0x08) {
-            for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++)
-                g_UnknownGlobal56e26c->field_0x215c[i].UnknownFunction522050();
+            for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++)
+                g_UnknownGlobal56e26c->mode.field_0x1be4[i].UnknownFunction522050();
         }
         g_UnknownGlobal59ae84 = 1;
         UnknownFunction46fce0(0, 100, 0);
@@ -968,7 +968,7 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
         g_UnknownGlobal56e26c->eventManager->UnknownFunction45cdc0(2);
         if (g_UnknownGlobal56e26c->field_0x08) {
             g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac510(1);
-            if (g_UnknownGlobal56e26c->field_0x2d70 == 2) {
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
                 UnknownFunction4aef40();
                 g_UnknownGlobal56e26c->eventManager->UnknownFunction45e710(100);
             } else {
@@ -1397,8 +1397,8 @@ int GhostFilesDlg::UnknownFunction454640(const char* path) {
 void GhostFilesDlg::UnknownFunction454970() {
     UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
     UnknownRecordFileHeader* header = &field_0x7f58[list->UnknownFunction4768d0(-1)];
-    memcpy(&g_UnknownGlobal56e26c->field_0x2d70, &header->field_0x34, sizeof(g_UnknownGlobal56e26c->field_0x2f5c));
-    COPY_TEXT(g_UnknownGlobal56e26c->field_0x2b64, field_0x7f60[list->UnknownFunction4768d0(-1)], 0x104);
+    memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &header->field_0x34, sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
+    COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x25ec, field_0x7f60[list->UnknownFunction4768d0(-1)], 0x104);
     field_0x2c->UnknownVirtualSlot26();
     g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(header->field_0x3c);
     UnknownFunction4536e0();
@@ -1574,13 +1574,13 @@ int ReplayFilesDlg::UnknownFunction455040(const char* path) {
 void ReplayFilesDlg::UnknownFunction455490() {
     UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
     UnknownRecordFileHeader* header = &field_0x7f58[list->UnknownFunction4768d0(-1)];
-    memcpy(&g_UnknownGlobal56e26c->field_0x2d70, &header->field_0x34, sizeof(g_UnknownGlobal56e26c->field_0x2f5c));
+    memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &header->field_0x34, sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
     g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(header->field_0x3c);
     g_UnknownGlobal56e26c->field_0x3428 = 1;
     g_UnknownGlobal56e26c->field_0x342c = 1;
-    *(int*)&g_UnknownGlobal56e26c->field_0x1550[0] = header->field_0x33c;
-    *(int*)&g_UnknownGlobal56e26c->field_0x1550[4] = header->field_0x340;
-    COPY_TEXT(g_UnknownGlobal56e26c->field_0x2c6c, field_0x7f60[list->UnknownFunction4768d0(-1)], 0x104);
+    *(int*)&g_UnknownGlobal56e26c->mode.field_0xfd8[0] = header->field_0x33c;
+    *(int*)&g_UnknownGlobal56e26c->mode.field_0xfd8[4] = header->field_0x340;
+    COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x26f4, field_0x7f60[list->UnknownFunction4768d0(-1)], 0x104);
     field_0x2c->UnknownVirtualSlot26();
     UnknownFunction4536e0();
 }
@@ -1693,12 +1693,12 @@ void DemoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case 6:
         if (!g_UnknownGlobal56e26c->field_0x2d5_bit1) {
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45cdc0(2);
-            memcpy(&g_UnknownGlobal56e26c->field_0x2d70, g_UnknownGlobal56e26c->field_0x2f5c,
-                   sizeof(g_UnknownGlobal56e26c->field_0x2f5c));
-            memcpy(g_UnknownGlobal56e26c->field_0x1550, g_UnknownGlobal56e26c->field_0x15ac,
-                   sizeof(g_UnknownGlobal56e26c->field_0x15ac));
-            memcpy(g_UnknownGlobal56e26c->field_0x1eec, g_UnknownGlobal56e26c->field_0x1fb4,
-                   sizeof(g_UnknownGlobal56e26c->field_0x1fb4));
+            memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &g_UnknownGlobal56e26c->mode.field_0x29e4,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
+            memcpy(g_UnknownGlobal56e26c->mode.field_0xfd8, g_UnknownGlobal56e26c->mode.field_0x1034,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1034));
+            memcpy(&g_UnknownGlobal56e26c->mode.field_0x1974, &g_UnknownGlobal56e26c->mode.field_0x1a3c,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1a3c));
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45e710(100);
             field_0x30->UnknownFunction486630(1);
         }

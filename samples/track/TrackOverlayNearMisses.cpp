@@ -46,7 +46,7 @@ int NameOverlay::UnknownFunction519000(const Vector3* point)
 // 0x005198a0: redraws the panel for the view mode.
 int StatsOverlay::UnknownFunction5198a0()
 {
-    switch (g_UnknownGlobal56e26c->field_0x2d74) {
+    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
     case 0:
         if (!UnknownFunction519a20())
             return 0;

@@ -19,6 +19,7 @@ struct UnknownDriveEntry {
 // volume is "MCM2" (0x00523bf0).
 class UnknownDriveList {
 public:
+    UnknownDriveList();                                   // called at 0x004676a0 (folded)
     ~UnknownDriveList();                                  // 0x0044a000
     int UnknownFunction449e60();                          // 0x00449e60: rescans
     // 0x00449e70: lists the fixed and CD-ROM drives; 0 when out of memory.

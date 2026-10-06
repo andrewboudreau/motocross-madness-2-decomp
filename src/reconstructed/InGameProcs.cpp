@@ -31,7 +31,7 @@ void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("ButLeft", event->field_0x04)) {
             UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
-            if (view && g_UnknownGlobal56e26c->field_0x2d70 == 4 && view->field_0x1e8 > 0) {
+            if (view && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4 && view->field_0x1e8 > 0) {
                 ChoiceDlg* dialog = new(__FILE__, 66) ChoiceDlg;
                 field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0,
                                                   (UnknownGuiDialog*)this, 0, 0, 1);
@@ -68,7 +68,7 @@ void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x13da);
         UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
         if (g_UnknownGlobal56e26c->field_0x08 || view->field_0x38->field_0x7a4 ||
-            g_UnknownGlobal56e26c->field_0x2d70 == 4)
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4)
             control->UnknownFunction470660(0, 1);
         control = UnknownFunction46ebf0("ButLeft", 1);
         control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x13db);
@@ -79,11 +79,11 @@ void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     }
     case 9:
         if (event->field_0x00 == 0x65) {
-            g_UnknownGlobal56e26c->field_0x2c68 = 1;
+            g_UnknownGlobal56e26c->mode.field_0x26f0 = 1;
             field_0x30->UnknownFunction486630(0);
             UnknownFunction4526b0(0x191, event);
         } else if (event->field_0x00 == 0x67) {
-            g_UnknownGlobal56e26c->field_0x2c68 = 0;
+            g_UnknownGlobal56e26c->mode.field_0x26f0 = 0;
             field_0x30->UnknownFunction486630(0);
             UnknownFunction4526b0(0x191, event);
         }
@@ -242,12 +242,12 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButExit", event->field_0x04)) {
             event->field_0x0c->UnknownFunction46ff30(0);
             event->field_0x20 = 1;
-            memcpy(&g_UnknownGlobal56e26c->field_0x2d70, g_UnknownGlobal56e26c->field_0x2f5c,
-                   sizeof(g_UnknownGlobal56e26c->field_0x2f5c));
-            memcpy(g_UnknownGlobal56e26c->field_0x1550, g_UnknownGlobal56e26c->field_0x15ac,
-                   sizeof(g_UnknownGlobal56e26c->field_0x15ac));
-            memcpy(g_UnknownGlobal56e26c->field_0x1eec, g_UnknownGlobal56e26c->field_0x1fb4,
-                   sizeof(g_UnknownGlobal56e26c->field_0x1fb4));
+            memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &g_UnknownGlobal56e26c->mode.field_0x29e4,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
+            memcpy(g_UnknownGlobal56e26c->mode.field_0xfd8, g_UnknownGlobal56e26c->mode.field_0x1034,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1034));
+            memcpy(&g_UnknownGlobal56e26c->mode.field_0x1974, &g_UnknownGlobal56e26c->mode.field_0x1a3c,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1a3c));
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45cdc0(2);
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45e710(100);
             field_0x30->UnknownFunction486630(1);

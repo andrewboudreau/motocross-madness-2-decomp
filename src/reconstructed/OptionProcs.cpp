@@ -164,10 +164,10 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (_stricmp("TerrainQualitySliderBar", event->field_0x04) == 0) {
             int value = event->field_0x14->UnknownFunction475500();
             g_UnknownGlobal6887d8.field_0x18 = value;
-            g_UnknownGlobal56e26c->field_0x1ed4[1] = value;
-            g_UnknownGlobal56e26c->field_0x1ed4[3] = value;
-            g_UnknownGlobal56e26c->field_0x1ed4[2] = value;
-            g_UnknownGlobal56e26c->field_0x1ed4[4] = value;
+            g_UnknownGlobal56e26c->mode.field_0x195c[1] = value;
+            g_UnknownGlobal56e26c->mode.field_0x195c[3] = value;
+            g_UnknownGlobal56e26c->mode.field_0x195c[2] = value;
+            g_UnknownGlobal56e26c->mode.field_0x195c[4] = value;
         }
         break;
     case 16:
@@ -193,7 +193,7 @@ void OptGraphicsDlg::UnknownVirtualSlot31(int save)
 // 0x004b26c0
 void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
-    int* settings = g_UnknownGlobal56e26c->field_0x1ed4;
+    int* settings = g_UnknownGlobal56e26c->mode.field_0x195c;
     char key[1024];
     switch (event->field_0x08) {
     case 6: {
@@ -546,7 +546,7 @@ static inline UnknownOptSoundSettings* UnknownSoundSettingsOf(TrackGame* game)
 
 static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* game)
 {
-    return (UnknownOptGraphicsSettings*)&game->field_0xfc4;
+    return (UnknownOptGraphicsSettings*)&game->mode.field_0xa4c;
 }
 
 static inline UnknownOptControlSettings* UnknownControlSettingsOf(TrackGame* game)
@@ -556,7 +556,7 @@ static inline UnknownOptControlSettings* UnknownControlSettingsOf(TrackGame* gam
 
 static inline UnknownOptGarageSettings* UnknownGarageSettingsOf(TrackGame* game)
 {
-    return (UnknownOptGarageSettings*)game->field_0x1550;
+    return (UnknownOptGarageSettings*)game->mode.field_0xfd8;
 }
 
 static inline char (*UnknownMessagesOf(TrackGame* game))[128]
@@ -704,7 +704,7 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             int count = ui->field_0x54;
             for (int i = 0; i < count; i++) {
                 if (((UnknownOptKrustyUIRecord*)ui->field_0x50)[i].field_0x8c == 0xfa) {
-                    ((int*)g_UnknownGlobal56e26c->field_0x1eec)[0x31] = i; // TrackGame+0x1fb0
+                    g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4 = i; // TrackGame+0x1fb0
                     break;
                 }
             }
@@ -956,7 +956,7 @@ void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                         game->ui->field_0x68[UnknownBikeClassOf(g_UnknownGlobal688808.field_0x00)][curve][band];
                 else
                     g_UnknownGlobal688808.field_0x24[band] =
-                        game->field_0x1668[UnknownBikeClassOf(g_UnknownGlobal688808.field_0x00)][curve - 3][band];
+                        game->mode.field_0x10f0[UnknownBikeClassOf(g_UnknownGlobal688808.field_0x00)][curve - 3][band];
             }
             UnknownFunction4b3bc0();
         }
@@ -1019,7 +1019,7 @@ void OptGarageDlg::UnknownFunction4b3aa0(UnknownGameUiControl* slider)
                       __min(value, g_UnknownGlobal56e26c->ui->field_0x324[bikeClass][band]));
     g_UnknownGlobal688808.field_0x24[band] = level;
     int custom = UnknownDropDownList(UnknownFunction46ebf0("DDLCurves", 6))->UnknownFunction4768d0(-1) - 3;
-    g_UnknownGlobal56e26c->field_0x1668[bikeClass][custom][band] = level;
+    g_UnknownGlobal56e26c->mode.field_0x10f0[bikeClass][custom][band] = level;
     UnknownFunction4b3bc0();
 }
 

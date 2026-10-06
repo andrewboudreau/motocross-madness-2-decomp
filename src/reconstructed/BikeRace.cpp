@@ -200,7 +200,7 @@ BikeRace::~BikeRace() {
 int BikeRace::UnknownVirtualSlot16(int value) {
     GameObject::UnknownVirtualSlot16(value);
     JoystickDevice* joystick = g_UnknownGlobal56e26c->field_0x14->activeJoystick;
-    if (joystick != 0 && g_UnknownGlobal56e26c->field_0x1000) {
+    if (joystick != 0 && g_UnknownGlobal56e26c->mode.field_0xa88) {
         joystick->UnknownVirtualSlot18(value);
     }
     return 1;
@@ -264,7 +264,7 @@ void BikeRace::UnknownFunction41d2a0(float time) {
 // 0x0041ea10
 int BikeRace::UnknownFunction41ea10() {
     if (g_UnknownGlobal56e26c->field_0x18 > 1) {
-        for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
+        for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
             if (field_0x03c[i]->UnknownFunction495c00()) {
                 return 1;
             }
@@ -325,9 +325,9 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
     if (type == 1) {
         UnknownBikeRaceNetState* state = (UnknownBikeRaceNetState*)data;
         int self = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
-        count = g_UnknownGlobal56e26c->field_0x2158;
+        count = g_UnknownGlobal56e26c->mode.field_0x1be0;
         for (int i = 0; i < count; i++) {
-            int id = g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4;
+            int id = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4;
             if (id != self && id == from) {
                 UnknownBikeRaceRacer* racer = field_0x03c[i];
                 if (racer != 0 && racer->field_0x734 == state->field_0x54) {
@@ -353,8 +353,8 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
     } else if (type == 13) {
         UnknownBikeRaceNetMessage13* message = (UnknownBikeRaceNetMessage13*)data;
         int self = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
-        for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-            int id = g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4;
+        for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+            int id = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4;
             if (id != self && id == from && field_0x03c[i] != 0 &&
                 field_0x03c[i]->field_0x734 == message->field_0x16) {
                 if (!field_0x03c[i]->field_0x11b8) {
@@ -372,10 +372,10 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
         }
     } else if (type == 10) {
         UnknownBikeRaceNetScore* score = (UnknownBikeRaceNetScore*)data;
-        count = g_UnknownGlobal56e26c->field_0x2158;
+        count = g_UnknownGlobal56e26c->mode.field_0x1be0;
         int self = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
         for (int i = 0; i < count; i++) {
-            int id = g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4;
+            int id = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4;
             if (id != self && id == from) {
                 UnknownBikeRaceRacer* racer = field_0x03c[i];
                 if (racer != 0 && racer->field_0x734 == score->field_0x01) {
@@ -401,13 +401,13 @@ int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int f
         return 1;
     } else if (type == 0x84) {
         UnknownBikeRaceNetStamp* stamp = (UnknownBikeRaceNetStamp*)data;
-        for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-            if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == from) {
+        for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+            if (g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4 == from) {
                 float delay = (float)(unsigned int)flags - (float)stamp->field_0x04;
-                if (delay < g_UnknownGlobal56e26c->field_0x215c[i].field_0xd0) {
-                    g_UnknownGlobal56e26c->field_0x215c[i].field_0xd0 = delay;
+                if (delay < g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd0) {
+                    g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd0 = delay;
                 }
-                g_UnknownGlobal56e26c->field_0x215c[i].field_0xc8 = 1;
+                g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xc8 = 1;
             }
         }
     }
@@ -433,12 +433,12 @@ UnknownBikeRaceRacer* BikeRace::UnknownFunction4204e0(int* iterator) {
     }
     (*iterator)++;
     if (g_UnknownGlobal56e26c->field_0x18 > 1) {
-        if (*iterator > g_UnknownGlobal56e26c->field_0x2d98 + g_UnknownGlobal56e26c->field_0x18) {
+        if (*iterator > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18) {
             *iterator = 0;
             return 0;
         }
     } else {
-        int count = g_UnknownGlobal56e26c->field_0x2d70 == 4 ? 1 : g_UnknownGlobal56e26c->field_0x2d94;
+        int count = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4 ? 1 : g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24;
         if (*iterator > count + 1) {
             *iterator = 0;
             return 0;
@@ -453,13 +453,13 @@ void BikeRace::UnknownFunction420590(int player) {
         return;
     }
     int self = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
-    for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-        int id = g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4;
+    for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+        int id = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4;
         if (id != self && id == player && field_0x03c[i] != 0) {
             field_0x03c[i]->UnknownRacerVirtualSlot44();
             TrackGameViewOwner* owner = g_UnknownGlobal56e26c->field_0x568;
             if (owner != 0 && owner->field_0xa8 == (UnknownEventRacer*)field_0x03c[i]) {
-                if (g_UnknownGlobal56e26c->field_0x2eb4) {
+                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x144) {
                     owner->field_0xa8 = 0;
                 } else if (g_UnknownGlobal56e26c->field_0x08->isHost) {
                     owner->UnknownFunction4a9d20();
@@ -483,13 +483,13 @@ void BikeRace::UnknownFunction420650(int mode, char* path, char* description) {
     int iterator = 0;
     Vector3 position;
     Vector3 direction;
-    if (field_0x064 != 0 && g_UnknownGlobal56e26c->field_0x2d70 != 0 &&
-        g_UnknownGlobal56e26c->field_0x2d70 != 4) {
+    if (field_0x064 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 &&
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
         field_0x064->UnknownVirtualSlot5();
     }
     int positions[11];
     int order[11];
-    if (g_UnknownGlobal56e26c->field_0x2d70 == 2) {
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
         UnknownFunction417bc0(order);
         for (int i = 0; i < field_0x158; i++) {
             for (int j = 0; j < field_0x158; j++) {
@@ -646,14 +646,14 @@ void BikeRace::UnknownFunction420bd0() {
     char bikeName[0x40];
     sprintf(model, "%s\\%s", "Res", "Ghost.mcf");
     sprintf(rider, "%s\\GhostRider.mcf", "Res");
-    g_UnknownGlobal56e26c->ui->UnknownFunction49b560(&g_UnknownGlobal56e26c->field_0x1eec[0x40],
+    g_UnknownGlobal56e26c->ui->UnknownFunction49b560(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x40,
                                                      riderName, 0x3f);
-    g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(&g_UnknownGlobal56e26c->field_0x1eec[0x80],
+    g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80,
                                                      bikeName, 0x3f);
     field_0x1a0->UnknownFunction49c070(0, 0, 0, &g_UnknownGlobal56e26c->mode, model, rider,
                                        riderName, bikeName, field_0x040[0]->field_0x738,
                                        (unsigned char)field_0x040[0]->field_0x737,
-                                       g_UnknownGlobal56e26c->field_0x2144);
+                                       g_UnknownGlobal56e26c->mode.field_0x1bcc);
     UnknownFunction469190(field_0x1a0, -1);
     field_0x038->UnknownFunction496e20(field_0x1a0);
     if (field_0x189 && field_0x038->field_0x7a0 == 1 && field_0x1f0[0] == 0) {
@@ -680,7 +680,7 @@ void BikeRace::UnknownFunction421050() {
         field_0x15c = 0.0f;
         return;
     }
-    int mode = g_UnknownGlobal56e26c->field_0x2d70;
+    int mode = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00;
     if (mode != 0 && mode != 4) {
         if (field_0x06c != 0) {
             field_0x15c = 8.2f;
@@ -712,12 +712,12 @@ void BikeRace::UnknownFunction423040(int index) {
 // own and remote.
 static inline int UnknownFunctionRacerCount() {
     if (g_UnknownGlobal56e26c->field_0x18 == 1) {
-        if (g_UnknownGlobal56e26c->field_0x2d70 == 4) {
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
             return g_UnknownGlobal56e26c->field_0x18;
         }
-        return g_UnknownGlobal56e26c->field_0x2d94 + 1;
+        return g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 + 1;
     }
-    return g_UnknownGlobal56e26c->field_0x2d98 + g_UnknownGlobal56e26c->field_0x18;
+    return g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
 }
 
 // 0x00422ec0
@@ -887,13 +887,13 @@ void BikeRace::UnknownFunction423790(int level) {
     g_UnknownGlobal689f18 = g_UnknownGlobal56e26c->field_0x2d0 ? g_UnknownGlobal5744c8 : g_UnknownGlobal574428;
     field_0x038->field_0x3bc->UnknownFunction4451e0(level);
     field_0x038->field_0x5c4->field_0x1a0->UnknownFunction4451e0(level);
-    if (g_UnknownGlobal56e26c->field_0x2d70 != 4) {
-        for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2d94; i++) {
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
+        for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++) {
             field_0x040[i]->field_0x3bc->UnknownFunction4451e0(level);
             field_0x040[i]->field_0x5c4->field_0x1a0->UnknownFunction4451e0(level);
         }
     }
-    for (int j = 0; j < g_UnknownGlobal56e26c->field_0x2da5; j++) {
+    for (int j = 0; j < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35; j++) {
         field_0x03c[j]->field_0x3bc->UnknownFunction4451e0(level);
         field_0x03c[j]->field_0x5c4->field_0x1a0->UnknownFunction4451e0(level);
     }

@@ -155,10 +155,10 @@ void BikeRace::UnknownFunction41f1d0(int forward, int racers, int objects) {
         int others;
         if (g_UnknownGlobal56e26c->field_0x18 > 1) {
             others = g_UnknownGlobal56e26c->field_0x3424;
-        } else if (g_UnknownGlobal56e26c->field_0x2d70 == 4) {
+        } else if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
             others = 1;
         } else {
-            others = g_UnknownGlobal56e26c->field_0x2d94;
+            others = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24;
         }
         if (g_UnknownGlobal56e26c->field_0x18 == 1 && others == 0) {
             return;
@@ -322,7 +322,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 sprintf(text, "%s : %s", title, value);
                 UnknownMessage* message = new (__FILE__, 0xcdd) UnknownMessage(text, 3.25f);
                 TextQueueOverlay* overlay;
-                switch (g_UnknownGlobal56e26c->field_0x2d74) {
+                switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
                 case 0:
                     overlay = g_UnknownGlobal56e26c->field_0x55c->field_0x6c;
                     break;
@@ -379,8 +379,8 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             break;
         case 0x22:
             if (UnknownFunction43caa0(0x22, 0, event, 0xc)) {
-                g_UnknownGlobal56e26c->field_0x1004 = 1 - g_UnknownGlobal56e26c->field_0x1004;
-                field_0x038->field_0x5bc = g_UnknownGlobal56e26c->field_0x1004;
+                g_UnknownGlobal56e26c->mode.field_0xa8c = 1 - g_UnknownGlobal56e26c->mode.field_0xa8c;
+                field_0x038->field_0x5bc = g_UnknownGlobal56e26c->mode.field_0xa8c;
                 TextQueueOverlay* overlay = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
                 if (overlay == 0) {
                     return 1;
@@ -399,8 +399,8 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
             break;
         case 0x30:
             if (UnknownFunction43caa0(0x30, 0, event, 0xc)) {
-                g_UnknownGlobal56e26c->field_0x1008 = 1 - g_UnknownGlobal56e26c->field_0x1008;
-                field_0x038->field_0x5c0 = g_UnknownGlobal56e26c->field_0x1008;
+                g_UnknownGlobal56e26c->mode.field_0xa90 = 1 - g_UnknownGlobal56e26c->mode.field_0xa90;
+                field_0x038->field_0x5c0 = g_UnknownGlobal56e26c->mode.field_0xa90;
                 TextQueueOverlay* overlay = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
                 if (overlay == 0) {
                     return 1;

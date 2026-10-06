@@ -21,7 +21,7 @@ static Vector3 s_UnknownVector67c3e8;
 // slot 10.
 int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
     if (!raceView) {
-        switch (g_UnknownGlobal56e26c->field_0x2d74) {
+        switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
             case 2:
                 raceView = g_UnknownGlobal56e26c->field_0x564->field_0x34;
                 break;

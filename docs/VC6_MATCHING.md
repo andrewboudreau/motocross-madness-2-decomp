@@ -211,7 +211,7 @@ bikerace.cpp (BikeRace) matches strictly in 39 functions; see
 vfwdeco.cpp is one function, the video decoder destructor, and it matches
 strictly; see [VFWDECO](VFWDECO.md).
 
-uiinfo.cpp (TrackGameMode) matches strictly in 26 functions; see
+uiinfo.cpp (TrackGameMode) matches strictly in 34 functions; see
 [UIINFO](UIINFO.md).
 
 Texmap.cpp is fully matched (13 functions); see [TEXMAP](TEXMAP.md).

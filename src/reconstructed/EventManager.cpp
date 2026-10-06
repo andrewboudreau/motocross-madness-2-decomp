@@ -92,7 +92,7 @@ void UnknownEventEntry::UnknownFunction45c8b0(UnknownEventRacer* racer) {
         field_0x34[0] = racer->field_0x7ac[0];
         field_0x34[1] = racer->field_0x7ac[1];
         field_0x34[2] = racer->field_0x7ac[2];
-        if (g_UnknownGlobal56e26c->field_0x2d74 == 0 || g_UnknownGlobal56e26c->field_0x2d74 == 4)
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 0 || g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 4)
             field_0x20 = 1;
         else
             field_0x20 = racer->field_0x7a4;
@@ -268,7 +268,7 @@ void EventManager::UnknownFunction45e520() {
     for (int i = 0; i < 11; i++)
         field_0x50[i].UnknownFunction45c840();
     field_0x48 = 0;
-    g_UnknownGlobal56e26c->field_0x2d7c = 0;
+    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c = 0;
 }
 
 // 0x0045e550
@@ -277,11 +277,11 @@ void EventManager::UnknownFunction45e550(float) {
         return;
     int ready = 1;
     int local = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
-    for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-        int player = g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4;
+    for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+        int player = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4;
         if (player != local) {
             NetPlayer* connected = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac800(player);
-            if (!g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc && connected)
+            if (!g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xcc && connected)
                 ready = 0;
         }
     }
@@ -376,7 +376,7 @@ void EventManager::UnknownFunction45e600() {
     if (!g_UnknownGlobal56e26c->uiInteractionBlocked && g_UnknownGlobal56e26c->field_0x3438) {
         g_UnknownGlobal56e26c->field_0x3438 = 0;
         if (g_UnknownGlobal56e26c->field_0x08 &&
-            (g_UnknownGlobal56e26c->field_0x2d70 != 2 || field_0x48 > g_UnknownGlobal56e26c->field_0x2d7c))
+            (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 2 || field_0x48 > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c))
             g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac510(1);
         field_0x34 = 0;
         UnknownFunction45cdc0(2);
@@ -396,29 +396,29 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
     char text[128];
     char line[260];
     if (type == DPSYS_DESTROYPLAYERORGROUP) {
-        for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-            if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == message->field_0x08)
-                g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
+        for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+            if (g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4 == message->field_0x08)
+                g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xcc = 1;
         }
-        if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !UnknownFunction45d2b0())
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && !UnknownFunction45d2b0())
             UnknownFunction45fbd0(message->field_0x08);
     } else if (from) {
         if (type == 0x89) {
-            for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-                if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == from)
-                    g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
+            for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+                if (g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4 == from)
+                    g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xcc = 1;
             }
-            if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !UnknownFunction45d2b0())
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && !UnknownFunction45d2b0())
                 UnknownFunction45fbd0(from);
         } else if (type == 0x86) {
             UnknownEventRacerMessage* update = (UnknownEventRacerMessage*)data;
             UnknownKrustyBikeView* view = UnknownFunction45d2f0();
             if (!view || g_UnknownGlobal56e26c->uiInteractionBlocked)
                 return 0;
-            for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-                if (g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4 == from &&
-                    g_UnknownGlobal56e26c->field_0x215c[i].field_0xd8 == update->field_0x04) {
-                    g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
+            for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+                if (g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4 == from &&
+                    g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd8 == update->field_0x04) {
+                    g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xcc = 1;
                     if (view->field_0x3c[i]) {
                         view->field_0x3c[i]->field_0x768 = update->field_0x08;
                         view->field_0x3c[i]->field_0x750 = update->field_0x10;
@@ -441,7 +441,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             }
             if (field_0x38)
                 return 0;
-            if (g_UnknownGlobal56e26c->field_0x2d74 == 4) {
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 4) {
                 TrackGameViewOwner* owner = UnknownFunction45d2b0();
                 if (owner->field_0xa8 == owner->field_0x34->field_0x38) {
                     owner->field_0xa8->field_0x764 += owner->field_0xa8->field_0x75c;
@@ -469,10 +469,10 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
                 g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac950();
                 field_0x3c = 1;
             } else {
-                for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
-                    if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4) {
-                        g_UnknownGlobal56e26c->field_0x215c[i].field_0xc8 = 1;
-                        g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 1;
+                for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+                    if (message->field_0x04 == g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4) {
+                        g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xc8 = 1;
+                        g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xcc = 1;
                     }
                 }
             }
@@ -512,21 +512,21 @@ int UnknownFunction45fbb0(const void* a, const void* b) {
 void EventManager::UnknownFunction45fbd0(int player) {
     if (g_UnknownGlobal56e26c->field_0x18 < 2)
         return;
-    for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
+    for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
         if (field_0x50[i].field_0x00 == player) {
             if (!field_0x50[i].field_0x30)
                 g_UnknownGlobal56e26c->field_0x18--;
             else
                 g_UnknownGlobal56e26c->field_0x3424--;
-            field_0x50[i] = field_0x50[g_UnknownGlobal56e26c->field_0x2158 - 1];
+            field_0x50[i] = field_0x50[g_UnknownGlobal56e26c->mode.field_0x1be0 - 1];
             if (UnknownFunction45d2b0())
-                g_UnknownGlobal56e26c->field_0x215c[i] =
-                    g_UnknownGlobal56e26c->field_0x215c[g_UnknownGlobal56e26c->field_0x2158 - 1];
-            g_UnknownGlobal56e26c->field_0x2da5--;
+                g_UnknownGlobal56e26c->mode.field_0x1be4[i] =
+                    g_UnknownGlobal56e26c->mode.field_0x1be4[g_UnknownGlobal56e26c->mode.field_0x1be0 - 1];
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35--;
         }
     }
-    if (g_UnknownGlobal56e26c->field_0x2158)
-        qsort(field_0x50, g_UnknownGlobal56e26c->field_0x2158 - 1, sizeof(UnknownEventEntry), UnknownFunction45fbb0);
+    if (g_UnknownGlobal56e26c->mode.field_0x1be0)
+        qsort(field_0x50, g_UnknownGlobal56e26c->mode.field_0x1be0 - 1, sizeof(UnknownEventEntry), UnknownFunction45fbb0);
 }
 
 // 0x0045f9a0: once, sends the local racer's state and then each AI racer's
@@ -551,7 +551,7 @@ void EventManager::UnknownFunction45f9a0() {
     message.field_0x04 = 0;
     g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(
         0x86, &message, sizeof(message), g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
-    for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2d94; i++) {
+    for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++) {
         if (!view->field_0x40[i]->field_0x7a4) {
             view->field_0x40[i]->field_0x754 = FLT_MAX;
             view->field_0x40[i]->field_0x748 = 0x7ffffffe;
@@ -587,7 +587,7 @@ int EventManager::UnknownFunction45cb70() {
     field_0x38 = 0;
     field_0x34 = 0;
     for (int i = 0; i < 8; i++)
-        g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc = 0;
+        g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xcc = 0;
     podiumCharacterCount = 0;
     for (int j = 0; j < 3; j++)
         podiumCharacters[j] = 0;
@@ -595,18 +595,18 @@ int EventManager::UnknownFunction45cb70() {
     field_0x3d0 = 0;
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
     g_UnknownGlobal56e26c->mode.UnknownFunction523a60(g_UnknownGlobal56e26c->mode.field_0x6a0,
-                                                      g_UnknownGlobal56e26c->field_0x2da6, "env", path);
+                                                      g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "env", path);
     g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9b80(path);
-    switch (g_UnknownGlobal56e26c->field_0x2d74) {
+    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
     case 0:
-        g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9e30(g_UnknownGlobal56e26c->field_0x2da6, "scn", 0);
+        g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9e30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "scn", 0);
         g_UnknownGlobal56e26c->field_0x55c = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
             ->UnknownFunction4de3b0(g_UnknownGlobal56e26c->field_0x10, UnknownFunction45cb20);
         if (!g_UnknownGlobal56e26c->field_0x34->UnknownFunction469190(g_UnknownGlobal56e26c->field_0x55c, -1))
             return 0;
         break;
     case 2:
-        g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9e30(g_UnknownGlobal56e26c->field_0x2da6, "scn", 0);
+        g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9e30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "scn", 0);
         g_UnknownGlobal56e26c->field_0x564 = (TrackGameViewOwner*)(new(__FILE__, 270) NationalRace(1))
             ->UnknownFunction4aa850(g_UnknownGlobal56e26c->field_0x10, UnknownFunction45cb20);
         if (!g_UnknownGlobal56e26c->field_0x34->UnknownFunction469190(g_UnknownGlobal56e26c->field_0x564, -1))
@@ -627,13 +627,13 @@ void EventManager::UnknownFunction45eef0(float frameTime) {
         UnknownFunction45e600();
     }
     TrackGameViewOwner* owner = UnknownFunction45d2b0();
-    if (g_UnknownGlobal56e26c->field_0x2d70 == 0 || g_UnknownGlobal56e26c->field_0x2d70 == 4 || !owner ||
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 0 || g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4 || !owner ||
         !owner->field_0x25_bit0)
         return;
     UnknownKrustyBikeView* view = UnknownFunction45d2f0();
     if (!view || !view->field_0x18a)
         return;
-    switch (g_UnknownGlobal56e26c->field_0x2d74) {
+    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
     case 1:
     case 2:
     case 3:
@@ -652,7 +652,7 @@ void EventManager::UnknownFunction45eef0(float frameTime) {
             if (field_0x40)
                 field_0x3c0 += g_UnknownGlobal56e26c->field_0x2f0;
             // VC6 merges this call pair with the one after the switch.
-            float limit = g_UnknownGlobal56e26c->field_0x2d88 ? 30.0f : 120.0f;
+            float limit = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x18 ? 30.0f : 120.0f;
             if (field_0x44 || limit < field_0x3c0) {
                 UnknownFunction45f9a0();
                 UnknownFunction45e600();
@@ -673,11 +673,11 @@ void EventManager::UnknownFunction45eef0(float frameTime) {
         }
         break;
     case 0:
-        if (g_UnknownGlobal56e26c->field_0x55c->field_0x70 < g_UnknownGlobal56e26c->field_0x2eb0)
+        if (g_UnknownGlobal56e26c->field_0x55c->field_0x70 < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140)
             return;
         break;
     case 4:
-        if (g_UnknownGlobal56e26c->field_0x568->field_0x70 < g_UnknownGlobal56e26c->field_0x2eb0)
+        if (g_UnknownGlobal56e26c->field_0x568->field_0x70 < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140)
             return;
         if (owner->field_0xa8 == owner->field_0x34->field_0x38) {
             owner->field_0xa8->field_0x764 += owner->field_0xa8->field_0x75c;
@@ -701,14 +701,14 @@ void EventManager::UnknownFunction45eef0(float frameTime) {
 // racer's place to its player's entry.
 void EventManager::UnknownFunction45e9d0() {
     UnknownKrustyBikeView* view = UnknownFunction45d2f0();
-    switch (g_UnknownGlobal56e26c->field_0x2d70) { // a one-case switch: `sub eax, 2; jne`
+    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00) { // a one-case switch: `sub eax, 2; jne`
     case 2:
         field_0x48++;
     }
     int count = 0;
     int iterator = 0;
     UnknownEventRacer* racer;
-    switch (g_UnknownGlobal56e26c->field_0x2d74) {
+    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
     case 1:
     case 2:
     case 3:
@@ -731,7 +731,7 @@ void EventManager::UnknownFunction45e9d0() {
         iterator = 0;
         for (racer = view->UnknownFunction4204e0(&iterator); racer; racer = view->UnknownFunction4204e0(&iterator)) {
             field_0x50[count].UnknownFunction45c8b0(racer);
-            if ((g_UnknownGlobal56e26c->field_0x2d70 == 2 || g_UnknownGlobal56e26c->field_0x3444) &&
+            if ((g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 || g_UnknownGlobal56e26c->field_0x3444) &&
                 !racer->field_0x4a0)
                 UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
             count++;
@@ -755,14 +755,14 @@ void EventManager::UnknownFunction45e9d0() {
         next = 0;
         for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
             field_0x50[count].UnknownFunction45c8b0(racer);
-            if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !racer->field_0x4a0)
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
                 UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
             count++;
         }
         break;
     }
     case 4:
-        if (g_UnknownGlobal56e26c->field_0x2eb8) {
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x148) {
             UnknownEventScore scores[11];
             int scored = 0;
             int next = 0;
@@ -779,7 +779,7 @@ void EventManager::UnknownFunction45e9d0() {
             next = 0;
             for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
                 field_0x50[count].UnknownFunction45c8b0(racer);
-                if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !racer->field_0x4a0)
+                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
                     UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
                 count++;
             }
@@ -800,7 +800,7 @@ void EventManager::UnknownFunction45e9d0() {
             next = 0;
             for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
                 field_0x50[count].UnknownFunction45c8b0(racer);
-                if (g_UnknownGlobal56e26c->field_0x2d70 == 2 && !racer->field_0x4a0)
+                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
                     UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
                 count++;
             }
@@ -808,7 +808,7 @@ void EventManager::UnknownFunction45e9d0() {
         break;
     }
     field_0x4c = count;
-    if (g_UnknownGlobal56e26c->field_0x2d70 == 2) {
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
         UnknownEventStanding standings[11];
         int next = 0;
         int standing = 0;
@@ -875,8 +875,8 @@ void EventManager::UnknownFunction45cdc0(int mode) {
         return;
     }
     if (view) {
-        if (g_UnknownGlobal56e26c->field_0x3334 && !g_UnknownGlobal56e26c->field_0x3428 &&
-            g_UnknownGlobal56e26c->field_0x2d70 != 4) {
+        if (g_UnknownGlobal56e26c->mode.field_0x2dbc && !g_UnknownGlobal56e26c->field_0x3428 &&
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
             char description[32];
             char time[32];
             g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea390(
@@ -898,7 +898,7 @@ void EventManager::UnknownFunction45cdc0(int mode) {
             sprintf(description, "%s %s", date, time);
             view->UnknownFunction420b00(name, description);
         }
-        if (g_UnknownGlobal56e26c->field_0x2d70 == 4 && g_UnknownGlobal56e26c->field_0x2c68) {
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4 && g_UnknownGlobal56e26c->mode.field_0x26f0) {
             char time[32];
             g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea390(
                 scene, g_UnknownGlobal56e26c->sceneObject->field_0x24c, 0);

@@ -32,12 +32,12 @@ static const char kSessionNameCharacters[] =
 // 0x004ae460
 void UnknownFunction4ae460(UnknownDialogEvent* event) {
     int selection = event->field_0x0c->UnknownFunction46ebf0("LstSessions", 0)->UnknownFunction476950();
-    g_UnknownGlobal56e26c->field_0x154c = selection;
+    g_UnknownGlobal56e26c->mode.field_0xfd4 = selection;
     if (selection != -1 && event->field_0x0c &&
         static_cast<HostJoinDlg*>(event->field_0x0c)->field_0xc4 != 0x85d &&
-        g_UnknownGlobal56e26c->field_0x1010[g_UnknownGlobal56e26c->field_0x154c].field_0x108 &&
+        g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[g_UnknownGlobal56e26c->mode.field_0xfd4].field_0x108 &&
         g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac480(
-            (const GUID*)g_UnknownGlobal56e26c->field_0x1010[g_UnknownGlobal56e26c->field_0x154c].field_0x108,
+            (const GUID*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[g_UnknownGlobal56e26c->mode.field_0xfd4].field_0x108,
             0x80)) {
         g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x866);
         event->field_0x0c->UnknownFunction46ff30(0x63);
@@ -58,8 +58,8 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control->UnknownFunction476c70(0xfeb97a, -1);
         control->UnknownFunction476b80(0xffffff);
         control->UnknownFunction476cd0(0xfeb97a);
-        g_UnknownGlobal56e26c->field_0x154c = 0;
-        control->UnknownVirtualSlot54(&g_UnknownGlobal56e26c->field_0x154c);
+        g_UnknownGlobal56e26c->mode.field_0xfd4 = 0;
+        control->UnknownVirtualSlot54(&g_UnknownGlobal56e26c->mode.field_0xfd4);
         UnknownFunction46ecc0(0);
         control->UnknownFunction476a60(0);
         UnknownFunction470000(control, 0, 0);
@@ -95,14 +95,14 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         list->UnknownFunction4775f0();
         g_UnknownGlobal6886cc = 0;
         if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4adff0(
-                (SessionInfoType*)g_UnknownGlobal56e26c->field_0x1010, &g_UnknownGlobal6886cc, 0x91) < 0) {
+                (SessionInfoType*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00, &g_UnknownGlobal6886cc, 0x91) < 0) {
             UnknownFunction4aef40();
             event->field_0x0c->UnknownFunction46ff30(0xd);
             event->field_0x20 = 1;
             break;
         }
         for (int i = 0; i < g_UnknownGlobal6886cc; i++) {
-            char* name = g_UnknownGlobal56e26c->field_0x1010[i].field_0x004;
+            char* name = g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[i].field_0x04;
             list->UnknownFunction476d80(name, (int)name, 0);
         }
         list->UnknownFunction476b30(selection);
@@ -139,10 +139,10 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             field_0x30->UnknownFunction4865e0(field_0x30->field_0x280, 1);
             g_UnknownGlobal6886cc = 0;
             long result = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4adff0(
-                (SessionInfoType*)g_UnknownGlobal56e26c->field_0x1010, &g_UnknownGlobal6886cc, 0x81);
+                (SessionInfoType*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00, &g_UnknownGlobal6886cc, 0x81);
             if (g_UnknownGlobal6886cc > 0 && result >= 0 &&
                 g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac480(
-                    (const GUID*)g_UnknownGlobal56e26c->field_0x1010[0].field_0x108, 0)) {
+                    (const GUID*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[0].field_0x108, 0)) {
                 field_0x30->UnknownFunction4865e0(field_0x30->field_0x200, 1);
                 g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x866);
                 event->field_0x0c->UnknownFunction46ff30(0x63);
@@ -275,8 +275,8 @@ void UnknownFunction4aef40() {
     }
     g_UnknownGlobal56e26c->field_0x18 = 1;
     g_UnknownGlobal56e26c->field_0x3424 = 0;
-    g_UnknownGlobal56e26c->field_0x2da5 = 0;
-    g_UnknownGlobal56e26c->field_0x2d98 = 0;
+    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35 = 0;
+    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = 0;
 }
 
 // 0x004aefa0
@@ -332,11 +332,11 @@ void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             SendMessageA((HWND)g_UnknownGlobal56e26c->field_0x31c, WM_SYSCOMMAND, SC_MINIMIZE, 0);
             g_UnknownGlobal6886cc = 0;
             g_UnknownGlobal56e26c->field_0x08->UnknownFunction4adff0(
-                (SessionInfoType*)g_UnknownGlobal56e26c->field_0x1010, &g_UnknownGlobal6886cc, 1);
+                (SessionInfoType*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00, &g_UnknownGlobal6886cc, 1);
             SendMessageA((HWND)g_UnknownGlobal56e26c->field_0x31c, WM_SYSCOMMAND, SC_RESTORE, 0);
             if (g_UnknownGlobal6886cc >= 1 &&
                 g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac480(
-                    (const GUID*)g_UnknownGlobal56e26c->field_0x1010[g_UnknownGlobal56e26c->field_0x154c].field_0x108,
+                    (const GUID*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[g_UnknownGlobal56e26c->mode.field_0xfd4].field_0x108,
                     0)) {
                 g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x866);
                 event->field_0x0c->UnknownFunction46ff30(0x63);

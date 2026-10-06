@@ -96,7 +96,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         list->UnknownFunction476d80("500cc 2-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[3]), 0);
         list->UnknownFunction476d80("600cc 4-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[4]), 0);
         list->UnknownFunction476b30(
-            UnknownBikeClassOf(((UnknownOptGarageSettings*)g_UnknownGlobal56e26c->field_0x1550)->field_0x00));
+            UnknownBikeClassOf(((UnknownOptGarageSettings*)g_UnknownGlobal56e26c->mode.field_0xfd8)->field_0x00));
         g_UnknownGlobal56e26c->UnknownFunction521970(0x146a, format, 0x80);
         list = UnknownFunction46ebf0("LargestOpponentDropDown", 6)->field_0x1fc;
         list->UnknownFunction4775f0();
@@ -110,7 +110,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         list->UnknownFunction476d80(text, 3, 0);
         sprintf(text, format, g_UnknownGlobal56cb6c[4]);
         list->UnknownFunction476d80(text, 4, 0);
-        list->UnknownFunction476a60(g_UnknownGlobal56e26c->field_0x2d8c);
+        list->UnknownFunction476a60(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c);
         UnknownGameUiControl* edit = UnknownFunction46ebf0("EditPlateNumber", 0xb);
         edit->UnknownFunction473f30("0123456789");
         g_UnknownGlobal56e26c->ui->UnknownFunction4999f0(this);
@@ -134,11 +134,11 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         field_0x7f70 = UnknownInlineLength(UnknownInlineDifference(*eye, g_UnknownGlobal56e26c->ui->field_0x474));
         UnknownFunction4500d0();
         UnknownFunction4f8d20();
-        UnknownFunction4f8570(g_UnknownGlobal56e26c->field_0x2144);
+        UnknownFunction4f8570(g_UnknownGlobal56e26c->mode.field_0x1bcc);
         srand(ReadClock());
         if (field_0x110)
             field_0x7f74 = field_0x110->UnknownFunction4040f0(1);
-        if ((g_UnknownGlobal56e26c->field_0x214c & 4) || g_UnknownGlobal689df4) {
+        if ((g_UnknownGlobal56e26c->mode.field_0x1bd4 & 4) || g_UnknownGlobal689df4) {
             UnknownFunction46ebf0("ButWrench", 0)->UnknownVirtualSlot49(0);
             UnknownFunction46ebf0("DDLBikes", 6)->UnknownVirtualSlot49(0);
             UnknownFunction46ebf0("BikeLeft", 0)->UnknownFunction470660(0, 1);
@@ -159,7 +159,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UnknownFunction4f8d20();
         } else if (!_stricmp("LargestOpponentDropDown", event->field_0x04)) {
             if (g_UnknownGlobal56e26c->field_0x08->isHost)
-                g_UnknownGlobal56e26c->field_0x2d8c = event->field_0x14->UnknownFunction4768d0(-1);
+                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c = event->field_0x14->UnknownFunction4768d0(-1);
         }
         break;
     case 1:
@@ -200,7 +200,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             } else {
                 number = 101;
             }
-            g_UnknownGlobal56e26c->field_0x2144 = number;
+            g_UnknownGlobal56e26c->mode.field_0x1bcc = number;
             _itoa(number, plate, 10);
             event->field_0x14->UnknownFunction473da0(plate);
             UnknownFunction4f8570(number);
@@ -212,7 +212,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             int number = atoi(typed);
             if (number >= 100 && number <= 999) {
                 UnknownFunction4f8570(number);
-                g_UnknownGlobal56e26c->field_0x2144 = number;
+                g_UnknownGlobal56e26c->mode.field_0x1bcc = number;
             }
         }
         break;
@@ -237,10 +237,10 @@ void MPBikeRiderDlg::UnknownFunction4f8220() {
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i];
         if (!entry->field_0x88) {
             int kind = ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->field_0x00].field_0xc4;
-            if (kind != 2 && kind != 3 && (kind != 10 || !(g_UnknownGlobal56e26c->field_0x1ee8 & 1)))
+            if (kind != 2 && kind != 3 && (kind != 10 || !(g_UnknownGlobal56e26c->mode.field_0x1970 & 1)))
                 continue;
         }
-        int flags = g_UnknownGlobal56e26c->field_0x214c;
+        int flags = g_UnknownGlobal56e26c->mode.field_0x1bd4;
         if (!flags) {
             sprintf(text, "%s %s", ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->field_0x00].field_0x00,
                     entry->field_0x04);
@@ -255,7 +255,7 @@ void MPBikeRiderDlg::UnknownFunction4f8220() {
                 if ((model == entry->field_0x00 || (!model && entry->field_0x00 == 7)) &&
                     UnknownBikeClassOf(entry->field_0x8c) <= 2) {
                     allowed = 1;
-                    if ((flags & 8) && i != ((UnknownTrackGameRacerSlot*)g_UnknownGlobal56e26c->field_0x1eec)->field_0xc4)
+                    if ((flags & 8) && i != g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4)
                         allowed = 0;
                 }
             }
@@ -267,7 +267,7 @@ void MPBikeRiderDlg::UnknownFunction4f8220() {
                     entry->field_0x04);
             list->UnknownFunction476d80(text, i, 0);
         }
-        if (((UnknownTrackGameRacerSlot*)g_UnknownGlobal56e26c->field_0x1eec)->field_0xc4 == i)
+        if (g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4 == i)
             bike = i;
     }
     if (bike)
@@ -282,7 +282,7 @@ void MPBikeRiderDlg::UnknownFunction4f8220() {
         if (entry->field_0xc4 == 2 || entry->field_0xc4 == 3 || entry->field_0xc0) {
             list->UnknownFunction476d80(entry->field_0x00, j, 0);
             if (!strcmp(((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[j].field_0x40,
-                        (char*)g_UnknownGlobal56e26c->field_0x1eec + 0x80))
+                        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80))
                 rider = j;
         }
     }

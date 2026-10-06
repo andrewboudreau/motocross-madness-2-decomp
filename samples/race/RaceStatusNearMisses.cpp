@@ -36,8 +36,8 @@ int UnknownFunction4e5d00(UnknownEventRacerPart** list, UnknownKrustyBikeView* v
     status->field_0x28 = view->field_0x38->field_0x00c;
     *list = status;
     tail = &status->field_0x50;
-    if (g_UnknownGlobal56e26c->field_0x18 == 1 && g_UnknownGlobal56e26c->field_0x2d70 != 4) {
-        for (i = 0; i < g_UnknownGlobal56e26c->field_0x2d94; i++) {
+    if (g_UnknownGlobal56e26c->field_0x18 == 1 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
+        for (i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++) {
             if (!UnknownFunction4e5c70(*list, view->field_0x40[i])) {
                 status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 235);
                 if (!status)

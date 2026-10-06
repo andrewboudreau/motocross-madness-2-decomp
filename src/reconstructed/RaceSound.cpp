@@ -249,7 +249,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
     }
     field_0x83c = new (__FILE__, 321) Sound(field_0x3c, 1);
     UnknownFunction4e5660(field_0x83c, "LandHard01.wav", 41, 3);
-    if (g_UnknownGlobal56e26c->field_0x2d74 != 3) {
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 3) {
         field_0x11b4 = new (__FILE__, 326) Sound(field_0x44, 1);
         UnknownFunction4e5660(field_0x11b4, "launch.wav", 1, 3);
     }
@@ -407,7 +407,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
     if (stream)
         delete stream;
 
-    if (g_UnknownGlobal56e26c->field_0x291c) {
+    if (g_UnknownGlobal56e26c->mode.field_0x23a4) {
         field_0x11e8 = new (__FILE__, 545) Sound(field_0x4c, 1);
         UnknownFunction4e5660(field_0x11e8, "CrowdLoop.wav", 1, 3);
         field_0x11ec = new (__FILE__, 548) Sound(field_0x4c, 1);
@@ -516,7 +516,7 @@ void RaceSound::UnknownFunction4e3430() {
         field_0x11b8[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
     for (i = 0; i < 6; i++)
         field_0x11d0[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
-    if (g_UnknownGlobal56e26c->field_0x291c)
+    if (g_UnknownGlobal56e26c->mode.field_0x23a4)
         UnknownFunction4e5780(field_0x11e8, 1, 1, 1, 0);
 
     if (g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 3 ||
@@ -753,7 +753,7 @@ int RaceSound::UnknownFunction4e39b0(float frameTime) {
                     field_0x11b4->UnknownFunction4bc940(1);
                     UnknownFunction4e5780(field_0x11b4, 0, 0, 0, 0);
                 }
-                if (g_UnknownGlobal56e26c->field_0x2d74 == 3) {
+                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3) {
                     if (field_0x438 == field_0x2c && field_0x438->field_0x784 == 1)
                         UnknownFunction4e5780(field_0x11f8, 0, 0, 0, 0);
                     if (field_0x438 == field_0x2c && field_0x438->field_0x784 > 1 && field_0x12a4 > 30.0f) {
@@ -831,7 +831,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
         case 0x2e:
             if (!g_UnknownGlobal56e26c->field_0x14->keyboard->UnknownVirtualSlot5(0x2e, 12, 0))
                 break;
-            if (g_UnknownGlobal56e26c->field_0x2d74 != 3)
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 3)
                 break;
             switch (field_0x50) {
             case 0:
@@ -852,7 +852,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 if (owner)
                     owner->field_0x6c->UnknownFunction51b540(&message);
             }
-            if (g_UnknownGlobal56e26c->field_0x291c)
+            if (g_UnknownGlobal56e26c->mode.field_0x23a4)
                 field_0x4c->UnknownFunction401dd0(field_0x50);
             return 1;
         case 0x1f:
@@ -869,7 +869,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     field_0x44->UnknownVirtualSlot16(0);
                 if (g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x2c->field_0xc4)
                     g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x2c->field_0xc4->UnknownVirtualSlot16(0);
-                if (g_UnknownGlobal56e26c->field_0x291c)
+                if (g_UnknownGlobal56e26c->mode.field_0x23a4)
                     UnknownFunction4e5780(field_0x11e8, 1, 1, 1, 0);
                 if (field_0x2c) {
                     field_0x1294 = field_0x2c->field_0x7b8;
@@ -1060,7 +1060,7 @@ int RaceSound::UnknownFunction4e5660(Sound* sound, const char* name, int a, int 
 
 // 0x004e5780
 void RaceSound::UnknownFunction4e5780(Sound* sound, int network, int stop, int loop, int unused) {
-    if (g_UnknownGlobal56e26c->mode.field_0xa28 && (g_UnknownGlobal56e26c->field_0x291c || !network) && sound) {
+    if (g_UnknownGlobal56e26c->mode.field_0xa28 && (g_UnknownGlobal56e26c->mode.field_0x23a4 || !network) && sound) {
         if (stop)
             sound->UnknownFunction4bc940(1);
         sound->UnknownFunction4bc6b0(0, loop, 1);
@@ -1070,9 +1070,9 @@ void RaceSound::UnknownFunction4e5780(Sound* sound, int network, int stop, int l
 // 0x004e57d0
 void RaceSound::UnknownFunction4e57d0(UnknownEventRacer* racer, float value) {
     if (field_0x2c == racer && value >= 10000.0f &&
-        (!g_UnknownGlobal56e26c->field_0x2d74 || g_UnknownGlobal56e26c->field_0x2d74 == 4))
+        (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 || g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 4))
         UnknownFunction4e5780(field_0x11ac, 0, 0, 0, 0);
-    if (g_UnknownGlobal56e26c->field_0x2d74 == 3 && field_0x12ac > 15.0f) {
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 && field_0x12ac > 15.0f) {
         UnknownFunction4e5780(field_0x11ec, 0, 0, 0, 0);
         field_0x12ac = 0;
     }

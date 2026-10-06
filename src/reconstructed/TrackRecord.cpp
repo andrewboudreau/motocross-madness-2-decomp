@@ -296,7 +296,7 @@ void TrackRecordDlg::UnknownFunction520390(UnknownTrackRecordEvent* event, int s
     control->UnknownFunction477bb0(0);
     control = UnknownFunction46ebf0("LstTrack", 3);
     control->UnknownFunction4775f0();
-    UnknownFunction51ffe0(control, g_UnknownGlobal56e26c->field_0x2b58, series);
+    UnknownFunction51ffe0(control, g_UnknownGlobal56e26c->mode.field_0x25e0, series);
     ((UnknownTrackRecordListBox*)control)->UnknownVirtualSlot66(0);
 }
 

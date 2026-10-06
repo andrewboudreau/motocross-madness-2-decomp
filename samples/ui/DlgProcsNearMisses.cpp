@@ -32,7 +32,7 @@ static inline UnknownOptSoundSettings* UnknownSoundSettingsOf(TrackGame* game) {
 }
 
 static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* game) {
-    return (UnknownOptGraphicsSettings*)&game->field_0xfc4;
+    return (UnknownOptGraphicsSettings*)&game->mode.field_0xa4c;
 }
 
 // 0x0044fa00
@@ -65,13 +65,13 @@ void SPBikeRiderDlg::UnknownFunction44f750() {
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i];
         if (!entry->field_0x88) {
             int kind = ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->field_0x00].field_0xc4;
-            if (kind != 2 && kind != 3 && (kind != 10 || !(g_UnknownGlobal56e26c->field_0x1ee8 & 1)))
+            if (kind != 2 && kind != 3 && (kind != 10 || !(g_UnknownGlobal56e26c->mode.field_0x1970 & 1)))
                 continue;
         }
         sprintf(text, "%s %s", ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->field_0x00].field_0x00,
                 entry->field_0x04);
         list->UnknownFunction476d80(text, i, 0);
-        if (((UnknownTrackGameRacerSlot*)g_UnknownGlobal56e26c->field_0x1eec)->field_0xc4 == i)
+        if (g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4 == i)
             bike = i;
     }
     if (bike)
@@ -86,7 +86,7 @@ void SPBikeRiderDlg::UnknownFunction44f750() {
         if (model->field_0xc4 == 2 || model->field_0xc4 == 3 || model->field_0xc0) {
             list->UnknownFunction476d80(model->field_0x00, j, 0);
             if (!strcmp(((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[j].field_0x40,
-                        (char*)g_UnknownGlobal56e26c->field_0x1eec + 0x80))
+                        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80))
                 rider = j;
         }
     }
@@ -126,7 +126,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         break;
     }
     case 0xcd:
-        if (strcmp(g_UnknownGlobal56e26c->field_0x2da6, "")) {
+        if (strcmp(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "")) {
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0xd0);
             event->field_0x0c->UnknownFunction46ff30(0);
             event->field_0x20 = 1;
@@ -187,7 +187,7 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
     case 0x104:
     case 0x105:
         g_UnknownGlobal56e26c->ui->field_0x30 = g_UnknownGlobal56e26c->ui->field_0x3c;
-        switch (g_UnknownGlobal56e26c->field_0x2d74) {
+        switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
         case 0:
         case 2:
             event->field_0x0c->UnknownFunction46ff30(0);

@@ -54,7 +54,7 @@ void EventManager::UnknownFunction45e710(int menu) {
     g_UnknownGlobal56e26c->field_0x3434 = 0;
     if (!g_UnknownGlobal56e26c->mode.field_0xa20)
         g_UnknownGlobal56e26c->UnknownFunction521a40();
-    UnknownDisplayMode* current = &g_UnknownGlobal56e26c->field_0x0c->field_0x10[g_UnknownGlobal56e26c->field_0xfc4];
+    UnknownDisplayMode* current = &g_UnknownGlobal56e26c->field_0x0c->field_0x10[g_UnknownGlobal56e26c->mode.field_0xa4c];
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
         g_UnknownGlobal56e26c->UnknownVirtualSlot19(
             g_UnknownGlobal56e26c->field_0x0c->UnknownFunction52d250(640, 480, 16, 0, 0));
@@ -62,7 +62,7 @@ void EventManager::UnknownFunction45e710(int menu) {
     UnknownKrustyUIGuiLayer* layer = g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction486540(0);
     layer->field_0xc0->field_0x5c = g_UnknownGlobal56e26c->mode.field_0x6d4;
     if (!g_UnknownGlobal56e26c->field_0x3428 && !g_UnknownGlobal56e26c->ui->field_0x4a8 &&
-        g_UnknownGlobal56e26c->field_0x2d70 != 0 && g_UnknownGlobal56e26c->field_0x2d70 != 4)
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4)
         g_UnknownGlobal56e26c->ui->UnknownFunction49bbb0();
     g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction486630(1);
     TransDlg* dialog = new(__FILE__, 1064) TransDlg;

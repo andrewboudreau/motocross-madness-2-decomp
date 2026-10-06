@@ -390,7 +390,7 @@ int StatsOverlay::UnknownVirtualSlot14()
         Target()->UnknownVirtualSlot7(0, 0x10, 1);
         Target()->UnknownVirtualSlot7(0, 0x11, 1);
         Overlay::UnknownVirtualSlot14();
-        switch (g_UnknownGlobal56e26c->field_0x2d74) {
+        switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
         case 0:
             UnknownFunction519e10();
             break;
@@ -727,7 +727,7 @@ int RadarOverlay::UnknownFunction51baf0(UnknownKrustyBikeView* view, int a2)
 // 0x0051bc60
 int RadarOverlay::UnknownFunction51bc60()
 {
-    switch (g_UnknownGlobal56e26c->field_0x2d74) {
+    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
     case 0:
         UnknownFunction51bed0(0);
         break;
@@ -873,7 +873,7 @@ ChatOverlay::~ChatOverlay()
 // 0x0051d980
 void ChatOverlay::UnknownFunction51d980(int show)
 {
-    if (g_UnknownGlobal56e26c->field_0x2d74 == 0) {
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 0) {
         field_0x164 = show;
         NameOverlay* tag = field_0x2d8[field_0x198];
         if (tag) {
@@ -977,7 +977,7 @@ int ChatOverlay::UnknownVirtualSlot13()
                 field_0x2d8[i]->UnknownVirtualSlot5();
         }
     }
-    if (g_UnknownGlobal56e26c->field_0x2d74 == 0)
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 0)
         UnknownFunction51e800();
     return 1;
 }

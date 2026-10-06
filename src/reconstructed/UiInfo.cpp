@@ -2,9 +2,12 @@
 // TrackGameMode's methods. The literal __FILE__ (0x00575780) is used at
 // 0x00522134 (constructor, line 71), 0x00522d2d..0x00522d9f (lines 383-385)
 // and 0x00523e81 (line 873); TypeRegistry.cpp ends at 0x00521f2b and VCR.cpp
-// starts at 0x00524110. Near misses and the functions blocked by TrackGame.h's
-// layout are in samples/game/UiInfoNearMisses.cpp.
-#include <stddef.h>
+// starts at 0x00524110. Near misses are in samples/game/UiInfoNearMisses.cpp.
+// The constructor also makes VC6 emit SessionInfoType's inline constructor
+// (0x00523b90), its implicit destructor (0x00523c80, the same bytes as
+// InfoType's) and UnknownTrackGameSessionList's implicit destructor
+// (0x00522420), which the constructor's and destructor's unwind actions call.
+#include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +16,7 @@
 
 #include "DebugAlloc.h"
 #include "Parameterblocks.h"
+#include "SoundInterface.h"
 #include "TextureMap.h"
 #include "UnknownResourceManager.h"
 
@@ -33,13 +37,23 @@ extern "C" __declspec(dllimport) void* __stdcall ShellExecuteA(void* window, con
 // both as 0x00523a60's directory and to a strcmp against "".
 #define UNKNOWN_HELP_DIRECTORY ""
 
-// TrackGameMode's own layout runs to +0x2dc0 (0x005231f0 builds a
-// 0x2dc0-byte TrackGameMode on its stack), but TrackGame.h still declares
-// everything past +0xa4c as TrackGame members (TrackGame+0xfc4..+0x3337).
-// Until that header is restructured, this TU reaches those members
-// through the enclosing TrackGame.
-static inline TrackGame* UnknownModeOwner(TrackGameMode* mode) {
-    return (TrackGame*)((char*)mode - offsetof(TrackGame, mode));
+// 0x00521f30
+UnknownTrackGameRacerSlot::UnknownTrackGameRacerSlot() {
+    int length;
+    int count;
+
+    field_0xd4 = 0;
+    length = strlen("");
+    count = length > 0xf ? 0xf : length;
+    strncpy(field_0xdc, "", count);
+    field_0xdc[count] = 0;
+    field_0xc8 = 0;
+    field_0xcc = 0;
+    field_0x80[0] = 0;
+    field_0x40[0] = 0;
+    field_0x00[0] = 0;
+    field_0xd0 = FLT_MAX;
+    field_0xf4 = 1;
 }
 
 // 0x00521fb0
@@ -61,6 +75,89 @@ void UnknownTrackGameRacerSlot::UnknownFunction521fb0(void* a, void* b, void* c)
 // 0x00522050
 void UnknownTrackGameRacerSlot::UnknownFunction522050() {
     field_0xc8 = 0;
+}
+
+// 0x00522060
+#define UNKNOWN_SET_DIRECTORY(index, name)                                        \
+    length = strlen(name);                                                        \
+    count = length > 0xff ? 0xff : length;                                        \
+    strncpy(field_0xa0[index], name, count);                                      \
+    field_0xa0[index][count] = 0;
+
+TrackGameMode::TrackGameMode() {
+    int i;
+    int length;
+    int count;
+
+    UnknownFunction522440();
+    field_0x23a4 = 0;
+    field_0x6a8 = 1;
+    memset(&field_0x23a8, 0, sizeof(field_0x23a8));
+    field_0x23cc = 2;
+    strcpy(field_0x23d0, "");
+    strcpy(field_0x24d4, "");
+    strcpy(field_0x25d8, "");
+    field_0x25dc = 0;
+    field_0x25dc = new(__FILE__, 71) UnknownDriveList;
+    if (!field_0x25dc->UnknownFunction449e60()) {
+        delete field_0x25dc;
+        field_0x25dc = 0;
+    }
+    field_0x25e0 = 0;
+    field_0x25e4 = 0;
+    field_0x25e8 = 0;
+    field_0x9c = 1;
+    field_0x25ec[0] = 0;
+    field_0x26f0 = 0;
+    field_0x26f4[0] = 0;
+    field_0x1974.field_0xc0 = -1;
+    field_0x1bcc = (int)((rand() * (1.0f / 32768.0f)) * 999.0f);
+    if (field_0x1bcc <= 99)
+        field_0x1bcc += 100;
+    for (i = 0; i < 6; i++) {
+        field_0x1384[i] = 0;
+        field_0x139c[i][0] = 0;
+    }
+    field_0x1bd0 = -1;
+    field_0x1bd4 = -1;
+    field_0x1bd8 = 0;
+    field_0x1be0 = 0;
+    field_0x10ec = 0;
+    UNKNOWN_SET_DIRECTORY(0, "Teraform\\Quarries")
+    UNKNOWN_SET_DIRECTORY(1, "Teraform\\Baja")
+    UNKNOWN_SET_DIRECTORY(2, "Teraform\\National")
+    UNKNOWN_SET_DIRECTORY(3, "Teraform\\SX")
+    UNKNOWN_SET_DIRECTORY(4, "Teraform\\Tag")
+    UNKNOWN_SET_DIRECTORY(5, "Teraform\\Enduro")
+}
+
+#undef UNKNOWN_SET_DIRECTORY
+
+// 0x005225f0
+TrackGameMode::~TrackGameMode() {
+    if (field_0x25e0)
+        delete field_0x25e0;
+    if (field_0x25e4)
+        delete field_0x25e4;
+    if (field_0x25e8)
+        delete field_0x25e8;
+}
+
+// 0x00522680 (TrackGame slot 4): clears the network race state.
+int TrackGameMode::UnknownFunction522680() {
+    int i;
+
+    field_0x6a4 = 0;
+    field_0xfd4 = 0;
+    field_0x1be0 = 0;
+    if (field_0x27f8.field_0x00 != 2) {
+        for (i = 0; i < 8; i++)
+            field_0x1be4[i] = UnknownTrackGameRacerSlot();
+    }
+    for (i = 0; i < 8; i++)
+        field_0x27f8.field_0x14c[i] = UnknownTrackGameModeEntry();
+    field_0x27f8.field_0x35 = 0;
+    return 1;
 }
 
 // 0x00522780
@@ -105,13 +202,13 @@ void TrackGameMode::UnknownFunction522800(UnknownTrackGameModeOptionsA68* option
 }
 
 // 0x00522840: reloads the ten names from string resources 0x1417..0x1420
-// (the argument is unused; the names are TrackGame+0x19d4).
+// (the argument is unused; the names are TrackGameMode+0x145c).
 #define UNKNOWN_LOAD_NAME(index, id)                                              \
     g_UnknownGlobal56e26c->UnknownFunction521970(id, text, 0x80);                 \
     length = strlen(text);                                                        \
     count = length > 0x7f ? 0x7f : length;                                        \
-    strncpy(g_UnknownGlobal56e26c->field_0x19d4[index], text, count);             \
-    g_UnknownGlobal56e26c->field_0x19d4[index][count] = 0;
+    strncpy(g_UnknownGlobal56e26c->mode.field_0x145c[index], text, count);             \
+    g_UnknownGlobal56e26c->mode.field_0x145c[index][count] = 0;
 
 void TrackGameMode::UnknownFunction522840(char (*names)[0x80]) {
     char text[0x100];
@@ -143,7 +240,7 @@ void TrackGameMode::UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* option
     for (k = 0; k < 5; k++) {
         for (j = 0; j < 3; j++) {
             for (i = 0; i < 11; i++)
-                UnknownModeOwner(this)->field_0x1668[k][j][i] =
+                field_0x10f0[k][j][i] =
                     g_UnknownGlobal56e26c->ui ? g_UnknownGlobal56e26c->ui->field_0x43c[k] : 0;
         }
     }
@@ -180,20 +277,19 @@ void TrackGameMode::UnknownFunction522cd0() {
         UnknownTrackGameModeEntry entry;
         entry.field_0x00 = 0;
         entry.field_0x04 = 0;
-        UnknownModeOwner(this)->field_0x2ebc[i] = entry;
+        field_0x27f8.field_0x14c[i] = entry;
     }
 }
 
 
 // 0x00522d00
 int TrackGameMode::UnknownFunction522d00() {
-    TrackGame* owner = UnknownModeOwner(this);
 
-    UnknownFunction522e20(0, &owner->field_0xfc4);
-    owner->field_0x2b58 = new(__FILE__, 383) DirectoryList;
-    owner->field_0x2b5c = new(__FILE__, 384) CombinedDirectoryList;
-    owner->field_0x2b60 = new(__FILE__, 385) CombinedDirectoryList;
-    if (owner->field_0x2b54 && owner->field_0x2b5c && owner->field_0x2b60)
+    UnknownFunction522e20(0, &field_0xa4c);
+    field_0x25e0 = new(__FILE__, 383) DirectoryList;
+    field_0x25e4 = new(__FILE__, 384) CombinedDirectoryList;
+    field_0x25e8 = new(__FILE__, 385) CombinedDirectoryList;
+    if (field_0x25dc && field_0x25e4 && field_0x25e8)
         return 1;
     return 0;
 }
@@ -249,7 +345,7 @@ void TrackGameMode::UnknownFunction522e20(const void* guid, int* mode) {
             }
         }
     }
-    UnknownModeOwner(this)->field_0x2920 = g_UnknownGlobal56e26c->field_0x0c->field_0x4ac;
+    field_0x23a8 = g_UnknownGlobal56e26c->field_0x0c->field_0x4ac;
 }
 
 // 0x00523000: loads the profile's control file.
@@ -288,9 +384,65 @@ void TrackGameMode::UnknownFunction523130() {
     g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction4489e0(path);
 }
 
+// 0x005231f0 (TrackGame slot 4): loads the profile; 1 when it has a name.
+// Without a profile file the name is cleared and a default TrackGameMode is
+// built and destroyed on the stack.
+int TrackGameMode::UnknownFunction5231f0() {
+    char path[0x104];
+    FILE* file;
+
+    sprintf(path, "%s\\%s\\%s.prf", "ui\\profile", field_0x00, field_0x00);
+    file = fopen(path, "rb");
+    if (!file) {
+        strcpy(field_0x00, "");
+        TrackGameMode();
+        return 0;
+    }
+    fread(field_0x00, 0x10, 1, file);
+    fread(&field_0x9c, 4, 1, file);
+    fread(&field_0x6ac, 0x374, 1, file);
+    fread(&field_0xa20, 0x2c, 1, file);
+    fread(&field_0xa4c, 0x1c, 1, file);
+    fread(field_0xa68, 0x30, 1, file);
+    fread(field_0x145c, 0x500, 1, file);
+    fread(field_0x195c, 0x18, 1, file);
+    fread(field_0x1034, 0x5c, 1, file);
+    fread(field_0x1090, 0x5c, 1, file);
+    fread(&field_0x1a3c, 0xc8, 1, file);
+    fread(field_0x1b04, 0xc8, 1, file);
+    fread(&field_0x23a8, 0x10, 1, file);
+    fread(&field_0x23b8, 4, 1, file);
+    fread(&field_0x23bc, 4, 1, file);
+    fread(&field_0x23c0, 4, 1, file);
+    fread(&field_0x23c4, 4, 1, file);
+    fread(&field_0x23c8, 4, 1, file);
+    fread(field_0x10, 0x80, 1, file);
+    fread(&field_0x29e4, 0x1ec, 1, file);
+    fread(&field_0x2bd0, 0x1ec, 1, file);
+    fread(field_0x1384, 0x18, 1, file);
+    fread(&field_0x1bdc, 4, 1, file);
+    fread(&field_0x90, 4, 1, file);
+    fread(&field_0x98, 4, 1, file);
+    fread(field_0x10f0, 0x294, 1, file);
+    fread(&field_0x1bcc, 4, 1, file);
+    fclose(file);
+    field_0x27f8.field_0x35 = 0;
+    UnknownFunction522e20(&field_0x23a8, &field_0xa4c);
+    g_UnknownGlobal56e26c->ui->field_0x48c = 1;
+    UnknownFunction523000();
+    if (g_UnknownGlobal56e26c->field_0x04) {
+        ((PCSoundInterface*)g_UnknownGlobal56e26c->field_0x04)->field_0x45c_bit3 = field_0xa34;
+        ((PCSoundInterface*)g_UnknownGlobal56e26c->field_0x04)->UnknownFunction4be910(22050, 1, field_0xa48 ? 16 : 8);
+    }
+    field_0x27f8 = field_0x29e4;
+    field_0x94 = field_0x98;
+    memcpy(field_0xfd8, field_0x1034, sizeof(field_0xfd8));
+    memcpy(&field_0x1974, &field_0x1a3c, sizeof(field_0x1974));
+    return strcmp(field_0x00, "") != 0;
+}
+
 // 0x00523580: saves the profile.
 void TrackGameMode::UnknownFunction523580() {
-    TrackGame* owner = UnknownModeOwner(this);
     char path[0x104];
     FILE* file;
 
@@ -304,29 +456,29 @@ void TrackGameMode::UnknownFunction523580() {
     fwrite(&field_0x9c, 4, 1, file);
     fwrite(&field_0x6ac, 0x374, 1, file);
     fwrite(&field_0xa20, 0x2c, 1, file);
-    fwrite(&owner->field_0xfc4, 0x1c, 1, file);
-    fwrite(owner->field_0xfe0, 0x30, 1, file);
-    fwrite(owner->field_0x19d4, 0x500, 1, file);
-    fwrite(owner->field_0x1ed4, 0x18, 1, file);
-    fwrite(owner->field_0x15ac, 0x5c, 1, file);
-    fwrite(owner->field_0x1608, 0x5c, 1, file);
-    fwrite(owner->field_0x1fb4, 0xc8, 1, file);
-    fwrite(owner->field_0x207c, 0xc8, 1, file);
-    fwrite(&owner->field_0x2920, 0x10, 1, file);
-    fwrite(&owner->field_0x2930, 4, 1, file);
-    fwrite(&owner->field_0x2934, 4, 1, file);
-    fwrite(&owner->field_0x2938, 4, 1, file);
-    fwrite(&owner->field_0x293c, 4, 1, file);
-    fwrite(&owner->field_0x2940, 4, 1, file);
+    fwrite(&field_0xa4c, 0x1c, 1, file);
+    fwrite(field_0xa68, 0x30, 1, file);
+    fwrite(field_0x145c, 0x500, 1, file);
+    fwrite(field_0x195c, 0x18, 1, file);
+    fwrite(field_0x1034, 0x5c, 1, file);
+    fwrite(field_0x1090, 0x5c, 1, file);
+    fwrite(&field_0x1a3c, 0xc8, 1, file);
+    fwrite(field_0x1b04, 0xc8, 1, file);
+    fwrite(&field_0x23a8, 0x10, 1, file);
+    fwrite(&field_0x23b8, 4, 1, file);
+    fwrite(&field_0x23bc, 4, 1, file);
+    fwrite(&field_0x23c0, 4, 1, file);
+    fwrite(&field_0x23c4, 4, 1, file);
+    fwrite(&field_0x23c8, 4, 1, file);
     fwrite(field_0x10, 0x80, 1, file);
-    fwrite(owner->field_0x2f5c, 0x1ec, 1, file);
-    fwrite(owner->field_0x3148, 0x1ec, 1, file);
-    fwrite(owner->field_0x18fc, 0x18, 1, file);
-    fwrite(&owner->field_0x2154, 4, 1, file);
+    fwrite(&field_0x29e4, 0x1ec, 1, file);
+    fwrite(&field_0x2bd0, 0x1ec, 1, file);
+    fwrite(field_0x1384, 0x18, 1, file);
+    fwrite(&field_0x1bdc, 4, 1, file);
     fwrite(&field_0x90, 4, 1, file);
     fwrite(&field_0x98, 4, 1, file);
-    fwrite(owner->field_0x1668, 0x294, 1, file);
-    fwrite(&owner->field_0x2144, 4, 1, file);
+    fwrite(field_0x10f0, 0x294, 1, file);
+    fwrite(&field_0x1bcc, 4, 1, file);
     fclose(file);
     g_UnknownGlobal56e26c->UnknownVirtualSlot28("MRUProfile", field_0x00);
     if (g_UnknownGlobal56e26c->ui)
@@ -378,37 +530,34 @@ int TrackGameMode::UnknownFunction523a60(int value, char* name, const char* kind
 
 // 0x00523b70
 void TrackGameMode::UnknownFunction523b70(char* name) {
-    TrackGame* owner = UnknownModeOwner(this);
-    UnknownFunction523bb0((short)owner->field_0x2d74, (short)owner->field_0x2d70, name);
+    UnknownFunction523bb0((short)field_0x27f8.field_0x04, (short)field_0x27f8.field_0x00, name);
 }
 
 // 0x00523bb0
 int TrackGameMode::UnknownFunction523bb0(short a, short b, char* name) {
-    strcpy(name, field_0xa0[UnknownModeOwner(this)->field_0x2d78]);
+    strcpy(name, field_0xa0[field_0x27f8.field_0x08]);
     return 1;
 }
 
 // 0x00523bf0: looks for the "MCM2" CD.
 int TrackGameMode::UnknownFunction523bf0() {
-    TrackGame* owner = UnknownModeOwner(this);
     int index;
 
-    if (owner->field_0x2944 != 2) {
-        if (!owner->field_0x2b54)
+    if (field_0x23cc != 2) {
+        if (!field_0x25dc)
             return 0;
-        owner->field_0x2b54->UnknownFunction449e70();
-        if (!owner->field_0x2b54->UnknownFunction44a010("MCM2", &index, 5))
+        field_0x25dc->UnknownFunction449e70();
+        if (!field_0x25dc->UnknownFunction44a010("MCM2", &index, 5))
             return 0;
-        if (!owner->field_0x2b54->UnknownFunction44a0b0(index, owner->field_0x2b50))
+        if (!field_0x25dc->UnknownFunction44a0b0(index, field_0x25d8))
             return 0;
-        sprintf(owner->field_0x2a4c, "%s%s", owner->field_0x2b50, "game");
+        sprintf(field_0x24d4, "%s%s", field_0x25d8, "game");
     }
     return 1;
 }
 
 // 0x00523c90 (TrackGame slot 1)
 int TrackGameMode::UnknownFunction523c90() {
-    TrackGame* owner = UnknownModeOwner(this);
     unsigned long size;
     char text[0x104];
 
@@ -416,11 +565,11 @@ int TrackGameMode::UnknownFunction523c90() {
     if (!g_UnknownGlobal56e26c->UnknownVirtualSlot23("InstallType", "", text, &size))
         return 0;
     if (!_stricmp(text, "Full"))
-        owner->field_0x2944 = 2;
+        field_0x23cc = 2;
     else
-        owner->field_0x2944 = 1;
+        field_0x23cc = 1;
     size = 0x104;
-    return g_UnknownGlobal56e26c->UnknownVirtualSlot23("HardDriveRootPath", "", owner->field_0x2948, &size) != 0;
+    return g_UnknownGlobal56e26c->UnknownVirtualSlot23("HardDriveRootPath", "", field_0x23d0, &size) != 0;
 }
 
 // 0x00523d30
@@ -451,8 +600,8 @@ void TrackGameMode::UnknownFunction523e50() {
     int i;
 
     for (i = 0; i < 6; i++) {
-        UnknownModeOwner(this)->field_0x18fc[i] = 0;
-        UnknownModeOwner(this)->field_0x1914[i][0] = 0;
+        field_0x1384[i] = 0;
+        field_0x139c[i][0] = 0;
     }
     if (stream->UnknownFunction460f50("PCSched.pb", "r", 0)) {
         int track;
@@ -461,19 +610,19 @@ void TrackGameMode::UnknownFunction523e50() {
         block.UnknownFunction4b78f0("Enduro");
         block.UnknownFunction4b7f10("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", UnknownModeOwner(this)->field_0x1914[5], -1);
+        block.UnknownFunction4b7ec0(key, "", field_0x139c[5], -1);
         block.UnknownFunction4b78f0("Baja");
         block.UnknownFunction4b7f10("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", UnknownModeOwner(this)->field_0x1914[1], -1);
+        block.UnknownFunction4b7ec0(key, "", field_0x139c[1], -1);
         block.UnknownFunction4b78f0("Nationals");
         block.UnknownFunction4b7f10("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", UnknownModeOwner(this)->field_0x1914[2], -1);
+        block.UnknownFunction4b7ec0(key, "", field_0x139c[2], -1);
         block.UnknownFunction4b78f0("Supercross");
         block.UnknownFunction4b7f10("BonusTrack", 0, &track);
         sprintf(key, "Track_%d", track);
-        block.UnknownFunction4b7ec0(key, "", UnknownModeOwner(this)->field_0x1914[3], -1);
+        block.UnknownFunction4b7ec0(key, "", field_0x139c[3], -1);
     }
     if (stream)
         delete stream;
@@ -481,11 +630,11 @@ void TrackGameMode::UnknownFunction523e50() {
 
 // 0x005240e0
 void TrackGameMode::UnknownFunction5240e0(int series) {
-    UnknownModeOwner(this)->field_0x2d78 = series;
+    field_0x27f8.field_0x08 = series;
     field_0x6a0 = (int)field_0xa0[series];
 }
 
 // 0x00524100
 int TrackGameMode::UnknownFunction524100() {
-    return UnknownModeOwner(this)->field_0x2d78;
+    return field_0x27f8.field_0x08;
 }

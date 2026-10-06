@@ -306,7 +306,7 @@ int UnknownTrackGameObject3444::UnknownFunction4d41a0()
             field_0x465[0].field_0x30 += (int)(field_0x465[0].field_0x34 * -1.1f);
             g_UnknownGlobal56e26c->UnknownFunction521970(0x145c, title, 128);
             if (field_0x465[0].field_0x18.field_0x10 <= 3)
-                *(unsigned char*)&g_UnknownGlobal56e26c->field_0x1ee8 |= 1; // retail ORs the low byte
+                *(unsigned char*)&g_UnknownGlobal56e26c->mode.field_0x1970 |= 1; // retail ORs the low byte
         }
         break;
     default:

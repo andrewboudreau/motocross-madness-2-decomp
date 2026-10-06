@@ -1,13 +1,7 @@
 {
-  "??0TrackGameMode@@QAE@XZ": "0x00522060",
-  "??1TrackGameMode@@QAE@XZ": "0x005225f0",
-  "??1UnknownDriveList@@QAE@XZ": "0x0044a000",
-  "??2@YAPAXIPBDH@Z": "0x004a3010",
-  "??3@YAXPAX@Z": "0x004a30c0",
   "??_C@_00A@?$AA@": "0x00577738",
   "??_C@_01LHO@r?$AA@": "0x00566a38",
   "??_C@_05KEJO@?$CFs?2?$CFs?$AA@": "0x005667dc",
-  "?UnknownFunction449e60@UnknownDriveList@@QAEHXZ": "0x00449e60",
   "?UnknownFunction522440@TrackGameMode@@QAEXXZ": "0x00522440",
   "?UnknownFunction522720@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptions6ac@@@Z": "0x00522720",
   "?UnknownFunction522780@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA20@@@Z": "0x00522780",
@@ -21,11 +15,8 @@
   "?UnknownFunction5238f0@TrackGameMode@@QAEHPBDPAD@Z": "0x005238f0",
   "?UnknownFunction523bf0@TrackGameMode@@QAEHXZ": "0x00523bf0",
   "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
-  "__FILE__:uiinfonearmisses.cpp": "0x00575780",
-  "__ftol": "0x00534a88",
   "__strnicmp": "0x005476f0",
   "_fclose": "0x00534c3d",
   "_fopen": "0x00534ceb",
-  "_rand": "0x00534c1b",
   "_sprintf": "0x00534aaf"
 }
