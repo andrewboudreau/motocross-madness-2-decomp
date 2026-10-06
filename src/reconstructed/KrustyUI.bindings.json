@@ -50,7 +50,7 @@
   "?UnknownFunction49bda0@@YAXXZ": "0x0049bda0",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
   "?UnknownFunction4e8cf0@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
-  "?UnknownFunction4e9030@UnknownResourceManager@@QAEXPBDH@Z": "0x004e9030",
+  "?UnknownFunction4e9030@UnknownResourceManager@@QAEPAVUnknownTextureStream@@PBDH@Z": "0x004e9030",
   "?UnknownFunction5053b0@@YAXH@Z": "0x005053b0",
   "?UnknownFunction521970@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction5231f0@TrackGameMode@@QAEHXZ": "0x005231f0",

@@ -39,6 +39,7 @@ public:
     int UnknownFunction461600();
     int UnknownFunction461640(void* buffer, int size, int count);
     int UnknownFunction461980();              // 0x00461980: reads a byte
+    void UnknownFunction461cb0(int* a, int* b); // 0x00461cb0 (SceneManager 0x004ea0fd)
     // 0x00430ff0 (out-of-line copy): whether the stream is at its end: past
     // its length within the inner stream, else the buffer is drained and the
     // file is at end-of-file.

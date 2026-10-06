@@ -108,6 +108,9 @@ nodes, their walks and the file's initializers) match strictly; see
 Net.cpp (DirectPlay sessions, players and messages) matches strictly in 81
 functions; see [NET](NET.md).
 
+SceneManager.cpp (Scene, its section readers and the track scene-file
+helpers) matches strictly in 46 functions; see [SCENEMANAGER](SCENEMANAGER.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

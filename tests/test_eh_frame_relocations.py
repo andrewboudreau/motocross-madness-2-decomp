@@ -13,13 +13,18 @@ FILE_VA = 0x56b6c8
 
 
 def frame_fixture(literal=b'D:\\aardvark\\VC\\krusty2\\gameobj.cpp\0', prologue=b'\x6a\xff\x68',
-                  scheduled=False):
+                  scheduled=False, scheduled_load=b'\x8a\x54\x24\x14'):
     """func: push -1; push $L1; mov eax, fs:[__except_list]; push ??_C@str; ret.
 
-    With `scheduled`, the fs:[0] load comes first (handler push at +9)."""
+    With `scheduled`, the fs:[0] load comes first (handler push at +9). With
+    scheduled='load', `scheduled_load` also sits between push -1 and the
+    handler push (handler at +13)."""
     text = prologue + b'\0' * 4 + b'\x64\xa1' + b'\0' * 4 + b'\x68' + b'\0' * 4 + b'\xc3'
     if scheduled:
         text = b'\x64\xa1' + b'\0' * 4 + b'\x6a\xff\x68' + b'\0' * 4 + b'\x68' + b'\0' * 4 + b'\xc3'
+    if scheduled == 'load':
+        text = (b'\x64\xa1' + b'\0' * 4 + b'\x6a\xff' + scheduled_load + b'\x68' + b'\0' * 4
+                + b'\x68' + b'\0' * 4 + b'\xc3')
     textx = b'\xb8\0\0\0\0\xc3'
     sections = [(b'.text', text, 0x60501020), (b'.text$x', textx, 0x60501020),
                 (b'.data', literal, 0xc0300040)]
@@ -37,6 +42,8 @@ def frame_fixture(literal=b'D:\\aardvark\\VC\\krusty2\\gameobj.cpp\0', prologue=
     relocs = struct.pack('<IIH', 3, 2, 6) + struct.pack('<IIH', 9, 3, 6) + struct.pack('<IIH', 14, 4, 6)
     if scheduled:
         relocs = struct.pack('<IIH', 2, 3, 6) + struct.pack('<IIH', 9, 2, 6) + struct.pack('<IIH', 14, 4, 6)
+    if scheduled == 'load':
+        relocs = struct.pack('<IIH', 2, 3, 6) + struct.pack('<IIH', 13, 2, 6) + struct.pack('<IIH', 18, 4, 6)
     header_size = 20 + 40 * len(sections)
     ptr = header_size
     headers, blobs = bytearray(), bytearray()
@@ -83,6 +90,19 @@ class EhFrameRelocationTests(unittest.TestCase):
         self.assertTrue(result['strict_exact'])
         self.assertEqual([row['symbol'] for row in result['relocations_applied']],
                          ['__except_list', 'func$ehhandler', '__FILE__'])
+
+    def test_scheduled_argument_load_before_handler_resolves(self):
+        retail_bytes = (b'\x64\xa1' + b'\0' * 4 + b'\x6a\xff\x8a\x54\x24\x14\x68'
+                        + struct.pack('<I', HANDLER_VA) + b'\x68' + struct.pack('<I', FILE_VA) + b'\xc3')
+        result = match_object(self.load(scheduled='load'), 'func', TARGET_VA, retail_bytes, self.bindings)
+        self.assertTrue(result['strict_exact'])
+        self.assertEqual([row['symbol'] for row in result['relocations_applied']],
+                         ['__except_list', 'func$ehhandler', '__FILE__'])
+
+    def test_scheduled_other_instruction_before_handler_needs_binding(self):
+        fixture = self.load(scheduled='load', scheduled_load=b'\x90\x90\x90\x90')
+        with self.assertRaises(RelocationError):
+            match_object(fixture, 'func', TARGET_VA, retail(), self.bindings)
 
     def test_wrong_handler_address_fails(self):
         result = match_object(self.load(), 'func', TARGET_VA, retail(handler=HANDLER_VA + 0x20), self.bindings)

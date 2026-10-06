@@ -119,18 +119,35 @@ public:
 // out-of-line and empty (the shared body 0x00464e90).
 class UnknownTrackGameObject574 {
 public:
-    UnknownTrackGameObject574();              // 0x004e99d0 (near SceneManager.cpp's literals)
+    UnknownTrackGameObject574();              // 0x004e99d0 (defined in SceneManager.cpp)
     ~UnknownTrackGameObject574();             // 0x00464e90
+    // 0x004e9a10 / 0x004e9ac0 (SceneManager.cpp): run a temporary Scene.
+    int UnknownFunction4e9a10(int* flag);
+    int UnknownFunction4e9ac0(unsigned long* info, char* a, char* b, int c);
+    // 0x004e9ba0: opens the scene archive `name` (default field_0x24c).
+    UnknownTextureStream* UnknownFunction4e9ba0(const char* name);
+    void UnknownFunction4e9f70(const char* name); // 0x004e9f70: derived file names
     void UnknownFunction4e9b80(char* path);   // 0x004e9b80 (EventManager 0x0045cb70)
     void UnknownFunction4e9e30(char* name, const char* kind, int value); // 0x004e9e30
     // 0x004ea390: writes the scene name for `field_0x24c` into `name`.
     void UnknownFunction4ea390(char* name, char* scene, int value);
     // 0x004ea010 (TrackRecord.cpp 0x0051ffe0): a track's display name.
-    void UnknownFunction4ea010(char* out, char* name, int index, const char* kind, int a, int b);
+    // Clears *a and *b when given; the archive's 0x00461cb0 fills them.
+    void UnknownFunction4ea010(char* out, char* name, int index, const char* kind, int* a, int* b);
 
-    unsigned char field_0x00[0x24c];
-    char field_0x24c[0x40];                   // length not established
-    unsigned char field_0x28c[0x394 - 0x28c];
+    // Layout from the constructor's stores; array lengths are inferred
+    // from the gaps between them (and the 0x103-byte copy into +0x44).
+    UnknownTextureStream* field_0x00;         // open scene archive
+    char field_0x04[0x40];                    // its name
+    char field_0x44[0x104];                   // path
+    char field_0x148[0x104];
+    char field_0x24c[0x40];                   // scene file name
+    char field_0x28c[0x40];                   // "%s.est"
+    char field_0x2cc[0x40];                   // "%s.trn"
+    char field_0x30c[0x40];
+    char field_0x34c[0x40];                   // "%s01.wpt"
+    int field_0x38c;
+    int field_0x390;
 };
 
 // Object at TrackGame+0x3338, deleted through its virtual destructor.
