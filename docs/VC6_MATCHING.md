@@ -4,11 +4,11 @@ Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 Results use VC6 SP3 natively on Windows. The full gate and profile matrix were
 repeated on 2026-10-02 under Linux/wibo; the default-profile calibration
-was rerun on 2026-10-05 (699 cases). A complete linked game remains a
+was rerun on 2026-10-05 (735 cases). A complete linked game remains a
 separate, unverified gate.
 
-The VC6 gate currently checks byte-exact functions from 51 handwritten C++
-candidate files: 44 of the 45 files in `src/reconstructed/` (all but
+The VC6 gate currently checks byte-exact functions from 53 handwritten C++
+candidate files: 46 of the 47 files in `src/reconstructed/` (all but
 `TerrainSupport.cpp`) and seven focused probes in `samples/`. This is a count of source files represented by at least one
 checked function, not a claim that complete object files or a linked game match.
 
@@ -16,7 +16,7 @@ checked function, not a claim that complete object files or a linked game match.
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 699/699 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 735/735 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
@@ -94,6 +94,9 @@ PCAudio.cpp matches strictly in 65 functions (PCSoundInterface, Sound and
 their helpers); see [PCAudio](PCAUDIO.md).
 
 RaceStatus.cpp (the per-racer status list): see [RaceStatus](RACESTATUS.md).
+
+VCR.cpp and VCRfile.cpp (the replay recorder and its file) match strictly
+in all 36 functions; see [VCR](VCR.md).
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
