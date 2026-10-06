@@ -226,7 +226,7 @@
   "?UnknownFunction523000@TrackGameMode@@QAEXXZ": "0x00523000",
   "?UnknownFunction5231f0@TrackGameMode@@QAEHXZ": "0x005231f0",
   "?UnknownFunction523580@TrackGameMode@@QAEXXZ": "0x00523580",
-  "?UnknownFunction523d30@TrackGameMode@@QAEXPBDH@Z": "0x00523d30",
+  "?UnknownFunction523d30@TrackGameMode@@QAEHPBD0@Z": "0x00523d30",
   "?UnknownMethod4c3ae0@PCJoystickDevice@@QAEXE@Z": "0x004c3ae0",
   "?UnknownVirtualSlot10@UIDialog@@UAEHM@Z": "0x0046ef00",
   "?UnknownVirtualSlot11@GameObject@@UAEHH@Z": "0x004da540",

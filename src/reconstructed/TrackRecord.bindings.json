@@ -77,7 +77,7 @@
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?UnknownFunction4ea010@UnknownTrackGameObject574@@QAEXPAD0HPBDPAH2@Z": "0x004ea010",
   "?UnknownFunction4e9b80@UnknownTrackGameObject574@@QAEXPAD@Z": "0x004e9b80",
-  "?UnknownFunction523a60@TrackGameMode@@QAEXHPADPBD0@Z": "0x00523a60",
+  "?UnknownFunction523a60@TrackGameMode@@QAEHHPADPBD0@Z": "0x00523a60",
   "?UnknownFunction524100@TrackGameMode@@QAEHXZ": "0x00524100",
   "??_C@_03IMM@scn?$AA@": "0x0056a080",
   "??_C@_03MBEN@env?$AA@": "0x0056a084",

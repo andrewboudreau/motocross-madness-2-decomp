@@ -75,7 +75,107 @@ struct UnknownTrackGameSession {
     void* field_0x108;                        // session instance GUID
 };
 
+// Settings blocks of TrackGameMode, passed to its reset helpers (0x00522720,
+// 0x00522780, 0x005227d0, 0x00522800, 0x00522cb0); 0x005231f0 saves each one
+// whole, which gives their sizes.
+// The last 0x14 bytes of UnknownTrackGameModeOptions6ac. 0x00522720 clears
+// them through a pointer advanced to +0x360 with a fresh zero register, which
+// suggests an inline helper (provisional; that function is still a near miss).
+struct UnknownTrackGameModeOptions6ac360 {
+    void UnknownReset() {
+        field_0x00 = 0;
+        field_0x04 = 0;
+        field_0x08 = 0;
+        field_0x0c = 0;
+        field_0x10 = 0;
+    }
+
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;
+    int field_0x0c;
+    int field_0x10;
+};
+
+struct UnknownTrackGameModeOptions6ac {       // TrackGameMode+0x6ac, 0x374 bytes
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;
+    int field_0x0c;
+    int field_0x10;
+    int field_0x14;
+    int field_0x18;
+    int field_0x1c;
+    int field_0x20;
+    int field_0x24;
+    int field_0x28;
+    int field_0x2c;
+    int field_0x30;
+    int field_0x34;
+    int field_0x38;
+    int field_0x3c;
+    int field_0x40;
+    int field_0x44;
+    unsigned char field_0x48[0x360 - 0x48];
+    UnknownTrackGameModeOptions6ac360 field_0x360;
+};
+
+struct UnknownTrackGameModeOptionsA20 {       // TrackGameMode+0xa20, 0x2c bytes
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;
+    int field_0x0c;
+    int field_0x10;
+    int field_0x14;
+    int field_0x18;
+    int field_0x1c;
+    int field_0x20;
+    int field_0x24;
+    int field_0x28;
+};
+
+struct UnknownTrackGameModeOptionsA4c {       // TrackGameMode+0xa4c, 0x1c bytes
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;
+    int field_0x0c;
+    int field_0x10;
+    int field_0x14;
+    int field_0x18;
+};
+
+struct UnknownTrackGameModeOptionsA68 {       // TrackGameMode+0xa68, 0x30 bytes
+    int field_0x00[7];                        // 50 each
+    int field_0x1c;
+    int field_0x20;
+    int field_0x24;
+    int field_0x28;
+    int field_0x2c;
+};
+
+// TrackGameMode+0xfd8, +0x1034 and +0x1090 (0x5c bytes each).
+struct UnknownTrackGameModeOptionsFd8 {
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;
+    float field_0x0c[6];
+    int field_0x24[11];                       // from KrustyUI's +0xec table
+    unsigned char field_0x50[0x5c - 0x50];
+};
+
+// Eight of these at TrackGame+0x2ebc, +0x30a8 and +0x3294 (the same offset
+// in the three 0x1ec-byte settings copies).
+struct UnknownTrackGameModeEntry {
+    int field_0x00;
+    char field_0x04;
+};
+
 // Object embedded at +0x578; KrustyBikeCamera slot 52 reads its mode.
+// Its methods are uiinfo.cpp's (0x00521f30..0x00524106). The real object is
+// 0x2dc0 bytes (0x005231f0 constructs one on its stack; the constructor and
+// the save/load code use offsets up to +0x2dbc), so TrackGame's members
+// +0xfc4..+0x3337 below belong to it; they stay TrackGame members here until
+// the many users of those names are moved (see src/reconstructed/UiInfo.cpp).
 class TrackGameMode {
 public:
     TrackGameMode();             // 0x00522060
@@ -84,19 +184,39 @@ public:
     ~TrackGameMode();            // 0x005225f0
     int UnknownFunction524100(); // 0x00524100
     void UnknownFunction5240e0(int series); // 0x005240e0 (TrackRecord.cpp 0x00520390)
-    void UnknownFunction523d30(const char* topic, int a); // 0x00523d30 (OptionProcs.cpp: "MCM2HELP")
+    // 0x00523d30 (OptionProcs.cpp: "MCM2HELP"): opens `topic`'s .hlp file
+    // with ShellExecuteA (passing `parameters`); 1 when found.
+    int UnknownFunction523d30(const char* topic, const char* parameters);
     void UnknownFunction522440();             // 0x00522440 (OptionProcs.cpp)
     void UnknownFunction523000();             // 0x00523000 (OptionProcs.cpp)
+    void UnknownFunction523130();             // 0x00523130: saves the controller choice
+    int UnknownFunction523800();              // 0x00523800: asks for the CD until it is found; 0 on cancel
     void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
     void UnknownFunction522680();             // 0x00522680 (TrackGame slot 4)
-    void UnknownFunction522d00();             // 0x00522d00 (TrackGame slot 4)
+    // Reset helpers called by 0x00522440.
+    void UnknownFunction522720(UnknownTrackGameModeOptions6ac* options);
+    void UnknownFunction522780(UnknownTrackGameModeOptionsA20* options);
+    void UnknownFunction5227d0(UnknownTrackGameModeOptionsA4c* options);
+    void UnknownFunction522800(UnknownTrackGameModeOptionsA68* options);
+    void UnknownFunction522840(char (*names)[0x80]);   // reloads TrackGame+0x19d4's strings
+    void UnknownFunction522bf0(UnknownTrackGameModeOptionsFd8* options);
+    void UnknownFunction522c70(UnknownTrackGameModeOptionsFd8* options);
+    void UnknownFunction522c90(UnknownTrackGameModeOptionsFd8* options);
+    void UnknownFunction522cb0(UnknownTrackGameModeOptionsFd8* options);
+    void UnknownFunction522cd0();
+    // 0x00522e20: picks the display mode (640x480x16 preferred) on the
+    // adapter whose GUID is `guid`, and stores the adapter GUID.
+    void UnknownFunction522e20(const void* guid, int* mode);
+    int UnknownFunction522d00();              // 0x00522d00 (TrackGame slot 4): creates the directory lists
     int UnknownFunction5231f0();              // 0x005231f0 (TrackGame slot 4)
     void UnknownFunction523e50();             // 0x00523e50 (KrustyUI 0x004988a0)
     void UnknownFunction523b70(char* name);   // 0x00523b70 (SelectGamePicProcs.cpp)
+    int UnknownFunction523bb0(short a, short b, char* name); // 0x00523bb0: copies directory field_0x2d78
     // 0x00523a60 (near uiinfo.cpp's literals): builds the path of `name`'s
     // `kind` file (EventManager 0x0045cb70 asks for "env").
-    void UnknownFunction523a60(int value, char* name, const char* kind, char* path);
+    // Returns 0 when the file is not found.
+    int UnknownFunction523a60(int value, char* name, const char* kind, char* path);
 
     char field_0x00[16];                      // name; slot 4 sets it from the network object
     char field_0x10[0x80];                    // player name (NetProcs.cpp opens sessions with it)
@@ -231,6 +351,9 @@ public:
     void UnknownFunction448c90(int device, int row, int kind, int code); // 0x00448c90
     int UnknownFunction448cc0(int row, int kind, int code, int* other);  // 0x00448cc0
     void UnknownFunction448e90(const char* path, int a);                 // 0x00448e90
+    void UnknownFunction448990(const char* path);                        // 0x00448990 (uiinfo.cpp 0x00523000)
+    void UnknownFunction4489e0(const char* path);                        // 0x004489e0 (uiinfo.cpp 0x00523130)
+    void UnknownFunction449220();                                        // 0x00449220 (uiinfo.cpp 0x00523000)
     void UnknownFunction449350(int device, int row, char* text);         // 0x00449350
     int UnknownFunction449380(int kind, int code, char* text);            // 0x00449380
 
@@ -246,7 +369,9 @@ struct UnknownTrackGameRacerSlot {
     void UnknownFunction521fb0(void* a, void* b, void* c);
     void UnknownFunction522050();             // 0x00522050 (dlgprocs.cpp LoadingDlg)
 
-    unsigned char field_0x00[0xc0];
+    char field_0x00[0x40];                    // 0x00521fb0 copies three names (at most 63 chars)
+    char field_0x40[0x40];
+    char field_0x80[0x40];
     int field_0xc0;                           // SelectGamePicProcs.cpp
     int field_0xc4;                           // SelectGamePicProcs.cpp
     int field_0xc8;                           // set when the player leaves (EventManager slot 24)
@@ -377,7 +502,9 @@ public:
     unsigned char field_0x1608[0x1664 - 0x1608];
     int field_0x1664;                          // SelectGamePicProcs.cpp
     int field_0x1668[5][3][11];                // custom garage curves per bike class (OptionProcs.cpp)
-    unsigned char field_0x18fc[0x1ed4 - 0x18fc];
+    int field_0x18fc[6];                       // cleared with the names below (uiinfo.cpp 0x00523e50)
+    char field_0x1914[6][0x20];                // names read from a profile (uiinfo.cpp 0x00523e50)
+    char field_0x19d4[10][0x80];               // string resources 0x1420, 0x1417..0x141f (uiinfo.cpp 0x00522840)
     int field_0x1ed4[5];                       // video settings: forced video memory, then four detail levels (OptionProcs.cpp)
     int field_0x1ee8;                          // bit 0 unlocks kind 10 bikes (SelectGamePicProcs.cpp)
     unsigned char field_0x1eec[0xc8];          // restored from +0x1fb4 when a replay is left (InGameProcs.cpp)
@@ -387,20 +514,24 @@ public:
     int field_0x2148;                         // SelectGamePicProcs.cpp
     int field_0x214c;                         // SelectGamePicProcs.cpp
     int field_0x2150;                         // largest opponent count (SelectGamePicProcs.cpp)
-    unsigned char field_0x2154[0x2158 - 0x2154];
+    int field_0x2154;                          // cleared by TrackGameMode 0x00522440
     int field_0x2158;                         // racer count (EventManager 0x0045e550)
     UnknownTrackGameRacerSlot field_0x215c[8];
     int field_0x291c;                         // network game (racesnd.cpp 0x004e5780)
-    unsigned char field_0x2920[0x2930 - 0x2920];
+    UnknownGuid field_0x2920;                  // display adapter GUID (TrackGameMode 0x00522e20)
     int field_0x2930;    // saved KrustyBikeCamera state (slots 61, 62)
     float field_0x2934;  // saved KrustyBikeCamera presets (slots 59, 60)
     float field_0x2938;
     float field_0x293c;
     float field_0x2940;
-    unsigned char field_0x2944[0x2b58 - 0x2944];
+    int field_0x2944;                          // 2 when the game runs without the CD (uiinfo.cpp 0x00523c90)
+    char field_0x2948[0x104];                  // installed data directory (uiinfo.cpp 0x00523c90)
+    char field_0x2a4c[0x104];                  // CD data directory (uiinfo.cpp 0x00523bf0)
+    char field_0x2b50[4];                      // CD drive root (uiinfo.cpp 0x00523bf0)
+    UnknownDriveList* field_0x2b54;            // created by TrackGameMode's constructor (0x005221e7)
     DirectoryList* field_0x2b58;               // scanned by TrackRecord.cpp 0x00520390
     DirectoryList* field_0x2b5c;               // track directories (SelectGamePicProcs.cpp)
-    unsigned char field_0x2b60[0x2b64 - 0x2b60];
+    CombinedDirectoryList* field_0x2b60;       // created by TrackGameMode 0x00522d00
     char field_0x2b64[0x104];                  // the ghost file raced against (dlgprocs.cpp GhostFilesDlg)
     int field_0x2c68;                          // mode 4 saves a ghost (EventManager 0x0045cdc0)
     char field_0x2c6c[0x104];                  // the replay file played (dlgprocs.cpp ReplayFilesDlg)
@@ -415,7 +546,10 @@ public:
     int field_0x2d90;                          // laps (SelectGamePicProcs.cpp)
     int field_0x2d94;                          // AI racer count (EventManager 0x0045f9a0)
     int field_0x2d98;                          // cleared by NetProcs.cpp 0x004aef40
-    unsigned char field_0x2d9c[0x2da4 - 0x2d9c];
+    unsigned char field_0x2d9c;                // cleared by TrackGameMode 0x00522440
+    unsigned char field_0x2d9d;                // 30 (TrackGameMode 0x00522440)
+    unsigned char field_0x2d9e[0x2da0 - 0x2d9e];
+    int field_0x2da0;                          // 1 (TrackGameMode 0x00522440)
     unsigned char field_0x2da4;                // SelectGamePicProcs.cpp
     unsigned char field_0x2da5;                // decremented when a player leaves (EventManager 0x0045fbd0)
     char field_0x2da6[0x20];                   // track name (length not established)
@@ -425,7 +559,8 @@ public:
     float field_0x2eb0;
     int field_0x2eb4;                          // tag ball (SelectGamePicProcs.cpp)
     int field_0x2eb8;                          // mode 4 ranks by +0x768 (else +0x764) (EventManager 0x0045e9d0)
-    unsigned char field_0x2ebc[0x2f5c - 0x2ebc];
+    UnknownTrackGameModeEntry field_0x2ebc[8]; // reset by TrackGameMode 0x00522cd0
+    unsigned char field_0x2efc[0x2f5c - 0x2efc];
     unsigned char field_0x2f5c[0x1ec];         // saved +0x2d70..+0x2f5c, restored when a replay is left (InGameProcs.cpp)
     unsigned char field_0x3148[0x3334 - 0x3148];
     int field_0x3334;                          // saves a replay (EventManager 0x0045cdc0)

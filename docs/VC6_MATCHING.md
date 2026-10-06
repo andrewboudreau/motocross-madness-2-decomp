@@ -211,6 +211,9 @@ bikerace.cpp (BikeRace) matches strictly in 39 functions; see
 vfwdeco.cpp is one function, the video decoder destructor, and it matches
 strictly; see [VFWDECO](VFWDECO.md).
 
+uiinfo.cpp (TrackGameMode) matches strictly in 26 functions; see
+[UIINFO](UIINFO.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
