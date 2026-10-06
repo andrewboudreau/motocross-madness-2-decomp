@@ -203,7 +203,7 @@ public:
     unsigned char field_0x14[NET_MAX_GENERIC_MSG_SIZE];
 };
 
-// The 0x8f4-byte message NetProcs.cpp's receive loop allocates (0x004afc10)
+// The 0x8f4-byte message NetThread.cpp's receive loop allocates (0x004afc10)
 // and appends to NetworkInterface+0x100.
 class NetIncomingMessage : public NetMessage {
 public:
@@ -407,7 +407,7 @@ public:
     int isHost;                                         // 1 after Open with DPOPEN_CREATE (0x004ac3c0) or DPSYS_HOST (KrustyUI slot 24); 0 after DPOPEN_JOIN
     int field_0x14;                                     // connected (TrackGame slot 4)
     int field_0x18;                                     // connection mode 1..4
-    void* field_0x1c;                                   // NetProcs thread (0x004af6a0)
+    void* field_0x1c;                                   // NetThread.cpp receive thread (0x004af6a0)
     unsigned int field_0x20;                            // its thread id
     void* field_0x24;                                   // events
     void* field_0x28;

@@ -159,6 +159,9 @@ the image, match strictly in all 24 functions; see
 cursor.cpp (GameCursor) matches strictly in 15 functions; see
 [GAMECURSOR](GAMECURSOR.md).
 
+NetThread.cpp (the DirectPlay receive thread) matches strictly in 3
+functions; see [NETTHREAD](NETTHREAD.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

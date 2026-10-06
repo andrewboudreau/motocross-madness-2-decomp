@@ -35,7 +35,7 @@ static const NetConstVec3 kVec3ZAxis = NetConstVec3(0.0f, 0.0f, 1.0f);
 // cdecl 0x004ad5a0: reports a DirectPlay error with its source position.
 void UnknownFunction4ad5a0(long result, const char* file, int line);
 
-// 0x004af6a0 (NetProcs.cpp): the receive thread.
+// 0x004af6a0 (NetThread.cpp): the receive thread.
 unsigned int __stdcall UnknownFunction4af6a0(void* net);
 
 // dplay.h/dplobby.h GUIDs.
