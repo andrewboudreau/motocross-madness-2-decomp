@@ -31,6 +31,8 @@ public:
 // RTTI: VCRDlg : UIDialog (vtable 0x00550d94): the replay controls.
 class VCRDlg : public UIDialog {
 public:
+    // Inline at bikerace.cpp's `new` (0x00420650, line 0x1073).
+    VCRDlg(int flags, const char* resource) : UIDialog(flags, resource) {}
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x004893c0
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00488c90
     void UnknownFunction4894c0();             // 0x004894c0: shows the replay mode on the toggles

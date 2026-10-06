@@ -28,6 +28,7 @@ struct UnknownSceneEntry {
     unsigned char field_0x00_bit1 : 1;
     unsigned char field_0x00_bit2 : 1;
     unsigned char field_0x00_bit3 : 1;
+    unsigned char field_0x00_bit4 : 1;              // skipped by bikerace.cpp's camera (0x0041f1d0)
     unsigned char field_0x01[3];
     UnknownSceneObject* field_0x04;
     void* field_0x08;

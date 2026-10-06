@@ -23,6 +23,11 @@ public:
     explicit GraphicsTest(int flags);
     virtual ~GraphicsTest();
 
+    // Debug drawing (bikerace.cpp slot 14): 0x0047c690 packs the draw
+    // colour, 0x0047c4f0 draws a line between two world points.
+    void SetDrawColor(int r, int g, int b);
+    void DrawLine(const Vector3* a, const Vector3* b);
+
 protected:
     int field_0x2c;            // packed draw colour (0x0047c690)
     int field_0x30;            // zeroed by the GraphicsTest constructor

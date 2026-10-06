@@ -28,12 +28,22 @@ struct UnknownTrackGameViewPart {
     GameObject* field_0xc4;                   // racesnd.cpp switches it with slot 16
 };
 
+// The object at TrackGameViewOwner+0xdc: bikerace.cpp 0x00420650 passes it
+// the new replay recorder (0x004a9d10).
+class KrustyVCR;
+class UnknownTrackGameViewOwnerDc {
+public:
+    void UnknownFunction4a9d10(KrustyVCR* vcr); // 0x004a9d10
+};
+
 struct TrackGameViewOwner : public GameObject {
     // 0x004e0c30 (among QuarryStuntEvent.cpp's code): shows the on/off
     // message for string `id` (racesnd.cpp passes 0x1429 and 0x14c3).
     void UnknownFunction4e0c30(int id, int value);
     void UnknownFunction4e1f00();             // 0x004e1f00 (dlgprocs.cpp LoadingDlg)
     void UnknownFunction4a9d20();             // 0x004a9d20 (dlgprocs.cpp 0x004526b0)
+    // 0x00404df0: bikerace.cpp passes a racer's +0x7b8, +0x7bc and the racer.
+    void UnknownFunction404df0(int a, int b, void* racer);
 
     UnknownTrackGameViewPart* field_0x2c;
     unsigned char field_0x30[0x34 - 0x30];
@@ -51,6 +61,8 @@ struct TrackGameViewOwner : public GameObject {
     GameObject* field_0x9c;                   // racesnd.cpp calls slot 4 (sound off) or 5 (on)
     unsigned char field_0xa0[0xa8 - 0xa0];
     UnknownEventRacer* field_0xa8;
+    unsigned char field_0xac[0xdc - 0xac];
+    UnknownTrackGameViewOwnerDc* field_0xdc;
 };
 
 // A SessionInfoType record (Net.h) as TrackGame+0x1010 holds five of them
@@ -239,7 +251,7 @@ struct UnknownTrackGameRacerSlot {
     int field_0xc4;                           // SelectGamePicProcs.cpp
     int field_0xc8;                           // set when the player leaves (EventManager slot 24)
     int field_0xcc;                           // ready
-    int field_0xd0;
+    float field_0xd0;                         // lowest message delay (bikerace.cpp slot 24)
     int field_0xd4;                           // network player id
     int field_0xd8;                           // player's racer index (EventManager slot 24)
     char field_0xdc[0x10];                    // player name (SelectGamePicProcs.cpp)
@@ -353,7 +365,11 @@ public:
     int field_0xfd4;                          // sky cube on (QuarryStuntEvent.cpp)
     unsigned char field_0xfd8[0xfdc - 0xfd8];
     int field_0xfdc;                          // detail level 0..9 (QuarryStuntEvent.cpp)
-    unsigned char field_0xfe0[0x1010 - 0xfe0];
+    unsigned char field_0xfe0[0x1000 - 0xfe0];
+    int field_0x1000;                          // joystick input on (bikerace.cpp slot 16)
+    int field_0x1004;                          // toggled by bikerace.cpp slot 23 (key 0x22)
+    int field_0x1008;                          // toggled by bikerace.cpp slot 23 (key 0x30)
+    unsigned char field_0x100c[0x1010 - 0x100c];
     UnknownTrackGameSession field_0x1010[5];   // enumerated sessions (NetProcs.cpp)
     int field_0x154c;                          // selected session (NetProcs.cpp)
     unsigned char field_0x1550[0x5c];          // restored from +0x15ac when a replay is left (InGameProcs.cpp)

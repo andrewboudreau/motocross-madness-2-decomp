@@ -20,7 +20,9 @@ struct UnknownKrustyUIGuiLayer {
     void UnknownFunction487c30(int value);    // 0x00487c30
     void UnknownFunction487d60();             // 0x00487d60
 
-    unsigned char field_0x00[0xc0];
+    unsigned char field_0x00[0x30];
+    GameObject* field_0x30;                   // the cursor (bikerace.cpp slot 23 tests its +0x25 bit 0)
+    unsigned char field_0x34[0xc0 - 0x34];
     UnknownKrustyUIGuiLayerItem* field_0xc0;
 };
 
@@ -42,6 +44,7 @@ public:
     UnknownTrackGameObject56cItem* UnknownFunction485df0();  // 0x00485df0
     void UnknownFunction485ef0();                            // 0x00485ef0
     UnknownKrustyUIGuiLayer* UnknownFunction486540(int index); // 0x00486540: layer `index` (0 past 3)
+    void UnknownFunction486590(const char* image, int visible); // 0x00486590 (bikerace.cpp: "ui\\cursor.tga")
     void UnknownFunction4868b0(int value);                   // 0x004868b0
     // 0x00485a70: shows `dialog` (EventManager 0x0045e710 passes 0, 2, 0, 0,
     // 0, 0, 1).
@@ -99,6 +102,10 @@ public:
     virtual int UnknownVirtualSlot25(void* value); // 0x00499980
     void UnknownFunction4999f0(GameObject* parent); // 0x004999f0: shows the +0x464 scene
     void UnknownFunction499a20();             // 0x00499a20: hides it
+    // 0x0049b560 / 0x0049b7f0 (bikerace.cpp passes TrackGame+0x1f2c and
+    // +0x1f6c): fill `text` (at most `size` bytes) from `source`.
+    void UnknownFunction49b560(void* source, char* text, int size);
+    void UnknownFunction49b7f0(void* source, char* text, int size);
     void UnknownFunction499b00();             // 0x00499b00
     void UnknownFunction499b10();             // 0x00499b10
     void UnknownFunction49a4a0();             // 0x0049a4a0: opens the exit dialog

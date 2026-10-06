@@ -202,6 +202,12 @@ see [DIALOGPROCS](DIALOGPROCS.md).
 QuarryStuntEvent.cpp (BaseQuarryEvent) matches strictly in 25 functions;
 see [QUARRYSTUNTEVENT](QUARRYSTUNTEVENT.md).
 
+gameui.cpp (the UI controls) matches strictly in 272 functions, 265 of
+them registered; see [GAMEUI](GAMEUI.md).
+
+bikerace.cpp (BikeRace) matches strictly in 39 functions; see
+[BIKERACE](BIKERACE.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

@@ -75,6 +75,9 @@ protected:
     friend class RaceSound; // turns the "SoundGroup" children off (0x004e3430)
     friend class GUIManager; // reads a dialog's +0x25 bit 0 (0x00485bd0)
     friend class GUIUser;   // reads a control's +0x25 bit 3 and +0x28 (0x00487730, 0x00487800)
+    friend class UICtlContainer; // walks its children back to front (0x0047b3f0)
+    friend class UnknownGameUiControl; // walks its siblings (0x004727c0)
+    friend class UIDialog;  // reads its control container's first child (0x0046f120)
     // RaceStatus.cpp 0x004e5ca0 reads a racer's +0x25 bit 0.
     friend int UnknownFunction4e5ca0(struct UnknownEventRacerPart** list);
 

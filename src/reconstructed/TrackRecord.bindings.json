@@ -39,10 +39,8 @@
   "??0UnknownTrackGameObject3400@@QAE@XZ$ehhandler": "0x0054ed94",
   "?UnknownFunction46ebf0@UIDialog@@QAEPAVUnknownGameUiControl@@PBDH@Z": "0x0046ebf0",
   "?UnknownFunction470b20@UnknownGameUiControl@@QAEXPBD@Z": "0x00470b20",
-  "?UnknownFunction476d80@UnknownGameUiControl@@QAEXPBDHH@Z": "0x00476d80",
   "?UnknownFunction4775f0@UnknownGameUiControl@@QAEXXZ": "0x004775f0",
   "?UnknownFunction477bb0@UnknownGameUiControl@@QAEXH@Z": "0x00477bb0",
-  "?UnknownFunction479310@UnknownGameUiControl@@QAEXH@Z": "0x00479310",
   "?UnknownFunction521970@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction518690@@YAXPADM@Z": "0x00518690",
   "__ftol": "0x00534a88",
@@ -84,5 +82,7 @@
   "??_C@_03IMM@scn?$AA@": "0x0056a080",
   "??_C@_03MBEN@env?$AA@": "0x0056a084",
   "??_C@_07MGOL@?$CFs?2?$CFs?$CFs?$AA@": "0x00575410",
-  "??_C@_01LHO@r?$AA@": "0x00566a38"
+  "??_C@_01LHO@r?$AA@": "0x00566a38",
+  "?UnknownFunction476d80@UnknownGameUiControl@@QAEHPBDHH@Z": "0x00476d80",
+  "?UnknownFunction479310@UnknownGameUiControl@@QAEHH@Z": "0x00479310"
 }

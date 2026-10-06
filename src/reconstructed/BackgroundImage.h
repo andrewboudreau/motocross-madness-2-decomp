@@ -56,6 +56,9 @@ public:
     // 0x00404700: draws `image` at (x, y) (GameCursor slot 15; not reconstructed).
     int UnknownFunction404700(PCTextureMap* image, int x, int y, void* sourceRect, int flags, int index,
                               int dirty, int* frames, int skip);
+    // 0x004049d0: a DC clipped to `rect` (gameui.cpp 0x0046ed70; not reconstructed).
+    int UnknownFunction4049d0(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* a,
+                              CameraRect* clip);
     int UnknownFunction404c80();                        // 0x00404c80: releases the DC
     void UnknownFunction404cb0(int index);              // 0x00404cb0
     void UnknownFunction404cd0();                       // 0x00404cd0: resets pending rectangles
