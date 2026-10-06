@@ -18,9 +18,20 @@ public:
     void UnknownFunction51b540(UnknownMessage* message); // 0x0051b540
 };
 
+struct UnknownEventRacer;
+
+// 0x54-byte race status node (RaceStatus.cpp, DebugCalloc'd): one per
+// racer, chained through +0x50; the racer points back at it from +0x744.
 struct UnknownEventRacerPart {
-    unsigned char field_0x00[0x0c];
+    int field_0x00;                         // 1-based order of creation
+    UnknownEventRacer* field_0x04;          // racer
+    unsigned char field_0x08[0x0c - 0x08];
     float field_0x0c;
+    unsigned char field_0x10[0x28 - 0x10];
+    Vector3 field_0x28;                     // the racer's position when created
+    int field_0x34;                         // the view's +0xc8
+    unsigned char field_0x38[0x50 - 0x38];
+    UnknownEventRacerPart* field_0x50;      // next
 };
 
 // A racer: a view's +0x38 (its own) and +0x3c (all, by racer slot), and the
@@ -30,9 +41,9 @@ struct UnknownEventRacerPart {
 // The class is not established; only the vbase access path is modelled.
 struct UnknownEventRacer : virtual public GameObject {
     virtual void UnknownVirtualSlot0();            // gives the racer its own vfptr at +0
-    unsigned char field_0x008[0x10 - 0x08];
-    float field_0x010;                             // KrustyBikeCamera slot 10 adds 2 for the height
-    unsigned char field_0x014[0x4a0 - 0x14];
+    unsigned char field_0x008[0x0c - 0x08];
+    Vector3 field_0x00c;                           // position (KrustyBikeCamera slot 10 adds 2 to y)
+    unsigned char field_0x018[0x4a0 - 0x18];
     int field_0x4a0;                               // EventManager 0x0045eef0: counts as done when set
     unsigned char field_0x4a4[0x5e0 - 0x4a4];
     char field_0x5e0[0x744 - 0x5e0];               // name
@@ -89,7 +100,11 @@ struct UnknownKrustyBikeView : public GameObject {
     GameObject* field_0x50;
     unsigned char field_0x054[0x60 - 0x54];
     GameObject* field_0x60;
-    unsigned char field_0x064[0x18a - 0x64];
+    unsigned char field_0x064[0xc8 - 0x64];
+    int field_0x0c8;
+    unsigned char field_0x0cc[0x158 - 0xcc];
+    int field_0x158;                     // entries in +0x3c
+    unsigned char field_0x15c[0x18a - 0x15c];
     bool field_0x18a;                    // racing (EventManager 0x0045eef0)
     unsigned char field_0x18b[0x18e - 0x18b];
     bool field_0x18e;                    // slot 10: view available
