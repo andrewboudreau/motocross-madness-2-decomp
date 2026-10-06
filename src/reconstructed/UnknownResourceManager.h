@@ -14,7 +14,8 @@ struct UnknownResourceEntry {
 
 // Global at 0x00572b44; its code is among ResourceManager.cpp's literals.
 // No RTTI names it. Its constructor, destructor and fields are declared on
-// UnknownSceneResourceManager (SceneManager.h).
+// UnknownSceneResourceManager (SceneManager.h); ResourceManager.h has the
+// full declaration ResourceManager.cpp compiles against (do not include both).
 class UnknownResourceManager {
 public:
     UnknownResourceEntry* UnknownFunction4e9360(const char* name, int a); // 0x004e9360: finds `name`

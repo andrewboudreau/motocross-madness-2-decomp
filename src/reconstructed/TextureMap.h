@@ -40,6 +40,17 @@ public:
     int UnknownFunction461640(void* buffer, int size, int count);
     int UnknownFunction461980();              // 0x00461980: reads a byte
     void UnknownFunction461cb0(int* a, int* b); // 0x00461cb0 (SceneManager 0x004ea0fd)
+    // 0x00460e70: 1 when `path` opens and passes 0x00460db0's check; the
+    // file is closed again (ResourceManager.cpp passes it to 0x00460f50).
+    int UnknownFunction460e70(const char* path);
+    // 0x004e9960 (out-of-line copy after ResourceManager.cpp's code):
+    // field_0x08 of the innermost stream.
+    int UnknownFunction4e9960()
+    {
+        if (field_0x1c)
+            return field_0x1c->UnknownFunction4e9960();
+        return field_0x08;
+    }
     // 0x00430ff0 (out-of-line copy): whether the stream is at its end: past
     // its length within the inner stream, else the buffer is drained and the
     // file is at end-of-file.
@@ -57,7 +68,8 @@ public:
 
     unsigned char field_0x000[0x04];
     int field_0x04;                           // length within the inner stream (0: to its end)
-    unsigned char field_0x008[0x14 - 0x08];
+    int field_0x08;
+    unsigned char field_0x00c[0x14 - 0x0c];
     FILE* field_0x14;                         // the open file
     unsigned char field_0x018[0x1c - 0x18];
     UnknownTextureStream* field_0x1c;         // inner stream
