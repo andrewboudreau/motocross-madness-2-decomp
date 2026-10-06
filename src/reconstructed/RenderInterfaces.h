@@ -22,7 +22,8 @@ struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();
     virtual long __stdcall UnknownMethod9();
-    virtual long __stdcall UnknownMethod10();
+    virtual long __stdcall UnknownMethod10(unsigned long count, void* rects, unsigned long flags,
+                                           unsigned long color, int z, unsigned long stencil); // Clear
     virtual long __stdcall UnknownMethod11(int kind, const Matrix4* value); // SetTransform
     virtual long __stdcall UnknownMethod12();
     virtual long __stdcall UnknownMethod13(void* viewport);               // SetViewport
@@ -107,6 +108,30 @@ struct UnknownSurfaceCaps {
     unsigned long caps4;
 };
 
+// 0x20-byte pixel format (the DDPIXELFORMAT layout).
+struct UnknownPixelFormat {
+    unsigned long size;
+    unsigned long flags;
+    unsigned long fourCC;
+    unsigned long bitCount;
+    unsigned long masks[4];
+};
+
+// 32-bit RGBA (format 0x22b8) and 24-bit RGB (0x378) pixels, red first in
+// memory (Pixtrans.cpp takes them by value; Tgafile.cpp swaps red and blue).
+struct UnknownPixel32 {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+    unsigned char alpha;
+};
+
+struct UnknownPixel24 {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+};
+
 // 0x7c-byte surface description (the DDSURFACEDESC2 layout).
 struct UnknownSurfaceDesc {
     unsigned long size;
@@ -119,7 +144,7 @@ struct UnknownSurfaceDesc {
     unsigned char field_0x1c[0x24 - 0x1c];
     void* surface;                                // the locked bits
     unsigned char field_0x28[0x48 - 0x28];
-    unsigned char pixelFormat[0x20];
+    UnknownPixelFormat pixelFormat;
     unsigned long caps[4];
     unsigned long textureStage;
 };

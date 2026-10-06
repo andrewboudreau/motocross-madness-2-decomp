@@ -1,47 +1,6 @@
 #pragma once
 
-#include "PCTextureMap.h"
-
-class ManagedTexture;
-struct UnknownTextureRegion;
-
-// RTTI: CacheTexture : PCTextureMap (vtable 0x005583d8; deleting wrapper
-// 0x0050f810, destructor 0x0050f830), 0x190 bytes. A page that a
-// ManagedTextureGroup packs its ManagedTextures onto; only what those
-// classes use is declared.
-class CacheTexture : public PCTextureMap {
-public:
-    // 0x0050f6a0
-    CacheTexture(TextureMapManager* manager, ManagedTextureGroup* group, int value);
-    // 0x0050f890: lists the textures placed on the page in `textures`.
-    void UnknownFunction50f890(ContainerList<ManagedTexture*>* textures);
-    int UnknownFunction50f9b0(int* levels, int count); // 0x0050f9b0
-    // 0x0050fdb0: places textures from `textures` on the page, adding each
-    // one placed to `placed` when given.
-    int UnknownFunction50fdb0(ContainerList<ManagedTexture*>* textures, ContainerList<ManagedTexture*>* placed);
-    void UnknownFunction50fc40();             // 0x0050fc40 (after restoring a lost page)
-    void UnknownFunction5102b0(ManagedTexture* texture); // 0x005102b0: takes `texture` off the page
-    void UnknownFunction5102d0(UnknownTextureRegion* region, int level); // 0x005102d0
-
-    unsigned char field_0x80[0x84 - 0x80];
-    UnknownTextureRegion* field_0x84;         // the whole page (0x00423fc0 block)
-    unsigned char field_0x88[0x184 - 0x88];
-    int field_0x184;                          // memory
-    unsigned char field_0x188[0x18c - 0x188];
-    int field_0x18c;                          // texels wanted on the page less its size (repacking)
-};
-
-// The part of a CacheTexture page (ManagedTexture+0x94) a texture occupies.
-struct UnknownTextureRegion {
-    void* field_0x00;                         // 0 for an undivided region
-    unsigned char field_0x04[0x18 - 0x04];
-    int field_0x18;
-    float field_0x1c;                         // left (u)
-    float field_0x20;                         // top (v)
-    float field_0x24;                         // right (u)
-    float field_0x28;
-    void* field_0x2c;                         // occupant
-};
+#include "CacheTexture.h"
 
 // RTTI: ManagedTexture : PCTextureMap (vtable 0x00558430, 0xbc bytes; it
 // overrides slots 0, 7, 8, 11 and 19). Its code sits between

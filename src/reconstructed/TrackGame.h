@@ -8,6 +8,7 @@
 #include "PCGame.h"
 #include "UnknownResourceManager.h"
 #include "RaceView.h"
+#include "TrackRecord.h"
 
 struct UnknownInputEntry;
 
@@ -29,7 +30,7 @@ struct TrackGameViewOwner : public GameObject {
     GameObject* field_0x60;
     GameObject* field_0x64;
     GameObject* field_0x68;
-    UnknownMessageTarget* field_0x6c;
+    TextQueueOverlay* field_0x6c;
     float field_0x70;                         // compared with TrackGame+0x2eb0 (EventManager 0x0045eef0)
     unsigned char field_0x74[0xa8 - 0x74];
     UnknownEventRacer* field_0xa8;
@@ -43,6 +44,7 @@ public:
     int UnknownFunction523c90(); // 0x00523c90 (TrackGame slot 1)
     ~TrackGameMode();            // 0x005225f0
     int UnknownFunction524100(); // 0x00524100
+    void UnknownFunction5240e0(int series); // 0x005240e0 (TrackRecord.cpp 0x00520390)
     void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
     void UnknownFunction522680();             // 0x00522680 (TrackGame slot 4)
@@ -54,9 +56,18 @@ public:
     void UnknownFunction523a60(int value, char* name, const char* kind, char* path);
 
     char field_0x00[16];                      // name; slot 4 sets it from the network object
-    unsigned char field_0x10[0x6a0 - 0x10];
-    int field_0x6a0;                          // EventManager 0x0045cb70 passes it to 0x00523a60
-    unsigned char field_0x6a4[0x6c8 - 0x6a4];
+    unsigned char field_0x10[0x90 - 0x10];
+    int field_0x90;                           // cycles 0..5 (TrackOverlay 0x0051e7c0)
+    unsigned char field_0x94[0xa0 - 0x94];
+    char field_0xa0[6][0x100];                // directories (TrackRecord.cpp 0x0051f0b0)
+    int field_0x6a0;                          // a directory name pointer for TrackRecord.cpp 0x0051f2c0                          // EventManager 0x0045cb70 passes it to 0x00523a60
+    unsigned char field_0x6a4[0x6b0 - 0x6a4];
+    int field_0x6b0;                          // shows the race statistics (TrackOverlay 0x00519980)
+    unsigned char field_0x6b4[0x6b8 - 0x6b4];
+    int field_0x6b8;                          // shows the racers' name tags (TrackOverlay 0x005190e0)
+    int field_0x6bc;                          // TrackOverlay 0x0051e390
+    int field_0x6c0;                          // TrackOverlay 0x0051e390
+    unsigned char field_0x6c4[0x6c8 - 0x6c4];
     int field_0x6c8;                          // copied to the GUI's +0xec (KrustyUI 0x004988a0)
     unsigned char field_0x6cc[0x6d4 - 0x6cc];
     int field_0x6d4;                          // copied into GUI layer 0 (EventManager 0x0045e710)
@@ -108,16 +119,35 @@ public:
 // out-of-line and empty (the shared body 0x00464e90).
 class UnknownTrackGameObject574 {
 public:
-    UnknownTrackGameObject574();              // 0x004e99d0 (near SceneManager.cpp's literals)
+    UnknownTrackGameObject574();              // 0x004e99d0 (defined in SceneManager.cpp)
     ~UnknownTrackGameObject574();             // 0x00464e90
+    // 0x004e9a10 / 0x004e9ac0 (SceneManager.cpp): run a temporary Scene.
+    int UnknownFunction4e9a10(int* flag);
+    int UnknownFunction4e9ac0(unsigned long* info, char* a, char* b, int c);
+    // 0x004e9ba0: opens the scene archive `name` (default field_0x24c).
+    UnknownTextureStream* UnknownFunction4e9ba0(const char* name);
+    void UnknownFunction4e9f70(const char* name); // 0x004e9f70: derived file names
     void UnknownFunction4e9b80(char* path);   // 0x004e9b80 (EventManager 0x0045cb70)
     void UnknownFunction4e9e30(char* name, const char* kind, int value); // 0x004e9e30
     // 0x004ea390: writes the scene name for `field_0x24c` into `name`.
     void UnknownFunction4ea390(char* name, char* scene, int value);
+    // 0x004ea010 (TrackRecord.cpp 0x0051ffe0): a track's display name.
+    // Clears *a and *b when given; the archive's 0x00461cb0 fills them.
+    void UnknownFunction4ea010(char* out, char* name, int index, const char* kind, int* a, int* b);
 
-    unsigned char field_0x00[0x24c];
-    char field_0x24c[0x40];                   // length not established
-    unsigned char field_0x28c[0x394 - 0x28c];
+    // Layout from the constructor's stores; array lengths are inferred
+    // from the gaps between them (and the 0x103-byte copy into +0x44).
+    UnknownTextureStream* field_0x00;         // open scene archive
+    char field_0x04[0x40];                    // its name
+    char field_0x44[0x104];                   // path
+    char field_0x148[0x104];
+    char field_0x24c[0x40];                   // scene file name
+    char field_0x28c[0x40];                   // "%s.est"
+    char field_0x2cc[0x40];                   // "%s.trn"
+    char field_0x30c[0x40];
+    char field_0x34c[0x40];                   // "%s01.wpt"
+    int field_0x38c;
+    int field_0x390;
 };
 
 // Object at TrackGame+0x3338, deleted through its virtual destructor.
@@ -132,14 +162,7 @@ public:
     unsigned char field_0x00[0x10];
 };
 
-// Object at TrackGame+0x3400.
-class UnknownTrackGameObject3400 {
-public:
-    UnknownTrackGameObject3400();             // 0x0051ef30
-    ~UnknownTrackGameObject3400();            // 0x0051efc0
-
-    unsigned char field_0x00[0xe8];
-};
+// UnknownTrackGameObject3400, the object at TrackGame+0x3400, is in TrackRecord.h.
 
 // Object at TrackGame+0x33fc (constructor near DebugOverlay.cpp's literals;
 // no destructor).
@@ -178,7 +201,7 @@ public:
 // MSZoneInterface.cpp's literals.
 class UnknownTrackGameObject3410 : public UnknownTrackGameObject3410Base {
 public:
-    void UnknownFunction4aa350(int a, int b); // 0x004aa350
+    void UnknownFunction4aa350(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b); // 0x004aa350
     void UnknownFunction49c770();             // 0x0049c770 (EventManager 0x0045e550)
 };
 
@@ -194,11 +217,17 @@ void UnknownFunction520820(const char* message);
 // Global object at 0x0068a48c, deleted by TrackGame's destructor.
 class UnknownTrackGameGlobal68a48c {
 public:
-    UnknownTrackGameGlobal68a48c();           // 0x004ad3b0 (near Net.cpp's literals)
+    UnknownTrackGameGlobal68a48c();           // 0x004ad3b0 (defined in Net.cpp)
     ~UnknownTrackGameGlobal68a48c();          // 0x004ad3d0
     int UnknownFunction4ad3e0(const char* address, int port); // 0x004ad3e0: 1 on failure
+    int UnknownFunction4ad530(const char* data, int length);  // 0x004ad530
+    int UnknownFunction4ad570(const char* text);              // 0x004ad570
 
-    unsigned char field_0x00[0x14];
+    unsigned int field_0x00;                  // WinSock socket
+    int field_0x04;                           // last WinSock result
+    int field_0x08;
+    int field_0x0c;                           // connected
+    int field_0x10;                           // port
 };
 extern UnknownTrackGameGlobal68a48c* g_UnknownGlobal68a48c;
 
@@ -248,7 +277,9 @@ public:
     float field_0x2938;
     float field_0x293c;
     float field_0x2940;
-    unsigned char field_0x2944[0x2c68 - 0x2944];
+    unsigned char field_0x2944[0x2b58 - 0x2944];
+    DirectoryList* field_0x2b58;               // scanned by TrackRecord.cpp 0x00520390
+    unsigned char field_0x2b5c[0x2c68 - 0x2b5c];
     int field_0x2c68;                          // mode 4 saves a ghost (EventManager 0x0045cdc0)
     unsigned char field_0x2c6c[0x2d70 - 0x2c6c];
     int field_0x2d70;    // EventManager 0x0045e600 compares it with 2

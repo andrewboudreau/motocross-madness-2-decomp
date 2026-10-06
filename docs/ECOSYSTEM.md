@@ -71,6 +71,16 @@ Classification, record application, geometry testing, traversal, allocation,
 and category helpers remain normal external call boundaries with reviewed
 addresses. Their internals are not replaced by an invented semantic shortcut.
 
+## Record helper near miss
+
+`samples/ecosystem/EcoRecordNearMisses.cpp` holds a VC6 candidate for the
+step 2 helper `0x00456890` (368 of 369 bytes). It writes the two caller
+values: 1 and 0xff when the record lies beyond the current distance band
+(`0x0059af14[EcoSystem+0x5c0]`, outer then inner `int`), first per axis and
+then radially through `0x00460b50`; otherwise 0 and a 0..255 fade between
+the band's inner and outer distances (0 inside it or without definition
+`+0x1fc`). Only one load's scheduling differs.
+
 ## Packed fields and the geometry branch
 
 The observed record prefix contains unsigned 16-bit components at `+0x0c`,

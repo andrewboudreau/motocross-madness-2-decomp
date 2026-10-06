@@ -3,19 +3,20 @@
 Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 Results use VC6 SP3 natively on Windows. The full gate and profile matrix were
-repeated on 2026-10-02 under Linux/wibo. A complete linked game remains a
+repeated on 2026-10-02 under Linux/wibo; the default-profile calibration
+was rerun on 2026-10-06 (1033 cases). A complete linked game remains a
 separate, unverified gate.
 
-The VC6 gate currently checks byte-exact functions from 41 handwritten C++
-candidate files: all 34 files in `src/reconstructed/` and seven focused probes
-in `samples/`. This is a count of source files represented by at least one
+The VC6 gate currently checks byte-exact functions from 60 handwritten C++
+candidate files: 53 of the 54 files in `src/reconstructed/` (all but
+`TerrainSupport.cpp`) and seven focused probes in `samples/`. This is a count of source files represented by at least one
 checked function, not a claim that complete object files or a linked game match.
 
 ## Compiler profiles
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 487/487 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 1033/1033 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
@@ -76,6 +77,45 @@ constructor,
 (`src/reconstructed/Camera.cpp`, `PCCamera.cpp`) also match strictly with every
 call bound;
 see [FollowCamera](FOLLOW_CAMERA.md#camera-and-pccamera).
+
+Every function of `Lzw.cpp` (11 bodies, `0x004a01d0..0x004a05da`) matches
+strictly; see [LZW](LZW.md).
+
+`Parameterblocks.cpp` matches strictly in 26 of its 27 functions; see
+[PARAMETERBLOCKS](PARAMETERBLOCKS.md).
+
+`Parser.cpp` matches strictly in 13 of its 14 functions; see [PARSER](PARSER.md).
+
+Track.cpp (tokenizer, node/segment walks, lap-time formatting): see [Track](TRACK.md).
+
+TrackRecord.cpp (the high-score table): see [TrackRecord](TRACKRECORD.md).
+
+TrackOverlay.cpp (the in-race overlays) matches strictly in 79 functions;
+see [TrackOverlay](TRACKOVERLAY.md).
+
+PCAudio.cpp matches strictly in 65 functions (PCSoundInterface, Sound and
+their helpers); see [PCAudio](PCAUDIO.md).
+
+RaceStatus.cpp (the per-racer status list): see [RaceStatus](RACESTATUS.md).
+
+VCR.cpp and VCRfile.cpp (the replay recorder and its file) match strictly
+in all 36 functions; see [VCR](VCR.md).
+
+Gridbase.cpp (2 functions) and Griddraw.cpp (51 functions: the terrain grid
+nodes, their walks and the file's initializers) match strictly; see
+[GRIDDRAW](GRIDDRAW.md).
+
+BackgroundImage.cpp matches strictly in 13 functions; see
+[BackgroundImage](BACKGROUNDIMAGE.md).
+
+wrecker.cpp (the Wrecker crash simulation) matches strictly in 26 functions;
+see [WRECKER](WRECKER.md).
+
+Net.cpp (DirectPlay sessions, players and messages) matches strictly in 81
+functions; see [NET](NET.md).
+
+SceneManager.cpp (Scene, its section readers and the track scene-file
+helpers) matches strictly in 46 functions; see [SCENEMANAGER](SCENEMANAGER.md).
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
@@ -148,9 +188,6 @@ Subject to the open-PR check, prefer:
    handling.
 3. Event progress callback `0x0045cb20` (63/67 bytes): isolate the two-register
    swap without moving provisional GUI types into shared headers.
-4. `PCTextureMap` colour-key helper `0x004c7e30`: preserve all three 16-bit format
-   paths and test source expressions that prevent VC6 from factoring the common
-   shift.
 
 For each body, first confirm its VA/extent and direct bindings against the current
 retail image, keep experiments in the existing `samples/` near-miss file, and

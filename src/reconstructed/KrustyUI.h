@@ -51,10 +51,11 @@ public:
     int field_0x30c;
     unsigned char field_0x310[0x34c - 0x310];
     int field_0x34c;
-    unsigned char field_0x350[0x3d0 - 0x350];
+    char field_0x350[0x3d0 - 0x350];          // font face (TrackOverlay 0x0051b320)
     float field_0x3d0;                        // string 0xfed's value when nonzero
-    int field_0x3d4;                          // string 0x1469's value
-    unsigned char field_0x3d8[0x3e0 - 0x3d8];
+    int field_0x3d4;                          // string 0x1469's value; bold font
+    int field_0x3d8;                          // italic font (TrackOverlay 0x0051b320)
+    unsigned char field_0x3dc[0x3e0 - 0x3dc];
 };
 
 

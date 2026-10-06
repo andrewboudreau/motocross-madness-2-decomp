@@ -349,7 +349,7 @@ UnknownSurfaceInterface* PCTextureMap::UnknownFunction4c83a0(int width) {
     return 0;
 }
 
-// 0x004c8430: fills every mip level.
+// 0x004c8430: dumps every mip level (0x004c84e0).
 int PCTextureMap::UnknownVirtualSlot20() {
     if (field_0x70) {
         UnknownFunction4c84e0(field_0x70, 0);
@@ -373,13 +373,13 @@ int PCTextureMap::UnknownVirtualSlot20() {
     return 1;
 }
 
-// 0x004c84e0
-int PCTextureMap::UnknownFunction4c84e0(UnknownSurfaceInterface* surface, int value) {
+// 0x004c84e0: locks a level and writes it to a file (0x004c8550).
+int PCTextureMap::UnknownFunction4c84e0(UnknownSurfaceInterface* surface, const char* name) {
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     surface->UnknownMethod25(0, &desc, 0x811, 0);
-    UnknownFunction4c8550(&desc, value);
+    UnknownFunction4c8550(&desc, name);
     surface->UnknownMethod32(0);
     return 1;
 }
@@ -490,7 +490,84 @@ static inline void SetRenderStatePair(TextureMap* map, int state, int value) {
     }
 }
 
-// 0x004c81d0: for 16-bit and 0x613 formats, applies colour `color` as the
+// 0x004c7e30: converts a 24-bit colour to the texture's format (555, 565 or
+// a palette index) and stores it as the colour key.
+void PCTextureMap::UnknownFunction4c7e30(unsigned int color) {
+    int key;
+    if (field_0x20 == 0x22b)
+        key = Pack555(color);
+    else if (field_0x20 == 0x235)
+        key = Pack565(color);
+    else if (field_0x20 == 8)
+        key = field_0x2c->field_0x710[Pack555(color)];
+    else
+        key = color;
+    field_0x34 = field_0x38 = key;
+}
+
+// 0x004c7ef0: replaces magenta in `surface` with `color` and makes `color`
+// (converted to the texture's format) the colour key. Magenta itself only
+// sets the key, except in format 0x22b8, where the key pixels also lose
+// their alpha.
+int PCTextureMap::UnknownFunction4c7ef0(UnknownSurfaceInterface* surface, unsigned int color) {
+    if (color == 0xff00ff && field_0x20 != 0x22b8) {
+        UnknownFunction4c7e30(color);
+        return 1;
+    }
+    UnknownSurfaceDesc desc;
+    memset(&desc, 0, sizeof(desc));
+    desc.size = sizeof(desc);
+    if (surface->UnknownMethod25(0, &desc, 0x801, 0))
+        goto failed;
+    if (field_0x20 == 0x22b8) {
+        UnknownPixel32 from;
+        UnknownPixel32 to;
+        field_0x34 = field_0x38 = color;
+        from.red = 0xff;
+        from.green = 0;
+        from.blue = 0xff;
+        from.alpha = 0xff;
+        to.red = (unsigned char)(color >> 16);
+        to.green = (unsigned char)(color >> 8);
+        to.blue = (unsigned char)color;
+        to.alpha = 0;
+        UnknownFunction4d1970(desc.surface, from, to, desc.width, desc.height,
+                              desc.pitch / UnknownFunction511970(0x22b8));
+    }
+    if (field_0x20 == 0x378) {
+        UnknownPixel24 from;
+        UnknownPixel24 to;
+        field_0x34 = field_0x38 = color;
+        from.red = 0xff;
+        from.green = 0;
+        from.blue = 0xff;
+        to.red = (unsigned char)(color >> 16);
+        to.green = (unsigned char)(color >> 8);
+        to.blue = (unsigned char)color;
+        UnknownFunction4d1a20(desc.surface, from, to, desc.width, desc.height,
+                              desc.pitch / UnknownFunction511970(0x378));
+    }
+    if (field_0x20 == 0x22b || field_0x20 == 0x613) {
+        field_0x34 = field_0x38 = Pack555(color);
+        UnknownFunction4d1ac0(desc.surface, 0x7c1f, Pack555(color), desc.width, desc.height,
+                              desc.pitch / UnknownFunction511970(field_0x20));
+    } else if (field_0x20 == 0x235) {
+        field_0x34 = field_0x38 = Pack565(color);
+        UnknownFunction4d1ac0(desc.surface, 0xf81f, Pack565(color), desc.width, desc.height,
+                              desc.pitch / UnknownFunction511970(0x235));
+    } else if (field_0x20 == 8) {
+        field_0x34 = field_0x38 = field_0x2c->field_0x710[Pack555(color)];
+        UnknownFunction4d1b40(desc.surface, field_0x2c->field_0x710[0x7c1f],
+                              field_0x2c->field_0x710[Pack555(color)], desc.width, desc.height, desc.pitch);
+    }
+    if (surface->UnknownMethod32(0))
+        goto failed;
+    return 1;
+failed:
+    return 0;
+}
+
+// 0x004c81d0: for 555, 565, 24-bit and 1555 formats, applies colour `color` as the
 // key on every level (0x004c7ef0), re-uploads, sets the surfaces' colour key
 // and records render states 0x29 = 1 and 0x1b = 0.
 int PCTextureMap::UnknownVirtualSlot18(unsigned int color) {

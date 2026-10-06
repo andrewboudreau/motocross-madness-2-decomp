@@ -49,7 +49,7 @@ int KrustyBikeCamera::UnknownVirtualSlot10(float frameTime) {
             FollowCamera::UnknownVirtualSlot46(&first, &s_UnknownVector67c3e8);
         }
         raceView->UnknownFunction4210f0(&first, &second, g_UnknownGlobal56e26c->field_0x560, 0);
-        first.y = raceView->field_0x38->field_0x010 + 2.0f;
+        first.y = raceView->field_0x38->field_0x00c.y + 2.0f;
         FollowCamera::UnknownVirtualSlot47(frameTime, &first);
         return 1;
     }

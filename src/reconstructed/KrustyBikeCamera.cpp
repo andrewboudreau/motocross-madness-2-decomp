@@ -112,7 +112,7 @@ void KrustyBikeCamera::UnknownVirtualSlot61() {
 // 0x004982c0: shows the state's name (string 0x13b9 + state) for 1.5 s,
 // except in state 6.
 void KrustyBikeCamera::UnknownVirtualSlot58() {
-    UnknownMessageTarget* target = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
+    TextQueueOverlay* target = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
     if (target && cameraState != 6) {
         char text[260];
         g_UnknownGlobal56e26c->UnknownFunction521970(cameraState + 0x13B9, text, 0x80);

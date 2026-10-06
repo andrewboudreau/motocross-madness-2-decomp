@@ -1,13 +1,13 @@
 {
-  "as_of": "2026-10-02",
+  "as_of": "2026-10-05",
   "retail_sha256": "31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874",
   "retail_text_bytes": 1368518,
   "retail_source_paths": 111,
   "rtti_types": 252,
-  "vc6_selected_targets": 483,
-  "vc6_exact_targets": 483,
-  "notes": "483 unique retail address/extent pairs passed strict comparison in 487 calibration cases using authentic VC6 SP3 on Windows. Every relocation was resolved, or the function had no relocation bytes. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.",
-  "vc6_case_count": 487,
+  "vc6_selected_targets": 776,
+  "vc6_exact_targets": 776,
+  "notes": "776 unique retail address/extent pairs passed strict comparison in 780 calibration cases using authentic VC6 SP3 on Windows. Every relocation was resolved, or the function had no relocation bytes. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.",
+  "vc6_case_count": 780,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "57d55d7e5df4a88d001b2f86752c29509bb7692d"
+  "reviewed_commit": "52f7af3a7fbdac46c6e9b94f7f5c9f63d77ec07c"
 }

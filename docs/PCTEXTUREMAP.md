@@ -14,7 +14,7 @@ at +0x74. An object at +0x7c is destroyed through vfwdeco.cpp's
 
 ## Status
 
-Exact (21 calibration cases):
+Exact (23 calibration cases):
 - the constructor `0x004c5f00` (TextureMap's `0x0050a4e0`, then clears
   +0x70..+0x7c);
 - the scalar deleting destructor `0x004c5f30` and the destructor
@@ -66,20 +66,41 @@ Exact (21 calibration cases):
   parent through Pixtrans.cpp's `0x004d1b90` (error line 1421). One
   `stride` variable carries the parent's stride; the lock and unlock
   failures share one `return 0` through `goto failed`;
-- slot 18, which colour-keys the 16-bit (and `0x613`) formats on every
-  level (`0x004c7ef0`, error line 1811), re-uploads, sets the surfaces'
+- slot 18, which colour-keys the 555, 565, 24-bit and 1555 formats on
+  every level (`0x004c7ef0`, error line 1811), re-uploads, sets the surfaces'
   colour key and records render states 0x29 = 1 and 0x1b = 0 through an
   inline find-or-append helper. Retail compares the format with `0x22b8`
   in the re-upload test (sic);
-- slot 20, which fills every mip level (error line 2084). Loading +0x70
+- slot 20, which dumps every mip level (error line 2084). Loading +0x70
   into a local before the caps memset reproduces retail's store order;
-- `0x004c84e0`, which locks a level (flags 0x811), fills it through
-  `0x004c8550` and unlocks it.
+- `0x004c7e30`, the colour key: a 24-bit colour packed as 555 or 565, or
+  looked up in the palette's 555 table (+0x2c, +0x710). The
+  `Pack555`/`Pack565` helpers (now in `Pixtrans.h`) cast the whole `|` to `unsigned short` and
+  list blue first; without the cast VC6 factors the common `>> 3` out of
+  the expression, and red-first order swaps two terms in `0x004c7ef0`;
+- `0x004c7ef0`, which locks a level (flags 0x801) and replaces magenta
+  with the key colour through Pixtrans.cpp's replacers (`0x004d1970`
+  32-bit RGBA, `0x004d1a20` 24-bit RGB, both taking pixel structs by
+  value; `0x004d1ac0` 16-bit; `0x004d1b40` 8-bit, from the palette's
+  magenta entry +0x710[0x7c1f]), storing the converted key. Magenta itself
+  only sets the key (`0x004c7e30`) except in format 0x22b8. Lock and
+  unlock failures share one `return 0` through `goto failed`;
+- `0x004c84e0`, which locks a level (flags 0x811), writes it to a file
+  through `0x004c8550` and unlocks it. Slot 20 calls it on every level with
+  no name, so slot 20 dumps the mip chain.
 
 Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
-- `0x004c7e30`, the colour key: a 24-bit colour packed as 555 or 565, or
-  looked up in the palette's 555 table (+0x2c, +0x710). VC6 factors the
-  common shift out of every `|` form tried;
+- `0x004c7b40` (about half of 750 bytes), the table blit: BltFast without
+  a table; otherwise it locks both surfaces (0x811), clips the rectangle to
+  the destination and sets each pixel to `table[source << 8 | destination]`
+  (8-bit; 16-bit pixels read the destination byte through the pixel value).
+  The loop nest's register assignment differs;
+- `0x004c8550` (391 of 393 bytes), the level dump: the first free
+  `C:\temp\<name><nnn>.bmp` (8-bit, through bmpfile.cpp's `0x004245f0`
+  and `0x00424380`) or `.tga` (converted to 32-bit by Pixtrans `0x004d1d20`
+  into a `DebugMalloc` buffer, lines 2149/2154, and written by Tgafile.cpp's
+  `0x005127f0`). `name` defaults to "tex". Only the buffer size's
+  multiplication operand order differs;
 - slot 9 (117 of 385 bytes), the upload: BltFast down the mip chain with
   partial texture blits or a positive mode, otherwise the device's Load.
   The frame matches with separate `next` surfaces. Retail keeps `this` in
@@ -101,8 +122,7 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   append helper. Only the non-mip fallback chain differs: VC6 cross-jumps
   its identical call tails into the first case, retail into the last.
 
-Not reconstructed: `0x004c7b40`, `0x004c7e30`, `0x004c7ef0`,
-`0x004c8550` and the error reporter `0x004c86e0`.
+Not reconstructed: the error reporter `0x004c86e0`.
 
 ## TextureMap
 

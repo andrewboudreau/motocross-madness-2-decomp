@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 from pathlib import Path
 
@@ -86,10 +87,13 @@ make progress
 make progress-check
 ```
 
-The repository-check GitHub Action runs `make progress-check`, so changes to
-canonical reconstructed sources or the snapshot cannot silently leave this page
-stale. The action uses no proprietary executable or compiler; the reviewed VC6
-numbers remain an explicit checked-in snapshot.
+The source-inventory rows are computed from the current tree, so any commit that
+adds, removes or edits a canonical `.cpp`/`.h` file must also commit the output of
+`make progress`; that needs no compiler or calibration run. `make static-check`
+and the repository-check GitHub Action both fail with a diff when this page is
+stale, so changes to canonical reconstructed sources or the snapshot cannot
+silently leave it out of date. The check uses no proprietary executable or
+compiler; the reviewed VC6 numbers remain an explicit checked-in snapshot.
 
 Reproduce the calibration with the [private-input setup](TOOLCHAIN.md):
 
@@ -108,19 +112,39 @@ and do not imply every body in those files matches.
 """
 
 
+def expected_document(root: Path = ROOT) -> str:
+    config = json.loads((root / "config" / "decompilation_progress.json").read_text(encoding="utf-8"))
+    return render(config, repository_counts(root))
+
+
+def staleness(root: Path = ROOT) -> str | None:
+    """Return a unified diff if the committed page differs from the rendering."""
+    output = root / OUTPUT.relative_to(ROOT)
+    expected = expected_document(root)
+    actual = output.read_text(encoding="utf-8") if output.exists() else ""
+    if actual == expected:
+        return None
+    diff = difflib.unified_diff(
+        actual.splitlines(keepends=True), expected.splitlines(keepends=True),
+        fromfile=f"committed/{OUTPUT.relative_to(ROOT).as_posix()}",
+        tofile="regenerated", n=0,
+    )
+    return "".join(diff)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true", help="fail if the document is stale")
     args = parser.parse_args()
-    config = json.loads(CONFIG.read_text(encoding="utf-8"))
-    content = render(config, repository_counts(ROOT))
     if args.check:
-        if not OUTPUT.exists() or OUTPUT.read_text(encoding="utf-8") != content:
+        diff = staleness()
+        if diff is not None:
             print(f"{OUTPUT.relative_to(ROOT)} is stale; run: make progress")
+            print(diff, end="")
             return 1
         print(f"{OUTPUT.relative_to(ROOT)} is up to date")
         return 0
-    OUTPUT.write_text(content, encoding="utf-8")
+    OUTPUT.write_text(expected_document(), encoding="utf-8", newline="\n")
     print(f"wrote {OUTPUT.relative_to(ROOT)}")
     return 0
 

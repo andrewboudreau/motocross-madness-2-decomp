@@ -1,8 +1,8 @@
 // SoultreePhysicsCharacter small virtuals (assigned targets).  TU ownership tier 2:
 // SoulTreePhysics.cpp (__FILE__ at 0x00503b13/0x00503f87).
 #include <string.h>
-#include "../hierarchy/SoultreePhysicsCharacter.h"
-#include "../soultree_base/SoultreePhysicsCallees.h"
+#include "soultree/SoultreePhysicsCharacter.h"
+#include "soultree/SoultreePhysicsCallees.h"
 #include "SoultreePhysicsObject.h"
 
 // SoultreePhysicsBaseObject::field_0x128 is the CollisionObject that slot 2 creates

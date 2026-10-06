@@ -1,11 +1,11 @@
 # Decompilation progress
 
-> Last reviewed: **2026-10-02** · Retail executable: `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`
+> Last reviewed: **2026-10-05** · Retail executable: `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`
 
 There is not yet a defensible whole-game percentage. The best reproducible
-headline is that **483 of 483 selected function targets (100.0%)**
+headline is that **776 of 776 selected function targets (100.0%)**
 have strict, byte-for-byte matches in the reviewed calibration suite, compiled
-with VC6 SP3. The suite contains **487 cases**; repeated
+with VC6 SP3. The suite contains **780 cases**; repeated
 retail address/extent pairs count once.
 That percentage measures the active target set, **not 100.0% of MCM2**:
 targets are chosen because they are useful or tractable, and the executable's
@@ -15,10 +15,10 @@ complete function inventory has not been established.
 
 | Indicator | Current value | What it means |
 |---|---:|---|
-| Strict VC6 exact targets | **483 / 483 (100.0%)** | Unique retail address/extent pairs in the reviewed calibration run |
-| Canonical reconstructed implementation files | **43** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
-| Canonical reconstructed headers | **67** | Layout and interface declarations, including support-only headers |
-| Canonical C++ source lines | **15,281** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
+| Strict VC6 exact targets | **776 / 776 (100.0%)** | Unique retail address/extent pairs in the reviewed calibration run |
+| Canonical reconstructed implementation files | **66** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
+| Canonical reconstructed headers | **102** | Layout and interface declarations, including support-only headers |
+| Canonical C++ source lines | **36,865** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
 | Retail source-path strings | **111** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **252** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **1,368,518 bytes (1.31 MiB)** | Broad code-section denominator; includes library code, thunks and padding |
@@ -49,10 +49,13 @@ make progress
 make progress-check
 ```
 
-The repository-check GitHub Action runs `make progress-check`, so changes to
-canonical reconstructed sources or the snapshot cannot silently leave this page
-stale. The action uses no proprietary executable or compiler; the reviewed VC6
-numbers remain an explicit checked-in snapshot.
+The source-inventory rows are computed from the current tree, so any commit that
+adds, removes or edits a canonical `.cpp`/`.h` file must also commit the output of
+`make progress`; that needs no compiler or calibration run. `make static-check`
+and the repository-check GitHub Action both fail with a diff when this page is
+stale, so changes to canonical reconstructed sources or the snapshot cannot
+silently leave it out of date. The check uses no proprietary executable or
+compiler; the reviewed VC6 numbers remain an explicit checked-in snapshot.
 
 Reproduce the calibration with the [private-input setup](TOOLCHAIN.md):
 
@@ -62,9 +65,9 @@ python3 tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt --vc6-root "
 
 Inspect every result: the runner reports nonmatches as data and its exit status
 alone does not prove strict matching. Reviewed code revision:
-`57d55d7e5df4a88d001b2f86752c29509bb7692d`. Source inventory counts reflect the current tree
+`52f7af3a7fbdac46c6e9b94f7f5c9f63d77ec07c`. Source inventory counts reflect the current tree
 and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot
 
-483 unique retail address/extent pairs passed strict comparison in 487 calibration cases using authentic VC6 SP3 on Windows. Every relocation was resolved, or the function had no relocation bytes. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.
+776 unique retail address/extent pairs passed strict comparison in 780 calibration cases using authentic VC6 SP3 on Windows. Every relocation was resolved, or the function had no relocation bytes. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.

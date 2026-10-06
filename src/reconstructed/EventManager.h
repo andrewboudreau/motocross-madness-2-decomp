@@ -4,7 +4,7 @@
 #include "MatrixUtil.h"
 #include "RaceView.h"
 
-class UnknownMessageTarget;
+class TextQueueOverlay;
 struct TrackGameViewOwner;
 struct UnknownKrustyBikeView;
 
@@ -17,7 +17,7 @@ struct UnknownEventRanking {
     float value;
 };
 
-// 8-byte record sorted with TrackOverlay's 0x005199f0 (lower value first).
+// 8-byte record sorted with TrackOverlay's 0x005199f0 (higher value first).
 struct UnknownEventScore {
     float value;
     UnknownEventRacer* racer;
@@ -72,11 +72,18 @@ struct UnknownEventEntry {
 
     int field_0x00;                                // network player id
     int field_0x04;                                // finishing position
-    unsigned char field_0x08[0x28 - 0x08];
+    float field_0x08;                              // high-score values (TrackRecord.cpp 0x0051f3c0)
+    int field_0x0c;
+    unsigned char field_0x10[0x14 - 0x10];
+    float field_0x14;
+    float field_0x18;
+    float field_0x1c;
+    unsigned char field_0x20[0x28 - 0x20];
     int field_0x28;                                // championship points
-    unsigned char field_0x2c[0x30 - 0x2c];
+    float field_0x2c;
     unsigned char field_0x30;                      // counted in TrackGame+0x3424 (else Game+0x18)
-    unsigned char field_0x31[0x50 - 0x31];
+    unsigned char field_0x31[0x40 - 0x31];
+    char field_0x40[16];                           // racer name
 };
 
 // RTTI: EventManager : GameObject (vtable 0x0055259c; 0xd08 bytes, the size
@@ -99,7 +106,7 @@ public:
     // +0x34 view and its +0x6c target.
     TrackGameViewOwner* UnknownFunction45d2b0();   // 0x0045d2b0
     UnknownKrustyBikeView* UnknownFunction45d2f0(); // 0x0045d2f0
-    UnknownMessageTarget* UnknownFunction45d340(); // 0x0045d340
+    TextQueueOverlay* UnknownFunction45d340(); // 0x0045d340
     void UnknownFunction45d270();                  // 0x0045d270: slot 5 on all three
     int UnknownFunction45d390();                   // 0x0045d390: whether any mode is present
     void UnknownFunction45e520();                  // 0x0045e520: resets the entries

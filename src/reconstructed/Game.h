@@ -2,6 +2,7 @@
 
 #include "Display.h"
 #include "GameObject.h"
+#include "Net.h"
 #include "RenderTarget.h"
 
 class ControlInterface;
@@ -10,30 +11,6 @@ class SoundInterface;
 class TextureMapManager;
 struct UnknownControlEvent;
 struct UnknownInputEntry;
-
-// Network object at Game+0x08 (0x128 bytes; its code is near Net.cpp's
-// literals). The class is not established.
-class UnknownNetObject {
-public:
-    UnknownNetObject();                       // 0x004ab480
-    ~UnknownNetObject();                      // 0x004ab570
-    long UnknownFunction4ab6b0(int value);    // 0x004ab6b0
-    int UnknownFunction4ac720(int player, char* name);  // 0x004ac720: the player's name; 0 if none
-    int UnknownFunction4ac800(int player);    // 0x004ac800 (EventManager 0x0045e550)
-    void UnknownFunction4ac950();             // 0x004ac950
-    void UnknownFunction4ac510(int value);    // 0x004ac510
-    // 0x004ac830: sends a message of `type` (EventManager 0x0045f9a0).
-    void UnknownFunction4ac830(int type, void* data, int size, int player, int flags);
-    void UnknownFunction4ac8d0(float a, float b); // 0x004ac8d0
-
-    unsigned char field_0x00[4];
-    int field_0x04;
-    int field_0x08;
-    int field_0x0c;                           // local player index
-    int field_0x10;                           // set by KrustyUI slot 24 for message 0x101
-    int field_0x14;                           // set once connected (TrackGame slot 4)
-    unsigned char field_0x18[0x128 - 0x18];
-};
 
 // Global at 0x0056c470: a GameObject (Game's initialiser adds it as a child
 // of the root and calls its slot 5), with a flag byte at +0x2c.
@@ -115,7 +92,7 @@ public:
     void UnknownFunction468880();             // 0x00468880 (PCCamera slot 27)
 
     SoundInterface* field_0x04;               // a PCSoundInterface (initialiser)
-    UnknownNetObject* field_0x08;
+    NetworkInterface* field_0x08;
     UnknownDisplay* field_0x0c;
     RenderTarget* field_0x10;                 // a PCRenderTarget (PCGame slot 31)
     ControlInterface* field_0x14;

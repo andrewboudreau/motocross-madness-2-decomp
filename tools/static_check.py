@@ -60,6 +60,15 @@ def main() -> None:
     if not p1 or p1.kind!='set_i32_constants': fail('set_i32_constants recognizer regression')
     if not p2 or p2.kind!='zero_i32_fields': fail('zero_i32_fields recognizer regression')
 
+    # The progress page embeds the canonical source inventory, so source commits
+    # must regenerate it. Checking here keeps the documented local loop
+    # (`make static-check test`) aligned with the GitHub Action.
+    from tools.decompilation_progress import staleness
+    diff = staleness(ROOT)
+    if diff is not None:
+        sys.stderr.write(diff)
+        fail('docs/DECOMPILATION_PROGRESS.md is stale; run: make progress')
+
     print(f'static-check: PASS ({len(py_files)} Python files, {len(json_files)} JSON files)')
 
 if __name__=='__main__': main()

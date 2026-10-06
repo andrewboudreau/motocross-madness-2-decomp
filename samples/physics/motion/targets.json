@@ -735,7 +735,7 @@
     "target_va": "0x004a7fd0",
     "target_size": 1121,
     "expect": "partial",
-    "notes": "cdecl; slot 7 helper. ~27%: same control flow and layout, but VC6 inlines differently: retail calls Vec3::Vec3 for the identity axis and, in the axisY path, calls DotProduct and inlines operator* (calling Vec3::Vec3); ours inlines the ctor and DotProduct and calls operator*. Every later byte shifts"
+    "notes": "cdecl; slot 7 helper. ~56% (was ~27% before UnitVector named its inverse length): same control flow and layout, but VC6 inlines differently: retail calls Vec3::Vec3 for the identity axis and, in the axisY path, calls DotProduct and inlines operator* (calling Vec3::Vec3); ours inlines the ctor and DotProduct and calls operator*. Every later byte shifts"
   },
   {
     "class": "CharacterPose",
@@ -744,6 +744,6 @@
     "target_va": "0x004a8470",
     "target_size": 1205,
     "expect": "partial",
-    "notes": "cdecl; slot 7 / 0x4a9050 helper. Same calls in the same order except that VC6 inlines the first CrossProduct (retail calls 0x00515600 twice), which shifts every later byte (inline budget)"
+    "notes": "cdecl; slot 7 / 0x4a9050 helper. ~19%. Same calls in the same order except that VC6 inlines the first CrossProduct (retail calls 0x00515600 twice), which shifts every later byte (inline budget)"
   }
 ]

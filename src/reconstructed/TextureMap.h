@@ -1,14 +1,18 @@
 #pragma once
 
+#include <stdio.h>
+
 #include "BaseObject.h"
 #include "TextureMapManager.h"
+#include "Tgafile.h"
 
 // Palette object at TextureMap+0x2c: +0x710 maps 555 colours to palette
 // indices.
 struct UnknownTexturePalette {
     unsigned char field_0x000[0x10];
     unsigned char field_0x010[256][3];             // RGB entries
-    unsigned char field_0x310[0x710 - 0x310];
+    unsigned short field_0x310[256];               // 16-bit entries (Pixtrans 0x004d11c0)
+    unsigned short field_0x510[256];               // 16-bit entries (Pixtrans 0x004d1150)
     unsigned char field_0x710[0x8000];
 };
 
@@ -28,8 +32,40 @@ struct UnknownTextureFormatChoice {
 // read. Both follow +0x1c to the innermost stream first.
 class UnknownTextureStream {
 public:
+    UnknownTextureStream(int a);              // 0x00460d10
+    ~UnknownTextureStream();                  // 0x00460d60
+    int UnknownFunction460f50(const char* path, const char* mode, int a); // 0x00460f50: opens `path`
+    int UnknownFunction461340(int offset, int a, int origin); // 0x00461340: seeks
     int UnknownFunction461600();
     int UnknownFunction461640(void* buffer, int size, int count);
+    int UnknownFunction461980();              // 0x00461980: reads a byte
+    void UnknownFunction461cb0(int* a, int* b); // 0x00461cb0 (SceneManager 0x004ea0fd)
+    // 0x00430ff0 (out-of-line copy): whether the stream is at its end: past
+    // its length within the inner stream, else the buffer is drained and the
+    // file is at end-of-file.
+    int UnknownFunction430ff0()
+    {
+        if (field_0x1c) {
+            if (field_0x04 > 0 && UnknownFunction461600() >= field_0x130 + field_0x04)
+                return 1;
+            return field_0x1c->UnknownFunction430ff0();
+        }
+        if (field_0x124 != field_0x128)
+            return 0;
+        return feof(field_0x14);
+    }
+
+    unsigned char field_0x000[0x04];
+    int field_0x04;                           // length within the inner stream (0: to its end)
+    unsigned char field_0x008[0x14 - 0x08];
+    FILE* field_0x14;                         // the open file
+    unsigned char field_0x018[0x1c - 0x18];
+    UnknownTextureStream* field_0x1c;         // inner stream
+    unsigned char field_0x020[0x124 - 0x20];
+    int field_0x124;                          // buffer position
+    int field_0x128;                          // buffer end
+    unsigned char field_0x12c[0x130 - 0x12c];
+    int field_0x130;                          // start offset in the inner stream
 };
 
 // A render state and its value (RenderTarget slot 8).
@@ -96,7 +132,3 @@ public:
     int field_0x6c;                           // format choice +0x14 (slot 5)
 };
 
-// Tgafile.cpp helpers (cdecl): whether a format has alpha, and its
-// DirectDraw pixel format.
-int UnknownFunction511ad0(int format);
-void UnknownFunction5119c0(int format, void* pixelFormat);

@@ -180,7 +180,7 @@ void PCGame::UnknownFunction4c0d10() {
                                 UnknownSurfaceDesc desc;
                                 memset(&desc, 0, sizeof(desc));
                                 desc.size = sizeof(desc);
-                                UnknownFunction5119c0(target->field_0x28, desc.pixelFormat);
+                                UnknownFunction5119c0(target->field_0x28, &desc.pixelFormat);
                                 desc.height = desc.width = 256;
                                 desc.flags = 0x1007;
                                 desc.caps[0] = 0x10005000;
