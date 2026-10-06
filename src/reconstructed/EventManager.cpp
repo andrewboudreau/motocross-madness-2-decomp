@@ -207,7 +207,7 @@ void EventManager::UnknownFunction45e550(float) {
     for (int i = 0; i < g_UnknownGlobal56e26c->field_0x2158; i++) {
         int player = g_UnknownGlobal56e26c->field_0x215c[i].field_0xd4;
         if (player != local) {
-            int connected = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac800(player);
+            NetPlayer* connected = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac800(player);
             if (!g_UnknownGlobal56e26c->field_0x215c[i].field_0xcc && connected)
                 ready = 0;
         }

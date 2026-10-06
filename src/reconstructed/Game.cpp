@@ -362,7 +362,7 @@ int Game::UnknownVirtualSlot15() {
 
 // 0x00468ae0
 int Game::UnknownVirtualSlot16(int value) {
-    field_0x08 = new(__FILE__, 979) UnknownNetObject;
+    field_0x08 = new(__FILE__, 979) NetworkInterface;
     if (field_0x08 && field_0x08->UnknownFunction4ab6b0(value) < 0) {
         delete field_0x08;
         field_0x08 = 0;

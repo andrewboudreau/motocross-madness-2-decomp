@@ -184,7 +184,7 @@ public:
 // MSZoneInterface.cpp's literals.
 class UnknownTrackGameObject3410 : public UnknownTrackGameObject3410Base {
 public:
-    void UnknownFunction4aa350(int a, int b); // 0x004aa350
+    void UnknownFunction4aa350(UnknownDirectPlay4A* a, UnknownDirectPlayLobby3A* b); // 0x004aa350
     void UnknownFunction49c770();             // 0x0049c770 (EventManager 0x0045e550)
 };
 
@@ -200,11 +200,17 @@ void UnknownFunction520820(const char* message);
 // Global object at 0x0068a48c, deleted by TrackGame's destructor.
 class UnknownTrackGameGlobal68a48c {
 public:
-    UnknownTrackGameGlobal68a48c();           // 0x004ad3b0 (near Net.cpp's literals)
+    UnknownTrackGameGlobal68a48c();           // 0x004ad3b0 (defined in Net.cpp)
     ~UnknownTrackGameGlobal68a48c();          // 0x004ad3d0
     int UnknownFunction4ad3e0(const char* address, int port); // 0x004ad3e0: 1 on failure
+    int UnknownFunction4ad530(const char* data, int length);  // 0x004ad530
+    int UnknownFunction4ad570(const char* text);              // 0x004ad570
 
-    unsigned char field_0x00[0x14];
+    unsigned int field_0x00;                  // WinSock socket
+    int field_0x04;                           // last WinSock result
+    int field_0x08;
+    int field_0x0c;                           // connected
+    int field_0x10;                           // port
 };
 extern UnknownTrackGameGlobal68a48c* g_UnknownGlobal68a48c;
 
