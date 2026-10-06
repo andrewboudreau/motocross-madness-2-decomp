@@ -75,7 +75,7 @@ RenderTarget's slot 18), and `0x00481580`, `0x00481a20`, `0x00481cc0` and
 `0x00481db0`. The rest are `0x004824c0`, `0x004826d0`, `0x00482a40`,
 `0x00482ae0`, `0x00482c90`, `0x00482f00`, `0x00483040` and `0x00483100`.
 
-Also exact, not yet registered in `tools/run_calibration.py`: the buffer
+Also exact (8 more calibration cases): the buffer
 rebuild `0x0047f840`, the index builders `0x0047fce0`, `0x0047fe70` and
 `0x00480200`, the draw submissions `0x00480c90` and `0x00480fb0`, the
 detail-band re-test `0x00482760` and the border hand-off `0x004835c0`.
