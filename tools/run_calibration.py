@@ -7630,7 +7630,6 @@ CASES = [
         'target_va': '0x0051eb10',
         'target_size': 40,
     },
-    # end TrackOverlay.cpp
 ]
 
 def main():

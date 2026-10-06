@@ -90,6 +90,9 @@ Track.cpp (tokenizer, node/segment walks, lap-time formatting): see [Track](TRAC
 
 TrackRecord.cpp (the high-score table): see [TrackRecord](TRACKRECORD.md).
 
+TrackOverlay.cpp (the in-race overlays) matches strictly in 79 functions;
+see [TrackOverlay](TRACKOVERLAY.md).
+
 PCAudio.cpp matches strictly in 65 functions (PCSoundInterface, Sound and
 their helpers); see [PCAudio](PCAUDIO.md).
 
