@@ -15,6 +15,8 @@
   "?UnknownFunction511e80@@YAHPAUUnknownTgaFile@@PAVUnknownTextureStream@@@Z": "0x00511e80",
   "?UnknownFunction512100@@YAHPAUUnknownTgaFile@@PAVUnknownTextureStream@@@Z": "0x00512100",
   "?UnknownFunction512370@@YAHPAUUnknownTgaFile@@PAVUnknownTextureStream@@@Z": "0x00512370",
+  "?UnknownFunction5125c0@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z": "0x005125c0",
+  "?UnknownFunction5125c0@@YAPAUUnknownTgaFile@@PBDPAU1@H@Z$ehhandler": "0x0054eb87",
   "?UnknownFunction5127a0@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x005127a0",
   "?UnknownFunction512870@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x00512870",
   "?UnknownFunction512940@@YAXPAUUnknownTgaFile@@PAXHH@Z": "0x00512940",

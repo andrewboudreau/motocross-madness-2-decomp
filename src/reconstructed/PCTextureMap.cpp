@@ -1,5 +1,6 @@
 #include "PCTextureMap.h"
 
+#include <stdio.h>
 #include <string.h>
 
 #include "DebugAlloc.h"
@@ -224,6 +225,28 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
     }
     return UnknownVirtualSlot4(bits, width, height, width, minimumSize, sourceFormat, format, palette, flags,
                                surfacePalette, 1, 0, addressU, addressV, 0, alphaThreshold, key);
+}
+
+// 0x004c68e0: tries `formats` in turn (0-terminated) until the display
+// creates +0x70 from `desc` in one the render target accepts (flag 4 skips
+// that check), then counts the surface (4/3 more with mip levels) in DirectX
+// memory.
+int PCTextureMap::UnknownFunction4c68e0(UnknownSurfaceDesc* desc, int flags, int* formats) {
+    for (; *formats; formats++) {
+        field_0x20 = *formats;
+        if (desc->flags & 0x1000)
+            UnknownFunction5119c0(field_0x20, &desc->pixelFormat);
+        if ((flags & 4 || g_UnknownGlobal56e26c->field_0x10->UnknownVirtualSlot13(field_0x20)) &&
+            !g_UnknownGlobal56e26c->field_0x0c->field_0x190->UnknownMethod6(desc, &field_0x70, 0)) {
+            float scale = 1.0f;
+            if (field_0x24 != 1)
+                scale = 4.0f / 3.0f;
+            g_MemTagStack->UnknownFunction4a2de0(
+                (int)(UnknownFunction511970(field_0x20) * field_0x18 * field_0x14 * scale));
+            return 1;
+        }
+    }
+    return 0;
 }
 
 // 0x004c6040
@@ -603,4 +626,346 @@ int PCTextureMap::UnknownVirtualSlot18(unsigned int color) {
     SetRenderStatePair(this, 0x29, 1);
     SetRenderStatePair(this, 0x1b, 0);
     return 1;
+}
+
+// 0x004c86e0: formats the name of a DirectDraw result into a local buffer.
+// Nothing reads the text, `file` or `line` in retail (the output was
+// presumably compiled out). Cases are in retail's body order.
+void UnknownReportDirectDrawError(long result, const char* file, int line) {
+    char text[256];
+    switch (result) {
+    case 0x800401f0:
+        sprintf(text, "DDERR_NOTINITIALIZED");
+        break;
+    case 0x80004005:
+        sprintf(text, "DDERR_GENERIC");
+        break;
+    case 0x80004001:
+        sprintf(text, "DDERR_UNSUPPORTED");
+        break;
+    case 0x8007000e:
+        sprintf(text, "DDERR_OUTOFMEMORY");
+        break;
+    case 0x88760005:
+        sprintf(text, "DDERR_ALREADYINITIALIZED");
+        break;
+    case 0x80070057:
+        sprintf(text, "DDERR_INVALIDPARAMS");
+        break;
+    case 0x8876000a:
+        sprintf(text, "DDERR_CANNOTATTACHSURFACE");
+        break;
+    case 0x88760014:
+        sprintf(text, "DDERR_CANNOTDETACHSURFACE");
+        break;
+    case 0x88760028:
+        sprintf(text, "DDERR_CURRENTLYNOTAVAIL");
+        break;
+    case 0x88760037:
+        sprintf(text, "DDERR_EXCEPTION");
+        break;
+    case 0x8876005a:
+        sprintf(text, "DDERR_HEIGHTALIGN");
+        break;
+    case 0x8876005f:
+        sprintf(text, "DDERR_INCOMPATIBLEPRIMARY");
+        break;
+    case 0x88760064:
+        sprintf(text, "DDERR_INVALIDCAPS");
+        break;
+    case 0x8876006e:
+        sprintf(text, "DDERR_INVALIDCLIPLIST");
+        break;
+    case 0x88760078:
+        sprintf(text, "DDERR_INVALIDMODE");
+        break;
+    case 0x88760082:
+        sprintf(text, "DDERR_INVALIDOBJECT");
+        break;
+    case 0x88760091:
+        sprintf(text, "DDERR_INVALIDPIXELFORMAT");
+        break;
+    case 0x88760096:
+        sprintf(text, "DDERR_INVALIDRECT");
+        break;
+    case 0x887600a0:
+        sprintf(text, "DDERR_LOCKEDSURFACES");
+        break;
+    case 0x887600aa:
+        sprintf(text, "DDERR_NO3D");
+        break;
+    case 0x887600b4:
+        sprintf(text, "DDERR_NOALPHAHW");
+        break;
+    case 0x887600cd:
+        sprintf(text, "DDERR_NOCLIPLIST");
+        break;
+    case 0x887600d2:
+        sprintf(text, "DDERR_NOCOLORCONVHW");
+        break;
+    case 0x887600d4:
+        sprintf(text, "DDERR_NOCOOPERATIVELEVELSET");
+        break;
+    case 0x887600d7:
+        sprintf(text, "DDERR_NOCOLORKEY");
+        break;
+    case 0x887600dc:
+        sprintf(text, "DDERR_NOCOLORKEYHW");
+        break;
+    case 0x887600de:
+        sprintf(text, "DDERR_NODIRECTDRAWSUPPORT");
+        break;
+    case 0x887600e1:
+        sprintf(text, "DDERR_NOEXCLUSIVEMODE");
+        break;
+    case 0x887600e6:
+        sprintf(text, "DDERR_NOFLIPHW");
+        break;
+    case 0x887600f0:
+        sprintf(text, "DDERR_NOGDI");
+        break;
+    case 0x887600fa:
+        sprintf(text, "DDERR_NOMIRRORHW");
+        break;
+    case 0x887600ff:
+        sprintf(text, "DDERR_NOTFOUND");
+        break;
+    case 0x88760104:
+        sprintf(text, "DDERR_NOOVERLAYHW");
+        break;
+    case 0x8876010e:
+        sprintf(text, "DDERR_OVERLAPPINGRECTS");
+        break;
+    case 0x88760118:
+        sprintf(text, "DDERR_NORASTEROPHW");
+        break;
+    case 0x88760122:
+        sprintf(text, "DDERR_NOROTATIONHW");
+        break;
+    case 0x88760136:
+        sprintf(text, "DDERR_NOSTRETCHHW");
+        break;
+    case 0x8876013c:
+        sprintf(text, "DDERR_NOT4BITCOLOR");
+        break;
+    case 0x8876013d:
+        sprintf(text, "DDERR_NOT4BITCOLORINDEX");
+        break;
+    case 0x88760140:
+        sprintf(text, "DDERR_NOT8BITCOLOR");
+        break;
+    case 0x8876014a:
+        sprintf(text, "DDERR_NOTEXTUREHW");
+        break;
+    case 0x8876014f:
+        sprintf(text, "DDERR_NOVSYNCHW");
+        break;
+    case 0x88760154:
+        sprintf(text, "DDERR_NOZBUFFERHW");
+        break;
+    case 0x8876015e:
+        sprintf(text, "DDERR_NOZOVERLAYHW");
+        break;
+    case 0x88760168:
+        sprintf(text, "DDERR_OUTOFCAPS");
+        break;
+    case 0x8876017c:
+        sprintf(text, "DDERR_OUTOFVIDEOMEMORY");
+        break;
+    case 0x8876017e:
+        sprintf(text, "DDERR_OVERLAYCANTCLIP");
+        break;
+    case 0x88760180:
+        sprintf(text, "DDERR_OVERLAYCOLORKEYONLYONEACTIVE");
+        break;
+    case 0x88760183:
+        sprintf(text, "DDERR_PALETTEBUSY");
+        break;
+    case 0x88760190:
+        sprintf(text, "DDERR_COLORKEYNOTSET");
+        break;
+    case 0x8876019a:
+        sprintf(text, "DDERR_SURFACEALREADYATTACHED");
+        break;
+    case 0x887601a4:
+        sprintf(text, "DDERR_SURFACEALREADYDEPENDENT");
+        break;
+    case 0x887601ae:
+        sprintf(text, "DDERR_SURFACEBUSY");
+        break;
+    case 0x887601b3:
+        sprintf(text, "DDERR_CANTLOCKSURFACE");
+        break;
+    case 0x887601b8:
+        sprintf(text, "DDERR_SURFACEISOBSCURED");
+        break;
+    case 0x887601c2:
+        sprintf(text, "DDERR_SURFACELOST");
+        break;
+    case 0x887601cc:
+        sprintf(text, "DDERR_SURFACENOTATTACHED");
+        break;
+    case 0x887601d6:
+        sprintf(text, "DDERR_TOOBIGHEIGHT");
+        break;
+    case 0x887601e0:
+        sprintf(text, "DDERR_TOOBIGSIZE");
+        break;
+    case 0x887601ea:
+        sprintf(text, "DDERR_TOOBIGWIDTH");
+        break;
+    case 0x887601fe:
+        sprintf(text, "DDERR_UNSUPPORTEDFORMAT");
+        break;
+    case 0x88760208:
+        sprintf(text, "DDERR_UNSUPPORTEDMASK");
+        break;
+    case 0x88760209:
+        sprintf(text, "DDERR_INVALIDSTREAM");
+        break;
+    case 0x88760219:
+        sprintf(text, "DDERR_VERTICALBLANKINPROGRESS");
+        break;
+    case 0x8876021c:
+        sprintf(text, "DDERR_WASSTILLDRAWING");
+        break;
+    case 0x88760230:
+        sprintf(text, "DDERR_XALIGN");
+        break;
+    case 0x88760231:
+        sprintf(text, "DDERR_INVALIDDIRECTDRAWGUID");
+        break;
+    case 0x88760232:
+        sprintf(text, "DDERR_DIRECTDRAWALREADYCREATED");
+        break;
+    case 0x88760233:
+        sprintf(text, "DDERR_NODIRECTDRAWHW");
+        break;
+    case 0x88760234:
+        sprintf(text, "DDERR_PRIMARYSURFACEALREADYEXISTS");
+        break;
+    case 0x88760235:
+        sprintf(text, "DDERR_NOEMULATION");
+        break;
+    case 0x88760236:
+        sprintf(text, "DDERR_REGIONTOOSMALL");
+        break;
+    case 0x88760237:
+        sprintf(text, "DDERR_CLIPPERISUSINGHWND");
+        break;
+    case 0x88760238:
+        sprintf(text, "DDERR_NOCLIPPERATTACHED");
+        break;
+    case 0x88760239:
+        sprintf(text, "DDERR_NOHWND");
+        break;
+    case 0x8876023a:
+        sprintf(text, "DDERR_HWNDSUBCLASSED");
+        break;
+    case 0x8876023b:
+        sprintf(text, "DDERR_HWNDALREADYSET");
+        break;
+    case 0x8876023c:
+        sprintf(text, "DDERR_NOPALETTEATTACHED");
+        break;
+    case 0x8876023d:
+        sprintf(text, "DDERR_NOPALETTEHW");
+        break;
+    case 0x8876023e:
+        sprintf(text, "DDERR_BLTFASTCANTCLIP");
+        break;
+    case 0x8876023f:
+        sprintf(text, "DDERR_NOBLTHW");
+        break;
+    case 0x88760240:
+        sprintf(text, "DDERR_NODDROPSHW");
+        break;
+    case 0x88760241:
+        sprintf(text, "DDERR_OVERLAYNOTVISIBLE");
+        break;
+    case 0x88760242:
+        sprintf(text, "DDERR_NOOVERLAYDEST");
+        break;
+    case 0x88760243:
+        sprintf(text, "DDERR_INVALIDPOSITION");
+        break;
+    case 0x88760244:
+        sprintf(text, "DDERR_NOTAOVERLAYSURFACE");
+        break;
+    case 0x88760245:
+        sprintf(text, "DDERR_EXCLUSIVEMODEALREADYSET");
+        break;
+    case 0x88760246:
+        sprintf(text, "DDERR_NOTFLIPPABLE");
+        break;
+    case 0x88760247:
+        sprintf(text, "DDERR_CANTDUPLICATE");
+        break;
+    case 0x88760248:
+        sprintf(text, "DDERR_NOTLOCKED");
+        break;
+    case 0x88760249:
+        sprintf(text, "DDERR_CANTCREATEDC");
+        break;
+    case 0x8876024a:
+        sprintf(text, "DDERR_NODC");
+        break;
+    case 0x8876024b:
+        sprintf(text, "DDERR_WRONGMODE");
+        break;
+    case 0x8876024c:
+        sprintf(text, "DDERR_IMPLICITLYCREATED");
+        break;
+    case 0x8876024d:
+        sprintf(text, "DDERR_NOTPALETTIZED");
+        break;
+    case 0x8876024e:
+        sprintf(text, "DDERR_UNSUPPORTEDMODE");
+        break;
+    case 0x8876024f:
+        sprintf(text, "DDERR_NOMIPMAPHW");
+        break;
+    case 0x88760250:
+        sprintf(text, "DDERR_INVALIDSURFACETYPE");
+        break;
+    case 0x88760258:
+        sprintf(text, "DDERR_NOOPTIMIZEHW");
+        break;
+    case 0x88760259:
+        sprintf(text, "DDERR_NOTLOADED");
+        break;
+    case 0x8876025a:
+        sprintf(text, "DDERR_NOFOCUSWINDOW");
+        break;
+    case 0x8876026c:
+        sprintf(text, "DDERR_DCALREADYCREATED");
+        break;
+    case 0x88760276:
+        sprintf(text, "DDERR_NONONLOCALVIDMEM");
+        break;
+    case 0x88760280:
+        sprintf(text, "DDERR_CANTPAGELOCK");
+        break;
+    case 0x88760294:
+        sprintf(text, "DDERR_CANTPAGEUNLOCK");
+        break;
+    case 0x887602a8:
+        sprintf(text, "DDERR_NOTPAGELOCKED");
+        break;
+    case 0x887602b2:
+        sprintf(text, "DDERR_MOREDATA");
+        break;
+    case 0x887602b3:
+        sprintf(text, "DDERR_EXPIRED");
+        break;
+    case 0x887602b7:
+        sprintf(text, "DDERR_VIDEONOTACTIVE");
+        break;
+    case 0x887602bb:
+        sprintf(text, "DDERR_DEVICEDOESNTOWNSURFACE");
+        break;
+    default:
+        sprintf(text, "Unknown Error");
+        break;
+    }
 }

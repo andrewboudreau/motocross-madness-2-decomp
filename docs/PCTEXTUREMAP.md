@@ -122,7 +122,18 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   append helper. Only the non-mip fallback chain differs: VC6 cross-jumps
   its identical call tails into the first case, retail into the last.
 
-Not reconstructed: the error reporter `0x004c86e0`.
+Also exact:
+- `0x004c68e0` (212 bytes), slot 4's format fallback: tries the
+  0-terminated `formats` until the display creates +0x70 in one the render
+  target accepts (flag 4 skips that check), then adds the surface to the
+  "in DirectX" count (`0x004a2de0`, 4/3 with mip levels);
+- `0x004c86e0` (3508 bytes including its jump tables), the DirectDraw
+  error reporter: a switch over 110 results that `sprintf`s the `DDERR_*`
+  name (or "Unknown Error") into a 256-byte local nothing reads; `file`
+  and `line` are unused. The cases are written in retail's body order,
+  which is also the reverse order of the strings at
+  `0x00570b70..0x005714f3`. Its code ends at `0x004c9494`; PCVideoCard.cpp
+  starts at `0x004c94a0`.
 
 ## TextureMap
 

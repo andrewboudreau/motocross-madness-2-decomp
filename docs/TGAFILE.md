@@ -86,6 +86,10 @@ lines 142/151 and the scratch row 203/208. The 16-bit reader does not swap,
 reads raw images row by row and computes its end as `pixel + count`
 (lines 252/261, 311/316).
 
-Near miss: `0x005125c0` (325 of 348 bytes), which loads a whole file from a
-path (stream line 567, frees at 608/609); only the stream and file swap
-ebx and ebp.
+Also exact: `0x005125c0` (348 bytes), which
+loads a whole file from a path (stream line 567, frees at 608/609). Retail's
+register choice (stream in ebx, file in ebp) needs each failure to delete
+the stream on its own path: an early return after a failed open, another
+after a failed header read, and a `failed:` block that frees the file and
+then the stream. A single `delete stream` after nested ifs swaps the two
+registers.

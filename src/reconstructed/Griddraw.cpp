@@ -825,6 +825,51 @@ int DrawableGridNode::UnknownFunction481180(int x, int z, int size, int quad)
     return 1;
 }
 
+// 0x004813e0: compares the shared edges of each child with its right and
+// lower neighbour (height, curve index and vertex bit 7) and counts the
+// differences, which nothing reads. Retail recurses into children[row]
+// once per column inside the scan, then into every child.
+void DrawableGridNode::UnknownFunction4813e0()
+{
+    int mismatches = 0;
+    if (childMask && children && !data->b0) {
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                DrawableGridNode* node = (DrawableGridNode*)children[g_gridRow16[i] + j];
+                DrawableGridNode* right = (DrawableGridNode*)children[g_gridRow16[i] + j + 1];
+                DrawableGridNode* below = (DrawableGridNode*)children[g_gridRow16[i + 1] + j];
+                if (node) {
+                    if (right && node->childMask && right->childMask) {
+                        for (int k = 0; k < 16; k++) {
+                            int cell = g_gridRow17[k];
+                            if (node->block->cells[cell + 16].height != right->block->cells[cell].height ||
+                                node->block->cells[cell + 16].field_0x1 != right->block->cells[cell].field_0x1 ||
+                                (node->data->field_0x000[cell + 16] ^ right->data->field_0x000[cell]) & 0x80)
+                                mismatches++;
+                        }
+                    }
+                    if (below && node->childMask && below->childMask) {
+                        for (int k = 0; k < 15; k++) {
+                            if (node->block->cells[g_gridRow17[16] + k].height != below->block->cells[k].height ||
+                                node->block->cells[g_gridRow17[16] + k].field_0x1 != below->block->cells[k].field_0x1 ||
+                                (node->data->field_0x000[g_gridRow17[16] + k] ^ below->data->field_0x000[k]) & 0x80)
+                                mismatches++;
+                        }
+                    }
+                }
+                if (children[i])
+                    ((DrawableGridNode*)children[i])->UnknownFunction4813e0();
+            }
+        }
+    }
+    if (children) {
+        for (int i = 0; i < 256; i++) {
+            if (children[i])
+                ((DrawableGridNode*)children[i])->UnknownFunction4813e0();
+        }
+    }
+}
+
 // 0x00481580
 void DrawableGridNode::UnknownFunction481580()
 {

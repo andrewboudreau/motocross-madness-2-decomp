@@ -597,6 +597,41 @@ int UnknownFunction512370(UnknownTgaFile* file, UnknownTextureStream* stream) {
     return 1;
 }
 
+// 0x005125c0: opens `path` "rb" in a new stream (line 567), reads the header
+// and the pixels for its depth and names the file after the path; frees the
+// file when the pixels cannot be read. Each failure deletes the stream on
+// its own path.
+UnknownTgaFile* UnknownFunction5125c0(const char* path, UnknownTgaFile* file, int a) {
+    UnknownTextureStream* stream = new(__FILE__, 567) UnknownTextureStream(a);
+    if (!stream->UnknownFunction460f50(path, "rb", 0)) {
+        delete stream;
+        return 0;
+    }
+    file = UnknownFunction511b40(stream, file, 0);
+    if (!file) {
+        delete stream;
+        return 0;
+    }
+    if (file->bitsPerPixel == 24) {
+        if (!UnknownFunction511e80(file, stream))
+            goto failed;
+    } else if (file->bitsPerPixel == 32) {
+        if (!UnknownFunction512100(file, stream))
+            goto failed;
+    } else if (!UnknownFunction512370(file, stream)) {
+        goto failed;
+    }
+    strcpy(file->name, path);
+    delete stream;
+    return file;
+failed:
+    if (file->bits)
+        operator delete(file->bits, __FILE__, 608);
+    operator delete(file, __FILE__, 609);
+    delete stream;
+    return 0;
+}
+
 // 0x00512720: writes 24-bit `bits` to the TGA file `path`.
 int UnknownFunction512720(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
     UnknownTgaFile file;

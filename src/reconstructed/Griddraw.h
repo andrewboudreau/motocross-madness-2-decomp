@@ -321,6 +321,9 @@ public:
     int UnknownFunction481170();                                // 0x00481170
     int UnknownFunction481180(int x, int z, int size, int quad); // 0x00481180 (ret 0x10)
     int UnknownFunction481300(int x, int z, int size, int quad); // 0x00481300 (ret 0x10)
+    // 0x004813e0: counts seams where neighbouring children disagree (the
+    // count is never used) and recurses into the children.
+    void UnknownFunction4813e0();
     void UnknownFunction481580();                               // 0x00481580
     int UnknownFunction481a20(int quad);                        // 0x00481a20 (ret 4)
     float UnknownFunction481b30(int block);                     // 0x00481b30 (ret 4)

@@ -237,6 +237,10 @@ TrackOverlay.cpp gains 10 more strict functions (the StatsOverlay panels,
 the chat input and its history) and TrackRecord.cpp gains the
 TrackRecordDlg procedure; see [TrackOverlay](TRACKOVERLAY.md).
 
+SceneManager.cpp (+9, the section readers and scene loader), Griddraw.cpp
+(+1), PCTexMap.cpp (+2, including the DirectDraw error reporter) and
+Tgafile.cpp (+1) gain strict functions; see [SceneManager](SCENEMANAGER.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
