@@ -1,0 +1,61 @@
+// Near-miss TrackOverlay.cpp candidates, kept out of src/reconstructed until
+// they match. See docs/TRACKOVERLAY.md. They compile against
+// src/reconstructed/TrackOverlay.h.
+//
+// NameOverlay::UnknownFunction519000 (0x00519000, 119 bytes): the candidate
+// is 118 bytes. Retail loads the camera pointer into ecx and adds 0x170 to it
+// after pushing `point`, then reloads +0x12c into edx; VC6 here picks eax for
+// the camera and ecx for the world. A camera local, an eye-pointer local, a
+// terrain local, an inline world wrapper, a block-scoped hit vector and
+// `== 0` instead of `!` do not move it.
+//
+// StatsOverlay::UnknownFunction5198a0 (0x005198a0, 72 bytes plus a 24-byte
+// jump table): the switch and its table match. Retail tests each result with
+// `test eax, eax; je` and returns 0 with an explicit `xor eax, eax` shared at
+// the end (case 2/3 jumps into the case 1/5 test); VC6 here returns the
+// callee's zero in eax (`if (!f()) return 0;`), or uses neg/sbb for
+// `return f() != 0`, `if (f()) return 1; return 0;` and a result flag.
+
+#include "../../src/reconstructed/TrackOverlay.h"
+#include "../../src/reconstructed/Camera.h"
+#include "../../src/reconstructed/TrackGame.h"
+
+// 0x00519000: every fourth frame, tests whether `point` can be seen from the
+// camera (no terrain in between).
+int NameOverlay::UnknownFunction519000(const Vector3* point)
+{
+    Vector3 hit;
+    if (field_0x134 == field_0x130)
+        field_0x138 = !field_0x12c->field_0x4c->UnknownFunction506e90(&Target()->field_0x08->field_0x170, point, &hit, 0, 0, 0);
+    field_0x134++;
+    if (field_0x134 > 3)
+        field_0x134 = 0;
+    return field_0x138;
+}
+
+// 0x005198a0: redraws the panel for the view mode.
+int StatsOverlay::UnknownFunction5198a0()
+{
+    switch (g_UnknownGlobal56e26c->field_0x2d74) {
+    case 0:
+        if (!UnknownFunction519a20())
+            return 0;
+        break;
+    case 1:
+    case 5:
+        if (!UnknownFunction51a560())
+            return 0;
+        break;
+    case 2:
+    case 3:
+        if (!UnknownFunction519ef0())
+            return 0;
+        break;
+    case 4:
+        if (!UnknownFunction51aa40())
+            return 0;
+        break;
+    }
+    return 1;
+}
+

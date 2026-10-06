@@ -20,6 +20,7 @@ public:
 };
 
 struct UnknownEventRacer;
+struct UnknownCameraBikeRider;
 
 // 0x54-byte race status node (RaceStatus.cpp, DebugCalloc'd): one per
 // racer, chained through +0x50; the racer points back at it from +0x744.
@@ -46,7 +47,9 @@ struct UnknownEventRacer : virtual public GameObject {
     Vector3 field_0x00c;                           // position (KrustyBikeCamera slot 10 adds 2 to y)
     unsigned char field_0x018[0x4a0 - 0x18];
     int field_0x4a0;                               // EventManager 0x0045eef0: counts as done when set
-    unsigned char field_0x4a4[0x5e0 - 0x4a4];
+    unsigned char field_0x4a4[0x5c4 - 0x4a4];
+    UnknownCameraBikeRider* field_0x5c4;           // as BikeCamera's bike +0x5c4 (TrackOverlay 0x005190e0)
+    unsigned char field_0x5c8[0x5e0 - 0x5c8];
     char field_0x5e0[0x744 - 0x5e0];               // name
     UnknownEventRacerPart* field_0x744;
     int field_0x748;                               // time stamp; 0x7ffffffe until finished

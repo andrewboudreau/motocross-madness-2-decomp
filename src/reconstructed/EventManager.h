@@ -17,7 +17,7 @@ struct UnknownEventRanking {
     float value;
 };
 
-// 8-byte record sorted with TrackOverlay's 0x005199f0 (lower value first).
+// 8-byte record sorted with TrackOverlay's 0x005199f0 (higher value first).
 struct UnknownEventScore {
     float value;
     UnknownEventRacer* racer;
