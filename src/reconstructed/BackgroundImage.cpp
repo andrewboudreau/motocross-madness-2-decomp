@@ -3,6 +3,7 @@
 #include "BackgroundImage.h"
 
 #include "DebugAlloc.h"
+#include "PCGame.h"
 #include "TrackGame.h"
 
 // The render target the image belongs to (GameObject+0x18).
@@ -14,6 +15,12 @@ CameraRect g_UnknownGlobal5777b8;
 // matching source rectangle (0x00404480).
 CameraRect g_UnknownGlobal577790;
 CameraRect g_UnknownGlobal577808;
+// 0x005777d8 / 0x005777c8: the same for 0x00404700, whose source rectangle
+// goes to PCTextureMap 0x004c7b40.
+CameraRect g_UnknownGlobal5777d8;
+UnknownRect g_UnknownGlobal5777c8;
+// 0x005777e8: the drawn rectangle 0x00404700 records for its region.
+CameraRect g_UnknownGlobal5777e8;
 
 // 0x00404010
 BackgroundImage::~BackgroundImage() {
@@ -106,6 +113,139 @@ void BackgroundImage::UnknownFunction404240(int index, CameraRect* rect) {
         }
         field_0x50[index].field_0x38 = Target()->field_0x1c;
     }
+}
+
+// 0x004042e0: copies each region's current-frame rectangle back from the
+// off-screen copy and ages the regions.
+int BackgroundImage::UnknownFunction4042e0() {
+    if (field_0x4c) {
+        for (int i = 0; i < field_0x48; i++) {
+            if (field_0x50[i].field_0x00) {
+                if (CurrentRegionRect(i).right - CurrentRegionRect(i).left > 0 &&
+                    CurrentRegionRect(i).bottom - CurrentRegionRect(i).top > 0 && !field_0x50[i].field_0x3c)
+                    Target()->field_0x48->UnknownMethod7(CurrentRegionRect(i).left, CurrentRegionRect(i).top,
+                                                         field_0x3c, &CurrentRegionRect(i), 0x10);
+                if (field_0x50[i].field_0x00 != Target()->field_0x14)
+                    field_0x50[i].field_0x00--;
+                if (field_0x50[i].field_0x00 == 0)
+                    field_0x4c--;
+            }
+        }
+    }
+    return 1;
+}
+
+// 0x00404480: draws `image` at `rect`. With the off-screen copy current,
+// only the parts under this frame's dirty regions are redrawn (into both
+// surfaces); `frames` counts full redraws still owed. The region rectangle is
+// re-read for each use: the global stores could alias it.
+int BackgroundImage::UnknownFunction404480(PCTextureMap* image, CameraRect* rect, void* sourceRect, int flags,
+                                           int index, int dirty, int* frames, int skip) {
+    if (dirty) {
+        if (field_0x40) {
+            if (*frames) {
+                UnknownFunction404c80();
+                image->UnknownFunction4c7b00(rect, field_0x3c, sourceRect, flags, skip);
+                image->UnknownFunction4c7b00(rect, Target()->field_0x48, sourceRect, flags, skip);
+                (*frames)--;
+            } else {
+                for (int i = 0; i < field_0x48; i++) {
+                    if (field_0x50[i].field_0x38 != Target()->field_0x1c)
+                        continue;
+                    g_UnknownGlobal577790.left =
+                        CurrentRegionRect(i).left > rect->left ? CurrentRegionRect(i).left : rect->left;
+                    g_UnknownGlobal577790.right =
+                        CurrentRegionRect(i).right < rect->right ? CurrentRegionRect(i).right : rect->right;
+                    g_UnknownGlobal577790.top =
+                        CurrentRegionRect(i).top > rect->top ? CurrentRegionRect(i).top : rect->top;
+                    g_UnknownGlobal577790.bottom =
+                        CurrentRegionRect(i).bottom < rect->bottom ? CurrentRegionRect(i).bottom : rect->bottom;
+                    if (g_UnknownGlobal577790.left < g_UnknownGlobal577790.right &&
+                        g_UnknownGlobal577790.top < g_UnknownGlobal577790.bottom) {
+                        UnknownFunction404c80();
+                        g_UnknownGlobal577808.left = g_UnknownGlobal577790.left - rect->left;
+                        g_UnknownGlobal577808.right = g_UnknownGlobal577790.right - rect->left;
+                        g_UnknownGlobal577808.top = g_UnknownGlobal577790.top - rect->top;
+                        g_UnknownGlobal577808.bottom = g_UnknownGlobal577790.bottom - rect->top;
+                        image->UnknownFunction4c7b00(&g_UnknownGlobal577790, Target()->field_0x48,
+                                                     &g_UnknownGlobal577808, flags, skip);
+                        image->UnknownFunction4c7b00(&g_UnknownGlobal577790, field_0x3c, &g_UnknownGlobal577808,
+                                                     flags, skip);
+                    }
+                }
+            }
+        } else {
+            UnknownFunction404c80();
+            image->UnknownFunction4c7b00(rect, Target()->field_0x48, sourceRect, flags, skip);
+            *frames = Target()->field_0x14;
+        }
+        if (index >= 0)
+            UnknownFunction404cb0(index);
+        return 1;
+    }
+    UnknownFunction404c80();
+    image->UnknownFunction4c7b00(rect, Target()->field_0x48, sourceRect, flags, skip);
+    if (index >= 0)
+        UnknownFunction404240(index, rect);
+    *frames = Target()->field_0x14;
+    return 1;
+}
+
+// 0x00404700: as 0x00404480, but copies `rect` of the image to (x, y)
+// through PCTextureMap 0x004c7b40.
+int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, CameraRect* rect, int flags, int index,
+                                           int dirty, int* frames, unsigned char* table) {
+    if (dirty) {
+        if (field_0x40) {
+            if (*frames) {
+                UnknownFunction404c80();
+                image->UnknownFunction4c7b40(x, y, field_0x3c, (UnknownRect*)rect, flags, table);
+                image->UnknownFunction4c7b40(x, y, Target()->field_0x48, (UnknownRect*)rect, flags, table);
+                (*frames)--;
+            } else {
+                for (int i = 0; i < field_0x48; i++) {
+                    if (field_0x50[i].field_0x38 != Target()->field_0x1c)
+                        continue;
+                    g_UnknownGlobal5777d8.left =
+                        CurrentRegionRect(i).left > rect->left ? CurrentRegionRect(i).left : rect->left;
+                    g_UnknownGlobal5777d8.right =
+                        CurrentRegionRect(i).right < rect->right ? CurrentRegionRect(i).right : rect->right;
+                    g_UnknownGlobal5777d8.top =
+                        CurrentRegionRect(i).top > rect->top ? CurrentRegionRect(i).top : rect->top;
+                    g_UnknownGlobal5777d8.bottom =
+                        CurrentRegionRect(i).bottom < rect->bottom ? CurrentRegionRect(i).bottom : rect->bottom;
+                    if (g_UnknownGlobal5777d8.left < g_UnknownGlobal5777d8.right &&
+                        g_UnknownGlobal5777d8.top < g_UnknownGlobal5777d8.bottom) {
+                        UnknownFunction404c80();
+                        g_UnknownGlobal5777c8.left = g_UnknownGlobal5777d8.left - rect->left;
+                        g_UnknownGlobal5777c8.right = g_UnknownGlobal5777d8.right - rect->left;
+                        g_UnknownGlobal5777c8.top = g_UnknownGlobal5777d8.top - rect->top;
+                        g_UnknownGlobal5777c8.bottom = g_UnknownGlobal5777d8.bottom - rect->top;
+                        image->UnknownFunction4c7b40(x, y, Target()->field_0x48, &g_UnknownGlobal5777c8, flags, table);
+                        image->UnknownFunction4c7b40(x, y, field_0x3c, &g_UnknownGlobal5777c8, flags, table);
+                    }
+                }
+            }
+        } else {
+            UnknownFunction404c80();
+            image->UnknownFunction4c7b40(x, y, Target()->field_0x48, (UnknownRect*)rect, flags, table);
+            *frames = Target()->field_0x14;
+        }
+        if (index >= 0)
+            UnknownFunction404cb0(index);
+        return 1;
+    }
+    UnknownFunction404c80();
+    image->UnknownFunction4c7b40(x, y, Target()->field_0x48, (UnknownRect*)rect, flags, table);
+    if (index >= 0) {
+        g_UnknownGlobal5777e8.left = x;
+        g_UnknownGlobal5777e8.right = rect->right - rect->left + x;
+        g_UnknownGlobal5777e8.top = y;
+        g_UnknownGlobal5777e8.bottom = rect->bottom - rect->top + y;
+        UnknownFunction404240(index, &g_UnknownGlobal5777e8);
+    }
+    *frames = Target()->field_0x14;
+    return 1;
 }
 
 // 0x00404c80

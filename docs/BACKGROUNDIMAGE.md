@@ -20,15 +20,23 @@ copies the regions back from the copy (BltFast) and clears their depth
 the screen. The camera's viewport fields are protected in Camera.h, so the
 file reads them through `UnknownBackgroundCamera`.
 
-Exact (13 calibration cases): the destructor and its deleting wrapper,
+Exact (16 calibration cases): the destructor and its deleting wrapper,
 slots 8, 15 and 18, `0x004040b0` (set image), `0x00404200` (release a
 region), `0x00404240` (record a region rectangle, clipped with `?:`),
-`0x00404c80` (release the DC), `0x00404cb0`, `0x00404cd0`, `0x00404d30`
-and `0x00404da0` (mark every frame dirty; an unsigned viewport compare).
+`0x004042e0` (restore the regions), `0x00404480` (draw an image into a
+rectangle), `0x00404700` (copy part of an image to a point, through
+PCTextureMap `0x004c7b40`), `0x00404c80` (release the DC), `0x00404cb0`,
+`0x00404cd0`, `0x00404d30` and `0x00404da0` (mark every frame dirty; an
+unsigned viewport compare).
+
+`0x004042e0`, `0x00404480` and `0x00404700` index the current frame's
+region rectangle afresh for every field (`CurrentRegionRect`, an inline
+accessor): retail reloads +0x50 and the target's frame index after each
+global store. A local rectangle pointer or reference keeps them in
+registers and does not match.
 
 Near misses (`samples/render/BackgroundImageNearMisses.cpp`, notes there):
 the constructor (vptr store placement), slot 13, the region allocator
-`0x004040f0`, the region loops `0x004042e0`/`0x004043c0` and the draw
-routine `0x00404480`.
-
-Not reconstructed: `0x00404700` and `0x004049d0`.
+`0x004040f0`, the depth clear `0x004043c0` (block layout only) and the DC
+lookup `0x004049d0` (retail stores its leading zeros as immediates; VC6
+here caches 0 in edi).

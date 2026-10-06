@@ -5,7 +5,9 @@
 // 0x0044a600 (104 bytes, the found-file filter): everything matches except
 // the attribute load: retail loads the whole dword and masks it with 0xff
 // before `>> 4 & 1`; with an unsigned char or a cast VC6 here loads only
-// the low byte.
+// the low byte, and an explicit `& 0xff`, `% 256` or `/ 16` on the dword
+// (int or unsigned) is folded away. Char and int parameter types, locals
+// and `(x & 0x10) >> 4` / `? 1 : 0` forms give one of those two shapes.
 //
 // 0x0044ac30 (1130 bytes, CombinedDirectoryList slot 1): the same calls,
 // allocations and merge order; retail keeps the merged count in ebp and the

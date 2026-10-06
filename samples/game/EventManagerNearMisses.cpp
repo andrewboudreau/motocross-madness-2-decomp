@@ -5,7 +5,9 @@
 // 0x0045cb70 and 0x0045cdc0 pass by address. 63 of 67 bytes match: retail
 // loads *step into edx and the bar value into ecx; VC6 here swaps them.
 // Compound, spelled-out, commuted, local-variable, void* and struct
-// parameter forms, and compiling the function alone, do not change it.
+// parameter forms, and compiling the function alone, do not change it;
+// neither do a non-union stand-in struct for the bar, a pointer to the
+// value or an early-return layout.
 //
 // EventManager::UnknownFunction45e710 (0x0045e710, 531 bytes): leaves the
 // race for a menu. Control flow, calls, the TransDlg `new` (retail line 1064)

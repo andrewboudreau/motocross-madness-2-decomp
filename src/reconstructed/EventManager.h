@@ -146,6 +146,12 @@ public:
     void UnknownFunction45f9a0();                  // 0x0045f9a0
     int UnknownFunction45cb70();                   // 0x0045cb70
     void UnknownFunction45fbd0(int player);        // 0x0045fbd0
+    // 0x0045fce0: removes every Vegetation in the rectangle from the
+    // collision quadtree (up to 1000).
+    void UnknownFunction45fce0(float x0, float z0, float x1, float z1);
+    // 0x0045fdc0: calls GameObject slot 4 on every CollisionObject in the
+    // rectangle.
+    void UnknownFunction45fdc0(float x0, float z0, float x1, float z1);
 
     // Passed to NetworkInterface 0x004ac8d0 (+0x7c, +0x80). Its keep-alive
     // thread 0x004af6a0 drops a player not heard from for +0x7c seconds and

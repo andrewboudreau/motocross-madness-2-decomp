@@ -3,16 +3,19 @@
 RTTI: `EventManager : GameObject : BaseObject` (vtable `0x0055259c`;
 0xd08 bytes, the size TrackGame slot 4 allocates). Its constructor
 `0x0045c9e0` writes the vtable. Canonical source is
-`src/reconstructed/EventManager.h` / `EventManager.cpp`; the TU is not
-established. Names are provisional. Its `new` calls pass
+`src/reconstructed/EventManager.h` / `EventManager.cpp`. Names are
+provisional. Its `new` calls pass
 `D:\aardvark\VC\krusty2\EventManager.cpp` as `__FILE__` (`0x0056a940`),
-which confirms the original translation unit's name.
+which confirms the original translation unit's name. The TU runs from
+`0x0045c830` to `0x0045fe3f` (strong inference: EcoSystem.cpp code precedes
+it, and the `$E` initializer pairs that open the next TU start at
+`0x0045fe40`).
 
 TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
 ## Status
 
-Exact (29 calibration cases):
+Exact (31 calibration cases):
 - the constructor (11 0x50-byte entries at +0x50; -1000 in each component
   of +0x3c4) and both destructors;
 - slot 8, which reads "KeepAliveTimeout" (default 20) into +0x2c. With
@@ -78,6 +81,15 @@ Exact (29 calibration cases):
   qsorts the entries with the unsigned comparator `0x0045fbb0`;
 - the cdecl comparators `0x0045e930` (standings) and `0x0045d3d0` (racer
   names, through the inline `strcmp` intrinsic);
+- `0x0045fce0` and `0x0045fdc0` (both called by the podium scene with a
+  rectangle, `0x0045fce0` also by `0x00418d5e` through TrackGame+0x570):
+  they query the collision quadtree (`0x0068aba4`). The first
+  `dynamic_cast`s each object to `Vegetation`, collects up to 1000 with
+  their codes (Vegetation slot 1, `0x00456720`) in a 0x1f40-byte local
+  array (`__chkstk`) and removes them after the query; the second calls
+  GameObject slot 4 on the GraphicsTest base (+0xc) of each
+  `CollisionObject`. The quadtree classes are TU-local views because the
+  `src/krusty2` declarations cannot share a TU with these headers;
 - `UnknownEventEntry`'s constructor `0x0045c830`, reset `0x0045c840`
   (position 1, empty name from the shared `""` literal `0x00577738`) and
   racer copy `0x0045c8b0` (id, name truncated to 15 characters, the fields
@@ -106,8 +118,9 @@ Not reconstructed:
   creates a `PCCamera` (constructor `0x004bed80`) at +0x3d4 and, for places
   1 to min(+0x4c, 3), a `D3DIMSoultreeCharacter` (0x240 bytes, constructor
   `0x004455b0`) at +0x424 from "%s\Winner.mcf" (or "Winnerd.mcf") with a
-  "Podium3/4/5_%02d" motion kept at +0x430; it also uses "CrowdLoop.wav".
-  A nonzero result makes `0x0045e600` block UI interaction for slot 10.
+  "Podium3/4/5_%02d" motion kept at +0x430; it also uses "CrowdLoop.wav"
+  and clears the podium area with `0x0045fce0` / `0x0045fdc0`. Heavy x87
+  code with many inline vector temporaries; not attempted. A nonzero result makes `0x0045e600` block UI interaction for slot 10.
 
 Near misses (`samples/game/EventManagerNearMisses.cpp`):
 - the cdecl progress callback `0x0045cb20` (63 of 67 bytes; retail swaps

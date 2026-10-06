@@ -13,12 +13,16 @@
 // search loop and jumps there on a failed realloc; VC6 here places it at the
 // end (early returns or `goto failed`).
 //
-// 0x004042e0 / 0x004043c0 (207 / 169 bytes): retail keeps the rectangle
-// pointer in a stack slot (frame 0xc) and the region offset in ebp; VC6 here
-// keeps both in registers.
+// 0x004043c0 (177 bytes): the instructions match; retail lays the
+// `return 0` block out between the loop and the final `return 1` (`jge`
+// out, `jmp` back), VC6 here puts it last. A local rectangle pointer, the
+// accessor, early returns, `continue`, `goto` and a while loop all compile
+// to the same layout.
 //
-// 0x00404480 (639 bytes): the dirty-region branch leads, as in retail, but
-// the loop counters and the clipped rectangle land in other registers.
+// 0x004049d0 (678 bytes): retail stores the three leading zeros (and
+// `field_0x60 = 0`) as immediates; VC6 here caches 0 in edi, which shifts
+// the register choice of the region loop. Statement orders and a helper
+// for the DC tail do not change that.
 
 #include <string.h>
 
@@ -34,6 +38,9 @@
 extern CameraRect g_UnknownGlobal5777b8;
 extern CameraRect g_UnknownGlobal577790;
 extern CameraRect g_UnknownGlobal577808;
+// 0x005777a0 / 0x005777a8: 0x004049d0's region index and clipped rectangle.
+int g_UnknownGlobal5777a0;
+CameraRect g_UnknownGlobal5777a8;
 
 // 0x00403d50
 BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
@@ -120,25 +127,6 @@ failed:
     return -1;
 }
 
-// 0x004042e0: copies each region's current-frame rectangle back from the
-// off-screen copy and ages the regions.
-int BackgroundImage::UnknownFunction4042e0() {
-    if (field_0x4c) {
-        for (int i = 0; i < field_0x48; i++) {
-            if (field_0x50[i].field_0x00) {
-                CameraRect* rect = &field_0x50[i].field_0x04[Target()->field_0x18];
-                if (rect->right - rect->left > 0 && rect->bottom - rect->top > 0 && !field_0x50[i].field_0x3c)
-                    Target()->field_0x48->UnknownMethod7(rect->left, rect->top, field_0x3c, rect, 0x10);
-                if (field_0x50[i].field_0x00 != Target()->field_0x14)
-                    field_0x50[i].field_0x00--;
-                if (field_0x50[i].field_0x00 == 0)
-                    field_0x4c--;
-            }
-        }
-    }
-    return 1;
-}
-
 // 0x004043c0: clears the depth buffer under each region's previous-frame
 // rectangle.
 int BackgroundImage::UnknownFunction4043c0() {
@@ -147,65 +135,93 @@ int BackgroundImage::UnknownFunction4043c0() {
         if (frame < 0)
             frame = Target()->field_0x14 - 1;
         for (int i = 0; i < field_0x48; i++) {
-            if (field_0x50[i].field_0x00) {
-                CameraRect* rect = &field_0x50[i].field_0x04[frame];
-                if (rect->right - rect->left > 0 && rect->bottom - rect->top > 0 &&
-                    Target()->field_0x50->UnknownMethod10(1, rect, 2, 0, Target()->field_0x2c, 0) != 0)
-                    return 0;
-            }
+            if (field_0x50[i].field_0x00 &&
+                field_0x50[i].field_0x04[frame].right - field_0x50[i].field_0x04[frame].left > 0 &&
+                field_0x50[i].field_0x04[frame].bottom - field_0x50[i].field_0x04[frame].top > 0 &&
+                Target()->field_0x50->UnknownMethod10(1, &field_0x50[i].field_0x04[frame], 2, 0,
+                                                      Target()->field_0x2c, 0) != 0)
+                return 0;
         }
     }
     return 1;
 }
 
-// 0x00404480: draws `image` at `rect`. With the off-screen copy current,
-// only the parts under this frame's dirty regions are redrawn (into both
-// surfaces); `frames` counts full redraws still owed.
-int BackgroundImage::UnknownFunction404480(PCTextureMap* image, CameraRect* rect, void* sourceRect, int flags,
-                                           int index, int dirty, int* frames, int skip) {
+// 0x004049d0: a DC for drawing `rect`: the back buffer, or with the copy
+// current the surfaces in turn (`a` set when the copy is returned), clipped
+// to the next dirty region in `clip`.
+int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int index, int dirty, int* frames, int* a,
+                                           CameraRect* clip) {
+    UnknownSurfaceInterface* surface;
+    *dc = 0;
+    surface = 0;
+    *a = 0;
     if (dirty) {
         if (field_0x40) {
             if (*frames) {
-                UnknownFunction404c80();
-                image->UnknownFunction4c7b00(rect, field_0x3c, sourceRect, flags, skip);
-                image->UnknownFunction4c7b00(rect, Target()->field_0x48, sourceRect, flags, skip);
-                (*frames)--;
+                if (field_0x60) {
+                    *a = 1;
+                    surface = field_0x3c;
+                    field_0x60 = 0;
+                } else {
+                    surface = Target()->field_0x48;
+                    field_0x60 = 1;
+                    (*frames)--;
+                }
             } else {
-                for (int i = 0; i < field_0x48; i++) {
-                    if (field_0x50[i].field_0x38 != Target()->field_0x1c)
+                field_0x60 = 1;
+                for (g_UnknownGlobal5777a0 = 0; g_UnknownGlobal5777a0 < field_0x48; g_UnknownGlobal5777a0++) {
+                    if (field_0x50[g_UnknownGlobal5777a0].field_0x38 != Target()->field_0x1c)
                         continue;
-                    CameraRect* region = &field_0x50[i].field_0x04[Target()->field_0x18];
-                    g_UnknownGlobal577790.left = region->left > rect->left ? region->left : rect->left;
-                    g_UnknownGlobal577790.right = region->right < rect->right ? region->right : rect->right;
-                    g_UnknownGlobal577790.top = region->top > rect->top ? region->top : rect->top;
-                    g_UnknownGlobal577790.bottom = region->bottom < rect->bottom ? region->bottom : rect->bottom;
-                    if (g_UnknownGlobal577790.left < g_UnknownGlobal577790.right &&
-                        g_UnknownGlobal577790.top < g_UnknownGlobal577790.bottom) {
-                        UnknownFunction404c80();
-                        g_UnknownGlobal577808.left = g_UnknownGlobal577790.left - rect->left;
-                        g_UnknownGlobal577808.right = g_UnknownGlobal577790.right - rect->left;
-                        g_UnknownGlobal577808.top = g_UnknownGlobal577790.top - rect->top;
-                        g_UnknownGlobal577808.bottom = g_UnknownGlobal577790.bottom - rect->top;
-                        image->UnknownFunction4c7b00(&g_UnknownGlobal577790, Target()->field_0x48,
-                                                     &g_UnknownGlobal577808, flags, skip);
-                        image->UnknownFunction4c7b00(&g_UnknownGlobal577790, field_0x3c, &g_UnknownGlobal577808,
-                                                     flags, skip);
+                    g_UnknownGlobal5777a8.left = CurrentRegionRect(g_UnknownGlobal5777a0).left > rect->left ? CurrentRegionRect(g_UnknownGlobal5777a0).left : rect->left;
+                    g_UnknownGlobal5777a8.right = CurrentRegionRect(g_UnknownGlobal5777a0).right < rect->right ? CurrentRegionRect(g_UnknownGlobal5777a0).right : rect->right;
+                    g_UnknownGlobal5777a8.top = CurrentRegionRect(g_UnknownGlobal5777a0).top > rect->top ? CurrentRegionRect(g_UnknownGlobal5777a0).top : rect->top;
+                    g_UnknownGlobal5777a8.bottom = CurrentRegionRect(g_UnknownGlobal5777a0).bottom < rect->bottom ? CurrentRegionRect(g_UnknownGlobal5777a0).bottom : rect->bottom;
+                    if (g_UnknownGlobal5777a8.left < g_UnknownGlobal5777a8.right &&
+                        g_UnknownGlobal5777a8.top < g_UnknownGlobal5777a8.bottom) {
+                        if (field_0x68 && g_UnknownGlobal5777a0 > field_0x64) {
+                            surface = Target()->field_0x48;
+                            field_0x68 = 0;
+                        } else if (!field_0x68 && g_UnknownGlobal5777a0 == field_0x64) {
+                            surface = field_0x3c;
+                            field_0x68 = 1;
+                        } else {
+                            continue;
+                        }
+                        *a = 1;
+                        *clip = g_UnknownGlobal5777a8;
+                        field_0x64 = g_UnknownGlobal5777a0;
+                        break;
                     }
+                }
+                if (g_UnknownGlobal5777a0 == field_0x48) {
+                    field_0x68 = 1;
+                    field_0x64 = -1;
                 }
             }
         } else {
-            UnknownFunction404c80();
-            image->UnknownFunction4c7b00(rect, Target()->field_0x48, sourceRect, flags, skip);
+            surface = Target()->field_0x48;
             *frames = Target()->field_0x14;
         }
         if (index >= 0)
             UnknownFunction404cb0(index);
-        return 1;
+    } else {
+        if (index >= 0)
+            UnknownFunction404240(index, rect);
+        surface = Target()->field_0x48;
+        *frames = Target()->field_0x14;
     }
-    UnknownFunction404c80();
-    image->UnknownFunction4c7b00(rect, Target()->field_0x48, sourceRect, flags, skip);
-    if (index >= 0)
-        UnknownFunction404240(index, rect);
-    *frames = Target()->field_0x14;
+    if (!surface)
+        return 0;
+    if (field_0x6c) {
+        if (surface != field_0x6c) {
+            UnknownFunction404c80();
+            field_0x6c = surface;
+            surface->UnknownMethod17(&field_0x70);
+        }
+    } else {
+        field_0x6c = surface;
+        surface->UnknownMethod17(&field_0x70);
+    }
+    *dc = field_0x70;
     return 1;
 }

@@ -940,3 +940,68 @@ void EventManager::UnknownFunction45cdc0(int mode) {
         g_UnknownGlobal56e26c->field_0x568 = 0;
     }
 }
+
+// The quadtree members 0x0045fce0 and 0x0045fdc0 use. Quadtree.cpp and
+// CollisionObject.cpp are declared in full under src/krusty2/broadphase and
+// src/krusty2/collision, whose header tree cannot be mixed with this one.
+// RTTI: Vegetation : QuadTreeObject (vtable 0x005524f8) and
+// CollisionObject : QuadTreeObject (+0), GraphicsTest (+0xc) : GameObject.
+class QuadTree;
+class QuadTreeObject {
+public:
+    virtual void UnknownVirtualSlot0();
+    // 0x00456720 for Vegetation: the object's quadtree code (ret 4).
+    virtual unsigned int UnknownVirtualSlot1(QuadTree* tree);
+    short field_0x04;
+    short field_0x06;
+    char field_0x08;
+};
+class Vegetation : public QuadTreeObject {};
+class UnknownEventGraphicsTest : public GameObject {};
+class CollisionObject : public QuadTreeObject, public UnknownEventGraphicsTest {};
+
+class QuadTree {
+public:
+    void Remove(QuadTreeObject* object, unsigned int code);     // 0x004dcf20
+    int BeginQuery(float x0, float z0, float x1, float z1);     // 0x004dd270
+    QuadTreeObject* NextObject();                               // 0x004dd540
+    void EndQuery();                                            // 0x004dd770
+};
+extern QuadTree* g_collisionQuadTree;                           // 0x0068aba4
+
+// 0x0045fce0
+void EventManager::UnknownFunction45fce0(float x0, float z0, float x1, float z1) {
+    struct {
+        Vegetation* object;
+        unsigned int code;
+    } found[1000];
+    int count = 0;
+    if (g_collisionQuadTree && g_collisionQuadTree->BeginQuery(x0, z0, x1, z1)) {
+        QuadTreeObject* object;
+        while ((object = g_collisionQuadTree->NextObject()) != 0) {
+            if (count < 1000) {
+                found[count].object = dynamic_cast<Vegetation*>(object);
+                if (found[count].object) {
+                    found[count].code = found[count].object->UnknownVirtualSlot1(g_collisionQuadTree);
+                    count++;
+                }
+            }
+        }
+        g_collisionQuadTree->EndQuery();
+        for (int i = 0; i < count; i++)
+            g_collisionQuadTree->Remove(found[i].object, found[i].code);
+    }
+}
+
+// 0x0045fdc0
+void EventManager::UnknownFunction45fdc0(float x0, float z0, float x1, float z1) {
+    if (g_collisionQuadTree && g_collisionQuadTree->BeginQuery(x0, z0, x1, z1)) {
+        QuadTreeObject* object;
+        while ((object = g_collisionQuadTree->NextObject()) != 0) {
+            GameObject* graphics = dynamic_cast<CollisionObject*>(object);
+            if (graphics)
+                graphics->UnknownVirtualSlot4();
+        }
+        g_collisionQuadTree->EndQuery();
+    }
+}

@@ -15,7 +15,7 @@
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?UnknownFunction4040f0@BackgroundImage@@QAEHH@Z": "0x004040f0",
   "?UnknownFunction404200@BackgroundImage@@QAEXH@Z": "0x00404200",
-  "?UnknownFunction404700@BackgroundImage@@QAEHPAVPCTextureMap@@HHPAXHHHPAHH@Z": "0x00404700",
+  "?UnknownFunction404700@BackgroundImage@@QAEHPAVPCTextureMap@@HHPAUCameraRect@@HHHPAHPAE@Z": "0x00404700",
   "?UnknownFunction43ea70@GameCursor@@QAEPAVGameObject@@PAXPAUUnknownControlBinding@@1PBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043ea70",
   "?UnknownFunction43eaf0@GameCursor@@QAEPAVGameObject@@PAXPBDPAVTextureMapManager@@PAVBackgroundImage@@0PAVPalette8@@@Z": "0x0043eaf0",
   "?UnknownFunction43ebd0@GameCursor@@QAEHPBDPAVTextureMapManager@@PAXPAVPalette8@@@Z": "0x0043ebd0",

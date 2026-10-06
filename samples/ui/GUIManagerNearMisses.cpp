@@ -25,7 +25,8 @@
 // 0x00487870 (283 bytes): same flow; retail caches `result` in edi and
 //   spills it around the inline strcmp; VC6 here keeps it on the stack.
 // 0x00488120 (49 bytes): retail keeps the `device ? owner : 0` branch
-//   (jmp + xor) that VC6 here threads into the owner test.
+//   (jmp + xor) that VC6 here threads into the owner test (also with an
+//   inline helper, an if/else assignment or early-return layouts).
 
 #include "../../src/reconstructed/GUIManager.cpp"
 
