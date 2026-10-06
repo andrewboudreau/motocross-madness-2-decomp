@@ -44,7 +44,7 @@ ArcadeObject::~ArcadeObject() {
 // 0x00401310
 ArcadeObject* ArcadeObject::UnknownFunction401310(void* value, int a, int b, const char* name,
                                                   Vector3 position, int pixels, UnknownArcadeView* view,
-                                                  float size, int c, int d, unsigned char alpha) {
+                                                  float size, float c, float d, unsigned char alpha) {
     Vector3 low;
     Vector3 extent;
 
@@ -90,7 +90,7 @@ void ArcadeObject::UnknownFunction4014f0(const Vector3* position) {
 }
 
 // 0x00401520
-void ArcadeObject::UnknownFunction401520(int a, int b, int c, int d) {
+void ArcadeObject::UnknownFunction401520(const Vector3* a, const Vector3* b, int c, int d) {
     field_0x2c->UnknownFunction4fbd70(a, b, c, d);
 }
 

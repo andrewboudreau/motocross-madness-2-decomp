@@ -113,10 +113,16 @@ relocation resolved by the bindings. Three near misses are parked in
   update. It drives the gravity model and rigid body, runs `0x00532020` and
   `0x005329e0`, and steps the rider pose. A function-start scan that
   trusts alignment splits it at `0x00530880`; the body continues past it.
+  Not attempted (size).
 - `0x00531740` (1624 bytes): contact response per probe. It uses
-  `0x00460b50`/`0x00460c00`, `0x0040ae30` and the out-of-line `Vector3`
-  constructor.
+  `0x00460b50`/`0x00460c00`, `0x0040ae30`, `0x005015b0`, `0x00421cb0` and
+  calls the out-of-line `Vector3` constructor (`0x00404e60`) nine times,
+  where every exact function of the unit inlines it. Not attempted.
 - `0x0052ff00`, `0x0052ff20`: ownership open (see Evidence).
+
+The near miss `0x00531da0` also keeps its `fld [delta.x]; fmul st(1)` with
+`step` built through a free `operator*=(Vector3&, float)`, `(1/count) *
+delta` or mixed component orders.
 
 ## Remaining uncertainty
 

@@ -72,6 +72,15 @@ public:
     void UnknownFunction4fb4f0();                                  // 0x004fb4f0: world matrix
     Vector3 UnknownFunction4fd660(const Vector3& p);               // 0x004fd660: local -> world point
     void UnknownFunction4fedb0();                                  // 0x004fedb0: registers the node
+    // Seen from Krusty3DObjects.cpp (src/krusty2/core/SoultreeObject.h
+    // describes the same functions): 0x004fc690 (ret 0x10) moves the node
+    // by `delta` in `frame`, 0x004fd090 (ret 0x10) sets the rotation about
+    // the axis (x, y, z), 0x004fd910 (ret 4) appends `child`, 0x004fd990
+    // (ret 4) unlinks `child`.
+    void UnknownFunction4fc690(SoultreeObject* frame, Vector3 delta);
+    void UnknownFunction4fd090(float x, float y, float z, float angle);
+    void UnknownFunction4fd910(SoultreeObject* child);
+    void UnknownFunction4fd990(SoultreeObject* child);
 
     char field_0x038[0x80];                    // name
     Matrix4 field_0x0b8;                       // local matrix
@@ -80,12 +89,15 @@ public:
     SoultreeObject* field_0x13c;               // parent
     SoultreeObject* field_0x140;               // first child
     SoultreeObject* field_0x144;               // next sibling
-    unsigned char field_0x148[0x150 - 0x148];
+    unsigned char field_0x148[0x14c - 0x148];
+    int field_0x14c;                           // Krusty3DObjects.cpp: hidden
     int field_0x150;                           // bounds found (slot 5)
     int field_0x154;                           // bounds valid
     Vector3 field_0x158;                       // bounds centre
     Vector3 field_0x164;                       // bounds half extent
-    unsigned char field_0x170[0x18c - 0x170];
+    int field_0x170;                           // Krusty3DObjects.cpp 0x0048c8a0 sets 1
+    Vector3 field_0x174;                       // Krusty3DObjects.cpp 0x0048c8a0
+    Vector3 field_0x180;                       // Krusty3DObjects.cpp 0x0048c8a0
     int field_0x18c;                           // subtree dirty
     unsigned char field_0x190[0x1a0 - 0x190];
     UnknownParameterBlock* field_0x1a0;        // .slt reader
@@ -213,7 +225,7 @@ public:
     // 0x00444d80 (ret 4) attaches a modifier.
     void UnknownFunction4fc660(const Vector3* position);
     void UnknownFunction4fe850(Vector3* a, Vector3* b);
-    void UnknownFunction4fbd70(int a, int b, int c, int d);
+    void UnknownFunction4fbd70(const Vector3* a, const Vector3* b, int c, int d); // two axes by pointer
     void UnknownFunction4fceb0(Vector3 axis, float angle);
     void UnknownFunction444d80(GameObject* modifier);
     // Seen from D3DIMSoultreeModifier.cpp: 0x00444de0 and 0x00444f10 (both

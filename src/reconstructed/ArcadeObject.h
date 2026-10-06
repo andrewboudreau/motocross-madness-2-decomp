@@ -31,10 +31,18 @@ public:
 };
 
 // The object passed as the ninth argument of 0x00401310; only its float at
-// +0x198 is read (it scales the model to a screen size).
+// +0x198 is read here (it scales the model to a screen size). The other
+// fields are the camera fields Krusty3DObjects.cpp's VisualCue reads.
 struct UnknownArcadeView {
-    unsigned char field_0x000[0x198];
+    unsigned char field_0x000[0xac];
+    float field_0x0ac[4][4];                   // camera matrix (rows of 4)
+    unsigned char field_0x0ec[0x16c - 0xec];
+    float field_0x16c;                         // field of view, degrees
+    Vector3 field_0x170;                       // position
+    unsigned char field_0x17c[0x198 - 0x17c];
     float field_0x198;
+    unsigned char field_0x19c[0x1b8 - 0x19c];
+    float field_0x1b8;                         // aspect ratio
 };
 
 class ArcadeObject : public GameObject {
@@ -48,10 +56,11 @@ public:
     // (line 78), places it and optionally scales it to `pixels` and attaches
     // a TransparencyMod with `alpha` (line 104). 0 when the model fails.
     ArcadeObject* UnknownFunction401310(void* value, int a, int b, const char* name, Vector3 position,
-                                        int pixels, UnknownArcadeView* view, float size, int c, int d,
+                                        int pixels, UnknownArcadeView* view, float size, float c, float d,
                                         unsigned char alpha);
     void UnknownFunction4014f0(const Vector3* position);  // 0x004014f0
-    void UnknownFunction401520(int a, int b, int c, int d); // 0x00401520: forwards to the model
+    // 0x00401520: forwards two axes and two flags to the model (0x004fbd70).
+    void UnknownFunction401520(const Vector3* a, const Vector3* b, int c, int d);
     // 0x00401540 (ret 0x18): builds the collision object (line 154) from
     // "<name>.col" when the archive has it, under the "Collision" category.
     int UnknownFunction401540(const char* name, int value, UnknownPickCallback callback, void* context,
@@ -66,8 +75,8 @@ public:
     float field_0x3c;
     UnknownArcadeView* field_0x40;
     float field_0x44;
-    int field_0x48;
-    int field_0x4c;
+    float field_0x48;                          // screen fraction (0x00401310's c)
+    float field_0x4c;                          // screen fraction (0x00401310's d)
     float field_0x50;                          // model width
     float field_0x54;                          // model height
     TransparencyMod* field_0x58;

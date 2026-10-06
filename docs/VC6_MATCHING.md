@@ -229,6 +229,10 @@ see [D3DIMSOULTREE](D3DIMSOULTREE.md).
 FollowCam.cpp gains 13 more strict functions (slots 23, 38 and 49, two
 helpers and its eight `$E`); see [FollowCamera](FOLLOW_CAMERA.md).
 
+Krusty3DObjects.cpp (RunwayLights, VisualCue and the number/bonus object
+managers) matches strictly in 36 functions; see
+[KRUSTY3DOBJECTS](KRUSTY3DOBJECTS.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
