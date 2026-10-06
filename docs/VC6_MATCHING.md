@@ -140,6 +140,9 @@ UIDlgContainer and HiResMeter) matches strictly in 96 functions; see
 TypeRegistry.cpp (the type-name registry krusty2's CollisionObject uses)
 matches strictly in all 14 functions (`src/reconstructed/TypeRegistry.cpp`).
 
+recorder.cpp (VCRInterface, the threaded replay recorder) matches strictly
+in 20 functions; see [RECORDER](RECORDER.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
