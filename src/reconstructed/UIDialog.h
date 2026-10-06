@@ -24,6 +24,7 @@ public:
     void UnknownFunction46ea80(int id, int value); // 0x0046ea80 (OptionProcs.cpp)
     void UnknownFunction46eb30(int id, int value); // 0x0046eb30 (OptionProcs.cpp)
     void UnknownFunction46ff30(int result);   // 0x0046ff30: closes the dialog with `result`
+    void UnknownFunction46ff70(int a, int b); // 0x0046ff70 (OptionProcs.cpp)
     void UnknownFunction470000(UnknownGameUiControl* control, int a, int b); // 0x00470000
 };
 

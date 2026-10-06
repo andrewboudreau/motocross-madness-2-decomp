@@ -71,6 +71,8 @@ public:
     int UnknownFunction524100(); // 0x00524100
     void UnknownFunction5240e0(int series); // 0x005240e0 (TrackRecord.cpp 0x00520390)
     void UnknownFunction523d30(const char* topic, int a); // 0x00523d30 (OptionProcs.cpp: "MCM2HELP")
+    void UnknownFunction522440();             // 0x00522440 (OptionProcs.cpp)
+    void UnknownFunction523000();             // 0x00523000 (OptionProcs.cpp)
     void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
     void UnknownFunction522680();             // 0x00522680 (TrackGame slot 4)
@@ -330,7 +332,9 @@ public:
     int field_0x154c;                          // selected session (NetProcs.cpp)
     unsigned char field_0x1550[0x5c];          // restored from +0x15ac when a replay is left (InGameProcs.cpp)
     unsigned char field_0x15ac[0x5c];
-    unsigned char field_0x1608[0x1ed4 - 0x1608];
+    unsigned char field_0x1608[0x1668 - 0x1608];
+    int field_0x1668[5][3][11];                // custom garage curves per bike class (OptionProcs.cpp)
+    unsigned char field_0x18fc[0x1ed4 - 0x18fc];
     int field_0x1ed4[5];                       // video settings: forced video memory, then four detail levels (OptionProcs.cpp)
     unsigned char field_0x1ee8[0x1eec - 0x1ee8];
     unsigned char field_0x1eec[0xc8];          // restored from +0x1fb4 when a replay is left (InGameProcs.cpp)

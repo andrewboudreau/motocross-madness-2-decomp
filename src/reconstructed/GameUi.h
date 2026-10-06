@@ -6,6 +6,13 @@
 
 #include "GameObject.h"
 
+// A 0x38-byte list box row; +0x14 is its text (OptionProcs.cpp 0x004b4e70).
+struct UnknownGameUiListRow {
+    unsigned char field_0x00[0x14];
+    char* field_0x14;
+    unsigned char field_0x18[0x38 - 0x18];
+};
+
 // A control found by name (its +0x1f0 is a progress bar's value). Every
 // control a dialog finds is a UIControl (RTTI UIControl : GameObject,
 // vtable 0x00552ba4, 65 slots); only the slots the dialog procedures call
@@ -40,6 +47,18 @@ public:
     virtual void UnknownVirtualSlot52();
     virtual void UnknownVirtualSlot53();
     virtual void UnknownVirtualSlot54(int* value); // NetProcs.cpp: binds a value
+    virtual void UnknownVirtualSlot55();
+    virtual void UnknownVirtualSlot56();
+    virtual void UnknownVirtualSlot57();
+    virtual void UnknownVirtualSlot58();
+    virtual void UnknownVirtualSlot59();
+    virtual void UnknownVirtualSlot60();
+    virtual void UnknownVirtualSlot61();
+    virtual void UnknownVirtualSlot62();
+    virtual void UnknownVirtualSlot63();
+    virtual void UnknownVirtualSlot64();
+    virtual void UnknownVirtualSlot65();
+    virtual void UnknownVirtualSlot66(int value); // OptionProcs.cpp (a list box's DDLCurves row change)
 
     void UnknownFunction47b370(int value);    // 0x0047b370
     void UnknownFunction470b20(const char* text); // 0x00470b20 (TrackRecord.cpp)
@@ -66,6 +85,10 @@ public:
     int UnknownFunction4768d0(int value);     // 0x004768d0
     int UnknownFunction476950();              // 0x00476950: selected row, -1 when none
     void UnknownFunction476a60(int value);    // 0x00476a60
+    void UnknownFunction473820(char* buffer, int size); // 0x00473820: an edit field's text buffer (OptionProcs.cpp)
+    void UnknownFunction476ad0(const char* text); // 0x00476ad0: selects the row `text` (OptionProcs.cpp)
+    int UnknownFunction475300(int value);     // 0x00475300 (OptionProcs.cpp)
+    void UnknownFunction4754d0(int range);    // 0x004754d0 (OptionProcs.cpp)
     void UnknownFunction476b30(int row);      // 0x00476b30
     void UnknownFunction476ba0(unsigned int color, int row); // 0x00476ba0 (OptionProcs.cpp)
     void UnknownFunction476ff0(int row, const char* text); // 0x00476ff0 (OptionProcs.cpp)
@@ -76,14 +99,20 @@ public:
     void UnknownFunction478cf0(int value);    // 0x00478cf0
     int UnknownFunction4793f0();              // 0x004793f0 (OptionProcs.cpp)
 
-    unsigned char field_0x02c[0x1d8 - 0x2c];
+    unsigned char field_0x02c[0x7c - 0x2c];
+    int field_0x7c;                           // control id (UIControl slot 52 sets it; OptionProcs.cpp's SldEQ band)
+    unsigned char field_0x080[0x1d8 - 0x80];
     int field_0x1d8;
     unsigned char field_0x1dc[0x1e8 - 0x1dc];
     int field_0x1e8;
-    unsigned char field_0x1ec[0x1f0 - 0x1ec];
+    int field_0x1ec;                          // a list box's visible rows (OptionProcs.cpp)
     int field_0x1f0;
     unsigned char field_0x1f4[0x1fc - 0x1f4];
     UnknownGameUiControl* field_0x1fc;        // a drop-down list's list box (OptionProcs.cpp)
+    unsigned char field_0x200[0x214 - 0x200];
+    UnknownGameUiListRow* field_0x214;        // a list box's rows (OptionProcs.cpp)
+    unsigned char field_0x218[0x21c - 0x218];
+    int field_0x21c;                          // set on the SldEQ sliders (OptionProcs.cpp)
 };
 
 // Page object at KrustyUI+0x490.

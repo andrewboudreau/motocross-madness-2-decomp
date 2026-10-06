@@ -17,7 +17,7 @@ struct UnknownDialogEvent {
     const char* field_0x04;                   // control name
     int field_0x08;                           // kind
     UIDialog* field_0x0c;                     // the dialog the message is for
-    unsigned char field_0x10[0x14 - 0x10];
+    GUIManager* field_0x10;                   // the GUI (OptionsDlg opens its sub-dialogs on it)
     UnknownGameUiControl* field_0x14;         // the control (VCRDlg)
     int field_0x18;                           // cleared by OptControlsDlg for kinds 11 and 12
     unsigned char field_0x1c[0x20 - 0x1c];

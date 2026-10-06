@@ -184,6 +184,9 @@ strictly; see [OVERLAY](OVERLAY.md).
 InGameProcs.cpp (6) and NetProcs.cpp (10), the dialog procedures, match
 strictly; see [DIALOGPROCS](DIALOGPROCS.md).
 
+OptionProcs.cpp (the option pages) matches strictly in 34 functions; see
+[DIALOGPROCS](DIALOGPROCS.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

@@ -14,6 +14,7 @@ public:
 
     int UnknownFunction4897e0(int value); // 0x004897e0
     friend class GUIInputDevice;  // reads deviceKind (GUIManager.cpp 0x00487150)
+    friend class OptControlsDlg;  // reads deviceKind (OptionProcs.cpp 0x004b2e00)
 
 protected:
     int axisCount;                  // +0x04

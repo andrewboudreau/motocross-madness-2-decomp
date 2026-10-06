@@ -1,4 +1,4 @@
-# InGameProcs.cpp and NetProcs.cpp
+# InGameProcs.cpp, NetProcs.cpp and OptionProcs.cpp
 
 These files hold dialog procedures. Each one is a slot-29 override of a
 UIDialog subclass named by RTTI, plus a few helpers. The sources are
@@ -41,3 +41,36 @@ Header changes, all layout-preserving:
 - UIDialog.h, TrackGame.h and RaceView.h gained the members these
   procedures use.
 - FollowCamera.h befriends VCRDlg, as Camera.h does for its readers.
+
+**OptionProcs.cpp** (`0x004b1ec0..0x004b5a5d`). Evidence:
+- **`__FILE__`:** the literal at `0x0056f57c`, with line pushes 979..1123.
+- **RTTI:** the vtables of OptGameSettingsDlg, OptGraphicsDlg,
+  OptAdvancedGraphicsDlg, OptSoundDlg, OptControlsDlg, OptGarageDlg,
+  OptMessagesDlg, OptionsDlg, GlobalSettingsDlg and ConfirmRestoreDlg,
+  whose procedures fill the range.
+- **Start (strong inference):** a set of kVec3 `$E` at
+  `0x004b1ec0..0x004b1ffb` writes bss in this file's run
+  (`0x00688778..0x00689110`). ObjectPlacement.cpp's own set ends at
+  `0x004b1ebb`.
+
+The option pages edit copies of TrackGame's settings blocks. `0x004b4280`
+copies +0xc24, +0xf98, +0xfc4, +0xfe0, +0x1550 and +0x19d4 into the file's
+globals with `rep movsd`. OptionProcs.h models these as
+`UnknownOpt*Settings`.
+
+Exact: 34 calibration cases. These are the eight `$E`, ten slot-29
+procedures, five slot-31 handlers, OptControlsDlg's slot 23 and ten
+helpers. Source forms needed:
+- Name compares use `_stricmp` and `_strnicmp`.
+- An inline drop-down accessor reads control +0x1fc, and an inline lookup
+  walks the bike-class table at `0x0056cb6c`.
+- `0x004b3aa0` nests `__min(__min(...))`.
+
+Near misses (`samples/ui/OptionProcsNearMisses.cpp`): OptControlsDlg slot
+22 `0x004b5600` and `0x004b5760`. Both have the same instructions with
+swapped registers.
+
+Header additions:
+- GameUi.h: control slots 55-66, list rows and fields.
+- UIDialog.h, TrackGame.h, KrustyUI.h and JoystickDevice.h: new members.
+- InputDevice.h befriends OptControlsDlg.

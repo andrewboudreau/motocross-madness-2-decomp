@@ -129,7 +129,14 @@ public:
     int field_0x5c;
     UnknownKrustyUIEntry* field_0x60;         // also freed by 0x0049bb80
     int field_0x64;                           // entry count
-    unsigned char field_0x68[0x464 - 0x68];
+    // Garage tables per bike class (OptionProcs.cpp's OptGarageDlg).
+    int field_0x68[5][3][11];                 // standard curves
+    unsigned char field_0x2fc[0x324 - 0x2fc];
+    int field_0x324[5][11];                   // band maxima
+    int field_0x400[5];                       // total of the bands
+    unsigned char field_0x414[0x43c - 0x414];
+    int field_0x43c[5];                       // slider minimum
+    int field_0x450[5];                       // slider maximum
     GameObject* field_0x464;                  // released by 0x004999b0
     Camera* field_0x468;                      // made current while +0x464 is shown
     unsigned char field_0x46c[0x48c - 0x46c];
