@@ -1,4 +1,6 @@
-// Candidate: relocation evidence is incomplete; see docs/PHYSICS_VALIDATION.md.
+// Candidate kept in samples/: with D3DIMSoultreeMotnctrl.bindings.json, 23 of its 26 targets
+// (targets.json) pass `tools/run_physics_samples.py --strict`; slots 2, 4 and 11 remain partial.
+// See docs/PHYSICS_VALIDATION.md.
 // D3DIMSoultreeMotnctrl.cpp -- D3DIMSoultreeCharacter methods (motion-control loading and playback).
 //
 // The retail __FILE__ string 'D:\aardvark\VC\krusty2\D3DIMSoultreeMotnctrl.cpp' is at 0x00568b70; it is

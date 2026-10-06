@@ -257,8 +257,9 @@
     "candidate_symbol_contains": "?FillNodeNames@@YAHHPAUNodeNameEntry@@PAVSoultreeObject@@@Z",
     "target_va": "0x00445460",
     "target_size": 327,
-    "expect": "masked",
-    "notes": "recursive node-name table fill; first row peeled"
+    "expect": "exact",
+    "notes": "recursive node-name table fill; first row peeled",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -266,8 +267,9 @@
     "candidate_symbol_contains": "CharacterVirtualSlot8@D3DIMSoultreeCharacter",
     "target_va": "0x00445e70",
     "target_size": 78,
-    "expect": "masked",
-    "notes": "name copy then Character slot 8"
+    "expect": "exact",
+    "notes": "name copy then Character slot 8",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -275,8 +277,9 @@
     "candidate_symbol_contains": "CharacterVirtualSlot6@D3DIMSoultreeCharacter",
     "target_va": "0x00446480",
     "target_size": 153,
-    "expect": "masked",
-    "notes": "Character virtual slot 6 override"
+    "expect": "exact",
+    "notes": "Character virtual slot 6 override",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -284,8 +287,9 @@
     "candidate_symbol_contains": "CharacterVirtualSlot3@D3DIMSoultreeCharacter",
     "target_va": "0x00446110",
     "target_size": 249,
-    "expect": "masked",
-    "notes": "Character virtual slot 3 override"
+    "expect": "exact",
+    "notes": "Character virtual slot 3 override",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -293,8 +297,9 @@
     "candidate_symbol_contains": "CharacterVirtualSlot5@D3DIMSoultreeCharacter",
     "target_va": "0x00446300",
     "target_size": 376,
-    "expect": "masked",
-    "notes": "mirror map, negated x"
+    "expect": "exact",
+    "notes": "mirror map, negated x",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -302,8 +307,9 @@
     "candidate_symbol_contains": "CharacterVirtualSlot10@D3DIMSoultreeCharacter",
     "target_va": "0x00446520",
     "target_size": 246,
-    "expect": "masked",
-    "notes": "sprintf Position/Orientation Data into dead local buffer"
+    "expect": "exact",
+    "notes": "sprintf Position/Orientation Data into dead local buffer",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -312,7 +318,8 @@
     "target_va": "0x00446210",
     "target_size": 235,
     "expect": "partial",
-    "notes": "98.63%: retail puts the 0x3c flag in ecx where ours uses eax (one register difference); separate nodeNames[idx] reads"
+    "notes": "98.63%: retail puts the 0x3c flag in ecx where ours uses eax (one register difference); separate nodeNames[idx] reads",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -321,7 +328,8 @@
     "target_va": "0x00445fc0",
     "target_size": 331,
     "expect": "partial",
-    "notes": "99.68%: single SIB base/index order byte differs ([ecx+eax+0x74] vs [eax+ecx+0x74])"
+    "notes": "99.68%: single SIB base/index order byte differs ([ecx+eax+0x74] vs [eax+ecx+0x74])",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -329,8 +337,9 @@
     "candidate_symbol_contains": "??1D3DIMSoultreeCharacter@@UAE@XZ",
     "target_va": "0x004459a0",
     "target_size": 200,
-    "expect": "masked",
-    "notes": "destructor core; this = GameObject vbase"
+    "expect": "exact",
+    "notes": "destructor core; this = GameObject vbase",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -338,8 +347,9 @@
     "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@UAEXXZ",
     "target_va": "0x00446640",
     "target_size": 40,
-    "expect": "masked",
-    "notes": "GameObject slot 4 override, clears 4 dwords"
+    "expect": "exact",
+    "notes": "GameObject slot 4 override, clears 4 dwords",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -347,8 +357,9 @@
     "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@UAEXXZ",
     "target_va": "0x00446620",
     "target_size": 21,
-    "expect": "masked",
-    "notes": "GameObject slot 5 override, forwards"
+    "expect": "exact",
+    "notes": "GameObject slot 5 override, forwards",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -356,8 +367,9 @@
     "candidate_symbol_contains": "?GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
     "target_va": "0x004466c0",
     "target_size": 8,
-    "expect": "masked",
-    "notes": "vtordisp thunk"
+    "expect": "exact",
+    "notes": "vtordisp thunk",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -365,8 +377,9 @@
     "candidate_symbol_contains": "?GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEXXZ",
     "target_va": "0x004466d0",
     "target_size": 8,
-    "expect": "masked",
-    "notes": "vtordisp thunk"
+    "expect": "exact",
+    "notes": "vtordisp thunk",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -374,8 +387,9 @@
     "candidate_symbol_contains": "??_ED3DIMSoultreeCharacter@@$4PPPPPPPM@A@AEPAXI@Z",
     "target_va": "0x00446670",
     "target_size": 8,
-    "expect": "masked",
-    "notes": "vtordisp thunk of scalar deleting dtor"
+    "expect": "exact",
+    "notes": "vtordisp thunk of scalar deleting dtor",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -383,8 +397,9 @@
     "candidate_symbol_contains": "??0D3DIMSoultreeCharacter@@QAE@H@Z",
     "target_va": "0x004455b0",
     "target_size": 195,
-    "expect": "masked",
-    "notes": "constructor(int)"
+    "expect": "exact",
+    "notes": "constructor(int)",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -392,8 +407,9 @@
     "candidate_symbol_contains": "CharacterVirtualSlot9@D3DIMSoultreeCharacter",
     "target_va": "0x00445ec0",
     "target_size": 248,
-    "expect": "masked",
-    "notes": "D3DIM slot 9"
+    "expect": "exact",
+    "notes": "D3DIM slot 9",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -401,8 +417,9 @@
     "candidate_symbol_contains": "CharacterVirtualSlot0@D3DIMSoultreeCharacter",
     "target_va": "0x00445a70",
     "target_size": 1021,
-    "expect": "masked",
-    "notes": "Character slot 0"
+    "expect": "exact",
+    "notes": "Character slot 0",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "D3DIMSoultreeCharacter",
@@ -411,7 +428,8 @@
     "target_va": "0x00445680",
     "target_size": 788,
     "expect": "partial",
-    "notes": "39.6%, 789 bytes vs 788: retail keeps registry entry in esi, reloads a2 from stack, frame 0x308; ours caches a2 in esi, spills entry, frame 0x30c"
+    "notes": "39.6%, 789 bytes vs 788: retail keeps registry entry in esi, reloads a2 from stack, frame 0x308; ours caches a2 in esi, spills entry, frame 0x30c",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {
     "class": "MotionManager",
@@ -745,5 +763,85 @@
     "target_size": 1205,
     "expect": "partial",
     "notes": "cdecl; slot 7 / 0x4a9050 helper. ~19%. Same calls in the same order except that VC6 inlines the first CrossProduct (retail calls 0x00515600 twice), which shifts every later byte (inline budget)"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004466e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser jmp thunk (per-TU Math3D.h copy)",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004466f0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser body: temporary copied to 0x0057ef68",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00446730",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser jmp thunk (per-TU Math3D.h copy)",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x00446740",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser body: temporary copied to 0x0057ef78",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x00446780",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser jmp thunk (per-TU Math3D.h copy)",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x00446790",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser body: temporary copied to 0x0057ef88",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004467d0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser jmp thunk (per-TU Math3D.h copy)",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeCharacter",
+    "source": "D3DIMSoultreeMotnctrl.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004467e0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser body: temporary copied to 0x0057ef58",
+    "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   }
 ]

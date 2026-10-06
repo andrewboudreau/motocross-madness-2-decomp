@@ -158,5 +158,15 @@
     "expect": "exact",
     "notes": "Generated destructor core selected by the RTTI-backed deleting wrapper at 0x00446890; identical base teardown is shared with TerrainShadow.",
     "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot14@D3DIMSoultreeShadow",
+    "target_va": "0x447540",
+    "target_size": 574,
+    "expect": "exact",
+    "notes": "slot 14: identity world matrix, texture bind, saved address mode / render state 4, indexed draw of field_0x44 vertices (0x581eb8) and indices (0x5995b8)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
   }
 ]

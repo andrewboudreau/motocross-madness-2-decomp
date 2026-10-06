@@ -10,6 +10,7 @@
   "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x4692f0",
   "?g_d3dimShadowIndexTable@@3PAFA": "0x5995b8",
   "?g_d3dimShadowTexel@@3MA": "0x57efa4",
+  "?g_d3dimShadowVertices@@3PAUD3DIMShadowVertex@@A": "0x581eb8",
   "_$E1": "0x4477e0",
   "_$E10": "0x4478d0",
   "_$E4": "0x447830",

@@ -92,6 +92,33 @@ This run reports `169/226 strict exact` and exits nonzero. `--strict` counts the
 `masked` targets as required failures because they lack bindings. Those failures mark
 incomplete evidence, not byte mismatches.
 
+## Wave-7 D3DIMSoultree slice
+
+Two more sources pass strict comparison:
+
+- `src/krusty2/shadow/D3DIMSoultreeShadow.cpp` now passes 17 cases. Slot 14,
+  `0x447540`, was added.
+- `samples/physics/motion/D3DIMSoultreeMotnctrl.cpp` passes 23 of 26
+  targets. These are the D3DIMSoultreeCharacter methods and the four vector
+  `$E` pairs, with `D3DIMSoultreeMotnctrl.bindings.json`.
+  - Slot 2 `0x445fc0` is one byte off.
+  - Slot 4 `0x446210` (98.6%) differs in register choice.
+  - Slot 11 `0x445680` is at 39.6%.
+
+Motnctrl stays in `samples/` because those three targets are still partial.
+Of its bindings, the seven that `tools/propose_bindings.py` could not prove
+were checked by hand. One of them is `_strupr` at `0x535d3d`; that CRT
+identity is provisional.
+
+```bash
+python tools/run_physics_samples.py --strict \
+  --source src/krusty2/shadow/D3DIMSoultreeShadow.cpp \
+  --source samples/physics/motion/D3DIMSoultreeMotnctrl.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+This run reports `40/43 strict exact` with no required failures.
+
 ## Code-generation limits behind the remaining partials
 
 These were measured with VC6 SP3 `/O2` on the real targets and on small synthetic

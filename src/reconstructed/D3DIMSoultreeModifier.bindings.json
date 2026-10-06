@@ -1,0 +1,20 @@
+{
+  "??0D3DIMSoultreeModifier@@QAE@H@Z": "0x00445240",
+  "??0GraphicsTest@@QAE@H@Z": "0x0047bc70",
+  "??1D3DIMSoultreeModifier@@UAE@XZ": "0x00445290",
+  "??1D3DIMSoultreeModifier@@UAE@XZ$ehhandler": "0x0054a168",
+  "??1GraphicsTest@@UAE@XZ": "0x0047bd00",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "??_7D3DIMSoultreeModifier@@6B@": "0x0055144c",
+  "??_GD3DIMSoultreeModifier@@UAEPAXI@Z": "0x00445270",
+  "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
+  "?UnknownFunction444de0@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444de0",
+  "?UnknownFunction444f10@D3DIMSoultreeObject@@QAEXPAVGameObject@@@Z": "0x00444f10",
+  "?UnknownFunction4452f0@D3DIMSoultreeModifier@@QAEXPAVD3DIMSoultreeObject@@@Z": "0x004452f0",
+  "?UnknownFunction445360@D3DIMSoultreeModifier@@QAEXPAVD3DIMSoultreeObject@@@Z": "0x00445360",
+  "?UnknownFunction4453e0@D3DIMSoultreeModifier@@QAEXXZ": "0x004453e0",
+  "?UnknownVirtualSlot8@D3DIMSoultreeModifier@@UAEPAVGameObject@@PAX@Z": "0x004452e0",
+  "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
+  "__FILE__:d3dimsoultreemodifier.cpp": "0x00568b24"
+}

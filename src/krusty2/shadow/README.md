@@ -1,5 +1,5 @@
 ProjectedShadow and TerrainShadow candidates are preserved in `samples/physics/shadow/`.
-D3DIMSoultreeShadow.cpp has 16 strictly verified cases with adjacent bindings.
+D3DIMSoultreeShadow.cpp has 17 strictly verified cases with adjacent bindings.
 Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
 
 # ProjectedShadow.cpp (shadow)
@@ -21,7 +21,9 @@ Counts: 26 exact, 7 partial of 33 targets (D3DIMSoultreeShadow.cpp added).
 D3DIMSoultreeShadow.cpp (D3DIMSoultreeShadow : ShadowReceiver : GameObject, vtable 0x55156c; ShadowReceiver 0x5515ec):
 ctor 0x446840, Attach 0x4468b0, slot 28 0x446bf0, both deleting dtors (0x446890 is shared with TerrainShadow by
 identical code folding, 0x4477a0), ShadowReceiver slot 8 / dtor, and the four ShadowConstVec3 `$E` pairs are exact.
-Open: slots 14, 27, 29, 30 and the 0x447910 setter. Ownership: slot 30 (0x446f40) pushes the file's own
+Slot 14 (0x447540, 574 bytes) is exact too; it fills the file's vertex array g_d3dimShadowVertices
+(0x581eb8, 3000 32-byte vertices). Open: slots 27, 29 and 30 (inlined 4x4 matrix products, x87 operand
+order). The 0x447910 setter is placed with DebugOverlay.cpp (docs/DEBUGOVERLAY.md). Ownership: slot 30 (0x446f40) pushes the file's own
 `__FILE__` 0x568cac at 0x447023/0x447043, and the other methods are contiguous members of the same class.
 
 Partial: ctor 84% (prevMinX/Y store scheduling), Init 19.6%, SetLight 6%, ComputeBounds 5.5%

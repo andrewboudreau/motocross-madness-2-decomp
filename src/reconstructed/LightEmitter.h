@@ -40,6 +40,11 @@ public:
     void UnknownFunction4fbd70(int a, int b, int c, int d);
     void UnknownFunction4fceb0(Vector3 axis, float angle);
     void UnknownFunction444d80(GameObject* modifier);
+    // Seen from D3DIMSoultreeModifier.cpp: 0x00444de0 and 0x00444f10 (both
+    // D3DIMSoulTree.CPP, ret 4) remove a modifier from the first (+0x264)
+    // or second (+0x26c) modifier list.
+    void UnknownFunction444de0(GameObject* modifier);
+    void UnknownFunction444f10(GameObject* modifier);
 
     unsigned char field_0x004[0x2d8 - 4];          // operator new size 0x2d8
 };
