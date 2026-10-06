@@ -77,7 +77,7 @@ void EventManager::UnknownFunction45d270() {
     UnknownKrustyBikeView* view = UnknownFunction45d2f0();
     if (view)
         view->UnknownVirtualSlot5();
-    UnknownMessageTarget* target = UnknownFunction45d340();
+    TextQueueOverlay* target = UnknownFunction45d340();
     if (target)
         target->UnknownVirtualSlot5();
 }
@@ -111,7 +111,7 @@ UnknownKrustyBikeView* EventManager::UnknownFunction45d2f0() {
 }
 
 // 0x0045d340
-UnknownMessageTarget* EventManager::UnknownFunction45d340() {
+TextQueueOverlay* EventManager::UnknownFunction45d340() {
     if (g_UnknownGlobal56e26c->field_0x558)
         return g_UnknownGlobal56e26c->field_0x558->field_0x6c;
     if (g_UnknownGlobal56e26c->field_0x55c)
@@ -382,7 +382,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int player, int d, 
             UnknownFunction45f9a0();
             UnknownFunction45e600();
         } else if (type == 0xcc) {
-            UnknownMessageTarget* target = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
+            TextQueueOverlay* target = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
             if (target) {
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x13d7, text, sizeof(text));
                 if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac720(message->field_0x04, name)) {
@@ -408,7 +408,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int player, int d, 
         } else if (type == 0x8e) {
             if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x08->field_0x0c) {
                 if (UnknownFunction45d2b0()) {
-                    UnknownMessageTarget* target = UnknownFunction45d340();
+                    TextQueueOverlay* target = UnknownFunction45d340();
                     if (target) {
                         g_UnknownGlobal56e26c->UnknownFunction521970(0x13d1, line, 128); // capped like `text`
                         UnknownMessage notice(line, 3.25f);

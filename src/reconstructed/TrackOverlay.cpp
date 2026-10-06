@@ -2,11 +2,33 @@
 #include <string.h>
 
 #include "TrackOverlay.h"
+#include "DebugAlloc.h"
 #include "BikeCamera.h"
 #include "Camera.h"
+#include "KrustyUI.h"
+#include "PCRenderTarget.h"
 #include "TrackGame.h"
 
+// GDI32 and USER32 imports (0x00550054..0x00550088, 0x005502e8).
+extern "C" __declspec(dllimport) void* __stdcall CreateFontA(int height, int width, int escapement,
+                                                             int orientation, int weight,
+                                                             unsigned long italic,
+                                                             unsigned long underline,
+                                                             unsigned long strikeOut,
+                                                             unsigned long charSet,
+                                                             unsigned long outPrecision,
+                                                             unsigned long clipPrecision,
+                                                             unsigned long quality,
+                                                             unsigned long pitchAndFamily,
+                                                             const char* face);
 extern "C" __declspec(dllimport) int __stdcall DeleteObject(void* object);
+extern "C" __declspec(dllimport) void* __stdcall SelectObject(void* dc, void* object);
+extern "C" __declspec(dllimport) unsigned long __stdcall SetBkColor(void* dc, unsigned long color);
+extern "C" __declspec(dllimport) int __stdcall SetBkMode(void* dc, int mode);
+extern "C" __declspec(dllimport) unsigned long __stdcall SetTextColor(void* dc, unsigned long color);
+extern "C" __declspec(dllimport) int __stdcall TextOutA(void* dc, int x, int y, const char* text, int length);
+extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* text, int length,
+                                                         UnknownOverlayRect* rect, unsigned int format);
 
 // 0x00575140, 0x0068a448: the previous state flag and the decaying value.
 static int s_UnknownGlobal575140 = 1;
@@ -377,4 +399,192 @@ int UnknownFunction5199f0(const void* a, const void* b)
     if (*left == *right)
         return 0;
     return 1;
+}
+
+// 0x0051ae80
+DropTextOverlay::DropTextOverlay(int flags) : GameObject(flags)
+{
+    field_0x2c = 0;
+    field_0x34 = 0;
+    field_0x38 = 0;
+    field_0x3c = 0;
+    field_0x40 = 0;
+    field_0x44 = 0;
+    field_0x30 = 1.0f;
+}
+
+// 0x0051aee0
+DropTextOverlay::~DropTextOverlay()
+{
+    if (field_0x2c)
+        DeleteObject(field_0x2c);
+}
+
+// 0x0051b0f0: draws the text twice through the surface's device context,
+// black one pixel down and right, then green on top.
+int DropTextOverlay::UnknownVirtualSlot15()
+{
+    if (field_0x34) {
+        GameObject::UnknownVirtualSlot15();
+        void* dc;
+        if (((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod17(&dc) == 0) {
+            SetBkColor(dc, 1);
+            SetBkMode(dc, 1);
+            void* font = SelectObject(dc, field_0x2c);
+            SetTextColor(dc, 0);
+            TextOutA(dc, field_0x3c + 1, field_0x44 + 1, field_0x48, strlen(field_0x48));
+            SetTextColor(dc, 0xff00);
+            TextOutA(dc, field_0x3c, field_0x44, field_0x48, strlen(field_0x48));
+            SelectObject(dc, font);
+            if (((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod26(dc) != 0)
+                return 0;
+        } else {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+// 0x0051b1f0
+void DropTextOverlay::UnknownFunction51b1f0()
+{
+    field_0x30 = 0.0f;
+    field_0x34 = 1;
+}
+
+// 0x0051b200
+UnknownMessage::UnknownMessage(const char* text, float duration)
+{
+    strcpy(field_0x00, text);
+    field_0x84 = 0.0f;
+    field_0x88 = 0;
+    field_0x80 = duration;
+}
+
+// 0x0051b250
+UnknownMessage::UnknownMessage(const UnknownMessage& other)
+{
+    strcpy(field_0x00, other.field_0x00);
+    field_0x80 = other.field_0x80;
+    field_0x84 = 0.0f;
+    field_0x88 = 0;
+}
+
+// 0x0051b2a0
+TextQueueOverlay::TextQueueOverlay(int flags) : GameObject(flags)
+{
+    field_0x2c = 0;
+    field_0x30.left = 0;
+    field_0x30.top = 0;
+    field_0x30.right = 0;
+    field_0x30.bottom = 0;
+    field_0x50 = 0;
+    field_0x54 = 0xff00;
+}
+
+// 0x0051b300
+TextQueueOverlay::~TextQueueOverlay()
+{
+    if (field_0x2c)
+        DeleteObject(field_0x2c);
+}
+
+// 0x0051b320
+TextQueueOverlay* TextQueueOverlay::UnknownFunction51b320(void* target, UnknownOverlayRect rect)
+{
+    GameObject::UnknownVirtualSlot8(target);
+    UnknownKrustyUIGui* gui = g_UnknownGlobal56e26c->ui->field_0x2c;
+    const char* face = gui ? gui->field_0x350 : "";
+    int weight = 700;
+    int italic = 1;
+    if (*face == '\0') {
+        face = "Arial";
+    } else {
+        weight = gui->field_0x3d4 ? 700 : 500;
+        italic = gui->field_0x3d8;
+    }
+    field_0x2c = CreateFontA(17, 0, 0, 0, weight, italic, 0, 0, 1, 0, 0, 2, 2, face);
+    field_0x40 = rect;
+    field_0x30.left = field_0x40.left - 1;
+    field_0x30.right = field_0x40.right - 1;
+    field_0x30.top = field_0x40.top - 1;
+    field_0x30.bottom = field_0x40.bottom - 1;
+    return this;
+}
+
+// 0x0051b3f0: ages the head line and drops it once its time is up.
+int TextQueueOverlay::UnknownVirtualSlot10(float frameTime)
+{
+    GameObject::UnknownVirtualSlot10(g_UnknownGlobal56e26c->field_0x2f0);
+    if (field_0x50) {
+        if (field_0x50->field_0x84 > field_0x50->field_0x80)
+            UnknownFunction51b670();
+        if (field_0x50)
+            field_0x50->field_0x84 += g_UnknownGlobal56e26c->field_0x2f0;
+    }
+    return 1;
+}
+
+// 0x0051b450: draws the head line, black in the shadow rectangle, then in
+// the text colour one pixel up and left.
+int TextQueueOverlay::UnknownVirtualSlot15()
+{
+    GameObject::UnknownVirtualSlot15();
+    if (field_0x50) {
+        void* dc;
+        if (((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod17(&dc) == 0) {
+            SetBkColor(dc, 1);
+            SetBkMode(dc, 1);
+            void* font = SelectObject(dc, field_0x2c);
+            SetTextColor(dc, 0);
+            DrawTextA(dc, field_0x50->field_0x00, strlen(field_0x50->field_0x00), &field_0x40, 0x124);
+            SetTextColor(dc, field_0x54);
+            DrawTextA(dc, field_0x50->field_0x00, strlen(field_0x50->field_0x00), &field_0x30, 0x124);
+            SelectObject(dc, font);
+            if (((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod26(dc) != 0)
+                return 0;
+        } else {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+// 0x0051b540: replaces the head line with a copy of `message`.
+void TextQueueOverlay::UnknownFunction51b540(UnknownMessage* message)
+{
+    if (!field_0x50) {
+        field_0x50 = new(__FILE__, 1451) UnknownMessage(*message);
+        return;
+    }
+    UnknownMessage* copy = new(__FILE__, 1453) UnknownMessage(*message);
+    copy->field_0x88 = field_0x50->field_0x88;
+    delete field_0x50;
+    field_0x50 = copy;
+}
+
+// 0x0051b5e0: appends a copy of `message`.
+void TextQueueOverlay::UnknownFunction51b5e0(UnknownMessage* message)
+{
+    if (!field_0x50) {
+        field_0x50 = new(__FILE__, 1469) UnknownMessage(*message);
+        return;
+    }
+    UnknownMessage* last;
+    UnknownMessage* entry = field_0x50;
+    while (entry) {
+        last = entry;
+        entry = entry->field_0x88;
+    }
+    last->field_0x88 = new(__FILE__, 1476) UnknownMessage(*message);
+}
+
+// 0x0051b670
+void TextQueueOverlay::UnknownFunction51b670()
+{
+    UnknownMessage* head = field_0x50;
+    if (head) {
+        field_0x50 = head->field_0x88;
+        delete head;
+    }
 }

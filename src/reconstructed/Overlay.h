@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameObject.h"
+#include "OverlayRect.h"
 #include "RenderTarget.h"
 #include "TextureMap.h"
 
@@ -9,24 +10,6 @@
 // it is not reconstructed. Only what TrackOverlay.cpp's derived classes use
 // is declared; names are provisional. Overlay introduces no slots: it
 // overrides the destructor, slot 10 (0x00499ae0) and slot 14 (0x004b61a0).
-
-// A screen rectangle as Overlay keeps it (+0xe8, +0xf8).
-struct UnknownOverlayRect {
-    int left;
-    int top;
-    int right;
-    int bottom;
-};
-
-inline UnknownOverlayRect UnknownMakeOverlayRect(int left, int top, int right, int bottom)
-{
-    UnknownOverlayRect rect;
-    rect.left = left;
-    rect.top = top;
-    rect.right = right;
-    rect.bottom = bottom;
-    return rect;
-}
 
 // A pre-transformed, lit vertex (D3DTLVERTEX, 0x20 bytes) as passed to
 // RenderTarget slot 16 with vertex format 0x1c4.

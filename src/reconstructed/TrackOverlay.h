@@ -162,3 +162,24 @@ public:
 // 0x005199f0 (cdecl): qsort comparator for UnknownEventScore records
 // (EventManager.h), larger value first.
 int UnknownFunction5199f0(const void* a, const void* b);
+
+// RTTI: DropTextOverlay : GameObject (vtable 0x005586f0), 0xc8 bytes: one
+// line of text drawn with GDI and a one-pixel black drop shadow.
+class DropTextOverlay : public GameObject {
+public:
+    explicit DropTextOverlay(int flags);      // 0x0051ae80
+    virtual ~DropTextOverlay();               // 0x0051aee0 (deleting wrapper 0x0051aec0)
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x0051b070 (not reconstructed)
+    virtual int UnknownVirtualSlot15();       // 0x0051b0f0
+
+    void UnknownFunction51b1f0();             // 0x0051b1f0: shows the text again
+
+    void* field_0x2c;                         // font (DeleteObject)
+    float field_0x30;                         // 1.0
+    int field_0x34;                           // shown
+    int field_0x38;
+    int field_0x3c;                           // text x
+    int field_0x40;
+    int field_0x44;                           // text y
+    char field_0x48[0x80];                    // text
+};

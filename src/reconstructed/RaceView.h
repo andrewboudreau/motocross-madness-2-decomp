@@ -2,21 +2,46 @@
 
 #include "GameObject.h"
 #include "MatrixUtil.h"
+#include "OverlayRect.h"
 #include "VCRfile.h"
 
-// Stack object built by KrustyBikeCamera slot 58 (constructor 0x0051b200,
-// no destructor call) and handed to UnknownMessageTarget::0x0051b540.
+// A queued text line (0x8c bytes, TrackOverlay.cpp). Callers build one on
+// the stack (constructor 0x0051b200, no destructor) and hand it to
+// TextQueueOverlay, which keeps heap copies (copy constructor 0x0051b250).
 class UnknownMessage {
 public:
-    UnknownMessage(const char* text, float duration);
+    UnknownMessage(const char* text, float duration); // 0x0051b200
+    UnknownMessage(const UnknownMessage& other);       // 0x0051b250
 
-    unsigned char field_0x00[0x8c];
+    char field_0x00[0x80];                    // text
+    float field_0x80;                         // seconds to show it
+    float field_0x84;                         // seconds shown so far
+    UnknownMessage* field_0x88;               // next queued line
 };
 
-// Also a GameObject: EventManager 0x0045d270 calls its slot 5.
-class UnknownMessageTarget : public GameObject {
+// RTTI: TextQueueOverlay : GameObject (vtable 0x00558760), 0x58 bytes
+// (TrackOverlay.cpp): draws the head of a queue of UnknownMessage lines with
+// GDI, then drops it after its duration. EventManager 0x0045d270 calls its
+// slot 5. Member names are provisional.
+class TextQueueOverlay : public GameObject {
 public:
-    void UnknownFunction51b540(UnknownMessage* message); // 0x0051b540
+    explicit TextQueueOverlay(int flags);     // 0x0051b2a0
+    virtual ~TextQueueOverlay();              // 0x0051b300 (deleting wrapper 0x0051b2e0)
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x0051b3f0
+    virtual int UnknownVirtualSlot15();       // 0x0051b450
+
+    // 0x0051b320: binds the render target and the text rectangle and creates
+    // the font from the GUI's face name (Arial when it has none).
+    TextQueueOverlay* UnknownFunction51b320(void* target, UnknownOverlayRect rect);
+    void UnknownFunction51b540(UnknownMessage* message); // 0x0051b540: replaces the head
+    void UnknownFunction51b5e0(UnknownMessage* message); // 0x0051b5e0: appends
+    void UnknownFunction51b670();             // 0x0051b670: drops the head
+
+    void* field_0x2c;                         // font (DeleteObject)
+    UnknownOverlayRect field_0x30;            // text rectangle (+0x40 less one)
+    UnknownOverlayRect field_0x40;            // shadow rectangle
+    UnknownMessage* field_0x50;               // queue head
+    unsigned int field_0x54;                  // text colour, 0xff00
 };
 
 struct UnknownEventRacer;

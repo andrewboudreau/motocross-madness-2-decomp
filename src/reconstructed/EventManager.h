@@ -4,7 +4,7 @@
 #include "MatrixUtil.h"
 #include "RaceView.h"
 
-class UnknownMessageTarget;
+class TextQueueOverlay;
 struct TrackGameViewOwner;
 struct UnknownKrustyBikeView;
 
@@ -106,7 +106,7 @@ public:
     // +0x34 view and its +0x6c target.
     TrackGameViewOwner* UnknownFunction45d2b0();   // 0x0045d2b0
     UnknownKrustyBikeView* UnknownFunction45d2f0(); // 0x0045d2f0
-    UnknownMessageTarget* UnknownFunction45d340(); // 0x0045d340
+    TextQueueOverlay* UnknownFunction45d340(); // 0x0045d340
     void UnknownFunction45d270();                  // 0x0045d270: slot 5 on all three
     int UnknownFunction45d390();                   // 0x0045d390: whether any mode is present
     void UnknownFunction45e520();                  // 0x0045e520: resets the entries

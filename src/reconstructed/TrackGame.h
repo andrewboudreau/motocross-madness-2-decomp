@@ -30,7 +30,7 @@ struct TrackGameViewOwner : public GameObject {
     GameObject* field_0x60;
     GameObject* field_0x64;
     GameObject* field_0x68;
-    UnknownMessageTarget* field_0x6c;
+    TextQueueOverlay* field_0x6c;
     float field_0x70;                         // compared with TrackGame+0x2eb0 (EventManager 0x0045eef0)
     unsigned char field_0x74[0xa8 - 0x74];
     UnknownEventRacer* field_0xa8;
