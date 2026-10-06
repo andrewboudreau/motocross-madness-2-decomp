@@ -156,7 +156,7 @@ AgeManager.cpp, ArcadeObject.cpp and Arrow.cpp, the first three units of
 the image, match strictly in all 24 functions; see
 [ARCADEOBJECT](ARCADEOBJECT.md).
 
-cursor.cpp (GameCursor) matches strictly in 15 functions; see
+cursor.cpp (GameCursor) matches strictly in 7 functions; see
 [GAMECURSOR](GAMECURSOR.md).
 
 NetThread.cpp (the DirectPlay receive thread) matches strictly in 3
@@ -165,6 +165,9 @@ functions; see [NETTHREAD](NETTHREAD.md).
 AuralScape.cpp (SoundGroup, SoundInterface, the sound emitters and the
 listener scheduler) matches strictly in 71 functions; see
 [AURALSCAPE](AURALSCAPE.md).
+
+cube.cpp (16) and cubedraw.cpp (22, DrawableCube) match strictly; see
+[CUBE](CUBE.md).
 
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation

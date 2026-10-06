@@ -46,20 +46,8 @@
   "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
   "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
-  "_$E1": "0x0043e880",
-  "_$E10": "0x0043e970",
-  "_$E11": "0x0043e960",
-  "_$E2": "0x0043e870",
-  "_$E4": "0x0043e8d0",
-  "_$E5": "0x0043e8c0",
-  "_$E7": "0x0043e920",
-  "_$E8": "0x0043e910",
   "__FILE__:gamecursor.cpp": "0x0056890c",
   "__except_list": "0x00000000",
   "__ftol": "0x00534a88",
-  "__imp__GetCursorPos@4": "0x00550338",
-  "_kVec3XAxis": "0x00579a60",
-  "_kVec3YAxis": "0x0057a200",
-  "_kVec3ZAxis": "0x005798a8",
-  "_kVec3Zero": "0x00579920"
+  "__imp__GetCursorPos@4": "0x00550338"
 }

@@ -15,13 +15,6 @@
 #include "Tgafile.h"
 #include "UnknownResourceManager.h"
 
-// The four vector constants that open many retail files: 0x00579920,
-// 0x00579a60, 0x0057a200 and 0x005798a8, built by 0x0043e870..0x0043e9ab.
-static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
-static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
-static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
-static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
-
 // 0x0043ea00
 GameCursor::GameCursor(int flags) : GameObject(flags) {
     field_0x3c = 0;
