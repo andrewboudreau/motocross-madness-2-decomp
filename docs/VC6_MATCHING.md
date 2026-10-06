@@ -196,6 +196,10 @@ in 43 functions; see [SELECTGAMEPICPROCS](SELECTGAMEPICPROCS.md).
 ProCircuit.cpp (17) and ProCircuitProcs.cpp (31), the pro circuit career
 and its dialogs, match strictly; see [PROCIRCUIT](PROCIRCUIT.md).
 
+The unnamed gearbox unit before ProCircuit.cpp (GearRatios.cpp, 4 functions
+and 8 `$E`) and Point2D's inline methods (5) match strictly; see
+[PROCIRCUIT](PROCIRCUIT.md).
+
 dlgprocs.cpp (the front-end dialogs) matches strictly in 81 functions;
 see [DIALOGPROCS](DIALOGPROCS.md).
 

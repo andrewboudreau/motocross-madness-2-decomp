@@ -11,10 +11,11 @@
 #include "MatrixUtil.h"
 #include "DebugAlloc.h"
 
-// The four vector constants that open many retail files (see
-// LightEmitter.cpp): 0x00689ac8, 0x00689ad8, 0x00689ae8 and 0x00689ab8,
-// initialised by 0x004d49e0..0x004d4b1b, just before this file's first
-// function.
+// The four vector constants of many retail files (see Cube.cpp):
+// 0x00689b08, 0x00689b18, 0x00689b28 and 0x00689af8, initialised by
+// 0x004da3e0..0x004da51b, after this file's last function. 0x004d6abb reads
+// the first and 0x004d73df passes the third. The set before the first
+// function (0x004d49e0) closes ProCircuit.cpp.
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);

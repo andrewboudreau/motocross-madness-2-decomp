@@ -11,10 +11,11 @@
 #include "MatrixUtil.h"
 #include "DebugAlloc.h"
 
-// The four vector constants that open many retail files (see
-// LightEmitter.cpp): 0x00689a88, 0x00689a98, 0x00689aa8 and 0x00689a78,
-// initialised by 0x004d3340..0x004d347b, just before this file's first
-// function.
+// The four vector constants of many retail files (see Cube.cpp):
+// 0x00689ac8, 0x00689ad8, 0x00689ae8 and 0x00689ab8, initialised by
+// 0x004d49e0..0x004d4b1b, after this file's last function. The set before
+// the constructor (0x004d3340) closes the gearbox unit (GearRatios.cpp),
+// whose 0x004d31b0 reads its zero vector; this file reads none of its own.
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);

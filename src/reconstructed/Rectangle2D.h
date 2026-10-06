@@ -2,12 +2,14 @@
 
 // RTTI: Point2D (no bases; vtable 0x00556f78, one slot: the deleting
 // destructor 0x004d28d0, which calls 0x004d2910). 0xc bytes: two floats.
+// The out-of-line methods sit at 0x004d28b0..0x004d2936 (Point2D.cpp).
 // Names are provisional.
 class Point2D {
 public:
     Point2D(float x, float y);                   // 0x004d28b0
     Point2D(const Point2D& other);               // 0x004d28f0
     virtual ~Point2D();                          // 0x004d2910
+    Point2D& operator=(const Point2D& other);    // 0x004d2920
 
     float x;
     float y;
