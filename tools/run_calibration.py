@@ -16267,6 +16267,15 @@ CASES = [
         'reason': 'direct callee in gameui.cpp extent 0x469db0-0x47b66f',
     },
     {
+        'name': 'vfwdeco.cpp vfwdeco.cpp UnknownVideoDecoder destructor 0x52d050',
+        'bindings': 'src/reconstructed/VfwDeco.bindings.json',
+        'source': 'src/reconstructed/VfwDeco.cpp',
+        'symbol': '??1UnknownVideoDecoder@@QAE@XZ',
+        'target_va': '0x0052d050',
+        'target_size': 113,
+        'reason': 'only xrefs of __FILE__ vfwdeco.cpp (lines 178-180); only ICClose/ICSendMessage(ICM_DECOMPRESSEX_END) caller',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

@@ -4,13 +4,7 @@
 #include "RenderInterfaces.h"
 #include "Pixtrans.h"
 #include "TextureMap.h"
-
-// Object at PCTextureMap+0x7c; its destructor 0x0052d050 sits among
-// vfwdeco.cpp's literals.
-class UnknownVideoDecoder {
-public:
-    ~UnknownVideoDecoder();                   // 0x0052d050
-};
+#include "VfwDeco.h"   // UnknownVideoDecoder at PCTextureMap+0x7c
 
 // Global at 0x00689964; when set, PCTextureMap tells the manager
 // (0x00511580) about lost or released surfaces.
