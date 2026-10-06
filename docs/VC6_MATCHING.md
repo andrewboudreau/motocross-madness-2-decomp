@@ -127,6 +127,9 @@ match strictly; see [FONTS AND BITMAPS](FONTTEXTURE.md).
 LightEmitter.cpp (26), Quantize.cpp (8) and MSZoneInterface.cpp (14) match
 strictly; see [LIGHTS, QUANTIZE AND ZONE](LIGHTEMITTER.md).
 
+dirlist.cpp (the drive list, DirectoryList and CombinedDirectoryList)
+matches strictly in 25 functions; see [DIRLIST](DIRLIST.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.
