@@ -1,4 +1,4 @@
-# InGameProcs.cpp, NetProcs.cpp and OptionProcs.cpp
+# dlgprocs.cpp, InGameProcs.cpp, NetProcs.cpp and OptionProcs.cpp
 
 These files hold dialog procedures. Each one is a slot-29 override of a
 UIDialog subclass named by RTTI, plus a few helpers. The sources are
@@ -74,3 +74,36 @@ Header additions:
 - GameUi.h: control slots 55-66, list rows and fields.
 - UIDialog.h, TrackGame.h, KrustyUI.h and JoystickDevice.h: new members.
 - InputDevice.h befriends OptControlsDlg.
+
+**dlgprocs.cpp** (`0x0044b0a0..0x00455d9f`, `src/reconstructed/DlgProcs.*`).
+Evidence:
+- **`__FILE__`:** the literal at `0x0056963c`, xrefs `0x0044b317..0x00455151`.
+- **Literals and RTTI:** its literals run from "LstProfiles" (`0x00569300`)
+  to "GoLink" (`0x0056a094`), followed by its dialogs' type descriptors.
+- **Start:** dirlist.cpp ends at `0x0044b09f`. The first functions are
+  qsort comparators that only this file pushes.
+- **Past the last xref:** DemoDlg, TransDlg and Exit1Dlg have their slots in
+  `0x00455a10..0x00455d9f`.
+- **End:** `0x00455da0..0x00455ddf` initializes EcoSystem's bss and is left
+  to EcoSystem.cpp.
+
+Its four kVec3 `$E` pairs sit mid-file (`0x00453d50..0x00453e8b`), and
+earlier code reads them.
+
+Exact: 81 calibration cases. They cover the slot 29 procedures and helpers
+of the main, single-player, profile, intro, credits, loading, ghost and
+replay, choice, edit-box, demo, transition and exit dialogs; the six
+Load*Dlg constructors; the cdecl menu helpers `0x004526b0` and
+`0x00453090`; and the eight `$E`. SPBikeRiderDlg slot 22 `0x0044fab0` and
+`0x004500d0` are bodies that the MP and pro circuit bike dialogs share.
+
+ChoiceDlg `0x00455700` now has typed parameters, so InGameProcs.bindings.json
+carries its new mangled name.
+
+Near misses (`samples/ui/DlgProcsNearMisses.cpp`): SPBikeRiderDlg slot 23
+`0x0044fa00`, the bike and rider lists `0x0044f750`, and `0x00452930`. All
+three differ in register allocation or tail merging.
+
+Not attempted (large): MainDlg slot 29, SPEventDlg slots 29 and 31 and its
+helpers, SPBikeRiderDlg slots 29 and 10, SPRaceInfoDlg and MPRaceInfoDlg
+slot 29, profile creation `0x00451b80` and race start `0x004536e0`.

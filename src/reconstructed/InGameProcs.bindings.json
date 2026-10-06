@@ -41,6 +41,7 @@
   "?UnknownFunction452930@@YAXHPAUUnknownDialogEvent@@@Z": "0x00452930",
   "?UnknownFunction453090@@YAXHPAUUnknownDialogEvent@@@Z": "0x00453090",
   "?UnknownFunction455700@ChoiceDlg@@QAEXHHHHHHHHHH@Z": "0x00455700",
+  "?UnknownFunction455700@ChoiceDlg@@QAEXPBDH0H0H0H0H@Z": "0x00455700",
   "?UnknownFunction45cdc0@EventManager@@QAEXH@Z": "0x0045cdc0",
   "?UnknownFunction45d2b0@EventManager@@QAEPAUTrackGameViewOwner@@XZ": "0x0045d2b0",
   "?UnknownFunction45d2f0@EventManager@@QAEPAUUnknownKrustyBikeView@@XZ": "0x0045d2f0",

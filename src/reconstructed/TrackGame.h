@@ -32,6 +32,8 @@ struct TrackGameViewOwner : public GameObject {
     // 0x004e0c30 (among QuarryStuntEvent.cpp's code): shows the on/off
     // message for string `id` (racesnd.cpp passes 0x1429 and 0x14c3).
     void UnknownFunction4e0c30(int id, int value);
+    void UnknownFunction4e1f00();             // 0x004e1f00 (dlgprocs.cpp LoadingDlg)
+    void UnknownFunction4a9d20();             // 0x004a9d20 (dlgprocs.cpp 0x004526b0)
 
     UnknownTrackGameViewPart* field_0x2c;
     unsigned char field_0x30[0x34 - 0x30];
@@ -88,11 +90,12 @@ public:
     char field_0x10[0x80];                    // player name (NetProcs.cpp opens sessions with it)
     int field_0x90;                           // cycles 0..5 (TrackOverlay 0x0051e7c0)
     int field_0x94;                           // "RadLODEasy" (SelectGamePicProcs.cpp)
-    unsigned char field_0x98[0x9c - 0x98];
-    int field_0x9c;                           // cleared by MPBikeRiderDlg (SelectGamePicProcs.cpp)
+    int field_0x98;                           // saved +0x94 (dlgprocs.cpp SinglePlayerDlg)
+    int field_0x9c;                           // cleared by MPBikeRiderDlg (SelectGamePicProcs.cpp); opens NewbieDlg (dlgprocs.cpp)
     char field_0xa0[6][0x100];                // directories (TrackRecord.cpp 0x0051f0b0)
     int field_0x6a0;                          // a directory name pointer for TrackRecord.cpp 0x0051f2c0                          // EventManager 0x0045cb70 passes it to 0x00523a60
-    unsigned char field_0x6a4[0x6b0 - 0x6a4];
+    int field_0x6a4;                          // cleared when a network race fails to load (dlgprocs.cpp LoadingDlg)
+    unsigned char field_0x6a8[0x6b0 - 0x6a8];
     int field_0x6b0;                          // shows the race statistics (TrackOverlay 0x00519980)
     unsigned char field_0x6b4[0x6b8 - 0x6b4];
     int field_0x6b8;                          // shows the racers' name tags (TrackOverlay 0x005190e0)
@@ -100,7 +103,8 @@ public:
     int field_0x6c0;                          // TrackOverlay 0x0051e390
     unsigned char field_0x6c4[0x6c8 - 0x6c4];
     int field_0x6c8;                          // copied to the GUI's +0xec (KrustyUI 0x004988a0)
-    unsigned char field_0x6cc[0x6d4 - 0x6cc];
+    int field_0x6cc;                          // intro movie on (dlgprocs.cpp Intro1Dlg)
+    unsigned char field_0x6d0[0x6d4 - 0x6d0];
     int field_0x6d4;                          // copied into GUI layer 0 (EventManager 0x0045e710)
     unsigned char field_0x6d8[0x6dc - 0x6d8];
     int field_0x6dc;                          // most AI bikes ("EditMaxAIBikes", SelectGamePicProcs.cpp)
@@ -227,6 +231,7 @@ public:
 struct UnknownTrackGameRacerSlot {
     // 0x00521fb0 (SelectGamePicProcs.cpp passes TrackGame+0x1eec, +0x1f2c and +0x1f6c).
     void UnknownFunction521fb0(void* a, void* b, void* c);
+    void UnknownFunction522050();             // 0x00522050 (dlgprocs.cpp LoadingDlg)
 
     unsigned char field_0x00[0xc0];
     int field_0xc0;                           // SelectGamePicProcs.cpp
@@ -279,11 +284,9 @@ public:
     void UnknownFunction49c770();             // 0x0049c770 (EventManager 0x0045e550)
 };
 
-// Object at TrackGame+0x3444 (0x00521cd0 tests that it exists).
-class UnknownTrackGameObject3444 {
-public:
-    ~UnknownTrackGameObject3444();            // 0x004d39f0
-};
+// Object at TrackGame+0x3444 (0x00521cd0 tests that it exists): the pro
+// circuit career, declared in ProCircuit.h.
+#include "ProCircuit.h"
 
 // cdecl 0x00520820 (near TrackRecord.cpp's literals): formats a message
 // (_vsnprintf into 0x200 bytes) and sends it through 0x0068a48c.
@@ -374,9 +377,10 @@ public:
     unsigned char field_0x2944[0x2b58 - 0x2944];
     DirectoryList* field_0x2b58;               // scanned by TrackRecord.cpp 0x00520390
     DirectoryList* field_0x2b5c;               // track directories (SelectGamePicProcs.cpp)
-    unsigned char field_0x2b60[0x2c68 - 0x2b60];
+    unsigned char field_0x2b60[0x2b64 - 0x2b60];
+    char field_0x2b64[0x104];                  // the ghost file raced against (dlgprocs.cpp GhostFilesDlg)
     int field_0x2c68;                          // mode 4 saves a ghost (EventManager 0x0045cdc0)
-    unsigned char field_0x2c6c[0x2d70 - 0x2c6c];
+    char field_0x2c6c[0x104];                  // the replay file played (dlgprocs.cpp ReplayFilesDlg)
     int field_0x2d70;    // EventManager 0x0045e600 compares it with 2
     int field_0x2d74;    // selects KrustyBikeCamera's view (slot 10)
     int field_0x2d78;                          // SelectGamePicProcs.cpp

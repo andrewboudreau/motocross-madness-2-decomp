@@ -7,6 +7,8 @@
 // vtable 0x00552a9c. Only what EventManager uses is declared.
 class UnknownGameUiControl;
 class Sound;
+class GUIManager;
+struct UnknownDialogEvent;
 
 class UIDialog : public GameObject {
 public:
@@ -17,6 +19,8 @@ public:
 
     // NetProcs.cpp and InGameProcs.cpp (provisional names).
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0046ef00
+    virtual int UnknownVirtualSlot13();       // 0x0046f1c0 (dlgprocs.cpp)
+    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0046a7d0 (dlgprocs.cpp)
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0046a780 (SelectGamePicProcs.cpp)
     void UnknownFunction46ecc0(int value);    // 0x0046ecc0
     Sound* UnknownFunction46e9a0(const char* name); // 0x0046e9a0: a dialog sound (OptionProcs.cpp)
@@ -27,6 +31,7 @@ public:
     void UnknownFunction46ff30(int result);   // 0x0046ff30: closes the dialog with `result`
     void UnknownFunction46ff70(int a, int b); // 0x0046ff70 (OptionProcs.cpp)
     void UnknownFunction470000(UnknownGameUiControl* control, int a, int b); // 0x00470000
+    void UnknownFunction46a8a0(GameObject* control, int a, int b); // 0x0046a8a0: adds a control (dlgprocs.cpp)
 };
 
 // RTTI: TransDlg : UIDialog (vtable 0x00552624; 0x7f64 bytes, the size
@@ -35,8 +40,12 @@ class TransDlg : public UIDialog {
 public:
     TransDlg() : UIDialog(1, "Trans.dtm") {}
     void UnknownFunction455c40(int menu);         // 0x00455c40: stores +0x7f60
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00455b60 (dlgprocs.cpp)
+    virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455bd0 (dlgprocs.cpp)
 
-    unsigned char field_0x2c[0x7f60 - 0x2c];
+    unsigned char field_0x2c[0x7f58 - 0x2c];
+    int field_0x7f58;                             // frames shown (dlgprocs.cpp)
+    float field_0x7f5c;                           // seconds shown (dlgprocs.cpp)
     int field_0x7f60;                             // the menu to open next
 };
 
@@ -45,8 +54,12 @@ public:
 class Intro1Dlg : public UIDialog {
 public:
     Intro1Dlg() : UIDialog(1, "intro1.dtm") {}
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004532c0 (dlgprocs.cpp)
+    virtual int UnknownVirtualSlot10(float frameTime);    // 0x004533d0 (dlgprocs.cpp)
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00453420 (dlgprocs.cpp)
 
-    unsigned char field_0x2c[0x7f5c - 0x2c];
+    unsigned char field_0x2c[0x7f58 - 0x2c];
+    int field_0x7f58;                             // frames shown (dlgprocs.cpp)
 };
 
 // RTTI: Exit1Dlg : UIDialog (vtable 0x0055503c; 0x7f68 bytes, the size
@@ -54,6 +67,15 @@ public:
 class Exit1Dlg : public UIDialog {
 public:
     Exit1Dlg() : UIDialog(1, "Exit1.dtm") {}
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00455c50 (dlgprocs.cpp)
+    virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455d00 (dlgprocs.cpp)
+    virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00455d70 (dlgprocs.cpp)
 
-    unsigned char field_0x2c[0x7f68 - 0x2c];
+    unsigned char field_0x2c[0x30 - 0x2c];
+    GUIManager* field_0x30;
+    unsigned char field_0x34[0x7f58 - 0x34];
+    int field_0x7f58;                             // frames shown (dlgprocs.cpp)
+    float field_0x7f5c;                           // seconds shown (dlgprocs.cpp)
+    int field_0x7f60;                             // set once a frame has run (dlgprocs.cpp)
+    int field_0x7f64;                             // a key or the "GoLink" button closes it (dlgprocs.cpp)
 };

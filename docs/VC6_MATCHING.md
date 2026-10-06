@@ -193,6 +193,12 @@ functions; see [MORPHBASTARDMODIFIER](MORPHBASTARDMODIFIER.md).
 SelectGamePicProcs.cpp (the multiplayer lobby dialogs) matches strictly
 in 43 functions; see [SELECTGAMEPICPROCS](SELECTGAMEPICPROCS.md).
 
+ProCircuit.cpp (17) and ProCircuitProcs.cpp (31), the pro circuit career
+and its dialogs, match strictly; see [PROCIRCUIT](PROCIRCUIT.md).
+
+dlgprocs.cpp (the front-end dialogs) matches strictly in 81 functions;
+see [DIALOGPROCS](DIALOGPROCS.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

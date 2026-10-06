@@ -20,7 +20,7 @@ struct UnknownDialogEvent {
     GUIManager* field_0x10;                   // the GUI (OptionsDlg opens its sub-dialogs on it)
     UnknownGameUiControl* field_0x14;         // the control (VCRDlg)
     int field_0x18;                           // cleared by OptControlsDlg for kinds 11 and 12
-    unsigned char field_0x1c[0x20 - 0x1c];
+    int field_0x1c;                           // a kind 11 message's key (dlgprocs.cpp RemoveProfileDlg)
     int field_0x20;                           // set to 1 once handled
 };
 
@@ -38,9 +38,16 @@ void UnknownFunction453090(int menu, UnknownDialogEvent* event);
 class ChoiceDlg : public UIDialog {
 public:
     ChoiceDlg() : UIDialog(1, "messbox2.dtm") {}
-    // 0x00455700: sets up the message and its buttons from string ids.
-    void UnknownFunction455700(int a, int b, int c, int d, int e, int f, int g, int h, int i,
-                               int j);
+    // 0x00455700: sets up the title, the message and the three buttons, each
+    // from a text or (when its id is nonzero) a string resource id.
+    void UnknownFunction455700(const char* title, int titleId, const char* prompt, int promptId,
+                               const char* left, int leftId, const char* middle, int middleId,
+                               const char* right, int rightId);
+    // 0x00455630: sets the title, the message and the buttons' texts (an empty
+    // button text hides the button).
+    void UnknownFunction455630(const char* title, const char* prompt, const char* left,
+                               const char* middle, const char* right);
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004555b0
 
     unsigned char field_0x2c[0x7f58 - 0x2c];
 };

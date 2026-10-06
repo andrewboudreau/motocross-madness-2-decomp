@@ -5,6 +5,7 @@
 
 class Camera;
 class RenderTarget;
+struct UnknownKrustyUIModelObject;
 
 // Object at KrustyUI+0x2c (its methods sit among GUIManager.cpp's literals).
 class UnknownTrackGameObject56cItem;
@@ -140,7 +141,8 @@ public:
     int field_0x450[5];                       // slider maximum
     GameObject* field_0x464;                  // released by 0x004999b0
     Camera* field_0x468;                      // made current while +0x464 is shown
-    unsigned char field_0x46c[0x474 - 0x46c];
+    UnknownKrustyUIModelObject* field_0x46c;  // the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
+    unsigned char field_0x470[0x474 - 0x470];
     Vector3 field_0x474;                      // the +0x464 scene's focus (SelectGamePicProcs.cpp)
     unsigned char field_0x480[0x48c - 0x480];
     int field_0x48c;

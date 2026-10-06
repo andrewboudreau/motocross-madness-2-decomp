@@ -6,6 +6,8 @@
 
 #include "GameObject.h"
 
+class MediaControl;
+
 // A 0x38-byte list box row; +0x14 is its text (OptionProcs.cpp 0x004b4e70).
 struct UnknownGameUiListRow {
     unsigned char field_0x00[0x14];
@@ -105,10 +107,21 @@ public:
     void UnknownFunction477e60(int a);        // 0x00477e60
     void UnknownFunction477110(const char* image, int a, int b, int c); // 0x00477110: shows an image
     char* UnknownFunction476d20(int row);     // 0x00476d20: a row's text (-1: the selected one)
+    // ProCircuitProcs.cpp (provisional names).
+    void UnknownFunction473390(UnknownGameUiControl* list); // 0x00473390: links a column button to its list
+    void UnknownFunction4777f0(int (*compare)(const void* a, const void* b)); // 0x004777f0: the rows' sort order
+    void UnknownFunction470760(int a, const char* image); // 0x00470760: shows an image file
+    void UnknownFunction470730(int a, void* image); // 0x00470730: shows a dialog resource image
     // Inline: a drop-down list's button.
     UnknownGameUiControl* UnknownInlineButton() { return field_0x1ec_control; }
 
-    unsigned char field_0x02c[0x7c - 0x2c];
+    unsigned char field_0x02c[0x3c - 0x2c];
+    int field_0x3c[4];                        // the control's area, a CameraRect (dlgprocs.cpp LoadingDlg)
+    unsigned char field_0x04c[0x5c - 0x4c];
+    int field_0x5c;                           // an edit box's state (dlgprocs.cpp UserNameDlg)
+    unsigned char field_0x060[0x68 - 0x60];
+    int field_0x68;                           // a movie control's playing flag (dlgprocs.cpp MainDlg slot 10)
+    unsigned char field_0x06c[0x7c - 0x6c];
     int field_0x7c;                           // control id (UIControl slot 52 sets it; OptionProcs.cpp's SldEQ band)
     unsigned char field_0x080[0x1d8 - 0x80];
     int field_0x1d8;
@@ -117,6 +130,7 @@ public:
     union {
         int field_0x1ec;                      // a list box's visible rows (OptionProcs.cpp)
         UnknownGameUiControl* field_0x1ec_control; // a drop-down list's button (SelectGamePicProcs.cpp)
+        MediaControl* field_0x1ec_movie;      // a movie control's player (dlgprocs.cpp)
     };
     int field_0x1f0;
     unsigned char field_0x1f4[0x1fc - 0x1f4];
