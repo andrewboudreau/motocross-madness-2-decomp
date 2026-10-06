@@ -352,7 +352,7 @@ public:
     float shortNetPacketIntervalSeconds;
     float fullRecordPacketIntervalSeconds;
     float shortRecordPacketIntervalSeconds;
-    int field_0x3424;
+    int field_0x3424;                          // EventManager 0x0045fbd0 decrements it for a leaving player whose entry has racer +0x11c0 set (Game+0x18 otherwise)
     int field_0x3428;
     int field_0x342c;
     int uiInteractionBlocked;

@@ -70,7 +70,7 @@ public:
     virtual void CharacterVirtualSlot4(int a, int b);   // 0x004a6ba0 (ret 8; shared by 4..6)
     virtual void CharacterVirtualSlot5(int a, int b);   // 0x004a6ba0
     virtual void CharacterVirtualSlot6(int a, int b);   // 0x004a6ba0
-    virtual void CharacterVirtualSlot7(int a, int b, int c);  // 0x004a70c0 (ret 0xc)
+    virtual int CharacterVirtualSlot7(float time, int a, int b);  // 0x004a70c0 (ret 0xc): fld of the first argument, added to +0x10
     virtual void CharacterVirtualSlot8(int a);    // 0x004a98b0 (ret 4)
     virtual void CharacterVirtualSlot9(int a);    // 0x00464e80 (ret 4)
     virtual void CharacterVirtualSlot10();        // 0x00464e90 (ret)
