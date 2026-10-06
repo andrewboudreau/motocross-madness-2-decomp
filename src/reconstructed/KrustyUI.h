@@ -103,25 +103,35 @@ public:
     void UnknownFunction4999f0(GameObject* parent); // 0x004999f0: shows the +0x464 scene
     void UnknownFunction499a20();             // 0x00499a20: hides it
     // 0x0049b560 / 0x0049b7f0 (bikerace.cpp passes TrackGame+0x1f2c and
-    // +0x1f6c): fill `text` (at most `size` bytes) from `source`.
-    void UnknownFunction49b560(void* source, char* text, int size);
-    void UnknownFunction49b7f0(void* source, char* text, int size);
+    // +0x1f6c): copy `name` to `text` (`size` bytes) and return 1 when it is
+    // an archive entry or a file (in "Res" when it has no directory; then
+    // `text` gets that path). Otherwise `text` gets a random bike (+0x50) or
+    // rider (+0x58) name and they return 0.
+    int UnknownFunction49b560(const char* name, char* text, int size);
+    int UnknownFunction49b7f0(const char* name, char* text, int size);
     void UnknownFunction499b00();             // 0x00499b00
     void UnknownFunction499b10();             // 0x00499b10
     void UnknownFunction49a4a0();             // 0x0049a4a0: opens the exit dialog
     // 0x0049b020: fills `names` with `count` distinct random short strings.
     void UnknownFunction49b020(const char** names, int count);
+    // 0x0049b0d0: picks `count` distinct random bikes and riders for the AI
+    // racers (bikes near the player's class).
+    void UnknownFunction49b0d0(int* bikes, int count, int* riders);
     // 0x0049ba70: appends an entry to +0x60; returns its index.
     int UnknownFunction49ba70(int a, int b, int c, const char* name, int d, int e);
     void UnknownFunction4999b0();             // 0x004999b0: shutdown (the destructor's first step)
     void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
-    void UnknownFunction49a540();             // 0x0049a540
+    void UnknownFunction49a540();             // 0x0049a540: loads the garage tables
     void UnknownFunction49a8b0();             // 0x0049a8b0
     GameObject* UnknownFunction4988a0(RenderTarget* target, int value); // 0x004988a0
     void UnknownFunction498cf0(int value);                         // 0x00498cf0
     void UnknownFunction499b20(int menu);                          // 0x00499b20: opens a menu
     void UnknownFunction49b530();                                  // 0x0049b530
-    void UnknownFunction49bbb0();                                  // 0x0049bbb0
+    // 0x0049bbb0: records the finished race in the high-score tables
+    // (TrackGame+0x3400): table 0, then 1 and 2 by laps (5, 10) or, in
+    // modes 0 and 4, by the +0x140 setting (5.0, 10.0).
+    void UnknownFunction49bbb0();
+    void UnknownFunction49bc50(int table);                         // 0x0049bc50
 
     UnknownKrustyUIGui* field_0x2c;
     int field_0x30;
@@ -138,14 +148,17 @@ public:
     int field_0x5c;
     UnknownKrustyUIEntry* field_0x60;         // also freed by 0x0049bb80
     int field_0x64;                           // entry count
-    // Garage tables per bike class (OptionProcs.cpp's OptGarageDlg).
-    int field_0x68[5][3][11];                 // standard curves
-    unsigned char field_0x2fc[0x324 - 0x2fc];
-    int field_0x324[5][11];                   // band maxima
-    int field_0x400[5];                       // total of the bands
-    unsigned char field_0x414[0x43c - 0x414];
-    int field_0x43c[5];                       // slider minimum
-    int field_0x450[5];                       // slider maximum
+    // Garage tables per bike class (OptionProcs.cpp's OptGarageDlg), read
+    // from presets.pb by 0x0049a540 (keys in the comments).
+    int field_0x68[5][3][11];                 // standard curves ("Category_%dPreset_%d" RPM%05d)
+    int field_0x2fc[5];                       // "RPMLowerLimit"
+    int field_0x310[5];                       // "RPMUpperLimit"
+    int field_0x324[5][11];                   // band maxima ("Category_%d" RPM%05d)
+    int field_0x400[5];                       // total of the bands ("HPSum")
+    int field_0x414[5];                       // RPM step: a tenth of the limits' range
+    int field_0x428[5];                       // "Weight"
+    int field_0x43c[5];                       // slider minimum ("MinRange")
+    int field_0x450[5];                       // slider maximum (the largest band maximum)
     GameObject* field_0x464;                  // released by 0x004999b0
     Camera* field_0x468;                      // made current while +0x464 is shown
     UnknownKrustyUIModelObject* field_0x46c;  // the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)

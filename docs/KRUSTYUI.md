@@ -7,9 +7,26 @@ which confirms the original translation unit's name. Canonical source:
 `src/reconstructed/KrustyUI.h` / `KrustyUI.cpp`. Names are provisional.
 TrackGame keeps it at +0x56c (`ui`).
 
+## Extent
+
+`0x004987f0..0x0049bf0b`. The first function is the constructor; the unit
+ends with the shared dialog deleting destructor and its vector set:
+
+- `0x0049bdb0` is `Exit1Dlg`'s scalar deleting destructor (strong
+  inference): krustyui.cpp instantiates `Exit1Dlg` (`0x0049a4a0`), the
+  compiled body matches, and the linker kept this copy for 70 dialog vtables.
+  It calls the folded implicit destructor `0x00450fc0` (`jmp 0x0046a070`).
+- `0x0049bdd0..0x0049bf0b` initialize the per-file vectors (0,0,0)
+  `0x0067c418`, (1,0,0) `0x0067c428`, (0,1,0) `0x0067c458` and (0,0,1)
+  `0x0067c3f8`. `0x00498cf0` reads the zero vector (`0x00498eac`), its own
+  function-local statics sit between them in `.bss` (`0x0067c408`,
+  `0x0067c438`, `0x0067c448`), and `.CRT$XCU` entries 163-166 follow
+  the set at 159-162 (`0x004986b0..0x004987a0`, just before the
+  constructor).
+
 ## Status
 
-Exact (21 calibration cases):
+Exact (35 functions):
 - the constructor `0x004987f0`. Eight 8-byte `{int, char}` records at
   +0x634 have an inline constructor, so VC6 emits the clearing loop before
   the vtable store; the body then clears the other fields in retail order;
@@ -37,26 +54,49 @@ Exact (21 calibration cases):
   name) to the +0x60 list through gameui.cpp's resize helper `0x0047b570`.
   It returns `++count - 1`;
 - `0x0049b020`, which fills an array with distinct random short strings from
-  `0x0068a498`, probing a DebugCalloc'd used-table (`0x004a2fc0`, lines
-  1120/1157). It scales `rand()` through a float local: written as one
-  expression, VC6 folds `1/32768` and `36` into a single constant.
+  `0x0068a498`, probing a DebugCalloc'd used-table (lines 1120/1157);
+- `0x0049a540`: reads `presets.pb` (`Category_%d` limits, `HPSum`,
+  `MinRange`, `Weight`, `RPM%05d` bands and three presets per class) into
+  the garage tables, or sets the defaults;
+- `0x0049b560` / `0x0049b7f0`: copy a bike or rider name and return 1 when
+  it is an archive entry or a file (prefixed `Res\` without a directory);
+  otherwise they pick a random available bike (+0x50) or rider (+0x58);
+- `0x0049bbb0` / `0x0049bc50`: record the race in the high-score tables at
+  TrackGame+0x3400 (table 0, then 1 and 2 by laps 5/10 or, in modes 0 and 4,
+  by the +0x140 setting 5.0/10.0);
+- `0x0049bdb0` and the eight `$E` thunks/bodies `0x0049bdd0..0x0049bed0`.
 
-Near miss (`samples/ui/KrustyUINearMisses.cpp`): `0x004988a0`, TrackGame
-slot 4's initialiser (872 of 1104 bytes). It loads 36 short strings
-(resources 5000–5035) into `0x0068a498`, the GUI scale (0xfed) and font
-(0xff2, else "Arial"). It creates the GUI (`new`, line 121) and adds the
-object its setup returns, applies the font size (0x1469), loads `ui`,
-`ui\wait.tga` and `ui\uires.res`, and restores "MRUProfile" and
-"JoystickFilter". Offline, when asked, it opens `Intro1Dlg` ("intro1.dtm",
-line 201). From the scale store on, retail picks different registers.
+The random helper `RandomUnit()` returns `(float)(rand() * (1.0f / 32768))`.
+The explicit cast is what keeps VC6 from folding the scale into a following
+constant (`* 36`) or reordering it after a variable factor (`* (count - 1)`).
+
+Near misses (`samples/ui/KrustyUINearMisses.cpp`, own bindings file):
+
+- `0x004988a0`, TrackGame slot 4's initialiser (872 of 1104 bytes). It loads
+  36 short strings (resources 5000–5035) into `0x0068a498`, the GUI scale
+  (0xfed) and font (0xff2, else "Arial"), creates the GUI (line 121), loads
+  `ui`, `ui\wait.tga` and `ui\uires.res`, restores "MRUProfile" and
+  "JoystickFilter", and offline opens `Intro1Dlg` (line 201). From the scale
+  store on, retail picks different registers.
+- `0x0049a8b0`, which loads `bikes.pb` and `riders.pb` (1891 of 1897 bytes).
+  Only manufacturers 3 and 7, their bike 2, and riders 42 and 44 are read.
+  Retail keeps the manufacturer index at `[esp+0x1c]` and the bike count at
+  `[esp+0x20]`; VC6 here swaps them whatever the declaration order, scope or
+  names.
+- `0x0049b0d0`, which picks distinct random bikes and riders for the AI
+  (880 of 916 bytes). Retail places the "class 1 above 0.2" arm after the
+  probe loop; every if/else, goto and ternary form tried keeps it before.
 
 The GUI page and control classes are declared in
 `src/reconstructed/GameUi.h`, not `KrustyUI.h`. Declaring them in a header
 that TrackGame.cpp includes disturbs TrackGame slot 1 (see
-[TrackGame](TRACKGAME.md)).
+[TrackGame](TRACKGAME.md)). The +0x48/+0x50/+0x58 list entries are views
+local to KrustyUI.cpp for the same reason.
 
-Not reconstructed: `0x00498cf0` (3114 bytes, with function-local statics;
-the empty `0x00499920`–`0x00499970` are their exit destructors),
-`0x00499b20` (2432 bytes, opens a menu), `0x0049a540`, `0x0049a690`,
-`0x0049a8b0`, `0x0049b0d0`, `0x0049b560`, `0x0049b7f0`,
-`0x0049bae0`, `0x0049bbb0` and `0x0049bc50`.
+Not reconstructed:
+- `0x00498cf0` (3114 bytes, with function-local statics; the empty
+  `0x00499920`–`0x00499970` are their exit destructors);
+- `0x00499b20` (2432 bytes): opens menu `id` through a sparse switch that
+  allocates 18 dialog classes (MainDlg, LoadingDlg, NetProcs/InGameProcs/
+  ProCircuitProcs dialogs, ...). Most of those classes have no inline
+  constructor declared in their headers yet.
