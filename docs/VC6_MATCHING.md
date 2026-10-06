@@ -223,6 +223,9 @@ Texmap.cpp is fully matched (13 functions); see [TEXMAP](TEXMAP.md).
 BoundingBoxTreeBuild.cpp (27) and GR_BitString (8) match strictly; see
 [BOUNDINGBOXTREE](BOUNDINGBOXTREE.md).
 
+D3DIMSoulTree.CPP (D3DIMSoultreeObject) matches strictly in 43 functions;
+see [D3DIMSOULTREE](D3DIMSOULTREE.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

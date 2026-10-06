@@ -2,52 +2,12 @@
 
 #include "GameObject.h"
 #include "MatrixUtil.h"
+#include "D3DIMSoulTree.h"  // D3DIMSoultreeObject (the "sphere.slt" model)
 
 // LightEmitter.cpp (literal __FILE__ at 0x0056ddf0, xrefs 0x0049e276..
 // 0x0049e4fc; code 0x0049dd30..0x004a01c4). RTTI: LightEmitter : GameObject
 // (vtable 0x005550cc) and LightManager : GameObject (vtable 0x00555144).
 // Field and method names are provisional.
-
-// RTTI D3DIMSoultreeObject (vtable 0x005513ec written by 0x0043f160), seen
-// from this file only: its SoultreeObject/QuadTreeObject base at +0 owns the
-// primary table and the two transform helpers, the GameObject base sits at
-// +0x0c (samples/physics/collision/SoultreePhysicsObject.h has the bases).
-class D3DIMSoultreeObject {
-public:
-    explicit D3DIMSoultreeObject(int flags);       // 0x0043f160 (ret 4)
-    virtual void UnknownVirtualSlot0();
-    virtual void UnknownVirtualSlot1();
-    virtual void UnknownVirtualSlot2();
-    virtual void UnknownVirtualSlot3();
-    virtual void UnknownVirtualSlot4();
-    virtual void UnknownVirtualSlot5();
-    virtual void UnknownVirtualSlot6();
-    virtual void UnknownVirtualSlot7();
-    virtual void UnknownVirtualSlot8();
-    // Slot 9 (0x0043f4b0, ret 0x14): loads the model; the result is handed
-    // straight to GameObject 0x00469190.
-    virtual GameObject* UnknownVirtualSlot9(void* owner, const char* name, int a, int b, int c);
-
-    void UnknownFunction4fc630(Vector3 position);  // 0x004fc630: sets the local translation
-    void UnknownFunction4fd340(float x, float y, float z); // 0x004fd340
-    // Seen from ArcadeObject.cpp: 0x004fc660 (ret 4) sets the position from
-    // a pointer, 0x004fe850 (ret 8) returns two vectors (the second is the
-    // half extent ArcadeObject doubles), 0x004fbd70 (ret 0x10) takes four
-    // pass-through arguments, 0x004fceb0 (ret 0x10) an axis and an angle,
-    // 0x00444d80 (D3DIMSoulTree.CPP, ret 4) attaches a modifier.
-    void UnknownFunction4fc660(const Vector3* position);
-    void UnknownFunction4fe850(Vector3* a, Vector3* b);
-    void UnknownFunction4fbd70(int a, int b, int c, int d);
-    void UnknownFunction4fceb0(Vector3 axis, float angle);
-    void UnknownFunction444d80(GameObject* modifier);
-    // Seen from D3DIMSoultreeModifier.cpp: 0x00444de0 and 0x00444f10 (both
-    // D3DIMSoulTree.CPP, ret 4) remove a modifier from the first (+0x264)
-    // or second (+0x26c) modifier list.
-    void UnknownFunction444de0(GameObject* modifier);
-    void UnknownFunction444f10(GameObject* modifier);
-
-    unsigned char field_0x004[0x2d8 - 4];          // operator new size 0x2d8
-};
 
 // The object at LightEmitter+0x9c; only these two helpers (both in this
 // file) are known.
