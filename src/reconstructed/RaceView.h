@@ -127,11 +127,20 @@ struct UnknownEventRacer : virtual public GameObject {
     char field_0x11c0;                             // AI racer's index in its messages
 };
 
+// The replay object at UnknownKrustyBikeView+0x1a0; +0x10c is its length.
+struct UnknownKrustyBikeViewReplay {
+    unsigned char field_0x000[0x10c];
+    float field_0x10c;
+};
+
 // Object at KrustyBikeCamera+0x3b8 (chosen by slot 10 from the global's
 // +0x558..+0x568 objects); slot 48 tests two flags. TrackGame and
 // EventManager use it as a GameObject (slot 5, the +0x25 flag bits), which
 // fits KrustyBike's primary base chain; its class is not established.
 struct UnknownKrustyBikeView : public GameObject {
+    void UnknownFunction41f1d0(int a, int b, int c); // 0x0041f1d0 (InGameProcs.cpp)
+    void UnknownFunction41f550(int value);   // 0x0041f550 (InGameProcs.cpp)
+    void UnknownFunction420650(int a, int b, int c); // 0x00420650 (InGameProcs.cpp ExitDlg)
     void UnknownFunction420590(int player);  // 0x00420590 (EventManager slot 24)
     // 0x00420b00 (near bikerace.cpp's literals): saves the replay to `path`
     // with `description`.
@@ -158,9 +167,20 @@ struct UnknownKrustyBikeView : public GameObject {
     bool field_0x18a;                    // racing (EventManager 0x0045eef0)
     unsigned char field_0x18b[0x18e - 0x18b];
     bool field_0x18e;                    // slot 10: view available
-    unsigned char field_0x18f[0x1a8 - 0x18f];
+    unsigned char field_0x18f[0x1a0 - 0x18f];
+    UnknownKrustyBikeViewReplay* field_0x1a0; // replay being played (InGameProcs.cpp VCRDlg)
+    unsigned char field_0x1a4[0x1a8 - 0x1a4];
     UnknownVcrFile* field_0x1a8;         // ghost recording (EventManager 0x0045cdc0)
-    unsigned char field_0x1ac[0x3f8 - 0x1ac];
+    unsigned char field_0x1ac[0x1b8 - 0x1ac];
+    float field_0x1b8;                   // replay time (InGameProcs.cpp VCRDlg)
+    unsigned char field_0x1bc[0x1c4 - 0x1bc];
+    float field_0x1c4;                   // replay seek target, -1 when none
+    unsigned char field_0x1c8[0x1dc - 0x1c8];
+    int field_0x1dc;                     // replay mode (4 play ... 14)
+    unsigned char field_0x1e0[0x1e4 - 0x1e0];
+    int field_0x1e4;                     // -2: no replay
+    int field_0x1e8;
+    unsigned char field_0x1ec[0x3f8 - 0x1ec];
     bool field_0x3f8;
     bool field_0x3f9;
 };

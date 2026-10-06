@@ -6,6 +6,7 @@
 // constructor 0x00469db0 takes a flag and the dialog resource and writes
 // vtable 0x00552a9c. Only what EventManager uses is declared.
 class UnknownGameUiControl;
+class Sound;
 
 class UIDialog : public GameObject {
 public:
@@ -13,6 +14,17 @@ public:
     // 0x0046ebf0: finds a control by name (GameUi.h declares the same
     // function on UnknownGameUiPage).
     UnknownGameUiControl* UnknownFunction46ebf0(const char* name, int flags);
+
+    // NetProcs.cpp and InGameProcs.cpp (provisional names).
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x0046ef00
+    void UnknownFunction46ecc0(int value);    // 0x0046ecc0
+    Sound* UnknownFunction46e9a0(const char* name); // 0x0046e9a0: a dialog sound (OptionProcs.cpp)
+    void UnknownFunction46fce0(int a, int time, int b); // 0x0046fce0
+    void UnknownFunction46fe40(int value);    // 0x0046fe40
+    void UnknownFunction46ea80(int id, int value); // 0x0046ea80 (OptionProcs.cpp)
+    void UnknownFunction46eb30(int id, int value); // 0x0046eb30 (OptionProcs.cpp)
+    void UnknownFunction46ff30(int result);   // 0x0046ff30: closes the dialog with `result`
+    void UnknownFunction470000(UnknownGameUiControl* control, int a, int b); // 0x00470000
 };
 
 // RTTI: TransDlg : UIDialog (vtable 0x00552624; 0x7f64 bytes, the size

@@ -11,6 +11,7 @@
 #include "TrackRecord.h"
 
 struct UnknownInputEntry;
+class FollowCamera;
 
 // RTTI: TrackGame : PCGame (vtable 0x00558938; trkgame.cpp). The global
 // pointer at 0x0056e26c is statically initialised to the object at
@@ -35,7 +36,9 @@ struct TrackGameViewOwner : public GameObject {
     UnknownTrackGameViewPart* field_0x2c;
     unsigned char field_0x30[0x34 - 0x30];
     UnknownKrustyBikeView* field_0x34;
-    unsigned char field_0x38[0x5c - 0x38];
+    unsigned char field_0x38[0x3c - 0x38];
+    FollowCamera* field_0x3c;                 // the race camera (InGameProcs.cpp VCRDlg)
+    unsigned char field_0x40[0x5c - 0x40];
     GameObject* field_0x5c;                   // EventManager 0x0045cdc0 calls slot 4 on 0x5c..0x68
     GameObject* field_0x60;
     GameObject* field_0x64;
@@ -48,6 +51,16 @@ struct TrackGameViewOwner : public GameObject {
     UnknownEventRacer* field_0xa8;
 };
 
+// A SessionInfoType record (Net.h) as TrackGame+0x1010 holds five of them
+// (0x10c bytes each; TrackGameMode's constructor 0x00522060 builds them with
+// SessionInfoType's constructor at its +0xa98, which is TrackGame+0x1010).
+// Declared without the vtable so TrackGame's constructor does not build them.
+struct UnknownTrackGameSession {
+    void* field_0x000;                        // SessionInfoType vtable
+    char field_0x004[0x104];                  // session name
+    void* field_0x108;                        // session instance GUID
+};
+
 // Object embedded at +0x578; KrustyBikeCamera slot 52 reads its mode.
 class TrackGameMode {
 public:
@@ -57,6 +70,7 @@ public:
     ~TrackGameMode();            // 0x005225f0
     int UnknownFunction524100(); // 0x00524100
     void UnknownFunction5240e0(int series); // 0x005240e0 (TrackRecord.cpp 0x00520390)
+    void UnknownFunction523d30(const char* topic, int a); // 0x00523d30 (OptionProcs.cpp: "MCM2HELP")
     void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
     void UnknownFunction522680();             // 0x00522680 (TrackGame slot 4)
@@ -68,7 +82,7 @@ public:
     void UnknownFunction523a60(int value, char* name, const char* kind, char* path);
 
     char field_0x00[16];                      // name; slot 4 sets it from the network object
-    unsigned char field_0x10[0x90 - 0x10];
+    char field_0x10[0x80];                    // player name (NetProcs.cpp opens sessions with it)
     int field_0x90;                           // cycles 0..5 (TrackOverlay 0x0051e7c0)
     unsigned char field_0x94[0xa0 - 0x94];
     char field_0xa0[6][0x100];                // directories (TrackRecord.cpp 0x0051f0b0)
@@ -186,8 +200,15 @@ public:
 class UnknownTrackGameObject33fc {
 public:
     UnknownTrackGameObject33fc();             // 0x00448960
+    // OptionProcs.cpp's control mapping dialog (provisional roles).
+    void UnknownFunction448c90(int device, int row, int kind, int code); // 0x00448c90
+    int UnknownFunction448cc0(int row, int kind, int code, int* other);  // 0x00448cc0
+    void UnknownFunction448e90(const char* path, int a);                 // 0x00448e90
+    void UnknownFunction449350(int device, int row, char* text);         // 0x00449350
+    int UnknownFunction449380(int kind, int code, char* text);            // 0x00449380
 
-    unsigned char field_0x00[0x384];
+    int field_0x00;                           // input device (OptionProcs.cpp "InputDeviceDDL")
+    unsigned char field_0x04[0x384 - 0x04];
 };
 
 // Per-racer record in TrackGame (0xf8 bytes from +0x215c, after the count at
@@ -304,7 +325,17 @@ public:
     UnknownTrackGameObject574* sceneObject;
     TrackGameMode mode;
     int field_0xfc4;                          // display mode index (EventManager 0x0045e710)
-    unsigned char field_0xfc8[0x2158 - 0xfc8];
+    unsigned char field_0xfc8[0x1010 - 0xfc8];
+    UnknownTrackGameSession field_0x1010[5];   // enumerated sessions (NetProcs.cpp)
+    int field_0x154c;                          // selected session (NetProcs.cpp)
+    unsigned char field_0x1550[0x5c];          // restored from +0x15ac when a replay is left (InGameProcs.cpp)
+    unsigned char field_0x15ac[0x5c];
+    unsigned char field_0x1608[0x1ed4 - 0x1608];
+    int field_0x1ed4[5];                       // video settings: forced video memory, then four detail levels (OptionProcs.cpp)
+    unsigned char field_0x1ee8[0x1eec - 0x1ee8];
+    unsigned char field_0x1eec[0xc8];          // restored from +0x1fb4 when a replay is left (InGameProcs.cpp)
+    unsigned char field_0x1fb4[0xc8];
+    unsigned char field_0x207c[0x2158 - 0x207c];
     int field_0x2158;                         // racer count (EventManager 0x0045e550)
     UnknownTrackGameRacerSlot field_0x215c[8];
     int field_0x291c;                         // network game (racesnd.cpp 0x004e5780)
@@ -327,14 +358,17 @@ public:
     int field_0x2d88;                          // selects a 30 (else 120) second limit (EventManager 0x0045eef0)
     unsigned char field_0x2d8c[0x2d94 - 0x2d8c];
     int field_0x2d94;                          // AI racer count (EventManager 0x0045f9a0)
-    unsigned char field_0x2d98[0x2da5 - 0x2d98];
+    int field_0x2d98;                          // cleared by NetProcs.cpp 0x004aef40
+    unsigned char field_0x2d9c[0x2da5 - 0x2d9c];
     unsigned char field_0x2da5;                // decremented when a player leaves (EventManager 0x0045fbd0)
     char field_0x2da6[0x20];                   // track name (length not established)
     unsigned char field_0x2dc6[0x2eb0 - 0x2dc6];
     float field_0x2eb0;
     unsigned char field_0x2eb4[0x2eb8 - 0x2eb4];
     int field_0x2eb8;                          // mode 4 ranks by +0x768 (else +0x764) (EventManager 0x0045e9d0)
-    unsigned char field_0x2ebc[0x3334 - 0x2ebc];
+    unsigned char field_0x2ebc[0x2f5c - 0x2ebc];
+    unsigned char field_0x2f5c[0x1ec];         // saved +0x2d70..+0x2f5c, restored when a replay is left (InGameProcs.cpp)
+    unsigned char field_0x3148[0x3334 - 0x3148];
     int field_0x3334;                          // saves a replay (EventManager 0x0045cdc0)
     DirectoryList* profileDirectory;
     int menuIsOpen;

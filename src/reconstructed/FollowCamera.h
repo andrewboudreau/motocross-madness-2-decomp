@@ -144,6 +144,7 @@ public:
                                const float* e);
 
 protected:
+    friend class VCRDlg;        // InGameProcs.cpp: ButCamera restores the saved state
     // Layout from the constructor (0x00462ee0) and destructor (0x00463350).
     float field_0x220;          // preset distance-like value (slots 63-67)
     float field_0x224;          // copy of field_0x220 (constructor)
