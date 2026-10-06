@@ -80,11 +80,20 @@ factors in the other order. An inline helper that takes the point by value
 and the edge points by pointer gives the other four edges' load order; a
 macro over plain floats loses it.
 
+Near miss: the placement search `0x00517340` (1509 bytes, to `0x00517925`;
+the block at `0x00517610` is part of it: it jumps back to `0x00517559` and
+returns with `ret 0x28`). The candidate is 1533 bytes and follows retail
+instruction for instruction, but VC6 here gives the candidate list a frame
+slot and assigns the path loop's registers differently. Candidates are
+0x10-byte records (Track.cpp line 889): a TrackPos and a next pointer. The
+fifth parameter is a work list of nodes, although RaceStatus.cpp's binding
+declares it `int`.
+
 Not yet attempted:
 - the loader `0x00515ed0` (2342 bytes);
-- the closest-position search `0x00516980` (its inner loop is the same as
-  `0x00516ca0`'s, so it is likely to hit the same blocker);
-- `0x00517340` and `0x00518230`.
+- the closest-position search `0x00516980` (786 bytes; its inner loop is the
+  same as `0x00516ca0`'s, so it is likely to hit the same blocker);
+- `0x00518230` (1033 bytes).
 
 ## Source shapes that mattered
 

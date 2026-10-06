@@ -41,54 +41,87 @@ holds the line being typed and four history entries.
 
 ## Status
 
-79 functions are exact under `vc6_o2_mt`, with every relocation bound. All
-of them are registered under `# TrackOverlay.cpp` in
-`tools/run_calibration.py`:
+89 functions are exact under `vc6_o2_mt`, with every relocation bound:
 
 - InstrumentOverlay: `0x00518720`..`0x00518cc0`, 7 functions.
 - The overlay rectangle constructors `0x00518d50` and `0x00518d60`.
-- NameOverlay: `0x00518d80`..`0x005190e0`, 7 functions.
-- StatsOverlay: `0x00519370`..`0x00519980`, 7 functions, plus the score
-  comparator `0x005199f0`.
+- NameOverlay: `0x00518d80`..`0x005190e0`, 8 functions, among them the
+  visibility test `0x00519000`.
+- StatsOverlay: `0x00519370`..`0x00519980`, 7 functions, the score
+  comparator `0x005199f0`, the view-mode redraw `0x005198a0` and the panels
+  `0x00519e10`, `0x00519ef0`, `0x0051a480`, `0x0051a560` and `0x0051aa40`.
 - DropTextOverlay: `0x0051ae80`..`0x0051b1f0`, 5 functions.
 - UnknownMessage and TextQueueOverlay: `0x0051b200`..`0x0051b670`, 11
   functions.
 - RadarOverlay: `0x0051b690`..`0x0051c460`, 11 functions.
 - The `$E` initializers and their stubs: `0x0051dba0`..`0x0051dcdc`, 8
   functions.
-- ChatOverlay: `0x0051cda0`..`0x0051e800`, 14 functions, among them the
-  constructor, the destructor, slots 10, 13 and 14, and the name-line
-  redraw.
-- UnknownChatInput: `0x0051ea50`..`0x0051eb10`, 6 functions.
+- ChatOverlay: `0x0051cda0`..`0x0051e800`, 16 functions, among them the
+  typed-key handler `0x0051da30` and the input/history redraw `0x0051de10`.
+- UnknownChatInput: `0x0051ea50`..`0x0051eb40`, 7 functions.
+
+Their calibration cases are under `# TrackOverlay.cpp` in
+`tools/run_calibration.py`.
 
 ### Near misses
 
 These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
 
-- `0x00519000` (NameOverlay visibility test, 119 bytes): the candidate is
-  118 bytes. VC6 swaps the eax/ecx choice for the camera and the world.
-- `0x005198a0` (StatsOverlay view-mode redraw): the switch and its jump
-  table match. Retail returns 0 through a shared `xor eax, eax`, which no
-  tried source shape reproduces.
-- `0x0051bb60` (RadarOverlay slot 23, the zoom keys, 89.69%): retail keeps
-  a dead `field_0x178` test. It schedules the fld/fmul/fidiv sequence before
+- `0x0051e910` (redraws one name tag or all, 308 bytes): exact once
+  `Overlay::UnknownFunction4b6880` takes an `unsigned short` colour. Retail
+  builds the 4444 grey in 16-bit registers and pushes it without
+  zero-extension. 0x004b6880 stays exact with that parameter type, but its
+  mangled name, and so its calibration case, changes.
+- `0x0051e3f0` (draws one name tag, 974 bytes, 964 match): the frame matches;
+  in the racer-tag branch retail picks eax/ecx/edx for the racer, the buffer
+  and the game pointer, VC6 here edx/eax/ecx.
+- `0x00519a20` (standings, 1002 bytes; candidate 1004): retail keeps the row
+  comparison index in edx and `this` in its spill slot. VC6 here does that
+  only when the index is read after the loop, which adds a redundant compare.
+- `0x005194b0` (StatsOverlay loader, 976 bytes; candidate 956): retail
+  places the 0x3c-byte LOGFONT below the two rectangles in the frame; VC6
+  here orders them the other way (it matches the retail order for a LOGFONT
+  of 0x38 bytes or less).
+- `0x0051d730` (racer name tags, 586 bytes; candidate 587): the zero and the
+  incremented count swap ebx and ebp.
+- `0x0051c4f0` (line/circle intersection, 560 bytes; candidate 550): frame
+  slot assignment of the float temporaries differs.
+- `0x0051bb60` (RadarOverlay slot 23, the zoom keys, 89.69%): retail keeps a
+  dead `field_0x178` test. It schedules the fld/fmul/fidiv sequence before
   that test; VC6 schedules it after.
 
 ### Not reconstructed
 
 - **Inline-asm float-to-int.** `0x00518f30`, `0x0051af00` and `0x0051b070`
   use a `fistp` helper that the project rules exclude.
-- **Shared tiny address.** `0x0051eae0` is a 3-byte `mov eax, ecx; ret`.
-- **Large bodies, not attempted:**
-  - StatsOverlay: `0x005194b0`, `0x00519a20`, `0x00519e10`, `0x00519ef0`,
-    `0x0051a480`, `0x0051a560`, `0x0051aa40`.
-  - RadarOverlay: `0x0051bed0`, `0x0051c4f0`, `0x0051c720`, `0x0051cb20`.
-  - ChatOverlay: `0x0051cf80`, `0x0051d730`, `0x0051da30`, `0x0051de10`,
-    `0x0051e3f0`, `0x0051e910`.
-  - UnknownChatInput: `0x0051eb40`.
+- **Shared tiny address.** `0x0051eae0` is a 3-byte `mov eax, ecx; ret`
+  (UnknownChatInput's line accessor; `0x0051da30` calls it).
+- **Not attempted or abandoned:**
+  - RadarOverlay: `0x0051bed0` (1160 bytes), `0x0051c720` (1016 bytes, a
+    track graph walk), `0x0051cb20` (640 bytes; the gate offsets are an
+    inlined cross product with (0, 1, 0), whose temporaries no tried
+    Vector3 form reproduces).
+  - ChatOverlay: the loader `0x0051cf80` (1953 bytes).
 
 ## Codegen notes
 
+- Every GetDC/ReleaseDC redraw returns 0 through one block: retail matches
+  `if (GetDC(...) != 0) goto fail; ... if (ReleaseDC(dc) != 0) { fail: return 0; }`.
+  Early `return 0` statements emit a separate epilogue. The same `goto fail`
+  shape gives 0x005198a0's shared `xor eax, eax`.
+- The row comparisons of the StatsOverlay panels are `for (...) if
+  (strcmp(...) != 0) goto draw; return 1; draw: ...`.
+- Read TrackGame fields through `g_UnknownGlobal56e26c` each time. A cached
+  game or mode local changes branch threading (0x0051a560) and register
+  choice (0x0051aa40).
+- Block scope changes the frame: 0x0051aa40 needs `iterator` and `own`
+  declared inside the `if` that uses them. The near miss 0x0051e3f0 gets
+  retail's frame only with one SIZE at function scope and one in the other
+  branch.
+- 0x00519e10 needs the limit in a float local:
+  `float limit = ...field_0x140 * 60.0f; f(limit - (a * 60.0f + b));`.
+- `x / 180.0f` compiles to a multiply by the reciprocal constant
+  (0x0055076c).
 - Zeroing an array with a for-loop gives the retail `rep stosd` with
   `lea edi` first. `memset` moves the `lea` after `mov ecx` and `xor eax`.
 - The clamp `int length = n > 0x103 ? 0x103 : n;` matches; an if-assign does

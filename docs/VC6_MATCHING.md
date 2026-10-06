@@ -233,6 +233,10 @@ Krusty3DObjects.cpp (RunwayLights, VisualCue and the number/bonus object
 managers) matches strictly in 36 functions; see
 [KRUSTY3DOBJECTS](KRUSTY3DOBJECTS.md).
 
+TrackOverlay.cpp gains 10 more strict functions (the StatsOverlay panels,
+the chat input and its history) and TrackRecord.cpp gains the
+TrackRecordDlg procedure; see [TrackOverlay](TRACKOVERLAY.md).
+
 The legacy function manifest and queue consume clang reports, not the VC6 profile
 matrix. Use actual VC6 reports for current matching status; queue validation
 labels do not yet reflect these results.

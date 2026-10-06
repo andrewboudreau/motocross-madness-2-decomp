@@ -6,12 +6,17 @@
 
 // The message TrackRecordDlg's slot 29 (0x0051f600) receives: its +0x08 is
 // the type (1..6), and +0x0c the dialog whose controls the list helpers
-// fill.
+// fill. The layout matches UnknownDialogEvent (DialogProc.h).
 struct UnknownTrackRecordEvent {
     int field_0x00;
-    int field_0x04;
+    const char* field_0x04;                   // control name
     int field_0x08;
     UIDialog* field_0x0c;
+    void* field_0x10;
+    UnknownGameUiControl* field_0x14;         // the control ("LstTrack")
+    int field_0x18;
+    int field_0x1c;
+    int field_0x20;                           // set to 1 once handled
 };
 
 // An 8-byte list row (0x0051ffe0, TrackRecord.cpp line 535): a strdup'd
@@ -100,6 +105,7 @@ public:
 // Names are provisional (docs/TRACKRECORD.md).
 class TrackRecordDlg : public UIDialog {
 public:
+    void UnknownVirtualSlot29(UnknownTrackRecordEvent* event);             // 0x0051f600
     void UnknownFunction51fc40(int series);                                 // 0x0051fc40: labels the tabs
     void UnknownFunction51fe80(UnknownTrackRecordEvent* event, int series); // 0x0051fe80: shows a tab
     void UnknownFunction51ff40();

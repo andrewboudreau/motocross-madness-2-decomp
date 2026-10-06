@@ -36,6 +36,17 @@
 // operands before p; the inline helper with a by-value TrackVec3 and
 // pointers to the edge points fixes that.
 //
+// Track::UnknownFunction517340 (0x00517340, 1509 bytes; the candidate is
+// 1533): the walk, the strip test, the candidate list and the acceptance
+// tests follow retail instruction for instruction, but VC6 here gives the
+// candidate list a frame slot (0x24 bytes of locals against retail's 0x20)
+// and assigns the path loop's pointer, node and segment to edi/esi/ebx
+// with start.t in ebp, where retail uses ebx/esi/edi and reloads start.t
+// from the frame. A do-while walk, separate or shared loop variables, an
+// aggregate TrackPos, function-scope distances and an inline accept helper
+// do not change it. The fifth parameter is the work list (RaceStatus.cpp's
+// binding declares it int).
+//
 // TrackRecordDlg::UnknownFunction51ffe0 (TrackRecord.cpp, 0x0051ffe0, 932
 // bytes): the candidate is 964 bytes. The frame (0x350, so one buffer is
 // 260 bytes), stack slots, calls and the body of the loop agree. Retail
@@ -356,4 +367,128 @@ void TrackRecordDlg::UnknownFunction51ffe0(UnknownGameUiControl* list, Directory
     } else {
         list->UnknownFunction477bb0(1);
     }
+}
+
+// 0x00517340
+int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out)
+{
+    float best;
+    float t;
+    TrackListItem* list = 0;
+    int found = 0;
+    TrackCandidate* candidates = 0;
+    TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 843);
+    if (!item)
+        return 0;
+    if (out) {
+        *out = from;
+        best = -range;
+    }
+    item->field_0x04 = field_0x00;
+    list = item;
+    do {
+        TrackNode* node = list->field_0x04;
+        if (node->field_0x00 & 4) {
+            node->field_0x00 &= ~4;
+            item = list;
+            list = list->field_0x0c;
+            operator delete(item, __FILE__, 865);
+        } else {
+            node->field_0x00 |= 4;
+            TrackSegment* next;
+            for (TrackSegment* segment = list->field_0x04->field_0x08; segment && (next = segment->field_0x2c) != 0;
+                 segment = segment->field_0x2c) {
+                if (UnknownFunction516ef0(*(TrackVec3*)&p, segment, next)) {
+                    float ex = next->field_0x00 - segment->field_0x00;
+                    float ez = next->field_0x08 - segment->field_0x08;
+                    if (ex == 0.0f && ez == 0.0f) {
+                        t = 0.0f;
+                    } else {
+                        t = ((p.x - segment->field_0x00) * ex + (p.z - segment->field_0x08) * ez) / (ez * ez + ex * ex);
+                        if (t > 1.0f)
+                            t = 1.0f;
+                        else if (t < 0.0f)
+                            t = 0.0f;
+                    }
+                    TrackCandidate* candidate = (TrackCandidate*)DebugCalloc(1, sizeof(TrackCandidate), __FILE__, 889);
+                    if (!candidate)
+                        return 0;
+                    candidate->next = candidates;
+                    candidate->pos.node = list->field_0x04;
+                    candidate->pos.segment = segment;
+                    candidate->pos.t = t;
+                    candidates = candidate;
+                }
+            }
+            int count = list->field_0x04->field_0x10;
+            TrackNode** links = list->field_0x04->field_0x14;
+            for (int i = 0; i < count; i++) {
+                if (!(links[i]->field_0x00 & 4)) {
+                    item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 907);
+                    if (!item) {
+                        UnknownFunction517930(&list, 0);
+                        return 0;
+                    }
+                    item->field_0x04 = links[i];
+                    item->field_0x0c = list;
+                    list = item;
+                }
+            }
+        }
+    } while (list);
+    while (candidates) {
+        if (distance < 0.0f || range < 0.0f) {
+            if (!found && out)
+                *out = candidates->pos;
+            found = 1;
+        }
+        if (!found || out) {
+            float ahead = UnknownFunction517da0(from, candidates->pos);
+            float behind = UnknownFunction517da0(candidates->pos, from);
+            if (ahead >= 0.0f && ahead <= distance || behind >= 0.0f && behind <= range) {
+                found = 1;
+                if (out && (ahead > best || -behind > best)) {
+                    *out = candidates->pos;
+                    if (ahead > best)
+                        best = ahead;
+                    else
+                        best = -behind;
+                }
+            }
+            for (TrackListItem* step = (TrackListItem*)path; !found && step; step = step->field_0x0c) {
+                TrackPos start;
+                start.node = step->field_0x04;
+                start.segment = start.node->field_0x08;
+                start.t = 0.0f;
+                ahead = UnknownFunction517da0(start, candidates->pos);
+                behind = UnknownFunction517da0(candidates->pos, start);
+                if (UnknownFunction517310(candidates->pos.segment, step->field_0x04)
+                    && (!UnknownFunction517310(from.segment, step->field_0x04)
+                        || ahead >= 0.0f && behind >= 0.0f && ahead < behind)) {
+                    found = 1;
+                    if (out && (ahead > best || -behind > best)) {
+                        *out = candidates->pos;
+                        if (ahead > best)
+                            best = ahead;
+                        else
+                            best = -behind;
+                    }
+                }
+                if (ahead >= 0.0f && ahead <= distance || behind >= 0.0f && behind <= range) {
+                    found = 1;
+                    if (out && (ahead > best || -behind > best)) {
+                        *out = candidates->pos;
+                        if (ahead > best)
+                            best = ahead;
+                        else
+                            best = -behind;
+                    }
+                }
+            }
+        }
+        TrackCandidate* done = candidates;
+        candidates = candidates->next;
+        operator delete(done, __FILE__, 994);
+    }
+    return found;
 }

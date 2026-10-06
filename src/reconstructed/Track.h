@@ -66,6 +66,13 @@ struct TrackListItem {
 };
 
 
+// A track position found by 0x00517340 (calloc(1, 0x10), Track.cpp line 889),
+// kept in a singly linked list.
+struct TrackCandidate {
+    TrackPos pos;
+    TrackCandidate* next;
+};
+
 class UnknownStream;
 
 class Track {
@@ -78,9 +85,12 @@ public:
     int UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
     int UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegment* next);
     int UnknownFunction517310(TrackSegment* segment, TrackNode* node);
-    // 0x00517340 (RaceStatus.cpp): follows `p` from `from` within the two
-    // distances; the result lands in `out`.
-    int UnknownFunction517340(Vector3 p, TrackPos from, float distance, float range, int flags, TrackPos* out);
+    // 0x00517340 (RaceStatus.cpp): places `p` on the track near `from`. Every
+    // segment whose strip contains p is a candidate; one within `distance`
+    // ahead of `from` or `range` behind it is accepted (the farthest ahead
+    // lands in `out`), and otherwise one on the nodes of the work list
+    // `path` (passed as an int). Returns whether one was accepted.
+    int UnknownFunction517340(Vector3 p, TrackPos from, float distance, float range, int path, TrackPos* out);
     int UnknownFunction517930(TrackListItem** list, int all);
     int UnknownFunction5179a0(TrackPos a, TrackPos b);
     int UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, float* distance);

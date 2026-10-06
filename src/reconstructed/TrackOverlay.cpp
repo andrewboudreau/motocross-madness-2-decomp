@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "TrackOverlay.h"
@@ -8,9 +9,12 @@
 #include "Camera.h"
 #include "ControlInterface.h"
 #include "FollowCamera.h"
+#include "KeyboardDevice.h"
 #include "KrustyUI.h"
 #include "PCRenderTarget.h"
+#include "PCTextureMap.h"
 #include "TrackGame.h"
+#include "Track.h"
 
 // GDI32 and USER32 imports (0x00550054..0x00550088, 0x005502e8).
 extern "C" __declspec(dllimport) void* __stdcall CreateFontA(int height, int width, int escapement,
@@ -25,11 +29,31 @@ extern "C" __declspec(dllimport) void* __stdcall CreateFontA(int height, int wid
                                                              unsigned long pitchAndFamily,
                                                              const char* face);
 extern "C" __declspec(dllimport) int __stdcall DeleteObject(void* object);
+// A GDI LOGFONTA (0x3c bytes).
+struct UnknownLogFont {
+    long lfHeight;
+    long lfWidth;
+    long lfEscapement;
+    long lfOrientation;
+    long lfWeight;
+    unsigned char lfItalic;
+    unsigned char lfUnderline;
+    unsigned char lfStrikeOut;
+    unsigned char lfCharSet;
+    unsigned char lfOutPrecision;
+    unsigned char lfClipPrecision;
+    unsigned char lfQuality;
+    unsigned char lfPitchAndFamily;
+    char lfFaceName[32];
+};
+extern "C" __declspec(dllimport) void* __stdcall CreateFontIndirectA(const UnknownLogFont* font);
 extern "C" __declspec(dllimport) void* __stdcall SelectObject(void* dc, void* object);
 extern "C" __declspec(dllimport) unsigned long __stdcall SetBkColor(void* dc, unsigned long color);
 extern "C" __declspec(dllimport) int __stdcall SetBkMode(void* dc, int mode);
 extern "C" __declspec(dllimport) unsigned long __stdcall SetTextColor(void* dc, unsigned long color);
 extern "C" __declspec(dllimport) int __stdcall TextOutA(void* dc, int x, int y, const char* text, int length);
+extern "C" __declspec(dllimport) int __stdcall GetTextExtentPoint32A(void* dc, const char* text, int length,
+                                                                     UnknownTextExtent* size);
 extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* text, int length,
                                                          UnknownOverlayRect* rect, unsigned int format);
 
@@ -39,6 +63,9 @@ static int s_UnknownGlobal57513c = 2;
 // 0x00575140, 0x0068a448: the previous state flag and the decaying value.
 static int s_UnknownGlobal575140 = 1;
 static float s_UnknownGlobal68a448;
+
+// 0x0068a440: never set; when set, StatsOverlay shows the end timer.
+static int s_UnknownGlobal68a440;
 
 // 0x0068a444: when set, ChatOverlay redraws all of its lines.
 static int s_UnknownGlobal68a444;
@@ -248,6 +275,21 @@ NameOverlay* NameOverlay::UnknownFunction518e30(RenderTarget* target, TextureMap
     return this;
 }
 
+// 0x00519000: every fourth frame, tests whether `point` can be seen from the
+// camera (no terrain in between).
+int NameOverlay::UnknownFunction519000(const Vector3* point)
+{
+    Vector3 hit;
+    if (field_0x134 == field_0x130) {
+        int hidden = field_0x12c->field_0x4c->UnknownFunction506e90(&((RenderTarget*)field_0x18)->field_0x08->field_0x170, point, &hit, 0, 0, 0);
+        field_0x138 = !hidden;
+    }
+    field_0x134++;
+    if (field_0x134 > 3)
+        field_0x134 = 0;
+    return field_0x138;
+}
+
 // 0x00519080
 void NameOverlay::UnknownFunction519080(Vector3 point)
 {
@@ -340,8 +382,8 @@ StatsOverlay::StatsOverlay(int flags) : Overlay(flags, 1)
     field_0x30 = 0;
     memset(field_0x5b0, 0, sizeof(field_0x5b0));
     memset(field_0x1b0, 0, sizeof(field_0x1b0));
-    field_0x9b4 = 0;
-    field_0x9b0 = 0;
+    field_0x9b0.cy = 0;
+    field_0x9b0.cx = 0;
 }
 
 // 0x00519420
@@ -360,8 +402,36 @@ StatsOverlay::~StatsOverlay()
 // 0x00519880
 int StatsOverlay::UnknownFunction519880(int value)
 {
-    field_0x124 = value;
+    field_0x124 = (UnknownStatsSource*)value;
     return 1;
+}
+
+// 0x005198a0: redraws the panel for the view mode; 0 when that failed.
+int StatsOverlay::UnknownFunction5198a0()
+{
+    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
+    case 0:
+        if (!UnknownFunction519a20())
+            goto fail;
+        break;
+    case 1:
+    case 5:
+        if (!UnknownFunction51a560())
+            goto fail;
+        break;
+    case 2:
+    case 3:
+        if (!UnknownFunction519ef0())
+            goto fail;
+        break;
+    case 4:
+        if (!UnknownFunction51aa40())
+            goto fail;
+        break;
+    }
+    return 1;
+fail:
+    return 0;
 }
 
 // 0x00519900
@@ -400,6 +470,317 @@ int StatsOverlay::UnknownVirtualSlot14()
             break;
         }
     }
+    return 1;
+}
+
+// 0x00519e10: the time left, in the first text row.
+void StatsOverlay::UnknownFunction519e10()
+{
+    char text[0x80];
+    UnknownOverlayRect rect;
+    int count;
+    TrackGame* game = g_UnknownGlobal56e26c;
+    if (game->mode.field_0x27f8.field_0x00 != 0 && game->mode.field_0x27f8.field_0x00 != 4) {
+        TrackGameViewOwner* owner = game->field_0x55c;
+        float limit = game->mode.field_0x27f8.field_0x140 * 60.0f;
+        UnknownFunction518640(text, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        rect = field_0x130[0];
+        rect.left += field_0x9b0.cx + 4;
+        sprintf(field_0x5b0[0], "%s", text);
+        field_0x38->UnknownFunction50ade0("arialsm");
+        void* laidOut = field_0x38->UnknownFunction50ba00(&rect, field_0x5b0[0], 0xffffff, &count);
+        field_0x38->UnknownFunction50bd30(Target(), laidOut, count);
+    }
+}
+
+// 0x00519ef0: the race panel of the other view modes; in mode 4 the lap
+// times come from the view's own racer.
+int StatsOverlay::UnknownFunction519ef0()
+{
+    void* dc;
+    int i;
+    int iterator;
+    void* font;
+    char label[0x80];
+    char time[0x80];
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x835, label, 0x80);
+    int finished = 0;
+    iterator = 0;
+    UnknownEventRacer* racer;
+    while ((racer = field_0x124->UnknownFunction4204e0(&iterator)) != 0) {
+        if (racer->field_0x4a0)
+            finished++;
+    }
+    int total;
+    if (g_UnknownGlobal56e26c->field_0x18 == 1) {
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4)
+            total = 1;
+        else
+            total = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 + 1;
+    } else {
+        total = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
+    }
+    sprintf(field_0x5b0[0], "%s %d / %d", label, field_0x128->field_0x3b4->field_0x784, total - finished);
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x836, label, 0x80);
+    int lap = field_0x128->field_0x3b4->field_0x7a0 + 1;
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
+        if (lap > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20)
+            lap = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20;
+    }
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4)
+        sprintf(field_0x5b0[1], "%s %d / %d", label, lap, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20);
+    else
+        sprintf(field_0x5b0[1], "%s %d", label, lap);
+    if (s_UnknownGlobal68a440) {
+        UnknownFunction518690(time, g_UnknownGlobal56e26c->eventManager->field_0x3c0);
+        sprintf(field_0x5b0[2], "%s %s %d", "End Timer", time, field_0x128->field_0x3b4->field_0x7a4);
+    } else {
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x837, label, 0x80);
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4 && field_0x128->field_0x3b4->field_0x736)
+            UnknownFunction518690(time, field_0x124->field_0x038->field_0x750);
+        else
+            UnknownFunction518690(time, field_0x128->field_0x3b4->field_0x74c);
+        sprintf(field_0x5b0[2], "%s %s", label, time);
+    }
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x838, label, 0x80);
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4)
+        UnknownFunction518690(time, field_0x124->field_0x038->field_0x750);
+    else
+        UnknownFunction518690(time, field_0x128->field_0x3b4->field_0x750);
+    sprintf(field_0x5b0[3], "%s %s", label, time);
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x839, label, 0x80);
+    UnknownFunction518690(time, field_0x128->field_0x3b4->field_0x770);
+    sprintf(field_0x5b0[4], "%s %s", label, time);
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x13b8, label, 0x80);
+    if (g_UnknownGlobal56e26c->field_0x3428)
+        UnknownFunction518690(time, field_0x124->field_0x1b8);
+    else
+        UnknownFunction518690(time, field_0x128->field_0x3b4->field_0x754);
+    sprintf(field_0x5b0[5], "%s:", label);
+    for (i = 0; i <= 5; i++) {
+        if (strcmp(field_0x5b0[i], field_0x1b0[i]) != 0)
+            goto draw;
+    }
+    return 1;
+draw:
+    UnknownFunction4b6710(&field_0xf8);
+    PCTextureMap* texture = (PCTextureMap*)field_0x34;
+    if (texture->field_0x70->UnknownMethod17(&dc) != 0)
+        goto fail;
+    SetBkColor(dc, 1);
+    SetBkMode(dc, 1);
+    SetTextColor(dc, 0xffffff);
+    font = SelectObject(dc, field_0x11c);
+    for (i = 0; i <= 5; i++) {
+        if (i == 5)
+            GetTextExtentPoint32A(dc, field_0x5b0[5], strlen(field_0x5b0[5]), &field_0x9b0);
+        if (i >= 2)
+            SelectObject(dc, field_0x120);
+        DrawTextA(dc, field_0x5b0[i], strlen(field_0x5b0[i]), &field_0x130[i], 0x120);
+        strcpy(field_0x1b0[i], field_0x5b0[i]);
+    }
+    SelectObject(dc, font);
+    if (texture->field_0x70->UnknownMethod26(dc) != 0) {
+fail:
+        return 0;
+    }
+    UnknownFunction4b6880(0, 0x80, 0xffff);
+    field_0x2c->UnknownVirtualSlot9(0, -1);
+    return 1;
+}
+
+// 0x0051a480: the lap time, in the sixth text row.
+void StatsOverlay::UnknownFunction51a480()
+{
+    char text[0x80];
+    UnknownOverlayRect rect;
+    int count;
+    if (g_UnknownGlobal56e26c->field_0x3428)
+        UnknownFunction518690(text, field_0x124->field_0x1b8);
+    else
+        UnknownFunction518690(text, field_0x128->field_0x3b4->field_0x754);
+    rect = field_0x130[5];
+    rect.left += field_0x9b0.cx + 4;
+    sprintf(field_0x5b0[5], "%s", text);
+    field_0x38->UnknownFunction50ade0("arialsm");
+    void* laidOut = field_0x38->UnknownFunction50ba00(&rect, field_0x5b0[5], 0xffffff, &count);
+    field_0x38->UnknownFunction50bd30(Target(), laidOut, count);
+}
+
+// 0x0051a560: the race panel: position, lap, lap times and gate.
+int StatsOverlay::UnknownFunction51a560()
+{
+    void* dc;
+    int i;
+    int iterator;
+    void* font;
+    char label[0x80];
+    char time[0x80];
+    int finished = 0;
+    iterator = 0;
+    UnknownEventRacer* racer;
+    while ((racer = field_0x124->UnknownFunction4204e0(&iterator)) != 0) {
+        if (racer->field_0x4a0)
+            finished++;
+    }
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x835, label, 0x80);
+    int total;
+    if (g_UnknownGlobal56e26c->field_0x18 == 1) {
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4)
+            total = 1;
+        else
+            total = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 + 1;
+    } else {
+        total = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
+    }
+    sprintf(field_0x5b0[0], "%s %d / %d", label, field_0x128->field_0x3b4->field_0x784, total - finished);
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x836, label, 0x80);
+    int lap = field_0x128->field_0x3b4->field_0x7a0 + 1;
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
+        if (lap > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20)
+            lap = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20;
+    }
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4)
+        sprintf(field_0x5b0[1], "%s %d / %d", label, lap, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20);
+    else
+        sprintf(field_0x5b0[1], "%s %d", label, lap);
+    if (s_UnknownGlobal68a440) {
+        UnknownFunction518690(time, g_UnknownGlobal56e26c->eventManager->field_0x3c0);
+        sprintf(field_0x5b0[2], "%s %s %d", "End Timer", time, field_0x128->field_0x3b4->field_0x7a4);
+    } else {
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x837, label, 0x80);
+        UnknownFunction518690(time, field_0x128->field_0x3b4->field_0x74c);
+        sprintf(field_0x5b0[2], "%s %s", label, time);
+    }
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x838, label, 0x80);
+    UnknownFunction518690(time, field_0x128->field_0x3b4->field_0x750);
+    sprintf(field_0x5b0[3], "%s %s", label, time);
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x839, label, 0x80);
+    UnknownFunction518690(time, field_0x128->field_0x3b4->field_0x770);
+    sprintf(field_0x5b0[4], "%s %s", label, time);
+    g_UnknownGlobal56e26c->UnknownFunction521970(0x13ad, label, 0x80);
+    sprintf(field_0x5b0[5], "%s %d / %d", label, field_0x128->field_0x3b4->field_0x7b8 + 1,
+            g_UnknownGlobal56e26c->field_0x560->field_0xac);
+    for (i = 0; i <= 5; i++) {
+        if (strcmp(field_0x5b0[i], field_0x1b0[i]) != 0)
+            goto draw;
+    }
+    return 1;
+draw:
+    UnknownFunction4b6710(&field_0xf8);
+    PCTextureMap* texture = (PCTextureMap*)field_0x34;
+    if (texture->field_0x70->UnknownMethod17(&dc) != 0)
+        goto fail;
+    SetBkColor(dc, 1);
+    SetBkMode(dc, 1);
+    SetTextColor(dc, 0xffffff);
+    font = SelectObject(dc, field_0x11c);
+    for (i = 0; i <= 5; i++) {
+        if (i >= 2)
+            SelectObject(dc, field_0x120);
+        DrawTextA(dc, field_0x5b0[i], strlen(field_0x5b0[i]), &field_0x130[i], 0x120);
+        strcpy(field_0x1b0[i], field_0x5b0[i]);
+    }
+    SelectObject(dc, font);
+    if (texture->field_0x70->UnknownMethod26(dc) != 0) {
+fail:
+        return 0;
+    }
+    UnknownFunction4b6880(0, 0x80, 0xffff);
+    field_0x2c->UnknownVirtualSlot9(0, -1);
+    return 1;
+}
+
+// 0x0051aa40: the tag standings (view mode 4): the time left, the racers
+// by score with the player's own row last, and in row 5 who holds the tag.
+int StatsOverlay::UnknownFunction51aa40()
+{
+    UnknownEventScore scores[11];
+    char tag[0x40];
+    char time[0x80];
+    char label[0x80];
+    void* dc;
+    void* font;
+    int i;
+    int count = 0;
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0) {
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x943, label, 0x80);
+        TrackGameViewOwner* owner = g_UnknownGlobal56e26c->field_0x568;
+        float limit = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140 * 60.0f;
+        UnknownFunction518640(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
+        sprintf(field_0x5b0[0], "%s %s", label, time);
+    }
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x148) {
+        int iterator;
+        int own;
+        UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->field_0x568->field_0x34;
+        iterator = 0;
+        UnknownEventRacer* racer;
+        while ((racer = view->UnknownFunction4204e0(&iterator)) != 0) {
+            scores[count].value = racer->field_0x768;
+            scores[count].racer = racer;
+            count++;
+        }
+        qsort(scores, count, sizeof(UnknownEventScore), UnknownFunction5199f0);
+        for (i = 0; i < count; i++) {
+            if (scores[i].racer == view->field_0x38) {
+                own = i;
+                break;
+            }
+        }
+        int first = 1;
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 0)
+            first = 0;
+        else
+            count++;
+        if (count >= 5)
+            count = 5;
+        int row;
+        int shown = 0;
+        for (row = first; row < count - 1; row++) {
+            sprintf(field_0x5b0[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
+                    scores[shown].racer->field_0x768);
+            shown++;
+        }
+        if (own >= shown)
+            sprintf(field_0x5b0[row], "%d) %s : %.0f", own + 1, scores[own].racer->field_0x5e0,
+                    scores[own].racer->field_0x768);
+        else
+            sprintf(field_0x5b0[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
+                    scores[shown].racer->field_0x768);
+    }
+    if (g_UnknownGlobal56e26c->field_0x568->field_0xa8) {
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x14b8, tag, 0x40);
+        sprintf(field_0x5b0[5], "  %s %s", g_UnknownGlobal56e26c->field_0x568->field_0xa8->field_0x5e0, tag);
+    } else if (g_UnknownGlobal56e26c->field_0x568->field_0xdc) {
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x14b7, tag, 0x40);
+        sprintf(field_0x5b0[5], "  %s", tag);
+    }
+    for (i = 0; i <= 5; i++) {
+        if (strcmp(field_0x5b0[i], field_0x1b0[i]) != 0)
+            goto draw;
+    }
+    return 1;
+draw:
+    UnknownFunction4b6710(&field_0xf8);
+    PCTextureMap* texture = (PCTextureMap*)field_0x34;
+    if (texture->field_0x70->UnknownMethod17(&dc) != 0)
+        goto fail;
+    SetBkColor(dc, 1);
+    SetBkMode(dc, 1);
+    SetTextColor(dc, 0xffffff);
+    font = SelectObject(dc, field_0x11c);
+    for (i = 0; i < 6; i++) {
+        DrawTextA(dc, field_0x5b0[i], strlen(field_0x5b0[i]), &field_0x130[i], 0x120);
+        strcpy(field_0x1b0[i], field_0x5b0[i]);
+    }
+    SelectObject(dc, font);
+    if (texture->field_0x70->UnknownMethod26(dc) != 0) {
+fail:
+        return 0;
+    }
+    UnknownFunction4b6880(0, 0x80, 0xffff);
+    field_0x2c->UnknownVirtualSlot9(0, -1);
     return 1;
 }
 
@@ -897,6 +1278,42 @@ void ChatOverlay::UnknownFunction51d9c0(float value, const char* name)
     field_0x1d4[length] = '\0';
 }
 
+// 0x0051da30
+int ChatOverlay::UnknownFunction51da30(int key, int* result)
+{
+    UnknownChatMessage message;
+    if (field_0x138) {
+        *result = 0;
+        if (key == 0xd || key == 0xa) {
+            int n = strlen(field_0x13c->UnknownFunction51eae0());
+            int length = n > 0x49 ? 0x49 : n;
+            strncpy(message.field_0x04, field_0x13c->UnknownFunction51eae0(), length);
+            message.field_0x04[length] = '\0';
+            if (strlen(message.field_0x04)) {
+                g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(
+                    0x85, &message, 0x4e, g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
+                UnknownFunction51dd70(g_UnknownGlobal56e26c->mode.field_0x00, (int)message.field_0x04, 0);
+            }
+            field_0x13c->UnknownFunction51ead0();
+            field_0x3dc = 0;
+            return 1;
+        }
+        if (key == 8) {
+            field_0x13c->UnknownFunction51eab0();
+            return 1;
+        }
+        if (key == 0x1b) {
+            *result = 1;
+            return 1;
+        }
+        if (field_0x3dc && !g_UnknownGlobal56e26c->field_0x14->keyboard->UnknownFunction48a240(0xc) && key) {
+            field_0x13c->UnknownFunction51ea80(key);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 // 0x0051dce0
 int ChatOverlay::UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result)
 {
@@ -936,7 +1353,7 @@ void ChatOverlay::UnknownFunction51dd70(const char* name, int a2, int a3)
     } else {
         strncpy(text, name, 10);
     }
-    field_0x13c->UnknownFunction51eb40(text, a2, a3);
+    field_0x13c->UnknownFunction51eb40(text, (const char*)a2, a3);
 }
 
 // 0x0051e200
@@ -995,6 +1412,80 @@ int ChatOverlay::UnknownVirtualSlot14()
     return 1;
 }
 
+// 0x0051de10
+int ChatOverlay::UnknownFunction51de10()
+{
+    void* dc;
+    int lineHeight;
+    int value;
+    void* font;
+    int rows;
+    UnknownOverlayRect rect;
+    char text[0x80];
+    UnknownFunction4b6710(&field_0xf8);
+    PCTextureMap* texture = (PCTextureMap*)field_0x34;
+    if (texture->field_0x70->UnknownMethod17(&dc) != 0)
+        goto fail;
+    SetBkColor(dc, 1);
+    SetBkMode(dc, 1);
+    SetTextColor(dc, 0xffffff);
+    font = SelectObject(dc, field_0x120);
+    strcpy(text, ">");
+    strcat(text, field_0x13c->UnknownFunction51eaf0());
+    strcat(text, "_");
+    rect.left = 1;
+    if (field_0x134) {
+        rect.right = 0xff;
+        rect.top = 7;
+        rect.bottom = 0x15;
+        lineHeight = 0xe;
+        rows = 0x3e;
+    } else {
+        rect.right = 0x7f;
+        rect.top = 7;
+        rect.bottom = 0xe;
+        lineHeight = 7;
+        rows = 0x1f;
+    }
+    DrawTextA(dc, text, strlen(text), &rect, 0x124);
+    int i;
+    for (i = 0; i <= field_0x13c->field_0x1c0; i++) {
+        int n = strlen(field_0x13c->UnknownFunction51eb10(i, &value));
+        int length = n > 0x7f ? 0x7f : n;
+        strncpy(text, field_0x13c->UnknownFunction51eb10(i, &value), length);
+        rect.top = (i + 1) * lineHeight + 7;
+        rect.bottom = rect.top + lineHeight;
+        text[length] = '\0';
+        if (value == 0)
+            DrawTextA(dc, text, strlen(text), &rect, 0x124);
+    }
+    SelectObject(dc, font);
+    if (texture->field_0x70->UnknownMethod26(dc) != 0)
+        goto fail;
+    UnknownFunction4b6880(0, rows, 0xfff0);
+    if (texture->field_0x70->UnknownMethod17(&dc) != 0)
+        goto fail;
+    SetBkColor(dc, 1);
+    SetBkMode(dc, 1);
+    SetTextColor(dc, 0xffffff);
+    font = SelectObject(dc, field_0x120);
+    for (i = 0; i <= field_0x13c->field_0x1c0; i++) {
+        strcpy(text, field_0x13c->UnknownFunction51eb10(i, &value));
+        rect.top = (i + 1) * lineHeight + 7;
+        rect.bottom = rect.top + lineHeight;
+        if (value != 0)
+            DrawTextA(dc, text, strlen(text), &rect, 0x124);
+    }
+    SelectObject(dc, font);
+    if (texture->field_0x70->UnknownMethod26(dc) != 0) {
+fail:
+        return 0;
+    }
+    UnknownFunction4b6880(0, rows, 0xf0ff);
+    field_0x2c->UnknownVirtualSlot9(0, -1);
+    return 1;
+}
+
 // 0x0051e7c0
 void ChatOverlay::UnknownFunction51e7c0()
 {
@@ -1021,6 +1512,54 @@ void ChatOverlay::UnknownFunction51e800()
         field_0x168 = 0;
         field_0x2d8[field_0x198]->field_0x124 = right - field_0x30c[field_0x198].left;
         UnknownFunction51e910(field_0x198);
+    }
+}
+
+// 0x0051eb40
+void UnknownChatInput::UnknownFunction51eb40(const char* name, const char* text, int value)
+{
+    char separator[8];
+    int nameLength = strlen(name);
+    int textLength = strlen(text);
+    strcpy(separator, ": ");
+    int separatorLength = strlen(separator);
+    if (field_0x1c0 < 3) {
+        strcpy(field_0x04c[field_0x1c0].field_0x04, name);
+        strcat(field_0x04c[field_0x1c0].field_0x04, separator);
+        strncat(field_0x04c[field_0x1c0].field_0x04, text, 0x31);
+        field_0x04c[field_0x1c0].field_0x04[0x31] = '\0';
+        field_0x04c[field_0x1c0].field_0x00 = value;
+        field_0x1c0++;
+    } else {
+        for (int i = 0; i < 2; i++) {
+            strncpy(field_0x04c[i].field_0x04, field_0x04c[i + 1].field_0x04, 0x31);
+            field_0x04c[i].field_0x00 = field_0x04c[i + 1].field_0x00;
+            field_0x04c[i].field_0x04[0x31] = '\0';
+        }
+        strcpy(field_0x04c[2].field_0x04, name);
+        strcat(field_0x04c[2].field_0x04, separator);
+        strncat(field_0x04c[2].field_0x04, text, 0x31);
+        field_0x04c[2].field_0x04[0x31] = '\0';
+        field_0x04c[2].field_0x00 = value;
+    }
+    if (nameLength + separatorLength + textLength > 0x31) {
+        if (field_0x1c0 < 3) {
+            strcpy(field_0x04c[field_0x1c0].field_0x04, "             ");
+            field_0x04c[field_0x1c0].field_0x04[separatorLength + nameLength] = '\0';
+            strncat(field_0x04c[field_0x1c0].field_0x04, text + 0x31 - separatorLength - nameLength, 0x31);
+            field_0x04c[field_0x1c0].field_0x00 = value;
+            field_0x1c0++;
+        } else {
+            for (int i = 0; i < 2; i++) {
+                strncpy(field_0x04c[i].field_0x04, field_0x04c[i + 1].field_0x04, 0x31);
+                field_0x04c[i].field_0x04[0x31] = '\0';
+                field_0x04c[i].field_0x00 = field_0x04c[i + 1].field_0x00;
+            }
+            strcpy(field_0x04c[2].field_0x04, "             ");
+            field_0x04c[2].field_0x04[separatorLength + nameLength] = '\0';
+            strncat(field_0x04c[2].field_0x04, text + 0x31 - separatorLength - nameLength, 0x31);
+            field_0x04c[2].field_0x00 = value;
+        }
     }
 }
 

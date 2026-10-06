@@ -37,8 +37,10 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
 - TrackRecordDlg fields: the current series (+0x7f58), the selected tab
   (+0x7f5c), and a realloc'd array of 8-byte track rows (+0x7f60, count
   +0x7f64). Each row is a strdup'd file name and an int. The event argument
-  of `0x0051fe80`, `0x00520390`, `0x00520480` and `0x005204e0` carries the
-  dialog pointer at +0x0c.
+  of slot 29 and of `0x0051fe80`, `0x00520390`, `0x00520480` and
+  `0x005204e0` has UnknownDialogEvent's layout: the control name (+0x04),
+  the kind (+0x08: 5 set-up, 1 button or tab, 2 list selection, 6 close),
+  the dialog (+0x0c), the control (+0x14) and the handled flag (+0x20).
 - `UIDialog::UnknownFunction46ebf0` looks a control up by name. GameUi.h
   already declares the same address as `UnknownGameUiPage::FindControl`.
   The new declaration was added because TrackRecordDlg derives from
@@ -49,7 +51,7 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
 
 ## Status
 
-The following 18 functions are exact under `vc6_o2_mt`, with every
+The following 19 functions are exact under `vc6_o2_mt`, with every
 relocation bound:
 
 | VA | Bytes | Body |
@@ -66,6 +68,7 @@ relocation bound:
 | `0x0051f260` | 90 | writes to a TrackGameMode directory |
 | `0x0051f2c0` | 253 | reads the table if the directory scan finds it |
 | `0x0051f3c0` | 564 | enters a racer and re-sorts |
+| `0x0051f600` | 1596 | dialog slot 29: set-up, tabs, track list |
 | `0x0051fc40` | 567 | tab captions for the series |
 | `0x0051fe80` | 188 | selects the series tab |
 | `0x0051ff40` | 149 | frees the track rows |
@@ -77,7 +80,7 @@ relocation bound:
 near miss in `samples/track/TrackNearMisses.cpp`. The candidate is 964
 bytes. Retail cross-jumps its two copies of the digit-suffix branch, and
 VC6 here allocates a different register in the second copy, which blocks
-the merge. `0x0051f600` (slot 29, 1596 bytes) has not been attempted.
+the merge.
 
 ## Source shapes that mattered
 

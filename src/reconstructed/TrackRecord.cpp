@@ -195,6 +195,107 @@ int UnknownTrackGameObject3400::UnknownFunction51f3c0(short kind, int racer)
     return 1;
 }
 
+// 0x0051f600: the dialog's messages: 5 sets it up, 1 handles the buttons
+// and tabs, 2 a track chosen in the list, 6 frees the rows.
+void TrackRecordDlg::UnknownVirtualSlot29(UnknownTrackRecordEvent* event)
+{
+    char name[128];
+    char path[260];
+    UnknownGameUiControl* control;
+    switch (event->field_0x08) {
+    case 5:
+        field_0x7f60 = 0;
+        field_0x7f64 = 0;
+        control = UnknownFunction46ebf0("TxtTitle", 0);
+        control->UnknownFunction470da0(10);
+        control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x958);
+        field_0x7f58 = 0;
+        g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(0);
+        UnknownFunction51fe80(event, field_0x7f58);
+        UnknownFunction520390(event, field_0x7f58);
+        field_0x7f5c = 0;
+        g_UnknownGlobal56e26c->field_0x3400->field_0x00 = 0;
+        control = UnknownFunction46ebf0("TabQuarry", 4);
+        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1423);
+        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1423);
+        control = UnknownFunction46ebf0("TabTag", 4);
+        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1426);
+        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1426);
+        control = UnknownFunction46ebf0("TabSupercross", 4);
+        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1424);
+        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1424);
+        control = UnknownFunction46ebf0("TabNationals", 4);
+        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1425);
+        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1425);
+        control = UnknownFunction46ebf0("TabBaja", 4);
+        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1421);
+        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1421);
+        control = UnknownFunction46ebf0("TabEnduro", 4);
+        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1422);
+        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1422);
+        UnknownFunction51fc40(field_0x7f58);
+        break;
+    case 1:
+        if (!_stricmp("Back", event->field_0x04)) {
+            g_UnknownGlobal56e26c->ui->UnknownFunction499b20(100);
+            event->field_0x0c->UnknownFunction46ff30(0);
+            event->field_0x20 = 1;
+        } else if (!_stricmp("TabQuarry", event->field_0x04)) {
+            field_0x7f58 = 0;
+            UnknownFunction520390(event, 0);
+        } else if (!_stricmp("TabBaja", event->field_0x04)) {
+            field_0x7f58 = 1;
+            UnknownFunction520390(event, 1);
+        } else if (!_stricmp("TabNationals", event->field_0x04)) {
+            field_0x7f58 = 2;
+            UnknownFunction520390(event, 2);
+        } else if (!_stricmp("TabSupercross", event->field_0x04)) {
+            field_0x7f58 = 3;
+            UnknownFunction520390(event, 3);
+        } else if (!_stricmp("TabEnduro", event->field_0x04)) {
+            field_0x7f58 = 5;
+            UnknownFunction520390(event, 5);
+        } else if (!_stricmp("TabTag", event->field_0x04)) {
+            field_0x7f58 = 4;
+            UnknownFunction520390(event, 4);
+        } else if (!_stricmp("TabLeft", event->field_0x04)) {
+            field_0x7f5c = 0;
+            g_UnknownGlobal56e26c->field_0x3400->field_0x00 = 0;
+            UnknownFunction520390(event, field_0x7f58);
+        } else if (!_stricmp("TabMiddle", event->field_0x04)) {
+            field_0x7f5c = 1;
+            g_UnknownGlobal56e26c->field_0x3400->field_0x00 = 1;
+            UnknownFunction520390(event, field_0x7f58);
+        } else if (!_stricmp("TabRight", event->field_0x04)) {
+            field_0x7f5c = 2;
+            g_UnknownGlobal56e26c->field_0x3400->field_0x00 = 2;
+            UnknownFunction520390(event, field_0x7f58);
+        } else if (!_stricmp("Help", event->field_0x04)) {
+            g_UnknownGlobal56e26c->mode.UnknownFunction523d30("MCM2HELP", 0);
+        }
+        break;
+    case 2:
+        if (!_stricmp("LstTrack", event->field_0x04)) {
+            g_UnknownGlobal56e26c->field_0x3400->UnknownFunction51efe0();
+            if (event->field_0x14->UnknownFunction476950() != -1 && field_0x7f60) {
+                int n = strlen(event->field_0x14->UnknownFunction476d20(-1));
+                int length = n > 0x7f ? 0x7f : n;
+                strncpy(name, event->field_0x14->UnknownFunction476d20(-1), length);
+                name[length] = '\0';
+                UnknownFunction46ebf0("LstStats1", 3)->UnknownFunction4775f0();
+                UnknownFunction46ebf0("LstStats2", 3)->UnknownFunction4775f0();
+                g_UnknownGlobal56e26c->mode.UnknownFunction523bb0((short)field_0x7f58, 0, path);
+                UnknownFunction5204e0(event, field_0x7f58,
+                                      field_0x7f60[event->field_0x14->UnknownFunction4768d0(-1)]->field_0x00);
+            }
+        }
+        break;
+    case 6:
+        UnknownFunction51ff40();
+        break;
+    }
+}
+
 void TrackRecordDlg::UnknownFunction51fc40(int series)
 {
     char text[128];

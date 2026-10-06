@@ -29,6 +29,22 @@ struct UnknownInstrumentState {
     float field_0x0bc;                        // the gauge value before scaling
     unsigned char field_0x0c0[0x108 - 0xc0];
     bool field_0x108;
+    unsigned char field_0x109[0x736 - 0x109];
+    unsigned char field_0x736;
+    unsigned char field_0x737[0x74c - 0x737];
+    float field_0x74c;                        // last lap time (StatsOverlay 0x0051a560)
+    float field_0x750;
+    float field_0x754;                        // a time (StatsOverlay 0x0051a480)
+    unsigned char field_0x758[0x770 - 0x758];
+    float field_0x770;
+    unsigned char field_0x774[0x784 - 0x774];
+    int field_0x784;                          // position
+    unsigned char field_0x788[0x7a0 - 0x788];
+    unsigned short field_0x7a0;               // laps done
+    unsigned char field_0x7a2[0x7a4 - 0x7a2];
+    char field_0x7a4;
+    unsigned char field_0x7a5[0x7b8 - 0x7a5];
+    int field_0x7b8;                          // gate of the lap
 };
 
 struct UnknownInstrumentSource {
@@ -130,6 +146,24 @@ public:
     int field_0x170;
 };
 
+// A GDI SIZE.
+struct UnknownTextExtent {
+    int cx;
+    int cy;
+};
+
+// StatsOverlay+0x124 (set by 0x00519880): a view whose racers 0x0051a560
+// counts (0x004204e0, as UnknownKrustyBikeView in RaceView.h); +0x1b8 is a
+// time (0x0051a480).
+struct UnknownStatsSource {
+    UnknownEventRacer* UnknownFunction4204e0(int* iterator); // 0x004204e0
+
+    unsigned char field_0x000[0x38];
+    UnknownEventRacer* field_0x038;           // its own racer
+    unsigned char field_0x03c[0x1b8 - 0x3c];
+    float field_0x1b8;
+};
+
 // RTTI: StatsOverlay : Overlay (vtable 0x00558680), 0x9b8 bytes: the race
 // statistics panel, redrawn about once a second for the view mode
 // (TrackGame +0x2d74).
@@ -159,14 +193,13 @@ public:
 
     void* field_0x11c;                        // GDI object (DeleteObject)
     void* field_0x120;                        // GDI object (DeleteObject)
-    int field_0x124;
-    int field_0x128;
+    UnknownStatsSource* field_0x124;          // set by 0x00519880; read when TrackGame+0x3428 is set
+    UnknownInstrumentSource* field_0x128;
     float field_0x12c;                        // seconds since the last redraw
     UnknownTrackOverlayRect field_0x130[8];
-    char field_0x1b0[0x400];
-    char field_0x5b0[0x400];
-    int field_0x9b0;
-    int field_0x9b4;
+    char field_0x1b0[8][0x80];
+    char field_0x5b0[8][0x80];                // the text drawn into field_0x130[i]
+    UnknownTextExtent field_0x9b0;            // extent of the first row (GetTextExtentPoint32A)
 };
 
 // 0x005199f0 (cdecl): qsort comparator for UnknownEventScore records
@@ -213,6 +246,7 @@ public:
     int UnknownFunction51bc60();              // 0x0051bc60: draws for the view mode
     void UnknownFunction51bdc0();             // 0x0051bdc0: frame-rate readout
     int UnknownFunction51bed0(int mode);      // 0x0051bed0 (not reconstructed)
+    void UnknownFunction51cb20();             // 0x0051cb20: the next two gates (not reconstructed)
     // 0x0051c360: maps the world point `point` to the map pixel (*x, *y);
     // when it lies beyond the map radius, returns 1 with the rim point in
     // (*rimX, *rimY).
@@ -220,6 +254,12 @@ public:
     // 0x0051c460: the line through a and b (x, y only) as a unit normal
     // (*nx, *ny) and offset *d; -1 when a and b coincide.
     int UnknownFunction51c460(const float* a, const float* b, float* nx, float* ny, float* d);
+    // 0x0051c4f0: intersects the line through a and b with the circle
+    // (circle[0], circle[1]) of radius circle[2]. Returns -1 for no
+    // intersection (or a degenerate line), 1 for a tangent point and 2 for
+    // the intersection nearer to `point`, written to `point`; 3 when the
+    // direction vanishes. `a4` is not read.
+    int UnknownFunction51c4f0(const float* a, const float* b, const float* circle, float* a4, float* point);
 
     float field_0x11c;                        // frame time summed
     float field_0x120;                        // frames summed
@@ -259,7 +299,11 @@ struct UnknownChatRacerState {
 struct UnknownChatRacer {
     unsigned char field_0x000[0x3bc];
     UnknownChatRacerState* field_0x3bc;
-    unsigned char field_0x3c0[0x784 - 0x3c0];
+    unsigned char field_0x3c0[0x4a4 - 0x3c0];
+    float field_0x4a4;                        // shown when TrackOverlay's 0x0068a444 is set
+    unsigned char field_0x4a8[0x5e0 - 0x4a8];
+    char field_0x5e0[0x10];                   // name
+    unsigned char field_0x5f0[0x784 - 0x5f0];
     int field_0x784;                          // ChatOverlay+0x19c keeps the last value
 };
 
@@ -270,6 +314,10 @@ struct UnknownChatCamera {
 };
 
 struct UnknownChatView {
+    // 0x004204e0: the next racer after `*iterator` (advancing it), or 0
+    // (UnknownKrustyBikeView::UnknownFunction4204e0 in RaceView.h).
+    UnknownChatRacer* UnknownFunction4204e0(int* iterator);
+
     unsigned char field_0x00[0x38];
     UnknownChatRacer* field_0x38;
 };
@@ -280,6 +328,13 @@ struct UnknownChatEntry {
     char field_0x04[0x58];
 };
 
+// Network message 0x85 (0x4e bytes sent): a chat line. Its first field is
+// never set by the sender (0x0051da30).
+struct UnknownChatMessage {
+    int field_0x00;
+    char field_0x04[0x4a];
+};
+
 // ChatOverlay+0x13c (0x1c4 bytes, no vtable): the line being typed (up to
 // 0x4a characters) and four history entries.
 class UnknownChatInput {
@@ -288,9 +343,13 @@ public:
     void UnknownFunction51ea80(char c);       // 0x0051ea80: appends c
     void UnknownFunction51eab0();             // 0x0051eab0: removes the last character
     void UnknownFunction51ead0();             // 0x0051ead0: clears the line
+    char* UnknownFunction51eae0();            // 0x0051eae0: the line (a shared `mov eax, ecx` body)
     char* UnknownFunction51eaf0();            // 0x0051eaf0: the last 0x31 characters
     char* UnknownFunction51eb10(int index, int* value); // 0x0051eb10: history entry
-    void UnknownFunction51eb40(const char* name, int a2, int a3); // 0x0051eb40 (not reconstructed)
+    // 0x0051eb40: adds "name: text" with `value` to the history (three
+    // lines; the oldest is dropped), and the rest of a long text as an
+    // indented second line.
+    void UnknownFunction51eb40(const char* name, const char* text, int value);
 
     char field_0x000[0x4c];                   // the line being typed
     UnknownChatEntry field_0x04c[4];
@@ -312,17 +371,26 @@ public:
     // the screen and the cue rectangle; returns this, or 0.
     ChatOverlay* UnknownFunction51cf80(RenderTarget* target, TextureMapManager* manager, void* camera,
                                        UnknownOverlayRect screen, UnknownOverlayRect cue);
+    // 0x0051d730 (QuarryStuntEvent.cpp 0x004e02c7): collects the racers of
+    // `view` and gives each a name tag; in view mode 0 one more.
+    int UnknownFunction51d730(UnknownChatView* view);
     void UnknownFunction51d980(int show);     // 0x0051d980
+    // 0x0051da30 (bikerace.cpp 0x0041f5b1): a typed key; Enter sends the
+    // line as network message 0x85, Escape sets *result.
+    int UnknownFunction51da30(int key, int* result);
     void UnknownFunction51d9c0(float value, const char* name); // 0x0051d9c0
     // 0x0051dce0: called before GameObject slot 23 with the same event.
     int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void UnknownFunction51dd10();             // 0x0051dd10: shows the input line
     void UnknownFunction51dd40();             // 0x0051dd40: hides it
-    void UnknownFunction51dd70(const char* name, int a2, int a3); // 0x0051dd70
-    void UnknownFunction51de10();             // 0x0051de10 (not reconstructed)
+    void UnknownFunction51dd70(const char* name, int a2, int a3); // 0x0051dd70: a2 is the text (0x0051eb40)
+    // 0x0051de10: redraws the input line and the history; 0 when the
+    // surface's device context is not available.
+    int UnknownFunction51de10();
+    void UnknownFunction51e3f0(void* dc, int index); // 0x0051e3f0: draws name tag `index`
     void UnknownFunction51e7c0();             // 0x0051e7c0
     void UnknownFunction51e800();             // 0x0051e800: redraws the name line
-    void UnknownFunction51e910(int index);    // 0x0051e910 (not reconstructed)
+    void UnknownFunction51e910(int index);    // 0x0051e910: redraws one name tag, or all (-1)
 
     void* field_0x11c;                        // GDI object (DeleteObject)
     void* field_0x120;                        // GDI object (DeleteObject)
@@ -330,10 +398,13 @@ public:
     UnknownChatCamera* field_0x128;
     UnknownChatView* field_0x12c;
     float field_0x130;                        // time summed
-    unsigned char field_0x134[0x138 - 0x134];
+    int field_0x134;                          // the large layout (set by 0x0051cf80)
     int field_0x138;                          // input line shown
     UnknownChatInput* field_0x13c;
-    unsigned char field_0x140[0x160 - 0x140];
+    unsigned char field_0x140[0x150 - 0x140];
+    int field_0x150;                          // the extra name tag's position (0x0051d730)
+    int field_0x154;
+    unsigned char field_0x158[0x160 - 0x158];
     int field_0x160;
     int field_0x164;
     int field_0x168;                          // name changed
