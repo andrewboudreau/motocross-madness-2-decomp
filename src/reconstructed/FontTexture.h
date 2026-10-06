@@ -16,6 +16,10 @@ public:
     CharacterCell(int code, const Rectangle2D& rect) : field_0x04(code), field_0x08(rect) {}
     virtual ~CharacterCell() {}
 
+    // 0x0050beb0 (out-of-line copy after TextService.cpp's code): the cell
+    // rectangle, in texture coordinates.
+    Rectangle2D UnknownFunction50beb0() { return field_0x08; }
+
     int field_0x04;                           // character code
     Rectangle2D field_0x08;
 };

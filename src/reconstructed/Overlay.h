@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "OverlayRect.h"
 #include "RenderTarget.h"
+#include "TextService.h"
 #include "TextureMap.h"
 
 // RTTI: Overlay : GameObject : BaseObject (vtable 0x00555a28). Its code cites
@@ -11,33 +12,8 @@
 // is declared; names are provisional. Overlay introduces no slots: it
 // overrides the destructor, slot 10 (0x00499ae0) and slot 14 (0x004b61a0).
 
-// A pre-transformed, lit vertex (D3DTLVERTEX, 0x20 bytes) as passed to
-// RenderTarget slot 16 with vertex format 0x1c4.
-struct UnknownOverlayVertex {
-    float sx;
-    float sy;
-    float sz;
-    float rhw;
-    unsigned int color;
-    unsigned int specular;
-    float tu;
-    float tv;
-};
-
-// The text renderer at Overlay+0x38 (Texmap.cpp's font code, not
-// reconstructed); thiscall, names provisional.
-class UnknownOverlayText {
-public:
-    void UnknownFunction50ade0(const char* font);   // 0x0050ade0: selects the font
-    // 0x0050ba00: lays `text` out in `rect` with `color`; returns the laid-out
-    // text, its count in *count.
-    void* UnknownFunction50ba00(const UnknownOverlayRect* rect, const char* text,
-                                unsigned int color, int* count);
-    void UnknownFunction50bd30(RenderTarget* target, void* text, int count); // 0x0050bd30: draws it
-    // 0x0050b080: draws `text` at (x, y) into `texture`; returns the x past
-    // its end.
-    int UnknownFunction50b080(TextureMap* texture, int x, int y, const char* text, int a5);
-};
+// UnknownOverlayVertex and the text renderer at Overlay+0x38
+// (UnknownOverlayText) are declared in TextService.h.
 
 class Overlay : public GameObject {
 public:
