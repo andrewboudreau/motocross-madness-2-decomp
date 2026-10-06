@@ -240,6 +240,30 @@ public:
     UnknownOverlayRect field_0x1f8;           // map rectangle
 };
 
+// What ChatOverlay+0x16c lists, one per name tag; only these fields are read.
+struct UnknownChatRacerState {
+    unsigned char field_0x000[0x14c];
+    int field_0x14c;                          // hides the name tag
+};
+
+struct UnknownChatRacer {
+    unsigned char field_0x000[0x3bc];
+    UnknownChatRacerState* field_0x3bc;
+    unsigned char field_0x3c0[0x784 - 0x3c0];
+    int field_0x784;                          // ChatOverlay+0x19c keeps the last value
+};
+
+// ChatOverlay+0x128 and +0x12c: only these fields are read.
+struct UnknownChatCamera {
+    unsigned char field_0x000[0x3b4];
+    UnknownChatRacer* field_0x3b4;
+};
+
+struct UnknownChatView {
+    unsigned char field_0x00[0x38];
+    UnknownChatRacer* field_0x38;
+};
+
 // One chat history line (0x5c bytes).
 struct UnknownChatEntry {
     int field_0x00;
@@ -271,6 +295,7 @@ public:
     explicit ChatOverlay(int flags);          // 0x0051cda0
     virtual ~ChatOverlay();                   // 0x0051cee0 (deleting wrapper 0x0051cec0)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0051e200
+    virtual int UnknownVirtualSlot13();       // 0x0051e240
     virtual int UnknownVirtualSlot14();       // 0x0051e390
 
     void UnknownFunction51d980(int show);     // 0x0051d980
@@ -280,14 +305,16 @@ public:
     void UnknownFunction51dd10();             // 0x0051dd10: shows the input line
     void UnknownFunction51dd40();             // 0x0051dd40: hides it
     void UnknownFunction51dd70(const char* name, int a2, int a3); // 0x0051dd70
+    void UnknownFunction51de10();             // 0x0051de10 (not reconstructed)
     void UnknownFunction51e7c0();             // 0x0051e7c0
+    void UnknownFunction51e800();             // 0x0051e800: redraws the name line
     void UnknownFunction51e910(int index);    // 0x0051e910 (not reconstructed)
 
     void* field_0x11c;                        // GDI object (DeleteObject)
     void* field_0x120;                        // GDI object (DeleteObject)
     void* field_0x124;                        // GDI object (DeleteObject)
-    int field_0x128;
-    unsigned char field_0x12c[0x130 - 0x12c];
+    UnknownChatCamera* field_0x128;
+    UnknownChatView* field_0x12c;
     float field_0x130;                        // time summed
     unsigned char field_0x134[0x138 - 0x134];
     int field_0x138;                          // input line shown
@@ -296,9 +323,9 @@ public:
     int field_0x160;
     int field_0x164;
     int field_0x168;                          // name changed
-    int field_0x16c[11];
+    UnknownChatRacer* field_0x16c[11];
     int field_0x198;                          // name tag index
-    int field_0x19c[11];
+    int field_0x19c[11];                      // field_0x16c[i]->field_0x784 last seen
     GameObject* field_0x1c8;
     GameObject* field_0x1cc;
     float field_0x1d0;

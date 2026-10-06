@@ -7551,6 +7551,14 @@ CASES = [
         'target_size': 55,
     },
     {
+        'name': 'TrackOverlay.cpp 0x51e240 ChatOverlay virtual slot 13 refreshes the name tags',
+        'bindings': 'src/reconstructed/TrackOverlay.bindings.json',
+        'source': 'src/reconstructed/TrackOverlay.cpp',
+        'symbol': '?UnknownVirtualSlot13@ChatOverlay@@UAEHXZ',
+        'target_va': '0x0051e240',
+        'target_size': 326,
+    },
+    {
         'name': 'TrackOverlay.cpp 0x51e390 ChatOverlay draws',
         'bindings': 'src/reconstructed/TrackOverlay.bindings.json',
         'source': 'src/reconstructed/TrackOverlay.cpp',
@@ -7565,6 +7573,14 @@ CASES = [
         'symbol': '?UnknownFunction51e7c0@ChatOverlay@@QAEXXZ',
         'target_va': '0x0051e7c0',
         'target_size': 50,
+    },
+    {
+        'name': 'TrackOverlay.cpp 0x51e800 ChatOverlay redraws the name line',
+        'bindings': 'src/reconstructed/TrackOverlay.bindings.json',
+        'source': 'src/reconstructed/TrackOverlay.cpp',
+        'symbol': '?UnknownFunction51e800@ChatOverlay@@QAEXXZ',
+        'target_va': '0x0051e800',
+        'target_size': 257,
     },
     {
         'name': 'TrackOverlay.cpp 0x51ea50 UnknownChatInput constructor',

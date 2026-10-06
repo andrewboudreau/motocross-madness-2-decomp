@@ -34,6 +34,9 @@ public:
     void* UnknownFunction50ba00(const UnknownOverlayRect* rect, const char* text,
                                 unsigned int color, int* count);
     void UnknownFunction50bd30(RenderTarget* target, void* text, int count); // 0x0050bd30: draws it
+    // 0x0050b080: draws `text` at (x, y) into `texture`; returns the x past
+    // its end.
+    int UnknownFunction50b080(TextureMap* texture, int x, int y, const char* text, int a5);
 };
 
 class Overlay : public GameObject {
@@ -51,6 +54,10 @@ public:
                                    const UnknownOverlayRect* source, float depth,
                                    char a7, const char* a8, const char** a9, int a10,
                                    int a11, int a12);
+
+    // 0x004b6710: clears `rect` of the overlay texture (ChatOverlay calls it
+    // before redrawing a line).
+    void UnknownFunction4b6710(const UnknownOverlayRect* rect);
 
     RenderTarget* Target() const { return (RenderTarget*)field_0x18; }
 

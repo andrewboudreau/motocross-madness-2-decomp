@@ -124,5 +124,12 @@
   "_strncpy": "0x00534b10",
   "??_C@_02OOND@?4?4?$AA@": "0x00569244",
   "??0ChatOverlay@@QAE@H@Z$ehhandler": "0x0054eccf",
-  "??1ChatOverlay@@UAE@XZ$ehhandler": "0x0054ece8"
+  "??1ChatOverlay@@UAE@XZ$ehhandler": "0x0054ece8",
+  "?UnknownFunction4b6710@Overlay@@QAEXPBUUnknownOverlayRect@@@Z": "0x004b6710",
+  "?UnknownFunction50b080@UnknownOverlayText@@QAEHPAVTextureMap@@HHPBDH@Z": "0x0050b080",
+  "??_C@_05HIFK@?$CFd?5?3?5?$AA@": "0x00575350",
+  "?UnknownFunction51de10@ChatOverlay@@QAEXXZ": "0x0051de10",
+  "_s_UnknownGlobal68a444": "0x0068a444",
+  "?UnknownFunction51e800@ChatOverlay@@QAEXXZ": "0x0051e800",
+  "__real@4@3ffbcccccd0000000000": "0x005507d0"
 }

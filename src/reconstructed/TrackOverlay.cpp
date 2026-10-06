@@ -40,6 +40,9 @@ static int s_UnknownGlobal57513c = 2;
 static int s_UnknownGlobal575140 = 1;
 static float s_UnknownGlobal68a448;
 
+// 0x0068a444: when set, ChatOverlay redraws all of its lines.
+static int s_UnknownGlobal68a444;
+
 // 0x00518720
 InstrumentOverlay::InstrumentOverlay(int flags) : Overlay(flags, 1)
 {
@@ -944,6 +947,41 @@ int ChatOverlay::UnknownVirtualSlot10(float frameTime)
     return 1;
 }
 
+// 0x0051e240
+int ChatOverlay::UnknownVirtualSlot13()
+{
+    UnknownOverlayRect rect;
+    if (field_0x130 >= 0.1f) {
+        if (field_0x138)
+            UnknownFunction51de10();
+        field_0x130 = 0.0f;
+    }
+    if (s_UnknownGlobal68a444) {
+        rect.left = 0;
+        rect.top = 0;
+        rect.right = 0xff;
+        rect.bottom = 0xff;
+        UnknownFunction4b6710(&rect);
+        UnknownFunction51e910(-1);
+    } else {
+        for (int i = 0; i < field_0x198; i++) {
+            if (g_UnknownGlobal56e26c->mode.field_0x6c0 && field_0x19c[i] != field_0x16c[i]->field_0x784) {
+                UnknownFunction51e910(i);
+                field_0x19c[i] = field_0x16c[i]->field_0x784;
+            }
+            if (field_0x16c[i]->field_0x3bc->field_0x14c)
+                field_0x2d8[i]->UnknownVirtualSlot4();
+            else if (field_0x16c[i] == field_0x12c->field_0x38 && field_0x128->field_0x3b4 == field_0x12c->field_0x38)
+                field_0x2d8[i]->UnknownVirtualSlot4();
+            else
+                field_0x2d8[i]->UnknownVirtualSlot5();
+        }
+    }
+    if (g_UnknownGlobal56e26c->field_0x2d74 == 0)
+        UnknownFunction51e800();
+    return 1;
+}
+
 // 0x0051e390
 int ChatOverlay::UnknownVirtualSlot14()
 {
@@ -964,6 +1002,26 @@ void ChatOverlay::UnknownFunction51e7c0()
     if (g_UnknownGlobal56e26c->mode.field_0x90 == 6)
         g_UnknownGlobal56e26c->mode.field_0x90 = 0;
     UnknownFunction51e910(-1);
+}
+
+// 0x0051e800
+void ChatOverlay::UnknownFunction51e800()
+{
+    UnknownOverlayRect rect;
+    char text[128];
+    rect = field_0x30c[field_0x198];
+    rect.right = field_0x160;
+    UnknownFunction4b6710(&rect);
+    sprintf(text, "%d : ", (int)sqrt(field_0x1d0));
+    field_0x38->UnknownFunction50ade0("arialsm");
+    int right = field_0x38->UnknownFunction50b080(field_0x2c, field_0x30c[field_0x198].left,
+                                                   field_0x30c[field_0x198].top, text, 0);
+    if (right != field_0x160 || field_0x168) {
+        field_0x160 = right;
+        field_0x168 = 0;
+        field_0x2d8[field_0x198]->field_0x124 = right - field_0x30c[field_0x198].left;
+        UnknownFunction51e910(field_0x198);
+    }
 }
 
 // 0x0051ea50
