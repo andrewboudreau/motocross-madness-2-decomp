@@ -155,6 +155,12 @@ struct UnknownCursorAnimation {
     int field_0x20;
 };
 
+// Cursor position in pixels (0x0043f100's result).
+struct UnknownCursorPosition {
+    int x;
+    int y;
+};
+
 // RTTI: GameCursor : GameObject (vtable 0x0055130c; constructor
 // 0x0043ea00). Only what GUIManager.cpp uses is declared.
 class GameCursor : public GameObject {
@@ -169,6 +175,9 @@ public:
     // 0x0043eaf0: a cursor without bindings.
     GameObject* UnknownFunction43eaf0(void* target, const char* image, TextureMapManager* textures,
                                       BackgroundImage* background, void* palette, Palette8* palette8);
+    // 0x0043f100: the bindings' values (or GetCursorPos's) plus the offset at
+    // +0x2c/+0x30.
+    UnknownCursorPosition UnknownFunction43f100();
 
     unsigned char field_0x2c[0x38 - 0x2c];
     int field_0x38;                           // current frame

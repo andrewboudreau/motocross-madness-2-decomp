@@ -3,9 +3,9 @@
 > Last reviewed: **2026-10-06** · Retail executable: `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`
 
 There is not yet a defensible whole-game percentage. The best reproducible
-headline is that **1332 of 1340 selected function targets (99.4%)**
+headline is that **1344 of 1352 selected function targets (99.4%)**
 have strict, byte-for-byte matches in the reviewed calibration suite, compiled
-with VC6 SP3. The suite contains **1344 cases**; repeated
+with VC6 SP3. The suite contains **1356 cases**; repeated
 retail address/extent pairs count once.
 That percentage measures the active target set, **not 99.4% of MCM2**:
 targets are chosen because they are useful or tractable, and the executable's
@@ -15,10 +15,10 @@ complete function inventory has not been established.
 
 | Indicator | Current value | What it means |
 |---|---:|---|
-| Strict VC6 exact targets | **1332 / 1340 (99.4%)** | Unique retail address/extent pairs in the reviewed calibration run |
-| Canonical reconstructed implementation files | **82** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
-| Canonical reconstructed headers | **119** | Layout and interface declarations, including support-only headers |
-| Canonical C++ source lines | **43,071** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
+| Strict VC6 exact targets | **1344 / 1352 (99.4%)** | Unique retail address/extent pairs in the reviewed calibration run |
+| Canonical reconstructed implementation files | **83** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
+| Canonical reconstructed headers | **120** | Layout and interface declarations, including support-only headers |
+| Canonical C++ source lines | **43,180** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
 | Retail source-path strings | **111** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **252** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **1,368,518 bytes (1.31 MiB)** | Broad code-section denominator; includes library code, thunks and padding |
