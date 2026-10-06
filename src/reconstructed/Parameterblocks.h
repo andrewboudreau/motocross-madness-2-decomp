@@ -38,6 +38,7 @@ public:
     int UnknownFunction461340(int offset, int a, int origin); // 0x00461340: seeks
     int UnknownFunction461600();                              // 0x00461600: read position
     int UnknownFunction461aa0(char* buffer, int size);        // 0x00461aa0: reads a line, 0 at the end
+    int UnknownFunction461640(void* buffer, int size, int count); // 0x00461640: reads `count` items (SoultreeMaterial.cpp)
 
     // 0x0043e9e0 (out-of-line copy): the text-mode byte.
     char UnknownFunction43e9e0()

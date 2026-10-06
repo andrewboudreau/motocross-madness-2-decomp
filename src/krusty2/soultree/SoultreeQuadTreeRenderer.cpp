@@ -16,7 +16,7 @@ extern TypeRegistry* g_TypeRegistry;             // 0x00575744
 
 extern SoultreeStats* g_soultreeStats;           // 0x0056e26c
 extern QuadTree* g_quadTree;                     // 0x0068aba4
-extern SoultreeObjectView** g_soultreeNodes;     // 0x00689ec4 node array (RegisterNode 0x4fedb0)
+extern SoultreeObject** g_soultreeNodes;     // 0x00689ec4 node array (RegisterNode 0x4fedb0)
 extern int g_soultreeNodeCount;                  // 0x00689ec8
 
 // 0x00504490
@@ -60,7 +60,7 @@ int SoultreeQuadTreeRenderer::GameObjectVirtualSlot12()
     visibleCount = 0;
     while (QuadTreeObject* obj = g_quadTree->NextObject()) {
         if (obj->objectTypeId == nodeTypeId) {
-            D3DIMSoultreeObjectView* node = (D3DIMSoultreeObjectView*)obj;
+            D3DIMSoultreeObject* node = (D3DIMSoultreeObject*)obj;
             if (node->field_0x14c == 0) {
                 node->field_0x2d4 = 1;
                 node->Fn_443de0(0, 0);
@@ -75,7 +75,7 @@ int SoultreeQuadTreeRenderer::GameObjectVirtualSlot12()
 int SoultreeQuadTreeRenderer::GameObjectVirtualSlot10(float dt)
 {
     for (int i = 0; i < g_soultreeNodeCount; i++) {
-        SoultreeObjectView* node = g_soultreeNodes[i];
+        SoultreeObject* node = g_soultreeNodes[i];
         if (node->subtreeDirty && node->field_0x194)
             node->Fn_4fecd0();
     }
@@ -90,7 +90,7 @@ void SoultreeQuadTreeRenderer::Fn_5046e0()
         root = root->parent;
     GameObjectIterator* it = new(__FILE__, 0x63) GameObjectIterator(root, 1, "");
     while (GameObject* obj = it->Next()) {
-        D3DIMSoultreeObjectView* node = dynamic_cast<D3DIMSoultreeObjectView*>(obj);
+        D3DIMSoultreeObject* node = dynamic_cast<D3DIMSoultreeObject*>(obj);
         if (node && node->field_0x28c) {
             field_0x34++;
             node->field_0x190 = 0;
@@ -111,7 +111,7 @@ void SoultreeQuadTreeRenderer::Fn_5047f0()
         root = root->parent;
     GameObjectIterator* it = new(__FILE__, 0x7f) GameObjectIterator(root, 1, "");
     while (GameObject* obj = it->Next()) {
-        SoultreeObjectView* node = dynamic_cast<SoultreeObjectView*>(obj);
+        SoultreeObject* node = dynamic_cast<SoultreeObject*>(obj);
         if (node) {
             node->Fn_4fed70();
             node->field_0x190 = 1;

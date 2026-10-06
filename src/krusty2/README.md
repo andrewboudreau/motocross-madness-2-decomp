@@ -37,19 +37,22 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionPoint.h`, `CollisionTypes.h`): 44 strict cases |
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts) |
-| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character headers: 37 strict cases |
+| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character headers: 37 strict cases; `SoultreeQuadTreeRenderer.cpp`: 8 strict cases |
+| `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
 | `vehicle/` | `Vehicle.cpp` (57 strict cases) and `Bike.cpp` (31 strict cases), `Vehicle.h`, `Bike.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
 | `bvh/` | Shared box-tree layouts; builder candidate in `samples/physics/bvh/` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
 | `motion/` | SphereManager: 14 strict cases; shared motion layouts |
-| `shadow/` | D3DIMSoultreeShadow: 16 strict cases; other shadow candidates in samples |
+| `shadow/` | D3DIMSoultreeShadow: 17 strict cases; other shadow candidates in samples |
 | `visibility/` | VisibilityQuadTree: 16 strict cases; partial traversal in samples |
 
 The earlier broad-phase counts are masked diagnostics. The new reviewed slices
 and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
-The combined SelectiveGravityModel/Shock candidate stays in samples: Shock TU
-ownership has only proximity evidence. Motion control, steering and the box-tree
+SelectiveGravityModel.cpp (0x4f9760..0x4f9a59) is promoted on its own. The Shock
+family (0x4f9a60..0x4fb1d7) builds a second set of the Math3D.h constant vectors
+(0x689e48..0x689e78), so it is a separate TU (strong inference). It stays in
+`samples/physics/suspension/Shock.cpp` because its name is not attested. Motion control, steering and the box-tree
 builder also remain samples pending complete relocation verification.
 
 Shared headers use paths relative to this folder, e.g. `core/GameObject.h`.

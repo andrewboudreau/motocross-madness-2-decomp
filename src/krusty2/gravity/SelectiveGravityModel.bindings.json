@@ -1,0 +1,22 @@
+{
+  "??0GameObject@@QAE@H@Z": "0x00468ca0",
+  "??1GameObject@@UAE@XZ": "0x00468d60",
+  "??1SelectiveGravityModel@@UAE@XZ": "0x004f97b0",
+  "??1SelectiveGravityModel@@UAE@XZ$ehhandler": "0x0054e1a8",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "??_7SelectiveGravityModel@@6B@": "0x00557b0c",
+  "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
+  "?GameObjectVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
+  "_$E1": "0x004f9920",
+  "_$E10": "0x004f9a10",
+  "_$E4": "0x004f9970",
+  "_$E7": "0x004f99c0",
+  "__FILE__:selectivegravitymodel.cpp": "0x00573f54",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@bfff8000000000000000": "0x00550810",
+  "_kVec3XAxis": "0x00689e28",
+  "_kVec3YAxis": "0x00689e38",
+  "_kVec3ZAxis": "0x00689e08",
+  "_kVec3Zero": "0x00689e18"
+}

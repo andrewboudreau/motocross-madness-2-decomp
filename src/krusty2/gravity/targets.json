@@ -1,0 +1,152 @@
+[
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??0SelectiveGravityModel@@QAE@H@Z",
+    "target_va": "0x004f9760",
+    "target_size": 43,
+    "expect": "exact",
+    "notes": "constructor: GameObject(flags), vptr 0x00557b0c, gravity 32.2f",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??_GSelectiveGravityModel@@UAEPAXI@Z",
+    "target_va": "0x004f9790",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "slot 0 scalar deleting destructor (compiler generated)",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "??1SelectiveGravityModel@@UAE@XZ",
+    "target_va": "0x004f97b0",
+    "target_size": 97,
+    "expect": "exact",
+    "notes": "destructor core: debug delete of the body array (own __FILE__, line 0x12)",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "?AddBody@SelectiveGravityModel@@UAEXPAVGravityBody@@@Z",
+    "target_va": "0x004f9820",
+    "target_size": 57,
+    "expect": "exact",
+    "notes": "slot 27: debug realloc of the body array (own __FILE__, line 0x18)",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SelectiveGravityModel@@UAEHM@Z",
+    "target_va": "0x004f9860",
+    "target_size": 39,
+    "expect": "exact",
+    "notes": "slot 10: GameObject slot 10, then slot 11 while field_0x38 is 0",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot11@SelectiveGravityModel@@UAEHM@Z",
+    "target_va": "0x004f9890",
+    "target_size": 113,
+    "expect": "exact",
+    "notes": "slot 11: Vec3(0,-1,0) * (mass * gravity) per body through slot 37",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004f9910",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initializer jmp (math/Math3D.h kVec3Zero)",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004f9920",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3Zero initializer body (copy-init), global 0x00689e18",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004f9960",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3XAxis initializer jmp",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004f9970",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3XAxis initializer body, global 0x00689e28",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004f99b0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3YAxis initializer jmp",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004f99c0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3YAxis initializer body, global 0x00689e38",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004f9a00",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kVec3ZAxis initializer jmp",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004f9a10",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "kVec3ZAxis initializer body, global 0x00689e08",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  },
+  {
+    "class": "SelectiveGravityModel",
+    "source": "SelectiveGravityModel.cpp",
+    "candidate_symbol_contains": "?SetGravity@SelectiveGravityModel@@UAEXM@Z",
+    "target_va": "0x004f9a50",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": "slot 28: inline virtual, emitted after the $E initializers",
+    "bindings": "SelectiveGravityModel.bindings.json"
+  }
+]

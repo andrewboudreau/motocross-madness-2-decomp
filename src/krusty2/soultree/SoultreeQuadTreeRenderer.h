@@ -16,13 +16,19 @@
 #define SOULTREE_QUADTREE_RENDERER_H
 
 #include "core/GraphicsTest.h"
+#ifdef MCM2_PHYSICS_COMMON_SOULTREEOBJECT_H
+#error "SoultreeQuadTreeRenderer.h declares its own polymorphic SoultreeObject view"
+#endif
 #include "collision/CollisionObject.h"   // QuadTreeObject (objectTypeId at +8)
 
 // SoultreeObject as the renderer sees it: RTTI .?AVSoultreeObject@@ has the direct bases
 // QuadTreeObject (+0) and GameObject (+12).  Only the fields the renderer reads are named; the
-// flat common/SoultreeObject.h lists the same offsets (tier 1).  The class is polymorphic so
-// that dynamic_cast to it compiles to the same __RTDynamicCast call as retail.
-class SoultreeObjectView : public QuadTreeObject, public GameObject {
+// flat core/SoultreeObject.h lists the same offsets (tier 1).  The class is polymorphic and
+// carries the RTTI names so that dynamic_cast compiles to the same __RTDynamicCast call as
+// retail and references the type descriptors .?AVSoultreeObject@@ (0x00568950) and
+// .?AVD3DIMSoultreeObject@@ (0x00568970).  This TU-local view and the flat physics layout in
+// core/SoultreeObject.h are alternative declarations of one retail class: never include both.
+class SoultreeObject : public QuadTreeObject, public GameObject {
 public:
     char pad_0x38[0x14c - 0x38];
     int field_0x14c;                  // tested by slot 12
@@ -36,7 +42,7 @@ public:
 };
 
 // RTTI .?AVD3DIMSoultreeObject@@ : SoultreeObject (plain inheritance).
-class D3DIMSoultreeObjectView : public SoultreeObjectView {
+class D3DIMSoultreeObject : public SoultreeObject {
 public:
     char pad_0x19c[0x28c - 0x19c];
     int field_0x28c;                  // nonzero gates the work in 0x5046e0

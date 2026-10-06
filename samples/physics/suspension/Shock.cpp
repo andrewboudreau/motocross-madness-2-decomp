@@ -1,5 +1,5 @@
-// SelectiveGravityModel.cpp -- reconstruction of D:\aardvark\VC\krusty2\SelectiveGravityModel.cpp
-// (SelectiveGravityModel, Shock, InlineShock, RotatingShock).
+// Shock.cpp -- candidate for the unnamed translation unit at 0x004f9a60..0x004fb1d7
+// (Shock, InlineShock, RotatingShock).  Not SelectiveGravityModel.cpp: see README.md.
 #include "Suspension.h"
 #include "core/DebugAlloc.h"
 #include "math/FastMath.h"
@@ -12,54 +12,6 @@ const ShockVec3 kShockZero = ShockVec3(0.0f, 0.0f, 0.0f);
 const ShockVec3 kShockAxisX = ShockVec3(1.0f, 0.0f, 0.0f);
 const ShockVec3 kShockAxisY = ShockVec3(0.0f, 1.0f, 0.0f);
 const ShockVec3 kShockAxisZ = ShockVec3(0.0f, 0.0f, 1.0f);
-
-// ---------------------------------------------------------------------------
-// SelectiveGravityModel
-// ---------------------------------------------------------------------------
-
-SelectiveGravityModel::SelectiveGravityModel(int flags)
-    : GameObject(flags)
-{
-    bodies = 0;
-    bodyCount = 0;
-    field_0x38 = 0;
-    gravity = 32.2f;
-}
-
-SelectiveGravityModel::~SelectiveGravityModel()
-{
-    if (bodies)
-        operator delete(bodies, __FILE__, 0x12);
-}
-
-void SelectiveGravityModel::AddBody(GravityBody* body)
-{
-    bodies = (GravityBody**)DebugRealloc(bodies, bodyCount * 4 + 4, __FILE__, 0x18);
-    bodies[bodyCount] = body;
-    bodyCount++;
-}
-
-void SelectiveGravityModel::SetGravity(float g)
-{
-    gravity = g;
-}
-
-int SelectiveGravityModel::GameObjectVirtualSlot10(float dt)
-{
-    GameObject::GameObjectVirtualSlot10(dt);
-    if (!field_0x38)
-        GameObjectVirtualSlot11(dt);
-    return 1;
-}
-
-int SelectiveGravityModel::GameObjectVirtualSlot11(float dt)
-{
-    for (int i = 0; i < bodyCount; i++) {
-        GravityBody* b = bodies[i];
-        b->AddWorldForce(ShockVec3(0.0f, b->mass * gravity * -1.0f, 0.0f));
-    }
-    return 1;
-}
 
 // ---------------------------------------------------------------------------
 // Shock

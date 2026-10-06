@@ -61,7 +61,8 @@ public:
     unsigned int field_0x164;            // capability bits (0x4000: 800x600, PCGame 0x004c0d10)
     unsigned char field_0x168[0x1a8 - 0x168];
     unsigned int field_0x1a8;            // capability bits (PCGame slot 7 tests 0x1, 0x800)
-    unsigned char field_0x1ac[0x1c4 - 0x1ac];
+    unsigned char field_0x1ac[0x1c0 - 0x1ac];
+    unsigned int field_0x1c0;            // capability bits (SoultreeMaterial tests 0x8 before colour keying)
     unsigned int field_0x1c4;            // texture filter capability bits (0x2, 0x20)
     unsigned char field_0x1c8[0x250 - 0x1c8];
     int field_0x250;                     // 3

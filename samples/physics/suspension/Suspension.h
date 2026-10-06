@@ -1,5 +1,5 @@
-// Suspension.h -- SelectiveGravityModel, Shock, InlineShock and RotatingShock
-// (retail D:\aardvark\VC\krusty2\SelectiveGravityModel.cpp).  Evidence is in README.md.
+// Suspension.h -- Shock, InlineShock and RotatingShock (unnamed retail TU following
+// SelectiveGravityModel.cpp).  Evidence is in README.md.
 // Names are tier 3 (provisional); offsets are tier 1 (decoded loads and stores).
 #ifndef SUSPENSION_H
 #define SUSPENSION_H
@@ -66,34 +66,6 @@ public:
     ShockNode* sceneNode;   // +0x40 (+0x44 in a Shock): the node the shocks move
     int ownerRef;           // +0x44 ctor arg c
     int field_0x48;
-};
-
-// Placeholders for the rigid body the SelectiveGravityModel pushes on.  Slots 0..26 are the
-// GameObject ones; the PhysicsBody slots 27..36 are placeholders and slot 37 is AddWorldForce
-// (PhysicsBody 0x00556e0c, samples/physics/rigidbody/PhysicsBody.h).
-class GravityBody : public GameObject {
-public:
-    virtual void Slot27(); virtual void Slot28(); virtual void Slot29(); virtual void Slot30();
-    virtual void Slot31(); virtual void Slot32(); virtual void Slot33(); virtual void Slot34();
-    virtual void Slot35(); virtual void Slot36();
-    virtual void AddWorldForce(ShockVec3 force);                       // slot 37
-    char field_0x2c[0x14c];
-    float mass;                                                        // +0x178
-};
-
-class SelectiveGravityModel : public GameObject {
-public:
-    explicit SelectiveGravityModel(int flags);                 // 0x004f9760
-    virtual ~SelectiveGravityModel();                          // slot 0, deleting 0x004f9790, core 0x004f97b0
-    virtual int GameObjectVirtualSlot10(float dt);             // 0x004f9860
-    virtual int GameObjectVirtualSlot11(float dt);             // 0x004f9890
-    virtual void AddBody(GravityBody* body);                   // slot 27, 0x004f9820
-    virtual void SetGravity(float g);                          // slot 28, 0x004f9a50
-
-    float gravity;          // +0x2c ctor 32.2f; slot 11 pushes mass * gravity along -Y
-    GravityBody** bodies;   // +0x30 array grown by slot 27 (debug realloc, line 0x18); freed by the dtor (line 0x12)
-    int bodyCount;          // +0x34 slot 27 appends here
-    int field_0x38;         // +0x38 ctor 0; slot 10 runs slot 11 itself while it is 0
 };
 
 class Shock : public MovingPart {

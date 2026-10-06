@@ -119,6 +119,26 @@ python tools/run_physics_samples.py --strict \
 
 This run reports `40/43 strict exact` with no required failures.
 
+## Wave-8 promoted slice
+
+`src/krusty2/soultree/SoultreeQuadTreeRenderer.cpp` (8 cases, moved from
+`samples/physics/soultree_base/`) and `src/krusty2/gravity/SelectiveGravityModel.cpp`
+(15 cases) pass strict comparison.
+- SelectiveGravityModel's slot 11 needs `Vec3(0,-1,0) * (b->mass * gravity)`.
+- Its SetGravity is an inline virtual, which places it after the `$E` code
+  as retail does.
+- The QuadTreeRenderer node views use the RTTI names, so their type
+  descriptors bind exactly.
+
+```bash
+python tools/run_physics_samples.py --strict \
+  --source src/krusty2/gravity/SelectiveGravityModel.cpp \
+  --source src/krusty2/soultree/SoultreeQuadTreeRenderer.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+This run reports `23/23 strict exact`.
+
 ## Code-generation limits behind the remaining partials
 
 These were measured with VC6 SP3 `/O2` on the real targets and on small synthetic
