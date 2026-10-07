@@ -210,7 +210,7 @@ krustyui.cpp (KrustyUI) matches strictly in 43 functions, including the
 QuarryStuntEvent.cpp (BaseQuarryEvent) matches strictly in 25 functions;
 see [QUARRYSTUNTEVENT](QUARRYSTUNTEVENT.md).
 
-gameui.cpp (the UI controls) matches strictly in 285 functions, 278 of
+gameui.cpp (the UI controls) matches strictly in 302 functions, 295 of
 them registered; see [GAMEUI](GAMEUI.md).
 
 bikerace.cpp (BikeRace) matches strictly in 41 functions; see

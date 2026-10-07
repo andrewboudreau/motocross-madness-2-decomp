@@ -7,14 +7,6 @@
 // procedures (their vtable slot 29), a few other slots and their helpers.
 // Names are provisional; the dialog classes are RTTI names.
 
-// RTTI: MediaControl : GameObject (vtable 0x005551c0), the movie player a
-// movie control holds at +0x1ec. Only what this file calls is declared.
-class MediaControl : public GameObject {
-public:
-    int UnknownFunction4a2900();              // 0x004a2900: restarts the movie
-    void UnknownFunction4a2940();             // 0x004a2940: stops the movie
-};
-
 // 0x0044b0a0 / 0x0044b0e0: qsort orders of list rows by the number in their
 // text (ascending / descending).
 int UnknownFunction44b0a0(const void* a, const void* b);
@@ -51,7 +43,7 @@ public:
     unsigned char field_0x2c[0x30 - 0x2c];
     GUIManager* field_0x30;
     unsigned char field_0x34[0x7f58 - 0x34];
-    UnknownGameUiControl* field_0x7f58;       // the movie control
+    UIVideoStatic* field_0x7f58;              // the movie control
     unsigned char field_0x7f5c[0x7f60 - 0x7f5c];
     UnknownGameUiControl* field_0x7f60;       // "MenuSingleAnimation"
     UnknownGameUiControl* field_0x7f64;       // "MenuMultiAnimation"
@@ -190,20 +182,6 @@ public:
     unsigned char field_0x30[0x7f58 - 0x30];
 };
 
-// RTTI: UIVideoStatic : UIControl (vtable 0x00553b60; 0x200 bytes): a
-// control that plays a movie. Modelled on GameObject because
-// UnknownGameUiControl declares list box members past its 0x200 bytes.
-class UIVideoStatic : public GameObject {
-public:
-    UIVideoStatic(int flags, CameraRect* area, UIDialog* owner); // 0x0047ae30
-    // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
-    int UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
-
-    unsigned char field_0x2c[0x1ec - 0x2c];
-    MediaControl* field_0x1ec;
-    unsigned char field_0x1f0[0x200 - 0x1f0];
-};
-
 // RTTI: CreditsVidDlg : UIDialog (vtable 0x005516f8).
 class CreditsVidDlg : public UIDialog {
 public:
@@ -278,21 +256,6 @@ public:
 class UnknownDialogImage {
 public:
     int UnknownFunction472f90();              // 0x00472f90: the current frame's texture
-};
-
-// RTTI: UIProgressBar : UIControl (vtable 0x00553c68; 0x204 bytes).
-// Modelled on GameObject like UIVideoStatic.
-class UIProgressBar : public GameObject {
-public:
-    UIProgressBar(int flags, CameraRect* area, UIDialog* owner); // 0x0047b020
-    void UnknownFunction470dc0(const char* name);            // 0x00470dc0
-    void UnknownFunction47b3d0(int texture, int a);          // 0x0047b3d0
-
-    unsigned char field_0x2c[0x1f0 - 0x2c];
-    int field_0x1f0;                          // range
-    unsigned char field_0x1f4[0x1fc - 0x1f4];
-    int field_0x1fc;                          // value
-    unsigned char field_0x200[0x204 - 0x200];
 };
 
 // 0x0059adfc: frames the loading dialog has waited; 0x0059ae84: set once

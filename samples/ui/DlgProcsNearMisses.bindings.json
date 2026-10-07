@@ -317,7 +317,7 @@
   "?UnknownFunction470a80@UnknownGameUiControl@@QAEXPAXH@Z": "0x00470a80",
   "?UnknownFunction470b20@UnknownGameUiControl@@QAEXPBD@Z": "0x00470b20",
   "?UnknownFunction470da0@UnknownGameUiControl@@QAEXH@Z": "0x00470da0",
-  "?UnknownFunction470dc0@UIProgressBar@@QAEXPBD@Z": "0x00470dc0",
+  "?UnknownFunction470dc0@UnknownGameUiControl@@QAEXPBD@Z": "0x00470dc0",
   "?UnknownFunction472f90@UnknownDialogImage@@QAEHXZ": "0x00472f90",
   "?UnknownFunction473390@UnknownGameUiControl@@QAEXPAV1@@Z": "0x00473390",
   "?UnknownFunction473c70@UnknownGameUiControl@@QAEXH@Z": "0x00473c70",

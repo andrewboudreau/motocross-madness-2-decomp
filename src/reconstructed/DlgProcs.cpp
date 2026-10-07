@@ -140,8 +140,8 @@ int MainDlg::UnknownVirtualSlot10(float frameTime) {
             } else {
                 field_0x7f78 = 0;
                 if (field_0x7f58) {
-                    field_0x7f58->field_0x1ec_movie->UnknownFunction4a2900();
-                    field_0x7f58->field_0x1ec_movie->UnknownVirtualSlot16(field_0x7f78);
+                    field_0x7f58->field_0x1ec->UnknownFunction4a2900();
+                    field_0x7f58->field_0x1ec->UnknownVirtualSlot16(field_0x7f78);
                     field_0x7f58->UnknownFunction470660(1, 1);
                 }
             }

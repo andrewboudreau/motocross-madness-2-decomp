@@ -104,19 +104,22 @@ public:
     int field_0x14c;
     unsigned char field_0x150[0x154 - 0x150];
     int field_0x154;
-    unsigned char field_0x158[0x160 - 0x158];
+    int field_0x158;                          // scales to the screen (not "NoScale")
+    int field_0x15c;                          // "Popup"
     CameraRect field_0x160;                   // screen area
-    int field_0x170;
-    int field_0x174;                          // where controls slide in from (x)
-    int field_0x178;                          // (y)
+    int field_0x170;                          // a popup's alignment ("DlgAlignV" | "DlgAlignH"); 9 otherwise
+    int field_0x174;                          // "ScreenWidth"; where controls slide in from (x)
+    int field_0x178;                          // "ScreenHeight"; (y)
     int field_0x17c;                          // result
     int field_0x180;
-    unsigned char field_0x184[0x95c - 0x184];
+    unsigned char field_0x184[0x18c - 0x184];
+    UIAnim* field_0x18c[500];                 // the "Set_Anim" sections' images
     UnknownCursorAnimation* field_0x95c;      // the cursor over it
-    unsigned char field_0x960[0x9b0 - 0x960];
-    int field_0x9b0;
-    unsigned char field_0x9b4[0x9bc - 0x9b4];
-    UnknownGameUiControl* field_0x9bc;        // the list box being sorted
+    Sound* field_0x960[20];                   // the "Set_Sound" sections' sounds
+    int field_0x9b0;                          // images
+    int field_0x9b4;                          // sounds
+    PCTextureMap* field_0x9b8;                // the parent's background image ("BackgroundFile")
+    UIListBox* field_0x9bc;                   // the list box being sorted
     float field_0x9c0;                        // frame time
     float field_0x9c4;                        // horizontal scale
     float field_0x9c8;                        // vertical scale
@@ -124,7 +127,10 @@ public:
     int field_0x7efc;                         // sounds
     void* field_0x7f00;
     void* field_0x7f04;
-    unsigned char field_0x7f08[0x7f18 - 0x7f08];
+    unsigned char field_0x7f08[0x7f0c - 0x7f08];
+    int field_0x7f0c;                         // owns the palette +0x140
+    int field_0x7f10;                         // has its own background image
+    unsigned char field_0x7f14[0x7f18 - 0x7f14];
     int field_0x7f18;
     int field_0x7f1c;                         // the joystick is centred
     void* field_0x7f20;                       // textures
@@ -391,7 +397,7 @@ void UIButton::UnknownFunction473370(UIAnim* image) {
 
 // 0x00473390
 void UnknownGameUiControl::UnknownFunction473390(UnknownGameUiControl* list) {
-    field_0x1ec_control = list;
+    UnknownInlineButtonControl()->field_0x1ec = list;
 }
 
 // ---------------------------------------------------------------------------
@@ -598,7 +604,7 @@ void UnknownGameUiControl::UnknownVirtualSlot64(CameraRect* in, CameraRect* out)
 // 0x004731f0
 UIButton::UIButton(int id, CameraRect* area, UnknownGameUiDialog* owner)
     : UnknownGameUiControl(1, id, area, owner) {
-    field_0x1ec_control = 0;
+    field_0x1ec = 0;
     UnknownFunction4732d0(0, 0, 0, 0);
     UnknownFunction470810(0, 0);
     UnknownFunction470810(1, 0);
@@ -612,8 +618,8 @@ int UIButton::UnknownVirtualSlot56(int a, int* position) {
     if (field_0xb8->field_0x34->field_0x1d8 == (UnknownGuiControl*)this && !a && field_0x60 == 2) {
         UnknownDialogEvent event;
         event.field_0x20 = a;
-        if (field_0x1ec_control)
-            field_0x1ec_control->UnknownFunction477900(1);
+        if (field_0x1ec)
+            field_0x1ec->UnknownFunction477900(1);
         event.field_0x08 = 1;
         event.field_0x00 = field_0x74;
         event.field_0x04 = UnknownFunction470df0();
@@ -651,7 +657,7 @@ UIEditBox::UIEditBox(int id, CameraRect* area, UnknownGameUiDialog* owner, int s
     field_0x200 = 0;
     field_0x1ec = 0;
     field_0xd0 = 0;
-    field_0x1fc_value = 0;
+    field_0x1fc = 0;
     field_0x210 = 0;
     field_0x20c = 0;
     field_0x228 = 0;
@@ -678,7 +684,7 @@ UIEditBox::~UIEditBox() {
 // 0x00473820
 void UnknownGameUiControl::UnknownFunction473820(char* buffer, int size) {
     UnknownGameUiControl::UnknownVirtualSlot54((int*)buffer);
-    field_0x224 = size;
+    UnknownInlineEditBox()->field_0x224 = size;
 }
 
 // 0x00473840
@@ -786,7 +792,7 @@ UIScrollBar::UIScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog
     field_0x1f0 = 0;
     field_0x1f4 = 0;
     field_0x1f8 = 0;
-    field_0x1fc_value = 0;
+    field_0x1fc = 0;
     field_0x208 = 0;
     field_0x204 = 0;
     field_0x210 = 0;
@@ -794,7 +800,7 @@ UIScrollBar::UIScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog
     field_0x218 = 0;
     field_0x21c = 0;
     field_0x200 = 100;
-    field_0x214_float = 0.2f;
+    field_0x214 = 0.2f;
 }
 
 // 0x00474c50
@@ -820,22 +826,22 @@ void UIScrollBar::UnknownFunction475160(int state) {
 
 // 0x004751c0
 void UnknownGameUiControl::UnknownFunction4751c0(int range) {
-    field_0x200 = range;
+    UnknownInlineScrollBar()->field_0x200 = range;
     UnknownVirtualSlot50();
 }
 
 // 0x004754d0
 void UnknownGameUiControl::UnknownFunction4754d0(int range) {
     if (range > 0)
-        field_0x1f0 = range - 1;
+        UnknownInlineScrollBar()->field_0x1f0 = range - 1;
     else
-        field_0x1f0 = 0;
+        UnknownInlineScrollBar()->field_0x1f0 = 0;
     UnknownVirtualSlot50();
 }
 
 // 0x004755c0
 int UnknownGameUiControl::UnknownFunction4755c0() {
-    return field_0x1f0;
+    return UnknownInlineScrollBar()->field_0x1f0;
 }
 
 // ---------------------------------------------------------------------------
@@ -951,12 +957,12 @@ UIListBox::~UIListBox() {
 
 // 0x00476860
 int UnknownGameUiControl::UnknownFunction476860(int row, int a) {
-    int last = field_0x1ec - field_0x204;
+    int last = UnknownInlineListBox()->field_0x1ec - UnknownInlineListBox()->field_0x204;
     if (row < last)
         last = row;
-    field_0x1f0 = last < 0 ? 0 : last;
-    if (field_0x200 == 1)
-        UnknownVirtualSlot65(field_0x1f0);
+    UnknownInlineListBox()->field_0x1f0 = last < 0 ? 0 : last;
+    if (UnknownInlineListBox()->field_0x200 == 1)
+        UnknownVirtualSlot65(UnknownInlineListBox()->field_0x1f0);
     UnknownVirtualSlot50();
     if (a)
         UnknownFunction477bc0();
@@ -966,11 +972,11 @@ int UnknownGameUiControl::UnknownFunction476860(int row, int a) {
 // 0x004768d0
 int UnknownGameUiControl::UnknownFunction4768d0(int row) {
     if (row == -1) {
-        row = field_0x1f4;
+        row = UnknownInlineListBox()->field_0x1f4;
         if (row == -1)
             return 0;
     }
-    return field_0x214[row].field_0x1c;
+    return UnknownInlineListBox()->field_0x214[row].field_0x1c;
 }
 
 // 0x00476900
@@ -984,13 +990,13 @@ int UIListBox::UnknownFunction476900(int data) {
 
 // 0x00476930
 void UnknownGameUiControl::UnknownFunction476930(int row, int data) {
-    field_0x214[row].field_0x1c = data;
+    UnknownInlineListBox()->field_0x214[row].field_0x1c = data;
 }
 
 // 0x00476950
 int UnknownGameUiControl::UnknownFunction476950() {
-    if (field_0x1ec > 0)
-        return field_0x1f4;
+    if (UnknownInlineListBox()->field_0x1ec > 0)
+        return UnknownInlineListBox()->field_0x1f4;
     return -1;
 }
 
@@ -1010,22 +1016,22 @@ int UIListBox::UnknownFunction4769a0(int row) {
 
 // 0x00476b80
 void UnknownGameUiControl::UnknownFunction476b80(unsigned int color) {
-    field_0x208 = color;
+    UnknownInlineListBox()->field_0x208 = color;
     UnknownVirtualSlot50();
 }
 
 // 0x00476d20
 char* UnknownGameUiControl::UnknownFunction476d20(int row) {
-    if (field_0x1f4 >= 0 && row == -1)
-        return field_0x214[field_0x1f4].field_0x14;
-    if (field_0x1ec && row >= 0 && row < field_0x1ec)
-        return field_0x214[row].field_0x14;
+    if (UnknownInlineListBox()->field_0x1f4 >= 0 && row == -1)
+        return UnknownInlineListBox()->field_0x214[UnknownInlineListBox()->field_0x1f4].field_0x14;
+    if (UnknownInlineListBox()->field_0x1ec && row >= 0 && row < UnknownInlineListBox()->field_0x1ec)
+        return UnknownInlineListBox()->field_0x214[row].field_0x14;
     return 0;
 }
 
 // 0x004777f0
 void UnknownGameUiControl::UnknownFunction4777f0(int (*compare)(const void* a, const void* b)) {
-    field_0x24c = compare;
+    UnknownInlineListBox()->field_0x24c = compare;
 }
 
 // 0x00477b60
@@ -1051,7 +1057,7 @@ void UIListBox::UnknownFunction477ba0(int value) {
 
 // 0x00477bb0
 void UnknownGameUiControl::UnknownFunction477bb0(int a) {
-    field_0x224 = a;
+    UnknownInlineListBox()->field_0x224 = a;
 }
 
 // 0x00477ce0
@@ -1065,9 +1071,9 @@ void UIListBox::UnknownVirtualSlot50() {
 
 // 0x00477e60
 void UnknownGameUiControl::UnknownFunction477e60(int a) {
-    field_0x240 = a;
-    if (!field_0x200)
-        field_0x200 = 1;
+    UnknownInlineListBox()->field_0x240 = a;
+    if (!UnknownInlineListBox()->field_0x200)
+        UnknownInlineListBox()->field_0x200 = 1;
 }
 
 // 0x00478190
@@ -1097,48 +1103,48 @@ UIMultiState::UIMultiState(int id, CameraRect* area, UnknownGameUiDialog* owner)
     : UnknownGameUiControl(2, id, area, owner) {
     field_0x1ec = 0;
     field_0x1f0 = 0;
-    field_0x1f4_states = 0;
+    field_0x1f4 = 0;
     UnknownFunction478860(2);
 }
 
 // 0x00478260
 int UIMultiState::UnknownVirtualSlot34() {
-    return (int)field_0x1f4_states[field_0x1f0].field_0x08;
+    return (int)field_0x1f4[field_0x1f0].field_0x08;
 }
 
 // 0x00478280
 int UIMultiState::UnknownVirtualSlot35() {
-    return field_0x1f4_states[field_0x1f0].field_0x0c;
+    return field_0x1f4[field_0x1f0].field_0x0c;
 }
 
 // 0x004782a0
 int UIMultiState::UnknownVirtualSlot36() {
-    return (int)field_0x1f4_states[field_0x1f0].field_0x1c;
+    return (int)field_0x1f4[field_0x1f0].field_0x1c;
 }
 
 // 0x004782c0
 void* UIMultiState::UnknownVirtualSlot37() {
-    return field_0x1f4_states[field_0x1f0].field_0x14;
+    return field_0x1f4[field_0x1f0].field_0x14;
 }
 
 // 0x00478300
 UIMultiState::~UIMultiState() {
     if (field_0x1ec && (!field_0xb8 || !field_0xb8->field_0x9b0)) {
         for (int i = 0; i < field_0x1ec; i++) {
-            UIAnim* image = field_0x1f4_states[i].field_0x00;
+            UIAnim* image = field_0x1f4[i].field_0x00;
             if (image && !image->field_0xf4)
                 operator delete(image, __FILE__, 0x210e);
-            image = field_0x1f4_states[i].field_0x04;
+            image = field_0x1f4[i].field_0x04;
             if (image && !image->field_0xf4)
                 operator delete(image, __FILE__, 0x210f);
-            if (field_0x1f4_states[i].field_0x08)
-                operator delete(field_0x1f4_states[i].field_0x08, __FILE__, 0x2110);
-            if (field_0x1f4_states[i].field_0x1c)
-                operator delete(field_0x1f4_states[i].field_0x1c, __FILE__, 0x2111);
+            if (field_0x1f4[i].field_0x08)
+                operator delete(field_0x1f4[i].field_0x08, __FILE__, 0x2110);
+            if (field_0x1f4[i].field_0x1c)
+                operator delete(field_0x1f4[i].field_0x1c, __FILE__, 0x2111);
         }
     }
-    if (field_0x1f4_states)
-        operator delete(field_0x1f4_states, __FILE__, 0x2114);
+    if (field_0x1f4)
+        operator delete(field_0x1f4, __FILE__, 0x2114);
 }
 
 // 0x00478450
@@ -1152,7 +1158,7 @@ void UIMultiState::UnknownVirtualSlot38() {
         return;
     }
     UIAnim* image;
-    if (!field_0x1f4_states || !(image = field_0x1f4_states[field_0x1f0].field_0x00)) {
+    if (!field_0x1f4 || !(image = field_0x1f4[field_0x1f0].field_0x00)) {
         field_0x1c0 = 1;
         return;
     }
@@ -1164,13 +1170,13 @@ void UIMultiState::UnknownVirtualSlot38() {
 
 // 0x004784e0
 void UIMultiState::UnknownVirtualSlot27() {
-    if (!field_0x1f4_states)
+    if (!field_0x1f4)
         return;
     UIAnim* image;
     if (field_0x60 == 4)
-        image = field_0x1f4_states[field_0x1f0].field_0x04;
+        image = field_0x1f4[field_0x1f0].field_0x04;
     else
-        image = field_0x1f4_states[field_0x1f0].field_0x00;
+        image = field_0x1f4[field_0x1f0].field_0x00;
     if (image)
         image->UnknownFunction472fe0();
 }
@@ -1192,10 +1198,10 @@ void UIMultiState::UnknownVirtualSlot59(int value) {
 // 0x004789f0
 void UIMultiState::UnknownFunction4789f0(int index, UIAnim* image, const char* text) {
     if (index < field_0x1ec && image) {
-        UIAnim* old = field_0x1f4_states[index].field_0x00;
+        UIAnim* old = field_0x1f4[index].field_0x00;
         if (old && !old->field_0xf4)
             old->Release();
-        field_0x1f4_states[index].field_0x00 = image;
+        field_0x1f4[index].field_0x00 = image;
     }
     if (text)
         UnknownFunction478ad0(index, text);
@@ -1203,14 +1209,14 @@ void UIMultiState::UnknownFunction4789f0(int index, UIAnim* image, const char* t
 
 // 0x00478cf0
 void UnknownGameUiControl::UnknownFunction478cf0(int value) {
-    if (value < field_0x1ec)
-        field_0x1f0 = value;
+    if (value < UnknownInlineMultiState()->field_0x1ec)
+        UnknownInlineMultiState()->field_0x1f0 = value;
     UnknownVirtualSlot50();
 }
 
 // 0x00478d10
 void UIMultiState::UnknownFunction478d10() {
-    UnknownGameUiState* states = field_0x1f4_states;
+    UnknownGameUiState* states = field_0x1f4;
     if (!states)
         return;
     int start = field_0x1f0;
@@ -1319,43 +1325,55 @@ int UIRadioButton::UnknownVirtualSlot53() {
 UIDDLScrollBar::UIDDLScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog* owner,
                                UIDropDownList* list)
     : UIScrollBar(type, id, area, owner) {
-    field_0x220_list = list;
+    field_0x220 = list;
     UnknownFunction469ce0(this);
 }
 
 // 0x004796e0
 void UIDDLScrollBar::UnknownVirtualSlot33(int value) {
     UnknownGameUiControl::UnknownVirtualSlot33(value);
-    if (!field_0x220_list->UnknownFunction47a800((UnknownGameUiControl*)value))
-        field_0x220_list->UnknownFunction47a2d0(0);
+    if (!field_0x220->UnknownFunction47a800((UnknownGameUiControl*)value))
+        field_0x220->UnknownFunction47a2d0(0);
+}
+
+// 0x00479b50
+UIDDLStatic::UIDDLStatic(int id, CameraRect* area, UnknownGameUiDialog* owner, UIDropDownList* list)
+    : UIStatic(id, area, owner), field_0x1ec(list) {
+    UnknownFunction469ce0(this);
 }
 
 // 0x00479bc0
 void UIDDLStatic::UnknownVirtualSlot33(int value) {
     UnknownGameUiControl::UnknownVirtualSlot33(value);
-    if (!field_0x1ec_list->UnknownFunction47a800((UnknownGameUiControl*)value))
-        field_0x1ec_list->UnknownFunction47a2d0(0);
+    if (!field_0x1ec->UnknownFunction47a800((UnknownGameUiControl*)value))
+        field_0x1ec->UnknownFunction47a2d0(0);
+}
+
+// 0x00479bf0
+UIDDLButton::UIDDLButton(int id, CameraRect* area, UnknownGameUiDialog* owner, UIDropDownList* list)
+    : UIButton(id, area, owner), field_0x1f0(list) {
+    UnknownFunction469ce0(this);
 }
 
 // 0x00479c90
 int UIDDLButton::UnknownVirtualSlot55(int a, int b) {
     UnknownGameUiControl::UnknownVirtualSlot55(a, b);
     if (field_0xb8->field_0x34->field_0x1d8 == (UnknownGuiControl*)this)
-        field_0x1f0_list->UnknownFunction47a2d0(1 - field_0x1f0_list->field_0x208);
+        field_0x1f0->UnknownFunction47a2d0(1 - field_0x1f0->field_0x208);
     return 0;
 }
 
 // 0x00479ce0
 void UIDDLButton::UnknownVirtualSlot33(int value) {
     UnknownGameUiControl::UnknownVirtualSlot33(value);
-    if (!field_0x1f0_list->UnknownFunction47a800((UnknownGameUiControl*)value))
-        field_0x1f0_list->UnknownFunction47a2d0(0);
+    if (!field_0x1f0->UnknownFunction47a800((UnknownGameUiControl*)value))
+        field_0x1f0->UnknownFunction47a2d0(0);
 }
 
 // 0x00479d10
-UIDDLListBox::UIDDLListBox(int id, CameraRect* area, UnknownGameUiDialog* owner, int rows,
+UIDDLListBox::UIDDLListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* owner,
                            UIDropDownList* list)
-    : UIListBox(id, area, owner, rows) {
+    : UIListBox(id, rows, area, owner) {
     field_0x250 = list;
     UnknownFunction469ce0(this);
 }
@@ -1378,15 +1396,53 @@ void UIDDLListBox::UnknownVirtualSlot33(int value) {
 // ---------------------------------------------------------------------------
 // UIDropDownList
 
+// 0x00479ea0
+UIDropDownList::UIDropDownList(int id, CameraRect* area, UnknownGameUiDialog* owner, const char* text,
+                               unsigned int color)
+    : UIStaticText(id, area, owner, text, color) {
+    UnknownFunction469ce0(this);
+    CameraRect rect;
+    field_0x5c = 6;
+    field_0x204 = 0x14;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = 10;
+    rect.bottom = 10;
+    field_0x1ec = new(__FILE__, 0x24e3) UIDDLButton(0, &rect, owner, this);
+    field_0x1fc = new(__FILE__, 0x24e4) UIDDLListBox(0, 100, &rect, owner, this);
+    field_0x200 = new(__FILE__, 0x24e5) UIDDLScrollBar(7, 0, &rect, owner, this);
+    field_0x1f0 = new(__FILE__, 0x24e6) UIDDLStatic(0, &rect, owner, this);
+    field_0x1f4 = new(__FILE__, 0x24e7) UIDDLStatic(0, &rect, owner, this);
+    field_0x1f8 = new(__FILE__, 0x24e8) UIDDLStatic(0, &rect, owner, this);
+    field_0x1f0->UnknownFunction470830(this, 1);
+    field_0x1f4->UnknownFunction470830(this, 1);
+    field_0x1f8->UnknownFunction470830(this, 1);
+    field_0x1ec->UnknownFunction470830(this, 1);
+    field_0x1fc->UnknownFunction470830(this, 1);
+    field_0x200->UnknownFunction470830(this, 1);
+    field_0x1fc->UnknownVirtualSlot52(0x4d43);
+    field_0x200->UnknownVirtualSlot52(0x4d43);
+    UnknownFunction469190(field_0x1ec, -1);
+    UnknownFunction469190(field_0x1f8, -1);
+    field_0x208 = 0;
+    UnknownFunction47a2d0(0);
+    owner->UnknownFunction46a840(field_0x1ec, 0, 0);
+    owner->UnknownFunction46a840(field_0x1fc, 0, 0);
+    owner->UnknownFunction46a840(field_0x200, 0, 0);
+    owner->UnknownFunction46a840(field_0x1f0, 0, 0);
+    owner->UnknownFunction46a840(field_0x1f8, 0, 0);
+    owner->UnknownFunction46a840(field_0x1f4, 0, 0);
+}
+
 // 0x0047a1f0
 UIDropDownList::~UIDropDownList() {
     if (field_0x1b4)
         UnknownVirtualSlot59(1);
     if (!field_0x208) {
-        field_0x1f0_control->Release();
-        field_0x1f4_control->Release();
+        field_0x1f0->Release();
+        field_0x1f4->Release();
         field_0x1fc->Release();
-        field_0x200_control->Release();
+        field_0x200->Release();
     }
 }
 
@@ -1396,7 +1452,7 @@ void UIDropDownList::UnknownVirtualSlot52(int id) {
     if (!id)
         id = 0x4d43;
     field_0x1fc->UnknownVirtualSlot52(id);
-    field_0x200_control->UnknownVirtualSlot52(id);
+    field_0x200->UnknownVirtualSlot52(id);
 }
 
 // 0x0047a7d0
@@ -1408,18 +1464,18 @@ void UIDropDownList::UnknownVirtualSlot33(int value) {
 
 // 0x0047a800
 int UIDropDownList::UnknownFunction47a800(UnknownGameUiControl* control) {
-    if (control == this || control == field_0x200_control || control == field_0x1ec_control ||
-        control == field_0x1fc || control == field_0x1f0_control || control == field_0x1f4_control ||
-        control == field_0x1f8_control)
+    if (control == this || control == field_0x200 || control == field_0x1ec ||
+        control == field_0x1fc || control == field_0x1f0 || control == field_0x1f4 ||
+        control == field_0x1f8)
         return 1;
     return 0;
 }
 
 // 0x0047a850
 int UIDropDownList::UnknownVirtualSlot61() {
-    if (!field_0x1ec_control->field_0x3c[0])
+    if (!field_0x1ec->field_0x3c[0])
         return field_0x3c[2] - field_0x3c[0];
-    return field_0x1ec_control->field_0x3c[2] - field_0x3c[0];
+    return field_0x1ec->field_0x3c[2] - field_0x3c[0];
 }
 
 // 0x0047a870
@@ -2179,8 +2235,8 @@ int UnknownGameUiControl::UnknownFunction476a60(int row) {
 
 // 0x00476ad0
 int UnknownGameUiControl::UnknownFunction476ad0(const char* text) {
-    for (int i = 0; i < field_0x1ec; i++) {
-        if (field_0x214[i].field_0x00 == 1 && !_stricmp(text, field_0x214[i].field_0x14))
+    for (int i = 0; i < UnknownInlineListBox()->field_0x1ec; i++) {
+        if (UnknownInlineListBox()->field_0x214[i].field_0x00 == 1 && !_stricmp(text, UnknownInlineListBox()->field_0x214[i].field_0x14))
             return UnknownFunction476a60(i);
     }
     return 0;
@@ -2188,7 +2244,7 @@ int UnknownGameUiControl::UnknownFunction476ad0(const char* text) {
 
 // 0x00476b30
 int UnknownGameUiControl::UnknownFunction476b30(int data) {
-    for (int i = 0; i < field_0x1ec; i++) {
+    for (int i = 0; i < UnknownInlineListBox()->field_0x1ec; i++) {
         if (UnknownFunction4768d0(i) == data)
             return UnknownFunction476a60(i);
     }
@@ -2198,20 +2254,20 @@ int UnknownGameUiControl::UnknownFunction476b30(int data) {
 // 0x00476ba0
 void UnknownGameUiControl::UnknownFunction476ba0(unsigned int color, int row) {
     if (row == -1) {
-        if (field_0x20c)
-            DeleteObject((HGDIOBJ)field_0x20c);
-        field_0x20c = color != 0xff000000 ? CreateSolidBrush(color) : 0;
-    } else if (row < field_0x1ec) {
-        void* brush = field_0x214[row].field_0x34;
+        if (UnknownInlineListBox()->field_0x20c)
+            DeleteObject((HGDIOBJ)UnknownInlineListBox()->field_0x20c);
+        UnknownInlineListBox()->field_0x20c = color != 0xff000000 ? CreateSolidBrush(color) : 0;
+    } else if (row < UnknownInlineListBox()->field_0x1ec) {
+        void* brush = UnknownInlineListBox()->field_0x214[row].field_0x34;
         if (brush) {
-            for (int i = 0; i < field_0x1ec; i++) {
-                if (field_0x214[i].field_0x34 == brush)
+            for (int i = 0; i < UnknownInlineListBox()->field_0x1ec; i++) {
+                if (UnknownInlineListBox()->field_0x214[i].field_0x34 == brush)
                     goto shared;
             }
             DeleteObject((HGDIOBJ)brush);
         }
     shared:
-        field_0x214[row].field_0x34 = color != 0xff000000 ? CreateSolidBrush(color) : 0;
+        UnknownInlineListBox()->field_0x214[row].field_0x34 = color != 0xff000000 ? CreateSolidBrush(color) : 0;
     }
     UnknownVirtualSlot50();
 }
@@ -2223,16 +2279,16 @@ void UnknownGameUiControl::UnknownFunction476c70(unsigned int color, int row) {
         UnknownVirtualSlot50();
         return;
     }
-    if (row < field_0x1ec)
-        field_0x214[row].field_0x28 = color;
+    if (row < UnknownInlineListBox()->field_0x1ec)
+        UnknownInlineListBox()->field_0x214[row].field_0x28 = color;
     UnknownVirtualSlot50();
 }
 
 // 0x00476cd0
 void UnknownGameUiControl::UnknownFunction476cd0(unsigned int color) {
-    if (field_0x210)
-        DeleteObject((HGDIOBJ)field_0x210);
-    field_0x210 = color != 0xff000000 ? CreateSolidBrush(color) : 0;
+    if (UnknownInlineListBox()->field_0x210)
+        DeleteObject((HGDIOBJ)UnknownInlineListBox()->field_0x210);
+    UnknownInlineListBox()->field_0x210 = color != 0xff000000 ? CreateSolidBrush(color) : 0;
     UnknownVirtualSlot50();
 }
 
@@ -2240,14 +2296,14 @@ void UnknownGameUiControl::UnknownFunction476cd0(unsigned int color) {
 int UnknownGameUiControl::UnknownFunction476ee0() {
     int height = 0;
     int rows = 0;
-    int i = field_0x1f0;
-    int count = field_0x1ec;
+    int i = UnknownInlineListBox()->field_0x1f0;
+    int count = UnknownInlineListBox()->field_0x1ec;
     if (i < count) {
         int space = field_0x2c[3] - field_0x2c[1];
         for (; i < count; i++) {
-            height += field_0x214[i].field_0x0c;
+            height += UnknownInlineListBox()->field_0x214[i].field_0x0c;
             if (height > space) {
-                if (!rows && field_0x240)
+                if (!rows && UnknownInlineListBox()->field_0x240)
                     rows = 1;
                 return rows;
             }
@@ -2259,13 +2315,13 @@ int UnknownGameUiControl::UnknownFunction476ee0() {
 
 // 0x00476f50
 int UnknownGameUiControl::UnknownFunction476f50(int rows) {
-    if (rows > field_0x1fc_value) {
+    if (rows > UnknownInlineListBox()->field_0x1fc) {
         UnknownGameUiListRow* resized =
-            (UnknownGameUiListRow*)UnknownFunction47b570(field_0x214, rows * sizeof(UnknownGameUiListRow));
+            (UnknownGameUiListRow*)UnknownFunction47b570(UnknownInlineListBox()->field_0x214, rows * sizeof(UnknownGameUiListRow));
         if (resized) {
-            memset(&resized[field_0x1fc_value], 0, (rows - field_0x1fc_value) * sizeof(UnknownGameUiListRow));
-            field_0x1fc_value = rows;
-            field_0x214 = resized;
+            memset(&resized[UnknownInlineListBox()->field_0x1fc], 0, (rows - UnknownInlineListBox()->field_0x1fc) * sizeof(UnknownGameUiListRow));
+            UnknownInlineListBox()->field_0x1fc = rows;
+            UnknownInlineListBox()->field_0x214 = resized;
             return 1;
         }
         return 0;
@@ -2275,24 +2331,24 @@ int UnknownGameUiControl::UnknownFunction476f50(int rows) {
 
 // 0x00476ff0
 void UnknownGameUiControl::UnknownFunction476ff0(int row, const char* text) {
-    if (row < field_0x1ec && row >= 0) {
-        if (field_0x214[row].field_0x14)
-            operator delete(field_0x214[row].field_0x14, __FILE__, 0x1e0b);
-        if (field_0x214[row].field_0x24)
-            operator delete(field_0x214[row].field_0x24, __FILE__, 0x1e0c);
-        field_0x214[row].field_0x08 = strlen(text);
-        field_0x214[row].field_0x14 = (char*)DebugMalloc(field_0x214[row].field_0x08 + 1, __FILE__, 0x1e0e);
-        strcpy(field_0x214[row].field_0x14, text);
-        field_0x214[row].field_0x24 = field_0xb8->UnknownFunction46f890(
-            field_0x214[row].field_0x14, field_0xc4, (void*)field_0x128, field_0x1c4, 0);
+    if (row < UnknownInlineListBox()->field_0x1ec && row >= 0) {
+        if (UnknownInlineListBox()->field_0x214[row].field_0x14)
+            operator delete(UnknownInlineListBox()->field_0x214[row].field_0x14, __FILE__, 0x1e0b);
+        if (UnknownInlineListBox()->field_0x214[row].field_0x24)
+            operator delete(UnknownInlineListBox()->field_0x214[row].field_0x24, __FILE__, 0x1e0c);
+        UnknownInlineListBox()->field_0x214[row].field_0x08 = strlen(text);
+        UnknownInlineListBox()->field_0x214[row].field_0x14 = (char*)DebugMalloc(UnknownInlineListBox()->field_0x214[row].field_0x08 + 1, __FILE__, 0x1e0e);
+        strcpy(UnknownInlineListBox()->field_0x214[row].field_0x14, text);
+        UnknownInlineListBox()->field_0x214[row].field_0x24 = field_0xb8->UnknownFunction46f890(
+            UnknownInlineListBox()->field_0x214[row].field_0x14, field_0xc4, (void*)field_0x128, field_0x1c4, 0);
     }
     UnknownVirtualSlot50();
 }
 
 // 0x00476d80
 int UnknownGameUiControl::UnknownFunction476d80(const char* text, int data, int a) {
-    if (text && (field_0x1ec < field_0x1fc_value || UnknownFunction476f50(field_0x1ec + 1))) {
-        UnknownGameUiListRow* row = &field_0x214[field_0x1ec];
+    if (text && (UnknownInlineListBox()->field_0x1ec < UnknownInlineListBox()->field_0x1fc || UnknownFunction476f50(UnknownInlineListBox()->field_0x1ec + 1))) {
+        UnknownGameUiListRow* row = &UnknownInlineListBox()->field_0x214[UnknownInlineListBox()->field_0x1ec];
         row->field_0x08 = strlen(text);
         int height = field_0x160;
         if (!height)
@@ -2308,12 +2364,12 @@ int UnknownGameUiControl::UnknownFunction476d80(const char* text, int data, int 
         strcpy(row->field_0x14, text);
         row->field_0x24 = field_0xb8->UnknownFunction46f890(row->field_0x14, field_0xc4, (void*)field_0x128,
                                                             field_0x1c4, 0);
-        UnknownFunction476930(field_0x1ec, data);
+        UnknownFunction476930(UnknownInlineListBox()->field_0x1ec, data);
         row->field_0x30 = 0;
-        field_0x1ec++;
-        field_0x200 = UnknownFunction476ee0();
+        UnknownInlineListBox()->field_0x1ec++;
+        UnknownInlineListBox()->field_0x200 = UnknownFunction476ee0();
         UnknownFunction477bc0();
-        if (field_0x21c)
+        if (UnknownInlineListBox()->field_0x21c)
             UnknownFunction477900(1);
         return 1;
     }
@@ -2325,34 +2381,34 @@ int UnknownGameUiControl::UnknownFunction476d80(const char* text, int data, int 
 
 // 0x00478860
 int UnknownGameUiControl::UnknownFunction478860(int count) {
-    if (field_0x1ec > count) {
-        for (int i = count; i < field_0x1ec; i++) {
-            UIAnim* image = field_0x1f4_states[i].field_0x00;
+    if (UnknownInlineMultiState()->field_0x1ec > count) {
+        for (int i = count; i < UnknownInlineMultiState()->field_0x1ec; i++) {
+            UIAnim* image = UnknownInlineMultiState()->field_0x1f4[i].field_0x00;
             if (image && !image->field_0xf4)
                 operator delete(image, __FILE__, 0x21b6);
-            image = field_0x1f4_states[i].field_0x04;
+            image = UnknownInlineMultiState()->field_0x1f4[i].field_0x04;
             if (image && !image->field_0xf4)
                 operator delete(image, __FILE__, 0x21b7);
-            if (field_0x1f4_states[i].field_0x08)
-                operator delete(field_0x1f4_states[i].field_0x08, __FILE__, 0x21b8);
-            if (field_0x1f4_states[i].field_0x1c)
-                operator delete(field_0x1f4_states[i].field_0x1c, __FILE__, 0x21b9);
+            if (UnknownInlineMultiState()->field_0x1f4[i].field_0x08)
+                operator delete(UnknownInlineMultiState()->field_0x1f4[i].field_0x08, __FILE__, 0x21b8);
+            if (UnknownInlineMultiState()->field_0x1f4[i].field_0x1c)
+                operator delete(UnknownInlineMultiState()->field_0x1f4[i].field_0x1c, __FILE__, 0x21b9);
         }
-        field_0x1f4_states = (UnknownGameUiState*)UnknownFunction47b570(field_0x1f4_states,
+        UnknownInlineMultiState()->field_0x1f4 = (UnknownGameUiState*)UnknownFunction47b570(UnknownInlineMultiState()->field_0x1f4,
                                                                          count * sizeof(UnknownGameUiState));
-    } else if (field_0x1ec < count) {
-        field_0x1f4_states = (UnknownGameUiState*)UnknownFunction47b570(field_0x1f4_states,
+    } else if (UnknownInlineMultiState()->field_0x1ec < count) {
+        UnknownInlineMultiState()->field_0x1f4 = (UnknownGameUiState*)UnknownFunction47b570(UnknownInlineMultiState()->field_0x1f4,
                                                                          count * sizeof(UnknownGameUiState));
-        for (int i = field_0x1ec; i < count; i++) {
-            field_0x1f4_states[i].field_0x00 = 0;
-            field_0x1f4_states[i].field_0x04 = 0;
-            field_0x1f4_states[i].field_0x08 = 0;
-            field_0x1f4_states[i].field_0x1c = 0;
-            field_0x1f4_states[i].field_0x10 = 1;
+        for (int i = UnknownInlineMultiState()->field_0x1ec; i < count; i++) {
+            UnknownInlineMultiState()->field_0x1f4[i].field_0x00 = 0;
+            UnknownInlineMultiState()->field_0x1f4[i].field_0x04 = 0;
+            UnknownInlineMultiState()->field_0x1f4[i].field_0x08 = 0;
+            UnknownInlineMultiState()->field_0x1f4[i].field_0x1c = 0;
+            UnknownInlineMultiState()->field_0x1f4[i].field_0x10 = 1;
         }
     }
-    field_0x1f0 = 0;
-    field_0x1ec = count;
+    UnknownInlineMultiState()->field_0x1f0 = 0;
+    UnknownInlineMultiState()->field_0x1ec = count;
     UnknownVirtualSlot50();
     return 1;
 }
@@ -2371,42 +2427,42 @@ void UnknownGameUiControl::UnknownFunction478a50(int index, void* module, int id
 
 // 0x00478ad0
 void UnknownGameUiControl::UnknownFunction478ad0(int index, const char* text) {
-    int current = field_0x1f0;
-    if (index < field_0x1ec) {
-        field_0x1f0 = index;
-        if (field_0x1f4_states[index].field_0x08)
-            operator delete(field_0x1f4_states[index].field_0x08, __FILE__, 0x2210);
-        if (field_0x1f4_states[index].field_0x1c)
-            operator delete(field_0x1f4_states[index].field_0x1c, __FILE__, 0x2211);
+    int current = UnknownInlineMultiState()->field_0x1f0;
+    if (index < UnknownInlineMultiState()->field_0x1ec) {
+        UnknownInlineMultiState()->field_0x1f0 = index;
+        if (UnknownInlineMultiState()->field_0x1f4[index].field_0x08)
+            operator delete(UnknownInlineMultiState()->field_0x1f4[index].field_0x08, __FILE__, 0x2210);
+        if (UnknownInlineMultiState()->field_0x1f4[index].field_0x1c)
+            operator delete(UnknownInlineMultiState()->field_0x1f4[index].field_0x1c, __FILE__, 0x2211);
         if (text) {
-            field_0x1f4_states[index].field_0x08 = (char*)DebugMalloc(strlen(text) + 1, __FILE__, 0x2213);
-            strcpy(field_0x1f4_states[index].field_0x08, text);
-            field_0x1f4_states[index].field_0x1c = field_0xb8->UnknownFunction46f890(
-                field_0x1f4_states[index].field_0x08, field_0xc4, (void*)field_0x128, field_0x1c4,
-                field_0x1f4_states[index].field_0x14);
-            if (!field_0x1f4_states[index].field_0x1c) {
-                field_0x1f4_states[index].field_0x14[0] = strlen(field_0x1f4_states[index].field_0x08);
-                field_0x1f4_states[index].field_0x0c = field_0x1f4_states[index].field_0x14[0];
+            UnknownInlineMultiState()->field_0x1f4[index].field_0x08 = (char*)DebugMalloc(strlen(text) + 1, __FILE__, 0x2213);
+            strcpy(UnknownInlineMultiState()->field_0x1f4[index].field_0x08, text);
+            UnknownInlineMultiState()->field_0x1f4[index].field_0x1c = field_0xb8->UnknownFunction46f890(
+                UnknownInlineMultiState()->field_0x1f4[index].field_0x08, field_0xc4, (void*)field_0x128, field_0x1c4,
+                UnknownInlineMultiState()->field_0x1f4[index].field_0x14);
+            if (!UnknownInlineMultiState()->field_0x1f4[index].field_0x1c) {
+                UnknownInlineMultiState()->field_0x1f4[index].field_0x14[0] = strlen(UnknownInlineMultiState()->field_0x1f4[index].field_0x08);
+                UnknownInlineMultiState()->field_0x1f4[index].field_0x0c = UnknownInlineMultiState()->field_0x1f4[index].field_0x14[0];
                 HDC dc;
                 if (!g_UnknownGlobal56e26c->PCTarget()->field_0x48->UnknownMethod17((void**)&dc)) {
                     HGDIOBJ font =
                         (HGDIOBJ)(field_0x128 ? field_0x128 : (field_0xb8 ? (int)field_0xb8->field_0xd8 : 0));
                     HGDIOBJ old = SelectObject(dc, font);
                     SIZE size;
-                    GetTextExtentPoint32A(dc, field_0x1f4_states[index].field_0x08,
-                                          field_0x1f4_states[index].field_0x0c, &size);
+                    GetTextExtentPoint32A(dc, UnknownInlineMultiState()->field_0x1f4[index].field_0x08,
+                                          UnknownInlineMultiState()->field_0x1f4[index].field_0x0c, &size);
                     SelectObject(dc, old);
                     g_UnknownGlobal56e26c->PCTarget()->field_0x48->UnknownMethod26(dc);
-                    field_0x1f4_states[index].field_0x14[1] = size.cx;
+                    UnknownInlineMultiState()->field_0x1f4[index].field_0x14[1] = size.cx;
                 } else {
-                    field_0x1f4_states[index].field_0x14[1] = 0;
+                    UnknownInlineMultiState()->field_0x1f4[index].field_0x14[1] = 0;
                 }
             }
         } else {
-            field_0x1f4_states[index].field_0x08 = 0;
-            field_0x1f4_states[index].field_0x1c = 0;
+            UnknownInlineMultiState()->field_0x1f4[index].field_0x08 = 0;
+            UnknownInlineMultiState()->field_0x1f4[index].field_0x1c = 0;
         }
-        field_0x1f0 = current;
+        UnknownInlineMultiState()->field_0x1f0 = current;
     }
     UnknownVirtualSlot50();
 }
@@ -2501,28 +2557,28 @@ int UIRadioButton::UnknownVirtualSlot55(int a, int b) {
 
 // 0x00477490
 int UnknownGameUiControl::UnknownFunction477490(int row) {
-    if (row < field_0x1ec && row >= 0) {
-        operator delete(field_0x214[row].field_0x14, __FILE__, 0x1e80);
-        operator delete(field_0x214[row].field_0x24, __FILE__, 0x1e81);
-        operator delete(field_0x214[row].field_0x18, __FILE__, 0x1e82);
-        void* brush = field_0x214[row].field_0x34;
+    if (row < UnknownInlineListBox()->field_0x1ec && row >= 0) {
+        operator delete(UnknownInlineListBox()->field_0x214[row].field_0x14, __FILE__, 0x1e80);
+        operator delete(UnknownInlineListBox()->field_0x214[row].field_0x24, __FILE__, 0x1e81);
+        operator delete(UnknownInlineListBox()->field_0x214[row].field_0x18, __FILE__, 0x1e82);
+        void* brush = UnknownInlineListBox()->field_0x214[row].field_0x34;
         if (brush) {
-            for (int i = 0; i < field_0x1ec; i++) {
-                if (field_0x214[i].field_0x34 == brush)
+            for (int i = 0; i < UnknownInlineListBox()->field_0x1ec; i++) {
+                if (UnknownInlineListBox()->field_0x214[i].field_0x34 == brush)
                     goto shared;
             }
             DeleteObject((HGDIOBJ)brush);
         }
     shared:
-        if (row < field_0x1ec - 1) {
-            for (int i = row; i < field_0x1ec; i++)
-                field_0x214[i] = field_0x214[i + 1];
+        if (row < UnknownInlineListBox()->field_0x1ec - 1) {
+            for (int i = row; i < UnknownInlineListBox()->field_0x1ec; i++)
+                UnknownInlineListBox()->field_0x214[i] = UnknownInlineListBox()->field_0x214[i + 1];
         }
-        memset(&field_0x214[field_0x1ec - 1], 0, sizeof(UnknownGameUiListRow));
-        int count = field_0x1ec - 1;
-        field_0x1ec = count <= 0 ? 0 : count;
-        if (field_0x1f4 == row && field_0x1f4 == field_0x1ec) {
-            UnknownVirtualSlot65(field_0x1f4 - 1 <= 0 ? 0 : field_0x1f4 - 1);
+        memset(&UnknownInlineListBox()->field_0x214[UnknownInlineListBox()->field_0x1ec - 1], 0, sizeof(UnknownGameUiListRow));
+        int count = UnknownInlineListBox()->field_0x1ec - 1;
+        UnknownInlineListBox()->field_0x1ec = count <= 0 ? 0 : count;
+        if (UnknownInlineListBox()->field_0x1f4 == row && UnknownInlineListBox()->field_0x1f4 == UnknownInlineListBox()->field_0x1ec) {
+            UnknownVirtualSlot65(UnknownInlineListBox()->field_0x1f4 - 1 <= 0 ? 0 : UnknownInlineListBox()->field_0x1f4 - 1);
         }
         UnknownFunction477bc0();
         return 1;
@@ -2532,66 +2588,67 @@ int UnknownGameUiControl::UnknownFunction477490(int row) {
 
 // 0x004775f0
 void UnknownGameUiControl::UnknownFunction4775f0() {
-    for (int i = 0; i < field_0x1ec; i++) {
-        operator delete(field_0x214[i].field_0x14, __FILE__, 0x1ecf);
-        operator delete(field_0x214[i].field_0x18, __FILE__, 0x1ed0);
-        operator delete(field_0x214[i].field_0x24, __FILE__, 0x1ed1);
-        if (field_0x214[i].field_0x34) {
-            DeleteObject((HGDIOBJ)field_0x214[i].field_0x34);
-            for (int j = 0; j < field_0x1ec; j++) {
-                if (field_0x214[j].field_0x34 == field_0x214[i].field_0x34)
-                    field_0x214[j].field_0x34 = 0;
+    for (int i = 0; i < UnknownInlineListBox()->field_0x1ec; i++) {
+        operator delete(UnknownInlineListBox()->field_0x214[i].field_0x14, __FILE__, 0x1ecf);
+        operator delete(UnknownInlineListBox()->field_0x214[i].field_0x18, __FILE__, 0x1ed0);
+        operator delete(UnknownInlineListBox()->field_0x214[i].field_0x24, __FILE__, 0x1ed1);
+        if (UnknownInlineListBox()->field_0x214[i].field_0x34) {
+            DeleteObject((HGDIOBJ)UnknownInlineListBox()->field_0x214[i].field_0x34);
+            for (int j = 0; j < UnknownInlineListBox()->field_0x1ec; j++) {
+                if (UnknownInlineListBox()->field_0x214[j].field_0x34 == UnknownInlineListBox()->field_0x214[i].field_0x34)
+                    UnknownInlineListBox()->field_0x214[j].field_0x34 = 0;
             }
         }
-        UIAnim* image = field_0x214[i].field_0x20;
+        UIAnim* image = UnknownInlineListBox()->field_0x214[i].field_0x20;
         if (image && !image->field_0xf4)
             image->Release();
     }
-    field_0x1ec = 0;
-    field_0x1f0 = 0;
+    UnknownInlineListBox()->field_0x1ec = 0;
+    UnknownInlineListBox()->field_0x1f0 = 0;
     UnknownFunction476a60(0);
-    field_0x204 = 0;
-    memset(field_0x214, 0, field_0x1fc_value * sizeof(UnknownGameUiListRow));
+    UnknownInlineListBox()->field_0x204 = 0;
+    memset(UnknownInlineListBox()->field_0x214, 0, UnknownInlineListBox()->field_0x1fc * sizeof(UnknownGameUiListRow));
     UnknownFunction477bc0();
 }
 
 // 0x00477900
 void UnknownGameUiControl::UnknownFunction477900(int a) {
     if (a || !field_0xb8->field_0x9bc || !g_UnknownGlobal65b608) {
-        field_0xb8->field_0x9bc = this;
+        field_0xb8->field_0x9bc = UnknownInlineListBox();
         g_UnknownGlobal65b608 = field_0xb8;
     }
-    if (!field_0x1ec)
+    if (!UnknownInlineListBox()->field_0x1ec)
         return;
-    field_0x220 = 1;
-    for (int i = 0; i < field_0x1ec; i++)
-        field_0x214[i].field_0x10 = i;
-    int selected = field_0x1f4;
-    qsort(field_0x214, field_0x1ec, sizeof(UnknownGameUiListRow), UnknownFunction477800);
+    UnknownInlineListBox()->field_0x220 = 1;
+    for (int i = 0; i < UnknownInlineListBox()->field_0x1ec; i++)
+        UnknownInlineListBox()->field_0x214[i].field_0x10 = i;
+    int selected = UnknownInlineListBox()->field_0x1f4;
+    qsort(UnknownInlineListBox()->field_0x214, UnknownInlineListBox()->field_0x1ec, sizeof(UnknownGameUiListRow), UnknownFunction477800);
     UnknownVirtualSlot50();
     if (field_0x7c > 0) {
         GameObjectIterator iterator(field_0xb8->field_0x7f3c, 1, "UIControl");
         UnknownGameUiControl* control;
         while ((control = (UnknownGameUiControl*)iterator.Next()) != 0) {
+            UIListBox* other = static_cast<UIListBox*>(control);
             if (control->field_0x7c == field_0x7c && control->field_0x5c == 3 && control != this &&
-                control->field_0x1ec == field_0x1ec) {
+                other->field_0x1ec == UnknownInlineListBox()->field_0x1ec) {
                 UnknownGameUiListRow* rows = (UnknownGameUiListRow*)DebugMalloc(
-                    control->field_0x1fc_value * sizeof(UnknownGameUiListRow), __FILE__, 0x1f87);
-                for (int j = 0; j < field_0x1ec; j++)
-                    rows[j] = control->field_0x214[field_0x214[j].field_0x10];
-                operator delete(control->field_0x214, __FILE__, 0x1f8e);
-                control->field_0x214 = rows;
+                    other->field_0x1fc * sizeof(UnknownGameUiListRow), __FILE__, 0x1f87);
+                for (int j = 0; j < UnknownInlineListBox()->field_0x1ec; j++)
+                    rows[j] = other->field_0x214[UnknownInlineListBox()->field_0x214[j].field_0x10];
+                operator delete(other->field_0x214, __FILE__, 0x1f8e);
+                other->field_0x214 = rows;
                 control->UnknownVirtualSlot50();
             }
         }
     }
-    for (int k = 0; k < field_0x1ec; k++) {
-        if (field_0x214[k].field_0x10 == selected) {
+    for (int k = 0; k < UnknownInlineListBox()->field_0x1ec; k++) {
+        if (UnknownInlineListBox()->field_0x214[k].field_0x10 == selected) {
             UnknownFunction476a60(k);
             break;
         }
     }
-    field_0x220 = 0;
+    UnknownInlineListBox()->field_0x220 = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -2599,29 +2656,31 @@ void UnknownGameUiControl::UnknownFunction477900(int a) {
 
 // 0x004751e0
 int UnknownGameUiControl::UnknownFunction4751e0(UnknownGameUiControl* list) {
-    return list->field_0x1ec - list->field_0x204;
+    UIListBox* listBox = static_cast<UIListBox*>(list);
+    return listBox->field_0x1ec - listBox->field_0x204;
 }
 
 // 0x00475200
 int UnknownGameUiControl::UnknownFunction475200(UnknownGameUiControl* list) {
+    UIListBox* listBox = static_cast<UIListBox*>(list);
     UnknownVirtualSlot50();
-    if (field_0x21c) {
-        int count = list->field_0x1ec;
-        field_0x1fc_value = count - list->UnknownFunction4755c0();
+    if (UnknownInlineScrollBar()->field_0x21c) {
+        int count = listBox->field_0x1ec;
+        UnknownInlineScrollBar()->field_0x1fc = count - list->UnknownFunction4755c0();
     } else {
-        field_0x1fc_value = list->UnknownFunction4755c0();
+        UnknownInlineScrollBar()->field_0x1fc = list->UnknownFunction4755c0();
     }
-    if (UnknownFunction4751e0(list) == field_0x1fc_value)
+    if (UnknownFunction4751e0(list) == UnknownInlineScrollBar()->field_0x1fc)
         return 1;
     unsigned int travel;
     if (field_0x5c == 8)
-        travel = UnknownVirtualSlot61() - field_0x1f4;
+        travel = UnknownVirtualSlot61() - UnknownInlineScrollBar()->field_0x1f4;
     else
-        travel = UnknownVirtualSlot62() - field_0x1f8;
-    unsigned int range = list->field_0x1ec - list->field_0x204;
+        travel = UnknownVirtualSlot62() - UnknownInlineScrollBar()->field_0x1f8;
+    unsigned int range = listBox->field_0x1ec - listBox->field_0x204;
     if (range) {
-        float position = field_0x1fc_value * (float)travel / range;
-        field_0x1ec_float = position < travel ? position : travel;
+        float position = UnknownInlineScrollBar()->field_0x1fc * (float)travel / range;
+        UnknownInlineScrollBar()->field_0x1ec_float = position < travel ? position : travel;
         return 1;
     }
     return 0;
@@ -2634,11 +2693,11 @@ int UnknownGameUiControl::UnknownFunction475300(int value) {
     unsigned int position;
     int travel;
     if (field_0x5c == 8) {
-        position = (int)(field_0x21c ? width - field_0x1ec_float : field_0x1ec_float);
+        position = (int)(UnknownInlineScrollBar()->field_0x21c ? width - UnknownInlineScrollBar()->field_0x1ec_float : UnknownInlineScrollBar()->field_0x1ec_float);
     } else {
-        position = (int)(field_0x21c ? height - field_0x1ec_float : field_0x1ec_float);
+        position = (int)(UnknownInlineScrollBar()->field_0x21c ? height - UnknownInlineScrollBar()->field_0x1ec_float : UnknownInlineScrollBar()->field_0x1ec_float);
     }
-    travel = field_0x5c == 8 ? width - field_0x1f4 : height - field_0x1f8;
+    travel = field_0x5c == 8 ? width - UnknownInlineScrollBar()->field_0x1f4 : height - UnknownInlineScrollBar()->field_0x1f8;
     return (int)(travel ? (double)(position * value) / travel : 0.0);
 }
 
@@ -2647,20 +2706,20 @@ int UnknownGameUiControl::UnknownFunction475500() {
     int width = UnknownVirtualSlot61();
     int height = UnknownVirtualSlot62();
     int position;
-    if (!field_0x21c) {
-        position = (int)field_0x1ec_float;
-        if (position < field_0x1ec_float)
+    if (!UnknownInlineScrollBar()->field_0x21c) {
+        position = (int)UnknownInlineScrollBar()->field_0x1ec_float;
+        if (position < UnknownInlineScrollBar()->field_0x1ec_float)
             position++;
     } else {
         if (field_0x5c == 8)
-            position = (int)(width - field_0x1ec_float);
+            position = (int)(width - UnknownInlineScrollBar()->field_0x1ec_float);
         else
-            position = (int)(height - field_0x1ec_float);
+            position = (int)(height - UnknownInlineScrollBar()->field_0x1ec_float);
     }
-    if (field_0x200 && width) {
+    if (UnknownInlineScrollBar()->field_0x200 && width) {
         if (field_0x5c == 8)
-            return (unsigned int)(field_0x200 * position) / (unsigned int)(width - field_0x1f4);
-        return (unsigned int)(field_0x200 * position) / (unsigned int)(height - field_0x1f8);
+            return (unsigned int)(UnknownInlineScrollBar()->field_0x200 * position) / (unsigned int)(width - UnknownInlineScrollBar()->field_0x1f4);
+        return (unsigned int)(UnknownInlineScrollBar()->field_0x200 * position) / (unsigned int)(height - UnknownInlineScrollBar()->field_0x1f8);
     }
     return position;
 }
@@ -2682,14 +2741,14 @@ void UnknownGameUiControl::UnknownFunction473c70(int size) {
         capacity = 1000;
     else if (capacity < 1)
         capacity = 1;
-    field_0x1f0 = capacity;
-    field_0x200 = 0;
-    field_0x1ec = 0;
-    field_0x1fc_value = 0;
+    UnknownInlineEditBox()->field_0x1f0 = capacity;
+    UnknownInlineEditBox()->field_0x200 = 0;
+    UnknownInlineEditBox()->field_0x1ec = 0;
+    UnknownInlineEditBox()->field_0x1fc = 0;
     field_0xd0 = 0;
     field_0xc0 = (char*)DebugMalloc(capacity, __FILE__, 0x16a3);
     if (kept) {
-        int max = field_0x1f0 - 1;
+        int max = UnknownInlineEditBox()->field_0x1f0 - 1;
         int n = strlen(saved);
         int length;
         if (n < max)
@@ -2707,8 +2766,8 @@ void UnknownGameUiControl::UnknownFunction473da0(char* text) {
     if (!text)
         text = "";
     if (!field_0xc0)
-        field_0xc0 = (char*)DebugMalloc(field_0x1f0, __FILE__, 0x16c0);
-    int max = field_0x1f0 - 1;
+        field_0xc0 = (char*)DebugMalloc(UnknownInlineEditBox()->field_0x1f0, __FILE__, 0x16c0);
+    int max = UnknownInlineEditBox()->field_0x1f0 - 1;
     int n = strlen(text);
     int length;
     if (n < max)
@@ -2717,7 +2776,7 @@ void UnknownGameUiControl::UnknownFunction473da0(char* text) {
         length = max;
     strncpy(field_0xc0, text, length);
     field_0xc0[length] = 0;
-    field_0x1ec = length;
+    UnknownInlineEditBox()->field_0x1ec = length;
     field_0xd0 = length;
     HDC dc;
     if (!g_UnknownGlobal56e26c->PCTarget()->field_0x48->UnknownMethod17((void**)&dc)) {
@@ -2728,10 +2787,10 @@ void UnknownGameUiControl::UnknownFunction473da0(char* text) {
         SelectObject(dc, old);
         g_UnknownGlobal56e26c->PCTarget()->field_0x48->UnknownMethod26(dc);
         field_0xdc[1] = size.cx;
-        field_0x1fc_value = size.cx;
+        UnknownInlineEditBox()->field_0x1fc = size.cx;
     } else {
         field_0xdc[1] = 0;
-        field_0x1fc_value = 0;
+        UnknownInlineEditBox()->field_0x1fc = 0;
     }
     UnknownVirtualSlot50();
 }
@@ -2740,29 +2799,29 @@ void UnknownGameUiControl::UnknownFunction473da0(char* text) {
 void UnknownGameUiControl::UnknownFunction473f30(const char* characters) {
     if (characters) {
         int length = strlen(characters);
-        field_0x210 = DebugMalloc(length + 1, __FILE__, 0x16f7);
-        if (field_0x210)
-            strcpy((char*)field_0x210, characters);
+        UnknownInlineEditBox()->field_0x210 = DebugMalloc(length + 1, __FILE__, 0x16f7);
+        if (UnknownInlineEditBox()->field_0x210)
+            strcpy((char*)UnknownInlineEditBox()->field_0x210, characters);
     } else {
-        if (field_0x210)
-            operator delete(field_0x210, __FILE__, 0x16fb);
-        field_0x210 = 0;
+        if (UnknownInlineEditBox()->field_0x210)
+            operator delete(UnknownInlineEditBox()->field_0x210, __FILE__, 0x16fb);
+        UnknownInlineEditBox()->field_0x210 = 0;
     }
 }
 
 // 0x00473fc0
 char UnknownGameUiControl::UnknownFunction473fc0(char c) {
-    if (!field_0x210)
+    if (!UnknownInlineEditBox()->field_0x210)
         return c;
     if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
         char other = c <= 'Z' ? c + 0x20 : c - 0x20;
-        if (strchr((char*)field_0x210, c))
+        if (strchr((char*)UnknownInlineEditBox()->field_0x210, c))
             return c;
-        if (strchr((char*)field_0x210, other))
+        if (strchr((char*)UnknownInlineEditBox()->field_0x210, other))
             return other;
         return 0;
     }
-    if (strchr((char*)field_0x210, c))
+    if (strchr((char*)UnknownInlineEditBox()->field_0x210, c))
         return c;
     return 0;
 }
@@ -3272,7 +3331,7 @@ void UnknownGameUiControl::UnknownFunction477d30(int* handled) {
     if (!event.field_0x20) {
         static unsigned int s_doubleClickTime = GetDoubleClickTime();
         g_UnknownGlobal65b59c = UnknownFunction4bfa80();
-        if (field_0x1f4 == field_0x238 && g_UnknownGlobal65b59c - field_0x23c <= s_doubleClickTime) {
+        if (UnknownInlineListBox()->field_0x1f4 == UnknownInlineListBox()->field_0x238 && g_UnknownGlobal65b59c - UnknownInlineListBox()->field_0x23c <= s_doubleClickTime) {
             event.field_0x08 = 0xd;
             event.field_0x00 = field_0x74;
             event.field_0x04 = field_0xf4;
@@ -3285,11 +3344,11 @@ void UnknownGameUiControl::UnknownFunction477d30(int* handled) {
                     *handled = 1;
                 return;
             }
-            field_0x23c = 0;
+            UnknownInlineListBox()->field_0x23c = 0;
             return;
         } else {
-            field_0x23c = g_UnknownGlobal65b59c;
-            field_0x238 = field_0x1f4;
+            UnknownInlineListBox()->field_0x23c = g_UnknownGlobal65b59c;
+            UnknownInlineListBox()->field_0x238 = UnknownInlineListBox()->field_0x1f4;
             return;
         }
     }
@@ -3304,57 +3363,57 @@ void UnknownGameUiControl::UnknownFunction477d30(int* handled) {
 void UIDropDownList::UnknownFunction47a880(int height) {
     field_0x1fc->field_0x2c[3] = field_0x1fc->field_0x2c[1] + height;
     *(CameraRect*)field_0x1fc->field_0x3c = *(CameraRect*)field_0x1fc->field_0x2c;
-    field_0x1f0_control->field_0x2c[3] = field_0x1f0_control->field_0x2c[1] + height;
-    *(CameraRect*)field_0x1f0_control->field_0x3c = *(CameraRect*)field_0x1f0_control->field_0x2c;
-    field_0x200_control->field_0x2c[3] = field_0x200_control->field_0x2c[1] + height;
-    field_0x200_control->field_0x2c[1] += 2;
-    field_0x200_control->field_0x2c[3] -= 2;
-    *(CameraRect*)field_0x200_control->field_0x3c = *(CameraRect*)field_0x200_control->field_0x2c;
-    field_0x1f4_control->field_0x2c[3] = field_0x1f4_control->field_0x2c[1] + height;
-    *(CameraRect*)field_0x1f4_control->field_0x3c = *(CameraRect*)field_0x1f4_control->field_0x2c;
+    field_0x1f0->field_0x2c[3] = field_0x1f0->field_0x2c[1] + height;
+    *(CameraRect*)field_0x1f0->field_0x3c = *(CameraRect*)field_0x1f0->field_0x2c;
+    field_0x200->field_0x2c[3] = field_0x200->field_0x2c[1] + height;
+    field_0x200->field_0x2c[1] += 2;
+    field_0x200->field_0x2c[3] -= 2;
+    *(CameraRect*)field_0x200->field_0x3c = *(CameraRect*)field_0x200->field_0x2c;
+    field_0x1f4->field_0x2c[3] = field_0x1f4->field_0x2c[1] + height;
+    *(CameraRect*)field_0x1f4->field_0x3c = *(CameraRect*)field_0x1f4->field_0x2c;
     field_0x204 = height;
 }
 
 // 0x0047a970
 void UIDropDownList::UnknownFunction47a970(UIAnim* image) {
-    field_0x1f0_control->UnknownFunction470730(0, image);
-    field_0x1f0_control->field_0x2c[2] = image->UnknownFunction472f80()->field_0x0c + field_0x1f0_control->field_0x2c[0];
-    field_0x1f0_control->field_0x2c[3] = image->UnknownFunction472f80()->field_0x10 + field_0x1f0_control->field_0x2c[1];
-    *(CameraRect*)field_0x1f0_control->field_0x3c = *(CameraRect*)field_0x1f0_control->field_0x2c;
-    *(CameraRect*)field_0x1fc->field_0x3c = *(CameraRect*)field_0x1f0_control->field_0x2c;
+    field_0x1f0->UnknownFunction470730(0, image);
+    field_0x1f0->field_0x2c[2] = image->UnknownFunction472f80()->field_0x0c + field_0x1f0->field_0x2c[0];
+    field_0x1f0->field_0x2c[3] = image->UnknownFunction472f80()->field_0x10 + field_0x1f0->field_0x2c[1];
+    *(CameraRect*)field_0x1f0->field_0x3c = *(CameraRect*)field_0x1f0->field_0x2c;
+    *(CameraRect*)field_0x1fc->field_0x3c = *(CameraRect*)field_0x1f0->field_0x2c;
     *(CameraRect*)field_0x1fc->field_0x2c = *(CameraRect*)field_0x1fc->field_0x3c;
     UnknownFunction47a880(image->UnknownFunction472f80()->field_0x10);
 }
 
 // 0x0047aa40
 void UIDropDownList::UnknownFunction47aa40(UIAnim* image) {
-    field_0x1f4_control->UnknownFunction470730(0, image);
-    field_0x1f4_control->field_0x2c[2] = image->UnknownFunction472f80()->field_0x0c + field_0x1f4_control->field_0x2c[0];
-    field_0x1f4_control->field_0x2c[3] = image->UnknownFunction472f80()->field_0x10 + field_0x1f4_control->field_0x2c[1];
-    *(CameraRect*)field_0x1f4_control->field_0x3c = *(CameraRect*)field_0x1f4_control->field_0x2c;
-    *(CameraRect*)field_0x200_control->field_0x2c = *(CameraRect*)field_0x1f4_control->field_0x2c;
-    field_0x200_control->field_0x2c[1] += 2;
-    field_0x200_control->field_0x2c[3] -= 2;
-    *(CameraRect*)field_0x200_control->field_0x3c = *(CameraRect*)field_0x200_control->field_0x2c;
+    field_0x1f4->UnknownFunction470730(0, image);
+    field_0x1f4->field_0x2c[2] = image->UnknownFunction472f80()->field_0x0c + field_0x1f4->field_0x2c[0];
+    field_0x1f4->field_0x2c[3] = image->UnknownFunction472f80()->field_0x10 + field_0x1f4->field_0x2c[1];
+    *(CameraRect*)field_0x1f4->field_0x3c = *(CameraRect*)field_0x1f4->field_0x2c;
+    *(CameraRect*)field_0x200->field_0x2c = *(CameraRect*)field_0x1f4->field_0x2c;
+    field_0x200->field_0x2c[1] += 2;
+    field_0x200->field_0x2c[3] -= 2;
+    *(CameraRect*)field_0x200->field_0x3c = *(CameraRect*)field_0x200->field_0x2c;
 }
 
 // 0x0047a2d0
 void UIDropDownList::UnknownFunction47a2d0(int open) {
-    field_0x1f0_control->UnknownFunction470660(open, 1);
-    field_0x1f4_control->UnknownFunction470660(open, 1);
+    field_0x1f0->UnknownFunction470660(open, 1);
+    field_0x1f4->UnknownFunction470660(open, 1);
     field_0x1fc->UnknownFunction470660(open, 1);
-    field_0x200_control->UnknownFunction470660(open, 1);
+    field_0x200->UnknownFunction470660(open, 1);
     if (!field_0x208 && open) {
-        field_0xb8->field_0x7f3c->UnknownFunction469190(field_0x1f0_control, -1);
-        field_0xb8->field_0x7f3c->UnknownFunction469190(field_0x1f4_control, -1);
+        field_0xb8->field_0x7f3c->UnknownFunction469190(field_0x1f0, -1);
+        field_0xb8->field_0x7f3c->UnknownFunction469190(field_0x1f4, -1);
         field_0xb8->field_0x7f3c->UnknownFunction469190(field_0x1fc, -1);
-        field_0xb8->field_0x7f3c->UnknownFunction469190(field_0x200_control, -1);
+        field_0xb8->field_0x7f3c->UnknownFunction469190(field_0x200, -1);
         field_0x1fc->UnknownFunction477bc0();
     } else if (field_0x208 && !open) {
-        field_0x1f0_control->UnknownFunction4691f0();
-        field_0x1f4_control->UnknownFunction4691f0();
+        field_0x1f0->UnknownFunction4691f0();
+        field_0x1f4->UnknownFunction4691f0();
         field_0x1fc->UnknownFunction4691f0();
-        field_0x200_control->UnknownFunction4691f0();
+        field_0x200->UnknownFunction4691f0();
         if (field_0xb8->field_0x110)
             field_0xb8->field_0x110->UnknownFunction404da0();
     }
@@ -3644,7 +3703,7 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
         switch (value) {
         case VK_HOME:
             field_0x1ec = 0;
-            field_0x1fc_value = 0;
+            field_0x1fc = 0;
             break;
         case VK_END:
             field_0x1ec = field_0xd0;
@@ -3685,7 +3744,7 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
             GetTextExtentPoint32A((HDC)dc, field_0xc0, field_0xd0, &size);
             field_0xdc[1] = size.cx;
             GetTextExtentPoint32A((HDC)dc, field_0xc0, field_0x1ec, &size);
-            field_0x1fc_value = size.cx;
+            field_0x1fc = size.cx;
             SelectObject((HDC)dc, font);
             ((PCRenderTarget*)field_0xb8->UnknownInlineField18())->field_0x48->UnknownMethod26(dc);
         }
@@ -3738,7 +3797,8 @@ int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
         int full = 0;
         for (UnknownGameUiControl* control = UnknownFunction472750(iterator); control;
              control = UnknownFunction472750(iterator)) {
-            if (control->field_0x5c == 3 && control->field_0x200 >= control->field_0x1ec)
+            if (control->field_0x5c == 3 &&
+                static_cast<UIListBox*>(control)->field_0x200 >= static_cast<UIListBox*>(control)->field_0x1ec)
                 full = 1;
         }
         UnknownFunction472730(iterator);
@@ -3820,7 +3880,7 @@ int UIScrollBar::UnknownVirtualSlot55(int a, int b) {
                     iterator = (GameObjectIterator*)UnknownVirtualSlot53();
                     for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
                         if (list->field_0x5c == 3) {
-                            int page = list->field_0x200;
+                            int page = static_cast<UIListBox*>(list)->field_0x200;
                             list->UnknownFunction476860(list->UnknownFunction4755c0() + page, 1);
                         }
                     }
@@ -3829,7 +3889,7 @@ int UIScrollBar::UnknownVirtualSlot55(int a, int b) {
                     iterator = (GameObjectIterator*)UnknownVirtualSlot53();
                     for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
                         if (list->field_0x5c == 3) {
-                            int page = list->field_0x200;
+                            int page = static_cast<UIListBox*>(list)->field_0x200;
                             list->UnknownFunction476860(list->UnknownFunction4755c0() - page, 1);
                         }
                     }
@@ -3847,7 +3907,7 @@ int UIScrollBar::UnknownVirtualSlot55(int a, int b) {
                     iterator = (GameObjectIterator*)UnknownVirtualSlot53();
                     for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
                         if (list->field_0x5c == 3) {
-                            int page = list->field_0x200;
+                            int page = static_cast<UIListBox*>(list)->field_0x200;
                             list->UnknownFunction476860(list->UnknownFunction4755c0() + page, 1);
                         }
                     }
@@ -3856,7 +3916,7 @@ int UIScrollBar::UnknownVirtualSlot55(int a, int b) {
                     iterator = (GameObjectIterator*)UnknownVirtualSlot53();
                     for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
                         if (list->field_0x5c == 3) {
-                            int page = list->field_0x200;
+                            int page = static_cast<UIListBox*>(list)->field_0x200;
                             list->UnknownFunction476860(list->UnknownFunction4755c0() - page, 1);
                         }
                     }
@@ -3907,9 +3967,9 @@ void UIScrollBar::UnknownVirtualSlot57(int a, int* position) {
             field_0x208 = 1;
         }
         if (!event.field_0x20) {
-            if (position[0] == field_0x20c_value && position[1] == field_0x210_value) {
+            if (position[0] == field_0x20c && position[1] == field_0x210) {
                 field_0x218_float += field_0xb8->field_0x9c0;
-                if (field_0x218_float < field_0x214_float)
+                if (field_0x218_float < field_0x214)
                     goto scroll;
                 event.field_0x08 = 0x11;
                 event.field_0x00 = field_0x74;
@@ -3926,8 +3986,8 @@ void UIScrollBar::UnknownVirtualSlot57(int a, int* position) {
                 event.field_0x10 = field_0xbc;
                 event.field_0x14 = this;
                 field_0xb8->UnknownVirtualSlot29(&event);
-                field_0x20c_value = position[0];
-                field_0x210_value = position[1];
+                field_0x20c = position[0];
+                field_0x210 = position[1];
                 field_0x218_float = 0.0f;
             }
             if (!event.field_0x20) {
@@ -3935,8 +3995,11 @@ void UIScrollBar::UnknownVirtualSlot57(int a, int* position) {
                 GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
                 for (UnknownGameUiControl* list = UnknownFunction472750(iterator); list;
                      list = UnknownFunction472750(iterator)) {
-                    if (list->field_0x5c == 3)
-                        list->UnknownFunction476860(UnknownFunction475300(list->field_0x1ec - list->field_0x204), 0);
+                    if (list->field_0x5c == 3) {
+                        UIListBox* listBox = static_cast<UIListBox*>(list);
+                        list->UnknownFunction476860(
+                            UnknownFunction475300(listBox->field_0x1ec - listBox->field_0x204), 0);
+                    }
                 }
                 UnknownFunction472730(iterator);
             }
@@ -4148,7 +4211,7 @@ failed:
 // 0x00479a00: a click on the bar moves the thumb (slider) or pages the list.
 int UIDDLScrollBar::UnknownVirtualSlot55(int a, int b) {
     if (field_0xb8->field_0x34->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
-        UnknownGameUiControl* list = field_0x220_list->field_0x1fc;
+        UIListBox* list = field_0x220->field_0x1fc;
         if (field_0x1f0) {
             field_0x1ec_float = (float)UNKNOWN_MIN(UnknownVirtualSlot62() - field_0x1f8,
                                                    UNKNOWN_MAX(((int*)b)[1] - field_0x2c[1], 0));
@@ -4172,45 +4235,161 @@ int UIDDLScrollBar::UnknownVirtualSlot55(int a, int b) {
 
 // 0x0047ab20
 void UIDropDownList::UnknownFunction47ab20(UIAnim* image) {
-    field_0x1f8_control->UnknownFunction470730(0, image);
-    field_0x1f8_control->field_0x2c[1] = 0;
-    field_0x1f8_control->field_0x2c[0] = 0;
-    field_0x1f8_control->field_0x2c[2] = image->UnknownFunction472f80()->field_0x0c;
-    field_0x1f8_control->field_0x2c[3] = image->UnknownFunction472f80()->field_0x10;
-    *(CameraRect*)field_0x1f8_control->field_0x3c = *(CameraRect*)field_0x1f8_control->field_0x2c;
-    field_0x2c[2] = field_0x1f8_control->field_0x2c[2] + field_0x2c[0];
-    field_0x2c[3] = field_0x1f8_control->field_0x2c[3] + field_0x2c[1];
+    field_0x1f8->UnknownFunction470730(0, image);
+    field_0x1f8->field_0x2c[1] = 0;
+    field_0x1f8->field_0x2c[0] = 0;
+    field_0x1f8->field_0x2c[2] = image->UnknownFunction472f80()->field_0x0c;
+    field_0x1f8->field_0x2c[3] = image->UnknownFunction472f80()->field_0x10;
+    *(CameraRect*)field_0x1f8->field_0x3c = *(CameraRect*)field_0x1f8->field_0x2c;
+    field_0x2c[2] = field_0x1f8->field_0x2c[2] + field_0x2c[0];
+    field_0x2c[3] = field_0x1f8->field_0x2c[3] + field_0x2c[1];
     *(CameraRect*)field_0x3c = *(CameraRect*)field_0x2c;
-    field_0x1f0_control->field_0x2c[0] = 0;
-    field_0x1f0_control->field_0x2c[1] = field_0x1f8_control->field_0x2c[3];
-    *(CameraRect*)field_0x1f0_control->field_0x3c = *(CameraRect*)field_0x1f0_control->field_0x2c;
-    *(CameraRect*)field_0x1fc->field_0x3c = *(CameraRect*)field_0x1f0_control->field_0x2c;
+    field_0x1f0->field_0x2c[0] = 0;
+    field_0x1f0->field_0x2c[1] = field_0x1f8->field_0x2c[3];
+    *(CameraRect*)field_0x1f0->field_0x3c = *(CameraRect*)field_0x1f0->field_0x2c;
+    *(CameraRect*)field_0x1fc->field_0x3c = *(CameraRect*)field_0x1f0->field_0x2c;
     *(CameraRect*)field_0x1fc->field_0x2c = *(CameraRect*)field_0x1fc->field_0x3c;
-    if (field_0x1ec_control->field_0x3c[0]) {
-        field_0x1ec_control->field_0x2c[1] = 0;
-        field_0x1ec_control->field_0x2c[0] = field_0x1f8_control->field_0x2c[2];
-        field_0x1ec_control->field_0x2c[2] =
-            field_0x1ec_control->UnknownVirtualSlot48(-1)->field_0x14 + field_0x1ec_control->field_0x2c[0];
-        field_0x1ec_control->field_0x2c[3] =
-            field_0x1ec_control->UnknownVirtualSlot48(-1)->field_0x18 + field_0x1ec_control->field_0x2c[1];
-        *(CameraRect*)field_0x1ec_control->field_0x3c = *(CameraRect*)field_0x1ec_control->field_0x2c;
+    if (field_0x1ec->field_0x3c[0]) {
+        field_0x1ec->field_0x2c[1] = 0;
+        field_0x1ec->field_0x2c[0] = field_0x1f8->field_0x2c[2];
+        field_0x1ec->field_0x2c[2] =
+            field_0x1ec->UnknownVirtualSlot48(-1)->field_0x14 + field_0x1ec->field_0x2c[0];
+        field_0x1ec->field_0x2c[3] =
+            field_0x1ec->UnknownVirtualSlot48(-1)->field_0x18 + field_0x1ec->field_0x2c[1];
+        *(CameraRect*)field_0x1ec->field_0x3c = *(CameraRect*)field_0x1ec->field_0x2c;
     }
-    field_0x1f4_control->field_0x2c[0] = field_0x1f8_control->field_0x2c[2];
-    field_0x1f4_control->field_0x2c[1] = field_0x1f8_control->field_0x2c[3];
-    *(CameraRect*)field_0x1f4_control->field_0x3c = *(CameraRect*)field_0x1f4_control->field_0x2c;
-    *(CameraRect*)field_0x200_control->field_0x2c = *(CameraRect*)field_0x1f4_control->field_0x2c;
-    field_0x200_control->field_0x2c[1] += 2;
-    field_0x200_control->field_0x2c[3] -= 2;
-    *(CameraRect*)field_0x200_control->field_0x3c = *(CameraRect*)field_0x200_control->field_0x2c;
+    field_0x1f4->field_0x2c[0] = field_0x1f8->field_0x2c[2];
+    field_0x1f4->field_0x2c[1] = field_0x1f8->field_0x2c[3];
+    *(CameraRect*)field_0x1f4->field_0x3c = *(CameraRect*)field_0x1f4->field_0x2c;
+    *(CameraRect*)field_0x200->field_0x2c = *(CameraRect*)field_0x1f4->field_0x2c;
+    field_0x200->field_0x2c[1] += 2;
+    field_0x200->field_0x2c[3] -= 2;
+    *(CameraRect*)field_0x200->field_0x3c = *(CameraRect*)field_0x200->field_0x2c;
 }
 
 // 0x0047b370 (UIProgressBar): one step on; redraws when `redraw`.
 void UnknownGameUiControl::UnknownFunction47b370(int redraw) {
-    int total = field_0x1f0;
+    int total = UnknownInlineProgressBar()->field_0x1f0;
     if (total) {
-        field_0x1f4 = UnknownMinInt(field_0x1f4 + 1, total);
-        field_0x1ec_float = (float)field_0x1f4 / total;
+        UnknownInlineProgressBar()->field_0x1f4 = UnknownMinInt(UnknownInlineProgressBar()->field_0x1f4 + 1, total);
+        UnknownInlineProgressBar()->field_0x1ec = (float)UnknownInlineProgressBar()->field_0x1f4 / total;
     }
     if (redraw && field_0xbc)
         field_0xbc->UnknownFunction486500();
+}
+
+// ---------------------------------------------------------------------------
+// UIVideoStatic
+
+// 0x0047ae30
+UIVideoStatic::UIVideoStatic(int flags, CameraRect* area, UIDialog* owner)
+    : UIStatic(flags, area, (UnknownGameUiDialog*)owner) {
+    field_0x1ec = 0;
+}
+
+// 0x0047ae90
+int UIVideoStatic::UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner) {
+    if (field_0x1ec)
+        field_0x1ec->Release();
+    field_0x1ec = new(__FILE__, 0x264d) MediaControl(1);
+    if (!field_0x1ec->UnknownFunction4a2560(field_0x18, file, done, owner)) {
+        field_0x1ec = 0;
+        return 0;
+    }
+    UnknownFunction469190(field_0x1ec, -1);
+    field_0x1f0[0] = 0;
+    field_0x1f0[1] = 0;
+    field_0x1f0[2] = field_0x1ec->field_0x30;
+    field_0x1f0[3] = field_0x1ec->field_0x34;
+    if (a)
+        field_0x1ec->UnknownFunction4a2900();
+    return 1;
+}
+
+// 0x0047af90
+int UIVideoStatic::UnknownVirtualSlot10(float frameTime) {
+    return UnknownGameUiControl::UnknownVirtualSlot10(frameTime);
+}
+
+// 0x0047afa0
+int UIVideoStatic::UnknownVirtualSlot40() {
+    CameraRect rect;
+    if (!field_0x1ec)
+        return 0;
+    if (field_0xb8->field_0x110) {
+        field_0xb8->field_0x110->UnknownFunction404c80();
+        UnknownVirtualSlot50();
+    }
+    UnknownVirtualSlot63((CameraRect*)field_0x2c, &rect);
+    return ((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod5(&rect, field_0x1ec->field_0x2c, field_0x1f0,
+                                                                      0x1000000, 0) == 0;
+}
+
+// ---------------------------------------------------------------------------
+// UIProgressBar
+
+// 0x0047b020
+UIProgressBar::UIProgressBar(int flags, CameraRect* area, UIDialog* owner)
+    : UIStatic(flags, area, (UnknownGameUiDialog*)owner) {
+    field_0x1ec = 0;
+    field_0x1f0 = 0;
+    field_0x1f4 = 0;
+    field_0x1f8 = 0;
+    field_0x1fc = 1;
+}
+
+// 0x0047b090
+UIProgressBar::~UIProgressBar() {
+    if (field_0x1f8 && field_0x200)
+        field_0x1f8->Release();
+}
+
+// 0x0047b100
+TextureMap* UIProgressBar::UnknownVirtualSlot48(int state) {
+    return field_0x1f8;
+}
+
+// 0x0047b110
+int UIProgressBar::UnknownVirtualSlot40() {
+    int redraw = field_0x1bc;
+    CameraRect rect;
+    void* dc;
+    int more;
+    if (field_0x1f8 && field_0x1ec != 0.0f) {
+        UnknownVirtualSlot63((CameraRect*)field_0x2c, &rect);
+        CameraRect source = *(CameraRect*)field_0x4c;
+        source.right = (int)((field_0x4c[2] - field_0x4c[0]) * field_0x1ec);
+        UnknownGameUiDialog* owner = field_0xb8;
+        rect.right = (int)(source.right * owner->field_0x9c4 + rect.left);
+        rect.bottom = (int)(source.bottom * owner->field_0x9c8 + rect.top);
+        if (owner->field_0x110) {
+            owner->field_0x110->UnknownFunction404480((PCTextureMap*)field_0x1f8, &rect, &source,
+                                                      field_0x1f8->field_0x30 ? 0x1008000 : 0x1000000,
+                                                      field_0x1b8, field_0x1c0, &redraw, 0);
+        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+                       &rect, field_0x1f8, &source, field_0x1f8->field_0x30 ? 0x1008000 : 0x1000000)) {
+            return 0;
+        }
+    }
+    if (field_0x1fc) {
+        redraw = field_0x1bc;
+        UnknownVirtualSlot64((CameraRect*)field_0x2c, &rect);
+        char text[16];
+        sprintf(text, "%3.0f%%", field_0x1ec * 100.0f);
+        if (field_0xb8->UnknownFunction46ed70(&dc, &rect, &more, this)) {
+            do {
+                field_0xb8->UnknownFunction46f550(dc, &rect, text, strlen(text), field_0xc4, field_0x160, 0,
+                                                  field_0xd4, field_0xc8, 2, 1, 0);
+                field_0xb8->UnknownFunction46eeb0(dc);
+            } while (more && field_0xb8->UnknownFunction46ed70(&dc, &rect, &more, this));
+        }
+        field_0x1bc = redraw;
+    }
+    return 1;
+}
+
+// 0x0047b3d0
+void UIProgressBar::UnknownFunction47b3d0(int texture, int owned) {
+    field_0x1f8 = (TextureMap*)texture;
+    field_0x200 = owned;
 }

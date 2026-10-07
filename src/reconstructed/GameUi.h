@@ -9,6 +9,7 @@
 
 class GUIManager;
 class MediaControl;
+struct UnknownSurfaceInterface;
 class Sound;
 class GameObjectIterator;
 class UnknownGameUiDialog;
@@ -18,6 +19,13 @@ struct tagPOINT;
 class TextureMap;
 class UIAnim;
 class UIDropDownList;
+class UIDialog;
+class UIButton;
+class UIEditBox;
+class UIScrollBar;
+class UIListBox;
+class UIMultiState;
+class UIProgressBar;
 
 // A 0x38-byte list box row; +0x14 is its text (OptionProcs.cpp 0x004b4e70).
 struct UnknownGameUiListRow {
@@ -134,12 +142,13 @@ struct UnknownGameUiState {
     char* field_0x1c;
 };
 
-// A control found by name (its +0x1f0 is a progress bar's value). Every
-// control a dialog finds is a UIControl (RTTI UIControl : GameObject,
-// vtable 0x00552ba4, 65 slots, 0x1ec bytes). Slots 65 and 66 are
-// UIListBox's; they are declared here because the dialog procedures call
-// them through this type. The members past +0x1ec belong to the derived
-// controls (list box, drop-down list, scroll bar, progress bar).
+// A control found by name. Every control a dialog finds is a UIControl
+// (RTTI UIControl : GameObject, vtable 0x00552ba4, 65 slots, 0x1ec bytes;
+// the derived controls' members follow it). Slots 65 and 66 and many
+// derived-control methods (list box, edit box, scroll bar, multi-state,
+// progress bar) are declared here because the dialog procedures call them
+// through this type; their bodies read the derived control through a typed
+// `this`.
 class UnknownGameUiControl : public GameObject {
 public:
     // 0x00470170: `type` is the control kind (5 a static, 12 a static text).
@@ -248,8 +257,23 @@ public:
     void UnknownFunction4777f0(int (*compare)(const void* a, const void* b)); // 0x004777f0: the rows' sort order
     void UnknownFunction470760(int a, const char* image); // 0x00470760: shows an image file
     void UnknownFunction470730(int a, void* image); // 0x00470730: shows a dialog resource image
-    // Inline: a drop-down list's button.
-    UnknownGameUiControl* UnknownInlineButton() { return field_0x1ec_control; }
+    // Inline: a drop-down list's button (defined after UIDropDownList).
+    UnknownGameUiControl* UnknownInlineButton();
+    // Inline: this control as the derived control a method above belongs to
+    // (defined after the derived classes).
+    UIButton* UnknownInlineButtonControl();
+    UIEditBox* UnknownInlineEditBox();
+    UIScrollBar* UnknownInlineScrollBar();
+    UIListBox* UnknownInlineListBox();
+    UIMultiState* UnknownInlineMultiState();
+    UIProgressBar* UnknownInlineProgressBar();
+    // The dialog files read a list box's row count (UIListBox +0x1ec) and a
+    // drop-down list's list box (UIDropDownList +0x1fc) through UIControl
+    // pointers; these read-only properties keep that source form.
+    int UnknownInlineRows();
+    UnknownGameUiControl* UnknownInlineDropDownListBox();
+    __declspec(property(get = UnknownInlineRows)) int field_0x1ec;
+    __declspec(property(get = UnknownInlineDropDownListBox)) UnknownGameUiControl* field_0x1fc;
 
     // gameui.cpp (provisional names).
     int UnknownFunction470720();              // 0x00470720
@@ -363,84 +387,10 @@ public:
     int field_0x1e0;
     unsigned char field_0x1e4[0x1e8 - 0x1e4];
     int field_0x1e8;
-    // The derived controls' members (UIButton, UIEditBox, UIScrollBar,
-    // UIListBox, UIMultiState, UIDropDownList ...).
-    union {
-        int field_0x1ec;                      // a list box's rows (OptionProcs.cpp)
-        UnknownGameUiControl* field_0x1ec_control; // a drop-down list's button (SelectGamePicProcs.cpp)
-        MediaControl* field_0x1ec_movie;      // a movie control's player (dlgprocs.cpp)
-        UIDropDownList* field_0x1ec_list;     // a UIDDLStatic's list
-        float field_0x1ec_float;
-    };
-    union {
-        int field_0x1f0;
-        UnknownGameUiControl* field_0x1f0_control;
-        UIDropDownList* field_0x1f0_list;     // a UIDDLButton's list
-    };
-    union {
-        int field_0x1f4;                      // a list box's selected row
-        UnknownGameUiState* field_0x1f4_states; // a multi-state control's states
-        UnknownGameUiControl* field_0x1f4_control;
-    };
-    union {
-        int field_0x1f8;
-        UnknownGameUiControl* field_0x1f8_control;
-        TextureMap* field_0x1f8_texture;
-    };
-    union {
-        UnknownGameUiControl* field_0x1fc;    // a drop-down list's list box (OptionProcs.cpp)
-        int field_0x1fc_value;
-    };
-    union {
-        int field_0x200;
-        UnknownGameUiControl* field_0x200_control;
-    };
-    union {
-        int field_0x204;
-        UIAnim* field_0x204_image;            // a scroll bar's track image
-        Sound* field_0x204_sound;             // an edit box's key click
-    };
-    union {
-        int field_0x208;
-        Sound* field_0x208_sound;             // an edit box's "full" sound
-    };
-    union {
-        void* field_0x20c;                    // a brush (HBRUSH)
-        int field_0x20c_value;                // a scroll bar's last drag position (x)
-    };
-    union {
-        void* field_0x210;
-        int field_0x210_value;                // (y)
-    };
-    union {
-        UnknownGameUiListRow* field_0x214;    // a list box's rows (OptionProcs.cpp)
-        float field_0x214_float;
-    };
-    union {
-        int field_0x218;
-        UnknownGameUiControl* field_0x218_control;
-        float field_0x218_float;              // a scroll bar's time held at one position
-    };
-    int field_0x21c;                          // set on the SldEQ sliders (OptionProcs.cpp)
-    union {
-        int field_0x220;
-        UIDropDownList* field_0x220_list;     // a UIDDLScrollBar's list
-    };
-    int field_0x224;
-    int field_0x228;
-    int field_0x22c;
-    int field_0x230;
-    int field_0x234;
-    int field_0x238;
-    int field_0x23c;
-    int field_0x240;
-    int field_0x244;
-    int field_0x248;
-    int (*field_0x24c)(const void* a, const void* b); // the rows' sort order
-    UIDropDownList* field_0x250;              // a UIDDLListBox's list
 };
 
-// RTTI: UIButton : UIControl (vtable 0x00552ce0; 0x1f8 bytes).
+// RTTI: UIButton : UIControl (vtable 0x00552ce0; 0x1f0 bytes: gameui.cpp's
+// `new` at 0x0046c019 and the UIScrollCtl ones push 0x1f0).
 class UIButton : public UnknownGameUiControl {
 public:
     UIButton(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x004731f0
@@ -455,9 +405,12 @@ public:
     void UnknownFunction473330(UIAnim* image); // 0x00473330
     void UnknownFunction473350(UIAnim* image); // 0x00473350
     void UnknownFunction473370(UIAnim* image); // 0x00473370
+
+    UnknownGameUiControl* field_0x1ec;        // the list a column button sorts (0x00473390)
 };
 
-// RTTI: UIStatic : UIControl (vtable 0x00553318; 0x1ec bytes).
+// RTTI: UIStatic : UIControl (vtable 0x00553318; 0x1ec bytes, `new` at
+// 0x0046cace): no members of its own.
 class UIStatic : public UnknownGameUiControl {
 public:
     UIStatic(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00478f60
@@ -466,7 +419,8 @@ public:
     virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00478fc0
 };
 
-// RTTI: UIEditBox : UIControl (vtable 0x00552de8; 0x230 bytes).
+// RTTI: UIEditBox : UIControl (vtable 0x00552de8; 0x230 bytes, `new` at
+// 0x0046ce50).
 class UIEditBox : public UnknownGameUiControl {
 public:
     // 0x00473630: `size` is the text's capacity.
@@ -484,10 +438,35 @@ public:
     void UnknownFunction473d80(int value);    // 0x00473d80
     void UnknownFunction473d90(int value);    // 0x00473d90
     void UnknownFunction474060(unsigned long color); // 0x00474060: the background brush
+
+    int field_0x1ec;
+    int field_0x1f0;                          // the text's capacity
+    int field_0x1f4;
+    int field_0x1f8;
+    int field_0x1fc;
+    int field_0x200;
+    union {
+        int field_0x204;
+        Sound* field_0x204_sound;             // the key click
+    };
+    union {
+        int field_0x208;
+        Sound* field_0x208_sound;             // the "full" sound
+    };
+    void* field_0x20c;                        // the background brush (HBRUSH)
+    void* field_0x210;                        // the characters it accepts
+    int field_0x214;
+    int field_0x218;
+    int field_0x21c;
+    int field_0x220;
+    int field_0x224;                          // the bound buffer's size (0x00473820)
+    int field_0x228;
+    int field_0x22c;
 };
 
-// RTTI: UIScrollCtl : UIButton (vtable 0x00552ef0; 0x1f8 bytes): a scroll
-// arrow; `type` 9 scrolls back, 10 forwards.
+// RTTI: UIScrollCtl : UIButton (vtable 0x00552ef0; 0x1f0 bytes, `new` at
+// 0x0046c070 and 0x0046c0c3): a scroll arrow; `type` 9 scrolls back, 10
+// forwards. No members of its own.
 class UIScrollCtl : public UIButton {
 public:
     UIScrollCtl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00474820
@@ -497,7 +476,8 @@ public:
     virtual void UnknownVirtualSlot60(int value); // 0x004749f0
 };
 
-// RTTI: UIScrollBar : UIControl (vtable 0x00552ff8; 0x220 bytes).
+// RTTI: UIScrollBar : UIControl (vtable 0x00552ff8; 0x220 bytes, `new` at
+// 0x0046cc82; its constructor clears +0x1ec..+0x21c).
 class UIScrollBar : public UnknownGameUiControl {
 public:
     UIScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00474ba0
@@ -510,12 +490,38 @@ public:
     virtual void UnknownVirtualSlot59(int value); // 0x00474cb0
 
     void UnknownFunction475160(int state);    // 0x00475160: the thumb size from a state image
+
+    union {
+        int field_0x1ec;
+        float field_0x1ec_float;              // the thumb's position (0..1)
+    };
+    int field_0x1f0;
+    int field_0x1f4;                          // the thumb's width
+    int field_0x1f8;                          // the thumb's height
+    int field_0x1fc;
+    int field_0x200;                          // range
+    union {
+        int field_0x204;
+        UIAnim* field_0x204_image;            // the track image
+    };
+    int field_0x208;
+    int field_0x20c;                          // the last drag position (x)
+    int field_0x210;                          // (y)
+    float field_0x214;
+    union {
+        int field_0x218;
+        float field_0x218_float;              // time held at one position
+    };
+    int field_0x21c;                          // set on the SldEQ sliders (OptionProcs.cpp)
 };
 
-// RTTI: UIListBox : UIControl (vtable 0x00553100; 0x250 bytes).
+// RTTI: UIListBox : UIControl (vtable 0x00553100; 0x250 bytes, `new` at
+// 0x0046c5b0).
 class UIListBox : public UnknownGameUiControl {
 public:
-    UIListBox(int id, CameraRect* area, UnknownGameUiDialog* owner, int rows); // 0x00475c70
+    // 0x00475c70: `rows` is the row capacity (it passes (id, area, owner) on
+    // to UIControl from its first, third and fourth arguments).
+    UIListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* owner);
     virtual ~UIListBox();                     // 0x00475e20 (deleting wrapper 0x00475e00)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00476020: joystick selection and the row under the cursor
     virtual int UnknownVirtualSlot40();       // 0x004761f0: draws the rows
@@ -535,9 +541,39 @@ public:
     void UnknownFunction477b90(int value);    // 0x00477b90
     void UnknownFunction477730(int delta);    // 0x00477730: scrolls by `delta`
     void UnknownFunction477ba0(int value);    // 0x00477ba0
+
+    int field_0x1ec;                          // rows
+    int field_0x1f0;                          // the first row shown
+    int field_0x1f4;                          // the selected row
+    int field_0x1f8;
+    int field_0x1fc;                          // row capacity
+    int field_0x200;                          // the rows that fit
+    int field_0x204;
+    int field_0x208;                          // text colour
+    void* field_0x20c;                        // a brush (HBRUSH)
+    void* field_0x210;
+    UnknownGameUiListRow* field_0x214;        // the rows (OptionProcs.cpp)
+    union {
+        int field_0x218;
+        UIListBox* field_0x218_control;       // itself
+    };
+    int field_0x21c;
+    int field_0x220;
+    int field_0x224;
+    int field_0x228;
+    int field_0x22c;
+    int field_0x230;
+    int field_0x234;
+    int field_0x238;
+    int field_0x23c;
+    int field_0x240;
+    int field_0x244;
+    int field_0x248;
+    int (*field_0x24c)(const void* a, const void* b); // the rows' sort order
 };
 
-// RTTI: UIMultiState : UIControl (vtable 0x00553210; 0x1f8 bytes).
+// RTTI: UIMultiState : UIControl (vtable 0x00553210; 0x1f8 bytes, `new` at
+// 0x0046c2b4).
 class UIMultiState : public UnknownGameUiControl {
 public:
     UIMultiState(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x004781f0
@@ -557,9 +593,14 @@ public:
     void UnknownFunction4789f0(int index, UIAnim* image, const char* text); // 0x004789f0
     void UnknownFunction478d10();             // 0x00478d10: the next selectable state
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00478d70
+
+    int field_0x1ec;                          // states
+    int field_0x1f0;                          // the current state
+    UnknownGameUiState* field_0x1f4;          // the states
 };
 
-// RTTI: UIStaticText : UIControl (vtable 0x00553420; 0x1ec bytes).
+// RTTI: UIStaticText : UIControl (vtable 0x00553420; 0x1ec bytes, `new` at
+// 0x0046d033): no members of its own.
 class UIStaticText : public UnknownGameUiControl {
 public:
     UIStaticText(int id, CameraRect* area, UnknownGameUiDialog* owner, const char* text,
@@ -572,7 +613,8 @@ public:
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00479190 (shared with UIStatic)
 };
 
-// RTTI: UIRadioButton : UIMultiState (vtable 0x00553528; 0x1f8 bytes).
+// RTTI: UIRadioButton : UIMultiState (vtable 0x00553528; 0x1f8 bytes, `new`
+// at 0x0046c982): no members of its own.
 class UIRadioButton : public UIMultiState {
 public:
     UIRadioButton(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00479240
@@ -582,8 +624,9 @@ public:
     virtual void UnknownVirtualSlot59(int value); // 0x004792e0
 };
 
-// RTTI: UIDDLScrollBar : UIScrollBar (vtable 0x00553630; 0x224 bytes): a
-// drop-down list's scroll bar. Its destructor is the compiler's.
+// RTTI: UIDDLScrollBar : UIScrollBar (vtable 0x00553630; 0x224 bytes, `new`
+// at 0x00479fae): a drop-down list's scroll bar. Its destructor is the
+// compiler's.
 class UIDDLScrollBar : public UIScrollBar {
 public:
     UIDDLScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog* owner,
@@ -591,37 +634,47 @@ public:
     virtual void UnknownVirtualSlot33(int value); // 0x004796e0
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00479a00
     virtual void UnknownVirtualSlot57(int a, int* position); // 0x00479710
+
+    UIDropDownList* field_0x220;              // its list
 };
 
-// RTTI: UIDDLStatic : UIStatic (vtable 0x00553738; 0x1f0 bytes): a
-// drop-down list's text. Its destructor is the compiler's.
+// RTTI: UIDDLStatic : UIStatic (vtable 0x00553738; 0x1f0 bytes, new'd three
+// times by UIDropDownList's constructor): a drop-down list's text. Its
+// destructor is the compiler's (0x0047ae80, which UIVideoStatic shares).
 class UIDDLStatic : public UIStatic {
 public:
     UIDDLStatic(int id, CameraRect* area, UnknownGameUiDialog* owner, UIDropDownList* list); // 0x00479b50
     virtual void UnknownVirtualSlot33(int value); // 0x00479bc0
+
+    UIDropDownList* field_0x1ec;              // its list
 };
 
-// RTTI: UIDDLButton : UIButton (vtable 0x00553840; 0x1f8 bytes): a
-// drop-down list's button. Its destructor is the compiler's.
+// RTTI: UIDDLButton : UIButton (vtable 0x00553840; 0x1f4 bytes, `new` at
+// 0x00479f2a): a drop-down list's button. Its destructor is the compiler's.
 class UIDDLButton : public UIButton {
 public:
     UIDDLButton(int id, CameraRect* area, UnknownGameUiDialog* owner, UIDropDownList* list); // 0x00479bf0
     virtual void UnknownVirtualSlot33(int value); // 0x00479ce0
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00479c90
+
+    UIDropDownList* field_0x1f0;              // its list
 };
 
-// RTTI: UIDDLListBox : UIListBox (vtable 0x00553948; 0x254 bytes): a
-// drop-down list's list. Its destructor is the compiler's.
+// RTTI: UIDDLListBox : UIListBox (vtable 0x00553948; 0x254 bytes, `new` at
+// 0x00479f6b): a drop-down list's list. Its destructor is the compiler's.
 class UIDDLListBox : public UIListBox {
 public:
-    UIDDLListBox(int id, CameraRect* area, UnknownGameUiDialog* owner, int rows,
+    UIDDLListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* owner,
                  UIDropDownList* list);       // 0x00479d10
     virtual void UnknownVirtualSlot33(int value); // 0x00479e70
     virtual int UnknownVirtualSlot65(int row); // 0x00479db0
     virtual void UnknownVirtualSlot66(int value); // 0x00479df0
+
+    UIDropDownList* field_0x250;              // its list
 };
 
-// RTTI: UIDropDownList : UIStaticText (vtable 0x00553a58; 0x21c bytes).
+// RTTI: UIDropDownList : UIStaticText (vtable 0x00553a58; 0x21c bytes, `new`
+// at 0x0046d109).
 class UIDropDownList : public UIStaticText {
 public:
     // 0x00479ea0: creates the parts (button, list box, scroll bar and three statics).
@@ -642,7 +695,87 @@ public:
     void UnknownFunction47aa40(UIAnim* image); // 0x0047aa40: the button's image
     void UnknownFunction47ab20(UIAnim* image); // 0x0047ab20: the corner image; lays the parts out around it
     int UnknownFunction47a800(UnknownGameUiControl* control); // 0x0047a800: whether `control` is a part
+
+    UIDDLButton* field_0x1ec;                 // the button
+    UIDDLStatic* field_0x1f0;                 // the static parts
+    UIDDLStatic* field_0x1f4;
+    UIDDLStatic* field_0x1f8;
+    UIDDLListBox* field_0x1fc;                // the list box (OptionProcs.cpp)
+    UIDDLScrollBar* field_0x200;              // the scroll bar
+    int field_0x204;                          // row height
+    int field_0x208;                          // open
+    int field_0x20c;
+    int field_0x210;
+    int field_0x214;
+    int field_0x218;
 };
+
+// RTTI: MediaControl : GameObject (vtable 0x005551c0; 0x80 bytes, new'd by
+// UIVideoStatic 0x0047ae90): a movie player. Declared here for
+// UIVideoStatic and the dialog procedures.
+class MediaControl : public GameObject {
+public:
+    MediaControl(int a);                      // 0x004a2410
+    // 0x004a2560: opens `file` for `target`; `done` is called with `owner`
+    // at its end. 0 when it fails.
+    int UnknownFunction4a2560(void* target, const char* file, void (*done)(UIDialog* dialog), UIDialog* owner);
+    int UnknownFunction4a2900();              // 0x004a2900: restarts the movie
+    void UnknownFunction4a2940();             // 0x004a2940: stops the movie
+
+    UnknownSurfaceInterface* field_0x2c;      // the frame's surface
+    int field_0x30;                           // width
+    int field_0x34;                           // height
+    unsigned char field_0x38[0x80 - 0x38];
+};
+
+// RTTI: UIVideoStatic : UIStatic (vtable 0x00553b60; 0x200 bytes, new'd by
+// dlgprocs.cpp's CreditsVidDlg): a control that plays a movie. Its
+// destructor is the compiler's (slot 0 is 0x0047ae60, shared with
+// UIDDLStatic).
+class UIVideoStatic : public UIStatic {
+public:
+    UIVideoStatic(int flags, CameraRect* area, UIDialog* owner); // 0x0047ae30
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x0047af90
+    virtual int UnknownVirtualSlot40();       // 0x0047afa0: copies the movie's frame
+    // 0x0047ae90: plays `file`; `done` is called with `owner` at its end.
+    int UnknownFunction47ae90(const char* file, int a, void (*done)(UIDialog* dialog), UIDialog* owner);
+
+    MediaControl* field_0x1ec;                // the player
+    int field_0x1f0[4];                       // the frame's source rectangle
+};
+
+// RTTI: UIProgressBar : UIStatic (vtable 0x00553c68; 0x204 bytes, new'd by
+// dlgprocs.cpp's LoadingDlg).
+class UIProgressBar : public UIStatic {
+public:
+    UIProgressBar(int flags, CameraRect* area, UIDialog* owner); // 0x0047b020
+    virtual ~UIProgressBar();                 // 0x0047b090 (deleting wrapper 0x0047b070)
+    virtual int UnknownVirtualSlot40();       // 0x0047b110: draws the bar and its percentage
+    virtual TextureMap* UnknownVirtualSlot48(int state); // 0x0047b100
+    void UnknownFunction47b3d0(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
+
+    float field_0x1ec;                        // the part done (0..1)
+    int field_0x1f0;                          // steps
+    int field_0x1f4;                          // steps done (0x0047b370)
+    TextureMap* field_0x1f8;                  // the bar's texture
+    int field_0x1fc;                          // draws the percentage
+    int field_0x200;                          // owns +0x1f8
+};
+
+inline UnknownGameUiControl* UnknownGameUiControl::UnknownInlineButton() {
+    return static_cast<UIDropDownList*>(this)->field_0x1ec;
+}
+
+inline UIButton* UnknownGameUiControl::UnknownInlineButtonControl() { return static_cast<UIButton*>(this); }
+inline UIEditBox* UnknownGameUiControl::UnknownInlineEditBox() { return static_cast<UIEditBox*>(this); }
+inline UIScrollBar* UnknownGameUiControl::UnknownInlineScrollBar() { return static_cast<UIScrollBar*>(this); }
+inline UIListBox* UnknownGameUiControl::UnknownInlineListBox() { return static_cast<UIListBox*>(this); }
+inline UIMultiState* UnknownGameUiControl::UnknownInlineMultiState() { return static_cast<UIMultiState*>(this); }
+inline UIProgressBar* UnknownGameUiControl::UnknownInlineProgressBar() { return static_cast<UIProgressBar*>(this); }
+inline int UnknownGameUiControl::UnknownInlineRows() { return UnknownInlineListBox()->field_0x1ec; }
+inline UnknownGameUiControl* UnknownGameUiControl::UnknownInlineDropDownListBox() {
+    return static_cast<UIDropDownList*>(this)->field_0x1fc;
+}
 
 // Page object at KrustyUI+0x490.
 class UnknownGameUiPage {

@@ -823,7 +823,7 @@ void GlobalSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448e90(profile, -1);
             } else if (choice == 2) {
                 UnknownGameUiControl* profiles = UnknownFunction46ebf0("LstProfiles", 3);
-                UnknownGameUiListRow* entry = &profiles->field_0x214[profiles->UnknownFunction476950()];
+                UnknownGameUiListRow* entry = &profiles->UnknownInlineListBox()->field_0x214[profiles->UnknownFunction476950()];
                 strcpy(g_UnknownGlobal56e26c->mode.field_0x00, entry->field_0x14);
                 g_UnknownGlobal56e26c->mode.UnknownFunction5231f0();
             }
@@ -1046,7 +1046,7 @@ void OptGarageDlg::UnknownFunction4b3bc0()
         UnknownFunction46ebf0(name, 0)->UnknownFunction470b20(text);
         sprintf(name, "SldEQ%d", i);
         UnknownGameUiControl* slider = UnknownFunction46ebf0(name, 8);
-        slider->field_0x21c = 1;
+        slider->UnknownInlineScrollBar()->field_0x21c = 1;
         slider->UnknownFunction4754d0(g_UnknownGlobal56e26c->ui->field_0x450[bikeClass] - g_UnknownGlobal56e26c->ui->field_0x43c[bikeClass] + 1);
         slider->UnknownFunction4753c0(*level - g_UnknownGlobal56e26c->ui->field_0x43c[bikeClass],
                                       g_UnknownGlobal56e26c->ui->field_0x450[bikeClass] - g_UnknownGlobal56e26c->ui->field_0x43c[bikeClass]);

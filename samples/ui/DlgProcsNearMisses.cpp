@@ -299,11 +299,11 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             if (field_0x7f6c) {
                 field_0x7f7c = 0.0f;
                 if (field_0x7f58) {
-                    field_0x7f58->field_0x1ec_movie->UnknownVirtualSlot16(1);
+                    field_0x7f58->field_0x1ec->UnknownVirtualSlot16(1);
                     field_0x7f58->UnknownFunction470660(0, 1);
                 }
             } else if (field_0x7f58) {
-                field_0x7f58->field_0x1ec_movie->UnknownVirtualSlot16(1);
+                field_0x7f58->field_0x1ec->UnknownVirtualSlot16(1);
                 field_0x7f58->UnknownFunction470660(0, 1);
             }
             if (field_0x7f70) {
@@ -374,7 +374,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
         } else if (!_stricmp("ButStuntQuarry", event->field_0x04)) {
             if (field_0x7f58)
-                field_0x7f58->field_0x1ec_movie->UnknownFunction4a2940();
+                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 0;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 0;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\Quarries";
@@ -384,7 +384,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->field_0x20 = 1;
         } else if (!_stricmp("ButBaja", event->field_0x04)) {
             if (field_0x7f58)
-                field_0x7f58->field_0x1ec_movie->UnknownFunction4a2940();
+                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 1;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 1;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\Baja";
@@ -394,7 +394,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->field_0x20 = 1;
         } else if (!_stricmp("ButSupercross", event->field_0x04)) {
             if (field_0x7f58)
-                field_0x7f58->field_0x1ec_movie->UnknownFunction4a2940();
+                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 3;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 3;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\SX";
@@ -404,7 +404,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->field_0x20 = 1;
         } else if (!_stricmp("ButEnduro", event->field_0x04)) {
             if (field_0x7f58)
-                field_0x7f58->field_0x1ec_movie->UnknownFunction4a2940();
+                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 5;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 5;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\Enduro";
@@ -414,7 +414,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->field_0x20 = 1;
         } else if (!_stricmp("ButNationals", event->field_0x04)) {
             if (field_0x7f58)
-                field_0x7f58->field_0x1ec_movie->UnknownFunction4a2940();
+                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 2;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 2;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\National";
@@ -424,7 +424,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->field_0x20 = 1;
         } else if (!_stricmp("ButProCircuit", event->field_0x04)) {
             if (field_0x7f58)
-                field_0x7f58->field_0x1ec_movie->UnknownFunction4a2940();
+                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
             PCStartupDlg* dialog = new(__FILE__, 389) PCStartupDlg;
             g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
             event->field_0x0c->UnknownFunction46ff30(0);

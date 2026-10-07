@@ -51,7 +51,7 @@ void UnknownFunction45cb20(int* step) {
     if (step) {
         if (ui->field_0x490) {
             UnknownGameUiControl* bar = ui->field_0x490->UnknownFunction46ebf0("ProgressBar", 0);
-            bar->field_0x1f0 += *step;
+            static_cast<UIProgressBar*>(bar)->field_0x1f0 += *step;
         }
     } else {
         ui->UnknownFunction49b530();
