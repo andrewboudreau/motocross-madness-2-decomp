@@ -98,7 +98,7 @@ public:
     virtual void UnknownVirtualSlot10();
     virtual void UnknownVirtualSlot11();
     virtual void UnknownVirtualSlot12();
-    virtual short* LockPixels(int a, int b, int c);                // 0x34 (slot 13): (0,0,0) in 0x004db8c0, result stored at +0x64
+    virtual short* LockPixels(int a, int* pitch, int c);           // 0x34 (slot 13): (0,0,0) in 0x004db8c0, result stored at +0x64; TerrainShadow slot 30 passes a local for the 2nd argument
     virtual void UnlockPixels(int a);                              // 0x38 (slot 14): (0) at the end of 0x004db8c0
     char pad_0x08[0x14 - 0x08];
     int size;                    // +0x14 texture edge (the clip rect is 0..size-1)

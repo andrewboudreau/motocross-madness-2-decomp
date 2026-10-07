@@ -4,7 +4,16 @@
   "??_7ShadowReceiver@@6B@": "0x005515ec",
   "??_7TerrainShadow@@6B@": "0x005582d4",
   "?AddReceiver@ProjectedShadow@@QAEXPAVShadowReceiver@@@Z": "0x004daba0",
-  "?GameObjectVirtualSlot14@TerrainShadow@@UAEHXZ": "0x0050a1a0",
+  "?ClipPolygon@ClipRectangle@@QAEHPAUClipPoint@@0H@Z": "0x00431680",
   "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x004692f0",
-  "?LookupCell@TerrainShutdownObject@@QAEPAUTerrainCell@@HH@Z": "0x00484d70"
+  "?LookupCell@TerrainShutdownObject@@QAEPAUTerrainCell@@HH@Z": "0x00484d70",
+  "?MarkUsed@TerrainOwned@@QAEXPAX@Z": "0x00401250",
+  "?Set@ClipRectangle@@QAEXMMMM@Z": "0x00431350",
+  "?ShadowFillTriangle@@YAXHPAFFPAHH@Z": "0x00461e60",
+  "?ShadowTransformPointsOrtho@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "0x004a1b00",
+  "?ShadowTransformPointsProjective@@YAXPAUShadowVec3@@PBXPBUShadowMatrix@@HHH@Z": "0x004a1a50",
+  "?g_clipRectangle@@3PAVClipRectangle@@A": "0x0056852c",
+  "__chkstk": "0x00535ed0",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3ffe8000000000000000": "0x005507f4"
 }

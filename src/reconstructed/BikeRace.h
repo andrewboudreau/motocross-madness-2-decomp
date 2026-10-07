@@ -743,17 +743,31 @@ struct UnknownBikeRaceVcrTick {
     int field_0x04;
 };
 
-// Record kind 0x11: the ghost's state (0x3c bytes).
+// Record kind 0x11: the ghost's state (0x3c bytes). Kind 0x10's deltas
+// (UnknownBikeRaceGhostDelta) accumulate into the ghost's copy of it.
 struct UnknownBikeRaceGhostRecord {
-    int field_0x00;
-    Vector3 field_0x04;
-    int field_0x10;
-    int field_0x14;
-    int field_0x18;
-    Vector3 field_0x1c;
-    Vector3 field_0x28;
-    int field_0x34;
+    short field_0x00;
+    unsigned short field_0x02;                // time step (0x004a9aa0)
+    Vector3 field_0x04;                       // ghost +0x5e0
+    float field_0x10;                         // ghost +0x5f8
+    float field_0x14;                         // ghost +0x5fc
+    float field_0x18;                         // ghost +0x600
+    Vector3 field_0x1c;                       // ghost +0x5ec
+    Vector3 field_0x28;                       // ghost +0x5d4 (position)
+    int field_0x34;                           // ghost +0x604 (running time)
     int field_0x38;
+};
+
+// Record kind 0x10: byte deltas of the ghost's state, 15/64 per unit for the
+// vectors at +0x01 and +0x0b and pi/64 for the rest (the same layout as the
+// network message 13 that KrustyBike.cpp's 0x004933e0 applies).
+struct UnknownBikeRaceGhostDelta {
+    char field_0x00;
+    signed char delta1[3];                    // +0x01 x 15/64 -> ghost +0x5e0
+    unsigned char step;                       // +0x04 bit 0: units of 8, bits 1-7: count
+    signed char delta3[3];                    // +0x05 x pi/64 -> ghost +0x5f8..+0x600
+    signed char delta2[3];                    // +0x08 x pi/64 -> ghost +0x5ec
+    signed char delta0[3];                    // +0x0b x 15/64 -> ghost +0x5d4
 };
 
 // One of the ghost's four received states (newest first).
@@ -765,8 +779,9 @@ struct UnknownBikeRaceGhostPart {
 
 // Record kind 0x87: the racer the ghost follows (by its +0x11bc id).
 struct UnknownBikeRaceVcrFollow {
-    int field_0x00;
-    int field_0x04;
+    int field_0x00;                           // not written by 0x004a9d20
+    char field_0x04;                          // 0x004a9d20 clears the byte
+    unsigned char field_0x05[0x08 - 0x05];
     int field_0x08;
 };
 
@@ -774,20 +789,21 @@ struct UnknownBikeRaceVcrFollow {
 // (TrackGame.h keeps the type for 0x004a9d10's symbol): the ghost bike.
 class UnknownBikeRaceGhost {
 public:
-    // 0x004a9aa0: applies record kind 0x10 to a state (as 0x004933e0).
-    void UnknownFunction4a9aa0(void* record, UnknownBikeRaceGhostPart* part);
+    // 0x004a9aa0 (FollowRacer.cpp): applies record kind 0x10 to a state (as
+    // 0x004933e0).
+    void UnknownFunction4a9aa0(const UnknownBikeRaceGhostDelta* delta, UnknownBikeRaceGhostPart* part);
 
     unsigned char field_0x000[0x4f8];
     int field_0x4f8;                          // has a state
     UnknownBikeRaceGhostPart* field_0x4fc[4];
     unsigned char field_0x50c[0x5d4 - 0x50c];
-    Vector3 field_0x5d4;
+    Vector3 field_0x5d4;                      // position
     Vector3 field_0x5e0;
     Vector3 field_0x5ec;
-    int field_0x5f8;
-    int field_0x5fc;
-    int field_0x600;
-    int field_0x604;
+    float field_0x5f8;
+    float field_0x5fc;
+    float field_0x600;
+    int field_0x604;                          // running time
 };
 
 // KrustyUI+0x48 records (0xc8 bytes; slot 10's debug page names the

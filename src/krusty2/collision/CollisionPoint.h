@@ -51,7 +51,7 @@ public:
     float penetration;  // +0x98 0x0043ad80: = (surfacePosition.y - worldPosition.y) * surfaceNormal.y; AddCollisionPoint initialises it to threshold - 999
     float penetrationThreshold;  // +0x9c AddCollisionPoint a4; 0x0043ad80: inContact = (penetration >= penetrationThreshold)
     float field_0xa0;
-    float inContact;  // +0xa4 0x0043ad80 sets 1.0f/0.0f from the penetration test and counts it; 0x0043aa30 only merges points with it set
+    int inContact;  // +0xa4 0x0043ad80 stores the integer 1/0 (mov eax, 1 / xor eax, eax) from the penetration test and counts it; 0x0043aa30 only merges points with it set; Tire 0x00513c70 stores 1/0 the same way
     float field_0xa8;
     float field_0xac;
     float field_0xb0;

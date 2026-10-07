@@ -1555,7 +1555,8 @@ int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* kee
             UnknownFunctionGhost()->field_0x4fc[1] = UnknownFunctionGhost()->field_0x4fc[0];
             UnknownFunctionGhost()->field_0x4fc[0] = oldest;
             UnknownFunctionGhost()->field_0x4fc[0]->field_0x3c = time;
-            UnknownFunctionGhost()->UnknownFunction4a9aa0(data, UnknownFunctionGhost()->field_0x4fc[0]);
+            UnknownFunctionGhost()->UnknownFunction4a9aa0((UnknownBikeRaceGhostDelta*)data,
+                                                          UnknownFunctionGhost()->field_0x4fc[0]);
             UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.field_0x34 = (int)(s_UnknownStatic578e8c * 1000.0f);
             UnknownFunctionGhost()->field_0x4fc[0]->field_0x40 = 0;
             return 1;

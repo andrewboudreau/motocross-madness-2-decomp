@@ -604,7 +604,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     }
     reportContactOutputs = 0;
     field_0x268 = 0;
-    CollisionPoint::inContact = 0.0f;
+    CollisionPoint::inContact = 0;
     CollisionPoint::tangentSpeed = 0.0f;
     CollisionPoint::spinSpeed = 0.0f;
 }
@@ -921,4 +921,73 @@ void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, floa
     torque->x += moment.x;
     torque->y += moment.y;
     torque->z += moment.z;
+}
+
+// In-place add through a reference (the sum keeps the added vector on the left).
+static inline void TireAddTo(CollisionVec3& v, const CollisionVec3& d)
+{
+    v.x = d.x + v.x;
+    v.y = d.y + v.y;
+    v.z = d.z + v.z;
+}
+
+// 0x00513c70 (near miss, 805 of 797 bytes): runs the attached shock against the
+// contact. The inline (+0x2b0) and rotating (+0x2ac) shocks are solved with the
+// same follow-up, written out twice as retail keeps two copies; the solve's load
+// and active flag become the contact's penetration and inContact. The outputs
+// live in the dead `dt` and `velocity` argument slots, as in retail. Retail also
+// keeps a zero register (ebx) for its null/flag compares and the final clears;
+// VC6 here uses `test` and immediates, which shifts the argument offsets by the
+// missing push, and so schedules the A path's first world-position add the
+// other way round. The shared `depth` local keeps it out of the `axisB` slot.
+void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
+                       const CollisionVec3* velocity, const CollisionVec3* axisB)
+{
+    float depth;
+    int active;
+    float load;
+    if (TireAttachA* slider = field_0x2b0) {
+        if (inContact) {
+            depth = CollisionPoint::penetration;
+            if (depth != 0.0f || slider->ratio != 0.0f) {
+                slider->SolveContact(dt, velocity, &this->CollisionPoint::field_0x5c, &wheelCenter,
+                                     &this->CollisionPoint::surfaceNormal, depth, &load, &active);
+                field_0x26c = field_0x2b0->extending;
+                if (active || crashed)
+                    CollisionPoint::inContact = 1;
+                CollisionPoint::penetration = load;
+                TireAddTo(CollisionPoint::worldPosition, field_0x2b0->field_0x80);
+                if (active)
+                    CollisionPoint::surfacePosition = TireTimes(load, CollisionPoint::surfaceNormal) + CollisionPoint::worldPosition;
+                else
+                    CollisionPoint::surfacePosition = CollisionPoint::worldPosition;
+                field_0x268 = 1;
+                return;
+            }
+        }
+    } else if (TireAttachB* hinge = field_0x2ac) {
+        if (inContact) {
+            depth = CollisionPoint::penetration;
+            if (depth != 0.0f || hinge->ratio != 0.0f) {
+                hinge->SolveContact(dt, &sideAxis, axisB, &wheelCenter, &this->CollisionPoint::surfaceNormal,
+                                    velocity, &this->CollisionPoint::field_0x5c, depth, &load, &active);
+                field_0x26c = field_0x2ac->extending;
+                if (active || crashed)
+                    CollisionPoint::inContact = 1;
+                CollisionPoint::penetration = load;
+                TireAddTo(CollisionPoint::worldPosition, field_0x2ac->field_0x80);
+                if (active)
+                    CollisionPoint::surfacePosition = TireTimes(load, CollisionPoint::surfaceNormal) + CollisionPoint::worldPosition;
+                else
+                    CollisionPoint::surfacePosition = CollisionPoint::worldPosition;
+                field_0x268 = 1;
+                return;
+            }
+        }
+    } else {
+        CollisionPoint::inContact = 1;
+        return;
+    }
+    field_0x26c = 0;
+    CollisionPoint::inContact = 0;
 }
