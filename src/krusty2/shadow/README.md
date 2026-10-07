@@ -4,9 +4,9 @@ Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDAT
 
 # ProjectedShadow.cpp (shadow)
 
-Validation: counts labeled "exact" below are historical relocation-masked
-diagnostics, not strict acceptance. Use `tools/run_physics_samples.py --strict`
-with reviewed bindings before accepting these candidates.
+Validation: every exact target of `samples/physics/shadow/` passes strict VC6 SP3
+comparison with `ProjectedShadow.bindings.json` / `TerrainShadow.bindings.json`
+(ProjectedShadow.cpp 19 of 26 targets, TerrainShadow.cpp 4 of 5; the rest are partial).
 
 Evidence
 - `__FILE__` string "ProjectedShadow.cpp" at VA 0x571fd8; own xrefs 0x4da745..0x4dacbc
@@ -19,7 +19,7 @@ Evidence
 - RTTI: ProjectedShadow : GameObject (vptr at +0). Overrides slots 10 (float dt), 12, 13.
 - Layout: see the `// +0xNN` comments in ProjectedShadow.h. Size >= 0x134.
 
-Counts: 26 exact, 7 partial of 33 targets (D3DIMSoultreeShadow.cpp added).
+Counts: ProjectedShadow.cpp 19 strict exact, 7 partial of 26 targets; D3DIMSoultreeShadow.cpp 17 strict exact.
 
 D3DIMSoultreeShadow.cpp (D3DIMSoultreeShadow : ShadowReceiver : GameObject, vtable 0x55156c; ShadowReceiver 0x5515ec):
 ctor 0x446840, Attach 0x4468b0, slot 28 0x446bf0, both deleting dtors (0x446890 is shared with TerrainShadow by

@@ -12,9 +12,8 @@
 #include "PCRenderTarget.h"
 #include "TrackGame.h"
 
-// Slot 14 (0x00462850) is a near miss: samples/render/FogNearMisses.cpp.
-
 #define TARGET() ((PCRenderTarget*)field_0x18)
+#define VIEWPORT(i) ((unsigned int)TARGET()->field_0x08->field_0x1a0[i])
 
 // 0x00462620
 Fog::Fog(int flags)
@@ -84,6 +83,107 @@ int Fog::UnknownVirtualSlot12()
         TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix);
     }
     return 1;
+}
+
+// A D3DFVF_TLVERTEX (screen-space backdrop corner).
+struct UnknownFogBackdropVertex {
+    float x;
+    float y;
+    float z;
+    float rhw;
+    unsigned int color;
+    unsigned int specular;
+    float tu;
+    float tv;
+};
+
+// 0x00462850: projects with the fog's far plane, draws the backdrop quad in
+// the fog colour when FogOn has not, then sets the device fog states. Both
+// failures leave through one `return 0` (retail shares a single block that
+// reloads eax, which separate `return 0` statements do not give), and each
+// corner stores rhw after its colours, as retail schedules it.
+int Fog::UnknownVirtualSlot14()
+{
+    if (field_0x25_bit0) {
+        TARGET()->field_0x08->UnknownFunction42e960(1.0f, fogEnd);
+        TARGET()->field_0x08->UnknownVirtualSlot28();
+        if (!TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix)) {
+            goto failed;
+        }
+        if (!drawnByFogOn && TARGET()->field_0x04->isPowerVR
+            && (TARGET()->field_0x34 || TARGET()->fillMode == D3DFILL_WIREFRAME)) {
+            UnknownFogBackdropVertex vertices[4];
+            vertices[0].x = (float)VIEWPORT(0);
+            vertices[0].y = (float)VIEWPORT(1);
+            vertices[0].z = 0.999999f;
+            vertices[0].color = field_0x2c;
+            vertices[0].specular = 0;
+            vertices[0].rhw = 1.0f;
+            vertices[1].x = (float)VIEWPORT(2) + (float)VIEWPORT(0);
+            vertices[1].y = (float)VIEWPORT(1);
+            vertices[1].z = 0.999999f;
+            vertices[1].color = field_0x2c;
+            vertices[1].specular = 0;
+            vertices[1].rhw = 1.0f;
+            vertices[2].x = (float)VIEWPORT(2) + (float)VIEWPORT(0);
+            vertices[2].y = (float)VIEWPORT(3) + (float)VIEWPORT(1);
+            vertices[2].z = 0.999999f;
+            vertices[2].color = field_0x2c;
+            vertices[2].specular = 0;
+            vertices[2].rhw = 1.0f;
+            vertices[3].x = (float)VIEWPORT(0);
+            vertices[3].y = (float)VIEWPORT(3) + (float)VIEWPORT(1);
+            vertices[3].z = 0.999999f;
+            vertices[3].color = field_0x2c;
+            vertices[3].specular = 0;
+            vertices[3].rhw = 1.0f;
+            TARGET()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+            TARGET()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+            if (TARGET()->fillMode != D3DFILL_SOLID) {
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
+            }
+            if (!TARGET()->UnknownVirtualSlot16(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, (int)vertices, 4, 0)) {
+                goto failed;
+            }
+            if (TARGET()->fillMode != D3DFILL_SOLID) {
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, TARGET()->fillMode, 0);
+            }
+        }
+        if (renderFog) {
+            float density = 1.0f;
+            TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 1, 0);
+            TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGCOLOR, field_0x2c, 0);
+            float start = fogStart;
+            float end = fogEnd;
+            if (field_0x44 == D3DPRASTERCAPS_FOGTABLE) {
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGSTART, *(int*)&start, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGEND, *(int*)&end, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
+                density = 0.22f;
+                if (TARGET()->field_0x04->isPowerVR) {
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_EXP, 0);
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
+                } else {
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_LINEAR, 0);
+                }
+                return 1;
+            }
+            if (field_0x44 == D3DPRASTERCAPS_FOGVERTEX) {
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGSTART, *(int*)&fogStart, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGEND, *(int*)&fogEnd, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_LINEAR, 0);
+                return 1;
+            }
+            TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE, 0);
+        }
+    }
+    return 1;
+failed:
+    return 0;
 }
 
 // 0x00462c20

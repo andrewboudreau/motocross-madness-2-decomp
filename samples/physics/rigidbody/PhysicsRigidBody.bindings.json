@@ -1,0 +1,12 @@
+{
+  "??1PhysicsRigidBody@@UAE@XZ": "0x004cc1e0",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "?GameObjectVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
+  "?GameObjectVirtualSlot14@PhysicsBody@@UAEHXZ": "0x004cbf10",
+  "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
+  "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
+  "?WorldToLocalPoint@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd7f0",
+  "?g_QuatIdentity@@3UQuat@@A": "0x006850b0",
+  "_kVec3Zero": "0x00689a00",
+  "_strncpy": "0x00534b10"
+}

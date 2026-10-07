@@ -969,10 +969,10 @@ void KrustyBike::UnknownVirtualSlot43()
         field_0x744->field_0x1c = Vec3(0.0f, 0.0f, 0.0f);
         field_0x744->field_0x28 = Vec3(0.0f, 0.0f, 0.0f);
     }
-    field_0x15c8 = g_kbGame->fullNetPacketIntervalSec;
+    netState.timer = g_kbGame->fullNetPacketIntervalSec;
     field_0x15d0 = g_kbGame->shortNetPacketIntervalSec;
     field_0x138c = 0;
-    field_0x13f8 = 0x7effffff;
+    recordState.timer = 1.7014117e38f;
 }
 
 // .data 0x0056cb88: six trick records {id, name[32]}; slot 97 registers the clips by
@@ -1519,4 +1519,352 @@ float KrustyBike::Fn_00495FF0()
     }
     Fn_0048D8B0();
     return 0.0f;
+}
+
+// 0x004977a0 (GameObject slot 10, reached through the virtual base): the per-frame update.
+// Picks the update path by the network state and game mode, re-targets the mode 4 player
+// record, ends the start-up ghosting once no rival overlaps this bike, and prints the camera
+// bike's figures (with a 0..88 "TimeTo60" stopwatch) on the debug overlay.
+static int s_kbTimeTo60Armed = 1;   // 0x0056d0a0
+static float s_kbTimeTo60;          // 0x0067c3b0
+static float s_kbLastTimeTo60;      // 0x0067c3b4
+
+int KrustyBike::GameObjectVirtualSlot10(float dt)
+{
+    if (g_kbGame->field_0x18 == 1 && !field_0x740->field_0x18a)
+        return 1;
+    if (g_kbGame->field_0x3428) {
+        if (field_0x740->field_0x18a) {
+            Fn_00493660(dt, 1);
+            if (field_0x740->field_0x1dc == 4 && field_0x740->field_0x1e0 == 4)
+                GameObject::GameObjectVirtualSlot10(dt);
+        }
+    } else if (field_0x735) {
+        Fn_00493660(dt, 0);
+        if (field_0x740->field_0x3fa)
+            Fn_00492AD0(dt, 1);
+        GameObject::GameObjectVirtualSlot10(dt);
+    } else if (g_kbGame->field_0x2d70 == 4) {
+        if (field_0x736) {
+            Fn_00493660(dt, 1);
+            if (Fn_00495C00())
+                GameObject::GameObjectVirtualSlot10(dt);
+        } else {
+            Vehicle::GameObjectVirtualSlot10(dt);
+            if (field_0x740->field_0x3fa)
+                Fn_00492AD0(dt, 1);
+        }
+    } else {
+        Vehicle::GameObjectVirtualSlot10(dt);
+        if (field_0x740->field_0x3fa)
+            Fn_00492AD0(dt, 1);
+        if (g_kbGame->field_0x18 > 1)
+            Fn_00492AD0(dt, 0);
+    }
+    if (g_kbGame->field_0x2d74 == 4) {
+        KbPlayer* p = g_kbGame->field_0x570->Fn_0045D2B0();
+        if (p->field_0xdc && p->field_0xa8 == this && crashState) {
+            if (g_kbGame->field_0x8->field_0x10)
+                p->Fn_004A9E80(0, this, 1);
+            else
+                Fn_004925A0(0, 1);
+        }
+    }
+    if (field_0x7a5 && !field_0x735 && field_0x740->field_0x18a) {
+        int cursor = 0;
+        int overlap = 0;
+        KrustyBike* bike;
+        for (bike = field_0x740->NextBike(&cursor); bike; bike = field_0x740->NextBike(&cursor)) {
+            if (!bike->field_0x4a0 && !bike->UnknownVirtualSlot51() && bike != this) {
+                overlap = ((KbBody*)collisionObject)->TestMeshBounds((KbBody*)bike->collisionObject);
+                if (overlap)
+                    break;
+            }
+        }
+        if (!overlap) {
+            spawnProtected = 0;
+            field_0x7a5 = 0;
+            if (field_0x736) {
+                ((KbXform*)modelNode)->Fn_00444DE0(field_0x15e8);
+                ((KbXform*)riderCharacter->c_0x1a0)->Fn_00444DE0(field_0x15e8);
+            }
+            Fn_00496E30(0);
+        }
+    }
+    if (g_kbGame->field_0x38 && field_0x740->field_0x38 == this) {
+        if (field_0x1410 < 0) {
+            int line = g_kbGame->field_0x38->lineCount++;
+            field_0x1410 = line;
+        }
+        g_kbGame->field_0x38->Title(field_0x1410, "KrustyBike");
+        g_kbGame->field_0x38->Print(field_0x1410, "Position/Heading=");
+        g_kbGame->field_0x38->Print(field_0x1410, "%.2f, %.2f, %.2f / (%.0f)", position.x, position.y,
+                                    position.z, bodyYaw * 57.29578f);
+        if (s_kbTimeTo60Armed) {
+            if (field_0x434 > 0.2f) {
+                if (field_0x434 < 88.0f) {
+                    s_kbTimeTo60 += g_kbGame->field_0x2f0;
+                } else {
+                    s_kbLastTimeTo60 = s_kbTimeTo60;
+                    s_kbTimeTo60Armed = 0;
+                }
+            }
+        } else if (field_0x434 < 0.2f) {
+            s_kbTimeTo60 = 0;
+            s_kbTimeTo60Armed = 1;
+        }
+        g_kbGame->field_0x38->Print(field_0x1410, "Last TimeTo60 = %.2f  seconds", s_kbLastTimeTo60);
+        g_kbGame->field_0x38->Print(field_0x1410, "TimeTo60 = %.2f  seconds", s_kbTimeTo60);
+    }
+    return 1;
+}
+
+// 0x00492670: sends this bike's state as message 1 (to every peer, or into the recorder when
+// `record` is set) and keeps what was sent in `state`; without a recorder, peers also get
+// message 10 every two seconds in modes 0 and 4.
+void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
+{
+    if (!g_kbGame->field_0x8 && (!record || !netRecorder))
+        return;
+    KbBikeMessage message;
+    message.position = position;
+    message.roll = bodyRoll;
+    message.pitch = bodyPitch;
+    message.yaw = bodyYaw;
+    message.velocity = velocity;
+    message.angularVelocity = angularVelocity;
+    message.angularVelocity.y += turnRate;
+    message.field_0x04 = field_0x7a0;
+    message.field_0x06 = field_0x790;
+    message.field_0x54 = field_0x11c0;
+    message.field_0x20 = field_0x74c;
+    message.field_0x28 = field_0x750;
+    message.field_0x2c = field_0x770;
+    message.field_0x01 = field_0x784;
+    message.poseIndex = poseIndex;
+    message.poseState = poseState;
+    message.poseParam = poseParam * 100.0f;
+    message.poseLeanBlend = poseLeanBlend * 100.0f;
+    message.poseBlend = poseBlend * 100.0f;
+    if (field_0x430) {
+        if (field_0x433 >= 0)
+            message.motion = field_0x433 + 1;
+        else
+            message.motion = 17;
+    } else {
+        message.motion = 0;
+    }
+    message.flag7 = field_0x478;
+    message.flag8 = field_0x479;
+    message.flag9 = field_0x153c;
+    message.crashDirection = crashDirection;
+    message.crashed = crashState;
+    message.flag4 = UnknownVirtualSlot51();
+    message.flag5 = field_0x7a4 != 0;
+    message.flag6 = field_0x78c;
+    if (g_kbGame->field_0x2d74 == 2 || g_kbGame->field_0x2d74 == 3)
+        message.field_0x53 = (unsigned char)field_0x7a0;
+    else
+        message.field_0x53 = field_0x7b8;
+    message.time = UnknownFunction4bfa80();
+    message.field_0x02 = (short)message.time - (short)state->time;
+    if (!record) {
+        if (g_kbGame->field_0x8)
+            g_kbGame->field_0x8->Send(1, &message, sizeof(message), field_0x11bc, 0);
+    } else if (netRecorder) {
+        netRecorder->Fn_004E8720(1, field_0x11bc, &message, sizeof(message));
+    }
+    state->position = position;
+    state->roll = bodyRoll;
+    state->pitch = bodyPitch;
+    state->yaw = bodyYaw;
+    state->velocity = velocity;
+    state->angularVelocity = angularVelocity;
+    state->angularVelocity.y += turnRate;
+    state->time = message.time;
+    state->velocityError = g_kbZeroVec;
+    state->positionError = g_kbZeroVec;
+    state->angularVelocityError = g_kbZeroVec;
+    state->rollError = 0;
+    state->pitchError = 0;
+    state->yawError = 0;
+    state->timer = 0;
+    if (!record) {
+        if (g_kbGame->field_0x8 &&
+            (!g_kbGame->field_0x2d74 || (g_kbGame->field_0x2d74 == 4 && g_kbGame->field_0x2eb8))) {
+            field_0x1604 -= g_kbGame->field_0x2f0;
+            if (field_0x1604 < 0.0f) {
+                KbBikePing ping;
+                ping.field_0x04 = field_0x768;
+                ping.field_0x01 = field_0x11c0;
+                g_kbGame->field_0x8->Send(10, &ping, sizeof(ping), field_0x11bc, 0);
+                field_0x1604 = 2.0f;
+            }
+        }
+    } else if (netRecorder && field_0x740->field_0x3fb) {
+        KbBikePing ping;
+        ping.field_0x04 = field_0x768;
+        ping.field_0x01 = field_0x11c0;
+        netRecorder->Fn_004E8720(10, field_0x11bc, &ping, sizeof(ping));
+    }
+}
+
+// |v| < 30, the range a message 13 delta may carry (written out at every use in retail).
+#define KB_DELTA_FITS(v) (((v) < 0.0f ? -(v) : (v)) < 30.0f)
+
+// 0x00492ad0: sends (or, with `record`, records) message 13, this bike's change since the
+// last state as byte deltas plus the pose and flags, carrying what the bytes lose over to the
+// next message. A full message 1 (0x00492670) goes instead when a delta does not fit, 1 s
+// has passed, or the full interval is due; peers otherwise get one every short interval.
+// Near miss (190/2315 positions; same instructions but for these): VC6 packs `diff` over the
+// int temporary (frame 0x30, retail 0x34, shifting the stack offsets) and keeps the full
+// message call after the record-interval test in place, where retail cross-jumps it (and the
+// network one, with 0 pushed) to the final call site. Declaration order, scopes, separate
+// per-vector variables and early-return forms were tried.
+void KrustyBike::Fn_00492AD0(float dt, int record)
+{
+    if (!g_kbGame->field_0x8 && (!record || !netRecorder))
+        return;
+    KbBikeState* state;
+    if (record) {
+        state = &recordState;
+        state->timer += g_kbGame->field_0x2f0;
+        if (state->timer > g_kbGame->fullRecordPacketIntervalSec)
+            goto sendFull;
+    } else {
+        state = &netState;
+        state->timer += g_kbGame->field_0x2f0;
+        field_0x15d0 += g_kbGame->field_0x2f0;
+        if (field_0x15d0 < g_kbGame->shortNetPacketIntervalSec)
+            return;
+        field_0x15d0 = 0;
+        if (state->timer > g_kbGame->fullNetPacketIntervalSec)
+            goto sendFull;
+    }
+    {
+        KbBikeDeltaMessage message;
+        message.field_0x16 = field_0x11c0;
+        Vec3 diff = velocity - state->velocity;
+        Vec3 d = diff + state->velocityError;
+        if (KB_DELTA_FITS(d.x) && KB_DELTA_FITS(d.y) && KB_DELTA_FITS(d.z)) {
+            message.velocity[0] = (signed char)(d.x * 4.2666669f);
+            state->velocityError.x = d.x - message.velocity[0] * 0.234375f;
+            message.velocity[1] = (signed char)(d.y * 4.2666669f);
+            state->velocityError.y = d.y - message.velocity[1] * 0.234375f;
+            message.velocity[2] = (signed char)(d.z * 4.2666669f);
+            state->velocityError.z = d.z - message.velocity[2] * 0.234375f;
+            diff = position - state->position;
+            d = diff + state->positionError;
+            if (KB_DELTA_FITS(d.x) && KB_DELTA_FITS(d.y) && KB_DELTA_FITS(d.z)) {
+                message.position[0] = (signed char)(d.x * 4.2666669f);
+                state->positionError.x = d.x - message.position[0] * 0.234375f;
+                message.position[1] = (signed char)(d.y * 4.2666669f);
+                state->positionError.y = d.y - message.position[1] * 0.234375f;
+                message.position[2] = (signed char)(d.z * 4.2666669f);
+                state->positionError.z = d.z - message.position[2] * 0.234375f;
+                scratchVector = angularVelocity;
+                scratchVector.y += turnRate;
+                diff = scratchVector - state->angularVelocity;
+                d = diff + state->angularVelocityError;
+                if (KB_DELTA_FITS(d.x) && KB_DELTA_FITS(d.y) && KB_DELTA_FITS(d.z)) {
+                    message.angularVelocity[0] = (signed char)(d.x * 20.371832f);
+                    state->angularVelocityError.x = d.x - message.angularVelocity[0] * 0.049087387f;
+                    message.angularVelocity[1] = (signed char)(d.y * 20.371832f);
+                    state->angularVelocityError.y = d.y - message.angularVelocity[1] * 0.049087387f;
+                    message.angularVelocity[2] = (signed char)(d.z * 20.371832f);
+                    state->angularVelocityError.z = d.z - message.angularVelocity[2] * 0.049087387f;
+                    float a = bodyYaw - state->yaw + state->yawError;
+                    if (KB_DELTA_FITS(a)) {
+                        message.yaw = (signed char)(a * 20.371832f);
+                        state->yawError = a - message.yaw * 0.049087387f;
+                        a = bodyRoll - state->roll + state->rollError;
+                        if (KB_DELTA_FITS(a)) {
+                            message.roll = (signed char)(a * 20.371832f);
+                            state->rollError = a - message.roll * 0.049087387f;
+                            a = bodyPitch - state->pitch + state->pitchError;
+                            if (KB_DELTA_FITS(a)) {
+                                message.pitch = (signed char)(a * 20.371832f);
+                                state->pitchError = a - message.pitch * 0.049087387f;
+                                unsigned int now = UnknownFunction4bfa80();
+                                unsigned int elapsed = now - state->time;
+                                if (elapsed < 1000) {
+                                    if (elapsed < 0x80) {
+                                        message.coarse = 0;
+                                        message.count = elapsed;
+                                    } else {
+                                        message.coarse = 1;
+                                        message.count = elapsed >> 3;
+                                    }
+                                    message.poseIndex = poseIndex;
+                                    message.poseState = poseState;
+                                    message.poseParam = poseParam * 100.0f;
+                                    message.poseLeanBlend = poseLeanBlend * 100.0f;
+                                    message.poseBlend = poseBlend * 100.0f;
+                                    if (field_0x430) {
+                                        if (field_0x433 >= 0)
+                                            message.motion = field_0x433 + 1;
+                                        else
+                                            message.motion = 17;
+                                    } else {
+                                        message.motion = 0;
+                                    }
+                                    message.flag7 = field_0x478;
+                                    message.flag8 = field_0x479;
+                                    message.flag9 = field_0x153c;
+                                    message.crashDirection = crashDirection;
+                                    message.crashed = crashState;
+                                    message.flag4 = UnknownVirtualSlot51();
+                                    message.flag5 = field_0x7a4 != 0;
+                                    message.flag6 = field_0x78c;
+                                    if (g_kbGame->field_0x2d74 == 2 || g_kbGame->field_0x2d74 == 3)
+                                        message.field_0x11 = (unsigned char)field_0x7a0;
+                                    else
+                                        message.field_0x11 = field_0x7b8;
+                                    if (!record) {
+                                        if (g_kbGame->field_0x8)
+                                            g_kbGame->field_0x8->Send(13, &message, sizeof(message), field_0x11bc, record);
+                                    } else if (netRecorder) {
+                                        netRecorder->Fn_004E8720(13, field_0x11bc, &message, sizeof(message));
+                                    }
+                                    state->position = position;
+                                    state->roll = bodyRoll;
+                                    state->pitch = bodyPitch;
+                                    state->yaw = bodyYaw;
+                                    state->velocity = velocity;
+                                    state->angularVelocity = angularVelocity;
+                                    state->angularVelocity.y += turnRate;
+                                    state->time = now;
+                                    if (!record) {
+                                        if (g_kbGame->field_0x8 &&
+                                            (!g_kbGame->field_0x2d74 || (g_kbGame->field_0x2d74 == 4 && g_kbGame->field_0x2eb8))) {
+                                            field_0x1604 -= g_kbGame->field_0x2f0;
+                                            if (field_0x1604 < 0.0f) {
+                                                KbBikePing ping;
+                                                ping.field_0x04 = field_0x768;
+                                                ping.field_0x01 = field_0x11c0;
+                                                g_kbGame->field_0x8->Send(10, &ping, sizeof(ping), field_0x11bc, 0);
+                                                field_0x1604 = 2.0f;
+                                            }
+                                        }
+                                    } else if (netRecorder && field_0x740->field_0x3fb) {
+                                        KbBikePing ping;
+                                        ping.field_0x04 = field_0x768;
+                                        ping.field_0x01 = field_0x11c0;
+                                        netRecorder->Fn_004E8720(10, field_0x11bc, &ping, sizeof(ping));
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+                Fn_00492670(state, g_kbGame->field_0x2f0, record);
+                return;
+            }
+            Fn_00492670(state, g_kbGame->field_0x2f0, record);
+            return;
+        }
+    }
+sendFull:
+    Fn_00492670(state, g_kbGame->field_0x2f0, record);
 }

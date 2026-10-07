@@ -731,5 +731,35 @@
     "expect": "exact",
     "notes": "KrustyBike.cpp vector set, XCU 155-158",
     "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00492AD0@KrustyBike",
+    "target_va": "0x00492ad0",
+    "target_size": 2315,
+    "expect": "partial",
+    "notes": "message 13 encoder; frame 0x30 vs 0x34 (diff/int-temp packing) and record-timeout tail not cross-jumped",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@KrustyBike@@UAEHM@Z",
+    "target_va": "0x004977a0",
+    "target_size": 1153,
+    "expect": "exact",
+    "notes": "vbase slot 10 per-frame update",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00492670@KrustyBike",
+    "target_va": "0x00492670",
+    "target_size": 1106,
+    "expect": "exact",
+    "notes": "message 1 builder; +0x11c0/+0x74c/+0x750/+0x770 store order",
+    "bindings": "KrustyBike.bindings.json"
   }
 ]

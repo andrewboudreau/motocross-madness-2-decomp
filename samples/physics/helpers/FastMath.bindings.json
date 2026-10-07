@@ -3,6 +3,8 @@
   "?FastInvSqrtEstimate@@YAMM@Z": "0x00460c70",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?InitFastInvSqrtTable@@YAXXZ": "0x00460bb0",
+  "?InitFastMath@@YAXXZ": "0x00460ad0",
+  "?InitFastSqrtTable@@YAXXZ": "0x00460ae0",
   "?InitTrigTables@@YAXXZ": "0x00460cb0",
   "?g_CosTable@@3PAMA": "0x005db3e0",
   "?g_FastInvSqrtTable@@3PAEA": "0x005daf5c",

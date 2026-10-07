@@ -6,7 +6,8 @@
     "target_va": "0x43b320",
     "target_size": 278,
     "expect": "exact",
-    "notes": "ARGB4444 alpha blend, result written in place over B (retail stores the blended bytes back into the B array). External linkage (called from 0x0050b637), so the function has its own COMDAT and its /Z7 size record; target_size is the code extent (278, without the 10 padding bytes)."
+    "notes": "ARGB4444 alpha blend, result written in place over B (retail stores the blended bytes back into the B array). External linkage (called from 0x0050b637), so the function has its own COMDAT and its /Z7 size record; target_size is the code extent (278, without the 10 padding bytes).",
+    "bindings": "PixelBlend.bindings.json"
   },
   {
     "class": "PixelBlend",
@@ -15,7 +16,8 @@
     "target_va": "0x43b440",
     "target_size": 274,
     "expect": "exact",
-    "notes": "ARGB1555 blend, in place over B. External linkage (called from 0x0050b937); code extent 274."
+    "notes": "ARGB1555 blend, in place over B. External linkage (called from 0x0050b937); code extent 274.",
+    "bindings": "PixelBlend.bindings.json"
   },
   {
     "class": "PixelBlend",
@@ -24,7 +26,8 @@
     "target_va": "0x43b560",
     "target_size": 243,
     "expect": "exact",
-    "notes": "ARGB8888 blend, in place over B. External linkage (called from 0x0050b338); code extent 243."
+    "notes": "ARGB8888 blend, in place over B. External linkage (called from 0x0050b338); code extent 243.",
+    "bindings": "PixelBlend.bindings.json"
   },
   {
     "class": "PixelBlend",
@@ -33,7 +36,8 @@
     "target_va": "0x43b660",
     "target_size": 409,
     "expect": "exact",
-    "notes": "surface-format colour pack. Alpha/red/green live in a 3-byte array ([esp+8..0xa]) and the 1555 alpha bit is an unsigned char (seta). External linkage (called from 0x0050b0bd/0x0050b0fb); code extent 409."
+    "notes": "surface-format colour pack. Alpha/red/green live in a 3-byte array ([esp+8..0xa]) and the 1555 alpha bit is an unsigned char (seta). External linkage (called from 0x0050b0bd/0x0050b0fb); code extent 409.",
+    "bindings": "PixelBlend.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -42,7 +46,8 @@
     "target_va": "0x43b800",
     "target_size": 202,
     "expect": "exact",
-    "notes": "cdecl callback stored in field_0x88. exact."
+    "notes": "cdecl callback stored in field_0x88. exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -51,7 +56,8 @@
     "target_va": "0x43b8d0",
     "target_size": 121,
     "expect": "exact",
-    "notes": "constructor. Exact with the body statement order bc, ec, b8, 108, then the zeroed fields (found by a placement search; VC6 schedules the vptr stores after the member stores)."
+    "notes": "constructor. Exact with the body statement order bc, ec, b8, 108, then the zeroed fields (found by a placement search; VC6 schedules the vptr stores after the member stores).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -60,7 +66,8 @@
     "target_va": "0x43b950",
     "target_size": 34,
     "expect": "exact",
-    "notes": "scalar deleting destructor. Extent is the CodeView function size; the alignment padding after it is not compared; retail next function is 0x43b980, so the 48-byte extent (34 code + 14 padding) is compared and matches byte-for-byte."
+    "notes": "scalar deleting destructor. Extent is the CodeView function size; the alignment padding after it is not compared; retail next function is 0x43b980, so the 48-byte extent (34 code + 14 padding) is compared and matches byte-for-byte.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -69,7 +76,8 @@
     "target_va": "0x43b980",
     "target_size": 18,
     "expect": "exact",
-    "notes": "destructor core. exact (dtor core: writes both vptrs then jmp base dtor)."
+    "notes": "destructor core. exact (dtor core: writes both vptrs then jmp base dtor).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -78,7 +86,8 @@
     "target_va": "0x43b9a0",
     "target_size": 59,
     "expect": "exact",
-    "notes": "slot 8 (secondary vtable). exact."
+    "notes": "slot 8 (secondary vtable). exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -87,7 +96,8 @@
     "target_va": "0x43b9e0",
     "target_size": 85,
     "expect": "exact",
-    "notes": "SetBody. exact."
+    "notes": "SetBody. exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -96,7 +106,8 @@
     "target_va": "0x43ba40",
     "target_size": 37,
     "expect": "exact",
-    "notes": "slot 10. exact."
+    "notes": "slot 10. exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -105,7 +116,8 @@
     "target_va": "0x43ba70",
     "target_size": 829,
     "expect": "partial",
-    "notes": "slot 11: probe / ground query. 13.2% (positional byte match; insn-level ratio ~0.4). Structure and semantics decoded; 2 variants tried. Retail hoists bestNormal/bestPoint uninitialised locals into ebx/ebp/[esp+30] and calls LocalToWorldPoint with the probe address; frame 0x48 vs 0x54, so every offset shifts. The push-out uses inline *1.005 temporaries (no ctor)."
+    "notes": "slot 11: probe / ground query. 13.2% (positional byte match; insn-level ratio ~0.4). Structure and semantics decoded; 2 variants tried. Retail hoists bestNormal/bestPoint uninitialised locals into ebx/ebp/[esp+30] and calls LocalToWorldPoint with the probe address; frame 0x48 vs 0x54, so every offset shifts. The push-out uses inline *1.005 temporaries (no ctor).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -114,7 +126,8 @@
     "target_va": "0x43bdb0",
     "target_size": 2619,
     "expect": "partial",
-    "notes": "impulse solver. 5.4%. Semantic reconstruction (impulse) from the decoded steps; retail frame 0xb8 vs 0xd4, the retail code copies Vec3 args through sub esp,0xc blocks and duplicates WorldToLocalDirection(J); the translation-row term of body B (+0x200..0x208 of invInertia) is not modelled. Not byte-close."
+    "notes": "impulse solver. 5.4%. Semantic reconstruction (impulse) from the decoded steps; retail frame 0xb8 vs 0xd4, the retail code copies Vec3 args through sub esp,0xc blocks and duplicates WorldToLocalDirection(J); the translation-row term of body B (+0x200..0x208 of invInertia) is not modelled. Not byte-close.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -123,7 +136,8 @@
     "target_va": "0x43c7f0",
     "target_size": 139,
     "expect": "exact",
-    "notes": "AddProbePoint. exact (signature is Vec3 by value + node: same stack layout as three floats)."
+    "notes": "AddProbePoint. exact (signature is Vec3 by value + node: same stack layout as three floats).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -132,7 +146,8 @@
     "target_va": "0x43c880",
     "target_size": 5,
     "expect": "exact",
-    "notes": "slot 14 tail jump. exact."
+    "notes": "slot 14 tail jump. exact.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -141,7 +156,8 @@
     "target_va": "0x0043c8e0",
     "target_size": 5,
     "expect": "exact",
-    "notes": "Dynamic-initializer thunk for the TU zero vector 0x579830 (a 5-byte jmp to the body; target_size is the CodeView extent, without the alignment padding)."
+    "notes": "Dynamic-initializer thunk for the TU zero vector 0x579830 (a 5-byte jmp to the body; target_size is the CodeView extent, without the alignment padding).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -150,6 +166,7 @@
     "target_va": "0x0043c8f0",
     "target_size": 60,
     "expect": "exact",
-    "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary, then copies it to 0x579830. Exact with copy-initialization `static const ConZeroVec g_ConZero = ConZeroVec(0,0,0);`; direct initialization gives three direct stores instead."
+    "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary, then copies it to 0x579830. Exact with copy-initialization `static const ConZeroVec g_ConZero = ConZeroVec(0,0,0);`; direct initialization gives three direct stores instead.",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   }
 ]

@@ -6,7 +6,8 @@
   "target_va": "0x004aa150",
   "target_size": 14,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -15,7 +16,8 @@
   "target_va": "0x0040b410",
   "target_size": 432,
   "expect": "partial",
-  "notes": "68.07% under vc6_o2_ml (wave 3: was 65.10%; same size). The else branch charges *b before copying field_0x1ac into v (+3%). Remaining: retail reads lenSq components y,x,z through an esi pointer (a helper with y/x/z locals reproduces that but drops to 35.7%, size 426), stores lenSq with fstp and reloads it after popping, keeps a dead fst of the FastSqrt result, loads 0x158 before 0x13c and uses fcom [b] for the t clamp. /Op makes it much worse (13.8%)."
+  "notes": "68.07% under vc6_o2_ml (wave 3: was 65.10%; same size). The else branch charges *b before copying field_0x1ac into v (+3%). Remaining: retail reads lenSq components y,x,z through an esi pointer (a helper with y/x/z locals reproduces that but drops to 35.7%, size 426), stores lenSq with fstp and reloads it after popping, keeps a dead fst of the FastSqrt result, loads 0x158 before 0x13c and uses fcom [b] for the t clamp. /Op makes it much worse (13.8%).",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -24,7 +26,8 @@
   "target_va": "0x0040b5c0",
   "target_size": 28,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -33,7 +36,8 @@
   "target_va": "0x00507920",
   "target_size": 5,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -42,7 +46,8 @@
   "target_va": "0x00464e80",
   "target_size": 3,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -51,7 +56,8 @@
   "target_va": "0x0040b5e0",
   "target_size": 24,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -60,7 +66,8 @@
   "target_va": "0x004aa160",
   "target_size": 38,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -69,7 +76,8 @@
   "target_va": "0x004aa190",
   "target_size": 3,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -78,7 +86,8 @@
   "target_va": "0x00464e90",
   "target_size": 1,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -87,7 +96,8 @@
   "target_va": "0x004aa1a0",
   "target_size": 28,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -96,7 +106,8 @@
   "target_va": "0x004aa1c0",
   "target_size": 25,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -105,7 +116,8 @@
   "target_va": "0x004aa1e0",
   "target_size": 37,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (no /G6)"
+  "notes": "exact under vc6_o2_ml (no /G6)",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  },
  {
   "class": "SoultreePhysicsBaseObject",
@@ -114,6 +126,7 @@
   "target_va": "0x004aa210",
   "target_size": 305,
   "expect": "exact",
-  "notes": "exact under vc6_o2_ml (wave 3: was 85.35%). Made it match: field_0x50 = field_0x34 is placed after the 0x4c/0x48 stores and before 0x54..0x5c."
+  "notes": "exact under vc6_o2_ml (wave 3: was 85.35%). Made it match: field_0x50 = field_0x34 is placed after the 0x4c/0x48 stores and before 0x54..0x5c.",
+  "bindings": "SoultreePhysicsInlines.bindings.json"
  }
 ]

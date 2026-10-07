@@ -9,6 +9,7 @@
 #define KRUSTYBIKE_TYPES_H
 
 struct KbRacer;
+struct KbOverlay;
 struct KbSession;
 struct KbPlayer;
 struct KbBody;
@@ -86,16 +87,119 @@ struct KbNetState {
     int field_0x50;
 };
 
+// Message type 1 (0x58 bytes) that 0x00492670 sends or records: this bike's motion state,
+// pose and flags (tier 2 layout from the stores, tier 3 names).
+struct KbBikeMessage {
+    char field_0x00;
+    unsigned char field_0x01;            // KrustyBike+0x784
+    short field_0x02;                    // ms since the state's last send
+    short field_0x04;                    // +0x7a0
+    short field_0x06;                    // +0x790
+    Vec3 position;                       // +0x08
+    float roll, pitch, yaw;              // +0x14
+    int field_0x20;                      // +0x74c
+    int field_0x24;
+    int field_0x28;                      // +0x750
+    int field_0x2c;                      // +0x770
+    Vec3 angularVelocity;                // +0x30 (y plus the turn rate)
+    Vec3 velocity;                       // +0x3c
+    unsigned char poseIndex : 4;         // +0x48
+    unsigned char poseState : 4;
+    unsigned char poseParam;             // +0x49 x 100
+    unsigned char poseBlend;             // +0x4a x 100
+    unsigned char poseLeanBlend;         // +0x4b x 100
+    unsigned int time;                   // +0x4c
+    unsigned char motion : 6;            // +0x50 crash motion (17 without one)
+    unsigned char pad_0x50 : 2;
+    unsigned char crashDirection : 3;    // +0x51
+    unsigned char crashed : 1;
+    unsigned char flag4 : 1;             // vehicle slot 51
+    unsigned char flag5 : 1;             // +0x7a4
+    unsigned char flag6 : 1;             // +0x78c
+    unsigned char flag7 : 1;             // +0x478
+    unsigned char flag8 : 1;             // +0x52 +0x479
+    unsigned char flag9 : 1;             //       +0x153c
+    unsigned char field_0x53;            // +0x7b8 (+0x7a0 in modes 2 and 3)
+    unsigned char field_0x54;            // +0x11c0
+};
+// Message type 10 (8 bytes): the bike's +0x11c0 flag and +0x768.
+struct KbBikePing {
+    char field_0x00;
+    unsigned char field_0x01;
+    char pad_0x02[2];
+    float field_0x04;
+};
+// The state 0x00492670 keeps of the last message (caller-owned; tier 3).
+struct KbBikeState {
+    Vec3 position;                       // +0x00
+    float roll, pitch, yaw;              // +0x0c
+    Vec3 angularVelocity;                // +0x18
+    Vec3 velocity;                       // +0x24
+    int field_0x30;
+    unsigned int time;                   // +0x34
+    // What message 13's byte deltas could not carry (0x00492ad0), per value.
+    Vec3 velocityError;                  // +0x38
+    Vec3 positionError;                  // +0x44
+    Vec3 angularVelocityError;           // +0x50
+    float rollError;                     // +0x5c
+    float pitchError;                    // +0x60
+    float yawError;                      // +0x64
+    float timer;                         // +0x68 seconds since the last full message
+};
+// Message type 13 (0x17 bytes, packed) that 0x00492ad0 sends or records: byte deltas
+// against the last state (the decoder 0x004933e0 reads them as KbNetDelta), the time step
+// and message 1's pose and flag bytes.
+#pragma pack(push, 1)
+struct KbBikeDeltaMessage {
+    char field_0x00;
+    signed char position[3];             // +0x01 x 64/15
+    unsigned char coarse : 1;            // +0x04 the count is in units of 8 ms
+    unsigned char count : 7;             //       ms since the last state
+    signed char roll, pitch, yaw;        // +0x05 x 64/pi
+    signed char angularVelocity[3];      // +0x08 x 64/pi
+    signed char velocity[3];             // +0x0b x 64/15
+    unsigned char motion : 6;            // +0x0e
+    unsigned char pad_0x0e : 2;
+    unsigned char crashDirection : 3;    // +0x0f
+    unsigned char crashed : 1;
+    unsigned char flag4 : 1;
+    unsigned char flag5 : 1;
+    unsigned char flag6 : 1;
+    unsigned char flag7 : 1;
+    unsigned char flag8 : 1;             // +0x10
+    unsigned char flag9 : 1;
+    unsigned char field_0x11;            // +0x11
+    unsigned char poseIndex : 4;         // +0x12
+    unsigned char poseState : 4;
+    unsigned char poseParam;             // +0x13 x 100
+    unsigned char poseBlend;             // +0x14 x 100
+    unsigned char poseLeanBlend;         // +0x15 x 100
+    unsigned char field_0x16;            // +0x16 +0x11c0
+};
+#pragma pack(pop)
+
 struct KbNetPacket { int field_0x0; char field_0x4; char pad_0x5[3]; int field_0x8; };
 // On-screen message object (0x8C bytes; ctor 0x0051B200 takes the text and a display time).
 struct KbMessage { char data[0x8C]; KbMessage(const char* text, float seconds); };
+// The debug overlay at KbGame+0x38 (src/reconstructed DebugOverlay: 0x00447fa0 names a page
+// line block, 0x00447f40 prints a line; both cdecl varargs members).
+struct KbOverlay {
+    void Title(int line, const char* format, ...);   // 0x00447fa0
+    void Print(int line, const char* format, ...);   // 0x00447f40
+    char pad_0x0000[0x26c0];
+    int lineCount;   // 0x26C0: next free line block
+};
 struct KbGame {
     void GetStringText(int id, char* buffer, int size);   // 0x00521970: fetch text for a string id
     char pad_0x0000[0x8];
     KbGameCfg* field_0x8; // 0x8
     char pad_0x000C[0xC];
     int field_0x18; // 0x18
-    char pad_0x001C[0x544];
+    char pad_0x001C[0x1c];
+    KbOverlay* field_0x38; // 0x38: debug overlay (0 when off)
+    char pad_0x003C[0x2f0 - 0x3c];
+    float field_0x2f0; // 0x2F0: frame time (seconds)
+    char pad_0x02F4[0x560 - 0x2f4];
     KbTrackRec* field_0x560; // 0x560: array of 24-byte records (first member is a Vec3)
     char pad_0x0564[0x4];
     KbRacer* field_0x568; // 0x568
@@ -125,14 +229,17 @@ struct KbGame {
     char pad_0x2EBC[0x3334 - 0x2ebc];
     int field_0x3334; // 0x3334
     char pad_0x3338[0xDC];
-    int fullNetPacketIntervalSec; // 0x3414
-    int shortNetPacketIntervalSec; // 0x3418
-    char pad_0x341C[0xC];
+    float fullNetPacketIntervalSec; // 0x3414
+    float shortNetPacketIntervalSec; // 0x3418
+    float fullRecordPacketIntervalSec; // 0x341C
+    char pad_0x3420[0x8];
     int field_0x3428; // 0x3428
     char pad_0x342C[0x3444 - 0x342c];
     KbBonusTable* field_0x3444; // 0x3444
 };
 extern KbGame* g_kbGame;
+// 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).
+unsigned int UnknownFunction4bfa80();
 
 // Part table at Vehicle+0x1f0 -> +0xb4 (tier 3): count at +0, 0x44-byte records at +4.  A record
 // with flag bit 3 clear owns a collision object at record+8 -> +0x3c.
@@ -213,6 +320,12 @@ struct KbRace {
     char field_0x18e; // 0x18E
     char pad_0x018F[0xD];
     KbSensor* field_0x19c; // 0x19C
+    char pad_0x01A0[0x1dc - 0x1a0];
+    int field_0x1dc; // 0x1DC  GameObject slot 10 runs the base update when both are 4
+    int field_0x1e0; // 0x1E0
+    char pad_0x01E4[0x3fa - 0x1e4];
+    char field_0x3fa; // 0x3FA  GameObject slot 10 calls 0x00492ad0 when set
+    char field_0x3fb; // 0x3FB  0x00492670 records message 10 when set
 };
 // Record at KrustyBike+0x744 (tier 3): per-bike state block reset by slot 43.
 struct KbRaw3 { int a, b, c; };
@@ -239,6 +352,7 @@ struct KbSink {
 // transforms a vector.
 struct KbXform {
     void Fn_00444D80(KbObj128* who);   // 0x00444D80 (tier 3: attach/detach with a scene object)
+    void Fn_00444DE0(KbObj128* who);   // 0x00444DE0 (D3DIMSoultreeObject; GameObject slot 10)
     Vec3 WorldToLocalDirection(const Vec3* v);
 };
 // Element of the array at Bike+0x12c (count at +0x130).
@@ -316,7 +430,7 @@ struct KbPlayer {
     Vehicle* field_0xa8;   // 0xA8: vehicle this player is bound to
     char pad_0x00AC[0x30];
     Vehicle* field_0xdc;   // 0xDC
-    void Fn_004A9E80(Vehicle* who, int a, int b);
+    void Fn_004A9E80(Vehicle* a, Vehicle* b, int c);   // 0x004A9E80: b is a vehicle (tested and read at +0x75c)
 };
 // Bounds/collision body at Vehicle::field_0x128 (canonical: CollisionObject::TestMeshBounds).
 struct KbBody { int TestMeshBounds(KbBody* other); };

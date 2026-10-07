@@ -1,0 +1,7 @@
+{
+  "?SerialBaudRate@@YAHH@Z": "0x004ae2f0",
+  "?SerialFlowControl@@YAHH@Z": "0x004ae3d0",
+  "?SerialParity@@YAHH@Z": "0x004ae390",
+  "?SerialStopBits@@YAHH@Z": "0x004ae370",
+  "?UnknownFunction4ae410@@YAXPAUUnknownSerialSettings@@PAUUnknownComPortAddress@@@Z": "0x004ae410"
+}

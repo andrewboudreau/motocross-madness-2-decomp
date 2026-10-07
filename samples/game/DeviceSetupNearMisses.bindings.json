@@ -1,0 +1,17 @@
+{
+  "?GetDXVersion@@YAXPAK00@Z": "0x00448560",
+  "??_C@_09LLMO@DDRAW?4DLL?$AA@": "0x00568d6c",
+  "??_C@_09MOHO@Blade?4dll?$AA@": "0x00568d78",
+  "??_C@_0BB@DLNE@DirectDrawCreate?$AA@": "0x00568d58",
+  "??_C@_0BD@NDCK@DirectDrawCreateEx?$AA@": "0x00568d44",
+  "??_C@_0BD@NJCB@DirectInputCreateA?$AA@": "0x00568d84",
+  "??_C@_0L@MNJD@DINPUT?4DLL?$AA@": "0x00568d98",
+  "_IID_IDirectDraw2": "0x00556090",
+  "_IID_IDirectDraw7": "0x005560b0",
+  "_IID_IDirectDrawSurface3": "0x005560e0",
+  "_IID_IDirectDrawSurface4": "0x005560f0",
+  "__imp__FreeLibrary@4": "0x00550274",
+  "__imp__GetProcAddress@8": "0x00550270",
+  "__imp__GetVersionExA@4": "0x00550268",
+  "__imp__LoadLibraryA@4": "0x0055026c"
+}

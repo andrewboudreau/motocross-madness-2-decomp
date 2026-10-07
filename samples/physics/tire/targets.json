@@ -73,7 +73,8 @@
     "target_va": "0x00431980",
     "target_size": 60,
     "expect": "exact",
-    "notes": "destructor core (this = GameObject subobject, jmp to D3DIMSoultreeCharacter core 0x004459a0)"
+    "notes": "destructor core (this = GameObject subobject, jmp to D3DIMSoultreeCharacter core 0x004459a0)",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -82,7 +83,8 @@
     "target_va": "0x00431d20",
     "target_size": 51,
     "expect": "exact",
-    "notes": "vbase deleting destructor: lea esi,[ecx-0x268] proves GameObject vbase at 616; 51 code bytes + 13 padding"
+    "notes": "vbase deleting destructor: lea esi,[ecx-0x268] proves GameObject vbase at 616; 51 code bytes + 13 padding",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -91,7 +93,8 @@
     "target_va": "0x00431d10",
     "target_size": 8,
     "expect": "exact",
-    "notes": "vtordisp thunk for vbase slot 0"
+    "notes": "vtordisp thunk for vbase slot 0",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -100,7 +103,8 @@
     "target_va": "0x00431d60",
     "target_size": 11,
     "expect": "exact",
-    "notes": "vtordisp + adjust (sub ecx,0x54) thunk for vbase slot 4 into D3DIM 0x00446640"
+    "notes": "vtordisp + adjust (sub ecx,0x54) thunk for vbase slot 4 into D3DIM 0x00446640",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -109,7 +113,8 @@
     "target_va": "0x00431d70",
     "target_size": 11,
     "expect": "exact",
-    "notes": "vtordisp + adjust (sub ecx,0x54) thunk for vbase slot 5 into D3DIM 0x00446620"
+    "notes": "vtordisp + adjust (sub ecx,0x54) thunk for vbase slot 5 into D3DIM 0x00446620",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -118,7 +123,8 @@
     "target_va": "0x00431d80",
     "target_size": 8,
     "expect": "exact",
-    "notes": "vtordisp thunk for overridden vbase slot 10"
+    "notes": "vtordisp thunk for overridden vbase slot 10",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -127,7 +133,8 @@
     "target_va": "0x00431d90",
     "target_size": 8,
     "expect": "exact",
-    "notes": "vtordisp thunk for overridden vbase slot 14"
+    "notes": "vtordisp thunk for overridden vbase slot 14",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -136,7 +143,8 @@
     "target_va": "0x00431cf0",
     "target_size": 21,
     "expect": "exact",
-    "notes": "tail call to GameObject slot 14 (0x00469360) on the vbase subobject"
+    "notes": "tail call to GameObject slot 14 (0x00469360) on the vbase subobject",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -145,7 +153,8 @@
     "target_va": "0x004319c0",
     "target_size": 360,
     "expect": "exact",
-    "notes": "non-virtual loader (ret 0x1c): D3DIM slot 11, new CollisionObject(1) with __FILE__ line 27, shape from .col path or node, owner tag 0x2711"
+    "notes": "non-virtual loader (ret 0x1c): D3DIM slot 11, new CollisionObject(1) with __FILE__ line 27, shape from .col path or node, owner tag 0x2711",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -154,7 +163,8 @@
     "target_va": "0x00431b30",
     "target_size": 438,
     "expect": "exact",
-    "notes": "velocity = (pos - last) / dt written through a reciprocal-multiply Vec3 divide (the shared out-of-line helper 0x0043c890: inv = 1/dt, then three multiplies on the Vec3 temporary). That form leaves the x component on the x87 stack as retail does; operator* by a float temp or per-component divide did not."
+    "notes": "velocity = (pos - last) / dt written through a reciprocal-multiply Vec3 divide (the shared out-of-line helper 0x0043c890: inv = 1/dt, then three multiplies on the Vec3 temporary). That form leaves the x component on the x87 stack as retail does; operator* by a float temp or per-component divide did not.",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "CollisionCharacter",
@@ -163,7 +173,8 @@
     "target_va": "0x004318d0",
     "target_size": 162,
     "expect": "exact",
-    "notes": "CollisionCharacter(int a) : GameObject(1), D3DIMSoultreeCharacter(a): vbase ctor 0x00468ca0(1) under the hidden most-derived flag, D3DIM ctor 0x004455b0(a, 0), vptr/vtordisp writes, field_0x210 = 0."
+    "notes": "CollisionCharacter(int a) : GameObject(1), D3DIMSoultreeCharacter(a): vbase ctor 0x00468ca0(1) under the hidden most-derived flag, D3DIM ctor 0x004455b0(a, 0), vptr/vtordisp writes, field_0x210 = 0.",
+    "bindings": "CollisionCharacter.bindings.json"
   },
   {
     "class": "Tire",

@@ -6,7 +6,8 @@
     "target_va": "0x004dd070",
     "target_size": 48,
     "expect": "exact",
-    "notes": "node ctor (vptr, list/children null, node count++, y interval 0/-FLT_MAX)"
+    "notes": "node ctor (vptr, list/children null, node count++, y interval 0/-FLT_MAX)",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTreeNode",
@@ -15,7 +16,8 @@
     "target_va": "0x004dd0a0",
     "target_size": 30,
     "expect": "exact",
-    "notes": "scalar deleting dtor wrapper (CodeView extent; the 2 padding bytes after it are not compared)"
+    "notes": "scalar deleting dtor wrapper (CodeView extent; the 2 padding bytes after it are not compared)",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTreeNode",
@@ -24,7 +26,8 @@
     "target_va": "0x004dd0c0",
     "target_size": 101,
     "expect": "exact",
-    "notes": "dtor core"
+    "notes": "dtor core",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -33,7 +36,8 @@
     "target_va": "0x004dda90",
     "target_size": 30,
     "expect": "exact",
-    "notes": "scalar deleting dtor wrapper (CodeView extent; the 2 padding bytes after it are not compared)"
+    "notes": "scalar deleting dtor wrapper (CodeView extent; the 2 padding bytes after it are not compared)",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -42,7 +46,8 @@
     "target_va": "0x004dc840",
     "target_size": 116,
     "expect": "exact",
-    "notes": "dtor core"
+    "notes": "dtor core",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -51,7 +56,8 @@
     "target_va": "0x004dc7e0",
     "target_size": 94,
     "expect": "exact",
-    "notes": "slot 1 node factory (operator new 0x14, Quadtree.cpp line 0x7a; ctor inlined only if defined after it)"
+    "notes": "slot 1 node factory (operator new 0x14, Quadtree.cpp line 0x7a; ctor inlined only if defined after it)",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -60,7 +66,8 @@
     "target_va": "0x004dc620",
     "target_size": 70,
     "expect": "exact",
-    "notes": "reset pools/root"
+    "notes": "reset pools/root",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -69,7 +76,8 @@
     "target_va": "0x004dc8c0",
     "target_size": 504,
     "expect": "exact",
-    "notes": "world rect -> 8 bit (depth, quadrant) code"
+    "notes": "world rect -> 8 bit (depth, quadrant) code",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -78,7 +86,8 @@
     "target_va": "0x004dcd40",
     "target_size": 477,
     "expect": "exact",
-    "notes": "move an object within the tree when its code/Y range changes"
+    "notes": "move an object within the tree when its code/Y range changes",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTreeNode",
@@ -87,7 +96,8 @@
     "target_va": "0x004dd1b0",
     "target_size": 177,
     "expect": "exact",
-    "notes": "unlink object from the node item list"
+    "notes": "unlink object from the node item list",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -96,7 +106,8 @@
     "target_va": "0x004dd270",
     "target_size": 354,
     "expect": "exact",
-    "notes": "start a rectangle query"
+    "notes": "start a rectangle query",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTreeNode",
@@ -105,7 +116,8 @@
     "target_va": "0x004dd3e0",
     "target_size": 258,
     "expect": "exact",
-    "notes": "collect nodes overlapping a rectangle"
+    "notes": "collect nodes overlapping a rectangle",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTreeNode",
@@ -114,7 +126,8 @@
     "target_va": "0x004dd4f0",
     "target_size": 65,
     "expect": "exact",
-    "notes": "collect a node and all children"
+    "notes": "collect a node and all children",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -123,7 +136,8 @@
     "target_va": "0x004dd540",
     "target_size": 144,
     "expect": "exact",
-    "notes": "iterate query results, stamp-deduplicated"
+    "notes": "iterate query results, stamp-deduplicated",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -132,7 +146,8 @@
     "target_va": "0x004dd5d0",
     "target_size": 42,
     "expect": "exact",
-    "notes": "qsort comparator; 42-byte body (the 6 padding bytes after it are not compared)"
+    "notes": "qsort comparator; 42-byte body (the 6 padding bytes after it are not compared)",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -141,7 +156,8 @@
     "target_va": "0x004dd750",
     "target_size": 22,
     "expect": "exact",
-    "notes": "rewind the query"
+    "notes": "rewind the query",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -150,7 +166,8 @@
     "target_va": "0x004dd770",
     "target_size": 44,
     "expect": "exact",
-    "notes": "end the query"
+    "notes": "end the query",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTreeNode",
@@ -159,7 +176,8 @@
     "target_va": "0x004dd7a0",
     "target_size": 740,
     "expect": "exact",
-    "notes": "slot 2 back-to-front gather (returns result list)"
+    "notes": "slot 2 back-to-front gather (returns result list)",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTreeNode",
@@ -168,7 +186,8 @@
     "target_va": "0x004ddab0",
     "target_size": 551,
     "expect": "exact",
-    "notes": "slot 1 back-to-front traversal"
+    "notes": "slot 1 back-to-front traversal",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTreeNode",
@@ -177,7 +196,8 @@
     "target_va": "0x004ddce0",
     "target_size": 50,
     "expect": "exact",
-    "notes": "realloc node to hold inline child array"
+    "notes": "realloc node to hold inline child array",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -186,7 +206,8 @@
     "target_va": "0x004ddd20",
     "target_size": 104,
     "expect": "exact",
-    "notes": "append a node's item blocks to the result array"
+    "notes": "append a node's item blocks to the result array",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -195,7 +216,8 @@
     "target_va": "0x004ddd90",
     "target_size": 58,
     "expect": "exact",
-    "notes": "validate a code against the depth"
+    "notes": "validate a code against the depth",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -204,7 +226,8 @@
     "target_va": "0x004dc670",
     "target_size": 365,
     "expect": "exact",
-    "notes": "cell-size table, world rect, pools, root. Exact: the extents are written as chained assignments (`float w = field_0x50 = x1 - x0;`), which gives retail's `fst [field]` plus the spill temporary; reading the field back after a separate store does not."
+    "notes": "cell-size table, world rect, pools, root. Exact: the extents are written as chained assignments (`float w = field_0x50 = x1 - x0;`), which gives retail's `fst [field]` plus the spill temporary; reading the field back after a separate store does not.",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -213,7 +236,8 @@
     "target_va": "0x004dcac0",
     "target_size": 627,
     "expect": "partial",
-    "notes": "3.6% match. Same control flow. Register allocation differs: retail has a 0x34 frame, spills `this` to esp+8, keeps depth in ebp, x in edx and z in ebx, and moves the Grow path out of line. The candidate has a 0x30 frame with `this` in ebx. Loop-form variants (count-down, 0..depth, if/else order) stay between 2% and 4%."
+    "notes": "3.6% match. Same control flow. Register allocation differs: retail has a 0x34 frame, spills `this` to esp+8, keeps depth in ebp, x in edx and z in ebx, and moves the Grow path out of line. The candidate has a 0x30 frame with `this` in ebx. Loop-form variants (count-down, 0..depth, if/else order) stay between 2% and 4%.",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -222,7 +246,8 @@
     "target_va": "0x004dcf20",
     "target_size": 331,
     "expect": "partial",
-    "notes": "11.3% match. Same control flow. Retail keeps `this` in ebp and code, i and bit in memory; the candidate holds code in esi and i in ebp. Tried without success: a goto/flag-free form, an if-body without continue, `0x10 << i`, recomputing x/z/cell in the loop, and moving cell inside the loop."
+    "notes": "11.3% match. Same control flow. Retail keeps `this` in ebp and code, i and bit in memory; the candidate holds code in esi and i in ebp. Tried without success: a goto/flag-free form, an if-body without continue, `0x10 << i`, recomputing x/z/cell in the loop, and moving cell inside the loop.",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTreeNode",
@@ -231,7 +256,8 @@
     "target_va": "0x004dd130",
     "target_size": 117,
     "expect": "exact",
-    "notes": "append obj to the node's first free item slot, allocating a 0x14 block from the pool. Exact: the fresh block is cleared with memset(p, 0, sizeof) (VC6 inlines it as `mov edx,eax; xor ecx,ecx; mov [edx],ecx` x5; field stores give `mov [eax+N],0`), and `prev` is left uninitialised on the empty-list path, which reproduces retail's dead load at 0x4dd165."
+    "notes": "append obj to the node's first free item slot, allocating a 0x14 block from the pool. Exact: the fresh block is cleared with memset(p, 0, sizeof) (VC6 inlines it as `mov edx,eax; xor ecx,ecx; mov [edx],ecx` x5; field stores give `mov [eax+N],0`), and `prev` is left uninitialised on the empty-list path, which reproduces retail's dead load at 0x4dd165.",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "QuadTree",
@@ -240,7 +266,8 @@
     "target_va": "0x004dd600",
     "target_size": 330,
     "expect": "partial",
-    "notes": "88.0% (329 vs 330 bytes). Same algorithm (qsort with CompareObjectKey, 2-element swap inline). Exact up to the outer loop's bottom: retail ends the loop with `cmp eax,edi; je ret0; jmp top` and puts the return-0 block last, but VC6 rotates every while/for(;;) loop whose top is a conditional exit into a bottom `jne body`. That shape has not been reproduced yet."
+    "notes": "88.0% (329 vs 330 bytes). Same algorithm (qsort with CompareObjectKey, 2-element swap inline). Exact up to the outer loop's bottom: retail ends the loop with `cmp eax,edi; je ret0; jmp top` and puts the return-0 block last, but VC6 rotates every while/for(;;) loop whose top is a conditional exit into a bottom `jne body`. That shape has not been reproduced yet.",
+    "bindings": "Quadtree.bindings.json"
   },
   {
     "class": "Terrain",
@@ -249,7 +276,8 @@
     "target_va": "0x00505830",
     "target_size": 370,
     "expect": "exact",
-    "notes": "Terrain(int a) : GameObject(a): base ctor 0x00468ca0 with the forwarded argument, GroundFogableObject member ctor, field inits and the 0x004a1410 identity-matrix copy."
+    "notes": "Terrain(int a) : GameObject(a): base ctor 0x00468ca0 with the forwarded argument, GroundFogableObject member ctor, field inits and the 0x004a1410 identity-matrix copy.",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -258,7 +286,8 @@
     "target_va": "0x005059b0",
     "target_size": 30,
     "expect": "exact",
-    "notes": "slot 0 scalar deleting dtor (CodeView extent; the 2 padding bytes after it are not compared)"
+    "notes": "slot 0 scalar deleting dtor (CodeView extent; the 2 padding bytes after it are not compared)",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -267,7 +296,8 @@
     "target_va": "0x005079f0",
     "target_size": 441,
     "expect": "exact",
-    "notes": "dtor core: profiling scope, releases owned sub-objects"
+    "notes": "dtor core: profiling scope, releases owned sub-objects",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -276,7 +306,8 @@
     "target_va": "0x00507920",
     "target_size": 5,
     "expect": "exact",
-    "notes": "slot 19 return-0 stub (declared non-virtual here: GameObject.h placeholder slot 19 has a different signature)"
+    "notes": "slot 19 return-0 stub (declared non-virtual here: GameObject.h placeholder slot 19 has a different signature)",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -285,7 +316,8 @@
     "target_va": "0x004dc4c0",
     "target_size": 5,
     "expect": "exact",
-    "notes": "slot 22 return-0 stub shared with ProjectedShadow/StatsOverlay (non-virtual here, same reason)"
+    "notes": "slot 22 return-0 stub shared with ProjectedShadow/StatsOverlay (non-virtual here, same reason)",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -294,7 +326,8 @@
     "target_va": "0x00507930",
     "target_size": 37,
     "expect": "exact",
-    "notes": "clamp >= 0 and set dirty flag field_0xbf4"
+    "notes": "clamp >= 0 and set dirty flag field_0xbf4",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -303,7 +336,8 @@
     "target_va": "0x00507960",
     "target_size": 129,
     "expect": "exact",
-    "notes": "select the quality table entry (row 9 when field_0xcb0 is set). Exact: the store is written as if/else, not as `field = cond ? a : b;`. In the if/else form VC6 tail-merges the two stores, and the joined value lands in edx."
+    "notes": "select the quality table entry (row 9 when field_0xcb0 is set). Exact: the store is written as if/else, not as `field = cond ? a : b;`. In the if/else form VC6 tail-merges the two stores, and the joined value lands in edx.",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -312,7 +346,8 @@
     "target_va": "0x00508850",
     "target_size": 276,
     "expect": "exact",
-    "notes": "slot 23 debug key handler (three toggle keys)"
+    "notes": "slot 23 debug key handler (three toggle keys)",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -321,7 +356,8 @@
     "target_va": "0x00507510",
     "target_size": 127,
     "expect": "exact",
-    "notes": "inline helper; retail keeps this out-of-line COMDAT copy because CastSegment ran out of inline budget. Exact: the early `return origin` (two return statements) keeps `push esi` in the prologue; a single return after the if makes VC6 sink it into the tail block. The reference parameters are ABI-identical to pointers."
+    "notes": "inline helper; retail keeps this out-of-line COMDAT copy because CastSegment ran out of inline budget. Exact: the early `return origin` (two return statements) keeps `push esi` in the prologue; a single return after the if makes VC6 sink it into the tail block. The reference parameters are ABI-identical to pointers.",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -330,7 +366,8 @@
     "target_va": "0x00507590",
     "target_size": 127,
     "expect": "exact",
-    "notes": "Z sibling of 0x00507510, same shape and the same cause of the exact match."
+    "notes": "Z sibling of 0x00507510, same shape and the same cause of the exact match.",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -339,7 +376,8 @@
     "target_va": "0x00507c10",
     "target_size": 2963,
     "expect": "partial",
-    "notes": "Height/normal query (58 callers). Checkerboard triangle split, inverse-squared-distance corner weights. Retail uses an EBP frame and inline fistp through pointer-aliased int locals (inline __asm in original source, not reproducible under rules); inherent partial. Also VC6 inline budget differs on Vec3 helpers."
+    "notes": "Height/normal query (58 callers). Checkerboard triangle split, inverse-squared-distance corner weights. Retail uses an EBP frame and inline fistp through pointer-aliased int locals (inline __asm in original source, not reproducible under rules); inherent partial. Also VC6 inline budget differs on Vec3 helpers.",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -348,7 +386,8 @@
     "target_va": "0x00506e90",
     "target_size": 1654,
     "expect": "partial",
-    "notes": "56.6% (1659 vs 1654). The first 0x3b7 bytes are identical. The Clip helpers are now `inline` with reference params, `-dir` is passed as a temporary, and operator/ builds the result with a direct constructor call. What remains is VC6's inline budget: retail does not inline the ClipZ for the Z end point and inlines the next `-dir`, but this source inlines that ClipZ and so runs out of budget one site early. See the comment above CastSegment."
+    "notes": "56.6% (1659 vs 1654). The first 0x3b7 bytes are identical. The Clip helpers are now `inline` with reference params, `-dir` is passed as a temporary, and operator/ builds the result with a direct constructor call. What remains is VC6's inline budget: retail does not inline the ClipZ for the Z end point and inlines the next `-dir`, but this source inlines that ClipZ and so runs out of budget one site early. See the comment above CastSegment.",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -357,7 +396,8 @@
     "target_va": "0x005057d0",
     "target_size": 83,
     "expect": "exact",
-    "notes": "linear search of field_0xcb8[] (count field_0xcbc); the match is swapped with the last live element, the count shrinks and the object is stored behind the new end. Exact first try; adjacent to the Terrain ctor 0x00505830, uses Terrain fields 0xcb8/0xcbc."
+    "notes": "linear search of field_0xcb8[] (count field_0xcbc); the match is swapped with the last live element, the count shrinks and the object is stored behind the new end. Exact first try; adjacent to the Terrain ctor 0x00505830, uses Terrain fields 0xcb8/0xcbc.",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",
@@ -366,7 +406,8 @@
     "target_va": "0x00507bb0",
     "target_size": 96,
     "expect": "exact",
-    "notes": "derives a/b, a^2/b^2 and their reciprocals from ints at 0x6c/0x70 into floats 0x74/0x78/0x7c/0x80 (called by slot 12 0x507610 after storing the new 0x6c). Exact with the source order b^2 ratio first then a/b (fidiv with int temporaries)."
+    "notes": "derives a/b, a^2/b^2 and their reciprocals from ints at 0x6c/0x70 into floats 0x74/0x78/0x7c/0x80 (called by slot 12 0x507610 after storing the new 0x6c). Exact with the source order b^2 ratio first then a/b (fidiv with int temporaries).",
+    "bindings": "Terrain.bindings.json"
   },
   {
     "class": "Terrain",

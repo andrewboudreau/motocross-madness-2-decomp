@@ -201,6 +201,138 @@ int EvictGeometry(void* owner, int context) {
     return 1;
 }
 
+// 0x00456a10: builds the lit geometry for `billboard` (a LOD index, or the
+// billboard when it is past the LOD count) at the quantized position, rotated
+// to face the camera's horizontal direction. The vertex block (vertices, the
+// 4-byte-padded indices, then the AgeEntry) is registered with the
+// AgeManager for eviction. The min/max of x are computed but unused.
+void Vegetation::SetBillboard(int billboard, int fade) {
+    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
+    UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->field_0x08;
+    fadeLevel = (unsigned char)fade;
+    if (billboard == isBillboard)
+        return;
+    if (isBillboard < definition->lodCount && geometryBlock)
+        g_UnknownGlobal59af0c--;
+    float maxX = -FLT_MAX;
+    float minX = FLT_MAX;
+    if (billboard < definition->lodCount && !geometryBlock) {
+        int vertexCount = definition->modelVertexCount[billboard];
+        int indexCount = definition->modelIndexCount[billboard];
+        int dwords = vertexCount * 8 + (indexCount + 1) / 2;
+        geometryBlock = DebugMalloc(dwords * 4 + sizeof(AgeEntry), __FILE__, 0x1fb);
+        AgeEntry* entry = (AgeEntry*)((int*)geometryBlock + dwords);
+        g_UnknownGlobal59aebc->ageManager->Register(entry, EvictGeometry, this, 0,
+                                                                  dwords * 4 + sizeof(AgeEntry));
+        g_UnknownGlobal59af0c++;
+        memcpy((UnknownEcoVertex*)geometryBlock + vertexCount, definition->modelIndices[billboard], indexCount * 2);
+        float radiusScale = definition->RadiusForParameter(radiusParam) * definition->modelRadiusScale;
+        float heightScale = definition->HeightForParameter(heightParam) * definition->modelHeightScale;
+        float c;
+        float s;
+        if (camera->field_0x17c.z != 0.0f) {
+            float inverse = UnknownFunction460c70(camera->field_0x17c.x * camera->field_0x17c.x
+                                                  + camera->field_0x17c.z * camera->field_0x17c.z) * radiusScale;
+            c = inverse * camera->field_0x17c.z;
+            s = -(inverse * camera->field_0x17c.x);
+        } else {
+            c = radiusScale;
+            s = 0.0f;
+        }
+        // Six scalars, not two Vector3s: retail interleaves the colour and
+        // ambient components with the other scalar slots of the frame.
+        float colorR = g_UnknownGlobal59aebc->lightColor.x;
+        float colorG = g_UnknownGlobal59aebc->lightColor.y;
+        float colorB = g_UnknownGlobal59aebc->lightColor.z;
+        float ambientR = g_UnknownGlobal59aebc->ambientLight.x;
+        float ambientG = g_UnknownGlobal59aebc->ambientLight.y;
+        float ambientB = g_UnknownGlobal59aebc->ambientLight.z;
+        unsigned int ambientColor = ECO_RGBA((int)(ambientR * 255.0f), (int)(ambientG * 255.0f),
+                                             (int)(ambientB * 255.0f), 255);
+        UnknownEcoModelVertex* source = definition->modelVertices[billboard];
+        int i;
+        // Retail indexes the output vertex off `geometryBlock` and re-reads
+        // the member before every store (the void* member aliases the
+        // stores); a walking `UnknownEcoVertex*` local compiles a different
+        // loop with a 0x4c frame.
+#define VERTEX ((UnknownEcoVertex*)geometryBlock)[i]
+        for (i = 0; i < vertexCount; i++) {
+            int unlit = 0;
+            Vector3 normal;
+            float x = quantizedPosition.x;
+            VERTEX.position.x = c * source->position.x - s * source->position.z + x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+            VERTEX.position.y = quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate + heightScale * source->position.y;
+            VERTEX.position.z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate + c * source->position.z
+                                + s * source->position.x;
+            if (definition->usePlanarLighting) {
+                if (source->normal.y < 0.0f) {
+                    unlit = 1;
+                } else {
+                    // The planar normal is the rotated model position (its
+                    // radial direction), not the model normal; the explicit
+                    // `unlit = 0` here reproduces retail's branch bodies.
+                    float length;
+                    unlit = 0;
+                    normal.x = c * source->position.x - s * source->position.z;
+                    normal.z = c * source->position.z + s * source->position.x;
+                    length = normal.x * normal.x;
+                    length += normal.z * normal.z;
+                    if (length == 0.0f) {
+                        normal = kVec3Zero;
+                    } else {
+                        length = FastInvSqrt(length);
+                        normal.x = length * normal.x;
+                        normal.y = 0.0f;
+                        normal.z = length * normal.z;
+                    }
+                }
+            } else {
+                float length;
+                normal.x = c * source->normal.x - s * source->normal.z;
+                normal.y = source->normal.y;
+                normal.z = s * source->normal.x + c * source->normal.z;
+                length = UnknownSquareMagnitude(&normal);
+                if (length == 0.0f) {
+                    normal = kVec3Zero;
+                } else {
+                    length = FastInvSqrt(length);
+                    normal.x = length * normal.x;
+                    normal.y = length * normal.y;
+                    normal.z = length * normal.z;
+                }
+            }
+            if (VERTEX.position.x > maxX)
+                maxX = VERTEX.position.x;
+            if (VERTEX.position.x < minX)
+                minX = VERTEX.position.x;
+            float intensity = -(normal.z * g_UnknownGlobal59aebc->lightDirection.z
+                                + (normal.x * g_UnknownGlobal59aebc->lightDirection.x
+                                   + normal.y * g_UnknownGlobal59aebc->lightDirection.y));
+            if (!unlit && source->normal.y > -0.95f && intensity > 0.0f) {
+                float r = intensity * colorR + ambientR;
+                float g = intensity * colorG + ambientG;
+                float b = intensity * colorB + ambientB;
+                if (r > 1.0f)
+                    r = 1.0f;
+                if (g > 1.0f)
+                    g = 1.0f;
+                if (b > 1.0f)
+                    b = 1.0f;
+                VERTEX.diffuse = ECO_RGBA((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f), 255);
+            } else {
+                VERTEX.diffuse = ambientColor;
+            }
+            VERTEX.reserved = 0;
+            VERTEX.specular = 0;
+            VERTEX.tu = source->tu;
+            VERTEX.tv = source->tv;
+            source++;
+        }
+#undef VERTEX
+    }
+    isBillboard = billboard;
+}
+
 // 0x00457000
 void Vegetation::DrawGeometry(UnknownEcoRenderTarget* target) {
     UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];

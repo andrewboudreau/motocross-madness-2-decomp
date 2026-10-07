@@ -33,22 +33,22 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 
 | Folder | Contents |
 |---|---|
-| `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug malloc/`new`/`delete`/realloc), `MemTag.h` |
+| `core/` | `GameObject.h`, `GraphicsTest.h`, `DebugAlloc.h` (debug malloc/`new`/`delete`/realloc), `MemTag.h`; `GraphicsTest.cpp`: 17 strict cases |
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
-| `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionPoint.h`, `CollisionTypes.h`): 44 strict cases |
-| `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts) |
-| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 44 strict cases; `SoultreeQuadTreeRenderer.cpp`: 8 strict cases; `soultree.cpp` (SoultreeObject): 56 strict cases |
+| `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionPoint.h`, `CollisionTypes.h`): 59 strict cases of 76 |
+| `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts); `ObjectPlacement.cpp`: 8 strict cases |
+| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 44 strict cases of 50; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 56 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
-| `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (42 strict cases of 55) and `BikeAI.cpp` (23 strict cases), `Vehicle.h`, `Bike.h` |
-| `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
-| `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 33 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
+| `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (43 strict cases of 55) and `BikeAI.cpp` (23 strict cases), `Vehicle.h`, `Bike.h` |
+| `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (20 strict cases of 22) |
+| `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 36 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
-| `motion/` | SphereManager: 14 strict cases; shared motion layouts |
+| `motion/` | SphereManager: 14 strict cases; `Motnctrl.cpp`: 40; `SteeringControl.cpp`: 21; shared motion layouts |
 | `shadow/` | D3DIMSoultreeShadow: 17 strict cases; other shadow candidates in samples |
-| `visibility/` | VisibilityQuadTree: 16 strict cases; partial traversal in samples |
+| `visibility/` | VisibilityQuadTree: 39 strict cases; partial traversal in samples |
 
-The earlier broad-phase counts are masked diagnostics. The new reviewed slices
-and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
+Every `exact` target under `src/krusty2` is strict exact (593 of 649 targets; the rest are
+`partial`). The reviewed slices and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
 SelectiveGravityModel.cpp (0x4f9760..0x4f9a59) is promoted on its own. The Shock
 family (0x4f9a60..0x4fb1d7) builds a second set of the Math3D.h constant vectors
 (0x689e48..0x689e78), so it is a separate TU (strong inference). It stays in
@@ -146,11 +146,10 @@ exposed a real error: TestHullAgainst and TestModelAgainst had their capsule (3)
 sphere (4) cases in the opposite source order to retail's jump table. The masked match
 hid it.
 
-Strict failures that remain are missing evidence, not byte differences:
-- the BikeA604 constructor 0x52ff90, called from Bike slot 97;
-- SoultreeRefreshContacts 0x43ad80, called from GameObjectVirtualSlot10. Its body is still a partial in samples.
-
-These targets are `expect: "masked"`.
+No strict failures remain under `src/krusty2`. The last missing bindings were the
+BlockAllocator::Reset call in Quadtree.cpp (0x00424110, a strict calibration target)
+and the BikeA604 constructor called from Bike slot 97 (0x0052ff90, the reviewed Wrecker
+constructor binding); the Bike.cpp target 0x00409420 is now `expect: "exact"`.
 
 The CollisionFileStream constructor 0x460d10 and destructor 0x460d60 are now bound as the
 direct call targets of 0x00432800 (a 0x134-byte object from `new(__FILE__, 0x12f)`, opened

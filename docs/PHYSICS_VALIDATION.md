@@ -256,8 +256,8 @@ python tools/run_physics_samples.py --strict --root src/krusty2/vehicle \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-This run reports `130/158 strict exact` with the pre-existing masked `0x409420` as the
-only required failure.
+This run reports `131/159 strict exact` with no required failures (`0x409420` is
+strict exact since the BikeA604 constructor call is bound to `0x0052ff90`).
 
 ## SoulTreePhysics round-out
 
@@ -370,8 +370,27 @@ where supported, without promoting that evidence into exact-code status.
 
 `expect: "masked"` requests a diagnostic regression check only. It does not
 count as strict validation. `expect: "partial"` retains known code-generation
-mismatches. The full `--strict` audit continues to fail on required targets
-with unresolved relocations, including pre-existing physics candidates:
+mismatches. Full-root status of the `--strict` audit:
+
+- `--root src/krusty2`: 593/649 strict exact, 0 required failures.
+- `--root samples/physics`: 323/397 strict exact, 2 required failures. Both are in
+  `samples/physics/collision/SoultreePhysicsCharacter.cpp` (`0x00503970`, `0x00503de0`):
+  they reference the sample's own `__FILE__` ("soultreephysicscharacter.cpp"), but the
+  retail sites load `0x00574320`, the "SoulTreePhysics.cpp" string. They need the code to
+  live in a source whose file name matches; the binding is deliberately not faked.
+
+Every other required target's relocations are bound in a `*.bindings.json` next to its
+source. The bindings came from `tools/propose_bindings.py` on masked-exact targets; the
+few it could not prove were checked by hand against retail (a call target that is a strict
+calibration target or a decoded function start, or a data address documented in the
+headers and consistent at every relocation site).
+
+```bash
+python tools/run_physics_samples.py --strict --root src/krusty2 --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+python tools/run_physics_samples.py --strict --root samples/physics --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+The default (diagnostic) run and a full JSON report:
 
 ```bash
 python tools/run_physics_samples.py --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
@@ -430,6 +449,31 @@ names its bindings file:
   separate records). The constructor `0x0048fa60` (`GameObject(1), Bike(flags)`,
   ret 8) is a near miss (472/532, store scheduling around the +0x1540 vector
   copy); `0x0048d780` uses an inline-asm rounding helper and stays excluded.
+  Exact as well: GameObject slot 10 `0x004977a0`
+  (the per-frame update reached through the virtual base: update path by
+  network state and mode, the mode 4 player re-target, the end of start-up
+  ghosting, and the "KrustyBike" debug overlay page with the static
+  "TimeTo60" stopwatch `0x0056d0a0`/`0x0067c3b0`/`0x0067c3b4`; the overlay
+  line index needs the `int line = lineCount++` form) and the message 1
+  builder `0x00492670` (0x58-byte `KbBikeMessage` with pose nibbles and flag
+  bitfields, sent through Net or the recorder, copied into a 0x6c-byte
+  `KbBikeState`; the stores of +0x11c0, +0x74c, +0x750, +0x770 need that
+  order). The two `KbBikeState`s are KrustyBike+0x1390 (recorded) and
+  +0x1560 (network); their +0x68 is the float timer the constructor sets to
+  `0x7effffff`. The message 13 encoder `0x00492ad0` is a near miss: byte
+  deltas with carried errors (`diff = a - b; d = diff + error` gives retail's
+  x87 order, `coarse:1, count:7` its time byte) match, but VC6 packs `diff`
+  over the int temporary (frame 0x30, retail 0x34) and keeps the full
+  message 1 call after the record-interval test in place instead of
+  cross-jumping it to the last call site. Not reconstructed: `0x0048e3e0`
+  (inline-asm `fistp` rounding), `0x0048eea0` (the fpatan/fxch form of
+  `0x0048e280`), the set-up `0x0048fc80` (5.4 KB, 25 arguments) and
+  `0x00493660` (8.5 KB).
+- TerrainShadow.cpp (`samples/physics/shadow`): slot 14 `0x0050a1a0` is exact
+  (D3DIMSoultreeShadow slot 14's draw of the +0x34 vertices without the world
+  matrix). Slot 30 `0x00509aa0` rounds with inline-asm `fistp`; slot 27
+  `0x00508bc0` (3087 bytes) calls the Vector3 helpers out of line (inline
+  budget, see VC6_INLINE_BUDGET.md) and is not reconstructed.
 - Tire.cpp: the 5 existing exact targets, plus the `.CRT$XCU` 319-322 set
   (`0x00515740..0x0051587b`; the former `g_TireZeroVec3`/`g_TireVec3_68a3c0`/
   `g_TireVec3_68a3f0` are its zero, z and y vectors), CollisionPoint's inline

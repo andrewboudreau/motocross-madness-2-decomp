@@ -122,3 +122,83 @@ int TerrainShadow::UnknownVirtualSlot28()
     }
     return 0;
 }
+
+// The render target at GameObject::field_0x18 and the shadow texture as slot 14 uses them (the
+// same local views as D3DIMSoultreeShadow.cpp's slot 14; RTTI PCRenderTarget / PCTextureMap).
+// Tier 3.
+class TerrainShadowTextureView {
+public:
+    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
+    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
+    virtual void Slot8(); virtual void Slot9(); virtual void Slot10(); virtual void Slot11();
+    virtual void Slot12(); virtual void Slot13(); virtual void Slot14(); virtual void Slot15();
+    virtual void Slot16(); virtual void Slot17(); virtual void Slot18();
+    virtual void Bind();                                          // slot 19
+};
+
+class TerrainShadowRenderTarget {
+public:
+    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
+    virtual void Slot4(); virtual void Slot5();
+    virtual long GetTextureStageState(int stage, int type, int* value);  // slot 6
+    virtual long SetTextureStageState(int stage, int type, int value);   // slot 7
+    virtual void SetRenderState(int state, int value, int force);        // slot 8
+    virtual long GetRenderState(int state, int* value);                  // slot 9
+    virtual void Slot10(); virtual void Slot11(); virtual void Slot12(); virtual void Slot13();
+    virtual void Slot14();
+    // slot 15: indexed draw (type, FVF, vertices, vertex count, indices, index count, flags).
+    virtual int DrawIndexed(int type, int fvf, void* vertices, int vertexCount, short* indices,
+                            int indexCount, int flags);
+    virtual void Slot16(); virtual void Slot17();
+    virtual void Slot18(int value);
+    char pad_0x04[0x1c8 - 0x04];
+    unsigned char field_0x1c8;                   // bit 2 tested by slot 14
+};
+
+// 0x0050a1a0 (slot 14): draws the field_0x6654 shadow vertices at +0x34 with the shadow texture
+// and modulating texture stages, as D3DIMSoultreeShadow's slot 14 does without its world matrix.
+int TerrainShadow::GameObjectVirtualSlot14()
+{
+    if (field_0x6654) {
+        ((TerrainShadowTextureView*)shadow->texture)->Bind();
+        int address;
+        ((TerrainShadowRenderTarget*)field_0x18)->GetTextureStageState(0, 0xc, &address);
+        if (address != 3)
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 0xc, 3);
+        if (shadow->surfaceFormat == 0x613) {
+            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x21, 1, 0);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
+            if (((TerrainShadowRenderTarget*)field_0x18)->field_0x1c8 & 4) {
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 4);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 5, 2);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 6, 0);
+            }
+        } else {
+            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 4);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 5, 2);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 6, 0);
+        }
+        int blend;
+        ((TerrainShadowRenderTarget*)field_0x18)->GetRenderState(4, &blend);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(4, 1, 0);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0xe, 0, 0);
+        ((TerrainShadowRenderTarget*)field_0x18)->Slot18(0);
+        ((TerrainShadowRenderTarget*)field_0x18)->DrawIndexed(4, 0x1e2, field_0x34, field_0x6654, indexTable,
+                                                              field_0x6654, 0);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0xe, 1, 0);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x1b, 0, 0);
+        if (address != 3)
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 0xc, address);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(4, blend, 0);
+        if (shadow->surfaceFormat == 0x613)
+            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x21, 0, 0);
+    }
+    return 1;
+}

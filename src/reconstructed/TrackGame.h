@@ -470,8 +470,16 @@ public:
 
 // UnknownTrackGameObject3400, the object at TrackGame+0x3400, is in TrackRecord.h.
 
+// One control assignment of UnknownTrackGameObject33fc: the device kind
+// (0 keyboard, 1 mouse, 2 joystick; -1 unassigned) and the key, button or
+// negative axis direction code. Saved as "kind,code" (DeviceSetup.cpp).
+struct UnknownControlAssignment {
+    int kind;
+    int code;
+};
+
 // Object at TrackGame+0x33fc (constructor near DebugOverlay.cpp's literals;
-// no destructor).
+// no destructor). Its methods are in DeviceSetup.cpp (provisional name).
 class UnknownTrackGameObject33fc {
 public:
     UnknownTrackGameObject33fc();             // 0x00448960
@@ -481,12 +489,20 @@ public:
     void UnknownFunction448e90(const char* path, int a);                 // 0x00448e90
     void UnknownFunction448990(const char* path);                        // 0x00448990 (uiinfo.cpp 0x00523000)
     void UnknownFunction4489e0(const char* path);                        // 0x004489e0 (uiinfo.cpp 0x00523130)
-    void UnknownFunction449220();                                        // 0x00449220 (uiinfo.cpp 0x00523000)
+    int UnknownFunction449220();                                         // 0x00449220 (uiinfo.cpp 0x00523000)
     void UnknownFunction449350(int device, int row, char* text);         // 0x00449350
     int UnknownFunction449380(int kind, int code, char* text);            // 0x00449380
+    // 0x00448a50 / 0x00448bc0: reads / writes "Controller<device>",
+    // "Key<row>" of the control file `path`.
+    void UnknownFunction448a50(int device, int row, const char* path);
+    void UnknownFunction448bc0(int device, int row, const char* path);
+    // 0x00448d30: binds an axis binding to the device of `kind`.
+    int UnknownFunction448d30(UnknownControlBinding* binding, int kind, int code, int code2);
+    // 0x00448df0: enters `code` for `control` in TrackGame's control mapping.
+    int UnknownFunction448df0(int control, int code, int kind);
 
     int field_0x00;                           // input device (OptionProcs.cpp "InputDeviceDDL")
-    unsigned char field_0x04[0x384 - 0x04];
+    UnknownControlAssignment field_0x04[8][14];  // per input device, per control row
 };
 
 // One player reported by 0x004aa670 (0x48 bytes).
@@ -494,6 +510,28 @@ struct UnknownZonePlayerRecord {
     char field_0x00[0x40];                    // name
     unsigned char field_0x40;                 // 1, other nonzero or zero: flags 2, 4 or 16
     int field_0x44;                           // score
+};
+
+// One racer's line of the race status (0x10 bytes). The names are the
+// labels of 0x0049c770's debug messages.
+struct UnknownZoneRaceRecord {
+    unsigned char field_0x00;                 // "Bike %d-%d": the bike manufacturer
+    unsigned char field_0x01;                 // and the bike type
+    unsigned char field_0x02;                 // "Position"
+    unsigned char field_0x03;
+    int field_0x04;                           // "FastestLap" (x100)
+    int field_0x08;                           // "TotalrunningTime" (x100)
+    int field_0x0c;                           // "LargestSingleStuntPoints"
+};
+
+// The race status 0x0049c770 passes to 0x004aa670 with its size (0x88).
+struct UnknownZoneRaceStatus {
+    unsigned char field_0x00;                 // event type index plus one
+    unsigned char field_0x01;
+    unsigned char field_0x02;                 // laps
+    unsigned char field_0x03;
+    int field_0x04;                           // the longest total running time
+    UnknownZoneRaceRecord field_0x08[8];
 };
 
 // Base of the +0x3410 object; its constructor sits among
@@ -507,9 +545,17 @@ public:
     UnknownDirectPlay4A* field_0x00;
     UnknownDirectPlayLobby3A* field_0x04;
     UnknownZonePlayerRecord field_0x08[8];    // reported by 0x004aa670
-    unsigned char field_0x248[0x298 - 0x248];
-    int field_0x298;                          // the lobby's bike model (SelectGamePicProcs.cpp)
-    unsigned char field_0x29c[0x32c - 0x29c];
+    unsigned char field_0x248[0x24c - 0x248];
+    // 0x0049c2f0 fills these from the lobby preset: a tag's value minus
+    // one, or -1 when the tag is missing.
+    int field_0x24c;                          // "EventTypeIndex"
+    int field_0x250;                          // "EventTypeLocation"
+    int field_0x254;                          // the race settings' +0x34 (a byte there)
+    char field_0x258[0x40];                   // track name copied when +0x250 is set
+    int field_0x298;                          // the lobby's bike model (SelectGamePicProcs.cpp); "BikeManufacturer"
+    int field_0x29c;                          // "BikeType"
+    int field_0x2a0;                          // tested after 0x0049ca60(1)
+    UnknownZoneRaceStatus field_0x2a4;        // sent through 0x004aa670 by 0x0049c770
 };
 
 // Object at TrackGame+0x3410, created for network games. It has no
@@ -525,9 +571,10 @@ public:
     int UnknownFunction4aa360(char* buffer, unsigned int size);
     int UnknownFunction4aa4e0(char* buffer, unsigned int size);
     int UnknownFunction4aa670(unsigned int count, void* a, void* b);
-    void UnknownFunction49c770();             // 0x0049c770 (EventManager 0x0045e550)
-    void UnknownFunction49c2f0(int* value);   // 0x0049c2f0 (SelectGamePicProcs.cpp: TrackGameMode+0x1bd4)
-    void UnknownFunction49c600();             // 0x0049c600 (SelectGamePicProcs.cpp)
+    int UnknownFunction49c770();              // 0x0049c770 (EventManager 0x0045e550): reports the race to the Zone
+    int UnknownFunction49c2f0(int* flags);    // 0x0049c2f0 (SelectGamePicProcs.cpp: TrackGameMode+0x1bd4)
+    void UnknownFunction49ca60(int kind);     // 0x0049ca60
+    int UnknownFunction49c600();              // 0x0049c600 (SelectGamePicProcs.cpp): waits up to 20 s for the lobby rank
 };
 
 // Object at TrackGame+0x3444 (0x00521cd0 tests that it exists): the pro

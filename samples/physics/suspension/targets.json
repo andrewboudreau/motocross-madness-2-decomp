@@ -6,7 +6,8 @@
     "target_va": "0x004f9a60",
     "target_size": 275,
     "expect": "exact",
-    "notes": "ctor"
+    "notes": "ctor",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "Shock",
@@ -15,7 +16,8 @@
     "target_va": "0x004f9b80",
     "target_size": 22,
     "expect": "exact",
-    "notes": "dtor"
+    "notes": "dtor",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "Shock",
@@ -24,7 +26,8 @@
     "target_va": "0x004f9ba0",
     "target_size": 206,
     "expect": "exact",
-    "notes": "slot 0"
+    "notes": "slot 0",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "Shock",
@@ -33,7 +36,8 @@
     "target_va": "0x004f9c70",
     "target_size": 180,
     "expect": "exact",
-    "notes": "slot 1"
+    "notes": "slot 1",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "InlineShock",
@@ -42,7 +46,8 @@
     "target_va": "0x004f9ee0",
     "target_size": 153,
     "expect": "exact",
-    "notes": "ctor"
+    "notes": "ctor",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "InlineShock",
@@ -51,7 +56,8 @@
     "target_va": "0x004f9f80",
     "target_size": 11,
     "expect": "exact",
-    "notes": "dtor"
+    "notes": "dtor",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "InlineShock",
@@ -60,7 +66,8 @@
     "target_va": "0x004fa2f0",
     "target_size": 26,
     "expect": "exact",
-    "notes": "slot 0"
+    "notes": "slot 0",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "RotatingShock",
@@ -69,7 +76,8 @@
     "target_va": "0x004fa8a0",
     "target_size": 11,
     "expect": "exact",
-    "notes": "dtor"
+    "notes": "dtor",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "RotatingShock",
@@ -78,7 +86,8 @@
     "target_va": "0x004fab30",
     "target_size": 34,
     "expect": "exact",
-    "notes": "slot 0"
+    "notes": "slot 0",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "Shock",
@@ -87,7 +96,8 @@
     "target_va": "0x004f9d30",
     "target_size": 428,
     "expect": "exact",
-    "notes": "spring/damper"
+    "notes": "spring/damper",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "InlineShock",
@@ -96,7 +106,8 @@
     "target_va": "0x004f9f90",
     "target_size": 250,
     "expect": "partial",
-    "notes": "partial 98.7%: 1.0f/len gives fld;fdiv instead of fld st0;fdivr"
+    "notes": "partial 98.7%: 1.0f/len gives fld;fdiv instead of fld st0;fdivr",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "InlineShock",
@@ -105,7 +116,8 @@
     "target_va": "0x004fa090",
     "target_size": 605,
     "expect": "exact",
-    "notes": "clamp and step"
+    "notes": "clamp and step",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "InlineShock",
@@ -114,7 +126,8 @@
     "target_va": "0x004fa310",
     "target_size": 239,
     "expect": "exact",
-    "notes": "retract"
+    "notes": "retract",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "InlineShock",
@@ -123,7 +136,8 @@
     "target_va": "0x004fa400",
     "target_size": 764,
     "expect": "partial",
-    "notes": "partial 68%: 758 of 764 bytes; projection temporary lands in a separate slot"
+    "notes": "partial 68%: 758 of 764 bytes; projection temporary lands in a separate slot",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "RotatingShock",
@@ -132,7 +146,8 @@
     "target_va": "0x004fa700",
     "target_size": 411,
     "expect": "exact",
-    "notes": "ctor"
+    "notes": "ctor",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "RotatingShock",
@@ -141,7 +156,8 @@
     "target_va": "0x004fa8b0",
     "target_size": 631,
     "expect": "exact",
-    "notes": "clamp and step"
+    "notes": "clamp and step",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "RotatingShock",
@@ -150,7 +166,8 @@
     "target_va": "0x004fab60",
     "target_size": 255,
     "expect": "exact",
-    "notes": "retract"
+    "notes": "retract",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "Shock",
@@ -159,7 +176,8 @@
     "target_va": "0x004fb110",
     "target_size": 200,
     "expect": "exact",
-    "notes": "static projection helper"
+    "notes": "static projection helper",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "RotatingShock",
@@ -168,7 +186,8 @@
     "target_va": "0x004fac60",
     "target_size": 880,
     "expect": "partial",
-    "notes": "partial 94%: jump-table extent; only the scheduling of the cross-product struct copies differs"
+    "notes": "partial 94%: jump-table extent; only the scheduling of the cross-product struct copies differs",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "Shock",
@@ -177,7 +196,8 @@
     "target_va": "0x004fafe0",
     "target_size": 60,
     "expect": "exact",
-    "notes": "kShockZero dynamic initializer (jmp thunk at 0x4fafd0)"
+    "notes": "kShockZero dynamic initializer (jmp thunk at 0x4fafd0)",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "Shock",
@@ -186,7 +206,8 @@
     "target_va": "0x004fb030",
     "target_size": 60,
     "expect": "exact",
-    "notes": "kShockAxisX dynamic initializer (thunk 0x4fb020)"
+    "notes": "kShockAxisX dynamic initializer (thunk 0x4fb020)",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "Shock",
@@ -195,7 +216,8 @@
     "target_va": "0x004fb080",
     "target_size": 60,
     "expect": "exact",
-    "notes": "kShockAxisY dynamic initializer (thunk 0x4fb070)"
+    "notes": "kShockAxisY dynamic initializer (thunk 0x4fb070)",
+    "bindings": "Shock.bindings.json"
   },
   {
     "class": "Shock",
@@ -204,6 +226,7 @@
     "target_va": "0x004fb0d0",
     "target_size": 60,
     "expect": "exact",
-    "notes": "kShockAxisZ dynamic initializer (thunk 0x4fb0c0)"
+    "notes": "kShockAxisZ dynamic initializer (thunk 0x4fb0c0)",
+    "bindings": "Shock.bindings.json"
   }
 ]

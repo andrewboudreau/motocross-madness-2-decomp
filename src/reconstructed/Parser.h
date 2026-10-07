@@ -23,6 +23,7 @@ public:
 // The list head; a parser holds it at +4.
 class UnknownParserList {
 public:
+    UnknownParserList();                                                  // 0x004aae20 (a shared body that stores one zero dword)
     ~UnknownParserList();                                                 // 0x004b86e0
     HRESULT UnknownFunction4b8510(const char* key, const char* value);    // appends a pair
     UnknownParserNode* UnknownFunction4b85f0(const char* key);            // finds a tag

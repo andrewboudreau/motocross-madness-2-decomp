@@ -1,0 +1,13 @@
+{
+  "?SetAngle@VehicleSteerState@@QAEXHPAVSoultreeObject@@@Z": "0x00504e20",
+  "?SetAxesPtr@VehSceneNodeView@@QAEXPBUVec3@@0HH@Z": "0x004fbd70",
+  "?SetPosition@SoultreeObject@@QAEXABUVec3@@@Z": "0x004fc660",
+  "?g_VehZeroVec3_005778a8@@3UVec3@@A": "0x005778a8",
+  "?g_VehZeroVec3_005778c8@@3UVec3@@A": "0x005778c8",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3ffccccccd0000000000": "0x005507b4",
+  "__real@4@3fff8000000000000000": "0x00550748",
+  "__real@4@4000c000000000000000": "0x00550774",
+  "__real@4@4003b000000000000000": "0x00550b4c",
+  "__real@4@bfff8000000000000000": "0x00550810"
+}

@@ -2,7 +2,7 @@
 
 Validation: the 18 cases in this directory pass strict VC6 SP3 comparison,
 including the added NullManager slot-8 override. Adjacent bindings resolve every
-relocation. Emitter counts below remain masked diagnostics for samples.
+relocation. The emitter samples are strict too (bindings next to each sample source).
 
 Retail files (all under `D:\aardvark\VC\krusty2\`):
 
@@ -12,9 +12,9 @@ Retail files (all under `D:\aardvark\VC\krusty2\`):
 | Nulls.cpp | 0x0056ed14 | 0x4b0059..0x4b0239 | 0x4b0109 (the `new` at line 5) | 6 / 0 |
 | Particles.cpp | 0x0056fa00 | 0x4b8584..0x4bb8d8 | 0x004ba4f1 and 0x004ba5c8 (slot 27, line 0x48a and 0x4a8) | 6 / 0 (+ 2 slots unattempted) |
 
-18 strict cases, 0 partial in this directory. `samples/physics/effects/` adds 33 exact and 8 partial (41 entries) for the
-emitter classes and the vector-constant initialisers, whose ownership is not proven. Gate: 50/58 exact, 0 required failures
-(round 2 added Steam and Dust slot 10 as exact, and DirtChunk, DirtSpray and Spark slot 10 as 98.3% partials).
+18 strict cases, 0 partial in this directory. `samples/physics/effects/` adds 33 strict exact and 8 partial (41 entries) for the
+emitter classes and the vector-constant initialisers, whose ownership is not proven; 0 required failures
+(DirtChunk, DirtSpray and Spark slot 10 are 98.3% partials).
 
 ## Ownership evidence
 

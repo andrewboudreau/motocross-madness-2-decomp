@@ -239,14 +239,27 @@ The CarProcedural..CollisionCharacter gap holds two units without RTTI or
 (10, the shadow clipper with its static instance and `$E` set) both match
 strictly; see [CDAUDIO_CLIPRECT](CDAUDIO_CLIPRECT.md).
 
+Three more units without RTTI or `__FILE__` match strictly:
+- the crash reporter (7 of 8; [EXCEPTIONHANDLER](EXCEPTIONHANDLER.md));
+- the TrackGame+0x33fc control layout (19; [DEVICESETUP](DEVICESETUP.md)),
+  with its GetDXVersion probe as a near miss;
+- WinMain with the main window and its window procedure (5; [MAIN](MAIN.md)).
+
+PickDevice.cpp, the display and controller choosers (8, including the two
+builders; [PICKDEVICE](PICKDEVICE.md)), and the serial address helpers
+between Net.cpp and NetProcs.cpp (5, samples/net/SerialAddress.cpp; owner
+unknown) match strictly. In physics targets KrustyBike gains slot 10 and the
+message 1 builder, and TerrainShadow its slot 14 ([PHYSICS_VALIDATION](PHYSICS_VALIDATION.md)).
+
 From the unattributed-code map ([UNATTRIBUTED](UNATTRIBUTED.md)):
 NationalRace.cpp (8, `__FILE__` 0x56e338 and RTTI NationalRace :
 BaseQuarryEvent), Rectangle2D (5) and SkyCube (5) match strictly; the last
 two are named from RTTI, their file names are unattested. Further units from
-that map: TransparencyMod (4), GhostMod1 (6), Fog/FogOff/FogOn (13),
+that map: TransparencyMod (4), GhostMod1 (6), Fog/FogOff/FogOn (14),
 MediaControl (15), GridNode (2), MatrixUtil's vector set (8), the
 allocation-accounting unit (22, in samples: no RTTI or `__FILE__`), file
-stream helpers (7, samples), VehicleCamera (+12) and KrustyBikeCamera's
+stream helpers (10, samples; [FILESTREAM](FILESTREAM.md)), KrustyVCR (6,
+[KRUSTYVCR](KRUSTYVCR.md)), VehicleCamera (+12) and KrustyBikeCamera's
 vector set (8). In physics targets: GraphicsTest (17), ObjectPlacement's
 set (8), Motnctrl.cpp promoted to src/krusty2/motion (40), FastMath (3),
 KrustyBike (+11, and its 56 exact targets now bound strictly) and Tire (+13).
@@ -381,14 +394,15 @@ calibration cases still pass.
 
 ### 3. Take bounded helpers before large orchestrators
 
-After the quick wins, close EcoSystem's record helpers `0x00456890` (356/369:
+After the quick wins, close EcoSystem's record helper `0x00456890` (356/369:
 its thirteen-byte scheduling block is invariant under every data-flow-equivalent
-spelling tried, so the next experiment is a different helper boundary, not a
-reordering) and `0x00456a10` (810/1512 since the output vertex is indexed off
-the re-read `geometryBlock`, which fixed the frame and loop shape; the slot
-assignment and the loop's zero register remain): both are reconstructed near
-misses in `samples/ecosystem/EcoSystemNearMisses.cpp` (see
-[ECOSYSTEM](ECOSYSTEM.md)). In parallel
+spelling and every helper boundary tried, and `/G6` scores lower, so it needs
+new evidence rather than another spelling), a reconstructed near miss in
+`samples/ecosystem/EcoSystemNearMisses.cpp` (see [ECOSYSTEM](ECOSYSTEM.md)).
+`0x00456a10` is exact: its remaining differences were the colour and ambient
+locals (six scalars, not two `Vector3`s, interleave with the other slots),
+the planar length as `x*x` then `+= z*z`, the x coordinate through a float
+local and the sums as `z + (x + y)`. In parallel
 conceptually—but as separate commits—trace Terrain construction/acquisition sites
 before attempting its cleanup, so member types and lifetime order are supported
 independently.
