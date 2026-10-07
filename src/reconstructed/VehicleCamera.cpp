@@ -85,6 +85,6 @@ float VehicleCamera::UnknownVirtualSlot51() {
 }
 
 // 0x0052d010
-int VehicleCamera::UnknownVirtualSlot75() {
+bool VehicleCamera::UnknownVirtualSlot75() {
     return FollowCamera::UnknownVirtualSlot75() || UnknownInlineIdle();
 }

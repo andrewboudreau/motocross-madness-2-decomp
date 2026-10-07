@@ -39,7 +39,7 @@ public:
     virtual void UnknownVirtualSlot42(bool flag);
     virtual Vector3 UnknownVirtualSlot48(int a, bool flag, int b);
     virtual void UnknownVirtualSlot52(Vector3* point);
-    virtual void UnknownVirtualSlot55();
+    virtual unsigned char UnknownVirtualSlot55();
     virtual bool UnknownVirtualSlot56();
     virtual void UnknownVirtualSlot58();
     virtual void UnknownVirtualSlot59();

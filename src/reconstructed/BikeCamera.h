@@ -47,7 +47,7 @@ public:
     virtual float UnknownVirtualSlot51();
     virtual void UnknownVirtualSlot53();
     virtual void UnknownVirtualSlot54();
-    virtual int UnknownVirtualSlot75();
+    virtual bool UnknownVirtualSlot75();
 
 protected:
     UnknownCameraBike* bike; // +0x3b0

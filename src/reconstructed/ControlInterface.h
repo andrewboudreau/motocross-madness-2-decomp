@@ -7,8 +7,9 @@ class MouseDevice;
 
 // FollowCamera's view of the keyboard at ControlInterface+0x34. FollowCamera
 // slots 55 and 56 call slot 5 with 0x38 and 0x2a (DirectInput left Alt and
-// left Shift) and return its result unconverted as bool (KrustyBikeCamera's
-// override of slot 56 is bool), while KeyboardDevice's own callers test the
+// left Shift) and return its result unconverted (slot 55 as a one-byte
+// unsigned char, slot 56 as bool; KrustyBikeCamera's override of slot 56 is
+// bool), while KeyboardDevice's own callers test the
 // full eax (int). The two declarations cannot be one type, so FollowCamera
 // reads the member through this view.
 class UnknownKeyboardBoolView {

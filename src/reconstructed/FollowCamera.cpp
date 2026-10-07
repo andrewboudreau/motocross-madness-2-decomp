@@ -491,8 +491,8 @@ void FollowCamera::UnknownVirtualSlot62() {}
 
 // 0x00464ea0 and 0x00464ec0: slot 5 of the interface behind the 0x0056e26c
 // object, with codes 0x38 and 0x2a.
-void FollowCamera::UnknownVirtualSlot55() {
-    ((UnknownKeyboardBoolView*)g_UnknownGlobal56e26c->field_0x14->keyboard)
+unsigned char FollowCamera::UnknownVirtualSlot55() {
+    return ((UnknownKeyboardBoolView*)g_UnknownGlobal56e26c->field_0x14->keyboard)
         ->UnknownVirtualSlot5(0x38, 0x3F, 0);
 }
 

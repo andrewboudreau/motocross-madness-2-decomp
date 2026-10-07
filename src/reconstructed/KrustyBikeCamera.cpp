@@ -42,8 +42,8 @@ void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
 }
 
 // 0x00498080
-void KrustyBikeCamera::UnknownVirtualSlot55() {
-    g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot2(0x0B, 0x3F);
+unsigned char KrustyBikeCamera::UnknownVirtualSlot55() {
+    return g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot2(0x0B, 0x3F);
 }
 
 // 0x004980a0: input 0x0a (unless +0x38c) clears +0x391/+0x392 when absent;

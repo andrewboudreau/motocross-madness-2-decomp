@@ -3,12 +3,13 @@
 // FollowCameraNearMisses.bindings.json.
 //
 // FollowCamera::UnknownVirtualSlot10 (0x00465c20, 3672 bytes): the per-frame
-// update. With slot 75 and slot 55 declared bool (both results are used as
-// al in retail) the body matches except 13 bytes: retail computes the second
+// update. Slots 75 (bool) and 55 (unsigned char) return one byte, as retail
+// uses their al. The body matches except 13 bytes: retail computes the second
 // D3DRMVectorRotate call's `&direction` before pushing `&position`, and in
 // state 5 reserves the 0x00460b50 argument slot (`push ecx`) after the two
-// squares, not before. As written here (headers unchanged) slot 55 is called
-// through a member pointer (a vcall thunk); see the function's comments.
+// squares, not before. Unchanged by /G3-/G5, /Ob2, separate locals, inline
+// wrappers (for the call, the sum or the rotation), term order, a distinct
+// variable for the second rotation, or extern/non-static axis vectors.
 // Source shapes it needs: one function-scope `position`/`target` pair shared
 // with the first-frame block, `if/else` (not ?:) for +0x2b4, the state 5
 // deltas as member arithmetic, Set(field_0x258, FLT_MAX) for every +0x294
@@ -25,11 +26,15 @@
 //
 // FollowCamera::UnknownVirtualSlot45 (0x00463a30, 4055 bytes plus padding):
 // the control flow, the stack frame (0x20, with ebp/edi holding the 1.55/7.0
-// constants) and every FPU sequence agree, but the code drifts by a few bytes:
-// at each joystick test retail reloads ControlInterface+0x0c for the call
-// (mov edx, ecx; mov ecx, [edx+0xc]) where VC6 reuses the tested register, and
-// retail stores the x * speed scale before multiplying (fstp/fmul) where VC6
-// emits fst/fmulp. The clamp/wrap must come from inline helpers (they keep the
+// constants) and every FPU sequence agree, but the code drifts by a few bytes
+// (aligned instruction ratio 0.937; 1088 instructions against retail's 1079).
+// Each joystick block is guarded by `if (activeJoystick) { ... }`: retail's
+// null test jumps to the shared epilogue at 0x004649fe. Left: at each joystick
+// test retail tests a copy (mov edx, [ecx+0xc]) and reloads the pointer for
+// the call (mov edx, ecx; mov ecx, [edx+0xc]) where VC6 reuses the tested
+// register (inline free/member wrappers do not change this), and retail stores
+// the x * speed scale before multiplying (fstp/fmul) where VC6 emits
+// fst/fmulp. The clamp/wrap must come from inline helpers (they keep the
 // sum on the FPU stack), and the key queries must be macros: with inline
 // helpers VC6 runs out of inline budget and calls the Vector3 constructor.
 //
@@ -414,20 +419,20 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
             cachedTarget += speed * field_0x17c;
         if ((FOLLOWCAMERA_KEY(0x4e) || FOLLOWCAMERA_KEY(0x0d)) && field_0x2c0 > 0.0)
             cachedTarget -= speed * field_0x17c;
-        if (!FOLLOWCAMERA_CONTROLS()->activeJoystick)
-            return moved;
-        if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
-                ->UnknownVirtualSlot4(0, &x, &y)) {
-            if (field_0x2c0 > 0.0f)
-                cachedTarget.y += y * speed;
-            cachedTarget += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
-            if (x != 0.0f || y != 0.0f)
-                return moved;
+        if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
+            if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
+                    ->UnknownVirtualSlot4(0, &x, &y)) {
+                if (field_0x2c0 > 0.0f)
+                    cachedTarget.y += y * speed;
+                cachedTarget += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
+                if (x != 0.0f || y != 0.0f)
+                    return moved;
+            }
+            if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0))
+                cachedTarget += speed * field_0x17c;
+            if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0) && field_0x2c0 > 0.0)
+                cachedTarget -= speed * field_0x17c;
         }
-        if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0))
-            cachedTarget += speed * field_0x17c;
-        if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0) && field_0x2c0 > 0.0)
-            cachedTarget -= speed * field_0x17c;
     } else if (cameraState != 3 && cameraState != 6 && cameraState != 7) {
     float x;
     float y;
@@ -458,25 +463,25 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
             field_0x170 += speed * field_0x17c;
             moved = true;
         }
-        if (!FOLLOWCAMERA_CONTROLS()->activeJoystick)
-            return moved;
-        if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
-                ->UnknownVirtualSlot4(0, &x, &y)) {
-            if (field_0x2c0 > 6.5f)
-                field_0x170.y += y * speed;
-            field_0x170 += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
-            if (x != 0.0 || y != 0.0f)
+        if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
+            if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
+                    ->UnknownVirtualSlot4(0, &x, &y)) {
+                if (field_0x2c0 > 6.5f)
+                    field_0x170.y += y * speed;
+                field_0x170 += Vector3(viewMatrix(0, 0), viewMatrix(1, 0), viewMatrix(2, 0)) * (x * speed);
+                if (x != 0.0 || y != 0.0f)
+                    moved = true;
+                if (x != 0.0f || y != 0.0f)
+                    return moved;
+            }
+            if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0)) {
+                field_0x170 -= speed * field_0x17c;
                 moved = true;
-            if (x != 0.0f || y != 0.0f)
-                return moved;
-        }
-        if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0)) {
-            field_0x170 -= speed * field_0x17c;
-            moved = true;
-        }
-        if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0) && field_0x2c0 > 6.5f) {
-            field_0x170 += speed * field_0x17c;
-            moved = true;
+            }
+            if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0) && field_0x2c0 > 6.5f) {
+                field_0x170 += speed * field_0x17c;
+                moved = true;
+            }
         }
         return moved;
     }
@@ -520,34 +525,34 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
             field_0x220 = 7.0f;
         moved = true;
     }
-    if (!FOLLOWCAMERA_CONTROLS()->activeJoystick)
-        return moved;
-    if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
-            ->UnknownVirtualSlot4(0, &x, &y)) {
-        if (field_0x220 < 50.0)
-            FollowCameraTilt(field_0x22c, (3.0f - field_0x220 * 0.04f) * y * turn * 0.01745329f);
-        else
-            FollowCameraTilt(field_0x22c, y * turn * 0.01745329f);
-        if (field_0x220 < 50.0)
-            FollowCameraTurn(field_0x234, (3.0f - field_0x220 * 0.04f) * x * turn * -0.01745329f);
-        else
-            FollowCameraTurn(field_0x234, x * turn * -0.01745329f);
-        if (x != 0.0 || y != 0.0f)
+    if (FOLLOWCAMERA_CONTROLS()->activeJoystick) {
+        if (FollowCameraJoystick(FOLLOWCAMERA_CONTROLS())
+                ->UnknownVirtualSlot4(0, &x, &y)) {
+            if (field_0x220 < 50.0)
+                FollowCameraTilt(field_0x22c, (3.0f - field_0x220 * 0.04f) * y * turn * 0.01745329f);
+            else
+                FollowCameraTilt(field_0x22c, y * turn * 0.01745329f);
+            if (field_0x220 < 50.0)
+                FollowCameraTurn(field_0x234, (3.0f - field_0x220 * 0.04f) * x * turn * -0.01745329f);
+            else
+                FollowCameraTurn(field_0x234, x * turn * -0.01745329f);
+            if (x != 0.0 || y != 0.0f)
+                moved = true;
+            if (x != 0.0f || y != 0.0f)
+                return moved;
+        }
+        if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0)) {
+            field_0x220 += turn;
+            if (field_0x220 < 7.0f)
+                field_0x220 = 7.0f;
             moved = true;
-        if (x != 0.0f || y != 0.0f)
-            return moved;
-    }
-    if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(2, 2, 0xc, 0)) {
-        field_0x220 += turn;
-        if (field_0x220 < 7.0f)
-            field_0x220 = 7.0f;
-        moved = true;
-    }
-    if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0)) {
-        field_0x220 -= turn;
-        if (field_0x220 < 7.0f)
-            field_0x220 = 7.0f;
-        moved = true;
+        }
+        if (FOLLOWCAMERA_CONTROLS()->UnknownVirtualSlot3(3, 2, 0xc, 0)) {
+            field_0x220 -= turn;
+            if (field_0x220 < 7.0f)
+                field_0x220 = 7.0f;
+            moved = true;
+        }
     }
     return moved;
     } else {
@@ -557,15 +562,6 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
         field_0x274 = 0;
     }
     return moved;
-}
-
-// Slot 10 tests slot 55's al (the keyboard test's bool), but FollowCamera.h
-// declares slot 55 void to keep its registered symbols; this sample calls it
-// through a bool-returning member pointer, which VC6 compiles as a vcall
-// thunk (not retail's direct vtable call).
-static inline bool FollowCameraSlot55(FollowCamera* camera) {
-    typedef bool (FollowCamera::*BoolMethod)();
-    return (camera->*reinterpret_cast<BoolMethod>(&FollowCamera::UnknownVirtualSlot55))();
 }
 
 static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
@@ -618,10 +614,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     }
     bool moved = UnknownVirtualSlot45(current, dt);
     UnknownVirtualSlot42(wide);
-    // Slot 75 returns bool in retail (its al is stored as is); FollowCamera.h
-    // declares it int to keep the registered symbols.
-    int following75 = UnknownVirtualSlot75();
-    bool following = (bool&)following75;
+    bool following = UnknownVirtualSlot75();
     target = UnknownVirtualSlot48(wide || field_0x274, following, *(int*)&dt);
     position = UnknownVirtualSlot49(following, target, dt);
     if (!field_0x288) {
@@ -735,7 +728,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             field_0x294->Set(field_0x258, FLT_MAX);
         }
         if (cameraState != 5 && cameraState != 7) {
-            if (FollowCameraSlot55(this)) {
+            if (UnknownVirtualSlot55()) {
                 if (cameraState != 6 && !field_0x276) {
                     savedCameraState = cameraState;
                     field_0x230 = field_0x22c;

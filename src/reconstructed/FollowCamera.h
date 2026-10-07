@@ -160,7 +160,10 @@ public:
     virtual void UnknownVirtualSlot52(Vector3* point);
     virtual void UnknownVirtualSlot53();
     virtual void UnknownVirtualSlot54();
-    virtual void UnknownVirtualSlot55();
+    // A one-byte result: slot 10 tests `al`, and KrustyBikeCamera's override
+    // returns ControlInterface slot 2's int with no conversion code, which a
+    // bool return would add (neg/sbb/neg).
+    virtual unsigned char UnknownVirtualSlot55();
     virtual bool UnknownVirtualSlot56();
     virtual Vector3 UnknownVirtualSlot57(int mode) = 0;
     virtual void UnknownVirtualSlot58();
@@ -183,7 +186,7 @@ public:
     virtual bool UnknownVirtualSlot74() = 0;
     // Inline: retail's copy sits at 0x00404fc0, far from FollowCam.cpp, and
     // VehicleCamera slot 75 inlines the same test.
-    virtual int UnknownVirtualSlot75() { return cameraState == 5 || cameraState == 2; }
+    virtual bool UnknownVirtualSlot75() { return cameraState == 5 || cameraState == 2; }
 
     // 0x00463450: writes entry `index` of the +0x2e4 table; each non-null
     // pointer supplies one field. Returns false when index >= +0x2e0.

@@ -73,7 +73,7 @@ public:
         }
         return false;
     }
-    virtual int UnknownVirtualSlot75();
+    virtual bool UnknownVirtualSlot75();
 
     // Inlined by slot 75: no vehicle mode, or the vehicle's +0x444 is clear.
     int UnknownInlineIdle() {

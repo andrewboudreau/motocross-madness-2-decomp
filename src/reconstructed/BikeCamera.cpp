@@ -67,10 +67,7 @@ float BikeCamera::UnknownVirtualSlot51() {
 }
 
 // 0x004174b0
-int BikeCamera::UnknownVirtualSlot75() {
-    if (FollowCamera::UnknownVirtualSlot75() || !vehicleMode || !bike->field_0x444)
-        return 1;
-    if (bike->field_0x460 == 6 && bike->field_0x604->field_0x44 != 3)
-        return 1;
-    return 0;
+bool BikeCamera::UnknownVirtualSlot75() {
+    return FollowCamera::UnknownVirtualSlot75() || !vehicleMode || !bike->field_0x444 ||
+           (bike->field_0x460 == 6 && bike->field_0x604->field_0x44 != 3);
 }

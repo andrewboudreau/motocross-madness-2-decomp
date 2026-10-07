@@ -28,8 +28,8 @@ Canonical source: `src/reconstructed/FollowCamera.h` and `.cpp`, built on
 | 37 | `0x00464a10` | 37 | Exact; returns +0x2b4 (named local copy) |
 | 52 | `0x00464e80` | 3 | Exact empty body (`ret 4`) |
 | 53, 54, 58–62 | `0x00464e90` | 1 | Exact shared empty body |
-| 55, 56 | `0x00464ea0`, `0x00464ec0` | 23 each | Exact; slot 5 of the interface at (`0x0056e26c` object)->+0x14->+0x34 with 0x38 / 0x2a |
-| 75 | `0x00404fc0` | 25 | Exact; state +0x244 is 5 or 2 |
+| 55, 56 | `0x00464ea0`, `0x00464ec0` | 23 each | Exact; slot 5 of the interface at (`0x0056e26c` object)->+0x14->+0x34 with 0x38 / 0x2a; slot 55 returns `unsigned char`, slot 56 `bool` |
+| 75 | `0x00404fc0` | 25 | Exact; `bool`, state +0x244 is 5 or 2 |
 
 | 40 | `0x004639f0` | 60 | Exact; with a non-empty +0x2e4 table, entry 0 takes the target, then slot 38 |
 | 43, 44 | `0x00464ee0`, `0x00464f70` | 144 each | Exact; feed a vector into +0x27c..+0x284 / +0x288..+0x290 values (inlined `Set`, rate 0.25 or 0.3 by subject+0xbe8) |
@@ -253,7 +253,7 @@ are strict exact.
 | 42 | `0x00498130` | 148 | +0x308 = fov/zoom ratio × bike +0x43c × 0.42 (0.55 in state 3), 0 otherwise |
 | 48 | `0x004985b0` | 249 | FollowCamera slot 48 plus the raw target while view +0x3f8/+0x3f9 are set |
 | 52 | `0x00497fa0` | 217 | Keeps a point 3.5 above the subject's ground probe (easing +0x22c), capped at 400 in global modes 3 and 4 |
-| 55 | `0x00498080` | 18 | Global +0x14 virtual slot 2 with (0x0b, 0x3f) |
+| 55 | `0x00498080` | 18 | Global +0x14 virtual slot 2 with (0x0b, 0x3f), returned unconverted |
 | 56 | `0x004980a0` | 134 | Input 0x0a test; outside state 7 also bike +0x108, axis < -2 and not +0x735 in vehicle mode |
 | 58 | `0x004982c0` | 116 | Unless state 6, shows string 0x13b9 + state for 1.5 s through the global +0x570 object |
 | 59, 60 | `0x004981d0`, `0x00498230` | 96 / 69 | Save / restore presets in global +0x2934..+0x2940 |
@@ -291,19 +291,33 @@ The 0x344 matrix belongs to FollowCamera, not VehicleCamera.
 
 Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
 - The constructor and slot 36, both already known.
-- Slot 10 `0x00465c20` (3672 bytes, the per-frame update): 13 bytes differ
-  when slots 55 and 75 return `bool` (retail uses their `al` directly);
-  `FollowCamera.h` keeps them `void`/`int` because the registered symbols
-  use those names, so the sample calls slot 55 through a member pointer.
-  The remaining bytes are two scheduling choices: the second
-  D3DRMVectorRotate's `&direction` is formed before `&position` is pushed,
-  and in state 5 the 0x00460b50 argument slot is reserved after the two
-  squares. The state-5 distance is `dz*dz + dx*dx + dy` (the y delta is not
-  squared in retail).
+- Slot 10 `0x00465c20` (3672 bytes, the per-frame update): 13 bytes differ,
+  with no member-pointer or reference-cast workarounds. The remaining bytes
+  are two scheduling choices: the second D3DRMVectorRotate's `&direction` is
+  formed before `&position` is pushed, and in state 5 the 0x00460b50
+  argument slot is reserved after the two squares. Neither changes with
+  `/G3`-`/G5`, `/Ob2`, separate locals, inline wrappers, term order or a
+  separate variable for the second rotation. The state-5 distance is
+  `dz*dz + dx*dx + dy` (the y delta is not squared in retail).
 - Slot 46 `0x004654e0`: two late `fsubp`.
 - Slot 47 `0x00465720`.
 - The CAMERA-file loader `0x004650e0`: retail keeps cross products in memory.
-- Slot 45 `0x00463a30`: joystick pointer reloads.
+- Slot 45 `0x00463a30`: aligned instruction ratio 0.937 (1088 instructions
+  against 1079). Retail's null-joystick tests jump to the shared epilogue at
+  `0x004649fe`, so each joystick block is an `if (activeJoystick) { ... }`.
+  Left: retail tests the pointer in edx and reloads it for the call
+  (`mov edx, ecx; mov ecx, [edx+0xc]`), and stores `x * speed` before
+  multiplying (`fstp`/`fmul`) where VC6 keeps it (`fst`/`fmulp`).
 
 `FollowCamera.h` also types slot 41 as returning `Vector3` (slot 10 stores
 it at +0x29c) and +0x304 as a float (slot 10's blend clock, clamped to 1).
+
+Return types of slots 55 and 75. Slot 10 uses the `al` of both calls, so
+both return one byte. Slot 75 is `bool`; FollowCamera's, VehicleCamera's and
+BikeCamera's bodies emit `mov eax, 1` / `xor eax, eax`, which VC6 produces for
+a returned `bool` expression (BikeCamera's is one `||` expression; separate
+`return 1`/`return 0` statements emit `mov al, 1`). Slot 55 is
+`unsigned char`: KrustyBikeCamera's override returns ControlInterface slot 2's
+`int` (tested as full eax in KrustyBikeCamera slot 56) with no conversion
+code, while a `bool` return adds `neg`/`sbb`/`neg`. The exact type name is
+provisional; `bool` is ruled out by that override.
