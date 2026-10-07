@@ -212,6 +212,10 @@ and [GAMEOBJECT](GAMEOBJECT.md). In krusty2, Bike.cpp, CollisionObject.cpp,
 VisibilityQuadTree.cpp, SoultreeQuadTreeRenderer.cpp and the promoted
 SteeringControl.cpp gain 59 strict physics targets.
 
+EcoSystem.cpp (EcoSystem, Vegetation and the vegetation definitions)
+matches strictly in 37 functions, including the .esb reader and writer and
+slot 12's classification pass; see [ECOSYSTEM](ECOSYSTEM.md).
+
 From the unattributed-code map ([UNATTRIBUTED](UNATTRIBUTED.md)):
 NationalRace.cpp (8, `__FILE__` 0x56e338 and RTTI NationalRace :
 BaseQuarryEvent), Rectangle2D (5) and SkyCube (5) match strictly; the last

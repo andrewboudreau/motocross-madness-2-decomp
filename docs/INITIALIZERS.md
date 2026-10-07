@@ -1,7 +1,7 @@
 # Dynamic initializers (`$E`) and unit attribution
 
 This page lists every registered `$E` case and the unit it belongs to. That
-covers 568 cases: `_$E*` symbols in `tools/run_calibration.py`, and `$E`
+covers 580 cases: `_$E*` symbols in `tools/run_calibration.py`, and `$E`
 entries in the `targets.json` files under `src/krusty2` and `samples/physics`.
 Most of them are the per-file vector sets. Each set is four thunk/body pairs
 that build (0,0,0), (1,0,0), (0,1,0) and (0,0,1) into four 12-byte `.bss`
@@ -144,3 +144,4 @@ The audit itself was a linear capstone pass over `.text`, using
 | `0x0047c740..0x0047c87b` (XCU 132-135, `0x0065b620..`) | src/krusty2/core/GraphicsTest.cpp | not traced | position |
 | `0x004b1d80..0x004b1ebb` (XCU 208-211, `0x00688738..0x00688770`) | src/krusty2/contact/ObjectPlacement.cpp | read only by 0x4b0df0 | closes the unit |
 | `0x004a8940..0x004a8a7b` (XCU 188-191, `0x00685120..0x00685158`) | src/krusty2/motion/Motnctrl.cpp | not traced | consistent |
+| `0x00459830..0x00459b3b` (XCU 99-102) and `0x00455da0..0x00455ddf` (XCU 103-104, peak holds `0x0059aef0`/`0x0059aec8`) | EcoSystem.cpp | this unit | vector set mid-file; own statics open it |
