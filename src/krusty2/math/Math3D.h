@@ -210,7 +210,7 @@ int OrientationAnglesFromVectors(Vec3 a, Vec3 b, float* yaw, float* pitch, float
                                  float* sinRoll, float* cosRoll, float* cosPitch,
                                  float* sinPitch);
 
-// 0x004cb6e0, 892 bytes, __cdecl: per-axis settle/clamp of two accumulators.
+// 0x004cb6e0, 1058 bytes, __cdecl: per-axis settle/clamp of two accumulators.
 // Arguments: (float* a, float* b, const float* c, float dt, unsigned char mask), each
 // pointer being 3 floats. For each axis k (bit 1<<k of mask), when c[k] != 0:
 //   * mask bit clear and a[k] == 0: if b[k] != 0 and sign(b[k]) != sign(c[k]),
@@ -219,8 +219,10 @@ int OrientationAnglesFromVectors(Vec3 a, Vec3 b, float* yaw, float* pitch, float
 //   * otherwise, with t = a[k] + dt*b[k] and d = dt*c[k]: b[k] += c[k] when
 //     sign(t) == sign(d), when |t| > |d|, or when t == 0. Otherwise a[k] = b[k] = 0.
 // This reads like a static-friction or stop-at-zero integrator guard. Tier 2
-// arithmetic (decoded from the x axis; y and z repeat it with bits 2 and 4). The
-// name and parameter roles are tier 3.
+// arithmetic (the three axes are spelled out; y and z use bits 2 and 4). The
+// name and parameter roles are tier 3. Body in
+// ../../../samples/physics/helpers/AxisSettle.cpp (its own unit between
+// PeakHold.cpp and PhysicsBody, with the vector set .CRT$XCU 220-223 behind it).
 void UnknownAxisSettle_4cb6e0(float* a, float* b, const float* c, float dt,
                               unsigned char mask);
 

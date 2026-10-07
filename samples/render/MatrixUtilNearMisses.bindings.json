@@ -1,7 +1,5 @@
 {
-  "?TriangleNormal@@YAXPBUVector3@@00PAU1@PAM@Z": "0x004a11e0",
-  "?UnknownFunction460c00@@YAMM@Z": "0x00460c00",
-  "?ZeroMatrix@@YA?AUMatrix4@@XZ": "0x004a13e0",
+  "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "_$E1": "0x004a1be0",
   "_$E10": "0x004a1cd0",
   "_$E11": "0x004a1cc0",

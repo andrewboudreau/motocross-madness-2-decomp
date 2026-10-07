@@ -1,16 +1,19 @@
 // PhysicsBody.cpp -- first PhysicsBody translation unit.
 //
-// TU evidence (tier 2): the retail code 0x004cbb10..0x004cbf1b is one TU. It
-// starts with the four Math3D.h vector-constant initializers (0x004cbb10..0x004cbc00).
-// Then come the constructor 0x004cbc50, the scalar deleting destructor 0x004cbdc0,
-// the destructor 0x004cbde0, and slots 28, 29, 30, 42, 43 and 14. The next four
-// initializers (0x004cbf20..) open the following TU. The remaining PhysicsBody
-// setters (slots 27, 31..35) sit in that TU, ahead of the PhysicsRigidBody
-// constructor (see PhysicsRigidBody.cpp). Neighbouring source strings are
-// PCVideoCard.cpp (before) and Pixtrans.cpp (after), which fits alphabetical link order.
+// TU evidence (tier 2): the retail code 0x004cbc50..0x004cc05c is one TU: the
+// constructor 0x004cbc50, the scalar deleting destructor 0x004cbdc0, the destructor
+// 0x004cbde0, slots 28, 29, 30, 42, 43 and 14, and then the four Math3D.h
+// vector-constant initializers (0x004cbf20..0x004cc05c). The initializer sets sit
+// at the end of each unit here: the set at 0x004cbf20 writes 0x006899c0, the
+// kVec3Zero copy the constructor reads, while the set before the constructor
+// (0x004cbb10, globals 0x00689980) belongs to the helper unit in front of it
+// (../helpers/AxisSettle.cpp). The remaining PhysicsBody setters (slots 27, 31..35)
+// sit in the next TU, ahead of the PhysicsRigidBody constructor (see
+// PhysicsRigidBody.cpp). Neighbouring source strings are PCVideoCard.cpp (before)
+// and Pixtrans.cpp (after), which fits alphabetical link order.
 #include "PhysicsBody.h"
 
-// 0x004cbc50 (not a target; kept to emit the vtable and document the defaults).
+// 0x004cbc50.
 PhysicsBody::PhysicsBody(int flags)
     : GraphicsTest(flags)
 {

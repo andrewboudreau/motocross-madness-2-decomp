@@ -12,8 +12,9 @@
 // mid-file and FreeMotion (line 0x5a7) last.  Every function here is strict exact with all
 // relocations resolved (Motnctrl.bindings.json).  Not here: the text .VUE loader 0x004a5e40,
 // the slot 7 helpers 0x004a7dc0, 0x004a7fd0, 0x004a8440 (an out-of-line copy of an inline) and
-// 0x004a8470 (near misses, samples/physics/motion/Motnctrl.cpp), slot 7 0x004a70c0, 0x004a6bb0,
-// 0x004a8c50 and 0x004a9050 (not reconstructed) and 0x004a8bf0 (an __asm fistp rounding helper).
+// 0x004a8470, and AdvanceMotion 0x004a6bb0 (near misses, samples/physics/motion/Motnctrl.cpp),
+// slot 7 0x004a70c0 (not reconstructed) and 0x004a8bf0, 0x004a8c50 and 0x004a9050 (they round with
+// direct fistp instructions where the rest of the unit calls __ftol: __asm, not reproducible here).
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -326,8 +327,8 @@ Character::Character(int a)
     currentFrame = 0;
     chr_field_0x10 = 0.0f;
     blendFromMotion = 0;
-    chr_field_0x28 = 0;
-    chr_field_0x24 = 0;
+    lastFrameTime = 0.0f;
+    lastFrame = 0;
     blendFromTime = 0.0f;
     blendActive = 0;
     strcpy(sltPath, "");
@@ -336,7 +337,7 @@ Character::Character(int a)
     strcpy(contentDirectory, "");
     poseList.poses = 0;
     poseList.field_0x00 = 0;
-    chr_field_0x24 = 0;
+    lastFrame = 0;
     vutLoaded = 0;
     motions = 0;
     blendDuration = 0.0f;
@@ -493,7 +494,7 @@ void Character::BlendToMotion(Motion* motion)
 // both motions have the same number of poses per frame; otherwise switches directly.
 void Character::BlendToMotion(Motion* motion, float time)
 {
-    if (time != 0.0f && chr_field_0x24 &&
+    if (time != 0.0f && lastFrame &&
         motion->frames->count == currentMotion->frames->count) {
         Motion* from = currentMotion;
         blendFromTime = chr_field_0x10;
@@ -517,7 +518,7 @@ void Character::CharacterVirtualSlot8(int a)
     motionCount = source->motionCount;
     currentMotion = source->currentMotion;
     currentFrame = source->currentFrame;
-    chr_field_0x24 = source->chr_field_0x24;
+    lastFrame = source->lastFrame;
     blendFromTime = source->blendFromTime;
     blendDuration = source->blendDuration;
     blendActive = source->blendActive;
