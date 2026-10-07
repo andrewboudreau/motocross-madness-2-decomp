@@ -41,52 +41,52 @@ struct UnknownDisplay : public VideoCard {
     // 0x004c9830: creates the DirectDraw object for `guid` (0: the primary
     // display) and reads its identity, caps and modes; deletes itself and
     // returns 0 on failure.
-    UnknownDisplay* UnknownFunction4c9830(UnknownGuid* guid, char* description, char* name,
-                                          void* window);
-    int UnknownFunction4c9c90();                  // 0x004c9c90: full-screen setup
-    int UnknownFunction4c9d20(int x, int y, int width, int height); // 0x004c9d20: windowed
-    int UnknownFunction4ca790(int width, int height, int windowed); // 0x004ca790
-    int UnknownFunction4ca900(int mode, int windowed);              // 0x004ca900
-    int UnknownFunction4ca5a0(int* value, RenderTarget* target);     // 0x004ca5a0
-    void UnknownFunction4c9b50();                                    // 0x004c9b50: re-reads the caps
-    void UnknownFunction4c9c10();                                    // 0x004c9c10: releases the surfaces
-    int UnknownFunction4c9f30(int backBuffers);                      // 0x004c9f30: flipping chain
-    int UnknownFunction4ca130(int backBuffers);                      // 0x004ca130
-    int UnknownFunction4ca520(int windowed);                         // 0x004ca520
-    void UnknownFunction4cab00(RenderTarget* target);                // 0x004cab00: blit timing
-    void UnknownFunction4cb5b0(int enable);       // 0x004cb5b0 (GUIManager.cpp 0x004868b0)
+    UnknownDisplay* InitializeDisplay(UnknownGuid* guid, char* description, char* name,
+        void* window);
+    int SetFullscreenCooperativeLevel();                // 0x004c9c90: full-screen setup
+    int SetWindowedCooperativeLevel(int x, int y, int width, int height); // 0x004c9d20: windowed
+    int CreateWindowedSurfaces(int width, int height, int windowed); // 0x004ca790
+    int SetFullscreenDisplayMode(int mode, int windowed); // 0x004ca900
+    int ProbeNonLocalTextureMemory(int* value, RenderTarget* target); // 0x004ca5a0
+    void RefreshDriverCaps();                           // 0x004c9b50: re-reads the caps
+    void ReleasePrimarySurface();                       // 0x004c9c10: releases the surfaces
+    int CreateFlipChain(int backBuffers);               // 0x004c9f30: flipping chain
+    int CreateSystemRenderSurface(int backBuffers);     // 0x004ca130
+    int CreateModeSurfaces(int windowed);               // 0x004ca520
+    void ProbePartialTextureUploads(RenderTarget* target); // 0x004cab00: blit timing
+    void SetGDISurfaceVisible(int enable);              // 0x004cb5b0 (GUIManager.cpp 0x004868b0)
 
-    UnknownDirectDrawInterface* field_0x190;      // IDirectDraw7 (DirectDrawCreateEx)
-    UnknownDirect3DInterface* field_0x194;        // IDirect3D7 (QueryInterface)
+    UnknownDirectDrawInterface* directDraw;    // +0x190: IDirectDraw7 (DirectDrawCreateEx)
+    UnknownDirect3DInterface* direct3D;        // +0x194: IDirect3D7 (QueryInterface)
     void* field_0x198;
-    UnknownSurfaceInterface* field_0x19c;     // primary; PCGame slot 5: IsLost/Restore
-    UnknownSurfaceInterface* field_0x1a0;     // back buffer; PCGame slot 31's surface without +0x1a8
-    UnknownGammaControlInterface* field_0x1a4;
-    UnknownSurfaceInterface* field_0x1a8;     // windowed render surface
-    UnknownClipperInterface* field_0x1ac;
-    void* field_0x1b0;                            // window handle
+    UnknownSurfaceInterface* primarySurface;   // +0x19c: primary; PCGame slot 5: IsLost/Restore
+    UnknownSurfaceInterface* backBuffer;       // +0x1a0: back buffer; PCGame slot 31's surface without +0x1a8
+    UnknownGammaControlInterface* gammaControl; // +0x1a4
+    UnknownSurfaceInterface* renderSurface;    // +0x1a8: windowed render surface
+    UnknownClipperInterface* clipper;          // +0x1ac
+    void* windowHandle;                        // +0x1b0: window handle
     // Hardware caps (0x17c bytes, the DDCAPS layout; GetCaps).
-    unsigned int field_0x1b4;                     // size
-    unsigned int field_0x1b8;                     // capability bits (PCGame 0x004c0d10: 0x1, 0x400)
-    unsigned int field_0x1bc;                     // caps2
+    unsigned int driverCapsSize;               // +0x1b4: size
+    unsigned int driverCaps;                   // +0x1b8: capability bits (PCGame 0x004c0d10: 0x1, 0x400)
+    unsigned int driverCaps2;                  // +0x1bc: caps2
     unsigned char field_0x1c0[0x1f0 - 0x1c0];
-    unsigned int field_0x1f0;                     // total video memory
+    unsigned int driverVideoMemory;            // +0x1f0: total video memory
     unsigned char field_0x1f4[0x330 - 0x1f4];
-    unsigned int field_0x330;                     // emulation caps (DDCAPS) from here
+    unsigned int emulationCapsSize;            // +0x330: emulation caps (DDCAPS) from here
     unsigned char field_0x334[0x4ac - 0x334];
-    UnknownGuid field_0x4ac;                      // DirectDraw driver GUID (0: primary)
-    char field_0x4bc[0x100];                      // driver name: the GUID text (PCGame 0x004c1610)
-    int field_0x5bc;                              // "PartialTexBlt"
-    UnknownDeviceIdentifier field_0x5c0;
-    int field_0x9f0;                              // "IsAGP"
+    UnknownGuid driverGuid;                    // +0x4ac: DirectDraw driver GUID (0: primary)
+    char driverGuidText[0x100];                // +0x4bc: driver name: the GUID text (PCGame 0x004c1610)
+    int partialTextureUploadResult;            // +0x5bc: "PartialTexBlt"
+    UnknownDeviceIdentifier deviceIdentifier;  // +0x5c0
+    int isAGP;                                 // +0x9f0: "IsAGP"
     unsigned char field_0x9f4[0xa70 - 0x9f4];
-    unsigned int field_0xa70;                     // cooperative level flags (8: normal)
-    char field_0xa74[0x80];                       // enumeration description
-    char field_0xaf4[0x80];                       // enumeration name
-    unsigned char field_0xb74_bit0 : 1;           // "DriverInfo\<name>\WaitForFlip"
-    unsigned char field_0xb74_bit1 : 1;           // disabled in this mode; keeps all modes
-    unsigned char field_0xb74_bit2 : 1;           // "IsPowerVR"
-    unsigned char field_0xb74_bit3 : 1;           // gamma ramp (cleared by caps2 0x100000)
+    unsigned int cooperativeLevel;             // +0xa70: cooperative level flags (8: normal)
+    char driverDescription[0x80];              // +0xa74: enumeration description
+    char driverName[0x80];                     // +0xaf4: enumeration name
+    unsigned char waitForFlip : 1;             // +0xb74 bit 0: "DriverInfo\<name>\WaitForFlip"
+    unsigned char keepAllDisplayModes : 1;     // +0xb74 bit 1: disabled in this mode; keeps all modes
+    unsigned char isPowerVR : 1;               // +0xb74 bit 2: "IsPowerVR"
+    unsigned char useGammaRamp : 1;            // +0xb74 bit 3: gamma ramp (cleared by caps2 0x100000)
     unsigned char field_0xb74_bits : 4;
 };
 

@@ -9,7 +9,7 @@
   "??_C@_0L@HADA@?$CFs?$CF05d?4TGA?$AA@": "0x005704dc",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
-  "?UnknownFunction4c4f80@PCRenderTarget@@QAEPAVRenderTarget@@PAUUnknownDisplay@@PBUUnknownGuid@@PAUUnknownSurfaceInterface@@HH@Z": "0x004c4f80",
+  "?InitializeRenderTarget@PCRenderTarget@@QAEPAVRenderTarget@@PAUUnknownDisplay@@PBUUnknownGuid@@PAUUnknownSurfaceInterface@@HH@Z": "0x004c4f80",
   "?EnumTextureFormatCallback@PCRenderTarget@@SGJPAUUnknownPixelFormat@@PAX@Z": "0x004c5230",
   "?EnumZBufferFormatCallback@PCRenderTarget@@SGJPAUUnknownPixelFormat@@PAX@Z": "0x004c52a0",
   "?MeasureTextureMemory@PCRenderTarget@@QAEHPAH@Z": "0x004c5950",

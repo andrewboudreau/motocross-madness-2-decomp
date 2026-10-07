@@ -368,7 +368,7 @@ void Scene::UnknownVirtualSlot5()
     for (int i = 0; i < sounds.m_count; i++) {
         Sound* sound = sounds.Get(i);
         if (sound)
-            sound->UnknownFunction4bc6b0(0, 1, 0);
+            sound->PlayWithOptions(0, 1, 0);
     }
     GameObject::UnknownVirtualSlot5();
 }
@@ -379,7 +379,7 @@ void Scene::UnknownVirtualSlot7()
     for (int i = 0; i < sounds.m_count; i++) {
         Sound* sound = sounds.Get(i);
         if (sound)
-            sound->UnknownFunction4bc6b0(0, 1, 0);
+            sound->PlayWithOptions(0, 1, 0);
     }
     GameObject::UnknownVirtualSlot7();
 }
@@ -1043,7 +1043,7 @@ int Scene::ReadSounds()
                             strcat(file, ".wav");
                         Sound* sound = UnknownFunction4bb890(soundGroup, file, 1, 1, 0, -1);
                         parameters.UnknownFunction4b7f10("SoundVolume", 0, &volume);
-                        sound->UnknownFunction4bcbe0(volume, 0);
+                        sound->SetVolume(volume, 0);
                         sounds.Add(sound);
                     }
                 }

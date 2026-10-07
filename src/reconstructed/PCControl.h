@@ -19,10 +19,10 @@ public:
     virtual int UnknownVirtualSlot4(int modifier);                                    // 0x004bf5e0
 
     // 0x004bf490: acquires (nonzero) or unacquires every device.
-    void UnknownFunction4bf490(int acquire);
+    void SetDevicesAcquired(int acquire);
     // 0x004bf3c0: joystick enumeration callback.
-    static int __stdcall UnknownEnumDevicesCallback(const UnknownDeviceInstance* instance,
-                                                    void* context);
+    static int __stdcall EnumJoystickCallback(const UnknownDeviceInstance* instance,
+        void* context);
 
-    int field_0xcc4;                       // acquired; 1 initially
+    int devicesAcquired;                       // +0xcc4: acquired; 1 initially
 };

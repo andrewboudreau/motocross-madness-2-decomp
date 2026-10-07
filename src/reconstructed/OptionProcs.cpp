@@ -53,9 +53,9 @@ void OptGameSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         FindControl("ChkWreckResetOnTrack", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.wreckResetOnTrack);
         UIMultiState* chat = static_cast<UIMultiState*>(FindControl("MultChatMode", 2));
         chat->SetStateCount(3);
-        chat->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x140b);
-        chat->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x140a);
-        chat->SetStateTextFromResource(2, g_TrackGame->field_0x420, 0x140c);
+        chat->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x140b);
+        chat->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x140a);
+        chat->SetStateTextFromResource(2, g_TrackGame->resourceInstance, 0x140c);
         UIControl* pid = FindControl("TxtPID", 12);
         unsigned long size;
         char value[128];
@@ -134,17 +134,17 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         int i = 0;
         if (g_TrackGame->field_0x2d4_bit1) {
             if (g_TrackGame->field_0x2d0) {
-                for (; i < g_TrackGame->display->field_0x08; i++) {
-                    UnknownDisplayMode* mode = &g_TrackGame->display->field_0x10[i];
+                for (; i < g_TrackGame->display->displayModeCount; i++) {
+                    UnknownDisplayMode* mode = &g_TrackGame->display->displayModes[i];
                     if (mode->field_0x18 == 1) {
                         sprintf(text, "%d X %d", mode->width, mode->height);
                         list->AddRow(text, i, 0);
                     }
                 }
             } else {
-                for (; i < g_TrackGame->display->field_0x08; i++) {
-                    UnknownDisplayMode* mode = &g_TrackGame->display->field_0x10[i];
-                    int usable = g_TrackGame->display->field_0x10[i].field_0x14;
+                for (; i < g_TrackGame->display->displayModeCount; i++) {
+                    UnknownDisplayMode* mode = &g_TrackGame->display->displayModes[i];
+                    int usable = g_TrackGame->display->displayModes[i].field_0x14;
                     if (usable == 1) {
                         sprintf(text, "%d X %d", mode->width, mode->height);
                         list->AddRow(text, i, 0);
@@ -159,9 +159,9 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case 3:
         if (_stricmp("DisplayResolutionDropDown", event->controlName) != 0) {
             Sound* sound = FindSectionObject("Ratchet03");
-            sound->UnknownFunction4bcbe0(guiManager->field_0x34c, 0);
+            sound->SetVolume(guiManager->field_0x34c, 0);
             if (sound)
-                sound->UnknownFunction4bc6b0(0, 0, 0);
+                sound->PlayWithOptions(0, 0, 0);
         }
         if (_stricmp("TerrainQualitySliderBar", event->controlName) == 0) {
             int value = static_cast<UIScrollBar*>(event->control)->UnknownFunction475500();
@@ -177,7 +177,7 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (_stricmp("DisplayResolutionDropDown", event->controlName) != 0) {
             Sound* sound = FindSectionObject("Ratchet03");
             if (sound)
-                sound->UnknownFunction4bc940(0);
+                sound->Stop(0);
         }
         break;
     }
@@ -206,7 +206,7 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             method = 2;
         else
             method = static_cast<UIRadioButton*>(FindControl("RadTerrDual", 4))->UnknownFunction4755c0() != 0;
-        sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod", g_TrackGame->display->field_0x4bc);
+        sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod", g_TrackGame->display->driverGuidText);
         g_TrackGame->SetRegistryInt(key, method);
         g_UnknownGlobal6887d8.terrainQuality = (settings[4] + settings[3] + settings[2] + settings[1]) / 4;
         break;
@@ -218,14 +218,14 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         FindControl("SldTerrain", 0)->UnknownVirtualSlot54(&settings[3]);
         FindControl("SldVisibility", 0)->UnknownVirtualSlot54(&settings[4]);
         if (g_TrackGame->field_0x2d0)
-            FindControl("Txt3DCard", 12)->SetTextFromResource(g_TrackGame->field_0x420, 0x1463);
+            FindControl("Txt3DCard", 12)->SetTextFromResource(g_TrackGame->resourceInstance, 0x1463);
         else
-            FindControl("Txt3DCard", 12)->SetText(g_TrackGame->display->field_0x5c0.description);
+            FindControl("Txt3DCard", 12)->SetText(g_TrackGame->display->deviceIdentifier.description);
         int useLast = g_TrackGame->GetRegistryFlag("UseLastVideoCard", 1);
         static_cast<UIMultiState*>(FindControl("ChkShowPick3D", 2))->SetCurrentState(useLast == 0);
-        sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod", g_TrackGame->display->field_0x4bc);
+        sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod", g_TrackGame->display->driverGuidText);
         int method = g_TrackGame->GetRegistryInt(key, -1);
-        sprintf(key, "DriverInfo\\%s\\CanRenderDualTextureInSinglePass", g_TrackGame->display->field_0x4bc);
+        sprintf(key, "DriverInfo\\%s\\CanRenderDualTextureInSinglePass", g_TrackGame->display->driverGuidText);
         int dual = g_TrackGame->GetRegistryInt(key, 0);
         if (method == -1 || (method == 2 && !dual)) {
             if (dual == 1)
@@ -285,9 +285,9 @@ void OptSoundDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         break;
     case 3: {
         Sound* sound = FindSectionObject("Ratchet03");
-        sound->UnknownFunction4bcbe0(guiManager->field_0x34c, 0);
+        sound->SetVolume(guiManager->field_0x34c, 0);
         if (sound)
-            sound->UnknownFunction4bc6b0(0, 0, 0);
+            sound->PlayWithOptions(0, 0, 0);
         ApplySoundSettings();
         break;
     }
@@ -295,7 +295,7 @@ void OptSoundDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case 17: {
         Sound* sound = FindSectionObject("Ratchet03");
         if (sound)
-            sound->UnknownFunction4bc940(0);
+            sound->Stop(0);
     }
         // fall through
     case kDialogCommand:
@@ -321,9 +321,9 @@ void OptSoundDlg::ApplySoundSettings()
 {
     UpdateBoundValues(1);
     if (g_TrackGame->soundInterface) {
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->field_0x45c_bit0 = g_UnknownGlobal688798.soundHardware;
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->field_0x45c_bit3 = g_UnknownGlobal688798.eax;
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->UnknownFunction4be910(22050, 1, g_UnknownGlobal688798.sound16Bit ? 16 : 8);
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->allowSoundHardware = g_UnknownGlobal688798.soundHardware;
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = g_UnknownGlobal688798.eax;
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, g_UnknownGlobal688798.sound16Bit ? 16 : 8);
     }
     guiManager->field_0x34c = (g_UnknownGlobal688798.uiSounds ? (g_UnknownGlobal688798.uiVolume - 100) * 25 : -10000) - 200;
 }
@@ -390,9 +390,9 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case 3:
         if (_stricmp("InputDeviceDDL", event->controlName) != 0 && _stricmp("ListboxScroll", event->controlName) != 0) {
             Sound* sound = FindSectionObject("Ratchet03");
-            sound->UnknownFunction4bcbe0(guiManager->field_0x34c, 0);
+            sound->SetVolume(guiManager->field_0x34c, 0);
             if (sound)
-                sound->UnknownFunction4bc6b0(0, 0, 0);
+                sound->PlayWithOptions(0, 0, 0);
         }
         break;
     case 16:
@@ -400,7 +400,7 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (_stricmp("InputDeviceDDL", event->controlName) != 0 && _stricmp("ListboxScroll", event->controlName) != 0) {
             Sound* sound = FindSectionObject("Ratchet03");
             if (sound)
-                sound->UnknownFunction4bc940(0);
+                sound->Stop(0);
         }
         break;
     case kDialogListSelect:
@@ -585,28 +585,28 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         field_0x7f68 = 0;
         field_0x7f6c = 0;
         UIMultiState* tab = static_cast<UIMultiState*>(FindControl("GameSettings", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13dd);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13dd);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13dd);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13dd);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("Graphics", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13de);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13de);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13de);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13de);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("Sound", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13df);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13df);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13df);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13df);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("Controls", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13e0);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13e0);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13e0);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13e0);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("Messages", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13e1);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13e1);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13e1);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13e1);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("Garage", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13e2);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13e2);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13e2);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13e2);
         tab->SetTextAlign(0x22);
         if (event->field_0x18 == 1) {
             OpenPage(3);
@@ -895,16 +895,16 @@ void ConfirmRestoreDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     switch (event->kind) {
     case kDialogInit: {
         UIControl* control = FindControl("ButLeft", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13e9);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13e9);
         control = FindControl("ButRight", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13dc);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13dc);
         control = FindControl("ButMiddle", 1);
         control->Show(0, 1);
         control = FindControl("TitleText", 12);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x14c9);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x14c9);
         UIControl* prompt = FindControl("TxtPrompt", 12);
         prompt->field_0x1e8 = 1;
-        prompt->SetTextFromResource(g_TrackGame->field_0x420, 0x14ca);
+        prompt->SetTextFromResource(g_TrackGame->resourceInstance, 0x14ca);
         break;
     }
     case kDialogCommand:
@@ -966,9 +966,9 @@ void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case 3:
         if (_stricmp("DDLCurves", event->controlName) != 0) {
             Sound* sound = FindSectionObject("Ratchet03");
-            sound->UnknownFunction4bcbe0(guiManager->field_0x34c, 0);
+            sound->SetVolume(guiManager->field_0x34c, 0);
             if (sound)
-                sound->UnknownFunction4bc6b0(0, 0, 0);
+                sound->PlayWithOptions(0, 0, 0);
             if (strlen(event->controlName) > 5 && _strnicmp(event->controlName, "SldEQ", 5) == 0)
                 EqSliderMoved(event->control);
         }
@@ -978,7 +978,7 @@ void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (_stricmp("DDLCurves", event->controlName) != 0) {
             Sound* sound = FindSectionObject("Ratchet03");
             if (sound)
-                sound->UnknownFunction4bc940(0);
+                sound->Stop(0);
             if (strlen(event->controlName) > 5 && _strnicmp(event->controlName, "SldEQ", 5) == 0)
                 EqSliderMoved(event->control);
         }

@@ -136,14 +136,14 @@ int Game::UnknownVirtualSlot33() {
 // 0x00467eb0: renders a frame, timing each phase, and with bit 2 of +0x2d4
 // fills the debug overlay's profile and memory pages.
 int Game::UnknownVirtualSlot8() {
-    if (display->field_0x70_bit2)
+    if (display->lastFlipFailed)
         display->UnknownVirtualSlot4(0);
     unsigned int last = UnknownFunction4bfa80();
     rootObject->UnknownVirtualSlot12();
     unsigned int now = UnknownFunction4bfa80();
     int prepareGeometry = now - last;
     last = now;
-    if (display->field_0x70_bit2)
+    if (display->lastFlipFailed)
         display->UnknownVirtualSlot4(1);
     now = UnknownFunction4bfa80();
     int waitForFlip = now - last;
@@ -186,11 +186,11 @@ int Game::UnknownVirtualSlot8() {
             s_RenderPost3DPeak.UnknownFunction4cb6b0(renderPost3D);
             s_ElapsedPeak.UnknownFunction4cb6b0(elapsed);
             if (debugOverlay->field_0x25_bit0 && debugOverlay->field_0x26c4 == profilePage) {
-                UnknownDisplayMode* mode = &display->field_0x10[display->field_0x0c];
+                UnknownDisplayMode* mode = &display->displayModes[display->currentDisplayMode];
                 debugOverlay->UnknownFunction447fa0(profilePage, "%c %d x %d %d bit(x%d)", 'R',
                                                   mode->width, mode->height, mode->bitDepth,
-                                                  display->field_0x78);
-                debugOverlay->UnknownFunction447f40(profilePage, "%s", display->field_0x5c0.description);
+                                                  display->frameBufferCount);
+                debugOverlay->UnknownFunction447f40(profilePage, "%s", display->deviceIdentifier.description);
                 debugOverlay->UnknownFunction447f40(profilePage, "ElapsedTime:   % 3d (%d)",
                                                   elapsed, s_ElapsedPeak.UnknownFunction4cb690());
                 debugOverlay->UnknownFunction447f40(profilePage, "PrepFrameTime: % 3d (%d)",
@@ -247,14 +247,14 @@ int Game::UnknownVirtualSlot8() {
                 debugOverlay->UnknownFunction447f40(memoryPage, "TotalVirtual    %10d", status.totalVirtual);
                 debugOverlay->UnknownFunction447f40(memoryPage, "AvailVirtual    %10d", status.availVirtual);
                 debugOverlay->UnknownFunction447f40(memoryPage, "Memory Load     %8d %%", status.memoryLoad);
-                debugOverlay->UnknownFunction447f40(memoryPage, "%s", display->field_0x5c0.description);
-                debugOverlay->UnknownFunction447f40(memoryPage, "Total VidMem    %10d", display->field_0x54);
+                debugOverlay->UnknownFunction447f40(memoryPage, "%s", display->deviceIdentifier.description);
+                debugOverlay->UnknownFunction447f40(memoryPage, "Total VidMem    %10d", display->totalVideoMemory);
                 debugOverlay->UnknownFunction447f40(memoryPage, "IsAGP           %s",
-                                                  display->field_0x9f0 ? "TRUE" : "FALSE");
+                                                  display->isAGP ? "TRUE" : "FALSE");
                 debugOverlay->UnknownFunction447f40(memoryPage, "VideoMemoryMB   %d",
                                                   GetRegistryInt("VideoMemoryMB", -1));
                 debugOverlay->UnknownFunction447f40(memoryPage, "PartialTexBlt   %s",
-                                                  g_TrackGame->display->field_0x5bc ? "Yes" : "No");
+                                                  g_TrackGame->display->partialTextureUploadResult ? "Yes" : "No");
                 debugOverlay->UnknownFunction447f40(memoryPage, "TexturesCached  %s",
                                                   g_TrackGame->field_0x2d5_bit2 ? "Yes" : "No");
             }

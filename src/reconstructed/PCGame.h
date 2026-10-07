@@ -73,19 +73,19 @@ public:
     int LoadDisplayProfile(UnknownDisplay* display);     // 0x004c16f0: loads its profile
 
     UnknownGuid deviceGuid;                   // Direct3D device GUID ("Renderer" setting)
-    UnknownRect field_0x308;                  // window rectangle (slot 32)
-    void* field_0x318;                        // instance handle
-    void* field_0x31c;                        // window handle
+    UnknownRect windowRect;                    // +0x308: window rectangle (slot 32)
+    void* instanceHandle;                      // +0x318: instance handle
+    void* windowHandle;                        // +0x31c: window handle
     char companyName[0x80];                   // "Rainbow Studios"
-    char field_0x3a0[0x80];                   // "Rainbow Demo"
-    void* field_0x420;                        // string resource instance (defaults to +0x318)
-    UnknownOSVersionInfo field_0x424;
-    char field_0x4b8[0x80];                   // "SOFTWARE\\Rainbow Studios\\Demo"
-    void* field_0x538;                        // IMM32.DLL
-    void* field_0x53c;                        // created input context
-    void* field_0x540;                        // previous input context (ImmAssociateContext result)
+    char applicationName[0x80];                // +0x3a0: "Rainbow Demo"
+    void* resourceInstance;                    // +0x420: string resource instance (defaults to +0x318)
+    UnknownOSVersionInfo osVersion;            // +0x424
+    char registryKey[0x80];                    // +0x4b8: "SOFTWARE\\Rainbow Studios\\Demo"
+    void* imeLibrary;                          // +0x538: IMM32.DLL
+    void* inputContext;                        // +0x53c: created input context
+    void* previousInputContext;                // +0x540: previous input context (ImmAssociateContext result)
     int field_0x544;                          // disables the 0x004ccd60 first argument
-    unsigned char field_0x548_bit0 : 1;
+    unsigned char displayProfilesStale : 1;    // +0x548 bit 0
     int magFilter;                            // texture stage 0 D3DTSS_MAGFILTER (slot 7)
     int minFilter;                            // D3DTSS_MINFILTER
     int mipFilter;                            // D3DTSS_MIPFILTER

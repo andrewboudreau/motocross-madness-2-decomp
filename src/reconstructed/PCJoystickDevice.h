@@ -100,32 +100,32 @@ public:
     virtual int UnknownVirtualSlot20(int value);
 
     // 0x004c2930: opens the device described by `instance`.
-    int UnknownFunction4c2930(const UnknownDeviceInstance* instance);
+    int OpenDevice(const UnknownDeviceInstance* instance);
     // 0x004c2cb0: object enumeration callback; marks the axes present.
-    static int __stdcall UnknownEnumObjectsCallback(const UnknownObjectInstance* object,
-                                                    void* context);
+    static int __stdcall EnumAxisObjectsCallback(const UnknownObjectInstance* object,
+        void* context);
     // 0x004c2d90: key-repeat stepping driven by an axis direction (gamepads).
-    void UnknownMethod4c2d90(int axis, int value);
+    void UpdateAxisRepeat(int axis, int value);
     // 0x004c3090: applies the axis dead-zone scale around 32768, clamped to
     // 0..65535.
-    int UnknownFunction4c3090(int axis, int value);
+    int ApplyAxisDeadZone(int axis, int value);
     // 0x004c2ef0: button index for a joystick state offset, or -1.
-    int UnknownFunction4c2ef0(int offset);
-    int UnknownMethod4c3100(int value);            // near miss in samples/inputdevice
+    int ButtonIndexFromOffset(int offset);
+    int ReadBufferedState(int value);                   // near miss in samples/inputdevice
     int FilterAxisSpike(int axis, unsigned long value); // inline (near miss sample)
-    int UnknownMethod4c3790(int value);            // near miss in samples/inputdevice
-    int UnknownMethod4c3a10(int buffered);
+    int ReadImmediateState(int value);                  // near miss in samples/inputdevice
+    int SetBufferedInput(int buffered);
     int CheckPollResult(long result);              // inline
     void UnknownMethod4c3ae0(unsigned char value);
 
 protected:
-    UnknownEffectInterface* field_0x578[5]; // released by slot 15
-    float field_0x58c[6];                  // axis ranges (flip base for axes 1, 2)
-    float field_0x5a4[6];                  // previous raw axis values
-    float field_0x5bc[6];                  // dead-zone scale per axis
-    unsigned char field_0x5d4_bit0 : 1;
-    unsigned char field_0x5d4_bit1 : 1;
+    UnknownEffectInterface* effects[5];        // +0x578: released by slot 15
+    float axisMaximums[6];                     // +0x58c: axis ranges (flip base for axes 1, 2)
+    float previousRawAxes[6];                  // +0x5a4: previous raw axis values
+    float deadZoneScales[6];                   // +0x5bc: dead-zone scale per axis
+    unsigned char bufferedInput : 1;           // +0x5d4 bit 0
+    unsigned char axisRepeatEnabled : 1;       // +0x5d4 bit 1
     unsigned char field_0x5d5;
-    int field_0x5d8[4];                    // -1 initially
-    int field_0x5e8;
+    int povValues[4];                          // +0x5d8: -1 initially
+    int povCount;                              // +0x5e8
 };

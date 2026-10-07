@@ -318,8 +318,8 @@ int UIControl::UnknownVirtualSlot41() {
         field_0x98 = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
         field_0x9c = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
         if (slideSound) {
-            slideSound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-            slideSound->UnknownFunction4bc6b0(1, 0, 0);
+            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
         field_0x80 += field_0x90;
@@ -1007,7 +1007,7 @@ int UIButton::UnknownVirtualSlot28(POINT point, int state) {
         UnknownSurfaceDesc desc;
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
-        if (!texture->field_0x70->Lock(0, &desc, 1, 0)) {
+        if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
             int offset = desc.pitch * y / UnknownFunction511970(format) + x;
             if (format == 8) {
                 if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
@@ -1016,7 +1016,7 @@ int UIButton::UnknownVirtualSlot28(POINT point, int state) {
                 if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
                     opaque = 1;
             }
-            if (texture->field_0x70->Unlock(0))
+            if (texture->systemSurface->Unlock(0))
                 return opaque;
         }
         return opaque;
@@ -1037,7 +1037,7 @@ int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
         UnknownSurfaceDesc desc;
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
-        if (!texture->field_0x70->Lock(0, &desc, 1, 0)) {
+        if (!texture->systemSurface->Lock(0, &desc, 1, 0)) {
             int offset = desc.pitch * y / UnknownFunction511970(format) + x;
             if (format == 8) {
                 if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
@@ -1046,7 +1046,7 @@ int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
                 if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
                     opaque = 1;
             }
-            if (texture->field_0x70->Unlock(0))
+            if (texture->systemSurface->Unlock(0))
                 return opaque;
         }
         return opaque;
@@ -1134,11 +1134,11 @@ int UIEditBox::UnknownVirtualSlot40() {
                     FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
             }
             ownerDialog->EndControlDraw(dc);
-            if (g_TrackGame->display->field_0x6c &&
+            if (g_TrackGame->display->freezeFrameIndex &&
                 ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 if (ownerDialog && ownerDialog->dialogBackground)
                     ownerDialog->dialogBackground->UnknownFunction404c80();
-                HIMC context = ImmGetContext((HWND)g_TrackGame->field_0x31c);
+                HIMC context = ImmGetContext((HWND)g_TrackGame->windowHandle);
                 if (ImmGetOpenStatus(context)) {
                     COMPOSITIONFORM composition;
                     composition.dwStyle = CFS_FORCE_POSITION;
@@ -1147,7 +1147,7 @@ int UIEditBox::UnknownVirtualSlot40() {
                     ImmSetCompositionWindow(context, &composition);
                 }
                 if (context)
-                    ImmReleaseContext((HWND)g_TrackGame->field_0x31c, context);
+                    ImmReleaseContext((HWND)g_TrackGame->windowHandle, context);
             }
         }
     } while (more);
@@ -1171,8 +1171,8 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
     if (!UIControl::UnknownVirtualSlot20(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (field_0x204_sound) {
-            field_0x204_sound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-            field_0x204_sound->UnknownFunction4bc6b0(1, 0, 0);
+            field_0x204_sound->SetVolume(ownerGui->field_0x34c, 0);
+            field_0x204_sound->PlayWithOptions(1, 0, 0);
         }
         switch (c) {
         case 8:
@@ -1230,15 +1230,15 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
                 textLength++;
                 field_0xd0++;
             } else if (field_0x208_sound) {
-                field_0x208_sound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-                field_0x208_sound->UnknownFunction4bc6b0(1, 0, 0);
+                field_0x208_sound->SetVolume(ownerGui->field_0x34c, 0);
+                field_0x208_sound->PlayWithOptions(1, 0, 0);
             }
             break;
         }
         }
         controlText[field_0xd0] = 0;
         void* dc;
-        if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->GetDC(&dc)) {
+        if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
             HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(fontHandle ? fontHandle : (int)ownerDialog->dialogFont));
             SIZE size;
             GetTextExtentPoint32A((HDC)dc, controlText, field_0xd0, &size);
@@ -1246,7 +1246,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
             GetTextExtentPoint32A((HDC)dc, controlText, textLength, &size);
             textWidth = size.cx;
             SelectObject((HDC)dc, font);
-            ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->ReleaseDC(dc);
+            ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
         }
         UnknownVirtualSlot50();
         redrawFrames++;

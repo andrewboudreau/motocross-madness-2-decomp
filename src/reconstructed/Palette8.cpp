@@ -80,7 +80,7 @@ Palette8::Palette8(UnknownTextureStream* stream) {
             field_0x308[i].flags = 0x40;
         }
     }
-    if (g_TrackGame->display->field_0x190->UnknownMethod5(0x44, field_0x308, &field_0x70c, 0) == 0
+    if (g_TrackGame->display->directDraw->CreatePalette(0x44, field_0x308, &field_0x70c, 0) == 0
         && *name)
         field_0x708 = ColorMapper::UnknownFunction4dddd0(name);
     DebugFree(name, __FILE__, 170);
@@ -91,7 +91,7 @@ Palette8::~Palette8() {
     void* entry;
 
     if (field_0x70c)
-        field_0x70c->UnknownMethod2();
+        field_0x70c->Release();
     if (field_0x708)
         field_0x708->Release();
     entry = g_UnknownResourceManager572b44->UnknownFunction4e93f0(this);

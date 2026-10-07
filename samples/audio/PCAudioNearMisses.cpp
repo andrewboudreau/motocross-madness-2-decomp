@@ -2,7 +2,7 @@
 // match. See docs/PCAUDIO.md. Each differs only in branch layout or register
 // choice:
 //
-// UnknownFunction4be910 (0x004be910, 158 bytes): sets the primary buffer's
+// SetPrimaryFormat (0x004be910, 158 bytes): sets the primary buffer's
 // PCM format. The 0x14-byte frame (a WAVEFORMATEX-sized local with only the
 // first 16 bytes cleared), the arithmetic and the call match (108 of 158
 // bytes); only the scheduling of the zeroing stores against the argument
@@ -59,7 +59,7 @@ static inline void CopySoundName(char* to, const char* name) {
 }
 
 // 0x004be910: sets the primary buffer's PCM format.
-int PCSoundInterface::UnknownFunction4be910(int rate, int stereo, int bits) {
+int PCSoundInterface::SetPrimaryFormat(int rate, int stereo, int bits) {
     if (!field_0x2c_bit0)
         return 0;
     UnknownWaveFormat format;
@@ -70,7 +70,7 @@ int PCSoundInterface::UnknownFunction4be910(int rate, int stereo, int bits) {
     format.samplesPerSec = rate;
     format.avgBytesPerSec = format.channels * format.bitsPerSample * format.samplesPerSec / 8;
     format.blockAlign = format.channels * format.bitsPerSample / 8;
-    return field_0x468->SetFormat(&format) >= 0;
+    return primaryBuffer->SetFormat(&format) >= 0;
 }
 
 
@@ -88,14 +88,14 @@ Sound* UnknownFunction4bb890(SoundGroup* group, const char* name, int flags, int
     if (loaded) {
         if (loaded->field_0x1e8 & 4) {
             entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
-            if (sound->UnknownFunction4bbef0(entry->field_0x14, flags, a, b, c))
+            if (sound->LoadWave(entry->field_0x14, flags, a, b, c))
                 goto named;
-        } else if (sound->UnknownFunction4bc4c0(loaded)) {
+        } else if (sound->DuplicateFrom(loaded)) {
             goto named;
         }
     } else {
         entry->field_0x14->UnknownFunction461340(entry->field_0x18, 0, 0);
-        if (sound->UnknownFunction4bbef0(entry->field_0x14, flags, a, b, c)) {
+        if (sound->LoadWave(entry->field_0x14, flags, a, b, c)) {
             g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, sound);
             goto named;
         }
@@ -126,13 +126,13 @@ int Sound::UnknownFunction4bc320(const char* name, UnknownTextureStream* stream,
         file = stream;
     }
     if (flags & 5) {
-        if (!UnknownFunction4bbef0(file, flags, a, b, -1))
+        if (!LoadWave(file, flags, a, b, -1))
             goto failed;
         if (!stream)
             delete file;
     } else if (flags & 2) {
         field_0x40 = file;
-        if (!UnknownFunction4bbef0(file, flags, a, b, c))
+        if (!LoadWave(file, flags, a, b, c))
             goto failed;
     }
     CopySoundName(field_0x60, name);
@@ -145,13 +145,13 @@ failed:
 }
 
 // 0x004bc4c0: shares `source`'s buffer.
-int Sound::UnknownFunction4bc4c0(Sound* source) {
+int Sound::DuplicateFrom(Sound* source) {
     if (!source || !SoundSystem() || !SoundSystem()->field_0x2c_bit0)
         return 0;
-    UnknownFunction4bcf50();
+    ReleaseBuffers();
     strcpy(field_0x60, "");
     UnknownSoundBuffer* duplicate = 0;
-    if (!UnknownFunction4bd6a0(&duplicate, source))
+    if (!DuplicateBuffer(&duplicate, source))
         return 0;
     field_0x0c = duplicate;
     if (source->field_0x10) {
@@ -159,7 +159,7 @@ int Sound::UnknownFunction4bc4c0(Sound* source) {
             field_0x10->Release();
             field_0x10 = 0;
         }
-        if (!UnknownFunction4bd6e0(field_0x0c, &field_0x10))
+        if (!Query3DBuffer(field_0x0c, &field_0x10))
             return 0;
     }
     field_0x28 = source;
@@ -167,17 +167,17 @@ int Sound::UnknownFunction4bc4c0(Sound* source) {
     source->AddRef();
     CopySoundName(field_0x60, field_0x28->field_0x60);
     if (field_0x1ec & 0x80)
-        UnknownFunction4bcbe0(field_0x08->field_0x30, 0);
+        SetVolume(field_0x08->field_0x30, 0);
     return 1;
 }
 
 // 0x004bcb30: sets the frequency (100..100000 Hz) of the sound and its
 // duplicates; unless `force`, only while playing and when it changes.
-int Sound::UnknownFunction4bcb30(unsigned long frequency, int force) {
+int Sound::SetFrequency(unsigned long frequency, int force) {
     if (!SoundSystem()->field_0x2c_bit0)
         return 1;
     if (field_0x0c && field_0x1f5_bit0 &&
-        (force || (field_0x19c != frequency && UnknownFunction4bca80()))) {
+        (force || (field_0x19c != frequency && IsPlaying()))) {
         if (frequency < 100 || frequency > 100000)
             goto failed;
         if (field_0x0c->SetFrequency(frequency) < 0)
@@ -194,11 +194,11 @@ failed:
 }
 
 // 0x004bcbe0: sets the volume (-10000..0) of a 2D sound and its duplicates.
-int Sound::UnknownFunction4bcbe0(long volume, int force) {
+int Sound::SetVolume(long volume, int force) {
     if (!SoundSystem()->field_0x2c_bit0)
         return 1;
     if (field_0x0c && !field_0x10 && field_0x1f5_bit0 &&
-        (force || (field_0x1a0 != volume && UnknownFunction4bca80()))) {
+        (force || (field_0x1a0 != volume && IsPlaying()))) {
         if (volume < -10000)
             volume = -10000;
         else if (volume > 0)
@@ -217,11 +217,11 @@ failed:
 }
 
 // 0x004bcca0: sets the pan of a 2D sound and its duplicates.
-int Sound::UnknownFunction4bcca0(long pan, int force) {
+int Sound::SetPan(long pan, int force) {
     if (!SoundSystem()->field_0x2c_bit0)
         return 1;
     if (field_0x0c && !field_0x10 && field_0x1f5_bit0 &&
-        (force || (field_0x1a4 != pan && UnknownFunction4bca80()))) {
+        (force || (field_0x1a4 != pan && IsPlaying()))) {
         if (field_0x0c->SetPan(pan) < 0)
             goto failed;
         for (int i = 0; i < field_0x24; i++) {
@@ -237,7 +237,7 @@ failed:
 
 // 0x004bd0c0: refills `buffer` from the sound's archive entry or file,
 // skipping the 44-byte header.
-int Sound::UnknownFunction4bd0c0(UnknownSoundBuffer** buffer) {
+int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
     if (!buffer)
         return 0;
     if (field_0x1f4_bit0) {
@@ -248,7 +248,7 @@ int Sound::UnknownFunction4bd0c0(UnknownSoundBuffer** buffer) {
         UnknownWaveHeader header;
         if (entry->field_0x14->UnknownFunction461640(&header, 0x2c, 1) != 1)
             return 0;
-        if (!UnknownFunction4bd260(buffer, entry->field_0x14, 0, field_0x198))
+        if (!FillBufferFromStream(buffer, entry->field_0x14, 0, field_0x198))
             return 0;
         return 1;
     }
@@ -258,7 +258,7 @@ int Sound::UnknownFunction4bd0c0(UnknownSoundBuffer** buffer) {
             file->UnknownFunction461340(file->field_0x130, 0, 0);
         UnknownWaveHeader header;
         if (file->UnknownFunction461640(&header, 0x2c, 1) == 1 &&
-            UnknownFunction4bd260(buffer, file, 0, field_0x198)) {
+            FillBufferFromStream(buffer, file, 0, field_0x198)) {
             delete file;
             return 1;
         }
@@ -268,13 +268,13 @@ int Sound::UnknownFunction4bd0c0(UnknownSoundBuffer** buffer) {
 }
 
 // 0x004bd4b0: creates the buffer a streamed sound is loaded into.
-int Sound::UnknownFunction4bd4b0() {
-    UnknownFunction4bcf50();
+int Sound::CreatePendingBuffer() {
+    ReleaseBuffers();
     int is3D = (field_0x1e8 >> 3) & 1;
-    if (!UnknownFunction4bd540(&field_0x18, field_0x198, field_0x16a.samplesPerSec, field_0x16a.bitsPerSample,
+    if (!CreateBuffer(&field_0x18, field_0x198, field_0x16a.samplesPerSec, field_0x16a.bitsPerSample,
                                field_0x16a.blockAlign, field_0x16a.channels > 1, is3D, 1, field_0x1ec, 0))
         goto failed;
-    if (is3D && !UnknownFunction4bd6e0(field_0x18, &field_0x1c))
+    if (is3D && !Query3DBuffer(field_0x18, &field_0x1c))
         goto failed;
     return 1;
 failed:
@@ -314,12 +314,12 @@ unsigned __stdcall UnknownPCAudioObject::UnknownThreadProc(void* context) {
                 unsigned long bytes = sound->field_0x198;
                 LeaveCriticalSection(&sound->field_0x48);
                 EnterCriticalSection(&audio->field_0x0c);
-                audio->UnknownFunction4be130(bytes);
+                audio->MakeRoomForSound(bytes);
                 LeaveCriticalSection(&audio->field_0x0c);
                 EnterCriticalSection(&sound->field_0x48);
                 int loaded = 0;
-                if (sound->UnknownFunction4bd4b0()) {
-                    sound->UnknownFunction4bd0c0(&sound->field_0x18);
+                if (sound->CreatePendingBuffer()) {
+                    sound->FillBufferFromFile(&sound->field_0x18);
                     sound->field_0x1f4_bit7 = 0;
                     sound->field_0x1f5_bit0 = 1;
                     sound->field_0x0c = sound->field_0x18;
@@ -328,12 +328,12 @@ unsigned __stdcall UnknownPCAudioObject::UnknownThreadProc(void* context) {
                     sound->field_0x1c = 0;
                     loaded = 1;
                     if (!sound->field_0x1f5_bit1)
-                        sound->UnknownFunction4bbcd0();
+                        sound->Play();
                 }
                 LeaveCriticalSection(&sound->field_0x48);
                 if (loaded) {
                     EnterCriticalSection(&audio->field_0x0c);
-                    audio->UnknownFunction4be0a0(sound, bytes);
+                    audio->RecordLoadedSound(sound, bytes);
                     LeaveCriticalSection(&audio->field_0x0c);
                 }
             }
@@ -352,7 +352,7 @@ stopped:
 // play directly, streamed ones get a new notifier first; deferred ones are
 // queued for the loader. Failures after the lock leave the critical section
 // held (retail behaviour).
-int Sound::UnknownFunction4bc6b0(int restart, unsigned long playFlags, int preferHardware) {
+int Sound::PlayWithOptions(int restart, unsigned long playFlags, int preferHardware) {
     if (!SoundSystem()->field_0x2c_bit0 || !field_0x08 || !field_0x08->field_0x2c_bit0 ||
         field_0x08->field_0x25_bit2)
         return 1;
@@ -362,8 +362,8 @@ int Sound::UnknownFunction4bc6b0(int restart, unsigned long playFlags, int prefe
     if (field_0x1e8 & 2) {
         field_0x1f0 = 1;
     } else if (!(field_0x1e8 & 0x20)) {
-        if (field_0x1f4_bit6 && SoundSystem()->field_0x45c_bit0 &&
-            (long)SoundSystem()->field_0x3fc.freeHw3DAllBuffers > 0)
+        if (field_0x1f4_bit6 && SoundSystem()->allowSoundHardware &&
+            (long)SoundSystem()->soundCaps.freeHw3DAllBuffers > 0)
             field_0x1f0 = playFlags | 2;
         else
             field_0x1f0 = playFlags | 4;
@@ -400,13 +400,13 @@ int Sound::UnknownFunction4bc6b0(int restart, unsigned long playFlags, int prefe
                 if (field_0x3c)
                     delete field_0x3c;
                 field_0x3c = new (__FILE__, 816) UnknownSoundNotifier;
-                if (!field_0x3c || !field_0x3c->UnknownFunction4bb740(this))
+                if (!field_0x3c || !field_0x3c->StartRefillThread(this))
                     goto failed;
                 field_0x44 = field_0x198 / 2;
-                if (!UnknownFunction4bbcd0())
+                if (!Play())
                     return 0;
             }
-        } else if (!UnknownFunction4bbcd0()) {
+        } else if (!Play()) {
             goto failed;
         }
     }
@@ -422,7 +422,7 @@ done:
         }
         LeaveCriticalSection(&field_0x48);
         if (queue)
-            SoundSystem()->field_0x46c->UnknownFunction4bdfc0(this);
+            SoundSystem()->soundMemoryManager->QueueSoundLoad(this);
         EnterCriticalSection(&field_0x48);
         field_0x1f5_bit1 = 0;
         LeaveCriticalSection(&field_0x48);

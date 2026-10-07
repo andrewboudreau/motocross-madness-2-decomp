@@ -8,8 +8,10 @@ literals; TextureMap's sits among `Texmap.cpp`'s. Canonical source:
 provisional.
 
 The texture wraps two DirectDraw 7-style surfaces (`UnknownSurfaceInterface`,
-see `RenderInterfaces.h`): a system-memory copy at +0x70 and the texture
-at +0x74. An object at +0x7c is destroyed through vfwdeco.cpp's
+see `RenderInterfaces.h`): `systemSurface` at +0x70 and `textureSurface`
+at +0x74, with `texturePalette` at +0x78. These are provisional role names;
+their offsets and declaration order are preserved. An object at +0x7c is
+destroyed through vfwdeco.cpp's
 `0x0052d050`.
 
 ## Status

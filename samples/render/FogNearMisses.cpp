@@ -39,7 +39,7 @@ int Fog::UnknownVirtualSlot14()
         if (!TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix)) {
             return 0;
         }
-        if (!drawnByFogOn && TARGET()->field_0x04->field_0xb74_bit2
+        if (!drawnByFogOn && TARGET()->field_0x04->isPowerVR
             && (TARGET()->field_0x34 || TARGET()->fillMode == D3DFILL_WIREFRAME)) {
             UnknownFogVertex vertices[4];
             vertices[0].x = (float)VIEWPORT(0);
@@ -89,7 +89,7 @@ int Fog::UnknownVirtualSlot14()
                 TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGEND, *(int*)&end, 0);
                 TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
                 density = 0.22f;
-                if (TARGET()->field_0x04->field_0xb74_bit2) {
+                if (TARGET()->field_0x04->isPowerVR) {
                     TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
                     TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_EXP, 0);
                     TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);

@@ -53,8 +53,8 @@ public:
     void SaveScreenshot();
     // 0x004c4f80: attaches the display (+0x04), the device GUID (+0x54), the
     // surface (+0x48) and the frame modulus (+0x14); returns the target or 0.
-    RenderTarget* UnknownFunction4c4f80(UnknownDisplay* display, const UnknownGuid* deviceId,
-                                        UnknownSurfaceInterface* surface, int wantZBuffer, int frames);
+    RenderTarget* InitializeRenderTarget(UnknownDisplay* display, const UnknownGuid* deviceId,
+        UnknownSurfaceInterface* surface, int wantZBuffer, int frames);
     // 0x004c5950 (PCGame slot 31): measures texture memory by creating 256x256,
     // then 32x32 surfaces until creation fails; *value gets the bytes.
     int MeasureTextureMemory(int* value);
@@ -65,14 +65,15 @@ public:
 
     // The surface: Blt, Lock, GetSurfaceDesc and GetDC go to it (GameUi.cpp and
     // PCVideoCard.cpp use it under this provisional name).
-    UnknownSurfaceInterface* field_0x48;
+    UnknownSurfaceInterface* renderSurface;    // +0x48
     UnknownSurfaceInterface* zbuffer;    // created with DDSCAPS_ZBUFFER and attached to the surface
     UnknownRenderInterface* device;      // created by the Direct3D object's method 4 (CreateDevice)
     UnknownGuid deviceGuid;             // Direct3D device GUID (PCGame +0x2f8); cleared by the constructor
     unsigned char field_0x64[0x164 - 0x64];
     // 0x164..0x250: the device description GetCaps fills (D3DDEVICEDESC7
     // layout: dwDevCaps, dpcLineCaps at +0x04, dpcTriCaps at +0x3c).
-    unsigned int field_0x164;            // dwDevCaps (0x4000 SEPARATETEXTUREMEMORIES; KrustyUI and PCGame read it)
+    // dwDevCaps: 0x4000 SEPARATETEXTUREMEMORIES; KrustyUI and PCGame read it.
+    unsigned int deviceCaps;                   // +0x164
     unsigned char field_0x168[0x1a8 - 0x168];
     unsigned int triRasterCaps;          // dpcTriCaps.dwRasterCaps: dither, fog vertex/table/range, antialias
     unsigned char field_0x1ac[0x1b8 - 0x1ac];

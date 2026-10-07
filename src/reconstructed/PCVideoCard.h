@@ -47,17 +47,17 @@ void UnknownFunction52ff20();
 
 // 0x004c9600: enumerates the DirectDraw devices for `window` into
 // g_UnknownDisplays68a754; returns their count.
-int UnknownFunction4c9600(void* window);
+int EnumerateDisplays(void* window);
 
 // 0x004ca9f0: copies the target's surface into the texture; 0 on failure.
-int UnknownFunction4ca9f0(PCRenderTarget* target, TextureMap* texture);
+int CopyRenderSurfaceToTexture(PCRenderTarget* target, TextureMap* texture);
 
 // 0x004cb330: the mean absolute channel difference (1/256 units) of two
 // 16-bit textures, or -1 when one cannot be locked (near miss,
 // samples/render/PCVideoCardNearMisses.cpp).
-float UnknownFunction4cb330(TextureMap* first, TextureMap* second);
+float MeanTextureChannelDifference(TextureMap* first, TextureMap* second);
 
 // 0x004caf70: one PartialTexBlt pass over `area` (see PCVideoCard.cpp).
-int UnknownFunction4caf70(PCRenderTarget* target, UnknownRect* area, PCTextureMap* image,
-                          PCTextureMap* expected, PCTextureMap* rendered, UnknownDisplay* display,
-                          int present);
+int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextureMap* image,
+    PCTextureMap* expected, PCTextureMap* rendered, UnknownDisplay* display,
+    int present);

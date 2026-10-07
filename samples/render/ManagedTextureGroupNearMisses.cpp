@@ -634,7 +634,7 @@ struct UnknownBltEffects {
 // its use, planned level and Un/Hi/Lo state) and an outline on its page,
 // in mode 2 the selected page with every texture copied into its region.
 int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
-    UnknownSurfaceInterface* surface = target->field_0x48;
+    UnknownSurfaceInterface* surface = target->renderSurface;
     if (field_0x40->field_0x3c != this)
         return 0;
     if (!g_TrackGame->field_0x2d4_bit2)
@@ -671,15 +671,15 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
                     UnknownFunction4d1d20(bits + x * size + 20 * pitch, source, selected->field_0x14,
                                           selected->field_0x18, pitch / size, sourcePitch / sourceSize,
                                           target->field_0x28, selected->field_0x20, 0, selected->field_0x2c, 0, 0);
-                    selected->field_0x70->Unlock(0);
+                    selected->systemSurface->Unlock(0);
                 }
                 target->UnknownVirtualSlot5(0);
             }
             _snprintf(text, sizeof(text), "%d %0.2f->%d,%s", field_0x1c8 + 1, selected->field_0xa4,
                       selected->field_0xa8, state);
-            if (!target->field_0x48->GetDC(&dc)) {
+            if (!target->renderSurface->GetDC(&dc)) {
                 TextOutA(dc, x, 20, text, strlen(text));
-                target->field_0x48->ReleaseDC(dc);
+                target->renderSurface->ReleaseDC(dc);
             }
         }
     }
@@ -724,7 +724,7 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
             int top = (int)(page->field_0x18 * region->field_0x20) + 20;
             int side = (int)(managed->field_0x84 * 256.0f);
             int levelSide = managed->field_0x14;
-            UnknownSurfaceInterface* level = managed->field_0x70;
+            UnknownSurfaceInterface* level = managed->systemSurface;
             UnknownSurfaceDesc desc;
             memset(&desc, 0, sizeof(desc));
             desc.size = sizeof(desc);

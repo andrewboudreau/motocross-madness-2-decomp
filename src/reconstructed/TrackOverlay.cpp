@@ -566,7 +566,7 @@ int StatsOverlay::UnknownFunction519ef0()
 draw:
     RestoreRect(&sourceRect);
     PCTextureMap* texture = (PCTextureMap*)sharedTexture;
-    if (texture->field_0x70->GetDC(&dc) != 0)
+    if (texture->systemSurface->GetDC(&dc) != 0)
         goto fail;
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
@@ -581,7 +581,7 @@ draw:
         strcpy(field_0x1b0[i], rowText[i]);
     }
     SelectObject(dc, font);
-    if (texture->field_0x70->ReleaseDC(dc) != 0) {
+    if (texture->systemSurface->ReleaseDC(dc) != 0) {
 fail:
         return 0;
     }
@@ -670,7 +670,7 @@ int StatsOverlay::DrawRacePanel()
 draw:
     RestoreRect(&sourceRect);
     PCTextureMap* texture = (PCTextureMap*)sharedTexture;
-    if (texture->field_0x70->GetDC(&dc) != 0)
+    if (texture->systemSurface->GetDC(&dc) != 0)
         goto fail;
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
@@ -683,7 +683,7 @@ draw:
         strcpy(field_0x1b0[i], rowText[i]);
     }
     SelectObject(dc, font);
-    if (texture->field_0x70->ReleaseDC(dc) != 0) {
+    if (texture->systemSurface->ReleaseDC(dc) != 0) {
 fail:
         return 0;
     }
@@ -765,7 +765,7 @@ int StatsOverlay::DrawTagStandings()
 draw:
     RestoreRect(&sourceRect);
     PCTextureMap* texture = (PCTextureMap*)sharedTexture;
-    if (texture->field_0x70->GetDC(&dc) != 0)
+    if (texture->systemSurface->GetDC(&dc) != 0)
         goto fail;
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
@@ -776,7 +776,7 @@ draw:
         strcpy(field_0x1b0[i], rowText[i]);
     }
     SelectObject(dc, font);
-    if (texture->field_0x70->ReleaseDC(dc) != 0) {
+    if (texture->systemSurface->ReleaseDC(dc) != 0) {
 fail:
         return 0;
     }
@@ -823,7 +823,7 @@ int DropTextOverlay::UnknownVirtualSlot15()
     if (visible) {
         GameObject::UnknownVirtualSlot15();
         void* dc;
-        if (((PCRenderTarget*)field_0x18)->field_0x48->GetDC(&dc) == 0) {
+        if (((PCRenderTarget*)field_0x18)->renderSurface->GetDC(&dc) == 0) {
             SetBkColor(dc, 1);
             SetBkMode(dc, 1);
             void* font = SelectObject(dc, textFont);
@@ -832,7 +832,7 @@ int DropTextOverlay::UnknownVirtualSlot15()
             SetTextColor(dc, 0xff00);
             TextOutA(dc, textX, textY, caption, strlen(caption));
             SelectObject(dc, font);
-            if (((PCRenderTarget*)field_0x18)->field_0x48->ReleaseDC(dc) != 0)
+            if (((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc) != 0)
                 return 0;
         } else {
             return 0;
@@ -928,7 +928,7 @@ int TextQueueOverlay::UnknownVirtualSlot15()
     GameObject::UnknownVirtualSlot15();
     if (field_0x50) {
         void* dc;
-        if (((PCRenderTarget*)field_0x18)->field_0x48->GetDC(&dc) == 0) {
+        if (((PCRenderTarget*)field_0x18)->renderSurface->GetDC(&dc) == 0) {
             SetBkColor(dc, 1);
             SetBkMode(dc, 1);
             void* font = SelectObject(dc, field_0x2c);
@@ -937,7 +937,7 @@ int TextQueueOverlay::UnknownVirtualSlot15()
             SetTextColor(dc, field_0x54);
             DrawTextA(dc, field_0x50->field_0x00, strlen(field_0x50->field_0x00), &field_0x30, 0x124);
             SelectObject(dc, font);
-            if (((PCRenderTarget*)field_0x18)->field_0x48->ReleaseDC(dc) != 0)
+            if (((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc) != 0)
                 return 0;
         } else {
             return 0;
@@ -1481,7 +1481,7 @@ int ChatOverlay::RedrawChat()
     char text[0x80];
     RestoreRect(&sourceRect);
     PCTextureMap* texture = (PCTextureMap*)sharedTexture;
-    if (texture->field_0x70->GetDC(&dc) != 0)
+    if (texture->systemSurface->GetDC(&dc) != 0)
         goto fail;
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
@@ -1517,10 +1517,10 @@ int ChatOverlay::RedrawChat()
             DrawTextA(dc, text, strlen(text), &rect, 0x124);
     }
     SelectObject(dc, font);
-    if (texture->field_0x70->ReleaseDC(dc) != 0)
+    if (texture->systemSurface->ReleaseDC(dc) != 0)
         goto fail;
     TintRows(0, rows, 0xfff0);
-    if (texture->field_0x70->GetDC(&dc) != 0)
+    if (texture->systemSurface->GetDC(&dc) != 0)
         goto fail;
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
@@ -1534,7 +1534,7 @@ int ChatOverlay::RedrawChat()
             DrawTextA(dc, text, strlen(text), &rect, 0x124);
     }
     SelectObject(dc, font);
-    if (texture->field_0x70->ReleaseDC(dc) != 0) {
+    if (texture->systemSurface->ReleaseDC(dc) != 0) {
 fail:
         return 0;
     }
@@ -1690,7 +1690,7 @@ void ChatOverlay::UnknownFunction51e910(int index)
     }
     PCTextureMap* texture = (PCTextureMap*)sharedTexture;
     void* dc;
-    if (texture->field_0x70->GetDC(&dc) == 0) {
+    if (texture->systemSurface->GetDC(&dc) == 0) {
         SetBkColor(dc, 1);
         SetBkMode(dc, 1);
         SetTextColor(dc, 0xffffff);
@@ -1700,7 +1700,7 @@ void ChatOverlay::UnknownFunction51e910(int index)
         } else {
             DrawNameTag(dc, index);
         }
-        texture->field_0x70->ReleaseDC(dc);
+        texture->systemSurface->ReleaseDC(dc);
     }
     TintRows(0x89, 0x46, 0xf000 | ((level & ~0xf) << 4) | (level & ~0xf) | (level >> 4));
     overlayTexture->UnknownVirtualSlot9(0, -1);

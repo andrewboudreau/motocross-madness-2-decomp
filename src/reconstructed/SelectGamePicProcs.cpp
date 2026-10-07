@@ -516,20 +516,20 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         field_0x7f64 = 0;
         field_0x80d0[0] = 0;
         UIMultiState* tab = static_cast<UIMultiState*>(FindControl("EventTab", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13e3);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13e3);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13e3);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13e3);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("BikeRiderTab", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13e4);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13e4);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13e4);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13e4);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("RaceInfoTab", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13e5);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13e5);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x13e5);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x13e5);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("OptionsTab", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1468);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1468);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1468);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1468);
         tab->SetTextAlign(0x22);
         memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.field_0x2bd0,
                sizeof(g_TrackGame->mode.field_0x27f8));
@@ -1061,14 +1061,14 @@ void MPEventDlg::ShowHostSettings() {
         g_TrackGame->mode.field_0x10ec = 0;
     if (g_TrackGame->mode.field_0x27f8.field_0x04 != 0 && g_TrackGame->mode.field_0x27f8.field_0x04 != 4) {
         UIControl* label = FindControl("LapsLabel", 0xc);
-        label->SetTextFromResource(g_TrackGame->field_0x420, 0x929);
+        label->SetTextFromResource(g_TrackGame->resourceInstance, 0x929);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
         laps->RemoveAllRows();
         UnknownFunction451380(g_TrackGame->mode.field_0x27f8.field_0x20, text);
         laps->AddRow(text, g_TrackGame->mode.field_0x27f8.field_0x20, 0);
     } else {
         UIControl* label = FindControl("LapsLabel", 0xc);
-        label->SetTextFromResource(g_TrackGame->field_0x420, 0x92f);
+        label->SetTextFromResource(g_TrackGame->resourceInstance, 0x92f);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
         laps->RemoveAllRows();
         UnknownFunction518640(text, g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f);
@@ -1253,7 +1253,7 @@ void MPEventDlg::UnknownFunction4f69d0() {
             racesLeft->Show(0, 1);
             racesRight->Show(0, 1);
         }
-        racesLabel->SetTextFromResource(g_TrackGame->field_0x420, 0x92b);
+        racesLabel->SetTextFromResource(g_TrackGame->resourceInstance, 0x92b);
         sprintf(text, "%d/%d", g_TrackGame->eventManager->field_0x48 + 1, g_TrackGame->mode.field_0x27f8.field_0x0c + 1);
         races->RemoveAllRows();
         races->AddRow(text, 0, 0);
@@ -1265,7 +1265,7 @@ void MPEventDlg::UnknownFunction4f69d0() {
             racesLeft->Show(1, 1);
             racesRight->Show(1, 1);
         }
-        racesLabel->SetTextFromResource(g_TrackGame->field_0x420, 0x92a);
+        racesLabel->SetTextFromResource(g_TrackGame->resourceInstance, 0x92a);
     }
 }
 
@@ -1282,7 +1282,7 @@ void MPEventDlg::ApplyEventType() {
     UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
     FindControl("RacesListBox", 3);
     UIControl* label = FindControl("LapsLabel", 0xc);
-    label->SetTextFromResource(g_TrackGame->field_0x420, 0x929);
+    label->SetTextFromResource(g_TrackGame->resourceInstance, 0x929);
     if (type != 4) {
         FindControl("OpponentsControlBox", 5)->Show(1, 1);
         FindControl("ChkTagBall", 2)->Show(0, 1);
@@ -1300,7 +1300,7 @@ void MPEventDlg::ApplyEventType() {
         }
         laps->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x20);
     } else {
-        label->SetTextFromResource(g_TrackGame->field_0x420, 0x92f);
+        label->SetTextFromResource(g_TrackGame->resourceInstance, 0x92f);
         laps->RemoveAllRows();
         for (int i = 2; i <= 5; i++) {
             UnknownFunction518640(text, i * 60.0f);

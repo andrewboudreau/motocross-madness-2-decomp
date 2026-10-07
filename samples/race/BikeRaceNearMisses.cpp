@@ -1079,10 +1079,10 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     AppendChild((GameObject*)field_0x044, -1);
     g_MemTagStack->Push("BikeRace");
     if (g_TrackGame->mode.field_0xa88) {
-        g_TrackGame->controlInterface->activeJoystick->UnknownMethod4c26d0(0);
+        g_TrackGame->controlInterface->activeJoystick->SetAcquired(0);
         g_TrackGame->controlInterface->activeJoystick->UnknownVirtualSlot5(g_TrackGame->mode.field_0xa88);
         localRacer->UnknownRacerVirtualSlot93();
-        g_TrackGame->controlInterface->activeJoystick->UnknownMethod4c26d0(1);
+        g_TrackGame->controlInterface->activeJoystick->SetAcquired(1);
     }
     if (g_TrackGame->mode.field_0x27f8.field_0x04)
         BuildStatusList(&field_0x0c4, (UnknownKrustyBikeView*)this);

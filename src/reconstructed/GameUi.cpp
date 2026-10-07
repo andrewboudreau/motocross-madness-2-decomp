@@ -543,8 +543,8 @@ void UIControl::UnknownVirtualSlot32(int value) {
 // 0x00472670
 void UIControl::UnknownVirtualSlot58(int index, int a) {
     if (sounds[index]) {
-        sounds[index]->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-        sounds[index]->UnknownFunction4bc6b0(1, 0, 0);
+        sounds[index]->SetVolume(ownerGui->field_0x34c, 0);
+        sounds[index]->PlayWithOptions(1, 0, 0);
     }
 }
 
@@ -926,7 +926,7 @@ UIAnim::~UIAnim() {
 TextureMap* UIAnim::AdvancePastSounds() {
     UIFrame* frame = Advance();
     while (frame->isSound == 1) {
-        frame->frameSound->UnknownFunction4bc6b0(1, 0, 0);
+        frame->frameSound->PlayWithOptions(1, 0, 0);
         frame = Advance();
     }
     return frame->frameTexture;
@@ -1981,14 +1981,14 @@ void UIControl::SetText(const char* text) {
             if (!textLines) {
                 field_0xd0 = textExtent[0] = strlen(controlText);
                 HDC dc;
-                if (!g_TrackGame->PCTarget()->field_0x48->GetDC((void**)&dc)) {
+                if (!g_TrackGame->PCTarget()->renderSurface->GetDC((void**)&dc)) {
                     HGDIOBJ font =
                         (HGDIOBJ)(fontHandle ? fontHandle : (ownerDialog ? (int)ownerDialog->dialogFont : 0));
                     HGDIOBJ old = SelectObject(dc, font);
                     SIZE size;
                     GetTextExtentPoint32A(dc, controlText, field_0xd0, &size);
                     SelectObject(dc, old);
-                    g_TrackGame->PCTarget()->field_0x48->ReleaseDC(dc);
+                    g_TrackGame->PCTarget()->renderSurface->ReleaseDC(dc);
                     textExtent[1] = size.cx;
                 } else {
                     textExtent[1] = 0;
@@ -2460,7 +2460,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
                 stateTable[index].textExtent[0] = strlen(stateTable[index].text);
                 stateTable[index].field_0x0c = stateTable[index].textExtent[0];
                 HDC dc;
-                if (!g_TrackGame->PCTarget()->field_0x48->GetDC((void**)&dc)) {
+                if (!g_TrackGame->PCTarget()->renderSurface->GetDC((void**)&dc)) {
                     HGDIOBJ font =
                         (HGDIOBJ)(fontHandle ? fontHandle : (ownerDialog ? (int)ownerDialog->dialogFont : 0));
                     HGDIOBJ old = SelectObject(dc, font);
@@ -2468,7 +2468,7 @@ void UIMultiState::SetStateText(int index, const char* text) {
                     GetTextExtentPoint32A(dc, stateTable[index].text,
                                           stateTable[index].field_0x0c, &size);
                     SelectObject(dc, old);
-                    g_TrackGame->PCTarget()->field_0x48->ReleaseDC(dc);
+                    g_TrackGame->PCTarget()->renderSurface->ReleaseDC(dc);
                     stateTable[index].textExtent[1] = size.cx;
                 } else {
                     stateTable[index].textExtent[1] = 0;
@@ -2793,13 +2793,13 @@ void UIEditBox::SetEditText(char* text) {
     textLength = length;
     field_0xd0 = length;
     HDC dc;
-    if (!g_TrackGame->PCTarget()->field_0x48->GetDC((void**)&dc)) {
+    if (!g_TrackGame->PCTarget()->renderSurface->GetDC((void**)&dc)) {
         HGDIOBJ font = (HGDIOBJ)(fontHandle ? fontHandle : (ownerDialog ? (int)ownerDialog->dialogFont : 0));
         HGDIOBJ old = SelectObject(dc, font);
         SIZE size;
         GetTextExtentPoint32A(dc, controlText, field_0xd0, &size);
         SelectObject(dc, old);
-        g_TrackGame->PCTarget()->field_0x48->ReleaseDC(dc);
+        g_TrackGame->PCTarget()->renderSurface->ReleaseDC(dc);
         textExtent[1] = size.cx;
         textWidth = size.cx;
     } else {
@@ -2858,7 +2858,7 @@ void UIDialog::EndControlDraw(void* dc) {
     if (dialog->field_0x7f04)
         SelectObject((HDC)dc, (HGDIOBJ)dialog->field_0x7f04);
     if (!dialog->dialogBackground && dc)
-        ((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->ReleaseDC(dc);
+        ((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
     if (dialog->field_0x7f00)
         DeleteObject((HGDIOBJ)dialog->field_0x7f00);
 }
@@ -3056,7 +3056,7 @@ int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* c
                 dialog->dialogBackground->UnknownFunction4049d0(dc, rect, -1, 0, &frames, a, &g_UnknownGlobal65b5f0);
         }
     } else {
-        ((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->GetDC(dc);
+        ((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->GetDC(dc);
         g_UnknownGlobal65b5ec = 1;
     }
     if (*dc && control) {
@@ -3088,8 +3088,8 @@ int UIControl::UnknownVirtualSlot46() {
         fxAnimIn->Rewind();
         field_0x164 = 1;
         if (fxSoundIn) {
-            fxSoundIn->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-            fxSoundIn->UnknownFunction4bc6b0(1, 0, 0);
+            fxSoundIn->SetVolume(ownerGui->field_0x34c, 0);
+            fxSoundIn->PlayWithOptions(1, 0, 0);
         }
     }
     if (field_0x164 == 1 && fxAnimIn->currentFrame <= fxAnimIn->frameCount - 1) {
@@ -3114,8 +3114,8 @@ int UIControl::UnknownVirtualSlot47() {
         }
         fxAnimOut->Rewind();
         if (fxSoundOut) {
-            fxSoundOut->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-            fxSoundOut->UnknownFunction4bc6b0(1, 0, 0);
+            fxSoundOut->SetVolume(ownerGui->field_0x34c, 0);
+            fxSoundOut->PlayWithOptions(1, 0, 0);
         }
     }
     if ((field_0x164 == 1 && fxAnimOut->currentFrame < fxAnimOut->frameCount - 1) ||
@@ -3141,8 +3141,8 @@ int UIControl::UnknownVirtualSlot42() {
         field_0x80 = (float)(left - field_0x3c[2] - 1);
         field_0x90 = ((float)left - field_0x80) / g_UnknownGlobal65b610;
         if (slideSound) {
-            slideSound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-            slideSound->UnknownFunction4bc6b0(1, 0, 0);
+            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
         field_0x80 += field_0x90;
@@ -3182,8 +3182,8 @@ int UIControl::UnknownVirtualSlot44() {
         field_0x84 = (float)(top - field_0x3c[3]);
         field_0x94 = ((float)top - field_0x84) / g_UnknownGlobal65b614;
         if (slideSound) {
-            slideSound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-            slideSound->UnknownFunction4bc6b0(1, 0, 0);
+            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
         field_0x84 += field_0x94;
@@ -3222,8 +3222,8 @@ int UIControl::UnknownVirtualSlot43() {
         field_0x80 = (float)ownerDialog->screenWidth;
         field_0x90 = ((float)field_0x3c[0] - field_0x80) / g_UnknownGlobal65b618;
         if (slideSound) {
-            slideSound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-            slideSound->UnknownFunction4bc6b0(1, 0, 0);
+            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
         field_0x80 += field_0x90;
@@ -3262,8 +3262,8 @@ int UIControl::UnknownVirtualSlot45() {
         field_0x84 = (float)ownerDialog->screenHeight;
         field_0x94 = ((float)field_0x3c[1] - field_0x84) / g_UnknownGlobal65b61c;
         if (slideSound) {
-            slideSound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-            slideSound->UnknownFunction4bc6b0(1, 0, 0);
+            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->PlayWithOptions(1, 0, 0);
         }
     } else {
         field_0x84 += field_0x94;
@@ -3536,7 +3536,7 @@ UnknownGameUiDialog* UnknownGameUiDialog::UnknownVirtualSlot27(void* target, Cam
 // codes. `size` receives the visible length and the total width.
 char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void* table, int* size) {
     UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
-    if (g_TrackGame->field_0x538)
+    if (g_TrackGame->imeLibrary)
         return 0;
     if (!strchr(text, '~') && (!strchr(text, '|') || !table))
         return 0;
@@ -3603,11 +3603,11 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
                 last->field_0x08 = mark - start;
             else
                 last->field_0x08 = run->field_0x00 - start - 2;
-            if (!((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->GetDC(&dc)) {
+            if (!((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
                 HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialog->dialogFont));
                 GetTextExtentPoint32A((HDC)dc, last->field_0x00, last->field_0x08, &extent);
                 SelectObject((HDC)dc, old);
-                ((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->ReleaseDC(dc);
+                ((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
             }
             last->field_0x10 = extent.cx;
         }
@@ -3620,11 +3620,11 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
             runs[count - 1].field_0x08 = mark - runs[count - 1].field_0x00;
         else
             runs[count - 1].field_0x08 = length - (runs[count - 1].field_0x00 - text);
-        if (!((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->GetDC(&dc)) {
+        if (!((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
             HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialog->dialogFont));
             GetTextExtentPoint32A((HDC)dc, runs[count - 1].field_0x00, runs[count - 1].field_0x08, &extent);
             SelectObject((HDC)dc, old);
-            ((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->ReleaseDC(dc);
+            ((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
             runs[count - 1].field_0x10 = extent.cx;
         } else {
             runs[count - 1].field_0x10 = 0;
@@ -3711,8 +3711,8 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
     if (!UIControl::UnknownVirtualSlot21(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (field_0x204_sound) {
-            field_0x204_sound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
-            field_0x204_sound->UnknownFunction4bc6b0(1, 0, 0);
+            field_0x204_sound->SetVolume(ownerGui->field_0x34c, 0);
+            field_0x204_sound->PlayWithOptions(1, 0, 0);
         }
         switch (value) {
         case VK_HOME:
@@ -3752,7 +3752,7 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
         }
         controlText[field_0xd0] = 0;
         void* dc;
-        if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->GetDC(&dc)) {
+        if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
             HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(fontHandle ? fontHandle : (int)ownerDialog->dialogFont));
             SIZE size;
             GetTextExtentPoint32A((HDC)dc, controlText, field_0xd0, &size);
@@ -3760,7 +3760,7 @@ int UIEditBox::UnknownVirtualSlot21(int value) {
             GetTextExtentPoint32A((HDC)dc, controlText, textLength, &size);
             textWidth = size.cx;
             SelectObject((HDC)dc, font);
-            ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->ReleaseDC(dc);
+            ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
         }
         UnknownVirtualSlot50();
         return 1;
@@ -4339,7 +4339,7 @@ int UIVideoStatic::UnknownVirtualSlot40() {
         UnknownVirtualSlot50();
     }
     UnknownVirtualSlot63((CameraRect*)field_0x2c, &rect);
-    return ((PCRenderTarget*)field_0x18)->field_0x48->Blt(&rect, field_0x1ec->field_0x2c, field_0x1f0,
+    return ((PCRenderTarget*)field_0x18)->renderSurface->Blt(&rect, field_0x1ec->field_0x2c, field_0x1f0,
                                                                       0x1000000, 0) == 0;
 }
 

@@ -4,6 +4,23 @@
 
 #include "InputDevice.h"
 
+// DirectInput constants used by the PC device readers. Property identifiers
+// keep the decoded int representation used by the interface shim below.
+enum DIPropertyId { DIPROP_BUFFERSIZE = 1, DIPROP_RANGE = 4, DIPROP_AUTOCENTER = 9 };
+enum DIPropertyAddressing { DIPH_DEVICE = 0, DIPH_BYOFFSET = 1, DIPH_BYID = 2 };
+enum DICooperativeLevelFlags { DISCL_EXCLUSIVE = 1, DISCL_NONEXCLUSIVE = 2, DISCL_FOREGROUND = 4 };
+enum DIEnumerationFlags { DIEDFL_ATTACHEDONLY = 1 };
+enum DIObjectTypeFlags { DIDFT_AXIS = 3 };
+enum DIDeviceType { DIDEVTYPE_JOYSTICK = 4 };
+enum DIDataFlags { DIGDD_PEEK = 1 };
+enum DIKeyCode {
+    DIK_LCONTROL = 0x1d, DIK_GRAVE = 0x29, DIK_LSHIFT = 0x2a,
+    DIK_RSHIFT = 0x36, DIK_LMENU = 0x38, DIK_NUMLOCK = 0x45,
+    DIK_RCONTROL = 0x9d, DIK_RMENU = 0xb8
+};
+#define DIERR_INPUTLOST ((long)0x8007001e)
+#define DIERR_NOTACQUIRED ((long)0x8007000c)
+
 // COM-style device at PCInputDevice+0x25c (`this` on the stack). Method 8 is
 // called before Release when the device is destroyed, consistent with
 // IDirectInputDevice::Unacquire, and PCJoystickDevice uses method 22 like
@@ -113,7 +130,7 @@ extern "C" const UnknownGuid GUID_Friction;       // 0x00556c30
 extern "C" const UnknownGuid GUID_CustomForce;    // 0x00556c40
 
 // cdecl 0x004beef0: writes a name for a known effect GUID; nonzero if known.
-int UnknownFunction4beef0(UnknownGuid guid, char* name);
+int GetForceFeedbackEffectName(UnknownGuid guid, char* name);
 
 // cdecl 0x004bf6a0: reports a failed result with the caller's __FILE__ and
 // __LINE__ (it maps DirectX error codes to text).
@@ -223,12 +240,12 @@ public:
     virtual ~PCInputDevice();       // 0x004c2650 (deleting wrapper 0x004c2630)
 
     // 0x004c26d0: interface method 7 when nonzero, else method 8; 1 on success.
-    int UnknownMethod4c26d0(int acquire);
+    int SetAcquired(int acquire);
     // 0x004c2710: sets a one-value property through interface method 6.
-    int UnknownMethod4c2710(int property, unsigned long object, unsigned long how,
-                            unsigned long data);
+    int SetDwordProperty(int property, unsigned long object, unsigned long how,
+        unsigned long data);
 
 protected:
-    UnknownDeviceInstance deviceInfo;   // +0x18; cleared by the constructor
-    UnknownInputInterface* device;      // +0x25c
+    UnknownDeviceInstance deviceInfo;          // +0x18; cleared by the constructor
+    UnknownInputInterface* device;             // +0x25c
 };

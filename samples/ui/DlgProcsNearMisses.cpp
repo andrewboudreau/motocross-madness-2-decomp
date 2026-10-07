@@ -652,7 +652,7 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     g_TrackGame->mode.field_0x27f8.field_0x0c + 1);
             text->SetText(title);
             if (g_TrackGame->eventManager->field_0x48 > g_TrackGame->mode.field_0x27f8.field_0x0c) {
-                text->SetTextFromResource(g_TrackGame->field_0x420, 0x93a);
+                text->SetTextFromResource(g_TrackGame->resourceInstance, 0x93a);
                 g_TrackGame->mode.field_0x10ec = 0;
                 g_TrackGame->ui->field_0x3c = 0x10e;
             }
@@ -770,7 +770,7 @@ void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 g_TrackGame->mode.field_0x27f8.field_0x0c + 1);
         text->SetText(title);
         if (g_TrackGame->eventManager->field_0x48 > g_TrackGame->mode.field_0x27f8.field_0x0c) {
-            text->SetTextFromResource(g_TrackGame->field_0x420, 0x93a);
+            text->SetTextFromResource(g_TrackGame->resourceInstance, 0x93a);
             g_TrackGame->mode.field_0x10ec = 0;
             g_TrackGame->ui->field_0x3c = 0x10e;
         }

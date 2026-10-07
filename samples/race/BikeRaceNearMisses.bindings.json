@@ -244,7 +244,7 @@
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction521cd0@TrackGame@@QAEHXZ": "0x00521cd0",
   "?Load@UnknownVcrFile@@QAEXPAD0@Z": "0x00524b80",
-  "?UnknownMethod4c26d0@PCInputDevice@@QAEHH@Z": "0x004c26d0",
+  "?SetAcquired@PCInputDevice@@QAEHH@Z": "0x004c26d0",
   "?UnknownVirtualSlot10@BikeRace@@UAEHM@Z": "0x0041d2b0",
   "?UnknownVirtualSlot10@BikeRace@@UAEHM@Z$ehhandler": "0x00549c94",
   "?UnknownVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",

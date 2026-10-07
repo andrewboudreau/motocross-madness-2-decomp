@@ -69,7 +69,7 @@ static inline int UnknownFileExists(const char* path)
 // Sets `control`'s text from string resource `id`.
 static inline void UnknownSetText(UIControl* control, int id)
 {
-    control->SetTextFromResource(g_TrackGame->field_0x420, id);
+    control->SetTextFromResource(g_TrackGame->resourceInstance, id);
 }
 
 // 0x004d4b20
@@ -352,17 +352,17 @@ void PCCentralDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         field_0x7f5c = 0;
         field_0x7f60 = 0;
         UIRadioButton* tab = static_cast<UIRadioButton*>(FindControl("TabNext", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1446);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1446);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1446);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1446);
         tab->SetTextAlign(0x22);
         tab->SelectInGroup(0);
         tab = static_cast<UIRadioButton*>(FindControl("TabBikeRider", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1447);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1447);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1447);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1447);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIRadioButton*>(FindControl("TabStandings", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1448);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1448);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1448);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1448);
         tab->SetTextAlign(0x22);
         static_cast<UIRadioButton*>(FindControl("TabNext", 4))->SelectInGroup(0);
         OpenPage(0);
@@ -693,13 +693,13 @@ void PCFailedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
         UIControl* description = FindControl("TxtDescription", 12);
         description->field_0x1e8 = 1;
-        description->SetTextFromResource(g_TrackGame->field_0x420, 0x1464);
+        description->SetTextFromResource(g_TrackGame->resourceInstance, 0x1464);
         label = FindControl("TitleText", 12);
-        label->SetTextFromResource(g_TrackGame->field_0x420, 0x1467);
+        label->SetTextFromResource(g_TrackGame->resourceInstance, 0x1467);
         label = FindControl("ButDecline", 1);
         label->Show(0, 1);
         label = FindControl("ButAccept", 1);
-        label->SetTextFromResource(g_TrackGame->field_0x420, 0x144e);
+        label->SetTextFromResource(g_TrackGame->resourceInstance, 0x144e);
         UIControl* picture = FindControl("Pic", 5);
         picture->SetImage(0, FindSectionObject("FailScreen"));
         break;

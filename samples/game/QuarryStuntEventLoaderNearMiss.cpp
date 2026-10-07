@@ -350,17 +350,17 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             modelTextures.field_0x14 = 1;
         }
     } else {
-        int videoMemory = ((PCRenderTarget*)field_0x18)->field_0x04->field_0x54;
-        sprintf(key, "DriverInfo\\%s\\VideoMemoryMB", ((PCRenderTarget*)field_0x18)->field_0x04->field_0x4bc);
+        int videoMemory = ((PCRenderTarget*)field_0x18)->field_0x04->totalVideoMemory;
+        sprintf(key, "DriverInfo\\%s\\VideoMemoryMB", ((PCRenderTarget*)field_0x18)->field_0x04->driverGuidText);
         int megabytes = g_TrackGame->GetRegistryInt(key, -1);
         forced = g_TrackGame->mode.field_0x195c[0];
         if (megabytes != -1)
             videoMemory = megabytes << 20;
         PCRenderTarget* target = (PCRenderTarget*)field_0x18;
         int available = videoMemory - FrameBufferBytes(target);
-        if (g_TrackGame->field_0x424.platformId != 2 && !(target->field_0x04->field_0x1b8 & 0x400)) {
+        if (g_TrackGame->osVersion.platformId != 2 && !(target->field_0x04->driverCaps & 0x400)) {
             available = videoMemory - 0x400000;
-            if (!(target->field_0x164 & 0x4000))
+            if (!(target->deviceCaps & 0x4000))
                 available = videoMemory - 0x200000;
         }
         terrainBytes = UnknownFunction4e04a0((int)terrainWidth);
@@ -371,7 +371,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         terrainTextures.field_0x14 = 0;
         skyTextures.field_0x14 = 0;
         modelTextures.field_0x14 = 0;
-        if (((UnknownDisplay*)g_TrackGame->display)->field_0x9f0) {
+        if (((UnknownDisplay*)g_TrackGame->display)->isAGP) {
             g_TrackGame->field_0x2d5_bit2 = 0;
             if (available - needed <= 0) {
                 if (forced) {

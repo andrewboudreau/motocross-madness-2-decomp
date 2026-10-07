@@ -126,7 +126,7 @@ RaceSound::~RaceSound() {
             DebugFree(engineChannels[i].sampleBuffer, __FILE__, 177);
         engineChannels[i].sampleBuffer = 0;
     }
-    SoundSystem()->UnknownFunction4be9b0(-10000);
+    SoundSystem()->SetPrimaryVolume(-10000);
     Release();
 }
 
@@ -161,7 +161,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     field_0x48 = new (__FILE__, 216) SoundGroup(1);
     AppendChild(field_0x48, -1);
     if (SoundSystem())
-        SoundSystem()->UnknownFunction4be8b0();
+        SoundSystem()->FormatSoundCapsReport();
 
     field_0x45c[0] = 0;
     field_0x45c[1] = 0;
@@ -438,7 +438,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     field_0x1204 = new (__FILE__, 589) Sound(field_0x44, 1);
     LoadSound(field_0x1204, "Waypoint.wav", 1, 3);
     if (SoundSystem())
-        SoundSystem()->UnknownFunction4be8b0();
+        SoundSystem()->FormatSoundCapsReport();
     return this;
 }
 
@@ -493,29 +493,29 @@ void RaceSound::AssignChannels() {
     }
     channelsInUse = count;
 
-    SoundSystem()->UnknownFunction4beba0(0.3048f);
-    SoundSystem()->UnknownFunction4bebd0(1.0f);
-    SoundSystem()->UnknownFunction4becd0(1.0f);
-    ownEngine->UnknownFunction4bd960(10.0f, 500.0f, 0);
+    SoundSystem()->SetListenerDistanceFactor(0.3048f);
+    SoundSystem()->SetListenerDopplerFactor(1.0f);
+    SoundSystem()->SetListenerRolloffFactor(1.0f);
+    ownEngine->Set3DDistanceRange(10.0f, 500.0f, 0);
 
     volume = (g_TrackGame->mode.field_0xa40 * 0.01f) * 2500.0f - 2500.0f;
     if (volume > 0.0f)
         volume = 0.0f;
     else if (volume == -2500.0f)
         volume = -10000.0f;
-    SoundSystem()->UnknownFunction4be9b0((long)volume);
+    SoundSystem()->SetPrimaryVolume((long)volume);
 
     for (i = 0; i < 4; i++) {
-        engineVoices[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
+        engineVoices[i]->Set3DDistanceRange(50.0f, 500.0f, 0);
         if (i < channelsInUse)
             PlayIfEnabled(engineVoices[i], 0, 0, 1, 0);
         if (i == channelsInUse)
             break;
     }
     for (i = 0; i < 6; i++)
-        field_0x11b8[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
+        field_0x11b8[i]->Set3DDistanceRange(50.0f, 500.0f, 0);
     for (i = 0; i < 6; i++)
-        field_0x11d0[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
+        field_0x11d0[i]->Set3DDistanceRange(50.0f, 500.0f, 0);
     if (g_TrackGame->mode.field_0x23a4)
         PlayIfEnabled(field_0x11e8, 1, 1, 1, 0);
 
@@ -533,8 +533,8 @@ void RaceSound::AssignChannels() {
         environment.damping = 0.0f;
         eaxEnabled = 0;
     }
-    SoundSystem()->UnknownFunction4bed40(&environment);
-    SoundSystem()->UnknownFunction4beb80();
+    SoundSystem()->SetEAXListenerParameters(&environment);
+    SoundSystem()->CommitListenerSettings();
     if (!g_TrackGame->mode.field_0xa28)
         g_TrackGame->field_0x34->UnknownFunction468dd0("SoundGroup");
 }
@@ -562,20 +562,20 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
             field_0x129c = listenerRacer->field_0x784;
         }
         UpdateRacerSounds(frameTime);
-        SoundSystem()->UnknownFunction4bec50(listenerCamera->listenerPosition);
-        SoundSystem()->UnknownFunction4bec00(listenerCamera->listenerForward, listenerCamera->listenerUp);
-        SoundSystem()->UnknownFunction4bec90(listenerCamera->followedBike->field_0x064);
+        SoundSystem()->SetListenerPosition(listenerCamera->listenerPosition);
+        SoundSystem()->SetListenerOrientation(listenerCamera->listenerForward, listenerCamera->listenerUp);
+        SoundSystem()->SetListenerVelocity(listenerCamera->followedBike->field_0x064);
         for (i = 0; i < channelsInUse; i++) {
             if (engineChannels[i].channelSound) {
                 engineChannels[i].channelRacer->field_0x3bc->UnknownFunction4fc970(&position);
-                engineChannels[i].channelSound->UnknownFunction4bd7e0(position, 0);
-                engineChannels[i].channelSound->UnknownFunction4bd8a0(engineChannels[i].channelRacer->field_0x064, 0);
+                engineChannels[i].channelSound->Set3DPosition(position, 0);
+                engineChannels[i].channelSound->Set3DVelocity(engineChannels[i].channelRacer->field_0x064, 0);
             }
         }
         listenerRacer->field_0x3bc->UnknownFunction4fc970(&position);
-        ownEngine->UnknownFunction4bd7e0(position, 0);
-        ownEngine->UnknownFunction4bd8a0(listenerRacer->field_0x064, 0);
-        SoundSystem()->UnknownFunction4beb80();
+        ownEngine->Set3DPosition(position, 0);
+        ownEngine->Set3DVelocity(listenerRacer->field_0x064, 0);
+        SoundSystem()->CommitListenerSettings();
     }
     return 1;
 }
@@ -601,7 +601,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
     for (i = channelsInUse - 1; i > -1; i--) {
         if (engineChannels[i].channelSound && i >= 4) {
             engineVoiceInUse[engineChannels[i].field_0x08] = 0;
-            engineChannels[i].channelSound->UnknownFunction4bc940(1);
+            engineChannels[i].channelSound->Stop(1);
             engineChannels[i].channelSound = 0;
             engineChannels[i].field_0x08 = -1;
         }
@@ -657,7 +657,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
         } else {
             streamChannel->airborneTime = 0;
             streamChannel->field_0x30 = 0;
-            if (streamChannel->field_0x2c == 1 && !ownEngine->UnknownFunction4bca80() &&
+            if (streamChannel->field_0x2c == 1 && !ownEngine->IsPlaying() &&
                 streamChannel->channelRacer == listenerRacer)
                 PlayIfEnabled(ownEngine, 0, 0, 0, 0);
             if (!streamChannel->channelRacer->field_0x478)
@@ -750,7 +750,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
         } else {
             if (!field_0x120c[i]) {
                 if (currentRacer == listenerRacer && listenerRacer->field_0x460 == 12) {
-                    field_0x11b4->UnknownFunction4bc940(1);
+                    field_0x11b4->Stop(1);
                     PlayIfEnabled(field_0x11b4, 0, 0, 0, 0);
                 }
                 if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3) {
@@ -765,13 +765,13 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
             if (currentRacer->field_0x484) {
                 if (!field_0x1238[i])
                     field_0x1238[i] = UnknownFunction4e42e0(currentRacer);
-                else if (!field_0x11b8[field_0x1238[i]]->UnknownFunction4bca80())
+                else if (!field_0x11b8[field_0x1238[i]]->IsPlaying())
                     field_0x1238[i] = UnknownFunction4e42e0(currentRacer);
             }
             if (currentRacer->field_0x604->field_0xb0) {
                 if (!field_0x1264[i])
                     field_0x1264[i] = UnknownFunction4e43a0(currentRacer);
-                else if (!field_0x11d0[field_0x1264[i]]->UnknownFunction4bca80())
+                else if (!field_0x11d0[field_0x1264[i]]->IsPlaying())
                     field_0x1264[i] = UnknownFunction4e43a0(currentRacer);
             }
             field_0x120c[i] = 1;
@@ -826,7 +826,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             }
             if (owner)
                 owner->ShowOnOffMessage(0x14c3, eaxEnabled);
-            SoundSystem()->UnknownFunction4bed40(&environment);
+            SoundSystem()->SetEAXListenerParameters(&environment);
             break;
         case 0x2e:
             if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2e, 12, 0))
@@ -904,13 +904,13 @@ int RaceSound::UnknownFunction4e42e0(UnknownEventRacer* racer) {
     int tries = 0;
     int index = rand() % 6;
 
-    while (field_0x11b8[index]->UnknownFunction4bca80()) {
+    while (field_0x11b8[index]->IsPlaying()) {
         if (++tries >= 10)
             return 0;
         index = rand() % 6;
     }
     racer->field_0x3bc->UnknownFunction4fc970(&position);
-    field_0x11b8[index]->UnknownFunction4bd7e0(position, 0);
+    field_0x11b8[index]->Set3DPosition(position, 0);
     PlayIfEnabled(field_0x11b8[index], 0, 0, 0, 0);
     return index;
 }
@@ -921,13 +921,13 @@ int RaceSound::UnknownFunction4e43a0(UnknownEventRacer* racer) {
     int tries = 0;
     int index = rand() % 6;
 
-    while (field_0x11d0[index]->UnknownFunction4bca80()) {
+    while (field_0x11d0[index]->IsPlaying()) {
         if (++tries >= 10)
             return 0;
         index = rand() % 6;
     }
     racer->field_0x3bc->UnknownFunction4fc970(&position);
-    field_0x11d0[index]->UnknownFunction4bd7e0(position, 0);
+    field_0x11d0[index]->Set3DPosition(position, 0);
     PlayIfEnabled(field_0x11d0[index], 0, 0, 0, 0);
     return index;
 }
@@ -960,8 +960,8 @@ void RaceSound::StartStream() {
 
     if (!streamChannel->channelSound)
         return;
-    streamChannel->channelSound->UnknownFunction4bcd40(&play, &write);
-    streamChannel->channelSound->UnknownFunction4bd020(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
+    streamChannel->channelSound->GetBufferPosition(&play, &write);
+    streamChannel->channelSound->LockBuffer(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
     if (write < (unsigned long)(5512 * field_0x1298)) {
         bytes = 11025 * field_0x1298 - write;
         memcpy((char*)streamChannel->sampleBuffer + write, (char*)streamChannel->streamSample + streamChannel->field_0x18,
@@ -994,7 +994,7 @@ void RaceSound::StartStream() {
         streamChannel->field_0x18 += 11025 * field_0x1298;
         streamChannel->field_0x1c = 2;
     }
-    streamChannel->channelSound->UnknownFunction4bd080(first, 22050 * field_0x1298, second, 0);
+    streamChannel->channelSound->UnlockBuffer(first, 22050 * field_0x1298, second, 0);
 }
 
 // The four per-TU vector constants (see src/krusty2/math/Math3D.h); their
@@ -1062,8 +1062,8 @@ int RaceSound::LoadSound(Sound* sound, const char* name, int a, int b) {
 void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused) {
     if (g_TrackGame->mode.field_0xa28 && (g_TrackGame->mode.field_0x23a4 || !network) && sound) {
         if (stop)
-            sound->UnknownFunction4bc940(1);
-        sound->UnknownFunction4bc6b0(0, loop, 1);
+            sound->Stop(1);
+        sound->PlayWithOptions(0, loop, 1);
     }
 }
 

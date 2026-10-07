@@ -45,7 +45,7 @@ void EventManager::UnknownFunction45e710(int menu) {
     if (item)
         item->UnknownFunction46ff30(0);
     if (g_TrackGame->ui->field_0x494)
-        ImmAssociateContext(g_TrackGame->field_0x31c, g_TrackGame->ui->field_0x494);
+        ImmAssociateContext(g_TrackGame->windowHandle, g_TrackGame->ui->field_0x494);
     if (g_TrackGame->ui->field_0x498)
         g_TrackGame->ui->field_0x2c->EnableWindowClipper(1);
     g_TrackGame->uiInteractionBlocked = 0;
@@ -53,10 +53,10 @@ void EventManager::UnknownFunction45e710(int menu) {
     g_TrackGame->field_0x3434 = 0;
     if (!g_TrackGame->mode.field_0xa20)
         g_TrackGame->UnknownFunction521a40();
-    UnknownDisplayMode* current = &g_TrackGame->display->field_0x10[g_TrackGame->mode.field_0xa4c];
+    UnknownDisplayMode* current = &g_TrackGame->display->displayModes[g_TrackGame->mode.field_0xa4c];
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
         g_TrackGame->UnknownVirtualSlot19(
-            g_TrackGame->display->UnknownFunction52d250(640, 480, 16, 0, 0));
+            g_TrackGame->display->FindDisplayMode(640, 480, 16, 0, 0));
     g_TrackGame->ui->field_0x2c->CreateBackground();
     UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->field_0x2c->GetUser(0);
     layer->field_0xc0->field_0x5c = g_TrackGame->mode.field_0x6d4;
@@ -67,7 +67,7 @@ void EventManager::UnknownFunction45e710(int menu) {
     TransDlg* dialog = new(__FILE__, 1064) TransDlg;
     g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
     dialog->SetNextMenu(menu);
-    ((PCSoundInterface*)g_TrackGame->soundInterface)->UnknownFunction4be9b0(0);
+    ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryVolume(0);
 }
 
 // Views for the podium scene 0x0045d480. Only what it calls is declared.
@@ -136,7 +136,7 @@ public:
     UnknownPodiumSound(GameObject* group, int type);                    // 0x004bba10
     int UnknownFunction4bc320(const char* name, UnknownTextureStream* stream, int flags, int a,
                               int b, int c);                            // 0x004bc320
-    int UnknownFunction4bc6b0(int restart, unsigned long playFlags, int preferHardware); // 0x004bc6b0
+    int PlayWithOptions(int restart, unsigned long playFlags, int preferHardware); // 0x004bc6b0
     unsigned char field_0x000[0x1f8];
 };
 class UnknownPodiumArcade {                         // ArcadeObject (+0x3d0)
@@ -351,7 +351,7 @@ int EventManager::CreatePodiumScene() {
         }
         sound->UnknownFunction4bc320("CrowdLoop.wav", audio, 1, 0, 0, -1);
         delete audio;
-        sound->UnknownFunction4bc6b0(0, 1, 0);
+        sound->PlayWithOptions(0, 1, 0);
     }
     D3DRMVectorRotate(&rotated, &cameraOffset, &kVec3YAxis, angle);
     podiumCameraPosition = rotated * PodiumLength(cameraOffset) + field_0x3c4;

@@ -24,12 +24,12 @@ int PCMouseDevice::UnknownVirtualSlot2() {
     axisCount = caps.axes;
     if (device->SetDataFormat(&c_dfDIMouse) < 0)
         goto failed;
-    if (device->SetCooperativeLevel(g_TrackGame->field_0x31c, 5) < 0)
+    if (device->SetCooperativeLevel(g_TrackGame->windowHandle, DISCL_EXCLUSIVE | DISCL_FOREGROUND) < 0)
         goto failed;
     deviceInfo.size = sizeof(deviceInfo);
     device->GetDeviceInfo(&deviceInfo);
     UnknownVirtualSlot3();
-    if (!UnknownMethod4c2710(1, 0, 0, 16))
+    if (!SetDwordProperty(DIPROP_BUFFERSIZE, 0, DIPH_DEVICE, 16))
         goto failed;
     if (device->Acquire() < 0)
         goto failed;
@@ -141,13 +141,13 @@ int PCMouseDevice::UnknownVirtualSlot6(int value) {
         return 0;
     count = -1;
     long result;
-    result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, 1);
-    if (result == (long)0x8007001e || result == (long)0x8007000c) {
+    result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);
+    if (result == DIERR_INPUTLOST || result == DIERR_NOTACQUIRED) {
         if (device->Acquire() < 0) {
             UnknownReportError(result, __FILE__, 1316);
             return 0;
         }
-        result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, 1);
+        result = device->GetDeviceData(sizeof(UnknownDeviceObjectData), 0, &count, DIGDD_PEEK);
     }
     if (result < 0)
         goto failed;

@@ -65,17 +65,17 @@ void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case kDialogInit: {
         UIControl* control = FindControl("TitleText", 12);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13d9);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13d9);
         control = FindControl("ButMiddle", 1);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13da);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13da);
         UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
         if (g_TrackGame->network || view->field_0x38->field_0x7a4 ||
             g_TrackGame->mode.field_0x27f8.field_0x00 == 4)
             control->Show(0, 1);
         control = FindControl("ButLeft", 1);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13db);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13db);
         control = FindControl("ButRight", 1);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13dc);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13dc);
         guiManager->ShowCursors(1);
         break;
     }
@@ -105,9 +105,9 @@ void ContinueDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case kDialogInit: {
         UIControl* control = FindControl("TitleText", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x8ff);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x8ff);
         control = FindControl("ButMiddle", 1);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x916);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x916);
         control->keyBind = 0x1c;
         control = FindControl("ButLeft", 1);
         control->Show(0, 1);

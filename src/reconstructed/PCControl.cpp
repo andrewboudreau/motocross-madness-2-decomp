@@ -10,7 +10,7 @@
 
 // 0x004beef0: the effect GUID's name in `name` (empty and 0 when unknown).
 // Placed here by address only: it directly precedes PCControlInterface.
-int UnknownFunction4beef0(UnknownGuid guid, char* name) {
+int GetForceFeedbackEffectName(UnknownGuid guid, char* name) {
     strcpy(name, "");
     if (!memcmp(&GUID_ConstantForce, &guid, sizeof(guid))) {
         strcpy(name, "GUID_ConstantForce");
@@ -66,14 +66,14 @@ int UnknownFunction4beef0(UnknownGuid guid, char* name) {
 // 0x004bf1f0
 PCControlInterface::PCControlInterface() {
     directInput = 0;
-    field_0xcc4 = 1;
+    devicesAcquired = 1;
 }
 
 // 0x004bf240: creates DirectInput (version 0x700), the keyboard and the
 // mouse, then the attached joysticks; without any joystick, one is created
 // anyway. The first joystick becomes the active one.
 int PCControlInterface::UnknownVirtualSlot1() {
-    if (DirectInputCreateEx(g_TrackGame->field_0x318, 0x700, IID_IDirectInput7A,
+    if (DirectInputCreateEx(g_TrackGame->instanceHandle, 0x700, IID_IDirectInput7A,
                             (void**)&directInput, 0) < 0)
         return 0;
     keyboard = new(__FILE__, 107) PCKeyboardDevice;
@@ -85,7 +85,7 @@ int PCControlInterface::UnknownVirtualSlot1() {
         return 0;
     mouse->UnknownVirtualSlot2();
     joystickCount = 0;
-    directInput->EnumDevices(4, UnknownEnumDevicesCallback, this, 1);
+    directInput->EnumDevices(DIDEVTYPE_JOYSTICK, EnumJoystickCallback, this, DIEDFL_ATTACHEDONLY);
     if (!joystickCount)
         joysticks[0] = new(__FILE__, 125) PCJoystickDevice(joystickCount);
     activeJoystick = joysticks[0];
@@ -94,12 +94,12 @@ int PCControlInterface::UnknownVirtualSlot1() {
 
 // 0x004bf3c0: opens each attached joystick, stopping at eight; a joystick
 // that fails to open is deleted.
-int __stdcall PCControlInterface::UnknownEnumDevicesCallback(const UnknownDeviceInstance* instance,
-                                                             void* context) {
+int __stdcall PCControlInterface::EnumJoystickCallback(const UnknownDeviceInstance* instance,
+    void* context) {
     PCControlInterface* control = (PCControlInterface*)context;
     control->joysticks[control->joystickCount] = new(__FILE__, 73) PCJoystickDevice(control->joystickCount);
     if (control->joysticks[control->joystickCount] &&
-        ((PCJoystickDevice*)control->joysticks[control->joystickCount])->UnknownFunction4c2930(instance)) {
+        ((PCJoystickDevice*)control->joysticks[control->joystickCount])->OpenDevice(instance)) {
         control->joystickCount++;
         if (control->joystickCount == 8)
             return 0;
@@ -111,15 +111,15 @@ int __stdcall PCControlInterface::UnknownEnumDevicesCallback(const UnknownDevice
 }
 
 // 0x004bf490
-void PCControlInterface::UnknownFunction4bf490(int acquire) {
-    field_0xcc4 = acquire;
+void PCControlInterface::SetDevicesAcquired(int acquire) {
+    devicesAcquired = acquire;
     if (keyboard)
-        keyboard->UnknownMethod4c26d0(field_0xcc4);
+        keyboard->SetAcquired(devicesAcquired);
     if (mouse)
-        mouse->UnknownMethod4c26d0(field_0xcc4);
+        mouse->SetAcquired(devicesAcquired);
     for (int i = 0; i < 8; i++) {
         if (joysticks[i])
-            joysticks[i]->UnknownMethod4c26d0(field_0xcc4);
+            joysticks[i]->SetAcquired(devicesAcquired);
     }
 }
 

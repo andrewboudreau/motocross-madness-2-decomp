@@ -118,10 +118,10 @@ void ManagedTexture::UnknownVirtualSlot19() {
     if (field_0x80) {
         for (int i = 0; i < field_0x44; i++)
             g_TrackGame->renderTarget->UnknownVirtualSlot8(field_0x48[i].state, field_0x48[i].value, 0);
-        if (field_0x30 && field_0x80->field_0x74 && field_0x80->field_0x74->SetColorKey(8, &field_0x34))
+        if (field_0x30 && field_0x80->textureSurface && field_0x80->textureSurface->SetColorKey(8, &field_0x34))
             return;
         field_0x80->UnknownVirtualSlot11();
-    } else if (field_0x74) {
+    } else if (textureSurface) {
         PCTextureMap::UnknownVirtualSlot19();
     }
 }
@@ -130,7 +130,7 @@ void ManagedTexture::UnknownVirtualSlot19() {
 int ManagedTexture::UnknownVirtualSlot11() {
     if (field_0x80)
         return field_0x80->UnknownVirtualSlot11();
-    if (field_0x74)
+    if (textureSurface)
         return PCTextureMap::UnknownVirtualSlot11();
     return 0;
 }

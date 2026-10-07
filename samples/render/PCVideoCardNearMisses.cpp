@@ -1,25 +1,25 @@
 // Near misses for src/reconstructed/PCVideoCard.cpp (TU PCVideoCard.cpp).
 // Each compiles from readable source but differs from retail as noted.
 //
-// UnknownDisplay::UnknownFunction4ca520 (0x004ca520, 116 bytes): logic and
+// UnknownDisplay::CreateModeSurfaces (0x004ca520, 116 bytes): logic and
 //   calls match; retail loads +0x74 and all four mode fields into registers
 //   before testing the argument and computes the free memory as
 //   neg/lea (memory - pixels * 2); local orders and pixel temporaries tried.
-// UnknownDisplay::UnknownFunction4ca5a0 (0x004ca5a0, 484 bytes): retail keeps
+// UnknownDisplay::ProbeNonLocalTextureMemory (0x004ca5a0, 484 bytes): retail keeps
 //   `target` in ebp, caches 480/16 in registers for the mode search and has
 //   one more 4-byte local; the flow (EH-guarded new PCRenderTarget, 128x128
 //   probe surface, caps bit 0x20000000) is as written.
-// float UnknownFunction4cb330 (0x004cb330, 628 bytes): register allocation
+// float MeanTextureChannelDifference (0x004cb330, 628 bytes): register allocation
 //   (retail: ebp = first, esi/edi = pixel pointers) and the x87 sequence for
 //   the three channel sums (retail keeps the green difference on the stack
 //   and stores the blue one) differ; the expansion and loop shapes match.
-// UnknownDisplay::UnknownFunction4cab00 (0x004cab00, 1129 bytes): the
+// UnknownDisplay::ProbePartialTextureUploads (0x004cab00, 1129 bytes): the
 //   PartialTexBlt driver; register allocation differs throughout (retail
 //   keeps `this` in ebp and spills it), structure follows retail.
-// UnknownDisplay::UnknownFunction4cb5b0 (0x004cb5b0, 186 bytes): retail
+// UnknownDisplay::SetGDISurfaceVisible (0x004cb5b0, 186 bytes): retail
 //   returns int (0 when a flip, GetGDISurface or the flip budget fails, else
 //   1). Display.h keeps `void` because GUIManager.bindings.json binds
-//   ?UnknownFunction4cb5b0@UnknownDisplay@@QAEXH@Z. With `int` the body
+//   ?SetGDISurfaceVisible@UnknownDisplay@@QAEXH@Z. With `int` the body
 //   matches except the placement of the shared `return 0` block after the
 //   loop (145/184 bytes).
 // VideoCard::VideoCard (0x0052d180, 115 bytes; VideoCard.cpp): every store
@@ -31,17 +31,17 @@
 
 // 0x004ca520: the surfaces for the current mode; full screen needs the
 // whole chain plus two 16-bit frames' worth of video memory.
-int UnknownDisplay::UnknownFunction4ca520(int fullScreen) {
-    int width = field_0x10[field_0x0c].width;
-    int height = field_0x10[field_0x0c].height;
-    int bitDepth = field_0x10[field_0x0c].bitDepth;
-    int buffers = field_0x10[field_0x0c].field_0x10;
+int UnknownDisplay::CreateModeSurfaces(int fullScreen) {
+    int width = displayModes[currentDisplayMode].width;
+    int height = displayModes[currentDisplayMode].height;
+    int bitDepth = displayModes[currentDisplayMode].bitDepth;
+    int buffers = displayModes[currentDisplayMode].field_0x10;
     if (fullScreen) {
-        if (width * height * bitDepth / 8 * buffers > field_0x74 - width * height * 2)
+        if (width * height * bitDepth / 8 * buffers > videoMemoryBudget - width * height * 2)
             return 0;
-        if (UnknownFunction4c9f30(buffers - 1))
+        if (CreateFlipChain(buffers - 1))
             return 1;
-    } else if (UnknownFunction4ca130(buffers - 1)) {
+    } else if (CreateSystemRenderSurface(buffers - 1)) {
         return 1;
     }
     return 0;
@@ -49,7 +49,7 @@ int UnknownDisplay::UnknownFunction4ca520(int fullScreen) {
 
 // 0x004ca5a0: whether a 128 x 128 texture of the target's format can be
 // created (with a temporary 640 x 480 x 16 target when `target` is 0).
-int UnknownDisplay::UnknownFunction4ca5a0(int* value, RenderTarget* target) {
+int UnknownDisplay::ProbeNonLocalTextureMemory(int* value, RenderTarget* target) {
     RenderTarget* render = 0;
     UnknownSurfaceInterface* surface;
     UnknownSurfaceCaps caps;
@@ -60,12 +60,12 @@ int UnknownDisplay::UnknownFunction4ca5a0(int* value, RenderTarget* target) {
     if (target) {
         render = target;
     } else {
-        for (int i = 0; i < field_0x08; i++) {
-            if (field_0x10[i].width == 640 && field_0x10[i].height == 480 && field_0x10[i].bitDepth == 16) {
-                if (UnknownFunction4ca900(i, 1)) {
+        for (int i = 0; i < displayModeCount; i++) {
+            if (displayModes[i].width == 640 && displayModes[i].height == 480 && displayModes[i].bitDepth == 16) {
+                if (SetFullscreenDisplayMode(i, 1)) {
                     render = (new (__FILE__, 1185) PCRenderTarget)
-                                 ->UnknownFunction4c4f80(this, &IID_IDirect3DHALDevice, field_0x1a0, 1,
-                                                         field_0x78);
+                                 ->InitializeRenderTarget(this, &IID_IDirect3DHALDevice, backBuffer, 1,
+                                                         frameBufferCount);
                     if (!render)
                         goto failed;
                 }
@@ -80,7 +80,7 @@ int UnknownDisplay::UnknownFunction4ca5a0(int* value, RenderTarget* target) {
     desc.height = 128;
     desc.flags = 0x1007;                          // caps, height, width, pixel format
     desc.caps[0] = 0x20005000;
-    if (field_0x190->UnknownMethod6(&desc, &surface, 0) == 0) {
+    if (directDraw->CreateSurface(&desc, &surface, 0) == 0) {
         if (surface->GetCaps(&caps)) {
             *value = 0;
             result = 0;
@@ -90,7 +90,7 @@ int UnknownDisplay::UnknownFunction4ca5a0(int* value, RenderTarget* target) {
             *value = 0;
             result = 0;
         }
-        surface->UnknownMethod2();
+        surface->Release();
         if (!target && render)
             delete render;
         return result;
@@ -109,7 +109,7 @@ failed:
 
 // 0x004cb330: the mean absolute channel difference (1/256 units) of two
 // 16-bit textures of `first`'s size, or -1 when one cannot be locked.
-float UnknownFunction4cb330(TextureMap* first, TextureMap* second) {
+float MeanTextureChannelDifference(TextureMap* first, TextureMap* second) {
     long firstPitch;
     long secondPitch;
     unsigned short* a = (unsigned short*)first->UnknownVirtualSlot13(0, &firstPitch, 0x811);
@@ -160,7 +160,7 @@ float UnknownFunction4cb330(TextureMap* first, TextureMap* second) {
 // partblt.tga through a texture and compares the drawn result. 1: works;
 // 0: wrong; -1: the full upload failed; -2: no image or texture; -3: no
 // 640 x 480 x 16 target; -4: no texture surface.
-void UnknownDisplay::UnknownFunction4cab00(RenderTarget* target) {
+void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
     int result = 1;
     UnknownRect area;
     UnknownRect tile;
@@ -177,13 +177,13 @@ void UnknownDisplay::UnknownFunction4cab00(RenderTarget* target) {
     UnknownTgaFile* file = UnknownFunction5125c0("partblt.tga", 0, 0);
     RenderTarget* render = target;
     if (!render) {
-        for (int i = 0; i < field_0x08; i++) {
-            if (field_0x10[i].width == 640 && field_0x10[i].height == 480 && field_0x10[i].bitDepth == 16) {
-                if (!UnknownFunction4ca900(i, 1)) {
+        for (int i = 0; i < displayModeCount; i++) {
+            if (displayModes[i].width == 640 && displayModes[i].height == 480 && displayModes[i].bitDepth == 16) {
+                if (!SetFullscreenDisplayMode(i, 1)) {
                     result = -3;
                 } else {
                     render = (new (__FILE__, 2053) PCRenderTarget)
-                                 ->UnknownFunction4c4f80(this, &IID_IDirect3DHALDevice, field_0x1a0, 1, field_0x78);
+                                 ->InitializeRenderTarget(this, &IID_IDirect3DHALDevice, backBuffer, 1, frameBufferCount);
                     if (render) {
                         result = 1;
                         g_TrackGame->renderTarget = render;
@@ -219,7 +219,7 @@ void UnknownDisplay::UnknownFunction4cab00(RenderTarget* target) {
                     result = -4;
                 } else {
                     UnknownFunction512dd0(file);
-                    if (UnknownFunction4caf70((PCRenderTarget*)render, &area, image, expected, rendered, this, 1) != 1) {
+                    if (TestPartialTextureUpload((PCRenderTarget*)render, &area, image, expected, rendered, this, 1) != 1) {
                         result = -1;
                     } else {
                         for (int y = 0; result == 1 && y < 256; y += 64) {
@@ -228,7 +228,7 @@ void UnknownDisplay::UnknownFunction4cab00(RenderTarget* target) {
                                 tile.top = y;
                                 tile.right = x + 64;
                                 tile.bottom = y + 64;
-                                if (!UnknownFunction4caf70((PCRenderTarget*)render, &tile, image, expected, rendered,
+                                if (!TestPartialTextureUpload((PCRenderTarget*)render, &tile, image, expected, rendered,
                                                            this, 1))
                                     result = 0;
                             }
@@ -249,52 +249,52 @@ void UnknownDisplay::UnknownFunction4cab00(RenderTarget* target) {
             g_TrackGame->display = 0;
         }
     }
-    field_0x5bc = result;
+    partialTextureUploadResult = result;
 }
 
 
 // 0x004cb5b0: with `enable`, flips until the GDI surface is the primary
 // (at most back buffers + 1 times); then sets +0x6c.
-void UnknownDisplay::UnknownFunction4cb5b0(int enable) {
+void UnknownDisplay::SetGDISurfaceVisible(int enable) {
     if (enable) {
         UnknownSurfaceInterface* gdi = 0;
-        field_0x190->UnknownMethod14(&gdi);
-        for (int i = 0; field_0x19c != gdi; ) {
+        directDraw->GetGDISurface(&gdi);
+        for (int i = 0; primarySurface != gdi; ) {
             if (gdi)
-                gdi->UnknownMethod2();
+                gdi->Release();
             gdi = 0;
-            if (field_0x19c->Flip(0, 1))
+            if (primarySurface->Flip(0, 1))
                 return;
-            if (field_0x190->UnknownMethod14(&gdi))
+            if (directDraw->GetGDISurface(&gdi))
                 return;
             g_TrackGame->renderTarget->UnknownFunction4e8cc0();
-            if (++i > field_0x78)
+            if (++i > frameBufferCount)
                 return;
         }
         if (gdi)
-            gdi->UnknownMethod2();
+            gdi->Release();
     }
-    field_0x6c = enable;
+    freezeFrameIndex = enable;
 }
 
 // 0x0052d180
 VideoCard::VideoCard() {
-    field_0x70_bit2 = 0;
-    field_0x80 = 0x7fffffff;
-    field_0x84 = 0x7fffffff;
+    lastFlipFailed = 0;
+    lastFrameTime = 0x7fffffff;
+    shortestFrameTime = 0x7fffffff;
     field_0x68 = 0;
     field_0x64 = 0;
-    field_0x0c = -1;
+    currentDisplayMode = -1;
     field_0x88 = 0;
-    field_0x78 = 0;
-    field_0x04 = 0;
-    field_0x10 = 0;
-    field_0x7c = 0;
+    frameBufferCount = 0;
+    displayModeCapacity = 0;
+    displayModes = 0;
+    lastPresentTime = 0;
     field_0x58 = 0;
     field_0x5c = 0;
     memset(field_0x90, 0, sizeof(field_0x90));
     field_0x8c = 0;
-    field_0x70_bit0 = 0;
-    field_0x6c = 0;
-    field_0x54 = 0;
+    use8BitTextures = 0;
+    freezeFrameIndex = 0;
+    totalVideoMemory = 0;
 }

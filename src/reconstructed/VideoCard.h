@@ -23,42 +23,42 @@ public:
     virtual void UnknownVirtualSlot4(int value) = 0; // called with 0 and 1 around a frame
 
     // 0x0052d250: sorts the modes and returns the index of the matching one
-    // (a zero `a`/`b` matches any field_0x10/refresh rate), or -1.
-    int UnknownFunction52d250(int width, int height, int bitDepth, int a, int b);
+    // (a zero `a`/`b` matches any mode field_0x10/refresh rate), or -1.
+    int FindDisplayMode(int width, int height, int bitDepth, int a, int b);
 
     // Inline (PCVideoCard.cpp): time since the last present and the
     // shortest such time.
-    void UnknownRecordFrameTime() {
+    void RecordFrameTime() {
         unsigned int now = UnknownFunction4bfa80();
-        field_0x80 = now - field_0x7c;
-        field_0x7c = now;
-        if (field_0x80 < field_0x84)
-            field_0x84 = field_0x80;
+        lastFrameTime = now - lastPresentTime;
+        lastPresentTime = now;
+        if (lastFrameTime < shortestFrameTime)
+            shortestFrameTime = lastFrameTime;
     }
 
-    int field_0x04;
-    int field_0x08;                               // display mode count
-    int field_0x0c;                               // current display mode (-1: none)
-    UnknownDisplayMode* field_0x10;               // DebugRealloc'd mode table
+    int displayModeCapacity;                   // +0x04
+    int displayModeCount;                      // +0x08: display mode count
+    int currentDisplayMode;                    // +0x0c: current display mode (-1: none)
+    UnknownDisplayMode* displayModes;          // +0x10: DebugRealloc'd mode table
     int field_0x14[16];                           // per texture kind (TextureMapManager 0x00511580)
-    int field_0x54;                               // "Total VidMem"
+    int totalVideoMemory;                      // +0x54: "Total VidMem"
     int field_0x58;
     int field_0x5c;
-    int field_0x60;                               // "TextureCacheLimit" (0x7fffffff if unset)
+    int textureCacheLimit;                     // +0x60: "TextureCacheLimit" (0x7fffffff if unset)
     int field_0x64;                               // passed to the GUI setup (KrustyUI 0x004988a0)
     int field_0x68;
-    int field_0x6c;      // freezes RenderTarget's frame index (0x004e8cc0)
-    unsigned char field_0x70_bit0 : 1;            // "Use8BitTextures"
+    int freezeFrameIndex;                      // +0x6c: freezes RenderTarget's frame index (0x004e8cc0)
+    unsigned char use8BitTextures : 1;         // +0x70 bit 0: "Use8BitTextures"
     unsigned char field_0x70_bit1 : 1;
-    unsigned char field_0x70_bit2 : 1;            // last flip failed; gates slot 4 (Game slot 8)
-    unsigned char field_0x70_bit3 : 1;            // full-screen flipping chain (0x004ca900)
+    unsigned char lastFlipFailed : 1;          // +0x70 bit 2: last flip failed; gates slot 4 (Game slot 8)
+    unsigned char useFlipChain : 1;            // +0x70 bit 3: full-screen flipping chain (0x004ca900)
     unsigned char field_0x70_bits : 4;
     unsigned char field_0x71[0x74 - 0x71];
-    int field_0x74;                               // video memory: caps total plus the desktop
-    int field_0x78;                               // back buffers + 1
-    unsigned int field_0x7c;                      // time stamp of the last present (0x004bfa80)
-    unsigned int field_0x80;                      // last frame time
-    unsigned int field_0x84;                      // shortest frame time
+    int videoMemoryBudget;                     // +0x74: video memory: caps total plus the desktop
+    int frameBufferCount;                      // +0x78: back buffers + 1
+    unsigned int lastPresentTime;              // +0x7c: time stamp of the last present (0x004bfa80)
+    unsigned int lastFrameTime;                // +0x80: last frame time
+    unsigned int shortestFrameTime;            // +0x84: shortest frame time
     int field_0x88;
     int field_0x8c;
     int field_0x90[64];
@@ -66,4 +66,4 @@ public:
 
 // 0x0052d120 (cdecl qsort comparator): orders modes by depth, height,
 // width, field_0x10, then refresh rate.
-int UnknownCompare52d120(const void* first, const void* second);
+int CompareDisplayModes(const void* first, const void* second);

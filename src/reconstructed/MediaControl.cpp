@@ -18,7 +18,7 @@ int MediaControl::UnknownFunction4a23d0()
     UnknownSurfaceInterface* graph;
     if (CoCreateInstance(*(const GUID*)&CLSID_FilterGraph, 0, CLSCTX_INPROC_SERVER,
                          *(const GUID*)&IID_IGraphBuilder, (void**)&graph) >= 0) {
-        graph->UnknownMethod2();
+        graph->Release();
         return 1;
     }
     return 0;
@@ -51,35 +51,35 @@ MediaControl::~MediaControl()
 {
     Stop();
     if (field_0x2c) {
-        field_0x2c->UnknownMethod2();
+        field_0x2c->Release();
         field_0x2c = 0;
     }
     if (field_0x38) {
-        field_0x38->UnknownMethod2();
+        field_0x38->Release();
         field_0x38 = 0;
     }
     if (field_0x64) {
-        field_0x64->UnknownMethod2();
+        field_0x64->Release();
         field_0x64 = 0;
     }
     if (field_0x60) {
-        field_0x60->UnknownMethod2();
+        field_0x60->Release();
         field_0x60 = 0;
     }
     if (field_0x5c) {
-        field_0x5c->UnknownMethod2();
+        field_0x5c->Release();
         field_0x5c = 0;
     }
     if (field_0x50) {
-        field_0x50->UnknownMethod2();
+        field_0x50->Release();
         field_0x50 = 0;
     }
     if (field_0x4c) {
-        field_0x4c->UnknownMethod2();
+        field_0x4c->Release();
         field_0x4c = 0;
     }
     if (field_0x54) {
-        field_0x54->UnknownMethod2();
+        field_0x54->Release();
         field_0x54 = 0;
     }
 }

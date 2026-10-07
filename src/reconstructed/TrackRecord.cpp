@@ -208,7 +208,7 @@ void TrackRecordDlg::UnknownVirtualSlot29(UnknownTrackRecordEvent* event)
         field_0x7f64 = 0;
         control = static_cast<UIMultiState*>(FindControl("TxtTitle", 0));
         control->SetTextAlign(10);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x958);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x958);
         field_0x7f58 = 0;
         g_TrackGame->mode.UnknownFunction5240e0(0);
         ShowTab(event, field_0x7f58);
@@ -216,23 +216,23 @@ void TrackRecordDlg::UnknownVirtualSlot29(UnknownTrackRecordEvent* event)
         field_0x7f5c = 0;
         g_TrackGame->field_0x3400->field_0x00 = 0;
         control = static_cast<UIMultiState*>(FindControl("TabQuarry", 4));
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1423);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1423);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1423);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1423);
         control = static_cast<UIMultiState*>(FindControl("TabTag", 4));
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1426);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1426);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1426);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1426);
         control = static_cast<UIMultiState*>(FindControl("TabSupercross", 4));
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1424);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1424);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1424);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1424);
         control = static_cast<UIMultiState*>(FindControl("TabNationals", 4));
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1425);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1425);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1425);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1425);
         control = static_cast<UIMultiState*>(FindControl("TabBaja", 4));
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1421);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1421);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1421);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1421);
         control = static_cast<UIMultiState*>(FindControl("TabEnduro", 4));
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1422);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1422);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1422);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1422);
         LabelTabs(field_0x7f58);
         break;
     case 1:
@@ -303,8 +303,8 @@ void TrackRecordDlg::LabelTabs(int series)
     UIMultiState* tab;
     if (series != 0 && series != 4) {
         tab = static_cast<UIMultiState*>(FindControl("TabLeft", 4));
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1427);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1427);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1427);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1427);
         tab = static_cast<UIMultiState*>(FindControl("TabMiddle", 4));
         g_TrackGame->LoadResourceString(0x142f, format, 128);
         sprintf(text, format, 5);
@@ -317,8 +317,8 @@ void TrackRecordDlg::LabelTabs(int series)
     } else {
         tab = static_cast<UIMultiState*>(FindControl("TabLeft", 4));
         int id = (series == 4) + 0x142a;
-        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, id);
-        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, id);
+        tab->SetStateTextFromResource(0, g_TrackGame->resourceInstance, id);
+        tab->SetStateTextFromResource(1, g_TrackGame->resourceInstance, id);
         tab = static_cast<UIMultiState*>(FindControl("TabMiddle", 4));
         g_TrackGame->LoadResourceString(0x1430, format, 128);
         sprintf(text, format, 5);

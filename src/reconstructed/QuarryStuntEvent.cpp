@@ -110,7 +110,7 @@ int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
     } else if (raceView->field_0x18e) {
         UnknownFunction4e1f00();
     }
-    SoundSystem()->UnknownFunction4beb80();
+    SoundSystem()->CommitListenerSettings();
     return 1;
 }
 

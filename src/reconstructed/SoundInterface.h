@@ -155,7 +155,7 @@ struct UnknownSoundDevice {
     UnknownSoundDevice(); // 0x004be280
     // 0x004be2d0: records `guid` and `description` and the device's caps;
     // 0 when `guid` is null or the device cannot be created.
-    int UnknownFunction4be2d0(UnknownGuid* guid, const char* description);
+    int ProbeSoundDevice(UnknownGuid* guid, const char* description);
 
     UnknownGuid guid;
     char description[0x80];
@@ -173,44 +173,44 @@ public:
 
     // 0x004be5a0: starts the audio (TrackGame slot 4 passes 22050, 1, 8 or
     // 16, 4000000 and a mode value); 0 or a DirectSound-style error.
-    long UnknownFunction4be5a0(int rate, int stereo, int bits, int value, int allowEax);
+    long InitializeSound(int rate, int stereo, int bits, int value, int allowEax);
     // 0x004be7b0: device enumeration callback; records up to four devices.
-    static int __stdcall UnknownEnumCallback(UnknownGuid* guid, const char* description, const char* module,
-                                             void* context);
-    UnknownSoundListener* UnknownFunction4be800(); // 0x004be800: queries a new listener
-    int UnknownFunction4be850();                   // 0x004be850: refreshes field_0x3fc
-    int UnknownFunction4be860(UnknownSoundCaps* caps); // 0x004be860
-    void UnknownFunction4be8b0();                  // 0x004be8b0: formats a caps report
-    int UnknownFunction4be910(int rate, int stereo, int bits); // 0x004be910: primary format
-    int UnknownFunction4be9b0(long volume);        // 0x004be9b0: primary volume
-    void UnknownFunction4be9e0();                  // 0x004be9e0: EAX probe
-    UnknownSoundBuffer* UnknownFunction4beb10();   // 0x004beb10: creates the primary buffer
+    static int __stdcall EnumSoundDeviceCallback(UnknownGuid* guid, const char* description, const char* module,
+        void* context);
+    UnknownSoundListener* QueryListener();              // 0x004be800: queries a new listener
+    int RefreshSoundCaps();                             // 0x004be850: refreshes soundCaps
+    int GetSoundCaps(UnknownSoundCaps* caps);           // 0x004be860
+    void FormatSoundCapsReport();                       // 0x004be8b0: formats a caps report
+    int SetPrimaryFormat(int rate, int stereo, int bits); // 0x004be910: primary format
+    int SetPrimaryVolume(long volume);                  // 0x004be9b0: primary volume
+    void ProbeEAXSupport();                             // 0x004be9e0: EAX probe
+    UnknownSoundBuffer* CreatePrimaryBuffer();          // 0x004beb10: creates the primary buffer
     // 0x004beb80-0x004becd0: the listener's deferred settings.
-    int UnknownFunction4beb80();
-    int UnknownFunction4beba0(float factor);
-    int UnknownFunction4bebd0(float factor);
-    int UnknownFunction4bec00(Vector3 front, Vector3 top);
-    int UnknownFunction4bec50(Vector3 position);
-    int UnknownFunction4bec90(Vector3 velocity);
-    int UnknownFunction4becd0(float factor);
+    int CommitListenerSettings();
+    int SetListenerDistanceFactor(float factor);
+    int SetListenerDopplerFactor(float factor);
+    int SetListenerOrientation(Vector3 front, Vector3 top);
+    int SetListenerPosition(Vector3 position);
+    int SetListenerVelocity(Vector3 velocity);
+    int SetListenerRolloffFactor(float factor);
     // 0x004bed00 / 0x004bed40: EAX listener property 1 and 0 (all
     // parameters, 16 bytes).
-    int UnknownFunction4bed00(unsigned long value);
-    int UnknownFunction4bed40(void* parameters);
+    int SetEAXEnvironment(unsigned long value);
+    int SetEAXListenerParameters(void* parameters);
 
-    int field_0x30;                       // enumerated device count
-    UnknownSoundDevice* field_0x34;       // chosen device
-    UnknownSoundDevice field_0x38[4];
-    long field_0x3f8;                     // primary volume at start-up
-    UnknownSoundCaps field_0x3fc;
-    unsigned char field_0x45c_bit0 : 1;   // "AllowSoundHardware"
-    unsigned char field_0x45c_bit1 : 1;   // "AllowSoundEnumeration"
-    unsigned char field_0x45c_bit2 : 1;   // EAX listener available
-    unsigned char field_0x45c_bit3 : 1;   // "AllowEAXExtension"
-    UnknownDirectSound* field_0x460;
-    UnknownSoundListener* field_0x464;
-    UnknownSoundBuffer* field_0x468;      // primary buffer
-    UnknownPCAudioObject* field_0x46c;
-    SoundGroup* field_0x470;
-    Sound* field_0x474;                   // EAX probe sound
+    int soundDeviceCount;                      // +0x30: enumerated device count
+    UnknownSoundDevice* selectedSoundDevice;   // +0x34: chosen device
+    UnknownSoundDevice soundDevices[4];        // +0x38
+    long startupPrimaryVolume;                 // +0x3f8: primary volume at start-up
+    UnknownSoundCaps soundCaps;                // +0x3fc
+    unsigned char allowSoundHardware : 1;      // +0x45c bit 0: "AllowSoundHardware"
+    unsigned char allowSoundEnumeration : 1;   // +0x45c bit 1: "AllowSoundEnumeration"
+    unsigned char eaxAvailable : 1;            // +0x45c bit 2: EAX listener available
+    unsigned char allowEAXExtension : 1;       // +0x45c bit 3: "AllowEAXExtension"
+    UnknownDirectSound* directSound;           // +0x460
+    UnknownSoundListener* listener;            // +0x464
+    UnknownSoundBuffer* primaryBuffer;         // +0x468: primary buffer
+    UnknownPCAudioObject* soundMemoryManager;  // +0x46c
+    SoundGroup* eaxProbeGroup;                 // +0x470
+    Sound* eaxProbeSound;                      // +0x474: EAX probe sound
 };

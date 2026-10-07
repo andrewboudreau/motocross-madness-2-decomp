@@ -159,12 +159,18 @@ enum DDSurfaceDescFlags {
     DDSD_HEIGHT = 0x2,
     DDSD_WIDTH = 0x4,
     DDSD_PITCH = 0x8,
+    DDSD_BACKBUFFERCOUNT = 0x20,
     DDSD_PIXELFORMAT = 0x1000,
     DDSD_MIPMAPCOUNT = 0x20000
 };
 enum DDSurfaceCaps {
+    DDSCAPS_BACKBUFFER = 0x4,
+    DDSCAPS_COMPLEX = 0x8,
+    DDSCAPS_FLIP = 0x10,
+    DDSCAPS_PRIMARYSURFACE = 0x200,
     DDSCAPS_SYSTEMMEMORY = 0x800,
     DDSCAPS_TEXTURE = 0x1000,
+    DDSCAPS_3DDEVICE = 0x2000,
     DDSCAPS_VIDEOMEMORY = 0x4000,
     DDSCAPS_ZBUFFER = 0x20000,
     DDSCAPS_LOCALVIDMEM = 0x10000000,
@@ -173,7 +179,24 @@ enum DDSurfaceCaps {
 enum DDPixelFormatFlags { DDPF_ZBUFFER = 0x400 };
 enum DDLockFlags { DDLOCK_WAIT = 0x1, DDLOCK_READONLY = 0x10, DDLOCK_NOSYSLOCK = 0x800 };
 
+// DirectDraw cooperative level, enumeration, blit and presentation flags.
+enum DDCooperativeLevelFlags {
+    DDSCL_FULLSCREEN = 0x1,
+    DDSCL_ALLOWREBOOT = 0x2,
+    DDSCL_NORMAL = 0x8,
+    DDSCL_EXCLUSIVE = 0x10,
+    DDSCL_FPUSETUP = 0x800
+};
+enum DDEnumerationFlags { DDENUM_ATTACHEDSECONDARYDEVICES = 0x1, DDENUM_NONDISPLAYDEVICES = 0x4 };
+enum DDBlitFlags { DDBLT_COLORFILL = 0x400, DDBLT_WAIT = 0x1000000 };
+enum DDBlitFastFlags { DDBLTFAST_WAIT = 0x10 };
+enum DDFlipFlags { DDFLIP_WAIT = 0x1, DDFLIP_DONOTWAIT = 0x20 };
+enum DDBlitStatusFlags { DDGBS_CANBLT = 0x1, DDGBS_ISBLTDONE = 0x2 };
+enum DDVerticalBlankFlags { DDWAITVB_BLOCKBEGIN = 0x1 };
+enum DDGammaRampFlags { DDSGR_CALIBRATE = 0x1 };
+
 // DirectDraw HRESULTs (PCTexMap.cpp's error reporter 0x004c86e0 names
 // them in its string table).
 #define DDERR_NOTFOUND 0x887600ff
 #define DDERR_OUTOFVIDEOMEMORY 0x8876017c
+#define DDERR_WASSTILLDRAWING 0x8876021c

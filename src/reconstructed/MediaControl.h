@@ -40,7 +40,7 @@ struct UnknownMediaSurfaceDesc {
 struct UnknownStreamSampleInterface {
     virtual long __stdcall UnknownMethod0(const UnknownGuid* iid, void** object); // QueryInterface
     virtual long __stdcall UnknownMethod1();                              // AddRef
-    virtual long __stdcall UnknownMethod2();                              // Release
+    virtual long __stdcall Release();                              // Release
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();
@@ -53,7 +53,7 @@ struct UnknownStreamSampleInterface {
 struct UnknownMediaStreamInterface {
     virtual long __stdcall UnknownMethod0(const UnknownGuid* iid, void** object); // QueryInterface
     virtual long __stdcall UnknownMethod1();                              // AddRef
-    virtual long __stdcall UnknownMethod2();                              // Release
+    virtual long __stdcall Release();                              // Release
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();
@@ -74,7 +74,7 @@ struct UnknownMediaStreamInterface {
 struct UnknownMultiMediaStreamInterface {
     virtual long __stdcall UnknownMethod0(const UnknownGuid* iid, void** object); // QueryInterface
     virtual long __stdcall UnknownMethod1();                              // AddRef
-    virtual long __stdcall UnknownMethod2();                              // Release
+    virtual long __stdcall Release();                              // Release
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4(const UnknownGuid* purpose,
                                           UnknownMediaStreamInterface** stream); // GetMediaStream

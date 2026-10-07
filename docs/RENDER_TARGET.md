@@ -35,7 +35,8 @@ identical-code folding. All functions below are strict exact.
 
 ## PCRenderTarget
 
-PCRenderTarget wraps a COM-style device at +0x50 and a surface at +0x48. The
+PCRenderTarget wraps a COM-style `device` at +0x50 and `renderSurface` at
++0x48; `deviceCaps` names the decoded capability word at +0x164. The
 method indices it uses line up with IDirect3DDevice7 and IDirectDrawSurface7:
 
 - **Device:** 5/6 BeginScene/EndScene, 11 SetTransform, 13 SetViewport, 20/21
@@ -98,6 +99,7 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004c5230` `EnumTextureFormatCallback`
 - `0x004c52a0` `EnumZBufferFormatCallback`
 - `0x004c5950` `MeasureTextureMemory`
+- `0x004c4f80` `InitializeRenderTarget`
 - `0x004c5d00` `SaveScreenshot`
 
 ## Direct3D constants

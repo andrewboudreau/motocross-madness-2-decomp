@@ -13,6 +13,23 @@ handwritten C++ files: 112 of the 113 files in `src/reconstructed/` (all but
 `TerrainSupport.cpp`) and five files in `samples/`. This is a count of source files represented by at least one
 checked function, not a claim that complete object files or a linked game match.
 
+## Pending readability validation
+
+The PC-layer readability changes rename methods and fields, name DirectX
+constants and rekey callers, bindings and calibration symbols. The matching
+results below were recorded before these edits. Repeating the authoritative
+VC6 calibration is pending: the configured private-input download returned
+HTTP 403 in this environment.
+
+Independent Clang checks found no new syntax errors across 137 translation
+units and unchanged code bytes/normalized relocations in all 2797 compared
+code sections from 129 compilable files, including the PC layer and its callers.
+These checks establish source consistency and
+independent code shape; they do not establish a VC6 retail-byte match.
+With private inputs installed, reproduce the authoritative checks with
+`make vc6-private-gate` and
+`python3 tools/with_private_env.py -- make calibration-vc6`.
+
 ## Compiler profiles
 
 | Profiles | Strict generated | Manual | Calibration |

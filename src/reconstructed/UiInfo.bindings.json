@@ -72,7 +72,7 @@
   "?UnknownFunction4b78f0@UnknownParameterBlock@@QAEHPBD@Z": "0x004b78f0",
   "?UnknownFunction4b7ec0@UnknownParameterBlock@@QAEHPBD0PADH@Z": "0x004b7ec0",
   "?UnknownFunction4b7f10@UnknownParameterBlock@@QAEHPBDHPAH@Z": "0x004b7f10",
-  "?UnknownFunction4be910@PCSoundInterface@@QAEHHHH@Z": "0x004be910",
+  "?SetPrimaryFormat@PCSoundInterface@@QAEHHHH@Z": "0x004be910",
   "?LoadResourceString@TrackGame@@QAEHHPADH@Z": "0x00521970",
   "?UnknownFunction521fb0@UnknownTrackGameRacerSlot@@QAEXPAX00@Z": "0x00521fb0",
   "?UnknownFunction522050@UnknownTrackGameRacerSlot@@QAEXXZ": "0x00522050",

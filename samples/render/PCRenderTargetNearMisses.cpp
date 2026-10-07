@@ -18,7 +18,7 @@ int PCRenderTarget::UnknownVirtualSlot12(const CameraRect* rect, int flags) {
     field_0x3c = 0;
     field_0x40 = 0;
     field_0x44 = 0;
-    if (!field_0x04->field_0xb74_bit2) {
+    if (!field_0x04->isPowerVR) {
         int clearFlags = flags;
         if (!clearFlags) {
             if (fillMode == D3DFILL_WIREFRAME)

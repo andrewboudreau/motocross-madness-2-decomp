@@ -18,5 +18,5 @@ public:
     virtual int UnknownVirtualSlot6(int value);
 
     // 0x004c4830: rebuilds the modifier state at +0x16d8 from the keys.
-    void UnknownFunction4c4830();
+    void RefreshModifierState();
 };

@@ -41,8 +41,8 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     GameObject::UnknownVirtualSlot8(target);
     guiTextures = textures;
     guiSoundGroup = sound;
-    if (startSound && SoundSystem()->UnknownFunction4be5a0(22050, 1, 16, 4000000, 0) == 0)
-        SoundSystem()->UnknownFunction4be910(22050, 1, 16);
+    if (startSound && SoundSystem()->InitializeSound(22050, 1, 16, 4000000, 0) == 0)
+        SoundSystem()->SetPrimaryFormat(22050, 1, 16);
     if (!sound) {
         guiSoundGroup = new(__FILE__, 130) SoundGroup(1);
         AppendChild(guiSoundGroup, -1);
@@ -188,10 +188,10 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     display = g_TrackGame->display;
-    if (display->field_0x1a8)
-        surface = display->field_0x1a8;
+    if (display->renderSurface)
+        surface = display->renderSurface;
     else
-        surface = display->field_0x19c;
+        surface = display->primarySurface;
     if (!surface->Lock(0, &desc, 0x811, 0)) {
         if (rect) {
             left = rect->left;
@@ -283,11 +283,11 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
             backgroundRegion = tipGui->guiBackground->UnknownFunction4040f0(0);
             restoreFrames = 3;
         }
-        if (!((PCRenderTarget*)field_0x18)->field_0x48->GetDC((void**)&dc)) {
+        if (!((PCRenderTarget*)field_0x18)->renderSurface->GetDC((void**)&dc)) {
             previous = SelectObject(dc, (HGDIOBJ)tipGui->toolTipFont);
             GetTextExtentPoint32A(dc, text, strlen(text), &size);
             SelectObject(dc, previous);
-            ((PCRenderTarget*)field_0x18)->field_0x48->ReleaseDC(dc);
+            ((PCRenderTarget*)field_0x18)->renderSurface->ReleaseDC(dc);
             target = (PCRenderTarget*)field_0x18;
             width = size.cx + 2;
             if (width >= target->field_0x0c - 2)
@@ -307,14 +307,14 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
             screenArea.bottom = screenArea.top + height;
             texture = tipGui->CreateFilledTexture(width, height, 0x808080);
             textTexture = texture;
-            if (texture && texture->field_0x70) {
-                if (!texture->field_0x70->GetDC((void**)&dc)) {
+            if (texture && texture->systemSurface) {
+                if (!texture->systemSurface->GetDC((void**)&dc)) {
                     previous = SelectObject(dc, (HGDIOBJ)tipGui->toolTipFont);
                     SetTextColor(dc, 0xcccccc);
                     SetBkColor(dc, 0x404040);
                     DrawTextA(dc, text, strlen(text), &textArea, 0x8025);
                     SelectObject(dc, previous);
-                    texture->field_0x70->ReleaseDC(dc);
+                    texture->systemSurface->ReleaseDC(dc);
                 }
                 shown = 1;
                 showDelay = time;
@@ -344,7 +344,7 @@ int GUIUser::UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl
             *previous = focusControl;
         field_0x1d8 = control;
         focusControl = control;
-        if (g_TrackGame->display->field_0x6c) {
+        if (g_TrackGame->display->freezeFrameIndex) {
             if (control->controlType == 11) {
                 EnableImeInput(!control->acceptedCharacters || strcmp(control->acceptedCharacters, "0123456789") != 0);
             } else {

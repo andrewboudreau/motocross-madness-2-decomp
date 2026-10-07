@@ -53,12 +53,12 @@ void MultiPlayerDlg::AddChatLine(int player, const char* text) {
         sprintf(line, "%s: %s", name, text);
     } else {
         g_TrackGame->LoadResourceString(0x14ba, system, 0x80);
-        if (!g_TrackGame->field_0x538)
+        if (!g_TrackGame->imeLibrary)
             sprintf(line, "~5%s: %s", system, text);
         else
             sprintf(line, "%s: %s", system, text);
     }
-    if (!g_TrackGame->field_0x538) {
+    if (!g_TrackGame->imeLibrary) {
         if (g_TrackGame->network->localPlayer == player) {
             sprintf(line, "~1%s: ~0%s", name, text);
         } else {

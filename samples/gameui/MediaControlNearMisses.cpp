@@ -44,7 +44,7 @@ MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file
     if (!UnknownFunction4a23d0()) {
         goto failed;
     }
-    field_0x58 = ((PCRenderTarget*)target)->field_0x04->field_0x190;
+    field_0x58 = ((PCRenderTarget*)target)->field_0x04->directDraw;
     field_0x70 = done;
     field_0x74 = owner;
     if (CoCreateInstance(*(const GUID*)&CLSID_AMMultiMediaStream, 0, CLSCTX_INPROC_SERVER,
@@ -80,10 +80,10 @@ MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file
     field_0x30 = format.width;
     field_0x34 = format.height;
     surface = 0;
-    if (TARGET()->field_0x04->field_0x190->UnknownMethod0(&IID_IDirectDraw, (void**)&field_0x54)) {
+    if (TARGET()->field_0x04->directDraw->QueryInterface(&IID_IDirectDraw, (void**)&field_0x54)) {
         goto failed;
     }
-    if (field_0x54->UnknownMethod6((UnknownSurfaceDesc*)&format, &surface, 0)) {
+    if (field_0x54->CreateSurface((UnknownSurfaceDesc*)&format, &surface, 0)) {
         goto failed;
     }
     if (field_0x60->UnknownMethod13(surface, 0, 1, &field_0x64) < 0) {
@@ -94,14 +94,14 @@ MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file
     }
     memset(&frameDesc, 0, sizeof(frameDesc));
     frameDesc.size = sizeof(frameDesc);
-    if (TARGET()->field_0x48->GetSurfaceDesc(&frameDesc)) {
+    if (TARGET()->renderSurface->GetSurfaceDesc(&frameDesc)) {
         goto failed;
     }
     frameDesc.height = field_0x34;
     frameDesc.width = field_0x30;
     frameDesc.flags = 0x1007;
     frameDesc.caps[0] = 0x2800;
-    if (field_0x58->UnknownMethod6(&frameDesc, &field_0x2c, 0)) {
+    if (field_0x58->CreateSurface(&frameDesc, &field_0x2c, 0)) {
         goto failed;
     }
     field_0x3c[2] = field_0x30;

@@ -143,7 +143,7 @@ class UnknownSoundNotifier {
 public:
     UnknownSoundNotifier();                       // 0x004bb720
     ~UnknownSoundNotifier();                      // 0x004bb810
-    int UnknownFunction4bb740(Sound* sound);      // 0x004bb740: starts the thread
+    int StartRefillThread(Sound* sound);                // 0x004bb740: starts the thread
     static unsigned __stdcall UnknownThreadProc(void* context); // 0x004bb630
 
     Sound* field_0x00;
@@ -170,49 +170,49 @@ public:
     Sound(SoundGroup* group, int type); // 0x004bba10
     virtual ~Sound();                   // 0x004bbb60 (deleting wrapper 0x004bbb40)
 
-    int UnknownFunction4bbcd0();        // 0x004bbcd0: plays
-    int UnknownFunction4bbdc0();        // 0x004bbdc0: reapplies the cached settings
-    int UnknownFunction4bbef0(UnknownTextureStream* stream, unsigned long flags, unsigned long controls,
-                              int duplicates, int streamBytes); // 0x004bbef0: loads a .wav
+    int Play();                                         // 0x004bbcd0: plays
+    int ApplyCachedSettings();                          // 0x004bbdc0: reapplies the cached settings
+    int LoadWave(UnknownTextureStream* stream, unsigned long flags, unsigned long controls,
+        int duplicates, int streamBytes); // 0x004bbef0: loads a .wav
     int UnknownFunction4bc320(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c);
-    unsigned long UnknownFunction4bc490(unsigned long flags); // 0x004bc490: control flags
-    int UnknownFunction4bc4c0(Sound* source);                 // 0x004bc4c0: duplicates `source`
-    int UnknownFunction4bc5f0(const UnknownGuid* set, unsigned long id, unsigned long support);
-    int UnknownFunction4bc640(const UnknownGuid* set, unsigned long id, void* instance,
-                              unsigned long instanceSize, void* data, unsigned long dataSize);
-    int UnknownFunction4bc6b0(int restart, unsigned long playFlags, int preferHardware);
-    int UnknownFunction4bc940(int rewind);                    // 0x004bc940: stops
-    int UnknownFunction4bca80();                              // 0x004bca80: whether playing
-    int UnknownFunction4bcb30(unsigned long frequency, int force);
-    int UnknownFunction4bcbe0(long volume, int force);
-    int UnknownFunction4bcca0(long pan, int force);
-    int UnknownFunction4bcd40(unsigned long* play, unsigned long* write);
-    int UnknownFunction4bcd80(unsigned long position);
-    int UnknownFunction4bcdc0();                              // 0x004bcdc0: restores a lost buffer
-    int UnknownFunction4bce20(int paused);
-    int UnknownFunction4bcea0(float elapsed);                 // 0x004bcea0: fades
-    void UnknownFunction4bcf50();                             // 0x004bcf50: releases the buffers
-    int UnknownFunction4bd020(unsigned long offset, unsigned long bytes, void** first, unsigned long* firstBytes,
-                              void** second, unsigned long* secondBytes, unsigned long flags);
-    int UnknownFunction4bd080(void* first, unsigned long firstBytes, void* second, unsigned long secondBytes);
-    int UnknownFunction4bd0c0(UnknownSoundBuffer** buffer);   // 0x004bd0c0: fills from the file
-    int UnknownFunction4bd260(UnknownSoundBuffer** buffer, UnknownTextureStream* stream, unsigned long offset,
-                              unsigned long bytes);
-    int UnknownFunction4bd4b0();                              // 0x004bd4b0: creates the pending buffer
-    int UnknownFunction4bd540(UnknownSoundBuffer** buffer, unsigned long bytes, unsigned long rate,
-                              int bits, int blockAlign, int stereo, int is3D, int isStatic,
-                              unsigned long flags, int hardware);
-    int UnknownFunction4bd6a0(UnknownSoundBuffer** duplicate, Sound* source);
-    int UnknownFunction4bd6e0(UnknownSoundBuffer* buffer, UnknownSound3DBuffer** buffer3D);
-    int UnknownFunction4bd710();                              // 0x004bd710: queries the property set
-    int UnknownFunction4bd740(UnknownSound3DParameters* parameters);
-    int UnknownFunction4bd790(unsigned long mode);
-    int UnknownFunction4bd7e0(Vector3 position, int force);
-    int UnknownFunction4bd8a0(Vector3 velocity, int force);
-    int UnknownFunction4bd960(float minDistance, float maxDistance, int force);
-    int UnknownFunction4bda10(unsigned long insideConeAngle, unsigned long outsideConeAngle, int force);
-    int UnknownFunction4bdaa0(Vector3 orientation, int force);
-    int UnknownFunction4bdb60(long volume, int force);
+    unsigned long GetBufferControlFlags(unsigned long flags); // 0x004bc490: control flags
+    int DuplicateFrom(Sound* source);                   // 0x004bc4c0: duplicates `source`
+    int SupportsProperty(const UnknownGuid* set, unsigned long id, unsigned long support);
+    int SetProperty(const UnknownGuid* set, unsigned long id, void* instance,
+        unsigned long instanceSize, void* data, unsigned long dataSize);
+    int PlayWithOptions(int restart, unsigned long playFlags, int preferHardware);
+    int Stop(int rewind);                               // 0x004bc940: stops
+    int IsPlaying();                                    // 0x004bca80: whether playing
+    int SetFrequency(unsigned long frequency, int force);
+    int SetVolume(long volume, int force);
+    int SetPan(long pan, int force);
+    int GetBufferPosition(unsigned long* play, unsigned long* write);
+    int SetBufferPosition(unsigned long position);
+    int RestoreBuffer();                                // 0x004bcdc0: restores a lost buffer
+    int SetPaused(int paused);
+    int UpdateFade(float elapsed);                      // 0x004bcea0: fades
+    void ReleaseBuffers();                              // 0x004bcf50: releases the buffers
+    int LockBuffer(unsigned long offset, unsigned long bytes, void** first, unsigned long* firstBytes,
+        void** second, unsigned long* secondBytes, unsigned long flags);
+    int UnlockBuffer(void* first, unsigned long firstBytes, void* second, unsigned long secondBytes);
+    int FillBufferFromFile(UnknownSoundBuffer** buffer); // 0x004bd0c0: fills from the file
+    int FillBufferFromStream(UnknownSoundBuffer** buffer, UnknownTextureStream* stream, unsigned long offset,
+        unsigned long bytes);
+    int CreatePendingBuffer();                          // 0x004bd4b0: creates the pending buffer
+    int CreateBuffer(UnknownSoundBuffer** buffer, unsigned long bytes, unsigned long rate,
+        int bits, int blockAlign, int stereo, int is3D, int isStatic,
+        unsigned long flags, int hardware);
+    int DuplicateBuffer(UnknownSoundBuffer** duplicate, Sound* source);
+    int Query3DBuffer(UnknownSoundBuffer* buffer, UnknownSound3DBuffer** buffer3D);
+    int QueryPropertySet();                             // 0x004bd710: queries the property set
+    int Set3DParameters(UnknownSound3DParameters* parameters);
+    int Set3DMode(unsigned long mode);
+    int Set3DPosition(Vector3 position, int force);
+    int Set3DVelocity(Vector3 velocity, int force);
+    int Set3DDistanceRange(float minDistance, float maxDistance, int force);
+    int Set3DConeAngles(unsigned long insideConeAngle, unsigned long outsideConeAngle, int force);
+    int Set3DConeOrientation(Vector3 orientation, int force);
+    int Set3DConeOutsideVolume(long volume, int force);
 
     SoundGroup* field_0x08;
     UnknownSoundBuffer* field_0x0c;          // buffer
@@ -266,11 +266,11 @@ public:
     UnknownPCAudioObject();  // 0x004bddf0
     ~UnknownPCAudioObject(); // 0x004bde40: stops the thread, closes the handles
     static unsigned __stdcall UnknownThreadProc(void* context); // 0x004bdc00
-    int UnknownFunction4bdef0(int budget);        // 0x004bdef0: starts the thread
-    void UnknownFunction4bdfc0(Sound* sound);     // 0x004bdfc0: queues a load
-    void UnknownFunction4be0a0(Sound* sound, int bytes); // 0x004be0a0: records a loaded sound
-    void UnknownFunction4be130(int bytes);        // 0x004be130: evicts to make room
-    void UnknownFunction4be220(Sound* sound);     // 0x004be220: unloads a sound
+    int StartLoaderThread(int budget);                  // 0x004bdef0: starts the thread
+    void QueueSoundLoad(Sound* sound);                  // 0x004bdfc0: queues a load
+    void RecordLoadedSound(Sound* sound, int bytes);    // 0x004be0a0: records a loaded sound
+    void MakeRoomForSound(int bytes);                   // 0x004be130: evicts to make room
+    void UnloadSound(Sound* sound);                     // 0x004be220: unloads a sound
 
     HANDLE field_0x00; // thread
     HANDLE field_0x04; // event signalled to stop the thread

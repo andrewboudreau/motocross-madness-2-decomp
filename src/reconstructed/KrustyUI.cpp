@@ -309,14 +309,14 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         if (!g_TrackGame->field_0x2d0) {
             // Free video memory: total less the frame buffers, or a fixed 4 MB
             // (2 MB below 800x600) off the total outside NT without the 0x400 cap.
-            int memory = KRUSTYUI_TARGET->field_0x04->field_0x54;
+            int memory = KRUSTYUI_TARGET->field_0x04->totalVideoMemory;
             int free = memory - UnknownFunction511970(KRUSTYUI_TARGET->field_0x28) *
                                     (KRUSTYUI_TARGET->field_0x14 + 1) * KRUSTYUI_TARGET->field_0x10 *
                                     KRUSTYUI_TARGET->field_0x0c;
-            if (g_TrackGame->field_0x424.platformId != 2 &&
-                !(KRUSTYUI_TARGET->field_0x04->field_0x1b8 & 0x400))
-                free = (KRUSTYUI_TARGET->field_0x164 & 0x4000) ? memory - 0x400000 : memory - 0x200000;
-            if (!g_TrackGame->display->field_0x9f0 && free < 0x500000)
+            if (g_TrackGame->osVersion.platformId != 2 &&
+                !(KRUSTYUI_TARGET->field_0x04->driverCaps & 0x400))
+                free = (KRUSTYUI_TARGET->deviceCaps & 0x4000) ? memory - 0x400000 : memory - 0x200000;
+            if (!g_TrackGame->display->isAGP && free < 0x500000)
                 context.field_0x14 = 1;
         }
         KRUSTYUI_GARAGE = new(__FILE__, 0x174) UnknownKrustyUICharacter(1);
@@ -516,7 +516,7 @@ void KrustyUI::OpenMenu(int menu) {
         field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);
         break;
     case 104:
-        if (g_TrackGame->mode.field_0xa4c != g_TrackGame->display->field_0x0c)
+        if (g_TrackGame->mode.field_0xa4c != g_TrackGame->display->currentDisplayMode)
             g_TrackGame->UnknownVirtualSlot19(g_TrackGame->mode.field_0xa4c);
         dialog = new(__FILE__, 695) LoadingDlg(1);
         field_0x2c->ShowDialog(dialog, menu, 2, 0, 0, 0, 0, 1);

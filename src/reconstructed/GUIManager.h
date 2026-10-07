@@ -36,7 +36,7 @@ class TextureMapManager;
 struct UnknownGuiClipper {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();                          // Release
+    virtual long __stdcall Release();                          // Release
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();
@@ -50,7 +50,7 @@ struct UnknownGuiClipper {
 struct UnknownGuiDirectDraw {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();
+    virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4(unsigned long flags, UnknownGuiClipper** clipper,
                                           void* outer);              // CreateClipper
@@ -59,7 +59,7 @@ struct UnknownGuiDirectDraw {
 struct UnknownGuiSurface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();
+    virtual long __stdcall Release();
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();

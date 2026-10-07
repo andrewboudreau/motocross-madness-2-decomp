@@ -59,13 +59,13 @@ int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, UnknownSurfaceInt
     UnknownSurfaceDesc target;
     long left, top, right, bottom;
     if (!table) {
-        if (destination->BltFast(x, y, field_0x70, rect, flags))
+        if (destination->BltFast(x, y, systemSurface, rect, flags))
             goto failed;
         return 1;
     }
     memset(&source, 0, sizeof(source));
     source.size = sizeof(source);
-    if (field_0x70->Lock(0, &source, 0x811, 0))
+    if (systemSurface->Lock(0, &source, 0x811, 0))
         goto failed;
     memset(&target, 0, sizeof(target));
     target.size = sizeof(target);
@@ -102,7 +102,7 @@ int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, UnknownSurfaceInt
             }
         }
     }
-    if (destination->Unlock(0) || field_0x70->Unlock(0))
+    if (destination->Unlock(0) || systemSurface->Unlock(0))
         goto failed;
     return 1;
 failed:
@@ -160,11 +160,11 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
         manager = g_TrackGame->field_0x3c;
         copy = new(__FILE__, 986) PCTextureMap(manager, 1);
     }
-    if (field_0x70) {
+    if (systemSurface) {
         UnknownSurfaceDesc desc;
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        if (!field_0x70->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0)) {
+        if (!systemSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0)) {
             int systemMemory = 0;
             int noAlpha = 0;
             if (!(desc.caps[0] & 0x30000000))
@@ -174,8 +174,8 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
             int created = copy->UnknownVirtualSlot4(desc.surface, field_0x14, field_0x18,
                                                     desc.pitch / UnknownFunction511970(field_0x20), field_0x1c,
                                                     field_0x20, field_0x20, field_0x2c, noAlpha | systemMemory,
-                                                    field_0x78, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-            if (!field_0x70->Unlock(0) && created) {
+                                                    texturePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+            if (!systemSurface->Unlock(0) && created) {
                 if (field_0x30) {
                     if (field_0x20 == 8) {
                         copy->UnknownVirtualSlot18((field_0x2c->field_0x010[field_0x34][0] << 8 |
@@ -225,7 +225,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
     field_0x18 = height;
     field_0x1c = minimumSize;
     field_0x2c = palette;
-    field_0x78 = surfacePalette;
+    texturePalette = surfacePalette;
     if (choice)
         format = UnknownFunction511ad0(format) ? choice->field_0x10 : choice->field_0x0c;
     field_0x20 = format;
@@ -234,7 +234,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
     field_0x24 = 1;
     if (!mipmapped) {
         field_0x1c = width;
-        if (!field_0x70) {
+        if (!systemSurface) {
             memset(&desc, 0, sizeof(desc));
             desc.size = sizeof(desc);
             desc.height = height;
@@ -251,8 +251,8 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                     (field_0x20 == 555 || field_0x20 == 565)) {
                     shared = 1;
                     if (g_UnknownSharedSurfaces68a394[field_0x24]) {
-                        field_0x70 = g_UnknownSharedSurfaces68a394[field_0x24];
-                        field_0x70->AddRef();
+                        systemSurface = g_UnknownSharedSurfaces68a394[field_0x24];
+                        systemSurface->AddRef();
                     } else {
                         desc.caps[0] = 0x1800;
                     }
@@ -260,7 +260,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                     desc.caps[0] = 0x1800;
                 }
             }
-            if (!field_0x70) {
+            if (!systemSurface) {
                 if (field_0x20 == 4444) {
                     formats[0] = field_0x20;
                     formats[1] = 1555;
@@ -295,15 +295,15 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                     formats[2] = 0;
                     if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (g_TrackGame->display->field_0x190->UnknownMethod6(&desc, &field_0x70, 0)) {
+                } else if (g_TrackGame->display->directDraw->CreateSurface(&desc, &systemSurface, 0)) {
                     goto failed;
                 }
             }
             if (shared) {
-                g_UnknownSharedSurfaces68a394[field_0x24] = field_0x70;
-                field_0x70->AddRef();
+                g_UnknownSharedSurfaces68a394[field_0x24] = systemSurface;
+                systemSurface->AddRef();
             }
-            if (field_0x78 && field_0x20 == 8 && field_0x70->SetPalette(field_0x78))
+            if (texturePalette && field_0x20 == 8 && systemSurface->SetPalette(texturePalette))
                 goto failed;
         }
     } else {
@@ -320,7 +320,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
             (!checkMemory || UnknownFunction511970(565) > UnknownFunction511970(sourceFormat)) &&
             !field_0x10->UnknownFunction511370(UnknownFunction511970(565) * width * height))
             return 0;
-        if (!field_0x70) {
+        if (!systemSurface) {
             memset(&desc, 0, sizeof(desc));
             desc.size = sizeof(desc);
             desc.height = height;
@@ -338,8 +338,8 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                     (field_0x20 == 555 || field_0x20 == 565)) {
                     shared = 1;
                     if (g_UnknownSharedMipSurfaces68a36c[field_0x24]) {
-                        field_0x70 = g_UnknownSharedMipSurfaces68a36c[field_0x24];
-                        field_0x70->AddRef();
+                        systemSurface = g_UnknownSharedMipSurfaces68a36c[field_0x24];
+                        systemSurface->AddRef();
                     } else {
                         desc.caps[0] = 0x401808;
                     }
@@ -347,7 +347,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                     desc.caps[0] = 0x401808;
                 }
             }
-            if (!field_0x70) {
+            if (!systemSurface) {
                 if (field_0x20 == 4444) {
                     formats[0] = field_0x20;
                     formats[1] = 1555;
@@ -385,19 +385,19 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 }
             }
             if (shared) {
-                g_UnknownSharedMipSurfaces68a36c[field_0x24] = field_0x70;
-                field_0x70->AddRef();
+                g_UnknownSharedMipSurfaces68a36c[field_0x24] = systemSurface;
+                systemSurface->AddRef();
             }
-            if (field_0x78 && field_0x20 == 8 && field_0x70->SetPalette(field_0x78))
+            if (texturePalette && field_0x20 == 8 && systemSurface->SetPalette(texturePalette))
                 goto failed;
         }
     }
-    if (field_0x70->GetCaps(&caps))
+    if (systemSurface->GetCaps(&caps))
         goto failed;
     if (bits) {
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        if (field_0x70->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
+        if (systemSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
             goto failed;
         void* destination = desc.surface;
         int bytesPerPixel = UnknownFunction511970(field_0x20);
@@ -406,13 +406,13 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
         if (!(flags & 4))
             field_0x3c = UnknownFunction4d24d0(destination, desc.width, desc.height, desc.pitch / bytesPerPixel,
                                                field_0x20, palette);
-        if (field_0x70->Unlock(0))
+        if (systemSurface->Unlock(0))
             goto failed;
         if (mipmapped && !UnknownVirtualSlot15(2))
             goto failed;
     }
     if (g_UnknownGlobal689968)
-        DumpLevel(field_0x70, 0);
+        DumpLevel(systemSurface, 0);
     if (UnknownFunction511ad0(format) & !UnknownFunction511ad0(field_0x20)) {
         UnknownVirtualSlot18(0xff00ff);
         return 1;

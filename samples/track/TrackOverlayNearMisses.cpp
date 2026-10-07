@@ -312,7 +312,7 @@ int StatsOverlay::UnknownFunction519a20()
         return 1;
     RestoreRect(&sourceRect);
     PCTextureMap* texture = (PCTextureMap*)sharedTexture;
-    if (texture->field_0x70->GetDC(&dc) != 0)
+    if (texture->systemSurface->GetDC(&dc) != 0)
         goto fail;
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
@@ -325,7 +325,7 @@ int StatsOverlay::UnknownFunction519a20()
         strcpy(field_0x1b0[i], rowText[i]);
     }
     SelectObject(dc, font);
-    if (texture->field_0x70->ReleaseDC(dc) != 0) {
+    if (texture->systemSurface->ReleaseDC(dc) != 0) {
 fail:
         return 0;
     }

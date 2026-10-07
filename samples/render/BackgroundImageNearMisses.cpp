@@ -67,8 +67,8 @@ int BackgroundImage::UnknownVirtualSlot13() {
     if (!fullRestoreFrames) {
         UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->field_0x08;
         if (!camera || !camera->field_0x25_bit0 || !camera->redrawFrames ||
-            camera->viewportHeight != g_TrackGame->display->field_0x10[g_TrackGame->display->field_0x0c].height ||
-            camera->viewportWidth != g_TrackGame->display->field_0x10[g_TrackGame->display->field_0x0c].width) {
+            camera->viewportHeight != g_TrackGame->display->displayModes[g_TrackGame->display->currentDisplayMode].height ||
+            camera->viewportWidth != g_TrackGame->display->displayModes[g_TrackGame->display->currentDisplayMode].width) {
             if (!copyValid) {
                 UnknownVirtualSlot27(offscreenCopy);
                 copyValid = 1;
@@ -80,7 +80,7 @@ int BackgroundImage::UnknownVirtualSlot13() {
             return 1;
         }
     }
-    UnknownVirtualSlot27(Target()->field_0x48);
+    UnknownVirtualSlot27(Target()->renderSurface);
     copyValid = 0;
     if (Target()->field_0x08)
         ClearRegionDepth();
@@ -163,7 +163,7 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
                     surface = offscreenCopy;
                     field_0x60 = 0;
                 } else {
-                    surface = Target()->field_0x48;
+                    surface = Target()->renderSurface;
                     field_0x60 = 1;
                     (*frames)--;
                 }
@@ -179,7 +179,7 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
                     if (g_UnknownGlobal5777a8.left < g_UnknownGlobal5777a8.right &&
                         g_UnknownGlobal5777a8.top < g_UnknownGlobal5777a8.bottom) {
                         if (field_0x68 && g_UnknownGlobal5777a0 > field_0x64) {
-                            surface = Target()->field_0x48;
+                            surface = Target()->renderSurface;
                             field_0x68 = 0;
                         } else if (!field_0x68 && g_UnknownGlobal5777a0 == field_0x64) {
                             surface = offscreenCopy;
@@ -199,7 +199,7 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
                 }
             }
         } else {
-            surface = Target()->field_0x48;
+            surface = Target()->renderSurface;
             *frames = Target()->field_0x14;
         }
         if (index >= 0)
@@ -207,7 +207,7 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
     } else {
         if (index >= 0)
             UnknownFunction404240(index, rect);
-        surface = Target()->field_0x48;
+        surface = Target()->renderSurface;
         *frames = Target()->field_0x14;
     }
     if (!surface)

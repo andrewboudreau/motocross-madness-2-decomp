@@ -116,5 +116,10 @@ Function names (tier 3, from behaviour): `0x004bfc50` `StartUp`,
 Fields: `deviceGuid` (+0x2f8, "Renderer"), `companyName` (+0x320,
 "Rainbow Studios") and the texture-stage filters `magFilter`, `minFilter`,
 `mipFilter` (+0x54c..+0x554, D3DTSS_MAGFILTER/MINFILTER/MIPFILTER in slot
-7). The window, instance, string-instance, OS-version, IMM and registry-key
-fields keep their offset names because UI and TrackGame sources read them.
+7). Windows members now use `windowRect` (+0x308), `instanceHandle`
+(+0x318), `windowHandle` (+0x31c), `applicationName` (+0x3a0),
+`resourceInstance` (+0x420), `osVersion` (+0x424), `registryKey` (+0x4b8),
+`imeLibrary` (+0x538), `inputContext` (+0x53c) and `previousInputContext`
+(+0x540). `displayProfilesStale` names bit 0 at +0x548. UI, input and
+TrackGame callers use these provisional names; the declarations retain
+the decoded offsets and layout.

@@ -129,9 +129,9 @@ TextureMapManager::~TextureMapManager() {
         delete field_0x70;
     for (int i = 0; i < 10; i++) {
         if (g_UnknownSharedSurfaces68a394[i])
-            g_UnknownSharedSurfaces68a394[i]->UnknownMethod2();
+            g_UnknownSharedSurfaces68a394[i]->Release();
         if (g_UnknownSharedMipSurfaces68a36c[i])
-            g_UnknownSharedMipSurfaces68a36c[i]->UnknownMethod2();
+            g_UnknownSharedMipSurfaces68a36c[i]->Release();
     }
 }
 
@@ -153,7 +153,7 @@ int TextureMapManager::UnknownVirtualSlot12() {
 
 // 0x00510e30: nothing to do with AGP textures.
 int TextureMapManager::UnknownVirtualSlot13() {
-    if (g_TrackGame->display->field_0x9f0)
+    if (g_TrackGame->display->isAGP)
         return 1;
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
@@ -265,7 +265,7 @@ int TextureMapManager::UnknownFunction5113d0() {
         if (!sizes[i])
             sizes[i] = 1;
     }
-    if (g_TrackGame->display->field_0x9f0) {
+    if (g_TrackGame->display->isAGP) {
         for (i = 0; i < count; i++) {
             UnknownTextureMapList* textures = &field_0x44.Get(i)->field_0x44;
             for (TextureMap* texture = textures->First(); texture; texture = textures->Next())
@@ -286,7 +286,7 @@ int TextureMapManager::UnknownFunction5113d0() {
             if (best == -1)
                 break;
             total += 0x2aaaa;
-            if (total > g_TrackGame->display->field_0x60)
+            if (total > g_TrackGame->display->textureCacheLimit)
                 break;
             if (!field_0x44.Get(best)->UnknownFunction50c4a0(steps[best] + 1))
                 break;
@@ -314,11 +314,11 @@ void TextureMapManager::UnknownFunction511580() {
     int count128 = 0;
     int count256 = 0;
     int cost = 0;
-    g_TrackGame->display->field_0x190->UnknownMethod23(&caps, &totalMemory, &freeMemory);
+    g_TrackGame->display->directDraw->GetAvailableVidMem(&caps, &totalMemory, &freeMemory);
     int bytes = 0;
     for (; texture; texture = field_0x2c.Next()) {
         int kind = 0;
-        if (static_cast<PCTextureMap*>(texture)->field_0x74) {
+        if (static_cast<PCTextureMap*>(texture)->textureSurface) {
             if (texture->field_0x14 == 32) {
                 count32++;
                 kind |= 6;

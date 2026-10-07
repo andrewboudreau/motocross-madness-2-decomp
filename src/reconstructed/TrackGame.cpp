@@ -93,15 +93,15 @@ TrackGame::TrackGame() {
     field_0x3400 = 0;
     languageModule = LoadLibraryA("lang.dll");
     if (languageModule)
-        field_0x420 = languageModule;
+        resourceInstance = languageModule;
     GetLocaleInfoA(kLocaleUserDefault, kLocaleDecimalSeparator, savedDecimalSeparator,
                    sizeof(savedDecimalSeparator));
     SetLocaleInfoA(kLocaleUserDefault, kLocaleDecimalSeparator, ".");
     const char* key = "Software\\Microsoft\\Microsoft Games\\Motocross Madness 2 Trial";
     int count = strlen(key);
     int length = count > 0x7f ? 0x7f : count;
-    strncpy(field_0x4b8, key, length);
-    field_0x4b8[length] = 0;
+    strncpy(registryKey, key, length);
+    registryKey[length] = 0;
     fullRecordPacketIntervalSeconds =
         GetRegistryInt("IntervalBetweenFullRecordPacketsMS", 500) * 0.001f;
     shortRecordPacketIntervalSeconds =
@@ -144,7 +144,7 @@ TrackGame::~TrackGame() {
     }
     delete field_0x3444;
     delete g_DebugSocket;
-    if (field_0x424.platformId == kWindowsNtPlatform && screenSaverWasActive)
+    if (osVersion.platformId == kWindowsNtPlatform && screenSaverWasActive)
         SystemParametersInfoA(kSetScreenSaverActive, 1, 0, 2);
 }
 
@@ -156,27 +156,27 @@ int TrackGame::UnknownVirtualSlot1() {
     UnknownMemoryStatus status;
     char text[128];
     if (!mode.FindDataDirectory() &&
-        LoadStringA(field_0x420, 0x13b3, text, sizeof(text))) {
+        LoadStringA(resourceInstance, 0x13b3, text, sizeof(text))) {
         ShowCursor(1);
-        MessageBoxA(0, text, field_0x3a0, 0x10);
+        MessageBoxA(0, text, applicationName, 0x10);
         return 0;
     }
     while (!mode.FindCdDirectory()) {
-        if (LoadStringA(field_0x420, 0x13b5, text, sizeof(text))) {
+        if (LoadStringA(resourceInstance, 0x13b5, text, sizeof(text))) {
             ShowCursor(1);
-            if (MessageBoxA(0, text, field_0x3a0, 0x15) == 2)
+            if (MessageBoxA(0, text, applicationName, 0x15) == 2)
                 return 0;
         }
     }
     GlobalMemoryStatus(&status);
     if (status.availPhys + status.availPageFile < 0x4000000 &&
-        LoadStringA(field_0x420, 0x14bb, text, sizeof(text))) {
+        LoadStringA(resourceInstance, 0x14bb, text, sizeof(text))) {
         ShowCursor(1);
-        int answer = MessageBoxA(0, text, field_0x3a0, 0x23);
+        int answer = MessageBoxA(0, text, applicationName, 0x23);
         if (answer == 2 || answer == 7)
             return 0;
     }
-    if (field_0x424.platformId == kWindowsNtPlatform) {
+    if (osVersion.platformId == kWindowsNtPlatform) {
         SystemParametersInfoA(kGetScreenSaverActive, 0, &screenSaverWasActive, 0);
         if (screenSaverWasActive)
             SystemParametersInfoA(kSetScreenSaverActive, 0, 0, 2);
@@ -197,7 +197,7 @@ int TrackGame::UnknownVirtualSlot1() {
     name[length] = 0;
     if (!UnknownVirtualSlot18(name, path))
         return 0;
-    int accepted = eula(field_0x4b8, path, 0, 1);
+    int accepted = eula(registryKey, path, 0, 1);
     FreeLibrary(library);
     if (!accepted)
         return 0;
@@ -245,15 +245,15 @@ int TrackGame::UnknownVirtualSlot4() {
     mode.CreateDirectoryLists();
     mode.ResetNetworkRace();
     g_MemTagStack->Push("Audio");
-    if (((PCSoundInterface*)soundInterface)->UnknownFunction4be5a0(22050, 1, mode.field_0xa48 ? 16 : 8,
+    if (((PCSoundInterface*)soundInterface)->InitializeSound(22050, 1, mode.field_0xa48 ? 16 : 8,
                                                               4000000, mode.field_0xa34) ==
         (long)kSoundDeviceAlreadyAllocated) {
         char text[256];
-        SendMessageA(field_0x31c, kSendSystemCommand, kScreenSaverCommand, 0);
+        SendMessageA(windowHandle, kSendSystemCommand, kScreenSaverCommand, 0);
         ShowCursor(1);
-        LoadStringA(field_0x420, 0x13d3, text, sizeof(text));
-        MessageBoxA(field_0x31c, text, field_0x3a0, 0x10);
-        PostMessageA(field_0x31c, kCloseWindow, 0, 0);
+        LoadStringA(resourceInstance, 0x13d3, text, sizeof(text));
+        MessageBoxA(windowHandle, text, applicationName, 0x10);
+        PostMessageA(windowHandle, kCloseWindow, 0, 0);
         return 1;
     }
     field_0x3340 = new(__FILE__, 343) CDAudio;
@@ -333,14 +333,14 @@ int TrackGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntr
 // opens menu 0x191 (in-game).
 int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind == 0) {
-        void* context = ImmGetContext(field_0x31c);
+        void* context = ImmGetContext(windowHandle);
         if (context) {
             int closed;
-            if (field_0x538 && ImmGetOpenStatus(context))
+            if (imeLibrary && ImmGetOpenStatus(context))
                 closed = 0;
             else
                 closed = 1;
-            ImmReleaseContext(field_0x31c, context);
+            ImmReleaseContext(windowHandle, context);
             if (!closed)
                 return 0;
         }
@@ -422,11 +422,11 @@ void TrackGame::SetMenuOpen(int open, int id, int sound) {
 
 // 0x00521970
 int TrackGame::LoadResourceString(int id, char* buffer, int size) {
-    if (!field_0x420) {
+    if (!resourceInstance) {
         strcpy(buffer, "Resource String Unavailable");
         return 0;
     }
-    if (!LoadStringA(field_0x420, id, buffer, size)) {
+    if (!LoadStringA(resourceInstance, id, buffer, size)) {
         char message[128];
         sprintf(message, "Resource string '%d' load fail\n", id);
         strcpy(buffer, "Resource String Unavailable");
@@ -437,7 +437,7 @@ int TrackGame::LoadResourceString(int id, char* buffer, int size) {
 
 // 0x00521a30
 void TrackGame::UnknownFunction521a30() {
-    ((PCSoundInterface*)soundInterface)->UnknownFunction4be9b0(0);
+    ((PCSoundInterface*)soundInterface)->SetPrimaryVolume(0);
 }
 
 // 0x00521a40

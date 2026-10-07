@@ -20,7 +20,7 @@ PCInputDevice::~PCInputDevice() {
 }
 
 // 0x004c26d0
-int PCInputDevice::UnknownMethod4c26d0(int acquire) {
+int PCInputDevice::SetAcquired(int acquire) {
     if (device) {
         if (acquire) {
             if (device->Acquire() >= 0)
@@ -34,8 +34,8 @@ int PCInputDevice::UnknownMethod4c26d0(int acquire) {
 }
 
 // 0x004c2710
-int PCInputDevice::UnknownMethod4c2710(int property, unsigned long object, unsigned long how,
-                                       unsigned long data) {
+int PCInputDevice::SetDwordProperty(int property, unsigned long object, unsigned long how,
+    unsigned long data) {
     if (!device)
         return 0;
     UnknownInputProperty value;

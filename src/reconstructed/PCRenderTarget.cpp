@@ -11,7 +11,7 @@
 // 0x004c4ee0: every cached render state starts as {i, 0}.
 PCRenderTarget::PCRenderTarget() {
     memset(&deviceGuid, 0, sizeof(deviceGuid));
-    field_0x48 = 0;
+    renderSurface = 0;
     device = 0;
     zbuffer = 0;
     textureFormatCount = 0;
@@ -32,11 +32,11 @@ PCRenderTarget::~PCRenderTarget() {
         textureFormatCount = 0;
     }
     if (device) {
-        device->UnknownMethod2();
+        device->Release();
         device = 0;
     }
     if (zbuffer) {
-        zbuffer->UnknownMethod2();
+        zbuffer->Release();
         zbuffer = 0;
     }
     if (zbufferFormats)
@@ -55,13 +55,13 @@ int PCRenderTarget::UnknownVirtualSlot2() {
 
 // 0x004c53f0
 int PCRenderTarget::UnknownVirtualSlot3(void* destination, void* source, void* sourceRect, int flags) {
-    return field_0x48->Blt(destination, static_cast<UnknownBlitSource*>(source)->field_0x70,
+    return renderSurface->Blt(destination, static_cast<UnknownBlitSource*>(source)->field_0x70,
                                       sourceRect, flags, 0) == 0;
 }
 
 // 0x004c5490
 int PCRenderTarget::UnknownVirtualSlot5(void* rect) {
-    return field_0x48->Unlock(rect) == 0;
+    return renderSurface->Unlock(rect) == 0;
 }
 
 // 0x004c54b0
@@ -137,7 +137,7 @@ void* PCRenderTarget::UnknownVirtualSlot4(void* rect, long* pitch, int flags) {
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    if (field_0x48->Lock(rect, &desc, flags, 0) != 0)
+    if (renderSurface->Lock(rect, &desc, flags, 0) != 0)
         return 0;
     if (pitch)
         *pitch = desc.pitch;
@@ -285,7 +285,7 @@ int PCRenderTarget::MeasureTextureMemory(int* value) {
         desc.height = 0x100;
         desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         desc.caps[0] = DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE;
-        if (field_0x04->field_0x190->UnknownMethod6(&desc, &surfaces[count], 0) != 0)
+        if (field_0x04->directDraw->CreateSurface(&desc, &surfaces[count], 0) != 0)
             break;
         surfaces[count]->GetCaps(&caps);
         if (caps.caps & DDSCAPS_LOCALVIDMEM)
@@ -303,7 +303,7 @@ int PCRenderTarget::MeasureTextureMemory(int* value) {
         desc.height = 0x20;
         desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
         desc.caps[0] = DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE;
-        if (field_0x04->field_0x190->UnknownMethod6(&desc, &surfaces[count], 0) != 0)
+        if (field_0x04->directDraw->CreateSurface(&desc, &surfaces[count], 0) != 0)
             break;
         surfaces[count]->GetCaps(&caps);
         if (caps.caps & DDSCAPS_LOCALVIDMEM)
@@ -313,7 +313,7 @@ int PCRenderTarget::MeasureTextureMemory(int* value) {
     }
     bytes += found << 11;
     for (int i = 0; i < count; i++)
-        surfaces[i]->UnknownMethod2();
+        surfaces[i]->Release();
     *value = bytes;
     return 1;
 }
@@ -345,7 +345,7 @@ void PCRenderTarget::SaveScreenshot() {
     }
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    if (field_0x48->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0) == 0) {
+    if (renderSurface->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0) == 0) {
         if (desc.pixelFormat.bitCount == 16)
             WriteTga16(desc.surface, desc.width, desc.height, desc.pitch, desc.pixelFormat.masks[1],
                                   path, 0x20);
@@ -353,7 +353,7 @@ void PCRenderTarget::SaveScreenshot() {
             WriteTga24(desc.surface, desc.width, desc.height, desc.pitch, path, 0x20);
         else if (desc.pixelFormat.bitCount == 32)
             WriteTga32(desc.surface, desc.width, desc.height, desc.pitch, path, 0x20);
-        field_0x48->Unlock(0);
+        renderSurface->Unlock(0);
     }
 }
 
@@ -361,21 +361,21 @@ void PCRenderTarget::SaveScreenshot() {
 // reads the surface size and pixel format, attaches a Z buffer of the same
 // depth when `zbuffer` is set, then creates the device and collects its caps
 // and texture formats. On any failure the target deletes itself.
-RenderTarget* PCRenderTarget::UnknownFunction4c4f80(UnknownDisplay* display, const UnknownGuid* deviceId,
-                                                    UnknownSurfaceInterface* surface, int wantZBuffer, int frames) {
+RenderTarget* PCRenderTarget::InitializeRenderTarget(UnknownDisplay* display, const UnknownGuid* deviceId,
+    UnknownSurfaceInterface* surface, int wantZBuffer, int frames) {
     UnknownPixelFormat format;
     UnknownSurfaceDesc desc;
     UnknownFunction4e8ca0(display);
-    field_0x48 = surface;
+    renderSurface = surface;
     field_0x14 = frames;
     field_0x04 = display;
     deviceGuid = *deviceId;
-    if (display->field_0x194->UnknownMethod6(&deviceGuid, EnumZBufferFormatCallback, this) != 0)
+    if (display->direct3D->EnumZBufferFormats(&deviceGuid, EnumZBufferFormatCallback, this) != 0)
         goto fail;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-    if (field_0x48->GetSurfaceDesc(&desc) != 0)
+    if (renderSurface->GetSurfaceDesc(&desc) != 0)
         goto fail;
     field_0x0c = desc.width;
     field_0x10 = desc.height;
@@ -383,7 +383,7 @@ RenderTarget* PCRenderTarget::UnknownFunction4c4f80(UnknownDisplay* display, con
         int memory = desc.caps[0] & DDSCAPS_VIDEOMEMORY;
         memset(&format, 0, sizeof(format));
         format.size = sizeof(format);
-        if (field_0x48->GetPixelFormat(&format) != 0)
+        if (renderSurface->GetPixelFormat(&format) != 0)
             goto fail;
         field_0x28 = FormatFromPixelFormat(&format);
         field_0x24 = memory ? DDSCAPS_VIDEOMEMORY : DDSCAPS_SYSTEMMEMORY;
@@ -409,21 +409,21 @@ RenderTarget* PCRenderTarget::UnknownFunction4c4f80(UnknownDisplay* display, con
             desc.height = field_0x10;
             desc.pixelFormat = zbufferFormats[i];
             desc.pixelFormat.size = sizeof(UnknownPixelFormat);
-            long result = field_0x04->field_0x190->UnknownMethod6(&desc, &zbuffer, 0);
+            long result = field_0x04->directDraw->CreateSurface(&desc, &zbuffer, 0);
             if (result == DDERR_OUTOFVIDEOMEMORY || result != 0)
                 goto fail;
-            if (field_0x48->AddAttachedSurface(zbuffer) != 0)
+            if (renderSurface->AddAttachedSurface(zbuffer) != 0)
                 goto fail;
         }
     }
-    if (field_0x04->field_0x194->UnknownMethod4(&deviceGuid, field_0x48, &device) != 0)
+    if (field_0x04->direct3D->CreateDevice(&deviceGuid, renderSurface, &device) != 0)
         goto fail;
-    memset(&field_0x164, 0, 0x250 - 0x164); // the D3DDEVICEDESC7
-    if (device->GetCaps(&field_0x164) != 0)
+    memset(&deviceCaps, 0, 0x250 - 0x164); // the D3DDEVICEDESC7
+    if (device->GetCaps(&deviceCaps) != 0)
         goto fail;
     memset(&format, 0, sizeof(format));
     format.size = sizeof(format);
-    if (field_0x48->GetPixelFormat(&format) != 0)
+    if (renderSurface->GetPixelFormat(&format) != 0)
         goto fail;
     field_0x28 = FormatFromPixelFormat(&format);
     field_0x2c = 1.0f;

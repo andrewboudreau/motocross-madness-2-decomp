@@ -69,7 +69,7 @@ int DebugOverlay::UnknownFunction447a00()
         for (int i = 0; i < 256; i++)
             characters[i] = (char)i;
         HDC dc;
-        if (fontTexture->field_0x70->GetDC((void**)&dc))
+        if (fontTexture->systemSurface->GetDC((void**)&dc))
             return 0;
         SetBkColor(dc, 1);
         SetBkMode(dc, 1);
@@ -109,7 +109,7 @@ int DebugOverlay::UnknownFunction447a00()
         }
         DeleteObject(handle);
         SelectObject(dc, previous);
-        if (fontTexture->field_0x70->ReleaseDC(dc))
+        if (fontTexture->systemSurface->ReleaseDC(dc))
             return 0;
     }
     if (fontTexture->UnknownVirtualSlot8(1, 0, 0))

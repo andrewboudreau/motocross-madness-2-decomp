@@ -184,7 +184,7 @@ GUIManager::~GUIManager() {
     if (toolTipFont)
         DeleteObject((HGDIOBJ)toolTipFont);
     if (windowClipper)
-        windowClipper->UnknownMethod2();
+        windowClipper->Release();
 }
 
 // 0x004857f0
@@ -521,23 +521,23 @@ int GUIManager::EnableWindowClipper(int enable) {
     if (enable) {
         if (windowClipper) {
             windowClipper->UnknownMethod7(0, 0);
-            windowClipper->UnknownMethod2();
+            windowClipper->Release();
         }
-        ((UnknownGuiDirectDraw*)g_TrackGame->display->field_0x190)
+        ((UnknownGuiDirectDraw*)g_TrackGame->display->directDraw)
             ->UnknownMethod4(0, &windowClipper, 0);
-        ((UnknownGuiSurface*)g_TrackGame->display->field_0x19c)->UnknownMethod28(windowClipper);
+        ((UnknownGuiSurface*)g_TrackGame->display->primarySurface)->UnknownMethod28(windowClipper);
         if (windowClipper)
-            windowClipper->UnknownMethod8(0, g_TrackGame->field_0x31c);
+            windowClipper->UnknownMethod8(0, g_TrackGame->windowHandle);
     } else {
         if (windowClipper) {
             windowClipper->UnknownMethod7(0, 0);
-            windowClipper->UnknownMethod2();
+            windowClipper->Release();
             windowClipper = 0;
         }
-        ((UnknownGuiSurface*)g_TrackGame->display->field_0x19c)->UnknownMethod28(0);
+        ((UnknownGuiSurface*)g_TrackGame->display->primarySurface)->UnknownMethod28(0);
     }
     display = g_TrackGame->display;
-    display->UnknownFunction4cb5b0(enable);
+    display->SetGDISurfaceVisible(enable);
     return 1;
 }
 
@@ -854,12 +854,12 @@ void GUIUser::EnableImeInput(int enable) {
     UnknownGuiControl* control;
 
     if (enable) {
-        ImmAssociateContext((HWND)g_TrackGame->field_0x31c, (HIMC)g_TrackGame->field_0x53c);
+        ImmAssociateContext((HWND)g_TrackGame->windowHandle, (HIMC)g_TrackGame->inputContext);
         area = focusControl->field_0x214;
         composition.dwStyle = CFS_FORCE_POSITION;
         composition.ptCurrentPos.x = area.left;
         composition.ptCurrentPos.y = area.top;
-        ImmSetCompositionWindow((HIMC)g_TrackGame->field_0x53c, &composition);
+        ImmSetCompositionWindow((HIMC)g_TrackGame->inputContext, &composition);
         font.lfWidth = 0;
         font.lfQuality = 2;
         font.lfPitchAndFamily = 2;
@@ -887,20 +887,20 @@ void GUIUser::EnableImeInput(int enable) {
             font.lfItalic = (BYTE)control->ownerGui->toolTipItalic;
         }
         strcpy(font.lfFaceName, face);
-        ImmSetCompositionFontA((HIMC)g_TrackGame->field_0x53c, &font);
+        ImmSetCompositionFontA((HIMC)g_TrackGame->inputContext, &font);
         position.x = 550;
         position.y = 450;
-        ImmSetStatusWindowPos((HIMC)g_TrackGame->field_0x53c, &position);
-        window = ImmGetDefaultIMEWnd((HWND)g_TrackGame->field_0x31c);
+        ImmSetStatusWindowPos((HIMC)g_TrackGame->inputContext, &position);
+        window = ImmGetDefaultIMEWnd((HWND)g_TrackGame->windowHandle);
         if (window)
             SendMessageA(window, WM_IME_CONTROL, IMC_OPENSTATUSWINDOW, 0);
-        ImmSetOpenStatus((HIMC)g_TrackGame->field_0x53c, 0);
+        ImmSetOpenStatus((HIMC)g_TrackGame->inputContext, 0);
     } else {
-        window = ImmGetDefaultIMEWnd((HWND)g_TrackGame->field_0x31c);
+        window = ImmGetDefaultIMEWnd((HWND)g_TrackGame->windowHandle);
         if (window)
             SendMessageA(window, WM_IME_CONTROL, IMC_CLOSESTATUSWINDOW, 0);
-        ImmNotifyIME((HIMC)g_TrackGame->field_0x53c, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
-        ImmAssociateContext((HWND)g_TrackGame->field_0x31c, (HIMC)g_TrackGame->field_0x540);
+        ImmNotifyIME((HIMC)g_TrackGame->inputContext, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
+        ImmAssociateContext((HWND)g_TrackGame->windowHandle, (HIMC)g_TrackGame->previousInputContext);
     }
 }
 

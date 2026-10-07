@@ -9,26 +9,29 @@
 PCCamera::PCCamera(int flags) : Camera(flags) {}
 
 
-int PCCamera::UnknownVirtualSlot30(const Matrix4* value) {
-    Camera::UnknownVirtualSlot30(value);
-    UnknownRenderInterface* render = PCOwner()->device;
-    if (render && render->SetTransform(D3DTRANSFORMSTATE_WORLD, value))
+// 0x004bedc0: stores and submits the world transform.
+int PCCamera::UnknownVirtualSlot30(const Matrix4* world) {
+    Camera::UnknownVirtualSlot30(world);
+    UnknownRenderInterface* device = PCOwner()->device;
+    if (device && device->SetTransform(D3DTRANSFORMSTATE_WORLD, world))
         return 0;
     return 1;
 }
 
-int PCCamera::UnknownVirtualSlot31(const Matrix4* value) {
-    Camera::UnknownVirtualSlot31(value);
-    UnknownRenderInterface* render = PCOwner()->device;
-    if (render && render->SetTransform(D3DTRANSFORMSTATE_VIEW, value))
+// 0x004bee00: stores and submits the view transform.
+int PCCamera::UnknownVirtualSlot31(const Matrix4* view) {
+    Camera::UnknownVirtualSlot31(view);
+    UnknownRenderInterface* device = PCOwner()->device;
+    if (device && device->SetTransform(D3DTRANSFORMSTATE_VIEW, view))
         return 0;
     return 1;
 }
 
-int PCCamera::UnknownVirtualSlot32(const Matrix4* value) {
-    Camera::UnknownVirtualSlot32(value);
-    UnknownRenderInterface* render = PCOwner()->device;
-    if (render && render->SetTransform(D3DTRANSFORMSTATE_PROJECTION, value))
+// 0x004bee40: stores and submits the projection transform.
+int PCCamera::UnknownVirtualSlot32(const Matrix4* projection) {
+    Camera::UnknownVirtualSlot32(projection);
+    UnknownRenderInterface* device = PCOwner()->device;
+    if (device && device->SetTransform(D3DTRANSFORMSTATE_PROJECTION, projection))
         return 0;
     return 1;
 }

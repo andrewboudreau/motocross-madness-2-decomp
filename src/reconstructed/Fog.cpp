@@ -39,17 +39,17 @@ Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibili
     if (g_TrackGame->field_0x2d0) {
         renderFog = 0;
     } else {
-        sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->field_0x04->field_0x4bc);
+        sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->field_0x04->driverGuidText);
         renderFog = g_TrackGame->GetRegistryFlag(name, 1);
         if (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGVERTEX) {
             field_0x44 = D3DPRASTERCAPS_FOGVERTEX;
-        } else if (TARGET()->field_0x04->field_0xb74_bit2 || (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
+        } else if (TARGET()->field_0x04->isPowerVR || (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
             field_0x44 = D3DPRASTERCAPS_FOGTABLE;
         } else if (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGRANGE) {
             field_0x44 = D3DPRASTERCAPS_FOGRANGE;
         }
         // Not Windows NT (VER_PLATFORM_WIN32_NT is 2).
-        if (g_TrackGame->field_0x424.platformId != 2 && !(TARGET()->field_0x04->field_0x1b8 & 0x400)
+        if (g_TrackGame->osVersion.platformId != 2 && !(TARGET()->field_0x04->driverCaps & 0x400)
             && (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
             field_0x44 = D3DPRASTERCAPS_FOGTABLE;
         }
@@ -93,7 +93,7 @@ int Fog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* ent
 
     if (UnknownFunction43caa0(0x57, 0, event, 3) && !g_TrackGame->field_0x2d0) {
         renderFog = 1 - renderFog;
-        sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->field_0x04->field_0x4bc);
+        sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->field_0x04->driverGuidText);
         g_TrackGame->SetRegistryFlag(name, renderFog);
         return 1;
     }

@@ -325,13 +325,13 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
 
     if (!game->display)
         return;
-    if (game->field_0x548_bit0 || !guid ||
-        memcmp(guid, &game->display->field_0x4ac, sizeof(UnknownGuid)) ||
-        !game->display->field_0x10[*mode].field_0x14) {
+    if (game->displayProfilesStale || !guid ||
+        memcmp(guid, &game->display->driverGuid, sizeof(UnknownGuid)) ||
+        !game->display->displayModes[*mode].field_0x14) {
         *mode = 0;
         if (g_TrackGame->field_0x2d0) {
-            for (i = 0; i < g_TrackGame->display->field_0x08; i++) {
-                UnknownDisplayMode* entry = &g_TrackGame->display->field_0x10[i];
+            for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
+                UnknownDisplayMode* entry = &g_TrackGame->display->displayModes[i];
                 if (entry->width == 640 && entry->height == 480 && entry->bitDepth == 16 &&
                     entry->field_0x18) {
                     *mode = i;
@@ -339,18 +339,18 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
                 }
             }
             if (!*mode) {
-                for (i = 0; i < g_TrackGame->display->field_0x08; i++) {
+                for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
                     if (!*mode ||
-                        (g_TrackGame->display->field_0x10[i].field_0x18 &&
-                         g_TrackGame->display->field_0x10[i].bitDepth == 16 &&
-                         g_TrackGame->display->field_0x10[i].height >
-                             g_TrackGame->display->field_0x10[*mode].height))
+                        (g_TrackGame->display->displayModes[i].field_0x18 &&
+                         g_TrackGame->display->displayModes[i].bitDepth == 16 &&
+                         g_TrackGame->display->displayModes[i].height >
+                             g_TrackGame->display->displayModes[*mode].height))
                         *mode = i;
                 }
             }
         } else {
-            for (i = 0; i < g_TrackGame->display->field_0x08; i++) {
-                UnknownDisplayMode* entry = &g_TrackGame->display->field_0x10[i];
+            for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
+                UnknownDisplayMode* entry = &g_TrackGame->display->displayModes[i];
                 if (entry->width == 640 && entry->height == 480 && entry->bitDepth == 16 &&
                     entry->field_0x14) {
                     *mode = i;
@@ -358,18 +358,18 @@ void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
                 }
             }
             if (!*mode) {
-                for (i = 0; i < g_TrackGame->display->field_0x08; i++) {
+                for (i = 0; i < g_TrackGame->display->displayModeCount; i++) {
                     if (!*mode ||
-                        (g_TrackGame->display->field_0x10[i].field_0x14 &&
-                         g_TrackGame->display->field_0x10[i].bitDepth == 16 &&
-                         g_TrackGame->display->field_0x10[i].height >
-                             g_TrackGame->display->field_0x10[*mode].height))
+                        (g_TrackGame->display->displayModes[i].field_0x14 &&
+                         g_TrackGame->display->displayModes[i].bitDepth == 16 &&
+                         g_TrackGame->display->displayModes[i].height >
+                             g_TrackGame->display->displayModes[*mode].height))
                         *mode = i;
                 }
             }
         }
     }
-    field_0x23a8 = g_TrackGame->display->field_0x4ac;
+    field_0x23a8 = g_TrackGame->display->driverGuid;
 }
 
 // 0x00523000: loads the profile's control file.
@@ -455,8 +455,8 @@ int TrackGameMode::UnknownFunction5231f0() {
     g_TrackGame->ui->field_0x48c = 1;
     UnknownFunction523000();
     if (g_TrackGame->soundInterface) {
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->field_0x45c_bit3 = field_0xa34;
-        ((PCSoundInterface*)g_TrackGame->soundInterface)->UnknownFunction4be910(22050, 1, field_0xa48 ? 16 : 8);
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->allowEAXExtension = field_0xa34;
+        ((PCSoundInterface*)g_TrackGame->soundInterface)->SetPrimaryFormat(22050, 1, field_0xa48 ? 16 : 8);
     }
     field_0x27f8 = field_0x29e4;
     field_0x94 = field_0x98;
@@ -514,17 +514,17 @@ void TrackGameMode::UnknownFunction523580() {
 int TrackGameMode::WaitForCd() {
     char text[0x80];
 
-    SendMessageA(g_TrackGame->field_0x31c, 0x112, 0xf020, 0);
+    SendMessageA(g_TrackGame->windowHandle, 0x112, 0xf020, 0);
     while (!FindCdDirectory()) {
-        if (LoadStringA(g_TrackGame->field_0x420, 0x13b5, text, 0x80)) {
+        if (LoadStringA(g_TrackGame->resourceInstance, 0x13b5, text, 0x80)) {
             ShowCursor(1);
-            if (MessageBoxA(g_TrackGame->field_0x31c, text, g_TrackGame->field_0x3a0, 0x15) == 2) {
-                SendMessageA(g_TrackGame->field_0x31c, 0x10, 0, 0);
+            if (MessageBoxA(g_TrackGame->windowHandle, text, g_TrackGame->applicationName, 0x15) == 2) {
+                SendMessageA(g_TrackGame->windowHandle, 0x10, 0, 0);
                 return 0;
             }
         }
     }
-    SendMessageA(g_TrackGame->field_0x31c, 0x112, 0xf120, 0);
+    SendMessageA(g_TrackGame->windowHandle, 0x112, 0xf120, 0);
     return 1;
 }
 
@@ -608,8 +608,8 @@ int TrackGameMode::OpenHelp(const char* topic, const char* parameters) {
         else
             sprintf(name, "%s\\%s.hlp", UNKNOWN_HELP_DIRECTORY, topic);
         if (UnknownFunction5238f0(name, path)) {
-            SendMessageA(g_TrackGame->field_0x31c, 0x112, 0xf020, 0);
-            ShellExecuteA(g_TrackGame->field_0x31c, 0, path, parameters, directory, 1);
+            SendMessageA(g_TrackGame->windowHandle, 0x112, 0xf020, 0);
+            ShellExecuteA(g_TrackGame->windowHandle, 0, path, parameters, directory, 1);
             return 1;
         }
     }

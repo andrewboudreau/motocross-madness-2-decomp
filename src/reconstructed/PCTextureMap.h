@@ -82,8 +82,8 @@ public:
     int CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* formats);
     void WriteLevel(UnknownSurfaceDesc* desc, const char* name);            // 0x004c8550: writes a level
 
-    UnknownSurfaceInterface* field_0x70;      // system-memory surface (counted in DirectX memory)
-    UnknownSurfaceInterface* field_0x74;      // texture surface
-    void* field_0x78;                         // palette for 8-bit textures
+    UnknownSurfaceInterface* systemSurface;    // +0x70: system-memory surface (counted in DirectX memory)
+    UnknownSurfaceInterface* textureSurface;   // +0x74: texture surface
+    void* texturePalette;                      // +0x78: palette for 8-bit textures
     UnknownVideoDecoder* videoDecoder;
 };

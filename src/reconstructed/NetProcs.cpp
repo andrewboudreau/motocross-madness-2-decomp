@@ -186,10 +186,10 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case kDialogInit: {
         UIMultiState* control = static_cast<UIMultiState*>(FindControl("ButPort", 2));
         control->SetStateCount(4);
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x147b);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x147c);
-        control->SetStateTextFromResource(2, g_TrackGame->field_0x420, 0x147d);
-        control->SetStateTextFromResource(3, g_TrackGame->field_0x420, 0x147e);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x147b);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x147c);
+        control->SetStateTextFromResource(2, g_TrackGame->resourceInstance, 0x147d);
+        control->SetStateTextFromResource(3, g_TrackGame->resourceInstance, 0x147e);
         g_SerialSettings.port = 0;
         control->UnknownVirtualSlot54(&g_SerialSettings.port);
 
@@ -204,28 +204,28 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 
         control = static_cast<UIMultiState*>(FindControl("ButStop", 2));
         control->SetStateCount(3);
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1478);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1479);
-        control->SetStateTextFromResource(2, g_TrackGame->field_0x420, 0x147a);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1478);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1479);
+        control->SetStateTextFromResource(2, g_TrackGame->resourceInstance, 0x147a);
         g_SerialSettings.stopBits = 0;
         control->UnknownVirtualSlot54(&g_SerialSettings.stopBits);
 
         control = static_cast<UIMultiState*>(FindControl("ButParity", 2));
         control->SetStateCount(4);
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x146f);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1470);
-        control->SetStateTextFromResource(2, g_TrackGame->field_0x420, 0x1471);
-        control->SetStateTextFromResource(3, g_TrackGame->field_0x420, 0x1472);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x146f);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1470);
+        control->SetStateTextFromResource(2, g_TrackGame->resourceInstance, 0x1471);
+        control->SetStateTextFromResource(3, g_TrackGame->resourceInstance, 0x1472);
         g_SerialSettings.parity = 0;
         control->UnknownVirtualSlot54(&g_SerialSettings.parity);
 
         control = static_cast<UIMultiState*>(FindControl("ButFlow", 2));
         control->SetStateCount(5);
-        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1474);
-        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1473);
-        control->SetStateTextFromResource(2, g_TrackGame->field_0x420, 0x1476);
-        control->SetStateTextFromResource(3, g_TrackGame->field_0x420, 0x1477);
-        control->SetStateTextFromResource(4, g_TrackGame->field_0x420, 0x1475);
+        control->SetStateTextFromResource(0, g_TrackGame->resourceInstance, 0x1474);
+        control->SetStateTextFromResource(1, g_TrackGame->resourceInstance, 0x1473);
+        control->SetStateTextFromResource(2, g_TrackGame->resourceInstance, 0x1476);
+        control->SetStateTextFromResource(3, g_TrackGame->resourceInstance, 0x1477);
+        control->SetStateTextFromResource(4, g_TrackGame->resourceInstance, 0x1475);
         g_SerialSettings.flowControl = 4;
         control->UnknownVirtualSlot54(&g_SerialSettings.flowControl);
 
@@ -254,14 +254,14 @@ void TCPAddressDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case kDialogInit: {
         UIControl* control = FindControl("TitleText", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x898);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x898);
         control = FindControl("OkButton", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13e9);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13e9);
         control = FindControl("CancelButton", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13dc);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13dc);
         control = FindControl("TxtPrompt", 12);
         control->field_0x1e8 = 1;
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x899);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x899);
         control = FindControl("EditBox", 0);
         guiUser->UnknownFunction487790((UnknownGuiControl*)control, 0, 0);
         break;
@@ -300,11 +300,11 @@ void SessionDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UnknownFunction452930(300, event);
         break;
     case kDialogInit: {
-        FindControl("TitleText", 12)->SetTextFromResource(g_TrackGame->field_0x420, 0x911);
+        FindControl("TitleText", 12)->SetTextFromResource(g_TrackGame->resourceInstance, 0x911);
         UIEditBox* control = static_cast<UIEditBox*>(FindControl("OKButton", 0));
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13e9);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13e9);
         control = static_cast<UIEditBox*>(FindControl("CancelButton", 0));
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13dc);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13dc);
         control = static_cast<UIEditBox*>(FindControl("EditBox", 0));
         control->SetCapacity(11);
         control->SetEditText(g_TrackGame->mode.field_0x10);
@@ -331,11 +331,11 @@ void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                                               (UnknownGuiDialog*)this, 0, 0, 1);
             return;
         } else if (!_stricmp("ButMiddle", event->controlName)) {
-            SendMessageA((HWND)g_TrackGame->field_0x31c, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+            SendMessageA((HWND)g_TrackGame->windowHandle, WM_SYSCOMMAND, SC_MINIMIZE, 0);
             g_SessionListCount = 0;
             g_TrackGame->network->EnumSessions(
                 (SessionInfoType*)g_TrackGame->mode.field_0xa98.field_0x00, &g_SessionListCount, 1);
-            SendMessageA((HWND)g_TrackGame->field_0x31c, WM_SYSCOMMAND, SC_RESTORE, 0);
+            SendMessageA((HWND)g_TrackGame->windowHandle, WM_SYSCOMMAND, SC_RESTORE, 0);
             if (g_SessionListCount >= 1 &&
                 g_TrackGame->network->JoinSession(
                     (const GUID*)g_TrackGame->mode.field_0xa98.field_0x00[g_TrackGame->mode.field_0xfd4].instance,
@@ -350,21 +350,21 @@ void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         }
         break;
     case kDialogInit: {
-        FindControl("TitleText", 12)->SetTextFromResource(g_TrackGame->field_0x420, 0x952);
+        FindControl("TitleText", 12)->SetTextFromResource(g_TrackGame->resourceInstance, 0x952);
         UIControl* control = FindControl("ButRight", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13dc);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13dc);
         control = FindControl("ButLeft", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x950);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x950);
         control = FindControl("ButMiddle", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x951);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x951);
         return;
     }
     case 9:
         if (event->code == 0x14) {
-            SendMessageA((HWND)g_TrackGame->field_0x31c, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+            SendMessageA((HWND)g_TrackGame->windowHandle, WM_SYSCOMMAND, SC_MINIMIZE, 0);
             int opened = g_TrackGame->network->CreateSession(
                 g_TrackGame->mode.field_0x10, 0);
-            SendMessageA((HWND)g_TrackGame->field_0x31c, WM_SYSCOMMAND, SC_RESTORE, 0);
+            SendMessageA((HWND)g_TrackGame->windowHandle, WM_SYSCOMMAND, SC_RESTORE, 0);
             if (opened) {
                 g_TrackGame->ui->OpenMenu(0x866);
                 event->dialog->EndDialog(0x63);
@@ -389,18 +389,18 @@ void ConnectErrorDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case kDialogInit: {
         UIControl* control = FindControl("TitleText", 0);
         control->SetTextAlign(10);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13c2);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13c2);
         control = FindControl("ButLeft", 1);
         control->Show(0, 1);
         control->keyBind = 0;
         control = FindControl("ButRight", 0);
         control->Show(0, 1);
         control = FindControl("ButMiddle", 0);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13e9);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13e9);
         control->keyBind = 0x1c;
         control = FindControl("TxtPrompt", 12);
         control->field_0x1e8 = 1;
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13c9);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13c9);
         break;
     }
     }
@@ -423,10 +423,10 @@ void PlayerRemovedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control = FindControl("ButMiddle", 1);
         control->Show(0, 1);
         control = FindControl("ButRight", 1);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13e9);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13e9);
         control->keyBind = 0x1c;
         control = FindControl("TitleText", 12);
-        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13d1);
+        control->SetTextFromResource(g_TrackGame->resourceInstance, 0x13d1);
         break;
     }
     }

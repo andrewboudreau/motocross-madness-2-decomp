@@ -20,6 +20,30 @@ presents frames, and reads the back buffer back for partial texture
 blits. `0x004ca790` and `0x004ca900` return int (PCGame and its near
 miss gained the new bindings keys).
 
+## Readable reconstruction names
+
+Display creation and mode changes now have names such as `InitializeDisplay`,
+`SetFullscreenCooperativeLevel`, `CreateFlipChain`, `CreateWindowedSurfaces`
+and `SetFullscreenDisplayMode`. The partial-upload probes use
+`CopyRenderSurfaceToTexture`, `ProbePartialTextureUploads`,
+`TestPartialTextureUpload` and `MeanTextureChannelDifference`. The base
+helpers are `CompareDisplayModes`, `FindDisplayMode` and `RecordFrameTime`.
+These names describe decoded calls, arguments and data flow (tier 3);
+retail entry addresses remain in comments and bindings.
+
+The DirectDraw/Direct3D objects, primary/back/render surfaces, driver identity,
+mode table, presentation flags and timing fields have role names, with
+their decoded offsets retained beside the declarations. DirectX interface
+methods and flag values follow the SDK layouts (strong inference from IIDs,
+slot order and call shapes). Remaining uncertain fields and virtual contracts
+keep their offset/slot names. Callers and near-miss samples use the same names;
+binding addresses and calibration extents are unchanged.
+
+See [pending readability validation](VC6_MATCHING.md#pending-readability-validation)
+for the distinction between the checks on these edits and the prior VC6 results.
+
+## Matching status
+
 Exact: 28 calibration cases (22 PCVideoCard, 6 VideoCard). Near misses
 (`samples/render/PCVideoCardNearMisses.cpp`, notes there): `0x004ca520`,
 `0x004ca5a0`, the PartialTexBlt driver `0x004cab00`, `0x004cb330`,

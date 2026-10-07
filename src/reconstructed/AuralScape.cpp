@@ -69,7 +69,7 @@ void SoundGroup::UnknownFunction401c30() {
 void SoundGroup::UnknownFunction401dd0(long volume) {
     field_0x30 = volume;
     for (int i = 0; i < field_0x34.m_count; i++)
-        field_0x34.Get(i)->UnknownFunction4bcbe0(volume, 0);
+        field_0x34.Get(i)->SetVolume(volume, 0);
 }
 
 // 0x00401e20
@@ -99,7 +99,7 @@ void SoundGroup::UnknownVirtualSlot7() {
 // 0x00401ea0
 int SoundGroup::UnknownVirtualSlot18() {
     for (int i = 0; i < field_0x34.m_count; i++)
-        field_0x34.Get(i)->UnknownFunction4bcdc0();
+        field_0x34.Get(i)->RestoreBuffer();
     return 1;
 }
 
@@ -107,14 +107,14 @@ int SoundGroup::UnknownVirtualSlot18() {
 int SoundGroup::UnknownVirtualSlot16(int value) {
     GameObject::UnknownVirtualSlot16(value);
     for (int i = 0; i < field_0x34.m_count; i++)
-        field_0x34.Get(i)->UnknownFunction4bce20(value);
+        field_0x34.Get(i)->SetPaused(value);
     return 1;
 }
 
 // 0x00401f30
 int SoundGroup::UnknownVirtualSlot10(float frameTime) {
     for (int i = 0; i < field_0x34.m_count; i++)
-        field_0x34.Get(i)->UnknownFunction4bcea0(frameTime);
+        field_0x34.Get(i)->UpdateFade(frameTime);
     return GameObject::UnknownVirtualSlot10(frameTime);
 }
 
@@ -222,7 +222,7 @@ void SoundEmitter::UnknownFunction402420(UnknownSound3DParameters params) {
     field_0x190 = field_0x150.position;
     field_0x150 = params;
     if (field_0x34)
-        field_0x34->UnknownFunction4bd740(&params);
+        field_0x34->Set3DParameters(&params);
 }
 
 // 0x00402470
@@ -234,8 +234,8 @@ void SoundEmitter::UnknownFunction402470(Vector3* position, Vector3* velocity) {
     if (velocity)
         field_0x150.velocity = *velocity;
     if (field_0x34) {
-        field_0x34->UnknownFunction4bd7e0(field_0x150.position, 1);
-        field_0x34->UnknownFunction4bd8a0(field_0x150.velocity, 1);
+        field_0x34->Set3DPosition(field_0x150.position, 1);
+        field_0x34->Set3DVelocity(field_0x150.velocity, 1);
     }
 }
 
@@ -284,21 +284,21 @@ void SoundEmitter::UnknownFunction402530(int count, AuralScapeListener** listene
 int SoundEmitter::UnknownFunction402680() {
     if (!field_0x34)
         return 0;
-    return field_0x34->UnknownFunction4bca80();
+    return field_0x34->IsPlaying();
 }
 
 // 0x00402690
 int SoundEmitter::UnknownFunction402690(long volume) {
     if (!field_0x34)
         return 0;
-    return field_0x34->UnknownFunction4bcbe0(volume, 0);
+    return field_0x34->SetVolume(volume, 0);
 }
 
 // 0x004026b0
 int SoundEmitter::UnknownFunction4026b0(long pan) {
     if (!field_0x34)
         return 0;
-    return field_0x34->UnknownFunction4bcca0(pan, 0);
+    return field_0x34->SetPan(pan, 0);
 }
 
 // 0x004026d0
@@ -306,7 +306,7 @@ int SoundEmitter::UnknownFunction4026d0() {
     field_0x1a0_bit4 = 0;
     if (!field_0x34)
         return 0;
-    return field_0x34->UnknownFunction4bc940(0);
+    return field_0x34->Stop(0);
 }
 
 // 0x00402700
@@ -328,7 +328,7 @@ int SoundEmitter::UnknownFunction402700(unsigned long flags) {
         UnknownFunction402420(field_0x150);
         return 1;
     }
-    field_0x34->UnknownFunction4bd960(field_0x150.minDistance, field_0x150.maxDistance, 1);
+    field_0x34->Set3DDistanceRange(field_0x150.minDistance, field_0x150.maxDistance, 1);
     UnknownFunction402470(&field_0x150.position, &field_0x150.velocity);
     return 1;
 }
@@ -356,9 +356,9 @@ int SoundEmitter::UnknownFunction402810() {
     if (field_0x14c & 1)
         field_0x1a0_bit0 = 1;
     int hardware = 0;
-    if ((int)SoundSystem()->field_0x3fc.freeHw3DAllBuffers > 0 && (field_0x14c & 0x10))
+    if ((int)SoundSystem()->soundCaps.freeHw3DAllBuffers > 0 && (field_0x14c & 0x10))
         hardware = 1;
-    return field_0x34->UnknownFunction4bc6b0(0, loop, hardware);
+    return field_0x34->PlayWithOptions(0, loop, hardware);
 }
 
 // 0x004028d0
@@ -369,7 +369,7 @@ int SoundEmitter::UnknownVirtualSlot10(float frameTime) {
         move.y = field_0x150.position.y - field_0x190.y;
         move.z = field_0x150.position.z - field_0x190.z;
         field_0x150.velocity = move * frameTime;
-        field_0x34->UnknownFunction4bd8a0(field_0x150.velocity, 0);
+        field_0x34->Set3DVelocity(field_0x150.velocity, 0);
     }
     return GameObject::UnknownVirtualSlot10(frameTime);
 }
@@ -409,7 +409,7 @@ int SoultreeSoundEmitter::UnknownVirtualSlot10(float frameTime) {
     field_0x190 = field_0x150.position;
     field_0x150.position = position;
     if (field_0x34)
-        field_0x34->UnknownFunction4bd7e0(position, 1);
+        field_0x34->Set3DPosition(position, 1);
     return SoundEmitter::UnknownVirtualSlot10(frameTime);
 }
 
@@ -431,7 +431,7 @@ int AuralScapeListener::UnknownFunction402b40(AuralScape* owner, float doppler, 
     if (!owner)
         return 0;
     field_0x00 = owner;
-    field_0x04 = SoundSystem()->UnknownFunction4be800();
+    field_0x04 = SoundSystem()->QueryListener();
     if (!field_0x04)
         return 0;
     if (!UnknownFunction402c10(doppler))
@@ -658,7 +658,7 @@ void AuralScape::UnknownFunction403150() {
     }
     qsort(field_0x80.m_data, field_0x80.m_count, sizeof(SoundEmitter*), UnknownCompare402d40);
 
-    int available = SoundSystem()->field_0x3fc.freeHw3DAllBuffers + field_0x30 - field_0x34;
+    int available = SoundSystem()->soundCaps.freeHw3DAllBuffers + field_0x30 - field_0x34;
     if (waiting3D > available) {
         qsort(field_0x44.m_data, field_0x44.m_count, sizeof(SoundEmitter*), UnknownCompare402d70);
         for (i = 0; i < field_0x44.m_count; i++) {
@@ -712,7 +712,7 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
         field_0x98->UnknownFunction507c10(&position, 0, 0, (int)&material);
         zone = (material >> 4) & 3;
         environment = field_0x94->field_0xa4->field_0x410[zone];
-        SoundSystem()->UnknownFunction4bed00(environment);
+        SoundSystem()->SetEAXEnvironment(environment);
     }
 
     for (int i = 0; i < field_0x38; i++)
@@ -725,14 +725,14 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
         g_TrackGame->debugOverlay->UnknownFunction447fa0(field_0x9c, "Audio");
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Hardware");
         g_TrackGame->debugOverlay->UnknownFunction447f40(
-            field_0x9c, "3D HW Buffers %d Free %d", SoundSystem()->field_0x3fc.maxHw3DAllBuffers,
-            SoundSystem()->field_0x3fc.freeHw3DAllBuffers);
+            field_0x9c, "3D HW Buffers %d Free %d", SoundSystem()->soundCaps.maxHw3DAllBuffers,
+            SoundSystem()->soundCaps.freeHw3DAllBuffers);
         g_TrackGame->debugOverlay->UnknownFunction447f40(
-            field_0x9c, "2D HW Buffers %d Free %d", SoundSystem()->field_0x3fc.maxHwMixingAllBuffers,
-            SoundSystem()->field_0x3fc.freeHwMixingAllBuffers);
+            field_0x9c, "2D HW Buffers %d Free %d", SoundSystem()->soundCaps.maxHwMixingAllBuffers,
+            SoundSystem()->soundCaps.freeHwMixingAllBuffers);
         g_TrackGame->debugOverlay->UnknownFunction447f40(
-            field_0x9c, "Bytes %d Free %d", SoundSystem()->field_0x3fc.totalHwMemBytes,
-            SoundSystem()->field_0x3fc.freeHwMemBytes);
+            field_0x9c, "Bytes %d Free %d", SoundSystem()->soundCaps.totalHwMemBytes,
+            SoundSystem()->soundCaps.freeHwMemBytes);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
 
         int sounds = 0;
@@ -743,7 +743,7 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
             Sound* sound = (Sound*)SoundSystem()->field_0x04.Get(j);
             if (sound) {
                 sounds++;
-                if (sound->UnknownFunction4bca80())
+                if (sound->IsPlaying())
                     playing++;
                 bytes += sound->field_0x198;
             }
@@ -766,9 +766,9 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "ReverbEnviro %d", environment);
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
         g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Total Wave Memory %d", bytes);
-        if (SoundSystem()->field_0x46c)
+        if (SoundSystem()->soundMemoryManager)
             g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "SoundCacheBytes %d",
-                                                                     SoundSystem()->field_0x46c->field_0x28);
+                                                                     SoundSystem()->soundMemoryManager->field_0x28);
     }
     return GameObject::UnknownVirtualSlot10(frameTime);
 }

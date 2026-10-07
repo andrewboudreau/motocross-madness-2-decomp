@@ -23,6 +23,15 @@ slots (for example `Acquire`, `GetDeviceData`, and `CreateDeviceEx`). Remaining
 uncertain virtuals and force-feedback fields retain slot/address names. These
 are reconstruction names, not recovered retail symbols.
 
+The PC layer also names its acquisition/property helpers (`SetAcquired`,
+`SetDwordProperty`, `SetDevicesAcquired`), joystick readers and axis helpers
+(`ReadBufferedState`, `ReadImmediateState`, `UpdateAxisRepeat`,
+`ApplyAxisDeadZone`), and keyboard modifier refresh (`RefreshModifierState`).
+DirectInput properties, cooperative flags, HRESULTs and modifier key codes
+use their SDK spellings without changing the decoded values. The joystick's
+effect, axis-range, dead-zone and POV members retain offset comments;
+unresolved force-feedback virtuals keep their slot names.
+
 ## Classes
 
 - **InputDevice:** slot 0 is `_purecall` and slot 1 its destructor, so a pure

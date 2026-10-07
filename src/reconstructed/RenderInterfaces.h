@@ -21,7 +21,7 @@ struct UnknownPixelFormat;
 struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();
+    virtual long __stdcall Release();                                           // 2
     virtual long __stdcall GetCaps(void* caps);                                   // 3
     virtual long __stdcall EnumTextureFormats(long(__stdcall* callback)(UnknownPixelFormat*, void*),
                                               void* context);                     // 4
@@ -78,7 +78,7 @@ struct UnknownRenderInterface {
 struct UnknownSurfaceInterface {
     virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object);  // 0
     virtual long __stdcall AddRef();                                              // 1
-    virtual long __stdcall UnknownMethod2();
+    virtual long __stdcall Release();                                           // 2
     virtual long __stdcall AddAttachedSurface(UnknownSurfaceInterface* surface);   // 3
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall Blt(void* destination, UnknownSurfaceInterface* source,
@@ -174,73 +174,73 @@ struct UnknownSurfaceDesc {
 struct UnknownPaletteInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();                              // Release
+    virtual long __stdcall Release();                                           // 2
 };
 
 // Interface at Display+0x190 (IDirectDraw7-shaped).
 struct UnknownDirectDrawInterface {
-    virtual long __stdcall UnknownMethod0(const UnknownGuid* iid, void** object);  // QueryInterface
+    virtual long __stdcall QueryInterface(const UnknownGuid* iid, void** object); // 0
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();
+    virtual long __stdcall Release();                                           // 2
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4(unsigned long flags, UnknownClipperInterface** clipper,
-                                          void* outer);                          // CreateClipper
-    virtual long __stdcall UnknownMethod5(unsigned long flags, void* entries, UnknownPaletteInterface** palette,
-                                          void* outer);                    // CreatePalette (Palette8.cpp)
-    virtual long __stdcall UnknownMethod6(UnknownSurfaceDesc* desc, UnknownSurfaceInterface** surface,
-                                          void* outer);                    // CreateSurface
+    virtual long __stdcall CreateClipper(unsigned long flags, UnknownClipperInterface** clipper,
+                                          void* outer);                         // 4
+    virtual long __stdcall CreatePalette(unsigned long flags, void* entries, UnknownPaletteInterface** palette,
+                                          void* outer);                         // 5
+    virtual long __stdcall CreateSurface(UnknownSurfaceDesc* desc, UnknownSurfaceInterface** surface,
+                                          void* outer);                         // 6
     virtual long __stdcall UnknownMethod7();
-    virtual long __stdcall UnknownMethod8(unsigned long flags, UnknownSurfaceDesc* desc, void* context,
-                                          long(__stdcall* callback)(UnknownSurfaceDesc*, void*)); // EnumDisplayModes
+    virtual long __stdcall EnumDisplayModes(unsigned long flags, UnknownSurfaceDesc* desc, void* context,
+                                          long(__stdcall* callback)(UnknownSurfaceDesc*, void*)); // 8
     virtual long __stdcall UnknownMethod9();
     virtual long __stdcall UnknownMethod10();
-    virtual long __stdcall UnknownMethod11(void* driverCaps, void* emulationCaps);    // GetCaps
-    virtual long __stdcall UnknownMethod12(UnknownSurfaceDesc* desc);                 // GetDisplayMode
+    virtual long __stdcall GetCaps(void* driverCaps, void* emulationCaps);      // 11
+    virtual long __stdcall GetDisplayMode(UnknownSurfaceDesc* desc);            // 12
     virtual long __stdcall UnknownMethod13();
-    virtual long __stdcall UnknownMethod14(UnknownSurfaceInterface** surface);        // GetGDISurface
+    virtual long __stdcall GetGDISurface(UnknownSurfaceInterface** surface);    // 14
     virtual long __stdcall UnknownMethod15();
     virtual long __stdcall UnknownMethod16();
     virtual long __stdcall UnknownMethod17();
     virtual long __stdcall UnknownMethod18();
     virtual long __stdcall UnknownMethod19();
-    virtual long __stdcall UnknownMethod20(void* window, unsigned long flags);        // SetCooperativeLevel
-    virtual long __stdcall UnknownMethod21(unsigned long width, unsigned long height,
+    virtual long __stdcall SetCooperativeLevel(void* window, unsigned long flags); // 20
+    virtual long __stdcall SetDisplayMode(unsigned long width, unsigned long height,
                                            unsigned long bitDepth, unsigned long refreshRate,
-                                           unsigned long flags);              // SetDisplayMode
-    virtual long __stdcall UnknownMethod22(unsigned long flags, void* event);         // WaitForVerticalBlank
-    virtual long __stdcall UnknownMethod23(UnknownSurfaceCaps* caps, unsigned long* total,
-                                           unsigned long* free);            // GetAvailableVidMem
+                                           unsigned long flags);                // 21
+    virtual long __stdcall WaitForVerticalBlank(unsigned long flags, void* event); // 22
+    virtual long __stdcall GetAvailableVidMem(UnknownSurfaceCaps* caps, unsigned long* total,
+                                           unsigned long* free);                // 23
     virtual long __stdcall UnknownMethod24();
     virtual long __stdcall UnknownMethod25();
     virtual long __stdcall UnknownMethod26();
-    virtual long __stdcall UnknownMethod27(void* identifier, unsigned long flags); // GetDeviceIdentifier
+    virtual long __stdcall GetDeviceIdentifier(void* identifier, unsigned long flags); // 27
 };
 
 // Interface at Display+0x194 (IDirect3D7, from QueryInterface).
 struct UnknownDirect3DInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();                              // Release
+    virtual long __stdcall Release();                                           // 2
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4(const UnknownGuid* device, UnknownSurfaceInterface* surface,
-                                          UnknownRenderInterface** result); // CreateDevice
+    virtual long __stdcall CreateDevice(const UnknownGuid* device, UnknownSurfaceInterface* surface,
+                                          UnknownRenderInterface** result);     // 4
     virtual long __stdcall UnknownMethod5();
-    virtual long __stdcall UnknownMethod6(const UnknownGuid* device,
+    virtual long __stdcall EnumZBufferFormats(const UnknownGuid* device,
                                           long(__stdcall* callback)(UnknownPixelFormat*, void*),
-                                          void* context);                   // EnumZBufferFormats
+                                          void* context);                       // 6
 };
 
 // Clipper at Display+0x1ac (IDirectDrawClipper-shaped).
 struct UnknownClipperInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();                              // Release
+    virtual long __stdcall Release();                                           // 2
     virtual long __stdcall UnknownMethod3();
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5();
     virtual long __stdcall UnknownMethod6();
     virtual long __stdcall UnknownMethod7();
-    virtual long __stdcall UnknownMethod8(unsigned long flags, void* window); // SetHWnd
+    virtual long __stdcall SetHWnd(unsigned long flags, void* window);          // 8
 };
 
 // Gamma control at Display+0x1a4 (IDirectDrawGammaControl-shaped, queried
@@ -248,7 +248,7 @@ struct UnknownClipperInterface {
 struct UnknownGammaControlInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
-    virtual long __stdcall UnknownMethod2();                              // Release
+    virtual long __stdcall Release();                                           // 2
     virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4(unsigned long flags, void* ramp);  // SetGammaRamp
+    virtual long __stdcall SetGammaRamp(unsigned long flags, void* ramp);       // 4
 };

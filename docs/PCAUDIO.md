@@ -15,8 +15,16 @@ queried from the primary buffer with the bytes of IID_IDirectSound3DListener
 (`0x00556c90`), the primary buffer description is 0x24 bytes with flags 0x91
 (primary, 3D, volume), the caps are 0x60 bytes, and the imports are
 DSOUND.dll ordinals 1 and 2 (`0x005330a0`, `0x005330a6`). `0x00556d20` holds
-the EAX 1.0 listener property set GUID. Method names on PCSoundInterface stay
-`UnknownFunctionN`.
+the EAX 1.0 listener property set GUID. Semantic method names such as
+`InitializeSound`, `CreatePrimaryBuffer`, `SetListenerPosition` and
+`SetEAXEnvironment` describe decoded behavior; they are provisional
+reconstruction names, not recovered symbols.
+
+The same naming convention covers Sound's playback, buffer, streaming and
+3D helpers (`Play`, `LoadWave`, `LockBuffer`, `Set3DDistanceRange`) and the
+loader's queue and eviction helpers. Device and interface members in
+`SoundInterface.h` retain their offsets in comments. Callers, near-miss
+samples and COFF bindings use the same names and retail addresses.
 
 Layout (0x478 bytes): SoundInterface's two `ContainerList`s (+0x04, +0x18)
 and started bit (+0x2c); the device count and chosen device (+0x30, +0x34);

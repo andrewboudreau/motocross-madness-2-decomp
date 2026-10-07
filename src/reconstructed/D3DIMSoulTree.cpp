@@ -349,7 +349,7 @@ void D3DIMSoultreeObject::UnknownFunction4439c0(UnknownSoultreeCounters* rect)
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    ((PCRenderTarget*)field_0x18)->field_0x48->Lock(0, &desc, 1, 0);
+    ((PCRenderTarget*)field_0x18)->renderSurface->Lock(0, &desc, 1, 0);
     UnknownSoultreeCameraView* camera = (UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08;
     char* bits = (char*)desc.surface + camera->viewportY * desc.pitch + camera->viewportX;
     int i;
@@ -361,7 +361,7 @@ void D3DIMSoultreeObject::UnknownFunction4439c0(UnknownSoultreeCounters* rect)
         bits[i * desc.pitch + rect->field_0x08 * 2] = 0;
         bits[i * desc.pitch + rect->field_0x00 * 2] = 0;
     }
-    ((PCRenderTarget*)field_0x18)->field_0x48->Unlock(0);
+    ((PCRenderTarget*)field_0x18)->renderSurface->Unlock(0);
 }
 
 // 0x00444030

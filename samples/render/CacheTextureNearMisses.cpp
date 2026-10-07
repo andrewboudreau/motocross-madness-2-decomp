@@ -41,8 +41,8 @@ int CacheTexture::UnknownFunction5102d0(UnknownTextureRegion* region, int level)
     int side = rect.right - rect.left;
     int levelWidth = width;
     UnknownRect whole = rect;
-    UnknownSurfaceInterface* source = region->field_0x14->field_0x70;
-    UnknownSurfaceInterface* destination = field_0x70;
+    UnknownSurfaceInterface* source = region->field_0x14->systemSurface;
+    UnknownSurfaceInterface* destination = systemSurface;
     UnknownSurfaceInterface* nextSource = 0;
     UnknownSurfaceInterface* nextDestination = 0;
     int sourceSide = region->field_0x14->field_0x14;
@@ -79,7 +79,7 @@ int CacheTexture::UnknownFunction5102d0(UnknownTextureRegion* region, int level)
     } else {
         return 0;
     }
-    if (g_TrackGame->display->field_0x5bc > 0)
+    if (g_TrackGame->display->partialTextureUploadResult > 0)
         UnknownVirtualSlot9(&whole, -1);
     else
         field_0x188 = 1;

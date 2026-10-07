@@ -22,7 +22,7 @@ void UnknownFunction52d0d0() {
 }
 
 // 0x0052d120
-int UnknownCompare52d120(const void* first, const void* second) {
+int CompareDisplayModes(const void* first, const void* second) {
     const UnknownDisplayMode* a = (const UnknownDisplayMode*)first;
     const UnknownDisplayMode* b = (const UnknownDisplayMode*)second;
     if (a->bitDepth != b->bitDepth)
@@ -45,15 +45,15 @@ VideoCard::~VideoCard() {
 
 // 0x0052d220
 void VideoCard::UnknownVirtualSlot1() {
-    if (field_0x10)
-        DebugFree(field_0x10, __FILE__, 63);
+    if (displayModes)
+        DebugFree(displayModes, __FILE__, 63);
 }
 
 // 0x0052d250
-int VideoCard::UnknownFunction52d250(int width, int height, int bitDepth, int a, int b) {
-    qsort(field_0x10, field_0x08, sizeof(UnknownDisplayMode), UnknownCompare52d120);
-    for (int i = 0; i < field_0x08; i++) {
-        UnknownDisplayMode* mode = &field_0x10[i];
+int VideoCard::FindDisplayMode(int width, int height, int bitDepth, int a, int b) {
+    qsort(displayModes, displayModeCount, sizeof(UnknownDisplayMode), CompareDisplayModes);
+    for (int i = 0; i < displayModeCount; i++) {
+        UnknownDisplayMode* mode = &displayModes[i];
         if (mode->bitDepth == bitDepth && mode->height == height && mode->width == width &&
             (!a || mode->field_0x10 == a) && (!b || mode->refreshRate == b))
             return i;

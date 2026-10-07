@@ -31,11 +31,11 @@ void RaceSound::RefillStream() {
 
     if (!streamChannel->channelSound)
         return;
-    streamChannel->channelSound->UnknownFunction4bcd40(&play, &write);
+    streamChannel->channelSound->GetBufferPosition(&play, &write);
     if (streamChannel->field_0x1c == 1) {
         if (write < (unsigned long)(16537 * field_0x1298))
             return;
-        streamChannel->channelSound->UnknownFunction4bd020(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
+        streamChannel->channelSound->LockBuffer(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
         if (streamChannel->field_0x20 == 0) {
             half = 11025 * field_0x1298;
             avail = streamChannel->field_0x14 - streamChannel->field_0x18;
@@ -91,12 +91,12 @@ void RaceSound::RefillStream() {
                 streamChannel->field_0x18 += half;
             }
         }
-        streamChannel->channelSound->UnknownFunction4bd080(first, half, second, 0);
+        streamChannel->channelSound->UnlockBuffer(first, half, second, 0);
         streamChannel->field_0x1c = 2;
     } else if (streamChannel->field_0x1c == 2) {
         if (write < (unsigned long)(5512 * field_0x1298) || write > (unsigned long)(11025 * field_0x1298))
             return;
-        streamChannel->channelSound->UnknownFunction4bd020(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
+        streamChannel->channelSound->LockBuffer(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
         if (streamChannel->field_0x20 == 0) {
             half = 11025 * field_0x1298;
             avail = streamChannel->field_0x14 - streamChannel->field_0x18;
@@ -151,7 +151,7 @@ void RaceSound::RefillStream() {
                 streamChannel->field_0x18 += half;
             }
         }
-        streamChannel->channelSound->UnknownFunction4bd080(first, 22050 * field_0x1298, second, 0);
+        streamChannel->channelSound->UnlockBuffer(first, 22050 * field_0x1298, second, 0);
         streamChannel->field_0x1c = 1;
     }
 }
