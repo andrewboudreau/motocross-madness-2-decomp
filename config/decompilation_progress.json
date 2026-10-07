@@ -4,10 +4,10 @@
   "retail_text_bytes": 1368518,
   "retail_source_paths": 111,
   "rtti_types": 252,
-  "vc6_selected_targets": 2676,
-  "vc6_exact_targets": 2668,
-  "notes": "2668 of 2676 unique retail address/extent pairs passed strict comparison in 2680 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). Every relocation was resolved, or the function had no relocation bytes. The remaining 8 (BaseObject::Release and seven UI compiler-shape probes) match only with relocations masked. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.",
-  "vc6_case_count": 2680,
+  "vc6_selected_targets": 2744,
+  "vc6_exact_targets": 2736,
+  "notes": "2736 of 2744 unique retail address/extent pairs passed strict comparison in 2748 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). Every relocation was resolved, or the function had no relocation bytes. The remaining 8 (BaseObject::Release and seven UI compiler-shape probes) match only with relocations masked. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.",
+  "vc6_case_count": 2748,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "1b67acaaf419a160c392a148409b456d272686fa"
+  "reviewed_commit": "a08243e6aa719c6c41f81e1b2b1e0f7ef8dd97d4"
 }
