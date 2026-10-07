@@ -153,7 +153,7 @@ int TextureMapManager::UnknownVirtualSlot12() {
 
 // 0x00510e30: nothing to do with AGP textures.
 int TextureMapManager::UnknownVirtualSlot13() {
-    if (g_UnknownGlobal56e26c->field_0x0c->field_0x9f0)
+    if (g_TrackGame->display->field_0x9f0)
         return 1;
     for (int i = 0; i < field_0x44.m_count; i++) {
         ManagedTextureGroup* cache = field_0x44.Get(i);
@@ -165,7 +165,7 @@ int TextureMapManager::UnknownVirtualSlot13() {
 
 // 0x00510e90
 int TextureMapManager::UnknownVirtualSlot15() {
-    if (g_UnknownGlobal56e26c->field_0x2d4_bit2) {
+    if (g_TrackGame->field_0x2d4_bit2) {
         for (int i = 0; i < field_0x44.m_count; i++) {
             ManagedTextureGroup* cache = field_0x44.Get(i);
             if (cache)
@@ -183,7 +183,7 @@ int TextureMapManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownI
     int handled = 0;
     if (GameObject::UnknownVirtualSlot23(event, entry))
         return 1;
-    if (g_UnknownGlobal56e26c->field_0x2d4_bit2 && field_0x3c) {
+    if (g_TrackGame->field_0x2d4_bit2 && field_0x3c) {
         handled = 1;
         if (UnknownFunction43caa0(0x14, 0, event, 0x80)) {
             if (++field_0x58 > 2)
@@ -265,7 +265,7 @@ int TextureMapManager::UnknownFunction5113d0() {
         if (!sizes[i])
             sizes[i] = 1;
     }
-    if (g_UnknownGlobal56e26c->field_0x0c->field_0x9f0) {
+    if (g_TrackGame->display->field_0x9f0) {
         for (i = 0; i < count; i++) {
             UnknownTextureMapList* textures = &field_0x44.Get(i)->field_0x44;
             for (TextureMap* texture = textures->First(); texture; texture = textures->Next())
@@ -286,7 +286,7 @@ int TextureMapManager::UnknownFunction5113d0() {
             if (best == -1)
                 break;
             total += 0x2aaaa;
-            if (total > g_UnknownGlobal56e26c->field_0x0c->field_0x60)
+            if (total > g_TrackGame->display->field_0x60)
                 break;
             if (!field_0x44.Get(best)->UnknownFunction50c4a0(steps[best] + 1))
                 break;
@@ -314,7 +314,7 @@ void TextureMapManager::UnknownFunction511580() {
     int count128 = 0;
     int count256 = 0;
     int cost = 0;
-    g_UnknownGlobal56e26c->field_0x0c->field_0x190->UnknownMethod23(&caps, &totalMemory, &freeMemory);
+    g_TrackGame->display->field_0x190->UnknownMethod23(&caps, &totalMemory, &freeMemory);
     int bytes = 0;
     for (; texture; texture = field_0x2c.Next()) {
         int kind = 0;
@@ -340,7 +340,7 @@ void TextureMapManager::UnknownFunction511580() {
                  width /= 2, height /= 2)
                 pixels += height * width;
             bytes += UnknownFunction511970(texture->field_0x20) * pixels;
-            cost += g_UnknownGlobal56e26c->field_0x0c->field_0x14[kind];
+            cost += g_TrackGame->display->field_0x14[kind];
         }
     }
     sprintf(text, "\nTexture Memory 32x32 = %d, 64x64 = %d, 128x128 = %d, 256x256 = %d, total = %d \n", count32,

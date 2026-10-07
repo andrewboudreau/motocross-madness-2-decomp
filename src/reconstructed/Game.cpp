@@ -70,17 +70,17 @@ Game::Game() {
     field_0x2d5_bit3 = 1;
     field_0x2d4_bit2 = 0;
     field_0x2d4_bit1 = 1;
-    field_0x04 = 0;
-    field_0x08 = 0;
-    field_0x0c = 0;
-    field_0x10 = 0;
-    field_0x14 = 0;
+    soundInterface = 0;
+    network = 0;
+    display = 0;
+    renderTarget = 0;
+    controlInterface = 0;
     field_0x34 = 0;
-    field_0x2f4 = 0;
+    rootObject = 0;
     field_0x3c = 0;
     field_0x18 = 1;
     field_0x2d0 = 0;
-    field_0x38 = 0;
+    debugOverlay = 0;
     s_UnknownFile65b4ac = 0;
     strcpy(field_0x40, "");
     field_0x2dc = 0;
@@ -99,7 +99,7 @@ Game::Game() {
     field_0x2e4 = 1.0f;
     field_0x2e8 = 0;
     field_0x2ec = 0.05f;
-    field_0x2f0 = 0;
+    frameTime = 0;
     DecodeString(s_UnknownEncoded56b334);
     DecodeString(s_UnknownEncoded56b350);
 }
@@ -119,62 +119,62 @@ int Game::UnknownVirtualSlot6() {
 
 // 0x00467af0: creates the PC control interface and sets it up (slot 1).
 int Game::UnknownVirtualSlot2() {
-    field_0x14 = new(__FILE__, 187) PCControlInterface;
-    return field_0x14->UnknownVirtualSlot1() != 0;
+    controlInterface = new(__FILE__, 187) PCControlInterface;
+    return controlInterface->UnknownVirtualSlot1() != 0;
 }
 
 // 0x00467e80: slot 31's result is kept at +0x10 and handed to the interface.
 int Game::UnknownVirtualSlot33() {
-    field_0x10 = UnknownVirtualSlot31();
-    if (!field_0x10)
+    renderTarget = UnknownVirtualSlot31();
+    if (!renderTarget)
         return 0;
-    if (field_0x2f4)
-        field_0x2f4->UnknownVirtualSlot25(field_0x10);
+    if (rootObject)
+        rootObject->UnknownVirtualSlot25(renderTarget);
     return 1;
 }
 
 // 0x00467eb0: renders a frame, timing each phase, and with bit 2 of +0x2d4
 // fills the debug overlay's profile and memory pages.
 int Game::UnknownVirtualSlot8() {
-    if (field_0x0c->field_0x70_bit2)
-        field_0x0c->UnknownVirtualSlot4(0);
+    if (display->field_0x70_bit2)
+        display->UnknownVirtualSlot4(0);
     unsigned int last = UnknownFunction4bfa80();
-    field_0x2f4->UnknownVirtualSlot12();
+    rootObject->UnknownVirtualSlot12();
     unsigned int now = UnknownFunction4bfa80();
     int prepareGeometry = now - last;
     last = now;
-    if (field_0x0c->field_0x70_bit2)
-        field_0x0c->UnknownVirtualSlot4(1);
+    if (display->field_0x70_bit2)
+        display->UnknownVirtualSlot4(1);
     now = UnknownFunction4bfa80();
     int waitForFlip = now - last;
     last = now;
-    field_0x2f4->UnknownVirtualSlot13();
+    rootObject->UnknownVirtualSlot13();
     now = UnknownFunction4bfa80();
     int renderPre3D = now - last;
     int render3D = 0;
     if (field_0x2d5_bit3) {
-        if (!field_0x10->UnknownVirtualSlot1())
+        if (!renderTarget->UnknownVirtualSlot1())
             goto failed;
-        field_0x10->UnknownVirtualSlot12(0, 0);
+        renderTarget->UnknownVirtualSlot12(0, 0);
         UnknownVirtualSlot7();
         last = UnknownFunction4bfa80();
-        field_0x2f4->UnknownVirtualSlot14();
+        rootObject->UnknownVirtualSlot14();
         render3D = UnknownFunction4bfa80() - last;
-        if (!field_0x10->UnknownVirtualSlot2()) {
+        if (!renderTarget->UnknownVirtualSlot2()) {
         failed:
             return 0;
         }
     }
     last = UnknownFunction4bfa80();
-    field_0x2f4->UnknownVirtualSlot15();
+    rootObject->UnknownVirtualSlot15();
     now = UnknownFunction4bfa80();
     int renderPost3D = now - last;
     int elapsed = now - s_LastFrameTime;
     if (field_0x2d4_bit2) {
-        if (field_0x38) {
+        if (debugOverlay) {
             static int profilePage = -1;
             if (profilePage < 0)
-                profilePage = field_0x38->NewPage();
+                profilePage = debugOverlay->NewPage();
             s_NetPeak.UnknownFunction4cb6b0(g_UnknownNetTime);
             s_TickPeak.UnknownFunction4cb6b0(g_UnknownTickTime);
             s_PrepFramePeak.UnknownFunction4cb6b0(g_UnknownPrepFrameTime);
@@ -185,78 +185,78 @@ int Game::UnknownVirtualSlot8() {
             s_Render3DPeak.UnknownFunction4cb6b0(render3D);
             s_RenderPost3DPeak.UnknownFunction4cb6b0(renderPost3D);
             s_ElapsedPeak.UnknownFunction4cb6b0(elapsed);
-            if (field_0x38->field_0x25_bit0 && field_0x38->field_0x26c4 == profilePage) {
-                UnknownDisplayMode* mode = &field_0x0c->field_0x10[field_0x0c->field_0x0c];
-                field_0x38->UnknownFunction447fa0(profilePage, "%c %d x %d %d bit(x%d)", 'R',
+            if (debugOverlay->field_0x25_bit0 && debugOverlay->field_0x26c4 == profilePage) {
+                UnknownDisplayMode* mode = &display->field_0x10[display->field_0x0c];
+                debugOverlay->UnknownFunction447fa0(profilePage, "%c %d x %d %d bit(x%d)", 'R',
                                                   mode->width, mode->height, mode->bitDepth,
-                                                  field_0x0c->field_0x78);
-                field_0x38->UnknownFunction447f40(profilePage, "%s", field_0x0c->field_0x5c0.description);
-                field_0x38->UnknownFunction447f40(profilePage, "ElapsedTime:   % 3d (%d)",
+                                                  display->field_0x78);
+                debugOverlay->UnknownFunction447f40(profilePage, "%s", display->field_0x5c0.description);
+                debugOverlay->UnknownFunction447f40(profilePage, "ElapsedTime:   % 3d (%d)",
                                                   elapsed, s_ElapsedPeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "PrepFrameTime: % 3d (%d)",
+                debugOverlay->UnknownFunction447f40(profilePage, "PrepFrameTime: % 3d (%d)",
                                                   g_UnknownPrepFrameTime,
                                                   s_PrepFramePeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "UpdateScrnTime:% 3d (%d)",
+                debugOverlay->UnknownFunction447f40(profilePage, "UpdateScrnTime:% 3d (%d)",
                                                   g_UnknownUpdateScreenTime,
                                                   s_UpdateScreenPeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "Net            % 3d (%d)",
+                debugOverlay->UnknownFunction447f40(profilePage, "Net            % 3d (%d)",
                                                   g_UnknownNetTime, s_NetPeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "Tick           % 3d (%d)",
+                debugOverlay->UnknownFunction447f40(profilePage, "Tick           % 3d (%d)",
                                                   g_UnknownTickTime, s_TickPeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "PrepareGeometry% 3d (%d)",
+                debugOverlay->UnknownFunction447f40(profilePage, "PrepareGeometry% 3d (%d)",
                                                   prepareGeometry,
                                                   s_PrepareGeometryPeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "WaitForFlip    % 3d (%d)",
+                debugOverlay->UnknownFunction447f40(profilePage, "WaitForFlip    % 3d (%d)",
                                                   waitForFlip, s_WaitForFlipPeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "RenderPre3D    % 3d (%d)",
+                debugOverlay->UnknownFunction447f40(profilePage, "RenderPre3D    % 3d (%d)",
                                                   renderPre3D, s_RenderPre3DPeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "Render3D       % 3d (%d)",
+                debugOverlay->UnknownFunction447f40(profilePage, "Render3D       % 3d (%d)",
                                                   render3D, s_Render3DPeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "   [this overlay %d]",
-                                                  field_0x38->field_0x36dc);
-                field_0x38->UnknownFunction447f40(profilePage, "RenderPost3D   % 3d (%d)",
+                debugOverlay->UnknownFunction447f40(profilePage, "   [this overlay %d]",
+                                                  debugOverlay->field_0x36dc);
+                debugOverlay->UnknownFunction447f40(profilePage, "RenderPost3D   % 3d (%d)",
                                                   renderPost3D, s_RenderPost3DPeak.UnknownFunction4cb690());
-                field_0x38->UnknownFunction447f40(profilePage, "TotalTransforms% 5d", field_0x10->field_0x38);
-                field_0x38->UnknownFunction447f40(profilePage, "TotalPoints    % 5d", field_0x10->field_0x3c);
-                field_0x38->UnknownFunction447f40(profilePage, "TotalLines     % 5d", field_0x10->field_0x40);
-                field_0x38->UnknownFunction447f40(profilePage, "TotalTriangles % 5d", field_0x10->field_0x44);
+                debugOverlay->UnknownFunction447f40(profilePage, "TotalTransforms% 5d", renderTarget->field_0x38);
+                debugOverlay->UnknownFunction447f40(profilePage, "TotalPoints    % 5d", renderTarget->field_0x3c);
+                debugOverlay->UnknownFunction447f40(profilePage, "TotalLines     % 5d", renderTarget->field_0x40);
+                debugOverlay->UnknownFunction447f40(profilePage, "TotalTriangles % 5d", renderTarget->field_0x44);
             }
             static int memoryPage = -1;
             if (memoryPage < 0)
-                memoryPage = field_0x38->NewPage();
-            if (field_0x38->field_0x25_bit0 && field_0x38->field_0x26c4 == memoryPage) {
+                memoryPage = debugOverlay->NewPage();
+            if (debugOverlay->field_0x25_bit0 && debugOverlay->field_0x26c4 == memoryPage) {
                 UnknownMemoryStatus status;
                 GlobalMemoryStatus(&status);
-                field_0x38->UnknownFunction447fa0(memoryPage, "Memory");
-                field_0x38->UnknownFunction447f40(memoryPage, "  Ours   in DirectX       Area");
+                debugOverlay->UnknownFunction447fa0(memoryPage, "Memory");
+                debugOverlay->UnknownFunction447f40(memoryPage, "  Ours   in DirectX       Area");
                 int count = g_MemTagStack->count;
                 int ours = 0;
                 int directx = 0;
                 for (int i = 0; i < count; i++) {
-                    field_0x38->UnknownFunction447f40(memoryPage, "%8d %8d %12s",
+                    debugOverlay->UnknownFunction447f40(memoryPage, "%8d %8d %12s",
                                                       g_MemTagStack->ours[i],
                                                       g_MemTagStack->directx[i],
                                                       g_MemTagStack->names[i]);
                     ours += g_MemTagStack->ours[i];
                     directx += g_MemTagStack->directx[i];
                 }
-                field_0x38->UnknownFunction447f40(memoryPage, "%8d %8d %12s", ours, directx, "Totals");
-                field_0x38->UnknownFunction447f40(memoryPage, "Grand Total    %10d", ours + directx);
-                field_0x38->UnknownFunction447f40(memoryPage, "TotalPhys       %10d", status.totalPhys);
-                field_0x38->UnknownFunction447f40(memoryPage, "AvailPhys       %10d", status.availPhys);
-                field_0x38->UnknownFunction447f40(memoryPage, "TotalVirtual    %10d", status.totalVirtual);
-                field_0x38->UnknownFunction447f40(memoryPage, "AvailVirtual    %10d", status.availVirtual);
-                field_0x38->UnknownFunction447f40(memoryPage, "Memory Load     %8d %%", status.memoryLoad);
-                field_0x38->UnknownFunction447f40(memoryPage, "%s", field_0x0c->field_0x5c0.description);
-                field_0x38->UnknownFunction447f40(memoryPage, "Total VidMem    %10d", field_0x0c->field_0x54);
-                field_0x38->UnknownFunction447f40(memoryPage, "IsAGP           %s",
-                                                  field_0x0c->field_0x9f0 ? "TRUE" : "FALSE");
-                field_0x38->UnknownFunction447f40(memoryPage, "VideoMemoryMB   %d",
-                                                  UnknownVirtualSlot20("VideoMemoryMB", -1));
-                field_0x38->UnknownFunction447f40(memoryPage, "PartialTexBlt   %s",
-                                                  g_UnknownGlobal56e26c->field_0x0c->field_0x5bc ? "Yes" : "No");
-                field_0x38->UnknownFunction447f40(memoryPage, "TexturesCached  %s",
-                                                  g_UnknownGlobal56e26c->field_0x2d5_bit2 ? "Yes" : "No");
+                debugOverlay->UnknownFunction447f40(memoryPage, "%8d %8d %12s", ours, directx, "Totals");
+                debugOverlay->UnknownFunction447f40(memoryPage, "Grand Total    %10d", ours + directx);
+                debugOverlay->UnknownFunction447f40(memoryPage, "TotalPhys       %10d", status.totalPhys);
+                debugOverlay->UnknownFunction447f40(memoryPage, "AvailPhys       %10d", status.availPhys);
+                debugOverlay->UnknownFunction447f40(memoryPage, "TotalVirtual    %10d", status.totalVirtual);
+                debugOverlay->UnknownFunction447f40(memoryPage, "AvailVirtual    %10d", status.availVirtual);
+                debugOverlay->UnknownFunction447f40(memoryPage, "Memory Load     %8d %%", status.memoryLoad);
+                debugOverlay->UnknownFunction447f40(memoryPage, "%s", display->field_0x5c0.description);
+                debugOverlay->UnknownFunction447f40(memoryPage, "Total VidMem    %10d", display->field_0x54);
+                debugOverlay->UnknownFunction447f40(memoryPage, "IsAGP           %s",
+                                                  display->field_0x9f0 ? "TRUE" : "FALSE");
+                debugOverlay->UnknownFunction447f40(memoryPage, "VideoMemoryMB   %d",
+                                                  GetRegistryInt("VideoMemoryMB", -1));
+                debugOverlay->UnknownFunction447f40(memoryPage, "PartialTexBlt   %s",
+                                                  g_TrackGame->display->field_0x5bc ? "Yes" : "No");
+                debugOverlay->UnknownFunction447f40(memoryPage, "TexturesCached  %s",
+                                                  g_TrackGame->field_0x2d5_bit2 ? "Yes" : "No");
             }
         }
         s_LastFrameTime = now;
@@ -266,7 +266,7 @@ int Game::UnknownVirtualSlot8() {
 
 // 0x004685c0
 int Game::UnknownVirtualSlot9() {
-    field_0x0c->UnknownVirtualSlot3();
+    display->UnknownVirtualSlot3();
     return 1;
 }
 
@@ -277,23 +277,23 @@ void Game::UnknownFunction468880() {
 
 // 0x004688a0
 int Game::UnknownVirtualSlot11(int value) {
-    if (field_0x08)
+    if (network)
         return 0;
     field_0x2d5_bit0 = value;
-    field_0x2f4->UnknownVirtualSlot16(value);
+    rootObject->UnknownVirtualSlot16(value);
     return 1;
 }
 
 // 0x004688e0
 int Game::UnknownVirtualSlot12(int value) {
-    return field_0x2f4->UnknownVirtualSlot19(value) != 0;
+    return rootObject->UnknownVirtualSlot19(value) != 0;
 }
 
 // 0x00468900: releases go to the interface unless bit 0 of +0x2d5 is set.
 int Game::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (field_0x2d5_bit0)
         return 1;
-    return field_0x2f4->UnknownVirtualSlot22(event, entry) != 0;
+    return rootObject->UnknownVirtualSlot22(event, entry) != 0;
 }
 
 // 0x00468930: presses go to the interface unless bit 0 of +0x2d5 is set.
@@ -303,23 +303,23 @@ int Game::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* en
 int Game::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (field_0x2d5_bit0)
         return 1;
-    if (field_0x2d4_bit2 && field_0x38 && UnknownFunction43caa0(0x20, 0, event, 0x80)) {
-        if (field_0x38->field_0x25_bit0) {
-            if (field_0x38->UnknownFunction4484f0())
-                field_0x38->UnknownVirtualSlot4();
+    if (field_0x2d4_bit2 && debugOverlay && UnknownFunction43caa0(0x20, 0, event, 0x80)) {
+        if (debugOverlay->field_0x25_bit0) {
+            if (debugOverlay->UnknownFunction4484f0())
+                debugOverlay->UnknownVirtualSlot4();
         } else {
-            field_0x38->UnknownVirtualSlot5();
+            debugOverlay->UnknownVirtualSlot5();
         }
     }
     if (field_0x2d4_bit0) {
-        if (field_0x14->UnknownVirtualSlot3(0x21, 0, 0xc, 0)) {
+        if (controlInterface->UnknownVirtualSlot3(0x21, 0, 0xc, 0)) {
             field_0x1c4 = 1 - field_0x1c4;
-        } else if (field_0x14->UnknownVirtualSlot3(0x12, 0, 0x3f, 0) && field_0x1c4) {
+        } else if (controlInterface->UnknownVirtualSlot3(0x12, 0, 0x3f, 0) && field_0x1c4) {
             field_0x1c8 = 1;
             field_0x1c4 = 0;
         }
     }
-    return field_0x2f4->UnknownVirtualSlot23(event, entry) != 0;
+    return rootObject->UnknownVirtualSlot23(event, entry) != 0;
 }
 
 // 0x00468a10
@@ -332,48 +332,48 @@ Game::~Game() {
 // the ControlInterface.
 int Game::UnknownVirtualSlot15() {
     field_0x2d5_bit1 = 1;
-    if (g_UnknownGlobal56c470 && field_0x38 && g_UnknownGlobal56c470->field_0x2c)
+    if (g_UnknownGlobal56c470 && debugOverlay && g_UnknownGlobal56c470->field_0x2c)
         g_UnknownGlobal56c470->UnknownFunction4691f0();
     g_UnknownStatic65b478.UnknownFunction4677c0();
-    if (field_0x2f4) {
-        field_0x2f4->Release();
-        field_0x2f4 = 0;
+    if (rootObject) {
+        rootObject->Release();
+        rootObject = 0;
     }
-    if (field_0x08) {
-        delete field_0x08;
-        field_0x08 = 0;
+    if (network) {
+        delete network;
+        network = 0;
     }
-    if (field_0x04) {
-        delete field_0x04;
-        field_0x04 = 0;
+    if (soundInterface) {
+        delete soundInterface;
+        soundInterface = 0;
     }
-    if (field_0x14) {
-        delete field_0x14;
-        field_0x14 = 0;
+    if (controlInterface) {
+        delete controlInterface;
+        controlInterface = 0;
     }
-    if (field_0x10) {
-        delete field_0x10;
-        field_0x10 = 0;
+    if (renderTarget) {
+        delete renderTarget;
+        renderTarget = 0;
     }
-    field_0x0c = 0;
+    display = 0;
     UnknownFunction52d0d0();
     return 1;
 }
 
 // 0x00468ae0
-int Game::UnknownVirtualSlot16(int value) {
-    field_0x08 = new(__FILE__, 979) NetworkInterface;
-    if (field_0x08 && field_0x08->Initialize(value) < 0) {
-        delete field_0x08;
-        field_0x08 = 0;
+int Game::CreateNetworkInterface(int value) {
+    network = new(__FILE__, 979) NetworkInterface;
+    if (network && network->Initialize(value) < 0) {
+        delete network;
+        network = 0;
         return 0;
     }
-    return field_0x08 != 0;
+    return network != 0;
 }
 
 // 0x00468ba0: hands a network message to the +0x2f4 object.
 int Game::UnknownVirtualSlot17(int type, void* data, int from, int to, int flags) {
-    return field_0x2f4->UnknownVirtualSlot24(type, data, from, to, flags) != 0;
+    return rootObject->UnknownVirtualSlot24(type, data, from, to, flags) != 0;
 }
 
 // 0x00468bd0: `path` = the +0x1cc directory, "\\" and `name`.

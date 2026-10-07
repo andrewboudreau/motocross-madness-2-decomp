@@ -27,7 +27,7 @@
   "?DispatchMessages@NetworkInterface@@QAEXH@Z": "0x004aced0",
   "?ReadProviderCaps@NetworkInterface@@QAEXPBU_GUID@@@Z": "0x004ad180",
   "?ReportDirectPlayError@@YAXJPBDH@Z": "0x004ad5a0",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_DPAID_ComPort": "0x00556970",
   "_DPAID_INet": "0x00556940",
   "_DPAID_INetPort": "0x00556960",

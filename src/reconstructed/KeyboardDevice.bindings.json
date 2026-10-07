@@ -14,6 +14,6 @@
   "?UnknownFunction43cd10@UnknownControlBinding@@QAEXXZ": "0x0043cd10",
   "?UnknownFunction43cd90@UnknownControlBinding@@QAEXM@Z": "0x0043cd90",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__FILE__:containerlist.h": "0x005666e4"
 }

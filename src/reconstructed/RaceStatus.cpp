@@ -267,9 +267,9 @@ int RankByScore(int keepRacing) {
     int count;
     int i;
 
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 0) {
+    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0) {
         count = 0;
-        UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->field_0x55c->field_0x34;
+        UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
         UnknownEventRacer* racer;
         iterator = 0;
         for (racer = view->UnknownFunction4204e0(&iterator); racer; racer = view->UnknownFunction4204e0(&iterator)) {
@@ -283,9 +283,9 @@ int RankByScore(int keepRacing) {
         for (i = 0; i < count; i++)
             scores[i].racer->field_0x784 = i + 1;
         if (!keepRacing) {
-            TrackGameViewOwner* owner = g_UnknownGlobal56e26c->field_0x55c;
+            TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
             if (owner->field_0x70 * 60.0f + owner->field_0x74 >=
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140 * 60.0f - 1.0f) {
+                g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f - 1.0f) {
                 for (i = 0; i < count; i++)
                     scores[i].racer->field_0x7a4 = 1;
             }
@@ -350,7 +350,7 @@ int UpdateLapRace(UnknownEventRacerPart** list, Track* track, float frameTime, U
             status->field_0x28.x = status->field_0x1c.x;
             status->field_0x28.y = status->field_0x1c.y;
             status->field_0x28.z = status->field_0x1c.z;
-            if (g_UnknownGlobal56e26c->field_0x18 == 1 && g_ViewRacerFinished) {
+            if (g_TrackGame->field_0x18 == 1 && g_ViewRacerFinished) {
                 if (racer->field_0x7a4)
                     goto next;
                 if (racer->field_0x734) {

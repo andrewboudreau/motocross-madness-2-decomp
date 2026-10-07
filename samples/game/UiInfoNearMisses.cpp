@@ -27,7 +27,7 @@ void TrackGameMode::UnknownFunction522440() {
     UnknownFunction522720((UnknownTrackGameModeOptions6ac*)&field_0x6ac);
     UnknownFunction522780((UnknownTrackGameModeOptionsA20*)&field_0xa20);
     UnknownFunction5227d0((UnknownTrackGameModeOptionsA4c*)&field_0xa4c);
-    g_UnknownGlobal56e26c->mode.ChooseDisplayMode(0, &field_0xa4c);
+    g_TrackGame->mode.ChooseDisplayMode(0, &field_0xa4c);
     UnknownFunction522800((UnknownTrackGameModeOptionsA68*)field_0xa68);
     UnknownFunction522840(field_0x145c);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0xfd8);

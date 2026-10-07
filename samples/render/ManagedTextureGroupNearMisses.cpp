@@ -210,7 +210,7 @@ void ManagedTextureGroup::UnknownFunction50c960() {
     }
     field_0x54.AppendList(&emptied);
 
-    if (g_UnknownGlobal56e26c->field_0x38) {
+    if (g_TrackGame->debugOverlay) {
         int now = UnknownFunction4bfa80();
         field_0x1d4.UnknownFunction4cb6b0(field_0x1d0);
         field_0x1e0.UnknownFunction4cb6b0(now - field_0x250);
@@ -228,37 +228,37 @@ void ManagedTextureGroup::UnknownFunction50c960() {
             } while ((texture = field_0x44.Next()) != 0);
         }
         if (field_0x254 < 0)
-            field_0x254 = g_UnknownGlobal56e26c->field_0x38->NewPage();
+            field_0x254 = g_TrackGame->debugOverlay->NewPage();
         field_0x1ec.UnknownFunction4cb6b0(filled);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447fa0(field_0x254, "TextureManager no partial");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "PixelFormat:%s", format);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447fa0(field_0x254, "TextureManager no partial");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "PixelFormat:%s", format);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "CacheTextures:%d %.2fM", field_0x54.m_count,
             PageMegabytes(this, field_0x54.m_count));
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "ManagedTextures:%d", field_0x44.m_count);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "ManagedTextures:%d", field_0x44.m_count);
         float peak = (float)field_0x1d4.UnknownFunction4cb690();
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMem Blted: %.2fM, Peak: %.2fM",
             (float)UnknownFunction511970(field_0x0c) * field_0x1d0 * 9.536743e-07f,
             UnknownFunction511970(field_0x0c) * peak * 9.536743e-07f);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "BltTime %d (%d)", now - field_0x250,
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "BltTime %d (%d)", now - field_0x250,
                                                                 field_0x1e0.UnknownFunction4cb690());
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "Size Requested Granted");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "256:    %02d        %02d",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Size Requested Granted");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "256:    %02d        %02d",
                                                                 field_0x1fc[8], field_0x220[8]);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "128:    %02d        %02d",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "128:    %02d        %02d",
                                                                 field_0x1fc[7], field_0x220[7]);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, " 64:    %02d        %02d",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, " 64:    %02d        %02d",
                                                                 field_0x1fc[6], field_0x220[6]);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, " 32:    %02d        %02d",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, " 32:    %02d        %02d",
                                                                 field_0x1fc[5], field_0x220[5]);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMemRequested:%.2fM", TexelMegabytes(this, field_0x244));
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMemGranted:%.2fM", TexelMegabytes(this, field_0x248));
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMemManaged:%.2fM", TexelMegabytes(this, field_0x24c));
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "Textures Blted %d (%d)", filled,
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Textures Blted %d (%d)", filled,
                                                                 field_0x1ec.UnknownFunction4cb690());
     }
     field_0x158.Clear();
@@ -546,7 +546,7 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
         }
     }
 
-    if (g_UnknownGlobal56e26c->field_0x38) {
+    if (g_TrackGame->debugOverlay) {
         int now = UnknownFunction4bfa80();
         field_0x1d4.UnknownFunction4cb6b0(field_0x1d0);
         field_0x1e0.UnknownFunction4cb6b0(now - field_0x250);
@@ -570,40 +570,40 @@ void ManagedTextureGroup::UnknownFunction50dad0() {
             } while ((texture = field_0x44.Next()) != 0);
         }
         if (field_0x254 < 0)
-            field_0x254 = g_UnknownGlobal56e26c->field_0x38->NewPage();
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447fa0(field_0x254, "TextureManager partial blts");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "PixelFormat:%s", format);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+            field_0x254 = g_TrackGame->debugOverlay->NewPage();
+        g_TrackGame->debugOverlay->UnknownFunction447fa0(field_0x254, "TextureManager partial blts");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "PixelFormat:%s", format);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "CacheTextures:%d %.2fM", field_0x54.m_count,
             (UnknownFunction511970(field_0x0c) * field_0x54.m_count << 18) * 3.1789145e-07f);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "ManagedTextures:%d", field_0x44.m_count);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "Managed %0.2fM",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "ManagedTextures:%d", field_0x44.m_count);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Managed %0.2fM",
                                                                 (managedF = (float)managedTexels) * 9.536743e-07f);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "Ideal   %0.2fM",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Ideal   %0.2fM",
                                                                 (wantedF = (float)wantedTexels) * 9.536743e-07f);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "  ratio %0.2fM", wantedF / managedF);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "  ratio %0.2fM", wantedF / managedF);
         float peak = (float)field_0x1d4.UnknownFunction4cb690();
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMem Blted: %.2fM, (%.2fM)",
             (float)UnknownFunction511970(field_0x0c) * field_0x1d0 * 9.536743e-07f,
             UnknownFunction511970(field_0x0c) * peak * 9.536743e-07f);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "BltTime %d (%d)", now - field_0x250,
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "BltTime %d (%d)", now - field_0x250,
                                                                 field_0x1e0.UnknownFunction4cb690());
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "256:    %02d        %02d",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "256:    %02d        %02d",
                                                                 field_0x1fc[8], field_0x220[8]);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "128:    %02d        %02d",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "128:    %02d        %02d",
                                                                 field_0x1fc[7], field_0x220[7]);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, " 64:    %02d        %02d",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, " 64:    %02d        %02d",
                                                                 field_0x1fc[6], field_0x220[6]);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, " 32:    %02d        %02d",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, " 32:    %02d        %02d",
                                                                 field_0x1fc[5], field_0x220[5]);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMemRequested:%.2fM", (float)UnknownFunction511970(field_0x0c) * field_0x244 * 1.2715658e-06f);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMemGranted:%.2fM", (float)UnknownFunction511970(field_0x0c) * field_0x248 * 1.2715658e-06f);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x254, "TexMemManaged:%.2fM", (float)UnknownFunction511970(field_0x0c) * field_0x24c * 1.2715658e-06f);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x254, "Textures Blted %d", field_0x144.m_count);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x254, "Textures Blted %d", field_0x144.m_count);
     }
 }
 
@@ -637,7 +637,7 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
     UnknownSurfaceInterface* surface = target->field_0x48;
     if (field_0x40->field_0x3c != this)
         return 0;
-    if (!g_UnknownGlobal56e26c->field_0x2d4_bit2)
+    if (!g_TrackGame->field_0x2d4_bit2)
         return 1;
     char text[0x50];
     void* dc;
@@ -671,15 +671,15 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
                     UnknownFunction4d1d20(bits + x * size + 20 * pitch, source, selected->field_0x14,
                                           selected->field_0x18, pitch / size, sourcePitch / sourceSize,
                                           target->field_0x28, selected->field_0x20, 0, selected->field_0x2c, 0, 0);
-                    selected->field_0x70->UnknownMethod32(0);
+                    selected->field_0x70->Unlock(0);
                 }
                 target->UnknownVirtualSlot5(0);
             }
             _snprintf(text, sizeof(text), "%d %0.2f->%d,%s", field_0x1c8 + 1, selected->field_0xa4,
                       selected->field_0xa8, state);
-            if (!target->field_0x48->UnknownMethod17(&dc)) {
+            if (!target->field_0x48->GetDC(&dc)) {
                 TextOutA(dc, x, 20, text, strlen(text));
-                target->field_0x48->UnknownMethod26(dc);
+                target->field_0x48->ReleaseDC(dc);
             }
         }
     }
@@ -712,7 +712,7 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
     rect.top = 20;
     rect.right = page->field_0x14;
     rect.bottom = page->field_0x18 + 20;
-    surface->UnknownMethod5(&rect, 0, 0, 0x400, &effects);
+    surface->Blt(&rect, 0, 0, 0x400, &effects);
     static_cast<CacheTexture*>(page)->UnknownFunction50f890(&field_0x1a8);
     long pitch;
     unsigned char* bits = (unsigned char*)target->UnknownVirtualSlot4(0, &pitch, 0x821);
@@ -728,31 +728,31 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
             UnknownSurfaceDesc desc;
             memset(&desc, 0, sizeof(desc));
             desc.size = sizeof(desc);
-            level->UnknownMethod22(&desc);
+            level->GetSurfaceDesc(&desc);
             while (side < levelSide) {
                 levelSide >>= 1;
-                level->UnknownMethod12((UnknownSurfaceCaps*)desc.caps, &level);
-                level->UnknownMethod22(&desc);
+                level->GetAttachedSurface((UnknownSurfaceCaps*)desc.caps, &level);
+                level->GetSurfaceDesc(&desc);
             }
             if (desc.height == side && desc.width == side) {
                 UnknownSurfaceDesc locked;
                 memset(&locked, 0, sizeof(locked));
                 locked.size = sizeof(locked);
-                if (!level->UnknownMethod25(0, &locked, 0x811, 0)) {
+                if (!level->Lock(0, &locked, 0x811, 0)) {
                     int sourceSize = UnknownFunction511970(managed->field_0x20);
                     int size = UnknownFunction511970(target->field_0x28);
                     UnknownFunction4d1d20(bits + top * pitch + left * size, locked.surface, levelSide, levelSide,
                                           pitch / size, locked.pitch / sourceSize, target->field_0x28,
                                           managed->field_0x20, 0, managed->field_0x2c, 0, 0);
-                    level->UnknownMethod32(0);
+                    level->Unlock(0);
                 }
             }
         }
-        surface->UnknownMethod32(0);
+        surface->Unlock(0);
     }
     field_0x1a8.Clear();
 
-    int failed = surface->UnknownMethod17(&dc);
+    int failed = surface->GetDC(&dc);
     if (!failed) {
         if (!field_0x1f8)
             field_0x1f8 = CreatePen(0, 1, 0xff00);
@@ -778,6 +778,6 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
     }
     sprintf(text, "#%d", field_0x1c4 + 1);
     TextOutA(dc, 0, 20, text, strlen(text));
-    surface->UnknownMethod26(dc);
+    surface->ReleaseDC(dc);
     return 1;
 }

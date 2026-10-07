@@ -191,5 +191,5 @@ long MediaControl::UnknownFunction4a2a90(UnknownSurfaceInterface* destination, v
     if (!field_0x38) {
         return 0x80004005;
     }
-    return destination->UnknownMethod5(destinationRect, field_0x38, sourceRect, flags, 0);
+    return destination->Blt(destinationRect, field_0x38, sourceRect, flags, 0);
 }

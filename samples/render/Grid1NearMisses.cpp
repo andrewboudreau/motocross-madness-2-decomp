@@ -64,7 +64,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot7(int block)
     } else if (record->own) {
         x->texture = record->texture;
         if (Extra()->blocks[block].ageEntry.size)
-            Terrain()->textureAgeManager->UnknownFunction401250(&Extra()->blocks[block].ageEntry);
+            Terrain()->textureAgeManager->MarkUsed(&Extra()->blocks[block].ageEntry);
     } else {
         x->texture = Terrain()->textures[index];
     }
@@ -169,7 +169,7 @@ retry:
                                         Extra()->blocks[block].texture->UnknownFunction510670();
                                     Extra()->textureFlags |= 1 << block;
                                     g_grid1OwnTextureCount++;
-                                    Terrain()->textureAgeManager->UnknownFunction401050(
+                                    Terrain()->textureAgeManager->Register(
                                         &Extra()->blocks[block].ageEntry, (int (*)(void*))EvictBlockTexture,
                                         this, block, UnknownFunction511970(Terrain()->nodeTextureFormat) * 0x40000 / 3);
                                 }
@@ -252,7 +252,7 @@ createTexture:
         ((ManagedTexture*)Extra()->field_0x10)->UnknownFunction510670();
     Extra()->textureFlags |= 0x10000;
     g_grid1OwnTextureCount++;
-    Terrain()->textureAgeManager->UnknownFunction401050(&Extra()->ageEntry, EvictNodeTexture, this, 0,
+    Terrain()->textureAgeManager->Register(&Extra()->ageEntry, EvictNodeTexture, this, 0,
                                                   UnknownFunction511970(Terrain()->nodeTextureFormat) * 0x40000 / 3);
 ownTexture:
     Extra()->texture = (ManagedTexture*)Extra()->field_0x10;

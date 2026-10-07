@@ -25,7 +25,7 @@
   "?UnknownVirtualSlot74@VehicleCamera@@UAE_NXZ": "0x00417490",
   "?UnknownVirtualSlot75@VehicleCamera@@UAE_NXZ": "0x0052d010",
   "?g_UnknownFloat558d60@@3MB": "0x00558d60",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_$E1": "0x0052cee0",
   "_$E10": "0x0052cfd0",
   "_$E11": "0x0052cfc0",

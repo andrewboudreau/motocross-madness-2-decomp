@@ -97,7 +97,7 @@
   "?UnknownFunction510990@ManagedTexture@@QAEHXZ": "0x00510990",
   "?UnknownFunction5109b0@ManagedTexture@@QAEMXZ": "0x005109b0",
   "?UnknownFunction511970@@YAHH@Z": "0x00511970",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__FILE__": "0x00574b84",
   "__FILE__:containerlist.h": "0x005666e4",
   "__ftol": "0x00534a88",

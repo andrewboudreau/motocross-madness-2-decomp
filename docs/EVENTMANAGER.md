@@ -25,8 +25,10 @@ Exact (31 calibration cases):
   +0x30 (1.0) it goes to NetworkInterface 0x004ac8d0 (+0x7c, +0x80): the
   keep-alive thread 0x004af6a0 sends 0xcc and drops a player not heard from
   for +0x7c seconds, and `Sleep`s +0x80 * 1000 ms between 0x4b sends;
-- `0x0045d2b0`, `0x0045d2f0` and `0x0045d340`: the first race-mode object of
-  TrackGame+0x558..+0x568 present, its +0x34 view and its +0x6c target;
+- `FindRaceMode` `0x0045d2b0`, `FindRaceView` `0x0045d2f0` and
+  `FindTextQueue` `0x0045d340`: the first race-mode object of
+  TrackGame+0x558..+0x568 present, its +0x34 view and its +0x6c
+  TextQueueOverlay;
 - `0x0045d390`: whether any is present;
 - `0x0045d270`: slot 5 on all three;
 - slot 10, the per-frame update: while UI interaction is blocked
@@ -35,7 +37,7 @@ Exact (31 calibration cases):
   `frameTime * speed / 7`; after 7 seconds it lifts the block;
 - slots 22 and 23: a press of control 1, 0x1c or 0x39, or any joystick
   button, ends the block once slot 23 has armed it;
-- `0x0045e520`: resets the 11 entries;
+- `ResetEntries` `0x0045e520`: resets the 11 entries;
 - `0x0045e550`: the race-start wait; it scans TrackGame's racer slots
   (+0x2228, 0xf8 apart) for readiness and drives the network object;
 - `0x0045e600`: finishes an event. Retail keeps a redundant

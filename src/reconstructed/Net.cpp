@@ -158,7 +158,7 @@ long NetPendingList::ResendExpired(NetworkInterface* net, int unused)
 {
     long result = 0;
     for (NetPendingMessage* message = head; message; message = message->next) {
-        message->resendTimer += g_UnknownGlobal56e26c->field_0x2f0;
+        message->resendTimer += g_TrackGame->frameTime;
         if (message->resendTimer > 4.0f) {
             result = net->directPlay->SendEx(message->from, message->to, 0x600,
                                              message->data, message->sendSize, 0, 0, 0, 0);
@@ -264,7 +264,7 @@ void NetFile::SendNextChunk()
     chunk.byteCount = count;
     memcpy(chunk.data, data + offset, count);
     chunk.index = chunksDone;
-    g_UnknownGlobal56e26c->field_0x08->Send(0xcf, &chunk, sizeof(chunk), 0,
+    g_TrackGame->network->Send(0xcf, &chunk, sizeof(chunk), 0,
                                                              destination);
     chunksDone++;
     if (chunksDone >= chunkCount) {

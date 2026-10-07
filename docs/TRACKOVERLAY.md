@@ -132,7 +132,7 @@ These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
   shape gives 0x005198a0's shared `xor eax, eax`.
 - The row comparisons of the StatsOverlay panels are `for (...) if
   (strcmp(...) != 0) goto draw; return 1; draw: ...`.
-- Read TrackGame fields through `g_UnknownGlobal56e26c` each time. A cached
+- Read TrackGame fields through `g_TrackGame` each time. A cached
   game or mode local changes branch threading (0x0051a560) and register
   choice (0x0051aa40).
 - Block scope changes the frame: 0x0051aa40 needs `iterator` and `own`

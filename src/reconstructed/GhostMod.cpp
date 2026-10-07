@@ -45,7 +45,7 @@ void GhostMod1::UnknownFunction47bbf0(float duration)
 int GhostMod1::UnknownVirtualSlot10(float frameTime)
 {
     if (timeRemaining != GHOST_MOD_NONE) {
-        float remaining = timeRemaining - g_UnknownGlobal56e26c->field_0x2f0;
+        float remaining = timeRemaining - g_TrackGame->frameTime;
         timeRemaining = remaining > 0.0f ? remaining : 0.0f;
     }
     return GameObject::UnknownVirtualSlot10(frameTime);

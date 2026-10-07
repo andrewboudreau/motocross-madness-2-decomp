@@ -33,7 +33,7 @@ extern int g_UnknownGlobal65b534;
 // cdecl 0x00460b50: table-driven square root (FollowCamera.h).
 float UnknownFunction460b50(float value);
 
-#define SoundSystem() ((PCSoundInterface*)g_UnknownGlobal56e26c->field_0x04)
+#define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
 // 0x00484f10
 void UnknownGroundFogShader::UnknownFunction484f10(UnknownFogVertex* vertices, int count) {
@@ -58,7 +58,7 @@ void UnknownGroundFogShader::UnknownFunction484f10(UnknownFogVertex* vertices, i
     if (field_0x00 == (UnknownGroundFog*)1)
         return;
     if (!field_0x00) {
-        field_0x00 = (UnknownGroundFog*)g_UnknownGlobal56e26c->field_0x34->UnknownFunction469770(1, "GroundFog");
+        field_0x00 = (UnknownGroundFog*)g_TrackGame->field_0x34->FindByClassName(1, "GroundFog");
         if (!field_0x00) {
             field_0x00 = (UnknownGroundFog*)1;
             return;
@@ -257,7 +257,7 @@ int GUIManager::UnknownVirtualSlot15() {
         GameObject::UnknownVirtualSlot15();
     } else {
         waitFrames = waitFrames - 1 < 0 ? 0 : waitFrames - 1;
-        g_UnknownGlobal56e26c->field_0x10->UnknownVirtualSlot12(0, 0);
+        g_TrackGame->renderTarget->UnknownVirtualSlot12(0, 0);
         if (!waitFrames && redrawBackground) {
             redrawBackground->UnknownFunction404da0();
             redrawBackground = 0;
@@ -276,7 +276,7 @@ void GUIManager::UnknownFunction485bd0(UnknownGuiDialog* dialog, int a, int wait
     if (dialog->parentDialog && (dialog->field_0x144 & 1))
         dialog->parentDialog->controlContainer->UnknownFunction469130(dialog, -1);
     else
-        dialogContainer->UnknownFunction469190(dialog, -1);
+        dialogContainer->AppendChild(dialog, -1);
     dialog->UnknownVirtualSlot28(a);
     dialog->field_0xc8 = field_0xec;
     if (guiBackground)
@@ -306,7 +306,7 @@ void GUIManager::UnknownFunction485d70(const char* directory) {
 }
 
 // 0x00485df0
-UnknownGuiDialog* GUIManager::UnknownFunction485df0() {
+UnknownGuiDialog* GUIManager::FindInputDialog() {
     UnknownGuiDialog* found = 0;
     UnknownGuiDialog* dialog;
     GameObjectIterator iterator(this, 1, "UIDialog");
@@ -337,18 +337,18 @@ int GUIManager::UnknownFunction485ee0(int value) {
 }
 
 // 0x00485ef0
-void GUIManager::UnknownFunction485ef0() {
+void GUIManager::CreateBackground() {
     int i;
 
     if (guiBackground)
         return;
-    guiBackground = (BackgroundImage*)UnknownFunction469190(
+    guiBackground = (BackgroundImage*)AppendChild(
         (new(__FILE__, 672) BackgroundImage(1))->UnknownVirtualSlot8(field_0x18), -1);
     guiBackground->UnknownFunction469260(dialogContainer, -1);
     ownsBackground = 1;
     UnknownFunction4865e0(0, 1);
     for (i = 0; i < userCount; i++)
-        UnknownFunction486540(i)->CreateToolTip(field_0x18, this);
+        GetUser(i)->CreateToolTip(field_0x18, this);
 }
 
 // 0x00485fc0
@@ -367,7 +367,7 @@ void GUIManager::ReleaseBackground() {
     while ((dialog = (UnknownGuiDialog*)iterator.Next()) != 0)
         dialog->UnknownFunction46ffd0(0);
     for (i = 0; i < userCount; i++)
-        UnknownFunction486540(i)->CreateToolTip(field_0x18, this);
+        GetUser(i)->CreateToolTip(field_0x18, this);
 }
 
 // 0x004860a0
@@ -411,13 +411,13 @@ void GUIManager::RedrawFrame() {
         guiBackground->UnknownFunction404c80();
         guiBackground->UnknownFunction404da0();
     }
-    g_UnknownGlobal56e26c->UnknownVirtualSlot8();
-    g_UnknownGlobal56e26c->UnknownVirtualSlot9();
-    g_UnknownGlobal56e26c->field_0x10->UnknownFunction4e8cc0();
+    g_TrackGame->UnknownVirtualSlot8();
+    g_TrackGame->UnknownVirtualSlot9();
+    g_TrackGame->renderTarget->UnknownFunction4e8cc0();
 }
 
 // 0x00486540
-GUIUser* GUIManager::UnknownFunction486540(int index) {
+GUIUser* GUIManager::GetUser(int index) {
     if (index < 4)
         return users[index];
     return 0;
@@ -449,13 +449,13 @@ void GUIManager::UnknownFunction4865e0(const char* image, int redraw) {
 }
 
 // 0x00486630
-void GUIManager::UnknownFunction486630(int show) {
+void GUIManager::ShowCursors(int show) {
     int count = userCount;
     GUIUser* user;
     int i;
 
     for (i = 0; i < count; i++) {
-        user = UnknownFunction486540(i);
+        user = GetUser(i);
         if (user && user->userCursor) {
             if (show)
                 user->userCursor->UnknownVirtualSlot5();
@@ -505,7 +505,7 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
         for (pixel = bits; pixel < bits + width * height; pixel++)
             *pixel = fill;
         if (texture->UnknownVirtualSlot4(bits, width, height, width, width, 0x378,
-                                         g_UnknownGlobal56e26c->field_0x10->field_0x28,
+                                         g_TrackGame->renderTarget->field_0x28,
                                          (UnknownTexturePalette*)(guiPalette ? guiPalette->field_0x708 : 0), 4,
                                          guiPalette ? guiPalette->field_0x70c : 0, 1, 0, 2, 1, 0, 0x80, 0xff00ff))
             texture->UnknownVirtualSlot18(0xff00ff);
@@ -515,7 +515,7 @@ PCTextureMap* GUIManager::CreateFilledTexture(int width, int height, unsigned lo
 }
 
 // 0x004868b0
-int GUIManager::UnknownFunction4868b0(int enable) {
+int GUIManager::EnableWindowClipper(int enable) {
     UnknownDisplay* display;
 
     if (enable) {
@@ -523,20 +523,20 @@ int GUIManager::UnknownFunction4868b0(int enable) {
             windowClipper->UnknownMethod7(0, 0);
             windowClipper->UnknownMethod2();
         }
-        ((UnknownGuiDirectDraw*)g_UnknownGlobal56e26c->field_0x0c->field_0x190)
+        ((UnknownGuiDirectDraw*)g_TrackGame->display->field_0x190)
             ->UnknownMethod4(0, &windowClipper, 0);
-        ((UnknownGuiSurface*)g_UnknownGlobal56e26c->field_0x0c->field_0x19c)->UnknownMethod28(windowClipper);
+        ((UnknownGuiSurface*)g_TrackGame->display->field_0x19c)->UnknownMethod28(windowClipper);
         if (windowClipper)
-            windowClipper->UnknownMethod8(0, g_UnknownGlobal56e26c->field_0x31c);
+            windowClipper->UnknownMethod8(0, g_TrackGame->field_0x31c);
     } else {
         if (windowClipper) {
             windowClipper->UnknownMethod7(0, 0);
             windowClipper->UnknownMethod2();
             windowClipper = 0;
         }
-        ((UnknownGuiSurface*)g_UnknownGlobal56e26c->field_0x0c->field_0x19c)->UnknownMethod28(0);
+        ((UnknownGuiSurface*)g_TrackGame->display->field_0x19c)->UnknownMethod28(0);
     }
-    display = g_UnknownGlobal56e26c->field_0x0c;
+    display = g_TrackGame->display;
     display->UnknownFunction4cb5b0(enable);
     return 1;
 }
@@ -648,9 +648,9 @@ GUIInputDevice* GUIInputDevice::Bind(void* target, InputDevice* device, float mi
         rangeY = (float)(((RenderTarget*)field_0x18)->field_0x10 - 1);
     }
     bindingX = UnknownControlBinding(rangeMinX, rangeX, 0.0f,
-                                       g_UnknownGlobal56e26c->field_0x14->UnknownFunction43ce90(), 0, 0.0f);
+                                       g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.0f);
     bindingY = UnknownControlBinding(rangeMinY, rangeY, 0.0f,
-                                       g_UnknownGlobal56e26c->field_0x14->UnknownFunction43ce90(), 1, 0.0f);
+                                       g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.0f);
     if (inputDevice->deviceKind == 2) {
         ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingX, 0.01f, 0.01f);
         ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingY, 0.01f, 0.01f);
@@ -681,9 +681,9 @@ void GUIInputDevice::Rebind() {
         rangeY = (float)(((RenderTarget*)field_0x18)->field_0x10 - 1);
     }
     bindingX = UnknownControlBinding(rangeMinX, rangeX, (float)x,
-                                       g_UnknownGlobal56e26c->field_0x14->UnknownFunction43ce90(), 0, 0.0f);
+                                       g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.0f);
     bindingY = UnknownControlBinding(rangeMinY, rangeY, (float)y,
-                                       g_UnknownGlobal56e26c->field_0x14->UnknownFunction43ce90(), 1, 0.0f);
+                                       g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.0f);
     if (inputDevice->deviceKind == 2) {
         ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingX, 0.01f, 0.01f);
         ((JoystickDevice*)inputDevice)->UnknownFunction489a20(&bindingY, 0.01f, 0.01f);
@@ -700,7 +700,7 @@ int GUIInputDevice::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     kind = inputDevice->deviceKind;
     if (kind) {
-        if (g_UnknownGlobal56e26c->field_0x2d4_bit1) {
+        if (g_TrackGame->field_0x2d4_bit1) {
             POINT* position = &pointerPosition;
             position->x = (int)bindingX.field_0x24;
             position->y = (int)bindingY.field_0x24;
@@ -791,7 +791,7 @@ GUIUser* GUIUser::UnknownFunction487650(void* target, GUIManager* gui) {
 // 0x00487680
 void GUIUser::CreateToolTip(void* target, GUIManager* gui) {
     UnknownFunction487710();
-    userToolTip = (ToolTip*)UnknownFunction469190(
+    userToolTip = (ToolTip*)AppendChild(
         (new(__FILE__, 1639) ToolTip(1))->UnknownFunction486a10(target, gui), -1);
 }
 
@@ -854,12 +854,12 @@ void GUIUser::EnableImeInput(int enable) {
     UnknownGuiControl* control;
 
     if (enable) {
-        ImmAssociateContext((HWND)g_UnknownGlobal56e26c->field_0x31c, (HIMC)g_UnknownGlobal56e26c->field_0x53c);
+        ImmAssociateContext((HWND)g_TrackGame->field_0x31c, (HIMC)g_TrackGame->field_0x53c);
         area = focusControl->field_0x214;
         composition.dwStyle = CFS_FORCE_POSITION;
         composition.ptCurrentPos.x = area.left;
         composition.ptCurrentPos.y = area.top;
-        ImmSetCompositionWindow((HIMC)g_UnknownGlobal56e26c->field_0x53c, &composition);
+        ImmSetCompositionWindow((HIMC)g_TrackGame->field_0x53c, &composition);
         font.lfWidth = 0;
         font.lfQuality = 2;
         font.lfPitchAndFamily = 2;
@@ -887,20 +887,20 @@ void GUIUser::EnableImeInput(int enable) {
             font.lfItalic = (BYTE)control->ownerGui->toolTipItalic;
         }
         strcpy(font.lfFaceName, face);
-        ImmSetCompositionFontA((HIMC)g_UnknownGlobal56e26c->field_0x53c, &font);
+        ImmSetCompositionFontA((HIMC)g_TrackGame->field_0x53c, &font);
         position.x = 550;
         position.y = 450;
-        ImmSetStatusWindowPos((HIMC)g_UnknownGlobal56e26c->field_0x53c, &position);
-        window = ImmGetDefaultIMEWnd((HWND)g_UnknownGlobal56e26c->field_0x31c);
+        ImmSetStatusWindowPos((HIMC)g_TrackGame->field_0x53c, &position);
+        window = ImmGetDefaultIMEWnd((HWND)g_TrackGame->field_0x31c);
         if (window)
             SendMessageA(window, WM_IME_CONTROL, IMC_OPENSTATUSWINDOW, 0);
-        ImmSetOpenStatus((HIMC)g_UnknownGlobal56e26c->field_0x53c, 0);
+        ImmSetOpenStatus((HIMC)g_TrackGame->field_0x53c, 0);
     } else {
-        window = ImmGetDefaultIMEWnd((HWND)g_UnknownGlobal56e26c->field_0x31c);
+        window = ImmGetDefaultIMEWnd((HWND)g_TrackGame->field_0x31c);
         if (window)
             SendMessageA(window, WM_IME_CONTROL, IMC_CLOSESTATUSWINDOW, 0);
-        ImmNotifyIME((HIMC)g_UnknownGlobal56e26c->field_0x53c, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
-        ImmAssociateContext((HWND)g_UnknownGlobal56e26c->field_0x31c, (HIMC)g_UnknownGlobal56e26c->field_0x540);
+        ImmNotifyIME((HIMC)g_TrackGame->field_0x53c, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
+        ImmAssociateContext((HWND)g_TrackGame->field_0x31c, (HIMC)g_TrackGame->field_0x540);
     }
 }
 
@@ -932,7 +932,7 @@ void GUIUser::AcceptKeyboardAndJoysticks() {
 
     if (userGui->keyboardDevice)
         AcceptDevice(userGui->keyboardDevice);
-    for (i = 0; i < g_UnknownGlobal56e26c->field_0x14->joystickCount; i++)
+    for (i = 0; i < g_TrackGame->controlInterface->joystickCount; i++)
         AcceptDevice(userGui->joystickDevices[i]);
 }
 
@@ -954,13 +954,13 @@ void GUIUser::CreateCursor(const char* image, int visible) {
         userGui->guiBackground->UnknownFunction404c80();
     if (userCursor || !pointerDevice)
         return;
-    if (g_UnknownGlobal56e26c->field_0x2d4_bit1) {
-        if (g_UnknownGlobal56e26c->field_0x10->field_0x28 > 8 ||
-            (g_UnknownGlobal56e26c->field_0x10->field_0x28 == 8 && userGui->guiPalette)) {
+    if (g_TrackGame->field_0x2d4_bit1) {
+        if (g_TrackGame->renderTarget->field_0x28 > 8 ||
+            (g_TrackGame->renderTarget->field_0x28 == 8 && userGui->guiPalette)) {
             palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
             if (!image)
                 image = cursorImage;
-            userCursor = (GUICursor*)UnknownFunction469190(
+            userCursor = (GUICursor*)AppendChild(
                 (new(__FILE__, 1890) GUICursor(visible))
                     ->UnknownFunction43ea70(field_0x18, &pointerDevice->bindingX, &pointerDevice->bindingY, image,
                                             userGui->guiTextures, userGui->guiBackground, palette,
@@ -968,8 +968,8 @@ void GUIUser::CreateCursor(const char* image, int visible) {
                 -1);
         }
     } else {
-        if (g_UnknownGlobal56e26c->field_0x10->field_0x28 > 8 ||
-            (g_UnknownGlobal56e26c->field_0x10->field_0x28 == 8 && userGui->guiPalette)) {
+        if (g_TrackGame->renderTarget->field_0x28 > 8 ||
+            (g_TrackGame->renderTarget->field_0x28 == 8 && userGui->guiPalette)) {
             palette = userGui->guiPalette ? userGui->guiPalette->field_0x708 : 0;
             if (!image)
                 image = cursorImage;
@@ -1004,11 +1004,11 @@ void GUIUser::UnknownFunction488010(const char* image, int redraw) {
     int visible;
     int defaultImage;
 
-    if (g_UnknownGlobal56e26c->field_0x2d5_bit1 || !pointerDevice)
+    if (g_TrackGame->field_0x2d5_bit1 || !pointerDevice)
         return;
     visible = userCursor ? userCursor->field_0x25_bit0 : 1;
     ReleaseCursor();
-    if (g_UnknownGlobal56e26c->field_0x10->field_0x28 == 8 && !userGui->guiPalette)
+    if (g_TrackGame->renderTarget->field_0x28 == 8 && !userGui->guiPalette)
         return;
     defaultImage = !image;
     CreateCursor(image ? image : cursorImage, visible);
@@ -1020,7 +1020,7 @@ void GUIUser::UnknownFunction488010(const char* image, int redraw) {
 
 // 0x004880c0
 void GUIUser::ReleaseCursor() {
-    if (!g_UnknownGlobal56e26c->field_0x2d5_bit1 && userCursor)
+    if (!g_TrackGame->field_0x2d5_bit1 && userCursor)
         userCursor->Release();
     userCursor = 0;
 }
@@ -1047,11 +1047,11 @@ int GUIUser::UnknownFunction488160(InputDevice* device) {
 // 0x004881d0
 int GUIUser::UnknownFunction4881d0(UnknownControlEvent* event) {
     if (event->kind == 0)
-        return UnknownFunction488160((InputDevice*)g_UnknownGlobal56e26c->field_0x14->keyboard);
+        return UnknownFunction488160((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
-        return UnknownFunction488160((InputDevice*)g_UnknownGlobal56e26c->field_0x14->mouse);
+        return UnknownFunction488160((InputDevice*)g_TrackGame->controlInterface->mouse);
     if (event->kind == 2 || event->kind == 3)
-        return UnknownFunction488160((InputDevice*)g_UnknownGlobal56e26c->field_0x14->joysticks[event->device]);
+        return UnknownFunction488160((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
     return 0;
 }
 
@@ -1073,11 +1073,11 @@ GUIInputDevice* GUIUser::UnknownFunction488240(InputDevice* device) {
 // 0x004882a0
 GUIInputDevice* GUIUser::UnknownFunction4882a0(UnknownControlEvent* event) {
     if (event->kind == 0)
-        return UnknownFunction488240((InputDevice*)g_UnknownGlobal56e26c->field_0x14->keyboard);
+        return UnknownFunction488240((InputDevice*)g_TrackGame->controlInterface->keyboard);
     if (event->kind == 1)
-        return UnknownFunction488240((InputDevice*)g_UnknownGlobal56e26c->field_0x14->mouse);
+        return UnknownFunction488240((InputDevice*)g_TrackGame->controlInterface->mouse);
     if (event->kind == 2 || event->kind == 3)
-        return UnknownFunction488240((InputDevice*)g_UnknownGlobal56e26c->field_0x14->joysticks[event->device]);
+        return UnknownFunction488240((InputDevice*)g_TrackGame->controlInterface->joysticks[event->device]);
     return 0;
 }
 
@@ -1158,23 +1158,23 @@ int HiResMeter::UnknownVirtualSlot10(float frameTime) {
     UnknownHiResMeterEntry* entry;
     int i;
 
-    if (g_UnknownGlobal56e26c->field_0x38) {
+    if (g_TrackGame->debugOverlay) {
         if (field_0x3c < 0)
-            field_0x3c = g_UnknownGlobal56e26c->field_0x38->NewPage();
-        if (g_UnknownGlobal56e26c->field_0x38->field_0x26c4 != field_0x3c) {
+            field_0x3c = g_TrackGame->debugOverlay->NewPage();
+        if (g_TrackGame->debugOverlay->field_0x26c4 != field_0x3c) {
             UnknownFunction488540();
             return 1;
         }
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447fa0(
+        g_TrackGame->debugOverlay->UnknownFunction447fa0(
             field_0x3c, "MS Timers [CallsThisTick-->TotMSThisTick (AvgMSPerTick)] : (Per-call Peak/Avg)");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x3c, "Previous Game Tick: % 3d  MS",
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x3c, "Previous Game Tick: % 3d  MS",
                                                                 g_UnknownGlobal65b534);
         for (i = 0; i < field_0x34; i++) {
             entry = &field_0x40[i];
             if (entry->field_0x08 != 0.0f) {
                 entry->field_0x1c += 1.0f;
                 entry->field_0x18 = entry->field_0x18 + entry->field_0x14;
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+                g_TrackGame->debugOverlay->UnknownFunction447f40(
                     field_0x3c, "%24.24s [%4.0f --> %6.3f (%6.3f)] : (%6.3f / %5.3f) MS", entry->field_0x24,
                     entry->field_0x10, entry->field_0x14, entry->field_0x18 / entry->field_0x1c,
                     entry->field_0x20, entry->field_0x0c / entry->field_0x08);

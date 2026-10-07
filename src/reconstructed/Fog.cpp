@@ -36,11 +36,11 @@ Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibili
     this->nearScale = nearScale;
     visibilityOffset = 0;
     minimumDistance = minimum;
-    if (g_UnknownGlobal56e26c->field_0x2d0) {
+    if (g_TrackGame->field_0x2d0) {
         renderFog = 0;
     } else {
         sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->field_0x04->field_0x4bc);
-        renderFog = g_UnknownGlobal56e26c->UnknownVirtualSlot22(name, 1);
+        renderFog = g_TrackGame->GetRegistryFlag(name, 1);
         if (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGVERTEX) {
             field_0x44 = D3DPRASTERCAPS_FOGVERTEX;
         } else if (TARGET()->field_0x04->field_0xb74_bit2 || (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
@@ -49,7 +49,7 @@ Fog* Fog::UnknownFunction462680(void* target, unsigned int color, float visibili
             field_0x44 = D3DPRASTERCAPS_FOGRANGE;
         }
         // Not Windows NT (VER_PLATFORM_WIN32_NT is 2).
-        if (g_UnknownGlobal56e26c->field_0x424.platformId != 2 && !(TARGET()->field_0x04->field_0x1b8 & 0x400)
+        if (g_TrackGame->field_0x424.platformId != 2 && !(TARGET()->field_0x04->field_0x1b8 & 0x400)
             && (TARGET()->triRasterCaps & D3DPRASTERCAPS_FOGTABLE)) {
             field_0x44 = D3DPRASTERCAPS_FOGTABLE;
         }
@@ -91,10 +91,10 @@ int Fog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* ent
 {
     char name[256];
 
-    if (UnknownFunction43caa0(0x57, 0, event, 3) && !g_UnknownGlobal56e26c->field_0x2d0) {
+    if (UnknownFunction43caa0(0x57, 0, event, 3) && !g_TrackGame->field_0x2d0) {
         renderFog = 1 - renderFog;
         sprintf(name, "DriverInfo\\%s\\RenderFog", TARGET()->field_0x04->field_0x4bc);
-        g_UnknownGlobal56e26c->UnknownVirtualSlot27(name, renderFog);
+        g_TrackGame->SetRegistryFlag(name, renderFog);
         return 1;
     }
     if (UnknownFunction43caa0(0x21, 0, event, 0x80)) {

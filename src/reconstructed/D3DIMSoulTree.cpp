@@ -188,7 +188,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
             materialTable[i] = new (__FILE__, 0x158) SoultreeMaterial(1);
             materialTable[i]->Attach((RenderTarget*)field_0x18, (const SoultreeTextureOptions*)textureOptions,
                                                   textureManager, textureFormat);
-            UnknownFunction469190(materialTable[i], -1);
+            AppendChild(materialTable[i], -1);
             materialTable[i]->ReadSaved((UnknownParameterStream*)stream);
         }
     } else {
@@ -264,7 +264,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot3()
         materialTable[i] = new (__FILE__, 0x1c5) SoultreeMaterial(1);
         materialTable[i]->Attach((RenderTarget*)field_0x18, (const SoultreeTextureOptions*)textureOptions,
                                               textureManager, textureFormat);
-        UnknownFunction469190(materialTable[i], -1);
+        AppendChild(materialTable[i], -1);
         char section[0x80];
         sprintf(section, "Material - %d", i);
         parameterBlock->UnknownFunction4b78f0(section);
@@ -274,7 +274,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot3()
         materialTable[count] = new (__FILE__, 0x1ce) SoultreeMaterial(1);
         materialTable[count]->Attach((RenderTarget*)field_0x18, (const SoultreeTextureOptions*)textureOptions,
                                                   textureManager, textureFormat);
-        UnknownFunction469190(materialTable[count], -1);
+        AppendChild(materialTable[count], -1);
         materialTable[count]->MakeUntextured();
     }
     UnknownFunction440810();
@@ -349,7 +349,7 @@ void D3DIMSoultreeObject::UnknownFunction4439c0(UnknownSoultreeCounters* rect)
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    ((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod25(0, &desc, 1, 0);
+    ((PCRenderTarget*)field_0x18)->field_0x48->Lock(0, &desc, 1, 0);
     UnknownSoultreeCameraView* camera = (UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08;
     char* bits = (char*)desc.surface + camera->viewportY * desc.pitch + camera->viewportX;
     int i;
@@ -361,7 +361,7 @@ void D3DIMSoultreeObject::UnknownFunction4439c0(UnknownSoultreeCounters* rect)
         bits[i * desc.pitch + rect->field_0x08 * 2] = 0;
         bits[i * desc.pitch + rect->field_0x00 * 2] = 0;
     }
-    ((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod32(0);
+    ((PCRenderTarget*)field_0x18)->field_0x48->Unlock(0);
 }
 
 // 0x00444030
@@ -447,7 +447,7 @@ void D3DIMSoultreeObject::UnknownFunction444a40(D3DIMSoultreeObject* source)
         materialTable[i] = new (__FILE__, 0x8ef) SoultreeMaterial(1);
         materialTable[i]->Attach((RenderTarget*)field_0x18, (const SoultreeTextureOptions*)textureOptions,
                                               textureManager, textureFormat);
-        UnknownFunction469190(materialTable[i], -1);
+        AppendChild(materialTable[i], -1);
         materialTable[i]->CopyFrom(source->materialTable[i]);
     }
 }

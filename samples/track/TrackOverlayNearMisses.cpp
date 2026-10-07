@@ -228,13 +228,13 @@ int ChatOverlay::UnknownFunction51d730(UnknownChatView* view)
         nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->UnknownFunction518e30(
             Target(), overlayTexture, &nameTagRects[i], 0, &nameTagRects[i], (UnknownEventRacer*)racers[i],
             (UnknownNameOverlayWorld*)chatView, i);
-        UnknownFunction469190(nameTags[i], -1);
+        AppendChild(nameTags[i], -1);
     }
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 0) {
+    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 0) {
         nameTags[field_0x198] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
             Target(), overlayTexture, &nameTagRects[field_0x198], 0, &nameTagRects[field_0x198], 0,
             (UnknownNameOverlayWorld*)chatView, i);
-        UnknownFunction469190(nameTags[field_0x198], -1);
+        AppendChild(nameTags[field_0x198], -1);
         if (nameTags[field_0x198]) {
             nameTags[field_0x198]->UnknownFunction519080(Vector3(cueRect.left, cueRect.top, 0));
             nameTags[field_0x198]->UnknownVirtualSlot4();
@@ -260,11 +260,11 @@ int StatsOverlay::UnknownFunction519a20()
     void* font;
     int i;
     int count = 0;
-    UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->field_0x55c->field_0x34;
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x943, label, 0x80);
-        TrackGameViewOwner* owner = g_UnknownGlobal56e26c->field_0x55c;
-        float limit = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140 * 60.0f;
+    UnknownKrustyBikeView* view = g_TrackGame->field_0x55c->field_0x34;
+    if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
+        g_TrackGame->LoadResourceString(0x943, label, 0x80);
+        TrackGameViewOwner* owner = g_TrackGame->field_0x55c;
+        float limit = g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f;
         UnknownFunction518640(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
         sprintf(rowText[0], "%s", label);
     }
@@ -285,7 +285,7 @@ int StatsOverlay::UnknownFunction519a20()
         }
     }
     int first = 1;
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4)
+    if (g_TrackGame->mode.field_0x27f8.field_0x00 != 0 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4)
         count++;
     else
         first = 0;
@@ -312,7 +312,7 @@ int StatsOverlay::UnknownFunction519a20()
         return 1;
     RestoreRect(&sourceRect);
     PCTextureMap* texture = (PCTextureMap*)sharedTexture;
-    if (texture->field_0x70->UnknownMethod17(&dc) != 0)
+    if (texture->field_0x70->GetDC(&dc) != 0)
         goto fail;
     SetBkColor(dc, 1);
     SetBkMode(dc, 1);
@@ -325,7 +325,7 @@ int StatsOverlay::UnknownFunction519a20()
         strcpy(field_0x1b0[i], rowText[i]);
     }
     SelectObject(dc, font);
-    if (texture->field_0x70->UnknownMethod26(dc) != 0) {
+    if (texture->field_0x70->ReleaseDC(dc) != 0) {
 fail:
         return 0;
     }
@@ -349,7 +349,7 @@ StatsOverlay* StatsOverlay::UnknownFunction5194b0(RenderTarget* target, TextureM
     rect.top = 0;
     rect.right = 128;
     rect.bottom = 128;
-    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
+    switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
     case 0:
         strcpy(name, "BajaScore.tga");
         break;
@@ -400,7 +400,7 @@ StatsOverlay* StatsOverlay::UnknownFunction5194b0(RenderTarget* target, TextureM
     logFont.lfClipPrecision = 0;
     logFont.lfQuality = 2;
     logFont.lfPitchAndFamily = 2;
-    UnknownKrustyUIGui* gui = g_UnknownGlobal56e26c->ui->field_0x2c;
+    UnknownKrustyUIGui* gui = g_TrackGame->ui->field_0x2c;
     const char* face = gui ? gui->field_0x350 : "";
     if (*face != '\0') {
         logFont.lfWeight = gui->field_0x3d4 ? 700 : 500;
@@ -452,7 +452,7 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
         if (s_UnknownGlobal68a444) {
             sprintf(text, "%.3f", racers[index]->field_0x4a4);
         } else {
-            if (g_UnknownGlobal56e26c->mode.field_0x6c0) {
+            if (g_TrackGame->mode.field_0x6c0) {
                 UnknownChatRacer* racer = racers[index];
                 if (racer->field_0x784 > 0)
                     sprintf(text, "%d", racer->field_0x784);
@@ -461,11 +461,11 @@ void ChatOverlay::DrawNameTag(void* dc, int index)
             } else {
                 strcpy(text, "");
             }
-            if (g_UnknownGlobal56e26c->mode.field_0x6bc)
+            if (g_TrackGame->mode.field_0x6bc)
                 strcpy(name, racers[index]->name);
             else
                 strcpy(name, "");
-            if (g_UnknownGlobal56e26c->mode.field_0x6c0 && g_UnknownGlobal56e26c->mode.field_0x6bc)
+            if (g_TrackGame->mode.field_0x6c0 && g_TrackGame->mode.field_0x6bc)
                 strcat(text, " : ");
             strcat(text, name);
         }
@@ -649,7 +649,7 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
         source.bottom = largeLayout ? 137 : 103;
         field_0x1c8 = new (__FILE__, 2284) Overlay(0, 1);
         field_0x1c8->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
-        UnknownFunction469190(field_0x1c8, -1);
+        AppendChild(field_0x1c8, -1);
         source.left += largeLayout ? 38 : 19;
         source.top = 69;
         source.right += largeLayout ? 38 : 19;
@@ -658,7 +658,7 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
         rect.right = chatRect.right + (largeLayout ? 38 : 19);
         field_0x1cc = new (__FILE__, 2294) Overlay(0, 1);
         field_0x1cc->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
-        UnknownFunction469190(field_0x1cc, -1);
+        AppendChild(field_0x1cc, -1);
     }
     field_0x11c = CreatePen(0, 3, 0xc0c0c0);
     logFont.lfHeight = 9;
@@ -673,7 +673,7 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
     logFont.lfClipPrecision = 0;
     logFont.lfQuality = 2;
     logFont.lfPitchAndFamily = 2;
-    UnknownKrustyUIGui* gui = g_UnknownGlobal56e26c->ui->field_0x2c;
+    UnknownKrustyUIGui* gui = g_TrackGame->ui->field_0x2c;
     const char* face = gui ? gui->field_0x350 : "";
     if (*face != '\0') {
         logFont.lfWeight = gui->field_0x3d4 ? 700 : 500;
@@ -738,8 +738,8 @@ void RadarOverlay::DrawRacers(int mode)
                     float distance = dz * dz + dx * dx;
                     radarView->field_0x19c->UnknownFunction51d9c0(distance, racers[i]->field_0x5e0);
                 }
-                if (outside && (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 ||
-                                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 2)) {
+                if (outside && (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 ||
+                                g_TrackGame->mode.field_0x27f8.field_0x04 == 2)) {
                     point.x = -1.0f;
                     point.y = -1.0f;
                 } else {
@@ -758,8 +758,8 @@ void RadarOverlay::DrawRacers(int mode)
                     radarView->field_0x19c->nameTags[i]->UnknownFunction5190a0(point, 0, outside);
             }
             if (outside) {
-                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 ||
-                    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 2)
+                if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 ||
+                    g_TrackGame->mode.field_0x27f8.field_0x04 == 2)
                     continue;
                 field_0x1b8.color = 0x28aa28;
                 field_0x1d8.color = 0x28aa28;

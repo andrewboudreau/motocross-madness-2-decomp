@@ -12,7 +12,7 @@ JoystickDevice::JoystickDevice(int index) : PCInputDevice(2) {
     }
     for (int j = 0; j < 32; j++)
         buttonStates[j].state = 0;
-    directionFlipped = g_UnknownGlobal56e26c->UnknownVirtualSlot22("JoyDirectionFlipped", 0);
+    directionFlipped = g_TrackGame->GetRegistryFlag("JoyDirectionFlipped", 0);
 }
 
 // 0x00489920
@@ -24,7 +24,7 @@ JoystickDevice::~JoystickDevice() {}
 // 0x00489980: with a keyboard, `modifier` must hold on it; without one,
 // only "none" (0, 0x80000000 or 0x3f) is accepted.
 int JoystickDevice::UnknownVirtualSlot2(int button, int modifier, UnknownInputEntry* entry) {
-    KeyboardDevice* keyboard = g_UnknownGlobal56e26c->field_0x14->keyboard;
+    KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
     if (((keyboard && keyboard->UnknownFunction48a240(modifier)) ||
          (!keyboard && (modifier == 0 || modifier == (int)0x80000000 || modifier == 0x3f))) &&
         buttonStates[button].state == 1) {
@@ -144,7 +144,7 @@ int JoystickDevice::UnknownFunction489c60(int control, int modifier, UnknownInpu
         }
         return 0;
     }
-    UnknownControlMapping* mapping = g_UnknownGlobal56e26c->field_0x14->mapping;
+    UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
     mapping->UnknownFunction43cbd0(control, &control, joystickIndex);

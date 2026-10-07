@@ -13,7 +13,7 @@ struct UnknownTrackRecordEvent {
     int kind;                                 // +0x08
     UIDialog* dialog;                         // +0x0c
     void* gui;                                // +0x10
-    UnknownGameUiControl* control;            // +0x14 the control ("LstTrack")
+    UIControl* control;            // +0x14 the control ("LstTrack")
     int field_0x18;
     int key;                                  // +0x1c
     int handled;                              // +0x20 set to 1 once handled
@@ -110,7 +110,7 @@ public:
     void LabelTabs(int series);                                 // 0x0051fc40: labels the tabs
     void ShowTab(UnknownTrackRecordEvent* event, int series); // 0x0051fe80: shows a tab
     void UnknownFunction51ff40();
-    void UnknownFunction51ffe0(UnknownGameUiControl* list, DirectoryList* directory, int series); // 0x0051ffe0
+    void UnknownFunction51ffe0(UIControl* list, DirectoryList* directory, int series); // 0x0051ffe0
     void FillLists(UnknownTrackRecordEvent* event, int series); // 0x00520390: fills the lists                                           // 0x0051ff40: frees the rows
     void UnknownFunction520480(UnknownTrackRecordEvent* event, const char* name, float value,
                                const char* text);                           // 0x00520480

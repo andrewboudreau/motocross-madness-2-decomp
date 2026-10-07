@@ -26,7 +26,7 @@ PCJoystickDevice::PCJoystickDevice(int index) : JoystickDevice(index) {
     field_0x5d4_bit0 = 1;
     field_0x5d4_bit1 = 1;
     field_0x5d5 = 0;
-    directionFlipped = g_UnknownGlobal56e26c->UnknownVirtualSlot22("JoyDirectionFlipped", 0);
+    directionFlipped = g_TrackGame->GetRegistryFlag("JoyDirectionFlipped", 0);
 }
 
 // 0x004c28d0: releases the effects and resets the device (calls bind
@@ -44,18 +44,18 @@ int PCJoystickDevice::UnknownFunction4c2930(const UnknownDeviceInstance* instanc
     UnknownDeviceCaps caps;
     int half;
     const UnknownGuid& guid = instance->instanceGuid;
-    if (g_UnknownGlobal56e26c->field_0x14->directInput->CreateDeviceEx(
+    if (g_TrackGame->controlInterface->directInput->CreateDeviceEx(
             guid, IID_IDirectInputDevice7A, &device, 0) < 0)
         goto failed;
     deviceInfo = *instance;
     deviceInfo.size = sizeof(deviceInfo);
     device->GetDeviceInfo(&deviceInfo);
     UnknownVirtualSlot19();
-    if (g_UnknownGlobal56e26c->field_0x14->directInput->GetDeviceStatus(guid) < 0)
+    if (g_TrackGame->controlInterface->directInput->GetDeviceStatus(guid) < 0)
         goto failed;
     if (device->SetDataFormat(&c_dfDIJoystick) < 0)
         goto failed;
-    if (device->SetCooperativeLevel(g_UnknownGlobal56e26c->field_0x31c, 5) < 0)
+    if (device->SetCooperativeLevel(g_TrackGame->field_0x31c, 5) < 0)
         goto failed;
     caps.size = sizeof(caps);
     if (device->GetCapabilities(&caps) < 0)
@@ -119,7 +119,7 @@ int PCJoystickDevice::UnknownFunction4c2930(const UnknownDeviceInstance* instanc
     }
     if (deviceKind == 3)
         UnknownVirtualSlot5(0);
-    UnknownMethod4c3a10(g_UnknownGlobal56e26c->UnknownVirtualSlot22("BufferedJoystick", 1));
+    UnknownMethod4c3a10(g_TrackGame->GetRegistryFlag("BufferedJoystick", 1));
     return 1;
 failed:
     if (device) {
@@ -157,10 +157,10 @@ int __stdcall PCJoystickDevice::UnknownEnumObjectsCallback(const UnknownObjectIn
 void PCJoystickDevice::UnknownMethod4c2d90(int axis, int value) {
     for (int i = 0; i < axisBindings[axis].m_count; i++) {
         UnknownControlBinding* binding = axisBindings[axis].Get(i);
-        binding->field_0x18 += g_UnknownGlobal56e26c->field_0x2f0;
-        binding->field_0x14 += g_UnknownGlobal56e26c->field_0x2f0;
+        binding->field_0x18 += g_TrackGame->frameTime;
+        binding->field_0x14 += g_TrackGame->frameTime;
         if (axisValues[axis] < 16384.0f) {
-            if (binding->field_0x14 - g_UnknownGlobal56e26c->field_0x2f0 > binding->field_0x20) {
+            if (binding->field_0x14 - g_TrackGame->frameTime > binding->field_0x20) {
                 binding->UnknownFunction43cd10();
                 binding->field_0x14 = 0;
             }
@@ -169,7 +169,7 @@ void PCJoystickDevice::UnknownMethod4c2d90(int axis, int value) {
                 binding->field_0x14 -= binding->field_0x20;
             }
         } else if (axisValues[axis] > 49152.0f) {
-            if (binding->field_0x18 - g_UnknownGlobal56e26c->field_0x2f0 > binding->field_0x20) {
+            if (binding->field_0x18 - g_TrackGame->frameTime > binding->field_0x20) {
                 binding->UnknownFunction43cd10();
                 binding->field_0x18 = 0;
             }

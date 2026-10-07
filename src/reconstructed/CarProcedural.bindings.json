@@ -45,7 +45,7 @@
   "?UnknownFunction461340@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?UnknownFunction461600@UnknownTextureStream@@QAEHXZ": "0x00461600",
   "?UnknownFunction461aa0@UnknownTextureStream@@QAEHPADH@Z": "0x00461aa0",
-  "?UnknownFunction469190@GameObject@@QAEHPAV1@H@Z": "0x00469190",
+  "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?UnknownFunction4fc970@CarProceduralNode@@QAEXPAUVector3@@@Z": "0x004fc970",
   "?UnknownFunction4fdae0@CarProceduralNode@@QAEPAV1@PBD@Z": "0x004fdae0",
   "?UnknownFunction4fe0a0@CarProceduralNode@@QAEXPAUVector3@@0@Z": "0x004fe0a0",

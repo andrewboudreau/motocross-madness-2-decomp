@@ -38,7 +38,7 @@ GameObject::GameObject(int flags) {
     field_0x20 = 0;
     field_0x28 = static_cast<char*>(DebugMalloc(1, __FILE__, 31));
     field_0x28[0] = 0;
-    UnknownFunction469ce0(this);
+    AppendClassName(this);
 }
 
 // 0x00468d60 (scalar deleting wrapper 0x00468d40)
@@ -319,7 +319,7 @@ int GameObject::UnknownVirtualSlot21(int value) {
 // 0x00469ce0: appends the RTTI name of `object`, without its "class " prefix,
 // and a comma to field_0x28. The constructor passes `this`, so each
 // constructor in a hierarchy contributes its own class name.
-void GameObject::UnknownFunction469ce0(GameObject* object) {
+void GameObject::AppendClassName(GameObject* object) {
     const char* name = typeid(*object).name();
     int length = strlen(name);
     if (strstr(name, "class ") == name) {
@@ -380,7 +380,7 @@ int GameObject::UnknownFunction469130(GameObject* object, int value) {
 
 // 0x00469190: appends `child` (and its later siblings) to the children;
 // returns `child`.
-int GameObject::UnknownFunction469190(GameObject* child, int value) {
+int GameObject::AppendChild(GameObject* child, int value) {
     if (g_UnknownGlobal65b548)
         return 0;
     if (child) {
@@ -510,7 +510,7 @@ void GameObject::UnknownFunction468f10(const char* name) {
 // "<name>," (any object when `name` is 0). Modes: 0 the children, 1 all
 // descendants (depth first), 2 the other siblings, 3 the parent, 4 the
 // ancestors.
-GameObject* GameObject::UnknownFunction469770(int mode, const char* name) {
+GameObject* GameObject::FindByClassName(int mode, const char* name) {
     char className[128];
     char pattern[128];
     int length = 0;
@@ -556,7 +556,7 @@ GameObject* GameObject::UnknownFunction469770(int mode, const char* name) {
             object = object->field_0x0C;
             break;
         case 1: {
-            GameObject* found = object->UnknownFunction469770(1, name);
+            GameObject* found = object->FindByClassName(1, name);
             if (found)
                 return found;
             object = object->field_0x0C;

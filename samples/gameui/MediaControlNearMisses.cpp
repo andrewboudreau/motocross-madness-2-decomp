@@ -89,12 +89,12 @@ MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file
     if (field_0x60->UnknownMethod13(surface, 0, 1, &field_0x64) < 0) {
         goto failed;
     }
-    if (surface->UnknownMethod0(&IID_IDirectDrawSurface4, (void**)&field_0x38)) {
+    if (surface->QueryInterface(&IID_IDirectDrawSurface4, (void**)&field_0x38)) {
         goto failed;
     }
     memset(&frameDesc, 0, sizeof(frameDesc));
     frameDesc.size = sizeof(frameDesc);
-    if (TARGET()->field_0x48->UnknownMethod22(&frameDesc)) {
+    if (TARGET()->field_0x48->GetSurfaceDesc(&frameDesc)) {
         goto failed;
     }
     frameDesc.height = field_0x34;

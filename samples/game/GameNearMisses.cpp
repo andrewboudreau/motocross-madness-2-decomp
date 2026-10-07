@@ -42,10 +42,10 @@ extern "C" __declspec(dllimport) long __stdcall RegCloseKey(void* key);
 // +0x2d4, then (when slot 32 allows) the texture manager, the debug overlay
 // (only with that bit) and the "AllowFreezeCamera" setting.
 int Game::UnknownFunction467b70(char*) {
-    field_0x2f4 = new(__FILE__, 222) GameObject(1);
+    rootObject = new(__FILE__, 222) GameObject(1);
     field_0x34 = new(__FILE__, 227) GameObject(1);
-    field_0x2f4->UnknownFunction469190(field_0x34, -1);
-    field_0x04 = new(__FILE__, 235) PCSoundInterface;
+    rootObject->AppendChild(field_0x34, -1);
+    soundInterface = new(__FILE__, 235) PCSoundInterface;
     srand(UnknownFunction4bfa80());
     int count = UnknownFunction4bfa80() & 0xff;
     do
@@ -64,26 +64,26 @@ int Game::UnknownFunction467b70(char*) {
     if (!UnknownVirtualSlot32())
         return 0;
     field_0x3c = new(__FILE__, 282) TextureMapManager;
-    field_0x34->UnknownFunction469190(field_0x3c->UnknownVirtualSlot8(field_0x10), -1);
+    field_0x34->AppendChild(field_0x3c->UnknownVirtualSlot8(renderTarget), -1);
     field_0x1c = field_0x3c;
     field_0x20 = 0;
     field_0x24 = 0;
-    field_0x28 = field_0x10->field_0x28;
+    field_0x28 = renderTarget->field_0x28;
     field_0x2c = 0x115c;
     field_0x30 = 0;
     if (field_0x2d4_bit2) {
         int category = g_MemTagStack->Push("DebugOverlay");
-        field_0x38 = (new(__FILE__, 305) DebugOverlay(0))->UnknownFunction447de0(field_0x10, field_0x3c, 8, 3, 3);
-        if (field_0x38) {
-            field_0x2f4->UnknownFunction469190(field_0x38, -1);
+        debugOverlay = (new(__FILE__, 305) DebugOverlay(0))->UnknownFunction447de0(renderTarget, field_0x3c, 8, 3, 3);
+        if (debugOverlay) {
+            rootObject->AppendChild(debugOverlay, -1);
             if (g_UnknownGlobal56c470->field_0x2c) {
-                field_0x2f4->UnknownFunction469190(g_UnknownGlobal56c470, -1);
+                rootObject->AppendChild(g_UnknownGlobal56c470, -1);
                 g_UnknownGlobal56c470->UnknownVirtualSlot5();
             }
         }
         g_MemTagStack->Pop(category);
     }
-    field_0x2d4_bit0 = UnknownVirtualSlot22("AllowFreezeCamera", 0);
+    field_0x2d4_bit0 = GetRegistryFlag("AllowFreezeCamera", 0);
     if (!UnknownVirtualSlot3())
         return 0;
     return UnknownVirtualSlot4() != 0;

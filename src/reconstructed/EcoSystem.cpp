@@ -209,7 +209,7 @@ void Vegetation::DrawGeometry(UnknownEcoRenderTarget* target) {
     int indexCount = definition->modelIndexCount[isBillboard];
     target->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, geometryBlock, vertexCount, (UnknownEcoVertex*)geometryBlock + vertexCount,
                                  indexCount, 0);
-    g_UnknownGlobal59aebc->ageManager->UnknownFunction401250(
+    g_UnknownGlobal59aebc->ageManager->MarkUsed(
         (AgeEntry*)((int*)geometryBlock + vertexCount * 8 + (indexCount + 1) / 2));
 }
 
@@ -475,7 +475,7 @@ EcoSystem* EcoSystem::UnknownFunction4594d0(void* view, TextureMapManager* textu
                                             int textureFormat, int collisions, int level) {
     int i;
     GameObject::UnknownVirtualSlot8(view);
-    g_UnknownGlobal59af14 = g_UnknownGlobal56e26c->field_0x2d0 ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
+    g_UnknownGlobal59af14 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
     UnknownFunction4594c0(level);
     groundTerrain = terrain;
     textureManager = textures;
@@ -590,10 +590,10 @@ int EcoSystem::UnknownVirtualSlot12() {
         return 1;
     if (ageManager) {
         int stale;
-        int total = ageManager->UnknownFunction401130(&stale);
+        int total = ageManager->TotalSize(&stale);
         if (stale > 0x40000)
-            ageManager->UnknownFunction4011b0(total - stale);
-        ageManager->UnknownFunction401040();
+            ageManager->EvictStale(total - stale);
+        ageManager->AdvanceAge();
     }
     g_UnknownGlobal59af00 = &ECO_VIEW->field_0x08->field_0xac;
     depthScale = 65535.0f / ECO_VIEW->field_0x08->field_0x1c0;
@@ -658,7 +658,7 @@ int EcoSystem::UnknownVirtualSlot12() {
 void EcoSystem::SetRenderStates(int format) {
     float alphaReference;
     if (format == 1555) {
-        alphaReference = (float)(g_UnknownGlobal56e26c->field_0x2d0 ? 0 : 0xc0);
+        alphaReference = (float)(g_TrackGame->field_0x2d0 ? 0 : 0xc0);
         ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
         ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     } else if (format == 4444 || format == 8888) {
@@ -703,7 +703,7 @@ void EcoSystem::SetRenderStates(int format) {
     }
     if (format == 1555) {
         ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
-        if (g_UnknownGlobal56e26c->field_0x2d0) {
+        if (g_TrackGame->field_0x2d0) {
             ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
             ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         } else {

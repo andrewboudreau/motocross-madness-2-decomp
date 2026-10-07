@@ -5,7 +5,7 @@
 // RTTI: UIDialog : GameObject (complete object locator 0x0055c280). Its
 // constructor 0x00469db0 takes a flag and the dialog resource and writes
 // vtable 0x00552a9c. Only what EventManager uses is declared.
-class UnknownGameUiControl;
+class UIControl;
 class Sound;
 class GUIManager;
 struct UnknownDialogEvent;
@@ -16,7 +16,7 @@ public:
     // 0x0046ebf0: the control whose .dtm section is `name` ("LstProfiles",
     // "ButLeft", ...), of control type `type` when nonzero (GameUi.h declares
     // the same function on UnknownGameUiPage).
-    UnknownGameUiControl* FindControl(const char* name, int type);
+    UIControl* FindControl(const char* name, int type);
 
     virtual int Release();                    // 0x0046a010 (gameui.cpp)
 
@@ -40,11 +40,11 @@ public:
     void ShowGroup(int group, int show);      // 0x0046eb30: Show on the controls of "GroupId" `group`
     void EndDialog(int result);               // 0x0046ff30: stores `result` (+0x17c) and starts closing
     void NotifyParent(int code, int kind);    // 0x0046ff70: sends the parent dialog an event
-    int UnknownFunction470000(UnknownGameUiControl* control, int a, int b); // 0x00470000
+    int UnknownFunction470000(UIControl* control, int a, int b); // 0x00470000
     GameObject* AddControl(GameObject* control, int group, int region); // 0x0046a8a0
 
     // gameui.cpp (provisional names).
-    UnknownGameUiControl* UnknownFunction46a840(UnknownGameUiControl* control, int group, int region); // 0x0046a840
+    UIControl* UnknownFunction46a840(UIControl* control, int group, int region); // 0x0046a840
     void UnknownFunction46ea60(int value);    // 0x0046ea60
     void EndControlDraw(void* dc);            // 0x0046eeb0: restores the font and releases `dc`
     int LoadDialogResource(const char* name); // 0x0046a8e0: the .dtm `name` from the resource manager
@@ -60,11 +60,11 @@ public:
     void DrawAlignedText(void* dc, struct CameraRect* rect, const char* text, int length,
                          unsigned int color, int height, struct UnknownGameUiTextRun* runs, int shadow,
                          unsigned int shadowColor, int flags, int transparent,
-                         UnknownGameUiControl* control);
+                         UIControl* control);
     // 0x0046f6c0: draws `control`'s text inside its margins.
-    void DrawControlText(void* dc, UnknownGameUiControl* control, int transparent);
+    void DrawControlText(void* dc, UIControl* control, int transparent);
     // 0x0046ed70: a DC for drawing `control` inside `rect`, with its font and clip region.
-    int BeginControlDraw(void** dc, struct CameraRect* rect, int* a, UnknownGameUiControl* control);
+    int BeginControlDraw(void** dc, struct CameraRect* rect, int* a, UIControl* control);
     // 0x0046fc80: whether `position` is in a double-byte character of `text`.
     int IsInDoubleByteCharacter(const char* text, const char* position, int length);
     void UnknownFunction46f120();             // 0x0046f120
@@ -84,7 +84,7 @@ public:
 class TransDlg : public UIDialog {
 public:
     TransDlg() : UIDialog(1, "Trans.dtm") {}
-    void UnknownFunction455c40(int menu);         // 0x00455c40: stores +0x7f60
+    void SetNextMenu(int menu);                   // 0x00455c40: stores +0x7f60
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00455b60 (dlgprocs.cpp)
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455bd0 (dlgprocs.cpp)
 

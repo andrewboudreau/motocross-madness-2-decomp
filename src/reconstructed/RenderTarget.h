@@ -52,7 +52,7 @@ public:
     int field_0x28;                      // pixel format of the surface
     float field_0x2c;                    // Z clear value (1.0f)
     int field_0x30;                      // clear colour
-    int field_0x34;                      // nonzero: clears the stencil too
+    int field_0x34;                      // nonzero: slot 12 also clears the target (D3DCLEAR_TARGET, 0x004c5549)
     int field_0x38;                      // vertices drawn in formats 0x112/0x1e2 (reset by slot 12)
     int field_0x3c;                      // points drawn
     int field_0x40;                      // lines drawn

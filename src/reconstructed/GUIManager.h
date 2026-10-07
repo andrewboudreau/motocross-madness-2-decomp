@@ -355,16 +355,16 @@ public:
                       const char* font, int fontSize, const char* cursor,
                       int callback);
     // 0x00485a70: shows `dialog`.
-    UnknownGuiDialog* UnknownFunction485a70(UnknownGuiDialog* dialog, int a, int flags, int b,
+    UnknownGuiDialog* ShowDialog(UnknownGuiDialog* dialog, int a, int flags, int b,
                                             UnknownGuiDialog* parent, int c, int d, int wait);
     void UnknownFunction485bd0(UnknownGuiDialog* dialog, int a, int wait);
     int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource
     void CloseDialogResource();             // 0x00485d50: closes it
     void UnknownFunction485d70(const char* directory); // 0x00485d70
-    UnknownGuiDialog* UnknownFunction485df0(); // 0x00485df0: the dialog taking input
+    UnknownGuiDialog* FindInputDialog();      // 0x00485df0: the dialog taking input
     int FindSectionObject(int value);     // 0x00485ec0
     int UnknownFunction485ee0(int value);     // 0x00485ee0: sets +0x2c, returns the old value
-    void UnknownFunction485ef0();             // 0x00485ef0: creates the background
+    void CreateBackground();                  // 0x00485ef0: creates the background
     void ReleaseBackground();             // 0x00485fc0: releases it
     void GrabBackground(int dim);      // 0x004860a0: grabs the screen as the background
     void ReleaseBackgroundGrab();             // 0x004860f0: releases the grab
@@ -374,16 +374,18 @@ public:
     PCTextureMap* CopyScreenToTexture(int dim, CameraRect* rect);
     int UnknownFunction4864f0();              // 0x004864f0
     void RedrawFrame();             // 0x00486500: redraws a frame
-    GUIUser* UnknownFunction486540(int index); // 0x00486540: user `index` (0 past 3)
+    GUIUser* GetUser(int index);              // 0x00486540: user `index` (0 past 3)
     void UnknownFunction486560(const char* image); // 0x00486560
     void UnknownFunction486590(const char* image, int visible); // 0x00486590
     void UnknownFunction4865e0(const char* image, int redraw); // 0x004865e0
-    void UnknownFunction486630(int show);     // 0x00486630
+    void ShowCursors(int show);               // 0x00486630: each user's cursor slot 5 (show) or 4
     void ReleaseCursors();             // 0x00486680: releases the cursors
     void UnknownFunction4866c0(const char* font); // 0x004866c0
     // 0x00486740: a `width` x `height` texture filled with `color`.
     PCTextureMap* CreateFilledTexture(int width, int height, unsigned long color);
-    int UnknownFunction4868b0(int enable);    // 0x004868b0: window clipper on/off
+    // 0x004868b0: creates (CreateClipper) and attaches (SetClipper, SetHWnd
+    // with the game window) or detaches the primary surface's clipper.
+    int EnableWindowClipper(int enable);
     void UnknownFunction464e90();             // 0x00464e90 (shared empty body)
 
     int field_0x2c;

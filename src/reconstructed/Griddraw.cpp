@@ -241,7 +241,7 @@ void DrawableGridNode::UnknownFunction47edb0(int recurse)
     data->field_0x128 = 0xffff;
     data->field_0x124 = 0xffff;
     if (data->ageEntry.size) {
-        terrain->ageManager->UnknownFunction4010d0(&data->ageEntry);
+        terrain->ageManager->Unregister(&data->ageEntry);
         data->ageEntry.size = 0;
     }
 }
@@ -403,7 +403,7 @@ int DrawableGridNode::UnknownFunction47f840()
         memcpy(data->field_0x134, g_gridVertexCache.vertices, data->field_0x13c * 32);
         memcpy(data->field_0x138, g_gridIndices, data->field_0x13e * 2);
         if (data->ageEntry.size == 0)
-            terrain->ageManager->UnknownFunction401050(&data->ageEntry, UnknownFunction47ecc0, this, 0,
+            terrain->ageManager->Register(&data->ageEntry, UnknownFunction47ecc0, this, 0,
                                                        data->field_0x142 + data->field_0x140);
         else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
             data->ageEntry.size = data->field_0x142 + data->field_0x140;
@@ -735,7 +735,7 @@ void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int v
                                                          &vertices->u, &vertices->v, vertexCount, 0x20);
             }
         }
-        terrain->ageManager->UnknownFunction401250(&data->ageEntry);
+        terrain->ageManager->MarkUsed(&data->ageEntry);
         if (!terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
             return;
     }
@@ -782,7 +782,7 @@ void DrawableGridNode::UnknownFunction480fb0(int a5, GridVertex* vertices, int v
         terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, g_gridGameSettings->mipFilter);
         terrain->field_0xcb4 = 0;
     }
-    terrain->ageManager->UnknownFunction401250(&data->ageEntry);
+    terrain->ageManager->MarkUsed(&data->ageEntry);
     if (terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, 0x222, vertices, vertexCount, indices, indexCount, 0)) {
         terrain->indicesDrawn += indexCount;
         terrain->verticesDrawn += vertexCount;

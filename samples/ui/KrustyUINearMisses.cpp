@@ -57,16 +57,16 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
     GameObject::UnknownVirtualSlot8(target);
     size = 16;
     for (int i = 0; i < 36; i++) {
-        g_UnknownGlobal56e26c->UnknownFunction521970(5000 + i, text, 128);
+        g_TrackGame->LoadResourceString(5000 + i, text, 128);
         length = strlen(text);
         count = length > 15 ? 15 : length;
         strncpy(g_UnknownStrings68a498[i], text, count);
         g_UnknownStrings68a498[i][count] = 0;
     }
     scale = 0;
-    if (g_UnknownGlobal56e26c->UnknownFunction521970(0xfed, text, 128))
+    if (g_TrackGame->LoadResourceString(0xfed, text, 128))
         scale = (float)atof(text);
-    if (g_UnknownGlobal56e26c->UnknownFunction521970(0xff2, text, 128)) {
+    if (g_TrackGame->LoadResourceString(0xff2, text, 128)) {
         length = strlen(text);
         count = length > 127 ? 127 : length;
         strncpy(font, text, count);
@@ -78,45 +78,45 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
     font[count] = 0;
     field_0x2c = new(__FILE__, 121) UnknownKrustyUIGui(1);
     if (!UnknownFunction469130(field_0x2c->SetUp(
-            field_0x18, g_UnknownGlobal56e26c->field_0x0c->field_0x64, g_UnknownGlobal56e26c->field_0x3c, 0,
+            field_0x18, g_TrackGame->display->field_0x64, g_TrackGame->field_0x3c, 0,
             0, 0, "Arial", 15, "ui\\cursor.tga", UnknownFunction49bda0, -1))) {
         Release();
         return 0;
     }
     if (font[0] && _strnicmp(font, "NONE", 4)) {
         field_0x2c->UnknownFunction4866c0(font);
-        if (g_UnknownGlobal56e26c->UnknownFunction521970(0x1469, text, 128))
+        if (g_TrackGame->LoadResourceString(0x1469, text, 128))
             field_0x2c->field_0x3d4 = atoi(text);
     }
     if (scale != 0.0f)
         field_0x2c->field_0x3d0 = scale;
-    field_0x2c->UnknownFunction485ef0();
+    field_0x2c->CreateBackground();
     field_0x2c->UnknownFunction485d70("ui");
     field_0x2c->UnknownFunction486560("ui\\wait.tga");
-    field_0x2c->UnknownFunction486540(0)->ForgetDevices();
-    field_0x2c->UnknownFunction486540(0)->AcceptDevice(field_0x2c->field_0x30c);
-    field_0x2c->UnknownFunction486630(0);
+    field_0x2c->GetUser(0)->ForgetDevices();
+    field_0x2c->GetUser(0)->AcceptDevice(field_0x2c->field_0x30c);
+    field_0x2c->ShowCursors(0);
     g_UnknownResourceManager572b44->UnknownFunction4e9030("ui\\uires.res", 0);
-    g_UnknownGlobal56e26c->mode.UnknownFunction523e50();
-    g_UnknownGlobal56e26c->UnknownVirtualSlot23("MRUProfile", g_UnknownString577738,
-                                                 g_UnknownGlobal56e26c->mode.field_0x00, &size);
-    g_UnknownGlobal56e26c->mode.UnknownFunction5231f0();
-    field_0x2c->field_0x0ec = g_UnknownGlobal56e26c->mode.field_0x6c8;
-    if (!g_UnknownGlobal56e26c->mode.field_0x6d4)
-        field_0x2c->UnknownFunction486540(0)->field_0xc0->field_0x5c = 0;
-    if (g_UnknownGlobal56e26c->field_0x14->activeJoystick)
-        ((PCJoystickDevice*)g_UnknownGlobal56e26c->field_0x14->activeJoystick)
-            ->UnknownMethod4c3ae0(g_UnknownGlobal56e26c->UnknownVirtualSlot22("JoystickFilter", 0));
+    g_TrackGame->mode.UnknownFunction523e50();
+    g_TrackGame->GetRegistryString("MRUProfile", g_UnknownString577738,
+                                                 g_TrackGame->mode.field_0x00, &size);
+    g_TrackGame->mode.UnknownFunction5231f0();
+    field_0x2c->field_0x0ec = g_TrackGame->mode.field_0x6c8;
+    if (!g_TrackGame->mode.field_0x6d4)
+        field_0x2c->GetUser(0)->field_0xc0->field_0x5c = 0;
+    if (g_TrackGame->controlInterface->activeJoystick)
+        ((PCJoystickDevice*)g_TrackGame->controlInterface->activeJoystick)
+            ->UnknownMethod4c3ae0(g_TrackGame->GetRegistryFlag("JoystickFilter", 0));
     field_0x50 = 0;
     field_0x58 = 0;
     field_0x48 = 0;
     UnknownFunction49a8b0();
     LoadGarageTables();
     field_0x2c->field_0x34c =
-        (g_UnknownGlobal56e26c->mode.field_0xa24 ? (g_UnknownGlobal56e26c->mode.field_0xa3c - 100) * 25 : -10000) -
+        (g_TrackGame->mode.field_0xa24 ? (g_TrackGame->mode.field_0xa3c - 100) * 25 : -10000) -
         200;
-    if ((!g_UnknownGlobal56e26c->field_0x08 || !g_UnknownGlobal56e26c->field_0x08->lobbyConnected) && showIntro)
-        field_0x2c->UnknownFunction485a70(new(__FILE__, 201) Intro1Dlg, 0, 2, 0, 0, 0, 0, 1);
+    if ((!g_TrackGame->network || !g_TrackGame->network->lobbyConnected) && showIntro)
+        field_0x2c->ShowDialog(new(__FILE__, 201) Intro1Dlg, 0, 2, 0, 0, 0, 0, 1);
     return this;
 }
 
@@ -147,7 +147,7 @@ void KrustyUI::UnknownFunction49b0d0(int* bikes, int count, int* riders) {
     int* usedBikes = (int*)DebugCalloc(field_0x54, sizeof(int), __FILE__, 1164);
     int* usedRiders = (int*)DebugCalloc(field_0x5c, sizeof(int), __FILE__, 1165);
     int playerClass = UnknownBikeClassOf(
-        ((UnknownTrackGameModeOptionsFd8*)g_UnknownGlobal56e26c->mode.field_0xfd8)->field_0x00);
+        ((UnknownTrackGameModeOptionsFd8*)g_TrackGame->mode.field_0xfd8)->field_0x00);
     srand(UnknownFunction4bfa80());
     int i;
     for (i = 0; i < field_0x5c; i++) {

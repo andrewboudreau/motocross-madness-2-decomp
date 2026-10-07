@@ -607,7 +607,7 @@ int DrawableGridNode::UnknownFunction47f210()
         z += 4;
     }
     if (data->ageEntry.size == 0)
-        terrain->ageManager->UnknownFunction401050(&data->ageEntry, UnknownFunction47ecc0, this, 0,
+        terrain->ageManager->Register(&data->ageEntry, UnknownFunction47ecc0, this, 0,
                                                    data->field_0x142 + data->field_0x140);
     else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
         data->ageEntry.size = data->field_0x142 + data->field_0x140;

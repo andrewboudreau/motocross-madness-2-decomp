@@ -25,7 +25,7 @@ would change KrustyUI's mangled names.
 
 Exact: 96 calibration cases. Near misses
 (`samples/ui/GUIManagerNearMisses.cpp`, notes there): the GUI setup
-`0x004853b0`, show dialog `0x00485a70`, `0x00485c80` (exact only with
+`0x004853b0`, show dialog `ShowDialog` `0x00485a70`, `0x00485c80` (exact only with
 UIDialog padded to 0x7f58, which would shift the derived dialogs'
 fields), the screen grab `0x00486170`, the tool-tip layout `0x00486b10` /
 `0x00486b80`, `0x00487870` and `0x00488120`. HiResMeter slot 8

@@ -32,21 +32,21 @@ int PCRenderTarget::UnknownVirtualSlot12(const CameraRect* rect, int flags) {
             area.top = rect->top;
             area.right = rect->right;
             area.bottom = rect->bottom;
-            if (device->UnknownMethod10(1, &area, clearFlags, field_0x30, field_0x2c, 0))
+            if (device->Clear(1, &area, clearFlags, field_0x30, field_0x2c, 0))
                 return 0;
         } else if (field_0x08) {
             area.left = 0;
             area.top = 0;
             area.right = field_0x08->field_0x1a0[2] + field_0x08->field_0x1a0[0];
             area.bottom = field_0x08->field_0x1a0[3] + field_0x08->field_0x1a0[1];
-            if (device->UnknownMethod10(1, &area, clearFlags, field_0x30, field_0x2c, 0))
+            if (device->Clear(1, &area, clearFlags, field_0x30, field_0x2c, 0))
                 return 0;
         } else {
             area.left = 0;
             area.top = 0;
             area.right = field_0x0c;
             area.bottom = field_0x10;
-            if (device->UnknownMethod10(1, &area, clearFlags, field_0x30, field_0x2c, 0))
+            if (device->Clear(1, &area, clearFlags, field_0x30, field_0x2c, 0))
                 return 0;
         }
     }

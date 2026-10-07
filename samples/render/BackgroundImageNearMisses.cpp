@@ -67,8 +67,8 @@ int BackgroundImage::UnknownVirtualSlot13() {
     if (!fullRestoreFrames) {
         UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->field_0x08;
         if (!camera || !camera->field_0x25_bit0 || !camera->redrawFrames ||
-            camera->viewportHeight != g_UnknownGlobal56e26c->field_0x0c->field_0x10[g_UnknownGlobal56e26c->field_0x0c->field_0x0c].height ||
-            camera->viewportWidth != g_UnknownGlobal56e26c->field_0x0c->field_0x10[g_UnknownGlobal56e26c->field_0x0c->field_0x0c].width) {
+            camera->viewportHeight != g_TrackGame->display->field_0x10[g_TrackGame->display->field_0x0c].height ||
+            camera->viewportWidth != g_TrackGame->display->field_0x10[g_TrackGame->display->field_0x0c].width) {
             if (!copyValid) {
                 UnknownVirtualSlot27(offscreenCopy);
                 copyValid = 1;
@@ -138,7 +138,7 @@ int BackgroundImage::ClearRegionDepth() {
             if (regionTable[i].framesLeft &&
                 regionTable[i].frameRects[frame].right - regionTable[i].frameRects[frame].left > 0 &&
                 regionTable[i].frameRects[frame].bottom - regionTable[i].frameRects[frame].top > 0 &&
-                Target()->device->UnknownMethod10(1, &regionTable[i].frameRects[frame], 2, 0,
+                Target()->device->Clear(1, &regionTable[i].frameRects[frame], 2, 0,
                                                       Target()->field_0x2c, 0) != 0)
                 return 0;
         }
@@ -216,11 +216,11 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
         if (surface != heldDcSurface) {
             UnknownFunction404c80();
             heldDcSurface = surface;
-            surface->UnknownMethod17(&heldDc);
+            surface->GetDC(&heldDc);
         }
     } else {
         heldDcSurface = surface;
-        surface->UnknownMethod17(&heldDc);
+        surface->GetDC(&heldDc);
     }
     *dc = heldDc;
     return 1;

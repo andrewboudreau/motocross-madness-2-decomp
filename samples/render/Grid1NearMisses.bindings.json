@@ -1,8 +1,8 @@
 {
   "?AcquireOwnedObject@Grid1Terrain@@QAEPAVManagedTexture@@XZ": "0x00505600",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
-  "?UnknownFunction401050@GridAgeManager@@QAEXPAUGridAgeEntry@@P6AHPAX@Z1HH@Z": "0x00401050",
-  "?UnknownFunction401250@GridAgeManager@@QAEXPAUGridAgeEntry@@@Z": "0x00401250",
+  "?Register@GridAgeManager@@QAEXPAUGridAgeEntry@@P6AHPAX@Z1HH@Z": "0x00401050",
+  "?MarkUsed@GridAgeManager@@QAEXPAUGridAgeEntry@@@Z": "0x00401250",
   "?EvictNodeTexture@@YAHPAX@Z": "0x0047ca00",
   "?EvictBlockTexture@@YAHPAXH@Z": "0x0047ca40",
   "?UnknownFunction47d470@DrawableGridNodeSharedTextures@@QAEHPAVManagedTexture@@@Z": "0x0047d470",

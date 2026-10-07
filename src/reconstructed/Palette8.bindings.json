@@ -24,7 +24,7 @@
   "?UnknownFunction4e9010@UnknownResourceManager@@QAEXPAXH@Z": "0x004e9010",
   "?UnknownFunction4e9360@UnknownResourceManager@@QAEPAUUnknownResourceEntry@@PBDH@Z": "0x004e9360",
   "?UnknownFunction4e93f0@UnknownResourceManager@@QAEPAXPAX@Z": "0x004e93f0",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "__FILE__": "0x0056f7cc",
   "__except_list": "0x00000000",

@@ -4,7 +4,7 @@
   "?UnknownVirtualSlot10@FollowCamera@@UAEHM@Z": "0x00465c20",
   "?UnknownVirtualSlot46@FollowCamera@@UAEXPAUVector3@@0@Z": "0x004654e0",
   "?UnknownVirtualSlot47@FollowCamera@@UAE_NMPBUVector3@@@Z": "0x00465720",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__real@4@3ff489f8740000000000": "0x00550cf8",
   "__real@4@3ff7c49ba60000000000": "0x00550d04",
   "__real@4@3ff89374bc0000000000": "0x00550d00",

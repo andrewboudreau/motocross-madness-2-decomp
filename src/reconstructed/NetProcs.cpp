@@ -34,14 +34,14 @@ static const char kSessionNameCharacters[] =
 // 0x004ae460
 void JoinSelectedSession(UnknownDialogEvent* event) {
     int selection = static_cast<UIListBox*>(event->dialog->FindControl("LstSessions", 0))->GetSelectedRow();
-    g_UnknownGlobal56e26c->mode.field_0xfd4 = selection;
+    g_TrackGame->mode.field_0xfd4 = selection;
     if (selection != -1 && event->dialog &&
         static_cast<HostJoinDlg*>(event->dialog)->field_0xc4 != 0x85d &&
-        g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[g_UnknownGlobal56e26c->mode.field_0xfd4].instance &&
-        g_UnknownGlobal56e26c->field_0x08->JoinSession(
-            (const GUID*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[g_UnknownGlobal56e26c->mode.field_0xfd4].instance,
+        g_TrackGame->mode.field_0xa98.field_0x00[g_TrackGame->mode.field_0xfd4].instance &&
+        g_TrackGame->network->JoinSession(
+            (const GUID*)g_TrackGame->mode.field_0xa98.field_0x00[g_TrackGame->mode.field_0xfd4].instance,
             0x80)) {
-        g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x866);
+        g_TrackGame->ui->OpenMenu(0x866);
         event->dialog->EndDialog(0x63);
         event->handled = 1;
     }
@@ -60,8 +60,8 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         control->SetRowTextColor(0xfeb97a, -1);
         control->SetSelectColor(0xffffff);
         control->SetSelectBoxColor(0xfeb97a);
-        g_UnknownGlobal56e26c->mode.field_0xfd4 = 0;
-        control->UnknownVirtualSlot54(&g_UnknownGlobal56e26c->mode.field_0xfd4);
+        g_TrackGame->mode.field_0xfd4 = 0;
+        control->UnknownVirtualSlot54(&g_TrackGame->mode.field_0xfd4);
         UpdateBoundValues(0);
         control->SelectRow(0);
         UnknownFunction470000(control, 0, 0);
@@ -76,12 +76,12 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case kDialogCommand:
         if (!_stricmp("ButHost", event->controlName)) {
             SessionDlg* dialog = new(__FILE__, 110) SessionDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 300, 4, 0,
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 300, 4, 0,
                                               (UnknownGuiDialog*)this, 0, 0, 1);
         } else if (!_stricmp("ButJoin", event->controlName)) {
             UpdateBoundValues(1);
             if (field_0xc4 == 0x85d)
-                g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0xd9);
+                g_TrackGame->ui->OpenMenu(0xd9);
             else
                 JoinSelectedSession(event);
         } else if (!_stricmp("ButCancel", event->controlName)) {
@@ -96,24 +96,24 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         int selection = list->GetRowData(-1);
         list->RemoveAllRows();
         g_SessionListCount = 0;
-        if (g_UnknownGlobal56e26c->field_0x08->EnumSessions(
-                (SessionInfoType*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00, &g_SessionListCount, 0x91) < 0) {
+        if (g_TrackGame->network->EnumSessions(
+                (SessionInfoType*)g_TrackGame->mode.field_0xa98.field_0x00, &g_SessionListCount, 0x91) < 0) {
             EndNetworkGame();
             event->dialog->EndDialog(0xd);
             event->handled = 1;
             break;
         }
         for (int i = 0; i < g_SessionListCount; i++) {
-            char* name = g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[i].name;
-            list->UnknownFunction476d80(name, (int)name, 0);
+            char* name = g_TrackGame->mode.field_0xa98.field_0x00[i].name;
+            list->AddRow(name, (int)name, 0);
         }
         list->SelectRowByData(selection);
         if (!g_SessionListCount) {
-            UnknownGameUiControl* join = FindControl("ButJoin", 0);
+            UIControl* join = FindControl("ButJoin", 0);
             join->UnknownVirtualSlot49(0);
             join->SetFontColor(0x808080);
         } else {
-            UnknownGameUiControl* join = FindControl("ButJoin", 0);
+            UIControl* join = FindControl("ButJoin", 0);
             join->UnknownVirtualSlot49(1);
             join->SetFontColor(0xffffff);
         }
@@ -124,29 +124,29 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             if (field_0xc4 == 0x85d) {
                 void* address;
                 unsigned long size;
-                if (!g_UnknownGlobal56e26c->field_0x08->CreateAddress(DPSPGUID_TCPIP, "", "", 0,
+                if (!g_TrackGame->network->CreateAddress(DPSPGUID_TCPIP, "", "", 0,
                                                                              &address, &size))
                     break;
-                if (!g_UnknownGlobal56e26c->field_0x08->InitializeConnection(address, size, 4))
+                if (!g_TrackGame->network->InitializeConnection(address, size, 4))
                     break;
                 DebugFree(address, __FILE__, 179);
             }
-            if (g_UnknownGlobal56e26c->field_0x08->CreateSession(
-                    g_UnknownGlobal56e26c->mode.field_0x10, 0x80)) {
-                g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x866);
+            if (g_TrackGame->network->CreateSession(
+                    g_TrackGame->mode.field_0x10, 0x80)) {
+                g_TrackGame->ui->OpenMenu(0x866);
                 event->dialog->EndDialog(0x63);
                 event->handled = 1;
             }
         } else if (event->code == 0xf) {
             guiManager->UnknownFunction4865e0(guiManager->waitCursorImage, 1);
             g_SessionListCount = 0;
-            long result = g_UnknownGlobal56e26c->field_0x08->EnumSessions(
-                (SessionInfoType*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00, &g_SessionListCount, 0x81);
+            long result = g_TrackGame->network->EnumSessions(
+                (SessionInfoType*)g_TrackGame->mode.field_0xa98.field_0x00, &g_SessionListCount, 0x81);
             if (g_SessionListCount > 0 && result >= 0 &&
-                g_UnknownGlobal56e26c->field_0x08->JoinSession(
-                    (const GUID*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[0].instance, 0)) {
+                g_TrackGame->network->JoinSession(
+                    (const GUID*)g_TrackGame->mode.field_0xa98.field_0x00[0].instance, 0)) {
                 guiManager->UnknownFunction4865e0(guiManager->cursorImage, 1);
-                g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x866);
+                g_TrackGame->ui->OpenMenu(0x866);
                 event->dialog->EndDialog(0x63);
                 event->handled = 1;
             } else {
@@ -155,7 +155,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 EndNetworkGame();
                 EnsureNetworkInterface();
                 guiManager->UnknownFunction4865e0(guiManager->cursorImage, 1);
-                g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x1f9);
+                g_TrackGame->ui->OpenMenu(0x1f9);
             }
         } else if (event->code == 0xd) {
             EndDialog(0xd);
@@ -186,10 +186,10 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case kDialogInit: {
         UIMultiState* control = static_cast<UIMultiState*>(FindControl("ButPort", 2));
         control->SetStateCount(4);
-        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x147b);
-        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x147c);
-        control->SetStateTextFromResource(2, g_UnknownGlobal56e26c->field_0x420, 0x147d);
-        control->SetStateTextFromResource(3, g_UnknownGlobal56e26c->field_0x420, 0x147e);
+        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x147b);
+        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x147c);
+        control->SetStateTextFromResource(2, g_TrackGame->field_0x420, 0x147d);
+        control->SetStateTextFromResource(3, g_TrackGame->field_0x420, 0x147e);
         g_SerialSettings.port = 0;
         control->UnknownVirtualSlot54(&g_SerialSettings.port);
 
@@ -204,28 +204,28 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 
         control = static_cast<UIMultiState*>(FindControl("ButStop", 2));
         control->SetStateCount(3);
-        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1478);
-        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1479);
-        control->SetStateTextFromResource(2, g_UnknownGlobal56e26c->field_0x420, 0x147a);
+        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1478);
+        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1479);
+        control->SetStateTextFromResource(2, g_TrackGame->field_0x420, 0x147a);
         g_SerialSettings.stopBits = 0;
         control->UnknownVirtualSlot54(&g_SerialSettings.stopBits);
 
         control = static_cast<UIMultiState*>(FindControl("ButParity", 2));
         control->SetStateCount(4);
-        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x146f);
-        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1470);
-        control->SetStateTextFromResource(2, g_UnknownGlobal56e26c->field_0x420, 0x1471);
-        control->SetStateTextFromResource(3, g_UnknownGlobal56e26c->field_0x420, 0x1472);
+        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x146f);
+        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1470);
+        control->SetStateTextFromResource(2, g_TrackGame->field_0x420, 0x1471);
+        control->SetStateTextFromResource(3, g_TrackGame->field_0x420, 0x1472);
         g_SerialSettings.parity = 0;
         control->UnknownVirtualSlot54(&g_SerialSettings.parity);
 
         control = static_cast<UIMultiState*>(FindControl("ButFlow", 2));
         control->SetStateCount(5);
-        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1474);
-        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1473);
-        control->SetStateTextFromResource(2, g_UnknownGlobal56e26c->field_0x420, 0x1476);
-        control->SetStateTextFromResource(3, g_UnknownGlobal56e26c->field_0x420, 0x1477);
-        control->SetStateTextFromResource(4, g_UnknownGlobal56e26c->field_0x420, 0x1475);
+        control->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1474);
+        control->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1473);
+        control->SetStateTextFromResource(2, g_TrackGame->field_0x420, 0x1476);
+        control->SetStateTextFromResource(3, g_TrackGame->field_0x420, 0x1477);
+        control->SetStateTextFromResource(4, g_TrackGame->field_0x420, 0x1475);
         g_SerialSettings.flowControl = 4;
         control->UnknownVirtualSlot54(&g_SerialSettings.flowControl);
 
@@ -253,15 +253,15 @@ void TCPAddressDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UnknownFunction452930(0xd9, event);
         break;
     case kDialogInit: {
-        UnknownGameUiControl* control = FindControl("TitleText", 0);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x898);
+        UIControl* control = FindControl("TitleText", 0);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x898);
         control = FindControl("OkButton", 0);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13e9);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13e9);
         control = FindControl("CancelButton", 0);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13dc);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13dc);
         control = FindControl("TxtPrompt", 12);
         control->field_0x1e8 = 1;
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x899);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x899);
         control = FindControl("EditBox", 0);
         guiUser->UnknownFunction487790((UnknownGuiControl*)control, 0, 0);
         break;
@@ -271,19 +271,19 @@ void TCPAddressDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 
 // 0x004aef40
 void EndNetworkGame() {
-    if (g_UnknownGlobal56e26c->field_0x08) {
-        delete g_UnknownGlobal56e26c->field_0x08;
-        g_UnknownGlobal56e26c->field_0x08 = 0;
+    if (g_TrackGame->network) {
+        delete g_TrackGame->network;
+        g_TrackGame->network = 0;
     }
-    g_UnknownGlobal56e26c->field_0x18 = 1;
-    g_UnknownGlobal56e26c->field_0x3424 = 0;
-    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35 = 0;
-    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = 0;
+    g_TrackGame->field_0x18 = 1;
+    g_TrackGame->field_0x3424 = 0;
+    g_TrackGame->mode.field_0x27f8.field_0x35 = 0;
+    g_TrackGame->mode.field_0x27f8.field_0x28 = 0;
 }
 
 // 0x004aefa0
 int EnsureNetworkInterface() {
-    if (!g_UnknownGlobal56e26c->field_0x08 && !g_UnknownGlobal56e26c->UnknownVirtualSlot16(1)) {
+    if (!g_TrackGame->network && !g_TrackGame->CreateNetworkInterface(1)) {
         EndNetworkGame();
         return 0;
     }
@@ -300,14 +300,14 @@ void SessionDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UnknownFunction452930(300, event);
         break;
     case kDialogInit: {
-        FindControl("TitleText", 12)->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x911);
+        FindControl("TitleText", 12)->SetTextFromResource(g_TrackGame->field_0x420, 0x911);
         UIEditBox* control = static_cast<UIEditBox*>(FindControl("OKButton", 0));
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13e9);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13e9);
         control = static_cast<UIEditBox*>(FindControl("CancelButton", 0));
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13dc);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13dc);
         control = static_cast<UIEditBox*>(FindControl("EditBox", 0));
         control->SetCapacity(11);
-        control->SetEditText(g_UnknownGlobal56e26c->mode.field_0x10);
+        control->SetEditText(g_TrackGame->mode.field_0x10);
         control->SetAcceptedCharacters(kSessionNameCharacters);
         guiUser->UnknownFunction487790((UnknownGuiControl*)control, 0, 0);
         break;
@@ -327,20 +327,20 @@ void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             return;
         } else if (!_stricmp("ButLeft", event->controlName)) {
             SessionDlg* dialog = new(__FILE__, 448) SessionDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 300, 4, 0,
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 300, 4, 0,
                                               (UnknownGuiDialog*)this, 0, 0, 1);
             return;
         } else if (!_stricmp("ButMiddle", event->controlName)) {
-            SendMessageA((HWND)g_UnknownGlobal56e26c->field_0x31c, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+            SendMessageA((HWND)g_TrackGame->field_0x31c, WM_SYSCOMMAND, SC_MINIMIZE, 0);
             g_SessionListCount = 0;
-            g_UnknownGlobal56e26c->field_0x08->EnumSessions(
-                (SessionInfoType*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00, &g_SessionListCount, 1);
-            SendMessageA((HWND)g_UnknownGlobal56e26c->field_0x31c, WM_SYSCOMMAND, SC_RESTORE, 0);
+            g_TrackGame->network->EnumSessions(
+                (SessionInfoType*)g_TrackGame->mode.field_0xa98.field_0x00, &g_SessionListCount, 1);
+            SendMessageA((HWND)g_TrackGame->field_0x31c, WM_SYSCOMMAND, SC_RESTORE, 0);
             if (g_SessionListCount >= 1 &&
-                g_UnknownGlobal56e26c->field_0x08->JoinSession(
-                    (const GUID*)g_UnknownGlobal56e26c->mode.field_0xa98.field_0x00[g_UnknownGlobal56e26c->mode.field_0xfd4].instance,
+                g_TrackGame->network->JoinSession(
+                    (const GUID*)g_TrackGame->mode.field_0xa98.field_0x00[g_TrackGame->mode.field_0xfd4].instance,
                     0)) {
-                g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x866);
+                g_TrackGame->ui->OpenMenu(0x866);
                 event->dialog->EndDialog(0x63);
                 event->handled = 1;
             } else {
@@ -350,23 +350,23 @@ void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         }
         break;
     case kDialogInit: {
-        FindControl("TitleText", 12)->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x952);
-        UnknownGameUiControl* control = FindControl("ButRight", 0);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13dc);
+        FindControl("TitleText", 12)->SetTextFromResource(g_TrackGame->field_0x420, 0x952);
+        UIControl* control = FindControl("ButRight", 0);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13dc);
         control = FindControl("ButLeft", 0);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x950);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x950);
         control = FindControl("ButMiddle", 0);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x951);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x951);
         return;
     }
     case 9:
         if (event->code == 0x14) {
-            SendMessageA((HWND)g_UnknownGlobal56e26c->field_0x31c, WM_SYSCOMMAND, SC_MINIMIZE, 0);
-            int opened = g_UnknownGlobal56e26c->field_0x08->CreateSession(
-                g_UnknownGlobal56e26c->mode.field_0x10, 0);
-            SendMessageA((HWND)g_UnknownGlobal56e26c->field_0x31c, WM_SYSCOMMAND, SC_RESTORE, 0);
+            SendMessageA((HWND)g_TrackGame->field_0x31c, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+            int opened = g_TrackGame->network->CreateSession(
+                g_TrackGame->mode.field_0x10, 0);
+            SendMessageA((HWND)g_TrackGame->field_0x31c, WM_SYSCOMMAND, SC_RESTORE, 0);
             if (opened) {
-                g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x866);
+                g_TrackGame->ui->OpenMenu(0x866);
                 event->dialog->EndDialog(0x63);
                 event->handled = 1;
                 return;
@@ -387,20 +387,20 @@ void ConnectErrorDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UnknownFunction452930(0x1f9, event);
         break;
     case kDialogInit: {
-        UnknownGameUiControl* control = FindControl("TitleText", 0);
+        UIControl* control = FindControl("TitleText", 0);
         control->SetTextAlign(10);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13c2);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13c2);
         control = FindControl("ButLeft", 1);
         control->Show(0, 1);
         control->keyBind = 0;
         control = FindControl("ButRight", 0);
         control->Show(0, 1);
         control = FindControl("ButMiddle", 0);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13e9);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13e9);
         control->keyBind = 0x1c;
         control = FindControl("TxtPrompt", 12);
         control->field_0x1e8 = 1;
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13c9);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13c9);
         break;
     }
     }
@@ -417,16 +417,16 @@ void PlayerRemovedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         }
         break;
     case kDialogInit: {
-        UnknownGameUiControl* control = FindControl("ButLeft", 1);
+        UIControl* control = FindControl("ButLeft", 1);
         control->Show(0, 1);
         control->keyBind = 0;
         control = FindControl("ButMiddle", 1);
         control->Show(0, 1);
         control = FindControl("ButRight", 1);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13e9);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13e9);
         control->keyBind = 0x1c;
         control = FindControl("TitleText", 12);
-        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13d1);
+        control->SetTextFromResource(g_TrackGame->field_0x420, 0x13d1);
         break;
     }
     }

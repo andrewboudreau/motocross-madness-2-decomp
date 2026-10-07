@@ -12,7 +12,7 @@
 #include "TextureMap.h"
 #include "TrackGame.h"
 
-#define SoundSystem() ((PCSoundInterface*)g_UnknownGlobal56e26c->field_0x04)
+#define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
 // 0x004e1fb0
 RaceSound::RaceSound(int flags) : GameObject(flags) {
@@ -153,13 +153,13 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     raceView = view;
     listenerCamera = camera;
     field_0x3c = new (__FILE__, 213) SoundGroup(1);
-    UnknownFunction469190(field_0x3c, -1);
+    AppendChild(field_0x3c, -1);
     field_0x44 = new (__FILE__, 214) SoundGroup(1);
-    UnknownFunction469190(field_0x44, -1);
+    AppendChild(field_0x44, -1);
     crowdSounds = new (__FILE__, 215) SoundGroup(1);
-    UnknownFunction469190(crowdSounds, -1);
+    AppendChild(crowdSounds, -1);
     field_0x48 = new (__FILE__, 216) SoundGroup(1);
-    UnknownFunction469190(field_0x48, -1);
+    AppendChild(field_0x48, -1);
     if (SoundSystem())
         SoundSystem()->UnknownFunction4be8b0();
 
@@ -193,7 +193,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     field_0x468[0] = 1;
     field_0x468[1] = 1;
     field_0x468[2] = 1;
-    if (!g_UnknownGlobal56e26c->mode.field_0xa48) {
+    if (!g_TrackGame->mode.field_0xa48) {
         if (racers <= 2) {
             if (field_0x478 == 2) {
                 field_0x468[0] = 2;
@@ -241,7 +241,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
 
     for (i = 0; i < 4; i++) {
         engineVoices[i] = new (__FILE__, 310) Sound(field_0x3c, 1);
-        if (g_UnknownGlobal56e26c->mode.field_0xa48)
+        if (g_TrackGame->mode.field_0xa48)
             LoadSound(engineVoices[i], "silence_16.wav", 41, 3);
         else
             LoadSound(engineVoices[i], "silence_08.wav", 41, 3);
@@ -249,12 +249,12 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     }
     ownEngine = new (__FILE__, 321) Sound(field_0x3c, 1);
     LoadSound(ownEngine, "LandHard01.wav", 41, 3);
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 3) {
+    if (g_TrackGame->mode.field_0x27f8.field_0x04 != 3) {
         field_0x11b4 = new (__FILE__, 326) Sound(field_0x44, 1);
         LoadSound(field_0x11b4, "launch.wav", 1, 3);
     }
 
-    if (g_UnknownGlobal56e26c->mode.field_0xa48) {
+    if (g_TrackGame->mode.field_0xa48) {
         field_0x1298 = 2;
         strcpy(file, "audio_16.ini");
     } else {
@@ -407,7 +407,7 @@ RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
     if (stream)
         delete stream;
 
-    if (g_UnknownGlobal56e26c->mode.field_0x23a4) {
+    if (g_TrackGame->mode.field_0x23a4) {
         field_0x11e8 = new (__FILE__, 545) Sound(crowdSounds, 1);
         LoadSound(field_0x11e8, "CrowdLoop.wav", 1, 3);
         field_0x11ec = new (__FILE__, 548) Sound(crowdSounds, 1);
@@ -498,7 +498,7 @@ void RaceSound::AssignChannels() {
     SoundSystem()->UnknownFunction4becd0(1.0f);
     ownEngine->UnknownFunction4bd960(10.0f, 500.0f, 0);
 
-    volume = (g_UnknownGlobal56e26c->mode.field_0xa40 * 0.01f) * 2500.0f - 2500.0f;
+    volume = (g_TrackGame->mode.field_0xa40 * 0.01f) * 2500.0f - 2500.0f;
     if (volume > 0.0f)
         volume = 0.0f;
     else if (volume == -2500.0f)
@@ -516,11 +516,11 @@ void RaceSound::AssignChannels() {
         field_0x11b8[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
     for (i = 0; i < 6; i++)
         field_0x11d0[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
-    if (g_UnknownGlobal56e26c->mode.field_0x23a4)
+    if (g_TrackGame->mode.field_0x23a4)
         PlayIfEnabled(field_0x11e8, 1, 1, 1, 0);
 
-    if (g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 3 ||
-        g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 4) {
+    if (g_TrackGame->mode.UnknownFunction524100() == 3 ||
+        g_TrackGame->mode.UnknownFunction524100() == 4) {
         environment.environment = 9;
         environment.volume = 0.361f;
         environment.decayTime = 7.0f;
@@ -535,8 +535,8 @@ void RaceSound::AssignChannels() {
     }
     SoundSystem()->UnknownFunction4bed40(&environment);
     SoundSystem()->UnknownFunction4beb80();
-    if (!g_UnknownGlobal56e26c->mode.field_0xa28)
-        g_UnknownGlobal56e26c->field_0x34->UnknownFunction468dd0("SoundGroup");
+    if (!g_TrackGame->mode.field_0xa28)
+        g_TrackGame->field_0x34->UnknownFunction468dd0("SoundGroup");
 }
 
 // 0x004e3730: moves the listener and every racer's engine sound to their
@@ -550,7 +550,7 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
         AssignChannels();
         field_0x1208 = 0;
     }
-    if (SoundSystem()->field_0x2c_bit0 && g_UnknownGlobal56e26c->mode.field_0xa28 && !raceView->field_0x3f8) {
+    if (SoundSystem()->field_0x2c_bit0 && g_TrackGame->mode.field_0xa28 && !raceView->field_0x3f8) {
         field_0x12a4 += frameTime;
         field_0x12a8 += frameTime;
         field_0x12ac += frameTime;
@@ -737,7 +737,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
         RefillStream();
     }
 
-    if (g_UnknownGlobal56e26c->mode.field_0xa38 &&
+    if (g_TrackGame->mode.field_0xa38 &&
         (listenerRacer->field_0x7b8 > field_0x1294 || listenerRacer->field_0x7a0 > field_0x1290))
         PlayIfEnabled(field_0x1204, 0, 0, 0, 0);
 
@@ -753,7 +753,7 @@ int RaceSound::UpdateRacerSounds(float frameTime) {
                     field_0x11b4->UnknownFunction4bc940(1);
                     PlayIfEnabled(field_0x11b4, 0, 0, 0, 0);
                 }
-                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3) {
+                if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3) {
                     if (currentRacer == listenerRacer && currentRacer->field_0x784 == 1)
                         PlayIfEnabled(field_0x11f8, 0, 0, 0, 0);
                     if (currentRacer == listenerRacer && currentRacer->field_0x784 > 1 && field_0x12a4 > 30.0f) {
@@ -805,11 +805,11 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 
     if (GameObject::UnknownVirtualSlot23(event, entry))
         return 1;
-    owner = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0();
+    owner = g_TrackGame->eventManager->FindRaceMode();
     if (!event->kind) {
         switch (event->control) {
         case 0x2f:
-            if (!g_UnknownGlobal56e26c->field_0x14->keyboard->UnknownVirtualSlot5(0x2f, 12, 0))
+            if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2f, 12, 0))
                 break;
             if (!eaxEnabled) {
                 environment.environment = 9;
@@ -829,22 +829,22 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
             SoundSystem()->UnknownFunction4bed40(&environment);
             break;
         case 0x2e:
-            if (!g_UnknownGlobal56e26c->field_0x14->keyboard->UnknownVirtualSlot5(0x2e, 12, 0))
+            if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2e, 12, 0))
                 break;
-            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 3)
+            if (g_TrackGame->mode.field_0x27f8.field_0x04 != 3)
                 break;
             switch (musicVolume) {
             case 0:
                 musicVolume = -500;
-                g_UnknownGlobal56e26c->UnknownFunction521970(0x14c0, text, sizeof(text));
+                g_TrackGame->LoadResourceString(0x14c0, text, sizeof(text));
                 break;
             case -500:
                 musicVolume = -10000;
-                g_UnknownGlobal56e26c->UnknownFunction521970(0x14c2, text, sizeof(text));
+                g_TrackGame->LoadResourceString(0x14c2, text, sizeof(text));
                 break;
             case -10000:
                 musicVolume = 0;
-                g_UnknownGlobal56e26c->UnknownFunction521970(0x14c1, text, sizeof(text));
+                g_TrackGame->LoadResourceString(0x14c1, text, sizeof(text));
                 break;
             }
             {
@@ -852,46 +852,46 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 if (owner)
                     owner->field_0x6c->UnknownFunction51b540(&message);
             }
-            if (g_UnknownGlobal56e26c->mode.field_0x23a4)
+            if (g_TrackGame->mode.field_0x23a4)
                 crowdSounds->UnknownFunction401dd0(musicVolume);
             return 1;
         case 0x1f:
-            if (!g_UnknownGlobal56e26c->field_0x14->keyboard->UnknownVirtualSlot5(0x1f, 12, 0))
+            if (!g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x1f, 12, 0))
                 break;
-            g_UnknownGlobal56e26c->mode.field_0xa28 = !g_UnknownGlobal56e26c->mode.field_0xa28;
-            if (g_UnknownGlobal56e26c->mode.field_0xa28) {
-                g_UnknownGlobal56e26c->field_0x34->UnknownFunction468f10("SoundGroup");
+            g_TrackGame->mode.field_0xa28 = !g_TrackGame->mode.field_0xa28;
+            if (g_TrackGame->mode.field_0xa28) {
+                g_TrackGame->field_0x34->UnknownFunction468f10("SoundGroup");
                 if (field_0x3c)
                     field_0x3c->UnknownVirtualSlot16(0);
                 if (field_0x40)
                     field_0x40->UnknownVirtualSlot16(0);
                 if (field_0x44)
                     field_0x44->UnknownVirtualSlot16(0);
-                if (g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x2c->field_0xc4)
-                    g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x2c->field_0xc4->UnknownVirtualSlot16(0);
-                if (g_UnknownGlobal56e26c->mode.field_0x23a4)
+                if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4)
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4->UnknownVirtualSlot16(0);
+                if (g_TrackGame->mode.field_0x23a4)
                     PlayIfEnabled(field_0x11e8, 1, 1, 1, 0);
                 if (listenerRacer) {
                     field_0x1294 = listenerRacer->field_0x7b8;
                     field_0x1290 = listenerRacer->field_0x7a0;
                 }
-                if (g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c)
-                    g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c->UnknownVirtualSlot5();
+                if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot5();
             } else {
-                g_UnknownGlobal56e26c->field_0x34->UnknownFunction468dd0("SoundGroup");
+                g_TrackGame->field_0x34->UnknownFunction468dd0("SoundGroup");
                 if (field_0x3c)
                     field_0x3c->UnknownVirtualSlot16(1);
                 if (field_0x40)
                     field_0x40->UnknownVirtualSlot16(1);
                 if (field_0x44)
                     field_0x44->UnknownVirtualSlot16(1);
-                if (g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x2c->field_0xc4)
-                    g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x2c->field_0xc4->UnknownVirtualSlot16(1);
-                if (g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c)
-                    g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c->UnknownVirtualSlot4();
+                if (g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4)
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x2c->field_0xc4->UnknownVirtualSlot16(1);
+                if (g_TrackGame->eventManager->FindRaceMode()->field_0x9c)
+                    g_TrackGame->eventManager->FindRaceMode()->field_0x9c->UnknownVirtualSlot4();
             }
             if (owner)
-                owner->ShowOnOffMessage(0x1429, g_UnknownGlobal56e26c->mode.field_0xa28);
+                owner->ShowOnOffMessage(0x1429, g_TrackGame->mode.field_0xa28);
             return 1;
         }
     }
@@ -1011,7 +1011,7 @@ void RaceSound::ReadSample(const char* name, void** data, int* size) {
     int bytes;
     void* buffer;
 
-    if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", 0)) {
+    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", 0)) {
         sprintf(message, "%s not found in Audio.res.\n", name);
     } else {
         stream->UnknownFunction461340(stream->field_0x130, 0, 1);
@@ -1042,7 +1042,7 @@ int RaceSound::LoadSound(Sound* sound, const char* name, int a, int b) {
     if (!sound)
         return 0;
     stream = new (__FILE__, 1678) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", 0)) {
+    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", 0)) {
         sprintf(message, "%s not found in Audio.res.\n", name);
         if (stream)
             delete stream;
@@ -1060,7 +1060,7 @@ int RaceSound::LoadSound(Sound* sound, const char* name, int a, int b) {
 
 // 0x004e5780
 void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused) {
-    if (g_UnknownGlobal56e26c->mode.field_0xa28 && (g_UnknownGlobal56e26c->mode.field_0x23a4 || !network) && sound) {
+    if (g_TrackGame->mode.field_0xa28 && (g_TrackGame->mode.field_0x23a4 || !network) && sound) {
         if (stop)
             sound->UnknownFunction4bc940(1);
         sound->UnknownFunction4bc6b0(0, loop, 1);
@@ -1070,9 +1070,9 @@ void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int
 // 0x004e57d0
 void RaceSound::UnknownFunction4e57d0(UnknownEventRacer* racer, float value) {
     if (listenerRacer == racer && value >= 10000.0f &&
-        (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 || g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 4))
+        (!g_TrackGame->mode.field_0x27f8.field_0x04 || g_TrackGame->mode.field_0x27f8.field_0x04 == 4))
         PlayIfEnabled(field_0x11ac, 0, 0, 0, 0);
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 && field_0x12ac > 15.0f) {
+    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 && field_0x12ac > 15.0f) {
         PlayIfEnabled(field_0x11ec, 0, 0, 0, 0);
         field_0x12ac = 0;
     }

@@ -50,25 +50,25 @@ int ControlInterface::UnknownFunction43cf00(int value) {
         switch (event->kind) {
         case 0:
             if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(
+                g_TrackGame->UnknownVirtualSlot13(
                     event, &keyboard->keyStates[event->control]);
             if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(
+                g_TrackGame->UnknownVirtualSlot14(
                     event, &keyboard->keyStates[event->control]);
             break;
         case 1:
             if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(event, &mouse->buttonStates[event->control]);
+                g_TrackGame->UnknownVirtualSlot13(event, &mouse->buttonStates[event->control]);
             if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(event, &mouse->buttonStates[event->control]);
+                g_TrackGame->UnknownVirtualSlot14(event, &mouse->buttonStates[event->control]);
             break;
         case 2:
         case 3:
             if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(
+                g_TrackGame->UnknownVirtualSlot13(
                     event, &joysticks[event->device]->buttonStates[event->control]);
             if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(
+                g_TrackGame->UnknownVirtualSlot14(
                     event, &joysticks[event->device]->buttonStates[event->control]);
             break;
         }

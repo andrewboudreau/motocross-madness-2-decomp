@@ -45,9 +45,9 @@ public:
     unsigned char field_0x34[0x7f58 - 0x34];
     UIVideoStatic* movieControl;              // +0x7f58: the movie control
     unsigned char field_0x7f5c[0x7f60 - 0x7f5c];
-    UnknownGameUiControl* menuSingleAnimation; // +0x7f60: "MenuSingleAnimation"
-    UnknownGameUiControl* menuMultiAnimation; // +0x7f64: "MenuMultiAnimation"
-    UnknownGameUiControl* menuUserAnimation;  // +0x7f68: "MenuUserAnimation"
+    UIControl* menuSingleAnimation; // +0x7f60: "MenuSingleAnimation"
+    UIControl* menuMultiAnimation; // +0x7f64: "MenuMultiAnimation"
+    UIControl* menuUserAnimation;  // +0x7f68: "MenuUserAnimation"
     int field_0x7f6c;
     int field_0x7f70;
     int field_0x7f74;

@@ -29,7 +29,7 @@
 int DebugOverlay::UnknownFunction447a00()
 {
     int c = 0;
-    fontTexture = (PCTextureMap*)UnknownFunction50a590(g_UnknownGlobal56e26c->field_0x3c,
+    fontTexture = (PCTextureMap*)UnknownFunction50a590(g_TrackGame->field_0x3c,
                                                         "DebugOverlayText.tga", 1555, 0, 0, 5, 6,
                                                         0, 0x80, 0xff00ff, 1, 1);
     if (fontTexture == 0) {
@@ -69,7 +69,7 @@ int DebugOverlay::UnknownFunction447a00()
         for (int i = 0; i < 256; i++)
             characters[i] = (char)i;
         HDC dc;
-        if (fontTexture->field_0x70->UnknownMethod17((void**)&dc))
+        if (fontTexture->field_0x70->GetDC((void**)&dc))
             return 0;
         SetBkColor(dc, 1);
         SetBkMode(dc, 1);
@@ -109,7 +109,7 @@ int DebugOverlay::UnknownFunction447a00()
         }
         DeleteObject(handle);
         SelectObject(dc, previous);
-        if (fontTexture->field_0x70->UnknownMethod26(dc))
+        if (fontTexture->field_0x70->ReleaseDC(dc))
             return 0;
     }
     if (fontTexture->UnknownVirtualSlot8(1, 0, 0))

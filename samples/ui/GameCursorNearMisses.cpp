@@ -35,16 +35,16 @@ int GameCursor::UnknownVirtualSlot15() {
         RECT frame;
 
         GetCursorPos(&s_mouse);
-        GetWindowRect((HWND)g_UnknownGlobal56e26c->field_0x31c, &window);
-        GetClientRect((HWND)g_UnknownGlobal56e26c->field_0x31c, &client);
+        GetWindowRect((HWND)g_TrackGame->field_0x31c, &window);
+        GetClientRect((HWND)g_TrackGame->field_0x31c, &client);
         area = client;
         frame.left = 0;
         frame.top = 0;
         frame.right = 10;
         frame.bottom = 10;
-        AdjustWindowRectEx(&frame, GetWindowLongA((HWND)g_UnknownGlobal56e26c->field_0x31c, GWL_STYLE),
-                           GetMenu((HWND)g_UnknownGlobal56e26c->field_0x31c) != 0,
-                           GetWindowLongA((HWND)g_UnknownGlobal56e26c->field_0x31c, GWL_EXSTYLE));
+        AdjustWindowRectEx(&frame, GetWindowLongA((HWND)g_TrackGame->field_0x31c, GWL_STYLE),
+                           GetMenu((HWND)g_TrackGame->field_0x31c) != 0,
+                           GetWindowLongA((HWND)g_TrackGame->field_0x31c, GWL_EXSTYLE));
         client.left = UNKNOWN_ABS(frame.left) + window.left;
         client.right += UNKNOWN_ABS(frame.left);
         client.top = UNKNOWN_ABS(frame.top) + window.top;
@@ -52,7 +52,7 @@ int GameCursor::UnknownVirtualSlot15() {
         field_0x54 = s_mouse.x - client.left;
         field_0x58 = s_mouse.y - client.top;
 
-        if (g_UnknownGlobal56e26c->field_0x2d4_bit1) {
+        if (g_TrackGame->field_0x2d4_bit1) {
             field_0x54 = max(0, min(field_0x54, client.right));
             field_0x58 = max(0, min(field_0x58, client.bottom));
         } else if (field_0x54 < 0 || field_0x58 < 0 || field_0x54 > area.right || field_0x58 > area.bottom) {
@@ -99,12 +99,12 @@ int GameCursor::UnknownVirtualSlot15() {
         field_0x44->UnknownFunction404700(frame, s_destination.left, s_destination.top, (CameraRect*)&s_source,
                                           (frame->field_0x30 != 0) + 0x10, field_0x48, 0, &field_0x4c, 0);
     } else if (field_0x38) {
-        if (((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod5(&s_destination, ((PCTextureMap*)field_0x38)->field_0x70, &s_source,
+        if (((PCRenderTarget*)field_0x18)->field_0x48->Blt(&s_destination, ((PCTextureMap*)field_0x38)->field_0x70, &s_source,
                 (((PCTextureMap*)field_0x38)->field_0x30 ? 0x8000 : 0) + 0x1000000, 0))
             return 0;
     } else {
         PCRenderTarget* screen = (PCRenderTarget*)field_0x18;
-        if (screen->field_0x48->UnknownMethod5(&s_destination, field_0x34->field_0x70, &s_source,
+        if (screen->field_0x48->Blt(&s_destination, field_0x34->field_0x70, &s_source,
                 (field_0x34->field_0x30 ? 0x8000 : 0) + 0x1000000, 0))
             return 0;
     }

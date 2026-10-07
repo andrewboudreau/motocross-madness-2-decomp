@@ -27,19 +27,19 @@ int OptControlsDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInpu
     if (event->kind == 0 && event->control == 1) {
         UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
         int row = keys->GetSelectedRow();
-        g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction449350(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row, text);
+        g_TrackGame->field_0x33fc->UnknownFunction449350(g_TrackGame->field_0x33fc->field_0x00, row, text);
         keys->SetRowText(row, text);
     } else {
         UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
         int row = keys->GetSelectedRow();
         if (!GetInputText(row, event->kind, event->control, text))
             return 1;
-        if (g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448cc0(row, event->kind, event->control, &other)) {
+        if (g_TrackGame->field_0x33fc->UnknownFunction448cc0(row, event->kind, event->control, &other)) {
             keys->SetRowText(other, "");
-            g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, other, -1, 0);
+            g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, other, -1, 0);
         }
         keys->SetRowText(row, text);
-        g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row, event->kind, event->control);
+        g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, row, event->kind, event->control);
     }
     EndInputWait();
     return 1;
@@ -48,8 +48,8 @@ int OptControlsDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInpu
 // 0x004b5760 (near miss)
 void OptControlsDlg::MapMovedInput()
 {
-    JoystickDevice* joystick = g_UnknownGlobal56e26c->field_0x14->activeJoystick;
-    MouseDevice* mouse = g_UnknownGlobal56e26c->field_0x14->mouse;
+    JoystickDevice* joystick = g_TrackGame->controlInterface->activeJoystick;
+    MouseDevice* mouse = g_TrackGame->controlInterface->mouse;
     UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
     int row = keys->GetSelectedRow();
     int code;
@@ -102,19 +102,19 @@ void OptControlsDlg::MapMovedInput()
 found:
     if (row % 2)
         row--;
-    if (g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448cc0(row, kind, code, &other)) {
+    if (g_TrackGame->field_0x33fc->UnknownFunction448cc0(row, kind, code, &other)) {
         keys->SetRowText(other, "");
-        g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, other, -1, 0);
+        g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, other, -1, 0);
         if (other < 4) {
-            g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, other + 1, -1, 0);
+            g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, other + 1, -1, 0);
             keys->SetRowText(other + 1, "");
         }
     }
-    g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row, kind, code);
-    g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction449350(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row, text);
+    g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, row, kind, code);
+    g_TrackGame->field_0x33fc->UnknownFunction449350(g_TrackGame->field_0x33fc->field_0x00, row, text);
     keys->SetRowText(row, text);
     if (row < 4) {
-        g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row + 1, kind, code);
+        g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, row + 1, kind, code);
         keys->SetRowText(row + 1, text);
     }
     EndInputWait();

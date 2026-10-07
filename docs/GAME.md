@@ -24,6 +24,12 @@ observations:
   PCGame (see [PCGAME.md](PCGAME.md)). +0x0c is the display and +0x10 a
   PCRenderTarget.
 
+Member names in Game.h follow that evidence: `soundInterface` (+0x04),
+`network` (+0x08, slot 16 `CreateNetworkInterface` news the
+NetworkInterface), `display` (+0x0c), `renderTarget` (+0x10),
+`controlInterface` (+0x14), `debugOverlay` (+0x38), `frameTime` (+0x2f0,
+slot 10 stores the scaled time-stamp delta) and `rootObject` (+0x2f4).
+
 `TrackGame` therefore derives from `Game`. It declares only the
 members past Game's layout that other code reads, such as the instance and
 window handles at +0x318/+0x31c and the camera state at +0x558 onward. Its
@@ -41,7 +47,7 @@ candidates.
 | 11, 12, 13, 17 | | Exact (forwards to the interface at +0x2f4) |
 | 14 | `0x00468930` | Exact. Input presses: control 0x20 drives the +0x38 object; Ctrl+F (key 0x21, modifier 0xc) toggles +0x1c4 and E (0x12) clears it |
 | 15 | `0x00468a30` | Exact. Shutdown: releases the interface, deletes the network object (+0x08), the owners (+0x04, +0x10) and the ControlInterface |
-| 16 | `0x00468ae0` | Exact. Creates the network object (`new` at Game.cpp line 979) |
+| 16 | `0x00468ae0` | Exact. `CreateNetworkInterface`: creates the network object (`new` at Game.cpp line 979) |
 | 18 | `0x00468bd0` | Exact. Builds `<+0x1cc>\<name>` |
 | 30 | `0x00468c60` | Exact ("No Strings Available") |
 | 33 | `0x00467e80` | Exact |

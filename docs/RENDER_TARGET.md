@@ -42,8 +42,12 @@ method indices it uses line up with IDirect3DDevice7 and IDirectDrawSurface7:
   Set/GetRenderState, 35 SetTexture, 36/37 Get/SetTextureStageState.
 - **Surface:** 5 Blt, 32 Unlock.
 
-That identity is inference from call shape (VC98 ships DirectX 5 headers
-only), so `RenderInterfaces.h` keeps neutral names and notes the indices.
+The game imports `DirectDrawCreateEx` and carries IID_IDirectDraw7 and
+IID_IDirect3D7, and every decoded index and argument count lines up with the
+DirectX 7 SDK declaration order, so `RenderInterfaces.h` names those methods
+after the SDK (strong inference; VC98 ships DirectX 5 headers only) and
+notes each index. Unused slots keep `UnknownMethodN`. +0x34 nonzero makes
+slot 12 clear the target (`D3DCLEAR_TARGET`) as well as Z.
 
 The class also keeps a 300-entry render-state cache at +0x264. The
 constructor fills it with `{i, 0}`, and slot 8 skips a state whose cached

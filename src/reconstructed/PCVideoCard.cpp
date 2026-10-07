@@ -125,7 +125,7 @@ UnknownDisplay* UnknownDisplay::UnknownFunction4c9830(UnknownGuid* guid, char* d
     char key[256];
 
     field_0x1b0 = window;
-    field_0xb74_bit2 = g_UnknownGlobal56e26c->UnknownVirtualSlot22("IsPowerVR", 0);
+    field_0xb74_bit2 = g_TrackGame->GetRegistryFlag("IsPowerVR", 0);
     if (DirectDrawCreateEx(guid, (void**)&field_0x190, IID_IDirectDraw7, 0))
         goto failed;
     if (field_0x190->UnknownMethod27(&field_0x5c0, 0))
@@ -152,7 +152,7 @@ UnknownDisplay* UnknownDisplay::UnknownFunction4c9830(UnknownGuid* guid, char* d
             field_0x4ac.data4[2], field_0x4ac.data4[3], field_0x4ac.data4[4], field_0x4ac.data4[5],
             field_0x4ac.data4[6], field_0x4ac.data4[7]);
     sprintf(key, "DriverInfo\\%s\\WaitForFlip", field_0x4bc);
-    field_0xb74_bit0 = g_UnknownGlobal56e26c->UnknownVirtualSlot22(key, 0);
+    field_0xb74_bit0 = g_TrackGame->GetRegistryFlag(key, 0);
     strncpy(field_0xa74, description, sizeof(field_0xa74));
     strncpy(field_0xaf4, name, sizeof(field_0xaf4));
     field_0x74 = field_0x1f0;
@@ -212,7 +212,7 @@ void UnknownDisplay::UnknownFunction4c9c10() {
         field_0x1a4 = 0;
     }
     if (field_0x19c) {
-        while (field_0x19c->UnknownMethod13(2) == UNKNOWN_DDERR_WASSTILLDRAWING) // DDGBS_ISBLTDONE
+        while (field_0x19c->GetBltStatus(2) == UNKNOWN_DDERR_WASSTILLDRAWING) // DDGBS_ISBLTDONE
             Sleep(1);
         field_0x19c->UnknownMethod2();
         field_0x19c = 0;
@@ -226,13 +226,13 @@ int UnknownDisplay::UnknownFunction4c9c90() {
     SetWindowLongA((HWND)field_0x1b0, GWL_STYLE,
                    GetWindowLongA((HWND)field_0x1b0, GWL_STYLE) & (WS_POPUP | WS_SYSMENU));
     ShowWindow((HWND)field_0x1b0, SW_SHOW);
-    if (g_UnknownGlobal56e26c->field_0x538)
+    if (g_TrackGame->field_0x538)
         UnknownFunction52ff00();
     // DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT | DDSCL_EXCLUSIVE | 0x800
     if (field_0x190->UnknownMethod20(field_0x1b0, 0x813))
         return 0;
     field_0xa70 = 0x813;
-    if (g_UnknownGlobal56e26c->field_0x538)
+    if (g_TrackGame->field_0x538)
         UnknownFunction52ff20();
     return 1;
 }
@@ -243,7 +243,7 @@ int UnknownDisplay::UnknownFunction4c9d20(int x, int y, int width, int height) {
     RECT rect;
     RECT workArea;
 
-    if (g_UnknownGlobal56e26c->field_0x538)
+    if (g_TrackGame->field_0x538)
         UnknownFunction52ff00();
     if (field_0x190->UnknownMethod20(field_0x1b0, 0x808))   // DDSCL_NORMAL | 0x800
         return 0;
@@ -261,7 +261,7 @@ int UnknownDisplay::UnknownFunction4c9d20(int x, int y, int width, int height) {
                  rect.bottom - rect.top, SWP_NOZORDER);
     if (!width && !height)
         ShowWindow((HWND)field_0x1b0, SW_HIDE);
-    if (g_UnknownGlobal56e26c->field_0x538)
+    if (g_TrackGame->field_0x538)
         UnknownFunction52ff20();
     return 1;
 }
@@ -297,10 +297,10 @@ int UnknownDisplay::UnknownFunction4c9f30(int backBuffers) {
         goto failed;
     memset(&caps, 0, sizeof(caps));
     caps.caps = 4;                                // DDSCAPS_BACKBUFFER
-    if (field_0x19c->UnknownMethod12(&caps, &field_0x1a0))
+    if (field_0x19c->GetAttachedSurface(&caps, &field_0x1a0))
         goto failed;
     field_0x78 = backBuffers + 1;
-    field_0x19c->UnknownMethod0(&IID_IDirectDrawGammaControl, (void**)&field_0x1a4);
+    field_0x19c->QueryInterface(&IID_IDirectDrawGammaControl, (void**)&field_0x1a4);
     if (field_0x1a4 && field_0xb74_bit3) {
         if (field_0x1a4->UnknownMethod4(1, g_UnknownGammaRamp570570))
             goto failed;
@@ -314,18 +314,18 @@ int UnknownDisplay::UnknownFunction4c9f30(int backBuffers) {
     rect.bottom = field_0x10[field_0x0c].height;
     int i;
     for (i = 0; i <= backBuffers; i++) {
-        if (field_0x1a0->UnknownMethod5(&rect, 0, 0, 0x1000400, &fx)) // DDBLT_COLORFILL | DDBLT_WAIT
+        if (field_0x1a0->Blt(&rect, 0, 0, 0x1000400, &fx)) // DDBLT_COLORFILL | DDBLT_WAIT
             goto failed;
-        if (field_0x19c->UnknownMethod11(0, 1))  // DDFLIP_WAIT
+        if (field_0x19c->Flip(0, 1))  // DDFLIP_WAIT
             goto failed;
     }
     field_0x80 = 0x7fffffff;
     field_0x84 = 0x7fffffff;
     field_0x7c = UnknownFunction4bfa80();
-    if (field_0x19c->UnknownMethod11(0, 1))
+    if (field_0x19c->Flip(0, 1))
         goto failed;
     for (i = 0; i < 10; i++) {
-        if (field_0x19c->UnknownMethod11(0, 1))
+        if (field_0x19c->Flip(0, 1))
             goto failed;
         UnknownRecordFrameTime();
     }
@@ -356,7 +356,7 @@ int UnknownDisplay::UnknownFunction4ca130(int backBuffers) {
     } else {
         memset(&caps, 0, sizeof(caps));
         caps.caps = 4;                            // DDSCAPS_BACKBUFFER
-        if (field_0x19c->UnknownMethod12(&caps, &field_0x1a0))
+        if (field_0x19c->GetAttachedSurface(&caps, &field_0x1a0))
             goto failed;
     }
     memset(&desc, 0, sizeof(desc));
@@ -383,7 +383,7 @@ int UnknownDisplay::UnknownVirtualSlot3() {
     if (field_0x70_bit3 && !field_0x6c) {
         UnknownFunction4bfa80();
         // DDFLIP_WAIT when waiting for flips, else DDFLIP_DONOTWAIT
-        field_0x70_bit2 = field_0x19c->UnknownMethod11(0, field_0xb74_bit0 ? 1 : 0x20) != 0;
+        field_0x70_bit2 = field_0x19c->Flip(0, field_0xb74_bit0 ? 1 : 0x20) != 0;
         UnknownFunction4bfa80();
         if (field_0x70_bit2)
             return 1;
@@ -396,24 +396,24 @@ int UnknownDisplay::UnknownVirtualSlot3() {
         rect.right = field_0x10[field_0x0c].width;
         rect.bottom = field_0x10[field_0x0c].height;
         if (field_0x1a0 && !field_0x6c) {
-            if (field_0x1a0->UnknownMethod7(0, 0, field_0x1a8, &rect, 0x10)) // DDBLTFAST_WAIT
+            if (field_0x1a0->BltFast(0, 0, field_0x1a8, &rect, 0x10)) // DDBLTFAST_WAIT
                 goto failed;
-            field_0x70_bit2 = field_0x19c->UnknownMethod11(0, field_0xb74_bit0) != 0;
+            field_0x70_bit2 = field_0x19c->Flip(0, field_0xb74_bit0) != 0;
             UnknownRecordFrameTime();
             return 1;
         }
         source = field_0x1a8 ? field_0x1a8 : field_0x1a0;
-        while (source->UnknownMethod13(1) == UNKNOWN_DDERR_WASSTILLDRAWING) // DDGBS_CANBLT
+        while (source->GetBltStatus(1) == UNKNOWN_DDERR_WASSTILLDRAWING) // DDGBS_CANBLT
             ;
         if (field_0x190->UnknownMethod22(1, 0))   // DDWAITVB_BLOCKBEGIN
             goto failed;
         UnknownRecordFrameTime();
-        if (field_0x19c->UnknownMethod5(0, source, &rect, 0x1000000, 0)) // DDBLT_WAIT
+        if (field_0x19c->Blt(0, source, &rect, 0x1000000, 0)) // DDBLT_WAIT
             goto failed;
         return 1;
     }
     source = field_0x1a8 ? field_0x1a8 : field_0x1a0;
-    if (field_0x19c->UnknownMethod5(&g_UnknownGlobal56e26c->field_0x308, source, 0, 0x1000000, 0))
+    if (field_0x19c->Blt(&g_TrackGame->field_0x308, source, 0, 0x1000000, 0))
         goto failed;
     now = UnknownFunction4bfa80();
     field_0x80 = now - field_0x7c;
@@ -426,9 +426,9 @@ failed:
 // 0x004ca4a0
 void UnknownDisplay::UnknownVirtualSlot4(int value) {
     if (value)
-        field_0x19c->UnknownMethod11(0, 1);
+        field_0x19c->Flip(0, 1);
     else
-        field_0x70_bit2 = field_0x19c->UnknownMethod11(0, field_0xb74_bit0 ? 1 : 0x20) != 0;
+        field_0x70_bit2 = field_0x19c->Flip(0, field_0xb74_bit0 ? 1 : 0x20) != 0;
     if (!field_0x70_bit2)
         UnknownRecordFrameTime();
 }
@@ -466,7 +466,7 @@ int UnknownDisplay::UnknownFunction4ca790(int width, int height, int windowed) {
         goto failed;
     if (field_0x1ac->UnknownMethod8(0, field_0x1b0))
         goto failed;
-    if (field_0x19c->UnknownMethod28(field_0x1ac))
+    if (field_0x19c->SetClipper(field_0x1ac))
         goto failed;
     field_0x0c = -1;
     field_0x70_bit3 = 0;
@@ -508,11 +508,11 @@ int UnknownFunction4ca9f0(PCRenderTarget* target, TextureMap* texture) {
 
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    if (target->field_0x48->UnknownMethod25(0, &desc, 0x811, 0)) // wait, read only, no sys lock
+    if (target->field_0x48->Lock(0, &desc, 0x811, 0)) // wait, read only, no sys lock
         return 0;
     char* bits = (char*)texture->UnknownVirtualSlot13(0, &pitch, 0x801);
     if (!bits) {
-        target->field_0x48->UnknownMethod32(0);
+        target->field_0x48->Unlock(0);
         return 0;
     }
     int rows = texture->field_0x18;
@@ -523,7 +523,7 @@ int UnknownFunction4ca9f0(PCRenderTarget* target, TextureMap* texture) {
         source += desc.pitch;
         bits += pitch;
     }
-    target->field_0x48->UnknownMethod32(0);
+    target->field_0x48->Unlock(0);
     texture->UnknownVirtualSlot14(0);
     return 1;
 }
@@ -566,14 +566,14 @@ int UnknownFunction4caf70(PCRenderTarget* target, UnknownRect* area, PCTextureMa
     memset(&fx, 0, sizeof(fx));
     fx.size = sizeof(fx);
     fx.fillColor = 0;
-    rendered->field_0x70->UnknownMethod5(0, 0, 0, 0x400, &fx); // DDBLT_COLORFILL
+    rendered->field_0x70->Blt(0, 0, 0, 0x400, &fx); // DDBLT_COLORFILL
     rendered->UnknownVirtualSlot9(0, 1);
-    expected->field_0x70->UnknownMethod5(0, 0, 0, 0x400, &fx);
-    rendered->field_0x70->UnknownMethod5(0, image->field_0x70, 0, 0x1000000, 0);
+    expected->field_0x70->Blt(0, 0, 0, 0x400, &fx);
+    rendered->field_0x70->Blt(0, image->field_0x70, 0, 0x1000000, 0);
     rendered->UnknownVirtualSlot9(area, 1);
-    expected->field_0x70->UnknownMethod5(area, image->field_0x70, area, 0x1000000, 0);
-    rendered->field_0x70->UnknownMethod5(0, 0, 0, 0x400, &fx);
-    target->field_0x48->UnknownMethod5(0, 0, 0, 0x400, &fx);
+    expected->field_0x70->Blt(area, image->field_0x70, area, 0x1000000, 0);
+    rendered->field_0x70->Blt(0, 0, 0, 0x400, &fx);
+    target->field_0x48->Blt(0, 0, 0, 0x400, &fx);
 
     memset(vertices, 0, sizeof(vertices));
     vertices[0].x = 0.0f;
@@ -617,8 +617,8 @@ int UnknownFunction4caf70(PCRenderTarget* target, UnknownRect* area, PCTextureMa
         clear.right = viewport.x + viewport.width;
         clear.top = 0;
         clear.bottom = viewport.y + viewport.height;
-        failed |= target->device->UnknownMethod10(1, &clear, 2, 0, target->field_0x2c, 0) != 0; // Clear z
-        g_UnknownGlobal56e26c->UnknownVirtualSlot7();
+        failed |= target->device->Clear(1, &clear, 2, 0, target->field_0x2c, 0) != 0; // Clear z
+        g_TrackGame->UnknownVirtualSlot7();
         rendered->UnknownVirtualSlot19();
         target->UnknownVirtualSlot8(0x1b, 0, 0);
         target->UnknownVirtualSlot8(0x29, 0, 0);

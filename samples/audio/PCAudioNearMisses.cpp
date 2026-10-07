@@ -47,7 +47,7 @@
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/UnknownResourceManager.h"
 
-#define SoundSystem() ((PCSoundInterface*)g_UnknownGlobal56e26c->field_0x04)
+#define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
 // Copies at most 0x103 characters of `name` and terminates them.
 static inline void CopySoundName(char* to, const char* name) {

@@ -162,7 +162,7 @@
   "?UnknownVirtualSlot0@NetworkInterface@@UAEXH@Z": "0x004ad050",
   "?UnknownVirtualSlot1@PlayerInfoType@@UAEXXZ": "0x004add00",
   "?UnknownVirtualSlot1@SessionInfoType@@UAEXXZ": "0x004adc90",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_EnumConnectionCount@@3HA": "0x006886ac",
   "?g_EnumSessionCount@@3HA": "0x006886b0",
   "?g_EnumPlayerCount@@3HA": "0x006886b4",

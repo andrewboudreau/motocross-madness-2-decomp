@@ -45,56 +45,56 @@ PCRenderTarget::~PCRenderTarget() {
 
 // 0x004c53d0
 int PCRenderTarget::UnknownVirtualSlot1() {
-    return device->UnknownMethod5() == 0;
+    return device->BeginScene() == 0;
 }
 
 // 0x004c53e0
 int PCRenderTarget::UnknownVirtualSlot2() {
-    return device->UnknownMethod6() == 0;
+    return device->EndScene() == 0;
 }
 
 // 0x004c53f0
 int PCRenderTarget::UnknownVirtualSlot3(void* destination, void* source, void* sourceRect, int flags) {
-    return field_0x48->UnknownMethod5(destination, static_cast<UnknownBlitSource*>(source)->field_0x70,
+    return field_0x48->Blt(destination, static_cast<UnknownBlitSource*>(source)->field_0x70,
                                       sourceRect, flags, 0) == 0;
 }
 
 // 0x004c5490
 int PCRenderTarget::UnknownVirtualSlot5(void* rect) {
-    return field_0x48->UnknownMethod32(rect) == 0;
+    return field_0x48->Unlock(rect) == 0;
 }
 
 // 0x004c54b0
 long PCRenderTarget::UnknownVirtualSlot6(int stage, int type, int* value) {
-    return device->UnknownMethod36(stage, type, value);
+    return device->GetTextureStageState(stage, type, value);
 }
 
 // 0x004c54d0
 long PCRenderTarget::UnknownVirtualSlot7(int stage, int type, int value) {
-    return device->UnknownMethod37(stage, type, value);
+    return device->SetTextureStageState(stage, type, value);
 }
 
 // 0x004c54f0
 int PCRenderTarget::UnknownVirtualSlot14(void* viewport) {
-    return device->UnknownMethod13(viewport) == 0;
+    return device->SetViewport(viewport) == 0;
 }
 
 // 0x004c56e0: skips states whose cached value already matches unless forced.
 void PCRenderTarget::UnknownVirtualSlot8(int state, int value, int force) {
     if (force || renderStates[state].value != value) {
-        device->UnknownMethod20(state, value);
+        device->SetRenderState(state, value);
         renderStates[state].value = value;
     }
 }
 
 // 0x004c5720
 long PCRenderTarget::UnknownVirtualSlot9(int state, int* value) {
-    return device->UnknownMethod21(state, value);
+    return device->GetRenderState(state, value);
 }
 
 // 0x004c5930
 long PCRenderTarget::UnknownVirtualSlot11(int stage) {
-    return device->UnknownMethod35(stage, 0);
+    return device->SetTexture(stage, 0);
 }
 
 // 0x004c5ed0: resets the alpha test (GREATER than 0, disabled), unforced.
@@ -137,7 +137,7 @@ void* PCRenderTarget::UnknownVirtualSlot4(void* rect, long* pitch, int flags) {
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    if (field_0x48->UnknownMethod25(rect, &desc, flags, 0) != 0)
+    if (field_0x48->Lock(rect, &desc, flags, 0) != 0)
         return 0;
     if (pitch)
         *pitch = desc.pitch;
@@ -171,7 +171,7 @@ int PCRenderTarget::UnknownVirtualSlot15(int type, int vertexFormat, int vertice
     case D3DPT_TRIANGLESTRIP:
     case D3DPT_TRIANGLEFAN: field_0x44 += indexCount; break;
     }
-    return device->UnknownMethod26(type, vertexFormat, (void*)vertices, vertexCount, (void*)indices,
+    return device->DrawIndexedPrimitive(type, vertexFormat, (void*)vertices, vertexCount, (void*)indices,
                                        indexCount, flags) == 0;
 }
 
@@ -187,7 +187,7 @@ int PCRenderTarget::UnknownVirtualSlot16(int type, int vertexFormat, int vertice
     case D3DPT_TRIANGLESTRIP:
     case D3DPT_TRIANGLEFAN: field_0x44 += count; break;
     }
-    return device->UnknownMethod25(type, vertexFormat, (void*)vertices, count, flags) == 0;
+    return device->DrawPrimitive(type, vertexFormat, (void*)vertices, count, flags) == 0;
 }
 
 // 0x004c5c70: DrawIndexedPrimitiveVB with the primitive counters.
@@ -201,7 +201,7 @@ int PCRenderTarget::UnknownVirtualSlot17(int type, int vertexBuffer, int start, 
     case D3DPT_TRIANGLESTRIP:
     case D3DPT_TRIANGLEFAN: field_0x44 += indexCount; break;
     }
-    return device->UnknownMethod32(type, (void*)vertexBuffer, start, vertexCount, (void*)indices,
+    return device->DrawIndexedPrimitiveVB(type, (void*)vertexBuffer, start, vertexCount, (void*)indices,
                                        indexCount, flags) == 0;
 }
 
@@ -226,44 +226,44 @@ void PCRenderTarget::UnknownVirtualSlot10(int mode, int textureAlpha) {
     switch (mode) {
     case 1:
     case 7:
-        device->UnknownMethod37(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-        device->UnknownMethod37(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        device->UnknownMethod37(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-        device->UnknownMethod37(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+        device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+        device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+        device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         break;
     case 2:
-        device->UnknownMethod37(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        device->UnknownMethod37(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        device->UnknownMethod37(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
         if (textureAlpha) {
-            device->UnknownMethod37(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            device->UnknownMethod37(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         } else {
-            device->UnknownMethod37(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-            device->UnknownMethod37(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+            device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
         }
         break;
     case 4:
-        device->UnknownMethod37(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-        device->UnknownMethod37(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        device->UnknownMethod37(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-        device->UnknownMethod37(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-        device->UnknownMethod37(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-        device->UnknownMethod37(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+        device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+        device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+        device->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
         break;
     case 8:
-        device->UnknownMethod37(0, D3DTSS_COLOROP, D3DTOP_ADD);
-        device->UnknownMethod37(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        device->UnknownMethod37(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-        device->UnknownMethod37(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-        device->UnknownMethod37(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+        device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_ADD);
+        device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+        device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
         break;
     case 3:
-        device->UnknownMethod37(0, D3DTSS_COLOROP, D3DTOP_BLENDTEXTUREALPHA);
-        device->UnknownMethod37(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-        device->UnknownMethod37(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
-        device->UnknownMethod37(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-        device->UnknownMethod37(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+        device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_BLENDTEXTUREALPHA);
+        device->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+        device->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
         break;
     }
 }
@@ -287,7 +287,7 @@ int PCRenderTarget::MeasureTextureMemory(int* value) {
         desc.caps[0] = DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE;
         if (field_0x04->field_0x190->UnknownMethod6(&desc, &surfaces[count], 0) != 0)
             break;
-        surfaces[count]->UnknownMethod14(&caps);
+        surfaces[count]->GetCaps(&caps);
         if (caps.caps & DDSCAPS_LOCALVIDMEM)
             found++;
         if (caps.caps & DDSCAPS_NONLOCALVIDMEM)
@@ -305,7 +305,7 @@ int PCRenderTarget::MeasureTextureMemory(int* value) {
         desc.caps[0] = DDSCAPS_LOCALVIDMEM | DDSCAPS_VIDEOMEMORY | DDSCAPS_TEXTURE;
         if (field_0x04->field_0x190->UnknownMethod6(&desc, &surfaces[count], 0) != 0)
             break;
-        surfaces[count]->UnknownMethod14(&caps);
+        surfaces[count]->GetCaps(&caps);
         if (caps.caps & DDSCAPS_LOCALVIDMEM)
             found++;
         if (caps.caps & DDSCAPS_NONLOCALVIDMEM)
@@ -345,7 +345,7 @@ void PCRenderTarget::SaveScreenshot() {
     }
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    if (field_0x48->UnknownMethod25(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0) == 0) {
+    if (field_0x48->Lock(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0) == 0) {
         if (desc.pixelFormat.bitCount == 16)
             WriteTga16(desc.surface, desc.width, desc.height, desc.pitch, desc.pixelFormat.masks[1],
                                   path, 0x20);
@@ -353,7 +353,7 @@ void PCRenderTarget::SaveScreenshot() {
             WriteTga24(desc.surface, desc.width, desc.height, desc.pitch, path, 0x20);
         else if (desc.pixelFormat.bitCount == 32)
             WriteTga32(desc.surface, desc.width, desc.height, desc.pitch, path, 0x20);
-        field_0x48->UnknownMethod32(0);
+        field_0x48->Unlock(0);
     }
 }
 
@@ -375,7 +375,7 @@ RenderTarget* PCRenderTarget::UnknownFunction4c4f80(UnknownDisplay* display, con
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     desc.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-    if (field_0x48->UnknownMethod22(&desc) != 0)
+    if (field_0x48->GetSurfaceDesc(&desc) != 0)
         goto fail;
     field_0x0c = desc.width;
     field_0x10 = desc.height;
@@ -383,7 +383,7 @@ RenderTarget* PCRenderTarget::UnknownFunction4c4f80(UnknownDisplay* display, con
         int memory = desc.caps[0] & DDSCAPS_VIDEOMEMORY;
         memset(&format, 0, sizeof(format));
         format.size = sizeof(format);
-        if (field_0x48->UnknownMethod21(&format) != 0)
+        if (field_0x48->GetPixelFormat(&format) != 0)
             goto fail;
         field_0x28 = FormatFromPixelFormat(&format);
         field_0x24 = memory ? DDSCAPS_VIDEOMEMORY : DDSCAPS_SYSTEMMEMORY;
@@ -412,22 +412,22 @@ RenderTarget* PCRenderTarget::UnknownFunction4c4f80(UnknownDisplay* display, con
             long result = field_0x04->field_0x190->UnknownMethod6(&desc, &zbuffer, 0);
             if (result == DDERR_OUTOFVIDEOMEMORY || result != 0)
                 goto fail;
-            if (field_0x48->UnknownMethod3(zbuffer) != 0)
+            if (field_0x48->AddAttachedSurface(zbuffer) != 0)
                 goto fail;
         }
     }
     if (field_0x04->field_0x194->UnknownMethod4(&deviceGuid, field_0x48, &device) != 0)
         goto fail;
     memset(&field_0x164, 0, 0x250 - 0x164); // the D3DDEVICEDESC7
-    if (device->UnknownMethod3(&field_0x164) != 0)
+    if (device->GetCaps(&field_0x164) != 0)
         goto fail;
     memset(&format, 0, sizeof(format));
     format.size = sizeof(format);
-    if (field_0x48->UnknownMethod21(&format) != 0)
+    if (field_0x48->GetPixelFormat(&format) != 0)
         goto fail;
     field_0x28 = FormatFromPixelFormat(&format);
     field_0x2c = 1.0f;
-    if (device->UnknownMethod4(EnumTextureFormatCallback, this) != 0) {
+    if (device->EnumTextureFormats(EnumTextureFormatCallback, this) != 0) {
     fail:
         delete this;
         return 0;

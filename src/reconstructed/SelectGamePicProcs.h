@@ -185,7 +185,7 @@ public:
     void ApplyEventType();             // 0x004f6e60: applies the event type
     void UnknownVirtualSlot31(int apply);     // 0x004f7210: stores (or shows) the event settings
     void ShowTrackPicture();             // 0x004f75d0: shows the track picture
-    void UnknownFunction4f7640(UnknownGameUiControl* picture, const char* directory, const char* name); // 0x004f7640
+    void UnknownFunction4f7640(UIControl* picture, const char* directory, const char* name); // 0x004f7640
 
     MultiPlayerDlg* parentDialog;             // +0x2c: parent dialog
     unsigned char field_0x30[0x7f3c - 0x30];

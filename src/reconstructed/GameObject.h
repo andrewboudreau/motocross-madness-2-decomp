@@ -45,22 +45,25 @@ public:
     virtual int UnknownVirtualSlot25(void* value);
     virtual void UnknownVirtualSlot26();
 
-    // 0x00469190: appends `child` (and its later siblings) to the children;
-    // not reconstructed.
-    int UnknownFunction469190(GameObject* child, int value);
+    // 0x00469190: appends `child` (and its later siblings) to the children,
+    // sets their parent and `child`'s +0x1c; returns `child`.
+    int AppendChild(GameObject* child, int value);
     int UnknownFunction469130(GameObject* child); // 0x00469130 (KrustyUI 0x004988a0)
     // 0x00469130 takes two arguments (ret 8); GUIManager.cpp passes -1 as the second.
     int UnknownFunction469130(GameObject* child, int value);
     int UnknownFunction469260(GameObject* parent, int value); // 0x00469260 (GUIManager.cpp)
-    // 0x00469770: finds a descendant by name (GUIManager.cpp passes 1, "GroundFog").
-    GameObject* UnknownFunction469770(int mode, const char* name);
+    // 0x00469770: finds an object whose class list (+0x28) or RTTI name
+    // matches `name`, among the children (mode 0), descendants (1),
+    // siblings (2), parent (3) or ancestors (4). GUIManager.cpp passes 1,
+    // "GroundFog".
+    GameObject* FindByClassName(int mode, const char* name);
     // 0x004691f0: unlinks this object from its siblings and parent and
     // recomputes the root's flags; returns 1 (0 while the global is set).
     int UnknownFunction4691f0();
     // 0x00469680: releases this object and every later sibling, back to front.
     int UnknownFunction469680();
     // 0x00469ce0: appends the RTTI class name of `object` to field_0x28.
-    void UnknownFunction469ce0(GameObject* object);
+    void AppendClassName(GameObject* object);
     // 0x004690c0: ORs `flags` into field_0x20 and propagates the result up
     // through every parent (each adds its own field_0x1C).
     void UnknownFunction4690c0(unsigned int flags);
@@ -89,7 +92,7 @@ protected:
     friend class GUIManager; // reads a dialog's +0x25 bit 0 (0x00485bd0)
     friend class GUIUser;   // reads a control's +0x25 bit 3 and +0x28 (0x00487730, 0x00487800)
     friend class UICtlContainer; // walks its children back to front (0x0047b3f0)
-    friend class UnknownGameUiControl; // walks its siblings (0x004727c0)
+    friend class UIControl; // walks its siblings (0x004727c0)
     friend class UIDialog;  // reads its control container's first child (0x0046f120)
     // RaceStatus.cpp 0x004e5ca0 reads a racer's +0x25 bit 0.
     friend int PruneStatusList(struct UnknownEventRacerPart** list);  // 0x004e5ca0

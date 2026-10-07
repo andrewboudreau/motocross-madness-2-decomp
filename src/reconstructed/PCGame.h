@@ -37,17 +37,17 @@ public:
     virtual int UnknownVirtualSlot15();       // 0x004c0230: shutdown, then shows the cursor
     virtual int UnknownVirtualSlot19(int mode); // 0x004c04a0: changes the display mode
     // Settings under HKEY_LOCAL_MACHINE\<+0x4b8>; "Sub\\Value" names a subkey.
-    virtual int UnknownVirtualSlot20(const char* name, int defaultValue);     // 0x004c1c20: DWORD
-    virtual float UnknownVirtualSlot21(const char* name, float defaultValue); // 0x004c1d50: float
-    virtual int UnknownVirtualSlot22(const char* name, int defaultValue);     // 0x004c1e80: flag
-    virtual int UnknownVirtualSlot23(const char* name, const char* defaultValue, char* buffer,
-                                     unsigned long* size);                     // 0x004c1fc0: string
-    virtual int UnknownVirtualSlot24(const char* name, void* data, unsigned long* size); // 0x004c2110: binary
-    virtual int UnknownVirtualSlot25(const char* name, int value);            // 0x004c2240: write DWORD
+    virtual int GetRegistryInt(const char* name, int defaultValue);       // 0x004c1c20: DWORD
+    virtual float GetRegistryFloat(const char* name, float defaultValue); // 0x004c1d50: float
+    virtual int GetRegistryFlag(const char* name, int defaultValue);      // 0x004c1e80: flag
+    virtual int GetRegistryString(const char* name, const char* defaultValue, char* buffer,
+                                  unsigned long* size);                     // 0x004c1fc0: string
+    virtual int GetRegistryBinary(const char* name, void* data, unsigned long* size); // 0x004c2110: binary
+    virtual int SetRegistryInt(const char* name, int value);              // 0x004c2240: write DWORD
     virtual int UnknownVirtualSlot26(const char* name, int value);            // 0x004c2240 (folded)
-    virtual int UnknownVirtualSlot27(const char* name, int value);            // 0x004c2240 (folded)
-    virtual int UnknownVirtualSlot28(const char* name, const char* value);    // 0x004c2370: write string
-    virtual int UnknownVirtualSlot29(const char* name, const void* data, unsigned long size); // 0x004c24b0
+    virtual int SetRegistryFlag(const char* name, int value);             // 0x004c2240 (folded)
+    virtual int SetRegistryString(const char* name, const char* value);   // 0x004c2370: write string
+    virtual int SetRegistryBinary(const char* name, const void* data, unsigned long size); // 0x004c24b0
     virtual RenderTarget* UnknownVirtualSlot31(); // 0x004c0a90: creates the render target
     virtual int UnknownVirtualSlot32();       // 0x004c0c60: sets the display mode
     virtual int UnknownVirtualSlot34(UnknownDisplay* display); // 0x004c05a0: filters display modes
@@ -56,7 +56,7 @@ public:
     virtual int UnknownVirtualSlot37();       // 0x004c0c10: the "lobby" command-line switch
 
     // Game+0x10 is always the PCRenderTarget that slot 31 creates.
-    PCRenderTarget* PCTarget() { return (PCRenderTarget*)field_0x10; }
+    PCRenderTarget* PCTarget() { return (PCRenderTarget*)renderTarget; }
 
     void SetWindowRect(const UnknownRect* rect);          // 0x004c0470
     // 0x004c0760: in full screen, marks modes larger than width x height

@@ -35,10 +35,10 @@ void KeyboardDevice::UnknownVirtualSlot0(int id) {
 void KeyboardDevice::UnknownFunction48a0c0(int list, int value) {
     for (int i = 0; i < axisBindings[list].m_count; i++) {
         UnknownControlBinding* binding = axisBindings[list].Get(i);
-        binding->field_0x18 += g_UnknownGlobal56e26c->field_0x2f0;
-        binding->field_0x14 += g_UnknownGlobal56e26c->field_0x2f0;
+        binding->field_0x18 += g_TrackGame->frameTime;
+        binding->field_0x14 += g_TrackGame->frameTime;
         if (UnknownVirtualSlot5(binding->field_0x0c, 0x3f, 0)) {
-            if (binding->field_0x14 - g_UnknownGlobal56e26c->field_0x2f0 > binding->field_0x20) {
+            if (binding->field_0x14 - g_TrackGame->frameTime > binding->field_0x20) {
                 binding->UnknownFunction43cd10();
                 binding->field_0x14 = 0;
             }
@@ -48,7 +48,7 @@ void KeyboardDevice::UnknownFunction48a0c0(int list, int value) {
             }
         }
         if (UnknownVirtualSlot5(binding->field_0x10, 0x3f, 0)) {
-            if (binding->field_0x18 - g_UnknownGlobal56e26c->field_0x2f0 > binding->field_0x20) {
+            if (binding->field_0x18 - g_TrackGame->frameTime > binding->field_0x20) {
                 binding->UnknownFunction43cd10();
                 binding->field_0x18 = 0;
             }
@@ -67,11 +67,11 @@ void KeyboardDevice::UnknownFunction48a0c0(int list, int value) {
 // states with bit 7 never do. 0x80 also holds while key 0x29 is down,
 // 0x80000000 means no modifier, and bit 6 asks for an exact match.
 int KeyboardDevice::UnknownFunction48a240(int modifier) {
-    if (!g_UnknownGlobal56e26c->field_0x2d4_bit2 && (modifier & 0x80))
+    if (!g_TrackGame->field_0x2d4_bit2 && (modifier & 0x80))
         return 0;
     if (modifier == 0x3f)
         return 1;
-    if (g_UnknownGlobal56e26c->field_0x2d4_bit2 && modifier == 0x80 && keyStates[0x29].state == 1)
+    if (g_TrackGame->field_0x2d4_bit2 && modifier == 0x80 && keyStates[0x29].state == 1)
         return 1;
     if (modifier == (int)0x80000000)
         return modifierState == 0;

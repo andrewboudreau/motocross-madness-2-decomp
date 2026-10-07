@@ -115,7 +115,7 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
 
     field_0x34 = new (__FILE__, 99) CarProceduralModel(1);
     field_0x34->UnknownNodeVirtualSlot9(a0, name, a3, a4, 1);
-    UnknownFunction469190(field_0x34, -1);
+    AppendChild(field_0x34, -1);
     field_0x1d0 = *a7;
     field_0x19c = a10;
     field_0x194 = 0.0f;
@@ -150,14 +150,14 @@ CarProcedural* CarProcedural::UnknownVirtualSlot27(void* a0, const char* name, c
     field_0x38 = new (__FILE__, 149) CarProceduralCollision(1);
     field_0x38->UnknownFunction4320f0(a0, 1, 1, 0);
     field_0x38->field_0x68 = 1;
-    UnknownFunction469190(field_0x38, -1);
+    AppendChild(field_0x38, -1);
     field_0x188 = 5.0f;
 
     int tag = g_MemTagStack->Push("Collision");
     field_0x3c = new (__FILE__, 162) CarProceduralCollision(1);
     field_0x3c->UnknownFunction4320f0(a0, 1, 1, 1);
     field_0x3c->field_0x68 = 1;
-    UnknownFunction469190(field_0x3c, -1);
+    AppendChild(field_0x3c, -1);
     if (collisionFile && *collisionFile)
         field_0x3c->UnknownFunction432800(field_0x34, collisionFile);
     else

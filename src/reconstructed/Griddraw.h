@@ -28,10 +28,10 @@ struct GridAgeEntry {
 };
 class GridAgeManager {
 public:
-    void UnknownFunction401050(GridAgeEntry* entry, int (*callback)(void* owner), void* owner,
+    void Register(GridAgeEntry* entry, int (*callback)(void* owner), void* owner,
                                int a, int size);    // 0x00401050 (ret 0x14)
-    void UnknownFunction4010d0(GridAgeEntry* entry);  // 0x004010d0 (ret 4)
-    void UnknownFunction401250(GridAgeEntry* entry);  // 0x00401250 (ret 4), marks the entry used
+    void Unregister(GridAgeEntry* entry);  // 0x004010d0 (ret 4)
+    void MarkUsed(GridAgeEntry* entry);  // 0x00401250 (ret 4), marks the entry used
 };
 
 // Boundary view of the renderer at Terrain+0x18 (thiscall virtuals). Slot 7

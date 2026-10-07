@@ -22,7 +22,7 @@
   "?HandleReceivedMessage@@YAXPAEIHHI@Z": "0x004afa90",
   "?HandleReceivedMessage@@YAXPAEIHHI@Z$ehhandler": "0x0054c64e",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__FILE__": "0x0056ec6c",
   "__FILE__:containerlist.h": "0x005666e4",
   "__except_list": "0x00000000",

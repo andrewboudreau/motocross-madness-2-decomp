@@ -2,7 +2,7 @@
 
 `src/reconstructed/GameUi.cpp`, with the classes in `GameUi.h` and
 `UIDialog.h`. RTTI names the classes: UIDialog and UIControl
-(`UnknownGameUiControl`) and the derived button, static, edit, scroll,
+(`UIControl`) and the derived button, static, edit, scroll,
 slider, list box, multi-state, animation, timer, frame and drop-down
 controls. Member names follow the evidence listed under "Names"; the rest
 stay provisional.
@@ -35,7 +35,7 @@ UIDDLListBox constructor case (`0x00479d10`) is re-keyed to its retail argument 
 
 Class layout (sizes from the `new` sites in `0x0046a920`, `0x00479ea0` and
 dlgprocs.cpp, and from the constructors):
-- UIControl (`UnknownGameUiControl`) is 0x1ec bytes. Its derived classes
+- UIControl (`UIControl`) is 0x1ec bytes. Its derived classes
   hold their own members: UIButton 0x1f0 (+0x1ec the list a column button
   sorts), UIScrollCtl 0x1f0, UIDDLButton 0x1f4, UIStatic 0x1ec,
   UIDDLStatic 0x1f0, UIVideoStatic 0x200, UIProgressBar 0x204,
@@ -115,7 +115,7 @@ Other header facts:
 - GameUi.cpp's UnknownGameUiDialog has slot 27's real 14-argument signature
   and names +0x38 (resource name), +0xb8, +0x118 (text colors), +0x95c,
   +0x7f1c and +0x7f40.
-- GameObject.h befriends UICtlContainer, UnknownGameUiControl and UIDialog.
+- GameObject.h befriends UICtlContainer, UIControl and UIDialog.
 
 Near misses (`samples/ui/GameUiNearMisses.cpp`): 38 functions, listed with
 their differences at the top of the sample, among them the UIControl and

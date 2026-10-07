@@ -90,7 +90,7 @@ int UnknownTrackGameObject3410::UnknownFunction4aa670(unsigned int count, void* 
         return 0;
     if (score->UnknownMethod3(&g_NetApplicationGuid, count, 0, 0, 0x1000) < 0)
         goto failed;
-    UnknownFunction520820("\nSending The RaceStatus to the Zone\n");
+    SendDebugMessage("\nSending The RaceStatus to the Zone\n");
     for (i = 0; i < count; i++) {
         if (field_0x08[i].field_0x40 == 1)
             flags = 2;
@@ -98,14 +98,14 @@ int UnknownTrackGameObject3410::UnknownFunction4aa670(unsigned int count, void* 
             flags = field_0x08[i].field_0x40 ? 4 : 16;
         if (score->UnknownMethod4(i, field_0x08[i].field_0x00, field_0x08[i].field_0x44, 0, flags) < 0)
             goto failed;
-        UnknownFunction520820("\nPlayer %s:%d,%d\n", field_0x08[i].field_0x00, field_0x08[i].field_0x40,
+        SendDebugMessage("\nPlayer %s:%d,%d\n", field_0x08[i].field_0x00, field_0x08[i].field_0x40,
                               field_0x08[i].field_0x44);
     }
     if (score->UnknownMethod6(a, b) < 0)
         goto failed;
     if (score->UnknownMethod15(field_0x04) < 0)
         goto failed;
-    UnknownFunction520820("Sent The Final Score to the Zone successfully\n");
+    SendDebugMessage("Sent The Final Score to the Zone successfully\n");
     score->Release();
     return 1;
 
@@ -118,4 +118,4 @@ failed:
 // this file's strings); the dynamic initializer 0x004aa7b0..0x004aa7e9
 // follows the functions above.
 TrackGame g_UnknownTrackGame6851a0;
-TrackGame* g_UnknownGlobal56e26c = &g_UnknownTrackGame6851a0;
+TrackGame* g_TrackGame = &g_UnknownTrackGame6851a0;

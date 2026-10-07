@@ -130,7 +130,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot6()
     if (Extra()->texture) {
         Extra()->texture->UnknownVirtualSlot19();
         if (Extra()->ageEntry.size)
-            Terrain()->textureAgeManager->UnknownFunction401250(&Extra()->ageEntry);
+            Terrain()->textureAgeManager->MarkUsed(&Extra()->ageEntry);
     } else {
         Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
         Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);

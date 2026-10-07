@@ -156,7 +156,7 @@
   "?UnknownVirtualSlot6@PCTextureMap@@UAEPAVTextureMap@@XZ$ehhandler": "0x0054cd34",
   "?UnknownVirtualSlot9@PCTextureMap@@UAEHPAUUnknownRect@@H@Z": "0x004c7640",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownGlobal689964@@3HA": "0x00689964",
   "?g_UnknownGlobal689968@@3HA": "0x00689968",
   "?g_UnknownSharedMipSurfaces68a36c@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a36c",

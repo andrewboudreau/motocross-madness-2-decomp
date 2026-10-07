@@ -32,7 +32,7 @@ definition is a real type, but review it with that in mind.
 
 Exact: 34 calibration cases plus `0x00522720`, all of the unit except two near misses:
 - The constructor `0x00522060`, the destructor `0x005225f0`, the profile load
-  `0x005231f0`, the network race reset `0x00522680`, the racer-slot
+  `0x005231f0`, the network race reset `ResetNetworkRace` `0x00522680`, the racer-slot
   constructor and the session list's unwind destructor.
 - The SessionInfoType constructor `0x00523b90`. Its destructor `0x00523c80`
   is folded with InfoType's, so the name owning that address is
@@ -44,8 +44,10 @@ Exact: 34 calibration cases plus `0x00522720`, all of the unit except two near m
   pick, control-file load and save, profile save, the CD prompt and search,
   file paths, install type, help file, bonus tracks and series accessors.
 
-Three return types now follow retail: `0x00522d00` and `0x00523a60` return
-int, and `0x00523d30` returns int and takes ShellExecuteA's parameters.
+Three return types now follow retail: `0x00522d00` and `FindFileDirectory`
+`0x00523a60` return int, and `OpenHelp` `0x00523d30` returns int and takes
+ShellExecuteA's parameters. `CopySeriesDirectory` `0x00523bb0` copies the
+current series' directory name.
 Their binding keys were renamed in the files that call them.
 
 `0x00522720` clears its last 0x14 bytes (+0x360) with an inline

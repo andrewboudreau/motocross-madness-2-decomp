@@ -22,7 +22,7 @@
   "?UnknownFunction439410@UnknownWreckerCollisionObject@@QAEXPAV1@@Z": "0x00439410",
   "?UnknownFunction43b9e0@UnknownWreckerCollisionModel@@QAEXPAVUnknownWreckerRigidBody@@HPBD@Z": "0x0043b9e0",
   "?UnknownFunction43c7f0@UnknownWreckerCollisionModel@@QAEXUVector3@@H@Z": "0x0043c7f0",
-  "?UnknownFunction469190@GameObject@@QAEHPAV1@H@Z": "0x00469190",
+  "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?UnknownFunction4a8ac0@UnknownWreckerCharacter@@QAEXPAUVector3@@H@Z": "0x004a8ac0",
   "?UnknownFunction4a8b10@UnknownWreckerCharacter@@QAEXPBD@Z": "0x004a8b10",
   "?UnknownFunction4a8b40@UnknownWreckerCharacter@@QAEXH@Z": "0x004a8b40",

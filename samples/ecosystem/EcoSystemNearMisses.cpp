@@ -125,7 +125,7 @@ void Vegetation::SetBillboard(int billboard, int fade) {
         int dwords = vertexCount * 8 + (indexCount + 1) / 2;
         geometryBlock = DebugMalloc(dwords * 4 + sizeof(AgeEntry), __FILE__, 0x1fb);
         AgeEntry* entry = (AgeEntry*)((int*)geometryBlock + dwords);
-        g_UnknownGlobal59aebc->ageManager->UnknownFunction401050(entry, EvictGeometry, this, 0,
+        g_UnknownGlobal59aebc->ageManager->Register(entry, EvictGeometry, this, 0,
                                                                   dwords * 4 + sizeof(AgeEntry));
         g_UnknownGlobal59af0c++;
         memcpy((UnknownEcoVertex*)geometryBlock + vertexCount, definition->modelIndices[billboard], indexCount * 2);
@@ -336,9 +336,9 @@ int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags)
             block->UnknownFunction4b78f0("Material - 0");
             block->UnknownFunction4b7b30("TextureMap", name, -1);
             int format = 1555;
-            if (!g_UnknownGlobal56e26c->field_0x2d0 && (g_UnknownGlobal56e26c->field_0x10->field_0x1c0 & 8)
-                && g_UnknownGlobal56e26c->UnknownVirtualSlot22("KeyColorTrees", 0))
-                format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+            if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->field_0x1c0 & 8)
+                && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
+                format = g_TrackGame->field_0x10->field_0x28;
             modelTexture = UnknownFunction50a590(textures, name, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
             if (!modelTexture->UnknownVirtualSlot7()) {
                 int loaded = modelTexture->field_0x20;
@@ -554,8 +554,8 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
     for (i = 0; i < definition->collisionCount; i++) {
         UnknownEcoCollisionDefinition* shape = &definition->collisionDefinitions[i];
         definition->collisionObjects[i] = new(__FILE__, 0x3ad) CollisionObject(1);
-        definition->collisionObjects[i]->UnknownFunction4320f0(g_UnknownGlobal56e26c->field_0x10, 0, 0, 1);
-        UnknownFunction469190(definition->collisionObjects[i], -1);
+        definition->collisionObjects[i]->UnknownFunction4320f0(g_TrackGame->field_0x10, 0, 0, 1);
+        AppendChild(definition->collisionObjects[i], -1);
         definition->collisionObjects[i]->field_0x64 = 0x3e8;
         if (shape->type == 0) {
             definition->collisionObjects[i]->field_0x64 = 0x3e9;

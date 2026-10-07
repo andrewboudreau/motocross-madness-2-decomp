@@ -101,7 +101,7 @@ static inline Vector3& operator-=(Vector3& v, const Vector3& other) {
 // Slot 45's input queries go through the game's ControlInterface each time.
 // Macros, not inline functions: with inline helpers VC6 runs out of inline
 // budget in slot 45 and calls the Vector3 constructor out of line.
-#define FOLLOWCAMERA_CONTROLS() (g_UnknownGlobal56e26c->field_0x14)
+#define FOLLOWCAMERA_CONTROLS() (g_TrackGame->controlInterface)
 static inline UnknownJoystickBoolView* FollowCameraJoystick(ControlInterface* controls) {
     return (UnknownJoystickBoolView*)controls->activeJoystick;
 }
@@ -761,13 +761,13 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
 
             }
         }
-        if (g_UnknownGlobal56e26c->field_0x1c4 || (cameraState != 5 && cameraState != 7)) {
-            if (g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xc7, 0, 0x80000000, 0)) {
+        if (g_TrackGame->field_0x1c4 || (cameraState != 5 && cameraState != 7)) {
+            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x80000000, 0)) {
                 field_0x258 -= 3.0f;
                 if (field_0x258 < field_0x1e0)
                     field_0x258 = field_0x1e0;
             }
-            if (g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xcf, 0, 0x80000000, 0)) {
+            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x80000000, 0)) {
                 field_0x258 += 3.0f;
                 if (field_0x258 > field_0x1dc)
                     field_0x258 = field_0x1dc;

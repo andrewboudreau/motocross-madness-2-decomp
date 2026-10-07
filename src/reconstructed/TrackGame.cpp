@@ -103,13 +103,13 @@ TrackGame::TrackGame() {
     strncpy(field_0x4b8, key, length);
     field_0x4b8[length] = 0;
     fullRecordPacketIntervalSeconds =
-        UnknownVirtualSlot20("IntervalBetweenFullRecordPacketsMS", 500) * 0.001f;
+        GetRegistryInt("IntervalBetweenFullRecordPacketsMS", 500) * 0.001f;
     shortRecordPacketIntervalSeconds =
-        UnknownVirtualSlot20("IntervalBetweenShortRecordPacketsMS", 100) * 0.001f;
+        GetRegistryInt("IntervalBetweenShortRecordPacketsMS", 100) * 0.001f;
     fullNetPacketIntervalSeconds =
-        UnknownVirtualSlot20("IntervalBetweenFullNetPacketsMS", 2000) * 0.001f;
+        GetRegistryInt("IntervalBetweenFullNetPacketsMS", 2000) * 0.001f;
     shortNetPacketIntervalSeconds =
-        UnknownVirtualSlot20("IntervalBetweenShortNetPacketsMS", 67) * 0.001f;
+        GetRegistryInt("IntervalBetweenShortNetPacketsMS", 67) * 0.001f;
     field_0x3424 = 0;
     field_0x2e0 = 1.0f;
     field_0x3428 = 0;
@@ -130,7 +130,7 @@ TrackGame::~TrackGame() {
                       0, 0, 3);
     if (openLocalizedWebPageOnExit) {
         char url[128];
-        UnknownFunction521970(0x14df, url, 0x7f);
+        LoadResourceString(0x14df, url, 0x7f);
         ShellExecuteA(0, 0, url, 0, 0, 3);
     }
     delete field_0x3340;
@@ -243,9 +243,9 @@ int TrackGame::UnknownVirtualSlot4() {
     profileDirectory->UnknownVirtualSlot1();
     field_0x3400 = new(__FILE__, 313) UnknownTrackGameObject3400;
     mode.CreateDirectoryLists();
-    mode.UnknownFunction522680();
+    mode.ResetNetworkRace();
     g_MemTagStack->Push("Audio");
-    if (((PCSoundInterface*)field_0x04)->UnknownFunction4be5a0(22050, 1, mode.field_0xa48 ? 16 : 8,
+    if (((PCSoundInterface*)soundInterface)->UnknownFunction4be5a0(22050, 1, mode.field_0xa48 ? 16 : 8,
                                                               4000000, mode.field_0xa34) ==
         (long)kSoundDeviceAlreadyAllocated) {
         char text[256];
@@ -262,22 +262,22 @@ int TrackGame::UnknownVirtualSlot4() {
     controlMapping = new(__FILE__, 350) UnknownControlMapping;
     if (!controlMapping)
         return 0;
-    field_0x14->UnknownFunction43ce70(controlMapping);
+    controlInterface->UnknownFunction43ce70(controlMapping);
     field_0x33fc = new(__FILE__, 360) UnknownTrackGameObject33fc;
     if (!field_0x33fc)
         return 0;
     g_MemTagStack->Push("UI");
     ui = new(__FILE__, 379) KrustyUI(1);
-    if (!field_0x34->UnknownFunction469190(ui->UnknownFunction4988a0(field_0x10, 1), -1))
+    if (!field_0x34->AppendChild(ui->UnknownFunction4988a0(renderTarget, 1), -1))
         return 0;
     eventManager = new(__FILE__, 382) EventManager(1);
-    if (!field_0x34->UnknownFunction469190(eventManager->UnknownVirtualSlot8(field_0x10), -1))
+    if (!field_0x34->AppendChild(eventManager->UnknownVirtualSlot8(renderTarget), -1))
         return 0;
-    if (field_0x08) {
+    if (network) {
         char address[32];
         unsigned long size = sizeof(address);
-        UnknownVirtualSlot23("debugIP", "", address, &size);
-        int port = UnknownVirtualSlot20("debugPort", 2001);
+        GetRegistryString("debugIP", "", address, &size);
+        int port = GetRegistryInt("debugPort", 2001);
         if (address[0]) {
             g_DebugSocket = new(__FILE__, 395) DebugSocket;
             if (g_DebugSocket) {
@@ -285,26 +285,26 @@ int TrackGame::UnknownVirtualSlot4() {
                     delete g_DebugSocket;
                     g_DebugSocket = 0;
                 }
-                UnknownFunction520820("Connected! to MCM2\n");
+                SendDebugMessage("Connected! to MCM2\n");
             }
         }
-        if (field_0x08->lobbyConnected) {
-            ui->field_0x2c->UnknownFunction486630(1);
+        if (network->lobbyConnected) {
+            ui->field_0x2c->ShowCursors(1);
             ui->UnknownFunction498cf0(-1);
             char name[16];
-            field_0x08->GetPlayerName(field_0x08->localPlayer, name);
+            network->GetPlayerName(network->localPlayer, name);
             if (strcmp(mode.field_0x00, name)) {
                 int count = strlen(name);
                 int length = count > 15 ? 15 : count;
                 strncpy(mode.field_0x00, name, length);
                 mode.field_0x00[length] = 0;
                 if (!mode.UnknownFunction5231f0())
-                    ui->UnknownFunction499b20(0xbbb);
+                    ui->OpenMenu(0xbbb);
             }
             networkGameObject = new(__FILE__, 430) UnknownTrackGameObject3410;
             if (networkGameObject)
-                networkGameObject->UnknownFunction4aa350(field_0x08->directPlay, field_0x08->lobby);
-            ui->UnknownFunction499b20(0x866);
+                networkGameObject->UnknownFunction4aa350(network->directPlay, network->lobby);
+            ui->OpenMenu(0x866);
         }
     }
     g_MemTagStack->Push("Audio");
@@ -345,8 +345,8 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
                 return 0;
         }
         if (event->kind == 0 && event->control == 0x1d &&
-            field_0x14->keyboard->UnknownVirtualSlot5(0x45, 0x3f, 0) && ui) {
-            if (field_0x08)
+            controlInterface->keyboard->UnknownVirtualSlot5(0x45, 0x3f, 0) && ui) {
+            if (network)
                 goto handled;
             goto toggle;
         }
@@ -368,18 +368,18 @@ int TrackGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntr
         g_MemTagStack->UnknownFunction4a2bc0("In Game");
         if (!menuIsOpen) {
             int category = g_MemTagStack->Push("UI");
-            UnknownFunction521860(1, 0x191, 1);
+            SetMenuOpen(1, 0x191, 1);
             g_MemTagStack->Pop(category);
         }
         return 1;
     }
-    if (!field_0x08 && (UnknownFunction43caa0(0x3d, 0, event, 0x80000000) ||
+    if (!network && (UnknownFunction43caa0(0x3d, 0, event, 0x80000000) ||
                         UnknownFunction43caa0(0xc5, 0, event, 0x80000000))) {
 toggle:
         if (menuIsOpen)
-            UnknownFunction521860(0, 0x190, 1);
+            SetMenuOpen(0, 0x190, 1);
         else
-            UnknownFunction521860(1, 0x190, 1);
+            SetMenuOpen(1, 0x190, 1);
 handled:
         return 1;
     }
@@ -387,17 +387,17 @@ handled:
 }
 
 // 0x00521860
-void TrackGame::UnknownFunction521860(int open, int id, int sound) {
-    GameObject* menu = eventManager->UnknownFunction45d2b0();
+void TrackGame::SetMenuOpen(int open, int id, int sound) {
+    GameObject* menu = eventManager->FindRaceMode();
     if (!ui || !menu || uiInteractionBlocked)
         return;
     if (open) {
-        GameObject* other = eventManager->UnknownFunction45d2f0();
+        GameObject* other = eventManager->FindRaceView();
         if (other && !other->field_0x25_bit0)
             return;
         if (menuIsOpen)
             return;
-        ui->UnknownFunction499b20(id);
+        ui->OpenMenu(id);
         if (!menu->field_0x25_bit0)
             return;
         menu->UnknownVirtualSlot4();
@@ -406,12 +406,12 @@ void TrackGame::UnknownFunction521860(int open, int id, int sound) {
     } else {
         if (!menuIsOpen)
             return;
-        if (!ui->field_0x2c->UnknownFunction485df0())
+        if (!ui->field_0x2c->FindInputDialog())
             return;
         if (id != ui->field_0x3c)
             return;
-        ui->field_0x2c->UnknownFunction485df0()->UnknownVirtualSlot26();
-        GameObject* current = eventManager->UnknownFunction45d2b0();
+        ui->field_0x2c->FindInputDialog()->UnknownVirtualSlot26();
+        GameObject* current = eventManager->FindRaceMode();
         if (current)
             current->UnknownVirtualSlot5();
         menuIsOpen = 0;
@@ -421,7 +421,7 @@ void TrackGame::UnknownFunction521860(int open, int id, int sound) {
 }
 
 // 0x00521970
-int TrackGame::UnknownFunction521970(int id, char* buffer, int size) {
+int TrackGame::LoadResourceString(int id, char* buffer, int size) {
     if (!field_0x420) {
         strcpy(buffer, "Resource String Unavailable");
         return 0;
@@ -437,7 +437,7 @@ int TrackGame::UnknownFunction521970(int id, char* buffer, int size) {
 
 // 0x00521a30
 void TrackGame::UnknownFunction521a30() {
-    ((PCSoundInterface*)field_0x04)->UnknownFunction4be9b0(0);
+    ((PCSoundInterface*)soundInterface)->UnknownFunction4be9b0(0);
 }
 
 // 0x00521a40

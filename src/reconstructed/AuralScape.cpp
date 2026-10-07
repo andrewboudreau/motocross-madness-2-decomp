@@ -11,7 +11,7 @@
 #include "TrackGame.h"
 #include "VehicleCamera.h"
 
-#define SoundSystem() ((PCSoundInterface*)g_UnknownGlobal56e26c->field_0x04)
+#define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
 // TU extent (strong inference): 0x00401a30..0x00403d4b. Arrow.cpp's
 // initializer is the .CRT$XCU entry 0x00566004; the next five entries
@@ -203,7 +203,7 @@ SoundEmitter* SoundEmitter::UnknownFunction402260(void* target, const char* name
         strncpy(field_0x48, name, sizeof(field_0x48) - 1);
         field_0x48[sizeof(field_0x48) - 1] = 0;
         sprintf(path, "%s\\%s", "Res", field_0x48);
-        found = g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)field_0x48);
+        found = g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)field_0x48);
     }
     if (!found) {
         if (stream)
@@ -718,22 +718,22 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
     for (int i = 0; i < field_0x38; i++)
         field_0x3c[i]->UnknownFunction402bc0();
 
-    DebugOverlay* overlay = g_UnknownGlobal56e26c->field_0x38;
+    DebugOverlay* overlay = g_TrackGame->debugOverlay;
     if (overlay) {
         if (field_0x9c < 0)
             field_0x9c = overlay->NewPage();
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447fa0(field_0x9c, "Audio");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "Hardware");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447fa0(field_0x9c, "Audio");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Hardware");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x9c, "3D HW Buffers %d Free %d", SoundSystem()->field_0x3fc.maxHw3DAllBuffers,
             SoundSystem()->field_0x3fc.freeHw3DAllBuffers);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x9c, "2D HW Buffers %d Free %d", SoundSystem()->field_0x3fc.maxHwMixingAllBuffers,
             SoundSystem()->field_0x3fc.freeHwMixingAllBuffers);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+        g_TrackGame->debugOverlay->UnknownFunction447f40(
             field_0x9c, "Bytes %d Free %d", SoundSystem()->field_0x3fc.totalHwMemBytes,
             SoundSystem()->field_0x3fc.freeHwMemBytes);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
 
         int sounds = 0;
         int j = 0;
@@ -748,26 +748,26 @@ int AuralScape::UnknownVirtualSlot10(float frameTime) {
                 bytes += sound->field_0x198;
             }
         }
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "Sounds %d Playing %d", sounds,
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Sounds %d Playing %d", sounds,
                                                                  playing);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "AuralScape");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "NumEmitters %d", field_0x44.m_count);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "Audible %d", field_0x58.m_count);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "AuralScape");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "NumEmitters %d", field_0x44.m_count);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Audible %d", field_0x58.m_count);
         int loaded = 0;
         for (int k = 0; k < field_0x44.m_count; k++) {
             if (field_0x44.Get(k)->field_0x34)
                 loaded++;
         }
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "Loaded %d", loaded);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "Playing %d", field_0x6c.m_count);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "ReverbZone %d", zone);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "ReverbEnviro %d", environment);
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "");
-        g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "Total Wave Memory %d", bytes);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Loaded %d", loaded);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Playing %d", field_0x6c.m_count);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "ReverbZone %d", zone);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "ReverbEnviro %d", environment);
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "");
+        g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "Total Wave Memory %d", bytes);
         if (SoundSystem()->field_0x46c)
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x9c, "SoundCacheBytes %d",
+            g_TrackGame->debugOverlay->UnknownFunction447f40(field_0x9c, "SoundCacheBytes %d",
                                                                      SoundSystem()->field_0x46c->field_0x28);
     }
     return GameObject::UnknownVirtualSlot10(frameTime);

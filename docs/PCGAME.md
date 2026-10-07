@@ -44,7 +44,12 @@ The following are exact (35 calibration cases):
 The registry slots read and write values under
 `HKEY_LOCAL_MACHINE\<+0x4b8>`. A `Sub\Value` name selects a subkey.
 `UNKNOWN_SETTING_PATH` stands for the path-building code that every one of
-them repeats. Slots 25-27 are one folded body.
+them repeats. Slots 25-27 are one folded body. Names: 20
+`GetRegistryInt`, 21 `GetRegistryFloat`, 22 `GetRegistryFlag`, 23
+`GetRegistryString`, 24 `GetRegistryBinary`, 25 `SetRegistryInt` (its
+values are read back with slot 20), 27 `SetRegistryFlag` (its keys are read
+back with slot 22), 28 `SetRegistryString`, 29 `SetRegistryBinary`. Slot
+26 has no known caller and keeps its provisional name.
 
 `0x004bfa80` is placed in PCGame.cpp by position only: it sits immediately
 before the constructor.

@@ -47,10 +47,10 @@ extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
 // 0x0045cb20: adds *step to KrustyUI's "ProgressBar"; without a step it
 // calls KrustyUI 0x0049b530.
 void LoadProgressCallback(int* step) {
-    KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+    KrustyUI* ui = g_TrackGame->ui;
     if (step) {
         if (ui->field_0x490) {
-            UnknownGameUiControl* bar = ui->field_0x490->UnknownFunction46ebf0("ProgressBar", 0);
+            UIControl* bar = ui->field_0x490->UnknownFunction46ebf0("ProgressBar", 0);
             static_cast<UIProgressBar*>(bar)->field_0x1f0 += *step;
         }
     } else {
@@ -61,35 +61,35 @@ void LoadProgressCallback(int* step) {
 // 0x0045e710: leaves the race for `menu`: restores the UI, the window's
 // input context and 640x480x16, and shows the transition dialog.
 void EventManager::UnknownFunction45e710(int menu) {
-    if (!g_UnknownGlobal56e26c->ui)
+    if (!g_TrackGame->ui)
         return;
-    UnknownTrackGameObject56cItem* item = g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485df0();
+    UnknownTrackGameObject56cItem* item = g_TrackGame->ui->field_0x2c->FindInputDialog();
     if (item)
         item->UnknownFunction46ff30(0);
-    if (g_UnknownGlobal56e26c->ui->field_0x494)
-        ImmAssociateContext(g_UnknownGlobal56e26c->field_0x31c, g_UnknownGlobal56e26c->ui->field_0x494);
-    if (g_UnknownGlobal56e26c->ui->field_0x498)
-        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction4868b0(1);
-    g_UnknownGlobal56e26c->uiInteractionBlocked = 0;
-    g_UnknownGlobal56e26c->field_0x3438 = 0;
-    g_UnknownGlobal56e26c->field_0x3434 = 0;
-    if (!g_UnknownGlobal56e26c->mode.field_0xa20)
-        g_UnknownGlobal56e26c->UnknownFunction521a40();
-    UnknownDisplayMode* current = &g_UnknownGlobal56e26c->field_0x0c->field_0x10[g_UnknownGlobal56e26c->mode.field_0xa4c];
+    if (g_TrackGame->ui->field_0x494)
+        ImmAssociateContext(g_TrackGame->field_0x31c, g_TrackGame->ui->field_0x494);
+    if (g_TrackGame->ui->field_0x498)
+        g_TrackGame->ui->field_0x2c->EnableWindowClipper(1);
+    g_TrackGame->uiInteractionBlocked = 0;
+    g_TrackGame->field_0x3438 = 0;
+    g_TrackGame->field_0x3434 = 0;
+    if (!g_TrackGame->mode.field_0xa20)
+        g_TrackGame->UnknownFunction521a40();
+    UnknownDisplayMode* current = &g_TrackGame->display->field_0x10[g_TrackGame->mode.field_0xa4c];
     if (current->width != 640 || current->height != 480 || current->bitDepth != 16)
-        g_UnknownGlobal56e26c->UnknownVirtualSlot19(
-            g_UnknownGlobal56e26c->field_0x0c->UnknownFunction52d250(640, 480, 16, 0, 0));
-    g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485ef0();
-    UnknownKrustyUIGuiLayer* layer = g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction486540(0);
-    layer->field_0xc0->field_0x5c = g_UnknownGlobal56e26c->mode.field_0x6d4;
-    if (!g_UnknownGlobal56e26c->field_0x3428 && !g_UnknownGlobal56e26c->ui->field_0x4a8 &&
-        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4)
-        g_UnknownGlobal56e26c->ui->UnknownFunction49bbb0();
-    g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction486630(1);
+        g_TrackGame->UnknownVirtualSlot19(
+            g_TrackGame->display->UnknownFunction52d250(640, 480, 16, 0, 0));
+    g_TrackGame->ui->field_0x2c->CreateBackground();
+    UnknownKrustyUIGuiLayer* layer = g_TrackGame->ui->field_0x2c->GetUser(0);
+    layer->field_0xc0->field_0x5c = g_TrackGame->mode.field_0x6d4;
+    if (!g_TrackGame->field_0x3428 && !g_TrackGame->ui->field_0x4a8 &&
+        g_TrackGame->mode.field_0x27f8.field_0x00 != 0 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4)
+        g_TrackGame->ui->UnknownFunction49bbb0();
+    g_TrackGame->ui->field_0x2c->ShowCursors(1);
     TransDlg* dialog = new(__FILE__, 1064) TransDlg;
-    g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
-    dialog->UnknownFunction455c40(menu);
-    ((PCSoundInterface*)g_UnknownGlobal56e26c->field_0x04)->UnknownFunction4be9b0(0);
+    g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
+    dialog->SetNextMenu(menu);
+    ((PCSoundInterface*)g_TrackGame->soundInterface)->UnknownFunction4be9b0(0);
 }
 
 // Views for the podium scene 0x0045d480. Only what it calls is declared.
@@ -213,29 +213,29 @@ int EventManager::CreatePodiumScene() {
     char name[256];
     char path[260];
     char message[388];
-    UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
-    TrackGameViewOwner* owner = UnknownFunction45d2b0();
-    UnknownKrustyBikeView* view = UnknownFunction45d2f0();
+    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+    TrackGameViewOwner* owner = FindRaceMode();
+    UnknownKrustyBikeView* view = FindRaceView();
     int iterator = 0;
     int ok;
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
-        ok = field_0x48 > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c;
+    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2)
+        ok = field_0x48 > g_TrackGame->mode.field_0x27f8.field_0x0c;
     else
         ok = 1;
     if (circuit) {
         if (!PodiumIsLastRace(circuit))
             return 0;
     } else {
-        if (!ok || !*(int*)g_UnknownGlobal56e26c->mode.field_0x6c4)
+        if (!ok || !*(int*)g_TrackGame->mode.field_0x6c4)
             return 0;
-        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 2 && !g_UnknownGlobal56e26c->field_0x08 &&
+        if (g_TrackGame->mode.field_0x27f8.field_0x00 != 2 && !g_TrackGame->network &&
             field_0x50[0].field_0x04 > 3)
             return 0;
     }
     UnknownFunction45cdc0(1);
     PCCamera* camera = new(__FILE__, 0x276) PCCamera(1);
     podiumCamera = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
-    if (!view->UnknownFunction469190(podiumCamera, -1))
+    if (!view->AppendChild(podiumCamera, -1))
         return 0;
     ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(podiumCamera);
     podiumCamera->UnknownFunction469260(view->field_0x50, -1);
@@ -249,7 +249,7 @@ int EventManager::CreatePodiumScene() {
     Vector3 direction;
     Vector3 up;
     if (grid->field_0x98.x == 0.0f && grid->field_0x98.y == 0.0f && grid->field_0x98.z == 0.0f) {
-        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
+        if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
             PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->UnknownFunction4fc970(&field_0x3c4);
             PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->UnknownFunction4fc4f0(&direction, &up);
         } else {
@@ -268,7 +268,7 @@ int EventManager::CreatePodiumScene() {
     Vector3 facings[3];
     Vector3 cameraOffset;
     Vector3 lookOffset;
-    int kind = g_UnknownGlobal56e26c->mode.UnknownFunction524100();
+    int kind = g_TrackGame->mode.UnknownFunction524100();
     if (kind >= 2 && kind <= 4) {
         offsets[0] = Vector3(0.0f, 0.383f, 0.0f);
         offsets[1] = Vector3(0.0f, 0.383f, 0.0f);
@@ -302,7 +302,7 @@ int EventManager::CreatePodiumScene() {
         facings[i] = rotated * PodiumLength(facings[i]);
     }
     UnknownPodiumContext context;
-    context.field_0x00 = g_UnknownGlobal56e26c->field_0x3c;
+    context.field_0x00 = g_TrackGame->field_0x3c;
     context.field_0x04 = PODIUM_OWNER(owner)->field_0x94;
     context.field_0x08 = PODIUM_OWNER(owner)->field_0x98;
     context.field_0x0c = ((RenderTarget*)field_0x18)->field_0x28;
@@ -322,13 +322,13 @@ int EventManager::CreatePodiumScene() {
         racer = PODIUM_OWNER(owner)->field_0x34->UnknownFunction4204e0(&iterator);
         while (racer && ((UnknownPodiumRacer*)racer)->field_0x784 != place)
             racer = PODIUM_OWNER(owner)->field_0x34->UnknownFunction4204e0(&iterator);
-        if (g_UnknownGlobal56e26c->UnknownFunction521cd0() &&
-            (g_UnknownGlobal56e26c->field_0x3444->field_0x464 & 2) &&
+        if (g_TrackGame->UnknownFunction521cd0() &&
+            (g_TrackGame->field_0x3444->field_0x464 & 2) &&
             racer == PODIUM_OWNER(owner)->field_0x34->field_0x38)
             sprintf(name, "%s\\Winnerd.mcf", "Res");
         else
             sprintf(name, "%s\\Winner.mcf", "Res");
-        if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", (int)path)) {
+        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", (int)path)) {
             sprintf(message, "No winner animation file found in resources.  Aborting podium scene.");
             delete stream;
             return 0;
@@ -336,11 +336,11 @@ int EventManager::CreatePodiumScene() {
         D3DIMSoultreeCharacter*& character = podiumCharacters[place - 1];
         character = new(__FILE__, 0x31d) D3DIMSoultreeCharacter(field_0x25_bit0);
         character->CharacterVirtualSlot11(field_0x18, path, PODIUM_OWNER(owner)->field_0x7c, &context, 1, 1);
-        view->UnknownFunction469190(character, -1);
+        view->AppendChild(character, -1);
         if (character) {
             if (PODIUM_OWNER(owner)->field_0x7c && PODIUM_OWNER(owner)->field_0x7c->field_0x25_bit0)
                 character->field_0x1a0->UnknownFunction4444c0(1);
-            int mode = g_UnknownGlobal56e26c->mode.UnknownFunction524100();
+            int mode = g_TrackGame->mode.UnknownFunction524100();
             if (mode == 3 || mode == 2 || mode == 4) {
                 if (chance < 0.5f && podiumCharacterCount != 1)
                     sprintf(name, "Podium3_%02d", place);
@@ -363,10 +363,10 @@ int EventManager::CreatePodiumScene() {
         }
     }
     delete stream;
-    if (g_UnknownGlobal56e26c->mode.field_0xa28 && g_UnknownGlobal56e26c->mode.field_0x23a4) {
+    if (g_TrackGame->mode.field_0xa28 && g_TrackGame->mode.field_0x23a4) {
         UnknownPodiumSound* sound = new(__FILE__, 0x34e) UnknownPodiumSound(PODIUM_OWNER(owner)->field_0x2c->field_0xc4, 1);
         UnknownTextureStream* audio = new(__FILE__, 0x34f) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-        if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(audio, "CrowdLoop.wav", "rb", 0)) {
+        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(audio, "CrowdLoop.wav", "rb", 0)) {
             sprintf(message, "CrowdLoop.wav not found in Audio.res.\n");
             delete audio;
             return 0;
@@ -389,6 +389,6 @@ int EventManager::CreatePodiumScene() {
     RemoveVegetationInRect(x0, z0, x1, z1);
     UnknownFunction45fdc0(x0, z0, x1, z1);
     field_0x440 = 0;
-    g_UnknownGlobal56e26c->UnknownFunction468880();
+    g_TrackGame->UnknownFunction468880();
     return 1;
 }

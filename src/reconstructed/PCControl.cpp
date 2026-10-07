@@ -73,7 +73,7 @@ PCControlInterface::PCControlInterface() {
 // mouse, then the attached joysticks; without any joystick, one is created
 // anyway. The first joystick becomes the active one.
 int PCControlInterface::UnknownVirtualSlot1() {
-    if (DirectInputCreateEx(g_UnknownGlobal56e26c->field_0x318, 0x700, IID_IDirectInput7A,
+    if (DirectInputCreateEx(g_TrackGame->field_0x318, 0x700, IID_IDirectInput7A,
                             (void**)&directInput, 0) < 0)
         return 0;
     keyboard = new(__FILE__, 107) PCKeyboardDevice;

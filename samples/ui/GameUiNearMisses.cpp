@@ -113,8 +113,8 @@ void UnknownGameUiDialog::UnknownVirtualSlot28(int value) {
 // 0x0046ea80
 void UIDialog::EnableGroup(int id, int value) {
     GameObjectIterator iterator(((UnknownGameUiDialog*)this)->controlContainer, 1, "UIControl");
-    UnknownGameUiControl* control;
-    while ((control = (UnknownGameUiControl*)iterator.Next()) != 0) {
+    UIControl* control;
+    while ((control = (UIControl*)iterator.Next()) != 0) {
         if (control->groupId == id)
             control->UnknownVirtualSlot49(value);
     }
@@ -130,16 +130,16 @@ void UIDialog::NotifyParent(int a, int b) {
         event.code = a;
         event.controlName = 0;
         event.dialog = parent;
-        event.control = (UnknownGameUiControl*)this;
+        event.control = (UIControl*)this;
         event.gui = parent->guiManager;
         parent->UnknownVirtualSlot29(&event);
     }
 }
 
 // 0x00470170
-UnknownGameUiControl::UnknownGameUiControl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner)
+UIControl::UIControl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner)
     : GameObject(1) {
-    UnknownFunction469ce0(this);
+    AppendClassName(this);
     controlType = type;
     eventCode = id;
     if (area) {
@@ -216,8 +216,8 @@ UnknownGameUiControl::UnknownGameUiControl(int type, int id, CameraRect* area, U
 }
 
 // 0x00470450
-UnknownGameUiControl::~UnknownGameUiControl() {
-    if (ownerDialog && !g_UnknownGlobal56e26c->field_0x2d5_bit1) {
+UIControl::~UIControl() {
+    if (ownerDialog && !g_TrackGame->field_0x2d5_bit1) {
         field_0x25_bit3 = 1;
         ToolTip* tip = 0;
         if (ownerDialog->guiUser) {
@@ -248,7 +248,7 @@ UnknownGameUiControl::~UnknownGameUiControl() {
 }
 
 // 0x004705d0
-void UnknownGameUiControl::UnknownVirtualSlot49(int enable) {
+void UIControl::UnknownVirtualSlot49(int enable) {
     if (enabled == enable)
         return;
     enabled = enable;
@@ -266,7 +266,7 @@ void UnknownGameUiControl::UnknownVirtualSlot49(int enable) {
 }
 
 // 0x00470f10
-void UnknownGameUiControl::UnknownVirtualSlot39() {
+void UIControl::UnknownVirtualSlot39() {
     UnknownGameUiDialog* owner = ownerDialog;
     int left = field_0x3c[0];
     field_0x2c[0] = (int)(left * owner->scaleX);
@@ -291,8 +291,8 @@ void UnknownGameUiControl::UnknownVirtualSlot39() {
     field_0x4c[1] = field_0x2c[1] < 0 ? -field_0x2c[1] : 0;
     int width = right - left;
     int height = bottom - top;
-    int over = field_0x2c[2] - g_UnknownGlobal56e26c->field_0x10->field_0x0c;
-    int under = field_0x2c[3] - g_UnknownGlobal56e26c->field_0x10->field_0x10;
+    int over = field_0x2c[2] - g_TrackGame->renderTarget->field_0x0c;
+    int under = field_0x2c[3] - g_TrackGame->renderTarget->field_0x10;
     if (over > 0)
         width -= over;
     field_0x4c[2] = width;
@@ -302,7 +302,7 @@ void UnknownGameUiControl::UnknownVirtualSlot39() {
 }
 
 // 0x004715d0
-int UnknownGameUiControl::UnknownVirtualSlot41() {
+int UIControl::UnknownVirtualSlot41() {
     if (field_0x164 == 0 && field_0xb0 && !field_0x25_bit2) {
         g_UnknownGlobal65b60c = field_0xb0 < 0 ? 7 : field_0xb0;
         field_0x88 = 21.0f;
@@ -354,7 +354,7 @@ int UnknownGameUiControl::UnknownVirtualSlot41() {
 }
 
 // 0x00472130
-int UnknownGameUiControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
+int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
     GUIInputDevice* device = ownerDialog->guiUser->UnknownFunction4882a0(event);
     if (device) {
         POINT position = device->pointerPosition;
@@ -426,7 +426,7 @@ void UIScrollCtl::UnknownVirtualSlot60(int value) {
     UnknownDialogEvent event;
     event.handled = 0;
     GameObjectIterator* iterator;
-    UnknownGameUiControl* control;
+    UIControl* control;
     switch (timer->timerId) {
     case 0x101:
         ownerDialog->RemoveTimer(timer);
@@ -483,7 +483,7 @@ int UIScrollBar::UnknownFunction4753c0(int value, int range) {
 
 // 0x00475c70
 UIListBox::UIListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* owner)
-    : UnknownGameUiControl(3, id, area, owner) {
+    : UIControl(3, id, area, owner) {
     selectBrush = 0;
     itemBrush = 0;
     rowCount = 0;
@@ -567,7 +567,7 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
     visibleRowCount = CountVisibleRows();
     UpdateScrollBars();
     if (autoSort)
-        UnknownFunction477900(1);
+        Sort(1);
     return 1;
 }
 
@@ -593,7 +593,7 @@ int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
     visibleRowCount = CountVisibleRows();
     UpdateScrollBars();
     if (autoSort)
-        UnknownFunction477900(1);
+        Sort(1);
     return 1;
 }
 
@@ -668,8 +668,8 @@ void UIListBox::UpdateScrollBars() {
     }
     lastPageRowCount = lastPageRowCount < 0 ? 0 : lastPageRowCount;
     GameObjectIterator iterator(owner->controlContainer, 1, "UIControl");
-    UnknownGameUiControl* control;
-    while ((control = (UnknownGameUiControl*)iterator.Next()) != 0) {
+    UIControl* control;
+    while ((control = (UIControl*)iterator.Next()) != 0) {
         if (control->attachId == attachId && (control->controlType == 8 || control->controlType == 7))
             static_cast<UIScrollBar*>(control)->UnknownFunction475200(this);
     }
@@ -699,10 +699,10 @@ int UIListBox::UnknownVirtualSlot55(int a, int b) {
             }
         } else if (a == 1 && allowWScroll) {
             field_0x22c = point->x;
-            return UnknownGameUiControl::UnknownVirtualSlot55(a, b);
+            return UIControl::UnknownVirtualSlot55(a, b);
         }
     }
-    return UnknownGameUiControl::UnknownVirtualSlot55(a, b);
+    return UIControl::UnknownVirtualSlot55(a, b);
 }
 
 // 0x00477ff0
@@ -712,12 +712,12 @@ int UIListBox::UnknownVirtualSlot56(int a, int* position) {
         field_0x234 = 0;
         field_0x230 += delta;
     }
-    return UnknownGameUiControl::UnknownVirtualSlot56(a, position);
+    return UIControl::UnknownVirtualSlot56(a, position);
 }
 
 // 0x00478040
 int UIListBox::UnknownVirtualSlot21(int key) {
-    if (!UnknownGameUiControl::UnknownVirtualSlot21(key) &&
+    if (!UIControl::UnknownVirtualSlot21(key) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this && selectable) {
         int row;
         switch (key) {
@@ -837,7 +837,7 @@ unlock:
 // 0x00472960
 UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) {
     if (_stricmp(file + strlen(file) - 4, ".wav")) {
-        int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+        int format = g_TrackGame->renderTarget->field_0x28;
         ownsSound = 0;
         isSound = 0;
         frameSound = 0;
@@ -884,7 +884,7 @@ int UIFrame::UnknownFunction472bc0(void* stream, int offset, void* palette) {
     if (stream) {
         UnknownTgaFile* image = UnknownFunction511dd0((UnknownTextureStream*)stream, 0, offset);
         if (image) {
-            int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+            int format = g_TrackGame->renderTarget->field_0x28;
             frameWidth = image->width;
             frameHeight = image->height;
             frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)field_0x20, 1);
@@ -933,7 +933,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
             timer->elapsedTime += (int)(frameTime * 1000.0f);
             if ((unsigned int)timer->elapsedTime >= (unsigned int)timer->periodTime) {
                 timer->elapsedTime = 0;
-                UnknownGameUiControl* control;
+                UIControl* control;
                 if ((control = timer->targetControl) != 0) {
                     control->UnknownVirtualSlot60((int)timer);
                 } else {
@@ -952,7 +952,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
             }
         }
         GUIUser* user = dialog->guiUser;
-        UnknownGameUiControl* focus = (UnknownGameUiControl*)user->field_0x1d8;
+        UIControl* focus = (UIControl*)user->field_0x1d8;
         user->UnknownFunction487fb0(focus && focus->mouseAnim ? (UnknownCursorAnimation*)focus->mouseAnim
                                                                  : dialog->cursorAnimation);
         GUIInputDevice* device;
@@ -964,14 +964,14 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
                 if (focus) {
                     if (x <= -1) {
                         if (dialog->joystickCentred) {
-                            UnknownGameUiControl* next = focus->UnknownFunction4727c0();
+                            UIControl* next = focus->UnknownFunction4727c0();
                             dialog->joystickCentred = 0;
                             if (next)
                                 UnknownFunction470000(next, 0, 0);
                         }
                     } else if (x >= 1) {
                         if (dialog->joystickCentred) {
-                            UnknownGameUiControl* next = focus->UnknownFunction472810();
+                            UIControl* next = focus->UnknownFunction472810();
                             dialog->joystickCentred = 0;
                             if (next)
                                 UnknownFunction470000(next, 0, 0);
@@ -997,7 +997,7 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
 // 0x004734c0: whether `point` is on an opaque pixel of the image.
 int UIButton::UnknownVirtualSlot28(POINT point, int state) {
     int opaque = 0;
-    int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+    int format = g_TrackGame->renderTarget->field_0x28;
     RECT rect = *(RECT*)field_0x2c;
     if (PtInRect(&rect, point)) {
         point.x -= rect.left;
@@ -1007,7 +1007,7 @@ int UIButton::UnknownVirtualSlot28(POINT point, int state) {
         UnknownSurfaceDesc desc;
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
-        if (!texture->field_0x70->UnknownMethod25(0, &desc, 1, 0)) {
+        if (!texture->field_0x70->Lock(0, &desc, 1, 0)) {
             int offset = desc.pitch * y / UnknownFunction511970(format) + x;
             if (format == 8) {
                 if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
@@ -1016,7 +1016,7 @@ int UIButton::UnknownVirtualSlot28(POINT point, int state) {
                 if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
                     opaque = 1;
             }
-            if (texture->field_0x70->UnknownMethod32(0))
+            if (texture->field_0x70->Unlock(0))
                 return opaque;
         }
         return opaque;
@@ -1027,7 +1027,7 @@ int UIButton::UnknownVirtualSlot28(POINT point, int state) {
 // 0x00478e10: the same test as UIButton slot 28 (0x004734c0).
 int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
     int opaque = 0;
-    int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+    int format = g_TrackGame->renderTarget->field_0x28;
     RECT rect = *(RECT*)field_0x2c;
     if (PtInRect(&rect, point)) {
         point.x -= rect.left;
@@ -1037,7 +1037,7 @@ int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
         UnknownSurfaceDesc desc;
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
-        if (!texture->field_0x70->UnknownMethod25(0, &desc, 1, 0)) {
+        if (!texture->field_0x70->Lock(0, &desc, 1, 0)) {
             int offset = desc.pitch * y / UnknownFunction511970(format) + x;
             if (format == 8) {
                 if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
@@ -1046,7 +1046,7 @@ int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
                 if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
                     opaque = 1;
             }
-            if (texture->field_0x70->UnknownMethod32(0))
+            if (texture->field_0x70->Unlock(0))
                 return opaque;
         }
         return opaque;
@@ -1134,11 +1134,11 @@ int UIEditBox::UnknownVirtualSlot40() {
                     FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
             }
             ownerDialog->EndControlDraw(dc);
-            if (g_UnknownGlobal56e26c->field_0x0c->field_0x6c &&
+            if (g_TrackGame->display->field_0x6c &&
                 ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
                 if (ownerDialog && ownerDialog->dialogBackground)
                     ownerDialog->dialogBackground->UnknownFunction404c80();
-                HIMC context = ImmGetContext((HWND)g_UnknownGlobal56e26c->field_0x31c);
+                HIMC context = ImmGetContext((HWND)g_TrackGame->field_0x31c);
                 if (ImmGetOpenStatus(context)) {
                     COMPOSITIONFORM composition;
                     composition.dwStyle = CFS_FORCE_POSITION;
@@ -1147,7 +1147,7 @@ int UIEditBox::UnknownVirtualSlot40() {
                     ImmSetCompositionWindow(context, &composition);
                 }
                 if (context)
-                    ImmReleaseContext((HWND)g_UnknownGlobal56e26c->field_0x31c, context);
+                    ImmReleaseContext((HWND)g_TrackGame->field_0x31c, context);
             }
         }
     } while (more);
@@ -1168,7 +1168,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
     char c = (char)value;
     int result = 0;
     event.handled = 0;
-    if (!UnknownGameUiControl::UnknownVirtualSlot20(value) &&
+    if (!UIControl::UnknownVirtualSlot20(value) &&
         ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (field_0x204_sound) {
             field_0x204_sound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
@@ -1238,7 +1238,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
         }
         controlText[field_0xd0] = 0;
         void* dc;
-        if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->UnknownMethod17(&dc)) {
+        if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->GetDC(&dc)) {
             HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(fontHandle ? fontHandle : (int)ownerDialog->dialogFont));
             SIZE size;
             GetTextExtentPoint32A((HDC)dc, controlText, field_0xd0, &size);
@@ -1246,7 +1246,7 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
             GetTextExtentPoint32A((HDC)dc, controlText, textLength, &size);
             textWidth = size.cx;
             SelectObject((HDC)dc, font);
-            ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->UnknownMethod26(dc);
+            ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->ReleaseDC(dc);
         }
         UnknownVirtualSlot50();
         redrawFrames++;
@@ -1268,7 +1268,7 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
         UnknownDialogEvent event;
         event.handled = 0;
         GameObjectIterator* iterator;
-        UnknownGameUiControl* control;
+        UIControl* control;
         if (controlType == 9) {
             iterator = (GameObjectIterator*)UnknownVirtualSlot53();
             for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
@@ -1304,12 +1304,12 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
         ownerDialog->UnknownVirtualSlot29(&event);
         ownerDialog->AddTimer(0x101, 0xfa, (int)this);
     }
-    return UnknownGameUiControl::UnknownVirtualSlot55(a, b);
+    return UIControl::UnknownVirtualSlot55(a, b);
 }
 
 // 0x00479710: dragging the thumb; holding it still repeats kind 0x11.
 void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
-    UnknownGameUiControl::UnknownVirtualSlot57(a, position);
+    UIControl::UnknownVirtualSlot57(a, position);
     UnknownDialogEvent event;
     event.handled = 0;
     if (!a && position) {
@@ -1515,7 +1515,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     char backgroundImage[0x80];
     backgroundImage[0] = 0;
-    int depth = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+    int depth = g_TrackGame->renderTarget->field_0x28;
     memset(dialog->sectionTable, 0, sizeof(dialog->sectionTable));
     int setType = 1;
     UnknownParameterBlock parameters;
@@ -1674,7 +1674,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     short state;
     int fontHeight;
     char type[0x80];
-    UnknownGameUiControl* control;
+    UIControl* control;
     int isDefault;
     for (int pass = 0; pass < 4; pass++) {
         for (int i = 0; i < dialog->sectionCount; i++) {
@@ -1684,9 +1684,9 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
             switch (dialog->sectionTable[i].field_0x38) {
             case 0:
                 if (pass == 0) {
-                    parameters.UnknownFunction4b7f10("ScreenWidth", g_UnknownGlobal56e26c->field_0x10->field_0x0c,
+                    parameters.UnknownFunction4b7f10("ScreenWidth", g_TrackGame->renderTarget->field_0x0c,
                                                      &dialog->screenWidth);
-                    parameters.UnknownFunction4b7f10("ScreenHeight", g_UnknownGlobal56e26c->field_0x10->field_0x10,
+                    parameters.UnknownFunction4b7f10("ScreenHeight", g_TrackGame->renderTarget->field_0x10,
                                                      &dialog->screenHeight);
                     parameters.UnknownFunction4b7f10("NoScale", 0, &dialog->scaleToScreen);
                     dialog->scaleToScreen = !dialog->scaleToScreen;
@@ -1779,7 +1779,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         dialog->field_0x10c = italic;
                         dialog->field_0x108 = bold;
                     }
-                    if (g_UnknownGlobal56e26c->field_0x10->field_0x28 == 8) {
+                    if (g_TrackGame->renderTarget->field_0x28 == 8) {
                         int load = 1;
                         if (dialog->guiManager) {
                             if (dialog->guiManager->UnknownFunction4864f0())
@@ -1807,7 +1807,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         UIStatic* frame = new(__FILE__, 0x3cd) UIStatic(0, &frameArea, dialog);
                         frame->SetName("FRMBIStatic");
                         frame->permanent = 1;
-                        dialog->controlContainer->UnknownFunction469190(frame, -1);
+                        dialog->controlContainer->AppendChild(frame, -1);
                         UnknownFunction46a840(frame, 0, 0);
                     }
                 }
@@ -1987,7 +1987,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("Selectable", defaultSelectable,
                                                      isDefault ? &defaultSelectable : &value);
                     if (!isDefault)
-                        static_cast<UIListBox*>(listBox)->UnknownFunction477bb0(value);
+                        static_cast<UIListBox*>(listBox)->SetSelectable(value);
                     parameters.UnknownFunction4b7f10("AllowWScroll", defaultAllowWScroll,
                                                      isDefault ? &defaultAllowWScroll : &value);
                     if (!isDefault)
@@ -2010,7 +2010,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                                 if (buffer[0] == '@')
                                     static_cast<UIListBox*>(listBox)->AddImageRow((UIAnim*)FindSectionObject(buffer + 1), 0, 0);
                                 else
-                                    static_cast<UIListBox*>(listBox)->UnknownFunction476d80(buffer, 0, 0);
+                                    static_cast<UIListBox*>(listBox)->AddRow(buffer, 0, 0);
                             }
                             item++;
                             if (isDefault && item >= 50)
@@ -2164,7 +2164,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                                                          -1)) {
                         do {
                             if (!isDefault)
-                                static_cast<UIListBox*>(dropDownListBox)->UnknownFunction476d80(buffer, 0, 0);
+                                static_cast<UIListBox*>(dropDownListBox)->AddRow(buffer, 0, 0);
                             item++;
                             if (isDefault && item >= 50)
                                 break;
@@ -2310,7 +2310,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
 
                 control->UnknownVirtualSlot52(attachId);
                 control->groupId = groupId;
-                control->SetAnchor((UnknownGameUiControl*)FindSectionObject(anchor), relAnchor);
+                control->SetAnchor((UIControl*)FindSectionObject(anchor), relAnchor);
                 control->SetName(dialog->sectionTable[i].sectionName);
                 control->moveable = moveable;
                 if (control->field_0x3c[2] == control->field_0x3c[0]) {
@@ -2450,7 +2450,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     }
 
     if (backgroundImage[0]) {
-        UnknownGameUiControl* frame = FindControl("FRMBIStatic", 5);
+        UIControl* frame = FindControl("FRMBIStatic", 5);
         UIAnim* image = (UIAnim*)FindSectionObject(backgroundImage);
         if (image) {
             int width = image->GetCurrentTexture()->field_0x14;

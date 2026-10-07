@@ -117,8 +117,8 @@ void ManagedTexture::UnknownFunction510820(float value) {
 void ManagedTexture::UnknownVirtualSlot19() {
     if (field_0x80) {
         for (int i = 0; i < field_0x44; i++)
-            g_UnknownGlobal56e26c->field_0x10->UnknownVirtualSlot8(field_0x48[i].state, field_0x48[i].value, 0);
-        if (field_0x30 && field_0x80->field_0x74 && field_0x80->field_0x74->UnknownMethod29(8, &field_0x34))
+            g_TrackGame->renderTarget->UnknownVirtualSlot8(field_0x48[i].state, field_0x48[i].value, 0);
+        if (field_0x30 && field_0x80->field_0x74 && field_0x80->field_0x74->SetColorKey(8, &field_0x34))
             return;
         field_0x80->UnknownVirtualSlot11();
     } else if (field_0x74) {

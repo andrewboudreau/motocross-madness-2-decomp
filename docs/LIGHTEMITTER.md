@@ -22,8 +22,8 @@ Names are provisional.
   `0x004aa010..0x004aa7e9`): the MSN Gaming Zone queries and score report
   of TrackGame+0x3410, the per-file vectors and the construction/atexit of
   the global TrackGame at `0x006851a0`. The definition of
-  `g_UnknownGlobal56e26c` is placed here because `0x0056e26c` follows this
-  file's strings in .data (strong inference). `UnknownFunction520820` is
+  `g_TrackGame` is placed here because `0x0056e26c` follows this
+  file's strings in .data (strong inference). `SendDebugMessage` is
   now declared variadic (retail calls `_vsnprintf`). 14 cases. Near misses
   in `samples/net/MSZoneInterfaceNearMisses.cpp`: the lobby queries
   `0x004aa360` and `0x004aa4e0` (failure-block placement). The soultree
