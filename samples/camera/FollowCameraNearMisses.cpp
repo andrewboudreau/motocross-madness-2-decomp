@@ -626,7 +626,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     bool moved = UnknownVirtualSlot45(current, dt);
     UnknownVirtualSlot42(wide);
     bool following = UnknownVirtualSlot75();
-    target = UnknownVirtualSlot48(wide || field_0x274, following, *(int*)&dt);
+    target = UnknownVirtualSlot48(wide || field_0x274, following, dt);
     position = UnknownVirtualSlot49(following, target, dt);
     if (!field_0x288) {
         field_0x284 = new(__FILE__, 0x4b0) UnknownFollowCameraValue(target.z, 0.3f);

@@ -54,6 +54,7 @@ public:
                                       float value2d0, float value2e8, int capacity, int count,
                                       const int* list);
 
+    virtual Vector3 UnknownVirtualSlot34(float dt);
     virtual Vector3 UnknownVirtualSlot37();
     virtual void UnknownVirtualSlot40(float a);
     virtual Vector3 UnknownVirtualSlot50();

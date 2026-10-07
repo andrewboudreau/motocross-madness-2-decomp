@@ -8,6 +8,18 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
+// By-value read of a vector's x. Slot 34's dot product needs it: retail loads
+// the returned vector's x before the member's but the member's y and z first,
+// and only this form gives that order (every term order, grouping, operand
+// order, operator[], pointer/by-value parameters and a reference local keep
+// the x product in the y/z order).
+static inline float VectorX(const Vector3& v) { return v.x; }
+
+// The inline dot product slot 34 uses; the grouping gives retail's y, x, z order.
+static inline float BikeCameraDot(const Vector3& a, const Vector3& b) {
+    return a.z * b.z + (VectorX(a) * b.x + a.y * b.y);
+}
+
 // 0x00416e20
 BikeCamera::BikeCamera(int flags) : VehicleCamera(flags) {
     bike = 0;
@@ -55,6 +67,36 @@ Vector3 BikeCamera::UnknownVirtualSlot37() {
     result.x = (targetPoint.x - head.x) * 0.38f + head.x;
     result.y = (targetPoint.y - head.y) * 0.38f + head.y;
     result.z = (targetPoint.z - head.z) * 0.38f + head.z;
+    return result;
+}
+
+// 0x00417050: in camera mode +0x276, the rider's part position led by the
+// bike's +0x604 -> +0x40 -> +0x154 vector times dt (scaled by
+// 4 - 0.006 * height below height 500); otherwise the target point plus the
+// +0x29c direction times a distance built from the dot product with slot
+// 33, the fov/zoom ratio and vehicle +0x438. Raised by 3.
+Vector3 BikeCamera::UnknownVirtualSlot34(float dt) {
+    Vector3 result;
+    if (field_0x276) {
+        bike->field_0x5c4->field_0x1a0->UnknownFunction4fc9a0(0, &result);
+        if (field_0x2c0 < 500.0f) {
+            Vector3 lead = bike->field_0x604->field_0x40->field_0x154 * dt;
+            lead = lead * (4.0f - field_0x2c0 * 0.006f);
+            result += lead;
+        } else {
+            result += bike->field_0x604->field_0x40->field_0x154 * dt;
+        }
+    } else {
+        float dot = BikeCameraDot(UnknownVirtualSlot33(), field_0x29c);
+        float height = field_0x2c0 * 0.009f + 1.0f;
+        float ratio = field_0x16c / field_0x1dc;
+        float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
+        float lag = (1.0f - field_0x2c0 * 0.00052631577f) * ratio;
+        float distance = lag * (height * height * dot / speed) * 35.0f;
+        Vector3 offset = field_0x29c * distance;
+        result = Vector3(offset.x + targetPoint.x, offset.y + targetPoint.y, offset.z + targetPoint.z);
+    }
+    result.y += 3.0f;
     return result;
 }
 

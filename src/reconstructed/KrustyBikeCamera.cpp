@@ -9,6 +9,15 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
+// By-value read of a vector's x; slot 34's dot product needs it for retail's
+// load order, as in BikeCamera.cpp.
+static inline float VectorX(const Vector3& v) { return v.x; }
+
+// The inline dot product slot 34 uses; the grouping gives retail's y, x, z order.
+static inline float KrustyCameraDot(const Vector3& a, const Vector3& b) {
+    return a.z * b.z + (VectorX(a) * b.x + a.y * b.y);
+}
+
 // 0x00497cb0: restores the saved state (slot 62) and applies it; virtual
 // calls in a constructor bind statically.
 KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
@@ -140,22 +149,51 @@ void KrustyBikeCamera::UnknownVirtualSlot58() {
     }
 }
 
+// 0x00498340: BikeCamera slot 34 (0x00417050) with a raw-target case while
+// the +0x3b8 view's +0x3f8 flag is set.
+Vector3 KrustyBikeCamera::UnknownVirtualSlot34(float dt) {
+    Vector3 result;
+    if (field_0x276) {
+        bike->field_0x5c4->field_0x1a0->UnknownFunction4fc9a0(0, &result);
+        if (field_0x2c0 < 500.0f) {
+            Vector3 lead = bike->field_0x604->field_0x40->field_0x154 * dt;
+            lead = lead * (4.0f - field_0x2c0 * 0.006f);
+            result += lead;
+        } else {
+            result += bike->field_0x604->field_0x40->field_0x154 * dt;
+        }
+    } else if (raceView->field_0x3f8) {
+        result = targetPoint;
+    } else {
+        float dot = KrustyCameraDot(UnknownVirtualSlot33(), field_0x29c);
+        float height = field_0x2c0 * 0.009f + 1.0f;
+        float ratio = field_0x16c / field_0x1dc;
+        float speed = vehicleMode ? vehicle->field_0x438 : 180.0f;
+        float lag = (1.0f - field_0x2c0 * 0.00052631577f) * ratio;
+        float distance = lag * (height * height * dot / speed) * 35.0f;
+        Vector3 offset = field_0x29c * distance;
+        result = Vector3(offset.x + targetPoint.x, offset.y + targetPoint.y, offset.z + targetPoint.z);
+    }
+    result.y += 3.0f;
+    return result;
+}
+
 // 0x004985b0: FollowCamera slot 48 plus a raw-target case while the +0x3b8
 // view flags are set.
-Vector3 KrustyBikeCamera::UnknownVirtualSlot48(int a, bool flag, int b) {
+Vector3 KrustyBikeCamera::UnknownVirtualSlot48(int a, bool flag, float dt) {
     Vector3 result;
     if (cameraState == 5) {
         if (overrideActive)
             result = cachedTarget;
         else
-            result = UnknownVirtualSlot34(b);
+            result = UnknownVirtualSlot34(dt);
     } else if (cameraState == 7) {
         result = targetPoint;
         result.y += 3.0f;
     } else if (raceView->field_0x3f8 || raceView->field_0x3f9) {
         result = targetPoint;
     } else if (flag) {
-        result = UnknownVirtualSlot35(a, b);
+        result = UnknownVirtualSlot35(a, dt);
     } else {
         result = UnknownVirtualSlot37();
     }

@@ -132,8 +132,12 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00466ad0, not reconstructed
 
     virtual Vector3 UnknownVirtualSlot33() = 0;
-    virtual Vector3 UnknownVirtualSlot34(int unused);
-    virtual Vector3 UnknownVirtualSlot35(int a, int b) = 0;
+    // Slots 34, 35 and 48 take the frame time as a float: slot 10 pushes its
+    // dt as slot 48's last argument, which slot 48 forwards to slot 34 and
+    // (with `a`) to slot 35; BikeCamera's and KrustyBikeCamera's slot 34 load
+    // it with fld/fmul. VehicleCamera's slot 35 (0x0052c510) never reads it.
+    virtual Vector3 UnknownVirtualSlot34(float dt);
+    virtual Vector3 UnknownVirtualSlot35(int a, float dt) = 0;
     // 0x00465000 (near miss: samples/camera)
     virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
     virtual Vector3 UnknownVirtualSlot37();
@@ -152,7 +156,7 @@ public:
     virtual void UnknownVirtualSlot46(Vector3* forward, Vector3* up);
     // 0x00465720: plays back the loaded CAMERA records.
     virtual bool UnknownVirtualSlot47(float dt, const Vector3* offset);
-    virtual Vector3 UnknownVirtualSlot48(int a, bool flag, int b);
+    virtual Vector3 UnknownVirtualSlot48(int a, bool flag, float dt);
     // 0x00464b30: the camera position for this frame.
     virtual Vector3 UnknownVirtualSlot49(bool orbit, const Vector3& base, float dt);
     virtual Vector3 UnknownVirtualSlot50() = 0;

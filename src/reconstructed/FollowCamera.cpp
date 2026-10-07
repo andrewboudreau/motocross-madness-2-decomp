@@ -225,18 +225,18 @@ void FollowCamera::UnknownVirtualSlot40(float a) {
 }
 
 // 0x00464a80: the point the camera follows, by state.
-Vector3 FollowCamera::UnknownVirtualSlot48(int a, bool flag, int b) {
+Vector3 FollowCamera::UnknownVirtualSlot48(int a, bool flag, float dt) {
     Vector3 result;
     if (cameraState == 5) {
         if (overrideActive)
             result = cachedTarget;
         else
-            result = UnknownVirtualSlot34(b);
+            result = UnknownVirtualSlot34(dt);
     } else if (cameraState == 7) {
         result = targetPoint;
         result.y += 3.0f;
     } else if (flag) {
-        result = UnknownVirtualSlot35(a, b);
+        result = UnknownVirtualSlot35(a, dt);
     } else {
         result = UnknownVirtualSlot37();
     }
@@ -473,7 +473,7 @@ Vector3 FollowCamera::UnknownVirtualSlot37() {
 }
 
 // 0x00464a40: the target point raised by 3 (as slot 68 uses it).
-Vector3 FollowCamera::UnknownVirtualSlot34(int) {
+Vector3 FollowCamera::UnknownVirtualSlot34(float) {
     Vector3 result = targetPoint;
     result.y += 3.0f;
     return result;
