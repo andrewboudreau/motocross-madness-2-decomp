@@ -67,6 +67,9 @@ _EH_PROLOGUES = {
 }
 
 
+_SEH_PROLOGUE = b'\x55\x8b\xec\x6a\xff\x68'
+
+
 def _is_eh_handler_push(prefix: bytes) -> bool:
     """Whether `prefix` is a /GX prologue ending just before the handler operand.
 
@@ -159,6 +162,15 @@ def match_object(obj: CoffObject, symbol: str, target_va: int, retail: bytes, bi
         if (_is_eh_handler_push(raw[:offset]) and record.storage_class == 6
                 and obj.section(record.section_number).name.startswith('.text$x')):
             name = f'{sym.name}$ehhandler'
+        # __try/__except frame prologue `push ebp; mov ebp, esp; push -1;
+        # push offset scopetable; push offset __except_handler3`: the scope
+        # table is a numbered compiler temporary ($T<n>) in .rdata, so it is
+        # bound under the stable key '<function symbol>$scopetable'.
+        elif (raw[:offset] == _SEH_PROLOGUE and raw[offset + 4:offset + 5] == b'\x68'
+                and record.name.startswith('$T') and record.storage_class == 3
+                and record.section_number > 0
+                and obj.section(record.section_number).name.startswith('.rdata')):
+            name = f'{sym.name}$scopetable'
         # __except_list is the CRT's absolute symbol for the fs:[0] SEH chain head.
         if name == '__except_list' and rel.type == 0x0006 and record.section_number in (0, -1):
             if name in bindings and bindings[name] != 0:
