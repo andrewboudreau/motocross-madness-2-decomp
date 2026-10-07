@@ -23925,6 +23925,42 @@ CASES = [
         'target_size': 50,
         'reason': 'RTTI MediaControl, contiguous methods; SetState(run) then Update; break-out-of-do places return 0 first',
     },
+    {
+        'name': 'ZoneReport.cpp 0x49c2f0 apply lobby preset',
+        'bindings': 'src/reconstructed/ZoneReport.bindings.json',
+        'source': 'src/reconstructed/ZoneReport.cpp',
+        'symbol': '?UnknownFunction49c2f0@UnknownTrackGameObject3410@@QAEHPAH@Z',
+        'target_va': '0x0049c2f0',
+        'target_size': 763,
+        'reason': 'Parser tags EventTypeIndex/EventTypeLocation/BikeManufacturer/BikeType from 0x4aa360; success body inside the if gives the explicit xor on failure',
+    },
+    {
+        'name': 'ZoneReport.cpp 0x49c5f0 implicit UnknownParser destructor',
+        'bindings': 'src/reconstructed/ZoneReport.bindings.json',
+        'source': 'src/reconstructed/ZoneReport.cpp',
+        'symbol': '??1UnknownParser@@QAE@XZ',
+        'target_va': '0x0049c5f0',
+        'target_size': 8,
+        'reason': 'out-of-line implicit destructor the unwind funclets 0x54c2d6/0x54c2f6 jump to',
+    },
+    {
+        'name': 'ZoneReport.cpp 0x49c600 poll lobby rank',
+        'bindings': 'src/reconstructed/ZoneReport.bindings.json',
+        'source': 'src/reconstructed/ZoneReport.cpp',
+        'symbol': '?UnknownFunction49c600@UnknownTrackGameObject3410@@QAEHXZ',
+        'target_va': '0x0049c600',
+        'target_size': 355,
+        'reason': "20 s loop over 0x4aa4e0, '%d,%d,%d,%d' into TrackGameMode+0x1bd0; else-return inside the loop keeps one epilogue",
+    },
+    {
+        'name': 'ZoneReport.cpp 0x49c770 send race status',
+        'bindings': 'src/reconstructed/ZoneReport.bindings.json',
+        'source': 'src/reconstructed/ZoneReport.cpp',
+        'symbol': '?UnknownFunction49c770@UnknownTrackGameObject3410@@QAEHXZ',
+        'target_va': '0x0049c770',
+        'target_size': 739,
+        'reason': 'called by EventManager; Player/Bike/Position/FastestLap/TotalrunningTime/LargestSingleStuntPoints debug labels; 0x88-byte status to 0x4aa670',
+    },
 ]
 
 def main():

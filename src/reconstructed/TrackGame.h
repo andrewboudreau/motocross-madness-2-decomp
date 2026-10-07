@@ -496,6 +496,28 @@ struct UnknownZonePlayerRecord {
     int field_0x44;                           // score
 };
 
+// One racer's line of the race status (0x10 bytes). The names are the
+// labels of 0x0049c770's debug messages.
+struct UnknownZoneRaceRecord {
+    unsigned char field_0x00;                 // "Bike %d-%d": the bike manufacturer
+    unsigned char field_0x01;                 // and the bike type
+    unsigned char field_0x02;                 // "Position"
+    unsigned char field_0x03;
+    int field_0x04;                           // "FastestLap" (x100)
+    int field_0x08;                           // "TotalrunningTime" (x100)
+    int field_0x0c;                           // "LargestSingleStuntPoints"
+};
+
+// The race status 0x0049c770 passes to 0x004aa670 with its size (0x88).
+struct UnknownZoneRaceStatus {
+    unsigned char field_0x00;                 // event type index plus one
+    unsigned char field_0x01;
+    unsigned char field_0x02;                 // laps
+    unsigned char field_0x03;
+    int field_0x04;                           // the longest total running time
+    UnknownZoneRaceRecord field_0x08[8];
+};
+
 // Base of the +0x3410 object; its constructor sits among
 // FontTextureManager.cpp's literals.
 class UnknownTrackGameObject3410Base {
@@ -507,9 +529,17 @@ public:
     UnknownDirectPlay4A* field_0x00;
     UnknownDirectPlayLobby3A* field_0x04;
     UnknownZonePlayerRecord field_0x08[8];    // reported by 0x004aa670
-    unsigned char field_0x248[0x298 - 0x248];
-    int field_0x298;                          // the lobby's bike model (SelectGamePicProcs.cpp)
-    unsigned char field_0x29c[0x32c - 0x29c];
+    unsigned char field_0x248[0x24c - 0x248];
+    // 0x0049c2f0 fills these from the lobby preset: a tag's value minus
+    // one, or -1 when the tag is missing.
+    int field_0x24c;                          // "EventTypeIndex"
+    int field_0x250;                          // "EventTypeLocation"
+    int field_0x254;                          // the race settings' +0x34 (a byte there)
+    char field_0x258[0x40];                   // track name copied when +0x250 is set
+    int field_0x298;                          // the lobby's bike model (SelectGamePicProcs.cpp); "BikeManufacturer"
+    int field_0x29c;                          // "BikeType"
+    int field_0x2a0;                          // tested after 0x0049ca60(1)
+    UnknownZoneRaceStatus field_0x2a4;        // sent through 0x004aa670 by 0x0049c770
 };
 
 // Object at TrackGame+0x3410, created for network games. It has no
@@ -525,9 +555,10 @@ public:
     int UnknownFunction4aa360(char* buffer, unsigned int size);
     int UnknownFunction4aa4e0(char* buffer, unsigned int size);
     int UnknownFunction4aa670(unsigned int count, void* a, void* b);
-    void UnknownFunction49c770();             // 0x0049c770 (EventManager 0x0045e550)
-    void UnknownFunction49c2f0(int* value);   // 0x0049c2f0 (SelectGamePicProcs.cpp: TrackGameMode+0x1bd4)
-    void UnknownFunction49c600();             // 0x0049c600 (SelectGamePicProcs.cpp)
+    int UnknownFunction49c770();              // 0x0049c770 (EventManager 0x0045e550): reports the race to the Zone
+    int UnknownFunction49c2f0(int* flags);    // 0x0049c2f0 (SelectGamePicProcs.cpp: TrackGameMode+0x1bd4)
+    void UnknownFunction49ca60(int kind);     // 0x0049ca60
+    int UnknownFunction49c600();              // 0x0049c600 (SelectGamePicProcs.cpp): waits up to 20 s for the lobby rank
 };
 
 // Object at TrackGame+0x3444 (0x00521cd0 tests that it exists): the pro

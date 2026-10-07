@@ -77,7 +77,7 @@
   "?EnableWindowClipper@UnknownKrustyUIGui@@QAEXH@Z": "0x004868b0",
   "?UnknownFunction49b530@KrustyUI@@QAEXXZ": "0x0049b530",
   "?UnknownFunction49bbb0@KrustyUI@@QAEXXZ": "0x0049bbb0",
-  "?UnknownFunction49c770@UnknownTrackGameObject3410@@QAEXXZ": "0x0049c770",
+  "?UnknownFunction49c770@UnknownTrackGameObject3410@@QAEHXZ": "0x0049c770",
   "?Create@NationalRace@@QAEPAV1@PAVRenderTarget@@P6AXPAH@Z@Z": "0x004aa850",
   "?SetSessionJoinable@NetworkInterface@@QAEHH@Z": "0x004ac510",
   "?GetPlayerName@NetworkInterface@@QAEHHPAD@Z": "0x004ac720",
