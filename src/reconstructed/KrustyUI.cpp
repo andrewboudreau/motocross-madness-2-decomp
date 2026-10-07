@@ -408,7 +408,7 @@ void KrustyUI::UnknownFunction4999b0() {
 // 0x0049b530: tells the "ProgressBar" control 1 (0x0047b370).
 void KrustyUI::UnknownFunction49b530() {
     if (field_0x490) {
-        UnknownGameUiControl* bar = field_0x490->UnknownFunction46ebf0("ProgressBar", 0);
+        UIProgressBar* bar = static_cast<UIProgressBar*>(field_0x490->UnknownFunction46ebf0("ProgressBar", 0));
         if (bar)
             bar->UnknownFunction47b370(1);
     }

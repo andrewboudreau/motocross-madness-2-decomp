@@ -27,9 +27,9 @@ UnknownOptGarageSettings g_UnknownGlobal688808;
 char g_UnknownGlobal688c10[10][128];
 
 // The list box of a drop-down list control.
-static inline UnknownGameUiControl* UnknownDropDownList(UnknownGameUiControl* dropDown)
+static inline UIListBox* UnknownDropDownList(UnknownGameUiControl* dropDown)
 {
-    return dropDown->field_0x1fc;
+    return static_cast<UIDropDownList*>(dropDown)->field_0x1fc;
 }
 
 
@@ -49,7 +49,7 @@ void OptGameSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         UnknownFunction46ebf0("ChkPlayerIndicator", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.field_0x24);
         UnknownFunction46ebf0("ChkToolTips", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.field_0x28);
         UnknownFunction46ebf0("ChkWreckResetOnTrack", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688898.field_0x2c);
-        UnknownGameUiControl* chat = UnknownFunction46ebf0("MultChatMode", 2);
+        UIMultiState* chat = static_cast<UIMultiState*>(UnknownFunction46ebf0("MultChatMode", 2));
         chat->UnknownFunction478860(3);
         chat->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x140b);
         chat->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x140a);
@@ -69,7 +69,7 @@ void OptGameSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case 1:
         if (_stricmp("ChkToolTips", event->field_0x04) == 0) {
-            if (event->field_0x14->UnknownFunction4755c0())
+            if (static_cast<UIMultiState*>(event->field_0x14)->UnknownFunction4755c0())
                 field_0x30->UnknownFunction486540(0)->field_0xc0->field_0x5c = 1;
             else
                 field_0x30->UnknownFunction486540(0)->field_0xc0->field_0x5c = 0;
@@ -82,7 +82,7 @@ void OptGameSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 void OptGameSettingsDlg::UnknownVirtualSlot31(int save)
 {
     if (save) {
-        switch (UnknownFunction46ebf0("MultChatMode", 2)->UnknownFunction4755c0()) {
+        switch (static_cast<UIMultiState*>(UnknownFunction46ebf0("MultChatMode", 2))->UnknownFunction4755c0()) {
         case 1:
             g_UnknownGlobal688898.field_0x08 = 1;
             break;
@@ -94,13 +94,13 @@ void OptGameSettingsDlg::UnknownVirtualSlot31(int save)
             break;
         }
         if (!g_UnknownGlobal56e26c->field_0x2d5_bit1) {
-            if (UnknownFunction46ebf0("ChkToolTips", 2)->UnknownFunction4755c0())
+            if (static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkToolTips", 2))->UnknownFunction4755c0())
                 field_0x30->UnknownFunction486540(0)->field_0xc0->field_0x5c = 1;
             else
                 field_0x30->UnknownFunction486540(0)->field_0xc0->field_0x5c = 0;
         }
     } else {
-        UnknownGameUiControl* chat = UnknownFunction46ebf0("MultChatMode", 2);
+        UIMultiState* chat = static_cast<UIMultiState*>(UnknownFunction46ebf0("MultChatMode", 2));
         switch (g_UnknownGlobal688898.field_0x08) {
         case 1:
             chat->UnknownFunction478cf0(1);
@@ -125,10 +125,10 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         UnknownFunction46ebf0("ParticlesCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal6887d8.field_0x08);
         UnknownFunction46ebf0("SkyCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal6887d8.field_0x10);
         UnknownFunction46ebf0("TerrainQualitySliderBar", 0)->UnknownVirtualSlot54(&g_UnknownGlobal6887d8.field_0x18);
-        UnknownGameUiControl* dropDown = UnknownFunction46ebf0("DisplayResolutionDropDown", 0);
+        UIDropDownList* dropDown = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DisplayResolutionDropDown", 0));
         dropDown->UnknownFunction470d40(0xffffff);
         dropDown->UnknownFunction470da0(0x12);
-        UnknownGameUiControl* list = dropDown->field_0x1fc;
+        UIListBox* list = dropDown->field_0x1fc;
         int i = 0;
         if (g_UnknownGlobal56e26c->field_0x2d4_bit1) {
             if (g_UnknownGlobal56e26c->field_0x2d0) {
@@ -162,7 +162,7 @@ void OptGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 sound->UnknownFunction4bc6b0(0, 0, 0);
         }
         if (_stricmp("TerrainQualitySliderBar", event->field_0x04) == 0) {
-            int value = event->field_0x14->UnknownFunction475500();
+            int value = static_cast<UIScrollBar*>(event->field_0x14)->UnknownFunction475500();
             g_UnknownGlobal6887d8.field_0x18 = value;
             g_UnknownGlobal56e26c->mode.field_0x195c[1] = value;
             g_UnknownGlobal56e26c->mode.field_0x195c[3] = value;
@@ -197,13 +197,13 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     char key[1024];
     switch (event->field_0x08) {
     case 6: {
-        int showPicker = UnknownFunction46ebf0("ChkShowPick3D", 2)->UnknownFunction4755c0();
+        int showPicker = static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkShowPick3D", 2))->UnknownFunction4755c0();
         g_UnknownGlobal56e26c->UnknownVirtualSlot27("UseLastVideoCard", showPicker == 0);
         int method;
-        if (UnknownFunction46ebf0("RadTerrSingle", 4)->UnknownFunction4755c0())
+        if (static_cast<UIRadioButton*>(UnknownFunction46ebf0("RadTerrSingle", 4))->UnknownFunction4755c0())
             method = 2;
         else
-            method = UnknownFunction46ebf0("RadTerrDual", 4)->UnknownFunction4755c0() != 0;
+            method = static_cast<UIRadioButton*>(UnknownFunction46ebf0("RadTerrDual", 4))->UnknownFunction4755c0() != 0;
         sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod", g_UnknownGlobal56e26c->field_0x0c->field_0x4bc);
         g_UnknownGlobal56e26c->UnknownVirtualSlot25(key, method);
         g_UnknownGlobal6887d8.field_0x18 = (settings[4] + settings[3] + settings[2] + settings[1]) / 4;
@@ -220,7 +220,7 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         else
             UnknownFunction46ebf0("Txt3DCard", 12)->UnknownFunction470b20(g_UnknownGlobal56e26c->field_0x0c->field_0x5c0.description);
         int useLast = g_UnknownGlobal56e26c->UnknownVirtualSlot22("UseLastVideoCard", 1);
-        UnknownFunction46ebf0("ChkShowPick3D", 2)->UnknownFunction478cf0(useLast == 0);
+        static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkShowPick3D", 2))->UnknownFunction478cf0(useLast == 0);
         sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod", g_UnknownGlobal56e26c->field_0x0c->field_0x4bc);
         int method = g_UnknownGlobal56e26c->UnknownVirtualSlot20(key, -1);
         sprintf(key, "DriverInfo\\%s\\CanRenderDualTextureInSinglePass", g_UnknownGlobal56e26c->field_0x0c->field_0x4bc);
@@ -232,16 +232,16 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 method = 1;
         }
         if (method == 0)
-            UnknownFunction46ebf0("RadTerrNone", 4)->UnknownFunction479310(method);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("RadTerrNone", 4))->UnknownFunction479310(method);
         else if (method == 1)
-            UnknownFunction46ebf0("RadTerrDual", 4)->UnknownFunction479310(0);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("RadTerrDual", 4))->UnknownFunction479310(0);
         else if (method == 2)
-            UnknownFunction46ebf0("RadTerrSingle", 4)->UnknownFunction479310(0);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("RadTerrSingle", 4))->UnknownFunction479310(0);
         if (!dual)
             UnknownFunction46ebf0("RadTerrSingle", 4)->UnknownVirtualSlot49(dual);
-        UnknownFunction46ebf0("ChkFilterInput", 2)->UnknownFunction478cf0(
+        static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkFilterInput", 2))->UnknownFunction478cf0(
             g_UnknownGlobal56e26c->UnknownVirtualSlot22("JoystickFilter", 0));
-        UnknownFunction46ebf0("ChkShowPickController", 2)->UnknownFunction478cf0(
+        static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkShowPickController", 2))->UnknownFunction478cf0(
             g_UnknownGlobal56e26c->UnknownVirtualSlot22("UseLastController", 0) == 0);
         UnknownFunction46ecc0(0);
         break;
@@ -250,12 +250,12 @@ void OptAdvancedGraphicsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (_stricmp("Back", event->field_0x04) == 0) {
             UnknownFunction46ff30(0x52);
         } else if (_stricmp("ChkFilterInput", event->field_0x04) == 0) {
-            int filter = event->field_0x14->UnknownFunction4755c0();
+            int filter = static_cast<UIMultiState*>(event->field_0x14)->UnknownFunction4755c0();
             g_UnknownGlobal56e26c->UnknownVirtualSlot27("JoystickFilter", filter);
             if (g_UnknownGlobal56e26c->field_0x14->activeJoystick)
                 ((PCJoystickDevice*)g_UnknownGlobal56e26c->field_0x14->activeJoystick)->UnknownMethod4c3ae0(filter);
         } else if (_stricmp("ChkShowPickController", event->field_0x04) == 0) {
-            int useLast = event->field_0x14->UnknownFunction4755c0() == 0;
+            int useLast = static_cast<UIMultiState*>(event->field_0x14)->UnknownFunction4755c0() == 0;
             g_UnknownGlobal56e26c->UnknownVirtualSlot27("UseLastController", useLast);
             g_UnknownGlobal56e26c->UnknownVirtualSlot27("PresetSelected", 0);
         } else if (_stricmp("Help", event->field_0x04) == 0) {
@@ -278,7 +278,7 @@ void OptSoundDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         UnknownFunction46ebf0("UserInterfaceVolumeSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688798.field_0x1c);
         UnknownFunction46ebf0("InGameVolumeSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688798.field_0x20);
         UnknownFunction46ebf0("Rad16Bit", 4)->UnknownVirtualSlot49(0);
-        UnknownFunction46ebf0("Rad8Bit", 4)->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(UnknownFunction46ebf0("Rad8Bit", 4))->UnknownFunction479310(0);
         UnknownFunction46ecc0(0);
         break;
     case 3: {
@@ -306,11 +306,11 @@ void OptSoundDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 void OptSoundDlg::UnknownVirtualSlot31(int save)
 {
     if (save) {
-        g_UnknownGlobal688798.field_0x28 = UnknownFunction46ebf0("Rad16Bit", 4)->UnknownFunction4793f0() - 1;
+        g_UnknownGlobal688798.field_0x28 = static_cast<UIRadioButton*>(UnknownFunction46ebf0("Rad16Bit", 4))->UnknownFunction4793f0() - 1;
     } else if (g_UnknownGlobal688798.field_0x28) {
-        UnknownFunction46ebf0("Rad16Bit", 4)->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(UnknownFunction46ebf0("Rad16Bit", 4))->UnknownFunction479310(0);
     } else {
-        UnknownFunction46ebf0("Rad8Bit", 4)->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(UnknownFunction46ebf0("Rad8Bit", 4))->UnknownFunction479310(0);
     }
 }
 
@@ -349,19 +349,19 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         UnknownFunction46ebf0("FeedbackSlider", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.field_0x1c);
         UnknownFunction46ebf0("ChkGasGyro", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.field_0x24);
         UnknownFunction46ebf0("ChkBrakeGyro", 0)->UnknownVirtualSlot54(&g_UnknownGlobal688868.field_0x28);
-        UnknownGameUiControl* actions = UnknownFunction46ebf0("ActionListBox", 0);
+        UIListBox* actions = static_cast<UIListBox*>(UnknownFunction46ebf0("ActionListBox", 0));
         for (i = 0; i < 14; i++) {
             g_UnknownGlobal56e26c->UnknownFunction521970(0x192 + i, text, 128);
             actions->UnknownFunction476d80(text, i, 0);
         }
-        UnknownGameUiControl* devices = UnknownDropDownList(UnknownFunction46ebf0("InputDeviceDDL", 6));
+        UIListBox* devices = UnknownDropDownList(UnknownFunction46ebf0("InputDeviceDDL", 6));
         devices->UnknownFunction4775f0();
         for (i = 0; i < 8; i++) {
             g_UnknownGlobal56e26c->UnknownFunction521970(0x1cc + i, text, 128);
             devices->UnknownFunction476d80(text, i, 0);
         }
         UnknownFunction4b3410();
-        UnknownGameUiControl* keys = UnknownFunction46ebf0("MapKeyListBox", 0);
+        UIListBox* keys = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 0));
         for (i = 0; i < 14; i++) {
             g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction449350(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, i, text);
             keys->UnknownFunction476d80(text, i, 0);
@@ -409,8 +409,8 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 UnknownDropDownList(UnknownFunction46ebf0("InputDeviceDDL", 6))->UnknownFunction4768d0(-1);
             UnknownFunction4b3410();
         } else if (_stricmp("MapKeyListBox", event->field_0x04) == 0 || _stricmp("ActionListBox", event->field_0x04) == 0) {
-            int row = event->field_0x14->UnknownFunction476950();
-            UnknownGameUiControl* keys = UnknownFunction46ebf0("MapKeyListBox", 3);
+            int row = static_cast<UIListBox*>(event->field_0x14)->UnknownFunction476950();
+            UIListBox* keys = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
             g_UnknownGlobal56e26c->UnknownFunction521970(0x1c2, text, 128);
             keys->UnknownFunction476ff0(row, text);
             UnknownFunction46ea80(0x65, 0);
@@ -441,7 +441,7 @@ void OptControlsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 void OptControlsDlg::UnknownFunction4b3410()
 {
     char text[128];
-    UnknownGameUiControl* keys = UnknownFunction46ebf0("MapKeyListBox", 3);
+    UIListBox* keys = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
     keys->UnknownFunction4775f0();
     for (int i = 0; i < 14; i++) {
         g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction449350(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, i, text);
@@ -465,20 +465,20 @@ void OptControlsDlg::UnknownVirtualSlot31(int save)
 // 0x004b54c0
 void OptControlsDlg::UnknownFunction4b54c0()
 {
-    UnknownGameUiControl* list;
+    UIListBox* list;
     int i;
     if (g_UnknownGlobal56e26c->field_0x33fc->field_0x00 == 1) {
-        list = UnknownFunction46ebf0("MapKeyListBox", 3);
+        list = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
         for (i = 0; i < 4; i++)
             list->UnknownFunction476ba0(0x5555ff, i);
-        list = UnknownFunction46ebf0("ActionListBox", 3);
+        list = static_cast<UIListBox*>(UnknownFunction46ebf0("ActionListBox", 3));
         for (i = 0; i < 4; i++)
             list->UnknownFunction476ba0(0x5555ff, i);
     } else {
-        list = UnknownFunction46ebf0("MapKeyListBox", 3);
+        list = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
         for (i = 0; i < 4; i++)
             list->UnknownFunction476ba0(0xff000000, i);
-        list = UnknownFunction46ebf0("ActionListBox", 3);
+        list = static_cast<UIListBox*>(UnknownFunction46ebf0("ActionListBox", 3));
         for (i = 0; i < 4; i++)
             list->UnknownFunction476ba0(0xff000000, i);
     }
@@ -515,16 +515,16 @@ void OptControlsDlg::UnknownFunction4b5a20()
 void OptMessagesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
     if (event->field_0x08 == 5) {
-        UnknownFunction46ebf0("Message1", 11)->UnknownFunction473820(g_UnknownGlobal688c10[1], 128);
-        UnknownFunction46ebf0("Message2", 11)->UnknownFunction473820(g_UnknownGlobal688c10[2], 128);
-        UnknownFunction46ebf0("Message3", 11)->UnknownFunction473820(g_UnknownGlobal688c10[3], 128);
-        UnknownFunction46ebf0("Message4", 11)->UnknownFunction473820(g_UnknownGlobal688c10[4], 128);
-        UnknownFunction46ebf0("Message5", 11)->UnknownFunction473820(g_UnknownGlobal688c10[5], 128);
-        UnknownFunction46ebf0("Message6", 11)->UnknownFunction473820(g_UnknownGlobal688c10[6], 128);
-        UnknownFunction46ebf0("Message7", 11)->UnknownFunction473820(g_UnknownGlobal688c10[7], 128);
-        UnknownFunction46ebf0("Message8", 11)->UnknownFunction473820(g_UnknownGlobal688c10[8], 128);
-        UnknownFunction46ebf0("Message9", 11)->UnknownFunction473820(g_UnknownGlobal688c10[9], 128);
-        UnknownFunction46ebf0("Message0", 11)->UnknownFunction473820(g_UnknownGlobal688c10[0], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message1", 11))->UnknownFunction473820(g_UnknownGlobal688c10[1], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message2", 11))->UnknownFunction473820(g_UnknownGlobal688c10[2], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message3", 11))->UnknownFunction473820(g_UnknownGlobal688c10[3], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message4", 11))->UnknownFunction473820(g_UnknownGlobal688c10[4], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message5", 11))->UnknownFunction473820(g_UnknownGlobal688c10[5], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message6", 11))->UnknownFunction473820(g_UnknownGlobal688c10[6], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message7", 11))->UnknownFunction473820(g_UnknownGlobal688c10[7], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message8", 11))->UnknownFunction473820(g_UnknownGlobal688c10[8], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message9", 11))->UnknownFunction473820(g_UnknownGlobal688c10[9], 128);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("Message0", 11))->UnknownFunction473820(g_UnknownGlobal688c10[0], 128);
         UnknownFunction46ecc0(0);
         GameObjectIterator controls(field_0x7f3c, 1, "UIControl");
         GameObject* control;
@@ -582,39 +582,39 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         field_0x7f64 = 0;
         field_0x7f68 = 0;
         field_0x7f6c = 0;
-        UnknownGameUiControl* tab = UnknownFunction46ebf0("GameSettings", 4);
+        UIMultiState* tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("GameSettings", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13dd);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13dd);
         tab->UnknownFunction470da0(0x22);
-        tab = UnknownFunction46ebf0("Graphics", 4);
+        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("Graphics", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13de);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13de);
         tab->UnknownFunction470da0(0x22);
-        tab = UnknownFunction46ebf0("Sound", 4);
+        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("Sound", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13df);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13df);
         tab->UnknownFunction470da0(0x22);
-        tab = UnknownFunction46ebf0("Controls", 4);
+        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("Controls", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e0);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e0);
         tab->UnknownFunction470da0(0x22);
-        tab = UnknownFunction46ebf0("Messages", 4);
+        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("Messages", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e1);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e1);
         tab->UnknownFunction470da0(0x22);
-        tab = UnknownFunction46ebf0("Garage", 4);
+        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("Garage", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e2);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e2);
         tab->UnknownFunction470da0(0x22);
         if (event->field_0x18 == 1) {
             UnknownFunction4b4ab0(3);
-            UnknownFunction46ebf0("Controls", 4)->UnknownFunction479310(0);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("Controls", 4))->UnknownFunction479310(0);
         } else if (event->field_0x18 == 2) {
             UnknownFunction4b4ab0(5);
-            UnknownFunction46ebf0("Garage", 4)->UnknownFunction479310(0);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("Garage", 4))->UnknownFunction479310(0);
         } else {
             UnknownFunction4b4ab0(0);
-            UnknownFunction46ebf0("GameSettings", 4)->UnknownFunction479310(0);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("GameSettings", 4))->UnknownFunction479310(0);
         }
         if (g_UnknownGlobal56e26c->UnknownFunction521cd0())
             UnknownFunction46ebf0("Restore", 0)->UnknownFunction470660(0, 1);
@@ -811,7 +811,7 @@ void GlobalSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             char name[128];
             char profile[260];
             char preset[260];
-            int choice = UnknownFunction46ebf0("ButFactory", 4)->UnknownFunction4793f0();
+            int choice = static_cast<UIRadioButton*>(UnknownFunction46ebf0("ButFactory", 4))->UnknownFunction4793f0();
             strcpy(name, g_UnknownGlobal56e26c->mode.field_0x00);
             if (choice == 1) {
                 g_UnknownGlobal56e26c->mode.UnknownFunction522440();
@@ -822,8 +822,8 @@ void GlobalSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 g_UnknownGlobal56e26c->mode.UnknownFunction523580();
                 g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448e90(profile, -1);
             } else if (choice == 2) {
-                UnknownGameUiControl* profiles = UnknownFunction46ebf0("LstProfiles", 3);
-                UnknownGameUiListRow* entry = &profiles->UnknownInlineListBox()->field_0x214[profiles->UnknownFunction476950()];
+                UIListBox* profiles = static_cast<UIListBox*>(UnknownFunction46ebf0("LstProfiles", 3));
+                UnknownGameUiListRow* entry = &profiles->field_0x214[profiles->UnknownFunction476950()];
                 strcpy(g_UnknownGlobal56e26c->mode.field_0x00, entry->field_0x14);
                 g_UnknownGlobal56e26c->mode.UnknownFunction5231f0();
             }
@@ -858,7 +858,7 @@ void GlobalSettingsDlg::UnknownFunction4b51a0()
 {
     char name[260];
     int count = 0;
-    UnknownGameUiControl* profiles = UnknownFunction46ebf0("LstProfiles", 0);
+    UIListBox* profiles = static_cast<UIListBox*>(UnknownFunction46ebf0("LstProfiles", 0));
     profiles->UnknownFunction4775f0();
     g_UnknownGlobal56e26c->profileDirectory->UnknownFunction44a1d0("ui\\profile");
     g_UnknownGlobal56e26c->profileDirectory->UnknownFunction44a220("*", 0);
@@ -934,12 +934,12 @@ void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case 1:
         if (_stricmp("CurveLeft", event->field_0x04) == 0) {
-            UnknownGameUiControl* curves = UnknownDropDownList(UnknownFunction46ebf0("DDLCurves", 6));
+            UIListBox* curves = UnknownDropDownList(UnknownFunction46ebf0("DDLCurves", 6));
             int rows = curves->field_0x1ec;
             curves->UnknownFunction476a60((curves->UnknownFunction476950() + rows - 1) % rows);
             curves->UnknownVirtualSlot66(0);
         } else if (_stricmp("CurveRight", event->field_0x04) == 0) {
-            UnknownGameUiControl* curves = UnknownDropDownList(UnknownFunction46ebf0("DDLCurves", 6));
+            UIListBox* curves = UnknownDropDownList(UnknownFunction46ebf0("DDLCurves", 6));
             int rows = curves->field_0x1ec;
             curves->UnknownFunction476a60((curves->UnknownFunction476950() + 1) % rows);
             curves->UnknownVirtualSlot66(0);
@@ -947,7 +947,7 @@ void OptGarageDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         break;
     case 2:
         if (_stricmp("DDLCurves", event->field_0x04) == 0) {
-            int curve = event->field_0x14->UnknownFunction4768d0(-1);
+            int curve = static_cast<UIListBox*>(event->field_0x14)->UnknownFunction4768d0(-1);
             g_UnknownGlobal688898.field_0x360[UnknownBikeClassOf(g_UnknownGlobal688808.field_0x00)] = curve;
             TrackGame* game = g_UnknownGlobal56e26c;
             for (int band = 0; band < 11; band++) {
@@ -996,7 +996,7 @@ void OptGarageDlg::UnknownFunction4b38f0()
     sprintf(engine, format, g_UnknownGlobal56cb6c[UnknownBikeClassOf(g_UnknownGlobal688808.field_0x00)]);
     g_UnknownGlobal56e26c->UnknownFunction521970(0x146b, standard, 127);
     g_UnknownGlobal56e26c->UnknownFunction521970(0x146c, custom, 127);
-    UnknownGameUiControl* curves = UnknownDropDownList(UnknownFunction46ebf0("DDLCurves", 6));
+    UIListBox* curves = UnknownDropDownList(UnknownFunction46ebf0("DDLCurves", 6));
     curves->UnknownFunction4775f0();
     for (int i = 0; i < 6; i++) {
         if (i < 3)
@@ -1013,7 +1013,7 @@ void OptGarageDlg::UnknownFunction4b3aa0(UnknownGameUiControl* slider)
 {
     int bikeClass = UnknownBikeClassOf(g_UnknownGlobal688808.field_0x00);
     int band = slider->field_0x7c;
-    int value = slider->UnknownFunction475300(g_UnknownGlobal56e26c->ui->field_0x450[bikeClass] - g_UnknownGlobal56e26c->ui->field_0x43c[bikeClass]);
+    int value = static_cast<UIScrollBar*>(slider)->UnknownFunction475300(g_UnknownGlobal56e26c->ui->field_0x450[bikeClass] - g_UnknownGlobal56e26c->ui->field_0x43c[bikeClass]);
     value += g_UnknownGlobal56e26c->ui->field_0x43c[bikeClass];
     int level = __min(g_UnknownGlobal688808.field_0x24[band] + (g_UnknownGlobal56e26c->ui->field_0x400[bikeClass] - field_0x7f58),
                       __min(value, g_UnknownGlobal56e26c->ui->field_0x324[bikeClass][band]));
@@ -1045,8 +1045,8 @@ void OptGarageDlg::UnknownFunction4b3bc0()
         sprintf(text, "%2.1fk", ((i - 1) * g_UnknownGlobal688808.field_0x58 + g_UnknownGlobal688808.field_0x50) * 0.001f);
         UnknownFunction46ebf0(name, 0)->UnknownFunction470b20(text);
         sprintf(name, "SldEQ%d", i);
-        UnknownGameUiControl* slider = UnknownFunction46ebf0(name, 8);
-        slider->UnknownInlineScrollBar()->field_0x21c = 1;
+        UIScrollBar* slider = static_cast<UIScrollBar*>(UnknownFunction46ebf0(name, 8));
+        slider->field_0x21c = 1;
         slider->UnknownFunction4754d0(g_UnknownGlobal56e26c->ui->field_0x450[bikeClass] - g_UnknownGlobal56e26c->ui->field_0x43c[bikeClass] + 1);
         slider->UnknownFunction4753c0(*level - g_UnknownGlobal56e26c->ui->field_0x43c[bikeClass],
                                       g_UnknownGlobal56e26c->ui->field_0x450[bikeClass] - g_UnknownGlobal56e26c->ui->field_0x43c[bikeClass]);
@@ -1067,18 +1067,18 @@ void OptGarageDlg::UnknownFunction4b3bc0()
 void OptGarageDlg::UnknownVirtualSlot31(int save)
 {
     if (save) {
-        g_UnknownGlobal688808.field_0x0c[0] = (unsigned int)UnknownFunction46ebf0("SldFrontComp", 8)->UnknownFunction475500() * 0.01f;
-        g_UnknownGlobal688808.field_0x0c[1] = (unsigned int)UnknownFunction46ebf0("SldFrontDecomp", 8)->UnknownFunction475500() * 0.01f;
-        g_UnknownGlobal688808.field_0x0c[2] = (unsigned int)UnknownFunction46ebf0("SldRearComp", 8)->UnknownFunction475500() * 0.01f;
-        g_UnknownGlobal688808.field_0x0c[3] = (unsigned int)UnknownFunction46ebf0("SldRearDecomp", 8)->UnknownFunction475500() * 0.01f;
-        g_UnknownGlobal688808.field_0x0c[4] = (unsigned int)UnknownFunction46ebf0("SldFrontDamp", 8)->UnknownFunction475500() * 0.01f;
-        g_UnknownGlobal688808.field_0x0c[5] = (unsigned int)UnknownFunction46ebf0("SldRearDamp", 8)->UnknownFunction475500() * 0.01f;
+        g_UnknownGlobal688808.field_0x0c[0] = (unsigned int)static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldFrontComp", 8))->UnknownFunction475500() * 0.01f;
+        g_UnknownGlobal688808.field_0x0c[1] = (unsigned int)static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldFrontDecomp", 8))->UnknownFunction475500() * 0.01f;
+        g_UnknownGlobal688808.field_0x0c[2] = (unsigned int)static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldRearComp", 8))->UnknownFunction475500() * 0.01f;
+        g_UnknownGlobal688808.field_0x0c[3] = (unsigned int)static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldRearDecomp", 8))->UnknownFunction475500() * 0.01f;
+        g_UnknownGlobal688808.field_0x0c[4] = (unsigned int)static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldFrontDamp", 8))->UnknownFunction475500() * 0.01f;
+        g_UnknownGlobal688808.field_0x0c[5] = (unsigned int)static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldRearDamp", 8))->UnknownFunction475500() * 0.01f;
     } else {
-        UnknownFunction46ebf0("SldFrontComp", 8)->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[0] * 100.0f), 100);
-        UnknownFunction46ebf0("SldFrontDecomp", 8)->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[1] * 100.0f), 100);
-        UnknownFunction46ebf0("SldRearComp", 8)->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[2] * 100.0f), 100);
-        UnknownFunction46ebf0("SldRearDecomp", 8)->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[3] * 100.0f), 100);
-        UnknownFunction46ebf0("SldFrontDamp", 8)->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[4] * 100.0f), 100);
-        UnknownFunction46ebf0("SldRearDamp", 8)->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[5] * 100.0f), 100);
+        static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldFrontComp", 8))->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[0] * 100.0f), 100);
+        static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldFrontDecomp", 8))->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[1] * 100.0f), 100);
+        static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldRearComp", 8))->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[2] * 100.0f), 100);
+        static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldRearDecomp", 8))->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[3] * 100.0f), 100);
+        static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldFrontDamp", 8))->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[4] * 100.0f), 100);
+        static_cast<UIScrollBar*>(UnknownFunction46ebf0("SldRearDamp", 8))->UnknownFunction4753c0((int)(g_UnknownGlobal688808.field_0x0c[5] * 100.0f), 100);
     }
 }

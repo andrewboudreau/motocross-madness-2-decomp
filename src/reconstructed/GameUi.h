@@ -144,11 +144,9 @@ struct UnknownGameUiState {
 
 // A control found by name. Every control a dialog finds is a UIControl
 // (RTTI UIControl : GameObject, vtable 0x00552ba4, 65 slots, 0x1ec bytes;
-// the derived controls' members follow it). Slots 65 and 66 and many
-// derived-control methods (list box, edit box, scroll bar, multi-state,
-// progress bar) are declared here because the dialog procedures call them
-// through this type; their bodies read the derived control through a typed
-// `this`.
+// the derived controls' members follow it). The dialog procedures find
+// controls through this type and cast them to the derived control a method
+// belongs to.
 class UnknownGameUiControl : public GameObject {
 public:
     // 0x00470170: `type` is the control kind (5 a static, 12 a static text).
@@ -200,80 +198,16 @@ public:
     virtual int UnknownVirtualSlot62();       // 0x00470420: height
     virtual void UnknownVirtualSlot63(CameraRect* in, CameraRect* out); // 0x00472860
     virtual void UnknownVirtualSlot64(CameraRect* in, CameraRect* out); // 0x004728e0
-    virtual int UnknownVirtualSlot65(int row); // UIListBox 0x004769e0: selects `row`
-    virtual void UnknownVirtualSlot66(int value); // OptionProcs.cpp (a list box's DDLCurves row change)
 
-    void UnknownFunction47b370(int value);    // 0x0047b370
     void UnknownFunction470b20(const char* text); // 0x00470b20 (TrackRecord.cpp)
-    int UnknownFunction476d80(const char* text, int data, int a); // 0x00476d80: adds a list row
-    void UnknownFunction4775f0();             // 0x004775f0
-    void UnknownFunction477900(int a);        // 0x00477900
-    void UnknownFunction477bb0(int a);        // 0x00477bb0
-    int UnknownFunction479310(int index);     // 0x00479310: selects radio button `index` (1-based) of the group
-    void UnknownFunction478a50(int index, void* module, int id); // 0x00478a50: a state's resource string
-    void UnknownFunction478ad0(int index, const char* text);    // 0x00478ad0: a state's text
-
     // NetProcs.cpp and InGameProcs.cpp (provisional names).
     void UnknownFunction470660(int a, int b); // 0x00470660
     void UnknownFunction470a80(void* module, int id); // 0x00470a80: text from string resource `id`
     void UnknownFunction470d40(unsigned int color); // 0x00470d40
     void UnknownFunction470da0(int value);    // 0x00470da0
-    void UnknownFunction473c70(int value);    // 0x00473c70
-    void UnknownFunction473da0(char* text);   // 0x00473da0
-    void UnknownFunction473f30(const char* characters); // 0x00473f30
-    char UnknownFunction473fc0(char c);       // 0x00473fc0: `c` if the edit field accepts it (either case)
-    void UnknownFunction4751c0(int range);    // 0x004751c0
-    int UnknownFunction4753c0(int value, int range); // 0x004753c0: sets the position to `value` of `range`
-    int UnknownFunction475500();              // 0x00475500
-    int UnknownFunction4755c0();              // 0x004755c0
-    int UnknownFunction4768d0(int value);     // 0x004768d0
-    int UnknownFunction476950();              // 0x00476950: selected row, -1 when none
-    int UnknownFunction476a60(int row);       // 0x00476a60: selects `row`
-    void UnknownFunction473820(char* buffer, int size); // 0x00473820: an edit field's text buffer (OptionProcs.cpp)
-    int UnknownFunction476ad0(const char* text); // 0x00476ad0: selects the row `text` (OptionProcs.cpp)
-    int UnknownFunction475300(int value);     // 0x00475300 (OptionProcs.cpp)
-    void UnknownFunction4754d0(int range);    // 0x004754d0 (OptionProcs.cpp)
-    int UnknownFunction476b30(int data);      // 0x00476b30: selects the row holding `data`
-    void UnknownFunction476ba0(unsigned int color, int row); // 0x00476ba0 (OptionProcs.cpp)
-    void UnknownFunction476ff0(int row, const char* text); // 0x00476ff0 (OptionProcs.cpp)
-    void UnknownFunction476b80(unsigned int color); // 0x00476b80
-    void UnknownFunction476c70(unsigned int color, int a); // 0x00476c70
-    void UnknownFunction476cd0(unsigned int color); // 0x00476cd0
-    int UnknownFunction478860(int count);     // 0x00478860: number of states
-    void UnknownFunction478cf0(int value);    // 0x00478cf0
-    int UnknownFunction4793f0();              // 0x004793f0 (OptionProcs.cpp)
-    // SelectGamePicProcs.cpp (provisional names).
-    char* UnknownFunction473ef0(char* buffer, int size); // 0x00473ef0: copies an edit field's text
-    int UnknownFunction476860(int row, int a); // 0x00476860: scrolls to `row`
-    int UnknownFunction477490(int row);       // 0x00477490: removes a list row
-    void UnknownFunction477d30(int* handled); // 0x00477d30: reports a click (and a double click)
-    int UnknownFunction4773a0(UIAnim* image, int data, int a); // 0x004773a0: adds an image row
-    void UnknownFunction477e60(int a);        // 0x00477e60
-    void UnknownFunction477110(const char* image, int a, int b, int c); // 0x00477110: shows an image
-    char* UnknownFunction476d20(int row);     // 0x00476d20: a row's text (-1: the selected one)
     // ProCircuitProcs.cpp (provisional names).
-    void UnknownFunction473390(UnknownGameUiControl* list); // 0x00473390: links a column button to its list
-    void UnknownFunction477bc0();             // 0x00477bc0
-    void UnknownFunction4777f0(int (*compare)(const void* a, const void* b)); // 0x004777f0: the rows' sort order
     void UnknownFunction470760(int a, const char* image); // 0x00470760: shows an image file
     void UnknownFunction470730(int a, void* image); // 0x00470730: shows a dialog resource image
-    // Inline: a drop-down list's button (defined after UIDropDownList).
-    UnknownGameUiControl* UnknownInlineButton();
-    // Inline: this control as the derived control a method above belongs to
-    // (defined after the derived classes).
-    UIButton* UnknownInlineButtonControl();
-    UIEditBox* UnknownInlineEditBox();
-    UIScrollBar* UnknownInlineScrollBar();
-    UIListBox* UnknownInlineListBox();
-    UIMultiState* UnknownInlineMultiState();
-    UIProgressBar* UnknownInlineProgressBar();
-    // The dialog files read a list box's row count (UIListBox +0x1ec) and a
-    // drop-down list's list box (UIDropDownList +0x1fc) through UIControl
-    // pointers; these read-only properties keep that source form.
-    int UnknownInlineRows();
-    UnknownGameUiControl* UnknownInlineDropDownListBox();
-    __declspec(property(get = UnknownInlineRows)) int field_0x1ec;
-    __declspec(property(get = UnknownInlineDropDownListBox)) UnknownGameUiControl* field_0x1fc;
 
     // gameui.cpp (provisional names).
     int UnknownFunction470720();              // 0x00470720
@@ -289,12 +223,6 @@ public:
     // 0x00470870: starts transition `type` (100-106).
     void UnknownFunction470870(int type, int a, int b, int delay, int c);
     int UnknownFunction471500();              // 0x00471500
-    // A list box's rows (UIListBox; declared here like the members above).
-    void UnknownFunction476930(int row, int data); // 0x00476930: a row's data
-    int UnknownFunction476ee0();              // 0x00476ee0: the rows that fit
-    int UnknownFunction476f50(int rows);      // 0x00476f50: grows the rows to `rows`
-    int UnknownFunction475200(UnknownGameUiControl* list); // 0x00475200: a scroll bar follows `list`
-    int UnknownFunction4751e0(UnknownGameUiControl* list); // 0x004751e0: `list`'s scroll range
     GameObjectIterator* UnknownFunction4726b0(); // slot 53's body: an iterator over the owner's controls
     void UnknownFunction472730(GameObjectIterator* iterator); // 0x00472730: deletes it
     // 0x00472750: the next control with this control's id.
@@ -405,8 +333,9 @@ public:
     void UnknownFunction473330(UIAnim* image); // 0x00473330
     void UnknownFunction473350(UIAnim* image); // 0x00473350
     void UnknownFunction473370(UIAnim* image); // 0x00473370
+    void UnknownFunction473390(UIListBox* list); // 0x00473390: links a column button to its list (ProCircuitProcs.cpp)
 
-    UnknownGameUiControl* field_0x1ec;        // the list a column button sorts (0x00473390)
+    UIListBox* field_0x1ec;                   // the list a column button sorts (slot 56 sorts it)
 };
 
 // RTTI: UIStatic : UIControl (vtable 0x00553318; 0x1ec bytes, `new` at
@@ -437,6 +366,12 @@ public:
 
     void UnknownFunction473d80(int value);    // 0x00473d80
     void UnknownFunction473d90(int value);    // 0x00473d90
+    void UnknownFunction473820(char* buffer, int size); // 0x00473820: binds a text buffer (OptionProcs.cpp)
+    void UnknownFunction473c70(int size);     // 0x00473c70: the text's capacity
+    void UnknownFunction473da0(char* text);   // 0x00473da0: sets the text
+    char* UnknownFunction473ef0(char* buffer, int size); // 0x00473ef0: copies the text
+    void UnknownFunction473f30(const char* characters); // 0x00473f30: the characters it accepts
+    char UnknownFunction473fc0(char c);       // 0x00473fc0: `c` if accepted (either case)
     void UnknownFunction474060(unsigned long color); // 0x00474060: the background brush
 
     int field_0x1ec;
@@ -490,6 +425,14 @@ public:
     virtual void UnknownVirtualSlot59(int value); // 0x00474cb0
 
     void UnknownFunction475160(int state);    // 0x00475160: the thumb size from a state image
+    void UnknownFunction4751c0(int range);    // 0x004751c0
+    int UnknownFunction4751e0(UIListBox* list); // 0x004751e0: `list`'s scroll range
+    int UnknownFunction475200(UIListBox* list); // 0x00475200: follows `list`
+    int UnknownFunction475300(int value);     // 0x00475300 (OptionProcs.cpp)
+    int UnknownFunction4753c0(int value, int range); // 0x004753c0: sets the position to `value` of `range`
+    void UnknownFunction4754d0(int range);    // 0x004754d0 (OptionProcs.cpp)
+    int UnknownFunction475500();              // 0x00475500
+    int UnknownFunction4755c0();              // 0x004755c0: +0x1f0
 
     union {
         int field_0x1ec;
@@ -533,9 +476,38 @@ public:
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00477ff0
     virtual void UnknownVirtualSlot57(int a, int* position); // 0x00478190
     virtual void UnknownVirtualSlot59(int value); // 0x00475fe0
-    virtual int UnknownVirtualSlot65(int row); // 0x004769e0
+    // Slots 65 and 66 are UIListBox's own (UIControl's vtable has 65 slots,
+    // UIListBox's and UIDDLListBox's 67).
+    virtual int UnknownVirtualSlot65(int row); // 0x004769e0: selects `row`
+    virtual void UnknownVirtualSlot66(int* handled); // 0x00477d30: reports a click (and a double click)
 
+    int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the first row shown
+    int UnknownFunction476860(int row, int a); // 0x00476860: scrolls to `row`
+    int UnknownFunction4768d0(int row);       // 0x004768d0: a row's data (-1: the selected one)
     int UnknownFunction476900(int data);      // 0x00476900: the row holding `data`, -1 when none
+    void UnknownFunction476930(int row, int data); // 0x00476930: a row's data
+    int UnknownFunction476950();              // 0x00476950: selected row, -1 when none
+    int UnknownFunction476a60(int row);       // 0x00476a60: selects `row`
+    int UnknownFunction476ad0(const char* text); // 0x00476ad0: selects the row `text`
+    int UnknownFunction476b30(int data);      // 0x00476b30: selects the row holding `data`
+    void UnknownFunction476b80(unsigned int color); // 0x00476b80
+    void UnknownFunction476ba0(unsigned int color, int row); // 0x00476ba0
+    void UnknownFunction476c70(unsigned int color, int row); // 0x00476c70
+    void UnknownFunction476cd0(unsigned int color); // 0x00476cd0
+    char* UnknownFunction476d20(int row);     // 0x00476d20: a row's text (-1: the selected one)
+    int UnknownFunction476d80(const char* text, int data, int a); // 0x00476d80: adds a row
+    int UnknownFunction476ee0();              // 0x00476ee0: the rows that fit
+    int UnknownFunction476f50(int rows);      // 0x00476f50: grows the rows to `rows`
+    void UnknownFunction476ff0(int row, const char* text); // 0x00476ff0: a row's text
+    int UnknownFunction477110(const char* image, int a, int b, int c); // 0x00477110: adds an image row from a file
+    int UnknownFunction4773a0(UIAnim* image, int data, int a); // 0x004773a0: adds an image row
+    int UnknownFunction477490(int row);       // 0x00477490: removes a row
+    void UnknownFunction4775f0();             // 0x004775f0: removes every row
+    void UnknownFunction4777f0(int (*compare)(const void* a, const void* b)); // 0x004777f0: the rows' sort order
+    void UnknownFunction477900(int a);        // 0x00477900: sorts the rows
+    void UnknownFunction477bb0(int a);        // 0x00477bb0
+    void UnknownFunction477bc0();             // 0x00477bc0: the rows' scroll bars follow
+    void UnknownFunction477e60(int a);        // 0x00477e60
     char* UnknownFunction476970(int row);     // 0x00476970
     int UnknownFunction4769a0(int row);       // 0x004769a0: a row's height
     void UnknownFunction477b90(int value);    // 0x00477b90
@@ -590,7 +562,12 @@ public:
     virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00478810
     virtual void UnknownVirtualSlot59(int value); // 0x00478540
 
+    int UnknownFunction4755c0();              // 0x004755c0 (folded with UIScrollBar's): the current state
+    int UnknownFunction478860(int count);     // 0x00478860: number of states
     void UnknownFunction4789f0(int index, UIAnim* image, const char* text); // 0x004789f0
+    void UnknownFunction478a50(int index, void* module, int id); // 0x00478a50: a state's resource string
+    void UnknownFunction478ad0(int index, const char* text);    // 0x00478ad0: a state's text
+    void UnknownFunction478cf0(int value);    // 0x00478cf0: sets the current state
     void UnknownFunction478d10();             // 0x00478d10: the next selectable state
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00478d70
 
@@ -622,6 +599,9 @@ public:
     virtual int UnknownVirtualSlot53();       // 0x004795c0
     virtual int UnknownVirtualSlot55(int a, int b); // 0x004794c0
     virtual void UnknownVirtualSlot59(int value); // 0x004792e0
+
+    int UnknownFunction479310(int index);     // 0x00479310: selects radio button `index` (1-based) of the group
+    int UnknownFunction4793f0();              // 0x004793f0: the group's selected button (1-based), 0 when none
 };
 
 // RTTI: UIDDLScrollBar : UIScrollBar (vtable 0x00553630; 0x224 bytes, `new`
@@ -668,7 +648,7 @@ public:
                  UIDropDownList* list);       // 0x00479d10
     virtual void UnknownVirtualSlot33(int value); // 0x00479e70
     virtual int UnknownVirtualSlot65(int row); // 0x00479db0
-    virtual void UnknownVirtualSlot66(int value); // 0x00479df0
+    virtual void UnknownVirtualSlot66(int* handled); // 0x00479df0
 
     UIDropDownList* field_0x250;              // its list
 };
@@ -695,6 +675,11 @@ public:
     void UnknownFunction47aa40(UIAnim* image); // 0x0047aa40: the button's image
     void UnknownFunction47ab20(UIAnim* image); // 0x0047ab20: the corner image; lays the parts out around it
     int UnknownFunction47a800(UnknownGameUiControl* control); // 0x0047a800: whether `control` is a part
+    // Inline: the button. SelectGamePicProcs.cpp reads it through this
+    // accessor; reading field_0x1ec directly lets VC6 merge the two branches
+    // of 0x004f3260 and 0x004f8700, which retail does not. Defined after the
+    // class (an in-class body flips ProCircuitProcsNearMisses' 0x004d59a0).
+    UIDDLButton* UnknownInlineButton();
 
     UIDDLButton* field_0x1ec;                 // the button
     UIDDLStatic* field_0x1f0;                 // the static parts
@@ -709,6 +694,8 @@ public:
     int field_0x214;
     int field_0x218;
 };
+
+inline UIDDLButton* UIDropDownList::UnknownInlineButton() { return field_0x1ec; }
 
 // RTTI: MediaControl : GameObject (vtable 0x005551c0; 0x80 bytes, new'd by
 // UIVideoStatic 0x0047ae90): a movie player. Declared here for
@@ -752,6 +739,7 @@ public:
     virtual ~UIProgressBar();                 // 0x0047b090 (deleting wrapper 0x0047b070)
     virtual int UnknownVirtualSlot40();       // 0x0047b110: draws the bar and its percentage
     virtual TextureMap* UnknownVirtualSlot48(int state); // 0x0047b100
+    void UnknownFunction47b370(int redraw);   // 0x0047b370: one step on
     void UnknownFunction47b3d0(int texture, int owned); // 0x0047b3d0: the bar's texture (a TextureMap*)
 
     float field_0x1ec;                        // the part done (0..1)
@@ -761,21 +749,6 @@ public:
     int field_0x1fc;                          // draws the percentage
     int field_0x200;                          // owns +0x1f8
 };
-
-inline UnknownGameUiControl* UnknownGameUiControl::UnknownInlineButton() {
-    return static_cast<UIDropDownList*>(this)->field_0x1ec;
-}
-
-inline UIButton* UnknownGameUiControl::UnknownInlineButtonControl() { return static_cast<UIButton*>(this); }
-inline UIEditBox* UnknownGameUiControl::UnknownInlineEditBox() { return static_cast<UIEditBox*>(this); }
-inline UIScrollBar* UnknownGameUiControl::UnknownInlineScrollBar() { return static_cast<UIScrollBar*>(this); }
-inline UIListBox* UnknownGameUiControl::UnknownInlineListBox() { return static_cast<UIListBox*>(this); }
-inline UIMultiState* UnknownGameUiControl::UnknownInlineMultiState() { return static_cast<UIMultiState*>(this); }
-inline UIProgressBar* UnknownGameUiControl::UnknownInlineProgressBar() { return static_cast<UIProgressBar*>(this); }
-inline int UnknownGameUiControl::UnknownInlineRows() { return UnknownInlineListBox()->field_0x1ec; }
-inline UnknownGameUiControl* UnknownGameUiControl::UnknownInlineDropDownListBox() {
-    return static_cast<UIDropDownList*>(this)->field_0x1fc;
-}
 
 // Page object at KrustyUI+0x490.
 class UnknownGameUiPage {

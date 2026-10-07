@@ -322,7 +322,7 @@ void PCCentralBikeRiderDlg::UnknownFunction4d6fc0()
     int rider = 0;
     char text[128];
     PCCentralBikeRiderDlg* self = this;
-    UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+    UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
     list->UnknownFunction4775f0();
     for (int i = 0; i < g_UnknownGlobal56e26c->ui->field_0x54; i++) {
         int rule = g_UnknownGlobal56e26c->field_0x3444->field_0x4c;
@@ -351,7 +351,7 @@ void PCCentralBikeRiderDlg::UnknownFunction4d6fc0()
     else
         list->UnknownFunction476a60(0);
     list->UnknownFunction477900(1);
-    list = self->UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+    list = static_cast<UIDropDownList*>(self->UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
     list->UnknownFunction4775f0();
     for (int j = 0; j < g_UnknownGlobal56e26c->ui->field_0x5c; j++) {
         UnknownKrustyUIModel* entry = &((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[j];
@@ -377,11 +377,11 @@ void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, in
     const char* prefix = finished || failed ? "LstDone" : "Lst";
 
     sprintf(name, "%s%s", prefix, "Name");
-    UnknownFunction46ebf0(name, 3)->UnknownFunction476d80(circuit->field_0x00, row, 0);
+    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(circuit->field_0x00, row, 0);
 
     sprintf(name, "%s%s", prefix, "Rank");
     sprintf(text, "%d / %d", circuit->field_0x465[0].field_0x18.field_0x10, circuit->field_0x460);
-    UnknownFunction46ebf0(name, 3)->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Class");
     switch (circuit->field_0x4c) {
@@ -395,7 +395,7 @@ void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, in
         g_UnknownGlobal56e26c->UnknownFunction521970(0x14cf, text, 127);
         break;
     }
-    UnknownFunction46ebf0(name, 3)->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Diff");
     switch (circuit->field_0x50) {
@@ -409,15 +409,15 @@ void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, in
         g_UnknownGlobal56e26c->UnknownFunction521970(0x14cc, text, 127);
         break;
     }
-    UnknownFunction46ebf0(name, 3)->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Points");
     _itoa(circuit->field_0x465[0].field_0x18.field_0x00, text, 10);
-    UnknownFunction46ebf0(name, 3)->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Cash");
     sprintf(text, "$%d", circuit->field_0x465[0].field_0x30);
-    UnknownFunction46ebf0(name, 3)->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
 
     if (finished || failed) {
         sprintf(name, "%s%s", prefix, "Status");
@@ -425,7 +425,7 @@ void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, in
             g_UnknownGlobal56e26c->UnknownFunction521970(0x1442, text, 128);
         else if (finished)
             g_UnknownGlobal56e26c->UnknownFunction521970(0x1443, text, 128);
-        UnknownFunction46ebf0(name, 3)->UnknownFunction476d80(text, row, 0);
+        static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
     }
 }
 
@@ -449,7 +449,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(&field_0x7f58, 0, 0, 0, 0);
         g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(field_0x7f64);
         field_0x7f78 = 1;
-        UnknownFunction46ebf0("ChkAutoRotate", 2)->UnknownFunction478cf0(0);
+        static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkAutoRotate", 2))->UnknownFunction478cf0(0);
     } else if (!field_0x7f78) {
         offset = UnknownVectorDifference(field_0x7f58, g_UnknownGlobal56e26c->ui->field_0x474);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
@@ -461,7 +461,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
     g_UnknownGlobal56e26c->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
     g_UnknownGlobal56e26c->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
     if (field_0x7f80 && rand() % 200 == 1) {
-        UnknownGameUiControl* bikes = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+        UIListBox* bikes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
         bikes->UnknownFunction4768d0(-1);
         switch (rand() % 3) {
         case 0:
@@ -477,7 +477,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         field_0x7f80 = 0;
     }
     if (!field_0x7f80 && g_UnknownGlobal56e26c->ui->field_0x46c->field_0x0c) {
-        UnknownGameUiControl* bikes = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+        UIListBox* bikes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
         KrustyUI* ui = g_UnknownGlobal56e26c->ui;
         UnknownKrustyUIModel* model =
             &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->UnknownFunction4768d0(-1)].field_0x00];

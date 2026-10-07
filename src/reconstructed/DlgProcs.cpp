@@ -113,7 +113,7 @@ int UnknownFunction44b0e0(const void* a, const void* b) {
 
 // 0x0044b120
 int UnknownFunction44b120(UnknownDialogEvent* event) {
-    UnknownGameUiControl* list = event->field_0x0c->UnknownFunction46ebf0("LstProfiles", 0);
+    UIListBox* list = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstProfiles", 0));
     short selection = list->UnknownFunction476950();
     if (selection != -1) {
         char name[16];
@@ -153,7 +153,7 @@ int MainDlg::UnknownVirtualSlot10(float frameTime) {
 // 0x0044c7a0
 void MainDlg::UnknownFunction44c7a0() {
     char name[260];
-    UnknownGameUiControl* list = UnknownFunction46ebf0("LstProfiles", 0);
+    UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstProfiles", 0));
     list->UnknownFunction4775f0();
     g_UnknownGlobal56e26c->profileDirectory->UnknownFunction44a1d0("ui\\profile");
     g_UnknownGlobal56e26c->profileDirectory->UnknownFunction44a220("*", 0);
@@ -227,30 +227,30 @@ void UnknownFunction44c9f0(UnknownDialogEvent* event, const char* a, const char*
 
 // 0x0044ca80
 void UnknownFunction44ca80(UnknownDialogEvent* event) {
-    event->field_0x0c->UnknownFunction46ebf0("LstStats1", 0)->UnknownFunction4775f0();
-    event->field_0x0c->UnknownFunction46ebf0("LstStats2", 0)->UnknownFunction4775f0();
-    event->field_0x0c->UnknownFunction46ebf0("LstStats3", 0)->UnknownFunction4775f0();
-    event->field_0x0c->UnknownFunction46ebf0("LstStats4", 0)->UnknownFunction4775f0();
+    static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats1", 0))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats2", 0))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats3", 0))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats4", 0))->UnknownFunction4775f0();
 }
 
 // 0x0044cae0
 void UnknownFunction44cae0(UnknownDialogEvent* event, const char* a, const char* b, const char* c,
                            const char* d) {
-    UnknownGameUiControl* list;
+    UIListBox* list;
     if (a) {
-        list = event->field_0x0c->UnknownFunction46ebf0("LstStats1", 0);
+        list = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats1", 0));
         list->UnknownFunction476d80(a, 0, 0);
     }
     if (b) {
-        list = event->field_0x0c->UnknownFunction46ebf0("LstStats2", 0);
+        list = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats2", 0));
         list->UnknownFunction476d80(b, 0, 0);
     }
     if (c) {
-        list = event->field_0x0c->UnknownFunction46ebf0("LstStats3", 0);
+        list = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats3", 0));
         list->UnknownFunction476d80(c, 0, 0);
     }
     if (d) {
-        list = event->field_0x0c->UnknownFunction46ebf0("LstStats4", 0);
+        list = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats4", 0));
         list->UnknownFunction476d80(d, 0, 0);
     }
 }
@@ -346,16 +346,16 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         field_0x7f58 = 0;
         field_0x7f5c = 0;
         field_0x7f60 = 0;
-        UnknownGameUiControl* tab = UnknownFunction46ebf0("EventTab", 4);
+        UIRadioButton* tab = static_cast<UIRadioButton*>(UnknownFunction46ebf0("EventTab", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e3);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e3);
         tab->UnknownFunction470da0(0x12);
         tab->UnknownFunction479310(0);
-        tab = UnknownFunction46ebf0("BikeRiderTab", 4);
+        tab = static_cast<UIRadioButton*>(UnknownFunction46ebf0("BikeRiderTab", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e4);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e4);
         tab->UnknownFunction470da0(0x12);
-        tab = UnknownFunction46ebf0("RaceInfoTab", 4);
+        tab = static_cast<UIRadioButton*>(UnknownFunction46ebf0("RaceInfoTab", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e5);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e5);
         tab->UnknownFunction470da0(0x12);
@@ -368,10 +368,10 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         g_UnknownGlobal56e26c->mode.field_0x94 = g_UnknownGlobal56e26c->mode.field_0x98;
         g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04);
         if (field_0xc4 == 0x88e) {
-            UnknownFunction46ebf0("RaceInfoTab", 4)->UnknownFunction479310(0);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("RaceInfoTab", 4))->UnknownFunction479310(0);
             UnknownFunction44d740(2);
         } else {
-            UnknownFunction46ebf0("EventTab", 4)->UnknownFunction479310(0);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("EventTab", 4))->UnknownFunction479310(0);
             UnknownFunction44d740(0);
         }
         break;
@@ -464,7 +464,7 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case 9: {
         int code = event->field_0x00;
         if (code == 0x33) {
-            UnknownFunction46ebf0("BikeRiderTab", 4)->UnknownFunction479310(0);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("BikeRiderTab", 4))->UnknownFunction479310(0);
             UnknownFunction44d740(1);
         } else if (code == 0x51) {
             if (field_0x7f5c) {
@@ -474,7 +474,7 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 field_0x7f5c->UnknownFunction4500e0();
             }
         } else if (code == 0x66) {
-            UnknownFunction46ebf0("EventTab", 4)->UnknownFunction479310(0);
+            static_cast<UIRadioButton*>(UnknownFunction46ebf0("EventTab", 4))->UnknownFunction479310(0);
             UnknownFunction44d740(0);
         }
         break;
@@ -533,7 +533,7 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->field_0x08) {
     case 5: {
         UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00;
-        UnknownGameUiControl* list = UnknownFunction46ebf0("EventTypeDropDown", 6)->field_0x1fc;
+        UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("EventTypeDropDown", 6))->field_0x1fc;
         g_UnknownGlobal56e26c->UnknownFunction521970(0x13ed, text, 0x80);
         list->UnknownFunction476d80(text, 1, 0);
         g_UnknownGlobal56e26c->UnknownFunction521970(0x13ee, text, 0x80);
@@ -545,7 +545,7 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         g_UnknownGlobal56e26c->UnknownFunction521970(0x13f2, text, 0x80);
         list->UnknownFunction476d80(text, 3, 0);
         list->UnknownFunction476b30(settings->field_0x04);
-        list = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+        list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("RaceModeDropDown", 6))->field_0x1fc;
         g_UnknownGlobal56e26c->UnknownFunction521970(0x13f3, text, 0x80);
         list->UnknownFunction476d80(text, 0, 0);
         g_UnknownGlobal56e26c->UnknownFunction521970(0x13f4, text, 0x80);
@@ -558,13 +558,13 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         UnknownFunction46ebf0("OpponentsListBox", 0)->UnknownVirtualSlot54(&settings->field_0x24);
         UnknownFunction46ebf0("ChkRecordRace", 0)->UnknownFunction470660(0, 1);
         UnknownFunction46ebf0("RadLODEasy", 0)->UnknownVirtualSlot54(&g_UnknownGlobal56e26c->mode.field_0x94);
-        UnknownGameUiControl* gates = UnknownFunction46ebf0("LstNumGates", 3);
+        UIListBox* gates = static_cast<UIListBox*>(UnknownFunction46ebf0("LstNumGates", 3));
         gates->UnknownFunction4775f0();
         for (int i = 10; i <= 30; i++) {
             _itoa(i, text, 10);
             gates->UnknownFunction476d80(text, i, 0);
         }
-        UnknownFunction46ebf0("EditSeed", 0xb)->UnknownFunction473f30("0123456789");
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("EditSeed", 0xb))->UnknownFunction473f30("0123456789");
         UnknownFunction46ecc0(0);
         UnknownFunction44e3e0();
         UnknownFunction44dfc0();
@@ -580,28 +580,28 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         if (!_stricmp("ChkRandomGates", event->field_0x04))
             UnknownFunction44dfc0();
         if (!_stricmp("TrackLeft", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLTextBox", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLTextBox", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("TrackRight", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLTextBox", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLTextBox", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("GhostLeft", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLGhostRaces", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLGhostRaces", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("GhostRight", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLGhostRaces", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLGhostRaces", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("SeedLeft", event->field_0x04)) {
             char seed[32];
-            UnknownGameUiControl* edit = UnknownFunction46ebf0("EditSeed", 0xb);
+            UIEditBox* edit = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditSeed", 0xb));
             edit->UnknownFunction473ef0(seed, 32);
             int value = atoi(seed) - 1;
             if (value < 0)
@@ -611,7 +611,7 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             field_0x34->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
         } else if (!_stricmp("SeedRight", event->field_0x04)) {
             char seed[32];
-            UnknownGameUiControl* edit = UnknownFunction46ebf0("EditSeed", 0xb);
+            UIEditBox* edit = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditSeed", 0xb));
             edit->UnknownFunction473ef0(seed, 32);
             int value = atoi(seed) + 1;
             if (value > 999)
@@ -626,9 +626,9 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case 2:
         if (!_stricmp("RaceModeDropDown", event->field_0x04)) {
-            if (event->field_0x14->UnknownFunction4768d0(-1) == 4)
+            if (static_cast<UIListBox*>(event->field_0x14)->UnknownFunction4768d0(-1) == 4)
                 UnknownFunction44eb40();
-            if (event->field_0x14->UnknownFunction4768d0(-1) != 2) {
+            if (static_cast<UIListBox*>(event->field_0x14)->UnknownFunction4768d0(-1) != 2) {
                 g_UnknownGlobal56e26c->mode.field_0x10ec = 0;
                 g_UnknownGlobal56e26c->eventManager->field_0x48 = 0;
             }
@@ -641,7 +641,7 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("DDLTextBox", event->field_0x04)) {
             UnknownFunction44eb40();
             strcpy(g_UnknownGlobal56e26c->mode.field_0x6f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04],
-                   event->field_0x14->UnknownFunction476d20(-1));
+                   static_cast<UIListBox*>(event->field_0x14)->UnknownFunction476d20(-1));
         }
         break;
     }
@@ -651,7 +651,7 @@ void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 void SPEventDlg::UnknownFunction44dfc0() {
     char text[32];
     UnknownGameUiControl* record = UnknownFunction46ebf0("ChkRecordRace", 0);
-    UnknownGameUiControl* modes = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+    UIListBox* modes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("RaceModeDropDown", 6))->field_0x1fc;
     int mode = modes->UnknownFunction4768d0(-1);
     UnknownGameUiControl* lapsBox = UnknownFunction46ebf0("LapsControlBox", 5);
     UnknownGameUiControl* racesBox = UnknownFunction46ebf0("RacesControlBox", 5);
@@ -687,7 +687,7 @@ void SPEventDlg::UnknownFunction44dfc0() {
     UnknownTrackGameModeSettings& settings = g_UnknownGlobal56e26c->mode.field_0x27f8;
     if (settings.field_0x04 == 1 && modes->UnknownFunction4768d0(-1) != 4) {
         waypoints->UnknownFunction470660(1, 1);
-        if (UnknownFunction46ebf0("ChkRandomGates", 2)->UnknownFunction4755c0()) {
+        if (static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkRandomGates", 2))->UnknownFunction4755c0()) {
             UnknownFunction46ea80(0x6f, 1);
             UnknownFunction46ebf0("LstNumGates", 0)->UnknownFunction470660(1, 1);
             UnknownFunction46ebf0("EditSeed", 0)->UnknownFunction470660(1, 1);
@@ -704,7 +704,7 @@ void SPEventDlg::UnknownFunction44dfc0() {
     UnknownGameUiControl* opponentsLeft = UnknownFunction46ebf0("OpponentsLeftArrow", 0);
     UnknownGameUiControl* opponentsRight = UnknownFunction46ebf0("OpponentsRightArrow", 0);
     UnknownGameUiControl* racesLabel = UnknownFunction46ebf0("RacesLabel", 0xc);
-    UnknownGameUiControl* races = UnknownFunction46ebf0("RacesListBox", 3);
+    UIListBox* races = static_cast<UIListBox*>(UnknownFunction46ebf0("RacesListBox", 3));
     UnknownGameUiControl* opponents = UnknownFunction46ebf0("OpponentsListBox", 3);
     races->UnknownFunction4775f0();
     for (int i = 3; i <= 7; i += 2) {
@@ -738,12 +738,12 @@ void SPEventDlg::UnknownFunction44dfc0() {
 void SPEventDlg::UnknownFunction44e3e0() {
     char label[64];
     char text[256];
-    UnknownGameUiControl* types = UnknownFunction46ebf0("EventTypeDropDown", 6)->field_0x1fc;
+    UIListBox* types = static_cast<UIDropDownList*>(UnknownFunction46ebf0("EventTypeDropDown", 6))->field_0x1fc;
     int type = types->UnknownFunction4768d0(-1);
     UnknownTrackGameModeSettings& settings = g_UnknownGlobal56e26c->mode.field_0x27f8;
     settings.field_0x04 = type;
     g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(type);
-    UnknownGameUiControl* modes = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+    UIListBox* modes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("RaceModeDropDown", 6))->field_0x1fc;
     int row = ((UIListBox*)modes)->UnknownFunction476900(4);
     if (type == 0) {
         if (row != -1) {
@@ -758,8 +758,8 @@ void SPEventDlg::UnknownFunction44e3e0() {
         modes->UnknownFunction476d80(label, 4, 1);
     }
     UnknownGameUiControl* lapsLabel = UnknownFunction46ebf0("LapsLabel", 0xc);
-    UnknownGameUiControl* opponents = UnknownFunction46ebf0("OpponentsListBox", 3);
-    UnknownGameUiControl* laps = UnknownFunction46ebf0("LapsListBox", 3);
+    UIListBox* opponents = static_cast<UIListBox*>(UnknownFunction46ebf0("OpponentsListBox", 3));
+    UIListBox* laps = static_cast<UIListBox*>(UnknownFunction46ebf0("LapsListBox", 3));
     UnknownFunction46ebf0("RacesListBox", 3);
     lapsLabel->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x929);
     opponents->UnknownFunction4775f0();
@@ -793,7 +793,7 @@ void SPEventDlg::UnknownFunction44e3e0() {
     }
     UnknownFunction46ecc0(0);
     g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(type);
-    UnknownGameUiControl* tracks = UnknownFunction46ebf0("DDLTextBox", 6)->field_0x1fc;
+    UIListBox* tracks = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLTextBox", 6))->field_0x1fc;
     tracks->UnknownFunction476ad0(g_UnknownGlobal56e26c->mode.field_0x6f4[type]);
 }
 
@@ -803,14 +803,14 @@ void SPEventDlg::UnknownVirtualSlot31(int apply) {
     UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00;
     if (apply) {
         if (settings->field_0x04 != 0 && settings->field_0x04 != 4)
-            settings->field_0x20 = UnknownFunction46ebf0("LapsListBox", 3)->UnknownFunction4768d0(-1);
+            settings->field_0x20 = static_cast<UIListBox*>(UnknownFunction46ebf0("LapsListBox", 3))->UnknownFunction4768d0(-1);
         else
-            settings->field_0x140 = (float)UnknownFunction46ebf0("LapsListBox", 3)->UnknownFunction4768d0(-1);
+            settings->field_0x140 = (float)static_cast<UIListBox*>(UnknownFunction46ebf0("LapsListBox", 3))->UnknownFunction4768d0(-1);
         if (!g_UnknownGlobal56e26c->mode.field_0x10ec)
-            settings->field_0x0c = UnknownFunction46ebf0("RacesListBox", 3)->UnknownFunction4768d0(-1);
-        settings->field_0x10 = UnknownFunction46ebf0("ChkTreeCollision", 2)->UnknownFunction4755c0();
+            settings->field_0x0c = static_cast<UIListBox*>(UnknownFunction46ebf0("RacesListBox", 3))->UnknownFunction4768d0(-1);
+        settings->field_0x10 = static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkTreeCollision", 2))->UnknownFunction4755c0();
         strcpy(settings->field_0x36, "");
-        UnknownGameUiControl* list = UnknownFunction46ebf0("DDLTextBox", 6)->field_0x1fc;
+        UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLTextBox", 6))->field_0x1fc;
         int index = list->UnknownFunction4768d0(-1);
         {
             char* name = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x14;
@@ -823,18 +823,18 @@ void SPEventDlg::UnknownVirtualSlot31(int apply) {
         settings->field_0x34 = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x04;
         strcpy(g_UnknownGlobal56e26c->mode.field_0x6f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04], list->UnknownFunction476d20(-1));
         g_UnknownGlobal56e26c->mode.field_0x9f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04] = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34;
-        if (UnknownFunction46ebf0("ChkRandomGates", 2)->UnknownFunction4755c0())
+        if (static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkRandomGates", 2))->UnknownFunction4755c0())
             settings->field_0x2c = 1;
         else
             settings->field_0x2c = 0;
-        settings->field_0x2d = UnknownFunction46ebf0("LstNumGates", 3)->UnknownFunction4768d0(-1);
-        UnknownFunction46ebf0("EditSeed", 0xb)->UnknownFunction473ef0(seed, 128);
+        settings->field_0x2d = static_cast<UIListBox*>(UnknownFunction46ebf0("LstNumGates", 3))->UnknownFunction4768d0(-1);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("EditSeed", 0xb))->UnknownFunction473ef0(seed, 128);
         settings->field_0x30 = atoi(seed);
-        list = UnknownFunction46ebf0("EventTypeDropDown", 6)->field_0x1fc;
+        list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("EventTypeDropDown", 6))->field_0x1fc;
         settings->field_0x04 = list->UnknownFunction4768d0(-1);
-        list = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+        list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("RaceModeDropDown", 6))->field_0x1fc;
         settings->field_0x00 = list->UnknownFunction4768d0(-1);
-        list = UnknownFunction46ebf0("DDLGhostRaces", 6)->field_0x1fc;
+        list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLGhostRaces", 6))->field_0x1fc;
         int ghost = list->UnknownFunction4768d0(-1);
         if (settings->field_0x00 == 4 && ghost != -1) {
             COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x25ec, field_0x7f60[ghost], 0x104);
@@ -844,20 +844,20 @@ void SPEventDlg::UnknownVirtualSlot31(int apply) {
             g_UnknownGlobal56e26c->mode.field_0x25ec[0] = 0;
         }
     } else {
-        UnknownFunction46ebf0("RacesListBox", 3)->UnknownFunction476b30(settings->field_0x0c);
-        UnknownFunction46ebf0("ChkRandomGates", 2)->UnknownFunction478cf0(settings->field_0x2c);
-        UnknownFunction46ebf0("LstNumGates", 3)->UnknownFunction476b30(settings->field_0x2d);
+        static_cast<UIListBox*>(UnknownFunction46ebf0("RacesListBox", 3))->UnknownFunction476b30(settings->field_0x0c);
+        static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkRandomGates", 2))->UnknownFunction478cf0(settings->field_0x2c);
+        static_cast<UIListBox*>(UnknownFunction46ebf0("LstNumGates", 3))->UnknownFunction476b30(settings->field_0x2d);
         _itoa(settings->field_0x30, seed, 10);
-        UnknownFunction46ebf0("EditSeed", 0xb)->UnknownFunction473da0(seed);
-        UnknownGameUiControl* laps = UnknownFunction46ebf0("LapsListBox", 3);
+        static_cast<UIEditBox*>(UnknownFunction46ebf0("EditSeed", 0xb))->UnknownFunction473da0(seed);
+        UIListBox* laps = static_cast<UIListBox*>(UnknownFunction46ebf0("LapsListBox", 3));
         if (settings->field_0x04 != 0 && settings->field_0x04 != 4)
             laps->UnknownFunction476b30(settings->field_0x20);
         else
             laps->UnknownFunction476b30((int)settings->field_0x140);
-        UnknownFunction46ebf0("ChkTreeCollision", 2)->UnknownFunction478cf0(settings->field_0x10);
-        UnknownGameUiControl* list = UnknownFunction46ebf0("EventTypeDropDown", 6)->field_0x1fc;
+        static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkTreeCollision", 2))->UnknownFunction478cf0(settings->field_0x10);
+        UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("EventTypeDropDown", 6))->field_0x1fc;
         list->UnknownFunction476b30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04);
-        list = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+        list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("RaceModeDropDown", 6))->field_0x1fc;
         list->UnknownFunction476b30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00);
     }
 }
@@ -868,7 +868,7 @@ void SPEventDlg::UnknownFunction44eb40() {
     char label[128];
     WIN32_FIND_DATAA data;
     UnknownFunction44eed0();
-    UnknownGameUiControl* list = UnknownFunction46ebf0("DDLGhostRaces", 6)->field_0x1fc;
+    UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLGhostRaces", 6))->field_0x1fc;
     list->UnknownFunction4775f0();
     g_UnknownGlobal56e26c->UnknownFunction521970(0x14c7, label, 128);
     list->UnknownFunction476d80(label, -1, 0);
@@ -894,7 +894,7 @@ int SPEventDlg::UnknownFunction44ec50(const char* path) {
     FILE* file = fopen(path, "rb");
     if (file) {
         if (fread(&header, sizeof(header), 1, file)) {
-            UnknownGameUiControl* tracks = UnknownFunction46ebf0("DDLTextBox", 6)->field_0x1fc;
+            UIListBox* tracks = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLTextBox", 6))->field_0x1fc;
             int row = tracks->UnknownFunction4768d0(-1);
             if (!_stricmp(header.field_0x6a, g_UnknownGlobal56e26c->ui->field_0x60[row].field_0x14) &&
                 header.field_0x30 > 0.0f &&
@@ -907,7 +907,7 @@ int SPEventDlg::UnknownFunction44ec50(const char* path) {
                 field_0x7f60[field_0x7f64] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 1986);
                 strcpy(field_0x7f60[field_0x7f64], path);
                 field_0x7f64++;
-                UnknownGameUiControl* list = UnknownFunction46ebf0("DDLGhostRaces", 6)->field_0x1fc;
+                UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLGhostRaces", 6))->field_0x1fc;
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x14c8, label, 128);
                 sprintf(text, "%s: %s", label, header.field_0x10);
                 list->UnknownFunction476d80(text, field_0x7f5c - 1, 0);
@@ -941,12 +941,12 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->field_0x08) {
     case 5: {
         field_0x7f78 = 0;
-        UnknownFunction46ebf0("ChkAutoRotate", 2)->UnknownFunction478cf0(1);
+        static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkAutoRotate", 2))->UnknownFunction478cf0(1);
         g_UnknownGlobal56e26c->mode.field_0x9c = 0;
         field_0x7f88 = 1;
         field_0x7f84 = 1;
         UnknownFunction44f750();
-        UnknownGameUiControl* list = UnknownFunction46ebf0("DDLEngineSize", 6)->field_0x1fc;
+        UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLEngineSize", 6))->field_0x1fc;
         list->UnknownFunction4775f0();
         list->UnknownFunction476d80("125cc 2-stroke", UnknownBikeClassOf(125), 0);
         list->UnknownFunction476d80("250cc 2-stroke", UnknownBikeClassOf(250), 0);
@@ -954,7 +954,7 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         list->UnknownFunction476d80("500cc 2-stroke", UnknownBikeClassOf(500), 0);
         list->UnknownFunction476d80("600cc 4-stroke", UnknownBikeClassOf(600), 0);
         list->UnknownFunction476b30(UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00));
-        UnknownGameUiControl* edit = UnknownFunction46ebf0("EditPlateNumber", 0xb);
+        UIEditBox* edit = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditPlateNumber", 0xb));
         edit->UnknownFunction473f30("0123456789");
         g_UnknownGlobal56e26c->ui->UnknownFunction4999f0(this);
         Vector3* eye = &field_0x7f58;
@@ -993,27 +993,27 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case 1:
         if (!_stricmp("BikeLeft", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("BikeRight", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("RiderLeft", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("RiderRight", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("ChkAutoRotate", event->field_0x04)) {
-            field_0x7f78 = !UnknownFunction46ebf0("ChkAutoRotate", 2)->UnknownFunction4755c0();
+            field_0x7f78 = !static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkAutoRotate", 2))->UnknownFunction4755c0();
         } else if (!_stricmp("ButWrench", event->field_0x04)) {
             OptionsDlg* dialog = new(__FILE__, 2135) OptionsDlg;
             field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, field_0x2c, 2, 0, 1);
@@ -1021,7 +1021,7 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case 10:
         if (!_stricmp("EditPlateNumber", event->field_0x04)) {
-            event->field_0x14->UnknownFunction473ef0(plate, 9);
+            static_cast<UIEditBox*>(event->field_0x14)->UnknownFunction473ef0(plate, 9);
             int number = atoi(plate);
             if (number < 100)
                 number += 100;
@@ -1033,13 +1033,13 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
             g_UnknownGlobal56e26c->mode.field_0x1bcc = number;
             _itoa(number, plate, 10);
-            event->field_0x14->UnknownFunction473da0(plate);
+            static_cast<UIEditBox*>(event->field_0x14)->UnknownFunction473da0(plate);
             UnknownFunction44f950(number);
         }
         break;
     case 19:
         if (!_stricmp("EditPlateNumber", event->field_0x04)) {
-            event->field_0x14->UnknownFunction473ef0(typed, 9);
+            static_cast<UIEditBox*>(event->field_0x14)->UnknownFunction473ef0(typed, 9);
             int number = atoi(typed);
             if (number >= 100 && number <= 999) {
                 UnknownFunction44f950(number);
@@ -1077,7 +1077,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
     if (field_0x110)
         field_0x110->UnknownFunction404c80();
     if (field_0x7f84) {
-        UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+        UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
         KrustyUI* ui = g_UnknownGlobal56e26c->ui;
         UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->field_0x50)[list->UnknownFunction4768d0(-1)];
         ((UnknownModelTexture*)((UnknownKrustyUIModel*)ui->field_0x48)[bike->field_0x00].field_0xc0->field_0x1a0)
@@ -1085,7 +1085,7 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
         field_0x7f84 = 0;
     }
     if (field_0x7f88) {
-        UnknownGameUiControl* list = UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+        UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
         KrustyUI* ui = g_UnknownGlobal56e26c->ui;
         UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->field_0x58)[list->UnknownFunction4768d0(-1)];
         ((UnknownModelTexture*)ui->field_0x46c->field_0x1a0)
@@ -1103,7 +1103,7 @@ void SPBikeRiderDlg::UnknownFunction4500d0() {
 // 0x004500e0: shows the chosen bike and loads its class's garage defaults.
 void SPBikeRiderDlg::UnknownFunction4500e0() {
     char text[12];
-    UnknownGameUiControl* bikes = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+    UIListBox* bikes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
     KrustyUI* ui = g_UnknownGlobal56e26c->ui;
     UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->field_0x50)[bikes->UnknownFunction4768d0(-1)];
     UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)ui->field_0x48)[bike->field_0x00];
@@ -1134,7 +1134,7 @@ void SPBikeRiderDlg::UnknownFunction4500e0() {
     }
     g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4 = bikes->UnknownFunction4768d0(-1);
     if (bike->field_0x88) {
-        UnknownGameUiControl* sizes = UnknownFunction46ebf0("DDLEngineSize", 6)->field_0x1fc;
+        UIListBox* sizes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLEngineSize", 6))->field_0x1fc;
         int size = sizes->UnknownFunction4768d0(-1);
         int previous = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00);
         UNKNOWN_GARAGE_SETTINGS->field_0x00 = g_UnknownGlobal56cb6c[size];
@@ -1153,7 +1153,7 @@ void SPBikeRiderDlg::UnknownFunction4500e0() {
         if (current != previous)
             UNKNOWN_APPLY_BIKE_CLASS(current, i);
     }
-    UnknownGameUiControl* plate = UnknownFunction46ebf0("EditPlateNumber", 0xb);
+    UIEditBox* plate = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditPlateNumber", 0xb));
     _itoa(g_UnknownGlobal56e26c->mode.field_0x1bcc, text, 10);
     plate->UnknownFunction473da0(text);
 }
@@ -1163,7 +1163,7 @@ void SPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
     if (!apply)
         return;
     strcpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00, "");
-    UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+    UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
     int bike = list->UnknownFunction4768d0(-1);
     {
         UnknownKrustyUIBike* bikes = (UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50;
@@ -1186,7 +1186,7 @@ void SPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
         strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80, "", count);
         g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80[count] = 0;
     }
-    list = UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+    list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
     int rider = list->UnknownFunction4768d0(-1);
     {
         char* name = ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[rider].field_0x40;
@@ -1324,7 +1324,7 @@ void UnknownFunction451b80(UnknownDialogEvent* event) {
     char name[128];
     char preset[260];
     char control[260];
-    UnknownGameUiControl* edit = event->field_0x0c->UnknownFunction46ebf0("EditBox", 0);
+    UIEditBox* edit = static_cast<UIEditBox*>(event->field_0x0c->UnknownFunction46ebf0("EditBox", 0));
     edit->UnknownFunction473ef0(name, 16);
     if (!strcmp(name, ""))
         return;
@@ -1399,7 +1399,7 @@ void UserNameDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         UnknownGameUiControl* prompt = UnknownFunction46ebf0("TxtPrompt", 12);
         prompt->field_0x1e8 = 1;
         prompt->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x13ae);
-        UnknownGameUiControl* edit = UnknownFunction46ebf0("EditBox", 0);
+        UIEditBox* edit = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditBox", 0));
         edit->UnknownFunction473c70(15);
         edit->UnknownFunction473f30(kProfileNameCharacters);
         if (g_UnknownGlobal56e26c->ui->field_0x3c == 0xbbb) {
@@ -1424,19 +1424,19 @@ void UserNameDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case 9:
         if (event->field_0x00 == 0x1f) {
-            UnknownGameUiControl* edit = UnknownFunction46ebf0("EditBox", 0);
+            UIEditBox* edit = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditBox", 0));
             edit->UnknownFunction473ef0(text, 128);
             COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x00, text, 16);
             g_UnknownGlobal56e26c->mode.UnknownFunction5231f0();
             UnknownFunction46ff30(0x1f);
         } else {
-            UnknownGameUiControl* edit = UnknownFunction46ebf0("EditBox", 0);
+            UIEditBox* edit = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditBox", 0));
             edit->UnknownFunction473da0("");
             field_0x34->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
         }
         break;
     case 19: {
-        UnknownGameUiControl* edit = UnknownFunction46ebf0("EditBox", 11);
+        UIEditBox* edit = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditBox", 11));
         edit->UnknownFunction473ef0(text, 127);
         if (!text[0])
             UnknownFunction46ebf0("OkButton", 0)->UnknownVirtualSlot49(0);
@@ -1859,16 +1859,16 @@ void GhostReplayDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case 5: {
         field_0x7f58 = 0;
         field_0x7f5c = 0;
-        UnknownGameUiControl* tab = UnknownFunction46ebf0("TabLeft", 4);
+        UIMultiState* tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabLeft", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x143a);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x143a);
         tab->UnknownFunction470da0(0x22);
-        tab = UnknownFunction46ebf0("TabRight", 4);
+        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabRight", 4));
         tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1439);
         tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1439);
         tab->UnknownFunction470da0(0x22);
         UnknownFunction453e90(1);
-        UnknownFunction46ebf0("TabRight", 4)->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabRight", 4))->UnknownFunction479310(0);
         break;
     }
     case 1:
@@ -1948,7 +1948,7 @@ void GhostFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case 1:
         if (!_stricmp("ButDelete", event->field_0x04)) {
             if (field_0x7f5c) {
-                UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
+                UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
                 sprintf(text, "%s, %s", list->UnknownFunction476d20(-1),
                         field_0x7f58[list->UnknownFunction4768d0(-1)].field_0x10);
                 ChoiceDlg* dialog = new(__FILE__, 4533) ChoiceDlg;
@@ -1958,7 +1958,7 @@ void GhostFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("ButDescription", event->field_0x04)) {
             if (field_0x7f5c) {
-                COPY_TEXT(field_0x7f68, UnknownFunction46ebf0("LstDesc", 3)->UnknownFunction476d20(-1), 32);
+                COPY_TEXT(field_0x7f68, static_cast<UIListBox*>(UnknownFunction46ebf0("LstDesc", 3))->UnknownFunction476d20(-1), 32);
                 EditBoxDlg* dialog = new(__FILE__, 4545) EditBoxDlg;
                 field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0,
                                                   (UnknownGuiDialog*)this, 0, 0, 1);
@@ -1969,11 +1969,11 @@ void GhostFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case 9: {
         int code = event->field_0x00;
         if (code == 0x65) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
+            UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
             DeleteFileA(field_0x7f60[list->UnknownFunction4768d0(-1)]);
             UnknownFunction454470();
         } else if (code == 0xc9) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
+            UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
             UnknownRecordFileHeader* header = &field_0x7f58[list->UnknownFunction4768d0(-1)];
             strcpy(header->field_0x10, field_0x7f68);
             char* path = field_0x7f60[list->UnknownFunction4768d0(-1)];
@@ -2015,10 +2015,10 @@ void GhostFilesDlg::UnknownFunction454470() {
     field_0x7f60 = 0;
     field_0x7f64 = 0;
     field_0x7f5c = 0;
-    UnknownFunction46ebf0("LstTrack", 3)->UnknownFunction4775f0();
-    UnknownFunction46ebf0("LstRider", 3)->UnknownFunction4775f0();
-    UnknownFunction46ebf0("LstLength", 3)->UnknownFunction4775f0();
-    UnknownFunction46ebf0("LstDesc", 3)->UnknownFunction4775f0();
+    static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(UnknownFunction46ebf0("LstRider", 3))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(UnknownFunction46ebf0("LstLength", 3))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(UnknownFunction46ebf0("LstDesc", 3))->UnknownFunction4775f0();
     HANDLE find = FindFirstFileA("Record\\*.gho", &data);
     if (find != INVALID_HANDLE_VALUE) {
         sprintf(path, "%s\\%s", "Record", data.cFileName);
@@ -2052,10 +2052,10 @@ int GhostFilesDlg::UnknownFunction454640(const char* path) {
             field_0x7f60[field_0x7f64] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 4657);
             strcpy(field_0x7f60[field_0x7f64], path);
             field_0x7f64++;
-            UnknownGameUiControl* track = UnknownFunction46ebf0("LstTrack", 3);
-            UnknownGameUiControl* rider = UnknownFunction46ebf0("LstRider", 3);
-            UnknownGameUiControl* length = UnknownFunction46ebf0("LstLength", 3);
-            UnknownGameUiControl* description = UnknownFunction46ebf0("LstDesc", 3);
+            UIListBox* track = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
+            UIListBox* rider = static_cast<UIListBox*>(UnknownFunction46ebf0("LstRider", 3));
+            UIListBox* length = static_cast<UIListBox*>(UnknownFunction46ebf0("LstLength", 3));
+            UIListBox* description = static_cast<UIListBox*>(UnknownFunction46ebf0("LstDesc", 3));
             g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(header.field_0x3c);
             g_UnknownGlobal56e26c->mode.UnknownFunction523a60(g_UnknownGlobal56e26c->mode.field_0x6a0,
                                                               header.field_0x6a, "env", env);
@@ -2078,7 +2078,7 @@ int GhostFilesDlg::UnknownFunction454640(const char* path) {
 
 // 0x00454970
 void GhostFilesDlg::UnknownFunction454970() {
-    UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
+    UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
     UnknownRecordFileHeader* header = &field_0x7f58[list->UnknownFunction4768d0(-1)];
     memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &header->field_0x34, sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
     COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x25ec, field_0x7f60[list->UnknownFunction4768d0(-1)], 0x104);
@@ -2101,7 +2101,7 @@ void ReplayFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case 1:
         if (!_stricmp("ButDelete", event->field_0x04)) {
             if (field_0x7f5c) {
-                UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
+                UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
                 sprintf(text, "%s, %s", list->UnknownFunction476d20(-1),
                         field_0x7f58[list->UnknownFunction4768d0(-1)].field_0x10);
                 ChoiceDlg* dialog = new(__FILE__, 4744) ChoiceDlg;
@@ -2111,7 +2111,7 @@ void ReplayFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("ButDescription", event->field_0x04)) {
             if (field_0x7f5c) {
-                COPY_TEXT(field_0x7f68, UnknownFunction46ebf0("LstDesc", 3)->UnknownFunction476d20(-1), 32);
+                COPY_TEXT(field_0x7f68, static_cast<UIListBox*>(UnknownFunction46ebf0("LstDesc", 3))->UnknownFunction476d20(-1), 32);
                 EditBoxDlg* dialog = new(__FILE__, 4756) EditBoxDlg;
                 field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0,
                                                   (UnknownGuiDialog*)this, 0, 0, 1);
@@ -2122,11 +2122,11 @@ void ReplayFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case 9: {
         int code = event->field_0x00;
         if (code == 0x65) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
+            UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
             DeleteFileA(field_0x7f60[list->UnknownFunction4768d0(-1)]);
             UnknownFunction454e60();
         } else if (code == 0xc9) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
+            UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
             UnknownRecordFileHeader* header = &field_0x7f58[list->UnknownFunction4768d0(-1)];
             COPY_TEXT(header->field_0x10, field_0x7f68, 32);
             char* path = field_0x7f60[list->UnknownFunction4768d0(-1)];
@@ -2168,11 +2168,11 @@ void ReplayFilesDlg::UnknownFunction454e60() {
     field_0x7f60 = 0;
     field_0x7f64 = 0;
     field_0x7f5c = 0;
-    UnknownFunction46ebf0("LstTrack", 3)->UnknownFunction4775f0();
-    UnknownFunction46ebf0("LstRider", 3)->UnknownFunction4775f0();
-    UnknownFunction46ebf0("LstLaps", 3)->UnknownFunction4775f0();
-    UnknownFunction46ebf0("LstLength", 3)->UnknownFunction4775f0();
-    UnknownFunction46ebf0("LstDesc", 3)->UnknownFunction4775f0();
+    static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(UnknownFunction46ebf0("LstRider", 3))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(UnknownFunction46ebf0("LstLaps", 3))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(UnknownFunction46ebf0("LstLength", 3))->UnknownFunction4775f0();
+    static_cast<UIListBox*>(UnknownFunction46ebf0("LstDesc", 3))->UnknownFunction4775f0();
     HANDLE find = FindFirstFileA("Record\\*.vcr", &data);
     if (find != INVALID_HANDLE_VALUE) {
         sprintf(path, "%s\\%s", "Record", data.cFileName);
@@ -2206,11 +2206,11 @@ int ReplayFilesDlg::UnknownFunction455040(const char* path) {
             field_0x7f60[field_0x7f64] = (char*)DebugMalloc(strlen(path) + 1, __FILE__, 4870);
             strcpy(field_0x7f60[field_0x7f64], path);
             field_0x7f64++;
-            UnknownGameUiControl* track = UnknownFunction46ebf0("LstTrack", 3);
-            UnknownGameUiControl* rider = UnknownFunction46ebf0("LstRider", 3);
-            UnknownGameUiControl* laps = UnknownFunction46ebf0("LstLaps", 3);
-            UnknownGameUiControl* length = UnknownFunction46ebf0("LstLength", 3);
-            UnknownGameUiControl* description = UnknownFunction46ebf0("LstDesc", 3);
+            UIListBox* track = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
+            UIListBox* rider = static_cast<UIListBox*>(UnknownFunction46ebf0("LstRider", 3));
+            UIListBox* laps = static_cast<UIListBox*>(UnknownFunction46ebf0("LstLaps", 3));
+            UIListBox* length = static_cast<UIListBox*>(UnknownFunction46ebf0("LstLength", 3));
+            UIListBox* description = static_cast<UIListBox*>(UnknownFunction46ebf0("LstDesc", 3));
             g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(header.field_0x3c);
             g_UnknownGlobal56e26c->mode.UnknownFunction523a60(g_UnknownGlobal56e26c->mode.field_0x6a0,
                                                               header.field_0x6a, "env", env);
@@ -2255,7 +2255,7 @@ int ReplayFilesDlg::UnknownFunction455040(const char* path) {
 
 // 0x00455490
 void ReplayFilesDlg::UnknownFunction455490() {
-    UnknownGameUiControl* list = UnknownFunction46ebf0("LstTrack", 3);
+    UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
     UnknownRecordFileHeader* header = &field_0x7f58[list->UnknownFunction4768d0(-1)];
     memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &header->field_0x34, sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
     g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(header->field_0x3c);
@@ -2338,7 +2338,7 @@ void EditBoxDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case 1:
         if (!_stricmp("OkButton", event->field_0x04)) {
-            UnknownFunction46ebf0("EditBox", 11)->UnknownFunction473ef0(field_0x7f58, field_0x7f5c);
+            static_cast<UIEditBox*>(UnknownFunction46ebf0("EditBox", 11))->UnknownFunction473ef0(field_0x7f58, field_0x7f5c);
             UnknownFunction46ff30(0xc9);
         } else if (!_stricmp("CancelButton", event->field_0x04)) {
             UnknownFunction46ff30(0xca);
@@ -2353,7 +2353,7 @@ void EditBoxDlg::UnknownFunction4558f0(const char* title, const char* prompt, ch
     field_0x7f58 = buffer;
     UnknownFunction46ebf0("TitleText", 0)->UnknownFunction470b20(title);
     UnknownFunction46ebf0("TxtPrompt", 0)->UnknownFunction470b20(prompt);
-    UnknownGameUiControl* edit = UnknownFunction46ebf0("EditBox", 11);
+    UIEditBox* edit = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditBox", 11));
     edit->UnknownFunction473c70(field_0x7f5c - 1);
     edit->UnknownFunction473da0(field_0x7f58);
 }

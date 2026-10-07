@@ -28,6 +28,14 @@
 // 0x00475c70 UIListBox constructor (319/382): retail re-tests the row height
 //   after the owner's font height test and reloads the owner for it; VC6
 //   here threads both tests (five if/ternary forms tried).
+// 0x00477110 adds an image row from a file (356/646): with `a` a UIAnim
+//   loaded from `file`, otherwise a row naming the TGA file with its header's
+//   size. Calls, constants and the row stores follow retail. Retail places
+//   the function's epilogue after the stream-failure block and sends every
+//   `return 0` (and the final `return 1`) there; VC6 here keeps the epilogue
+//   last, which shifts every later offset. Retail also loads `b` into eax and
+//   the frame's size into ecx/edx (VC6 here: ecx, edx/eax). Fail-first,
+//   if-block and goto forms were tried.
 // 0x004773a0 adds an image row (169/232): retail loads the frame's width
 //   before its height and stores the row's +0x18 later; 40 store orders were
 //   tried.
@@ -455,19 +463,19 @@ void UIScrollCtl::UnknownVirtualSlot60(int value) {
 }
 
 // 0x004753c0
-int UnknownGameUiControl::UnknownFunction4753c0(int value, int range) {
-    unsigned int position = static_cast<UIScrollBar*>(this)->field_0x21c ? range - value : value;
+int UIScrollBar::UnknownFunction4753c0(int value, int range) {
+    unsigned int position = field_0x21c ? range - value : value;
     UnknownVirtualSlot50();
-    if (!static_cast<UIScrollBar*>(this)->field_0x1f0 && UnknownFunction475300(range) == position)
+    if (!field_0x1f0 && UnknownFunction475300(range) == position)
         return 1;
     if (!range) {
-        static_cast<UIScrollBar*>(this)->field_0x1ec_float = position;
+        field_0x1ec_float = position;
         return 1;
     }
-    unsigned int travel = field_0x5c == 8 ? UnknownVirtualSlot61() - static_cast<UIScrollBar*>(this)->field_0x1f4 : UnknownVirtualSlot62() - static_cast<UIScrollBar*>(this)->field_0x1f8;
+    unsigned int travel = field_0x5c == 8 ? UnknownVirtualSlot61() - field_0x1f4 : UnknownVirtualSlot62() - field_0x1f8;
     if ((unsigned int)range > 0) {
         float scaled = (double)(travel * position) / (unsigned int)range;
-        static_cast<UIScrollBar*>(this)->field_0x1ec_float = scaled < travel ? scaled : travel;
+        field_0x1ec_float = scaled < travel ? scaled : travel;
         return 1;
     }
     return 0;
@@ -510,9 +518,62 @@ UIListBox::UIListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* ow
     }
 }
 
+// 0x00477110
+int UIListBox::UnknownFunction477110(const char* file, int data, int a, int b) {
+    if (field_0x1ec >= field_0x1fc && !UnknownFunction476f50(field_0x1ec + 1))
+        return 0;
+    UnknownGameUiListRow row;
+    if (a) {
+        UnknownTextureStream* stream =
+            new(__FILE__, 0x1e20) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        if (stream->UnknownFunction460f50(file, "r", 0)) {
+            row.field_0x00 = 2;
+            row.field_0x14 = 0;
+            row.field_0x18 = 0;
+            row.field_0x24 = 0;
+            UIAnim* image = new(__FILE__, 0x1e27) UIAnim(field_0xb8->field_0x7f20, 0);
+            row.field_0x20 = image;
+            image->UnknownFunction4730e0(file, 0);
+            UIFrame* frame = image->field_0x28[0];
+            row.field_0x04 = b;
+            row.field_0x08 = frame->field_0x0c;
+            row.field_0x0c = frame->field_0x10;
+            row.field_0x30 = 0;
+            delete stream;
+        } else {
+            delete stream;
+            return 0;
+        }
+    } else {
+        row.field_0x00 = 3;
+        row.field_0x14 = 0;
+        row.field_0x20 = 0;
+        char* name = (char*)DebugMalloc(strlen(file) + 1, __FILE__, 0x1e37);
+        row.field_0x04 = b;
+        row.field_0x18 = name;
+        strcpy(name, file);
+        row.field_0x24 = 0;
+        row.field_0x30 = 0;
+        UnknownTgaFile* header = UnknownFunction511d00(file, 0, (int)g_UnknownResourceManager572b44);
+        if (!header)
+            return 0;
+        row.field_0x08 = header->width;
+        row.field_0x0c = header->height;
+        UnknownFunction512dd0(header);
+    }
+    field_0x214[field_0x1ec] = row;
+    UnknownFunction476930(field_0x1ec, data);
+    field_0x1ec++;
+    field_0x200 = UnknownFunction476ee0();
+    UnknownFunction477bc0();
+    if (field_0x21c)
+        UnknownFunction477900(1);
+    return 1;
+}
+
 // 0x004773a0
-int UnknownGameUiControl::UnknownFunction4773a0(UIAnim* image, int data, int a) {
-    if (static_cast<UIListBox*>(this)->field_0x1ec >= static_cast<UIListBox*>(this)->field_0x1fc && !UnknownFunction476f50(static_cast<UIListBox*>(this)->field_0x1ec + 1))
+int UIListBox::UnknownFunction4773a0(UIAnim* image, int data, int a) {
+    if (field_0x1ec >= field_0x1fc && !UnknownFunction476f50(field_0x1ec + 1))
         return 0;
     UnknownGameUiListRow row;
     row.field_0x00 = 2;
@@ -526,12 +587,12 @@ int UnknownGameUiControl::UnknownFunction4773a0(UIAnim* image, int data, int a) 
     row.field_0x18 = 0;
     row.field_0x24 = 0;
     row.field_0x30 = 0;
-    static_cast<UIListBox*>(this)->field_0x214[static_cast<UIListBox*>(this)->field_0x1ec] = row;
-    UnknownFunction476930(static_cast<UIListBox*>(this)->field_0x1ec, data);
-    static_cast<UIListBox*>(this)->field_0x1ec++;
-    static_cast<UIListBox*>(this)->field_0x200 = UnknownFunction476ee0();
+    field_0x214[field_0x1ec] = row;
+    UnknownFunction476930(field_0x1ec, data);
+    field_0x1ec++;
+    field_0x200 = UnknownFunction476ee0();
     UnknownFunction477bc0();
-    if (static_cast<UIListBox*>(this)->field_0x21c)
+    if (field_0x21c)
         UnknownFunction477900(1);
     return 1;
 }
@@ -558,7 +619,7 @@ void UIListBox::UnknownFunction477730(int delta) {
     }
     if (field_0x200 == 1) {
         UnknownVirtualSlot65(field_0x1f0);
-        UnknownVirtualSlot66((int)&handled);
+        UnknownVirtualSlot66(&handled);
         if (handled)
             return;
     }
@@ -593,24 +654,24 @@ static int UnknownFunction477800(const void* a, const void* b) {
 }
 
 // 0x00477bc0
-void UnknownGameUiControl::UnknownFunction477bc0() {
+void UIListBox::UnknownFunction477bc0() {
     UnknownGameUiDialog* owner = field_0xb8;
     if (!owner)
         return;
     int height = 0;
-    static_cast<UIListBox*>(this)->field_0x204 = 0;
-    for (int i = static_cast<UIListBox*>(this)->field_0x1ec - 1; i >= 0; i--) {
-        height += static_cast<UIListBox*>(this)->field_0x214[i].field_0x0c;
+    field_0x204 = 0;
+    for (int i = field_0x1ec - 1; i >= 0; i--) {
+        height += field_0x214[i].field_0x0c;
         if (height > field_0x2c[3] - field_0x2c[1])
             break;
-        static_cast<UIListBox*>(this)->field_0x204++;
+        field_0x204++;
     }
-    static_cast<UIListBox*>(this)->field_0x204 = static_cast<UIListBox*>(this)->field_0x204 < 0 ? 0 : static_cast<UIListBox*>(this)->field_0x204;
+    field_0x204 = field_0x204 < 0 ? 0 : field_0x204;
     GameObjectIterator iterator(owner->field_0x7f3c, 1, "UIControl");
     UnknownGameUiControl* control;
     while ((control = (UnknownGameUiControl*)iterator.Next()) != 0) {
         if (control->field_0x7c == field_0x7c && (control->field_0x5c == 8 || control->field_0x5c == 7))
-            control->UnknownFunction475200(this);
+            static_cast<UIScrollBar*>(control)->UnknownFunction475200(this);
     }
     UnknownVirtualSlot50();
 }
@@ -627,7 +688,7 @@ int UIListBox::UnknownVirtualSlot55(int a, int b) {
                     rect.bottom = rect.top + UnknownFunction4769a0(row);
                     if (PtInRect(&rect, *point) && !(field_0x214[row].field_0x04 & 1)) {
                         UnknownFunction476a60(row);
-                        UnknownVirtualSlot66((int)&found);
+                        UnknownVirtualSlot66(&found);
                         break;
                     }
                     if (!found)
@@ -703,7 +764,7 @@ int UIListBox::UnknownVirtualSlot21(int key) {
             return 0;
         }
         int handled;
-        UnknownVirtualSlot66((int)&handled);
+        UnknownVirtualSlot66(&handled);
         return 1;
     }
     return 0;
@@ -719,7 +780,7 @@ TextureMap* UIMultiState::UnknownVirtualSlot48(int state) {
 }
 
 // 0x00479df0
-void UIDDLListBox::UnknownVirtualSlot66(int value) {
+void UIDDLListBox::UnknownVirtualSlot66(int* handled) {
     UnknownDialogEvent event;
     event.field_0x20 = 0;
     field_0x250->UnknownFunction470b20(UnknownFunction476d20(UnknownFunction476950()));
@@ -1217,7 +1278,7 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
                 }
                 if (control->field_0x5c == 6) {
                     ((UIDropDownList*)control)->field_0x1fc->field_0x23c = 0;
-                    ((UIListBox*)control->field_0x1fc)->UnknownFunction477730(-1);
+                    ((UIDropDownList*)control)->field_0x1fc->UnknownFunction477730(-1);
                 }
             }
         } else {
@@ -1229,7 +1290,7 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
                 }
                 if (control->field_0x5c == 6) {
                     ((UIDropDownList*)control)->field_0x1fc->field_0x23c = 0;
-                    ((UIListBox*)control->field_0x1fc)->UnknownFunction477730(1);
+                    ((UIDropDownList*)control)->field_0x1fc->UnknownFunction477730(1);
                 }
             }
         }
@@ -1311,7 +1372,7 @@ void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
                 UIListBox* list = field_0x220->field_0x1fc;
                 if (list) {
                     int rows = list->field_0x1ec - list->field_0x204;
-                    list->UnknownFunction476860(UnknownFunction475300(rows), 0);
+                    static_cast<UIListBox*>(list)->UnknownFunction476860(UnknownFunction475300(rows), 0);
                 }
             }
         }
@@ -1433,9 +1494,9 @@ void UIDropDownList::UnknownFunction47a400() {
     *(CameraRect*)field_0x1f8->field_0x3c = *(CameraRect*)field_0x1f8->field_0x2c;
     field_0x1fc->field_0xe8 = field_0xe8;
     field_0x1fc->field_0xec = field_0xec;
-    field_0x1fc->UnknownFunction476c70(field_0xc4, -1);
+    static_cast<UIListBox*>(field_0x1fc)->UnknownFunction476c70(field_0xc4, -1);
     if (field_0xc4 != 0xffffff)
-        field_0x1fc->UnknownFunction476b80(0xffffff);
+        static_cast<UIListBox*>(field_0x1fc)->UnknownFunction476b80(0xffffff);
     field_0x1fc->UnknownFunction470d80(field_0xc8);
 }
 
@@ -1860,7 +1921,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7ec0("SortLBName", defaultSortLBName,
                                                      isDefault ? defaultSortLBName : buffer, -1);
                     if (!isDefault)
-                        button->UnknownFunction473390((UnknownGameUiControl*)UnknownFunction46e9a0(buffer));
+                        button->UnknownFunction473390((UIListBox*)UnknownFunction46e9a0(buffer));
                 }
 
                 if (!_stricmp(type, "MULTISTATE") || isDefault) {
@@ -1872,11 +1933,11 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("NumStates", defaultNumStates,
                                                      isDefault ? &defaultNumStates : &states);
                     if (!isDefault)
-                        multiState->UnknownFunction478860(states);
+                        static_cast<UIMultiState*>(multiState)->UnknownFunction478860(states);
                     int selected;
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &selected);
                     if (!isDefault)
-                        multiState->UnknownFunction478cf0(selected);
+                        static_cast<UIMultiState*>(multiState)->UnknownFunction478cf0(selected);
                     state = 0;
                     char stateKey[0x80];
                     char textKey[0x80];
@@ -1915,18 +1976,18 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     }
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault)
-                        listBox->UnknownFunction476a60(value);
+                        static_cast<UIListBox*>(listBox)->UnknownFunction476a60(value);
                     parameters.UnknownFunction4b7f10("AutoSort", defaultDefault, isDefault ? &defaultAutoSort : &value);
                     if (!isDefault)
                         listBox->UnknownFunction477b90(value);
                     parameters.UnknownFunction4b7f10("SelectColor", defaultSelectColor,
                                                      isDefault ? &defaultSelectColor : &value);
                     if (!isDefault)
-                        listBox->UnknownFunction476b80(value);
+                        static_cast<UIListBox*>(listBox)->UnknownFunction476b80(value);
                     parameters.UnknownFunction4b7f10("Selectable", defaultSelectable,
                                                      isDefault ? &defaultSelectable : &value);
                     if (!isDefault)
-                        listBox->UnknownFunction477bb0(value);
+                        static_cast<UIListBox*>(listBox)->UnknownFunction477bb0(value);
                     parameters.UnknownFunction4b7f10("AllowWScroll", defaultAllowWScroll,
                                                      isDefault ? &defaultAllowWScroll : &value);
                     if (!isDefault)
@@ -1934,11 +1995,11 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("SelectBoxColor", defaultSelectBoxColor,
                                                      isDefault ? &defaultSelectBoxColor : &value);
                     if (!isDefault)
-                        listBox->UnknownFunction476cd0(value);
+                        static_cast<UIListBox*>(listBox)->UnknownFunction476cd0(value);
                     parameters.UnknownFunction4b7f10("ItemBoxColor", defaultItemBoxColor,
                                                      isDefault ? &defaultItemBoxColor : &value);
                     if (!isDefault)
-                        listBox->UnknownFunction476ba0(value, -1);
+                        static_cast<UIListBox*>(listBox)->UnknownFunction476ba0(value, -1);
                     char itemKey[0x80];
                     item = 1;
                     sprintf(itemKey, "%s%d", "Item", 1);
@@ -1947,9 +2008,9 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         do {
                             if (!isDefault) {
                                 if (buffer[0] == '@')
-                                    listBox->UnknownFunction4773a0((UIAnim*)UnknownFunction46e9a0(buffer + 1), 0, 0);
+                                    static_cast<UIListBox*>(listBox)->UnknownFunction4773a0((UIAnim*)UnknownFunction46e9a0(buffer + 1), 0, 0);
                                 else
-                                    listBox->UnknownFunction476d80(buffer, 0, 0);
+                                    static_cast<UIListBox*>(listBox)->UnknownFunction476d80(buffer, 0, 0);
                             }
                             item++;
                             if (isDefault && item >= 50)
@@ -1974,7 +2035,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     }
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault)
-                        radioButton->UnknownFunction478cf0(value);
+                        static_cast<UIMultiState*>(radioButton)->UnknownFunction478cf0(value);
                     parameters.UnknownFunction4b7ec0("AnimOff", defaultAnimOff, isDefault ? defaultAnimOff : buffer, -1);
                     if (!isDefault)
                         radioButton->UnknownFunction4789f0(0, (UIAnim*)UnknownFunction46e9a0(buffer), 0);
@@ -2007,8 +2068,8 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &position);
                     parameters.UnknownFunction4b7f10("Scale", defaultScale, isDefault ? &defaultScale : &scale);
                     if (!isDefault) {
-                        scrollBar->UnknownFunction4754d0(ticks);
-                        scrollBar->UnknownFunction4751c0(scale);
+                        static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4754d0(ticks);
+                        static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4751c0(scale);
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
@@ -2025,7 +2086,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                             control->field_0x3c[2] = image->field_0x28[0]->field_0x0c + control->field_0x3c[0];
                             control->field_0x3c[3] = control->field_0x3c[1] + image->field_0x28[0]->field_0x10;
                         }
-                        scrollBar->UnknownFunction4753c0(position, ticks ? ticks
+                        static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4753c0(position, ticks ? ticks
                                                                          : control->field_0x3c[2] - control->field_0x3c[0] + 1);
                         scrollBar->UnknownFunction475160(0);
                     }
@@ -2038,7 +2099,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     }
                     parameters.UnknownFunction4b7f10("MaxLen", defaultMaxLen, isDefault ? &defaultMaxLen : &value);
                     if (!isDefault)
-                        editBox->UnknownFunction473c70(value);
+                        static_cast<UIEditBox*>(editBox)->UnknownFunction473c70(value);
                     parameters.UnknownFunction4b7ec0("SoundClick", defaultSoundClick,
                                                      isDefault ? defaultSoundClick : buffer, -1);
                     if (!isDefault)
@@ -2103,7 +2164,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                                                          -1)) {
                         do {
                             if (!isDefault)
-                                dropDownListBox->UnknownFunction476d80(buffer, 0, 0);
+                                static_cast<UIListBox*>(dropDownListBox)->UnknownFunction476d80(buffer, 0, 0);
                             item++;
                             if (isDefault && item >= 50)
                                 break;
@@ -2142,8 +2203,8 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault) {
                         int row = value - 1 < 0 ? 0 : value - 1;
-                        dropDownListBox->UnknownFunction476a60(row);
-                        dropDownList->UnknownFunction470b20(dropDownListBox->UnknownFunction476d20(row));
+                        static_cast<UIListBox*>(dropDownListBox)->UnknownFunction476a60(row);
+                        dropDownList->UnknownFunction470b20(static_cast<UIListBox*>(dropDownListBox)->UnknownFunction476d20(row));
                     }
                     parameters.UnknownFunction4b7ec0("AnimTextBack", defaultAnimTextBack,
                                                      isDefault ? defaultAnimTextBack : buffer, -1);

@@ -339,7 +339,7 @@ void TrackRecordDlg::UnknownFunction51ffe0(UnknownGameUiControl* list, Directory
                                                               track, "env", pattern);
             g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9b80(pattern);
             g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea010(display, track, digit, "scn", 0, 0);
-            list->UnknownFunction476d80(display, field_0x7f64, 0);
+            static_cast<UIListBox*>(list)->UnknownFunction476d80(display, field_0x7f64, 0);
             count++;
             field_0x7f60 = (UnknownTrackRecordRow**)DebugRealloc(field_0x7f60, (field_0x7f64 + 1) * 4, __FILE__, 534);
             field_0x7f60[field_0x7f64] = new(__FILE__, 535) UnknownTrackRecordRow;
@@ -359,13 +359,13 @@ void TrackRecordDlg::UnknownFunction51ffe0(UnknownGameUiControl* list, Directory
             }
         }
     }
-    list->UnknownFunction477900(1);
+    static_cast<UIListBox*>(list)->UnknownFunction477900(1);
     if (count == 0) {
         g_UnknownGlobal56e26c->UnknownFunction521970(0x142e, path, 128);
-        list->UnknownFunction476d80(path, 0, 0);
-        list->UnknownFunction477bb0(0);
+        static_cast<UIListBox*>(list)->UnknownFunction476d80(path, 0, 0);
+        static_cast<UIListBox*>(list)->UnknownFunction477bb0(0);
     } else {
-        list->UnknownFunction477bb0(1);
+        static_cast<UIListBox*>(list)->UnknownFunction477bb0(1);
     }
 }
 

@@ -133,7 +133,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->field_0x08) {
     case 5:
         field_0x7f58 = 0;
-        UnknownFunction46ebf0("SliderTime", 8)->UnknownFunction4751c0(1000);
+        static_cast<UIScrollBar*>(UnknownFunction46ebf0("SliderTime", 8))->UnknownFunction4751c0(1000);
         UnknownFunction46ebf0("ButSave", 0)->UnknownFunction470660(0, 1);
         if (!g_UnknownGlobal56e26c->UnknownVirtualSlot22("AllowVCRControls", 0)) {
             UnknownFunction46ebf0("TogFF", 0)->UnknownFunction470660(0, 1);
@@ -167,7 +167,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("TogFF", event->field_0x04)) {
             if (view->field_0x1e4 != -2) {
-                if (event->field_0x14->UnknownFunction4755c0() == 1) {
+                if (static_cast<UIMultiState*>(event->field_0x14)->UnknownFunction4755c0() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
                     view->field_0x1dc = 8;
@@ -180,7 +180,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("TogFFF", event->field_0x04)) {
             if (view->field_0x1e4 != -2) {
-                if (event->field_0x14->UnknownFunction4755c0() == 1) {
+                if (static_cast<UIMultiState*>(event->field_0x14)->UnknownFunction4755c0() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
                     view->field_0x1dc = 9;
@@ -192,7 +192,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 }
             }
         } else if (!_stricmp("TogReverse", event->field_0x04)) {
-            if (event->field_0x14->UnknownFunction4755c0() == 1) {
+            if (static_cast<UIMultiState*>(event->field_0x14)->UnknownFunction4755c0() == 1) {
                 if (view->field_0x1dc != 14) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
@@ -258,7 +258,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case 16:
         if (!_stricmp("SliderTime", event->field_0x04)) {
-            float fraction = event->field_0x14->UnknownFunction475500() / 1000.0f;
+            float fraction = static_cast<UIScrollBar*>(event->field_0x14)->UnknownFunction475500() / 1000.0f;
             UnknownKrustyBikeView* replay = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
             replay->field_0x1c4 = fraction * replay->field_0x1a0->field_0x10c;
         }
@@ -274,7 +274,7 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 int VCRDlg::UnknownVirtualSlot10(float frameTime) {
     char text[32];
     field_0x30->UnknownFunction486630(1);
-    UnknownGameUiControl* slider = UnknownFunction46ebf0("SliderTime", 8);
+    UIScrollBar* slider = static_cast<UIScrollBar*>(UnknownFunction46ebf0("SliderTime", 8));
     UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
     UnknownGameUiControl* control = UnknownFunction46ebf0("TxtTime", 12);
     UnknownFunction488bd0(text, view->field_0x1b8);
@@ -292,11 +292,11 @@ int VCRDlg::UnknownVirtualSlot10(float frameTime) {
 // 0x004894c0
 void VCRDlg::UnknownFunction4894c0() {
     UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
-    UnknownGameUiControl* play = UnknownFunction46ebf0("TogPlay", 2);
-    UnknownGameUiControl* pause = UnknownFunction46ebf0("TogPause", 2);
-    UnknownGameUiControl* reverse = UnknownFunction46ebf0("TogReverse", 2);
-    UnknownGameUiControl* fastForward = UnknownFunction46ebf0("TogFF", 2);
-    UnknownGameUiControl* fasterForward = UnknownFunction46ebf0("TogFFF", 2);
+    UIMultiState* play = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogPlay", 2));
+    UIMultiState* pause = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogPause", 2));
+    UIMultiState* reverse = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogReverse", 2));
+    UIMultiState* fastForward = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogFF", 2));
+    UIMultiState* fasterForward = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogFFF", 2));
     if (view->field_0x3f8) {
         play->UnknownFunction478cf0(0);
         pause->UnknownFunction478cf0(1);

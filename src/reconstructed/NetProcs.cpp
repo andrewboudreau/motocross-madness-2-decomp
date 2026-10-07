@@ -31,7 +31,7 @@ static const char kSessionNameCharacters[] =
 
 // 0x004ae460
 void UnknownFunction4ae460(UnknownDialogEvent* event) {
-    int selection = event->field_0x0c->UnknownFunction46ebf0("LstSessions", 0)->UnknownFunction476950();
+    int selection = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstSessions", 0))->UnknownFunction476950();
     g_UnknownGlobal56e26c->mode.field_0xfd4 = selection;
     if (selection != -1 && event->field_0x0c &&
         static_cast<HostJoinDlg*>(event->field_0x0c)->field_0xc4 != 0x85d &&
@@ -49,12 +49,12 @@ void UnknownFunction4ae460(UnknownDialogEvent* event) {
 void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->field_0x08) {
     case 5: {
-        UnknownGameUiControl* control = UnknownFunction46ebf0("ButJoin", 0);
+        UIListBox* control = static_cast<UIListBox*>(UnknownFunction46ebf0("ButJoin", 0));
         if (field_0xc4 != 0x85d) {
             control->UnknownVirtualSlot49(0);
             control->UnknownFunction470d40(0x808080);
         }
-        control = UnknownFunction46ebf0("LstSessions", 0);
+        control = static_cast<UIListBox*>(UnknownFunction46ebf0("LstSessions", 0));
         control->UnknownFunction476c70(0xfeb97a, -1);
         control->UnknownFunction476b80(0xffffff);
         control->UnknownFunction476cd0(0xfeb97a);
@@ -90,7 +90,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         }
         break;
     case 7: {
-        UnknownGameUiControl* list = UnknownFunction46ebf0("LstSessions", 0);
+        UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstSessions", 0));
         int selection = list->UnknownFunction4768d0(-1);
         list->UnknownFunction4775f0();
         g_UnknownGlobal6886cc = 0;
@@ -182,7 +182,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         }
         break;
     case 5: {
-        UnknownGameUiControl* control = UnknownFunction46ebf0("ButPort", 2);
+        UIMultiState* control = static_cast<UIMultiState*>(UnknownFunction46ebf0("ButPort", 2));
         control->UnknownFunction478860(4);
         control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x147b);
         control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x147c);
@@ -191,7 +191,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         g_UnknownGlobal6886b8.port = 0;
         control->UnknownVirtualSlot54(&g_UnknownGlobal6886b8.port);
 
-        control = UnknownFunction46ebf0("ButBaud", 2);
+        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("ButBaud", 2));
         control->UnknownFunction478860(10);
         for (int i = 0; i < 10; i++) {
             sprintf(text, "%d", g_UnknownGlobal56eadc[i]);
@@ -200,7 +200,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         g_UnknownGlobal6886b8.baudRate = 6;
         control->UnknownVirtualSlot54(&g_UnknownGlobal6886b8.baudRate);
 
-        control = UnknownFunction46ebf0("ButStop", 2);
+        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("ButStop", 2));
         control->UnknownFunction478860(3);
         control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1478);
         control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1479);
@@ -208,7 +208,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         g_UnknownGlobal6886b8.stopBits = 0;
         control->UnknownVirtualSlot54(&g_UnknownGlobal6886b8.stopBits);
 
-        control = UnknownFunction46ebf0("ButParity", 2);
+        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("ButParity", 2));
         control->UnknownFunction478860(4);
         control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x146f);
         control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1470);
@@ -217,7 +217,7 @@ void SerialPopupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         g_UnknownGlobal6886b8.parity = 0;
         control->UnknownVirtualSlot54(&g_UnknownGlobal6886b8.parity);
 
-        control = UnknownFunction46ebf0("ButFlow", 2);
+        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("ButFlow", 2));
         control->UnknownFunction478860(5);
         control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1474);
         control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1473);
@@ -299,11 +299,11 @@ void SessionDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case 5: {
         UnknownFunction46ebf0("TitleText", 12)->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x911);
-        UnknownGameUiControl* control = UnknownFunction46ebf0("OKButton", 0);
+        UIEditBox* control = static_cast<UIEditBox*>(UnknownFunction46ebf0("OKButton", 0));
         control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x13e9);
-        control = UnknownFunction46ebf0("CancelButton", 0);
+        control = static_cast<UIEditBox*>(UnknownFunction46ebf0("CancelButton", 0));
         control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x13dc);
-        control = UnknownFunction46ebf0("EditBox", 0);
+        control = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditBox", 0));
         control->UnknownFunction473c70(11);
         control->UnknownFunction473da0(g_UnknownGlobal56e26c->mode.field_0x10);
         control->UnknownFunction473f30(kSessionNameCharacters);

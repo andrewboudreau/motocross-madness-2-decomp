@@ -25,12 +25,12 @@ int OptControlsDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInpu
     if (!field_0x7f70)
         return GameObject::UnknownVirtualSlot22(event, entry);
     if (event->kind == 0 && event->control == 1) {
-        UnknownGameUiControl* keys = UnknownFunction46ebf0("MapKeyListBox", 3);
+        UIListBox* keys = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
         int row = keys->UnknownFunction476950();
         g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction449350(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row, text);
         keys->UnknownFunction476ff0(row, text);
     } else {
-        UnknownGameUiControl* keys = UnknownFunction46ebf0("MapKeyListBox", 3);
+        UIListBox* keys = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
         int row = keys->UnknownFunction476950();
         if (!UnknownFunction4b5570(row, event->kind, event->control, text))
             return 1;
@@ -50,7 +50,7 @@ void OptControlsDlg::UnknownFunction4b5760()
 {
     JoystickDevice* joystick = g_UnknownGlobal56e26c->field_0x14->activeJoystick;
     MouseDevice* mouse = g_UnknownGlobal56e26c->field_0x14->mouse;
-    UnknownGameUiControl* keys = UnknownFunction46ebf0("MapKeyListBox", 3);
+    UIListBox* keys = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
     int row = keys->UnknownFunction476950();
     int code;
     int kind;

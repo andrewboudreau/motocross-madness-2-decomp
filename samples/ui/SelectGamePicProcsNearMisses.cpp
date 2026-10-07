@@ -41,7 +41,7 @@ void MultiPlayerDlg::UnknownFunction4f3720(int player, const char* text) {
     char line[0x60];
     char name[0x80];
     char system[0x80];
-    UnknownGameUiControl* list = UnknownFunction46ebf0("ListChat", 3);
+    UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("ListChat", 3));
     if (!list)
         return;
     if (player != -1) {
@@ -102,7 +102,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         field_0x7f88 = 1;
         field_0x7f84 = 1;
         UnknownFunction4f8220();
-        UnknownGameUiControl* list = UnknownFunction46ebf0("DDLEngineSize", 6)->field_0x1fc;
+        UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLEngineSize", 6))->field_0x1fc;
         list->UnknownFunction4775f0();
         list->UnknownFunction476d80("125cc 2-stroke", 0, 0);
         list->UnknownFunction476d80("250cc 2-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[1]), 0);
@@ -112,7 +112,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         list->UnknownFunction476b30(
             UnknownBikeClassOf(((UnknownOptGarageSettings*)g_UnknownGlobal56e26c->mode.field_0xfd8)->field_0x00));
         g_UnknownGlobal56e26c->UnknownFunction521970(0x146a, format, 0x80);
-        list = UnknownFunction46ebf0("LargestOpponentDropDown", 6)->field_0x1fc;
+        list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("LargestOpponentDropDown", 6))->field_0x1fc;
         list->UnknownFunction4775f0();
         sprintf(text, format, g_UnknownGlobal56cb6c[0]);
         list->UnknownFunction476d80(text, 0, 0);
@@ -125,7 +125,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         sprintf(text, format, g_UnknownGlobal56cb6c[4]);
         list->UnknownFunction476d80(text, 4, 0);
         list->UnknownFunction476a60(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c);
-        UnknownGameUiControl* edit = UnknownFunction46ebf0("EditPlateNumber", 0xb);
+        UIEditBox* edit = static_cast<UIEditBox*>(UnknownFunction46ebf0("EditPlateNumber", 0xb));
         edit->UnknownFunction473f30("0123456789");
         g_UnknownGlobal56e26c->ui->UnknownFunction4999f0(this);
         Vector3* eye = &field_0x7f58;
@@ -173,27 +173,27 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UnknownFunction4f8d20();
         } else if (!_stricmp("LargestOpponentDropDown", event->field_0x04)) {
             if (g_UnknownGlobal56e26c->field_0x08->isHost)
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c = event->field_0x14->UnknownFunction4768d0(-1);
+                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c = static_cast<UIListBox*>(event->field_0x14)->UnknownFunction4768d0(-1);
         }
         break;
     case 1:
         if (!_stricmp("BikeLeft", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("BikeRight", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("RiderLeft", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("RiderRight", event->field_0x04)) {
-            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+            UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
             int rows = list->field_0x1ec;
             list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
             list->UnknownVirtualSlot66(0);
@@ -204,7 +204,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         break;
     case 10:
         if (!_stricmp("EditPlateNumber", event->field_0x04)) {
-            event->field_0x14->UnknownFunction473ef0(plate, 9);
+            static_cast<UIEditBox*>(event->field_0x14)->UnknownFunction473ef0(plate, 9);
             int number = atoi(plate);
             if (number < 100)
                 number += 100;
@@ -216,13 +216,13 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
             g_UnknownGlobal56e26c->mode.field_0x1bcc = number;
             _itoa(number, plate, 10);
-            event->field_0x14->UnknownFunction473da0(plate);
+            static_cast<UIEditBox*>(event->field_0x14)->UnknownFunction473da0(plate);
             UnknownFunction4f8570(number);
         }
         break;
     case 19:
         if (!_stricmp("EditPlateNumber", event->field_0x04)) {
-            event->field_0x14->UnknownFunction473ef0(typed, 9);
+            static_cast<UIEditBox*>(event->field_0x14)->UnknownFunction473ef0(typed, 9);
             int number = atoi(typed);
             if (number >= 100 && number <= 999) {
                 UnknownFunction4f8570(number);
@@ -245,7 +245,7 @@ void MPBikeRiderDlg::UnknownFunction4f8220() {
     int rider = 0;
     char text[0x80];
     MPBikeRiderDlg* self = this;
-    UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+    UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
     list->UnknownFunction4775f0();
     for (int i = 0; i < g_UnknownGlobal56e26c->ui->field_0x54; i++) {
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i];
@@ -289,7 +289,7 @@ void MPBikeRiderDlg::UnknownFunction4f8220() {
     else
         list->UnknownFunction476a60(0);
     list->UnknownFunction477900(1);
-    list = self->UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+    list = static_cast<UIDropDownList*>(self->UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
     list->UnknownFunction4775f0();
     for (int j = 0; j < g_UnknownGlobal56e26c->ui->field_0x5c; j++) {
         UnknownKrustyUIModel* entry = &((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[j];
@@ -316,16 +316,16 @@ int UnknownFunction4f17a0(DirectoryList* directories, const char* directory, con
     char file[260];
     char entry[260];
     char text[64];
-    UnknownGameUiControl* list = 0;
+    UIListBox* list = 0;
     int index = 0;
     if (!dialog)
         dialog = (UIDialog*)g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485df0();
-    UnknownGameUiControl* pictures = dialog->UnknownFunction46ebf0(picture, 0);
+    UIListBox* pictures = static_cast<UIListBox*>(dialog->UnknownFunction46ebf0(picture, 0));
     pictures->UnknownFunction477e60(1);
     if (!append)
         pictures->UnknownFunction4775f0();
     if (strcmp(listName, "")) {
-        list = dialog->UnknownFunction46ebf0(listName, 0)->field_0x1fc;
+        list = static_cast<UIDropDownList*>(dialog->UnknownFunction46ebf0(listName, 0))->field_0x1fc;
         if (!append)
             list->UnknownFunction4775f0();
     }
@@ -480,7 +480,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     g_UnknownGlobal56e26c->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
     g_UnknownGlobal56e26c->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
     if (field_0x7f80 && rand() % 200 == 1) {
-        UnknownGameUiControl* bikes = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+        UIListBox* bikes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
         bikes->UnknownFunction4768d0(-1);
         switch (rand() % 3) {
         case 0:
@@ -496,7 +496,7 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
         field_0x7f80 = 0;
     }
     if (!field_0x7f80 && g_UnknownGlobal56e26c->ui->field_0x46c->field_0x0c) {
-        UnknownGameUiControl* bikes = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+        UIListBox* bikes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
         KrustyUI* ui = g_UnknownGlobal56e26c->ui;
         UnknownKrustyUIModel* model =
             &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->UnknownFunction4768d0(-1)].field_0x00];
@@ -708,7 +708,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
                 g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xd0 = delay;
             field_0x7f68.UnknownFunction4f2f20(from, state->field_0xc3);
             if (g_UnknownGlobal56e26c->field_0x08->isHost && field_0x7f58) {
-                UnknownGameUiControl* list = field_0x7f58->UnknownFunction46ebf0("OpponentsListBox", 0);
+                UIListBox* list = static_cast<UIListBox*>(field_0x7f58->UnknownFunction46ebf0("OpponentsListBox", 0));
                 if (list && list->field_0x1ec - 1 != g_UnknownGlobal56e26c->mode.field_0x1bd8) {
                     int selection = list->UnknownFunction476950();
                     list->UnknownFunction4775f0();
@@ -779,7 +779,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
     } else if (type == 5) {
         field_0x7f68.UnknownFunction4f2f80(((UnknownPlayerLeftMessage*)data)->field_0x08);
         if (field_0x7f58) {
-            UnknownGameUiControl* list = field_0x7f58->UnknownFunction46ebf0("OpponentsListBox", 0);
+            UIListBox* list = static_cast<UIListBox*>(field_0x7f58->UnknownFunction46ebf0("OpponentsListBox", 0));
             if (g_UnknownGlobal56e26c->field_0x08->isHost && list &&
                 list->field_0x1ec - 1 != g_UnknownGlobal56e26c->mode.field_0x1bd8) {
                 int selection = list->UnknownFunction476950();
@@ -811,7 +811,7 @@ int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
         }
         field_0x7f68.UnknownFunction4f2f80(kick->field_0x04);
         if (field_0x7f58) {
-            UnknownGameUiControl* list = field_0x7f58->UnknownFunction46ebf0("OpponentsListBox", 0);
+            UIListBox* list = static_cast<UIListBox*>(field_0x7f58->UnknownFunction46ebf0("OpponentsListBox", 0));
             if (g_UnknownGlobal56e26c->field_0x08->isHost && list &&
                 list->field_0x1ec - 1 != g_UnknownGlobal56e26c->mode.field_0x1bd8) {
                 int selection = list->UnknownFunction476950();
