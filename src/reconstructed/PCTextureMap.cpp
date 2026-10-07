@@ -450,6 +450,61 @@ failed:
     return 0;
 }
 
+// 0x004c7640: with partial texture blits (Display+0x5bc) or a positive
+// `mode`, copies `rect` (or the whole texture) down the mip chain with
+// BltFast, halving it per level; otherwise lets the device Load it. Then
+// applies the colour key. The level loop tests its two sizes in separate
+// `break`s: a `while (a && b)` condition is rotated to the bottom, retail
+// re-runs the test at the top of every pass.
+int PCTextureMap::UnknownVirtualSlot9(UnknownRect* rect, int mode) {
+    if (!field_0x70 || !field_0x74)
+        return 0;
+    UnknownSurfaceInterface* source = field_0x70;
+    UnknownSurfaceInterface* destination = field_0x74;
+    if (mode > 0 || mode == -1 && g_UnknownGlobal56e26c->field_0x0c->field_0x5bc > 0 ||
+        g_UnknownGlobal56e26c->field_0x0c->field_0x5bc <= 0) {
+        UnknownRect area;
+        if (rect && g_UnknownGlobal56e26c->field_0x0c->field_0x5bc > 0) {
+            area = *rect;
+        } else {
+            area.left = 0;
+            area.top = 0;
+            area.right = field_0x14;
+            area.bottom = field_0x18;
+        }
+        UnknownSurfaceCaps caps;
+        memset(&caps, 0, sizeof(caps));
+        caps.caps = 0x401000;
+        while (1) {
+            if (area.right - area.left <= 0)
+                break;
+            if (area.bottom - area.top <= 0)
+                break;
+            if (destination->UnknownMethod7(area.left, area.top, source, &area, 0x10))
+                return 0;
+            UnknownSurfaceInterface* nextSource;
+            UnknownSurfaceInterface* nextDestination;
+            long sourceResult = source->UnknownMethod12(&caps, &nextSource);
+            long destinationResult = destination->UnknownMethod12(&caps, &nextDestination);
+            if (sourceResult || destinationResult)
+                break;
+            source = nextSource;
+            destination = nextDestination;
+            area.top >>= 1;
+            area.left >>= 1;
+            area.bottom >>= 1;
+            area.right >>= 1;
+        }
+        if (field_0x30 && field_0x74->UnknownMethod29(8, &field_0x34))
+            return 0;
+        return 1;
+    }
+    if (destination != source)
+        ((PCRenderTarget*)g_UnknownGlobal56e26c->field_0x10)
+            ->field_0x50->UnknownMethod43(destination, 0, source, 0, 0);
+    return 0;
+}
+
 // 0x004c77d0: fills each mip level by downsampling the level above it.
 int PCTextureMap::UnknownVirtualSlot15(int filter) {
     UnknownSurfaceInterface* level;

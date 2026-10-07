@@ -230,7 +230,8 @@ the inlined cross products in PoseRotation 0x4a7fd0, WorldToLocalDirection
   popped after the call) was not produced by any source form tried.
 
 **Inline budget.** Motnctrl expands some helpers inline at some sites and calls their
-out-of-line copies at others. Synthetic tests show:
+out-of-line copies at others. Synthetic tests show (measured in detail in
+[VC6_INLINE_BUDGET](VC6_INLINE_BUDGET.md)):
 
 - VC6 gives each caller its own size budget for inline expansion, shared by
   nested expansions.

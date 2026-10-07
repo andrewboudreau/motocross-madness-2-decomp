@@ -19093,6 +19093,15 @@ CASES = [
         'reason': 'dlgprocs.cpp LoadingDlg caller; stores +0x1f8/+0x200',
     },
     {
+        'name': 'PCTexMap.cpp PCTextureMap slot 9 upload',
+        'bindings': 'src/reconstructed/PCTextureMap.bindings.json',
+        'source': 'src/reconstructed/PCTextureMap.cpp',
+        'symbol': '?UnknownVirtualSlot9@PCTextureMap@@UAEHPAUUnknownRect@@H@Z',
+        'target_va': '0x004c7640',
+        'target_size': 385,
+        'reason': 'vtable 0x00555fec slot 9; BltFast down the mip chain via GetAttachedSurface with caps 0x401000, device Load otherwise',
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

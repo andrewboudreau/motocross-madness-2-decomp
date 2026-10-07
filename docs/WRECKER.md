@@ -105,7 +105,7 @@ relocation resolved by the bindings. Three near misses are parked in
 |---|---:|---|---|
 | `0x00531da0` | 634 | 629/634 | one `fld`/`fmul` operand pair in the first component of `step` |
 | `0x00532580` | 562 | 490/562 | the copies go through a member-by-member copy helper and the old up row is three float locals (both now match); each cross product's two loads are swapped and its `fsubp` is scheduled after the destination pointer copy |
-| `0x005329e0` | 1312 | 213/1314 | stack frame 0xa0 here, 0x94 in retail; the out-of-line `Vector3` constructor call (`0x00404e60`) is inlined here |
+| `0x005329e0` | 1312 | 213/1314 | stack frame 0xa0 here, 0x94 in retail. Retail's inline budget ([VC6_INLINE_BUDGET](VC6_INLINE_BUDGET.md)) runs out at the final scale: it expands `operator*` but calls the `Vector3` constructor (`0x00404e60`) inside it, then calls `operator*` (`0x005015b0`) for `* frameTime`. The natural `sum * field_0x118 * frameTime` gets the 0x94 frame with every site expanded; one more trivial inline expansion reproduces the constructor call, so the original had about one small inline helper more |
 
 ## Not reconstructed
 
@@ -115,7 +115,10 @@ relocation resolved by the bindings. Three near misses are parked in
   trusts alignment splits it at `0x00530880`; the body continues past it.
   Not attempted: like `0x00531740` it calls the out-of-line Vector3
   constructor (`0x00404e60`), normalisation (`0x005087b0`) and cross
-  product (`0x00515600`), so it depends on reproducing VC6's inline budget.
+  product (`0x00515600`), so it depends on reproducing the original's
+  inline structure, which is what sets VC6's per-function expansion budget
+  ([VC6_INLINE_BUDGET](VC6_INLINE_BUDGET.md)); the out-of-line copies are
+  COMDAT instances of the header inlines, not library functions.
 - `0x00531740` (1624 bytes): contact response per probe. It uses
   `0x00460b50`/`0x00460c00`, `0x0040ae30`, `0x005015b0`, `0x00421cb0` and
   calls the out-of-line `Vector3` constructor (`0x00404e60`) nine times,
@@ -123,7 +126,9 @@ relocation resolved by the bindings. Three near misses are parked in
   dot product (`0x0040ae30`), scale (`0x005015b0`) and sum (`0x00421cb0`).
   Decoded (contact particles: a spray along the slide, `dt * 200` per
   frame, from the particle manager's free list at +0x2c/+0x40) but not
-  written: the inline/out-of-line mix is the blocker.
+  written: the inline/out-of-line mix is the blocker (the budget is
+  exhausted early, so the original expanded more or larger helpers before
+  those sites than the decoded arithmetic shows).
 - `0x0052ff00`, `0x0052ff20`: ownership open (see Evidence).
 
 The near miss `0x00531da0` also keeps its `fld [delta.x]; fmul st(1)` with

@@ -29,11 +29,16 @@
 // field_0x10c. Every block matches in shape, including the per-axis clip
 // (an inline helper with by-value parameters, which explains the local
 // copies of the extent and the previous position) and the retail use of the
-// previous position's y for the x axis. The stack frame is 0xa0 bytes here
-// and 0x94 in retail, so every local slot differs (213/1314 positional).
-// All 12 declaration orders of the accumulators were tried. Retail also
-// builds the scaled sum with a call to the out-of-line Vector3 constructor
-// (0x00404e60); VC6 here inlines it.
+// previous position's y for the x axis. Retail runs out of inline budget at
+// the end (docs/VC6_INLINE_BUDGET.md): it expands `sum * field_0x118` but
+// calls the Vector3 constructor inside it (0x00404e60), then calls the
+// out-of-line `operator*` (0x005015b0) for `* frameTime`. Written naturally
+// (`field_0x10c = sum * field_0x118 * frameTime;`) VC6 expands every site
+// and gets retail's 0x94-byte frame; one more trivial inline expansion
+// anywhere in the body makes it call the constructor as retail does, so
+// the original had about one small inline helper more (an accessor, for
+// example). The version below spells the last scale as the out-of-line
+// call; its frame is 0xa0 and every local slot differs (213/1314).
 
 #include <math.h>
 #include <stdlib.h>

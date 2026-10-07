@@ -14,7 +14,12 @@
 // component (below) everything inlines, but VC6 then keeps `this` in edi and
 // the key count in esi (retail: esi, edi) and addresses the second key
 // through its base instead of retail's `lea ecx,[key + 4]` (the inlined
-// operator-'s reference). Named intermediate vectors do not change the budget.
+// operator-'s reference). Named intermediate vectors barely change the
+// budget. The budget follows the caller's front-end tree size
+// (docs/VC6_INLINE_BUDGET.md): about 30 extra trivial statements (dead
+// code counts, empty statements do not) make VC6 expand all 14 operators
+// and match retail's first 0x19b bytes; the tangent temporaries' slots
+// then differ. No padded source is kept.
 //
 // Not reconstructed: slot 10 (0x0042fd80, 2907 bytes), the per-frame
 // update along the path (wheel spin and steering, the collision objects'

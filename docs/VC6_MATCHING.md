@@ -349,10 +349,12 @@ an evidence-preserving next experiment.
 
 ### 4. Expand one subsystem at a time
 
-Prefer `PCTextureMap` slots 9 and 6 next because their frames and high-level flow
-are already understood. Defer its 2031-byte setup (slot 4), EventManager's
-4247-byte routine until its callees,
-member layouts and smaller surrounding methods are represented. This keeps a
+PCTextureMap slot 9 is exact; slot 6 differs only in its callee-saved
+register assignment. Functions that call Vector3 helpers out of line are
+limited by VC6's per-function inline budget, not by flags; see
+[VC6_INLINE_BUDGET](VC6_INLINE_BUDGET.md) before attempting them. Defer
+large routines until their callees, member layouts and smaller
+surrounding methods are represented. This keeps a
 failed large match from conflating ABI, register allocation, control flow and
 unknown type errors.
 

@@ -14,7 +14,7 @@ at +0x74. An object at +0x7c is destroyed through vfwdeco.cpp's
 
 ## Status
 
-Exact (23 calibration cases):
+Exact (24 calibration cases):
 - the constructor `0x004c5f00` (TextureMap's `0x0050a4e0`, then clears
   +0x70..+0x7c);
 - the scalar deleting destructor `0x004c5f30` and the destructor
@@ -88,6 +88,14 @@ Exact (23 calibration cases):
 - `0x004c84e0`, which locks a level (flags 0x811), writes it to a file
   through `0x004c8550` and unlocks it. Slot 20 calls it on every level with
   no name, so slot 20 dumps the mip chain.
+- slot 9 (385 bytes), the upload: BltFast down the mip chain with partial
+  texture blits (Display+0x5bc) or a positive mode, halving the rectangle
+  per level, otherwise the device's Load; then the colour key. The null
+  test is on the two surface fields before the locals are taken, and the
+  level loop is `while (1)` with the two size tests as separate `break`s:
+  a `while (a && b)` condition is rotated to the bottom, retail re-runs it
+  at the top of every pass. The next-level surfaces live in the dead
+  parameter slots.
 
 Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
 - `0x004c7b40` (about half of 750 bytes), the table blit: BltFast without
@@ -101,16 +109,17 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   into a `DebugMalloc` buffer, lines 2149/2154, and written by Tgafile.cpp's
   `0x005127f0`). `name` defaults to "tex". Only the buffer size's
   multiplication operand order differs;
-- slot 9 (117 of 385 bytes), the upload: BltFast down the mip chain with
-  partial texture blits or a positive mode, otherwise the device's Load.
-  The frame matches with separate `next` surfaces. Retail keeps `this` in
-  ebp and tests the level loop at the top on every pass;
-- slot 6 (61 of 600 bytes), the copy. It makes a `ManagedTexture` (RTTI
-  `ManagedTexture : PCTextureMap`, 0xbc bytes, registered with the source's
-  +0x90 ManagedTextureGroup) when TextureMap+0x68 bit 0 is set, else a
-  PCTextureMap. It fills the copy through slot 4 and copies the colour key
-  through slot 18. The structure lines up; retail's register assignment
-  (constant 1 in ebx, the copy in ebp) does not.
+- slot 6 (ratio 0.78 of 600 bytes), the copy. It makes a `ManagedTexture`
+  (RTTI `ManagedTexture : PCTextureMap`, 0xbc bytes, registered with the
+  source's +0x90 ManagedTextureGroup) when TextureMap+0x68 bit 0 is set,
+  else a PCTextureMap. It fills the copy through slot 4 and copies the
+  colour key through slot 18. With the flag normalised to 0/1
+  (`(field_0x68 & 1) != 0`, stored where the `new` temporary later lives),
+  the manager in a local before each `new`, the two caps flags as separate
+  `if`s and the copy assigned directly, everything matches but the
+  callee-saved assignment: retail keeps the constant 1 in ebx and the copy
+  in ebp, VC6 the reverse, which also changes the 8-bit key expansion's
+  scratch registers.
 - slot 4 (2031 bytes), the setup: it picks the format (through the
   optional +0x0c/+0x10 choice when the format has alpha), counts mip
   levels by halving both sides down to `minimumSize`, reuses a shared
@@ -120,7 +129,10 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   builds the mips through slot 15 and appends render states 0x29/0x1b
   (+0x13/0x14 address modes when the format has alpha) through an inline
   append helper. Only the non-mip fallback chain differs: VC6 cross-jumps
-  its identical call tails into the first case, retail into the last.
+  its identical call tails into the first case (as both do in the mip
+  chain), retail into the last. A `switch` with the device call as
+  `default` (in either case order) and a negated test for the device call
+  ahead of the chain are both further away.
 
 Also exact:
 - `0x004c68e0` (212 bytes), slot 4's format fallback: tries the
