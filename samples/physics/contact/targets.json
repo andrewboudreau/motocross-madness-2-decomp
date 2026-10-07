@@ -6,7 +6,8 @@
     "target_va": "0x004320f0",
     "target_size": 40,
     "expect": "exact",
-    "notes": "Stores b,c,d into field_0x80/0x6c/0x70 then tail-calls GameObject slot 8 (0x4692f0)."
+    "notes": "Stores b,c,d into field_0x80/0x6c/0x70 then tail-calls GameObject slot 8 (0x4692f0).",
+    "bindings": "CollisionObjectSetup.bindings.json"
   },
   {
     "class": "ContactSolveImpulse",

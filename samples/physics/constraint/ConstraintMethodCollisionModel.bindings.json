@@ -1,0 +1,21 @@
+{
+  "??0CollisionObject@@QAE@H@Z": "0x00431e70",
+  "??1CollisionObject@@UAE@XZ": "0x00432000",
+  "??1ConstraintMethodCollisionModel@@UAE@XZ": "0x0043b980",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7ConstraintMethodCollisionModel@@6BGraphicsTest@@@": "0x005511f0",
+  "??_7ConstraintMethodCollisionModel@@6BQuadTreeObject@@@": "0x00551260",
+  "?ApplyContactImpulse@ConstraintMethodCollisionModel@@QAEXPAVConBody@@MUConVec3@@11@Z": "0x0043bdb0",
+  "?CollisionEmptyCallback@@YAXPAVCollisionObject@@0@Z": "0x00464e90",
+  "?Configure@CollisionObject@@QAEXHHHH@Z": "0x004320f0",
+  "?ConstraintContactCallback@@YAXPAVCollisionObject@@0@Z": "0x0043b800",
+  "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
+  "?GameObjectVirtualSlot10@CollisionObject@@UAEHM@Z": "0x00499ae0",
+  "?GameObjectVirtualSlot14@CollisionObject@@UAEHXZ": "0x00434540",
+  "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",
+  "?SetModelShape@CollisionObject@@QAEXPAXHHHH@Z": "0x004324b0",
+  "?UpdatePlacement@CollisionObject@@QAEXXZ": "0x00435fb0",
+  "_$E1": "0x0043c8f0",
+  "__FILE__:constraintmethodcollisionmodel.cpp": "0x00568818",
+  "_g_ConZero": "0x00579830"
+}

@@ -6,7 +6,8 @@
     "target_va": "0x0043b240",
     "target_size": 186,
     "expect": "partial",
-    "notes": "95.7%: same size, scheduling differs (sub esp placement / fld order)"
+    "notes": "95.7%: same size, scheduling differs (sub esp placement / fld order)",
+    "bindings": "CollisionPoint.bindings.json"
   },
   {
     "class": "CollisionPoint",
@@ -15,7 +16,8 @@
     "target_va": "0x0043b300",
     "target_size": 32,
     "expect": "exact",
-    "notes": "12.5%: same size; retail loads flag byte into al then test al,1 (mine tests [esp+4] directly); core dtor inlined as in retail; exact under vc6_o2_ml (retail profile, no /G6)"
+    "notes": "12.5%: same size; retail loads flag byte into al then test al,1 (mine tests [esp+4] directly); core dtor inlined as in retail; exact under vc6_o2_ml (retail profile, no /G6)",
+    "bindings": "CollisionPoint.bindings.json"
   },
   {
     "class": "CollisionPoint",
@@ -24,7 +26,8 @@
     "target_va": "0x0043a330",
     "target_size": 565,
     "expect": "exact",
-    "notes": "AddCollisionPoint with the inlined CollisionPoint ctor. Exact with the capacity test as `if (*count < capacity) {...} return 0;` (retail puts the return 0 at the end) and field_0x04 = 0 after field_0x08 in the ctor."
+    "notes": "AddCollisionPoint with the inlined CollisionPoint ctor. Exact with the capacity test as `if (*count < capacity) {...} return 0;` (retail puts the return 0 at the end) and field_0x04 = 0 after field_0x08 in the ctor.",
+    "bindings": "CollisionPoint.bindings.json"
   },
   {
     "class": "ConstraintMethodCollisionModel",
@@ -42,7 +45,8 @@
     "target_va": "0x005040c0",
     "target_size": 43,
     "expect": "exact",
-    "notes": "calls base slot 1 then clears four bytes at +0x430..0x433"
+    "notes": "calls base slot 1 then clears four bytes at +0x430..0x433",
+    "bindings": "SoultreePhysicsCharacter.bindings.json"
   },
   {
     "class": "SoultreePhysicsCharacter",
@@ -51,7 +55,8 @@
     "target_va": "0x005040f0",
     "target_size": 193,
     "expect": "exact",
-    "notes": "5.8%: retail passes &field_0x0c as hidden return pointer of 0x4fc970 (void GetPosition(Vec3*)); Agent A's decl returns Vec3 by value so a temp copy is emitted (219 vs 193 bytes); exact under vc6_o2_ml (no /G6), likely true retail profile"
+    "notes": "5.8%: retail passes &field_0x0c as hidden return pointer of 0x4fc970 (void GetPosition(Vec3*)); Agent A's decl returns Vec3 by value so a temp copy is emitted (219 vs 193 bytes); exact under vc6_o2_ml (no /G6), likely true retail profile",
+    "bindings": "SoultreePhysicsCharacter.bindings.json"
   },
   {
     "class": "SoultreePhysicsCharacter",
@@ -60,7 +65,8 @@
     "target_va": "0x005041c0",
     "target_size": 79,
     "expect": "exact",
-    "notes": "36%: same size; prologue/argument-lea scheduling differs; exact under vc6_o2_ml (no /G6), likely true retail profile"
+    "notes": "36%: same size; prologue/argument-lea scheduling differs; exact under vc6_o2_ml (no /G6), likely true retail profile",
+    "bindings": "SoultreePhysicsCharacter.bindings.json"
   },
   {
     "class": "SoultreePhysicsCharacter",
@@ -69,7 +75,8 @@
     "target_va": "0x00504360",
     "target_size": 262,
     "expect": "exact",
-    "notes": "exact: node reset via 0x4fc540/0x4fc050, slot 34, OrientationAnglesFromVectors (0x4b5a60), then copies 0x88/0x94 to 0xa0/0xac and 0x2c..0x44 to 0x48..0x60"
+    "notes": "exact: node reset via 0x4fc540/0x4fc050, slot 34, OrientationAnglesFromVectors (0x4b5a60), then copies 0x88/0x94 to 0xa0/0xac and 0x2c..0x44 to 0x48..0x60",
+    "bindings": "SoultreePhysicsCharacter.bindings.json"
   },
   {
     "class": "SoultreePhysicsCharacter",
@@ -78,7 +85,8 @@
     "target_va": "0x00504470",
     "target_size": 29,
     "expect": "exact",
-    "notes": "signed-char flag test"
+    "notes": "signed-char flag test",
+    "bindings": "SoultreePhysicsCharacter.bindings.json"
   },
   {
     "class": "SoultreePhysicsObject",
@@ -87,7 +95,8 @@
     "target_va": "0x00503970",
     "target_size": 724,
     "expect": "exact",
-    "notes": "slot 40 loader: D3DIM base load, slot 2 setup, .col path build, SoultreeFile + 0x4e9cd0 lookup, CollisionObject shape setup"
+    "notes": "slot 40 loader: D3DIM base load, slot 2 setup, .col path build, SoultreeFile + 0x4e9cd0 lookup, CollisionObject shape setup",
+    "bindings": "SoultreePhysicsCharacter.bindings.json"
   },
   {
     "class": "SoultreePhysicsCharacter",
@@ -96,7 +105,8 @@
     "target_va": "0x00503de0",
     "target_size": 731,
     "expect": "exact",
-    "notes": "slot 40 loader: D3DIM base load, slot 2 setup, .col path build, SoultreeFile + 0x4e9cd0 lookup, CollisionObject shape setup"
+    "notes": "slot 40 loader: D3DIM base load, slot 2 setup, .col path build, SoultreeFile + 0x4e9cd0 lookup, CollisionObject shape setup",
+    "bindings": "SoultreePhysicsCharacter.bindings.json"
   },
   {
     "class": "CollisionQueries",
@@ -105,7 +115,8 @@
     "target_va": "0x0043a1e0",
     "target_size": 134,
     "expect": "exact",
-    "notes": "exact under vc6_o2_ml (no /G6), likely true retail profile; point-in-circle test in XZ against bounding sphere"
+    "notes": "exact under vc6_o2_ml (no /G6), likely true retail profile; point-in-circle test in XZ against bounding sphere",
+    "bindings": "CollisionQueries.bindings.json"
   },
   {
     "class": "CollisionQueries",
@@ -114,7 +125,8 @@
     "target_va": "0x0043a270",
     "target_size": 183,
     "expect": "exact",
-    "notes": "exact under vc6_o2_ml (no /G6), likely true retail profile; sphere-sphere overlap"
+    "notes": "exact under vc6_o2_ml (no /G6), likely true retail profile; sphere-sphere overlap",
+    "bindings": "CollisionQueries.bindings.json"
   },
   {
     "class": "CollisionVectorHelpers",
@@ -143,7 +155,8 @@
     "target_va": "0x0043a640",
     "target_size": 1003,
     "expect": "partial",
-    "notes": "5.0% under vc6_o2_ml; semantics match retail (see CollisionPoint.cpp) but retail pushes an extra ebx, keeps sums z,y,x and spills different temporaries (942 vs 1003 bytes)"
+    "notes": "5.0% under vc6_o2_ml; semantics match retail (see CollisionPoint.cpp) but retail pushes an extra ebx, keeps sums z,y,x and spills different temporaries (942 vs 1003 bytes)",
+    "bindings": "CollisionPoint.bindings.json"
   },
   {
     "class": "CollisionPoint",
@@ -170,7 +183,8 @@
     "target_va": "0x0043a570",
     "target_size": 109,
     "expect": "exact",
-    "notes": "AddCollisionPoint without the allocation: optional caller-supplied point stored into the slot, position reset from the zero vector"
+    "notes": "AddCollisionPoint without the allocation: optional caller-supplied point stored into the slot, position reset from the zero vector",
+    "bindings": "CollisionPoint.bindings.json"
   },
   {
     "class": "CollisionPoint",
@@ -179,7 +193,8 @@
     "target_va": "0x0043a5e0",
     "target_size": 85,
     "expect": "exact",
-    "notes": "search loop with the shift nested inside the match; returning from inside the loop keeps the separate not-found return"
+    "notes": "search loop with the shift nested inside the match; returning from inside the loop keeps the separate not-found return",
+    "bindings": "CollisionPoint.bindings.json"
   },
   {
     "class": "CollisionVectorHelpers",
@@ -198,7 +213,8 @@
     "target_va": "0x0043aff0",
     "target_size": 88,
     "expect": "partial",
-    "notes": "85 vs 88 bytes: control flow, loop and the reload of *points after the call match; operand order of the thiscall setup (lea ecx before mov ecx,[eax+4]) and the register used for the +0xa4 test differ"
+    "notes": "85 vs 88 bytes: control flow, loop and the reload of *points after the call match; operand order of the thiscall setup (lea ecx before mov ecx,[eax+4]) and the register used for the +0xa4 test differ",
+    "bindings": "CollisionPoint.bindings.json"
   },
   {
     "class": "CollisionObject",

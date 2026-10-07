@@ -256,8 +256,8 @@ python tools/run_physics_samples.py --strict --root src/krusty2/vehicle \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-This run reports `130/158 strict exact` with the pre-existing masked `0x409420` as the
-only required failure.
+This run reports `131/159 strict exact` with no required failures (`0x409420` is
+strict exact since the BikeA604 constructor call is bound to `0x0052ff90`).
 
 ## SoulTreePhysics round-out
 
@@ -370,8 +370,27 @@ where supported, without promoting that evidence into exact-code status.
 
 `expect: "masked"` requests a diagnostic regression check only. It does not
 count as strict validation. `expect: "partial"` retains known code-generation
-mismatches. The full `--strict` audit continues to fail on required targets
-with unresolved relocations, including pre-existing physics candidates:
+mismatches. Full-root status of the `--strict` audit:
+
+- `--root src/krusty2`: 593/649 strict exact, 0 required failures.
+- `--root samples/physics`: 323/397 strict exact, 2 required failures. Both are in
+  `samples/physics/collision/SoultreePhysicsCharacter.cpp` (`0x00503970`, `0x00503de0`):
+  they reference the sample's own `__FILE__` ("soultreephysicscharacter.cpp"), but the
+  retail sites load `0x00574320`, the "SoulTreePhysics.cpp" string. They need the code to
+  live in a source whose file name matches; the binding is deliberately not faked.
+
+Every other required target's relocations are bound in a `*.bindings.json` next to its
+source. The bindings came from `tools/propose_bindings.py` on masked-exact targets; the
+few it could not prove were checked by hand against retail (a call target that is a strict
+calibration target or a decoded function start, or a data address documented in the
+headers and consistent at every relocation site).
+
+```bash
+python tools/run_physics_samples.py --strict --root src/krusty2 --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+python tools/run_physics_samples.py --strict --root samples/physics --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+The default (diagnostic) run and a full JSON report:
 
 ```bash
 python tools/run_physics_samples.py --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"

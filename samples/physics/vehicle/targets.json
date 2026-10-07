@@ -6,7 +6,8 @@
   "target_va": "0x0040c4c0",
   "target_size": 118,
   "expect": "partial",
-  "notes": "90.4% (118/118). Cross via VehV3::CrossB member helper; remaining divergence: load order of the last product (b.x*y) in r.z."
+  "notes": "90.4% (118/118). Cross via VehV3::CrossB member helper; remaining divergence: load order of the last product (b.x*y) in r.z.",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -15,7 +16,8 @@
   "target_va": "0x0040c540",
   "target_size": 130,
   "expect": "partial",
-  "notes": "94.4% (130/130). Same CrossB helper as slot 34; remaining divergence: load order of the last product in r.z."
+  "notes": "94.4% (130/130). Same CrossB helper as slot 34; remaining divergence: load order of the last product in r.z.",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -24,7 +26,8 @@
   "target_va": "0x0040c880",
   "target_size": 7,
   "expect": "exact",
-  "notes": "slot 45 (introduced); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 45 (introduced); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -33,7 +36,8 @@
   "target_va": "0x0040c890",
   "target_size": 7,
   "expect": "exact",
-  "notes": "slot 51 (introduced); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 51 (introduced); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -42,7 +46,8 @@
   "target_va": "0x0040c8a0",
   "target_size": 14,
   "expect": "exact",
-  "notes": "slot 52 (introduced); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 52 (introduced); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -51,7 +56,8 @@
   "target_va": "0x0040cac0",
   "target_size": 18,
   "expect": "exact",
-  "notes": "slot 68 (introduced); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 68 (introduced); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -60,7 +66,8 @@
   "target_va": "0x0040cae0",
   "target_size": 13,
   "expect": "exact",
-  "notes": "slot 69 (introduced); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 69 (introduced); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -69,7 +76,8 @@
   "target_va": "0x0040caf0",
   "target_size": 38,
   "expect": "exact",
-  "notes": "slot 23 (override); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 23 (override); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -78,7 +86,8 @@
   "target_va": "0x0040cb20",
   "target_size": 59,
   "expect": "exact",
-  "notes": "slot 24 (override); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 24 (override); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -87,7 +96,8 @@
   "target_va": "0x0040cb60",
   "target_size": 59,
   "expect": "exact",
-  "notes": "slot 25 (override); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 25 (override); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -96,7 +106,8 @@
   "target_va": "0x00492220",
   "target_size": 76,
   "expect": "exact",
-  "notes": "slot 78 (introduced); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 78 (introduced); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -105,7 +116,8 @@
   "target_va": "0x00492270",
   "target_size": 76,
   "expect": "exact",
-  "notes": "slot 79 (introduced); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 79 (introduced); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -114,7 +126,8 @@
   "target_va": "0x004a6ba0",
   "target_size": 3,
   "expect": "exact",
-  "notes": "slot 92 (introduced); exact under vc6_o2_ml (no /G6)"
+  "notes": "slot 92 (introduced); exact under vc6_o2_ml (no /G6)",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -123,7 +136,8 @@
   "target_va": "0x0040c710",
   "target_size": 368,
   "expect": "exact",
-  "notes": "Wave 2. Sign chosen as y >= 0 ? -1 : 1 to get the branch polarity."
+  "notes": "Wave 2. Sign chosen as y >= 0 ? -1 : 1 to get the branch polarity.",
+  "bindings": "VehicleInlines.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -132,7 +146,8 @@
   "target_va": "0x0052b620",
   "target_size": 8,
   "expect": "exact",
-  "notes": "wave5: vtordisp adjustor thunk (sub ecx,[ecx-4]; jmp ??_G) for the scalar deleting dtor in the GameObject virtual-base vtable; emitted by the compiler from LayoutProbe.cpp. owner: Vehicle.cpp (vtable slot 0 of Vehicle+1472)"
+  "notes": "wave5: vtordisp adjustor thunk (sub ecx,[ecx-4]; jmp ??_G) for the scalar deleting dtor in the GameObject virtual-base vtable; emitted by the compiler from LayoutProbe.cpp. owner: Vehicle.cpp (vtable slot 0 of Vehicle+1472)",
+  "bindings": "../hierarchy/LayoutProbe.bindings.json"
  },
  {
   "class": "StreamTable",
@@ -141,7 +156,8 @@
   "target_va": "0x005253d0",
   "target_size": 107,
   "expect": "exact",
-  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp"
+  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp",
+  "bindings": "FileSlots.bindings.json"
  },
  {
   "class": "StreamTable",
@@ -150,7 +166,8 @@
   "target_va": "0x00525440",
   "target_size": 93,
   "expect": "exact",
-  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp"
+  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp",
+  "bindings": "FileSlots.bindings.json"
  },
  {
   "class": "StreamTable",
@@ -159,6 +176,7 @@
   "target_va": "0x005254a0",
   "target_size": 117,
   "expect": "exact",
-  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp"
+  "notes": "wave5: in-memory/CRT stream accessor (mode flag +0x23c); owner: bracket only (callers in recorder.cpp), not Vehicle.cpp",
+  "bindings": "FileSlots.bindings.json"
  }
 ]

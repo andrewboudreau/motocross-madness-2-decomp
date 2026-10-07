@@ -5,8 +5,9 @@
     "candidate_symbol_contains": "??0TerrainShadow",
     "target_va": "0x508ae0",
     "target_size": 142,
-    "expect": "masked",
-    "notes": "ctor: caster/index table/min-max sentinels; min/max stores in natural source order give retail's schedule"
+    "expect": "exact",
+    "notes": "ctor: caster/index table/min-max sentinels; min/max stores in natural source order give retail's schedule",
+    "bindings": "TerrainShadow.bindings.json"
   },
   {
     "class": "TerrainShadow",
@@ -14,8 +15,9 @@
     "candidate_symbol_contains": "?Attach@TerrainShadow",
     "target_va": "0x508b80",
     "target_size": 58,
-    "expect": "masked",
-    "notes": "Attach(host,caster,shadow), same nested-if shape as D3DIM Attach"
+    "expect": "exact",
+    "notes": "Attach(host,caster,shadow), same nested-if shape as D3DIM Attach",
+    "bindings": "TerrainShadow.bindings.json"
   },
   {
     "class": "ShadowReceiver",
@@ -23,8 +25,9 @@
     "candidate_symbol_contains": "??1ShadowReceiver",
     "target_va": "0x508b70",
     "target_size": 11,
-    "expect": "masked",
-    "notes": "empty ~ShadowReceiver COMDAT copy for this TU"
+    "expect": "exact",
+    "notes": "empty ~ShadowReceiver COMDAT copy for this TU",
+    "bindings": "TerrainShadow.bindings.json"
   },
   {
     "class": "TerrainShadow",
@@ -32,8 +35,9 @@
     "candidate_symbol_contains": "UnknownVirtualSlot29@TerrainShadow",
     "target_va": "0x005099c0",
     "target_size": 215,
-    "expect": "masked",
-    "notes": "slot 29: scans the cell rectangle in steps of 16, de-duplicates cell keys (cell reassigned to cell->key in place, as retail keeps it in eax); lists up to 0x40 then resets"
+    "expect": "exact",
+    "notes": "slot 29: scans the cell rectangle in steps of 16, de-duplicates cell keys (cell reassigned to cell->key in place, as retail keeps it in eax); lists up to 0x40 then resets",
+    "bindings": "TerrainShadow.bindings.json"
   },
   {
     "class": "TerrainShadow",
@@ -42,7 +46,8 @@
     "target_va": "0x005097d0",
     "target_size": 486,
     "expect": "partial",
-    "notes": "slot 28 light matrix setup, 23.8% (499/486). Retail keeps extent=max(x,z) in memory ([esp+0xc], redundant reload), reloads [ecx+0x54] for the 2nd texture->size read and uses frame 0x48; none of the source shapes tried reproduce these"
+    "notes": "slot 28 light matrix setup, 23.8% (499/486). Retail keeps extent=max(x,z) in memory ([esp+0xc], redundant reload), reloads [ecx+0x54] for the 2nd texture->size read and uses frame 0x48; none of the source shapes tried reproduce these",
+    "bindings": "TerrainShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -51,7 +56,8 @@
     "target_va": "0x004da570",
     "target_size": 331,
     "expect": "partial",
-    "notes": "ctor 84%: prevMinX/Y store scheduling differs (retail loads 0x7fffffff early, stores late)"
+    "notes": "ctor 84%: prevMinX/Y store scheduling differs (retail loads 0x7fffffff early, stores late)",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -59,8 +65,9 @@
     "candidate_symbol_contains": "??1ProjectedShadow",
     "target_va": "0x004da6e0",
     "target_size": 194,
-    "expect": "masked",
-    "notes": "destructor core"
+    "expect": "exact",
+    "notes": "destructor core",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -68,8 +75,9 @@
     "candidate_symbol_contains": "??_GProjectedShadow",
     "target_va": "0x004da6c0",
     "target_size": 30,
-    "expect": "masked",
-    "notes": "scalar deleting dtor wrapper"
+    "expect": "exact",
+    "notes": "scalar deleting dtor wrapper",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -78,7 +86,8 @@
     "target_va": "0x004da7b0",
     "target_size": 842,
     "expect": "partial",
-    "notes": "19% byte match, structurally close: sprintf-arg/save-order register allocation and per-statement pointer reloads differ"
+    "notes": "19% byte match, structurally close: sprintf-arg/save-order register allocation and per-statement pointer reloads differ",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -86,8 +95,9 @@
     "candidate_symbol_contains": "?AddCaster@",
     "target_va": "0x004dab00",
     "target_size": 135,
-    "expect": "masked",
-    "notes": "grow x2 array, new/DebugAlloc line 0xfe/0x102"
+    "expect": "exact",
+    "notes": "grow x2 array, new/DebugAlloc line 0xfe/0x102",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -95,8 +105,9 @@
     "candidate_symbol_contains": "?ClearCasters@",
     "target_va": "0x004dab90",
     "target_size": 8,
-    "expect": "masked",
-    "notes": "casterCount=0"
+    "expect": "exact",
+    "notes": "casterCount=0",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -104,8 +115,9 @@
     "candidate_symbol_contains": "?AddReceiver@",
     "target_va": "0x004daba0",
     "target_size": 167,
-    "expect": "masked",
-    "notes": "grow receivers, lines 0x115/0x119"
+    "expect": "exact",
+    "notes": "grow receivers, lines 0x115/0x119",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -113,8 +125,9 @@
     "candidate_symbol_contains": "?ResizeVertexBuffer@",
     "target_va": "0x004dac50",
     "target_size": 138,
-    "expect": "masked",
-    "notes": "vertex buffer line 0x131/0x134"
+    "expect": "exact",
+    "notes": "vertex buffer line 0x131/0x134",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -122,8 +135,9 @@
     "candidate_symbol_contains": "?SetShadowStrength@",
     "target_va": "0x004dace0",
     "target_size": 336,
-    "expect": "masked",
-    "notes": "colour key from strength"
+    "expect": "exact",
+    "notes": "colour key from strength",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -131,8 +145,9 @@
     "candidate_symbol_contains": "?SetShadowGrey@",
     "target_va": "0x004dae30",
     "target_size": 31,
-    "expect": "masked",
-    "notes": "grey level to shadowColor"
+    "expect": "exact",
+    "notes": "grey level to shadowColor",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -141,7 +156,8 @@
     "target_va": "0x004dae50",
     "target_size": 365,
     "expect": "partial",
-    "notes": "6%: retail keeps newMode in ebx, ours const-propagates 1/3 into stores"
+    "notes": "6%: retail keeps newMode in ebx, ours const-propagates 1/3 into stores",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -149,8 +165,9 @@
     "candidate_symbol_contains": "GameObjectVirtualSlot10",
     "target_va": "0x004dafc0",
     "target_size": 62,
-    "expect": "masked",
-    "notes": "slot 10 (float dt)"
+    "expect": "exact",
+    "notes": "slot 10 (float dt)",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -158,8 +175,9 @@
     "candidate_symbol_contains": "GameObjectVirtualSlot12",
     "target_va": "0x004db000",
     "target_size": 193,
-    "expect": "masked",
-    "notes": "slot 12 per-frame update"
+    "expect": "exact",
+    "notes": "slot 12 per-frame update",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -167,8 +185,9 @@
     "candidate_symbol_contains": "GameObjectVirtualSlot13",
     "target_va": "0x004dc410",
     "target_size": 165,
-    "expect": "masked",
-    "notes": "slot 13"
+    "expect": "exact",
+    "notes": "slot 13",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -177,7 +196,8 @@
     "target_va": "0x004db0d0",
     "target_size": 2020,
     "expect": "partial",
-    "notes": "5.5%, 1761/2020 B: caster AABB through world matrix, lens scale, mode 3/1 camera set-up; retail inlines Vec3 helpers via store/reload temporaries"
+    "notes": "5.5%, 1761/2020 B: caster AABB through world matrix, lens scale, mode 3/1 camera set-up; retail inlines Vec3 helpers via store/reload temporaries",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -186,7 +206,8 @@
     "target_va": "0x004db8c0",
     "target_size": 1074,
     "expect": "partial",
-    "notes": "2.3%, 884/1074 B: retail has an ebp frame and an unrolled 15-entry jump-table dword clear; rasteriser and transform helpers are called out of line"
+    "notes": "2.3%, 884/1074 B: retail has an ebp frame and an unrolled 15-entry jump-table dword clear; rasteriser and transform helpers are called out of line",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -195,7 +216,8 @@
     "target_va": "0x004dbd30",
     "target_size": 1218,
     "expect": "partial",
-    "notes": "12.5%, 655/1218 B: 2x2 box filter into the halved rect; retail clears with three unrolled jump tables (45/30/15 entries, included in the extent)"
+    "notes": "12.5%, 655/1218 B: 2x2 box filter into the halved rect; retail clears with three unrolled jump tables (45/30/15 entries, included in the extent)",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
@@ -204,7 +226,8 @@
     "target_va": "0x004dc2b0",
     "target_size": 352,
     "expect": "partial",
-    "notes": "9%, 354/352 B: retail converts with an inline fistp helper (fstp/fld float temp, fistp through a local pointer) which is inline asm (same as Terrain QueryGround 0x507c10); source uses (int) casts so __ftol is called instead"
+    "notes": "9%, 354/352 B: retail converts with an inline fistp helper (fstp/fld float temp, fistp through a local pointer) which is inline asm (same as Terrain QueryGround 0x507c10); source uses (int) casts so __ftol is called instead",
+    "bindings": "ProjectedShadow.bindings.json"
   },
   {
     "class": "ProjectedShadow",
