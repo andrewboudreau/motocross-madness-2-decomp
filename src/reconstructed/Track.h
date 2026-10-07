@@ -74,9 +74,18 @@ struct TrackCandidate {
 };
 
 class UnknownStream;
+class UnknownTextureStream;
 
 class Track {
 public:
+    // Inline at bikerace.cpp's `new` sites (0x00418147, 0x004182bb).
+    Track() { field_0x00 = 0; }
+
+    // 0x00515ed0 (ret 0x14): loads the track file from `stream`, with the
+    // start and finish probes (bikerace.cpp's 0x3c-byte gates) and whether
+    // the file has them; 1 on success.
+    int UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void* finish, int* hasStart,
+                              int* hasFinish);
     int UnknownFunction515e70(UnknownStream* stream, TrackNode** nodes, int count);
     int UnknownFunction516800(TrackNode* node);
     int UnknownFunction516870(TrackNode** start);

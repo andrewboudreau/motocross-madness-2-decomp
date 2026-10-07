@@ -480,7 +480,7 @@ int BikeRace::UnknownVirtualSlot10(float frameTime) {
                     if (g_UnknownGlobal56e26c->field_0x18 > 1) {
                         int count = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
                         for (int k = 0; k < count; k++) {
-                            field_0x03c[k]->UnknownRacerVirtualSlot50(1, field_0x03c[k]->UnknownRacerVirtualSlot45(0));
+                            field_0x03c[k]->UnknownRacerVirtualSlot50(1, field_0x03c[k]->UnknownRacerVirtualSlot45(), 0);
                         }
                     }
                 }
@@ -1168,7 +1168,7 @@ void BikeRace::UnknownFunction420bd0() {
                                                      riderName, 0x3f);
     g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80,
                                                      bikeName, 0x3f);
-    field_0x1a0->UnknownFunction49c070(0, 0, 0, &g_UnknownGlobal56e26c->mode, model, rider,
+    field_0x1a0->UnknownFunction49c070(0, 0, 0, g_UnknownGlobal56e26c->mode.field_0x00, model, rider,
                                        riderName, bikeName, field_0x040[0]->field_0x738,
                                        (unsigned char)field_0x040[0]->field_0x737,
                                        g_UnknownGlobal56e26c->mode.field_0x1bcc);

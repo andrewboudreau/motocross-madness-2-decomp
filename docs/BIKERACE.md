@@ -45,7 +45,31 @@ Near misses (`samples/race/BikeRaceNearMisses.cpp`):
 - `0x004210f0` (start grid), 969 of 2940 bytes: VC6's inline budget
   places the out-of-line `Vector3` constructor/scale calls differently
   (see the comment in the sample).
+- `0x00417ed0` (setup, 6745 bytes with the jump table at `0x0041992c`;
+  ret 0x24; QuarryStuntEvent.cpp's loader calls it after the
+  constructor), 2800 of 6756 positions: all 166 calls in retail order, the
+  EH states 0..0x10 (`new` lines 0x193..0x367) and the 0x4e8-byte frame with
+  the buffers at retail's offsets. Retail spills `z*z` of both vector
+  lengths to a stack temporary (`fstp [t]; faddp; fadd [t]`, a shape found
+  nowhere else in the binary) and orders the girl block's temporaries
+  differently, so most esp offsets below +0x44 differ.
+- `0x00419970` (loader, 13428 bytes; ret 0x14, frame 0xab0), 1380 of
+  13322 positions: completely decoded (pro circuit, network, offline,
+  ghost and AI racers, collision pairing; EH states for `new` lines
+  0x3b6..0x78f, frees at lines 0x4ff..0x501, 0x550..0x552 and
+  0x7f7..0x7f9); 194 of retail's 195 calls in order. The candidate's frame
+  (0xac4) orders the locals differently, and register choice follows.
 
-Not attempted: the 6.7 KB setup `0x00417ed0` (9 arguments, returns this;
-16 EH states, atan2/sqrt float code) and the 13 KB loader `0x00419970`
-(called by the setup).
+Facts the two functions establish:
+- Racers are KrustyBike (constructor `0x0048fa60`, 0x1638 bytes, the
+  GameObject virtual base at +0x160c), set up by `0x0048fc80` (25
+  arguments; its 12th is a char AI index). KrustyBike slot 45 takes no
+  argument and slot 50 three (`ret 0`, `ret 0xc`).
+- KrustyVCR `0x0049c070` takes a char second argument and a name (the
+  player name, `TrackGameMode+0`) fourth; `0x0049c1e0` reads a record back.
+- The track file name comes from `strrchr(path, '.')` (`0x00534a60`).
+- `0x00515ed0` is Track's loader (start and finish probes); `new Track`
+  inlines a constructor that clears +0.
+- The credits dialog is DemoDlg (vtable `0x00550e18`), constructed inline
+  as `UIDialog(1, "credits.dtm")`; DlgProcs.h declares no constructor, so
+  the sample uses a local stand-in class bound to that vtable.
