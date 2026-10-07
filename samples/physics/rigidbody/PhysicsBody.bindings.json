@@ -1,10 +1,24 @@
 {
+  "??0GraphicsTest@@QAE@H@Z": "0x0047bc70",
+  "??0PhysicsBody@@QAE@H@Z$ehhandler": "0x0054ce48",
+  "??1GraphicsTest@@UAE@XZ": "0x0047bd00",
   "??1PhysicsBody@@UAE@XZ": "0x004cbde0",
   "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7PhysicsBody@@6B@": "0x00556e0c",
   "?GameObjectVirtualSlot14@GameObject@@UAEHXZ": "0x00469360",
+  "?IntegrateAdamsBashforth2@@YAXMHPAM0@Z": "0x004a1d10",
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
   "?MatrixInverse@@YA?AUMatrix4@@U1@@Z": "0x004a18e0",
+  "?MatrixZero@@YA?AUMatrix4@@XZ": "0x004a13e0",
   "?WorldToLocalDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd710",
+  "_$E1": "0x004cbf30",
+  "_$E10": "0x004cc020",
+  "_$E4": "0x004cbf80",
+  "_$E7": "0x004cbfd0",
   "__real@4@3fff8000000000000000": "0x00550748",
-  "__real@8@00000000000000000000": "0x005507e8"
+  "__real@8@00000000000000000000": "0x005507e8",
+  "_kVec3XAxis": "0x006899d0",
+  "_kVec3YAxis": "0x006899e0",
+  "_kVec3ZAxis": "0x006899b0",
+  "_kVec3Zero": "0x006899c0"
 }

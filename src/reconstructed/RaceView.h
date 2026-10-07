@@ -88,6 +88,15 @@ struct UnknownEventRacerPart {
 // The class is not established; only the vbase access path is modelled.
 struct UnknownEventRacer : virtual public GameObject {
     virtual void UnknownVirtualSlot0();            // gives the racer its own vfptr at +0
+    // Own vtable +0xc8 (slot 50) is called by FollowRacer.cpp 0x004a9e80 with
+    // (1, 5.0f, 0); samples/race/FollowRacerNearMisses.cpp views the slot.
+
+    // 0x004925a0 (KrustyBike.cpp's code): the view's own racer hears that
+    // `racer` is followed (FollowRacer.cpp passes 0 as the flag).
+    void UnknownFunction4925a0(UnknownEventRacer* racer, bool flag);
+    // 0x00496f90 (KrustyBike.cpp's code): this racer hears about `other`.
+    void UnknownFunction496f90(UnknownEventRacer* other);
+
     unsigned char field_0x008[0x0c - 0x08];
     Vector3 field_0x00c;                           // position (KrustyBikeCamera slot 10 adds 2 to y)
     unsigned char field_0x018[0x50 - 0x18];
@@ -165,6 +174,13 @@ struct UnknownEventRacer : virtual public GameObject {
     char field_0x11c0;                             // AI racer's index in its messages
 };
 
+// The score board at UnknownKrustyBikeView+0xbc (the krustybike sample's
+// KbScoreBoard); only 0x0048d1e0 is declared: shows `score` with `multiplier`
+// (FollowRacer.cpp passes 2500 and 1 for taking over the followed racer).
+struct UnknownScoreBoard {
+    void UnknownFunction48d1e0(float score, float multiplier);  // 0x0048d1e0
+};
+
 // The replay object at UnknownKrustyBikeView+0x1a0; +0x10c is its length.
 struct UnknownKrustyBikeViewReplay {
     unsigned char field_0x000[0x10c];
@@ -199,7 +215,9 @@ struct UnknownKrustyBikeView : public GameObject {
     GameObject* field_0x50;
     unsigned char field_0x054[0x60 - 0x54];
     GameObject* field_0x60;
-    unsigned char field_0x064[0xc8 - 0x64];
+    unsigned char field_0x064[0xbc - 0x64];
+    UnknownScoreBoard* field_0x0bc;        // score board (FollowRacer.cpp 0x004a9e80)
+    unsigned char field_0x0c0[0xc8 - 0xc0];
     UnknownBikeRaceNode* field_0x0c8;      // gate list (BikeRace.h)
     unsigned char field_0x0cc[0x158 - 0xcc];
     int field_0x158;                     // entries in +0x3c

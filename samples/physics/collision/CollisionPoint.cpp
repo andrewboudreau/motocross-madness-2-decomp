@@ -141,7 +141,7 @@ void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {
     CollisionVec3 tmp;
     for (int i = count; i > 0; i--, points++) {
         CollisionPoint* p = *points;
-        if (p->ownerNode && *(int*)&p->inContact) {
+        if (p->ownerNode && p->inContact) {
             CollisionVec3* world = p->ownerNode->LocalToWorldPoint(&tmp, &p->localPosition);
             (*points)->worldPosition = *world;
         }

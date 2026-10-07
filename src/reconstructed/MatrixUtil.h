@@ -22,7 +22,10 @@ struct Matrix4 {
     float m[4][4];
 };
 
-// 12-byte float triple with D3DVECTOR-style constructors (D3D_OVERLOADS).
+// 12-byte float triple with D3DVECTOR-style constructors and the d3dvec.inl
+// index accessor (D3D_OVERLOADS). The accessor matters to codegen the same
+// way operator() does for Matrix4: 0x004a1300's dot products match only when
+// the components are read through it (see MatrixUtil.cpp).
 struct Vector3 {
     Vector3() {}
     Vector3(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
@@ -30,6 +33,8 @@ struct Vector3 {
     float y;
     float z;
 
+    float& operator[](int i) { return (&x)[i]; }
+    const float& operator[](int i) const { return (&x)[i]; }
     Vector3 operator*(float scale) const { return Vector3(x * scale, y * scale, z * scale); }
     Vector3& operator+=(const Vector3& other) {
         x += other.x;
@@ -47,7 +52,8 @@ inline Vector3 operator*(float scale, const Vector3& v) {
 // result into `out`.
 void UnknownFunction4a10e0(const Vector3* v, const Vector3* n, Vector3* out);
 // 0x004a11e0: unit normal of the triangle a, b, c and, when `offset` is
-// given, the plane offset -(normal . a).
+// given, the plane offset -(normal . a). Near miss (one store scheduled one
+// instruction apart): samples/render/MatrixUtilNearMisses.cpp.
 void TriangleNormal(const Vector3* a, const Vector3* b, const Vector3* c, Vector3* normal, float* offset);
 // 0x004a1300: where the line through `from` and `to` meets the plane of the
 // triangle a, b, c.
@@ -63,6 +69,7 @@ Matrix4 MatrixMult(Matrix4 a, Matrix4 b);      // 0x004a1860
 // fourth row and column of the result are left unset.
 Matrix4 MatrixInverse(Matrix4 m);
 // 0x004a1a50: transforms `count` points by `matrix` with the perspective
-// divide; `sourceStride` 0 means `targetStride`.
+// divide; `sourceStride` 0 means `targetStride`. Near miss (one fld/fmul
+// operand pair): samples/render/MatrixUtilNearMisses.cpp.
 void UnknownFunction4a1a50(void* target, const void* source, const Matrix4* matrix, int count,
                            int targetStride, int sourceStride);

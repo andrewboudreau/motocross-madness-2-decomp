@@ -1,0 +1,17 @@
+{
+  "?UnknownFunction4204e0@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
+  "?UnknownFunction4925a0@UnknownEventRacer@@QAEXPAU1@_N@Z": "0x004925a0",
+  "?UnknownFunction496f90@UnknownEventRacer@@QAEXPAU1@@Z": "0x00496f90",
+  "?UnknownFunction48d1e0@UnknownScoreBoard@@QAEXMM@Z": "0x0048d1e0",
+  "?UnknownFunction4a9f90@TrackGameViewOwner@@QAEXPAUUnknownEventRacer@@0@Z": "0x004a9f90",
+  "?UnknownFunction4e5860@RaceSound@@QAEXXZ": "0x004e5860",
+  "?Send@NetworkInterface@@QAEHHPAXHHH@Z": "0x004ac830",
+  "?QueueRecord@VCRInterface@@QAEHHHPBXI@Z": "0x004e8720",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
+  "_rand": "0x00534c1b",
+  "__ftol": "0x00534a88",
+  "__real@4@3ff08000000000000000": "0x005505f0",
+  "__real@4@3ffac90fdb0000000000": "0x0055534c",
+  "__real@4@3ffcf000000000000000": "0x00554714",
+  "__real@4@400a9c40000000000000": "0x00550bb8"
+}

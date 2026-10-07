@@ -14,11 +14,21 @@
 #include "shadow/ProjectedShadow.h"
 #include "broadphase/Terrain.h"
 
+// 32-byte lit vertex (FVF 0x1e2, the D3DLVERTEX layout) slot 14 draws from the inline array at
+// +0x34 (tier 2: the slot 14 draw call).  PROVISIONAL name.
+struct TerrainShadowVertex {
+    float x, y, z;
+    int reserved;
+    unsigned int diffuse;
+    unsigned int specular;
+    float tu, tv;
+};
+
 class TerrainShadow : public ShadowReceiver {
 public:
     explicit TerrainShadow(int flags);                                                  // 0x00508ae0
     TerrainShadow* Attach(int host, Terrain* terrain, ProjectedShadow* shadow);     // 0x00508b80
-    virtual int GameObjectVirtualSlot14();                                              // 0x0050a1a0
+    virtual int GameObjectVirtualSlot14();                                              // 0x0050a1a0 (render)
     virtual int UnknownVirtualSlot27();                                                 // 0x00508bc0
     virtual int UnknownVirtualSlot28();                                                 // 0x005097d0
     virtual int UnknownVirtualSlot29();                                                 // 0x005099c0
@@ -27,9 +37,10 @@ public:
     Terrain* caster;               // +0x2c ctor 0; Attach stores its second argument.  Tier 2: slot 28 calls
                                    // 0x00484d70 on caster+0x44, which is Terrain::heightField
     ProjectedShadow* shadow;       // +0x30 Attach stores its third argument and registers this
-    char field_0x34[0x6054 - 0x34]; // +0x34 slot 14 draws it as FVF 0x1e2 vertices (32 bytes each)
+    TerrainShadowVertex vertices[0x300];  // +0x34 slot 14 draws vertexCount of them with indexTable
+    char pad_0x6034[0x6054 - 0x6034];
     short indexTable[0x300];       // +0x6054 ctor fills with 0..0x2ff (`mov [ecx],ax; inc eax; cmp eax,0x300`)
-    int field_0x6654;              // +0x6654 ctor 0; slot 29 clears it when its list fills
+    int vertexCount;               // +0x6654 ctor 0; slot 29 clears it when its list fills; slot 14 draws that many
     int minX;                      // +0x6658 ctor 0x7fffffff (running minimum, tier 3 role)
     int maxX;                      // +0x665c ctor 0x80000000
     int minZ;                      // +0x6660 ctor 0x7fffffff

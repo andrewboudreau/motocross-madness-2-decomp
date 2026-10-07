@@ -17,8 +17,8 @@ static void CollisionRefreshContact(CollisionPoint* p, CollisionFrameHelper* fra
     frame->QueryGround(&p->surfacePosition, &p->surfaceNormal, 0, &p->surfaceType);
     p->penetration = (p->surfacePosition.y - p->worldPosition.y) * p->surfaceNormal.y;
     p->surfaceType &= 7;
-    p->inContact = (p->penetration >= p->penetrationThreshold) ? 1.0f : 0.0f;
-    if (p->inContact != 0.0f)
+    p->inContact = (p->penetration >= p->penetrationThreshold) ? 1 : 0;
+    if (p->inContact)
         ++*penetrating;
     if (p->surfaceOwner) {
         // field_0xc0 -> object whose +0xa4 table holds per-surface values at +0x3a0 (tier 3: surface friction/grip).
@@ -74,7 +74,7 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
     float deepest;
     int merged = 0;
     CollisionPoint* first = points[0];
-    if (first->inContact != 0.0f) {
+    if (first->inContact) {
         deepest = first->penetration > 0.0f ? first->penetration : 0.0f;
         sum = first->worldPosition;
         *normal = first->surfaceNormal;
@@ -86,7 +86,7 @@ int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec
     }
     for (int i = 1; i < count; ++i) {
         CollisionPoint* p = points[i];
-        if (p->inContact != 0.0f) {
+        if (p->inContact) {
             if (p->penetration > 0.0f && p->penetration > deepest)
                 deepest = p->penetration;
             sum.x += p->worldPosition.x;

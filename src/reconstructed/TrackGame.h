@@ -30,11 +30,17 @@ struct UnknownTrackGameViewPart {
 };
 
 // The object at TrackGameViewOwner+0xdc: bikerace.cpp 0x00420650 passes it
-// the new replay recorder (0x004a9d10).
+// the new replay recorder (0x004a9d10). It is the ghost bike BikeRace.h
+// declares as UnknownBikeRaceGhost (FollowRacer.cpp implements both views).
 class KrustyVCR;
 class UnknownTrackGameViewOwnerDc {
 public:
-    void UnknownFunction4a9d10(KrustyVCR* vcr); // 0x004a9d10
+    void UnknownFunction4a9d10(KrustyVCR* vcr); // 0x004a9d10: keeps the recorder at +0x708
+
+    unsigned char field_0x000[0x10a];
+    unsigned char field_0x10a;                // cleared when the followed racer changes (0x004a9e80)
+    unsigned char field_0x10b[0x708 - 0x10b];
+    KrustyVCR* field_0x708;
 };
 
 struct TrackGameViewOwner : public GameObject {
@@ -42,7 +48,14 @@ struct TrackGameViewOwner : public GameObject {
     // message for string `id` (racesnd.cpp passes 0x1429 and 0x14c3).
     void ShowOnOffMessage(int id, int value);
     void UnknownFunction4e1f00();             // 0x004e1f00 (dlgprocs.cpp LoadingDlg)
-    void UnknownFunction4a9d20();             // 0x004a9d20 (dlgprocs.cpp 0x004526b0)
+    // 0x004a9d20 (dlgprocs.cpp 0x004526b0): the host picks the racer to
+    // follow (+0xa8) and tells the players and the recorder (FollowRacer.cpp).
+    void UnknownFunction4a9d20();
+    // 0x004a9e80: follows `racer` after `previous` (KrustyBike.cpp 0x00497986
+    // passes itself, 0, 1); `tell` lets the view's own racer know.
+    void UnknownFunction4a9e80(UnknownEventRacer* racer, UnknownEventRacer* previous, int tell);
+    // 0x004a9f90: lets every other racer know about the switch.
+    void UnknownFunction4a9f90(UnknownEventRacer* racer, UnknownEventRacer* previous);
     // 0x00404df0: bikerace.cpp passes a racer's +0x7b8, +0x7bc and the racer.
     void UnknownFunction404df0(int a, int b, void* racer);
 
@@ -62,7 +75,11 @@ struct TrackGameViewOwner : public GameObject {
     unsigned char field_0x78[0x9c - 0x78];
     GameObject* field_0x9c;                   // racesnd.cpp calls slot 4 (sound off) or 5 (on)
     unsigned char field_0xa0[0xa8 - 0xa0];
-    UnknownEventRacer* field_0xa8;
+    UnknownEventRacer* field_0xa8;            // the followed racer (0x004a9d20 picks it, 0x004a9e80 switches it)
+    // One struct stands in for the three owners at TrackGame +0x55c/+0x560/
+    // +0x568; +0xac is a gate count in the quarry/course owners and a float
+    // (stored through a cast: a float member here moves TrackGame slot 1 and
+    // TrackOverlay 0x0051a560) in the bike race owner.
     int field_0xac;                           // RaceStatus.cpp 0x004e6a50 wraps a racer's next gate by it
     unsigned char field_0xb0[0xdc - 0xb0];
     UnknownTrackGameViewOwnerDc* field_0xdc;

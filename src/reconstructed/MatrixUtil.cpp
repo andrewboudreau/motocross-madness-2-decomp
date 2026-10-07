@@ -15,8 +15,58 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
-// 0x004a10e0, 0x004a11e0 and 0x004a1300 are near misses:
-// samples/render/MatrixUtilNearMisses.cpp.
+// 0x00460c00 (src/krusty2/math/FastMath.h).
+float FastInvSqrt(float x);
+
+// Normalizes `v` in place; the zero vector stays zero. The squared length is
+// summed as z^2 + (x^2 + y^2): the natural x + y + z order swaps the x87
+// loads in 0x004a10e0 and 0x004a11e0.
+inline void NormalizeVector(Vector3* v) {
+    float lengthSquared = v->z * v->z + (v->x * v->x + v->y * v->y);
+    if (lengthSquared == 0.0f) {
+        *v = kVec3Zero;
+    } else {
+        float scale = FastInvSqrt(lengthSquared);
+        v->x *= scale;
+        v->y *= scale;
+        v->z *= scale;
+    }
+}
+
+// Dot product through the d3dvec.inl index accessor, summed as
+// z + (x + y). Both the accessor and the association are needed for
+// 0x004a1300's fld/fmul operand order (0x004a10e0 writes its dot inline).
+inline float DotProduct(const Vector3& a, const Vector3& b) {
+    return a[2] * b[2] + (a[0] * b[0] + a[1] * b[1]);
+}
+
+inline Vector3 operator-(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+// 0x004a10e0: out = normalize(v - 2 (v . n) n).
+void UnknownFunction4a10e0(const Vector3* v, const Vector3* n, Vector3* out) {
+    float d = v->z * n->z + (v->x * n->x + v->y * n->y);
+    Vector3 twice(n->x + n->x, n->y + n->y, n->z + n->z);
+    Vector3 s = twice * d;
+    *out = Vector3(v->x - s.x, v->y - s.y, v->z - s.z);
+    NormalizeVector(out);
+}
+
+// 0x004a11e0 (TriangleNormal) is a near miss: samples/render/MatrixUtilNearMisses.cpp.
+
+// 0x004a1300: the triangle's plane (normal, offset) from TriangleNormal, then
+// from + (to - from) * t with t = -(normal . from + offset) / (normal . direction).
+void UnknownFunction4a1300(const Vector3* from, const Vector3* to, const Vector3* a, const Vector3* b,
+                           const Vector3* c, Vector3* out) {
+    Vector3 normal;
+    float offset;
+    TriangleNormal(a, b, c, &normal, &offset);
+    Vector3 direction = *to - *from;
+    float t = -((DotProduct(normal, *from) + offset) / DotProduct(normal, direction));
+    Vector3 step = direction * t;
+    *out = Vector3(step.x + from->x, step.y + from->y, step.z + from->z);
+}
 
 // 0x004a13e0
 Matrix4 ZeroMatrix() {
@@ -78,7 +128,34 @@ Matrix4 MatrixMult(Matrix4 a, Matrix4 b) {
     return result;
 }
 
-// 0x004a18e0 (MatrixInverse) and 0x004a1a50 are near misses:
+// 0x004a18e0: inverse of the upper 3x3 by cofactors, in the d3dmath.cpp
+// D3DMath_MatrixInvert shape (inverse * cofactor, the first-column cofactors
+// repeated from the determinant and shared by the compiler). Named cofactor
+// locals keep c11 in a register and swap the determinant's fld/fmul; the
+// fourth row and column of the result are left unset.
+Matrix4 MatrixInverse(Matrix4 m) {
+    Matrix4 result;
+    float determinant = m.m[0][0] * (m.m[1][1] * m.m[2][2] - m.m[2][1] * m.m[1][2])
+                        - m.m[0][1] * (m.m[2][2] * m.m[1][0] - m.m[1][2] * m.m[2][0])
+                        + m.m[0][2] * (m.m[2][1] * m.m[1][0] - m.m[1][1] * m.m[2][0]);
+    if (determinant != 0.0f) {
+        float inverse = 1.0f / determinant;
+        result.m[0][0] = inverse * (m.m[1][1] * m.m[2][2] - m.m[2][1] * m.m[1][2]);
+        result.m[0][1] = -inverse * (m.m[2][2] * m.m[0][1] - m.m[2][1] * m.m[0][2]);
+        result.m[0][2] = inverse * (m.m[1][2] * m.m[0][1] - m.m[1][1] * m.m[0][2]);
+        result.m[1][0] = -inverse * (m.m[2][2] * m.m[1][0] - m.m[1][2] * m.m[2][0]);
+        result.m[1][1] = inverse * (m.m[0][0] * m.m[2][2] - m.m[2][0] * m.m[0][2]);
+        result.m[1][2] = -inverse * (m.m[0][0] * m.m[1][2] - m.m[1][0] * m.m[0][2]);
+        result.m[2][0] = inverse * (m.m[2][1] * m.m[1][0] - m.m[1][1] * m.m[2][0]);
+        result.m[2][1] = -inverse * (m.m[0][0] * m.m[2][1] - m.m[0][1] * m.m[2][0]);
+        result.m[2][2] = inverse * (m.m[0][0] * m.m[1][1] - m.m[0][1] * m.m[1][0]);
+    } else {
+        result = ZeroMatrix();
+    }
+    return result;
+}
+
+// 0x004a1a50 (the strided perspective transform) is a near miss:
 // samples/render/MatrixUtilNearMisses.cpp.
 
 // 0x004a1b00 is hand-scheduled x87 code (an ebp frame, fxch pairing and a

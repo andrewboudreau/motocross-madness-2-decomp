@@ -1,14 +1,16 @@
 // PhysicsRigidBody.cpp -- second translation unit of the physics body code.
 //
-// TU evidence (tier 2): 0x004cbf20..0x004cca7e. It opens with the four Math3D.h
-// vector-constant initializers (0x004cbf20..0x004cc010). The remaining PhysicsBody
-// setters (slots 27, 31..35) follow, then everything for PhysicsRigidBody: the
+// TU evidence (tier 2): 0x004cc060..0x004ccbcc. The remaining PhysicsBody setters
+// (slots 27, 31..35) come first, then everything for PhysicsRigidBody: the
 // constructor 0x004cc120, the scalar deleting destructor 0x004cc1c0, the
-// destructor 0x004cc1e0, the force/torque accumulators, ResetState, and slots
-// 10/11/14. VC6 emits $E initializers first and then functions in source order,
-// which was verified with a probe compile. The retail file name is unknown. The
-// PhysicsBody setters could equally live at the end of an unknown
-// PhysicsBody-related file; they are kept here to preserve link order.
+// destructor 0x004cc1e0, the force/torque accumulators, ResetState, slots 10/11/14,
+// and finally the four Math3D.h vector-constant initializers (0x004cca90..0x004ccbcc,
+// globals 0x006899f0..0x00689a28; the constructor reads that set's kVec3Zero
+// 0x00689a00). The set at 0x004cbf20 in front of the setters writes 0x006899c0,
+// the copy PhysicsBody's constructor reads, so it closes PhysicsBody.cpp's unit.
+// The retail file name is unknown. The PhysicsBody setters could equally live at
+// the end of an unknown PhysicsBody-related file; they are kept here to preserve
+// link order.
 #include <string.h>
 #include "PhysicsBody.h"
 
@@ -60,7 +62,7 @@ void PhysicsBody::UnknownVirtualSlot35(int)
 // PhysicsRigidBody
 // ---------------------------------------------------------------------------
 
-// 0x004cc120 (not a target; emits the vtable and the scalar deleting destructor).
+// 0x004cc120.
 PhysicsRigidBody::PhysicsRigidBody(int flags)
     : PhysicsBody(flags)
 {
