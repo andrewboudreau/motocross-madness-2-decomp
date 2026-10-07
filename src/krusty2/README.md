@@ -37,7 +37,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionPoint.h`, `CollisionTypes.h`): 59 strict cases of 76 |
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts); `ObjectPlacement.cpp`: 8 strict cases |
-| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 44 strict cases of 50; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 56 strict cases |
+| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 46 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 56 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
 | `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (43 strict cases of 55) and `BikeAI.cpp` (23 strict cases), `Vehicle.h`, `Bike.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (20 strict cases of 22) |
@@ -47,7 +47,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `shadow/` | D3DIMSoultreeShadow: 17 strict cases; other shadow candidates in samples |
 | `visibility/` | VisibilityQuadTree: 39 strict cases; partial traversal in samples |
 
-Every `exact` target under `src/krusty2` is strict exact (593 of 649 targets; the rest are
+Every `exact` target under `src/krusty2` is strict exact (595 of 651 targets; the rest are
 `partial`). The reviewed slices and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
 SelectiveGravityModel.cpp (0x4f9760..0x4f9a59) is promoted on its own. The Shock
 family (0x4f9a60..0x4fb1d7) builds a second set of the Math3D.h constant vectors

@@ -1148,5 +1148,25 @@
     "expect": "partial",
     "notes": "1366/1942; all calls, branches and x87 sequences in retail order; residue is stack-slot packing.",
     "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot40@SoultreePhysicsObject",
+    "target_va": "0x00503970",
+    "target_size": 724,
+    "expect": "exact",
+    "notes": "slot 40 loader (ret 0x70): D3DIM object slot 9, slot 2 setup, .col path, new(SoulTreePhysics.cpp __FILE__ 0x00574320, 0x84e) file object + 0x4e9cd0 lookup, CollisionObject shape setup",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsCharacter",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot40@SoultreePhysicsCharacter",
+    "target_va": "0x00503de0",
+    "target_size": 731,
+    "expect": "exact",
+    "notes": "slot 40 loader (ret 0x6c): D3DIM character slot 11, slot 2 setup, .col path, new(SoulTreePhysics.cpp __FILE__ 0x00574320, 0x8cd) file object + 0x4e9cd0 lookup, CollisionObject shape setup",
+    "bindings": "SoulTreePhysics.bindings.json"
   }
 ]

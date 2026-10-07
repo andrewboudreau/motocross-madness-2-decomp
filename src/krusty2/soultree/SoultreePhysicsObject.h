@@ -1,6 +1,6 @@
 // SoultreePhysicsObject and D3DIMSoultreeObject -- class shapes for the SoulTreePhysics.cpp
 // members of SoultreePhysicsObject (ctor 0x005037c0, dtor 0x005038d0, GameObject slot 10
-// 0x00503c50) and the slot 40 loader 0x00503970 (samples/physics/collision).
+// 0x00503c50) and the slot 40 loader 0x00503970, all defined in SoulTreePhysics.cpp.
 //
 // Evidence (tier 1, analysis/rtti_classes.json and analysis/vtables.json):
 //  * SoultreePhysicsObject : SoultreePhysicsBaseObject (+0), D3DIMSoultreeObject (+540).

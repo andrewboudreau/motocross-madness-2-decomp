@@ -89,26 +89,6 @@
     "bindings": "SoultreePhysicsCharacter.bindings.json"
   },
   {
-    "class": "SoultreePhysicsObject",
-    "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot40@SoultreePhysicsObject",
-    "target_va": "0x00503970",
-    "target_size": 724,
-    "expect": "exact",
-    "notes": "slot 40 loader: D3DIM base load, slot 2 setup, .col path build, SoultreeFile + 0x4e9cd0 lookup, CollisionObject shape setup",
-    "bindings": "SoultreePhysicsCharacter.bindings.json"
-  },
-  {
-    "class": "SoultreePhysicsCharacter",
-    "source": "SoultreePhysicsCharacter.cpp",
-    "candidate_symbol_contains": "UnknownVirtualSlot40@SoultreePhysicsCharacter",
-    "target_va": "0x00503de0",
-    "target_size": 731,
-    "expect": "exact",
-    "notes": "slot 40 loader: D3DIM base load, slot 2 setup, .col path build, SoultreeFile + 0x4e9cd0 lookup, CollisionObject shape setup",
-    "bindings": "SoultreePhysicsCharacter.bindings.json"
-  },
-  {
     "class": "CollisionQueries",
     "source": "CollisionQueries.cpp",
     "candidate_symbol_contains": "SphereContainsPointXZ",

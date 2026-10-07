@@ -279,6 +279,12 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
   `0x2d0 = 0x4f8 - 0x228`.  Declaring D3DIMSoultreeObject with QuadTreeObject and GameObject
   as direct bases (its own dtor 0x0043f2b0 writes the primary vptr through `edi-0xc`)
   reproduces all of it.
+- The slot 40 loaders `0x00503970` (SoultreePhysicsObject, `ret 0x70`) and `0x00503de0`
+  (SoultreePhysicsCharacter, `ret 0x6c`), moved from
+  `samples/physics/collision/SoultreePhysicsCharacter.cpp`.  Both allocate the 0x134-byte
+  `.col` file object with `new(SP_FILE, 0x84e/0x8cd)`, and retail pushes this TU's
+  `__FILE__` string `0x00574320` at `0x00503b13`/`0x00503f87`, so they belong here and
+  bind strictly through `__FILE__:soultreephysics.cpp`.
 
 Still partial in SoulTreePhysics.cpp:
 
@@ -372,12 +378,8 @@ where supported, without promoting that evidence into exact-code status.
 count as strict validation. `expect: "partial"` retains known code-generation
 mismatches. Full-root status of the `--strict` audit:
 
-- `--root src/krusty2`: 593/649 strict exact, 0 required failures.
-- `--root samples/physics`: 323/397 strict exact, 2 required failures. Both are in
-  `samples/physics/collision/SoultreePhysicsCharacter.cpp` (`0x00503970`, `0x00503de0`):
-  they reference the sample's own `__FILE__` ("soultreephysicscharacter.cpp"), but the
-  retail sites load `0x00574320`, the "SoulTreePhysics.cpp" string. They need the code to
-  live in a source whose file name matches; the binding is deliberately not faked.
+- `--root src/krusty2`: 595/651 strict exact, 0 required failures.
+- `--root samples/physics`: 328/401 strict exact, 0 required failures.
 
 Every other required target's relocations are bound in a `*.bindings.json` next to its
 source. The bindings came from `tools/propose_bindings.py` on masked-exact targets; the
