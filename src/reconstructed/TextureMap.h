@@ -45,12 +45,12 @@ public:
     UnknownTextureStream(int a);              // 0x00460d10
     ~UnknownTextureStream();                  // 0x00460d60
     int UnknownFunction460f50(const char* path, const char* mode, int a); // 0x00460f50: opens `path`
-    int UnknownFunction461340(int offset, int a, int origin); // 0x00461340: seeks
+    int UnknownFunction461340(int offset, int origin, int flag); // 0x00461340: seeks
     int UnknownFunction461600();
     int UnknownFunction461640(void* buffer, int size, int count);
     int UnknownFunction461980();              // 0x00461980: reads a byte
     int UnknownFunction461aa0(char* buffer, int size); // 0x00461aa0: reads a line (CarProcedural.cpp)
-    void UnknownFunction461cb0(int* a, int* b); // 0x00461cb0 (SceneManager 0x004ea0fd)
+    int UnknownFunction461cb0(int* time, int* size); // 0x00461cb0: _fstat times (SceneManager 0x004ea0fd)
     // 0x00460e70: 1 when `path` opens and passes 0x00460db0's check; the
     // file is closed again (ResourceManager.cpp passes it to 0x00460f50).
     int UnknownFunction460e70(const char* path);
