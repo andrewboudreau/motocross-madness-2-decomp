@@ -212,6 +212,11 @@ and [GAMEOBJECT](GAMEOBJECT.md). In krusty2, Bike.cpp, CollisionObject.cpp,
 VisibilityQuadTree.cpp, SoultreeQuadTreeRenderer.cpp and the promoted
 SteeringControl.cpp gain 59 strict physics targets.
 
+From the unattributed-code map ([UNATTRIBUTED](UNATTRIBUTED.md)):
+NationalRace.cpp (8, `__FILE__` 0x56e338 and RTTI NationalRace :
+BaseQuarryEvent), Rectangle2D (5) and SkyCube (5) match strictly; the last
+two are named from RTTI, their file names are unattested.
+
 krustyui.cpp (KrustyUI) matches strictly in 43 functions, including the
 3114-byte garage scene and the 2432-byte open-menu routine; see
 [KRUSTYUI](KRUSTYUI.md).

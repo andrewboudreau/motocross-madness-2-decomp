@@ -216,6 +216,11 @@ public:
     virtual int UnknownVirtualSlot15();       // 0x0051b0f0
 
     void UnknownFunction51b1f0();             // 0x0051b1f0: shows the text again
+    // 0x0051af00 (ret 0x18): slot 8 on `value`, then sets up the text (size
+    // characters) with the game's texture manager; returns this or 0
+    // (NationalRace.cpp is the caller).
+    DropTextOverlay* UnknownFunction51af00(void* value, TextureMapManager* textures, float scale, int a, int size,
+                                           const char* text);
 
     void* field_0x2c;                         // font (DeleteObject)
     float field_0x30;                         // 1.0

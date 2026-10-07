@@ -1,0 +1,155 @@
+# Unattributed .text: gap map and attribution
+
+`.text` is `0x00401000..0x0054f1c6` (1,368,518 bytes). The established
+translation-unit extents (the `docs/*.md` units, the `src/krusty2` READMEs
+and the registered calibration spans) leave 46 gaps. This page splits those
+gaps at unit boundaries and records, for each range, the function starts,
+the attribution signals and a proposed unit with its evidence tier
+(1 confirmed literal/RTTI, 2 strong inference, 3 provisional). Alignment
+slivers under 16 bytes are omitted. The machine-readable form (every
+function start with size, registration state, vtable/`__FILE__`/`.CRT$XCU`
+tags, string literals, callers and callees) is `gaps.json` in the analysis
+scratch output of `gapmap.py`/`gapdoc.py` (not tracked).
+
+Function starts are the `allfn.txt` candidates that are registered, or
+16-byte aligned after `ret`/`int3`/`nop` padding, or called from two or more
+sites, plus every vtable entry and `.CRT$XCU` entry; jump-table targets and
+starts inside registered extents are dropped. "unreg." counts the starts
+not registered as exact in `tools/run_calibration.py` or a `targets.json`.
+
+Totals on the game side (`0x00401000..0x0053303c`): 252,322 gap bytes,
+of which 153,471 bytes in 490 unregistered function starts. After the game
+code: 29 import thunks, 5,421 bytes of DirectInput data-format tables,
+the VC6 LIBCMT span (`0x00534426..0x00548b50`, 443 atlas functions), a
+2.7 KB x87 span filler of non-VC6 shape, and 393 `$ehhandler` stubs with
+their unwind funclets (`0x005495f8..0x0054f168`).
+
+Signals used: `analysis/source_xrefs.json` (`__FILE__` literals),
+`analysis/vtables.json` and `rtti_classes.json` (vtable slot ownership),
+string literals reached by 32-bit immediates, direct-call callers/callees
+mapped to known extents, the `.CRT$XCU` table (`0x00566004..0x00566580`,
+link order, see [INITIALIZERS.md](INITIALIZERS.md)) with a linear scan for
+readers of each `$E` set's `.bss` vectors, and the alphabetical link order
+of the retail `.cpp` objects (a unit lies between its alphabetical
+neighbours' `__FILE__` xrefs).
+
+## Gap table
+
+| Range | Bytes | Starts (unregistered, bytes) | Proposed unit | Evidence | Tier |
+|---|---:|---|---|---|---:|
+| `0x00404df0..0x00404e80` | 144 | 2 (1 unreg., 110 B) | BackgroundImage.cpp tail or BaseObject.cpp head (unknown) | 0x404df0 (110 B, TrackGame view-owner setter called from BikeRace/RaceStatus) sits after BackgroundImage.cpp's last __FILE__ xref 0x404150 and before the two $E sets; no literal, no RTTI | 3 |
+| `0x00404e80..0x00405120` | 672 | 17 (16 unreg., 520 B) | two Math3D vector sets, units between AuralScape.cpp and Bike.cpp (.CRT$XCU 6-13) | two four-pair kVec3 sets (0x577818.., 0x577858..); no reader anywhere in .text; link order puts their units after AuralScape.cpp and before Bike.cpp (BackgroundImage.cpp and BaseObject.cpp are the known units in that span) | 3 |
+| `0x00405120..0x00405190` | 112 | 5 (1 unreg., 8 B) | BaseObject.cpp (registered, name ours) | src/reconstructed/BaseObject.cpp; 0x405160 is the shared slot-1 stub of every BaseObject vtable | 2 |
+| `0x0042e2a4..0x0042f390` | 4332 | 31 (6 unreg., 2374 B) | Camera.cpp (registered, name ours) | RTTI Camera vtable slots 10/28/29 and the Camera $E set XCU 49-52; bracket BoundingBoxTreeBuild.cpp 0x42e257 .. CarProcedural.cpp 0x42f657; six slot/helper functions unregistered | 2 |
+| `0x00430ff0..0x004318d0` | 2272 | 20 (20 unreg., 2144 B) | CD-audio / TrackGame+0x3340 helper unit (Ca..Co, provisional 'CDAudio.cpp') | literal 'cdaudio' at 0x4311e0 (MCI string), TrackGame+0x3340 object ctor/dtor 0x431050/0x4310b0, own $E static XCU 57 (0x4312b0 -> 0x579730); between CarProcedural.cpp (last xref 0x42fb52) and CollisionCharacter.cpp (0x431a12); no __FILE__, no RTTI | 3 |
+| `0x004318d0..0x00431da0` | 1232 | 11 (0 unreg., 0 B) | CollisionCharacter.cpp (samples/physics/tire) | __FILE__ xref 0x431a12; RTTI CollisionCharacter; all registered | 1 |
+| `0x0043a130..0x0043b320` | 4592 | 20 (8 unreg., 260 B) | CollisionPoint.cpp (samples/physics/collision) | __FILE__ xref 0x43a347; RTTI CollisionPoint; XCU 62-65 kVec3 set sits mid-file (no readers; XCU order between CollisionObject.cpp and ConstraintMethodCollisionModel.cpp) | 1 |
+| `0x0043b320..0x0043b950` | 1584 | 6 (0 unreg., 0 B) | registered samples/physics/constraint helpers (TextService callers) | registered exact in samples/physics/constraint/targets.json; no literal | 2 |
+| `0x0043b950..0x0043ca20` | 4304 | 18 (6 unreg., 195 B) | ConstraintMethodCollisionModel.cpp (samples/physics/constraint) | __FILE__ xref 0x43c7f9; RTTI; XCU 66-69 is its kVec3 set (four pairs 0x43c8e0..0x43ca1b) | 1 |
+| `0x0043ca20..0x0043caa0` | 128 | 1 (0 unreg., 0 B) | vector helper after ConstraintMethodCollisionModel's $E set (samples CollisionVectorHelpers) | 0x43ca20 (115 B) registered partial in samples/physics/collision; follows the set, so it closes that unit or opens the next (ControlInterface at 0x43caa0) | 3 |
+| `0x00448560..0x00449e60` | 6400 | 18 (18 unreg., 6264 B) | DirectX probing + input key-layout unit (De..Di, provisional 'DeviceSetup.cpp') | 0x448560 LoadLibrary DINPUT.DLL/DDRAW.DLL/Blade.dll (called from the startup code 0x4a08f7); TrackGame+0x33fc object 0x448960.. with 'Controller%d'/'Key%d'/'CurrentInputDevice' registry strings; 0x449270 '%s %s' called 54x; between DebugOverlay.cpp (0x447a67) and dirlist.cpp (0x449ea6); DEBUGOVERLAY.md 'not attributed'; no __FILE__/RTTI; may be two units | 3 |
+| `0x00455da0..0x0045c830` | 27280 | 52 (52 unreg., 26883 B) | EcoSystem.cpp | __FILE__ D:\aardvark\VC\krusty2\EcoSystem.cpp, 35 xrefs 0x455ee6..0x45c509; RTTI EcoSystem (vtable slots 0/12/14/23) and Vegetation; XCU 99-102 kVec3 set mid-file and 103-104 own statics at the top; 'EcoGen'/'QuadTree' strings; samples/ecosystem holds a non-matching candidate | 1 |
+| `0x0045ff80..0x00460b50` | 3024 | 10 (10 unreg., 2960 B) | error log / exception report unit (Ev..Fo, provisional 'ErrorLog.cpp') | 'errorlog.txt', 'Error creating exception report', exception-code names, '- file date is'; 0x45ff80 called from the entry wrapper 0x4a0c19; between EventManager.cpp (0x45e89a) and FollowCam.cpp (0x46315a); no __FILE__/RTTI | 3 |
+| `0x00460b50..0x004624d0` | 6528 | 25 (23 unreg., 6178 B) | file-stream helpers (provisional 'FileStream.cpp'; FastMath helpers registered) | stream ctor/dtor/Open/Read 0x460d10/0x460d60/0x460f50/0x461640 (called from Track, SceneManager, BoundingBoxTreeBuild...), printf-to-FILE 0x461d40, 0x461e60 (shadow triangle fill); 0x460b50/0x460c00 registered as samples FastMath.cpp; no __FILE__/RTTI; same bracket as above | 3 |
+| `0x004624d0..0x00462620` | 336 | 9 (8 unreg., 260 B) | kVec3 set XCU 109-112 (no readers) + shared 5-byte stub | four-pair set 0x65b3f8..; no reader; opens the Fog unit or closes the stream helpers; 0x4624d0 is a shared stub registered to PCCamera.cpp | 3 |
+| `0x00462620..0x00462ee0` | 2240 | 15 (14 unreg., 2085 B) | Fog / FogOff / FogOn (provisional 'Fog.cpp') | RTTI Fog (vtable slots 0/10/12/14/22), FogOff, FogOn; registry string DriverInfo\%s\RenderFog; constructed by QuarryStuntEvent 0x4de590; precedes FollowCam.cpp's first xref 0x46315a (Fo < Fol) | 2 |
+| `0x0047b670..0x0047bb20` | 1200 | 6 (6 unreg., 1178 B) | gameui.cpp tail or Ge..Gh unit (unknown) | 0x47b670 called by RaceStatus, 0x47b800 float helper (BikeAI/Track), 0x47b8a0 'NONE' (25 callers), three '%s\%s' path joiners; after gameui.cpp's last xref 0x47b5e0 (GAMEUI.md ends the TU at the vcall thunks 0x47b66f); no literal/RTTI | 3 |
+| `0x0047bb20..0x0047bc70` | 336 | 6 (6 unreg., 304 B) | GhostMod1 (provisional 'GhostMod.cpp') | RTTI GhostMod1 (slots 0/10/27 at 0x47bb50/0x47bc20/0x47bb70); between gameui.cpp and Grid1.cpp | 2 |
+| `0x0047bc70..0x0047c880` | 3088 | 19 (19 unreg., 2919 B) | GraphicsTest (provisional 'GraphicsTest.cpp') | RTTI GraphicsTest ctor 0x47bc70 / dtor 0x47bce0,0x47bd00; debug-draw helpers 0x47bd10..0x47c6f0 called by CollisionObject/BikeRace (krusty2/core/GraphicsTest.h); XCU 132-135 kVec3 set 0x47c740 (no readers) precedes Grid1.cpp (0x47c97a), CARPROCEDURAL.md calls it GraphicsTest's | 2 |
+| `0x004838a0..0x00484dd0` | 5424 | 5 (5 unreg., 5404 B) | GridNode / DrawableGridNode destructor and slot 1 (provisional 'GridNode.cpp') | RTTI GridNode dtor 0x4838f0 and DrawableGridNode slot 1 0x483d40 (4140 B); GRIDDRAW.md: 'in the next TU' after Griddraw.cpp (0x4825b0); before GUIManager.cpp (0x485430); 0x483910 (1067 B) called by Terrain | 2 |
+| `0x0048963c..0x00489780` | 324 | 8 (8 unreg., 260 B) | kVec3 set XCU 147-150 (no readers) | four-pair set 0x67c2b8..; after InGameProcs.cpp (0x488928) and before the InputDevice run; no reader; opens InputDevice or closes InGameProcs.cpp | 3 |
+| `0x00489780..0x0048a5b0` | 3632 | 25 (2 unreg., 321 B) | InputDevice / JoystickDevice / KeyboardDevice / MouseDevice (registered, names ours) | RTTI vtables; only ContainerList.h literals; 0x489f80 and 0x48a420 unregistered but contiguous with KeyboardDevice/MouseDevice methods | 2 |
+| `0x0048d77c..0x00497cb0` | 42292 | 89 (21 unreg., 26795 B) | KrustyBike.cpp (samples/physics/krustybike) | __FILE__ xrefs 0x48fe58..0x496b18 (0x48fc80, 0x491540, 0x495ff0, 0x496790); RTTI KrustyBike slots; XCU 155-158 mid-file; 13 unregistered functions incl. 0x493660 (8545 B), 0x48fc80 (5384 B) | 1 |
+| `0x00497cb0..0x004987f0` | 2880 | 25 (10 unreg., 1248 B) | KrustyBikeCamera.cpp (registered, name ours) | RTTI KrustyBikeCamera slots; XCU 159-162 kVec3 set 0x4986b0 read by slot 10 0x497e20 (closes the unit); 0x497e20 and 0x498340 (slot 34) unregistered | 2 |
+| `0x0049bf0c..0x0049c2f0` | 996 | 6 (6 unreg., 959 B) | KrustyVCR (provisional 'KrustyVCR.cpp') | RTTI KrustyVCR : VCRInterface; 'MCMVCR' literal; all six functions called from BikeRace (BikeRace.h declares the class); after krustyui.cpp (0x49bb93) | 2 |
+| `0x0049c2f0..0x0049dd30` | 6720 | 5 (5 unreg., 6675 B) | event/track table + Zone reporting unit (Kr..Li, unknown) | 0x49c2f0 'EventTypeIndex/EventTypeLocation/BikeManufacturer/BikeType' (Parser, MSZoneInterface, Net), 0x49c600 '%d,%d,%d,%d', 0x49c770 called by EventManager, 0x49ca60 (4810 B) track-name strings 'Quarry01'..; before LightEmitter.cpp (0x49e276); no __FILE__/RTTI | 3 |
+| `0x004a05db..0x004a10e0` | 2821 | 5 (5 unreg., 2768 B) | program entry unit (provisional 'main.cpp') | 0x4a0bc0 'main thread' wrapper calls 0x4a0680 ('Startup','Rainbow','Demo','IsAdmin' registry/command line, LoadLibrary probe 0x448560) and the error logger 0x45ff80; 0x4a0c50 'blank.cur'; 0x4a0d50 thread/window proc referenced from 0x4a0c8d; between Lzw.cpp (0x4a03ac) and the matrix unit; no __FILE__/RTTI | 3 |
+| `0x004a10e0..0x004a1d10` | 3120 | 14 (14 unreg., 1732 B) | MatrixUtil (registered 0x4a13e0..0x4a18dc, name ours) extended | 0x4a10e0/0x4a11e0 read the kVec3 set XCU 175-178 (0x685030..) and 0x4a1300/0x4a18e0/0x4a1a50/0x4a1b00 are matrix helpers between them: one unit with the registered MatrixUtil code | 2 |
+| `0x004a1d10..0x004a2350` | 1600 | 13 (11 unreg., 1276 B) | Math3D helpers (samples/physics/common Math3D.cpp) + kVec3 set XCU 179-182 | 0x4a1d10, 0x4a1f90 registered as Math3D.cpp; 0x4a1d60/0x4a1e10/0x4a2040 unregistered; set 0x4a2210 (0x685070..) has no reader; names ours | 3 |
+| `0x004a2350..0x004a2ac0` | 1904 | 19 (19 unreg., 1744 B) | MediaControl (provisional 'MediaControl.cpp') | RTTI MediaControl (slots 0/10/16/17/18 at 0x4a2470..0x4a2970; GameUi.h declares it); 0x4a2350/0x4a23a0 (MorphBastardModifier/Bike callers) precede the ctor 0x4a2410 and may be the previous unit's tail | 2 |
+| `0x004a2ac0..0x004a3150` | 1680 | 22 (22 unreg., 1546 B) | allocation accounting unit (provisional 'MemTag.cpp'; docs/ALLOCATION.md) | MemTagStack push/pop 0x4a2bc0/0x4a2d00, DebugMalloc 0x4a2e20, debug operator new/delete 0x4a3010/0x4a2e60/0x4a30c0 (506 and 48+ callers), 'Unclaimed' root 0x4a2b00 built by own $E XCU 183 (0x4a2ac0 -> 0x6850c0); before MorphBastardModifier.cpp (0x4a3215); no __FILE__ | 2 |
+| `0x004a562c..0x004a9aa0` | 17524 | 52 (14 unreg., 8113 B) | Motnctrl.cpp (samples/physics/motion) | __FILE__ xrefs 0x4a5659..0x4a9a87; RTTI Character; XCU 188-192; five unregistered: 0x4a6bb0, 0x4a70c0 (Character slot 7, 3327 B), 0x4a8bf0, 0x4a8c50, 0x4a9050 | 1 |
+| `0x004a9aa0..0x004aa010` | 1392 | 5 (5 unreg., 1355 B) | ghost/replay helpers used by BikeRace (Mo..MS, unknown) | 0x4a9aa0 (BikeRace ghost part), 0x4a9d10/0x4a9d20 (TrackGame view owner, KrustyVCR arg; Net/Recorder callees), 0x4a9e80 (RaceSound/Krusty3DObjects); after Motnctrl.cpp (0x4a9a87), before MSZoneInterface.cpp (0x4aa36c); no literal/RTTI | 3 |
+| `0x004aa7ea..0x004aab00` | 790 | 8 (8 unreg., 729 B) | NationalRace.cpp | __FILE__ D:\aardvark\VC\krusty2\NationalRace.cpp xrefs 0x4aa8c7 (slot 27) and 0x4aa9b0 (slot 29); RTTI NationalRace : BaseQuarryEvent (slots 0/10/27/29/30); ctor 0x4aa7f0 and init 0x4aa850 called by EventManager; reconstructed in src/reconstructed/NationalRace.cpp, all 8 functions strict exact | 1 |
+| `0x004ae2e8..0x004ae460` | 376 | 4 (4 unreg., 339 B) | Net.cpp tail or NetProcs.cpp head (unknown) | dispatcher 0x4ae3d0 calling 0x4ae2f0/0x4ae370/0x4ae390; between Net.cpp (0x4ae173) and NetProcs.cpp (0x4ae64d); NET.md: not claimed | 3 |
+| `0x004aff74..0x004aff90` | 28 | 1 (1 unreg., 10 B) | NormalDistribution.cpp $E thunk | XCU 202 thunk 0x4aff80 for the registered body 0x4aff90 (INITIALIZERS.md) | 2 |
+| `0x004b08ec..0x004b0df0` | 1284 | 3 (3 unreg., 1251 B) | ObjectPicker.cpp tail or ObjectPlacement.cpp head (unknown) | 0x4b08f0 'CollisionObject'/'Vegetation' TypeRegistry lookups, 0x4b0ac0, 0x4b0b80 (Terrain callee); after ObjectPicker.cpp (0x4b041c), before ObjectPlacement.cpp's xref 0x4b0fca; no literal | 3 |
+| `0x004b0df0..0x004b1ec0` | 4304 | 9 (8 unreg., 260 B) | ObjectPlacement.cpp (samples/physics/contact, partial) | __FILE__ xref 0x4b0fca inside 0x4b0df0 (3971 B); XCU 208-211 kVec3 set 0x4b1d80 (0x688738..) read only by 0x4b0df0 (closes the unit) | 1 |
+| `0x004b5a5e..0x004b5e20` | 962 | 2 (1 unreg., 274 B) | vector helpers between OptionProcs.cpp and overlay.cpp (unknown) | 0x4b5a60 registered partial in samples/physics/helpers; 0x4b5d00 (Vector3*,Vector3*,float,float,int) called by SceneManager/CarProcedural; no literal | 3 |
+| `0x004b89f6..0x004ba390` | 6554 | 37 (0 unreg., 0 B) | particle emitter classes (samples/physics/effects, provisional 'ParticleEmitter.cpp') | RTTI Dust/DirtChunk/DirtSpray/Spark/SteamParticleEmitter (slots 0/10/27); XCU 216-219 kVec3 set 0x4b9e00 (EmitterVec3Constants, no readers); between Parser.cpp (0x4b8584) and Particles.cpp (0x4ba4f1); six slot-10 bodies partial | 2 |
+| `0x004bac5a..0x004bb630` | 2518 | 2 (2 unreg., 2496 B) | Particles.cpp | ParticleManager slot 14 0x4bac60 (2495 B); after Particles.cpp's xrefs 0x4ba4f1..0x4ba5c8, before PCAudio.cpp (0x4bb8d8) | 2 |
+| `0x004bed80..0x004bfa80` | 3328 | 18 (2 unreg., 1082 B) | PCCamera.cpp / PCControl.cpp (registered) + DirectInput error reporter | PCControl.cpp __FILE__ xrefs 0x4bf298..0x4bf3da; unregistered PCControlInterface slot 3 0x4bf4f0 and 0x4bf6a0 (DIERR_* names; INPUT_DEVICES.md) before PCGame.cpp (0x4c0ad2) | 2 |
+| `0x004c25f0..0x004c2770` | 384 | 5 (0 unreg., 0 B) | PCInputDevice.cpp (registered, name ours) | all registered; retail unit is PCInputDeviceType.cpp (xrefs 0x4c3166..0x4c4d50 cover the joystick/keyboard/mouse code) | 2 |
+| `0x004c43c0..0x004c4ee0` | 2848 | 16 (0 unreg., 0 B) | PCKeyboardDevice.cpp / PCMouseDevice.cpp (registered, names ours; retail PCInputDeviceType.cpp) | __FILE__ PCInputDeviceType.cpp xrefs 0x4c45e0/0x4c4cf0; all registered | 1 |
+| `0x004cb668..0x004cb6e0` | 120 | 3 (0 unreg., 0 B) | PeakHold.cpp (registered, name ours) | three registered accessors | 2 |
+| `0x004cb6e0..0x004cbc50` | 1392 | 9 (9 unreg., 1318 B) | physics helper + kVec3 set XCU 220-223 (Pe..Ph, unknown) | 0x4cb6e0 (1058 B) called from KrustyBike 0x495d51 and SoulTreePhysics 0x50229f; the set 0x4cbb10 (0x689970..) has no reader; PhysicsBody owns the next set, so this is a separate unit | 3 |
+| `0x004cbc50..0x004cc120` | 1232 | 23 (10 unreg., 632 B) | PhysicsBody (samples/physics/rigidbody PhysicsBody.cpp) | RTTI PhysicsBody slots; 0x4cbc50 reads the XCU 224-227 set (0x6899c0..) that sits mid-file at 0x4cbf20 | 2 |
+| `0x004cc120..0x004ccbd0` | 2736 | 21 (10 unreg., 431 B) | PhysicsRigidBody (samples/physics/rigidbody PhysicsRigidBody.cpp) | RTTI PhysicsRigidBody slots; XCU 228-231 set 0x4cca90 (0x6899f0..) read by 0x4cc120/0x4cc500/0x4cc630 (closes the unit) | 2 |
+| `0x004ccbd0..0x004cde20` | 4688 | 8 (8 unreg., 4618 B) | display / controller selection dialogs (Ph..Pi, provisional 'PickDevice.cpp') | 0x4ccd60 chooses the display and 0x4cd610 the joystick (PCGAME.md), registry 'VideoCardClass'/'InputDeviceClass'/'UseVideoCardIdx'/'UseControllerId', Win32 'STATIC'/'BUTTON'/'LISTBOX' controls, two dialog procs 0x4ccbd0/0x4cd430; before Pixtrans.cpp (0x4cf2f2); no __FILE__/RTTI | 3 |
+| `0x004da520..0x004dc620` | 8448 | 31 (1 unreg., 5 B) | ShadowCamera (registered) + ProjectedShadow.cpp (samples/physics/shadow) | __FILE__ ProjectedShadow.cpp xrefs 0x4da745..0x4dacbc; RTTI ProjectedShadow; XCU 244-247; 0x4dc610 shared slot-0 stub | 1 |
+| `0x004e8ad0..0x004e8c50` | 384 | 5 (5 unreg., 348 B) | Rectangle2D (provisional 'Rectangle2D.cpp') | RTTI Rectangle2D (vtable 0x5577fc, dtor 0x4e8bc0); ctor/copy/dtor/operator= 0x4e8ad0/0x4e8b60/0x4e8bc0/0x4e8c20 called by TextService and FontTexture; between recorder.cpp (0x4e7ceb) and ResourceManager.cpp (0x4e8de6); Rectangle2D.h declares it; reconstructed in src/reconstructed/Rectangle2D.cpp, all 5 functions strict exact | 2 |
+| `0x004e8c50..0x004e8d30` | 224 | 6 (0 unreg., 0 B) | RenderTarget.cpp (registered, name ours) | RTTI RenderTarget; all registered | 2 |
+| `0x004f9a5a..0x004fb1e0` | 6022 | 27 (4 unreg., 20 B) | Shock family (samples/physics/suspension Shock.cpp) | RTTI Shock/InlineShock/RotatingShock; XCU 275-278 (second kVec3 set after SelectiveGravityModel's); three partials | 2 |
+| `0x004fb1e0..0x004fb2b0` | 208 | 5 (5 unreg., 184 B) | SkyCube (provisional 'SkyCube.cpp') | RTTI SkyCube : DrawableCube (ctor 0x4fb1e0 calls the DrawableCube ctor 0x43d910, dtor thunk 0x4fb220 -> 0x43e290, slot 10 0x4fb260); constructed by QuarryStuntEvent (0x4fb230); before soultree.cpp (0x4fdb7d); reconstructed in src/reconstructed/SkyCube.cpp, all 5 functions strict exact | 2 |
+| `0x005051ed..0x005053b0` | 451 | 6 (0 unreg., 0 B) | SurfaceMap (samples/physics/motion) | RTTI SurfaceMap; registered masked; between SteeringControl.cpp (0x504bd2) and Terrain.cpp | 2 |
+| `0x005053b0..0x00505480` | 208 | 4 (4 unreg., 175 B) | Alt-Tab keyboard hook (unknown; Terrain.cpp top by position) | SetWindowsHookEx(WH_KEYBOARD, 0x5053d0) install/remove with VK_TAB/VK_ESCAPE+ALT filter; 0x5053b0 called from KrustyUI; XCU 304 (0x505480, builds a PCCamera at 0x68a090) precedes Terrain's timer initializers 305-314, so Terrain.cpp's own statics start here | 3 |
+| `0x00508add..0x0050a3a0` | 6339 | 8 (3 unreg., 5373 B) | TerrainShadow (samples/physics/shadow TerrainShadow.cpp) | RTTI TerrainShadow slots 14/27/28/29/30; 0x508bc0 (3087 B), 0x509aa0 (1788 B), 0x50a1a0 unregistered; before Texmap.cpp (0x50a6bc) | 2 |
+| `0x0050beca..0x0050f6a0` | 14294 | 16 (3 unreg., 10596 B) | TextureCache.cpp (registered as ManagedTextureGroup.cpp) | __FILE__ TextureCache.cpp xref 0x50c4e2 inside 0x50c4a0; RTTI ManagedTextureGroup; 0x50c960 (3742 B), 0x50dad0 (5020 B), 0x50ef70 (1834 B) unregistered, called from ManagedTextureGroup/TextureMapManager code | 1 |
+| `0x005104fc..0x00510a50` | 1364 | 18 (0 unreg., 0 B) | TextureCache.cpp (registered as ManagedTexture.cpp) | RTTI ManagedTexture; all registered; same retail unit as above by bracket (TextService.cpp 0x50aea0 .. TextureMapManager.cpp 0x510c5e) | 2 |
+| `0x00512e30..0x00515dc0` | 12176 | 29 (17 unreg., 3130 B) | Tire (samples/physics/tire Tire.cpp) | RTTI Tire (two vtables); XCU 319-322 kVec3 set 0x515740 read by 0x512f10/0x514550/0x515b50; nine unregistered incl. 0x514550 (4258 B partial), 0x513c70, 0x514170 | 2 |
+| `0x00520693..0x00520820` | 397 | 4 (4 unreg., 372 B) | TransparencyMod (provisional 'TransparencyMod.cpp') | RTTI TransparencyMod : D3DIMSoultreeModifier (ctor 0x5206a0 bound from ArcadeObject.cpp, dtor 0x5206d0, slot 27 0x5206f0); TRACKRECORD.md excludes it; before trkgame.cpp (0x521086) | 2 |
+| `0x00520820..0x00520870` | 80 | 1 (1 unreg., 72 B) | debug/trace printf used by MSZoneInterface and TrackGame (unknown) | 0x520820 (72 B, varargs) 5 callers in MSZoneInterface; no literal | 3 |
+| `0x0052b91a..0x0052d0d0` | 6070 | 29 (16 unreg., 4918 B) | VehicleCamera.cpp (registered, name ours) + VfwDeco.cpp | RTTI VehicleCamera slots 35/36/41/57/68 unregistered (0x52bcf0..0x52cc80); XCU 336-339 mid-file; 0x52d050 vfwdeco.cpp (__FILE__ 0x52d07e) | 2 |
+| `0x0053303c..0x005330f0` | 180 | 9 (9 unreg., 174 B) | import thunks | 29 jmp [IAT] thunks | 1 |
+| `0x005330f0..0x00534426` | 4918 | 1 (1 unreg., 5421 B) | DirectInput data-format tables (dinput.lib) | DIOBJECTDATAFORMAT records {GUID* 0x556a70.., dwOfs, dwType 0x80ffff03/0x8000000c, flags} = c_dfDIKeyboard/Mouse/Joystick; one jmp [IAT] thunk at 0x534420 | 2 |
+| `0x00534426..0x00548b50` | 83754 | 5 (5 unreg., 109481 B) | VC6 LIBCMT (docs/VC6_CRT_ATLAS.md) | 443 atlas functions; 11 unlabeled gaps > 96 B (3077 B) inside the span | 1 |
+| `0x00548b50..0x005495f8` | 2728 | 0 (0 unreg., 0 B) | x87 span filler, non-VC6 code shape (unknown library) | thunk 0x548b50; 0x548b60 uses 'add esp,-0x28', fnstcw/fldcw and unrolled texture loops, no direct E8 caller in .text | 3 |
+| `0x005495f8..0x0054f1c6` | 23502 | 0 (0 unreg., 0 B) | EH handlers and unwind funclets of game TUs | 393 '$ehhandler' stubs (mov eax, FuncInfo; jmp ___CxxFrameHandler) 0x5495f8..0x54f168 plus unwind funclets; excluded from TU extents by convention | 1 |
+
+## Largest attributable work, by unregistered bytes
+
+| Unit | Range | Unregistered | Status |
+|---|---|---:|---|
+| EcoSystem.cpp | `0x00455da0..0x0045c830` | 52 starts, 26.9 KB | tier 1 (`__FILE__`, RTTI EcoSystem/Vegetation); nothing matched; `samples/ecosystem` holds a non-matching candidate for `0x0045aad0` |
+| KrustyBike.cpp | `0x0048d77c..0x00497cb0` | 21 starts, 26.8 KB | tier 1; the large slot bodies (`0x00493660` 8.5 KB, `0x0048fc80` 5.4 KB, `0x0048e3e0`, `0x0048eea0`) remain |
+| TextureCache.cpp (ManagedTextureGroup/ManagedTexture) | `0x0050beca..0x0050f6a0` | 3 starts, 10.6 KB | tier 1; `0x0050c960`, `0x0050dad0`, `0x0050ef70` |
+| Motnctrl.cpp | `0x004a562c..0x004a9aa0` | 14 starts, 8.1 KB | tier 1; samples partial/masked |
+| Kr..Li unit (event tables, Zone reporting) | `0x0049c2f0..0x0049dd30` | 5 starts, 6.7 KB | tier 3, name unknown |
+| De..Di unit (DirectX probe, key layout) | `0x00448560..0x00449e60` | 18 starts, 6.3 KB | tier 3, name unknown |
+| file-stream helpers | `0x00460b50..0x004624d0` | 23 starts, 6.2 KB | tier 3, name unknown |
+
+## Remaining uncertainty
+
+- Five `$E` kVec3 sets have no reader anywhere in `.text`: XCU 6-13 (two
+  sets, `0x00404e80`), 109-112 (`0x004624e0`), 132-135 (`0x0047c740`),
+  147-150 (`0x00489640`) and 179-182 (`0x004a2210`). Position bounds their
+  units to two neighbours each; nothing decides between them.
+- Sets 159-162, 175-178, 208-211, 224-227, 228-231 and 319-322 now have
+  readers (KrustyBikeCamera slot 10, the matrix helpers `0x004a10e0`/
+  `0x004a11e0`, ObjectPlacement `0x004b0df0`, `0x004cbc50`, the
+  PhysicsRigidBody methods and the Tire code respectively); those
+  attributions are strong inference, not literal evidence.
+- XCU 304 (`0x00505480`, a global PCCamera at `0x0068a090`) is listed between
+  Terrain.cpp's vector set (300-303) and its timer initializers (305-314), so it
+  is Terrain.cpp's. Whether the keyboard-hook code before it (`0x005053b0..`)
+  is Terrain.cpp's top or a separate Sv..Te unit is open.
+- Provisional file names (`CDAudio`, `DeviceSetup`, `ErrorLog`, `FileStream`,
+  `Fog`, `GhostMod`, `GraphicsTest`, `GridNode`, `main`, `MediaControl`,
+  `MemTag`, `PickDevice`, `Rectangle2D`, `SkyCube`, `TransparencyMod`,
+  `KrustyVCR`) are ours. None appears in `analysis/source_paths.txt`; they are
+  bounded only by the alphabetical bracket given in the evidence column. The
+  RTTI class names in them are confirmed; the file ownership is not.
+- `0x00448560..0x00449e60`, `0x0045ff80..0x004624d0` and
+  `0x004a05db..0x004a10e0` may each hold more than one unit; nothing in the
+  binary separates them.
+- The `0x00548b60..0x005495f8` filler has no direct caller in `.text`; its
+  provider is unknown. The 11 unlabeled gaps inside the LIBCMT span (3,077
+  bytes) are short runtime functions the atlas does not admit, not game code.
+
+## Reproduction
+
+The map was produced by a linear capstone pass over `.text` with
+`mcm2tool.pe.PEImage` (function-start filter as above, `.CRT$XCU` decode,
+`.bss` reader scan) joined with `analysis/source_xrefs.json`,
+`analysis/vtables.json`, the calibration cases and every `targets.json`.
+The CRT span comes from `make vc6-crt-atlas`.

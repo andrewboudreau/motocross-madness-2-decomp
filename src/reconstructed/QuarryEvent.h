@@ -169,11 +169,23 @@ public:
 };
 
 // RTTI: NationalRace : BaseQuarryEvent (vtable 0x00555354; 0xb0 bytes).
+// Its code is NationalRace.cpp (D:\aardvark\VC\krusty2\NationalRace.cpp,
+// literal 0x0056e338), 0x004aa7f0..0x004aaaf2, reconstructed in
+// src/reconstructed/NationalRace.cpp. The destructor is compiler-generated.
+class RunwayLights;
+class DropTextOverlay;
+
 class NationalRace : public BaseQuarryEvent {
 public:
     explicit NationalRace(int flags);         // 0x004aa7f0
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x004aaa70: shows the finish text once
+    virtual int UnknownVirtualSlot27(int value); // 0x004aa890: the visual cue, then the runway lights
+    virtual void UnknownVirtualSlot29();      // 0x004aa970: the overlays, then the drop text
+    virtual void UnknownVirtualSlot30();      // 0x004aaa50: adds the drop text as a child
     // 0x004aa850: the base initialiser, then 0x0048ad50 on +0xa4.
     NationalRace* UnknownFunction4aa850(RenderTarget* target, UnknownProgressCallback progress);
 
-    unsigned char field_0xa4[0xb0 - 0xa4];
+    RunwayLights* field_0xa4;
+    DropTextOverlay* field_0xa8;              // the finish text (string 0x913)
+    int field_0xac;                           // finish text shown
 };
