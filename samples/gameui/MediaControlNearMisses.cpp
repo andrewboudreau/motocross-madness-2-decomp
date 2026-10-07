@@ -5,12 +5,12 @@
 // matches. Retail keeps a zero in ebx and &field_0x60 in ebp after the
 // QueryInterface for the DirectDraw stream and pushes ebx for the later zero
 // arguments; VC6 here pushes immediates and uses one register fewer, so the
-// frame offsets differ by one dword. Local order does not change it.
+// frame offsets differ by one dword. Neither local order nor moving the
+// `surface = 0` store before the memset changes it. Retail's ebx holds
+// &field_0x5c and then field_0x5c itself (the QueryInterface `this`) before
+// the zero; VC6 here reloads it into eax.
 //
-// 0x004a2900 (restart, 50 bytes): retail tests SetState with `jl` to the
-// shared `return 0` and Update with `jge` to a `return 1` placed after it;
-// the &&, nested-if, early-return, ternary and result-flag forms all emit the
-// two `jl` tests with `return 1` first.
+// 0x004a2900 (restart) is exact in src/reconstructed/MediaControl.cpp.
 
 #include <windows.h>
 #include <string.h>
@@ -112,14 +112,5 @@ MediaControl* MediaControl::UnknownFunction4a2560(void* target, const char* file
 
 failed:
     Release();
-    return 0;
-}
-
-// 0x004a2900
-int MediaControl::Restart()
-{
-    if (field_0x50->UnknownMethod7(1) >= 0 && field_0x64->UnknownMethod6(0, 0, 0, 0) >= 0) {
-        return 1;
-    }
     return 0;
 }

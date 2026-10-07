@@ -23898,6 +23898,33 @@ CASES = [
         'target_size': 591,
         'reason': 'chained zero init; break to one return; dst temporaries keep source-before-index order',
     },
+    {
+        'name': 'MovingPart.cpp 0x4a2350 GetMatrixRow',
+        'bindings': 'src/reconstructed/MovingPart.bindings.json',
+        'source': 'src/reconstructed/MovingPart.cpp',
+        'symbol': '?GetMatrixRow@@YA?AUVector3@@PBUMatrix4@@H@Z',
+        'target_va': '0x004a2350',
+        'target_size': 66,
+        'reason': 'cdecl row getter called by MorphBastardModifier and Bike; component-wise copy into a local gives the stack temporary',
+    },
+    {
+        'name': 'MovingPart.cpp 0x4a23a0 MovingPart constructor',
+        'bindings': 'src/reconstructed/MovingPart.bindings.json',
+        'source': 'src/reconstructed/MovingPart.cpp',
+        'symbol': '??0MovingPart@@QAE@PBDPAVSoultreeObject@@H@Z',
+        'target_va': '0x004a23a0',
+        'target_size': 48,
+        'reason': 'non-polymorphic base of Tire and the Shock family; FindByName 0x4fdae0 then GetLocalMatrix 0x4fca60 into +0',
+    },
+    {
+        'name': 'MediaControl restart',
+        'bindings': 'src/reconstructed/MediaControl.bindings.json',
+        'source': 'src/reconstructed/MediaControl.cpp',
+        'symbol': '?Restart@MediaControl@@QAEHXZ',
+        'target_va': '0x004a2900',
+        'target_size': 50,
+        'reason': 'RTTI MediaControl, contiguous methods; SetState(run) then Update; break-out-of-do places return 0 first',
+    },
 ]
 
 def main():
