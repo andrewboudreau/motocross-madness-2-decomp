@@ -20695,6 +20695,15 @@ CASES = [
         'reason': 'AgeManager callback: delete(line 0x1a1), clears +0x18, sets billboard bit',
     },
     {
+        'name': 'EcoSystem.cpp Vegetation geometry build',
+        'bindings': 'src/reconstructed/EcoSystem.bindings.json',
+        'source': 'src/reconstructed/EcoSystem.cpp',
+        'symbol': '?SetBillboard@Vegetation@@QAEXHH@Z',
+        'target_va': '0x00456a10',
+        'target_size': 1512,
+        'reason': 'DebugMalloc(line 0x1fb), AgeManager register with 0x456850, FastInvSqrt, two normal paths',
+    },
+    {
         'name': 'EcoSystem.cpp Vegetation draw geometry',
         'bindings': 'src/reconstructed/EcoSystem.bindings.json',
         'source': 'src/reconstructed/EcoSystem.cpp',

@@ -364,14 +364,15 @@ calibration cases still pass.
 
 ### 3. Take bounded helpers before large orchestrators
 
-After the quick wins, close EcoSystem's record helpers `0x00456890` (356/369:
+After the quick wins, close EcoSystem's record helper `0x00456890` (356/369:
 its thirteen-byte scheduling block is invariant under every data-flow-equivalent
-spelling tried, so the next experiment is a different helper boundary, not a
-reordering) and `0x00456a10` (810/1512 since the output vertex is indexed off
-the re-read `geometryBlock`, which fixed the frame and loop shape; the slot
-assignment and the loop's zero register remain): both are reconstructed near
-misses in `samples/ecosystem/EcoSystemNearMisses.cpp` (see
-[ECOSYSTEM](ECOSYSTEM.md)). In parallel
+spelling and every helper boundary tried, and `/G6` scores lower, so it needs
+new evidence rather than another spelling), a reconstructed near miss in
+`samples/ecosystem/EcoSystemNearMisses.cpp` (see [ECOSYSTEM](ECOSYSTEM.md)).
+`0x00456a10` is exact: its remaining differences were the colour and ambient
+locals (six scalars, not two `Vector3`s, interleave with the other slots),
+the planar length as `x*x` then `+= z*z`, the x coordinate through a float
+local and the sums as `z + (x + y)`. In parallel
 conceptually—but as separate commits—trace Terrain construction/acquisition sites
 before attempting its cleanup, so member types and lifetime order are supported
 independently.

@@ -62,7 +62,7 @@ functions.
   3D and fade distances, model flags, billboard range and limit, and three
   render-state switches.
 
-## Exact (37 calibration cases)
+## Exact (38 calibration cases)
 
 Small: the two peak-hold `$E` pairs and the four vector `$E` pairs; the
 definition constructor / destructor and its four parameter helpers
@@ -75,7 +75,10 @@ collision-count and radius getters `0x00457080` / `0x00457230`; the
 EcoSystem constructor, destructor and deleting destructor, the detail-level
 setter `0x004594c0`, the geometry draw `0x00457000` and slot 23.
 
-Medium and large: the lighting update `0x0045a9a0`; slot 12 `0x0045aad0`
+Medium and large: the geometry build `0x00456a10` (1512 bytes: the
+AgeManager-registered vertex block, rotation from the camera's horizontal
+direction, the planar and model-normal lighting paths); the lighting update
+`0x0045a9a0`; slot 12 `0x0045aad0`
 (the classification pass: AgeManager trim, view matrix publication, the
 sorted QuadTree query, the fade helper, the frustum test and the two draw
 lists with their 100/20-entry growth); the render-state setter
@@ -87,6 +90,14 @@ object array, buffers, placement by method, .esb write).
 Source forms that mattered:
 - The squared length in `0x0045a9a0` only compiles to retail's load order
   as `z*z + (x*x + y*y)` (`UnknownSquareMagnitude`).
+- `0x00456a10`: the light colour and ambient are six float locals (two
+  `Vector3`s are placed as aggregates at the top of the frame; retail
+  interleaves their components with the other scalar slots); the planar
+  length is `x*x` then `+= z*z`; the quantized x goes through a float local
+  (that is what orders the zero register before the global reload); the 3D
+  length is `UnknownSquareMagnitude` and the light dot product sums as
+  `z + (x + y)`; the output vertex is indexed off the re-read
+  `geometryBlock` member.
 - `0x0045ade0`: the alpha reference for the colour-keyed format is
   `software ? 0 : 0xc0` (VC6 encodes `and ecx, 0xffffff40` as `and cl, 0x40`);
   the stage states repeat the identical pair in both arms of an
@@ -106,8 +117,7 @@ Scores are matching / compared bytes in the src unit's context.
 | VA | Function | State |
 |---|---|---|
 | `0x004567e0` | world-position placement | 82/112: VC6 orders `position->x * scale` as `fld scale; fmul x`; retail loads x first. Only a by-value float accessor (`position->X()`) reproduces it; the project's `Vector3` has none. |
-| `0x00456890` | fade / distance band | 356/369: retail schedules the camera pointer load and the z store before the first `fmul`. The block is scheduling-invariant: eighteen data-flow-equivalent spellings (locals before or after the camera load, no camera local, the view in a local, one declaration per statement, a position reference, the products computed before the camera, `-=`, int locals and casts, a `Vector3` position, z first, a delta vector) give the same bytes, and every statement reordering scores lower. |
-| `0x00456a10` | geometry build (1512 bytes) | 810/1512: the body is reproduced (rotation from the camera direction, vertex transform, two normal paths, lighting, colours, the dead min/max of x) and, with the output vertex indexed off the re-read `geometryBlock` member instead of a walking pointer, so are the 0x50 frame and the loop shape. The planar normal is the rotated model *position*, with an explicit `unlit = 0` in that branch. What remains is the local slot assignment (retail: normal 0x54-0x5c, colour 0x3c-0x44, ambient 0x28-0x30, length 0x1c, unlit 0x18; neither declaration order nor sum association moves it) and the loop's zero register (`xor edx, edx` reused for `cmp` and the `unlit` store). |
+| `0x00456890` | fade / distance band | 356/369: retail schedules the camera pointer load and the z store before the first `fmul`. The block is scheduling-invariant: eighteen data-flow-equivalent spellings (locals before or after the camera load, no camera local, the view in a local, one declaration per statement, a position reference, the products computed before the camera, `-=`, int locals and casts, a `Vector3` position, z first, a delta vector) give the same bytes, and every statement reordering scores lower. Helper boundaries do not move it either: inline and static accessors for the eye and the scaled coordinate, pointer, reference and by-value helpers, a struct copy and the difference as a `Vector3` all give the identical 356 or less, and `/G6` scores 267. |
 | `0x004570a0` | collision object placement | 74/349: retail does not fold the definition lookup across the position conversions; the radius and height divide by the definition's mean values. |
 | `0x00456050` | definition load (.slt) | 195/1496: `this` / `textures` register roles and the local layout (the loop extremes, a/b/c, faces) differ; the frame is 0x1b8 for 0x1b4. |
 | `0x00457480` | .est reader (2626 bytes) | 380/2624 with the handler label bound by hand (the matcher does not recognise the `push ebp; mov ebp, esp; and esp, -8; push -1; push handler` prologue, so the case cannot be registered yet); the only other difference is the probe stream kept in `esi` as well as its EH slot. |
