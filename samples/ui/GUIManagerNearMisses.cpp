@@ -243,7 +243,7 @@ PCTextureMap* GUIManager::UnknownFunction486170(int dim, CameraRect* rect) {
         texture = new(__FILE__, 916) PCTextureMap(field_0xd8, 1);
         texture->UnknownVirtualSlot4(bits, width, height, width, width, format, format, 0, 4, 0, 0, 0, 2, 1, 0, 0x80,
                                      0xff00ff);
-        operator delete(bits, __FILE__, 921);
+        DebugFree(bits, __FILE__, 921);
     }
     return texture;
 }

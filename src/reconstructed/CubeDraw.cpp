@@ -130,7 +130,7 @@ int DrawableCube::UnknownFunction43e210()
 DrawableCube::~DrawableCube()
 {
     if (s_UnknownGlobal57ee94)
-        operator delete(s_UnknownGlobal57ee94, __FILE__, 0x192);
+        DebugFree(s_UnknownGlobal57ee94, __FILE__, 0x192);
     s_UnknownGlobal57ee94 = 0;
     s_UnknownGlobal57ee98 = 0;
     if (field_0x30)

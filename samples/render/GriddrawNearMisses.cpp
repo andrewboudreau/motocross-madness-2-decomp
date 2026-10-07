@@ -570,7 +570,7 @@ int DrawableGridNode::UnknownFunction47f210()
                     }
                     if (old) {
                         memcpy(data->field_0x134, old, oldSize);
-                        operator delete(old, __FILE__, 1085);
+                        DebugFree(old, __FILE__, 1085);
                     }
                     g_gridDrawMemory += data->field_0x140;
                     if (g_gridDrawMemory > g_gridDrawMemoryPeak)
@@ -591,7 +591,7 @@ int DrawableGridNode::UnknownFunction47f210()
                     }
                     if (old) {
                         memcpy(data->field_0x138, old, oldSize);
-                        operator delete(old, __FILE__, 1107);
+                        DebugFree(old, __FILE__, 1107);
                     }
                     g_gridDrawMemory += data->field_0x142;
                     if (g_gridDrawMemory > g_gridDrawMemoryPeak)

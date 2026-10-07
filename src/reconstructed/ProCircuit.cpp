@@ -134,8 +134,8 @@ UnknownTrackGameObject3444::UnknownTrackGameObject3444()
 UnknownTrackGameObject3444::~UnknownTrackGameObject3444()
 {
     for (int i = 0; i < field_0x1281; i++)
-        operator delete(field_0x127d[i], __FILE__, 139);
-    operator delete(field_0x127d, __FILE__, 141);
+        DebugFree(field_0x127d[i], __FILE__, 139);
+    DebugFree(field_0x127d, __FILE__, 141);
     for (int j = 0; j < 6; j++)
         UnknownFunction4d3a60(&field_0x1285[j]);
 }
@@ -146,13 +146,13 @@ void UnknownTrackGameObject3444::UnknownFunction4d3a60(UnknownProCircuitSchedule
     if (schedule->field_0x00) {
         for (int i = 0; i < schedule->field_0x04; i++) {
             if (schedule->field_0x00[i].field_0x04)
-                operator delete(schedule->field_0x00[i].field_0x04, __FILE__, 153);
+                DebugFree(schedule->field_0x00[i].field_0x04, __FILE__, 153);
             if (schedule->field_0x00[i].field_0x00)
-                operator delete(schedule->field_0x00[i].field_0x00, __FILE__, 154);
+                DebugFree(schedule->field_0x00[i].field_0x00, __FILE__, 154);
             if (schedule->field_0x00[i].field_0x08)
-                operator delete(schedule->field_0x00[i].field_0x08, __FILE__, 155);
+                DebugFree(schedule->field_0x00[i].field_0x08, __FILE__, 155);
         }
-        operator delete(schedule->field_0x00, __FILE__, 158);
+        DebugFree(schedule->field_0x00, __FILE__, 158);
     }
 }
 
@@ -245,7 +245,7 @@ found:
                     ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].field_0x04)
     field_0x465[0].field_0x138 = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].field_0x8c;
     field_0x465[0].field_0x13c = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].field_0x90;
-    operator delete(used, __FILE__, 273);
+    DebugFree(used, __FILE__, 273);
 }
 
 // 0x004d4100

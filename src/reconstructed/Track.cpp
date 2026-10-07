@@ -43,7 +43,7 @@ int Track::UnknownFunction515e70(UnknownStream* stream, TrackNode** nodes, int c
         if (nodes[i])
             UnknownFunction516800(nodes[i]);
     }
-    operator delete(nodes, __FILE__, 30);
+    DebugFree(nodes, __FILE__, 30);
     return 1;
 }
 
@@ -55,11 +55,11 @@ int Track::UnknownFunction516800(TrackNode* node)
     while (node->field_0x08) {
         TrackSegment* segment = node->field_0x08;
         node->field_0x08 = segment->field_0x2c;
-        operator delete(segment, __FILE__, 353);
+        DebugFree(segment, __FILE__, 353);
     }
     if (node->field_0x14)
-        operator delete(node->field_0x14, __FILE__, 359);
-    operator delete(node, __FILE__, 361);
+        DebugFree(node->field_0x14, __FILE__, 359);
+    DebugFree(node, __FILE__, 361);
     return 1;
 }
 
@@ -82,7 +82,7 @@ int Track::UnknownFunction516870(TrackNode** start)
             UnknownFunction516800(node);
             item = list;
             list = list->field_0x0c;
-            operator delete(item, __FILE__, 400);
+            DebugFree(item, __FILE__, 400);
         } else {
             node->field_0x00 |= 4;
             int count = list->field_0x04->field_0x10;
@@ -125,7 +125,7 @@ int Track::UnknownFunction517930(TrackListItem** list, int all)
         if (item->field_0x04 && (!(item->field_0x04->field_0x00 & 1) || all))
             UnknownFunction516800(item->field_0x04);
         *list = (*list)->field_0x0c;
-        operator delete(item, __FILE__, 1021);
+        DebugFree(item, __FILE__, 1021);
     }
     return 1;
 }

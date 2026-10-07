@@ -80,7 +80,7 @@ void BlockAllocator::Clear() {
     while (p) {
         Block* old = p;
         p = p->next;
-        operator delete(old, __FILE__, 156);
+        DebugFree(old, __FILE__, 156);
     }
     firstBlock = 0;
     lastBlock = 0;

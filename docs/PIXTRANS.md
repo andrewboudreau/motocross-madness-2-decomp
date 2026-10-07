@@ -118,6 +118,7 @@ through `0x004cf2a0` when asked and otherwise map through the 555-to-index
 and 565-to-index tables `0x004de280`/`0x004de290`.
 
 Not reconstructed: the halvers `0x004ce190`, `0x004ce5f0`, `0x004cea10`
-and `0x004cee30`, the ditherer `0x004cf2a0` and the table getters
-`0x004de280`/`0x004de290`. `0x004cf162` and `0x004d0000` are not function
+and `0x004cee30` and the ditherer `0x004cf2a0`. The table getters
+`0x004de280`/`0x004de290` are exact in `src/reconstructed/Quantize.cpp`.
+`0x004cf162` and `0x004d0000` are not function
 starts (inside the ditherer and `0x004cfe70`).

@@ -41,7 +41,7 @@ void ResourceItem::UnknownFunction4e8de0()
 ResourceItem::~ResourceItem()
 {
     if (field_0x08)
-        operator delete(field_0x08, __FILE__, 42);
+        DebugFree(field_0x08, __FILE__, 42);
 }
 
 // 0x004e8e80
@@ -65,14 +65,14 @@ UnknownResourceManager::~UnknownResourceManager()
             if (field_0x10[i])
                 delete field_0x10[i];
         }
-        operator delete(field_0x10, __FILE__, 135);
+        DebugFree(field_0x10, __FILE__, 135);
     }
     if (field_0x14) {
         for (i = 0; i < field_0x08; i++) {
             if (field_0x14[i])
                 field_0x14[i]->Release();
         }
-        operator delete(field_0x14, __FILE__, 139);
+        DebugFree(field_0x14, __FILE__, 139);
     }
     field_0x08 = 0;
     field_0x14 = 0;

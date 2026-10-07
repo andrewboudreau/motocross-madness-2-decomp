@@ -276,8 +276,8 @@ void ChooseTriangleSplit(const TreeBuildTriangle* tris, int count, const TreeVec
     case 1: *split = (dy / 20.0f) * (bestStep + 1) + min.y; break;
     case 2: *split = (dz / 20.0f) * (bestStep + 1) + min.z; break;
     }
-    operator delete(left, __FILE__, 0x158);
-    operator delete(right, __FILE__, 0x159);
+    DebugFree(left, __FILE__, 0x158);
+    DebugFree(right, __FILE__, 0x159);
 }
 
 // 0x0042b9d0.  Split plane for a point set: the axis with the largest extent, at the middle of
@@ -407,10 +407,10 @@ void ChooseBoxSplit(const TreeVec3* boxes, const TreeVec3* centers, int count, f
     case 1: *split = (dy / 20.0f) * (bestStep + 1) + min.y; break;
     case 2: *split = (dz / 20.0f) * (bestStep + 1) + min.z; break;
     }
-    operator delete(leftBoxes, __FILE__, 0x205);
-    operator delete(rightBoxes, __FILE__, 0x206);
-    operator delete(leftCenters, __FILE__, 0x208);
-    operator delete(rightCenters, __FILE__, 0x209);
+    DebugFree(leftBoxes, __FILE__, 0x205);
+    DebugFree(rightBoxes, __FILE__, 0x206);
+    DebugFree(leftCenters, __FILE__, 0x208);
+    DebugFree(rightCenters, __FILE__, 0x209);
 }
 
 // 0x0042bf90.  Fills `node` for `count` triangle records: a leaf for one record, otherwise an
@@ -461,8 +461,8 @@ void BuildTriangleNode(BoxTreeNode* node, TreeBuildTriangle* tris, int count,
         tris[i] = left[i];
     for (i = 0; i < rightCount; i++)
         tris[leftCount + i] = right[i];
-    operator delete(left, __FILE__, 0x243);
-    operator delete(right, __FILE__, 0x244);
+    DebugFree(left, __FILE__, 0x243);
+    DebugFree(right, __FILE__, 0x244);
 
     if (rightCount == 0 || leftCount == 0) {
         leftCount = count / 2;
@@ -517,8 +517,8 @@ void BuildModelTriangleTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* 
     }
 
     BuildTriangleNode(root, tris, triCount, vertices);
-    operator delete(indices, __FILE__, 0x3be);
-    operator delete(tris, __FILE__, 0x3bf);
+    DebugFree(indices, __FILE__, 0x3be);
+    DebugFree(tris, __FILE__, 0x3bf);
 }
 
 // 0x0042cc60.  Builds a mesh's triangle tree.  `indices` holds three vertex indices per
@@ -555,7 +555,7 @@ void BuildTriangleMeshTree(BoxTreeNode* root, TreeMatrix4* m, TreeVec3* verts,
     }
 
     BuildTriangleNode(root, tris, triCount, verts);
-    operator delete(tris, __FILE__, 0x3f6);
+    DebugFree(tris, __FILE__, 0x3f6);
 }
 
 // 0x0042cfa0.  BuildTriangleNode for a point tree: a leaf holds one point.
@@ -599,8 +599,8 @@ void BuildPointNode(BoxTreeNode* node, TreeVec3* points, int count)
         points[i] = left[i];
     for (i = 0; i < rightCount; i++)
         points[leftCount + i] = right[i];
-    operator delete(left, __FILE__, 0x428);
-    operator delete(right, __FILE__, 0x429);
+    DebugFree(left, __FILE__, 0x428);
+    DebugFree(right, __FILE__, 0x429);
 
     if (rightCount == 0 || leftCount == 0) {
         leftCount = count / 2;
@@ -671,10 +671,10 @@ void BuildBoxNode(BoxTreeNode* node, TreeVec3* boxes, TreeVec3* centers, int cou
         centers[i] = leftCenters[i];
     for (i = 0; i < rightCount; i++)
         centers[leftCount + i] = rightCenters[leftCount + i];
-    operator delete(leftBoxes, __FILE__, 0x4be);
-    operator delete(rightBoxes, __FILE__, 0x4bf);
-    operator delete(leftCenters, __FILE__, 0x4c0);
-    operator delete(rightCenters, __FILE__, 0x4c1);
+    DebugFree(leftBoxes, __FILE__, 0x4be);
+    DebugFree(rightBoxes, __FILE__, 0x4bf);
+    DebugFree(leftCenters, __FILE__, 0x4c0);
+    DebugFree(rightCenters, __FILE__, 0x4c1);
 
     if (rightCount == 0 || leftCount == 0) {
         leftCount = count / 2;
@@ -712,7 +712,7 @@ void BuildModelBoxTree(BoxTreeNode* root, const TreeMatrix4* m, TreeVec3* boxes,
         TransformPoint(&boxes[i], boxes[i], &inverse);
 
     BuildBoxNode(root, boxes, centers, count);
-    operator delete(centers, __FILE__, 0x4ef);
+    DebugFree(centers, __FILE__, 0x4ef);
 }
 
 // 0x0042de90.  Rotation of `angle` radians about the axis (x, y, z) (normalised here), in the

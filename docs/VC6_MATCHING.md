@@ -4,19 +4,20 @@ Target `mcm2.exe` SHA-256:
 `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`.
 Results use VC6 SP3 natively on Windows. The full gate and profile matrix were
 repeated on 2026-10-02 under Linux/wibo; the default-profile calibration
-was rerun on 2026-10-06 (1133 cases). A complete linked game remains a
+was rerun on 2026-10-07 (2658 cases: 2650 strict exact with every relocation
+resolved, 8 exact without bindings). A complete linked game remains a
 separate, unverified gate.
 
-The VC6 gate currently checks byte-exact functions from 69 handwritten C++
-candidate files: 61 of the 62 files in `src/reconstructed/` (all but
-`TerrainSupport.cpp`) and eight focused probes in `samples/`. This is a count of source files represented by at least one
+The default-profile calibration checks byte-exact functions from 117
+handwritten C++ files: 112 of the 113 files in `src/reconstructed/` (all but
+`TerrainSupport.cpp`) and five files in `samples/`. This is a count of source files represented by at least one
 checked function, not a claim that complete object files or a linked game match.
 
 ## Compiler profiles
 
 | Profiles | Strict generated | Manual | Calibration |
 |---|---:|---:|---:|
-| `vc6_o2_mt` (default) | 39/39 | 19/19 | 1133/1133 |
+| `vc6_o2_mt` (default) | 39/39 | 19/19 | 2658/2658 |
 | `vc6_o2_ml` | 39/39 | 19/19 | 52/52 (first 52 cases) |
 | `vc6_o2_mt_g6` | 39/39 | 19/19 | 27/61 (first 61 cases) |
 | `vc6_o2_ml_g6` | 39/39 | 19/19 | 25/52 (first 52 cases) |
@@ -355,10 +356,9 @@ calibration cases still pass.
 
 ### 3. Take bounded helpers before large orchestrators
 
-After the quick wins, reconstruct EcoSystem's two constrained record helpers at
-`0x00456890` and `0x00456a10`. Their call contracts and downstream uses are known,
-so they can replace provisional state interpretations with evidence without
-claiming that the allocation category establishes source ownership. In parallel
+After the quick wins, close EcoSystem's record helpers `0x00456890` (356/369)
+and `0x00456a10`: both are reconstructed near misses in
+`samples/ecosystem/EcoSystemNearMisses.cpp` (see [ECOSYSTEM](ECOSYSTEM.md)). In parallel
 conceptually—but as separate commits—trace Terrain construction/acquisition sites
 before attempting its cleanup, so member types and lifetime order are supported
 independently.

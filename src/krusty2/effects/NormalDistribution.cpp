@@ -30,7 +30,7 @@ NormalDistribution::NormalDistribution(int resolution)
 NormalDistribution::~NormalDistribution()
 {
     if (table)
-        operator delete(table, __FILE__, 0x1e);
+        DebugFree(table, __FILE__, 0x1e);
 }
 
 float NormalDistribution::Lookup(float mean, float value, float sigma)

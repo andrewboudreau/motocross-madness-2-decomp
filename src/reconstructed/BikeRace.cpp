@@ -166,7 +166,7 @@ BikeRace::~BikeRace() {
     }
     if (field_0x040 != 0) {
         if (g_UnknownGlobal56e26c->UnknownFunction521cd0()) {
-            operator delete(field_0x040, __FILE__, 0x809);
+            DebugFree(field_0x040, __FILE__, 0x809);
         } else {
             delete field_0x040;
         }
@@ -197,7 +197,7 @@ BikeRace::~BikeRace() {
     while (field_0x0c8 != 0) {
         UnknownBikeRaceNode* node = field_0x0c8;
         field_0x0c8 = node->field_0x38;
-        operator delete(node, __FILE__, 0x82e);
+        DebugFree(node, __FILE__, 0x82e);
     }
 }
 
@@ -1632,7 +1632,7 @@ void BikeRace::UnknownFunction423140(Track* track) {
             item = list;
             list = list->field_0x0c;
             item->field_0x04->field_0x00 &= ~4;
-            operator delete(item, __FILE__, 0x13a8);
+            DebugFree(item, __FILE__, 0x13a8);
         } else {
             TrackSegment* segment = list->field_0x04->field_0x08;
             while (segment != 0 && segment->field_0x2c != 0) {

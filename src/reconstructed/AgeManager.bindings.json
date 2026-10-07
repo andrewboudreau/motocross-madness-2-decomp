@@ -1,7 +1,7 @@
 {
   "??0AgeManager@@QAE@XZ": "0x00401000",
   "??1AgeManager@@QAE@XZ": "0x00401020",
-  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?UnknownFunction401040@AgeManager@@QAEXXZ": "0x00401040",
   "?UnknownFunction401050@AgeManager@@QAEXPAUAgeEntry@@P6AHPAXH@Z1HH@Z": "0x00401050",

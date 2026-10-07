@@ -113,12 +113,12 @@ UnknownEcoDefinition::~UnknownEcoDefinition() {
     }
     for (i = 0; i < field_0x1d8; i++) {
         if (field_0x1ec[i])
-            operator delete(field_0x1ec[i], __FILE__, 0x66);
+            DebugFree(field_0x1ec[i], __FILE__, 0x66);
     }
     if (field_0x208)
-        operator delete(field_0x208, __FILE__, 0x6a);
+        DebugFree(field_0x208, __FILE__, 0x6a);
     if (field_0x20c)
-        operator delete(field_0x20c, __FILE__, 0x6e);
+        DebugFree(field_0x20c, __FILE__, 0x6e);
     g_UnknownGlobal59af10 = 0;
 }
 
@@ -194,7 +194,7 @@ void Vegetation::UnknownFunction4567a0(TextureMapManager* textures, unsigned cha
 // 0x00456850
 int UnknownFunction456850(void* owner, int context) {
     Vegetation* object = (Vegetation*)owner;
-    operator delete(object->field_0x18, __FILE__, 0x1a1);
+    DebugFree(object->field_0x18, __FILE__, 0x1a1);
     object->field_0x18 = 0;
     object->field_0x16_bit0 = 1;
     return 1;
@@ -254,18 +254,18 @@ EcoSystem::~EcoSystem() {
     if (field_0x38) {
         for (i = 0; i < field_0x55c; i++) {
             if (field_0x38[i].field_0x18)
-                operator delete(field_0x38[i].field_0x18, __FILE__, 0x2cd);
+                DebugFree(field_0x38[i].field_0x18, __FILE__, 0x2cd);
         }
         delete field_0x38;
     }
     if (field_0x50)
-        operator delete(field_0x50, __FILE__, 0x2d2);
+        DebugFree(field_0x50, __FILE__, 0x2d2);
     if (field_0x54)
-        operator delete(field_0x54, __FILE__, 0x2d3);
+        DebugFree(field_0x54, __FILE__, 0x2d3);
     if (field_0x3c)
-        operator delete(field_0x3c, __FILE__, 0x2d4);
+        DebugFree(field_0x3c, __FILE__, 0x2d4);
     if (field_0x40)
-        operator delete(field_0x40, __FILE__, 0x2d5);
+        DebugFree(field_0x40, __FILE__, 0x2d5);
     if (field_0x59c)
         delete field_0x59c;
     g_UnknownGlobal59aebc = 0;

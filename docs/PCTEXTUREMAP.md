@@ -150,7 +150,8 @@ Also exact:
 ## TextureMap
 
 `src/reconstructed/TextureMap.h` / `TextureMap.cpp` (Texmap.cpp's
-literals). Exact (4 calibration cases):
+literals). Exact (13 calibration cases): the eight kVec3 `$E`
+(`0x0050a3a0..0x0050a4db`, statics at `0x0068a330`) and
 - the constructor `0x0050a4e0` (manager at +0x10, registered through
   `0x005112f0` when the second argument is set; clears the size, format,
   mip count, +0x28, +0x30, +0x40, pair count and +0x68/+0x6c);
@@ -159,9 +160,8 @@ literals). Exact (4 calibration cases):
   (`0x00511300`) and removes the resource manager's (`0x00572b44`) entry
   for the texture (`0x004e93f0`, `0x004e9010`);
 - `0x0050abd0`, which rewrites the 0x13/0x14 address-mode render states of
-  an alpha texture.
-
-Not reconstructed: `0x0050a590` (1442 bytes, cdecl), which looks a texture
-up through the resource manager (`0x004e9360`), returns its existing map or
-reads a header from the entry's stream and creates a PCTextureMap or
-ManagedTexture through slots 4/5.
+  an alpha texture;
+- `0x0050a590` (1442 bytes, cdecl), which looks a texture up through the
+  resource manager (`0x004e9360`), returns its existing map or reads a
+  header from the entry's stream and creates a PCTextureMap or
+  ManagedTexture through slots 4/5.

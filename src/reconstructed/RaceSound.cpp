@@ -82,48 +82,48 @@ RaceSound::~RaceSound() {
     for (k = 0; k < 3; k++) {
         for (i = 0; i < 10; i++) {
             if (field_0x840[k][i])
-                operator delete(field_0x840[k][i], __FILE__, 128);
+                DebugFree(field_0x840[k][i], __FILE__, 128);
             field_0x840[k][i] = 0;
         }
         for (i = 0; i < 10; i++) {
             if (field_0x8b8[k][i])
-                operator delete(field_0x8b8[k][i], __FILE__, 132);
+                DebugFree(field_0x8b8[k][i], __FILE__, 132);
             field_0x8b8[k][i] = 0;
         }
         for (i = 0; i < 10; i++) {
             if (field_0x930[k][i])
-                operator delete(field_0x930[k][i], __FILE__, 136);
+                DebugFree(field_0x930[k][i], __FILE__, 136);
             field_0x930[k][i] = 0;
         }
         for (i = 0; i < 10; i++) {
             if (field_0x9a8[k][i])
-                operator delete(field_0x9a8[k][i], __FILE__, 140);
+                DebugFree(field_0x9a8[k][i], __FILE__, 140);
             field_0x9a8[k][i] = 0;
         }
         for (i = 0; i < 10; i++) {
             if (field_0xa20[k][i])
-                operator delete(field_0xa20[k][i], __FILE__, 144);
+                DebugFree(field_0xa20[k][i], __FILE__, 144);
             field_0xa20[k][i] = 0;
         }
         for (i = 0; i < 10; i++) {
             if (field_0xa98[k][i])
-                operator delete(field_0xa98[k][i], __FILE__, 148);
+                DebugFree(field_0xa98[k][i], __FILE__, 148);
             field_0xa98[k][i] = 0;
         }
         for (i = 0; i < 10; i++) {
             if (field_0xb10[k][i])
-                operator delete(field_0xb10[k][i], __FILE__, 152);
+                DebugFree(field_0xb10[k][i], __FILE__, 152);
             field_0xb10[k][i] = 0;
         }
         for (i = 0; i < 10; i++) {
             if (field_0xb88[k][i])
-                operator delete(field_0xb88[k][i], __FILE__, 156);
+                DebugFree(field_0xb88[k][i], __FILE__, 156);
             field_0xb88[k][i] = 0;
         }
     }
     for (i = 0; i < 11; i++) {
         if (field_0x98[i].field_0x50)
-            operator delete(field_0x98[i].field_0x50, __FILE__, 177);
+            DebugFree(field_0x98[i].field_0x50, __FILE__, 177);
         field_0x98[i].field_0x50 = 0;
     }
     SoundSystem()->UnknownFunction4be9b0(-10000);

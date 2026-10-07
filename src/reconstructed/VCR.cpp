@@ -27,7 +27,7 @@ UnknownVcr::UnknownVcr(unsigned int size) {
 // Frees field_0x1014 blocks of the chain, as 0x00524640 does.
 UnknownVcr::~UnknownVcr() {
     for (int i = 0; i < 256; i++) {
-        if (slots[i].data) operator delete(slots[i].data, __FILE__, 54);
+        if (slots[i].data) DebugFree(slots[i].data, __FILE__, 54);
     }
     if (field_0x100c) {
         UnknownVcrBlock* block = field_0x100c;
@@ -35,7 +35,7 @@ UnknownVcr::~UnknownVcr() {
         while (count--) {
             UnknownVcrBlock* old = block;
             block = block->next;
-            operator delete(old, __FILE__, 62);
+            DebugFree(old, __FILE__, 62);
         }
     }
 }
@@ -48,7 +48,7 @@ int UnknownVcr::UnknownFunction524220(unsigned int size, int* index, void** data
     unsigned int needed = size + 4;
     void* buffer = slots[field_0x1008].data;
     if (needed > slots[field_0x1008].size || !slots[field_0x1008].size) {
-        if (buffer) operator delete(buffer, __FILE__, 82);
+        if (buffer) DebugFree(buffer, __FILE__, 82);
         buffer = DebugMalloc(needed, __FILE__, 83);
         if (!buffer) return 0;
         slots[field_0x1008].size = size;
@@ -83,7 +83,7 @@ int UnknownVcr::UnknownFunction524350() {
 int UnknownVcr::UnknownFunction524390(unsigned int size, int* index, void** data) {
     UnknownFunction524a00();
     if (size > slots[field_0x1008].size || !slots[field_0x1008].size) {
-        if (slots[field_0x1008].data) operator delete(slots[field_0x1008].data, __FILE__, 149);
+        if (slots[field_0x1008].data) DebugFree(slots[field_0x1008].data, __FILE__, 149);
         slots[field_0x1008].data = DebugMalloc(size, __FILE__, 150);
         if (!slots[field_0x1008].data) return 0;
         slots[field_0x1008].size = size;
@@ -154,7 +154,7 @@ void UnknownVcr::UnknownFunction524640() {
         while (count--) {
             UnknownVcrBlock* old = block;
             block = block->next;
-            operator delete(old, __FILE__, 258);
+            DebugFree(old, __FILE__, 258);
         }
     }
     field_0x100c = (UnknownVcrBlock*)DebugMalloc(sizeof(UnknownVcrBlock), __FILE__, 261);

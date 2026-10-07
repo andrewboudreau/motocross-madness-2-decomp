@@ -1,5 +1,4 @@
 {
-  "??3@YAXPAXPBDH@Z": "0x004a2e60",
   "?BuildBoxNode@@YAXPAUBoxTreeNode@@PAUTreeVec3@@1H@Z": "0x0042d9e0",
   "?BuildModelPointTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAVTreeSceneNode@@@Z": "0x0042d390",
   "?BuildPointNode@@YAXPAUBoxTreeNode@@PAUTreeVec3@@H@Z": "0x0042cfa0",
@@ -9,6 +8,7 @@
   "?ChooseTriangleSplit@@YAXPBUTreeBuildTriangle@@HPBUTreeVec3@@PAMPAH@Z": "0x0042b5f0",
   "?ComputePointBounds@@YAXPBUTreeVec3@@HPAU1@1PAMPBUTreeMatrix4@@@Z": "0x0042aff0",
   "?ComputeTriangleBounds@@YAXPBUTreeBuildTriangle@@HPBUTreeVec3@@PAU2@2PAMPBUTreeMatrix4@@@Z": "0x0042b2a0",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?GatherModelTriangles@@YAXPAVTreeModelSource@@PAVTreeSceneNode@@PAH2PAPAHPAPAUTreeVec3@@@Z": "0x0042c260",
   "?GetMatrixIn@TreeSceneNode@@QAEXPAV1@PAUTreeMatrix4@@@Z": "0x004fca80",

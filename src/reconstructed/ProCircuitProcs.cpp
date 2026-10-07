@@ -276,9 +276,9 @@ void PCStartupDlg::UnknownFunction4d5ca0()
     if (field_0x7f58) {
         for (int i = 0; i < field_0x7f5c; i++) {
             if (field_0x7f58[i])
-                operator delete(field_0x7f58[i], __FILE__, 379);
+                DebugFree(field_0x7f58[i], __FILE__, 379);
         }
-        operator delete(field_0x7f58, __FILE__, 382);
+        DebugFree(field_0x7f58, __FILE__, 382);
     }
     field_0x7f5c = 0;
     field_0x7f58 = 0;

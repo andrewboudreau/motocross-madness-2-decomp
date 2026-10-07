@@ -60,7 +60,7 @@ Terrain::~Terrain()
     if (ownedObjectArray) {
         for (int i = 0; i < ownedObjectArrayCount; i++)
             ownedObjectArray[i]->BaseObjectVirtualSlot2();
-        operator delete(ownedObjectArray, __FILE__, 0x4b3);
+        DebugFree(ownedObjectArray, __FILE__, 0x4b3);
     }
     if (field_0xc3c)
         field_0xc3c->BaseObjectVirtualSlot2();
@@ -86,7 +86,7 @@ Terrain::~Terrain()
             if (blocks[i])
                 delete blocks[i];
         }
-        operator delete(blocks, __FILE__, 0x4d0);
+        DebugFree(blocks, __FILE__, 0x4d0);
     }
     if (field_0xc84)
         delete field_0xc84;

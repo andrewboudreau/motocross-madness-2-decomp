@@ -385,13 +385,13 @@ void KrustyUI::UnknownFunction498cf0(int value) {
 KrustyUI::~KrustyUI() {
     UnknownFunction4999b0();
     if (field_0x48)
-        operator delete(field_0x48, __FILE__, 1306);
+        DebugFree(field_0x48, __FILE__, 1306);
     if (field_0x50)
-        operator delete(field_0x50, __FILE__, 1307);
+        DebugFree(field_0x50, __FILE__, 1307);
     if (field_0x58)
-        operator delete(field_0x58, __FILE__, 1308);
+        DebugFree(field_0x58, __FILE__, 1308);
     if (field_0x60)
-        operator delete(field_0x60, __FILE__, 1309);
+        DebugFree(field_0x60, __FILE__, 1309);
 }
 
 // 0x004999b0
@@ -417,7 +417,7 @@ void KrustyUI::UnknownFunction49b530() {
 // 0x0049bb80
 void KrustyUI::UnknownFunction49bb80() {
     if (field_0x60)
-        operator delete(field_0x60, __FILE__, 1453);
+        DebugFree(field_0x60, __FILE__, 1453);
     field_0x60 = 0;
     field_0x64 = 0;
 }
@@ -821,5 +821,5 @@ void KrustyUI::UnknownFunction49b020(const char** names, int count) {
         used[index] = 1;
         *names++ = g_UnknownStrings68a498[index];
     }
-    operator delete(used, __FILE__, 1157);
+    DebugFree(used, __FILE__, 1157);
 }

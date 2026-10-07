@@ -92,7 +92,7 @@ def build_review(pe, config, instructions):
             'limits':['Normal control-flow only: exceptions and callee effects are not modeled.',
                       'Branch outcomes are explored structurally, not solved symbolically.',
                       'Saved-value stack equivalence is a documented manual review, not an automatic proof.',
-                      'Terrain is a normal-path model; review_ecosystem.py reviews the complete EcoSystem algorithm separately.',
+                      'Terrain is a normal-path model; the EcoSystem algorithm is reconstructed in src/reconstructed/EcoSystem.cpp.',
                       'No new original translation-unit or full-function byte match is claimed.']}
 
 

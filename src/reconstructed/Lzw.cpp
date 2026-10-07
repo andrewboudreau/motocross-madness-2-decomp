@@ -73,7 +73,7 @@ int UnknownFunction4a0360()
                 256, sizeof(LzwDictionaryEntry), __FILE__, 96);
             if (g_lzwDictionary[i] == 0) {
                 for (int j = 0; j < i; j++) {
-                    operator delete(g_lzwDictionary[j], __FILE__, 104);
+                    DebugFree(g_lzwDictionary[j], __FILE__, 104);
                     g_lzwDictionary[j] = 0;
                 }
                 return 0;

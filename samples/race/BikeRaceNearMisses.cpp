@@ -1364,11 +1364,11 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                     -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
                 if (riders)
-                    operator delete(riders, __FILE__, 0x550);
+                    DebugFree(riders, __FILE__, 0x550);
                 if (bikes)
-                    operator delete(bikes, __FILE__, 0x551);
+                    DebugFree(bikes, __FILE__, 0x551);
                 if (names)
-                    operator delete(names, __FILE__, 0x552);
+                    DebugFree(names, __FILE__, 0x552);
                 delete stream;
                 Release();
                 return 0;
@@ -1507,11 +1507,11 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                 -1)) {
             sprintf(message, "Player Bike not loaded\n");
             if (riders)
-                operator delete(riders, __FILE__, 0x4ff);
+                DebugFree(riders, __FILE__, 0x4ff);
             if (bikes)
-                operator delete(bikes, __FILE__, 0x500);
+                DebugFree(bikes, __FILE__, 0x500);
             if (names)
-                operator delete(names, __FILE__, 0x501);
+                DebugFree(names, __FILE__, 0x501);
             delete stream;
             Release();
             return 0;
@@ -1777,11 +1777,11 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
         }
     }
     if (riders)
-        operator delete(riders, __FILE__, 0x7f7);
+        DebugFree(riders, __FILE__, 0x7f7);
     if (bikes)
-        operator delete(bikes, __FILE__, 0x7f8);
+        DebugFree(bikes, __FILE__, 0x7f8);
     if (names)
-        operator delete(names, __FILE__, 0x7f9);
+        DebugFree(names, __FILE__, 0x7f9);
     delete stream;
     return 1;
 }

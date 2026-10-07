@@ -40,7 +40,7 @@
   "?UnknownFunction515df0@UnknownTokenizer@@QAEPADPBD@Z": "0x00515df0",
   "??2@YAPAXIPBDH@Z": "0x004a3010",
   "??3@YAXPAX@Z": "0x004a30c0",
-  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "??_C@_00A@?$AA@": "0x00577738",

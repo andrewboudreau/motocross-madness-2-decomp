@@ -1,7 +1,7 @@
 # KrustyUI
 
 RTTI: `KrustyUI : GameObject : BaseObject` (vtable `0x0055488c`; 0x1364
-bytes, the size TrackGame slot 4 allocates). Its `operator delete` calls
+bytes, the size TrackGame slot 4 allocates). Its `DebugFree` calls
 pass `D:\aardvark\VC\krusty2\krustyui.cpp` as `__FILE__` (`0x0056d67c`),
 which confirms the original translation unit's name. Canonical source:
 `src/reconstructed/KrustyUI.h` / `KrustyUI.cpp`. Names are provisional.

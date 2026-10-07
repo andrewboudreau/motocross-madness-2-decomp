@@ -4,6 +4,7 @@
 
 #include "FollowCamera.h"
 #include "KrustyBikeCamera.h"
+#include "DebugAlloc.h"
 #include "DebugOverlay.h"
 #include "ObjectPicker.h"
 #include "InGameProcs.h"
@@ -571,8 +572,6 @@ struct UnknownBikeRaceView6c : virtual public GameObject {
     UnknownBikeRaceCollider* field_0x210;
 };
 
-void operator delete(void* p, const char* file, int line);
-
 // The object at BikeRace+0x4c: 0x00507c10 moves a point (the track debug
 // drawing passes each end point with three zeros).
 class UnknownBikeRaceProjector {
@@ -829,7 +828,7 @@ public:
             while (field_0x0c8 != 0) {
                 UnknownBikeRaceNode* node = field_0x0c8;
                 field_0x0c8 = node->field_0x38;
-                operator delete(node, __FILE__, 0xd3);
+                DebugFree(node, __FILE__, 0xd3);
             }
             field_0x0c8 = 0;
         }

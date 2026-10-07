@@ -164,7 +164,7 @@ long NetworkInterface::UnknownFunction4ab960()
         lobby->Release();
         lobby = 0;
     }
-    operator delete(connection, __FILE__, 867);
+    DebugFree(connection, __FILE__, 867);
     return 0;
 
 failed:
@@ -182,7 +182,7 @@ failed:
         lobby = 0;
     }
     if (connection)
-        operator delete(connection, __FILE__, 892);
+        DebugFree(connection, __FILE__, 892);
     return result;
 }
 
@@ -248,7 +248,7 @@ int NetworkInterface::UnknownFunction4abf10(GUID provider, char* address, char* 
     if (!buffer)
         goto failed;
     if (field_0x08->CreateCompoundAddress(elements, count, buffer, &size) < 0) {
-        operator delete(buffer, __FILE__, 1135);
+        DebugFree(buffer, __FILE__, 1135);
         goto failed;
     }
     *result = buffer;

@@ -25,7 +25,7 @@ TypeRegistry::TypeRegistry() {
 // 0x00521e80
 TypeRegistry::~TypeRegistry() {
     if (names)
-        operator delete(names, __FILE__, 19);
+        DebugFree(names, __FILE__, 19);
 }
 
 // 0x00521ea0

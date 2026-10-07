@@ -62,23 +62,23 @@ D3DIMSoultreeObject::D3DIMSoultreeObject(int flags)
 D3DIMSoultreeObject::~D3DIMSoultreeObject()
 {
     if (field_0x290)
-        operator delete(field_0x290, __FILE__, 0x5d);
+        DebugFree(field_0x290, __FILE__, 0x5d);
     if (field_0x280)
-        operator delete(field_0x280, __FILE__, 0x60);
+        DebugFree(field_0x280, __FILE__, 0x60);
     if (field_0x28c) {
         for (int i = 0; i < field_0x274; i++) {
             for (int j = 0; j < field_0x28c[i].field_0x00; j++) {
-                operator delete(field_0x28c[i].field_0x04[j].field_0x1c, __FILE__, 0x67);
-                operator delete(field_0x28c[i].field_0x04[j].field_0x04, __FILE__, 0x68);
-                operator delete(field_0x28c[i].field_0x04[j].field_0x10, __FILE__, 0x69);
-                operator delete(field_0x28c[i].field_0x04[j].field_0x14, __FILE__, 0x6a);
-                operator delete(field_0x28c[i].field_0x04[j].field_0x18, __FILE__, 0x6b);
-                operator delete(field_0x28c[i].field_0x04[j].field_0x28, __FILE__, 0x6c);
-                operator delete(field_0x28c[i].field_0x04[j].field_0x24, __FILE__, 0x6d);
+                DebugFree(field_0x28c[i].field_0x04[j].field_0x1c, __FILE__, 0x67);
+                DebugFree(field_0x28c[i].field_0x04[j].field_0x04, __FILE__, 0x68);
+                DebugFree(field_0x28c[i].field_0x04[j].field_0x10, __FILE__, 0x69);
+                DebugFree(field_0x28c[i].field_0x04[j].field_0x14, __FILE__, 0x6a);
+                DebugFree(field_0x28c[i].field_0x04[j].field_0x18, __FILE__, 0x6b);
+                DebugFree(field_0x28c[i].field_0x04[j].field_0x28, __FILE__, 0x6c);
+                DebugFree(field_0x28c[i].field_0x04[j].field_0x24, __FILE__, 0x6d);
             }
-            operator delete(field_0x28c[i].field_0x04, __FILE__, 0x70);
+            DebugFree(field_0x28c[i].field_0x04, __FILE__, 0x70);
         }
-        operator delete(field_0x28c, __FILE__, 0x72);
+        DebugFree(field_0x28c, __FILE__, 0x72);
     }
     UnknownFunction444e80();
     UnknownFunction444fb0();
@@ -244,7 +244,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot2(UnknownTextureStream* stream)
     } else {
         field_0x28c = 0;
     }
-    operator delete(nodes, __FILE__, 0x1a7);
+    DebugFree(nodes, __FILE__, 0x1a7);
     UnknownFunction444440();
 }
 
@@ -398,7 +398,7 @@ void D3DIMSoultreeObject::UnknownFunction444440()
     UnknownFunction4fda60(&index, nodes);
     for (int i = 0; i < count; i++)
         nodes[i]->SoultreeVirtualSlot5();
-    operator delete(nodes, __FILE__, 0x812);
+    DebugFree(nodes, __FILE__, 0x812);
     UnknownFunction4fe0f0();
 }
 

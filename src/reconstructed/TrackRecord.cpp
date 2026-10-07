@@ -370,10 +370,10 @@ void TrackRecordDlg::UnknownFunction51ff40()
 {
     if (field_0x7f60) {
         for (int i = 0; i < field_0x7f64; i++) {
-            operator delete(field_0x7f60[i]->field_0x00, __FILE__, 467);
-            operator delete(field_0x7f60[i], __FILE__, 468);
+            DebugFree(field_0x7f60[i]->field_0x00, __FILE__, 467);
+            DebugFree(field_0x7f60[i], __FILE__, 468);
         }
-        operator delete(field_0x7f60, __FILE__, 470);
+        DebugFree(field_0x7f60, __FILE__, 470);
     }
     field_0x7f60 = 0;
     field_0x7f64 = 0;

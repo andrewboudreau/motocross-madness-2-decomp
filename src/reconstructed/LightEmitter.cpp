@@ -185,7 +185,7 @@ LightManager::LightManager(int flags) : GameObject(flags) {
 // 0x0049e400
 LightManager::~LightManager() {
     if (field_0xf8)
-        operator delete(field_0xf8, __FILE__, 271);
+        DebugFree(field_0xf8, __FILE__, 271);
 }
 
 // 0x004452e0 (shared body)

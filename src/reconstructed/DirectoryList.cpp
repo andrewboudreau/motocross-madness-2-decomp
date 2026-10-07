@@ -62,7 +62,7 @@ int UnknownDriveList::UnknownFunction449e70() {
         }
     }
     count = found;
-    operator delete(strings, __FILE__, 63);
+    DebugFree(strings, __FILE__, 63);
     return 1;
 }
 

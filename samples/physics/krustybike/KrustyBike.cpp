@@ -86,9 +86,9 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 KrustyBike::~KrustyBike()
 {
     if (heapBufferA)
-        operator delete(heapBufferA, __FILE__, 0x8bb);
+        DebugFree(heapBufferA, __FILE__, 0x8bb);
     if (heapBufferB)
-        operator delete(heapBufferB, __FILE__, 0x8be);
+        DebugFree(heapBufferB, __FILE__, 0x8be);
 }
 
 void KrustyBike::UnknownVirtualSlot27()

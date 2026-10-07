@@ -482,7 +482,7 @@
     "target_va": "0x00491540",
     "target_size": 192,
     "expect": "exact",
-    "notes": "Destructor body (reached through the vbase-adjusted deleting destructor 0x00497c40): releases two debug-heap buffers (__FILE__ lines 0x8bb/0x8be), then runs Bike's destructor body. Exact with operator delete(p, __FILE__, line) calls.",
+    "notes": "Destructor body (reached through the vbase-adjusted deleting destructor 0x00497c40): releases two debug-heap buffers (__FILE__ lines 0x8bb/0x8be), then runs Bike's destructor body. Exact with DebugFree(p, __FILE__, line) calls.",
     "bindings": "KrustyBike.bindings.json"
   },
   {

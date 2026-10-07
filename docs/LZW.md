@@ -57,7 +57,7 @@ that retail links, `0x004a01d0..0x004a05da`. Every function is exact under
   `oldCode` in the `size` slot (10% match).
 - The dictionary allocator tests each bank before allocating, so a second
   call only fills the gaps. The cleanup loop frees banks `0..i-1` with
-  `operator delete(p, __FILE__, 104)` and clears them.
+  `DebugFree(p, __FILE__, 104)` and clears them.
 
 ## Remaining uncertainty
 

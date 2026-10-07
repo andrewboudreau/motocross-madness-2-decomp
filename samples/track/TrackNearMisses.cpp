@@ -136,7 +136,7 @@ int Track::UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, f
             item = list;
             list = list->field_0x0c;
             item->field_0x04->field_0x00 &= ~4;
-            operator delete(item, __FILE__, 1212);
+            DebugFree(item, __FILE__, 1212);
         } else {
             if (node != a.node && node != b.node)
                 length += node->field_0x04;
@@ -392,7 +392,7 @@ int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float
             node->field_0x00 &= ~4;
             item = list;
             list = list->field_0x0c;
-            operator delete(item, __FILE__, 865);
+            DebugFree(item, __FILE__, 865);
         } else {
             node->field_0x00 |= 4;
             TrackSegment* next;
@@ -488,7 +488,7 @@ int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float
         }
         TrackCandidate* done = candidates;
         candidates = candidates->next;
-        operator delete(done, __FILE__, 994);
+        DebugFree(done, __FILE__, 994);
     }
     return found;
 }

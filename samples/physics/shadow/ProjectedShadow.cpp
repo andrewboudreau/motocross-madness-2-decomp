@@ -68,11 +68,11 @@ ProjectedShadow::~ProjectedShadow()
         texture->BaseObjectVirtualSlot2();
     }
     if (vertexBuffer)
-        operator delete(vertexBuffer, __FILE__, 0x5e);
+        DebugFree(vertexBuffer, __FILE__, 0x5e);
     if (casters)
-        operator delete(casters, __FILE__, 0x5f);
+        DebugFree(casters, __FILE__, 0x5f);
     if (receivers)
-        operator delete(receivers, __FILE__, 0x60);
+        DebugFree(receivers, __FILE__, 0x60);
 }
 
 // 0x004dab00: appends a caster, growing the pointer array by one entry at a time (debug

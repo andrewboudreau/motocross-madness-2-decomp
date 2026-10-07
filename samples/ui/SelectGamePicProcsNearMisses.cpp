@@ -633,7 +633,7 @@ void MultiPlayerDlg::UnknownFunction4f2340(short start) {
             }
         }
         if (names)
-            operator delete(names, __FILE__, 0x23e);
+            DebugFree(names, __FILE__, 0x23e);
     }
     UnknownLobbyStartMessage message;
     message.field_0x04 = start;

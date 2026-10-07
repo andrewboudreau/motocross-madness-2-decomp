@@ -138,10 +138,6 @@ counters and the peak holds).
   (`0x0052fbb0`, `g_visibilityClipper`) on the camera's +0xec matrix.
 - `0x00511ad0(textureFormat)` seeds the generator; `0x0047b8a0` (gameui.cpp
   tail) is the float profile reader with a `double` default.
-- The old clang candidate for slot 12 (`samples/ecosystem/EcoSystemPass.h`,
-  `EcoSystemProbe.cpp`, `EpochProbe.cpp`, `test_pass.cpp`,
-  `EcoRecordNearMisses.cpp`, `config/ecosystem_pass.json`,
-  `tools/review_ecosystem.py`) is superseded by the exact VC6 function.
 
 ## Reproduce
 

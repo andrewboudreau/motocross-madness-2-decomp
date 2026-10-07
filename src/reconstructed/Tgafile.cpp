@@ -325,8 +325,8 @@ UnknownTgaFile* UnknownFunction511b40(UnknownTextureStream* stream, UnknownTgaFi
 failed:
     if (file) {
         if (file->bits)
-            operator delete(file->bits, __FILE__, 421);
-        operator delete(file, __FILE__, 422);
+            DebugFree(file->bits, __FILE__, 421);
+        DebugFree(file, __FILE__, 422);
     }
     return 0;
 }
@@ -363,8 +363,8 @@ UnknownTgaFile* UnknownFunction511dd0(UnknownTextureStream* stream, UnknownTgaFi
     return file;
 failed:
     if (file->bits)
-        operator delete(file->bits, __FILE__, 553);
-    operator delete(file, __FILE__, 554);
+        DebugFree(file->bits, __FILE__, 553);
+    DebugFree(file, __FILE__, 554);
     return 0;
 }
 
@@ -384,7 +384,7 @@ int UnknownFunction511e80(UnknownTgaFile* file, UnknownTextureStream* stream) {
     unsigned int size = count * 3;
     if (size > file->field_0x18) {
         if (file->bits)
-            operator delete(file->bits, __FILE__, 40);
+            DebugFree(file->bits, __FILE__, 40);
         file->bits = 0;
         file->field_0x18 = 0;
     }
@@ -427,7 +427,7 @@ int UnknownFunction511e80(UnknownTgaFile* file, UnknownTextureStream* stream) {
         unsigned char* top = (unsigned char*)file->bits;
         unsigned char* bottom = top + (file->height - 1) * file->width * 3;
         if (file->field_0x120 && file->field_0x124 < (unsigned int)(file->width * 3)) {
-            operator delete(file->field_0x120, __FILE__, 101);
+            DebugFree(file->field_0x120, __FILE__, 101);
             file->field_0x124 = 0;
             file->field_0x120 = 0;
         }
@@ -457,7 +457,7 @@ int UnknownFunction512100(UnknownTgaFile* file, UnknownTextureStream* stream) {
     unsigned int size = count * 4;
     if (size > file->field_0x18) {
         if (file->bits)
-            operator delete(file->bits, __FILE__, 142);
+            DebugFree(file->bits, __FILE__, 142);
         file->bits = 0;
         file->field_0x18 = 0;
     }
@@ -503,7 +503,7 @@ int UnknownFunction512100(UnknownTgaFile* file, UnknownTextureStream* stream) {
         unsigned char* top = (unsigned char*)file->bits;
         unsigned char* bottom = top + (file->height - 1) * file->width * 4;
         if (file->field_0x120 && file->field_0x124 < (unsigned int)(file->width * 4)) {
-            operator delete(file->field_0x120, __FILE__, 203);
+            DebugFree(file->field_0x120, __FILE__, 203);
             file->field_0x124 = 0;
             file->field_0x120 = 0;
         }
@@ -533,7 +533,7 @@ int UnknownFunction512370(UnknownTgaFile* file, UnknownTextureStream* stream) {
     unsigned int size = count * 2;
     if (size > file->field_0x18) {
         if (file->bits)
-            operator delete(file->bits, __FILE__, 252);
+            DebugFree(file->bits, __FILE__, 252);
         file->bits = 0;
         file->field_0x18 = 0;
     }
@@ -574,7 +574,7 @@ int UnknownFunction512370(UnknownTgaFile* file, UnknownTextureStream* stream) {
         unsigned char* top = (unsigned char*)file->bits;
         unsigned char* bottom = top + (file->height - 1) * file->width * 2;
         if (file->field_0x120 && file->field_0x124 < (unsigned int)(file->width * 2)) {
-            operator delete(file->field_0x120, __FILE__, 311);
+            DebugFree(file->field_0x120, __FILE__, 311);
             file->field_0x124 = 0;
             file->field_0x120 = 0;
         }
@@ -626,8 +626,8 @@ UnknownTgaFile* UnknownFunction5125c0(const char* path, UnknownTgaFile* file, in
     return file;
 failed:
     if (file->bits)
-        operator delete(file->bits, __FILE__, 608);
-    operator delete(file, __FILE__, 609);
+        DebugFree(file->bits, __FILE__, 608);
+    DebugFree(file, __FILE__, 609);
     delete stream;
     return 0;
 }
@@ -712,9 +712,9 @@ void UnknownFunction512940(UnknownTgaFile* file, void* bits, int width, int heig
 void UnknownFunction512dd0(UnknownTgaFile* file) {
     if (file) {
         if (file->bits)
-            operator delete(file->bits, __FILE__, 865);
+            DebugFree(file->bits, __FILE__, 865);
         if (file->field_0x120)
-            operator delete(file->field_0x120, __FILE__, 866);
-        operator delete(file, __FILE__, 867);
+            DebugFree(file->field_0x120, __FILE__, 866);
+        DebugFree(file, __FILE__, 867);
     }
 }

@@ -1,6 +1,6 @@
 {
-  "??3@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugCalloc@@YAPAXIIPBDH@Z": "0x004a2fc0",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?UnknownFunction4204e0@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
   "?UnknownFunction47b670@@YAHPAUVector3@@0PAUUnknownBikeRaceNode@@H@Z": "0x0047b670",
   "?UnknownFunction4e58c0@@YAHPAUVector3@@0PAGPAUUnknownBikeRaceNode@@PADHPAM4M44HHHH@Z": "0x004e58c0",

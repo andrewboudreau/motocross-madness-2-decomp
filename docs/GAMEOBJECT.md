@@ -37,7 +37,7 @@ not match under `/G6`.
 |---|---|---:|---|
 | Constructor | `0x00468ca0` | 149 | `/GX` frame for the BaseObject subobject; clears links, sets +0x25 bits; `DebugMalloc(1, __FILE__, 31)` into +0x28; then `0x00469ce0(this)` |
 | Scalar deleting destructor | `0x00468d40` | 30 | Destructor core, then `operator delete` `0x004a30c0` |
-| Destructor core | `0x00468d60` | 97 | `/GX` frame; frees +0x28 with `operator delete(p, __FILE__, 40)` (`0x004a2e60`); `~BaseObject` |
+| Destructor core | `0x00468d60` | 97 | `/GX` frame; frees +0x28 with `DebugFree(p, __FILE__, 40)` (`0x004a2e60`); `~BaseObject` |
 | `0x00469680` | `0x00469680` | 58 | Recurses to the last next-sibling, unlinks each from its predecessor, virtual `Release` |
 | `0x00469ce0` | `0x00469ce0` | 201 | Appends `typeid(*object).name()` minus `"class "` and a comma to +0x28 (`DebugRealloc`, line 1163) |
 

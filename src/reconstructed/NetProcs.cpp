@@ -127,7 +127,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     break;
                 if (!g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abdf0(address, size, 4))
                     break;
-                operator delete(address, __FILE__, 179);
+                DebugFree(address, __FILE__, 179);
             }
             if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac3c0(
                     g_UnknownGlobal56e26c->mode.field_0x10, 0x80)) {

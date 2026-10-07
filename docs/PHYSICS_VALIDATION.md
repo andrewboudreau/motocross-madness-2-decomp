@@ -107,7 +107,7 @@ Two more sources pass strict comparison:
   - Slot 4 `0x446210` (98.6%) differs in register choice.
   - Slot 11 `0x445680` is at 39.6%.
 
-Motnctrl stays in `samples/` because those three targets are still partial.
+D3DIMSoultreeMotnctrl.cpp stays in `samples/` because those three targets are still partial.
 Of its bindings, the seven that `tools/propose_bindings.py` could not prove
 were checked by hand. One of them is `_strupr` at `0x535d3d`; that CRT
 identity is provisional.
@@ -360,11 +360,12 @@ InterpolatePose from 10.7% to 19.4%, with no other motion target changing.
 
 ## Preserved candidates
 
-The tree builder, D3DIMSoultree motion control, Motnctrl loaders/playback, steering, projected shadow,
-and the visibility traversal remain under `samples/physics/` until their
-remaining byte/relocation evidence is complete. Shared layout headers remain
-under `src/krusty2/` for both verified source and samples; a header alone does
-not claim a reconstructed implementation. Retail-file attribution is retained
+The near misses of the tree builder, D3DIMSoultree motion control, Motnctrl (the .VUE loader and pose
+helpers), steering (SetAxisFromPoints), projected shadow and the visibility traversal remain under
+`samples/physics/` until their remaining byte/relocation evidence is
+complete. Shared layout headers remain under `src/krusty2/` for both verified
+source and samples; a header alone does not claim a reconstructed
+implementation. Retail-file attribution is retained
 where supported, without promoting that evidence into exact-code status.
 
 `expect: "masked"` requests a diagnostic regression check only. It does not
@@ -416,9 +417,8 @@ Strict exact with the units' existing sources (registration pending):
 
 `samples/physics/krustybike/KrustyBike.bindings.json` and
 `samples/physics/tire/Tire.bindings.json` resolve every relocation of the
-samples' exact targets, so they pass strict comparison once each exact entry
-of the two `targets.json` files names its bindings file (registration
-pending; until then the runner reports them as unresolved):
+samples' exact targets; every exact entry of the two `targets.json` files
+names its bindings file:
 
 - KrustyBike.cpp: the 56 existing exact targets, plus the `.CRT$XCU` 155-158
   set (`0x00491190..0x004912cb`, vectors `0x0067c348`, `0x0067c358`,
@@ -438,8 +438,7 @@ pending; until then the runner reports them as unresolved):
   the same file: `0x00513f90` (470/479, stack slots), `0x00514170` and
   `0x00515c90` (x87 operand order).
 
-Check (a scratch copy of the targets with `bindings` added gives 85/85 strict
-for these two files):
+Check (85/85 exact targets strict for these two files):
 
 ```bash
 python tools/run_physics_samples.py --strict \

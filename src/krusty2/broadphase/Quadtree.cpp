@@ -47,7 +47,7 @@ QuadTree::~QuadTree()
     g_pQuadTree = this;
     stateFlags |= 2;
     if (resultArray)
-        operator delete(resultArray, __FILE__, 0x85);
+        DebugFree(resultArray, __FILE__, 0x85);
     if (rootNode)
         delete rootNode;
     delete itemPool;

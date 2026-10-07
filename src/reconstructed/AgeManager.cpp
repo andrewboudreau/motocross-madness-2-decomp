@@ -16,7 +16,7 @@ AgeManager::AgeManager() {
 // 0x00401020
 AgeManager::~AgeManager() {
     if (field_0x0c)
-        operator delete(field_0x0c, __FILE__, 17);
+        DebugFree(field_0x0c, __FILE__, 17);
 }
 
 // 0x00401040

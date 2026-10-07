@@ -239,7 +239,7 @@ NetFile::NetFile()
 NetFile::~NetFile()
 {
     if (field_0x00)
-        operator delete(field_0x00, __FILE__, 347);
+        DebugFree(field_0x00, __FILE__, 347);
     if (field_0x04)
         delete field_0x04;
 }
@@ -284,7 +284,7 @@ void NetFile::UnknownFunction4ab280(int id, NetFileHeader* header)
     field_0x0c[count] = 0;
     field_0x08 = header->field_0x108;
     if (field_0x00)
-        operator delete(field_0x00, __FILE__, 497);
+        DebugFree(field_0x00, __FILE__, 497);
     field_0x00 = (char*)DebugMalloc(field_0x08, __FILE__, 499);
     field_0x118 = field_0x08 / (int)sizeof(((NetFileChunk*)0)->field_0x04) + 1;
     field_0x11c = 0;
@@ -308,7 +308,7 @@ void NetFile::UnknownFunction4ab380(int id, NetFileChunk* chunk)
     if (field_0x11c == field_0x118) {
         field_0x128_bit1 = 0;
         UnknownFunction4ab440();
-        operator delete(field_0x00, __FILE__, 534);
+        DebugFree(field_0x00, __FILE__, 534);
         field_0x00 = 0;
         field_0x128_bit3 = 1;
     }
@@ -450,7 +450,7 @@ void NetworkInterface::UnknownFunction4abd40(unsigned char** data, unsigned long
     *sequence = *guaranteed ? trailer[0] + 1 : 0;
     *data = (unsigned char*)DebugMalloc(*size - trailerSize, __FILE__, 927);
     memcpy(*data, message, *size - trailerSize);
-    operator delete(message, __FILE__, 929);
+    DebugFree(message, __FILE__, 929);
     *size -= trailerSize;
 }
 
@@ -525,7 +525,7 @@ int NetworkInterface::UnknownFunction4ac2d0(char* address)
         goto failed;
     if (field_0x08->EnumAddress(UnknownFunction4aac40, data, size, address))
         goto failed;
-    operator delete(data, __FILE__, 1172);
+    DebugFree(data, __FILE__, 1172);
     return 1;
 failed:
     return 0;
@@ -595,11 +595,11 @@ int NetworkInterface::UnknownFunction4ac510(int value)
         desc->flags |= 1;
     if (field_0x04->SetSessionDesc(desc, 0))
         goto failed;
-    operator delete(desc, __FILE__, 1274);
+    DebugFree(desc, __FILE__, 1274);
     return 1;
 failed:
     if (desc)
-        operator delete(desc, __FILE__, 1279);
+        DebugFree(desc, __FILE__, 1279);
     return 0;
 }
 
@@ -672,11 +672,11 @@ int NetworkInterface::UnknownFunction4ac720(int player, char* name)
     if (!UnknownFunction4ad0f0(player, &playerName))
         goto failed;
     strncpy(name, playerName->shortName, 16);
-    operator delete(playerName, __FILE__, 1365);
+    DebugFree(playerName, __FILE__, 1365);
     return 1;
 failed:
     if (playerName)
-        operator delete(playerName, __FILE__, 1370);
+        DebugFree(playerName, __FILE__, 1370);
     return 0;
 }
 
@@ -965,7 +965,7 @@ int NetworkInterface::UnknownFunction4ad0f0(int player, NetName** name)
     if (!data)
         goto failed;
     if (field_0x04->GetPlayerName(player, data, &size)) {
-        operator delete(data, __FILE__, 2015);
+        DebugFree(data, __FILE__, 2015);
         goto failed;
     }
     *name = (NetName*)data;
@@ -1015,7 +1015,7 @@ int NetworkInterface::UnknownFunction4ad280(int type, void* data, int size, shor
         memcpy(buffer, data, size);
         memcpy(buffer + size, extra, extraSize);
         result = field_0x04->SendEx(from, to, 0x600, buffer, total, 0, 0, 0, 0);
-        operator delete(buffer, __FILE__, 2182);
+        DebugFree(buffer, __FILE__, 2182);
     } else {
         result = field_0x04->SendEx(from, to, 0x600, data, size, 0, 0, 0, 0);
     }
@@ -1479,7 +1479,7 @@ void SessionInfoType::UnknownVirtualSlot1()
 {
     field_0x04[0] = 0;
     if (field_0x108) {
-        operator delete(field_0x108, __FILE__, 2472);
+        DebugFree(field_0x108, __FILE__, 2472);
         field_0x108 = 0;
     }
 }

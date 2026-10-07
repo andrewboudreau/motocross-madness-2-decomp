@@ -46,8 +46,8 @@ are not reconstructed.
 - Local stand-in `ModelObject` is D3DIMSoultreeObject (vtable `0x5513ec`, size 0x2d8, ctor `0x43f160(int)`, slot 7
   `0x444560` takes a source object); helper classes ArchiveFile (0x134), SltFile (0x5c4), registry entry (owner +0x10)
   are local, tier 3.
-- Not attempted: D3DIMSoultreeShadow `0x446840..0x446f40` (its `__FILE__` xrefs `0x447024/0x447044` straddle the
-  bracket end).
+- D3DIMSoultreeShadow `0x446840..` (its `__FILE__` xrefs `0x447024/0x447044` straddle the bracket end) is
+  reconstructed in `src/krusty2/shadow/D3DIMSoultreeShadow.cpp`.
 
 ## Verified SphereManager slice
 
@@ -66,7 +66,8 @@ constants in other files. `Spheres.bindings.json` records this reviewed mapping.
 The other motion-source counts above remain historical masked diagnostics.
 
 ## Motnctrl.cpp
-Wave 5 candidate: `samples/physics/motion/Motnctrl.cpp`.
+Promoted to `src/krusty2/motion/Motnctrl.cpp` (types in `Motnctrl.h`, `Motnctrl.bindings.json`); the near misses
+stay in `samples/physics/motion/Motnctrl.cpp`.
 - `__FILE__` string `D:\aardvark\VC\krusty2\Motnctrl.cpp` at `0x0056e034`. Its xrefs run from `0x4a5659` (the
   MotionManager `$E` initialiser, line 9) to `0x4a9a87` (FreeMotion, line 0x5a7). The line numbers rise with the
   address. The link-order bracket is `0x4a5447..0x4aa36c`.
@@ -91,7 +92,7 @@ Wave 5 candidate: `samples/physics/motion/Motnctrl.cpp`.
 
     The paths are at `+0x3c/+0x8c/+0xdc/+0x12c`. `motions` is at `+0x180`, the `MotionPoseList` is at `+0x190` and
     `vutLoaded` is at `+0x19c`. These fields are named in `src/krusty2/motion/D3DIMSoultreeCharacter.h`.
-- **Coverage**: 37 targets, 33 exact and 4 partial.
+- **Coverage**: 40 strict exact in `src/krusty2/motion/Motnctrl.cpp`, plus ClampFloat and 4 partials in the sample.
   - The exact targets are:
     - two `$E` initialisers
     - the pose comparator and the two frame-advance helpers
@@ -102,13 +103,14 @@ Wave 5 candidate: `samples/physics/motion/Motnctrl.cpp`.
     - ApplyPoseList (slots 4 and 6), SetMotion and SetMotionByName
     - both BlendToMotion overloads
     - FreeMotion
-    - ClampFloat
+    - the `.CRT$XCU` 188-191 `Vec3` set (`0x4a8940..0x4a8a7b`, 8 functions)
+    - ClampFloat `0x4a8440` (sample; an out-of-line copy of an inline)
   - The partial targets are:
-    - **LoadVue `0x4a5e40`, 48%**: the structure and calls are identical, but the registers are permuted (ebx/ebp and
+    - **LoadVue `0x4a5e40`, 48.08%**: the structure and calls are identical, but the registers are permuted (ebx/ebp and
       esi/edi).
     - **RotatePose `0x4a7dc0`, 90.66%**: the Vec3Normalize temporaries use a different stack slot.
-    - **PoseRotation `0x4a7fd0`, ~27%**: the inline budget differs.
-    - **InterpolatePose `0x4a8470`, 10.65%**: VC6 inlines the first CrossProduct, where retail calls `0x515600`.
+    - **PoseRotation `0x4a7fd0`, 55.70%**: the inline budget differs.
+    - **InterpolatePose `0x4a8470`, 19.40%**: VC6 inlines the first CrossProduct, where retail calls `0x515600`.
 - **Inline budget**: VC6 spends its per-function inline budget breadth-first over call sites in source order. The
   calls inside inlined bodies are considered after all direct call sites. In these FPU helpers retail calls the
   out-of-line COMDAT copies of `Vec3::Vec3` (`0x404e60`), DotProduct (`0x40ae30`), `operator*` (`0x5015b0`),
@@ -119,5 +121,5 @@ Wave 5 candidate: `samples/physics/motion/Motnctrl.cpp`.
     finished, smoothsteps the blend weight, lerps the poses and dispatches slot 4/5.
   - Slot 7 `0x4a70c0` (3327 bytes).
   - `0x4a9050` (2138 bytes).
-  - The `$E` set at `0x4a8930..` and the functions after `0x4a9aa0`.
+  - The functions after `0x4a9aa0`.
   - `0x4a8bf0` and `0x4a8c50`, which contain inline fistp instructions; the original source mechanism is unproven.

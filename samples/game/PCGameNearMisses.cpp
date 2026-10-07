@@ -54,7 +54,7 @@ int PCGame::UnknownFunction4c16f0(UnknownDisplay* display) {
             break;
     }
     if (i != count) {
-        operator delete(saved, __FILE__, 1844);
+        DebugFree(saved, __FILE__, 1844);
         return 0;
     }
     for (i = 0; i < count; i++) {
@@ -82,7 +82,7 @@ int PCGame::UnknownFunction4c16f0(UnknownDisplay* display) {
         display->field_0xb74_bit1 = 1;
         return 1;
     }
-    operator delete(saved, __FILE__, 1841);
+    DebugFree(saved, __FILE__, 1841);
     return 1;
 }
 

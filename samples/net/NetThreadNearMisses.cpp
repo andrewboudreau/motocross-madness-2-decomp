@@ -61,7 +61,7 @@ long UnknownFunction4af8e0(unsigned int time)
             &from, &to, 1 /* DPRECEIVE_ALL */, g_UnknownGlobal6886d8, &size);
         if (result == NET_DPERR_BUFFERTOOSMALL) {
             if (g_UnknownGlobal6886d8)
-                operator delete(g_UnknownGlobal6886d8, __FILE__, 221);
+                DebugFree(g_UnknownGlobal6886d8, __FILE__, 221);
             g_UnknownGlobal6886dc = 0;
             g_UnknownGlobal6886d8 = (unsigned char*)DebugMalloc(size, __FILE__, 223);
             if (!g_UnknownGlobal6886d8)

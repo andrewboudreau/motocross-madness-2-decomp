@@ -7,12 +7,16 @@
 // operator new (same name as src/reconstructed/DebugAlloc.h).
 void* DebugMalloc(unsigned int size, const char* file, int line);
 
+// 0x004a2e60: free(ptr, file, line) with category accounting; the target of every explicit
+// (pointer, __FILE__, __LINE__) free.
+void DebugFree(void* p, const char* file, int line);
+
 // 0x004a3010: operator new(size, __FILE__, __LINE__).  The (size, file, line) push order
 // is confirmed at 0x0043a344.
 void* operator new(unsigned int size, const char* file, int line);
 
-// 0x004a2e60: the matching delete (ptr, file, line).  It also unwinds a failed
-// constructor after the placement form of new.
+// 0x004a3060: the matching placement delete; only the compiler-generated unwind funclets
+// of `new(__FILE__, __LINE__)` expressions call it.
 void operator delete(void* p, const char* file, int line);
 
 // 0x004a2ec0: realloc(ptr, size, __FILE__, __LINE__).

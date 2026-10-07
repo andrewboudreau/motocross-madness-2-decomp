@@ -65,8 +65,8 @@ UnknownBitmapFile* UnknownFunction424140(const char* name, UnknownBitmapFile* bi
     failed:
         if (bitmap) {
             if (bitmap->bits)
-                operator delete(bitmap->bits, __FILE__, 101);
-            operator delete(bitmap, __FILE__, 102);
+                DebugFree(bitmap->bits, __FILE__, 101);
+            DebugFree(bitmap, __FILE__, 102);
         }
     close:
         fclose(file);
@@ -128,8 +128,8 @@ int UnknownFunction424380(UnknownBitmapFile* bitmap) {
 void UnknownFunction4245b0(UnknownBitmapFile* bitmap) {
     if (bitmap) {
         if (bitmap->bits)
-            operator delete(bitmap->bits, __FILE__, 200);
-        operator delete(bitmap, __FILE__, 201);
+            DebugFree(bitmap->bits, __FILE__, 200);
+        DebugFree(bitmap, __FILE__, 201);
     }
 }
 

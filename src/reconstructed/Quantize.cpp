@@ -81,7 +81,7 @@ ColorMapper::ColorMapper(UnknownTextureStream* stream) {
                 return;
             UnknownFunction4a03d0(field_0x8710, buffer, 0x10000);
         }
-        operator delete(buffer, __FILE__, 261);
+        DebugFree(buffer, __FILE__, 261);
     } else {
         if (stream->UnknownFunction461640(field_0x10, 0x300, 1) != 1)
             return;

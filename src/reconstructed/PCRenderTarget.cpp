@@ -26,7 +26,7 @@ PCRenderTarget::PCRenderTarget() {
 // 0x004c5320
 PCRenderTarget::~PCRenderTarget() {
     if (field_0x258) {
-        operator delete(field_0x258, __FILE__, 196);
+        DebugFree(field_0x258, __FILE__, 196);
         field_0x258 = 0;
         field_0x254 = 0;
     }
@@ -39,7 +39,7 @@ PCRenderTarget::~PCRenderTarget() {
         field_0x4c = 0;
     }
     if (field_0x260)
-        operator delete(field_0x260, __FILE__, 210);
+        DebugFree(field_0x260, __FILE__, 210);
 }
 
 // 0x004c53d0

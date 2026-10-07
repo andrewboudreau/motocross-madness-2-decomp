@@ -1,5 +1,4 @@
 {
-  "??3@YAXPAXPBDH@Z": "0x004a2e60",
   "?AxisAngleMatrix@@YAXPAUTreeMatrix4@@MMMM@Z": "0x0042de90",
   "?BuildBoxNode@@YAXPAUBoxTreeNode@@PAUTreeVec3@@1H@Z": "0x0042d9e0",
   "?BuildModelBoxTree@@YAXPAUBoxTreeNode@@PBUTreeMatrix4@@PAUTreeVec3@@H@Z": "0x0042dc90",
@@ -12,6 +11,7 @@
   "?ChooseTriangleSplit@@YAXPBUTreeBuildTriangle@@HPBUTreeVec3@@PAMPAH@Z": "0x0042b5f0",
   "?ComputePointBounds@@YAXPBUTreeVec3@@HPAU1@1PAMPBUTreeMatrix4@@@Z": "0x0042aff0",
   "?ComputeTriangleBounds@@YAXPBUTreeBuildTriangle@@HPBUTreeVec3@@PAU2@2PAMPBUTreeMatrix4@@@Z": "0x0042b2a0",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?GatherModelTriangles@@YAXPAVTreeModelSource@@PAVTreeSceneNode@@PAH2PAPAHPAPAUTreeVec3@@@Z": "0x0042c260",
   "?PointBoundsVolume@@YAMPBUTreeVec3@@H@Z": "0x0042b5c0",

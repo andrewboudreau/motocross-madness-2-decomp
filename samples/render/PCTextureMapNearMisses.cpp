@@ -139,7 +139,7 @@ void PCTextureMap::UnknownFunction4c8550(UnknownSurfaceDesc* desc, const char* n
                               desc->pitch / UnknownFunction511970(field_0x20), 0x22b8, field_0x20, 0, 0, 0x80,
                               0xff00ff);
         UnknownFunction5127f0(pixels, desc->width, desc->height, 0, path, 32);
-        operator delete(pixels, __FILE__, 2154);
+        DebugFree(pixels, __FILE__, 2154);
     }
 }
 

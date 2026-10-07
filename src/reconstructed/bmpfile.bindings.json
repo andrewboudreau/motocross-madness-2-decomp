@@ -1,8 +1,8 @@
 {
-  "??3@YAXPAXPBDH@Z": "0x004a2e60",
   "??_C@_02HGED@BM?$AA@": "0x005682b8",
   "??_C@_02JKAF@rb?$AA@": "0x0056666c",
   "??_C@_02NGAF@wb?$AA@": "0x005682b4",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
   "?UnknownFunction424140@@YAPAUUnknownBitmapFile@@PBDPAU1@@Z": "0x00424140",
   "?UnknownFunction424380@@YAHPAUUnknownBitmapFile@@@Z": "0x00424380",

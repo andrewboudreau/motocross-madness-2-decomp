@@ -20,8 +20,6 @@
 #include "../../src/reconstructed/MemTag.h"
 #include "../../src/reconstructed/DebugAlloc.h"
 
-// 0x004a2e60: frees a block and takes its size off the current category.
-void DebugFree(void* p, const char* file, int line);
 // 0x004a3120: memcpy with the caller's file and line (DebugRealloc).
 void* DebugMemcpy(void* destination, const void* source, unsigned int size, const char* file, int line);
 

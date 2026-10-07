@@ -507,7 +507,7 @@ void RadarOverlay::UnknownFunction51c720(int mode)
             node->field_0x00 &= ~4;
             item = list;
             list = list->field_0x0c;
-            operator delete(item, __FILE__, 2001);
+            DebugFree(item, __FILE__, 2001);
         } else {
         node->field_0x00 |= 4;
         TrackSegment* first = node->field_0x08;

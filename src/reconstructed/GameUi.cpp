@@ -672,11 +672,11 @@ UIEditBox::~UIEditBox() {
     if (field_0x1b4)
         UnknownVirtualSlot59(1);
     if (field_0xc0) {
-        operator delete(field_0xc0, __FILE__, 0x15d2);
+        DebugFree(field_0xc0, __FILE__, 0x15d2);
         field_0xc0 = 0;
     }
     if (field_0x210)
-        operator delete(field_0x210, __FILE__, 0x15d6);
+        DebugFree(field_0x210, __FILE__, 0x15d6);
     if (field_0x20c)
         DeleteObject((HGDIOBJ)field_0x20c);
 }
@@ -951,9 +951,9 @@ UIListBox::~UIListBox() {
     if (field_0x210)
         DeleteObject((HGDIOBJ)field_0x210);
     for (int i = 0; i < field_0x1ec; i++) {
-        operator delete(field_0x214[i].field_0x14, __FILE__, 0x1b79);
-        operator delete(field_0x214[i].field_0x18, __FILE__, 0x1b7a);
-        operator delete(field_0x214[i].field_0x24, __FILE__, 0x1b7b);
+        DebugFree(field_0x214[i].field_0x14, __FILE__, 0x1b79);
+        DebugFree(field_0x214[i].field_0x18, __FILE__, 0x1b7a);
+        DebugFree(field_0x214[i].field_0x24, __FILE__, 0x1b7b);
         UIAnim* image = field_0x214[i].field_0x20;
         if (image && !image->field_0xf4)
             image->Release();
@@ -965,7 +965,7 @@ UIListBox::~UIListBox() {
             }
         }
     }
-    operator delete(field_0x214, __FILE__, 0x1b88);
+    DebugFree(field_0x214, __FILE__, 0x1b88);
 }
 
 // 0x00476860
@@ -1146,18 +1146,18 @@ UIMultiState::~UIMultiState() {
         for (int i = 0; i < field_0x1ec; i++) {
             UIAnim* image = field_0x1f4[i].field_0x00;
             if (image && !image->field_0xf4)
-                operator delete(image, __FILE__, 0x210e);
+                DebugFree(image, __FILE__, 0x210e);
             image = field_0x1f4[i].field_0x04;
             if (image && !image->field_0xf4)
-                operator delete(image, __FILE__, 0x210f);
+                DebugFree(image, __FILE__, 0x210f);
             if (field_0x1f4[i].field_0x08)
-                operator delete(field_0x1f4[i].field_0x08, __FILE__, 0x2110);
+                DebugFree(field_0x1f4[i].field_0x08, __FILE__, 0x2110);
             if (field_0x1f4[i].field_0x1c)
-                operator delete(field_0x1f4[i].field_0x1c, __FILE__, 0x2111);
+                DebugFree(field_0x1f4[i].field_0x1c, __FILE__, 0x2111);
         }
     }
     if (field_0x1f4)
-        operator delete(field_0x1f4, __FILE__, 0x2114);
+        DebugFree(field_0x1f4, __FILE__, 0x2114);
 }
 
 // 0x00478450
@@ -1550,14 +1550,14 @@ int UICtlContainer::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInpu
 // 0x0047b570
 void* UnknownFunction47b570(void* block, unsigned int size) {
     if (block && size <= 0) {
-        operator delete(block, __FILE__, 0x2782);
+        DebugFree(block, __FILE__, 0x2782);
         return 0;
     }
     void* resized = DebugMalloc(size, __FILE__, 0x2787);
     if (resized && block) {
         int length = _msize(block);
         memcpy(resized, block, length < (int)size ? length : size);
-        operator delete(block, __FILE__, 0x278e);
+        DebugFree(block, __FILE__, 0x278e);
     }
     return resized;
 }
@@ -1968,9 +1968,9 @@ void UnknownGameUiControl::UnknownFunction470b20(const char* text) {
             static_cast<UIEditBox*>(this)->UnknownFunction473da0((char*)text);
         } else {
             if (field_0xc0)
-                operator delete(field_0xc0, __FILE__, 0xcc2);
+                DebugFree(field_0xc0, __FILE__, 0xcc2);
             if (field_0xe4)
-                operator delete(field_0xe4, __FILE__, 0xcc3);
+                DebugFree(field_0xe4, __FILE__, 0xcc3);
             field_0xc0 = (char*)DebugMalloc(strlen(text) + 1, __FILE__, 0xcc4);
             strcpy(field_0xc0, text);
             field_0xe4 = field_0xb8->UnknownFunction46f890(field_0xc0, field_0xc4, (void*)field_0x128,
@@ -1995,9 +1995,9 @@ void UnknownGameUiControl::UnknownFunction470b20(const char* text) {
         UnknownVirtualSlot50();
     } else {
         if (field_0xc0)
-            operator delete(field_0xc0, __FILE__, 0xcde);
+            DebugFree(field_0xc0, __FILE__, 0xcde);
         if (field_0xe4)
-            operator delete(field_0xe4, __FILE__, 0xcdf);
+            DebugFree(field_0xe4, __FILE__, 0xcdf);
         field_0xc0 = 0;
         field_0xe4 = 0;
     }
@@ -2346,9 +2346,9 @@ int UIListBox::UnknownFunction476f50(int rows) {
 void UIListBox::UnknownFunction476ff0(int row, const char* text) {
     if (row < field_0x1ec && row >= 0) {
         if (field_0x214[row].field_0x14)
-            operator delete(field_0x214[row].field_0x14, __FILE__, 0x1e0b);
+            DebugFree(field_0x214[row].field_0x14, __FILE__, 0x1e0b);
         if (field_0x214[row].field_0x24)
-            operator delete(field_0x214[row].field_0x24, __FILE__, 0x1e0c);
+            DebugFree(field_0x214[row].field_0x24, __FILE__, 0x1e0c);
         field_0x214[row].field_0x08 = strlen(text);
         field_0x214[row].field_0x14 = (char*)DebugMalloc(field_0x214[row].field_0x08 + 1, __FILE__, 0x1e0e);
         strcpy(field_0x214[row].field_0x14, text);
@@ -2398,14 +2398,14 @@ int UIMultiState::UnknownFunction478860(int count) {
         for (int i = count; i < field_0x1ec; i++) {
             UIAnim* image = field_0x1f4[i].field_0x00;
             if (image && !image->field_0xf4)
-                operator delete(image, __FILE__, 0x21b6);
+                DebugFree(image, __FILE__, 0x21b6);
             image = field_0x1f4[i].field_0x04;
             if (image && !image->field_0xf4)
-                operator delete(image, __FILE__, 0x21b7);
+                DebugFree(image, __FILE__, 0x21b7);
             if (field_0x1f4[i].field_0x08)
-                operator delete(field_0x1f4[i].field_0x08, __FILE__, 0x21b8);
+                DebugFree(field_0x1f4[i].field_0x08, __FILE__, 0x21b8);
             if (field_0x1f4[i].field_0x1c)
-                operator delete(field_0x1f4[i].field_0x1c, __FILE__, 0x21b9);
+                DebugFree(field_0x1f4[i].field_0x1c, __FILE__, 0x21b9);
         }
         field_0x1f4 = (UnknownGameUiState*)UnknownFunction47b570(field_0x1f4,
                                                                          count * sizeof(UnknownGameUiState));
@@ -2444,9 +2444,9 @@ void UIMultiState::UnknownFunction478ad0(int index, const char* text) {
     if (index < field_0x1ec) {
         field_0x1f0 = index;
         if (field_0x1f4[index].field_0x08)
-            operator delete(field_0x1f4[index].field_0x08, __FILE__, 0x2210);
+            DebugFree(field_0x1f4[index].field_0x08, __FILE__, 0x2210);
         if (field_0x1f4[index].field_0x1c)
-            operator delete(field_0x1f4[index].field_0x1c, __FILE__, 0x2211);
+            DebugFree(field_0x1f4[index].field_0x1c, __FILE__, 0x2211);
         if (text) {
             field_0x1f4[index].field_0x08 = (char*)DebugMalloc(strlen(text) + 1, __FILE__, 0x2213);
             strcpy(field_0x1f4[index].field_0x08, text);
@@ -2571,9 +2571,9 @@ int UIRadioButton::UnknownVirtualSlot55(int a, int b) {
 // 0x00477490
 int UIListBox::UnknownFunction477490(int row) {
     if (row < field_0x1ec && row >= 0) {
-        operator delete(field_0x214[row].field_0x14, __FILE__, 0x1e80);
-        operator delete(field_0x214[row].field_0x24, __FILE__, 0x1e81);
-        operator delete(field_0x214[row].field_0x18, __FILE__, 0x1e82);
+        DebugFree(field_0x214[row].field_0x14, __FILE__, 0x1e80);
+        DebugFree(field_0x214[row].field_0x24, __FILE__, 0x1e81);
+        DebugFree(field_0x214[row].field_0x18, __FILE__, 0x1e82);
         void* brush = field_0x214[row].field_0x34;
         if (brush) {
             for (int i = 0; i < field_0x1ec; i++) {
@@ -2602,9 +2602,9 @@ int UIListBox::UnknownFunction477490(int row) {
 // 0x004775f0
 void UIListBox::UnknownFunction4775f0() {
     for (int i = 0; i < field_0x1ec; i++) {
-        operator delete(field_0x214[i].field_0x14, __FILE__, 0x1ecf);
-        operator delete(field_0x214[i].field_0x18, __FILE__, 0x1ed0);
-        operator delete(field_0x214[i].field_0x24, __FILE__, 0x1ed1);
+        DebugFree(field_0x214[i].field_0x14, __FILE__, 0x1ecf);
+        DebugFree(field_0x214[i].field_0x18, __FILE__, 0x1ed0);
+        DebugFree(field_0x214[i].field_0x24, __FILE__, 0x1ed1);
         if (field_0x214[i].field_0x34) {
             DeleteObject((HGDIOBJ)field_0x214[i].field_0x34);
             for (int j = 0; j < field_0x1ec; j++) {
@@ -2649,7 +2649,7 @@ void UIListBox::UnknownFunction477900(int a) {
                     other->field_0x1fc * sizeof(UnknownGameUiListRow), __FILE__, 0x1f87);
                 for (int j = 0; j < field_0x1ec; j++)
                     rows[j] = other->field_0x214[field_0x214[j].field_0x10];
-                operator delete(other->field_0x214, __FILE__, 0x1f8e);
+                DebugFree(other->field_0x214, __FILE__, 0x1f8e);
                 other->field_0x214 = rows;
                 control->UnknownVirtualSlot50();
             }
@@ -2744,7 +2744,7 @@ void UIEditBox::UnknownFunction473c70(int size) {
     int kept = 0;
     if (field_0xc0) {
         strcpy(saved, field_0xc0);
-        operator delete(field_0xc0, __FILE__, 0x169a);
+        DebugFree(field_0xc0, __FILE__, 0x169a);
         kept = 1;
     }
     int capacity = size + 1;
@@ -2815,7 +2815,7 @@ void UIEditBox::UnknownFunction473f30(const char* characters) {
             strcpy((char*)field_0x210, characters);
     } else {
         if (field_0x210)
-            operator delete(field_0x210, __FILE__, 0x16fb);
+            DebugFree(field_0x210, __FILE__, 0x16fb);
         field_0x210 = 0;
     }
 }

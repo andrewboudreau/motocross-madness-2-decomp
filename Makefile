@@ -171,13 +171,3 @@ category-pilots-probe: ensure-work
 
 category-pilots-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_category_pilots.py' -v
-
-.PHONY: ecosystem ecosystem-probes ecosystem-test
-ecosystem: ensure-work
-	$(PYTHON) tools/review_ecosystem.py --exe "$(EXE)"
-
-ecosystem-probes: ensure-work
-	$(PYTHON) tools/review_ecosystem.py --exe "$(EXE)" --compile-probes
-
-ecosystem-test:
-	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_ecosystem.py' -v

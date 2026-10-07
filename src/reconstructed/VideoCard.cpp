@@ -46,7 +46,7 @@ VideoCard::~VideoCard() {
 // 0x0052d220
 void VideoCard::UnknownVirtualSlot1() {
     if (field_0x10)
-        operator delete(field_0x10, __FILE__, 63);
+        DebugFree(field_0x10, __FILE__, 63);
 }
 
 // 0x0052d250

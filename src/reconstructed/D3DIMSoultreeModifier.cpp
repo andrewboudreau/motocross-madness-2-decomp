@@ -29,7 +29,7 @@ void D3DIMSoultreeModifier::UnknownFunction4452f0(D3DIMSoultreeObject* object)
         objects[i] = field_0x34[i];
     objects[field_0x38] = object;
     field_0x38++;
-    operator delete(field_0x34, __FILE__, 33);
+    DebugFree(field_0x34, __FILE__, 33);
     field_0x34 = objects;
 }
 
@@ -45,7 +45,7 @@ void D3DIMSoultreeModifier::UnknownFunction445360(D3DIMSoultreeObject* object)
         if (field_0x34[i] != object)
             objects[n++] = field_0x34[i];
     }
-    operator delete(field_0x34, __FILE__, 53);
+    DebugFree(field_0x34, __FILE__, 53);
     field_0x34 = objects;
     field_0x38--;
 }
@@ -64,6 +64,6 @@ void D3DIMSoultreeModifier::UnknownFunction4453e0()
             else
                 objects[j]->UnknownFunction444f10(this);
         }
-        operator delete(objects, __FILE__, 80);
+        DebugFree(objects, __FILE__, 80);
     }
 }

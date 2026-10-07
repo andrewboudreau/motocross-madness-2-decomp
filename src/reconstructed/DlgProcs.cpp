@@ -922,11 +922,11 @@ int SPEventDlg::UnknownFunction44ec50(const char* path) {
 // 0x0044eed0
 void SPEventDlg::UnknownFunction44eed0() {
     if (field_0x7f58)
-        operator delete(field_0x7f58, __FILE__, 2009);
+        DebugFree(field_0x7f58, __FILE__, 2009);
     if (field_0x7f60) {
         for (int i = 0; i < field_0x7f64; i++)
-            operator delete(field_0x7f60[i], __FILE__, 2013);
-        operator delete(field_0x7f60, __FILE__, 2015);
+            DebugFree(field_0x7f60[i], __FILE__, 2013);
+        DebugFree(field_0x7f60, __FILE__, 2015);
     }
     field_0x7f58 = 0;
     field_0x7f60 = 0;
@@ -1989,11 +1989,11 @@ void GhostFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     }
     case 6:
         if (field_0x7f58)
-            operator delete(field_0x7f58, __FILE__, 4580);
+            DebugFree(field_0x7f58, __FILE__, 4580);
         if (field_0x7f60) {
             for (int i = 0; i < field_0x7f64; i++)
-                operator delete(field_0x7f60[i], __FILE__, 4584);
-            operator delete(field_0x7f60, __FILE__, 4586);
+                DebugFree(field_0x7f60[i], __FILE__, 4584);
+            DebugFree(field_0x7f60, __FILE__, 4586);
         }
         break;
     }
@@ -2005,11 +2005,11 @@ void GhostFilesDlg::UnknownFunction454470() {
     WIN32_FIND_DATAA data;
     int count = 0;
     if (field_0x7f58)
-        operator delete(field_0x7f58, __FILE__, 4599);
+        DebugFree(field_0x7f58, __FILE__, 4599);
     if (field_0x7f60) {
         for (int i = 0; i < field_0x7f64; i++)
-            operator delete(field_0x7f60[i], __FILE__, 4603);
-        operator delete(field_0x7f60, __FILE__, 4605);
+            DebugFree(field_0x7f60[i], __FILE__, 4603);
+        DebugFree(field_0x7f60, __FILE__, 4605);
     }
     field_0x7f58 = 0;
     field_0x7f60 = 0;
@@ -2142,11 +2142,11 @@ void ReplayFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     }
     case 6:
         if (field_0x7f58)
-            operator delete(field_0x7f58, __FILE__, 4791);
+            DebugFree(field_0x7f58, __FILE__, 4791);
         if (field_0x7f60) {
             for (int i = 0; i < field_0x7f64; i++)
-                operator delete(field_0x7f60[i], __FILE__, 4795);
-            operator delete(field_0x7f60, __FILE__, 4797);
+                DebugFree(field_0x7f60[i], __FILE__, 4795);
+            DebugFree(field_0x7f60, __FILE__, 4797);
         }
         break;
     }
@@ -2158,11 +2158,11 @@ void ReplayFilesDlg::UnknownFunction454e60() {
     WIN32_FIND_DATAA data;
     int count = 0;
     if (field_0x7f58)
-        operator delete(field_0x7f58, __FILE__, 4810);
+        DebugFree(field_0x7f58, __FILE__, 4810);
     if (field_0x7f60) {
         for (int i = 0; i < field_0x7f64; i++)
-            operator delete(field_0x7f60[i], __FILE__, 4814);
-        operator delete(field_0x7f60, __FILE__, 4816);
+            DebugFree(field_0x7f60[i], __FILE__, 4814);
+        DebugFree(field_0x7f60, __FILE__, 4816);
     }
     field_0x7f58 = 0;
     field_0x7f60 = 0;

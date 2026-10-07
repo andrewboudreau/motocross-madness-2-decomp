@@ -1,6 +1,6 @@
 {
   "??1UnknownVideoDecoder@@QAE@XZ": "0x0052d050",
-  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "_ICClose@4": "0x00533058",
   "_ICSendMessage@16": "0x00533052",
   "__FILE__:vfwdeco.cpp": "0x005759cc"

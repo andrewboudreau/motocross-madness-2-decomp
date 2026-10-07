@@ -48,7 +48,7 @@ Palette8::Palette8(UnknownTextureStream* stream) {
         return;
     if (stream->UnknownFunction461640(name, length, 1) != 1
         || stream->UnknownFunction461640(field_0x008, sizeof(field_0x008), 1) != 1) {
-        operator delete(name, __FILE__, 73);
+        DebugFree(name, __FILE__, 73);
         return;
     }
     if (field_0x710 == 10) {
@@ -83,7 +83,7 @@ Palette8::Palette8(UnknownTextureStream* stream) {
     if (g_UnknownGlobal56e26c->field_0x0c->field_0x190->UnknownMethod5(0x44, field_0x308, &field_0x70c, 0) == 0
         && *name)
         field_0x708 = ColorMapper::UnknownFunction4dddd0(name);
-    operator delete(name, __FILE__, 170);
+    DebugFree(name, __FILE__, 170);
 }
 
 // 0x004b6ea0

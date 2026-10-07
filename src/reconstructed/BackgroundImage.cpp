@@ -35,7 +35,7 @@ BackgroundImage::~BackgroundImage() {
         field_0x2c = 0;
     }
     if (field_0x50)
-        operator delete(field_0x50, __FILE__, 230);
+        DebugFree(field_0x50, __FILE__, 230);
 }
 
 // 0x00403ec0

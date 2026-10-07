@@ -255,8 +255,8 @@ int D3DIMSoultreeObject::UnknownFunction440060()
         }
     }
     UnknownFunction444440();
-    operator delete(groups, __FILE__, 0x291);
-    operator delete(nodes, __FILE__, 0x292);
+    DebugFree(groups, __FILE__, 0x291);
+    DebugFree(nodes, __FILE__, 0x292);
     return untextured;
 }
 
@@ -511,8 +511,8 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
                 }
             }
         }
-        operator delete(nodes, __FILE__, 0x8e1);
-        operator delete(sourceNodes, __FILE__, 0x8e2);
+        DebugFree(nodes, __FILE__, 0x8e1);
+        DebugFree(sourceNodes, __FILE__, 0x8e2);
         UnknownFunction444440();
     } else {
         field_0x28c = 0;

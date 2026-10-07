@@ -666,7 +666,7 @@ int UnknownFunction4cfaf0(void* destination, void* source, int width, int height
         UnknownFunction4cde20(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
     }
     UnknownFunction4cde20(destination, buffer, width, height, destinationStride, levelWidth);
-    operator delete(buffer, __FILE__, 1350);
+    DebugFree(buffer, __FILE__, 1350);
     return 1;
 }
 
@@ -696,7 +696,7 @@ int UnknownFunction4cfc40(void* destination, void* source, int width, int height
         UnknownFunction4cdf10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
     }
     UnknownFunction4cdf10(destination, buffer, width, height, destinationStride, levelWidth);
-    operator delete(buffer, __FILE__, 1412);
+    DebugFree(buffer, __FILE__, 1412);
     return 1;
 }
 
@@ -723,7 +723,7 @@ int UnknownFunction4d0020(void* destination, void* source, int width, int height
         UnknownFunction4ce190(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, 0);
     }
     UnknownFunction4ce190(destination, buffer, width, height, destinationStride, levelWidth, 0);
-    operator delete(buffer, __FILE__, 1593);
+    DebugFree(buffer, __FILE__, 1593);
     return 1;
 }
 
@@ -750,7 +750,7 @@ int UnknownFunction4d0170(void* destination, void* source, int width, int height
         UnknownFunction4ce420(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
     }
     UnknownFunction4ce420(destination, buffer, width, height, destinationStride, levelWidth);
-    operator delete(buffer, __FILE__, 1653);
+    DebugFree(buffer, __FILE__, 1653);
     return 1;
 }
 
@@ -778,7 +778,7 @@ int UnknownFunction4d02c0(void* destination, void* source, int width, int height
         UnknownFunction4cea10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, filter, 0xf81f);
     }
     UnknownFunction4cea10(destination, buffer, width, height, destinationStride, levelWidth, filter, 0xf81f);
-    operator delete(buffer, __FILE__, 1714);
+    DebugFree(buffer, __FILE__, 1714);
     return 1;
 }
 
@@ -806,7 +806,7 @@ int UnknownFunction4d0440(void* destination, void* source, int width, int height
         UnknownFunction4ce5f0(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, filter, 0x7c1f);
     }
     UnknownFunction4ce5f0(destination, buffer, width, height, destinationStride, levelWidth, filter, 0x7c1f);
-    operator delete(buffer, __FILE__, 1775);
+    DebugFree(buffer, __FILE__, 1775);
     return 1;
 }
 
@@ -834,7 +834,7 @@ int UnknownFunction4d05c0(void* destination, void* source, int width, int height
         UnknownFunction4cee30(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, palette);
     }
     UnknownFunction4cee30(destination, buffer, width, height, destinationStride, levelWidth, palette);
-    operator delete(buffer, __FILE__, 1840);
+    DebugFree(buffer, __FILE__, 1840);
     return 1;
 }
 
@@ -884,7 +884,7 @@ int UnknownFunction4cfe70(void* destination, void* source, int width, int height
         int levelHeight = height << (levels - 1);
         void* buffer = DebugMalloc(levelWidth * levelHeight * 4, __FILE__, 1505);
         if (!buffer) {
-            operator delete(full, __FILE__, 1534);
+            DebugFree(full, __FILE__, 1534);
             return 0;
         }
         UnknownFunction4cdf10(buffer, full, levelWidth, levelHeight, levelWidth, sourceStride);
@@ -894,9 +894,9 @@ int UnknownFunction4cfe70(void* destination, void* source, int width, int height
             UnknownFunction4cdf10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
         }
         UnknownFunction4cdf10(destination, buffer, width, height, destinationStride, levelWidth);
-        operator delete(buffer, __FILE__, 1527);
+        DebugFree(buffer, __FILE__, 1527);
     }
-    operator delete(full, __FILE__, 1529);
+    DebugFree(full, __FILE__, 1529);
     return 1;
 }
 

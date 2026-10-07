@@ -87,7 +87,7 @@ TextureMap* UnknownFunction50a590(TextureMapManager* manager, const char* name, 
                 entry->field_0x14->UnknownFunction43e9b0(mode);
             }
         } else {
-            operator delete(paletteName, __FILE__, 138);
+            DebugFree(paletteName, __FILE__, 138);
 failed:
             return 0;
         }
@@ -146,7 +146,7 @@ failed:
         g_UnknownResourceManager572b44->UnknownFunction4e9010(entry, map);
     }
     if (paletteName)
-        operator delete(paletteName, __FILE__, 320);
+        DebugFree(paletteName, __FILE__, 320);
     return map;
 }
 

@@ -70,7 +70,7 @@ relocation resolved by the bindings. Three near misses are parked in
 |---|---:|---|---|
 | `0x0052ff90` | 261 | constructor | integer members first, then the two `Vector3` members (copy-assigned temporaries); `RANDOM_UNIT()` macro |
 | `0x005300a0` | 30 | scalar deleting destructor | compiler generated |
-| `0x005300c0` | 195 | destructor | `operator delete(p, __FILE__, line)` per array |
+| `0x005300c0` | 195 | destructor | `DebugFree(p, __FILE__, line)` per array |
 | `0x00530190` | 36 | setup | qualified `GameObject::UnknownVirtualSlot8`, returns `this` |
 | `0x005301c0` | 995 | builds the physics objects | `field_0xe8`, `field_0xf4`, then `field_0x100 = 0` |
 | `0x005305b0`, `0x005305f0`, `0x00530630`, `0x00530680` | 60-82 | appends | `DebugRealloc(p, n * 4 + 4, ...)`; `0x00530630` returns `count - 1` |

@@ -91,7 +91,7 @@ unsigned int __stdcall UnknownFunction4af6a0(void* arg)
 done:
     EnterCriticalSection(NET_LOCK(net->field_0x48));
     if (g_UnknownGlobal6886d8) {
-        operator delete(g_UnknownGlobal6886d8, __FILE__, 162);
+        DebugFree(g_UnknownGlobal6886d8, __FILE__, 162);
         g_UnknownGlobal6886d8 = 0;
     }
     LeaveCriticalSection(NET_LOCK(net->field_0x48));

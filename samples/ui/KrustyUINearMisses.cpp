@@ -222,8 +222,8 @@ void KrustyUI::UnknownFunction49b0d0(int* bikes, int count, int* riders) {
         usedRiders[index] = 1;
         riders[k] = index;
     }
-    operator delete(usedBikes, __FILE__, 1299);
-    operator delete(usedRiders, __FILE__, 1300);
+    DebugFree(usedBikes, __FILE__, 1299);
+    DebugFree(usedRiders, __FILE__, 1300);
 }
 
 // 0x0049a8b0: reads the bike models and bikes (bikes.pb) and the riders
@@ -235,11 +235,11 @@ void KrustyUI::UnknownFunction49a8b0() {
     UnknownParameterBlock block;
     UnknownTextureStream* stream = new(__FILE__, 913) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (field_0x48)
-        operator delete(field_0x48, __FILE__, 918);
+        DebugFree(field_0x48, __FILE__, 918);
     if (field_0x50)
-        operator delete(field_0x50, __FILE__, 919);
+        DebugFree(field_0x50, __FILE__, 919);
     if (field_0x58)
-        operator delete(field_0x58, __FILE__, 920);
+        DebugFree(field_0x58, __FILE__, 920);
     field_0x50 = 0;
     field_0x58 = 0;
     field_0x5c = 0;

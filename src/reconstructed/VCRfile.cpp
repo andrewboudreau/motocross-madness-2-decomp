@@ -30,11 +30,11 @@ UnknownVcrFile::~UnknownVcrFile() {
     if (memory) {
         for (int i = 0; i < count; i++) {
             UnknownVcrFileBlock* next = blocks[i]->next;
-            operator delete(blocks[i], __FILE__, 50);
+            DebugFree(blocks[i], __FILE__, 50);
             while (next) {
                 UnknownVcrFileBlock* block = next;
                 next = next->next;
-                operator delete(block, __FILE__, 54);
+                DebugFree(block, __FILE__, 54);
             }
         }
     }

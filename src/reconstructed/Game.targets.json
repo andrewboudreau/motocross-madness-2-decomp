@@ -8,7 +8,7 @@
     "target_size": 6,
     "confidence": "high-body-low-name",
     "status": "exact-byte-match",
-    "notes": "6/6 bytes match with clang-cl. Shared return-1 virtual; original name remains unknown."
+    "notes": "6/6 bytes under VC6 SP3 (strict exact in the calibration). Shared return-1 virtual; original name remains unknown."
   },
   {
     "class": "Game",
@@ -19,6 +19,6 @@
     "target_size": 6,
     "confidence": "high-body-low-name",
     "status": "exact-byte-match",
-    "notes": "6/6 bytes match with clang-cl. Original function name remains unknown."
+    "notes": "6/6 bytes under VC6 SP3 (strict exact in the calibration). Original function name remains unknown."
   }
 ]

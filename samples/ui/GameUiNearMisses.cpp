@@ -236,15 +236,15 @@ UnknownGameUiControl::~UnknownGameUiControl() {
     if (field_0x1b8 != -1 && field_0xb8 && field_0xb8->field_0x110)
         field_0xb8->field_0x110->UnknownFunction404200(field_0x1b8);
     if (field_0xc0)
-        operator delete(field_0xc0, __FILE__, 0xba3);
+        DebugFree(field_0xc0, __FILE__, 0xba3);
     if (field_0xf0)
-        operator delete(field_0xf0, __FILE__, 0xba4);
+        DebugFree(field_0xf0, __FILE__, 0xba4);
     if (field_0x12c)
         DeleteObject((HGDIOBJ)field_0x128);
     if (field_0xe4)
-        operator delete(field_0xe4, __FILE__, 0xba8);
+        DebugFree(field_0xe4, __FILE__, 0xba8);
     if (field_0x1c4)
-        operator delete(field_0x1c4, __FILE__, 0xba9);
+        DebugFree(field_0x1c4, __FILE__, 0xba9);
 }
 
 // 0x004705d0
@@ -2365,13 +2365,13 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         char tip[0x400];
                         if (LoadStringA((HINSTANCE)dialog->field_0x30->field_0x348, toolTipId, tip, sizeof(tip))) {
                             if (control->field_0xf0)
-                                operator delete(control->field_0xf0, __FILE__, 0x646);
+                                DebugFree(control->field_0xf0, __FILE__, 0x646);
                             control->field_0xf0 = (char*)DebugMalloc(strlen(tip) + 1, __FILE__, 0x647);
                             strcpy(control->field_0xf0, tip);
                         } else {
                             sprintf(tip, "Resource string '%d' load fail\n", toolTipId);
                             if (control->field_0xf0)
-                                operator delete(control->field_0xf0, __FILE__, 0x64d);
+                                DebugFree(control->field_0xf0, __FILE__, 0x64d);
                             control->field_0xf0 = 0;
                         }
                     }

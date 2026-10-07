@@ -16,9 +16,9 @@ UnknownVideoDecoder::~UnknownVideoDecoder() {
         ICDecompressExEnd(field_0x18);
     }
     if (field_0x00)
-        operator delete(field_0x00, __FILE__, 178);
+        DebugFree(field_0x00, __FILE__, 178);
     if (field_0x10)
-        operator delete(field_0x10, __FILE__, 179);
+        DebugFree(field_0x10, __FILE__, 179);
     if (field_0x14)
-        operator delete(field_0x14, __FILE__, 180);
+        DebugFree(field_0x14, __FILE__, 180);
 }

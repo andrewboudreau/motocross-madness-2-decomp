@@ -122,9 +122,9 @@ TextureMapManager::TextureMapManager() : GameObject(1) {
 // shared texture surfaces.
 TextureMapManager::~TextureMapManager() {
     if (field_0x5c)
-        operator delete(field_0x5c, __FILE__, 143);
+        DebugFree(field_0x5c, __FILE__, 143);
     if (field_0x60)
-        operator delete(field_0x60, __FILE__, 144);
+        DebugFree(field_0x60, __FILE__, 144);
     if (field_0x70)
         delete field_0x70;
     for (int i = 0; i < 10; i++) {
@@ -362,7 +362,7 @@ void TextureMapManager::UnknownFunction511300(TextureMap* texture) {
 void* TextureMapManager::UnknownFunction511310(unsigned int bytes) {
     if (field_0x64 < bytes) {
         if (field_0x5c) {
-            operator delete(field_0x5c, __FILE__, 497);
+            DebugFree(field_0x5c, __FILE__, 497);
             field_0x5c = 0;
         }
         field_0x5c = DebugMalloc(bytes, __FILE__, 500);
@@ -377,7 +377,7 @@ void* TextureMapManager::UnknownFunction511310(unsigned int bytes) {
 void* TextureMapManager::UnknownFunction511370(unsigned int bytes) {
     if (field_0x68 < bytes) {
         if (field_0x60) {
-            operator delete(field_0x60, __FILE__, 512);
+            DebugFree(field_0x60, __FILE__, 512);
             field_0x60 = 0;
         }
         field_0x60 = DebugMalloc(bytes, __FILE__, 515);

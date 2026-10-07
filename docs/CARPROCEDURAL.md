@@ -11,9 +11,9 @@ literal at `0x005683e4` (xrefs `0x0042f657..0x0042fb52`) and RTTI
 `CarProcedural : GraphicsTest : GameObject` (vtable `0x00551000`, 28
 slots; overrides 0 and 10 and adds 27). Its four kVec3 `$E` pairs at
 `0x00430eb0..0x00430feb` are listed in `.CRT$XCU` right after Camera.cpp's.
-Camera.cpp ends at `0x0042f38b`. Still unmatched there: `0x0042f0e0`,
-`0x0042f190`, `0x0042f210` and its eight `$E`. `0x00430ff0` is the
-TextureMap.h inline copy, which is already covered.
+Camera.cpp ends at `0x0042f38b` (its last functions are exact; see
+[OVERLAY.md](OVERLAY.md)). `0x00430ff0` is the TextureMap.h inline copy,
+which is already covered.
 
 Exact (15): the constructor, the destructor and its deleting wrapper,
 slot 27 (1020 bytes), the path-file parser `0x0042fa00`, the path distance

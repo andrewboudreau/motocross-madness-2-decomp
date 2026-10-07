@@ -235,7 +235,7 @@ extern OwnerRegistry* g_pOwnerRegistry;                 // 0x00572b44
 D3DIMSoultreeCharacter::~D3DIMSoultreeCharacter()
 {
     if (*(void**)(d3d_field_0x1a4 + 0x64))
-        operator delete(*(void**)(d3d_field_0x1a4 + 0x64), __FILE__, 0xc4);
+        DebugFree(*(void**)(d3d_field_0x1a4 + 0x64), __FILE__, 0xc4);
     if (nodeNames)
         operator delete(nodeNames);
     OwnerEntry* entry = g_pOwnerRegistry->FindByOwner(this);

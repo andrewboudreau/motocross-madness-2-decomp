@@ -62,7 +62,7 @@ void CollisionHullShape_Free(CollisionHullShape* s) {
     if (s->pointTree)
         Fn_0042a160(s->pointTree);
     if (s->vertices)
-        operator delete(s->vertices, __FILE__, 36);
+        DebugFree(s->vertices, __FILE__, 36);
 }
 
 void CollisionModelShape_Free(void* shape) {
@@ -157,7 +157,7 @@ CollisionObject::~CollisionObject()
         g_collisionQuadTree->Remove(this, quadtreeCell);
     FreeShape();
     if (ignoreList)
-        operator delete((void*)ignoreList, __FILE__, 0x6c);
+        DebugFree((void*)ignoreList, __FILE__, 0x6c);
     if (shape) {
         switch (shapeType) {
         case 0:

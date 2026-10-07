@@ -155,9 +155,11 @@ DebugCalloc, operator new and the three free bodies, and the memcpy helper
 placement `operator delete(void*, const char*, int)` the unwind funclets call
 when a constructor after `new(__FILE__, line)` throws, `0x004a30c0` is the
 plain `operator delete(void*)` of the deleting destructors, and `0x004a2e60`
-takes the explicit `(pointer, file, line)` calls (named DebugFree in the
-sample; other bindings files map those explicit calls under the placement
-delete's name, which binds the same address). The file name is ours and the
+takes the explicit `(pointer, file, line)` calls. Source writes those as
+`DebugFree(p, __FILE__, line)` (declared in both `DebugAlloc.h` headers) and
+binds `?DebugFree@@YAXPAXPBDH@Z` to `0x004a2e60`; bindings keep
+`??3@YAXPAXPBDH@Z` only for the compiler-emitted funclet references, bound to
+`0x004a3060` (all 501 funclet calls in `0x005495f8..0x0054f168` go there). The file name is ours and the
 unit has no `__FILE__` literal, so it stays in samples.
 
 ### Application accounting probes

@@ -35,20 +35,20 @@ MorphBastardModifier::~MorphBastardModifier()
         for (int i = 0; i < field_0x44; i++) {
             for (int j = 0; j < field_0x48[i].field_0x00; j++) {
                 for (int k = 0; k < field_0x48[i].field_0x04[j].field_0x4c; k++) {
-                    operator delete(field_0x48[i].field_0x04[j].field_0x50[k].field_0x08, __FILE__, 28);
-                    operator delete(field_0x48[i].field_0x04[j].field_0x50[k].field_0x0c, __FILE__, 29);
-                    operator delete(field_0x48[i].field_0x04[j].field_0x50[k].field_0x10, __FILE__, 30);
+                    DebugFree(field_0x48[i].field_0x04[j].field_0x50[k].field_0x08, __FILE__, 28);
+                    DebugFree(field_0x48[i].field_0x04[j].field_0x50[k].field_0x0c, __FILE__, 29);
+                    DebugFree(field_0x48[i].field_0x04[j].field_0x50[k].field_0x10, __FILE__, 30);
                 }
-                operator delete(field_0x48[i].field_0x04[j].field_0x50, __FILE__, 32);
-                operator delete(field_0x48[i].field_0x04[j].field_0x48, __FILE__, 33);
+                DebugFree(field_0x48[i].field_0x04[j].field_0x50, __FILE__, 32);
+                DebugFree(field_0x48[i].field_0x04[j].field_0x48, __FILE__, 33);
             }
-            operator delete(field_0x48[i].field_0x04, __FILE__, 35);
+            DebugFree(field_0x48[i].field_0x04, __FILE__, 35);
         }
-        operator delete(field_0x48, __FILE__, 37);
+        DebugFree(field_0x48, __FILE__, 37);
     }
-    operator delete(field_0x4c, __FILE__, 40);
-    operator delete(field_0x50, __FILE__, 41);
-    operator delete(field_0x54, __FILE__, 42);
+    DebugFree(field_0x4c, __FILE__, 40);
+    DebugFree(field_0x50, __FILE__, 41);
+    DebugFree(field_0x54, __FILE__, 42);
     if (field_0x40) {
         delete field_0x40->field_0x10;
         delete field_0x40->field_0x14;

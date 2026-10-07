@@ -46,13 +46,13 @@ int UnknownTrackGameObject3410::UnknownFunction4aa360(char* buffer, unsigned int
         if (response->result != 0 || response->requestId != 1 ||
             memcmp(&response->property, &g_UnknownGuid556dd0, sizeof(GUID)) != 0 || response->dataSize > size) {
         failed:
-            operator delete(response, __FILE__, 118);
+            DebugFree(response, __FILE__, 118);
             return 0;
         }
         memcpy(buffer, response->data, response->dataSize);
         UnknownFunction520820("\nGot Preset from The Zone\n%s\n", response->data);
     }
-    operator delete(response, __FILE__, 114);
+    DebugFree(response, __FILE__, 114);
     return 1;
 }
 
@@ -85,12 +85,12 @@ int UnknownTrackGameObject3410::UnknownFunction4aa4e0(char* buffer, unsigned int
         if (response->result != 0 || response->requestId != 2 ||
             memcmp(&response->property, &g_UnknownGuid556de0, sizeof(GUID)) != 0 || response->dataSize > size) {
         failed:
-            operator delete(response, __FILE__, 198);
+            DebugFree(response, __FILE__, 198);
             return 0;
         }
         memcpy(buffer, response->data, response->dataSize);
         UnknownFunction520820("\nGot Rank# from The Zone\n%s\n", response->data);
     }
-    operator delete(response, __FILE__, 194);
+    DebugFree(response, __FILE__, 194);
     return 1;
 }

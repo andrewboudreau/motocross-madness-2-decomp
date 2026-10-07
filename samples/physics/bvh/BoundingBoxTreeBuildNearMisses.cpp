@@ -175,9 +175,9 @@ void GatherModelTriangles(TreeModelSource* model, TreeSceneNode* frame, int* tri
             corners[k] = remap[remap[corners[k]]];
     }
 
-    operator delete(remap, __FILE__, 0x376);
-    operator delete(positions, __FILE__, 0x377);
-    operator delete(keep, __FILE__, 0x378);
+    DebugFree(remap, __FILE__, 0x376);
+    DebugFree(positions, __FILE__, 0x377);
+    DebugFree(keep, __FILE__, 0x378);
     *verts = unique;
     *indices = corners;
     *vertCount = numUnique;
@@ -259,5 +259,5 @@ void BuildModelPointTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* mod
     for (i = 0; i < total; i++)
         TransformPoint(&points[i], points[i], &inverse);
     BuildPointNode(root, points, total);
-    operator delete(points, __FILE__, 0x48a);
+    DebugFree(points, __FILE__, 0x48a);
 }

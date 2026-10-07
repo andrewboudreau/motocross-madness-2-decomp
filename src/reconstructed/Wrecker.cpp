@@ -54,11 +54,11 @@ Wrecker::Wrecker(int flags) : GraphicsTest(flags) {
 }
 
 Wrecker::~Wrecker() {
-    if (field_0x104) operator delete(field_0x104, __FILE__, 0x3e);
-    if (field_0x108) operator delete(field_0x108, __FILE__, 0x40);
-    if (field_0x58) operator delete(field_0x58, __FILE__, 0x43);
-    if (field_0x50) operator delete(field_0x50, __FILE__, 0x45);
-    if (field_0x48) operator delete(field_0x48, __FILE__, 0x47);
+    if (field_0x104) DebugFree(field_0x104, __FILE__, 0x3e);
+    if (field_0x108) DebugFree(field_0x108, __FILE__, 0x40);
+    if (field_0x58) DebugFree(field_0x58, __FILE__, 0x43);
+    if (field_0x50) DebugFree(field_0x50, __FILE__, 0x45);
+    if (field_0x48) DebugFree(field_0x48, __FILE__, 0x47);
 }
 
 Wrecker* Wrecker::UnknownFunction530190(void* owner, UnknownWreckerCharacter* character, const char* name) {

@@ -134,13 +134,13 @@ UnknownParameterBlock::~UnknownParameterBlock()
 {
     UnknownFunction4b7890();
     if (field_0x120) {
-        operator delete(field_0x120, __FILE__, 141);
+        DebugFree(field_0x120, __FILE__, 141);
         field_0x120 = 0;
         field_0x118 = 0;
     }
     for (int i = 0; i < field_0x540; i++) {
         if (field_0x544[i].type == 2)
-            operator delete(field_0x544[i].s, __FILE__, 147);
+            DebugFree(field_0x544[i].s, __FILE__, 147);
         field_0x544[i].s = 0;
     }
     field_0x540 = 0;
@@ -203,7 +203,7 @@ int UnknownParameterBlock::UnknownFunction4b72c0(const char* name)
     field_0x12c = new (__FILE__, 285) char*[field_0x128];
     for (int i = 0; i < field_0x128; i++)
         field_0x12c[i] = lines[i];
-    operator delete(lines, __FILE__, 290);
+    DebugFree(lines, __FILE__, 290);
     field_0x530 = 0;
     return 1;
 }
@@ -262,7 +262,7 @@ void UnknownParameterBlock::UnknownFunction4b77a0(UnknownParameterStream* stream
     field_0x00c = 0;
     field_0x000 = stream;
     if (field_0x120) {
-        operator delete(field_0x120, __FILE__, 362);
+        DebugFree(field_0x120, __FILE__, 362);
         field_0x120 = 0;
         field_0x118 = 0;
     }
@@ -470,7 +470,7 @@ int UnknownParameterBlock::UnknownFunction4b8010(char* raw)
         return 0;
     for (int i = 0; i < field_0x540; i++) {
         if (field_0x544[i].type == 2)
-            operator delete(field_0x544[i].s, __FILE__, 802);
+            DebugFree(field_0x544[i].s, __FILE__, 802);
         field_0x544[i].s = 0;
     }
     field_0x000->UnknownFunction461aa0(line, PB_LINE_SIZE);

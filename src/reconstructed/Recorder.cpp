@@ -70,7 +70,7 @@ VCRInterface::~VCRInterface() {
     if (field_0xb0)
         delete field_0xb0;
     if (field_0x7c)
-        operator delete(field_0x7c, __FILE__, 442);
+        DebugFree(field_0x7c, __FILE__, 442);
 }
 
 // 0x004e7a00

@@ -27,7 +27,7 @@ SelectiveGravityModel::SelectiveGravityModel(int flags)
 SelectiveGravityModel::~SelectiveGravityModel()
 {
     if (bodies)
-        operator delete(bodies, __FILE__, 0x12);
+        DebugFree(bodies, __FILE__, 0x12);
 }
 
 // slot 27, 0x004f9820

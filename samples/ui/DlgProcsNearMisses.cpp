@@ -169,13 +169,13 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
             break;
         }
         if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abdf0(address, size, 8)) {
-            operator delete(address, __FILE__, 3843);
+            DebugFree(address, __FILE__, 3843);
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x85c);
             return;
         }
         event->field_0x0c->UnknownFunction46ff30(0xd);
         event->field_0x20 = 1;
-        operator delete(address, __FILE__, 3850);
+        DebugFree(address, __FILE__, 3850);
         break;
     }
     case 0xd9:
@@ -194,12 +194,12 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abdf0(address, size, 4)) {
             event->field_0x0c->UnknownFunction46ff30(0xf);
             event->field_0x20 = 1;
-            operator delete(address, __FILE__, 3874);
+            DebugFree(address, __FILE__, 3874);
             break;
         }
         event->field_0x0c->UnknownFunction46ff30(0xd);
         event->field_0x20 = 1;
-        operator delete(address, __FILE__, 3879);
+        DebugFree(address, __FILE__, 3879);
         break;
     case 0x104:
     case 0x105:
@@ -467,7 +467,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             g_UnknownGlobal56e26c->ui->field_0x4b0 = 1;
             if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abf10(DPSPGUID_IPX, "", "", 0, &address, &size) &&
                 g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abdf0(address, size, 1)) {
-                operator delete(address, __FILE__, 443);
+                DebugFree(address, __FILE__, 443);
                 g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x85c);
             }
         } else if (!_stricmp("ButTCP", event->field_0x04)) {
@@ -543,7 +543,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         if (event->field_0x00 == 0x3c) {
             if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abf10(DPSPGUID_TCPIP, "", "", 0, &address, &size) &&
                 g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abdf0(address, size, 2)) {
-                operator delete(address, __FILE__, 596);
+                DebugFree(address, __FILE__, 596);
                 g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x85c);
             }
         }

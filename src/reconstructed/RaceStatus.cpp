@@ -133,7 +133,7 @@ int UnknownFunction4e5ca0(UnknownEventRacerPart** list) {
             (*list)->field_0x04->field_0x744 = 0;
             UnknownEventRacerPart* status = *list;
             *list = status->field_0x50;
-            operator delete(status, __FILE__, 193);
+            DebugFree(status, __FILE__, 193);
         } else {
             list = &(*list)->field_0x50;
         }
@@ -146,7 +146,7 @@ int UnknownFunction4e5f10(UnknownEventRacerPart* list) {
     while (list) {
         UnknownEventRacerPart* status = list;
         list = list->field_0x50;
-        operator delete(status, __FILE__, 285);
+        DebugFree(status, __FILE__, 285);
     }
     return 0;
 }

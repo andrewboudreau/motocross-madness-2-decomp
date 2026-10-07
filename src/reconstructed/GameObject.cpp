@@ -44,7 +44,7 @@ GameObject::GameObject(int flags) {
 // 0x00468d60 (scalar deleting wrapper 0x00468d40)
 GameObject::~GameObject() {
     if (field_0x28)
-        operator delete(field_0x28, __FILE__, 40);
+        DebugFree(field_0x28, __FILE__, 40);
 }
 
 // 0x00469050

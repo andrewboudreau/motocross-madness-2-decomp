@@ -1,7 +1,7 @@
 {
   "??0TypeRegistry@@QAE@XZ": "0x004676a0",
   "??1TypeRegistry@@QAE@XZ": "0x00521e80",
-  "??3@YAXPAXPBDH@Z": "0x004a2e60",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?FindTypeId@TypeRegistry@@QAEDPBD@Z": "0x00521ea0",
   "?g_TypeRegistry@@3PAVTypeRegistry@@A": "0x00575744",

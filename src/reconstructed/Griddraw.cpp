@@ -178,14 +178,14 @@ int UnknownFunction47ecc0(void* owner)
     GridNodeDrawData* d = ((DrawableGridNode*)owner)->data;
     if (d->field_0x134) {
         g_gridDrawMemory -= d->field_0x140;
-        operator delete(d->field_0x134, __FILE__, 816);
+        DebugFree(d->field_0x134, __FILE__, 816);
         d->field_0x134 = 0;
         d->field_0x13c = 0;
         d->field_0x140 = 0;
     }
     if (d->field_0x138) {
         g_gridDrawMemory -= d->field_0x142;
-        operator delete(d->field_0x138, __FILE__, 823);
+        DebugFree(d->field_0x138, __FILE__, 823);
         d->field_0x138 = 0;
         d->field_0x13e = 0;
         d->field_0x142 = 0;
@@ -221,14 +221,14 @@ void DrawableGridNode::UnknownFunction47edb0(int recurse)
     }
     if (data->field_0x134) {
         g_gridDrawMemory -= data->field_0x140;
-        operator delete(data->field_0x134, __FILE__, 858);
+        DebugFree(data->field_0x134, __FILE__, 858);
         data->field_0x134 = 0;
         data->field_0x13c = 0;
         data->field_0x140 = 0;
     }
     if (data->field_0x138) {
         g_gridDrawMemory -= data->field_0x142;
-        operator delete(data->field_0x138, __FILE__, 865);
+        DebugFree(data->field_0x138, __FILE__, 865);
         data->field_0x138 = 0;
         data->field_0x13e = 0;
         data->field_0x142 = 0;
@@ -369,7 +369,7 @@ int DrawableGridNode::UnknownFunction47f840()
         if (data->field_0x134 == 0 || vertexBytes > data->field_0x140) {
             g_gridDrawMemory -= data->field_0x140;
             if (data->field_0x134)
-                operator delete(data->field_0x134, __FILE__, 1306);
+                DebugFree(data->field_0x134, __FILE__, 1306);
             data->field_0x140 = vertexBytes + 0x80;
             data->field_0x134 = DebugMalloc(data->field_0x140, __FILE__, 1309);
             if (data->field_0x134 == 0) {
@@ -385,7 +385,7 @@ int DrawableGridNode::UnknownFunction47f840()
         if (data->field_0x138 == 0 || indexBytes > data->field_0x142) {
             g_gridDrawMemory -= data->field_0x142;
             if (data->field_0x138)
-                operator delete(data->field_0x138, __FILE__, 1324);
+                DebugFree(data->field_0x138, __FILE__, 1324);
             data->field_0x142 = indexBytes + 0x20;
             data->field_0x138 = DebugMalloc(data->field_0x142, __FILE__, 1327);
             if (data->field_0x138 == 0) {
