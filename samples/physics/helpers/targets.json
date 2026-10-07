@@ -221,5 +221,95 @@
     "expect": "exact",
     "notes": "fills 0x5dafe0 (256 entries); the index is unsigned (jb)",
     "bindings": "FastMath.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "AxisSettle.cpp",
+    "candidate_symbol_contains": "?UnknownAxisSettle_4cb6e0@@",
+    "target_va": "0x004cb6e0",
+    "target_size": 1058,
+    "expect": "exact",
+    "notes": "cdecl per-axis settle of two accumulators (KrustyBike 0x495d51, SoulTreePhysics 0x50229f); own unit between PeakHold.cpp and PhysicsBody, followed by its Math3D.h vector set XCU 220-223; retail spells the x-axis sum b + c and the y/z sums c + b",
+    "bindings": "AxisSettle.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "AxisSettle.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004cbb10",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser jmp thunk (per-TU Math3D.h copy, XCU 220)",
+    "bindings": "AxisSettle.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "AxisSettle.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004cbb20",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser body: temporary copied to 0x00689980",
+    "bindings": "AxisSettle.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "AxisSettle.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004cbb60",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser jmp thunk (XCU 221)",
+    "bindings": "AxisSettle.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "AxisSettle.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004cbb70",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser body: temporary copied to 0x00689990",
+    "bindings": "AxisSettle.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "AxisSettle.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004cbbb0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser jmp thunk (XCU 222)",
+    "bindings": "AxisSettle.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "AxisSettle.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004cbbc0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser body: temporary copied to 0x006899a0",
+    "bindings": "AxisSettle.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "AxisSettle.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004cbc00",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser jmp thunk (XCU 223)",
+    "bindings": "AxisSettle.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "AxisSettle.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004cbc10",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser body: temporary copied to 0x00689970",
+    "bindings": "AxisSettle.bindings.json"
   }
 ]
