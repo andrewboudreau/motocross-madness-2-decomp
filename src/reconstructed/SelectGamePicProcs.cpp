@@ -632,7 +632,7 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             static_cast<UIRadioButton*>(FindControl("EventTab", 4))->SelectInGroup(0);
             ShowPage(0);
         }
-        field_0x118 = 0xfeb97a;
+        textColors[0] = 0xfeb97a;
         int connection = g_TrackGame->network->providerKind;
         char address[0x80];
         char line[0x80];
@@ -714,7 +714,7 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     field_0x7f58->UpdateBoundValues(1);
                 if (g_TrackGame->mode.field_0x27f8.field_0x08 == -1) {
                     ChoiceDlg* dialog = new(__FILE__, 0x6a4) ChoiceDlg;
-                    guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+                    guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
                     strcpy(prompt, "You must choose one of the following trial version tracks:\n"
                                    "Stunt Event: Donner Pass, or\n"
                                    "Nationals Race: A Voodoo Basin\n");
@@ -749,10 +749,10 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             RemoveLobbyPlayer(6);
         } else if (!_stricmp("Options", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 0x6d5) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, (UIDialog*)this, 0, 0, 1);
         } else if (!_stricmp("Joystick", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 0x6d8) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 1, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, (UIDialog*)this, 1, 0, 1);
         } else if (!_stricmp("Help", event->controlName)) {
             g_TrackGame->mode.OpenHelp("MCM2HELP", 0);
         }
@@ -1029,7 +1029,7 @@ int MPEventDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int
 // 0x004f6070
 void MPEventDlg::ShowHostSettings() {
     char text[0x80];
-    MultiPlayerDlg* parent = parentDialog;
+    MultiPlayerDlg* parent = static_cast<MultiPlayerDlg*>(parentDialog);
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
     list->RemoveAllRows();
     list->AddRow(parent->field_0x80d0, 0, 0);
@@ -1330,7 +1330,7 @@ void MPEventDlg::ApplyEventType() {
         list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
         list->SelectRowByText(g_TrackGame->mode.field_0x6f4[type]);
     } else {
-        MultiPlayerDlg* parent = parentDialog;
+        MultiPlayerDlg* parent = static_cast<MultiPlayerDlg*>(parentDialog);
         list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
         list->RemoveAllRows();
         list->AddRow(parent->field_0x80d0, 0, 0);
@@ -1472,7 +1472,7 @@ void MPBikeRiderDlg::UnknownFunction4f8650() {
         if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.field_0xfd8)->engineSize) >
                 g_TrackGame->mode.field_0x27f8.field_0x1c &&
             g_UnknownGlobal689df4)
-            parentDialog->UnknownFunction4f57c0(1);
+            static_cast<MultiPlayerDlg*>(parentDialog)->UnknownFunction4f57c0(1);
     }
 }
 

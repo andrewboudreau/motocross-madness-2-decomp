@@ -5,11 +5,10 @@
 // implements it. This is the object Camera keeps at +0x18. The code sits just
 // before ResourceManager.cpp references; RenderTarget.cpp is not attested.
 
+#include "CameraRect.h"
 #include "Display.h"
 
 class Camera;
-
-struct CameraRect { int left; int top; int right; int bottom; };
 
 class RenderTarget {
 public:

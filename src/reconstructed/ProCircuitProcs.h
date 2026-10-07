@@ -68,10 +68,6 @@ class PCBonusTrackDlg : public UIDialog {
 public:
     PCBonusTrackDlg() : UIDialog(1, "PCDeal.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d9cd0
-
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: PCBailoutDlg : UIDialog (vtable 0x005573b0; 0x7f64 bytes): offers
@@ -81,9 +77,6 @@ public:
     PCBailoutDlg() : UIDialog(1, "PCDeal.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d8fc0
 
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
     int entryFee;                             // +0x7f58: the entry fee
     int playerCash;                           // +0x7f5c: the player's cash
     int cashShortfall;                        // +0x7f60: the difference
@@ -95,10 +88,6 @@ class PCFinishedDlg : public UIDialog {
 public:
     PCFinishedDlg() : UIDialog(1, "PCFinish.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d94e0
-
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: PCBunnyDlg : UIDialog (vtable 0x0055732c; 0x7f64 bytes).
@@ -107,9 +96,6 @@ public:
     PCBunnyDlg() : UIDialog(1, "PCDeal.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d9860
 
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
     int field_0x7f58;                         // the entry fee
     int field_0x7f5c;                         // the player's cash
     int field_0x7f60;                         // what accepting adds
@@ -120,10 +106,6 @@ class PCFailedDlg : public UIDialog {
 public:
     PCFailedDlg() : UIDialog(1, "PCTrans.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d9340
-
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: PCLastRaceDlg : UIDialog (vtable 0x00554a90): the last race's
@@ -133,10 +115,6 @@ public:
     PCLastRaceDlg() : UIDialog(1, "PCLRace.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d8660
     void PayOutRace();             // 0x004d8c40: pays out the race
-
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: PCCompleteDlg : UIDialog (vtable 0x00557014; 0x7f58 bytes).
@@ -144,10 +122,6 @@ class PCCompleteDlg : public UIDialog {
 public:
     PCCompleteDlg() : UIDialog(1, "PCTrans.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004da1b0
-
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: PCNewEventDlg : UIDialog (vtable 0x00556f90; 0x7f58 bytes).
@@ -155,10 +129,6 @@ class PCNewEventDlg : public UIDialog {
 public:
     PCNewEventDlg() : UIDialog(1, "PCTrans.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d9fd0
-
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: PCCentralNextDlg : UIDialog (vtable 0x0055711c; 0x7f58 bytes): the
@@ -167,8 +137,6 @@ class PCCentralNextDlg : public UIDialog {
 public:
     PCCentralNextDlg() : UIDialog(1, "PCCNext.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d7f40
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: PCCentralBikeRiderDlg : UIDialog (vtable 0x005571a0; 0x7f9c bytes):
@@ -190,12 +158,6 @@ public:
     void ApplyChosenRider();             // 0x004d78c0: takes the chosen rider
     void ApplyChosenBike();             // 0x004d7900: applies the chosen bike
 
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    GUIUser* guiUser;                         // +0x34
-    unsigned char field_0x38[0x110 - 0x38];
-    BackgroundImage* dialogBackground;        // +0x110
-    unsigned char field_0x114[0x7f58 - 0x114];
     Vector3 field_0x7f58;                     // the bike view's eye
     Vector3 field_0x7f64;                     // and target
     float field_0x7f70;                       // their distance
@@ -214,8 +176,6 @@ class PCCentralStandingsDlg : public UIDialog {
 public:
     PCCentralStandingsDlg() : UIDialog(1, "PCCStand.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d8380
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: PCCentralDlg : UIDialog (vtable 0x00554a0c; 0x7f64 bytes): the
@@ -226,9 +186,6 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d5f70
     void OpenPage(int page);     // 0x004d6570: opens page `page` (0..2)
 
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
     PCCentralNextDlg* field_0x7f58;
     PCCentralBikeRiderDlg* field_0x7f5c;
     PCCentralStandingsDlg* field_0x7f60;
@@ -243,9 +200,6 @@ public:
     // 0x004d5f40: where the answers go.
     void SetAnswerTargets(char* name, int* difficulty, int* bikeClass, int* opponents);
 
-    unsigned char field_0x2c[0x34 - 0x2c];
-    GUIUser* guiUser;                         // +0x34
-    unsigned char field_0x38[0x7f58 - 0x38];
     char* field_0x7f58;                       // name (64 bytes)
     int* field_0x7f5c;                        // "RadLODEasy" group
     int* field_0x7f60;                        // "RadClass125" group
@@ -264,9 +218,6 @@ public:
     void AddCircuitRow(UnknownTrackGameObject3444* circuit, int row);
     void FreeFileNames();             // 0x004d5ca0: frees the file names
 
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
     char** field_0x7f58;                      // career file names
     int field_0x7f5c;                         // their count
     char field_0x7f60[0x100];                 // new career's name

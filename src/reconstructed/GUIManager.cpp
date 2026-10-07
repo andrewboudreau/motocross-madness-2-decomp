@@ -269,7 +269,7 @@ int GUIManager::UnknownVirtualSlot15() {
 }
 
 // 0x00485bd0
-void GUIManager::UnknownFunction485bd0(UnknownGuiDialog* dialog, int a, int wait) {
+void GUIManager::UnknownFunction485bd0(UIDialog* dialog, int a, int wait) {
     int visible = dialog->field_0x25_bit0;
 
     dialog->UnknownFunction46ea60(0);
@@ -278,7 +278,7 @@ void GUIManager::UnknownFunction485bd0(UnknownGuiDialog* dialog, int a, int wait
     else
         dialogContainer->AppendChild(dialog, -1);
     dialog->UnknownVirtualSlot28(a);
-    dialog->field_0xc8 = field_0xec;
+    dialog->animatesControls = field_0xec;
     if (guiBackground)
         guiBackground->UnknownFunction404da0();
     if (wait)
@@ -286,6 +286,19 @@ void GUIManager::UnknownFunction485bd0(UnknownGuiDialog* dialog, int a, int wait
     if (field_0x1f0)
         waitFrames = 3;
     dialog->UnknownFunction46ea60(visible);
+}
+
+// 0x00485c80: opens `resource` as a plain UIDialog (0x7f58 bytes) with the
+// GUI's sound group, textures and directory, in Arial 14.
+int GUIManager::OpenDialogResource(const char* resource) {
+    CloseDialogResource();
+    openedDialog = new(__FILE__, 523) UIDialog(0, resource);
+    if (openedDialog) {
+        openedDialog->UnknownVirtualSlot27(field_0x18, 0, 0, 0, guiSoundGroup, guiTextures, dialogDirectory, 0, 0, "Arial",
+                                         14, 0, 0, 0);
+        return 1;
+    }
+    return 0;
 }
 
 // 0x00485d50
@@ -306,15 +319,15 @@ void GUIManager::UnknownFunction485d70(const char* directory) {
 }
 
 // 0x00485df0
-UnknownGuiDialog* GUIManager::FindInputDialog() {
-    UnknownGuiDialog* found = 0;
-    UnknownGuiDialog* dialog;
+UIDialog* GUIManager::FindInputDialog() {
+    UIDialog* found = 0;
+    UIDialog* dialog;
     GameObjectIterator iterator(this, 1, "UIDialog");
 
-    while ((dialog = (UnknownGuiDialog*)iterator.Next()) != 0) {
+    while ((dialog = (UIDialog*)iterator.Next()) != 0) {
         if (!found)
             found = dialog;
-        if (mouseDevice && PtInRect(&dialog->screenArea, mouseDevice->pointerPosition))
+        if (mouseDevice && PtInRect((RECT*)&dialog->screenArea, mouseDevice->pointerPosition))
             found = dialog;
         if (dialog->field_0x148)
             found = dialog;
@@ -323,9 +336,9 @@ UnknownGuiDialog* GUIManager::FindInputDialog() {
 }
 
 // 0x00485ec0
-int GUIManager::FindSectionObject(int value) {
+Sound* GUIManager::FindSectionObject(const char* name) {
     if (openedDialog)
-        return openedDialog->FindSectionObject(value);
+        return openedDialog->FindSectionObject(name);
     return 0;
 }
 
@@ -353,7 +366,7 @@ void GUIManager::CreateBackground() {
 
 // 0x00485fc0
 void GUIManager::ReleaseBackground() {
-    UnknownGuiDialog* dialog;
+    UIDialog* dialog;
     int i;
 
     if (!ownsBackground)
@@ -364,7 +377,7 @@ void GUIManager::ReleaseBackground() {
     guiBackground = 0;
     UnknownFunction4865e0(0, 0);
     GameObjectIterator iterator(this, 1, "UIDialog");
-    while ((dialog = (UnknownGuiDialog*)iterator.Next()) != 0)
+    while ((dialog = (UIDialog*)iterator.Next()) != 0)
         dialog->UnknownFunction46ffd0(0);
     for (i = 0; i < userCount; i++)
         GetUser(i)->CreateToolTip(field_0x18, this);

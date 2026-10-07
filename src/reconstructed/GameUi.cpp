@@ -51,7 +51,7 @@ static inline int UnknownMaxInt(int a, int b) { return a < b ? b : a; }
 // cdecl 0x0047b570: resizes a DebugMalloc'd block (KrustyUI.cpp).
 void* UnknownFunction47b570(void* block, unsigned int size);
 // 0x0065b608: the dialog whose list box is being sorted (0x00477900).
-UnknownGameUiDialog* g_UnknownGlobal65b608;
+UIDialog* g_UnknownGlobal65b608;
 // 0x0065b60c: the frames of the zoom transition (UIControl slot 41).
 int g_UnknownGlobal65b60c;
 
@@ -63,99 +63,6 @@ int UnknownFunction477800(const void* a, const void* b);
 // cdecl 0x0047b490: whether `texture` has a pixel of colour `key`
 // (samples/ui/GameUiNearMisses.cpp).
 int UnknownFunction47b490(TextureMap* texture, int key);
-
-// One .dtm section of a dialog (0x3c bytes; the table is at UIDialog+0x9cc):
-// its name and the control, image or sound built for it
-// (UIDialog::FindSectionObject).
-struct UnknownGameUiSection {
-    char sectionName[0x34];                   // +0x00
-    Sound* sectionObject;                     // +0x34 (typed as the sound case)
-    int field_0x38;
-};
-
-// A dialog as its controls see it: UIDialog (0x7f58 bytes) with the
-// members read here. Never constructed as such.
-class UnknownGameUiDialog : public UIDialog {
-public:
-    // 0x0046a300: creates the controls from the resource; this, or 0 when it fails.
-    virtual UnknownGameUiDialog* UnknownVirtualSlot27(void* target, CameraRect* area, int a, int flags,
-                                                      SoundGroup* sound, void* textures, const char* directory,
-                                                      UnknownGameUiDialog* parent, BackgroundImage* background,
-                                                      const char* font, int fontSize, GUIManager* gui,
-                                                      GUIUser* user, const char* name);
-    virtual void UnknownVirtualSlot28(int value); // 0x0046e8c0
-    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00470020: the dialog's procedure
-    virtual void UnknownVirtualSlot30();      // 0x00470040
-    virtual void UnknownVirtualSlot31(int value); // 0x00470050
-
-    void* UnknownInlineField18() { return field_0x18; }
-
-    UnknownGameUiDialog* parentDialog;        // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    GUIUser* guiUser;                         // +0x34
-    char resourceName[0x80];                  // +0x38: the dialog resource's name
-    UnknownTextureStream* resourceArchive;    // +0xb8: its archive (slot 27)
-    int isShown;                              // +0xbc
-    int field_0xc0;
-    int field_0xc4;
-    int animatesControls;                     // +0xc8: animates its controls
-    void (*field_0xcc)(UnknownDialogEvent* event); // the procedure (slot 29)
-    void (*field_0xd0)(UIDialog* dialog, int value); // slot 31
-    void (*field_0xd4)();                     // slot 30
-    void* dialogFont;                         // +0xd8
-    int dialogFontHeight;                     // +0xdc
-    char dialogFontFace[0x108 - 0xe0];        // +0xe0
-    int field_0x108;
-    int field_0x10c;
-    BackgroundImage* dialogBackground;        // +0x110
-    SoundGroup* soundGroup;                   // +0x114
-    unsigned int textColors[10];              // +0x118: the text colors "~0".."~9" select
-    void* dialogPalette;                      // +0x140
-    int field_0x144;
-    int field_0x148;
-    int field_0x14c;
-    unsigned char field_0x150[0x154 - 0x150];
-    int field_0x154;
-    int scaleToScreen;                        // +0x158: scales to the screen (not "NoScale")
-    int isPopup;                              // +0x15c: "Popup"
-    CameraRect screenArea;                    // +0x160
-    int popupAlignment;                       // +0x170: a popup's alignment ("DlgAlignV" | "DlgAlignH"); 9 otherwise
-    int screenWidth;                          // +0x174: "ScreenWidth"; where controls slide in from (x)
-    int screenHeight;                         // +0x178: "ScreenHeight"; (y)
-    int dialogResult;                         // +0x17c
-    int field_0x180;
-    unsigned char field_0x184[0x18c - 0x184];
-    UIAnim* imageTable[500];                  // +0x18c: the "Set_Anim" sections' images
-    UnknownCursorAnimation* cursorAnimation;  // +0x95c: the cursor over it
-    Sound* soundTable[20];                    // +0x960: the "Set_Sound" sections' sounds
-    int imageCount;                           // +0x9b0
-    int soundCount;                           // +0x9b4
-    PCTextureMap* parentBackground;           // +0x9b8: the parent's background image ("BackgroundFile")
-    UIListBox* sortingList;                   // +0x9bc: the list box being sorted
-    float lastFrameTime;                      // +0x9c0
-    float scaleX;                             // +0x9c4: horizontal scale
-    float scaleY;                             // +0x9c8: vertical scale
-    UnknownGameUiSection sectionTable[500]; // +0x9cc
-    int sectionCount;                         // +0x7efc
-    void* field_0x7f00;
-    void* field_0x7f04;
-    unsigned char field_0x7f08[0x7f0c - 0x7f08];
-    int ownsPalette;                          // +0x7f0c: owns the palette +0x140
-    int ownsBackground;                       // +0x7f10: has its own background image
-    unsigned char field_0x7f14[0x7f18 - 0x7f14];
-    int field_0x7f18;
-    int joystickCentred;                      // +0x7f1c: the joystick is centred
-    void* dialogTextures;                     // +0x7f20
-    ContainerList<UITimer*> timerList;        // +0x7f24
-    unsigned char field_0x7f38[0x7f3c - 0x7f38];
-    GameObject* controlContainer;             // +0x7f3c: the controls' container
-    int sendFrameEvent;                       // +0x7f40: sends kind 0x12 on the next frame
-    PCTextureMap* screenGrab;                 // +0x7f44: the screen behind it
-    int grabRegion;                           // +0x7f48
-    int field_0x7f4c;
-    int isClosing;                            // +0x7f50
-    int closeFrame;                           // +0x7f54: the frame it closed on
-};
 
 // ---------------------------------------------------------------------------
 // UICtlContainer
@@ -416,7 +323,7 @@ void UIButton::SetSortList(UIListBox* list) {
 // UIStatic
 
 // 0x00478f60
-UIStatic::UIStatic(int id, CameraRect* area, UnknownGameUiDialog* owner)
+UIStatic::UIStatic(int id, CameraRect* area, UIDialog* owner)
     : UIControl(5, id, area, owner) {
 }
 
@@ -518,7 +425,7 @@ void UIControl::UnknownVirtualSlot57(int a, int* position) {
         UnknownVirtualSlot50();
         int width = UnknownVirtualSlot61();
         int height = UnknownVirtualSlot62();
-        UnknownGameUiDialog* owner = ownerDialog;
+        UIDialog* owner = ownerDialog;
         field_0x3c[0] = position[0] - owner->screenArea.left;
         field_0x3c[2] = field_0x3c[0] + width;
         field_0x3c[1] = position[1] - owner->screenArea.top;
@@ -614,7 +521,7 @@ void UIControl::UnknownVirtualSlot64(CameraRect* in, CameraRect* out) {
 // UIButton (continued)
 
 // 0x004731f0
-UIButton::UIButton(int id, CameraRect* area, UnknownGameUiDialog* owner)
+UIButton::UIButton(int id, CameraRect* area, UIDialog* owner)
     : UIControl(1, id, area, owner) {
     field_0x1ec = 0;
     UnknownFunction4732d0(0, 0, 0, 0);
@@ -649,7 +556,7 @@ int UIButton::UnknownVirtualSlot56(int a, int* position) {
 // UIEditBox
 
 // 0x00473630
-UIEditBox::UIEditBox(int id, CameraRect* area, UnknownGameUiDialog* owner, int size, int a, int b)
+UIEditBox::UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a, int b)
     : UIControl(0xb, id, area, owner) {
     char* text = controlText;
     if (!text) {
@@ -767,7 +674,7 @@ int UIEditBox::UnknownVirtualSlot55(int a, int b) {
 // UIScrollCtl
 
 // 0x00474820
-UIScrollCtl::UIScrollCtl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner)
+UIScrollCtl::UIScrollCtl(int type, int id, CameraRect* area, UIDialog* owner)
     : UIButton(id, area, owner) {
     controlType = type;
 }
@@ -798,7 +705,7 @@ int UIScrollCtl::UnknownVirtualSlot56(int a, int* position) {
 // UIScrollBar
 
 // 0x00474ba0
-UIScrollBar::UIScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog* owner)
+UIScrollBar::UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner)
     : UIControl(type, id, area, owner) {
     field_0x1ec = 0;
     field_0x1f0 = 0;
@@ -831,7 +738,7 @@ void UIScrollBar::UnknownVirtualSlot59(int value) {
 
 // 0x00475160
 void UIScrollBar::UnknownFunction475160(int state) {
-    UnknownGameUiDialog* owner = ownerDialog;
+    UIDialog* owner = ownerDialog;
     thumbWidth = (int)(stateImages[state]->frameList[0]->frameWidth * owner->scaleX);
     thumbHeight = (int)(stateImages[state]->frameList[0]->frameHeight * owner->scaleY);
 }
@@ -1124,7 +1031,7 @@ void UIListBox::UnknownVirtualSlot29(int state) {
 // UIMultiState
 
 // 0x004781f0
-UIMultiState::UIMultiState(int id, CameraRect* area, UnknownGameUiDialog* owner)
+UIMultiState::UIMultiState(int id, CameraRect* area, UIDialog* owner)
     : UIControl(2, id, area, owner) {
     stateCount = 0;
     selectedState = 0;
@@ -1259,7 +1166,7 @@ void UIMultiState::SelectNextState() {
 // UIStaticText
 
 // 0x00478ff0
-UIStaticText::UIStaticText(int id, CameraRect* area, UnknownGameUiDialog* owner, const char* text,
+UIStaticText::UIStaticText(int id, CameraRect* area, UIDialog* owner, const char* text,
                            unsigned int color)
     : UIControl(0xc, id, area, owner) {
     textColor = color;
@@ -1320,7 +1227,7 @@ int UIStaticText::UnknownVirtualSlot55(int a, int b) {
 // UIRadioButton
 
 // 0x00479240
-UIRadioButton::UIRadioButton(int id, CameraRect* area, UnknownGameUiDialog* owner)
+UIRadioButton::UIRadioButton(int id, CameraRect* area, UIDialog* owner)
     : UIMultiState(id, area, owner) {
     AppendClassName(this);
     controlType = 4;
@@ -1347,7 +1254,7 @@ int UIRadioButton::UnknownVirtualSlot53() {
 // The drop-down list's parts
 
 // 0x00479640
-UIDDLScrollBar::UIDDLScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog* owner,
+UIDDLScrollBar::UIDDLScrollBar(int type, int id, CameraRect* area, UIDialog* owner,
                                UIDropDownList* list)
     : UIScrollBar(type, id, area, owner) {
     ownerList = list;
@@ -1362,7 +1269,7 @@ void UIDDLScrollBar::UnknownVirtualSlot33(int value) {
 }
 
 // 0x00479b50
-UIDDLStatic::UIDDLStatic(int id, CameraRect* area, UnknownGameUiDialog* owner, UIDropDownList* list)
+UIDDLStatic::UIDDLStatic(int id, CameraRect* area, UIDialog* owner, UIDropDownList* list)
     : UIStatic(id, area, owner), ownerList(list) {
     AppendClassName(this);
 }
@@ -1375,7 +1282,7 @@ void UIDDLStatic::UnknownVirtualSlot33(int value) {
 }
 
 // 0x00479bf0
-UIDDLButton::UIDDLButton(int id, CameraRect* area, UnknownGameUiDialog* owner, UIDropDownList* list)
+UIDDLButton::UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownList* list)
     : UIButton(id, area, owner), ownerList(list) {
     AppendClassName(this);
 }
@@ -1396,7 +1303,7 @@ void UIDDLButton::UnknownVirtualSlot33(int value) {
 }
 
 // 0x00479d10
-UIDDLListBox::UIDDLListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* owner,
+UIDDLListBox::UIDDLListBox(int id, int rows, CameraRect* area, UIDialog* owner,
                            UIDropDownList* list)
     : UIListBox(id, rows, area, owner) {
     ownerList = list;
@@ -1422,7 +1329,7 @@ void UIDDLListBox::UnknownVirtualSlot33(int value) {
 // UIDropDownList
 
 // 0x00479ea0
-UIDropDownList::UIDropDownList(int id, CameraRect* area, UnknownGameUiDialog* owner, const char* text,
+UIDropDownList::UIDropDownList(int id, CameraRect* area, UIDialog* owner, const char* text,
                                unsigned int color)
     : UIStaticText(id, area, owner, text, color) {
     AppendClassName(this);
@@ -1577,28 +1484,137 @@ void* UnknownFunction47b570(void* block, unsigned int size) {
 // ---------------------------------------------------------------------------
 // UIDialog
 
+// 0x00469db0: `resource` is the .dtm the dialog is built from.
+UIDialog::UIDialog(int flags, const char* resource) : GameObject(flags) {
+    AppendClassName(this);
+    if (resource)
+        strcpy(resourceName, resource);
+    else
+        strcpy(resourceName, "");
+    parentDialog = 0;
+    guiManager = 0;
+    dialogResult = 0;
+    dialogFont = 0;
+    field_0x108 = 0;
+    field_0x10c = 0;
+    dialogFontFace[0] = 0;
+    screenWidth = 640;
+    screenHeight = 480;
+    isShown = 1;
+    openingMenu = 0;
+    field_0xcc = 0;
+    field_0xd0 = 0;
+    field_0xd4 = 0;
+    cursorAnimation = 0;
+    field_0x184 = 0;
+    field_0x188 = 0;
+    imageCount = 0;
+    soundCount = 0;
+    dialogTextures = 0;
+    dialogBackground = 0;
+    soundGroup = 0;
+    field_0x7f14 = 0;
+    field_0xc0 = 0;
+    field_0x148 = 0;
+    for (int i = 0; i < 10; i++)
+        textColors[i] = 0xffffff;
+    scaleY = 1.0f;
+    scaleX = 1.0f;
+    dialogPalette = 0;
+    ownsPalette = 0;
+    parentBackground = 0;
+    ownsBackground = 0;
+    scaleToScreen = 1;
+    isPopup = 0;
+    popupAlignment = 0x12;
+    field_0x180 = 7;
+    animatesControls = 1;
+    memset(sectionTable, 0, sizeof(sectionTable));
+    sectionCount = 0;
+    field_0x154 = 1;
+    lastFrameTime = 0.0f;
+    field_0x7f18 = 1;
+    timerList.Init(2, 1);
+    joystickCentred = 1;
+    guiUser = 0;
+    resourceArchive = 0;
+    controlContainer = 0;
+    field_0x14c = 0;
+    screenGrab = 0;
+    field_0x144 = 0;
+    isClosing = 0;
+    grabRegion = -1;
+}
+
+// 0x0046a070 (deleting wrapper 0x00469ff0): tells the GUI, releases the
+// images, the palette and background it owns, and the timers.
+UIDialog::~UIDialog() {
+    if (guiManager) {
+        if (field_0x148)
+            guiManager->UnknownFunction485ee0(field_0x14c);
+        if (g_TrackGame->renderTarget->field_0x28 == 8) {
+            if (!guiManager || !guiManager->UnknownFunction4864f0())
+                guiManager->UnknownFunction464e90();
+        }
+        if (field_0x148 && parentDialog)
+            parentDialog->UnknownFunction470070(0, 0, 0);
+        if ((field_0x144 & 4) && (field_0x144 & 0x10))
+            guiManager->ReleaseBackgroundGrab();
+    }
+    if (dialogBackground && !g_TrackGame->field_0x2d5_bit1)
+        dialogBackground->UnknownFunction404da0();
+    if (parentDialog) {
+        if (parentDialog->dialogPalette && parentDialog->dialogPalette != dialogPalette &&
+            parentDialog->guiManager && !parentDialog->guiManager->UnknownFunction4864f0())
+            parentDialog->guiManager->UnknownFunction486150((Palette8*)parentDialog->dialogPalette);
+        if (field_0x154)
+            NotifyParent(dialogResult, 9);
+    }
+    if (dialogFont)
+        DeleteObject((HGDIOBJ)dialogFont);
+    if (imageCount) {
+        for (int i = 0; i < imageCount; i++) {
+            if (imageTable[i])
+                imageTable[i]->Release();
+        }
+    }
+    if (!g_TrackGame->field_0x2d5_bit1 && g_UnknownResourceManager572b44 && resourceArchive)
+        g_UnknownResourceManager572b44->UnknownFunction4e9830(resourceArchive);
+    if ((ownsPalette && dialogPalette && !parentDialog) ||
+        (dialogPalette && parentDialog && parentDialog->dialogPalette != dialogPalette))
+        ((Palette8*)dialogPalette)->Release();
+    if (!g_TrackGame->field_0x2d5_bit1 && ownsBackground && parentBackground) {
+        dialogBackground->field_0x2c->Release();
+        dialogBackground->SetImage(parentBackground);
+    }
+    if (!g_TrackGame->field_0x2d5_bit1 && parentDialog && parentDialog->dialogBackground)
+        parentDialog->dialogBackground->UnknownFunction404da0();
+    int i = 0;
+    UITimer* timer;
+    while ((timer = timerList.Get(i++)) != 0)
+        timer->Release();
+}
+
 // 0x0046a010
 int UIDialog::Release() {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     UnknownDialogEvent event;
     event.handled = 0;
     UpdateBoundValues(1);
-    dialog->UnknownVirtualSlot31(1);
-    event.gui = (GUIManager*)dialog->guiManager;
+    UnknownVirtualSlot31(1);
+    event.gui = guiManager;
     event.kind = kDialogClose;
     event.code = 0;
     event.controlName = 0;
     event.dialog = this;
     event.control = 0;
-    dialog->UnknownVirtualSlot29(&event);
+    UnknownVirtualSlot29(&event);
     return GameObject::Release();
 }
 
 // 0x0046a780
 int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     if (event->kind && (unsigned int)event->control < 0x20)
-        dialog->guiUser->field_0x3c[event->control] = 1;
+        guiUser->field_0x3c[event->control] = 1;
     if (!field_0x25_bit2) {
         if (event->kind == 1)
             UnknownFunction46f120();
@@ -1609,9 +1625,8 @@ int UIDialog::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
 
 // 0x0046a7d0
 int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     if (event->kind && (unsigned int)event->control < 0x20)
-        dialog->guiUser->field_0x3c[event->control] = 0;
+        guiUser->field_0x3c[event->control] = 0;
     if (!field_0x25_bit2) {
         if (event->kind == 1)
             UnknownFunction46f120();
@@ -1626,15 +1641,14 @@ int UIDialog::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry
 
 // 0x0046a840
 UIControl* UIDialog::UnknownFunction46a840(UIControl* control, int group, int region) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     if (control) {
         control->UnknownInlineSetField18(field_0x18);
-        control->post3D = dialog->field_0x7f18;
-        control->ownerGui = dialog->guiManager;
+        control->post3D = field_0x7f18;
+        control->ownerGui = guiManager;
         control->groupId = group;
-        control->fontHeight = dialog->dialogFontHeight;
-        if (dialog->dialogBackground)
-            control->backgroundRegion = dialog->dialogBackground->UnknownFunction4040f0(region);
+        control->fontHeight = dialogFontHeight;
+        if (dialogBackground)
+            control->backgroundRegion = dialogBackground->UnknownFunction4040f0(region);
         return control;
     }
     return 0;
@@ -1644,7 +1658,7 @@ UIControl* UIDialog::UnknownFunction46a840(UIControl* control, int group, int re
 GameObject* UIDialog::AddControl(GameObject* control, int a, int b) {
     if (control) {
         UnknownFunction46a840((UIControl*)control, a, b);
-        ((UnknownGameUiDialog*)this)->controlContainer->AppendChild(control, -1);
+        controlContainer->AppendChild(control, -1);
         return control;
     }
     return 0;
@@ -1652,21 +1666,20 @@ GameObject* UIDialog::AddControl(GameObject* control, int a, int b) {
 
 // 0x0046e9a0
 Sound* UIDialog::FindSectionObject(const char* name) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     if (!name)
         return 0;
-    for (int i = 0; i < dialog->sectionCount; i++) {
-        if (!_stricmp(name, dialog->sectionTable[i].sectionName))
-            return dialog->sectionTable[i].sectionObject;
+    for (int i = 0; i < sectionCount; i++) {
+        if (!_stricmp(name, sectionTable[i].sectionName))
+            return sectionTable[i].sectionObject;
     }
-    if (dialog->guiManager)
-        return (Sound*)dialog->guiManager->FindSectionObject((int)name);
+    if (guiManager)
+        return guiManager->FindSectionObject(name);
     return 0;
 }
 
 // 0x0046ea60
 void UIDialog::UnknownFunction46ea60(int value) {
-    ((UnknownGameUiDialog*)this)->isShown = value;
+    isShown = value;
     if (value)
         GameObject::UnknownVirtualSlot5();
     else
@@ -1675,21 +1688,20 @@ void UIDialog::UnknownFunction46ea60(int value) {
 
 // 0x0046eb30
 void UIDialog::ShowGroup(int id, int value) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
-    GameObjectIterator iterator(dialog->controlContainer, 1, "UIControl");
+    GameObjectIterator iterator(controlContainer, 1, "UIControl");
     UIControl* control;
     while ((control = (UIControl*)iterator.Next()) != 0) {
         if (control->groupId == id)
             control->Show(value, 1);
     }
-    if (!value && dialog->dialogBackground)
-        dialog->dialogBackground->UnknownFunction404da0();
+    if (!value && dialogBackground)
+        dialogBackground->UnknownFunction404da0();
 }
 
 // 0x0046ebf0
 UIControl* UIDialog::FindControl(const char* name, int flags) {
     UIControl* found = 0;
-    GameObjectIterator iterator(((UnknownGameUiDialog*)this)->controlContainer, 1, "UIControl");
+    GameObjectIterator iterator(controlContainer, 1, "UIControl");
     UIControl* control = (UIControl*)iterator.Next();
     while (control) {
         if (!_stricmp(control->GetName(), name)) {
@@ -1704,36 +1716,35 @@ UIControl* UIDialog::FindControl(const char* name, int flags) {
 
 // 0x0046ecc0
 void UIDialog::UpdateBoundValues(int value) {
-    GameObjectIterator iterator(((UnknownGameUiDialog*)this)->controlContainer, 1, "UIControl");
+    GameObjectIterator iterator(controlContainer, 1, "UIControl");
     UIControl* control;
     while ((control = (UIControl*)iterator.Next()) != 0) {
         if (control->boundValue)
             control->UnknownVirtualSlot59(value);
     }
-    ((UnknownGameUiDialog*)this)->UnknownVirtualSlot31(value);
+    UnknownVirtualSlot31(value);
 }
 
 // 0x0046f1c0
 int UIDialog::UnknownVirtualSlot13() {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     if (!field_0x25_bit2) {
-        GameObjectIterator iterator(dialog->controlContainer, 1, "UIControl");
-        if (dialog->dialogBackground) {
+        GameObjectIterator iterator(controlContainer, 1, "UIControl");
+        if (dialogBackground) {
             UIControl* control;
             while ((control = (UIControl*)iterator.Next()) != 0) {
                 if (control->backgroundRegion >= 0 && (!control->needsRedraw || control->redrawFrames))
-                    dialog->dialogBackground->UnknownFunction404240(control->backgroundRegion,
+                    dialogBackground->UnknownFunction404240(control->backgroundRegion,
                                                                (CameraRect*)&control->field_0x2c);
             }
         }
         GameObject::UnknownVirtualSlot13();
-    } else if (dialog->screenGrab && !dialog->field_0x7f18) {
-        if (dialog->dialogBackground)
-            dialog->dialogBackground->UnknownFunction404480(dialog->screenGrab, &dialog->screenArea, 0, 0x1000000,
-                                                       dialog->grabRegion, 1, &dialog->field_0x7f4c, 0);
+    } else if (screenGrab && !field_0x7f18) {
+        if (dialogBackground)
+            dialogBackground->UnknownFunction404480(screenGrab, &screenArea, 0, 0x1000000,
+                                                       grabRegion, 1, &field_0x7f4c, 0);
         else
-            ((RenderTarget*)dialog->UnknownInlineField18())->UnknownVirtualSlot3(&dialog->screenArea,
-                                                                                 dialog->screenGrab, 0, 0x1000000);
+            ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
+                                                                                 screenGrab, 0, 0x1000000);
     }
     return 1;
 }
@@ -1747,18 +1758,17 @@ int UIDialog::UnknownVirtualSlot14() {
 
 // 0x0046f320
 int UIDialog::UnknownVirtualSlot15() {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     if (!field_0x25_bit2) {
         GameObject::UnknownVirtualSlot15();
-    } else if (dialog->screenGrab && dialog->field_0x7f18) {
-        if (dialog->dialogBackground)
-            dialog->dialogBackground->UnknownFunction404480(dialog->screenGrab, &dialog->screenArea, 0, 0x1000000,
-                                                       dialog->grabRegion, 1, &dialog->field_0x7f4c, 0);
+    } else if (screenGrab && field_0x7f18) {
+        if (dialogBackground)
+            dialogBackground->UnknownFunction404480(screenGrab, &screenArea, 0, 0x1000000,
+                                                       grabRegion, 1, &field_0x7f4c, 0);
         else
-            ((RenderTarget*)dialog->UnknownInlineField18())->UnknownVirtualSlot3(&dialog->screenArea,
-                                                                                 dialog->screenGrab, 0, 0x1000000);
+            ((RenderTarget*)UnknownInlineField18())->UnknownVirtualSlot3(&screenArea,
+                                                                                 screenGrab, 0, 0x1000000);
     }
-    if (dialog->isClosing && dialog->closeFrame != ((RenderTarget*)dialog->UnknownInlineField18())->field_0x1c)
+    if (isClosing && closeFrame != ((RenderTarget*)UnknownInlineField18())->field_0x1c)
         UnknownVirtualSlot26();
     return 1;
 }
@@ -1766,73 +1776,87 @@ int UIDialog::UnknownVirtualSlot15() {
 // 0x0046fe40
 void UIDialog::RemoveTimers(int id) {
     UITimer* timer;
-    for (int i = 0; (timer = ((UnknownGameUiDialog*)this)->timerList.Get(i)) != 0; i++) {
+    for (int i = 0; (timer = timerList.Get(i)) != 0; i++) {
         if (timer->timerId == id)
-            ((UnknownGameUiDialog*)this)->timerList.Remove(timer);
+            timerList.Remove(timer);
     }
 }
 
 // 0x0046fec0
 void UIDialog::RemoveTimer(void* timer) {
     UITimer* entry;
-    for (int i = 0; (entry = ((UnknownGameUiDialog*)this)->timerList.Get(i)) != 0; i++) {
+    for (int i = 0; (entry = timerList.Get(i)) != 0; i++) {
         if (entry == timer)
-            ((UnknownGameUiDialog*)this)->timerList.Remove((UITimer*)timer);
+            timerList.Remove((UITimer*)timer);
+    }
+}
+
+// 0x0046ff70: sends the parent dialog a `kind` event with `code`; every
+// parent read goes through the member (a local copy hoists the vtable load).
+void UIDialog::NotifyParent(int code, int kind) {
+    if (parentDialog) {
+        UnknownDialogEvent event;
+        event.kind = kind;
+        event.handled = 0;
+        event.code = code;
+        event.controlName = 0;
+        event.dialog = parentDialog;
+        event.control = (UIControl*)this;
+        event.gui = parentDialog->guiManager;
+        parentDialog->UnknownVirtualSlot29(&event);
     }
 }
 
 // 0x0046ff30
 void UIDialog::EndDialog(int result) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
-    if (!dialog->isClosing) {
-        dialog->dialogResult = result;
-        dialog->isClosing = 1;
-        dialog->closeFrame = ((RenderTarget*)field_0x18)->field_0x1c;
+    if (!isClosing) {
+        dialogResult = result;
+        isClosing = 1;
+        closeFrame = ((RenderTarget*)field_0x18)->field_0x1c;
     }
 }
 
 // 0x0046ff60
 void UIDialog::UnknownFunction46ff60() {
-    ((UnknownGameUiDialog*)this)->field_0x154 = 0;
+    field_0x154 = 0;
     UnknownVirtualSlot26();
 }
 
 // 0x0046ffc0
 void UIDialog::UnknownFunction46ffc0(int value) {
-    ((UnknownGameUiDialog*)this)->popupAlignment = value;
+    popupAlignment = value;
 }
 
 // 0x0046ffd0
 void UIDialog::UnknownFunction46ffd0(void* background) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
-    if (dialog->parentDialog) {
-        dialog->parentDialog->UnknownFunction46ffd0(background);
-        dialog->dialogBackground = (BackgroundImage*)background;
+    if (parentDialog) {
+        parentDialog->UnknownFunction46ffd0(background);
+        dialogBackground = (BackgroundImage*)background;
     } else {
-        dialog->dialogBackground = (BackgroundImage*)background;
+        dialogBackground = (BackgroundImage*)background;
     }
 }
 
 // 0x00470000
 int UIDialog::UnknownFunction470000(UIControl* control, int a, int b) {
-    return ((UnknownGameUiDialog*)this)->guiUser->UnknownFunction487730((UnknownGuiControl*)control,
+    return guiUser->UnknownFunction487730((UnknownGuiControl*)control,
                                                                     (UnknownGuiControl**)a, b);
 }
 
 // 0x00470020
-void UnknownGameUiDialog::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+void UIDialog::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     if (field_0xcc)
         field_0xcc(event);
 }
 
 // 0x00470040
-void UnknownGameUiDialog::UnknownVirtualSlot30() {
+void UIDialog::UnknownVirtualSlot30() {
     if (field_0xd4)
         field_0xd4();
 }
 
 // 0x00470050
-void UnknownGameUiDialog::UnknownVirtualSlot31(int value) {
+void UIDialog::UnknownVirtualSlot31(int value) {
     if (field_0xd0)
         field_0xd0(this, value);
 }
@@ -1848,30 +1872,28 @@ void UIDialog::UnknownFunction470070(int a, int b, CameraRect* rect) {
 
 // 0x004700b0
 void UIDialog::GrabBackground(int dim, CameraRect* rect) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     ReleaseBackgroundGrab();
     if (!rect)
-        rect = &dialog->screenArea;
-    dialog->screenGrab = dialog->guiManager->CopyScreenToTexture(dim, rect);
-    if (dialog->dialogBackground) {
-        dialog->grabRegion = dialog->dialogBackground->UnknownFunction4040f0(1);
-        dialog->dialogBackground->UnknownFunction404da0();
-        dialog->dialogBackground->field_0x30 = 0;
+        rect = &screenArea;
+    screenGrab = guiManager->CopyScreenToTexture(dim, rect);
+    if (dialogBackground) {
+        grabRegion = dialogBackground->UnknownFunction4040f0(1);
+        dialogBackground->UnknownFunction404da0();
+        dialogBackground->field_0x30 = 0;
     }
 }
 
 // 0x00470110
 void UIDialog::ReleaseBackgroundGrab() {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
-    if (dialog->screenGrab)
-        dialog->screenGrab->Release();
-    if (dialog->dialogBackground && dialog->grabRegion >= 0) {
-        dialog->dialogBackground->UnknownFunction404200(dialog->grabRegion);
-        dialog->dialogBackground->field_0x30 = 1;
+    if (screenGrab)
+        screenGrab->Release();
+    if (dialogBackground && grabRegion >= 0) {
+        dialogBackground->UnknownFunction404200(grabRegion);
+        dialogBackground->field_0x30 = 1;
     }
-    dialog->screenGrab = 0;
-    dialog->grabRegion = -1;
-    dialog->field_0x7f4c = 0;
+    screenGrab = 0;
+    grabRegion = -1;
+    field_0x7f4c = 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -2062,7 +2084,7 @@ int UIControl::UnknownVirtualSlot15() {
 // 0x00471500
 int UIControl::UnknownFunction471500() {
     int done = 1;
-    UnknownGameUiDialog* owner = ownerDialog;
+    UIDialog* owner = ownerDialog;
     int (UIControl::*step)();
     if (owner->animatesControls && (step = field_0x1d0) != 0 && field_0x68 && controlType != 3 && controlType != 0xc) {
         transitionTime += (int)(owner->lastFrameTime * 1000.0f);
@@ -2863,13 +2885,12 @@ int UIDialog::LoadDialogResource(const char* name) {
 
 // 0x0046eeb0
 void UIDialog::EndControlDraw(void* dc) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
-    if (dialog->field_0x7f04)
-        SelectObject((HDC)dc, (HGDIOBJ)dialog->field_0x7f04);
-    if (!dialog->dialogBackground && dc)
-        ((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
-    if (dialog->field_0x7f00)
-        DeleteObject((HGDIOBJ)dialog->field_0x7f00);
+    if (field_0x7f04)
+        SelectObject((HDC)dc, (HGDIOBJ)field_0x7f04);
+    if (!dialogBackground && dc)
+        ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
+    if (field_0x7f00)
+        DeleteObject((HGDIOBJ)field_0x7f00);
 }
 
 // 0x0046f3c0
@@ -2899,18 +2920,17 @@ int UIDialog::IsInDoubleByteCharacter(const char* text, const char* position, in
 
 // 0x0046f120
 void UIDialog::UnknownFunction46f120() {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
-    if (dialog->guiUser->pointerDevice && dialog->controlContainer->field_0x10) {
-        GUIUser* user = dialog->guiUser;
+    if (guiUser->pointerDevice && controlContainer->field_0x10) {
+        GUIUser* user = guiUser;
         UnknownGuiControl* focus = user->field_0x1d8;
-        if (focus && ((UIControl*)focus)->ownerDialog != (UnknownGameUiDialog*)this)
+        if (focus && ((UIControl*)focus)->ownerDialog != (UIDialog*)this)
             focus = 0;
         POINT position = user->pointerDevice->pointerPosition;
-        if (dialog->controlContainer->field_0x10) {
+        if (controlContainer->field_0x10) {
             user->field_0x1dc = 0;
-            int result = ((UIControl*)dialog->controlContainer->field_0x10)->UnknownFunction472480((int*)&position);
-            if (focus && !dialog->guiUser->field_0x1cc && !result)
-                dialog->guiUser->UnknownFunction487730(0, 0, 1);
+            int result = ((UIControl*)controlContainer->field_0x10)->UnknownFunction472480((int*)&position);
+            if (focus && !guiUser->field_0x1cc && !result)
+                guiUser->UnknownFunction487730(0, 0, 1);
         }
     }
 }
@@ -2984,7 +3004,7 @@ void UIDialog::DrawAlignedText(void* dc, CameraRect* rect, const char* text, int
     else
         g_UnknownGlobal65b5a8 = rect->left;
     if (!height)
-        height = ((UnknownGameUiDialog*)this)->dialogFontHeight;
+        height = dialogFontHeight;
     if (flags & 0x10)
         g_UnknownGlobal65b584 = (rect->bottom - rect->top) / 2 - height / 2 + rect->top;
     else if (flags & 0x20)
@@ -3026,9 +3046,9 @@ void UIDialog::DrawControlText(void* dc, UIControl* control, int transparent) {
         g_UnknownGlobal65b5e8 = rect.left;
     if (control->textAlign & 0x10)
         g_UnknownGlobal65b5c0 =
-            (rect.bottom - rect.top) / 2 - ((UnknownGameUiDialog*)this)->dialogFontHeight / 2 + rect.top;
+            (rect.bottom - rect.top) / 2 - dialogFontHeight / 2 + rect.top;
     else if (control->textAlign & 0x20)
-        g_UnknownGlobal65b5c0 = rect.bottom - ((UnknownGameUiDialog*)this)->dialogFontHeight;
+        g_UnknownGlobal65b5c0 = rect.bottom - dialogFontHeight;
     else
         g_UnknownGlobal65b5c0 = rect.top;
     if (control->UnknownVirtualSlot36())
@@ -3048,34 +3068,33 @@ int g_UnknownGlobal65b5ec;
 
 // 0x0046ed70
 int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* control) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     g_UnknownGlobal65b588 = rect;
     *a = 0;
-    dialog->field_0x7f04 = 0;
-    if (dialog->dialogBackground) {
+    field_0x7f04 = 0;
+    if (dialogBackground) {
         g_UnknownGlobal65b588 = &g_UnknownGlobal65b5f0;
         g_UnknownGlobal65b5f0 = *rect;
         if (control) {
-            g_UnknownGlobal65b5ec = dialog->dialogBackground->UnknownFunction4049d0(
+            g_UnknownGlobal65b5ec = dialogBackground->UnknownFunction4049d0(
                 dc, rect, control->backgroundRegion, control->needsRedraw, &control->redrawFrames, a,
                 &g_UnknownGlobal65b5f0);
         } else {
             int frames = 1;
             g_UnknownGlobal65b5ec =
-                dialog->dialogBackground->UnknownFunction4049d0(dc, rect, -1, 0, &frames, a, &g_UnknownGlobal65b5f0);
+                dialogBackground->UnknownFunction4049d0(dc, rect, -1, 0, &frames, a, &g_UnknownGlobal65b5f0);
         }
     } else {
-        ((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->GetDC(dc);
+        ((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(dc);
         g_UnknownGlobal65b5ec = 1;
     }
     if (*dc && control) {
-        dialog->field_0x7f04 =
-            SelectObject((HDC)*dc, (HGDIOBJ)(control->fontHandle ? control->fontHandle : (int)dialog->dialogFont));
-        dialog->field_0x7f00 = CreateRectRgn(g_UnknownGlobal65b588->left, g_UnknownGlobal65b588->top,
+        field_0x7f04 =
+            SelectObject((HDC)*dc, (HGDIOBJ)(control->fontHandle ? control->fontHandle : (int)dialogFont));
+        field_0x7f00 = CreateRectRgn(g_UnknownGlobal65b588->left, g_UnknownGlobal65b588->top,
                                              g_UnknownGlobal65b588->right, g_UnknownGlobal65b588->bottom);
-        SelectClipRgn((HDC)*dc, (HRGN)dialog->field_0x7f00);
+        SelectClipRgn((HDC)*dc, (HRGN)field_0x7f00);
     } else {
-        dialog->field_0x7f00 = 0;
+        field_0x7f00 = 0;
     }
     return g_UnknownGlobal65b5ec;
 }
@@ -3083,7 +3102,7 @@ int UIDialog::BeginControlDraw(void** dc, CameraRect* rect, int* a, UIControl* c
 // 0x0046fce0
 void UIDialog::AddTimer(int a, int time, int b) {
     if (time)
-        ((UnknownGameUiDialog*)this)->timerList.Add(
+        timerList.Add(
             new(__FILE__, 0xa76) UITimer(a, time, (UIControl*)b));
 }
 
@@ -3447,9 +3466,9 @@ void UIDropDownList::UnknownFunction47a2d0(int open) {
 // Drawing and input slots
 
 // 0x0046a300
-UnknownGameUiDialog* UnknownGameUiDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, int flags,
+UIDialog* UIDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, int flags,
                                                                SoundGroup* sound, void* textures,
-                                                               const char* directory, UnknownGameUiDialog* parent,
+                                                               const char* directory, UIDialog* parent,
                                                                BackgroundImage* background, const char* font,
                                                                int fontSize, GUIManager* gui, GUIUser* user,
                                                                const char* name) {
@@ -3472,7 +3491,7 @@ UnknownGameUiDialog* UnknownGameUiDialog::UnknownVirtualSlot27(void* target, Cam
         field_0x14c = gui->UnknownFunction485ee0((int)this);
     if (parent)
         dialogPalette = parent->dialogPalette;
-    field_0xc4 = a;
+    openingMenu = a;
     dialogBackground = background;
     soundGroup = sound;
     dialogTextures = textures;
@@ -3544,7 +3563,6 @@ UnknownGameUiDialog* UnknownGameUiDialog::UnknownVirtualSlot27(void* target, Cam
 // table[x]) codes into runs, each measured with `font`; 0 when there are no
 // codes. `size` receives the visible length and the total width.
 char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void* table, int* size) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     if (g_TrackGame->imeLibrary)
         return 0;
     if (!strchr(text, '~') && (!strchr(text, '|') || !table))
@@ -3586,7 +3604,7 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
                 index = 9;
             else if (index < 0)
                 index = 0;
-            run->field_0x0c = dialog->textColors[index];
+            run->field_0x0c = textColors[index];
         } else {
             run->field_0x04 = 2;
             if (table) {
@@ -3612,11 +3630,11 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
                 last->field_0x08 = mark - start;
             else
                 last->field_0x08 = run->field_0x00 - start - 2;
-            if (!((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
-                HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialog->dialogFont));
+            if (!((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(&dc)) {
+                HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialogFont));
                 GetTextExtentPoint32A((HDC)dc, last->field_0x00, last->field_0x08, &extent);
                 SelectObject((HDC)dc, old);
-                ((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
+                ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
             }
             last->field_0x10 = extent.cx;
         }
@@ -3629,11 +3647,11 @@ char* UIDialog::SplitTextLines(char* text, unsigned int color, void* font, void*
             runs[count - 1].field_0x08 = mark - runs[count - 1].field_0x00;
         else
             runs[count - 1].field_0x08 = length - (runs[count - 1].field_0x00 - text);
-        if (!((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->GetDC(&dc)) {
-            HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialog->dialogFont));
+        if (!((PCRenderTarget*)UnknownInlineField18())->renderSurface->GetDC(&dc)) {
+            HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialogFont));
             GetTextExtentPoint32A((HDC)dc, runs[count - 1].field_0x00, runs[count - 1].field_0x08, &extent);
             SelectObject((HDC)dc, old);
-            ((PCRenderTarget*)dialog->UnknownInlineField18())->renderSurface->ReleaseDC(dc);
+            ((PCRenderTarget*)UnknownInlineField18())->renderSurface->ReleaseDC(dc);
             runs[count - 1].field_0x10 = extent.cx;
         } else {
             runs[count - 1].field_0x10 = 0;
@@ -4310,7 +4328,7 @@ void UIProgressBar::UnknownFunction47b370(int redraw) {
 
 // 0x0047ae30
 UIVideoStatic::UIVideoStatic(int flags, CameraRect* area, UIDialog* owner)
-    : UIStatic(flags, area, (UnknownGameUiDialog*)owner) {
+    : UIStatic(flags, area, owner) {
     field_0x1ec = 0;
 }
 
@@ -4357,7 +4375,7 @@ int UIVideoStatic::UnknownVirtualSlot40() {
 
 // 0x0047b020
 UIProgressBar::UIProgressBar(int flags, CameraRect* area, UIDialog* owner)
-    : UIStatic(flags, area, (UnknownGameUiDialog*)owner) {
+    : UIStatic(flags, area, owner) {
     progressFraction = 0;
     field_0x1f0 = 0;
     stepsDone = 0;
@@ -4386,7 +4404,7 @@ int UIProgressBar::UnknownVirtualSlot40() {
         UnknownVirtualSlot63((CameraRect*)field_0x2c, &rect);
         CameraRect source = *(CameraRect*)field_0x4c;
         source.right = (int)((field_0x4c[2] - field_0x4c[0]) * progressFraction);
-        UnknownGameUiDialog* owner = ownerDialog;
+        UIDialog* owner = ownerDialog;
         rect.right = (int)(source.right * owner->scaleX + rect.left);
         rect.bottom = (int)(source.bottom * owner->scaleY + rect.top);
         if (owner->dialogBackground) {

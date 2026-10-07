@@ -119,30 +119,16 @@ inline int UnknownBikeClassOf(int cc)
 class OptGameSettingsDlg : public UIDialog {
 public:
     OptGameSettingsDlg() : UIDialog(1, "OptGame.dtm") {}
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b2000
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);                    // 0x004b22d0
-
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: OptGraphicsDlg : UIDialog (vtable 0x00555898; 0x7f58 bytes).
 class OptGraphicsDlg : public UIDialog {
 public:
     OptGraphicsDlg() : UIDialog(1, "OptGraph.dtm") {}
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b23b0
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);                    // 0x004b2670
-
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: OptAdvancedGraphicsDlg : UIDialog (vtable 0x00555580; 0x7f58
@@ -150,29 +136,17 @@ public:
 class OptAdvancedGraphicsDlg : public UIDialog {
 public:
     OptAdvancedGraphicsDlg() : UIDialog(1, "OptAdvG.dtm") {}
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b26c0
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: OptSoundDlg : UIDialog (vtable 0x00555814; 0x7f58 bytes).
 class OptSoundDlg : public UIDialog {
 public:
     OptSoundDlg() : UIDialog(1, "OptSound.dtm") {}
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b2b20
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);                    // 0x004b2ce0
     void ApplySoundSettings();             // 0x004b2d40: applies the sound settings
-
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // 0x004b5570 (cdecl): the text of input `code` of `kind` for list row
@@ -187,19 +161,13 @@ public:
     OptControlsDlg() : UIDialog(1, "OptCont.dtm") {}
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004b5600 (near miss in samples/ui)
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004b55d0
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b2e00
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);                    // 0x004b3470
     void ListMappedKeys();             // 0x004b3410: lists the mapped keys
     void ColorListRows();             // 0x004b54c0: colours the list rows
     void MapMovedInput();             // 0x004b5760: maps a moved axis or mouse direction (near miss in samples/ui)
     void EndInputWait();             // 0x004b5a20: ends the wait for input
 
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
     float axisValuesAtWait[6];                // +0x7f58: joystick axis values when the wait began
     int waitingForInput;                      // +0x7f70: waiting for input to map
     int field_0x7f74;
@@ -210,20 +178,12 @@ public:
 class OptGarageDlg : public UIDialog {
 public:
     OptGarageDlg() : UIDialog(1, "OptGar.dtm") {}
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b3500
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);                    // 0x004b3e70
     void FillCurveList();             // 0x004b38f0: fills DDLCurves
     void EqSliderMoved(UIControl* slider); // 0x004b3aa0: an SldEQ slider moved
     void ShowCurve();             // 0x004b3bc0: shows the curve
 
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f3c - 0x34];
-    GameObject* controlContainer;             // +0x7f3c: the controls (UnknownGuiDialog)
-    unsigned char field_0x7f40[0x7f58 - 0x7f40];
     int curveSum;                             // +0x7f58: sum of the curve values shown
 };
 
@@ -232,15 +192,8 @@ public:
 class OptMessagesDlg : public UIDialog {
 public:
     OptMessagesDlg() : UIDialog(1, "OptMess.dtm") {}
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b40a0
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);
-
-    unsigned char field_0x2c[0x7f3c - 0x2c];
-    GameObject* controlContainer;             // +0x7f3c: the controls (UnknownGuiDialog)
-    unsigned char field_0x7f40[0x7f58 - 0x7f40];
 };
 
 // The 0x94-byte records at KrustyUI+0x50 (+0x54 counts them) as OptionsDlg
@@ -256,16 +209,10 @@ struct UnknownOptKrustyUIRecord {
 class OptionsDlg : public UIDialog {
 public:
     OptionsDlg() : UIDialog(1, "OptBase.dtm") {} // SelectGamePicProcs.cpp 0x004f8047 allocates 0x7f70 bytes
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b4280
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);
     void OpenPage(int page);     // 0x004b4ab0: opens page `page` (0..5)
 
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
     OptGameSettingsDlg* field_0x7f58;
     OptGraphicsDlg* field_0x7f5c;
     OptSoundDlg* field_0x7f60;
@@ -279,27 +226,15 @@ public:
 class GlobalSettingsDlg : public UIDialog {
 public:
     GlobalSettingsDlg() : UIDialog(1, "GlobSet.dtm") {}
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b4e70
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);
     void ListOtherProfiles();             // 0x004b51a0: lists the other profiles
-
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: ConfirmRestoreDlg : UIDialog (vtable 0x005559a0; 0x7f58 bytes).
 class ConfirmRestoreDlg : public UIDialog {
 public:
     ConfirmRestoreDlg() : UIDialog(1, "messbox2.dtm") {}
-    virtual void UnknownVirtualSlot27();
-    virtual void UnknownVirtualSlot28();
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b5380
-    virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };

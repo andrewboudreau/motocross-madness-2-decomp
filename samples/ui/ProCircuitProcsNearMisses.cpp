@@ -130,12 +130,12 @@ void PCBailoutDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             circuit->field_0x465[0].field_0x34 += cashShortfall;
             g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
             PCCentralDlg* dialog = new(__FILE__, 1551) PCCentralDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         } else if (_stricmp("ButDecline", event->controlName) == 0) {
             circuit->field_0x464 |= 4;
             PCFailedDlg* dialog = new(__FILE__, 1556) PCFailedDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         }
         break;
@@ -192,12 +192,12 @@ void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             circuit->field_0x465[0].field_0x34 = 0;
             g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
             PCCentralDlg* dialog = new(__FILE__, 1744) PCCentralDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         } else if (_stricmp("ButDecline", event->controlName) == 0) {
             circuit->field_0x464 |= 4;
             PCFailedDlg* dialog = new(__FILE__, 1749) PCFailedDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         }
         break;
@@ -308,7 +308,7 @@ void PCNewEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case kDialogCommand: {
         PCCentralDlg* dialog = new(__FILE__, 1896) PCCentralDlg;
-        guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+        guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
         EndDialog(0);
         break;
     }

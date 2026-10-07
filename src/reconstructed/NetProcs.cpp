@@ -36,7 +36,7 @@ void JoinSelectedSession(UnknownDialogEvent* event) {
     int selection = static_cast<UIListBox*>(event->dialog->FindControl("LstSessions", 0))->GetSelectedRow();
     g_TrackGame->mode.field_0xfd4 = selection;
     if (selection != -1 && event->dialog &&
-        static_cast<HostJoinDlg*>(event->dialog)->field_0xc4 != 0x85d &&
+        static_cast<HostJoinDlg*>(event->dialog)->openingMenu != 0x85d &&
         g_TrackGame->mode.field_0xa98.field_0x00[g_TrackGame->mode.field_0xfd4].instance &&
         g_TrackGame->network->JoinSession(
             (const GUID*)g_TrackGame->mode.field_0xa98.field_0x00[g_TrackGame->mode.field_0xfd4].instance,
@@ -52,7 +52,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         UIListBox* control = static_cast<UIListBox*>(FindControl("ButJoin", 0));
-        if (field_0xc4 != 0x85d) {
+        if (openingMenu != 0x85d) {
             control->UnknownVirtualSlot49(0);
             control->SetFontColor(0x808080);
         }
@@ -65,7 +65,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         UpdateBoundValues(0);
         control->SelectRow(0);
         UnknownFunction470000(control, 0, 0);
-        if (field_0xc4 != 0x85d)
+        if (openingMenu != 0x85d)
             AddTimer(0, 1000, 0);
         break;
     }
@@ -76,11 +76,11 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case kDialogCommand:
         if (!_stricmp("ButHost", event->controlName)) {
             SessionDlg* dialog = new(__FILE__, 110) SessionDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 300, 4, 0,
-                                              (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 300, 4, 0,
+                                              (UIDialog*)this, 0, 0, 1);
         } else if (!_stricmp("ButJoin", event->controlName)) {
             UpdateBoundValues(1);
-            if (field_0xc4 == 0x85d)
+            if (openingMenu == 0x85d)
                 g_TrackGame->ui->OpenMenu(0xd9);
             else
                 JoinSelectedSession(event);
@@ -121,7 +121,7 @@ void HostJoinDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     }
     case 9:
         if (event->code == 0x14) {
-            if (field_0xc4 == 0x85d) {
+            if (openingMenu == 0x85d) {
                 void* address;
                 unsigned long size;
                 if (!g_TrackGame->network->CreateAddress(DPSPGUID_TCPIP, "", "", 0,
@@ -327,8 +327,8 @@ void WaitOrCallDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             return;
         } else if (!_stricmp("ButLeft", event->controlName)) {
             SessionDlg* dialog = new(__FILE__, 448) SessionDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 300, 4, 0,
-                                              (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 300, 4, 0,
+                                              (UIDialog*)this, 0, 0, 1);
             return;
         } else if (!_stricmp("ButMiddle", event->controlName)) {
             SendMessageA((HWND)g_TrackGame->windowHandle, WM_SYSCOMMAND, SC_MINIMIZE, 0);

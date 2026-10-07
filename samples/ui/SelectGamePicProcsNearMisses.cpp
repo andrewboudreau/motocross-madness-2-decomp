@@ -202,7 +202,7 @@ void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("ButWrench", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 0xb19) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)parentDialog, 2, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, (UIDialog*)parentDialog, 2, 0, 1);
         }
         break;
     case kDialogEditDone:

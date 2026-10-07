@@ -23,10 +23,11 @@ points to it). KrustyUI.h still declares GUIManager and GUIUser as
 `UnknownKrustyUIGui` / `UnknownKrustyUIGuiLayer` views; unifying them
 would change KrustyUI's mangled names.
 
-Exact: 96 calibration cases. Near misses
+Exact: 97 calibration cases, among them `OpenDialogResource` `0x00485c80`
+(its `new` allocates the 0x7f58-byte UIDialog that UIDialog.h now declares).
+The dialog is a plain `UIDialog*` everywhere (the former `UnknownGuiDialog`
+view is gone; `FindSectionObject` returns the dialog's `Sound*`). Near misses
 (`samples/ui/GUIManagerNearMisses.cpp`, notes there): the GUI setup
-`0x004853b0`, show dialog `ShowDialog` `0x00485a70`, `0x00485c80` (exact only with
-UIDialog padded to 0x7f58, which would shift the derived dialogs'
-fields), the screen grab `0x00486170`, the tool-tip layout `0x00486b10` /
+`0x004853b0`, show dialog `ShowDialog` `0x00485a70`, the screen grab `0x00486170`, the tool-tip layout `0x00486b10` /
 `0x00486b80`, `0x00487870` and `0x00488120`. HiResMeter slot 8
 `0x00488440` uses `rdtsc` (inline assembly) and is not attempted.

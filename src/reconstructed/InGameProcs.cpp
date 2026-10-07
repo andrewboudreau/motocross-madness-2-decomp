@@ -35,8 +35,8 @@ void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UnknownKrustyBikeView* view = g_TrackGame->eventManager->FindRaceView();
             if (view && g_TrackGame->mode.field_0x27f8.field_0x00 == 4 && view->field_0x1e8 > 0) {
                 ChoiceDlg* dialog = new(__FILE__, 66) ChoiceDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0,
-                                                  (UnknownGuiDialog*)this, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
+                                                  (UIDialog*)this, 0, 0, 1);
                 dialog->SetTextsOrResources(0, 0x1440, 0, 0, 0, 0x143e, 0, 0, 0, 0x143d);
             } else {
                 if (g_TrackGame->network) {

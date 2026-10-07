@@ -157,40 +157,6 @@ public:
     UnknownCursorAnimation* field_0x5c;
 };
 
-// A dialog as GUIManager sees it: UIDialog (0x7f58 bytes) with its own
-// slots 27 and 28 and the members read here. Never constructed as such.
-class UnknownGuiDialog : public UIDialog {
-public:
-    // Slot 27 (0x6c): creates the dialog's controls.
-    virtual int UnknownVirtualSlot27(void* target, int a, int b, int flags, SoundGroup* sound,
-                                     TextureMapManager* textures, char* directory,
-                                     UnknownGuiDialog* parent, BackgroundImage* background,
-                                     char* font, int fontSize, GUIManager* gui, GUIUser* user, int c);
-    virtual void UnknownVirtualSlot28(int value); // slot 28 (0x70)
-
-    void UnknownFunction46ea60(int value);    // 0x0046ea60
-    int FindSectionObject(int value);     // 0x0046e9a0
-    void UnknownFunction46ffd0(int value);    // 0x0046ffd0
-    void UnknownFunction470070(int a, int b, CameraRect* rect); // 0x00470070
-
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    unsigned char field_0x30[0x34 - 0x30];
-    GUIUser* guiUser;                         // +0x34
-    unsigned char field_0x38[0xc8 - 0x38];
-    int field_0xc8;
-    unsigned char field_0xcc[0xdc - 0xcc];
-    int dialogFontHeight;                     // +0xdc
-    char dialogFontFace[0x108 - 0xe0];        // +0xe0
-    int field_0x108;                          // bold
-    unsigned char field_0x10c[0x144 - 0x10c];
-    int field_0x144;                          // flags from 0x00485a70
-    int field_0x148;                          // takes the input first (0x00485df0)
-    unsigned char field_0x14c[0x160 - 0x14c];
-    RECT screenArea;                          // +0x160
-    unsigned char field_0x170[0x7f3c - 0x170];
-    GameObject* controlContainer;             // +0x7f3c: child dialogs are added here
-};
-
 // A dialog control as GUIUser and ToolTip see it. Never constructed as such.
 class UnknownGuiControl : public GameObject {
 public:
@@ -207,7 +173,7 @@ public:
     unsigned char field_0x4c[0x5c - 0x4c];
     int controlType;                          // +0x5c: control type (11: edit field)
     unsigned char field_0x60[0xb8 - 0x60];
-    UnknownGuiDialog* ownerDialog;            // +0xb8
+    UIDialog* ownerDialog;            // +0xb8
     GUIManager* ownerGui;                     // +0xbc
     unsigned char field_0xc0[0xf0 - 0xc0];
     char* toolTipText;                        // +0xf0: tool tip text
@@ -355,14 +321,14 @@ public:
                       const char* font, int fontSize, const char* cursor,
                       int callback);
     // 0x00485a70: shows `dialog`.
-    UnknownGuiDialog* ShowDialog(UnknownGuiDialog* dialog, int a, int flags, int b,
-                                            UnknownGuiDialog* parent, int c, int d, int wait);
-    void UnknownFunction485bd0(UnknownGuiDialog* dialog, int a, int wait);
+    UIDialog* ShowDialog(UIDialog* dialog, int a, int flags, int b,
+                                            UIDialog* parent, int c, int d, int wait);
+    void UnknownFunction485bd0(UIDialog* dialog, int a, int wait);
     int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource
     void CloseDialogResource();             // 0x00485d50: closes it
     void UnknownFunction485d70(const char* directory); // 0x00485d70
-    UnknownGuiDialog* FindInputDialog();      // 0x00485df0: the dialog taking input
-    int FindSectionObject(int value);     // 0x00485ec0
+    UIDialog* FindInputDialog();      // 0x00485df0: the dialog taking input
+    Sound* FindSectionObject(const char* name); // 0x00485ec0: the opened dialog's section object
     int UnknownFunction485ee0(int value);     // 0x00485ee0: sets +0x2c, returns the old value
     void CreateBackground();                  // 0x00485ef0: creates the background
     void ReleaseBackground();             // 0x00485fc0: releases it
@@ -389,7 +355,7 @@ public:
     void UnknownFunction464e90();             // 0x00464e90 (shared empty body)
 
     int field_0x2c;
-    UnknownGuiDialog* openedDialog;           // +0x30: dialog opened by 0x00485c80
+    UIDialog* openedDialog;           // +0x30: dialog opened by 0x00485c80
     Palette8* guiPalette;                     // +0x34
     Palette8* field_0x38;
     BackgroundImage* guiBackground;           // +0x3c

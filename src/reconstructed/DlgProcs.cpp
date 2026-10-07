@@ -400,8 +400,8 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 field_0x7f58->UpdateBoundValues(1);
             if (g_TrackGame->mode.field_0x27f8.field_0x08 == -1) {
                 ChoiceDlg* dialog = new(__FILE__, 1274) ChoiceDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0,
-                                                  (UnknownGuiDialog*)this, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
+                                                  (UIDialog*)this, 0, 0, 1);
                 char text[1024];
                 strcpy(text, "You must choose one of the following trial version tracks:\n"
                              "Stunt Event: Donner Pass, or\n"
@@ -410,8 +410,8 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 dialog->FindControl("TxtPrompt", 0)->field_0x1e8 = 1;
             } else if (g_TrackGame->mode.field_0x9c) {
                 NewbieDlg* dialog = new(__FILE__, 1292) NewbieDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0,
-                                                  (UnknownGuiDialog*)this, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
+                                                  (UIDialog*)this, 0, 0, 1);
             } else {
                 g_TrackGame->ui->HideScene();
                 g_TrackGame->mode.field_0x27f8.field_0x28 = 0;
@@ -453,12 +453,12 @@ void SinglePlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             OpenPage(2);
         } else if (!_stricmp("Options", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 1347) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0,
-                                              (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0,
+                                              (UIDialog*)this, 0, 0, 1);
         } else if (!_stricmp("Joystick", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 1350) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0,
-                                              (UnknownGuiDialog*)this, 1, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0,
+                                              (UIDialog*)this, 1, 0, 1);
         } else if (!_stricmp("Help", event->controlName)) {
             g_TrackGame->mode.OpenHelp("MCM2HELP", 0);
         }
@@ -1018,7 +1018,7 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             previewDragged = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->UnknownFunction4755c0();
         } else if (!_stricmp("ButWrench", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 2135) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);
         }
         break;
     case kDialogEditDone:
@@ -1202,32 +1202,32 @@ void SPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
 
 // 0x00450e30
 LoadSupercrossDlg::LoadSupercrossDlg(int flags) : LoadingDlg(flags) {
-    strcpy(field_0x38, "LoadSX.dtm");
+    strcpy(resourceName, "LoadSX.dtm");
 }
 
 // 0x00450e80
 LoadEnduroDlg::LoadEnduroDlg(int flags) : LoadingDlg(flags) {
-    strcpy(field_0x38, "LoadEnd.dtm");
+    strcpy(resourceName, "LoadEnd.dtm");
 }
 
 // 0x00450ed0
 LoadQuarryDlg::LoadQuarryDlg(int flags) : LoadingDlg(flags) {
-    strcpy(field_0x38, "LoadQuar.dtm");
+    strcpy(resourceName, "LoadQuar.dtm");
 }
 
 // 0x00450f20
 LoadNationalsDlg::LoadNationalsDlg(int flags) : LoadingDlg(flags) {
-    strcpy(field_0x38, "LoadNat.dtm");
+    strcpy(resourceName, "LoadNat.dtm");
 }
 
 // 0x00450f70
 LoadTagDlg::LoadTagDlg(int flags) : LoadingDlg(flags) {
-    strcpy(field_0x38, "LoadTag.dtm");
+    strcpy(resourceName, "LoadTag.dtm");
 }
 
 // 0x00450fd0
 LoadBajaDlg::LoadBajaDlg(int flags) : LoadingDlg(flags) {
-    strcpy(field_0x38, "LoadBaja.dtm");
+    strcpy(resourceName, "LoadBaja.dtm");
 }
 
 // 0x00451020
@@ -1954,16 +1954,16 @@ void GhostFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 sprintf(text, "%s, %s", list->GetRowText(-1),
                         fileHeaders[list->GetRowData(-1)].description);
                 ChoiceDlg* dialog = new(__FILE__, 4533) ChoiceDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0,
-                                                  (UnknownGuiDialog*)this, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
+                                                  (UIDialog*)this, 0, 0, 1);
                 dialog->SetTextsOrResources(0, 0x143c, text, 0, 0, 0x143e, 0, 0, 0, 0x143d);
             }
         } else if (!_stricmp("ButDescription", event->controlName)) {
             if (fileHeaderCount) {
                 COPY_TEXT(editedDescription, static_cast<UIListBox*>(FindControl("LstDesc", 3))->GetRowText(-1), 32);
                 EditBoxDlg* dialog = new(__FILE__, 4545) EditBoxDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0,
-                                                  (UnknownGuiDialog*)this, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
+                                                  (UIDialog*)this, 0, 0, 1);
                 dialog->EditWithResources(0, 0x143f, 0, 0, editedDescription, 32);
             }
         }
@@ -2107,16 +2107,16 @@ void ReplayFilesDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 sprintf(text, "%s, %s", list->GetRowText(-1),
                         field_0x7f58[list->GetRowData(-1)].description);
                 ChoiceDlg* dialog = new(__FILE__, 4744) ChoiceDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0,
-                                                  (UnknownGuiDialog*)this, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
+                                                  (UIDialog*)this, 0, 0, 1);
                 dialog->SetTextsOrResources(0, 0x143c, text, 0, 0, 0x143e, 0, 0, 0, 0x143d);
             }
         } else if (!_stricmp("ButDescription", event->controlName)) {
             if (field_0x7f5c) {
                 COPY_TEXT(field_0x7f68, static_cast<UIListBox*>(FindControl("LstDesc", 3))->GetRowText(-1), 32);
                 EditBoxDlg* dialog = new(__FILE__, 4756) EditBoxDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0,
-                                                  (UnknownGuiDialog*)this, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0,
+                                                  (UIDialog*)this, 0, 0, 1);
                 dialog->EditWithResources(0, 0x143f, 0, 0, field_0x7f68, 32);
             }
         }

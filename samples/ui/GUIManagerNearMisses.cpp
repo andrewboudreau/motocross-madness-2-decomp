@@ -10,10 +10,6 @@
 // 0x00485a70 (345 bytes): same calls and argument order; retail keeps
 //   `flags & 4` in edi and `wait` in ebp, VC6 here keeps `a`/`parent` in
 //   ebp (a `flags & 4` local makes it worse).
-// 0x00485c80 (192 bytes): only the allocation size differs. Retail
-//   allocates 0x7f58 bytes (the whole UIDialog); UIDialog.h declares 0x2c.
-//   With UIDialog padded to 0x7f58 it is strict exact (checked), but that
-//   shifts TransDlg/Intro1Dlg/Exit1Dlg/TrackRecordDlg padding.
 // 0x00486170 (896 bytes): same logic; retail keeps three more stack locals
 //   (frame 0xb0 against 0xa4) and allocates registers differently around
 //   the row copy and the 8-bit dim loop.
@@ -104,8 +100,8 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
 }
 
 // 0x00485a70
-UnknownGuiDialog* GUIManager::ShowDialog(UnknownGuiDialog* dialog, int a, int flags, int b,
-                                                   UnknownGuiDialog* parent, int c, int d, int wait) {
+UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,
+                                                   UIDialog* parent, int c, int d, int wait) {
     CameraRect screen;
     CameraRect* rect;
 
@@ -127,26 +123,15 @@ UnknownGuiDialog* GUIManager::ShowDialog(UnknownGuiDialog* dialog, int a, int fl
     }
     if (wait)
         UnknownFunction4865e0(waitCursorImage, field_0x1f0 == 0);
-    if (dialog->UnknownVirtualSlot27(field_0x18, b, a, flags, guiSoundGroup, guiTextures, dialogDirectory, parent,
-                                     guiBackground, dialogFontName, dialogFontSize, this, users[0], d)) {
+    if (dialog->UnknownVirtualSlot27(field_0x18, (CameraRect*)b, a, flags, guiSoundGroup, guiTextures, dialogDirectory,
+                                     parent, guiBackground, dialogFontName, dialogFontSize, this, users[0],
+                                     (const char*)d)) {
         dialog->field_0x144 = flags;
         UnknownFunction485bd0(dialog, a, wait);
         return dialog;
     }
     if (wait)
         UnknownFunction4865e0(cursorImage, field_0x1f0 == 0);
-    return 0;
-}
-
-// 0x00485c80
-int GUIManager::OpenDialogResource(const char* resource) {
-    CloseDialogResource();
-    openedDialog = (UnknownGuiDialog*)new(__FILE__, 523) UIDialog(0, resource);
-    if (openedDialog) {
-        openedDialog->UnknownVirtualSlot27(field_0x18, 0, 0, 0, guiSoundGroup, guiTextures, dialogDirectory, 0, 0, "Arial",
-                                         14, 0, 0, 0);
-        return 1;
-    }
     return 0;
 }
 

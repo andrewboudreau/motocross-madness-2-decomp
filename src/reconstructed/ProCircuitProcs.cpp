@@ -142,7 +142,7 @@ void PCStartupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case kDialogCommand:
         if (_stricmp("ButNew", event->controlName) == 0) {
             PCNewDlg* dialog = new(__FILE__, 135) PCNewDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
             dialog->SetAnswerTargets(field_0x7f60, &field_0x8060, &field_0x8064, &field_0x8068);
         } else if (_stricmp("ButContinue", event->controlName) == 0) {
             int row = static_cast<UIListBox*>(FindControl("LstRank", 3))->GetRowData(-1);
@@ -150,18 +150,18 @@ void PCStartupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             strcpy((char*)g_TrackGame->field_0x3448, field_0x7f58[row]);
             if (g_TrackGame->field_0x3444->LoadSaved((char*)g_TrackGame->field_0x3448)) {
                 PCCentralDlg* dialog = new(__FILE__, 146) PCCentralDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             }
             EndDialog(0);
         } else if (_stricmp("ButDelete", event->controlName) == 0) {
             field_0x8070 = 0;
             field_0x806c = new(__FILE__, 152) ChoiceDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)field_0x806c, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)field_0x806c, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
             field_0x806c->SetTextsOrResources(0, 0x143c, 0, 0, 0, 0x143e, 0, 0, 0, 0x143d);
         } else if (_stricmp("ButDoneDelete", event->controlName) == 0) {
             field_0x806c = 0;
             field_0x8070 = new(__FILE__, 162) ChoiceDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)field_0x8070, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)field_0x8070, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
             field_0x8070->SetTextsOrResources(0, 0x143c, 0, 0, 0, 0x143e, 0, 0, 0, 0x143d);
         } else if (_stricmp("Back", event->controlName) == 0) {
             g_TrackGame->ui->OpenMenu(100);
@@ -195,7 +195,7 @@ void PCStartupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
             EndDialog(0);
             PCNewEventDlg* dialog = new(__FILE__, 214) PCNewEventDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
         } else if (event->code == 0x65) {
             if (field_0x806c)
                 DeleteFileA(field_0x7f58[static_cast<UIListBox*>(FindControl("LstRank", 3))->GetRowData(-1)]);
@@ -372,7 +372,7 @@ void PCCentralDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         if (_stricmp("Back", event->controlName) == 0) {
             g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
             PCStartupDlg* dialog = new(__FILE__, 488) PCStartupDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);
             event->handled = 1;
         } else if (_stricmp("Start", event->controlName) == 0 || _stricmp("Practice", event->controlName) == 0) {
@@ -420,10 +420,10 @@ void PCCentralDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             OpenPage(2);
         } else if (_stricmp("Options", event->controlName) == 0) {
             OptionsDlg* dialog = new(__FILE__, 554) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, (UIDialog*)this, 0, 0, 1);
         } else if (_stricmp("Controls", event->controlName) == 0) {
             OptionsDlg* dialog = new(__FILE__, 557) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 1, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, (UIDialog*)this, 1, 0, 1);
         } else if (_stricmp("Help", event->controlName) == 0) {
             g_TrackGame->mode.OpenHelp("MCM2HELP", 0);
         }
@@ -455,19 +455,19 @@ void PCCentralDlg::OpenPage(int page)
     case 0:
         if (!field_0x7f58) {
             field_0x7f58 = new(__FILE__, 584) PCCentralNextDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)field_0x7f58, 0, 1, (int)&area, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)field_0x7f58, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!field_0x7f5c) {
             field_0x7f5c = new(__FILE__, 590) PCCentralBikeRiderDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)field_0x7f5c, 0, 1, (int)&area, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)field_0x7f5c, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 2:
         if (!field_0x7f60) {
             field_0x7f60 = new(__FILE__, 596) PCCentralStandingsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)field_0x7f60, 0, 1, (int)&area, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)field_0x7f60, 0, 1, (int)&area, (UIDialog*)this, 0, 0, 1);
         }
         break;
     }
@@ -649,21 +649,21 @@ void PCLastRaceDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             int bonus = circuit->field_0x44 == circuit->field_0x1285[circuit->field_0x40].field_0x08;
             if (bonus && circuit->field_0x465[0].field_0x18.field_0x10 == 1) {
                 PCBonusTrackDlg* dialog = new(__FILE__, 1368) PCBonusTrackDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             } else if (circuit->field_0x465[0].field_0x30 <
                        circuit->field_0x1229[g_TrackGame->field_0x3444->field_0x40]) {
                 if (!(circuit->field_0x464 & 1)) {
                     PCBailoutDlg* dialog = new(__FILE__, 1374) PCBailoutDlg;
-                    guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                    guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
                     circuit->field_0x464 |= 1;
                 } else if (!(circuit->field_0x464 & 2)) {
                     PCBunnyDlg* dialog = new(__FILE__, 1378) PCBunnyDlg;
-                    guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                    guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
                     circuit->field_0x464 |= 2;
                 } else {
                     circuit->field_0x464 |= 4;
                     PCFailedDlg* dialog = new(__FILE__, 1383) PCFailedDlg;
-                    guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                    guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
                 }
             } else {
                 OpenCareerDialog();
@@ -706,7 +706,7 @@ void PCFailedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case kDialogCommand: {
         PCFinishedDlg* dialog = new(__FILE__, 1593) PCFinishedDlg;
-        guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+        guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
         EndDialog(0);
         break;
     }
@@ -759,7 +759,7 @@ void PCFinishedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case kDialogCommand:
         if (_stricmp("Back", event->controlName) == 0) {
             PCStartupDlg* dialog = new(__FILE__, 1659) PCStartupDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         }
         break;
@@ -794,7 +794,7 @@ void PCCompleteDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case kDialogCommand: {
         PCFinishedDlg* dialog = new(__FILE__, 1941) PCFinishedDlg;
-        guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+        guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
         EndDialog(0);
         break;
     }
@@ -991,7 +991,7 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             field_0x7f78 = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->UnknownFunction4755c0();
         } else if (!_stricmp("ButWrench", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 719) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);
         }
         break;
     case kDialogEditDone:

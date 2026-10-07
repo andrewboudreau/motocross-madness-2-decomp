@@ -187,10 +187,6 @@ public:
     void ShowTrackPicture();             // 0x004f75d0: shows the track picture
     void UnknownFunction4f7640(UIControl* picture, const char* directory, const char* name); // 0x004f7640
 
-    MultiPlayerDlg* parentDialog;             // +0x2c: parent dialog
-    unsigned char field_0x30[0x7f3c - 0x30];
-    GameObject* controlContainer;             // +0x7f3c: the controls
-    unsigned char field_0x7f40[0x7f58 - 0x7f40];
     int field_0x7f58;
 };
 
@@ -210,12 +206,6 @@ public:
     void ApplyChosenBike();             // 0x004f8d20: applies the chosen bike
     void ApplyChosenRider();             // 0x004500d0 (in dlgprocs.cpp's code): applies the chosen rider
 
-    MultiPlayerDlg* parentDialog;             // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    GUIUser* guiUser;                         // +0x34
-    unsigned char field_0x38[0x110 - 0x38];
-    BackgroundImage* dialogBackground;        // +0x110
-    unsigned char field_0x114[0x7f58 - 0x114];
     Vector3 viewEye;                          // +0x7f58: the bike view's eye
     Vector3 viewTarget;                       // +0x7f64: and target
     float viewDistance;                       // +0x7f70: their distance
@@ -234,8 +224,6 @@ class MPRaceInfoDlg : public UIDialog {
 public:
     MPRaceInfoDlg() : UIDialog(1, "MPRInfo.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004513a0 (DlgProcs.cpp)
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: MPOptionsDlg : UIDialog (vtable 0x005578fc; 0x7f58 bytes).
@@ -246,8 +234,6 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f93c0
     void UnknownFunction4f95a0();             // 0x004f95a0
     void UnknownFunction4f95b0();             // 0x004f95b0
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: MultiPlayerDlg : UIDialog (vtable 0x00554b14; 0x8110 bytes, the
@@ -271,14 +257,6 @@ public:
     void ShowPage(int page);     // 0x004f5a00: shows page `page`
     void FollowTrackChange();             // 0x004f5ca0: follows a track change
 
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    GUIUser* guiUser;                         // +0x34
-    unsigned char field_0x38[0xc4 - 0x38];
-    int openingMenu;                          // +0xc4: the menu that opened it (0x866, 0x868, 0x88e)
-    unsigned char field_0xc8[0x118 - 0xc8];
-    int field_0x118;                          // a color (0xfeb97a)
-    unsigned char field_0x11c[0x7f58 - 0x11c];
     MPEventDlg* field_0x7f58;
     MPBikeRiderDlg* field_0x7f5c;
     MPRaceInfoDlg* field_0x7f60;

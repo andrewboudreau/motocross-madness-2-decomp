@@ -664,16 +664,16 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             OpenPage(5);
         } else if (_stricmp("Restore", event->controlName) == 0) {
             GlobalSettingsDlg* dialog = new(__FILE__, 979) GlobalSettingsDlg;
-            event->gui->ShowDialog((UnknownGuiDialog*)dialog, 0, 0xc, 0,
-                                                     (UnknownGuiDialog*)this, 0, 0, 1);
+            event->gui->ShowDialog((UIDialog*)dialog, 0, 0xc, 0,
+                                                     (UIDialog*)this, 0, 0, 1);
         } else if (_stricmp("Help", event->controlName) == 0) {
             g_TrackGame->mode.OpenHelp("MCM2HELP", 0);
         } else if (_stricmp("Advanced", event->controlName) == 0) {
             if (field_0x7f5c)
                 field_0x7f5c->UpdateBoundValues(1);
             OptAdvancedGraphicsDlg* dialog = new(__FILE__, 987) OptAdvancedGraphicsDlg;
-            event->gui->ShowDialog((UnknownGuiDialog*)dialog, 0, 0xc, 0,
-                                                     (UnknownGuiDialog*)this, 0, 0, 1);
+            event->gui->ShowDialog((UIDialog*)dialog, 0, 0xc, 0,
+                                                     (UIDialog*)this, 0, 0, 1);
         }
         break;
     case 9:
@@ -725,7 +725,7 @@ void OptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         memcpy(UnknownMessagesOf(g_TrackGame), g_UnknownGlobal688c10, sizeof(g_UnknownGlobal688c10));
         guiManager->field_0xec = g_UnknownGlobal688898.uiAnimations;
         if (parentDialog)
-            parentDialog->field_0xc8 = g_UnknownGlobal688898.uiAnimations;
+            parentDialog->animatesControls = g_UnknownGlobal688898.uiAnimations;
         break;
     }
 }
@@ -848,8 +848,8 @@ void GlobalSettingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             EndDialog(0);
         } else if (_stricmp("ButLoad", event->controlName) == 0) {
             ConfirmRestoreDlg* dialog = new(__FILE__, 1123) ConfirmRestoreDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 0xc, 0,
-                                              (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 0xc, 0,
+                                              (UIDialog*)this, 0, 0, 1);
         }
         break;
     }

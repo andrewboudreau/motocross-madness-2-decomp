@@ -197,7 +197,7 @@
   "?SetCurrentState@UIMultiState@@QAEXH@Z": "0x00478cf0",
   "?SelectInGroup@UIRadioButton@@QAEHH@Z": "0x00479310",
   "?GetGroupSelection@UIRadioButton@@QAEHXZ": "0x004793f0",
-  "?ShowDialog@GUIManager@@QAEPAVUnknownGuiDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
+  "?ShowDialog@GUIManager@@QAEPAVUIDialog@@PAV2@HHH0HHH@Z": "0x00485a70",
   "?ShowDialog@UnknownKrustyUIGui@@QAEXPAVGameObject@@HHHHHHH@Z": "0x00485a70",
   "?GetUser@GUIManager@@QAEPAVGUIUser@@H@Z": "0x00486540",
   "?UnknownFunction4897e0@InputDevice@@QAEHH@Z": "0x004897e0",

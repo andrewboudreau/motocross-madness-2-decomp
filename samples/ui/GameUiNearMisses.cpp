@@ -7,9 +7,6 @@
 //   hoisted load.
 // 0x0046ea80 (160/164): the two arguments are loaded into the opposite
 //   registers (id in esi in retail); a local copy of either does not change it.
-// 0x0046ff70 (23/71): the same event stores; retail schedules them in field
-//   order, VC6 here hoists `this` and the parent's GUI. Seven store orders were
-//   tried, plus every position of the control store.
 // 0x00470170 UIControl constructor (535/578): retail places the owner == 0
 //   block differently.
 // 0x00470450 UIControl destructor (88/386): retail threads the tool-tip jumps
@@ -103,7 +100,7 @@
 int g_UnknownGlobal65b5c8;
 
 // 0x0046e8c0
-void UnknownGameUiDialog::UnknownVirtualSlot28(int value) {
+void UIDialog::UnknownVirtualSlot28(int value) {
     UnknownDialogEvent event;
     event.handled = 0;
     event.gui = guiManager;
@@ -118,7 +115,7 @@ void UnknownGameUiDialog::UnknownVirtualSlot28(int value) {
 
 // 0x0046ea80
 void UIDialog::EnableGroup(int id, int value) {
-    GameObjectIterator iterator(((UnknownGameUiDialog*)this)->controlContainer, 1, "UIControl");
+    GameObjectIterator iterator(controlContainer, 1, "UIControl");
     UIControl* control;
     while ((control = (UIControl*)iterator.Next()) != 0) {
         if (control->groupId == id)
@@ -126,24 +123,8 @@ void UIDialog::EnableGroup(int id, int value) {
     }
 }
 
-// 0x0046ff70
-void UIDialog::NotifyParent(int a, int b) {
-    UnknownGameUiDialog* parent = ((UnknownGameUiDialog*)this)->parentDialog;
-    if (parent) {
-        UnknownDialogEvent event;
-        event.kind = b;
-        event.handled = 0;
-        event.code = a;
-        event.controlName = 0;
-        event.dialog = parent;
-        event.control = (UIControl*)this;
-        event.gui = parent->guiManager;
-        parent->UnknownVirtualSlot29(&event);
-    }
-}
-
 // 0x00470170
-UIControl::UIControl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner)
+UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
     : GameObject(1) {
     AppendClassName(this);
     controlType = type;
@@ -273,7 +254,7 @@ void UIControl::UnknownVirtualSlot49(int enable) {
 
 // 0x00470f10
 void UIControl::UnknownVirtualSlot39() {
-    UnknownGameUiDialog* owner = ownerDialog;
+    UIDialog* owner = ownerDialog;
     int left = field_0x3c[0];
     field_0x2c[0] = (int)(left * owner->scaleX);
     int top = field_0x3c[1];
@@ -406,7 +387,7 @@ void UIScrollCtl::UnknownVirtualSlot60(int value) {
 }
 
 // 0x00475c70
-UIListBox::UIListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* owner)
+UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
     : UIControl(3, id, area, owner) {
     selectBrush = 0;
     itemBrush = 0;
@@ -549,7 +530,7 @@ static int UnknownFunction477800(const void* a, const void* b) {
 
 // 0x00477bc0
 void UIListBox::UpdateScrollBars() {
-    UnknownGameUiDialog* owner = ownerDialog;
+    UIDialog* owner = ownerDialog;
     if (!owner)
         return;
     int height = 0;
@@ -679,25 +660,24 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
 
 // 0x0046ef00: runs the timers and the joystick focus moves.
 int UIDialog::UnknownVirtualSlot10(float frameTime) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
-    if (dialog->lastFrameTime != 0.0f)
-        dialog->lastFrameTime = frameTime;
+    if (lastFrameTime != 0.0f)
+        lastFrameTime = frameTime;
     else
-        dialog->lastFrameTime = 0.001f;
-    if (dialog->sendFrameEvent) {
+        lastFrameTime = 0.001f;
+    if (sendFrameEvent) {
         UnknownDialogEvent event;
-        event.gui = dialog->guiManager;
+        event.gui = guiManager;
         event.handled = 0;
         event.kind = kDialogFrame;
         event.controlName = 0;
         event.dialog = this;
         event.control = 0;
-        dialog->UnknownVirtualSlot29(&event);
-        dialog->sendFrameEvent = 0;
+        UnknownVirtualSlot29(&event);
+        sendFrameEvent = 0;
     }
-    if (!field_0x25_bit2 && !dialog->isClosing) {
+    if (!field_0x25_bit2 && !isClosing) {
         UITimer* timer;
-        for (int i = 0; (timer = dialog->timerList.Get(i)) != 0; i++) {
+        for (int i = 0; (timer = timerList.Get(i)) != 0; i++) {
             timer->elapsedTime += (int)(frameTime * 1000.0f);
             if ((unsigned int)timer->elapsedTime >= (unsigned int)timer->periodTime) {
                 timer->elapsedTime = 0;
@@ -707,57 +687,57 @@ int UIDialog::UnknownVirtualSlot10(float frameTime) {
                 } else {
                     UnknownDialogEvent event;
                     event.code = timer->timerId;
-                    event.gui = dialog->guiManager;
+                    event.gui = guiManager;
                     event.handled = 0;
                     event.kind = kDialogTimer;
                     event.controlName = 0;
                     event.dialog = this;
                     event.control = 0;
-                    dialog->UnknownVirtualSlot29(&event);
+                    UnknownVirtualSlot29(&event);
                     if (event.handled)
                         return 1;
                 }
             }
         }
-        GUIUser* user = dialog->guiUser;
+        GUIUser* user = guiUser;
         UIControl* focus = (UIControl*)user->field_0x1d8;
         user->UnknownFunction487fb0(focus && focus->mouseAnim ? (UnknownCursorAnimation*)focus->mouseAnim
-                                                                 : dialog->cursorAnimation);
+                                                                 : cursorAnimation);
         GUIInputDevice* device;
         int j = 0;
-        while ((device = dialog->guiUser->UnknownFunction488310(j++)) != 0) {
+        while ((device = guiUser->UnknownFunction488310(j++)) != 0) {
             if (device->inputDevice->deviceKind == 2) {
                 int x = device->pointerPosition.x;
                 int y = device->pointerPosition.y;
                 if (focus) {
                     if (x <= -1) {
-                        if (dialog->joystickCentred) {
+                        if (joystickCentred) {
                             UIControl* next = focus->UnknownFunction4727c0();
-                            dialog->joystickCentred = 0;
+                            joystickCentred = 0;
                             if (next)
                                 UnknownFunction470000(next, 0, 0);
                         }
                     } else if (x >= 1) {
-                        if (dialog->joystickCentred) {
+                        if (joystickCentred) {
                             UIControl* next = focus->UnknownFunction472810();
-                            dialog->joystickCentred = 0;
+                            joystickCentred = 0;
                             if (next)
                                 UnknownFunction470000(next, 0, 0);
                         }
                     } else if (y <= -1) {
-                        if (dialog->joystickCentred)
-                            dialog->joystickCentred = 0;
+                        if (joystickCentred)
+                            joystickCentred = 0;
                     } else if (y >= 1) {
-                        if (dialog->joystickCentred)
-                            dialog->joystickCentred = 0;
+                        if (joystickCentred)
+                            joystickCentred = 0;
                     } else {
-                        dialog->joystickCentred = 1;
+                        joystickCentred = 1;
                     }
                 }
             }
         }
         UnknownFunction46f120();
-        GameObject::UnknownVirtualSlot10(dialog->lastFrameTime);
+        GameObject::UnknownVirtualSlot10(lastFrameTime);
     }
     return 1;
 }
@@ -1280,11 +1260,10 @@ char* g_UnknownGlobal65b600;
 // (pass 0), the images (1), the sounds (2) and the controls with their
 // "Set_Default" sections (3).
 int UIDialog::UnknownFunction46a920(void* stream, int offset) {
-    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
     char backgroundImage[0x80];
     backgroundImage[0] = 0;
     int depth = g_TrackGame->renderTarget->field_0x28;
-    memset(dialog->sectionTable, 0, sizeof(dialog->sectionTable));
+    memset(sectionTable, 0, sizeof(sectionTable));
     int setType = 1;
     UnknownParameterBlock parameters;
     parameters.UnknownFunction4b77a0((UnknownParameterStream*)stream, offset, 1);
@@ -1299,15 +1278,15 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
         } else if (!_strnicmp(name, "Set_Control", strlen("Set_Control"))) {
             setType = 4;
         } else {
-            strcpy(dialog->sectionTable[dialog->sectionCount].sectionName, name);
-            dialog->sectionTable[dialog->sectionCount].sectionObject = 0;
+            strcpy(sectionTable[sectionCount].sectionName, name);
+            sectionTable[sectionCount].sectionObject = 0;
             if (!_strnicmp(name, "Set_Info", strlen("Set_Info")))
-                dialog->sectionTable[dialog->sectionCount].field_0x38 = 0;
+                sectionTable[sectionCount].field_0x38 = 0;
             else if (!_strnicmp(name, "Set_Default", strlen("Set_Default")))
-                dialog->sectionTable[dialog->sectionCount].field_0x38 = 3;
+                sectionTable[sectionCount].field_0x38 = 3;
             else
-                dialog->sectionTable[dialog->sectionCount].field_0x38 = setType;
-            dialog->sectionCount++;
+                sectionTable[sectionCount].field_0x38 = setType;
+            sectionCount++;
         }
     }
     delete sections;
@@ -1445,29 +1424,29 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     UIControl* control;
     int isDefault;
     for (int pass = 0; pass < 4; pass++) {
-        for (int i = 0; i < dialog->sectionCount; i++) {
+        for (int i = 0; i < sectionCount; i++) {
             control = 0;
             isDefault = 0;
-            parameters.UnknownFunction4b78f0(dialog->sectionTable[i].sectionName);
-            switch (dialog->sectionTable[i].field_0x38) {
+            parameters.UnknownFunction4b78f0(sectionTable[i].sectionName);
+            switch (sectionTable[i].field_0x38) {
             case 0:
                 if (pass == 0) {
                     parameters.UnknownFunction4b7f10("ScreenWidth", g_TrackGame->renderTarget->field_0x0c,
-                                                     &dialog->screenWidth);
+                                                     &screenWidth);
                     parameters.UnknownFunction4b7f10("ScreenHeight", g_TrackGame->renderTarget->field_0x10,
-                                                     &dialog->screenHeight);
-                    parameters.UnknownFunction4b7f10("NoScale", 0, &dialog->scaleToScreen);
-                    dialog->scaleToScreen = !dialog->scaleToScreen;
-                    parameters.UnknownFunction4b7f10("Popup", 1, &dialog->isPopup);
-                    RenderTarget* target = (RenderTarget*)dialog->field_0x18;
-                    if (dialog->scaleToScreen) {
-                        dialog->scaleX = (float)target->field_0x0c / dialog->screenWidth;
-                        dialog->scaleY = (float)target->field_0x10 / dialog->screenHeight;
-                    } else if (dialog->screenWidth * 2 > target->field_0x0c ||
-                               dialog->screenHeight * 2 > target->field_0x10) {
-                        dialog->scaleX = dialog->scaleY = 1.0f;
+                                                     &screenHeight);
+                    parameters.UnknownFunction4b7f10("NoScale", 0, &scaleToScreen);
+                    scaleToScreen = !scaleToScreen;
+                    parameters.UnknownFunction4b7f10("Popup", 1, &isPopup);
+                    RenderTarget* target = (RenderTarget*)field_0x18;
+                    if (scaleToScreen) {
+                        scaleX = (float)target->field_0x0c / screenWidth;
+                        scaleY = (float)target->field_0x10 / screenHeight;
+                    } else if (screenWidth * 2 > target->field_0x0c ||
+                               screenHeight * 2 > target->field_0x10) {
+                        scaleX = scaleY = 1.0f;
                     }
-                    if (dialog->isPopup) {
+                    if (isPopup) {
                         parameters.UnknownFunction4b7ec0("DlgAlignV", "MIDDLE", buffer, -1);
                         short align;
                         if (!_stricmp(buffer, "TOP"))
@@ -1482,35 +1461,35 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         else
                             UnknownFunction46ffc0(align | 2);
                     } else {
-                        dialog->popupAlignment = 9;
+                        popupAlignment = 9;
                     }
                     for (int color = 0; color < 10; color++) {
                         sprintf(buffer, "%s%d", "TextColor", color);
                         parameters.UnknownFunction4b7f10(buffer, defaultColors[color], &value);
-                        dialog->textColors[color] = value;
+                        textColors[color] = value;
                     }
                     parameters.UnknownFunction4b7ec0("MouseCursorAnim", "", buffer, -1);
                     if (buffer[0])
-                        dialog->cursorAnimation = (UnknownCursorAnimation*)FindSectionObject(buffer);
+                        cursorAnimation = (UnknownCursorAnimation*)FindSectionObject(buffer);
                     parameters.UnknownFunction4b7ec0("BackgroundFile", "", buffer, -1);
-                    if (buffer[0] && dialog->dialogBackground) {
+                    if (buffer[0] && dialogBackground) {
                         UnknownTgaFile* file = UnknownFunction5125c0(buffer, 0, (int)g_UnknownResourceManager572b44);
                         if (file) {
-                            dialog->ownsBackground = 1;
-                            if (dialog->parentDialog)
-                                dialog->parentBackground = dialog->dialogBackground->field_0x2c;
-                            dialog->dialogBackground->field_0x2c =
-                                new(__FILE__, 0x367) PCTextureMap((TextureMapManager*)dialog->dialogTextures, 1);
-                            dialog->dialogBackground->field_0x2c->UnknownVirtualSlot4(
+                            ownsBackground = 1;
+                            if (parentDialog)
+                                parentBackground = dialogBackground->field_0x2c;
+                            dialogBackground->field_0x2c =
+                                new(__FILE__, 0x367) PCTextureMap((TextureMapManager*)dialogTextures, 1);
+                            dialogBackground->field_0x2c->UnknownVirtualSlot4(
                                 file->bits, file->width, file->height, file->width, file->width, 0x22b, depth,
-                                dialog->dialogPalette ? (UnknownTexturePalette*)((Palette8*)dialog->dialogPalette)->field_0x708 : 0,
-                                4, dialog->dialogPalette ? ((Palette8*)dialog->dialogPalette)->field_0x70c : 0, 0, 0, 2, 1, 0,
+                                dialogPalette ? (UnknownTexturePalette*)((Palette8*)dialogPalette)->field_0x708 : 0,
+                                4, dialogPalette ? ((Palette8*)dialogPalette)->field_0x70c : 0, 0, 0, 2, 1, 0,
                                 0x80, 0xff00ff);
-                            dialog->dialogBackground->UnknownFunction404da0();
+                            dialogBackground->UnknownFunction404da0();
                             UnknownFunction512dd0(file);
                         }
-                    } else if (dialog->parentDialog) {
-                        dialog->dialogBackground = dialog->parentDialog->dialogBackground;
+                    } else if (parentDialog) {
+                        dialogBackground = parentDialog->dialogBackground;
                     }
                     char fontName[0x80];
                     parameters.UnknownFunction4b7ec0("FontName", "", fontName, -1);
@@ -1526,106 +1505,106 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                             size++;
                     }
                     if (fontName[0] && size) {
-                        if (dialog->dialogFont)
-                            DeleteObject((HGDIOBJ)dialog->dialogFont);
-                        dialog->dialogFontHeight = (int)(size * dialog->scaleY);
-                        strcpy(dialog->dialogFontFace, fontName);
+                        if (dialogFont)
+                            DeleteObject((HGDIOBJ)dialogFont);
+                        dialogFontHeight = (int)(size * scaleY);
+                        strcpy(dialogFontFace, fontName);
                         int bold;
                         int italic;
                         parameters.UnknownFunction4b7f10("Bold", 0, &bold);
                         parameters.UnknownFunction4b7f10("Italic", 0, &italic);
-                        const char* face = dialog->guiManager ? dialog->guiManager->toolTipFontFace : "";
+                        const char* face = guiManager ? guiManager->toolTipFontFace : "";
                         if (*face) {
-                            strcpy(dialog->dialogFontFace, face);
-                            bold = dialog->guiManager->toolTipBold;
-                            italic = dialog->guiManager->toolTipItalic;
+                            strcpy(dialogFontFace, face);
+                            bold = guiManager->toolTipBold;
+                            italic = guiManager->toolTipItalic;
                         }
-                        dialog->dialogFontHeight = (int)((dialog->guiManager ? *(float*)&dialog->guiManager->field_0x3d0 : 0.0f) +
-                                                   dialog->dialogFontHeight);
-                        dialog->dialogFont = CreateFontA(dialog->dialogFontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM, italic,
-                                                         0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialog->dialogFontFace);
-                        dialog->field_0x10c = italic;
-                        dialog->field_0x108 = bold;
+                        dialogFontHeight = (int)((guiManager ? *(float*)&guiManager->field_0x3d0 : 0.0f) +
+                                                   dialogFontHeight);
+                        dialogFont = CreateFontA(dialogFontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM, italic,
+                                                         0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialogFontFace);
+                        field_0x10c = italic;
+                        field_0x108 = bold;
                     }
                     if (g_TrackGame->renderTarget->field_0x28 == 8) {
                         int load = 1;
-                        if (dialog->guiManager) {
-                            if (dialog->guiManager->UnknownFunction4864f0())
+                        if (guiManager) {
+                            if (guiManager->UnknownFunction4864f0())
                                 load = 0;
-                            dialog->dialogPalette = dialog->guiManager->guiPalette;
+                            dialogPalette = guiManager->guiPalette;
                         }
                         parameters.UnknownFunction4b7ec0("PaletteFile", "", buffer, -1);
                         if (buffer[0] && load) {
                             UnknownResourceEntry* resource = g_UnknownResourceManager572b44->UnknownFunction4e9360(buffer, 1);
                             if (resource) {
-                                dialog->dialogPalette = new(__FILE__, 0x3b6) Palette8(resource->field_0x14);
-                                dialog->ownsPalette = 1;
+                                dialogPalette = new(__FILE__, 0x3b6) Palette8(resource->field_0x14);
+                                ownsPalette = 1;
                             }
                         }
-                        if (dialog->guiManager && load)
-                            dialog->guiManager->UnknownFunction486150((Palette8*)dialog->dialogPalette);
+                        if (guiManager && load)
+                            guiManager->UnknownFunction486150((Palette8*)dialogPalette);
                     }
                     parameters.UnknownFunction4b7ec0("BackgroundImage", "", backgroundImage, -1);
                     if (backgroundImage[0]) {
                         CameraRect frameArea;
                         frameArea.left = 0;
                         frameArea.top = 0;
-                        frameArea.right = dialog->screenArea.right - dialog->screenArea.left;
-                        frameArea.bottom = dialog->screenArea.bottom - dialog->screenArea.top;
-                        UIStatic* frame = new(__FILE__, 0x3cd) UIStatic(0, &frameArea, dialog);
+                        frameArea.right = screenArea.right - screenArea.left;
+                        frameArea.bottom = screenArea.bottom - screenArea.top;
+                        UIStatic* frame = new(__FILE__, 0x3cd) UIStatic(0, &frameArea, this);
                         frame->SetName("FRMBIStatic");
                         frame->permanent = 1;
-                        dialog->controlContainer->AppendChild(frame, -1);
+                        controlContainer->AppendChild(frame, -1);
                         UnknownFunction46a840(frame, 0, 0);
                     }
                 }
                 break;
             case 1:
-                if (pass == 1 && dialog->imageCount < 500) {
-                    dialog->imageTable[dialog->imageCount] = new(__FILE__, 0x3df) UIAnim(dialog->dialogTextures, (void*)1);
+                if (pass == 1 && imageCount < 500) {
+                    imageTable[imageCount] = new(__FILE__, 0x3df) UIAnim(dialogTextures, (void*)1);
                     int delay;
                     int loops;
                     parameters.UnknownFunction4b7f10("MSecDelay", 0, &delay);
                     parameters.UnknownFunction4b7f10("LoopCount", 0, &loops);
-                    dialog->imageTable[dialog->imageCount]->SetFrameDelay(delay);
-                    dialog->imageTable[dialog->imageCount]->SetFrameCount(loops);
+                    imageTable[imageCount]->SetFrameDelay(delay);
+                    imageTable[imageCount]->SetFrameCount(loops);
                     parameters.UnknownFunction4b7ec0("Files1", "", buffer, -1);
                     UnknownTokenizer files(buffer);
                     for (char* file = files.UnknownFunction515df0(","); file; file = files.UnknownFunction515df0(",")) {
-                        if (g_UnknownResourceManager572b44->UnknownFunction4e9360(dialog->sectionTable[i].sectionName, 1))
-                            dialog->imageTable[dialog->imageCount]->LoadFromModule(
-                                dialog->sectionTable[i].sectionName, (int)g_UnknownResourceManager572b44, (int)dialog->soundGroup,
-                                dialog->dialogPalette);
+                        if (g_UnknownResourceManager572b44->UnknownFunction4e9360(sectionTable[i].sectionName, 1))
+                            imageTable[imageCount]->LoadFromModule(
+                                sectionTable[i].sectionName, (int)g_UnknownResourceManager572b44, (int)soundGroup,
+                                dialogPalette);
                         else if (g_UnknownResourceManager572b44->UnknownFunction4e9360(file, 1))
-                            dialog->imageTable[dialog->imageCount]->LoadFromModule(
-                                file, (int)g_UnknownResourceManager572b44, (int)dialog->soundGroup, dialog->dialogPalette);
+                            imageTable[imageCount]->LoadFromModule(
+                                file, (int)g_UnknownResourceManager572b44, (int)soundGroup, dialogPalette);
                         else
-                            dialog->imageTable[dialog->imageCount]->LoadFile(file, dialog->dialogPalette);
+                            imageTable[imageCount]->LoadFile(file, dialogPalette);
                     }
-                    dialog->sectionTable[i].sectionObject = (Sound*)dialog->imageTable[dialog->imageCount];
-                    dialog->imageCount++;
+                    sectionTable[i].sectionObject = (Sound*)imageTable[imageCount];
+                    imageCount++;
                 }
                 break;
             case 2:
-                if (pass == 2 && dialog->soundCount < 20) {
+                if (pass == 2 && soundCount < 20) {
                     int isStatic;
                     int copies;
                     parameters.UnknownFunction4b7f10("Static", 1, &isStatic);
                     parameters.UnknownFunction4b7f10("Copies", 0, &copies);
                     parameters.UnknownFunction4b7ec0("File", "", buffer, -1);
                     int flags = isStatic ? 1 : 2;
-                    if (g_UnknownResourceManager572b44->UnknownFunction4e9360(dialog->sectionTable[i].sectionName, 1)) {
-                        dialog->soundTable[dialog->soundCount] =
-                            UnknownFunction4bb890(dialog->soundGroup, dialog->sectionTable[i].sectionName, flags, 3, copies, -1);
+                    if (g_UnknownResourceManager572b44->UnknownFunction4e9360(sectionTable[i].sectionName, 1)) {
+                        soundTable[soundCount] =
+                            UnknownFunction4bb890(soundGroup, sectionTable[i].sectionName, flags, 3, copies, -1);
                     } else if (g_UnknownResourceManager572b44->UnknownFunction4e9360(buffer, 1)) {
-                        dialog->soundTable[dialog->soundCount] =
-                            UnknownFunction4bb890(dialog->soundGroup, buffer, flags, 3, copies, -1);
+                        soundTable[soundCount] =
+                            UnknownFunction4bb890(soundGroup, buffer, flags, 3, copies, -1);
                     } else {
-                        dialog->soundTable[dialog->soundCount] = new(__FILE__, 0x41e) Sound(dialog->soundGroup, 1);
-                        dialog->soundTable[dialog->soundCount]->UnknownFunction4bc320(buffer, 0, flags, 3, copies, -1);
+                        soundTable[soundCount] = new(__FILE__, 0x41e) Sound(soundGroup, 1);
+                        soundTable[soundCount]->UnknownFunction4bc320(buffer, 0, flags, 3, copies, -1);
                     }
-                    dialog->sectionTable[i].sectionObject = dialog->soundTable[dialog->soundCount];
-                    dialog->soundCount++;
+                    sectionTable[i].sectionObject = soundTable[soundCount];
+                    soundCount++;
                 }
                 break;
             case 3:
@@ -1662,13 +1641,13 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     isDefault) {
                     if (!isDefault) {
                         if (!_stricmp(type, "BUTTON")) {
-                            control = new(__FILE__, 0x45b) UIButton(0, &area, dialog);
+                            control = new(__FILE__, 0x45b) UIButton(0, &area, this);
                             button = (UIButton*)AddControl(control, groupId, 0);
                         } else if (!_stricmp(type, "SCROLLDOWN")) {
-                            control = new(__FILE__, 0x45c) UIScrollCtl(10, 0, &area, dialog);
+                            control = new(__FILE__, 0x45c) UIScrollCtl(10, 0, &area, this);
                             button = (UIButton*)AddControl(control, groupId, 0);
                         } else if (!_stricmp(type, "SCROLLUP")) {
-                            control = new(__FILE__, 0x45d) UIScrollCtl(9, 0, &area, dialog);
+                            control = new(__FILE__, 0x45d) UIScrollCtl(9, 0, &area, this);
                             button = (UIButton*)AddControl(control, groupId, 0);
                         }
                     }
@@ -1694,7 +1673,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
 
                 if (!_stricmp(type, "MULTISTATE") || isDefault) {
                     if (!isDefault) {
-                        control = new(__FILE__, 0x474) UIMultiState(0, &area, dialog);
+                        control = new(__FILE__, 0x474) UIMultiState(0, &area, this);
                         multiState = (UIMultiState*)AddControl(control, groupId, 0);
                     }
                     int states;
@@ -1739,7 +1718,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 if (!_stricmp(type, "LISTBOX") || isDefault) {
                     parameters.UnknownFunction4b7f10("MaxItems", 100, isDefault ? &defaultMaxItems : &value);
                     if (!isDefault) {
-                        control = new(__FILE__, 0x4a3) UIListBox(0, value, &area, dialog);
+                        control = new(__FILE__, 0x4a3) UIListBox(0, value, &area, this);
                         listBox = (UIListBox*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
@@ -1798,7 +1777,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
 
                 if (!_stricmp(type, "RADIOBUTTON") || isDefault) {
                     if (!isDefault) {
-                        control = new(__FILE__, 0x4e3) UIRadioButton(0, &area, dialog);
+                        control = new(__FILE__, 0x4e3) UIRadioButton(0, &area, this);
                         radioButton = (UIRadioButton*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
@@ -1814,7 +1793,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
 
                 if (!_stricmp(type, "STATIC") || isDefault) {
                     if (!isDefault) {
-                        control = new(__FILE__, 0x4f3) UIStatic(0, &area, dialog);
+                        control = new(__FILE__, 0x4f3) UIStatic(0, &area, this);
                         staticControl = (UIStatic*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
@@ -1824,7 +1803,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
 
                 if (!_stricmp(type, "VSCROLLBAR") || !_stricmp(type, "HSCROLLBAR") || isDefault) {
                     if (!isDefault) {
-                        control = new(__FILE__, 0x500) UIScrollBar(7, 0, &area, dialog);
+                        control = new(__FILE__, 0x500) UIScrollBar(7, 0, &area, this);
                         scrollBar = (UIScrollBar*)AddControl(control, groupId, 0);
                     }
                     if (!_stricmp(type, "HSCROLLBAR"))
@@ -1862,7 +1841,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
 
                 if (!_stricmp(type, "EDITBOX") || isDefault) {
                     if (!isDefault) {
-                        control = new(__FILE__, 0x52c) UIEditBox(0, &area, dialog, 100, 0, 0);
+                        control = new(__FILE__, 0x52c) UIEditBox(0, &area, this, 100, 0, 0);
                         editBox = (UIEditBox*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7f10("MaxLen", defaultMaxLen, isDefault ? &defaultMaxLen : &value);
@@ -1886,7 +1865,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
 
                 if (!_stricmp(type, "STATICTEXT") || isDefault) {
                     if (!isDefault) {
-                        control = new(__FILE__, 0x545) UIStaticText(0, &area, dialog, 0, 0xffff);
+                        control = new(__FILE__, 0x545) UIStaticText(0, &area, this, 0, 0xffff);
                         staticText = (UIStaticText*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
@@ -1896,7 +1875,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
 
                 if (!_strnicmp(type, "DROPDOWNLIST", 12) || isDefault) {
                     if (!isDefault) {
-                        control = new(__FILE__, 0x54f) UIDropDownList(0, &area, dialog, 0, 0xffff);
+                        control = new(__FILE__, 0x54f) UIDropDownList(0, &area, this, 0, 0xffff);
                         dropDownList = (UIDropDownList*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
@@ -1940,7 +1919,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         } while (parameters.UnknownFunction4b7ec0(listKey, item < 50 ? defaultItems[item] : "",
                                                                   isDefault ? defaultItems[item] : buffer, -1));
                     }
-                    control->SetName(dialog->sectionTable[i].sectionName);
+                    control->SetName(sectionTable[i].sectionName);
                     int leftMargin;
                     int topMargin;
                     int textColor;
@@ -2079,7 +2058,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 control->UnknownVirtualSlot52(attachId);
                 control->groupId = groupId;
                 control->SetAnchor((UIControl*)FindSectionObject(anchor), relAnchor);
-                control->SetName(dialog->sectionTable[i].sectionName);
+                control->SetName(sectionTable[i].sectionName);
                 control->moveable = moveable;
                 if (control->field_0x3c[2] == control->field_0x3c[0]) {
                     UIAnim* image;
@@ -2090,7 +2069,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     control->field_0x3c[2] = image->frameList[0]->frameWidth + control->field_0x3c[0];
                     control->field_0x3c[3] = control->field_0x3c[1] + image->frameList[0]->frameHeight;
                 }
-                if (fontName[0] || (fontHeight && dialog->guiManager && dialog->guiManager->dialogFontName)) {
+                if (fontName[0] || (fontHeight && guiManager && guiManager->dialogFontName)) {
                     control->ownsFont = 1;
                     if (control->fontHandle)
                         DeleteObject((HGDIOBJ)control->fontHandle);
@@ -2101,20 +2080,20 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         bold = 1;
                     else if (bold > 1)
                         bold = 0;
-                    const char* face = dialog->guiManager ? dialog->guiManager->toolTipFontFace : "";
+                    const char* face = guiManager ? guiManager->toolTipFontFace : "";
                     if (*face) {
                         strcpy(control->fontFace, face);
-                        bold = dialog->guiManager->toolTipBold;
-                        italic = dialog->guiManager->toolTipItalic;
+                        bold = guiManager->toolTipBold;
+                        italic = guiManager->toolTipItalic;
                     }
-                    control->fontHeight = (int)((dialog->guiManager ? *(float*)&dialog->guiManager->field_0x3d0 : 0.0f) +
+                    control->fontHeight = (int)((guiManager ? *(float*)&guiManager->field_0x3d0 : 0.0f) +
                                                  control->fontHeight);
-                    if (control->fontHeight != dialog->dialogFontHeight || bold != dialog->field_0x108 ||
-                        italic != dialog->field_0x10c) {
-                        control->fontHeight = (int)(control->fontHeight * dialog->scaleY);
+                    if (control->fontHeight != dialogFontHeight || bold != field_0x108 ||
+                        italic != field_0x10c) {
+                        control->fontHeight = (int)(control->fontHeight * scaleY);
                         control->fontHandle = (int)CreateFontA(control->fontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM,
-                                                                italic, 0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialog->dialogFontFace);
-                        strcpy(control->fontFace, dialog->dialogFontFace);
+                                                                italic, 0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialogFontFace);
+                        strcpy(control->fontFace, dialogFontFace);
                         control->bold = bold;
                         control->italic = italic;
                     }
@@ -2122,16 +2101,16 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 if (sourceBlit)
                     control->sourceBlit = 1;
                 control->SetShapeBounds(shapeBounds);
-                if (dialog->guiManager->languageModule) {
+                if (guiManager->languageModule) {
                     int textId;
                     int toolTipId;
                     parameters.UnknownFunction4b7f10("LocalTextId", 0, &textId);
                     parameters.UnknownFunction4b7f10("LocalToolTipId", 0, &toolTipId);
                     if (textId)
-                        control->SetTextFromResource(dialog->guiManager->languageModule, textId);
+                        control->SetTextFromResource(guiManager->languageModule, textId);
                     if (toolTipId) {
                         char tip[0x400];
-                        if (LoadStringA((HINSTANCE)dialog->guiManager->languageModule, toolTipId, tip, sizeof(tip))) {
+                        if (LoadStringA((HINSTANCE)guiManager->languageModule, toolTipId, tip, sizeof(tip))) {
                             if (control->toolTipText)
                                 DebugFree(control->toolTipText, __FILE__, 0x646);
                             control->toolTipText = (char*)DebugMalloc(strlen(tip) + 1, __FILE__, 0x647);
@@ -2210,7 +2189,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 control->permanent = permanent;
                 control->drawnTexture = control->UnknownVirtualSlot48(-1);
                 control->UnknownVirtualSlot39();
-                dialog->sectionTable[i].sectionObject = (Sound*)control;
+                sectionTable[i].sectionObject = (Sound*)control;
                 break;
             }
             }
@@ -2228,39 +2207,39 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
             frame->field_0x2c[3] = imageHeight;
             *(CameraRect*)frame->field_0x3c = *(CameraRect*)frame->field_0x2c;
             frame->drawnTexture = frame->UnknownVirtualSlot48(0);
-            dialog->screenArea.right = dialog->screenArea.left + width;
-            dialog->screenArea.bottom = dialog->screenArea.top + imageHeight;
+            screenArea.right = screenArea.left + width;
+            screenArea.bottom = screenArea.top + imageHeight;
             frame->UnknownVirtualSlot39();
         }
     }
-    if (dialog->isPopup && dialog->screenWidth && dialog->screenHeight) {
-        int align = dialog->popupAlignment;
-        RenderTarget* target = (RenderTarget*)dialog->field_0x18;
+    if (isPopup && screenWidth && screenHeight) {
+        int align = popupAlignment;
+        RenderTarget* target = (RenderTarget*)field_0x18;
         if (align & 1) {
-            dialog->screenArea.right -= dialog->screenArea.left;
-            dialog->screenArea.left = 0;
+            screenArea.right -= screenArea.left;
+            screenArea.left = 0;
         } else if (align & 4) {
-            int shift = target->field_0x0c - dialog->screenArea.left * 2 - dialog->screenArea.right;
-            dialog->screenArea.left += shift;
-            dialog->screenArea.right += shift;
+            int shift = target->field_0x0c - screenArea.left * 2 - screenArea.right;
+            screenArea.left += shift;
+            screenArea.right += shift;
         } else {
-            int shift = (target->field_0x0c - dialog->screenArea.left - dialog->screenArea.right) / 2 -
-                        dialog->screenArea.left;
-            dialog->screenArea.left += shift;
-            dialog->screenArea.right += shift;
+            int shift = (target->field_0x0c - screenArea.left - screenArea.right) / 2 -
+                        screenArea.left;
+            screenArea.left += shift;
+            screenArea.right += shift;
         }
         if (align & 8) {
-            dialog->screenArea.bottom -= dialog->screenArea.top;
-            dialog->screenArea.top = 0;
+            screenArea.bottom -= screenArea.top;
+            screenArea.top = 0;
         } else if (align & 0x20) {
-            int shift = target->field_0x10 - dialog->screenArea.top * 2 - dialog->screenArea.bottom;
-            dialog->screenArea.top += shift;
-            dialog->screenArea.bottom += shift;
+            int shift = target->field_0x10 - screenArea.top * 2 - screenArea.bottom;
+            screenArea.top += shift;
+            screenArea.bottom += shift;
         } else {
-            int shift = (target->field_0x10 - dialog->screenArea.top - dialog->screenArea.bottom) / 2 -
-                        dialog->screenArea.top;
-            dialog->screenArea.top += shift;
-            dialog->screenArea.bottom += shift;
+            int shift = (target->field_0x10 - screenArea.top - screenArea.bottom) / 2 -
+                        screenArea.top;
+            screenArea.top += shift;
+            screenArea.bottom += shift;
         }
     }
     return 1;

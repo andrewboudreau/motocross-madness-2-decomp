@@ -12,7 +12,6 @@ class GUIManager;
 struct UnknownSurfaceInterface;
 class Sound;
 class GameObjectIterator;
-class UnknownGameUiDialog;
 struct CameraRect;
 struct tagPOINT;
 
@@ -150,7 +149,7 @@ struct UnknownGameUiState {
 class UIControl : public GameObject {
 public:
     // 0x00470170: `type` is the control kind (5 a static, 12 a static text).
-    UIControl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner);
+    UIControl(int type, int id, CameraRect* area, UIDialog* owner);
     virtual ~UIControl();          // 0x00470450 (deleting wrapper 0x00470430)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00470e00
     virtual int UnknownVirtualSlot13();       // 0x00471140
@@ -268,7 +267,7 @@ public:
     unsigned int transitionDelay;             // +0xac: "FXDelay"
     int field_0xb0;
     int field_0xb4;
-    UnknownGameUiDialog* ownerDialog;         // +0xb8
+    UIDialog* ownerDialog;         // +0xb8
     GUIManager* ownerGui;                     // +0xbc
     char* controlText;                        // +0xc0: "Text" (SetText)
     unsigned int textColor;                   // +0xc4: "TextColor"
@@ -322,7 +321,7 @@ public:
 // `new` at 0x0046c019 and the UIScrollCtl ones push 0x1f0).
 class UIButton : public UIControl {
 public:
-    UIButton(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x004731f0
+    UIButton(int id, CameraRect* area, UIDialog* owner); // 0x004731f0
     virtual ~UIButton();                      // 0x004732c0 (deleting wrapper 0x004732a0)
     virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x004734c0
     virtual void UnknownVirtualSlot49(int enable); // 0x004733a0
@@ -343,7 +342,7 @@ public:
 // 0x0046cace): no members of its own.
 class UIStatic : public UIControl {
 public:
-    UIStatic(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00478f60
+    UIStatic(int id, CameraRect* area, UIDialog* owner); // 0x00478f60
     virtual ~UIStatic();                      // 0x00478fb0 (deleting wrapper 0x00478f90)
     virtual int UnknownVirtualSlot30();       // 0x00478fe0
     virtual TextureMap* UnknownVirtualSlot48(int state); // 0x00478fc0
@@ -354,7 +353,7 @@ public:
 class UIEditBox : public UIControl {
 public:
     // 0x00473630: `size` is the text's capacity.
-    UIEditBox(int id, CameraRect* area, UnknownGameUiDialog* owner, int size, int a, int b);
+    UIEditBox(int id, CameraRect* area, UIDialog* owner, int size, int a, int b);
     virtual ~UIEditBox();                     // 0x00473770 (deleting wrapper 0x00473750)
     virtual int UnknownVirtualSlot20(int value); // 0x00474150
     virtual int UnknownVirtualSlot21(int value); // 0x00474570
@@ -405,7 +404,7 @@ public:
 // forwards. No members of its own.
 class UIScrollCtl : public UIButton {
 public:
-    UIScrollCtl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00474820
+    UIScrollCtl(int type, int id, CameraRect* area, UIDialog* owner); // 0x00474820
     virtual ~UIScrollCtl();                   // 0x00474870 (deleting wrapper 0x00474850)
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00474880
     virtual int UnknownVirtualSlot56(int a, int* position); // 0x00474b10
@@ -416,7 +415,7 @@ public:
 // 0x0046cc82; its constructor clears +0x1ec..+0x21c).
 class UIScrollBar : public UIControl {
 public:
-    UIScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00474ba0
+    UIScrollBar(int type, int id, CameraRect* area, UIDialog* owner); // 0x00474ba0
     virtual ~UIScrollBar();                   // 0x00474c50 (deleting wrapper 0x00474c30)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00474cf0
     virtual int UnknownVirtualSlot40();       // 0x00474ed0
@@ -465,7 +464,7 @@ class UIListBox : public UIControl {
 public:
     // 0x00475c70: `rows` is the row capacity (it passes (id, area, owner) on
     // to UIControl from its first, third and fourth arguments).
-    UIListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* owner);
+    UIListBox(int id, int rows, CameraRect* area, UIDialog* owner);
     virtual ~UIListBox();                     // 0x00475e20 (deleting wrapper 0x00475e00)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00476020: joystick selection and the row under the cursor
     virtual int UnknownVirtualSlot40();       // 0x004761f0: draws the rows
@@ -549,7 +548,7 @@ public:
 // 0x0046c2b4).
 class UIMultiState : public UIControl {
 public:
-    UIMultiState(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x004781f0
+    UIMultiState(int id, CameraRect* area, UIDialog* owner); // 0x004781f0
     virtual ~UIMultiState();                  // 0x00478300 (deleting wrapper 0x004782e0)
     virtual void UnknownVirtualSlot27();      // 0x004784e0
     virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x00478e10: whether `point` is on an opaque pixel
@@ -581,7 +580,7 @@ public:
 // 0x0046d033): no members of its own.
 class UIStaticText : public UIControl {
 public:
-    UIStaticText(int id, CameraRect* area, UnknownGameUiDialog* owner, const char* text,
+    UIStaticText(int id, CameraRect* area, UIDialog* owner, const char* text,
                  unsigned int color);         // 0x00478ff0
     virtual ~UIStaticText();                  // 0x004790f0 (deleting wrapper 0x004790d0)
     virtual void UnknownVirtualSlot29(int state); // 0x00479220 (shared with UIListBox)
@@ -595,7 +594,7 @@ public:
 // at 0x0046c982): no members of its own.
 class UIRadioButton : public UIMultiState {
 public:
-    UIRadioButton(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00479240
+    UIRadioButton(int id, CameraRect* area, UIDialog* owner); // 0x00479240
     virtual ~UIRadioButton();                 // 0x004792d0 (deleting wrapper 0x004792b0)
     virtual int UnknownVirtualSlot53();       // 0x004795c0
     virtual int UnknownVirtualSlot55(int a, int b); // 0x004794c0
@@ -610,7 +609,7 @@ public:
 // compiler's.
 class UIDDLScrollBar : public UIScrollBar {
 public:
-    UIDDLScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog* owner,
+    UIDDLScrollBar(int type, int id, CameraRect* area, UIDialog* owner,
                    UIDropDownList* list);     // 0x00479640
     virtual void UnknownVirtualSlot33(int value); // 0x004796e0
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00479a00
@@ -624,7 +623,7 @@ public:
 // destructor is the compiler's (0x0047ae80, which UIVideoStatic shares).
 class UIDDLStatic : public UIStatic {
 public:
-    UIDDLStatic(int id, CameraRect* area, UnknownGameUiDialog* owner, UIDropDownList* list); // 0x00479b50
+    UIDDLStatic(int id, CameraRect* area, UIDialog* owner, UIDropDownList* list); // 0x00479b50
     virtual void UnknownVirtualSlot33(int value); // 0x00479bc0
 
     UIDropDownList* ownerList;                // +0x1ec
@@ -634,7 +633,7 @@ public:
 // 0x00479f2a): a drop-down list's button. Its destructor is the compiler's.
 class UIDDLButton : public UIButton {
 public:
-    UIDDLButton(int id, CameraRect* area, UnknownGameUiDialog* owner, UIDropDownList* list); // 0x00479bf0
+    UIDDLButton(int id, CameraRect* area, UIDialog* owner, UIDropDownList* list); // 0x00479bf0
     virtual void UnknownVirtualSlot33(int value); // 0x00479ce0
     virtual int UnknownVirtualSlot55(int a, int b); // 0x00479c90
 
@@ -645,7 +644,7 @@ public:
 // 0x00479f6b): a drop-down list's list. Its destructor is the compiler's.
 class UIDDLListBox : public UIListBox {
 public:
-    UIDDLListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* owner,
+    UIDDLListBox(int id, int rows, CameraRect* area, UIDialog* owner,
                  UIDropDownList* list);       // 0x00479d10
     virtual void UnknownVirtualSlot33(int value); // 0x00479e70
     virtual int UnknownVirtualSlot65(int row); // 0x00479db0
@@ -659,7 +658,7 @@ public:
 class UIDropDownList : public UIStaticText {
 public:
     // 0x00479ea0: creates the parts (button, list box, scroll bar and three statics).
-    UIDropDownList(int id, CameraRect* area, UnknownGameUiDialog* owner, const char* text, unsigned int color);
+    UIDropDownList(int id, CameraRect* area, UIDialog* owner, const char* text, unsigned int color);
     virtual ~UIDropDownList();                // 0x0047a1f0 (deleting wrapper 0x0047a1d0)
     virtual int UnknownVirtualSlot30();       // 0x00467ae0 (shared body: returns 1)
     virtual void UnknownVirtualSlot33(int value); // 0x0047a7d0

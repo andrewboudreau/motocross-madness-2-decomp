@@ -1,23 +1,9 @@
 #pragma once
 
+#include "DialogProc.h"
 #include "DirectoryList.h"
 #include "GameUi.h"
 #include "UIDialog.h"
-
-// The message TrackRecordDlg's slot 29 (0x0051f600) receives: its +0x08 is
-// the type (1..6), and +0x0c the dialog whose controls the list helpers
-// fill. The layout matches UnknownDialogEvent (DialogProc.h).
-struct UnknownTrackRecordEvent {
-    int code;
-    const char* controlName;                  // +0x04
-    int kind;                                 // +0x08
-    UIDialog* dialog;                         // +0x0c
-    void* gui;                                // +0x10
-    UIControl* control;            // +0x14 the control ("LstTrack")
-    int field_0x18;
-    int key;                                  // +0x1c
-    int handled;                              // +0x20 set to 1 once handled
-};
 
 // An 8-byte list row (0x0051ffe0, TrackRecord.cpp line 535): a strdup'd
 // name and a value.
@@ -106,17 +92,18 @@ public:
 class TrackRecordDlg : public UIDialog {
 public:
     TrackRecordDlg() : UIDialog(1, "HiScores.dtm") {} // inline (KrustyUI 0x00499b20)
-    void UnknownVirtualSlot29(UnknownTrackRecordEvent* event);             // 0x0051f600
+    // 0x0051f600: the dialog's procedure; its +0x08 is the type (1..6) and
+    // +0x0c the dialog whose controls the list helpers fill.
+    virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);
     void LabelTabs(int series);                                 // 0x0051fc40: labels the tabs
-    void ShowTab(UnknownTrackRecordEvent* event, int series); // 0x0051fe80: shows a tab
+    void ShowTab(UnknownDialogEvent* event, int series); // 0x0051fe80: shows a tab
     void UnknownFunction51ff40();
     void UnknownFunction51ffe0(UIControl* list, DirectoryList* directory, int series); // 0x0051ffe0
-    void FillLists(UnknownTrackRecordEvent* event, int series); // 0x00520390: fills the lists                                           // 0x0051ff40: frees the rows
-    void UnknownFunction520480(UnknownTrackRecordEvent* event, const char* name, float value,
+    void FillLists(UnknownDialogEvent* event, int series); // 0x00520390: fills the lists                                           // 0x0051ff40: frees the rows
+    void UnknownFunction520480(UnknownDialogEvent* event, const char* name, float value,
                                const char* text);                           // 0x00520480
-    void UnknownFunction5204e0(UnknownTrackRecordEvent* event, int times, const char* name); // 0x005204e0
+    void UnknownFunction5204e0(UnknownDialogEvent* event, int times, const char* name); // 0x005204e0
 
-    unsigned char field_0x2c[0x7f58 - 0x2c];
     int field_0x7f58;                         // selected series (0..5)
     int field_0x7f5c;
     UnknownTrackRecordRow** field_0x7f60;

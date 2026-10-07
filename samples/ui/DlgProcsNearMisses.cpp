@@ -375,7 +375,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("MenuOptions", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 345) OptionsDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, (UIDialog*)this, 0, 0, 1);
         } else if (!_stricmp("ButStuntQuarry", event->controlName)) {
             if (movieControl)
                 movieControl->field_0x1ec->Stop();
@@ -454,11 +454,11 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             short row = list->GetSelectedRow();
             if (!_stricmp(list->GetRowText(-1), g_TrackGame->mode.field_0x00)) {
                 NoDelCurProfileDlg* dialog = new(__FILE__, 423) NoDelCurProfileDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+                guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
             } else if (row != -1) {
                 g_UnknownGlobal59adbc = row;
                 RemoveProfileDlg* dialog = new(__FILE__, 426) RemoveProfileDlg;
-                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0x12f, 4, 0, (UnknownGuiDialog*)this,
+                guiManager->ShowDialog((UIDialog*)dialog, 0x12f, 4, 0, (UIDialog*)this,
                                                   (int)list->GetRowText(-1), 0, 1);
             }
             UnknownFunction470000(list, 0, 0);
@@ -473,7 +473,7 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         } else if (!_stricmp("ButTCP", event->controlName)) {
             g_TrackGame->ui->field_0x4b0 = 1;
             ChooseTCPMethodDlg* dialog = new(__FILE__, 453) ChooseTCPMethodDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 4, 0, (UIDialog*)this, 0, 0, 1);
         } else if (!_stricmp("ButZone", event->controlName)) {
             g_TrackGame->openLocalizedWebPageOnExit = 1;
             event->dialog->EndDialog(0);
@@ -495,15 +495,15 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
         } else if (!_stricmp("MenuReplay", event->controlName)) {
             GhostReplayDlg* dialog = new(__FILE__, 487) GhostReplayDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         } else if (!_stricmp("MenuHighScore", event->controlName)) {
             TrackRecordDlg* dialog = new(__FILE__, 492) TrackRecordDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0x911, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0x911, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         } else if (!_stricmp("MenuCredits", event->controlName)) {
             CreditsVidDlg* dialog = new(__FILE__, 501) CreditsVidDlg;
-            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         } else if (!_stricmp("MenuHelp", event->controlName)) {
             g_TrackGame->mode.OpenHelp("MCM2HELP", 0);

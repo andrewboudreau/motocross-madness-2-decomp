@@ -29,8 +29,10 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
   written as one block.
 - **Record**, 0x14 bytes: a 16-byte name and a float time or score.
 - **TrackRecordDlg** : UIDialog (RTTI), 0x7f68 bytes (the allocation size
-  at `0x0044c27b` and `0x0049a2e6`). Its inline constructor passes
-  `UIDialog(1, ...)`.
+  at `0x0044c27b` and `0x0049a2e6`; four own members after UIDialog's
+  0x7f58). Its inline constructor passes `UIDialog(1, ...)`. Its slot 29
+  overrides UIDialog's with the shared `UnknownDialogEvent` (DialogProc.h);
+  the former `UnknownTrackRecordEvent` had the same layout.
 - `0x0051f3c0` reads the racer entries in EventManager+0x50, at +0x08,
   +0x0c (an int), +0x14, +0x18, +0x1c, +0x2c and the name at +0x40.
 - `0x0051f0b0` and `0x0051f260` index six 0x100-byte directory names at

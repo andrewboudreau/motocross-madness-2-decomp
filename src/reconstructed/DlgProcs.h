@@ -40,9 +40,6 @@ public:
     void FillProfileList();             // 0x0044c7a0: fills "LstProfiles"
     void ShowCurrentProfile();             // 0x0044c8c0: shows the current profile
 
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
     UIVideoStatic* movieControl;              // +0x7f58: the movie control
     unsigned char field_0x7f5c[0x7f60 - 0x7f5c];
     UIControl* menuSingleAnimation; // +0x7f60: "MenuSingleAnimation"
@@ -60,8 +57,6 @@ class ChooseTCPMethodDlg : public UIDialog {
 public:
     ChooseTCPMethodDlg() : UIDialog(1, "messbox2.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044cb80
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: NewbieDlg : UIDialog (vtable 0x00551c2c; 0x7f58 bytes).
@@ -69,8 +64,6 @@ class NewbieDlg : public UIDialog {
 public:
     NewbieDlg() : UIDialog(1, "messbox2.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044ccf0
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: NoDelCurProfileDlg : UIDialog (vtable 0x0055198c).
@@ -78,8 +71,6 @@ class NoDelCurProfileDlg : public UIDialog {
 public:
     NoDelCurProfileDlg() : UIDialog(1, "messbox2.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044ce10
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 class BackgroundImage;
@@ -102,11 +93,6 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044cf20
     void OpenPage(int page);     // 0x0044d740: opens page `page` (0..2)
 
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0xc4 - 0x34];
-    int openingMenu;                          // +0xc4: 0x88e when opened on the race info page
-    unsigned char field_0xc8[0x7f58 - 0xc8];
     SPEventDlg* field_0x7f58;
     SPBikeRiderDlg* field_0x7f5c;
     SPRaceInfoDlg* field_0x7f60;
@@ -126,9 +112,6 @@ public:
     int AddGhost(const char* path); // 0x0044ec50: adds a ghost; 0 when unusable
     void ForgetGhosts();             // 0x0044eed0: forgets the ghosts
 
-    unsigned char field_0x2c[0x34 - 0x2c];
-    GUIUser* guiUser;                         // +0x34
-    unsigned char field_0x38[0x7f58 - 0x38];
     UnknownRecordFileHeader* ghostHeaders;    // +0x7f58: the ghost files' headers
     int ghostHeaderCount;                     // +0x7f5c: their count
     char** ghostPaths;                        // +0x7f60: the ghost files' paths
@@ -154,12 +137,6 @@ public:
     void ApplyChosenRider();
     void UnknownFunction4500e0();             // 0x004500e0
 
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    GUIUser* guiUser;                         // +0x34
-    unsigned char field_0x38[0x110 - 0x38];
-    BackgroundImage* dialogBackground;        // +0x110
-    unsigned char field_0x114[0x7f58 - 0x114];
     Vector3 viewEye;                          // +0x7f58: the bike view's eye
     Vector3 viewTarget;                       // +0x7f64: and target
     float viewDistance;                       // +0x7f70: their distance
@@ -177,9 +154,6 @@ class SPRaceInfoDlg : public UIDialog {
 public:
     SPRaceInfoDlg() : UIDialog(1, "SPRInfo.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004507a0
-
-    SinglePlayerDlg* parentDialog;            // +0x2c: parent dialog
-    unsigned char field_0x30[0x7f58 - 0x30];
 };
 
 // RTTI: CreditsVidDlg : UIDialog (vtable 0x005516f8).
@@ -188,7 +162,6 @@ public:
     CreditsVidDlg() : UIDialog(1, "credits.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453170
 
-    unsigned char field_0x2c[0x7f58 - 0x2c];
     UIVideoStatic* field_0x7f58;
 };
 
@@ -204,7 +177,6 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00453570
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004535f0
 
-    unsigned char field_0x2c[0x7f58 - 0x2c];
     int framesShown;                          // +0x7f58: frames shown
     float secondsShown;                       // +0x7f5c: seconds shown
     int frameRan;                             // +0x7f60: set once a frame has run
@@ -218,7 +190,6 @@ public:
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00453670
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004536c0
 
-    unsigned char field_0x2c[0x7f58 - 0x2c];
     float secondsShown;                       // +0x7f58: seconds shown
     int frameRan;                             // +0x7f5c: set once a frame has run
 };
@@ -234,9 +205,6 @@ public:
     void EditWithResources(const char* title, int titleId, const char* prompt, int promptId, char* buffer,
                            int size);
 
-    unsigned char field_0x2c[0x34 - 0x2c];
-    GUIUser* guiUser;                         // +0x34
-    unsigned char field_0x38[0x7f58 - 0x38];
     char* editBuffer;                         // +0x7f58: the edited text
     int editBufferSize;                       // +0x7f5c: its size
 };
@@ -247,9 +215,6 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00455a10
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455b20
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00455ae0
-
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
 };
 
 // The image a dialog resource names (UIDialog 0x0046e9a0 returns its entry).
@@ -279,11 +244,6 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00451020
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00451270
 
-    unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x38 - 0x34];
-    char field_0x38[0x110 - 0x38];            // the dialog resource (UIDialog's constructor copies it)
-    unsigned char field_0x110[0x7f58 - 0x110];
     int framesShown;                          // +0x7f58: frames shown
 };
 
@@ -334,10 +294,6 @@ class UserNameDlg : public UIDialog {
 public:
     UserNameDlg() : UIDialog(1, "messbox1.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00451ff0
-
-    unsigned char field_0x2c[0x34 - 0x2c];
-    GUIUser* guiUser;                         // +0x34
-    unsigned char field_0x38[0x7f58 - 0x38];
 };
 
 // RTTI: ProfileExistsDlg : UIDialog (vtable 0x005521dc; 0x7f58 bytes).
@@ -345,8 +301,6 @@ class ProfileExistsDlg : public UIDialog {
 public:
     ProfileExistsDlg() : UIDialog(1, "messbox2.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00452370
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: RemoveProfileDlg : UIDialog (vtable 0x00551908).
@@ -354,8 +308,6 @@ class RemoveProfileDlg : public UIDialog {
 public:
     RemoveProfileDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004524f0
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block (also
@@ -401,7 +353,6 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453b20
     void OpenPage(int page);     // 0x00453e90: opens page `page` (0 ghosts, 1 replays)
 
-    unsigned char field_0x2c[0x7f58 - 0x2c];
     GhostFilesDlg* field_0x7f58;
     ReplayFilesDlg* field_0x7f5c;
 };
@@ -415,9 +366,6 @@ public:
     int AddGhostFile(const char* path); // 0x00454640: adds a ghost file; 0 when unusable
     void RaceSelectedGhost();             // 0x00454970: races the selected ghost
 
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
     UnknownRecordFileHeader* fileHeaders;     // +0x7f58: the files' headers
     int fileHeaderCount;                      // +0x7f5c: their count
     char** filePaths;                         // +0x7f60: the files' paths
@@ -434,9 +382,6 @@ public:
     int AddReplayFile(const char* path); // 0x00455040: adds a replay file; 0 when unusable
     void PlaySelectedReplay();             // 0x00455490: plays the selected replay
 
-    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
-    GUIManager* guiManager;                   // +0x30
-    unsigned char field_0x34[0x7f58 - 0x34];
     UnknownRecordFileHeader* field_0x7f58;
     int field_0x7f5c;
     char** field_0x7f60;

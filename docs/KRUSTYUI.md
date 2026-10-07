@@ -111,4 +111,5 @@ local to KrustyUI.cpp for the same reason.
 `0x00499b20` (2432 bytes, exact): opens menu `id` through a sparse switch
 that allocates 18 dialog classes (MainDlg, LoadingDlg, NetProcs/InGameProcs/
 ProCircuitProcs dialogs, ...). Their headers gained inline constructors
-(`UIDialog(1, "<name>.dtm")`) padded to the retail allocation size 0x7f58.
+(`UIDialog(1, "<name>.dtm")`); UIDialog.h declares the 0x7f58-byte layout
+they are allocated with.

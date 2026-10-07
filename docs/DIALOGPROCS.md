@@ -13,10 +13,13 @@ Names: the event record's members (`code`, `controlName`, `kind`, `dialog`,
 them; `DialogEventKind.h` names the kinds. The dialogs' helper methods are
 named after what their bodies do, as their header comments record
 (`FillProfileList`, `OpenPage`, `ListGhosts`, `PaintPlateNumber`, ...).
-Dialog members inherited from UIDialog are named where the derived class
-declares them with their type: +0x2c `parentDialog`, +0x30 `guiManager`,
-+0x34 `guiUser`, +0x110 `dialogBackground`. The procedures stay
-`UnknownVirtualSlot29`; other names are provisional.
+The members inherited from UIDialog (+0x2c `parentDialog`, +0x30
+`guiManager`, +0x34 `guiUser`, +0xc4 `openingMenu`, +0x110
+`dialogBackground`, ...) come from UIDialog.h's 0x7f58-byte layout
+([GAMEUI.md](GAMEUI.md)); the derived classes declare only their own members
+from +0x7f58 (`samples/gameui/UIDialogLayoutProbe.cpp` checks their sizes).
+The procedures stay `UnknownVirtualSlot29`, overriding UIDialog's virtual
+slot 29 (so they mangle as `UAE`); other names are provisional.
 
 **InGameProcs.cpp** (`0x004886e0..0x0048963b`). Evidence: the `__FILE__`
 literal at `0x0056c5cc` (xref `0x00488928`). It starts where GUIManager.cpp

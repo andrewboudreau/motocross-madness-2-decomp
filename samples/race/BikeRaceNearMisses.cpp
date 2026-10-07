@@ -709,8 +709,6 @@ public:
     UnknownBikeRaceDemoDlg(int flags, const char* resource) : UIDialog(flags, resource) {}
     virtual int UnknownVirtualSlot10(float frameTime);    // 0x00455b20
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00455ae0
-
-    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // The length of `v` (1 without a square root for unit vectors); the setup
