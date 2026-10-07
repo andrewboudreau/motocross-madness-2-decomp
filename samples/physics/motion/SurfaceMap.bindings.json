@@ -1,0 +1,11 @@
+{
+  "??0SurfaceBaseObject@@QAE@XZ": "0x00405120",
+  "??0SurfaceMap@@QAE@PAVSurfaceTexture@@PBUSurfaceMaterial@@@Z$ehhandler": "0x0054e558",
+  "??1SurfaceBaseObject@@UAE@XZ": "0x00405150",
+  "??1SurfaceMap@@UAE@XZ": "0x00505350",
+  "??1SurfaceMap@@UAE@XZ$ehhandler": "0x0054e578",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7SurfaceMap@@6B@": "0x00558248",
+  "?Apply@SurfaceMap@@QAEHXZ": "0x005052f0",
+  "?g_pGame@@3PAVSurfaceGame@@A": "0x0056e26c"
+}

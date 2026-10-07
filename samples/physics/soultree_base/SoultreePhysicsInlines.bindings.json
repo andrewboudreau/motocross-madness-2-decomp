@@ -1,0 +1,8 @@
+{
+  "?GetAxesIn@SoultreeObject@@QAEXPAV1@PAUVec3@@1@Z": "0x004fc540",
+  "?SetAxesIn@SoultreeObject@@QAEXPAV1@PBUVec3@@1HH@Z": "0x004fc050",
+  "?g_SoultreeVec3_685190@@3UVec3@@A": "0x00685190",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3fff8000000000000000": "0x00550748",
+  "__real@4@bfff8000000000000000": "0x00550810"
+}

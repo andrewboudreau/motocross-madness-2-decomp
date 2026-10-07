@@ -1,0 +1,20 @@
+{
+  "??1DustParticleEmitter@@UAE@XZ": "0x004b8aa0",
+  "??1GameObject@@UAE@XZ": "0x00468d60",
+  "??3@YAXPAX@Z": "0x004a30c0",
+  "??_7DustParticleEmitter@@6B@": "0x00555ab8",
+  "?AddParticle@ParticleManager@@QAEHMPBUParticleVec3@@HMMMIH@Z": "0x004baa50",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
+  "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x004692f0",
+  "?g_gameContext@@3PAUParticleGameContext@@A": "0x0056e26c",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3ff8da72a80000000000": "0x00555b2c",
+  "__real@4@3ffbcccccd0000000000": "0x005507d0",
+  "__real@4@3ffd8000000000000000": "0x005507f8",
+  "__real@4@3ffd99999a0000000000": "0x00550bac",
+  "__real@4@3fff8000000000000000": "0x00550748",
+  "__real@4@40008000000000000000": "0x0055074c",
+  "__real@4@4007fa00000000000000": "0x00550d08",
+  "__real@4@4008fa00000000000000": "0x00550f44",
+  "__real@4@4009fa00000000000000": "0x00555b28"
+}

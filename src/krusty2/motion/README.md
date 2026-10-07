@@ -3,9 +3,9 @@ Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDAT
 
 # motion (Spheres.cpp, SteeringControl.cpp)
 
-Validation: counts labeled "exact" below are historical relocation-masked
-diagnostics, not strict acceptance. Use `tools/run_physics_samples.py --strict`
-with reviewed bindings before accepting these candidates.
+Validation: all 75 targets under `src/krusty2/motion/` pass strict VC6 SP3 comparison
+(Spheres 14, SteeringControl 21, Motnctrl 40). In `samples/physics/motion/`, SurfaceMap.cpp
+is strict exact for 6 of 6 targets and D3DIMSoultreeMotnctrl.cpp for 23 of 26; the rest are partial.
 
 Wave 4. Both files are linked back to back in `0x504940..0x5051ec`; SurfaceMap and the keyboard hooks
 that follow live in `samples/physics/motion/`.
@@ -17,7 +17,7 @@ that follow live in `samples/physics/motion/`.
   deleting dtor (slot 0, `0x005049f0`), dtor body (`0x00504a10`) and the four per-TU `Vec3` constant initialisers.
 - RTTI `.?AVSphereManager@@` (COL `0x0055f290`), direct base GameObject, vtable `0x005581d8`, object size `0x418`.
   `char field_0x2c[0x3e8]; int field_0x414` are unnamed (no reads in this file).
-- 13 exact, 0 partial.
+- 14 strict exact, 0 partial.
 
 ## SteeringControl.cpp
 - `__FILE__` string at `0x005745ac`; one use (debug `new`, line 0x17) in the ctor.
@@ -63,7 +63,6 @@ The four independent initializer bodies write the zero/X/Y/Z float triples to
 bodies at `0x00504a30`, `0x00504a80`, `0x00504ad0`, `0x00504b20`.
 Those decoded writes distinguish TU-local constants from similarly named
 constants in other files. `Spheres.bindings.json` records this reviewed mapping.
-The other motion-source counts above remain historical masked diagnostics.
 
 ## Motnctrl.cpp
 Promoted to `src/krusty2/motion/Motnctrl.cpp` (types in `Motnctrl.h`, `Motnctrl.bindings.json`); the near misses

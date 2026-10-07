@@ -125,8 +125,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot97@Bike",
     "target_va": "0x00409420",
     "target_size": 1516,
-    "expect": "masked",
-    "notes": "Exact. Needs the placement operator delete declaration (EH unwind frame) and the bone-attach helper as __forceinline so all 15 bones expand inline.; strict: unresolved symbol: ??0BikeA604@@QAE@H@Z",
+    "expect": "exact",
+    "notes": "Exact. Needs the placement operator delete declaration (EH unwind frame) and the bone-attach helper as __forceinline so all 15 bones expand inline.",
     "bindings": "Bike.bindings.json"
   },
   {

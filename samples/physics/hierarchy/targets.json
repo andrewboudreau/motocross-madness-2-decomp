@@ -6,7 +6,8 @@
   "target_va": "0x004a68d0",
   "target_size": 51,
   "expect": "exact",
-  "notes": "vbase deleting dtor: lea esi,[ecx-0x1a0] proves GameObject virtual base at 416 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
+  "notes": "vbase deleting dtor: lea esi,[ecx-0x1a0] proves GameObject virtual base at 416 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "D3DIMSoultreeCharacter",
@@ -15,7 +16,8 @@
   "target_va": "0x00446680",
   "target_size": 51,
   "expect": "exact",
-  "notes": "vbase deleting dtor: lea esi,[ecx-0x214] proves GameObject virtual base at 532 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
+  "notes": "vbase deleting dtor: lea esi,[ecx-0x214] proves GameObject virtual base at 532 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "SoultreePhysicsCharacter",
@@ -24,7 +26,8 @@
   "target_va": "0x005042f0",
   "target_size": 51,
   "expect": "exact",
-  "notes": "vbase deleting dtor: lea esi,[ecx-0x438] proves GameObject virtual base at 1080 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
+  "notes": "vbase deleting dtor: lea esi,[ecx-0x438] proves GameObject virtual base at 1080 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -33,7 +36,8 @@
   "target_va": "0x0052b630",
   "target_size": 51,
   "expect": "exact",
-  "notes": "vbase deleting dtor: lea esi,[ecx-0x5c0] proves GameObject virtual base at 1472 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
+  "notes": "vbase deleting dtor: lea esi,[ecx-0x5c0] proves GameObject virtual base at 1472 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "Bike",
@@ -42,7 +46,8 @@
   "target_va": "0x0040ca50",
   "target_size": 51,
   "expect": "exact",
-  "notes": "vbase deleting dtor: lea esi,[ecx-0x738] proves GameObject virtual base at 1848 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
+  "notes": "vbase deleting dtor: lea esi,[ecx-0x738] proves GameObject virtual base at 1848 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "KrustyBike",
@@ -51,7 +56,8 @@
   "target_va": "0x00497c40",
   "target_size": 51,
   "expect": "exact",
-  "notes": "vbase deleting dtor: lea esi,[ecx-0x160c] proves GameObject virtual base at 5644 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output"
+  "notes": "vbase deleting dtor: lea esi,[ecx-0x160c] proves GameObject virtual base at 5644 (RTTI vtable offset); 51 code bytes + 13 nop alignment bytes, identical in retail and VC6 output",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "SoultreePhysicsCharacter",
@@ -60,7 +66,8 @@
   "target_va": "0x00504330",
   "target_size": 8,
   "expect": "exact",
-  "notes": "SoultreePhysicsCharacter vbase slot 4 adjustor sub ecx,0x8 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540"
+  "notes": "SoultreePhysicsCharacter vbase slot 4 adjustor sub ecx,0x8 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "SoultreePhysicsCharacter",
@@ -69,7 +76,8 @@
   "target_va": "0x00504340",
   "target_size": 8,
   "expect": "exact",
-  "notes": "SoultreePhysicsCharacter vbase slot 5 adjustor sub ecx,0x8 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540"
+  "notes": "SoultreePhysicsCharacter vbase slot 5 adjustor sub ecx,0x8 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -78,7 +86,8 @@
   "target_va": "0x0052b670",
   "target_size": 11,
   "expect": "exact",
-  "notes": "Vehicle vbase slot 4 adjustor sub ecx,0x190 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540"
+  "notes": "Vehicle vbase slot 4 adjustor sub ecx,0x190 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "Vehicle",
@@ -87,7 +96,8 @@
   "target_va": "0x0052b680",
   "target_size": 11,
   "expect": "exact",
-  "notes": "Vehicle vbase slot 5 adjustor sub ecx,0x190 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540"
+  "notes": "Vehicle vbase slot 5 adjustor sub ecx,0x190 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "Bike",
@@ -96,7 +106,8 @@
   "target_va": "0x0040ca90",
   "target_size": 11,
   "expect": "exact",
-  "notes": "Bike vbase slot 4 adjustor sub ecx,0x308 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540"
+  "notes": "Bike vbase slot 4 adjustor sub ecx,0x308 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "Bike",
@@ -105,7 +116,8 @@
   "target_va": "0x0040caa0",
   "target_size": 11,
   "expect": "exact",
-  "notes": "Bike vbase slot 5 adjustor sub ecx,0x308 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540"
+  "notes": "Bike vbase slot 5 adjustor sub ecx,0x308 = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "KrustyBike",
@@ -114,7 +126,8 @@
   "target_va": "0x00497c80",
   "target_size": 11,
   "expect": "exact",
-  "notes": "KrustyBike vbase slot 4 adjustor sub ecx,0x11dc = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540"
+  "notes": "KrustyBike vbase slot 4 adjustor sub ecx,0x11dc = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "KrustyBike",
@@ -123,7 +136,8 @@
   "target_va": "0x00497c90",
   "target_size": 11,
   "expect": "exact",
-  "notes": "KrustyBike vbase slot 5 adjustor sub ecx,0x11dc = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540"
+  "notes": "KrustyBike vbase slot 5 adjustor sub ecx,0x11dc = GameObject offset - (0x21c + 0x214): proves D3DIMSoultreeCharacter secondary base at 540",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "Bike",
@@ -132,7 +146,8 @@
   "target_va": "0x0040cab0",
   "target_size": 14,
   "expect": "exact",
-  "notes": "Bike vbase slot 10: sub ecx,[ecx-4]; sub ecx,0x178 (0x738 - 0x5c0) -> Vehicle 0x0052a830; proves Bike reads a vtordisp and the Vehicle/Bike vbase delta"
+  "notes": "Bike vbase slot 10: sub ecx,[ecx-4]; sub ecx,0x178 (0x738 - 0x5c0) -> Vehicle 0x0052a830; proves Bike reads a vtordisp and the Vehicle/Bike vbase delta",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "SoultreePhysicsCharacter",
@@ -141,7 +156,8 @@
   "target_va": "0x00503c70",
   "target_size": 202,
   "expect": "exact",
-  "notes": "constructor (retail TU SoulTreePhysics.cpp, bracket 0x00503c50..0x00503d40): GameObject(1) under the hidden most-derived flag, SoultreePhysicsBaseObject(flags) 0x00500aa0, D3DIMSoultreeCharacter(flags) 0x004455b0, three vptrs + vtordisp, field_0x42c = 0; EH frame from the base subobjects. 202 bytes + 6 padding."
+  "notes": "constructor (retail TU SoulTreePhysics.cpp, bracket 0x00503c50..0x00503d40): GameObject(1) under the hidden most-derived flag, SoultreePhysicsBaseObject(flags) 0x00500aa0, D3DIMSoultreeCharacter(flags) 0x004455b0, three vptrs + vtordisp, field_0x42c = 0; EH frame from the base subobjects. 202 bytes + 6 padding.",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "SoultreePhysicsCharacter",
@@ -150,7 +166,8 @@
   "target_va": "0x00503d40",
   "target_size": 159,
   "expect": "exact",
-  "notes": "destructor core (vbase-relative this): empty body; vptr/vtordisp restore, ~D3DIMSoultreeCharacter 0x004459a0 on the null-guarded secondary base, then ~SoultreePhysicsBaseObject 0x00501260. 159 bytes + 1 padding."
+  "notes": "destructor core (vbase-relative this): empty body; vptr/vtordisp restore, ~D3DIMSoultreeCharacter 0x004459a0 on the null-guarded secondary base, then ~SoultreePhysicsBaseObject 0x00501260. 159 bytes + 1 padding.",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "SoultreePhysicsCharacter",
@@ -159,7 +176,8 @@
   "target_va": "0x00504210",
   "target_size": 77,
   "expect": "exact",
-  "notes": "GameObject slot 10 override: if slot 42 (vcall +0xa8) then field_0x430 = 0, field_0x431 = 1; then SoultreePhysicsBaseObject::GameObjectVirtualSlot10 (0x005036f0) and GameObject::GameObjectVirtualSlot10 (0x004693d0, result returned). 77 bytes + 3 padding."
+  "notes": "GameObject slot 10 override: if slot 42 (vcall +0xa8) then field_0x430 = 0, field_0x431 = 1; then SoultreePhysicsBaseObject::GameObjectVirtualSlot10 (0x005036f0) and GameObject::GameObjectVirtualSlot10 (0x004693d0, result returned). 77 bytes + 3 padding.",
+  "bindings": "LayoutProbe.bindings.json"
  },
  {
   "class": "SoultreePhysicsCharacter",
@@ -168,6 +186,7 @@
   "target_va": "0x00504350",
   "target_size": 8,
   "expect": "exact",
-  "notes": "vtordisp thunk for slot 10 in the GameObject vbase vtable 0x00558004 (sub ecx,[ecx-4]; jmp 0x00504210); emitted with the definition. 8 bytes + 8 padding."
+  "notes": "vtordisp thunk for slot 10 in the GameObject vbase vtable 0x00558004 (sub ecx,[ecx-4]; jmp 0x00504210); emitted with the definition. 8 bytes + 8 padding.",
+  "bindings": "LayoutProbe.bindings.json"
  }
 ]
