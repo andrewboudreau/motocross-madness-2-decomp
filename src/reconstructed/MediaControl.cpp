@@ -9,8 +9,7 @@
 extern "C" const UnknownGuid CLSID_FilterGraph;           // 0x00558ee0
 extern "C" const UnknownGuid IID_IGraphBuilder;           // 0x00558ef0
 
-// 0x004a2560 (open) and 0x004a2900 (restart) are near misses:
-// samples/gameui/MediaControlNearMisses.cpp.
+// 0x004a2560 (open) is a near miss: samples/gameui/MediaControlNearMisses.cpp.
 
 // 0x004a23d0
 int MediaControl::UnknownFunction4a23d0()
@@ -124,6 +123,23 @@ int MediaControl::UnknownVirtualSlot18()
 {
     UnknownVirtualSlot16(0);
     return GameObject::UnknownVirtualSlot18();
+}
+
+// 0x004a2900. The break-out-of-do form places the shared `return 0` before
+// `return 1`, as retail does (jl, then jge over it); the &&, nested-if,
+// early-return, goto and result-flag forms all put `return 1` first.
+int MediaControl::Restart()
+{
+    do {
+        if (field_0x50->UnknownMethod7(1) < 0) {
+            break;
+        }
+        if (field_0x64->UnknownMethod6(0, 0, 0, 0) < 0) {
+            break;
+        }
+        return 1;
+    } while (0);
+    return 0;
 }
 
 // 0x004a2940
