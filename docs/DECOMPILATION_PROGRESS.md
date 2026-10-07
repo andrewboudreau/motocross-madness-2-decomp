@@ -3,9 +3,9 @@
 > Last reviewed: **2026-10-07** · Retail executable: `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`
 
 There is not yet a defensible whole-game percentage. The best reproducible
-headline is that **2665 of 2673 selected function targets (99.7%)**
+headline is that **2668 of 2676 selected function targets (99.7%)**
 have strict, byte-for-byte matches in the reviewed calibration suite, compiled
-with VC6 SP3. The suite contains **2677 cases**; repeated
+with VC6 SP3. The suite contains **2680 cases**; repeated
 retail address/extent pairs count once.
 That percentage measures the active target set, **not 99.7% of MCM2**:
 targets are chosen because they are useful or tractable, and the executable's
@@ -15,7 +15,7 @@ complete function inventory has not been established.
 
 | Indicator | Current value | What it means |
 |---|---:|---|
-| Strict VC6 exact targets | **2665 / 2673 (99.7%)** | Unique retail address/extent pairs in the reviewed calibration run |
+| Strict VC6 exact targets | **2668 / 2676 (99.7%)** | Unique retail address/extent pairs in the reviewed calibration run |
 | Canonical reconstructed implementation files | **136** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
 | Canonical reconstructed headers | **164** | Layout and interface declarations, including support-only headers |
 | Canonical C++ source lines | **83,623** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
@@ -65,9 +65,9 @@ python3 tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt --vc6-root "
 
 Inspect every result: the runner reports nonmatches as data and its exit status
 alone does not prove strict matching. Reviewed code revision:
-`bf7d299358faed38e90bf0192c76eacdc8a97fd4`. Source inventory counts reflect the current tree
+`1173970e3cbcd3edca7d60742a967c212f8a530f`. Source inventory counts reflect the current tree
 and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot
 
-2665 of 2673 unique retail address/extent pairs passed strict comparison in 2677 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). Every relocation was resolved, or the function had no relocation bytes. The remaining 8 (BaseObject::Release and seven UI compiler-shape probes) match only with relocations masked. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.
+2668 of 2676 unique retail address/extent pairs passed strict comparison in 2680 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). Every relocation was resolved, or the function had no relocation bytes. The remaining 8 (BaseObject::Release and seven UI compiler-shape probes) match only with relocations masked. This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.
