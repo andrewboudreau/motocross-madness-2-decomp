@@ -1,13 +1,6 @@
 // Near-miss FontTexture.cpp candidates (src/reconstructed/FontTexture.cpp),
 // kept out of src/reconstructed until they match.
 //
-// FontTexture::FindCell (0x00467340, 63 bytes): the cell
-// lookup. Retail keeps the loop test at the top (`cmp i, count; jae`, then
-// `jmp` back after `i++`); VC6 here rotates the loop (`test count; jbe`
-// up front, test at the bottom). for, while, for(;;) with breaks, continue,
-// a cached count and a local array pointer all rotate or are worse.
-// The same unrotated shape appears in FontTextureManager.cpp's 0x004677f0.
-//
 // FontTexture::UnknownFunction4673d0 (0x004673d0, 645 bytes): the loader.
 // 607 of 645 bytes; every instruction matches except placement of the
 // esi/edi saves: retail pushes all four callee-saved registers before the
@@ -26,17 +19,6 @@
 
 #include "../../src/reconstructed/TrackOverlay.h"
 #include "../../src/reconstructed/UnknownResourceManager.h"
-
-// 0x00467340
-CharacterCell* FontTexture::FindCell(int code) {
-    unsigned int i;
-
-    for (i = 0; i < cells->Count(); i++) {
-        if (code == (*cells)[i]->code)
-            return (*cells)[i];
-    }
-    return 0;
-}
 
 // 0x004673d0: the cell file holds the count, then per cell its code and
 // four rectangle values.

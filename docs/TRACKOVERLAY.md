@@ -45,7 +45,7 @@ at lines 2284 and 2294).
 
 ## Status
 
-90 functions are exact under `vc6_o2_mt`, with every relocation bound:
+91 functions are exact under `vc6_o2_mt`, with every relocation bound:
 
 - InstrumentOverlay: `0x00518720`..`0x00518cc0`, 7 functions.
 - The overlay rectangle constructors `0x00518d50` and `0x00518d60`.
@@ -120,8 +120,9 @@ These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
   use a `fistp` helper that the project rules exclude.
 - `0x00518c20` is not a function start (inside the InstrumentOverlay
   destructor `0x00518c00`).
-- **Shared tiny address.** `0x0051eae0` is a 3-byte `mov eax, ecx; ret`
-  (UnknownChatInput's line accessor; `0x0051da30` calls it).
+- `0x0051eae0` is a 3-byte `mov eax, ecx; ret`: UnknownChatInput's line
+  accessor `GetLine` (exact). Its only callers are `0x0051da30`'s two calls
+  (`0x0051dae5`, `0x0051db09`), and no vtable lists it.
 - Every RadarOverlay function is now exact or a documented near miss.
 
 ## Codegen notes

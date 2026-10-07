@@ -23,7 +23,8 @@ Exact: 6 calibration cases (constructor, destructor, set font, factory,
 draw, and the out-of-line `CharacterCell::UnknownFunction50beb0` checked
 from the sample). Near misses
 (`samples/render/TextServiceNearMisses.cpp`, notes there): select font
-`0x0050ade0` (retail keeps the loop test at the top), the layout
+`0x0050ade0` (117/125: the `while (1)` form keeps the loop test at the top;
+only the element load's register roles differ), the layout
 `0x0050ba00` (store scheduling) and the three blitters (register and
 stack-slot assignment).
 

@@ -14,19 +14,21 @@
 // (src/reconstructed/KrustyBikeCamera.cpp); it is file-static there, so this
 // sample keeps its own static.
 //
-// KrustyBikeCamera slot 34 (0x00498340, 612 bytes): 605 of 612 bytes match.
-// The argument is the frame time as a float (FollowCamera slot 10 passes dt
-// through slot 48; FollowCamera.h still declares slot 34 with an int), so the
-// body is kept here as a helper of a derived view. Only the second product of
-// the inline dot product differs: retail loads the returned vector's x first
-// (`fld [eax]; fmul [esi+0x29c]`), VC6 the member's. Every term order and
-// grouping, a member Dot, by-value parameters and a reference local were tried;
-// `z + (x + y)` grouping with the returned vector first is the closest.
+// KrustyBikeCamera slot 34 (0x00498340, 612 bytes): strict exact here
+// (612/612) as a helper of a derived view, not registered: the argument is
+// the frame time as a float (FollowCamera slot 10 passes dt through slot
+// 48; FollowCamera.h still declares slot 34 with an int). The dot product
+// matches only with the returned vector's x read by value (`VectorX(a)`):
+// retail loads that x before the member's but the y and z products the
+// other way round. Same form as BikeCamera slot 34
+// (BikeCameraNearMisses.cpp).
 #include "../../src/reconstructed/KrustyBikeCamera.h"
+
+static inline float VectorX(const Vector3& v) { return v.x; }
 
 // The inline dot product slot 34 uses; the grouping gives retail's y, x, z order.
 static inline float KrustyCameraDot(const Vector3& a, const Vector3& b) {
-    return a.z * b.z + (a.x * b.x + a.y * b.y);
+    return a.z * b.z + (VectorX(a) * b.x + a.y * b.y);
 }
 
 // KrustyBikeCamera slot 34 (0x00498340): the followed point, led by the bike's

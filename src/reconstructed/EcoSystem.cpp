@@ -192,6 +192,28 @@ void Vegetation::PlaceQuantized(TextureMapManager* textures, unsigned char defin
     isBillboard = 1;
 }
 
+// By-value component reads. Retail's 0x004567e0 multiplies with the
+// position component loaded first (`fld [position]; fmul [scale]`); VC6 SP3
+// produces that order only when the component is read through a by-value
+// accessor like these. A plain `position->x` operand is loaded second
+// whichever way the product is written.
+static inline float VectorX(const Vector3& v) { return v.x; }
+static inline float VectorY(const Vector3& v) { return v.y; }
+static inline float VectorZ(const Vector3& v) { return v.z; }
+
+// 0x004567e0: places the object at the world position `position`.
+void Vegetation::Place(TextureMapManager* textures, unsigned char definition,
+                                       const Vector3* position, unsigned char heightParameter,
+                                       unsigned char radiusParameter) {
+    definitionIndex = definition;
+    quantizedPosition.x = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * VectorX(*position));
+    quantizedPosition.y = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * VectorY(*position));
+    quantizedPosition.z = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * VectorZ(*position));
+    radiusParam = radiusParameter;
+    heightParam = heightParameter;
+    isBillboard = 1;
+}
+
 // 0x00456850
 int EvictGeometry(void* owner, int context) {
     Vegetation* object = (Vegetation*)owner;

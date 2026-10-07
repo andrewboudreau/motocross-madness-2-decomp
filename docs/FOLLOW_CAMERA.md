@@ -228,6 +228,16 @@ references. All bodies below are strict exact under the default profile.
 | BikeCamera 53, 54 | `0x004172e0`, `0x00417310` | 45 each | `0x004444e0` / `0x004fdb50` on the bike part and the rider |
 | BikeCamera 75 | `0x004174b0` | 72 | FollowCamera slot 75, mode and bike state tests |
 
+BikeCamera slot 34 (`0x00417050`, 573 bytes, vtable `0x00550bc0` entry 34)
+is KrustyBikeCamera slot 34 below without the race-view test. It compiles
+strictly exact in `samples/camera/BikeCameraNearMisses.cpp` as a helper of
+a derived view taking a `float`, and is not a calibration case: FollowCamera.h
+declares slots 34 and 48 with an `int` argument, and slot 10 passes the
+frame time through slot 48, so the override needs those declarations (and
+the registered FollowCamera and KrustyBikeCamera symbols) changed to `float`
+first. The plate-number painter after BikeCamera's code
+(`0x00417500..0x00417aff`, see [BIKERACE](BIKERACE.md)) is not BikeCamera's.
+
 Several shapes record source structure:
 
 - **FollowCamera slot 75 is inline.** Its body is inlined into both
@@ -293,15 +303,19 @@ slots 46 and 47 from it; slot 46's up vector is the unit's y axis
 initialisation guard). From the second `0x004210f0` call on, VC6 rotates the
 scratch registers (edx/ecx/eax in retail).
 
-Slot 34 (`0x00498340`, 612 bytes) is a near miss in the same file (605 of 612
-bytes): in camera mode +0x276 it leads the rider's part position by bike
-+0x604 → +0x40 → +0x154 times its argument (scaled by 4 − 0.006 × +0x2c0 below
-height 500); otherwise the target point, or the target point plus the +0x29c
-direction times a distance built from the dot product with slot 33, the
-fov/zoom ratio and vehicle +0x438. Its argument is the frame time as a float:
-FollowCamera slot 10 passes `dt` through slot 48 (FollowCamera.h still declares
-slots 34/48 with an int). Only one product of the inline dot product has its
-operands swapped.
+Slot 34 (`0x00498340`, 612 bytes) compiles strictly exact in
+`samples/camera/KrustyBikeCameraNearMisses.cpp` as a derived-view helper
+(not registered, for the `int` declaration above): in camera mode +0x276 it
+leads the rider's part position by bike +0x604 → +0x40 → +0x154 times its
+argument (scaled by 4 − 0.006 × +0x2c0 below height 500); otherwise the
+target point, or the target point plus the +0x29c direction times a
+distance built from the dot product with slot 33, the fov/zoom ratio and
+vehicle +0x438. Its argument is the frame time as a float: FollowCamera
+slot 10 passes `dt` through slot 48. The inline dot product sums
+`z + (x + y)` and matches only with the returned vector's x read through a
+by-value accessor (`VectorX(a) * b.x`): retail loads that x before the
+member's but the y and z products the other way round, and no term order,
+grouping or operand order gives that with plain member access.
 
 The KrustyBikeCamera code runs `0x00497cb0..0x004987ec`; its vector set closes
 the unit, and KrustyBike.cpp's own set (`.CRT$XCU` 155-158, `0x00491190`) is a

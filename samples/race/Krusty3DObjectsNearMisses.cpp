@@ -5,13 +5,14 @@
 // samples/race/Krusty3DObjectsNearMisses.bindings.json.
 //
 // BonusObjectManager::UnknownVirtualSlot10 (0x0048ccc0, 1308 bytes): steps
-// and places the bonus frame. 1295 of 1308 bytes match. The difference is
-// the size factor's denominator `field_0x38->field_0x198 * field_0x1e4`:
-// retail loads field_0x38 before storing the length and multiplies
-// `fld [camera+0x198]; fmul [this+0x1e4]`; VC6 here loads the camera after
-// the numerator and emits `fld [this+0x1e4]; fmul [camera+0x198]`. Both
-// operand orders, a separate length local, a chained assignment, a ternary
-// length and a denominator local were tried.
+// and places the bonus frame. 1299 of 1308 bytes match. The size factor's
+// denominator multiplies `fld [camera+0x198]; fmul [this+0x1e4]` as in
+// retail once the camera's value is read through a by-value accessor
+// (CameraZoom below; written plainly VC6 loads this+0x1e4 first, 1295/1308,
+// whichever operand order). Left: retail loads field_0x38 before storing the
+// length to field_0x1ec, VC6 here after. A separate length local, a
+// chained assignment, the length stored in its own statement and a
+// reference parameter for the camera leave that order.
 //
 // VisualCue::UnknownVirtualSlot10 (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode
@@ -26,6 +27,11 @@
 #include <math.h>
 
 #include "../../src/reconstructed/Krusty3DObjects.h"
+
+// By-value read of the camera's +0x198 value (see slot 10 above).
+static inline float CameraZoom(const UnknownBonusCamera* camera) {
+    return camera->field_0x198;
+}
 
 static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -95,7 +101,7 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
             field_0x1dc = field_0x38->field_0x16c;
             Vector3 delta = position - field_0x38->field_0x170;
             field_0x1f0 = 0;
-            sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (field_0x38->field_0x198 * field_0x1e4);
+            sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (CameraZoom(field_0x38) * field_0x1e4);
         }
         position += field_0x2c->field_0x38->field_0x5f4->field_0x230 * 5.0f;
         if (keyAngleChange == 0.0f && keyAngle == 0.0f) {

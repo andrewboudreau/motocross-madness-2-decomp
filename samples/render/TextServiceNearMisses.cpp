@@ -2,12 +2,14 @@
 // kept out of src/reconstructed until they match.
 //
 // UnknownOverlayText::SelectFont (0x0050ade0, 125 bytes): the
-// font lookup by name. Retail keeps the loop test at the top (`cmp i,
-// count; jae`, `jmp` back after `i++`) and loads `font` before the loop;
-// VC6 here rotates the loop. for, while, for(;;) with return/break,
-// continue, goto and Count() in the condition all rotate. Same unrotated
-// shape as FontTexture.cpp's 0x00467340 and FontTextureManager.cpp's
-// 0x004677f0 (see FontTextureNearMisses.cpp).
+// font lookup by name. 117 of 125: written as `while (1)` with the count
+// test and the match as breaks (the form that makes FontTexture.cpp's
+// 0x00467340 and FontTextureManager.cpp's 0x004677f0 exact), the loop
+// test stays at the top as in retail. Only the element load in the loop
+// differs: retail computes `i - base` in eax with the list in ecx, VC6
+// here keeps the list in eax and the index in edx. Declaration order,
+// `++i`, `== 0`, a named element or name local do not change it; `for`
+// and `while (i < count)` loops rotate.
 //
 // UnknownFunction50b400 (0x0050b400, 758 bytes; 4444 texels),
 // UnknownFunction50b700 (0x0050b700, 758 bytes; 1555 texels) and the 32-bit
@@ -38,12 +40,15 @@ void UnknownOverlayText::SelectFont(const char* font) {
     unsigned int i;
 
     count = fonts->Count();
-    for (i = 0; i < count; i++) {
-        if (!strcmp(font, (*fonts)[i]->UnknownFunction4673b0())) {
-            currentFont = (*fonts)[i];
+    i = 0;
+    while (1) {
+        if (i >= count)
             return;
-        }
+        if (!strcmp(font, (*fonts)[i]->UnknownFunction4673b0()))
+            break;
+        i++;
     }
+    currentFont = (*fonts)[i];
 }
 
 // 0x0050b080

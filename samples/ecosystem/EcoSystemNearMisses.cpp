@@ -2,7 +2,6 @@
 // src/reconstructed/EcoSystem.cpp until they match. They compile against
 // the reconstructed header; the exact functions they call live in the src
 // unit (bound by address). What differs from retail (docs/ECOSYSTEM.md):
-//   0x004567e0  operand order of `position->x * scale` (retail loads x first)
 //   0x00456890  the camera pointer and the z store are scheduled before the
 //               first fmul in retail (13 bytes); the block compiles the same
 //               under every data-flow-equivalent spelling tried (locals
@@ -21,7 +20,6 @@
 //   0x00457480  the probe stream also lives in esi; the aligned-frame EH
 //               prologue is not recognised by the matcher
 //   0x00457ed0  one scheduled load (the cylinder height) in the vertex loop
-//               and the operand order of the offset's z component
 //   0x00458360  zero kept in ebp, the count tested twice
 //   0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
 //   0x004598d0  loop counter in memory, definition byte cached in a register
@@ -86,23 +84,17 @@ static inline void UnknownSetIdentity(Matrix4* m) {
     (*m)(0, 0) = 1.0f;
 }
 
-// The vector sum as 0x00458246 computes it (a value-returning inline in
-// operator+ form; VC6 picks the operand order per component itself).
-static inline Vector3 UnknownEcoOffset(const Vector3& a, const Vector3& b) {
-    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+// By-value component read: it makes VC6 load the other operand first
+// (0x004567e0, now exact in the src unit, needs the same).
+static inline float UnknownEcoZ(const Vector3& v) {
+    return v.z;
 }
 
-// 0x004567e0
-void Vegetation::Place(TextureMapManager* textures, unsigned char definition,
-                                       const Vector3* position, unsigned char heightParameter,
-                                       unsigned char radiusParameter) {
-    definitionIndex = definition;
-    quantizedPosition.x = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * position->x);
-    quantizedPosition.y = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * position->y);
-    quantizedPosition.z = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * position->z);
-    radiusParam = radiusParameter;
-    heightParam = heightParameter;
-    isBillboard = 1;
+// The vector sum as 0x00458246 computes it (a value-returning inline in
+// operator+ form). Retail sums z vertex-first (`fld [vertex.z]; fadd
+// [start.z]`); only the by-value read of the vertex's z gives that order.
+static inline Vector3 UnknownEcoOffset(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x + b.x, a.y + b.y, a.z + UnknownEcoZ(b));
 }
 
 // 0x00456890: whether the object is beyond the detail band's 3D distance

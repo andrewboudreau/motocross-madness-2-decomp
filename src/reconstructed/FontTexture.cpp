@@ -50,6 +50,22 @@ FontTexture::~FontTexture() {
     }
 }
 
+// 0x00467340: the cell with character code `code`, or 0. The test stays
+// at the top of the loop only as `while (1)` with a `break`; a `for` or
+// `while (i < count)` loop is rotated to test at the bottom.
+CharacterCell* FontTexture::FindCell(int code) {
+    unsigned int i = 0;
+
+    while (1) {
+        if (i >= cells->Count())
+            break;
+        if (code == (*cells)[i]->code)
+            return (*cells)[i];
+        i++;
+    }
+    return 0;
+}
+
 // 0x00467380
 void FontTexture::SetCell(unsigned int index, CharacterCell* cell) {
     (*cells)[index] = cell;

@@ -1658,6 +1658,13 @@ void UnknownChatInput::ClearLine()
     typedLength = 0;
 }
 
+// 0x0051eae0: the 3-byte `mov eax, ecx; ret`. Its only callers are
+// RedrawChat's two calls (0x0051dae5, 0x0051db09).
+char* UnknownChatInput::GetLine()
+{
+    return typedLine;
+}
+
 // 0x0051eaf0
 char* UnknownChatInput::GetLineTail()
 {

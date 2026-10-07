@@ -22,14 +22,22 @@ RTTI `Palette8 : BaseObject` (vtable `0x00555aa4`), `FontTexture`
   object is not established; Game.h's `g_UnknownStatic65b478` names the same
   address.
 - `FontTextureManager.cpp`: the manager list's constructors, destructor,
-  append and clear (`0x00467690..0x004677ef`).
+  append, removal, clear and search by name (`0x00467690..0x00467847`).
 
-Exact: 28 calibration cases (4 + 4 + 15 + 5).
+Exact: 31 calibration cases (4 + 4 + 16 + 7), including FontTexture's
+`FindCell` `0x00467340` and the manager's removal `0x00467760` and search
+`0x004677f0`.
 
-Near misses (notes in the sample files): FontTexture `0x00467340` and the
-list search `0x004677f0` (retail keeps the loop test at the top), the
-loader `0x004673d0` (esi/edi saves placed before the early return in
-retail) and the list removal `0x00467760` (separate stack cleanups).
+Source forms that mattered:
+- `0x00467340` and `0x004677f0` keep the loop test at the top only as
+  `while (1)` with the end test and the match as `break`s; `for` and
+  `while (cond)` loops are rotated to test at the bottom.
+- `0x00467760` writes `delete node` in both arms of the unlink. VC6 merges
+  the two into one tail, and that keeps the delete's `add esp, 4` apart from
+  the release call's, as in retail.
+
+Near miss (notes in the sample file): the loader `0x004673d0` (esi/edi
+saves placed before the early return in retail).
 
 ## Function names
 

@@ -45,8 +45,13 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
   - `ConnectionInfoType`: `0x005553fc`.
   - `SessionInfoType`: `0x005589d4`, slot 1 is `0x004adc90`.
 
-  The deleting destructor `0x004adce0` is slot 0 of all three InfoType
+  The deleting destructor `0x004adce0` is slot 0 of all three derived
   vtables (identical-code folding). It is bound as PlayerInfoType's.
+  - `InfoType` itself: `0x00551c20`, slots `0x0044d720` (its deleting
+    destructor, exact from Net.cpp's inline `~InfoType`) and `0x0044d710`
+    (the shared empty body, checked as RenderTarget slot 19). Both copies
+    lie in dlgprocs.cpp's range, where the linker kept the COMDATs
+    (inference from their position).
 - `Game.cpp` line 979 allocates the 0x128-byte NetworkInterface into
   Game+0x08. `0x004add10` (ConnectionInfoType's constructor) is defined out
   of line here, because code at `0x0044b634`/`0x0044c0f5` passes its address

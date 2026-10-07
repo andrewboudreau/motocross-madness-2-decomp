@@ -64,7 +64,7 @@ That leaves 49 functions.
   3D and fade distances, model flags, billboard range and limit, and three
   render-state switches.
 
-## Exact (38 calibration cases)
+## Exact (39 calibration cases)
 
 Small: the two peak-hold `$E` pairs and the four vector `$E` pairs; the
 definition constructor / destructor and its four parameter helpers
@@ -72,7 +72,7 @@ definition constructor / destructor and its four parameter helpers
 `0x00455f90` / `0x00455ff0` height / radius for a parameter byte); the
 Vegetation constructor, slot 0 (view depth as a 16-bit sort key), slot 1
 (QuadTree cell code from the radius), the quantised placement
-`0x004567a0`, the AgeManager eviction callback `0x00456850`, the
+`0x004567a0` and the world-position placement `0x004567e0`, the AgeManager eviction callback `0x00456850`, the
 collision-count and radius getters `0x00457080` / `0x00457230`; the
 EcoSystem constructor, destructor and deleting destructor, the detail-level
 setter `0x004594c0`, the geometry draw `0x00457000` and slot 23.
@@ -90,6 +90,12 @@ selection, scale from the QuadTree extents, load, textures, collisions,
 object array, buffers, placement by method, .esb write).
 
 Source forms that mattered:
+- `0x004567e0` loads each position component before the scale
+  (`fld [position]; fmul [scale]`) only when the components are read
+  through by-value accessors (`VectorX(*position)`); with `position->x` VC6
+  loads the scale first in either written order. KrustyBikeCamera and
+  BikeCamera slot 34 need the same accessor for one dot-product term
+  ([FOLLOW_CAMERA](FOLLOW_CAMERA.md)).
 - The squared length in `0x0045a9a0` only compiles to retail's load order
   as `z*z + (x*x + y*y)` (`UnknownSquareMagnitude`).
 - `0x00456a10`: the light colour and ambient are six float locals (two
@@ -119,12 +125,11 @@ sample's bindings file; `$ehhandler` keys for the EH prologues).
 
 | VA | Function | State |
 |---|---|---|
-| `0x004567e0` | world-position placement | 82/112: VC6 orders `position->x * scale` as `fld scale; fmul x`; retail loads x first. Only a by-value float accessor (`position->X()`) reproduces it; the project's `Vector3` has none. |
 | `0x00456890` | fade / distance band | 356/369: retail schedules the camera pointer load and the z store before the first `fmul`. The block is scheduling-invariant: eighteen data-flow-equivalent spellings (locals before or after the camera load, no camera local, the view in a local, one declaration per statement, a position reference, the products computed before the camera, `-=`, int locals and casts, a `Vector3` position, z first, a delta vector) give the same bytes, and every statement reordering scores lower. Helper boundaries do not move it either: inline and static accessors for the eye and the scaled coordinate, pointer, reference and by-value helpers, a struct copy and the difference as a `Vector3` all give the identical 356 or less, and `/G6` scores 267. |
 | `0x004570a0` | collision object placement | 74/349: retail does not fold the definition lookup across the position conversions; the radius and height divide by the definition's mean values. |
 | `0x00456050` | definition load (.slt) | 163/1513: `this` / `textures` register roles and the local layout (the loop extremes, a/b/c, faces) differ; the frame is 0x1b8 for 0x1b4. |
 | `0x00457480` | .est reader (2626 bytes) | 371/2646 (the matcher now binds the handler of the `push ebp; mov ebp, esp; and esp, -8; push -1; push handler` prologue); the probe stream is kept in `esi` as well as its EH slot, and the local layout follows from that. |
-| `0x00457ed0` | collision objects (1150 bytes) | 1101/1153: the cylinder height load `mov edx, [edi+0x20]` is scheduled before the cosine in retail (every placement of the `.y` store scores lower), and the z component of the offset is summed vertex-first (`fld [eax-4]; fadd [edi+0xc]`) whatever the source order. The offset is `operator+` shaped (`Vector3(a.x + b.x, ...)`, `UnknownEcoOffset(shape->start, vertices[j])`); the named-result form scores 1094. |
+| `0x00457ed0` | collision objects (1150 bytes) | 1105/1153: the cylinder height load `mov edx, [edi+0x20]` is scheduled before the cosine in retail (every placement of the `.y` store scores lower). The offset is `operator+` shaped (`Vector3(a.x + b.x, ...)`, `UnknownEcoOffset(shape->start, vertices[j])`; the named-result form scores less); its z component is summed vertex-first as in retail only when the vertex's z is read through a by-value accessor. |
 | `0x00458360` | "CollisionObject%i" reader (1104 bytes) | 113/1112: retail keeps 0 in `ebp` (`cmp eax, ebp`, `push ebp`) and tests the count twice; the local arrays are key, value, section, kind in that order. |
 | `0x00458da0` | .txt listing | 457/461: four SIB operands are `[esi + eax]` instead of retail's `[eax + esi]` (array base / induction order); no source form found yet. |
 | `0x004598d0` | placement from the .esb | 34/462: the loop keeps `i` in memory and the definition byte zero-extended in a register; local layout. |
