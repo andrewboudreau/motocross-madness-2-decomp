@@ -19,6 +19,10 @@ public:
     virtual int UnknownVirtualSlot5(int key, int modifier, UnknownInputEntry* entry) = 0;
     virtual int UnknownVirtualSlot6(int value) = 0;
 
+    // 0x00489f80: attaches `binding` to the keys `key` and `key2` with a
+    // repeat step and interval (DeviceSetup.cpp 0x00448d30).
+    int UnknownFunction489f80(UnknownControlBinding* binding, int key, int key2, float step,
+                              float interval);
     // 0x0048a0c0: key-repeat stepping for the bindings in list `list`.
     void UnknownFunction48a0c0(int list, int value);
     // 0x0048a240: whether modifier state `modifier` holds.

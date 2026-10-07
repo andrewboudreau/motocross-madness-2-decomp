@@ -222,6 +222,12 @@ The CarProcedural..CollisionCharacter gap holds two units without RTTI or
 (10, the shadow clipper with its static instance and `$E` set) both match
 strictly; see [CDAUDIO_CLIPRECT](CDAUDIO_CLIPRECT.md).
 
+Three more units without RTTI or `__FILE__` match strictly:
+- the crash reporter (7 of 8; [EXCEPTIONHANDLER](EXCEPTIONHANDLER.md));
+- the TrackGame+0x33fc control layout (19; [DEVICESETUP](DEVICESETUP.md)),
+  with its GetDXVersion probe as a near miss;
+- WinMain with the main window and its window procedure (5; [MAIN](MAIN.md)).
+
 From the unattributed-code map ([UNATTRIBUTED](UNATTRIBUTED.md)):
 NationalRace.cpp (8, `__FILE__` 0x56e338 and RTTI NationalRace :
 BaseQuarryEvent), Rectangle2D (5) and SkyCube (5) match strictly; the last

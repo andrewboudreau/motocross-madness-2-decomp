@@ -47,6 +47,33 @@ extern float g_SinTable[0x10000];       // 0x0061b3e0
 extern float g_CosTable[0x10000];       // 0x005db3e0
 extern float g_TanTable[0x10000];       // 0x0059af5c
 
+// 0x00460ae0: fills the 256-entry square root mantissa table from sqrt over
+// two exponent octaves ([1,2) at i, [2,4) at i + 0x80), keeping the result's
+// top 7 mantissa bits in place.
+void InitFastSqrtTable()
+{
+    for (unsigned int i = 0; i < 0x80; i++) {
+        float f;
+        *(unsigned long*)&f = (i | 0x3f80) << 16;
+        f = (float)sqrt(f);
+        g_FastSqrtTable[i] = *(unsigned long*)&f & 0x7f0000;
+        *(unsigned long*)&f = (i | 0x4000) << 16;
+        f = (float)sqrt(f);
+        g_FastSqrtTable[i + 0x80] = *(unsigned long*)&f & 0x7f0000;
+    }
+}
+
+void InitFastInvSqrtTable();
+void InitTrigTables();
+
+// 0x00460ad0: builds all three tables; called once from 0x0046799c.
+void InitFastMath()
+{
+    InitFastSqrtTable();
+    InitFastInvSqrtTable();
+    InitTrigTables();
+}
+
 // 0x00460bb0: fills the 128-entry reciprocal square root table from 1 / sqrt over one
 // exponent octave (mantissa top bits | 0x1f80 << 17), rounded to 8 mantissa bits.
 void InitFastInvSqrtTable()

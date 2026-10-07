@@ -470,8 +470,16 @@ public:
 
 // UnknownTrackGameObject3400, the object at TrackGame+0x3400, is in TrackRecord.h.
 
+// One control assignment of UnknownTrackGameObject33fc: the device kind
+// (0 keyboard, 1 mouse, 2 joystick; -1 unassigned) and the key, button or
+// negative axis direction code. Saved as "kind,code" (DeviceSetup.cpp).
+struct UnknownControlAssignment {
+    int kind;
+    int code;
+};
+
 // Object at TrackGame+0x33fc (constructor near DebugOverlay.cpp's literals;
-// no destructor).
+// no destructor). Its methods are in DeviceSetup.cpp (provisional name).
 class UnknownTrackGameObject33fc {
 public:
     UnknownTrackGameObject33fc();             // 0x00448960
@@ -481,12 +489,20 @@ public:
     void UnknownFunction448e90(const char* path, int a);                 // 0x00448e90
     void UnknownFunction448990(const char* path);                        // 0x00448990 (uiinfo.cpp 0x00523000)
     void UnknownFunction4489e0(const char* path);                        // 0x004489e0 (uiinfo.cpp 0x00523130)
-    void UnknownFunction449220();                                        // 0x00449220 (uiinfo.cpp 0x00523000)
+    int UnknownFunction449220();                                         // 0x00449220 (uiinfo.cpp 0x00523000)
     void UnknownFunction449350(int device, int row, char* text);         // 0x00449350
     int UnknownFunction449380(int kind, int code, char* text);            // 0x00449380
+    // 0x00448a50 / 0x00448bc0: reads / writes "Controller<device>",
+    // "Key<row>" of the control file `path`.
+    void UnknownFunction448a50(int device, int row, const char* path);
+    void UnknownFunction448bc0(int device, int row, const char* path);
+    // 0x00448d30: binds an axis binding to the device of `kind`.
+    int UnknownFunction448d30(UnknownControlBinding* binding, int kind, int code, int code2);
+    // 0x00448df0: enters `code` for `control` in TrackGame's control mapping.
+    int UnknownFunction448df0(int control, int code, int kind);
 
     int field_0x00;                           // input device (OptionProcs.cpp "InputDeviceDDL")
-    unsigned char field_0x04[0x384 - 0x04];
+    UnknownControlAssignment field_0x04[8][14];  // per input device, per control row
 };
 
 // One player reported by 0x004aa670 (0x48 bytes).

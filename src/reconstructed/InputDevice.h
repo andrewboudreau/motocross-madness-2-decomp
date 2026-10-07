@@ -18,6 +18,7 @@ public:
     friend class UIDialog;        // reads deviceKind (gameui.cpp 0x0046ef00)
     friend class UIScrollBar;     // reads deviceKind (gameui.cpp 0x00474cf0)
     friend class UIListBox;       // reads deviceKind (gameui.cpp 0x00476020)
+    friend class UnknownTrackGameObject33fc; // reads buttonCount, deviceSubtype (0x00449220)
 
 protected:
     int axisCount;                  // +0x04
