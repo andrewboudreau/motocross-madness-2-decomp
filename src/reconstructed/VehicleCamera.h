@@ -57,6 +57,12 @@ public:
     explicit VehicleCamera(int flags); // 0x0052b920
     virtual ~VehicleCamera();          // 0x0052b9d0 (deleting wrapper 0x0052b9b0)
 
+    // 0x0052b9e0: FollowCamera's setup (0x00463140); returns this, or 0
+    // when it failed.
+    VehicleCamera* UnknownFunction52b9e0(void* value, float rate294, float rate298, float value228,
+                                         float value2d0, float value2e8, int capacity, int count,
+                                         const int* list);
+
     virtual Vector3 UnknownVirtualSlot33();
 
     virtual float UnknownVirtualSlot39();

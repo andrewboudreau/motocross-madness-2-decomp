@@ -1,6 +1,9 @@
 #include "GameObject.h"
+#include "GameObjectIterator.h"
 #include "DebugAlloc.h"
+#include "MemTag.h"
 
+#include <stdio.h>
 #include <string.h>
 #include <typeinfo.h>
 
@@ -334,4 +337,336 @@ void GameObject::UnknownFunction469ce0(GameObject* object) {
 // 0x004da540: shared by many classes (identical-code folding).
 int GameObject::UnknownVirtualSlot11(int) {
     return 1;
+}
+
+// 0x004690c0
+void GameObject::UnknownFunction4690c0(unsigned int flags) {
+    GameObject* object = this;
+    unsigned int combined = object->field_0x20 |= flags;
+    while (object->field_0x14) {
+        unsigned int own = object->field_0x1C;
+        object = object->field_0x14;
+        combined = object->field_0x20 |= own | combined;
+    }
+}
+
+// 0x00469100
+unsigned int GameObject::UnknownFunction469100() {
+    unsigned int flags = 0;
+    for (GameObject* child = field_0x10; child; child = child->field_0x0C)
+        flags |= child->UnknownFunction469100();
+    field_0x20 = flags;
+    return field_0x1C | flags;
+}
+
+// 0x00469130: appends `object` (and its later siblings) after this object's
+// last sibling, under the same parent; returns `object`.
+int GameObject::UnknownFunction469130(GameObject* object, int value) {
+    if (g_UnknownGlobal65b548)
+        return 0;
+    if (object) {
+        GameObject* last = this;
+        while (last->field_0x0C)
+            last = last->field_0x0C;
+        last->field_0x0C = object;
+        object->field_0x08 = last;
+        for (GameObject* sibling = object; sibling; sibling = sibling->field_0x0C)
+            sibling->field_0x14 = field_0x14;
+        object->field_0x1C = value;
+        object->UnknownFunction4690c0(object->field_0x20);
+    }
+    return (int)object;
+}
+
+// 0x00469190: appends `child` (and its later siblings) to the children;
+// returns `child`.
+int GameObject::UnknownFunction469190(GameObject* child, int value) {
+    if (g_UnknownGlobal65b548)
+        return 0;
+    if (child) {
+        if (!field_0x10) {
+            field_0x10 = child;
+            child->field_0x08 = 0;
+        } else {
+            GameObject* last = field_0x10;
+            while (last->field_0x0C)
+                last = last->field_0x0C;
+            last->field_0x0C = child;
+            child->field_0x08 = last;
+        }
+        for (GameObject* sibling = child; sibling; sibling = sibling->field_0x0C)
+            sibling->field_0x14 = this;
+        child->field_0x1C = value;
+        child->UnknownFunction4690c0(child->field_0x20);
+    }
+    return (int)child;
+}
+
+// 0x00469260: unlinks this object and inserts it before `next`.
+int GameObject::UnknownFunction469260(GameObject* next, int value) {
+    if (g_UnknownGlobal65b548)
+        return 0;
+    UnknownFunction4691f0();
+    field_0x08 = next->field_0x08;
+    field_0x0C = next;
+    if (field_0x08)
+        field_0x08->field_0x0C = this;
+    field_0x0C->field_0x08 = this;
+    if (next->field_0x14 && next->field_0x14->field_0x10 == next)
+        next->field_0x14->field_0x10 = this;
+    field_0x1C = value;
+    UnknownFunction4690c0(field_0x20);
+    return 1;
+}
+
+// 0x00469c80
+void GameObject::UnknownFunction469c80() {
+    GameObject* child = field_0x10;
+    while (child) {
+        if (child->field_0x25_bit3) {
+            int previous = g_MemTagStack->Push("UI");
+            child->UnknownFunction4691f0();
+            GameObject* removed = child;
+            child = child->field_0x0C;
+            removed->Release();
+            g_MemTagStack->Pop(previous);
+        } else {
+            child->UnknownFunction469c80();
+            child = child->field_0x0C;
+        }
+    }
+}
+
+// 0x00468dd0: calls slot 4 on every descendant (skipping bit 3) whose name
+// list or RTTI class name starts with or contains "<name>,".
+void GameObject::UnknownFunction468dd0(const char* name) {
+    char className[128];
+    char pattern[128];
+    GameObject* child = field_0x10;
+    sprintf(pattern, "%s,", name);
+    int length = strlen(pattern) - 1;
+    for (; child; child = child->field_0x0C) {
+        if (child->field_0x25_bit3)
+            continue;
+        if (strstr(child->field_0x28, pattern)) {
+            child->UnknownVirtualSlot4();
+        } else {
+            strcpy(className, typeid(*child).name());
+            if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
+                strstr(className, "class ") == className)
+                child->UnknownVirtualSlot4();
+            if (!strncmp(className, pattern, length))
+                child->UnknownVirtualSlot4();
+        }
+        child->UnknownFunction468dd0(name);
+    }
+}
+
+// 0x00468f10: the same walk calling slot 5.
+void GameObject::UnknownFunction468f10(const char* name) {
+    char className[128];
+    char pattern[128];
+    GameObject* child = field_0x10;
+    sprintf(pattern, "%s,", name);
+    int length = strlen(pattern) - 1;
+    for (; child; child = child->field_0x0C) {
+        if (child->field_0x25_bit3)
+            continue;
+        if (strstr(child->field_0x28, pattern)) {
+            child->UnknownVirtualSlot5();
+        } else {
+            strcpy(className, typeid(*child).name());
+            if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
+                strstr(className, "class ") == className)
+                child->UnknownVirtualSlot5();
+            if (!strncmp(className, pattern, length))
+                child->UnknownVirtualSlot5();
+        }
+        child->UnknownFunction468f10(name);
+    }
+}
+
+// 0x00469770: finds an object whose name list or RTTI class name matches
+// "<name>," (any object when `name` is 0). Modes: 0 the children, 1 all
+// descendants (depth first), 2 the other siblings, 3 the parent, 4 the
+// ancestors.
+GameObject* GameObject::UnknownFunction469770(int mode, const char* name) {
+    char className[128];
+    char pattern[128];
+    int length = 0;
+    if (name) {
+        sprintf(pattern, "%s,", name);
+        length = strlen(pattern) - 1;
+    }
+    GameObject* object;
+    switch (mode) {
+    case 0:
+    case 1:
+        object = field_0x10;
+        break;
+    case 2:
+        object = field_0x08;
+        if (object) {
+            while (object->field_0x08)
+                object = object->field_0x08;
+        } else {
+            object = field_0x0C;
+        }
+        break;
+    case 3:
+    case 4:
+        object = field_0x14;
+        break;
+    default:
+        return 0;
+    }
+    while (object) {
+        if (!name)
+            return object;
+        if (strstr(object->field_0x28, pattern))
+            return object;
+        strcpy(className, typeid(*object).name());
+        if (strlen(className) > 6 && !strncmp(className + 6, pattern, length) &&
+            strstr(className, "class ") == className)
+            return object;
+        if (!strncmp(className, pattern, length))
+            return object;
+        switch (mode) {
+        case 0:
+            object = object->field_0x0C;
+            break;
+        case 1: {
+            GameObject* found = object->UnknownFunction469770(1, name);
+            if (found)
+                return found;
+            object = object->field_0x0C;
+            break;
+        }
+        case 2:
+            object = object->field_0x0C;
+            if (object == this)
+                object = object->field_0x0C;
+            break;
+        case 3:
+            return 0;
+        case 4:
+            object = object->field_0x14;
+            break;
+        }
+    }
+    return 0;
+}
+
+// 0x00469950
+GameObjectIterator::GameObjectIterator(GameObject* root, int mode, const char* filter) {
+    field_0x00 = root;
+    field_0x08 = mode;
+    if (filter) {
+        sprintf(field_0x0c, "%s,", filter);
+        field_0x8c = strlen(field_0x0c) - 1;
+    } else {
+        field_0x0c[0] = 0;
+        field_0x8c = 0;
+    }
+    switch (field_0x08) {
+    case 0:
+    case 1:
+        field_0x04 = field_0x00->field_0x10;
+        break;
+    case 2:
+        if (field_0x00->field_0x08) {
+            field_0x04 = field_0x00->field_0x08;
+            while (field_0x04->field_0x08)
+                field_0x04 = field_0x04->field_0x08;
+        } else {
+            field_0x04 = field_0x00->field_0x0C;
+        }
+        break;
+    case 3:
+    case 4:
+        field_0x04 = field_0x00->field_0x14;
+        break;
+    }
+    g_UnknownGlobal65b548++;
+    field_0x90 = 0;
+}
+
+// 0x00469a20
+void GameObjectIterator::UnknownFunction469a20() {
+    if (!field_0x90)
+        g_UnknownGlobal65b548--;
+    field_0x04 = 0;
+}
+
+// 0x00469a40
+GameObjectIterator::~GameObjectIterator() {
+    UnknownFunction469a20();
+}
+
+// 0x00469a50: the next match, or 0 (releasing the global) once the walk
+// runs out.
+GameObject* GameObjectIterator::Next() {
+    char className[128];
+    if (!field_0x04)
+        return 0;
+    GameObject* found;
+    do {
+        if (field_0x0c[0]) {
+            if (strstr(field_0x04->field_0x28, field_0x0c)) {
+                found = field_0x04;
+            } else {
+                strcpy(className, typeid(*field_0x04).name());
+                if (strlen(className) > 6 && !strncmp(className + 6, field_0x0c, field_0x8c) &&
+                    strstr(className, "class ") == className)
+                    found = field_0x04;
+                if (!strncmp(className, field_0x0c, field_0x8c))
+                    found = field_0x04;
+                else
+                    found = 0;
+            }
+        } else {
+            found = field_0x04;
+        }
+        switch (field_0x08) {
+        case 0:
+            field_0x04 = field_0x04->field_0x0C;
+            break;
+        case 1:
+            if (field_0x04->field_0x10) {
+                field_0x04 = field_0x04->field_0x10;
+            } else if (field_0x04->field_0x0C) {
+                field_0x04 = field_0x04->field_0x0C;
+            } else if (field_0x04 == field_0x00 || field_0x04->field_0x14 == field_0x00) {
+                field_0x04 = 0;
+            } else {
+                for (field_0x04 = field_0x04->field_0x14; field_0x04; field_0x04 = field_0x04->field_0x14) {
+                    if (field_0x04 == field_0x00) {
+                        field_0x04 = 0;
+                        break;
+                    }
+                    if (field_0x04->field_0x0C) {
+                        field_0x04 = field_0x04->field_0x0C;
+                        break;
+                    }
+                }
+            }
+            break;
+        case 2:
+            field_0x04 = field_0x04->field_0x0C;
+            if (field_0x04 == field_0x00)
+                field_0x04 = field_0x04->field_0x0C;
+            break;
+        case 3:
+            field_0x04 = 0;
+            break;
+        case 4:
+            field_0x04 = field_0x04->field_0x14;
+            break;
+        }
+    } while (!found && field_0x04);
+    if (!field_0x04) {
+        g_UnknownGlobal65b548--;
+        field_0x90 = 1;
+    }
+    return found;
 }

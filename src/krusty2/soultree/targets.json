@@ -1068,5 +1068,15 @@
     "expect": "exact",
     "notes": "Math3D.h vector initializer (this unit's vectors 0x00689e88..0x00689ec0)",
     "bindings": "soultree.bindings.json"
+  },
+  {
+    "class": "SoultreeQuadTreeRenderer",
+    "source": "SoultreeQuadTreeRenderer.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot23@SoultreeQuadTreeRenderer",
+    "target_va": "0x005048d0",
+    "target_size": 101,
+    "expect": "exact",
+    "notes": "vtable 0x558168 slot 23",
+    "bindings": "SoultreeQuadTreeRenderer.bindings.json"
   }
 ]

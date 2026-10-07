@@ -203,6 +203,14 @@ and 8 `$E`) and Point2D's inline methods (5) match strictly; see
 dlgprocs.cpp (the front-end dialogs) matches strictly in 89 functions;
 see [DIALOGPROCS](DIALOGPROCS.md).
 
+A coverage round-out adds PCRenderTarget.cpp (+12), gameobj.cpp (+13,
+including GameObjectIterator), PCAudio.cpp's two deleting destructors,
+the BikeCamera/VehicleCamera/KrustyBikeCamera init chain (+3) and
+BikeCamera.cpp's vector set (+8); see [RENDER_TARGET](RENDER_TARGET.md)
+and [GAMEOBJECT](GAMEOBJECT.md). In krusty2, Bike.cpp, CollisionObject.cpp,
+VisibilityQuadTree.cpp, SoultreeQuadTreeRenderer.cpp and the promoted
+SteeringControl.cpp gain 59 strict physics targets.
+
 krustyui.cpp (KrustyUI) matches strictly in 43 functions, including the
 3114-byte garage scene and the 2432-byte open-menu routine; see
 [KRUSTYUI](KRUSTYUI.md).

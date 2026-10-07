@@ -11,21 +11,23 @@ struct UnknownGuid;
 struct UnknownClipperInterface;
 struct UnknownSurfaceDesc;
 struct UnknownSurfaceCaps;
+struct UnknownPixelFormat;
 
 // Device at PCRenderTarget+0x50 (IDirect3DDevice7-shaped).
 struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall UnknownMethod2();
-    virtual long __stdcall UnknownMethod3();
-    virtual long __stdcall UnknownMethod4();
+    virtual long __stdcall UnknownMethod3(void* caps);                    // GetCaps
+    virtual long __stdcall UnknownMethod4(long(__stdcall* callback)(UnknownPixelFormat*, void*),
+                                          void* context);                   // EnumTextureFormats
     virtual long __stdcall UnknownMethod5();                              // BeginScene
     virtual long __stdcall UnknownMethod6();                              // EndScene
     virtual long __stdcall UnknownMethod7();
     virtual long __stdcall UnknownMethod8();
     virtual long __stdcall UnknownMethod9();
     virtual long __stdcall UnknownMethod10(unsigned long count, void* rects, unsigned long flags,
-                                           unsigned long color, int z, unsigned long stencil); // Clear
+                                           unsigned long color, float z, unsigned long stencil); // Clear
     virtual long __stdcall UnknownMethod11(int kind, const Matrix4* value); // SetTransform
     virtual long __stdcall UnknownMethod12();
     virtual long __stdcall UnknownMethod13(void* viewport);               // SetViewport
@@ -40,14 +42,17 @@ struct UnknownRenderInterface {
     virtual long __stdcall UnknownMethod22();
     virtual long __stdcall UnknownMethod23();
     virtual long __stdcall UnknownMethod24();
-    virtual long __stdcall UnknownMethod25();
-    virtual long __stdcall UnknownMethod26();
+    virtual long __stdcall UnknownMethod25(int type, int vertexFormat, void* vertices, int count,
+                                           int flags);                     // DrawPrimitive
+    virtual long __stdcall UnknownMethod26(int type, int vertexFormat, void* vertices, int vertexCount,
+                                           void* indices, int indexCount, int flags); // DrawIndexedPrimitive
     virtual long __stdcall UnknownMethod27();
     virtual long __stdcall UnknownMethod28();
     virtual long __stdcall UnknownMethod29();
     virtual long __stdcall UnknownMethod30();
     virtual long __stdcall UnknownMethod31();
-    virtual long __stdcall UnknownMethod32();
+    virtual long __stdcall UnknownMethod32(int type, void* vertexBuffer, int start, int vertexCount,
+                                           void* indices, int indexCount, int flags); // DrawIndexedPrimitiveVB
     virtual long __stdcall UnknownMethod33();
     virtual long __stdcall UnknownMethod34();
     virtual long __stdcall UnknownMethod35(int stage, void* texture);     // SetTexture
@@ -68,7 +73,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod0(const UnknownGuid* iid, void** object); // QueryInterface
     virtual long __stdcall UnknownMethod1();                              // AddRef
     virtual long __stdcall UnknownMethod2();
-    virtual long __stdcall UnknownMethod3();
+    virtual long __stdcall UnknownMethod3(UnknownSurfaceInterface* surface);     // AddAttachedSurface
     virtual long __stdcall UnknownMethod4();
     virtual long __stdcall UnknownMethod5(void* destination, UnknownSurfaceInterface* source,
                                           void* sourceRect, int flags, void* effects); // Blt
@@ -88,7 +93,7 @@ struct UnknownSurfaceInterface {
     virtual long __stdcall UnknownMethod18();
     virtual long __stdcall UnknownMethod19();
     virtual long __stdcall UnknownMethod20();
-    virtual long __stdcall UnknownMethod21();
+    virtual long __stdcall UnknownMethod21(UnknownPixelFormat* format);   // GetPixelFormat
     virtual long __stdcall UnknownMethod22(UnknownSurfaceDesc* desc);      // GetSurfaceDesc
     virtual long __stdcall UnknownMethod23();
     virtual long __stdcall UnknownMethod24();                             // IsLost
@@ -209,6 +214,13 @@ struct UnknownDirect3DInterface {
     virtual long __stdcall UnknownMethod0();
     virtual long __stdcall UnknownMethod1();
     virtual long __stdcall UnknownMethod2();                              // Release
+    virtual long __stdcall UnknownMethod3();
+    virtual long __stdcall UnknownMethod4(const UnknownGuid* device, UnknownSurfaceInterface* surface,
+                                          UnknownRenderInterface** result); // CreateDevice
+    virtual long __stdcall UnknownMethod5();
+    virtual long __stdcall UnknownMethod6(const UnknownGuid* device,
+                                          long(__stdcall* callback)(UnknownPixelFormat*, void*),
+                                          void* context);                   // EnumZBufferFormats
 };
 
 // Clipper at Display+0x1ac (IDirectDrawClipper-shaped).

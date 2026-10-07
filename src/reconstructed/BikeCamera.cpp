@@ -1,5 +1,13 @@
 #include "BikeCamera.h"
 
+// The unit's per-file vectors (Math3D.h's four constants); their initializers
+// 0x00417350..0x0041746b sit after slot 0x00417340 and build 0x00578e20,
+// 0x00578e30, 0x00578e40 and 0x00578e10. No code in this unit reads them.
+static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
+static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
+static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
+
 // 0x00416e20
 BikeCamera::BikeCamera(int flags) : VehicleCamera(flags) {
     bike = 0;
@@ -7,6 +15,15 @@ BikeCamera::BikeCamera(int flags) : VehicleCamera(flags) {
 
 // 0x00416e70: an explicit empty destructor.
 BikeCamera::~BikeCamera() {}
+
+// 0x00416e80
+BikeCamera* BikeCamera::UnknownFunction416e80(void* value, float rate294, float rate298, float value228,
+                                              float value2d0, float value2e8, int capacity, int count,
+                                              const int* list) {
+    if (!UnknownFunction52b9e0(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
+        return 0;
+    return this;
+}
 
 // 0x00416ed0: table entries 0 (rider's head) and 1 (target point) with two
 // values that depend on bike state 6, then slot 38.

@@ -11,6 +11,7 @@
   "??0UnknownSoundNotifier@@QAE@XZ": "0x004bb720",
   "??0UnknownTextureStream@@QAE@H@Z": "0x00460d10",
   "??1BaseObject@@UAE@XZ": "0x00405150",
+  "??1PCSoundInterface@@UAE@XZ": "0x004be4b0",
   "??1PCSoundInterface@@UAE@XZ$ehhandler": "0x0054cad8",
   "??1Sound@@UAE@XZ": "0x004bbb60",
   "??1Sound@@UAE@XZ$ehhandler": "0x0054ca18",

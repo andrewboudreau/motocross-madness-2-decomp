@@ -25,7 +25,9 @@ that follow live in `samples/physics/motion/`.
   eight `$E` pairs. Retail has two sets of the four `Vec3` constants here; `Math3D.h` supplies the first and
   `SteeringControl.cpp` declares the second locally (`kSecondVec3*`).
 - SteeringControl has no RTTI (no virtuals). Layout: `node` +0 (SoultreeObject*), `angle` +4, `field_0x08`, `axis` +0xc.
-- 21 exact (5 methods + 16 `$E`), 1 partial (SetAxisFromPoints 60.7%, y spilled to a stack slot in retail).
+- Promoted to `src/krusty2/motion/SteeringControl.cpp` with `SteeringControl.bindings.json`: 21 strict exact
+  (5 methods + 16 `$E`). SetAxisFromPoints `0x00504d30` stays a near miss in
+  `samples/physics/motion/SteeringControl.cpp` (y spilled to a stack slot in retail).
 
 ## Not attributed
 The keyboard-hook functions `0x005053b0..0x00505480` and the `$E` at `0x00505480` have no `__FILE__` reference and

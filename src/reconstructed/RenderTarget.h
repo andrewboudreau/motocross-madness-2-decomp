@@ -25,9 +25,9 @@ public:
     virtual long UnknownVirtualSlot7(int stage, int type, int value) = 0;
     virtual void UnknownVirtualSlot8(int state, int value, int force) = 0;
     virtual long UnknownVirtualSlot9(int state, int* value) = 0;
-    virtual int UnknownVirtualSlot10(int a, int b) = 0;
+    virtual void UnknownVirtualSlot10(int mode, int flag) = 0;
     virtual long UnknownVirtualSlot11(int stage) = 0;
-    virtual void UnknownVirtualSlot12(const CameraRect* rect, int flag) = 0;
+    virtual int UnknownVirtualSlot12(const CameraRect* rect, int flags) = 0;
     virtual int UnknownVirtualSlot13(int a) = 0;
     virtual int UnknownVirtualSlot14(void* viewport) = 0;
     virtual int UnknownVirtualSlot15(int a, int b, int c, int d, int e, int f, int g) = 0;
@@ -47,14 +47,14 @@ public:
     int field_0x14;                      // frame modulus (Camera slots 5/18 read it)
     int field_0x18;                      // frame index, wraps at field_0x14
     int field_0x1c;                      // frame count
-    int field_0x20;
-    int field_0x24;
-    int field_0x28;
-    int field_0x2c;
-    int field_0x30;
-    int field_0x34;
-    int field_0x38;
-    int field_0x3c;
-    int field_0x40;
-    int field_0x44;
+    int field_0x20;                      // Z depth (PCRenderTarget: 16 or 32)
+    int field_0x24;                      // surface memory caps (0x4000 video, 0x800 system)
+    int field_0x28;                      // pixel format of the surface
+    float field_0x2c;                    // Z clear value (1.0f)
+    int field_0x30;                      // clear colour
+    int field_0x34;                      // nonzero: clears the stencil too
+    int field_0x38;                      // vertices drawn in formats 0x112/0x1e2 (reset by slot 12)
+    int field_0x3c;                      // points drawn
+    int field_0x40;                      // lines drawn
+    int field_0x44;                      // triangles drawn
 };

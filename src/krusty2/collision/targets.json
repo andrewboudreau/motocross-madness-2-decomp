@@ -608,5 +608,95 @@
     "expect": "exact",
     "notes": "thiscall member loaders on CollisionFileStream; owner: bracket only",
     "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "?Fn_004394f0@@",
+    "target_va": "0x004394f0",
+    "target_size": 257,
+    "expect": "exact",
+    "notes": "sphere query; ObjectPicker caller 0x4b0a46",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004356f0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "CollisionObject.cpp Math3D vector set (vectors 0x5797a0..0x5797d0)",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00435700",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "CollisionObject.cpp Math3D vector set (vectors 0x5797a0..0x5797d0)",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00435740",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "CollisionObject.cpp Math3D vector set (vectors 0x5797a0..0x5797d0)",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x00435750",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "CollisionObject.cpp Math3D vector set (vectors 0x5797a0..0x5797d0)",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x00435790",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "CollisionObject.cpp Math3D vector set (vectors 0x5797a0..0x5797d0)",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004357a0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "CollisionObject.cpp Math3D vector set (vectors 0x5797a0..0x5797d0)",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004357e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "CollisionObject.cpp Math3D vector set (vectors 0x5797a0..0x5797d0)",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004357f0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "CollisionObject.cpp Math3D vector set (vectors 0x5797a0..0x5797d0)",
+    "bindings": "CollisionObject.bindings.json"
   }
 ]

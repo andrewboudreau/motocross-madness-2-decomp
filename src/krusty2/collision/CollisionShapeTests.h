@@ -88,6 +88,10 @@ int Fn_00429570(CollisionVec3* worldCenter, float radius, float radiusSq, void* 
                 const Matrix4* xf, int mode);
 int Fn_00429890(CollisionVec3* worldEnds, float radius, float radiusSq, void* geom,
                 const Matrix4* xf, int mode, void* aux);
+// 0x00429540: the sphere test of 0x00429570 with a vertex array (BoundingBoxTreeQuery.h's
+// SphereTreeQueryWithVertices).
+int Fn_00429540(const CollisionVec3* worldCenter, float radius, float radiusSq, void* geom,
+                const Matrix4* xf, int mode, void* vertices);
 // 0x00424730: broad-phase box overlap in a relative frame (center/half extents of box A by
 // value, box B by pointer, relative transform, transform of A).
 int Fn_00424730(CollisionVec3 aCenter, CollisionVec3 aHalf, const CollisionVec3* bCenter,

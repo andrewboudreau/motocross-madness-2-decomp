@@ -1803,3 +1803,36 @@ void SetCollisionBoxResult(CollisionBoxResult* result)
 {
     g_CollisionBoxResult = result;
 }
+
+// 0x004394f0 (cdecl; ObjectPicker.cpp 0x004b0a46): whether a sphere (world centre, r, r*r)
+// touches an enabled object's triangles: a hull directly, a model after its bounds test,
+// element by element.  Shape 2 (and any other) reports no contact; retail keeps an empty
+// case 2 in the dispatch (the second `dec ecx`).
+int Fn_004394f0(const CollisionVec3* center, float radius, float radiusSq, CollisionObject* object)
+{
+    if (!(object->statusFlags & 1))
+        return 0;
+    switch (object->shapeType) {
+    case 0: {
+        CollisionHullBody* hull = (CollisionHullBody*)object->shape;
+        return Fn_00429540(center, radius, radiusSq, hull->triangleTree, &hull->worldTransform, 1,
+                           hull->vertices);
+    }
+    case 1: {
+        CollisionModelBody* model = (CollisionModelBody*)object->shape;
+        if (Fn_00425750(&model->center, &model->halfExtents, *center, radius, radiusSq, &model->field_0x88)) {
+            for (int i = 0; i < model->elementCount; i++) {
+                CollisionHullBody* hull = &model->elements[i];
+                if (Fn_00429540(center, radius, radiusSq, hull->triangleTree, &hull->worldTransform, 1,
+                                hull->vertices))
+                    return 1;
+            }
+        }
+        return 0;
+    }
+    case 2:
+        return 0;
+    }
+    return 0;
+}
+

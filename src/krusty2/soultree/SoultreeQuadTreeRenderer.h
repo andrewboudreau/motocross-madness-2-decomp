@@ -73,6 +73,8 @@ struct SoultreeStatsLog {
 struct SoultreeStats {
     char pad_0x00[0x38];
     SoultreeStatsLog* log;            // +0x38
+    char pad_0x3c[0x2d4 - 0x3c];
+    unsigned char debugFlags;         // +0x2d4 bit 2 enables the debug keys (slot 23)
 };
 void SoultreeSetLineName(SoultreeStatsLog* log, int line, const char* name);              // 0x00447fa0
 void SoultreeLogLine(SoultreeStatsLog* log, int line, const char* format, ...);           // 0x00447f40
@@ -84,6 +86,7 @@ public:
     virtual int GameObjectVirtualSlot10(float dt);                    // 0x00504690
     virtual int GameObjectVirtualSlot12();                            // 0x00504620
     virtual int GameObjectVirtualSlot14();                            // 0x00504570
+    virtual int GameObjectVirtualSlot23(int a, int b);                // 0x005048d0
 
     void Fn_5046e0();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x63)
     void Fn_5047f0();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x7f)

@@ -65,6 +65,7 @@ protected:
     RenderTarget* Owner() const { return static_cast<RenderTarget*>(field_0x18); }
 
     friend class RenderTarget;
+    friend class PCRenderTarget;    // PCRenderTarget.cpp slot 12 clears the viewport (+0x1a0)
     friend class PCGame;           // slot 19 reattaches the camera (+0x18, +0x1a0)
     friend class InstrumentOverlay; // TrackOverlay.cpp: slot 14 reads +0x1a0 and +0x1cc
     friend class NameOverlay;       // TrackOverlay.cpp: reads +0x170

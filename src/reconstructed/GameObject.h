@@ -59,6 +59,14 @@ public:
     int UnknownFunction469680();
     // 0x00469ce0: appends the RTTI class name of `object` to field_0x28.
     void UnknownFunction469ce0(GameObject* object);
+    // 0x004690c0: ORs `flags` into field_0x20 and propagates the result up
+    // through every parent (each adds its own field_0x1C).
+    void UnknownFunction4690c0(unsigned int flags);
+    // 0x00469100: recomputes field_0x20 from the children; returns it with
+    // field_0x1C added.
+    unsigned int UnknownFunction469100();
+    // 0x00469c80: unlinks and releases every descendant marked with +0x25 bit 3.
+    void UnknownFunction469c80();
 
 protected:
     // 0x00468dd0 / 0x00468f10: TrackGame turns the "RaceSound" child on and
@@ -66,6 +74,7 @@ protected:
     void UnknownFunction468dd0(const char* name);
     void UnknownFunction468f10(const char* name);
 
+    friend class GameObjectIterator; // gameobj.cpp walks the links and names
     friend class Game;      // reads the +0x25 bits of its DebugOverlay
     friend class TrackGame; // reads the +0x25 bits of its UI objects (0x00521860)
     friend class EventManager; // reads a race-mode object's +0x25 bit 0 (0x0045eef0)

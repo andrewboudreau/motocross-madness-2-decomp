@@ -19,6 +19,8 @@ extern QuadTree* g_quadTree;                     // 0x0068aba4
 extern SoultreeObject** g_soultreeNodes;     // 0x00689ec4 node array (RegisterNode 0x4fedb0)
 extern int g_soultreeNodeCount;                  // 0x00689ec8
 
+int CheckKey(int key, int a, int b, int flags);  // 0x0043caa0 (cdecl)
+
 // 0x00504490
 SoultreeQuadTreeRenderer::SoultreeQuadTreeRenderer(int flags)
     : GraphicsTest(flags)
@@ -119,4 +121,17 @@ void SoultreeQuadTreeRenderer::Fn_5047f0()
     }
     field_0x34 = 0;
     delete it;
+}
+
+// slot 23, 0x005048d0: with the debug keys enabled, key 0x2d switches every
+// node on (Fn_5046e0) or, when some are on, off again (Fn_5047f0).
+int SoultreeQuadTreeRenderer::GameObjectVirtualSlot23(int a, int b)
+{
+    if ((g_soultreeStats->debugFlags & 4) && CheckKey(0x2d, 0, a, 0x80)) {
+        if (!field_0x34)
+            Fn_5046e0();
+        else
+            Fn_5047f0();
+    }
+    return GraphicsTest::GameObjectVirtualSlot23(a, b);
 }

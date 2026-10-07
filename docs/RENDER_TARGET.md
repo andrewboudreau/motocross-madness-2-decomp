@@ -63,5 +63,24 @@ value already matches unless forced.
 | 14 | `0x004c54f0` | 22 | Device method 13 succeeded (Camera's viewport) |
 | 19 | `0x004c5ed0` | 42 | Render states 0x19 = 5, 0x18 = 0, 0x0f = 0, unforced |
 
-Slots 4, 10, 12, 13 and 15–18 and the helper `0x004c5d00` are not yet
-reconstructed.
+Also strict exact (12 more functions, not yet calibration cases):
+
+| Function | Retail VA | Bytes | Behavior |
+|---|---|---:|---|
+| `0x004c4f80` | `0x004c4f80` | 681 | Attach: display, device GUID (+0x54), surface, frame modulus; size and pixel format from the surface; with `zbuffer`, a Z surface of the same depth from the enumerated list (fails on `0x8876017c`); CreateDevice, caps into +0x164..+0x24f, texture formats; deletes itself on failure |
+| Z/texture format callbacks | `0x004c52a0` / `0x004c5230` | 114 / 105 | stdcall enumeration callbacks; append the 0x20-byte format to +0x260/+0x25c (Z, flag 0x400 only; line 39) or +0x258/+0x254 (line 20) with `DebugRealloc` |
+| 4 | `0x004c5420` | 99 | Lock: returns the bits (0 on failure) and the pitch |
+| 10 | `0x004c5740` | 488 | Stage-0 colour/alpha operations for blend modes 1-8 (switch; case 8 jumps into case 3's tail) |
+| 13 | `0x004c5640` | 151 | Whether a texture format matching flags/FourCC/bit count/G/A masks was enumerated |
+| 15, 16, 17 | `0x004c5b20`, `0x004c5bd0`, `0x004c5c70` | 164 / 152 / 144 | DrawIndexedPrimitive, DrawPrimitive, DrawIndexedPrimitiveVB (device 26/25/32); count vertices of formats 0x112/0x1e2 (+0x38) and points/lines/triangles (+0x3c/+0x40/+0x44) |
+| 18 | `0x004c5e60` | 112 | By caps +0x1b8 bit 0x10 or 0x20: render states 0x18, 0x0f, 0x19 through slot 8 |
+| `0x004c5950` | `0x004c5950` | 453 | Texture-memory probe: creates 256x256 then 32x32 surfaces (caps 0x10005000) until failure or system memory; bytes = count<<17 + count<<11 |
+| `0x004c5d00` | `0x004c5d00` | 351 | Screenshot: first free `"%s%05d.TGA"` (computer name, counter `0x0068995c`), lock, Tgafile writer for 16/24/32 bits; `MAX_PATH` buffer and an inline file-exists test give retail's frame and unrotated loop |
+
+RenderTarget fields: +0x20 Z depth, +0x24 memory caps (0x4000/0x800), +0x28
+pixel format, +0x2c Z clear value (float 1.0), +0x30 clear colour, +0x34
+stencil flag, +0x38..+0x44 per-frame primitive counters (reset by slot 12).
+
+Near miss (`samples/render/PCRenderTargetNearMisses.cpp`): slot 12
+`0x004c5510` (Clear), 44/275 — register allocation and the merging of the
+three Clear calls.

@@ -64,7 +64,7 @@
   "?UnknownFunction4c16f0@PCGame@@QAEHPAUUnknownDisplay@@@Z": "0x004c16f0",
   "?UnknownFunction4c1a00@PCGame@@QAEHXZ": "0x004c1a00",
   "?UnknownFunction4c4f80@PCRenderTarget@@QAEPAVRenderTarget@@PAUUnknownDisplay@@PBUUnknownGuid@@PAUUnknownSurfaceInterface@@HH@Z": "0x004c4f80",
-  "?UnknownFunction4c5950@PCRenderTarget@@QAEXPAH@Z": "0x004c5950",
+  "?UnknownFunction4c5950@PCRenderTarget@@QAEHPAH@Z": "0x004c5950",
   "?UnknownFunction4c5d00@PCRenderTarget@@QAEXXZ": "0x004c5d00",
   "?UnknownFunction4c9600@@YAHPAX@Z": "0x004c9600",
   "?UnknownFunction4c9b50@UnknownDisplay@@QAEXXZ": "0x004c9b50",

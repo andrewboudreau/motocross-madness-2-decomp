@@ -6,6 +6,7 @@
 #include "ControlInterface.h"
 #include "GameCursor.h"
 #include "GameObject.h"
+#include "GameObjectIterator.h"
 #include "RenderTarget.h"
 #include "UIDialog.h"
 
@@ -29,18 +30,6 @@ class Palette8;
 class PCTextureMap;
 class SoundGroup;
 class TextureMapManager;
-
-// Stack iterator over an object's descendants whose class name matches
-// (0x94 bytes; samples/physics/soultree_base declares the same helper).
-class GameObjectIterator {
-public:
-    GameObjectIterator(GameObject* root, int mode, const char* filter); // 0x00469950
-    ~GameObjectIterator();                                                // 0x00469a40
-    GameObject* Next();                                                   // 0x00469a50
-
-private:
-    char field_0x00[0x94];
-};
 
 // IDirectDrawClipper-shaped interface at GUIManager+0x3dc (created through
 // Display+0x190's method 4, handed to Display+0x19c's method 28).

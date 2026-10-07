@@ -41,6 +41,11 @@ public:
     explicit BikeCamera(int flags); // 0x00416e20
     virtual ~BikeCamera();          // 0x00416e70 (deleting wrapper 0x00416e50)
 
+    // 0x00416e80: VehicleCamera's setup (0x0052b9e0); this or 0.
+    BikeCamera* UnknownFunction416e80(void* value, float rate294, float rate298, float value228,
+                                      float value2d0, float value2e8, int capacity, int count,
+                                      const int* list);
+
     virtual Vector3 UnknownVirtualSlot37();
     virtual void UnknownVirtualSlot40(float a);
     virtual Vector3 UnknownVirtualSlot50();

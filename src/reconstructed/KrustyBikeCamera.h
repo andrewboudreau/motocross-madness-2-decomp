@@ -33,6 +33,12 @@ public:
     explicit KrustyBikeCamera(int flags); // 0x00497cb0
     virtual ~KrustyBikeCamera();          // 0x00497d80 (deleting wrapper 0x00497d60)
 
+    // 0x00497d90: BikeCamera's setup (0x00416e80), then the "FlybyCam.vue"
+    // frames; this or 0.
+    KrustyBikeCamera* UnknownFunction497d90(void* value, float rate294, float rate298, float value228,
+                                            float value2d0, float value2e8, int capacity, int count,
+                                            const int* list);
+
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00497e20 (near miss: samples/camera)
 
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);

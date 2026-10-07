@@ -7,7 +7,7 @@ Literal evidence: `D:\aardvark\VC\krusty2\PCAudio.cpp` (`0x0056fa28`, the
 `AllowSoundHardware`, `AllowSoundEnumeration` and `AllowEAXExtension`, the
 "Sound Card reports" format string (`0x0056fac8`), RTTI for
 `PCSoundInterface : SoundInterface` (vtable `0x00555d9c`, whose only slot is
-the deleting destructor `0x004be490`), `Sound` (`0x00555d88`) and
+the deleting destructor `0x004be490`; strict exact, as is Sound's `0x004bbb40`), `Sound` (`0x00555d88`) and
 `SoundGroup` (`0x00550500`).
 
 The DirectSound identities are strong inference, not RTTI: the listener is

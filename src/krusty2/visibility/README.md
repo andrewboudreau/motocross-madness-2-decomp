@@ -10,7 +10,13 @@ partial candidate; the separate helper samples are not covered by that claim.
 - `VisibilityQuadTree : QuadTree (+0), GameObject (+0x874)`; primary vtable 0x558dfc,
   secondary (GameObject shape) 0x558d8c. `VisibilityQuadTreeNode : QuadTreeNode`, vtable 0x558e08.
 - 16 exact (see targets.json), Traverse 0x52d610 partial (72.7%, 3026 vs 3027 bytes, call-site arg scheduling). Samples: 3 exact, 3 partial (VisProjectPoint, VisCullQuad, VisSphereInFrustum).
-- Not done: 0x52f570 (box test, VisibilityClipper thiscall, 1358 bytes), 0x52fdc0, 0x52f190 (argument layout still unclear).
+- File statics, in `.CRT$XCU` order (entries 340-347, right after the previous unit's
+  vectors and before wrecker.cpp's): an empty static (0x52d2c0/0x52d2d0), the frozen camera
+  0x68a968 built by the PCCamera constructor 0x4bed80(1) with atexit destructor 0x4624d0
+  (0x52d2e0..0x52d310), the query timer 0x68ab90 (`UnknownPeakHold`-shaped, 5000;
+  0x52d320/0x52d330), Math3D.h's four vectors (0x52fdc0..0x52fefb) and a second empty static
+  (0x52f080/0x52f090). All 18 initializer functions are strict exact.
+- Not done: 0x52f570 (box test, VisibilityClipper thiscall, 1358 bytes), 0x52f190 (argument layout still unclear).
 - The verified debug walk uses a typed renderer pointer at camera+0x18. The partial
   projection probe has a separate provisional `VisProjectionRecord`; its matrix-prefix
   hypothesis is not asserted as part of VisibilityCamera.

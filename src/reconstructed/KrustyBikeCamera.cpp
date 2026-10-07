@@ -17,6 +17,16 @@ KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {
 // 0x00497d80: an explicit empty destructor.
 KrustyBikeCamera::~KrustyBikeCamera() {}
 
+// 0x00497d90
+KrustyBikeCamera* KrustyBikeCamera::UnknownFunction497d90(void* value, float rate294, float rate298,
+                                                          float value228, float value2d0, float value2e8,
+                                                          int capacity, int count, const int* list) {
+    if (!UnknownFunction416e80(value, rate294, rate298, value228, value2d0, value2e8, capacity, count, list))
+        return 0;
+    UnknownFunction4650e0("FlybyCam.vue");
+    return this;
+}
+
 // 0x00497df0: the FollowCamera search, unless the global +0x3430 blocks it.
 int KrustyBikeCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (g_UnknownGlobal56e26c->uiInteractionBlocked)

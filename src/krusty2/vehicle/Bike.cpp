@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include "vehicle/Bike.h"
+#include "collision/CollisionObject.h"
 
 static inline float BikeMin(float a, float b) { return a < b ? a : b; }
 static inline float BikeMaxF(float a, float b) { return a > b ? a : b; }
@@ -1675,4 +1676,33 @@ int Bike::UnknownVirtualSlot89(float t)
         }
     }
     return 0;
+}
+
+// ---- collision callbacks (0x00405cd0, 0x00405d70) -------------------------------------
+// The bike's version of SoulTreePhysics.cpp's pair: 0x004079c0 stores them at the collision
+// object's +0x88 / +0x8c (0x004092c0, 0x004092d0).  The other object's type tag is recorded
+// and forwarded to slot 38; slot 38's first argument is slot 52's answer unless the tag is
+// 0x3e8.  Tags 0x64/0x65 (and 0x68 for the second) are filtered as below (tier 1 data flow).
+void BikeCollisionCallback(CollisionObject* self, CollisionObject* other)
+{
+    Vehicle* vehicle = (Vehicle*)self->ownerObject;
+    int kind = other->ownerType;
+    vehicle->lastCollisionType = kind;
+    if (!vehicle->UnknownVirtualSlot51() || kind == 0x66 || kind == 0x3e9 || kind == 0x6a) {
+        if (kind == 0x64) {
+            if (((Vehicle*)other->ownerObject)->UnknownVirtualSlot51())
+                return;
+        } else if (kind == 0x65) {
+            return;
+        }
+        vehicle->UnknownVirtualSlot38(vehicle->UnknownVirtualSlot52() && kind != 0x3e8 ? 1 : 0, kind, other);
+    }
+}
+
+void BikeStaticCollisionCallback(CollisionObject* self, CollisionObject* other)
+{
+    Vehicle* vehicle = (Vehicle*)self->ownerObject;
+    int kind = other->ownerType;
+    if (!vehicle->UnknownVirtualSlot51() && kind != 0x64 && kind != 0x65 && kind != 0x68)
+        BikeCollisionCallback(self, other);
 }

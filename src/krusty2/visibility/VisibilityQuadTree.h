@@ -21,6 +21,12 @@
 class VisibilityRenderer;
 
 struct VisibilityCamera {
+    // The frozen copy g_frozenCamera (0x0068a968) is built and destroyed by the
+    // PCCamera constructor/destructor (its initializers 0x0052d2f0/0x0052d310),
+    // so the record is a PCCamera (strong inference); the 0x220-byte copy in
+    // slot 23 includes its vtable pointer.
+    explicit VisibilityCamera(int flags);  // 0x004bed80
+    ~VisibilityCamera();                   // 0x004624d0
     char field_0x00[0x18];
     VisibilityRenderer* renderer; // +0x18 loaded by the verified debug walk
     char field_0x1c[0x24];
@@ -64,6 +70,7 @@ struct VisibilityResultList {
 // Accumulator object at 0x0068ab90: 0x004cb6b0 adds a sample, 0x004cb690 reads a value (tier 3).
 class VisibilityStat {
 public:
+    explicit VisibilityStat(int hold);   // 0x004cb670 (5000 for g_visibilityTickStat)
     void AddSample(int value);   // 0x004cb6b0
     int GetValue();              // 0x004cb690
 };

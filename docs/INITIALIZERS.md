@@ -1,7 +1,7 @@
 # Dynamic initializers (`$E`) and unit attribution
 
 This page lists every registered `$E` case and the unit it belongs to. That
-covers 458 cases: `_$E*` symbols in `tools/run_calibration.py`, and `$E`
+covers 500 cases: `_$E*` symbols in `tools/run_calibration.py`, and `$E`
 entries in the `targets.json` files under `src/krusty2` and `samples/physics`.
 Most of them are the per-file vector sets. Each set is four thunk/body pairs
 that build (0,0,0), (1,0,0), (0,1,0) and (0,0,1) into four 12-byte `.bss`
@@ -130,3 +130,8 @@ The audit itself was a linear capstone pass over `.text`, using
 | `0x00466f10..0x004670fb` (XCU 113-116, vectors `0x0065b438..0x0065b468`) | FollowCam.cpp | FollowCam code only | consistent; closes the unit |
 | `0x00442e00..0x00442f3b` (XCU 82-85) | D3DIMSoulTree.CPP | not traced | mid-file |
 | `0x0045fe40..0x0045ff7b` (vectors `0x0059af18..0x0059af50`) | EventManager.cpp | the podium scene `0x0045d480` reads y and z | consistent; closes the unit |
+| `0x00417350..0x0041748b` (vectors `0x00578e10..0x00578e40`) | BikeCamera.cpp | not traced | second Math3D set after BikeAI's |
+| `0x00407880..0x004079bb` (vectors from `0x005778a8`) | src/krusty2/vehicle/Bike.cpp | not traced | consistent |
+| `0x004356f0..0x0043582b` (vectors `0x005797a0..0x005797d0`) | src/krusty2/collision/CollisionObject.cpp | not traced | consistent |
+| `0x0052d2c0..0x0052d33b`, `0x0052f080..0x0052f09b`, `0x0052fdc0..0x0052fefb` (XCU 340-347) | src/krusty2/visibility/VisibilityQuadTree.cpp | this unit (camera, timer, stat) | `.CRT$XCU` order |
+| `0x00504f70..0x005051eb` | src/krusty2/motion/SteeringControl.cpp | not traced | was masked in samples; now exact |

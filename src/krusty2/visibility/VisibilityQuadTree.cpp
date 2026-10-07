@@ -1,6 +1,20 @@
 // VisibilityQuadTree.cpp -- reconstruction of D:\aardvark\VC\krusty2\VisibilityQuadTree.cpp.
 #include "visibility/VisibilityQuadTree.h"
 
+// The unit's file statics, in .CRT$XCU order (entries 340-347): an empty
+// static (0x0052d2c0), the frozen camera (0x0052d2e0) and the query timer
+// (0x0052d320), then Math3D.h's four vectors (0x0052fdc0..) and a second
+// empty static (0x0052f080). The empty statics' addresses never appear in the
+// code, so their types are unknown; an empty user constructor reproduces them.
+struct UnknownVisibilityStatic {
+    UnknownVisibilityStatic() {}
+};
+static UnknownVisibilityStatic s_visibilityUnknownStatic0;
+VisibilityCamera g_frozenCamera(1);                // 0x0068a968
+VisibilityStat g_visibilityTickStat(5000);        // 0x0068ab90
+
+#include "math/Math3D.h"
+
 // Installed for CollisionObject broad-phase queries; g_pQuadTree is the
 // separate active traversal context at 0x00689b78. Names are provisional.
 QuadTree* g_collisionQuadTree;  // 0x0068aba4
@@ -16,9 +30,9 @@ extern VisibilityGlobalEntry g_visibilityEntries[16];
 // Debug toggles and the frozen camera snapshot (slot 23).  Names tier 3.
 extern int g_visibilityDebugDraw;          // 0x0068ab9c toggled by key 0x44 in slot 23; gates slot 14
 extern int g_visibilityFreeze;             // 0x0068aba0 toggled by key 0x57 in slot 23; selects g_frozenCamera in slot 12
-extern VisibilityCamera g_frozenCamera;    // 0x0068a968 0x220-byte copy of the camera record
+// g_frozenCamera (0x0068a968): the 0x220-byte copy of the camera record (defined above).
 extern int g_visibilityQueryTicks;         // 0x0068ab88 clock delta around Query in slot 12
-extern VisibilityStat g_visibilityQueryStat; // 0x0068ab90 accumulator fed with the query ticks
+// g_visibilityTickStat (0x0068ab90): accumulator fed with the query ticks (defined above).
 
 int ReadClock();                                        // 0x004bfa80
 int CheckKey(int key, int a, int b, int flags);         // 0x0043caa0 (cdecl, 4 args)
@@ -120,11 +134,11 @@ int VisibilityQuadTree::GameObjectVirtualSlot12()
             int line = log->nextLineIndex++;
             field_0x858 = line;
         }
-        g_visibilityQueryStat.AddSample(g_visibilityQueryTicks);
+        g_visibilityTickStat.AddSample(g_visibilityQueryTicks);
         SetLineName(g_profiler->log, field_0x858, "QuadTree");
         LogLine(g_profiler->log, field_0x858, "Memory %d", g_memoryStats->GetBytes("QuadTree"));
         LogLine(g_profiler->log, field_0x858, "PrepareGeometry %d %d", g_visibilityQueryTicks,
-                g_visibilityQueryStat.GetValue());
+                g_visibilityTickStat.GetValue());
     }
     return 1;
 }
@@ -242,3 +256,6 @@ void VisibilityQuadTreeNode::DebugDraw(int x, int z, int nodeX, int nodeZ, int s
         DrawChild(0, x, z, nodeX, nodeZ, midX, midZ, size, centerX, centerZ, halfExtent, camera, &center, &extent, &cornersInside);
     }
 }
+
+// 0x0052f080 / 0x0052f090: the second empty file static (see the top).
+static UnknownVisibilityStatic s_visibilityUnknownStatic1;

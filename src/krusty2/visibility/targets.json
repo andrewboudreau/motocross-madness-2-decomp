@@ -158,5 +158,185 @@
     "expect": "exact",
     "notes": "4-child walk with __forceinline DrawChild",
     "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x0052d2c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x0052d2d0",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x0052d2e0",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x0052d2f0",
+    "target_size": 13,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E6",
+    "target_va": "0x0052d300",
+    "target_size": 12,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x0052d310",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x0052d320",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E9",
+    "target_va": "0x0052d330",
+    "target_size": 16,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x0052fdc0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E12",
+    "target_va": "0x0052fdd0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E16",
+    "target_va": "0x0052fe10",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E15",
+    "target_va": "0x0052fe20",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E19",
+    "target_va": "0x0052fe60",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E18",
+    "target_va": "0x0052fe70",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E22",
+    "target_va": "0x0052feb0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E21",
+    "target_va": "0x0052fec0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E25",
+    "target_va": "0x0052f080",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityQuadTree",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "_$E24",
+    "target_va": "0x0052f090",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
+    "bindings": "VisibilityQuadTree.bindings.json"
   }
 ]

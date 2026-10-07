@@ -282,3 +282,18 @@ or relocation-byte fitting is used to make a candidate pass.
 `make progress` regenerates the public source inventory and the separately
 reviewed calibration snapshot. It does not compile or count this physics suite.
 A complete linked game remains unverified.
+
+## Per-unit vector initializers and collision callbacks
+
+Strict exact with the units' existing sources (registration pending):
+- Bike.cpp: its Math3D.h set `0x00407880..0x004079bb` (vectors `0x005778a8`, `0x005778b8`,
+  `0x005778c8`, `0x00577898`, bound in `Bike.bindings.json`) and the two collision
+  callbacks `0x00405cd0`/`0x00405d70` that `0x004079c0` stores at the collision object's
+  +0x88/+0x8c (`0x004092c0`, `0x004092d0`).
+- CollisionObject.cpp: its Math3D.h set `0x004356f0..0x0043582b` (vectors `0x005797a0..`)
+  and the sphere query `0x004394f0` (ObjectPicker.cpp's caller `0x004b0a46`). The capsule
+  query `0x00439600` is a near miss (516/532) in
+  `samples/physics/collision/CollisionObjectNearMisses.cpp`.
+- VisibilityQuadTree.cpp: the unit's 18 initializer functions (see its README).
+- SoultreeQuadTreeRenderer.cpp: slot 23 `0x005048d0` (debug key 0x2d toggles the nodes).
+- SteeringControl.cpp: promoted from samples (see `src/krusty2/motion/README.md`).

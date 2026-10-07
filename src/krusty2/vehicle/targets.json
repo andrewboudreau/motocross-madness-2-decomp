@@ -1448,5 +1448,105 @@
     "expect": "exact",
     "notes": "empty-constructor static initializer body (bare ret)",
     "bindings": "BikeAI.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "?BikeCollisionCallback@@",
+    "target_va": "0x00405cd0",
+    "target_size": 145,
+    "expect": "exact",
+    "notes": "collision callback stored at the collision object +0x88 by 0x4092c0",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "?BikeStaticCollisionCallback@@",
+    "target_va": "0x00405d70",
+    "target_size": 58,
+    "expect": "exact",
+    "notes": "collision callback stored at +0x8c by 0x4092d0",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00407880",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Bike.cpp Math3D vector set (vectors from 0x5778a8)",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00407890",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Bike.cpp Math3D vector set (vectors from 0x5778a8)",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004078d0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Bike.cpp Math3D vector set (vectors from 0x5778a8)",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004078e0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Bike.cpp Math3D vector set (vectors from 0x5778a8)",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x00407920",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Bike.cpp Math3D vector set (vectors from 0x5778a8)",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x00407930",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Bike.cpp Math3D vector set (vectors from 0x5778a8)",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x00407970",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Bike.cpp Math3D vector set (vectors from 0x5778a8)",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00407980",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Bike.cpp Math3D vector set (vectors from 0x5778a8)",
+    "bindings": "Bike.bindings.json"
   }
 ]

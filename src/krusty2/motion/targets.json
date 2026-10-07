@@ -138,5 +138,215 @@
     "expect": "exact",
     "notes": "Non-inherited RTTI slot 8: call GameObject slot 8 and return this; shared retail body, not evidence of original TU ownership.",
     "bindings": "Spheres.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "??0SteeringControl@@QAE@MMPBUVec3@@0@Z",
+    "target_va": "0x00504b60",
+    "target_size": 235,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp __FILE__ 0x5745ac",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?Release@SteeringControl@@QAEXXZ",
+    "target_va": "0x00504c50",
+    "target_size": 26,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?SetAxisFromDirection@SteeringControl@@QAEHPBUVec3@@PAVSoultreeObject@@@Z",
+    "target_va": "0x00504c70",
+    "target_size": 182,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?SetAngle@SteeringControl@@QAEXMPAVSoultreeObject@@@Z",
+    "target_va": "0x00504e20",
+    "target_size": 150,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "?AddAngle@SteeringControl@@QAEXMPAVSoultreeObject@@@Z",
+    "target_va": "0x00504ec0",
+    "target_size": 165,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00504f70",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00504f80",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00504fc0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x00504fd0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x00505010",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x00505020",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x00505060",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00505070",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x005050b0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x005050c0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E17",
+    "target_va": "0x00505100",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E16",
+    "target_va": "0x00505110",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E20",
+    "target_va": "0x00505150",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E19",
+    "target_va": "0x00505160",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E23",
+    "target_va": "0x005051a0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "SteeringControl",
+    "source": "SteeringControl.cpp",
+    "candidate_symbol_contains": "_$E22",
+    "target_va": "0x005051b0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "SteeringControl.cpp initializer",
+    "bindings": "SteeringControl.bindings.json"
   }
 ]
