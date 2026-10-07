@@ -24015,6 +24015,33 @@ CASES = [
         'target_size': 346,
         'reason': "lpfnWndProc of 'InputDeviceClass' registered by 0x4cd610; button 1003 toggles UseLastController through SetRegistryFlag",
     },
+    {
+        'name': 'PlacementQueries.cpp 0x4b08f0 sphere blocked by objects or vegetation',
+        'bindings': 'src/reconstructed/PlacementQueries.bindings.json',
+        'source': 'src/reconstructed/PlacementQueries.cpp',
+        'symbol': '?PlacementSphereBlocked@@YAHPAUCollisionVec3@@MPAVCollisionObject@@HHHH@Z',
+        'target_va': '0x004b08f0',
+        'target_size': 455,
+        'reason': 'CollisionObject/Vegetation type ids cached at 0x56eeb0 (unsigned bytes give mov bl,0xff); quadtree 0x68aba4 query with ignore lists and SphereTouchesObject 0x4394f0',
+    },
+    {
+        'name': 'PlacementQueries.cpp 0x4b0ac0 point in placement square',
+        'bindings': 'src/reconstructed/PlacementQueries.bindings.json',
+        'source': 'src/reconstructed/PlacementQueries.cpp',
+        'symbol': '?PointInPlacementSquare@@YAHPBUCollisionVec3@@MMMMPAM111@Z',
+        'target_va': '0x004b0ac0',
+        'target_size': 177,
+        'reason': "square scaled by scale*256 with four optional outputs; the size term written twice (CSE) keeps retail's stack use",
+    },
+    {
+        'name': 'PlacementQueries.cpp 0x4b0b80 clamp to placement square',
+        'bindings': 'src/reconstructed/PlacementQueries.bindings.json',
+        'source': 'src/reconstructed/PlacementQueries.cpp',
+        'symbol': '?ClampToPlacementSquare@@YAXPAVCollisionObject@@PAVPlacementProbe@@PBUCollisionVec3@@MHHH2PAU3@3@Z',
+        'target_va': '0x004b0b80',
+        'target_size': 619,
+        'reason': 'ObjectPlacement 0x4b0df0 tail call; 1.2333/10 margins, ground probe 0x507c10 with the 0.707 slope test; block-scope probe point fixes the frame layout',
+    },
 ]
 
 def main():

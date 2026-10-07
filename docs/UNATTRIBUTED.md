@@ -74,7 +74,7 @@ neighbours' `__FILE__` xrefs).
 | `0x004aa7ea..0x004aab00` | 790 | 8 (0 unreg., 0 B) | NationalRace.cpp | __FILE__ D:\aardvark\VC\krusty2\NationalRace.cpp xrefs 0x4aa8c7 (slot 27) and 0x4aa9b0 (slot 29); RTTI NationalRace : BaseQuarryEvent (slots 0/10/27/29/30); ctor 0x4aa7f0 and init 0x4aa850 called by EventManager; reconstructed in src/reconstructed/NationalRace.cpp, all 8 functions strict exact | 1 |
 | `0x004ae2e8..0x004ae460` | 376 | 4 (4 unreg., 339 B) | Net.cpp tail or NetProcs.cpp head (unknown) | dispatcher 0x4ae3d0 calling 0x4ae2f0/0x4ae370/0x4ae390; between Net.cpp (0x4ae173) and NetProcs.cpp (0x4ae64d); NET.md: not claimed | 3 |
 | `0x004aff74..0x004aff90` | 28 | 1 (1 unreg., 10 B) | NormalDistribution.cpp $E thunk | XCU 202 thunk 0x4aff80 for the registered body 0x4aff90 (INITIALIZERS.md) | 2 |
-| `0x004b08ec..0x004b0df0` | 1284 | 3 (3 unreg., 1251 B) | ObjectPicker.cpp tail or ObjectPlacement.cpp head (unknown) | 0x4b08f0 'CollisionObject'/'Vegetation' TypeRegistry lookups, 0x4b0ac0, 0x4b0b80 (Terrain callee); after ObjectPicker.cpp (0x4b041c), before ObjectPlacement.cpp's xref 0x4b0fca; no literal | 3 |
+| `0x004b08ec..0x004b0df0` | 1284 | 3 (0 unreg.) | ObjectPicker.cpp tail or ObjectPlacement.cpp head (unknown; provisional 'PlacementQueries.cpp') | 0x4b08f0 'CollisionObject'/'Vegetation' TypeRegistry lookups, 0x4b0ac0, 0x4b0b80 (Terrain callee); after ObjectPicker.cpp (0x4b041c), before ObjectPlacement.cpp's xref 0x4b0fca; no literal; all three strict exact in src/reconstructed/PlacementQueries.cpp ([PLACEMENTQUERIES](PLACEMENTQUERIES.md)) | 3 |
 | `0x004b0df0..0x004b1ec0` | 4304 | 9 (0 unreg., 0 B) | ObjectPlacement.cpp (samples/physics/contact, partial) | __FILE__ xref 0x4b0fca inside 0x4b0df0 (3971 B); XCU 208-211 kVec3 set 0x4b1d80 (0x688738..) read only by 0x4b0df0 (closes the unit); the XCU 208-211 set (8 functions) strict exact in src/krusty2/contact/ObjectPlacement.cpp | 1 |
 | `0x004b5a5e..0x004b5e20` | 962 | 2 (1 unreg., 274 B) | vector helpers between OptionProcs.cpp and overlay.cpp (unknown) | 0x4b5a60 registered partial in samples/physics/helpers; 0x4b5d00 (Vector3*,Vector3*,float,float,int) called by SceneManager/CarProcedural; no literal | 3 |
 | `0x004b89f6..0x004ba390` | 6554 | 37 (0 unreg., 0 B) | particle emitter classes (samples/physics/effects, provisional 'ParticleEmitter.cpp') | RTTI Dust/DirtChunk/DirtSpray/Spark/SteamParticleEmitter (slots 0/10/27); XCU 216-219 kVec3 set 0x4b9e00 (EmitterVec3Constants, no readers); between Parser.cpp (0x4b8584) and Particles.cpp (0x4ba4f1); six slot-10 bodies partial | 2 |
@@ -137,7 +137,7 @@ neighbours' `__FILE__` xrefs).
 - Provisional file names (`CDAudio`, `ClipRectangle`, `DeviceSetup`,
   `ErrorLog`, `FileStream`, `Fog`, `GhostMod`, `GraphicsTest`, `GridNode`,
   `main`, `MediaControl`, `MemTag`, `PickDevice`, `Rectangle2D`, `SkyCube`,
-  `TransparencyMod`, `KrustyVCR`, `ZoneReport`) are ours. None appears in `analysis/source_paths.txt`; they are
+  `TransparencyMod`, `KrustyVCR`, `ZoneReport`, `PlacementQueries`) are ours. None appears in `analysis/source_paths.txt`; they are
   bounded only by the alphabetical bracket given in the evidence column. The
   RTTI class names in them are confirmed; the file ownership is not.
 - `0x00448560..0x00449e60`, `0x0045ff80..0x004624d0` and
