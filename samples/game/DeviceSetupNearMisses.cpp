@@ -3,10 +3,14 @@
 // (src/reconstructed/DeviceSetup.cpp, docs/DEVICESETUP.md).
 //
 // Status: same instruction sequence, branch layout and frame layout except
-// for one register swap. Retail keeps the zero constant in edi and the
-// LoadLibrary cache in ebp; VC6 here swaps the two, which spills
-// DirectInputCreate to the stack and grows the frame by four bytes. Tried:
-// dropping the dead NULL initialisers, separate NT-path library variables.
+// for one register swap (18% masked). Retail keeps the zero constant in edi,
+// the LoadLibrary import pointer in ebp and GetProcAddress in edi once the
+// zero is dead; VC6 here swaps the two, which spills DirectInputCreate to
+// the stack and grows the frame by four bytes. Tried: dropping the dead NULL
+// initialisers, separate NT-path library variables, the NT path reusing the
+// 9x path's DIHinst/DirectInputCreate (or DDHinst), and the SDK's DX7 tail
+// (`pDD7 = NULL`, `DirectDrawCreateEx = NULL`, nested ifs, `hr`): all give
+// the same 1006 bytes, or 1014 with the SDK tail.
 //
 // It is the DirectX SDK's GetDXVersion sample (GetDXVer.cpp) changed to
 // report whether "Blade.dll" loads (on NT 5 and in place of DDRAW.DLL on
