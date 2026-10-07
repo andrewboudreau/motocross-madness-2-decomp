@@ -30,7 +30,7 @@ alone made VC6 swap a commutative add in TrackGame slot 1 (`0x00520ab0`).
 Any further struct definition restored it, so the racer-choice
 definition is a real type, but review it with that in mind.
 
-Exact: 34 calibration cases, all of the unit except three near misses:
+Exact: 34 calibration cases plus `0x00522720`, all of the unit except two near misses:
 - The constructor `0x00522060`, the destructor `0x005225f0`, the profile load
   `0x005231f0`, the network race reset `0x00522680`, the racer-slot
   constructor and the session list's unwind destructor.
@@ -48,6 +48,14 @@ Three return types now follow retail: `0x00522d00` and `0x00523a60` return
 int, and `0x00523d30` returns int and takes ShellExecuteA's parameters.
 Their binding keys were renamed in the files that call them.
 
-Near misses (`samples/game/UiInfoNearMisses.cpp`): the defaults reset
-`0x00522440`, `0x00522720` and the path lookup `0x005238f0`. They differ
-in constant registers, store scheduling and register use.
+`0x00522720` clears its last 0x14 bytes (+0x360) with an inline
+`memset`. VC6 advances the pointer and takes a fresh zero register, as
+retail does.
+
+Near misses (`samples/game/UiInfoNearMisses.cpp`):
+- the defaults reset `0x00522440` (362 of 427): retail keeps 1 in ecx and
+  hoists `&field_0x27f8`, and the second settings copy is scheduled
+  differently;
+- the path lookup `0x005238f0` (189 of 379): retail moves fopen's result
+  into edx only at the shared found block. Writing the found block twice
+  does not get VC6 to merge the copies.

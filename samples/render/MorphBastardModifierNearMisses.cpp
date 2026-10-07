@@ -17,11 +17,20 @@
 // object/channel loops differs (retail keeps the object offset in esi and
 // reloads the index from +0x28, the channel in ebp).
 //
-// MorphBastardModifier::UnknownFunction4a3c80 (0x004a3c80, 2340 bytes,
-// ret 0x44) is not reconstructed: it derives the controller's rotation about
-// each axis from the controller and object matrices through 0x004a2350,
-// 0x00515600, 0x0040ae30, 0x0042de90, 0x00436500, 0x00460c00 and 0x004a3be0
-// and stores the three angles at channel +0x60..+0x68.
+// MorphBastardModifier::UnknownFunction4a3c80 (0x004a3c80..0x004a4ba5,
+// 3878 bytes, ret 0x44): the controller angles. Controller matrix times
+// the rest inverse (inline, through a copy), then per axis: rotate the
+// identity's axis onto the controller's (cross product, 0x004a3be0 angle,
+// normalise or fall back to the unit axis, axis-angle matrix, 0x00436500)
+// and measure the angle between the next rows in degrees (57.2957764),
+// signed by the cross product. Stores -x, -z, -y at +0x60/+0x64/+0x68.
+// The first axis inlines identity, rows, cross product and the axis-angle
+// matrix; the later ones call 0x004a2350, 0x00515600, 0x0042de90,
+// 0x0040ae30 and the Vector3 constructor 0x00404e60 (likely VC6's inline
+// budget). Normalised ratio 0.93 over the first half; 872 of 896
+// instructions, retail frame 0x1fc (ours 0x1b4); the source here uses the
+// inline Vector3 constructor where retail calls 0x00404e60, and VC6's
+// term order differs in the products.
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -287,4 +296,165 @@ void MorphBastardModifier::UnknownVirtualSlot27(D3DIMSoultreeObject* object, Unk
         }
     }
     *out = field_0x40;
+}
+
+// ---------------------------------------------------------------------------
+// 0x004a3c80..0x004a4ba5 (ret 0x44): the controller angles. Not matched; see
+// the notes at the top of this file. The helpers retail calls out of line
+// are declared here; the first uses of the same operations are inline in
+// retail (identity, the row copies, the first cross products and the first
+// axis-angle matrix).
+
+static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+
+float FastInvSqrt(float x);                                          // 0x00460c00
+float UnknownFunction40ae30(const Vector3* a, const Vector3* b);     // 0x0040ae30: a.b
+Vector3 UnknownFunction515600(const Vector3* a, const Vector3* b);   // 0x00515600: a x b
+Vector3 UnknownFunction4a2350(const Matrix4* m, int row);            // 0x004a2350: row of m
+void UnknownFunction42de90(Matrix4* out, float x, float y, float z, float angle); // 0x0042de90: axis-angle
+void UnknownFunction436500(Matrix4* out, const Matrix4* a, const Matrix4* b);    // 0x00436500: a * b
+
+static inline void NormalizeOrZero(Vector3& v)
+{
+    float squared = UnknownFunction40ae30(&v, &v);
+    if (squared == 0.0f) {
+        v = kVec3Zero;
+    } else {
+        float scale = FastInvSqrt(squared);
+        v.x *= scale;
+        v.y *= scale;
+        v.z *= scale;
+    }
+}
+
+// 0x004a3c80: the rotation of the channel's controller relative to its rest
+// pose (`inverse`), as three angles in degrees. For each axis the identity's
+// axis is rotated onto the controller's; the angle left between the next
+// axes is the rotation about it.
+void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, Matrix4 inverse)
+{
+    Matrix4 identity;
+    memset(&identity, 0, sizeof(identity));
+    identity.m[0][0] = 1.0f;
+    identity.m[1][1] = 1.0f;
+    identity.m[2][2] = 1.0f;
+    identity.m[3][3] = 1.0f;
+    Matrix4 controller;
+    channel->field_0x44->UnknownFunction4fca80(0, &controller);
+    Matrix4 world = controller;
+    controller(0, 0) = world(0, 0) * inverse(0, 0) + world(0, 1) * inverse(1, 0) + world(0, 2) * inverse(2, 0) +
+                       world(0, 3) * inverse(3, 0);
+    controller(0, 1) = world(0, 0) * inverse(0, 1) + world(0, 1) * inverse(1, 1) + world(0, 2) * inverse(2, 1) +
+                       world(0, 3) * inverse(3, 1);
+    controller(0, 2) = world(0, 0) * inverse(0, 2) + world(0, 1) * inverse(1, 2) + world(0, 2) * inverse(2, 2) +
+                       world(0, 3) * inverse(3, 2);
+    controller(0, 3) = world(0, 0) * inverse(0, 3) + world(0, 1) * inverse(1, 3) + world(0, 2) * inverse(2, 3) +
+                       world(0, 3) * inverse(3, 3);
+    controller(1, 0) = world(1, 0) * inverse(0, 0) + world(1, 1) * inverse(1, 0) + world(1, 2) * inverse(2, 0) +
+                       world(1, 3) * inverse(3, 0);
+    controller(1, 1) = world(1, 0) * inverse(0, 1) + world(1, 1) * inverse(1, 1) + world(1, 2) * inverse(2, 1) +
+                       world(1, 3) * inverse(3, 1);
+    controller(1, 2) = world(1, 0) * inverse(0, 2) + world(1, 1) * inverse(1, 2) + world(1, 2) * inverse(2, 2) +
+                       world(1, 3) * inverse(3, 2);
+    controller(1, 3) = world(1, 0) * inverse(0, 3) + world(1, 1) * inverse(1, 3) + world(1, 2) * inverse(2, 3) +
+                       world(1, 3) * inverse(3, 3);
+    controller(2, 0) = world(2, 0) * inverse(0, 0) + world(2, 1) * inverse(1, 0) + world(2, 2) * inverse(2, 0) +
+                       world(2, 3) * inverse(3, 0);
+    controller(2, 1) = world(2, 0) * inverse(0, 1) + world(2, 1) * inverse(1, 1) + world(2, 2) * inverse(2, 1) +
+                       world(2, 3) * inverse(3, 1);
+    controller(2, 2) = world(2, 0) * inverse(0, 2) + world(2, 1) * inverse(1, 2) + world(2, 2) * inverse(2, 2) +
+                       world(2, 3) * inverse(3, 2);
+    controller(2, 3) = world(2, 0) * inverse(0, 3) + world(2, 1) * inverse(1, 3) + world(2, 2) * inverse(2, 3) +
+                       world(2, 3) * inverse(3, 3);
+    controller(3, 0) = world(3, 0) * inverse(0, 0) + world(3, 1) * inverse(1, 0) + world(3, 2) * inverse(2, 0) +
+                       world(3, 3) * inverse(3, 0);
+    controller(3, 1) = world(3, 0) * inverse(0, 1) + world(3, 1) * inverse(1, 1) + world(3, 2) * inverse(2, 1) +
+                       world(3, 3) * inverse(3, 1);
+    controller(3, 2) = world(3, 0) * inverse(0, 2) + world(3, 1) * inverse(1, 2) + world(3, 2) * inverse(2, 2) +
+                       world(3, 3) * inverse(3, 2);
+    controller(3, 3) = world(3, 0) * inverse(0, 3) + world(3, 1) * inverse(1, 3) + world(3, 2) * inverse(2, 3) +
+                       world(3, 3) * inverse(3, 3);
+
+    // The x axes.
+    Vector3 from = *(Vector3*)&identity.m[0][0];
+    Vector3 to = *(Vector3*)&controller.m[0][0];
+    Vector3 axis = Vector3(from.y * to.z - from.z * to.y, from.z * to.x - to.z * from.x, to.y * from.x - from.y * to.x);
+    float angle = UnknownFunction4a3be0(from, to);
+    if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
+        axis = Vector3(1.0f, 0.0f, 0.0f);
+    else
+        NormalizeOrZero(axis);
+    float length = (float)sqrt(axis.z * axis.z + axis.y * axis.y + axis.x * axis.x);
+    float x = axis.x / length;
+    float y = axis.y / length;
+    float z = axis.z / length;
+    float c = (float)cos(angle);
+    float s = (float)sin(angle);
+    float t = 1.0f - c;
+    Matrix4 rotation;
+    rotation(0, 0) = t * x * x + c;
+    rotation(0, 1) = t * x * y + s * z;
+    rotation(0, 2) = t * x * z - s * y;
+    rotation(0, 3) = 0.0f;
+    rotation(1, 0) = t * x * y - s * z;
+    rotation(1, 1) = t * y * y + c;
+    rotation(1, 2) = t * y * z + s * x;
+    rotation(1, 3) = 0.0f;
+    rotation(2, 0) = t * x * z + s * y;
+    rotation(2, 1) = t * y * z - s * x;
+    rotation(2, 2) = t * z * z + c;
+    rotation(2, 3) = 0.0f;
+    rotation(3, 0) = 0.0f;
+    rotation(3, 1) = 0.0f;
+    rotation(3, 2) = 0.0f;
+    rotation(3, 3) = 1.0f;
+    Matrix4 aligned;
+    UnknownFunction436500(&aligned, &identity, &rotation);
+    Vector3 alignedY = *(Vector3*)&aligned.m[1][0];
+    Vector3 controllerY = *(Vector3*)&controller.m[1][0];
+    Vector3 cross(alignedY.y * controllerY.z - alignedY.z * controllerY.y,
+                  alignedY.z * controllerY.x - alignedY.x * controllerY.z,
+                  alignedY.x * controllerY.y - alignedY.y * controllerY.x);
+    float angleX = UnknownFunction4a3be0(alignedY, controllerY) * 57.2957764f;
+    if (cross.y * to.y + cross.x * to.x + cross.z * to.z < 0.0f)
+        angleX = -angleX;
+
+    // The y axes.
+    from = *(Vector3*)&identity.m[1][0];
+    to = *(Vector3*)&controller.m[1][0];
+    axis = UnknownFunction515600(&from, &to);
+    angle = UnknownFunction4a3be0(from, to);
+    if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
+        axis = Vector3(0.0f, 1.0f, 0.0f);
+    else
+        NormalizeOrZero(axis);
+    UnknownFunction42de90(&rotation, axis.x, axis.y, axis.z, angle);
+    UnknownFunction436500(&aligned, &identity, &rotation);
+    cross = UnknownFunction515600(&UnknownFunction4a2350(&aligned, 2), &UnknownFunction4a2350(&controller, 2));
+    float angleY = UnknownFunction4a3be0(UnknownFunction4a2350(&aligned, 2), UnknownFunction4a2350(&controller, 2)) *
+                   57.2957764f;
+    if (UnknownFunction40ae30(&to, &cross) < 0.0f)
+        angleY = -angleY;
+
+    // The z axes.
+    from = UnknownFunction4a2350(&identity, 2);
+    to = UnknownFunction4a2350(&controller, 2);
+    axis = UnknownFunction515600(&from, &to);
+    angle = UnknownFunction4a3be0(from, to);
+    if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
+        axis = Vector3(0.0f, 0.0f, 1.0f);
+    else
+        NormalizeOrZero(axis);
+    UnknownFunction42de90(&rotation, axis.x, axis.y, axis.z, angle);
+    UnknownFunction436500(&aligned, &identity, &rotation);
+    cross = UnknownFunction515600(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
+    UnknownFunction40ae30(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
+    float angleZ = UnknownFunction4a3be0(UnknownFunction4a2350(&aligned, 0), UnknownFunction4a2350(&controller, 0)) *
+                   57.2957764f;
+    if (UnknownFunction40ae30(&to, &cross) < 0.0f)
+        angleZ = -angleZ;
+
+    channel->field_0x60 = -angleX;
+    channel->field_0x64 = -angleZ;
+    channel->field_0x68 = -angleY;
 }

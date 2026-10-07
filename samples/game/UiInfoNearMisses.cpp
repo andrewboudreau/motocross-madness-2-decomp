@@ -9,12 +9,6 @@
 // here picks eax for 1 and schedules the copies and the memset differently.
 // Store-order permutations, struct-assignment copies and memset forms tried.
 //
-// TrackGameMode::UnknownFunction522720 (0x00522720, 92 bytes): 54 of 101.
-// Retail holds 1 in ecx and 0 in edx, then advances eax by 0x360 and clears
-// a fresh ecx for the last five fields (an inline helper on a sub-object);
-// VC6 here swaps ecx/edx and folds the +0x360 offsets. Store-order, inline
-// member/static helper and local-constant forms tried.
-//
 // TrackGameMode::UnknownFunction5238f0 (0x005238f0, 353 bytes): 189 of 379.
 // Retail shares one `return 0` epilogue and keeps fopen's result in eax until
 // the found block (mov edx, eax there); the nested/goto/condition forms tried
@@ -72,29 +66,6 @@ void TrackGameMode::UnknownFunction522440() {
     memset(field_0x1384, 0, sizeof(field_0x1384));
     field_0x98 = 2;
     field_0x94 = 2;
-}
-
-// 0x00522720
-void TrackGameMode::UnknownFunction522720(UnknownTrackGameModeOptions6ac* options) {
-    options->field_0x00 = 1;
-    options->field_0x04 = 1;
-    options->field_0x1c = 1;
-    options->field_0x08 = 0;
-    options->field_0x0c = 1;
-    options->field_0x10 = 1;
-    options->field_0x14 = 1;
-    options->field_0x18 = 1;
-    options->field_0x30 = 2;
-    options->field_0x34 = 0;
-    options->field_0x38 = 0;
-    options->field_0x3c = 0;
-    options->field_0x40 = 0;
-    options->field_0x44 = 0;
-    options->field_0x20 = 1;
-    options->field_0x24 = 1;
-    options->field_0x28 = 1;
-    options->field_0x2c = 1;
-    options->field_0x360.UnknownReset();
 }
 
 // 0x005238f0 (TrackGame slot 18): finds `name` under the installed data

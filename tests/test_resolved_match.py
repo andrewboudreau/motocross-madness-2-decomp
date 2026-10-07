@@ -129,5 +129,19 @@ class InternalRelocationTests(unittest.TestCase):
             match_object(obj, 'func', 0x00401000, code(0xa1), {'case0': 0x00401009})
 
 
+class EhPrologueShapeTests(unittest.TestCase):
+    def test_global_load_scheduled_after_fs_load(self):
+        from mcm2tool.resolved_match import _is_eh_handler_push
+        # mov eax, fs:[0]; mov edx, [abs32]; push -1; push offset handler
+        prefix = b'\x64\xa1\x00\x00\x00\x00' + b'\x8b\x15\x00\x00\x00\x00' + b'\x6a\xff\x68'
+        self.assertTrue(_is_eh_handler_push(prefix))
+
+    def test_other_instruction_after_fs_load_is_not_a_prologue(self):
+        from mcm2tool.resolved_match import _is_eh_handler_push
+        # mov edx, [ecx+0] is not an absolute load
+        prefix = b'\x64\xa1\x00\x00\x00\x00' + b'\x8b\x51\x00' + b'\x6a\xff\x68'
+        self.assertFalse(_is_eh_handler_push(prefix))
+
+
 if __name__ == '__main__':
     unittest.main()

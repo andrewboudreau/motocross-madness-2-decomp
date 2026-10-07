@@ -78,6 +78,7 @@
   "?UnknownFunction522050@UnknownTrackGameRacerSlot@@QAEXXZ": "0x00522050",
   "?UnknownFunction522440@TrackGameMode@@QAEXXZ": "0x00522440",
   "?UnknownFunction522680@TrackGameMode@@QAEHXZ": "0x00522680",
+  "?UnknownFunction522720@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptions6ac@@@Z": "0x00522720",
   "?UnknownFunction522780@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA20@@@Z": "0x00522780",
   "?UnknownFunction5227d0@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA4c@@@Z": "0x005227d0",
   "?UnknownFunction522800@TrackGameMode@@QAEXPAUUnknownTrackGameModeOptionsA68@@@Z": "0x00522800",

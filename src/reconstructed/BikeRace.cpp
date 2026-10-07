@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ArcadeObject.h"
 #include "DebugAlloc.h"
 
 // A truncating copy into a `size`-byte buffer (as DlgProcs.cpp); retail
@@ -22,6 +23,10 @@ static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
+
+// 0x00578e8c (.bss, after the vectors): the replay recorder's last tick
+// time (0x00421d50).
+static float s_UnknownStatic578e8c;
 
 static inline Vector3 operator+(const Vector3& a, const Vector3& b) {
     return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
@@ -259,6 +264,519 @@ int BikeRace::UnknownFunction41d1e0() {
 // 0x0041d2a0
 void BikeRace::UnknownFunction41d2a0(float time) {
     field_0x058->UnknownFunction4eb000(time);
+}
+
+// Inline: the racers in the race, own and AI (a single player race) or
+// own and remote.
+static inline int UnknownFunctionRacerCount() {
+    if (g_UnknownGlobal56e26c->field_0x18 == 1) {
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+            return g_UnknownGlobal56e26c->field_0x18;
+        }
+        return g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 + 1;
+    }
+    return g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
+}
+
+static inline float UnknownFunctionMax(float a, float b) {
+    return a > b ? a : b;
+}
+
+// 0x0041d2b0
+int BikeRace::UnknownVirtualSlot10(float frameTime) {
+    if (!g_UnknownGlobal56e26c->uiInteractionBlocked) {
+        if (UnknownFunctionCameraView()->field_0x390 &&
+            UnknownFunctionCameraView()->field_0x3b0->field_0x4a0 != 0) {
+            UnknownFunction41f1d0(0, 1, 0);
+        }
+        if (!g_UnknownGlobal56e26c->field_0x1c4) {
+            if (g_UnknownGlobal56e26c->mode.field_0xa88) {
+                field_0x038->UnknownRacerVirtualSlot94();
+            }
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+                unsigned short lap = field_0x038->field_0x7a0;
+                if (field_0x1e8 != lap && (!field_0x189 || lap > 0)) {
+                    UnknownFunction420bd0();
+                    field_0x1e8 = field_0x038->field_0x7a0;
+                    field_0x1b8 = 0;
+                    field_0x1d4 = 0;
+                    field_0x1bc = 0;
+                    field_0x1d8 = 0;
+                    field_0x1ac = 0;
+                    field_0x1b0 = 0;
+                    field_0x1b4 = 0;
+                    field_0x038->field_0x13f8 = FLT_MAX / 2;
+                } else {
+                    field_0x1b8 += g_UnknownGlobal56e26c->field_0x2f0;
+                    field_0x1d4++;
+                    if (field_0x1bc != field_0x1cc) {
+                        field_0x1bc += g_UnknownGlobal56e26c->field_0x2f0;
+                        field_0x1d8++;
+                    }
+                    if (field_0x1bc > field_0x1cc) {
+                        field_0x1bc = field_0x1cc;
+                        TextQueueOverlay* overlay = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
+                        char text[0x100];
+                        g_UnknownGlobal56e26c->UnknownFunction521970(0x14de, text, 0x80);
+                        UnknownMessage* message = new (__FILE__, 0x8bf) UnknownMessage(text, 3.25f);
+                        if (message != 0) {
+                            overlay->UnknownFunction51b540(message);
+                            delete message;
+                        }
+                    } else {
+                        field_0x1c0 += g_UnknownGlobal56e26c->field_0x2f0;
+                        field_0x3fa = field_0x1c0 >= g_UnknownGlobal56e26c->shortRecordPacketIntervalSeconds;
+                        if (field_0x3fa) {
+                            field_0x1c0 -= g_UnknownGlobal56e26c->shortRecordPacketIntervalSeconds;
+                            field_0x1ac = field_0x1bc;
+                            field_0x1b0++;
+                            field_0x1b4 = 1;
+                            if (field_0x1a0 != 0) {
+                                field_0x1a0->UnknownFunction4e8720(-1, 0, &field_0x1ac, 0xc);
+                            }
+                        }
+                    }
+                }
+            }
+            if (g_UnknownGlobal56e26c->field_0x342c) {
+                if (!field_0x3f8) {
+                    if (field_0x1dc == 8) {
+                        field_0x1b8 += g_UnknownGlobal56e26c->field_0x2f0 * g_UnknownGlobal56e26c->field_0x2e0;
+                        field_0x1d4 += (int)g_UnknownGlobal56e26c->field_0x2e0;
+                    } else if (field_0x1dc == 9) {
+                        field_0x1b8 += g_UnknownGlobal56e26c->field_0x2f0 * g_UnknownGlobal56e26c->field_0x2e0;
+                        field_0x1d4 += (int)g_UnknownGlobal56e26c->field_0x2e0;
+                    } else if (field_0x1dc != 11) {
+                        field_0x1b8 += g_UnknownGlobal56e26c->field_0x2f0;
+                        field_0x1d4++;
+                        if (field_0x1bc != field_0x1d0) {
+                            field_0x1bc += g_UnknownGlobal56e26c->field_0x2f0;
+                            field_0x1d8++;
+                        }
+                    }
+                    field_0x1a0->UnknownFunction49bff0(field_0x1bc, 0);
+                    if (field_0x1dc == 4) {
+                        if (field_0x1e0 != 4) {
+                            field_0x1e0 = 4;
+                            if (g_UnknownGlobal56e26c->mode.field_0xa28) {
+                                if (g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c != 0) {
+                                    g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c->UnknownVirtualSlot5();
+                                }
+                                ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468f10("SoundGroup");
+                            }
+                            if (g_UnknownGlobal56e26c->mode.field_0xa54) {
+                                ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468f10("ParticleManager");
+                                ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468f10("DirtParticleEmitter");
+                                ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468f10("DustParticleEmitter");
+                                ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468f10("DirtChunkParticleEmitter");
+                                ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468f10("SteamParticleEmitter");
+                            }
+                            if (g_UnknownGlobal56e26c->mode.field_0xa50) {
+                                ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468f10("ProjectedShadow");
+                                ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468f10("TerrainShadow");
+                                ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468f10("D3DIMSoultreeShadow");
+                            }
+                        }
+                    } else if (field_0x1e0 != field_0x1dc) {
+                        field_0x1e0 = field_0x1dc;
+                        if (g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c != 0) {
+                            g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c->UnknownVirtualSlot4();
+                        }
+                        ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468dd0("SoundGroup");
+                        ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468dd0("ParticleManager");
+                        ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468dd0("DirtParticleEmitter");
+                        ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468dd0("DustParticleEmitter");
+                        ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468dd0("DirtChunkParticleEmitter");
+                        ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468dd0("SteamParticleEmitter");
+                        ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468dd0("ProjectedShadow");
+                        ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468dd0("TerrainShadow");
+                        ((UnknownBikeRaceRoot*)g_UnknownGlobal56e26c->field_0x34)->UnknownFunction468dd0("D3DIMSoultreeShadow");
+                    }
+                }
+                if (!g_UnknownGlobal56e26c->field_0x3428 && field_0x18a) {
+                    if (field_0x1bc > field_0x1d0) {
+                        field_0x1bc = field_0x1d0;
+                        TextQueueOverlay* overlay = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
+                        char text[0x100];
+                        g_UnknownGlobal56e26c->UnknownFunction521970(0x14dd, text, 0x80);
+                        UnknownMessage* message = new (__FILE__, 0x912) UnknownMessage(text, 3.25f);
+                        if (message != 0) {
+                            overlay->UnknownFunction51b540(message);
+                            delete message;
+                        }
+                    } else {
+                        field_0x1c0 += g_UnknownGlobal56e26c->field_0x2f0;
+                        field_0x3fa = field_0x1c0 >= g_UnknownGlobal56e26c->shortRecordPacketIntervalSeconds;
+                        if (field_0x3fa) {
+                            field_0x1c0 -= g_UnknownGlobal56e26c->shortRecordPacketIntervalSeconds;
+                            field_0x1ac = field_0x1bc;
+                            field_0x1b0++;
+                            TrackGameViewOwner* owner = g_UnknownGlobal56e26c->field_0x568;
+                            if (owner != 0 && owner->field_0xdc != 0 && owner->field_0xa8 == 0) {
+                                field_0x1b4 = UnknownFunctionRacerCount() + 1;
+                            } else {
+                                field_0x1b4 = UnknownFunctionRacerCount();
+                            }
+                            int camera = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04;
+                            if (camera == 0 || (camera == 4 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x148)) {
+                                if (field_0x1b0 % 20 == 0) {
+                                    field_0x3fb = true;
+                                    field_0x1b4 *= 2;
+                                } else {
+                                    field_0x3fb = false;
+                                }
+                            }
+                            if (field_0x1a0 != 0) {
+                                field_0x1a0->UnknownFunction4e8720(-1, 0, &field_0x1ac, 0xc);
+                            }
+                        }
+                    }
+                }
+                if (field_0x1a0 != 0 && field_0x1a0->field_0xcc) {
+                    UnknownFunction41d2a0(field_0x1a0->field_0xd0);
+                    field_0x1a0->field_0xcc = 0;
+                }
+            }
+            if (field_0x18e) {
+                if (!field_0x18f) {
+                    UnknownBikeRaceNetStamp stamp;
+                    stamp.field_0x04 = UnknownFunction4bfa80();
+                    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(
+                        0x84, &stamp, 8, g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
+                    field_0x18f = true;
+                }
+            }
+            if (field_0x18e) {
+                int ready = 1;
+                int self = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
+                for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
+                    int id = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4;
+                    if (id != self) {
+                        NetPlayer* player = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac800(id);
+                        if (!g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xc8 && player != 0) {
+                            ready = 0;
+                        } else {
+                            field_0x03c[i]->UnknownVirtualSlot5();
+                            for (int j = 0; j < g_UnknownGlobal56e26c->field_0x3424 + g_UnknownGlobal56e26c->field_0x18; j++) {
+                                if (field_0x03c[j]->field_0x11bc == id) {
+                                    field_0x03c[j]->UnknownVirtualSlot5();
+                                }
+                            }
+                        }
+                        if (player == 0) {
+                            field_0x03c[i]->UnknownVirtualSlot4();
+                            for (int j = 0; j < g_UnknownGlobal56e26c->field_0x3424 + g_UnknownGlobal56e26c->field_0x18; j++) {
+                                if (field_0x03c[j]->field_0x11bc == id) {
+                                    field_0x03c[j]->UnknownVirtualSlot4();
+                                }
+                            }
+                        }
+                    }
+                }
+                if (ready) {
+                    UnknownFunction421050();
+                    field_0x18e = false;
+                    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac950();
+                    if (g_UnknownGlobal56e26c->field_0x18 > 1) {
+                        int count = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
+                        for (int k = 0; k < count; k++) {
+                            field_0x03c[k]->UnknownRacerVirtualSlot50(1, field_0x03c[k]->UnknownRacerVirtualSlot45(0));
+                        }
+                    }
+                }
+            } else {
+                Vector3 position;
+                if (field_0x18a) {
+                    if (field_0x064 != 0 && ((UnknownBikeRaceSceneCharacter*)field_0x064)->field_0x25_bit0 &&
+                        field_0x160 > 0.0f) {
+                        field_0x160 -= g_UnknownGlobal56e26c->field_0x2f0;
+                        if (field_0x160 <= 0.0f) {
+                            field_0x160 = 0;
+                            field_0x058->UnknownFunction4eb040(field_0x068, 0.0f, 0, 0);
+                            field_0x064->UnknownVirtualSlot4();
+                            if (!UnknownFunctionCameraView()->field_0x390 && field_0x150 == field_0x068) {
+                                UnknownFunction41f1d0(1, 1, 0);
+                            }
+                            if (field_0x064->field_0x210 != 0) {
+                                field_0x064->field_0x210->Release();
+                                field_0x064->field_0x210 = 0;
+                            }
+                        }
+                    }
+                } else {
+                    field_0x15c -= g_UnknownGlobal56e26c->field_0x2f0;
+                    if (field_0x15c <= 0.0f || UnknownFunction41ea10()) {
+                        field_0x15c = 0;
+                        field_0x18a = true;
+                        field_0x058->field_0x7c0 = 0;
+                        if (field_0x064 != 0) {
+                            field_0x058->UnknownFunction4eafd0(field_0x068);
+                            field_0x160 = 5.0f;
+                        }
+                        if (g_UnknownGlobal56e26c->field_0x18 > 1) {
+                            int self = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
+                            int count = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
+                            for (int i = 0; i < count; i++) {
+                                if (g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4 == self) {
+                                    field_0x03c[i]->field_0x064 = kVec3Zero;
+                                    field_0x03c[i]->field_0x0bc = 0;
+                                }
+                            }
+                        }
+                        field_0x1b8 = 0;
+                        field_0x1d4 = 0;
+                        field_0x1bc = 0;
+                        field_0x1d8 = 0;
+                        if (field_0x06c != 0) {
+                            field_0x058->UnknownFunction4eb040(field_0x070, 0.0f, 0, 0);
+                            field_0x06c->UnknownVirtualSlot4();
+                            if (!UnknownFunctionCameraView()->field_0x390 && field_0x150 == field_0x070) {
+                                UnknownFunction41f1d0(1, 1, 0);
+                            }
+                            if (field_0x06c->field_0x210 != 0) {
+                                field_0x06c->field_0x210->Release();
+                                field_0x06c->field_0x210 = 0;
+                            }
+                        }
+                        switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
+                        case 2:
+                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_UnknownGlobal56e26c->field_0x564->field_0x64;
+                            break;
+                        case 3:
+                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_UnknownGlobal56e26c->field_0x558->field_0x64;
+                            break;
+                        case 0:
+                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_UnknownGlobal56e26c->field_0x55c->field_0x64;
+                            break;
+                        case 1:
+                        case 5:
+                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_UnknownGlobal56e26c->field_0x560->field_0x64;
+                            break;
+                        case 4:
+                            field_0x19c = (UnknownBikeRaceOverlay19c*)g_UnknownGlobal56e26c->field_0x568->field_0x64;
+                            break;
+                        }
+                    }
+                }
+                GameObject::UnknownVirtualSlot10(frameTime);
+                int camera = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04;
+                if (camera == 3 || camera == 2 || camera == 5 || camera == 1 || camera == 0) {
+                    Track* track = field_0x048;
+                    if ((track != 0 || field_0x0c8 != 0 || camera == 0) && field_0x18a && !field_0x18b &&
+                        field_0x038 != 0) {
+                        int keepRacing = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 0 ||
+                                         g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4;
+                        if (!g_UnknownGlobal56e26c->field_0x3428) {
+                            if (camera == 1 || camera == 5) {
+                                UnknownFunction4e6a50(&field_0x0c4, field_0x0c8, g_UnknownGlobal56e26c->field_0x2f0,
+                                                      g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20, keepRacing);
+                            } else if (camera == 0) {
+                                UnknownFunction4e62d0(keepRacing);
+                            } else {
+                                UnknownFunction4e63e0(&field_0x0c4, track, g_UnknownGlobal56e26c->field_0x2f0, &field_0x0cc,
+                                                      &field_0x108, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20,
+                                                      keepRacing);
+                            }
+                        }
+                    }
+                }
+                if (field_0x18a && field_0x18b) {
+                    field_0x18b = false;
+                    field_0x18a = false;
+                }
+                if (field_0x060 != 0 && ((UnknownBikeRaceObjectFlags*)field_0x060)->field_0x25_bit0) {
+                    position = field_0x038->field_0x018;
+                    position.y += 4.25f;
+                    ((ArcadeObject*)field_0x060)->UnknownFunction4014f0(&position);
+                }
+                if (field_0x194 > 0.0f && g_UnknownGlobal56e26c->mode.field_0x6b4 != 1) {
+                    field_0x194 -= g_UnknownGlobal56e26c->field_0x2f0;
+                    if (field_0x194 <= 0.0f) {
+                        field_0x194 = 0;
+                        if (field_0x19c != 0) {
+                            field_0x19c->field_0x3dc = 0;
+                            field_0x19c->UnknownFunction51dd40();
+                        }
+                        field_0x190 = false;
+                    }
+                }
+                if (field_0x074 != 0 && field_0x038->field_0x744->field_0x44.node != 0) {
+                    int laps = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20;
+                    int lap = field_0x038->field_0x7a0;
+                    int last = lap == laps - 1;
+                    int previous = lap == laps - 2;
+                    if (previous || last) {
+                        float toFinish = field_0x048->UnknownFunction517da0(field_0x038->field_0x744->field_0x44,
+                                                                            field_0x108.field_0x2c);
+                        float fromFinish = field_0x048->UnknownFunction517da0(field_0x108.field_0x2c,
+                                                                              field_0x038->field_0x744->field_0x44);
+                        if (field_0x078 && field_0x038->field_0x7a4 && fromFinish > 100.0f) {
+                            UnknownFunction41ea60(field_0x074, 1, 2);
+                            field_0x074->UnknownFunction4a8b10("Stand");
+                            field_0x078 = 0;
+                        } else if ((previous && toFinish < 300.0f) || (last && fromFinish < 100.0f)) {
+                            if (field_0x078 != 1) {
+                                UnknownFunction41ea60(field_0x074, 1, 2);
+                                field_0x078 = 1;
+                                field_0x074->UnknownFunction4a8b10("FlagStart");
+                            } else if (field_0x074->field_0x00c) {
+                                field_0x074->UnknownFunction4a8b10("FlagLoop");
+                            }
+                        } else if (field_0x078 && field_0x078 < 3 &&
+                                   ((previous && toFinish > 100.0f) || (last && fromFinish > 100.0f))) {
+                            field_0x074->UnknownFunction4a8b10("Stand");
+                            field_0x078 = 0;
+                        } else if ((last && toFinish < 300.0f) || (field_0x038->field_0x7a4 && fromFinish < 100.0f)) {
+                            if (field_0x078 < 3) {
+                                UnknownFunction41ea60(field_0x074, 2, 1);
+                                field_0x078 = 3;
+                                field_0x074->UnknownFunction4a8b10("FlagStart");
+                            } else if (field_0x074->field_0x00c) {
+                                field_0x074->UnknownFunction4a8b10("FlagLoop");
+                                field_0x078 = 4;
+                            }
+                        }
+                    }
+                    field_0x074->UnknownVirtualSlot7(frameTime, 0, 0);
+                }
+            }
+        } else if (field_0x1a0 != 0) {
+            field_0x1a0->UnknownVirtualSlot10(frameTime);
+        }
+    }
+    if (g_UnknownGlobal56e26c->field_0x2d4_bit2 && g_UnknownGlobal56e26c->field_0x38 != 0) {
+        if (field_0x0a8 < 0) {
+            field_0x0a8 = g_UnknownGlobal56e26c->field_0x38->NewPage();
+        }
+        if (g_UnknownGlobal56e26c->field_0x38->field_0x26c4 == field_0x0a8) {
+            char name[0x20];
+            UnknownBikeRaceModel* model;
+            int pass = 0;
+            if ((signed char)field_0x0b0 < 0) {
+                strncpy(name,
+                        ((UnknownBikeRaceUiModel*)g_UnknownGlobal56e26c->ui->field_0x48)
+                            [((UnknownBikeRaceUiChoice*)g_UnknownGlobal56e26c->ui->field_0x50)
+                                 [g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4].field_0x00].field_0x40,
+                        0x14);
+                name[0x14] = 0;
+                field_0x058->UnknownFunction4f0ec0(name);
+                model = field_0x038->field_0x3bc;
+            } else if (field_0x0b0 == 0) {
+                strncpy(name, field_0x058->field_0xb8->field_0x04[field_0x0ac].field_0x10, 0x14);
+                name[0x14] = 0;
+                model = (UnknownBikeRaceModel*)field_0x058->field_0xb8->field_0x04[field_0x0ac].field_0x04;
+            } else {
+                strncpy(name, field_0x058->field_0xb4->field_0x04[field_0x0ac].field_0x2c, 0x14);
+                name[0x14] = 0;
+                UnknownSceneEntry* entry = &field_0x058->field_0xb4->field_0x04[field_0x0ac];
+                if (entry->field_0x00_bit3) {
+                    model = ((UnknownBikeRaceRider*)entry->field_0x04)->field_0x1a0;
+                } else {
+                    model = (UnknownBikeRaceModel*)entry->field_0x08->field_0x34;
+                }
+            }
+            do {
+                int faces = 0;
+                UnknownBikeRaceMeshGroup* group = &model->field_0x28c[model->field_0x27c];
+                for (int i = 0; i < group->field_0x00; i++) {
+                    faces += group->field_0x04[i].field_0x0c;
+                }
+                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447fa0(field_0x0a8, "Soultree LOD (%s)", name);
+                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x0a8, "Current LOD %d out of %d",
+                                                                        model->field_0x27c + 1, model->field_0x274);
+                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(field_0x0a8, "Number of Faces = %d", faces);
+                if ((signed char)field_0x0b0 < 0) {
+                    if (g_UnknownGlobal567a88 > 5) {
+                        if ((pass == 1 && g_UnknownGlobal567a88 - 7 > model->field_0x274) || g_UnknownGlobal567a88 < 2) {
+                            g_UnknownGlobal56e26c->field_0x38->UnknownFunction448000(field_0x0a8, g_UnknownGlobal567a88 + 1, 0);
+                            g_UnknownGlobal567a88 = 2;
+                        }
+                    } else if ((pass == 0 && g_UnknownGlobal567a88 > model->field_0x274) || g_UnknownGlobal567a88 < 2) {
+                        g_UnknownGlobal56e26c->field_0x38->UnknownFunction448000(field_0x0a8, g_UnknownGlobal567a88 + 1, 0);
+                        g_UnknownGlobal567a88 = 9;
+                    }
+                } else if (g_UnknownGlobal567a88 > model->field_0x274 || g_UnknownGlobal567a88 < 2) {
+                    g_UnknownGlobal56e26c->field_0x38->UnknownFunction448000(field_0x0a8, g_UnknownGlobal567a88 + 1, 0);
+                    g_UnknownGlobal567a88 = 2;
+                }
+                if (model->field_0x274 > 1) {
+                    int up = g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xd0, 0, 0x80, 0);
+                    int down = g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xc8, 0, 0x80, 0);
+                    int row = g_UnknownGlobal567a88 - 1;
+                    if (down || up) {
+                        if ((signed char)field_0x0b0 < 0) {
+                            if (g_UnknownGlobal567a88 > 5) {
+                                if (pass == 1) {
+                                    row = g_UnknownGlobal567a88 - 8;
+                                } else {
+                                    row = 99;
+                                }
+                            } else if (pass == 1) {
+                                row = 99;
+                            }
+                        }
+                        switch (row) {
+                        case 1:
+                            if (model->field_0x274 > 1) {
+                                if (down) {
+                                    model->field_0x280[0] += 0.05f;
+                                } else {
+                                    model->field_0x280[0] -= 0.05f;
+                                    model->field_0x280[0] = UnknownFunctionMax(model->field_0x280[0], 0.0f);
+                                }
+                            }
+                            break;
+                        case 2:
+                            if (model->field_0x274 > 2) {
+                                if (down) {
+                                    model->field_0x280[1] += 0.05f;
+                                } else {
+                                    model->field_0x280[1] -= 0.05f;
+                                    model->field_0x280[1] = UnknownFunctionMax(model->field_0x280[1], 0.0f);
+                                }
+                            }
+                            break;
+                        case 3:
+                            if (model->field_0x274 > 3) {
+                                if (down) {
+                                    model->field_0x280[2] += 0.05f;
+                                } else {
+                                    model->field_0x280[2] -= 0.05f;
+                                    model->field_0x280[2] = UnknownFunctionMax(model->field_0x280[2], 0.0f);
+                                }
+                            }
+                            break;
+                        case 4:
+                            if (model->field_0x274 > 4) {
+                                if (down) {
+                                    model->field_0x280[3] += 0.05f;
+                                } else {
+                                    model->field_0x280[3] -= 0.05f;
+                                    model->field_0x280[3] = UnknownFunctionMax(model->field_0x280[3], 0.0f);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+                        field_0x0a8, "AutoLOD#0 %.2f", model->field_0x274 > 1 ? model->field_0x280[0] : 0.0f);
+                    g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+                        field_0x0a8, "AutoLOD#1 %.2f", model->field_0x274 > 2 ? model->field_0x280[1] : 0.0f);
+                    g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+                        field_0x0a8, "AutoLOD#2 %.2f", model->field_0x274 > 3 ? model->field_0x280[2] : 0.0f);
+                    g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(
+                        field_0x0a8, "AutoLOD#3 %.2f", model->field_0x274 > 4 ? model->field_0x280[3] : 0.0f);
+                    g_UnknownGlobal56e26c->field_0x38->UnknownFunction448000(field_0x0a8, g_UnknownGlobal567a88 + 1, 1);
+                }
+                if ((signed char)field_0x0b0 >= 0) {
+                    break;
+                }
+                COPY_TEXT(name, "rider.slt", 0x20);
+                model = field_0x038->field_0x5c4->field_0x1a0;
+            } while (++pass < 2);
+        }
+    }
+    return 1;
 }
 
 // 0x0041ea10
@@ -697,6 +1215,370 @@ void BikeRace::UnknownFunction421050() {
     }
 }
 
+// Inline: TrackGame+0x568's ghost bike, reloaded at each use.
+static inline UnknownBikeRaceGhost* UnknownFunctionGhost() {
+    return (UnknownBikeRaceGhost*)g_UnknownGlobal56e26c->field_0x568->field_0xdc;
+}
+
+// 0x00421d50
+int BikeRace::UnknownFunction421d50(int a, void* data, int flag, int b, int* keep, int time) {
+    *keep = 0;
+    field_0x1e4 = a;
+    if (field_0x3f8 && a == -1) {
+        field_0x1b8 = ((UnknownBikeRaceVcrTick*)data)->field_0x00;
+        field_0x3f9 = false;
+        return 5;
+    }
+    if (g_UnknownGlobal56e26c->uiInteractionBlocked) {
+        return 0;
+    }
+    if (a == -2) {
+        UnknownFunction422ec0();
+        g_UnknownGlobal56e26c->field_0x2e0 = 1.0f;
+        if (g_UnknownGlobal56e26c->ui->field_0x4a8) {
+            g_UnknownGlobal56e26c->ui->field_0x44 = 1;
+            return 1;
+        }
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+            return 1;
+        }
+        field_0x1b8 = field_0x1a0->field_0x10c;
+        if (field_0x1c4 != -1.0f && field_0x1b8 > field_0x1c4) {
+            field_0x1dc = 11;
+            UnknownFunction41f550(0);
+            return 11;
+        }
+        if (field_0x1dc == 12) {
+            field_0x1dc = 4;
+            field_0x1b8 = 0;
+            UnknownFunction41f550(0);
+            return 12;
+        }
+        UnknownFunction41f550(1);
+        if (field_0x1dc == 11) {
+            UnknownFunction41f550(0);
+            return 11;
+        }
+        return 1;
+    } else if (a == -3) {
+        UnknownFunction422ec0();
+        g_UnknownGlobal56e26c->field_0x2e0 = 1.0f;
+        if (field_0x1dc == 14) {
+            UnknownFunction41f550(1);
+            field_0x1dc = 4;
+            return 1;
+        }
+        if (field_0x1c4 != -1.0f && field_0x1c4 > field_0x1b8) {
+            field_0x1dc = 9;
+            g_UnknownGlobal56e26c->field_0x2e0 = 15.0f;
+            UnknownFunction41f550(0);
+            return 1;
+        }
+        if (field_0x1c4 != -1.0f) {
+            g_UnknownGlobal56e26c->field_0x2e0 = 1.0f;
+            field_0x1c4 = -1.0f;
+        }
+        field_0x1b8 = 0;
+        field_0x1dc = 4;
+        return 1;
+    } else if (a == -1) {
+        UnknownBikeRaceVcrTick* tick = (UnknownBikeRaceVcrTick*)data;
+        if (field_0x3f9) {
+            field_0x1b8 = tick->field_0x00;
+            UnknownFunction41f550(0);
+            return 7;
+        }
+        float step = field_0x1b8 / (float)field_0x1d4;
+        float tickStep = tick->field_0x00 / (float)tick->field_0x04;
+        if (field_0x1c4 != -1.0f) {
+            if ((field_0x1dc == 9 && field_0x1c4 < field_0x1b8) ||
+                (field_0x1dc == 11 && field_0x1c4 > field_0x1b8)) {
+                UnknownFunction422ec0();
+                field_0x1dc = 4;
+                g_UnknownGlobal56e26c->field_0x2e0 = 1.0f;
+                field_0x1c4 = -1.0f;
+            } else if (field_0x1c4 > field_0x1b8) {
+                field_0x1dc = 9;
+                g_UnknownGlobal56e26c->field_0x2e0 = 15.0f;
+            } else {
+                field_0x1dc = 11;
+                field_0x1b8 = tick->field_0x00;
+                return 11;
+            }
+        }
+        if (field_0x1dc == 11) {
+            field_0x1b8 = tick->field_0x00;
+            return 11;
+        }
+        if (field_0x1dc == 12) {
+            field_0x1b8 = 0;
+            field_0x1dc = 14;
+            return 12;
+        }
+        if (field_0x1dc == 14) {
+            if (field_0x1b8 > 0.5f) {
+                UnknownFunction41f550(0);
+                UnknownFunction422ec0();
+                return 5;
+            }
+            return 1;
+        }
+        if (field_0x1e0 != field_0x1dc) {
+            field_0x1b8 = s_UnknownStatic578e8c = tick->field_0x00;
+            UnknownFunction422ec0();
+        }
+        if (tick->field_0x00 > field_0x1b8) {
+            s_UnknownStatic578e8c = tick->field_0x00;
+            return 3;
+        }
+        if (field_0x1b8 - step > s_UnknownStatic578e8c && tickStep + tick->field_0x00 < field_0x1b8) {
+            s_UnknownStatic578e8c = tick->field_0x00;
+            return 2;
+        }
+        s_UnknownStatic578e8c = tick->field_0x00;
+        return 1;
+    } else if (a == 6) {
+        if (field_0x3f8) {
+            UnknownFunction41f550(0);
+        }
+        return field_0x1dc == 11 ? 11 : 1;
+    } else if (a == 1) {
+        UnknownBikeRaceNetState* state = (UnknownBikeRaceNetState*)data;
+        UnknownBikeRaceRacer* racer = field_0x038;
+        if (b == racer->field_0x11bc && racer->field_0x734 == state->field_0x54) {
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+                racer = field_0x040[0];
+            }
+            if (racer == 0) {
+                return 0;
+            }
+            racer->field_0x11b8 = 1;
+            UnknownBikeRaceRacerPart* oldest;
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+                oldest = racer->field_0x11c8[2];
+            } else {
+                oldest = racer->field_0x11c8[3];
+                racer->field_0x11c8[3] = racer->field_0x11c8[2];
+            }
+            racer->field_0x11c8[2] = racer->field_0x11c8[1];
+            racer->field_0x11c8[1] = racer->field_0x11c8[0];
+            racer->field_0x11c8[0] = oldest;
+            oldest->field_0x58 = time;
+            racer->field_0x11c8[0]->field_0x00 = *state;
+            racer->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+            racer->field_0x11c8[0]->field_0x5c = 1;
+            racer->field_0x1358 = state->field_0x3c;
+            racer->field_0x1364 = state->field_0x08;
+            racer->field_0x1370 = state->field_0x30;
+            racer->field_0x137c = state->field_0x14;
+            racer->field_0x1380 = state->field_0x18;
+            racer->field_0x1384 = state->field_0x1c;
+            racer->field_0x1388 = field_0x1dc == 11 ? time : state->field_0x4c;
+            if (field_0x1a4 == 0) {
+                racer->field_0x750 = state->field_0x28;
+                racer->field_0x770 = state->field_0x2c;
+            }
+            *keep = 1;
+            if (field_0x1dc == 11) {
+                racer->field_0x11c8[1]->field_0x00 = racer->field_0x11c8[0]->field_0x00;
+                racer->field_0x11c8[2]->field_0x00 = racer->field_0x11c8[1]->field_0x00;
+                racer->field_0x11c8[3]->field_0x00 = racer->field_0x11c8[2]->field_0x00;
+                racer->field_0x11c8[1]->field_0x58 = racer->field_0x11c8[0]->field_0x58;
+                racer->field_0x11c8[2]->field_0x58 = racer->field_0x11c8[1]->field_0x58;
+                racer->field_0x11c8[3]->field_0x58 = racer->field_0x11c8[2]->field_0x58;
+                racer->field_0x11c8[1]->field_0x5c = 1;
+                racer->field_0x11c8[2]->field_0x5c = 1;
+                racer->field_0x11c8[3]->field_0x5c = 1;
+                return 11;
+            }
+            return 1;
+        }
+        for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++) {
+            if (field_0x040[i] != 0 && b == field_0x040[i]->field_0x11bc &&
+                field_0x040[i]->field_0x734 == state->field_0x54) {
+                field_0x040[i]->field_0x11b8 = 1;
+                UnknownBikeRaceRacerPart* oldest;
+                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+                    oldest = field_0x040[i]->field_0x11c8[2];
+                } else {
+                    oldest = field_0x040[i]->field_0x11c8[3];
+                    field_0x040[i]->field_0x11c8[3] = field_0x040[i]->field_0x11c8[2];
+                }
+                field_0x040[i]->field_0x11c8[2] = field_0x040[i]->field_0x11c8[1];
+                field_0x040[i]->field_0x11c8[1] = field_0x040[i]->field_0x11c8[0];
+                field_0x040[i]->field_0x11c8[0] = oldest;
+                field_0x040[i]->field_0x11c8[0]->field_0x58 = time;
+                field_0x040[i]->field_0x11c8[0]->field_0x00 = *state;
+                field_0x040[i]->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+                field_0x040[i]->field_0x11c8[0]->field_0x5c = 1;
+                field_0x040[i]->field_0x1358 = state->field_0x3c;
+                field_0x040[i]->field_0x1364 = state->field_0x08;
+                field_0x040[i]->field_0x1370 = state->field_0x30;
+                field_0x040[i]->field_0x137c = state->field_0x14;
+                field_0x040[i]->field_0x1380 = state->field_0x18;
+                field_0x040[i]->field_0x1384 = state->field_0x1c;
+                field_0x040[i]->field_0x1388 = field_0x1dc == 11 ? time : state->field_0x4c;
+                if (field_0x1a4 == 0) {
+                    field_0x040[i]->field_0x750 = state->field_0x28;
+                    field_0x040[i]->field_0x770 = state->field_0x2c;
+                }
+                *keep = 1;
+                if (field_0x1dc == 11) {
+                    field_0x040[i]->field_0x11c8[1]->field_0x00 = field_0x040[i]->field_0x11c8[0]->field_0x00;
+                    field_0x040[i]->field_0x11c8[2]->field_0x00 = field_0x040[i]->field_0x11c8[1]->field_0x00;
+                    field_0x040[i]->field_0x11c8[3]->field_0x00 = field_0x040[i]->field_0x11c8[2]->field_0x00;
+                    field_0x040[i]->field_0x11c8[1]->field_0x58 = field_0x040[i]->field_0x11c8[0]->field_0x58;
+                    field_0x040[i]->field_0x11c8[2]->field_0x58 = field_0x040[i]->field_0x11c8[1]->field_0x58;
+                    field_0x040[i]->field_0x11c8[3]->field_0x58 = field_0x040[i]->field_0x11c8[2]->field_0x58;
+                    field_0x040[i]->field_0x11c8[1]->field_0x5c = 1;
+                    field_0x040[i]->field_0x11c8[2]->field_0x5c = 1;
+                    field_0x040[i]->field_0x11c8[3]->field_0x5c = 1;
+                    return 11;
+                }
+                return 1;
+            }
+        }
+    } else if (a == 13) {
+        UnknownBikeRaceNetMessage13* message = (UnknownBikeRaceNetMessage13*)data;
+        if (flag) {
+            return 1;
+        }
+        UnknownBikeRaceRacer* racer = field_0x038;
+        if (b == racer->field_0x11bc && racer->field_0x734 == message->field_0x16) {
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+                racer = field_0x040[0];
+            }
+            if (racer == 0 || !racer->field_0x11b8) {
+                return 0;
+            }
+            UnknownBikeRaceRacerPart* oldest;
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+                oldest = racer->field_0x11c8[2];
+            } else {
+                oldest = racer->field_0x11c8[3];
+                racer->field_0x11c8[3] = racer->field_0x11c8[2];
+            }
+            racer->field_0x11c8[2] = racer->field_0x11c8[1];
+            racer->field_0x11c8[1] = racer->field_0x11c8[0];
+            racer->field_0x11c8[0] = oldest;
+            oldest->field_0x58 = time;
+            racer->UnknownFunction4933e0(message, racer->field_0x11c8[0]);
+            racer->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+            racer->field_0x11c8[0]->field_0x5c = 0;
+            return 1;
+        }
+        int i = 0;
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+            return 1;
+        }
+        for (; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++) {
+            if (field_0x040[i] != 0 && b == field_0x040[i]->field_0x11bc &&
+                field_0x040[i]->field_0x734 == message->field_0x16) {
+                if (!field_0x040[i]->field_0x11b8) {
+                    return 0;
+                }
+                UnknownBikeRaceRacerPart* oldest = field_0x040[i]->field_0x11c8[3];
+                field_0x040[i]->field_0x11c8[3] = field_0x040[i]->field_0x11c8[2];
+                field_0x040[i]->field_0x11c8[2] = field_0x040[i]->field_0x11c8[1];
+                field_0x040[i]->field_0x11c8[1] = field_0x040[i]->field_0x11c8[0];
+                field_0x040[i]->field_0x11c8[0] = oldest;
+                field_0x040[i]->field_0x11c8[0]->field_0x58 = time;
+                field_0x040[i]->UnknownFunction4933e0(message, field_0x040[i]->field_0x11c8[0]);
+                field_0x040[i]->field_0x11c8[0]->field_0x00.field_0x4c = (int)(s_UnknownStatic578e8c * 1000.0f);
+                field_0x040[i]->field_0x11c8[0]->field_0x5c = 0;
+                return 1;
+            }
+        }
+    } else if (a == 10) {
+        UnknownBikeRaceNetScore* score = (UnknownBikeRaceNetScore*)data;
+        UnknownBikeRaceRacer* racer = field_0x038;
+        if (b == racer->field_0x11bc && racer->field_0x734 == score->field_0x01) {
+            if (racer == 0) {
+                return 0;
+            }
+            racer->field_0x768 = score->field_0x04;
+            *keep = 1;
+            return 1;
+        }
+        for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++) {
+            if (field_0x040[i] != 0 && b == field_0x040[i]->field_0x11bc &&
+                field_0x040[i]->field_0x734 == score->field_0x01) {
+                field_0x040[i]->field_0x768 = score->field_0x04;
+                *keep = 1;
+                return 1;
+            }
+        }
+    } else if (a == 0x11) {
+        UnknownBikeRaceGhostRecord* record = (UnknownBikeRaceGhostRecord*)data;
+        if (g_UnknownGlobal56e26c->field_0x568 != 0 && g_UnknownGlobal56e26c->field_0x568->field_0xdc != 0) {
+            UnknownFunctionGhost()->field_0x4f8 = 1;
+            UnknownBikeRaceGhostPart* oldest = UnknownFunctionGhost()->field_0x4fc[3];
+            UnknownFunctionGhost()->field_0x4fc[3] = UnknownFunctionGhost()->field_0x4fc[2];
+            UnknownFunctionGhost()->field_0x4fc[2] = UnknownFunctionGhost()->field_0x4fc[1];
+            UnknownFunctionGhost()->field_0x4fc[1] = UnknownFunctionGhost()->field_0x4fc[0];
+            UnknownFunctionGhost()->field_0x4fc[0] = oldest;
+            UnknownFunctionGhost()->field_0x4fc[0]->field_0x3c = time;
+            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00 = *record;
+            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.field_0x34 = (int)(s_UnknownStatic578e8c * 1000.0f);
+            UnknownFunctionGhost()->field_0x4fc[0]->field_0x40 = 1;
+            UnknownFunctionGhost()->field_0x5d4 = record->field_0x28;
+            UnknownFunctionGhost()->field_0x5e0 = record->field_0x04;
+            UnknownFunctionGhost()->field_0x5ec = record->field_0x1c;
+            UnknownFunctionGhost()->field_0x5f8 = record->field_0x10;
+            UnknownFunctionGhost()->field_0x5fc = record->field_0x14;
+            UnknownFunctionGhost()->field_0x600 = record->field_0x18;
+            UnknownFunctionGhost()->field_0x604 = field_0x1dc == 11 ? time : record->field_0x34;
+            *keep = 1;
+            if (field_0x1dc == 11) {
+                UnknownFunctionGhost()->field_0x4fc[1]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[0]->field_0x00;
+                UnknownFunctionGhost()->field_0x4fc[2]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[1]->field_0x00;
+                UnknownFunctionGhost()->field_0x4fc[3]->field_0x00 = UnknownFunctionGhost()->field_0x4fc[2]->field_0x00;
+                UnknownFunctionGhost()->field_0x4fc[1]->field_0x3c = UnknownFunctionGhost()->field_0x4fc[0]->field_0x3c;
+                UnknownFunctionGhost()->field_0x4fc[2]->field_0x3c = UnknownFunctionGhost()->field_0x4fc[1]->field_0x3c;
+                UnknownFunctionGhost()->field_0x4fc[3]->field_0x3c = UnknownFunctionGhost()->field_0x4fc[2]->field_0x3c;
+                UnknownFunctionGhost()->field_0x4fc[1]->field_0x40 = 1;
+                UnknownFunctionGhost()->field_0x4fc[2]->field_0x40 = 1;
+                UnknownFunctionGhost()->field_0x4fc[3]->field_0x40 = 1;
+                return 11;
+            }
+            return 1;
+        }
+    } else if (a == 0x10) {
+        if (flag) {
+            return 1;
+        }
+        if (g_UnknownGlobal56e26c->field_0x568 != 0 && g_UnknownGlobal56e26c->field_0x568->field_0xdc != 0 &&
+            UnknownFunctionGhost()->field_0x4f8) {
+            UnknownBikeRaceGhostPart* oldest = UnknownFunctionGhost()->field_0x4fc[3];
+            UnknownFunctionGhost()->field_0x4fc[3] = UnknownFunctionGhost()->field_0x4fc[2];
+            UnknownFunctionGhost()->field_0x4fc[2] = UnknownFunctionGhost()->field_0x4fc[1];
+            UnknownFunctionGhost()->field_0x4fc[1] = UnknownFunctionGhost()->field_0x4fc[0];
+            UnknownFunctionGhost()->field_0x4fc[0] = oldest;
+            UnknownFunctionGhost()->field_0x4fc[0]->field_0x3c = time;
+            UnknownFunctionGhost()->UnknownFunction4a9aa0(data, UnknownFunctionGhost()->field_0x4fc[0]);
+            UnknownFunctionGhost()->field_0x4fc[0]->field_0x00.field_0x34 = (int)(s_UnknownStatic578e8c * 1000.0f);
+            UnknownFunctionGhost()->field_0x4fc[0]->field_0x40 = 0;
+            return 1;
+        }
+    } else if (a == 0x87) {
+        UnknownBikeRaceVcrFollow* follow = (UnknownBikeRaceVcrFollow*)data;
+        if (g_UnknownGlobal56e26c->field_0x568 != 0) {
+            g_UnknownGlobal56e26c->field_0x568->field_0xa8 = 0;
+            if (follow->field_0x08 != 0) {
+                int iterator = 0;
+                for (UnknownBikeRaceRacer* racer = UnknownFunction4204e0(&iterator); racer != 0;
+                     racer = UnknownFunction4204e0(&iterator)) {
+                    if (racer->field_0x11bc == follow->field_0x08) {
+                        g_UnknownGlobal56e26c->field_0x568->field_0xa8 = (UnknownEventRacer*)racer;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 // 0x00423040
 void BikeRace::UnknownFunction423040(int index) {
     UnknownBikeRaceRacer* racer = field_0x040[index];
@@ -706,18 +1588,6 @@ void BikeRace::UnknownFunction423040(int index) {
         racer->field_0x11c8[2]->field_0x00.field_0x08 = kVec3Zero;
         racer->field_0x11c8[3]->field_0x00.field_0x08 = kVec3Zero;
     }
-}
-
-// Inline: the racers in the race, own and AI (a single player race) or
-// own and remote.
-static inline int UnknownFunctionRacerCount() {
-    if (g_UnknownGlobal56e26c->field_0x18 == 1) {
-        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
-            return g_UnknownGlobal56e26c->field_0x18;
-        }
-        return g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 + 1;
-    }
-    return g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
 }
 
 // 0x00422ec0

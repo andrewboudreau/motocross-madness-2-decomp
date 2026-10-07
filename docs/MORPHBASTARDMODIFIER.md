@@ -30,10 +30,11 @@ its deleting wrapper, the qsort comparator `0x004a3bb0`, the vector angle
 Near misses (`samples/render/MorphBastardModifierNearMisses.cpp`):
 - The 1982-byte parameter-file loader `0x004a33b0`.
 - Slot 27 `0x004a4c60`.
+- The controller-angle solver `0x004a3c80..0x004a4ba5` (3878 bytes, not
+  2340): structure reconstructed; retail calls the out-of-line Vector3
+  constructor `0x00404e60` and has a larger frame.
 
-Both differ in stack-slot and register assignment. Not written: the
-2340-byte axis-angle solver `0x004a3c80`; the sample's header describes
-it.
+The first two differ in stack-slot and register assignment.
 
 D3DIMSoultreeModifier.h now gives slot 27 its signature `(object, mesh,
 out)`, taken from the call site `0x00440ded`.

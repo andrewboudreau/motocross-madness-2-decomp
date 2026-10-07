@@ -73,7 +73,16 @@ def _is_eh_handler_push(prefix: bytes) -> bool:
     Besides the fixed shapes in _EH_PROLOGUES, VC6 can schedule loads of stack
     arguments (`mov r8/r32, [esp+disp8]`) between `push -1` and
     `push offset handler` when the fs:[0] load comes first (Scene 0x004ea7e0).
+    It can also schedule loads of globals (`mov r32, [abs32]`, unrelocated in
+    the object) between the fs:[0] load and `push -1` (bikerace.cpp slot 10
+    0x0041d2b0).
     """
+    if prefix in _EH_PROLOGUES.get(len(prefix), ()):
+        return True
+    fs_load = b'\x64\xa1\x00\x00\x00\x00'
+    while (prefix.startswith(fs_load) and len(prefix) >= len(fs_load) + 6
+           and prefix[6] == 0x8b and prefix[7] & 0xc7 == 0x05):
+        prefix = fs_load + prefix[len(fs_load) + 6:]
     if prefix in _EH_PROLOGUES.get(len(prefix), ()):
         return True
     head = b'\x64\xa1\x00\x00\x00\x00\x6a\xff'

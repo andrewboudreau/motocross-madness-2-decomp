@@ -19,6 +19,16 @@
 // case is reconstructed, but retail keeps 0 in ebx for the whole function
 // (the candidate keeps the EH state -1 there), and its case-local buffers
 // sit at different stack offsets (frame 0x494 against 0x594).
+//
+// 0x004210f0 (2981 bytes with its jump table; the start grid): every case
+// is decoded and the arithmetic matches where VC6 makes the same inlining
+// choices. Retail calls the out-of-line Vector3 constructor (0x00404e60)
+// for the last two expansions of the mode 2/3 case and inlines
+// Scale(field_0x170, 20.0f) in the mode 4 case; this candidate does the
+// opposite (VC6's inline budget). Call sequence (D dot, I FastInvSqrt,
+// S scale, C constructor): retail DIS..CCDISCCCCCCDISCCCCCCDISCC-CSS+,
+// candidate DIS..DISCCCCCCDISCCCCCCDISCS-SS+. Statement-count and helper
+// spelling variations moved either end but never both.
 
 #include "../../src/reconstructed/BikeRace.cpp"
 
@@ -510,3 +520,146 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
     return 0;
 }
 
+
+float FastInvSqrt(float x); // 0x00460c00 (FastMath)
+
+static inline float DotProduct(const Vector3& a, const Vector3& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+static inline Vector3& operator-=(Vector3& v, const Vector3& o) {
+    v.x -= o.x;
+    v.y -= o.y;
+    v.z -= o.z;
+    return v;
+}
+
+static inline Vector3& operator*=(Vector3& v, float s) {
+    v.x *= s;
+    v.y *= s;
+    v.z *= s;
+    return v;
+}
+
+static inline float SquareMagnitude(const Vector3& v) {
+    return DotProduct(v, v);
+}
+
+static inline Vector3 Scale(const Vector3& v, float s) {
+    return Vector3(s * v.x, s * v.y, s * v.z);
+}
+
+float UnknownFunction40ae30(const Vector3* a, const Vector3* b); // 0x0040ae30: a.b
+
+static inline Vector3 Normalize(const Vector3& v) {
+    float length = SquareMagnitude(v);
+    if (length == 1.0f) {
+        return v;
+    }
+    float scale = FastInvSqrt(length);
+    return Scale(v, scale);
+}
+
+// 0x004210f0
+void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, int count) {
+    if (field_0x188 && count != 0) {
+        *a = Scale(field_0x170, (float)count) + field_0x164;
+        *b = field_0x17c;
+        return;
+    }
+    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
+    case 2:
+    case 3: {
+        if (field_0x144) {
+            a->x = field_0x0cc.field_0x00.x;
+            a->z = field_0x0cc.field_0x00.z;
+            a->y = 0.0f;
+            b->x = field_0x0cc.field_0x0c.x;
+            b->z = field_0x0cc.field_0x0c.z;
+            b->y = 0.0f;
+        } else {
+            *a = field_0x058->field_0x70;
+            *b = Normalize(field_0x058->field_0x7c);
+        }
+        if (count <= 0) {
+            return;
+        }
+        float side;
+        if (field_0x048->field_0x00 != 0 && field_0x048->field_0x00->field_0x08 != 0 &&
+            field_0x048->field_0x00->field_0x08->field_0x2c != 0 &&
+            field_0x048->field_0x00->field_0x08->field_0x2c->field_0x2c != 0) {
+            TrackVec3 p0;
+            TrackVec3 p1;
+            field_0x048->UnknownFunction518130(field_0x048->field_0x00->field_0x08, &p0);
+            field_0x048->UnknownFunction518130(field_0x048->field_0x00->field_0x08->field_0x2c, &p1);
+            if (p0.z * p1.x - p1.z * p0.x <= 0.0f) {
+                side = 1.0f;
+            } else {
+                side = -1.0f;
+            }
+        } else {
+            side = -1.0f;
+        }
+        field_0x17c = *b;
+        *a -= Scale(*b, 4.66f);
+        field_0x170 = Vector3(b->z, 0.0f, -b->x);
+        field_0x164 = *a - Scale(Scale(Scale(field_0x170, 6.75f), field_0x04c->field_0x40), side);
+        field_0x170 *= field_0x04c->field_0x40 * 15.5f / (field_0x158 + 1) * side;
+        *a = Scale(field_0x170, (float)count) + field_0x164;
+        break;
+    }
+    case 0:
+        *a = field_0x058->field_0x70;
+        *b = Normalize(field_0x058->field_0x7c);
+        if (count <= 0) {
+            return;
+        }
+        field_0x17c = *b;
+        *a -= Scale(*b, 4.66f);
+        field_0x170 = Vector3(b->z, 0.0f, -b->x);
+        field_0x164 = *a - Scale(field_0x170, 20.0f);
+        field_0x170 = Scale(Vector3(b->z, 0.0f, -b->x), 20.0f);
+        *a = Scale(field_0x170, (float)count) + field_0x164;
+        break;
+    case 1:
+    case 5: {
+        UnknownBikeRaceNodeOwner* owner = (UnknownBikeRaceNodeOwner*)reference;
+        Vector3 direction = owner->field_0x0d8[owner->field_0x0ac - 1].field_0x0c;
+        direction.y = 0.0f;
+        *b = Normalize(direction);
+        *a = owner->field_0x0d8[owner->field_0x0ac - 1].field_0x00;
+        *a += Scale(*b, 8.0f);
+        a->y = 0.0f;
+        if (count <= 0) {
+            return;
+        }
+        float width = owner->field_0x420[owner->field_0x0ac - 1]->field_0x50 * 1.05f;
+        float spacing = width / (field_0x158 + 1);
+        if (3.4f > spacing) {
+            spacing = 3.4f;
+        }
+        field_0x17c = *b;
+        field_0x170 = Vector3(b->z, 0.0f, -b->x);
+        field_0x164 = *a - Scale(field_0x170, width * 0.48f);
+        field_0x170 = Scale(Vector3(b->z, 0.0f, -b->x), spacing);
+        *a = Scale(field_0x170, (float)count) + field_0x164;
+        break;
+    }
+    case 4:
+        *a = field_0x058->field_0x70;
+        *b = Normalize(field_0x058->field_0x7c);
+        if (count <= 0) {
+            return;
+        }
+        field_0x17c = *b;
+        *a -= Scale(*b, 4.66f);
+        field_0x170 = Vector3(b->z, 0.0f, -b->x);
+        field_0x164 = *a - Scale(field_0x170, 20.0f);
+        field_0x170 = Scale(Vector3(b->z, 0.0f, -b->x), 20.0f);
+        *a = field_0x164 + Scale(field_0x170, (float)count);
+        break;
+    default:
+        return;
+    }
+    field_0x188 = true;
+}

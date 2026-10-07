@@ -32,15 +32,28 @@ Exact: 43 calibration cases:
   counts.
 - The eight `$E`.
 
-Near misses (`samples/render/D3DIMSoulTreeNearMisses.cpp`):
+Near misses (`samples/render/D3DIMSoulTreeNearMisses.cpp`, details in its
+header):
 - The LOD `.slt` reader `0x00440060` (1955 of 1964 bytes) and the
   vertex-group transform `0x00440d40`. Retail adds `offset + base`.
-- Slot 5 bounds `0x00444140`. It fails to link because VC6 keeps a bound on
-  the FPU stack and needs a 64000.0 constant.
-- Slot 7 copy `0x00444560`.
-- The axis gizmo `0x004435b0`.
-- The box outline `0x00443740`.
-- The LOD chooser `0x00443de0`.
+- Slot 12 `0x00443aa0` (799 of 832): row 1 of the inline view-matrix
+  product adds its terms in another order.
+- Slot 5 bounds `0x00444140` (610 of 764): the y/z sums of the centre.
+- The texture-density pass `0x00440810` (same instruction count; one
+  extra frame slot), the normals `0x00442fe0` and vertex crosses
+  `0x004431f0` (their scales are function-local statics in .data at
+  `0x00568944`/`0x00568948`), the LOD chooser `0x00443de0`, slot 7
+  `0x00444560`, the axis gizmo `0x004435b0` and the box outline
+  `0x00443740`.
+- The drawing function `0x00440f30..0x00442dd8`: a nine-way switch on the
+  material mapping type, then modifiers, draw and debug overlays. Its
+  function-local statics are the .data ints `0x00568930..0x0056893c`, the
+  float `0x00568940` and three vectors (`0x0057eef8`, `0x0057ef38`,
+  `0x0057eee8`, guard `0x0057ef24`) with an empty destructor; the `ret`
+  stubs `0x00442f40/50/60` are their atexit entries, so they belong to
+  this TU and are matched only together with the drawing function.
 
-Not attempted: `0x00440810`, the drawing function `0x00440f30`, slot 12
-`0x00443aa0` and three `ret` stubs.
+Header note: adding the node calls `0x004fca80`, `0x004fc9a0`,
+`0x004fd710`, `0x004fd7f0` and `0x004fd5c0` to `SoultreeObject` here
+changes VC6's operand order in SceneManager.cpp's exact `0x004eb570`, so
+the near-miss file declares them on a local view class.

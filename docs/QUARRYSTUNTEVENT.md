@@ -31,9 +31,38 @@ Source forms needed:
   changes the destructor's registers.
 
 Near misses (`samples/game/QuarryStuntEventNearMisses.cpp`): the memory
-estimate `0x004e0560` and slot 12 `0x004e14a0` (the "Atmosphere" debug
-page). Both differ only in register choice. The 7.9 KB loader
-`0x004de590` is not attempted.
+estimate `0x004e0560` (23 of 331 positions; retail's frame is one
+`push ecx` slot where VC6 here allocates 0xc bytes, which shifts every
+stack offset) and slot 12 `0x004e14a0` (166 of 1756; the prologue's
+register choice shifts the rest). The scores are the same with HEAD's
+headers.
+
+The loader `0x004de590` (7952 bytes) is a near miss in
+`samples/game/QuarryStuntEventLoaderNearMiss.cpp`, which carries its own
+`UnknownQuarry*` views. About 95% of the normalised instructions align.
+These match:
+- the call sequence;
+- the allocation sizes and `__FILE__` lines (252..1251);
+- the EH states, the error paths and the 0x650 frame.
+
+These differ:
+- the stack slots of most locals;
+- register choices and expression shapes in the memory-budget tree
+  (`0x004de7e0..0x004ded5e`);
+- the zero register retail keeps around the collision links.
+
+Facts the loader establishes:
+- The three 0x18-byte `UnknownTextureFormatChoice` records hold the
+  terrain, model and sky texture settings: +0x14 is the halving level, set
+  from total/available memory, the `DriverInfo\<driver>\VideoMemoryMB`
+  registry value and the "MarginPercentage"/"MinMarginKBytes" settings.
+- The model record goes to Scene `0x004ea7e0`/`0x004efb20`, the race
+  `0x00417ed0`, slot 27 and the podium; the terrain record to `0x005059d0`;
+  the sky record to SkyCube `0x004fb230`.
+- The visibility quadtree `0x0052d460` returns its GameObject base at
+  +0x874.
 
 QuarryEvent.h now types BaseQuarryEvent's fields (size still 0xa4).
 TrackOverlay.h, SceneManager.h, RaceView.h and TrackGame.h gained members.
+SceneManager.h names CollisionCharacter +0x210 and CarProcedural
++0x38/+0x3c for the loader's collision links.

@@ -99,18 +99,9 @@ public:
     Vector3 field_0x174;                       // Krusty3DObjects.cpp 0x0048c8a0
     Vector3 field_0x180;                       // Krusty3DObjects.cpp 0x0048c8a0
     int field_0x18c;                           // subtree dirty
-    unsigned char field_0x190[0x1a0 - 0x190];
+    int field_0x190;                           // slot 12 tests it before the visibility test
+    unsigned char field_0x194[0x1a0 - 0x194];
     UnknownParameterBlock* field_0x1a0;        // .slt reader
-};
-
-// One 0x14-byte vertex group of a surface: the vertices one node moves.
-// 0x00440d40 transforms field_0x04 vertices by the node's world matrix.
-struct UnknownSoultreeFaceGroup {
-    SoultreeObject* field_0x00;                // node
-    int field_0x04;                            // vertex count
-    void* field_0x08;                          // source vertices
-    void* field_0x0c;                          // transformed vertices
-    Vector3* field_0x10;                       // normals
 };
 
 // One 0x20-byte vertex in the D3DLVERTEX layout (drawn with FVF 0x1e2):
@@ -122,6 +113,16 @@ struct UnknownSoultreeVertex {
     unsigned int field_0x14;
     float field_0x18;
     float field_0x1c;
+};
+
+// One 0x14-byte vertex group of a surface: the vertices one node moves.
+// 0x00440d40 transforms field_0x04 vertices by the node's world matrix.
+struct UnknownSoultreeFaceGroup {
+    SoultreeObject* field_0x00;                // node
+    int field_0x04;                            // vertex count
+    UnknownSoultreeVertex* field_0x08;         // source vertices
+    UnknownSoultreeVertex* field_0x0c;         // transformed vertices
+    Vector3* field_0x10;                       // normals
 };
 
 // The texture coordinates of one vertex.
@@ -167,9 +168,12 @@ struct UnknownSoultreeLod {
 // The camera fields 0x004439c0 reads (RenderTarget+0x08): the viewport
 // origin (ObjectPicker.h's UnknownPickCamera names the same fields).
 struct UnknownSoultreeCameraView {
-    unsigned char field_0x000[0x170];
+    unsigned char field_0x000[0xec];
+    Matrix4 field_0x0ec;                       // view matrix (slot 12's visibility test)
+    unsigned char field_0x12c[0x170 - 0x12c];
     Vector3 field_0x170;                       // position
-    unsigned char field_0x17c[0x198 - 0x17c];
+    Vector3 field_0x17c;                       // view direction (drawing mode 5)
+    unsigned char field_0x188[0x198 - 0x188];
     float field_0x198;                         // image plane distance
     int field_0x19c;
     unsigned int field_0x1a0;                  // viewport x
@@ -245,6 +249,8 @@ public:
     void UnknownFunction4435b0();                  // 0x004435b0: axes of the subtree
     void UnknownFunction443740(Vector3 center, Vector3 extents, int flag); // 0x00443740 (ret 0x1c)
     void UnknownFunction442f70(UnknownSoultreeSurface* surface);  // 0x00442f70 (ret 4): wireframe
+    void UnknownFunction442fe0(UnknownSoultreeSurface* surface);  // 0x00442fe0 (ret 4): normals
+    void UnknownFunction4431f0(UnknownSoultreeSurface* surface);  // 0x004431f0 (ret 4): vertex crosses
     void UnknownFunction4433f0(int surface, UnknownSoultreeVertex** vertices, int* vertexCount,
                                unsigned short** indices, int* indexCount, int a6, int lod); // 0x004433f0
     int UnknownFunction440060();                   // 0x00440060: reads the levels of detail
@@ -293,7 +299,7 @@ public:
     UnknownSoultreeCounters field_0x2a8;
     float field_0x2b8;                         // frame time (slot 10)
     Vector3 field_0x2bc;
-    int field_0x2c8;
+    float field_0x2c8;                         // texture scroll (drawing modes 1 and 2)
     int field_0x2cc;                           // load flag (slot 9)
     int field_0x2d0;
     int field_0x2d4;                           // 1 after construction

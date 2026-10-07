@@ -20,33 +20,64 @@ struct UnknownSound3DParameters;
 struct UnknownSceneLodObject {
     void UnknownFunction4444c0(int value);           // 0x004444c0
     void UnknownFunction4451e0(int level);           // 0x004451e0
+    void UnknownFunction4fbd70(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
+    void UnknownFunction4fc660(const Vector3* position); // 0x004fc660
 };
 
-// The object a scene entry holds. Tier 2: 0x004eb040 calls 0x004a8b40
+// The object a key-framed scene entry holds: CollisionCharacter (0x294
+// bytes, constructor 0x004318d0, samples/physics/tire), a
+// D3DIMSoultreeCharacter with its own vtable at +0, a vbptr at +4 and the
+// GameObject virtual base at +0x268. Tier 2: 0x004eb040 calls 0x004a8b40
 // (D3DIMSoultreeCharacter::SetMotion in src/krusty2/motion) on it, whose
-// +0x1a4 buffer 0x004eaec0 compares as the name. Only that is declared here.
-struct UnknownSceneObject {
+// +0x1a4 buffer 0x004eaec0 compares as the name. Only what the scene uses is
+// declared.
+struct UnknownSceneObject : public virtual GameObject {
+public:
+    explicit UnknownSceneObject(int flags);            // 0x004318d0
+    virtual void UnknownVirtualSlot0();
+
+    // 0x004319c0: loads the character and returns the GameObject to add.
+    GameObject* UnknownFunction4319c0(void* owner, const char* name, const char* colPath,
+                                      LightManager* lights, int a4, int a5, int a6);
+    void* UnknownFunction4a6b30(const char* name, int a); // 0x004a6b30 (FindMotion)
     void UnknownFunction4a8b40(void* motion);          // 0x004a8b40 (SetMotion)
     int UnknownFunction4a6bb0(float time, int a, int b); // 0x004a6bb0: advances the motion
 
-    unsigned char field_0x000[0x0c];
+    unsigned char field_0x008[0x0c - 0x08];
     int field_0x0c;                       // cleared by 0x004a8b40
     int field_0x10;                       // the motion time (Character +0x10)
     unsigned char field_0x014[0x1a0 - 0x14];
     UnknownSceneLodObject* field_0x1a0;
     char field_0x1a4[0x6c];
+    void* field_0x210;                    // CollisionCharacter's CollisionObject (QuarryStuntEvent.cpp)
+    unsigned char field_0x214[0x268 - 0x214];
 };
 
-// What UnknownSceneEntry::field_0x08 holds for entries without bit 3: a
-// GameObject whose slot 10 0x004eb040 calls. Only those fields are known.
+// What UnknownSceneEntry::field_0x08 holds for procedural entries (without
+// bit 3): CarProcedural (0x22c bytes), a GameObject whose slot 10 0x004eb040
+// calls. Only what the scene uses is declared.
 class UnknownSceneAnimatedObject : public GameObject {
 public:
+    explicit UnknownSceneAnimatedObject(int flags);    // 0x0042f390 (CarProcedural)
+    // Slot 27 (0x0042f600, CarProcedural.h): loads the model and its path;
+    // returns the object to add.
+    virtual GameObject* UnknownVirtualSlot27(void* owner, const char* name, const char* colPath,
+                                             LightManager* lights, int a4, int a5, const char* vuePath,
+                                             const Vector3* position, float fps, int frontWheelsTurn,
+                                             float lagDistance, float a11, int tires, float a13,
+                                             float a14, float a15);
+
     unsigned char field_0x2c[0x34 - 0x2c];
     UnknownSceneLodObject* field_0x34;
-    unsigned char field_0x38[0x5c - 0x38];
+    void* field_0x38;                     // CarProcedural's two CollisionObjects (QuarryStuntEvent.cpp)
+    void* field_0x3c;
+    unsigned char field_0x40[0x5c - 0x40];
     int field_0x5c;
     unsigned char field_0x60[0x194 - 0x60];
     float field_0x194;
+    // +0x20c (the terrain) stays unnamed here: naming it together with
+    // +0x38/+0x3c changes VC6's code for 0x004eb570.
+    unsigned char field_0x198[0x22c - 0x198];
 };
 
 // 0x44-byte element of UnknownSceneTable::field_0x04. The flag byte at +0
@@ -58,19 +89,20 @@ struct UnknownSceneEntry {
     unsigned char field_0x00_bit2 : 1;
     unsigned char field_0x00_bit3 : 1;
     unsigned char field_0x00_bit4 : 1;              // skipped by bikerace.cpp's camera (0x0041f1d0)
+    unsigned char field_0x00_bit5 : 1;              // cleared by 0x004edfe0
     unsigned char field_0x01[3];
-    UnknownSceneObject* field_0x04;
-    void* field_0x08;
-    unsigned char field_0x0c[0x18 - 0x0c];
+    UnknownSceneObject* field_0x04;       // key-framed (bit 3)
+    UnknownSceneAnimatedObject* field_0x08; // procedural
+    Vector3 field_0x0c;                   // "Position" (or "Offset")
     int field_0x18;                       // 0x004eb040: the motion advance result
-    int field_0x1c;
+    int field_0x1c;                       // "NumberOfMotions" (1 for procedural entries)
     void** field_0x20;                    // motions
     char field_0x24;                      // current motion index
-    signed char field_0x25;               // field_0x28 count
+    signed char field_0x25;               // field_0x28 count ("NumberInSequence")
     signed char field_0x26;               // index into field_0x28
     unsigned char field_0x27;
-    char* field_0x28;                     // motion numbers (1-based)
-    unsigned char field_0x2c[0x44 - 0x2c];
+    char* field_0x28;                     // motion numbers (1-based, "MotionSequence")
+    char field_0x2c[0x18];                // the MCF or SLT file name, at most 0x14 characters
 };
 
 // 0x10-byte element of UnknownSceneTable::field_0x0c.
@@ -78,8 +110,8 @@ struct UnknownSceneEntry2 {
     signed char field_0x00;
     unsigned char field_0x01[3];
     UnknownSceneEntry* field_0x04;        // 0x004eff30 reads it as an entry
-    void* field_0x08;
-    void* field_0x0c;
+    signed char* field_0x08;              // animation indices ("RandomSet" a.m pairs)
+    signed char* field_0x0c;              // motion indices
 };
 
 // Owned by Scene+0xb4; freed with its arrays by the destructor.
@@ -274,8 +306,11 @@ public:
     // `interval` models.
     int UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, void (*progress)(int),
                               int interval);           // near miss (samples/track)
+    // 0x004edfe0: reads "Animations": a key-framed character or a procedural
+    // car per "Animation<n>", with its motions and sound emitter, then the
+    // "RandomSet<n>" sections.
     int UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*progress)(int),
-                              int interval);           // not reconstructed
+                              int interval);           // near miss (samples/track)
     int UnknownFunction4ef4c0();                     // 0x004ef4c0: reads the "Sounds" section
     int UnknownFunction4ebfc0(const char* directory, const char* cubeDirectory); // "Environment"
     int UnknownFunction4eb570(int index);            // reads "Light<index + 1>"

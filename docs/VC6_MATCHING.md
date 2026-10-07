@@ -209,13 +209,13 @@ see [QUARRYSTUNTEVENT](QUARRYSTUNTEVENT.md).
 gameui.cpp (the UI controls) matches strictly in 272 functions, 265 of
 them registered; see [GAMEUI](GAMEUI.md).
 
-bikerace.cpp (BikeRace) matches strictly in 39 functions; see
+bikerace.cpp (BikeRace) matches strictly in 41 functions; see
 [BIKERACE](BIKERACE.md).
 
 vfwdeco.cpp is one function, the video decoder destructor, and it matches
 strictly; see [VFWDECO](VFWDECO.md).
 
-uiinfo.cpp (TrackGameMode) matches strictly in 34 functions; see
+uiinfo.cpp (TrackGameMode) matches strictly in 35 functions; see
 [UIINFO](UIINFO.md).
 
 Texmap.cpp is fully matched (13 functions); see [TEXMAP](TEXMAP.md).

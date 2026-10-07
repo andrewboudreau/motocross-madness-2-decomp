@@ -160,6 +160,30 @@ int TrackGameMode::UnknownFunction522680() {
     return 1;
 }
 
+// 0x00522720: the defaults of the TrackGameMode+0x6ac options; the last
+// 0x14 bytes are cleared with an inline memset.
+void TrackGameMode::UnknownFunction522720(UnknownTrackGameModeOptions6ac* options) {
+    options->field_0x00 = 1;
+    options->field_0x04 = 1;
+    options->field_0x1c = 1;
+    options->field_0x08 = 0;
+    options->field_0x0c = 1;
+    options->field_0x10 = 1;
+    options->field_0x14 = 1;
+    options->field_0x18 = 1;
+    options->field_0x30 = 2;
+    options->field_0x34 = 0;
+    options->field_0x38 = 0;
+    options->field_0x3c = 0;
+    options->field_0x40 = 0;
+    options->field_0x44 = 0;
+    options->field_0x20 = 1;
+    options->field_0x24 = 1;
+    options->field_0x28 = 1;
+    options->field_0x2c = 1;
+    memset(&options->field_0x360, 0, sizeof(options->field_0x360));
+}
+
 // 0x00522780
 void TrackGameMode::UnknownFunction522780(UnknownTrackGameModeOptionsA20* options) {
     options->field_0x00 = 0;

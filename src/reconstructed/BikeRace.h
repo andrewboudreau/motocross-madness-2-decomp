@@ -73,6 +73,7 @@ public:
     int UnknownFunction49bf10(UnknownRecorderCallback callback, int mode, char* name,
                               UnknownVcrFile* file);
     float UnknownFunction49c000();            // 0x0049c000: the recorded length
+    void UnknownFunction49bff0(float time, int flag); // 0x0049bff0
     // 0x0049c010: saves the recording with its length and description.
     void UnknownFunction49c010(float length, char* description, int flag);
     // 0x0049c070: describes the ghost rider (model files, rider and bike
@@ -81,7 +82,9 @@ public:
                                char* rider, char* riderName, char* bikeName, int engineSize,
                                int engineKind, int value);
 
-    unsigned char field_0x0d8[0x25c - 0xd8];
+    unsigned char field_0x0d8[0x10c - 0xd8];
+    float field_0x10c;                        // the time played (0x00421d50)
+    unsigned char field_0x110[0x25c - 0x110];
     UnknownKrustyVcrRecord field_0x25c[8];
     unsigned char field_0x29c[0xf8c - 0x29c];
 };
@@ -98,9 +101,22 @@ struct UnknownBikeRaceMesh {
 
 class UnknownBikeRaceCharacter {
 public:
-    void UnknownFunction4a8b10(const char* motion); // 0x004a8b10: plays a motion ("Stand")
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6();
+    // Slot 7: per frame (BikeRace slot 10 passes the frame time).
+    virtual int UnknownVirtualSlot7(float frameTime, int a, int b);
 
-    unsigned char field_0x000[0x1a0];
+    // 0x004a8b10: plays a motion ("Stand", "FlagStart", "FlagLoop").
+    void UnknownFunction4a8b10(const char* motion);
+
+    unsigned char field_0x004[0x0c - 0x04];
+    int field_0x00c;                          // the motion finished (slot 10 then loops "FlagLoop")
+    unsigned char field_0x010[0x1a0 - 0x10];
     UnknownBikeRaceMesh* field_0x1a0;
 };
 
@@ -121,7 +137,9 @@ struct UnknownBikeRaceMeshGroup {
 
 // An item of a mesh group (0x38 bytes).
 struct UnknownBikeRaceMeshItem {
-    unsigned char field_0x00[0x20];
+    unsigned char field_0x00[0x0c];
+    int field_0x0c;                           // face count
+    unsigned char field_0x10[0x20 - 0x10];
     int field_0x20;                           // id count
     int* field_0x24;                          // ids
     unsigned char field_0x28[0x38 - 0x28];
@@ -133,6 +151,7 @@ public:
     // 0x0051dce0: the chat line's input; nonzero when it took the event.
     int UnknownFunction51dce0(UnknownControlEvent* event, UnknownInputEntry* entry, int* result);
     void UnknownFunction51dd10();             // 0x0051dd10
+    void UnknownFunction51dd40();             // 0x0051dd40: closes the chat line
     void UnknownFunction51dd70(char* name, unsigned int* text, int flag); // 0x0051dd70
 
     unsigned char field_0x000[0x3dc];
@@ -151,8 +170,13 @@ public:
     void UnknownFunction444d40(int value);    // 0x00444d40: hidden for the followed racer
     void UnknownFunction4fdb50();             // 0x004fdb50
 
-    unsigned char field_0x000[0x27c];
-    int field_0x27c;
+    unsigned char field_0x000[0x274];
+    int field_0x274;                          // detail level count
+    unsigned char field_0x278[0x27c - 0x278];
+    int field_0x27c;                          // current detail level
+    float* field_0x280;                       // automatic detail distances (slot 10's debug page)
+    unsigned char field_0x284[0x28c - 0x284];
+    UnknownBikeRaceMeshGroup* field_0x28c;    // per level
 };
 
 struct UnknownBikeRaceRider {
@@ -218,6 +242,56 @@ public:
     virtual void UnknownRacerVirtualSlot43();
     // Its own slot 44 (0x00420590 calls it for a player who left).
     virtual void UnknownRacerVirtualSlot44();
+    virtual float UnknownRacerVirtualSlot45(int value); // 0x0041d2b0 passes its result to slot 50
+    virtual void UnknownRacerVirtualSlot46();
+    virtual void UnknownRacerVirtualSlot47();
+    virtual void UnknownRacerVirtualSlot48();
+    virtual void UnknownRacerVirtualSlot49();
+    virtual void UnknownRacerVirtualSlot50(int value, float time);
+    virtual void UnknownRacerVirtualSlot51();
+    virtual void UnknownRacerVirtualSlot52();
+    virtual void UnknownRacerVirtualSlot53();
+    virtual void UnknownRacerVirtualSlot54();
+    virtual void UnknownRacerVirtualSlot55();
+    virtual void UnknownRacerVirtualSlot56();
+    virtual void UnknownRacerVirtualSlot57();
+    virtual void UnknownRacerVirtualSlot58();
+    virtual void UnknownRacerVirtualSlot59();
+    virtual void UnknownRacerVirtualSlot60();
+    virtual void UnknownRacerVirtualSlot61();
+    virtual void UnknownRacerVirtualSlot62();
+    virtual void UnknownRacerVirtualSlot63();
+    virtual void UnknownRacerVirtualSlot64();
+    virtual void UnknownRacerVirtualSlot65();
+    virtual void UnknownRacerVirtualSlot66();
+    virtual void UnknownRacerVirtualSlot67();
+    virtual void UnknownRacerVirtualSlot68();
+    virtual void UnknownRacerVirtualSlot69();
+    virtual void UnknownRacerVirtualSlot70();
+    virtual void UnknownRacerVirtualSlot71();
+    virtual void UnknownRacerVirtualSlot72();
+    virtual void UnknownRacerVirtualSlot73();
+    virtual void UnknownRacerVirtualSlot74();
+    virtual void UnknownRacerVirtualSlot75();
+    virtual void UnknownRacerVirtualSlot76();
+    virtual void UnknownRacerVirtualSlot77();
+    virtual void UnknownRacerVirtualSlot78();
+    virtual void UnknownRacerVirtualSlot79();
+    virtual void UnknownRacerVirtualSlot80();
+    virtual void UnknownRacerVirtualSlot81();
+    virtual void UnknownRacerVirtualSlot82();
+    virtual void UnknownRacerVirtualSlot83();
+    virtual void UnknownRacerVirtualSlot84();
+    virtual void UnknownRacerVirtualSlot85();
+    virtual void UnknownRacerVirtualSlot86();
+    virtual void UnknownRacerVirtualSlot87();
+    virtual void UnknownRacerVirtualSlot88();
+    virtual void UnknownRacerVirtualSlot89();
+    virtual void UnknownRacerVirtualSlot90();
+    virtual void UnknownRacerVirtualSlot91();
+    virtual void UnknownRacerVirtualSlot92();
+    virtual void UnknownRacerVirtualSlot93();
+    virtual void UnknownRacerVirtualSlot94(); // slot 10 calls it while TrackGameMode+0xa88 is set
 
     int UnknownFunction495c00();              // 0x00495c00 (KrustyBike.cpp's code)
 
@@ -226,7 +300,13 @@ public:
     // 0x004933e0 (KrustyBike.cpp's code): applies message 13 to a state.
     void UnknownFunction4933e0(UnknownBikeRaceNetMessage13* message, UnknownBikeRaceRacerPart* part);
 
-    unsigned char field_0x008[0x109 - 0x08];
+    unsigned char field_0x008[0x18 - 0x08];
+    Vector3 field_0x018;                      // the flag carried above it (slot 10)
+    unsigned char field_0x024[0x64 - 0x24];
+    Vector3 field_0x064;                      // velocity (cleared for a remote player's racer)
+    unsigned char field_0x070[0xbc - 0x70];
+    int field_0x0bc;
+    unsigned char field_0x0c0[0x109 - 0xc0];
     bool field_0x109;                         // set on a restart
     unsigned char field_0x10a[0x10c - 0x10a];
     Vector3 field_0x10c;                      // start position (0x004210f0)
@@ -246,19 +326,26 @@ public:
     int field_0x738;                          // engine size
     unsigned char field_0x73c[0x740 - 0x73c];
     UnknownBikeRaceRacerInfo* field_0x740;
-    unsigned char field_0x744[0x74c - 0x744];
+    UnknownEventRacerPart* field_0x744;       // race status node (RaceView.h)
+    unsigned char field_0x748[0x74c - 0x748];
     float field_0x74c;
     float field_0x750;
     unsigned char field_0x754[0x768 - 0x754];
     float field_0x768;                        // score (network message 10)
-    unsigned char field_0x76c[0x7a0 - 0x76c];
+    unsigned char field_0x76c[0x770 - 0x76c];
+    int field_0x770;                          // replayed from message 1's +0x2c
+    unsigned char field_0x774[0x7a0 - 0x774];
     unsigned short field_0x7a0;
-    unsigned char field_0x7a2[0x7b8 - 0x7a2];
+    unsigned char field_0x7a2[0x7a4 - 0x7a2];
+    char field_0x7a4;                         // finished
+    unsigned char field_0x7a5[0x7b8 - 0x7a5];
     int field_0x7b8;
     int field_0x7bc;
     unsigned char field_0x7c0[0x11b8 - 0x7c0];
     unsigned char field_0x11b8;
-    unsigned char field_0x11b9[0x11c8 - 0x11b9];
+    unsigned char field_0x11b9[0x11bc - 0x11b9];
+    int field_0x11bc;                         // recorder id (0x00421d50 matches records by it)
+    unsigned char field_0x11c0[0x11c8 - 0x11c0];
     UnknownBikeRaceRacerPart* field_0x11c8[4];
     unsigned char field_0x11d8[0x1358 - 0x11d8];
     Vector3 field_0x1358;
@@ -268,6 +355,8 @@ public:
     int field_0x1380;
     int field_0x1384;
     int field_0x1388;
+    unsigned char field_0x138c[0x13f8 - 0x138c];
+    float field_0x13f8;                       // reset to FLT_MAX / 2 on a new lap (slot 10)
 };
 
 // A racer's network state (0x58 bytes, network message 1).
@@ -280,7 +369,9 @@ struct UnknownBikeRaceNetState {
     int field_0x14;
     int field_0x18;
     int field_0x1c;
-    unsigned char field_0x20[0x30 - 0x20];
+    unsigned char field_0x20[0x28 - 0x20];
+    float field_0x28;
+    int field_0x2c;
     Vector3 field_0x30;
     Vector3 field_0x3c;
     unsigned char field_0x48[0x4c - 0x48];
@@ -387,6 +478,9 @@ void operator delete(void* p, const char* file, int line);
 class UnknownBikeRaceProjector {
 public:
     void UnknownFunction507c10(Vector3* point, int a, int b, int c); // 0x00507c10
+
+    unsigned char field_0x00[0x40];
+    float field_0x40;                         // scales the start grid (0x004210f0)
 };
 
 // A GameObject's +0x25 flags, which GameObject.h keeps protected
@@ -519,6 +613,82 @@ struct UnknownBikeRacePickObject {
     int field_0x3c;
 };
 
+// The replay recorder's record kinds -1 (a tick) carry the time played and
+// the tick count.
+struct UnknownBikeRaceVcrTick {
+    float field_0x00;
+    int field_0x04;
+};
+
+// Record kind 0x11: the ghost's state (0x3c bytes).
+struct UnknownBikeRaceGhostRecord {
+    int field_0x00;
+    Vector3 field_0x04;
+    int field_0x10;
+    int field_0x14;
+    int field_0x18;
+    Vector3 field_0x1c;
+    Vector3 field_0x28;
+    int field_0x34;
+    int field_0x38;
+};
+
+// One of the ghost's four received states (newest first).
+struct UnknownBikeRaceGhostPart {
+    UnknownBikeRaceGhostRecord field_0x00;
+    int field_0x3c;                           // the record's time
+    int field_0x40;                           // fresh
+};
+
+// Record kind 0x87: the racer the ghost follows (by its +0x11bc id).
+struct UnknownBikeRaceVcrFollow {
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;
+};
+
+// TrackGame+0x568's +0xdc object as the replay recorder callback reaches it
+// (TrackGame.h keeps the type for 0x004a9d10's symbol): the ghost bike.
+class UnknownBikeRaceGhost {
+public:
+    // 0x004a9aa0: applies record kind 0x10 to a state (as 0x004933e0).
+    void UnknownFunction4a9aa0(void* record, UnknownBikeRaceGhostPart* part);
+
+    unsigned char field_0x000[0x4f8];
+    int field_0x4f8;                          // has a state
+    UnknownBikeRaceGhostPart* field_0x4fc[4];
+    unsigned char field_0x50c[0x5d4 - 0x50c];
+    Vector3 field_0x5d4;
+    Vector3 field_0x5e0;
+    Vector3 field_0x5ec;
+    int field_0x5f8;
+    int field_0x5fc;
+    int field_0x600;
+    int field_0x604;
+};
+
+// KrustyUI+0x48 records (0xc8 bytes; slot 10's debug page names the
+// player's bike model from +0x40) and the KrustyUI+0x50 records (0x94
+// bytes) whose +0 indexes them.
+struct UnknownBikeRaceUiModel {
+    unsigned char field_0x00[0x40];
+    char field_0x40[0xc8 - 0x40];
+};
+
+struct UnknownBikeRaceUiChoice {
+    int field_0x00;
+    unsigned char field_0x04[0x94 - 0x04];
+};
+
+// Game+0x34, the second root object, seen for GameObject's name switches
+// 0x00468dd0 and 0x00468f10 (protected in GameObject.h), which slot 10
+// applies to the sound and effect children by name.
+class UnknownBikeRaceRoot {
+public:
+    void UnknownFunction468dd0(const char* name);
+    void UnknownFunction468f10(const char* name);
+};
+
 // The debug lines' row counter (0x00567a88).
 extern int g_UnknownGlobal567a88;
 
@@ -526,6 +696,9 @@ class BikeRace : public GraphicsTest {
 public:
     explicit BikeRace(int flags);             // 0x00417c30
     virtual ~BikeRace();                      // 0x0041cf30 (deleting wrapper 0x00417eb0)
+    // 0x0041d2b0: per frame: the replay recorder, the race start, the
+    // flag girl and the debug page.
+    virtual int UnknownVirtualSlot10(float frameTime);
     // 0x00423410: debug drawing (the track, the probes and the debug lines
     // other files leave in globals) while +0x34 is set.
     virtual int UnknownVirtualSlot14();
@@ -634,8 +807,10 @@ public:
     int field_0x154;
     int field_0x158;                          // racer count
     float field_0x15c;
-    int field_0x160;
-    unsigned char field_0x164[0x188 - 0x164];
+    float field_0x160;                        // seconds until +0x64 is shown (slot 10)
+    Vector3 field_0x164;                      // start grid: first slot (0x004210f0)
+    Vector3 field_0x170;                      // start grid: step between slots
+    Vector3 field_0x17c;                      // start grid: direction
     bool field_0x188;
     unsigned char field_0x189;
     bool field_0x18a;                         // racing
@@ -652,12 +827,12 @@ public:
     KrustyVCR* field_0x1a0;                   // replay being recorded or played
     KrustyVCR* field_0x1a4;                   // ghost
     UnknownVcrFile* field_0x1a8;
-    int field_0x1ac;
+    float field_0x1ac;                        // the record slot 10 queues (+0x1ac..+0x1b7)
     int field_0x1b0;
     int field_0x1b4;
     float field_0x1b8;                        // replay time
     float field_0x1bc;                        // replay length
-    int field_0x1c0;
+    float field_0x1c0;                        // seconds since the last recorder tick (slot 10)
     float field_0x1c4;                        // replay seek target, -1 when none
     float field_0x1c8;
     float field_0x1cc;                        // "VCRGhostTimeLimit"

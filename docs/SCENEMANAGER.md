@@ -27,8 +27,8 @@ type, member and function names are provisional.
   - Overridden slots: 0 (deleting destructor `0x004ea7c0`), 5, 7, 10, 14, 22
     and 23. Slot 10 (`0x004eab00`) is not reconstructed.
 - Function starts in the extent (call targets, data references and
-  post-padding starts, minus jump-table targets): 54. Matched: 51; one
-  near miss, two not reconstructed.
+  post-padding starts, minus jump-table targets): 54. Matched: 51; two
+  near misses, one not reconstructed.
 - `UnknownTrackGameObject574` (TrackGame+0x574) has its constructor and
   scene-file helpers here: `0x004e99d0`..`0x004ea390`.
 - `0x004de580` (`ret 0xc`) and `0x00464e80` (`ret 4`) are shared empty
@@ -75,10 +75,20 @@ type, member and function names are provisional.
 
 - `UnknownSceneLight`, `UnknownSceneEnvironment`: the light and environment
   records; offsets from the readers, names from the section keys.
-- `UnknownSceneObject` (+0x0c, +0x10, +0x1a0, methods `0x004a8b40` and
-  `0x004a6bb0`), `UnknownSceneAnimatedObject` (a GameObject with +0x34,
-  +0x5c, +0x194) and `UnknownSceneLodObject` (`0x004444c0`, `0x004451e0`):
-  what the entry functions touch of the Soultree classes.
+- `UnknownSceneObject` is the key-framed entry's CollisionCharacter. It has
+  its own vfptr at +0, a vbptr at +4, the GameObject virtual base at +0x268
+  and fields +0x0c, +0x10, +0x1a0, +0x1a4 and +0x210. It stays a `struct`
+  so the bound mangled names keep `PAU`.
+- `UnknownSceneAnimatedObject` is the procedural entry's CarProcedural: a
+  GameObject with +0x34, +0x38/+0x3c, +0x5c and +0x194, plus slot 27.
+  Naming +0x20c as well changes VC6's code for `0x004eb570`.
+- `UnknownSceneLodObject` has `0x004444c0`, `0x004451e0`, `0x004fbd70` and
+  `0x004fc660`.
+
+  Together they are what the entry functions touch of the Soultree classes.
+- `UnknownSceneEntry` types +0x08 (the procedural object), +0x0c (a
+  `Vector3`) and +0x2c (the file name) and adds bit 5.
+  `UnknownSceneEntry2` types its index arrays as `signed char*`.
 - `UnknownFolded4de580`: a second declaration bound to the empty body
   `0x004de580`. In `0x004ebfc0` VC6 cross-jumps the "found" and "default"
   report calls when both call the same function; retail keeps them apart,
@@ -156,8 +166,36 @@ type, member and function names are provisional.
   sample. Shapes that mattered: nested `if`s for the missing-count and
   no-models messages, `model[0x44]` and `slt[0x108]` (retail's frame), the
   emitter loop inside `if (points > 0)` and `if (a2)`, inline keyword
-  lookups over local `{name, value}` tables, and 0.033333f.
-- `0x004edfe0` (5343 bytes): the "Animations" counterpart.
+  lookups over local `{name, value}` tables, and 0.033333f. These do not
+  change the store:
+  - other spellings of it (`*(p + n)`, `n[p]`, byte offsets from the
+    element);
+  - other clamp forms;
+  - reusing the function's other ints for the length and count.
+
+  `0x004edfe0` builds the same store from the same source shape, and
+  there VC6 matches retail.
+- `0x004edfe0` (5343 bytes) is a near miss in the same sample (4372 of
+  5346 compared positions): the "Animations" reader. Each "Animation<n>"
+  entry (`UnknownSceneEntry`, 0x44 bytes) is either key-framed (bit 3; a
+  `CollisionCharacter`, 0x294 bytes, constructor `0x004318d0`, loaded by
+  `0x004319c0`, motions from `0x004a6b30`) or procedural (a `CarProcedural`,
+  0x22c bytes, constructor `0x0042f390`, slot 27). The "RandomSet<n>"
+  sections fill `UnknownSceneEntry2`. Code, calls, EH states and the frame
+  size line up. What differs:
+  - the frame slots of most scalars and of two buffers;
+  - one count comparison;
+  - the grouping of the shared "Cannot find %s" error tails;
+  - the load order at the end of the random-set loop.
+
+  VC6 orders this frame by use, not by declaration or name. Shapes that
+  mattered:
+  - `length > 0x103 ? 0x103 : length` through a separate variable;
+  - the MotionSequence/NumberInSequence checks nested as if/else, with the
+    inner error placed first;
+  - `for (m...; m++)` with `m + 1` passed to sprintf;
+  - the sound node chosen by if/else on full member expressions;
+  - `strrchr` for the ".col" name.
 - `0x004f17a0` lies after the player-record initializers that open
   SelectGamePicProcs.cpp.
 
