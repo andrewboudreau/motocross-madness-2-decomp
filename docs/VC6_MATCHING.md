@@ -337,9 +337,10 @@ allocation in other translation units.
 
 Subject to the open-PR check, prefer:
 
-1. `PCGame` profile loader `0x004c16f0` (767/771 bytes): the behavior, extent and
-   calls are already reconstructed; only the copy loop's SIB base/index choice
-   differs.
+1. `PCGame` profile loader `0x004c16f0`: exact in `PCGame.cpp`. The copy
+   loop's SIB base/index order follows the index expression: a count-down
+   loop with a `count - remaining` index puts the induction register first;
+   ascending `i`, pointer walks, `i[table]` and byte offsets do not.
 2. `ControlInterface` update `0x0043cf00`: the devices, event layout and dispatch
    are established, and the remaining discrepancy is confined to modifier null
    handling.

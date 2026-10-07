@@ -2614,6 +2614,15 @@ CASES = [
         'reason': 'global display array loop',
     },
     {
+        'name': 'PCGame load display profile 0x4c16f0',
+        'bindings': 'src/reconstructed/PCGame.bindings.json',
+        'source': 'src/reconstructed/PCGame.cpp',
+        'symbol': '?LoadDisplayProfile@PCGame@@QAEHPAUUnknownDisplay@@@Z',
+        'target_va': '0x004c16f0',
+        'target_size': 771,
+        'reason': 'DriverInfo\\%s strings; __LINE__ 1726/1841/1844 DebugMalloc/DebugFree; count-down copy loop',
+    },
+    {
         'name': 'PCGame stale profile check 0x4c1410',
         'bindings': 'src/reconstructed/PCGame.bindings.json',
         'source': 'src/reconstructed/PCGame.cpp',
