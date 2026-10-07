@@ -13,19 +13,23 @@ void UnknownFunction488bd0(char* text, float seconds);
 // RTTI: ExitDlg : UIDialog (vtable 0x00554ca0).
 class ExitDlg : public UIDialog {
 public:
+    ExitDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004886e0
 
     unsigned char field_0x2c[0x30 - 0x2c];
     GUIManager* field_0x30;
+    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: ContinueDlg : UIDialog (vtable 0x00554d24).
 class ContinueDlg : public UIDialog {
 public:
+    ContinueDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00488ad0
 
     unsigned char field_0x2c[0x30 - 0x2c];
     GUIManager* field_0x30;
+    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: VCRDlg : UIDialog (vtable 0x00550d94): the replay controls.

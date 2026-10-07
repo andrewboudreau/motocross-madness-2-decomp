@@ -26,7 +26,7 @@ ends with the shared dialog deleting destructor and its vector set:
 
 ## Status
 
-Exact (35 functions):
+Exact (43 functions, including the open-menu routine `0x00499b20`):
 - the constructor `0x004987f0`. Eight 8-byte `{int, char}` records at
   +0x634 have an inline constructor, so VC6 emits the clearing loop before
   the vtable store; the body then clears the other fields in retail order;
@@ -64,6 +64,19 @@ Exact (35 functions):
 - `0x0049bbb0` / `0x0049bc50`: record the race in the high-score tables at
   TrackGame+0x3400 (table 0, then 1 and 2 by laps 5/10 or, in modes 0 and 4,
   by the +0x140 setting 5.0/10.0);
+- `0x00498cf0` (3114 bytes): builds the garage scene at +0x464 on the
+  first call with 1 or -1 (camera, light manager and three lights, the
+  "UIgarage.mcf" and "UIRider.mcf" characters, a ProjectedShadow and its
+  D3DIMSoultreeShadow) and with 2 or -1 later loads every bike model
+  ("Animations\UIbike\%s", "WaitB") with its plate number once. Its six
+  static vectors have an empty destructor (a `Vector3` subclass), which
+  gives the six empty exit handlers `0x00499920`–`0x00499970` (also exact,
+  `_$E14`..`_$E19`). Source shapes: one function-scope 260-byte buffer, the
+  render target read through a cast each time (a local adds a register
+  copy), and an inline helper for "add the light when there is one" —
+  written out three times, VC6 forms the bike loop's addresses as
+  [offset + list] instead of [list + offset]. The views it calls are local
+  to `KrustyUI.cpp`;
 - `0x0049bdb0` and the eight `$E` thunks/bodies `0x0049bdd0..0x0049bed0`.
 
 The random helper `RandomUnit()` returns `(float)(rand() * (1.0f / 32768))`.
@@ -93,10 +106,7 @@ that TrackGame.cpp includes disturbs TrackGame slot 1 (see
 [TrackGame](TRACKGAME.md)). The +0x48/+0x50/+0x58 list entries are views
 local to KrustyUI.cpp for the same reason.
 
-Not reconstructed:
-- `0x00498cf0` (3114 bytes, with function-local statics; the empty
-  `0x00499920`–`0x00499970` are their exit destructors);
-- `0x00499b20` (2432 bytes): opens menu `id` through a sparse switch that
-  allocates 18 dialog classes (MainDlg, LoadingDlg, NetProcs/InGameProcs/
-  ProCircuitProcs dialogs, ...). Most of those classes have no inline
-  constructor declared in their headers yet.
+`0x00499b20` (2432 bytes, exact): opens menu `id` through a sparse switch
+that allocates 18 dialog classes (MainDlg, LoadingDlg, NetProcs/InGameProcs/
+ProCircuitProcs dialogs, ...). Their headers gained inline constructors
+(`UIDialog(1, "<name>.dtm")`) padded to the retail allocation size 0x7f58.

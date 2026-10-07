@@ -25,6 +25,15 @@
 #include "Track.h"
 #include "TrackGame.h"
 
+// A truncating copy into a `size`-byte buffer (as in DlgProcs.cpp).
+#define COPY_TEXT(dest, source, size)                              \
+    {                                                              \
+        int length = strlen(source);                               \
+        int copied = length > (size) - 1 ? (size) - 1 : length;    \
+        strncpy(dest, source, copied);                             \
+        (dest)[copied] = 0;                                        \
+    }
+
 // The four vector constants many retail files declare: 0x00689ce8,
 // 0x00689cf8, 0x00689db0 and 0x00689cd8. Their initializers
 // (0x004f9620..0x004f975b) follow this file's last function rather than
@@ -44,6 +53,27 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 // SceneManager.cpp's, the array lies inside this file's .bss block, and
 // only this file's code reads it.
 PlayerInfoType g_UnknownGlobal689d08[7];
+
+// d3drm.dll's D3DRMVectorRotate (declared as in FollowCamera.h): rotates
+// `vector` about `axis` by `theta`.
+extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector, Vector3* axis,
+                                                float theta);
+
+// Inline vector helpers of the bike views (as in DlgProcs.cpp).
+static inline Vector3 UnknownVectorDifference(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+static inline Vector3 UnknownVectorSum(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+static inline Vector3& operator*=(Vector3& v, float scale) {
+    v.x *= scale;
+    v.y *= scale;
+    v.z *= scale;
+    return v;
+}
 
 int g_UnknownGlobal689df4;
 int g_UnknownGlobal689df8;
@@ -1071,6 +1101,69 @@ int MPBikeRiderDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInpu
         }
     }
     return UIDialog::UnknownVirtualSlot23(event, entry);
+}
+
+
+// 0x004f8d20
+void MPBikeRiderDlg::UnknownFunction4f8d20() {
+    char text[12];
+    UnknownGameUiControl* bikes = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+    KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+    UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->field_0x50)[bikes->UnknownFunction4768d0(-1)];
+    UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)ui->field_0x48)[bike->field_0x00];
+    int i;
+    // Retail re-reads TrackGame's KrustyUI after each model is hidden.
+    for (i = 0; i < ui->field_0x4c; i++) {
+        ((UnknownKrustyUIModel*)ui->field_0x48)[i].field_0xc0->UnknownVirtualSlot4();
+        ui = g_UnknownGlobal56e26c->ui;
+    }
+    model->field_0xc0->UnknownVirtualSlot5();
+    field_0x7f84 = 1;
+    if (bike->field_0x88) {
+        UnknownGameUiControl* engine = UnknownFunction46ebf0("DDLEngineSize", 0);
+        if (!engine->field_0x70) {
+            engine->UnknownFunction470660(1, 1);
+            UnknownFunction46ebf0("TxtEngineSize", 0)->UnknownFunction470660(1, 1);
+            if (field_0x110)
+                field_0x110->UnknownFunction404da0();
+            if (g_UnknownGlobal689df4)
+                engine->UnknownVirtualSlot49(0);
+        }
+    } else {
+        UnknownGameUiControl* engine = UnknownFunction46ebf0("DDLEngineSize", 0);
+        if (engine->field_0x70) {
+            engine->UnknownFunction470660(0, 1);
+            UnknownFunction46ebf0("TxtEngineSize", 0)->UnknownFunction470660(0, 1);
+            if (field_0x110)
+                field_0x110->UnknownFunction404da0();
+        }
+    }
+    g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4 = bikes->UnknownFunction4768d0(-1);
+    if (bike->field_0x88) {
+        UnknownGameUiControl* sizes = UnknownFunction46ebf0("DDLEngineSize", 6)->field_0x1fc;
+        int size = sizes->UnknownFunction4768d0(-1);
+        UNKNOWN_GARAGE_SETTINGS->field_0x00 = g_UnknownGlobal56cb6c[size];
+        UNKNOWN_GARAGE_SETTINGS->field_0x04 = size == 2 || size == 4 ? 1 : 0;
+        UNKNOWN_APPLY_BIKE_CLASS(size, i);
+        ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4]
+            .field_0x8c = UNKNOWN_GARAGE_SETTINGS->field_0x00;
+        ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4]
+            .field_0x90 = UNKNOWN_GARAGE_SETTINGS->field_0x04;
+    } else {
+        int row = bikes->UnknownFunction4768d0(-1);
+        UNKNOWN_GARAGE_SETTINGS->field_0x00 = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[row].field_0x8c;
+        UNKNOWN_GARAGE_SETTINGS->field_0x04 = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[row].field_0x90;
+        int bikeClass = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00);
+        UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
+    }
+    UnknownGameUiControl* plate = UnknownFunction46ebf0("EditPlateNumber", 0xb);
+    if (g_UnknownGlobal56e26c->mode.field_0x1bd0 > 0 && g_UnknownGlobal56e26c->mode.field_0x1bd0 < 101) {
+        g_UnknownGlobal56e26c->mode.field_0x1bcc = g_UnknownGlobal56e26c->mode.field_0x1bd0;
+        sprintf(text, "%d", g_UnknownGlobal56e26c->mode.field_0x1bcc);
+    } else {
+        _itoa(g_UnknownGlobal56e26c->mode.field_0x1bcc, text, 10);
+    }
+    plate->UnknownFunction473da0(text);
 }
 
 // 0x004f91e0

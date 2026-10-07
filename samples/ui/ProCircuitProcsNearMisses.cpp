@@ -29,6 +29,9 @@
 //   the translation unit flip it.
 // PCCentralBikeRiderDlg::UnknownFunction4d6fc0 (0x004d6fc0, 557 bytes, 555
 //   match): retail reloads the bike row offset into ecx, VC6 here into ebp.
+// PCCentralBikeRiderDlg::UnknownVirtualSlot10 (0x004d72c0, 1291 bytes, 1233
+//   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
+//   scheduling of the by-value Vector3 copies for the camera call differs.
 
 #include "../../src/reconstructed/ProCircuitProcs.cpp"
 
@@ -424,4 +427,65 @@ void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, in
             g_UnknownGlobal56e26c->UnknownFunction521970(0x1443, text, 128);
         UnknownFunction46ebf0(name, 3)->UnknownFunction476d80(text, row, 0);
     }
+}
+
+// 0x004d72c0: as SPBikeRiderDlg slot 10 (dlgprocs.cpp 0x0044fae0).
+int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
+{
+    if (field_0x110)
+        field_0x110->UnknownFunction404da0();
+    Vector3 offset;
+    Vector3 turned;
+    GUIInputDevice* pointer = field_0x34->field_0x2c;
+    if (pointer && field_0x7f78 && field_0x7f7c) {
+        float dx = (float)(pointer->field_0xa4.x - field_0x34->field_0x34);
+        field_0x7f58.y += (pointer->field_0xa4.y - field_0x34->field_0x38) * 0.1f;
+        field_0x7f58.y = __max(1.0f, __min(field_0x7f58.y, 10.0f));
+        offset = UnknownVectorDifference(field_0x7f58, g_UnknownGlobal56e26c->ui->field_0x474);
+        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
+        float distance = field_0x7f70;
+        turned *= distance;
+        field_0x7f58 = UnknownVectorSum(turned, g_UnknownGlobal56e26c->ui->field_0x474);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(&field_0x7f58, 0, 0, 0, 0);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(field_0x7f64);
+        field_0x7f78 = 1;
+        UnknownFunction46ebf0("ChkAutoRotate", 2)->UnknownFunction478cf0(0);
+    } else if (!field_0x7f78) {
+        offset = UnknownVectorDifference(field_0x7f58, g_UnknownGlobal56e26c->ui->field_0x474);
+        D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
+        turned *= field_0x7f70;
+        field_0x7f58 = UnknownVectorSum(turned, g_UnknownGlobal56e26c->ui->field_0x474);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(&field_0x7f58, 0, 0, 0, 0);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(field_0x7f64);
+    }
+    g_UnknownGlobal56e26c->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
+    g_UnknownGlobal56e26c->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
+    if (field_0x7f80 && rand() % 200 == 1) {
+        UnknownGameUiControl* bikes = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+        bikes->UnknownFunction4768d0(-1);
+        switch (rand() % 3) {
+        case 0:
+            g_UnknownGlobal56e26c->ui->field_0x46c->UnknownFunction4a8b10("LookLeftR");
+            break;
+        case 1:
+            g_UnknownGlobal56e26c->ui->field_0x46c->UnknownFunction4a8b10("LookRightR");
+            break;
+        case 2:
+            g_UnknownGlobal56e26c->ui->field_0x46c->UnknownFunction4a8b10("StretchR");
+            break;
+        }
+        field_0x7f80 = 0;
+    }
+    if (!field_0x7f80 && g_UnknownGlobal56e26c->ui->field_0x46c->field_0x0c) {
+        UnknownGameUiControl* bikes = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+        KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+        UnknownKrustyUIModel* model =
+            &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->UnknownFunction4768d0(-1)].field_0x00];
+        model->field_0xc0->UnknownFunction4a8b10("WaitB");
+        g_UnknownGlobal56e26c->ui->field_0x46c->UnknownFunction4a8b10("WaitR");
+        field_0x7f80 = 1;
+    }
+    if (field_0x110)
+        field_0x110->UnknownFunction404240(field_0x7f74, (CameraRect*)&field_0x7f8c);
+    return UIDialog::UnknownVirtualSlot10(frameTime);
 }

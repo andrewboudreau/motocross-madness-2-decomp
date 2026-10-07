@@ -5,15 +5,19 @@
 #include <string.h>
 
 #include "BackgroundImage.h"
+#include "Camera.h"
 #include "DebugAlloc.h"
+#include "../krusty2/math/FastMath.h"
 #include "InGameProcs.h"
 #include "MatrixUtil.h"
 #include "Net.h"
 #include "NetProcs.h"
 #include "OptionProcs.h"
+#include "ProCircuitProcs.h"
 #include "RenderTarget.h"
 #include "SelectGamePicProcs.h"
 #include "TrackGame.h"
+#include "TrackRecordDlg.h"
 
 // A truncating copy into a `size`-byte buffer. Retail evaluates `source`
 // once for the length and again for the copy, so this is a macro.
@@ -34,6 +38,42 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
+// d3drm.dll's D3DRMVectorRotate (declared as in FollowCamera.h): rotates
+// `vector` about `axis` by `theta`.
+extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector, Vector3* axis,
+                                                float theta);
+
+// Inline vector helpers of the bike views (D3D_OVERLOADS-style).
+static inline Vector3 UnknownVectorDifference(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+static inline Vector3 UnknownVectorSum(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+static inline float UnknownVectorLength(const Vector3& v) {
+    float lengthSquared = (v.x * v.x + v.y * v.y) + v.z * v.z;
+    if (lengthSquared == 1.0f)
+        return 1.0f;
+    return FastSqrt(lengthSquared);
+}
+
+static inline Vector3& operator*=(Vector3& v, float scale) {
+    v.x *= scale;
+    v.y *= scale;
+    v.z *= scale;
+    return v;
+}
+
+// dplay.h's service provider GUIDs (Net.cpp declares them the same way).
+extern "C" const GUID DPSPGUID_IPX;                     // 0x005567d0
+extern "C" const GUID DPSPGUID_TCPIP;                   // 0x005567e0
+extern "C" const GUID DPSPGUID_SERIAL;                  // 0x005567f0
+extern "C" const GUID DPSPGUID_MODEM;                   // 0x00556800
+
+// 0x0059adbc: the profile row "ButRemoveProfile" asked to remove.
+int g_UnknownGlobal59adbc;
 int g_UnknownGlobal59adfc;
 int g_UnknownGlobal59ae84;
 int g_UnknownGlobal59ae88;
@@ -487,6 +527,341 @@ void SinglePlayerDlg::UnknownFunction44d740(int page) {
     }
 }
 
+// 0x0044d950
+void SPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+    char text[128];
+    switch (event->field_0x08) {
+    case 5: {
+        UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00;
+        UnknownGameUiControl* list = UnknownFunction46ebf0("EventTypeDropDown", 6)->field_0x1fc;
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13ed, text, 0x80);
+        list->UnknownFunction476d80(text, 1, 0);
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13ee, text, 0x80);
+        list->UnknownFunction476d80(text, 0, 0);
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f0, text, 0x80);
+        list->UnknownFunction476d80(text, 5, 0);
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13ef, text, 0x80);
+        list->UnknownFunction476d80(text, 2, 0);
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f2, text, 0x80);
+        list->UnknownFunction476d80(text, 3, 0);
+        list->UnknownFunction476b30(settings->field_0x04);
+        list = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f3, text, 0x80);
+        list->UnknownFunction476d80(text, 0, 0);
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f4, text, 0x80);
+        list->UnknownFunction476d80(text, 1, 0);
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f5, text, 0x80);
+        list->UnknownFunction476d80(text, 2, 1);
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f6, text, 0x80);
+        list->UnknownFunction476d80(text, 4, 1);
+        list->UnknownFunction476a60(settings->field_0x00);
+        UnknownFunction46ebf0("OpponentsListBox", 0)->UnknownVirtualSlot54(&settings->field_0x24);
+        UnknownFunction46ebf0("ChkRecordRace", 0)->UnknownFunction470660(0, 1);
+        UnknownFunction46ebf0("RadLODEasy", 0)->UnknownVirtualSlot54(&g_UnknownGlobal56e26c->mode.field_0x94);
+        UnknownGameUiControl* gates = UnknownFunction46ebf0("LstNumGates", 3);
+        gates->UnknownFunction4775f0();
+        for (int i = 10; i <= 30; i++) {
+            _itoa(i, text, 10);
+            gates->UnknownFunction476d80(text, i, 0);
+        }
+        UnknownFunction46ebf0("EditSeed", 0xb)->UnknownFunction473f30("0123456789");
+        UnknownFunction46ecc0(0);
+        UnknownFunction44e3e0();
+        UnknownFunction44dfc0();
+        field_0x7f5c = 0;
+        field_0x7f58 = 0;
+        field_0x7f64 = 0;
+        field_0x7f60 = 0;
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4)
+            UnknownFunction44eb40();
+        break;
+    }
+    case 1:
+        if (!_stricmp("ChkRandomGates", event->field_0x04))
+            UnknownFunction44dfc0();
+        if (!_stricmp("TrackLeft", event->field_0x04)) {
+            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLTextBox", 6)->field_0x1fc;
+            int rows = list->field_0x1ec;
+            list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("TrackRight", event->field_0x04)) {
+            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLTextBox", 6)->field_0x1fc;
+            int rows = list->field_0x1ec;
+            list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("GhostLeft", event->field_0x04)) {
+            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLGhostRaces", 6)->field_0x1fc;
+            int rows = list->field_0x1ec;
+            list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("GhostRight", event->field_0x04)) {
+            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLGhostRaces", 6)->field_0x1fc;
+            int rows = list->field_0x1ec;
+            list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("SeedLeft", event->field_0x04)) {
+            char seed[32];
+            UnknownGameUiControl* edit = UnknownFunction46ebf0("EditSeed", 0xb);
+            edit->UnknownFunction473ef0(seed, 32);
+            int value = atoi(seed) - 1;
+            if (value < 0)
+                value = 999;
+            _itoa(value, seed, 10);
+            edit->UnknownFunction473da0(seed);
+            field_0x34->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+        } else if (!_stricmp("SeedRight", event->field_0x04)) {
+            char seed[32];
+            UnknownGameUiControl* edit = UnknownFunction46ebf0("EditSeed", 0xb);
+            edit->UnknownFunction473ef0(seed, 32);
+            int value = atoi(seed) + 1;
+            if (value > 999)
+                value = 0;
+            _itoa(value, seed, 10);
+            edit->UnknownFunction473da0(seed);
+            field_0x34->UnknownFunction487790((UnknownGuiControl*)edit, 0, 0);
+        } else if (!_stricmp("OpponentsLeftArrow", event->field_0x04) ||
+                   !_stricmp("OpponentsRightArrow", event->field_0x04)) {
+            UnknownFunction44dfc0();
+        }
+        break;
+    case 2:
+        if (!_stricmp("RaceModeDropDown", event->field_0x04)) {
+            if (event->field_0x14->UnknownFunction4768d0(-1) == 4)
+                UnknownFunction44eb40();
+            if (event->field_0x14->UnknownFunction4768d0(-1) != 2) {
+                g_UnknownGlobal56e26c->mode.field_0x10ec = 0;
+                g_UnknownGlobal56e26c->eventManager->field_0x48 = 0;
+            }
+            UnknownFunction44dfc0();
+        } else if (!_stricmp("EventTypeDropDown", event->field_0x04)) {
+            UnknownFunction46ecc0(1);
+            UnknownFunction44e3e0();
+            UnknownFunction44dfc0();
+            UnknownFunction44eb40();
+        } else if (!_stricmp("DDLTextBox", event->field_0x04)) {
+            UnknownFunction44eb40();
+            strcpy(g_UnknownGlobal56e26c->mode.field_0x6f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04],
+                   event->field_0x14->UnknownFunction476d20(-1));
+        }
+        break;
+    }
+}
+
+// 0x0044dfc0: shows the controls that apply to the chosen race mode.
+void SPEventDlg::UnknownFunction44dfc0() {
+    char text[32];
+    UnknownGameUiControl* record = UnknownFunction46ebf0("ChkRecordRace", 0);
+    UnknownGameUiControl* modes = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+    int mode = modes->UnknownFunction4768d0(-1);
+    UnknownGameUiControl* lapsBox = UnknownFunction46ebf0("LapsControlBox", 5);
+    UnknownGameUiControl* racesBox = UnknownFunction46ebf0("RacesControlBox", 5);
+    UnknownGameUiControl* ghostBox = UnknownFunction46ebf0("GhostBox", 5);
+    UnknownGameUiControl* opponentsBox = UnknownFunction46ebf0("OpponentsControlBox", 5);
+    opponentsBox->UnknownFunction470660(1, 1);
+    record->UnknownFunction470660(0, 1);
+    ghostBox->UnknownFunction470660(0, 1);
+    UnknownFunction46eb30(0x3f3, 1);
+    switch (mode) {
+    case 0:
+        lapsBox->UnknownFunction470660(0, 1);
+        racesBox->UnknownFunction470660(0, 1);
+        break;
+    case 1:
+        lapsBox->UnknownFunction470660(1, 1);
+        racesBox->UnknownFunction470660(0, 1);
+        break;
+    case 2:
+        lapsBox->UnknownFunction470660(1, 1);
+        racesBox->UnknownFunction470660(1, 1);
+        break;
+    case 4:
+        opponentsBox->UnknownFunction470660(0, 1);
+        lapsBox->UnknownFunction470660(0, 1);
+        racesBox->UnknownFunction470660(0, 1);
+        record->UnknownFunction470660(0, 1);
+        ghostBox->UnknownFunction470660(1, 1);
+        UnknownFunction46eb30(0x3f3, 0);
+        break;
+    }
+    UnknownGameUiControl* waypoints = UnknownFunction46ebf0("WaypointBox", 5);
+    UnknownTrackGameModeSettings& settings = g_UnknownGlobal56e26c->mode.field_0x27f8;
+    if (settings.field_0x04 == 1 && modes->UnknownFunction4768d0(-1) != 4) {
+        waypoints->UnknownFunction470660(1, 1);
+        if (UnknownFunction46ebf0("ChkRandomGates", 2)->UnknownFunction4755c0()) {
+            UnknownFunction46ea80(0x6f, 1);
+            UnknownFunction46ebf0("LstNumGates", 0)->UnknownFunction470660(1, 1);
+            UnknownFunction46ebf0("EditSeed", 0)->UnknownFunction470660(1, 1);
+        } else {
+            UnknownFunction46ea80(0x6f, 0);
+            UnknownFunction46ebf0("LstNumGates", 0)->UnknownFunction470660(0, 1);
+            UnknownFunction46ebf0("EditSeed", 0)->UnknownFunction470660(0, 1);
+        }
+    } else {
+        waypoints->UnknownFunction470660(0, 1);
+    }
+    UnknownGameUiControl* racesLeft = UnknownFunction46ebf0("RacesLeftArrow", 9);
+    UnknownGameUiControl* racesRight = UnknownFunction46ebf0("RacesRightArrow", 0xa);
+    UnknownGameUiControl* opponentsLeft = UnknownFunction46ebf0("OpponentsLeftArrow", 0);
+    UnknownGameUiControl* opponentsRight = UnknownFunction46ebf0("OpponentsRightArrow", 0);
+    UnknownGameUiControl* racesLabel = UnknownFunction46ebf0("RacesLabel", 0xc);
+    UnknownGameUiControl* races = UnknownFunction46ebf0("RacesListBox", 3);
+    UnknownGameUiControl* opponents = UnknownFunction46ebf0("OpponentsListBox", 3);
+    races->UnknownFunction4775f0();
+    for (int i = 3; i <= 7; i += 2) {
+        sprintf(text, "%d", i);
+        races->UnknownFunction476d80(text, i - 1, 0);
+    }
+    races->UnknownFunction476b30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c);
+    if (settings.field_0x00 == 2 && g_UnknownGlobal56e26c->mode.field_0x10ec) {
+        opponentsLeft->UnknownFunction470660(0, 1);
+        opponentsRight->UnknownFunction470660(0, 1);
+        opponents->UnknownVirtualSlot49(0);
+        racesLeft->UnknownFunction470660(0, 1);
+        racesRight->UnknownFunction470660(0, 1);
+        racesLabel->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x92b);
+        sprintf(text, "%d/%d", g_UnknownGlobal56e26c->eventManager->field_0x48 + 1,
+                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c + 1);
+        races->UnknownFunction4775f0();
+        races->UnknownFunction476d80(text, 0, 0);
+    } else {
+        opponentsLeft->UnknownFunction470660(1, 1);
+        opponentsRight->UnknownFunction470660(1, 1);
+        opponents->UnknownVirtualSlot49(1);
+        racesLeft->UnknownFunction470660(1, 1);
+        racesRight->UnknownFunction470660(1, 1);
+        racesLabel->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x92a);
+    }
+}
+
+// 0x0044e3e0: fills the race mode, opponent and lap lists for the chosen
+// event type and lists its tracks.
+void SPEventDlg::UnknownFunction44e3e0() {
+    char label[64];
+    char text[256];
+    UnknownGameUiControl* types = UnknownFunction46ebf0("EventTypeDropDown", 6)->field_0x1fc;
+    int type = types->UnknownFunction4768d0(-1);
+    UnknownTrackGameModeSettings& settings = g_UnknownGlobal56e26c->mode.field_0x27f8;
+    settings.field_0x04 = type;
+    g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(type);
+    UnknownGameUiControl* modes = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+    int row = ((UIListBox*)modes)->UnknownFunction476900(4);
+    if (type == 0) {
+        if (row != -1) {
+            if (modes->UnknownFunction476950() == row) {
+                modes->UnknownFunction476b30(0);
+                settings.field_0x00 = 0;
+            }
+            modes->UnknownFunction477490(row);
+        }
+    } else if (row == -1) {
+        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f6, label, 128);
+        modes->UnknownFunction476d80(label, 4, 1);
+    }
+    UnknownGameUiControl* lapsLabel = UnknownFunction46ebf0("LapsLabel", 0xc);
+    UnknownGameUiControl* opponents = UnknownFunction46ebf0("OpponentsListBox", 3);
+    UnknownGameUiControl* laps = UnknownFunction46ebf0("LapsListBox", 3);
+    UnknownFunction46ebf0("RacesListBox", 3);
+    lapsLabel->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x929);
+    opponents->UnknownFunction4775f0();
+    int i;
+    for (i = 0; i <= 4; i++) {
+        sprintf(text, "%d", i);
+        opponents->UnknownFunction476d80(text, i, 0);
+    }
+    laps->UnknownFunction4775f0();
+    for (i = type == 2 || type == 3 ? 2 : 1; i <= 5; i++) {
+        sprintf(text, "%d", i);
+        laps->UnknownFunction476d80(text, i, 0);
+    }
+    laps->UnknownFunction476b30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20);
+    if (type == 0) {
+        lapsLabel->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x92f);
+        laps->UnknownFunction4775f0();
+        for (i = 2; i <= 5; i++) {
+            sprintf(text, "%dm", i);
+            laps->UnknownFunction476d80(text, i, 0);
+        }
+        laps->UnknownFunction476b30((int)g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140);
+    }
+    if (settings.field_0x04 == 0) {
+        g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(0);
+        UnknownFunction4f3080(1, "PictureBox", "DDLTextBox", 0, this, 0);
+        g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(5);
+        UnknownFunction4f3080(1, "PictureBox", "DDLTextBox", 0, this, 1);
+    } else {
+        UnknownFunction4f3080(1, "PictureBox", "DDLTextBox", 0, this, 0);
+    }
+    UnknownFunction46ecc0(0);
+    g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(type);
+    UnknownGameUiControl* tracks = UnknownFunction46ebf0("DDLTextBox", 6)->field_0x1fc;
+    tracks->UnknownFunction476ad0(g_UnknownGlobal56e26c->mode.field_0x6f4[type]);
+}
+
+// 0x0044e6c0
+void SPEventDlg::UnknownVirtualSlot31(int apply) {
+    char seed[128];
+    UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00;
+    if (apply) {
+        if (settings->field_0x04 != 0 && settings->field_0x04 != 4)
+            settings->field_0x20 = UnknownFunction46ebf0("LapsListBox", 3)->UnknownFunction4768d0(-1);
+        else
+            settings->field_0x140 = (float)UnknownFunction46ebf0("LapsListBox", 3)->UnknownFunction4768d0(-1);
+        if (!g_UnknownGlobal56e26c->mode.field_0x10ec)
+            settings->field_0x0c = UnknownFunction46ebf0("RacesListBox", 3)->UnknownFunction4768d0(-1);
+        settings->field_0x10 = UnknownFunction46ebf0("ChkTreeCollision", 2)->UnknownFunction4755c0();
+        strcpy(settings->field_0x36, "");
+        UnknownGameUiControl* list = UnknownFunction46ebf0("DDLTextBox", 6)->field_0x1fc;
+        int index = list->UnknownFunction4768d0(-1);
+        {
+            char* name = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x14;
+            int length = strlen(name);
+            int count = length > 0xff ? 0xff : length;
+            strncpy(settings->field_0x36, name, count);
+            settings->field_0x36[count] = 0;
+        }
+        g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x08);
+        settings->field_0x34 = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x04;
+        strcpy(g_UnknownGlobal56e26c->mode.field_0x6f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04], list->UnknownFunction476d20(-1));
+        g_UnknownGlobal56e26c->mode.field_0x9f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04] = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34;
+        if (UnknownFunction46ebf0("ChkRandomGates", 2)->UnknownFunction4755c0())
+            settings->field_0x2c = 1;
+        else
+            settings->field_0x2c = 0;
+        settings->field_0x2d = UnknownFunction46ebf0("LstNumGates", 3)->UnknownFunction4768d0(-1);
+        UnknownFunction46ebf0("EditSeed", 0xb)->UnknownFunction473ef0(seed, 128);
+        settings->field_0x30 = atoi(seed);
+        list = UnknownFunction46ebf0("EventTypeDropDown", 6)->field_0x1fc;
+        settings->field_0x04 = list->UnknownFunction4768d0(-1);
+        list = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+        settings->field_0x00 = list->UnknownFunction4768d0(-1);
+        list = UnknownFunction46ebf0("DDLGhostRaces", 6)->field_0x1fc;
+        int ghost = list->UnknownFunction4768d0(-1);
+        if (settings->field_0x00 == 4 && ghost != -1) {
+            COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x25ec, field_0x7f60[ghost], 0x104);
+            // KrustyUI+0x4b4 holds the header of the ghost raced against.
+            *(UnknownRecordFileHeader*)((unsigned char*)g_UnknownGlobal56e26c->ui + 0x4b4) = field_0x7f58[ghost];
+        } else {
+            g_UnknownGlobal56e26c->mode.field_0x25ec[0] = 0;
+        }
+    } else {
+        UnknownFunction46ebf0("RacesListBox", 3)->UnknownFunction476b30(settings->field_0x0c);
+        UnknownFunction46ebf0("ChkRandomGates", 2)->UnknownFunction478cf0(settings->field_0x2c);
+        UnknownFunction46ebf0("LstNumGates", 3)->UnknownFunction476b30(settings->field_0x2d);
+        _itoa(settings->field_0x30, seed, 10);
+        UnknownFunction46ebf0("EditSeed", 0xb)->UnknownFunction473da0(seed);
+        UnknownGameUiControl* laps = UnknownFunction46ebf0("LapsListBox", 3);
+        if (settings->field_0x04 != 0 && settings->field_0x04 != 4)
+            laps->UnknownFunction476b30(settings->field_0x20);
+        else
+            laps->UnknownFunction476b30((int)settings->field_0x140);
+        UnknownFunction46ebf0("ChkTreeCollision", 2)->UnknownFunction478cf0(settings->field_0x10);
+        UnknownGameUiControl* list = UnknownFunction46ebf0("EventTypeDropDown", 6)->field_0x1fc;
+        list->UnknownFunction476b30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04);
+        list = UnknownFunction46ebf0("RaceModeDropDown", 6)->field_0x1fc;
+        list->UnknownFunction476b30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00);
+    }
+}
+
 // 0x0044eb40
 void SPEventDlg::UnknownFunction44eb40() {
     char path[260];
@@ -559,6 +934,128 @@ void SPEventDlg::UnknownFunction44eed0() {
     field_0x7f5c = 0;
 }
 
+// 0x0044ef70
+void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+    char plate[12];
+    char typed[12];
+    switch (event->field_0x08) {
+    case 5: {
+        field_0x7f78 = 0;
+        UnknownFunction46ebf0("ChkAutoRotate", 2)->UnknownFunction478cf0(1);
+        g_UnknownGlobal56e26c->mode.field_0x9c = 0;
+        field_0x7f88 = 1;
+        field_0x7f84 = 1;
+        UnknownFunction44f750();
+        UnknownGameUiControl* list = UnknownFunction46ebf0("DDLEngineSize", 6)->field_0x1fc;
+        list->UnknownFunction4775f0();
+        list->UnknownFunction476d80("125cc 2-stroke", UnknownBikeClassOf(125), 0);
+        list->UnknownFunction476d80("250cc 2-stroke", UnknownBikeClassOf(250), 0);
+        list->UnknownFunction476d80("400cc 4-stroke", UnknownBikeClassOf(400), 0);
+        list->UnknownFunction476d80("500cc 2-stroke", UnknownBikeClassOf(500), 0);
+        list->UnknownFunction476d80("600cc 4-stroke", UnknownBikeClassOf(600), 0);
+        list->UnknownFunction476b30(UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00));
+        UnknownGameUiControl* edit = UnknownFunction46ebf0("EditPlateNumber", 0xb);
+        edit->UnknownFunction473f30("0123456789");
+        g_UnknownGlobal56e26c->ui->UnknownFunction4999f0(this);
+        Vector3* eye = &field_0x7f58;
+        field_0x7f8c.left = 0x5b;
+        field_0x7f8c.right = 0x21f;
+        field_0x7f8c.top = 0x6c;
+        field_0x7f8c.bottom = 0x148;
+        *eye = kVec3Zero;
+        float fov = 50.0f;
+        Vector3* target = &field_0x7f64;
+        field_0x7f58.z = 15.0f;
+        field_0x7f58.y = 1.0f;
+        *target = g_UnknownGlobal56e26c->ui->field_0x474;
+        field_0x7f64.y += 3.0f;
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(eye, 0, 0, 0, (int)&fov);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(*target);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42f190(
+            field_0x7f8c.left, field_0x7f8c.top, field_0x7f8c.right - field_0x7f8c.left,
+            field_0x7f8c.bottom - field_0x7f8c.top);
+        field_0x7f70 = UnknownVectorLength(UnknownVectorDifference(*eye, g_UnknownGlobal56e26c->ui->field_0x474));
+        UnknownFunction4500d0();
+        UnknownFunction4500e0();
+        UnknownFunction44f950(g_UnknownGlobal56e26c->mode.field_0x1bcc);
+        srand(ReadClock());
+        if (field_0x110)
+            field_0x7f74 = field_0x110->UnknownFunction4040f0(1);
+        break;
+    }
+    case 2:
+        if (!_stricmp("DDLBikes", event->field_0x04))
+            UnknownFunction4500e0();
+        else if (!_stricmp("DDLRiders", event->field_0x04))
+            UnknownFunction4500d0();
+        else if (!_stricmp("DDLEngineSize", event->field_0x04))
+            UnknownFunction4500e0();
+        break;
+    case 1:
+        if (!_stricmp("BikeLeft", event->field_0x04)) {
+            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+            int rows = list->field_0x1ec;
+            list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("BikeRight", event->field_0x04)) {
+            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+            int rows = list->field_0x1ec;
+            list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("RiderLeft", event->field_0x04)) {
+            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+            int rows = list->field_0x1ec;
+            list->UnknownFunction476a60((list->UnknownFunction476950() + rows - 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("RiderRight", event->field_0x04)) {
+            UnknownGameUiControl* list = UnknownFunction46ebf0("DDLRiders", 6)->field_0x1fc;
+            int rows = list->field_0x1ec;
+            list->UnknownFunction476a60((list->UnknownFunction476950() + 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("ChkAutoRotate", event->field_0x04)) {
+            field_0x7f78 = !UnknownFunction46ebf0("ChkAutoRotate", 2)->UnknownFunction4755c0();
+        } else if (!_stricmp("ButWrench", event->field_0x04)) {
+            OptionsDlg* dialog = new(__FILE__, 2135) OptionsDlg;
+            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, field_0x2c, 2, 0, 1);
+        }
+        break;
+    case 10:
+        if (!_stricmp("EditPlateNumber", event->field_0x04)) {
+            event->field_0x14->UnknownFunction473ef0(plate, 9);
+            int number = atoi(plate);
+            if (number < 100)
+                number += 100;
+            if (number >= 101) {
+                if (number > 999)
+                    number = 999;
+            } else {
+                number = 101;
+            }
+            g_UnknownGlobal56e26c->mode.field_0x1bcc = number;
+            _itoa(number, plate, 10);
+            event->field_0x14->UnknownFunction473da0(plate);
+            UnknownFunction44f950(number);
+        }
+        break;
+    case 19:
+        if (!_stricmp("EditPlateNumber", event->field_0x04)) {
+            event->field_0x14->UnknownFunction473ef0(typed, 9);
+            int number = atoi(typed);
+            if (number >= 100 && number <= 999) {
+                UnknownFunction44f950(number);
+                g_UnknownGlobal56e26c->mode.field_0x1bcc = number;
+            }
+        }
+        break;
+    case 6:
+        g_UnknownGlobal56e26c->ui->UnknownFunction499a20();
+        if (field_0x110)
+            field_0x110->UnknownFunction404200(field_0x7f74);
+        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
+        break;
+    }
+}
+
 // 0x0044f950
 void SPBikeRiderDlg::UnknownFunction44f950(int number) {
     UnknownBikeNumberPainter painter(g_UnknownGlobal56e26c->field_0x1c);
@@ -601,6 +1098,64 @@ int SPBikeRiderDlg::UnknownVirtualSlot13() {
 // 0x004500d0
 void SPBikeRiderDlg::UnknownFunction4500d0() {
     field_0x7f88 = 1;
+}
+
+// 0x004500e0: shows the chosen bike and loads its class's garage defaults.
+void SPBikeRiderDlg::UnknownFunction4500e0() {
+    char text[12];
+    UnknownGameUiControl* bikes = UnknownFunction46ebf0("DDLBikes", 6)->field_0x1fc;
+    KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+    UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->field_0x50)[bikes->UnknownFunction4768d0(-1)];
+    UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)ui->field_0x48)[bike->field_0x00];
+    int i;
+    // Retail re-reads TrackGame's KrustyUI after each model is hidden.
+    for (i = 0; i < ui->field_0x4c; i++) {
+        ((UnknownKrustyUIModel*)ui->field_0x48)[i].field_0xc0->UnknownVirtualSlot4();
+        ui = g_UnknownGlobal56e26c->ui;
+    }
+    model->field_0xc0->UnknownVirtualSlot5();
+    field_0x7f84 = 1;
+    if (bike->field_0x88) {
+        UnknownGameUiControl* engine = UnknownFunction46ebf0("DDLEngineSize", 0);
+        if (!engine->field_0x70) {
+            engine->UnknownFunction470660(1, 1);
+            UnknownFunction46ebf0("TxtEngineSize", 0)->UnknownFunction470660(1, 1);
+            if (field_0x110)
+                field_0x110->UnknownFunction404da0();
+        }
+    } else {
+        UnknownGameUiControl* engine = UnknownFunction46ebf0("DDLEngineSize", 0);
+        if (engine->field_0x70) {
+            engine->UnknownFunction470660(0, 1);
+            UnknownFunction46ebf0("TxtEngineSize", 0)->UnknownFunction470660(0, 1);
+            if (field_0x110)
+                field_0x110->UnknownFunction404da0();
+        }
+    }
+    g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4 = bikes->UnknownFunction4768d0(-1);
+    if (bike->field_0x88) {
+        UnknownGameUiControl* sizes = UnknownFunction46ebf0("DDLEngineSize", 6)->field_0x1fc;
+        int size = sizes->UnknownFunction4768d0(-1);
+        int previous = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00);
+        UNKNOWN_GARAGE_SETTINGS->field_0x00 = g_UnknownGlobal56cb6c[size];
+        UNKNOWN_GARAGE_SETTINGS->field_0x04 = size == 2 || size == 4 ? 1 : 0;
+        int current = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00);
+        if (current != previous)
+            UNKNOWN_APPLY_BIKE_CLASS(current, i);
+    } else {
+        int row = bikes->UnknownFunction4768d0(-1);
+        int previous = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00);
+        UNKNOWN_GARAGE_SETTINGS->field_0x00 =
+            ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[row].field_0x8c;
+        UNKNOWN_GARAGE_SETTINGS->field_0x04 =
+            ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[row].field_0x90;
+        int current = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00);
+        if (current != previous)
+            UNKNOWN_APPLY_BIKE_CLASS(current, i);
+    }
+    UnknownGameUiControl* plate = UnknownFunction46ebf0("EditPlateNumber", 0xb);
+    _itoa(g_UnknownGlobal56e26c->mode.field_0x1bcc, text, 10);
+    plate->UnknownFunction473da0(text);
 }
 
 // 0x004505d0
@@ -762,6 +1317,67 @@ int LoadingDlg::UnknownVirtualSlot10(float frameTime) {
 // 0x00451380
 void UnknownFunction451380(int value, char* text) {
     _itoa(value, text, 10);
+}
+
+// 0x00451b80
+void UnknownFunction451b80(UnknownDialogEvent* event) {
+    char name[128];
+    char preset[260];
+    char control[260];
+    UnknownGameUiControl* edit = event->field_0x0c->UnknownFunction46ebf0("EditBox", 0);
+    edit->UnknownFunction473ef0(name, 16);
+    if (!strcmp(name, ""))
+        return;
+    if (g_UnknownGlobal56e26c->profileDirectory->UnknownFunction44a910(name)) {
+        ProfileExistsDlg* dialog = new(__FILE__, 3416) ProfileExistsDlg;
+        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 4, 0, (int)event->field_0x0c,
+                                                                     (int)name, 0, 1);
+        return;
+    }
+    sprintf(preset, "%s\\%s", "ui\\profile", name);
+    if (!CreateDirectoryA(preset, 0))
+        return;
+    g_UnknownGlobal56e26c->mode.UnknownFunction522440();
+    COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x00, name, 16);
+    g_UnknownGlobal56e26c->mode.field_0x9c = 1;
+    for (int i = 0; i < g_UnknownGlobal56e26c->ui->field_0x54; i++) {
+        if (((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i].field_0x8c == 250) {
+            g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4 = i;
+            g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc0 =
+                ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i].field_0x00;
+            strcpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00,
+                   ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)
+                       [((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i].field_0x00].field_0x40);
+            strcpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x40,
+                   ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i].field_0x48);
+            break;
+        }
+    }
+    strcpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80,
+           ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[0].field_0x40);
+    memcpy(g_UnknownGlobal56e26c->mode.field_0x1b04, &g_UnknownGlobal56e26c->mode.field_0x1974,
+           sizeof(g_UnknownGlobal56e26c->mode.field_0x1b04));
+    memcpy(&g_UnknownGlobal56e26c->mode.field_0x1a3c, g_UnknownGlobal56e26c->mode.field_0x1b04,
+           sizeof(g_UnknownGlobal56e26c->mode.field_0x1a3c));
+    for (int type = 0; type < 6; type++) {
+        g_UnknownGlobal56e26c->mode.field_0x6f4[type][0] = 0;
+        g_UnknownGlobal56e26c->mode.field_0x9f4[type] = 0;
+    }
+    strcpy(g_UnknownGlobal56e26c->mode.field_0x10, "");
+    strcpy(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "");
+    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 = 0;
+    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34 = 0;
+    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x08 = 0;
+    sprintf(preset, "%s\\%s", "ui", "preset.ctl");
+    sprintf(control, "%s\\%s\\%s", "ui\\profile", name, "control.ctl");
+    CopyFileA(preset, control, 0);
+    g_UnknownGlobal56e26c->mode.UnknownFunction523000();
+    g_UnknownGlobal56e26c->profileDirectory->UnknownVirtualSlot1();
+    g_UnknownGlobal56e26c->mode.UnknownFunction523580();
+    g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448e90(control, -1);
+    g_UnknownGlobal56e26c->UnknownFunction521a30();
+    event->field_0x0c->UnknownFunction46ff30(0x1e);
+    event->field_0x20 = 1;
 }
 
 // 0x00451ff0
@@ -1168,6 +1784,73 @@ int Intro3Dlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
     if (field_0x7f5c == 1)
         g_UnknownGlobal59ae00 = 1;
     return 1;
+}
+
+// 0x004536e0: leaves the menus for the race: keeps a copy of the settings and
+// opens the loading dialog of the event type.
+void UnknownFunction4536e0() {
+    g_UnknownGlobal56e26c->mode.field_0x2dbc = 0;
+    g_UnknownGlobal56e26c->ui->field_0x4ac = 1;
+    g_UnknownGlobal56e26c->ui->field_0x4a8 = 0;
+    g_UnknownGlobal56e26c->ui->UnknownFunction4999b0();
+    g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485fc0();
+    if (g_UnknownGlobal56e26c->field_0x0c->field_0x6c)
+        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction4868b0(0);
+    if (g_UnknownGlobal56e26c->field_0x18 == 1 && !g_UnknownGlobal56e26c->UnknownFunction521cd0() &&
+        !g_UnknownGlobal56e26c->ui->field_0x4a8 && !g_UnknownGlobal56e26c->field_0x3428) {
+        memcpy(&g_UnknownGlobal56e26c->mode.field_0x29e4, &g_UnknownGlobal56e26c->mode.field_0x27f8,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
+        memcpy(g_UnknownGlobal56e26c->mode.field_0x1034, g_UnknownGlobal56e26c->mode.field_0xfd8,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x1034));
+        memcpy(&g_UnknownGlobal56e26c->mode.field_0x1a3c, &g_UnknownGlobal56e26c->mode.field_0x1974,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x1a3c));
+        g_UnknownGlobal56e26c->mode.field_0x98 = g_UnknownGlobal56e26c->mode.field_0x94;
+    }
+    if (g_UnknownGlobal56e26c->field_0x18 > 1 && !g_UnknownGlobal56e26c->ui->field_0x4a8 &&
+        !g_UnknownGlobal56e26c->field_0x3428) {
+        memcpy(&g_UnknownGlobal56e26c->mode.field_0x2bd0, &g_UnknownGlobal56e26c->mode.field_0x27f8,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x2bd0));
+        memcpy(g_UnknownGlobal56e26c->mode.field_0x1090, g_UnknownGlobal56e26c->mode.field_0xfd8,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x1090));
+        memcpy(g_UnknownGlobal56e26c->mode.field_0x1b04, &g_UnknownGlobal56e26c->mode.field_0x1974,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x1b04));
+    }
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && !g_UnknownGlobal56e26c->mode.field_0x10ec) {
+        g_UnknownGlobal56e26c->mode.field_0x10ec = 1;
+        g_UnknownGlobal56e26c->eventManager->field_0x48 = 0;
+        for (int i = 0; i < 11; i++)
+            g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x28 = 0;
+    }
+    g_UnknownGlobal56e26c->ui->field_0x494 = (void*)ImmAssociateContext((HWND)g_UnknownGlobal56e26c->field_0x31c, 0);
+    if (g_UnknownGlobal56e26c->ui->field_0x2c->field_0x03c)
+        g_UnknownGlobal56e26c->ui->field_0x2c->field_0x03c->UnknownFunction404c80();
+    if (g_UnknownGlobal56e26c->mode.field_0xa4c != g_UnknownGlobal56e26c->field_0x0c->field_0x0c)
+        g_UnknownGlobal56e26c->UnknownVirtualSlot19(g_UnknownGlobal56e26c->mode.field_0xa4c);
+    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
+        g_UnknownGlobal56e26c->mode.field_0x26f0 = 0;
+        g_UnknownGlobal56e26c->mode.field_0x2dbc = 0;
+        g_UnknownGlobal56e26c->mode.field_0x94 = 2;
+    }
+    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
+    case 3:
+        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(new(__FILE__, 4405) LoadSupercrossDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        break;
+    case 5:
+        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(new(__FILE__, 4408) LoadEnduroDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        break;
+    case 0:
+        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(new(__FILE__, 4411) LoadQuarryDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        break;
+    case 4:
+        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(new(__FILE__, 4414) LoadTagDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        break;
+    case 1:
+        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(new(__FILE__, 4417) LoadBajaDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        break;
+    case 2:
+        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(new(__FILE__, 4420) LoadNationalsDlg(1), 0, 2, 0, 0, 0, 0, 0);
+        break;
+    }
 }
 
 // 0x00453b20

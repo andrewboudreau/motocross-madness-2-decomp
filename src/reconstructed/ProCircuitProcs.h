@@ -130,11 +130,13 @@ public:
 // results.
 class PCLastRaceDlg : public UIDialog {
 public:
+    PCLastRaceDlg() : UIDialog(1, "PCLRace.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d8660
     void UnknownFunction4d8c40();             // 0x004d8c40: pays out the race
 
     UnknownGuiDialog* field_0x2c;             // parent dialog
     GUIManager* field_0x30;
+    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: PCCompleteDlg : UIDialog (vtable 0x00557014; 0x7f58 bytes).
@@ -178,6 +180,7 @@ public:
 class PCCentralBikeRiderDlg : public UIDialog {
 public:
     PCCentralBikeRiderDlg() : UIDialog(1, "PCCBikeR.dtm") {}
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x004d72c0: turns the bike view
     virtual int UnknownVirtualSlot13();       // 0x004d77d0: applies the chosen bike and rider skins
     virtual void UnknownVirtualSlot26();      // 0x004d72a0: hides the bike view
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004d6770
@@ -185,6 +188,7 @@ public:
     void UnknownFunction4d6fc0();             // 0x004d6fc0: fills the bike and rider lists
     void UnknownFunction4d71f0(int number);   // 0x004d71f0: paints the plate number on every bike
     void UnknownFunction4d78c0();             // 0x004d78c0: takes the chosen rider
+    void UnknownFunction4d7900();             // 0x004d7900: applies the chosen bike
 
     UnknownGuiDialog* field_0x2c;             // parent dialog
     GUIManager* field_0x30;

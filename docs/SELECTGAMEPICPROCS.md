@@ -19,7 +19,7 @@ Extent: `0x004f1740..0x004f975b`. Evidence:
   SceneManager.cpp's. The array lies inside this unit's vector `.bss`
   block, and only this code reads it (see [INITIALIZERS](INITIALIZERS.md)).
 
-Exact: 47 calibration cases:
+Exact: 48 calibration cases:
 - MultiPlayerDlg: 11 functions.
 - The lobby slot table at MultiPlayerDlg+0x7f68: the constructor, its
   methods and the qsort comparator.
@@ -36,11 +36,17 @@ Source forms needed:
   pointer.
 - The slot table is copied into the settings message with `memcpy`.
 
+Also exact: MPBikeRiderDlg `0x004f8d20`.
+
 Near misses (`samples/ui/SelectGamePicProcsNearMisses.cpp`):
 - The chat line `0x004f3720`: block layout differs.
 - The bike and rider lists `0x004f8220`: registers differ.
 - MPBikeRiderDlg slot 29 `0x004f78a0`, 2415 of 2419 bytes: only the x87
   operand order of a distance differs.
+- The picture-list scan `0x004f17a0`, 2244 of 2258 bytes: two buffers'
+  frame slots are swapped.
+- MPBikeRiderDlg slot 10 `0x004f8820`: only the scheduling of the by-value
+  vector copies for the camera call differs.
 
-Not attempted: `0x004f17a0`, `0x004f2340`, MultiPlayerDlg slots 24 and 29,
-MPBikeRiderDlg slot 10 and `0x004f8d20`.
+Not attempted: `0x004f2340` (the lobby start message, type 0x83) and
+MultiPlayerDlg slots 24 and 29.

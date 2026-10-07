@@ -9,10 +9,17 @@
 #include "GameUi.h"
 #include "OptionProcs.h"
 #include "Parameterblocks.h"
+#include "PCCamera.h"
 #include "TextureMap.h"
 #include "UIDialog.h"
 #include "RenderTarget.h"
 #include "TrackGame.h"
+#include "DlgProcs.h"
+#include "InGameProcs.h"
+#include "NetProcs.h"
+#include "ProCircuitProcs.h"
+#include "SelectGamePicProcs.h"
+#include "TrackRecordDlg.h"
 
 // The four per-file vector constants (see src/krusty2/math/Math3D.h):
 // 0x0067c418, 0x0067c428, 0x0067c458 and 0x0067c3f8, initialised by
@@ -32,12 +39,143 @@ char g_UnknownStrings68a498[36][16];
 // cdecl 0x005053b0, called first on shutdown with 0.
 void UnknownFunction5053b0(int value);
 
+// Views for 0x00498cf0 (the garage scene). Only what it calls is declared;
+// the classes' full declarations (LightEmitter.h, the D3DIMSoultree and
+// ProjectedShadow headers) are not mixed into this unit. Names provisional.
+
+// The Soultree object at a character's +0x1a0.
+struct UnknownKrustyUISoultree {
+    void UnknownFunction4444c0(int value);                 // 0x004444c0
+    void UnknownFunction4fc660(const Vector3* position);   // 0x004fc660
+    void UnknownFunction4fbd10(float a, float b, float c, float d, float e, float f, float g,
+                               int h);                     // 0x004fbd10
+};
+
+// RTTI D3DIMSoultreeCharacter (0x240 bytes, constructor 0x004455b0): vfptr
+// at +0, vbptr at +4, virtual GameObject base. Its primary slot 11 loads a
+// model file and returns the GameObject to add to the scene.
+class UnknownKrustyUICharacter : public virtual GameObject {
+public:
+    explicit UnknownKrustyUICharacter(int flags);
+    virtual void CharacterVirtualSlot0();
+    virtual void CharacterVirtualSlot1();
+    virtual void CharacterVirtualSlot2();
+    virtual void CharacterVirtualSlot3();
+    virtual void CharacterVirtualSlot4();
+    virtual void CharacterVirtualSlot5();
+    virtual void CharacterVirtualSlot6();
+    virtual void CharacterVirtualSlot7();
+    virtual void CharacterVirtualSlot8();
+    virtual void CharacterVirtualSlot9();
+    virtual void CharacterVirtualSlot10();
+    virtual GameObject* CharacterVirtualSlot11(void* owner, const char* name, GameObject* lights,
+                                               void* context, int a, int b);
+    void UnknownFunction4a8b10(const char* motion);        // 0x004a8b10: plays a motion
+    int UnknownFunction4a6bb0(float time, int a, int b);   // 0x004a6bb0: advances it
+
+    unsigned char field_0x008[0x1a0 - 0x8];
+    UnknownKrustyUISoultree* field_0x1a0;
+    unsigned char field_0x1a4[0x214 - 0x1a4];
+};
+
+// RTTI LightManager (0x11c bytes) and LightEmitter (0xac bytes).
+class UnknownKrustyUILight;
+class UnknownKrustyUILightManager : public GameObject {
+public:
+    explicit UnknownKrustyUILightManager(int flags);               // 0x0049e390
+    void UnknownFunction49e470(UnknownKrustyUILight* light);        // 0x0049e470: adds a light
+    unsigned char field_0x2c[0x11c - 0x2c];
+};
+
+class UnknownKrustyUILight : public GameObject {
+public:
+    explicit UnknownKrustyUILight(int flags);                      // 0x0049deb0
+    // 0x0049e230: slot 8, then type, colour, range, position, direction.
+    UnknownKrustyUILight* UnknownFunction49e230(void* owner, int type, unsigned int color,
+                                                const Vector3* position, const Vector3* direction,
+                                                float range, int sphere, int a8, int a9, int a10,
+                                                int index);
+    unsigned char field_0x2c[0xac - 0x2c];
+};
+
+// Adds `light` to `lights` when there is one. An inline helper: written out
+// at each of the three sites, VC6 here forms the bike loop's addresses as
+// [offset + list] instead of retail's [list + offset].
+static inline void KrustyUIAddLight(UnknownKrustyUILightManager* lights, UnknownKrustyUILight* light) {
+    if (light)
+        lights->UnknownFunction49e470(light);
+}
+
+// RTTI ProjectedShadow (0x134 bytes, constructor 0x004da570).
+class UnknownKrustyUIShadow : public GameObject {
+public:
+    explicit UnknownKrustyUIShadow(int flags);
+    UnknownKrustyUIShadow* UnknownFunction4da7b0(void* owner, TextureMapManager* textures); // 0x004da7b0
+    void UnknownFunction4dab00(UnknownKrustyUISoultree* caster);     // 0x004dab00: adds a caster
+    void UnknownFunction4dae50(const Vector3* position, const Vector3* direction, int a); // 0x004dae50
+    void UnknownFunction4dace0(int value);                           // 0x004dace0
+    void UnknownFunction4dae30(int value);                           // 0x004dae30
+    unsigned char field_0x2c[0x134 - 0x2c];
+};
+
+// RTTI D3DIMSoultreeShadow (0x48 bytes, constructor 0x00446840).
+class UnknownKrustyUIShadowLink : public GameObject {
+public:
+    explicit UnknownKrustyUIShadowLink(int flags);
+    GameObject* UnknownFunction4468b0(void* owner, UnknownKrustyUISoultree* caster,
+                                      UnknownKrustyUIShadow* shadow); // 0x004468b0
+    unsigned char field_0x2c[0x48 - 0x2c];
+};
+
+// The plate number painter (SelectGamePicProcs.h's UnknownBikeNumberPainter).
+class UnknownKrustyUIPlatePainter {
+public:
+    UnknownKrustyUIPlatePainter(TextureMapManager* textures);       // 0x00417500
+    ~UnknownKrustyUIPlatePainter();                                 // 0x00417570
+    void UnknownFunction417670(UnknownKrustyUISoultree* texture, int number); // 0x00417670
+    unsigned char field_0x00[0x2c];
+};
+
+// Game+0x1c..+0x33, copied as the garage model's resource context; 0x00498cf0
+// sets +0x14 when little video memory is free.
+struct UnknownKrustyUIContext {
+    TextureMapManager* field_0x00;
+    int field_0x04;
+    int field_0x08;
+    int field_0x0c;
+    int field_0x10;
+    int field_0x14;
+};
+
+// The GUI's 0x00485c80 (GUIManager.h) opens a dialog resource.
+class UnknownKrustyUIGuiView {
+public:
+    int UnknownFunction485c80(const char* resource);
+};
+
+// The garage scene's static vectors have an empty destructor: retail
+// registers six empty atexit handlers (0x00499920..0x00499970).
+struct UnknownKrustyUIVector : public Vector3 {
+    ~UnknownKrustyUIVector() {}
+    UnknownKrustyUIVector& operator=(const Vector3& v) {
+        Vector3::operator=(v);
+        return *this;
+    }
+};
+
+inline Vector3 operator-(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+// cdecl 0x00511970 (Tgafile.h): bytes per pixel of a pixel format.
+int UnknownFunction511970(int format);
+
 // Views of the +0x48 (model), +0x50 (bike) and +0x58 (rider) lists.
 struct UnknownKrustyUIModelEntry {
     char field_0x00[0x40];                    // name
     char field_0x40[0x40];                    // model file (a rider's file runs to +0xc0)
     char field_0x80[0x40];                    // UI model file
-    int field_0xc0;
+    UnknownKrustyUICharacter* field_0xc0;     // the loaded UI model (0x00498cf0)
     int field_0xc4;                           // availability (3 for the random choices)
 };
 
@@ -89,6 +227,158 @@ KrustyUI::KrustyUI(int flags) : GameObject(flags) {
     field_0x49c = 0;
     field_0x60 = 0;
     field_0x64 = 0;
+}
+
+
+// KrustyUI.h leaves +0x480 as bytes and types +0x46c and +0x470 as the
+// selection dialogs' model views; 0x00498cf0 stores the garage character at
+// +0x470, the rider at +0x46c and the rider's position (a Vector3) at +0x480.
+#define KRUSTYUI_GARAGE (*(UnknownKrustyUICharacter**)&field_0x470)
+#define KRUSTYUI_RIDER (*(UnknownKrustyUICharacter**)&field_0x46c)
+#define KRUSTYUI_RIDER_POSITION (*(Vector3*)field_0x480)
+#define KRUSTYUI_TARGET ((PCRenderTarget*)field_0x18)
+#define KRUSTYUI_MODELS ((UnknownKrustyUIModelEntry*)field_0x48)
+
+// 0x00498cf0: builds the garage scene (+0x464) on the first call with 1 or
+// -1: camera, lights, the garage and rider models and their shadow; with 2
+// or -1 afterwards, loads each bike model with its plate number once.
+void KrustyUI::UnknownFunction498cf0(int value) {
+    static UnknownKrustyUIVector s408;
+    static UnknownKrustyUIVector s438;
+    static UnknownKrustyUIVector s448;
+    static UnknownKrustyUIVector s468;
+    static UnknownKrustyUIVector s478;
+    static UnknownKrustyUIVector s488;
+    static UnknownKrustyUILightManager* lights;
+    static UnknownKrustyUILight* light;
+    static UnknownKrustyUIShadow* shadow;
+    static GameObject* shadowLink;
+    static int pending;
+    static int done;
+    char text[260];
+
+    field_0x4ac = 0;
+    field_0x4a8 = 0;
+    ((RenderTarget*)field_0x18)->field_0x34 = 0;
+    g_UnknownGlobal56e26c->field_0x2d5_bit2 = 1;
+    if (!field_0x464 && (value == 1 || value == -1)) {
+        UnknownFunction5053b0(1);
+        field_0x498 = 0;
+        if (g_UnknownGlobal56e26c->UnknownFunction521970(0x1438, text, 0x80))
+            field_0x498 = atoi(text) != 0;
+        field_0x498 = g_UnknownGlobal56e26c->UnknownVirtualSlot22("AllowIME", field_0x498);
+        if (field_0x498)
+            field_0x2c->UnknownFunction4868b0(1);
+        ((UnknownKrustyUIGuiView*)field_0x2c)->UnknownFunction485c80("global.dtm");
+        field_0x474 = kVec3Zero;
+        KRUSTYUI_RIDER_POSITION = kVec3Zero;
+        KRUSTYUI_RIDER_POSITION.y += 0.1f;
+        field_0x464 = new(__FILE__, 0x105) GameObject(1);
+        PCCamera* camera = new(__FILE__, 0x108) PCCamera(1);
+        field_0x468 = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
+        field_0x464->UnknownFunction469190(field_0x468, -1);
+        field_0x468->field_0x1d8 = 0;
+        field_0x468->field_0x1d4 = 0;
+        UnknownKrustyUILightManager* manager = new(__FILE__, 0x111) UnknownKrustyUILightManager(1);
+        lights = (UnknownKrustyUILightManager*)manager->UnknownVirtualSlot8(field_0x18);
+        field_0x464->UnknownFunction469190(lights, -1);
+        UnknownKrustyUILight* emitter = new(__FILE__, 0x116) UnknownKrustyUILight(1);
+        light = emitter->UnknownFunction49e230(field_0x18, 6, 0x606060, 0, 0, 0, 0, 0, 0, 0, 0);
+        field_0x464->UnknownFunction469190(light, -1);
+        KrustyUIAddLight(lights, light);
+        Vector3 position(-1800.0f, 200.0f, 0.0f);
+        Vector3 direction = field_0x474 - position;
+        emitter = new(__FILE__, 0x121) UnknownKrustyUILight(1);
+        light = emitter->UnknownFunction49e230(field_0x18, 4, 0xffffff, &position, &direction, 0, 0, 0,
+                                               0, 0, 0);
+        field_0x464->UnknownFunction469190(light, -1);
+        KrustyUIAddLight(lights, light);
+        s488 = field_0x474;
+        s488.y += 8.0f;
+        s488.x += 12.0f;
+        s408 = field_0x474 - s488;
+        s448 = s488;
+        s448.x -= 24.0f;
+        s438 = field_0x474 - s448;
+        emitter = new(__FILE__, 0x130) UnknownKrustyUILight(1);
+        light = emitter->UnknownFunction49e230(field_0x18, 1, 0x8c8c8c, &s488, &s408, 0, 0, 0, 0, 0, 0);
+        field_0x464->UnknownFunction469190(light, -1);
+        KrustyUIAddLight(lights, light);
+        UnknownKrustyUIContext context = *(UnknownKrustyUIContext*)&g_UnknownGlobal56e26c->field_0x1c;
+        context.field_0x14 = 0;
+        if (!g_UnknownGlobal56e26c->field_0x2d0) {
+            // Free video memory: total less the frame buffers, or a fixed 4 MB
+            // (2 MB below 800x600) off the total outside NT without the 0x400 cap.
+            int memory = KRUSTYUI_TARGET->field_0x04->field_0x54;
+            int free = memory - UnknownFunction511970(KRUSTYUI_TARGET->field_0x28) *
+                                    (KRUSTYUI_TARGET->field_0x14 + 1) * KRUSTYUI_TARGET->field_0x10 *
+                                    KRUSTYUI_TARGET->field_0x0c;
+            if (g_UnknownGlobal56e26c->field_0x424.platformId != 2 &&
+                !(KRUSTYUI_TARGET->field_0x04->field_0x1b8 & 0x400))
+                free = (KRUSTYUI_TARGET->field_0x164 & 0x4000) ? memory - 0x400000 : memory - 0x200000;
+            if (!g_UnknownGlobal56e26c->field_0x0c->field_0x9f0 && free < 0x500000)
+                context.field_0x14 = 1;
+        }
+        KRUSTYUI_GARAGE = new(__FILE__, 0x174) UnknownKrustyUICharacter(1);
+        field_0x464->UnknownFunction469190(
+            KRUSTYUI_GARAGE->CharacterVirtualSlot11(field_0x18, "UIgarage.mcf", lights, &context, 1, 1), -1);
+        KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4444c0(0);
+        KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fc660(&field_0x474);
+        KRUSTYUI_GARAGE->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+        KRUSTYUI_GARAGE->UnknownFunction4a8b10("Spin");
+        KRUSTYUI_GARAGE->UnknownFunction4a6bb0(0.03f, 0, 0);
+        UnknownKrustyUIShadow* projected = new(__FILE__, 0x182) UnknownKrustyUIShadow(1);
+        shadow = projected->UnknownFunction4da7b0(field_0x18, g_UnknownGlobal56e26c->field_0x3c);
+        UnknownKrustyUIShadowLink* link = new(__FILE__, 0x186) UnknownKrustyUIShadowLink(1);
+        shadowLink = link->UnknownFunction4468b0(field_0x18, KRUSTYUI_GARAGE->field_0x1a0, shadow);
+        field_0x464->UnknownFunction469190(shadowLink, -1);
+        if (shadow)
+            field_0x464->UnknownFunction469190(shadow, -1);
+        KRUSTYUI_RIDER = new(__FILE__, 0x194) UnknownKrustyUICharacter(1);
+        field_0x464->UnknownFunction469190(
+            KRUSTYUI_RIDER->CharacterVirtualSlot11(field_0x18, "UIRider.mcf", lights,
+                                                   &g_UnknownGlobal56e26c->field_0x1c, 1, 1), -1);
+        KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4444c0(1);
+        KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4fc660(&KRUSTYUI_RIDER_POSITION);
+        KRUSTYUI_RIDER->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+        KRUSTYUI_RIDER->UnknownFunction4a8b10("WaitR");
+        KRUSTYUI_RIDER->UnknownFunction4a6bb0(0.03f, 0, 0);
+        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
+        pending = 1;
+        done = 0;
+    }
+    if (pending && !done && (value == 2 || value == -1)) {
+        UnknownKrustyUIPlatePainter painter(g_UnknownGlobal56e26c->field_0x1c);
+        for (int i = 0; i < field_0x4c; i++) {
+            sprintf(text, "Animations\\UIbike\\%s", KRUSTYUI_MODELS[i].field_0x80);
+            KRUSTYUI_MODELS[i].field_0xc0 = new(__FILE__, 0x1b4) UnknownKrustyUICharacter(0);
+            field_0x464->UnknownFunction469190(
+                KRUSTYUI_MODELS[i].field_0xc0->CharacterVirtualSlot11(field_0x18, text, lights,
+                                                                      &g_UnknownGlobal56e26c->field_0x1c,
+                                                                      1, 1), -1);
+            UnknownKrustyUICharacter* bike = KRUSTYUI_MODELS[i].field_0xc0;
+            bike->field_0x1a0->UnknownFunction4444c0(1);
+            bike->field_0x1a0->UnknownFunction4fc660(&field_0x474);
+            bike->field_0x1a0->UnknownFunction4fbd10(0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1);
+            bike->UnknownFunction4a8b10("WaitB");
+            bike->UnknownFunction4a6bb0(0.03f, 0, 0);
+            painter.UnknownFunction417670(bike->field_0x1a0, g_UnknownGlobal56e26c->mode.field_0x1bcc);
+        }
+        if (shadow) {
+            shadow->UnknownFunction4dab00(KRUSTYUI_MODELS[0].field_0xc0->field_0x1a0);
+            shadow->UnknownFunction4dab00(KRUSTYUI_RIDER->field_0x1a0);
+            s468 = field_0x474;
+            s468.y += 40.0f;
+            s468.x += 15.0f;
+            s478 = field_0x474 - s468;
+            // Retail passes the key light's vectors here, not the two just set.
+            shadow->UnknownFunction4dae50(&s488, &s408, 3);
+            shadow->UnknownFunction4dace0(0x20);
+            shadow->UnknownFunction4dae30(0x20);
+            pending = 0;
+            done = 1;
+        }
+    }
 }
 
 // 0x0049b470
@@ -203,6 +493,119 @@ void KrustyUI::UnknownFunction499b00() {
 void KrustyUI::UnknownFunction499b10() {
     if (field_0x2c)
         field_0x2c->UnknownFunction486630(0);
+}
+
+// 0x00499b20: opens menu `menu` (each id has its dialog class).
+void KrustyUI::UnknownFunction499b20(int menu) {
+    UIDialog* dialog;
+    if (menu == 0xd0)
+        field_0x34 = field_0x3c;
+    field_0x3c = menu;
+    switch (menu) {
+    case 100:
+        dialog = new(__FILE__, 674) MainDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 2, 0, 0, 0, 0, 1);
+        g_UnknownGlobal56e26c->UnknownFunction468880();
+        break;
+    case 101:
+        dialog = new(__FILE__, 681) SinglePlayerDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 2, 0, 0, 0, 0, 1);
+        break;
+    case 102:
+        dialog = new(__FILE__, 685) OptionsDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 2, 0, 0, 0, 0, 1);
+        break;
+    case 104:
+        if (g_UnknownGlobal56e26c->mode.field_0xa4c != g_UnknownGlobal56e26c->field_0x0c->field_0x0c)
+            g_UnknownGlobal56e26c->UnknownVirtualSlot19(g_UnknownGlobal56e26c->mode.field_0xa4c);
+        dialog = new(__FILE__, 695) LoadingDlg(1);
+        field_0x2c->UnknownFunction485a70(dialog, menu, 2, 0, 0, 0, 0, 1);
+        break;
+    case 0x85c:
+    case 0x85d:
+        dialog = new(__FILE__, 727) HostJoinDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 4, 0, (int)field_0x2c->UnknownFunction485df0(), 0, 0, 1);
+        break;
+    case 0x866:
+    case 0x867:
+    case 0x868:
+        dialog = new(__FILE__, 733) MultiPlayerDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 2, 0, 0, 0, 0, 1);
+        break;
+    case 0xd8:
+        dialog = new(__FILE__, 737) SerialPopupDlg;
+        field_0x2c->UnknownFunction485a70(dialog, 0xd8, 4, 0, (int)field_0x2c->UnknownFunction485df0(), 0, 0, 1);
+        break;
+    case 0xd9:
+        dialog = new(__FILE__, 741) TCPAddressDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 4, 0, (int)field_0x2c->UnknownFunction485df0(), 0, 0, 1);
+        break;
+    case 0x88f:
+        if (g_UnknownGlobal56e26c->field_0x3444) {
+            dialog = new(__FILE__, 747) PCCentralDlg;
+            field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
+        }
+        break;
+    case 0x88e: {
+        UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
+        if (circuit) {
+            if (circuit->field_0x1285[circuit->field_0x40].field_0x08 == circuit->field_0x44) {
+                circuit->UnknownFunction4d41a0();
+                UnknownFunction4d4ba0();
+                return;
+            }
+            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 1) {
+                dialog = new(__FILE__, 760) PCLastRaceDlg;
+                field_0x2c->UnknownFunction485a70(dialog, 0x88e, 2, 0, 0, 0, 0, 1);
+            } else {
+                dialog = new(__FILE__, 763) PCCentralDlg;
+                field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
+            }
+        } else if (g_UnknownGlobal56e26c->field_0x18 == 1) {
+            dialog = new(__FILE__, 767) SinglePlayerDlg;
+            field_0x2c->UnknownFunction485a70(dialog, 0x88e, 2, 0, 0, 0, 0, 1);
+        } else {
+            dialog = new(__FILE__, 769) MultiPlayerDlg;
+            field_0x2c->UnknownFunction485a70(dialog, 0x88e, 2, 0, 0, 0, 0, 1);
+        }
+        break;
+    }
+    case 0xfc:
+        dialog = new(__FILE__, 774) WaitOrCallDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 4, 0, (int)field_0x2c->UnknownFunction485df0(), 0, 0, 1);
+        break;
+    case 0x910:
+    case 0x911:
+        dialog = new(__FILE__, 788) TrackRecordDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 2, 0, 0, 0, 0, 1);
+        break;
+    case 0xbb9:
+    case 0xbba:
+    case 0xbbb:
+        dialog = new(__FILE__, 798) UserNameDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 0xc, 0, (int)field_0x2c->UnknownFunction485df0(), 0, 0, 1);
+        break;
+    case 0x12f:
+        dialog = new(__FILE__, 802) RemoveProfileDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 4, 0, (int)field_0x2c->UnknownFunction485df0(), 0, 0, 1);
+        break;
+    case 0x1f9:
+        dialog = new(__FILE__, 806) ConnectErrorDlg;
+        field_0x2c->UnknownFunction485a70(dialog, 0x1f9, 4, 0, (int)field_0x2c->UnknownFunction485df0(), 0, 0, 1);
+        break;
+    case 0x1fa:
+        dialog = new(__FILE__, 810) PlayerRemovedDlg;
+        field_0x2c->UnknownFunction485a70(dialog, 0x1fa, 4, 0, (int)field_0x2c->UnknownFunction485df0(), 0, 0, 1);
+        break;
+    case 0x191:
+        dialog = new(__FILE__, 817) ExitDlg;
+        field_0x2c->UnknownFunction485a70(dialog, 0x191, 0x1c, 0, 0, 0, 0, 1);
+        break;
+    case 0x190:
+        dialog = new(__FILE__, 822) ContinueDlg;
+        field_0x2c->UnknownFunction485a70(dialog, menu, 0x1c, 0, 0, 0, 0, 1);
+        break;
+    }
 }
 
 // 0x0049a4a0: turns "MediaControl" on, hides the GUI and opens Exit1Dlg.

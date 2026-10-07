@@ -24,6 +24,32 @@ struct UnknownDialogEvent {
     int field_0x20;                           // set to 1 once handled
 };
 
+// The garage settings at TrackGame+0x1550 (OptionProcs.h's
+// UnknownOptGarageSettings; TrackGame.h declares the block as bytes).
+#define UNKNOWN_GARAGE_SETTINGS ((UnknownOptGarageSettings*)g_UnknownGlobal56e26c->mode.field_0xfd8)
+
+// Loads bike class `bikeClass`'s garage defaults (KrustyUI's tables) and its
+// chosen power curve into the garage settings, counting the bands with
+// `band`. The bike dialogs of dlgprocs.cpp, SelectGamePicProcs.cpp and
+// ProCircuitProcs.cpp repeat this block; retail's code reuses the caller's
+// loop counter, so it is a macro. Needs TrackGame.h and OptionProcs.h.
+#define UNKNOWN_APPLY_BIKE_CLASS(bikeClass, band)                                                     \
+    {                                                                                                 \
+        UNKNOWN_GARAGE_SETTINGS->field_0x50 = g_UnknownGlobal56e26c->ui->field_0x2fc[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->field_0x54 = g_UnknownGlobal56e26c->ui->field_0x310[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->field_0x58 = g_UnknownGlobal56e26c->ui->field_0x414[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->field_0x08 = g_UnknownGlobal56e26c->ui->field_0x428[bikeClass];      \
+        int curve = g_UnknownGlobal56e26c->mode.field_0xa0c[bikeClass];                              \
+        for (band = 0; band < 11; band++) {                                                           \
+            if (curve < 3)                                                                            \
+                UNKNOWN_GARAGE_SETTINGS->field_0x24[band] =                                           \
+                    g_UnknownGlobal56e26c->ui->field_0x68[bikeClass][curve][band];                    \
+            else                                                                                      \
+                UNKNOWN_GARAGE_SETTINGS->field_0x24[band] =                                           \
+                    g_UnknownGlobal56e26c->mode.field_0x10f0[bikeClass][curve - 3][band];             \
+        }                                                                                             \
+    }
+
 // cdecl entry points in dlgprocs.cpp's code that the procedures pass a menu
 // id and their message to (0x004526b0 near dlgprocs.cpp's line references at
 // 0x00452b8e; 0x00453090 near 0x004531dc).

@@ -38,46 +38,61 @@ int UnknownFunction4aefa0();
 // dialog is the host variant.
 class HostJoinDlg : public UIDialog {
 public:
+    HostJoinDlg() : UIDialog(1, "HostJoin.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004ae500
 
     unsigned char field_0x2c[0x30 - 0x2c];
     GUIManager* field_0x30;
     unsigned char field_0x34[0xc4 - 0x34];
     int field_0xc4;
+    unsigned char field_0xc8[0x7f58 - 0xc8];
 };
 
 // RTTI: SerialPopupDlg : UIDialog (vtable 0x00554eb0).
 class SerialPopupDlg : public UIDialog {
 public:
+    SerialPopupDlg() : UIDialog(1, "SerPopup.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004aea60
+
+    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: TCPAddressDlg : UIDialog (vtable 0x00554e2c).
 class TCPAddressDlg : public UIDialog {
 public:
+    TCPAddressDlg() : UIDialog(1, "messbox1.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004aee10
 
     unsigned char field_0x2c[0x34 - 0x2c];
     GUIUser* field_0x34;
+    unsigned char field_0x38[0x7f58 - 0x38];
 };
 
 // RTTI: WaitOrCallDlg : UIDialog (vtable 0x00554da8).
 class WaitOrCallDlg : public UIDialog {
 public:
+    WaitOrCallDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004af100
 
     unsigned char field_0x2c[0x30 - 0x2c];
     GUIManager* field_0x30;
+    unsigned char field_0x34[0x7f58 - 0x34];
 };
 
 // RTTI: ConnectErrorDlg : UIDialog (vtable 0x00554c1c).
 class ConnectErrorDlg : public UIDialog {
 public:
+    ConnectErrorDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004af470
+
+    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: PlayerRemovedDlg : UIDialog (vtable 0x00551b9c).
 class PlayerRemovedDlg : public UIDialog {
 public:
+    PlayerRemovedDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004af590
+
+    unsigned char field_0x2c[0x7f58 - 0x2c];
 };

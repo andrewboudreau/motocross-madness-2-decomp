@@ -44,8 +44,26 @@ void UnknownFunction4f3080(int a, const char* picture, const char* listName, int
 
 // KrustyUI+0x50's 0x94-byte bike records and the 0xc8-byte model records
 // at KrustyUI+0x48 and +0x58 (bikes and riders) they index.
-struct UnknownKrustyUIModelObject {
-    unsigned char field_0x000[0x1a0];
+// A bike or rider model: a vfptr at +0, GameObject reached through the
+// vbptr at +4 (the bike dialogs hide and show the models with its slots 4
+// and 5).
+struct UnknownKrustyUIModelObject : virtual public GameObject {
+    // Its own vtable (the slots past GameObject's; names provisional).
+    virtual void ModelVirtualSlot0();
+    virtual void ModelVirtualSlot1();
+    virtual void ModelVirtualSlot2();
+    virtual void ModelVirtualSlot3();
+    virtual void ModelVirtualSlot4();
+    virtual void ModelVirtualSlot5();
+    virtual void ModelVirtualSlot6();
+    // Advances the model's animation (dlgprocs.cpp SPBikeRiderDlg slot 10
+    // passes the frame time and two zeros).
+    virtual void ModelVirtualSlot7(float frameTime, int a, int b);
+    void UnknownFunction4a8b10(const char* motion); // 0x004a8b10: plays a motion ("WaitR")
+
+    unsigned char field_0x008[0x0c - 0x08];
+    int field_0x0c;                           // the motion has finished
+    unsigned char field_0x010[0x1a0 - 0x10];
     void* field_0x1a0;                        // the texture the plate number goes on
 };
 
@@ -86,9 +104,15 @@ struct UnknownRaceSettings {
     int field_0x04;                           // event type (+0x2d74)
     unsigned char field_0x08[0x0c - 0x08];
     int field_0x0c;                           // races (+0x2d7c)
-    unsigned char field_0x10[0x20 - 0x10];
+    int field_0x10;                           // tree collision (+0x2d80)
+    unsigned char field_0x14[0x20 - 0x14];
     int field_0x20;                           // laps (+0x2d90)
-    unsigned char field_0x24[0x34 - 0x24];
+    int field_0x24;                           // opponents (+0x2d94)
+    int field_0x28;
+    unsigned char field_0x2c;                 // random gates (+0x2d9c)
+    unsigned char field_0x2d;                 // gate count (+0x2d9d)
+    unsigned char field_0x2e[0x30 - 0x2e];
+    int field_0x30;                           // gate seed (+0x2da0)
     unsigned char field_0x34;                 // track number (+0x2da4)
     unsigned char field_0x35;
     char field_0x36[0x100];                   // track name (+0x2da6)
@@ -169,6 +193,7 @@ public:
 class MPBikeRiderDlg : public UIDialog {
 public:
     MPBikeRiderDlg() : UIDialog(1, "MPBikeR.dtm") {}
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x004f8820: turns the bike view
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004f8780
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f8620
     void UnknownVirtualSlot31(int apply);     // 0x004f91e0: stores the chosen bike and rider
@@ -199,10 +224,11 @@ public:
 };
 
 // RTTI: MPRaceInfoDlg : UIDialog (vtable 0x00557980; 0x7f58 bytes; its
-// procedure 0x004513a0 is not in this file).
+// procedure 0x004513a0 is in dlgprocs.cpp's code).
 class MPRaceInfoDlg : public UIDialog {
 public:
     MPRaceInfoDlg() : UIDialog(1, "MPRInfo.dtm") {}
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004513a0 (DlgProcs.cpp)
 
     unsigned char field_0x2c[0x7f58 - 0x2c];
 };
@@ -223,6 +249,7 @@ public:
 // size KrustyUI 0x0049a08b allocates).
 class MultiPlayerDlg : public UIDialog {
 public:
+    MultiPlayerDlg() : UIDialog(1, "MPBase.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownFunction4f20d0();             // 0x004f20d0: fills the racer slots for the race
     void UnknownFunction4f2b90();             // 0x004f2b90: sends the lobby settings
     int UnknownFunction4f2ec0();              // 0x004f2ec0

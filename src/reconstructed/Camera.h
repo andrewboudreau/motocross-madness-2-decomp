@@ -68,6 +68,7 @@ protected:
     friend class PCGame;           // slot 19 reattaches the camera (+0x18, +0x1a0)
     friend class InstrumentOverlay; // TrackOverlay.cpp: slot 14 reads +0x1a0 and +0x1cc
     friend class NameOverlay;       // TrackOverlay.cpp: reads +0x170
+    friend class KrustyUI;          // krustyui.cpp 0x00498cf0 clears +0x1d4/+0x1d8
 
     // Provisional Direct3D semantics: PCCamera submits these with transform
     // kinds 1 (world), 3 (projection), and 2 (view), respectively.

@@ -12,6 +12,7 @@
 class MediaControl : public GameObject {
 public:
     int UnknownFunction4a2900();              // 0x004a2900: restarts the movie
+    void UnknownFunction4a2940();             // 0x004a2940: stops the movie
 };
 
 // 0x0044b0a0 / 0x0044b0e0: qsort orders of list rows by the number in their
@@ -41,12 +42,16 @@ void UnknownFunction44cae0(UnknownDialogEvent* event, const char* a, const char*
 // KrustyUI 0x00499b20 allocates).
 class MainDlg : public UIDialog {
 public:
+    MainDlg() : UIDialog(1, "mainmenu.dtm") {} // inline (KrustyUI 0x00499b20)
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044b200
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0044c6b0
     void UnknownFunction44c7a0();             // 0x0044c7a0: fills "LstProfiles"
     void UnknownFunction44c8c0();             // 0x0044c8c0: shows the current profile
 
-    unsigned char field_0x2c[0x7f58 - 0x2c];
-    UnknownGameUiControl* field_0x7f58;
+    unsigned char field_0x2c[0x30 - 0x2c];
+    GUIManager* field_0x30;
+    unsigned char field_0x34[0x7f58 - 0x34];
+    UnknownGameUiControl* field_0x7f58;       // the movie control
     unsigned char field_0x7f5c[0x7f60 - 0x7f5c];
     UnknownGameUiControl* field_0x7f60;       // "MenuSingleAnimation"
     UnknownGameUiControl* field_0x7f64;       // "MenuMultiAnimation"
@@ -61,7 +66,10 @@ public:
 // RTTI: ChooseTCPMethodDlg : UIDialog (vtable 0x00551884).
 class ChooseTCPMethodDlg : public UIDialog {
 public:
+    ChooseTCPMethodDlg() : UIDialog(1, "messbox2.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044cb80
+
+    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // RTTI: NewbieDlg : UIDialog (vtable 0x00551c2c; 0x7f58 bytes).
@@ -76,7 +84,10 @@ public:
 // RTTI: NoDelCurProfileDlg : UIDialog (vtable 0x0055198c).
 class NoDelCurProfileDlg : public UIDialog {
 public:
+    NoDelCurProfileDlg() : UIDialog(1, "messbox2.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044ce10
+
+    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 class BackgroundImage;
@@ -115,11 +126,17 @@ struct UnknownRecordFileHeader;
 class SPEventDlg : public UIDialog {
 public:
     SPEventDlg() : UIDialog(1, "SPEvent.dtm") {}
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044d950
+    void UnknownFunction44dfc0();             // 0x0044dfc0: shows the controls for the race mode
+    void UnknownFunction44e3e0();             // 0x0044e3e0: applies the chosen event type
+    void UnknownVirtualSlot31(int apply);     // 0x0044e6c0: stores (or shows) the event settings
     void UnknownFunction44eb40();             // 0x0044eb40: lists the ghosts for the track
     int UnknownFunction44ec50(const char* path); // 0x0044ec50: adds a ghost; 0 when unusable
     void UnknownFunction44eed0();             // 0x0044eed0: forgets the ghosts
 
-    unsigned char field_0x2c[0x7f58 - 0x2c];
+    unsigned char field_0x2c[0x34 - 0x2c];
+    GUIUser* field_0x34;
+    unsigned char field_0x38[0x7f58 - 0x38];
     UnknownRecordFileHeader* field_0x7f58;    // the ghost files' headers
     int field_0x7f5c;                         // their count
     char** field_0x7f60;                      // the ghost files' paths
@@ -130,11 +147,13 @@ public:
 class SPBikeRiderDlg : public UIDialog {
 public:
     SPBikeRiderDlg() : UIDialog(1, "SPBikeR.dtm") {}
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x0044ef70
     // 0x0044fab0 / 0x0044fa00 (a near miss): MPBikeRiderDlg's and
     // PCCentralBikeRiderDlg's slot 22 and PCCentralBikeRiderDlg's slot 23
     // share these bodies.
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry);
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x0044fae0: turns the bike view
     virtual int UnknownVirtualSlot13();       // 0x0044ffc0: names the chosen bike's and rider's textures
     void UnknownVirtualSlot31(int apply);     // 0x004505d0: stores the chosen bike and rider
     void UnknownFunction44f750();             // 0x0044f750: fills the bike and rider lists (a near miss)
@@ -143,14 +162,19 @@ public:
     void UnknownFunction4500d0();
     void UnknownFunction4500e0();             // 0x004500e0
 
-    unsigned char field_0x2c[0x34 - 0x2c];
+    UnknownGuiDialog* field_0x2c;             // parent dialog
+    GUIManager* field_0x30;
     GUIUser* field_0x34;
     unsigned char field_0x38[0x110 - 0x38];
     BackgroundImage* field_0x110;
-    unsigned char field_0x114[0x7f78 - 0x114];
+    unsigned char field_0x114[0x7f58 - 0x114];
+    Vector3 field_0x7f58;                     // the bike view's eye
+    Vector3 field_0x7f64;                     // and target
+    float field_0x7f70;                       // their distance
+    int field_0x7f74;                         // background region
     int field_0x7f78;                         // the bike preview was dragged
     int field_0x7f7c;                         // the bike preview is being dragged
-    unsigned char field_0x7f80[0x7f84 - 0x7f80];
+    int field_0x7f80;                         // the rider's idle motion is playing
     int field_0x7f84;                         // the bike changed
     int field_0x7f88;                         // the rider changed
     CameraRect field_0x7f8c;                  // the bike preview's area
@@ -160,8 +184,10 @@ public:
 class SPRaceInfoDlg : public UIDialog {
 public:
     SPRaceInfoDlg() : UIDialog(1, "SPRInfo.dtm") {}
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004507a0
 
-    unsigned char field_0x2c[0x7f58 - 0x2c];
+    SinglePlayerDlg* field_0x2c;              // parent dialog
+    unsigned char field_0x30[0x7f58 - 0x30];
 };
 
 // RTTI: UIVideoStatic : UIControl (vtable 0x00553b60; 0x200 bytes): a
@@ -181,6 +207,7 @@ public:
 // RTTI: CreditsVidDlg : UIDialog (vtable 0x005516f8).
 class CreditsVidDlg : public UIDialog {
 public:
+    CreditsVidDlg() : UIDialog(1, "credits.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453170
 
     unsigned char field_0x2c[0x7f58 - 0x2c];
@@ -342,10 +369,12 @@ void UnknownFunction451b80(UnknownDialogEvent* event);
 // RTTI: UserNameDlg : UIDialog (vtable 0x00554988): asks for the profile name.
 class UserNameDlg : public UIDialog {
 public:
+    UserNameDlg() : UIDialog(1, "messbox1.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00451ff0
 
     unsigned char field_0x2c[0x34 - 0x2c];
     GUIUser* field_0x34;
+    unsigned char field_0x38[0x7f58 - 0x38];
 };
 
 // RTTI: ProfileExistsDlg : UIDialog (vtable 0x005521dc; 0x7f58 bytes).
@@ -360,7 +389,10 @@ public:
 // RTTI: RemoveProfileDlg : UIDialog (vtable 0x00551908).
 class RemoveProfileDlg : public UIDialog {
 public:
+    RemoveProfileDlg() : UIDialog(1, "messbox2.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004524f0
+
+    unsigned char field_0x2c[0x7f58 - 0x2c];
 };
 
 // cdecl 0x0047b570 (gameui.cpp): resizes a DebugMalloc'd block (also
@@ -402,6 +434,7 @@ class ReplayFilesDlg;
 // replay file pages.
 class GhostReplayDlg : public UIDialog {
 public:
+    GhostReplayDlg() : UIDialog(1, "GRBase.dtm") {}
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00453b20
     void UnknownFunction453e90(int page);     // 0x00453e90: opens page `page` (0 ghosts, 1 replays)
 

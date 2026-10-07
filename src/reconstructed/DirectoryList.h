@@ -69,6 +69,9 @@ public:
     // a directory unless `includeFiles` is set.
     int UnknownFunction44a600(const char* name, unsigned int attributes);
     int UnknownFunction44a910(const char* name);           // 0x0044a910: whether `name` is listed
+    // 0x004673b0: the entry count (an out-of-line accessor that the linker
+    // folded with FontTexture's identical 0x004673b0).
+    int UnknownFunction4673b0();
     // 0x0044a960: deletes the directory `path` and everything below it.
     int UnknownFunction44a960(const char* path);
     void UnknownFunction44aab0();                          // 0x0044aab0: sorts the entries by name

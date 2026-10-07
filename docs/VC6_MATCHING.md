@@ -191,17 +191,21 @@ MorphBastardModifier.cpp (the rider morph) matches strictly in 15
 functions; see [MORPHBASTARDMODIFIER](MORPHBASTARDMODIFIER.md).
 
 SelectGamePicProcs.cpp (the multiplayer lobby dialogs) matches strictly
-in 47 functions; see [SELECTGAMEPICPROCS](SELECTGAMEPICPROCS.md).
+in 48 functions; see [SELECTGAMEPICPROCS](SELECTGAMEPICPROCS.md).
 
-ProCircuit.cpp (17) and ProCircuitProcs.cpp (31), the pro circuit career
+ProCircuit.cpp (17) and ProCircuitProcs.cpp (33), the pro circuit career
 and its dialogs, match strictly; see [PROCIRCUIT](PROCIRCUIT.md).
 
 The unnamed gearbox unit before ProCircuit.cpp (GearRatios.cpp, 4 functions
 and 8 `$E`) and Point2D's inline methods (5) match strictly; see
 [PROCIRCUIT](PROCIRCUIT.md).
 
-dlgprocs.cpp (the front-end dialogs) matches strictly in 81 functions;
+dlgprocs.cpp (the front-end dialogs) matches strictly in 89 functions;
 see [DIALOGPROCS](DIALOGPROCS.md).
+
+krustyui.cpp (KrustyUI) matches strictly in 43 functions, including the
+3114-byte garage scene and the 2432-byte open-menu routine; see
+[KRUSTYUI](KRUSTYUI.md).
 
 QuarryStuntEvent.cpp (BaseQuarryEvent) matches strictly in 25 functions;
 see [QUARRYSTUNTEVENT](QUARRYSTUNTEVENT.md).
@@ -347,7 +351,7 @@ an evidence-preserving next experiment.
 
 Prefer `PCTextureMap` slots 9 and 6 next because their frames and high-level flow
 are already understood. Defer its 2031-byte setup (slot 4), EventManager's
-4247-byte routine, and KrustyUI's 2432/3114-byte routines until their callees,
+4247-byte routine until its callees,
 member layouts and smaller surrounding methods are represented. This keeps a
 failed large match from conflating ABI, register allocation, control flow and
 unknown type errors.

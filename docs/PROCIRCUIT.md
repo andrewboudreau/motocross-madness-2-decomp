@@ -31,7 +31,7 @@ closes with its own `$E` set `0x004da3e0..0x004da51b`, whose vectors
 `0x00689b08` and `0x00689b28` are read at `0x004d6aba` and `0x004d73df`. The slot-29 procedures belong to the
 RTTI PC*Dlg vtables.
 
-Exact (31):
+Exact (33):
 - The eight `$E`.
 - Three qsort comparators.
 - The state-dialog opener `0x004d4ba0`.
@@ -59,7 +59,10 @@ Near misses (`samples/ui/ProCircuitProcsNearMisses.cpp`):
   `0x0054d257` is bound. The resolver does not yet recognise that
   `mov edx,[esp+4]` EH prologue shape.
 
-Not attempted: PCCentralBikeRiderDlg slots 29 and 10 and `0x004d7900`.
+- PCCentralBikeRiderDlg slot 10 `0x004d72c0`, 1233 of 1291 bytes: only
+  the scheduling of the by-value vector copies for the camera call differs.
+
+Also exact: PCCentralBikeRiderDlg slot 29 `0x004d6770` and `0x004d7900`.
 The `UnknownProCircuitSkinned` view is the same object as DlgProcs.h's
 `UnknownModelTexture`; one should eventually replace the other.
 

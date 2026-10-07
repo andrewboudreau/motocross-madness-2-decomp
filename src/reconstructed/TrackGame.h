@@ -320,7 +320,7 @@ public:
     unsigned char field_0x6e0[0x6f4 - 0x6e0];
     char field_0x6f4[6][0x80];                // a track name per game type (SelectGamePicProcs.cpp)
     int field_0x9f4[6];                       // a track index per game type (SelectGamePicProcs.cpp)
-    unsigned char field_0xa0c[0xa20 - 0xa0c];
+    int field_0xa0c[5];                       // the garage curve chosen per bike class (OptionProcs.cpp's +0x360)
     int field_0xa20;                          // EventManager 0x0045e710 calls TrackGame 0x00521a40 when clear
     int field_0xa24;                          // selects +0xa3c for the GUI's +0x34c (KrustyUI 0x004988a0)
     int field_0xa28;                          // sound on (racesnd.cpp)

@@ -105,6 +105,7 @@ public:
 // Names are provisional (docs/TRACKRECORD.md).
 class TrackRecordDlg : public UIDialog {
 public:
+    TrackRecordDlg() : UIDialog(1, "HiScores.dtm") {} // inline (KrustyUI 0x00499b20)
     void UnknownVirtualSlot29(UnknownTrackRecordEvent* event);             // 0x0051f600
     void UnknownFunction51fc40(int series);                                 // 0x0051fc40: labels the tabs
     void UnknownFunction51fe80(UnknownTrackRecordEvent* event, int series); // 0x0051fe80: shows a tab

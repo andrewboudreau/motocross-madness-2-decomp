@@ -90,7 +90,7 @@ Evidence:
 Its four kVec3 `$E` pairs sit mid-file (`0x00453d50..0x00453e8b`), and
 earlier code reads them.
 
-Exact: 81 calibration cases. They cover the slot 29 procedures and helpers
+Exact: 89 calibration cases. They cover the slot 29 procedures and helpers
 of the main, single-player, profile, intro, credits, loading, ghost and
 replay, choice, edit-box, demo, transition and exit dialogs; the six
 Load*Dlg constructors; the cdecl menu helpers `0x004526b0` and
@@ -100,10 +100,23 @@ Load*Dlg constructors; the cdecl menu helpers `0x004526b0` and
 ChoiceDlg `0x00455700` now has typed parameters, so InGameProcs.bindings.json
 carries its new mangled name.
 
-Near misses (`samples/ui/DlgProcsNearMisses.cpp`): SPBikeRiderDlg slot 23
-`0x0044fa00`, the bike and rider lists `0x0044f750`, and `0x00452930`. All
-three differ in register allocation or tail merging.
+Also exact (8, added in the large-function wave): SPEventDlg slot 29
+`0x0044d950`, its helpers `0x0044dfc0` and `0x0044e3e0` and slot 31
+`0x0044e6c0`; SPBikeRiderDlg slot 29 `0x0044ef70` and `0x004500e0`; profile
+creation `0x00451b80`; race start `0x004536e0`. Source forms needed:
+- A per-branch scoped buffer (the 32-byte seed text in slot 29) keeps VC6
+  from merging the branch tails.
+- The bike-class apply loop is the `UNKNOWN_APPLY_BIKE_CLASS` macro in
+  DialogProc.h, reusing the caller's loop counter.
+- The bike view distance is `(x*x + y*y) + z*z`.
+- `0x004536e0`'s switch cases are written in the order 3, 5, 0, 4, 1, 2.
 
-Not attempted (large): MainDlg slot 29, SPEventDlg slots 29 and 31 and its
-helpers, SPBikeRiderDlg slots 29 and 10, SPRaceInfoDlg and MPRaceInfoDlg
-slot 29, profile creation `0x00451b80` and race start `0x004536e0`.
+Near misses (`samples/ui/DlgProcsNearMisses.cpp`):
+- SPBikeRiderDlg slot 23 `0x0044fa00`, the bike and rider lists
+  `0x0044f750`, and `0x00452930`: register allocation or tail merging.
+- MainDlg slot 29 `0x0044b200`: retail shares one frame slot between its two
+  ConnectionInfoType[5] arrays; VC6 here does not (frame 0xc64 vs 0x6c4).
+- SPBikeRiderDlg slot 10 `0x0044fae0`, 1181 of 1235 bytes: only the
+  scheduling of the by-value vector copies for the camera call differs.
+- SPRaceInfoDlg and MPRaceInfoDlg slot 29 (`0x004507a0`, `0x004513a0`):
+  register use inside the per-racer loops differs.

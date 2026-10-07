@@ -27,6 +27,7 @@ struct UnknownKrustyUIGuiLayer {
 };
 
 class TextureMapManager;
+class BackgroundImage;
 
 class UnknownKrustyUIGui {
 public:
@@ -49,8 +50,11 @@ public:
     // 0x00485a70: shows `dialog` (EventManager 0x0045e710 passes 0, 2, 0, 0,
     // 0, 0, 1).
     void UnknownFunction485a70(GameObject* dialog, int a, int b, int c, int d, int e, int f, int g);
+    void UnknownFunction485fc0();                            // 0x00485fc0: releases the background
 
-    unsigned char field_0x000[0xec];
+    unsigned char field_0x000[0x3c];
+    BackgroundImage* field_0x03c;             // the background (dlgprocs.cpp 0x004536e0)
+    unsigned char field_0x040[0xec - 0x40];
     int field_0x0ec;                          // from TrackGame+0xc40 (KrustyUI 0x004988a0)
     unsigned char field_0x0f0[0x30c - 0xf0];
     int field_0x30c;
@@ -162,7 +166,7 @@ public:
     GameObject* field_0x464;                  // released by 0x004999b0
     Camera* field_0x468;                      // made current while +0x464 is shown
     UnknownKrustyUIModelObject* field_0x46c;  // the rider preview (dlgprocs.cpp SPBikeRiderDlg slot 13)
-    unsigned char field_0x470[0x474 - 0x470];
+    UnknownKrustyUIModelObject* field_0x470;  // the garage character (dlgprocs.cpp SPBikeRiderDlg slot 10)
     Vector3 field_0x474;                      // the +0x464 scene's focus (SelectGamePicProcs.cpp)
     unsigned char field_0x480[0x48c - 0x480];
     int field_0x48c;
