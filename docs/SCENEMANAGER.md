@@ -162,7 +162,9 @@ type, member and function names are provisional.
   (`0x0043a330`), particle emitters (`0x004b8a00`, `0x004b8df0`,
   `0x004b9310`, slot 27), collision object (`0x00431e70`) and sound emitter.
   Only the address of the name terminator differs (retail adds the element
-  offset to the array base first). The views of those classes live in the
+  offset to the array base first); the order follows the spill of the
+  element offset around the physics branch, which retail shares (sample
+  header). The views of those classes live in the
   sample. Shapes that mattered: nested `if`s for the missing-count and
   no-models messages, `model[0x44]` and `slt[0x108]` (retail's frame), the
   emitter loop inside `if (points > 0)` and `if (a2)`, inline keyword

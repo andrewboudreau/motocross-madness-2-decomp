@@ -9,6 +9,14 @@
 // `add edx,esi; mov [edx+ebx+0x10],0` here. Pointer and index spellings,
 // the clamp forms, function-scope declarations, inline helpers and an
 // element pointer local do not change it (helpers and locals make it worse).
+// The order follows the spill of the element offset (ebx, stored at
+// [esp+0x4c] around the physics branch and reloaded in the sound section,
+// as in retail): builds without that spill (the physics branch, the
+// collision block or the sound section removed) emit retail's
+// `add edx, ebx`, and a small probe with the same statements does too.
+// Declaration order, `count`/`length`/`i` types (int, long, unsigned,
+// register), `'\0'`, `*(p + count)`, extra uses of `count` and the
+// /G3-/G6, /GB, /Gy, /Gf, /Zp, /Op, /Ox, /vm* flags leave it.
 
 //
 // Scene::UnknownFunction4edfe0 (0x004edfe0, 5343 bytes): the "Animations"

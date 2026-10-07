@@ -35,9 +35,12 @@ Exact: 43 calibration cases:
 Near misses (`samples/render/D3DIMSoulTreeNearMisses.cpp`, details in its
 header):
 - The LOD `.slt` reader `0x00440060` (1955 of 1964 bytes) and the
-  vertex-group transform `0x00440d40`. Retail adds `offset + base`.
+  vertex-group transform `0x00440d40`. Retail adds `offset + base`; a
+  probe with only the face loop reproduces retail, so the swap is a
+  whole-function effect.
 - Slot 12 `0x00443aa0` (799 of 832): row 1 of the inline view-matrix
-  product adds its terms in another order.
+  product adds its terms in another order. VC6 canonicalises each sum by
+  the kind of its leaves and destination, not by the source order.
 - Slot 5 bounds `0x00444140` (610 of 764): the y/z sums of the centre.
 - The texture-density pass `0x00440810` (same instruction count; one
   extra frame slot), the normals `0x00442fe0` and vertex crosses

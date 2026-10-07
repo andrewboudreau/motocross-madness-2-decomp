@@ -23,7 +23,11 @@
 //   pushes the constant 1 where VC6 here keeps it in edi.
 // SPBikeRiderDlg::UnknownVirtualSlot10 (0x0044fae0, 1235 bytes, 1181
 //   match): the same flow and x87 code; only the scheduling of the by-value
-//   Vector3 copies passed to the camera's slot 29 differs.
+//   Vector3 copies passed to the camera's slot 29 differs (retail takes
+//   `edi = esp` after the camera and vtable loads and loads z before storing
+//   y). A pointer, reference, `this->`, explicit copy, cast or camera local
+//   for the argument leaves it; a user-defined Vector3 copy constructor
+//   copies before the camera is evaluated (worse).
 // SPRaceInfoDlg::UnknownVirtualSlot29 (0x004507a0, 1652 bytes) and
 // MPRaceInfoDlg::UnknownVirtualSlot29 (0x004513a0, 2004 bytes): the same
 //   calls, strings and list columns; inside the per-racer loops retail

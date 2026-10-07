@@ -9,7 +9,10 @@
 // and stores the face indices as [faces + offset]; VC6 emits
 // `surfaces + offset` and [offset + faces] for every indexing form tried
 // (&a[i], a + i, i + a, a pointer local, a (*)[3] cast). Same pattern as
-// samples/camera/FollowCameraNearMisses.cpp's 0x00463140.
+// samples/camera/FollowCameraNearMisses.cpp's 0x00463140. A small probe
+// with only the face loop (3*f, f*3, pointer forms, unsigned f, a k += 3
+// loop) emits retail's `[faces + offset]`: the swap is a whole-function
+// effect, as samples/track/SceneManagerNearMisses.cpp's 0x004ecd60.
 //
 // UnknownFunction440d40 (0x00440d40, 484 bytes): 241/484, 2 bytes short.
 // The vertex-group transform; the same `offset + groups` operand order for
@@ -53,7 +56,13 @@
 // matrix product only gets retail's `add eax, 0xec` base when the camera
 // is not held in a local; named result fields (_11.._44) fix the term
 // order of rows 0, 2 and 3. Row 1 still adds its four products in a
-// different order.
+// different order. VC6 canonicalises each sum (the source term order and
+// the statement order of the rows do not matter); the order changes with
+// the kind of the leaves and of the destination (a row pointer for row 1:
+// 808 of 832; operator(): 787; `view.m[r][c]` stores: 768; a `float*`
+// or pointer/reference to `view`: 739), not with symbol numbering (dummy
+// locals), a plain struct instead of the union, projection pointers or
+// flattened indices (unchanged), and no uniform form gives retail's row 1.
 //
 // UnknownFunction442fe0 (normals, 528 bytes) and UnknownFunction4431f0
 // (vertex crosses, 512 bytes): both scale by function-local statics in

@@ -79,7 +79,8 @@ Near misses (`samples/ui/SelectGamePicProcsNearMisses.cpp`):
   memory and the bike, rider and name arrays in registers. VC6 here keeps
   the total in a register instead.
 - MultiPlayerDlg slot 24 `0x004f3a70`, 2714 of 2729 bytes: only the order
-  of two instructions in the arrival-delay conversion differs.
+  of two instructions in the arrival-delay conversion differs (operand
+  types, locals and the comparison direction do not move them).
 
 Every other start in the extent is a jump table or a branch target inside
 one of these functions.

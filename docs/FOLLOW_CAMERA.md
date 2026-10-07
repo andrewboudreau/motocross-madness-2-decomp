@@ -297,7 +297,9 @@ Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
   formed before `&position` is pushed, and in state 5 the 0x00460b50
   argument slot is reserved after the two squares. Neither changes with
   `/G3`-`/G5`, `/Ob2`, separate locals, inline wrappers, term order or a
-  separate variable for the second rotation. The state-5 distance is
+  separate variable for the second rotation. The push sits in the first
+  x87 stall slot of its block; retail's slot is that of a block starting at
+  `fld st(0)` (sample header lists the forms tried). The state-5 distance is
   `dz*dz + dx*dx + dy` (the y delta is not squared in retail).
 - Slot 46 `0x004654e0`: two late `fsubp`.
 - Slot 47 `0x00465720`.

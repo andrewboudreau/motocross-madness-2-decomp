@@ -6,7 +6,8 @@
 // Retail loads the scene-table index (+0x150) before the table pointer when
 // it addresses the entry (edx/ecx swapped at the branch head as well); a
 // local index, a reference, pointer arithmetic and store orders did not
-// reproduce it.
+// reproduce it; neither do an entry reference, a long/unsigned index,
+// index[array] or the /G, /O, /Zp flag sweep.
 //
 // 0x0041f1d0 (881 bytes; next/previous camera target): control flow, the
 // three branches and the shared tail call 0x0041eb20(caster) (the caster

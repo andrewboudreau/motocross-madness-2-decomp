@@ -14,6 +14,17 @@
 // with the first-frame block, `if/else` (not ?:) for +0x2b4, the state 5
 // deltas as member arithmetic, Set(field_0x258, FLT_MAX) for every +0x294
 // write, and the store orders below (found by permutation).
+// The state 5 `push ecx` is placed in the first x87 stall slot of its block
+// (after the third `fsub`, before `fld st(0)`); retail's slot (after the
+// two squares) is where VC6 puts it when the block starts at `fld st(0)`,
+// as in state 7 after its `je` and at every other retail site of the
+// pattern. No source form moves it: dx/dy/dz as locals (any order, const,
+// register, function scope), a Vector3 delta, macro or inline squares,
+// inline subtractions, every association/parenthesisation, a named sum,
+// an inline call wrapper, double, a switch, a block; /G6 moves it the
+// other way (before the subtractions). For the rotation, a scoped or
+// separate result variable, the call's return value, D3DVECTOR casts and
+// `position = direction * k + target` are all worse.
 //
 // FollowCamera::UnknownVirtualSlot46 (0x004654e0, 576 bytes): 563/576. Two
 // `fsubp` instructions of the second cross product are scheduled one

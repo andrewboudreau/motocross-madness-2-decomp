@@ -117,6 +117,7 @@ Near misses (`samples/ui/DlgProcsNearMisses.cpp`):
 - MainDlg slot 29 `0x0044b200`: retail shares one frame slot between its two
   ConnectionInfoType[5] arrays; VC6 here does not (frame 0xc64 vs 0x6c4).
 - SPBikeRiderDlg slot 10 `0x0044fae0`, 1181 of 1235 bytes: only the
-  scheduling of the by-value vector copies for the camera call differs.
+  scheduling of the by-value vector copies for the camera call differs
+  (no argument spelling changes it; a Vector3 copy constructor is worse).
 - SPRaceInfoDlg and MPRaceInfoDlg slot 29 (`0x004507a0`, `0x004513a0`):
   register use inside the per-racer loops differs.

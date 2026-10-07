@@ -39,7 +39,8 @@ Source forms needed:
 
 Near misses (`samples/race/BikeRaceNearMisses.cpp`):
 - `0x0041eb20` (camera target), 1699 of 1710 bytes: register swap in the
-  scene-object branch.
+  scene-object branch (retail loads the index before the table; no
+  index/entry spelling or flag changes it).
 - `0x0041f1d0` and slot 23 `0x0041f5e0`: retail keeps 0 in a callee-saved
   register throughout; the candidates do not.
 - `0x004210f0` (start grid), 969 of 2940 bytes: VC6's inline budget

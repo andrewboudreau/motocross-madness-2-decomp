@@ -32,7 +32,10 @@
 // MultiPlayerDlg::UnknownVirtualSlot24 (0x004f3a70, 2729 bytes, 2714
 //   match): only the scheduling of the arrival-delay conversion differs
 //   (retail stores the sent time before the fild, VC6 here after loading
-//   TrackGame).
+//   TrackGame). Unchanged by unsigned/int locals for either operand (an
+//   int local for the sent time drops the qword temp and is worse), float
+//   locals, the comparison direction, a pointer to the minimum, no local,
+//   and the /G, /O, /Zp flag sweep.
 
 #include "../../src/reconstructed/SelectGamePicProcs.cpp"
 
