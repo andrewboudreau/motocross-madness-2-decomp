@@ -4,6 +4,7 @@
   "??_7ShadowReceiver@@6B@": "0x005515ec",
   "??_7TerrainShadow@@6B@": "0x005582d4",
   "?AddReceiver@ProjectedShadow@@QAEXPAVShadowReceiver@@@Z": "0x004daba0",
+  "?GameObjectVirtualSlot14@TerrainShadow@@UAEHXZ": "0x0050a1a0",
   "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x004692f0",
   "?LookupCell@TerrainShutdownObject@@QAEPAUTerrainCell@@HH@Z": "0x00484d70"
 }

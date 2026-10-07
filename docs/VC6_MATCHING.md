@@ -228,6 +228,12 @@ Three more units without RTTI or `__FILE__` match strictly:
   with its GetDXVersion probe as a near miss;
 - WinMain with the main window and its window procedure (5; [MAIN](MAIN.md)).
 
+PickDevice.cpp, the display and controller choosers (8, including the two
+builders; [PICKDEVICE](PICKDEVICE.md)), and the serial address helpers
+between Net.cpp and NetProcs.cpp (5, samples/net/SerialAddress.cpp; owner
+unknown) match strictly. In physics targets KrustyBike gains slot 10 and the
+message 1 builder, and TerrainShadow its slot 14 ([PHYSICS_VALIDATION](PHYSICS_VALIDATION.md)).
+
 From the unattributed-code map ([UNATTRIBUTED](UNATTRIBUTED.md)):
 NationalRace.cpp (8, `__FILE__` 0x56e338 and RTTI NationalRace :
 BaseQuarryEvent), Rectangle2D (5) and SkyCube (5) match strictly; the last

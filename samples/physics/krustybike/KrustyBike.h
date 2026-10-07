@@ -88,6 +88,13 @@ public:
     void Fn_004933E0(const KbNetDelta* delta, KbNetState* state);
     void Fn_00496E30(int a);
     void Fn_00413200(float dt);
+    // 0x00493660 (8.5 KB) and 0x00492ad0: per-frame steps GameObject slot 10 runs (ret 8;
+    // tier 3 roles: the local/replayed update and the network update).
+    void Fn_00493660(float dt, int a);
+    void Fn_00492AD0(float dt, int a);
+    // 0x00492670 (ret 0xc; called three times by 0x00492ad0): sends (or records) message 1
+    // with this bike's state and keeps a copy in `state`; `dt` is unused.
+    void Fn_00492670(KbBikeState* state, float dt, int record);
 
 public:
     char field_0x734; // 0x734  first KrustyBike field (Bike's own data ends at 0x734)
@@ -140,7 +147,8 @@ public:
     char field_0x11b8; // 0x11B8
     char pad_0x11B9[0x3];
     int field_0x11bc; // 0x11BC  network id (KbNetBike)
-    char pad_0x11C0[0x1358 - 0x11c0];
+    unsigned char field_0x11c0; // 0x11C0
+    char pad_0x11C1[0x1358 - 0x11c1];
     Vec3 field_0x1358; // 0x1358
     Vec3 field_0x1364; // 0x1364
     Vec3 field_0x1370; // 0x1370
@@ -149,8 +157,7 @@ public:
     float field_0x1384; // 0x1384
     int field_0x1388; // 0x1388
     int field_0x138c; // 0x138C
-    char pad_0x1390[0x68];
-    int field_0x13f8; // 0x13F8
+    KbBikeState recordState; // 0x1390  last state recorded (0x00492ad0 with record set)
     KbRecorder* netRecorder; // 0x13FC
     int field_0x1400; // 0x1400
     int field_0x1404; // 0x1404
@@ -184,10 +191,9 @@ public:
     int field_0x1554; // 0x1554  Fn_0048E280 clears it
     float field_0x1558; // 0x1558  Fn_0048E280: wrapped bearing to the rival relative to heading +0x50, clamped to +-2.7
     KrustyBike* nearestRival; // 0x155C  FindNearestRival result (closest other bike of the race; tier 3 name)
-    char pad_0x1560[0x68];
-    int field_0x15c8; // 0x15C8
+    KbBikeState netState; // 0x1560  last state sent to the peers (0x00492ad0)
     char pad_0x15CC[0x4];
-    int field_0x15d0; // 0x15D0
+    float field_0x15d0; // 0x15D0  seconds since the last short message (0x00492ad0)
     int field_0x15d4; // 0x15D4
     char pad_0x15D8[0xd];
     char field_0x15e5; // 0x15E5
@@ -195,7 +201,7 @@ public:
     char pad_0x15E7[0x1];
     KbObj128* field_0x15e8; // 0x15E8
     char pad_0x15EC[0x18];
-    int field_0x1604; // 0x1604
+    float field_0x1604; // 0x1604  seconds to the next message 10 (0x00492670)
     // own data ends at 0x1608; the compiler places the vtordisp there
 };
 

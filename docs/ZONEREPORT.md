@@ -47,9 +47,19 @@ the preset fields and `UnknownZoneRaceStatus`. The three methods return
 
 ## Open
 
-- `0x0049ca60` (4810 bytes) builds local tables of track names
-  (`"Quarry01"`..). `0x0049c2f0` calls it with 1 and `0x0049c770` with 2.
-  Not attempted.
+- `0x0049ca60` (4810 bytes) converts between the lobby's numbering and the
+  game's. `0x0049c2f0` calls it with 1 (bike manufacturer/type to the bike
+  index `+0x2a0`, event type/location to track name `+0x258` and variant
+  `+0x254`) and `0x0049c770` with 2 (the reverse; `+0x2a5` gets the 1-based
+  track entry, matched with `_stricmp`). It uses the bike-type counts
+  `0x0056db00` and a 70-entry local track table. Near miss in
+  `samples/net/ZoneReportNearMisses.cpp`: one local table array gives
+  retail's frame layout (six separate arrays are laid out in another
+  order), and the logic matches instruction for instruction, but VC6 spills
+  direction 2's index (frame 0x5ac against retail's 0x5a8, which keeps it in
+  `ebx`), shifting every table store by 4, and schedules the table stores
+  differently. Separate loop counters, direct field arithmetic, a `next`
+  temporary, an indexed search and a scoped index all keep the spill.
 
 ## Reproduce
 

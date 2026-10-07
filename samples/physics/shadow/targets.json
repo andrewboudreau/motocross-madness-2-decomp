@@ -308,5 +308,15 @@
     "expect": "exact",
     "notes": "static const Vec3 (0,0,1) dynamic initializer body; closes ProjectedShadow.cpp: the zero vector is read only by its ctor, and .CRT$XCU lists the set after ProCircuitProcs.cpp's (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
     "bindings": "ProjectedShadow.bindings.json"
+  },
+  {
+    "class": "TerrainShadow",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot14@TerrainShadow",
+    "target_va": "0x0050a1a0",
+    "target_size": 498,
+    "expect": "exact",
+    "notes": "slot 14 shadow draw, D3DIMSoultreeShadow slot 14 shape without the world matrix",
+    "bindings": "TerrainShadow.bindings.json"
   }
 ]

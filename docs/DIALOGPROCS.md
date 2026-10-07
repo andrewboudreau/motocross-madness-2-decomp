@@ -37,7 +37,8 @@ SessionDlg, WaitOrCallDlg, ConnectErrorDlg and PlayerRemovedDlg. It also
 has the session join `0x004ae460` and the network drop and ensure
 functions `0x004aef40`/`0x004aefa0`. The serial helpers at
 `0x004ae2f0..0x004ae454` map baud, parity and other settings; Net.cpp and
-NetProcs.cpp are equally possible owners, so they are not claimed.
+NetProcs.cpp are equally possible owners, so they are not claimed (they are
+reconstructed in samples/net/SerialAddress.cpp).
 
 Exact: all 16 functions (6 and 10). Source forms needed:
 - `_stricmp` calls take the literal first.

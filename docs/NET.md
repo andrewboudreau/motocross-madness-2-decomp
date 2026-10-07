@@ -37,7 +37,8 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
   It ends with the EnumPlayers callback at `0x004ae270`. NetProcs.cpp follows:
   its `__FILE__` is at `0x0056eb2c` and its literals begin at `0x0056eb04`
   (used from `0x004ae467`). The small switch helpers at
-  `0x004ae2f0`..`0x004ae410` sit between the two files and are not claimed.
+  `0x004ae2f0`..`0x004ae410` sit between the two files and are not claimed;
+  they are reconstructed (all strict exact) in samples/net/SerialAddress.cpp.
 - Vtables:
   - `NetworkInterface`: `0x005553e8`, one slot, `0x004ad050`.
   - `PlayerInfoType`: `0x005553f0`, slots `0x004adce0` and `0x004add00`.

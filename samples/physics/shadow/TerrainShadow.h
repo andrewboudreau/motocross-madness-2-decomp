@@ -18,6 +18,7 @@ class TerrainShadow : public ShadowReceiver {
 public:
     explicit TerrainShadow(int flags);                                                  // 0x00508ae0
     TerrainShadow* Attach(int host, Terrain* terrain, ProjectedShadow* shadow);     // 0x00508b80
+    virtual int GameObjectVirtualSlot14();                                              // 0x0050a1a0
     virtual int UnknownVirtualSlot27();                                                 // 0x00508bc0
     virtual int UnknownVirtualSlot28();                                                 // 0x005097d0
     virtual int UnknownVirtualSlot29();                                                 // 0x005099c0
@@ -26,7 +27,7 @@ public:
     Terrain* caster;               // +0x2c ctor 0; Attach stores its second argument.  Tier 2: slot 28 calls
                                    // 0x00484d70 on caster+0x44, which is Terrain::heightField
     ProjectedShadow* shadow;       // +0x30 Attach stores its third argument and registers this
-    char field_0x34[0x6054 - 0x34];
+    char field_0x34[0x6054 - 0x34]; // +0x34 slot 14 draws it as FVF 0x1e2 vertices (32 bytes each)
     short indexTable[0x300];       // +0x6054 ctor fills with 0..0x2ff (`mov [ecx],ax; inc eax; cmp eax,0x300`)
     int field_0x6654;              // +0x6654 ctor 0; slot 29 clears it when its list fills
     int minX;                      // +0x6658 ctor 0x7fffffff (running minimum, tier 3 role)
