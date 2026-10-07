@@ -1,0 +1,172 @@
+[
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "??0GraphicsTest",
+    "target_va": "0x0047bc70",
+    "target_size": 102,
+    "expect": "exact",
+    "notes": "ctor, vtable 0x553de4",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "??_GGraphicsTest",
+    "target_va": "0x0047bce0",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "deleting dtor",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "??1GraphicsTest",
+    "target_va": "0x0047bd00",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "dtor",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "?Fn_0047c0b0",
+    "target_va": "0x0047c0b0",
+    "target_size": 434,
+    "expect": "exact",
+    "notes": "wire sphere",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "?DrawLine",
+    "target_va": "0x0047c4f0",
+    "target_size": 120,
+    "expect": "exact",
+    "notes": "GraphicsTest",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "?DrawMarker",
+    "target_va": "0x0047c570",
+    "target_size": 278,
+    "expect": "exact",
+    "notes": "GraphicsTest",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "?SetDrawColor",
+    "target_va": "0x0047c690",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "GraphicsTest",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "?Fn_0047c6c0",
+    "target_va": "0x0047c6c0",
+    "target_size": 37,
+    "expect": "exact",
+    "notes": "GraphicsTest",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "?Fn_0047c6f0",
+    "target_va": "0x0047c6f0",
+    "target_size": 71,
+    "expect": "exact",
+    "notes": "GraphicsTest",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x0047c740",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Math3D.h vector set XCU 132-135, globals 0x65b620..",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x0047c750",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Math3D.h vector set XCU 132-135, globals 0x65b620..",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x0047c790",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Math3D.h vector set XCU 132-135, globals 0x65b620..",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x0047c7a0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Math3D.h vector set XCU 132-135, globals 0x65b620..",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x0047c7e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Math3D.h vector set XCU 132-135, globals 0x65b620..",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x0047c7f0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Math3D.h vector set XCU 132-135, globals 0x65b620..",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x0047c830",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Math3D.h vector set XCU 132-135, globals 0x65b620..",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x0047c840",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Math3D.h vector set XCU 132-135, globals 0x65b620..",
+    "bindings": "GraphicsTest.bindings.json"
+  }
+]

@@ -1,5 +1,14 @@
 #include "KrustyBikeCamera.h"
 
+// The four Math3D vector constants (.CRT$XCU 159-162, initialisers
+// 0x004986b0..0x004987eb, after the last method): 0x0067c3c8, 0x0067c3d8,
+// 0x0067c3e8 and 0x0067c3b8. Slot 10 passes the y axis to FollowCamera
+// slot 46.
+static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
+static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
+static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
+
 // 0x00497cb0: restores the saved state (slot 62) and applies it; virtual
 // calls in a constructor bind statically.
 KrustyBikeCamera::KrustyBikeCamera(int flags) : BikeCamera(flags) {

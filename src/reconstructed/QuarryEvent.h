@@ -2,11 +2,11 @@
 
 #include "GameObject.h"
 #include "MatrixUtil.h"
+#include "Fog.h"
 
 class AuralScape;
 class ChatOverlay;
 class EcoSystem;
-class Fog;
 class InstrumentOverlay;
 class LightEmitter;
 class LightManager;
@@ -73,22 +73,8 @@ public:
     void UnknownFunction45a9a0();             // 0x0045a9a0: lighting changed
 };
 
-// RTTI: Fog (vtable 0x005526dc), 0x5c bytes; constructed by 0x004de590
-// with 0x00462620. Fields as this file's debug page reads them.
-class Fog {
-public:
-    // 0x004627a0: sets the colour, visibility and haziness.
-    void UnknownFunction4627a0(unsigned int color, float visibility, float haziness);
-    void UnknownFunction462db0(int level);    // 0x00462db0: detail level
-
-    unsigned char field_0x00[0x2c];
-    unsigned int field_0x2c;                  // colour, 0x00RRGGBB
-    unsigned char field_0x30[0x38 - 0x30];
-    float field_0x38;                         // visibility
-    unsigned char field_0x3c[0x40 - 0x3c];
-    float field_0x40;                         // haziness
-    int field_0x44;                           // fog kind: 0x80 vertex, 0x100 table, 0x10000 range
-};
+// Fog (vtable 0x005526dc, 0x5c bytes; constructed by 0x004de590 with
+// 0x00462620) is declared in Fog.h.
 
 // RTTI: BaseQuarryEvent : GameObject (vtable 0x0055766c; 0xa4 bytes, the
 // size EventManager 0x0045cb70 allocates). QuarryStuntEvent.cpp

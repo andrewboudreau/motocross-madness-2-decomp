@@ -616,7 +616,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
     if (overrideActive)
         targetPoint = cachedTarget;
     else
-        targetPoint = UnknownVirtualSlot57(*(int*)&dt);
+        targetPoint = UnknownVirtualSlot57(dt);
     if (cameraState == 5) {
         float dx = field_0x170.x - targetPoint.x;
         float dy = field_0x170.y - targetPoint.y;

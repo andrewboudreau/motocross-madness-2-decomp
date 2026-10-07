@@ -2,6 +2,7 @@
 // Translation unit: KrustyBike.cpp (literal __FILE__ xrefs near 0x0048FE58; tier 2).
 // Member and helper names are provisional (tier 3); see KrustyBikeTypes.h.
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include "KrustyBike.h"
 #include "math/FastMath.h"
@@ -27,6 +28,57 @@ static inline float KbLength(const Vec3& v)
     if (d == 1.0f)
         return 1.0f;
     return (float)sqrt(d);
+}
+
+// 0x0048fa60 (near miss, 472 of 532 bytes): the GameObject virtual base is built
+// only for the most-derived object (GameObject(1)), then Bike(flags). Every store
+// matches, but VC6 schedules the +0x7c0/+0x7bc stores into the kVec3Zero copy for
+// +0x1540 where retail puts +0x11b8/+0x604 (the next two statements). Other
+// orders of the first four statements and an inline helper for the
+// +0x7b8/+0x7c0/+0x7bc triple (also written together by slot 97) are worse.
+KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
+{
+    field_0x73c = 0x65;
+    field_0x1540 = kVec3Zero;
+    field_0x11b8 = 0;
+    field_0x604 = 0;
+    field_0x734 = 0;
+    field_0x735 = 0;
+    field_0x768 = 0;
+    field_0x1604 = 0;
+    field_0x740 = 0;
+    field_0x7b8 = 0;
+    field_0x7c0 = 0;
+    field_0x7bc = 1;
+    field_0x748 = 0;
+    field_0x11bc = 0;
+    field_0x141c = 0;
+    field_0x4a4 = 1.0f;
+    field_0x788 = 0;
+    field_0x758 = 0;
+    field_0x760 = 0;
+    field_0x75c = 0;
+    field_0x764 = 0;
+    field_0x15e8 = 0;
+    field_0x1410 = -1;
+    field_0x15e6 = 0;
+    field_0x7a5 = 0;
+    field_0x736 = 0;
+    field_0x7ac = 0;
+    field_0x7b0 = 0;
+    field_0x7b4 = 0;
+    field_0x1358 = kVec3Zero;
+    field_0x1364 = kVec3Zero;
+    field_0x1370 = kVec3Zero;
+    field_0x137c = 0;
+    field_0x1380 = 0;
+    field_0x1384 = 0;
+    field_0x1388 = 0;
+    field_0x1558 = 0;
+    field_0x15d4 = 0;
+    lastCollisionType = 0;
+    altBodyB = 0;
+    altBodyA = 0;
 }
 
 // Destructor body (0x00491540, reached through the vbase-adjusted scalar deleting
@@ -923,6 +975,16 @@ void KrustyBike::UnknownVirtualSlot43()
     field_0x13f8 = 0x7effffff;
 }
 
+// .data 0x0056cb88: six trick records {id, name[32]}; slot 97 registers the clips by
+// these names (retail keeps the two "BackOver" entries apart).
+struct KrustyTrickName {
+    int id;
+    char name[32];
+};
+static KrustyTrickName s_KrustyTricks[6] = {
+    {0, "BackOver"}, {1, "Endo"}, {2, "Kahuna"}, {3, "BackOver"}, {4, "LeftOver"}, {5, "RightOver"},
+};
+
 // Slot 97: after the Bike set-up, registers the rider's animation clips (by name) with the
 // field_0x604 object, binds both wheels and attaches the scene node (tier 3 semantics).
 void KrustyBike::UnknownVirtualSlot97()
@@ -937,12 +999,12 @@ void KrustyBike::UnknownVirtualSlot97()
     ((KbA604*)field_0x604)->Fn_005305B0(((KbA5C4*)riderCharacter)->Fn_004A6B30("FeetHitL", 1));
     ((KbA604*)field_0x604)->Fn_005305B0(((KbA5C4*)riderCharacter)->Fn_004A6B30("FeetHitR", 1));
     ((KbA604*)field_0x604)->Fn_005305B0(((KbA5C4*)riderCharacter)->Fn_004A6B30("HeadHit", 1));
-    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30("BackOver", 1));
-    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30("Endo", 1));
-    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30("Kahuna", 1));
-    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30("BackOver", 1));
-    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30("LeftOver", 1));
-    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30("RightOver", 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30(s_KrustyTricks[0].name, 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30(s_KrustyTricks[1].name, 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30(s_KrustyTricks[2].name, 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30(s_KrustyTricks[3].name, 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30(s_KrustyTricks[4].name, 1));
+    ((KbA604*)field_0x604)->Fn_00530630(((KbA5C4*)riderCharacter)->Fn_004A6B30(s_KrustyTricks[5].name, 1));
     ((KbA604*)field_0x604)->Fn_00530680(frontWheel);
     ((KbA604*)field_0x604)->Fn_00530680(rearWheel);
     ((KbA604*)field_0x604)->Fn_005328B0(modelNode->firstChild, Vec3(0.0f, 2.0f, 0.0f), Vec3(0.5f, 1.5f, 3.0f));
@@ -1351,4 +1413,110 @@ void KrustyBike::Fn_0048E280()
     field_0x1554 = 0;
     ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[14], 0.5f);
     D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], 0.5f);
+}
+
+// 0x004933e0: the decoded network state (+0x1358..+0x1388) accumulates message 13's
+// byte deltas; the result is copied into *state.
+void KrustyBike::Fn_004933E0(const KbNetDelta* delta, KbNetState* state)
+{
+    Vec3 d0(delta->delta0[0] * 0.234375f, delta->delta0[1] * 0.234375f, delta->delta0[2] * 0.234375f);
+    Vec3 d1(delta->delta1[0] * 0.234375f, delta->delta1[1] * 0.234375f, delta->delta1[2] * 0.234375f);
+    Vec3 d2(delta->delta2[0] * 0.049087387f, delta->delta2[1] * 0.049087387f, delta->delta2[2] * 0.049087387f);
+    field_0x1358 += d0;
+    field_0x1364 += d1;
+    field_0x1370 += d2;
+    field_0x137c += delta->delta3[0] * 0.049087387f;
+    field_0x1380 += delta->delta3[1] * 0.049087387f;
+    field_0x1384 += delta->delta3[2] * 0.049087387f;
+    int step;
+    if (delta->step & 1)
+        step = (delta->step >> 1) * 8;
+    else
+        step = delta->step >> 1;
+    state->step = step;
+    field_0x1388 += state->step;
+    state->field_0x4c = field_0x1388;
+    state->field_0x3c = field_0x1358;
+    state->field_0x08 = field_0x1364;
+    state->field_0x30 = field_0x1370;
+    state->field_0x14 = field_0x137c;
+    state->field_0x18 = field_0x1380;
+    state->field_0x1c = field_0x1384;
+    state->field_0x50 = delta->field_0x0e;
+    state->field_0x48 = delta->field_0x12;
+}
+
+// 0x00495ff0: ends a trick. The angle (+0x1530) drops its part below 100, the
+// score is angle x multiplier (+0x1538, +0.5 for a +0x153f landing); the race
+// handler hears of it. In game mode 0 (or 4 with +0x2eb8 for the +0x568 racer's
+// bike) the score is kept in +0x788 and returned; otherwise the bonus rules
+// (+0x3444) turn it into a capped bonus, shown to the +0x50 racer's bike.
+// Near miss (871 of 895 bytes): retail shares one stack slot between score and
+// gain and one between the integer and float bonus, and loads +0x153f before
+// the fsubr; the declaration orders tried do not reproduce that.
+float KrustyBike::Fn_00495FF0()
+{
+    field_0x1530 -= (float)fmod(field_0x1530, 100.0);
+    if (field_0x153f)
+        field_0x1538 += 0.5f;
+    float score = field_0x1530 * field_0x1538;
+    if (field_0x740->field_0x38 == this && field_0x740->handler)
+        field_0x740->handler->Fn_004E57D0(this, score);
+    if (!g_kbGame->field_0x2d74 ||
+        (g_kbGame->field_0x2d74 == 4 && g_kbGame->field_0x2eb8 && g_kbGame->field_0x568->field_0xa8 == this)) {
+        if (field_0x740->field_0x38 == this) {
+            if (field_0x740->field_0xbc)
+                field_0x740->field_0xbc->Fn_0048D1E0(field_0x1530, field_0x1538);
+            int points = (int)score;
+            if (field_0x788 > points)
+                points = field_0x788;
+            field_0x788 = points;
+        }
+        Fn_0048D8B0();
+        return score;
+    }
+    KbBonusTable* rules = g_kbGame->field_0x3444;
+    if (rules) {
+        float step = field_0x1530 * 0.000016f;
+        if (!(step < 1.0f))
+            step = 1.0f;
+        int base = rules->base[rules->index];
+        int points = (int)(base * rules->baseScale);
+        float gain = 0.0f;
+        float bonus = points;
+        float limit = points * rules->limitScale;
+        if (field_0x7b4 * 400.0f < limit) {
+            float total = step + field_0x7b4;
+            if (total * 400.0f > limit) {
+                field_0x7b4 = limit * 0.0025f;
+            } else {
+                field_0x7b4 = total;
+                gain = step * 400.0f;
+            }
+        }
+        if (this == field_0x740->field_0x50->field_0x3b4) {
+            KbMsgSink* sink = g_kbGame->field_0x570->Fn_0045D340();
+            char text[0x80];
+            char line[0x80];
+            if (gain > 0.0f) {
+                g_kbGame->Fn_00521970(0x14d8, text, 0x80);
+                sprintf(line, "%s %.0f.00", text, gain);
+                KbMessage* message = new(__FILE__, 0xa14) KbMessage(line, 3.25f);
+                if (message) {
+                    sink->Fn_0051B540(message);
+                    delete message;
+                }
+            } else {
+                g_kbGame->Fn_00521970(0x14d9, text, 0x80);
+                sprintf(line, "%s %.0f.00)", text, bonus * rules->limitScale);
+                KbMessage* message = new(__FILE__, 0xa1d) KbMessage(line, 3.25f);
+                if (message) {
+                    sink->Fn_0051B540(message);
+                    delete message;
+                }
+            }
+        }
+    }
+    Fn_0048D8B0();
+    return 0.0f;
 }

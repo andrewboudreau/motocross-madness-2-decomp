@@ -6,9 +6,9 @@
 // Reconstructed bodies are in GameUi.cpp.
 
 #include "GameObject.h"
+#include "MediaControl.h"
 
 class GUIManager;
-class MediaControl;
 struct UnknownSurfaceInterface;
 class Sound;
 class GameObjectIterator;
@@ -697,23 +697,8 @@ public:
 
 inline UIDDLButton* UIDropDownList::UnknownInlineButton() { return field_0x1ec; }
 
-// RTTI: MediaControl : GameObject (vtable 0x005551c0; 0x80 bytes, new'd by
-// UIVideoStatic 0x0047ae90): a movie player. Declared here for
-// UIVideoStatic and the dialog procedures.
-class MediaControl : public GameObject {
-public:
-    MediaControl(int a);                      // 0x004a2410
-    // 0x004a2560: opens `file` for `target`; `done` is called with `owner`
-    // at its end. 0 when it fails.
-    int UnknownFunction4a2560(void* target, const char* file, void (*done)(UIDialog* dialog), UIDialog* owner);
-    int UnknownFunction4a2900();              // 0x004a2900: restarts the movie
-    void UnknownFunction4a2940();             // 0x004a2940: stops the movie
-
-    UnknownSurfaceInterface* field_0x2c;      // the frame's surface
-    int field_0x30;                           // width
-    int field_0x34;                           // height
-    unsigned char field_0x38[0x80 - 0x38];
-};
+// MediaControl (RTTI, vtable 0x005551c0; 0x80 bytes, new'd by UIVideoStatic
+// 0x0047ae90), the movie player, is declared in MediaControl.h.
 
 // RTTI: UIVideoStatic : UIStatic (vtable 0x00553b60; 0x200 bytes, new'd by
 // dlgprocs.cpp's CreditsVidDlg): a control that plays a movie. Its

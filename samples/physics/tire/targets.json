@@ -1,200 +1,335 @@
 [
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "??1Tire@@UAE@XZ",
-  "target_va": "0x005133d0",
-  "target_size": 185,
-  "expect": "exact",
-  "notes": "destructor core: releases field_0x2b0 else field_0x2ac, then base dtors; proves base order/offsets CollisionObject@0, CollisionPoint@0xb8, MovingPart@0x17c"
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "??_GTire@@UAEPAXI@Z",
-  "target_va": "0x005133a0",
-  "target_size": 34,
-  "expect": "exact",
-  "notes": "scalar deleting destructor; 34 code bytes + 14 padding"
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "??_ETire@@WKM@AEPAXI@Z",
-  "target_va": "0x00515730",
-  "target_size": 11,
-  "expect": "exact",
-  "notes": "vtable thunk for the CollisionPoint subobject (this - 0xac, i.e. -172) into the deleting dtor"
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "GameObjectVirtualSlot8@Tire",
-  "target_va": "0x00513490",
-  "target_size": 201,
-  "expect": "partial",
-  "notes": "98.87% at exact size 201: zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap"
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "CollisionPointVirtualSlot1@Tire",
-  "target_va": "0x00515b50",
-  "target_size": 316,
-  "expect": "partial",
-  "notes": "48.7%: retail keeps s=sqrt(1-c*c) on the x87 stack (fmul st(2)) and multiplies each term by field_0x74 separately (term with field_0x270 first); VC6 here factors field_0x74 out of the sum and reloads s. Clamp is `c >= 1.0f` Wave 2: swapping term order, naming s as a local, re-reading s from field_0x288 all compile to identical bytes (VC6 factors the shared field_0x74 multiply and evaluates the field_0x1cc term first); retail multiplies field_0x74 into each term."
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "HandleContact@Tire",
-  "target_va": "0x00512e80",
-  "target_size": 137,
-  "expect": "partial",
-  "notes": "14% : same switch cases and vec copy, but retail keeps 0x65 and default as separate returns with the vector pointer in edx and esi saved for the whole function; VC6 orders the case tests and saves esi differently"
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "TireCollisionCallback",
-  "target_va": "0x00512e30",
-  "target_size": 72,
-  "expect": "exact",
-  "notes": "wave5: exact. Early-return shape (`if (tag==0x64) { if (slot51(owner)) return; } else if (tag==0x65) return; HandleContact(1, tag, b);`) shares one call so the tag stays in esi instead of being constant-propagated to 0x64"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "??1CollisionCharacter@@UAE@XZ",
-  "target_va": "0x00431980",
-  "target_size": 60,
-  "expect": "exact",
-  "notes": "destructor core (this = GameObject subobject, jmp to D3DIMSoultreeCharacter core 0x004459a0)"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "??_GCollisionCharacter@@UAEPAXI@Z",
-  "target_va": "0x00431d20",
-  "target_size": 51,
-  "expect": "exact",
-  "notes": "vbase deleting destructor: lea esi,[ecx-0x268] proves GameObject vbase at 616; 51 code bytes + 13 padding"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "??_ECollisionCharacter@@$4PPPPPPPM@A@AEPAXI@Z",
-  "target_va": "0x00431d10",
-  "target_size": 8,
-  "expect": "exact",
-  "notes": "vtordisp thunk for vbase slot 0"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@$4PPPPPPPM@FE@AEXXZ",
-  "target_va": "0x00431d60",
-  "target_size": 11,
-  "expect": "exact",
-  "notes": "vtordisp + adjust (sub ecx,0x54) thunk for vbase slot 4 into D3DIM 0x00446640"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@$4PPPPPPPM@FE@AEXXZ",
-  "target_va": "0x00431d70",
-  "target_size": 11,
-  "expect": "exact",
-  "notes": "vtordisp + adjust (sub ecx,0x54) thunk for vbase slot 5 into D3DIM 0x00446620"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "GameObjectVirtualSlot10@CollisionCharacter@@$4PPPPPPPM@A@AEHM@Z",
-  "target_va": "0x00431d80",
-  "target_size": 8,
-  "expect": "exact",
-  "notes": "vtordisp thunk for overridden vbase slot 10"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@$4PPPPPPPM@A@AEHXZ",
-  "target_va": "0x00431d90",
-  "target_size": 8,
-  "expect": "exact",
-  "notes": "vtordisp thunk for overridden vbase slot 14"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@UAEHXZ",
-  "target_va": "0x00431cf0",
-  "target_size": 21,
-  "expect": "exact",
-  "notes": "tail call to GameObject slot 14 (0x00469360) on the vbase subobject"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "?Load@CollisionCharacter",
-  "target_va": "0x004319c0",
-  "target_size": 360,
-  "expect": "exact",
-  "notes": "non-virtual loader (ret 0x1c): D3DIM slot 11, new CollisionObject(1) with __FILE__ line 27, shape from .col path or node, owner tag 0x2711"
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "GameObjectVirtualSlot10@CollisionCharacter@@UAEHM@Z",
-  "target_va": "0x00431b30",
-  "target_size": 438,
-  "expect": "exact",
-  "notes": "velocity = (pos - last) / dt written through a reciprocal-multiply Vec3 divide (the shared out-of-line helper 0x0043c890: inv = 1/dt, then three multiplies on the Vec3 temporary). That form leaves the x component on the x87 stack as retail does; operator* by a float temp or per-component divide did not."
- },
- {
-  "class": "CollisionCharacter",
-  "source": "CollisionCharacter.cpp",
-  "candidate_symbol_contains": "??0CollisionCharacter@@QAE@H@Z",
-  "target_va": "0x004318d0",
-  "target_size": 162,
-  "expect": "exact",
-  "notes": "CollisionCharacter(int a) : GameObject(1), D3DIMSoultreeCharacter(a): vbase ctor 0x00468ca0(1) under the hidden most-derived flag, D3DIM ctor 0x004455b0(a, 0), vptr/vtordisp writes, field_0x210 = 0."
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "TireBuildFrame",
-  "target_va": "0x00515880",
-  "target_size": 703,
-  "expect": "partial",
-  "notes": "7.35% (tier 3 name): rotation-frame builder; 677 bytes vs 703 target. Uses TireNormalizeZ helper. Retail has 0x30 locals + push esi (B.z in esi); ours has an extra Vec3 temp and caches y in registers"
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "UpdateContactPatch",
-  "target_va": "0x005135f0",
-  "target_size": 1664,
-  "expect": "partial",
-  "notes": "17.2% (tier 3 name): contact-patch update, all 3 paths (minLength>0.001 with reject/normalise, dot<=0.001 tail, short-axis tail with out-of-line dot) and all stores present; candidate 1628 B vs 1664. First divergence is register/temp allocation after the second cross product (retail keeps the normal pointer in ecx, we address through esi) and x87 temp reuse of dead parameter slots (retail stores a dot in the arg9 slot); the g_TireZeroVec3 copies and the CollisionVec3 ctor call form on the tail paths differ"
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "UpdateSuspensionProbe",
-  "target_va": "0x00514550",
-  "target_size": 4258,
-  "expect": "partial",
-  "notes": "5.2% (tier 3 name): wheel ground probe; all 3 world probes (0x00507c10), owner/non-owner/angle==pi/2 branches, surface-record lookup, bounds record path, TireBuildFrame + 0x435830/0x438e70 calls and final stores present; candidate 3977 B vs 4258. First divergence is in the prologue: retail frame 0xc0 (ours 0xbc) and different local-vector placement/temps; retail re-derives owner-node loads and the normalise fall-back in separate inlined copies (TireNormalizeOr is a single shared helper here)"
- },
- {
-  "class": "Tire",
-  "source": "Tire.cpp",
-  "candidate_symbol_contains": "??0Tire@@",
-  "target_va": "0x00512f10",
-  "target_size": 1165,
-  "expect": "exact",
-  "notes": "99.1% (only the dead CollisionPoint vptr store 0x5511d8 at +0xb8 is missing: retail keeps it before the CollisionPoint field inits, VC6 drops it because the Tire vptrs overwrite it). Same size 1165. Base order CollisionObject(1), MovingPart(a1,a2,a6), CollisionPoint(a4,a15) with the CollisionPoint ctor inlined via an area-local `inline` definition using the 0x68a3d0/0x68a3f0 globals; EH frame (state stores, handler 0x54ebc7) generated by the compiler with no explicit placement delete needed wave5: exact after moving CollisionPoint's normalForce/surfaceOwner initialisation out of the member-init list into the inlined constructor body (retail stores the vptr before normalForce)."
- }
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "??1Tire@@UAE@XZ",
+    "target_va": "0x005133d0",
+    "target_size": 185,
+    "expect": "exact",
+    "notes": "destructor core: releases field_0x2b0 else field_0x2ac, then base dtors; proves base order/offsets CollisionObject@0, CollisionPoint@0xb8, MovingPart@0x17c",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "??_GTire@@UAEPAXI@Z",
+    "target_va": "0x005133a0",
+    "target_size": 34,
+    "expect": "exact",
+    "notes": "scalar deleting destructor; 34 code bytes + 14 padding",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "??_ETire@@WKM@AEPAXI@Z",
+    "target_va": "0x00515730",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "vtable thunk for the CollisionPoint subobject (this - 0xac, i.e. -172) into the deleting dtor",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot8@Tire",
+    "target_va": "0x00513490",
+    "target_size": 201,
+    "expect": "partial",
+    "notes": "98.87% at exact size 201: zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "CollisionPointVirtualSlot1@Tire",
+    "target_va": "0x00515b50",
+    "target_size": 316,
+    "expect": "partial",
+    "notes": "48.7%: retail keeps s=sqrt(1-c*c) on the x87 stack (fmul st(2)) and multiplies each term by field_0x74 separately (term with field_0x270 first); VC6 here factors field_0x74 out of the sum and reloads s. Clamp is `c >= 1.0f` Wave 2: swapping term order, naming s as a local, re-reading s from field_0x288 all compile to identical bytes (VC6 factors the shared field_0x74 multiply and evaluates the field_0x1cc term first); retail multiplies field_0x74 into each term."
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "HandleContact@Tire",
+    "target_va": "0x00512e80",
+    "target_size": 137,
+    "expect": "partial",
+    "notes": "14% : same switch cases and vec copy, but retail keeps 0x65 and default as separate returns with the vector pointer in edx and esi saved for the whole function; VC6 orders the case tests and saves esi differently"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "TireCollisionCallback",
+    "target_va": "0x00512e30",
+    "target_size": 72,
+    "expect": "exact",
+    "notes": "wave5: exact. Early-return shape (`if (tag==0x64) { if (slot51(owner)) return; } else if (tag==0x65) return; HandleContact(1, tag, b);`) shares one call so the tag stays in esi instead of being constant-propagated to 0x64",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "??1CollisionCharacter@@UAE@XZ",
+    "target_va": "0x00431980",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "destructor core (this = GameObject subobject, jmp to D3DIMSoultreeCharacter core 0x004459a0)"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "??_GCollisionCharacter@@UAEPAXI@Z",
+    "target_va": "0x00431d20",
+    "target_size": 51,
+    "expect": "exact",
+    "notes": "vbase deleting destructor: lea esi,[ecx-0x268] proves GameObject vbase at 616; 51 code bytes + 13 padding"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "??_ECollisionCharacter@@$4PPPPPPPM@A@AEPAXI@Z",
+    "target_va": "0x00431d10",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk for vbase slot 0"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot4@D3DIMSoultreeCharacter@@$4PPPPPPPM@FE@AEXXZ",
+    "target_va": "0x00431d60",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "vtordisp + adjust (sub ecx,0x54) thunk for vbase slot 4 into D3DIM 0x00446640"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot5@D3DIMSoultreeCharacter@@$4PPPPPPPM@FE@AEXXZ",
+    "target_va": "0x00431d70",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "vtordisp + adjust (sub ecx,0x54) thunk for vbase slot 5 into D3DIM 0x00446620"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot10@CollisionCharacter@@$4PPPPPPPM@A@AEHM@Z",
+    "target_va": "0x00431d80",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk for overridden vbase slot 10"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@$4PPPPPPPM@A@AEHXZ",
+    "target_va": "0x00431d90",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk for overridden vbase slot 14"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionCharacter@@UAEHXZ",
+    "target_va": "0x00431cf0",
+    "target_size": 21,
+    "expect": "exact",
+    "notes": "tail call to GameObject slot 14 (0x00469360) on the vbase subobject"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "?Load@CollisionCharacter",
+    "target_va": "0x004319c0",
+    "target_size": 360,
+    "expect": "exact",
+    "notes": "non-virtual loader (ret 0x1c): D3DIM slot 11, new CollisionObject(1) with __FILE__ line 27, shape from .col path or node, owner tag 0x2711"
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot10@CollisionCharacter@@UAEHM@Z",
+    "target_va": "0x00431b30",
+    "target_size": 438,
+    "expect": "exact",
+    "notes": "velocity = (pos - last) / dt written through a reciprocal-multiply Vec3 divide (the shared out-of-line helper 0x0043c890: inv = 1/dt, then three multiplies on the Vec3 temporary). That form leaves the x component on the x87 stack as retail does; operator* by a float temp or per-component divide did not."
+  },
+  {
+    "class": "CollisionCharacter",
+    "source": "CollisionCharacter.cpp",
+    "candidate_symbol_contains": "??0CollisionCharacter@@QAE@H@Z",
+    "target_va": "0x004318d0",
+    "target_size": 162,
+    "expect": "exact",
+    "notes": "CollisionCharacter(int a) : GameObject(1), D3DIMSoultreeCharacter(a): vbase ctor 0x00468ca0(1) under the hidden most-derived flag, D3DIM ctor 0x004455b0(a, 0), vptr/vtordisp writes, field_0x210 = 0."
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "TireBuildFrame",
+    "target_va": "0x00515880",
+    "target_size": 703,
+    "expect": "partial",
+    "notes": "7.35% (tier 3 name): rotation-frame builder; 677 bytes vs 703 target. Uses TireNormalizeZ helper. Retail has 0x30 locals + push esi (B.z in esi); ours has an extra Vec3 temp and caches y in registers"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "UpdateContactPatch",
+    "target_va": "0x005135f0",
+    "target_size": 1664,
+    "expect": "partial",
+    "notes": "17.2% (tier 3 name): contact-patch update, all 3 paths (minLength>0.001 with reject/normalise, dot<=0.001 tail, short-axis tail with out-of-line dot) and all stores present; candidate 1628 B vs 1664. First divergence is register/temp allocation after the second cross product (retail keeps the normal pointer in ecx, we address through esi) and x87 temp reuse of dead parameter slots (retail stores a dot in the arg9 slot); the g_TireZeroVec3 copies and the CollisionVec3 ctor call form on the tail paths differ"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "UpdateSuspensionProbe",
+    "target_va": "0x00514550",
+    "target_size": 4258,
+    "expect": "partial",
+    "notes": "5.2% (tier 3 name): wheel ground probe; all 3 world probes (0x00507c10), owner/non-owner/angle==pi/2 branches, surface-record lookup, bounds record path, TireBuildFrame + 0x435830/0x438e70 calls and final stores present; candidate 3977 B vs 4258. First divergence is in the prologue: retail frame 0xc0 (ours 0xbc) and different local-vector placement/temps; retail re-derives owner-node loads and the normalise fall-back in separate inlined copies (TireNormalizeOr is a single shared helper here)"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "??0Tire@@",
+    "target_va": "0x00512f10",
+    "target_size": 1165,
+    "expect": "exact",
+    "notes": "99.1% (only the dead CollisionPoint vptr store 0x5511d8 at +0xb8 is missing: retail keeps it before the CollisionPoint field inits, VC6 drops it because the Tire vptrs overwrite it). Same size 1165. Base order CollisionObject(1), MovingPart(a1,a2,a6), CollisionPoint(a4,a15) with the CollisionPoint ctor inlined via an area-local `inline` definition using the 0x68a3d0/0x68a3f0 globals; EH frame (state stores, handler 0x54ebc7) generated by the compiler with no explicit placement delete needed wave5: exact after moving CollisionPoint's normalForce/surfaceOwner initialisation out of the member-init list into the inlined constructor body (retail stores the vptr before normalForce).",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "??1CollisionPoint@@UAE@XZ",
+    "target_va": "0x00515b40",
+    "target_size": 7,
+    "expect": "exact",
+    "notes": "inline dtor emitted for the constructor's unwind",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "?SetRollDistance@Tire@@",
+    "target_va": "0x00513560",
+    "target_size": 68,
+    "expect": "exact",
+    "notes": "Tire.cpp",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "?ApplyRollAngle@Tire@@",
+    "target_va": "0x005135b0",
+    "target_size": 56,
+    "expect": "exact",
+    "notes": "Tire.cpp",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "?UpdateAttachment@Tire@@",
+    "target_va": "0x00515660",
+    "target_size": 195,
+    "expect": "exact",
+    "notes": "Tire.cpp",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "?UpdateRoll@Tire@@",
+    "target_va": "0x005143d0",
+    "target_size": 369,
+    "expect": "exact",
+    "notes": "Tire.cpp",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00515740",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Tire vector set, XCU 319-322",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x00515750",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Tire vector set, XCU 319-322",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x00515790",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Tire vector set, XCU 319-322",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x005157a0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Tire vector set, XCU 319-322",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x005157e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Tire vector set, XCU 319-322",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x005157f0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Tire vector set, XCU 319-322",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x00515830",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Tire vector set, XCU 319-322",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00515840",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Tire vector set, XCU 319-322",
+    "bindings": "Tire.bindings.json"
+  }
 ]

@@ -230,6 +230,8 @@ class GridNode {
 public:
     virtual ~GridNode();                                        // 0x004838a0 (slot 0 0x004838f0)
     virtual int UnknownVirtualSlot1(void* a, void* b, void* out, int c, int d, int e); // 0x00483d40
+    // 0x00484d70: the leaf whose grid position is (x, z), or 0 (GridNode.cpp).
+    GridNode* UnknownFunction484d70(int x, int z);
 
     GridNode** children;                       // +0x04 256 entries (0x400 bytes)
     GridNode* parent;                          // +0x08

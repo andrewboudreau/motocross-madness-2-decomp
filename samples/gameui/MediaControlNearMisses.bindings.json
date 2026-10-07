@@ -1,0 +1,15 @@
+{
+  "?UnknownFunction4a23d0@MediaControl@@SAHXZ": "0x004a23d0",
+  "?UnknownFunction4a2560@MediaControl@@QAEPAV1@PAXPBDP6AXPAVUIDialog@@@Z2@Z": "0x004a2560",
+  "?UnknownFunction4a2900@MediaControl@@QAEHXZ": "0x004a2900",
+  "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
+  "_CLSID_AMMultiMediaStream": "0x00558ec0",
+  "_IID_IAMMultiMediaStream": "0x00558ed0",
+  "_IID_IDirectDraw": "0x00556080",
+  "_IID_IDirectDrawMediaStream": "0x00558e90",
+  "_IID_IDirectDrawSurface4": "0x005560f0",
+  "_MSPID_PrimaryAudio": "0x00558ea0",
+  "_MSPID_PrimaryVideo": "0x00558eb0",
+  "__imp__CoCreateInstance@20": "0x005503fc",
+  "__imp__MultiByteToWideChar@24": "0x005501a0"
+}

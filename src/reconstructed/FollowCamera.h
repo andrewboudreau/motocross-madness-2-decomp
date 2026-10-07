@@ -165,7 +165,9 @@ public:
     // bool return would add (neg/sbb/neg).
     virtual unsigned char UnknownVirtualSlot55();
     virtual bool UnknownVirtualSlot56();
-    virtual Vector3 UnknownVirtualSlot57(int mode) = 0;
+    // The argument is a float: FollowCamera slot 10 passes its frame time and
+    // VehicleCamera's override caps it at 0.2.
+    virtual Vector3 UnknownVirtualSlot57(float dt) = 0;
     virtual void UnknownVirtualSlot58();
     virtual void UnknownVirtualSlot59();
     virtual void UnknownVirtualSlot60();
@@ -234,7 +236,7 @@ protected:
     int overrideActive;              // +0x268, slot 70 input byte
     int field_0x26c;            // reset by slot 70
     float field_0x270;          // 15.0f
-    unsigned char field_0x274;
+    bool field_0x274;           // VehicleCamera slot 36 returns it as its bool result
     unsigned char field_0x275;
     unsigned char field_0x276;
     bool field_0x277;           // set when slot 36 ran with enable

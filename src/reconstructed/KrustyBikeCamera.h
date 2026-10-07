@@ -24,8 +24,9 @@ struct UnknownKrustyBike {
     bool field_0x7a4;
 };
 
-// RTTI: KrustyBikeCamera : BikeCamera. KrustyBike.cpp is a candidate for its
-// translation unit (name overlap and nearby references), not established.
+// RTTI: KrustyBikeCamera : BikeCamera. Its code (0x00497cb0..0x004987ec) follows
+// KrustyBike.cpp's but ends with its own Math3D vector set, so it is a separate
+// unit; the file name is ours.
 // It keeps the camera state and presets in the 0x0056e26c object so they
 // survive between cameras.
 class KrustyBikeCamera : public BikeCamera {

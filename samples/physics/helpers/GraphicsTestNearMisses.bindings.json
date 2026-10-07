@@ -1,0 +1,20 @@
+{
+  "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600",
+  "?DrawBox@GraphicsTest@@QAEXPBUVec3@@0PBUMatrix4@@@Z": "0x0047c270",
+  "?DrawLine@GraphicsTest@@QAEXPBUVec3@@0@Z": "0x0047c4f0",
+  "?Fn_0047bd10@GraphicsTest@@QAEXPBUVec3@@M0H@Z": "0x0047bd10",
+  "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z": "0x005087b0",
+  "_$E1": "0x0047c750",
+  "_$E10": "0x0047c840",
+  "_$E11": "0x0047c830",
+  "_$E2": "0x0047c740",
+  "_$E4": "0x0047c7a0",
+  "_$E5": "0x0047c790",
+  "_$E7": "0x0047c7f0",
+  "_$E8": "0x0047c7e0",
+  "__real@4@4001c90fdb0000000000": "0x00550488",
+  "_kVec3XAxis": "0x0065b640",
+  "_kVec3YAxis": "0x0065b650",
+  "_kVec3ZAxis": "0x0065b620",
+  "_kVec3Zero": "0x0065b630"
+}

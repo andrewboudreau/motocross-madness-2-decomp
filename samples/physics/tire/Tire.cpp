@@ -1,8 +1,27 @@
 // Tire.cpp -- Tire (CollisionObject + MovingPart + CollisionPoint), see Tire.h.
 #include "Tire.h"
+#include <float.h>
 #include <math.h>
 
 #define TIRE_PI 3.14159265358979f
+
+// The four Math3D vector constants of this unit (.CRT$XCU 319-322, initialisers
+// 0x00515740..0x0051587b): 0x0068a3d0, 0x0068a3e0, 0x0068a3f0 and 0x0068a3c0.
+// The constructor, UpdateSuspensionProbe and CollisionPoint slot 1 read them.
+// CollisionVec3's (x, y, z) constructor is out of line, so the values go through
+// an inline helper; it gives the same initialiser code as Math3D.h's.
+static inline CollisionVec3 TireVec3(float x, float y, float z)
+{
+    CollisionVec3 v;
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    return v;
+}
+static const CollisionVec3 kVec3Zero = TireVec3(0.0f, 0.0f, 0.0f);
+static const CollisionVec3 kVec3XAxis = TireVec3(1.0f, 0.0f, 0.0f);
+static const CollisionVec3 kVec3YAxis = TireVec3(0.0f, 1.0f, 0.0f);
+static const CollisionVec3 kVec3ZAxis = TireVec3(0.0f, 0.0f, 1.0f);
 
 // Callback stored in CollisionObject::field_0x88 by slot 8 (0x00512e30).  a is the
 // tire's own CollisionObject (field_0x60 = owner, the Tire), b is the object that was hit.
@@ -193,7 +212,7 @@ void Tire::CollisionPointVirtualSlot1()
 {
     if (!(CollisionPoint::tangentSpeed > 0.001f) && !(CollisionPoint::spinSpeed > 0.001f)) {
         CollisionPoint::frictionMagnitude = 0.0f;
-        CollisionPoint::frictionForce = g_TireZeroVec3;
+        CollisionPoint::frictionForce = kVec3Zero;
     } else {
         float c = CollisionPoint::frictionDirection.y * rollDirection.y + CollisionPoint::frictionDirection.x * rollDirection.x
                 + CollisionPoint::frictionDirection.z * rollDirection.z;
@@ -297,7 +316,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             float inv = 1.0f / this->CollisionPoint::spinSpeed;
             this->CollisionPoint::frictionDirection = CollisionVec3(slipVector.x * inv, slipVector.y * inv, slipVector.z * inv);
         } else {
-            this->CollisionPoint::frictionDirection = g_TireZeroVec3;
+            this->CollisionPoint::frictionDirection = kVec3Zero;
             this->CollisionPoint::spinSpeed = 0.0f;
         }
         float c = this->CollisionPoint::frictionDirection.y * rollDirection.y + this->CollisionPoint::frictionDirection.x * rollDirection.x +
@@ -322,7 +341,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
             float inv = 1.0f / this->CollisionPoint::spinSpeed;
             this->CollisionPoint::frictionDirection = CollisionVec3(slipVector.x * inv, slipVector.y * inv, slipVector.z * inv);
         } else {
-            this->CollisionPoint::frictionDirection = g_TireZeroVec3;
+            this->CollisionPoint::frictionDirection = kVec3Zero;
             this->CollisionPoint::spinSpeed = 0.0f;
         }
         float c = TireDot(&this->CollisionPoint::frictionDirection, &rollDirection);
@@ -384,7 +403,7 @@ static inline CollisionVec3 TireNormalizeOr(const CollisionVec3& v, const Collis
         return fallback;
     float lenSq = TireDot(&v, &v);
     if (lenSq == 0.0f)
-        return g_TireZeroVec3;
+        return kVec3Zero;
     float inv = FastInvSqrt(lenSq);
     CollisionVec3 r;
     r.x = v.x * inv;
@@ -407,7 +426,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3& forward = rollDirection;
     CollisionVec3& side = sideAxis;
 
-    ((TireNode*)MovingPart::sceneNode)->Fn_004fc9a0(0, &origin);
+    MovingPart::sceneNode->Fn_004fc9a0(0, &origin);
     curPos = origin;
     world->Fn_00507c10(&curPos, &normal, 0, surface);
 
@@ -415,14 +434,14 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
         TireOwnerRef* owner = (TireOwnerRef*)MovingPart::ownerRef;
         CollisionVec3 t0;
         CollisionVec3 t1;
-        up = *owner->node->Fn_004fd5c0(&t0, &g_TireVec3_68a3c0);
-        CollisionVec3 b = *owner->node->Fn_004fd5c0(&t1, &g_TireVec3_68a3f0);
+        up = *owner->node->Fn_004fd5c0(&t0, &kVec3ZAxis);
+        CollisionVec3 b = *owner->node->Fn_004fd5c0(&t1, &kVec3YAxis);
         side = TireCross(up, b);
     } else {
         up = *a6;
         if (a7 == 0) {
             CollisionVec3 t0;
-            CollisionVec3 b = *a8->Fn_004fd5c0(&t0, &g_TireVec3_68a3f0);
+            CollisionVec3 b = *a8->Fn_004fd5c0(&t0, &kVec3YAxis);
             side = TireCross(up, b);
         } else {
             side = TireCross(up, *a7);
@@ -430,7 +449,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     }
     float lenSq = side.x * side.x + side.y * side.y + side.z * side.z;
     if (lenSq == 0.0f) {
-        side = g_TireZeroVec3;
+        side = kVec3Zero;
     } else {
         float inv = FastInvSqrt(lenSq);
         side.x = side.x * inv;
@@ -469,12 +488,12 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
         TireOwnerRef* owner = (TireOwnerRef*)MovingPart::ownerRef; (void)owner;
         CollisionVec3 base = up * wheelRadius + origin;
         CollisionVec3 c;
-        c.x = g_TireVec3_68a3f0.y * up.z - g_TireVec3_68a3f0.z * up.y;
-        c.y = g_TireVec3_68a3f0.z * up.x - g_TireVec3_68a3f0.x * up.z;
-        c.z = g_TireVec3_68a3f0.x * up.y - g_TireVec3_68a3f0.y * up.x;
+        c.x = kVec3YAxis.y * up.z - kVec3YAxis.z * up.y;
+        c.y = kVec3YAxis.z * up.x - kVec3YAxis.x * up.z;
+        c.z = kVec3YAxis.x * up.y - kVec3YAxis.y * up.x;
         float cLenSq = c.x * c.x + c.y * c.y + c.z * c.z;
         if (cLenSq == 0.0f) {
-            c = g_TireZeroVec3;
+            c = kVec3Zero;
         } else {
             float inv = FastInvSqrt(cLenSq);
             c.x = c.x * inv;
@@ -485,15 +504,15 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
         pt = c * s + base;
     } else {
         CollisionVec3 v;
-        TireVectorBlend(&v, &g_TireVec3_68a3c0, &g_TireVec3_68a3f0, a5);
+        TireVectorBlend(&v, &kVec3ZAxis, &kVec3YAxis, a5);
         CollisionVec3 base = v * -wheelRadius + origin;
         CollisionVec3 c;
-        c.x = v.y * g_TireVec3_68a3f0.z - v.z * g_TireVec3_68a3f0.y;
-        c.y = v.z * g_TireVec3_68a3f0.x - v.x * g_TireVec3_68a3f0.z;
-        c.z = v.x * g_TireVec3_68a3f0.y - v.y * g_TireVec3_68a3f0.x;
+        c.x = v.y * kVec3YAxis.z - v.z * kVec3YAxis.y;
+        c.y = v.z * kVec3YAxis.x - v.x * kVec3YAxis.z;
+        c.z = v.x * kVec3YAxis.y - v.y * kVec3YAxis.x;
         float cLenSq = TireDot(&c, &c);
         if (cLenSq == 0.0f) {
-            c = g_TireZeroVec3;
+            c = kVec3Zero;
         } else {
             float inv = FastInvSqrt(cLenSq);
             c.x = c.x * inv;
@@ -599,15 +618,15 @@ inline CollisionPoint::CollisionPoint(float a, int b)
 {
     normalForce = a;
     surfaceOwner = b;
-    localPosition = g_TireZeroVec3;
+    localPosition = kVec3Zero;
     ownerNode = 0;
-    worldPosition = g_TireZeroVec3;
-    surfacePosition = g_TireZeroVec3;
-    surfaceNormal = g_TireVec3_68a3f0;
-    relativePosition = g_TireZeroVec3;
-    field_0x44 = g_TireZeroVec3;
-    frictionDirection = g_TireZeroVec3;
-    field_0x5c = g_TireZeroVec3;
+    worldPosition = kVec3Zero;
+    surfacePosition = kVec3Zero;
+    surfaceNormal = kVec3YAxis;
+    relativePosition = kVec3Zero;
+    field_0x44 = kVec3Zero;
+    frictionDirection = kVec3Zero;
+    field_0x5c = kVec3Zero;
     tangentSpeed = 0;
     spinSpeed = 0;
     penetration = -999.0f;
@@ -622,30 +641,30 @@ inline CollisionPoint::CollisionPoint(float a, int b)
     surfaceType = 0;
     surfaceGrip = 1.0f;
     frictionMagnitude = 0;
-    frictionForce = g_TireZeroVec3;
+    frictionForce = kVec3Zero;
     frictionCoefficient = 0;
-    field_0x68 = g_TireZeroVec3;
+    field_0x68 = kVec3Zero;
 }
 
-Tire::Tire(void* a1, int a2, float a3, float a4, int a5, int a6, int a7, float a8,
-           float a9, void* a10, float a11, float a12, float a13, float a14, int a15)
+Tire::Tire(void* a1, int a2, float a3, float a4, int a5, int a6, float a7, float a8,
+           float a9, float a10, float a11, float a12, float a13, float a14, int a15)
     : CollisionObject(1), MovingPart(a1, a2, a6), CollisionPoint(a4, a15)
 {
     CollisionVec3 extentA;
     CollisionVec3 extentB;
-    ((TireNode*)MovingPart::sceneNode)->Fn_004fe0a0(&extentA, &extentB);
+    MovingPart::sceneNode->Fn_004fe0a0(&extentA, &extentB);
     wheelRadius = extentB.y;
     invWheelRadius = 1.0f / extentB.y;
-    field_0x278 = 0;
-    ((TireNode*)MovingPart::sceneNode)->Fn_004fc9a0(0, &wheelCenter);
-    slipVector = g_TireZeroVec3;
+    rollAngle = 0.0f;
+    MovingPart::sceneNode->Fn_004fc9a0(0, &wheelCenter);
+    slipVector = kVec3Zero;
     inContact = 0;
-    wheelVelocity = g_TireZeroVec3;
-    rollDirection = g_TireZeroVec3;
-    sideAxis = g_TireZeroVec3;
-    field_0x248 = g_TireZeroVec3;
+    wheelVelocity = kVec3Zero;
+    rollDirection = kVec3Zero;
+    sideAxis = kVec3Zero;
+    field_0x248 = kVec3Zero;
     field_0x280 = 0;
-    field_0x254 = g_TireZeroVec3;
+    field_0x254 = kVec3Zero;
     tangentCos = 0;
     rollFriction = a3;
     sideFriction = a4;
@@ -665,15 +684,241 @@ Tire::Tire(void* a1, int a2, float a3, float a4, int a5, int a6, int a7, float a
     field_0x2bc = 0;
     reportContactOutputs = 0;
     field_0x268 = 0;
-    field_0x29c = 0;
+    rampLevel = 0;
     field_0x1dc = a12;
     field_0x1e0 = a13;
     field_0x290 = 0;
-    wheelUpAxis = g_TireVec3_68a3c0;
+    wheelUpAxis = kVec3ZAxis;
     surfaceScaleB = 1.0f;
     field_0x26c = 0;
-    contactObjectVelocity = g_TireZeroVec3;
+    contactObjectVelocity = kVec3Zero;
     hasContactObjectVelocity = 0;
     field_0x2a4 = 1.0f;
-    normalLeverCross = g_TireZeroVec3;
+    normalLeverCross = kVec3Zero;
+}
+
+// 0x00513560
+void Tire::SetRollDistance(float distance)
+{
+    rollAngle = distance * invWheelRadius;
+    if (_finite(rollAngle))
+        MovingPart::sceneNode->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
+}
+
+// 0x005135b0
+void Tire::ApplyRollAngle()
+{
+    if (_finite(rollAngle))
+        MovingPart::sceneNode->RotateAbout(1.0f, 0.0f, 0.0f, rollAngle);
+}
+
+// 0x00515660
+void Tire::UpdateAttachment()
+{
+    if (TireAttachA* slider = field_0x2b0) {
+        float offset = -slider->position;
+        slider->node->SetPosition(TireVec3(offset * slider->direction.x,
+                                           offset * slider->direction.y,
+                                           offset * slider->direction.z));
+    } else if (TireAttachB* hinge = field_0x2ac) {
+        float angle = hinge->position / hinge->scale;
+        if (_finite(angle)) {
+            hinge->node->SetLocalMatrix(&hinge->restMatrix);
+            hinge->node->Rotate(hinge->axis, angle);
+        }
+    }
+}
+
+// Inline forms of the dot and cross products (the out-of-line dot is TireDot).
+static inline float TireDotInline(const CollisionVec3& a, const CollisionVec3& b)
+{
+    return a.z * b.z + (a.x * b.x + a.y * b.y);
+}
+
+static inline CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec3& b)
+{
+    CollisionVec3 r;
+    r.x = b.z * a.y - b.y * a.z;
+    r.y = b.x * a.z - b.z * a.x;
+    r.z = b.y * a.x - b.x * a.y;
+    return r;
+}
+
+// 0x00515c90 (near miss): the normalised cross product a x b; the fallback when
+// it is exactly zero (this is unused). The dot product and control flow match;
+// VC6 orders the cross-product operands differently (retail loads b's
+// component first in every product; swapping the source operands does not
+// change VC6's choice) and does not keep the copy of the product that retail
+// scales.
+CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
+                                 const CollisionVec3* fallback)
+{
+    CollisionVec3 c;
+    c.x = a->y * b->z - a->z * b->y;
+    c.y = a->z * b->x - a->x * b->z;
+    c.z = a->x * b->y - a->y * b->x;
+    CollisionVec3 n = c;
+    if (c.x == 0.0f && c.y == 0.0f && c.z == 0.0f) {
+        n = *fallback;
+    } else {
+        float lenSq = TireDotInline(n, n);
+        if (lenSq == 0.0f) {
+            n = kVec3Zero;
+        } else {
+            float inv = FastInvSqrt(lenSq);
+            n.x *= inv;
+            n.y *= inv;
+            n.z *= inv;
+        }
+    }
+    *out = n;
+    return out;
+}
+
+// 0x005143d0
+void Tire::UpdateRoll(float dt, float distanceScale, int locked, int driven, int a5, float driveScale)
+{
+    if (locked) {
+        if (rampLevel != 0.0f) {
+            rollAngle = (1.0f - rampLevel) * rollAngle;
+            ApplyRollAngle();
+            return;
+        }
+        if (field_0x2a8 && field_0x2a8->value < 1.0f && field_0x2a8->value != 0.0f)
+            rollAngle = field_0x2a8->value * 6.0f;
+        ApplyRollAngle();
+    } else if (driven) {
+        if (field_0x2a8) {
+            float drive = field_0x2bc * field_0x280 * dt * driveScale;
+            field_0x290 = drive;
+            if (slipSpeed > 0.1f)
+                SetRollDistance(distanceScale * slipSpeed + drive);
+        } else if (slipSpeed > 0.1f) {
+            SetRollDistance(distanceScale * slipSpeed);
+        }
+    } else if (inContact) {
+        if (field_0x2a8) {
+            float drive = field_0x2bc * field_0x280 * dt * driveScale;
+            field_0x290 = drive;
+            SetRollDistance(distanceScale * slipSpeed + drive);
+        } else {
+            SetRollDistance(distanceScale * slipSpeed);
+        }
+    } else {
+        if (field_0x2a8 && field_0x2a8->value < 1.0f && field_0x2a8->value != 0.0f)
+            rollAngle = field_0x2a8->value * 6.0f;
+        ApplyRollAngle();
+    }
+}
+
+// Length from a squared length (1.0 is special-cased), with the table square root.
+static inline float TireLength(const CollisionVec3& v)
+{
+    float lenSq = v.z * v.z + (v.x * v.x + v.y * v.y);
+    if (lenSq == 1.0f)
+        return 1.0f;
+    return FastSqrt(lenSq);
+}
+
+// In-place scale through a reference.
+static inline void TireScale(CollisionVec3& v, float s)
+{
+    v.x *= s;
+    v.y *= s;
+    v.z *= s;
+}
+
+// 0x00513f90 (near miss, 470 of 479 bytes): only the stack slots differ; retail
+// keeps `boost` in the dead argument slot and the squared length/`minimum` in the
+// local, VC6 the other way round (declaration order does not change it).
+void Tire::UpdateDriveShare(TireVehicle* vehicle)
+{
+    if (!field_0x2a8)
+        return;
+    if (slipSpeed < field_0x2b4 && !vehicle->field_0x444) {
+        float boost;
+        if (vehicle->field_0xa4 > 0.0f && vehicle->field_0x60 * 1.25f > 1.0f)
+            boost = vehicle->field_0x60 * 1.25f;
+        else
+            boost = 1.0f;
+        float grip = vehicle->UnknownVirtualSlot47(this);
+        float excess = field_0x280 * vehicle->field_0x24 - TireLength(vehicle->field_0x70);
+        float share;
+        if (excess < 1.01f) {
+            share = 1.0f;
+        } else {
+            if (!(excess < 320.0f))
+                excess = 320.0f;
+            share = (400.0f - excess) * 0.0025f;
+        }
+        float minimum;
+        if (slipSpeed > field_0x2b4)
+            minimum = 1.0f;
+        else
+            minimum = 1.0f - (field_0x2b4 - slipSpeed) / field_0x2b4;
+        share = share * grip * boost;
+        if (!(share < 1.0f))
+            share = 1.0f;
+        if (!(share > minimum))
+            share = minimum;
+        field_0x2b8 = share * surfaceScaleB;
+        TireScale(field_0x248, field_0x2b8);
+        field_0x2bc = 1.0f - field_0x2b8;
+    } else {
+        field_0x2b8 = 1.0f;
+        field_0x2bc = 0.0f;
+    }
+}
+
+static inline CollisionVec3 TireTimes(float s, const CollisionVec3& v)
+{
+    CollisionVec3 r;
+    r.x = s * v.x;
+    r.y = s * v.y;
+    r.z = s * v.z;
+    return r;
+}
+
+static inline CollisionVec3 TireNegate(const CollisionVec3& v)
+{
+    CollisionVec3 r;
+    r.x = -v.x;
+    r.y = -v.y;
+    r.z = -v.z;
+    return r;
+}
+
+// 0x00514170 (near miss, 276 of 589 compared bytes): the set-up matches; VC6 then
+// loads *speed with `fld st(0); fcomp` where retail uses `fcom`, scales `dir` as
+// `fld mem; fmul st(1)` for all three components (retail starts with
+// `fld st(0); fmul mem`) and keeps +0x1d8 in memory for the moment.
+void Tire::ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
+                      CollisionVec3* torque, CollisionVec3* force)
+{
+    if (!inContact || field_0x2a0 == 0.0f || rampLevel == 0.0f || slipSpeed == 0.0f)
+        return;
+    float grip = CollisionPoint::surfaceGrip * field_0x2a0 * rampLevel;
+    CollisionVec3 push = rollDirection * -grip;
+    CollisionVec3 dir = push;
+    float amount = share * slipSpeed;
+    if (!forward)
+        dir = TireNegate(push);
+    amount = amount > *speed ? *speed : amount;
+    amount = amount > 0.0f ? amount : 0.0f;
+    float rate = mass / stepTime;
+    float needed = rate * amount;
+    if (grip > needed) {
+        push = TireTimes(needed / grip, dir);
+        *speed -= amount;
+    } else {
+        *speed -= grip / rate;
+        push = dir;
+    }
+    force->x += push.x;
+    force->y += push.y;
+    force->z += push.z;
+    CollisionVec3 moment = TireTimes(field_0x1d8, CollisionCross(CollisionPoint::relativePosition, push));
+    torque->x += moment.x;
+    torque->y += moment.y;
+    torque->z += moment.z;
 }

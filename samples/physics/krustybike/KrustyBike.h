@@ -13,7 +13,7 @@
 
 class KrustyBike : public Bike {
 public:
-    KrustyBike();
+    explicit KrustyBike(int flags);   // 0x0048fa60, ret 8 = flags + hidden most-derived flag
     virtual ~KrustyBike();
     virtual int GameObjectVirtualSlot10(float dt);   // 0x004977a0 (vbase vtable slot 10)
 
@@ -84,6 +84,8 @@ public:
     void Fn_00496F90(KrustyBike* other);
     void Fn_00497370(KrustyBike* other);
     float Fn_00495FF0();
+    // 0x004933e0: adds message 13's deltas to the decoded network state and copies it out.
+    void Fn_004933E0(const KbNetDelta* delta, KbNetState* state);
     void Fn_00496E30(int a);
     void Fn_00413200(float dt);
 
@@ -91,15 +93,16 @@ public:
     char field_0x734; // 0x734  first KrustyBike field (Bike's own data ends at 0x734)
     char field_0x735; // 0x735
     char field_0x736; // 0x736
-    char pad_0x0737[0x9];
+    char pad_0x0737[0x5];
+    int field_0x73c; // 0x73C  0x65 from the constructor
     KbRace* field_0x740; // 0x740
     KbGhost* field_0x744; // 0x744
-    char pad_0x0748[0x4];
+    int field_0x748; // 0x748
     int field_0x74c; // 0x74C
     int field_0x750; // 0x750
     float field_0x754; // 0x754
     float field_0x758; // 0x758
-    char pad_0x075C[0x4];
+    int field_0x75c; // 0x75C
     int field_0x760; // 0x760
     int field_0x764; // 0x764
     float field_0x768; // 0x768
@@ -124,7 +127,7 @@ public:
     float field_0x7a8; // 0x7A8
     float field_0x7ac; // 0x7AC
     float field_0x7b0; // 0x7B0
-    char pad_0x07B4[0x4];
+    float field_0x7b4; // 0x7B4  bonus accumulated by 0x00495ff0
     int field_0x7b8; // 0x7B8
     int field_0x7bc; // 0x7BC
     int field_0x7c0; // 0x7C0
@@ -133,7 +136,18 @@ public:
     float field_0x808; // 0x808
     char pad_0x080C[0x8];
     int field_0x814; // 0x814
-    char pad_0x0818[0xB74];
+    char pad_0x0818[0x11b8 - 0x818];
+    char field_0x11b8; // 0x11B8
+    char pad_0x11B9[0x3];
+    int field_0x11bc; // 0x11BC  network id (KbNetBike)
+    char pad_0x11C0[0x1358 - 0x11c0];
+    Vec3 field_0x1358; // 0x1358
+    Vec3 field_0x1364; // 0x1364
+    Vec3 field_0x1370; // 0x1370
+    float field_0x137c; // 0x137C
+    float field_0x1380; // 0x1380
+    float field_0x1384; // 0x1384
+    int field_0x1388; // 0x1388
     int field_0x138c; // 0x138C
     char pad_0x1390[0x68];
     int field_0x13f8; // 0x13F8
@@ -142,7 +156,7 @@ public:
     int field_0x1404; // 0x1404
     int field_0x1408; // 0x1408
     int field_0x140c; // 0x140C
-    char pad_0x1410[0x4];
+    int field_0x1410; // 0x1410  -1 from the constructor
     KbObj128* altBodyA; // 0x1414
     KbObj128* altBodyB; // 0x1418
     float field_0x141c; // 0x141C
@@ -174,12 +188,15 @@ public:
     int field_0x15c8; // 0x15C8
     char pad_0x15CC[0x4];
     int field_0x15d0; // 0x15D0
-    char pad_0x15D4[0x11];
+    int field_0x15d4; // 0x15D4
+    char pad_0x15D8[0xd];
     char field_0x15e5; // 0x15E5
     char field_0x15e6; // 0x15E6
     char pad_0x15E7[0x1];
     KbObj128* field_0x15e8; // 0x15E8
-    char pad_0x15EC[0x1C];   // own data ends at 0x1608; the compiler places the vtordisp there
+    char pad_0x15EC[0x18];
+    int field_0x1604; // 0x1604
+    // own data ends at 0x1608; the compiler places the vtordisp there
 };
 
 typedef char kb_assert_sizeof[(sizeof(KrustyBike) == 0x160c + 0x2c) ? 1 : -1];

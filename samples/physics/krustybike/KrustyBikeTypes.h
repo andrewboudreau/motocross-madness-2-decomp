@@ -23,6 +23,7 @@ struct KbChild;
 struct KbObj128;
 struct KbGhost;
 struct KbCollider;
+struct KbBonusTable;
 class KrustyBike;
 
 // Vectors use the shared Math3D Vec3 (12 bytes: x,y,z at +0,+4,+8; tier 1 layout).
@@ -52,6 +53,39 @@ struct KbNetBike {
     KbCell* field_0x11cc;
 };
 // 12-byte message built by KrustyBike::Fn_004925A0 (tier 3: the leading dword is never written).
+// Network message 13 (bikerace.cpp's 0x0041fb.. handlers pass it to 0x004933e0):
+// signed byte deltas of the four state vectors plus two raw ints at the unaligned
+// offsets +0x0e/+0x12 (tier 2 layout, tier 3 names).
+#pragma pack(push, 1)
+struct KbNetDelta {
+    char field_0x00;
+    signed char delta1[3];       // +0x01 x 15/64 -> KrustyBike+0x1364
+    unsigned char step;          // +0x04 bit 0: units of 8, bits 1-7: count
+    signed char delta3[3];       // +0x05 x pi/64 -> +0x137c..+0x1384
+    signed char delta2[3];       // +0x08 x pi/64 -> +0x1370
+    signed char delta0[3];       // +0x0b x 15/64 -> +0x1358
+    int field_0x0e;
+    int field_0x12;
+};
+#pragma pack(pop)
+
+// The state a message is decoded into (BikeRace.h's UnknownBikeRaceNetState).
+struct KbNetState {
+    short field_0x00;
+    unsigned short step;         // +0x02
+    int field_0x04;
+    Vec3 field_0x08;             // KrustyBike+0x1364
+    float field_0x14;            // +0x137c
+    float field_0x18;            // +0x1380
+    float field_0x1c;            // +0x1384
+    char pad_0x20[0x10];
+    Vec3 field_0x30;             // +0x1370
+    Vec3 field_0x3c;             // +0x1358
+    int field_0x48;
+    int field_0x4c;              // running step total (+0x1388)
+    int field_0x50;
+};
+
 struct KbNetPacket { int field_0x0; char field_0x4; char pad_0x5[3]; int field_0x8; };
 // On-screen message object (0x8C bytes; ctor 0x0051B200 takes the text and a display time).
 struct KbMessage { char data[0x8C]; KbMessage(const char* text, float seconds); };
@@ -86,13 +120,17 @@ struct KbGame {
     int field_0x2d74; // 0x2D74
     char pad_0x2D78[0xC];
     int field_0x2d84; // 0x2D84
-    char pad_0x2D88[0x5AC];
+    char pad_0x2D88[0x2eb8 - 0x2d88];
+    int field_0x2eb8; // 0x2EB8
+    char pad_0x2EBC[0x3334 - 0x2ebc];
     int field_0x3334; // 0x3334
     char pad_0x3338[0xDC];
     int fullNetPacketIntervalSec; // 0x3414
     int shortNetPacketIntervalSec; // 0x3418
     char pad_0x341C[0xC];
     int field_0x3428; // 0x3428
+    char pad_0x342C[0x3444 - 0x342c];
+    KbBonusTable* field_0x3444; // 0x3444
 };
 extern KbGame* g_kbGame;
 
@@ -129,7 +167,22 @@ struct KbRacer {
 
 struct KbRaceHandler {
     void Fn_004DE580(void* who, float a, int b);
+    void Fn_004E57D0(KrustyBike* who, float score);   // 0x004e57d0: reports a trick score
 };
+// Object at KbRace+0xbc: 0x00495ff0 hands it the trick angle and multiplier.
+struct KbScoreBoard { void Fn_0048D1E0(float angle, float multiplier); };
+// Object at KbGame+0x3444 (bonus rules; packed: its ints sit at odd offsets).
+#pragma pack(push, 1)
+struct KbBonusTable {
+    char pad_0x0000[0x40];
+    int index;                   // +0x40 selects base[]
+    char pad_0x0044[0x1229 - 0x44];
+    int base[6];                 // +0x1229
+    float baseScale;             // +0x1241
+    char pad_0x1245[0x124d - 0x1245];
+    float limitScale;            // +0x124d
+};
+#pragma pack(pop)
 
 // Object reached through KrustyBike+0x740 (event/race context).
 struct KbRaceSub { int* field_0x0; };
@@ -144,7 +197,8 @@ struct KbRace {
     KbRacer* field_0x50; // 0x50
     char pad_0x0054[0x64];
     int field_0xb8; // 0xB8
-    char pad_0x00BC[0xC];
+    KbScoreBoard* field_0xbc; // 0xBC
+    char pad_0x00C0[0x8];
     int field_0xc8; // 0xC8
     char pad_0x00CC[0x2C];
     int field_0xf8; // 0xF8

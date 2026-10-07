@@ -6,6 +6,9 @@
 // established). Only the fields the camera reads are declared.
 class UnknownVehiclePart {
 public:
+    unsigned char field_0x000[0x140];
+    UnknownVehiclePart* field_0x140;     // 0x0052bb60 prefers it when set
+
     // 0x004fc9a0: writes a position for `index` into *position.
     void UnknownFunction4fc9a0(int index, Vector3* position);
     // 0x004fc970: writes the part's translation into *translation.
@@ -23,7 +26,9 @@ struct UnknownCameraVehicle {
     Vector3 field_0x64;                  // VehicleCamera slot 33
     unsigned char field_0x070[0x3bc - 0x70];
     UnknownVehiclePart* field_0x3bc;     // VehicleCamera slot 50
-    unsigned char field_0x3c0[0x43c - 0x3c0];
+    unsigned char field_0x3c0[0x434 - 0x3c0];
+    float field_0x434;                   // VehicleCamera slot 36 tests > 0.1
+    float field_0x438;                   // KrustyBikeCamera slot 34 divisor
     float field_0x43c;                   // VehicleCamera slot 42 scale
     int field_0x440;
     int field_0x444;                     // VehicleCamera slots 72, 74, 75
@@ -31,23 +36,28 @@ struct UnknownCameraVehicle {
     float field_0x45c;                   // VehicleCamera slot 39
     int field_0x460;                     // BikeCamera slot 75 tests 6
     int field_0x464;                     // VehicleCamera slot 39
+    unsigned char field_0x468[0x488 - 0x468];
+    Vector3 field_0x488;                 // 0x0052bc50 in vehicle mode
+    Vector3 field_0x494;                 // 0x0052bac0 in vehicle mode
 };
 
 // Optional targets at VehicleCamera+0x384 / +0x388 (slot 33).
 struct UnknownCameraTargetA {
-    unsigned char field_0x000[0x224];
+    unsigned char field_0x000[0x1a0];
+    UnknownVehiclePart* field_0x1a0;     // 0x0052bb60
+    unsigned char field_0x1a4[0x224 - 0x1a4];
     Vector3 field_0x224;
 };
 
 struct UnknownCameraTargetB {
-    unsigned char field_0x00[0x40];
+    unsigned char field_0x00[0x34];
+    UnknownVehiclePart* field_0x34;      // 0x0052bb60
+    unsigned char field_0x38[0x40 - 0x38];
     Vector3 field_0x40;
 };
 
 // .rdata float next to VehicleCamera's vtable, loaded by slot 67 (17.0f).
 extern const float g_UnknownFloat558d60;
-// .bss vector copied into +0x398 and +0x3a4 by the constructor.
-extern Vector3 g_UnknownVector68a728;
 
 // RTTI: VehicleCamera : FollowCamera. Vehicle.cpp is a name-overlap candidate
 // for its translation unit, not established. Implements FollowCamera's pure
@@ -63,12 +73,22 @@ public:
                                          float value2d0, float value2e8, int capacity, int count,
                                          const int* list);
 
+    // 0x0052bac0 / 0x0052bc50: the vehicle's +0x494 / +0x488 in vehicle
+    // mode; otherwise slot 33 / 0x0052bb60, latched in +0x398 / +0x3a4 by
+    // +0x392 / +0x391.
+    Vector3 UnknownFunction52bac0();
+    Vector3 UnknownFunction52bc50();
+    // 0x0052bb60: the position of the followed part or target.
+    Vector3 UnknownFunction52bb60();
+
     virtual Vector3 UnknownVirtualSlot33();
 
     virtual float UnknownVirtualSlot39();
     virtual void UnknownVirtualSlot42(bool flag);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float UnknownVirtualSlot51();
+    virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
+    virtual Vector3 UnknownVirtualSlot57(float dt);
     virtual void UnknownVirtualSlot67();
     virtual void UnknownVirtualSlot72();
     // Inline: retail's copy (0x00417490) is emitted next to BikeCamera code.
@@ -91,7 +111,7 @@ public:
 protected:
     UnknownCameraTargetA* field_0x384;
     UnknownCameraTargetB* field_0x388;
-    int field_0x38c;
+    UnknownVehiclePart* field_0x38c;     // 0x0052bb60
     bool vehicleMode;                    // +0x390, vehicle mode
     unsigned char field_0x391;
     unsigned char field_0x392;

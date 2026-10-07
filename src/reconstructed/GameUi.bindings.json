@@ -309,7 +309,7 @@
   "?UnknownFunction487790@GUIUser@@QAEHPAVUnknownGuiControl@@PAPAV2@H@Z": "0x00487790",
   "?UnknownFunction488310@GUIUser@@QAEPAVGUIInputDevice@@H@Z": "0x00488310",
   "?UnknownFunction4897e0@InputDevice@@QAEHH@Z": "0x004897e0",
-  "?UnknownFunction4a2560@MediaControl@@QAEHPAXPBDP6AXPAVUIDialog@@@Z2@Z": "0x004a2560",
+  "?UnknownFunction4a2560@MediaControl@@QAEPAV1@PAXPBDP6AXPAVUIDialog@@@Z2@Z": "0x004a2560",
   "?UnknownFunction4a2900@MediaControl@@QAEHXZ": "0x004a2900",
   "?UnknownFunction4bb890@@YAPAVSound@@PAVSoundGroup@@PBDHHHH@Z": "0x004bb890",
   "?UnknownFunction4bc6b0@Sound@@QAEHHKH@Z": "0x004bc6b0",

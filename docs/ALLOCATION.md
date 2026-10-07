@@ -142,6 +142,24 @@ The constructor does not initialize `allocatedBytes` (+0x24), and `Clear`
 releases only the active chain, not the spare chain. These are decoded retail
 behaviors retained by the reconstruction, not recommended allocator semantics.
 
+### Accounting unit (VC6 strict exact)
+
+`samples/allocation/MemTag.cpp` (bindings `MemTag.bindings.json`) reconstructs
+the whole unit `0x004a2ac0..0x004a3142` against `src/reconstructed/MemTag.h`
+and `DebugAlloc.h`; all 22 functions are strict exact under VC6 with every
+relocation resolved: the `.CRT$XCU` 183 initializer set for the static tracker
+at `0x006850c0` (constructor `0x004a2b00`, destructor `0x004a2b80`), the
+tracker methods `0x004a2bc0..0x004a2e00`, DebugMalloc, DebugRealloc,
+DebugCalloc, operator new and the three free bodies, and the memcpy helper
+`0x004a3120`. The free bodies differ only by caller: `0x004a3060` is the
+placement `operator delete(void*, const char*, int)` the unwind funclets call
+when a constructor after `new(__FILE__, line)` throws, `0x004a30c0` is the
+plain `operator delete(void*)` of the deleting destructors, and `0x004a2e60`
+takes the explicit `(pointer, file, line)` calls (named DebugFree in the
+sample; other bindings files map those explicit calls under the placement
+delete's name, which binds the same address). The file name is ours and the
+unit has no `__FILE__` literal, so it stays in samples.
+
 ### Application accounting probes
 
 `samples/allocation/AllocationAccountingProbe.cpp` contains ordinary C++98

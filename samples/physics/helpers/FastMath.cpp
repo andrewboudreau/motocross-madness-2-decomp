@@ -36,3 +36,50 @@ float FastInvSqrt(float x)
     y = 0.5f * y * (3.0f - x * y * y);
     return 0.5f * y * (3.0f - x * y * y);
 }
+
+// The same unit (tier 2 by position: between FastInvSqrt and the stream code at
+// 0x00460d10, all on the same tables) also builds the tables and has an estimate-only
+// variant.  Names tier 3.
+#include <math.h>
+
+extern float g_TrigTableScale;          // 0x005dafdc: table entries per radian
+extern float g_SinTable[0x10000];       // 0x0061b3e0
+extern float g_CosTable[0x10000];       // 0x005db3e0
+extern float g_TanTable[0x10000];       // 0x0059af5c
+
+// 0x00460bb0: fills the 128-entry reciprocal square root table from 1 / sqrt over one
+// exponent octave (mantissa top bits | 0x1f80 << 17), rounded to 8 mantissa bits.
+void InitFastInvSqrtTable()
+{
+    for (int i = 0; i < 0x80; i++) {
+        float x;
+        float r;
+        *(unsigned long*)&x = (i | 0x1f80) << 17;
+        r = 1.0f / (float)sqrt(x);
+        g_FastInvSqrtTable[i] = (unsigned char)((*(unsigned long*)&r + 0x2000) >> 15);
+    }
+    g_FastInvSqrtTable[0x40] = 0xff;
+}
+
+// 0x00460c70: the table estimate of FastInvSqrt without the Newton steps.
+float FastInvSqrtEstimate(float x)
+{
+    unsigned long bits = *(unsigned long*)&x;
+    unsigned char e = (unsigned char)(bits >> 23);   // biased exponent byte
+    *(unsigned long*)&x = ((0x5f000000 - (e << 22)) & 0xff800000) |
+                          ((unsigned long)g_FastInvSqrtTable[(bits >> 17) & 0x7f] << 15);
+    return x;
+}
+
+// 0x00460cb0: 65536-entry sine, cosine and tangent tables over one turn.
+void InitTrigTables()
+{
+    g_TrigTableScale = 10430.21875f;
+    for (unsigned int i = 0; i < 0x10000; i++) {
+        float angle = i * 9.5873799e-05f;
+        float s = (float)sin(angle);
+        g_SinTable[i] = s;
+        g_CosTable[i] = (float)cos(angle);
+        g_TanTable[i] = s / (float)cos(angle);
+    }
+}

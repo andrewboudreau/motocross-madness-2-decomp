@@ -69,7 +69,8 @@
     "target_va": "0x00460b50",
     "target_size": 85,
     "expect": "exact",
-    "notes": ""
+    "notes": "",
+    "bindings": "FastMath.bindings.json"
   },
   {
     "class": "Math",
@@ -78,7 +79,8 @@
     "target_va": "0x00460c00",
     "target_size": 107,
     "expect": "exact",
-    "notes": ""
+    "notes": "",
+    "bindings": "FastMath.bindings.json"
   },
   {
     "class": "SoultreeObject",
@@ -169,5 +171,35 @@
     "target_size": 657,
     "expect": "partial",
     "notes": "partial 97.1%: provisional semantics; sqrt(a.x*a.x+a.z*a.z) order fixed. Remaining: fmul operand order in the b rotation sums (source term order has no effect) and one extra live FPU stack value before the pitch sqrt."
+  },
+  {
+    "class": "Math",
+    "source": "FastMath.cpp",
+    "candidate_symbol_contains": "?InitFastInvSqrtTable@@",
+    "target_va": "0x00460bb0",
+    "target_size": 74,
+    "expect": "exact",
+    "notes": "fills 0x5daf5c",
+    "bindings": "FastMath.bindings.json"
+  },
+  {
+    "class": "Math",
+    "source": "FastMath.cpp",
+    "candidate_symbol_contains": "?FastInvSqrtEstimate@@",
+    "target_va": "0x00460c70",
+    "target_size": 59,
+    "expect": "exact",
+    "notes": "table estimate, no Newton step",
+    "bindings": "FastMath.bindings.json"
+  },
+  {
+    "class": "Math",
+    "source": "FastMath.cpp",
+    "candidate_symbol_contains": "?InitTrigTables@@",
+    "target_va": "0x00460cb0",
+    "target_size": 86,
+    "expect": "exact",
+    "notes": "sin/cos/tan tables 0x61b3e0/0x5db3e0/0x59af5c",
+    "bindings": "FastMath.bindings.json"
   }
 ]

@@ -6,7 +6,8 @@
     "target_va": "0x0048da00",
     "target_size": 75,
     "expect": "exact",
-    "notes": "vtable slot 27 override of Bike (base function 0x00464e90)"
+    "notes": "vtable slot 27 override of Bike (base function 0x00464e90)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -15,7 +16,8 @@
     "target_va": "0x0048dbf0",
     "target_size": 109,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 87.6% byte match. Retail loads [eax...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 87.6% byte match. Retail loads [eax...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -24,7 +26,8 @@
     "target_va": "0x0048dc60",
     "target_size": 112,
     "expect": "exact",
-    "notes": "vtable slot 4 override of Bike (base 0x005265d0). Exact: forwards float a4 unchanged to the handler (Fn_004DE580 float overload)."
+    "notes": "vtable slot 4 override of Bike (base 0x005265d0). Exact: forwards float a4 unchanged to the handler (Fn_004DE580 float overload).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -33,7 +36,8 @@
     "target_va": "0x0048de20",
     "target_size": 191,
     "expect": "exact",
-    "notes": "vtable slot 12 override of Bike (base function 0x00507920)"
+    "notes": "vtable slot 12 override of Bike (base function 0x00507920)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -42,7 +46,8 @@
     "target_va": "0x0048e130",
     "target_size": 87,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 54.2% byte match. Retail keeps eax ...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 54.2% byte match. Retail keeps eax ...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -51,7 +56,8 @@
     "target_va": "0x0048fa10",
     "target_size": 74,
     "expect": "exact",
-    "notes": "vtable slot 1 override of Bike (base function 0x00407630)"
+    "notes": "vtable slot 1 override of Bike (base function 0x00407630)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -60,7 +66,8 @@
     "target_va": "0x00491600",
     "target_size": 40,
     "expect": "exact",
-    "notes": "vtable slot 8 override of Bike (base function 0x00406750)"
+    "notes": "vtable slot 8 override of Bike (base function 0x00406750)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -69,7 +76,8 @@
     "target_va": "0x00491630",
     "target_size": 103,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 96.0% byte match. mov edx,[ecx] loa...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 96.0% byte match. mov edx,[ecx] loa...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -87,7 +95,8 @@
     "target_va": "0x00491a90",
     "target_size": 121,
     "expect": "exact",
-    "notes": "vtable slot 67 override of Bike (base function 0x0040a180)"
+    "notes": "vtable slot 67 override of Bike (base function 0x0040a180)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -96,7 +105,8 @@
     "target_va": "0x00491b10",
     "target_size": 83,
     "expect": "exact",
-    "notes": "vtable slot 39 override of Bike (base function 0x0040a1f0)"
+    "notes": "vtable slot 39 override of Bike (base function 0x0040a1f0)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -105,7 +115,8 @@
     "target_va": "0x00491ca0",
     "target_size": 103,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 73.6% byte match. Struct-return tem...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 73.6% byte match. Struct-return tem...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -114,7 +125,8 @@
     "target_va": "0x004922c0",
     "target_size": 155,
     "expect": "exact",
-    "notes": "vtable slot 80 override of Bike (base function 0x005290f0)"
+    "notes": "vtable slot 80 override of Bike (base function 0x005290f0)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -123,7 +135,8 @@
     "target_va": "0x00492360",
     "target_size": 100,
     "expect": "exact",
-    "notes": "vtable slot 83 override of Bike (base function 0x00529180)"
+    "notes": "vtable slot 83 override of Bike (base function 0x00529180)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -132,7 +145,8 @@
     "target_va": "0x004923d0",
     "target_size": 88,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 96.6% byte match. push eax vs mov e...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 96.6% byte match. push eax vs mov e...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -141,7 +155,8 @@
     "target_va": "0x00492430",
     "target_size": 134,
     "expect": "exact",
-    "notes": "vtable slot 82 override of Bike (base function 0x005290b0)"
+    "notes": "vtable slot 82 override of Bike (base function 0x005290b0)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -150,7 +165,8 @@
     "target_va": "0x004924c0",
     "target_size": 50,
     "expect": "exact",
-    "notes": "Exact under vc6_o2_ml with a void(float) signature (neither this override nor Vehicle slot 63 sets eax) and two separate stores (0x804, then 0x808)."
+    "notes": "Exact under vc6_o2_ml with a void(float) signature (neither this override nor Vehicle slot 63 sets eax) and two separate stores (0x804, then 0x808).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -159,7 +175,8 @@
     "target_va": "0x00492500",
     "target_size": 37,
     "expect": "exact",
-    "notes": "vtable slot 64 override of Bike (base function 0x00528e50)"
+    "notes": "vtable slot 64 override of Bike (base function 0x00528e50)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -168,7 +185,8 @@
     "target_va": "0x00492530",
     "target_size": 105,
     "expect": "exact",
-    "notes": "vtable slot 71 override of Bike (base 0x0040a480). Exact with a single trailing base call after if/else."
+    "notes": "vtable slot 71 override of Bike (base 0x0040a480). Exact with a single trailing base call after if/else.",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -177,7 +195,8 @@
     "target_va": "0x004957d0",
     "target_size": 37,
     "expect": "exact",
-    "notes": "vtable slot 45 override of Bike (base function 0x0040c880)"
+    "notes": "vtable slot 45 override of Bike (base function 0x0040c880)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -186,7 +205,8 @@
     "target_va": "0x00495800",
     "target_size": 29,
     "expect": "exact",
-    "notes": "vtable slot 52 override of Bike (base function 0x0040c8a0)"
+    "notes": "vtable slot 52 override of Bike (base function 0x0040c8a0)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -195,7 +215,8 @@
     "target_va": "0x00495820",
     "target_size": 164,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 25.3% byte match. Retail uses cmp b...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 25.3% byte match. Retail uses cmp b...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -204,7 +225,8 @@
     "target_va": "0x004958d0",
     "target_size": 123,
     "expect": "exact",
-    "notes": "vtable slot 24 override of Bike. Exact with separate return 0 in each arm (duplicated tail)."
+    "notes": "vtable slot 24 override of Bike. Exact with separate return 0 in each arm (duplicated tail).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -213,7 +235,8 @@
     "target_va": "0x00495950",
     "target_size": 123,
     "expect": "exact",
-    "notes": "vtable slot 25 override of Bike (base function 0x0040cb60)"
+    "notes": "vtable slot 25 override of Bike (base function 0x0040cb60)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -222,7 +245,8 @@
     "target_va": "0x004959d0",
     "target_size": 85,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 88.3% byte match. Store order of 0x...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 88.3% byte match. Store order of 0x...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -231,7 +255,8 @@
     "target_va": "0x00495a30",
     "target_size": 49,
     "expect": "exact",
-    "notes": "vtable slot 68 override of Bike (base function 0x0040cac0)"
+    "notes": "vtable slot 68 override of Bike (base function 0x0040cac0)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -240,7 +265,8 @@
     "target_va": "0x00495a70",
     "target_size": 44,
     "expect": "exact",
-    "notes": "vtable slot 66 override of Bike (base function 0x0040cfd0)"
+    "notes": "vtable slot 66 override of Bike (base function 0x0040cfd0)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -249,7 +275,8 @@
     "target_va": "0x00495aa0",
     "target_size": 352,
     "expect": "exact",
-    "notes": "vtable slot 96 override of Bike (base function 0x0040d030)"
+    "notes": "vtable slot 96 override of Bike (base function 0x0040d030)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -258,7 +285,8 @@
     "target_va": "0x00495ca0",
     "target_size": 5,
     "expect": "exact",
-    "notes": "vtable slot 44 override of Bike (base function 0x0040a500)"
+    "notes": "vtable slot 44 override of Bike (base function 0x0040a500)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -267,7 +295,8 @@
     "target_va": "0x00495cb0",
     "target_size": 176,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 86.9% byte match. Instruction sched...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 86.9% byte match. Instruction sched...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -276,7 +305,8 @@
     "target_va": "0x00495d60",
     "target_size": 124,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 95.2% byte match. Only store order ...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 95.2% byte match. Only store order ...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -285,7 +315,8 @@
     "target_va": "0x00495de0",
     "target_size": 42,
     "expect": "exact",
-    "notes": "Exact (was partial: Semantics reconstructed; 27.5% byte match. Retail compares [...)"
+    "notes": "Exact (was partial: Semantics reconstructed; 27.5% byte match. Retail compares [...)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -294,7 +325,8 @@
     "target_va": "0x00495e10",
     "target_size": 56,
     "expect": "exact",
-    "notes": "vtable slot 23 override of Bike (base function 0x0040caf0)"
+    "notes": "vtable slot 23 override of Bike (base function 0x0040caf0)",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -303,7 +335,8 @@
     "target_va": "0x004964e0",
     "target_size": 249,
     "expect": "exact",
-    "notes": "vtable slot 48 override of Bike (base 0x0052a890). Exact: dt passed straight from field_0x13c (no local copy)."
+    "notes": "vtable slot 48 override of Bike (base 0x0052a890). Exact: dt passed straight from field_0x13c (no local copy).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -330,7 +363,8 @@
     "target_va": "0x0048d8b0",
     "target_size": 85,
     "expect": "exact",
-    "notes": "non-virtual state reset called from slot 1"
+    "notes": "non-virtual state reset called from slot 1",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -339,7 +373,8 @@
     "target_va": "0x00491b70",
     "target_size": 298,
     "expect": "exact",
-    "notes": "Exact. Wheel-force step: ramp from field_0x664 (float in retail), wheel query call, halve force when g_kbGame flag set. Needs KbFloat identity inline to get fld/fstp [esp] arg pattern."
+    "notes": "Exact. Wheel-force step: ramp from field_0x664 (float in retail), wheel query call, halve force when g_kbGame flag set. Needs KbFloat identity inline to get fld/fstp [esp] arg pattern.",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -348,7 +383,8 @@
     "target_va": "0x0048da50",
     "target_size": 416,
     "expect": "exact",
-    "notes": "Exact. Mode-4 (tier 3) player re-target plus airborne random jitter of 0x7ac/0x7b0. rand()*(1/32768) must go through a local float (KbRandUnit), else VC6 folds the two constants into one fmul."
+    "notes": "Exact. Mode-4 (tier 3) player re-target plus airborne random jitter of 0x7ac/0x7b0. rand()*(1/32768) must go through a local float (KbRandUnit), else VC6 folds the two constants into one fmul.",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -357,7 +393,8 @@
     "target_va": "0x004916a0",
     "target_size": 757,
     "expect": "exact",
-    "notes": "Exact. Off-track recovery (tier 3). Lessons: squared length must be accumulated term by term (d=x*x; d+=y*y; d+=z*z); the random kick needs plain rand()*(1/32768) locals rx, ry (a KbRandUnit inline with a local moves the temp slot)."
+    "notes": "Exact. Off-track recovery (tier 3). Lessons: squared length must be accumulated term by term (d=x*x; d+=y*y; d+=z*z); the random kick needs plain rand()*(1/32768) locals rx, ry (a KbRandUnit inline with a local moves the temp slot).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -375,7 +412,8 @@
     "target_va": "0x00496370",
     "target_size": 113,
     "expect": "exact",
-    "notes": "Slot 93 (Vehicle slot, empty stub in base). Pad effect re-arm; _ftol of a float*float expression, game value at KbGame+0xffc. Exact first try."
+    "notes": "Slot 93 (Vehicle slot, empty stub in base). Pad effect re-arm; _ftol of a float*float expression, game value at KbGame+0xffc. Exact first try.",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -384,7 +422,8 @@
     "target_va": "0x004963f0",
     "target_size": 236,
     "expect": "exact",
-    "notes": "Slot 94 pad force effect: 2-dword local {0x4650,0} passed by pointer, force clamp, slot 80 selects effect call. Exact first try."
+    "notes": "Slot 94 pad force effect: 2-dword local {0x4650,0} passed by pointer, force clamp, slot 80 selects effect call. Exact first try.",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -393,7 +432,8 @@
     "target_va": "0x00495e50",
     "target_size": 401,
     "expect": "exact",
-    "notes": "Slot 29 (Bike override). Exact once the 7-float angle copy was written in the order 0x50,0x4c,0x48,0x54,0x58,0x60,0x5c (a block copy or sequential order gives different load scheduling)."
+    "notes": "Slot 29 (Bike override). Exact once the 7-float angle copy was written in the order 0x50,0x4c,0x48,0x54,0x58,0x60,0x5c (a block copy or sequential order gives different load scheduling).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -402,7 +442,8 @@
     "target_va": "0x00497630",
     "target_size": 365,
     "expect": "exact",
-    "notes": "Slot 50 override. Exact when the c!=0 branch has ONE shared Vehicle::UnknownVirtualSlot50(a,0,0) call after an inner if/else on a (two separate calls let VC6 fold a==0 into push 0)."
+    "notes": "Slot 50 override. Exact when the c!=0 branch has ONE shared Vehicle::UnknownVirtualSlot50(a,0,0) call after an inner if/else on a (two separate calls let VC6 fold a==0 into push 0).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -411,7 +452,8 @@
     "target_va": "0x0048dee0",
     "target_size": 580,
     "expect": "exact",
-    "notes": "Slot 43 reset. Vehicle slot 43 then ~30 zero stores, 0x744 record fill (Vec3(0,0,0) temps for 0x1c/0x28), KbGame+0x3414/0x3418 copies. Exact after ordering the last four stores 15c8,15d0,138c,13f8 (found by permutation search)."
+    "notes": "Slot 43 reset. Vehicle slot 43 then ~30 zero stores, 0x744 record fill (Vec3(0,0,0) temps for 0x1c/0x28), KbGame+0x3414/0x3418 copies. Exact after ordering the last four stores 15c8,15d0,138c,13f8 (found by permutation search).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -420,7 +462,8 @@
     "target_va": "0x004912d0",
     "target_size": 624,
     "expect": "exact",
-    "notes": "Slot 97: Bike::slot97 then 17 animation-clip lookups (0x4a6b30) fed to 0x5305f0/0x5305b0/0x530630, wheels to 0x530680, 0x5328b0(node, Vec3, Vec3). Exact only when field_0x5c4/0x604 are re-read through casts at every call (locals cache them in registers)."
+    "notes": "Slot 97: Bike::slot97 then 17 animation-clip lookups (0x4a6b30) fed to 0x5305f0/0x5305b0/0x530630, wheels to 0x530680, 0x5328b0(node, Vec3, Vec3). Exact only when field_0x5c4/0x604 are re-read through casts at every call (locals cache them in registers).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -429,7 +472,8 @@
     "target_va": "0x00496790",
     "target_size": 1400,
     "expect": "exact",
-    "notes": "Slot 49 (Bike override; EH frame, 4 debug new expressions for on-screen messages, jump table). target_size 1400 = extent_with_tables (1354 code + 2 pad + 11-entry jump table). Exact needed: per-arm if(msg){send;delete} duplicated in source (VC6 cross-jumps them), switch with the string-fetch call inside each case, nested if for the 0x784/0x7a4 tail."
+    "notes": "Slot 49 (Bike override; EH frame, 4 debug new expressions for on-screen messages, jump table). target_size 1400 = extent_with_tables (1354 code + 2 pad + 11-entry jump table). Exact needed: per-arm if(msg){send;delete} duplicated in source (VC6 cross-jumps them), switch with the string-fetch call inside each case, nested if for the 0x784/0x7a4 tail.",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -438,7 +482,8 @@
     "target_va": "0x00491540",
     "target_size": 192,
     "expect": "exact",
-    "notes": "Destructor body (reached through the vbase-adjusted deleting destructor 0x00497c40): releases two debug-heap buffers (__FILE__ lines 0x8bb/0x8be), then runs Bike's destructor body. Exact with operator delete(p, __FILE__, line) calls."
+    "notes": "Destructor body (reached through the vbase-adjusted deleting destructor 0x00497c40): releases two debug-heap buffers (__FILE__ lines 0x8bb/0x8be), then runs Bike's destructor body. Exact with operator delete(p, __FILE__, line) calls.",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -447,7 +492,8 @@
     "target_va": "0x004925a0",
     "target_size": 197,
     "expect": "exact",
-    "notes": "Non-virtual: network/recorder notification (Net.cpp send at 0x004ac830, recorder 0x004e8720). Exact once the net pointer is read through g_kbGame->field_0x8 at both the test and the call (a local KbGame* CSEs it) and the message type is (unsigned char)(flag ? 0x13 : 0x87)."
+    "notes": "Non-virtual: network/recorder notification (Net.cpp send at 0x004ac830, recorder 0x004e8720). Exact once the net pointer is read through g_kbGame->field_0x8 at both the test and the call (a local KbGame* CSEs it) and the message type is (unsigned char)(flag ? 0x13 : 0x87).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -456,7 +502,8 @@
     "target_va": "0x00496e20",
     "target_size": 13,
     "expect": "exact",
-    "notes": "Setter for the recorder pointer at +0x13fc."
+    "notes": "Setter for the recorder pointer at +0x13fc.",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -465,7 +512,8 @@
     "target_va": "0x00495c00",
     "target_size": 151,
     "expect": "exact",
-    "notes": "Non-virtual: compares the integer x/z of the two cells at +0x11c8/+0x11cc (tier 3 semantics)."
+    "notes": "Non-virtual: compares the integer x/z of the two cells at +0x11c8/+0x11cc (tier 3 semantics).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -474,7 +522,8 @@
     "target_va": "0x00496f90",
     "target_size": 981,
     "expect": "exact",
-    "notes": "mutual AddIgnoredOwner (0x439410) over 5 collision objects each"
+    "notes": "mutual AddIgnoredOwner (0x439410) over 5 collision objects each",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -483,7 +532,8 @@
     "target_va": "0x00497370",
     "target_size": 692,
     "expect": "exact",
-    "notes": "mutual RemoveIgnoredOwner (0x439490) with racer/slot51 guards"
+    "notes": "mutual RemoveIgnoredOwner (0x439490) with racer/slot51 guards",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -501,7 +551,8 @@
     "target_va": "0x00496e30",
     "target_size": 350,
     "expect": "exact",
-    "notes": "toggle mutual collision ignoring against other bikes (0x496f90/0x497370) and part colliders; matched with items[i].flags test then a separate part pointer"
+    "notes": "toggle mutual collision ignoring against other bikes (0x496f90/0x497370) and part colliders; matched with items[i].flags test then a separate part pointer",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -519,7 +570,8 @@
     "target_va": "0x0048d910",
     "target_size": 123,
     "expect": "exact",
-    "notes": "Rider knock-off animation start (animSetA/B)."
+    "notes": "Rider knock-off animation start (animSetA/B).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -528,7 +580,8 @@
     "target_va": "0x0048d990",
     "target_size": 98,
     "expect": "exact",
-    "notes": "Rider animation start variant (animSetC/D)."
+    "notes": "Rider animation start variant (animSetC/D).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -537,7 +590,8 @@
     "target_va": "0x0048dcd0",
     "target_size": 165,
     "expect": "exact",
-    "notes": "Collision callback A (static, cdecl)."
+    "notes": "Collision callback A (static, cdecl).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -546,7 +600,8 @@
     "target_va": "0x0048dd80",
     "target_size": 155,
     "expect": "exact",
-    "notes": "Collision callback B (static, cdecl)."
+    "notes": "Collision callback B (static, cdecl).",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -555,7 +610,8 @@
     "target_va": "0x0048e190",
     "target_size": 225,
     "expect": "exact",
-    "notes": "Nearest other race bike."
+    "notes": "Nearest other race bike.",
+    "bindings": "KrustyBike.bindings.json"
   },
   {
     "class": "KrustyBike",
@@ -565,5 +621,115 @@
     "target_size": 339,
     "expect": "partial",
     "notes": "Bearing to nearest rival, head-turn pose. 25%: retail inlines fpatan keeping dz live on the FPU (fld st0; fxch x3; fpatan; fxch; fstp st0); VC6 emits plain fpatan for atan2(dx,dz) in every source shape tried (locals, Vec3 difference)."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "??_EKrustyBike@@$4PPPPPPPM@A@AEPAXI@Z",
+    "target_va": "0x00497c30",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk, vbase slot 0",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@KrustyBike@@$4PPPPPPPM@A@AEHM@Z",
+    "target_va": "0x00497ca0",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk, vbase slot 10",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "?Fn_004933E0@KrustyBike@@",
+    "target_va": "0x004933e0",
+    "target_size": 634,
+    "expect": "exact",
+    "notes": "net message 13 decoder",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x00491190",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "KrustyBike.cpp vector set, XCU 155-158",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004911a0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "KrustyBike.cpp vector set, XCU 155-158",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004911e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "KrustyBike.cpp vector set, XCU 155-158",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004911f0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "KrustyBike.cpp vector set, XCU 155-158",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x00491230",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "KrustyBike.cpp vector set, XCU 155-158",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x00491240",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "KrustyBike.cpp vector set, XCU 155-158",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x00491280",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "KrustyBike.cpp vector set, XCU 155-158",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x00491290",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "KrustyBike.cpp vector set, XCU 155-158",
+    "bindings": "KrustyBike.bindings.json"
   }
 ]

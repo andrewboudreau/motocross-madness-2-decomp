@@ -7,8 +7,16 @@ struct UnknownCameraBikeRider {
     UnknownVehiclePart* field_0x1a0;     // the rider model; has a "Head" part
 };
 
+// Object at UnknownCameraBikeState+0x40; KrustyBikeCamera slot 34 leads the
+// camera by its +0x154 vector.
+struct UnknownCameraBikeBody {
+    unsigned char field_0x000[0x154];
+    Vector3 field_0x154;
+};
+
 struct UnknownCameraBikeState {
-    unsigned char field_0x00[0x44];
+    unsigned char field_0x00[0x40];
+    UnknownCameraBikeBody* field_0x40;   // KrustyBikeCamera slot 34
     int field_0x44;                      // BikeCamera slot 75 tests 3
     unsigned char field_0x48[0xb0 - 0x48];
     int field_0xb0;                      // racesnd.cpp 0x004e39b0

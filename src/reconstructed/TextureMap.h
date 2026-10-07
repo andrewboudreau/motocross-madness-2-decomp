@@ -38,6 +38,8 @@ struct UnknownTextureFormatChoice {
 // The stream textures load from: 0x00461600 returns the read position,
 // 0x00461640 reads `count` items of `size` bytes and returns how many it
 // read. Both follow +0x1c to the innermost stream first.
+class UnknownResourceManager;
+
 class UnknownTextureStream {
 public:
     UnknownTextureStream(int a);              // 0x00460d10
@@ -52,6 +54,15 @@ public:
     // 0x00460e70: 1 when `path` opens and passes 0x00460db0's check; the
     // file is closed again (ResourceManager.cpp passes it to 0x00460f50).
     int UnknownFunction460e70(const char* path);
+    // 0x00460d70: the archive holding `name` (its offset and length go to
+    // +0x130 and +0x04), or 0 (FileStream.cpp).
+    UnknownTextureStream* UnknownFunction460d70(const char* name);
+    int UnknownFunction460db0();              // 0x00460db0: checks the "FAOE" header
+    int UnknownFunction461310(int unused);    // 0x00461310: binary mode
+    int UnknownFunction4618e0(const void* buffer, int size, int count); // 0x004618e0: writes
+    int UnknownFunction461a60(int c);         // 0x00461a60: writes a byte
+    int UnknownFunction461b90(const char* path); // 0x00461b90: writes the header, keyed by the name
+    void UnknownFunction461d20();             // 0x00461d20: restarts the key
     // 0x0043e9e0 (out-of-line copy): the text-mode byte.
     char UnknownFunction43e9e0()
     {
@@ -90,19 +101,23 @@ public:
         return feof(field_0x14);
     }
 
-    unsigned char field_0x00;
-    char field_0x01;                          // text mode
-    unsigned char field_0x02[0x04 - 0x02];
+    char field_0x00;                          // 'A', second byte of the "FAOE" header
+    char field_0x01;                          // text mode; the running key of an encoded file
+    char field_0x02;                          // 'F', first header byte
+    char field_0x03;                          // key derived from the file name (0x00461b90)
     int field_0x04;                           // length within the inner stream (0: to its end)
-    int field_0x08;
-    unsigned char field_0x00c[0x14 - 0x0c];
+    int field_0x08;                           // 1: the file is encoded
+    int field_0x0c;
+    int field_0x10;                           // header size before the data (4 when encoded)
     FILE* field_0x14;                         // the open file
-    unsigned char field_0x018[0x1c - 0x18];
+    char field_0x18;                          // 'E', fourth header byte
+    unsigned char field_0x019[0x1c - 0x19];
     UnknownTextureStream* field_0x1c;         // inner stream
-    unsigned char field_0x020[0x124 - 0x20];
-    int field_0x124;                          // buffer position
-    int field_0x128;                          // buffer end
-    unsigned char field_0x12c[0x130 - 0x12c];
+    char field_0x20;                          // 'O', third header byte
+    char field_0x21[0x124 - 0x21];            // read buffer
+    char* field_0x124;                        // buffer position
+    char* field_0x128;                        // buffer end
+    UnknownResourceManager* field_0x12c;      // the archives (constructor argument)
     int field_0x130;                          // start offset in the inner stream
 };
 

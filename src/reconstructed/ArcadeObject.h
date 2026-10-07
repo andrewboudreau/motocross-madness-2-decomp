@@ -13,22 +13,11 @@
 
 #include "GameObject.h"
 #include "MatrixUtil.h"
+#include "TransparencyMod.h"
 
 class CollisionObject;
 class D3DIMSoultreeObject;
 typedef void (*UnknownPickCallback)(CollisionObject* self, CollisionObject* other);
-
-// RTTI TransparencyMod : D3DIMSoultreeModifier : GraphicsTest : GameObject
-// (vtable 0x005588c4, constructor 0x005206a0, 0x4c bytes). The intermediate
-// bases are folded into GameObject here; only the alpha byte is used.
-class TransparencyMod : public GameObject {
-public:
-    explicit TransparencyMod(int flags);       // 0x005206a0 (ret 4)
-
-    unsigned char field_0x2c[0x48 - 0x2c];
-    unsigned char field_0x48;                  // alpha, 0x80 by default
-    unsigned char field_0x49[0x4c - 0x49];
-};
 
 // The object passed as the ninth argument of 0x00401310; only its float at
 // +0x198 is read here (it scales the model to a screen size). The other

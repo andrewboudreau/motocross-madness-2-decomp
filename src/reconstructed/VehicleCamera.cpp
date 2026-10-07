@@ -1,4 +1,13 @@
 #include "VehicleCamera.h"
+#include "TrackGame.h"
+
+// The four Math3D vector constants (.CRT$XCU 336-339, initialisers
+// 0x0052ced0..0x0052d00b): 0x0068a728, 0x0068a738, 0x0068a748 and
+// 0x0068a718. The constructor and 0x0052bb60 read the zero vector.
+static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
+static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
+static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x0052b920
 VehicleCamera::VehicleCamera(int flags) : FollowCamera(flags) {
@@ -9,8 +18,8 @@ VehicleCamera::VehicleCamera(int flags) : FollowCamera(flags) {
     field_0x388 = 0;
     field_0x38c = 0;
     field_0x384 = 0;
-    field_0x3a4 = g_UnknownVector68a728;
-    field_0x398 = g_UnknownVector68a728;
+    field_0x3a4 = kVec3Zero;
+    field_0x398 = kVec3Zero;
 }
 
 // 0x0052b9d0: an explicit empty destructor (vptr store, then FollowCamera's).
@@ -34,7 +43,79 @@ Vector3 VehicleCamera::UnknownVirtualSlot33() {
         return field_0x384->field_0x224;
     if (field_0x388)
         return field_0x388->field_0x40;
-    return g_UnknownVector68a728;
+    return kVec3Zero;
+}
+
+// 0x0052bac0
+Vector3 VehicleCamera::UnknownFunction52bac0() {
+    if (vehicleMode) {
+        field_0x392 = 0;
+        return vehicle->field_0x494;
+    }
+    if (!field_0x392) {
+        field_0x398 = UnknownVirtualSlot33();
+        field_0x392 = 1;
+    }
+    return field_0x398;
+}
+
+// 0x0052bb60: part 0 of the vehicle's +0x3bc in vehicle mode; else the first
+// target's model (its +0x140 child when set), the second target's +0x34
+// translation, the +0x38c translation, or the global default.
+Vector3 VehicleCamera::UnknownFunction52bb60() {
+    Vector3 position;
+    if (vehicleMode) {
+        vehicle->field_0x3bc->UnknownFunction4fc9a0(0, &position);
+        return position;
+    }
+    if (field_0x384) {
+        UnknownVehiclePart* model = field_0x384->field_0x1a0;
+        if (model->field_0x140)
+            model->field_0x140->UnknownFunction4fc9a0(0, &position);
+        else
+            model->UnknownFunction4fc9a0(0, &position);
+        return position;
+    }
+    if (field_0x388) {
+        field_0x388->field_0x34->UnknownFunction4fc970(&position);
+        return position;
+    }
+    if (field_0x38c) {
+        field_0x38c->UnknownFunction4fc970(&position);
+        return position;
+    }
+    return kVec3Zero;
+}
+
+// 0x0052bc50
+Vector3 VehicleCamera::UnknownFunction52bc50() {
+    if (vehicleMode) {
+        field_0x391 = 0;
+        return vehicle->field_0x488;
+    }
+    if (!field_0x391) {
+        field_0x3a4 = UnknownFunction52bb60();
+        field_0x391 = 1;
+    }
+    return field_0x3a4;
+}
+
+// 0x0052ca10: 0x0052bb60's position, led by the tracked point (slot 33)
+// scaled by dt (at most 0.2) while the camera is free to follow.
+Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
+    Vector3 result = UnknownFunction52bb60();
+    if (cameraState != 7 && !g_UnknownGlobal56e26c->field_0x1c4) {
+        if (vehicleMode) {
+            if (!vehicle->field_0x444) {
+                float lead = 0.2f < dt ? 0.2f : dt;
+                result += UnknownVirtualSlot33() * lead;
+            }
+        } else {
+            float lead = 0.2f < dt ? 0.2f : dt;
+            result += UnknownVirtualSlot33() * lead;
+        }
+    }
+    return result;
 }
 
 // 0x0052bfa0: preset; distance 17 in vehicle mode, else 60.

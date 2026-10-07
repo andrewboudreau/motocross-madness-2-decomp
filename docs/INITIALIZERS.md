@@ -1,7 +1,7 @@
 # Dynamic initializers (`$E`) and unit attribution
 
 This page lists every registered `$E` case and the unit it belongs to. That
-covers 500 cases: `_$E*` symbols in `tools/run_calibration.py`, and `$E`
+covers 568 cases: `_$E*` symbols in `tools/run_calibration.py`, and `$E`
 entries in the `targets.json` files under `src/krusty2` and `samples/physics`.
 Most of them are the per-file vector sets. Each set is four thunk/body pairs
 that build (0,0,0), (1,0,0), (0,1,0) and (0,0,1) into four 12-byte `.bss`
@@ -135,3 +135,12 @@ The audit itself was a linear capstone pass over `.text`, using
 | `0x004356f0..0x0043582b` (vectors `0x005797a0..0x005797d0`) | src/krusty2/collision/CollisionObject.cpp | not traced | consistent |
 | `0x0052d2c0..0x0052d33b`, `0x0052f080..0x0052f09b`, `0x0052fdc0..0x0052fefb` (XCU 340-347) | src/krusty2/visibility/VisibilityQuadTree.cpp | this unit (camera, timer, stat) | `.CRT$XCU` order |
 | `0x00504f70..0x005051eb` | src/krusty2/motion/SteeringControl.cpp | not traced | was masked in samples; now exact |
+| `0x0052ced0..0x0052d00b` (XCU 336-339, vectors `0x0068a718..0x0068a748`) | VehicleCamera.cpp | zero vector was `g_UnknownVector68a728` | consistent |
+| `0x004986b0..0x004987eb` (XCU 159-162) | KrustyBikeCamera.cpp | slot 10 reads the y axis `0x0067c3e8` | closes the unit |
+| `0x00491190..0x004912cb` (XCU 155-158, vectors from `0x0067c348`) | samples/physics/krustybike/KrustyBike.cpp | not traced | consistent |
+| `0x00515740..0x0051587b` (XCU 319-322) | samples/physics/tire/Tire.cpp | Tire code (former `g_Tire*` vectors) | consistent |
+| `0x004a1bd0..0x004a1d0b` (XCU 175-178, `0x00685030..0x00685068`) | MatrixUtil.cpp | 0x4a10e0/0x4a11e0 | consistent |
+| `0x004a2ac0..0x004a2aff` (XCU 183, tracker `0x006850c0`) | samples/allocation/MemTag.cpp | MemTagStack ("Unclaimed" root) | own static |
+| `0x0047c740..0x0047c87b` (XCU 132-135, `0x0065b620..`) | src/krusty2/core/GraphicsTest.cpp | not traced | position |
+| `0x004b1d80..0x004b1ebb` (XCU 208-211, `0x00688738..0x00688770`) | src/krusty2/contact/ObjectPlacement.cpp | read only by 0x4b0df0 | closes the unit |
+| `0x004a8940..0x004a8a7b` (XCU 188-191, `0x00685120..0x00685158`) | src/krusty2/motion/Motnctrl.cpp | not traced | consistent |

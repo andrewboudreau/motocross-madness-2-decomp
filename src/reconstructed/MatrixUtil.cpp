@@ -3,7 +3,20 @@
 #include "MatrixUtil.h"
 
 // Free matrix helpers in retail address order. Names are provisional and
-// describe the decoded behavior; see MatrixUtil.h.
+// describe the decoded behavior; see MatrixUtil.h. The unit is
+// 0x004a10e0..0x004a1d0b: the vector helpers, the matrix helpers, then this
+// file's vector set, which 0x004a10e0 and 0x004a11e0 read (strong inference).
+
+// The four vector constants that open about 73 retail files (see
+// src/krusty2/math/Math3D.h): 0x00685040, 0x00685050, 0x00685060 and
+// 0x00685030, initialised by 0x004a1bd0..0x004a1d0b (.CRT$XCU 175-178).
+static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
+static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
+static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
+
+// 0x004a10e0, 0x004a11e0 and 0x004a1300 are near misses:
+// samples/render/MatrixUtilNearMisses.cpp.
 
 // 0x004a13e0
 Matrix4 ZeroMatrix() {
@@ -64,3 +77,10 @@ Matrix4 MatrixMult(Matrix4 a, Matrix4 b) {
     }
     return result;
 }
+
+// 0x004a18e0 (MatrixInverse) and 0x004a1a50 are near misses:
+// samples/render/MatrixUtilNearMisses.cpp.
+
+// 0x004a1b00 is hand-scheduled x87 code (an ebp frame, fxch pairing and a
+// negative-index loop ending in `cmp edx, 0`): inline assembly in the
+// original, not reconstructed (src/reconstructed/D3DIMSoulTree.h declares it).

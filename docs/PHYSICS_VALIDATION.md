@@ -411,3 +411,39 @@ Strict exact with the units' existing sources (registration pending):
   0x0052fac0, which are thiscall methods of the object at 0x00575a98.
 - SoultreeQuadTreeRenderer.cpp: slot 23 `0x005048d0` (debug key 0x2d toggles the nodes).
 - SteeringControl.cpp: promoted from samples (see `src/krusty2/motion/README.md`).
+
+## KrustyBike and Tire samples with bindings
+
+`samples/physics/krustybike/KrustyBike.bindings.json` and
+`samples/physics/tire/Tire.bindings.json` resolve every relocation of the
+samples' exact targets, so they pass strict comparison once each exact entry
+of the two `targets.json` files names its bindings file (registration
+pending; until then the runner reports them as unresolved):
+
+- KrustyBike.cpp: the 56 existing exact targets, plus the `.CRT$XCU` 155-158
+  set (`0x00491190..0x004912cb`, vectors `0x0067c348`, `0x0067c358`,
+  `0x0067c368`, `0x0067c338`; the constructor and `0x00492670` read the zero
+  vector), the two vtordisp thunks `0x00497c30`/`0x00497ca0` and the network
+  message 13 decoder `0x004933e0`. The trick end `0x00495ff0` is a near miss
+  (871/895, stack slots). Slot 97's six clip names come from a
+  `{id, name[32]}` table at `0x0056cb88` (the two "BackOver" entries are
+  separate records). The constructor `0x0048fa60` (`GameObject(1), Bike(flags)`,
+  ret 8) is a near miss (472/532, store scheduling around the +0x1540 vector
+  copy); `0x0048d780` uses an inline-asm rounding helper and stays excluded.
+- Tire.cpp: the 5 existing exact targets, plus the `.CRT$XCU` 319-322 set
+  (`0x00515740..0x0051587b`; the former `g_TireZeroVec3`/`g_TireVec3_68a3c0`/
+  `g_TireVec3_68a3f0` are its zero, z and y vectors), CollisionPoint's inline
+  destructor `0x00515b40`, the roll helpers `0x00513560`/`0x005135b0`, the
+  attachment pose `0x00515660` and the roll update `0x005143d0`. Near misses in
+  the same file: `0x00513f90` (470/479, stack slots), `0x00514170` and
+  `0x00515c90` (x87 operand order).
+
+Check (a scratch copy of the targets with `bindings` added gives 85/85 strict
+for these two files):
+
+```bash
+python tools/run_physics_samples.py --strict \
+  --source samples/physics/krustybike/KrustyBike.cpp \
+  --source samples/physics/tire/Tire.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```

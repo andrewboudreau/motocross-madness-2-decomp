@@ -204,9 +204,13 @@ references. All bodies below are strict exact under the default profile.
 
 | Function | Retail VA | Bytes | Behavior |
 |---|---|---:|---|
-| VehicleCamera constructor | `0x0052b920` | 137 | `FollowCamera(flags)`; +0x390 = true; +0x398/+0x3a4 from the `.bss` vector `0x0068a728` |
+| VehicleCamera constructor | `0x0052b920` | 137 | `FollowCamera(flags)`; +0x390 = true; +0x398/+0x3a4 = the unit's zero vector `0x0068a728` |
 | VehicleCamera destructor / wrapper | `0x0052b9d0` / `0x0052b9b0` | 11 / 30 | Explicit empty destructor (vptr store, jump to `~FollowCamera`) |
-| VehicleCamera 33 | `0x0052ba30` | 142 | Tracked point: vehicle +0x64 in vehicle mode, else target +0x384 (+0x224) or +0x388 (+0x40), else the global default |
+| VehicleCamera 33 | `0x0052ba30` | 142 | Tracked point: vehicle +0x64 in vehicle mode, else target +0x384 (+0x224) or +0x388 (+0x40), else the zero vector |
+| VehicleCamera `0x0052bac0` / `0x0052bc50` | `0x0052bac0`, `0x0052bc50` | 158 / 155 | Vehicle +0x494 / +0x488 in vehicle mode (clearing +0x392 / +0x391); otherwise slot 33 / `0x0052bb60`, latched in +0x398 / +0x3a4 |
+| VehicleCamera `0x0052bb60` | `0x0052bb60` | 225 | Part 0 of vehicle +0x3bc; else target +0x384's model (its +0x140 child first), target +0x388's +0x34 translation, +0x38c's translation, or the zero vector |
+| VehicleCamera 57 | `0x0052ca10` | 356 | `0x0052bb60` plus slot 33 × min(dt, 0.2) unless state 7, game +0x1c4 or vehicle +0x444 |
+| VehicleCamera `$E` | `0x0052ced0..0x0052d00b` | 8 × 5/60 | `.CRT$XCU` 336-339: zero, x, y, z axes at `0x0068a728`, `0x0068a738`, `0x0068a748`, `0x0068a718` |
 | VehicleCamera 42 | `0x0052cc00` | 122 | +0x308 = fov/zoom ratio × vehicle +0x43c × 0.3 (0.4 in state 3), 0 otherwise |
 | VehicleCamera 39 | `0x0052cbd0` | 41 | Returns vehicle +0x45c; +0x23c += π when vehicle +0x464 is set |
 | VehicleCamera 50 | `0x0052cb80` | 73 | Vehicle part position 0, raised by 5 |
@@ -235,18 +239,36 @@ Several shapes record source structure:
   `setne al` to land straight in the return register.
 - **BikeCamera's "Head" lookup.** The lookup is its own statement. Nesting it
   inside the position call makes VC6 push the outer call's arguments first.
+- **VehicleCamera slot 57's cap.** The capped frame time is a new local
+  (`lead = 0.2f < dt ? 0.2f : dt`); assigning back to `dt` drops retail's
+  self-move in the else path.
+
+VehicleCamera.cpp's extent: its `.CRT$XCU` set (336-339) is emitted between
+slot 51 (`0x0052cec0`) and slot 75 (`0x0052d010`); the zero vector the code
+reads is that set's, so the vectors are file statics of the unit. VfwDeco.cpp
+starts at `0x0052d050`.
+
+Slot 36 (`0x0052cc80`, 573 bytes) is a near miss in
+`samples/camera/VehicleCameraNearMisses.cpp`: identical up to the disabled
+exit, which shows FollowCamera slot 36's pattern (retail `xor al, al;
+mov [esi+0x277], al`, VC6 an immediate store and a merged `return false`).
+Its tolerances are 10 while vehicle +0x434 > 0.1, else 0.01, and it returns
++0x274 as the bool result (so +0x274 is `bool`). Slots 35 (`0x0052c510`), 41
+(`0x0052c030`) and 68 (`0x0052bcf0`) are not reconstructed; slot 41 normalises
+a heading with `0x00460c00` and reads the unit's z axis.
 
 ## KrustyBikeCamera
 
 RTTI: `KrustyBikeCamera : BikeCamera`. Canonical source:
-`src/reconstructed/KrustyBikeCamera.{h,cpp}`. KrustyBike.cpp is a candidate
-TU (name overlap, nearby references). The camera keeps its state and presets
-in the object behind the global pointer `0x0056e26c` (declared in
-`TrackGame.h`), so they survive between cameras. All bodies below
-are strict exact.
+`src/reconstructed/KrustyBikeCamera.{h,cpp}`. Its unit follows KrustyBike.cpp
+but is a separate one (its own vector set, below); the file name is ours.
+The camera keeps its state and presets in the object behind the global
+pointer `0x0056e26c` (declared in `TrackGame.h`), so they survive between
+cameras. All bodies below are strict exact.
 
 | Function | Retail VA | Bytes | Behavior |
 |---|---|---:|---|
+| `$E` | `0x004986b0..0x004987eb` | 8 × 5/60 | `.CRT$XCU` 159-162: zero, x, y, z axes at `0x0067c3c8`, `0x0067c3d8`, `0x0067c3e8`, `0x0067c3b8` |
 | Constructor | `0x00497cb0` | 170 | `/GX` frame; slot 62 (restore state) and slot 71 bound statically; resets and copies |
 | Destructor / wrapper | `0x00497d80` / `0x00497d60` | 11 / 30 | Explicit empty destructor |
 | 23 | `0x00497df0` | 38 | Returns 0 while global +0x3430 is set, else FollowCamera slot 23 |
@@ -263,12 +285,27 @@ Slot 58's frame holds a 0x8c-byte message object and a `char[260]` text
 buffer (MAX_PATH), although it asks for at most 0x80 characters.
 
 Slot 10 (`0x00497e20`, 352 bytes plus a 6-entry jump table) is a near miss in
-`samples/camera/KrustyBikeCameraNearMisses.cpp`, with 35 of 376 bytes
-differing. It picks its view from the global's +0x558..+0x568 objects by
-+0x2d74 (case order 2, 3, 0, 1/5, 4 in the code). While the view is available
-it drives FollowCamera slots 46 and 47 from it, using file-scope statics at
-`0x0067c3e8` and `0x0067c3f4` (no initialisation guard). Only the register
-choice in its second `0x004210f0` call differs.
+`samples/camera/KrustyBikeCameraNearMisses.cpp` (341 of 376 bytes). It picks
+its view from the global's +0x558..+0x568 objects by +0x2d74 (case order 2, 3,
+0, 1/5, 4 in the code). While the view is available it drives FollowCamera
+slots 46 and 47 from it; slot 46's up vector is the unit's y axis
+(`0x0067c3e8`) and the latch is a file static at `0x0067c3f4` (no
+initialisation guard). From the second `0x004210f0` call on, VC6 rotates the
+scratch registers (edx/ecx/eax in retail).
+
+Slot 34 (`0x00498340`, 612 bytes) is a near miss in the same file (605 of 612
+bytes): in camera mode +0x276 it leads the rider's part position by bike
++0x604 → +0x40 → +0x154 times its argument (scaled by 4 − 0.006 × +0x2c0 below
+height 500); otherwise the target point, or the target point plus the +0x29c
+direction times a distance built from the dot product with slot 33, the
+fov/zoom ratio and vehicle +0x438. Its argument is the frame time as a float:
+FollowCamera slot 10 passes `dt` through slot 48 (FollowCamera.h still declares
+slots 34/48 with an int). Only one product of the inline dot product has its
+operands swapped.
+
+The KrustyBikeCamera code runs `0x00497cb0..0x004987ec`; its vector set closes
+the unit, and KrustyBike.cpp's own set (`.CRT$XCU` 155-158, `0x00491190`) is a
+separate one, so the two are different translation units.
 
 ## FollowCam.cpp extent and the second wave
 
@@ -313,6 +350,7 @@ Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
 
 `FollowCamera.h` also types slot 41 as returning `Vector3` (slot 10 stores
 it at +0x29c) and +0x304 as a float (slot 10's blend clock, clamped to 1).
+Slot 57 takes a float (slot 10 passes `dt`; VehicleCamera caps it at 0.2).
 
 Return types of slots 55 and 75. Slot 10 uses the `al` of both calls, so
 both return one byte. Slot 75 is `bool`; FollowCamera's, VehicleCamera's and

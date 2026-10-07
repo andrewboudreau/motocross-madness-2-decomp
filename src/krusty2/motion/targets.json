@@ -348,5 +348,405 @@
     "expect": "exact",
     "notes": "SteeringControl.cpp initializer",
     "bindings": "SteeringControl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x004a5630",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x004a5640",
+    "target_size": 104,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?ComparePoses@@",
+    "target_va": "0x004a56b0",
+    "target_size": 25,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?AdvanceLooping@@",
+    "target_va": "0x004a56d0",
+    "target_size": 121,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?AdvanceClamped@@",
+    "target_va": "0x004a5750",
+    "target_size": 230,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "??0MotionManager@@",
+    "target_va": "0x004a5840",
+    "target_size": 22,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Release@MotionManager@@",
+    "target_va": "0x004a5860",
+    "target_size": 152,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Load@MotionManager@@",
+    "target_va": "0x004a5900",
+    "target_size": 816,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?LoadMot@MotionManager@@",
+    "target_va": "0x004a5c30",
+    "target_size": 528,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Find@MotionManager@@",
+    "target_va": "0x004a6290",
+    "target_size": 63,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a62d0@Character@@",
+    "target_va": "0x004a62d0",
+    "target_size": 555,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a6500@Character@@",
+    "target_va": "0x004a6500",
+    "target_size": 441,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?LoadMotions@Character@@",
+    "target_va": "0x004a66c0",
+    "target_size": 185,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "??0Character@@",
+    "target_va": "0x004a6780",
+    "target_size": 335,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a6910@Character@@",
+    "target_va": "0x004a6910",
+    "target_size": 23,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot1@Character",
+    "target_va": "0x004a6930",
+    "target_size": 145,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "??1Character@@",
+    "target_va": "0x004a69d0",
+    "target_size": 141,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?CaptureMotion@Character@@",
+    "target_va": "0x004a6a60",
+    "target_size": 76,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?SortMotion@Character@@",
+    "target_va": "0x004a6ab0",
+    "target_size": 89,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a6b10@Character@@",
+    "target_va": "0x004a6b10",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?FindMotion@Character@@",
+    "target_va": "0x004a6b30",
+    "target_size": 24,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?FindNode@Character@@",
+    "target_va": "0x004a6b50",
+    "target_size": 80,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot4@Character",
+    "target_va": "0x004a6ba0",
+    "target_size": 3,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?ApplyPoseListSlot4@Character@@",
+    "target_va": "0x004a8a80",
+    "target_size": 59,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?ApplyPoseListSlot6@Character@@",
+    "target_va": "0x004a8ac0",
+    "target_size": 59,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?Method_0x004a8b00@Character@@",
+    "target_va": "0x004a8b00",
+    "target_size": 15,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?SetMotionByName@Character@@",
+    "target_va": "0x004a8b10",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?SetMotion@Character@@",
+    "target_va": "0x004a8b40",
+    "target_size": 27,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?BlendToMotion@Character@@QAEXPAUMotion@@@Z",
+    "target_va": "0x004a8b60",
+    "target_size": 20,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?BlendToMotion@Character@@QAEXPAUMotion@@M@Z",
+    "target_va": "0x004a8b80",
+    "target_size": 107,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "CharacterVirtualSlot8@Character",
+    "target_va": "0x004a98b0",
+    "target_size": 381,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?FreeMotion@@",
+    "target_va": "0x004a9a30",
+    "target_size": 112,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; strict with relocations bound (was masked in samples)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004a8940",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp vector set XCU 188-191, globals 0x685120..0x685158",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004a8950",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp vector set XCU 188-191, globals 0x685120..0x685158",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004a8990",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp vector set XCU 188-191, globals 0x685120..0x685158",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004a89a0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp vector set XCU 188-191, globals 0x685120..0x685158",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004a89e0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp vector set XCU 188-191, globals 0x685120..0x685158",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004a89f0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp vector set XCU 188-191, globals 0x685120..0x685158",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004a8a30",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp vector set XCU 188-191, globals 0x685120..0x685158",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004a8a40",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp vector set XCU 188-191, globals 0x685120..0x685158",
+    "bindings": "Motnctrl.bindings.json"
   }
 ]
