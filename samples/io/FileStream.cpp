@@ -1,12 +1,34 @@
-// FileStream.cpp -- the buffered file stream (UnknownTextureStream, declared in
-// src/reconstructed/TextureMap.h), 0x00460d10..0x00461d57, after the FastMath helpers
-// (samples/physics/helpers/FastMath.cpp) and before the shadow fill code 0x00461d60.
-// No __FILE__ literal or RTTI: the file name is ours (tier 3), as are the names.
+// FileStream.cpp -- near misses of the buffered file stream (UnknownTextureStream,
+// declared in src/reconstructed/TextureMap.h), 0x00460d10..0x00461d57. The eleven
+// methods that match retail are in src/reconstructed/FileStream.cpp; these seven
+// (constructor, header check, open, seek, read, write, write-header) stay here with
+// their notes. The bindings file covers both.
 //
 // A stream reads a file directly or a slice (+0x130, +0x04) of an inner stream (+0x1c);
 // every method first follows +0x1c to the innermost stream (tail recursion, which VC6
 // turns into a loop). Files written with 0x00461b90 start with "FAOE" and are encoded
 // byte by byte with a running key seeded from the file name.
+//
+// What moved the scores, and what did not:
+// - The byte decode `c = *p; decoded = key ^ c; key += c; *p = decoded;` with the key
+//   read straight from the field (no key temporary) makes VC6 load the key first and
+//   copy it, as retail does; this matched 0x00461980 and is the DecodeBytes shape.
+// - In the seed loop of 0x00461b90, `char c = *p++;` before the key update gives
+//   retail's loop body (85% -> 90%); the same spelling in 0x00460f50 regresses it,
+//   where retail keeps `*p++` inside the expression.
+// - 0x00461b90: retail stores the 0xfa seed inside the inlined strcat and sets up the
+//   name pointer (lea esi) right after strlen; no statement order, helper, index or
+//   countdown loop shape moves those two.
+// - 0x004618e0: retail loads buffer/size/count into registers before the pushes;
+//   VC6 here pushes them from the stack. Register locals, a helper for the fseek
+//   block and an unsigned count do not change it.
+// - 0x00460d10: a member-initialiser list stores in declaration order (62% with every
+//   field in it), but retail's order is the body order below with the argument
+//   loaded into edx at entry; neither form reproduces the entry load.
+// - 0x00461340: retail loads the decoded position (+0x0c) once and keeps the next
+//   pointer in a different register; the `position` ternary, an explicit if/else
+//   and assigning position before the zero test all give the same or worse code.
+// - /G6 makes every one of these worse.
 
 #include <io.h>
 #include <fcntl.h>
@@ -34,7 +56,7 @@ static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream
     return stream;
 }
 
-// 0x00460d10. Near miss: retail loads the argument into edx on entry and stores
+// 0x00460d10. Near miss (22%): retail loads the argument into edx on entry and stores
 // it in sequence; every ordering tried here loads it just before its store.
 UnknownTextureStream::UnknownTextureStream(int a)
 {
@@ -56,28 +78,6 @@ UnknownTextureStream::UnknownTextureStream(int a)
     field_0x128 = field_0x21;
 }
 
-// 0x00460d60
-UnknownTextureStream::~UnknownTextureStream()
-{
-    if (field_0x14) {
-        fclose(field_0x14);
-    }
-}
-
-// 0x00460d70
-UnknownTextureStream* UnknownTextureStream::UnknownFunction460d70(const char* name)
-{
-    if (field_0x12c) {
-        ResourceItem* item = field_0x12c->UnknownFunction4e9360(name, 0);
-        if (item) {
-            field_0x130 = item->field_0x18;
-            field_0x04 = item->field_0x1c;
-            return item->field_0x14;
-        }
-    }
-    return 0;
-}
-
 // Whether the next four bytes are the "FAOE" header. As an inline helper the
 // failure path of the four tests falls through, as in retail.
 static inline int HeaderMatches(UnknownTextureStream* stream)
@@ -92,7 +92,7 @@ static inline int HeaderMatches(UnknownTextureStream* stream)
 }
 
 // 0x00460db0: 1 when the file starts with the header; the file is closed when a
-// seek fails. Near miss: retail keeps the first fseek-failure block inline and
+// seek fails. Near miss (16%): retail keeps the first fseek-failure block inline and
 // cross-jumps only from its fclose call into the second one (the two load +0x14
 // into different registers), and stores field_0x08 = 0 as an immediate; VC6 here
 // merges the whole first block into the second and stores fseek's zero result.
@@ -120,34 +120,6 @@ int UnknownTextureStream::UnknownFunction460db0()
     field_0x08 = encoded;
     field_0x124 = field_0x128;
     return 1;
-}
-
-// 0x00460e70. The NULL test guards the rest, so its message comes last.
-int UnknownTextureStream::UnknownFunction460e70(const char* path)
-{
-    char message[0x184];
-
-    if (field_0x14) {
-        fclose(field_0x14);
-    }
-    if (path) {
-        if (*path && (field_0x14 = fopen(path, "rb")) != 0) {
-            if (!UnknownFunction460db0()) {
-                fclose(field_0x14);
-                field_0x14 = 0;
-                return 0;
-            }
-            if (field_0x14) {
-                fclose(field_0x14);
-                field_0x14 = 0;
-            }
-            return 1;
-        }
-        sprintf(message, "Error opening %s.\n", path);
-        return 0;
-    }
-    sprintf(message, "filename is NULL!\n");
-    return 0;
 }
 
 // 0x00460f50: opens `path` with fopen `mode` ("r"/"a" read, "w" write) or as a
@@ -261,13 +233,6 @@ int UnknownTextureStream::UnknownFunction460f50(const char* path, const char* mo
     return 1;
 }
 
-// 0x00461310
-int UnknownTextureStream::UnknownFunction461310(int unused)
-{
-    FILE* file = InnermostStream(this)->field_0x14;
-    return _setmode(file->_file, _O_BINARY);
-}
-
 // Restarts the key of `stream`: 0x00461d20 inlined one level.
 static inline void RestartKey(UnknownTextureStream* stream)
 {
@@ -281,10 +246,11 @@ static inline void RestartKey(UnknownTextureStream* stream)
 // fseek into the middle of its key stream, so with `flag` it rewinds (or keeps
 // the decoded position +0x0c) and decodes forward through a scratch buffer.
 // Near miss (about 29%, 700 vs 702 bytes): the control flow and the inner
-// loop match, but retail keeps `offset` in ebx and `origin` in ebp where VC6
-// here swaps them, so most instructions differ by register. The 0x418-byte
-// buffer reproduces retail's 0x41c-byte frame; `result = 0` inside the loop
-// reproduces retail's store (the source was likely tail recursion).
+// loop match, but retail keeps the next pointer and the zero in other registers
+// and loads the decoded position +0x0c once, so most instructions differ by
+// register. The 0x418-byte buffer reproduces retail's 0x41c-byte frame;
+// `result = 0` inside the loop reproduces retail's store (the source was likely
+// tail recursion).
 int UnknownTextureStream::UnknownFunction461340(int offset, int origin, int flag)
 {
     unsigned char buffer[0x418];
@@ -351,32 +317,21 @@ int UnknownTextureStream::UnknownFunction461340(int offset, int origin, int flag
     return result;
 }
 
-// 0x00461600
-int UnknownTextureStream::UnknownFunction461600()
-{
-    UnknownTextureStream* stream = InnermostStream(this);
-    int position = ftell(stream->field_0x14) + (stream->field_0x124 - stream->field_0x128);
-    if (position >= stream->field_0x10) {
-        return position - stream->field_0x10;
-    }
-    return -1;
-}
-
-// The running-key decode used by 0x00461640.
+// The running-key decode used by 0x00461640 (the 0x00461980 shape).
 static inline void DecodeBytes(UnknownTextureStream* stream, char* p, int count)
 {
     for (int i = 0; i < count; i++) {
-        char key = stream->field_0x01;
-        char c = *p ^ key;
-        stream->field_0x01 = key + *p;
-        *p++ = c;
+        char c = *p;
+        char decoded = stream->field_0x01 ^ c;
+        stream->field_0x01 += c;
+        *p++ = decoded;
     }
 }
 
 // 0x00461640: reads `count` items of `size` bytes, from the buffer first, and
-// returns how many it read. Near miss (about 30%): retail loads the key before
-// the byte in the decode loop, keeps the advanced buffer pointer in ecx and
-// tail-merges the two encoded 45c7b0 calls; VC6 here does none of these.
+// returns how many it read. Near miss (about 32%): retail keeps the advanced
+// buffer pointer in ecx and tail-merges the two encoded 45c7b0 calls; VC6 here
+// does neither.
 int UnknownTextureStream::UnknownFunction461640(void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);
@@ -454,8 +409,8 @@ int UnknownTextureStream::UnknownFunction461640(void* buffer, int size, int coun
     return count;
 }
 
-// 0x004618e0. Near miss: retail loads every argument into a register before the
-// pushes; VC6 here pushes from memory.
+// 0x004618e0. Near miss (88%): retail loads every argument into a register before
+// the pushes; VC6 here pushes from memory.
 int UnknownTextureStream::UnknownFunction4618e0(const void* buffer, int size, int count)
 {
     UnknownTextureStream* stream = InnermostStream(this);
@@ -473,105 +428,6 @@ int UnknownTextureStream::UnknownFunction4618e0(const void* buffer, int size, in
     return fwrite(buffer, size, count, stream->field_0x14);
 }
 
-// 0x00461980: the next byte, decoded with the running key in an encoded file; -1 at
-// the end. Near miss (98%): retail loads the key before the byte; every ordering of
-// the decode tried here loads the byte first. inline_depth(0) keeps the
-// UnknownFunction430ff0 call out of line, as retail has it.
-#pragma inline_depth(0)
-int UnknownTextureStream::UnknownFunction461980()
-{
-    if (field_0x1c) {
-        if (field_0x04 > 0 && UnknownFunction461600() >= field_0x130 + field_0x04) {
-            return -1;
-        }
-        if (field_0x1c->UnknownFunction430ff0()) {
-            return -1;
-        }
-        return field_0x1c->UnknownFunction461980();
-    }
-    if (field_0x124 == field_0x128) {
-        int count = fread(field_0x21, 1, 0x100, field_0x14);
-        if (count != 0x100 && (count == 0 || (field_0x14->_flag & _IOERR))) {
-            return -1;
-        }
-        field_0x124 = field_0x21;
-        field_0x128 = field_0x124 + count;
-    }
-    char* p = field_0x124;
-    if (p < field_0x128) {
-        if (field_0x08) {
-            char key = field_0x01;
-            char c = *p ^ key;
-            field_0x01 = key + *p;
-            *p = c;
-            return (unsigned char)*field_0x124++;
-        }
-        return (unsigned char)*field_0x124++;
-    }
-    return -1;
-}
-#pragma inline_depth()
-
-// 0x00461a60
-int UnknownTextureStream::UnknownFunction461a60(int c)
-{
-    UnknownTextureStream* stream = InnermostStream(this);
-    char byte = (char)c;
-    if (!stream->UnknownFunction4618e0(&byte, 1, 1)) {
-        return -1;
-    }
-    return c;
-}
-
-// 0x00461aa0: reads a line of at most size - 1 characters; "\r\n" ends it as "\n".
-#pragma inline_depth(0)
-int UnknownTextureStream::UnknownFunction461aa0(char* buffer, int size)
-{
-    if (field_0x1c) {
-        if (field_0x04 > 0 && UnknownFunction461600() >= field_0x130 + field_0x04) {
-            return 0;
-        }
-        if (field_0x1c->UnknownFunction430ff0()) {
-            return 0;
-        }
-        if (field_0x04 > 0) {
-            int left = field_0x130 - UnknownFunction461600() + field_0x04 + 1;
-            if (left < size) {
-                size = left;
-            }
-        }
-        return field_0x1c->UnknownFunction461aa0(buffer, size);
-    }
-    char* p = buffer;
-    *p = (char)UnknownFunction461980();
-    if (*p == (char)-1) {
-        return 0;
-    }
-    int count = 1;
-    while (count < size - 1) {
-        if (*p == '\n') {
-            if (p[-1] == '\n' && count > 1) {
-                *p = 0;
-                return (int)buffer;
-            }
-            break;
-        }
-        if (*p == '\r') {
-            *p = '\n';
-        }
-        p++;
-        *p = (char)UnknownFunction461980();
-        if (*p == (char)-1) {
-            *p = 0;
-            break;
-        }
-        count++;
-    }
-    p[1] = 0;
-    return (int)buffer;
-}
-#pragma inline_depth()
-
 // Writes the "FAOE" header; 0 when a write fails. As an inline helper the failure
 // path falls through, as in retail.
 static inline int PutHeader(UnknownTextureStream* stream)
@@ -586,11 +442,9 @@ static inline int PutHeader(UnknownTextureStream* stream)
 }
 
 // 0x00461b90: writes the header and seeds the key from the file name (name plus
-// extension). Near miss (85%): retail stores the 0xfa seed inside the inlined
-// strcat, sets up the name pointer after strlen and holds key + 3 in dl and the
-// name byte in cl; VC6 here swaps those two registers and schedules the seed and
-// pointer later. The index, countdown, operand-order and helper shapes of the
-// loop do not change it.
+// extension). Near miss (90%): the loop body matches with the name byte in a
+// temporary; retail stores the 0xfa seed inside the inlined strcat and sets up
+// the name pointer right after strlen, where VC6 here schedules both later.
 int UnknownTextureStream::UnknownFunction461b90(const char* path)
 {
     char drive[_MAX_DRIVE];
@@ -610,54 +464,9 @@ int UnknownTextureStream::UnknownFunction461b90(const char* path)
     int length = strlen(name);
     char* p = name;
     for (int i = 0; i < length; i++) {
-        stream->field_0x01 = ((stream->field_0x01 + 3) ^ *p++) + stream->field_0x01;
+        char c = *p++;
+        stream->field_0x01 = ((stream->field_0x01 + 3) ^ c) + stream->field_0x01;
     }
     stream->field_0x03 = stream->field_0x01;
     return 1;
-}
-
-// The modification time and size of the stream's file; _fstat's result.
-static inline int FileTimes(UnknownTextureStream* stream, int* time, int* size)
-{
-    struct _stat status;
-    int result = _fstat(stream->field_0x14->_file, &status);
-    if (result) {
-        *time = 0;
-        *size = 0;
-    } else {
-        *time = status.st_mtime;
-        *size = status.st_size;
-    }
-    return result;
-}
-
-// 0x00461cb0. Writing the _fstat call inline keeps the recursion a call;
-// through FileTimes VC6 turns it into the loop retail has.
-int UnknownTextureStream::UnknownFunction461cb0(int* time, int* size)
-{
-    if (!time || !size) {
-        return -1;
-    }
-    if (field_0x1c) {
-        return field_0x1c->UnknownFunction461cb0(time, size);
-    }
-    return FileTimes(this, time, size);
-}
-
-// 0x00461d20
-void UnknownTextureStream::UnknownFunction461d20()
-{
-    if (field_0x1c) {
-        field_0x1c->UnknownFunction461d20();
-        return;
-    }
-    field_0x01 = field_0x03;
-}
-
-// 0x00461d40: fprintf.
-int UnknownFunction461d40(FILE* file, const char* format, ...)
-{
-    va_list arguments;
-    va_start(arguments, format);
-    return vfprintf(file, format, arguments);
 }

@@ -1,14 +1,23 @@
 // Near-miss MediaControl.cpp candidates (src/reconstructed/MediaControl.cpp,
 // MediaControl.h), kept out of src/reconstructed until they match.
 //
-// 0x004a2560 (open, 646 bytes): every call, argument, GUID and branch target
-// matches. Retail keeps a zero in ebx and &field_0x60 in ebp after the
-// QueryInterface for the DirectDraw stream and pushes ebx for the later zero
-// arguments; VC6 here pushes immediates and uses one register fewer, so the
-// frame offsets differ by one dword. Neither local order nor moving the
-// `surface = 0` store before the memset changes it. Retail's ebx holds
-// &field_0x5c and then field_0x5c itself (the QueryInterface `this`) before
-// the zero; VC6 here reloads it into eax.
+// 0x004a2560 (open, 646 bytes; 9% masked): every call, argument, GUID and
+// branch target matches. Retail keeps a zero in ebx and &field_0x60 in ebp
+// after the QueryInterface for the DirectDraw stream and pushes ebx for the
+// later zero arguments; VC6 here pushes immediates and uses one register
+// fewer, so the frame offsets differ by one dword. Neither local order nor
+// moving the `surface = 0` store before the memset changes it. Retail's ebx
+// holds &field_0x5c and then field_0x5c itself (the QueryInterface `this`)
+// before the zero; VC6 here reloads it into eax.
+//
+// The zero register itself is reachable: `UnknownSurfaceInterface* surface
+// = 0;` as a declaration initialiser (with the later `surface = 0` kept)
+// makes VC6 keep the zero in a register and reproduces retail's frame (637
+// bytes). But retail births the `xor ebx, ebx` inside the inlined memset
+// after that QueryInterface and keeps &field_0x60 in ebp and field_0x5c in
+// ebx; VC6 hoists the xor to entry and swaps ebx/ebp, so the score stays.
+// Zeroing `surface` both before the memset and after field_0x34 gives 11%
+// with two stores.
 //
 // 0x004a2900 (restart) is exact in src/reconstructed/MediaControl.cpp.
 

@@ -1,7 +1,8 @@
 # File stream helpers
 
-Candidate source: `samples/io/FileStream.cpp` and its bindings. The class is
-`UnknownTextureStream`, declared in `src/reconstructed/TextureMap.h`.
+Source: `src/reconstructed/FileStream.cpp` (the exact methods) and
+`samples/io/FileStream.cpp` (the near misses), each with its bindings. The
+class is `UnknownTextureStream`, declared in `src/reconstructed/TextureMap.h`.
 
 ## Evidence
 
@@ -20,7 +21,7 @@ Candidate source: `samples/io/FileStream.cpp` and its bindings. The class is
 - Encoded files start with "FAOE". Their bytes go through a running key at
   `+0x01`, seeded from the file name.
 
-## Exact (10)
+## Exact (11), `src/reconstructed/FileStream.cpp`
 
 | VA | Size (bytes) |
 |---|---|
@@ -29,6 +30,7 @@ Candidate source: `samples/io/FileStream.cpp` and its bindings. The class is
 | `0x00460e70` | 209 |
 | `0x00461310` | 39 |
 | `0x00461600` | 63 |
+| `0x00461980` | 224 |
 | `0x00461a60` | 56 |
 | `0x00461aa0` | 229 |
 | `0x00461cb0` | 107 |
@@ -38,6 +40,11 @@ Candidate source: `samples/io/FileStream.cpp` and its bindings. The class is
 Source forms that mattered:
 - **`0x00460e70`:** the NULL test guards the rest, so its message is
   emitted last.
+- **`0x00461980`:** the decode reads the byte into a `char` temporary and
+  the key straight from the field: `c = *p; decoded = key ^ c; key += c;
+  *p = decoded;`. That is the one spelling under which VC6 loads the key
+  first and copies it, as retail does; naming the key in a temporary makes
+  it copy the byte instead.
 - **`0x00461aa0`:** two forms mattered.
   - `#pragma inline_depth(0)` keeps the end-of-stream test `0x00430ff0` out
     of line.
@@ -45,9 +52,9 @@ Source forms that mattered:
 - **`0x00461cb0`:** returns `_fstat`'s result, not void. `TextureMap.h` and
   `SceneManager.bindings.json` now use the `int` signature.
 
-## Near misses
+## Near misses (7), `samples/io/FileStream.cpp`
 
-The notes are in the source.
+The notes are in the source header.
 
 | VA | Size (bytes) | Masked match | Function |
 |---|---|---|---|
@@ -55,14 +62,14 @@ The notes are in the source.
 | `0x00460db0` | 186 | 16% | header check |
 | `0x00460f50` | 957 | 30% | open |
 | `0x00461340` | 702 | 29% | seek |
-| `0x00461640` | 663 | 31% | read |
+| `0x00461640` | 663 | 32% | read |
 | `0x004618e0` | 152 | 88% | write |
-| `0x00461980` | 224 | 98% | read a byte |
-| `0x00461b90` | 282 | 85% | write the header |
+| `0x00461b90` | 282 | 90% | write the header |
 
 Each miss comes down to one of:
 - register assignment;
-- the decode order (retail loads the key before the byte);
+- instruction scheduling (the 0xfa seed store and the name pointer in
+  `0x00461b90`, the argument loads in `0x004618e0`);
 - tail merging.
 
 The control flow of each one is reconstructed.
