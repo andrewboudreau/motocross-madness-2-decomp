@@ -63,6 +63,22 @@ struct UnknownKrustyVcrRecord {
     char field_0x04;
 };
 
+// One racer of a recording (KrustyVCR+0x300, 0x124 bytes; 0x0049c070 writes
+// one and 0x0049c1e0 reads it back). The strings are copied with their
+// lengths clamped to the array size less one.
+struct UnknownKrustyVcrRacer {
+    int field_0x000;                          // network id
+    char field_0x004;                         // AI index
+    char field_0x005[0x10];                   // name
+    char field_0x015[0x40];
+    char field_0x055[0x40];
+    char field_0x095[0x40];
+    char field_0x0d5[0x40];
+    int field_0x118;                          // engine size
+    int field_0x11c;                          // engine kind
+    int field_0x120;
+};
+
 // RTTI: KrustyVCR : VCRInterface (vtable 0x00550e9c, 0xf8c bytes). Its
 // constructor is inline at bikerace.cpp's `new` sites (lines 0x2b9, 0x10e7,
 // 0x1103 and others), which also emit its implicit destructor 0x00419960
@@ -91,13 +107,19 @@ public:
                                char* bikeName, char* riderName, int* engineSize, int* engineKind,
                                int* value);
 
-    unsigned char field_0x0d8[0x10c - 0xd8];
+    float field_0x0d8;                        // 0x0049bff0 stores its first argument
+    // +0xdc..+0xf8c (0xeb0 bytes) is the block 0x0049bf10 and 0x0049c010 hand
+    // to the recorder.
+    char field_0x0dc[8];                      // "MCMVCR" (0x0049bf10, mode 0)
+    char field_0x0e4[8];                      // the string at 0x0056da64
+    char field_0x0ec[0x20];                   // description (0x0049c010)
     float field_0x10c;                        // the time played (0x00421d50)
+    // TrackGame+0x2d70's 0x1ec bytes (copied by 0x0049bf10, mode 0).
     unsigned char field_0x110[0x25c - 0x110];
     UnknownKrustyVcrRecord field_0x25c[8];
     unsigned char field_0x29c[0x2fc - 0x29c];
     int field_0x2fc;                          // racers recorded (the loader)
-    unsigned char field_0x300[0xf8c - 0x300];
+    UnknownKrustyVcrRacer field_0x300[11];    // 0x0049c070 / 0x0049c1e0
 };
 
 // The model at +0x1a0 of BikeRace+0x74's object: +0x274 groups at +0x28c

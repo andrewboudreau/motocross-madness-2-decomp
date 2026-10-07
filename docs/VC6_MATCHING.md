@@ -226,10 +226,11 @@ From the unattributed-code map ([UNATTRIBUTED](UNATTRIBUTED.md)):
 NationalRace.cpp (8, `__FILE__` 0x56e338 and RTTI NationalRace :
 BaseQuarryEvent), Rectangle2D (5) and SkyCube (5) match strictly; the last
 two are named from RTTI, their file names are unattested. Further units from
-that map: TransparencyMod (4), GhostMod1 (6), Fog/FogOff/FogOn (13),
+that map: TransparencyMod (4), GhostMod1 (6), Fog/FogOff/FogOn (14),
 MediaControl (15), GridNode (2), MatrixUtil's vector set (8), the
 allocation-accounting unit (22, in samples: no RTTI or `__FILE__`), file
-stream helpers (7, samples), VehicleCamera (+12) and KrustyBikeCamera's
+stream helpers (10, samples; [FILESTREAM](FILESTREAM.md)), KrustyVCR (6,
+[KRUSTYVCR](KRUSTYVCR.md)), VehicleCamera (+12) and KrustyBikeCamera's
 vector set (8). In physics targets: GraphicsTest (17), ObjectPlacement's
 set (8), Motnctrl.cpp promoted to src/krusty2/motion (40), FastMath (3),
 KrustyBike (+11, and its 56 exact targets now bound strictly) and Tire (+13).
