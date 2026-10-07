@@ -151,11 +151,13 @@ See the notes at the top of `samples/render/GriddrawNearMisses.cpp`:
 | `0x00481b30` (block distance) | 139/393 | which floats stay on the x87 stack |
 | `0x00483200` (border walk) | 84/956 | x/z in ebp/ebx (retail ebx/ebp), `level` reload |
 
+| `0x004815e0` (detail update) | 60/1083 | the two axis deltas stay on the x87 stack across the branch in retail; VC6 stores them, which shifts the frame and keeps `push edi` in the prologue |
+| `0x00481de0` (visibility walk) | 143/1712 | `extent`/`a1` in ebp/ebx where retail keeps `size`, `a9` and `a1`; the subdivision block's placement |
+
 ## Not reconstructed
 
-The detail update `0x004815e0` (1082 bytes of x87 code) and the visibility
-walk `0x00481de0` (1750 bytes, vector temporaries). Gridbase's possible
-`0x0047d780`.
+Gridbase's possible `0x0047d780`. Every Griddraw.cpp function start is now
+exact or a documented near miss.
 
 ## Remaining uncertainty
 
@@ -184,6 +186,16 @@ python tools/match.py --exe "$MCM2_EXE" --target-va 0x0047ef80 \
 
 Not function starts (branch targets inside the functions above):
 `0x0047f190`, `0x0047f470`, `0x00480020`, `0x00480074`, `0x00481330`,
-`0x004831a0` and `0x00483510`. Not reconstructed or attempted:
-`0x004815e0` (1082 bytes, an x87 viewer-distance test with a `FastSqrt`
-call) and `0x00481de0` (1750 bytes, a recursive node walk).
+`0x004831a0` and `0x00483510`.
+
+`0x004815e0` computes, for the viewer at Terrain+0x60, the squared nearest
+and farthest distances to the node's x/z range (+0x164..+0x170 of the draw
+data) and the y delta to +0x18/+0x1c, returns `FastSqrt(dy² + near²)` and,
+unless `coarse`, writes the detail words +0x122/+0x124 (the old values go
+to +0x126/+0x128; +0x124 is 0 while Terrain+0x6c is clear and 0xffff when
+either range distance is 0). `0x00481de0` tests the node box against the
+clipper (`0x0052f570`, the camera from the renderer's +0x08, counting the
+tests in `0x0068a084`), recurses into the four quadrants until single
+child blocks, sets their masks (0x3fffff fully visible, 0x1fffff a leaf,
+cleared through the empty `0x00464e90`) and marks the ancestors dirty
+when the mask changed.

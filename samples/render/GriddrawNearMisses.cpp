@@ -75,6 +75,33 @@
 // forms, rx as a variable or inline, the cell comparison forms, an explicit
 // node loop (worse) and x reused as the divided column.
 
+//
+// DrawableGridNode 0x004815e0 (detail update, 1082 bytes; candidate 1083):
+// computes the squared near and far distances of the viewer to the node's
+// x and z range, the y delta, the distance (FastSqrt), and the two
+// 16-bit detail words from (dy² / q + q) * +0x174 * +0x74 with q the
+// nearest of the three distances. Control flow, calls and clamps match
+// (the 65535 clamps are ternaries; `0xffff` immediates stay immediates
+// once they are). Retail keeps the two axis deltas on the x87 stack across
+// the three-way branch (fcom on the first, the second loaded before the
+// fnstsw, spilled ad hoc in the arms); VC6 here stores both and reloads
+// them, which shifts the frame slots, keeps `push edi` in the prologue
+// instead of after the early return and tail-merges the early return.
+// Tried: locals, block scopes, const/register, repeated expressions, an
+// inline helper with reference, pointer or by-value arguments, and an
+// accumulating form (which enregisters only the first delta).
+//
+// DrawableGridNode 0x00481de0 (visibility walk, 1750 bytes; candidate
+// 1712): tests the node's box (or the four quadrant boxes, recursively,
+// down to the child blocks) against the clipper and updates the child
+// mask; `a7` is the recursion level, `a8` the quadrant path and the
+// child blocks' masks are set to 0x3fffff (all visible), 0x1fffff (leaf)
+// or cleared with 0x00464e90. Structure and calls match; the frame is
+// the same size. VC6 here keeps `extent` in ebp and `a1` in ebx where
+// retail keeps `size` then `a9` in ebx and `a1` in ebp, and lays out the
+// subdivision block after the general tests rather than as the
+// fall-through of the `size <= 1` branch, so the body differs throughout.
+
 #include <float.h>
 #include <string.h>
 
@@ -103,6 +130,7 @@ extern int g_gridDrawMemoryPeak;
 extern unsigned short g_gridIndices[0xd8c / 2];
 extern GridVertexCache g_gridVertexCache;
 float FastSqrt(float x);
+extern int g_gridBoxTests;                      // 0x0068a084, box tests this frame
 
 // 0x0047de90: index of vertex (x, z) of the current node in the vertex
 // list, appending it on first use this frame. The first vertex of a node
@@ -729,4 +757,254 @@ void DrawableGridNode::UnknownFunction483200(int x, int z, int flag, int dir, Gr
     GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
     if (cell != origin)
         UnknownFunction482dd0(x, z, flag, dir, origin);
+}
+
+// 0x004815e0: the detail update (see the note at the top).
+float DrawableGridNode::UnknownFunction4815e0(int coarse)
+{
+    float nearX;
+    float farX;
+    float nearZ;
+    float farZ;
+    GridTerrain* t = terrain;
+    GridNodeDrawData* d = data;
+    float ax = t->field_0x60 - d->field_0x164;
+    float bx = t->field_0x60 - d->field_0x16c;
+    if (ax < 0.0f) {
+        nearX = ax * ax;
+        farX = bx * bx;
+    } else if (bx > 0.0f) {
+        nearX = bx * bx;
+        farX = ax * ax;
+    } else {
+        nearX = 0.0f;
+        float f = ((t->field_0x60 + t->field_0x60 < d->field_0x164 + d->field_0x16c) ? d->field_0x16c : d->field_0x164) - t->field_0x60;
+        farX = f * f;
+    }
+    float az = t->field_0x68 - d->field_0x168;
+    float bz = t->field_0x68 - d->field_0x170;
+    if (az < 0.0f) {
+        nearZ = az * az;
+        farZ = bz * bz;
+    } else if (bz > 0.0f) {
+        nearZ = bz * bz;
+        farZ = az * az;
+    } else {
+        nearZ = 0.0f;
+        float f = ((t->field_0x68 + t->field_0x68 < d->field_0x170 + d->field_0x168) ? d->field_0x170 : d->field_0x168) - t->field_0x68;
+        farZ = f * f;
+    }
+    float near2 = nearZ + nearX;
+    float far2 = farZ + farX;
+    float dyLo = t->field_0x64 - field_0x18;
+    float dyHi = t->field_0x64 - field_0x1c;
+    float dy;
+    float dySq;
+    if (dyLo < 0.0f) {
+        dy = dyLo;
+        dySq = dyLo * dyLo;
+    } else if (dyHi > 0.0f) {
+        dy = dyHi;
+        dySq = dyHi * dyHi;
+    } else {
+        dySq = 0.0f;
+        dy = 0.0f;
+    }
+    float distance = FastSqrt(dySq + near2);
+    if (coarse)
+        return distance;
+    terrain->field_0x98++;
+    data->field_0x126 = data->field_0x122;
+    data->field_0x128 = data->field_0x124;
+    if (terrain->field_0x6c == 0) {
+        data->field_0x124 = 0;
+    } else if (near2 == 0.0f) {
+        data->field_0x124 = 0xffff;
+    } else if (far2 == 0.0f) {
+        data->field_0x124 = 0xffff;
+    } else {
+        float nearDist = FastSqrt(near2);
+        float farDist = FastSqrt(far2);
+        float q;
+        if (dySq < near2)
+            q = nearDist;
+        else if (dySq > far2)
+            q = farDist;
+        else
+            q = dy;
+        float v = (dySq / q + q) * data->field_0x174 * terrain->field_0x74;
+        data->field_0x122 = (v < 65535.0f) ? (unsigned short)(int)v : 0xffff;
+        if (dyLo < 0.0f)
+            dyLo = -dyLo;
+        if (dyHi < 0.0f)
+            dyHi = -dyHi;
+        float m = (dyLo > dyHi) ? dyLo : dyHi;
+        m = m * m;
+        float ratioNear = (m + near2) / nearDist;
+        float ratioFar = (m + far2) / farDist;
+        float w = ((ratioNear > ratioFar) ? ratioNear : ratioFar) * (data->field_0x174 * terrain->field_0x74);
+        data->field_0x124 = (w < 65535.0f) ? (unsigned short)(int)w : 0xffff;
+        return distance;
+    }
+    float q;
+    if (dySq < near2)
+        q = FastSqrt(near2);
+    else if (dySq > far2)
+        q = FastSqrt(far2);
+    else
+        q = dy;
+    data->field_0x122 = (unsigned short)(int)((dySq / q + q) * data->field_0x174 * terrain->field_0x74);
+    if (data->field_0x122 > 0xffff)
+        data->field_0x122 = 0xffff;
+    return distance;
+}
+
+// 0x00481de0: the visibility walk (see the note at the top).
+int DrawableGridNode::UnknownFunction481de0(void* a0, void* a1, float* center, float* extent, int a4, int a5,
+                                            int size, int a7, int a8, int a9)
+{
+    int count = 0;
+    int changed = 0;
+    int oldMask = childMask;
+    int visible;
+    int corners;
+    int i;
+    int j;
+    if (size > 1) {
+        g_gridBoxTests++;
+        visible = g_visibilityClipper->TestBox(terrain->field_0x18->field_0x08, (float*)a1, center, extent, 0, &corners, 0);
+        if (corners != 8)
+            corners = 0;
+        if (size == 16) {
+            if (visible) {
+                UnknownFunction4824c0((UnknownTextureStream*)a0, a1, 0, a9);
+                if (data->b0) {
+                    count = 1;
+                    if (childMask == 0) {
+                        childMask = 1;
+                        changed = 1;
+                    }
+                } else {
+                    childMask = 0;
+                }
+            } else {
+                childMask = 0;
+            }
+        }
+    } else {
+        visible = 1;
+        corners = 0;
+    }
+    if (visible) {
+        if (corners == 0) {
+            size >>= 1;
+            if (size) {
+                const GridVec3& e = *(const GridVec3*)extent;
+                const GridVec3& c = *(const GridVec3*)center;
+                GridVec3 childExtent = GridVec3(e.x * 0.5f, e.y, e.z * 0.5f);
+                GridVec3 c1 = GridVec3(c.x - childExtent.x, c.y, c.z - childExtent.z);
+                GridVec3 c2 = GridVec3(childExtent.x + c.x, c.y, c.z - childExtent.z);
+                GridVec3 c3 = GridVec3(c.x - childExtent.x, c.y, childExtent.z + c.z);
+                GridVec3 c4 = GridVec3(childExtent.x + c.x, c.y, childExtent.z + c.z);
+                count += UnknownFunction481de0(a0, a1, &c1.x, &childExtent.x, a4, a5, size, a7 + 1, a8 * 4, a9);
+                count += UnknownFunction481de0(a0, a1, &c2.x, &childExtent.x, a4 + size, a5, size, a7 + 1, a8 * 4 + 1, a9);
+                count += UnknownFunction481de0(a0, a1, &c3.x, &childExtent.x, a4, a5 + size, size, a7 + 1, a8 * 4 + 2, a9);
+                count += UnknownFunction481de0(a0, a1, &c4.x, &childExtent.x, a4 + size, a5 + size, size, a7 + 1, a8 * 4 + 3, a9);
+                if (a7 + 1 == 8 || size == 16) {
+                    if (count == 0)
+                        childMask = 0;
+                    else if (childMask == 0)
+                        changed = 1;
+                }
+            } else {
+                DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[a5] + a4];
+                if (child) {
+                    if (child->children) {
+                        count += child->UnknownFunction481de0(a0, a1, &child->center.x, &child->extent.x, 0, 0, 16, 0, 0, a9);
+                        child->data->b1 = 1;
+                    } else {
+                        int dummy;
+                        g_gridBoxTests++;
+                        if (g_visibilityClipper->TestBox(terrain->field_0x18->field_0x08, (float*)a1, &child->center.x,
+                                                         &child->extent.x, 0, 0, &dummy)) {
+                            if (child->childMask != 0x1fffff) {
+                                child->childMask = 0x1fffff;
+                                changed = 1;
+                            }
+                            child->UnknownFunction4824c0((UnknownTextureStream*)a0, a1, 0, a9);
+                            count++;
+                        } else if (child->childMask) {
+                            child->childMask = 0;
+                            changed = 1;
+                            child->UnknownFunction464e90();
+                        }
+                    }
+                }
+            }
+        } else {
+            for (j = 0; j < size; j++) {
+                for (i = 0; i < size; i++) {
+                    DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[a5 + j] + i + a4];
+                    if (child) {
+                        if (child->childMask != 0x3fffff) {
+                            child->childMask = 0x3fffff;
+                            changed = 1;
+                            if (child->children)
+                                child->data->b1 = 1;
+                        }
+                        child->UnknownFunction4824c0((UnknownTextureStream*)a0, a1, 1, a9);
+                        count++;
+                    }
+                }
+            }
+            switch (a7) {
+            case 0:
+                childMask = 0x1fffff;
+                break;
+            case 1:
+                childMask |= 0x1e0 << (a8 * 4);
+                break;
+            }
+            if (size == 16) {
+                if (count == 0)
+                    childMask = 0;
+                else if (childMask == 0)
+                    changed = 1;
+            }
+        }
+        switch (a7) {
+        case 0:
+            childMask |= 1;
+            goto finish;
+        case 1:
+            childMask |= 2 << a8;
+            return count;
+        case 2:
+            childMask |= 0x20 << a8;
+            return count;
+        }
+    } else {
+        for (j = 0; j < size; j++) {
+            for (i = 0; i < size; i++) {
+                DrawableGridNode* child = (DrawableGridNode*)children[g_gridRow16[a5 + j] + i + a4];
+                if (child && child->childMask) {
+                    child->childMask = 0;
+                    changed = 1;
+                    child->UnknownFunction464e90();
+                }
+            }
+        }
+    }
+    if (a7 != 0)
+        return count;
+finish:
+    if (count == 0x100)
+        childMask |= 0x200000;
+    if (changed || oldMask != childMask) {
+        for (DrawableGridNode* node = this; node; node = (DrawableGridNode*)node->parent)
+            node->data->b1 = 1;
+    }
+    if (oldMask != 0 && childMask == 0)
+        UnknownFunction464e90();
+    return count;
 }

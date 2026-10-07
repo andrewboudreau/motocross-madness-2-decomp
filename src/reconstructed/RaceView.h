@@ -48,6 +48,7 @@ public:
 struct UnknownEventRacer;
 struct UnknownKrustyBikeView;
 struct UnknownBikeRaceNode;
+class ChatOverlay;
 
 // The object at a racer's +0x5f0; RaceStatus.cpp 0x004e6a50 reads the
 // position at +0x200 for gate races.
@@ -89,7 +90,9 @@ struct UnknownEventRacer : virtual public GameObject {
     virtual void UnknownVirtualSlot0();            // gives the racer its own vfptr at +0
     unsigned char field_0x008[0x0c - 0x08];
     Vector3 field_0x00c;                           // position (KrustyBikeCamera slot 10 adds 2 to y)
-    unsigned char field_0x018[0x64 - 0x18];
+    unsigned char field_0x018[0x50 - 0x18];
+    float field_0x050;                             // heading; RadarOverlay 0x0051bed0 negates it for the map
+    unsigned char field_0x054[0x64 - 0x54];
     Vector3 field_0x064;                           // velocity (racesnd.cpp 0x004e3730)
     unsigned char field_0x070[0x88 - 0x70];
     Vector3 field_0x088;                           // RaceStatus.cpp 0x004e63e0 leads the position by 3.5 times it
@@ -204,7 +207,8 @@ struct UnknownKrustyBikeView : public GameObject {
     bool field_0x18a;                    // racing (EventManager 0x0045eef0)
     unsigned char field_0x18b[0x18e - 0x18b];
     bool field_0x18e;                    // slot 10: view available
-    unsigned char field_0x18f[0x1a0 - 0x18f];
+    unsigned char field_0x18f[0x19c - 0x18f];
+    ChatOverlay* field_0x19c;            // the name tags (TrackOverlay 0x0051bed0 updates them)
     UnknownKrustyBikeViewReplay* field_0x1a0; // replay being played (InGameProcs.cpp VCRDlg)
     unsigned char field_0x1a4[0x1a8 - 0x1a4];
     UnknownVcrFile* field_0x1a8;         // ghost recording (EventManager 0x0045cdc0)

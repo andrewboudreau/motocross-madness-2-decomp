@@ -45,7 +45,7 @@ at lines 2284 and 2294).
 
 ## Status
 
-89 functions are exact under `vc6_o2_mt`, with every relocation bound:
+90 functions are exact under `vc6_o2_mt`, with every relocation bound:
 
 - InstrumentOverlay: `0x00518720`..`0x00518cc0`, 7 functions.
 - The overlay rectangle constructors `0x00518d50` and `0x00518d60`.
@@ -60,6 +60,8 @@ at lines 2284 and 2294).
 - RadarOverlay: `0x0051b690`..`0x0051c460`, 11 functions.
 - The `$E` initializers and their stubs: `0x0051dba0`..`0x0051dcdc`, 8
   functions.
+- RadarOverlay's gate drawing `0x0051cb20` (the current and next gate as
+  a line between their posts).
 - ChatOverlay: `0x0051cda0`..`0x0051e800`, 16 functions, among them the
   typed-key handler `0x0051da30` and the input/history redraw `0x0051de10`.
 - UnknownChatInput: `0x0051ea50`..`0x0051eb40`, 7 functions.
@@ -76,9 +78,16 @@ zero-extension.
 
 These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
 
-- `0x0051e3f0` (draws one name tag, 974 bytes, 964 match): the frame matches;
-  in the racer-tag branch retail picks eax/ecx/edx for the racer, the buffer
-  and the game pointer, VC6 here edx/eax/ecx.
+- `0x0051e3f0` (draws one name tag, 974 bytes, 966 match): the frame matches;
+  a racer local in the position branch gives retail's eax there; in the
+  `%.3f` branch retail picks eax/ecx/edx for the racer, the buffer and the
+  game pointer, VC6 here edx/eax/ecx.
+- `0x0051bed0` (the map update, 1160 bytes; 1129 match): places every
+  racer's name tag through the view's ChatOverlay (+0x19c) and draws the
+  map dots, then calls `0x0051c720` (modes 2, 3) or `0x0051cb20` (modes
+  1, 5). Calls, loops and stores match; retail allocates the int-to-float
+  slot of the clip result right above `x` and computes the distance
+  products before the pushes of the `0x0051d9c0` call.
 - `0x00519a20` (standings, 1002 bytes; candidate 1004): retail keeps the row
   comparison index in edx and `this` in its spill slot. VC6 here does that
   only when the index is read after the loop, which adds a redundant compare.
@@ -113,11 +122,7 @@ These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
   destructor `0x00518c00`).
 - **Shared tiny address.** `0x0051eae0` is a 3-byte `mov eax, ecx; ret`
   (UnknownChatInput's line accessor; `0x0051da30` calls it).
-- **Not attempted or abandoned:**
-  - RadarOverlay: `0x0051bed0` (1160 bytes; calls `0x0051c720` with modes
-    1 and 2 and `0x0051cb20`), `0x0051cb20` (640 bytes; the gate offsets are
-    an inlined cross product with (0, 1, 0), whose temporaries no tried
-    Vector3 form reproduces).
+- Every RadarOverlay function is now exact or a documented near miss.
 
 ## Codegen notes
 
@@ -145,6 +150,14 @@ These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
 - Compute a call's result into a float local before initialising a result
   flag. Otherwise the flag lands in a callee-saved register.
 - `x / 180.0f / zoom` with a known `x` folds to a constant.
+- 0x0051cb20's gate posts are `CrossProduct(dir, Vector3(0, 1, 0))` and
+  `CrossProduct(Vector3(0, 1, 0), dir)` with the cross product written as
+  `((a.y * b.z) - (a.z * b.y))`: the doubled parentheses make VC6 load the
+  non-folded operand first (`fld; fsubr st(1)`) and keep the folded zero on
+  the x87 stack. The result is copied into a local, scaled in x and z only
+  (the zero y is not multiplied) and offset with `+=`. The rim point of
+  `0x0051c360` is a `Vector3` (its z slot is unused, which gives the frame
+  size), and the colour is an if/else with direct stores.
 
 ## Reproduce
 

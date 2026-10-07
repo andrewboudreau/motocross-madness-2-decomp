@@ -230,6 +230,13 @@ public:
 // RTTI: RadarOverlay : Overlay (vtable 0x005587d0): the radar map in a
 // screen corner (radar128.tga, or radar256.tga above 800 pixels) with the
 // racers on it, and an optional frame-rate readout.
+// The camera RadarOverlay's loader is given (KrustyBikeCamera; see
+// RaceSound.h's view of it): only the followed racer at +0x3b0 is read.
+struct UnknownRadarCamera {
+    unsigned char field_0x000[0x3b0];
+    UnknownEventRacer* field_0x3b0;
+};
+
 class RadarOverlay : public Overlay {
 public:
     explicit RadarOverlay(int flags);         // 0x0051b690
@@ -245,8 +252,12 @@ public:
     int UnknownFunction51baf0(UnknownKrustyBikeView* view, int a2); // 0x0051baf0: collects the racers
     int UnknownFunction51bc60();              // 0x0051bc60: draws for the view mode
     void UnknownFunction51bdc0();             // 0x0051bdc0: frame-rate readout
-    int UnknownFunction51bed0(int mode);      // 0x0051bed0 (not reconstructed)
-    void UnknownFunction51cb20();             // 0x0051cb20: the next two gates (not reconstructed)
+    // 0x0051bed0: places every racer's name tag and draws its map dot, then
+    // the track outline (modes 2, 3) or the gates (modes 1, 5).
+    void UnknownFunction51bed0(int mode);
+    // 0x0051cb20: draws the current and the next gate (the race's +0xb0 and
+    // +0xb4) as a line between their posts, the current one in yellow.
+    void UnknownFunction51cb20();
     // 0x0051c720: draws the track outline (mode 1 or 2 picks the segment
     // edge), clipped to the map circle (near miss).
     void UnknownFunction51c720(int mode);
@@ -269,7 +280,7 @@ public:
     float field_0x124;                        // average frame time
     float field_0x128;                        // frame rate summed
     UnknownKrustyBikeView* field_0x12c;
-    int field_0x130;
+    UnknownRadarCamera* field_0x130;
     UnknownEventRacer* field_0x134[11];
     int field_0x160;                          // racer count
     int field_0x164;                          // shows the frame rate
@@ -291,6 +302,33 @@ public:
     UnknownOverlayVertex field_0x1b8;
     UnknownOverlayVertex field_0x1d8;
     UnknownOverlayRect field_0x1f8;           // map rectangle
+};
+
+// The race object at TrackGame+0x560 as RadarOverlay's gate drawing reads
+// it (bikerace.cpp sees the same records as UnknownBikeRaceNodeOwner in
+// BikeRace.h): +0xac gates, +0xb0/+0xb4 the current and next gate, +0xd8 the
+// gate records (position, direction) and +0x420 one entry per gate, whose
+// +0x30 enables drawing and whose first +0x50 is the half width.
+struct UnknownRadarGate {
+    Vector3 position;
+    Vector3 direction;
+};
+
+struct UnknownRadarGateEntry {
+    unsigned char field_0x00[0x30];
+    int field_0x30;
+    unsigned char field_0x34[0x50 - 0x34];
+    float field_0x50;
+};
+
+struct UnknownRadarGateOwner {
+    unsigned char field_0x000[0xac];
+    int field_0x0ac;
+    int field_0x0b0;
+    int field_0x0b4;
+    unsigned char field_0x0b8[0xd8 - 0xb8];
+    UnknownRadarGate field_0x0d8[0x23];
+    UnknownRadarGateEntry* field_0x420[1];
 };
 
 // What ChatOverlay+0x16c lists, one per name tag; only these fields are read.

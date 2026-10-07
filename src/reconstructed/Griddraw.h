@@ -14,6 +14,7 @@
 
 class UnknownTextureStream;
 struct GridVertex;
+struct GridCamera;
 
 // AgeManager (D:\aardvark\VC\krusty2\AgeManager.cpp, tier 1 by its
 // destructor's __FILE__ use) as seen from this file: 0x00401050 registers a
@@ -56,6 +57,9 @@ public:
     virtual void UnknownVirtualSlot14() = 0;
     virtual int UnknownVirtualSlot15(int primitive, int format, void* vertices, int vertexCount,
                                      unsigned short* indices, int indexCount, int flags) = 0;
+
+    void* field_0x04;
+    GridCamera* field_0x08;                    // +0x08 the camera the box test takes (0x00481de0)
 };
 
 // Boundary view of ManagedTexture (src/reconstructed binds 0x00510910 as
@@ -111,7 +115,7 @@ struct GridCamera {
 class GridVisibilityClipper {
 public:
     int TestBox(GridCamera* camera, const float* matrix, const float* center, const float* extent,
-                int* screenRect, int* cornersInside, int unused);  // 0x0052f570 (ret 0x1c)
+                int* screenRect, int* cornersInside, int* a6);  // 0x0052f570 (ret 0x1c)
 };
 extern GridVisibilityClipper* g_visibilityClipper;   // 0x00575a98
 
@@ -137,7 +141,8 @@ struct GridTerrain {
     int field_0x88;                            // +0x88 indices drawn
     int field_0x8c;                            // +0x8c vertices drawn
     int field_0x90;                            // +0x90 incremented per vertex error test
-    unsigned char field_0x094[0x9c - 0x94];
+    int field_0x94;
+    int field_0x98;                            // +0x98 incremented per detail update (0x004815e0)
     int field_0x9c;                            // +0x9c incremented by 0x00482dd0
     int field_0xa0;                            // +0xa0 incremented by 0x00482c90
     int field_0xa4;                            // +0xa4 incremented per buffer rebuild (0x0047f840)
@@ -349,6 +354,7 @@ public:
                                int minLevel);                   // 0x00483200 (ret 0x18)
     void UnknownFunction4835c0(DrawableGridNode* child, int x, int z, int flag, int dir,
                                GridBaseCell* cell);             // 0x004835c0 (ret 0x18)
+    void UnknownFunction464e90();                               // 0x00464e90 (shared empty body)
 
     GridTerrain* terrain;                      // +0x34
     GridNodeDrawData* data;                    // +0x38

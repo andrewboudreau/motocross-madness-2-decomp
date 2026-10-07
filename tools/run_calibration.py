@@ -19525,6 +19525,15 @@ CASES = [
         'reason': 'Pixtrans span; called by exact 0x4cfe70; rows addressed from the row index',
     },
     {
+        'name': 'TrackOverlay.cpp RadarOverlay gate line 0x51cb20',
+        'bindings': 'src/reconstructed/TrackOverlay.bindings.json',
+        'source': 'src/reconstructed/TrackOverlay.cpp',
+        'symbol': '?UnknownFunction51cb20@RadarOverlay@@QAEXXZ',
+        'target_va': '0x0051cb20',
+        'target_size': 640,
+        'reason': "called by 0x51bed0 (RadarOverlay map update); reads TrackGame+0x560 gates and draws through slot 16 like 0x51baf0's siblings",
+    },
+    {
         'name': 'GameObject constructor',
         'bindings': 'src/reconstructed/GameObject.bindings.json',
         'source': 'src/reconstructed/GameObject.cpp',

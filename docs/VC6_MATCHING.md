@@ -249,8 +249,8 @@ Krusty3DObjects.cpp (RunwayLights, VisualCue and the number/bonus object
 managers) matches strictly in 36 functions; see
 [KRUSTY3DOBJECTS](KRUSTY3DOBJECTS.md).
 
-TrackOverlay.cpp gains 10 more strict functions (the StatsOverlay panels,
-the chat input and its history) and TrackRecord.cpp gains the
+TrackOverlay.cpp gains 11 more strict functions (the StatsOverlay panels,
+the chat input and its history, and the radar gate line 0x51cb20) and TrackRecord.cpp gains the
 TrackRecordDlg procedure; see [TrackOverlay](TRACKOVERLAY.md).
 
 SceneManager.cpp (+9, the section readers and scene loader), Griddraw.cpp

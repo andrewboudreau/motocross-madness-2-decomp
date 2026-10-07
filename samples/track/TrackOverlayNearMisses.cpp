@@ -40,12 +40,13 @@
 // rectangle stores use different displacements. Declaration order, names,
 // aggregate initializers and UnknownMakeOverlayRect do not move them.
 
-// ChatOverlay::UnknownFunction51e3f0 (0x0051e3f0, 974 bytes, 964 match):
-// the frame and code match except in the racer-tag branch, where retail
-// loads the racer pointer into eax and the buffer address into ecx (and the
-// game pointer into edx); VC6 here uses edx, eax and ecx. Inverted
-// branches, a racer local, a game local and an explicit double do not
-// change it.
+// ChatOverlay::UnknownFunction51e3f0 (0x0051e3f0, 974 bytes, 966 match):
+// the frame and code match except in the racer-tag branch. A racer local in
+// the position branch gives retail's eax there; in the "%.3f" branch retail
+// loads the racer into eax and the buffer address into ecx (VC6 here edx and
+// eax), and loads the game pointer into edx (here ecx). Inverted branches, a
+// racer local in that branch, a game local, a float or double local and a
+// buffer pointer do not change it.
 
 // RadarOverlay::UnknownFunction51c720 (0x0051c720, 1016 bytes; candidate
 // 1002): draws the track outline through a TrackListItem work list. The
@@ -68,6 +69,19 @@
 // thirteenth name-tag rectangle, whose constructor temporary retail places
 // in a separate frame slot (0x74) where VC6 here reuses the first one.
 
+
+// RadarOverlay::UnknownFunction51bed0 (0x0051bed0, 1160 bytes; 1129 match):
+// the map update. Every call, loop and store matches with the racer read
+// through `field_0x134[i]` each time, the own position through a reference,
+// the rim point as a Vector3 (its third slot is unused) and the chosen
+// screen point as the ternaries below. Left: retail allocates the
+// int-to-float slot of `outside` right above `x` (here it is the last
+// scalar slot, so y and the loop temporaries shift by one), and schedules
+// the distance products before the name address and the pushes of the
+// 0x0051d9c0 call. Declaration order and scope, an int copy, a float copy
+// and a distance local do not move either.
+
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -438,8 +452,9 @@ void ChatOverlay::UnknownFunction51e3f0(void* dc, int index)
             sprintf(text, "%.3f", field_0x16c[index]->field_0x4a4);
         } else {
             if (g_UnknownGlobal56e26c->mode.field_0x6c0) {
-                if (field_0x16c[index]->field_0x784 > 0)
-                    sprintf(text, "%d", field_0x16c[index]->field_0x784);
+                UnknownChatRacer* racer = field_0x16c[index];
+                if (racer->field_0x784 > 0)
+                    sprintf(text, "%d", racer->field_0x784);
                 else
                     strcpy(text, "--");
             } else {
@@ -685,4 +700,96 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
     field_0x30c[11] = UnknownTrackOverlayRect(0x81, 0xff, 0xc0, 0xca);
     field_0x30c[12] = UnknownTrackOverlayRect(0, 0x80, 0xcb, 0xd5);
     return this;
+}
+
+// 0x0051bed0: places the name tags and draws the map dots (see the note at
+// the top).
+void RadarOverlay::UnknownFunction51bed0(int mode)
+{
+    int i;
+    int x;
+    int y;
+    int outside;
+    Vector3 rim;
+    Vector3 point;
+    for (i = 0; i < field_0x160; i++) {
+        if (field_0x134[i] == field_0x130->field_0x3b0) {
+            field_0x17c = field_0x134[i]->field_0x00c;
+            field_0x188 = -field_0x134[i]->field_0x050;
+            if (field_0x134[i]->field_0x444)
+                field_0x188 = field_0x18c;
+            else
+                field_0x18c = field_0x188;
+            field_0x170 = i;
+            break;
+        }
+    }
+    field_0x190 = cos(field_0x188);
+    field_0x194 = sin(field_0x188);
+    for (i = 0; i < field_0x160; i++) {
+        if (i != field_0x170 && field_0x134[i]->field_0x25_bit0) {
+            outside = UnknownFunction51c360(field_0x134[i]->field_0x00c, &x, &y, &rim.x, &rim.y);
+            if (field_0x174 && field_0x16c == i) {
+                if (field_0x12c->field_0x19c) {
+                    Vector3& own = field_0x134[field_0x170]->field_0x00c;
+                    float dx = field_0x134[i]->field_0x00c.x - own.x;
+                    float dz = field_0x134[i]->field_0x00c.z - own.z;
+                    float distance = dz * dz + dx * dx;
+                    field_0x12c->field_0x19c->UnknownFunction51d9c0(distance, field_0x134[i]->field_0x5e0);
+                }
+                if (outside && (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 ||
+                                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 2)) {
+                    point.x = -1.0f;
+                    point.y = -1.0f;
+                } else {
+                    point.x = (outside != 0.0f) ? rim.x : (float)x;
+                    point.y = (float)(int)(((field_0x1f8.top + outside) ? rim.y : (float)y) - 6.4f);
+                }
+                for (int k = 0; k < field_0x160; k++) {
+                    NameOverlay* tag = field_0x12c->field_0x19c->field_0x2d8[k];
+                    if (tag->field_0x11c == field_0x134[i])
+                        tag->UnknownFunction5190a0(point, x - field_0x1a0 > 0, outside);
+                }
+            } else {
+                point.x = -1.0f;
+                point.y = -1.0f;
+                if (field_0x12c->field_0x19c)
+                    field_0x12c->field_0x19c->field_0x2d8[i]->UnknownFunction5190a0(point, 0, outside);
+            }
+            if (outside) {
+                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 ||
+                    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 2)
+                    continue;
+                field_0x1b8.color = 0x28aa28;
+                field_0x1d8.color = 0x28aa28;
+                field_0x1b8.sx = rim.x;
+                field_0x1b8.sy = rim.y;
+            } else {
+                field_0x1b8.color = 0x50e650;
+                field_0x1d8.color = 0x50e650;
+                field_0x1b8.sx = (float)x;
+                field_0x1b8.sy = (float)y;
+            }
+            field_0x1d8 = field_0x1b8;
+            field_0x1d8.sx += 3.0f;
+            Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+            field_0x1b8.sy += 1.0f;
+            field_0x1d8.sy += 1.0f;
+            Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+            field_0x1b8.sy -= 2.0f;
+            field_0x1d8.sy -= 2.0f;
+            Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+        } else {
+            point.x = -1.0f;
+            point.y = -1.0f;
+            if (field_0x12c->field_0x19c)
+                field_0x12c->field_0x19c->field_0x2d8[i]->UnknownFunction5190a0(point, 0, 1);
+        }
+    }
+    if (mode == 2 || mode == 3) {
+        UnknownFunction51c720(1);
+        UnknownFunction51c720(2);
+    }
+    if (mode == 1 || mode == 5)
+        UnknownFunction51cb20();
 }

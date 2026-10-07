@@ -1069,7 +1069,7 @@ RadarOverlay* RadarOverlay::UnknownFunction51b840(RenderTarget* target, TextureM
         field_0x1a8.top = field_0x1f8.top + 112;
         field_0x1a8.bottom = field_0x1f8.top + 124;
     }
-    field_0x130 = a3;
+    field_0x130 = (UnknownRadarCamera*)a3;
     field_0x30 = UnknownFunction50a590(manager, name, 0x115c, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
     if (!field_0x30) {
         Release();
@@ -1207,6 +1207,62 @@ int RadarOverlay::UnknownFunction51c460(const float* a, const float* b, float* n
     *ny = dx * scale;
     *d = (a[0] * b[1] - b[0] * a[1]) * scale;
     return 0;
+}
+
+// The race object RadarOverlay's gate drawing reads (see TrackOverlay.h).
+#define RadarRace() ((UnknownRadarGateOwner*)g_UnknownGlobal56e26c->field_0x560)
+
+// Cross product as 0x0051cb20 inlines it. The doubled parentheses matter:
+// with them VC6 keeps the folded zero term on the x87 stack and loads the
+// other operand first, as retail does.
+static inline Vector3 RadarCross(const Vector3& a, const Vector3& b)
+{
+    Vector3 r;
+    r.x = ((a.y * b.z) - (a.z * b.y));
+    r.y = ((a.z * b.x) - (a.x * b.z));
+    r.z = ((a.x * b.y) - (a.y * b.x));
+    return r;
+}
+
+// 0x0051cb20
+void RadarOverlay::UnknownFunction51cb20()
+{
+    int x;
+    int y;
+    Vector3 left;
+    Vector3 right;
+    Vector3 rim;
+    float width = RadarRace()->field_0x420[0]->field_0x50;
+    for (int i = 0; i < RadarRace()->field_0x0ac; i++) {
+        if (RadarRace()->field_0x420[i]->field_0x30 == 0)
+            continue;
+        if (i != RadarRace()->field_0x0b0 && i != RadarRace()->field_0x0b4)
+            continue;
+        if (UnknownFunction51c360(RadarRace()->field_0x0d8[i].position, &x, &y, &rim.x, &rim.y) != 0)
+            continue;
+        left = RadarCross(RadarRace()->field_0x0d8[i].direction, Vector3(0.0f, 1.0f, 0.0f));
+        left.x *= width;
+        left.z *= width;
+        left += RadarRace()->field_0x0d8[i].position;
+        right = RadarCross(Vector3(0.0f, 1.0f, 0.0f), RadarRace()->field_0x0d8[i].direction);
+        right.x *= width;
+        right.z *= width;
+        right += RadarRace()->field_0x0d8[i].position;
+        if (i == RadarRace()->field_0x0b0) {
+            field_0x1b8.color = 0xffff5e;
+            field_0x1d8.color = 0xffff5e;
+        } else {
+            field_0x1b8.color = 0xffffff;
+            field_0x1d8.color = 0xffffff;
+        }
+        UnknownFunction51c360(left, &x, &y, &rim.x, &rim.y);
+        field_0x1b8.sx = (float)x;
+        field_0x1b8.sy = (float)y;
+        UnknownFunction51c360(right, &x, &y, &rim.x, &rim.y);
+        field_0x1d8.sx = (float)x;
+        field_0x1d8.sy = (float)y;
+        Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+    }
 }
 
 // 0x0051cda0
