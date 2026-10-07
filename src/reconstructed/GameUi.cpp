@@ -14,6 +14,7 @@
 #include "DebugAlloc.h"
 #include "DialogProc.h"
 #include "GUIManager.h"
+#include "InputDevice.h"
 #include "MatrixUtil.h"
 #include "PCAudio.h"
 #include "PCRenderTarget.h"
@@ -31,6 +32,16 @@ static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
+
+// The smaller and the larger of two ints (inline helpers; the drag and
+// progress code computes each operand once).
+static inline int UnknownMinInt(int a, int b) { return a < b ? a : b; }
+static inline int UnknownMaxInt(int a, int b) { return a < b ? b : a; }
+
+// The same as macros, evaluating an operand twice (0x00479a00 calls slot 62
+// again for the chosen operand).
+#define UNKNOWN_MIN(a, b) ((a) < (b) ? (a) : (b))
+#define UNKNOWN_MAX(a, b) ((a) < (b) ? (b) : (a))
 
 // cdecl 0x0047b570: resizes a DebugMalloc'd block (KrustyUI.cpp).
 void* UnknownFunction47b570(void* block, unsigned int size);
@@ -54,7 +65,12 @@ struct UnknownGameUiDialogSound {
 // members read here. Never constructed as such.
 class UnknownGameUiDialog : public UIDialog {
 public:
-    virtual void UnknownVirtualSlot27();      // 0x0046a300: creates the controls
+    // 0x0046a300: creates the controls from the resource; this, or 0 when it fails.
+    virtual UnknownGameUiDialog* UnknownVirtualSlot27(void* target, CameraRect* area, int a, int flags,
+                                                      SoundGroup* sound, void* textures, const char* directory,
+                                                      UnknownGameUiDialog* parent, BackgroundImage* background,
+                                                      const char* font, int fontSize, GUIManager* gui,
+                                                      GUIUser* user, const char* name);
     virtual void UnknownVirtualSlot28(int value); // 0x0046e8c0
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x00470020: the dialog's procedure
     virtual void UnknownVirtualSlot30();      // 0x00470040
@@ -65,18 +81,23 @@ public:
     UnknownGameUiDialog* field_0x2c;          // parent dialog
     GUIManager* field_0x30;
     GUIUser* field_0x34;
-    unsigned char field_0x38[0xbc - 0x38];
+    char field_0x38[0x80];                    // the dialog resource's name
+    UnknownTextureStream* field_0xb8;         // its archive (slot 27)
     int field_0xbc;                           // shown
-    unsigned char field_0xc0[0xc8 - 0xc0];
+    int field_0xc0;
+    int field_0xc4;
     int field_0xc8;                           // animates its controls
     void (*field_0xcc)(UnknownDialogEvent* event); // the procedure (slot 29)
     void (*field_0xd0)(UIDialog* dialog, int value); // slot 31
     void (*field_0xd4)();                     // slot 30
     void* field_0xd8;                         // font (HFONT)
     int field_0xdc;                           // font height
-    unsigned char field_0xe0[0x110 - 0xe0];
+    char field_0xe0[0x108 - 0xe0];            // font face
+    int field_0x108;
+    int field_0x10c;
     BackgroundImage* field_0x110;
-    unsigned char field_0x114[0x140 - 0x114];
+    SoundGroup* field_0x114;
+    unsigned int field_0x118[10];             // the text colors "~0".."~9" select
     void* field_0x140;                        // palette
     int field_0x144;
     int field_0x148;
@@ -90,7 +111,9 @@ public:
     int field_0x178;                          // (y)
     int field_0x17c;                          // result
     int field_0x180;
-    unsigned char field_0x184[0x9b0 - 0x184];
+    unsigned char field_0x184[0x95c - 0x184];
+    UnknownCursorAnimation* field_0x95c;      // the cursor over it
+    unsigned char field_0x960[0x9b0 - 0x960];
     int field_0x9b0;
     unsigned char field_0x9b4[0x9bc - 0x9b4];
     UnknownGameUiControl* field_0x9bc;        // the list box being sorted
@@ -103,12 +126,12 @@ public:
     void* field_0x7f04;
     unsigned char field_0x7f08[0x7f18 - 0x7f08];
     int field_0x7f18;
-    unsigned char field_0x7f1c[0x7f20 - 0x7f1c];
+    int field_0x7f1c;                         // the joystick is centred
     void* field_0x7f20;                       // textures
     ContainerList<UITimer*> field_0x7f24;     // timers
     unsigned char field_0x7f38[0x7f3c - 0x7f38];
     GameObject* field_0x7f3c;                 // the controls' container
-    unsigned char field_0x7f40[0x7f44 - 0x7f40];
+    int field_0x7f40;                         // sends kind 0x12 on the next frame
     PCTextureMap* field_0x7f44;               // the screen behind it
     int field_0x7f48;                         // its background region
     int field_0x7f4c;
@@ -3336,4 +3359,858 @@ void UIDropDownList::UnknownFunction47a2d0(int open) {
             field_0xb8->field_0x110->UnknownFunction404da0();
     }
     field_0x208 = open;
+}
+
+// ---------------------------------------------------------------------------
+// Drawing and input slots
+
+// 0x0046a300
+UnknownGameUiDialog* UnknownGameUiDialog::UnknownVirtualSlot27(void* target, CameraRect* area, int a, int flags,
+                                                               SoundGroup* sound, void* textures,
+                                                               const char* directory, UnknownGameUiDialog* parent,
+                                                               BackgroundImage* background, const char* font,
+                                                               int fontSize, GUIManager* gui, GUIUser* user,
+                                                               const char* name) {
+    GameObject::UnknownVirtualSlot8(target);
+    if (area) {
+        field_0x160 = *area;
+    } else {
+        field_0x160.top = 0;
+        field_0x160.left = 0;
+        field_0x160.right = ((RenderTarget*)field_0x18)->field_0x0c;
+        field_0x160.bottom = ((RenderTarget*)field_0x18)->field_0x10;
+    }
+    field_0x2c = parent;
+    if (!(flags & 6))
+        field_0x148 = 0;
+    else
+        field_0x148 = 1;
+    field_0x30 = gui;
+    if (gui && field_0x148)
+        field_0x14c = gui->UnknownFunction485ee0((int)this);
+    if (parent)
+        field_0x140 = parent->field_0x140;
+    field_0xc4 = a;
+    field_0x110 = background;
+    field_0x114 = sound;
+    field_0x7f20 = textures;
+    field_0x34 = user;
+    field_0xdc = fontSize;
+    strcpy(field_0xe0, font);
+    field_0xd8 = CreateFontA(field_0xdc, 0, 0, 0, FW_MEDIUM, 0, 0, 0, DEFAULT_CHARSET, 0, 0, PROOF_QUALITY,
+                             VARIABLE_PITCH, field_0xe0);
+    field_0x108 = 0;
+    field_0x10c = 0;
+    field_0x7f3c = (GameObject*)UnknownFunction469190(new(__FILE__, 0x16e) UICtlContainer, -1);
+    UnknownDialogEvent event;
+    event.field_0x20 = 0;
+    event.field_0x08 = 4;
+    event.field_0x00 = 0;
+    event.field_0x04 = 0;
+    event.field_0x0c = this;
+    event.field_0x14 = 0;
+    event.field_0x10 = field_0x30;
+    UnknownVirtualSlot29(&event);
+    if (field_0x38[0]) {
+        char path[0x100];
+        char* dot = strrchr(field_0x38, '.');
+        if (!name) {
+            if (dot) {
+                char base[0x100];
+                int length = dot - field_0x38;
+                strncpy(base, field_0x38, length);
+                base[length] = 0;
+                sprintf(path, "%s%s.dat", directory ? directory : "", base);
+            } else {
+                sprintf(path, "%s%s.dat", directory ? directory : "", field_0x38);
+            }
+        } else {
+            sprintf(path, "%s%s", directory ? directory : "", name);
+        }
+        field_0xb8 = g_UnknownResourceManager572b44->UnknownFunction4e9030(path, 0);
+        sprintf(path, "%s%s", directory ? directory : "", field_0x38);
+        UnknownTextureStream* stream = new(__FILE__, 0x194) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        if (stream->UnknownFunction460f50(path, "r", 0)) {
+            if (!UnknownFunction46a920(stream, 0)) {
+                delete stream;
+                UnknownFunction46ff60();
+                return 0;
+            }
+            delete stream;
+        } else {
+            delete stream;
+            if (!UnknownFunction46a8e0(field_0x38)) {
+                UnknownFunction46ff60();
+                return 0;
+            }
+        }
+    }
+    if (parent && !field_0x110)
+        field_0x110 = parent->field_0x110;
+    if (field_0x110)
+        field_0x110->UnknownFunction404da0();
+    if (user && !user->field_0x2c) {
+        GameObjectIterator iterator(field_0x7f3c, 1, "UIControl");
+        UnknownFunction470000((UnknownGameUiControl*)iterator.Next(), 0, 0);
+    }
+    UnknownFunction46ecc0(0);
+    field_0x7f40 = 1;
+    return this;
+}
+
+// 0x0046f890: splits `text` at its "~N" (color N) and "|x" (position
+// table[x]) codes into runs, each measured with `font`; 0 when there are no
+// codes. `size` receives the visible length and the total width.
+char* UIDialog::UnknownFunction46f890(char* text, unsigned int color, void* font, void* table, int* size) {
+    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
+    if (g_UnknownGlobal56e26c->field_0x538)
+        return 0;
+    if (!strchr(text, '~') && (!strchr(text, '|') || !table))
+        return 0;
+    void* dc;
+    SIZE extent;
+    UnknownGameUiTextRun runs[100];
+    int length = strlen(text);
+    int i = 0;
+    int count = 0;
+    if (text[0] != '~' && text[0] != '|') {
+        runs[0].field_0x00 = text;
+        runs[0].field_0x0c = color;
+        runs[0].field_0x04 = 1;
+        count = 1;
+    }
+    char* start = text;
+    char* mark = 0;
+    while (text[i]) {
+        char c = text[i];
+        if (c != '~' && c != '|') {
+            i++;
+            continue;
+        }
+        if (!mark)
+            mark = &text[i];
+        if (i + 2 >= length)
+            break;
+        if (text[i + 2] == '~' || text[i + 2] == '|') {
+            i += 2;
+            continue;
+        }
+        UnknownGameUiTextRun* run = &runs[count];
+        run->field_0x00 = &text[i + 2];
+        if (c == '~') {
+            int index = text[i + 1] - '0';
+            run->field_0x04 = 1;
+            if (index > 9)
+                index = 9;
+            else if (index < 0)
+                index = 0;
+            run->field_0x0c = dialog->field_0x118[index];
+        } else {
+            run->field_0x04 = 2;
+            if (table) {
+                char key = text[i + 1];
+                char digit;
+                if (key >= '0' && key <= '9')
+                    digit = key - '0';
+                else if (key >= 'a' && key <= 'z')
+                    digit = key - 'a' + 10;
+                else if (key >= 'A' && key <= 'Z')
+                    digit = key - 'A' + 10;
+                else
+                    digit = 0;
+                run->field_0x14 = ((int*)table)[digit];
+            } else {
+                run->field_0x14 = 0;
+            }
+        }
+        i += 2;
+        if (count) {
+            UnknownGameUiTextRun* last = run - 1;
+            if (mark)
+                last->field_0x08 = mark - start;
+            else
+                last->field_0x08 = run->field_0x00 - start - 2;
+            if (!((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->UnknownMethod17(&dc)) {
+                HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialog->field_0xd8));
+                GetTextExtentPoint32A((HDC)dc, last->field_0x00, last->field_0x08, &extent);
+                SelectObject((HDC)dc, old);
+                ((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->UnknownMethod26(dc);
+            }
+            last->field_0x10 = extent.cx;
+        }
+        start = (char*)run->field_0x00;
+        mark = 0;
+        count++;
+    }
+    if (count) {
+        if (mark)
+            runs[count - 1].field_0x08 = mark - runs[count - 1].field_0x00;
+        else
+            runs[count - 1].field_0x08 = length - (runs[count - 1].field_0x00 - text);
+        if (!((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->UnknownMethod17(&dc)) {
+            HGDIOBJ old = SelectObject((HDC)dc, (HGDIOBJ)(font ? font : dialog->field_0xd8));
+            GetTextExtentPoint32A((HDC)dc, runs[count - 1].field_0x00, runs[count - 1].field_0x08, &extent);
+            SelectObject((HDC)dc, old);
+            ((PCRenderTarget*)dialog->UnknownInlineField18())->field_0x48->UnknownMethod26(dc);
+            runs[count - 1].field_0x10 = extent.cx;
+        } else {
+            runs[count - 1].field_0x10 = 0;
+        }
+    }
+    if (size) {
+        size[1] = 0;
+        size[0] = length - count * 2;
+        for (int j = 0; j < count; j++)
+            size[1] += runs[j].field_0x10;
+    }
+    runs[count].field_0x00 = 0;
+    runs[count].field_0x08 = 0;
+    runs[count].field_0x04 = 0;
+    UnknownGameUiTextRun* result =
+        (UnknownGameUiTextRun*)DebugMalloc((count + 1) * sizeof(UnknownGameUiTextRun), __FILE__, 0xa5b);
+    if (result)
+        memcpy(result, runs, (count + 1) * sizeof(UnknownGameUiTextRun));
+    return (char*)result;
+}
+
+// 0x00471240: draws the state's image, then the text.
+int UnknownGameUiControl::UnknownVirtualSlot40() {
+    int frames = -1;
+    int redraw = field_0x1bc;
+    CameraRect rect;
+    if (field_0x1cc) {
+        UnknownVirtualSlot63((CameraRect*)field_0x2c, &rect);
+        if (field_0xb8->field_0x110) {
+            field_0xb8->field_0x110->UnknownFunction404480((PCTextureMap*)field_0x1cc, &rect, field_0x4c,
+                                                           field_0x1cc->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           field_0x1b8, field_0x1c0, &field_0x1bc, 0);
+            frames = field_0x1bc;
+        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+                       &rect, field_0x1cc, field_0x4c, field_0x1cc->field_0x30 ? 0x1008000 : 0x1000000)) {
+            return 0;
+        }
+    }
+    if (field_0xc0 && field_0xd0) {
+        field_0x1bc = redraw;
+        UnknownVirtualSlot64((CameraRect*)field_0x2c, &rect);
+        void* dc;
+        int more;
+        if (field_0xb8->UnknownFunction46ed70(&dc, &rect, &more, this)) {
+            do {
+                if (field_0x1e8) {
+                    unsigned int format = DT_WORDBREAK | DT_NOPREFIX;
+                    if (field_0xd8 & 2)
+                        format = DT_WORDBREAK | DT_NOPREFIX | DT_CENTER;
+                    else if (!(field_0xd8 & 1) && (field_0xd8 & 4))
+                        format = DT_WORDBREAK | DT_NOPREFIX | DT_RIGHT;
+                    SetBkMode((HDC)dc, TRANSPARENT);
+                    if (field_0xd4) {
+                        rect.left--;
+                        rect.top--;
+                        rect.right--;
+                        rect.bottom--;
+                        SetTextColor((HDC)dc, field_0xc8);
+                        DrawTextA((HDC)dc, field_0xc0, field_0xd0, (RECT*)&rect, format);
+                        rect.left++;
+                        rect.top++;
+                        rect.right++;
+                        rect.bottom++;
+                    }
+                    SetTextColor((HDC)dc, field_0xc4);
+                    DrawTextA((HDC)dc, field_0xc0, field_0xd0, (RECT*)&rect, format);
+                } else {
+                    field_0xb8->UnknownFunction46f550(dc, &rect, field_0xc0, field_0xd0, field_0xc4, field_0x160,
+                                                      (UnknownGameUiTextRun*)field_0xe4, field_0xd4, field_0xc8,
+                                                      field_0xd8, 1, 0);
+                }
+                field_0xb8->UnknownFunction46eeb0(dc);
+            } while (more && field_0xb8->UnknownFunction46ed70(&dc, &rect, &more, this));
+        }
+        if (frames >= 0)
+            field_0x1bc = frames;
+    }
+    return 1;
+}
+
+// 0x00474570: the caret keys (Home, End, Left, Right, Delete); measures the
+// text and the caret's offset.
+int UIEditBox::UnknownVirtualSlot21(int value) {
+    if (!UnknownGameUiControl::UnknownVirtualSlot21(value) &&
+        field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
+        if (field_0x204_sound) {
+            field_0x204_sound->UnknownFunction4bcbe0(field_0xbc->field_0x34c, 0);
+            field_0x204_sound->UnknownFunction4bc6b0(1, 0, 0);
+        }
+        switch (value) {
+        case VK_HOME:
+            field_0x1ec = 0;
+            field_0x1fc_value = 0;
+            break;
+        case VK_END:
+            field_0x1ec = field_0xd0;
+            break;
+        case VK_DELETE:
+            if (field_0x1ec < field_0xd0) {
+                if (IsDBCSLeadByte(field_0xc0[field_0x1ec])) {
+                    memmove(field_0xc0 + field_0x1ec, field_0xc0 + field_0x1ec + 2, field_0xd0 - field_0x1ec - 1);
+                    field_0xd0 -= 2;
+                } else {
+                    memmove(field_0xc0 + field_0x1ec, field_0xc0 + field_0x1ec + 1, field_0xd0 - field_0x1ec);
+                    field_0xd0--;
+                }
+            }
+            break;
+        case VK_LEFT:
+            if (field_0x1ec > 0) {
+                if (field_0xb8->UnknownFunction46fc80(field_0xc0, field_0xc0 + field_0x1ec - 1, strlen(field_0xc0)))
+                    field_0x1ec -= 2;
+                else
+                    field_0x1ec--;
+            }
+            break;
+        case VK_RIGHT:
+            if (field_0x1ec < field_0xd0) {
+                if (IsDBCSLeadByte(field_0xc0[field_0x1ec]))
+                    field_0x1ec += 2;
+                else
+                    field_0x1ec++;
+            }
+            break;
+        }
+        field_0xc0[field_0xd0] = 0;
+        void* dc;
+        if (!((PCRenderTarget*)field_0xb8->UnknownInlineField18())->field_0x48->UnknownMethod17(&dc)) {
+            HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(field_0x128 ? field_0x128 : (int)field_0xb8->field_0xd8));
+            SIZE size;
+            GetTextExtentPoint32A((HDC)dc, field_0xc0, field_0xd0, &size);
+            field_0xdc[1] = size.cx;
+            GetTextExtentPoint32A((HDC)dc, field_0xc0, field_0x1ec, &size);
+            field_0x1fc_value = size.cx;
+            SelectObject((HDC)dc, font);
+            ((PCRenderTarget*)field_0xb8->UnknownInlineField18())->field_0x48->UnknownMethod26(dc);
+        }
+        UnknownVirtualSlot50();
+        return 1;
+    }
+    return 0;
+}
+
+// 0x00474cf0: the joystick moves the focused scroll bar; then hides the
+// thumb while every list it follows shows all its rows.
+int UIScrollBar::UnknownVirtualSlot10(float frameTime) {
+    int range = UnknownVirtualSlot61();
+    GUIInputDevice* device;
+    for (int i = 0; (device = field_0xb8->field_0x34->UnknownFunction488310(i++)) != 0;) {
+        if (device->field_0xac->deviceKind == 2 && device->field_0xac->UnknownFunction4897e0(4)) {
+            POINT position = device->field_0xa4;
+            if (field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
+                if (position.y <= -1) {
+                    if (field_0xb8->field_0x7f1c) {
+                        if (UnknownFunction4755c0()) {
+                            if (UnknownFunction475500())
+                                UnknownFunction4753c0(UnknownFunction475500() - 1, UnknownFunction4755c0());
+                        } else {
+                            if (UnknownFunction475500())
+                                UnknownFunction4753c0(UnknownFunction475500() - 1, range);
+                        }
+                        field_0xb8->field_0x7f1c = 0;
+                    }
+                } else if (position.y >= 1) {
+                    if (field_0xb8->field_0x7f1c) {
+                        if (UnknownFunction4755c0()) {
+                            if ((unsigned int)UnknownFunction475500() < (unsigned int)UnknownFunction4755c0())
+                                UnknownFunction4753c0(UnknownFunction475500() + 1, UnknownFunction4755c0());
+                        } else {
+                            if ((unsigned int)UnknownFunction475500() < (unsigned int)range)
+                                UnknownFunction4753c0(UnknownFunction475500() + 1, range);
+                        }
+                        field_0xb8->field_0x7f1c = 0;
+                    }
+                } else {
+                    field_0xb8->field_0x7f1c = 1;
+                }
+            }
+        }
+    }
+    int result = UnknownGameUiControl::UnknownVirtualSlot10(frameTime);
+    if (result) {
+        GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+        int full = 0;
+        for (UnknownGameUiControl* control = UnknownFunction472750(iterator); control;
+             control = UnknownFunction472750(iterator)) {
+            if (control->field_0x5c == 3 && control->field_0x200 >= control->field_0x1ec)
+                full = 1;
+        }
+        UnknownFunction472730(iterator);
+        if (full)
+            field_0x1cc = 0;
+    }
+    return result;
+}
+
+// 0x00474ed0: draws the track centred across the bar, then the thumb.
+int UIScrollBar::UnknownVirtualSlot40() {
+    CameraRect rect;
+    TextureMap* thumb;
+    if (field_0x204_image && field_0x1cc) {
+        TextureMap* track = field_0x204_image->UnknownFunction472f90();
+        int redraw = field_0x1bc;
+        rect = *(CameraRect*)field_0x2c;
+        if (field_0x5c == 8) {
+            rect.top += UnknownMaxInt((field_0x2c[3] - field_0x2c[1] - track->field_0x18) / 2, 0);
+            rect.bottom = track->field_0x18 + rect.top;
+        } else {
+            rect.left += UnknownMaxInt((field_0x2c[2] - field_0x2c[0] - track->field_0x14) / 2, 0);
+            rect.right = track->field_0x14 + rect.left;
+        }
+        if (field_0xb8->field_0x110)
+            field_0xb8->field_0x110->UnknownFunction404480((PCTextureMap*)track, &rect, 0,
+                                                           track->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           field_0x1b8, field_0x1c0, &field_0x1bc, 0);
+        else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, track, 0,
+                                                                   track->field_0x30 ? 0x1008000 : 0x1000000))
+            goto failed;
+        field_0x1bc = redraw;
+    }
+    thumb = field_0x1cc;
+    if (thumb) {
+        if (field_0x5c == 8) {
+            rect.top = (field_0x2c[3] - field_0x1f8 - field_0x2c[1]) / 2 + field_0x2c[1];
+            rect.left = (int)field_0x1ec_float + field_0x2c[0];
+            rect.bottom = field_0x1f8 + rect.top;
+            rect.right = field_0x1f4 + rect.left;
+        } else {
+            rect.top = (int)field_0x1ec_float + field_0x2c[1];
+            rect.left = (field_0x2c[2] - field_0x1f4 - field_0x2c[0]) / 2 + field_0x2c[0];
+            rect.bottom = field_0x1f8 + rect.top;
+            rect.right = field_0x1f4 + rect.left;
+        }
+        if (field_0xb8->field_0x110) {
+            field_0xb8->field_0x110->UnknownFunction404480((PCTextureMap*)thumb, &rect, 0,
+                                                           thumb->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           field_0x1b8, field_0x1c0, &field_0x1bc, 0);
+            if (field_0x16c[field_0x60]->field_0x10 == 1)
+                field_0x1c0 = 1;
+            else
+                UnknownVirtualSlot50();
+        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, thumb, 0,
+                                                                     thumb->field_0x30 ? 0x1008000 : 0x1000000)) {
+            goto failed;
+        }
+    }
+    return 1;
+
+failed:
+    return 0;
+}
+
+// 0x004755d0: a click on the bar moves the thumb (slider) or pages the lists.
+int UIScrollBar::UnknownVirtualSlot55(int a, int b) {
+    if (field_0xb8->field_0x34->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
+        GameObjectIterator* iterator;
+        UnknownGameUiControl* list;
+        if (field_0x5c == 8) {
+            if (field_0x1f0) {
+                field_0x1ec_float = (float)UnknownMinInt(UnknownVirtualSlot61() - field_0x1f4,
+                                                         UnknownMaxInt(((int*)b)[0] - field_0x2c[0], 0));
+            } else {
+                float x = (float)((int*)b)[0];
+                float left = (float)field_0x2c[0];
+                if (x > field_0x1ec_float + (left + field_0x1f4)) {
+                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
+                        if (list->field_0x5c == 3) {
+                            int page = list->field_0x200;
+                            list->UnknownFunction476860(list->UnknownFunction4755c0() + page, 1);
+                        }
+                    }
+                    UnknownFunction472730(iterator);
+                } else if (x < left + field_0x1ec_float) {
+                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
+                        if (list->field_0x5c == 3) {
+                            int page = list->field_0x200;
+                            list->UnknownFunction476860(list->UnknownFunction4755c0() - page, 1);
+                        }
+                    }
+                    UnknownFunction472730(iterator);
+                }
+            }
+        } else {
+            if (field_0x1f0) {
+                field_0x1ec_float = (float)UnknownMinInt(UnknownVirtualSlot62() - field_0x1f8,
+                                                         UnknownMaxInt(((int*)b)[1] - field_0x2c[1], 0));
+            } else {
+                float y = (float)((int*)b)[1];
+                float top = (float)field_0x2c[1];
+                if (y > field_0x1ec_float + (top + field_0x1f8)) {
+                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
+                        if (list->field_0x5c == 3) {
+                            int page = list->field_0x200;
+                            list->UnknownFunction476860(list->UnknownFunction4755c0() + page, 1);
+                        }
+                    }
+                    UnknownFunction472730(iterator);
+                } else if (y < top + field_0x1ec_float) {
+                    iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                    for (list = UnknownFunction472750(iterator); list; list = UnknownFunction472750(iterator)) {
+                        if (list->field_0x5c == 3) {
+                            int page = list->field_0x200;
+                            list->UnknownFunction476860(list->UnknownFunction4755c0() - page, 1);
+                        }
+                    }
+                    UnknownFunction472730(iterator);
+                }
+            }
+        }
+        if (field_0x1f0)
+            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
+    }
+    return UnknownGameUiControl::UnknownVirtualSlot55(a, b);
+}
+
+// 0x00475970: dragging the thumb; holding it still repeats kind 0x11.
+void UIScrollBar::UnknownVirtualSlot57(int a, int* position) {
+    UnknownGameUiControl::UnknownVirtualSlot57(a, position);
+    UnknownDialogEvent event;
+    event.field_0x20 = 0;
+    if (!a && position) {
+        int width = UnknownVirtualSlot61();
+        int height = UnknownVirtualSlot62();
+        UnknownVirtualSlot50();
+        if (field_0x5c == 8) {
+            if (field_0x1f0)
+                field_0x1ec_float = (float)UnknownMinInt(width - field_0x1f4,
+                                                       UnknownMaxInt(position[0] - field_0x2c[0], 0));
+            else
+                field_0x1ec_float = (float)UnknownMinInt(width - field_0x1f4,
+                                                       UnknownMaxInt(position[0] - field_0x2c[0] - field_0x1f4 / 2, 0));
+        } else {
+            if (field_0x1f0 != 0.0f)
+                field_0x1ec_float = (float)UnknownMinInt(height - field_0x1f8,
+                                                       UnknownMaxInt(position[1] - field_0x2c[1], 0));
+            else
+                field_0x1ec_float = (float)UnknownMinInt(height - field_0x1f8,
+                                                       UnknownMaxInt(position[1] - field_0x2c[1] - field_0x1f8 / 2, 0));
+        }
+        if (field_0x1f0)
+            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
+        if (!field_0x208) {
+            event.field_0x08 = 0xf;
+            event.field_0x00 = field_0x74;
+            event.field_0x04 = UnknownFunction470df0();
+            event.field_0x0c = field_0xb8;
+            event.field_0x10 = field_0xbc;
+            event.field_0x14 = this;
+            field_0xb8->UnknownVirtualSlot29(&event);
+            field_0x208 = 1;
+        }
+        if (!event.field_0x20) {
+            if (position[0] == field_0x20c_value && position[1] == field_0x210_value) {
+                field_0x218_float += field_0xb8->field_0x9c0;
+                if (field_0x218_float < field_0x214_float)
+                    goto scroll;
+                event.field_0x08 = 0x11;
+                event.field_0x00 = field_0x74;
+                event.field_0x04 = UnknownFunction470df0();
+                event.field_0x0c = field_0xb8;
+                event.field_0x10 = field_0xbc;
+                event.field_0x14 = this;
+                field_0xb8->UnknownVirtualSlot29(&event);
+            } else {
+                event.field_0x08 = 3;
+                event.field_0x00 = field_0x74;
+                event.field_0x04 = UnknownFunction470df0();
+                event.field_0x0c = field_0xb8;
+                event.field_0x10 = field_0xbc;
+                event.field_0x14 = this;
+                field_0xb8->UnknownVirtualSlot29(&event);
+                field_0x20c_value = position[0];
+                field_0x210_value = position[1];
+                field_0x218_float = 0.0f;
+            }
+            if (!event.field_0x20) {
+            scroll:
+                GameObjectIterator* iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+                for (UnknownGameUiControl* list = UnknownFunction472750(iterator); list;
+                     list = UnknownFunction472750(iterator)) {
+                    if (list->field_0x5c == 3)
+                        list->UnknownFunction476860(UnknownFunction475300(list->field_0x1ec - list->field_0x204), 0);
+                }
+                UnknownFunction472730(iterator);
+            }
+        }
+    }
+}
+
+// 0x00476020: the joystick moves the selection; the row under the cursor
+// is +0x248.
+int UIListBox::UnknownVirtualSlot10(float frameTime) {
+    GUIInputDevice* device;
+    for (int i = 0; (device = field_0xb8->field_0x34->UnknownFunction488310(i++)) != 0;) {
+        if (device->field_0xac->deviceKind == 2 && device->field_0xac->UnknownFunction4897e0(4)) {
+            POINT position = device->field_0xa4;
+            if (field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
+                if (position.y <= -1) {
+                    if (UnknownFunction476950() > 0)
+                        UnknownFunction476a60(UnknownFunction476950() - 1);
+                } else if (position.y >= 1) {
+                    if (UnknownFunction476950() < field_0x1ec - 1)
+                        UnknownFunction476a60(UnknownFunction476950() + 1);
+                }
+            }
+        }
+    }
+    field_0x248 = -1;
+    GUIUser* user = field_0xb8->field_0x34;
+    if (user->field_0x2c) {
+        POINT cursor = user->field_0x2c->field_0xa4;
+        if (user->field_0x1d8 == (UnknownGuiControl*)this && field_0x224) {
+            RECT rect = *(RECT*)field_0x2c;
+            for (int row = field_0x1f0; row < field_0x1f0 + field_0x200; row++) {
+                rect.bottom = rect.top + UnknownFunction4769a0(row);
+                if (PtInRect(&rect, cursor) && !(field_0x214[row].field_0x04 & 1)) {
+                    field_0x248 = row;
+                    break;
+                }
+                rect.top += UnknownFunction4769a0(row);
+            }
+        }
+    }
+    return UnknownGameUiControl::UnknownVirtualSlot10(frameTime);
+}
+
+// 0x004761f0: draws the background, then the rows: the text rows on a DC
+// (pass 0), then the image rows (pass 1, loading the images of kind 3).
+int UIListBox::UnknownVirtualSlot40() {
+    void* dc;
+    int more;
+    CameraRect rect;
+    CameraRect area;
+    int pass;
+    int frames = -1;
+    int redraw = field_0x1bc;
+    int visible = 0;
+    int done = 1;
+    if (field_0x1cc) {
+        if (field_0xb8->field_0x110) {
+            field_0xb8->field_0x110->UnknownFunction404480((PCTextureMap*)field_0x1cc, (CameraRect*)field_0x2c,
+                                                           field_0x4c,
+                                                           field_0x1cc->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           field_0x1b8, field_0x1c0, &field_0x1bc, 0);
+            field_0x1bc = redraw;
+        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+                       field_0x2c, field_0x1cc, field_0x4c, field_0x1cc->field_0x30 ? 0x1008000 : 0x1000000)) {
+            goto failed;
+        }
+    }
+    area = *(CameraRect*)field_0x2c;
+    area.left += field_0xe8;
+    area.right -= field_0xe8;
+    area.top += field_0xec;
+    area.bottom -= field_0xec;
+    for (pass = 0; pass < 2; pass++) {
+        do {
+            if (pass == 0) {
+                field_0xb8->UnknownFunction46ed70(&dc, &area, &more, this);
+                if (field_0x20c)
+                    FillRect((HDC)dc, (RECT*)&area, (HBRUSH)field_0x20c);
+            } else {
+                more = 0;
+                frames = field_0x1bc;
+                field_0x1bc = redraw;
+            }
+            int y = area.top;
+            for (int row = field_0x1f0; row < field_0x1ec; row++) {
+                int height = UnknownFunction4769a0(row);
+                int whole;
+                if (field_0x240 && visible <= 0) {
+                    whole = 0;
+                } else {
+                    whole = 1;
+                    if (height + y > area.bottom)
+                        break;
+                }
+                switch ((int)UnknownFunction476970(row)) {
+                case 3:
+                    if (pass == 1) {
+                        if (field_0x214[row].field_0x18) {
+                            if (field_0x214[row].field_0x20)
+                                field_0x214[row].field_0x20->Release();
+                            field_0x214[row].field_0x20 =
+                                new(__FILE__, 0x1c62) UIAnim(field_0xb8->field_0x7f20, 0);
+                            field_0x214[row].field_0x20->UnknownFunction4730e0(field_0x214[row].field_0x18,
+                                                                                field_0xb8->field_0x140);
+                            field_0x214[row].field_0x08 = field_0x214[row].field_0x20->field_0x28[0]->field_0x0c;
+                            field_0x214[row].field_0x0c = field_0x214[row].field_0x20->field_0x28[0]->field_0x10;
+                            height = field_0x214[row].field_0x0c;
+                        } else {
+                            field_0x214[row].field_0x20 = 0;
+                        }
+                        field_0x214[row].field_0x00 = 2;
+                        UnknownVirtualSlot50();
+                    }
+                    if (whole && height + y > area.bottom)
+                        break;
+                case 2:
+                    if (pass == 1 && field_0x214[row].field_0x20) {
+                        int width = field_0x214[row].field_0x20->UnknownFunction472f80()->field_0x0c;
+                        int imageHeight = field_0x214[row].field_0x20->UnknownFunction472f80()->field_0x10;
+                        rect.left = field_0x230 + area.left;
+                        rect.top = y;
+                        rect.right = rect.left + width;
+                        if (rect.right >= area.right)
+                            rect.right = area.right;
+                        if (field_0x240) {
+                            if (imageHeight + y >= area.bottom)
+                                rect.bottom = area.bottom;
+                            else
+                                rect.bottom = imageHeight + y;
+                        } else {
+                            rect.bottom = imageHeight + y;
+                        }
+                        TextureMap* texture = field_0x214[row].field_0x20->UnknownFunction472f80()->field_0x18;
+                        if (field_0xb8->field_0x110) {
+                            field_0xb8->field_0x110->UnknownFunction404480(
+                                (PCTextureMap*)texture, &rect, 0, texture->field_0x30 ? 0x1008000 : 0x1000000,
+                                field_0x1b8, field_0x1c0, &field_0x1bc, 0);
+                            if (field_0x214[row].field_0x20->field_0x10 > 1) {
+                                done = 0;
+                                frames = field_0x1bc;
+                            }
+                        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(
+                                       &rect, texture, 0, texture->field_0x30 ? 0x1008000 : 0x1000000)) {
+                            goto failed;
+                        }
+                        visible++;
+                    }
+                    break;
+                case 1:
+                    if (pass == 0 && field_0x214[row].field_0x14) {
+                        rect.left = area.left;
+                        rect.top = y;
+                        rect.bottom = height + y;
+                        rect.right = area.right;
+                        SetBkMode((HDC)dc, TRANSPARENT);
+                        unsigned int color;
+                        if (row == field_0x1f4 && field_0x224) {
+                            if (field_0x210)
+                                FillRect((HDC)dc, (RECT*)&rect, (HBRUSH)field_0x210);
+                            color = field_0x208;
+                        } else {
+                            if (field_0x214[row].field_0x34)
+                                FillRect((HDC)dc, (RECT*)&rect, (HBRUSH)field_0x214[row].field_0x34);
+                            color = field_0x214[row].field_0x28;
+                            if (!color)
+                                color = field_0xc4;
+                        }
+                        if (field_0x214[row].field_0x08) {
+                            rect.left += field_0x234 + field_0x230;
+                            rect.right += field_0x234 + field_0x230;
+                            field_0xb8->UnknownFunction46f550(dc, &rect, field_0x214[row].field_0x14,
+                                                              field_0x214[row].field_0x08, color, field_0x160,
+                                                              (UnknownGameUiTextRun*)field_0x214[row].field_0x24,
+                                                              field_0xd4, field_0xc8, field_0xd8, 1, 0);
+                        }
+                        if (!more)
+                            visible++;
+                    }
+                    break;
+                }
+                if (field_0x248 == row && pass == 0 && field_0x200 > 1) {
+                    rect.left = area.left;
+                    rect.top = y;
+                    rect.bottom = height + y;
+                    rect.right = area.right;
+                    if (field_0x20c)
+                        FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)field_0x20c);
+                    else
+                        FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
+                    UnknownVirtualSlot50();
+                }
+                y += height;
+            }
+            if (pass == 0)
+                field_0xb8->UnknownFunction46eeb0(dc);
+        } while (more);
+    }
+    if (frames >= 0)
+        field_0x1bc = frames;
+    field_0x200 = visible;
+    field_0x1c0 = done;
+    return 1;
+
+failed:
+    return 0;
+}
+
+// 0x00479a00: a click on the bar moves the thumb (slider) or pages the list.
+int UIDDLScrollBar::UnknownVirtualSlot55(int a, int b) {
+    if (field_0xb8->field_0x34->field_0x1d8 == (UnknownGuiControl*)this && !a && b) {
+        UnknownGameUiControl* list = field_0x220_list->field_0x1fc;
+        if (field_0x1f0) {
+            field_0x1ec_float = (float)UNKNOWN_MIN(UnknownVirtualSlot62() - field_0x1f8,
+                                                   UNKNOWN_MAX(((int*)b)[1] - field_0x2c[1], 0));
+        } else {
+            float y = (float)((int*)b)[1];
+            float top = (float)field_0x2c[1];
+            if (y > field_0x1ec_float + (top + field_0x1f8))
+            {
+                int page = list->field_0x200;
+                list->UnknownFunction476860(list->UnknownFunction4755c0() + page, 1);
+            } else if (y < top + field_0x1ec_float) {
+                int page = list->field_0x200;
+                list->UnknownFunction476860(list->UnknownFunction4755c0() - page, 1);
+            }
+        }
+    }
+    if (field_0x1f0)
+        UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
+    return UnknownGameUiControl::UnknownVirtualSlot55(a, b);
+}
+
+// 0x0047ab20
+void UIDropDownList::UnknownFunction47ab20(UIAnim* image) {
+    field_0x1f8_control->UnknownFunction470730(0, image);
+    field_0x1f8_control->field_0x2c[1] = 0;
+    field_0x1f8_control->field_0x2c[0] = 0;
+    field_0x1f8_control->field_0x2c[2] = image->UnknownFunction472f80()->field_0x0c;
+    field_0x1f8_control->field_0x2c[3] = image->UnknownFunction472f80()->field_0x10;
+    *(CameraRect*)field_0x1f8_control->field_0x3c = *(CameraRect*)field_0x1f8_control->field_0x2c;
+    field_0x2c[2] = field_0x1f8_control->field_0x2c[2] + field_0x2c[0];
+    field_0x2c[3] = field_0x1f8_control->field_0x2c[3] + field_0x2c[1];
+    *(CameraRect*)field_0x3c = *(CameraRect*)field_0x2c;
+    field_0x1f0_control->field_0x2c[0] = 0;
+    field_0x1f0_control->field_0x2c[1] = field_0x1f8_control->field_0x2c[3];
+    *(CameraRect*)field_0x1f0_control->field_0x3c = *(CameraRect*)field_0x1f0_control->field_0x2c;
+    *(CameraRect*)field_0x1fc->field_0x3c = *(CameraRect*)field_0x1f0_control->field_0x2c;
+    *(CameraRect*)field_0x1fc->field_0x2c = *(CameraRect*)field_0x1fc->field_0x3c;
+    if (field_0x1ec_control->field_0x3c[0]) {
+        field_0x1ec_control->field_0x2c[1] = 0;
+        field_0x1ec_control->field_0x2c[0] = field_0x1f8_control->field_0x2c[2];
+        field_0x1ec_control->field_0x2c[2] =
+            field_0x1ec_control->UnknownVirtualSlot48(-1)->field_0x14 + field_0x1ec_control->field_0x2c[0];
+        field_0x1ec_control->field_0x2c[3] =
+            field_0x1ec_control->UnknownVirtualSlot48(-1)->field_0x18 + field_0x1ec_control->field_0x2c[1];
+        *(CameraRect*)field_0x1ec_control->field_0x3c = *(CameraRect*)field_0x1ec_control->field_0x2c;
+    }
+    field_0x1f4_control->field_0x2c[0] = field_0x1f8_control->field_0x2c[2];
+    field_0x1f4_control->field_0x2c[1] = field_0x1f8_control->field_0x2c[3];
+    *(CameraRect*)field_0x1f4_control->field_0x3c = *(CameraRect*)field_0x1f4_control->field_0x2c;
+    *(CameraRect*)field_0x200_control->field_0x2c = *(CameraRect*)field_0x1f4_control->field_0x2c;
+    field_0x200_control->field_0x2c[1] += 2;
+    field_0x200_control->field_0x2c[3] -= 2;
+    *(CameraRect*)field_0x200_control->field_0x3c = *(CameraRect*)field_0x200_control->field_0x2c;
+}
+
+// 0x0047b370 (UIProgressBar): one step on; redraws when `redraw`.
+void UnknownGameUiControl::UnknownFunction47b370(int redraw) {
+    int total = field_0x1f0;
+    if (total) {
+        field_0x1f4 = UnknownMinInt(field_0x1f4 + 1, total);
+        field_0x1ec_float = (float)field_0x1f4 / total;
+    }
+    if (redraw && field_0xbc)
+        field_0xbc->UnknownFunction486500();
 }

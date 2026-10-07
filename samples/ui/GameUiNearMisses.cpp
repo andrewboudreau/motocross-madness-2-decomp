@@ -43,8 +43,42 @@
 //   the vptr, which needs a mem-initializer of the class's own member.
 // 0x00479bf0 UIDDLButton constructor (93/103): as UIDDLStatic's.
 // 0x00479df0 UIDDLListBox slot 66 (104/120).
+// 0x0047b490 colour-key test (116/210): retail keeps the key pixel in esi and
+//   the row count in the key's argument slot.
+// 0x00472960 UIFrame constructor from a file (377/562): retail re-tests the
+//   loaded image before freeing it on both paths; VC6 here threads the test.
+// 0x00472bc0 UIFrame image from a stream (295/315): the palette's two members
+//   land in ecx/ebx swapped.
+// 0x0046ef00 UIDialog slot 10 (352/555): the timer's +0x0c is cleared before
+//   +0x14 is loaded, and the joystick branches sit after the epilogue.
+// 0x004734c0 UIButton slot 28 (256/328) and 0x00478e10 UIMultiState slot 28
+//   (28/328): retail keeps the result partly in edi, tests Unlock's result
+//   and returns separately when Lock fails.
+// 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
+//   redraw count in memory.
+// 0x00474150 UIEditBox slot 20 (339/1048): Backspace: retail loads the
+//   length before the lead-byte test.
+// 0x00474880 UIScrollCtl slot 55 (254/355): retail pushes every register in
+//   the prologue and keeps `this` in esi.
+// 0x00479710 UIDDLScrollBar slot 57 (736/738): the list's +0x204 goes through
+//   ebp instead of ecx.
+// 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
+//   shares its spill slot with the DC.
+// 0x0047a400 drop-down layout (320/960): store scheduling of the part rects.
+// 0x00479ea0 UIDropDownList constructor (786/803): every part is allocated
+//   with sizeof 0x254 (GameUi.h flattens the derived controls' members into
+//   UIControl; retail sizes 0x1f4/0x254/0x224/0x1f0), and the list box's
+//   arguments are pushed as (id, rows, area, owner, list), which suggests
+//   UIListBox's real parameter order is (id, rows, area, owner).
 
 #include "../../src/reconstructed/GameUi.cpp"
+
+#include <imm.h>
+
+#include "../../src/reconstructed/Display.h"
+#include "../../src/reconstructed/PCTextureMap.h"
+#include "../../src/reconstructed/Palette8.h"
+#include "../../src/reconstructed/Tgafile.h"
 
 // 0x0065b5c8: the time stamp of the last image step (UIAnim 0x00472fe0).
 int g_UnknownGlobal65b5c8;
@@ -708,4 +742,748 @@ void UIDDLListBox::UnknownVirtualSlot66(int value) {
     event.field_0x14 = this;
     event.field_0x10 = field_0xb8->field_0x30;
     field_0xb8->UnknownVirtualSlot29(&event);
+}
+
+// ---------------------------------------------------------------------------
+// Drawing, input and loading near misses
+
+// cdecl 0x0047b490: whether `texture` has a pixel of colour `key`.
+int UnknownFunction47b490(TextureMap* texture, int key) {
+    int found = 0;
+    unsigned short* bits = (unsigned short*)texture->UnknownVirtualSlot13(0, 0, 0x11);
+    if (bits) {
+        int red;
+        int green;
+        if (texture->field_0x20 == 0x235) {
+            red = (key >> 8) & 0xf800;
+            green = (key >> 5) & 0x7e0;
+        } else if (texture->field_0x20 == 0x22b) {
+            red = (key >> 9) & 0x7c00;
+            green = (key >> 6) & 0x3e0;
+        } else {
+            goto unlock;
+        }
+        {
+            int pixel = red | green | ((key >> 3) & 0x1f);
+            if (pixel) {
+                for (int rows = texture->field_0x18; rows > 0; rows--) {
+                    for (int x = 0; x < texture->field_0x14; x++) {
+                        if (bits[x] == pixel) {
+                            found = 1;
+                            break;
+                        }
+                    }
+                    bits += texture->field_0x14;
+                }
+            }
+        }
+unlock:
+        if (texture->UnknownVirtualSlot14(0))
+            return found;
+    }
+    return 0;
+}
+
+// 0x00472960
+UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) {
+    if (_stricmp(file + strlen(file) - 4, ".wav")) {
+        int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+        field_0x1c = 0;
+        field_0x08 = 0;
+        field_0x14 = 0;
+        field_0x20 = (int)textures;
+        UnknownTgaFile* image = UnknownFunction5125c0(file, 0, (int)g_UnknownResourceManager572b44);
+        if (image) {
+            field_0x0c = image->width;
+            field_0x10 = image->height;
+            field_0x18 = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)field_0x20, 1);
+            ColorMapper* mapper;
+            UnknownPaletteInterface* surfacePalette;
+            if (palette) {
+                surfacePalette = ((Palette8*)palette)->field_0x70c;
+                mapper = ((Palette8*)palette)->field_0x708;
+            } else {
+                surfacePalette = 0;
+                mapper = 0;
+            }
+            field_0x18->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+                                            image->width, 0x22b, format, (UnknownTexturePalette*)mapper, 4,
+                                            surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+            if (UnknownFunction47b490(field_0x18, 0xff00ff))
+                field_0x18->UnknownVirtualSlot18(0xff00ff);
+        } else {
+            char message[100];
+            field_0x18 = 0;
+            sprintf(message, "UIFrame(): Warning! Error loading frame: %s\n", file);
+        }
+        if (image)
+            UnknownFunction512dd0(image);
+    } else {
+        field_0x14 = new(__FILE__, 0x13b9) Sound((SoundGroup*)a, 1);
+        field_0x14->UnknownFunction4bc320(file, 0, 1, 3, b, -1);
+        field_0x1c = 1;
+        field_0x08 = 1;
+        field_0x0c = 0;
+        field_0x10 = 0;
+        field_0x18 = 0;
+    }
+}
+
+// 0x00472bc0
+int UIFrame::UnknownFunction472bc0(void* stream, int offset, void* palette) {
+    if (stream) {
+        UnknownTgaFile* image = UnknownFunction511dd0((UnknownTextureStream*)stream, 0, offset);
+        if (image) {
+            int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+            field_0x0c = image->width;
+            field_0x10 = image->height;
+            field_0x18 = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)field_0x20, 1);
+            ColorMapper* mapper;
+            UnknownPaletteInterface* surfacePalette;
+            if (palette) {
+                surfacePalette = ((Palette8*)palette)->field_0x70c;
+                mapper = ((Palette8*)palette)->field_0x708;
+            } else {
+                surfacePalette = 0;
+                mapper = 0;
+            }
+            field_0x18->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+                                            image->width, 0x22b, format, (UnknownTexturePalette*)mapper, 4,
+                                            surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+            if (UnknownFunction47b490(field_0x18, 0xff00ff))
+                field_0x18->UnknownVirtualSlot18(0xff00ff);
+            UnknownFunction512dd0(image);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// 0x0046ef00: runs the timers and the joystick focus moves.
+int UIDialog::UnknownVirtualSlot10(float frameTime) {
+    UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
+    if (dialog->field_0x9c0 != 0.0f)
+        dialog->field_0x9c0 = frameTime;
+    else
+        dialog->field_0x9c0 = 0.001f;
+    if (dialog->field_0x7f40) {
+        UnknownDialogEvent event;
+        event.field_0x10 = dialog->field_0x30;
+        event.field_0x20 = 0;
+        event.field_0x08 = 0x12;
+        event.field_0x04 = 0;
+        event.field_0x0c = this;
+        event.field_0x14 = 0;
+        dialog->UnknownVirtualSlot29(&event);
+        dialog->field_0x7f40 = 0;
+    }
+    if (!field_0x25_bit2 && !dialog->field_0x7f50) {
+        UITimer* timer;
+        for (int i = 0; (timer = dialog->field_0x7f24.Get(i)) != 0; i++) {
+            timer->field_0x0c += (int)(frameTime * 1000.0f);
+            if ((unsigned int)timer->field_0x0c >= (unsigned int)timer->field_0x10) {
+                timer->field_0x0c = 0;
+                UnknownGameUiControl* control;
+                if ((control = timer->field_0x14) != 0) {
+                    control->UnknownVirtualSlot60((int)timer);
+                } else {
+                    UnknownDialogEvent event;
+                    event.field_0x00 = timer->field_0x08;
+                    event.field_0x10 = dialog->field_0x30;
+                    event.field_0x20 = 0;
+                    event.field_0x08 = 7;
+                    event.field_0x04 = 0;
+                    event.field_0x0c = this;
+                    event.field_0x14 = 0;
+                    dialog->UnknownVirtualSlot29(&event);
+                    if (event.field_0x20)
+                        return 1;
+                }
+            }
+        }
+        GUIUser* user = dialog->field_0x34;
+        UnknownGameUiControl* focus = (UnknownGameUiControl*)user->field_0x1d8;
+        user->UnknownFunction487fb0(focus && focus->field_0x180 ? (UnknownCursorAnimation*)focus->field_0x180
+                                                                 : dialog->field_0x95c);
+        GUIInputDevice* device;
+        int j = 0;
+        while ((device = dialog->field_0x34->UnknownFunction488310(j++)) != 0) {
+            if (device->field_0xac->deviceKind == 2) {
+                int x = device->field_0xa4.x;
+                int y = device->field_0xa4.y;
+                if (focus) {
+                    if (x <= -1) {
+                        if (dialog->field_0x7f1c) {
+                            UnknownGameUiControl* next = focus->UnknownFunction4727c0();
+                            dialog->field_0x7f1c = 0;
+                            if (next)
+                                UnknownFunction470000(next, 0, 0);
+                        }
+                    } else if (x >= 1) {
+                        if (dialog->field_0x7f1c) {
+                            UnknownGameUiControl* next = focus->UnknownFunction472810();
+                            dialog->field_0x7f1c = 0;
+                            if (next)
+                                UnknownFunction470000(next, 0, 0);
+                        }
+                    } else if (y <= -1) {
+                        if (dialog->field_0x7f1c)
+                            dialog->field_0x7f1c = 0;
+                    } else if (y >= 1) {
+                        if (dialog->field_0x7f1c)
+                            dialog->field_0x7f1c = 0;
+                    } else {
+                        dialog->field_0x7f1c = 1;
+                    }
+                }
+            }
+        }
+        UnknownFunction46f120();
+        GameObject::UnknownVirtualSlot10(dialog->field_0x9c0);
+    }
+    return 1;
+}
+
+// 0x004734c0: whether `point` is on an opaque pixel of the image.
+int UIButton::UnknownVirtualSlot28(POINT point, int state) {
+    int opaque = 0;
+    int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+    RECT rect = *(RECT*)field_0x2c;
+    if (PtInRect(&rect, point)) {
+        point.x -= rect.left;
+        point.y -= rect.top;
+        int x = (int)(point.x / field_0xb8->field_0x9c4);
+        int y = (int)(point.y / field_0xb8->field_0x9c8);
+        UnknownSurfaceDesc desc;
+        desc.size = sizeof(desc);
+        PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
+        if (!texture->field_0x70->UnknownMethod25(0, &desc, 1, 0)) {
+            int offset = desc.pitch * y / UnknownFunction511970(format) + x;
+            if (format == 8) {
+                if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
+                    opaque = 1;
+            } else {
+                if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
+                    opaque = 1;
+            }
+            if (texture->field_0x70->UnknownMethod32(0))
+                return opaque;
+        }
+        return opaque;
+    }
+    return 0;
+}
+
+// 0x00478e10: the same test as UIButton slot 28 (0x004734c0).
+int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
+    int opaque = 0;
+    int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+    RECT rect = *(RECT*)field_0x2c;
+    if (PtInRect(&rect, point)) {
+        point.x -= rect.left;
+        point.y -= rect.top;
+        int x = (int)(point.x / field_0xb8->field_0x9c4);
+        int y = (int)(point.y / field_0xb8->field_0x9c8);
+        UnknownSurfaceDesc desc;
+        desc.size = sizeof(desc);
+        PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
+        if (!texture->field_0x70->UnknownMethod25(0, &desc, 1, 0)) {
+            int offset = desc.pitch * y / UnknownFunction511970(format) + x;
+            if (format == 8) {
+                if (((unsigned char*)desc.surface)[offset] != *(unsigned char*)&desc.field_0x28[0x18])
+                    opaque = 1;
+            } else {
+                if (((unsigned short*)desc.surface)[offset] != *(unsigned short*)&desc.field_0x28[0x18])
+                    opaque = 1;
+            }
+            if (texture->field_0x70->UnknownMethod32(0))
+                return opaque;
+        }
+        return opaque;
+    }
+    return 0;
+}
+
+// 0x004738a0: draws the image, the text scrolled to keep the caret in view,
+// and the caret.
+int UIEditBox::UnknownVirtualSlot40() {
+    int width = UnknownVirtualSlot61();
+    int frames = -1;
+    int redraw = field_0x1bc;
+    if (!field_0xc0)
+        UnknownFunction473da0("");
+    if (field_0x1cc) {
+        if (field_0xb8->field_0x110) {
+            field_0xb8->field_0x110->UnknownFunction404480((PCTextureMap*)field_0x1cc, (CameraRect*)field_0x2c,
+                                                           field_0x4c,
+                                                           field_0x1cc->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           field_0x1b8, field_0x1c0, &field_0x1bc, 0);
+            frames = field_0x1bc;
+            field_0x1bc = redraw;
+        } else {
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot3(field_0x2c, field_0x1cc, field_0x4c,
+                                                            field_0x1cc->field_0x30 ? 0x1008000 : 0x1000000);
+            field_0x1bc = redraw;
+        }
+    } else {
+        field_0x1bc = redraw;
+    }
+    void* dc;
+    int more;
+    CameraRect rect;
+    do {
+        if (field_0xd8 & 1) {
+            int offset = width - field_0x1fc_value;
+            field_0x200 = offset > 0 ? 0 : offset;
+        } else if (field_0xd8 & 2) {
+            if (UnknownVirtualSlot61() > field_0x1fc_value)
+                field_0x200 = width / 2 - field_0x1fc_value / 2;
+            else
+                field_0x200 = width - field_0x1fc_value;
+        } else if (field_0xd8 & 4) {
+            field_0x200 = width - field_0x1fc_value;
+        } else {
+            int offset = width - field_0x1fc_value;
+            field_0x200 = offset > 0 ? 0 : offset;
+        }
+        int x = field_0x2c[0] + field_0x200;
+        int y;
+        if (field_0xd8 & 8)
+            y = field_0x2c[1];
+        else if (field_0xd8 & 0x10)
+            y = (field_0x2c[3] - field_0x2c[1]) / 2 - field_0x160 / 2 + field_0x2c[1];
+        else if (field_0xd8 & 0x20)
+            y = field_0x2c[3] - field_0x160;
+        else
+            y = field_0x2c[1];
+        rect.left = x + field_0xe8;
+        rect.top = y + field_0xec;
+        rect.right = field_0x2c[2] - field_0xe8;
+        rect.bottom = field_0x2c[3] - field_0xec;
+        if (field_0xb8->UnknownFunction46ed70(&dc, (CameraRect*)field_0x2c, &more, this)) {
+            if (field_0xd0)
+                field_0xb8->UnknownFunction46f550(dc, &rect, field_0xc0, field_0xd0, field_0xc4, field_0x160, 0,
+                                                  field_0xd4, field_0xc8, 9, 1, 0);
+            if (!more && field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
+                int caret = rect.left + field_0x1fc_value;
+                int limit = field_0xb8->field_0x160.left + field_0x2c[0] + width - 1;
+                if (limit < caret)
+                    caret = limit;
+                rect.left = caret;
+                rect.top++;
+                rect.right = caret + 1;
+                int height = field_0x160;
+                if (!height)
+                    height = field_0xb8->field_0xdc;
+                rect.bottom = rect.top + height + 1;
+                CameraRect* caretRect = (CameraRect*)&field_0x214;
+                *caretRect = rect;
+                if (field_0x20c)
+                    FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)field_0x20c);
+                else
+                    FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
+            }
+            field_0xb8->UnknownFunction46eeb0(dc);
+            if (g_UnknownGlobal56e26c->field_0x0c->field_0x6c &&
+                field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
+                if (field_0xb8 && field_0xb8->field_0x110)
+                    field_0xb8->field_0x110->UnknownFunction404c80();
+                HIMC context = ImmGetContext((HWND)g_UnknownGlobal56e26c->field_0x31c);
+                if (ImmGetOpenStatus(context)) {
+                    COMPOSITIONFORM composition;
+                    composition.dwStyle = CFS_FORCE_POSITION;
+                    composition.ptCurrentPos.x = ((CameraRect*)&field_0x214)->left;
+                    composition.ptCurrentPos.y = ((CameraRect*)&field_0x214)->top;
+                    ImmSetCompositionWindow(context, &composition);
+                }
+                if (context)
+                    ImmReleaseContext((HWND)g_UnknownGlobal56e26c->field_0x31c, context);
+            }
+        }
+    } while (more);
+    if (frames >= 0)
+        field_0x1bc = frames;
+    if (field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this)
+        UnknownVirtualSlot50();
+    else
+        field_0x1c0 = 1;
+    return 1;
+}
+
+// 0x00474150: typed characters: Backspace, Enter (kind 10) and inserted
+// characters, double-byte ones in two steps; then measures the text and
+// sends kind 0x13.
+int UIEditBox::UnknownVirtualSlot20(int value) {
+    UnknownDialogEvent event;
+    char c = (char)value;
+    int result = 0;
+    event.field_0x20 = 0;
+    if (!UnknownGameUiControl::UnknownVirtualSlot20(value) &&
+        field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
+        if (field_0x204_sound) {
+            field_0x204_sound->UnknownFunction4bcbe0(field_0xbc->field_0x34c, 0);
+            field_0x204_sound->UnknownFunction4bc6b0(1, 0, 0);
+        }
+        switch (c) {
+        case 8:
+            if (field_0xd0 && field_0x1ec > 0) {
+                char* previous = CharPrevA(field_0xc0, field_0xc0 + field_0x1ec);
+                if (previous) {
+                    if (IsDBCSLeadByte(*previous)) {
+                        memmove(previous, field_0xc0 + field_0x1ec, field_0xd0 - field_0x1ec + 1);
+                        field_0xd0 -= 2;
+                        field_0x1ec -= 2;
+                    } else {
+                        memmove(previous, field_0xc0 + field_0x1ec, field_0xd0 - field_0x1ec + 1);
+                        field_0xd0--;
+                        field_0x1ec--;
+                    }
+                }
+            }
+            break;
+        case 9:
+        case 0x1b:
+            break;
+        case 0xd:
+            event.field_0x08 = 10;
+            event.field_0x00 = field_0x74;
+            event.field_0x04 = UnknownFunction470df0();
+            event.field_0x0c = field_0xb8;
+            event.field_0x10 = field_0xbc;
+            event.field_0x14 = this;
+            field_0xb8->UnknownVirtualSlot29(&event);
+            if (event.field_0x20)
+                return 1;
+            break;
+        default: {
+            int lead = !field_0x228 && IsDBCSLeadByte(c) ? 1 : 0;
+            if (!field_0x228 && !lead) {
+                c = UnknownFunction473fc0(c);
+                if (!c)
+                    break;
+            }
+            field_0x228 = 0;
+            int room;
+            if (lead) {
+                field_0x228 = 1;
+                room = field_0xd0 < field_0x1f0 - 2;
+                field_0x22c = !room;
+            } else if (field_0x22c) {
+                field_0x22c = 0;
+                room = 0;
+            } else {
+                room = field_0xd0 < field_0x1f0 - 1;
+            }
+            if (room) {
+                memmove(field_0xc0 + field_0x1ec + 1, field_0xc0 + field_0x1ec, field_0xd0 - field_0x1ec + 1);
+                field_0xc0[field_0x1ec] = c;
+                field_0x1ec++;
+                field_0xd0++;
+            } else if (field_0x208_sound) {
+                field_0x208_sound->UnknownFunction4bcbe0(field_0xbc->field_0x34c, 0);
+                field_0x208_sound->UnknownFunction4bc6b0(1, 0, 0);
+            }
+            break;
+        }
+        }
+        field_0xc0[field_0xd0] = 0;
+        void* dc;
+        if (!((PCRenderTarget*)field_0xb8->UnknownInlineField18())->field_0x48->UnknownMethod17(&dc)) {
+            HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(field_0x128 ? field_0x128 : (int)field_0xb8->field_0xd8));
+            SIZE size;
+            GetTextExtentPoint32A((HDC)dc, field_0xc0, field_0xd0, &size);
+            field_0xdc[1] = size.cx;
+            GetTextExtentPoint32A((HDC)dc, field_0xc0, field_0x1ec, &size);
+            field_0x1fc_value = size.cx;
+            SelectObject((HDC)dc, font);
+            ((PCRenderTarget*)field_0xb8->UnknownInlineField18())->field_0x48->UnknownMethod26(dc);
+        }
+        UnknownVirtualSlot50();
+        field_0x1bc++;
+        event.field_0x08 = 0x13;
+        event.field_0x00 = field_0x74;
+        event.field_0x04 = UnknownFunction470df0();
+        event.field_0x0c = field_0xb8;
+        event.field_0x10 = field_0xbc;
+        event.field_0x14 = this;
+        field_0xb8->UnknownVirtualSlot29(&event);
+        result = 1;
+    }
+    return result;
+}
+
+// 0x00474880: a click scrolls the arrow's lists by a row, then repeats on a timer.
+int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
+    if (field_0xb8->field_0x34->field_0x1d8 == (UnknownGuiControl*)this && !a) {
+        UnknownDialogEvent event;
+        event.field_0x20 = 0;
+        GameObjectIterator* iterator;
+        UnknownGameUiControl* control;
+        if (field_0x5c == 9) {
+            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+                if (control->field_0x5c == 3) {
+                    control->field_0x23c = 0;
+                    ((UIListBox*)control)->UnknownFunction477730(-1);
+                }
+                if (control->field_0x5c == 6) {
+                    control->field_0x1fc->field_0x23c = 0;
+                    ((UIListBox*)control->field_0x1fc)->UnknownFunction477730(-1);
+                }
+            }
+        } else {
+            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+                if (control->field_0x5c == 3) {
+                    control->field_0x23c = 0;
+                    ((UIListBox*)control)->UnknownFunction477730(1);
+                }
+                if (control->field_0x5c == 6) {
+                    control->field_0x1fc->field_0x23c = 0;
+                    ((UIListBox*)control->field_0x1fc)->UnknownFunction477730(1);
+                }
+            }
+        }
+        UnknownFunction472730(iterator);
+        event.field_0x00 = field_0x74;
+        event.field_0x08 = 0xe;
+        event.field_0x04 = field_0xf4;
+        event.field_0x0c = field_0xb8;
+        event.field_0x14 = this;
+        event.field_0x10 = field_0xb8->field_0x30;
+        field_0xb8->UnknownVirtualSlot29(&event);
+        field_0xb8->UnknownFunction46fce0(0x101, 0xfa, (int)this);
+    }
+    return UnknownGameUiControl::UnknownVirtualSlot55(a, b);
+}
+
+// 0x00479710: dragging the thumb; holding it still repeats kind 0x11.
+void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
+    UnknownGameUiControl::UnknownVirtualSlot57(a, position);
+    UnknownDialogEvent event;
+    event.field_0x20 = 0;
+    if (!a && position) {
+        int width = UnknownVirtualSlot61();
+        int height = UnknownVirtualSlot62();
+        UnknownVirtualSlot50();
+        if (field_0x5c == 8) {
+            if (field_0x1f0)
+                field_0x1ec_float = (float)UnknownMinInt(width - field_0x1f4,
+                                                       UnknownMaxInt(position[0] - field_0x2c[0], 0));
+            else
+                field_0x1ec_float = (float)UnknownMinInt(width - field_0x1f4,
+                                                       UnknownMaxInt(position[0] - field_0x2c[0] - field_0x1f4 / 2, 0));
+        } else {
+            if (field_0x1f0 != 0.0f)
+                field_0x1ec_float = (float)UnknownMinInt(height - field_0x1f8,
+                                                       UnknownMaxInt(position[1] - field_0x2c[1], 0));
+            else
+                field_0x1ec_float = (float)UnknownMinInt(height - field_0x1f8,
+                                                       UnknownMaxInt(position[1] - field_0x2c[1] - field_0x1f8 / 2, 0));
+        }
+        if (field_0x1f0)
+            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
+        if (!field_0x208) {
+            event.field_0x08 = 0xf;
+            event.field_0x00 = field_0x74;
+            event.field_0x04 = field_0x220_list->UnknownFunction470df0();
+            event.field_0x0c = field_0xb8;
+            event.field_0x10 = field_0xbc;
+            event.field_0x14 = this;
+            field_0xb8->UnknownVirtualSlot29(&event);
+            field_0x208 = 1;
+        }
+        if (!event.field_0x20) {
+            if (position[0] == field_0x20c_value && position[1] == field_0x210_value) {
+                field_0x218_float += field_0xb8->field_0x9c0;
+                if (field_0x218_float < field_0x214_float)
+                    goto scroll;
+                event.field_0x08 = 0x11;
+                event.field_0x00 = field_0x74;
+                event.field_0x04 = field_0x220_list->UnknownFunction470df0();
+                event.field_0x0c = field_0xb8;
+                event.field_0x10 = field_0xbc;
+                event.field_0x14 = this;
+                field_0xb8->UnknownVirtualSlot29(&event);
+            } else {
+                event.field_0x08 = 3;
+                event.field_0x00 = field_0x74;
+                event.field_0x04 = field_0x220_list->UnknownFunction470df0();
+                event.field_0x0c = field_0xb8;
+                event.field_0x10 = field_0xbc;
+                event.field_0x14 = this;
+                field_0xb8->UnknownVirtualSlot29(&event);
+                field_0x20c_value = position[0];
+                field_0x210_value = position[1];
+                field_0x218_float = 0.0f;
+            }
+            if (!event.field_0x20) {
+            scroll:
+                UnknownGameUiControl* list = field_0x220_list->field_0x1fc;
+                if (list) {
+                    int rows = list->field_0x1ec - list->field_0x204;
+                    list->UnknownFunction476860(UnknownFunction475300(rows), 0);
+                }
+            }
+        }
+    }
+}
+
+// 0x00478570: draws the state's image, then its text.
+int UIMultiState::UnknownVirtualSlot40() {
+    int frames = -1;
+    int redraw = field_0x1bc;
+    CameraRect rect;
+    if (field_0x1f4_states && field_0x1cc) {
+        TextureMap* texture = field_0x1cc;
+        rect = *(CameraRect*)field_0x2c;
+        if (field_0xa4) {
+            rect.right = (int)(texture->field_0x14 * field_0xb8->field_0x9c4) + rect.left;
+            rect.bottom = (int)(texture->field_0x18 * field_0xb8->field_0x9c8) + rect.top;
+        }
+        if (field_0xb8->field_0x110) {
+            field_0xb8->field_0x110->UnknownFunction404480((PCTextureMap*)texture, &rect, 0,
+                                                           texture->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           field_0x1b8, field_0x1c0, &field_0x1bc, 0);
+            frames = field_0x1bc;
+        } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, texture, 0,
+                                                                     texture->field_0x30 ? 0x1008000 : 0x1000000)) {
+            return 0;
+        }
+    }
+    if ((field_0x1f4_states && field_0x1f4_states[field_0x1f0].field_0x08 && field_0x1f4_states[field_0x1f0].field_0x0c) ||
+        (field_0xa4 && field_0xc0 && field_0xd0)) {
+        void* dc;
+        int more;
+        field_0x1bc = redraw;
+        do {
+            if (field_0xb8->UnknownFunction46ed70(&dc, (CameraRect*)field_0x2c, &more, this)) {
+                if (field_0xa4) {
+                    rect = *(CameraRect*)field_0x2c;
+                    rect.left += field_0x1f4_states[field_0x1f0].field_0x00->UnknownFunction472f80()->field_0x0c +
+                                 field_0xe8;
+                    rect.right -= field_0xe8;
+                    rect.top += field_0xec;
+                    rect.bottom -= field_0xec;
+                    field_0xb8->UnknownFunction46f550(dc, &rect, field_0xc0, field_0xd0, field_0xc4, field_0x160,
+                                                      (UnknownGameUiTextRun*)field_0xe4, field_0xd4, field_0xc8,
+                                                      0x11, 1, 0);
+                } else {
+                    field_0xb8->UnknownFunction46f6c0(dc, this, 1);
+                }
+                field_0xb8->UnknownFunction46eeb0(dc);
+            }
+        } while (more);
+        if (frames >= 0)
+            field_0x1bc = frames;
+    }
+    return 1;
+}
+
+// 0x0047a400: names the parts after the list ("<name>_BUT", "_LB", "_SB",
+// "_LBK", "_SBK", "_TBK") and lays them out below and beside the text.
+void UIDropDownList::UnknownFunction47a400() {
+    int left = field_0x2c[0];
+    CameraRect full;
+    full.left = 0;
+    full.top = 0;
+    full.right = field_0x2c[2] - left;
+    int top = field_0x2c[1];
+    full.bottom = field_0x2c[3] - top;
+    CameraRect button;
+    UIAnim* image = field_0x1ec_control->field_0x16c[0];
+    if (image) {
+        button = full;
+        button.left = full.right + 1;
+        button.right = image->field_0x28[0]->field_0x0c + button.left;
+    } else {
+        button.left = 0;
+        button.top = 0;
+        button.right = 0;
+        button.bottom = 0;
+    }
+    CameraRect list = full;
+    list.top = full.bottom + 1;
+    list.bottom = field_0x204 + list.top;
+    CameraRect scroll = list;
+    scroll.top += 2;
+    scroll.bottom -= 2;
+    scroll.left = button.left;
+    scroll.right = button.right;
+    CameraRect* area = (CameraRect*)&field_0x20c;
+    char name[50];
+    area->left = left;
+    area->top = top;
+    area->right = left + scroll.right;
+    area->bottom = top + scroll.bottom;
+    sprintf(name, "%s_BUT", UnknownFunction470df0());
+    field_0x1ec_control->UnknownFunction470dc0(name);
+    *(CameraRect*)field_0x1ec_control->field_0x2c = button;
+    *(CameraRect*)field_0x1ec_control->field_0x3c = *(CameraRect*)field_0x1ec_control->field_0x2c;
+    if (!button.left)
+        field_0x1ec_control->UnknownVirtualSlot4();
+    sprintf(name, "%s_LB", UnknownFunction470df0());
+    field_0x1fc->UnknownFunction470dc0(name);
+    *(CameraRect*)field_0x1fc->field_0x2c = list;
+    *(CameraRect*)field_0x1fc->field_0x3c = *(CameraRect*)field_0x1fc->field_0x2c;
+    sprintf(name, "%s_SB", UnknownFunction470df0());
+    field_0x200_control->UnknownFunction470dc0(name);
+    *(CameraRect*)field_0x200_control->field_0x2c = scroll;
+    *(CameraRect*)field_0x200_control->field_0x3c = *(CameraRect*)field_0x200_control->field_0x2c;
+    sprintf(name, "%s_LBK", UnknownFunction470df0());
+    field_0x1f0_control->UnknownFunction470dc0(name);
+    *(CameraRect*)field_0x1f0_control->field_0x2c = list;
+    *(CameraRect*)field_0x1f0_control->field_0x3c = *(CameraRect*)field_0x1f0_control->field_0x2c;
+    sprintf(name, "%s_SBK", UnknownFunction470df0());
+    field_0x1f4_control->UnknownFunction470dc0(name);
+    *(CameraRect*)field_0x1f4_control->field_0x2c = scroll;
+    *(CameraRect*)field_0x1f4_control->field_0x3c = *(CameraRect*)field_0x1f4_control->field_0x2c;
+    sprintf(name, "%s_TBK", UnknownFunction470df0());
+    field_0x1f8_control->UnknownFunction470dc0(name);
+    *(CameraRect*)field_0x1f8_control->field_0x2c = full;
+    *(CameraRect*)field_0x1f8_control->field_0x3c = *(CameraRect*)field_0x1f8_control->field_0x2c;
+    field_0x1fc->field_0xe8 = field_0xe8;
+    field_0x1fc->field_0xec = field_0xec;
+    field_0x1fc->UnknownFunction476c70(field_0xc4, -1);
+    if (field_0xc4 != 0xffffff)
+        field_0x1fc->UnknownFunction476b80(0xffffff);
+    field_0x1fc->UnknownFunction470d80(field_0xc8);
+}
+
+// 0x00479ea0
+UIDropDownList::UIDropDownList(int id, CameraRect* area, UnknownGameUiDialog* owner, const char* text,
+                               unsigned int color)
+    : UIStaticText(id, area, owner, text, color) {
+    UnknownFunction469ce0(this);
+    CameraRect rect;
+    field_0x5c = 6;
+    field_0x204 = 0x14;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = 10;
+    rect.bottom = 10;
+    field_0x1ec_control = new(__FILE__, 0x24e3) UIDDLButton(0, &rect, owner, this);
+    field_0x1fc = new(__FILE__, 0x24e4) UIDDLListBox(0, &rect, owner, 100, this);
+    field_0x200_control = new(__FILE__, 0x24e5) UIDDLScrollBar(7, 0, &rect, owner, this);
+    field_0x1f0_control = new(__FILE__, 0x24e6) UIDDLStatic(0, &rect, owner, this);
+    field_0x1f4_control = new(__FILE__, 0x24e7) UIDDLStatic(0, &rect, owner, this);
+    field_0x1f8_control = new(__FILE__, 0x24e8) UIDDLStatic(0, &rect, owner, this);
+    field_0x1f0_control->UnknownFunction470830(this, 1);
+    field_0x1f4_control->UnknownFunction470830(this, 1);
+    field_0x1f8_control->UnknownFunction470830(this, 1);
+    field_0x1ec_control->UnknownFunction470830(this, 1);
+    field_0x1fc->UnknownFunction470830(this, 1);
+    field_0x200_control->UnknownFunction470830(this, 1);
+    field_0x1fc->UnknownVirtualSlot52(0x4d43);
+    field_0x200_control->UnknownVirtualSlot52(0x4d43);
+    UnknownFunction469190(field_0x1ec_control, -1);
+    UnknownFunction469190(field_0x1f8_control, -1);
+    field_0x208 = 0;
+    UnknownFunction47a2d0(0);
+    owner->UnknownFunction46a840(field_0x1ec_control, 0, 0);
+    owner->UnknownFunction46a840(field_0x1fc, 0, 0);
+    owner->UnknownFunction46a840(field_0x200_control, 0, 0);
+    owner->UnknownFunction46a840(field_0x1f0_control, 0, 0);
+    owner->UnknownFunction46a840(field_0x1f8_control, 0, 0);
+    owner->UnknownFunction46a840(field_0x1f4_control, 0, 0);
 }

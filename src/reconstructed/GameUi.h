@@ -395,10 +395,23 @@ public:
         int field_0x200;
         UnknownGameUiControl* field_0x200_control;
     };
-    int field_0x204;
-    int field_0x208;
-    void* field_0x20c;                        // a brush (HBRUSH)
-    void* field_0x210;
+    union {
+        int field_0x204;
+        UIAnim* field_0x204_image;            // a scroll bar's track image
+        Sound* field_0x204_sound;             // an edit box's key click
+    };
+    union {
+        int field_0x208;
+        Sound* field_0x208_sound;             // an edit box's "full" sound
+    };
+    union {
+        void* field_0x20c;                    // a brush (HBRUSH)
+        int field_0x20c_value;                // a scroll bar's last drag position (x)
+    };
+    union {
+        void* field_0x210;
+        int field_0x210_value;                // (y)
+    };
     union {
         UnknownGameUiListRow* field_0x214;    // a list box's rows (OptionProcs.cpp)
         float field_0x214_float;
@@ -406,6 +419,7 @@ public:
     union {
         int field_0x218;
         UnknownGameUiControl* field_0x218_control;
+        float field_0x218_float;              // a scroll bar's time held at one position
     };
     int field_0x21c;                          // set on the SldEQ sliders (OptionProcs.cpp)
     union {
@@ -503,6 +517,8 @@ class UIListBox : public UnknownGameUiControl {
 public:
     UIListBox(int id, CameraRect* area, UnknownGameUiDialog* owner, int rows); // 0x00475c70
     virtual ~UIListBox();                     // 0x00475e20 (deleting wrapper 0x00475e00)
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x00476020: joystick selection and the row under the cursor
+    virtual int UnknownVirtualSlot40();       // 0x004761f0: draws the rows
     virtual void UnknownVirtualSlot27();      // 0x00475fa0
     virtual void UnknownVirtualSlot29(int state); // 0x00479220
     virtual void UnknownVirtualSlot50();      // 0x00477ce0
@@ -527,6 +543,8 @@ public:
     UIMultiState(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x004781f0
     virtual ~UIMultiState();                  // 0x00478300 (deleting wrapper 0x004782e0)
     virtual void UnknownVirtualSlot27();      // 0x004784e0
+    virtual int UnknownVirtualSlot28(tagPOINT point, int state); // 0x00478e10: whether `point` is on an opaque pixel
+    virtual int UnknownVirtualSlot40();       // 0x00478570: draws
     virtual void UnknownVirtualSlot29(int state); // 0x00478520
     virtual int UnknownVirtualSlot34();       // 0x00478260
     virtual int UnknownVirtualSlot35();       // 0x00478280
@@ -606,6 +624,8 @@ public:
 // RTTI: UIDropDownList : UIStaticText (vtable 0x00553a58; 0x21c bytes).
 class UIDropDownList : public UIStaticText {
 public:
+    // 0x00479ea0: creates the parts (button, list box, scroll bar and three statics).
+    UIDropDownList(int id, CameraRect* area, UnknownGameUiDialog* owner, const char* text, unsigned int color);
     virtual ~UIDropDownList();                // 0x0047a1f0 (deleting wrapper 0x0047a1d0)
     virtual int UnknownVirtualSlot30();       // 0x00467ae0 (shared body: returns 1)
     virtual void UnknownVirtualSlot33(int value); // 0x0047a7d0
@@ -616,9 +636,11 @@ public:
     virtual int UnknownVirtualSlot62();       // 0x0047a870
 
     void UnknownFunction47a2d0(int open);     // 0x0047a2d0: opens or closes the list
+    void UnknownFunction47a400();             // 0x0047a400: names and lays out the parts
     void UnknownFunction47a880(int height);   // 0x0047a880: lays the parts out for a row height
     void UnknownFunction47a970(UIAnim* image); // 0x0047a970: the static part's image
     void UnknownFunction47aa40(UIAnim* image); // 0x0047aa40: the button's image
+    void UnknownFunction47ab20(UIAnim* image); // 0x0047ab20: the corner image; lays the parts out around it
     int UnknownFunction47a800(UnknownGameUiControl* control); // 0x0047a800: whether `control` is a part
 };
 
