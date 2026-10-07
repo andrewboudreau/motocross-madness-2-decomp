@@ -42,7 +42,7 @@ static int s_UnknownGlobal57ee98;
 DrawableCube::DrawableCube(int flags) : GameObject(flags)
 {
     field_0x2c = 0;
-    field_0x30 = 0;
+    loadPalette = 0;
     field_0x40 = 0;
     memset(s_cellMappings, 0, sizeof(s_cellMappings));
     for (int i = 0; i < 96; i++)
@@ -50,7 +50,7 @@ DrawableCube::DrawableCube(int flags) : GameObject(flags)
 }
 
 // 0x0043d980
-DrawableCube* DrawableCube::UnknownFunction43d980(void* value, UnknownTextureStream* stream,
+DrawableCube* DrawableCube::Load(void* value, UnknownTextureStream* stream,
                                                   UnknownCubeTextureContext* context)
 {
     int offset;
@@ -61,7 +61,7 @@ DrawableCube* DrawableCube::UnknownFunction43d980(void* value, UnknownTextureStr
     int i;
 
     GameObject::UnknownVirtualSlot8(value);
-    field_0x34 = context->field_0x04;
+    textureGroup = context->field_0x04;
     if (!stream)
         goto fail;
     if (stream->field_0x1c)
@@ -78,9 +78,9 @@ DrawableCube* DrawableCube::UnknownFunction43d980(void* value, UnknownTextureStr
         mode = ((UnknownParameterStream*)stream)->UnknownFunction43e9e0();
         if (stream->UnknownFunction461340(offset + start, 0, 1))
             goto fail;
-        if (field_0x30)
-            field_0x30->Release();
-        field_0x30 = new (__FILE__, 0x5f) ColorMapper(stream);
+        if (loadPalette)
+            loadPalette->Release();
+        loadPalette = new (__FILE__, 0x5f) ColorMapper(stream);
         if (stream->UnknownFunction461340(position, 0, 1))
             goto fail;
         ((UnknownParameterStream*)stream)->UnknownFunction43e9b0(mode);
@@ -94,7 +94,7 @@ DrawableCube* DrawableCube::UnknownFunction43d980(void* value, UnknownTextureStr
             goto fail;
         if (field_0x2c)
             field_0x2c->Release();
-        field_0x2c = (new (__FILE__, 0x6d) Cube)->UnknownFunction43d230(stream, 0, field_0x34, start);
+        field_0x2c = (new (__FILE__, 0x6d) Cube)->UnknownFunction43d230(stream, 0, textureGroup, start);
         if (!field_0x2c)
             goto fail;
         if (stream->UnknownFunction461340(position, 0, 1))
@@ -103,8 +103,8 @@ DrawableCube* DrawableCube::UnknownFunction43d980(void* value, UnknownTextureStr
     }
     UnknownFunction43dc60();
     UnknownFunction43e0b0(field_0x2c, context);
-    field_0x30->Release();
-    field_0x30 = 0;
+    loadPalette->Release();
+    loadPalette = 0;
     return this;
 fail:
     Release();
@@ -112,12 +112,12 @@ fail:
 }
 
 // 0x0043e210
-int DrawableCube::UnknownFunction43e210()
+int DrawableCube::RecordTextureUse()
 {
     for (int face = 0; face < 6; face++) {
         for (int i = 0; i < 16; i++) {
-            if (field_0x34 && (field_0x2c->field_0x38[face].field_0xe8 & (1 << i))) {
-                TextureMap* texture = field_0x2c->field_0x38[face].field_0x08[i];
+            if (textureGroup && (field_0x2c->field_0x38[face].visibleCells & (1 << i))) {
+                TextureMap* texture = field_0x2c->field_0x38[face].textures[i];
                 if (texture && (texture->field_0x68 & 1))
                     ((ManagedTexture*)texture)->UnknownFunction510820(7.0f);
             }
@@ -133,8 +133,8 @@ DrawableCube::~DrawableCube()
         DebugFree(s_UnknownGlobal57ee94, __FILE__, 0x192);
     s_UnknownGlobal57ee94 = 0;
     s_UnknownGlobal57ee98 = 0;
-    if (field_0x30)
-        field_0x30->Release();
+    if (loadPalette)
+        loadPalette->Release();
     if (field_0x2c)
         field_0x2c->Release();
 }
@@ -143,7 +143,7 @@ DrawableCube::~DrawableCube()
 int DrawableCube::UnknownVirtualSlot12()
 {
     UnknownFunction43e330();
-    UnknownFunction43e210();
+    RecordTextureUse();
     return 1;
 }
 

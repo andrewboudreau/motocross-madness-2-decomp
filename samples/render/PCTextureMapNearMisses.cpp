@@ -1,7 +1,7 @@
 // Near-miss PCTextureMap candidates, kept out of src/reconstructed until
 // they match. See docs/PCTEXTUREMAP.md.
 //
-// PCTextureMap::UnknownFunction4c7b40 (0x004c7b40, 750 bytes): the table
+// PCTextureMap::CopyRectTo (0x004c7b40, 750 bytes): the table
 // blit (callers around 0x00404750 pass 0x005777c8 or a per-object table).
 // The early BltFast path, both locks, the clipping arithmetic and the
 // shared failure return line up; about half the instructions differ in the
@@ -10,7 +10,7 @@
 // VC6 here swaps left/bottom and the row pointers. Declaration order of the
 // rect locals, row pointers, operand order and indexed loops do not help.
 //
-// PCTextureMap::UnknownFunction4c8550 (0x004c8550, 393 bytes): the level
+// PCTextureMap::WriteLevel (0x004c8550, 393 bytes): the level
 // dump. Everything but the 32-bit buffer size matches (391 of 393 bytes):
 // retail loads the height and multiplies by the width, VC6 here the other
 // way round in every operand order, cast, `<< 2` and sizeof form tried; a
@@ -32,8 +32,8 @@
 // PCTextureMap::UnknownVirtualSlot4 (0x004c69c0, 2031 bytes): the setup.
 // Everything but the non-mip format fallback chain lines up, including
 // the mip chain (same source shape). VC6 cross-jumps the identical
-// UnknownFunction4c68e0 call tails of that chain into the first case
-// (0x115c); retail merges them into the last (0x235) in mirror order, which
+// CreateSystemSurface call tails of that chain into the first case
+// (4444); retail merges them into the last (565) in mirror order, which
 // also changes which blocks interleave their array stores with the pushes.
 // if/else, nested negated ifs, switch, goto-to-label, return/goto mixes,
 // aggregate initializers and an inline helper all keep VC6's order.
@@ -46,13 +46,14 @@
 #include "../../src/reconstructed/TrackGame.h"
 
 #include "../../src/reconstructed/ManagedTexture.h"
+#include "../../src/reconstructed/D3DConstants.h"
 
 // 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`. Without a
 // table this is BltFast; with one, both surfaces are locked and each
 // destination pixel becomes table[source << 8 | destination], clipped to
 // the destination. (16-bit pixels read their destination byte through the
 // pixel value, as retail does.)
-int PCTextureMap::UnknownFunction4c7b40(unsigned long x, unsigned long y, UnknownSurfaceInterface* destination,
+int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, UnknownSurfaceInterface* destination,
                                         UnknownRect* rect, int flags, unsigned char* table) {
     UnknownSurfaceDesc source;
     UnknownSurfaceDesc target;
@@ -111,7 +112,7 @@ failed:
 // 0x004c8550: writes a locked level to C:\temp\<name><nnn>.bmp (8-bit) or
 // .tga (anything else, converted to 32-bit first), taking the first number
 // with no existing file. `name` defaults to "tex".
-void PCTextureMap::UnknownFunction4c8550(UnknownSurfaceDesc* desc, const char* name) {
+void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
     char path[260];
     UnknownBitmapFile bitmap;
     const char* extension = desc->pixelFormat.bitCount == 8 ? ".bmp" : ".tga";
@@ -136,9 +137,9 @@ void PCTextureMap::UnknownFunction4c8550(UnknownSurfaceDesc* desc, const char* n
     } else {
         void* pixels = DebugMalloc(desc->width * desc->height * sizeof(unsigned int), __FILE__, 2149);
         UnknownFunction4d1d20(pixels, desc->surface, desc->width, desc->height, desc->width,
-                              desc->pitch / UnknownFunction511970(field_0x20), 0x22b8, field_0x20, 0, 0, 0x80,
+                              desc->pitch / UnknownFunction511970(field_0x20), 8888, field_0x20, 0, 0, 0x80,
                               0xff00ff);
-        UnknownFunction5127f0(pixels, desc->width, desc->height, 0, path, 32);
+        WriteTga32(pixels, desc->width, desc->height, 0, path, 32);
         DebugFree(pixels, __FILE__, 2154);
     }
 }
@@ -163,7 +164,7 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
         UnknownSurfaceDesc desc;
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        if (!field_0x70->UnknownMethod25(0, &desc, 0x811, 0)) {
+        if (!field_0x70->UnknownMethod25(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0)) {
             int systemMemory = 0;
             int noAlpha = 0;
             if (!(desc.caps[0] & 0x30000000))
@@ -183,7 +184,7 @@ TextureMap* PCTextureMap::UnknownVirtualSlot6() {
                     } else {
                         unsigned int key = field_0x34;
                         unsigned int color;
-                        if (field_0x20 == 0x22b)
+                        if (field_0x20 == 555)
                             color = (key & 0x7c00) << 9 | (key & 0x3e0) << 6 | (key & 0x1f) << 3;
                         else
                             color = (key & 0xf800) << 8 | (key & 0x7e0) << 5 | (key & 0x1f) << 3;
@@ -247,7 +248,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 desc.caps[0] = 0x1000;
                 if (!(flags & 8) && !g_UnknownGlobal56e26c->field_0x2d0 &&
                     !(g_UnknownGlobal56e26c->field_0x2d5_bit2) &&
-                    (field_0x20 == 0x22b || field_0x20 == 0x235)) {
+                    (field_0x20 == 555 || field_0x20 == 565)) {
                     shared = 1;
                     if (g_UnknownSharedSurfaces68a394[field_0x24]) {
                         field_0x70 = g_UnknownSharedSurfaces68a394[field_0x24];
@@ -260,39 +261,39 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 }
             }
             if (!field_0x70) {
-                if (field_0x20 == 0x115c) {
+                if (field_0x20 == 4444) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x613;
-                    formats[2] = 0x22b;
-                    formats[3] = 0x235;
+                    formats[1] = 1555;
+                    formats[2] = 555;
+                    formats[3] = 565;
                     formats[4] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 0x613) {
+                } else if (field_0x20 == 1555) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x22b;
-                    formats[2] = 0x235;
+                    formats[1] = 555;
+                    formats[2] = 565;
                     formats[3] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
                 } else if (field_0x20 == 8) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x22b;
-                    formats[2] = 0x235;
+                    formats[1] = 555;
+                    formats[2] = 565;
                     formats[3] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 0x22b) {
+                } else if (field_0x20 == 555) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x235;
+                    formats[1] = 565;
                     formats[2] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 0x235) {
+                } else if (field_0x20 == 565) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x22b;
+                    formats[1] = 555;
                     formats[2] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
                 } else if (g_UnknownGlobal56e26c->field_0x0c->field_0x190->UnknownMethod6(&desc, &field_0x70, 0)) {
                     goto failed;
@@ -316,8 +317,8 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
             field_0x24++;
         }
         if (bits && sourceFormat != field_0x20 &&
-            (!checkMemory || UnknownFunction511970(0x235) > UnknownFunction511970(sourceFormat)) &&
-            !field_0x10->UnknownFunction511370(UnknownFunction511970(0x235) * width * height))
+            (!checkMemory || UnknownFunction511970(565) > UnknownFunction511970(sourceFormat)) &&
+            !field_0x10->UnknownFunction511370(UnknownFunction511970(565) * width * height))
             return 0;
         if (!field_0x70) {
             memset(&desc, 0, sizeof(desc));
@@ -334,7 +335,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 desc.caps[0] = 0x401008;
                 if (!(flags & 8) && !g_UnknownGlobal56e26c->field_0x2d0 &&
                     !(g_UnknownGlobal56e26c->field_0x2d5_bit2) &&
-                    (field_0x20 == 0x22b || field_0x20 == 0x235)) {
+                    (field_0x20 == 555 || field_0x20 == 565)) {
                     shared = 1;
                     if (g_UnknownSharedMipSurfaces68a36c[field_0x24]) {
                         field_0x70 = g_UnknownSharedMipSurfaces68a36c[field_0x24];
@@ -347,39 +348,39 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
                 }
             }
             if (!field_0x70) {
-                if (field_0x20 == 0x115c) {
+                if (field_0x20 == 4444) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x613;
-                    formats[2] = 0x22b;
-                    formats[3] = 0x235;
+                    formats[1] = 1555;
+                    formats[2] = 555;
+                    formats[3] = 565;
                     formats[4] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 0x613) {
+                } else if (field_0x20 == 1555) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x22b;
-                    formats[2] = 0x235;
+                    formats[1] = 555;
+                    formats[2] = 565;
                     formats[3] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
                 } else if (field_0x20 == 8) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x22b;
-                    formats[2] = 0x235;
+                    formats[1] = 555;
+                    formats[2] = 565;
                     formats[3] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 0x22b) {
+                } else if (field_0x20 == 555) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x235;
+                    formats[1] = 565;
                     formats[2] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
-                } else if (field_0x20 == 0x235) {
+                } else if (field_0x20 == 565) {
                     formats[0] = field_0x20;
-                    formats[1] = 0x22b;
+                    formats[1] = 555;
                     formats[2] = 0;
-                    if (!UnknownFunction4c68e0(&desc, flags, formats))
+                    if (!CreateSystemSurface(&desc, flags, formats))
                         goto failed;
                 }
             }
@@ -396,7 +397,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
     if (bits) {
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        if (field_0x70->UnknownMethod25(0, &desc, 0x801, 0))
+        if (field_0x70->UnknownMethod25(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
             goto failed;
         void* destination = desc.surface;
         int bytesPerPixel = UnknownFunction511970(field_0x20);
@@ -411,7 +412,7 @@ int PCTextureMap::UnknownVirtualSlot4(void* bits, int width, int height, int str
             goto failed;
     }
     if (g_UnknownGlobal689968)
-        UnknownFunction4c84e0(field_0x70, 0);
+        DumpLevel(field_0x70, 0);
     if (UnknownFunction511ad0(format) & !UnknownFunction511ad0(field_0x20)) {
         UnknownVirtualSlot18(0xff00ff);
         return 1;

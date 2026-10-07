@@ -93,7 +93,7 @@ type, member and function names are provisional.
   `0x004de580`. In `0x004ebfc0` VC6 cross-jumps the "found" and "default"
   report calls when both call the same function; retail keeps them apart,
   as calls to two folded functions would.
-- `Scene::UnknownFunction4f1130` now takes (counts, width, hasCube,
+- `Scene::CountTextures` (0x004f1130) now takes (counts, width, hasCube,
   ecosystem); `0x004e9ac0` casts the arguments TrackGame.h declares.
 
 ## Shared changes
@@ -208,3 +208,28 @@ make vc6-gate VC6_ROOT="$VC6_ROOT"
 PYTHONPATH=. python tools/run_calibration.py --compiler vc6 \
     --vc6-root "$VC6_ROOT" --profile vc6_o2_mt
 ```
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x004e9980` `FindKeyword`
+- `0x004eb160` `ReadVector`
+- `0x004eb300` `ReadColor`
+- `0x004eb480` `ReadFlags`
+- `0x004eb570` `ReadLight`
+- `0x004ebdb0` `ReadFog`
+- `0x004ebfc0` `ReadEnvironment`
+- `0x004eca20` `OpenResourceFiles`
+- `0x004ecc10` `ReadStadium`
+- `0x004ecd60` `ReadStaticModels`
+- `0x004edfe0` `ReadAnimations`
+- `0x004ef4c0` `ReadSounds`
+- `0x004ef9c0` `ReadSoundSettings`
+- `0x004f00e0` `CountTexture`
+- `0x004f0310` `AddResource`
+- `0x004f0390` `CountModelTextures`
+- `0x004f0d20` `CountObjects`
+- `0x004f1130` `CountTextures`

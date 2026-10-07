@@ -99,39 +99,39 @@ int g_UnknownGlobal65b60c;                    // frames of the zoom (slot 41)
 // 0x0046e8c0
 void UnknownGameUiDialog::UnknownVirtualSlot28(int value) {
     UnknownDialogEvent event;
-    event.field_0x20 = 0;
-    event.field_0x10 = field_0x30;
-    event.field_0x00 = 0;
-    event.field_0x04 = 0;
-    event.field_0x14 = 0;
+    event.handled = 0;
+    event.gui = guiManager;
+    event.code = 0;
+    event.controlName = 0;
+    event.control = 0;
     event.field_0x18 = value;
-    event.field_0x08 = 5;
-    event.field_0x0c = this;
+    event.kind = kDialogInit;
+    event.dialog = this;
     UnknownVirtualSlot29(&event);
 }
 
 // 0x0046ea80
-void UIDialog::UnknownFunction46ea80(int id, int value) {
-    GameObjectIterator iterator(((UnknownGameUiDialog*)this)->field_0x7f3c, 1, "UIControl");
+void UIDialog::EnableGroup(int id, int value) {
+    GameObjectIterator iterator(((UnknownGameUiDialog*)this)->controlContainer, 1, "UIControl");
     UnknownGameUiControl* control;
     while ((control = (UnknownGameUiControl*)iterator.Next()) != 0) {
-        if (control->field_0x78 == id)
+        if (control->groupId == id)
             control->UnknownVirtualSlot49(value);
     }
 }
 
 // 0x0046ff70
-void UIDialog::UnknownFunction46ff70(int a, int b) {
-    UnknownGameUiDialog* parent = ((UnknownGameUiDialog*)this)->field_0x2c;
+void UIDialog::NotifyParent(int a, int b) {
+    UnknownGameUiDialog* parent = ((UnknownGameUiDialog*)this)->parentDialog;
     if (parent) {
         UnknownDialogEvent event;
-        event.field_0x08 = b;
-        event.field_0x20 = 0;
-        event.field_0x00 = a;
-        event.field_0x04 = 0;
-        event.field_0x0c = parent;
-        event.field_0x14 = (UnknownGameUiControl*)this;
-        event.field_0x10 = parent->field_0x30;
+        event.kind = b;
+        event.handled = 0;
+        event.code = a;
+        event.controlName = 0;
+        event.dialog = parent;
+        event.control = (UnknownGameUiControl*)this;
+        event.gui = parent->guiManager;
         parent->UnknownVirtualSlot29(&event);
     }
 }
@@ -140,8 +140,8 @@ void UIDialog::UnknownFunction46ff70(int a, int b) {
 UnknownGameUiControl::UnknownGameUiControl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner)
     : GameObject(1) {
     UnknownFunction469ce0(this);
-    field_0x5c = type;
-    field_0x74 = id;
+    controlType = type;
+    eventCode = id;
     if (area) {
         *(CameraRect*)field_0x2c = *area;
         *(CameraRect*)field_0x3c = *area;
@@ -149,143 +149,143 @@ UnknownGameUiControl::UnknownGameUiControl(int type, int id, CameraRect* area, U
         field_0x3c[0] = field_0x3c[1] = field_0x3c[2] = field_0x3c[3] = 0;
         *(CameraRect*)field_0x2c = *(CameraRect*)field_0x3c;
     }
-    field_0x64 = 0;
-    field_0x60 = 0;
+    savedState = 0;
+    currentState = 0;
     field_0x68 = 0;
-    field_0x6c = 1;
+    enabled = 1;
     field_0x70 = 1;
-    field_0x78 = 0;
-    field_0x7c = 0;
-    field_0xb8 = owner;
-    field_0xbc = owner ? owner->field_0x30 : 0;
-    field_0x18c = 0;
-    field_0x190 = 0;
-    field_0xa0 = 0;
-    field_0xa4 = 0;
-    field_0x1b4 = 0;
-    field_0x1b8 = -1;
-    field_0x1bc = 0;
-    field_0xc0 = 0;
-    field_0xf0 = 0;
-    field_0xc4 = 0xffff;
-    field_0xcc = 0xffff;
-    field_0xd4 = 1;
-    field_0xc8 = 0;
-    field_0xd8 = 1;
+    groupId = 0;
+    attachId = 0;
+    ownerDialog = owner;
+    ownerGui = owner ? owner->guiManager : 0;
+    anchorControl = 0;
+    relAnchor = 0;
+    shapeBounds = 0;
+    sourceBlit = 0;
+    boundValue = 0;
+    backgroundRegion = -1;
+    redrawFrames = 0;
+    controlText = 0;
+    toolTipText = 0;
+    textColor = 0xffff;
+    currentTextColor = 0xffff;
+    textDrop = 1;
+    dropColor = 0;
+    textAlign = 1;
     field_0xd0 = 0;
-    field_0xe4 = 0;
-    field_0x1c0 = 1;
-    field_0x168 = 0;
-    field_0x1d8 = 0;
+    textLines = 0;
+    needsRedraw = 1;
+    moveable = 0;
+    keyBind = 0;
     field_0x1c8 = 0;
     field_0x1c4 = 0;
-    field_0x180 = 0;
+    mouseAnim = 0;
     for (int i = 0; i < 5; i++) {
-        field_0x16c[i] = 0;
-        field_0x194[i] = 0;
+        stateImages[i] = 0;
+        sounds[i] = 0;
     }
     field_0x164 = 0;
-    field_0xac = 0;
-    field_0xa8 = 0;
-    field_0x1a8 = 0;
-    field_0x188 = 0;
-    field_0x184 = 0;
-    field_0x1b0 = 0;
-    field_0x1ac = 0;
-    field_0xf4[0] = 0;
-    field_0x12c = 0;
-    field_0x128 = 0;
-    field_0x130[0] = 0;
-    field_0x160 = 0;
-    field_0x158 = 0;
-    field_0x15c = 0;
-    field_0xec = 0;
-    field_0xe8 = 0;
-    field_0x1cc = 0;
+    transitionDelay = 0;
+    transitionTime = 0;
+    slideSound = 0;
+    fxAnimOut = 0;
+    fxAnimIn = 0;
+    fxSoundOut = 0;
+    fxSoundIn = 0;
+    controlName[0] = 0;
+    ownsFont = 0;
+    fontHandle = 0;
+    fontFace[0] = 0;
+    fontHeight = 0;
+    bold = 0;
+    italic = 0;
+    textTopMargin = 0;
+    textLeftMargin = 0;
+    drawnTexture = 0;
     field_0x1d0 = 0;
     field_0xb4 = 0;
     field_0x1d4 = -1;
     if (owner) {
-        field_0x1dc = owner->field_0x7f18;
+        post3D = owner->field_0x7f18;
         field_0x18 = owner->UnknownInlineField18();
     } else {
-        field_0x1dc = 1;
+        post3D = 1;
     }
-    field_0x1e0 = 0;
+    permanent = 0;
     field_0x1e8 = 0;
 }
 
 // 0x00470450
 UnknownGameUiControl::~UnknownGameUiControl() {
-    if (field_0xb8 && !g_UnknownGlobal56e26c->field_0x2d5_bit1) {
+    if (ownerDialog && !g_UnknownGlobal56e26c->field_0x2d5_bit1) {
         field_0x25_bit3 = 1;
         ToolTip* tip = 0;
-        if (field_0xb8->field_0x34) {
-            if (field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
-                field_0xb8->field_0x34->UnknownFunction487bf0(0);
-                tip = field_0xb8->field_0x34->field_0xc0;
+        if (ownerDialog->guiUser) {
+            if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+                ownerDialog->guiUser->UnknownFunction487bf0(0);
+                tip = ownerDialog->guiUser->userToolTip;
             }
-            if (field_0xb8->field_0x34 && field_0xb8->field_0x34->field_0x1d8 == (UnknownGuiControl*)this) {
-                field_0xb8->UnknownFunction470000(0, 0, 1);
-                tip = field_0xb8->field_0x34->field_0xc0;
+            if (ownerDialog->guiUser && ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
+                ownerDialog->UnknownFunction470000(0, 0, 1);
+                tip = ownerDialog->guiUser->userToolTip;
             }
         }
         if (tip)
-            tip->UnknownFunction486b80(0, 0, 1.0f);
+            tip->ShowText(0, 0, 1.0f);
     }
-    if (field_0x1b8 != -1 && field_0xb8 && field_0xb8->field_0x110)
-        field_0xb8->field_0x110->UnknownFunction404200(field_0x1b8);
-    if (field_0xc0)
-        DebugFree(field_0xc0, __FILE__, 0xba3);
-    if (field_0xf0)
-        DebugFree(field_0xf0, __FILE__, 0xba4);
-    if (field_0x12c)
-        DeleteObject((HGDIOBJ)field_0x128);
-    if (field_0xe4)
-        DebugFree(field_0xe4, __FILE__, 0xba8);
+    if (backgroundRegion != -1 && ownerDialog && ownerDialog->dialogBackground)
+        ownerDialog->dialogBackground->UnknownFunction404200(backgroundRegion);
+    if (controlText)
+        DebugFree(controlText, __FILE__, 0xba3);
+    if (toolTipText)
+        DebugFree(toolTipText, __FILE__, 0xba4);
+    if (ownsFont)
+        DeleteObject((HGDIOBJ)fontHandle);
+    if (textLines)
+        DebugFree(textLines, __FILE__, 0xba8);
     if (field_0x1c4)
         DebugFree(field_0x1c4, __FILE__, 0xba9);
 }
 
 // 0x004705d0
 void UnknownGameUiControl::UnknownVirtualSlot49(int enable) {
-    if (field_0x6c == enable)
+    if (enabled == enable)
         return;
-    field_0x6c = enable;
+    enabled = enable;
     if (enable) {
-        UnknownVirtualSlot29(field_0x64);
-        UnknownFunction470d40(field_0xcc);
+        UnknownVirtualSlot29(savedState);
+        SetFontColor(currentTextColor);
     } else {
-        if (field_0x16c[4]) {
-            field_0x64 = field_0x60;
+        if (stateImages[4]) {
+            savedState = currentState;
             UnknownVirtualSlot29(4);
         }
-        field_0xcc = field_0xc4;
-        UnknownFunction470d40(0x999999);
+        currentTextColor = textColor;
+        SetFontColor(0x999999);
     }
 }
 
 // 0x00470f10
 void UnknownGameUiControl::UnknownVirtualSlot39() {
-    UnknownGameUiDialog* owner = field_0xb8;
+    UnknownGameUiDialog* owner = ownerDialog;
     int left = field_0x3c[0];
-    field_0x2c[0] = (int)(left * owner->field_0x9c4);
+    field_0x2c[0] = (int)(left * owner->scaleX);
     int top = field_0x3c[1];
-    field_0x2c[1] = (int)(top * owner->field_0x9c8);
+    field_0x2c[1] = (int)(top * owner->scaleY);
     int right = field_0x3c[2];
-    field_0x2c[2] = (int)(right * owner->field_0x9c4);
+    field_0x2c[2] = (int)(right * owner->scaleX);
     int bottom = field_0x3c[3];
-    field_0x2c[3] = (int)(bottom * owner->field_0x9c8);
-    if (field_0x18c && field_0x190) {
-        field_0x2c[1] += field_0x18c->field_0x2c[1];
-        field_0x2c[3] += field_0x18c->field_0x2c[1];
-        field_0x2c[0] += field_0x18c->field_0x2c[0];
-        field_0x2c[2] += field_0x18c->field_0x2c[0];
+    field_0x2c[3] = (int)(bottom * owner->scaleY);
+    if (anchorControl && relAnchor) {
+        field_0x2c[1] += anchorControl->field_0x2c[1];
+        field_0x2c[3] += anchorControl->field_0x2c[1];
+        field_0x2c[0] += anchorControl->field_0x2c[0];
+        field_0x2c[2] += anchorControl->field_0x2c[0];
     } else {
-        field_0x2c[1] += owner->field_0x160.top;
-        field_0x2c[3] += owner->field_0x160.top;
-        field_0x2c[0] += owner->field_0x160.left;
-        field_0x2c[2] += owner->field_0x160.left;
+        field_0x2c[1] += owner->screenArea.top;
+        field_0x2c[3] += owner->screenArea.top;
+        field_0x2c[0] += owner->screenArea.left;
+        field_0x2c[2] += owner->screenArea.left;
     }
     field_0x4c[0] = field_0x2c[0] < 0 ? -field_0x2c[0] : 0;
     field_0x4c[1] = field_0x2c[1] < 0 ? -field_0x2c[1] : 0;
@@ -317,9 +317,9 @@ int UnknownGameUiControl::UnknownVirtualSlot41() {
         field_0x94 = ((float)top - field_0x84) / g_UnknownGlobal65b60c;
         field_0x98 = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
         field_0x9c = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
-        if (field_0x1a8) {
-            field_0x1a8->UnknownFunction4bcbe0(field_0xbc->field_0x34c, 0);
-            field_0x1a8->UnknownFunction4bc6b0(1, 0, 0);
+        if (slideSound) {
+            slideSound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
+            slideSound->UnknownFunction4bc6b0(1, 0, 0);
         }
     } else {
         field_0x80 += field_0x90;
@@ -335,18 +335,18 @@ int UnknownGameUiControl::UnknownVirtualSlot41() {
         field_0x2c[1] = (int)field_0x84;
         field_0x2c[2] = (int)(field_0x80 + field_0x88);
         field_0x2c[3] = (int)(field_0x8c + field_0x84);
-        switch (field_0x5c) {
+        switch (controlType) {
         case 1:
         case 2:
         case 4:
         case 5:
         case 9:
         case 10:
-            field_0x1cc = field_0x16c[field_0x60]->UnknownFunction472f90();
+            drawnTexture = stateImages[currentState]->GetCurrentTexture();
             field_0x164++;
             break;
         default:
-            field_0x1cc = 0;
+            drawnTexture = 0;
             return 1;
         }
     }
@@ -355,9 +355,9 @@ int UnknownGameUiControl::UnknownVirtualSlot41() {
 
 // 0x00472130
 int UnknownGameUiControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    GUIInputDevice* device = field_0xb8->field_0x34->UnknownFunction4882a0(event);
+    GUIInputDevice* device = ownerDialog->guiUser->UnknownFunction4882a0(event);
     if (device) {
-        POINT position = device->field_0xa4;
+        POINT position = device->pointerPosition;
         if (event->kind && UnknownVirtualSlot56(event->control, (int*)&position))
             return 1;
     }
@@ -366,57 +366,57 @@ int UnknownGameUiControl::UnknownVirtualSlot22(UnknownControlEvent* event, Unkno
 
 // 0x00472e30
 UIAnim::UIAnim(void* textures, void* palette) {
-    field_0xf0 = textures;
-    field_0x08 = 0;
-    field_0x10 = 0;
-    field_0x14 = 0;
+    animTextures = textures;
+    currentFrame = 0;
+    frameCount = 0;
+    passesLeft = 0;
     field_0x18 = 0;
-    field_0x20 = 0;
-    field_0x0c = 1;
-    field_0x1c = 0;
-    field_0x24 = 0;
-    field_0xf4 = palette;
-    memset(field_0x28, 0, sizeof(field_0x28));
+    lastStepTime = 0;
+    playForwards = 1;
+    frameDelay = 0;
+    playBackwards = 0;
+    animPalette = palette;
+    memset(frameList, 0, sizeof(frameList));
 }
 
 // 0x00472fe0
-UIFrame* UIAnim::UnknownFunction472fe0() {
+UIFrame* UIAnim::Advance() {
     int now = UnknownFunction4bfa80();
     g_UnknownGlobal65b5c8 = now;
-    if (abs(now - field_0x20) > field_0x1c || field_0x28[field_0x08]->field_0x08 == 1) {
-        field_0x20 = now;
-        if (field_0x24) {
-            if (!field_0x0c && field_0x08 > 0)
-                return field_0x28[--field_0x08];
-            field_0x0c = 0;
-            if (field_0x14 == 0x7fff || (field_0x14 && --field_0x18 > 0))
-                return field_0x28[field_0x08 = field_0x10];
+    if (abs(now - lastStepTime) > frameDelay || frameList[currentFrame]->isSound == 1) {
+        lastStepTime = now;
+        if (playBackwards) {
+            if (!playForwards && currentFrame > 0)
+                return frameList[--currentFrame];
+            playForwards = 0;
+            if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
+                return frameList[currentFrame = frameCount];
         } else {
-            if (!field_0x0c && field_0x08 + 1 < field_0x10)
-                return field_0x28[++field_0x08];
-            field_0x0c = 0;
-            if (field_0x14 == 0x7fff || (field_0x14 && --field_0x18 > 0))
-                field_0x08 = 0;
+            if (!playForwards && currentFrame + 1 < frameCount)
+                return frameList[++currentFrame];
+            playForwards = 0;
+            if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
+                currentFrame = 0;
         }
     }
-    return field_0x28[field_0x08];
+    return frameList[currentFrame];
 }
 
 // 0x004733a0
 void UIButton::UnknownVirtualSlot49(int enable) {
-    if (field_0x6c == enable)
+    if (enabled == enable)
         return;
-    field_0x6c = enable;
+    enabled = enable;
     if (enable) {
         UnknownVirtualSlot29(0);
-        UnknownFunction470d40(field_0xcc);
+        SetFontColor(currentTextColor);
     } else {
-        if (field_0x16c[4]) {
-            field_0x64 = field_0x60;
+        if (stateImages[4]) {
+            savedState = currentState;
             UnknownVirtualSlot29(4);
         }
-        field_0xcc = field_0xc4;
-        UnknownFunction470d40(0x999999);
+        currentTextColor = textColor;
+        SetFontColor(0x999999);
     }
 }
 
@@ -424,38 +424,38 @@ void UIButton::UnknownVirtualSlot49(int enable) {
 void UIScrollCtl::UnknownVirtualSlot60(int value) {
     UITimer* timer = (UITimer*)value;
     UnknownDialogEvent event;
-    event.field_0x20 = 0;
+    event.handled = 0;
     GameObjectIterator* iterator;
     UnknownGameUiControl* control;
-    switch (timer->field_0x08) {
+    switch (timer->timerId) {
     case 0x101:
-        field_0xb8->UnknownFunction46fec0(timer);
-        field_0xb8->UnknownFunction46fce0(0x102, 100, (int)this);
+        ownerDialog->RemoveTimer(timer);
+        ownerDialog->AddTimer(0x102, 100, (int)this);
         break;
     case 0x102:
-        switch (field_0x5c) {
+        switch (controlType) {
         case 9:
             iterator = (GameObjectIterator*)UnknownVirtualSlot53();
             for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
-                if (control->field_0x5c == 3)
-                    ((UIListBox*)control)->UnknownFunction477730(-1);
+                if (control->controlType == 3)
+                    ((UIListBox*)control)->ScrollBy(-1);
             }
             goto send;
         case 10:
             iterator = (GameObjectIterator*)UnknownVirtualSlot53();
             for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
-                if (control->field_0x5c == 3)
-                    ((UIListBox*)control)->UnknownFunction477730(1);
+                if (control->controlType == 3)
+                    ((UIListBox*)control)->ScrollBy(1);
             }
         send:
             UnknownFunction472730(iterator);
-            event.field_0x08 = 0xe;
-            event.field_0x00 = field_0x74;
-            event.field_0x04 = UnknownFunction470df0();
-            event.field_0x0c = field_0xb8;
-            event.field_0x10 = field_0xbc;
-            event.field_0x14 = this;
-            field_0xb8->UnknownVirtualSlot29(&event);
+            event.kind = 0xe;
+            event.code = eventCode;
+            event.controlName = GetName();
+            event.dialog = ownerDialog;
+            event.gui = ownerGui;
+            event.control = this;
+            ownerDialog->UnknownVirtualSlot29(&event);
             break;
         }
         break;
@@ -472,7 +472,7 @@ int UIScrollBar::UnknownFunction4753c0(int value, int range) {
         field_0x1ec_float = position;
         return 1;
     }
-    unsigned int travel = field_0x5c == 8 ? UnknownVirtualSlot61() - field_0x1f4 : UnknownVirtualSlot62() - field_0x1f8;
+    unsigned int travel = controlType == 8 ? UnknownVirtualSlot61() - thumbWidth : UnknownVirtualSlot62() - thumbHeight;
     if ((unsigned int)range > 0) {
         float scaled = (double)(travel * position) / (unsigned int)range;
         field_0x1ec_float = scaled < travel ? scaled : travel;
@@ -484,60 +484,60 @@ int UIScrollBar::UnknownFunction4753c0(int value, int range) {
 // 0x00475c70
 UIListBox::UIListBox(int id, int rows, CameraRect* area, UnknownGameUiDialog* owner)
     : UnknownGameUiControl(3, id, area, owner) {
-    field_0x210 = 0;
-    field_0x20c = 0;
-    field_0x1ec = 0;
-    field_0x1f4 = 0;
-    field_0x1f0 = 0;
-    field_0x1fc = rows;
-    field_0x204 = 0;
-    field_0x208 = 0xffffff;
-    field_0x214 = (UnknownGameUiListRow*)DebugMalloc(rows * sizeof(UnknownGameUiListRow), __FILE__, 0x1b50);
+    selectBrush = 0;
+    itemBrush = 0;
+    rowCount = 0;
+    selectedRow = 0;
+    firstVisibleRow = 0;
+    rowCapacity = rows;
+    lastPageRowCount = 0;
+    selectColor = 0xffffff;
+    rowTable = (UnknownGameUiListRow*)DebugMalloc(rows * sizeof(UnknownGameUiListRow), __FILE__, 0x1b50);
     field_0x24c = UnknownFunction477b60;
     field_0x218 = (int)this;
-    field_0x21c = 0;
+    autoSort = 0;
     field_0x220 = 0;
-    field_0x224 = 1;
-    field_0x228 = 1;
+    selectable = 1;
+    allowWScroll = 1;
     field_0x234 = 0;
     field_0x230 = 0;
     field_0x22c = 0;
-    field_0x23c = 0;
+    lastClickTime = 0;
     field_0x240 = 0;
-    field_0x1ec = 0;
-    field_0x1f0 = 0;
-    field_0x204 = 0;
-    memset(field_0x214, 0, field_0x1fc * sizeof(UnknownGameUiListRow));
+    rowCount = 0;
+    firstVisibleRow = 0;
+    lastPageRowCount = 0;
+    memset(rowTable, 0, rowCapacity * sizeof(UnknownGameUiListRow));
     field_0x244 = 1;
-    int height = field_0x160;
-    if (!height && (!field_0xb8 || !field_0xb8->field_0xdc)) {
-        field_0x200 = 1;
+    int height = fontHeight;
+    if (!height && (!ownerDialog || !ownerDialog->dialogFontHeight)) {
+        visibleRowCount = 1;
     } else {
-        int rowsShown = (field_0x2c[3] - field_0x2c[1]) / (height ? height : field_0xb8->field_0xdc);
-        field_0x200 = rowsShown < 1 ? 1 : rowsShown;
+        int rowsShown = (field_0x2c[3] - field_0x2c[1]) / (height ? height : ownerDialog->dialogFontHeight);
+        visibleRowCount = rowsShown < 1 ? 1 : rowsShown;
     }
 }
 
 // 0x00477110
-int UIListBox::UnknownFunction477110(const char* file, int data, int a, int b) {
-    if (field_0x1ec >= field_0x1fc && !UnknownFunction476f50(field_0x1ec + 1))
+int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
+    if (rowCount >= rowCapacity && !UnknownFunction476f50(rowCount + 1))
         return 0;
     UnknownGameUiListRow row;
     if (a) {
         UnknownTextureStream* stream =
             new(__FILE__, 0x1e20) UnknownTextureStream((int)g_UnknownResourceManager572b44);
         if (stream->UnknownFunction460f50(file, "r", 0)) {
-            row.field_0x00 = 2;
-            row.field_0x14 = 0;
-            row.field_0x18 = 0;
-            row.field_0x24 = 0;
-            UIAnim* image = new(__FILE__, 0x1e27) UIAnim(field_0xb8->field_0x7f20, 0);
-            row.field_0x20 = image;
-            image->UnknownFunction4730e0(file, 0);
-            UIFrame* frame = image->field_0x28[0];
-            row.field_0x04 = b;
-            row.field_0x08 = frame->field_0x0c;
-            row.field_0x0c = frame->field_0x10;
+            row.kind = 2;
+            row.text = 0;
+            row.imageFile = 0;
+            row.textLines = 0;
+            UIAnim* image = new(__FILE__, 0x1e27) UIAnim(ownerDialog->dialogTextures, 0);
+            row.image = image;
+            image->LoadFile(file, 0);
+            UIFrame* frame = image->frameList[0];
+            row.flags = b;
+            row.width = frame->frameWidth;
+            row.height = frame->frameHeight;
             row.field_0x30 = 0;
             delete stream;
         } else {
@@ -545,132 +545,132 @@ int UIListBox::UnknownFunction477110(const char* file, int data, int a, int b) {
             return 0;
         }
     } else {
-        row.field_0x00 = 3;
-        row.field_0x14 = 0;
-        row.field_0x20 = 0;
+        row.kind = 3;
+        row.text = 0;
+        row.image = 0;
         char* name = (char*)DebugMalloc(strlen(file) + 1, __FILE__, 0x1e37);
-        row.field_0x04 = b;
-        row.field_0x18 = name;
+        row.flags = b;
+        row.imageFile = name;
         strcpy(name, file);
-        row.field_0x24 = 0;
+        row.textLines = 0;
         row.field_0x30 = 0;
         UnknownTgaFile* header = UnknownFunction511d00(file, 0, (int)g_UnknownResourceManager572b44);
         if (!header)
             return 0;
-        row.field_0x08 = header->width;
-        row.field_0x0c = header->height;
+        row.width = header->width;
+        row.height = header->height;
         UnknownFunction512dd0(header);
     }
-    field_0x214[field_0x1ec] = row;
-    UnknownFunction476930(field_0x1ec, data);
-    field_0x1ec++;
-    field_0x200 = UnknownFunction476ee0();
-    UnknownFunction477bc0();
-    if (field_0x21c)
+    rowTable[rowCount] = row;
+    SetRowData(rowCount, data);
+    rowCount++;
+    visibleRowCount = CountVisibleRows();
+    UpdateScrollBars();
+    if (autoSort)
         UnknownFunction477900(1);
     return 1;
 }
 
 // 0x004773a0
-int UIListBox::UnknownFunction4773a0(UIAnim* image, int data, int a) {
-    if (field_0x1ec >= field_0x1fc && !UnknownFunction476f50(field_0x1ec + 1))
+int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
+    if (rowCount >= rowCapacity && !UnknownFunction476f50(rowCount + 1))
         return 0;
     UnknownGameUiListRow row;
-    row.field_0x00 = 2;
-    row.field_0x14 = 0;
-    row.field_0x20 = image;
+    row.kind = 2;
+    row.text = 0;
+    row.image = image;
     image->AddRef();
-    UIFrame* frame = image->field_0x28[0];
-    row.field_0x04 = a;
-    row.field_0x08 = frame->field_0x0c;
-    row.field_0x0c = frame->field_0x10;
-    row.field_0x18 = 0;
-    row.field_0x24 = 0;
+    UIFrame* frame = image->frameList[0];
+    row.flags = a;
+    row.width = frame->frameWidth;
+    row.height = frame->frameHeight;
+    row.imageFile = 0;
+    row.textLines = 0;
     row.field_0x30 = 0;
-    field_0x214[field_0x1ec] = row;
-    UnknownFunction476930(field_0x1ec, data);
-    field_0x1ec++;
-    field_0x200 = UnknownFunction476ee0();
-    UnknownFunction477bc0();
-    if (field_0x21c)
+    rowTable[rowCount] = row;
+    SetRowData(rowCount, data);
+    rowCount++;
+    visibleRowCount = CountVisibleRows();
+    UpdateScrollBars();
+    if (autoSort)
         UnknownFunction477900(1);
     return 1;
 }
 
 // 0x00477730
-void UIListBox::UnknownFunction477730(int delta) {
+void UIListBox::ScrollBy(int delta) {
     int handled = 0;
-    int count = field_0x1ec;
+    int count = rowCount;
     if (!count)
         return;
-    int first = field_0x1f0 += delta;
+    int first = firstVisibleRow += delta;
     if (field_0x244) {
         if (first < 0)
-            field_0x1f0 = first + count;
-        int index = field_0x1f0 % count;
+            firstVisibleRow = first + count;
+        int index = firstVisibleRow % count;
         if (index < 0)
             index = -index;
-        field_0x1f0 = index;
+        firstVisibleRow = index;
     } else {
-        int last = count - field_0x200;
+        int last = count - visibleRowCount;
         if (last < first)
             first = last;
-        field_0x1f0 = first < 0 ? 0 : first;
+        firstVisibleRow = first < 0 ? 0 : first;
     }
-    if (field_0x200 == 1) {
-        UnknownVirtualSlot65(field_0x1f0);
+    if (visibleRowCount == 1) {
+        UnknownVirtualSlot65(firstVisibleRow);
         UnknownVirtualSlot66(&handled);
         if (handled)
             return;
     }
     UnknownVirtualSlot50();
-    UnknownFunction477bc0();
+    UpdateScrollBars();
 }
 
 // 0x00477800: the order 0x00477900 sorts by, then the linked lists' orders.
 static int UnknownFunction477800(const void* a, const void* b) {
-    if (!g_UnknownGlobal65b608->field_0x9bc)
+    if (!g_UnknownGlobal65b608->sortingList)
         return 0;
-    int result = g_UnknownGlobal65b608->field_0x9bc->field_0x218_control->field_0x24c(a, b);
+    int result = g_UnknownGlobal65b608->sortingList->field_0x218_control->field_0x24c(a, b);
     if (result)
         return result;
-    int left = ((const UnknownGameUiListRow*)a)->field_0x10;
-    int right = ((const UnknownGameUiListRow*)b)->field_0x10;
+    int left = ((const UnknownGameUiListRow*)a)->sortIndex;
+    int right = ((const UnknownGameUiListRow*)b)->sortIndex;
     GameObjectIterator* iterator =
-        (GameObjectIterator*)g_UnknownGlobal65b608->field_0x9bc->field_0x218_control->UnknownVirtualSlot53();
+        (GameObjectIterator*)g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownVirtualSlot53();
     UIListBox* other;
     while ((other = static_cast<UIListBox*>(
-                g_UnknownGlobal65b608->field_0x9bc->field_0x218_control->UnknownFunction472790(iterator))) != 0) {
-        if (other->field_0x1ec != g_UnknownGlobal65b608->field_0x9bc->field_0x218_control->field_0x1ec) {
+                g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472790(iterator))) != 0) {
+        if (other->rowCount != g_UnknownGlobal65b608->sortingList->field_0x218_control->rowCount) {
             result = -1;
             break;
         }
-        result = other->field_0x24c(&other->field_0x214[left], &other->field_0x214[right]);
+        result = other->field_0x24c(&other->rowTable[left], &other->rowTable[right]);
         if (result)
             break;
     }
-    g_UnknownGlobal65b608->field_0x9bc->field_0x218_control->UnknownFunction472730(iterator);
+    g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472730(iterator);
     return result;
 }
 
 // 0x00477bc0
-void UIListBox::UnknownFunction477bc0() {
-    UnknownGameUiDialog* owner = field_0xb8;
+void UIListBox::UpdateScrollBars() {
+    UnknownGameUiDialog* owner = ownerDialog;
     if (!owner)
         return;
     int height = 0;
-    field_0x204 = 0;
-    for (int i = field_0x1ec - 1; i >= 0; i--) {
-        height += field_0x214[i].field_0x0c;
+    lastPageRowCount = 0;
+    for (int i = rowCount - 1; i >= 0; i--) {
+        height += rowTable[i].height;
         if (height > field_0x2c[3] - field_0x2c[1])
             break;
-        field_0x204++;
+        lastPageRowCount++;
     }
-    field_0x204 = field_0x204 < 0 ? 0 : field_0x204;
-    GameObjectIterator iterator(owner->field_0x7f3c, 1, "UIControl");
+    lastPageRowCount = lastPageRowCount < 0 ? 0 : lastPageRowCount;
+    GameObjectIterator iterator(owner->controlContainer, 1, "UIControl");
     UnknownGameUiControl* control;
     while ((control = (UnknownGameUiControl*)iterator.Next()) != 0) {
-        if (control->field_0x7c == field_0x7c && (control->field_0x5c == 8 || control->field_0x5c == 7))
+        if (control->attachId == attachId && (control->controlType == 8 || control->controlType == 7))
             static_cast<UIScrollBar*>(control)->UnknownFunction475200(this);
     }
     UnknownVirtualSlot50();
@@ -679,25 +679,25 @@ void UIListBox::UnknownFunction477bc0() {
 // 0x00477e90
 int UIListBox::UnknownVirtualSlot55(int a, int b) {
     POINT* point = (POINT*)b;
-    if (field_0xb8->field_0x34->field_0x1d8 == (UnknownGuiControl*)this && point) {
+    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && point) {
         if (a == 0) {
-            if (field_0x224) {
+            if (selectable) {
                 int found = 0;
                 RECT rect = *(RECT*)field_0x2c;
-                for (int row = field_0x1f0; row < field_0x1f0 + field_0x200; row++) {
-                    rect.bottom = rect.top + UnknownFunction4769a0(row);
-                    if (PtInRect(&rect, *point) && !(field_0x214[row].field_0x04 & 1)) {
-                        UnknownFunction476a60(row);
+                for (int row = firstVisibleRow; row < firstVisibleRow + visibleRowCount; row++) {
+                    rect.bottom = rect.top + GetRowHeight(row);
+                    if (PtInRect(&rect, *point) && !(rowTable[row].flags & 1)) {
+                        SelectRow(row);
                         UnknownVirtualSlot66(&found);
                         break;
                     }
                     if (!found)
-                        rect.top += UnknownFunction4769a0(row);
+                        rect.top += GetRowHeight(row);
                 }
                 if (found)
                     return 1;
             }
-        } else if (a == 1 && field_0x228) {
+        } else if (a == 1 && allowWScroll) {
             field_0x22c = point->x;
             return UnknownGameUiControl::UnknownVirtualSlot55(a, b);
         }
@@ -707,7 +707,7 @@ int UIListBox::UnknownVirtualSlot55(int a, int b) {
 
 // 0x00477ff0
 int UIListBox::UnknownVirtualSlot56(int a, int* position) {
-    if ((UnknownGuiControl*)this == field_0xb8->field_0x34->field_0x1d8 && a == 1) {
+    if ((UnknownGuiControl*)this == ownerDialog->guiUser->field_0x1d8 && a == 1) {
         int delta = field_0x234;
         field_0x234 = 0;
         field_0x230 += delta;
@@ -718,47 +718,47 @@ int UIListBox::UnknownVirtualSlot56(int a, int* position) {
 // 0x00478040
 int UIListBox::UnknownVirtualSlot21(int key) {
     if (!UnknownGameUiControl::UnknownVirtualSlot21(key) &&
-        field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this && field_0x224) {
+        ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this && selectable) {
         int row;
         switch (key) {
         case VK_LEFT:
         case VK_UP:
-            if (UnknownFunction476950() <= 0)
+            if (GetSelectedRow() <= 0)
                 return 0;
-            UnknownFunction476a60(UnknownFunction476950() - 1);
+            SelectRow(GetSelectedRow() - 1);
             break;
         case VK_RIGHT:
         case VK_DOWN:
-            if (UnknownFunction476950() >= field_0x1ec - 1)
+            if (GetSelectedRow() >= rowCount - 1)
                 return 0;
-            UnknownFunction476a60(UnknownFunction476950() + 1);
+            SelectRow(GetSelectedRow() + 1);
             break;
         case VK_HOME:
-            if (UnknownFunction476950() <= 0)
+            if (GetSelectedRow() <= 0)
                 return 0;
-            UnknownFunction476a60(0);
+            SelectRow(0);
             break;
         case VK_END:
-            row = field_0x1ec - 1;
-            if (UnknownFunction476950() >= row)
+            row = rowCount - 1;
+            if (GetSelectedRow() >= row)
                 return 0;
-            UnknownFunction476a60(row);
+            SelectRow(row);
             break;
         case VK_PRIOR:
-            row = UnknownFunction476950() - field_0x200;
+            row = GetSelectedRow() - visibleRowCount;
             if (row < 0)
                 row = 0;
-            if (row == UnknownFunction476950())
+            if (row == GetSelectedRow())
                 return 0;
-            UnknownFunction476a60(row);
+            SelectRow(row);
             break;
         case VK_NEXT:
-            row = UnknownFunction476950() + field_0x200;
-            if (row > field_0x1ec - 1)
-                row = field_0x1ec - 1;
-            if (row == UnknownFunction476950())
+            row = GetSelectedRow() + visibleRowCount;
+            if (row > rowCount - 1)
+                row = rowCount - 1;
+            if (row == GetSelectedRow())
                 return 0;
-            UnknownFunction476a60(row);
+            SelectRow(row);
             break;
         default:
             return 0;
@@ -773,25 +773,25 @@ int UIListBox::UnknownVirtualSlot21(int key) {
 // 0x00478810
 TextureMap* UIMultiState::UnknownVirtualSlot48(int state) {
     UIAnim* image;
-    if ((field_0x60 == 4 && (image = field_0x1f4[field_0x1f0].field_0x04) != 0) ||
-        (image = field_0x1f4[field_0x1f0].field_0x00) != 0)
-        return image->UnknownFunction472f90();
+    if ((currentState == 4 && (image = stateTable[selectedState].focusImage) != 0) ||
+        (image = stateTable[selectedState].image) != 0)
+        return image->GetCurrentTexture();
     return 0;
 }
 
 // 0x00479df0
 void UIDDLListBox::UnknownVirtualSlot66(int* handled) {
     UnknownDialogEvent event;
-    event.field_0x20 = 0;
-    field_0x250->UnknownFunction470b20(UnknownFunction476d20(UnknownFunction476950()));
-    field_0x250->UnknownFunction47a2d0(0);
-    event.field_0x08 = 2;
-    event.field_0x00 = field_0x250->field_0x74;
-    event.field_0x04 = field_0x250->UnknownFunction470df0();
-    event.field_0x0c = field_0xb8;
-    event.field_0x14 = this;
-    event.field_0x10 = field_0xb8->field_0x30;
-    field_0xb8->UnknownVirtualSlot29(&event);
+    event.handled = 0;
+    ownerList->SetText(GetRowText(GetSelectedRow()));
+    ownerList->UnknownFunction47a2d0(0);
+    event.kind = kDialogListSelect;
+    event.code = ownerList->eventCode;
+    event.controlName = ownerList->GetName();
+    event.dialog = ownerDialog;
+    event.control = this;
+    event.gui = ownerDialog->guiManager;
+    ownerDialog->UnknownVirtualSlot29(&event);
 }
 
 // ---------------------------------------------------------------------------
@@ -838,15 +838,15 @@ unlock:
 UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) {
     if (_stricmp(file + strlen(file) - 4, ".wav")) {
         int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
-        field_0x1c = 0;
-        field_0x08 = 0;
-        field_0x14 = 0;
+        ownsSound = 0;
+        isSound = 0;
+        frameSound = 0;
         field_0x20 = (int)textures;
         UnknownTgaFile* image = UnknownFunction5125c0(file, 0, (int)g_UnknownResourceManager572b44);
         if (image) {
-            field_0x0c = image->width;
-            field_0x10 = image->height;
-            field_0x18 = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)field_0x20, 1);
+            frameWidth = image->width;
+            frameHeight = image->height;
+            frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)field_0x20, 1);
             ColorMapper* mapper;
             UnknownPaletteInterface* surfacePalette;
             if (palette) {
@@ -856,26 +856,26 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
                 surfacePalette = 0;
                 mapper = 0;
             }
-            field_0x18->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format, (UnknownTexturePalette*)mapper, 4,
                                             surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-            if (UnknownFunction47b490(field_0x18, 0xff00ff))
-                field_0x18->UnknownVirtualSlot18(0xff00ff);
+            if (UnknownFunction47b490(frameTexture, 0xff00ff))
+                frameTexture->UnknownVirtualSlot18(0xff00ff);
         } else {
             char message[100];
-            field_0x18 = 0;
+            frameTexture = 0;
             sprintf(message, "UIFrame(): Warning! Error loading frame: %s\n", file);
         }
         if (image)
             UnknownFunction512dd0(image);
     } else {
-        field_0x14 = new(__FILE__, 0x13b9) Sound((SoundGroup*)a, 1);
-        field_0x14->UnknownFunction4bc320(file, 0, 1, 3, b, -1);
-        field_0x1c = 1;
-        field_0x08 = 1;
-        field_0x0c = 0;
-        field_0x10 = 0;
-        field_0x18 = 0;
+        frameSound = new(__FILE__, 0x13b9) Sound((SoundGroup*)a, 1);
+        frameSound->UnknownFunction4bc320(file, 0, 1, 3, b, -1);
+        ownsSound = 1;
+        isSound = 1;
+        frameWidth = 0;
+        frameHeight = 0;
+        frameTexture = 0;
     }
 }
 
@@ -885,9 +885,9 @@ int UIFrame::UnknownFunction472bc0(void* stream, int offset, void* palette) {
         UnknownTgaFile* image = UnknownFunction511dd0((UnknownTextureStream*)stream, 0, offset);
         if (image) {
             int format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
-            field_0x0c = image->width;
-            field_0x10 = image->height;
-            field_0x18 = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)field_0x20, 1);
+            frameWidth = image->width;
+            frameHeight = image->height;
+            frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)field_0x20, 1);
             ColorMapper* mapper;
             UnknownPaletteInterface* surfacePalette;
             if (palette) {
@@ -897,11 +897,11 @@ int UIFrame::UnknownFunction472bc0(void* stream, int offset, void* palette) {
                 surfacePalette = 0;
                 mapper = 0;
             }
-            field_0x18->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
                                             image->width, 0x22b, format, (UnknownTexturePalette*)mapper, 4,
                                             surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-            if (UnknownFunction47b490(field_0x18, 0xff00ff))
-                field_0x18->UnknownVirtualSlot18(0xff00ff);
+            if (UnknownFunction47b490(frameTexture, 0xff00ff))
+                frameTexture->UnknownVirtualSlot18(0xff00ff);
             UnknownFunction512dd0(image);
             return 1;
         }
@@ -912,84 +912,84 @@ int UIFrame::UnknownFunction472bc0(void* stream, int offset, void* palette) {
 // 0x0046ef00: runs the timers and the joystick focus moves.
 int UIDialog::UnknownVirtualSlot10(float frameTime) {
     UnknownGameUiDialog* dialog = (UnknownGameUiDialog*)this;
-    if (dialog->field_0x9c0 != 0.0f)
-        dialog->field_0x9c0 = frameTime;
+    if (dialog->lastFrameTime != 0.0f)
+        dialog->lastFrameTime = frameTime;
     else
-        dialog->field_0x9c0 = 0.001f;
-    if (dialog->field_0x7f40) {
+        dialog->lastFrameTime = 0.001f;
+    if (dialog->sendFrameEvent) {
         UnknownDialogEvent event;
-        event.field_0x10 = dialog->field_0x30;
-        event.field_0x20 = 0;
-        event.field_0x08 = 0x12;
-        event.field_0x04 = 0;
-        event.field_0x0c = this;
-        event.field_0x14 = 0;
+        event.gui = dialog->guiManager;
+        event.handled = 0;
+        event.kind = kDialogFrame;
+        event.controlName = 0;
+        event.dialog = this;
+        event.control = 0;
         dialog->UnknownVirtualSlot29(&event);
-        dialog->field_0x7f40 = 0;
+        dialog->sendFrameEvent = 0;
     }
-    if (!field_0x25_bit2 && !dialog->field_0x7f50) {
+    if (!field_0x25_bit2 && !dialog->isClosing) {
         UITimer* timer;
-        for (int i = 0; (timer = dialog->field_0x7f24.Get(i)) != 0; i++) {
-            timer->field_0x0c += (int)(frameTime * 1000.0f);
-            if ((unsigned int)timer->field_0x0c >= (unsigned int)timer->field_0x10) {
-                timer->field_0x0c = 0;
+        for (int i = 0; (timer = dialog->timerList.Get(i)) != 0; i++) {
+            timer->elapsedTime += (int)(frameTime * 1000.0f);
+            if ((unsigned int)timer->elapsedTime >= (unsigned int)timer->periodTime) {
+                timer->elapsedTime = 0;
                 UnknownGameUiControl* control;
-                if ((control = timer->field_0x14) != 0) {
+                if ((control = timer->targetControl) != 0) {
                     control->UnknownVirtualSlot60((int)timer);
                 } else {
                     UnknownDialogEvent event;
-                    event.field_0x00 = timer->field_0x08;
-                    event.field_0x10 = dialog->field_0x30;
-                    event.field_0x20 = 0;
-                    event.field_0x08 = 7;
-                    event.field_0x04 = 0;
-                    event.field_0x0c = this;
-                    event.field_0x14 = 0;
+                    event.code = timer->timerId;
+                    event.gui = dialog->guiManager;
+                    event.handled = 0;
+                    event.kind = kDialogTimer;
+                    event.controlName = 0;
+                    event.dialog = this;
+                    event.control = 0;
                     dialog->UnknownVirtualSlot29(&event);
-                    if (event.field_0x20)
+                    if (event.handled)
                         return 1;
                 }
             }
         }
-        GUIUser* user = dialog->field_0x34;
+        GUIUser* user = dialog->guiUser;
         UnknownGameUiControl* focus = (UnknownGameUiControl*)user->field_0x1d8;
-        user->UnknownFunction487fb0(focus && focus->field_0x180 ? (UnknownCursorAnimation*)focus->field_0x180
-                                                                 : dialog->field_0x95c);
+        user->UnknownFunction487fb0(focus && focus->mouseAnim ? (UnknownCursorAnimation*)focus->mouseAnim
+                                                                 : dialog->cursorAnimation);
         GUIInputDevice* device;
         int j = 0;
-        while ((device = dialog->field_0x34->UnknownFunction488310(j++)) != 0) {
-            if (device->field_0xac->deviceKind == 2) {
-                int x = device->field_0xa4.x;
-                int y = device->field_0xa4.y;
+        while ((device = dialog->guiUser->UnknownFunction488310(j++)) != 0) {
+            if (device->inputDevice->deviceKind == 2) {
+                int x = device->pointerPosition.x;
+                int y = device->pointerPosition.y;
                 if (focus) {
                     if (x <= -1) {
-                        if (dialog->field_0x7f1c) {
+                        if (dialog->joystickCentred) {
                             UnknownGameUiControl* next = focus->UnknownFunction4727c0();
-                            dialog->field_0x7f1c = 0;
+                            dialog->joystickCentred = 0;
                             if (next)
                                 UnknownFunction470000(next, 0, 0);
                         }
                     } else if (x >= 1) {
-                        if (dialog->field_0x7f1c) {
+                        if (dialog->joystickCentred) {
                             UnknownGameUiControl* next = focus->UnknownFunction472810();
-                            dialog->field_0x7f1c = 0;
+                            dialog->joystickCentred = 0;
                             if (next)
                                 UnknownFunction470000(next, 0, 0);
                         }
                     } else if (y <= -1) {
-                        if (dialog->field_0x7f1c)
-                            dialog->field_0x7f1c = 0;
+                        if (dialog->joystickCentred)
+                            dialog->joystickCentred = 0;
                     } else if (y >= 1) {
-                        if (dialog->field_0x7f1c)
-                            dialog->field_0x7f1c = 0;
+                        if (dialog->joystickCentred)
+                            dialog->joystickCentred = 0;
                     } else {
-                        dialog->field_0x7f1c = 1;
+                        dialog->joystickCentred = 1;
                     }
                 }
             }
         }
         UnknownFunction46f120();
-        GameObject::UnknownVirtualSlot10(dialog->field_0x9c0);
+        GameObject::UnknownVirtualSlot10(dialog->lastFrameTime);
     }
     return 1;
 }
@@ -1002,8 +1002,8 @@ int UIButton::UnknownVirtualSlot28(POINT point, int state) {
     if (PtInRect(&rect, point)) {
         point.x -= rect.left;
         point.y -= rect.top;
-        int x = (int)(point.x / field_0xb8->field_0x9c4);
-        int y = (int)(point.y / field_0xb8->field_0x9c8);
+        int x = (int)(point.x / ownerDialog->scaleX);
+        int y = (int)(point.y / ownerDialog->scaleY);
         UnknownSurfaceDesc desc;
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
@@ -1032,8 +1032,8 @@ int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
     if (PtInRect(&rect, point)) {
         point.x -= rect.left;
         point.y -= rect.top;
-        int x = (int)(point.x / field_0xb8->field_0x9c4);
-        int y = (int)(point.y / field_0xb8->field_0x9c8);
+        int x = (int)(point.x / ownerDialog->scaleX);
+        int y = (int)(point.y / ownerDialog->scaleY);
         UnknownSurfaceDesc desc;
         desc.size = sizeof(desc);
         PCTextureMap* texture = (PCTextureMap*)UnknownVirtualSlot48(-1);
@@ -1059,85 +1059,85 @@ int UIMultiState::UnknownVirtualSlot28(POINT point, int state) {
 int UIEditBox::UnknownVirtualSlot40() {
     int width = UnknownVirtualSlot61();
     int frames = -1;
-    int redraw = field_0x1bc;
-    if (!field_0xc0)
-        UnknownFunction473da0("");
-    if (field_0x1cc) {
-        if (field_0xb8->field_0x110) {
-            field_0xb8->field_0x110->UnknownFunction404480((PCTextureMap*)field_0x1cc, (CameraRect*)field_0x2c,
+    int redraw = redrawFrames;
+    if (!controlText)
+        SetEditText("");
+    if (drawnTexture) {
+        if (ownerDialog->dialogBackground) {
+            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)drawnTexture, (CameraRect*)field_0x2c,
                                                            field_0x4c,
-                                                           field_0x1cc->field_0x30 ? 0x1008000 : 0x1000000,
-                                                           field_0x1b8, field_0x1c0, &field_0x1bc, 0);
-            frames = field_0x1bc;
-            field_0x1bc = redraw;
+                                                           drawnTexture->field_0x30 ? 0x1008000 : 0x1000000,
+                                                           backgroundRegion, needsRedraw, &redrawFrames, 0);
+            frames = redrawFrames;
+            redrawFrames = redraw;
         } else {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot3(field_0x2c, field_0x1cc, field_0x4c,
-                                                            field_0x1cc->field_0x30 ? 0x1008000 : 0x1000000);
-            field_0x1bc = redraw;
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot3(field_0x2c, drawnTexture, field_0x4c,
+                                                            drawnTexture->field_0x30 ? 0x1008000 : 0x1000000);
+            redrawFrames = redraw;
         }
     } else {
-        field_0x1bc = redraw;
+        redrawFrames = redraw;
     }
     void* dc;
     int more;
     CameraRect rect;
     do {
-        if (field_0xd8 & 1) {
-            int offset = width - field_0x1fc;
+        if (textAlign & 1) {
+            int offset = width - textWidth;
             field_0x200 = offset > 0 ? 0 : offset;
-        } else if (field_0xd8 & 2) {
-            if (UnknownVirtualSlot61() > field_0x1fc)
-                field_0x200 = width / 2 - field_0x1fc / 2;
+        } else if (textAlign & 2) {
+            if (UnknownVirtualSlot61() > textWidth)
+                field_0x200 = width / 2 - textWidth / 2;
             else
-                field_0x200 = width - field_0x1fc;
-        } else if (field_0xd8 & 4) {
-            field_0x200 = width - field_0x1fc;
+                field_0x200 = width - textWidth;
+        } else if (textAlign & 4) {
+            field_0x200 = width - textWidth;
         } else {
-            int offset = width - field_0x1fc;
+            int offset = width - textWidth;
             field_0x200 = offset > 0 ? 0 : offset;
         }
         int x = field_0x2c[0] + field_0x200;
         int y;
-        if (field_0xd8 & 8)
+        if (textAlign & 8)
             y = field_0x2c[1];
-        else if (field_0xd8 & 0x10)
-            y = (field_0x2c[3] - field_0x2c[1]) / 2 - field_0x160 / 2 + field_0x2c[1];
-        else if (field_0xd8 & 0x20)
-            y = field_0x2c[3] - field_0x160;
+        else if (textAlign & 0x10)
+            y = (field_0x2c[3] - field_0x2c[1]) / 2 - fontHeight / 2 + field_0x2c[1];
+        else if (textAlign & 0x20)
+            y = field_0x2c[3] - fontHeight;
         else
             y = field_0x2c[1];
-        rect.left = x + field_0xe8;
-        rect.top = y + field_0xec;
-        rect.right = field_0x2c[2] - field_0xe8;
-        rect.bottom = field_0x2c[3] - field_0xec;
-        if (field_0xb8->UnknownFunction46ed70(&dc, (CameraRect*)field_0x2c, &more, this)) {
+        rect.left = x + textLeftMargin;
+        rect.top = y + textTopMargin;
+        rect.right = field_0x2c[2] - textLeftMargin;
+        rect.bottom = field_0x2c[3] - textTopMargin;
+        if (ownerDialog->BeginControlDraw(&dc, (CameraRect*)field_0x2c, &more, this)) {
             if (field_0xd0)
-                field_0xb8->UnknownFunction46f550(dc, &rect, field_0xc0, field_0xd0, field_0xc4, field_0x160, 0,
-                                                  field_0xd4, field_0xc8, 9, 1, 0);
-            if (!more && field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
-                int caret = rect.left + field_0x1fc;
-                int limit = field_0xb8->field_0x160.left + field_0x2c[0] + width - 1;
+                ownerDialog->DrawAlignedText(dc, &rect, controlText, field_0xd0, textColor, fontHeight, 0,
+                                                  textDrop, dropColor, 9, 1, 0);
+            if (!more && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+                int caret = rect.left + textWidth;
+                int limit = ownerDialog->screenArea.left + field_0x2c[0] + width - 1;
                 if (limit < caret)
                     caret = limit;
                 rect.left = caret;
                 rect.top++;
                 rect.right = caret + 1;
-                int height = field_0x160;
+                int height = fontHeight;
                 if (!height)
-                    height = field_0xb8->field_0xdc;
+                    height = ownerDialog->dialogFontHeight;
                 rect.bottom = rect.top + height + 1;
                 CameraRect* caretRect = (CameraRect*)&field_0x214;
                 *caretRect = rect;
-                if (field_0x20c)
-                    FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)field_0x20c);
+                if (backgroundBrush)
+                    FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)backgroundBrush);
                 else
                     FrameRect((HDC)dc, (RECT*)&rect, (HBRUSH)GetStockObject(WHITE_BRUSH));
             }
-            field_0xb8->UnknownFunction46eeb0(dc);
+            ownerDialog->EndControlDraw(dc);
             if (g_UnknownGlobal56e26c->field_0x0c->field_0x6c &&
-                field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
-                if (field_0xb8 && field_0xb8->field_0x110)
-                    field_0xb8->field_0x110->UnknownFunction404c80();
+                ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+                if (ownerDialog && ownerDialog->dialogBackground)
+                    ownerDialog->dialogBackground->UnknownFunction404c80();
                 HIMC context = ImmGetContext((HWND)g_UnknownGlobal56e26c->field_0x31c);
                 if (ImmGetOpenStatus(context)) {
                     COMPOSITIONFORM composition;
@@ -1152,11 +1152,11 @@ int UIEditBox::UnknownVirtualSlot40() {
         }
     } while (more);
     if (frames >= 0)
-        field_0x1bc = frames;
-    if (field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this)
+        redrawFrames = frames;
+    if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this)
         UnknownVirtualSlot50();
     else
-        field_0x1c0 = 1;
+        needsRedraw = 1;
     return 1;
 }
 
@@ -1167,26 +1167,26 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
     UnknownDialogEvent event;
     char c = (char)value;
     int result = 0;
-    event.field_0x20 = 0;
+    event.handled = 0;
     if (!UnknownGameUiControl::UnknownVirtualSlot20(value) &&
-        field_0xb8->field_0x34->field_0x1d4 == (UnknownGuiControl*)this) {
+        ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
         if (field_0x204_sound) {
-            field_0x204_sound->UnknownFunction4bcbe0(field_0xbc->field_0x34c, 0);
+            field_0x204_sound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
             field_0x204_sound->UnknownFunction4bc6b0(1, 0, 0);
         }
         switch (c) {
         case 8:
-            if (field_0xd0 && field_0x1ec > 0) {
-                char* previous = CharPrevA(field_0xc0, field_0xc0 + field_0x1ec);
+            if (field_0xd0 && textLength > 0) {
+                char* previous = CharPrevA(controlText, controlText + textLength);
                 if (previous) {
                     if (IsDBCSLeadByte(*previous)) {
-                        memmove(previous, field_0xc0 + field_0x1ec, field_0xd0 - field_0x1ec + 1);
+                        memmove(previous, controlText + textLength, field_0xd0 - textLength + 1);
                         field_0xd0 -= 2;
-                        field_0x1ec -= 2;
+                        textLength -= 2;
                     } else {
-                        memmove(previous, field_0xc0 + field_0x1ec, field_0xd0 - field_0x1ec + 1);
+                        memmove(previous, controlText + textLength, field_0xd0 - textLength + 1);
                         field_0xd0--;
-                        field_0x1ec--;
+                        textLength--;
                     }
                 }
             }
@@ -1195,20 +1195,20 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
         case 0x1b:
             break;
         case 0xd:
-            event.field_0x08 = 10;
-            event.field_0x00 = field_0x74;
-            event.field_0x04 = UnknownFunction470df0();
-            event.field_0x0c = field_0xb8;
-            event.field_0x10 = field_0xbc;
-            event.field_0x14 = this;
-            field_0xb8->UnknownVirtualSlot29(&event);
-            if (event.field_0x20)
+            event.kind = kDialogEditDone;
+            event.code = eventCode;
+            event.controlName = GetName();
+            event.dialog = ownerDialog;
+            event.gui = ownerGui;
+            event.control = this;
+            ownerDialog->UnknownVirtualSlot29(&event);
+            if (event.handled)
                 return 1;
             break;
         default: {
             int lead = !field_0x228 && IsDBCSLeadByte(c) ? 1 : 0;
             if (!field_0x228 && !lead) {
-                c = UnknownFunction473fc0(c);
+                c = FilterCharacter(c);
                 if (!c)
                     break;
             }
@@ -1216,47 +1216,47 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
             int room;
             if (lead) {
                 field_0x228 = 1;
-                room = field_0xd0 < field_0x1f0 - 2;
+                room = field_0xd0 < textCapacity - 2;
                 field_0x22c = !room;
             } else if (field_0x22c) {
                 field_0x22c = 0;
                 room = 0;
             } else {
-                room = field_0xd0 < field_0x1f0 - 1;
+                room = field_0xd0 < textCapacity - 1;
             }
             if (room) {
-                memmove(field_0xc0 + field_0x1ec + 1, field_0xc0 + field_0x1ec, field_0xd0 - field_0x1ec + 1);
-                field_0xc0[field_0x1ec] = c;
-                field_0x1ec++;
+                memmove(controlText + textLength + 1, controlText + textLength, field_0xd0 - textLength + 1);
+                controlText[textLength] = c;
+                textLength++;
                 field_0xd0++;
             } else if (field_0x208_sound) {
-                field_0x208_sound->UnknownFunction4bcbe0(field_0xbc->field_0x34c, 0);
+                field_0x208_sound->UnknownFunction4bcbe0(ownerGui->field_0x34c, 0);
                 field_0x208_sound->UnknownFunction4bc6b0(1, 0, 0);
             }
             break;
         }
         }
-        field_0xc0[field_0xd0] = 0;
+        controlText[field_0xd0] = 0;
         void* dc;
-        if (!((PCRenderTarget*)field_0xb8->UnknownInlineField18())->field_0x48->UnknownMethod17(&dc)) {
-            HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(field_0x128 ? field_0x128 : (int)field_0xb8->field_0xd8));
+        if (!((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->UnknownMethod17(&dc)) {
+            HGDIOBJ font = SelectObject((HDC)dc, (HGDIOBJ)(fontHandle ? fontHandle : (int)ownerDialog->dialogFont));
             SIZE size;
-            GetTextExtentPoint32A((HDC)dc, field_0xc0, field_0xd0, &size);
-            field_0xdc[1] = size.cx;
-            GetTextExtentPoint32A((HDC)dc, field_0xc0, field_0x1ec, &size);
-            field_0x1fc = size.cx;
+            GetTextExtentPoint32A((HDC)dc, controlText, field_0xd0, &size);
+            textExtent[1] = size.cx;
+            GetTextExtentPoint32A((HDC)dc, controlText, textLength, &size);
+            textWidth = size.cx;
             SelectObject((HDC)dc, font);
-            ((PCRenderTarget*)field_0xb8->UnknownInlineField18())->field_0x48->UnknownMethod26(dc);
+            ((PCRenderTarget*)ownerDialog->UnknownInlineField18())->field_0x48->UnknownMethod26(dc);
         }
         UnknownVirtualSlot50();
-        field_0x1bc++;
-        event.field_0x08 = 0x13;
-        event.field_0x00 = field_0x74;
-        event.field_0x04 = UnknownFunction470df0();
-        event.field_0x0c = field_0xb8;
-        event.field_0x10 = field_0xbc;
-        event.field_0x14 = this;
-        field_0xb8->UnknownVirtualSlot29(&event);
+        redrawFrames++;
+        event.kind = kDialogEditChange;
+        event.code = eventCode;
+        event.controlName = GetName();
+        event.dialog = ownerDialog;
+        event.gui = ownerGui;
+        event.control = this;
+        ownerDialog->UnknownVirtualSlot29(&event);
         result = 1;
     }
     return result;
@@ -1264,45 +1264,45 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
 
 // 0x00474880: a click scrolls the arrow's lists by a row, then repeats on a timer.
 int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
-    if (field_0xb8->field_0x34->field_0x1d8 == (UnknownGuiControl*)this && !a) {
+    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
         UnknownDialogEvent event;
-        event.field_0x20 = 0;
+        event.handled = 0;
         GameObjectIterator* iterator;
         UnknownGameUiControl* control;
-        if (field_0x5c == 9) {
+        if (controlType == 9) {
             iterator = (GameObjectIterator*)UnknownVirtualSlot53();
             for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
-                if (control->field_0x5c == 3) {
-                    ((UIListBox*)control)->field_0x23c = 0;
-                    ((UIListBox*)control)->UnknownFunction477730(-1);
+                if (control->controlType == 3) {
+                    ((UIListBox*)control)->lastClickTime = 0;
+                    ((UIListBox*)control)->ScrollBy(-1);
                 }
-                if (control->field_0x5c == 6) {
-                    ((UIDropDownList*)control)->field_0x1fc->field_0x23c = 0;
-                    ((UIDropDownList*)control)->field_0x1fc->UnknownFunction477730(-1);
+                if (control->controlType == 6) {
+                    ((UIDropDownList*)control)->listPart->lastClickTime = 0;
+                    ((UIDropDownList*)control)->listPart->ScrollBy(-1);
                 }
             }
         } else {
             iterator = (GameObjectIterator*)UnknownVirtualSlot53();
             for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
-                if (control->field_0x5c == 3) {
-                    ((UIListBox*)control)->field_0x23c = 0;
-                    ((UIListBox*)control)->UnknownFunction477730(1);
+                if (control->controlType == 3) {
+                    ((UIListBox*)control)->lastClickTime = 0;
+                    ((UIListBox*)control)->ScrollBy(1);
                 }
-                if (control->field_0x5c == 6) {
-                    ((UIDropDownList*)control)->field_0x1fc->field_0x23c = 0;
-                    ((UIDropDownList*)control)->field_0x1fc->UnknownFunction477730(1);
+                if (control->controlType == 6) {
+                    ((UIDropDownList*)control)->listPart->lastClickTime = 0;
+                    ((UIDropDownList*)control)->listPart->ScrollBy(1);
                 }
             }
         }
         UnknownFunction472730(iterator);
-        event.field_0x00 = field_0x74;
-        event.field_0x08 = 0xe;
-        event.field_0x04 = field_0xf4;
-        event.field_0x0c = field_0xb8;
-        event.field_0x14 = this;
-        event.field_0x10 = field_0xb8->field_0x30;
-        field_0xb8->UnknownVirtualSlot29(&event);
-        field_0xb8->UnknownFunction46fce0(0x101, 0xfa, (int)this);
+        event.code = eventCode;
+        event.kind = 0xe;
+        event.controlName = controlName;
+        event.dialog = ownerDialog;
+        event.control = this;
+        event.gui = ownerDialog->guiManager;
+        ownerDialog->UnknownVirtualSlot29(&event);
+        ownerDialog->AddTimer(0x101, 0xfa, (int)this);
     }
     return UnknownGameUiControl::UnknownVirtualSlot55(a, b);
 }
@@ -1311,68 +1311,68 @@ int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
 void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
     UnknownGameUiControl::UnknownVirtualSlot57(a, position);
     UnknownDialogEvent event;
-    event.field_0x20 = 0;
+    event.handled = 0;
     if (!a && position) {
         int width = UnknownVirtualSlot61();
         int height = UnknownVirtualSlot62();
         UnknownVirtualSlot50();
-        if (field_0x5c == 8) {
+        if (controlType == 8) {
             if (field_0x1f0)
-                field_0x1ec_float = (float)UnknownMinInt(width - field_0x1f4,
+                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
                                                        UnknownMaxInt(position[0] - field_0x2c[0], 0));
             else
-                field_0x1ec_float = (float)UnknownMinInt(width - field_0x1f4,
-                                                       UnknownMaxInt(position[0] - field_0x2c[0] - field_0x1f4 / 2, 0));
+                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
+                                                       UnknownMaxInt(position[0] - field_0x2c[0] - thumbWidth / 2, 0));
         } else {
             if (field_0x1f0 != 0.0f)
-                field_0x1ec_float = (float)UnknownMinInt(height - field_0x1f8,
+                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
                                                        UnknownMaxInt(position[1] - field_0x2c[1], 0));
             else
-                field_0x1ec_float = (float)UnknownMinInt(height - field_0x1f8,
-                                                       UnknownMaxInt(position[1] - field_0x2c[1] - field_0x1f8 / 2, 0));
+                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
+                                                       UnknownMaxInt(position[1] - field_0x2c[1] - thumbHeight / 2, 0));
         }
         if (field_0x1f0)
             UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
         if (!field_0x208) {
-            event.field_0x08 = 0xf;
-            event.field_0x00 = field_0x74;
-            event.field_0x04 = field_0x220->UnknownFunction470df0();
-            event.field_0x0c = field_0xb8;
-            event.field_0x10 = field_0xbc;
-            event.field_0x14 = this;
-            field_0xb8->UnknownVirtualSlot29(&event);
+            event.kind = 0xf;
+            event.code = eventCode;
+            event.controlName = ownerList->GetName();
+            event.dialog = ownerDialog;
+            event.gui = ownerGui;
+            event.control = this;
+            ownerDialog->UnknownVirtualSlot29(&event);
             field_0x208 = 1;
         }
-        if (!event.field_0x20) {
-            if (position[0] == field_0x20c && position[1] == field_0x210) {
-                field_0x218_float += field_0xb8->field_0x9c0;
+        if (!event.handled) {
+            if (position[0] == dragX && position[1] == dragY) {
+                field_0x218_float += ownerDialog->lastFrameTime;
                 if (field_0x218_float < field_0x214)
                     goto scroll;
-                event.field_0x08 = 0x11;
-                event.field_0x00 = field_0x74;
-                event.field_0x04 = field_0x220->UnknownFunction470df0();
-                event.field_0x0c = field_0xb8;
-                event.field_0x10 = field_0xbc;
-                event.field_0x14 = this;
-                field_0xb8->UnknownVirtualSlot29(&event);
+                event.kind = 0x11;
+                event.code = eventCode;
+                event.controlName = ownerList->GetName();
+                event.dialog = ownerDialog;
+                event.gui = ownerGui;
+                event.control = this;
+                ownerDialog->UnknownVirtualSlot29(&event);
             } else {
-                event.field_0x08 = 3;
-                event.field_0x00 = field_0x74;
-                event.field_0x04 = field_0x220->UnknownFunction470df0();
-                event.field_0x0c = field_0xb8;
-                event.field_0x10 = field_0xbc;
-                event.field_0x14 = this;
-                field_0xb8->UnknownVirtualSlot29(&event);
-                field_0x20c = position[0];
-                field_0x210 = position[1];
+                event.kind = 3;
+                event.code = eventCode;
+                event.controlName = ownerList->GetName();
+                event.dialog = ownerDialog;
+                event.gui = ownerGui;
+                event.control = this;
+                ownerDialog->UnknownVirtualSlot29(&event);
+                dragX = position[0];
+                dragY = position[1];
                 field_0x218_float = 0.0f;
             }
-            if (!event.field_0x20) {
+            if (!event.handled) {
             scroll:
-                UIListBox* list = field_0x220->field_0x1fc;
+                UIListBox* list = ownerList->listPart;
                 if (list) {
-                    int rows = list->field_0x1ec - list->field_0x204;
-                    static_cast<UIListBox*>(list)->UnknownFunction476860(UnknownFunction475300(rows), 0);
+                    int rows = list->rowCount - list->lastPageRowCount;
+                    static_cast<UIListBox*>(list)->ScrollToRow(UnknownFunction475300(rows), 0);
                 }
             }
         }
@@ -1382,50 +1382,50 @@ void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
 // 0x00478570: draws the state's image, then its text.
 int UIMultiState::UnknownVirtualSlot40() {
     int frames = -1;
-    int redraw = field_0x1bc;
+    int redraw = redrawFrames;
     CameraRect rect;
-    if (field_0x1f4 && field_0x1cc) {
-        TextureMap* texture = field_0x1cc;
+    if (stateTable && drawnTexture) {
+        TextureMap* texture = drawnTexture;
         rect = *(CameraRect*)field_0x2c;
-        if (field_0xa4) {
-            rect.right = (int)(texture->field_0x14 * field_0xb8->field_0x9c4) + rect.left;
-            rect.bottom = (int)(texture->field_0x18 * field_0xb8->field_0x9c8) + rect.top;
+        if (sourceBlit) {
+            rect.right = (int)(texture->field_0x14 * ownerDialog->scaleX) + rect.left;
+            rect.bottom = (int)(texture->field_0x18 * ownerDialog->scaleY) + rect.top;
         }
-        if (field_0xb8->field_0x110) {
-            field_0xb8->field_0x110->UnknownFunction404480((PCTextureMap*)texture, &rect, 0,
+        if (ownerDialog->dialogBackground) {
+            ownerDialog->dialogBackground->UnknownFunction404480((PCTextureMap*)texture, &rect, 0,
                                                            texture->field_0x30 ? 0x1008000 : 0x1000000,
-                                                           field_0x1b8, field_0x1c0, &field_0x1bc, 0);
-            frames = field_0x1bc;
+                                                           backgroundRegion, needsRedraw, &redrawFrames, 0);
+            frames = redrawFrames;
         } else if (!((RenderTarget*)field_0x18)->UnknownVirtualSlot3(&rect, texture, 0,
                                                                      texture->field_0x30 ? 0x1008000 : 0x1000000)) {
             return 0;
         }
     }
-    if ((field_0x1f4 && field_0x1f4[field_0x1f0].field_0x08 && field_0x1f4[field_0x1f0].field_0x0c) ||
-        (field_0xa4 && field_0xc0 && field_0xd0)) {
+    if ((stateTable && stateTable[selectedState].text && stateTable[selectedState].field_0x0c) ||
+        (sourceBlit && controlText && field_0xd0)) {
         void* dc;
         int more;
-        field_0x1bc = redraw;
+        redrawFrames = redraw;
         do {
-            if (field_0xb8->UnknownFunction46ed70(&dc, (CameraRect*)field_0x2c, &more, this)) {
-                if (field_0xa4) {
+            if (ownerDialog->BeginControlDraw(&dc, (CameraRect*)field_0x2c, &more, this)) {
+                if (sourceBlit) {
                     rect = *(CameraRect*)field_0x2c;
-                    rect.left += field_0x1f4[field_0x1f0].field_0x00->UnknownFunction472f80()->field_0x0c +
-                                 field_0xe8;
-                    rect.right -= field_0xe8;
-                    rect.top += field_0xec;
-                    rect.bottom -= field_0xec;
-                    field_0xb8->UnknownFunction46f550(dc, &rect, field_0xc0, field_0xd0, field_0xc4, field_0x160,
-                                                      (UnknownGameUiTextRun*)field_0xe4, field_0xd4, field_0xc8,
+                    rect.left += stateTable[selectedState].image->GetCurrentFrame()->frameWidth +
+                                 textLeftMargin;
+                    rect.right -= textLeftMargin;
+                    rect.top += textTopMargin;
+                    rect.bottom -= textTopMargin;
+                    ownerDialog->DrawAlignedText(dc, &rect, controlText, field_0xd0, textColor, fontHeight,
+                                                      (UnknownGameUiTextRun*)textLines, textDrop, dropColor,
                                                       0x11, 1, 0);
                 } else {
-                    field_0xb8->UnknownFunction46f6c0(dc, this, 1);
+                    ownerDialog->DrawControlText(dc, this, 1);
                 }
-                field_0xb8->UnknownFunction46eeb0(dc);
+                ownerDialog->EndControlDraw(dc);
             }
         } while (more);
         if (frames >= 0)
-            field_0x1bc = frames;
+            redrawFrames = frames;
     }
     return 1;
 }
@@ -1441,11 +1441,11 @@ void UIDropDownList::UnknownFunction47a400() {
     int top = field_0x2c[1];
     full.bottom = field_0x2c[3] - top;
     CameraRect button;
-    UIAnim* image = field_0x1ec->field_0x16c[0];
+    UIAnim* image = buttonPart->stateImages[0];
     if (image) {
         button = full;
         button.left = full.right + 1;
-        button.right = image->field_0x28[0]->field_0x0c + button.left;
+        button.right = image->frameList[0]->frameWidth + button.left;
     } else {
         button.left = 0;
         button.top = 0;
@@ -1454,7 +1454,7 @@ void UIDropDownList::UnknownFunction47a400() {
     }
     CameraRect list = full;
     list.top = full.bottom + 1;
-    list.bottom = field_0x204 + list.top;
+    list.bottom = rowHeight + list.top;
     CameraRect scroll = list;
     scroll.top += 2;
     scroll.bottom -= 2;
@@ -1466,38 +1466,38 @@ void UIDropDownList::UnknownFunction47a400() {
     area->top = top;
     area->right = left + scroll.right;
     area->bottom = top + scroll.bottom;
-    sprintf(name, "%s_BUT", UnknownFunction470df0());
-    field_0x1ec->UnknownFunction470dc0(name);
-    *(CameraRect*)field_0x1ec->field_0x2c = button;
-    *(CameraRect*)field_0x1ec->field_0x3c = *(CameraRect*)field_0x1ec->field_0x2c;
+    sprintf(name, "%s_BUT", GetName());
+    buttonPart->SetName(name);
+    *(CameraRect*)buttonPart->field_0x2c = button;
+    *(CameraRect*)buttonPart->field_0x3c = *(CameraRect*)buttonPart->field_0x2c;
     if (!button.left)
-        field_0x1ec->UnknownVirtualSlot4();
-    sprintf(name, "%s_LB", UnknownFunction470df0());
-    field_0x1fc->UnknownFunction470dc0(name);
-    *(CameraRect*)field_0x1fc->field_0x2c = list;
-    *(CameraRect*)field_0x1fc->field_0x3c = *(CameraRect*)field_0x1fc->field_0x2c;
-    sprintf(name, "%s_SB", UnknownFunction470df0());
-    field_0x200->UnknownFunction470dc0(name);
-    *(CameraRect*)field_0x200->field_0x2c = scroll;
-    *(CameraRect*)field_0x200->field_0x3c = *(CameraRect*)field_0x200->field_0x2c;
-    sprintf(name, "%s_LBK", UnknownFunction470df0());
-    field_0x1f0->UnknownFunction470dc0(name);
-    *(CameraRect*)field_0x1f0->field_0x2c = list;
-    *(CameraRect*)field_0x1f0->field_0x3c = *(CameraRect*)field_0x1f0->field_0x2c;
-    sprintf(name, "%s_SBK", UnknownFunction470df0());
-    field_0x1f4->UnknownFunction470dc0(name);
-    *(CameraRect*)field_0x1f4->field_0x2c = scroll;
-    *(CameraRect*)field_0x1f4->field_0x3c = *(CameraRect*)field_0x1f4->field_0x2c;
-    sprintf(name, "%s_TBK", UnknownFunction470df0());
-    field_0x1f8->UnknownFunction470dc0(name);
-    *(CameraRect*)field_0x1f8->field_0x2c = full;
-    *(CameraRect*)field_0x1f8->field_0x3c = *(CameraRect*)field_0x1f8->field_0x2c;
-    field_0x1fc->field_0xe8 = field_0xe8;
-    field_0x1fc->field_0xec = field_0xec;
-    static_cast<UIListBox*>(field_0x1fc)->UnknownFunction476c70(field_0xc4, -1);
-    if (field_0xc4 != 0xffffff)
-        static_cast<UIListBox*>(field_0x1fc)->UnknownFunction476b80(0xffffff);
-    field_0x1fc->UnknownFunction470d80(field_0xc8);
+        buttonPart->UnknownVirtualSlot4();
+    sprintf(name, "%s_LB", GetName());
+    listPart->SetName(name);
+    *(CameraRect*)listPart->field_0x2c = list;
+    *(CameraRect*)listPart->field_0x3c = *(CameraRect*)listPart->field_0x2c;
+    sprintf(name, "%s_SB", GetName());
+    scrollBarPart->SetName(name);
+    *(CameraRect*)scrollBarPart->field_0x2c = scroll;
+    *(CameraRect*)scrollBarPart->field_0x3c = *(CameraRect*)scrollBarPart->field_0x2c;
+    sprintf(name, "%s_LBK", GetName());
+    staticPart0->SetName(name);
+    *(CameraRect*)staticPart0->field_0x2c = list;
+    *(CameraRect*)staticPart0->field_0x3c = *(CameraRect*)staticPart0->field_0x2c;
+    sprintf(name, "%s_SBK", GetName());
+    staticPart1->SetName(name);
+    *(CameraRect*)staticPart1->field_0x2c = scroll;
+    *(CameraRect*)staticPart1->field_0x3c = *(CameraRect*)staticPart1->field_0x2c;
+    sprintf(name, "%s_TBK", GetName());
+    staticPart2->SetName(name);
+    *(CameraRect*)staticPart2->field_0x2c = full;
+    *(CameraRect*)staticPart2->field_0x3c = *(CameraRect*)staticPart2->field_0x2c;
+    listPart->textLeftMargin = textLeftMargin;
+    listPart->textTopMargin = textTopMargin;
+    static_cast<UIListBox*>(listPart)->SetRowTextColor(textColor, -1);
+    if (textColor != 0xffffff)
+        static_cast<UIListBox*>(listPart)->SetSelectColor(0xffffff);
+    listPart->SetDropColor(dropColor);
 }
 
 // ---------------------------------------------------------------------------
@@ -1516,7 +1516,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     char backgroundImage[0x80];
     backgroundImage[0] = 0;
     int depth = g_UnknownGlobal56e26c->field_0x10->field_0x28;
-    memset(dialog->field_0x9cc, 0, sizeof(dialog->field_0x9cc));
+    memset(dialog->sectionTable, 0, sizeof(dialog->sectionTable));
     int setType = 1;
     UnknownParameterBlock parameters;
     parameters.UnknownFunction4b77a0((UnknownParameterStream*)stream, offset, 1);
@@ -1531,15 +1531,15 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
         } else if (!_strnicmp(name, "Set_Control", strlen("Set_Control"))) {
             setType = 4;
         } else {
-            strcpy(dialog->field_0x9cc[dialog->field_0x7efc].field_0x00, name);
-            dialog->field_0x9cc[dialog->field_0x7efc].field_0x34 = 0;
+            strcpy(dialog->sectionTable[dialog->sectionCount].sectionName, name);
+            dialog->sectionTable[dialog->sectionCount].sectionObject = 0;
             if (!_strnicmp(name, "Set_Info", strlen("Set_Info")))
-                dialog->field_0x9cc[dialog->field_0x7efc].field_0x38 = 0;
+                dialog->sectionTable[dialog->sectionCount].field_0x38 = 0;
             else if (!_strnicmp(name, "Set_Default", strlen("Set_Default")))
-                dialog->field_0x9cc[dialog->field_0x7efc].field_0x38 = 3;
+                dialog->sectionTable[dialog->sectionCount].field_0x38 = 3;
             else
-                dialog->field_0x9cc[dialog->field_0x7efc].field_0x38 = setType;
-            dialog->field_0x7efc++;
+                dialog->sectionTable[dialog->sectionCount].field_0x38 = setType;
+            dialog->sectionCount++;
         }
     }
     delete sections;
@@ -1677,29 +1677,29 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     UnknownGameUiControl* control;
     int isDefault;
     for (int pass = 0; pass < 4; pass++) {
-        for (int i = 0; i < dialog->field_0x7efc; i++) {
+        for (int i = 0; i < dialog->sectionCount; i++) {
             control = 0;
             isDefault = 0;
-            parameters.UnknownFunction4b78f0(dialog->field_0x9cc[i].field_0x00);
-            switch (dialog->field_0x9cc[i].field_0x38) {
+            parameters.UnknownFunction4b78f0(dialog->sectionTable[i].sectionName);
+            switch (dialog->sectionTable[i].field_0x38) {
             case 0:
                 if (pass == 0) {
                     parameters.UnknownFunction4b7f10("ScreenWidth", g_UnknownGlobal56e26c->field_0x10->field_0x0c,
-                                                     &dialog->field_0x174);
+                                                     &dialog->screenWidth);
                     parameters.UnknownFunction4b7f10("ScreenHeight", g_UnknownGlobal56e26c->field_0x10->field_0x10,
-                                                     &dialog->field_0x178);
-                    parameters.UnknownFunction4b7f10("NoScale", 0, &dialog->field_0x158);
-                    dialog->field_0x158 = !dialog->field_0x158;
-                    parameters.UnknownFunction4b7f10("Popup", 1, &dialog->field_0x15c);
+                                                     &dialog->screenHeight);
+                    parameters.UnknownFunction4b7f10("NoScale", 0, &dialog->scaleToScreen);
+                    dialog->scaleToScreen = !dialog->scaleToScreen;
+                    parameters.UnknownFunction4b7f10("Popup", 1, &dialog->isPopup);
                     RenderTarget* target = (RenderTarget*)dialog->field_0x18;
-                    if (dialog->field_0x158) {
-                        dialog->field_0x9c4 = (float)target->field_0x0c / dialog->field_0x174;
-                        dialog->field_0x9c8 = (float)target->field_0x10 / dialog->field_0x178;
-                    } else if (dialog->field_0x174 * 2 > target->field_0x0c ||
-                               dialog->field_0x178 * 2 > target->field_0x10) {
-                        dialog->field_0x9c4 = dialog->field_0x9c8 = 1.0f;
+                    if (dialog->scaleToScreen) {
+                        dialog->scaleX = (float)target->field_0x0c / dialog->screenWidth;
+                        dialog->scaleY = (float)target->field_0x10 / dialog->screenHeight;
+                    } else if (dialog->screenWidth * 2 > target->field_0x0c ||
+                               dialog->screenHeight * 2 > target->field_0x10) {
+                        dialog->scaleX = dialog->scaleY = 1.0f;
                     }
-                    if (dialog->field_0x15c) {
+                    if (dialog->isPopup) {
                         parameters.UnknownFunction4b7ec0("DlgAlignV", "MIDDLE", buffer, -1);
                         short align;
                         if (!_stricmp(buffer, "TOP"))
@@ -1714,35 +1714,35 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         else
                             UnknownFunction46ffc0(align | 2);
                     } else {
-                        dialog->field_0x170 = 9;
+                        dialog->popupAlignment = 9;
                     }
                     for (int color = 0; color < 10; color++) {
                         sprintf(buffer, "%s%d", "TextColor", color);
                         parameters.UnknownFunction4b7f10(buffer, defaultColors[color], &value);
-                        dialog->field_0x118[color] = value;
+                        dialog->textColors[color] = value;
                     }
                     parameters.UnknownFunction4b7ec0("MouseCursorAnim", "", buffer, -1);
                     if (buffer[0])
-                        dialog->field_0x95c = (UnknownCursorAnimation*)UnknownFunction46e9a0(buffer);
+                        dialog->cursorAnimation = (UnknownCursorAnimation*)FindSectionObject(buffer);
                     parameters.UnknownFunction4b7ec0("BackgroundFile", "", buffer, -1);
-                    if (buffer[0] && dialog->field_0x110) {
+                    if (buffer[0] && dialog->dialogBackground) {
                         UnknownTgaFile* file = UnknownFunction5125c0(buffer, 0, (int)g_UnknownResourceManager572b44);
                         if (file) {
-                            dialog->field_0x7f10 = 1;
-                            if (dialog->field_0x2c)
-                                dialog->field_0x9b8 = dialog->field_0x110->field_0x2c;
-                            dialog->field_0x110->field_0x2c =
-                                new(__FILE__, 0x367) PCTextureMap((TextureMapManager*)dialog->field_0x7f20, 1);
-                            dialog->field_0x110->field_0x2c->UnknownVirtualSlot4(
+                            dialog->ownsBackground = 1;
+                            if (dialog->parentDialog)
+                                dialog->parentBackground = dialog->dialogBackground->field_0x2c;
+                            dialog->dialogBackground->field_0x2c =
+                                new(__FILE__, 0x367) PCTextureMap((TextureMapManager*)dialog->dialogTextures, 1);
+                            dialog->dialogBackground->field_0x2c->UnknownVirtualSlot4(
                                 file->bits, file->width, file->height, file->width, file->width, 0x22b, depth,
-                                dialog->field_0x140 ? (UnknownTexturePalette*)((Palette8*)dialog->field_0x140)->field_0x708 : 0,
-                                4, dialog->field_0x140 ? ((Palette8*)dialog->field_0x140)->field_0x70c : 0, 0, 0, 2, 1, 0,
+                                dialog->dialogPalette ? (UnknownTexturePalette*)((Palette8*)dialog->dialogPalette)->field_0x708 : 0,
+                                4, dialog->dialogPalette ? ((Palette8*)dialog->dialogPalette)->field_0x70c : 0, 0, 0, 2, 1, 0,
                                 0x80, 0xff00ff);
-                            dialog->field_0x110->UnknownFunction404da0();
+                            dialog->dialogBackground->UnknownFunction404da0();
                             UnknownFunction512dd0(file);
                         }
-                    } else if (dialog->field_0x2c) {
-                        dialog->field_0x110 = dialog->field_0x2c->field_0x110;
+                    } else if (dialog->parentDialog) {
+                        dialog->dialogBackground = dialog->parentDialog->dialogBackground;
                     }
                     char fontName[0x80];
                     parameters.UnknownFunction4b7ec0("FontName", "", fontName, -1);
@@ -1758,106 +1758,106 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                             size++;
                     }
                     if (fontName[0] && size) {
-                        if (dialog->field_0xd8)
-                            DeleteObject((HGDIOBJ)dialog->field_0xd8);
-                        dialog->field_0xdc = (int)(size * dialog->field_0x9c8);
-                        strcpy(dialog->field_0xe0, fontName);
+                        if (dialog->dialogFont)
+                            DeleteObject((HGDIOBJ)dialog->dialogFont);
+                        dialog->dialogFontHeight = (int)(size * dialog->scaleY);
+                        strcpy(dialog->dialogFontFace, fontName);
                         int bold;
                         int italic;
                         parameters.UnknownFunction4b7f10("Bold", 0, &bold);
                         parameters.UnknownFunction4b7f10("Italic", 0, &italic);
-                        const char* face = dialog->field_0x30 ? dialog->field_0x30->field_0x350 : "";
+                        const char* face = dialog->guiManager ? dialog->guiManager->toolTipFontFace : "";
                         if (*face) {
-                            strcpy(dialog->field_0xe0, face);
-                            bold = dialog->field_0x30->field_0x3d4;
-                            italic = dialog->field_0x30->field_0x3d8;
+                            strcpy(dialog->dialogFontFace, face);
+                            bold = dialog->guiManager->toolTipBold;
+                            italic = dialog->guiManager->toolTipItalic;
                         }
-                        dialog->field_0xdc = (int)((dialog->field_0x30 ? *(float*)&dialog->field_0x30->field_0x3d0 : 0.0f) +
-                                                   dialog->field_0xdc);
-                        dialog->field_0xd8 = CreateFontA(dialog->field_0xdc, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM, italic,
-                                                         0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialog->field_0xe0);
+                        dialog->dialogFontHeight = (int)((dialog->guiManager ? *(float*)&dialog->guiManager->field_0x3d0 : 0.0f) +
+                                                   dialog->dialogFontHeight);
+                        dialog->dialogFont = CreateFontA(dialog->dialogFontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM, italic,
+                                                         0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialog->dialogFontFace);
                         dialog->field_0x10c = italic;
                         dialog->field_0x108 = bold;
                     }
                     if (g_UnknownGlobal56e26c->field_0x10->field_0x28 == 8) {
                         int load = 1;
-                        if (dialog->field_0x30) {
-                            if (dialog->field_0x30->UnknownFunction4864f0())
+                        if (dialog->guiManager) {
+                            if (dialog->guiManager->UnknownFunction4864f0())
                                 load = 0;
-                            dialog->field_0x140 = dialog->field_0x30->field_0x34;
+                            dialog->dialogPalette = dialog->guiManager->guiPalette;
                         }
                         parameters.UnknownFunction4b7ec0("PaletteFile", "", buffer, -1);
                         if (buffer[0] && load) {
                             UnknownResourceEntry* resource = g_UnknownResourceManager572b44->UnknownFunction4e9360(buffer, 1);
                             if (resource) {
-                                dialog->field_0x140 = new(__FILE__, 0x3b6) Palette8(resource->field_0x14);
-                                dialog->field_0x7f0c = 1;
+                                dialog->dialogPalette = new(__FILE__, 0x3b6) Palette8(resource->field_0x14);
+                                dialog->ownsPalette = 1;
                             }
                         }
-                        if (dialog->field_0x30 && load)
-                            dialog->field_0x30->UnknownFunction486150((Palette8*)dialog->field_0x140);
+                        if (dialog->guiManager && load)
+                            dialog->guiManager->UnknownFunction486150((Palette8*)dialog->dialogPalette);
                     }
                     parameters.UnknownFunction4b7ec0("BackgroundImage", "", backgroundImage, -1);
                     if (backgroundImage[0]) {
                         CameraRect frameArea;
                         frameArea.left = 0;
                         frameArea.top = 0;
-                        frameArea.right = dialog->field_0x160.right - dialog->field_0x160.left;
-                        frameArea.bottom = dialog->field_0x160.bottom - dialog->field_0x160.top;
+                        frameArea.right = dialog->screenArea.right - dialog->screenArea.left;
+                        frameArea.bottom = dialog->screenArea.bottom - dialog->screenArea.top;
                         UIStatic* frame = new(__FILE__, 0x3cd) UIStatic(0, &frameArea, dialog);
-                        frame->UnknownFunction470dc0("FRMBIStatic");
-                        frame->field_0x1e0 = 1;
-                        dialog->field_0x7f3c->UnknownFunction469190(frame, -1);
+                        frame->SetName("FRMBIStatic");
+                        frame->permanent = 1;
+                        dialog->controlContainer->UnknownFunction469190(frame, -1);
                         UnknownFunction46a840(frame, 0, 0);
                     }
                 }
                 break;
             case 1:
-                if (pass == 1 && dialog->field_0x9b0 < 500) {
-                    dialog->field_0x18c[dialog->field_0x9b0] = new(__FILE__, 0x3df) UIAnim(dialog->field_0x7f20, (void*)1);
+                if (pass == 1 && dialog->imageCount < 500) {
+                    dialog->imageTable[dialog->imageCount] = new(__FILE__, 0x3df) UIAnim(dialog->dialogTextures, (void*)1);
                     int delay;
                     int loops;
                     parameters.UnknownFunction4b7f10("MSecDelay", 0, &delay);
                     parameters.UnknownFunction4b7f10("LoopCount", 0, &loops);
-                    dialog->field_0x18c[dialog->field_0x9b0]->UnknownFunction472f40(delay);
-                    dialog->field_0x18c[dialog->field_0x9b0]->UnknownFunction472f20(loops);
+                    dialog->imageTable[dialog->imageCount]->SetFrameDelay(delay);
+                    dialog->imageTable[dialog->imageCount]->SetFrameCount(loops);
                     parameters.UnknownFunction4b7ec0("Files1", "", buffer, -1);
                     UnknownTokenizer files(buffer);
                     for (char* file = files.UnknownFunction515df0(","); file; file = files.UnknownFunction515df0(",")) {
-                        if (g_UnknownResourceManager572b44->UnknownFunction4e9360(dialog->field_0x9cc[i].field_0x00, 1))
-                            dialog->field_0x18c[dialog->field_0x9b0]->UnknownFunction473160(
-                                dialog->field_0x9cc[i].field_0x00, (int)g_UnknownResourceManager572b44, (int)dialog->field_0x114,
-                                dialog->field_0x140);
+                        if (g_UnknownResourceManager572b44->UnknownFunction4e9360(dialog->sectionTable[i].sectionName, 1))
+                            dialog->imageTable[dialog->imageCount]->LoadFromModule(
+                                dialog->sectionTable[i].sectionName, (int)g_UnknownResourceManager572b44, (int)dialog->soundGroup,
+                                dialog->dialogPalette);
                         else if (g_UnknownResourceManager572b44->UnknownFunction4e9360(file, 1))
-                            dialog->field_0x18c[dialog->field_0x9b0]->UnknownFunction473160(
-                                file, (int)g_UnknownResourceManager572b44, (int)dialog->field_0x114, dialog->field_0x140);
+                            dialog->imageTable[dialog->imageCount]->LoadFromModule(
+                                file, (int)g_UnknownResourceManager572b44, (int)dialog->soundGroup, dialog->dialogPalette);
                         else
-                            dialog->field_0x18c[dialog->field_0x9b0]->UnknownFunction4730e0(file, dialog->field_0x140);
+                            dialog->imageTable[dialog->imageCount]->LoadFile(file, dialog->dialogPalette);
                     }
-                    dialog->field_0x9cc[i].field_0x34 = (Sound*)dialog->field_0x18c[dialog->field_0x9b0];
-                    dialog->field_0x9b0++;
+                    dialog->sectionTable[i].sectionObject = (Sound*)dialog->imageTable[dialog->imageCount];
+                    dialog->imageCount++;
                 }
                 break;
             case 2:
-                if (pass == 2 && dialog->field_0x9b4 < 20) {
+                if (pass == 2 && dialog->soundCount < 20) {
                     int isStatic;
                     int copies;
                     parameters.UnknownFunction4b7f10("Static", 1, &isStatic);
                     parameters.UnknownFunction4b7f10("Copies", 0, &copies);
                     parameters.UnknownFunction4b7ec0("File", "", buffer, -1);
                     int flags = isStatic ? 1 : 2;
-                    if (g_UnknownResourceManager572b44->UnknownFunction4e9360(dialog->field_0x9cc[i].field_0x00, 1)) {
-                        dialog->field_0x960[dialog->field_0x9b4] =
-                            UnknownFunction4bb890(dialog->field_0x114, dialog->field_0x9cc[i].field_0x00, flags, 3, copies, -1);
+                    if (g_UnknownResourceManager572b44->UnknownFunction4e9360(dialog->sectionTable[i].sectionName, 1)) {
+                        dialog->soundTable[dialog->soundCount] =
+                            UnknownFunction4bb890(dialog->soundGroup, dialog->sectionTable[i].sectionName, flags, 3, copies, -1);
                     } else if (g_UnknownResourceManager572b44->UnknownFunction4e9360(buffer, 1)) {
-                        dialog->field_0x960[dialog->field_0x9b4] =
-                            UnknownFunction4bb890(dialog->field_0x114, buffer, flags, 3, copies, -1);
+                        dialog->soundTable[dialog->soundCount] =
+                            UnknownFunction4bb890(dialog->soundGroup, buffer, flags, 3, copies, -1);
                     } else {
-                        dialog->field_0x960[dialog->field_0x9b4] = new(__FILE__, 0x41e) Sound(dialog->field_0x114, 1);
-                        dialog->field_0x960[dialog->field_0x9b4]->UnknownFunction4bc320(buffer, 0, flags, 3, copies, -1);
+                        dialog->soundTable[dialog->soundCount] = new(__FILE__, 0x41e) Sound(dialog->soundGroup, 1);
+                        dialog->soundTable[dialog->soundCount]->UnknownFunction4bc320(buffer, 0, flags, 3, copies, -1);
                     }
-                    dialog->field_0x9cc[i].field_0x34 = dialog->field_0x960[dialog->field_0x9b4];
-                    dialog->field_0x9b4++;
+                    dialog->sectionTable[i].sectionObject = dialog->soundTable[dialog->soundCount];
+                    dialog->soundCount++;
                 }
                 break;
             case 3:
@@ -1895,49 +1895,49 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     if (!isDefault) {
                         if (!_stricmp(type, "BUTTON")) {
                             control = new(__FILE__, 0x45b) UIButton(0, &area, dialog);
-                            button = (UIButton*)UnknownFunction46a8a0(control, groupId, 0);
+                            button = (UIButton*)AddControl(control, groupId, 0);
                         } else if (!_stricmp(type, "SCROLLDOWN")) {
                             control = new(__FILE__, 0x45c) UIScrollCtl(10, 0, &area, dialog);
-                            button = (UIButton*)UnknownFunction46a8a0(control, groupId, 0);
+                            button = (UIButton*)AddControl(control, groupId, 0);
                         } else if (!_stricmp(type, "SCROLLUP")) {
                             control = new(__FILE__, 0x45d) UIScrollCtl(9, 0, &area, dialog);
-                            button = (UIButton*)UnknownFunction46a8a0(control, groupId, 0);
+                            button = (UIButton*)AddControl(control, groupId, 0);
                         }
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
-                        button->UnknownFunction473310((UIAnim*)UnknownFunction46e9a0(buffer));
+                        button->SetNormalImage((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimFocus", defaultAnimFocus, isDefault ? defaultAnimFocus : buffer,
                                                      -1);
                     if (!isDefault)
-                        button->UnknownFunction473330((UIAnim*)UnknownFunction46e9a0(buffer));
+                        button->SetFocusImage((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimPush", defaultAnimPush, isDefault ? defaultAnimPush : buffer, -1);
                     if (!isDefault)
-                        button->UnknownFunction473350((UIAnim*)UnknownFunction46e9a0(buffer));
+                        button->SetPushImage((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimDisable", defaultAnimDisable,
                                                      isDefault ? defaultAnimDisable : buffer, -1);
                     if (!isDefault)
-                        button->UnknownFunction473370((UIAnim*)UnknownFunction46e9a0(buffer));
+                        button->SetDisabledImage((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("SortLBName", defaultSortLBName,
                                                      isDefault ? defaultSortLBName : buffer, -1);
                     if (!isDefault)
-                        button->UnknownFunction473390((UIListBox*)UnknownFunction46e9a0(buffer));
+                        button->SetSortList((UIListBox*)FindSectionObject(buffer));
                 }
 
                 if (!_stricmp(type, "MULTISTATE") || isDefault) {
                     if (!isDefault) {
                         control = new(__FILE__, 0x474) UIMultiState(0, &area, dialog);
-                        multiState = (UIMultiState*)UnknownFunction46a8a0(control, groupId, 0);
+                        multiState = (UIMultiState*)AddControl(control, groupId, 0);
                     }
                     int states;
                     parameters.UnknownFunction4b7f10("NumStates", defaultNumStates,
                                                      isDefault ? &defaultNumStates : &states);
                     if (!isDefault)
-                        static_cast<UIMultiState*>(multiState)->UnknownFunction478860(states);
+                        static_cast<UIMultiState*>(multiState)->SetStateCount(states);
                     int selected;
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &selected);
                     if (!isDefault)
-                        static_cast<UIMultiState*>(multiState)->UnknownFunction478cf0(selected);
+                        static_cast<UIMultiState*>(multiState)->SetCurrentState(selected);
                     state = 0;
                     char stateKey[0x80];
                     char textKey[0x80];
@@ -1952,7 +1952,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     while (gotState | gotText) {
                         if (!isDefault) {
                             g_UnknownGlobal65b600 = textBuffer[0] ? textBuffer : 0;
-                            multiState->UnknownFunction4789f0(state, (UIAnim*)UnknownFunction46e9a0(stateBuffer),
+                            multiState->SetStateEntry(state, (UIAnim*)FindSectionObject(stateBuffer),
                                                               g_UnknownGlobal65b600);
                         }
                         state++;
@@ -1972,18 +1972,18 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("MaxItems", 100, isDefault ? &defaultMaxItems : &value);
                     if (!isDefault) {
                         control = new(__FILE__, 0x4a3) UIListBox(0, value, &area, dialog);
-                        listBox = (UIListBox*)UnknownFunction46a8a0(control, groupId, 0);
+                        listBox = (UIListBox*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault)
-                        static_cast<UIListBox*>(listBox)->UnknownFunction476a60(value);
+                        static_cast<UIListBox*>(listBox)->SelectRow(value);
                     parameters.UnknownFunction4b7f10("AutoSort", defaultDefault, isDefault ? &defaultAutoSort : &value);
                     if (!isDefault)
-                        listBox->UnknownFunction477b90(value);
+                        listBox->SetAutoSort(value);
                     parameters.UnknownFunction4b7f10("SelectColor", defaultSelectColor,
                                                      isDefault ? &defaultSelectColor : &value);
                     if (!isDefault)
-                        static_cast<UIListBox*>(listBox)->UnknownFunction476b80(value);
+                        static_cast<UIListBox*>(listBox)->SetSelectColor(value);
                     parameters.UnknownFunction4b7f10("Selectable", defaultSelectable,
                                                      isDefault ? &defaultSelectable : &value);
                     if (!isDefault)
@@ -1991,15 +1991,15 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7f10("AllowWScroll", defaultAllowWScroll,
                                                      isDefault ? &defaultAllowWScroll : &value);
                     if (!isDefault)
-                        listBox->UnknownFunction477ba0(value);
+                        listBox->SetAllowWScroll(value);
                     parameters.UnknownFunction4b7f10("SelectBoxColor", defaultSelectBoxColor,
                                                      isDefault ? &defaultSelectBoxColor : &value);
                     if (!isDefault)
-                        static_cast<UIListBox*>(listBox)->UnknownFunction476cd0(value);
+                        static_cast<UIListBox*>(listBox)->SetSelectBoxColor(value);
                     parameters.UnknownFunction4b7f10("ItemBoxColor", defaultItemBoxColor,
                                                      isDefault ? &defaultItemBoxColor : &value);
                     if (!isDefault)
-                        static_cast<UIListBox*>(listBox)->UnknownFunction476ba0(value, -1);
+                        static_cast<UIListBox*>(listBox)->SetItemBoxColor(value, -1);
                     char itemKey[0x80];
                     item = 1;
                     sprintf(itemKey, "%s%d", "Item", 1);
@@ -2008,7 +2008,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         do {
                             if (!isDefault) {
                                 if (buffer[0] == '@')
-                                    static_cast<UIListBox*>(listBox)->UnknownFunction4773a0((UIAnim*)UnknownFunction46e9a0(buffer + 1), 0, 0);
+                                    static_cast<UIListBox*>(listBox)->AddImageRow((UIAnim*)FindSectionObject(buffer + 1), 0, 0);
                                 else
                                     static_cast<UIListBox*>(listBox)->UnknownFunction476d80(buffer, 0, 0);
                             }
@@ -2021,46 +2021,46 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault) {
-                        listBox->UnknownFunction470730(0, UnknownFunction46e9a0(buffer));
-                        listBox->UnknownFunction470730(1, UnknownFunction46e9a0(buffer));
-                        listBox->UnknownFunction470730(2, UnknownFunction46e9a0(buffer));
-                        listBox->UnknownFunction470730(4, UnknownFunction46e9a0(buffer));
+                        listBox->SetImage(0, FindSectionObject(buffer));
+                        listBox->SetImage(1, FindSectionObject(buffer));
+                        listBox->SetImage(2, FindSectionObject(buffer));
+                        listBox->SetImage(4, FindSectionObject(buffer));
                     }
                 }
 
                 if (!_stricmp(type, "RADIOBUTTON") || isDefault) {
                     if (!isDefault) {
                         control = new(__FILE__, 0x4e3) UIRadioButton(0, &area, dialog);
-                        radioButton = (UIRadioButton*)UnknownFunction46a8a0(control, groupId, 0);
+                        radioButton = (UIRadioButton*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault)
-                        static_cast<UIMultiState*>(radioButton)->UnknownFunction478cf0(value);
+                        static_cast<UIMultiState*>(radioButton)->SetCurrentState(value);
                     parameters.UnknownFunction4b7ec0("AnimOff", defaultAnimOff, isDefault ? defaultAnimOff : buffer, -1);
                     if (!isDefault)
-                        radioButton->UnknownFunction4789f0(0, (UIAnim*)UnknownFunction46e9a0(buffer), 0);
+                        radioButton->SetStateEntry(0, (UIAnim*)FindSectionObject(buffer), 0);
                     parameters.UnknownFunction4b7ec0("AnimOn", defaultAnimOn, isDefault ? defaultAnimOn : buffer, -1);
                     if (!isDefault)
-                        radioButton->UnknownFunction4789f0(1, (UIAnim*)UnknownFunction46e9a0(buffer), 0);
+                        radioButton->SetStateEntry(1, (UIAnim*)FindSectionObject(buffer), 0);
                 }
 
                 if (!_stricmp(type, "STATIC") || isDefault) {
                     if (!isDefault) {
                         control = new(__FILE__, 0x4f3) UIStatic(0, &area, dialog);
-                        staticControl = (UIStatic*)UnknownFunction46a8a0(control, groupId, 0);
+                        staticControl = (UIStatic*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
-                        staticControl->UnknownFunction470730(0, UnknownFunction46e9a0(buffer));
+                        staticControl->SetImage(0, FindSectionObject(buffer));
                 }
 
                 if (!_stricmp(type, "VSCROLLBAR") || !_stricmp(type, "HSCROLLBAR") || isDefault) {
                     if (!isDefault) {
                         control = new(__FILE__, 0x500) UIScrollBar(7, 0, &area, dialog);
-                        scrollBar = (UIScrollBar*)UnknownFunction46a8a0(control, groupId, 0);
+                        scrollBar = (UIScrollBar*)AddControl(control, groupId, 0);
                     }
                     if (!_stricmp(type, "HSCROLLBAR"))
-                        control->field_0x5c = 8;
+                        control->controlType = 8;
                     int ticks;
                     int position;
                     int scale;
@@ -2073,18 +2073,18 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
-                        scrollBar->field_0x204_image = (UIAnim*)UnknownFunction46e9a0(buffer);
+                        scrollBar->field_0x204_image = (UIAnim*)FindSectionObject(buffer);
                     parameters.UnknownFunction4b7ec0("AnimThumb", defaultAnimThumb, isDefault ? defaultAnimThumb : buffer,
                                                      -1);
                     if (!isDefault) {
-                        scrollBar->UnknownFunction470730(0, UnknownFunction46e9a0(buffer));
-                        scrollBar->UnknownFunction470730(1, UnknownFunction46e9a0(buffer));
-                        scrollBar->UnknownFunction470730(2, UnknownFunction46e9a0(buffer));
-                        scrollBar->UnknownFunction470730(3, UnknownFunction46e9a0(buffer));
+                        scrollBar->SetImage(0, FindSectionObject(buffer));
+                        scrollBar->SetImage(1, FindSectionObject(buffer));
+                        scrollBar->SetImage(2, FindSectionObject(buffer));
+                        scrollBar->SetImage(3, FindSectionObject(buffer));
                         if (control->field_0x3c[2] == control->field_0x3c[0]) {
-                            UIAnim* image = control->field_0x16c[0];
-                            control->field_0x3c[2] = image->field_0x28[0]->field_0x0c + control->field_0x3c[0];
-                            control->field_0x3c[3] = control->field_0x3c[1] + image->field_0x28[0]->field_0x10;
+                            UIAnim* image = control->stateImages[0];
+                            control->field_0x3c[2] = image->frameList[0]->frameWidth + control->field_0x3c[0];
+                            control->field_0x3c[3] = control->field_0x3c[1] + image->frameList[0]->frameHeight;
                         }
                         static_cast<UIScrollBar*>(scrollBar)->UnknownFunction4753c0(position, ticks ? ticks
                                                                          : control->field_0x3c[2] - control->field_0x3c[0] + 1);
@@ -2095,67 +2095,67 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 if (!_stricmp(type, "EDITBOX") || isDefault) {
                     if (!isDefault) {
                         control = new(__FILE__, 0x52c) UIEditBox(0, &area, dialog, 100, 0, 0);
-                        editBox = (UIEditBox*)UnknownFunction46a8a0(control, groupId, 0);
+                        editBox = (UIEditBox*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7f10("MaxLen", defaultMaxLen, isDefault ? &defaultMaxLen : &value);
                     if (!isDefault)
-                        static_cast<UIEditBox*>(editBox)->UnknownFunction473c70(value);
+                        static_cast<UIEditBox*>(editBox)->SetCapacity(value);
                     parameters.UnknownFunction4b7ec0("SoundClick", defaultSoundClick,
                                                      isDefault ? defaultSoundClick : buffer, -1);
                     if (!isDefault)
-                        editBox->UnknownFunction473d80((int)UnknownFunction46e9a0(buffer));
+                        editBox->UnknownFunction473d80((int)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("SoundEnd", defaultSoundEnd, isDefault ? defaultSoundEnd : buffer, -1);
                     if (!isDefault)
-                        editBox->UnknownFunction473d90((int)UnknownFunction46e9a0(buffer));
+                        editBox->UnknownFunction473d90((int)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault) {
-                        editBox->UnknownFunction470730(0, UnknownFunction46e9a0(buffer));
-                        editBox->UnknownFunction470730(1, UnknownFunction46e9a0(buffer));
-                        editBox->UnknownFunction470730(2, UnknownFunction46e9a0(buffer));
-                        editBox->UnknownFunction470730(4, UnknownFunction46e9a0(buffer));
+                        editBox->SetImage(0, FindSectionObject(buffer));
+                        editBox->SetImage(1, FindSectionObject(buffer));
+                        editBox->SetImage(2, FindSectionObject(buffer));
+                        editBox->SetImage(4, FindSectionObject(buffer));
                     }
                 }
 
                 if (!_stricmp(type, "STATICTEXT") || isDefault) {
                     if (!isDefault) {
                         control = new(__FILE__, 0x545) UIStaticText(0, &area, dialog, 0, 0xffff);
-                        staticText = (UIStaticText*)UnknownFunction46a8a0(control, groupId, 0);
+                        staticText = (UIStaticText*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
-                        staticText->UnknownFunction470730(0, UnknownFunction46e9a0(buffer));
+                        staticText->SetImage(0, FindSectionObject(buffer));
                 }
 
                 if (!_strnicmp(type, "DROPDOWNLIST", 12) || isDefault) {
                     if (!isDefault) {
                         control = new(__FILE__, 0x54f) UIDropDownList(0, &area, dialog, 0, 0xffff);
-                        dropDownList = (UIDropDownList*)UnknownFunction46a8a0(control, groupId, 0);
+                        dropDownList = (UIDropDownList*)AddControl(control, groupId, 0);
                     }
                     parameters.UnknownFunction4b7ec0("AnimNorm", defaultAnimNorm, isDefault ? defaultAnimNorm : buffer, -1);
                     if (!isDefault)
-                        dropDownList->field_0x1ec->UnknownFunction473310((UIAnim*)UnknownFunction46e9a0(buffer));
+                        dropDownList->buttonPart->SetNormalImage((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimFocus", defaultAnimFocus, isDefault ? defaultAnimFocus : buffer,
                                                      -1);
                     if (!isDefault)
-                        dropDownList->field_0x1ec->UnknownFunction473330((UIAnim*)UnknownFunction46e9a0(buffer));
+                        dropDownList->buttonPart->SetFocusImage((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimPush", defaultAnimPush, isDefault ? defaultAnimPush : buffer, -1);
                     if (!isDefault)
-                        dropDownList->field_0x1ec->UnknownFunction473350((UIAnim*)UnknownFunction46e9a0(buffer));
+                        dropDownList->buttonPart->SetPushImage((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimThumb", defaultAnimThumb, isDefault ? defaultAnimThumb : buffer,
                                                      -1);
                     if (!isDefault) {
-                        UIScrollBar* thumb = dropDownList->field_0x200;
-                        thumb->UnknownFunction470730(0, UnknownFunction46e9a0(buffer));
-                        thumb->UnknownFunction470730(1, UnknownFunction46e9a0(buffer));
-                        thumb->UnknownFunction470730(2, UnknownFunction46e9a0(buffer));
-                        thumb->UnknownFunction470730(3, UnknownFunction46e9a0(buffer));
+                        UIScrollBar* thumb = dropDownList->scrollBarPart;
+                        thumb->SetImage(0, FindSectionObject(buffer));
+                        thumb->SetImage(1, FindSectionObject(buffer));
+                        thumb->SetImage(2, FindSectionObject(buffer));
+                        thumb->SetImage(3, FindSectionObject(buffer));
                         thumb->UnknownFunction475160(0);
                     }
                     parameters.UnknownFunction4b7f10("ListHeight", defaultListHeight,
                                                      isDefault ? &defaultListHeight : &value);
                     if (!isDefault) {
                         dropDownList->UnknownFunction47a880(value);
-                        dropDownListBox = dropDownList->field_0x1fc;
+                        dropDownListBox = dropDownList->listPart;
                     }
                     char listKey[0x80];
                     item = 1;
@@ -2172,7 +2172,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         } while (parameters.UnknownFunction4b7ec0(listKey, item < 50 ? defaultItems[item] : "",
                                                                   isDefault ? defaultItems[item] : buffer, -1));
                     }
-                    control->UnknownFunction470dc0(dialog->field_0x9cc[i].field_0x00);
+                    control->SetName(dialog->sectionTable[i].sectionName);
                     int leftMargin;
                     int topMargin;
                     int textColor;
@@ -2190,34 +2190,34 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     parameters.UnknownFunction4b7ec0("SoundPush", defaultSoundPush, soundPush, -1);
                     parameters.UnknownFunction4b7ec0("SoundClick", defaultSoundClick, soundClick, -1);
                     if (!isDefault) {
-                        dropDownList->field_0x1ec->UnknownFunction470810(0, UnknownFunction46e9a0(soundNorm));
-                        dropDownList->field_0x1ec->UnknownFunction470810(1, UnknownFunction46e9a0(soundFocus));
-                        dropDownList->field_0x1ec->UnknownFunction470810(2, UnknownFunction46e9a0(soundPush));
-                        dropDownList->field_0x1ec->UnknownFunction470810(3, UnknownFunction46e9a0(soundClick));
-                        dropDownList->field_0xe8 = leftMargin;
-                        dropDownList->field_0xec = topMargin;
-                        dropDownList->UnknownFunction470d40(textColor);
-                        dropDownList->UnknownFunction470d80(dropColor);
+                        dropDownList->buttonPart->SetSound(0, FindSectionObject(soundNorm));
+                        dropDownList->buttonPart->SetSound(1, FindSectionObject(soundFocus));
+                        dropDownList->buttonPart->SetSound(2, FindSectionObject(soundPush));
+                        dropDownList->buttonPart->SetSound(3, FindSectionObject(soundClick));
+                        dropDownList->textLeftMargin = leftMargin;
+                        dropDownList->textTopMargin = topMargin;
+                        dropDownList->SetFontColor(textColor);
+                        dropDownList->SetDropColor(dropColor);
                         dropDownList->UnknownFunction47a400();
                     }
                     parameters.UnknownFunction4b7f10("Default", defaultDefault, isDefault ? &defaultDefault : &value);
                     if (!isDefault) {
                         int row = value - 1 < 0 ? 0 : value - 1;
-                        static_cast<UIListBox*>(dropDownListBox)->UnknownFunction476a60(row);
-                        dropDownList->UnknownFunction470b20(static_cast<UIListBox*>(dropDownListBox)->UnknownFunction476d20(row));
+                        static_cast<UIListBox*>(dropDownListBox)->SelectRow(row);
+                        dropDownList->SetText(static_cast<UIListBox*>(dropDownListBox)->GetRowText(row));
                     }
                     parameters.UnknownFunction4b7ec0("AnimTextBack", defaultAnimTextBack,
                                                      isDefault ? defaultAnimTextBack : buffer, -1);
                     if (!isDefault && buffer[0])
-                        dropDownList->UnknownFunction47ab20((UIAnim*)UnknownFunction46e9a0(buffer));
+                        dropDownList->UnknownFunction47ab20((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimListBack", defaultAnimListBack,
                                                      isDefault ? defaultAnimListBack : buffer, -1);
                     if (!isDefault && buffer[0])
-                        dropDownList->UnknownFunction47a970((UIAnim*)UnknownFunction46e9a0(buffer));
+                        dropDownList->UnknownFunction47a970((UIAnim*)FindSectionObject(buffer));
                     parameters.UnknownFunction4b7ec0("AnimScrollBack", defaultAnimScrollBack,
                                                      isDefault ? defaultAnimScrollBack : buffer, -1);
                     if (!isDefault && buffer[0])
-                        dropDownList->UnknownFunction47aa40((UIAnim*)UnknownFunction46e9a0(buffer));
+                        dropDownList->UnknownFunction47aa40((UIAnim*)FindSectionObject(buffer));
                 }
 
                 // Every control's settings.
@@ -2309,85 +2309,85 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                     break;
 
                 control->UnknownVirtualSlot52(attachId);
-                control->field_0x78 = groupId;
-                control->UnknownFunction470830((UnknownGameUiControl*)UnknownFunction46e9a0(anchor), relAnchor);
-                control->UnknownFunction470dc0(dialog->field_0x9cc[i].field_0x00);
-                control->field_0x168 = moveable;
+                control->groupId = groupId;
+                control->SetAnchor((UnknownGameUiControl*)FindSectionObject(anchor), relAnchor);
+                control->SetName(dialog->sectionTable[i].sectionName);
+                control->moveable = moveable;
                 if (control->field_0x3c[2] == control->field_0x3c[0]) {
                     UIAnim* image;
                     if (!_stricmp(type, "MULTISTATE") || !_stricmp(type, "RADIOBUTTON"))
-                        image = ((UIMultiState*)control)->field_0x1f4[((UIMultiState*)control)->field_0x1f0].field_0x00;
+                        image = ((UIMultiState*)control)->stateTable[((UIMultiState*)control)->selectedState].image;
                     else
-                        image = control->field_0x16c[0];
-                    control->field_0x3c[2] = image->field_0x28[0]->field_0x0c + control->field_0x3c[0];
-                    control->field_0x3c[3] = control->field_0x3c[1] + image->field_0x28[0]->field_0x10;
+                        image = control->stateImages[0];
+                    control->field_0x3c[2] = image->frameList[0]->frameWidth + control->field_0x3c[0];
+                    control->field_0x3c[3] = control->field_0x3c[1] + image->frameList[0]->frameHeight;
                 }
-                if (fontName[0] || (fontHeight && dialog->field_0x30 && dialog->field_0x30->field_0x50)) {
-                    control->field_0x12c = 1;
-                    if (control->field_0x128)
-                        DeleteObject((HGDIOBJ)control->field_0x128);
-                    control->field_0x128 = 0;
+                if (fontName[0] || (fontHeight && dialog->guiManager && dialog->guiManager->dialogFontName)) {
+                    control->ownsFont = 1;
+                    if (control->fontHandle)
+                        DeleteObject((HGDIOBJ)control->fontHandle);
+                    control->fontHandle = 0;
                     if (fontHeight)
-                        control->field_0x160 = fontHeight;
+                        control->fontHeight = fontHeight;
                     if (bold > 500)
                         bold = 1;
                     else if (bold > 1)
                         bold = 0;
-                    const char* face = dialog->field_0x30 ? dialog->field_0x30->field_0x350 : "";
+                    const char* face = dialog->guiManager ? dialog->guiManager->toolTipFontFace : "";
                     if (*face) {
-                        strcpy(control->field_0x130, face);
-                        bold = dialog->field_0x30->field_0x3d4;
-                        italic = dialog->field_0x30->field_0x3d8;
+                        strcpy(control->fontFace, face);
+                        bold = dialog->guiManager->toolTipBold;
+                        italic = dialog->guiManager->toolTipItalic;
                     }
-                    control->field_0x160 = (int)((dialog->field_0x30 ? *(float*)&dialog->field_0x30->field_0x3d0 : 0.0f) +
-                                                 control->field_0x160);
-                    if (control->field_0x160 != dialog->field_0xdc || bold != dialog->field_0x108 ||
+                    control->fontHeight = (int)((dialog->guiManager ? *(float*)&dialog->guiManager->field_0x3d0 : 0.0f) +
+                                                 control->fontHeight);
+                    if (control->fontHeight != dialog->dialogFontHeight || bold != dialog->field_0x108 ||
                         italic != dialog->field_0x10c) {
-                        control->field_0x160 = (int)(control->field_0x160 * dialog->field_0x9c8);
-                        control->field_0x128 = (int)CreateFontA(control->field_0x160, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM,
-                                                                italic, 0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialog->field_0xe0);
-                        strcpy(control->field_0x130, dialog->field_0xe0);
-                        control->field_0x158 = bold;
-                        control->field_0x15c = italic;
+                        control->fontHeight = (int)(control->fontHeight * dialog->scaleY);
+                        control->fontHandle = (int)CreateFontA(control->fontHeight, 0, 0, 0, bold ? FW_BOLD : FW_MEDIUM,
+                                                                italic, 0, 0, DEFAULT_CHARSET, 0, 0, 2, 2, dialog->dialogFontFace);
+                        strcpy(control->fontFace, dialog->dialogFontFace);
+                        control->bold = bold;
+                        control->italic = italic;
                     }
                 }
                 if (sourceBlit)
-                    control->field_0xa4 = 1;
-                control->UnknownFunction4709d0(shapeBounds);
-                if (dialog->field_0x30->field_0x348) {
+                    control->sourceBlit = 1;
+                control->SetShapeBounds(shapeBounds);
+                if (dialog->guiManager->languageModule) {
                     int textId;
                     int toolTipId;
                     parameters.UnknownFunction4b7f10("LocalTextId", 0, &textId);
                     parameters.UnknownFunction4b7f10("LocalToolTipId", 0, &toolTipId);
                     if (textId)
-                        control->UnknownFunction470a80(dialog->field_0x30->field_0x348, textId);
+                        control->SetTextFromResource(dialog->guiManager->languageModule, textId);
                     if (toolTipId) {
                         char tip[0x400];
-                        if (LoadStringA((HINSTANCE)dialog->field_0x30->field_0x348, toolTipId, tip, sizeof(tip))) {
-                            if (control->field_0xf0)
-                                DebugFree(control->field_0xf0, __FILE__, 0x646);
-                            control->field_0xf0 = (char*)DebugMalloc(strlen(tip) + 1, __FILE__, 0x647);
-                            strcpy(control->field_0xf0, tip);
+                        if (LoadStringA((HINSTANCE)dialog->guiManager->languageModule, toolTipId, tip, sizeof(tip))) {
+                            if (control->toolTipText)
+                                DebugFree(control->toolTipText, __FILE__, 0x646);
+                            control->toolTipText = (char*)DebugMalloc(strlen(tip) + 1, __FILE__, 0x647);
+                            strcpy(control->toolTipText, tip);
                         } else {
                             sprintf(tip, "Resource string '%d' load fail\n", toolTipId);
-                            if (control->field_0xf0)
-                                DebugFree(control->field_0xf0, __FILE__, 0x64d);
-                            control->field_0xf0 = 0;
+                            if (control->toolTipText)
+                                DebugFree(control->toolTipText, __FILE__, 0x64d);
+                            control->toolTipText = 0;
                         }
                     }
                 } else {
                     if (toolTip[0]) {
-                        control->field_0xf0 = (char*)DebugMalloc(strlen(toolTip) + 1, __FILE__, 0x656);
-                        strcpy(control->field_0xf0, toolTip);
+                        control->toolTipText = (char*)DebugMalloc(strlen(toolTip) + 1, __FILE__, 0x656);
+                        strcpy(control->toolTipText, toolTip);
                     }
                     if (text[0])
-                        control->UnknownFunction470b20(text);
+                        control->SetText(text);
                 }
-                control->field_0xe8 = textLMargin;
-                control->field_0xec = textTMargin;
-                control->UnknownFunction470d60(textDrop != 0);
-                control->UnknownFunction470d40(textColor);
-                control->UnknownFunction470d80(dropColor);
+                control->textLeftMargin = textLMargin;
+                control->textTopMargin = textTMargin;
+                control->SetTextDrop(textDrop != 0);
+                control->SetFontColor(textColor);
+                control->SetDropColor(dropColor);
                 int align;
                 if (!_stricmp(textAlignV, "TOP"))
                     align = 8;
@@ -2398,7 +2398,7 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                 } else if (!_stricmp(textAlign, "CENTER")) {
                     align |= 2;
                 } else {
-                    switch (control->field_0x5c) {
+                    switch (control->controlType) {
                     case 1:
                     case 2:
                     case 4:
@@ -2412,37 +2412,37 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
                         break;
                     }
                 }
-                control->UnknownFunction470da0(align);
+                control->SetTextAlign(align);
                 if (!_stricmp(fx, "GROW")) {
-                    control->UnknownFunction470870(100, (int)UnknownFunction46e9a0(fxSound), 1, fxDelay, -1);
+                    control->StartTransition(100, (int)FindSectionObject(fxSound), 1, fxDelay, -1);
                 } else if (!_stricmp(fx, "LSLIDE")) {
-                    control->UnknownFunction470870(101, (int)UnknownFunction46e9a0(fxSound), 1, fxDelay, -1);
+                    control->StartTransition(101, (int)FindSectionObject(fxSound), 1, fxDelay, -1);
                 } else if (!_stricmp(fx, "TSLIDE")) {
-                    control->UnknownFunction470870(103, (int)UnknownFunction46e9a0(fxSound), 1, fxDelay, -1);
+                    control->StartTransition(103, (int)FindSectionObject(fxSound), 1, fxDelay, -1);
                 } else if (!_stricmp(fx, "RSLIDE")) {
-                    control->UnknownFunction470870(102, (int)UnknownFunction46e9a0(fxSound), 1, fxDelay, -1);
+                    control->StartTransition(102, (int)FindSectionObject(fxSound), 1, fxDelay, -1);
                 } else if (!_stricmp(fx, "BSLIDE")) {
-                    control->UnknownFunction470870(104, (int)UnknownFunction46e9a0(fxSound), 1, fxDelay, -1);
+                    control->StartTransition(104, (int)FindSectionObject(fxSound), 1, fxDelay, -1);
                 } else if (!_stricmp(fx, "ANIM")) {
-                    control->UnknownFunction470870(106, 0, 1, 0, -1);
-                    control->field_0x184 = (UIAnim*)UnknownFunction46e9a0(fxAnimIn);
-                    control->field_0x188 = (UIAnim*)UnknownFunction46e9a0(fxAnimOut);
-                    control->field_0x1ac = UnknownFunction46e9a0(fxSoundIn);
-                    control->field_0x1b0 = UnknownFunction46e9a0(fxSoundOut);
+                    control->StartTransition(106, 0, 1, 0, -1);
+                    control->fxAnimIn = (UIAnim*)FindSectionObject(fxAnimIn);
+                    control->fxAnimOut = (UIAnim*)FindSectionObject(fxAnimOut);
+                    control->fxSoundIn = FindSectionObject(fxSoundIn);
+                    control->fxSoundOut = FindSectionObject(fxSoundOut);
                 }
-                control->UnknownFunction470810(0, UnknownFunction46e9a0(soundNorm));
-                control->UnknownFunction470810(1, UnknownFunction46e9a0(soundFocus));
-                control->UnknownFunction470810(2, UnknownFunction46e9a0(soundPush));
-                control->UnknownFunction470810(3, UnknownFunction46e9a0(soundClick));
+                control->SetSound(0, FindSectionObject(soundNorm));
+                control->SetSound(1, FindSectionObject(soundFocus));
+                control->SetSound(2, FindSectionObject(soundPush));
+                control->SetSound(3, FindSectionObject(soundClick));
                 control->UnknownVirtualSlot49(enable != 0);
-                control->UnknownFunction470660(show != 0, 1);
-                control->field_0x180 = (int)UnknownFunction46e9a0(mouseAnim);
-                control->field_0x1d8 = keyBind;
-                control->field_0x1dc = pre3D == 0;
-                control->field_0x1e0 = permanent;
-                control->field_0x1cc = control->UnknownVirtualSlot48(-1);
+                control->Show(show != 0, 1);
+                control->mouseAnim = (int)FindSectionObject(mouseAnim);
+                control->keyBind = keyBind;
+                control->post3D = pre3D == 0;
+                control->permanent = permanent;
+                control->drawnTexture = control->UnknownVirtualSlot48(-1);
                 control->UnknownVirtualSlot39();
-                dialog->field_0x9cc[i].field_0x34 = (Sound*)control;
+                dialog->sectionTable[i].sectionObject = (Sound*)control;
                 break;
             }
             }
@@ -2450,49 +2450,49 @@ int UIDialog::UnknownFunction46a920(void* stream, int offset) {
     }
 
     if (backgroundImage[0]) {
-        UnknownGameUiControl* frame = UnknownFunction46ebf0("FRMBIStatic", 5);
-        UIAnim* image = (UIAnim*)UnknownFunction46e9a0(backgroundImage);
+        UnknownGameUiControl* frame = FindControl("FRMBIStatic", 5);
+        UIAnim* image = (UIAnim*)FindSectionObject(backgroundImage);
         if (image) {
-            int width = image->UnknownFunction472f90()->field_0x14;
-            int imageHeight = image->UnknownFunction472f90()->field_0x18;
-            frame->UnknownFunction470730(0, image);
+            int width = image->GetCurrentTexture()->field_0x14;
+            int imageHeight = image->GetCurrentTexture()->field_0x18;
+            frame->SetImage(0, image);
             frame->field_0x2c[2] = width;
             frame->field_0x2c[3] = imageHeight;
             *(CameraRect*)frame->field_0x3c = *(CameraRect*)frame->field_0x2c;
-            frame->field_0x1cc = frame->UnknownVirtualSlot48(0);
-            dialog->field_0x160.right = dialog->field_0x160.left + width;
-            dialog->field_0x160.bottom = dialog->field_0x160.top + imageHeight;
+            frame->drawnTexture = frame->UnknownVirtualSlot48(0);
+            dialog->screenArea.right = dialog->screenArea.left + width;
+            dialog->screenArea.bottom = dialog->screenArea.top + imageHeight;
             frame->UnknownVirtualSlot39();
         }
     }
-    if (dialog->field_0x15c && dialog->field_0x174 && dialog->field_0x178) {
-        int align = dialog->field_0x170;
+    if (dialog->isPopup && dialog->screenWidth && dialog->screenHeight) {
+        int align = dialog->popupAlignment;
         RenderTarget* target = (RenderTarget*)dialog->field_0x18;
         if (align & 1) {
-            dialog->field_0x160.right -= dialog->field_0x160.left;
-            dialog->field_0x160.left = 0;
+            dialog->screenArea.right -= dialog->screenArea.left;
+            dialog->screenArea.left = 0;
         } else if (align & 4) {
-            int shift = target->field_0x0c - dialog->field_0x160.left * 2 - dialog->field_0x160.right;
-            dialog->field_0x160.left += shift;
-            dialog->field_0x160.right += shift;
+            int shift = target->field_0x0c - dialog->screenArea.left * 2 - dialog->screenArea.right;
+            dialog->screenArea.left += shift;
+            dialog->screenArea.right += shift;
         } else {
-            int shift = (target->field_0x0c - dialog->field_0x160.left - dialog->field_0x160.right) / 2 -
-                        dialog->field_0x160.left;
-            dialog->field_0x160.left += shift;
-            dialog->field_0x160.right += shift;
+            int shift = (target->field_0x0c - dialog->screenArea.left - dialog->screenArea.right) / 2 -
+                        dialog->screenArea.left;
+            dialog->screenArea.left += shift;
+            dialog->screenArea.right += shift;
         }
         if (align & 8) {
-            dialog->field_0x160.bottom -= dialog->field_0x160.top;
-            dialog->field_0x160.top = 0;
+            dialog->screenArea.bottom -= dialog->screenArea.top;
+            dialog->screenArea.top = 0;
         } else if (align & 0x20) {
-            int shift = target->field_0x10 - dialog->field_0x160.top * 2 - dialog->field_0x160.bottom;
-            dialog->field_0x160.top += shift;
-            dialog->field_0x160.bottom += shift;
+            int shift = target->field_0x10 - dialog->screenArea.top * 2 - dialog->screenArea.bottom;
+            dialog->screenArea.top += shift;
+            dialog->screenArea.bottom += shift;
         } else {
-            int shift = (target->field_0x10 - dialog->field_0x160.top - dialog->field_0x160.bottom) / 2 -
-                        dialog->field_0x160.top;
-            dialog->field_0x160.top += shift;
-            dialog->field_0x160.bottom += shift;
+            int shift = (target->field_0x10 - dialog->screenArea.top - dialog->screenArea.bottom) / 2 -
+                        dialog->screenArea.top;
+            dialog->screenArea.top += shift;
+            dialog->screenArea.bottom += shift;
         }
     }
     return 1;

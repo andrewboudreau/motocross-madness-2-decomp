@@ -33,7 +33,7 @@ struct DebugOverlayRow {
     int right;                                // 0x100
     int bottom;                               // y + line height
     char text[0x80];
-    int field_0x90;                           // drawn in the second (red) pass when set
+    int highlighted;                          // drawn in the second (red) pass when set
     unsigned int color;                       // 0xffffff
 };
 
@@ -60,7 +60,7 @@ public:
     // ("Courier", height field_0x36d0) into a new 256x256 texture through GDI.
     int UnknownFunction447a00();
     // 0x00447e90 (ret 0xc): sets the text of row `row` when it changed.
-    void UnknownFunction447e90(int row, const char* text, int flag);
+    void SetRowText(int row, const char* text, int flag);
     int UnknownFunction4484f0();                                        // 0x004484f0: next page
     // 0x00447f40 and 0x00447fa0: format a row onto page `page` when that page
     // is shown (+0x25 bit 0 and +0x26c4); cdecl, `this` on the stack.
@@ -69,23 +69,23 @@ public:
     // 0x00448000 (ret 0xc): sets field_0x90 of row `row` on a shown page.
     void UnknownFunction448000(int page, int row, int flag);
     // 0x00448200 (ret 0x14): draws `length` characters of `text` at (x, y).
-    void UnknownFunction448200(int x, int y, const char* text, int length, unsigned int color);
-    int NewPage() { return field_0x26c0++; }
+    void DrawString(int x, int y, const char* text, int length, unsigned int color);
+    int NewPage() { return nextPage++; }
 
-    char field_0x2c[0x80];                    // formatted row
-    int field_0xac;                           // rows on the shown page
+    char rowText[0x80];                       // formatted row
+    int pageRowCount;                         // rows on the shown page
     int field_0xb0;
     DebugOverlayRow field_0xb4[64];
-    int field_0x26b4;                         // line height
-    int field_0x26b8;                         // left of the rows
-    int field_0x26bc;                         // top of the rows
-    int field_0x26c0;                         // next page number
+    int lineHeight;                           // line height
+    int rowsLeft;                             // left of the rows
+    int rowsTop;                              // top of the rows
+    int nextPage;                             // next page number
     int field_0x26c4;                         // page shown
-    int field_0x26c8;                         // row limit
-    float field_0x26cc;                       // vertex z, 0.001
+    int rowLimit;                             // row limit
+    float vertexZ;                            // vertex z, 0.001
     DebugOverlayGlyph field_0x26d0[256];
-    int field_0x36d0;                         // font height
+    int fontHeight;                           // font height
     TextureMapManager* field_0x36d4;
-    PCTextureMap* field_0x36d8;               // font texture
+    PCTextureMap* fontTexture;                // font texture
     int field_0x36dc;                         // Game slot 8: "[this overlay %d]"
 };

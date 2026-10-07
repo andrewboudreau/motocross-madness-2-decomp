@@ -1,7 +1,7 @@
 // Near-miss TextService.cpp candidates (src/reconstructed/TextService.cpp),
 // kept out of src/reconstructed until they match.
 //
-// UnknownOverlayText::UnknownFunction50ade0 (0x0050ade0, 125 bytes): the
+// UnknownOverlayText::SelectFont (0x0050ade0, 125 bytes): the
 // font lookup by name. Retail keeps the loop test at the top (`cmp i,
 // count; jae`, `jmp` back after `i++`) and loads `font` before the loop;
 // VC6 here rotates the loop. for, while, for(;;) with return/break,
@@ -33,14 +33,14 @@
 #include "../../src/reconstructed/TextService.cpp"
 
 // 0x0050ade0
-void UnknownOverlayText::UnknownFunction50ade0(const char* font) {
+void UnknownOverlayText::SelectFont(const char* font) {
     unsigned int count;
     unsigned int i;
 
-    count = field_0x04->Count();
+    count = fonts->Count();
     for (i = 0; i < count; i++) {
-        if (!strcmp(font, (*field_0x04)[i]->UnknownFunction4673b0())) {
-            field_0x00 = (*field_0x04)[i];
+        if (!strcmp(font, (*fonts)[i]->UnknownFunction4673b0())) {
+            currentFont = (*fonts)[i];
             return;
         }
     }
@@ -48,12 +48,12 @@ void UnknownOverlayText::UnknownFunction50ade0(const char* font) {
 
 // 0x0050b080
 int UnknownOverlayText::UnknownFunction50b080(TextureMap* texture, int x, int y, const char* text, int color) {
-    if (texture->field_0x20 == 0x613)
+    if (texture->field_0x20 == 1555)
         return UnknownFunction50b700(texture, x, y, text, UnknownFunction43b660(color, texture->field_0x20));
-    if (texture->field_0x20 == 0x115c)
+    if (texture->field_0x20 == 4444)
         return UnknownFunction50b400(texture, x, y, text, UnknownFunction43b660(color, texture->field_0x20));
 
-    TextureMap* fontTexture = field_0x00->UnknownFunction4673c0();
+    TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->field_0x14;
     long pitch = 0;
     long fontPitch = 0;
@@ -71,7 +71,7 @@ int UnknownOverlayText::UnknownFunction50b080(TextureMap* texture, int x, int y,
     unsigned int i;
 
     for (i = 0; i < length; i++) {
-        CharacterCell* character = field_0x00->UnknownFunction467340(text[i]);
+        CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
             cell = character->UnknownFunction50beb0();
             unsigned int u = (unsigned int)(fontWidth * cell.field_0x04.x);
@@ -104,7 +104,7 @@ int UnknownOverlayText::UnknownFunction50b080(TextureMap* texture, int x, int y,
 
 // 0x0050b400
 int UnknownOverlayText::UnknownFunction50b400(TextureMap* texture, int x, int y, const char* text, int color) {
-    TextureMap* fontTexture = field_0x00->UnknownFunction4673c0();
+    TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->field_0x14;
     long pitch = 0;
     long fontPitch = 0;
@@ -122,7 +122,7 @@ int UnknownOverlayText::UnknownFunction50b400(TextureMap* texture, int x, int y,
     unsigned int i;
 
     for (i = 0; i < length; i++) {
-        CharacterCell* character = field_0x00->UnknownFunction467340(text[i]);
+        CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
             cell = character->UnknownFunction50beb0();
             unsigned int u = (unsigned int)(fontWidth * cell.field_0x04.x);
@@ -155,7 +155,7 @@ int UnknownOverlayText::UnknownFunction50b400(TextureMap* texture, int x, int y,
 
 // 0x0050b700
 int UnknownOverlayText::UnknownFunction50b700(TextureMap* texture, int x, int y, const char* text, int color) {
-    TextureMap* fontTexture = field_0x00->UnknownFunction4673c0();
+    TextureMap* fontTexture = currentFont->GetTexture();
     unsigned int width = texture->field_0x14;
     long pitch = 0;
     long fontPitch = 0;
@@ -173,7 +173,7 @@ int UnknownOverlayText::UnknownFunction50b700(TextureMap* texture, int x, int y,
     unsigned int i;
 
     for (i = 0; i < length; i++) {
-        CharacterCell* character = field_0x00->UnknownFunction467340(text[i]);
+        CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
             cell = character->UnknownFunction50beb0();
             unsigned int u = (unsigned int)(fontWidth * cell.field_0x04.x);
@@ -217,7 +217,7 @@ void* UnknownOverlayText::UnknownFunction50ba00(const UnknownOverlayRect* rect, 
 
     *count = length * 6;
     for (i = 0; i < length; i++) {
-        CharacterCell* character = field_0x00->UnknownFunction467340(text[i]);
+        CharacterCell* character = currentFont->FindCell(text[i]);
         if (character) {
             cell = character->UnknownFunction50beb0();
             float height = (cell.field_0x10.y - cell.field_0x04.y) * 255.0f;
@@ -230,7 +230,7 @@ void* UnknownOverlayText::UnknownFunction50ba00(const UnknownOverlayRect* rect, 
 
             field_0x2c[i * 6 + 0].sx = x;
             field_0x2c[i * 6 + 0].sy = y;
-            field_0x2c[i * 6 + 0].sz = field_0x0c;
+            field_0x2c[i * 6 + 0].sz = vertexDepth;
             field_0x2c[i * 6 + 0].rhw = 1.0f;
             field_0x2c[i * 6 + 0].color = color;
             field_0x2c[i * 6 + 0].specular = 0;
@@ -239,7 +239,7 @@ void* UnknownOverlayText::UnknownFunction50ba00(const UnknownOverlayRect* rect, 
 
             field_0x2c[i * 6 + 2].sx = x;
             field_0x2c[i * 6 + 2].sy = bottom;
-            field_0x2c[i * 6 + 2].sz = field_0x0c;
+            field_0x2c[i * 6 + 2].sz = vertexDepth;
             field_0x2c[i * 6 + 2].rhw = 1.0f;
             field_0x2c[i * 6 + 2].color = color;
             field_0x2c[i * 6 + 2].specular = 0;
@@ -248,7 +248,7 @@ void* UnknownOverlayText::UnknownFunction50ba00(const UnknownOverlayRect* rect, 
 
             field_0x2c[i * 6 + 1].sx = right;
             field_0x2c[i * 6 + 1].sy = bottom;
-            field_0x2c[i * 6 + 1].sz = field_0x0c;
+            field_0x2c[i * 6 + 1].sz = vertexDepth;
             field_0x2c[i * 6 + 1].rhw = 1.0f;
             field_0x2c[i * 6 + 1].color = color;
             field_0x2c[i * 6 + 1].specular = 0;
@@ -257,7 +257,7 @@ void* UnknownOverlayText::UnknownFunction50ba00(const UnknownOverlayRect* rect, 
 
             field_0x2c[i * 6 + 3].sx = x;
             field_0x2c[i * 6 + 3].sy = y;
-            field_0x2c[i * 6 + 3].sz = field_0x0c;
+            field_0x2c[i * 6 + 3].sz = vertexDepth;
             field_0x2c[i * 6 + 3].rhw = 1.0f;
             field_0x2c[i * 6 + 3].color = color;
             field_0x2c[i * 6 + 3].specular = 0;
@@ -266,7 +266,7 @@ void* UnknownOverlayText::UnknownFunction50ba00(const UnknownOverlayRect* rect, 
 
             field_0x2c[i * 6 + 5].sx = right;
             field_0x2c[i * 6 + 5].sy = bottom;
-            field_0x2c[i * 6 + 5].sz = field_0x0c;
+            field_0x2c[i * 6 + 5].sz = vertexDepth;
             field_0x2c[i * 6 + 5].rhw = 1.0f;
             field_0x2c[i * 6 + 5].color = color;
             field_0x2c[i * 6 + 5].specular = 0;
@@ -275,7 +275,7 @@ void* UnknownOverlayText::UnknownFunction50ba00(const UnknownOverlayRect* rect, 
 
             field_0x2c[i * 6 + 4].sx = right;
             field_0x2c[i * 6 + 4].sy = y;
-            field_0x2c[i * 6 + 4].sz = field_0x0c;
+            field_0x2c[i * 6 + 4].sz = vertexDepth;
             field_0x2c[i * 6 + 4].rhw = 1.0f;
             field_0x2c[i * 6 + 4].color = color;
             field_0x2c[i * 6 + 4].specular = 0;

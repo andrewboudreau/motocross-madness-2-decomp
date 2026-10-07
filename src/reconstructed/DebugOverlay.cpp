@@ -10,6 +10,7 @@
 #include "Game.h"
 #include "PCTextureMap.h"
 #include "RenderTarget.h"
+#include "D3DConstants.h"
 
 // A transformed, lit vertex (FVF 0x1c4: position and rhw, diffuse,
 // specular, one texture coordinate pair), the D3DTLVERTEX layout.
@@ -40,102 +41,102 @@ void UnknownFunction447910(void* window)
 DebugOverlay::DebugOverlay(int flags)
     : GameObject(flags)
 {
-    field_0x26c0 = 0;
+    nextPage = 0;
     field_0x26c4 = 0;
     field_0x36dc = 0;
-    field_0x26c8 = 0;
-    field_0x36d0 = 0;
-    field_0xac = -1;
-    field_0x26cc = 0.001f;
+    rowLimit = 0;
+    fontHeight = 0;
+    pageRowCount = -1;
+    vertexZ = 0.001f;
 }
 
 DebugOverlay::~DebugOverlay()
 {
-    if (field_0x36d8) {
-        field_0x36d8->Release();
-        field_0x36d8 = 0;
+    if (fontTexture) {
+        fontTexture->Release();
+        fontTexture = 0;
     }
 }
 
-void DebugOverlay::UnknownFunction447e90(int row, const char* text, int flag)
+void DebugOverlay::SetRowText(int row, const char* text, int flag)
 {
-    if (row < field_0x26c8 && strcmp(field_0xb4[row].text, text) != 0) {
+    if (row < rowLimit && strcmp(field_0xb4[row].text, text) != 0) {
         int length = strlen(text);
         int n = length > 0x7f ? 0x7f : length;
         strncpy(field_0xb4[row].text, text, n);
         field_0xb4[row].text[n] = 0;
         field_0xb4[row].color = 0xffffff;
-        field_0xb4[row].field_0x90 = flag;
+        field_0xb4[row].highlighted = flag;
     }
 }
 
 void DebugOverlay::UnknownFunction447f40(int page, const char* format, ...)
 {
-    if (field_0x25_bit0 && page == field_0x26c4 && field_0xac + 1 < field_0x26c8) {
+    if (field_0x25_bit0 && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
         va_list args;
         va_start(args, format);
-        vsprintf(field_0x2c, format, args);
-        UnknownFunction447e90(++field_0xac, field_0x2c, 0);
+        vsprintf(rowText, format, args);
+        SetRowText(++pageRowCount, rowText, 0);
     }
 }
 
 void DebugOverlay::UnknownFunction447fa0(int page, const char* format, ...)
 {
-    if (field_0x25_bit0 && page == field_0x26c4 && field_0xac + 1 < field_0x26c8) {
+    if (field_0x25_bit0 && page == field_0x26c4 && pageRowCount + 1 < rowLimit) {
         va_list args;
         va_start(args, format);
-        vsprintf(field_0x2c, format, args);
-        UnknownFunction447e90(++field_0xac, field_0x2c, 1);
+        vsprintf(rowText, format, args);
+        SetRowText(++pageRowCount, rowText, 1);
     }
 }
 
 void DebugOverlay::UnknownFunction448000(int page, int row, int flag)
 {
     if (field_0x25_bit0 && page == field_0x26c4)
-        field_0xb4[row].field_0x90 = flag;
+        field_0xb4[row].highlighted = flag;
 }
 
 int DebugOverlay::UnknownVirtualSlot14()
 {
-    field_0x36d8->UnknownVirtualSlot19();
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1c, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 0x10, 1);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 0x11, 1);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 4);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 2, 2);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 3, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 2);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 5, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 1, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0xf, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0xe, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(7, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(4, 0, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(8, 3, 0);
+    fontTexture->UnknownVirtualSlot19();
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
     unsigned int start = UnknownFunction4bfa80();
     int i;
-    for (i = 0; i <= field_0xac; i++) {
-        if (!field_0xb4[i].field_0x90)
-            UnknownFunction448200(field_0xb4[i].x + field_0x26b8, field_0xb4[i].y + field_0x26bc,
+    for (i = 0; i <= pageRowCount; i++) {
+        if (!field_0xb4[i].highlighted)
+            DrawString(field_0xb4[i].x + rowsLeft, field_0xb4[i].y + rowsTop,
                                   field_0xb4[i].text, strlen(field_0xb4[i].text), 0xa0ffffff);
     }
-    for (i = 0; i <= field_0xac; i++) {
-        if (field_0xb4[i].field_0x90)
-            UnknownFunction448200(field_0xb4[i].x + field_0x26b8, field_0xb4[i].y + field_0x26bc,
+    for (i = 0; i <= pageRowCount; i++) {
+        if (field_0xb4[i].highlighted)
+            DrawString(field_0xb4[i].x + rowsLeft, field_0xb4[i].y + rowsTop,
                                   field_0xb4[i].text, strlen(field_0xb4[i].text), 0xc0ff0000);
     }
-    field_0xac = -1;
+    pageRowCount = -1;
     field_0x36dc = UnknownFunction4bfa80() - start;
     return 1;
 }
 
-void DebugOverlay::UnknownFunction448200(int x, int y, const char* text, int length,
+void DebugOverlay::DrawString(int x, int y, const char* text, int length,
                                          unsigned int color)
 {
     DebugOverlayVertex vertices[192];
     float left = (float)x;
     float top = (float)y;
-    float bottom = top + field_0x26b4;
+    float bottom = top + lineHeight;
     if (!(bottom < ((RenderTarget*)field_0x18)->field_0x10))
         return;
     int index = 0;
@@ -148,12 +149,12 @@ void DebugOverlay::UnknownFunction448200(int x, int y, const char* text, int len
             float right = (field_0x26d0[ch].u1 - field_0x26d0[ch].u0) * 256.0f + left;
             if (!(right < ((RenderTarget*)field_0x18)->field_0x0c)) {
                 if (count)
-                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(4, 0x1c4, (int)vertices, count, 0);
+                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
                 return;
             }
             vertices[count].x = left;
             vertices[count].y = top;
-            vertices[count].z = field_0x26cc;
+            vertices[count].z = vertexZ;
             vertices[count].rhw = 1.0f;
             vertices[count].diffuse = color;
             vertices[count].specular = 0;
@@ -161,7 +162,7 @@ void DebugOverlay::UnknownFunction448200(int x, int y, const char* text, int len
             vertices[count].tv = field_0x26d0[ch].v0;
             vertices[count + 2].x = left;
             vertices[count + 2].y = bottom;
-            vertices[count + 2].z = field_0x26cc;
+            vertices[count + 2].z = vertexZ;
             vertices[count + 2].rhw = 1.0f;
             vertices[count + 2].diffuse = color;
             vertices[count + 2].specular = 0;
@@ -169,7 +170,7 @@ void DebugOverlay::UnknownFunction448200(int x, int y, const char* text, int len
             vertices[count + 2].tv = field_0x26d0[ch].v1;
             vertices[count + 1].x = right;
             vertices[count + 1].y = bottom;
-            vertices[count + 1].z = field_0x26cc;
+            vertices[count + 1].z = vertexZ;
             vertices[count + 1].rhw = 1.0f;
             vertices[count + 1].diffuse = color;
             vertices[count + 1].specular = 0;
@@ -177,7 +178,7 @@ void DebugOverlay::UnknownFunction448200(int x, int y, const char* text, int len
             vertices[count + 1].tv = field_0x26d0[ch].v1;
             vertices[count + 3].x = left;
             vertices[count + 3].y = top;
-            vertices[count + 3].z = field_0x26cc;
+            vertices[count + 3].z = vertexZ;
             vertices[count + 3].rhw = 1.0f;
             vertices[count + 3].diffuse = color;
             vertices[count + 3].specular = 0;
@@ -185,7 +186,7 @@ void DebugOverlay::UnknownFunction448200(int x, int y, const char* text, int len
             vertices[count + 3].tv = field_0x26d0[ch].v0;
             vertices[count + 5].x = right;
             vertices[count + 5].y = bottom;
-            vertices[count + 5].z = field_0x26cc;
+            vertices[count + 5].z = vertexZ;
             vertices[count + 5].rhw = 1.0f;
             vertices[count + 5].diffuse = color;
             vertices[count + 5].specular = 0;
@@ -193,7 +194,7 @@ void DebugOverlay::UnknownFunction448200(int x, int y, const char* text, int len
             vertices[count + 5].tv = field_0x26d0[ch].v1;
             vertices[count + 4].x = right;
             vertices[count + 4].y = top;
-            vertices[count + 4].z = field_0x26cc;
+            vertices[count + 4].z = vertexZ;
             vertices[count + 4].rhw = 1.0f;
             vertices[count + 4].diffuse = color;
             vertices[count + 4].specular = 0;
@@ -203,7 +204,7 @@ void DebugOverlay::UnknownFunction448200(int x, int y, const char* text, int len
             count += 6;
             index++;
         }
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(4, 0x1c4, (int)vertices, count, 0);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_TLVERTEX, (int)vertices, count, 0);
         ((RenderTarget*)field_0x18)->field_0x44 -= count / 3;
         length -= count / 6;
     }
@@ -211,7 +212,7 @@ void DebugOverlay::UnknownFunction448200(int x, int y, const char* text, int len
 
 int DebugOverlay::UnknownFunction4484f0()
 {
-    if (++field_0x26c4 >= field_0x26c0) {
+    if (++field_0x26c4 >= nextPage) {
         field_0x26c4 = 0;
         return 1;
     }
@@ -221,8 +222,8 @@ int DebugOverlay::UnknownFunction4484f0()
 int DebugOverlay::UnknownVirtualSlot25(void* value)
 {
     GameObject::UnknownVirtualSlot25(value);
-    if (!field_0x36d8->UnknownFunction4c7420()) {
-        field_0x36d8->Release();
+    if (!fontTexture->RestoreTextureSurface()) {
+        fontTexture->Release();
         return UnknownFunction447a00();
     }
     return 1;

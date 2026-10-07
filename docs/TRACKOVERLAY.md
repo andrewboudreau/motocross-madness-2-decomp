@@ -166,3 +166,34 @@ PYTHONPATH=. python tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt 
   --vc6-root "$VC6_ROOT" --exe work/game/mcm2.exe --jobs 8
 PYTHONPATH=. python tools/disasm_fn.py --exe work/game/mcm2.exe 0x51e240
 ```
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x00518c60` `PlaceNeedle`
+- `0x00518cc0` `PlaceNeedleTip`
+- `0x00519000` `IsPointVisible`
+- `0x005198a0` `Redraw`
+- `0x00519e10` `DrawTimeLeft`
+- `0x0051a480` `DrawLapTime`
+- `0x0051a560` `DrawRacePanel`
+- `0x0051aa40` `DrawTagStandings`
+- `0x0051bc60` `DrawForViewMode`
+- `0x0051bdc0` `DrawFrameRate`
+- `0x0051bed0` `DrawRacers`
+- `0x0051c360` `WorldToMap`
+- `0x0051c460` `LineThrough`
+- `0x0051cb20` `DrawGates`
+- `0x0051de10` `RedrawChat`
+- `0x0051e3f0` `DrawNameTag`
+- `0x0051e800` `RedrawNameLine`
+- `0x0051ea80` `AppendChar`
+- `0x0051eab0` `Backspace`
+- `0x0051ead0` `ClearLine`
+- `0x0051eae0` `GetLine`
+- `0x0051eaf0` `GetLineTail`
+- `0x0051eb10` `GetHistory`
+- `0x0051eb40` `AddHistory`

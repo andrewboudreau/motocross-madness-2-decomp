@@ -38,3 +38,14 @@ The first two differ in stack-slot and register assignment.
 
 D3DIMSoultreeModifier.h now gives slot 27 its signature `(object, mesh,
 out)`, taken from the call site `0x00440ded`.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x004a3bb0` `CompareTargets`
+- `0x004a3be0` `AngleBetween`
+- `0x004a4bb0` `UpdateChannels`
+- `0x004a5290` `CopyMesh`

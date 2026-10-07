@@ -3,7 +3,9 @@
 The literal `__FILE__` `D:\aardvark\VC\krusty2\TrackRecord.cpp`
 (`0x0057536c`) is referenced by `0x0051ef30`, `0x0051ff40` and
 `0x0051ffe0`. Canonical source is `src/reconstructed/TrackRecord.h`,
-`TrackRecordDlg.h` and `TrackRecord.cpp`; every name is provisional.
+`TrackRecordDlg.h` and `TrackRecord.cpp`. The table methods (`Clear`,
+`Read`, `Write`, `AddRacer`) and dialog helpers (`LabelTabs`, `ShowTab`,
+`FillLists`) are named after their bodies; other names are provisional.
 
 The TU covers at least `0x0051ee90..0x00520692`. ChatOverlay's code ends
 before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
@@ -41,8 +43,8 @@ before it. `0x005206a0` writes another class's vtable (`0x005588c4`) and
   `0x005204e0` has UnknownDialogEvent's layout: the control name (+0x04),
   the kind (+0x08: 5 set-up, 1 button or tab, 2 list selection, 6 close),
   the dialog (+0x0c), the control (+0x14) and the handled flag (+0x20).
-- `UIDialog::UnknownFunction46ebf0` looks a control up by name. GameUi.h
-  already declares the same address as `UnknownGameUiPage::FindControl`.
+- `UIDialog::FindControl` (`0x0046ebf0`) looks a control up by name. GameUi.h
+  also declares the address as `UnknownGameUiPage::UnknownFunction46ebf0`.
   The new declaration was added because TrackRecordDlg derives from
   UIDialog, so the two names are one function, not proven types.
 - `0x00520390` calls control slot 66 (`+0x108`) on the track list. Vtable

@@ -1,7 +1,7 @@
 // Near-miss SceneManager.cpp candidates, kept out of src/reconstructed until
 // they match. See docs/SCENEMANAGER.md.
 //
-// Scene::UnknownFunction4ecd60 (0x004ecd60, 4543 bytes; 4534 of 4536 compared
+// Scene::ReadStaticModels (0x004ecd60, 4543 bytes; 4534 of 4536 compared
 // positions): the "StaticModels" reader. Everything but one store lines up,
 // including the frame, the jump table and the EH states. The model name's
 // terminator `field_0xb8->field_0x04[i].field_0x10[count] = 0` is
@@ -19,7 +19,7 @@
 // /G3-/G6, /GB, /Gy, /Gf, /Zp, /Op, /Ox, /vm* flags leave it.
 
 //
-// Scene::UnknownFunction4edfe0 (0x004edfe0, 5343 bytes): the "Animations"
+// Scene::ReadAnimations (0x004edfe0, 5343 bytes): the "Animations"
 // reader. Code, calls, EH states, the error tails and the frame size
 // (0xcfc) line up except: (1) the frame slots of most scalars and of
 // `list`/`sltPath` (VC6 orders the frame by use, not declaration; the
@@ -188,7 +188,7 @@ static inline int FindEmitter(const char* name, const UnknownSceneEmitterKeyword
 // 0x004ecd60: see the declaration. A model whose ".seg" name is the
 // stadium's gets no collision object; its ".col" file is used when the
 // archive has one.
-int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, void (*progress)(int),
+int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (*progress)(int),
                                  int interval)
 {
     int models;
@@ -225,11 +225,11 @@ int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, v
 
     models = 0;
     field_0xb8 = 0;
-    int found = field_0xdc.UnknownFunction4b78f0("StaticModels");
-    if (field_0x2c->field_0x38c && found) {
-        if (!field_0xdc.UnknownFunction4b7f10("NumberOfStaticModels", -1, &models)) {
+    int found = parameters.UnknownFunction4b78f0("StaticModels");
+    if (sceneManager->field_0x38c && found) {
+        if (!parameters.UnknownFunction4b7f10("NumberOfStaticModels", -1, &models)) {
             sprintf(text, "\nNumberOfStaticModels cannot be found under [%s] in %s.\n\n", "StaticModels",
-                    field_0x7c8);
+                    scenePath);
             UnknownFunction464e80(text);
             return 0;
         }
@@ -244,16 +244,16 @@ int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, v
             progress(0);
         next = i + 1;
         sprintf(model, "Model%d", next);
-        field_0xdc.UnknownFunction4b78f0(model);
-        if (!field_0xdc.UnknownFunction4b7ec0("SLT", "", slt, 0x104)) {
-            sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", slt, model, field_0x7c8);
+        parameters.UnknownFunction4b78f0(model);
+        if (!parameters.UnknownFunction4b7ec0("SLT", "", slt, 0x104)) {
+            sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", slt, model, scenePath);
             UnknownFunction464e80(message);
             return 0;
         }
         strcpy(path, slt);
         stadium = 0;
         strcpy(strrchr(path, '.'), ".seg");
-        if (!_stricmp(field_0x6bc, path))
+        if (!_stricmp(stadiumFile, path))
             stadium = 1;
         sprintf(sltPath, "%s\\%s", "Res", slt);
         strcpy(strrchr(slt, '.'), ".col");
@@ -262,22 +262,22 @@ int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, v
             strcpy(strrchr(slt, '.'), "");
             colPath[0] = 0;
         }
-        UnknownFunction4eb160(&position, model, "Position", "0.0,0.0,0.0", 0, 0);
-        if (field_0xdc.UnknownFunction4b7f40("Heading", -999.0f, &heading)) {
-            field_0xdc.UnknownFunction4b7f40("Pitch", 0, &pitch);
+        ReadVector(&position, model, "Position", "0.0,0.0,0.0", 0, 0);
+        if (parameters.UnknownFunction4b7f40("Heading", -999.0f, &heading)) {
+            parameters.UnknownFunction4b7f40("Pitch", 0, &pitch);
             UnknownFunction4b5d00(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
         } else {
-            UnknownFunction4eb160(&look, model, "LookVector", "0.0,0.0,1.0", 0, 0);
-            UnknownFunction4eb160(&up, model, "UpVector", "0.0,1.0,0.0", 0, 0);
+            ReadVector(&look, model, "LookVector", "0.0,0.0,1.0", 0, 0);
+            ReadVector(&up, model, "UpVector", "0.0,1.0,0.0", 0, 0);
         }
         field_0xb8->field_0x04[i].field_0x0c = 0;
-        field_0xdc.UnknownFunction4b7f10("PhysicsObject", 0, &physics);
+        parameters.UnknownFunction4b7f10("PhysicsObject", 0, &physics);
         if (physics) {
-            field_0xdc.UnknownFunction4b7f10("NumberOfCollisionPoints", 0, &points);
-            field_0xdc.UnknownFunction4b7f10("NumberOfEmitters", 0, &emitters);
-            field_0xdc.UnknownFunction4b7f10("MinCollisionPointsToRestOn", 1, &minPoints);
-            field_0xdc.UnknownFunction4b7f40("Radius", 1.0f, &radius);
-            field_0xdc.UnknownFunction4b7ec0("ObjectShape", "", text, 0x80);
+            parameters.UnknownFunction4b7f10("NumberOfCollisionPoints", 0, &points);
+            parameters.UnknownFunction4b7f10("NumberOfEmitters", 0, &emitters);
+            parameters.UnknownFunction4b7f10("MinCollisionPointsToRestOn", 1, &minPoints);
+            parameters.UnknownFunction4b7f40("Radius", 1.0f, &radius);
+            parameters.UnknownFunction4b7ec0("ObjectShape", "", text, 0x80);
             UnknownSceneShapeKeyword shapes[2] = {{"Box", 0}, {"Sphere", 1}};
             int shape = FindShape(text, shapes);
             if (minPoints >= points - 1)
@@ -294,9 +294,9 @@ int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, v
             if (points > 0) {
                 for (int p = 0; p < points; p++) {
                     sprintf(key, "CollisionPoint%d", p + 1);
-                    UnknownFunction4eb160(&position, model, key, "0.0,0.0,0.0", 0, 0);
+                    ReadVector(&position, model, key, "0.0,0.0,0.0", 0, 0);
                     sprintf(key, "FrictionCoefficient%d", p + 1);
-                    field_0xdc.UnknownFunction4b7f40(key, 0.6f, &friction);
+                    parameters.UnknownFunction4b7f40(key, 0.6f, &friction);
                     UnknownFunction43a330(points, object->field_0x12c, &position,
                                           object->UnknownScenePhysicsBody::field_0x08, 0, &object->field_0x130,
                                           friction, (int)this);
@@ -309,7 +309,7 @@ int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, v
                 for (int e = 0; e < emitters; e = nextEmitter) {
                     nextEmitter = e + 1;
                     sprintf(key, "EmitterType%d", nextEmitter);
-                    field_0xdc.UnknownFunction4b7ec0(key, "", text, 0x17);
+                    parameters.UnknownFunction4b7ec0(key, "", text, 0x17);
                     UnknownSceneEmitterKeyword types[4] = {
                         {"DustEmitter", 1}, {"DirtChunkEmitter", 2}, {"DirtSprayEmitter", 3},
                         {"ExhaustEmitter", 4},
@@ -372,7 +372,7 @@ int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, v
             field_0xb8->field_0x04[i].field_0x10[count] = 0;
             ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fc630(position);
             ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fbd70(&look, &up, 1, 0);
-            field_0xdc.UnknownFunction4b7f10("Collision", 1, &collision);
+            parameters.UnknownFunction4b7f10("Collision", 1, &collision);
             field_0xb8->field_0x04[i].field_0x0c = 0;
             if (collision && !stadium
                 && ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fda30() == 1) {
@@ -394,18 +394,18 @@ int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, v
             }
             field_0xb8->field_0x04[i].physics = 0;
         }
-        field_0xdc.UnknownFunction4b7f10("UseLighting", 1, &useLighting);
+        parameters.UnknownFunction4b7f10("UseLighting", 1, &useLighting);
         field_0xb8->field_0x04[i].useLighting = useLighting;
         ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)
             ->UnknownFunction4444c0(field_0xb8->field_0x04[i].useLighting);
-        if (field_0xc0) {
-            field_0xdc.UnknownFunction4b7ec0("SoundResourceFile", "", sound, 0x103);
+        if (auralScape) {
+            parameters.UnknownFunction4b7ec0("SoundResourceFile", "", sound, 0x103);
             if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
-                UnknownFunction4ef9c0(model, sound, 1, &params, &flags, &oneShotDistance, &randomTriggerPercent,
+                ReadSoundSettings(model, sound, 1, &params, &flags, &oneShotDistance, &randomTriggerPercent,
                                       &oneShot, &force2D);
                 SoultreeSoundEmitter* emitter =
                     (new(__FILE__, 2015)
-                         SoultreeSoundEmitter((AuralScape*)field_0xc0, field_0xc4, 1, field_0x25_bit0))
+                         SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
                         ->UnknownFunction4029f0(field_0x18, sound, "",
                                                 (UnknownVehiclePart*)field_0xb8->field_0x04[i].field_0x04,
                                                 params, flags, oneShotDistance, randomTriggerPercent, 0,
@@ -425,11 +425,11 @@ int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, v
     UnknownFunction464e80("");
     return 1;
         }
-        sprintf(text, "\nNumber of models<1 in %s.\n\n", "StaticModels", field_0x7c8);
+        sprintf(text, "\nNumber of models<1 in %s.\n\n", "StaticModels", scenePath);
         UnknownFunction464e80(text);
         return 0;
     }
-    sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "StaticModels", field_0x7c8);
+    sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "StaticModels", scenePath);
     UnknownFunction464e80(text);
     return 0;
 }
@@ -438,7 +438,7 @@ int Scene::UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, v
 // "Animation<n>", either a key-framed character (MCF file, motions and a
 // motion sequence) or a procedural car (SLT and VUE files), each with an
 // optional sound emitter; then the "RandomSet<n>" sections.
-int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*progress)(int), int interval)
+int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)(int), int interval)
 {
     int automatic;
     float fps;
@@ -478,11 +478,11 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
     char vuePath[0x104];
 
     animations = 0;
-    int found = field_0xdc.UnknownFunction4b78f0("Animations");
-    if (field_0x2c->field_0x38c && found) {
-        if (!field_0xdc.UnknownFunction4b7f10("NumberOfAnimations", -1, &animations)) {
+    int found = parameters.UnknownFunction4b78f0("Animations");
+    if (sceneManager->field_0x38c && found) {
+        if (!parameters.UnknownFunction4b7f10("NumberOfAnimations", -1, &animations)) {
             sprintf(text, "\nNumberOfAnimations cannot be found under [%s] in %s.\n\n", "Animations",
-                    field_0x7c8);
+                    scenePath);
             UnknownFunction464e80(text);
             return 0;
         }
@@ -497,15 +497,15 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
         field_0xb4->field_0x04[i].field_0x00_bit0 = 0;
         next = i + 1;
         sprintf(name, "Animation%d", next);
-        field_0xdc.UnknownFunction4b78f0(name);
-        if (!field_0xdc.UnknownFunction4b7ec0("AnimationType", "", text, 0x40)) {
+        parameters.UnknownFunction4b78f0(name);
+        if (!parameters.UnknownFunction4b7ec0("AnimationType", "", text, 0x40)) {
             sprintf(message, "\nScene: AnimationType not specified for anim#%d.  Using KeyFramed.\n", i);
             UnknownFunction464e80(message);
             field_0xb4->field_0x04[i].field_0x00_bit3 = 1;
         } else if (!_strnicmp(text, "Procedural", 3)) {
             field_0xb4->field_0x04[i].field_0x00_bit3 = 0;
-            if (!field_0xdc.UnknownFunction4b7ec0("VUE", "", vue, 0x40)) {
-                sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "VUE", name, field_0x7c8);
+            if (!parameters.UnknownFunction4b7ec0("VUE", "", vue, 0x40)) {
+                sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "VUE", name, scenePath);
                 UnknownFunction464e80(message);
                 return 0;
             }
@@ -519,15 +519,15 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
             }
             delete stream;
             UnknownFunction4de580(name, "VUE", vuePath);
-            if (!field_0xdc.UnknownFunction4b7f40("FPS", 30.0f, &fps))
+            if (!parameters.UnknownFunction4b7f40("FPS", 30.0f, &fps))
                 UnknownFunction4de580(name, "FPS(Default)", fps);
             else
                 UnknownFunction4de580(name, "FPS", fps);
-            if (!field_0xdc.UnknownFunction4b7f40("LagDistance", 0, &lagDistance))
+            if (!parameters.UnknownFunction4b7f40("LagDistance", 0, &lagDistance))
                 UnknownFunction4de580(name, "LagDistance(Default)", lagDistance);
             else
                 UnknownFunction4de580(name, "LagDistance", lagDistance);
-            if (!field_0xdc.UnknownFunction4b7f10("FrontWheelsTurn", 1, &frontWheelsTurn)) {
+            if (!parameters.UnknownFunction4b7f10("FrontWheelsTurn", 1, &frontWheelsTurn)) {
                 UnknownFunction4de580(name, "FrontWheelsTurn(Default)", frontWheelsTurn);
                 if (lagDistance == 0)
                     frontWheelsTurn = 1;
@@ -536,7 +536,7 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
             } else {
                 UnknownFunction4de580(name, "FrontWheelsTurn", frontWheelsTurn);
             }
-            if (!field_0xdc.UnknownFunction4b7f10("NumberOfTires", 4, &tires))
+            if (!parameters.UnknownFunction4b7f10("NumberOfTires", 4, &tires))
                 UnknownFunction4de580(name, "NumberOfTires(Default)", tires);
             else
                 UnknownFunction4de580(name, "NumberOfTires", tires);
@@ -544,13 +544,13 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
             field_0xb4->field_0x04[i].field_0x00_bit3 = 1;
         }
         field_0xb4->field_0x04[i].field_0x00_bit5 = 0;
-        if (field_0xb4->field_0x04[i].field_0x00_bit3 && !field_0xdc.UnknownFunction4b7ec0("MCF", "", file, 0x104)) {
-            sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "MCF", name, field_0x7c8);
+        if (field_0xb4->field_0x04[i].field_0x00_bit3 && !parameters.UnknownFunction4b7ec0("MCF", "", file, 0x104)) {
+            sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "MCF", name, scenePath);
             UnknownFunction464e80(message);
             return 0;
         }
-        if (!field_0xb4->field_0x04[i].field_0x00_bit3 && !field_0xdc.UnknownFunction4b7ec0("SLT", "", file, 0x104)) {
-            sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "SLT", name, field_0x7c8);
+        if (!field_0xb4->field_0x04[i].field_0x00_bit3 && !parameters.UnknownFunction4b7ec0("SLT", "", file, 0x104)) {
+            sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "SLT", name, scenePath);
             UnknownFunction464e80(message);
             return 0;
         }
@@ -572,8 +572,8 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
         if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, text, "rb", (int)colPath))
             colPath[0] = 0;
         delete stream;
-        if (!UnknownFunction4eb160(&field_0xb4->field_0x04[i].field_0x0c, name, "Position", "0.0,0.0,0.0", 0, 0))
-            UnknownFunction4eb160(&field_0xb4->field_0x04[i].field_0x0c, name, "Offset", "0.0,0.0,0.0", 0, 0);
+        if (!ReadVector(&field_0xb4->field_0x04[i].position, name, "Position", "0.0,0.0,0.0", 0, 0))
+            ReadVector(&field_0xb4->field_0x04[i].position, name, "Offset", "0.0,0.0,0.0", 0, 0);
         if (field_0xb4->field_0x04[i].field_0x00_bit3) {
             UnknownSceneObject* character = new(__FILE__, 2300) UnknownSceneObject(1);
             field_0xb4->field_0x04[i].field_0x04 = character;
@@ -588,7 +588,7 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
             UnknownSceneAnimatedObject* car = new(__FILE__, 2305) UnknownSceneAnimatedObject(1);
             field_0xb4->field_0x04[i].field_0x08 = car;
             if (!UnknownFunction469190(car->UnknownVirtualSlot27(field_0x18, sltPath, colPath, lights, a4, 0, vuePath,
-                                                                 &field_0xb4->field_0x04[i].field_0x0c, fps,
+                                                                 &field_0xb4->field_0x04[i].position, fps,
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create procedural model from %s.\n\n", file);
@@ -597,89 +597,89 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
             }
         }
         g_MemTagStack->Push("Scene");
-        field_0xdc.UnknownFunction4b7f10("UseLighting", 1, &useLighting);
+        parameters.UnknownFunction4b7f10("UseLighting", 1, &useLighting);
         int axes = 0;
-        if (field_0xdc.UnknownFunction4b7f40("Heading", -999.0f, &heading)) {
-            field_0xdc.UnknownFunction4b7f40("Pitch", 0, &pitch);
+        if (parameters.UnknownFunction4b7f40("Heading", -999.0f, &heading)) {
+            parameters.UnknownFunction4b7f40("Pitch", 0, &pitch);
             UnknownFunction4b5d00(&look, &up, heading * 0.01745329f, pitch * 0.01745329f, 0);
             axes = 1;
-        } else if (UnknownFunction4eb160(&look, name, "LookVector", "0.0,0.0,1.0", 0, 0)) {
-            UnknownFunction4eb160(&up, name, "UpVector", "0.0,1.0,0.0", 0, 0);
+        } else if (ReadVector(&look, name, "LookVector", "0.0,0.0,1.0", 0, 0)) {
+            ReadVector(&up, name, "UpVector", "0.0,1.0,0.0", 0, 0);
             axes = 1;
         }
-        field_0xdc.UnknownFunction4b7f10("ExcludeFromCameraIteration", 0, &exclude);
+        parameters.UnknownFunction4b7f10("ExcludeFromCameraIteration", 0, &exclude);
         field_0xb4->field_0x04[i].field_0x00_bit4 = exclude;
         if (field_0xb4->field_0x04[i].field_0x00_bit3) {
             UnknownFunction4de580(name, "MCF", file);
-            field_0xb4->field_0x04[i].field_0x04->field_0x1a0->UnknownFunction4fc660(&field_0xb4->field_0x04[i].field_0x0c);
+            field_0xb4->field_0x04[i].field_0x04->field_0x1a0->UnknownFunction4fc660(&field_0xb4->field_0x04[i].position);
             if (axes)
                 field_0xb4->field_0x04[i].field_0x04->field_0x1a0->UnknownFunction4fbd70(&look, &up, 1, 0);
             field_0xb4->field_0x04[i].field_0x04->field_0x1a0->UnknownFunction4444c0(useLighting);
-            field_0xdc.UnknownFunction4b7f10("UseBlendedKeys", 1, &automatic);
+            parameters.UnknownFunction4b7f10("UseBlendedKeys", 1, &automatic);
             field_0xb4->field_0x04[i].field_0x00_bit1 = automatic;
-            field_0xdc.UnknownFunction4b7f10("NumberOfMotions", 0, &field_0xb4->field_0x04[i].field_0x1c);
-            field_0xb4->field_0x04[i].field_0x20 = 0;
-            field_0xb4->field_0x04[i].field_0x28 = 0;
-            if (field_0xb4->field_0x04[i].field_0x1c > 0) {
-                field_0xb4->field_0x04[i].field_0x20 = new(__FILE__, 2357) void*[field_0xb4->field_0x04[i].field_0x1c];
-                for (int m = 0; m < field_0xb4->field_0x04[i].field_0x1c; m++) {
+            parameters.UnknownFunction4b7f10("NumberOfMotions", 0, &field_0xb4->field_0x04[i].motionCount);
+            field_0xb4->field_0x04[i].motions = 0;
+            field_0xb4->field_0x04[i].motionSequence = 0;
+            if (field_0xb4->field_0x04[i].motionCount > 0) {
+                field_0xb4->field_0x04[i].motions = new(__FILE__, 2357) void*[field_0xb4->field_0x04[i].motionCount];
+                for (int m = 0; m < field_0xb4->field_0x04[i].motionCount; m++) {
                     sprintf(key, "MotionToPlay%d", m + 1);
-                    if (!field_0xdc.UnknownFunction4b7ec0(key, "", motion, 0x10)) {
-                        sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", key, name, field_0x7c8);
+                    if (!parameters.UnknownFunction4b7ec0(key, "", motion, 0x10)) {
+                        sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", key, name, scenePath);
                         UnknownFunction464e80(message);
                         return 0;
                     }
                     UnknownFunction4de580(name, key, motion);
-                    field_0xb4->field_0x04[i].field_0x20[m] =
+                    field_0xb4->field_0x04[i].motions[m] =
                         field_0xb4->field_0x04[i].field_0x04->UnknownFunction4a6b30(motion, 1);
                 }
-                if (field_0xdc.UnknownFunction4b7ec0("MotionSequence", "", sequence, 0x40)) {
+                if (parameters.UnknownFunction4b7ec0("MotionSequence", "", sequence, 0x40)) {
                     char* token = strtok(sequence, ",");
                     int j = 0;
-                    field_0xdc.UnknownFunction4b7ec0("NumberInSequence", "", number, 0x10);
-                    field_0xb4->field_0x04[i].field_0x25 = atoi(number);
-                    if (field_0xb4->field_0x04[i].field_0x25) {
-                        field_0xb4->field_0x04[i].field_0x28 =
-                            new(__FILE__, 2379) char[field_0xb4->field_0x04[i].field_0x25];
-                        for (; token && j < field_0xb4->field_0x04[i].field_0x25; j++) {
-                            field_0xb4->field_0x04[i].field_0x28[j] = atoi(token);
+                    parameters.UnknownFunction4b7ec0("NumberInSequence", "", number, 0x10);
+                    field_0xb4->field_0x04[i].sequenceLength = atoi(number);
+                    if (field_0xb4->field_0x04[i].sequenceLength) {
+                        field_0xb4->field_0x04[i].motionSequence =
+                            new(__FILE__, 2379) char[field_0xb4->field_0x04[i].sequenceLength];
+                        for (; token && j < field_0xb4->field_0x04[i].sequenceLength; j++) {
+                            field_0xb4->field_0x04[i].motionSequence[j] = atoi(token);
                             token = strtok(0, ",");
                         }
-                        field_0xdc.UnknownFunction4b7f10("AutomaticSequence", 1, &automatic);
+                        parameters.UnknownFunction4b7f10("AutomaticSequence", 1, &automatic);
                         field_0xb4->field_0x04[i].field_0x00_bit2 = automatic;
-                        field_0xb4->field_0x04[i].field_0x26 = field_0xb4->field_0x04[i].field_0x28[0];
-                        if (field_0xb4->field_0x04[i].field_0x26 >= field_0xb4->field_0x04[i].field_0x25)
-                            field_0xb4->field_0x04[i].field_0x26 = 0;
-                        field_0xb4->field_0x04[i].field_0x24 = field_0xb4->field_0x04[i].field_0x26;
-                        UnknownFunction4eb040(i, field_0xb4->field_0x04[i].field_0x26, 0, 0);
+                        field_0xb4->field_0x04[i].sequenceIndex = field_0xb4->field_0x04[i].motionSequence[0];
+                        if (field_0xb4->field_0x04[i].sequenceIndex >= field_0xb4->field_0x04[i].sequenceLength)
+                            field_0xb4->field_0x04[i].sequenceIndex = 0;
+                        field_0xb4->field_0x04[i].currentMotion = field_0xb4->field_0x04[i].sequenceIndex;
+                        UnknownFunction4eb040(i, field_0xb4->field_0x04[i].sequenceIndex, 0, 0);
                     } else {
-                        field_0xb4->field_0x04[i].field_0x26 = 0;
-                        sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "NumberInSequence", name, field_0x7c8);
+                        field_0xb4->field_0x04[i].sequenceIndex = 0;
+                        sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "NumberInSequence", name, scenePath);
                         UnknownFunction464e80(message);
                         return 0;
                     }
                 } else {
-                    field_0xb4->field_0x04[i].field_0x24 = 0;
-                    field_0xb4->field_0x04[i].field_0x25 = 0;
-                    sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "MotionSequence", name, field_0x7c8);
+                    field_0xb4->field_0x04[i].currentMotion = 0;
+                    field_0xb4->field_0x04[i].sequenceLength = 0;
+                    sprintf(message, "\n%s for [%s] in %s is ZERO!\n\n", "MotionSequence", name, scenePath);
                     UnknownFunction464e80(message);
                     return 0;
                 }
             }
         } else {
             UnknownFunction4de580(name, "SLT", sltPath);
-            field_0xb4->field_0x04[i].field_0x1c = 1;
+            field_0xb4->field_0x04[i].motionCount = 1;
             field_0xb4->field_0x04[i].field_0x08->field_0x34->UnknownFunction4444c0(useLighting);
             if (axes)
                 field_0xb4->field_0x04[i].field_0x08->field_0x34->UnknownFunction4fbd70(&look, &up, 1, 0);
         }
-        if (field_0xb4->field_0x04[i].field_0x1c > 0) {
-            if (field_0xc0) {
-                field_0xdc.UnknownFunction4b7ec0("SoundResourceFile", "", sound, 0x103);
+        if (field_0xb4->field_0x04[i].motionCount > 0) {
+            if (auralScape) {
+                parameters.UnknownFunction4b7ec0("SoundResourceFile", "", sound, 0x103);
                 if (strcmp(sound, "") && _stricmp(sound, "NONE")) {
-                    UnknownFunction4ef9c0(name, sound, 0, &params, &flags, &oneShotDistance, &randomTriggerPercent,
+                    ReadSoundSettings(name, sound, 0, &params, &flags, &oneShotDistance, &randomTriggerPercent,
                                           &oneShot, &force2D);
-                    field_0xdc.UnknownFunction4b7ec0("SoundAttachToObject", "", attach, 0x40);
+                    parameters.UnknownFunction4b7ec0("SoundAttachToObject", "", attach, 0x40);
                     UnknownSceneLodObject* node;
                     if (field_0xb4->field_0x04[i].field_0x00_bit3)
                         node = field_0xb4->field_0x04[i].field_0x04->field_0x1a0;
@@ -687,7 +687,7 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
                         node = field_0xb4->field_0x04[i].field_0x08->field_0x34;
                     SoultreeSoundEmitter* emitter =
                         (new(__FILE__, 2433)
-                             SoultreeSoundEmitter((AuralScape*)field_0xc0, field_0xc4, 1, field_0x25_bit0))
+                             SoultreeSoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
                             ->UnknownFunction4029f0(field_0x18, sound, attach, (UnknownVehiclePart*)node, params,
                                                     flags, oneShotDistance, randomTriggerPercent, 0, force2D);
                     if (!emitter) {
@@ -703,64 +703,64 @@ int Scene::UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*pr
             }
         }
     }
-    field_0xdc.UnknownFunction4b78f0("Animations");
-    field_0xdc.UnknownFunction4b7f10("NumberOfRandomSets", 0, &field_0xb4->field_0x08);
-    if (field_0xb4->field_0x08 > 0) {
-        field_0xb4->field_0x0c = new(__FILE__, 2466) UnknownSceneEntry2[field_0xb4->field_0x08];
-        for (i = 0; i < field_0xb4->field_0x08; i = next) {
-            field_0xb4->field_0x0c[i].field_0x08 = 0;
-            field_0xb4->field_0x0c[i].field_0x0c = 0;
+    parameters.UnknownFunction4b78f0("Animations");
+    parameters.UnknownFunction4b7f10("NumberOfRandomSets", 0, &field_0xb4->randomSetCount);
+    if (field_0xb4->randomSetCount > 0) {
+        field_0xb4->randomSets = new(__FILE__, 2466) UnknownSceneEntry2[field_0xb4->randomSetCount];
+        for (i = 0; i < field_0xb4->randomSetCount; i = next) {
+            field_0xb4->randomSets[i].animationIndices = 0;
+            field_0xb4->randomSets[i].motionIndices = 0;
             next = i + 1;
             sprintf(setName, "RandomSet%d", next);
-            if (!field_0xdc.UnknownFunction4b78f0(setName)) {
-                sprintf(message, "\nCannot find [%s] in %s.\n\n", setName, field_0x7c8);
+            if (!parameters.UnknownFunction4b78f0(setName)) {
+                sprintf(message, "\nCannot find [%s] in %s.\n\n", setName, scenePath);
                 UnknownFunction464e80(message);
                 return 0;
             }
-            if (!field_0xdc.UnknownFunction4b7ec0("RandomSet", "", list, 0x80)) {
-                sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "RandomSet", setName, field_0x7c8);
+            if (!parameters.UnknownFunction4b7ec0("RandomSet", "", list, 0x80)) {
+                sprintf(message, "\nCannot find %s for [%s] in %s.\n\n", "RandomSet", setName, scenePath);
                 UnknownFunction464e80(message);
                 return 0;
             }
             char* token = strtok(list, ",");
             int j = 0;
-            field_0xb4->field_0x0c[i].field_0x04 = 0;
-            field_0xdc.UnknownFunction4b7ec0("NumberInSequence", 0, (char*)&field_0xb4->field_0x0c[i].field_0x00, -1);
-            if (field_0xb4->field_0x0c[i].field_0x00) {
-                field_0xb4->field_0x0c[i].field_0x08 = new(__FILE__, 2491) signed char[field_0xb4->field_0x0c[i].field_0x00];
-                field_0xb4->field_0x0c[i].field_0x0c = new(__FILE__, 2492) signed char[field_0xb4->field_0x0c[i].field_0x00];
-                for (; token && j < field_0xb4->field_0x0c[i].field_0x00; j++) {
+            field_0xb4->randomSets[i].entry = 0;
+            parameters.UnknownFunction4b7ec0("NumberInSequence", 0, (char*)&field_0xb4->randomSets[i].count, -1);
+            if (field_0xb4->randomSets[i].count) {
+                field_0xb4->randomSets[i].animationIndices = new(__FILE__, 2491) signed char[field_0xb4->randomSets[i].count];
+                field_0xb4->randomSets[i].motionIndices = new(__FILE__, 2492) signed char[field_0xb4->randomSets[i].count];
+                for (; token && j < field_0xb4->randomSets[i].count; j++) {
                     automatic = strcspn(token, ".");
                     if (!automatic || automatic == (int)strlen(token)) {
                         sprintf(message, "\nInvalid Animation or Motion #%d in [%s] in %s.\n\n", j, setName,
-                                field_0x7c8);
+                                scenePath);
                         UnknownFunction464e80(message);
                         return 0;
                     }
                     token[automatic] = 0;
-                    field_0xb4->field_0x0c[i].field_0x08[j] = atoi(token) - 1;
-                    field_0xb4->field_0x04[field_0xb4->field_0x0c[i].field_0x08[j]].field_0x00_bit0 = 1;
+                    field_0xb4->randomSets[i].animationIndices[j] = atoi(token) - 1;
+                    field_0xb4->field_0x04[field_0xb4->randomSets[i].animationIndices[j]].field_0x00_bit0 = 1;
                     if (field_0xb4->field_0x04[i].field_0x00_bit3)
-                        field_0xb4->field_0x04[field_0xb4->field_0x0c[i].field_0x08[j]].field_0x04->UnknownVirtualSlot4();
+                        field_0xb4->field_0x04[field_0xb4->randomSets[i].animationIndices[j]].field_0x04->UnknownVirtualSlot4();
                     else
-                        field_0xb4->field_0x04[field_0xb4->field_0x0c[i].field_0x08[j]].field_0x08->UnknownVirtualSlot4();
-                    field_0xb4->field_0x0c[i].field_0x0c[j] = atoi(token + automatic + 1) - 1;
+                        field_0xb4->field_0x04[field_0xb4->randomSets[i].animationIndices[j]].field_0x08->UnknownVirtualSlot4();
+                    field_0xb4->randomSets[i].motionIndices[j] = atoi(token + automatic + 1) - 1;
                     token = strtok(0, ",");
                 }
-                field_0xb4->field_0x0c[i].field_0x04 = field_0xb4->field_0x04;
+                field_0xb4->randomSets[i].entry = field_0xb4->field_0x04;
             }
         }
     } else {
-        field_0xb4->field_0x0c = 0;
+        field_0xb4->randomSets = 0;
     }
     UnknownFunction464e80("");
     return 1;
         }
-        sprintf(text, "\nNumber of animations<1 in %s.\n\n", "Animations", field_0x7c8);
+        sprintf(text, "\nNumber of animations<1 in %s.\n\n", "Animations", scenePath);
         UnknownFunction464e80(text);
         return 0;
     }
-    sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "Animations", field_0x7c8);
+    sprintf(text, "\nCannot find data for [%s] in %s.\n\n", "Animations", scenePath);
     UnknownFunction464e80(text);
     return 0;
 }

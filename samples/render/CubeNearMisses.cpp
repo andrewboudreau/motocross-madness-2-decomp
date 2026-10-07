@@ -24,20 +24,20 @@ Cube* Cube::UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTe
     int i;
 
     field_0x610 = group;
-    field_0x60c = baseOffset;
+    alignmentBase = baseOffset;
     field_0x08 = stream;
-    if (stream->UnknownFunction461640(&field_0x0c, 4, 1) != 1)
+    if (stream->UnknownFunction461640(&fileFormat, 4, 1) != 1)
         goto fail;
     if (stream->UnknownFunction461640(&flags, 2, 1) != 1)
         goto fail;
     if (stream->UnknownFunction461640(&field_0x12, 2, 1) != 1)
         goto fail;
     for (face = 0; face < 6; face++) {
-        if (stream->UnknownFunction461640(&field_0x38[face].field_0x04, 2, 1) != 1)
+        if (stream->UnknownFunction461640(&field_0x38[face].presentTextures, 2, 1) != 1)
             goto fail;
     }
     for (face = 0; face < 6; face++) {
-        if (stream->UnknownFunction461640(&field_0x38[face].field_0x00, 4, 1) != 1)
+        if (stream->UnknownFunction461640(&field_0x38[face].sizeCodes, 4, 1) != 1)
             goto fail;
     }
     if (stream->UnknownFunction461640(&field_0x14, 12, 1) != 1)
@@ -61,8 +61,8 @@ Cube* Cube::UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTe
         }
     }
     if (flags & 2)
-        UnknownFunction43d0d0(stream, field_0x60c);
-    field_0x608 = stream->UnknownFunction461600();
+        UnknownFunction43d0d0(stream, alignmentBase);
+    textureDataOffset = stream->UnknownFunction461600();
     if (a) {
     fail:
         Release();

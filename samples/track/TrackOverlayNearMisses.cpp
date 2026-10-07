@@ -8,7 +8,7 @@
 // here after it. A scale local, a ternary, assigning before the test and an
 // empty or return-only test do not reproduce it.
 
-// RadarOverlay::UnknownFunction51c4f0 (0x0051c4f0, 560 bytes, 64%): the
+// RadarOverlay::IntersectLineCircle (0x0051c4f0, 560 bytes, 64%): the
 // candidate is 550 bytes. The arithmetic and branch structure match; VC6
 // here assigns the scale, discriminant and intersection temporaries to
 // other frame slots (retail shares one slot for the scale and the
@@ -40,7 +40,7 @@
 // rectangle stores use different displacements. Declaration order, names,
 // aggregate initializers and UnknownMakeOverlayRect do not move them.
 
-// ChatOverlay::UnknownFunction51e3f0 (0x0051e3f0, 974 bytes, 966 match):
+// ChatOverlay::DrawNameTag (0x0051e3f0, 974 bytes, 966 match):
 // the frame and code match except in the racer-tag branch. A racer local in
 // the position branch gives retail's eax there; in the "%.3f" branch retail
 // loads the racer into eax and the buffer address into ecx (VC6 here edx and
@@ -48,7 +48,7 @@
 // racer local in that branch, a game local, a float or double local and a
 // buffer pointer do not change it.
 
-// RadarOverlay::UnknownFunction51c720 (0x0051c720, 1016 bytes; candidate
+// RadarOverlay::DrawTrackOutline (0x0051c720, 1016 bytes; candidate
 // 1002): draws the track outline through a TrackListItem work list. The
 // control flow, the calls and the stores match once the node is read
 // through a reference to the list entry (`TrackNode*& node`, retail keeps
@@ -70,7 +70,7 @@
 // in a separate frame slot (0x74) where VC6 here reuses the first one.
 
 
-// RadarOverlay::UnknownFunction51bed0 (0x0051bed0, 1160 bytes; 1129 match):
+// RadarOverlay::DrawRacers (0x0051bed0, 1160 bytes; 1129 match):
 // the map update. Every call, loop and store matches with the racer read
 // through `field_0x134[i]` each time, the own position through a reference,
 // the rim point as a Vector3 (its third slot is unused) and the chosen
@@ -94,6 +94,7 @@
 #include "../../src/reconstructed/Track.h"
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/ControlInterface.h"
+#include "../../src/reconstructed/D3DConstants.h"
 
 // GDI32 imports, as in TrackOverlay.cpp.
 struct UnknownLogFont {
@@ -133,37 +134,37 @@ static int s_UnknownGlobal68a444;
 int RadarOverlay::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry)
 {
     if (UnknownFunction43caa0(0x21, 0, event, 0x80000000)) {
-        field_0x164 = 1 - field_0x164;
+        showFrameRate = 1 - showFrameRate;
         return 1;
     }
     if (UnknownFunction43caa0(0x34, 0, event, 0x80000000)) {
         if (++s_UnknownGlobal57513c > 5)
             s_UnknownGlobal57513c = 5;
-        if (field_0x178)
-            field_0x198 = field_0x19c / 180.0f / s_UnknownGlobal57513c;
+        if (largeMap)
+            mapScale = mapRadius / 180.0f / s_UnknownGlobal57513c;
         else
-            field_0x198 = field_0x19c / 180.0f / s_UnknownGlobal57513c;
+            mapScale = mapRadius / 180.0f / s_UnknownGlobal57513c;
         return 1;
     }
     if (UnknownFunction43caa0(0x33, 0, event, 0x80000000)) {
         if (--s_UnknownGlobal57513c < 1)
             s_UnknownGlobal57513c = 1;
-        if (field_0x178)
-            field_0x198 = field_0x19c / 180.0f / s_UnknownGlobal57513c;
+        if (largeMap)
+            mapScale = mapRadius / 180.0f / s_UnknownGlobal57513c;
         else
-            field_0x198 = field_0x19c / 180.0f / s_UnknownGlobal57513c;
+            mapScale = mapRadius / 180.0f / s_UnknownGlobal57513c;
         return 1;
     }
     return 0;
 }
 
 // 0x0051c4f0
-int RadarOverlay::UnknownFunction51c4f0(const float* a, const float* b, const float* circle, float* a4, float* point)
+int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const float* circle, float* a4, float* point)
 {
     float nx;
     float ny;
     float d;
-    if (UnknownFunction51c460(a, b, &nx, &ny, &d))
+    if (LineThrough(a, b, &nx, &ny, &d))
         return -1;
     float scale = 1.0f / (nx * nx + ny * ny);
     float t = -(scale * d);
@@ -218,27 +219,27 @@ int ChatOverlay::UnknownFunction51d730(UnknownChatView* view)
     UnknownChatRacer* racer;
     field_0x198 = 0;
     iterator = 0;
-    field_0x12c = view;
-    while ((racer = field_0x12c->UnknownFunction4204e0(&iterator)) != 0) {
-        field_0x16c[field_0x198] = racer;
+    chatView = view;
+    while ((racer = chatView->UnknownFunction4204e0(&iterator)) != 0) {
+        racers[field_0x198] = racer;
         field_0x198++;
     }
     for (int i = 0; i < field_0x198; i++) {
-        field_0x2d8[i] = (new(__FILE__, 2369) NameOverlay(1))->UnknownFunction518e30(
-            Target(), field_0x2c, &field_0x30c[i], 0, &field_0x30c[i], (UnknownEventRacer*)field_0x16c[i],
-            (UnknownNameOverlayWorld*)field_0x12c, i);
-        UnknownFunction469190(field_0x2d8[i], -1);
+        nameTags[i] = (new(__FILE__, 2369) NameOverlay(1))->UnknownFunction518e30(
+            Target(), overlayTexture, &nameTagRects[i], 0, &nameTagRects[i], (UnknownEventRacer*)racers[i],
+            (UnknownNameOverlayWorld*)chatView, i);
+        UnknownFunction469190(nameTags[i], -1);
     }
     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 0) {
-        field_0x2d8[field_0x198] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
-            Target(), field_0x2c, &field_0x30c[field_0x198], 0, &field_0x30c[field_0x198], 0,
-            (UnknownNameOverlayWorld*)field_0x12c, i);
-        UnknownFunction469190(field_0x2d8[field_0x198], -1);
-        if (field_0x2d8[field_0x198]) {
-            field_0x2d8[field_0x198]->UnknownFunction519080(Vector3(field_0x150.left, field_0x150.top, 0));
-            field_0x2d8[field_0x198]->UnknownVirtualSlot4();
-            field_0x160 = field_0x30c[field_0x198].right;
-            field_0x2d8[field_0x198]->field_0x124 = 0;
+        nameTags[field_0x198] = (new(__FILE__, 2376) NameOverlay(1))->UnknownFunction518e30(
+            Target(), overlayTexture, &nameTagRects[field_0x198], 0, &nameTagRects[field_0x198], 0,
+            (UnknownNameOverlayWorld*)chatView, i);
+        UnknownFunction469190(nameTags[field_0x198], -1);
+        if (nameTags[field_0x198]) {
+            nameTags[field_0x198]->UnknownFunction519080(Vector3(cueRect.left, cueRect.top, 0));
+            nameTags[field_0x198]->UnknownVirtualSlot4();
+            field_0x160 = nameTagRects[field_0x198].right;
+            nameTags[field_0x198]->field_0x124 = 0;
         }
     }
     UnknownFunction51e910(-1);
@@ -265,7 +266,7 @@ int StatsOverlay::UnknownFunction519a20()
         TrackGameViewOwner* owner = g_UnknownGlobal56e26c->field_0x55c;
         float limit = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140 * 60.0f;
         UnknownFunction518640(time, limit - (owner->field_0x70 * 60.0f + owner->field_0x74));
-        sprintf(field_0x5b0[0], "%s", label);
+        sprintf(rowText[0], "%s", label);
     }
     iterator = 0;
     UnknownEventRacer* racer;
@@ -293,24 +294,24 @@ int StatsOverlay::UnknownFunction519a20()
     int row;
     int shown = 0;
     for (row = first; row < count - 1; row++) {
-        sprintf(field_0x5b0[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
                 scores[shown].racer->field_0x768);
         shown++;
     }
     if (own >= shown)
-        sprintf(field_0x5b0[row], "%d) %s : %.0f", own + 1, scores[own].racer->field_0x5e0,
+        sprintf(rowText[row], "%d) %s : %.0f", own + 1, scores[own].racer->field_0x5e0,
                 scores[own].racer->field_0x768);
     else
-        sprintf(field_0x5b0[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
+        sprintf(rowText[row], "%d) %s : %.0f", shown + 1, scores[shown].racer->field_0x5e0,
                 scores[shown].racer->field_0x768);
     for (i = 0; i <= row; i++) {
-        if (strcmp(field_0x5b0[i], field_0x1b0[i]) != 0)
+        if (strcmp(rowText[i], field_0x1b0[i]) != 0)
             break;
     }
     if (row < i)
         return 1;
-    UnknownFunction4b6710(&field_0xf8);
-    PCTextureMap* texture = (PCTextureMap*)field_0x34;
+    RestoreRect(&sourceRect);
+    PCTextureMap* texture = (PCTextureMap*)sharedTexture;
     if (texture->field_0x70->UnknownMethod17(&dc) != 0)
         goto fail;
     SetBkColor(dc, 1);
@@ -319,17 +320,17 @@ int StatsOverlay::UnknownFunction519a20()
     font = SelectObject(dc, field_0x11c);
     for (i = 0; i <= row; i++) {
         if (i == 0)
-            GetTextExtentPoint32A(dc, field_0x5b0[0], strlen(field_0x5b0[0]), &field_0x9b0);
-        DrawTextA(dc, field_0x5b0[i], strlen(field_0x5b0[i]), &field_0x130[i], 0x120);
-        strcpy(field_0x1b0[i], field_0x5b0[i]);
+            GetTextExtentPoint32A(dc, rowText[0], strlen(rowText[0]), &rowExtent);
+        DrawTextA(dc, rowText[i], strlen(rowText[i]), &rowRects[i], 0x120);
+        strcpy(field_0x1b0[i], rowText[i]);
     }
     SelectObject(dc, font);
     if (texture->field_0x70->UnknownMethod26(dc) != 0) {
 fail:
         return 0;
     }
-    UnknownFunction4b6880(0, 0x80, 0xffff);
-    field_0x2c->UnknownVirtualSlot9(0, -1);
+    TintRows(0, 0x80, 0xffff);
+    overlayTexture->UnknownVirtualSlot9(0, -1);
     return 1;
 }
 
@@ -343,7 +344,7 @@ StatsOverlay* StatsOverlay::UnknownFunction5194b0(RenderTarget* target, TextureM
     UnknownOverlayRect source;
     char name[260];
     char path[260];
-    field_0x128 = (UnknownInstrumentSource*)camera;
+    instrumentSource = (UnknownInstrumentSource*)camera;
     rect.left = 0;
     rect.top = 0;
     rect.right = 128;
@@ -371,22 +372,22 @@ StatsOverlay* StatsOverlay::UnknownFunction5194b0(RenderTarget* target, TextureM
         Release();
         return 0;
     }
-    field_0x30 = UnknownFunction50a590(manager, name, 0x115c, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
-    if (!field_0x30) {
+    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    if (!backingTexture) {
         Release();
         return 0;
     }
-    field_0x2c = field_0x30->UnknownVirtualSlot6();
-    if (field_0x2c->field_0x20 == 0x115c)
-        field_0x2c->UnknownFunction50abd0(5, 6);
-    field_0x2c->UnknownVirtualSlot8(1, 0, 0);
+    overlayTexture = backingTexture->UnknownVirtualSlot6();
+    if (overlayTexture->field_0x20 == 4444)
+        overlayTexture->UnknownFunction50abd0(5, 6);
+    overlayTexture->UnknownVirtualSlot8(1, 0, 0);
     source.left = 0;
     source.right = 128;
     source.top = 0;
     source.bottom = 128;
     font = "arialsm";
     sprintf(path, "%s\\%s", "Res", "Fonts.res");
-    UnknownFunction4b5f50(target, field_0x2c, &rect, 0, &source, 0.00001f, 1, path, &font, 1, 0x115c, 0);
+    Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 1, path, &font, 1, 4444, 0);
     logFont.lfHeight = 16;
     logFont.lfWidth = 0;
     logFont.lfEscapement = 0;
@@ -411,20 +412,20 @@ StatsOverlay* StatsOverlay::UnknownFunction5194b0(RenderTarget* target, TextureM
     field_0x11c = CreateFontIndirectA(&logFont);
     logFont.lfHeight = 12;
     field_0x120 = CreateFontIndirectA(&logFont);
-    field_0x130[0] = UnknownTrackOverlayRect(14, 128, 20, 30);
-    field_0x130[1] = UnknownTrackOverlayRect(14, 128, 36, 46);
-    field_0x130[2] = UnknownTrackOverlayRect(14, 128, 53, 63);
-    field_0x130[3] = UnknownTrackOverlayRect(14, 128, 69, 79);
-    field_0x130[4] = UnknownTrackOverlayRect(14, 128, 87, 97);
-    field_0x130[5] = UnknownTrackOverlayRect(14, 100, 105, 115);
-    field_0x130[6] = UnknownTrackOverlayRect(5, 86, 34, 49);
+    rowRects[0] = UnknownTrackOverlayRect(14, 128, 20, 30);
+    rowRects[1] = UnknownTrackOverlayRect(14, 128, 36, 46);
+    rowRects[2] = UnknownTrackOverlayRect(14, 128, 53, 63);
+    rowRects[3] = UnknownTrackOverlayRect(14, 128, 69, 79);
+    rowRects[4] = UnknownTrackOverlayRect(14, 128, 87, 97);
+    rowRects[5] = UnknownTrackOverlayRect(14, 100, 105, 115);
+    rowRects[6] = UnknownTrackOverlayRect(5, 86, 34, 49);
     return this;
 }
 
 // 0x0051e3f0: draws name tag `index` into `dc`: the name line for the
 // player's own tag, otherwise the position and the racer's name (or the
 // value at +0x4a4), centred, and sizes the tag to the text.
-void ChatOverlay::UnknownFunction51e3f0(void* dc, int index)
+void ChatOverlay::DrawNameTag(void* dc, int index)
 {
     char text[0x80];
     char name[0x80];
@@ -432,27 +433,27 @@ void ChatOverlay::UnknownFunction51e3f0(void* dc, int index)
     UnknownTextExtent size;
     void* font = SelectObject(dc, field_0x124);
     if (index == field_0x198) {
-        sprintf(text, "%s", field_0x1d4);
+        sprintf(text, "%s", playerName);
         length = strlen(text);
-        UnknownOverlayRect rect = field_0x30c[index];
-        rect.left += field_0x2d8[index]->field_0x124;
+        UnknownOverlayRect rect = nameTagRects[index];
+        rect.left += nameTags[index]->field_0x124;
         DrawTextA(dc, text, length, &rect, 0x8124);
         UnknownTextExtent size;
         GetTextExtentPoint32A(dc, text, length, &size);
-        field_0x2d8[index]->field_0x124 += size.cx;
-        field_0x2d8[index]->field_0xf8 = field_0x30c[index];
-        if (field_0x2d8[index]->field_0x124 + 4 < field_0x2d8[index]->field_0x120) {
-            field_0x2d8[index]->field_0x124 += 4;
-            field_0x2d8[index]->field_0xf8.right = field_0x2d8[index]->field_0x124 + field_0x2d8[index]->field_0xf8.left - 1;
+        nameTags[index]->field_0x124 += size.cx;
+        nameTags[index]->sourceRect = nameTagRects[index];
+        if (nameTags[index]->field_0x124 + 4 < nameTags[index]->sourceWidth) {
+            nameTags[index]->field_0x124 += 4;
+            nameTags[index]->sourceRect.right = nameTags[index]->field_0x124 + nameTags[index]->sourceRect.left - 1;
         } else {
-            field_0x2d8[index]->field_0x124 = field_0x2d8[index]->field_0x120;
+            nameTags[index]->field_0x124 = nameTags[index]->sourceWidth;
         }
     } else {
         if (s_UnknownGlobal68a444) {
-            sprintf(text, "%.3f", field_0x16c[index]->field_0x4a4);
+            sprintf(text, "%.3f", racers[index]->field_0x4a4);
         } else {
             if (g_UnknownGlobal56e26c->mode.field_0x6c0) {
-                UnknownChatRacer* racer = field_0x16c[index];
+                UnknownChatRacer* racer = racers[index];
                 if (racer->field_0x784 > 0)
                     sprintf(text, "%d", racer->field_0x784);
                 else
@@ -461,7 +462,7 @@ void ChatOverlay::UnknownFunction51e3f0(void* dc, int index)
                 strcpy(text, "");
             }
             if (g_UnknownGlobal56e26c->mode.field_0x6bc)
-                strcpy(name, field_0x16c[index]->field_0x5e0);
+                strcpy(name, racers[index]->name);
             else
                 strcpy(name, "");
             if (g_UnknownGlobal56e26c->mode.field_0x6c0 && g_UnknownGlobal56e26c->mode.field_0x6bc)
@@ -470,16 +471,16 @@ void ChatOverlay::UnknownFunction51e3f0(void* dc, int index)
         }
         length = strlen(text);
         GetTextExtentPoint32A(dc, text, length, &size);
-        field_0x2d8[index]->field_0x124 = size.cx;
-        DrawTextA(dc, text, length, &field_0x30c[index], 0x8125);
-        field_0x2d8[index]->field_0xf8 = field_0x30c[index];
-        if (field_0x2d8[index]->field_0x124 + 4 < field_0x2d8[index]->field_0x120) {
-            field_0x2d8[index]->field_0x124 += 4;
-            int margin = (field_0x2d8[index]->field_0x120 - field_0x2d8[index]->field_0x124) >> 1;
-            field_0x2d8[index]->field_0xf8.left += margin;
-            field_0x2d8[index]->field_0xf8.right += 1 - margin;
+        nameTags[index]->field_0x124 = size.cx;
+        DrawTextA(dc, text, length, &nameTagRects[index], 0x8125);
+        nameTags[index]->sourceRect = nameTagRects[index];
+        if (nameTags[index]->field_0x124 + 4 < nameTags[index]->sourceWidth) {
+            nameTags[index]->field_0x124 += 4;
+            int margin = (nameTags[index]->sourceWidth - nameTags[index]->field_0x124) >> 1;
+            nameTags[index]->sourceRect.left += margin;
+            nameTags[index]->sourceRect.right += 1 - margin;
         } else {
-            field_0x2d8[index]->field_0x124 = field_0x2d8[index]->field_0x120;
+            nameTags[index]->field_0x124 = nameTags[index]->sourceWidth;
         }
     }
     SelectObject(dc, font);
@@ -494,11 +495,11 @@ struct UnknownRadarView {
 // 0x0051c720: draws the track outline (mode 1: the +0x18 edge of every
 // segment, 2: the +0x0c edge), clipped to the map circle, walking every node
 // once through a work list.
-void RadarOverlay::UnknownFunction51c720(int mode)
+void RadarOverlay::DrawTrackOutline(int mode)
 {
     TrackListItem* list = 0;
     TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1992);
-    item->field_0x04 = ((UnknownRadarView*)field_0x12c)->field_0x48->field_0x00;
+    item->field_0x04 = ((UnknownRadarView*)radarView)->field_0x48->field_0x00;
     item->field_0x0c = list;
     list = item;
     while (list) {
@@ -519,7 +520,7 @@ void RadarOverlay::UnknownFunction51c720(int mode)
         int startX;
         int startY;
         float rim[2];
-        int outside = UnknownFunction51c360(point, &startX, &startY, &rim[0], &rim[1]);
+        int outside = WorldToMap(point, &startX, &startY, &rim[0], &rim[1]);
         field_0x1b8.sx = (float)startX;
         field_0x1b8.sy = (float)startY;
         field_0x1b8.color = 0xedea5e;
@@ -536,7 +537,7 @@ void RadarOverlay::UnknownFunction51c720(int mode)
             float from[2];
             from[0] = (float)x;
             from[1] = (float)y;
-            outside = UnknownFunction51c360(point, &x, &y, &rim[0], &rim[1]);
+            outside = WorldToMap(point, &x, &y, &rim[0], &rim[1]);
             if (outside) {
                 if (wasOutside) {
                     field_0x1b8.sx = (float)x;
@@ -547,13 +548,13 @@ void RadarOverlay::UnknownFunction51c720(int mode)
                     float hit[2];
                     to[0] = (float)x;
                     to[1] = (float)y;
-                    circle[2] = field_0x19c;
-                    circle[0] = (float)field_0x1a0;
-                    circle[1] = (float)field_0x1a4;
-                    if (UnknownFunction51c4f0(from, to, circle, rim, hit) != -1) {
+                    circle[2] = mapRadius;
+                    circle[0] = (float)mapCenterX;
+                    circle[1] = (float)mapCenterY;
+                    if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
                         field_0x1d8.sx = hit[0];
                         field_0x1d8.sy = hit[1];
-                        Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+                        Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
                         field_0x1b8 = field_0x1d8;
                     }
                 }
@@ -563,21 +564,21 @@ void RadarOverlay::UnknownFunction51c720(int mode)
                 float hit[2];
                 to[0] = (float)x;
                 to[1] = (float)y;
-                circle[2] = field_0x19c;
-                circle[0] = (float)field_0x1a0;
-                circle[1] = (float)field_0x1a4;
-                if (UnknownFunction51c4f0(from, to, circle, rim, hit) != -1) {
+                circle[2] = mapRadius;
+                circle[0] = (float)mapCenterX;
+                circle[1] = (float)mapCenterY;
+                if (IntersectLineCircle(from, to, circle, rim, hit) != -1) {
                     field_0x1b8.sy = hit[1];
                     field_0x1d8.sy = (float)y;
                     field_0x1d8.sx = (float)x;
                     field_0x1b8.sx = hit[0];
-                    Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+                    Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
                     field_0x1b8 = field_0x1d8;
                 }
             } else {
                 field_0x1d8.sx = (float)x;
                 field_0x1d8.sy = (float)y;
-                Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+                Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
                 field_0x1b8 = field_0x1d8;
             }
             segment = segment->field_0x2c;
@@ -613,50 +614,50 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
     char name[260];
     char path[260];
 
-    field_0x134 = 1;
-    field_0x140.left = screen.right / 2 - 128;
-    field_0x140.top = 0;
-    field_0x140.right = field_0x140.left + 256;
-    field_0x140.bottom = 68;
+    largeLayout = 1;
+    chatRect.left = screen.right / 2 - 128;
+    chatRect.top = 0;
+    chatRect.right = chatRect.left + 256;
+    chatRect.bottom = 68;
     strcpy(name, "chat256.tga");
-    field_0x128 = (UnknownChatCamera*)camera;
-    field_0x150 = cue;
-    field_0x130 = 0.08f;
-    field_0x30 = UnknownFunction50a590(manager, name, 0x115c, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
-    if (!field_0x30) {
+    chatCamera = (UnknownChatCamera*)camera;
+    cueRect = cue;
+    timeSum = 0.08f;
+    backingTexture = UnknownFunction50a590(manager, name, 4444, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    if (!backingTexture) {
         Release();
         return 0;
     }
-    field_0x2c = field_0x30->UnknownVirtualSlot6();
-    if (field_0x2c->field_0x20 == 0x115c)
-        field_0x2c->UnknownFunction50abd0(5, 6);
-    field_0x2c->UnknownVirtualSlot8(1, 0, 0);
+    overlayTexture = backingTexture->UnknownVirtualSlot6();
+    if (overlayTexture->field_0x20 == 4444)
+        overlayTexture->UnknownFunction50abd0(5, 6);
+    overlayTexture->UnknownVirtualSlot8(1, 0, 0);
     source.left = 0;
-    source.right = field_0x134 ? 256 : 128;
+    source.right = largeLayout ? 256 : 128;
     source.top = 0;
-    source.bottom = field_0x134 ? 68 : 37;
+    source.bottom = largeLayout ? 68 : 37;
     font = "arialsm";
     sprintf(path, "%s\\%s", "Res", "Fonts.res");
-    UnknownFunction4b5f50(target, field_0x2c, &field_0x140, 0, &source, 0.00001f, 1, path, &font, 1, 0x115c, 0);
+    Attach(target, overlayTexture, &chatRect, 0, &source, 0.00001f, 1, path, &font, 1, 4444, 0);
     if (screen.right - screen.left > 512) {
-        UnknownOverlayRect rect = field_0x140;
+        UnknownOverlayRect rect = chatRect;
         source.left = 3;
         source.top = 69;
         rect.right = rect.left;
-        rect.left -= field_0x134 ? 38 : 19;
-        source.right = field_0x134 ? 38 : 19;
-        source.bottom = field_0x134 ? 137 : 103;
+        rect.left -= largeLayout ? 38 : 19;
+        source.right = largeLayout ? 38 : 19;
+        source.bottom = largeLayout ? 137 : 103;
         field_0x1c8 = new (__FILE__, 2284) Overlay(0, 1);
-        field_0x1c8->UnknownFunction4b5f50(target, field_0x2c, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 0x613, 0);
+        field_0x1c8->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
         UnknownFunction469190(field_0x1c8, -1);
-        source.left += field_0x134 ? 38 : 19;
+        source.left += largeLayout ? 38 : 19;
         source.top = 69;
-        source.right += field_0x134 ? 38 : 19;
-        source.bottom = field_0x134 ? 137 : 103;
-        rect.left = field_0x140.right;
-        rect.right = field_0x140.right + (field_0x134 ? 38 : 19);
+        source.right += largeLayout ? 38 : 19;
+        source.bottom = largeLayout ? 137 : 103;
+        rect.left = chatRect.right;
+        rect.right = chatRect.right + (largeLayout ? 38 : 19);
         field_0x1cc = new (__FILE__, 2294) Overlay(0, 1);
-        field_0x1cc->UnknownFunction4b5f50(target, field_0x2c, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 0x613, 0);
+        field_0x1cc->Attach(target, overlayTexture, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 1555, 0);
         UnknownFunction469190(field_0x1cc, -1);
     }
     field_0x11c = CreatePen(0, 3, 0xc0c0c0);
@@ -686,25 +687,25 @@ ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMap
         strcpy(logFont.lfFaceName, "Small Fonts");
     logFont.lfHeight = 10;
     field_0x124 = CreateFontIndirectA(&logFont);
-    field_0x30c[0] = UnknownTrackOverlayRect(0, 0x80, 0x89, 0x93);
-    field_0x30c[1] = UnknownTrackOverlayRect(0x81, 0xff, 0x89, 0x93);
-    field_0x30c[2] = UnknownTrackOverlayRect(0, 0x80, 0x94, 0x9e);
-    field_0x30c[3] = UnknownTrackOverlayRect(0x81, 0xff, 0x94, 0x9e);
-    field_0x30c[4] = UnknownTrackOverlayRect(0, 0x80, 0x9f, 0xa9);
-    field_0x30c[5] = UnknownTrackOverlayRect(0x81, 0xff, 0x9f, 0xa9);
-    field_0x30c[6] = UnknownTrackOverlayRect(0, 0x80, 0xaa, 0xb4);
-    field_0x30c[7] = UnknownTrackOverlayRect(0x81, 0xff, 0xaa, 0xb4);
-    field_0x30c[8] = UnknownTrackOverlayRect(0, 0x80, 0xb5, 0xbf);
-    field_0x30c[9] = UnknownTrackOverlayRect(0x81, 0xff, 0xb5, 0xbf);
-    field_0x30c[10] = UnknownTrackOverlayRect(0, 0x80, 0xc0, 0xca);
-    field_0x30c[11] = UnknownTrackOverlayRect(0x81, 0xff, 0xc0, 0xca);
-    field_0x30c[12] = UnknownTrackOverlayRect(0, 0x80, 0xcb, 0xd5);
+    nameTagRects[0] = UnknownTrackOverlayRect(0, 0x80, 0x89, 0x93);
+    nameTagRects[1] = UnknownTrackOverlayRect(0x81, 0xff, 0x89, 0x93);
+    nameTagRects[2] = UnknownTrackOverlayRect(0, 0x80, 0x94, 0x9e);
+    nameTagRects[3] = UnknownTrackOverlayRect(0x81, 0xff, 0x94, 0x9e);
+    nameTagRects[4] = UnknownTrackOverlayRect(0, 0x80, 0x9f, 0xa9);
+    nameTagRects[5] = UnknownTrackOverlayRect(0x81, 0xff, 0x9f, 0xa9);
+    nameTagRects[6] = UnknownTrackOverlayRect(0, 0x80, 0xaa, 0xb4);
+    nameTagRects[7] = UnknownTrackOverlayRect(0x81, 0xff, 0xaa, 0xb4);
+    nameTagRects[8] = UnknownTrackOverlayRect(0, 0x80, 0xb5, 0xbf);
+    nameTagRects[9] = UnknownTrackOverlayRect(0x81, 0xff, 0xb5, 0xbf);
+    nameTagRects[10] = UnknownTrackOverlayRect(0, 0x80, 0xc0, 0xca);
+    nameTagRects[11] = UnknownTrackOverlayRect(0x81, 0xff, 0xc0, 0xca);
+    nameTagRects[12] = UnknownTrackOverlayRect(0, 0x80, 0xcb, 0xd5);
     return this;
 }
 
 // 0x0051bed0: places the name tags and draws the map dots (see the note at
 // the top).
-void RadarOverlay::UnknownFunction51bed0(int mode)
+void RadarOverlay::DrawRacers(int mode)
 {
     int i;
     int x;
@@ -712,11 +713,11 @@ void RadarOverlay::UnknownFunction51bed0(int mode)
     int outside;
     Vector3 rim;
     Vector3 point;
-    for (i = 0; i < field_0x160; i++) {
-        if (field_0x134[i] == field_0x130->field_0x3b0) {
-            field_0x17c = field_0x134[i]->field_0x00c;
-            field_0x188 = -field_0x134[i]->field_0x050;
-            if (field_0x134[i]->field_0x444)
+    for (i = 0; i < racerCount; i++) {
+        if (racers[i] == radarCamera->followedRacer) {
+            field_0x17c = racers[i]->field_0x00c;
+            field_0x188 = -racers[i]->field_0x050;
+            if (racers[i]->field_0x444)
                 field_0x188 = field_0x18c;
             else
                 field_0x18c = field_0x188;
@@ -726,16 +727,16 @@ void RadarOverlay::UnknownFunction51bed0(int mode)
     }
     field_0x190 = cos(field_0x188);
     field_0x194 = sin(field_0x188);
-    for (i = 0; i < field_0x160; i++) {
-        if (i != field_0x170 && field_0x134[i]->field_0x25_bit0) {
-            outside = UnknownFunction51c360(field_0x134[i]->field_0x00c, &x, &y, &rim.x, &rim.y);
+    for (i = 0; i < racerCount; i++) {
+        if (i != field_0x170 && racers[i]->field_0x25_bit0) {
+            outside = WorldToMap(racers[i]->field_0x00c, &x, &y, &rim.x, &rim.y);
             if (field_0x174 && field_0x16c == i) {
-                if (field_0x12c->field_0x19c) {
-                    Vector3& own = field_0x134[field_0x170]->field_0x00c;
-                    float dx = field_0x134[i]->field_0x00c.x - own.x;
-                    float dz = field_0x134[i]->field_0x00c.z - own.z;
+                if (radarView->field_0x19c) {
+                    Vector3& own = racers[field_0x170]->field_0x00c;
+                    float dx = racers[i]->field_0x00c.x - own.x;
+                    float dz = racers[i]->field_0x00c.z - own.z;
                     float distance = dz * dz + dx * dx;
-                    field_0x12c->field_0x19c->UnknownFunction51d9c0(distance, field_0x134[i]->field_0x5e0);
+                    radarView->field_0x19c->UnknownFunction51d9c0(distance, racers[i]->field_0x5e0);
                 }
                 if (outside && (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 ||
                                 g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 2)) {
@@ -743,18 +744,18 @@ void RadarOverlay::UnknownFunction51bed0(int mode)
                     point.y = -1.0f;
                 } else {
                     point.x = (outside != 0.0f) ? rim.x : (float)x;
-                    point.y = (float)(int)(((field_0x1f8.top + outside) ? rim.y : (float)y) - 6.4f);
+                    point.y = (float)(int)(((mapRect.top + outside) ? rim.y : (float)y) - 6.4f);
                 }
-                for (int k = 0; k < field_0x160; k++) {
-                    NameOverlay* tag = field_0x12c->field_0x19c->field_0x2d8[k];
-                    if (tag->field_0x11c == field_0x134[i])
-                        tag->UnknownFunction5190a0(point, x - field_0x1a0 > 0, outside);
+                for (int k = 0; k < racerCount; k++) {
+                    NameOverlay* tag = radarView->field_0x19c->nameTags[k];
+                    if (tag->trackedRacer == racers[i])
+                        tag->UnknownFunction5190a0(point, x - mapCenterX > 0, outside);
                 }
             } else {
                 point.x = -1.0f;
                 point.y = -1.0f;
-                if (field_0x12c->field_0x19c)
-                    field_0x12c->field_0x19c->field_0x2d8[i]->UnknownFunction5190a0(point, 0, outside);
+                if (radarView->field_0x19c)
+                    radarView->field_0x19c->nameTags[i]->UnknownFunction5190a0(point, 0, outside);
             }
             if (outside) {
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 ||
@@ -772,24 +773,24 @@ void RadarOverlay::UnknownFunction51bed0(int mode)
             }
             field_0x1d8 = field_0x1b8;
             field_0x1d8.sx += 3.0f;
-            Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
             field_0x1b8.sy += 1.0f;
             field_0x1d8.sy += 1.0f;
-            Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
             field_0x1b8.sy -= 2.0f;
             field_0x1d8.sy -= 2.0f;
-            Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+            Target()->UnknownVirtualSlot16(D3DPT_LINESTRIP, D3DFVF_TLVERTEX, (int)&field_0x1b8, 2, 0);
         } else {
             point.x = -1.0f;
             point.y = -1.0f;
-            if (field_0x12c->field_0x19c)
-                field_0x12c->field_0x19c->field_0x2d8[i]->UnknownFunction5190a0(point, 0, 1);
+            if (radarView->field_0x19c)
+                radarView->field_0x19c->nameTags[i]->UnknownFunction5190a0(point, 0, 1);
         }
     }
     if (mode == 2 || mode == 3) {
-        UnknownFunction51c720(1);
-        UnknownFunction51c720(2);
+        DrawTrackOutline(1);
+        DrawTrackOutline(2);
     }
     if (mode == 1 || mode == 5)
-        UnknownFunction51cb20();
+        DrawGates();
 }

@@ -24,15 +24,15 @@ void UnknownStatic65b478::UnknownFunction467760(FontTexture* font) {
     UnknownFontTextureNode* previous = 0;
     UnknownFontTextureNode* node;
 
-    for (node = field_0x00; node; node = node->next) {
+    for (node = firstNode; node; node = node->next) {
         if (font == node->font) {
             if (!previous)
-                field_0x00 = node->next;
+                firstNode = node->next;
             else
                 previous->next = node->next;
             delete node;
             FontTexture::UnknownFunction467280(font);
-            field_0x04--;
+            nodeCount--;
             return;
         }
         previous = node;
@@ -43,7 +43,7 @@ void UnknownStatic65b478::UnknownFunction467760(FontTexture* font) {
 UnknownFontTextureNode* UnknownStatic65b478::UnknownFunction4677f0(const char* name) {
     UnknownFontTextureNode* node;
 
-    node = field_0x00;
+    node = firstNode;
     while (node && strcmp(name, node->font->UnknownFunction4673b0()) != 0)
         node = node->next;
     return node;

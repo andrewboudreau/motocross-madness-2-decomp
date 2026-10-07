@@ -51,6 +51,7 @@
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/Pixtrans.h"
 #include "../../src/reconstructed/Tgafile.h"
+#include "../../src/reconstructed/D3DConstants.h"
 
 // 0x0047d370: selects and binds one block's texture.
 void DrawableGridNodeSharedTextures::UnknownVirtualSlot7(int block)
@@ -63,15 +64,15 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot7(int block)
     } else if (record->own) {
         x->texture = record->texture;
         if (Extra()->blocks[block].ageEntry.size)
-            Terrain()->field_0xc84->UnknownFunction401250(&Extra()->blocks[block].ageEntry);
+            Terrain()->textureAgeManager->UnknownFunction401250(&Extra()->blocks[block].ageEntry);
     } else {
         x->texture = Terrain()->textures[index];
     }
     if (Extra()->texture) {
         Extra()->texture->UnknownVirtualSlot19();
     } else {
-        Terrain()->field_0x18->UnknownVirtualSlot7(0, 1, 1);
-        Terrain()->field_0x18->UnknownVirtualSlot7(0, 4, 1);
+        Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     }
 }
 
@@ -111,7 +112,7 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot3(float distance)
         stage = 3;
 
     int wanted = stage;
-    if (((Grid1RenderHost*)Terrain()->field_0x18)->camera->field_0x200 > 0.5f && level == 0)
+    if (((Grid1RenderHost*)Terrain()->renderer)->camera->field_0x200 > 0.5f && level == 0)
         wanted = stage > 2 ? 2 : stage;
 
     float scale;
@@ -168,9 +169,9 @@ retry:
                                         Extra()->blocks[block].texture->UnknownFunction510670();
                                     Extra()->textureFlags |= 1 << block;
                                     g_grid1OwnTextureCount++;
-                                    Terrain()->field_0xc84->UnknownFunction401050(
-                                        &Extra()->blocks[block].ageEntry, (int (*)(void*))UnknownFunction47ca40,
-                                        this, block, UnknownFunction511970(Terrain()->field_0xc24) * 0x40000 / 3);
+                                    Terrain()->textureAgeManager->UnknownFunction401050(
+                                        &Extra()->blocks[block].ageEntry, (int (*)(void*))EvictBlockTexture,
+                                        this, block, UnknownFunction511970(Terrain()->nodeTextureFormat) * 0x40000 / 3);
                                 }
                             } else {
                                 stage = wanted;
@@ -251,8 +252,8 @@ createTexture:
         ((ManagedTexture*)Extra()->field_0x10)->UnknownFunction510670();
     Extra()->textureFlags |= 0x10000;
     g_grid1OwnTextureCount++;
-    Terrain()->field_0xc84->UnknownFunction401050(&Extra()->ageEntry, UnknownFunction47ca00, this, 0,
-                                                  UnknownFunction511970(Terrain()->field_0xc24) * 0x40000 / 3);
+    Terrain()->textureAgeManager->UnknownFunction401050(&Extra()->ageEntry, EvictNodeTexture, this, 0,
+                                                  UnknownFunction511970(Terrain()->nodeTextureFormat) * 0x40000 / 3);
 ownTexture:
     Extra()->texture = (ManagedTexture*)Extra()->field_0x10;
     UnknownFunction483100();

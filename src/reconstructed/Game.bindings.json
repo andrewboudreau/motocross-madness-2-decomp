@@ -65,7 +65,7 @@
   "?UnknownFunction467b70@Game@@QAEHPAD@Z$ehhandler": "0x0054ad03",
   "?UnknownFunction469190@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?UnknownFunction4691f0@GameObject@@QAEHXZ": "0x004691f0",
-  "?UnknownFunction4ab6b0@NetworkInterface@@QAEJH@Z": "0x004ab6b0",
+  "?Initialize@NetworkInterface@@QAEJH@Z": "0x004ab6b0",
   "?UnknownFunction4bfa80@@YAIXZ": "0x004bfa80",
   "?UnknownFunction4cb690@UnknownPeakHold@@QAEHXZ": "0x004cb690",
   "?UnknownFunction4cb6b0@UnknownPeakHold@@QAEXH@Z": "0x004cb6b0",

@@ -108,7 +108,7 @@ public:
 
     // 0x004de3b0: GameObject's slot 8, then loads the event; on failure it
     // releases itself (slot 2) and returns 0, else returns this.
-    BaseQuarryEvent* UnknownFunction4de3b0(RenderTarget* target, UnknownProgressCallback progress);
+    BaseQuarryEvent* Create(RenderTarget* target, UnknownProgressCallback progress);
     // 0x004de590 (about 7.9 KB): loads the scene, terrain, lights, sounds
     // and race objects; not reconstructed.
     int UnknownFunction4de590(UnknownProgressCallback progress);
@@ -120,38 +120,38 @@ public:
     int UnknownFunction4e0560();
     // 0x004e0c30: shows "<string id> <on/off>" (strings 0x1407/0x1408) in
     // the text queue.
-    void UnknownFunction4e0c30(int id, int on);
+    void ShowOnOffMessage(int id, int on);
     void UnknownFunction4e1f00();             // 0x004e1f00: clears the clock
 
-    Scene* field_0x2c;
-    void* field_0x30;                         // SkyCube
-    UnknownKrustyBikeView* field_0x34;
-    VisualCue* field_0x38;
-    UnknownQuarryCamera* field_0x3c;
-    UnknownTerrain* field_0x40;               // Terrain (src/krusty2/broadphase/Terrain.h)
+    Scene* eventScene;
+    void* skyCube;                         // SkyCube
+    UnknownKrustyBikeView* raceView;
+    VisualCue* visualCue;
+    UnknownQuarryCamera* raceCamera;
+    UnknownTerrain* eventTerrain;               // Terrain (src/krusty2/broadphase/Terrain.h)
     UnknownTextureStream* field_0x44;
-    EcoSystem* field_0x48;
+    EcoSystem* ecoSystem;
     void* field_0x4c;
     void* field_0x50;
-    void* field_0x54;                         // TerrainShadow
-    void* field_0x58;                         // ProjectedShadow
-    StatsOverlay* field_0x5c;
-    RadarOverlay* field_0x60;
-    ChatOverlay* field_0x64;
-    InstrumentOverlay* field_0x68;
-    TextQueueOverlay* field_0x6c;
-    float field_0x70;                         // race clock, minutes
-    float field_0x74;                         // race clock, seconds
-    void* field_0x78;                         // ParticleManager
-    LightManager* field_0x7c;
-    LightEmitter* field_0x80;                 // sun
-    LightEmitter* field_0x84;                 // ambient
-    Fog* field_0x88;
+    void* terrainShadow;                         // TerrainShadow
+    void* projectedShadow;                         // ProjectedShadow
+    StatsOverlay* statsOverlay;
+    RadarOverlay* radarOverlay;
+    ChatOverlay* chatOverlay;
+    InstrumentOverlay* instrumentOverlay;
+    TextQueueOverlay* textQueue;
+    float clockMinutes;                         // race clock, minutes
+    float clockSeconds;                         // race clock, seconds
+    void* particleManager;                         // ParticleManager
+    LightManager* lightManager;
+    LightEmitter* sunLight;                 // sun
+    LightEmitter* ambientLight;                 // ambient
+    Fog* eventFog;
     unsigned char field_0x8c[0x94 - 0x8c];
     GameObject* field_0x94;
     GameObject* field_0x98;
-    AuralScape* field_0x9c;
-    int field_0xa0;                           // AuralScape listener
+    AuralScape* auralScape;
+    int auralScapeListener;                           // AuralScape listener
 };
 
 // RTTI: NationalRace : BaseQuarryEvent (vtable 0x00555354; 0xb0 bytes).
@@ -169,9 +169,9 @@ public:
     virtual void UnknownVirtualSlot29();      // 0x004aa970: the overlays, then the drop text
     virtual void UnknownVirtualSlot30();      // 0x004aaa50: adds the drop text as a child
     // 0x004aa850: the base initialiser, then 0x0048ad50 on +0xa4.
-    NationalRace* UnknownFunction4aa850(RenderTarget* target, UnknownProgressCallback progress);
+    NationalRace* Create(RenderTarget* target, UnknownProgressCallback progress);
 
-    RunwayLights* field_0xa4;
-    DropTextOverlay* field_0xa8;              // the finish text (string 0x913)
-    int field_0xac;                           // finish text shown
+    RunwayLights* runwayLights;
+    DropTextOverlay* finishText;              // the finish text (string 0x913)
+    int finishTextShown;                           // finish text shown
 };

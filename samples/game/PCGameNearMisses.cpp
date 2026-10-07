@@ -1,13 +1,13 @@
 // Near-miss PCGame candidates, kept out of src/reconstructed until they
 // match. See docs/PCGAME.md.
 //
-// PCGame::UnknownFunction4c16f0 (0x004c16f0, 771 bytes): 767 of 771 bytes
+// PCGame::LoadDisplayProfile (0x004c16f0, 771 bytes): 767 of 771 bytes
 // match. The four stores in the profile copy loop encode their address as
 // [mode table + offset] where retail has [offset + mode table] (SIB base and
 // index swapped). Pointer-walk, `(table + i)->`, reference and 16-byte
 // struct-copy forms do not change it.
 //
-// PCGame::UnknownFunction4c0d10 (0x004c0d10, 1790 bytes): the control flow,
+// PCGame::ProfileDisplays (0x004c0d10, 1790 bytes): the control flow,
 // calls and constants line up, but the frame and registers do not. Retail
 // keeps the 16-byte capability block below the name buffer, and in the first
 // loop holds the count in ebp, the index in edi and the array pointer in
@@ -27,7 +27,7 @@ void UnknownFunction5119c0(int format, void* pixelFormat);
 // 0x004c16f0: loads the display's saved profile. Fails (0) unless the saved
 // mode list matches the display's; marks the display disabled (+0xb74 bit 1)
 // when the profile says so.
-int PCGame::UnknownFunction4c16f0(UnknownDisplay* display) {
+int PCGame::LoadDisplayProfile(UnknownDisplay* display) {
     char name[256];
     sprintf(name, "DriverInfo\\%s\\TextureCacheLimit", display->field_0x4bc);
     display->field_0x60 = UnknownVirtualSlot20(name, 0);
@@ -90,11 +90,11 @@ int PCGame::UnknownFunction4c16f0(UnknownDisplay* display) {
 // list, whether windowed, full-screen, software and hardware rendering work,
 // its video memory, AGP, whether ten 256x256 textures fit and the partial
 // texture blit timing.
-void PCGame::UnknownFunction4c0d10() {
+void PCGame::ProfileDisplays() {
     int loaded = 0;
     int i;
     for (i = 0; i < g_UnknownDisplayCount68a764; i++)
-        if (UnknownFunction4c16f0(g_UnknownDisplays68a754[i]))
+        if (LoadDisplayProfile(g_UnknownDisplays68a754[i]))
             loaded++;
     if (loaded == g_UnknownDisplayCount68a764)
         return;
@@ -160,9 +160,9 @@ void PCGame::UnknownFunction4c0d10() {
                             if (field_0x424.platformId != 2 &&
                                 !(g_UnknownDisplays68a754[i]->field_0x1b8 & 0x400)) {
                                 if (((PCRenderTarget*)target)->field_0x164 & 0x4000)
-                                    UnknownFunction4c0760(g_UnknownDisplays68a754[i], 800, 600);
+                                    LimitDisplayModes(g_UnknownDisplays68a754[i], 800, 600);
                                 else
-                                    UnknownFunction4c0760(g_UnknownDisplays68a754[i], 640, 480);
+                                    LimitDisplayModes(g_UnknownDisplays68a754[i], 640, 480);
                                 sprintf(name, "DriverInfo\\%s\\Modes",
                                         g_UnknownDisplays68a754[i]->field_0x4bc);
                                 UnknownVirtualSlot29(name, g_UnknownDisplays68a754[i]->field_0x10,

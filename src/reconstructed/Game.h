@@ -67,6 +67,10 @@ public:
     virtual int UnknownVirtualSlot17(int type, void* data, int from, int to, int flags);
     virtual int UnknownVirtualSlot18(const char* name, char* path); // 0x00468bd0
     virtual int UnknownVirtualSlot19(int mode) = 0;
+    // Slots 20-29 are PCGame's registry accessors under its key
+    // (RegQueryValueExA / RegSetValueExA, PCGame.cpp): 20 reads a DWORD, 21
+    // a float, 22 a DWORD as a flag, 23 a string, 24 binary data; 25-27
+    // write a DWORD, 28 a string and 29 binary data.
     virtual int UnknownVirtualSlot20(const char* name, int defaultValue) = 0; // "VideoMemoryMB"
     virtual float UnknownVirtualSlot21(const char* name, float defaultValue) = 0;
     // Named setting (JoystickDevice asks for "JoyDirectionFlipped").
@@ -90,11 +94,11 @@ public:
     int UnknownFunction467b70(char* message);
     void UnknownFunction468880();             // 0x00468880 (PCCamera slot 27)
 
-    SoundInterface* field_0x04;               // a PCSoundInterface (initialiser)
-    NetworkInterface* field_0x08;
-    UnknownDisplay* field_0x0c;
+    SoundInterface* field_0x04;               // the sound interface: a PCSoundInterface (initialiser)
+    NetworkInterface* field_0x08;             // the network interface: created by slot 16, deleted by NetProcs.cpp's EndNetworkGame
+    UnknownDisplay* field_0x0c;               // the display (video card and modes; slot 8's profile page)
     RenderTarget* field_0x10;                 // a PCRenderTarget (PCGame slot 31)
-    ControlInterface* field_0x14;
+    ControlInterface* field_0x14;             // the control interface: a PCControlInterface (slot 2)
     int field_0x18;                           // 1 initially; KrustyBikeCamera slot 42 tests > 1
     TextureMapManager* field_0x1c;
     int field_0x20;
@@ -103,7 +107,7 @@ public:
     int field_0x2c;                           // 0x115c after initialisation
     int field_0x30;
     GameObject* field_0x34;                   // second root object (initialiser 0x00467b70)
-    DebugOverlay* field_0x38;                 // with "DebugOverlay" set
+    DebugOverlay* field_0x38;                 // the debug overlay, created with the "DebugOverlay" registry flag
     TextureMapManager* field_0x3c;
     char field_0x40[0x1c4 - 0x40];            // empty string initially
     int field_0x1c4;
@@ -130,6 +134,6 @@ public:
     float field_0x2e4;
     float field_0x2e8;
     float field_0x2ec;
-    float field_0x2f0;                        // frame time (KeyboardDevice 0x0048a0c0)
+    float field_0x2f0;                        // frame time in seconds (KeyboardDevice 0x0048a0c0; Net.cpp's resend timers add it)
     GameObject* field_0x2f4;                  // root object; most slots forward to it
 };

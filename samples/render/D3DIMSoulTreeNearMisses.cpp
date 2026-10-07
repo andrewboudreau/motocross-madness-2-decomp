@@ -3,7 +3,7 @@
 // evidence and the exact functions are in src/reconstructed/D3DIMSoulTree.h
 // and .cpp. Bindings: D3DIMSoulTreeNearMisses.bindings.json.
 //
-// UnknownFunction440060 (0x00440060, 1964 bytes): 1955/1964. The .slt LOD
+// ReadLods (0x00440060, 1964 bytes): 1955/1964. The .slt LOD
 // reader. Two operand orders: retail forms the surface address as
 // `offset + surfaces` (mov ebx, offset; mov edi, surfaces; add ebx, edi)
 // and stores the face indices as [faces + offset]; VC6 emits
@@ -14,7 +14,7 @@
 // loop) emits retail's `[faces + offset]`: the swap is a whole-function
 // effect, as samples/track/SceneManagerNearMisses.cpp's 0x004ecd60.
 //
-// UnknownFunction440d40 (0x00440d40, 484 bytes): 241/484, 2 bytes short.
+// TransformVertexGroups (0x00440d40, 484 bytes): 241/484, 2 bytes short.
 // The vertex-group transform; the same `offset + groups` operand order for
 // the source group (retail mov ecx, groups; mov ebp, offset; add ebp, ecx).
 // Everything after that only shifts.
@@ -35,7 +35,7 @@
 // VC6 adds the y and z of `high + low` as low + high, and keeps the
 // +0x164 address in ebp where retail uses edx.
 //
-// UnknownFunction443de0 (0x00443de0, 592 bytes): the level-of-detail and
+// SelectLod (0x00443de0, 592 bytes): the level-of-detail and
 // mip chooser. Writing the camera expression without a local reproduces
 // retail's `add esi, 0x170`. Retail keeps `center`/`extents` in ebx/ebp
 // from the prologue and multiplies scale * +0x280[i] * +0x284 and
@@ -64,14 +64,14 @@
 // locals), a plain struct instead of the union, projection pointers or
 // flattened indices (unchanged), and no uniform form gives retail's row 1.
 //
-// UnknownFunction442fe0 (normals, 528 bytes) and UnknownFunction4431f0
+// DrawNormals (normals, 528 bytes) and DrawVertexCrosses
 // (vertex crosses, 512 bytes): both scale by function-local statics in
 // .data (0x00568944 = 0.5, 0x00568948 = 0.025), which is what puts the
 // variable before the vertex operand in retail's fmul/fadd. Remaining:
 // retail materializes the face-group address with `lea` and keeps
 // different induction registers.
 //
-// UnknownFunction440f30 (0x00440f30..0x00442dd8, 7848 bytes): the drawing
+// DrawCurrentLod (0x00440f30..0x00442dd8, 7848 bytes): the drawing
 // function. A nine-way switch on the material mapping type (+0xc8; source
 // order 0, 7, 1, 3, 4, 8, 2, 5, 6 from the case layout) rewrites the
 // source texture coordinates, then the modifiers, the texture
@@ -99,6 +99,7 @@
 #include "../../src/reconstructed/ResourceManager.h"
 #include "../../src/reconstructed/SoultreeMaterial.h"
 #include "../../src/reconstructed/TextureMap.h"
+#include "../../src/reconstructed/D3DConstants.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -130,127 +131,127 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b)
 
 // 0x00440060: reads the levels of detail from the .slt keys; returns 1
 // when a surface has no material (slot 3 then adds an untextured one).
-int D3DIMSoultreeObject::UnknownFunction440060()
+int D3DIMSoultreeObject::ReadLods()
 {
     int untextured = 0;
     int count = UnknownFunction4fda30();
     SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x1dd);
     int index = 1;
     nodes[0] = this;
-    UnknownFunction4fda60(&index, nodes);
+    CollectDescendants(&index, nodes);
     char section[0x80];
     sprintf(section, "LOD Information");
-    field_0x1a0->UnknownFunction4b78f0(section);
-    field_0x1a0->UnknownFunction4b7f10("NumberOfLOD", 0, &field_0x274);
-    field_0x1a0->UnknownFunction4b7f10("UseAutoLOD", 0, &field_0x288);
+    parameterBlock->UnknownFunction4b78f0(section);
+    parameterBlock->UnknownFunction4b7f10("NumberOfLOD", 0, &lodCount);
+    parameterBlock->UnknownFunction4b7f10("UseAutoLOD", 0, &field_0x288);
     int i;
     if (field_0x288) {
-        field_0x280 = (float*)DebugMalloc(field_0x274 * 4 - 1, __FILE__, 0x1ec);
-        for (i = 0; i < field_0x274 - 1; i++) {
+        autoLodDistances = (float*)DebugMalloc(lodCount * 4 - 1, __FILE__, 0x1ec);
+        for (i = 0; i < lodCount - 1; i++) {
             sprintf(section, "AutoLOD#%i", i);
-            field_0x1a0->UnknownFunction4b7f40(section, -1.0f, &field_0x280[i]);
+            parameterBlock->UnknownFunction4b7f40(section, -1.0f, &autoLodDistances[i]);
         }
     }
-    field_0x28c = (UnknownSoultreeLod*)DebugMalloc(field_0x274 * 8, __FILE__, 0x1f5);
+    lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x1f5);
     UnknownSoultreeFaceGroup* groups = (UnknownSoultreeFaceGroup*)DebugMalloc(count * 0x14, __FILE__, 0x1f9);
     for (i = 0; i < count; i++)
-        groups[i].field_0x00 = nodes[i];
-    for (int lod = 0; lod < field_0x274; lod++) {
-        UnknownSoultreeLod* level = &field_0x28c[lod];
+        groups[i].node = nodes[i];
+    for (int lod = 0; lod < lodCount; lod++) {
+        UnknownSoultreeLod* level = &lodTable[lod];
         sprintf(section, "LOD %i", lod);
-        field_0x1a0->UnknownFunction4b78f0(section);
-        field_0x1a0->UnknownFunction4b7f10("NumberOfSurfaces", 0, &level->field_0x00);
-        level->field_0x04 = (UnknownSoultreeSurface*)DebugMalloc(level->field_0x00 * 0x38, __FILE__, 0x206);
-        for (int s = 0; s < level->field_0x00; s++) {
-            UnknownSoultreeSurface* surface = &level->field_0x04[s];
+        parameterBlock->UnknownFunction4b78f0(section);
+        parameterBlock->UnknownFunction4b7f10("NumberOfSurfaces", 0, &level->surfaceCount);
+        level->surfaces = (UnknownSoultreeSurface*)DebugMalloc(level->surfaceCount * 0x38, __FILE__, 0x206);
+        for (int s = 0; s < level->surfaceCount; s++) {
+            UnknownSoultreeSurface* surface = &level->surfaces[s];
             surface->field_0x2c = 1.0f;
             surface->field_0x30 = 0;
             surface->field_0x34 = 0;
             sprintf(section, "LOD %i - Surface %i", lod, s);
-            field_0x1a0->UnknownFunction4b78f0(section);
-            field_0x1a0->UnknownFunction4b7f10("NumberOfVertices", 0, &surface->field_0x08);
-            field_0x1a0->UnknownFunction4b7f10("NumberOfFaces", 0, &surface->field_0x0c);
-            field_0x1a0->UnknownFunction4b7f10("NumberOfMaterials", 0, &surface->field_0x20);
-            if (surface->field_0x20 > 0) {
-                surface->field_0x24 = (int*)DebugMalloc(surface->field_0x20 * 4, __FILE__, 0x216);
-                for (int m = 0; m < surface->field_0x20; m++) {
+            parameterBlock->UnknownFunction4b78f0(section);
+            parameterBlock->UnknownFunction4b7f10("NumberOfVertices", 0, &surface->vertexCount);
+            parameterBlock->UnknownFunction4b7f10("NumberOfFaces", 0, &surface->faceCount);
+            parameterBlock->UnknownFunction4b7f10("NumberOfMaterials", 0, &surface->materialCount);
+            if (surface->materialCount > 0) {
+                surface->materialIndices = (int*)DebugMalloc(surface->materialCount * 4, __FILE__, 0x216);
+                for (int m = 0; m < surface->materialCount; m++) {
                     char key[0x80];
                     sprintf(key, "Material#%i", m);
-                    field_0x1a0->UnknownFunction4b7f10(key, 0, &surface->field_0x24[m]);
+                    parameterBlock->UnknownFunction4b7f10(key, 0, &surface->materialIndices[m]);
                 }
             } else {
                 untextured = 1;
-                surface->field_0x24 = (int*)DebugMalloc(4, __FILE__, 0x21e);
-                surface->field_0x24[0] = 0;
-                surface->field_0x20 = 1;
+                surface->materialIndices = (int*)DebugMalloc(4, __FILE__, 0x21e);
+                surface->materialIndices[0] = 0;
+                surface->materialCount = 1;
             }
-            surface->field_0x10 = (UnknownSoultreeVertex*)DebugMalloc(surface->field_0x08 * 0x20, __FILE__, 0x223);
-            surface->field_0x14 = (UnknownSoultreeVertex*)DebugMalloc(surface->field_0x08 * 0x20, __FILE__, 0x224);
-            surface->field_0x18 = (Vector3*)DebugMalloc(surface->field_0x08 * 0xc, __FILE__, 0x225);
-            surface->field_0x1c = (unsigned short*)DebugMalloc(surface->field_0x0c * 6, __FILE__, 0x226);
-            surface->field_0x28 = (UnknownSoultreeUV*)DebugMalloc(surface->field_0x08 * 8, __FILE__, 0x227);
+            surface->vertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x223);
+            surface->drawnVertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x224);
+            surface->normals = (Vector3*)DebugMalloc(surface->vertexCount * 0xc, __FILE__, 0x225);
+            surface->indices = (unsigned short*)DebugMalloc(surface->faceCount * 6, __FILE__, 0x226);
+            surface->uvs = (UnknownSoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x227);
             sprintf(section, "LOD %i - Surface %i - Vertices", lod, s);
-            field_0x1a0->UnknownFunction4b7f70(section);
+            parameterBlock->UnknownFunction4b7f70(section);
             int v;
-            for (v = 0; v < surface->field_0x08; v++) {
+            for (v = 0; v < surface->vertexCount; v++) {
                 float red;
                 float green;
                 float blue;
-                field_0x1a0->UnknownFunction4b8010(0);
-                field_0x1a0->UnknownFunction4b81c0(0, &surface->field_0x14[v].field_0x00.x);
-                field_0x1a0->UnknownFunction4b81c0(1, &surface->field_0x14[v].field_0x00.y);
-                field_0x1a0->UnknownFunction4b81c0(2, &surface->field_0x14[v].field_0x00.z);
-                field_0x1a0->UnknownFunction4b81c0(3, &surface->field_0x18[v].x);
-                field_0x1a0->UnknownFunction4b81c0(4, &surface->field_0x18[v].y);
-                field_0x1a0->UnknownFunction4b81c0(5, &surface->field_0x18[v].z);
-                field_0x1a0->UnknownFunction4b81c0(6, &surface->field_0x14[v].field_0x18);
-                field_0x1a0->UnknownFunction4b81c0(7, &surface->field_0x14[v].field_0x1c);
-                field_0x1a0->UnknownFunction4b81c0(12, &red);
-                field_0x1a0->UnknownFunction4b81c0(13, &green);
-                field_0x1a0->UnknownFunction4b81c0(14, &blue);
-                surface->field_0x14[v].field_0x10 = 0xff000000 | ((long)(red * 255.0) << 16) |
+                parameterBlock->UnknownFunction4b8010(0);
+                parameterBlock->UnknownFunction4b81c0(0, &surface->drawnVertices[v].position.x);
+                parameterBlock->UnknownFunction4b81c0(1, &surface->drawnVertices[v].position.y);
+                parameterBlock->UnknownFunction4b81c0(2, &surface->drawnVertices[v].position.z);
+                parameterBlock->UnknownFunction4b81c0(3, &surface->normals[v].x);
+                parameterBlock->UnknownFunction4b81c0(4, &surface->normals[v].y);
+                parameterBlock->UnknownFunction4b81c0(5, &surface->normals[v].z);
+                parameterBlock->UnknownFunction4b81c0(6, &surface->drawnVertices[v].tu);
+                parameterBlock->UnknownFunction4b81c0(7, &surface->drawnVertices[v].tv);
+                parameterBlock->UnknownFunction4b81c0(12, &red);
+                parameterBlock->UnknownFunction4b81c0(13, &green);
+                parameterBlock->UnknownFunction4b81c0(14, &blue);
+                surface->drawnVertices[v].diffuse = 0xff000000 | ((long)(red * 255.0) << 16) |
                                                     ((long)(green * 255.0) << 8) | (long)(blue * 255.0);
-                surface->field_0x14[v].field_0x14 = 0;
-                surface->field_0x10[v] = surface->field_0x14[v];
-                surface->field_0x28[v].field_0x00 = surface->field_0x10[v].field_0x18;
-                surface->field_0x28[v].field_0x04 = surface->field_0x10[v].field_0x1c;
+                surface->drawnVertices[v].specular = 0;
+                surface->vertices[v] = surface->drawnVertices[v];
+                surface->uvs[v].u = surface->vertices[v].tu;
+                surface->uvs[v].v = surface->vertices[v].tv;
             }
             sprintf(section, "LOD %i - Surface %i - Faces", lod, s);
-            field_0x1a0->UnknownFunction4b7f70(section);
-            for (int f = 0; f < surface->field_0x0c; f++) {
+            parameterBlock->UnknownFunction4b7f70(section);
+            for (int f = 0; f < surface->faceCount; f++) {
                 int a;
                 int b;
                 int c;
-                field_0x1a0->UnknownFunction4b8010(0);
-                field_0x1a0->UnknownFunction4b8180(0, &a);
-                field_0x1a0->UnknownFunction4b8180(1, &b);
-                field_0x1a0->UnknownFunction4b8180(2, &c);
-                surface->field_0x1c[f * 3] = a;
-                surface->field_0x1c[f * 3 + 1] = b;
-                surface->field_0x1c[f * 3 + 2] = c;
+                parameterBlock->UnknownFunction4b8010(0);
+                parameterBlock->UnknownFunction4b8180(0, &a);
+                parameterBlock->UnknownFunction4b8180(1, &b);
+                parameterBlock->UnknownFunction4b8180(2, &c);
+                surface->indices[f * 3] = a;
+                surface->indices[f * 3 + 1] = b;
+                surface->indices[f * 3 + 2] = c;
             }
             sprintf(section, "LOD %i - Surface %i - Object Pointer List", lod, s);
-            field_0x1a0->UnknownFunction4b7f70(section);
+            parameterBlock->UnknownFunction4b7f70(section);
             int used = 0;
             for (i = 0; i < count; i++) {
                 int first;
                 int vertices;
-                field_0x1a0->UnknownFunction4b8010(0);
-                field_0x1a0->UnknownFunction4b8180(0, &first);
-                field_0x1a0->UnknownFunction4b8180(1, &vertices);
-                groups[i].field_0x04 = vertices;
-                groups[i].field_0x08 = &surface->field_0x10[first];
-                groups[i].field_0x0c = &surface->field_0x14[first];
-                groups[i].field_0x10 = &surface->field_0x18[first];
+                parameterBlock->UnknownFunction4b8010(0);
+                parameterBlock->UnknownFunction4b8180(0, &first);
+                parameterBlock->UnknownFunction4b8180(1, &vertices);
+                groups[i].vertexCount = vertices;
+                groups[i].sourceVertices = &surface->vertices[first];
+                groups[i].transformedVertices = &surface->drawnVertices[first];
+                groups[i].normals = &surface->normals[first];
                 if (vertices > 0)
                     used++;
             }
-            surface->field_0x00 = used;
-            surface->field_0x04 = (UnknownSoultreeFaceGroup*)DebugMalloc(used * 0x14, __FILE__, 0x283);
+            surface->groupCount = used;
+            surface->groups = (UnknownSoultreeFaceGroup*)DebugMalloc(used * 0x14, __FILE__, 0x283);
             int k = 0;
             for (i = 0; i < count; i++) {
-                if (groups[i].field_0x04 > 0)
-                    surface->field_0x04[k++] = groups[i];
+                if (groups[i].vertexCount > 0)
+                    surface->groups[k++] = groups[i];
             }
         }
     }
@@ -261,45 +262,45 @@ int D3DIMSoultreeObject::UnknownFunction440060()
 }
 
 // 0x00440d40
-void D3DIMSoultreeObject::UnknownFunction440d40(int lod)
+void D3DIMSoultreeObject::TransformVertexGroups(int lod)
 {
     int saved = field_0x27c;
     if (lod != -1)
         field_0x27c = lod;
-    for (int i = 0; i < field_0x28c[field_0x27c].field_0x00; i++) {
-        UnknownSoultreeSurface* surface = &field_0x28c[field_0x27c].field_0x04[i];
+    for (int i = 0; i < lodTable[field_0x27c].surfaceCount; i++) {
+        UnknownSoultreeSurface* surface = &lodTable[field_0x27c].surfaces[i];
         int colored = 0;
         int k;
-        for (k = 0; k < surface->field_0x20; k++) {
-            SoultreeMaterial* material = field_0x290[surface->field_0x24[k]];
-            if (!material->field_0x9c || material->field_0xa0)
+        for (k = 0; k < surface->materialCount; k++) {
+            SoultreeMaterial* material = materialTable[surface->materialIndices[k]];
+            if (!material->hasTextureName || material->useVertexColor)
                 colored = 1;
         }
         UnknownSoultreeSurface* drawn;
-        if (field_0x26c > 0) {
-            for (k = 0; k < field_0x26c; k++)
-                ((D3DIMSoultreeModifier*)field_0x270[k])->UnknownVirtualSlot27(
+        if (secondModifierCount > 0) {
+            for (k = 0; k < secondModifierCount; k++)
+                ((D3DIMSoultreeModifier*)secondModifierList[k])->UnknownVirtualSlot27(
                     this, (UnknownSoultreeMesh*)surface, (UnknownSoultreeMesh**)&drawn);
         } else {
             drawn = surface;
         }
-        for (int j = 0; j < drawn->field_0x00; j++) {
-            UnknownSoultreeFaceGroup* group = &drawn->field_0x04[j];
-            UnknownSoultreeFaceGroup* source = &surface->field_0x04[j];
-            int count = group->field_0x04;
+        for (int j = 0; j < drawn->groupCount; j++) {
+            UnknownSoultreeFaceGroup* group = &drawn->groups[j];
+            UnknownSoultreeFaceGroup* source = &surface->groups[j];
+            int count = group->vertexCount;
             if (count) {
-                group->field_0x00->UnknownFunction4fb4f0();
-                void* target = group->field_0x0c;
-                void* vertices = source->field_0x08;
+                group->node->UpdateWorldMatrix();
+                void* target = group->transformedVertices;
+                void* vertices = source->sourceVertices;
                 if (field_0x1a4) {
                     if (colored)
-                        field_0x1bc->UnknownFunction49e4a0(&group->field_0x00->field_0x0f8, count,
-                                                           group->field_0x10, vertices, 0xc, target);
+                        lightManager->UnknownFunction49e4a0(&group->node->worldMatrix, count,
+                                                           group->normals, vertices, 0xc, target);
                     else
-                        field_0x1bc->UnknownFunction49e4a0(&group->field_0x00->field_0x0f8, count,
-                                                           group->field_0x10, vertices, 0xc, 0);
+                        lightManager->UnknownFunction49e4a0(&group->node->worldMatrix, count,
+                                                           group->normals, vertices, 0xc, 0);
                 }
-                UnknownFunction4a1b00(vertices, target, &group->field_0x00->field_0x0f8, count, 0x20, 0x20);
+                TransformPoints(vertices, target, &group->node->worldMatrix, count, 0x20, 0x20);
             }
         }
     }
@@ -310,11 +311,11 @@ void D3DIMSoultreeObject::UnknownFunction440d40(int lod)
 // 0x004435b0
 void D3DIMSoultreeObject::UnknownFunction4435b0()
 {
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 0, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 1);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
     unsigned short indices[6] = { 0, 1, 0, 2, 0, 3 };
     Vector3 points[4];
@@ -333,28 +334,28 @@ void D3DIMSoultreeObject::UnknownFunction4435b0()
     UnknownSoultreeVertex vertices[4];
     for (int i = 0; i < 4; i++) {
         points[i] = UnknownFunction4fd660(points[i]);
-        vertices[i].field_0x00 = points[i];
-        vertices[i].field_0x18 = 0;
-        vertices[i].field_0x1c = 0;
-        vertices[i].field_0x14 = 0;
+        vertices[i].position = points[i];
+        vertices[i].tu = 0;
+        vertices[i].tv = 0;
+        vertices[i].specular = 0;
     }
-    vertices[0].field_0x10 = 0xffffff;
-    vertices[1].field_0x10 = 0xff0000;
-    vertices[2].field_0x10 = 0xff;
-    vertices[3].field_0x10 = 0xff00;
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(2, 0x1e2, (int)vertices, 4, (int)indices, 6, 0);
+    vertices[0].diffuse = 0xffffff;
+    vertices[1].diffuse = 0xff0000;
+    vertices[2].diffuse = 0xff;
+    vertices[3].diffuse = 0xff00;
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 4, (int)indices, 6, 0);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
-    if (field_0x144)
-        ((D3DIMSoultreeObject*)field_0x144)->UnknownFunction4435b0();
-    if (field_0x140)
-        ((D3DIMSoultreeObject*)field_0x140)->UnknownFunction4435b0();
+    if (nextSibling)
+        ((D3DIMSoultreeObject*)nextSibling)->UnknownFunction4435b0();
+    if (firstChild)
+        ((D3DIMSoultreeObject*)firstChild)->UnknownFunction4435b0();
 }
 
 // 0x00443740
 void D3DIMSoultreeObject::UnknownFunction443740(Vector3 center, Vector3 extents, int flag)
 {
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 1);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
     unsigned short indices[24] = {
         0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7,
@@ -374,16 +375,16 @@ void D3DIMSoultreeObject::UnknownFunction443740(Vector3 center, Vector3 extents,
         corners[i].y = center.y + corners[i].y;
         corners[i].z = center.z + corners[i].z;
         corners[i] = UnknownFunction4fd660(corners[i]);
-        vertices[i].field_0x00 = corners[i];
-        vertices[i].field_0x18 = 0;
-        vertices[i].field_0x1c = 0;
+        vertices[i].position = corners[i];
+        vertices[i].tu = 0;
+        vertices[i].tv = 0;
         if (flag)
-            vertices[i].field_0x14 = 0;
+            vertices[i].specular = 0;
         else
-            vertices[i].field_0x14 = 0xff0000;
-        vertices[i].field_0x10 = 0;
+            vertices[i].specular = 0xff0000;
+        vertices[i].diffuse = 0;
     }
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(2, 0x1e2, (int)vertices, 8, (int)indices, 24, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)vertices, 8, (int)indices, 24, 0);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
 }
 
@@ -403,31 +404,31 @@ static inline void Lower(float& bound, float value)
 void D3DIMSoultreeObject::SoultreeVirtualSlot5()
 {
     D3DIMSoultreeObject* model = this;
-    while (!model->field_0x28c)
-        model = (D3DIMSoultreeObject*)model->field_0x13c;
-    field_0x150 = 0;
+    while (!model->lodTable)
+        model = (D3DIMSoultreeObject*)model->parent;
+    boundsFound = 0;
     Vector3 low(64000.0f, 64000.0f, 64000.0f);
     Vector3 high(-64000.0f, -64000.0f, -64000.0f);
-    for (int lod = 0; lod < model->field_0x274; lod++) {
-        for (int i = 0; i < model->field_0x28c[lod].field_0x00; i++) {
-            for (int j = 0; j < model->field_0x28c[lod].field_0x04[i].field_0x00; j++) {
-                if (model->field_0x28c[lod].field_0x04[i].field_0x04[j].field_0x00 == this) {
-                    UnknownSoultreeVertex* vertex = model->field_0x28c[lod].field_0x04[i].field_0x04[j].field_0x0c;
-                    int count = model->field_0x28c[lod].field_0x04[i].field_0x04[j].field_0x04;
+    for (int lod = 0; lod < model->lodCount; lod++) {
+        for (int i = 0; i < model->lodTable[lod].surfaceCount; i++) {
+            for (int j = 0; j < model->lodTable[lod].surfaces[i].groupCount; j++) {
+                if (model->lodTable[lod].surfaces[i].groups[j].node == this) {
+                    UnknownSoultreeVertex* vertex = model->lodTable[lod].surfaces[i].groups[j].transformedVertices;
+                    int count = model->lodTable[lod].surfaces[i].groups[j].vertexCount;
                     for (int k = 0; k < count; k++) {
-                        Raise(high.x, vertex[k].field_0x00.x);
-                        Raise(high.y, vertex[k].field_0x00.y);
-                        Raise(high.z, vertex[k].field_0x00.z);
-                        Lower(low.x, vertex[k].field_0x00.x);
-                        Lower(low.y, vertex[k].field_0x00.y);
-                        Lower(low.z, vertex[k].field_0x00.z);
-                        field_0x150 = 1;
+                        Raise(high.x, vertex[k].position.x);
+                        Raise(high.y, vertex[k].position.y);
+                        Raise(high.z, vertex[k].position.z);
+                        Lower(low.x, vertex[k].position.x);
+                        Lower(low.y, vertex[k].position.y);
+                        Lower(low.z, vertex[k].position.z);
+                        boundsFound = 1;
                     }
                 }
             }
         }
     }
-    if (!field_0x150) {
+    if (!boundsFound) {
         low = Vector3(0.0f, 0.0f, 0.0f);
         high = Vector3(0.0f, 0.0f, 0.0f);
     }
@@ -441,73 +442,73 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
 {
     D3DIMSoultreeObject* source = (D3DIMSoultreeObject*)sourceNode;
     GameObject::UnknownVirtualSlot8(source->field_0x18);
-    field_0x244 = source->field_0x244;
-    field_0x240 = source->field_0x240;
-    field_0x1bc = source->field_0x1bc;
+    textureFormat = source->textureFormat;
+    textureManager = source->textureManager;
+    lightManager = source->lightManager;
     SoultreeObject::SoultreeVirtualSlot7(source);
     UnknownFunction444a40(source);
-    field_0x274 = source->field_0x274;
+    lodCount = source->lodCount;
     field_0x27c = source->field_0x27c;
-    field_0x278 = source->field_0x278;
+    lowestLod = source->lowestLod;
     field_0x288 = source->field_0x288;
     if (field_0x288) {
-        field_0x280 = (float*)DebugMalloc(field_0x274 * 4, __FILE__, 0x88e);
-        for (int i = 0; i < field_0x274; i++)
-            field_0x280[i] = source->field_0x280[i];
+        autoLodDistances = (float*)DebugMalloc(lodCount * 4, __FILE__, 0x88e);
+        for (int i = 0; i < lodCount; i++)
+            autoLodDistances[i] = source->autoLodDistances[i];
     }
-    if (source->field_0x28c) {
+    if (source->lodTable) {
         int count = UnknownFunction4fda30();
         SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x897);
         int index = 1;
         nodes[0] = this;
-        UnknownFunction4fda60(&index, nodes);
+        CollectDescendants(&index, nodes);
         SoultreeObject** sourceNodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x89d);
         index = 1;
         sourceNodes[0] = source;
-        source->UnknownFunction4fda60(&index, sourceNodes);
-        field_0x28c = (UnknownSoultreeLod*)DebugMalloc(field_0x274 * 8, __FILE__, 0x8a2);
-        for (int lod = 0; lod < field_0x274; lod++) {
-            UnknownSoultreeLod* from = &source->field_0x28c[lod];
-            UnknownSoultreeLod* to = &field_0x28c[lod];
-            to->field_0x00 = from->field_0x00;
-            to->field_0x04 = (UnknownSoultreeSurface*)DebugMalloc(from->field_0x00 * 0x38, __FILE__, 0x8aa);
-            for (int i = 0; i < to->field_0x00; i++) {
-                UnknownSoultreeSurface* s = &from->field_0x04[i];
-                UnknownSoultreeSurface* d = &to->field_0x04[i];
-                d->field_0x08 = s->field_0x08;
-                d->field_0x0c = s->field_0x0c;
-                d->field_0x20 = s->field_0x20;
-                d->field_0x24 = (int*)DebugMalloc(d->field_0x20 * 4, __FILE__, 0x8b3);
+        source->CollectDescendants(&index, sourceNodes);
+        lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x8a2);
+        for (int lod = 0; lod < lodCount; lod++) {
+            UnknownSoultreeLod* from = &source->lodTable[lod];
+            UnknownSoultreeLod* to = &lodTable[lod];
+            to->surfaceCount = from->surfaceCount;
+            to->surfaces = (UnknownSoultreeSurface*)DebugMalloc(from->surfaceCount * 0x38, __FILE__, 0x8aa);
+            for (int i = 0; i < to->surfaceCount; i++) {
+                UnknownSoultreeSurface* s = &from->surfaces[i];
+                UnknownSoultreeSurface* d = &to->surfaces[i];
+                d->vertexCount = s->vertexCount;
+                d->faceCount = s->faceCount;
+                d->materialCount = s->materialCount;
+                d->materialIndices = (int*)DebugMalloc(d->materialCount * 4, __FILE__, 0x8b3);
                 int k;
-                for (k = 0; k < d->field_0x20; k++)
-                    d->field_0x24[k] = s->field_0x24[k];
+                for (k = 0; k < d->materialCount; k++)
+                    d->materialIndices[k] = s->materialIndices[k];
                 d->field_0x2c = s->field_0x2c;
                 d->field_0x30 = s->field_0x30;
                 d->field_0x34 = s->field_0x34;
-                d->field_0x10 = (UnknownSoultreeVertex*)DebugMalloc(d->field_0x08 * 0x20, __FILE__, 0x8bd);
-                d->field_0x14 = (UnknownSoultreeVertex*)DebugMalloc(d->field_0x08 * 0x20, __FILE__, 0x8be);
-                d->field_0x18 = (Vector3*)DebugMalloc(d->field_0x08 * 0xc, __FILE__, 0x8bf);
-                d->field_0x1c = (unsigned short*)DebugMalloc(d->field_0x0c * 6, __FILE__, 0x8c0);
-                d->field_0x28 = (UnknownSoultreeUV*)DebugMalloc(d->field_0x08 * 8, __FILE__, 0x8c1);
-                memcpy(d->field_0x10, s->field_0x10, d->field_0x08 * 0x20);
-                memcpy(d->field_0x14, s->field_0x14, d->field_0x08 * 0x20);
-                memcpy(d->field_0x18, s->field_0x18, d->field_0x08 * 0xc);
-                memcpy(d->field_0x1c, s->field_0x1c, d->field_0x0c * 6);
-                memcpy(d->field_0x28, s->field_0x28, d->field_0x08 * 8);
-                d->field_0x00 = s->field_0x00;
-                d->field_0x04 = (UnknownSoultreeFaceGroup*)DebugMalloc(d->field_0x00 * 0x14, __FILE__, 0x8cb);
+                d->vertices = (UnknownSoultreeVertex*)DebugMalloc(d->vertexCount * 0x20, __FILE__, 0x8bd);
+                d->drawnVertices = (UnknownSoultreeVertex*)DebugMalloc(d->vertexCount * 0x20, __FILE__, 0x8be);
+                d->normals = (Vector3*)DebugMalloc(d->vertexCount * 0xc, __FILE__, 0x8bf);
+                d->indices = (unsigned short*)DebugMalloc(d->faceCount * 6, __FILE__, 0x8c0);
+                d->uvs = (UnknownSoultreeUV*)DebugMalloc(d->vertexCount * 8, __FILE__, 0x8c1);
+                memcpy(d->vertices, s->vertices, d->vertexCount * 0x20);
+                memcpy(d->drawnVertices, s->drawnVertices, d->vertexCount * 0x20);
+                memcpy(d->normals, s->normals, d->vertexCount * 0xc);
+                memcpy(d->indices, s->indices, d->faceCount * 6);
+                memcpy(d->uvs, s->uvs, d->vertexCount * 8);
+                d->groupCount = s->groupCount;
+                d->groups = (UnknownSoultreeFaceGroup*)DebugMalloc(d->groupCount * 0x14, __FILE__, 0x8cb);
                 int first = 0;
-                for (int j = 0; j < d->field_0x00; j++) {
-                    d->field_0x04[j].field_0x00 = 0;
-                    for (k = 0; !d->field_0x04[j].field_0x00; k++) {
-                        if (sourceNodes[k] == s->field_0x04[j].field_0x00)
-                            d->field_0x04[j].field_0x00 = nodes[k];
+                for (int j = 0; j < d->groupCount; j++) {
+                    d->groups[j].node = 0;
+                    for (k = 0; !d->groups[j].node; k++) {
+                        if (sourceNodes[k] == s->groups[j].node)
+                            d->groups[j].node = nodes[k];
                     }
-                    d->field_0x04[j].field_0x04 = s->field_0x04[j].field_0x04;
-                    d->field_0x04[j].field_0x08 = &d->field_0x10[first];
-                    d->field_0x04[j].field_0x0c = &d->field_0x14[first];
-                    d->field_0x04[j].field_0x10 = &d->field_0x18[first];
-                    first += d->field_0x04[j].field_0x04;
+                    d->groups[j].vertexCount = s->groups[j].vertexCount;
+                    d->groups[j].sourceVertices = &d->vertices[first];
+                    d->groups[j].transformedVertices = &d->drawnVertices[first];
+                    d->groups[j].normals = &d->normals[first];
+                    first += d->groups[j].vertexCount;
                 }
             }
         }
@@ -515,7 +516,7 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
         DebugFree(sourceNodes, __FILE__, 0x8e2);
         UnknownFunction444440();
     } else {
-        field_0x28c = 0;
+        lodTable = 0;
         UnknownFunction444440();
     }
 }
@@ -533,7 +534,7 @@ static inline float Magnitude(const Vector3& v)
 }
 
 // 0x00443de0
-void D3DIMSoultreeObject::UnknownFunction443de0(Vector3* center, Vector3* extents)
+void D3DIMSoultreeObject::SelectLod(Vector3* center, Vector3* extents)
 {
     Vector3 boundsCenter;
     Vector3 boundsExtents;
@@ -543,22 +544,22 @@ void D3DIMSoultreeObject::UnknownFunction443de0(Vector3* center, Vector3* extent
         extents = &boundsExtents;
     }
     float distance = Magnitude(UnknownFunction4fd660(*center) -
-                               ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->field_0x170);
+                               ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position);
     float range = distance - Magnitude(*extents);
     if (0.1f > range)
         range = 0.1f;
-    float scale = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->field_0x198 / range;
+    float scale = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->imagePlaneDistance / range;
     if (field_0x288) {
         int lod = 0;
-        for (int i = 0; i < field_0x274 - 1; i++) {
-            if (scale * field_0x280[i] * field_0x284 < 1.0f)
+        for (int i = 0; i < lodCount - 1; i++) {
+            if (scale * autoLodDistances[i] * field_0x284 < 1.0f)
                 lod = i + 1;
         }
         if (field_0x27c != lod)
             UnknownFunction444d00(lod);
     }
-    for (int i = 0; i < field_0x294; i++) {
-        SoultreeMaterial* material = field_0x290[i];
+    for (int i = 0; i < materialCount; i++) {
+        SoultreeMaterial* material = materialTable[i];
         if (material->field_0x70) {
             ManagedTexture* texture = (ManagedTexture*)material->field_0x70->texture;
             if (texture->field_0x68 & 1) {
@@ -600,20 +601,20 @@ static inline float Length(const Vector3& v)
 // +0xcc.
 void D3DIMSoultreeObject::UnknownFunction440810()
 {
-    UnknownFunction440d40(-1);
-    for (int i = 0; i < field_0x28c[field_0x27c].field_0x00; i++) {
-        UnknownSoultreeSurface* surface = &field_0x28c[field_0x27c].field_0x04[i];
+    TransformVertexGroups(-1);
+    for (int i = 0; i < lodTable[field_0x27c].surfaceCount; i++) {
+        UnknownSoultreeSurface* surface = &lodTable[field_0x27c].surfaces[i];
         float best = 0.0f;
-        for (int f = 0; f < surface->field_0x0c; f++) {
+        for (int f = 0; f < surface->faceCount; f++) {
             Vector3 zero(0.0f, 0.0f, 0.0f);
-            unsigned short* face = &surface->field_0x1c[f * 3];
-            Vector3 p0 = surface->field_0x10[face[0]].field_0x00;
-            Vector3 p1 = surface->field_0x10[face[1]].field_0x00;
-            Vector3 p2 = surface->field_0x10[face[2]].field_0x00;
+            unsigned short* face = &surface->indices[f * 3];
+            Vector3 p0 = surface->vertices[face[0]].position;
+            Vector3 p1 = surface->vertices[face[1]].position;
+            Vector3 p2 = surface->vertices[face[2]].position;
 
             Vector3 delta = zero;
-            delta.x = surface->field_0x10[face[0]].field_0x18 - surface->field_0x10[face[1]].field_0x18;
-            delta.y = surface->field_0x10[face[0]].field_0x1c - surface->field_0x10[face[1]].field_0x1c;
+            delta.x = surface->vertices[face[0]].tu - surface->vertices[face[1]].tu;
+            delta.y = surface->vertices[face[0]].tv - surface->vertices[face[1]].tv;
             Vector3 edge = p0 - p1;
             float uvLength = Length(delta);
             if (uvLength <= 0.01f)
@@ -622,8 +623,8 @@ void D3DIMSoultreeObject::UnknownFunction440810()
             if (best <= ratio)
                 best = ratio;
 
-            delta.x = surface->field_0x10[face[1]].field_0x18 - surface->field_0x10[face[2]].field_0x18;
-            delta.y = surface->field_0x10[face[1]].field_0x1c - surface->field_0x10[face[2]].field_0x1c;
+            delta.x = surface->vertices[face[1]].tu - surface->vertices[face[2]].tu;
+            delta.y = surface->vertices[face[1]].tv - surface->vertices[face[2]].tv;
             edge = p1 - p2;
             uvLength = Length(delta);
             if (uvLength <= 0.01f)
@@ -632,8 +633,8 @@ void D3DIMSoultreeObject::UnknownFunction440810()
             if (best <= ratio)
                 best = ratio;
 
-            delta.x = surface->field_0x10[face[2]].field_0x18 - surface->field_0x10[face[0]].field_0x18;
-            delta.y = surface->field_0x10[face[2]].field_0x1c - surface->field_0x10[face[0]].field_0x1c;
+            delta.x = surface->vertices[face[2]].tu - surface->vertices[face[0]].tu;
+            delta.y = surface->vertices[face[2]].tv - surface->vertices[face[0]].tv;
             edge = p2 - p0;
             uvLength = Length(delta);
             if (uvLength <= 0.01f)
@@ -642,8 +643,8 @@ void D3DIMSoultreeObject::UnknownFunction440810()
             if (best <= ratio)
                 best = ratio;
         }
-        for (int k = 0; k < surface->field_0x20; k++) {
-            SoultreeMaterial* material = field_0x290[surface->field_0x24[k]];
+        for (int k = 0; k < surface->materialCount; k++) {
+            SoultreeMaterial* material = materialTable[surface->materialIndices[k]];
             if (material->field_0x70) {
                 float scale = best / material->field_0x70->texture->field_0x18;
                 float current = *(float*)&material->field_0xcc;
@@ -654,45 +655,45 @@ void D3DIMSoultreeObject::UnknownFunction440810()
 }
 
 // 0x00442fe0
-void D3DIMSoultreeObject::UnknownFunction442fe0(UnknownSoultreeSurface* surface)
+void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
 {
     static float length = 0.5f;                    // 0x00568944
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 1);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
-    for (int i = 0; i < surface->field_0x00; i++) {
-        for (int j = 0; j < surface->field_0x04[i].field_0x04; j++) {
-            UnknownSoultreeFaceGroup* group = &surface->field_0x04[i];
+    for (int i = 0; i < surface->groupCount; i++) {
+        for (int j = 0; j < surface->groups[i].vertexCount; j++) {
+            UnknownSoultreeFaceGroup* group = &surface->groups[i];
             Vector3 from;
-            from.x = group->field_0x0c[j].field_0x00.x;
-            from.y = group->field_0x0c[j].field_0x00.y;
-            from.z = group->field_0x0c[j].field_0x00.z;
-            Vector3 to = from + length * group->field_0x10[j];
-            from = group->field_0x00->UnknownFunction4fd660(from);
-            to = surface->field_0x04[i].field_0x00->UnknownFunction4fd660(to);
+            from.x = group->transformedVertices[j].position.x;
+            from.y = group->transformedVertices[j].position.y;
+            from.z = group->transformedVertices[j].position.z;
+            Vector3 to = from + length * group->normals[j];
+            from = group->node->UnknownFunction4fd660(from);
+            to = surface->groups[i].node->UnknownFunction4fd660(to);
             UnknownSoultreeVertex line[2];
-            line[0].field_0x00 = from;
-            line[0].field_0x18 = 0;
-            line[0].field_0x1c = 0;
-            line[0].field_0x14 = 0xff;
-            line[0].field_0x10 = 0;
-            line[1].field_0x00 = to;
-            line[1].field_0x18 = 0;
-            line[1].field_0x1c = 0;
-            line[1].field_0x10 = 0;
-            line[1].field_0x14 = 0xffffff;
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(2, 0x1e2, (int)line, 2, 0);
+            line[0].position = from;
+            line[0].tu = 0;
+            line[0].tv = 0;
+            line[0].specular = 0xff;
+            line[0].diffuse = 0;
+            line[1].position = to;
+            line[1].tu = 0;
+            line[1].tv = 0;
+            line[1].diffuse = 0;
+            line[1].specular = 0xffffff;
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)line, 2, 0);
         }
     }
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
 }
 
 // 0x004431f0
-void D3DIMSoultreeObject::UnknownFunction4431f0(UnknownSoultreeSurface* surface)
+void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
 {
     static float size = 0.025f;                    // 0x00568948
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 1);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
     Vector3 offsets[6];
     UnknownSoultreeVertex cross[6];
@@ -701,10 +702,10 @@ void D3DIMSoultreeObject::UnknownFunction4431f0(UnknownSoultreeSurface* surface)
         offsets[k].x = 0.0f;
         offsets[k].y = 0.0f;
         offsets[k].z = 0.0f;
-        cross[k].field_0x18 = 0;
-        cross[k].field_0x1c = 0;
-        cross[k].field_0x14 = 0xff0000;
-        cross[k].field_0x10 = 0;
+        cross[k].tu = 0;
+        cross[k].tv = 0;
+        cross[k].specular = 0xff0000;
+        cross[k].diffuse = 0;
     }
     offsets[0].x += size;
     offsets[1].x -= size;
@@ -712,19 +713,19 @@ void D3DIMSoultreeObject::UnknownFunction4431f0(UnknownSoultreeSurface* surface)
     offsets[3].y -= size;
     offsets[4].z += size;
     offsets[5].z -= size;
-    for (int i = 0; i < surface->field_0x00; i++) {
-        for (int j = 0; j < surface->field_0x04[i].field_0x04; j++) {
+    for (int i = 0; i < surface->groupCount; i++) {
+        for (int j = 0; j < surface->groups[i].vertexCount; j++) {
             for (k = 0; k < 6; k++) {
-                UnknownSoultreeFaceGroup* group = &surface->field_0x04[i];
+                UnknownSoultreeFaceGroup* group = &surface->groups[i];
                 Vector3 point;
-                point.x = group->field_0x0c[j].field_0x00.x;
-                point.y = group->field_0x0c[j].field_0x00.y;
-                point.z = group->field_0x0c[j].field_0x00.z;
+                point.x = group->transformedVertices[j].position.x;
+                point.y = group->transformedVertices[j].position.y;
+                point.z = group->transformedVertices[j].position.z;
                 point += offsets[k];
-                point = group->field_0x00->UnknownFunction4fd660(point);
-                cross[k].field_0x00 = point;
+                point = group->node->UnknownFunction4fd660(point);
+                cross[k].position = point;
             }
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(2, 0x1e2, (int)cross, 6, 0);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)cross, 6, 0);
         }
     }
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
@@ -776,7 +777,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
         Vector3 center;
         Vector3 extents;
         UnknownFunction4fe850(&center, &extents);
-        const Matrix4& projection = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->field_0x0ec;
+        const Matrix4& projection = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->viewMatrix;
         UnknownSoultreeMatrix view;
         view._11 = world.m[0][0] * projection.m[0][0] + world.m[0][1] * projection.m[1][0] + world.m[0][2] * projection.m[2][0] + world.m[0][3] * projection.m[3][0];
         view._12 = world.m[0][0] * projection.m[0][1] + world.m[0][1] * projection.m[1][1] + world.m[0][2] * projection.m[2][1] + world.m[0][3] * projection.m[3][1];
@@ -797,7 +798,7 @@ int D3DIMSoultreeObject::UnknownVirtualSlot12()
         if (g_UnknownSoultreeClipper575a98->UnknownFunction52f570((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08, (Matrix4*)&view, &center, &extents, &field_0x298, 0,
                                                                   &field_0x260)) {
             field_0x2d4 = 1;
-            UnknownFunction443de0(&center, &extents);
+            SelectLod(&center, &extents);
         }
     }
     return GameObject::UnknownVirtualSlot12();
@@ -856,8 +857,8 @@ static inline float RemapDown(float value, float scale, float offset)
 static inline LightEmitter* FindLight(LightManager* lights)
 {
     LightEmitter* light = 0;
-    for (int i = 0; i < lights->field_0x2c; i++) {
-        if (lights->field_0x30[i]->field_0x2c == 1 || lights->field_0x30[i]->field_0x2c == 2)
+    for (int i = 0; i < lights->lightCount; i++) {
+        if (lights->field_0x30[i]->lightType == 1 || lights->field_0x30[i]->lightType == 2)
             light = lights->field_0x30[i];
     }
     return light;
@@ -866,12 +867,12 @@ static inline LightEmitter* FindLight(LightManager* lights)
 // 0x00440f30: draws the current level of detail. Per surface and material
 // the material's mapping type (+0xc8) rewrites the texture coordinates of
 // the source vertices first; afterwards they are restored from +0x28.
-void D3DIMSoultreeObject::UnknownFunction440f30()
+void D3DIMSoultreeObject::DrawCurrentLod()
 {
-    if (!field_0x28c)
+    if (!lodTable)
         return;
     if (field_0x18c)
-        UnknownFunction440d40(-1);
+        TransformVertexGroups(-1);
     Matrix4 identity;
     memset(&identity, 0, sizeof(identity));
     identity.m[0][0] = 1.0f;
@@ -883,23 +884,23 @@ void D3DIMSoultreeObject::UnknownFunction440f30()
     int savedShade;
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot9(4, &savedCull);
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot9(9, &savedShade);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(4, field_0x1b4, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, field_0x1b4, 0);
     if (field_0x1b8)
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(9, 2, 0);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 0);
     else
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(9, 1, 0);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
     int k;
-    for (int s = 0; s < field_0x28c[field_0x27c].field_0x00; s++) {
-        UnknownSoultreeSurface* surface = &field_0x28c[field_0x27c].field_0x04[s];
-        int count = surface->field_0x08;
+    for (int s = 0; s < lodTable[field_0x27c].surfaceCount; s++) {
+        UnknownSoultreeSurface* surface = &lodTable[field_0x27c].surfaces[s];
+        int count = surface->vertexCount;
         int modified = 0;
         int restore = 0;
-        for (int m = 0; m < surface->field_0x20; m++) {
-            SoultreeMaterial* material = field_0x290[surface->field_0x24[m]];
+        for (int m = 0; m < surface->materialCount; m++) {
+            SoultreeMaterial* material = materialTable[surface->materialIndices[m]];
             if (field_0x1a4)
                 ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
-            material->UnknownFunction4ff180();
-            switch (material->field_0xc8) {
+            material->ApplyRenderStates();
+            switch (material->mappingType) {
             case 0:
                 modified = 1;
                 break;
@@ -907,46 +908,46 @@ void D3DIMSoultreeObject::UnknownFunction440f30()
                 modified = 1;
                 restore = 1;
                 for (int v = 0; v < count; v++) {
-                    if (surface->field_0x14[v].field_0x00.x > 0.0f) {
-                        surface->field_0x10[v].field_0x1c = Remap(surface->field_0x14[v].field_0x00.y, -1.0f, 3.0f);
-                        surface->field_0x10[v].field_0x18 = RemapDown(surface->field_0x14[v].field_0x00.z, 1.0f, -2.4f);
+                    if (surface->drawnVertices[v].position.x > 0.0f) {
+                        surface->vertices[v].tv = Remap(surface->drawnVertices[v].position.y, -1.0f, 3.0f);
+                        surface->vertices[v].tu = RemapDown(surface->drawnVertices[v].position.z, 1.0f, -2.4f);
                     } else {
-                        surface->field_0x10[v].field_0x1c = Remap(surface->field_0x14[v].field_0x00.y, -1.0f, 3.0f);
-                        surface->field_0x10[v].field_0x18 = RemapDown(surface->field_0x14[v].field_0x00.z, -1.0f, 1.4f);
+                        surface->vertices[v].tv = Remap(surface->drawnVertices[v].position.y, -1.0f, 3.0f);
+                        surface->vertices[v].tu = RemapDown(surface->drawnVertices[v].position.z, -1.0f, 1.4f);
                     }
                 }
                 break;
             }
             case 1: {
-                field_0x2c8 += field_0x2b8 * material->field_0xc4;
-                while (field_0x2c8 > 1.0f)
-                    field_0x2c8 -= 1.0f;
+                textureScroll += lastFrameTime * material->textureSpeed;
+                while (textureScroll > 1.0f)
+                    textureScroll -= 1.0f;
                 for (int v = 0; v < count; v++)
-                    surface->field_0x10[v].field_0x1c = surface->field_0x10[v].field_0x1c + field_0x2c8;
+                    surface->vertices[v].tv = surface->vertices[v].tv + textureScroll;
                 modified = 1;
                 restore = 1;
                 break;
             }
             case 3: {
-                LightManager* lights = field_0x1bc;
+                LightManager* lights = lightManager;
                 if (!lights)
                     break;
                 LightEmitter* light = FindLight(lights);
                 if (!light)
                     break;
-                Vector3 lightPosition = light->field_0x64;
-                for (int j = 0; j < surface->field_0x00; j++) {
-                    UnknownSoultreeFaceGroup* group = &surface->field_0x04[j];
-                    int vertices = group->field_0x04;
+                Vector3 lightPosition = light->lightPosition;
+                for (int j = 0; j < surface->groupCount; j++) {
+                    UnknownSoultreeFaceGroup* group = &surface->groups[j];
+                    int vertices = group->vertexCount;
                     Vector3 position;
-                    ((UnknownSoultreeNodeView*)group->field_0x00)->UnknownFunction4fc9a0(0, &position);
+                    ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fc9a0(0, &position);
                     Vector3 direction = NormalizedByCall(position - lightPosition);
-                    direction = ((UnknownSoultreeNodeView*)group->field_0x00)->UnknownFunction4fd710(&direction);
+                    direction = ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fd710(&direction);
                     for (int v = 0; v < vertices; v++) {
-                        group->field_0x08[v].field_0x18 =
-                            1.0f - (direction.y * group->field_0x10[v].y + direction.x * group->field_0x10[v].x +
-                                    direction.z * group->field_0x10[v].z + 1.0f) * 0.5f;
-                        group->field_0x08[v].field_0x1c = 0;
+                        group->sourceVertices[v].tu =
+                            1.0f - (direction.y * group->normals[v].y + direction.x * group->normals[v].x +
+                                    direction.z * group->normals[v].z + 1.0f) * 0.5f;
+                        group->sourceVertices[v].tv = 0;
                     }
                 }
                 modified = 1;
@@ -954,19 +955,19 @@ void D3DIMSoultreeObject::UnknownFunction440f30()
                 break;
             }
             case 4: {
-                Vector3 eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->field_0x170;
-                for (int j = 0; j < surface->field_0x00; j++) {
-                    UnknownSoultreeFaceGroup* group = &surface->field_0x04[j];
-                    int vertices = group->field_0x04;
+                Vector3 eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position;
+                for (int j = 0; j < surface->groupCount; j++) {
+                    UnknownSoultreeFaceGroup* group = &surface->groups[j];
+                    int vertices = group->vertexCount;
                     Vector3 position;
-                    ((UnknownSoultreeNodeView*)group->field_0x00)->UnknownFunction4fc9a0(0, &position);
+                    ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fc9a0(0, &position);
                     Vector3 direction = NormalizedByCall(position - eye);
-                    direction = ((UnknownSoultreeNodeView*)group->field_0x00)->UnknownFunction4fd710(&direction);
+                    direction = ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fd710(&direction);
                     for (int v = 0; v < vertices; v++) {
-                        group->field_0x08[v].field_0x18 =
-                            1.0f - (direction.y * group->field_0x10[v].y + direction.x * group->field_0x10[v].x +
-                                    direction.z * group->field_0x10[v].z + 1.0f) * 0.5f;
-                        group->field_0x08[v].field_0x1c = 0;
+                        group->sourceVertices[v].tu =
+                            1.0f - (direction.y * group->normals[v].y + direction.x * group->normals[v].x +
+                                    direction.z * group->normals[v].z + 1.0f) * 0.5f;
+                        group->sourceVertices[v].tv = 0;
                     }
                 }
                 modified = 1;
@@ -978,75 +979,75 @@ void D3DIMSoultreeObject::UnknownFunction440f30()
                 static int updateEye = 1;                  // 0x00568930
                 static int drawReflections = 1;            // 0x00568934
                 if (drawReflections)
-                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
+                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
                 UnknownSoultreeVertex line[2];
-                line[0].field_0x10 = 0xffff0000;
-                line[1].field_0x10 = 0xffffffff;
+                line[0].diffuse = 0xffff0000;
+                line[1].diffuse = 0xffffffff;
                 if (updateEye)
-                    (Vector3&)eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->field_0x170;
-                for (int j = 0; j < surface->field_0x00; j++) {
-                    UnknownSoultreeFaceGroup* group = &surface->field_0x04[j];
-                    Vector3 localEye = ((UnknownSoultreeNodeView*)group->field_0x00)->UnknownFunction4fd7f0(&eye);
+                    (Vector3&)eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position;
+                for (int j = 0; j < surface->groupCount; j++) {
+                    UnknownSoultreeFaceGroup* group = &surface->groups[j];
+                    Vector3 localEye = ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fd7f0(&eye);
                     if (!count)
                         continue;
-                    for (int v = 0; v < group->field_0x04; v++) {
+                    for (int v = 0; v < group->vertexCount; v++) {
                         Vector3 direction;
-                        direction.x = group->field_0x0c[v].field_0x00.x - localEye.x;
-                        direction.y = group->field_0x0c[v].field_0x00.y - localEye.y;
-                        direction.z = group->field_0x0c[v].field_0x00.z - localEye.z;
+                        direction.x = group->transformedVertices[v].position.x - localEye.x;
+                        direction.y = group->transformedVertices[v].position.y - localEye.y;
+                        direction.z = group->transformedVertices[v].position.z - localEye.z;
                         direction = Normalized(direction);
                         Vector3 reflected;
-                        UnknownFunction4a10e0(&direction, &group->field_0x10[v], &reflected);
+                        UnknownFunction4a10e0(&direction, &group->normals[v], &reflected);
                         if (drawReflections) {
-                            Vector3 world = ((UnknownSoultreeNodeView*)group->field_0x00)->UnknownFunction4fd5c0(&reflected);
-                            line[0].field_0x00.x = group->field_0x08[v].field_0x00.x;
-                            line[0].field_0x00.y = group->field_0x08[v].field_0x00.y;
-                            line[0].field_0x00.z = group->field_0x08[v].field_0x00.z;
-                            line[1].field_0x00.x = world.x + group->field_0x08[v].field_0x00.x;
-                            line[1].field_0x00.y = world.y + group->field_0x08[v].field_0x00.y;
-                            line[1].field_0x00.z = world.z + group->field_0x08[v].field_0x00.z;
-                            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(2, 0x1e2, (int)line, 2, 0);
+                            Vector3 world = ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fd5c0(&reflected);
+                            line[0].position.x = group->sourceVertices[v].position.x;
+                            line[0].position.y = group->sourceVertices[v].position.y;
+                            line[0].position.z = group->sourceVertices[v].position.z;
+                            line[1].position.x = world.x + group->sourceVertices[v].position.x;
+                            line[1].position.y = world.y + group->sourceVertices[v].position.y;
+                            line[1].position.z = world.z + group->sourceVertices[v].position.z;
+                            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)line, 2, 0);
                         }
-                        group->field_0x08[v].field_0x1c = ((float)asin(reflected.y) + 1.5707964f) * -0.31830987f;
-                        group->field_0x08[v].field_0x1c = -((reflected.y + 1.0f) * 0.5f);
-                        group->field_0x08[v].field_0x1c = 0.25f;
+                        group->sourceVertices[v].tv = ((float)asin(reflected.y) + 1.5707964f) * -0.31830987f;
+                        group->sourceVertices[v].tv = -((reflected.y + 1.0f) * 0.5f);
+                        group->sourceVertices[v].tv = 0.25f;
                         reflected.y = 0.0f;
                         reflected = Normalized(reflected);
-                        group->field_0x08[v].field_0x18 =
+                        group->sourceVertices[v].tu =
                             ((float)atan(reflected.x / reflected.z) + 1.5707964f) * 0.31830987f;
                     }
                 }
                 restore = 1;
                 if (drawReflections)
-                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 4);
+                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
                 break;
             }
             case 2: {
-                Vector3 position = *(Vector3*)&field_0x0f8.m[3][0];
-                field_0x2c8 += Length(field_0x2bc - position) * 0.0075f;
+                Vector3 position = *(Vector3*)&worldMatrix.m[3][0];
+                textureScroll += Length(field_0x2bc - position) * 0.0075f;
                 field_0x2bc = position;
-                if (field_0x2c8 > 100.0f)
-                    field_0x2c8 -= 100.0f;
-                float scroll = field_0x2c8;
-                Vector3 eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->field_0x170;
-                for (int j = 0; j < surface->field_0x00; j++) {
-                    UnknownSoultreeFaceGroup* group = &surface->field_0x04[j];
-                    count = group->field_0x04;
+                if (textureScroll > 100.0f)
+                    textureScroll -= 100.0f;
+                float scroll = textureScroll;
+                Vector3 eye = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position;
+                for (int j = 0; j < surface->groupCount; j++) {
+                    UnknownSoultreeFaceGroup* group = &surface->groups[j];
+                    count = group->vertexCount;
                     if (!count)
                         continue;
-                    group->field_0x00->UnknownFunction4fb4f0();
-                    Matrix4* world = &group->field_0x00->field_0x0f8;
+                    group->node->UpdateWorldMatrix();
+                    Matrix4* world = &group->node->worldMatrix;
                     for (int v = 0; v < count; v++) {
-                        Vector3 direction = Normalized(group->field_0x08[v].field_0x00 - eye);
-                        Vector3 normal = group->field_0x10[v];
+                        Vector3 direction = Normalized(group->sourceVertices[v].position - eye);
+                        Vector3 normal = group->normals[v];
                         Vector3 n(normal.x * world->m[0][0] + normal.y * world->m[1][0] + normal.z * world->m[2][0],
                                   normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],
                                   normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);
                         Vector3 twice = n + n;
                         float d = direction.x * n.x + direction.y * n.y + direction.z * n.z;
                         Vector3 reflected = twice * d - direction;
-                        group->field_0x08[v].field_0x18 = reflected.x * 0.5f + 0.5f;
-                        group->field_0x08[v].field_0x1c = reflected.y * 0.5f + 0.5f - scroll;
+                        group->sourceVertices[v].tu = reflected.x * 0.5f + 0.5f;
+                        group->sourceVertices[v].tv = reflected.y * 0.5f + 0.5f - scroll;
                     }
                 }
                 restore = 1;
@@ -1066,47 +1067,47 @@ void D3DIMSoultreeObject::UnknownFunction440f30()
                 }
                 UnknownSoultreeVertex ring[32];
                 for (i = 0; i < 32; i++) {
-                    ring[i].field_0x10 = 0xff00ff00;
-                    ring[i].field_0x14 = 0xff000000;
-                    ring[i].field_0x18 = 0;
-                    ring[i].field_0x1c = 0;
+                    ring[i].diffuse = 0xff00ff00;
+                    ring[i].specular = 0xff000000;
+                    ring[i].tu = 0;
+                    ring[i].tv = 0;
                 }
                 for (i = 0; i < 16; i++) {
-                    ring[i * 2].field_0x00 = circle[i];
-                    ring[i * 2 + 1].field_0x00 = circle[i + 1];
+                    ring[i * 2].position = circle[i];
+                    ring[i * 2 + 1].position = circle[i + 1];
                 }
                 static UnknownSoultreeStaticVector viewDirection;  // 0x0057ef38 (guard bit 2)
                 static UnknownSoultreeStaticVector viewPosition;   // 0x0057eee8 (guard bit 4)
                 static int updateView = 1;                         // 0x00568938
                 static int drawSphere = 1;                         // 0x0056893c
                 if (drawSphere) {
-                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
-                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(2, 0x1e2, (int)ring, 32, 0);
+                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+                    ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)ring, 32, 0);
                 }
                 if (updateView) {
-                    (Vector3&)viewDirection = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->field_0x17c;
-                    (Vector3&)viewPosition = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->field_0x170;
+                    (Vector3&)viewDirection = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->viewDirection;
+                    (Vector3&)viewPosition = ((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position;
                 }
                 UnknownSoultreeVertex lines[4];
                 for (i = 0; i < 4; i++) {
-                    lines[i].field_0x10 = 0xffff0000;
-                    lines[i].field_0x14 = 0xff000000;
-                    lines[i].field_0x18 = 0;
-                    lines[i].field_0x1c = 0;
+                    lines[i].diffuse = 0xffff0000;
+                    lines[i].specular = 0xff000000;
+                    lines[i].tu = 0;
+                    lines[i].tv = 0;
                 }
-                for (int j = 0; j < surface->field_0x00; j++) {
-                    UnknownSoultreeFaceGroup* group = &surface->field_0x04[k];
-                    count = group->field_0x04;
+                for (int j = 0; j < surface->groupCount; j++) {
+                    UnknownSoultreeFaceGroup* group = &surface->groups[k];
+                    count = group->vertexCount;
                     if (!count)
                         continue;
-                    group->field_0x00->UnknownFunction4fb4f0();
-                    Matrix4* world = &group->field_0x00->field_0x0f8;
+                    group->node->UpdateWorldMatrix();
+                    Matrix4* world = &group->node->worldMatrix;
                     for (int v = 0; v < count; v++) {
-                        Vector3 position = group->field_0x08[v].field_0x00;
+                        Vector3 position = group->sourceVertices[v].position;
                         Vector3 segment[2];
                         segment[0] = position;
                         Vector3 direction = Normalized(position - viewPosition);
-                        Vector3 normal = group->field_0x10[v];
+                        Vector3 normal = group->normals[v];
                         Vector3 n(normal.x * world->m[0][0] + normal.z * world->m[2][0] + normal.y * world->m[1][0],
                                   normal.x * world->m[0][1] + normal.y * world->m[1][1] + normal.z * world->m[2][1],
                                   normal.x * world->m[0][2] + normal.y * world->m[1][2] + normal.z * world->m[2][2]);
@@ -1136,25 +1137,25 @@ void D3DIMSoultreeObject::UnknownFunction440f30()
                         }
                         float fresnel = 1.0f - (float)fabs(facing);
                         segment[1] = hit;
-                        group->field_0x08[v].field_0x1c = hit.y * 0.01f;
-                        if (group->field_0x08[v].field_0x1c > 1.0f)
-                            group->field_0x08[v].field_0x1c = 1.0f;
-                        group->field_0x08[v].field_0x1c = 1.0f - group->field_0x08[v].field_0x1c;
+                        group->sourceVertices[v].tv = hit.y * 0.01f;
+                        if (group->sourceVertices[v].tv > 1.0f)
+                            group->sourceVertices[v].tv = 1.0f;
+                        group->sourceVertices[v].tv = 1.0f - group->sourceVertices[v].tv;
                         Vector3 around = hit - center;
                         around.y = 0.0f;
                         around = Normalized(around);
                         float angle = (float)acos(around.z);
                         if (around.x < 0.0f)
                             angle = -angle;
-                        group->field_0x08[v].field_0x18 = angle * 0.15915494f;
-                        group->field_0x08[v].field_0x10 = ((long)(fresnel * 255.0f) << 24) | 0xffffff;
+                        group->sourceVertices[v].tu = angle * 0.15915494f;
+                        group->sourceVertices[v].diffuse = ((long)(fresnel * 255.0f) << 24) | 0xffffff;
                         for (i = 0; i < 2; i++) {
-                            lines[i * 2].field_0x00 = segment[i];
-                            lines[i * 2 + 1].field_0x00 = segment[i + 1];
+                            lines[i * 2].position = segment[i];
+                            lines[i * 2 + 1].position = segment[i + 1];
                         }
                         if (drawSphere) {
-                            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
-                            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(2, 0x1e2, (int)lines, 2, 0);
+                            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+                            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)lines, 2, 0);
                         }
                     }
                 }
@@ -1162,29 +1163,29 @@ void D3DIMSoultreeObject::UnknownFunction440f30()
                 break;
             }
             case 6: {
-                LightManager* lights = field_0x1bc;
+                LightManager* lights = lightManager;
                 if (!lights)
                     break;
                 LightEmitter* light = FindLight(lights);
                 if (!light)
                     break;
                 static float exponent = 20.0f;             // 0x00568940
-                for (int j = 0; j < surface->field_0x00; j++) {
-                    UnknownSoultreeFaceGroup* group = &surface->field_0x04[j];
-                    Vector3 lightPosition = ((UnknownSoultreeNodeView*)group->field_0x00)->UnknownFunction4fd710(&light->field_0x64);
-                    Vector3 eye = ((UnknownSoultreeNodeView*)group->field_0x00)->UnknownFunction4fd710(
-                        &((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->field_0x170);
-                    for (int v = 0; v < group->field_0x04; v++) {
-                        Vector3 position = group->field_0x08[v].field_0x00;
+                for (int j = 0; j < surface->groupCount; j++) {
+                    UnknownSoultreeFaceGroup* group = &surface->groups[j];
+                    Vector3 lightPosition = ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fd710(&light->lightPosition);
+                    Vector3 eye = ((UnknownSoultreeNodeView*)group->node)->UnknownFunction4fd710(
+                        &((UnknownSoultreeCameraView*)((RenderTarget*)field_0x18)->field_0x08)->position);
+                    for (int v = 0; v < group->vertexCount; v++) {
+                        Vector3 position = group->sourceVertices[v].position;
                         Vector3 toLight = Normalized(position - lightPosition);
                         Vector3 toEye = Normalized(eye - position);
-                        Vector3& normal = group->field_0x10[v];
+                        Vector3& normal = group->normals[v];
                         float d = (toLight.x * normal.x + toLight.y * normal.y + toLight.z * normal.z) * 2.0f;
                         Vector3 reflected = toLight - normal * d;
                         float specular = toEye.x * reflected.x + toEye.y * reflected.y + toEye.z * reflected.z;
                         if (specular < 0.0f)
                             specular = 0.0f;
-                        group->field_0x08[v].field_0x10 = ((long)(pow(specular, exponent) * 255.0) << 24) | 0xffffff;
+                        group->sourceVertices[v].diffuse = ((long)(pow(specular, exponent) * 255.0) << 24) | 0xffffff;
                     }
                 }
                 modified = 1;
@@ -1193,42 +1194,42 @@ void D3DIMSoultreeObject::UnknownFunction440f30()
             }
             }
             UnknownSoultreeSurface* drawn;
-            if (field_0x264 > 0) {
-                for (int i = 0; i < field_0x264; i++)
-                    ((D3DIMSoultreeModifier*)field_0x268[i])->UnknownVirtualSlot27(
+            if (modifierCount > 0) {
+                for (int i = 0; i < modifierCount; i++)
+                    ((D3DIMSoultreeModifier*)modifierList[i])->UnknownVirtualSlot27(
                         this, (UnknownSoultreeMesh*)surface, (UnknownSoultreeMesh**)&drawn);
             } else {
                 drawn = surface;
             }
-            if (drawn->field_0x08) {
+            if (drawn->vertexCount) {
                 if (material->field_0x70) {
                     ManagedTexture* texture = (ManagedTexture*)material->field_0x70->texture;
                     if (texture->field_0x68 & 1)
                         texture->UnknownFunction510910(&drawn->field_0x2c, (float*)&drawn->field_0x30,
-                                                       (float*)&drawn->field_0x34, &drawn->field_0x10->field_0x18,
-                                                       &drawn->field_0x10->field_0x1c, drawn->field_0x08, 0x20);
+                                                       (float*)&drawn->field_0x34, &drawn->vertices->tu,
+                                                       &drawn->vertices->tv, drawn->vertexCount, 0x20);
                 }
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(4, 0x1e2, (int)drawn->field_0x10, drawn->field_0x08,
-                                                                  (int)drawn->field_0x1c, drawn->field_0x0c * 3, 0);
+                ((RenderTarget*)field_0x18)->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)drawn->vertices, drawn->vertexCount,
+                                                                  (int)drawn->indices, drawn->faceCount * 3, 0);
                 if (field_0x1b0)
-                    UnknownFunction442f70(drawn);
+                    DrawWireframe(drawn);
                 if (field_0x1a8)
-                    UnknownFunction442fe0(drawn);
+                    DrawNormals(drawn);
                 if (field_0x1ac)
-                    UnknownFunction4431f0(drawn);
+                    DrawVertexCrosses(drawn);
             }
             if (modified && restore) {
                 for (k = 0; k < count; k++) {
-                    surface->field_0x10[k].field_0x18 = surface->field_0x28[k].field_0x00;
-                    surface->field_0x10[k].field_0x1c = surface->field_0x28[k].field_0x04;
+                    surface->vertices[k].tu = surface->uvs[k].u;
+                    surface->vertices[k].tv = surface->uvs[k].v;
                 }
                 surface->field_0x2c = 1.0f;
                 surface->field_0x30 = 0;
                 surface->field_0x34 = 0;
             }
-            material->UnknownFunction4ff410();
+            material->RestoreRenderStates();
         }
     }
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(4, savedCull, 0);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(9, savedShade, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, savedCull, 0);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, savedShade, 0);
 }

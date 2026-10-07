@@ -8,7 +8,7 @@
 //   rectangle's address into edi before reading it, VC6 here reads the
 //   rectangle through `this`. A local pointer, an inline accessor, an inline
 //   inset helper and an aggregate initializer compile the same.
-// SPBikeRiderDlg::UnknownFunction44f750 (0x0044f750, 509 bytes): the same
+// SPBikeRiderDlg::FillBikeRiderLists (0x0044f750, 509 bytes): the same
 //   flow and calls as MPBikeRiderDlg 0x004f8220 (also a near miss); retail
 //   swaps the registers holding KrustyUI and the bike entry.
 // UnknownFunction452930 (0x00452930, 1875 bytes): the same cases, calls and
@@ -55,59 +55,59 @@ static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* g
 // 0x0044fa00
 int SPBikeRiderDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (event->kind == 1 && event->control == 0) {
-        CameraRect* preview = &field_0x7f8c;
+        CameraRect* preview = &previewArea;
         RECT area;
         area.left = preview->left + 50;
         area.top = preview->top + 30;
         area.right = preview->right - 50;
         area.bottom = preview->bottom - 30;
-        if (PtInRect(&area, field_0x34->field_0x2c->field_0xa4)) {
-            field_0x7f78 = 1;
-            field_0x7f7c = 1;
-            static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkAutoRotate", 2))->UnknownFunction478cf0(0);
+        if (PtInRect(&area, guiUser->pointerDevice->pointerPosition)) {
+            previewDragged = 1;
+            previewDragging = 1;
+            static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
         }
     }
     return UIDialog::UnknownVirtualSlot23(event, entry);
 }
 
 // 0x0044f750
-void SPBikeRiderDlg::UnknownFunction44f750() {
+void SPBikeRiderDlg::FillBikeRiderLists() {
     int bike = 0;
     int rider = 0;
     char text[0x80];
     SPBikeRiderDlg* self = this;
-    UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
-    list->UnknownFunction4775f0();
+    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+    list->RemoveAllRows();
     for (int i = 0; i < g_UnknownGlobal56e26c->ui->field_0x54; i++) {
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i];
         if (!entry->field_0x88) {
-            int kind = ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->field_0x00].field_0xc4;
+            int kind = ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->model].modelKind;
             if (kind != 2 && kind != 3 && (kind != 10 || !(g_UnknownGlobal56e26c->mode.field_0x1970 & 1)))
                 continue;
         }
-        sprintf(text, "%s %s", ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->field_0x00].field_0x00,
-                entry->field_0x04);
+        sprintf(text, "%s %s", ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->model].displayName,
+                entry->displayName);
         list->UnknownFunction476d80(text, i, 0);
         if (g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4 == i)
             bike = i;
     }
     if (bike)
-        list->UnknownFunction476b30(bike);
+        list->SelectRowByData(bike);
     else
-        list->UnknownFunction476a60(0);
+        list->SelectRow(0);
     list->UnknownFunction477900(1);
-    list = static_cast<UIDropDownList*>(self->UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
-    list->UnknownFunction4775f0();
+    list = static_cast<UIDropDownList*>(self->FindControl("DDLRiders", 6))->listPart;
+    list->RemoveAllRows();
     for (int j = 0; j < g_UnknownGlobal56e26c->ui->field_0x5c; j++) {
         UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[j];
-        if (model->field_0xc4 == 2 || model->field_0xc4 == 3 || model->field_0xc0) {
-            list->UnknownFunction476d80(model->field_0x00, j, 0);
-            if (!strcmp(((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[j].field_0x40,
+        if (model->modelKind == 2 || model->modelKind == 3 || model->field_0xc0) {
+            list->UnknownFunction476d80(model->displayName, j, 0);
+            if (!strcmp(((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[j].modelName,
                         g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80))
                 rider = j;
         }
     }
-    list->UnknownFunction476b30(rider);
+    list->SelectRowByData(rider);
 }
 
 // 0x00452930
@@ -117,88 +117,88 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
     char text[128];
     switch (menu) {
     case 0xc9:
-        event->field_0x0c->UnknownFunction46ecc0(1);
+        event->dialog->UpdateBoundValues(1);
         *UnknownGameSettingsOf(g_UnknownGlobal56e26c) = g_UnknownGlobal688898;
-        g_UnknownGlobal56e26c->ui->field_0x2c->field_0x0ec = UnknownGameSettingsOf(g_UnknownGlobal56e26c)->field_0x1c;
+        g_UnknownGlobal56e26c->ui->field_0x2c->field_0x0ec = UnknownGameSettingsOf(g_UnknownGlobal56e26c)->uiAnimations;
         g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x66);
-        event->field_0x0c->UnknownFunction46ff30(0);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0);
+        event->handled = 1;
         break;
     case 0xca:
-        event->field_0x0c->UnknownFunction46ecc0(1);
+        event->dialog->UpdateBoundValues(1);
         *UnknownSoundSettingsOf(g_UnknownGlobal56e26c) = g_UnknownGlobal688798;
         g_UnknownGlobal56e26c->UnknownFunction521a30();
         g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x66);
-        event->field_0x0c->UnknownFunction46ff30(0);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0);
+        event->handled = 1;
         break;
     case 0xcb: {
-        event->field_0x0c->UnknownFunction46ecc0(1);
-        UIListBox* modes = static_cast<UIDropDownList*>(event->field_0x0c->UnknownFunction46ebf0("ModeDDL", 0))->field_0x1fc;
-        g_UnknownGlobal6887d8.field_0x00 = modes->UnknownFunction4768d0(-1);
+        event->dialog->UpdateBoundValues(1);
+        UIListBox* modes = static_cast<UIDropDownList*>(event->dialog->FindControl("ModeDDL", 0))->listPart;
+        g_UnknownGlobal6887d8.resolutionRow = modes->GetRowData(-1);
         *UnknownGraphicsSettingsOf(g_UnknownGlobal56e26c) = g_UnknownGlobal6887d8;
         g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x66);
-        event->field_0x0c->UnknownFunction46ff30(0);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0);
+        event->handled = 1;
         break;
     }
     case 0xcd:
         if (strcmp(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "")) {
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0xd0);
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
+            event->dialog->EndDialog(0);
+            event->handled = 1;
         }
         break;
     case 0xd0:
         g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x68);
-        event->field_0x0c->UnknownFunction46ff30(0);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0);
+        event->handled = 1;
         break;
     case 0xd8: {
         UnknownComPortAddress serial;
-        serial.field_0x00 = 0;
-        serial.field_0x04 = 0;
-        serial.field_0x08 = 0;
-        serial.field_0x0c = 0;
-        serial.field_0x10 = 0;
-        UnknownFunction4ae410(&g_UnknownGlobal6886b8, &serial);
-        if (!g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abf10(DPSPGUID_SERIAL, "", "", &serial, &address,
+        serial.port = 0;
+        serial.baudRate = 0;
+        serial.stopBits = 0;
+        serial.parity = 0;
+        serial.flowControl = 0;
+        UnknownFunction4ae410(&g_SerialSettings, &serial);
+        if (!g_UnknownGlobal56e26c->field_0x08->CreateAddress(DPSPGUID_SERIAL, "", "", &serial, &address,
                                                                      &size)) {
-            event->field_0x0c->UnknownFunction46ff30(0xd);
-            event->field_0x20 = 1;
+            event->dialog->EndDialog(0xd);
+            event->handled = 1;
             break;
         }
-        if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abdf0(address, size, 8)) {
+        if (g_UnknownGlobal56e26c->field_0x08->InitializeConnection(address, size, 8)) {
             DebugFree(address, __FILE__, 3843);
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x85c);
             return;
         }
-        event->field_0x0c->UnknownFunction46ff30(0xd);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0xd);
+        event->handled = 1;
         DebugFree(address, __FILE__, 3850);
         break;
     }
     case 0xd9:
         address = 0;
-        static_cast<UIEditBox*>(event->field_0x0c->UnknownFunction46ebf0("EditBox", 0))->UnknownFunction473ef0(text, 128);
+        static_cast<UIEditBox*>(event->dialog->FindControl("EditBox", 0))->GetEditText(text, 128);
         if (!strcmp(text, "")) {
-            event->field_0x0c->UnknownFunction46ff30(0xe);
-            event->field_0x20 = 1;
+            event->dialog->EndDialog(0xe);
+            event->handled = 1;
             break;
         }
-        if (!g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abf10(DPSPGUID_TCPIP, text, "", 0, &address, &size)) {
-            event->field_0x0c->UnknownFunction46ff30(0xd);
-            event->field_0x20 = 1;
+        if (!g_UnknownGlobal56e26c->field_0x08->CreateAddress(DPSPGUID_TCPIP, text, "", 0, &address, &size)) {
+            event->dialog->EndDialog(0xd);
+            event->handled = 1;
             break;
         }
-        if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abdf0(address, size, 4)) {
-            event->field_0x0c->UnknownFunction46ff30(0xf);
-            event->field_0x20 = 1;
+        if (g_UnknownGlobal56e26c->field_0x08->InitializeConnection(address, size, 4)) {
+            event->dialog->EndDialog(0xf);
+            event->handled = 1;
             DebugFree(address, __FILE__, 3874);
             break;
         }
-        event->field_0x0c->UnknownFunction46ff30(0xd);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0xd);
+        event->handled = 1;
         DebugFree(address, __FILE__, 3879);
         break;
     case 0x104:
@@ -207,8 +207,8 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
         case 0:
         case 2:
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
+            event->dialog->EndDialog(0);
+            event->handled = 1;
             break;
         case 3:
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0xcd);
@@ -216,8 +216,8 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
         }
         break;
     case 0x12c:
-        static_cast<UIEditBox*>(event->field_0x0c->UnknownFunction46ebf0("EditBox", 0))
-            ->UnknownFunction473ef0(g_UnknownGlobal56e26c->mode.field_0x10, 128);
+        static_cast<UIEditBox*>(event->dialog->FindControl("EditBox", 0))
+            ->GetEditText(g_UnknownGlobal56e26c->mode.field_0x10, 128);
         if (!strcmp(g_UnknownGlobal56e26c->mode.field_0x10, "")) {
             char computer[16];
             size = sizeof(computer);
@@ -228,28 +228,28 @@ void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
                 COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x10, text, 128);
             }
         }
-        event->field_0x0c->UnknownFunction46ff30(0x14);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0x14);
+        event->handled = 1;
         break;
     case 0x12f:
-        event->field_0x0c->UnknownFunction46ff30(0x32);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0x32);
+        event->handled = 1;
         break;
     case 0x191:
         g_UnknownGlobal56e26c->UnknownFunction521860(0, 0x191, 1);
         break;
     case 0x1f9:
-        event->field_0x0c->UnknownFunction46ff30(0);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0);
+        event->handled = 1;
         break;
     case 0x1fa:
-        event->field_0x0c->UnknownFunction46ff30(0);
-        event->field_0x20 = 1;
+        event->dialog->EndDialog(0);
+        event->handled = 1;
         break;
     case 0xbb9:
     case 0xbba:
     case 0xbbb:
-        UnknownFunction451b80(event);
+        CreateProfile(event);
         break;
     }
 }
@@ -261,22 +261,22 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     int count;
     void* address;
     unsigned long size;
-    switch (event->field_0x08) {
-    case 5:
-        field_0x7f60 = UnknownFunction46ebf0("MenuSingleAnimation", 5);
-        field_0x7f64 = UnknownFunction46ebf0("MenuMultiAnimation", 5);
-        field_0x7f68 = UnknownFunction46ebf0("MenuUserAnimation", 5);
-        field_0x7f60->UnknownFunction470660(0, 0);
-        field_0x7f64->UnknownFunction470660(0, 0);
-        field_0x7f68->UnknownFunction470660(0, 0);
+    switch (event->kind) {
+    case kDialogInit:
+        menuSingleAnimation = FindControl("MenuSingleAnimation", 5);
+        menuMultiAnimation = FindControl("MenuMultiAnimation", 5);
+        menuUserAnimation = FindControl("MenuUserAnimation", 5);
+        menuSingleAnimation->Show(0, 0);
+        menuMultiAnimation->Show(0, 0);
+        menuUserAnimation->Show(0, 0);
         field_0x7f6c = 0;
         field_0x7f70 = 0;
         field_0x7f74 = 0;
         field_0x7f7c = 0.0f;
         g_UnknownGlobal56e26c->ui->field_0x4b0 = 0;
         g_UnknownGlobal56e26c->mode.field_0x10ec = 0;
-        UnknownFunction44c7a0();
-        UnknownFunction44c8c0();
+        FillProfileList();
+        ShowCurrentProfile();
         if (g_UnknownGlobal56e26c->profileDirectory->count >= 1 && g_UnknownGlobal56e26c->ui->field_0x48c) {
             if (event->field_0x18 == 0x63) {
                 PlayerRemovedDlg* dialog = new(__FILE__, 168) PlayerRemovedDlg;
@@ -289,272 +289,272 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             delete g_UnknownGlobal56e26c->field_0x3444;
             g_UnknownGlobal56e26c->field_0x3444 = 0;
         }
-        UnknownFunction46ebf0("MenuReplay", 0)->UnknownVirtualSlot49(0);
-        UnknownFunction46ebf0("MenuHighScore", 0)->UnknownVirtualSlot49(0);
-        UnknownFunction46ebf0("MenuCredits", 0)->UnknownVirtualSlot49(0);
-        UnknownFunction46ebf0("ButProCircuit", 0)->UnknownVirtualSlot49(0);
-        field_0x7f58 = 0;
+        FindControl("MenuReplay", 0)->UnknownVirtualSlot49(0);
+        FindControl("MenuHighScore", 0)->UnknownVirtualSlot49(0);
+        FindControl("MenuCredits", 0)->UnknownVirtualSlot49(0);
+        FindControl("ButProCircuit", 0)->UnknownVirtualSlot49(0);
+        movieControl = 0;
         break;
-    case 1:
-        if (!_stricmp("MenuSingle", event->field_0x04)) {
+    case kDialogCommand:
+        if (!_stricmp("MenuSingle", event->controlName)) {
             field_0x7f6c = field_0x7f6c == 0;
-            field_0x7f60->UnknownFunction470660(field_0x7f6c, 1);
+            menuSingleAnimation->Show(field_0x7f6c, 1);
             field_0x7f78 = 1;
             if (field_0x7f6c) {
                 field_0x7f7c = 0.0f;
-                if (field_0x7f58) {
-                    field_0x7f58->field_0x1ec->UnknownVirtualSlot16(1);
-                    field_0x7f58->UnknownFunction470660(0, 1);
+                if (movieControl) {
+                    movieControl->field_0x1ec->UnknownVirtualSlot16(1);
+                    movieControl->Show(0, 1);
                 }
-            } else if (field_0x7f58) {
-                field_0x7f58->field_0x1ec->UnknownVirtualSlot16(1);
-                field_0x7f58->UnknownFunction470660(0, 1);
+            } else if (movieControl) {
+                movieControl->field_0x1ec->UnknownVirtualSlot16(1);
+                movieControl->Show(0, 1);
             }
             if (field_0x7f70) {
-                field_0x7f64->UnknownFunction470660(0, 1);
+                menuMultiAnimation->Show(0, 1);
                 field_0x7f70 = 0;
-                UnknownFunction4aef40();
+                EndNetworkGame();
                 g_UnknownGlobal56e26c->ui->field_0x4b0 = 0;
             }
             if (field_0x7f74) {
-                field_0x7f68->UnknownFunction470660(0, 1);
+                menuUserAnimation->Show(0, 1);
                 field_0x7f74 = 0;
             }
-        } else if (!_stricmp("MenuMulti", event->field_0x04)) {
+        } else if (!_stricmp("MenuMulti", event->controlName)) {
             field_0x7f70 = field_0x7f70 == 0;
-            field_0x7f64->UnknownFunction470660(field_0x7f70, 1);
+            menuMultiAnimation->Show(field_0x7f70, 1);
             if (field_0x7f6c) {
-                field_0x7f60->UnknownFunction470660(0, 1);
+                menuSingleAnimation->Show(0, 1);
                 field_0x7f6c = 0;
             }
             if (field_0x7f74) {
-                field_0x7f68->UnknownFunction470660(0, 1);
+                menuUserAnimation->Show(0, 1);
                 field_0x7f74 = 0;
             }
             if (field_0x7f70) {
-                field_0x30->UnknownFunction4865e0(field_0x30->field_0x280, 1);
-                UnknownFunction46ebf0("ButIPX", 1)->UnknownVirtualSlot49(0);
-                UnknownFunction46ebf0("ButTCP", 1)->UnknownVirtualSlot49(0);
-                UnknownFunction46ebf0("ButZone", 1)->UnknownVirtualSlot49(1);
-                UnknownFunction46ebf0("ButCable", 1)->UnknownVirtualSlot49(0);
-                UnknownFunction46ebf0("ButModem", 1)->UnknownVirtualSlot49(0);
+                guiManager->UnknownFunction4865e0(guiManager->waitCursorImage, 1);
+                FindControl("ButIPX", 1)->UnknownVirtualSlot49(0);
+                FindControl("ButTCP", 1)->UnknownVirtualSlot49(0);
+                FindControl("ButZone", 1)->UnknownVirtualSlot49(1);
+                FindControl("ButCable", 1)->UnknownVirtualSlot49(0);
+                FindControl("ButModem", 1)->UnknownVirtualSlot49(0);
                 g_UnknownGlobal56e26c->mode.field_0x2bd0.field_0x28 = 0;
-                if (UnknownFunction4aefa0()) {
+                if (EnsureNetworkInterface()) {
                     ConnectionInfoType connections[5];
-                    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4add50(connections, &count);
+                    g_UnknownGlobal56e26c->field_0x08->EnumConnections(connections, &count);
                     for (int i = 0; i < count; i++) {
-                        if (!memcmp(connections[i].field_0x108, &DPSPGUID_IPX, sizeof(GUID)))
-                            UnknownFunction46ebf0("ButIPX", 1)->UnknownVirtualSlot49(1);
-                        else if (!memcmp(connections[i].field_0x108, &DPSPGUID_TCPIP, sizeof(GUID)))
-                            UnknownFunction46ebf0("ButTCP", 1)->UnknownVirtualSlot49(1);
-                        else if (!memcmp(connections[i].field_0x108, &DPSPGUID_SERIAL, sizeof(GUID)))
-                            UnknownFunction46ebf0("ButCable", 1)->UnknownVirtualSlot49(1);
-                        else if (!memcmp(connections[i].field_0x108, &DPSPGUID_MODEM, sizeof(GUID)))
-                            UnknownFunction46ebf0("ButModem", 1)->UnknownVirtualSlot49(1);
+                        if (!memcmp(connections[i].provider, &DPSPGUID_IPX, sizeof(GUID)))
+                            FindControl("ButIPX", 1)->UnknownVirtualSlot49(1);
+                        else if (!memcmp(connections[i].provider, &DPSPGUID_TCPIP, sizeof(GUID)))
+                            FindControl("ButTCP", 1)->UnknownVirtualSlot49(1);
+                        else if (!memcmp(connections[i].provider, &DPSPGUID_SERIAL, sizeof(GUID)))
+                            FindControl("ButCable", 1)->UnknownVirtualSlot49(1);
+                        else if (!memcmp(connections[i].provider, &DPSPGUID_MODEM, sizeof(GUID)))
+                            FindControl("ButModem", 1)->UnknownVirtualSlot49(1);
                     }
                 }
-                field_0x30->UnknownFunction4865e0(field_0x30->field_0x200, 0);
+                guiManager->UnknownFunction4865e0(guiManager->cursorImage, 0);
             } else {
-                UnknownFunction4aef40();
+                EndNetworkGame();
                 g_UnknownGlobal56e26c->ui->field_0x4b0 = 0;
             }
-        } else if (!_stricmp("MenuUserProfile", event->field_0x04) || !_stricmp("ButCancelProfile", event->field_0x04)) {
+        } else if (!_stricmp("MenuUserProfile", event->controlName) || !_stricmp("ButCancelProfile", event->controlName)) {
             field_0x7f74 = field_0x7f74 == 0;
-            field_0x7f68->UnknownFunction470660(field_0x7f74, 1);
+            menuUserAnimation->Show(field_0x7f74, 1);
             if (field_0x7f70) {
-                field_0x7f64->UnknownFunction470660(0, 1);
+                menuMultiAnimation->Show(0, 1);
                 field_0x7f70 = 0;
-                UnknownFunction4aef40();
+                EndNetworkGame();
                 g_UnknownGlobal56e26c->ui->field_0x4b0 = 0;
             }
             if (field_0x7f74)
-                UnknownFunction470000(UnknownFunction46ebf0("LstProfiles", 3), 0, 0);
+                UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
             if (field_0x7f6c) {
-                field_0x7f60->UnknownFunction470660(0, 1);
+                menuSingleAnimation->Show(0, 1);
                 field_0x7f6c = 0;
             }
-        } else if (!_stricmp("MenuOptions", event->field_0x04)) {
+        } else if (!_stricmp("MenuOptions", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 345) OptionsDlg;
-            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
-        } else if (!_stricmp("ButStuntQuarry", event->field_0x04)) {
-            if (field_0x7f58)
-                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
+            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+        } else if (!_stricmp("ButStuntQuarry", event->controlName)) {
+            if (movieControl)
+                movieControl->field_0x1ec->Stop();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 0;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 0;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\Quarries";
             SinglePlayerDlg* dialog = new(__FILE__, 352) SinglePlayerDlg;
             g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
-        } else if (!_stricmp("ButBaja", event->field_0x04)) {
-            if (field_0x7f58)
-                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+        } else if (!_stricmp("ButBaja", event->controlName)) {
+            if (movieControl)
+                movieControl->field_0x1ec->Stop();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 1;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 1;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\Baja";
             SinglePlayerDlg* dialog = new(__FILE__, 360) SinglePlayerDlg;
             g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
-        } else if (!_stricmp("ButSupercross", event->field_0x04)) {
-            if (field_0x7f58)
-                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+        } else if (!_stricmp("ButSupercross", event->controlName)) {
+            if (movieControl)
+                movieControl->field_0x1ec->Stop();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 3;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 3;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\SX";
             SinglePlayerDlg* dialog = new(__FILE__, 368) SinglePlayerDlg;
             g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
-        } else if (!_stricmp("ButEnduro", event->field_0x04)) {
-            if (field_0x7f58)
-                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+        } else if (!_stricmp("ButEnduro", event->controlName)) {
+            if (movieControl)
+                movieControl->field_0x1ec->Stop();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 5;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 5;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\Enduro";
             SinglePlayerDlg* dialog = new(__FILE__, 376) SinglePlayerDlg;
             g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
-        } else if (!_stricmp("ButNationals", event->field_0x04)) {
-            if (field_0x7f58)
-                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+        } else if (!_stricmp("ButNationals", event->controlName)) {
+            if (movieControl)
+                movieControl->field_0x1ec->Stop();
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x04 = 2;
             g_UnknownGlobal56e26c->mode.field_0x29e4.field_0x08 = 2;
             g_UnknownGlobal56e26c->mode.field_0x6a0 = (int)"Teraform\\National";
             SinglePlayerDlg* dialog = new(__FILE__, 384) SinglePlayerDlg;
             g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
-        } else if (!_stricmp("ButProCircuit", event->field_0x04)) {
-            if (field_0x7f58)
-                field_0x7f58->field_0x1ec->UnknownFunction4a2940();
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+        } else if (!_stricmp("ButProCircuit", event->controlName)) {
+            if (movieControl)
+                movieControl->field_0x1ec->Stop();
             PCStartupDlg* dialog = new(__FILE__, 389) PCStartupDlg;
             g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
-        } else if (!_stricmp("ButLoadProfile", event->field_0x04)) {
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+        } else if (!_stricmp("ButLoadProfile", event->controlName)) {
             g_UnknownGlobal56e26c->mode.UnknownFunction523580();
-            if (UnknownFunction44b120(event))
+            if (UseSelectedProfile(event))
                 g_UnknownGlobal56e26c->UnknownFunction521a30();
-            UnknownFunction470000(UnknownFunction46ebf0("LstProfiles", 3), 0, 0);
-            UnknownFunction44c8c0();
+            UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
+            ShowCurrentProfile();
             field_0x7f74 = 0;
-            field_0x7f68->UnknownFunction470660(0, 1);
-        } else if (!_stricmp("ButNewProfile", event->field_0x04)) {
+            menuUserAnimation->Show(0, 1);
+        } else if (!_stricmp("ButNewProfile", event->controlName)) {
             g_UnknownGlobal56e26c->mode.UnknownFunction523580();
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0xbb9);
-            UnknownFunction470000(UnknownFunction46ebf0("LstProfiles", 3), 0, 0);
-            UnknownFunction44c7a0();
-            UnknownFunction44c8c0();
+            UnknownFunction470000(FindControl("LstProfiles", 3), 0, 0);
+            FillProfileList();
+            ShowCurrentProfile();
             field_0x7f74 = 0;
-            field_0x7f68->UnknownFunction470660(0, 1);
-        } else if (!_stricmp("ButRemoveProfile", event->field_0x04)) {
-            UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstProfiles", 0));
-            short row = list->UnknownFunction476950();
-            if (!_stricmp(list->UnknownFunction476d20(-1), g_UnknownGlobal56e26c->mode.field_0x00)) {
+            menuUserAnimation->Show(0, 1);
+        } else if (!_stricmp("ButRemoveProfile", event->controlName)) {
+            UIListBox* list = static_cast<UIListBox*>(FindControl("LstProfiles", 0));
+            short row = list->GetSelectedRow();
+            if (!_stricmp(list->GetRowText(-1), g_UnknownGlobal56e26c->mode.field_0x00)) {
                 NoDelCurProfileDlg* dialog = new(__FILE__, 423) NoDelCurProfileDlg;
-                field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+                guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
             } else if (row != -1) {
                 g_UnknownGlobal59adbc = row;
                 RemoveProfileDlg* dialog = new(__FILE__, 426) RemoveProfileDlg;
-                field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0x12f, 4, 0, (UnknownGuiDialog*)this,
-                                                  (int)list->UnknownFunction476d20(-1), 0, 1);
+                guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0x12f, 4, 0, (UnknownGuiDialog*)this,
+                                                  (int)list->GetRowText(-1), 0, 1);
             }
             UnknownFunction470000(list, 0, 0);
-            UnknownFunction44c7a0();
-        } else if (!_stricmp("ButIPX", event->field_0x04)) {
+            FillProfileList();
+        } else if (!_stricmp("ButIPX", event->controlName)) {
             g_UnknownGlobal56e26c->ui->field_0x4b0 = 1;
-            if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abf10(DPSPGUID_IPX, "", "", 0, &address, &size) &&
-                g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abdf0(address, size, 1)) {
+            if (g_UnknownGlobal56e26c->field_0x08->CreateAddress(DPSPGUID_IPX, "", "", 0, &address, &size) &&
+                g_UnknownGlobal56e26c->field_0x08->InitializeConnection(address, size, 1)) {
                 DebugFree(address, __FILE__, 443);
                 g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x85c);
             }
-        } else if (!_stricmp("ButTCP", event->field_0x04)) {
+        } else if (!_stricmp("ButTCP", event->controlName)) {
             g_UnknownGlobal56e26c->ui->field_0x4b0 = 1;
             ChooseTCPMethodDlg* dialog = new(__FILE__, 453) ChooseTCPMethodDlg;
-            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
-        } else if (!_stricmp("ButZone", event->field_0x04)) {
+            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+        } else if (!_stricmp("ButZone", event->controlName)) {
             g_UnknownGlobal56e26c->openLocalizedWebPageOnExit = 1;
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
-            g_UnknownGlobal56e26c->ui->UnknownFunction49a4a0();
-        } else if (!_stricmp("ButCable", event->field_0x04)) {
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+            g_UnknownGlobal56e26c->ui->OpenExitDialog();
+        } else if (!_stricmp("ButCable", event->controlName)) {
             g_UnknownGlobal56e26c->ui->field_0x4b0 = 1;
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0xd8);
-        } else if (!_stricmp("ButModem", event->field_0x04)) {
+        } else if (!_stricmp("ButModem", event->controlName)) {
             g_UnknownGlobal56e26c->ui->field_0x4b0 = 1;
             ConnectionInfoType connections[5];
-            g_UnknownGlobal56e26c->field_0x08->UnknownFunction4add50(connections, &count);
+            g_UnknownGlobal56e26c->field_0x08->EnumConnections(connections, &count);
             for (int i = 0; i < count; i++) {
-                if (!memcmp(connections[i].field_0x108, &DPSPGUID_MODEM, sizeof(GUID))) {
-                    g_UnknownGlobal56e26c->field_0x08->field_0x04->InitializeConnection(connections[i].field_0x118, 0);
+                if (!memcmp(connections[i].provider, &DPSPGUID_MODEM, sizeof(GUID))) {
+                    g_UnknownGlobal56e26c->field_0x08->directPlay->InitializeConnection(connections[i].connection, 0);
                     g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0xfc);
                     break;
                 }
             }
-        } else if (!_stricmp("MenuReplay", event->field_0x04)) {
+        } else if (!_stricmp("MenuReplay", event->controlName)) {
             GhostReplayDlg* dialog = new(__FILE__, 487) GhostReplayDlg;
-            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-            UnknownFunction46ff30(0);
-        } else if (!_stricmp("MenuHighScore", event->field_0x04)) {
+            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
+        } else if (!_stricmp("MenuHighScore", event->controlName)) {
             TrackRecordDlg* dialog = new(__FILE__, 492) TrackRecordDlg;
-            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0x911, 2, 0, 0, 0, 0, 1);
-            UnknownFunction46ff30(0);
-        } else if (!_stricmp("MenuCredits", event->field_0x04)) {
+            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0x911, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
+        } else if (!_stricmp("MenuCredits", event->controlName)) {
             CreditsVidDlg* dialog = new(__FILE__, 501) CreditsVidDlg;
-            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-            UnknownFunction46ff30(0);
-        } else if (!_stricmp("MenuHelp", event->field_0x04)) {
+            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
+        } else if (!_stricmp("MenuHelp", event->controlName)) {
             g_UnknownGlobal56e26c->mode.UnknownFunction523d30("MCM2HELP", 0);
-        } else if (!_stricmp("MenuExit", event->field_0x04)) {
-            UnknownFunction46ff30(0);
-            g_UnknownGlobal56e26c->ui->UnknownFunction49a4a0();
+        } else if (!_stricmp("MenuExit", event->controlName)) {
+            EndDialog(0);
+            g_UnknownGlobal56e26c->ui->OpenExitDialog();
         }
         break;
     case 9:
-        if (event->field_0x00 == 0x1e || event->field_0x00 == 0x32) {
-            UIListBox* list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstProfiles", 0));
-            if (event->field_0x00 == 0x1e) {
+        if (event->code == 0x1e || event->code == 0x32) {
+            UIListBox* list = static_cast<UIListBox*>(FindControl("LstProfiles", 0));
+            if (event->code == 0x1e) {
                 list->UnknownFunction476d80(g_UnknownGlobal56e26c->mode.field_0x00, 0, 0);
                 list->UnknownFunction477900(1);
-                list->UnknownFunction476ad0(g_UnknownGlobal56e26c->mode.field_0x00);
-            } else if (event->field_0x00 == 0x32) {
-                COPY_TEXT(name, list->UnknownFunction476d20(g_UnknownGlobal59adbc), 16);
+                list->SelectRowByText(g_UnknownGlobal56e26c->mode.field_0x00);
+            } else if (event->code == 0x32) {
+                COPY_TEXT(name, list->GetRowText(g_UnknownGlobal59adbc), 16);
                 sprintf(path, "%s\\%s", "ui\\profile", name);
                 if (g_UnknownGlobal56e26c->profileDirectory->UnknownFunction44a960(path)) {
                     g_UnknownGlobal56e26c->profileDirectory->UnknownVirtualSlot1();
-                    list->UnknownFunction477490(g_UnknownGlobal59adbc);
+                    list->RemoveRow(g_UnknownGlobal59adbc);
                 }
             }
-            UnknownFunction44c7a0();
-            UnknownFunction44c8c0();
+            FillProfileList();
+            ShowCurrentProfile();
             if (field_0x7f74)
                 UnknownFunction470000(list, 0, 0);
         }
-        if (event->field_0x00 == 0x1f)
-            UnknownFunction44c8c0();
-        if (event->field_0x00 == 0x63) {
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
+        if (event->code == 0x1f)
+            ShowCurrentProfile();
+        if (event->code == 0x63) {
+            event->dialog->EndDialog(0);
+            event->handled = 1;
         }
-        if (event->field_0x00 == 0x3d)
+        if (event->code == 0x3d)
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x85d);
-        if (event->field_0x00 == 0x3c) {
-            if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abf10(DPSPGUID_TCPIP, "", "", 0, &address, &size) &&
-                g_UnknownGlobal56e26c->field_0x08->UnknownFunction4abdf0(address, size, 2)) {
+        if (event->code == 0x3c) {
+            if (g_UnknownGlobal56e26c->field_0x08->CreateAddress(DPSPGUID_TCPIP, "", "", 0, &address, &size) &&
+                g_UnknownGlobal56e26c->field_0x08->InitializeConnection(address, size, 2)) {
                 DebugFree(address, __FILE__, 596);
                 g_UnknownGlobal56e26c->ui->UnknownFunction499b20(0x85c);
             }
         }
         break;
-    case 6:
+    case kDialogClose:
         field_0x7f74 = 0;
         field_0x7f70 = 0;
         field_0x7f6c = 0;
-        field_0x7f68 = 0;
-        field_0x7f64 = 0;
-        field_0x7f60 = 0;
+        menuUserAnimation = 0;
+        menuMultiAnimation = 0;
+        menuSingleAnimation = 0;
         break;
     }
 }
@@ -562,37 +562,37 @@ void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 // 0x0044fae0: turns the bike view (dragged with the pointer, else slowly by
 // itself), animates the previews and now and then plays a rider idle motion.
 int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
-    if (field_0x110)
-        field_0x110->UnknownFunction404da0();
+    if (dialogBackground)
+        dialogBackground->UnknownFunction404da0();
     Vector3 offset;
     Vector3 turned;
-    GUIInputDevice* pointer = field_0x34->field_0x2c;
-    if (pointer && field_0x7f78 && field_0x7f7c) {
-        float dx = (float)(pointer->field_0xa4.x - field_0x34->field_0x34);
-        field_0x7f58.y += (pointer->field_0xa4.y - field_0x34->field_0x38) * 0.1f;
-        field_0x7f58.y = __max(1.0f, __min(field_0x7f58.y, 10.0f));
-        offset = UnknownVectorDifference(field_0x7f58, g_UnknownGlobal56e26c->ui->field_0x474);
+    GUIInputDevice* pointer = guiUser->pointerDevice;
+    if (pointer && previewDragged && previewDragging) {
+        float dx = (float)(pointer->pointerPosition.x - guiUser->field_0x34);
+        viewEye.y += (pointer->pointerPosition.y - guiUser->field_0x38) * 0.1f;
+        viewEye.y = __max(1.0f, __min(viewEye.y, 10.0f));
+        offset = UnknownVectorDifference(viewEye, g_UnknownGlobal56e26c->ui->field_0x474);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
-        float distance = field_0x7f70;
+        float distance = viewDistance;
         turned *= distance;
-        field_0x7f58 = UnknownVectorSum(turned, g_UnknownGlobal56e26c->ui->field_0x474);
-        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(&field_0x7f58, 0, 0, 0, 0);
-        g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(field_0x7f64);
-        field_0x7f78 = 1;
-        static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkAutoRotate", 2))->UnknownFunction478cf0(0);
-    } else if (!field_0x7f78) {
-        offset = UnknownVectorDifference(field_0x7f58, g_UnknownGlobal56e26c->ui->field_0x474);
+        viewEye = UnknownVectorSum(turned, g_UnknownGlobal56e26c->ui->field_0x474);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
+        previewDragged = 1;
+        static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
+    } else if (!previewDragged) {
+        offset = UnknownVectorDifference(viewEye, g_UnknownGlobal56e26c->ui->field_0x474);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
-        turned *= field_0x7f70;
-        field_0x7f58 = UnknownVectorSum(turned, g_UnknownGlobal56e26c->ui->field_0x474);
-        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(&field_0x7f58, 0, 0, 0, 0);
-        g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(field_0x7f64);
+        turned *= viewDistance;
+        viewEye = UnknownVectorSum(turned, g_UnknownGlobal56e26c->ui->field_0x474);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(&viewEye, 0, 0, 0, 0);
+        g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(viewTarget);
     }
     g_UnknownGlobal56e26c->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
     g_UnknownGlobal56e26c->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
-    if (field_0x7f80 && rand() % 200 == 1) {
-        UIListBox* bikes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
-        bikes->UnknownFunction4768d0(-1);
+    if (idleMotionPlaying && rand() % 200 == 1) {
+        UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+        bikes->GetRowData(-1);
         switch (rand() % 3) {
         case 0:
             g_UnknownGlobal56e26c->ui->field_0x46c->UnknownFunction4a8b10("LookLeftR");
@@ -604,16 +604,16 @@ int SPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
             g_UnknownGlobal56e26c->ui->field_0x46c->UnknownFunction4a8b10("StretchR");
             break;
         }
-        field_0x7f80 = 0;
+        idleMotionPlaying = 0;
     }
-    if (!field_0x7f80 && g_UnknownGlobal56e26c->ui->field_0x46c->field_0x0c) {
-        UIListBox* bikes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
-        bikes->UnknownFunction4768d0(-1);
+    if (!idleMotionPlaying && g_UnknownGlobal56e26c->ui->field_0x46c->motionFinished) {
+        UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+        bikes->GetRowData(-1);
         g_UnknownGlobal56e26c->ui->field_0x46c->UnknownFunction4a8b10("WaitR");
-        field_0x7f80 = 1;
+        idleMotionPlaying = 1;
     }
-    if (field_0x110)
-        field_0x110->UnknownFunction404240(field_0x7f74, &field_0x7f8c);
+    if (dialogBackground)
+        dialogBackground->UnknownFunction404240(previewRegion, &previewArea);
     return UIDialog::UnknownVirtualSlot10(frameTime);
 }
 
@@ -639,27 +639,27 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     char suffix[128];
     char label[128];
     char time[128];
-    switch (event->field_0x08) {
-    case 5: {
+    switch (event->kind) {
+    case kDialogInit: {
         if (g_UnknownGlobal56e26c->ui->field_0x40)
-            UnknownFunction46ebf0("ButViewReplay", 1)->UnknownFunction470660(1, 1);
+            FindControl("ButViewReplay", 1)->Show(1, 1);
         else
-            UnknownFunction46ebf0("ButViewReplay", 1)->UnknownFunction470660(0, 1);
+            FindControl("ButViewReplay", 1)->Show(0, 1);
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
-            UnknownGameUiControl* text = UnknownFunction46ebf0("TitleText", 0xc);
+            UnknownGameUiControl* text = FindControl("TitleText", 0xc);
             g_UnknownGlobal56e26c->UnknownFunction521970(0x93b, position, 0x80);
             sprintf(title, "%s (%d/%d)", position, g_UnknownGlobal56e26c->eventManager->field_0x48,
                     g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c + 1);
-            text->UnknownFunction470b20(title);
+            text->SetText(title);
             if (g_UnknownGlobal56e26c->eventManager->field_0x48 > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c) {
-                text->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x93a);
+                text->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x93a);
                 g_UnknownGlobal56e26c->mode.field_0x10ec = 0;
                 g_UnknownGlobal56e26c->ui->field_0x3c = 0x10e;
             }
         }
-        UnknownGameUiControl* first = UnknownFunction46ebf0("LstStats1", 0);
+        UnknownGameUiControl* first = FindControl("LstStats1", 0);
         UnknownFunction470000(first, 0, 0);
-        UnknownFunction44ca80(event);
+        ClearStatsLists(event);
         int i;
         UIListBox* list;
         switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
@@ -668,14 +668,14 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         case 3:
         case 5: {
             if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
-                UnknownFunction44c930(event, 0x934, 0x935, 0, 0x938);
+                SetStatsButtonResources(event, 0x934, 0x935, 0, 0x938);
             else
-                UnknownFunction44c930(event, 0x934, 0x935, 0, 0);
+                SetStatsButtonResources(event, 0x934, 0x935, 0, 0);
             g_UnknownGlobal56e26c->UnknownFunction521970(0x936, label, 0x80);
             g_UnknownGlobal56e26c->UnknownFunction521970(0x13b8, suffix, 0x80);
             sprintf(title, "%s (%s)", label, suffix);
-            UnknownGameUiControl* button = UnknownFunction46ebf0("ButStats3", 0);
-            button->UnknownFunction470b20(title);
+            UnknownGameUiControl* button = FindControl("ButStats3", 0);
+            button->SetText(title);
             for (i = 0; i < g_UnknownGlobal56e26c->eventManager->field_0x4c; i++) {
                 sprintf(position, "%d", g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x04);
                 UnknownFunction518690(time, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x08);
@@ -686,49 +686,49 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 sprintf(score, "%s (%s)", time, best);
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
                     sprintf(points, "%d", g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x28);
-                    UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position,
-                                          score, points);
+                    AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position,
+                                 score, points);
                 } else {
-                    UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position,
-                                          score, 0);
+                    AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position,
+                                 score, 0);
                 }
             }
-            UIListBox* stats = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats4", 0));
-            static_cast<UIButton*>(UnknownFunction46ebf0("ButStats4", 1))->UnknownFunction473390(stats);
-            stats->UnknownFunction4777f0(UnknownFunction44b0e0);
-            list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats2", 0));
-            static_cast<UIButton*>(UnknownFunction46ebf0("ButStats2", 1))->UnknownFunction473390(list);
-            list->UnknownFunction4777f0(UnknownFunction44b0a0);
+            UIListBox* stats = static_cast<UIListBox*>(FindControl("LstStats4", 0));
+            static_cast<UIButton*>(FindControl("ButStats4", 1))->SetSortList(stats);
+            stats->SetSortCompare(CompareRowNumbersDescending);
+            list = static_cast<UIListBox*>(FindControl("LstStats2", 0));
+            static_cast<UIButton*>(FindControl("ButStats2", 1))->SetSortList(list);
+            list->SetSortCompare(CompareRowNumbersAscending);
             list->UnknownFunction477900(1);
             break;
         }
         case 0: {
             if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
-                UnknownFunction44c930(event, 0x934, 0, 0x937, 0x938);
+                SetStatsButtonResources(event, 0x934, 0, 0x937, 0x938);
             else
-                UnknownFunction44c930(event, 0x934, 0, 0x937, 0);
+                SetStatsButtonResources(event, 0x934, 0, 0x937, 0);
             for (i = 0; i < g_UnknownGlobal56e26c->eventManager->field_0x4c; i++) {
                 sprintf(position, "%d", (int)g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x2c);
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
                     sprintf(score, "%d", g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x28);
-                    UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, score);
+                    AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, score);
                 } else {
-                    UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, 0);
+                    AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, 0);
                 }
             }
-            UIListBox* stats = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats4", 0));
-            static_cast<UIButton*>(UnknownFunction46ebf0("ButStats4", 1))->UnknownFunction473390(stats);
-            stats->UnknownFunction4777f0(UnknownFunction44b0e0);
-            list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats3", 0));
-            list->UnknownFunction4777f0(UnknownFunction44b0e0);
+            UIListBox* stats = static_cast<UIListBox*>(FindControl("LstStats4", 0));
+            static_cast<UIButton*>(FindControl("ButStats4", 1))->SetSortList(stats);
+            stats->SetSortCompare(CompareRowNumbersDescending);
+            list = static_cast<UIListBox*>(FindControl("LstStats3", 0));
+            list->SetSortCompare(CompareRowNumbersDescending);
             list->UnknownFunction477900(1);
             break;
         }
         }
         break;
     }
-    case 1:
-        if (!_stricmp("ButViewReplay", event->field_0x04)) {
+    case kDialogCommand:
+        if (!_stricmp("ButViewReplay", event->controlName)) {
             UnknownReplayTapeHeader header;
             FILE* file = fopen("VCRtape.dat", "rb");
             if (file) {
@@ -738,13 +738,13 @@ void SPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04);
                 g_UnknownGlobal56e26c->field_0x3428 = 1;
                 g_UnknownGlobal56e26c->field_0x342c = 1;
-                UNKNOWN_GARAGE_SETTINGS->field_0x00 = header.field_0x33c;
+                UNKNOWN_GARAGE_SETTINGS->engineSize = header.field_0x33c;
                 UNKNOWN_GARAGE_SETTINGS->field_0x04 = header.field_0x340;
                 COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x26f4, "VCRtape.dat", 0x104);
                 UnknownFunction4536e0();
-                field_0x2c->UnknownVirtualSlot26();
+                parentDialog->UnknownVirtualSlot26();
             } else {
-                event->field_0x14->UnknownFunction470660(0, 1);
+                event->control->Show(0, 1);
             }
         }
         break;
@@ -761,23 +761,23 @@ void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     char suffix[128];
     char label[128];
     char time[128];
-    if (event->field_0x08 != 5)
+    if (event->kind != kDialogInit)
         return;
     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
-        UnknownGameUiControl* text = UnknownFunction46ebf0("TitleText", 0xc);
+        UnknownGameUiControl* text = FindControl("TitleText", 0xc);
         g_UnknownGlobal56e26c->UnknownFunction521970(0x93b, position, 0x80);
         sprintf(title, "%s (%d/%d)", position, g_UnknownGlobal56e26c->eventManager->field_0x48,
                 g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c + 1);
-        text->UnknownFunction470b20(title);
+        text->SetText(title);
         if (g_UnknownGlobal56e26c->eventManager->field_0x48 > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c) {
-            text->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x93a);
+            text->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x93a);
             g_UnknownGlobal56e26c->mode.field_0x10ec = 0;
             g_UnknownGlobal56e26c->ui->field_0x3c = 0x10e;
         }
     }
-    UnknownGameUiControl* first = UnknownFunction46ebf0("LstStats1", 0);
+    UnknownGameUiControl* first = FindControl("LstStats1", 0);
     UnknownFunction470000(first, 0, 0);
-    UnknownFunction44ca80(event);
+    ClearStatsLists(event);
     int i;
     UIListBox* list;
     switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
@@ -786,14 +786,14 @@ void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case 3:
     case 5: {
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
-            UnknownFunction44c930(event, 0x934, 0x935, 0, 0x938);
+            SetStatsButtonResources(event, 0x934, 0x935, 0, 0x938);
         else
-            UnknownFunction44c930(event, 0x934, 0x935, 0, 0);
+            SetStatsButtonResources(event, 0x934, 0x935, 0, 0);
         g_UnknownGlobal56e26c->UnknownFunction521970(0x936, label, 0x80);
         g_UnknownGlobal56e26c->UnknownFunction521970(0x13b8, suffix, 0x80);
         sprintf(title, "%s (%s)", label, suffix);
-        UnknownGameUiControl* button = UnknownFunction46ebf0("ButStats3", 0);
-        button->UnknownFunction470b20(title);
+        UnknownGameUiControl* button = FindControl("ButStats3", 0);
+        button->SetText(title);
         for (i = 0; i < g_UnknownGlobal56e26c->eventManager->field_0x4c; i++) {
             if (!g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x24) {
                 sprintf(position, "%d", g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x04);
@@ -805,77 +805,77 @@ void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 sprintf(score, "%s (%s)", time, best);
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
                     sprintf(points, "%d", g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x28);
-                    UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position, score,
-                                          points);
+                    AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position, score,
+                                 points);
                 } else {
-                    UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position, score, 0);
+                    AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position, score, 0);
                 }
             }
         }
-        UIListBox* stats = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats4", 0));
-        static_cast<UIButton*>(UnknownFunction46ebf0("ButStats4", 1))->UnknownFunction473390(stats);
-        stats->UnknownFunction4777f0(UnknownFunction44b0e0);
-        list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats2", 0));
-        list->UnknownFunction4777f0(UnknownFunction44b0a0);
+        UIListBox* stats = static_cast<UIListBox*>(FindControl("LstStats4", 0));
+        static_cast<UIButton*>(FindControl("ButStats4", 1))->SetSortList(stats);
+        stats->SetSortCompare(CompareRowNumbersDescending);
+        list = static_cast<UIListBox*>(FindControl("LstStats2", 0));
+        list->SetSortCompare(CompareRowNumbersAscending);
         list->UnknownFunction477900(1);
         break;
     }
     case 0: {
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
-            UnknownFunction44c930(event, 0x934, 0, 0x937, 0x938);
+            SetStatsButtonResources(event, 0x934, 0, 0x937, 0x938);
         else
-            UnknownFunction44c930(event, 0x934, 0, 0x937, 0);
+            SetStatsButtonResources(event, 0x934, 0, 0x937, 0);
         for (i = 0; i < g_UnknownGlobal56e26c->eventManager->field_0x4c; i++) {
             if (!g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x24) {
                 sprintf(position, "%d", (int)g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x2c);
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
                     sprintf(score, "%d", g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x28);
-                    UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, score);
+                    AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, score);
                 } else {
-                    UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, 0);
+                    AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, 0);
                 }
             }
         }
-        UIListBox* stats = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats4", 0));
-        static_cast<UIButton*>(UnknownFunction46ebf0("ButStats4", 1))->UnknownFunction473390(stats);
-        stats->UnknownFunction4777f0(UnknownFunction44b0e0);
-        list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats3", 0));
-        list->UnknownFunction4777f0(UnknownFunction44b0e0);
+        UIListBox* stats = static_cast<UIListBox*>(FindControl("LstStats4", 0));
+        static_cast<UIButton*>(FindControl("ButStats4", 1))->SetSortList(stats);
+        stats->SetSortCompare(CompareRowNumbersDescending);
+        list = static_cast<UIListBox*>(FindControl("LstStats3", 0));
+        list->SetSortCompare(CompareRowNumbersDescending);
         list->UnknownFunction477900(1);
         break;
     }
     case 4:
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x148) {
             if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
-            UnknownFunction44c930(event, 0x934, 0, 0x937, 0x938);
+            SetStatsButtonResources(event, 0x934, 0, 0x937, 0x938);
         else
-            UnknownFunction44c930(event, 0x934, 0, 0x937, 0);
+            SetStatsButtonResources(event, 0x934, 0, 0x937, 0);
             for (i = 0; i < g_UnknownGlobal56e26c->eventManager->field_0x4c; i++) {
                 if (!g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x24) {
                     sprintf(position, "%d", (int)g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x2c);
                     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
                         sprintf(score, "%d", g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x28);
-                        UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, score);
+                        AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, score);
                     } else {
-                        UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, 0);
+                        AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, 0, position, 0);
                     }
                 }
             }
-            UIListBox* stats = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats4", 0));
-            static_cast<UIButton*>(UnknownFunction46ebf0("ButStats4", 1))->UnknownFunction473390(stats);
-            stats->UnknownFunction4777f0(UnknownFunction44b0e0);
-            list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats3", 0));
-            list->UnknownFunction4777f0(UnknownFunction44b0e0);
+            UIListBox* stats = static_cast<UIListBox*>(FindControl("LstStats4", 0));
+            static_cast<UIButton*>(FindControl("ButStats4", 1))->SetSortList(stats);
+            stats->SetSortCompare(CompareRowNumbersDescending);
+            list = static_cast<UIListBox*>(FindControl("LstStats3", 0));
+            list->SetSortCompare(CompareRowNumbersDescending);
             list->UnknownFunction477900(1);
         } else {
             if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
-                UnknownFunction44c930(event, 0x934, 0x939, 0x938, 0);
+                SetStatsButtonResources(event, 0x934, 0x939, 0x938, 0);
             } else {
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x934, position, 0x80);
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x935, score, 0x80);
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x939, points, 0x80);
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x142b, title, 0x80);
-                UnknownFunction44c9f0(event, position, score, points, title);
+                SetStatsButtonTexts(event, position, score, points, title);
             }
             for (i = 0; i < g_UnknownGlobal56e26c->eventManager->field_0x4c; i++) {
                 if (!g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x24) {
@@ -884,16 +884,16 @@ void MPRaceInfoDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     UnknownFunction518690(points, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x18);
                     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
                         sprintf(points, "%d", g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x28);
-                        UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position, score,
-                                              points);
+                        AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position, score,
+                                     points);
                     } else {
-                        UnknownFunction44cae0(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position, score,
-                                              points);
+                        AddStatsRows(event, g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x40, position, score,
+                                     points);
                     }
                 }
             }
-            list = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats2", 0));
-            list->UnknownFunction4777f0(UnknownFunction44b0a0);
+            list = static_cast<UIListBox*>(FindControl("LstStats2", 0));
+            list->SetSortCompare(CompareRowNumbersAscending);
             list->UnknownFunction477900(1);
         }
         break;

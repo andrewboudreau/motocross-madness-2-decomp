@@ -1,7 +1,7 @@
 // Near-miss EventManager candidates, kept out of src/reconstructed until
 // they match. See docs/EVENTMANAGER.md.
 //
-// UnknownFunction45cb20 (0x0045cb20, 67 bytes): cdecl progress callback that
+// LoadProgressCallback (0x0045cb20, 67 bytes): cdecl progress callback that
 // 0x0045cb70 and 0x0045cdc0 pass by address. 63 of 67 bytes match: retail
 // loads *step into edx and the bar value into ecx; VC6 here swaps them.
 // Compound, spelled-out, commuted, local-variable, void* and struct
@@ -17,7 +17,7 @@
 // base-pointer, assignment-in-argument and declaration-placement forms do
 // not change it.
 //
-// EventManager::UnknownFunction45d480 (0x0045d480, 4247 bytes): the podium
+// EventManager::CreatePodiumScene (0x0045d480, 4247 bytes): the podium
 // scene. A first full draft: control flow, calls, strings, `new` lines and
 // EH states follow retail, but about 500 instructions still differ: the
 // frame (retail 0x460, three text buffers at +0xe8/+0x1e8/+0x2ec and a
@@ -46,7 +46,7 @@ extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
 
 // 0x0045cb20: adds *step to KrustyUI's "ProgressBar"; without a step it
 // calls KrustyUI 0x0049b530.
-void UnknownFunction45cb20(int* step) {
+void LoadProgressCallback(int* step) {
     KrustyUI* ui = g_UnknownGlobal56e26c->ui;
     if (step) {
         if (ui->field_0x490) {
@@ -195,7 +195,7 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 
 #define PODIUM_OWNER(o) ((UnknownPodiumOwner*)(o))
 #define PODIUM_VIEW(v) ((UnknownPodiumViewFields*)(v))
-#define PODIUM_ARCADE ((UnknownPodiumArcade*)field_0x3d0)
+#define PODIUM_ARCADE ((UnknownPodiumArcade*)podiumObject)
 
 // Whether the career's current race is its series' last (the bonus track
 // is the last when there is one).
@@ -209,7 +209,7 @@ static inline int PodiumIsLastRace(UnknownTrackGameObject3444* circuit) {
 }
 
 // 0x0045d480
-int EventManager::UnknownFunction45d480() {
+int EventManager::CreatePodiumScene() {
     char name[256];
     char path[260];
     char message[388];
@@ -234,11 +234,11 @@ int EventManager::UnknownFunction45d480() {
     }
     UnknownFunction45cdc0(1);
     PCCamera* camera = new(__FILE__, 0x276) PCCamera(1);
-    field_0x3d4 = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
-    if (!view->UnknownFunction469190(field_0x3d4, -1))
+    podiumCamera = (Camera*)camera->UnknownVirtualSlot8(field_0x18);
+    if (!view->UnknownFunction469190(podiumCamera, -1))
         return 0;
-    ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(field_0x3d4);
-    field_0x3d4->UnknownFunction469260(view->field_0x50, -1);
+    ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(podiumCamera);
+    podiumCamera->UnknownFunction469260(view->field_0x50, -1);
     UnknownPodiumGrid* grid = PODIUM_OWNER(owner)->field_0x2c;
     float rows = grid->field_0xa4->field_0x398;
     if (!((int)rows & 1))
@@ -376,17 +376,17 @@ int EventManager::UnknownFunction45d480() {
         sound->UnknownFunction4bc6b0(0, 1, 0);
     }
     D3DRMVectorRotate(&rotated, &cameraOffset, &kVec3YAxis, angle);
-    field_0x3e4 = rotated * PodiumLength(cameraOffset) + field_0x3c4;
+    podiumCameraPosition = rotated * PodiumLength(cameraOffset) + field_0x3c4;
     D3DRMVectorRotate(&rotated, &lookOffset, &kVec3YAxis, angle);
-    field_0x3f0 = rotated * PodiumLength(lookOffset) + field_0x3c4;
-    field_0x414 = field_0x3f0 - field_0x3e4;
-    field_0x3d4->UnknownFunction42e9b0(&field_0x3e4, 0, 0, 0, 0);
-    field_0x3d4->UnknownVirtualSlot29(field_0x3d8);
+    podiumCameraTarget = rotated * PodiumLength(lookOffset) + field_0x3c4;
+    podiumPanSpeed = podiumCameraTarget - podiumCameraPosition;
+    podiumCamera->UnknownFunction42e9b0(&podiumCameraPosition, 0, 0, 0, 0);
+    podiumCamera->UnknownVirtualSlot29(field_0x3d8);
     float x0 = field_0x3c4.x - 16.0f;
     float x1 = x0 + 32.0f;
     float z0 = field_0x3c4.z - 16.0f;
     float z1 = z0 + 32.0f;
-    UnknownFunction45fce0(x0, z0, x1, z1);
+    RemoveVegetationInRect(x0, z0, x1, z1);
     UnknownFunction45fdc0(x0, z0, x1, z1);
     field_0x440 = 0;
     g_UnknownGlobal56e26c->UnknownFunction468880();

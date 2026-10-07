@@ -4,7 +4,9 @@ RTTI: `KrustyUI : GameObject : BaseObject` (vtable `0x0055488c`; 0x1364
 bytes, the size TrackGame slot 4 allocates). Its `DebugFree` calls
 pass `D:\aardvark\VC\krusty2\krustyui.cpp` as `__FILE__` (`0x0056d67c`),
 which confirms the original translation unit's name. Canonical source:
-`src/reconstructed/KrustyUI.h` / `KrustyUI.cpp`. Names are provisional.
+`src/reconstructed/KrustyUI.h` / `KrustyUI.cpp`. A few methods are named
+after their bodies (`ShowScene`, `HideScene`, `OpenExitDialog`, `Shutdown`,
+`LoadGarageTables`); the rest are provisional.
 TrackGame keeps it at +0x56c (`ui`).
 
 ## Extent

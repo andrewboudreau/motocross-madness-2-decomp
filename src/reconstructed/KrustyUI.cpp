@@ -150,7 +150,7 @@ struct UnknownKrustyUIContext {
 // The GUI's 0x00485c80 (GUIManager.h) opens a dialog resource.
 class UnknownKrustyUIGuiView {
 public:
-    int UnknownFunction485c80(const char* resource);
+    int OpenDialogResource(const char* resource);
 };
 
 // The garage scene's static vectors have an empty destructor: retail
@@ -269,7 +269,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
         field_0x498 = g_UnknownGlobal56e26c->UnknownVirtualSlot22("AllowIME", field_0x498);
         if (field_0x498)
             field_0x2c->UnknownFunction4868b0(1);
-        ((UnknownKrustyUIGuiView*)field_0x2c)->UnknownFunction485c80("global.dtm");
+        ((UnknownKrustyUIGuiView*)field_0x2c)->OpenDialogResource("global.dtm");
         field_0x474 = kVec3Zero;
         KRUSTYUI_RIDER_POSITION = kVec3Zero;
         KRUSTYUI_RIDER_POSITION.y += 0.1f;
@@ -383,7 +383,7 @@ void KrustyUI::UnknownFunction498cf0(int value) {
 
 // 0x0049b470
 KrustyUI::~KrustyUI() {
-    UnknownFunction4999b0();
+    Shutdown();
     if (field_0x48)
         DebugFree(field_0x48, __FILE__, 1306);
     if (field_0x50)
@@ -395,10 +395,10 @@ KrustyUI::~KrustyUI() {
 }
 
 // 0x004999b0
-void KrustyUI::UnknownFunction4999b0() {
+void KrustyUI::Shutdown() {
     UnknownFunction5053b0(0);
     if (!g_UnknownGlobal56e26c->field_0x2d5_bit1)
-        field_0x2c->UnknownFunction485d50();
+        field_0x2c->CloseDialogResource();
     if (field_0x464) {
         field_0x464->Release();
         field_0x464 = 0;
@@ -468,7 +468,7 @@ int KrustyUI::UnknownVirtualSlot25(void* value) {
 }
 
 // 0x004999f0
-void KrustyUI::UnknownFunction4999f0(GameObject* parent) {
+void KrustyUI::ShowScene(GameObject* parent) {
     if (field_0x464) {
         parent->UnknownFunction469190(field_0x464, -1);
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(field_0x468);
@@ -476,7 +476,7 @@ void KrustyUI::UnknownFunction4999f0(GameObject* parent) {
 }
 
 // 0x00499a20
-void KrustyUI::UnknownFunction499a20() {
+void KrustyUI::HideScene() {
     if (field_0x464) {
         field_0x464->UnknownFunction4691f0();
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
@@ -550,8 +550,8 @@ void KrustyUI::UnknownFunction499b20(int menu) {
         UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
         if (circuit) {
             if (circuit->field_0x1285[circuit->field_0x40].field_0x08 == circuit->field_0x44) {
-                circuit->UnknownFunction4d41a0();
-                UnknownFunction4d4ba0();
+                circuit->AdvanceAfterRace();
+                OpenCareerDialog();
                 return;
             }
             if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 1) {
@@ -609,14 +609,14 @@ void KrustyUI::UnknownFunction499b20(int menu) {
 }
 
 // 0x0049a4a0: turns "MediaControl" on, hides the GUI and opens Exit1Dlg.
-void KrustyUI::UnknownFunction49a4a0() {
+void KrustyUI::OpenExitDialog() {
     UnknownFunction468dd0("MediaControl");
     field_0x2c->UnknownFunction486630(0);
     field_0x2c->UnknownFunction485a70(new(__FILE__, 836) Exit1Dlg, 0, 2, 0, 0, 0, 0, 1);
 }
 
 // 0x0049a540: reads presets.pb's garage tables, or sets the defaults.
-void KrustyUI::UnknownFunction49a540() {
+void KrustyUI::LoadGarageTables() {
     char key[128];
     UnknownParameterBlock block;
     UnknownTextureStream* stream = new(__FILE__, 851) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -786,12 +786,12 @@ void KrustyUI::UnknownFunction49bc50(int table) {
         (short)g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04, name);
     int added = 0;
     if (g_UnknownGlobal56e26c->field_0x18 == 1) {
-        if (!g_UnknownGlobal56e26c->field_0x3400->UnknownFunction51f3c0(
+        if (!g_UnknownGlobal56e26c->field_0x3400->AddRacer(
                 (short)g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04, 0))
             return;
     } else {
         for (int i = 0; i < g_UnknownGlobal56e26c->field_0x18; i++) {
-            if (g_UnknownGlobal56e26c->field_0x3400->UnknownFunction51f3c0(
+            if (g_UnknownGlobal56e26c->field_0x3400->AddRacer(
                     (short)g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04, i))
                 added = 1;
         }

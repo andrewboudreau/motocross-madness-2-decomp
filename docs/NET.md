@@ -7,6 +7,25 @@ are in `samples/net/NetNearMisses.cpp`. The RTTI names are `NetworkInterface`,
 `InfoType`, `PlayerInfoType`, `ConnectionInfoType` and `SessionInfoType`. All
 other type, member and function names are provisional.
 
+## Names
+
+Function and member names in `Net.h` are provisional (tier 3) unless noted:
+
+- `ConnectUsingLobby` (`0x004ab960`) is the literal of its error texts
+  ("Error: ConnectUsingLobby::...").
+- `ReportDirectPlayError` (`0x004ad5a0`) formats "ERROR: DirectPlay (%s) in
+  file %s at line %d".
+- The wrappers are named after the single DirectPlay call each makes
+  (`CreateSession`/`JoinSession` open with DPOPEN_CREATE/JOIN,
+  `EnumConnections`/`EnumSessions`/`EnumPlayers` and their callbacks, and
+  `CreatePlayer`, `DestroyPlayer`, `CreateGroup`).
+- The keep-alive members (`StartKeepAlive`, `keepAliveTimeout`,
+  `keepAliveInterval`, `keepAliveEvent`) are named from NetThread.cpp's loop.
+  It drops a player not heard from for the timeout, sends message 0x4b every
+  interval, and EventManager passes its "KeepAliveTimeout" setting.
+- NetMessage's `type`/`from`/`to`/`flags`/`size`/`data` are the arguments
+  `Set` (`0x004aacc0`) stores.
+
 ## Evidence
 
 - `D:\aardvark\VC\krusty2\Net.cpp` (`0x0056e39c`) is the `__FILE__` of the
@@ -38,7 +57,7 @@ other type, member and function names are provisional.
     application GUID is at `0x00556dc0`.
   - CoCreateInstance binds to IAT `0x005503fc` and DirectPlayLobbyCreateA to
     `0x00534420`.
-- The WinSock client `0x004ad3b0`..`0x004ad570` (`UnknownTrackGameGlobal68a48c`,
+- The WinSock client `0x004ad3b0`..`0x004ad570` (`DebugSocket`,
   declared in TrackGame.h) has no `__FILE__`. It is placed here only because
   it lies between Net.cpp functions (`0x004ad280` and `0x004ad5a0`).
   - Its WSOCK32 calls bind to the ordinal-import thunks

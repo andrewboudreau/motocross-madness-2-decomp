@@ -307,9 +307,9 @@ void TrackGameMode::UnknownFunction522cd0() {
 
 
 // 0x00522d00
-int TrackGameMode::UnknownFunction522d00() {
+int TrackGameMode::CreateDirectoryLists() {
 
-    UnknownFunction522e20(0, &field_0xa4c);
+    ChooseDisplayMode(0, &field_0xa4c);
     field_0x25e0 = new(__FILE__, 383) DirectoryList;
     field_0x25e4 = new(__FILE__, 384) CombinedDirectoryList;
     field_0x25e8 = new(__FILE__, 385) CombinedDirectoryList;
@@ -319,7 +319,7 @@ int TrackGameMode::UnknownFunction522d00() {
 }
 
 // 0x00522e20
-void TrackGameMode::UnknownFunction522e20(const void* guid, int* mode) {
+void TrackGameMode::ChooseDisplayMode(const void* guid, int* mode) {
     TrackGame* game = g_UnknownGlobal56e26c;
     int i;
 
@@ -392,7 +392,7 @@ void TrackGameMode::UnknownFunction523000() {
 }
 
 // 0x00523130: saves the profile's control file.
-void TrackGameMode::UnknownFunction523130() {
+void TrackGameMode::SaveControllerChoice() {
     unsigned long size;
     char controller[0x80];
     char path[0x104];
@@ -451,7 +451,7 @@ int TrackGameMode::UnknownFunction5231f0() {
     fread(&field_0x1bcc, 4, 1, file);
     fclose(file);
     field_0x27f8.field_0x35 = 0;
-    UnknownFunction522e20(&field_0x23a8, &field_0xa4c);
+    ChooseDisplayMode(&field_0x23a8, &field_0xa4c);
     g_UnknownGlobal56e26c->ui->field_0x48c = 1;
     UnknownFunction523000();
     if (g_UnknownGlobal56e26c->field_0x04) {
@@ -507,15 +507,15 @@ void TrackGameMode::UnknownFunction523580() {
     g_UnknownGlobal56e26c->UnknownVirtualSlot28("MRUProfile", field_0x00);
     if (g_UnknownGlobal56e26c->ui)
         g_UnknownGlobal56e26c->ui->field_0x48c = 1;
-    UnknownFunction523130();
+    SaveControllerChoice();
 }
 
 // 0x00523800
-int TrackGameMode::UnknownFunction523800() {
+int TrackGameMode::WaitForCd() {
     char text[0x80];
 
     SendMessageA(g_UnknownGlobal56e26c->field_0x31c, 0x112, 0xf020, 0);
-    while (!UnknownFunction523bf0()) {
+    while (!FindCdDirectory()) {
         if (LoadStringA(g_UnknownGlobal56e26c->field_0x420, 0x13b5, text, 0x80)) {
             ShowCursor(1);
             if (MessageBoxA(g_UnknownGlobal56e26c->field_0x31c, text, g_UnknownGlobal56e26c->field_0x3a0, 0x15) == 2) {
@@ -564,7 +564,7 @@ int TrackGameMode::UnknownFunction523bb0(short a, short b, char* name) {
 }
 
 // 0x00523bf0: looks for the "MCM2" CD.
-int TrackGameMode::UnknownFunction523bf0() {
+int TrackGameMode::FindCdDirectory() {
     int index;
 
     if (field_0x23cc != 2) {
@@ -581,7 +581,7 @@ int TrackGameMode::UnknownFunction523bf0() {
 }
 
 // 0x00523c90 (TrackGame slot 1)
-int TrackGameMode::UnknownFunction523c90() {
+int TrackGameMode::FindDataDirectory() {
     unsigned long size;
     char text[0x104];
 

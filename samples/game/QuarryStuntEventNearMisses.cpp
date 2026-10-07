@@ -89,9 +89,9 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
             int down = g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xd0, 0, 0x80, 0);
             int up = g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xc8, 0, 0x80, 0);
             if (up || down) {
-                unsigned int sun = field_0x80->UnknownFunction49dfd0();
-                unsigned int ambient = field_0x84->UnknownFunction49dfd0();
-                Fog* fog = field_0x88;
+                unsigned int sun = sunLight->UnknownFunction49dfd0();
+                unsigned int ambient = ambientLight->UnknownFunction49dfd0();
+                Fog* fog = eventFog;
                 float visibility;
                 float haziness;
                 unsigned int color;
@@ -230,35 +230,35 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
                 }
                 if (fog)
                     fog->UnknownFunction4627a0(color, visibility, haziness);
-                field_0x80->UnknownFunction49e020(sun);
-                field_0x84->UnknownFunction49e020(ambient);
-                if (field_0x48)
-                    field_0x48->UnknownFunction45a9a0();
+                sunLight->UnknownFunction49e020(sun);
+                ambientLight->UnknownFunction49e020(ambient);
+                if (ecoSystem)
+                    ecoSystem->UnknownFunction45a9a0();
             }
-            if (field_0x88) {
-                if (field_0x88->field_0x44 == 0x100)
+            if (eventFog) {
+                if (eventFog->field_0x44 == 0x100)
                     strcpy(atmosphere, "(Table Fog)");
-                else if (field_0x88->field_0x44 == 0x80)
+                else if (eventFog->field_0x44 == 0x80)
                     strcpy(atmosphere, "(Vertex Fog)");
-                else if (field_0x88->field_0x44 == 0x10000)
+                else if (eventFog->field_0x44 == 0x10000)
                     strcpy(atmosphere, "(Range Fog)");
             } else {
                 strcpy(atmosphere, "(No Fog)");
             }
             g_UnknownGlobal56e26c->field_0x38->UnknownFunction447fa0(s_DebugPage, "Atmosphere %s", atmosphere);
-            if (field_0x88) {
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Visibility %f", field_0x88->field_0x38);
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Haziness %f", field_0x88->field_0x40);
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Fog R      %d", (field_0x88->field_0x2c >> 16) & 0xff);
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Fog G      %d", (field_0x88->field_0x2c >> 8) & 0xff);
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Fog B      %d", field_0x88->field_0x2c & 0xff);
+            if (eventFog) {
+                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Visibility %f", eventFog->field_0x38);
+                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Haziness %f", eventFog->field_0x40);
+                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Fog R      %d", (eventFog->field_0x2c >> 16) & 0xff);
+                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Fog G      %d", (eventFog->field_0x2c >> 8) & 0xff);
+                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Fog B      %d", eventFog->field_0x2c & 0xff);
             }
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "SunLight R %d", (field_0x80->UnknownFunction49dfd0() >> 16) & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "SunLight G %d", (field_0x80->UnknownFunction49dfd0() >> 8) & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "SunLight B %d", field_0x80->UnknownFunction49dfd0() & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Ambient  R %d", (field_0x84->UnknownFunction49dfd0() >> 16) & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Ambient  G %d", (field_0x84->UnknownFunction49dfd0() >> 8) & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Ambient  B %d", field_0x84->UnknownFunction49dfd0() & 0xff);
+            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "SunLight R %d", (sunLight->UnknownFunction49dfd0() >> 16) & 0xff);
+            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "SunLight G %d", (sunLight->UnknownFunction49dfd0() >> 8) & 0xff);
+            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "SunLight B %d", sunLight->UnknownFunction49dfd0() & 0xff);
+            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Ambient  R %d", (ambientLight->UnknownFunction49dfd0() >> 16) & 0xff);
+            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Ambient  G %d", (ambientLight->UnknownFunction49dfd0() >> 8) & 0xff);
+            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Ambient  B %d", ambientLight->UnknownFunction49dfd0() & 0xff);
             g_UnknownGlobal56e26c->field_0x38->UnknownFunction448000(s_DebugPage, s_DebugRow + 1, 1);
         }
     }

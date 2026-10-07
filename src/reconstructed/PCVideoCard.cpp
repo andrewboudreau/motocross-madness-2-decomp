@@ -617,7 +617,7 @@ int UnknownFunction4caf70(PCRenderTarget* target, UnknownRect* area, PCTextureMa
         clear.right = viewport.x + viewport.width;
         clear.top = 0;
         clear.bottom = viewport.y + viewport.height;
-        failed |= target->field_0x50->UnknownMethod10(1, &clear, 2, 0, target->field_0x2c, 0) != 0; // Clear z
+        failed |= target->device->UnknownMethod10(1, &clear, 2, 0, target->field_0x2c, 0) != 0; // Clear z
         g_UnknownGlobal56e26c->UnknownVirtualSlot7();
         rendered->UnknownVirtualSlot19();
         target->UnknownVirtualSlot8(0x1b, 0, 0);

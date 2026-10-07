@@ -43,7 +43,7 @@ UnknownVcrFile::~UnknownVcrFile() {
 // Loads `path` into the first unused in-memory handle, naming it `name`
 // with mode "rb". The read loop ends inside the found path; a loop with the
 // tail after it compiles to a second epilogue (see docs/VCR.md).
-void UnknownVcrFile::UnknownFunction524b80(char* path, char* name) {
+void UnknownVcrFile::Load(char* path, char* name) {
     if (!memory) return;
     for (int i = 0; i < count; i++) {
         if (!entries[i].field_0x00 && !entries[i].size) {
@@ -75,7 +75,7 @@ void UnknownVcrFile::UnknownFunction524b80(char* path, char* name) {
 }
 
 // Writes the first in-memory handle whose mode starts with 'r' to `path`.
-void UnknownVcrFile::UnknownFunction524d00(char* path) {
+void UnknownVcrFile::Save(char* path) {
     if (memory) {
         for (int i = 0; i < count; i++) {
             FILE* file;
@@ -99,7 +99,7 @@ void UnknownVcrFile::UnknownFunction524d00(char* path) {
 // fopen-like: returns a handle index or -1. In memory mode an existing name
 // is reopened with the new mode ("w..." truncates it); otherwise the first
 // unused entry is claimed. Nothing in this file sets field_0x00.
-int UnknownVcrFile::UnknownFunction524dd0(char* name, char* mode) {
+int UnknownVcrFile::Open(char* name, char* mode) {
     int i;
     if (memory) {
         for (i = 0; i < count; i++) {
@@ -143,7 +143,7 @@ int UnknownVcrFile::UnknownFunction524dd0(char* name, char* mode) {
 }
 
 // fclose-like.
-void UnknownVcrFile::UnknownFunction525000(int handle) {
+void UnknownVcrFile::Close(int handle) {
     if (memory) {
         if (handle >= 0 && entries[handle].field_0x00) {
             entries[handle].field_0x00 = 0;
@@ -158,7 +158,7 @@ void UnknownVcrFile::UnknownFunction525000(int handle) {
 // fread-like: returns the bytes copied (size * count) in memory mode, or 0
 // at or past the end. VC6 turns the block-skipping loop into a division by
 // 0x19000 (the 0x51eb851f multiply in retail).
-int UnknownVcrFile::UnknownFunction525070(void* buffer, int size, int count, int handle) {
+int UnknownVcrFile::Read(void* buffer, int size, int count, int handle) {
     if (memory) {
         for (int i = 0; i < this->count; i++) {
             if (i == handle) {
@@ -195,7 +195,7 @@ int UnknownVcrFile::UnknownFunction525070(void* buffer, int size, int count, int
 }
 
 // fwrite-like: grows the block chain as needed and extends the size.
-int UnknownVcrFile::UnknownFunction5251f0(const void* buffer, int size, int count, int handle) {
+int UnknownVcrFile::Write(const void* buffer, int size, int count, int handle) {
     if (memory) {
         for (int i = 0; i < this->count; i++) {
             if (i == handle) {
@@ -238,7 +238,7 @@ int UnknownVcrFile::UnknownFunction5251f0(const void* buffer, int size, int coun
 
 // fseek-like. In memory mode `origin` is ignored and the new position is
 // returned (retail leaves `offset` in eax).
-int UnknownVcrFile::UnknownFunction5253d0(int handle, int offset, int origin) {
+int UnknownVcrFile::Seek(int handle, int offset, int origin) {
     if (memory) {
         for (int i = 0; i < count; i++) {
             if (i == handle) return entries[i].position = offset;
@@ -250,7 +250,7 @@ int UnknownVcrFile::UnknownFunction5253d0(int handle, int offset, int origin) {
 }
 
 // ftell-like.
-int UnknownVcrFile::UnknownFunction525440(int handle) {
+int UnknownVcrFile::Tell(int handle) {
     if (memory) {
         for (int i = 0; i < count; i++) {
             if (i == handle) return entries[i].position;
@@ -262,7 +262,7 @@ int UnknownVcrFile::UnknownFunction525440(int handle) {
 }
 
 // feof-like; VC6's feof is the `_flag & _IOEOF` macro.
-int UnknownVcrFile::UnknownFunction5254a0(int handle) {
+int UnknownVcrFile::IsEndOfFile(int handle) {
     if (memory) {
         for (int i = 0; i < count; i++) {
             if (i == handle) return entries[i].size <= entries[i].position;

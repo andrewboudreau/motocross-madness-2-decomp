@@ -4,6 +4,7 @@
 #include "Grid1.h"
 
 #include "DebugAlloc.h"
+#include "D3DConstants.h"
 
 // Row offsets into 16 x 16 and 17 x 17 grids: the first copy of the shared
 // header's tables (0x0056bfac and 0x0056bff0; Griddraw.cpp declares the same
@@ -44,7 +45,7 @@ GridNode* DrawableGridNodeSharedTextures::UnknownVirtualSlot2(UnknownTextureStre
 }
 
 // 0x0047ca00: eviction callback for the node-wide texture.
-int UnknownFunction47ca00(void* owner)
+int EvictNodeTexture(void* owner)
 {
     DrawableGridNodeSharedTextures* node = (DrawableGridNodeSharedTextures*)owner;
     node->Terrain()->RetireOwnedObject(node->Extra()->field_0x10);
@@ -55,7 +56,7 @@ int UnknownFunction47ca00(void* owner)
 }
 
 // 0x0047ca40: eviction callback for one block's texture.
-int UnknownFunction47ca40(void* owner, int block)
+int EvictBlockTexture(void* owner, int block)
 {
     DrawableGridNodeSharedTextures* node = (DrawableGridNodeSharedTextures*)owner;
     node->Terrain()->RetireOwnedObject(node->Extra()->blocks[block].texture);
@@ -129,10 +130,10 @@ void DrawableGridNodeSharedTextures::UnknownVirtualSlot6()
     if (Extra()->texture) {
         Extra()->texture->UnknownVirtualSlot19();
         if (Extra()->ageEntry.size)
-            Terrain()->field_0xc84->UnknownFunction401250(&Extra()->ageEntry);
+            Terrain()->textureAgeManager->UnknownFunction401250(&Extra()->ageEntry);
     } else {
-        Terrain()->field_0x18->UnknownVirtualSlot7(0, 1, 1);
-        Terrain()->field_0x18->UnknownVirtualSlot7(0, 4, 1);
+        Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        Terrain()->renderer->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     }
 }
 

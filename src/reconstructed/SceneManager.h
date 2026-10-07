@@ -80,46 +80,48 @@ public:
     unsigned char field_0x198[0x22c - 0x198];
 };
 
-// 0x44-byte element of UnknownSceneTable::field_0x04. The flag byte at +0
-// is read and written as single bits (0x004ea880 tests bit 3, 0x004eafd0
-// sets bit 2).
+// 0x44-byte element of UnknownSceneTable::field_0x04 (an "Animation<n>"
+// section). The flag byte at +0 is read and written as single bits
+// (0x004ea880 tests bit 3, 0x004eafd0 sets bit 2). BikeRace.cpp reads
+// +0x04, +0x08 and +0x2c under their provisional names.
 struct UnknownSceneEntry {
     unsigned char field_0x00_bit0 : 1;
     unsigned char field_0x00_bit1 : 1;
     unsigned char field_0x00_bit2 : 1;
-    unsigned char field_0x00_bit3 : 1;
+    unsigned char field_0x00_bit3 : 1;    // key-framed character (else a procedural car)
     unsigned char field_0x00_bit4 : 1;              // skipped by bikerace.cpp's camera (0x0041f1d0)
     unsigned char field_0x00_bit5 : 1;              // cleared by 0x004edfe0
     unsigned char field_0x01[3];
     UnknownSceneObject* field_0x04;       // key-framed (bit 3)
     UnknownSceneAnimatedObject* field_0x08; // procedural
-    Vector3 field_0x0c;                   // "Position" (or "Offset")
+    Vector3 position;                     // "Position" (or "Offset")
     int field_0x18;                       // 0x004eb040: the motion advance result
-    int field_0x1c;                       // "NumberOfMotions" (1 for procedural entries)
-    void** field_0x20;                    // motions
-    char field_0x24;                      // current motion index
-    signed char field_0x25;               // field_0x28 count ("NumberInSequence")
-    signed char field_0x26;               // index into field_0x28
+    int motionCount;                      // "NumberOfMotions" (1 for procedural entries)
+    void** motions;
+    char currentMotion;                   // index into motions
+    signed char sequenceLength;           // motionSequence count ("NumberInSequence")
+    signed char sequenceIndex;            // index into motionSequence
     unsigned char field_0x27;
-    char* field_0x28;                     // motion numbers (1-based, "MotionSequence")
+    char* motionSequence;                 // motion numbers (1-based, "MotionSequence")
     char field_0x2c[0x18];                // the MCF or SLT file name, at most 0x14 characters
 };
 
-// 0x10-byte element of UnknownSceneTable::field_0x0c.
+// 0x10-byte element of UnknownSceneTable::randomSets (a "RandomSet<n>"
+// section).
 struct UnknownSceneEntry2 {
-    signed char field_0x00;
+    signed char count;                    // "NumberInSequence"
     unsigned char field_0x01[3];
-    UnknownSceneEntry* field_0x04;        // 0x004eff30 reads it as an entry
-    signed char* field_0x08;              // animation indices ("RandomSet" a.m pairs)
-    signed char* field_0x0c;              // motion indices
+    UnknownSceneEntry* entry;             // 0x004eff30 reads it as an entry
+    signed char* animationIndices;        // the a of each "a.m" pair
+    signed char* motionIndices;           // the m of each pair
 };
 
 // Owned by Scene+0xb4; freed with its arrays by the destructor.
 struct UnknownSceneTable {
-    int field_0x00;                       // entry count
+    int field_0x00;                       // entry count ("NumberOfAnimations")
     UnknownSceneEntry* field_0x04;
-    int field_0x08;                       // entry2 count
-    UnknownSceneEntry2* field_0x0c;
+    int randomSetCount;
+    UnknownSceneEntry2* randomSets;
 };
 
 class ShadowCaster;
@@ -164,7 +166,7 @@ public:
 // known; its extent is provisional.
 struct UnknownSceneTextureInfo {
     unsigned char field_0x00[0x2c];
-    char field_0x2c[0x40];
+    char textureName[0x40];
 };
 
 // 0x8c-byte element of Scene::field_0xac, filled by 0x004eb570 from the
@@ -270,18 +272,19 @@ public:
     void UnknownFunction4eb000(float time);
     int UnknownFunction4eb040(int index, float time, int force, int motion);
     // 0x004eb160/0x004eb300/0x004eb480: read "x,y,z", "r,g,b" and a Y/T/1
-    // flag list from `block` (default: field_0xdc). Parameter names provisional.
-    int UnknownFunction4eb160(Vector3* out, const char* section, const char* key,
+    // flag list from `block` (default: the scene file, parameters). Parameter names provisional.
+    int ReadVector(Vector3* out, const char* section, const char* key,
                               const char* def, int useDefault, UnknownParameterBlock* block);
-    int UnknownFunction4eb300(unsigned long* out, const char* section, const char* key,
+    int ReadColor(unsigned long* out, const char* section, const char* key,
                               const char* def, int unused, UnknownParameterBlock* block);
-    int UnknownFunction4eb480(char* out, int count, const char* section, const char* key,
+    int ReadFlags(char* out, int count, const char* section, const char* key,
                               const char* def, int unused, UnknownParameterBlock* block);
-    int UnknownFunction4ebdb0();                     // reads the "Fog" section
-    int UnknownFunction4eca20();                     // opens the "ResourceFiles" archives
+    int ReadFog();                        // 0x004ebdb0: the "Fog" section
+    int OpenResourceFiles();              // 0x004eca20: opens the "ResourceFiles" archives
     void UnknownFunction4edf20(ProjectedShadow* shadow, int flags); // shadows for the casters
-    void UnknownFunction4ecc10();                    // reads the "Stadium" section
-    void UnknownFunction4ef9c0(const char* section, char* file, int is3D,
+    void ReadStadium();                   // 0x004ecc10: the "Stadium" section
+    // 0x004ef9c0: one sound emitter's settings from `section`.
+    void ReadSoundSettings(const char* section, char* file, int is3D,
                                UnknownSound3DParameters* params, unsigned long* flags,
                                float* oneShotDistance, float* randomTriggerPercent,
                                int* oneShot, int* force2D);
@@ -304,56 +307,57 @@ public:
     // physics object, collision points and particle emitters or its
     // collision object, and its sound emitter. `progress` is called every
     // `interval` models.
-    int UnknownFunction4ecd60(LightManager* lights, int a2, int a3, int a4, void (*progress)(int),
+    int ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (*progress)(int),
                               int interval);           // near miss (samples/track)
     // 0x004edfe0: reads "Animations": a key-framed character or a procedural
     // car per "Animation<n>", with its motions and sound emitter, then the
     // "RandomSet<n>" sections.
-    int UnknownFunction4edfe0(LightManager* lights, int a3, int a4, void (*progress)(int),
+    int ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)(int),
                               int interval);           // near miss (samples/track)
-    int UnknownFunction4ef4c0();                     // 0x004ef4c0: reads the "Sounds" section
-    int UnknownFunction4ebfc0(const char* directory, const char* cubeDirectory); // "Environment"
-    int UnknownFunction4eb570(int index);            // reads "Light<index + 1>"
+    int ReadSounds();                                // 0x004ef4c0: reads the "Sounds" section
+    int ReadEnvironment(const char* directory, const char* cubeDirectory); // 0x004ebfc0: "Environment"
+    int ReadLight(int index);             // 0x004eb570: reads "Light<index + 1>"
     // 0x00464e80 is likewise a shared empty `ret 4` body (FollowCamera slot 52
     // among others), called directly with the formatted "Cannot find data" text.
     void UnknownFunction464e80(const char* message);
-    int UnknownFunction4f0d20(int* count);           // loads the scene file
+    int CountObjects(int* count);         // 0x004f0d20: loads the scene file, counts its objects
     int UnknownFunction4f0ec0(char* path);           // model path -> its SLT file
     // 0x004f1130: counts the textures of the scene's models and animations
     // by width (0x004f0390) and reads the terrain width, whether a cube file
     // is set and the ecosystem file path, without building anything.
-    int UnknownFunction4f1130(unsigned long* counts, float* width, int* hasCube, char* ecosystem);
+    int CountTextures(unsigned long* counts, float* width, int* hasCube, char* ecosystem);
 
-    UnknownTrackGameObject574* field_0x2c;
-    char field_0x30[0x40];
-    Vector3 field_0x70;
-    Vector3 field_0x7c;
+    UnknownTrackGameObject574* sceneManager; // the owner 0x004ea7e0 stores
+    char sceneName[0x40];                 // "SceneInfo" "SceneName"
+    Vector3 field_0x70;                   // "SceneInfo" "DefaultStartPosition"
+    Vector3 field_0x7c;                   // "SceneInfo" "DefaultStartDirection"
     char field_0x88;
     unsigned char field_0x89[3];
-    Vector3 field_0x8c;                              // "PodiumPosition"
-    Vector3 field_0x98;                              // "PodiumDirection"
-    UnknownSceneEnvironment* field_0xa4;
-    int field_0xa8;
-    UnknownSceneLight* field_0xac;
-    UnknownSceneFog* field_0xb0;
-    UnknownSceneTable* field_0xb4;
-    UnknownSceneBuffer* field_0xb8;
-    int field_0xbc;
-    int field_0xc0;
-    SoundGroup* field_0xc4;
-    ContainerList<Sound*> field_0xc8;
-    UnknownParameterBlock field_0xdc;
-    unsigned char field_0x6a0_bit0 : 1;              // "Stadium" section present
+    Vector3 podiumPosition;                          // "PodiumPosition"
+    Vector3 podiumDirection;                         // "PodiumDirection"
+    // QuarryStuntEvent.cpp reads +0xa4..+0xbc under their provisional names.
+    UnknownSceneEnvironment* field_0xa4;  // "Environment" section
+    int field_0xa8;                       // light count ("Lights" "NumberOfLights")
+    UnknownSceneLight* field_0xac;        // "Light<n>" sections
+    UnknownSceneFog* field_0xb0;          // "Fog" section
+    UnknownSceneTable* field_0xb4;        // "Animations" section (BikeRace.cpp reads it)
+    UnknownSceneBuffer* field_0xb8;       // "StaticModels" section
+    int field_0xbc;                       // "Sounds" "CrowdPresent"
+    int auralScape;                       // the AuralScape the sound emitters use
+    SoundGroup* soundGroup;
+    ContainerList<Sound*> sounds;
+    UnknownParameterBlock parameters;     // the scene file
+    unsigned char hasStadium : 1;                    // "Stadium" section present
     unsigned char field_0x6a1[3];
-    float field_0x6a4;                               // Stadium "Top"
-    float field_0x6a8;                               // Stadium "Bottom"
-    float field_0x6ac;                               // Stadium "Scale"
-    Vector3 field_0x6b0;                             // Stadium "Position"
-    char field_0x6bc[0x100];
-    int field_0x7bc;                                 // toggled by slot 22
+    float stadiumTop;                                // Stadium "Top"
+    float stadiumBottom;                             // Stadium "Bottom"
+    float stadiumScale;                              // Stadium "Scale"
+    Vector3 stadiumPosition;                         // Stadium "Position"
+    char stadiumFile[0x100];              // Stadium "FileName"
+    int visible;                          // slot 14 draws only while set; control 5 toggles it
     int field_0x7c0;
-    FILE* field_0x7c4;
-    char field_0x7c8[0x104];
+    FILE* logFile;                        // "scnmgr.log"
+    char scenePath[0x104];
 };
 
 // The detail-level table 0x004eff30 selects by Game+0x2d0 (declared alike
@@ -362,11 +366,12 @@ extern unsigned char* g_UnknownGlobal689f18;
 extern unsigned char g_UnknownGlobal5744c8[];
 extern unsigned char g_UnknownGlobal574428[];
 
-int UnknownFunction4f0310(UnknownResourceManager* manager, const char* name, const char* path);
+// 0x004f0310: registers texture `name` with `manager` (see the definition).
+int AddResource(UnknownResourceManager* manager, const char* name, const char* path);
 // 0x004f0390: counts the textures of the model file `path` into counts[0..3]
 // (0x004f00e0), loading them through `resources`; not reconstructed.
-int UnknownFunction4f0390(const char* path, UnknownSceneResourceManager* resources, unsigned long* counts);
-int UnknownFunction4e9980(int* out, const char* name, const UnknownSceneKeyword* table);
+int CountModelTextures(const char* path, UnknownSceneResourceManager* resources, unsigned long* counts);
+int FindKeyword(int* out, const char* name, const UnknownSceneKeyword* table); // 0x004e9980
 // 0x004f00e0: counts the texture by width (256, 128, 64 or 32) in counts[0..3];
 // "PROCEDURAL" textures count as 64.
-int UnknownFunction4f00e0(UnknownSceneTextureInfo* texture, int* counts);
+int CountTexture(UnknownSceneTextureInfo* texture, int* counts);

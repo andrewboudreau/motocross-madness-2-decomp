@@ -4,6 +4,7 @@
 
 #include "SoultreeMaterial.h"
 #include "DebugAlloc.h"
+#include "D3DConstants.h"
 
 // 0x00574060..0x00574068: the colour key used when the render target can key
 // its own format (initialised data of this TU).
@@ -18,36 +19,36 @@ int g_UnknownInt689ed0;
 SoultreeMaterial::SoultreeMaterial(int flags)
     : GameObject(flags)
 {
-    strcpy(field_0x2c, "");
-    field_0xa4 = 1;
-    field_0x6c = 0;
-    field_0x2c[0] = 0;
-    field_0x9c = 0;
-    field_0xa8 = 0;
-    field_0xac = 0;
-    field_0xb0 = 0;
+    strcpy(textureName, "");
+    mipMapped = 1;
+    textureManager = 0;
+    textureName[0] = 0;
+    hasTextureName = 0;
+    hasColorKey = 0;
+    hasSourceBlend = 0;
+    hasDestBlend = 0;
     field_0x70 = 0;
-    field_0xc8 = 0;
-    field_0xbc = 0;
+    mappingType = 0;
+    hasAlpha = 0;
     field_0xcc = 0;
-    field_0xc4 = 0.0f;
-    field_0xa0 = 0;
-    field_0xb4 = 0;
-    field_0xc0 = 1.0f;
+    textureSpeed = 0.0f;
+    useVertexColor = 0;
+    clampTexture = 0;
+    materialAlpha = 1.0f;
     field_0xb8 = 1;
 }
 
 // 0x004ff0b0: returns this, like GameObject slot 8.
-SoultreeMaterial* SoultreeMaterial::UnknownFunction4ff0b0(RenderTarget* target, const SoultreeTextureOptions* options,
+SoultreeMaterial* SoultreeMaterial::Attach(RenderTarget* target, const SoultreeTextureOptions* options,
                                              TextureMapManager* manager, int format)
 {
     GameObject::UnknownVirtualSlot8(target);
-    strcpy(field_0x2c, "");
-    field_0x6c = manager;
+    strcpy(textureName, "");
+    textureManager = manager;
     field_0x18 = target;
     field_0x70 = 0;
     field_0x74 = *options;
-    field_0x8c = format;
+    textureFormat = format;
     return this;
 }
 
@@ -61,47 +62,47 @@ SoultreeMaterial::~SoultreeMaterial()
 }
 
 // 0x004ff410
-void SoultreeMaterial::UnknownFunction4ff410()
+void SoultreeMaterial::RestoreRenderStates()
 {
-    if (field_0xc8 == 8)
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x80, 0, 0);
-    if (field_0xb4)
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 0xc, g_UnknownInt689ed0);
+    if (mappingType == 8)
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_WRAP0, 0, 0);
+    if (clampTexture)
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, g_UnknownInt689ed0);
 }
 
 // 0x004ff450
-void SoultreeMaterial::UnknownFunction4ff450(UnknownParameterStream* stream)
+void SoultreeMaterial::ReadSaved(UnknownParameterStream* stream)
 {
-    stream->UnknownFunction461640(field_0x2c, 0x40, 1);
-    stream->UnknownFunction461640(&field_0x8c, 4, 1);
-    stream->UnknownFunction461640(&field_0x90, 4, 1);
-    stream->UnknownFunction461640(&field_0x94, 4, 1);
-    stream->UnknownFunction461640(&field_0x98, 4, 1);
-    stream->UnknownFunction461640(&field_0x9c, 4, 1);
-    stream->UnknownFunction461640(&field_0xa0, 4, 1);
-    stream->UnknownFunction461640(&field_0xa4, 4, 1);
-    stream->UnknownFunction461640(&field_0xa8, 4, 1);
-    stream->UnknownFunction461640(&field_0xac, 4, 1);
-    stream->UnknownFunction461640(&field_0xb0, 4, 1);
+    stream->UnknownFunction461640(textureName, 0x40, 1);
+    stream->UnknownFunction461640(&textureFormat, 4, 1);
+    stream->UnknownFunction461640(&colorKey, 4, 1);
+    stream->UnknownFunction461640(&sourceBlend, 4, 1);
+    stream->UnknownFunction461640(&destBlend, 4, 1);
+    stream->UnknownFunction461640(&hasTextureName, 4, 1);
+    stream->UnknownFunction461640(&useVertexColor, 4, 1);
+    stream->UnknownFunction461640(&mipMapped, 4, 1);
+    stream->UnknownFunction461640(&hasColorKey, 4, 1);
+    stream->UnknownFunction461640(&hasSourceBlend, 4, 1);
+    stream->UnknownFunction461640(&hasDestBlend, 4, 1);
     stream->UnknownFunction461640(&field_0xb8, 4, 1);
-    stream->UnknownFunction461640(&field_0xb4, 4, 1);
-    stream->UnknownFunction461640(&field_0xbc, 4, 1);
-    stream->UnknownFunction461640(&field_0xc0, 4, 1);
-    stream->UnknownFunction461640(&field_0xc4, 4, 1);
-    stream->UnknownFunction461640(&field_0xc8, 2, 1);
+    stream->UnknownFunction461640(&clampTexture, 4, 1);
+    stream->UnknownFunction461640(&hasAlpha, 4, 1);
+    stream->UnknownFunction461640(&materialAlpha, 4, 1);
+    stream->UnknownFunction461640(&textureSpeed, 4, 1);
+    stream->UnknownFunction461640(&mappingType, 2, 1);
     stream->UnknownFunction461640(&field_0xcc, 4, 1);
     int position = stream->UnknownFunction461600();
     char mode = stream->UnknownFunction43e9e0();
-    if (!_stricmp(field_0x2c, "PROCEDURAL"))
-        field_0x74.field_0x04 = field_0x74.field_0x08 = 0;
-    if (field_0x9c)
-        UnknownFunction4ff620();
+    if (!_stricmp(textureName, "PROCEDURAL"))
+        field_0x74.opaqueTextures = field_0x74.alphaTextures = 0;
+    if (hasTextureName)
+        LoadTexture();
     stream->UnknownFunction461340(position, 0, 0);
     stream->UnknownFunction43e9b0(mode);
 }
 
 // 0x004ff620
-void SoultreeMaterial::UnknownFunction4ff620()
+void SoultreeMaterial::LoadTexture()
 {
     if (!field_0x70)
         field_0x70 = new(__FILE__, 0x118) SurfaceMap(0, 0);
@@ -109,225 +110,225 @@ void SoultreeMaterial::UnknownFunction4ff620()
         field_0x70->texture->Release();
         field_0x70->texture = 0;
     }
-    int format = field_0x8c;
-    if (field_0xa8) {
+    int format = textureFormat;
+    if (hasColorKey) {
         PCRenderTarget* target = (PCRenderTarget*)field_0x18;
-        if ((target->field_0x1c0 & 8) && field_0x74.field_0x04) {
+        if ((target->triTextureCaps & 8) && field_0x74.opaqueTextures) {
             format = target->field_0x28;
-            field_0x90 = (g_UnknownInt574060 << 8 | g_UnknownInt574064) << 8 | g_UnknownInt574068;
+            colorKey = (g_UnknownInt574060 << 8 | g_UnknownInt574064) << 8 | g_UnknownInt574068;
         } else {
-            format = 0x613;
+            format = 1555;
         }
     }
-    if (format == 0x613) {
-        field_0x74.field_0x0c = 0x613;
-        field_0x74.field_0x04 = 0;
-        field_0x74.field_0x08 = 0;
+    if (format == 1555) {
+        field_0x74.format = 1555;
+        field_0x74.opaqueTextures = 0;
+        field_0x74.alphaTextures = 0;
     }
     int procedural = 0;
-    if (!_stricmp(field_0x2c, "PROCEDURAL"))
+    if (!_stricmp(textureName, "PROCEDURAL"))
         procedural = 1;
     int alpha = UnknownFunction511ad0(format);
     TextureMap* texture;
     if (procedural) {
-        if (field_0x74.field_0x04 && field_0x74.field_0x08) {
-            texture = new(__FILE__, 0x165) ManagedTexture(field_0x74.field_0x00);
-            texture->UnknownVirtualSlot4(0, 0x40, 0x40, 0x40, 1, 0, format, 0, field_0xa4 ? 2 : 0, 0, 0, 0,
-                                         field_0xac ? field_0x94 : 5, field_0xb0 ? field_0x98 : 6, 0,
+        if (field_0x74.opaqueTextures && field_0x74.alphaTextures) {
+            texture = new(__FILE__, 0x165) ManagedTexture(field_0x74.textureManager);
+            texture->UnknownVirtualSlot4(0, 0x40, 0x40, 0x40, 1, 0, format, 0, mipMapped ? 2 : 0, 0, 0, 0,
+                                         hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6, 0,
                                          0x80, 0xff00ff);
             if (alpha) {
-                if (field_0x74.field_0x08)
-                    field_0x74.field_0x08->UnknownFunction50c6c0((ManagedTexture*)texture);
-            } else if (field_0x74.field_0x04) {
-                field_0x74.field_0x04->UnknownFunction50c6c0((ManagedTexture*)texture);
+                if (field_0x74.alphaTextures)
+                    field_0x74.alphaTextures->UnknownFunction50c6c0((ManagedTexture*)texture);
+            } else if (field_0x74.opaqueTextures) {
+                field_0x74.opaqueTextures->UnknownFunction50c6c0((ManagedTexture*)texture);
             }
         } else {
-            texture = new(__FILE__, 0x17a) PCTextureMap(field_0x74.field_0x00, 1);
-            texture->UnknownVirtualSlot4(0, 0x40, 0x40, 0x40, 1, 0, format, 0, field_0xa4 ? 2 : 0, 0, 0, 0,
-                                         field_0xac ? field_0x94 : 5, field_0xb0 ? field_0x98 : 6, 0,
+            texture = new(__FILE__, 0x17a) PCTextureMap(field_0x74.textureManager, 1);
+            texture->UnknownVirtualSlot4(0, 0x40, 0x40, 0x40, 1, 0, format, 0, mipMapped ? 2 : 0, 0, 0, 0,
+                                         hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6, 0,
                                          0x80, 0xff00ff);
         }
     } else {
-        texture = UnknownFunction50a590(field_0x6c, field_0x2c, format, 0, field_0xa4 ? 2 : 0,
-                                        field_0xac ? field_0x94 : 5, field_0xb0 ? field_0x98 : 6,
+        texture = UnknownFunction50a590(textureManager, textureName, format, 0, mipMapped ? 2 : 0,
+                                        hasSourceBlend ? sourceBlend : 5, hasDestBlend ? destBlend : 6,
                                         &field_0x74, 0x80, 0xff00ff, 1, 1);
     }
     if (!texture) {
         char message[256];
-        sprintf(message, "TextureMap %s Not loaded, please check resources and current directory\n", field_0x2c);
+        sprintf(message, "TextureMap %s Not loaded, please check resources and current directory\n", textureName);
     }
     field_0x70->SetTexture(texture);
     if (texture) {
         texture->Release();
         if (!field_0x70->texture->UnknownVirtualSlot7() && field_0x70->texture->GetRefCount() == 1) {
-            if (field_0xa8)
-                field_0x70->texture->UnknownVirtualSlot18(field_0x90);
+            if (hasColorKey)
+                field_0x70->texture->UnknownVirtualSlot18(colorKey);
             field_0x70->texture->UnknownVirtualSlot8(1, 0, 0);
         }
     }
 }
 
 // 0x004ff9e0
-void SoultreeMaterial::UnknownFunction4ff9e0(UnknownParameterBlock* block, int load)
+void SoultreeMaterial::ReadKeys(UnknownParameterBlock* block, int load)
 {
     char value[128];
-    field_0x2c[0] = 0;
-    field_0xa4 = 1;
-    field_0x9c = 0;
-    field_0xa8 = 0;
-    field_0xac = 0;
-    field_0xb0 = 0;
+    textureName[0] = 0;
+    mipMapped = 1;
+    hasTextureName = 0;
+    hasColorKey = 0;
+    hasSourceBlend = 0;
+    hasDestBlend = 0;
     field_0x70 = 0;
-    field_0xc8 = 0;
-    field_0xbc = 0;
+    mappingType = 0;
+    hasAlpha = 0;
     field_0xcc = 0;
-    field_0xc4 = 0.0f;
-    field_0xa0 = 0;
-    field_0xc0 = 1.0f;
-    if (block->UnknownFunction4b7b30("TextureMap", field_0x2c, -1))
-        field_0x9c = 1;
-    int managed = field_0x74.field_0x04 || (field_0x74.field_0x08 && field_0x9c);
-    block->UnknownFunction4b7cf0("TextureFormat", &field_0x8c);
-    block->UnknownFunction4b7cf0("UseVertexColor", &field_0xa0);
-    block->UnknownFunction4b7cf0("MipMapped", &field_0xa4);
+    textureSpeed = 0.0f;
+    useVertexColor = 0;
+    materialAlpha = 1.0f;
+    if (block->UnknownFunction4b7b30("TextureMap", textureName, -1))
+        hasTextureName = 1;
+    int managed = field_0x74.opaqueTextures || (field_0x74.alphaTextures && hasTextureName);
+    block->UnknownFunction4b7cf0("TextureFormat", &textureFormat);
+    block->UnknownFunction4b7cf0("UseVertexColor", &useVertexColor);
+    block->UnknownFunction4b7cf0("MipMapped", &mipMapped);
     block->UnknownFunction4b7cf0("ManagedTexture", &managed);
-    block->UnknownFunction4b7f10("ClampTexture", 0, &field_0xb4);
+    block->UnknownFunction4b7f10("ClampTexture", 0, &clampTexture);
     if (block->UnknownFunction4b7b30("MappingType", value, -1)) {
         if (!_stricmp(value, "STANDARD"))
-            field_0xc8 = 0;
+            mappingType = 0;
         if (!_stricmp(value, "FIRE"))
-            field_0xc8 = 1;
+            mappingType = 1;
         if (!_stricmp(value, "CHROME"))
-            field_0xc8 = 2;
+            mappingType = 2;
         if (!_stricmp(value, "LIGHT"))
-            field_0xc8 = 3;
+            mappingType = 3;
         if (!_stricmp(value, "CEL"))
-            field_0xc8 = 4;
+            mappingType = 4;
         if (!_stricmp(value, "WATERREFLECTION"))
-            field_0xc8 = 5;
+            mappingType = 5;
         if (!_stricmp(value, "SPECULAR"))
-            field_0xc8 = 6;
+            mappingType = 6;
         if (!_stricmp(value, "PROJECTION"))
-            field_0xc8 = 7;
+            mappingType = 7;
         if (!_stricmp(value, "ENVIRONMENT"))
-            field_0xc8 = 8;
+            mappingType = 8;
         if (!_stricmp(value, "NONE"))
-            field_0xc8 = 9;
+            mappingType = 9;
     }
     if (!managed) {
-        field_0x74.field_0x04 = 0;
-        field_0x74.field_0x08 = 0;
+        field_0x74.opaqueTextures = 0;
+        field_0x74.alphaTextures = 0;
     }
     if (block->UnknownFunction4b7b30("ColorKey", value, -1)) {
-        field_0xa8 = 1;
+        hasColorKey = 1;
         UnknownTokenizer tokens(value);
         int red = atoi(tokens.UnknownFunction515df0(","));
         int green = atoi(tokens.UnknownFunction515df0(","));
         int blue = atoi(tokens.UnknownFunction515df0("\n"));
-        field_0x90 = (red << 8 | green) << 8 | blue;
+        colorKey = (red << 8 | green) << 8 | blue;
     }
-    if (block->UnknownFunction4b7e70("Alpha", &field_0xc0))
-        field_0xbc = 1;
-    block->UnknownFunction4b7e70("TextureSpeed", &field_0xc4);
+    if (block->UnknownFunction4b7e70("Alpha", &materialAlpha))
+        hasAlpha = 1;
+    block->UnknownFunction4b7e70("TextureSpeed", &textureSpeed);
     if (block->UnknownFunction4b7b30("SourceBlend", value, -1)) {
-        field_0xac = 1;
+        hasSourceBlend = 1;
         if (!_stricmp(value, "ZERO"))
-            field_0x94 = 1;
+            sourceBlend = 1;
         if (!_stricmp(value, "ONE"))
-            field_0x94 = 2;
+            sourceBlend = 2;
         if (!_stricmp(value, "SRCCOLOR"))
-            field_0x94 = 3;
+            sourceBlend = 3;
         if (!_stricmp(value, "INVSRCCOLOR"))
-            field_0x94 = 4;
+            sourceBlend = 4;
         if (!_stricmp(value, "SRCALPHA"))
-            field_0x94 = 5;
+            sourceBlend = 5;
         if (!_stricmp(value, "INVSRCALPHA"))
-            field_0x94 = 6;
+            sourceBlend = 6;
         if (!_stricmp(value, "DESTALPHA"))
-            field_0x94 = 7;
+            sourceBlend = 7;
         if (!_stricmp(value, "INVDESTALPHA"))
-            field_0x94 = 8;
+            sourceBlend = 8;
         if (!_stricmp(value, "DESTCOLOR"))
-            field_0x94 = 9;
+            sourceBlend = 9;
         if (!_stricmp(value, "INVDESTCOLOR"))
-            field_0x94 = 10;
+            sourceBlend = 10;
         if (!_stricmp(value, "SRCALPHASAT"))
-            field_0x94 = 11;
+            sourceBlend = 11;
         if (!_stricmp(value, "BOTHSRCALPHA"))
-            field_0x94 = 12;
+            sourceBlend = 12;
         if (!_stricmp(value, "BOTHINVSRCALPHA"))
-            field_0x94 = 13;
+            sourceBlend = 13;
     }
     if (block->UnknownFunction4b7b30("DestBlend", value, -1)) {
-        field_0xb0 = 1;
+        hasDestBlend = 1;
         if (!_stricmp(value, "ZERO"))
-            field_0x98 = 1;
+            destBlend = 1;
         if (!_stricmp(value, "ONE"))
-            field_0x98 = 2;
+            destBlend = 2;
         if (!_stricmp(value, "SRCCOLOR"))
-            field_0x98 = 3;
+            destBlend = 3;
         if (!_stricmp(value, "INVSRCCOLOR"))
-            field_0x98 = 4;
+            destBlend = 4;
         if (!_stricmp(value, "SRCALPHA"))
-            field_0x98 = 5;
+            destBlend = 5;
         if (!_stricmp(value, "INVSRCALPHA"))
-            field_0x98 = 6;
+            destBlend = 6;
         if (!_stricmp(value, "DESTALPHA"))
-            field_0x98 = 7;
+            destBlend = 7;
         if (!_stricmp(value, "INVDESTALPHA"))
-            field_0x98 = 8;
+            destBlend = 8;
         if (!_stricmp(value, "DESTCOLOR"))
-            field_0x98 = 9;
+            destBlend = 9;
         if (!_stricmp(value, "INVDESTCOLOR"))
-            field_0x98 = 10;
+            destBlend = 10;
         if (!_stricmp(value, "SRCALPHASAT"))
-            field_0x98 = 11;
+            destBlend = 11;
         if (!_stricmp(value, "BOTHSRCALPHA"))
-            field_0x98 = 12;
+            destBlend = 12;
         if (!_stricmp(value, "BOTHINVSRCALPHA"))
-            field_0x98 = 13;
+            destBlend = 13;
     }
-    if (field_0x9c && load)
-        UnknownFunction4ff620();
+    if (hasTextureName && load)
+        LoadTexture();
 }
 
 // 0x005000b0
-void SoultreeMaterial::UnknownFunction5000b0()
+void SoultreeMaterial::MakeUntextured()
 {
-    field_0xc8 = 9;
-    field_0x2c[0] = 0;
-    field_0x9c = 0;
-    field_0xa8 = 0;
-    field_0xa4 = 0;
-    field_0xac = 0;
-    field_0xb0 = 0;
+    mappingType = 9;
+    textureName[0] = 0;
+    hasTextureName = 0;
+    hasColorKey = 0;
+    mipMapped = 0;
+    hasSourceBlend = 0;
+    hasDestBlend = 0;
     field_0x70 = 0;
-    field_0xbc = 0;
+    hasAlpha = 0;
 }
 
 // 0x005000f0
-void SoultreeMaterial::UnknownFunction5000f0(const SoultreeMaterial* other)
+void SoultreeMaterial::CopyFrom(const SoultreeMaterial* other)
 {
-    strcpy(field_0x2c, other->field_0x2c);
+    strcpy(textureName, other->textureName);
     field_0x74 = other->field_0x74;
-    field_0x8c = other->field_0x8c;
-    field_0x90 = other->field_0x90;
-    field_0x94 = other->field_0x94;
-    field_0x98 = other->field_0x98;
-    field_0x9c = other->field_0x9c;
-    field_0xa0 = other->field_0xa0;
-    field_0xa4 = other->field_0xa4;
-    field_0xa8 = other->field_0xa8;
-    field_0xac = other->field_0xac;
-    field_0xb0 = other->field_0xb0;
-    field_0xbc = other->field_0xbc;
-    field_0xc0 = other->field_0xc0;
-    field_0xc4 = other->field_0xc4;
-    field_0xc8 = other->field_0xc8;
+    textureFormat = other->textureFormat;
+    colorKey = other->colorKey;
+    sourceBlend = other->sourceBlend;
+    destBlend = other->destBlend;
+    hasTextureName = other->hasTextureName;
+    useVertexColor = other->useVertexColor;
+    mipMapped = other->mipMapped;
+    hasColorKey = other->hasColorKey;
+    hasSourceBlend = other->hasSourceBlend;
+    hasDestBlend = other->hasDestBlend;
+    hasAlpha = other->hasAlpha;
+    materialAlpha = other->materialAlpha;
+    textureSpeed = other->textureSpeed;
+    mappingType = other->mappingType;
     field_0xcc = other->field_0xcc;
     field_0xb8 = other->field_0xb8;
-    field_0xb4 = other->field_0xb4;
+    clampTexture = other->clampTexture;
     field_0x70 = 0;
-    if (field_0x9c)
-        UnknownFunction4ff620();
+    if (hasTextureName)
+        LoadTexture();
 }

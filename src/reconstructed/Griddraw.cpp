@@ -8,6 +8,7 @@
 
 #include "DebugAlloc.h"
 #include "TextureMap.h"
+#include "D3DConstants.h"
 
 // Per-TU vector constants (tier 2, the shape documented in docs/LZW.md):
 // four dynamic initializers (0x004807c0..0x004808fb, listed first in this
@@ -240,7 +241,7 @@ void DrawableGridNode::UnknownFunction47edb0(int recurse)
     data->field_0x128 = 0xffff;
     data->field_0x124 = 0xffff;
     if (data->ageEntry.size) {
-        terrain->field_0xc88->UnknownFunction4010d0(&data->ageEntry);
+        terrain->ageManager->UnknownFunction4010d0(&data->ageEntry);
         data->ageEntry.size = 0;
     }
 }
@@ -307,7 +308,7 @@ int DrawableGridNode::UnknownFunction47ef80(int x, int z, int size, int quad)
         }
         data->b1 = 0;
         if (data->b2)
-            terrain->field_0xc40->UnknownFunction49e4a0(terrain->field_0xc44, data->field_0x13c,
+            terrain->vertexSink->UnknownFunction49e4a0(terrain->transform, data->field_0x13c,
                 (char*)data->field_0x134 + 0xc, data->field_0x134, 0x20, 0);
     }
     if (parent)
@@ -335,24 +336,24 @@ int DrawableGridNode::UnknownFunction47f840()
         m = n;
         n = UnknownFunction47fce0(8, n, 0, 0, 8, 8, &closed);
         if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
-            ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+            ((DrawableGridNode*)parent)->extra->texture == 0)
             n = UnknownFunction480700(n, 0, 0, 16, 16);
         m = n;
         n = UnknownFunction47fce0(8, n, 16, 16, -8, -8, &closed);
         if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
-            ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+            ((DrawableGridNode*)parent)->extra->texture == 0)
             n = UnknownFunction480700(n, 16, 16, -16, -16);
     } else {
         n = 0;
         m = n;
         n = UnknownFunction47fce0(8, n, 0, 16, 8, -8, &closed);
         if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
-            ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+            ((DrawableGridNode*)parent)->extra->texture == 0)
             n = UnknownFunction480700(n, 0, 16, 16, -16);
         m = n;
         n = UnknownFunction47fce0(8, n, 16, 0, -8, 8, &closed);
         if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
-            ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+            ((DrawableGridNode*)parent)->extra->texture == 0)
             n = UnknownFunction480700(n, 16, 0, -16, 16);
     }
     data->field_0x12a = n;
@@ -402,7 +403,7 @@ int DrawableGridNode::UnknownFunction47f840()
         memcpy(data->field_0x134, g_gridVertexCache.vertices, data->field_0x13c * 32);
         memcpy(data->field_0x138, g_gridIndices, data->field_0x13e * 2);
         if (data->ageEntry.size == 0)
-            terrain->field_0xc88->UnknownFunction401050(&data->ageEntry, UnknownFunction47ecc0, this, 0,
+            terrain->ageManager->UnknownFunction401050(&data->ageEntry, UnknownFunction47ecc0, this, 0,
                                                        data->field_0x142 + data->field_0x140);
         else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
             data->ageEntry.size = data->field_0x142 + data->field_0x140;
@@ -659,18 +660,18 @@ void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int v
 {
     float detail;
     if (block == -1)
-        detail = extra->field_0x34;
+        detail = extra->detail;
     else
-        detail = extra->field_0x38[block].field_0x28;
-    if (g_gridGameSettings->field_0x2d0) {
-        if (terrain->field_0xca8 < detail)
-            terrain->field_0x18->UnknownVirtualSlot8(4, 1, 0);
+        detail = extra->blockRecords[block].detail;
+    if (g_gridGameSettings->softwareRenderer) {
+        if (terrain->qualityParamB < detail)
+            terrain->renderer->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 0);
         else
-            terrain->field_0x18->UnknownVirtualSlot8(4, 0, 0);
+            terrain->renderer->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
     }
     if (terrain->field_0xc3c) {
         if (a5) {
-            if (terrain->field_0xca4 < detail) {
+            if (terrain->qualityParamA < detail) {
                 float scale = g_gridDrawNormalScale;
                 if (level)
                     scale = g_gridDrawNormalScale * 16.0f;
@@ -680,32 +681,32 @@ void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int v
                     uv[0] = (packed >> 16) * scale;
                     uv[1] = (packed & 0xffff) * scale;
                 }
-                if (!terrain->field_0x18->UnknownVirtualSlot15(4, 0x222, vertices, vertexCount, indices, indexCount, 0))
+                if (!terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, 0x222, vertices, vertexCount, indices, indexCount, 0))
                     return;
             }
         } else {
-            terrain->field_0x2c.UnknownFunction484f10(vertices, vertexCount);
+            terrain->vertexLighter.UnknownFunction484f10(vertices, vertexCount);
             if (block >= 0)
                 UnknownVirtualSlot7(block);
             else
                 UnknownVirtualSlot6();
-            if (terrain->field_0x38 && extra->field_0x08 && (extra->field_0x08->field_0x68 & 1)) {
+            if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->field_0x68 & 1)) {
                 if (block >= 0) {
-                    GridBlockRecord* r = &extra->field_0x38[block];
-                    extra->field_0x08->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
+                    GridBlockRecord* r = &extra->blockRecords[block];
+                    extra->texture->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
                                                              &vertices->u, &vertices->v, vertexCount, 0x20);
                 } else {
-                    extra->field_0x08->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c,
+                    extra->texture->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c,
                                                              &extra->field_0x30, &vertices->u, &vertices->v,
                                                              vertexCount, 0x20);
                 }
             }
-            if (terrain->field_0xca4 < detail) {
+            if (terrain->qualityParamA < detail) {
                 for (int i = 0; i < vertexCount; i++) {
                     vertices[i].color = -1;
                     vertices[i].specular = 0;
                 }
-                if (!terrain->field_0x18->UnknownVirtualSlot15(4, 0x1e2, vertices, vertexCount, indices, indexCount, 0))
+                if (!terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
                     return;
             } else {
                 int color = terrain->unlitColor;
@@ -714,32 +715,32 @@ void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int v
                     vertices[i].color = color;
                     vertices[i].specular = specular;
                 }
-                if (!terrain->field_0x18->UnknownVirtualSlot15(4, 0x1e2, vertices, vertexCount, indices, indexCount, 0))
+                if (!terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
                     return;
             }
         }
     } else {
-        terrain->field_0x2c.UnknownFunction484f10(vertices, vertexCount);
+        terrain->vertexLighter.UnknownFunction484f10(vertices, vertexCount);
         if (block >= 0)
             UnknownVirtualSlot7(block);
         else
             UnknownVirtualSlot6();
-        if (terrain->field_0x38 && extra->field_0x08 && (extra->field_0x08->field_0x68 & 1)) {
+        if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->field_0x68 & 1)) {
             if (block >= 0) {
-                GridBlockRecord* r = &extra->field_0x38[block];
-                extra->field_0x08->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
+                GridBlockRecord* r = &extra->blockRecords[block];
+                extra->texture->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24,
                                                          &vertices->u, &vertices->v, vertexCount, 0x20);
             } else {
-                extra->field_0x08->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
+                extra->texture->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
                                                          &vertices->u, &vertices->v, vertexCount, 0x20);
             }
         }
-        terrain->field_0xc88->UnknownFunction401250(&data->ageEntry);
-        if (!terrain->field_0x18->UnknownVirtualSlot15(4, 0x1e2, vertices, vertexCount, indices, indexCount, 0))
+        terrain->ageManager->UnknownFunction401250(&data->ageEntry);
+        if (!terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, vertices, vertexCount, indices, indexCount, 0))
             return;
     }
-    terrain->field_0x88 += indexCount;
-    terrain->field_0x8c += vertexCount;
+    terrain->indicesDrawn += indexCount;
+    terrain->verticesDrawn += vertexCount;
 }
 
 // 0x00480fb0: submits a node's (block == -1) or one block's lit vertex range:
@@ -749,42 +750,42 @@ void DrawableGridNode::UnknownFunction480c90(int a5, GridVertex* vertices, int v
 void DrawableGridNode::UnknownFunction480fb0(int a5, GridVertex* vertices, int vertexCount, unsigned short* indices,
                                             int indexCount, int block)
 {
-    if (g_gridGameSettings->field_0x2d0 || !a5)
+    if (g_gridGameSettings->softwareRenderer || !a5)
         return;
     float detail;
     if (block == -1)
-        detail = extra->field_0x34;
+        detail = extra->detail;
     else
-        detail = extra->field_0x38[block].field_0x28;
+        detail = extra->blockRecords[block].detail;
     if (block >= 0)
         UnknownVirtualSlot7(block);
     else
         UnknownVirtualSlot6();
-    if (terrain->field_0x38 && extra->field_0x08 && (extra->field_0x08->field_0x68 & 1)) {
+    if (terrain->updateTextureCoordinates && extra->texture && (extra->texture->field_0x68 & 1)) {
         if (block >= 0) {
-            GridBlockRecord* r = &extra->field_0x38[block];
-            extra->field_0x08->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24, &vertices->u,
+            GridBlockRecord* r = &extra->blockRecords[block];
+            extra->texture->UnknownFunction510910(&r->field_0x1c, &r->field_0x20, &r->field_0x24, &vertices->u,
                                                      &vertices->v, vertexCount, 0x20);
         } else {
-            extra->field_0x08->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
+            extra->texture->UnknownFunction510910(&extra->field_0x28, &extra->field_0x2c, &extra->field_0x30,
                                                      &vertices->u, &vertices->v, vertexCount, 0x20);
         }
     }
-    if (terrain->field_0xca4 < detail) {
+    if (terrain->qualityParamA < detail) {
         if (terrain->field_0xcb4 == 0) {
-            terrain->field_0x18->UnknownVirtualSlot7(1, 0x11, 2);
-            terrain->field_0x18->UnknownVirtualSlot7(1, 0x12, 1);
+            terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, D3DTFN_LINEAR);
+            terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, D3DTFP_NONE);
             terrain->field_0xcb4 = 1;
         }
     } else if (terrain->field_0xcb4 != 0) {
-        terrain->field_0x18->UnknownVirtualSlot7(1, 0x11, g_gridGameSettings->field_0x550);
-        terrain->field_0x18->UnknownVirtualSlot7(1, 0x12, g_gridGameSettings->field_0x554);
+        terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MINFILTER, g_gridGameSettings->minFilter);
+        terrain->renderer->UnknownVirtualSlot7(1, D3DTSS_MIPFILTER, g_gridGameSettings->mipFilter);
         terrain->field_0xcb4 = 0;
     }
-    terrain->field_0xc88->UnknownFunction401250(&data->ageEntry);
-    if (terrain->field_0x18->UnknownVirtualSlot15(4, 0x222, vertices, vertexCount, indices, indexCount, 0)) {
-        terrain->field_0x88 += indexCount;
-        terrain->field_0x8c += vertexCount;
+    terrain->ageManager->UnknownFunction401250(&data->ageEntry);
+    if (terrain->renderer->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, 0x222, vertices, vertexCount, indices, indexCount, 0)) {
+        terrain->indicesDrawn += indexCount;
+        terrain->verticesDrawn += vertexCount;
     }
 }
 
@@ -797,7 +798,7 @@ int DrawableGridNode::UnknownFunction481170()
 // 0x00481180
 int DrawableGridNode::UnknownFunction481180(int x, int z, int size, int quad)
 {
-    if (data->field_0x13c != 0 && childMask != 0 && size == 16 && extra->field_0x08 != 0 && !data->b3)
+    if (data->field_0x13c != 0 && childMask != 0 && size == 16 && extra->texture != 0 && !data->b3)
         UnknownVirtualSlot4(-1);
     if (!data->b0 || data->b3) {
         size >>= 1;
@@ -893,7 +894,7 @@ void DrawableGridNode::UnknownFunction4824c0(UnknownTextureStream* stream, void*
 {
     float detail = UnknownFunction4815e0(coarse);
     UnknownVirtualSlot3(detail);
-    if (field_0x20 <= data->field_0x122 && extra->field_0x08) {
+    if (field_0x20 <= data->field_0x122 && extra->texture) {
         if (data->b0)
             return;
         data->b0 = 1;
@@ -987,7 +988,7 @@ void DrawableGridNode::UnknownFunction482760()
         int i = block->field_0xb08[k];
         data->field_0x000[i] &= ~0x40;
         if (!(data->field_0x000[i] & 0xf)) {
-            terrain->field_0xac++;
+            terrain->verticesReleased++;
             if (!(data->field_0x000[i] & 0x10) && (data->field_0x000[i] & 0x80)) {
                 data->field_0x000[i] &= ~0x80;
                 data->b1 = 1;
@@ -1000,7 +1001,7 @@ void DrawableGridNode::UnknownFunction482760()
             int i = block->field_0xb08[k];
             data->field_0x000[i] |= 0x40;
             if (!(data->field_0x000[i] & 0xf)) {
-                terrain->field_0xa8++;
+                terrain->verticesPinned++;
                 if (!(data->field_0x000[i] & 0x80)) {
                     data->field_0x000[i] |= 0x80;
                     data->b1 = 1;
@@ -1256,7 +1257,7 @@ int DrawableGridNode::UnknownFunction481a20(int block)
     boxCenter[0] = (block % 4) * size + data->field_0x164 * terrain->gridCellSize + half;
     boxCenter[2] = (block / 4) * size + data->field_0x168 * terrain->gridCellSize + half;
     boxCenter[1] = ((GridBlockRange*)data->field_0x17c)[block].centerY;
-    int visible = g_visibilityClipper->TestBox(terrain->field_0xc8c, terrain->field_0xc8c->matrix,
+    int visible = g_visibilityClipper->TestBox(terrain->camera, terrain->camera->matrix,
                                                boxCenter, boxExtent, 0, 0, 0);
     if (visible)
         data->field_0x178 |= 1 << block;
@@ -1278,9 +1279,9 @@ int DrawableGridNode::UnknownFunction481cc0(int x, int z)
 {
     GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
     float error = (float)g_gridBaseCurve[cell->field_0x1] * field_0x14 * field_0x10;
-    float dx = terrain->field_0x60 - (float)((gridX + x) << shift);
-    float dz = terrain->field_0x68 - (float)((gridZ + z) << shift);
-    float dy = terrain->field_0x64 -
+    float dx = terrain->viewerX - (float)((gridX + x) << shift);
+    float dz = terrain->viewerZ - (float)((gridZ + z) << shift);
+    float dy = terrain->viewerY -
                ((float)(cell->height - block->field_0xd4c) * field_0x10 + block->field_0xd4c) * field_0x14;
     float horizontal = dx * dx + dz * dz;
     float distance = dy * dy + horizontal;

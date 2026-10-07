@@ -65,28 +65,28 @@ static inline Vector3 UnknownEcoOffset(const Vector3* a, const Vector3* b) {
 }
 
 // 0x004567e0
-void Vegetation::UnknownFunction4567e0(TextureMapManager* textures, unsigned char definition,
+void Vegetation::Place(TextureMapManager* textures, unsigned char definition,
                                        const Vector3* position, unsigned char heightParameter,
                                        unsigned char radiusParameter) {
-    field_0x12 = definition;
-    field_0x0c.x = (unsigned short)(int)(g_UnknownGlobal59aebc->field_0x5ac * position->x);
-    field_0x0c.y = (unsigned short)(int)(g_UnknownGlobal59aebc->field_0x5ac * position->y);
-    field_0x0c.z = (unsigned short)(int)(g_UnknownGlobal59aebc->field_0x5ac * position->z);
-    field_0x15 = radiusParameter;
-    field_0x14 = heightParameter;
-    field_0x16_bit0 = 1;
+    definitionIndex = definition;
+    quantizedPosition.x = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * position->x);
+    quantizedPosition.y = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * position->y);
+    quantizedPosition.z = (unsigned short)(int)(g_UnknownGlobal59aebc->coordinatesPerUnit * position->z);
+    radiusParam = radiusParameter;
+    heightParam = heightParameter;
+    isBillboard = 1;
 }
 
 // 0x00456890: whether the object is beyond the detail band's 3D distance
 // (then `fade` is 255), else the fade between the band's two distances.
-void Vegetation::UnknownFunction456890(int* billboard, int* fade) {
-    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->field_0x58[field_0x12];
+void Vegetation::TestDistance(int* billboard, int* fade) {
+    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
     UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->field_0x08;
-    float dx = camera->field_0x170.x - field_0x0c.x * g_UnknownGlobal59aebc->field_0x5a8;
-    float dz = camera->field_0x170.z - field_0x0c.z * g_UnknownGlobal59aebc->field_0x5a8;
+    float dx = camera->field_0x170.x - quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+    float dz = camera->field_0x170.z - quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
     *billboard = 0;
-    float outer = (float)g_UnknownGlobal59af14[g_UnknownGlobal59aebc->field_0x5c0].field_0x00;
-    float inner = (float)g_UnknownGlobal59af14[g_UnknownGlobal59aebc->field_0x5c0].field_0x04;
+    float outer = (float)g_UnknownGlobal59af14[g_UnknownGlobal59aebc->detailLevel].geometryDistance;
+    float inner = (float)g_UnknownGlobal59af14[g_UnknownGlobal59aebc->detailLevel].fadeStartDistance;
     if (dx > outer || dz > outer) {
         *billboard = 1;
         *fade = 0xff;
@@ -98,7 +98,7 @@ void Vegetation::UnknownFunction456890(int* billboard, int* fade) {
         *fade = 0xff;
         return;
     }
-    if (definition->field_0x1fc) {
+    if (definition->blendLods) {
         if (distance < inner)
             *fade = 0;
         else
@@ -109,28 +109,28 @@ void Vegetation::UnknownFunction456890(int* billboard, int* fade) {
 }
 
 // 0x00456a10
-void Vegetation::UnknownFunction456a10(int billboard, int fade) {
-    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->field_0x58[field_0x12];
+void Vegetation::SetBillboard(int billboard, int fade) {
+    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
     UnknownEcoCamera* camera = ((UnknownEcoRenderTarget*)g_UnknownGlobal59aebc->field_0x18)->field_0x08;
-    field_0x13 = (unsigned char)fade;
-    if (billboard == field_0x16_bit0)
+    fadeLevel = (unsigned char)fade;
+    if (billboard == isBillboard)
         return;
-    if (field_0x16_bit0 < definition->field_0x1d8 && field_0x18)
+    if (isBillboard < definition->lodCount && geometryBlock)
         g_UnknownGlobal59af0c--;
     float maxX = -FLT_MAX;
     float minX = FLT_MAX;
-    if (billboard < definition->field_0x1d8 && !field_0x18) {
-        int vertexCount = definition->field_0x1f0[billboard];
-        int indexCount = definition->field_0x1f4[billboard];
+    if (billboard < definition->lodCount && !geometryBlock) {
+        int vertexCount = definition->modelVertexCount[billboard];
+        int indexCount = definition->modelIndexCount[billboard];
         int dwords = vertexCount * 8 + (indexCount + 1) / 2;
-        field_0x18 = DebugMalloc(dwords * 4 + sizeof(AgeEntry), __FILE__, 0x1fb);
-        AgeEntry* entry = (AgeEntry*)((int*)field_0x18 + dwords);
-        g_UnknownGlobal59aebc->field_0x59c->UnknownFunction401050(entry, UnknownFunction456850, this, 0,
+        geometryBlock = DebugMalloc(dwords * 4 + sizeof(AgeEntry), __FILE__, 0x1fb);
+        AgeEntry* entry = (AgeEntry*)((int*)geometryBlock + dwords);
+        g_UnknownGlobal59aebc->ageManager->UnknownFunction401050(entry, EvictGeometry, this, 0,
                                                                   dwords * 4 + sizeof(AgeEntry));
         g_UnknownGlobal59af0c++;
-        memcpy((UnknownEcoVertex*)field_0x18 + vertexCount, definition->field_0x1e8[billboard], indexCount * 2);
-        float radiusScale = definition->UnknownFunction455ff0(field_0x15) * definition->field_0x1d0;
-        float heightScale = definition->UnknownFunction455f90(field_0x14) * definition->field_0x1cc;
+        memcpy((UnknownEcoVertex*)geometryBlock + vertexCount, definition->modelIndices[billboard], indexCount * 2);
+        float radiusScale = definition->RadiusForParameter(radiusParam) * definition->modelRadiusScale;
+        float heightScale = definition->HeightForParameter(heightParam) * definition->modelHeightScale;
         float c;
         float s;
         if (camera->field_0x17c.z != 0.0f) {
@@ -144,26 +144,26 @@ void Vegetation::UnknownFunction456a10(int billboard, int fade) {
         }
         Vector3 color;
         Vector3 ambient;
-        color.x = g_UnknownGlobal59aebc->field_0x564.x;
-        color.y = g_UnknownGlobal59aebc->field_0x564.y;
-        color.z = g_UnknownGlobal59aebc->field_0x564.z;
-        ambient.x = g_UnknownGlobal59aebc->field_0x570.x;
-        ambient.y = g_UnknownGlobal59aebc->field_0x570.y;
-        ambient.z = g_UnknownGlobal59aebc->field_0x570.z;
+        color.x = g_UnknownGlobal59aebc->lightColor.x;
+        color.y = g_UnknownGlobal59aebc->lightColor.y;
+        color.z = g_UnknownGlobal59aebc->lightColor.z;
+        ambient.x = g_UnknownGlobal59aebc->ambientLight.x;
+        ambient.y = g_UnknownGlobal59aebc->ambientLight.y;
+        ambient.z = g_UnknownGlobal59aebc->ambientLight.z;
         unsigned int ambientColor = ECO_RGBA((int)(ambient.x * 255.0f), (int)(ambient.y * 255.0f),
                                              (int)(ambient.z * 255.0f), 255);
-        UnknownEcoModelVertex* source = definition->field_0x1ec[billboard];
-        UnknownEcoVertex* vertex = (UnknownEcoVertex*)field_0x18;
+        UnknownEcoModelVertex* source = definition->modelVertices[billboard];
+        UnknownEcoVertex* vertex = (UnknownEcoVertex*)geometryBlock;
         int i;
         for (i = 0; i < vertexCount; i++) {
             int unlit = 0;
             Vector3 normal;
             vertex->position.x = c * source->position.x - s * source->position.z
-                                 + field_0x0c.x * g_UnknownGlobal59aebc->field_0x5a8;
-            vertex->position.y = field_0x0c.y * g_UnknownGlobal59aebc->field_0x5a8 + heightScale * source->position.y;
-            vertex->position.z = field_0x0c.z * g_UnknownGlobal59aebc->field_0x5a8 + c * source->position.z
+                                 + quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+            vertex->position.y = quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate + heightScale * source->position.y;
+            vertex->position.z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate + c * source->position.z
                                  + s * source->position.x;
-            if (definition->field_0x1f8) {
+            if (definition->usePlanarLighting) {
                 if (source->normal.y < 0.0f) {
                     unlit = 1;
                 } else {
@@ -199,9 +199,9 @@ void Vegetation::UnknownFunction456a10(int billboard, int fade) {
                 maxX = vertex->position.x;
             if (vertex->position.x < minX)
                 minX = vertex->position.x;
-            float intensity = -(normal.y * g_UnknownGlobal59aebc->field_0x57c.y
-                                + normal.x * g_UnknownGlobal59aebc->field_0x57c.x
-                                + normal.z * g_UnknownGlobal59aebc->field_0x57c.z);
+            float intensity = -(normal.y * g_UnknownGlobal59aebc->lightDirection.y
+                                + normal.x * g_UnknownGlobal59aebc->lightDirection.x
+                                + normal.z * g_UnknownGlobal59aebc->lightDirection.z);
             if (!unlit && source->normal.y > -0.95f && intensity > 0.0f) {
                 float r = intensity * color.x + ambient.x;
                 float g = intensity * color.y + ambient.y;
@@ -224,19 +224,19 @@ void Vegetation::UnknownFunction456a10(int billboard, int fade) {
             vertex++;
         }
     }
-    field_0x16_bit0 = billboard;
+    isBillboard = billboard;
 }
 
 // 0x004570a0
-CollisionObject* Vegetation::UnknownFunction4570a0(int index) {
-    CollisionObject* object = g_UnknownGlobal59aebc->field_0x58[field_0x12]->field_0x20c[index];
-    float x = field_0x0c.x * g_UnknownGlobal59aebc->field_0x5a8;
-    float y = field_0x0c.y * g_UnknownGlobal59aebc->field_0x5a8;
-    float z = field_0x0c.z * g_UnknownGlobal59aebc->field_0x5a8;
-    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->field_0x58[field_0x12];
-    float radius = definition->UnknownFunction455ff0(field_0x15) / definition->field_0x18c;
-    float height = definition->UnknownFunction455f90(field_0x14)
-                   / g_UnknownGlobal59aebc->field_0x58[field_0x12]->field_0x180;
+CollisionObject* Vegetation::GetCollisionObject(int index) {
+    CollisionObject* object = g_UnknownGlobal59aebc->definitionTable[definitionIndex]->collisionObjects[index];
+    float x = quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+    float y = quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
+    float z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
+    float radius = definition->RadiusForParameter(radiusParam) / definition->meanRadius;
+    float height = definition->HeightForParameter(heightParam)
+                   / g_UnknownGlobal59aebc->definitionTable[definitionIndex]->meanHeight;
     if (object->field_0x50 == 4) {
         UnknownEcoSphereShape* shape = (UnknownEcoSphereShape*)object->field_0x54;
         shape->field_0x14 = radius;
@@ -314,18 +314,18 @@ int UnknownFunction45c7b0(unsigned char* data, int size, int count, FILE* file, 
 
 // 0x00456050: loads the billboard texture and the .slt model (vertices,
 // faces and its texture); `modelFlags` is the detail band's model flag.
-int UnknownEcoDefinition::UnknownFunction456050(TextureMapManager* textures, int modelFlags) {
+int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags) {
     char name[0x104];
     char section[0x80];
-    if (field_0x080[0]) {
-        field_0x1e0 = UnknownFunction50a590(textures, field_0x080, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
-        if (!field_0x1e0->UnknownVirtualSlot7())
-            field_0x1e0->UnknownVirtualSlot8(1, 0, 0);
+    if (billboardName[0]) {
+        billboardTexture = UnknownFunction50a590(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
+        if (!billboardTexture->UnknownVirtualSlot7())
+            billboardTexture->UnknownVirtualSlot8(1, 0, 0);
     }
-    if (field_0x000[0]) {
-        int nameLength = strlen(field_0x000);
+    if (name[0]) {
+        int nameLength = strlen(name);
         int length = nameLength > 0x103 ? 0x103 : nameLength;
-        strncpy(name, field_0x000, length);
+        strncpy(name, name, length);
         name[length] = 0;
         strcat(name, ".slt");
         UnknownTextureStream* stream = new(__FILE__, 0xc0) UnknownTextureStream(g_UnknownResourceManager572b44);
@@ -335,40 +335,40 @@ int UnknownEcoDefinition::UnknownFunction456050(TextureMapManager* textures, int
             block->UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
             block->UnknownFunction4b78f0("Material - 0");
             block->UnknownFunction4b7b30("TextureMap", name, -1);
-            int format = 0x613;
+            int format = 1555;
             if (!g_UnknownGlobal56e26c->field_0x2d0 && (g_UnknownGlobal56e26c->field_0x10->field_0x1c0 & 8)
                 && g_UnknownGlobal56e26c->UnknownVirtualSlot22("KeyColorTrees", 0))
                 format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
-            field_0x1e4 = UnknownFunction50a590(textures, name, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
-            if (!field_0x1e4->UnknownVirtualSlot7()) {
-                int loaded = field_0x1e4->field_0x20;
-                if (loaded == 0x22b || loaded == 0x235 || loaded == 0x378 || loaded == 0x613)
-                    field_0x1e4->UnknownVirtualSlot18(field_0x1dc);
-                field_0x1e4->UnknownVirtualSlot8(1, 0, 0);
+            modelTexture = UnknownFunction50a590(textures, name, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
+            if (!modelTexture->UnknownVirtualSlot7()) {
+                int loaded = modelTexture->field_0x20;
+                if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
+                    modelTexture->UnknownVirtualSlot18(keyColor);
+                modelTexture->UnknownVirtualSlot8(1, 0, 0);
             }
             block->UnknownFunction4b78f0("LOD Information");
-            block->UnknownFunction4b7f10("NumberOfLOD", 0, &field_0x1d8);
-            if (field_0x1d8 > kMaxLods)
-                field_0x1d8 = kMaxLods;
+            block->UnknownFunction4b7f10("NumberOfLOD", 0, &lodCount);
+            if (lodCount > kMaxLods)
+                lodCount = kMaxLods;
             float maxY = -FLT_MAX;
             float minY = FLT_MAX;
             float maxX = -FLT_MAX;
             float minX = FLT_MAX;
-            for (lod = 0; lod < field_0x1d8; lod++) {
+            for (lod = 0; lod < lodCount; lod++) {
                 int faces;
                 int i;
                 sprintf(section, "LOD %d - Surface 0", lod);
                 block->UnknownFunction4b78f0(section);
-                block->UnknownFunction4b7f10("NumberOfVertices", 0, &field_0x1f0[lod]);
+                block->UnknownFunction4b7f10("NumberOfVertices", 0, &modelVertexCount[lod]);
                 block->UnknownFunction4b7f10("NumberOfFaces", 0, &faces);
-                field_0x1f4[lod] = faces * 3;
-                field_0x1ec[lod] = (UnknownEcoModelVertex*)DebugMalloc(
-                    field_0x1f0[lod] * sizeof(UnknownEcoModelVertex) + faces * 3 * sizeof(unsigned short), __FILE__, 0x106);
-                field_0x1e8[lod] = (unsigned short*)(field_0x1ec[lod] + field_0x1f0[lod]);
+                modelIndexCount[lod] = faces * 3;
+                modelVertices[lod] = (UnknownEcoModelVertex*)DebugMalloc(
+                    modelVertexCount[lod] * sizeof(UnknownEcoModelVertex) + faces * 3 * sizeof(unsigned short), __FILE__, 0x106);
+                modelIndices[lod] = (unsigned short*)(modelVertices[lod] + modelVertexCount[lod]);
                 sprintf(section, "LOD %d - Surface 0 - Vertices", lod);
                 block->UnknownFunction4b7f70(section);
-                for (i = 0; i < field_0x1f0[lod]; i++) {
-                    UnknownEcoModelVertex* vertex = &field_0x1ec[lod][i];
+                for (i = 0; i < modelVertexCount[lod]; i++) {
+                    UnknownEcoModelVertex* vertex = &modelVertices[lod][i];
                     block->UnknownFunction4b8010(0);
                     block->UnknownFunction4b81c0(0, &vertex->position.x);
                     block->UnknownFunction4b81c0(1, &vertex->position.y);
@@ -391,8 +391,8 @@ int UnknownEcoDefinition::UnknownFunction456050(TextureMapManager* textures, int
                 }
                 sprintf(section, "LOD %i - Surface 0 - Faces", lod);
                 block->UnknownFunction4b7f70(section);
-                unsigned short* index = field_0x1e8[lod];
-                for (i = 0; i < field_0x1f4[lod] / 3; i++) {
+                unsigned short* index = modelIndices[lod];
+                for (i = 0; i < modelIndexCount[lod] / 3; i++) {
                     int a;
                     int b;
                     int c;
@@ -407,9 +407,9 @@ int UnknownEcoDefinition::UnknownFunction456050(TextureMapManager* textures, int
             }
             if (block)
                 delete block;
-            field_0x1cc = 1.0f / (maxY - minY);
-            field_0x1d0 = 2.0f / (maxX - minX);
-            field_0x1d4 = field_0x1cc * minY;
+            modelHeightScale = 1.0f / (maxY - minY);
+            modelRadiusScale = 2.0f / (maxX - minX);
+            field_0x1d4 = modelHeightScale * minY;
         }
         if (stream)
             delete stream;
@@ -418,7 +418,7 @@ int UnknownEcoDefinition::UnknownFunction456050(TextureMapManager* textures, int
 }
 
 // 0x00457480
-int EcoSystem::UnknownFunction457480(char* path, UnknownTextureStream* stream) {
+int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
     char name[0x104];
     char value[0x80];
     char section[0x80];
@@ -441,12 +441,12 @@ int EcoSystem::UnknownFunction457480(char* path, UnknownTextureStream* stream) {
         if (!strcmp(value, "NONE"))
             return 0;
         if (!_stricmp(value, "Authored"))
-            field_0x30 = 1;
+            method = 1;
         else if (!_stricmp(value, "Auto"))
-            field_0x30 = 2;
+            method = 2;
         else
             return 0;
-        field_0x34 = GetPrivateProfileInt("EcoSystem", "TotalObjects", 40000, path);
+        totalObjects = GetPrivateProfileInt("EcoSystem", "TotalObjects", 40000, path);
         total = 0.0f;
         for (i = 1; i < 256; i++) {
             sprintf(section, "Vegetation_%d", i);
@@ -455,140 +455,140 @@ int EcoSystem::UnknownFunction457480(char* path, UnknownTextureStream* stream) {
                 int red;
                 int green;
                 int blue;
-                field_0x58[i] = new(__FILE__, 0x31f) UnknownEcoDefinition;
-                strcpy(field_0x58[i]->field_0x000, value);
+                definitionTable[i] = new(__FILE__, 0x31f) UnknownEcoDefinition;
+                strcpy(definitionTable[i]->name, value);
                 GetPrivateProfileString(section, "BillboardName", "NONE", value, 0x80, path);
-                strcpy(field_0x58[i]->field_0x080, value);
-                field_0x58[i]->field_0x180 = UnknownFunction47b8a0(section, "MeanHeight", 10.0, path);
-                field_0x58[i]->field_0x184 = UnknownFunction47b8a0(section, "MinHeight", 5.0, path);
-                field_0x58[i]->field_0x188 = UnknownFunction47b8a0(section, "MaxHeight", 15.0, path);
-                field_0x58[i]->field_0x18c = UnknownFunction47b8a0(section, "MeanRadius", 10.0, path);
-                field_0x58[i]->field_0x190 = UnknownFunction47b8a0(section, "MinRadius", 5.0, path);
-                field_0x58[i]->field_0x194 = UnknownFunction47b8a0(section, "MaxRadius", 15.0, path);
-                field_0x58[i]->field_0x1b8 = UnknownFunction47b8a0(section, "ULeft", 0.0, path) * (1.0f / 256.0f);
-                field_0x58[i]->field_0x1bc = UnknownFunction47b8a0(section, "URight", 1.0, path) * (1.0f / 256.0f);
-                field_0x58[i]->field_0x1c4 = UnknownFunction47b8a0(section, "VBottom", 0.0, path) * (1.0f / 256.0f);
-                field_0x58[i]->field_0x1c0 = UnknownFunction47b8a0(section, "UCenter", 1.0, path) * (1.0f / 256.0f);
-                field_0x58[i]->field_0x1c8 = UnknownFunction47b8a0(section, "VTop", 1.0, path) * (1.0f / 256.0f);
-                field_0x58[i]->field_0x1f8 = GetPrivateProfileInt(section, "UsePlanarLighting", 1, path) != 0;
-                field_0x58[i]->field_0x1fc = GetPrivateProfileInt(section, "BlendLODs", 1, path) != 0;
-                field_0x58[i]->field_0x200 = UnknownFunction47b8a0(section, "PercentBias", 1.0, path);
+                strcpy(definitionTable[i]->billboardName, value);
+                definitionTable[i]->meanHeight = UnknownFunction47b8a0(section, "MeanHeight", 10.0, path);
+                definitionTable[i]->minHeight = UnknownFunction47b8a0(section, "MinHeight", 5.0, path);
+                definitionTable[i]->maxHeight = UnknownFunction47b8a0(section, "MaxHeight", 15.0, path);
+                definitionTable[i]->meanRadius = UnknownFunction47b8a0(section, "MeanRadius", 10.0, path);
+                definitionTable[i]->minRadius = UnknownFunction47b8a0(section, "MinRadius", 5.0, path);
+                definitionTable[i]->maxRadius = UnknownFunction47b8a0(section, "MaxRadius", 15.0, path);
+                definitionTable[i]->uLeft = UnknownFunction47b8a0(section, "ULeft", 0.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->uRight = UnknownFunction47b8a0(section, "URight", 1.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->vBottom = UnknownFunction47b8a0(section, "VBottom", 0.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->uCenter = UnknownFunction47b8a0(section, "UCenter", 1.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->vTop = UnknownFunction47b8a0(section, "VTop", 1.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->usePlanarLighting = GetPrivateProfileInt(section, "UsePlanarLighting", 1, path) != 0;
+                definitionTable[i]->blendLods = GetPrivateProfileInt(section, "BlendLODs", 1, path) != 0;
+                definitionTable[i]->percentBias = UnknownFunction47b8a0(section, "PercentBias", 1.0, path);
                 red = GetPrivateProfileInt(section, "KeyColorRed", 0x5a, path);
                 green = GetPrivateProfileInt(section, "KeyColorGreen", 0x5b, path);
                 blue = GetPrivateProfileInt(section, "KeyColorBlue", 0xb, path);
-                field_0x58[i]->field_0x1dc = (red << 16) | (green << 8) | blue;
-                total = total + field_0x58[i]->field_0x200;
-                UnknownFunction458360(path, i, field_0x58[i]);
+                definitionTable[i]->keyColor = (red << 16) | (green << 8) | blue;
+                total = total + definitionTable[i]->percentBias;
+                ReadCollisionObjects(path, i, definitionTable[i]);
             }
         }
         if (total != 100.0f) {
             for (i = 1; i < 256; i++) {
-                if (field_0x58[i])
-                    field_0x58[i]->field_0x200 = 100.0f / total * field_0x58[i]->field_0x200;
+                if (definitionTable[i])
+                    definitionTable[i]->percentBias = 100.0f / total * definitionTable[i]->percentBias;
             }
         }
         GetPrivateProfileString("EcoSystem", "PlacementBmp", "NONE", value, 0x80, path);
         if (!strcmp(value, "NONE")) {
-            field_0x45c[0] = 0;
+            placementBmp[0] = 0;
         } else {
             int valueLength = strlen(value);
             int length = valueLength > 0x7f ? 0x7f : valueLength;
-            strncpy(field_0x45c, value, length);
-            field_0x45c[length] = 0;
+            strncpy(placementBmp, value, length);
+            placementBmp[length] = 0;
         }
-        if (field_0x30 == 2) {
+        if (method == 2) {
             for (i = 0; i < 256; i++) {
-                if (field_0x58[i]) {
+                if (definitionTable[i]) {
                     sprintf(section, "Vegetation_%d", i);
-                    field_0x58[i]->field_0x198 = UnknownFunction47b8a0(section, "MeanSlope", 45.0, path) * (1.0f / 90.0f);
-                    field_0x58[i]->field_0x19c =
+                    definitionTable[i]->meanSlope = UnknownFunction47b8a0(section, "MeanSlope", 45.0, path) * (1.0f / 90.0f);
+                    definitionTable[i]->standardDeviationSlope =
                         UnknownFunction47b8a0(section, "StandardDeviationSlope", 45.0, path) * (1.0f / 90.0f);
-                    field_0x58[i]->field_0x1a0 =
+                    definitionTable[i]->meanAspect =
                         (UnknownFunction47b8a0(section, "MeanAspect", 180.0, path) - 180.0f) * (1.0f / 90.0f);
-                    field_0x58[i]->field_0x1a4 =
+                    definitionTable[i]->standardDeviationAspect =
                         (UnknownFunction47b8a0(section, "StandardDeviationAspect", 180.0, path) - 180.0f) * (1.0f / 90.0f);
-                    field_0x58[i]->field_0x1a8 = UnknownFunction47b8a0(section, "MeanDrainage", 0.5, path);
-                    field_0x58[i]->field_0x1ac = UnknownFunction47b8a0(section, "StandardDeviationDrainage", 0.5, path);
-                    field_0x58[i]->field_0x1b0 = UnknownFunction47b8a0(section, "MeanAltitude", 0.5, path);
-                    field_0x58[i]->field_0x1b4 = UnknownFunction47b8a0(section, "StandardDeviationAltitude", 0.5, path);
+                    definitionTable[i]->meanDrainage = UnknownFunction47b8a0(section, "MeanDrainage", 0.5, path);
+                    definitionTable[i]->standardDeviationDrainage = UnknownFunction47b8a0(section, "StandardDeviationDrainage", 0.5, path);
+                    definitionTable[i]->meanAltitude = UnknownFunction47b8a0(section, "MeanAltitude", 0.5, path);
+                    definitionTable[i]->standardDeviationAltitude = UnknownFunction47b8a0(section, "StandardDeviationAltitude", 0.5, path);
                     GetPrivateProfileString(section, "ProbabilityTga", "NONE", value, 0x80, path);
                     if (!strcmp(value, "NONE"))
-                        field_0x58[i]->field_0x100[0] = 0;
+                        definitionTable[i]->probabilityTga[0] = 0;
                     else
-                        strcpy(field_0x58[i]->field_0x100, value);
+                        strcpy(definitionTable[i]->probabilityTga, value);
                 }
             }
-            field_0x458 = UnknownFunction47b8a0("EcoSystem", "NorthAngle", 0.0, path);
+            northAngle = UnknownFunction47b8a0("EcoSystem", "NorthAngle", 0.0, path);
             GetPrivateProfileString("EcoSystem", "ProbabilityTga", "NONE", value, 0x80, path);
             if (!strcmp(value, "NONE")) {
-                field_0x4dc[0] = 0;
+                probabilityTga[0] = 0;
             } else {
                 int valueLength = strlen(value);
                 int length = valueLength > 0x7f ? 0x7f : valueLength;
-                strncpy(field_0x4dc, value, length);
-                field_0x4dc[length] = 0;
+                strncpy(probabilityTga, value, length);
+                probabilityTga[length] = 0;
             }
         }
         return 1;
     }
     if (strstr(path, ".esb")) {
-        UnknownFunction458f70(path, stream);
+        ReadEsb(path, stream);
         return 1;
     }
     return 0;
 }
 
 // 0x00457ed0: builds the definition's collision objects as children.
-void EcoSystem::UnknownFunction457ed0(UnknownEcoDefinition* definition) {
+void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
     Vector3 vertices[32];
     int indices[96];
     int i;
     int j;
-    if (definition->field_0x204 == 0) {
-        definition->field_0x20c = 0;
+    if (definition->collisionCount == 0) {
+        definition->collisionObjects = 0;
         return;
     }
     int category = g_MemTagStack->Push("Collision");
-    definition->field_0x20c = (CollisionObject**)DebugMalloc(definition->field_0x204 * sizeof(CollisionObject*),
+    definition->collisionObjects = (CollisionObject**)DebugMalloc(definition->collisionCount * sizeof(CollisionObject*),
                                                              __FILE__, 0x3a5);
-    for (i = 0; i < definition->field_0x204; i++) {
-        UnknownEcoCollisionDefinition* shape = &definition->field_0x208[i];
-        definition->field_0x20c[i] = new(__FILE__, 0x3ad) CollisionObject(1);
-        definition->field_0x20c[i]->UnknownFunction4320f0(g_UnknownGlobal56e26c->field_0x10, 0, 0, 1);
-        UnknownFunction469190(definition->field_0x20c[i], -1);
-        definition->field_0x20c[i]->field_0x64 = 0x3e8;
-        if (shape->field_0x00 == 0) {
-            definition->field_0x20c[i]->field_0x64 = 0x3e9;
-            Vector3* hull = new(__FILE__, 0x3b8) Vector3[definition->field_0x1f0[0]];
-            int* hullIndices = new(__FILE__, 0x3b9) int[definition->field_0x1f4[0]];
-            for (j = 0; j < definition->field_0x1f4[0]; j++)
-                hullIndices[j] = definition->field_0x1e8[0][j];
-            for (j = 0; j < definition->field_0x1f0[0]; j++) {
-                hull[j].x = definition->field_0x1ec[0][j].position.x;
-                hull[j].y = definition->field_0x1ec[0][j].position.y;
-                hull[j].z = definition->field_0x1ec[0][j].position.z;
+    for (i = 0; i < definition->collisionCount; i++) {
+        UnknownEcoCollisionDefinition* shape = &definition->collisionDefinitions[i];
+        definition->collisionObjects[i] = new(__FILE__, 0x3ad) CollisionObject(1);
+        definition->collisionObjects[i]->UnknownFunction4320f0(g_UnknownGlobal56e26c->field_0x10, 0, 0, 1);
+        UnknownFunction469190(definition->collisionObjects[i], -1);
+        definition->collisionObjects[i]->field_0x64 = 0x3e8;
+        if (shape->type == 0) {
+            definition->collisionObjects[i]->field_0x64 = 0x3e9;
+            Vector3* hull = new(__FILE__, 0x3b8) Vector3[definition->modelVertexCount[0]];
+            int* hullIndices = new(__FILE__, 0x3b9) int[definition->modelIndexCount[0]];
+            for (j = 0; j < definition->modelIndexCount[0]; j++)
+                hullIndices[j] = definition->modelIndices[0][j];
+            for (j = 0; j < definition->modelVertexCount[0]; j++) {
+                hull[j].x = definition->modelVertices[0][j].position.x;
+                hull[j].y = definition->modelVertices[0][j].position.y;
+                hull[j].z = definition->modelVertices[0][j].position.z;
             }
-            definition->field_0x20c[i]->field_0x64 = 0x3e9;
-            definition->field_0x20c[i]->UnknownFunction4328b0(hull, hullIndices, definition->field_0x1f4[0] / 3,
-                                                               definition->field_0x1f0[0]);
-            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->field_0x20c[i]->field_0x54)->field_0xc8);
+            definition->collisionObjects[i]->field_0x64 = 0x3e9;
+            definition->collisionObjects[i]->UnknownFunction4328b0(hull, hullIndices, definition->modelIndexCount[0] / 3,
+                                                               definition->modelVertexCount[0]);
+            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->field_0x54)->field_0xc8);
             delete hull;
             delete hullIndices;
-        } else if (shape->field_0x00 == 2) {
-            definition->field_0x20c[i]->UnknownFunction4329a0(shape->field_0x04, shape->field_0x1c);
-        } else if (shape->field_0x00 == 3) {
-            definition->field_0x20c[i]->UnknownFunction432a20(shape->field_0x04, shape->field_0x10, shape->field_0x1c);
-        } else if (shape->field_0x00 == 1) {
-            definition->field_0x20c[i]->field_0x64 = 0x3e9;
+        } else if (shape->type == 2) {
+            definition->collisionObjects[i]->UnknownFunction4329a0(shape->start, shape->radius);
+        } else if (shape->type == 3) {
+            definition->collisionObjects[i]->UnknownFunction432a20(shape->start, shape->end, shape->radius);
+        } else if (shape->type == 1) {
+            definition->collisionObjects[i]->field_0x64 = 0x3e9;
             for (j = 0; j < 16; j++) {
                 float angle = j * 0.39269909f;
-                vertices[j].x = vertices[j + 16].x = (float)cos(angle) * shape->field_0x1c;
-                vertices[j].z = vertices[j + 16].z = (float)sin(angle) * shape->field_0x1c;
-                vertices[j].y = shape->field_0x20;
+                vertices[j].x = vertices[j + 16].x = (float)cos(angle) * shape->radius;
+                vertices[j].z = vertices[j + 16].z = (float)sin(angle) * shape->radius;
+                vertices[j].y = shape->height;
                 vertices[j + 16].y = 0.0f;
             }
             for (j = 0; j < 32; j++)
-                vertices[j] = UnknownEcoOffset(&vertices[j], &shape->field_0x04);
+                vertices[j] = UnknownEcoOffset(&vertices[j], &shape->start);
             for (j = 0; j < 16; j++) {
                 int next = j + 1;
                 if (next >= 16)
@@ -600,15 +600,15 @@ void EcoSystem::UnknownFunction457ed0(UnknownEcoDefinition* definition) {
                 indices[j * 6 + 4] = next + 16;
                 indices[j * 6 + 5] = j + 16;
             }
-            definition->field_0x20c[i]->UnknownFunction4328b0(vertices, indices, 32, 32);
-            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->field_0x20c[i]->field_0x54)->field_0xc8);
+            definition->collisionObjects[i]->UnknownFunction4328b0(vertices, indices, 32, 32);
+            UnknownSetIdentity(&((UnknownEcoHullShape*)definition->collisionObjects[i]->field_0x54)->field_0xc8);
         }
     }
     g_MemTagStack->Pop(category);
 }
 
 // 0x00458360
-void EcoSystem::UnknownFunction458360(const char* path, int index, UnknownEcoDefinition* definition) {
+void EcoSystem::ReadCollisionObjects(const char* path, int index, UnknownEcoDefinition* definition) {
     char key[0x80];
     char value[0x80];
     char section[0x100];
@@ -616,59 +616,59 @@ void EcoSystem::UnknownFunction458360(const char* path, int index, UnknownEcoDef
     int i;
     sprintf(section, "Vegetation_%d", index);
     int count = GetPrivateProfileInt(section, "NumCollisionObjects", 0, path);
-    definition->field_0x204 = count;
+    definition->collisionCount = count;
     if (count > 0) {
-    definition->field_0x208 = (UnknownEcoCollisionDefinition*)DebugMalloc(count * sizeof(UnknownEcoCollisionDefinition),
+    definition->collisionDefinitions = (UnknownEcoCollisionDefinition*)DebugMalloc(count * sizeof(UnknownEcoCollisionDefinition),
                                                                           __FILE__, 0x40c);
-    for (i = 1; i - 1 < definition->field_0x204; i++) {
-        UnknownEcoCollisionDefinition* shape = &definition->field_0x208[i - 1];
+    for (i = 1; i - 1 < definition->collisionCount; i++) {
+        UnknownEcoCollisionDefinition* shape = &definition->collisionDefinitions[i - 1];
         sprintf(key, "CollisionObject%i", i);
         GetPrivateProfileString(section, key, "NONE", kind, 0x80, path);
         if (!_stricmp(kind, "GEOMETRY")) {
-            shape->field_0x00 = 0;
+            shape->type = 0;
         } else if (!_stricmp(kind, "SPHERE")) {
-            shape->field_0x00 = 2;
+            shape->type = 2;
             sprintf(key, "CollisionObject%iCenter", i);
             GetPrivateProfileString(section, key, "NONE", value, 0x80, path);
-            shape->field_0x04.x = (float)atof(strtok(value, ","));
-            shape->field_0x04.y = (float)atof(strtok(0, ","));
-            shape->field_0x04.z = (float)atof(strtok(0, "\n"));
+            shape->start.x = (float)atof(strtok(value, ","));
+            shape->start.y = (float)atof(strtok(0, ","));
+            shape->start.z = (float)atof(strtok(0, "\n"));
             sprintf(key, "CollisionObject%iRadius", i);
-            shape->field_0x1c = UnknownFunction47b8a0(section, key, 0.0, path);
+            shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
         } else if (!_stricmp(kind, "RADIUSEDLINE")) {
-            shape->field_0x00 = 3;
+            shape->type = 3;
             sprintf(key, "CollisionObject%iStart", i);
             GetPrivateProfileString(section, key, "NONE", value, 0x80, path);
-            shape->field_0x04.x = (float)atof(strtok(value, ","));
-            shape->field_0x04.y = (float)atof(strtok(0, ","));
-            shape->field_0x04.z = (float)atof(strtok(0, "\n"));
+            shape->start.x = (float)atof(strtok(value, ","));
+            shape->start.y = (float)atof(strtok(0, ","));
+            shape->start.z = (float)atof(strtok(0, "\n"));
             sprintf(key, "CollisionObject%iEnd", i);
             GetPrivateProfileString(section, key, "NONE", value, 0x80, path);
-            shape->field_0x10.x = (float)atof(strtok(value, ","));
-            shape->field_0x10.y = (float)atof(strtok(0, ","));
-            shape->field_0x10.z = (float)atof(strtok(0, "\n"));
+            shape->end.x = (float)atof(strtok(value, ","));
+            shape->end.y = (float)atof(strtok(0, ","));
+            shape->end.z = (float)atof(strtok(0, "\n"));
             sprintf(key, "CollisionObject%iRadius", i);
-            shape->field_0x1c = UnknownFunction47b8a0(section, key, 0.0, path);
+            shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
         } else if (!_stricmp(kind, "CYLINDER")) {
-            shape->field_0x00 = 1;
+            shape->type = 1;
             sprintf(key, "CollisionObject%iBottom", i);
             GetPrivateProfileString(section, key, "NONE", value, 0x80, path);
-            shape->field_0x04.x = (float)atof(strtok(value, ","));
-            shape->field_0x04.y = (float)atof(strtok(0, ","));
-            shape->field_0x04.z = (float)atof(strtok(0, "\n"));
+            shape->start.x = (float)atof(strtok(value, ","));
+            shape->start.y = (float)atof(strtok(0, ","));
+            shape->start.z = (float)atof(strtok(0, "\n"));
             sprintf(key, "CollisionObject%iRadius", i);
-            shape->field_0x1c = UnknownFunction47b8a0(section, key, 0.0, path);
+            shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
             sprintf(key, "CollisionObject%iHeight", i);
-            shape->field_0x20 = UnknownFunction47b8a0(section, key, 0.0, path);
+            shape->height = UnknownFunction47b8a0(section, key, 0.0, path);
         }
     }
     } else {
-        definition->field_0x208 = 0;
+        definition->collisionDefinitions = 0;
     }
 }
 
 // 0x00458da0: writes the placed objects as text next to the .est.
-void EcoSystem::UnknownFunction458da0(const char* path) {
+void EcoSystem::WriteListing(const char* path) {
     char name[0x104];
     int i;
     int pathLength = strlen(path);
@@ -679,26 +679,26 @@ void EcoSystem::UnknownFunction458da0(const char* path) {
     FILE* file = fopen(name, "w");
     if (!file)
         return;
-    UnknownFunction461d40(file, "%i\n", field_0x55c);
-    for (i = 0; i < field_0x55c; i++) {
-        UnknownEcoDefinition* definition = field_0x58[field_0x38[i].field_0x12];
-        float radius = definition->UnknownFunction455ff0(field_0x38[i].field_0x15);
-        float height = definition->UnknownFunction455f90(field_0x38[i].field_0x14);
-        float z = field_0x38[i].field_0x0c.z * g_UnknownGlobal59aebc->field_0x5a8;
-        float y = field_0x38[i].field_0x0c.y * g_UnknownGlobal59aebc->field_0x5a8;
-        float x = field_0x38[i].field_0x0c.x * g_UnknownGlobal59aebc->field_0x5a8;
-        UnknownFunction461d40(file, "%i,%f,%f,%f,%f,%f\n", field_0x38[i].field_0x12, x, y, z,
-                              definition->UnknownFunction455ff0(field_0x38[i].field_0x15),
-                              definition->UnknownFunction455f90(field_0x38[i].field_0x14));
+    UnknownFunction461d40(file, "%i\n", placedCount);
+    for (i = 0; i < placedCount; i++) {
+        UnknownEcoDefinition* definition = definitionTable[vegetation[i].definitionIndex];
+        float radius = definition->RadiusForParameter(vegetation[i].radiusParam);
+        float height = definition->HeightForParameter(vegetation[i].heightParam);
+        float z = vegetation[i].quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        float y = vegetation[i].quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        float x = vegetation[i].quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        UnknownFunction461d40(file, "%i,%f,%f,%f,%f,%f\n", vegetation[i].definitionIndex, x, y, z,
+                              definition->RadiusForParameter(vegetation[i].radiusParam),
+                              definition->HeightForParameter(vegetation[i].heightParam));
     }
     fclose(file);
 }
 
 // 0x004598d0: places the objects the .esb lists.
-int EcoSystem::UnknownFunction4598d0() {
-    UnknownTextureStream* stream = field_0x590;
+int EcoSystem::PlaceStoredObjects() {
+    UnknownTextureStream* stream = esbStream;
     int i;
-    for (i = 0; i < field_0x55c; i++) {
+    for (i = 0; i < placedCount; i++) {
         unsigned char definition;
         UnknownEcoCoordinates coordinates;
         unsigned char heightParameter;
@@ -707,31 +707,31 @@ int EcoSystem::UnknownFunction4598d0() {
         stream->UnknownFunction461640(&coordinates, 6, 1);
         stream->UnknownFunction461640(&heightParameter, 1, 1);
         stream->UnknownFunction461640(&radiusParameter, 1, 1);
-        field_0x38[i].UnknownFunction4567a0(field_0x48, definition, &coordinates, heightParameter, radiusParameter);
-        float radius = field_0x58[definition]->UnknownFunction455ff0(radiusParameter);
-        float height = field_0x58[definition]->UnknownFunction455f90(heightParameter);
-        float x = field_0x38[i].field_0x0c.x * g_UnknownGlobal59aebc->field_0x5a8;
-        float y = field_0x38[i].field_0x0c.y * g_UnknownGlobal59aebc->field_0x5a8;
-        float z = field_0x38[i].field_0x0c.z * g_UnknownGlobal59aebc->field_0x5a8;
+        vegetation[i].PlaceQuantized(textureManager, definition, &coordinates, heightParameter, radiusParameter);
+        float radius = definitionTable[definition]->RadiusForParameter(radiusParameter);
+        float height = definitionTable[definition]->HeightForParameter(heightParameter);
+        float x = vegetation[i].quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        float y = vegetation[i].quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
+        float z = vegetation[i].quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
         unsigned int code = g_collisionQuadTree->ComputeCode(x - radius, z - radius, x + radius, z + radius);
         g_MemTagStack->Push("QuadTree");
-        g_collisionQuadTree->Insert(&field_0x38[i], code, y, y + height);
+        g_collisionQuadTree->Insert(&vegetation[i], code, y, y + height);
         g_MemTagStack->Push("EcoSystem");
     }
-    if (!field_0x594) {
-        if (field_0x590)
-            delete field_0x590;
-        field_0x590 = 0;
+    if (!esbStreamInArchive) {
+        if (esbStream)
+            delete esbStream;
+        esbStream = 0;
     }
     return 1;
 }
 
 // 0x00459b40: places the objects the PlacementBmp paints (one pixel per
 // terrain cell, the palette index selecting the definition).
-int EcoSystem::UnknownFunction459b40() {
-    if (!field_0x45c[0])
+int EcoSystem::PlaceAuthoredObjects() {
+    if (!placementBmp[0])
         return 0;
-    UnknownBitmapFile* bitmap = UnknownFunction424140(field_0x45c, 0);
+    UnknownBitmapFile* bitmap = UnknownFunction424140(placementBmp, 0);
     if (!bitmap)
         return 0;
     int width = bitmap->infoHeader.width;
@@ -744,20 +744,20 @@ int EcoSystem::UnknownFunction459b40() {
     for (row = 0; row < height; row++) {
         for (column = 0; column < width; column++) {
             int index = *pixel++;
-            if (index && field_0x58[index]) {
+            if (index && definitionTable[index]) {
                 Vector3 position;
-                if (field_0x55c == field_0x34)
+                if (placedCount == totalObjects)
                     goto done;
                 position.x = (column + 0.5f) * cellX;
                 position.y = 0.0f;
                 position.z = (row + 0.5f) * cellZ;
-                field_0x44->QueryGround(&position, 0, 0, 0);
-                unsigned char heightParameter = field_0x58[index]->UnknownFunction455f50();
-                unsigned char radiusParameter = field_0x58[index]->UnknownFunction455f60(
-                    field_0x58[index]->UnknownFunction455f90(heightParameter));
-                field_0x38[field_0x55c].UnknownFunction4567e0(field_0x48, index, &position, heightParameter,
+                groundTerrain->QueryGround(&position, 0, 0, 0);
+                unsigned char heightParameter = definitionTable[index]->RandomParameter();
+                unsigned char radiusParameter = definitionTable[index]->ParameterForHeight(
+                    definitionTable[index]->HeightForParameter(heightParameter));
+                vegetation[placedCount].Place(textureManager, index, &position, heightParameter,
                                                              radiusParameter);
-                field_0x55c++;
+                placedCount++;
             }
         }
     }

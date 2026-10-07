@@ -23,3 +23,18 @@ register in case 8 differs.
 
 Parameterblocks.h and PCRenderTarget.h gained declarations for the calls
 and the field at +0x1c0; the layout is unchanged.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x004ff0b0` `Attach`
+- `0x004ff180` `ApplyRenderStates`
+- `0x004ff410` `RestoreRenderStates`
+- `0x004ff450` `ReadSaved`
+- `0x004ff620` `LoadTexture`
+- `0x004ff9e0` `ReadKeys`
+- `0x005000b0` `MakeUntextured`
+- `0x005000f0` `CopyFrom`

@@ -7,8 +7,12 @@ GUICursor : GameCursor, GUIManager, UIDlgContainer, ToolTip,
 GUIInputDevice, GUIUser and HiResMeter. The TU runs from `0x00484dd0` to
 `0x004886df` (strong inference: its `.CRT$XCU` initializer entries
 `0x0056623c..0x0056624c`, its `.data` from "GroundFog" `0x0056c338` to the
-HiResMeter strings, and InGameProcs.cpp starting at `0x004886e0`). Names
-other than the RTTI classes are provisional.
+HiResMeter strings, and InGameProcs.cpp starting at `0x004886e0`). Methods
+whose bodies are unambiguous are named for them (`OpenDialogResource`,
+`GrabBackground`, `CreateFilledTexture`, `CreateCursor`, `AcceptDevice`,
+`ToolTip::ShowText`, ...). Methods that other files call through
+KrustyUI.h's alias keep their provisional names, and so do the remaining
+members.
 
 GUIManager owns the dialogs, the background image and screen grab, the
 tool-tip font, the cursors and up to four GUIUsers; each GUIUser routes

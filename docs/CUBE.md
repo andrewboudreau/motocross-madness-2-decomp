@@ -43,3 +43,15 @@ Near misses:
   `0x0043dc60`, the texture coordinates `0x0043e0b0`, the visibility test
   `0x0043e330` and slot 14 `0x0043e4c0`. They differ in register use,
   strength reduction and constant materialisation.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x0043d110` `Reset`
+- `0x0043d460` `LoadTexture`
+- `0x0043d630` `LoadMissingTextures`
+- `0x0043d980` `Load`
+- `0x0043e210` `RecordTextureUse`

@@ -4,7 +4,8 @@
 `UIDialog.h`. RTTI names the classes: UIDialog and UIControl
 (`UnknownGameUiControl`) and the derived button, static, edit, scroll,
 slider, list box, multi-state, animation, timer, frame and drop-down
-controls. Method names are provisional.
+controls. Member names follow the evidence listed under "Names"; the rest
+stay provisional.
 
 Extent: `0x00469db0..0x0047b66f`. Evidence:
 - **Start:** the UIDialog constructor (vtable `0x00552a9c`). gameobj.cpp's
@@ -58,7 +59,7 @@ dlgprocs.cpp, and from the constructors):
   column button's list (0x00473390, UIButton +0x1ec, a UIListBox* that slot
   56 sorts) and the progress step (0x0047b370, UIProgressBar). Their bodies
   use `this` directly. Dialog files find controls with
-  UIDialog 0x0046ebf0, whose second argument is the control type (1 button,
+  `UIDialog::FindControl` (0x0046ebf0), whose second argument is the control type (1 button,
   2 multi-state, 3 list box, 4 radio button, 6 drop-down list, 7/8 scroll
   bar, 0xb edit box), and cast the result to that control.
 - Slots 65 and 66 belong to UIListBox: UIControl's vtable has 65 entries,
@@ -83,6 +84,30 @@ dlgprocs.cpp, and from the constructors):
   (scales), +0x15c (popup), +0x170 (popup alignment), +0x174/+0x178
   (resource screen size), +0x18c (500 images), +0x960 (20 sounds),
   +0x9b0/+0x9b4 (their counts), +0x9b8, +0x7f0c and +0x7f10.
+
+Names (strong inference from bodies and literals, not original symbols):
+- The control loader in `0x0046a920` reads each control's .dtm keys and
+  stores them in UIControl members or passes them to setters; those keys
+  name the members and setters: "GroupId" (+0x78 `groupId`, used by
+  `EnableGroup`/`ShowGroup`), "AttachId" (+0x7c `attachId`, slot 52),
+  "TextColor" (`SetFontColor`), "DropColor", "TextDrop", "TextAlign",
+  "ShapeBounds", "Anchor"/"RelAnchor" (`SetAnchor`), "Show" (`Show(show,
+  1)`), "SoundNorm".."SoundClick" (`SetSound`), "KeyBind", "Pre3D",
+  "Permanent", "Moveable", "FontName"/"FontHeight", "ToolTipText", "FX"
+  (`StartTransition` 100-106) and the list keys "AutoSort", "SelectColor",
+  "Selectable", "AllowWScroll", "SelectBoxColor", "ItemBoxColor".
+- Other methods are named for what their bodies do: `FindControl` (name
+  and type match over the "UIControl" iterator), `SetText` /
+  `SetTextFromResource` (LoadStringA), `EndDialog` (stores the result at
+  +0x17c and starts closing), `AddTimer`/`RemoveTimers`, `NotifyParent`,
+  the list-box row methods and the UIAnim frame methods.
+- `UIDialog::FindSectionObject` (0x0046e9a0) returns the object built for
+  a .dtm section (control, image or sound), falling back to the GUI's.
+- `DialogEventKind.h` names the dialog event kinds after their senders
+  (1 command, 2 list click, 4 create, 5 init, 6 close, 7 timer, 10 edit
+  done, 13 list double click, 18 frame, 19 edit change). It is a separate
+  header because declaring the enum in DialogProc.h changes VC6's register
+  choice in BikeRaceNearMisses' 0x00419970.
 
 Other header facts:
 - InputDevice.h befriends UIDialog, UIScrollBar and UIListBox (they read

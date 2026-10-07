@@ -77,7 +77,7 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
     }
     font[count] = 0;
     field_0x2c = new(__FILE__, 121) UnknownKrustyUIGui(1);
-    if (!UnknownFunction469130(field_0x2c->UnknownFunction4853b0(
+    if (!UnknownFunction469130(field_0x2c->SetUp(
             field_0x18, g_UnknownGlobal56e26c->field_0x0c->field_0x64, g_UnknownGlobal56e26c->field_0x3c, 0,
             0, 0, "Arial", 15, "ui\\cursor.tga", UnknownFunction49bda0, -1))) {
         Release();
@@ -93,8 +93,8 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
     field_0x2c->UnknownFunction485ef0();
     field_0x2c->UnknownFunction485d70("ui");
     field_0x2c->UnknownFunction486560("ui\\wait.tga");
-    field_0x2c->UnknownFunction486540(0)->UnknownFunction487d60();
-    field_0x2c->UnknownFunction486540(0)->UnknownFunction487c30(field_0x2c->field_0x30c);
+    field_0x2c->UnknownFunction486540(0)->ForgetDevices();
+    field_0x2c->UnknownFunction486540(0)->AcceptDevice(field_0x2c->field_0x30c);
     field_0x2c->UnknownFunction486630(0);
     g_UnknownResourceManager572b44->UnknownFunction4e9030("ui\\uires.res", 0);
     g_UnknownGlobal56e26c->mode.UnknownFunction523e50();
@@ -111,11 +111,11 @@ GameObject* KrustyUI::UnknownFunction4988a0(RenderTarget* target, int showIntro)
     field_0x58 = 0;
     field_0x48 = 0;
     UnknownFunction49a8b0();
-    UnknownFunction49a540();
+    LoadGarageTables();
     field_0x2c->field_0x34c =
         (g_UnknownGlobal56e26c->mode.field_0xa24 ? (g_UnknownGlobal56e26c->mode.field_0xa3c - 100) * 25 : -10000) -
         200;
-    if ((!g_UnknownGlobal56e26c->field_0x08 || !g_UnknownGlobal56e26c->field_0x08->field_0x14) && showIntro)
+    if ((!g_UnknownGlobal56e26c->field_0x08 || !g_UnknownGlobal56e26c->field_0x08->lobbyConnected) && showIntro)
         field_0x2c->UnknownFunction485a70(new(__FILE__, 201) Intro1Dlg, 0, 2, 0, 0, 0, 0, 1);
     return this;
 }

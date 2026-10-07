@@ -23,12 +23,12 @@ ColorMapper* ColorMapper::UnknownFunction4dddd0(const char* name) {
 }
 
 // 0x004ddec0
-void ColorMapper::UnknownFunction4ddec0() {
+void ColorMapper::Build16BitTables() {
     int i;
 
     for (i = 0; i < 256; i++) {
-        field_0x310[i] = ((field_0x10[i][0] >> 3) << 10) | ((field_0x10[i][1] >> 3) << 5) | (field_0x10[i][2] >> 3);
-        field_0x510[i] = ((field_0x10[i][0] >> 3) << 11) | ((field_0x10[i][1] >> 2) << 5) | (field_0x10[i][2] >> 3);
+        entries555[i] = ((entries[i][0] >> 3) << 10) | ((entries[i][1] >> 3) << 5) | (entries[i][2] >> 3);
+        entries565[i] = ((entries[i][0] >> 3) << 11) | ((entries[i][1] >> 2) << 5) | (entries[i][2] >> 3);
     }
 }
 
@@ -38,9 +38,9 @@ void ColorMapper::UnknownFunction4ddec0() {
 ColorMapper::ColorMapper(UnknownTextureStream* stream) {
     int compressed;
 
-    if (stream->UnknownFunction461640(&field_0x08, 4, 1) != 1)
+    if (stream->UnknownFunction461640(&firstIndex, 4, 1) != 1)
         return;
-    if (stream->UnknownFunction461640(&field_0x0c, 4, 1) != 1)
+    if (stream->UnknownFunction461640(&entryCount, 4, 1) != 1)
         return;
     if (stream->UnknownFunction461640(&compressed, 4, 1) != 1)
         return;
@@ -54,50 +54,50 @@ ColorMapper::ColorMapper(UnknownTextureStream* stream) {
         if (stream->UnknownFunction461640(&size, 4, 1) != 1)
             return;
         if (size == 0x300) {
-            if (stream->UnknownFunction461640(field_0x10, 0x300, 1) != 1)
+            if (stream->UnknownFunction461640(entries, 0x300, 1) != 1)
                 return;
         } else {
             if (stream->UnknownFunction461640(buffer, size, 1) != 1)
                 return;
-            UnknownFunction4a03d0(field_0x10[0], buffer, 0x300);
+            UnknownFunction4a03d0(entries[0], buffer, 0x300);
         }
         if (stream->UnknownFunction461640(&size, 4, 1) != 1)
             return;
         if (size == 0x8000) {
-            if (stream->UnknownFunction461640(field_0x710, 0x8000, 1) != 1)
+            if (stream->UnknownFunction461640(indexFrom555, 0x8000, 1) != 1)
                 return;
         } else {
             if (stream->UnknownFunction461640(buffer, size, 1) != 1)
                 return;
-            UnknownFunction4a03d0(field_0x710, buffer, 0x8000);
+            UnknownFunction4a03d0(indexFrom555, buffer, 0x8000);
         }
         if (stream->UnknownFunction461640(&size, 4, 1) != 1)
             return;
         if (size == 0x10000) {
-            if (stream->UnknownFunction461640(field_0x8710, 0x10000, 1) != 1)
+            if (stream->UnknownFunction461640(indexFrom565, 0x10000, 1) != 1)
                 return;
         } else {
             if (stream->UnknownFunction461640(buffer, size, 1) != 1)
                 return;
-            UnknownFunction4a03d0(field_0x8710, buffer, 0x10000);
+            UnknownFunction4a03d0(indexFrom565, buffer, 0x10000);
         }
         DebugFree(buffer, __FILE__, 261);
     } else {
-        if (stream->UnknownFunction461640(field_0x10, 0x300, 1) != 1)
+        if (stream->UnknownFunction461640(entries, 0x300, 1) != 1)
             return;
-        if (stream->UnknownFunction461640(field_0x710, 0x8000, 1) != 1)
+        if (stream->UnknownFunction461640(indexFrom555, 0x8000, 1) != 1)
             return;
-        if (stream->UnknownFunction461640(field_0x8710, 0x10000, 1) != 1)
+        if (stream->UnknownFunction461640(indexFrom565, 0x10000, 1) != 1)
             return;
     }
-    if (field_0x0c != 256) {
-        field_0x10[field_0x0c + field_0x08][0] = 0xff;
-        field_0x10[field_0x0c + field_0x08][1] = 0;
-        field_0x10[field_0x0c + field_0x08][2] = 0xff;
-        field_0x8710[0xf81f] = field_0x710[0x7c1f] = (unsigned char)(field_0x0c + field_0x08);
-        field_0x0c++;
+    if (entryCount != 256) {
+        entries[entryCount + firstIndex][0] = 0xff;
+        entries[entryCount + firstIndex][1] = 0;
+        entries[entryCount + firstIndex][2] = 0xff;
+        indexFrom565[0xf81f] = indexFrom555[0x7c1f] = (unsigned char)(entryCount + firstIndex);
+        entryCount++;
     }
-    UnknownFunction4ddec0();
+    Build16BitTables();
 }
 
 // 0x004de200
@@ -109,15 +109,15 @@ ColorMapper::~ColorMapper() {
 
 // 0x004de270
 unsigned char* ColorMapper::UnknownFunction4de270() {
-    return field_0x10[0];
+    return entries[0];
 }
 
 // 0x004de280
 unsigned char* ColorMapper::UnknownFunction4de280() {
-    return field_0x710;
+    return indexFrom555;
 }
 
 // 0x004de290
 unsigned char* ColorMapper::UnknownFunction4de290() {
-    return field_0x8710;
+    return indexFrom565;
 }

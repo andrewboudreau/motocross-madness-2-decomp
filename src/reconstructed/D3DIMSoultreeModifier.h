@@ -15,7 +15,7 @@
 // vptr. Member and method names are provisional (tier 3).
 //
 // The modifier keeps the D3DIMSoultreeObjects it is attached to; the objects
-// call UnknownFunction4452f0 / UnknownFunction445360 when a modifier is added
+// call AddObject / RemoveObject when a modifier is added
 // to or removed from one of their two modifier lists (+0x264 / +0x26c).
 
 #include "Wrecker.h"       // GraphicsTest
@@ -35,15 +35,15 @@ public:
                                       UnknownSoultreeMesh** out) = 0;
 
     // 0x004452f0 (ret 4): appends `object` (lines 26 and 33).
-    void UnknownFunction4452f0(D3DIMSoultreeObject* object);
+    void AddObject(D3DIMSoultreeObject* object);
     // 0x00445360 (ret 4): removes `object` (lines 41 and 53).
-    void UnknownFunction445360(D3DIMSoultreeObject* object);
+    void RemoveObject(D3DIMSoultreeObject* object);
     // 0x004453e0: detaches the modifier from every object (lines 64 and 80);
     // field_0x3c selects the object's first (0x00444de0) or second
     // (0x00444f10) modifier list.
     void UnknownFunction4453e0();
 
-    D3DIMSoultreeObject** field_0x34;                 // objects
-    int field_0x38;                                   // object count
+    D3DIMSoultreeObject** modifiedObjects;            // objects
+    int objectCount;                                  // object count
     int field_0x3c;                                   // 1 by default
 };

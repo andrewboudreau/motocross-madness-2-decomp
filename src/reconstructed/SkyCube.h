@@ -17,5 +17,5 @@ public:
     SkyCube* UnknownFunction4fb230(void* value, UnknownTextureStream* stream, UnknownCubeTextureContext* context,
                                    float height);
 
-    float field_0x44;                         // height of the cube's centre above the camera
+    float centerHeight;                       // height of the cube's centre above the camera
 };

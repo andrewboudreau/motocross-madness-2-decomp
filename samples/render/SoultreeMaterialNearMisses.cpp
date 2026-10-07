@@ -8,75 +8,76 @@
 // return-versus-break, default labels, explicit empty cases 5/7, a local
 // target pointer and a PCRenderTarget cast do not change it.
 #include "../../src/reconstructed/SoultreeMaterial.h"
+#include "../../src/reconstructed/D3DConstants.h"
 
 // 0x00689ed0 (defined in SoultreeMaterial.cpp)
 extern int g_UnknownInt689ed0;
 
 // 0x004ff180
-void SoultreeMaterial::UnknownFunction4ff180()
+void SoultreeMaterial::ApplyRenderStates()
 {
     if (field_0x70) {
         field_0x70->Select();
         int format = field_0x70->texture->field_0x20;
-        if (format != 0x613 && format != 0x115c && format != 0x22b8) {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0xf, 0, 0);
-        } else if (field_0xa8) {
-            if (field_0xbc)
+        if (format != 1555 && format != 4444 && format != 8888) {
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+        } else if (hasColorKey) {
+            if (hasAlpha)
                 ((RenderTarget*)field_0x18)->UnknownVirtualSlot18(0);
             else
                 ((RenderTarget*)field_0x18)->UnknownVirtualSlot18(0x80);
         } else {
             ((RenderTarget*)field_0x18)->UnknownVirtualSlot18(0);
         }
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 4);
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 2, 2);
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 3, 0);
-        if (format == 0x115c || format == 0x22b8 || (format == 0x613 && field_0xbc)) {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 1, 0);
-            if (!field_0xbc && field_0xc8 != 6) {
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 2);
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 5, 2);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        if (format == 4444 || format == 8888 || (format == 1555 && hasAlpha)) {
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+            if (!hasAlpha && mappingType != 6) {
+                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
             } else {
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 4);
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 5, 2);
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 6, 0);
-                ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 1, 0);
+                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+                ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+                ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
             }
-        } else if (field_0xbc) {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 1, 0);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 2);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 6, 0);
+        } else if (hasAlpha) {
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
         } else {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 0, 0);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 2);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 5, 2);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         }
     } else {
         ((RenderTarget*)field_0x18)->UnknownVirtualSlot11(0);
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
-        if (field_0xbc) {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 1, 0);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 2);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 5, 0);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+        if (hasAlpha) {
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
         } else {
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 0, 0);
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 4, 1);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
         }
     }
-    if (field_0xb4) {
+    if (clampTexture) {
         ((RenderTarget*)field_0x18)->UnknownVirtualSlot6(0, 0xc, &g_UnknownInt689ed0);
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, 0xc, 3);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
     }
-    switch (field_0xc8) {
+    switch (mappingType) {
     case 3:
     case 6:
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 1, 0);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
         break;
     case 4:
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x1b, 1, 0);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
         break;
     case 8:
-        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(0x80, 1, 0);
+        ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_WRAP0, 1, 0);
         break;
     }
 }

@@ -54,11 +54,11 @@ struct UnknownEventRacerMessage {                  // type 0x86
 
 // 0x0045c830
 UnknownEventEntry::UnknownEventEntry() {
-    UnknownFunction45c840();
+    Reset();
 }
 
 // 0x0045c840: an empty entry in position 1.
-void UnknownEventEntry::UnknownFunction45c840() {
+void UnknownEventEntry::Reset() {
     field_0x00 = 0;
     field_0x04 = 1;
     field_0x08 = 0;
@@ -81,7 +81,7 @@ void UnknownEventEntry::UnknownFunction45c840() {
 // 0x0045c8b0: the racer's results. A racer with +0x4a0 set is listed in
 // position 99 with nothing else; in modes 0 and 4 every racer counts as
 // finished.
-void UnknownEventEntry::UnknownFunction45c8b0(UnknownEventRacer* racer) {
+void UnknownEventEntry::CopyFromRacer(UnknownEventRacer* racer) {
     field_0x00 = racer->field_0x11bc;
     int length = strlen(racer->field_0x5e0);
     int count = length > 15 ? 15 : length;
@@ -135,8 +135,8 @@ EventManager::EventManager(int flags) : GameObject(flags) {
     keepAliveTimeout = 20.0f;
     keepAliveInterval = 1.0f;
     field_0x440 = 0;
-    field_0x3d4 = 0;
-    field_0x3d0 = 0;
+    podiumCamera = 0;
+    podiumObject = 0;
     field_0x3c4 = Vector3(-1000.0f, -1000.0f, -1000.0f);
 }
 
@@ -208,7 +208,7 @@ TextQueueOverlay* EventManager::UnknownFunction45d340() {
 }
 
 // 0x0045d390
-int EventManager::UnknownFunction45d390() {
+int EventManager::HasRaceMode() {
     if (g_UnknownGlobal56e26c->field_0x558 || g_UnknownGlobal56e26c->field_0x55c ||
         g_UnknownGlobal56e26c->field_0x560 || g_UnknownGlobal56e26c->field_0x564 ||
         g_UnknownGlobal56e26c->field_0x568)
@@ -248,21 +248,21 @@ int EventManager::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputE
 int EventManager::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     if (field_0x3c) {
-        UnknownFunction4aef40();
+        EndNetworkGame();
         field_0x3c = 0;
     }
     if (field_0x34)
-        UnknownFunction45e550(frameTime);
+        WaitForRemoteRacers(frameTime);
     else if (!g_UnknownGlobal56e26c->field_0x3428 && !g_UnknownGlobal56e26c->uiInteractionBlocked &&
-             UnknownFunction45d390())
+             HasRaceMode())
         UnknownFunction45eef0(frameTime);
     if (g_UnknownGlobal56e26c->uiInteractionBlocked) {
         g_UnknownGlobal56e26c->field_0x3434 += frameTime;
         for (int i = 0; i < podiumCharacterCount; i++)
             podiumCharacters[i]->CharacterVirtualSlot7(frameTime, 0, 0);
-        field_0x3e4 += frameTime * field_0x414 * (1.0f / 7);
-        field_0x3d4->UnknownFunction42e9b0(&field_0x3e4, 0, 0, 0, 0);
-        field_0x3d4->UnknownVirtualSlot29(field_0x3d8);
+        podiumCameraPosition += frameTime * podiumPanSpeed * (1.0f / 7);
+        podiumCamera->UnknownFunction42e9b0(&podiumCameraPosition, 0, 0, 0, 0);
+        podiumCamera->UnknownVirtualSlot29(field_0x3d8);
         if (!g_UnknownGlobal56e26c->field_0x3438 && g_UnknownGlobal56e26c->field_0x3434 > 7.0f) {
             g_UnknownGlobal56e26c->uiInteractionBlocked = 0;
             g_UnknownGlobal56e26c->field_0x3438 = 1;
@@ -275,27 +275,27 @@ int EventManager::UnknownVirtualSlot10(float frameTime) {
 // 0x0045e520
 void EventManager::UnknownFunction45e520() {
     for (int i = 0; i < 11; i++)
-        field_0x50[i].UnknownFunction45c840();
+        field_0x50[i].Reset();
     field_0x48 = 0;
     g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c = 0;
 }
 
 // 0x0045e550
-void EventManager::UnknownFunction45e550(float) {
+void EventManager::WaitForRemoteRacers(float) {
     if (!field_0x34)
         return;
     int ready = 1;
-    int local = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
+    int local = g_UnknownGlobal56e26c->field_0x08->localPlayer;
     for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
         int player = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4;
         if (player != local) {
-            NetPlayer* connected = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac800(player);
+            NetPlayer* connected = g_UnknownGlobal56e26c->field_0x08->FindPlayer(player);
             if (!g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xcc && connected)
                 ready = 0;
         }
     }
     if (ready) {
-        g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac950();
+        g_UnknownGlobal56e26c->field_0x08->StopKeepAlive();
         field_0x34 = 0;
         UnknownFunction45e600();
         if (g_UnknownGlobal56e26c->networkGameObject)
@@ -304,7 +304,7 @@ void EventManager::UnknownFunction45e550(float) {
 }
 
 // 0x0045e930
-int UnknownFunction45e930(const void* a, const void* b) {
+int CompareRankings(const void* a, const void* b) {
     const UnknownEventRanking* first = (const UnknownEventRanking*)a;
     const UnknownEventRanking* second = (const UnknownEventRanking*)b;
     if (first->value < second->value)
@@ -327,7 +327,7 @@ int UnknownFunction45e930(const void* a, const void* b) {
 }
 
 // 0x0045f180
-void EventManager::UnknownFunction45f180(UnknownEventRacer* racer, int* points) {
+void EventManager::AddChampionshipPoints(UnknownEventRacer* racer, int* points) {
     int table[10];
     table[0] = 20;
     table[1] = 17;
@@ -344,7 +344,7 @@ void EventManager::UnknownFunction45f180(UnknownEventRacer* racer, int* points) 
 }
 
 // 0x0045d3d0
-int UnknownFunction45d3d0(const void* a, const void* b) {
+int CompareStandings(const void* a, const void* b) {
     const UnknownEventStanding* first = (const UnknownEventStanding*)a;
     const UnknownEventStanding* second = (const UnknownEventStanding*)b;
     if (first->field_0x00 > second->field_0x00)
@@ -371,7 +371,7 @@ void EventManager::UnknownFunction45e600() {
         UnknownKrustyBikeView* view = UnknownFunction45d2f0();
         if (view)
             view->UnknownVirtualSlot5();
-        if (UnknownFunction45d480()) {
+        if (CreatePodiumScene()) {
             g_UnknownGlobal56e26c->uiInteractionBlocked = 1;
             g_UnknownGlobal56e26c->field_0x3434 = 0;
             return;
@@ -386,7 +386,7 @@ void EventManager::UnknownFunction45e600() {
         g_UnknownGlobal56e26c->field_0x3438 = 0;
         if (g_UnknownGlobal56e26c->field_0x08 &&
             (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 2 || field_0x48 > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c))
-            g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac510(1);
+            g_UnknownGlobal56e26c->field_0x08->SetSessionJoinable(1);
         field_0x34 = 0;
         UnknownFunction45cdc0(2);
         UnknownFunction45e710(g_UnknownGlobal56e26c->field_0x18 == 1 ? 0x88e : 0x868);
@@ -468,14 +468,14 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             TextQueueOverlay* target = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
             if (target) {
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x13d7, text, sizeof(text));
-                if (g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac720(message->field_0x04, name)) {
+                if (g_UnknownGlobal56e26c->field_0x08->GetPlayerName(message->field_0x04, name)) {
                     sprintf(line, "%s %s", name, text);
                     UnknownMessage notice(line, 3.25f);
                     target->UnknownFunction51b540(&notice);
                 }
             }
-            if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x08->field_0x0c) {
-                g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac950();
+            if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x08->localPlayer) {
+                g_UnknownGlobal56e26c->field_0x08->StopKeepAlive();
                 field_0x3c = 1;
             } else {
                 for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x1be0; i++) {
@@ -489,7 +489,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
             if (view)
                 view->UnknownFunction420590(message->field_0x04);
         } else if (type == 0x8e) {
-            if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x08->field_0x0c) {
+            if (message->field_0x04 == g_UnknownGlobal56e26c->field_0x08->localPlayer) {
                 if (UnknownFunction45d2b0()) {
                     TextQueueOverlay* target = UnknownFunction45d340();
                     if (target) {
@@ -508,7 +508,7 @@ int EventManager::UnknownVirtualSlot24(int type, void* data, int from, int to, i
 }
 
 // 0x0045fbb0
-int UnknownFunction45fbb0(const void* a, const void* b) {
+int CompareUnsigned(const void* a, const void* b) {
     unsigned int first = *(const unsigned int*)a;
     unsigned int second = *(const unsigned int*)b;
     if (first < second)
@@ -535,7 +535,7 @@ void EventManager::UnknownFunction45fbd0(int player) {
         }
     }
     if (g_UnknownGlobal56e26c->mode.field_0x1be0)
-        qsort(field_0x50, g_UnknownGlobal56e26c->mode.field_0x1be0 - 1, sizeof(UnknownEventEntry), UnknownFunction45fbb0);
+        qsort(field_0x50, g_UnknownGlobal56e26c->mode.field_0x1be0 - 1, sizeof(UnknownEventEntry), CompareUnsigned);
 }
 
 // 0x0045f9a0: once, sends the local racer's state and then each AI racer's
@@ -558,8 +558,8 @@ void EventManager::UnknownFunction45f9a0() {
     message.field_0x1c = view->field_0x38->field_0x760;
     message.field_0x20 = view->field_0x38->field_0x764;
     message.field_0x04 = 0;
-    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(
-        0x86, &message, sizeof(message), g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
+    g_UnknownGlobal56e26c->field_0x08->Send(
+        0x86, &message, sizeof(message), g_UnknownGlobal56e26c->field_0x08->localPlayer, 0);
     for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++) {
         if (!view->field_0x40[i]->field_0x7a4) {
             view->field_0x40[i]->field_0x754 = FLT_MAX;
@@ -574,11 +574,11 @@ void EventManager::UnknownFunction45f9a0() {
         message.field_0x1c = view->field_0x40[i]->field_0x760;
         message.field_0x20 = view->field_0x40[i]->field_0x764;
         message.field_0x04 = view->field_0x40[i]->field_0x11c0;
-        g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(
-            0x86, &message, sizeof(message), g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
+        g_UnknownGlobal56e26c->field_0x08->Send(
+            0x86, &message, sizeof(message), g_UnknownGlobal56e26c->field_0x08->localPlayer, 0);
     }
     field_0x38 = 1;
-    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac8d0(keepAliveTimeout, keepAliveInterval);
+    g_UnknownGlobal56e26c->field_0x08->StartKeepAlive(keepAliveTimeout, keepAliveInterval);
     view->UnknownVirtualSlot4();
     field_0x34 = 1;
 }
@@ -600,8 +600,8 @@ int EventManager::UnknownFunction45cb70() {
     podiumCharacterCount = 0;
     for (int j = 0; j < 3; j++)
         podiumCharacters[j] = 0;
-    field_0x3d4 = 0;
-    field_0x3d0 = 0;
+    podiumCamera = 0;
+    podiumObject = 0;
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
     g_UnknownGlobal56e26c->mode.UnknownFunction523a60(g_UnknownGlobal56e26c->mode.field_0x6a0,
                                                       g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "env", path);
@@ -610,14 +610,14 @@ int EventManager::UnknownFunction45cb70() {
     case 0:
         g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9e30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "scn", 0);
         g_UnknownGlobal56e26c->field_0x55c = (TrackGameViewOwner*)(new(__FILE__, 252) BaseQuarryEvent(1))
-            ->UnknownFunction4de3b0(g_UnknownGlobal56e26c->field_0x10, UnknownFunction45cb20);
+            ->Create(g_UnknownGlobal56e26c->field_0x10, LoadProgressCallback);
         if (!g_UnknownGlobal56e26c->field_0x34->UnknownFunction469190(g_UnknownGlobal56e26c->field_0x55c, -1))
             return 0;
         break;
     case 2:
         g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9e30(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "scn", 0);
         g_UnknownGlobal56e26c->field_0x564 = (TrackGameViewOwner*)(new(__FILE__, 270) NationalRace(1))
-            ->UnknownFunction4aa850(g_UnknownGlobal56e26c->field_0x10, UnknownFunction45cb20);
+            ->Create(g_UnknownGlobal56e26c->field_0x10, LoadProgressCallback);
         if (!g_UnknownGlobal56e26c->field_0x34->UnknownFunction469190(g_UnknownGlobal56e26c->field_0x564, -1))
             return 0;
         break;
@@ -733,16 +733,16 @@ void EventManager::UnknownFunction45e9d0() {
                     ranked++;
                 }
             }
-            qsort(rankings, ranked, sizeof(rankings[0]), UnknownFunction45e930);
+            qsort(rankings, ranked, sizeof(rankings[0]), CompareRankings);
             for (int i = 0; i < ranked; i++)
                 rankings[i].racer->field_0x784 = i + 1;
         }
         iterator = 0;
         for (racer = view->UnknownFunction4204e0(&iterator); racer; racer = view->UnknownFunction4204e0(&iterator)) {
-            field_0x50[count].UnknownFunction45c8b0(racer);
+            field_0x50[count].CopyFromRacer(racer);
             if ((g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 || g_UnknownGlobal56e26c->field_0x3444) &&
                 !racer->field_0x4a0)
-                UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
+                AddChampionshipPoints(racer, &field_0x50[count].field_0x28);
             count++;
         }
         break;
@@ -763,9 +763,9 @@ void EventManager::UnknownFunction45e9d0() {
             scores[i].racer->field_0x784 = i + 1;
         next = 0;
         for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
-            field_0x50[count].UnknownFunction45c8b0(racer);
+            field_0x50[count].CopyFromRacer(racer);
             if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
-                UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
+                AddChampionshipPoints(racer, &field_0x50[count].field_0x28);
             count++;
         }
         break;
@@ -787,9 +787,9 @@ void EventManager::UnknownFunction45e9d0() {
                 scores[i].racer->field_0x784 = i + 1;
             next = 0;
             for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
-                field_0x50[count].UnknownFunction45c8b0(racer);
+                field_0x50[count].CopyFromRacer(racer);
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
-                    UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
+                    AddChampionshipPoints(racer, &field_0x50[count].field_0x28);
                 count++;
             }
         } else {
@@ -808,9 +808,9 @@ void EventManager::UnknownFunction45e9d0() {
                 scores[i].racer->field_0x784 = i + 1;
             next = 0;
             for (racer = view->UnknownFunction4204e0(&next); racer; racer = view->UnknownFunction4204e0(&next)) {
-                field_0x50[count].UnknownFunction45c8b0(racer);
+                field_0x50[count].CopyFromRacer(racer);
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && !racer->field_0x4a0)
-                    UnknownFunction45f180(racer, &field_0x50[count].field_0x28);
+                    AddChampionshipPoints(racer, &field_0x50[count].field_0x28);
                 count++;
             }
         }
@@ -828,7 +828,7 @@ void EventManager::UnknownFunction45e9d0() {
                 standing++;
             }
         }
-        qsort(standings, standing, sizeof(standings[0]), UnknownFunction45d3d0);
+        qsort(standings, standing, sizeof(standings[0]), CompareStandings);
         next = 0;
         while ((racer = view->UnknownFunction4204e0(&next)) != 0) {
             int i;
@@ -924,7 +924,7 @@ void EventManager::UnknownFunction45cdc0(int mode) {
             filtered[count] = 0;
             sprintf(name, "Record\\%s.gho", filtered);
             if (view->field_0x1a8)
-                view->field_0x1a8->UnknownFunction524d00(name);
+                view->field_0x1a8->Save(name);
         }
     }
     if (g_UnknownGlobal56e26c->field_0x558) {
@@ -979,7 +979,7 @@ public:
 extern QuadTree* g_collisionQuadTree;                           // 0x0068aba4
 
 // 0x0045fce0
-void EventManager::UnknownFunction45fce0(float x0, float z0, float x1, float z1) {
+void EventManager::RemoveVegetationInRect(float x0, float z0, float x1, float z1) {
     struct {
         Vegetation* object;
         unsigned int code;

@@ -23,20 +23,20 @@ struct UnknownKrustyBikeView;
 // offsets; the declared class there keeps them protected.
 struct UnknownRaceSoundCamera {
     unsigned char field_0x000[0x170];
-    Vector3 field_0x170;                  // position
-    Vector3 field_0x17c;                  // forward
-    Vector3 field_0x188;                  // up
+    Vector3 listenerPosition;                  // position
+    Vector3 listenerForward;                  // forward
+    Vector3 listenerUp;                  // up
     unsigned char field_0x194[0x3b0 - 0x194];
-    UnknownEventRacer* field_0x3b0;       // followed bike
-    UnknownEventRacer* field_0x3b4;       // racer the listener follows
+    UnknownEventRacer* followedBike;       // followed bike
+    UnknownEventRacer* followedRacer;       // racer the listener follows
 };
 
 // One 0x54-byte engine channel per racer (RaceSound+0x98, eleven of them).
 // Each owns a 44100-byte sample buffer; the channel at RaceSound+0x434 is
 // streamed into its Sound in two halves (0x004e4a30 / 0x004e4d10).
 struct UnknownRaceSoundChannel {
-    UnknownEventRacer* field_0x00;        // racer
-    Sound* field_0x04;
+    UnknownEventRacer* channelRacer;        // racer
+    Sound* channelSound;
     int field_0x08;                       // -1 when reset
     int field_0x0c;                       // sample set: 0, or 1/2 by engine
     int field_0x10;
@@ -49,13 +49,13 @@ struct UnknownRaceSoundChannel {
     int field_0x2c;
     int field_0x30;
     int field_0x34;
-    void* field_0x38;                     // sample being streamed
-    float field_0x3c;                     // seconds airborne
+    void* streamSample;                     // sample being streamed
+    float airborneTime;                     // seconds airborne
     int field_0x40;
     int field_0x44;
     int field_0x48;
     int field_0x4c;                       // 1000000 when reset
-    void* field_0x50;                     // 44100-byte buffer
+    void* sampleBuffer;                     // 44100-byte buffer
 };
 
 // EAX 1.0 listener settings (16 bytes) passed to PCSoundInterface
@@ -77,56 +77,56 @@ public:
     // 0x004e23f0 (thiscall, ret 0x10; bikerace.cpp 0x00419628 passes its
     // +0x18, itself, its +0x50 camera and 6): creates the sound groups and
     // loads every sample; returns this.
-    RaceSound* UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* view, UnknownRaceSoundCamera* camera,
+    RaceSound* Create(void* owner, UnknownKrustyBikeView* view, UnknownRaceSoundCamera* camera,
                                      int racers);
     // 0x004e3430: assigns the racers to channels and resets the listener and
     // the 3D distances.
-    void UnknownFunction4e3430();
-    int UnknownFunction4e39b0(float frameTime); // 0x004e39b0: per-racer sounds
+    void AssignChannels();
+    int UpdateRacerSounds(float frameTime); // 0x004e39b0: per-racer sounds
     // 0x004e42e0 / 0x004e43a0: plays a random idle sound from field_0x11b8
     // (field_0x11d0) at `racer`; the index, or 0 after ten busy tries.
     int UnknownFunction4e42e0(UnknownEventRacer* racer);
     int UnknownFunction4e43a0(UnknownEventRacer* racer);
     // 0x004e4460: the ground distance between two points, 500 when either
     // axis is further apart than that.
-    float UnknownFunction4e4460(Vector3* a, Vector3* b);
-    void UnknownFunction4e4a30();         // 0x004e4a30: starts the stream
-    void UnknownFunction4e4d10();         // 0x004e4d10: refills a half
+    float GroundDistance(Vector3* a, Vector3* b);
+    void StartStream();         // 0x004e4a30: starts the stream
+    void RefillStream();         // 0x004e4d10: refills a half
     // 0x004e5500: reads the raw sample `name` from Audio.res into a new
     // buffer; its size goes to *size (both 0 on failure).
-    void UnknownFunction4e5500(const char* name, void** data, int* size);
+    void ReadSample(const char* name, void** data, int* size);
     // 0x004e5660: loads `name` from Audio.res into `sound`.
-    int UnknownFunction4e5660(Sound* sound, const char* name, int a, int b);
+    int LoadSound(Sound* sound, const char* name, int a, int b);
     // 0x004e5780: plays `sound` while sound is on (`network` sounds only in
     // network games); `stop` rewinds it first.
-    void UnknownFunction4e5780(Sound* sound, int network, int stop, int loop, int unused);
+    void PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused);
     void UnknownFunction4e57d0(UnknownEventRacer* racer, float value); // 0x004e57d0
     void UnknownFunction4e5860();         // 0x004e5860: plays field_0x11b0
     // 0x004e5880 (qsort callback): orders channels by field_0x4c.
-    static int UnknownFunction4e5880(const void* a, const void* b);
+    static int CompareChannels(const void* a, const void* b);
 
-    UnknownEventRacer* field_0x2c;        // listener's racer
+    UnknownEventRacer* listenerRacer;        // listener's racer
     int field_0x30;
-    UnknownKrustyBikeView* field_0x34;
-    UnknownRaceSoundCamera* field_0x38;
+    UnknownKrustyBikeView* raceView;
+    UnknownRaceSoundCamera* listenerCamera;
     SoundGroup* field_0x3c;
     SoundGroup* field_0x40;
     SoundGroup* field_0x44;
     SoundGroup* field_0x48;
-    SoundGroup* field_0x4c;               // crowd sounds (network games); slot 23 sets its volume
-    long field_0x50;                      // music volume: 0, -500 or -10000
-    int field_0x54;                       // EAX environment on
+    SoundGroup* crowdSounds;               // crowd sounds (network games); slot 23 sets its volume
+    long musicVolume;                      // music volume: 0, -500 or -10000
+    int eaxEnabled;                       // EAX environment on
     int field_0x58;
     int field_0x5c;
     int field_0x60;
     int field_0x64;
-    UnknownWaveHeader field_0x68;         // header read by 0x004e5500
-    int field_0x94;                       // channels in use
-    UnknownRaceSoundChannel field_0x98[11];
-    UnknownRaceSoundChannel* field_0x434; // streamed channel
-    UnknownEventRacer* field_0x438;       // racer being updated
-    Sound* field_0x43c[4];                // the four engine voices
-    int field_0x44c[4];                   // voice in use
+    UnknownWaveHeader waveHeader;         // header read by 0x004e5500
+    int channelsInUse;                       // channels in use
+    UnknownRaceSoundChannel engineChannels[11];
+    UnknownRaceSoundChannel* streamChannel; // streamed channel
+    UnknownEventRacer* currentRacer;       // racer being updated
+    Sound* engineVoices[4];                // the four engine voices
+    int engineVoiceInUse[4];                   // voice in use
     // Engines present in the race (audio_*.ini sections "125", "250", "400",
     // chosen by racer +0x738/+0x737),
     // the divisor applied to each engine's sample counts, the listener's
@@ -140,7 +140,7 @@ public:
     int field_0x488[3];
     int field_0x494[3];
     unsigned char field_0x4a0[0x83c - 0x4a0];
-    Sound* field_0x83c;                   // listener's own engine
+    Sound* ownEngine;                   // listener's own engine
     // Eight sample sets of three engines by ten samples (data, then byte
     // counts, then the number loaded per engine).
     void* field_0x840[3][10];

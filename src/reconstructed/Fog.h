@@ -41,18 +41,20 @@ public:
     void UnknownFunction4627a0(unsigned int color, float visibility, float haziness);
     void UnknownFunction462db0(int level);    // 0x00462db0: detail level
 
+    // QuarryStuntEvent.cpp reads +0x2c, +0x38, +0x40 and +0x44 under their
+    // provisional names.
     unsigned int field_0x2c;                  // colour, 0x00RRGGBB
-    float field_0x30;                         // fog start
-    float field_0x34;                         // fog end
+    float fogStart;
+    float fogEnd;
     float field_0x38;                         // visibility
-    float field_0x3c;                         // visibility offset (keys, detail level)
+    float visibilityOffset;                   // keys 0x21 / 0x22 and the detail level move it
     float field_0x40;                         // haziness
-    int field_0x44;                           // fog kind: 0x80 vertex, 0x100 table, 0x10000 range
-    int field_0x48;                           // "RenderFog"
-    int field_0x4c;                           // set while FogOn draws it
-    float field_0x50;
-    float field_0x54;
-    float field_0x58;
+    int field_0x44;                           // fog kind: the D3DPRASTERCAPS_FOGVERTEX, FOGTABLE or FOGRANGE bit
+    int renderFog;                            // "DriverInfo\<driver>\RenderFog" setting
+    int drawnByFogOn;                         // set while FogOn draws it (skips the backdrop)
+    float farScale;                           // scale the visibility into the fog range
+    float nearScale;
+    float minimumDistance;
 };
 
 class FogOff : public GameObject {
@@ -68,5 +70,5 @@ public:
     virtual int UnknownVirtualSlot14();       // 0x00462eb0
     GameObject* UnknownFunction486a10(void* target, Fog* fog); // 0x00486a10
 
-    Fog* field_0x2c;
+    Fog* fog;                                 // the Fog it redraws
 };

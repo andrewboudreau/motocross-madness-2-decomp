@@ -25,13 +25,13 @@ class UnknownTrackGameObject3400 {
 public:
     UnknownTrackGameObject3400();             // 0x0051ef30
     ~UnknownTrackGameObject3400();            // 0x0051efc0
-    void UnknownFunction51efe0();             // 0x0051efe0: clears the table
+    void Clear();             // 0x0051efe0: clears the table
     int UnknownFunction51f0b0(short directory, const char* name); // 0x0051f0b0
-    int UnknownFunction51f110(const char* path);                  // 0x0051f110: reads
-    int UnknownFunction51f1b0(const char* path, int value);       // 0x0051f1b0: writes
+    int Read(const char* path);                  // 0x0051f110: reads
+    int Write(const char* path, int value);       // 0x0051f1b0: writes
     int UnknownFunction51f260(short directory, const char* name, int value); // 0x0051f260
     void UnknownFunction51f2c0(int unused, const char* name);    // 0x0051f2c0
-    int UnknownFunction51f3c0(short kind, int racer);             // 0x0051f3c0: adds a racer
+    int AddRacer(short kind, int racer);             // 0x0051f3c0: adds a racer
 
     int field_0x00;                           // selects the file extension
     char field_0x04[3][5];                    // ".hs1", ".hs2", ".hs3"

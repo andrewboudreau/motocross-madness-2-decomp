@@ -1,5 +1,7 @@
 #include "InGameProcs.h"
 
+#include "DialogEventKind.h"
+
 #include <float.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,10 +20,10 @@ struct UnknownPlayerLeftMessage {
 
 // 0x004886e0
 void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
-    switch (event->field_0x08) {
-    case 1:
-        if (!_stricmp("ButMiddle", event->field_0x04)) {
-            field_0x30->UnknownFunction486630(0);
+    switch (event->kind) {
+    case kDialogCommand:
+        if (!_stricmp("ButMiddle", event->controlName)) {
+            guiManager->UnknownFunction486630(0);
             if (!g_UnknownGlobal56e26c->uiInteractionBlocked) {
                 UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
                 if (view && !view->field_0x38->field_0x7a4) {
@@ -29,62 +31,62 @@ void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     g_UnknownGlobal56e26c->UnknownFunction521860(0, 0x191, 1);
                 }
             }
-        } else if (!_stricmp("ButLeft", event->field_0x04)) {
+        } else if (!_stricmp("ButLeft", event->controlName)) {
             UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
             if (view && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4 && view->field_0x1e8 > 0) {
                 ChoiceDlg* dialog = new(__FILE__, 66) ChoiceDlg;
-                field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0,
+                guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0,
                                                   (UnknownGuiDialog*)this, 0, 0, 1);
-                dialog->UnknownFunction455700(0, 0x1440, 0, 0, 0, 0x143e, 0, 0, 0, 0x143d);
+                dialog->SetTextsOrResources(0, 0x1440, 0, 0, 0, 0x143e, 0, 0, 0, 0x143d);
             } else {
                 if (g_UnknownGlobal56e26c->field_0x08) {
                     char name[128];
                     UnknownPlayerLeftMessage message;
                     NetworkInterface* network = g_UnknownGlobal56e26c->field_0x08;
-                    int player = network->field_0x0c;
-                    network->UnknownFunction4ac720(player, name);
+                    int player = network->localPlayer;
+                    network->GetPlayerName(player, name);
                     if (strcmp(name, "") != 0) {
                         int length = strlen(name);
                         int count = length > 15 ? 15 : length;
                         strncpy(message.field_0x04, name, count);
                         message.field_0x04[count] = 0;
-                        g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(
+                        g_UnknownGlobal56e26c->field_0x08->Send(
                             0x89, &message, sizeof(message), player, 0);
                     }
                 }
-                field_0x30->UnknownFunction486630(0);
+                guiManager->UnknownFunction486630(0);
                 UnknownFunction4526b0(0x191, event);
             }
-        } else if (!_stricmp("ButRight", event->field_0x04)) {
-            field_0x30->UnknownFunction486630(0);
+        } else if (!_stricmp("ButRight", event->controlName)) {
+            guiManager->UnknownFunction486630(0);
             UnknownFunction452930(0x191, event);
             g_UnknownGlobal56e26c->UnknownFunction468880();
         }
         break;
-    case 5: {
-        UnknownGameUiControl* control = UnknownFunction46ebf0("TitleText", 12);
-        control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x13d9);
-        control = UnknownFunction46ebf0("ButMiddle", 1);
-        control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x13da);
+    case kDialogInit: {
+        UnknownGameUiControl* control = FindControl("TitleText", 12);
+        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13d9);
+        control = FindControl("ButMiddle", 1);
+        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13da);
         UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
         if (g_UnknownGlobal56e26c->field_0x08 || view->field_0x38->field_0x7a4 ||
             g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4)
-            control->UnknownFunction470660(0, 1);
-        control = UnknownFunction46ebf0("ButLeft", 1);
-        control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x13db);
-        control = UnknownFunction46ebf0("ButRight", 1);
-        control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x13dc);
-        field_0x30->UnknownFunction486630(1);
+            control->Show(0, 1);
+        control = FindControl("ButLeft", 1);
+        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13db);
+        control = FindControl("ButRight", 1);
+        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x13dc);
+        guiManager->UnknownFunction486630(1);
         break;
     }
     case 9:
-        if (event->field_0x00 == 0x65) {
+        if (event->code == 0x65) {
             g_UnknownGlobal56e26c->mode.field_0x26f0 = 1;
-            field_0x30->UnknownFunction486630(0);
+            guiManager->UnknownFunction486630(0);
             UnknownFunction4526b0(0x191, event);
-        } else if (event->field_0x00 == 0x67) {
+        } else if (event->code == 0x67) {
             g_UnknownGlobal56e26c->mode.field_0x26f0 = 0;
-            field_0x30->UnknownFunction486630(0);
+            guiManager->UnknownFunction486630(0);
             UnknownFunction4526b0(0x191, event);
         }
         break;
@@ -93,31 +95,31 @@ void ExitDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 
 // 0x00488ad0
 void ContinueDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
-    switch (event->field_0x08) {
-    case 1:
-        if (!_stricmp("ButMiddle", event->field_0x04)) {
-            field_0x30->UnknownFunction486630(0);
+    switch (event->kind) {
+    case kDialogCommand:
+        if (!_stricmp("ButMiddle", event->controlName)) {
+            guiManager->UnknownFunction486630(0);
             UnknownFunction453090(0x190, event);
             g_UnknownGlobal56e26c->UnknownFunction468880();
         }
         break;
-    case 5: {
-        UnknownGameUiControl* control = UnknownFunction46ebf0("TitleText", 0);
-        control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x8ff);
-        control = UnknownFunction46ebf0("ButMiddle", 1);
-        control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x916);
-        control->field_0x1d8 = 0x1c;
-        control = UnknownFunction46ebf0("ButLeft", 1);
-        control->UnknownFunction470660(0, 1);
-        control->field_0x1d8 = 0;
-        UnknownFunction46ebf0("ButRight", 0)->UnknownFunction470660(0, 1);
+    case kDialogInit: {
+        UnknownGameUiControl* control = FindControl("TitleText", 0);
+        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x8ff);
+        control = FindControl("ButMiddle", 1);
+        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x916);
+        control->keyBind = 0x1c;
+        control = FindControl("ButLeft", 1);
+        control->Show(0, 1);
+        control->keyBind = 0;
+        FindControl("ButRight", 0)->Show(0, 1);
         break;
     }
     }
 }
 
 // 0x00488bd0
-void UnknownFunction488bd0(char* text, float seconds) {
+void FormatTime(char* text, float seconds) {
     if (seconds == 0.0f || seconds == FLT_MAX) {
         strcpy(text, "00:00:00.00");
         return;
@@ -130,44 +132,44 @@ void UnknownFunction488bd0(char* text, float seconds) {
 // 0x00488c90
 void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
-    switch (event->field_0x08) {
-    case 5:
+    switch (event->kind) {
+    case kDialogInit:
         field_0x7f58 = 0;
-        static_cast<UIScrollBar*>(UnknownFunction46ebf0("SliderTime", 8))->UnknownFunction4751c0(1000);
-        UnknownFunction46ebf0("ButSave", 0)->UnknownFunction470660(0, 1);
+        static_cast<UIScrollBar*>(FindControl("SliderTime", 8))->UnknownFunction4751c0(1000);
+        FindControl("ButSave", 0)->Show(0, 1);
         if (!g_UnknownGlobal56e26c->UnknownVirtualSlot22("AllowVCRControls", 0)) {
-            UnknownFunction46ebf0("TogFF", 0)->UnknownFunction470660(0, 1);
-            UnknownFunction46ebf0("TogFFF", 0)->UnknownFunction470660(0, 1);
-            UnknownFunction46ebf0("TogReverse", 0)->UnknownFunction470660(0, 1);
-            UnknownFunction46ebf0("ButBeginning", 0)->UnknownFunction470660(0, 1);
-            UnknownFunction46ebf0("ButEnd", 0)->UnknownFunction470660(0, 1);
-            UnknownFunction46ebf0("ButFrame", 0)->UnknownFunction470660(0, 1);
-            UnknownFunction46ebf0("TogFF", 0)->UnknownVirtualSlot49(0);
-            UnknownFunction46ebf0("TogFFF", 0)->UnknownVirtualSlot49(0);
-            UnknownFunction46ebf0("TogReverse", 0)->UnknownVirtualSlot49(0);
-            UnknownFunction46ebf0("ButBeginning", 0)->UnknownVirtualSlot49(0);
-            UnknownFunction46ebf0("ButEnd", 0)->UnknownVirtualSlot49(0);
-            UnknownFunction46ebf0("SliderTime", 8)->UnknownVirtualSlot49(0);
-            UnknownFunction46ebf0("ButFrame", 0)->UnknownVirtualSlot49(0);
+            FindControl("TogFF", 0)->Show(0, 1);
+            FindControl("TogFFF", 0)->Show(0, 1);
+            FindControl("TogReverse", 0)->Show(0, 1);
+            FindControl("ButBeginning", 0)->Show(0, 1);
+            FindControl("ButEnd", 0)->Show(0, 1);
+            FindControl("ButFrame", 0)->Show(0, 1);
+            FindControl("TogFF", 0)->UnknownVirtualSlot49(0);
+            FindControl("TogFFF", 0)->UnknownVirtualSlot49(0);
+            FindControl("TogReverse", 0)->UnknownVirtualSlot49(0);
+            FindControl("ButBeginning", 0)->UnknownVirtualSlot49(0);
+            FindControl("ButEnd", 0)->UnknownVirtualSlot49(0);
+            FindControl("SliderTime", 8)->UnknownVirtualSlot49(0);
+            FindControl("ButFrame", 0)->UnknownVirtualSlot49(0);
         }
         break;
-    case 1:
-        if (!_stricmp("TogPlay", event->field_0x04)) {
+    case kDialogCommand:
+        if (!_stricmp("TogPlay", event->controlName)) {
             if (view->field_0x1e4 != -2) {
                 view->UnknownFunction41f550(1);
                 view->UnknownFunction41f550(0);
                 view->field_0x1dc = 4;
                 g_UnknownGlobal56e26c->field_0x2e0 = 1.0f;
             }
-        } else if (!_stricmp("TogPause", event->field_0x04)) {
+        } else if (!_stricmp("TogPause", event->controlName)) {
             if (view->field_0x1e4 != -2) {
                 view->UnknownFunction41f550(0);
                 view->field_0x1dc = 4;
                 g_UnknownGlobal56e26c->field_0x2e0 = 1.0f;
             }
-        } else if (!_stricmp("TogFF", event->field_0x04)) {
+        } else if (!_stricmp("TogFF", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                if (static_cast<UIMultiState*>(event->field_0x14)->UnknownFunction4755c0() == 1) {
+                if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
                     view->field_0x1dc = 8;
@@ -178,9 +180,9 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     g_UnknownGlobal56e26c->field_0x2e0 = 1.0f;
                 }
             }
-        } else if (!_stricmp("TogFFF", event->field_0x04)) {
+        } else if (!_stricmp("TogFFF", event->controlName)) {
             if (view->field_0x1e4 != -2) {
-                if (static_cast<UIMultiState*>(event->field_0x14)->UnknownFunction4755c0() == 1) {
+                if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 1) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
                     view->field_0x1dc = 9;
@@ -191,8 +193,8 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     g_UnknownGlobal56e26c->field_0x2e0 = 1.0f;
                 }
             }
-        } else if (!_stricmp("TogReverse", event->field_0x04)) {
-            if (static_cast<UIMultiState*>(event->field_0x14)->UnknownFunction4755c0() == 1) {
+        } else if (!_stricmp("TogReverse", event->controlName)) {
+            if (static_cast<UIMultiState*>(event->control)->UnknownFunction4755c0() == 1) {
                 if (view->field_0x1dc != 14) {
                     if (view->field_0x3f8)
                         view->UnknownFunction41f550(0);
@@ -204,25 +206,25 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 view->field_0x1dc = 4;
                 g_UnknownGlobal56e26c->field_0x2e0 = 1.0f;
             }
-        } else if (!_stricmp("ButFrame", event->field_0x04)) {
+        } else if (!_stricmp("ButFrame", event->controlName)) {
             if (view->field_0x1e4 != -2) {
                 if (view->field_0x3f8)
                     view->UnknownFunction41f550(0);
                 view->field_0x3f9 = 1;
                 g_UnknownGlobal56e26c->field_0x1c8 = 1;
             }
-        } else if (!_stricmp("ButBeginning", event->field_0x04)) {
+        } else if (!_stricmp("ButBeginning", event->controlName)) {
             if (view->field_0x3f8)
                 view->UnknownFunction41f550(0);
             view->field_0x1dc = 12;
-        } else if (!_stricmp("ButEnd", event->field_0x04)) {
+        } else if (!_stricmp("ButEnd", event->controlName)) {
             if (view->field_0x1e4 != -2) {
                 if (view->field_0x3f8)
                     view->UnknownFunction41f550(0);
                 view->field_0x1dc = 9;
                 g_UnknownGlobal56e26c->field_0x2e0 = 30.0f;
             }
-        } else if (!_stricmp("ButCamera", event->field_0x04)) {
+        } else if (!_stricmp("ButCamera", event->controlName)) {
             TrackGameViewOwner* owner = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0();
             if (owner->field_0x3c->cameraState == 5) {
                 owner->field_0x3c->cameraState = owner->field_0x3c->savedCameraState;
@@ -231,17 +233,17 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             } else {
                 owner->field_0x3c->UnknownVirtualSlot72();
             }
-        } else if (!_stricmp("ButPrevRider", event->field_0x04) ||
-                   !_stricmp("ButNextRider", event->field_0x04)) {
+        } else if (!_stricmp("ButPrevRider", event->controlName) ||
+                   !_stricmp("ButNextRider", event->controlName)) {
             UnknownKrustyBikeView* racers =
                 g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x34;
-            if (!_stricmp("ButPrevRider", event->field_0x04))
+            if (!_stricmp("ButPrevRider", event->controlName))
                 racers->UnknownFunction41f1d0(1, 1, 0);
             else
                 racers->UnknownFunction41f1d0(0, 1, 0);
-        } else if (!_stricmp("ButExit", event->field_0x04)) {
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
+        } else if (!_stricmp("ButExit", event->controlName)) {
+            event->dialog->EndDialog(0);
+            event->handled = 1;
             memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &g_UnknownGlobal56e26c->mode.field_0x29e4,
                    sizeof(g_UnknownGlobal56e26c->mode.field_0x29e4));
             memcpy(g_UnknownGlobal56e26c->mode.field_0xfd8, g_UnknownGlobal56e26c->mode.field_0x1034,
@@ -250,22 +252,22 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                    sizeof(g_UnknownGlobal56e26c->mode.field_0x1a3c));
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45cdc0(2);
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45e710(100);
-            field_0x30->UnknownFunction486630(1);
+            guiManager->UnknownFunction486630(1);
             field_0x7f58 = 1;
             break;
         }
-        UnknownFunction4894c0();
+        ShowReplayMode();
         break;
     case 16:
-        if (!_stricmp("SliderTime", event->field_0x04)) {
-            float fraction = static_cast<UIScrollBar*>(event->field_0x14)->UnknownFunction475500() / 1000.0f;
+        if (!_stricmp("SliderTime", event->controlName)) {
+            float fraction = static_cast<UIScrollBar*>(event->control)->UnknownFunction475500() / 1000.0f;
             UnknownKrustyBikeView* replay = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
             replay->field_0x1c4 = fraction * replay->field_0x1a0->field_0x10c;
         }
         break;
-    case 6:
+    case kDialogClose:
         if (!g_UnknownGlobal56e26c->field_0x2d5_bit1 && !field_0x7f58)
-            field_0x30->UnknownFunction486630(0);
+            guiManager->UnknownFunction486630(0);
         break;
     }
 }
@@ -273,73 +275,73 @@ void VCRDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 // 0x004893c0
 int VCRDlg::UnknownVirtualSlot10(float frameTime) {
     char text[32];
-    field_0x30->UnknownFunction486630(1);
-    UIScrollBar* slider = static_cast<UIScrollBar*>(UnknownFunction46ebf0("SliderTime", 8));
+    guiManager->UnknownFunction486630(1);
+    UIScrollBar* slider = static_cast<UIScrollBar*>(FindControl("SliderTime", 8));
     UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
-    UnknownGameUiControl* control = UnknownFunction46ebf0("TxtTime", 12);
-    UnknownFunction488bd0(text, view->field_0x1b8);
-    control->UnknownFunction470b20(text);
-    control = UnknownFunction46ebf0("TxtTimeEnd", 12);
-    UnknownFunction488bd0(text, view->field_0x1a0->field_0x10c);
-    control->UnknownFunction470b20(text);
+    UnknownGameUiControl* control = FindControl("TxtTime", 12);
+    FormatTime(text, view->field_0x1b8);
+    control->SetText(text);
+    control = FindControl("TxtTimeEnd", 12);
+    FormatTime(text, view->field_0x1a0->field_0x10c);
+    control->SetText(text);
     if (view->field_0x1c4 == -1.0f)
         slider->UnknownFunction4753c0((int)(view->field_0x1b8 * 1000.0f),
                                       (int)(view->field_0x1a0->field_0x10c * 1000.0f));
-    UnknownFunction4894c0();
+    ShowReplayMode();
     return UIDialog::UnknownVirtualSlot10(frameTime);
 }
 
 // 0x004894c0
-void VCRDlg::UnknownFunction4894c0() {
+void VCRDlg::ShowReplayMode() {
     UnknownKrustyBikeView* view = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2f0();
-    UIMultiState* play = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogPlay", 2));
-    UIMultiState* pause = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogPause", 2));
-    UIMultiState* reverse = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogReverse", 2));
-    UIMultiState* fastForward = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogFF", 2));
-    UIMultiState* fasterForward = static_cast<UIMultiState*>(UnknownFunction46ebf0("TogFFF", 2));
+    UIMultiState* play = static_cast<UIMultiState*>(FindControl("TogPlay", 2));
+    UIMultiState* pause = static_cast<UIMultiState*>(FindControl("TogPause", 2));
+    UIMultiState* reverse = static_cast<UIMultiState*>(FindControl("TogReverse", 2));
+    UIMultiState* fastForward = static_cast<UIMultiState*>(FindControl("TogFF", 2));
+    UIMultiState* fasterForward = static_cast<UIMultiState*>(FindControl("TogFFF", 2));
     if (view->field_0x3f8) {
-        play->UnknownFunction478cf0(0);
-        pause->UnknownFunction478cf0(1);
-        reverse->UnknownFunction478cf0(0);
-        fastForward->UnknownFunction478cf0(0);
-        fasterForward->UnknownFunction478cf0(0);
+        play->SetCurrentState(0);
+        pause->SetCurrentState(1);
+        reverse->SetCurrentState(0);
+        fastForward->SetCurrentState(0);
+        fasterForward->SetCurrentState(0);
         return;
     }
     switch (view->field_0x1dc) {
     case 4:
-        play->UnknownFunction478cf0(1);
-        pause->UnknownFunction478cf0(0);
-        reverse->UnknownFunction478cf0(0);
-        fastForward->UnknownFunction478cf0(0);
-        fasterForward->UnknownFunction478cf0(0);
+        play->SetCurrentState(1);
+        pause->SetCurrentState(0);
+        reverse->SetCurrentState(0);
+        fastForward->SetCurrentState(0);
+        fasterForward->SetCurrentState(0);
         break;
     case 8:
-        play->UnknownFunction478cf0(0);
-        pause->UnknownFunction478cf0(0);
-        reverse->UnknownFunction478cf0(0);
-        fastForward->UnknownFunction478cf0(1);
-        fasterForward->UnknownFunction478cf0(0);
+        play->SetCurrentState(0);
+        pause->SetCurrentState(0);
+        reverse->SetCurrentState(0);
+        fastForward->SetCurrentState(1);
+        fasterForward->SetCurrentState(0);
         break;
     case 9:
-        play->UnknownFunction478cf0(0);
-        pause->UnknownFunction478cf0(0);
-        reverse->UnknownFunction478cf0(0);
-        fastForward->UnknownFunction478cf0(0);
-        fasterForward->UnknownFunction478cf0(1);
+        play->SetCurrentState(0);
+        pause->SetCurrentState(0);
+        reverse->SetCurrentState(0);
+        fastForward->SetCurrentState(0);
+        fasterForward->SetCurrentState(1);
         break;
     case 11:
-        play->UnknownFunction478cf0(0);
-        pause->UnknownFunction478cf0(0);
-        reverse->UnknownFunction478cf0(1);
-        fastForward->UnknownFunction478cf0(0);
-        fasterForward->UnknownFunction478cf0(0);
+        play->SetCurrentState(0);
+        pause->SetCurrentState(0);
+        reverse->SetCurrentState(1);
+        fastForward->SetCurrentState(0);
+        fasterForward->SetCurrentState(0);
         break;
     case 14:
-        play->UnknownFunction478cf0(0);
-        pause->UnknownFunction478cf0(0);
-        reverse->UnknownFunction478cf0(0);
-        fastForward->UnknownFunction478cf0(0);
-        fasterForward->UnknownFunction478cf0(0);
+        play->SetCurrentState(0);
+        pause->SetCurrentState(0);
+        reverse->SetCurrentState(0);
+        fastForward->SetCurrentState(0);
+        fasterForward->SetCurrentState(0);
         break;
     }
 }

@@ -19,7 +19,7 @@ unsigned __stdcall UnknownRecorderThread(void* parameters); // 0x004e6f80 (sampl
 
 // 0x004e77f0
 VCRInterface::VCRInterface() : GameObject(1) {
-    field_0x2c = 0;
+    workerThread = 0;
     field_0x30 = 0;
     field_0x34 = 0;
     field_0x38 = 0;
@@ -29,31 +29,31 @@ VCRInterface::VCRInterface() : GameObject(1) {
     field_0x4c = 0;
     field_0x50 = 0;
     field_0x54 = 0;
-    field_0x58 = 0;
-    field_0x5c = 0;
-    field_0xb0 = 0;
-    field_0x7c = 0;
+    stopEvent = 0;
+    workerThreadId = 0;
+    frameRing = 0;
+    recordBuffer = 0;
     field_0x88 = 0;
     field_0x84 = 0;
     field_0xa0 = 0;
     field_0xa4 = 0;
     field_0xa8 = 0;
-    field_0xb8 = 0;
+    isBusy = 0;
     field_0xbc = 0;
     field_0xc0 = 0;
     field_0xc4 = 0;
     field_0xcc = 0;
     field_0xd0 = 0;
-    field_0xb4 = 1;
-    field_0xc8 = 1;
+    isStopped = 1;
+    workerAcknowledged = 1;
 }
 
 // 0x004e78b0
 VCRInterface::~VCRInterface() {
-    if (field_0x2c) {
-        SetEvent(field_0x58);
-        WaitForSingleObject(field_0x2c, INFINITE);
-        CLOSE_HANDLE(field_0x2c);
+    if (workerThread) {
+        SetEvent(stopEvent);
+        WaitForSingleObject(workerThread, INFINITE);
+        CLOSE_HANDLE(workerThread);
     }
     CLOSE_HANDLE(field_0x30);
     CLOSE_HANDLE(field_0x34);
@@ -65,44 +65,44 @@ VCRInterface::~VCRInterface() {
     CLOSE_HANDLE(field_0x4c);
     CLOSE_HANDLE(field_0x50);
     CLOSE_HANDLE(field_0x54);
-    CLOSE_HANDLE(field_0x58);
-    DeleteCriticalSection(&field_0x60);
-    if (field_0xb0)
-        delete field_0xb0;
-    if (field_0x7c)
-        DebugFree(field_0x7c, __FILE__, 442);
+    CLOSE_HANDLE(stopEvent);
+    DeleteCriticalSection(&lock);
+    if (frameRing)
+        delete frameRing;
+    if (recordBuffer)
+        DebugFree(recordBuffer, __FILE__, 442);
 }
 
 // 0x004e7a00
-void VCRInterface::UnknownFunction4e7a00(HANDLE event, DWORD interval) {
+void VCRInterface::SignalAndWait(HANDLE event, DWORD interval) {
     int waiting;
 
-    EnterCriticalSection(&field_0x60);
-    field_0xc8 = 0;
-    LeaveCriticalSection(&field_0x60);
+    EnterCriticalSection(&lock);
+    workerAcknowledged = 0;
+    LeaveCriticalSection(&lock);
     SetEvent(event);
     Sleep(interval);
-    EnterCriticalSection(&field_0x60);
-    waiting = !field_0xc8;
-    LeaveCriticalSection(&field_0x60);
+    EnterCriticalSection(&lock);
+    waiting = !workerAcknowledged;
+    LeaveCriticalSection(&lock);
     while (waiting) {
         Sleep(interval);
-        EnterCriticalSection(&field_0x60);
-        waiting = !field_0xc8;
-        LeaveCriticalSection(&field_0x60);
+        EnterCriticalSection(&lock);
+        waiting = !workerAcknowledged;
+        LeaveCriticalSection(&lock);
     }
 }
 
 // 0x004e7a90
-int VCRInterface::UnknownFunction4e7a90(int a1, int a2, int a3, int mode, int a5, unsigned int size,
+int VCRInterface::Start(int a1, int a2, int a3, int mode, int a5, unsigned int size,
                                         UnknownRecorderOwner* owner) {
     DWORD interval;
 
-    field_0xb0 = new (__FILE__, 477) UnknownVcr(size);
-    if (!field_0xb0)
+    frameRing = new (__FILE__, 477) UnknownVcr(size);
+    if (!frameRing)
         return 0;
-    field_0xac = owner;
-    field_0x80 = (UnknownRecorderCallback)a1;
+    vcrFile = owner;
+    recordCallback = (UnknownRecorderCallback)a1;
     field_0x30 = CreateEventA(0, 0, 0, 0);
     field_0x34 = CreateEventA(0, 0, 0, 0);
     field_0x38 = CreateEventA(0, 0, 0, 0);
@@ -113,85 +113,85 @@ int VCRInterface::UnknownFunction4e7a90(int a1, int a2, int a3, int mode, int a5
     field_0x4c = CreateEventA(0, 0, 0, 0);
     field_0x50 = CreateEventA(0, 0, 0, 0);
     field_0x54 = CreateEventA(0, 0, 0, 0);
-    field_0x58 = CreateEventA(0, 0, 0, 0);
-    if (!field_0x30 || !field_0x58 || !field_0x34 || !field_0x38 || !field_0x3c || !field_0x40 ||
+    stopEvent = CreateEventA(0, 0, 0, 0);
+    if (!field_0x30 || !stopEvent || !field_0x34 || !field_0x38 || !field_0x3c || !field_0x40 ||
         !field_0x44 || !field_0x48 || !field_0x4c || !field_0x50 || !field_0x54)
         return 0;
-    field_0x78 = mode;
-    field_0x90.field_0x00 = a2;
-    field_0x90.field_0x04 = a3;
-    field_0x90.field_0x08 = a5;
-    field_0x90.owner = this;
-    InitializeCriticalSection(&field_0x60);
-    field_0x2c = (HANDLE)_beginthreadex(0, 0, UnknownRecorderThread, &field_0x90, 0, &field_0x5c);
-    if (!field_0x2c)
+    recordMode = mode;
+    threadParameters.field_0x00 = a2;
+    threadParameters.field_0x04 = a3;
+    threadParameters.field_0x08 = a5;
+    threadParameters.owner = this;
+    InitializeCriticalSection(&lock);
+    workerThread = (HANDLE)_beginthreadex(0, 0, UnknownRecorderThread, &threadParameters, 0, &workerThreadId);
+    if (!workerThread)
         return 0;
-    interval = field_0xac->field_0x23c ? 10 : 200;
+    interval = vcrFile->field_0x23c ? 10 : 200;
     if (mode == 0) {
-        UnknownFunction4e7a00(field_0x34, interval);
+        SignalAndWait(field_0x34, interval);
         return 1;
     }
     if (mode == 2) {
-        UnknownFunction4e7a00(field_0x38, interval);
+        SignalAndWait(field_0x38, interval);
         return 1;
     }
     if (mode == 1) {
-        field_0x7c = DebugMalloc(0x400, __FILE__, 535);
-        if (!field_0x7c)
+        recordBuffer = DebugMalloc(0x400, __FILE__, 535);
+        if (!recordBuffer)
             return 0;
-        UnknownFunction4e7a00(field_0x3c, interval);
-        field_0xb0->UnknownFunction524590(-1, 0);
-        field_0xb0->UnknownFunction524590(-1, 0);
+        SignalAndWait(field_0x3c, interval);
+        frameRing->UnknownFunction524590(-1, 0);
+        frameRing->UnknownFunction524590(-1, 0);
     }
     return 1;
 }
 
 // 0x004e86d0
 void VCRInterface::UnknownFunction4e86d0(int a, int b, int wait) {
-    int fast = field_0xac->field_0x23c;
+    int fast = vcrFile->field_0x23c;
 
-    field_0x90.field_0x00 = a;
-    field_0x90.field_0x04 = b;
+    threadParameters.field_0x00 = a;
+    threadParameters.field_0x04 = b;
     if (wait)
-        UnknownFunction4e7a00(field_0x54, fast ? 10 : 200);
+        SignalAndWait(field_0x54, fast ? 10 : 200);
     else
         SetEvent(field_0x54);
 }
 
 // 0x004e8720
-int VCRInterface::UnknownFunction4e8720(int a, int b, const void* data, unsigned int size) {
+int VCRInterface::QueueRecord(int a, int b, const void* data, unsigned int size) {
     void* block;
     int* record;
     int index;
 
     block = 0;
-    if (!field_0xb0)
+    if (!frameRing)
         return 0;
-    EnterCriticalSection(&field_0x60);
-    if (field_0xb4) {
-        LeaveCriticalSection(&field_0x60);
-        return 0;
-    }
-    if (!field_0xb0->UnknownFunction524220(size + 12, &index, &block)) {
-        LeaveCriticalSection(&field_0x60);
+    EnterCriticalSection(&lock);
+    if (isStopped) {
+        LeaveCriticalSection(&lock);
         return 0;
     }
-    LeaveCriticalSection(&field_0x60);
+    if (!frameRing->UnknownFunction524220(size + 12, &index, &block)) {
+        LeaveCriticalSection(&lock);
+        return 0;
+    }
+    LeaveCriticalSection(&lock);
     record = (int*)block;
     *record++ = a;
     *record++ = b;
     *record++ = size;
     block = record;
     memcpy(block, data, size);
-    EnterCriticalSection(&field_0x60);
-    field_0xb0->UnknownFunction5242e0(index);
-    LeaveCriticalSection(&field_0x60);
+    EnterCriticalSection(&lock);
+    frameRing->UnknownFunction5242e0(index);
+    LeaveCriticalSection(&lock);
     SetEvent(field_0x30);
     return 1;
 }
 
 // 0x004e8810
-int VCRInterface::UnknownFunction4e8810(int* a, int* b, int* value, void* data, unsigned int* size, int signal) {
+int VCRInterface::TakeRecord(int* a, int* b, int* value, void* data, unsigned int* size, int signal) {
     void* block;
     int* record;
     int index;
@@ -201,14 +201,14 @@ int VCRInterface::UnknownFunction4e8810(int* a, int* b, int* value, void* data, 
 
     block = 0;
     bytes = 0;
-    if (!field_0xb0)
+    if (!frameRing)
         return 4;
-    EnterCriticalSection(&field_0x60);
-    result = field_0xb0->UnknownFunction524460(&block, &bytes, &extra, &index);
+    EnterCriticalSection(&lock);
+    result = frameRing->UnknownFunction524460(&block, &bytes, &extra, &index);
     if (result == 0) {
-        LeaveCriticalSection(&field_0x60);
+        LeaveCriticalSection(&lock);
         if (*(unsigned char*)block == 0xff && extra == -1) {
-            field_0xb0->UnknownFunction524540(index);
+            frameRing->UnknownFunction524540(index);
             SetEvent(field_0x44);
             return 3;
         }
@@ -219,9 +219,9 @@ int VCRInterface::UnknownFunction4e8810(int* a, int* b, int* value, void* data, 
         block = record;
         memcpy(data, block, *size);
         *value = extra;
-        EnterCriticalSection(&field_0x60);
-        field_0xb0->UnknownFunction524540(index);
-        LeaveCriticalSection(&field_0x60);
+        EnterCriticalSection(&lock);
+        frameRing->UnknownFunction524540(index);
+        LeaveCriticalSection(&lock);
         if (signal)
             SetEvent(field_0x40);
         else
@@ -229,45 +229,45 @@ int VCRInterface::UnknownFunction4e8810(int* a, int* b, int* value, void* data, 
         return 0;
     }
     if (result == 1) {
-        LeaveCriticalSection(&field_0x60);
+        LeaveCriticalSection(&lock);
         UnknownFunction4e8990();
         return 1;
     }
     if (result == 2) {
-        LeaveCriticalSection(&field_0x60);
+        LeaveCriticalSection(&lock);
         UnknownFunction4e8990();
         return 2;
     }
-    LeaveCriticalSection(&field_0x60);
+    LeaveCriticalSection(&lock);
     return 4;
 }
 
 // 0x004e8990
 void VCRInterface::UnknownFunction4e8990() {
-    EnterCriticalSection(&field_0x60);
+    EnterCriticalSection(&lock);
     field_0xc0 = 0;
     field_0xbc = 0;
-    LeaveCriticalSection(&field_0x60);
+    LeaveCriticalSection(&lock);
     SetEvent(field_0x50);
 }
 
 // 0x004e89c0
 void VCRInterface::UnknownFunction4e89c0() {
-    if (field_0xb0) {
-        EnterCriticalSection(&field_0x60);
-        field_0xb8 = 1;
-        LeaveCriticalSection(&field_0x60);
-        EnterCriticalSection(&field_0x60);
-        field_0xb0->UnknownFunction524910();
-        field_0xb8 = 0;
-        LeaveCriticalSection(&field_0x60);
+    if (frameRing) {
+        EnterCriticalSection(&lock);
+        isBusy = 1;
+        LeaveCriticalSection(&lock);
+        EnterCriticalSection(&lock);
+        frameRing->UnknownFunction524910();
+        isBusy = 0;
+        LeaveCriticalSection(&lock);
         SetEvent(field_0x44);
     }
 }
 
 // 0x004e8a20
 void VCRInterface::UnknownFunction4e8a20(unsigned int milliseconds) {
-    if (field_0xb0) {
+    if (frameRing) {
         SetEvent(field_0x48);
         field_0xcc = 1;
         field_0xd0 = milliseconds * 0.001f;
@@ -276,13 +276,13 @@ void VCRInterface::UnknownFunction4e8a20(unsigned int milliseconds) {
 
 // 0x004e8a70
 void VCRInterface::UnknownFunction4e8a70() {
-    if (field_0xb0) {
-        EnterCriticalSection(&field_0x60);
+    if (frameRing) {
+        EnterCriticalSection(&lock);
         field_0xcc = 1;
         field_0xd0 = 0;
         field_0xbc = 0;
-        field_0xb0->UnknownFunction524640();
+        frameRing->UnknownFunction524640();
         SetEvent(field_0x4c);
-        LeaveCriticalSection(&field_0x60);
+        LeaveCriticalSection(&lock);
     }
 }

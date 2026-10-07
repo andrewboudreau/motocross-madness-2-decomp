@@ -18,21 +18,21 @@ struct UnknownSerialSettings {
     int parity;                               // "ButParity"
     int flowControl;                          // "ButFlow"
 };
-extern UnknownSerialSettings g_UnknownGlobal6886b8;
+extern UnknownSerialSettings g_SerialSettings;
 
 // 0x006886cc: session count filled by NetworkInterface 0x004adff0.
-extern int g_UnknownGlobal6886cc;
+extern int g_SessionListCount;
 
 // Net.cpp's error report (0x004ad5a0).
-void UnknownFunction4ad5a0(long result, const char* file, int line);
+void ReportDirectPlayError(long result, const char* file, int line);  // 0x004ad5a0
 
 // cdecl 0x004ae460: joins the session selected in "LstSessions" (the
 // HostJoinDlg procedure calls it for a kind 13 message).
-void UnknownFunction4ae460(UnknownDialogEvent* event);
+void JoinSelectedSession(UnknownDialogEvent* event);  // 0x004ae460
 
 // cdecl 0x004aefa0: 1 when the network object exists or Game slot 16
 // creates it; otherwise drops it (0x004aef40) and returns 0.
-int UnknownFunction4aefa0();
+int EnsureNetworkInterface();  // 0x004aefa0
 
 // RTTI: HostJoinDlg : UIDialog (vtable 0x00554b98). +0xc4 is 0x85d when the
 // dialog is the host variant.
@@ -42,7 +42,7 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004ae500
 
     unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* field_0x30;
+    GUIManager* guiManager;                   // +0x30
     unsigned char field_0x34[0xc4 - 0x34];
     int field_0xc4;
     unsigned char field_0xc8[0x7f58 - 0xc8];
@@ -64,7 +64,7 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004aee10
 
     unsigned char field_0x2c[0x34 - 0x2c];
-    GUIUser* field_0x34;
+    GUIUser* guiUser;                         // +0x34
     unsigned char field_0x38[0x7f58 - 0x38];
 };
 
@@ -75,7 +75,7 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004af100
 
     unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* field_0x30;
+    GUIManager* guiManager;                   // +0x30
     unsigned char field_0x34[0x7f58 - 0x34];
 };
 

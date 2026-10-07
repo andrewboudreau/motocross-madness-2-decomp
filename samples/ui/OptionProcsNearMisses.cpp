@@ -8,7 +8,7 @@
 //   swapped registers (retail: this in ebx, the list in ebp; VC6 here the
 //   reverse). An else around the base call, a nested 0x004b5570 test, one
 //   list/row variable for both branches and a `this` copy do not move it.
-// OptControlsDlg::UnknownFunction4b5760 (0x004b5760, 708 bytes, 259 match):
+// OptControlsDlg::MapMovedInput (0x004b5760, 708 bytes, 259 match):
 //   the same flow; retail keeps the mapping code in esi (the axis loop's
 //   counter register) and rebuilds row + 1 in edi, VC6 here puts the code in
 //   edi and row + 1 in esi, so every later push differs. Declaration order,
@@ -22,36 +22,36 @@ int OptControlsDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInpu
 {
     int other;
     char text[128];
-    if (!field_0x7f70)
+    if (!waitingForInput)
         return GameObject::UnknownVirtualSlot22(event, entry);
     if (event->kind == 0 && event->control == 1) {
-        UIListBox* keys = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
-        int row = keys->UnknownFunction476950();
+        UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
+        int row = keys->GetSelectedRow();
         g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction449350(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row, text);
-        keys->UnknownFunction476ff0(row, text);
+        keys->SetRowText(row, text);
     } else {
-        UIListBox* keys = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
-        int row = keys->UnknownFunction476950();
-        if (!UnknownFunction4b5570(row, event->kind, event->control, text))
+        UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
+        int row = keys->GetSelectedRow();
+        if (!GetInputText(row, event->kind, event->control, text))
             return 1;
         if (g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448cc0(row, event->kind, event->control, &other)) {
-            keys->UnknownFunction476ff0(other, "");
+            keys->SetRowText(other, "");
             g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, other, -1, 0);
         }
-        keys->UnknownFunction476ff0(row, text);
+        keys->SetRowText(row, text);
         g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row, event->kind, event->control);
     }
-    UnknownFunction4b5a20();
+    EndInputWait();
     return 1;
 }
 
 // 0x004b5760 (near miss)
-void OptControlsDlg::UnknownFunction4b5760()
+void OptControlsDlg::MapMovedInput()
 {
     JoystickDevice* joystick = g_UnknownGlobal56e26c->field_0x14->activeJoystick;
     MouseDevice* mouse = g_UnknownGlobal56e26c->field_0x14->mouse;
-    UIListBox* keys = static_cast<UIListBox*>(UnknownFunction46ebf0("MapKeyListBox", 3));
-    int row = keys->UnknownFunction476950();
+    UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
+    int row = keys->GetSelectedRow();
     int code;
     int kind;
     int other;
@@ -60,7 +60,7 @@ void OptControlsDlg::UnknownFunction4b5760()
         return;
     if (joystick) {
         for (int i = 0; i < 6; i++) {
-            float delta = joystick->UnknownFunction489e20(i) - field_0x7f58[i];
+            float delta = joystick->UnknownFunction489e20(i) - axisValuesAtWait[i];
             if (delta < 0.0f)
                 delta = -delta;
             if (delta > 16384.0f) {
@@ -103,20 +103,20 @@ found:
     if (row % 2)
         row--;
     if (g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448cc0(row, kind, code, &other)) {
-        keys->UnknownFunction476ff0(other, "");
+        keys->SetRowText(other, "");
         g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, other, -1, 0);
         if (other < 4) {
             g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, other + 1, -1, 0);
-            keys->UnknownFunction476ff0(other + 1, "");
+            keys->SetRowText(other + 1, "");
         }
     }
     g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row, kind, code);
     g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction449350(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row, text);
-    keys->UnknownFunction476ff0(row, text);
+    keys->SetRowText(row, text);
     if (row < 4) {
         g_UnknownGlobal56e26c->field_0x33fc->UnknownFunction448c90(g_UnknownGlobal56e26c->field_0x33fc->field_0x00, row + 1, kind, code);
-        keys->UnknownFunction476ff0(row + 1, text);
+        keys->SetRowText(row + 1, text);
     }
-    UnknownFunction4b5a20();
+    EndInputWait();
 }
 

@@ -64,26 +64,26 @@ public:
 
 // One delta set (0x14 bytes, sorted by value with qsort 0x4a3bb0).
 struct MorphBastardTarget {
-    float field_0x00;                 // controller value of the target
-    int field_0x04;                   // delta count
-    int* field_0x08;                  // vertex indices (line 0xd9)
-    Vector3* field_0x0c;              // deltas (line 0xda)
-    float* field_0x10;                // last weight per delta (line 0xdb)
+    float value;                      // controller value of the target
+    int deltaCount;                   // delta count
+    int* vertexIndices;               // vertex indices (line 0xd9)
+    Vector3* deltas;                  // deltas (line 0xda)
+    float* lastWeights;               // last weight per delta (line 0xdb)
 };
 
 // One controller channel (0x6c bytes): a controller node and axis that
 // drives a list of targets of its morph object.
 struct MorphBastardChannel {
-    int field_0x00;                   // axis 0..2
-    Matrix4 field_0x04;               // inverse rest matrix of the controller
-    MorphBastardNode* field_0x44;     // controller
-    int* field_0x48;                  // target numbers; [0] is -1
-    int field_0x4c;                   // their count
-    MorphBastardTarget* field_0x50;   // one per target number (line 0xb2)
-    float field_0x54;                 // smallest target value
-    float field_0x58;                 // largest target value
+    int axis;                         // axis 0..2
+    Matrix4 inverseRestMatrix;        // inverse rest matrix of the controller
+    MorphBastardNode* controller;     // controller
+    int* targetNumbers;               // target numbers; [0] is -1
+    int targetCount;                  // their count
+    MorphBastardTarget* targets;      // one per target number (line 0xb2)
+    float minimumValue;               // smallest target value
+    float maximumValue;               // largest target value
     int field_0x5c;                   // -1
-    float field_0x60;                 // current value per axis (0x004a3c80)
+    float currentValue;               // current value per axis (0x004a3c80)
     float field_0x64;
     float field_0x68;
 };
@@ -92,10 +92,10 @@ struct MorphBastardChannel {
 // leaves only the count-down of the inlined construction loop at 0x004a34d5.
 struct MorphBastardObject {
     MorphBastardObject() {}
-    int field_0x00;                   // channel count
-    MorphBastardChannel* field_0x04;  // channels (realloc'd, lines 0x8f/0x98)
-    MorphBastardNode* field_0x08;     // the morphed node
-    Matrix4 field_0x0c;               // its inverse rest matrix
+    int channelCount;                 // channel count
+    MorphBastardChannel* channels;    // channels (realloc'd, lines 0x8f/0x98)
+    MorphBastardNode* node;           // the morphed node
+    Matrix4 inverseRestMatrix;        // its inverse rest matrix
 };
 
 // 32-byte vertex (position, normal, texture coordinates) with an empty
@@ -113,8 +113,8 @@ struct MorphBastardFace {
 
 // A vertex group of a mesh (0x14 bytes); the pointers index the mesh arrays.
 struct MorphBastardMeshGroup {
-    MorphBastardNode* field_0x00;     // the node the group belongs to
-    int field_0x04;                   // vertex count
+    MorphBastardNode* node;           // the node the group belongs to
+    int vertexCount;                  // vertex count
     MorphBastardVertex* field_0x08;
     MorphBastardVertex* field_0x0c;
     Vector3* field_0x10;
@@ -127,10 +127,10 @@ struct MorphBastardMeshPair {
 
 // The mesh slot 27 receives and returns (0x38 bytes).
 struct UnknownSoultreeMesh {
-    int field_0x00;                   // group count
+    int groupCount;                   // group count
     MorphBastardMeshGroup* field_0x04;
-    int field_0x08;                   // vertex count
-    int field_0x0c;                   // face count
+    int vertexCount;                  // vertex count
+    int faceCount;                    // face count
     MorphBastardVertex* field_0x10;
     MorphBastardVertex* field_0x14;
     Vector3* field_0x18;
@@ -146,7 +146,7 @@ struct UnknownSoultreeMesh {
 // current level of detail at +0x27c (src/krusty2/bvh/BoundingBoxTreeBuild.h).
 struct MorphBastardSoultreeView {
     unsigned char field_0x000[0x27c];
-    int field_0x27c;                  // nonzero: draw the mesh unchanged
+    int drawUnchanged;                // nonzero: draw the mesh unchanged
 };
 
 class MorphBastardModifier : public D3DIMSoultreeModifier {
@@ -163,21 +163,21 @@ public:
     // 0x004a3c80 (ret 0x44)
     void UnknownFunction4a3c80(MorphBastardChannel* channel, Matrix4 inverse);
     // 0x004a4bb0 (ret 4): updates every channel of `object`.
-    void UnknownFunction4a4bb0(MorphBastardObject* object);
+    void UpdateChannels(MorphBastardObject* object);
     // 0x00464e80 (ret 4): the shared empty stub, called with the object index.
     void UnknownFunction464e80(int index);
     // 0x004a5290 (ret 4): makes field_0x40 a copy of `mesh`.
-    void UnknownFunction4a5290(UnknownSoultreeMesh* mesh);
+    void CopyMesh(UnknownSoultreeMesh* mesh);
 
     UnknownSoultreeMesh* field_0x40;
-    int field_0x44;                   // morph object count
-    MorphBastardObject* field_0x48;   // line 0x57
-    Vector3* field_0x4c;              // summed deltas per vertex (lines 0x21d..0x21f)
-    Vector3* field_0x50;              // smallest delta per vertex
-    Vector3* field_0x54;              // largest delta per vertex
+    int objectCount;                  // morph object count
+    MorphBastardObject* morphObjects; // line 0x57
+    Vector3* deltaSums;               // summed deltas per vertex (lines 0x21d..0x21f)
+    Vector3* deltaMinimums;           // smallest delta per vertex
+    Vector3* deltaMaximums;           // largest delta per vertex
 };
 
 // 0x004a3bb0: qsort order of MorphBastardTarget by value.
-int UnknownFunction4a3bb0(const void* a, const void* b);
+int CompareTargets(const void* a, const void* b);
 // 0x004a3be0: the angle between two unit vectors (0 at 1, pi/2 at 0, else acos).
-float UnknownFunction4a3be0(Vector3 a, Vector3 b);
+float AngleBetween(Vector3 a, Vector3 b);

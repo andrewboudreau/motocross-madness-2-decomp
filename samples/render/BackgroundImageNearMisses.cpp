@@ -44,16 +44,16 @@ CameraRect g_UnknownGlobal5777a8;
 
 // 0x00403d50
 BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
-    field_0x40 = 0;
+    copyValid = 0;
     field_0x2c = 0;
-    field_0x50 = 0;
-    field_0x48 = 0;
-    field_0x4c = 0;
-    field_0x58 = 0;
-    field_0x6c = 0;
-    field_0x70 = 0;
+    regionTable = 0;
+    regionCapacity = 0;
+    regionCount = 0;
+    fullRestoreFrames = 0;
+    heldDcSurface = 0;
+    heldDc = 0;
     field_0x5c = 0;
-    field_0x34 = -1;
+    imageRegion = -1;
     field_0x64 = -1;
     field_0x30 = 1;
     field_0x60 = 1;
@@ -64,32 +64,32 @@ BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
 // restored from the off-screen copy region by region; otherwise (or while
 // frames are left to restore) the whole copy is restored.
 int BackgroundImage::UnknownVirtualSlot13() {
-    if (!field_0x58) {
+    if (!fullRestoreFrames) {
         UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->field_0x08;
-        if (!camera || !camera->field_0x25_bit0 || !camera->field_0x1d0 ||
-            camera->field_0x1ac != g_UnknownGlobal56e26c->field_0x0c->field_0x10[g_UnknownGlobal56e26c->field_0x0c->field_0x0c].height ||
-            camera->field_0x1a8 != g_UnknownGlobal56e26c->field_0x0c->field_0x10[g_UnknownGlobal56e26c->field_0x0c->field_0x0c].width) {
-            if (!field_0x40) {
-                UnknownVirtualSlot27(field_0x3c);
-                field_0x40 = 1;
+        if (!camera || !camera->field_0x25_bit0 || !camera->redrawFrames ||
+            camera->viewportHeight != g_UnknownGlobal56e26c->field_0x0c->field_0x10[g_UnknownGlobal56e26c->field_0x0c->field_0x0c].height ||
+            camera->viewportWidth != g_UnknownGlobal56e26c->field_0x0c->field_0x10[g_UnknownGlobal56e26c->field_0x0c->field_0x0c].width) {
+            if (!copyValid) {
+                UnknownVirtualSlot27(offscreenCopy);
+                copyValid = 1;
             }
-            UnknownFunction404cd0();
+            ResetPendingRects();
             if (Target()->field_0x08)
-                UnknownFunction4043c0();
-            UnknownFunction4042e0();
+                ClearRegionDepth();
+            RestoreRegions();
             return 1;
         }
     }
     UnknownVirtualSlot27(Target()->field_0x48);
-    field_0x40 = 0;
+    copyValid = 0;
     if (Target()->field_0x08)
-        UnknownFunction4043c0();
-    if (field_0x4c) {
-        for (int i = 0; i < field_0x48; i++)
+        ClearRegionDepth();
+    if (regionCount) {
+        for (int i = 0; i < regionCapacity; i++)
             UnknownFunction404d30(i);
     }
-    if (--field_0x58 < 0)
-        field_0x58 = 0;
+    if (--fullRestoreFrames < 0)
+        fullRestoreFrames = 0;
     return 1;
 }
 
@@ -97,48 +97,48 @@ int BackgroundImage::UnknownVirtualSlot13() {
 int BackgroundImage::UnknownFunction4040f0(int owner) {
     int i;
 
-    if (field_0x48 > field_0x4c) {
-        for (i = 0; i < field_0x48; i++) {
-            if (field_0x50[i].field_0x00 == 0) {
-                field_0x50[i].field_0x00 = Target()->field_0x14 + 1;
-                field_0x50[i].field_0x3c = owner;
-                field_0x4c++;
+    if (regionCapacity > regionCount) {
+        for (i = 0; i < regionCapacity; i++) {
+            if (regionTable[i].framesLeft == 0) {
+                regionTable[i].framesLeft = Target()->field_0x14 + 1;
+                regionTable[i].owner = owner;
+                regionCount++;
                 return i;
             }
         }
         goto failed;
     }
-    field_0x50 = (UnknownBackgroundRegion*)DebugRealloc(field_0x50, (field_0x48 + 4) * sizeof(UnknownBackgroundRegion),
+    regionTable = (UnknownBackgroundRegion*)DebugRealloc(regionTable, (regionCapacity + 4) * sizeof(UnknownBackgroundRegion),
                                                         __FILE__, 270);
-    if (!field_0x50)
+    if (!regionTable)
         goto failed;
-    for (i = field_0x48; i < field_0x48 + 4; i++) {
-        field_0x50[i].field_0x00 = 0;
-        field_0x50[i].field_0x34 = -1;
-        field_0x50[i].field_0x3c = 0;
+    for (i = regionCapacity; i < regionCapacity + 4; i++) {
+        regionTable[i].framesLeft = 0;
+        regionTable[i].pendingFrame = -1;
+        regionTable[i].owner = 0;
     }
-    field_0x50[field_0x48].field_0x00 = Target()->field_0x14 + 1;
-    field_0x50[field_0x48].field_0x38 = Target()->field_0x1c;
-    field_0x50[field_0x48].field_0x3c = owner;
-    field_0x48 += 4;
-    field_0x4c++;
-    return field_0x48 - 4;
+    regionTable[regionCapacity].framesLeft = Target()->field_0x14 + 1;
+    regionTable[regionCapacity].lastFrameCount = Target()->field_0x1c;
+    regionTable[regionCapacity].owner = owner;
+    regionCapacity += 4;
+    regionCount++;
+    return regionCapacity - 4;
 failed:
     return -1;
 }
 
 // 0x004043c0: clears the depth buffer under each region's previous-frame
 // rectangle.
-int BackgroundImage::UnknownFunction4043c0() {
-    if (field_0x4c && Target()->field_0x08) {
+int BackgroundImage::ClearRegionDepth() {
+    if (regionCount && Target()->field_0x08) {
         int frame = Target()->field_0x18 - 1;
         if (frame < 0)
             frame = Target()->field_0x14 - 1;
-        for (int i = 0; i < field_0x48; i++) {
-            if (field_0x50[i].field_0x00 &&
-                field_0x50[i].field_0x04[frame].right - field_0x50[i].field_0x04[frame].left > 0 &&
-                field_0x50[i].field_0x04[frame].bottom - field_0x50[i].field_0x04[frame].top > 0 &&
-                Target()->field_0x50->UnknownMethod10(1, &field_0x50[i].field_0x04[frame], 2, 0,
+        for (int i = 0; i < regionCapacity; i++) {
+            if (regionTable[i].framesLeft &&
+                regionTable[i].frameRects[frame].right - regionTable[i].frameRects[frame].left > 0 &&
+                regionTable[i].frameRects[frame].bottom - regionTable[i].frameRects[frame].top > 0 &&
+                Target()->device->UnknownMethod10(1, &regionTable[i].frameRects[frame], 2, 0,
                                                       Target()->field_0x2c, 0) != 0)
                 return 0;
         }
@@ -156,11 +156,11 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
     surface = 0;
     *a = 0;
     if (dirty) {
-        if (field_0x40) {
+        if (copyValid) {
             if (*frames) {
                 if (field_0x60) {
                     *a = 1;
-                    surface = field_0x3c;
+                    surface = offscreenCopy;
                     field_0x60 = 0;
                 } else {
                     surface = Target()->field_0x48;
@@ -169,8 +169,8 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
                 }
             } else {
                 field_0x60 = 1;
-                for (g_UnknownGlobal5777a0 = 0; g_UnknownGlobal5777a0 < field_0x48; g_UnknownGlobal5777a0++) {
-                    if (field_0x50[g_UnknownGlobal5777a0].field_0x38 != Target()->field_0x1c)
+                for (g_UnknownGlobal5777a0 = 0; g_UnknownGlobal5777a0 < regionCapacity; g_UnknownGlobal5777a0++) {
+                    if (regionTable[g_UnknownGlobal5777a0].lastFrameCount != Target()->field_0x1c)
                         continue;
                     g_UnknownGlobal5777a8.left = CurrentRegionRect(g_UnknownGlobal5777a0).left > rect->left ? CurrentRegionRect(g_UnknownGlobal5777a0).left : rect->left;
                     g_UnknownGlobal5777a8.right = CurrentRegionRect(g_UnknownGlobal5777a0).right < rect->right ? CurrentRegionRect(g_UnknownGlobal5777a0).right : rect->right;
@@ -182,7 +182,7 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
                             surface = Target()->field_0x48;
                             field_0x68 = 0;
                         } else if (!field_0x68 && g_UnknownGlobal5777a0 == field_0x64) {
-                            surface = field_0x3c;
+                            surface = offscreenCopy;
                             field_0x68 = 1;
                         } else {
                             continue;
@@ -193,7 +193,7 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
                         break;
                     }
                 }
-                if (g_UnknownGlobal5777a0 == field_0x48) {
+                if (g_UnknownGlobal5777a0 == regionCapacity) {
                     field_0x68 = 1;
                     field_0x64 = -1;
                 }
@@ -212,16 +212,16 @@ int BackgroundImage::UnknownFunction4049d0(void** dc, CameraRect* rect, int inde
     }
     if (!surface)
         return 0;
-    if (field_0x6c) {
-        if (surface != field_0x6c) {
+    if (heldDcSurface) {
+        if (surface != heldDcSurface) {
             UnknownFunction404c80();
-            field_0x6c = surface;
-            surface->UnknownMethod17(&field_0x70);
+            heldDcSurface = surface;
+            surface->UnknownMethod17(&heldDc);
         }
     } else {
-        field_0x6c = surface;
-        surface->UnknownMethod17(&field_0x70);
+        heldDcSurface = surface;
+        surface->UnknownMethod17(&heldDc);
     }
-    *dc = field_0x70;
+    *dc = heldDc;
     return 1;
 }

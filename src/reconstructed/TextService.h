@@ -48,16 +48,16 @@ public:
     // 0x0050ae80 (cdecl): adds the archive `archive`, then loads the
     // `count` fonts `names` (cell file "<name>.cell", texture
     // "<name>.tga") and selects the first.
-    static UnknownOverlayText* UnknownFunction50ae80(const char* archive, const char** names, int count,
+    static UnknownOverlayText* Create(const char* archive, const char** names, int count,
                                                      int format, TextureMapManager* manager, float x,
                                                      float y, float width, float height, int a10);
 
-    void UnknownFunction50ade0(const char* font); // 0x0050ade0: selects the font named `font`
-    void UnknownFunction50ae60(unsigned int index, FontTexture* font); // 0x0050ae60
+    void SelectFont(const char* font);            // 0x0050ade0: selects the font named `font`
+    void SetFont(unsigned int index, FontTexture* font);               // 0x0050ae60
 
     // 0x0050b080: draws `text` at (x, y) into `texture`, wrapping at its
-    // width; returns the x past its end. 0x0050b700 (format 0x613) and
-    // 0x0050b400 (format 0x115c) are the 16-bit versions; they take the
+    // width; returns the x past its end. 0x0050b700 (format 1555) and
+    // 0x0050b400 (format 4444) are the 16-bit versions; they take the
     // colour already converted.
     int UnknownFunction50b080(TextureMap* texture, int x, int y, const char* text, int color);
     int UnknownFunction50b400(TextureMap* texture, int x, int y, const char* text, int color);
@@ -68,12 +68,12 @@ public:
     void* UnknownFunction50ba00(const UnknownOverlayRect* rect, const char* text,
                                 unsigned int color, int* count);
     // 0x0050bd30: draws vertices laid out by 0x0050ba00.
-    void UnknownFunction50bd30(RenderTarget* target, void* vertices, int count);
+    void DrawVertices(RenderTarget* target, void* vertices, int count);
 
-    FontTexture* field_0x00;                  // selected font
-    EArray<FontTexture*>* field_0x04;         // fonts
+    FontTexture* currentFont;                 // selected font
+    EArray<FontTexture*>* fonts;              // fonts
     float field_0x08;                         // 0.2
-    float field_0x0c;                         // 0.001: vertex depth
+    float vertexDepth;                        // 0.001: vertex depth
     Rectangle2D field_0x10;
     UnknownOverlayVertex field_0x2c[24 * 6];
 };

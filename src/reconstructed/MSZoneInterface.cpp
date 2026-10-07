@@ -25,7 +25,7 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 extern const GUID g_UnknownGuid556d80;
 extern const GUID g_UnknownGuid556da0;
 extern const GUID g_UnknownGuid556db0;
-extern const GUID g_UnknownGuid556dc0;
+extern const GUID g_NetApplicationGuid;
 extern const GUID g_UnknownGuid556dd0;
 extern const GUID g_UnknownGuid556de0;
 
@@ -88,7 +88,7 @@ int UnknownTrackGameObject3410::UnknownFunction4aa670(unsigned int count, void* 
 
     if (CoCreateInstance(g_UnknownGuid556da0, 0, CLSCTX_INPROC_SERVER, g_UnknownGuid556d80, (void**)&score) < 0)
         return 0;
-    if (score->UnknownMethod3(&g_UnknownGuid556dc0, count, 0, 0, 0x1000) < 0)
+    if (score->UnknownMethod3(&g_NetApplicationGuid, count, 0, 0, 0x1000) < 0)
         goto failed;
     UnknownFunction520820("\nSending The RaceStatus to the Zone\n");
     for (i = 0; i < count; i++) {

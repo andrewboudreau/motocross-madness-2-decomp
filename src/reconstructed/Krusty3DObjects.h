@@ -123,10 +123,10 @@ public:
     RunwayLights* UnknownFunction48a600(void* value, int a, int b, UnknownRunwayTerrain* terrain);
     void UnknownFunction48ad50(UnknownRunwayRacer* racer); // 0x0048ad50: sets +0x30
 
-    float field_0x2c;                          // blink timer
+    float blinkTimer;                          // blink timer
     UnknownRunwayRacer* field_0x30;
     UnknownRunwayTerrain* field_0x34;
-    ArcadeObject* field_0x38[5];
+    ArcadeObject* lightModels[5];
 };
 
 // The object at a view's +0x50 (KrustyBikeCamera; +0x3b0 is the racer it
@@ -166,7 +166,7 @@ public:
                                      UnknownVisualCueView* view, int pixels, UnknownArcadeView* camera,
                                      float size, float c, float d);
     // 0x0048af20 (ret 4): collects the view's racers.
-    void UnknownFunction48af20(UnknownVisualCueView* view);
+    void CollectRacers(UnknownVisualCueView* view);
     int UnknownFunction48bc30();               // 0x0048bc30: the next cue index when it changed, else -1
     int UnknownFunction48bc80();               // 0x0048bc80
 
@@ -177,17 +177,17 @@ public:
     // The placement block slot 10 repeats in each mode.
     void UnknownPlace();
 
-    UnknownVisualCueView* field_0xa8;
+    UnknownVisualCueView* cueView;
     UnknownRunwayTerrain* field_0xac;
-    float field_0xb0;                          // field of view the offsets were built for
-    float field_0xb4;                          // screen offset along the camera's x axis
-    float field_0xb8;                          // screen offset along the camera's y axis
+    float builtFieldOfView;                          // field of view the offsets were built for
+    float screenOffsetX;                          // screen offset along the camera's x axis
+    float screenOffsetY;                          // screen offset along the camera's y axis
     int field_0xbc;                            // toggled by control 0x14
-    int field_0xc0;                            // current racer
-    int field_0xc4;                            // last reported racer
-    int field_0xc8;                            // racer to skip
-    UnknownVisualCueRacer* field_0xcc[11];
-    int field_0xf8;                            // racers in +0xcc
+    int currentRacer;                            // current racer
+    int reportedRacer;                            // last reported racer
+    int skippedRacer;                            // racer to skip
+    UnknownVisualCueRacer* cueRacers[11];
+    int cueRacerCount;                            // racers in +0xcc
 };
 
 // The digit models "five.slt" .. "one.slt".
@@ -340,35 +340,35 @@ public:
     // 0x0048ca60 (ret 0x14): slot 8, then both loaders; returns this, or 0.
     BonusObjectManager* UnknownFunction48ca60(void* value, int a, int b, UnknownBonusRacer* racer,
                                               UnknownBonusCamera* camera);
-    void UnknownFunction48cad0();              // 0x0048cad0: steps to the next key
-    void UnknownFunction48d1e0(float value, float fraction); // 0x0048d1e0 (ret 8): shows a value
-    void UnknownFunction48d540();              // 0x0048d540: hides the shown digits
+    void NextKey();              // 0x0048cad0: steps to the next key
+    void ShowValue(float value, float fraction); // 0x0048d1e0 (ret 8): shows a value
+    void HideDigits();              // 0x0048d540: hides the shown digits
 
     UnknownBonusRacer* field_0x2c;
-    int field_0x30;                            // current key, -1 when idle
-    float field_0x34;                          // time since the start
+    int currentKey;                            // current key, -1 when idle
+    float elapsed;                          // time since the start
     UnknownBonusCamera* field_0x38;
-    D3DIMSoultreeObject* field_0x3c;           // "Base Bonus Frame"
-    D3DIMSoultreeObject* field_0x40[10][5];    // digit models by digit and place
-    int field_0x108[5];                        // shown digit per place, -1 when none
-    D3DIMSoultreeObject* field_0x11c;          // "x"
-    D3DIMSoultreeObject* field_0x120;          // decimal point
-    D3DIMSoultreeObject* field_0x124[10][2];   // fraction digit models
-    int field_0x174[2];                        // shown fraction digits
-    float field_0x17c;                         // key duration
-    float field_0x180;                         // angle
-    float field_0x184;                         // angle change over the key
+    D3DIMSoultreeObject* baseFrame;           // "Base Bonus Frame"
+    D3DIMSoultreeObject* digitModels[10][5];    // digit models by digit and place
+    int shownDigits[5];                        // shown digit per place, -1 when none
+    D3DIMSoultreeObject* timesModel;          // "x"
+    D3DIMSoultreeObject* decimalPointModel;          // decimal point
+    D3DIMSoultreeObject* fractionDigitModels[10][2];   // fraction digit models
+    int shownFractionDigits[2];                        // shown fraction digits
+    float keyDuration;                         // key duration
+    float keyAngle;                         // angle
+    float keyAngleChange;                         // angle change over the key
     Vector3 field_0x188;
-    Vector3 field_0x194;                       // position
-    Vector3 field_0x1a0;                       // position change
-    Vector3 field_0x1ac;                       // scale
-    Vector3 field_0x1b8;                       // scale change
-    Vector3 field_0x1c4;                       // axis
-    Vector3 field_0x1d0;                       // axis change
+    Vector3 keyPosition;                       // position
+    Vector3 keyPositionChange;                       // position change
+    Vector3 keyScale;                       // scale
+    Vector3 keyScaleChange;                       // scale change
+    Vector3 keyAxis;                       // axis
+    Vector3 keyAxisChange;                       // axis change
     float field_0x1dc;                         // camera +0x16c when last placed
     float field_0x1e0;
     float field_0x1e4;                         // twice the frame's half height
-    float field_0x1e8;                         // size factor
+    float sizeFactor;                         // size factor
     float field_0x1ec;
     int field_0x1f0;
 };

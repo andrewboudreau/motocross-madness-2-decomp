@@ -17,8 +17,8 @@ struct UnknownKrustyUIGuiLayerItem {
 
 // One of the GUI's four layers (+0x330).
 struct UnknownKrustyUIGuiLayer {
-    void UnknownFunction487c30(int value);    // 0x00487c30
-    void UnknownFunction487d60();             // 0x00487d60
+    void AcceptDevice(int value);    // 0x00487c30
+    void ForgetDevices();             // 0x00487d60
 
     unsigned char field_0x00[0x30];
     GameObject* field_0x30;                   // the cursor (bikerace.cpp slot 23 tests its +0x25 bit 0)
@@ -34,14 +34,14 @@ public:
     explicit UnknownKrustyUIGui(int flags);                  // 0x00485190 (0x3e0 bytes; GUIManager.cpp)
     // 0x004853b0: sets the GUI up (font, cursor, progress callback); returns
     // the object KrustyUI adds as its child.
-    GameObject* UnknownFunction4853b0(void* owner, int a, TextureMapManager* textures, int b, int c,
-                                      int d, const char* font, int fontSize, const char* cursor,
-                                      void (*progress)(), int e);
+    GameObject* SetUp(void* owner, int a, TextureMapManager* textures, int b, int c,
+                      int d, const char* font, int fontSize, const char* cursor,
+                      void (*progress)(), int e);
     void UnknownFunction485d70(const char* directory);       // 0x00485d70 ("ui")
     void UnknownFunction486560(const char* image);           // 0x00486560 ("ui\\wait.tga")
     void UnknownFunction4866c0(char* font);                  // 0x004866c0
     void UnknownFunction486630(int value);                   // 0x00486630
-    void UnknownFunction485d50();                            // 0x00485d50 (KrustyUI 0x004999b0)
+    void CloseDialogResource();                            // 0x00485d50 (KrustyUI 0x004999b0)
     UnknownTrackGameObject56cItem* UnknownFunction485df0();  // 0x00485df0
     void UnknownFunction485ef0();                            // 0x00485ef0
     UnknownKrustyUIGuiLayer* UnknownFunction486540(int index); // 0x00486540: layer `index` (0 past 3)
@@ -50,7 +50,7 @@ public:
     // 0x00485a70: shows `dialog` (EventManager 0x0045e710 passes 0, 2, 0, 0,
     // 0, 0, 1).
     void UnknownFunction485a70(GameObject* dialog, int a, int b, int c, int d, int e, int f, int g);
-    void UnknownFunction485fc0();                            // 0x00485fc0: releases the background
+    void ReleaseBackground();                            // 0x00485fc0: releases the background
 
     unsigned char field_0x000[0x3c];
     BackgroundImage* field_0x03c;             // the background (dlgprocs.cpp 0x004536e0)
@@ -104,8 +104,8 @@ public:
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00499a40
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x00499a70
     virtual int UnknownVirtualSlot25(void* value); // 0x00499980
-    void UnknownFunction4999f0(GameObject* parent); // 0x004999f0: shows the +0x464 scene
-    void UnknownFunction499a20();             // 0x00499a20: hides it
+    void ShowScene(GameObject* parent); // 0x004999f0: shows the +0x464 scene
+    void HideScene();             // 0x00499a20: hides it
     // 0x0049b560 / 0x0049b7f0 (bikerace.cpp passes TrackGame+0x1f2c and
     // +0x1f6c): copy `name` to `text` (`size` bytes) and return 1 when it is
     // an archive entry or a file (in "Res" when it has no directory; then
@@ -115,7 +115,7 @@ public:
     int UnknownFunction49b7f0(const char* name, char* text, int size);
     void UnknownFunction499b00();             // 0x00499b00
     void UnknownFunction499b10();             // 0x00499b10
-    void UnknownFunction49a4a0();             // 0x0049a4a0: opens the exit dialog
+    void OpenExitDialog();             // 0x0049a4a0: opens the exit dialog
     // 0x0049b020: fills `names` with `count` distinct random short strings.
     void UnknownFunction49b020(const char** names, int count);
     // 0x0049b0d0: picks `count` distinct random bikes and riders for the AI
@@ -123,9 +123,9 @@ public:
     void UnknownFunction49b0d0(int* bikes, int count, int* riders);
     // 0x0049ba70: appends an entry to +0x60; returns its index.
     int UnknownFunction49ba70(int a, int b, int c, const char* name, int d, int e);
-    void UnknownFunction4999b0();             // 0x004999b0: shutdown (the destructor's first step)
+    void Shutdown();             // 0x004999b0: shutdown (the destructor's first step)
     void UnknownFunction49bb80();             // 0x0049bb80: frees +0x60
-    void UnknownFunction49a540();             // 0x0049a540: loads the garage tables
+    void LoadGarageTables();             // 0x0049a540: loads the garage tables
     void UnknownFunction49a8b0();             // 0x0049a8b0
     GameObject* UnknownFunction4988a0(RenderTarget* target, int value); // 0x004988a0
     void UnknownFunction498cf0(int value);                         // 0x00498cf0

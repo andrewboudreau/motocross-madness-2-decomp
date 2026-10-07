@@ -38,3 +38,12 @@ assignment.
 Not attributed: `0x00448560..0x00449e5f` has no source literal and no RTTI.
 It includes the TrackGame+0x33fc constructor `0x00448960` and the
 keyboard-layout code before dirlist.cpp.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x00447e90` `SetRowText`
+- `0x00448200` `DrawString`

@@ -43,7 +43,7 @@ UnknownTrackGameObject3400::UnknownTrackGameObject3400()
 {
     field_0xdc = new(__FILE__, 47) DirectoryList;
     field_0x00 = 0;
-    UnknownFunction51efe0();
+    Clear();
 }
 
 // 0x0051efc0
@@ -56,7 +56,7 @@ UnknownTrackGameObject3400::~UnknownTrackGameObject3400()
 }
 
 // 0x0051efe0: empties the table and restores the extensions.
-void UnknownTrackGameObject3400::UnknownFunction51efe0()
+void UnknownTrackGameObject3400::Clear()
 {
     field_0xe0 = 0;
     for (int i = 0; i < 10; i++)
@@ -72,14 +72,14 @@ int UnknownTrackGameObject3400::UnknownFunction51f0b0(short directory, const cha
 {
     char path[260];
     sprintf(path, "%s\\%s", g_UnknownGlobal56e26c->mode.field_0xa0[directory], name);
-    return UnknownFunction51f110(path);
+    return Read(path);
 }
 
 // 0x0051f110: reads the table from `path` plus the current extension.
-int UnknownTrackGameObject3400::UnknownFunction51f110(const char* path)
+int UnknownTrackGameObject3400::Read(const char* path)
 {
     char name[260];
-    UnknownFunction51efe0();
+    Clear();
     sprintf(name, "%s%s", path, field_0x04[field_0x00]);
     FILE* file = fopen(name, "rb");
     if (!file)
@@ -92,7 +92,7 @@ int UnknownTrackGameObject3400::UnknownFunction51f110(const char* path)
 }
 
 // 0x0051f1b0: writes the table to `path` plus the current extension.
-int UnknownTrackGameObject3400::UnknownFunction51f1b0(const char* path, int value)
+int UnknownTrackGameObject3400::Write(const char* path, int value)
 {
     char name[260];
     field_0xe4 = value;
@@ -112,7 +112,7 @@ int UnknownTrackGameObject3400::UnknownFunction51f260(short directory, const cha
 {
     char path[260];
     sprintf(path, "%s\\%s", g_UnknownGlobal56e26c->mode.field_0xa0[directory], name);
-    return UnknownFunction51f1b0(path, value);
+    return Write(path, value);
 }
 
 // 0x0051f2c0: reads `name` when the directory scan lists it; the first
@@ -130,13 +130,13 @@ void UnknownTrackGameObject3400::UnknownFunction51f2c0(int unused, const char* n
     sprintf(path, "%s\\%s", (const char*)g_UnknownGlobal56e26c->mode.field_0x6a0, name);
     sprintf(file, "%s%s", name, field_0x04[field_0x00]);
     if (field_0xdc->UnknownFunction44a910(file))
-        UnknownFunction51f110(path);
+        Read(path);
 }
 
 // 0x0051f3c0: enters `racer` as the last record and re-sorts the table;
 // 0 when the value would not place. Kinds 0 and 4 rank higher values
 // first, the rest lower times first.
-int UnknownTrackGameObject3400::UnknownFunction51f3c0(short kind, int racer)
+int UnknownTrackGameObject3400::AddRacer(short kind, int racer)
 {
     char name[16];
     int n = strlen(g_UnknownGlobal56e26c->eventManager->field_0x50[racer].field_0x40);
@@ -202,91 +202,91 @@ void TrackRecordDlg::UnknownVirtualSlot29(UnknownTrackRecordEvent* event)
     char name[128];
     char path[260];
     UIMultiState* control;
-    switch (event->field_0x08) {
+    switch (event->kind) {
     case 5:
         field_0x7f60 = 0;
         field_0x7f64 = 0;
-        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("TxtTitle", 0));
-        control->UnknownFunction470da0(10);
-        control->UnknownFunction470a80(g_UnknownGlobal56e26c->field_0x420, 0x958);
+        control = static_cast<UIMultiState*>(FindControl("TxtTitle", 0));
+        control->SetTextAlign(10);
+        control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x958);
         field_0x7f58 = 0;
         g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(0);
-        UnknownFunction51fe80(event, field_0x7f58);
-        UnknownFunction520390(event, field_0x7f58);
+        ShowTab(event, field_0x7f58);
+        FillLists(event, field_0x7f58);
         field_0x7f5c = 0;
         g_UnknownGlobal56e26c->field_0x3400->field_0x00 = 0;
-        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabQuarry", 4));
-        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1423);
-        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1423);
-        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabTag", 4));
-        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1426);
-        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1426);
-        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabSupercross", 4));
-        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1424);
-        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1424);
-        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabNationals", 4));
-        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1425);
-        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1425);
-        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabBaja", 4));
-        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1421);
-        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1421);
-        control = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabEnduro", 4));
-        control->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1422);
-        control->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1422);
-        UnknownFunction51fc40(field_0x7f58);
+        control = static_cast<UIMultiState*>(FindControl("TabQuarry", 4));
+        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1423);
+        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1423);
+        control = static_cast<UIMultiState*>(FindControl("TabTag", 4));
+        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1426);
+        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1426);
+        control = static_cast<UIMultiState*>(FindControl("TabSupercross", 4));
+        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1424);
+        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1424);
+        control = static_cast<UIMultiState*>(FindControl("TabNationals", 4));
+        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1425);
+        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1425);
+        control = static_cast<UIMultiState*>(FindControl("TabBaja", 4));
+        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1421);
+        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1421);
+        control = static_cast<UIMultiState*>(FindControl("TabEnduro", 4));
+        control->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1422);
+        control->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1422);
+        LabelTabs(field_0x7f58);
         break;
     case 1:
-        if (!_stricmp("Back", event->field_0x04)) {
+        if (!_stricmp("Back", event->controlName)) {
             g_UnknownGlobal56e26c->ui->UnknownFunction499b20(100);
-            event->field_0x0c->UnknownFunction46ff30(0);
-            event->field_0x20 = 1;
-        } else if (!_stricmp("TabQuarry", event->field_0x04)) {
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+        } else if (!_stricmp("TabQuarry", event->controlName)) {
             field_0x7f58 = 0;
-            UnknownFunction520390(event, 0);
-        } else if (!_stricmp("TabBaja", event->field_0x04)) {
+            FillLists(event, 0);
+        } else if (!_stricmp("TabBaja", event->controlName)) {
             field_0x7f58 = 1;
-            UnknownFunction520390(event, 1);
-        } else if (!_stricmp("TabNationals", event->field_0x04)) {
+            FillLists(event, 1);
+        } else if (!_stricmp("TabNationals", event->controlName)) {
             field_0x7f58 = 2;
-            UnknownFunction520390(event, 2);
-        } else if (!_stricmp("TabSupercross", event->field_0x04)) {
+            FillLists(event, 2);
+        } else if (!_stricmp("TabSupercross", event->controlName)) {
             field_0x7f58 = 3;
-            UnknownFunction520390(event, 3);
-        } else if (!_stricmp("TabEnduro", event->field_0x04)) {
+            FillLists(event, 3);
+        } else if (!_stricmp("TabEnduro", event->controlName)) {
             field_0x7f58 = 5;
-            UnknownFunction520390(event, 5);
-        } else if (!_stricmp("TabTag", event->field_0x04)) {
+            FillLists(event, 5);
+        } else if (!_stricmp("TabTag", event->controlName)) {
             field_0x7f58 = 4;
-            UnknownFunction520390(event, 4);
-        } else if (!_stricmp("TabLeft", event->field_0x04)) {
+            FillLists(event, 4);
+        } else if (!_stricmp("TabLeft", event->controlName)) {
             field_0x7f5c = 0;
             g_UnknownGlobal56e26c->field_0x3400->field_0x00 = 0;
-            UnknownFunction520390(event, field_0x7f58);
-        } else if (!_stricmp("TabMiddle", event->field_0x04)) {
+            FillLists(event, field_0x7f58);
+        } else if (!_stricmp("TabMiddle", event->controlName)) {
             field_0x7f5c = 1;
             g_UnknownGlobal56e26c->field_0x3400->field_0x00 = 1;
-            UnknownFunction520390(event, field_0x7f58);
-        } else if (!_stricmp("TabRight", event->field_0x04)) {
+            FillLists(event, field_0x7f58);
+        } else if (!_stricmp("TabRight", event->controlName)) {
             field_0x7f5c = 2;
             g_UnknownGlobal56e26c->field_0x3400->field_0x00 = 2;
-            UnknownFunction520390(event, field_0x7f58);
-        } else if (!_stricmp("Help", event->field_0x04)) {
+            FillLists(event, field_0x7f58);
+        } else if (!_stricmp("Help", event->controlName)) {
             g_UnknownGlobal56e26c->mode.UnknownFunction523d30("MCM2HELP", 0);
         }
         break;
     case 2:
-        if (!_stricmp("LstTrack", event->field_0x04)) {
-            g_UnknownGlobal56e26c->field_0x3400->UnknownFunction51efe0();
-            if (static_cast<UIListBox*>(event->field_0x14)->UnknownFunction476950() != -1 && field_0x7f60) {
-                int n = strlen(static_cast<UIListBox*>(event->field_0x14)->UnknownFunction476d20(-1));
+        if (!_stricmp("LstTrack", event->controlName)) {
+            g_UnknownGlobal56e26c->field_0x3400->Clear();
+            if (static_cast<UIListBox*>(event->control)->GetSelectedRow() != -1 && field_0x7f60) {
+                int n = strlen(static_cast<UIListBox*>(event->control)->GetRowText(-1));
                 int length = n > 0x7f ? 0x7f : n;
-                strncpy(name, static_cast<UIListBox*>(event->field_0x14)->UnknownFunction476d20(-1), length);
+                strncpy(name, static_cast<UIListBox*>(event->control)->GetRowText(-1), length);
                 name[length] = '\0';
-                static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats1", 3))->UnknownFunction4775f0();
-                static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats2", 3))->UnknownFunction4775f0();
+                static_cast<UIListBox*>(FindControl("LstStats1", 3))->RemoveAllRows();
+                static_cast<UIListBox*>(FindControl("LstStats2", 3))->RemoveAllRows();
                 g_UnknownGlobal56e26c->mode.UnknownFunction523bb0((short)field_0x7f58, 0, path);
                 UnknownFunction5204e0(event, field_0x7f58,
-                                      field_0x7f60[static_cast<UIListBox*>(event->field_0x14)->UnknownFunction4768d0(-1)]->field_0x00);
+                                      field_0x7f60[static_cast<UIListBox*>(event->control)->GetRowData(-1)]->field_0x00);
             }
         }
         break;
@@ -296,72 +296,72 @@ void TrackRecordDlg::UnknownVirtualSlot29(UnknownTrackRecordEvent* event)
     }
 }
 
-void TrackRecordDlg::UnknownFunction51fc40(int series)
+void TrackRecordDlg::LabelTabs(int series)
 {
     char text[128];
     char format[128];
     UIMultiState* tab;
     if (series != 0 && series != 4) {
-        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabLeft", 4));
-        tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1427);
-        tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1427);
-        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabMiddle", 4));
+        tab = static_cast<UIMultiState*>(FindControl("TabLeft", 4));
+        tab->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1427);
+        tab->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1427);
+        tab = static_cast<UIMultiState*>(FindControl("TabMiddle", 4));
         g_UnknownGlobal56e26c->UnknownFunction521970(0x142f, format, 128);
         sprintf(text, format, 5);
-        tab->UnknownFunction478ad0(0, text);
-        tab->UnknownFunction478ad0(1, text);
-        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabRight", 4));
+        tab->SetStateText(0, text);
+        tab->SetStateText(1, text);
+        tab = static_cast<UIMultiState*>(FindControl("TabRight", 4));
         sprintf(text, format, 10);
-        tab->UnknownFunction478ad0(0, text);
-        tab->UnknownFunction478ad0(1, text);
+        tab->SetStateText(0, text);
+        tab->SetStateText(1, text);
     } else {
-        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabLeft", 4));
+        tab = static_cast<UIMultiState*>(FindControl("TabLeft", 4));
         int id = (series == 4) + 0x142a;
-        tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, id);
-        tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, id);
-        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabMiddle", 4));
+        tab->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, id);
+        tab->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, id);
+        tab = static_cast<UIMultiState*>(FindControl("TabMiddle", 4));
         g_UnknownGlobal56e26c->UnknownFunction521970(0x1430, format, 128);
         sprintf(text, format, 5);
-        tab->UnknownFunction478ad0(0, text);
-        tab->UnknownFunction478ad0(1, text);
-        tab = static_cast<UIMultiState*>(UnknownFunction46ebf0("TabRight", 4));
+        tab->SetStateText(0, text);
+        tab->SetStateText(1, text);
+        tab = static_cast<UIMultiState*>(FindControl("TabRight", 4));
         sprintf(text, format, 10);
-        tab->UnknownFunction478ad0(0, text);
-        tab->UnknownFunction478ad0(1, text);
+        tab->SetStateText(0, text);
+        tab->SetStateText(1, text);
     }
     switch (field_0x7f5c) {
     case 1:
-        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabMiddle", 4))->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(FindControl("TabMiddle", 4))->SelectInGroup(0);
         break;
     case 2:
-        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabRight", 4))->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(FindControl("TabRight", 4))->SelectInGroup(0);
         break;
     default:
-        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabLeft", 4))->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(FindControl("TabLeft", 4))->SelectInGroup(0);
         break;
     }
 }
 
-void TrackRecordDlg::UnknownFunction51fe80(UnknownTrackRecordEvent* event, int series)
+void TrackRecordDlg::ShowTab(UnknownTrackRecordEvent* event, int series)
 {
     switch (series) {
     case 0:
-        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabQuarry", 4))->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(FindControl("TabQuarry", 4))->SelectInGroup(0);
         break;
     case 1:
-        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabBaja", 4))->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(FindControl("TabBaja", 4))->SelectInGroup(0);
         break;
     case 4:
-        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabTag", 4))->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(FindControl("TabTag", 4))->SelectInGroup(0);
         break;
     case 5:
-        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabEnduro", 4))->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(FindControl("TabEnduro", 4))->SelectInGroup(0);
         break;
     case 2:
-        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabNationals", 4))->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(FindControl("TabNationals", 4))->SelectInGroup(0);
         break;
     case 3:
-        static_cast<UIRadioButton*>(UnknownFunction46ebf0("TabSupercross", 4))->UnknownFunction479310(0);
+        static_cast<UIRadioButton*>(FindControl("TabSupercross", 4))->SelectInGroup(0);
         break;
     }
 }
@@ -381,22 +381,22 @@ void TrackRecordDlg::UnknownFunction51ff40()
 
 // 0x00520390: selects the series, then fills the track list; `event` is
 // unused.
-void TrackRecordDlg::UnknownFunction520390(UnknownTrackRecordEvent* event, int series)
+void TrackRecordDlg::FillLists(UnknownTrackRecordEvent* event, int series)
 {
     char text[128];
     g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(field_0x7f58);
-    UnknownFunction51fc40(field_0x7f58);
-    UIListBox* control = static_cast<UIListBox*>(UnknownFunction46ebf0("TxtTrack", 12));
+    LabelTabs(field_0x7f58);
+    UIListBox* control = static_cast<UIListBox*>(FindControl("TxtTrack", 12));
     g_UnknownGlobal56e26c->UnknownFunction521970(0xbc6, text, 128);
-    control->UnknownFunction470b20(text);
-    control = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats1", 3));
-    control->UnknownFunction4775f0();
+    control->SetText(text);
+    control = static_cast<UIListBox*>(FindControl("LstStats1", 3));
+    control->RemoveAllRows();
     control->UnknownFunction477bb0(0);
-    control = static_cast<UIListBox*>(UnknownFunction46ebf0("LstStats2", 3));
-    control->UnknownFunction4775f0();
+    control = static_cast<UIListBox*>(FindControl("LstStats2", 3));
+    control->RemoveAllRows();
     control->UnknownFunction477bb0(0);
-    control = static_cast<UIListBox*>(UnknownFunction46ebf0("LstTrack", 3));
-    control->UnknownFunction4775f0();
+    control = static_cast<UIListBox*>(FindControl("LstTrack", 3));
+    control->RemoveAllRows();
     UnknownFunction51ffe0(control, g_UnknownGlobal56e26c->mode.field_0x25e0, series);
     ((UnknownTrackRecordListBox*)control)->UnknownVirtualSlot66(0);
 }
@@ -406,11 +406,11 @@ void TrackRecordDlg::UnknownFunction520480(UnknownTrackRecordEvent* event, const
 {
     UIListBox* list;
     if (name) {
-        list = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats1", 0));
+        list = static_cast<UIListBox*>(event->dialog->FindControl("LstStats1", 0));
         list->UnknownFunction476d80(name, (int)value, 0);
     }
     if (text) {
-        list = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats2", 0));
+        list = static_cast<UIListBox*>(event->dialog->FindControl("LstStats2", 0));
         list->UnknownFunction476d80(text, 0, 0);
     }
 }
@@ -418,21 +418,21 @@ void TrackRecordDlg::UnknownFunction520480(UnknownTrackRecordEvent* event, const
 void TrackRecordDlg::UnknownFunction5204e0(UnknownTrackRecordEvent* event, int times, const char* name)
 {
     char text[128];
-    UIListBox* control = static_cast<UIListBox*>(UnknownFunction46ebf0("TxtStats1", 12));
+    UIListBox* control = static_cast<UIListBox*>(FindControl("TxtStats1", 12));
     g_UnknownGlobal56e26c->UnknownFunction521970(0xbc4, text, 128);
-    control->UnknownFunction470b20(text);
-    control = static_cast<UIListBox*>(UnknownFunction46ebf0("TxtStats2", 12));
+    control->SetText(text);
+    control = static_cast<UIListBox*>(FindControl("TxtStats2", 12));
     if (!times)
         g_UnknownGlobal56e26c->UnknownFunction521970(0x938, text, 128);
     else
         g_UnknownGlobal56e26c->UnknownFunction521970(0xbc5, text, 128);
-    control->UnknownFunction470b20(text);
+    control->SetText(text);
     g_UnknownGlobal56e26c->field_0x3400->UnknownFunction51f2c0(times, name);
-    control = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats1", 0));
-    control->UnknownFunction4775f0();
+    control = static_cast<UIListBox*>(event->dialog->FindControl("LstStats1", 0));
+    control->RemoveAllRows();
     control->UnknownFunction477bb0(0);
-    control = static_cast<UIListBox*>(event->field_0x0c->UnknownFunction46ebf0("LstStats2", 0));
-    control->UnknownFunction4775f0();
+    control = static_cast<UIListBox*>(event->dialog->FindControl("LstStats2", 0));
+    control->RemoveAllRows();
     control->UnknownFunction477bb0(0);
     for (int i = 0; i < 10; i++) {
         UnknownTrackGameObject3400* table = g_UnknownGlobal56e26c->field_0x3400;

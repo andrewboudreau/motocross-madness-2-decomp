@@ -8,7 +8,7 @@
 #include "TextureMap.h"
 
 // 0x004d0870: converts 4444 to 8888.
-int UnknownFunction4d0870(void* destination, void* source, int width, int height, int destinationStride,
+int Convert4444To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
     UnknownPixel32* row = (UnknownPixel32*)destination;
@@ -28,7 +28,7 @@ int UnknownFunction4d0870(void* destination, void* source, int width, int height
 }
 
 // 0x004cde20: halves 24-bit pixels, averaging each 2x2 block.
-int UnknownFunction4cde20(void* destination, void* source, int width, int height, int destinationStride,
+int Halve24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     UnknownPixel24* sourceRow = (UnknownPixel24*)source;
     UnknownPixel24* row = (UnknownPixel24*)destination;
@@ -47,10 +47,10 @@ int UnknownFunction4cde20(void* destination, void* source, int width, int height
 }
 
 // 0x004d0900: converts 24-bit to 565, through the ditherer when asked.
-int UnknownFunction4d0900(void* destination, void* source, int width, int height, int destinationStride,
+int Convert24To565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int dither) {
     if (dither) {
-        UnknownFunction4cf2a0(source, 0x378, width, height, sourceStride, destinationStride, 0, destination,
+        DitherConvert(source, 888, width, height, sourceStride, destinationStride, 0, destination,
                               0, 0, 0);
     } else {
         UnknownPixel24* sourceRow = (UnknownPixel24*)source;
@@ -68,10 +68,10 @@ int UnknownFunction4d0900(void* destination, void* source, int width, int height
 }
 
 // 0x004d09d0: converts 24-bit to 555, through the ditherer when asked.
-int UnknownFunction4d09d0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert24To555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int dither) {
     if (dither) {
-        UnknownFunction4cf2a0(source, 0x378, width, height, sourceStride, destinationStride, 0, 0,
+        DitherConvert(source, 888, width, height, sourceStride, destinationStride, 0, 0,
                               destination, 0, 0);
     } else {
         UnknownPixel24* sourceRow = (UnknownPixel24*)source;
@@ -89,7 +89,7 @@ int UnknownFunction4d09d0(void* destination, void* source, int width, int height
 }
 
 // 0x004d0e40: converts 555 to 8888; the key colour becomes opaque magenta.
-int UnknownFunction4d0e40(void* destination, void* source, int width, int height, int destinationStride,
+int Convert555To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key) {
     unsigned short* sourceRow = (unsigned short*)source;
     UnknownPixel32* row = (UnknownPixel32*)destination;
@@ -116,7 +116,7 @@ int UnknownFunction4d0e40(void* destination, void* source, int width, int height
 }
 
 // 0x004d0f10: converts 555 to 24-bit; 555 magenta stays exactly magenta.
-int UnknownFunction4d0f10(void* destination, void* source, int width, int height, int destinationStride,
+int Convert555To24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
     UnknownPixel24* row = (UnknownPixel24*)destination;
@@ -141,7 +141,7 @@ int UnknownFunction4d0f10(void* destination, void* source, int width, int height
 }
 
 // 0x004d0fb0: converts 555 to 565.
-int UnknownFunction4d0fb0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert555To565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
     unsigned short* row = (unsigned short*)destination;
@@ -158,7 +158,7 @@ int UnknownFunction4d0fb0(void* destination, void* source, int width, int height
 }
 
 // 0x004d1030: converts 565 pixels to 555.
-int UnknownFunction4d1030(void* destination, void* source, int width, int height, int destinationStride,
+int Convert565To555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
     unsigned short* row = (unsigned short*)destination;
@@ -174,7 +174,7 @@ int UnknownFunction4d1030(void* destination, void* source, int width, int height
 }
 
 // 0x004d10b0: converts palette indices to 24-bit RGB.
-int UnknownFunction4d10b0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert8To24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, UnknownTexturePalette* palette) {
     unsigned char* sourceRow = (unsigned char*)source;
     UnknownPixel24* row = (UnknownPixel24*)destination;
@@ -225,7 +225,7 @@ int UnknownFunction4d11c0(void* destination, void* source, int width, int height
 }
 
 // 0x004d1230: converts 8888 to 4444.
-int UnknownFunction4d1230(void* destination, void* source, int width, int height, int destinationStride,
+int Convert8888To4444(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     UnknownPixel32* sourceRow = (UnknownPixel32*)source;
     unsigned short* row = (unsigned short*)destination;
@@ -242,7 +242,7 @@ int UnknownFunction4d1230(void* destination, void* source, int width, int height
 }
 
 // 0x004d12d0: converts 8888 to 1555, opaque where alpha reaches the threshold.
-int UnknownFunction4d12d0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert8888To1555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int alphaThreshold) {
     UnknownPixel32* sourceRow = (UnknownPixel32*)source;
     unsigned short* row = (unsigned short*)destination;
@@ -262,7 +262,7 @@ int UnknownFunction4d12d0(void* destination, void* source, int width, int height
 }
 
 // 0x004d1370: converts 24-bit to 1555; the key colour becomes transparent 0.
-int UnknownFunction4d1370(void* destination, void* source, int width, int height, int destinationStride,
+int Convert24To1555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int key) {
     UnknownPixel24* sourceRow = (UnknownPixel24*)source;
     unsigned short* row = (unsigned short*)destination;
@@ -284,7 +284,7 @@ int UnknownFunction4d1370(void* destination, void* source, int width, int height
 }
 
 // 0x004d1440: converts 4444 to 555; pixels below the alpha threshold become `color`.
-int UnknownFunction4d1440(void* destination, void* source, int width, int height, int destinationStride,
+int Convert4444To555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int alphaThreshold, unsigned int color) {
     alphaThreshold = (alphaThreshold >> 4) << 12;
     unsigned short background = Pack555(color);
@@ -306,7 +306,7 @@ int UnknownFunction4d1440(void* destination, void* source, int width, int height
 }
 
 // 0x004d1530: converts 4444 to 1555; pixels below the alpha threshold become 0.
-int UnknownFunction4d1530(void* destination, void* source, int width, int height, int destinationStride,
+int Convert4444To1555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int alphaThreshold) {
     alphaThreshold = (alphaThreshold >> 4) << 12;
     unsigned short* sourceRow = (unsigned short*)source;
@@ -327,7 +327,7 @@ int UnknownFunction4d1530(void* destination, void* source, int width, int height
 }
 
 // 0x004d15f0: converts 4444 to 565; pixels below the alpha threshold become `color`.
-int UnknownFunction4d15f0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert4444To565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int alphaThreshold, unsigned int color) {
     alphaThreshold = (alphaThreshold >> 4) << 12;
     unsigned short background = Pack565(color);
@@ -349,7 +349,7 @@ int UnknownFunction4d15f0(void* destination, void* source, int width, int height
 }
 
 // 0x004d16e0: converts 555 to 1555, transparent where the pixel is the key.
-int UnknownFunction4d16e0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert555To1555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key) {
     unsigned short transparent = Pack555(key);
     unsigned short* sourceRow = (unsigned short*)source;
@@ -372,7 +372,7 @@ int UnknownFunction4d16e0(void* destination, void* source, int width, int height
 
 // 0x004d1780: converts 1555 to 555: transparent pixels become the key (opaque ones only lose
 // the alpha bit of what is already in `destination`, as in retail).
-int UnknownFunction4d1780(void* destination, void* source, int width, int height, int destinationStride,
+int Convert1555To555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key) {
     unsigned short transparent = Pack555(key);
     unsigned short* sourceRow = (unsigned short*)source;
@@ -393,7 +393,7 @@ int UnknownFunction4d1780(void* destination, void* source, int width, int height
 }
 
 // 0x004d1810: converts 565 to 1555, transparent where the pixel is the key.
-int UnknownFunction4d1810(void* destination, void* source, int width, int height, int destinationStride,
+int Convert565To1555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key) {
     unsigned short transparent = Pack565(key);
     unsigned short* sourceRow = (unsigned short*)source;
@@ -414,7 +414,7 @@ int UnknownFunction4d1810(void* destination, void* source, int width, int height
 }
 
 // 0x004d18c0: converts 1555 to 565; transparent pixels become the key.
-int UnknownFunction4d18c0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert1555To565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key) {
     unsigned short transparent = Pack565(key);
     unsigned short* sourceRow = (unsigned short*)source;
@@ -439,29 +439,29 @@ int UnknownFunction4d1b90(void* destination, void* source, int width, int height
                           int sourceStride, int levels, int format, UnknownTexturePalette* palette, int filter) {
     switch (format) {
     case 8:
-        return UnknownFunction4d05c0(destination, source, width, height, destinationStride, sourceStride, levels,
+        return Downsample8(destination, source, width, height, destinationStride, sourceStride, levels,
                                      palette);
-    case 0x22b:
-        return UnknownFunction4d0440(destination, source, width, height, destinationStride, sourceStride, levels,
+    case 555:
+        return Downsample555(destination, source, width, height, destinationStride, sourceStride, levels,
                                      filter);
-    case 0x235:
-        return UnknownFunction4d02c0(destination, source, width, height, destinationStride, sourceStride, levels,
+    case 565:
+        return Downsample565(destination, source, width, height, destinationStride, sourceStride, levels,
                                      filter);
-    case 0x378:
-        return UnknownFunction4cfaf0(destination, source, width, height, destinationStride, sourceStride, levels);
-    case 0x613:
-        return UnknownFunction4d0170(destination, source, width, height, destinationStride, sourceStride, levels);
-    case 0x115c:
-        return UnknownFunction4d0020(destination, source, width, height, destinationStride, sourceStride, levels);
-    case 0x22b8:
-        return UnknownFunction4cfc40(destination, source, width, height, destinationStride, sourceStride, levels);
+    case 888:
+        return Downsample24(destination, source, width, height, destinationStride, sourceStride, levels);
+    case 1555:
+        return Downsample1555(destination, source, width, height, destinationStride, sourceStride, levels);
+    case 4444:
+        return Downsample4444(destination, source, width, height, destinationStride, sourceStride, levels);
+    case 8888:
+        return Downsample8888(destination, source, width, height, destinationStride, sourceStride, levels);
     }
     return 0;
 }
 
 // 0x004d1970: replaces 32-bit `from` pixels with `to`; pixels already equal
 // to `to` get their blue byte nudged (255 down, otherwise up) first.
-int UnknownFunction4d1970(void* bits, UnknownPixel32 from, UnknownPixel32 to, int width, int height, int stride) {
+int ReplaceColor32(void* bits, UnknownPixel32 from, UnknownPixel32 to, int width, int height, int stride) {
     UnknownPixel32* row = (UnknownPixel32*)bits;
     for (int y = 0; y < height; y++) {
         UnknownPixel32* pixel = row;
@@ -487,7 +487,7 @@ int UnknownFunction4d1970(void* bits, UnknownPixel32 from, UnknownPixel32 to, in
 }
 
 // 0x004d1a20: the 24-bit replacer.
-int UnknownFunction4d1a20(void* bits, UnknownPixel24 from, UnknownPixel24 to, int width, int height, int stride) {
+int ReplaceColor24(void* bits, UnknownPixel24 from, UnknownPixel24 to, int width, int height, int stride) {
     UnknownPixel24* row = (UnknownPixel24*)bits;
     for (int y = 0; y < height; y++) {
         UnknownPixel24* pixel = row;
@@ -511,7 +511,7 @@ int UnknownFunction4d1a20(void* bits, UnknownPixel24 from, UnknownPixel24 to, in
 
 // 0x004d1ac0: the 16-bit replacer; a pixel equal to `to` moves one step
 // (down when its low five bits are all set, otherwise up).
-int UnknownFunction4d1ac0(void* bits, unsigned short from, unsigned short to, int width, int height, int stride) {
+int ReplaceColor16(void* bits, unsigned short from, unsigned short to, int width, int height, int stride) {
     unsigned short* row = (unsigned short*)bits;
     for (int y = 0; y < height; y++) {
         unsigned short* pixel = row;
@@ -531,7 +531,7 @@ int UnknownFunction4d1ac0(void* bits, unsigned short from, unsigned short to, in
 }
 
 // 0x004d1b40: the 8-bit (palette index) replacer.
-int UnknownFunction4d1b40(void* bits, unsigned char from, unsigned char to, int width, int height, int stride) {
+int ReplaceColor8(void* bits, unsigned char from, unsigned char to, int width, int height, int stride) {
     unsigned char* row = (unsigned char*)bits;
     for (int y = 0; y < height; y++) {
         unsigned char* pixel = row;
@@ -545,10 +545,10 @@ int UnknownFunction4d1b40(void* bits, unsigned char from, unsigned char to, int 
 }
 
 // 0x004d0aa0: converts 24-bit to palette indices through the 555 table.
-int UnknownFunction4d0aa0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert24To8(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int dither, UnknownTexturePalette* palette) {
     if (dither && palette) {
-        UnknownFunction4cf2a0(source, 0x378, width, height, sourceStride, destinationStride, 0, 0, 0,
+        DitherConvert(source, 888, width, height, sourceStride, destinationStride, 0, 0, 0,
                               destination, palette);
     } else {
         UnknownPixel24* sourceRow = (UnknownPixel24*)source;
@@ -567,10 +567,10 @@ int UnknownFunction4d0aa0(void* destination, void* source, int width, int height
 }
 
 // 0x004d0b90: converts 565 to palette indices through the 565 table.
-int UnknownFunction4d0b90(void* destination, void* source, int width, int height, int destinationStride,
+int Convert565To8(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int dither, UnknownTexturePalette* palette) {
     if (dither && palette) {
-        UnknownFunction4cf2a0(source, 0x235, width, height, sourceStride, destinationStride, 0, 0, 0,
+        DitherConvert(source, 565, width, height, sourceStride, destinationStride, 0, 0, 0,
                               destination, palette);
     } else {
         unsigned short* sourceRow = (unsigned short*)source;
@@ -590,7 +590,7 @@ int UnknownFunction4d0b90(void* destination, void* source, int width, int height
 
 // 0x004cf980: spreads 24-bit pixels into 16.16 channel triples (the
 // ditherer's row reader).
-void UnknownFunction4cf980(UnknownPixel24* source, int* channels, int count) {
+void ReadRow24(UnknownPixel24* source, int* channels, int count) {
     do {
         channels[0] = source->red << 16;
         channels[1] = source->green << 16;
@@ -601,7 +601,7 @@ void UnknownFunction4cf980(UnknownPixel24* source, int* channels, int count) {
 }
 
 // 0x004cf9c0: the 565 row reader.
-void UnknownFunction4cf9c0(unsigned short* source, int* channels, int count) {
+void ReadRow565(unsigned short* source, int* channels, int count) {
     do {
         channels[0] = (*source & 0xf800) << 8;
         channels[1] = (*source & 0x7e0) << 13;
@@ -612,7 +612,7 @@ void UnknownFunction4cf9c0(unsigned short* source, int* channels, int count) {
 }
 
 // 0x004cfa10: the 555 row reader.
-void UnknownFunction4cfa10(unsigned short* source, int* channels, int count) {
+void ReadRow555(unsigned short* source, int* channels, int count) {
     do {
         channels[0] = (*source & 0x7c00) << 9;
         channels[1] = (*source & 0x3e0) << 14;
@@ -623,7 +623,7 @@ void UnknownFunction4cfa10(unsigned short* source, int* channels, int count) {
 }
 
 // 0x004cfa60: converts 565 to 24-bit.
-int UnknownFunction4cfa60(void* destination, void* source, int width, int height, int destinationStride,
+int Convert565To24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
     UnknownPixel24* row = (UnknownPixel24*)destination;
@@ -644,7 +644,7 @@ int UnknownFunction4cfa60(void* destination, void* source, int width, int height
 // 0x004cfaf0: shrinks 24-bit `source` by `levels` halvings into the width x
 // height `destination` (0: a plain copy). Intermediate levels go through a
 // buffer of the first level's size.
-int UnknownFunction4cfaf0(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample24(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
@@ -653,26 +653,26 @@ int UnknownFunction4cfaf0(void* destination, void* source, int width, int height
         return 1;
     }
     if (levels == 1) {
-        UnknownFunction4cde20(destination, source, width, height, destinationStride, sourceStride);
+        Halve24(destination, source, width, height, destinationStride, sourceStride);
         return 1;
     }
     int levelWidth = width << (levels - 1);
     int levelHeight = height << (levels - 1);
     void* buffer = DebugMalloc(levelHeight * levelWidth * 3, __FILE__, 1329);
-    UnknownFunction4cde20(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
+    Halve24(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
     for (int i = 2; i < levels; i++) {
         levelWidth /= 2;
         levelHeight /= 2;
-        UnknownFunction4cde20(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
+        Halve24(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
     }
-    UnknownFunction4cde20(destination, buffer, width, height, destinationStride, levelWidth);
+    Halve24(destination, buffer, width, height, destinationStride, levelWidth);
     DebugFree(buffer, __FILE__, 1350);
     return 1;
 }
 
 // 0x004cfc40: shrinks 8888 `source` by `levels` halvings (0: a plain
 // copy), like 0x004cfaf0.
-int UnknownFunction4cfc40(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
@@ -681,7 +681,7 @@ int UnknownFunction4cfc40(void* destination, void* source, int width, int height
         return 1;
     }
     if (levels == 1) {
-        UnknownFunction4cdf10(destination, source, width, height, destinationStride, sourceStride);
+        Halve8888(destination, source, width, height, destinationStride, sourceStride);
         return 1;
     }
     int levelWidth = width << (levels - 1);
@@ -689,19 +689,19 @@ int UnknownFunction4cfc40(void* destination, void* source, int width, int height
     void* buffer = DebugMalloc(levelHeight * levelWidth * 4, __FILE__, 1390);
     if (!buffer)
         return 0;
-    UnknownFunction4cdf10(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
+    Halve8888(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
     for (int i = 2; i < levels; i++) {
         levelWidth /= 2;
         levelHeight /= 2;
-        UnknownFunction4cdf10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
+        Halve8888(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
     }
-    UnknownFunction4cdf10(destination, buffer, width, height, destinationStride, levelWidth);
+    Halve8888(destination, buffer, width, height, destinationStride, levelWidth);
     DebugFree(buffer, __FILE__, 1412);
     return 1;
 }
 
 // 0x004d0020: shrinks 4444 `source` by `levels` halvings through 0x004ce190.
-int UnknownFunction4d0020(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample4444(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
@@ -710,25 +710,25 @@ int UnknownFunction4d0020(void* destination, void* source, int width, int height
         return 1;
     }
     if (levels == 1) {
-        UnknownFunction4ce190(destination, source, width, height, destinationStride, sourceStride, 0);
+        Halve4444(destination, source, width, height, destinationStride, sourceStride, 0);
         return 1;
     }
     int levelWidth = width << (levels - 1);
     int levelHeight = height << (levels - 1);
     void* buffer = DebugMalloc(levelHeight * levelWidth * 2, __FILE__, 1572);
-    UnknownFunction4ce190(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, 0);
+    Halve4444(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, 0);
     for (int i = 2; i < levels; i++) {
         levelWidth /= 2;
         levelHeight /= 2;
-        UnknownFunction4ce190(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, 0);
+        Halve4444(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, 0);
     }
-    UnknownFunction4ce190(destination, buffer, width, height, destinationStride, levelWidth, 0);
+    Halve4444(destination, buffer, width, height, destinationStride, levelWidth, 0);
     DebugFree(buffer, __FILE__, 1593);
     return 1;
 }
 
 // 0x004d0170: shrinks 1555 `source` by `levels` halvings through 0x004ce420.
-int UnknownFunction4d0170(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample1555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
@@ -737,26 +737,26 @@ int UnknownFunction4d0170(void* destination, void* source, int width, int height
         return 1;
     }
     if (levels == 1) {
-        UnknownFunction4ce420(destination, source, width, height, destinationStride, sourceStride);
+        Halve1555(destination, source, width, height, destinationStride, sourceStride);
         return 1;
     }
     int levelWidth = width << (levels - 1);
     int levelHeight = height << (levels - 1);
     void* buffer = DebugMalloc(levelHeight * levelWidth * 2, __FILE__, 1632);
-    UnknownFunction4ce420(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
+    Halve1555(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
     for (int i = 2; i < levels; i++) {
         levelWidth /= 2;
         levelHeight /= 2;
-        UnknownFunction4ce420(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
+        Halve1555(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
     }
-    UnknownFunction4ce420(destination, buffer, width, height, destinationStride, levelWidth);
+    Halve1555(destination, buffer, width, height, destinationStride, levelWidth);
     DebugFree(buffer, __FILE__, 1653);
     return 1;
 }
 
 // 0x004d02c0: shrinks 565 `source` by `levels` halvings through 0x004cea10
 // (magenta 0xf81f is the key).
-int UnknownFunction4d02c0(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels, int filter) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
@@ -765,26 +765,26 @@ int UnknownFunction4d02c0(void* destination, void* source, int width, int height
         return 1;
     }
     if (levels == 1) {
-        UnknownFunction4cea10(destination, source, width, height, destinationStride, sourceStride, filter, 0xf81f);
+        Halve565(destination, source, width, height, destinationStride, sourceStride, filter, 0xf81f);
         return 1;
     }
     int levelWidth = width << (levels - 1);
     int levelHeight = height << (levels - 1);
     void* buffer = DebugMalloc(levelHeight * levelWidth * 2, __FILE__, 1693);
-    UnknownFunction4cea10(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, filter, 0xf81f);
+    Halve565(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, filter, 0xf81f);
     for (int i = 2; i < levels; i++) {
         levelWidth /= 2;
         levelHeight /= 2;
-        UnknownFunction4cea10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, filter, 0xf81f);
+        Halve565(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, filter, 0xf81f);
     }
-    UnknownFunction4cea10(destination, buffer, width, height, destinationStride, levelWidth, filter, 0xf81f);
+    Halve565(destination, buffer, width, height, destinationStride, levelWidth, filter, 0xf81f);
     DebugFree(buffer, __FILE__, 1714);
     return 1;
 }
 
 // 0x004d0440: shrinks 555 `source` by `levels` halvings through 0x004ce5f0
 // (magenta 0x7c1f is the key).
-int UnknownFunction4d0440(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels, int filter) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
@@ -793,26 +793,26 @@ int UnknownFunction4d0440(void* destination, void* source, int width, int height
         return 1;
     }
     if (levels == 1) {
-        UnknownFunction4ce5f0(destination, source, width, height, destinationStride, sourceStride, filter, 0x7c1f);
+        Halve555(destination, source, width, height, destinationStride, sourceStride, filter, 0x7c1f);
         return 1;
     }
     int levelWidth = width << (levels - 1);
     int levelHeight = height << (levels - 1);
     void* buffer = DebugMalloc(levelHeight * levelWidth * 2, __FILE__, 1754);
-    UnknownFunction4ce5f0(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, filter, 0x7c1f);
+    Halve555(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, filter, 0x7c1f);
     for (int i = 2; i < levels; i++) {
         levelWidth /= 2;
         levelHeight /= 2;
-        UnknownFunction4ce5f0(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, filter, 0x7c1f);
+        Halve555(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, filter, 0x7c1f);
     }
-    UnknownFunction4ce5f0(destination, buffer, width, height, destinationStride, levelWidth, filter, 0x7c1f);
+    Halve555(destination, buffer, width, height, destinationStride, levelWidth, filter, 0x7c1f);
     DebugFree(buffer, __FILE__, 1775);
     return 1;
 }
 
 // 0x004d05c0: shrinks palette-index `source` by `levels` halvings through
 // 0x004cee30.
-int UnknownFunction4d05c0(void* destination, void* source, int width, int height, int destinationStride,
+int Downsample8(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels, UnknownTexturePalette* palette) {
     if (levels == 0) {
         for (int y = 0; y < height; y++)
@@ -821,26 +821,26 @@ int UnknownFunction4d05c0(void* destination, void* source, int width, int height
         return 1;
     }
     if (levels == 1) {
-        UnknownFunction4cee30(destination, source, width, height, destinationStride, sourceStride, palette);
+        Halve8(destination, source, width, height, destinationStride, sourceStride, palette);
         return 1;
     }
     int levelWidth = width << (levels - 1);
     int levelHeight = height << (levels - 1);
     void* buffer = DebugMalloc(levelHeight * levelWidth, __FILE__, 1816);
-    UnknownFunction4cee30(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, palette);
+    Halve8(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, palette);
     for (int i = 2; i < levels; i++) {
         levelWidth /= 2;
         levelHeight /= 2;
-        UnknownFunction4cee30(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, palette);
+        Halve8(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, palette);
     }
-    UnknownFunction4cee30(destination, buffer, width, height, destinationStride, levelWidth, palette);
+    Halve8(destination, buffer, width, height, destinationStride, levelWidth, palette);
     DebugFree(buffer, __FILE__, 1840);
     return 1;
 }
 
 // 0x004cfda0: converts 24-bit to 8888; the 0xRRGGBB `key` becomes
 // transparent. Rows are addressed from the row index.
-void UnknownFunction4cfda0(void* destination, void* source, int width, int height, int destinationStride,
+void Convert24To8888(void* destination, void* source, int width, int height, int destinationStride,
                            int sourceStride, unsigned int key) {
     int keyColor[3];
     keyColor[0] = (key >> 16) & 0xff;
@@ -868,7 +868,7 @@ void UnknownFunction4cfda0(void* destination, void* source, int width, int heigh
 int UnknownFunction4cfe70(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int levels, unsigned int key) {
     if (levels == 0) {
-        UnknownFunction4cfda0(destination, source, width, height, destinationStride, sourceStride, key);
+        Convert24To8888(destination, source, width, height, destinationStride, sourceStride, key);
         return 1;
     }
     int fullWidth = width << levels;
@@ -876,9 +876,9 @@ int UnknownFunction4cfe70(void* destination, void* source, int width, int height
     void* full = DebugMalloc(fullWidth * fullHeight * 4, __FILE__, 1484);
     if (!full)
         return 0;
-    UnknownFunction4cfda0(full, source, fullWidth, fullHeight, sourceStride, sourceStride, key);
+    Convert24To8888(full, source, fullWidth, fullHeight, sourceStride, sourceStride, key);
     if (levels == 1) {
-        UnknownFunction4cdf10(destination, full, width, height, destinationStride, sourceStride);
+        Halve8888(destination, full, width, height, destinationStride, sourceStride);
     } else {
         int levelWidth = width << (levels - 1);
         int levelHeight = height << (levels - 1);
@@ -887,13 +887,13 @@ int UnknownFunction4cfe70(void* destination, void* source, int width, int height
             DebugFree(full, __FILE__, 1534);
             return 0;
         }
-        UnknownFunction4cdf10(buffer, full, levelWidth, levelHeight, levelWidth, sourceStride);
+        Halve8888(buffer, full, levelWidth, levelHeight, levelWidth, sourceStride);
         for (int i = 2; i < levels; i++) {
             levelWidth /= 2;
             levelHeight /= 2;
-            UnknownFunction4cdf10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
+            Halve8888(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
         }
-        UnknownFunction4cdf10(destination, buffer, width, height, destinationStride, levelWidth);
+        Halve8888(destination, buffer, width, height, destinationStride, levelWidth);
         DebugFree(buffer, __FILE__, 1527);
     }
     DebugFree(full, __FILE__, 1529);
@@ -903,13 +903,13 @@ int UnknownFunction4cfe70(void* destination, void* source, int width, int height
 // 0x004d0c40: converts 555 to palette indices: dithered when asked, through
 // the assembly 0x004d0d40 for unpadded rows of a multiple of eight pixels,
 // otherwise through the 555 table.
-int UnknownFunction4d0c40(void* destination, void* source, int width, int height, int destinationStride,
+int Convert555To8(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int dither, UnknownTexturePalette* palette) {
     if (dither && palette) {
-        UnknownFunction4cf2a0(source, 0x22b, width, height, sourceStride, destinationStride, 0, 0, 0,
+        DitherConvert(source, 555, width, height, sourceStride, destinationStride, 0, 0, 0,
                               destination, palette);
     } else if (sourceStride == width && sourceStride % 8 == 0) {
-        UnknownFunction4d0d40(source, destination, destinationStride, width, height,
+        Convert555To8Fast(source, destination, destinationStride, width, height,
                               palette->UnknownFunction4de280());
     } else {
         unsigned short* sourceRow = (unsigned short*)source;
@@ -934,112 +934,112 @@ int UnknownFunction4d1d20(void* destination, void* source, int width, int height
                            int sourceStride, int format, int sourceFormat, int dither,
                            UnknownTexturePalette* palette, int alphaThreshold, unsigned int key) {
     switch (sourceFormat) {
-    case 0x235:
+    case 565:
         switch (format) {
-        case 0x235:
-            return UnknownFunction4d02c0(destination, source, width, height, destinationStride, sourceStride, 0, 2);
-        case 0x22b:
-            return UnknownFunction4d1030(destination, source, width, height, destinationStride, sourceStride);
+        case 565:
+            return Downsample565(destination, source, width, height, destinationStride, sourceStride, 0, 2);
+        case 555:
+            return Convert565To555(destination, source, width, height, destinationStride, sourceStride);
         case 8:
-            return UnknownFunction4d0b90(destination, source, width, height, destinationStride, sourceStride, dither,
+            return Convert565To8(destination, source, width, height, destinationStride, sourceStride, dither,
                                          palette);
-        case 0x378:
-            return UnknownFunction4cfa60(destination, source, width, height, destinationStride, sourceStride);
-        case 0x22b8:
-            return UnknownFunction4d0700(destination, source, width, height, destinationStride, sourceStride, key);
-        case 0x613:
-            return UnknownFunction4d1810(destination, source, width, height, destinationStride, sourceStride, key);
+        case 888:
+            return Convert565To24(destination, source, width, height, destinationStride, sourceStride);
+        case 8888:
+            return Convert565To8888(destination, source, width, height, destinationStride, sourceStride, key);
+        case 1555:
+            return Convert565To1555(destination, source, width, height, destinationStride, sourceStride, key);
         }
         break;
-    case 0x22b:
+    case 555:
         switch (format) {
-        case 0x235:
-            return UnknownFunction4d0fb0(destination, source, width, height, destinationStride, sourceStride);
-        case 0x22b:
-            return UnknownFunction4d0440(destination, source, width, height, destinationStride, sourceStride, 0, 2);
+        case 565:
+            return Convert555To565(destination, source, width, height, destinationStride, sourceStride);
+        case 555:
+            return Downsample555(destination, source, width, height, destinationStride, sourceStride, 0, 2);
         case 8:
-            return UnknownFunction4d0c40(destination, source, width, height, destinationStride, sourceStride, dither,
+            return Convert555To8(destination, source, width, height, destinationStride, sourceStride, dither,
                                          palette);
-        case 0x378:
-            return UnknownFunction4d0f10(destination, source, width, height, destinationStride, sourceStride);
-        case 0x22b8:
-            return UnknownFunction4d0e40(destination, source, width, height, destinationStride, sourceStride, key);
-        case 0x613:
-            return UnknownFunction4d16e0(destination, source, width, height, destinationStride, sourceStride, key);
+        case 888:
+            return Convert555To24(destination, source, width, height, destinationStride, sourceStride);
+        case 8888:
+            return Convert555To8888(destination, source, width, height, destinationStride, sourceStride, key);
+        case 1555:
+            return Convert555To1555(destination, source, width, height, destinationStride, sourceStride, key);
         }
         break;
     case 8:
         switch (format) {
-        case 0x22b:
+        case 555:
             return UnknownFunction4d11c0(destination, source, width, height, destinationStride, sourceStride, palette);
         case 8:
-            return UnknownFunction4d05c0(destination, source, width, height, destinationStride, sourceStride, 0,
+            return Downsample8(destination, source, width, height, destinationStride, sourceStride, 0,
                                          palette);
-        case 0x235:
+        case 565:
             return UnknownFunction4d1150(destination, source, width, height, destinationStride, sourceStride, palette);
-        case 0x378:
-            return UnknownFunction4d10b0(destination, source, width, height, destinationStride, sourceStride, palette);
+        case 888:
+            return Convert8To24(destination, source, width, height, destinationStride, sourceStride, palette);
         }
         break;
-    case 0x378:
+    case 888:
         switch (format) {
-        case 0x235:
-            return UnknownFunction4d0900(destination, source, width, height, destinationStride, sourceStride, dither);
-        case 0x22b:
-            return UnknownFunction4d09d0(destination, source, width, height, destinationStride, sourceStride, dither);
+        case 565:
+            return Convert24To565(destination, source, width, height, destinationStride, sourceStride, dither);
+        case 555:
+            return Convert24To555(destination, source, width, height, destinationStride, sourceStride, dither);
         case 8:
-            return UnknownFunction4d0aa0(destination, source, width, height, destinationStride, sourceStride, dither,
+            return Convert24To8(destination, source, width, height, destinationStride, sourceStride, dither,
                                          palette);
-        case 0x378:
+        case 888:
             if (dither)
-                return UnknownFunction4cf2a0(source, 0x378, width, height, sourceStride, destinationStride, destination,
+                return DitherConvert(source, 888, width, height, sourceStride, destinationStride, destination,
                                              0, 0, 0, 0);
             else
-                return UnknownFunction4cfaf0(destination, source, width, height, destinationStride, sourceStride, 0);
-        case 0x22b8:
+                return Downsample24(destination, source, width, height, destinationStride, sourceStride, 0);
+        case 8888:
             return UnknownFunction4cfe70(destination, source, width, height, destinationStride, sourceStride, 0, key);
-        case 0x613:
-            return UnknownFunction4d1370(destination, source, width, height, destinationStride, sourceStride, key);
+        case 1555:
+            return Convert24To1555(destination, source, width, height, destinationStride, sourceStride, key);
         }
         break;
-    case 0x22b8:
+    case 8888:
         switch (format) {
-        case 0x22b8:
-            return UnknownFunction4cfc40(destination, source, width, height, destinationStride, sourceStride, 0);
-        case 0x115c:
-            return UnknownFunction4d1230(destination, source, width, height, destinationStride, sourceStride);
-        case 0x613:
-            return UnknownFunction4d12d0(destination, source, width, height, destinationStride, sourceStride,
+        case 8888:
+            return Downsample8888(destination, source, width, height, destinationStride, sourceStride, 0);
+        case 4444:
+            return Convert8888To4444(destination, source, width, height, destinationStride, sourceStride);
+        case 1555:
+            return Convert8888To1555(destination, source, width, height, destinationStride, sourceStride,
                                          alphaThreshold);
         }
         break;
-    case 0x115c:
+    case 4444:
         switch (format) {
-        case 0x235:
-            return UnknownFunction4d15f0(destination, source, width, height, destinationStride, sourceStride,
+        case 565:
+            return Convert4444To565(destination, source, width, height, destinationStride, sourceStride,
                                          alphaThreshold, key);
-        case 0x22b:
-            return UnknownFunction4d1440(destination, source, width, height, destinationStride, sourceStride,
+        case 555:
+            return Convert4444To555(destination, source, width, height, destinationStride, sourceStride,
                                          alphaThreshold, key);
-        case 0x613:
-            return UnknownFunction4d1530(destination, source, width, height, destinationStride, sourceStride,
+        case 1555:
+            return Convert4444To1555(destination, source, width, height, destinationStride, sourceStride,
                                          alphaThreshold);
-        case 0x22b8:
-            return UnknownFunction4d0870(destination, source, width, height, destinationStride, sourceStride);
-        case 0x115c:
-            return UnknownFunction4d0020(destination, source, width, height, destinationStride, sourceStride, 0);
+        case 8888:
+            return Convert4444To8888(destination, source, width, height, destinationStride, sourceStride);
+        case 4444:
+            return Downsample4444(destination, source, width, height, destinationStride, sourceStride, 0);
         }
         break;
-    case 0x613:
+    case 1555:
         switch (format) {
-        case 0x235:
-            return UnknownFunction4d18c0(destination, source, width, height, destinationStride, sourceStride, key);
-        case 0x22b:
-            return UnknownFunction4d1780(destination, source, width, height, destinationStride, sourceStride, key);
-        case 0x613:
-            return UnknownFunction4d0170(destination, source, width, height, destinationStride, sourceStride, 0);
-        case 0x22b8:
-            return UnknownFunction4d07d0(destination, source, width, height, destinationStride, sourceStride);
+        case 565:
+            return Convert1555To565(destination, source, width, height, destinationStride, sourceStride, key);
+        case 555:
+            return Convert1555To555(destination, source, width, height, destinationStride, sourceStride, key);
+        case 1555:
+            return Downsample1555(destination, source, width, height, destinationStride, sourceStride, 0);
+        case 8888:
+            return Convert1555To8888(destination, source, width, height, destinationStride, sourceStride);
         }
         break;
     }

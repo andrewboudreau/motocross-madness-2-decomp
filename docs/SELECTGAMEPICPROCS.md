@@ -2,7 +2,8 @@
 
 `src/reconstructed/SelectGamePicProcs.h` / `SelectGamePicProcs.cpp`. These
 are the multiplayer lobby dialogs, written in the dialog-procedure style
-of [DIALOGPROCS](DIALOGPROCS.md). Names are provisional.
+of [DIALOGPROCS](DIALOGPROCS.md). Helper names follow their bodies (see
+DIALOGPROCS "Names"); the rest are provisional.
 
 Extent: `0x004f1740..0x004f975b`. Evidence:
 - **`__FILE__`:** the literal at `0x00573c6c`; its first xref is at

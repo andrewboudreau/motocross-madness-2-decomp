@@ -24,17 +24,17 @@ RaceSound::RaceSound(int flags) : GameObject(flags) {
     field_0x12a4 = 0;
     field_0x12a8 = 0;
     field_0x12ac = 0;
-    field_0x434 = 0;
-    field_0x94 = 0;
-    field_0x438 = 0;
+    streamChannel = 0;
+    channelsInUse = 0;
+    currentRacer = 0;
     field_0x1290 = 0;
     field_0x1294 = 0;
     field_0x1204 = 0;
     field_0x11e8 = 0;
-    field_0x2c = 0;
+    listenerRacer = 0;
     field_0x30 = 0;
-    field_0x34 = 0;
-    field_0x38 = 0;
+    raceView = 0;
+    listenerCamera = 0;
     field_0x3c = 0;
     field_0x44 = 0;
     field_0x40 = 0;
@@ -46,7 +46,7 @@ RaceSound::RaceSound(int flags) : GameObject(flags) {
     field_0x11b4 = 0;
     field_0x11ac = 0;
     field_0x1208 = 1;
-    field_0x50 = 0;
+    musicVolume = 0;
     field_0x11ec = 0;
     field_0x11f0 = 0;
     field_0x11f4 = 0;
@@ -54,9 +54,9 @@ RaceSound::RaceSound(int flags) : GameObject(flags) {
         field_0x120c[i] = 0;
         field_0x1264[i] = 0;
         field_0x1238[i] = 0;
-        field_0x98[i].field_0x50 = 0;
-        field_0x98[i].field_0x50 = DebugMalloc(44100, __FILE__, 77);
-        memset(field_0x98[i].field_0x50, 0, 44100);
+        engineChannels[i].sampleBuffer = 0;
+        engineChannels[i].sampleBuffer = DebugMalloc(44100, __FILE__, 77);
+        memset(engineChannels[i].sampleBuffer, 0, 44100);
     }
     for (i = 0; i < 6; i++)
         field_0x11b8[i] = 0;
@@ -122,9 +122,9 @@ RaceSound::~RaceSound() {
         }
     }
     for (i = 0; i < 11; i++) {
-        if (field_0x98[i].field_0x50)
-            DebugFree(field_0x98[i].field_0x50, __FILE__, 177);
-        field_0x98[i].field_0x50 = 0;
+        if (engineChannels[i].sampleBuffer)
+            DebugFree(engineChannels[i].sampleBuffer, __FILE__, 177);
+        engineChannels[i].sampleBuffer = 0;
     }
     SoundSystem()->UnknownFunction4be9b0(-10000);
     Release();
@@ -134,7 +134,7 @@ RaceSound::~RaceSound() {
 // present engine's section ("125", "250", "400") of audio_16.ini or
 // audio_08.ini: the sample counts (divided down when several engines share
 // the race) and names of eight sample sets, and three engine speeds.
-RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* view,
+RaceSound* RaceSound::Create(void* owner, UnknownKrustyBikeView* view,
                                             UnknownRaceSoundCamera* camera, int racers) {
     int count;
     UnknownTextureStream* stream;
@@ -150,14 +150,14 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
 
     stream = new (__FILE__, 203) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     GameObject::UnknownVirtualSlot8(owner);
-    field_0x34 = view;
-    field_0x38 = camera;
+    raceView = view;
+    listenerCamera = camera;
     field_0x3c = new (__FILE__, 213) SoundGroup(1);
     UnknownFunction469190(field_0x3c, -1);
     field_0x44 = new (__FILE__, 214) SoundGroup(1);
     UnknownFunction469190(field_0x44, -1);
-    field_0x4c = new (__FILE__, 215) SoundGroup(1);
-    UnknownFunction469190(field_0x4c, -1);
+    crowdSounds = new (__FILE__, 215) SoundGroup(1);
+    UnknownFunction469190(crowdSounds, -1);
     field_0x48 = new (__FILE__, 216) SoundGroup(1);
     UnknownFunction469190(field_0x48, -1);
     if (SoundSystem())
@@ -167,18 +167,18 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
     field_0x45c[1] = 0;
     field_0x45c[2] = 0;
     iterator = 0;
-    while ((racer = field_0x34->UnknownFunction4204e0(&iterator)) != 0) {
+    while ((racer = raceView->UnknownFunction4204e0(&iterator)) != 0) {
         if (racer->field_0x738 < 250) {
             field_0x45c[0] = 1;
-            if (racer == field_0x34->field_0x38)
+            if (racer == raceView->field_0x38)
                 field_0x474 = 0;
         } else if (!racer->field_0x737) {
             field_0x45c[1] = 1;
-            if (racer == field_0x34->field_0x38)
+            if (racer == raceView->field_0x38)
                 field_0x474 = 1;
         } else {
             field_0x45c[2] = 1;
-            if (racer == field_0x34->field_0x38)
+            if (racer == raceView->field_0x38)
                 field_0x474 = 2;
         }
     }
@@ -240,18 +240,18 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
     }
 
     for (i = 0; i < 4; i++) {
-        field_0x43c[i] = new (__FILE__, 310) Sound(field_0x3c, 1);
+        engineVoices[i] = new (__FILE__, 310) Sound(field_0x3c, 1);
         if (g_UnknownGlobal56e26c->mode.field_0xa48)
-            UnknownFunction4e5660(field_0x43c[i], "silence_16.wav", 41, 3);
+            LoadSound(engineVoices[i], "silence_16.wav", 41, 3);
         else
-            UnknownFunction4e5660(field_0x43c[i], "silence_08.wav", 41, 3);
-        field_0x44c[i] = 0;
+            LoadSound(engineVoices[i], "silence_08.wav", 41, 3);
+        engineVoiceInUse[i] = 0;
     }
-    field_0x83c = new (__FILE__, 321) Sound(field_0x3c, 1);
-    UnknownFunction4e5660(field_0x83c, "LandHard01.wav", 41, 3);
+    ownEngine = new (__FILE__, 321) Sound(field_0x3c, 1);
+    LoadSound(ownEngine, "LandHard01.wav", 41, 3);
     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 3) {
         field_0x11b4 = new (__FILE__, 326) Sound(field_0x44, 1);
-        UnknownFunction4e5660(field_0x11b4, "launch.wav", 1, 3);
+        LoadSound(field_0x11b4, "launch.wav", 1, 3);
     }
 
     if (g_UnknownGlobal56e26c->mode.field_0xa48) {
@@ -291,7 +291,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
             for (i = 0; i < field_0x1128[k]; i++) {
                 sprintf(key, "idle_%d", i + 1);
                 parameters.UnknownFunction4b7b30(key, sample, -1);
-                UnknownFunction4e5500(sample, &field_0x840[k][i], &field_0xc00[k][i]);
+                ReadSample(sample, &field_0x840[k][i], &field_0xc00[k][i]);
             }
         }
 
@@ -306,7 +306,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
             for (i = 0; i < field_0x1134[k]; i++) {
                 sprintf(key, "LowTorque_%d", i + 1);
                 parameters.UnknownFunction4b7b30(key, sample, -1);
-                UnknownFunction4e5500(sample, &field_0x8b8[k][i], &field_0xc78[k][i]);
+                ReadSample(sample, &field_0x8b8[k][i], &field_0xc78[k][i]);
             }
         }
 
@@ -321,7 +321,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
             for (i = 0; i < field_0x1140[k]; i++) {
                 sprintf(key, "MidTorque_%d", i + 1);
                 parameters.UnknownFunction4b7b30(key, sample, -1);
-                UnknownFunction4e5500(sample, &field_0x930[k][i], &field_0xcf0[k][i]);
+                ReadSample(sample, &field_0x930[k][i], &field_0xcf0[k][i]);
             }
         }
 
@@ -336,7 +336,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
             for (i = 0; i < field_0x114c[k]; i++) {
                 sprintf(key, "HighTorque_%d", i + 1);
                 parameters.UnknownFunction4b7b30(key, sample, -1);
-                UnknownFunction4e5500(sample, &field_0x9a8[k][i], &field_0xd68[k][i]);
+                ReadSample(sample, &field_0x9a8[k][i], &field_0xd68[k][i]);
             }
         }
 
@@ -351,7 +351,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
             for (i = 0; i < field_0x1158[k]; i++) {
                 sprintf(key, "PowerBand_%d", i + 1);
                 parameters.UnknownFunction4b7b30(key, sample, -1);
-                UnknownFunction4e5500(sample, &field_0xa20[k][i], &field_0xde0[k][i]);
+                ReadSample(sample, &field_0xa20[k][i], &field_0xde0[k][i]);
             }
         }
 
@@ -366,7 +366,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
             for (i = 0; i < field_0x1164[k]; i++) {
                 sprintf(key, "Decel_%d", i + 1);
                 parameters.UnknownFunction4b7b30(key, sample, -1);
-                UnknownFunction4e5500(sample, &field_0xa98[k][i], &field_0xe58[k][i]);
+                ReadSample(sample, &field_0xa98[k][i], &field_0xe58[k][i]);
             }
         }
 
@@ -381,7 +381,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
             for (i = 0; i < field_0x1170[k]; i++) {
                 sprintf(key, "Sputter_%d", i + 1);
                 parameters.UnknownFunction4b7b30(key, sample, -1);
-                UnknownFunction4e5500(sample, &field_0xb10[k][i], &field_0xed0[k][i]);
+                ReadSample(sample, &field_0xb10[k][i], &field_0xed0[k][i]);
             }
         }
 
@@ -396,7 +396,7 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
             for (i = 0; i < field_0x117c[k]; i++) {
                 sprintf(key, "Rev_%d", i + 1);
                 parameters.UnknownFunction4b7b30(key, sample, -1);
-                UnknownFunction4e5500(sample, &field_0xb88[k][i], &field_0xf48[k][i]);
+                ReadSample(sample, &field_0xb88[k][i], &field_0xf48[k][i]);
             }
         }
 
@@ -408,42 +408,42 @@ RaceSound* RaceSound::UnknownFunction4e23f0(void* owner, UnknownKrustyBikeView* 
         delete stream;
 
     if (g_UnknownGlobal56e26c->mode.field_0x23a4) {
-        field_0x11e8 = new (__FILE__, 545) Sound(field_0x4c, 1);
-        UnknownFunction4e5660(field_0x11e8, "CrowdLoop.wav", 1, 3);
-        field_0x11ec = new (__FILE__, 548) Sound(field_0x4c, 1);
-        UnknownFunction4e5660(field_0x11ec, "applause01.wav", 1, 3);
-        field_0x11f0 = new (__FILE__, 550) Sound(field_0x4c, 1);
-        UnknownFunction4e5660(field_0x11f0, "applause02.wav", 1, 3);
-        field_0x11f4 = new (__FILE__, 552) Sound(field_0x4c, 1);
-        UnknownFunction4e5660(field_0x11f4, "applause03.wav", 1, 3);
-        field_0x11f8 = new (__FILE__, 554) Sound(field_0x4c, 1);
-        UnknownFunction4e5660(field_0x11f8, "boo_01.wav", 1, 3);
-        field_0x11fc = new (__FILE__, 556) Sound(field_0x4c, 1);
-        UnknownFunction4e5660(field_0x11fc, "oh_01.wav", 1, 3);
+        field_0x11e8 = new (__FILE__, 545) Sound(crowdSounds, 1);
+        LoadSound(field_0x11e8, "CrowdLoop.wav", 1, 3);
+        field_0x11ec = new (__FILE__, 548) Sound(crowdSounds, 1);
+        LoadSound(field_0x11ec, "applause01.wav", 1, 3);
+        field_0x11f0 = new (__FILE__, 550) Sound(crowdSounds, 1);
+        LoadSound(field_0x11f0, "applause02.wav", 1, 3);
+        field_0x11f4 = new (__FILE__, 552) Sound(crowdSounds, 1);
+        LoadSound(field_0x11f4, "applause03.wav", 1, 3);
+        field_0x11f8 = new (__FILE__, 554) Sound(crowdSounds, 1);
+        LoadSound(field_0x11f8, "boo_01.wav", 1, 3);
+        field_0x11fc = new (__FILE__, 556) Sound(crowdSounds, 1);
+        LoadSound(field_0x11fc, "oh_01.wav", 1, 3);
     }
     field_0x11ac = new (__FILE__, 566) Sound(field_0x44, 1);
-    UnknownFunction4e5660(field_0x11ac, "bonus.wav", 1, 3);
+    LoadSound(field_0x11ac, "bonus.wav", 1, 3);
     field_0x11b0 = new (__FILE__, 570) Sound(field_0x44, 1);
-    UnknownFunction4e5660(field_0x11b0, "It.wav", 1, 3);
+    LoadSound(field_0x11b0, "It.wav", 1, 3);
     for (i = 0; i < 6; i++) {
         field_0x11b8[i] = new (__FILE__, 577) Sound(field_0x44, 1);
         sprintf(sample, "wreck%02d.wav", i + 1);
-        UnknownFunction4e5660(field_0x11b8[i], sample, 41, 3);
+        LoadSound(field_0x11b8[i], sample, 41, 3);
     }
     for (i = 0; i < 6; i++) {
         field_0x11d0[i] = new (__FILE__, 584) Sound(field_0x44, 1);
         sprintf(sample, "fall%02d.wav", i + 1);
-        UnknownFunction4e5660(field_0x11d0[i], sample, 41, 3);
+        LoadSound(field_0x11d0[i], sample, 41, 3);
     }
     field_0x1204 = new (__FILE__, 589) Sound(field_0x44, 1);
-    UnknownFunction4e5660(field_0x1204, "Waypoint.wav", 1, 3);
+    LoadSound(field_0x1204, "Waypoint.wav", 1, 3);
     if (SoundSystem())
         SoundSystem()->UnknownFunction4be8b0();
     return this;
 }
 
 // 0x004e3430
-void RaceSound::UnknownFunction4e3430() {
+void RaceSound::AssignChannels() {
     UnknownEaxListenerParameters environment;
     int iterator;
     int i;
@@ -453,50 +453,50 @@ void RaceSound::UnknownFunction4e3430() {
     float volume;
 
     for (i = 0; i < 11; i++) {
-        field_0x98[i].field_0x00 = 0;
-        field_0x98[i].field_0x04 = 0;
-        field_0x98[i].field_0x08 = -1;
-        field_0x98[i].field_0x0c = 0;
-        field_0x98[i].field_0x10 = 0;
-        field_0x98[i].field_0x14 = 0;
-        field_0x98[i].field_0x18 = 0;
-        field_0x98[i].field_0x38 = 0;
-        field_0x98[i].field_0x20 = 0;
-        field_0x98[i].field_0x1c = 1;
-        field_0x98[i].field_0x24 = 0;
-        field_0x98[i].field_0x28 = 0;
-        field_0x98[i].field_0x2c = 0;
-        field_0x98[i].field_0x30 = 0;
-        field_0x98[i].field_0x34 = 0;
-        field_0x98[i].field_0x3c = 0;
-        field_0x98[i].field_0x44 = 0;
-        field_0x98[i].field_0x48 = 0;
-        field_0x98[i].field_0x4c = 1000000;
+        engineChannels[i].channelRacer = 0;
+        engineChannels[i].channelSound = 0;
+        engineChannels[i].field_0x08 = -1;
+        engineChannels[i].field_0x0c = 0;
+        engineChannels[i].field_0x10 = 0;
+        engineChannels[i].field_0x14 = 0;
+        engineChannels[i].field_0x18 = 0;
+        engineChannels[i].streamSample = 0;
+        engineChannels[i].field_0x20 = 0;
+        engineChannels[i].field_0x1c = 1;
+        engineChannels[i].field_0x24 = 0;
+        engineChannels[i].field_0x28 = 0;
+        engineChannels[i].field_0x2c = 0;
+        engineChannels[i].field_0x30 = 0;
+        engineChannels[i].field_0x34 = 0;
+        engineChannels[i].airborneTime = 0;
+        engineChannels[i].field_0x44 = 0;
+        engineChannels[i].field_0x48 = 0;
+        engineChannels[i].field_0x4c = 1000000;
     }
 
     iterator = 0;
     count = 0;
-    while ((racer = field_0x34->UnknownFunction4204e0(&iterator)) != 0) {
-        field_0x98[count].field_0x00 = racer;
+    while ((racer = raceView->UnknownFunction4204e0(&iterator)) != 0) {
+        engineChannels[count].channelRacer = racer;
         if (racer->field_0x738 < 250)
-            field_0x98[count].field_0x0c = 0;
+            engineChannels[count].field_0x0c = 0;
         else
-            field_0x98[count].field_0x0c = (racer->field_0x737 != 0) + 1;
-        kind = field_0x98[count].field_0x0c;
-        field_0x98[count].field_0x38 = field_0x840[kind][0];
-        field_0x98[count].field_0x14 = field_0xc00[kind][0];
-        field_0x98[count].field_0x18 = 0;
-        field_0x98[count].field_0x10 = 1;
-        field_0x98[count].field_0x20 = 0;
-        field_0x98[count].field_0x1c = 1;
+            engineChannels[count].field_0x0c = (racer->field_0x737 != 0) + 1;
+        kind = engineChannels[count].field_0x0c;
+        engineChannels[count].streamSample = field_0x840[kind][0];
+        engineChannels[count].field_0x14 = field_0xc00[kind][0];
+        engineChannels[count].field_0x18 = 0;
+        engineChannels[count].field_0x10 = 1;
+        engineChannels[count].field_0x20 = 0;
+        engineChannels[count].field_0x1c = 1;
         count++;
     }
-    field_0x94 = count;
+    channelsInUse = count;
 
     SoundSystem()->UnknownFunction4beba0(0.3048f);
     SoundSystem()->UnknownFunction4bebd0(1.0f);
     SoundSystem()->UnknownFunction4becd0(1.0f);
-    field_0x83c->UnknownFunction4bd960(10.0f, 500.0f, 0);
+    ownEngine->UnknownFunction4bd960(10.0f, 500.0f, 0);
 
     volume = (g_UnknownGlobal56e26c->mode.field_0xa40 * 0.01f) * 2500.0f - 2500.0f;
     if (volume > 0.0f)
@@ -506,10 +506,10 @@ void RaceSound::UnknownFunction4e3430() {
     SoundSystem()->UnknownFunction4be9b0((long)volume);
 
     for (i = 0; i < 4; i++) {
-        field_0x43c[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
-        if (i < field_0x94)
-            UnknownFunction4e5780(field_0x43c[i], 0, 0, 1, 0);
-        if (i == field_0x94)
+        engineVoices[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
+        if (i < channelsInUse)
+            PlayIfEnabled(engineVoices[i], 0, 0, 1, 0);
+        if (i == channelsInUse)
             break;
     }
     for (i = 0; i < 6; i++)
@@ -517,7 +517,7 @@ void RaceSound::UnknownFunction4e3430() {
     for (i = 0; i < 6; i++)
         field_0x11d0[i]->UnknownFunction4bd960(50.0f, 500.0f, 0);
     if (g_UnknownGlobal56e26c->mode.field_0x23a4)
-        UnknownFunction4e5780(field_0x11e8, 1, 1, 1, 0);
+        PlayIfEnabled(field_0x11e8, 1, 1, 1, 0);
 
     if (g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 3 ||
         g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 4) {
@@ -525,13 +525,13 @@ void RaceSound::UnknownFunction4e3430() {
         environment.volume = 0.361f;
         environment.decayTime = 7.0f;
         environment.damping = 0.332f;
-        field_0x54 = 1;
+        eaxEnabled = 1;
     } else {
         environment.environment = 17;
         environment.volume = 0.0f;
         environment.decayTime = 0.0f;
         environment.damping = 0.0f;
-        field_0x54 = 0;
+        eaxEnabled = 0;
     }
     SoundSystem()->UnknownFunction4bed40(&environment);
     SoundSystem()->UnknownFunction4beb80();
@@ -547,34 +547,34 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
 
     GameObject::UnknownVirtualSlot10(frameTime);
     if (field_0x1208) {
-        UnknownFunction4e3430();
+        AssignChannels();
         field_0x1208 = 0;
     }
-    if (SoundSystem()->field_0x2c_bit0 && g_UnknownGlobal56e26c->mode.field_0xa28 && !field_0x34->field_0x3f8) {
+    if (SoundSystem()->field_0x2c_bit0 && g_UnknownGlobal56e26c->mode.field_0xa28 && !raceView->field_0x3f8) {
         field_0x12a4 += frameTime;
         field_0x12a8 += frameTime;
         field_0x12ac += frameTime;
-        field_0x2c = field_0x38->field_0x3b4;
-        if (field_0x2c != field_0x12a0) {
-            field_0x12a0 = field_0x2c;
-            field_0x1290 = field_0x2c->field_0x7a0;
-            field_0x1294 = field_0x2c->field_0x7b8;
-            field_0x129c = field_0x2c->field_0x784;
+        listenerRacer = listenerCamera->followedRacer;
+        if (listenerRacer != field_0x12a0) {
+            field_0x12a0 = listenerRacer;
+            field_0x1290 = listenerRacer->field_0x7a0;
+            field_0x1294 = listenerRacer->field_0x7b8;
+            field_0x129c = listenerRacer->field_0x784;
         }
-        UnknownFunction4e39b0(frameTime);
-        SoundSystem()->UnknownFunction4bec50(field_0x38->field_0x170);
-        SoundSystem()->UnknownFunction4bec00(field_0x38->field_0x17c, field_0x38->field_0x188);
-        SoundSystem()->UnknownFunction4bec90(field_0x38->field_0x3b0->field_0x064);
-        for (i = 0; i < field_0x94; i++) {
-            if (field_0x98[i].field_0x04) {
-                field_0x98[i].field_0x00->field_0x3bc->UnknownFunction4fc970(&position);
-                field_0x98[i].field_0x04->UnknownFunction4bd7e0(position, 0);
-                field_0x98[i].field_0x04->UnknownFunction4bd8a0(field_0x98[i].field_0x00->field_0x064, 0);
+        UpdateRacerSounds(frameTime);
+        SoundSystem()->UnknownFunction4bec50(listenerCamera->listenerPosition);
+        SoundSystem()->UnknownFunction4bec00(listenerCamera->listenerForward, listenerCamera->listenerUp);
+        SoundSystem()->UnknownFunction4bec90(listenerCamera->followedBike->field_0x064);
+        for (i = 0; i < channelsInUse; i++) {
+            if (engineChannels[i].channelSound) {
+                engineChannels[i].channelRacer->field_0x3bc->UnknownFunction4fc970(&position);
+                engineChannels[i].channelSound->UnknownFunction4bd7e0(position, 0);
+                engineChannels[i].channelSound->UnknownFunction4bd8a0(engineChannels[i].channelRacer->field_0x064, 0);
             }
         }
-        field_0x2c->field_0x3bc->UnknownFunction4fc970(&position);
-        field_0x83c->UnknownFunction4bd7e0(position, 0);
-        field_0x83c->UnknownFunction4bd8a0(field_0x2c->field_0x064, 0);
+        listenerRacer->field_0x3bc->UnknownFunction4fc970(&position);
+        ownEngine->UnknownFunction4bd7e0(position, 0);
+        ownEngine->UnknownFunction4bd8a0(listenerRacer->field_0x064, 0);
         SoundSystem()->UnknownFunction4beb80();
     }
     return 1;
@@ -583,216 +583,216 @@ int RaceSound::UnknownVirtualSlot10(float frameTime) {
 // 0x004e39b0: sorts the channels by distance from the camera, gives the
 // nearest four racers the engine voices, steps each channel's engine sample
 // set from its throttle and speed, and plays the position and lap sounds.
-int RaceSound::UnknownFunction4e39b0(float frameTime) {
+int RaceSound::UpdateRacerSounds(float frameTime) {
     int i;
     int j;
 
-    for (i = 0; i < field_0x94; i++) {
-        if (!field_0x98[i].field_0x00->field_0x4a0) {
-            field_0x98[i].field_0x4c =
-                (int)UnknownFunction4e4460(&field_0x38->field_0x170, &field_0x98[i].field_0x00->field_0x00c);
+    for (i = 0; i < channelsInUse; i++) {
+        if (!engineChannels[i].channelRacer->field_0x4a0) {
+            engineChannels[i].field_0x4c =
+                (int)GroundDistance(&listenerCamera->listenerPosition, &engineChannels[i].channelRacer->field_0x00c);
         } else {
-            field_0x98[i].field_0x4c = 1000000;
-            field_0x98[i].field_0x04 = 0;
+            engineChannels[i].field_0x4c = 1000000;
+            engineChannels[i].channelSound = 0;
         }
     }
-    qsort(field_0x98, field_0x94, sizeof(UnknownRaceSoundChannel), UnknownFunction4e5880);
+    qsort(engineChannels, channelsInUse, sizeof(UnknownRaceSoundChannel), CompareChannels);
 
-    for (i = field_0x94 - 1; i > -1; i--) {
-        if (field_0x98[i].field_0x04 && i >= 4) {
-            field_0x44c[field_0x98[i].field_0x08] = 0;
-            field_0x98[i].field_0x04->UnknownFunction4bc940(1);
-            field_0x98[i].field_0x04 = 0;
-            field_0x98[i].field_0x08 = -1;
+    for (i = channelsInUse - 1; i > -1; i--) {
+        if (engineChannels[i].channelSound && i >= 4) {
+            engineVoiceInUse[engineChannels[i].field_0x08] = 0;
+            engineChannels[i].channelSound->UnknownFunction4bc940(1);
+            engineChannels[i].channelSound = 0;
+            engineChannels[i].field_0x08 = -1;
         }
-        if (!field_0x98[i].field_0x04 && i < 4) {
+        if (!engineChannels[i].channelSound && i < 4) {
             for (j = 0; j < 4; j++) {
-                if (!field_0x44c[j]) {
-                    field_0x98[i].field_0x04 = field_0x43c[j];
-                    field_0x98[i].field_0x08 = j;
-                    field_0x44c[j] = 1;
-                    UnknownFunction4e5780(field_0x98[i].field_0x04, 0, 0, 1, 0);
+                if (!engineVoiceInUse[j]) {
+                    engineChannels[i].channelSound = engineVoices[j];
+                    engineChannels[i].field_0x08 = j;
+                    engineVoiceInUse[j] = 1;
+                    PlayIfEnabled(engineChannels[i].channelSound, 0, 0, 1, 0);
                     break;
                 }
             }
         }
     }
 
-    for (i = 0; i < field_0x94; i++) {
-        field_0x434 = &field_0x98[i];
-        if (field_0x434->field_0x00->field_0x479)
-            field_0x434->field_0x48 = 0;
+    for (i = 0; i < channelsInUse; i++) {
+        streamChannel = &engineChannels[i];
+        if (streamChannel->channelRacer->field_0x479)
+            streamChannel->field_0x48 = 0;
         else
-            field_0x434->field_0x48 = 1;
-        if (field_0x434->field_0x00->field_0x108) {
-            field_0x434->field_0x3c += frameTime;
-            if (field_0x434->field_0x3c >= 0.2f) {
-                if (!field_0x434->field_0x00->field_0x478)
-                    field_0x434->field_0x30 = 1;
-                if (field_0x434->field_0x10 != 5 && field_0x434->field_0x10 != 6 && field_0x434->field_0x10 != 1) {
-                    j = rand() % field_0x1164[field_0x434->field_0x0c];
-                    field_0x434->field_0x38 = field_0xa98[field_0x434->field_0x0c][j];
-                    field_0x434->field_0x14 = field_0xe58[field_0x434->field_0x0c][j];
-                    field_0x434->field_0x18 = 0;
-                    field_0x434->field_0x10 = 5;
-                    field_0x434->field_0x20 = 1;
-                    UnknownFunction4e4a30();
+            streamChannel->field_0x48 = 1;
+        if (streamChannel->channelRacer->field_0x108) {
+            streamChannel->airborneTime += frameTime;
+            if (streamChannel->airborneTime >= 0.2f) {
+                if (!streamChannel->channelRacer->field_0x478)
+                    streamChannel->field_0x30 = 1;
+                if (streamChannel->field_0x10 != 5 && streamChannel->field_0x10 != 6 && streamChannel->field_0x10 != 1) {
+                    j = rand() % field_0x1164[streamChannel->field_0x0c];
+                    streamChannel->streamSample = field_0xa98[streamChannel->field_0x0c][j];
+                    streamChannel->field_0x14 = field_0xe58[streamChannel->field_0x0c][j];
+                    streamChannel->field_0x18 = 0;
+                    streamChannel->field_0x10 = 5;
+                    streamChannel->field_0x20 = 1;
+                    StartStream();
                 }
-                if (field_0x434->field_0x30 == 1 && field_0x434->field_0x00->field_0x478) {
-                    field_0x434->field_0x30 = 0;
-                    j = rand() % field_0x117c[field_0x434->field_0x0c];
-                    field_0x434->field_0x38 = field_0xb88[field_0x434->field_0x0c][j];
-                    field_0x434->field_0x14 = field_0xf48[field_0x434->field_0x0c][j];
+                if (streamChannel->field_0x30 == 1 && streamChannel->channelRacer->field_0x478) {
+                    streamChannel->field_0x30 = 0;
+                    j = rand() % field_0x117c[streamChannel->field_0x0c];
+                    streamChannel->streamSample = field_0xb88[streamChannel->field_0x0c][j];
+                    streamChannel->field_0x14 = field_0xf48[streamChannel->field_0x0c][j];
                     // Retail compares the old state with 6 and then restarts
                     // the sample either way.
-                    if (field_0x434->field_0x10 != 6)
-                        field_0x434->field_0x18 = 0;
+                    if (streamChannel->field_0x10 != 6)
+                        streamChannel->field_0x18 = 0;
                     else
-                        field_0x434->field_0x18 = 0;
-                    field_0x434->field_0x10 = 6;
-                    field_0x434->field_0x20 = 1;
-                    UnknownFunction4e4a30();
+                        streamChannel->field_0x18 = 0;
+                    streamChannel->field_0x10 = 6;
+                    streamChannel->field_0x20 = 1;
+                    StartStream();
                 }
             }
         } else {
-            field_0x434->field_0x3c = 0;
-            field_0x434->field_0x30 = 0;
-            if (field_0x434->field_0x2c == 1 && !field_0x83c->UnknownFunction4bca80() &&
-                field_0x434->field_0x00 == field_0x2c)
-                UnknownFunction4e5780(field_0x83c, 0, 0, 0, 0);
-            if (!field_0x434->field_0x00->field_0x478)
-                field_0x434->field_0x34 = 1;
-            if (field_0x434->field_0x48) {
-                if (field_0x434->field_0x00->field_0x478) {
-                    if (field_0x434->field_0x10 == 6) {
-                        j = rand() % field_0x114c[field_0x434->field_0x0c];
-                        field_0x434->field_0x38 = field_0x9a8[field_0x434->field_0x0c][j];
-                        field_0x434->field_0x14 = field_0xd68[field_0x434->field_0x0c][j];
-                        field_0x434->field_0x18 = 0;
-                        field_0x434->field_0x10 = 2;
-                        field_0x434->field_0x20 = 3;
-                        UnknownFunction4e4a30();
+            streamChannel->airborneTime = 0;
+            streamChannel->field_0x30 = 0;
+            if (streamChannel->field_0x2c == 1 && !ownEngine->UnknownFunction4bca80() &&
+                streamChannel->channelRacer == listenerRacer)
+                PlayIfEnabled(ownEngine, 0, 0, 0, 0);
+            if (!streamChannel->channelRacer->field_0x478)
+                streamChannel->field_0x34 = 1;
+            if (streamChannel->field_0x48) {
+                if (streamChannel->channelRacer->field_0x478) {
+                    if (streamChannel->field_0x10 == 6) {
+                        j = rand() % field_0x114c[streamChannel->field_0x0c];
+                        streamChannel->streamSample = field_0x9a8[streamChannel->field_0x0c][j];
+                        streamChannel->field_0x14 = field_0xd68[streamChannel->field_0x0c][j];
+                        streamChannel->field_0x18 = 0;
+                        streamChannel->field_0x10 = 2;
+                        streamChannel->field_0x20 = 3;
+                        StartStream();
                     }
-                    if (field_0x434->field_0x10 == 1 || field_0x434->field_0x10 == 5) {
-                        field_0x434->field_0x44 = (int)(field_0x434->field_0x00->field_0x0b8 * 0.68182f);
-                        if (field_0x434->field_0x44 < field_0x47c[field_0x434->field_0x0c]) {
-                            j = rand() % field_0x1134[field_0x434->field_0x0c];
-                            field_0x434->field_0x38 = field_0x8b8[field_0x434->field_0x0c][j];
-                            field_0x434->field_0x14 = field_0xc78[field_0x434->field_0x0c][j];
-                            field_0x434->field_0x18 = 0;
-                            field_0x434->field_0x10 = 2;
-                            field_0x434->field_0x20 = 3;
-                        } else if (field_0x434->field_0x44 < field_0x488[field_0x434->field_0x0c]) {
-                            j = rand() % field_0x1140[field_0x434->field_0x0c];
-                            field_0x434->field_0x38 = field_0x930[field_0x434->field_0x0c][j];
-                            field_0x434->field_0x14 = field_0xcf0[field_0x434->field_0x0c][j];
-                            field_0x434->field_0x18 = 0;
-                            field_0x434->field_0x10 = 2;
-                            field_0x434->field_0x20 = 3;
-                        } else if (field_0x434->field_0x44 < field_0x494[field_0x434->field_0x0c]) {
-                            j = rand() % field_0x114c[field_0x434->field_0x0c];
-                            field_0x434->field_0x38 = field_0x9a8[field_0x434->field_0x0c][j];
-                            field_0x434->field_0x14 = field_0xd68[field_0x434->field_0x0c][j];
-                            field_0x434->field_0x18 = 0;
-                            field_0x434->field_0x10 = 2;
-                            field_0x434->field_0x20 = 3;
+                    if (streamChannel->field_0x10 == 1 || streamChannel->field_0x10 == 5) {
+                        streamChannel->field_0x44 = (int)(streamChannel->channelRacer->field_0x0b8 * 0.68182f);
+                        if (streamChannel->field_0x44 < field_0x47c[streamChannel->field_0x0c]) {
+                            j = rand() % field_0x1134[streamChannel->field_0x0c];
+                            streamChannel->streamSample = field_0x8b8[streamChannel->field_0x0c][j];
+                            streamChannel->field_0x14 = field_0xc78[streamChannel->field_0x0c][j];
+                            streamChannel->field_0x18 = 0;
+                            streamChannel->field_0x10 = 2;
+                            streamChannel->field_0x20 = 3;
+                        } else if (streamChannel->field_0x44 < field_0x488[streamChannel->field_0x0c]) {
+                            j = rand() % field_0x1140[streamChannel->field_0x0c];
+                            streamChannel->streamSample = field_0x930[streamChannel->field_0x0c][j];
+                            streamChannel->field_0x14 = field_0xcf0[streamChannel->field_0x0c][j];
+                            streamChannel->field_0x18 = 0;
+                            streamChannel->field_0x10 = 2;
+                            streamChannel->field_0x20 = 3;
+                        } else if (streamChannel->field_0x44 < field_0x494[streamChannel->field_0x0c]) {
+                            j = rand() % field_0x114c[streamChannel->field_0x0c];
+                            streamChannel->streamSample = field_0x9a8[streamChannel->field_0x0c][j];
+                            streamChannel->field_0x14 = field_0xd68[streamChannel->field_0x0c][j];
+                            streamChannel->field_0x18 = 0;
+                            streamChannel->field_0x10 = 2;
+                            streamChannel->field_0x20 = 3;
                         } else {
-                            j = rand() % field_0x1158[field_0x434->field_0x0c];
-                            field_0x434->field_0x38 = field_0xa20[field_0x434->field_0x0c][j];
-                            field_0x434->field_0x14 = field_0xde0[field_0x434->field_0x0c][j];
-                            field_0x434->field_0x18 = 0;
-                            field_0x434->field_0x10 = 3;
-                            field_0x434->field_0x20 = 4;
+                            j = rand() % field_0x1158[streamChannel->field_0x0c];
+                            streamChannel->streamSample = field_0xa20[streamChannel->field_0x0c][j];
+                            streamChannel->field_0x14 = field_0xde0[streamChannel->field_0x0c][j];
+                            streamChannel->field_0x18 = 0;
+                            streamChannel->field_0x10 = 3;
+                            streamChannel->field_0x20 = 4;
                         }
-                        UnknownFunction4e4a30();
+                        StartStream();
                     }
-                } else if (field_0x434->field_0x10 == 2 || field_0x434->field_0x10 == 3 ||
-                           field_0x434->field_0x10 == 4) {
-                    j = rand() % field_0x1164[field_0x434->field_0x0c];
-                    field_0x434->field_0x38 = field_0xa98[field_0x434->field_0x0c][j];
-                    field_0x434->field_0x14 = field_0xe58[field_0x434->field_0x0c][j];
-                    field_0x434->field_0x18 = 0;
-                    field_0x434->field_0x10 = 5;
-                    field_0x434->field_0x20 = 1;
-                    UnknownFunction4e4a30();
+                } else if (streamChannel->field_0x10 == 2 || streamChannel->field_0x10 == 3 ||
+                           streamChannel->field_0x10 == 4) {
+                    j = rand() % field_0x1164[streamChannel->field_0x0c];
+                    streamChannel->streamSample = field_0xa98[streamChannel->field_0x0c][j];
+                    streamChannel->field_0x14 = field_0xe58[streamChannel->field_0x0c][j];
+                    streamChannel->field_0x18 = 0;
+                    streamChannel->field_0x10 = 5;
+                    streamChannel->field_0x20 = 1;
+                    StartStream();
                 }
-            } else if (field_0x434->field_0x00->field_0x478 == true &&
-                       (field_0x434->field_0x34 == 1 || field_0x434->field_0x28 == 1)) {
-                field_0x434->field_0x34 = 0;
+            } else if (streamChannel->channelRacer->field_0x478 == true &&
+                       (streamChannel->field_0x34 == 1 || streamChannel->field_0x28 == 1)) {
+                streamChannel->field_0x34 = 0;
                 j = rand() % 1;
-                field_0x434->field_0x38 = field_0xb88[field_0x434->field_0x0c][j];
-                field_0x434->field_0x14 = field_0xf48[field_0x434->field_0x0c][j];
-                if (field_0x434->field_0x10 != 6)
-                    field_0x434->field_0x18 = 0;
+                streamChannel->streamSample = field_0xb88[streamChannel->field_0x0c][j];
+                streamChannel->field_0x14 = field_0xf48[streamChannel->field_0x0c][j];
+                if (streamChannel->field_0x10 != 6)
+                    streamChannel->field_0x18 = 0;
                 else
-                    field_0x434->field_0x18 = 0;
-                field_0x434->field_0x10 = 6;
-                field_0x434->field_0x20 = 1;
-                UnknownFunction4e4a30();
+                    streamChannel->field_0x18 = 0;
+                streamChannel->field_0x10 = 6;
+                streamChannel->field_0x20 = 1;
+                StartStream();
             }
         }
-        field_0x434->field_0x28 = field_0x434->field_0x48;
-        field_0x434->field_0x24 = (unsigned char)field_0x434->field_0x00->field_0x478;
-        field_0x434->field_0x2c = (unsigned char)field_0x434->field_0x00->field_0x108;
-        UnknownFunction4e4d10();
+        streamChannel->field_0x28 = streamChannel->field_0x48;
+        streamChannel->field_0x24 = (unsigned char)streamChannel->channelRacer->field_0x478;
+        streamChannel->field_0x2c = (unsigned char)streamChannel->channelRacer->field_0x108;
+        RefillStream();
     }
 
     if (g_UnknownGlobal56e26c->mode.field_0xa38 &&
-        (field_0x2c->field_0x7b8 > field_0x1294 || field_0x2c->field_0x7a0 > field_0x1290))
-        UnknownFunction4e5780(field_0x1204, 0, 0, 0, 0);
+        (listenerRacer->field_0x7b8 > field_0x1294 || listenerRacer->field_0x7a0 > field_0x1290))
+        PlayIfEnabled(field_0x1204, 0, 0, 0, 0);
 
-    for (i = 0; i < field_0x94; i++) {
-        field_0x438 = field_0x98[i].field_0x00;
-        if (!field_0x438->field_0x444) {
+    for (i = 0; i < channelsInUse; i++) {
+        currentRacer = engineChannels[i].channelRacer;
+        if (!currentRacer->field_0x444) {
             field_0x120c[i] = 0;
             field_0x1238[i] = 0;
             field_0x1264[i] = 0;
         } else {
             if (!field_0x120c[i]) {
-                if (field_0x438 == field_0x2c && field_0x2c->field_0x460 == 12) {
+                if (currentRacer == listenerRacer && listenerRacer->field_0x460 == 12) {
                     field_0x11b4->UnknownFunction4bc940(1);
-                    UnknownFunction4e5780(field_0x11b4, 0, 0, 0, 0);
+                    PlayIfEnabled(field_0x11b4, 0, 0, 0, 0);
                 }
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3) {
-                    if (field_0x438 == field_0x2c && field_0x438->field_0x784 == 1)
-                        UnknownFunction4e5780(field_0x11f8, 0, 0, 0, 0);
-                    if (field_0x438 == field_0x2c && field_0x438->field_0x784 > 1 && field_0x12a4 > 30.0f) {
-                        UnknownFunction4e5780(field_0x11fc, 0, 0, 0, 0);
+                    if (currentRacer == listenerRacer && currentRacer->field_0x784 == 1)
+                        PlayIfEnabled(field_0x11f8, 0, 0, 0, 0);
+                    if (currentRacer == listenerRacer && currentRacer->field_0x784 > 1 && field_0x12a4 > 30.0f) {
+                        PlayIfEnabled(field_0x11fc, 0, 0, 0, 0);
                         field_0x12a4 = 0;
                     }
                 }
             }
-            if (field_0x438->field_0x484) {
+            if (currentRacer->field_0x484) {
                 if (!field_0x1238[i])
-                    field_0x1238[i] = UnknownFunction4e42e0(field_0x438);
+                    field_0x1238[i] = UnknownFunction4e42e0(currentRacer);
                 else if (!field_0x11b8[field_0x1238[i]]->UnknownFunction4bca80())
-                    field_0x1238[i] = UnknownFunction4e42e0(field_0x438);
+                    field_0x1238[i] = UnknownFunction4e42e0(currentRacer);
             }
-            if (field_0x438->field_0x604->field_0xb0) {
+            if (currentRacer->field_0x604->field_0xb0) {
                 if (!field_0x1264[i])
-                    field_0x1264[i] = UnknownFunction4e43a0(field_0x438);
+                    field_0x1264[i] = UnknownFunction4e43a0(currentRacer);
                 else if (!field_0x11d0[field_0x1264[i]]->UnknownFunction4bca80())
-                    field_0x1264[i] = UnknownFunction4e43a0(field_0x438);
+                    field_0x1264[i] = UnknownFunction4e43a0(currentRacer);
             }
             field_0x120c[i] = 1;
         }
-        if (field_0x438 == field_0x2c && field_0x438->field_0x784 < field_0x129c) {
-            if (field_0x438->field_0x784 == 1) {
+        if (currentRacer == listenerRacer && currentRacer->field_0x784 < field_0x129c) {
+            if (currentRacer->field_0x784 == 1) {
                 if (field_0x11f4)
-                    UnknownFunction4e5780(field_0x11f4, 0, 0, 0, 0);
+                    PlayIfEnabled(field_0x11f4, 0, 0, 0, 0);
             } else if (field_0x12a8 > 15.0f) {
                 if (rand() > 0.5f) {
                     if (field_0x11ec)
-                        UnknownFunction4e5780(field_0x11ec, 0, 0, 0, 0);
+                        PlayIfEnabled(field_0x11ec, 0, 0, 0, 0);
                 } else if (field_0x11f0)
-                    UnknownFunction4e5780(field_0x11f0, 0, 0, 0, 0);
+                    PlayIfEnabled(field_0x11f0, 0, 0, 0, 0);
                 field_0x12a8 = 0;
             }
         }
     }
-    field_0x1290 = field_0x2c->field_0x7a0;
-    field_0x1294 = field_0x2c->field_0x7b8;
-    field_0x129c = field_0x2c->field_0x784;
+    field_0x1290 = listenerRacer->field_0x7a0;
+    field_0x1294 = listenerRacer->field_0x7b8;
+    field_0x129c = listenerRacer->field_0x784;
     return 1;
 }
 
@@ -811,21 +811,21 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
         case 0x2f:
             if (!g_UnknownGlobal56e26c->field_0x14->keyboard->UnknownVirtualSlot5(0x2f, 12, 0))
                 break;
-            if (!field_0x54) {
+            if (!eaxEnabled) {
                 environment.environment = 9;
                 environment.volume = 0.361f;
                 environment.decayTime = 7.0f;
                 environment.damping = 0.332f;
-                field_0x54 = 1;
+                eaxEnabled = 1;
             } else {
                 environment.environment = 17;
                 environment.volume = 0.0f;
                 environment.decayTime = 0.0f;
                 environment.damping = 0.0f;
-                field_0x54 = 0;
+                eaxEnabled = 0;
             }
             if (owner)
-                owner->UnknownFunction4e0c30(0x14c3, field_0x54);
+                owner->ShowOnOffMessage(0x14c3, eaxEnabled);
             SoundSystem()->UnknownFunction4bed40(&environment);
             break;
         case 0x2e:
@@ -833,17 +833,17 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 break;
             if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 3)
                 break;
-            switch (field_0x50) {
+            switch (musicVolume) {
             case 0:
-                field_0x50 = -500;
+                musicVolume = -500;
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x14c0, text, sizeof(text));
                 break;
             case -500:
-                field_0x50 = -10000;
+                musicVolume = -10000;
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x14c2, text, sizeof(text));
                 break;
             case -10000:
-                field_0x50 = 0;
+                musicVolume = 0;
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x14c1, text, sizeof(text));
                 break;
             }
@@ -853,7 +853,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     owner->field_0x6c->UnknownFunction51b540(&message);
             }
             if (g_UnknownGlobal56e26c->mode.field_0x23a4)
-                field_0x4c->UnknownFunction401dd0(field_0x50);
+                crowdSounds->UnknownFunction401dd0(musicVolume);
             return 1;
         case 0x1f:
             if (!g_UnknownGlobal56e26c->field_0x14->keyboard->UnknownVirtualSlot5(0x1f, 12, 0))
@@ -870,10 +870,10 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                 if (g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x2c->field_0xc4)
                     g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x2c->field_0xc4->UnknownVirtualSlot16(0);
                 if (g_UnknownGlobal56e26c->mode.field_0x23a4)
-                    UnknownFunction4e5780(field_0x11e8, 1, 1, 1, 0);
-                if (field_0x2c) {
-                    field_0x1294 = field_0x2c->field_0x7b8;
-                    field_0x1290 = field_0x2c->field_0x7a0;
+                    PlayIfEnabled(field_0x11e8, 1, 1, 1, 0);
+                if (listenerRacer) {
+                    field_0x1294 = listenerRacer->field_0x7b8;
+                    field_0x1290 = listenerRacer->field_0x7a0;
                 }
                 if (g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c)
                     g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c->UnknownVirtualSlot5();
@@ -891,7 +891,7 @@ int RaceSound::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
                     g_UnknownGlobal56e26c->eventManager->UnknownFunction45d2b0()->field_0x9c->UnknownVirtualSlot4();
             }
             if (owner)
-                owner->UnknownFunction4e0c30(0x1429, g_UnknownGlobal56e26c->mode.field_0xa28);
+                owner->ShowOnOffMessage(0x1429, g_UnknownGlobal56e26c->mode.field_0xa28);
             return 1;
         }
     }
@@ -911,7 +911,7 @@ int RaceSound::UnknownFunction4e42e0(UnknownEventRacer* racer) {
     }
     racer->field_0x3bc->UnknownFunction4fc970(&position);
     field_0x11b8[index]->UnknownFunction4bd7e0(position, 0);
-    UnknownFunction4e5780(field_0x11b8[index], 0, 0, 0, 0);
+    PlayIfEnabled(field_0x11b8[index], 0, 0, 0, 0);
     return index;
 }
 
@@ -928,12 +928,12 @@ int RaceSound::UnknownFunction4e43a0(UnknownEventRacer* racer) {
     }
     racer->field_0x3bc->UnknownFunction4fc970(&position);
     field_0x11d0[index]->UnknownFunction4bd7e0(position, 0);
-    UnknownFunction4e5780(field_0x11d0[index], 0, 0, 0, 0);
+    PlayIfEnabled(field_0x11d0[index], 0, 0, 0, 0);
     return index;
 }
 
 // 0x004e4460
-float RaceSound::UnknownFunction4e4460(Vector3* a, Vector3* b) {
+float RaceSound::GroundDistance(Vector3* a, Vector3* b) {
     float dx = a->x - b->x;
     float dz;
 
@@ -949,7 +949,7 @@ float RaceSound::UnknownFunction4e4460(Vector3* a, Vector3* b) {
 
 // 0x004e4a30: fills the streamed channel's buffer from its sample, starting
 // behind the play cursor (the buffer holds one second, 22050 samples).
-void RaceSound::UnknownFunction4e4a30() {
+void RaceSound::StartStream() {
     void* first;
     unsigned long write;
     void* second;
@@ -958,43 +958,43 @@ void RaceSound::UnknownFunction4e4a30() {
     unsigned long firstBytes;
     int bytes;
 
-    if (!field_0x434->field_0x04)
+    if (!streamChannel->channelSound)
         return;
-    field_0x434->field_0x04->UnknownFunction4bcd40(&play, &write);
-    field_0x434->field_0x04->UnknownFunction4bd020(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
+    streamChannel->channelSound->UnknownFunction4bcd40(&play, &write);
+    streamChannel->channelSound->UnknownFunction4bd020(0, 0, &first, &firstBytes, &second, &secondBytes, 2);
     if (write < (unsigned long)(5512 * field_0x1298)) {
         bytes = 11025 * field_0x1298 - write;
-        memcpy((char*)field_0x434->field_0x50 + write, (char*)field_0x434->field_0x38 + field_0x434->field_0x18,
+        memcpy((char*)streamChannel->sampleBuffer + write, (char*)streamChannel->streamSample + streamChannel->field_0x18,
                bytes);
-        memcpy(first, field_0x434->field_0x50, 22050 * field_0x1298);
-        field_0x434->field_0x18 += bytes;
-        field_0x434->field_0x1c = 2;
+        memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
+        streamChannel->field_0x18 += bytes;
+        streamChannel->field_0x1c = 2;
     } else if (write < (unsigned long)(11025 * field_0x1298)) {
         bytes = 22050 * field_0x1298 - write;
-        memcpy((char*)field_0x434->field_0x50 + write, (char*)field_0x434->field_0x38 + field_0x434->field_0x18,
+        memcpy((char*)streamChannel->sampleBuffer + write, (char*)streamChannel->streamSample + streamChannel->field_0x18,
                bytes);
-        memcpy(first, field_0x434->field_0x50, 22050 * field_0x1298);
-        field_0x434->field_0x18 += bytes;
-        field_0x434->field_0x1c = 1;
+        memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
+        streamChannel->field_0x18 += bytes;
+        streamChannel->field_0x1c = 1;
     } else if (write < (unsigned long)(16537 * field_0x1298)) {
         bytes = 22050 * field_0x1298 - write;
-        memcpy((char*)field_0x434->field_0x50 + write, (char*)field_0x434->field_0x38 + field_0x434->field_0x18,
+        memcpy((char*)streamChannel->sampleBuffer + write, (char*)streamChannel->streamSample + streamChannel->field_0x18,
                bytes);
-        memcpy(first, field_0x434->field_0x50, 22050 * field_0x1298);
-        field_0x434->field_0x18 += bytes;
-        field_0x434->field_0x1c = 1;
+        memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
+        streamChannel->field_0x18 += bytes;
+        streamChannel->field_0x1c = 1;
     } else {
         bytes = 22050 * field_0x1298 - write;
-        memcpy((char*)field_0x434->field_0x50 + write, (char*)field_0x434->field_0x38 + field_0x434->field_0x18,
+        memcpy((char*)streamChannel->sampleBuffer + write, (char*)streamChannel->streamSample + streamChannel->field_0x18,
                bytes);
-        field_0x434->field_0x18 += bytes;
-        memcpy(field_0x434->field_0x50, (char*)field_0x434->field_0x38 + field_0x434->field_0x18,
+        streamChannel->field_0x18 += bytes;
+        memcpy(streamChannel->sampleBuffer, (char*)streamChannel->streamSample + streamChannel->field_0x18,
                11025 * field_0x1298);
-        memcpy(first, field_0x434->field_0x50, 22050 * field_0x1298);
-        field_0x434->field_0x18 += 11025 * field_0x1298;
-        field_0x434->field_0x1c = 2;
+        memcpy(first, streamChannel->sampleBuffer, 22050 * field_0x1298);
+        streamChannel->field_0x18 += 11025 * field_0x1298;
+        streamChannel->field_0x1c = 2;
     }
-    field_0x434->field_0x04->UnknownFunction4bd080(first, 22050 * field_0x1298, second, 0);
+    streamChannel->channelSound->UnknownFunction4bd080(first, 22050 * field_0x1298, second, 0);
 }
 
 // The four per-TU vector constants (see src/krusty2/math/Math3D.h); their
@@ -1005,7 +1005,7 @@ static const Vector3 s_UnknownVector689bf0 = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 s_UnknownVector689bc0 = Vector3(0.0f, 0.0f, 1.0f);
 
 // 0x004e5500
-void RaceSound::UnknownFunction4e5500(const char* name, void** data, int* size) {
+void RaceSound::ReadSample(const char* name, void** data, int* size) {
     char message[0x184];
     UnknownTextureStream* stream = new (__FILE__, 1630) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     int bytes;
@@ -1015,8 +1015,8 @@ void RaceSound::UnknownFunction4e5500(const char* name, void** data, int* size) 
         sprintf(message, "%s not found in Audio.res.\n", name);
     } else {
         stream->UnknownFunction461340(stream->field_0x130, 0, 1);
-        stream->UnknownFunction461640(&field_0x68, 1, sizeof(field_0x68));
-        bytes = field_0x68.dataSize;
+        stream->UnknownFunction461640(&waveHeader, 1, sizeof(waveHeader));
+        bytes = waveHeader.dataSize;
         buffer = DebugMalloc(bytes, __FILE__, 1652);
         if (!buffer) {
             *data = 0;
@@ -1035,7 +1035,7 @@ void RaceSound::UnknownFunction4e5500(const char* name, void** data, int* size) 
 }
 
 // 0x004e5660
-int RaceSound::UnknownFunction4e5660(Sound* sound, const char* name, int a, int b) {
+int RaceSound::LoadSound(Sound* sound, const char* name, int a, int b) {
     char message[0x184];
     UnknownTextureStream* stream;
 
@@ -1059,7 +1059,7 @@ int RaceSound::UnknownFunction4e5660(Sound* sound, const char* name, int a, int 
 }
 
 // 0x004e5780
-void RaceSound::UnknownFunction4e5780(Sound* sound, int network, int stop, int loop, int unused) {
+void RaceSound::PlayIfEnabled(Sound* sound, int network, int stop, int loop, int unused) {
     if (g_UnknownGlobal56e26c->mode.field_0xa28 && (g_UnknownGlobal56e26c->mode.field_0x23a4 || !network) && sound) {
         if (stop)
             sound->UnknownFunction4bc940(1);
@@ -1069,22 +1069,22 @@ void RaceSound::UnknownFunction4e5780(Sound* sound, int network, int stop, int l
 
 // 0x004e57d0
 void RaceSound::UnknownFunction4e57d0(UnknownEventRacer* racer, float value) {
-    if (field_0x2c == racer && value >= 10000.0f &&
+    if (listenerRacer == racer && value >= 10000.0f &&
         (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 || g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 4))
-        UnknownFunction4e5780(field_0x11ac, 0, 0, 0, 0);
+        PlayIfEnabled(field_0x11ac, 0, 0, 0, 0);
     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3 && field_0x12ac > 15.0f) {
-        UnknownFunction4e5780(field_0x11ec, 0, 0, 0, 0);
+        PlayIfEnabled(field_0x11ec, 0, 0, 0, 0);
         field_0x12ac = 0;
     }
 }
 
 // 0x004e5860
 void RaceSound::UnknownFunction4e5860() {
-    UnknownFunction4e5780(field_0x11b0, 0, 0, 0, 0);
+    PlayIfEnabled(field_0x11b0, 0, 0, 0, 0);
 }
 
 // 0x004e5880
-int RaceSound::UnknownFunction4e5880(const void* a, const void* b) {
+int RaceSound::CompareChannels(const void* a, const void* b) {
     int first = ((const UnknownRaceSoundChannel*)a)->field_0x4c;
     int second = ((const UnknownRaceSoundChannel*)b)->field_0x4c;
 

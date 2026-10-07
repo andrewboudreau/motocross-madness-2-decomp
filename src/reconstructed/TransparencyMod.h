@@ -27,8 +27,8 @@ public:
     virtual void UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
                                       UnknownSoultreeMesh** out); // 0x005206f0
 
-    int field_0x40;                            // state last applied to a whole level of detail
-    int field_0x44;                            // 1: transparent
+    int appliedState;                          // state last applied to a whole level of detail
+    int isTransparent;                         // 1: transparent
     unsigned char field_0x48;                  // alpha, 0x80 by default
-    unsigned char field_0x49;                  // surfaces drawn since field_0x44 changed
+    unsigned char surfacesDrawn;               // surfaces drawn since field_0x44 changed
 };

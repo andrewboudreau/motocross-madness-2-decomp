@@ -5,6 +5,7 @@
 #include "PCGame.h"
 
 #include "Camera.h"
+#include "D3DConstants.h"
 #include "DebugAlloc.h"
 #include "ControlInterface.h"
 #include "TrackGame.h"
@@ -118,7 +119,7 @@ PCGame::PCGame() {
     GetVersionExA(&field_0x424);
     timeBeginPeriod(1);
     timeEndPeriod(1);
-    strcpy(field_0x320, "Rainbow Studios");
+    strcpy(companyName, "Rainbow Studios");
     strcpy(field_0x3a0, "Rainbow Demo");
     strcpy(field_0x4b8, "SOFTWARE\\Rainbow Studios\\Demo");
     GetCurrentDirectoryA(0x104, field_0x1cc);
@@ -150,7 +151,7 @@ int PCGame::UnknownVirtualSlot2() {
 // "Renderer" setting, enumerates and (re)profiles the displays, picks the
 // display and its feature flags and the joystick, then runs Game's
 // initialiser.
-int PCGame::UnknownFunction4bfc50(char* message) {
+int PCGame::StartUp(char* message) {
     char name[256];
     char renderer[260];
     char text[512];
@@ -161,20 +162,20 @@ int PCGame::UnknownFunction4bfc50(char* message) {
     UnknownVirtualSlot23("Renderer", "HAL", renderer, &size);
     field_0x2d0 = 0;
     if (!_stricmp(renderer, "RGB")) {
-        field_0x2f8 = IID_IDirect3DRGBDevice;
+        deviceGuid = IID_IDirect3DRGBDevice;
     } else if (!_stricmp(renderer, "MMX")) {
-        field_0x2f8 = IID_IDirect3DMMXDevice;
+        deviceGuid = IID_IDirect3DMMXDevice;
     } else if (!_stricmp(renderer, "Ramp")) {
-        field_0x2f8 = IID_IDirect3DRampDevice;
+        deviceGuid = IID_IDirect3DRampDevice;
     } else if (!_stricmp(renderer, "Null")) {
-        field_0x2f8 = IID_IDirect3DNullDevice;
+        deviceGuid = IID_IDirect3DNullDevice;
     } else if (!_stricmp(renderer, "Ref")) {
-        field_0x2f8 = IID_IDirect3DRefDevice;
+        deviceGuid = IID_IDirect3DRefDevice;
     } else if (!_stricmp(renderer, "Blade")) {
-        field_0x2f8 = g_UnknownBladeDevice556040;
+        deviceGuid = g_UnknownBladeDevice556040;
         field_0x2d0 = 1;
     } else {
-        field_0x2f8 = IID_IDirect3DHALDevice;
+        deviceGuid = IID_IDirect3DHALDevice;
     }
     field_0x2d4_bit1 = UnknownVirtualSlot22("FullScreen", field_0x2d4_bit1);
     if (!UnknownVirtualSlot37()) {
@@ -186,7 +187,7 @@ int PCGame::UnknownFunction4bfc50(char* message) {
         return 0;
     for (int i = 0; i < g_UnknownDisplayCount68a764; i++)
         g_UnknownDisplays68a754[i]->UnknownFunction4c9d20(0, 0, 0, 0);
-    field_0x548_bit0 = UnknownFunction4c1410();
+    field_0x548_bit0 = IsAnyProfileStale();
     if (field_0x548_bit0) {
         if (LoadStringA(field_0x420, 0x13d8, text, sizeof(text))) {
             ShowCursor(1);
@@ -194,11 +195,11 @@ int PCGame::UnknownFunction4bfc50(char* message) {
                 return 0;
             ShowCursor(0);
         }
-        UnknownFunction4c1a00();
+        DeleteDisplayProfiles();
         UnknownVirtualSlot27("UseLastVideoCard", 0);
-        UnknownFunction4c16b0();
+        ProfileEveryDisplay();
     }
-    UnknownFunction4c0d10();
+    ProfileDisplays();
     field_0x0c = g_UnknownDisplays68a754[0];
     int flag = field_0x2d5_bit3 && !field_0x544;
     int useLast = UnknownVirtualSlot22("UseLastVideoCard", 0);
@@ -208,7 +209,7 @@ int PCGame::UnknownFunction4bfc50(char* message) {
         return 0;
     }
     if (field_0x2d0)
-        field_0x2f8 = g_UnknownBladeDevice556040;
+        deviceGuid = g_UnknownBladeDevice556040;
     sprintf(name, "DriverInfo\\%s\\AllowDither", field_0x0c->field_0x4bc);
     field_0x2d4_bit3 = UnknownVirtualSlot22(name, field_0x2d4_bit3);
     sprintf(name, "DriverInfo\\%s\\AllowMipMapping", field_0x0c->field_0x4bc);
@@ -247,9 +248,9 @@ int PCGame::UnknownVirtualSlot5() {
         if ((field_0x0c && field_0x0c->field_0x19c &&
              field_0x0c->field_0x19c->UnknownMethod24() &&
              field_0x0c->field_0x19c->UnknownMethod27()) ||
-            (field_0x2d5_bit3 && field_0x10 && PCTarget()->field_0x4c &&
-             PCTarget()->field_0x4c->UnknownMethod24() &&
-             PCTarget()->field_0x4c->UnknownMethod27()))
+            (field_0x2d5_bit3 && field_0x10 && PCTarget()->zbuffer &&
+             PCTarget()->zbuffer->UnknownMethod24() &&
+             PCTarget()->zbuffer->UnknownMethod27()))
             return 0;
         if (field_0x2f4)
             field_0x2f4->UnknownVirtualSlot18();
@@ -286,19 +287,19 @@ int PCGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* 
         return 1;
     if (event->kind == 0 && event->control == 0xb7) {
         if (field_0x10 && !field_0x10->field_0x08)
-            PCTarget()->UnknownFunction4c5d00();
+            PCTarget()->SaveScreenshot();
         return 1;
     }
     return 0;
 }
 
-// 0x004c0400: with the debug bit, control 0x41 toggles the +0x10 object's
-// +0x250 between 2 and 3.
+// 0x004c0400: with the debug bit, control 0x41 toggles the render target's
+// fill mode between solid and wireframe.
 int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (Game::UnknownVirtualSlot14(event, entry))
         return 1;
     if (field_0x2d4_bit2 && UnknownFunction43caa0(0x41, 0, event, 3)) {
-        PCTarget()->field_0x250 = PCTarget()->field_0x250 == 3 ? 2 : 3;
+        PCTarget()->fillMode = PCTarget()->fillMode == D3DFILL_SOLID ? D3DFILL_WIREFRAME : D3DFILL_SOLID;
         return 1;
     }
     return 0;
@@ -339,7 +340,7 @@ int PCGame::UnknownVirtualSlot19(int mode) {
 }
 
 // 0x004c0470
-void PCGame::UnknownFunction4c0470(const UnknownRect* rect) {
+void PCGame::SetWindowRect(const UnknownRect* rect) {
     field_0x308 = *rect;
 }
 
@@ -390,59 +391,63 @@ int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
     return 1;
 }
 
-// 0x004c07d0: sets the render target's states (slot 8; the numbers line
-// up with Direct3D's render state IDs) and the device's texture stage 0
-// states, choosing the filters from the +0x2d4 bits and the capabilities.
+// 0x004c07d0: sets the render target's default render states and the
+// device's texture stage 0 states, choosing dithering, antialiasing and the
+// filters from the "DriverInfo\<driver>\Allow..." bits (+0x2d4) and the
+// device capabilities.
 int PCGame::UnknownVirtualSlot7() {
-    field_0x10->UnknownVirtualSlot8(0x1a, field_0x2d4_bit3 && (PCTarget()->field_0x1a8 & 1), 1);
-    field_0x10->UnknownVirtualSlot8(0x28, 0, 1);
-    field_0x10->UnknownVirtualSlot8(2, 0, 1);
-    if (field_0x2d4_bit6 && (PCTarget()->field_0x1a8 & 0x800))
-        field_0x10->UnknownVirtualSlot8(2, 2, 1);
-    field_0x10->UnknownVirtualSlot8(0x1c, 0, 1);
-    field_0x10->UnknownVirtualSlot8(0x30, 0, 1);
-    field_0x10->UnknownVirtualSlot8(8, PCTarget()->field_0x250, 1);
-    field_0x10->UnknownVirtualSlot8(7, field_0x2d5_bit3, 1);
-    field_0x10->UnknownVirtualSlot8(0xe, field_0x2d5_bit3, 1);
-    field_0x10->UnknownVirtualSlot8(0x1b, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_DITHERENABLE,
+                                    field_0x2d4_bit3 && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_DITHER), 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_EDGEANTIALIAS, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 0, 1);
+    if (field_0x2d4_bit6 && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT))
+        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 2, 1); // D3DANTIALIAS_SORTINDEPENDENT
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_RANGEFOGENABLE, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, PCTarget()->fillMode, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, field_0x2d5_bit3, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, field_0x2d5_bit3, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 1);
     field_0x10->UnknownVirtualSlot10(7, 0);
     if (field_0x2d0) {
-        field_0x10->UnknownVirtualSlot8(9, 1, 1);
-        field_0x10->UnknownVirtualSlot8(4, 0, 1);
+        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 1);
+        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 1);
     } else {
-        field_0x10->UnknownVirtualSlot8(9, 2, 1);
-        field_0x10->UnknownVirtualSlot8(4, 1, 1);
+        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 1);
+        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 1);
     }
-    PCTarget()->field_0x50->UnknownMethod37(0, 0xc, 1);
-    field_0x10->UnknownVirtualSlot8(0x17, 4, 1);
-    field_0x10->UnknownVirtualSlot8(0x1d, 0, 1);
-    field_0x10->UnknownVirtualSlot8(0x1e, 0, 1);
-    field_0x10->UnknownVirtualSlot8(0x10, 0, 1);
-    field_0x10->UnknownVirtualSlot8(0x21, 0, 1);
-    field_0x10->UnknownVirtualSlot8(0xf, 1, 1);
-    field_0x10->UnknownVirtualSlot8(0x18, 0, 1);
-    field_0x10->UnknownVirtualSlot8(0x19, 5, 1);
-    field_0x54c = field_0x2d4_bit5 && (PCTarget()->field_0x1c4 & 2) ? 2 : 1;
-    field_0x550 = field_0x2d4_bit5 && (PCTarget()->field_0x1c4 & 2) ? 2 : 1;
-    field_0x554 = 1;
+    PCTarget()->device->UnknownMethod37(0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_SPECULARENABLE, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZVISIBLE, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_LASTPIXEL, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_STIPPLEDALPHA, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 1, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAREF, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 1);
+    magFilter = field_0x2d4_bit5 && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFG_LINEAR
+                                                                                               : D3DTFG_POINT;
+    minFilter = field_0x2d4_bit5 && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFN_LINEAR
+                                                                                               : D3DTFN_POINT;
+    mipFilter = D3DTFP_NONE;
     if (field_0x2d4_bit4) {
-        if (field_0x2d4_bit7 && (PCTarget()->field_0x1c4 & 0x20))
-            field_0x554 = 3;
+        if (field_0x2d4_bit7 && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEARMIPLINEAR))
+            mipFilter = D3DTFP_LINEAR;
         else
-            field_0x554 = 2;
+            mipFilter = D3DTFP_POINT;
     }
-    PCTarget()->field_0x50->UnknownMethod37(0, 0x10, field_0x54c);
-    PCTarget()->field_0x50->UnknownMethod37(0, 0x11, field_0x550);
-    PCTarget()->field_0x50->UnknownMethod37(0, 0x12, field_0x554);
-    PCTarget()->field_0x50->UnknownMethod37(0, 1, 1);
-    PCTarget()->field_0x50->UnknownMethod37(0, 4, 1);
-    field_0x10->UnknownVirtualSlot8(0x89, 0, 1);
-    field_0x10->UnknownVirtualSlot8(0x17, 4, 1);
+    PCTarget()->device->UnknownMethod37(0, D3DTSS_MAGFILTER, magFilter);
+    PCTarget()->device->UnknownMethod37(0, D3DTSS_MINFILTER, minFilter);
+    PCTarget()->device->UnknownMethod37(0, D3DTSS_MIPFILTER, mipFilter);
+    PCTarget()->device->UnknownMethod37(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    PCTarget()->device->UnknownMethod37(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_LIGHTING, 0, 1);
+    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
     return 1;
 }
 
 // 0x004c0760
-int PCGame::UnknownFunction4c0760(UnknownDisplay* display, int width, int height) {
+int PCGame::LimitDisplayModes(UnknownDisplay* display, int width, int height) {
     if (field_0x2d4_bit1 && !display->field_0xb74_bit1) {
         for (int i = 0; i < display->field_0x08; i++) {
             UnknownDisplayMode* mode = &display->field_0x10[i];
@@ -460,7 +465,7 @@ RenderTarget* PCGame::UnknownVirtualSlot31() {
     UnknownSurfaceInterface* surface =
         field_0x0c->field_0x1a8 ? field_0x0c->field_0x1a8 : field_0x0c->field_0x1a0;
     RenderTarget* target = (new(__FILE__, 984) PCRenderTarget)
-        ->UnknownFunction4c4f80(field_0x0c, &field_0x2f8, surface, field_0x2d5_bit3, frames);
+        ->UnknownFunction4c4f80(field_0x0c, &deviceGuid, surface, field_0x2d5_bit3, frames);
     if (!target)
         return 0;
     if (field_0x2d4_bit1) {
@@ -470,11 +475,11 @@ RenderTarget* PCGame::UnknownVirtualSlot31() {
         int value;
         if (field_0x0c->UnknownFunction4ca5a0(&value, field_0x10)) {
             field_0x0c->field_0x5c = value;
-            PCTarget()->UnknownFunction4c5950(&value);
+            PCTarget()->MeasureTextureMemory(&value);
             field_0x0c->field_0x58 = value;
         } else {
             field_0x0c->field_0x5c = 0;
-            PCTarget()->UnknownFunction4c5950(&value);
+            PCTarget()->MeasureTextureMemory(&value);
             field_0x0c->field_0x58 = value;
         }
     }
@@ -530,7 +535,7 @@ int PCGame::UnknownVirtualSlot32() {
 
 // 0x004c1610: records the display's identifier under "DriverInfo\\<name>"
 // and marks it profiled (version 7).
-int PCGame::UnknownFunction4c1610(UnknownDisplay* display) {
+int PCGame::SaveDisplayProfile(UnknownDisplay* display) {
     char name[256];
     sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", display->field_0x4bc);
     UnknownVirtualSlot29(name, &display->field_0x5c0, sizeof(display->field_0x5c0));
@@ -543,7 +548,7 @@ int PCGame::UnknownFunction4c1610(UnknownDisplay* display) {
 
 // 0x004c1410: whether any display lacks a current profile (version 7 with
 // an identical saved identifier).
-int PCGame::UnknownFunction4c1410() {
+int PCGame::IsAnyProfileStale() {
     for (int i = 0; i < g_UnknownDisplayCount68a764; i++) {
         char name[256];
         UnknownDeviceIdentifier saved;
@@ -570,16 +575,16 @@ int PCGame::UnknownFunction4c1410() {
 }
 
 // 0x004c16b0
-int PCGame::UnknownFunction4c16b0() {
+int PCGame::ProfileEveryDisplay() {
     for (int i = 0; i < g_UnknownDisplayCount68a764; i++)
-        UnknownFunction4c1610(g_UnknownDisplays68a754[i]);
+        SaveDisplayProfile(g_UnknownDisplays68a754[i]);
     return 1;
 }
 
 // 0x004c1a00: deletes every display's cached data under DriverInfo (the
 // mode lists, "PartialTextureBlt" and the 32 "BltSpeed" entries), then the
 // display keys themselves.
-int PCGame::UnknownFunction4c1a00() {
+int PCGame::DeleteDisplayProfiles() {
     char path[256];
     char display[256];
     char name[16];

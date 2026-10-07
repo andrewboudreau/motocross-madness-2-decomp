@@ -165,3 +165,19 @@ literals). Exact (13 calibration cases): the eight kVec3 `$E`
   resource manager (`0x004e9360`), returns its existing map or reads a
   header from the entry's stream and creates a PCTextureMap or
   ManagedTexture through slots 4/5.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x004c68e0` `CreateSystemSurface`
+- `0x004c7420` `RestoreTextureSurface`
+- `0x004c7b00` `BlitTo`
+- `0x004c7b40` `CopyRectTo`
+- `0x004c7e30` `SetColorKey`
+- `0x004c7ef0` `ColorKeyLevel`
+- `0x004c83a0` `FindMipLevel`
+- `0x004c84e0` `DumpLevel`
+- `0x004c8550` `WriteLevel`

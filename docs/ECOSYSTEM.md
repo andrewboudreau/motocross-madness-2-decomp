@@ -96,7 +96,7 @@ Source forms that mattered:
 - `0x00458f70`: the stream selection is `if (!stream) { if (!entry) new +
   open else entry stream, flag } else flag`.
 - `0x004594d0`: the band table is a conditional expression; the index
-  buffer is filled through a running index; `field_0x5a8 = size *
+  buffer is filled through a running index; `unitsPerCoordinate = size *
   (1.0f / 65536.0f)`.
 
 ## Near misses (`samples/ecosystem/EcoSystemNearMisses.cpp`)
@@ -145,3 +145,34 @@ counters and the peak holds).
 python3 tools/compile.py --compiler vc6 --vc6-root "$VC6_ROOT" src/reconstructed/EcoSystem.cpp -o work/EcoSystem.obj
 python3 tools/run_calibration.py --exe "$MCM2_EXE" --compiler vc6 --vc6-root "$VC6_ROOT"
 ```
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x00455f50` `RandomParameter`
+- `0x00455f60` `ParameterForHeight`
+- `0x00455f90` `HeightForParameter`
+- `0x00455ff0` `RadiusForParameter`
+- `0x00456050` `LoadModel`
+- `0x004567a0` `PlaceQuantized`
+- `0x004567e0` `Place`
+- `0x00456850` `EvictGeometry`
+- `0x00456890` `TestDistance`
+- `0x00456a10` `SetBillboard`
+- `0x00457000` `DrawGeometry`
+- `0x00457080` `GetCollisionCount`
+- `0x004570a0` `GetCollisionObject`
+- `0x00457230` `GetRadius`
+- `0x00457480` `ReadEst`
+- `0x00457ed0` `BuildCollisionObjects`
+- `0x00458360` `ReadCollisionObjects`
+- `0x004587b0` `WriteEsb`
+- `0x00458da0` `WriteListing`
+- `0x00458f70` `ReadEsb`
+- `0x004598d0` `PlaceStoredObjects`
+- `0x00459b40` `PlaceAuthoredObjects`
+- `0x00459ce0` `GenerateObjects`
+- `0x0045ade0` `SetRenderStates`

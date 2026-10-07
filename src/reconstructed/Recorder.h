@@ -55,23 +55,23 @@ public:
 
     // 0x004e7a00: signals `event` and polls every `interval` ms until the
     // worker acknowledges (+0xc8).
-    void UnknownFunction4e7a00(HANDLE event, DWORD interval);
+    void SignalAndWait(HANDLE event, DWORD interval);
     // 0x004e7a90: creates the ring (`size`), the events and the worker, then
     // starts `mode` (0, 1 or 2); 0 on failure.
-    int UnknownFunction4e7a90(int a1, int a2, int a3, int mode, int a5, unsigned int size,
+    int Start(int a1, int a2, int a3, int mode, int a5, unsigned int size,
                               UnknownRecorderOwner* owner);
     void UnknownFunction4e86d0(int a, int b, int wait);  // 0x004e86d0
     // 0x004e8720: queues `size` bytes of `data` with two header values; 0 when
     // full or stopped.
-    int UnknownFunction4e8720(int a, int b, const void* data, unsigned int size);
+    int QueueRecord(int a, int b, const void* data, unsigned int size);
     // 0x004e8810: takes the next queued record; 0..4.
-    int UnknownFunction4e8810(int* a, int* b, int* value, void* data, unsigned int* size, int signal);
+    int TakeRecord(int* a, int* b, int* value, void* data, unsigned int* size, int signal);
     void UnknownFunction4e8990();         // 0x004e8990
     void UnknownFunction4e89c0();         // 0x004e89c0
     void UnknownFunction4e8a20(unsigned int milliseconds); // 0x004e8a20
     void UnknownFunction4e8a70();         // 0x004e8a70
 
-    HANDLE field_0x2c;                    // worker thread
+    HANDLE workerThread;                    // worker thread
     HANDLE field_0x30;                    // events (CreateEventA, auto-reset)
     HANDLE field_0x34;
     HANDLE field_0x38;
@@ -82,28 +82,28 @@ public:
     HANDLE field_0x4c;
     HANDLE field_0x50;
     HANDLE field_0x54;
-    HANDLE field_0x58;                    // stops the worker
-    unsigned int field_0x5c;              // worker thread id
-    CRITICAL_SECTION field_0x60;
-    int field_0x78;                       // mode
-    void* field_0x7c;                     // 0x400-byte buffer (mode 1)
-    UnknownRecorderCallback field_0x80;
+    HANDLE stopEvent;                    // stops the worker
+    unsigned int workerThreadId;              // worker thread id
+    CRITICAL_SECTION lock;
+    int recordMode;                       // mode
+    void* recordBuffer;                     // 0x400-byte buffer (mode 1)
+    UnknownRecorderCallback recordCallback;
     int field_0x84;
     int field_0x88;
     unsigned char field_0x8c[0x90 - 0x8c];
-    UnknownRecorderThreadParameters field_0x90;
+    UnknownRecorderThreadParameters threadParameters;
     int field_0xa0;
     int field_0xa4;
     int field_0xa8;
-    UnknownRecorderOwner* field_0xac;
-    UnknownVcr* field_0xb0;
-    int field_0xb4;                       // stopped
-    int field_0xb8;                       // busy
+    UnknownRecorderOwner* vcrFile;
+    UnknownVcr* frameRing;
+    int isStopped;                       // stopped
+    int isBusy;                       // busy
     int field_0xbc;
     int field_0xc0;
     int field_0xc4;
-    int field_0xc8;                       // acknowledged by the worker
+    int workerAcknowledged;                       // acknowledged by the worker
     int field_0xcc;
     float field_0xd0;                     // seconds
-    int field_0xd4;                       // record time in ms (worker event 5, slot 10)
+    int recordTimeMs;                       // record time in ms (worker event 5, slot 10)
 };

@@ -6,7 +6,17 @@ UIDialog subclass named by RTTI, plus a few helpers. The sources are
 what both use. That covers the slot-29 event record, the dlgprocs.cpp calls
 `0x004526b0`/`0x00452930`/`0x00453090`, and the inline-constructed
 ChoiceDlg (vtable `0x00551cb0`, "messbox2.dtm") and SessionDlg
-(`0x00555408`, "messbox1.dtm"). Names are provisional.
+(`0x00555408`, "messbox1.dtm").
+
+Names: the event record's members (`code`, `controlName`, `kind`, `dialog`,
+`gui`, `control`, `key`, `handled`) follow how GameUi.cpp's senders fill
+them; `DialogEventKind.h` names the kinds. The dialogs' helper methods are
+named after what their bodies do, as their header comments record
+(`FillProfileList`, `OpenPage`, `ListGhosts`, `PaintPlateNumber`, ...).
+Dialog members inherited from UIDialog are named where the derived class
+declares them with their type: +0x2c `parentDialog`, +0x30 `guiManager`,
++0x34 `guiUser`, +0x110 `dialogBackground`. The procedures stay
+`UnknownVirtualSlot29`; other names are provisional.
 
 **InGameProcs.cpp** (`0x004886e0..0x0048963b`). Evidence: the `__FILE__`
 literal at `0x0056c5cc` (xref `0x00488928`). It starts where GUIManager.cpp

@@ -11,7 +11,7 @@
 #include "TextureMap.h"
 
 // 0x00511740: bytes per stored pixel of a file format.
-int UnknownFunction511740(int fileFormat) {
+int BytesPerPixel(int fileFormat) {
     switch (fileFormat) {
     case 12:
     case 15:
@@ -58,7 +58,7 @@ int UnknownFunction511740(int fileFormat) {
 // 0x00511800: whether a file format is compressed. Formats 0..34 are all
 // listed: retail's table starts at 0 and merges the 0 cases with the
 // default.
-int UnknownFunction511800(int fileFormat) {
+int IsCompressedFormat(int fileFormat) {
     switch (fileFormat) {
     case 0:
     case 1:
@@ -102,7 +102,7 @@ int UnknownFunction511800(int fileFormat) {
 }
 
 // 0x00511850: whether a file format stores mip levels.
-int UnknownFunction511850(int fileFormat) {
+int HasMipLevels(int fileFormat) {
     switch (fileFormat) {
     case 0:
     case 1:
@@ -146,7 +146,7 @@ int UnknownFunction511850(int fileFormat) {
 }
 
 // 0x005118a0: the pixel format a file format decodes to.
-int UnknownFunction5118a0(int fileFormat) {
+int DecodedFormat(int fileFormat) {
     switch (fileFormat) {
     case 12:
     case 15:
@@ -154,36 +154,36 @@ int UnknownFunction5118a0(int fileFormat) {
     case 30:
     case 32:
     case 34:
-        return 0x22b8;
+        return 8888;
     case 1:
     case 9:
     case 16:
     case 24:
-        return 0x378;
+        return 888;
     case 2:
     case 5:
     case 7:
     case 17:
     case 20:
     case 22:
-        return 0x22b;
+        return 555;
     case 3:
     case 8:
     case 18:
     case 23:
-        return 0x235;
+        return 565;
     case 10:
     case 13:
     case 25:
     case 28:
     case 31:
     case 33:
-        return 0x613;
+        return 1555;
     case 11:
     case 14:
     case 26:
     case 29:
-        return 0x115c;
+        return 4444;
     case 4:
     case 6:
     case 19:
@@ -199,17 +199,17 @@ int UnknownFunction511970(int format) {
     switch (format) {
     case 8:
         return 1;
-    case 0x22b:
+    case 555:
         return 2;
-    case 0x235:
+    case 565:
         return 2;
-    case 0x378:
+    case 888:
         return 3;
-    case 0x613:
+    case 1555:
         return 2;
-    case 0x115c:
+    case 4444:
         return 2;
-    case 0x22b8:
+    case 8888:
         return 4;
     }
     return 0;
@@ -224,7 +224,7 @@ void UnknownFunction5119c0(int format, void* pixelFormat) {
     description->size = sizeof(*description);
     description->flags = 0x40;
     switch (format) {
-    case 0x235:
+    case 565:
         description->bitCount = 16;
         description->masks[0] = 0xf800;
         description->masks[1] = 0x7e0;
@@ -234,16 +234,16 @@ void UnknownFunction5119c0(int format, void* pixelFormat) {
         description->flags = 0x60;
         description->bitCount = 8;
         break;
-    case 0x22b8:
+    case 8888:
         description->flags = 0x41;
         description->masks[3] = 0xff000000;
-    case 0x378:
+    case 888:
         description->bitCount = 24;
         description->masks[0] = 0xff0000;
         description->masks[1] = 0xff00;
         description->masks[2] = 0xff;
         break;
-    case 0x115c:
+    case 4444:
         description->flags = 0x41;
         description->masks[3] = 0xf000;
         description->bitCount = 16;
@@ -251,10 +251,10 @@ void UnknownFunction5119c0(int format, void* pixelFormat) {
         description->masks[1] = 0xf0;
         description->masks[2] = 0xf;
         break;
-    case 0x613:
+    case 1555:
         description->flags = 0x41;
         description->masks[3] = 0x8000;
-    case 0x22b:
+    case 555:
         description->bitCount = 16;
         description->masks[0] = 0x7c00;
         description->masks[1] = 0x3e0;
@@ -265,40 +265,40 @@ void UnknownFunction5119c0(int format, void* pixelFormat) {
 
 // 0x00511ad0: whether a pixel format is 4444 or 8888.
 int UnknownFunction511ad0(int format) {
-    if (format != 0x115c)
-        return format == 0x22b8;
+    if (format != 4444)
+        return format == 8888;
     return 1;
 }
 
 // 0x00511af0: the pixel format a DirectDraw pixel format describes: 555 or
 // 565 by green mask, 24-bit, 8888 for 32 bits, palettised otherwise. Other
 // 16-bit masks leave `format` unset (retail returns the argument's slot).
-int UnknownFunction511af0(UnknownPixelFormat* pixelFormat) {
+int FormatFromPixelFormat(UnknownPixelFormat* pixelFormat) {
     int format;
     if (pixelFormat->bitCount == 16) {
         if (pixelFormat->masks[1] == 0x3e0)
-            format = 0x22b;
+            format = 555;
         else if (pixelFormat->masks[1] == 0x7e0)
-            format = 0x235;
+            format = 565;
     } else if (pixelFormat->bitCount == 24) {
-        format = 0x378;
+        format = 888;
     } else {
-        format = pixelFormat->bitCount == 32 ? 0x22b8 : 8;
+        format = pixelFormat->bitCount == 32 ? 8888 : 8;
     }
     return format;
 }
 
 // 0x00511b40: reads the header field by field. Only 16, 24 and 32-bit
 // files of image type 2 (raw) or 10 (run-length) are accepted.
-UnknownTgaFile* UnknownFunction511b40(UnknownTextureStream* stream, UnknownTgaFile* file, int offset) {
+UnknownTgaFile* ReadTgaHeader(UnknownTextureStream* stream, UnknownTgaFile* file, int offset) {
     if (!file) {
         file = (UnknownTgaFile*)DebugMalloc(sizeof(UnknownTgaFile), __FILE__, 354);
         if (!file)
             return 0;
         file->bits = 0;
-        file->field_0x18 = 0;
-        file->field_0x120 = 0;
-        file->field_0x124 = 0;
+        file->bitsSize = 0;
+        file->flipRow = 0;
+        file->flipRowSize = 0;
     }
     file->name[0] = 0;
     if (offset == 0) {
@@ -339,7 +339,7 @@ UnknownTgaFile* UnknownFunction511d00(const char* path, UnknownTgaFile* file, in
         delete stream;
         return 0;
     }
-    file = UnknownFunction511b40(stream, file, 0);
+    file = ReadTgaHeader(stream, file, 0);
     delete stream;
     return file;
 }
@@ -347,16 +347,16 @@ UnknownTgaFile* UnknownFunction511d00(const char* path, UnknownTgaFile* file, in
 // 0x00511dd0: reads the header and then the pixels for its depth; frees
 // the file when the pixels cannot be read.
 UnknownTgaFile* UnknownFunction511dd0(UnknownTextureStream* stream, UnknownTgaFile* file, int offset) {
-    file = UnknownFunction511b40(stream, file, offset);
+    file = ReadTgaHeader(stream, file, offset);
     if (!file)
         return 0;
     if (file->bitsPerPixel == 24) {
-        if (!UnknownFunction511e80(file, stream))
+        if (!ReadTgaPixels24(file, stream))
             goto failed;
     } else if (file->bitsPerPixel == 32) {
-        if (!UnknownFunction512100(file, stream))
+        if (!ReadTgaPixels32(file, stream))
             goto failed;
-    } else if (!UnknownFunction512370(file, stream)) {
+    } else if (!ReadTgaPixels16(file, stream)) {
         goto failed;
     }
     strcpy(file->name, g_UnknownGlobal577738);
@@ -379,20 +379,20 @@ static inline void SwapBytes(unsigned char& a, unsigned char& b) {
 // 0x00511e80: reads 24-bit pixels, raw (image type 2) or run-length coded,
 // swapping red and blue, then flips bottom-up images through the scratch
 // row and marks them top-down.
-int UnknownFunction511e80(UnknownTgaFile* file, UnknownTextureStream* stream) {
+int ReadTgaPixels24(UnknownTgaFile* file, UnknownTextureStream* stream) {
     int count = file->height * file->width;
     unsigned int size = count * 3;
-    if (size > file->field_0x18) {
+    if (size > file->bitsSize) {
         if (file->bits)
             DebugFree(file->bits, __FILE__, 40);
         file->bits = 0;
-        file->field_0x18 = 0;
+        file->bitsSize = 0;
     }
     if (!file->bits) {
         file->bits = DebugMalloc(size, __FILE__, 49);
         if (!file->bits)
             return 0;
-        file->field_0x18 = size;
+        file->bitsSize = size;
     }
     UnknownPixel24* pixel = (UnknownPixel24*)file->bits;
     UnknownPixel24* end = (UnknownPixel24*)((unsigned char*)pixel + size);
@@ -426,18 +426,18 @@ int UnknownFunction511e80(UnknownTgaFile* file, UnknownTextureStream* stream) {
     if (!(file->descriptor & 0x20)) {
         unsigned char* top = (unsigned char*)file->bits;
         unsigned char* bottom = top + (file->height - 1) * file->width * 3;
-        if (file->field_0x120 && file->field_0x124 < (unsigned int)(file->width * 3)) {
-            DebugFree(file->field_0x120, __FILE__, 101);
-            file->field_0x124 = 0;
-            file->field_0x120 = 0;
+        if (file->flipRow && file->flipRowSize < (unsigned int)(file->width * 3)) {
+            DebugFree(file->flipRow, __FILE__, 101);
+            file->flipRowSize = 0;
+            file->flipRow = 0;
         }
-        if (!file->field_0x120) {
-            file->field_0x120 = DebugMalloc(file->width * 3, __FILE__, 106);
-            if (!file->field_0x120)
+        if (!file->flipRow) {
+            file->flipRow = DebugMalloc(file->width * 3, __FILE__, 106);
+            if (!file->flipRow)
                 return 0;
-            file->field_0x124 = file->width * 3;
+            file->flipRowSize = file->width * 3;
         }
-        void* row = file->field_0x120;
+        void* row = file->flipRow;
         for (int i = 0; i < file->height / 2; i++) {
             memcpy(row, top, file->width * 3);
             memcpy(top, bottom, file->width * 3);
@@ -452,20 +452,20 @@ int UnknownFunction511e80(UnknownTgaFile* file, UnknownTextureStream* stream) {
 
 // 0x00512100: reads 32-bit pixels like 0x00511e80; literal run-length
 // pixels are read one at a time.
-int UnknownFunction512100(UnknownTgaFile* file, UnknownTextureStream* stream) {
+int ReadTgaPixels32(UnknownTgaFile* file, UnknownTextureStream* stream) {
     int count = file->height * file->width;
     unsigned int size = count * 4;
-    if (size > file->field_0x18) {
+    if (size > file->bitsSize) {
         if (file->bits)
             DebugFree(file->bits, __FILE__, 142);
         file->bits = 0;
-        file->field_0x18 = 0;
+        file->bitsSize = 0;
     }
     if (!file->bits) {
         file->bits = DebugMalloc(size, __FILE__, 151);
         if (!file->bits)
             return 0;
-        file->field_0x18 = size;
+        file->bitsSize = size;
     }
     UnknownPixel32* pixel = (UnknownPixel32*)file->bits;
     UnknownPixel32* end = (UnknownPixel32*)((unsigned char*)pixel + size);
@@ -502,18 +502,18 @@ int UnknownFunction512100(UnknownTgaFile* file, UnknownTextureStream* stream) {
     if (!(file->descriptor & 0x20)) {
         unsigned char* top = (unsigned char*)file->bits;
         unsigned char* bottom = top + (file->height - 1) * file->width * 4;
-        if (file->field_0x120 && file->field_0x124 < (unsigned int)(file->width * 4)) {
-            DebugFree(file->field_0x120, __FILE__, 203);
-            file->field_0x124 = 0;
-            file->field_0x120 = 0;
+        if (file->flipRow && file->flipRowSize < (unsigned int)(file->width * 4)) {
+            DebugFree(file->flipRow, __FILE__, 203);
+            file->flipRowSize = 0;
+            file->flipRow = 0;
         }
-        if (!file->field_0x120) {
-            file->field_0x120 = DebugMalloc(file->width * 4, __FILE__, 208);
-            if (!file->field_0x120)
+        if (!file->flipRow) {
+            file->flipRow = DebugMalloc(file->width * 4, __FILE__, 208);
+            if (!file->flipRow)
                 return 0;
-            file->field_0x124 = file->width * 4;
+            file->flipRowSize = file->width * 4;
         }
-        void* row = file->field_0x120;
+        void* row = file->flipRow;
         for (int i = 0; i < file->height / 2; i++) {
             memcpy(row, top, file->width * 4);
             memcpy(top, bottom, file->width * 4);
@@ -528,20 +528,20 @@ int UnknownFunction512100(UnknownTgaFile* file, UnknownTextureStream* stream) {
 
 // 0x00512370: reads 16-bit pixels like 0x00511e80, without the colour
 // swap; raw images are read row by row.
-int UnknownFunction512370(UnknownTgaFile* file, UnknownTextureStream* stream) {
+int ReadTgaPixels16(UnknownTgaFile* file, UnknownTextureStream* stream) {
     int count = file->height * file->width;
     unsigned int size = count * 2;
-    if (size > file->field_0x18) {
+    if (size > file->bitsSize) {
         if (file->bits)
             DebugFree(file->bits, __FILE__, 252);
         file->bits = 0;
-        file->field_0x18 = 0;
+        file->bitsSize = 0;
     }
     if (!file->bits) {
         file->bits = DebugMalloc(size, __FILE__, 261);
         if (!file->bits)
             return 0;
-        file->field_0x18 = size;
+        file->bitsSize = size;
     }
     unsigned short* pixel = (unsigned short*)file->bits;
     unsigned short* end = pixel + count;
@@ -573,18 +573,18 @@ int UnknownFunction512370(UnknownTgaFile* file, UnknownTextureStream* stream) {
     if (!(file->descriptor & 0x20)) {
         unsigned char* top = (unsigned char*)file->bits;
         unsigned char* bottom = top + (file->height - 1) * file->width * 2;
-        if (file->field_0x120 && file->field_0x124 < (unsigned int)(file->width * 2)) {
-            DebugFree(file->field_0x120, __FILE__, 311);
-            file->field_0x124 = 0;
-            file->field_0x120 = 0;
+        if (file->flipRow && file->flipRowSize < (unsigned int)(file->width * 2)) {
+            DebugFree(file->flipRow, __FILE__, 311);
+            file->flipRowSize = 0;
+            file->flipRow = 0;
         }
-        if (!file->field_0x120) {
-            file->field_0x120 = DebugMalloc(file->width * 2, __FILE__, 316);
-            if (!file->field_0x120)
+        if (!file->flipRow) {
+            file->flipRow = DebugMalloc(file->width * 2, __FILE__, 316);
+            if (!file->flipRow)
                 return 0;
-            file->field_0x124 = file->width * 2;
+            file->flipRowSize = file->width * 2;
         }
-        void* row = file->field_0x120;
+        void* row = file->flipRow;
         for (int i = 0; i < file->height / 2; i++) {
             memcpy(row, top, file->width * 2);
             memcpy(top, bottom, file->width * 2);
@@ -607,18 +607,18 @@ UnknownTgaFile* UnknownFunction5125c0(const char* path, UnknownTgaFile* file, in
         delete stream;
         return 0;
     }
-    file = UnknownFunction511b40(stream, file, 0);
+    file = ReadTgaHeader(stream, file, 0);
     if (!file) {
         delete stream;
         return 0;
     }
     if (file->bitsPerPixel == 24) {
-        if (!UnknownFunction511e80(file, stream))
+        if (!ReadTgaPixels24(file, stream))
             goto failed;
     } else if (file->bitsPerPixel == 32) {
-        if (!UnknownFunction512100(file, stream))
+        if (!ReadTgaPixels32(file, stream))
             goto failed;
-    } else if (!UnknownFunction512370(file, stream)) {
+    } else if (!ReadTgaPixels16(file, stream)) {
         goto failed;
     }
     strcpy(file->name, path);
@@ -633,15 +633,15 @@ failed:
 }
 
 // 0x00512720: writes 24-bit `bits` to the TGA file `path`.
-int UnknownFunction512720(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
+int WriteTga24(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
     UnknownTgaFile file;
-    UnknownFunction5127a0(&file, bits, width, height);
+    FillTgaHeader24(&file, bits, width, height);
     strcpy(file.name, path);
     return UnknownFunction512990(&file, stride, 0, descriptor);
 }
 
 // 0x005127a0: fills a 24-bit uncompressed true-colour header for `bits`.
-void UnknownFunction5127a0(UnknownTgaFile* file, void* bits, int width, int height) {
+void FillTgaHeader24(UnknownTgaFile* file, void* bits, int width, int height) {
     file->idLength = 0;
     file->colorMapType = 0;
     file->imageType = 2;
@@ -658,15 +658,15 @@ void UnknownFunction5127a0(UnknownTgaFile* file, void* bits, int width, int heig
 }
 
 // 0x005127f0: writes 32-bit `bits` to the TGA file `path`.
-int UnknownFunction5127f0(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
+int WriteTga32(void* bits, int width, int height, unsigned int stride, const char* path, int descriptor) {
     UnknownTgaFile file;
-    UnknownFunction512870(&file, bits, width, height);
+    FillTgaHeader32(&file, bits, width, height);
     strcpy(file.name, path);
     return UnknownFunction512990(&file, stride, 0, descriptor);
 }
 
 // 0x00512870: fills a 32-bit uncompressed true-colour header for `bits`.
-void UnknownFunction512870(UnknownTgaFile* file, void* bits, int width, int height) {
+void FillTgaHeader32(UnknownTgaFile* file, void* bits, int width, int height) {
     file->idLength = 0;
     file->colorMapType = 0;
     file->imageType = 2;
@@ -683,16 +683,16 @@ void UnknownFunction512870(UnknownTgaFile* file, void* bits, int width, int heig
 }
 
 // 0x005128c0: writes 16-bit `bits` to the TGA file `path`.
-int UnknownFunction5128c0(void* bits, int width, int height, unsigned int stride, int greenMask, const char* path,
+int WriteTga16(void* bits, int width, int height, unsigned int stride, int greenMask, const char* path,
                           int descriptor) {
     UnknownTgaFile file;
-    UnknownFunction512940(&file, bits, width, height);
+    FillTgaHeader16(&file, bits, width, height);
     strcpy(file.name, path);
     return UnknownFunction512990(&file, stride, greenMask, descriptor);
 }
 
 // 0x00512940: fills a 16-bit uncompressed true-colour header for `bits`.
-void UnknownFunction512940(UnknownTgaFile* file, void* bits, int width, int height) {
+void FillTgaHeader16(UnknownTgaFile* file, void* bits, int width, int height) {
     file->idLength = 0;
     file->colorMapType = 0;
     file->imageType = 2;
@@ -713,8 +713,8 @@ void UnknownFunction512dd0(UnknownTgaFile* file) {
     if (file) {
         if (file->bits)
             DebugFree(file->bits, __FILE__, 865);
-        if (file->field_0x120)
-            DebugFree(file->field_0x120, __FILE__, 866);
+        if (file->flipRow)
+            DebugFree(file->flipRow, __FILE__, 866);
         DebugFree(file, __FILE__, 867);
     }
 }

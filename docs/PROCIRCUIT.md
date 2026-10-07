@@ -1,7 +1,9 @@
 # ProCircuit.cpp and ProCircuitProcs.cpp
 
 These are the pro circuit career and its dialogs: `src/reconstructed/ProCircuit.*`
-and `ProCircuitProcs.*`. Names are provisional.
+and `ProCircuitProcs.*`. Helper names follow their bodies (`FreeSchedule`,
+`LoadSaved`, `Save`, `AdvanceAfterRace`, `PickComputerRacers`, `OpenPage`,
+...); the rest are provisional.
 
 **ProCircuit.cpp** (`0x004d3480..0x004d4b1f`). Evidence: the `__FILE__`
 literal at `0x005718ac` (xrefs `0x004d34a1..0x004d45c2`); the unit closes

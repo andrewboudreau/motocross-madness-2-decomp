@@ -84,3 +84,30 @@ stencil flag, +0x38..+0x44 per-frame primitive counters (reset by slot 12).
 Near miss (`samples/render/PCRenderTargetNearMisses.cpp`): slot 12
 `0x004c5510` (Clear), 44/275 — register allocation and the merging of the
 three Clear calls.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x004c5230` `EnumTextureFormatCallback`
+- `0x004c52a0` `EnumZBufferFormatCallback`
+- `0x004c5950` `MeasureTextureMemory`
+- `0x004c5d00` `SaveScreenshot`
+
+## Direct3D constants
+
+`src/reconstructed/D3DConstants.h` spells the DirectX 7 SDK values the
+renderer passes (render states, compare functions, texture-stage states,
+primitive types, FVF codes, primitive caps, DDSD/DDSCAPS/DDLOCK flags and
+the two DDERR codes the code tests). A value is named only where the
+receiving method is identified by its vtable index: PCRenderTarget slot 8
+forwards to device method 20 (SetRenderState), slot 7 to method 37
+(SetTextureStageState), slots 15/16/17 to methods 26/25/32 (draw calls).
+GetCaps (method 3) fills PCRenderTarget+0x164..+0x250 in the
+D3DDEVICEDESC7 layout: `triRasterCaps` (+0x1a8), `triAlphaCmpCaps`
+(+0x1b8), `triTextureCaps` (+0x1c0) and `triTextureFilterCaps` (+0x1c4)
+are dpcTriCaps members, and the bits tested against them (fog vertex /
+table / range, dither, antialias, GREATER / NOTEQUAL, TRANSPARENCY,
+LINEAR / LINEARMIPLINEAR) are the SDK's.

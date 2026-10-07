@@ -29,6 +29,6 @@ public:
     void UnknownFunction47bbf0(float duration);
     virtual int UnknownVirtualSlot10(float frameTime); // 0x0047bc20
 
-    float field_0x40;                          // time remaining
-    float field_0x44;                          // duration
+    float timeRemaining;                       // time remaining
+    float totalDuration;                       // duration
 };

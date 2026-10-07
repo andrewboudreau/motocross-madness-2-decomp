@@ -57,16 +57,16 @@ public:
     // 0x004017a0 (ret 0x10): spins around `axis` at `speed` degrees per unit time.
     void UnknownFunction4017a0(Vector3 axis, float speed);
 
-    D3DIMSoultreeObject* field_0x2c;           // model
-    int field_0x30;                            // visible
-    float field_0x34;                          // scale, 1 by default
+    D3DIMSoultreeObject* arcadeModel;           // model
+    int isVisible;                            // visible
+    float modelScale;                          // scale, 1 by default
     float field_0x38;
     float field_0x3c;
-    UnknownArcadeView* field_0x40;
+    UnknownArcadeView* arcadeView;
     float field_0x44;
     float field_0x48;                          // screen fraction (0x00401310's c)
     float field_0x4c;                          // screen fraction (0x00401310's d)
-    float field_0x50;                          // model width
+    float modelWidth;                          // model width
     float field_0x54;                          // model height
     TransparencyMod* field_0x58;
     CollisionObject* field_0x5c;

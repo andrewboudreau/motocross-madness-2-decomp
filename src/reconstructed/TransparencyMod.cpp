@@ -9,9 +9,9 @@
 TransparencyMod::TransparencyMod(int flags)
     : D3DIMSoultreeModifier(flags)
 {
-    field_0x40 = 0;
-    field_0x49 = 0;
-    field_0x44 = 1;
+    appliedState = 0;
+    surfacesDrawn = 0;
+    isTransparent = 1;
     field_0x48 = 0x80;
 }
 
@@ -20,32 +20,32 @@ void TransparencyMod::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownS
                                            UnknownSoultreeMesh** out)
 {
     *out = mesh;
-    if (field_0x44 == field_0x40) {
+    if (isTransparent == appliedState) {
         return;
     }
-    field_0x49++;
-    if (field_0x49 == object->field_0x28c[object->field_0x27c].field_0x00) {
-        field_0x40 = field_0x44;
-        field_0x49 = 0;
+    surfacesDrawn++;
+    if (surfacesDrawn == object->lodTable[object->field_0x27c].surfaceCount) {
+        appliedState = isTransparent;
+        surfacesDrawn = 0;
     }
 
     UnknownSoultreeVertex* vertices;
     unsigned int alpha = field_0x48 << 24;
     int i;
-    if (field_0x44) {
-        for (i = 0; i < object->field_0x294; i++) {
-            object->field_0x290[i]->field_0xbc = 1;
+    if (isTransparent) {
+        for (i = 0; i < object->materialCount; i++) {
+            object->materialTable[i]->hasAlpha = 1;
         }
-        for (i = 0; i < mesh->field_0x08; i++) {
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].field_0x10 &= 0xffffff;
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].field_0x10 |= alpha;
+        for (i = 0; i < mesh->vertexCount; i++) {
+            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse &= 0xffffff;
+            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse |= alpha;
         }
     } else {
-        for (i = 0; i < object->field_0x294; i++) {
-            object->field_0x290[i]->field_0xbc = 0;
+        for (i = 0; i < object->materialCount; i++) {
+            object->materialTable[i]->hasAlpha = 0;
         }
-        for (i = 0; i < mesh->field_0x08; i++) {
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].field_0x10 |= 0xff000000;
+        for (i = 0; i < mesh->vertexCount; i++) {
+            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse |= 0xff000000;
         }
     }
 }

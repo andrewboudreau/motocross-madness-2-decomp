@@ -58,9 +58,9 @@ struct UnknownCubeTextureMapping {
 // view matrix's third column (+0xb4, +0xc4, +0xd4) and the position.
 struct UnknownCubeCameraView {
     unsigned char field_0x000[0xac];
-    Matrix4 field_0xac;                       // view matrix
+    Matrix4 viewMatrix;                       // view matrix
     unsigned char field_0x0ec[0x170 - 0xec];
-    Vector3 field_0x170;                      // position
+    Vector3 position;                         // position
 };
 
 // The object at 0x00575a98 (TrackOverlay.h and Griddraw.h view other
@@ -85,19 +85,19 @@ public:
     virtual int UnknownVirtualSlot14();       // 0x0043e4c0: draws the visible cells
 
     // 0x0043d980: reads the palettes and cubes listed in `stream`.
-    DrawableCube* UnknownFunction43d980(void* value, UnknownTextureStream* stream,
+    DrawableCube* Load(void* value, UnknownTextureStream* stream,
                                         UnknownCubeTextureContext* context);
     int UnknownFunction43dc60();              // 0x0043dc60: builds the face geometry
     // 0x0043e0b0: loads the cube's textures and sets the cells' texture coordinates.
     int UnknownFunction43e0b0(Cube* cube, UnknownCubeTextureContext* context);
-    int UnknownFunction43e210();              // 0x0043e210: records texture use
+    int RecordTextureUse();                   // 0x0043e210: records texture use
     void UnknownFunction43e330();             // 0x0043e330: marks the visible cells
 
     RenderTarget* Target() const { return (RenderTarget*)field_0x18; }
 
     Cube* field_0x2c;
-    ColorMapper* field_0x30;                  // palette while loading
-    ManagedTextureGroup* field_0x34;          // the context's group
+    ColorMapper* loadPalette;                 // palette while loading
+    ManagedTextureGroup* textureGroup;        // the context's group
     int field_0x38;
     int field_0x3c;
     int field_0x40;

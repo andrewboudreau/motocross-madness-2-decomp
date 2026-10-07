@@ -46,14 +46,14 @@ struct UnknownCubeTextureContext {
 
 // One face, 0xf8 bytes (stride from 0x0043d110, 0x0043d230, 0x0043d460).
 struct UnknownCubeFace {
-    int field_0x00;                     // 2-bit size codes (0x0043d080)
-    unsigned short field_0x04;          // bit j: texture j is present
+    int sizeCodes;                      // 2-bit size codes (0x0043d080)
+    unsigned short presentTextures;     // bit j: texture j is present
     unsigned short field_0x06;
-    TextureMap* field_0x08[16];         // textures (released by the destructor)
+    TextureMap* textures[16];           // textures (released by the destructor)
     int field_0x48[16];                 // read when the flags have bit 0
     unsigned short field_0x88[16];      // 0xffff; read when the flags have bit 2
     int field_0xa8[16];                 // -1
-    unsigned short field_0xe8;          // bit j: cell j is on screen (cubedraw.cpp 0x0043e330)
+    unsigned short visibleCells;        // bit j: cell j is on screen (cubedraw.cpp 0x0043e330)
     unsigned short field_0xea;          // field_0xe8.. are not reset by 0x0043d110
     int field_0xec;
     int field_0xf0;
@@ -67,7 +67,7 @@ public:
     Cube();                                     // 0x0043d1f0
     virtual ~Cube();                            // 0x0043d6c0 (deleting wrapper 0x0043d210)
 
-    void UnknownFunction43d110();               // 0x0043d110: resets every member
+    void Reset();                               // 0x0043d110: resets every member
     // 0x0043d230: reads the header from `stream`; releases itself and
     // returns 0 on a short read (or when `a` is nonzero).
     Cube* UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTextureGroup* group,
@@ -75,20 +75,20 @@ public:
     // 0x0043d400: copies whichever of the three vectors are given.
     int UnknownFunction43d400(const Vector3* a, const Vector3* b, const Vector3* c);
     // 0x0043d460: creates texture `index` of face `face` and reads it.
-    int UnknownFunction43d460(int face, int index, UnknownTexturePalette* palette,
+    int LoadTexture(int face, int index, UnknownTexturePalette* palette,
                               UnknownCubeTextureContext* context);
     // 0x0043d630: seeks to the texture data and reads every missing texture.
-    int UnknownFunction43d630(UnknownTexturePalette* palette, UnknownCubeTextureContext* context);
+    int LoadMissingTextures(UnknownTexturePalette* palette, UnknownCubeTextureContext* context);
 
     UnknownTextureStream* field_0x08;
-    int field_0x0c;                             // file format (Tgafile.h)
+    int fileFormat;                             // file format (Tgafile.h)
     short field_0x10;                           // bit 1: textures are 0x800-aligned
     unsigned short field_0x12;
     Vector3 field_0x14;
     Vector3 field_0x20;
     Vector3 field_0x2c;
     UnknownCubeFace field_0x38[6];
-    int field_0x608;                            // texture data offset in the stream
-    int field_0x60c;                            // alignment base
+    int textureDataOffset;                      // texture data offset in the stream
+    int alignmentBase;                          // alignment base
     ManagedTextureGroup* field_0x610;
 };

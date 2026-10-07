@@ -30,8 +30,8 @@ public:
     // 0x004677f0: the node of the font named `name`, or 0.
     UnknownFontTextureNode* UnknownFunction4677f0(const char* name);
 
-    UnknownFontTextureNode* field_0x00;       // first node
-    int field_0x04;                           // node count
+    UnknownFontTextureNode* firstNode;        // first node
+    int nodeCount;                            // node count
 };
 
 // The type of the static object at 0x0065b478: it adds nothing to the list

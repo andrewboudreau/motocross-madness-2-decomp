@@ -13,10 +13,12 @@
 #include "../../src/reconstructed/Camera.h"
 #include "../../src/reconstructed/Display.h"
 #include "../../src/reconstructed/PCRenderTarget.h"
+#include "../../src/reconstructed/D3DConstants.h"
 
 #define TARGET() ((PCRenderTarget*)field_0x18)
 #define VIEWPORT(i) ((unsigned int)TARGET()->field_0x08->field_0x1a0[i])
 
+// A D3DFVF_TLVERTEX (screen-space backdrop corner).
 struct UnknownFogVertex {
     float x;
     float y;
@@ -32,13 +34,13 @@ struct UnknownFogVertex {
 int Fog::UnknownVirtualSlot14()
 {
     if (field_0x25_bit0) {
-        TARGET()->field_0x08->UnknownFunction42e960(1.0f, field_0x34);
+        TARGET()->field_0x08->UnknownFunction42e960(1.0f, fogEnd);
         TARGET()->field_0x08->UnknownVirtualSlot28();
         if (!TARGET()->field_0x08->UnknownVirtualSlot32(&TARGET()->field_0x08->projectionMatrix)) {
             return 0;
         }
-        if (!field_0x4c && TARGET()->field_0x04->field_0xb74_bit2
-            && (TARGET()->field_0x34 || TARGET()->field_0x250 == 2)) {
+        if (!drawnByFogOn && TARGET()->field_0x04->field_0xb74_bit2
+            && (TARGET()->field_0x34 || TARGET()->fillMode == D3DFILL_WIREFRAME)) {
             UnknownFogVertex vertices[4];
             vertices[0].x = (float)VIEWPORT(0);
             vertices[0].y = (float)VIEWPORT(1);
@@ -64,48 +66,48 @@ int Fog::UnknownVirtualSlot14()
             vertices[3].rhw = 1.0f;
             vertices[3].color = field_0x2c;
             vertices[3].specular = 0;
-            TARGET()->UnknownVirtualSlot7(0, 1, 1);
-            TARGET()->UnknownVirtualSlot7(0, 4, 1);
-            if (TARGET()->field_0x250 != 3) {
-                TARGET()->UnknownVirtualSlot8(8, 3, 0);
+            TARGET()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+            TARGET()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+            if (TARGET()->fillMode != D3DFILL_SOLID) {
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 0);
             }
-            if (!TARGET()->UnknownVirtualSlot16(6, 0x1c4, (int)vertices, 4, 0)) {
+            if (!TARGET()->UnknownVirtualSlot16(D3DPT_TRIANGLEFAN, D3DFVF_TLVERTEX, (int)vertices, 4, 0)) {
                 return 0;
             }
-            if (TARGET()->field_0x250 != 3) {
-                TARGET()->UnknownVirtualSlot8(8, TARGET()->field_0x250, 0);
+            if (TARGET()->fillMode != D3DFILL_SOLID) {
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, TARGET()->fillMode, 0);
             }
         }
-        if (field_0x48) {
+        if (renderFog) {
             float density = 1.0f;
-            TARGET()->UnknownVirtualSlot8(0x1c, 1, 0);
-            TARGET()->UnknownVirtualSlot8(0x22, field_0x2c, 0);
-            float start = field_0x30;
-            float end = field_0x34;
-            if (field_0x44 == 0x100) {
-                TARGET()->UnknownVirtualSlot8(0x24, *(int*)&start, 0);
-                TARGET()->UnknownVirtualSlot8(0x25, *(int*)&end, 0);
-                TARGET()->UnknownVirtualSlot8(0x26, *(int*)&density, 0);
+            TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 1, 0);
+            TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGCOLOR, field_0x2c, 0);
+            float start = fogStart;
+            float end = fogEnd;
+            if (field_0x44 == D3DPRASTERCAPS_FOGTABLE) {
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGSTART, *(int*)&start, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGEND, *(int*)&end, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
                 density = 0.22f;
                 if (TARGET()->field_0x04->field_0xb74_bit2) {
-                    TARGET()->UnknownVirtualSlot8(0x8c, 0, 0);
-                    TARGET()->UnknownVirtualSlot8(0x23, 1, 0);
-                    TARGET()->UnknownVirtualSlot8(0x26, *(int*)&density, 0);
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_EXP, 0);
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
                 } else {
-                    TARGET()->UnknownVirtualSlot8(0x8c, 0, 0);
-                    TARGET()->UnknownVirtualSlot8(0x23, 3, 0);
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_NONE, 0);
+                    TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_LINEAR, 0);
                 }
                 return 1;
             }
-            if (field_0x44 == 0x80) {
-                TARGET()->UnknownVirtualSlot8(0x24, *(int*)&field_0x30, 0);
-                TARGET()->UnknownVirtualSlot8(0x25, *(int*)&field_0x34, 0);
-                TARGET()->UnknownVirtualSlot8(0x26, *(int*)&density, 0);
-                TARGET()->UnknownVirtualSlot8(0x23, 0, 0);
-                TARGET()->UnknownVirtualSlot8(0x8c, 3, 0);
+            if (field_0x44 == D3DPRASTERCAPS_FOGVERTEX) {
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGSTART, *(int*)&fogStart, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGEND, *(int*)&fogEnd, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGDENSITY, *(int*)&density, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE, 0);
+                TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGVERTEXMODE, D3DFOG_LINEAR, 0);
                 return 1;
             }
-            TARGET()->UnknownVirtualSlot8(0x23, 0, 0);
+            TARGET()->UnknownVirtualSlot8(D3DRENDERSTATE_FOGTABLEMODE, D3DFOG_NONE, 0);
         }
     }
     return 1;

@@ -116,7 +116,7 @@ failed:
 }
 
 // 0x004a2900
-int MediaControl::UnknownFunction4a2900()
+int MediaControl::Restart()
 {
     if (field_0x50->UnknownMethod7(1) >= 0 && field_0x64->UnknownMethod6(0, 0, 0, 0) >= 0) {
         return 1;

@@ -30,3 +30,14 @@ Near misses (notes in the sample files): FontTexture `0x00467340` and the
 list search `0x004677f0` (retail keeps the loop test at the top), the
 loader `0x004673d0` (esi/edi saves placed before the early return in
 retail) and the list removal `0x00467760` (separate stack cleanups).
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x00467340` `FindCell`
+- `0x00467380` `SetCell`
+- `0x004673a0` `SetTexture`
+- `0x004673c0` `GetTexture`

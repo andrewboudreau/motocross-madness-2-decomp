@@ -152,7 +152,7 @@ int GridVertexCache::GetVertex(int x, int z)
             scale = node->terrain->gridCellSize;
             minY = FLT_MAX;
             maxY = -FLT_MAX;
-            field_0x2d64 = node->terrain->field_0xcb0;
+            field_0x2d64 = node->terrain->lowestQualityOverride;
             field_0x2d68 = node->terrain->field_0xc9c;
             field_0x2d6c = node->terrain->field_0xca0;
             field_0x2d70 = g_gridDrawNormalScale;
@@ -254,8 +254,8 @@ DrawableGridNode* DrawableGridNode::UnknownFunction47e600(UnknownTextureStream* 
         if (field_0x1c > boundsMax[1])
             boundsMax[1] = field_0x1c;
     }
-    stream->UnknownFunction461640(&field_0x22, 2, 1);
-    block = terrain->blocks[field_0x22];
+    stream->UnknownFunction461640(&blockIndex, 2, 1);
+    block = terrain->blocks[blockIndex];
     stream->UnknownFunction461640(&header, 4, 1);
     stream->UnknownFunction461640(words, 4, 16);
     for (i = 0; i < 16; i++) {
@@ -263,10 +263,10 @@ DrawableGridNode* DrawableGridNode::UnknownFunction47e600(UnknownTextureStream* 
             data = (GridNodeDrawData*)DebugCalloc(1, 0x540, __FILE__, 687);
             data->field_0x17c = (char*)data + 0x180;
             extra = (GridNodeExtra*)((char*)data->field_0x17c + 0xc0);
-            extra->field_0x38 = (GridBlockRecord*)((char*)extra + 0x40);
+            extra->blockRecords = (GridBlockRecord*)((char*)extra + 0x40);
             for (int j = 0; j < 16; j++) {
-                extra->field_0x38[j].field_0x00 = words[j];
-                extra->field_0x38[j].field_0x04 = 0;
+                extra->blockRecords[j].field_0x00 = words[j];
+                extra->blockRecords[j].field_0x04 = 0;
             }
             goto allocated;
         }
@@ -274,7 +274,7 @@ DrawableGridNode* DrawableGridNode::UnknownFunction47e600(UnknownTextureStream* 
     data = (GridNodeDrawData*)DebugCalloc(1, 0x1c0, __FILE__, 698);
     data->field_0x17c = 0;
     extra = (GridNodeExtra*)((char*)data + 0x180);
-    extra->field_0x38 = 0;
+    extra->blockRecords = 0;
 allocated:
     extra->field_0x0c = header;
     extra->field_0x10 = 0;
@@ -297,10 +297,10 @@ allocated:
     data->b3 = 0;
     data->b2 = terrain->field_0xc34 & 1;
     stream->UnknownFunction461640(extra, 4, 1);
-    if (extra->field_0x00) {
-        extra->field_0x04 = DebugMalloc(extra->field_0x00, __FILE__, 732);
-        g_gridExtraBytes += extra->field_0x00;
-        stream->UnknownFunction461640(extra->field_0x04, extra->field_0x00, 1);
+    if (extra->byteCount) {
+        extra->data = DebugMalloc(extra->byteCount, __FILE__, 732);
+        g_gridExtraBytes += extra->byteCount;
+        stream->UnknownFunction461640(extra->data, extra->byteCount, 1);
     }
     stream->UnknownFunction461640(&field_0x2b, 1, 1);
     stream->UnknownFunction461640(&field_0x2c, 4, 1);
@@ -366,7 +366,7 @@ int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size
             indexCount = ranges[block].indexEnd - indexStart;
         }
         if (vertexCount != 0 && (data->field_0x178 & (1 << block))) {
-            if (terrain->field_0xcb0)
+            if (terrain->lowestQualityOverride)
                 UnknownFunction480fb0(a5, (GridVertex*)data->field_0x134 + vertexStart, vertexCount,
                                       (unsigned short*)data->field_0x138 + indexStart, indexCount,
                                       g_gridQuadOrder[quad]);
@@ -382,7 +382,7 @@ int DrawableGridNode::UnknownFunction480ad0(void* target, int x, int z, int size
                 DrawableGridNode* child = (DrawableGridNode*)children[g_gridQuadCell[quad] + i + j];
                 if (child && child->childMask) {
                     if (child->data->field_0x13c != 0 && !child->data->b3) {
-                        if (terrain->field_0xcb0)
+                        if (terrain->lowestQualityOverride)
                             child->UnknownFunction480fb0(a5, (GridVertex*)child->data->field_0x134,
                                                          child->data->field_0x13c,
                                                          (unsigned short*)child->data->field_0x138,
@@ -535,13 +535,13 @@ int DrawableGridNode::UnknownFunction47f210()
             m = n;
             n = UnknownFunction47fce0(4, n, x, z + 4, 2, -2, &closed);
             if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
-                ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+                ((DrawableGridNode*)parent)->extra->texture == 0)
                 n = UnknownFunction480700(n, x, z + 4, 4, -4);
             m = n;
             x += 4;
             n = UnknownFunction47fce0(4, n, x, z, -2, 2, &closed);
             if (n == m && (data->b0 ? 0 : data->field_0x12c) == 0 && parent &&
-                ((DrawableGridNode*)parent)->extra->field_0x08 == 0)
+                ((DrawableGridNode*)parent)->extra->texture == 0)
                 n = UnknownFunction480700(n, x, z, -4, 4);
             vertexTotal += g_gridVertexCache.count;
             indexTotal += n * 3;
@@ -550,9 +550,9 @@ int DrawableGridNode::UnknownFunction47f210()
                 (g_gridVertexCache.maxY - g_gridVertexCache.minY) * terrain->gridCellSize * 0.5f;
             ((GridBlockRange*)data->field_0x17c)[b].end = vertexTotal;
             ((GridBlockRange*)data->field_0x17c)[b].indexEnd = indexTotal;
-            extra->field_0x38[b].field_0x1c = 1.0f;
-            extra->field_0x38[b].field_0x20 = 0;
-            extra->field_0x38[b].field_0x24 = 0;
+            extra->blockRecords[b].field_0x1c = 1.0f;
+            extra->blockRecords[b].field_0x20 = 0;
+            extra->blockRecords[b].field_0x24 = 0;
             if (n != 0) {
                 int vertexBytes = vertexTotal * 32;
                 int indexBytes = (indexTotal + vertexTotal) * 2;
@@ -607,7 +607,7 @@ int DrawableGridNode::UnknownFunction47f210()
         z += 4;
     }
     if (data->ageEntry.size == 0)
-        terrain->field_0xc88->UnknownFunction401050(&data->ageEntry, UnknownFunction47ecc0, this, 0,
+        terrain->ageManager->UnknownFunction401050(&data->ageEntry, UnknownFunction47ecc0, this, 0,
                                                    data->field_0x142 + data->field_0x140);
     else if (data->ageEntry.size != data->field_0x142 + data->field_0x140)
         data->ageEntry.size = data->field_0x142 + data->field_0x140;
@@ -629,9 +629,9 @@ int DrawableGridNode::UnknownFunction47f210()
 // 0x00481b30: distance from the viewer to a 4 x 4 block's box.
 float DrawableGridNode::UnknownFunction481b30(int block)
 {
-    float ex = terrain->field_0x60;
-    float ey = terrain->field_0x64;
-    float ez = terrain->field_0x68;
+    float ex = terrain->viewerX;
+    float ey = terrain->viewerY;
+    float ez = terrain->viewerZ;
     float size = (data->field_0x16c - data->field_0x164) * 0.25f;
     float minX = (block % 4) * size + data->field_0x164;
     float maxX = minX + size;
@@ -768,8 +768,8 @@ float DrawableGridNode::UnknownFunction4815e0(int coarse)
     float farZ;
     GridTerrain* t = terrain;
     GridNodeDrawData* d = data;
-    float ax = t->field_0x60 - d->field_0x164;
-    float bx = t->field_0x60 - d->field_0x16c;
+    float ax = t->viewerX - d->field_0x164;
+    float bx = t->viewerX - d->field_0x16c;
     if (ax < 0.0f) {
         nearX = ax * ax;
         farX = bx * bx;
@@ -778,11 +778,11 @@ float DrawableGridNode::UnknownFunction4815e0(int coarse)
         farX = ax * ax;
     } else {
         nearX = 0.0f;
-        float f = ((t->field_0x60 + t->field_0x60 < d->field_0x164 + d->field_0x16c) ? d->field_0x16c : d->field_0x164) - t->field_0x60;
+        float f = ((t->viewerX + t->viewerX < d->field_0x164 + d->field_0x16c) ? d->field_0x16c : d->field_0x164) - t->viewerX;
         farX = f * f;
     }
-    float az = t->field_0x68 - d->field_0x168;
-    float bz = t->field_0x68 - d->field_0x170;
+    float az = t->viewerZ - d->field_0x168;
+    float bz = t->viewerZ - d->field_0x170;
     if (az < 0.0f) {
         nearZ = az * az;
         farZ = bz * bz;
@@ -791,13 +791,13 @@ float DrawableGridNode::UnknownFunction4815e0(int coarse)
         farZ = az * az;
     } else {
         nearZ = 0.0f;
-        float f = ((t->field_0x68 + t->field_0x68 < d->field_0x170 + d->field_0x168) ? d->field_0x170 : d->field_0x168) - t->field_0x68;
+        float f = ((t->viewerZ + t->viewerZ < d->field_0x170 + d->field_0x168) ? d->field_0x170 : d->field_0x168) - t->viewerZ;
         farZ = f * f;
     }
     float near2 = nearZ + nearX;
     float far2 = farZ + farX;
-    float dyLo = t->field_0x64 - field_0x18;
-    float dyHi = t->field_0x64 - field_0x1c;
+    float dyLo = t->viewerY - field_0x18;
+    float dyHi = t->viewerY - field_0x1c;
     float dy;
     float dySq;
     if (dyLo < 0.0f) {
@@ -872,7 +872,7 @@ int DrawableGridNode::UnknownFunction481de0(void* a0, void* a1, float* center, f
     int j;
     if (size > 1) {
         g_gridBoxTests++;
-        visible = g_visibilityClipper->TestBox(terrain->field_0x18->field_0x08, (float*)a1, center, extent, 0, &corners, 0);
+        visible = g_visibilityClipper->TestBox(terrain->renderer->camera, (float*)a1, center, extent, 0, &corners, 0);
         if (corners != 8)
             corners = 0;
         if (size == 16) {
@@ -925,7 +925,7 @@ int DrawableGridNode::UnknownFunction481de0(void* a0, void* a1, float* center, f
                     } else {
                         int dummy;
                         g_gridBoxTests++;
-                        if (g_visibilityClipper->TestBox(terrain->field_0x18->field_0x08, (float*)a1, &child->center.x,
+                        if (g_visibilityClipper->TestBox(terrain->renderer->camera, (float*)a1, &child->center.x,
                                                          &child->extent.x, 0, 0, &dummy)) {
                             if (child->childMask != 0x1fffff) {
                                 child->childMask = 0x1fffff;

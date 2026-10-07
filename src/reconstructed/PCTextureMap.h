@@ -64,26 +64,26 @@ public:
     virtual void UnknownVirtualSlot19();      // 0x004c79a0: binds and applies the render states
     virtual int UnknownVirtualSlot20();       // 0x004c8430: dumps every mip level
 
-    int UnknownFunction4c7420();              // 0x004c7420: recreates a lost texture surface
+    int RestoreTextureSurface();              // 0x004c7420: recreates a lost texture surface
     // 0x004c7b40: copies `rect` of +0x70 to (x, y) in `destination`,
     // blending through `table` when given.
-    int UnknownFunction4c7b40(unsigned long x, unsigned long y, UnknownSurfaceInterface* destination,
+    int CopyRectTo(unsigned long x, unsigned long y, UnknownSurfaceInterface* destination,
                               struct UnknownRect* rect, int flags, unsigned char* table);
     // 0x004c7b00: blits +0x70 into `destination` unless `skip`.
-    int UnknownFunction4c7b00(void* destinationRect, UnknownSurfaceInterface* destination,
+    int BlitTo(void* destinationRect, UnknownSurfaceInterface* destination,
                               void* sourceRect, int flags, int skip);
     // 0x004c83a0: the mip level whose width is `width`, or 0.
-    UnknownSurfaceInterface* UnknownFunction4c83a0(int width);
-    int UnknownFunction4c84e0(UnknownSurfaceInterface* surface, const char* name); // 0x004c84e0: dumps a level
-    void UnknownFunction4c7e30(unsigned int color); // 0x004c7e30: sets the colour key
-    int UnknownFunction4c7ef0(UnknownSurfaceInterface* surface, unsigned int color); // 0x004c7ef0: keys a level
+    UnknownSurfaceInterface* FindMipLevel(int width);
+    int DumpLevel(UnknownSurfaceInterface* surface, const char* name);             // 0x004c84e0: dumps a level
+    void SetColorKey(unsigned int color);           // 0x004c7e30: sets the colour key
+    int ColorKeyLevel(UnknownSurfaceInterface* surface, unsigned int color);         // 0x004c7ef0: keys a level
     // 0x004c68e0: creates +0x70 with the first of `formats` (0-terminated)
     // the device accepts.
-    int UnknownFunction4c68e0(UnknownSurfaceDesc* desc, int flags, int* formats);
-    void UnknownFunction4c8550(UnknownSurfaceDesc* desc, const char* name); // 0x004c8550: writes a level
+    int CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* formats);
+    void WriteLevel(UnknownSurfaceDesc* desc, const char* name);            // 0x004c8550: writes a level
 
     UnknownSurfaceInterface* field_0x70;      // system-memory surface (counted in DirectX memory)
     UnknownSurfaceInterface* field_0x74;      // texture surface
     void* field_0x78;                         // palette for 8-bit textures
-    UnknownVideoDecoder* field_0x7c;
+    UnknownVideoDecoder* videoDecoder;
 };

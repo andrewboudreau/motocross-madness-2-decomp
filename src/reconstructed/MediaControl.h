@@ -108,13 +108,13 @@ public:
     // at its end. Releases itself and returns 0 when it fails.
     MediaControl* UnknownFunction4a2560(void* target, const char* file, void (*done)(UIDialog* dialog),
                                         UIDialog* owner);
-    int UnknownFunction4a2900();              // 0x004a2900: restarts the movie
-    void UnknownFunction4a2940();             // 0x004a2940: stops the movie
-    int UnknownFunction4a29f0(__int64 time);  // 0x004a29f0: seeks
-    int UnknownFunction4a2a10();              // 0x004a2a10: seeks to the start
-    int UnknownFunction4a2a20();              // 0x004a2a20: 1 while running
-    int UnknownFunction4a2a50(__int64* time); // 0x004a2a50
-    int UnknownFunction4a2a70(__int64* duration); // 0x004a2a70
+    int Restart();              // 0x004a2900: restarts the movie
+    void Stop();             // 0x004a2940: stops the movie
+    int Seek(__int64 time);  // 0x004a29f0: seeks
+    int SeekToStart();              // 0x004a2a10: seeks to the start
+    int IsRunning();              // 0x004a2a20: 1 while running
+    int GetPosition(__int64* time); // 0x004a2a50
+    int GetDuration(__int64* duration); // 0x004a2a70
     // 0x004a2a90: blits the frame into `destination`.
     long UnknownFunction4a2a90(UnknownSurfaceInterface* destination, void* destinationRect,
                                void* sourceRect, int flags);

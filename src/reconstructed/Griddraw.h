@@ -59,7 +59,7 @@ public:
                                      unsigned short* indices, int indexCount, int flags) = 0;
 
     void* field_0x04;
-    GridCamera* field_0x08;                    // +0x08 the camera the box test takes (0x00481de0)
+    GridCamera* camera;                        // +0x08 the camera the box test takes (0x00481de0)
 };
 
 // Boundary view of ManagedTexture (src/reconstructed binds 0x00510910 as
@@ -88,10 +88,10 @@ public:
 // texture-stage values restored after a close-up draw.
 struct GridGameSettings {
     unsigned char field_0x000[0x2d0];
-    int field_0x2d0;
+    int softwareRenderer;
     unsigned char field_0x2d4[0x550 - 0x2d4];
-    int field_0x550;
-    int field_0x554;
+    int minFilter;
+    int mipFilter;
 };
 extern GridGameSettings* g_gridGameSettings;          // 0x0056e26c
 
@@ -123,31 +123,31 @@ extern GridVisibilityClipper* g_visibilityClipper;   // 0x00575a98
 // src/krusty2/broadphase/Terrain.h). Only the members this file touches.
 struct GridTerrain {
     unsigned char field_0x000[0x18];
-    GridRenderDevice* field_0x18;              // +0x18
+    GridRenderDevice* renderer;                // +0x18
     unsigned char field_0x01c[0x2c - 0x1c];
-    GridVertexLighter field_0x2c;              // +0x2c
-    int field_0x38;                            // +0x38 enables texture coordinate updates
+    GridVertexLighter vertexLighter;           // +0x2c
+    int updateTextureCoordinates;              // +0x38 enables texture coordinate updates
     unsigned char field_0x03c[0x40 - 0x3c];
     float gridCellSize;                        // +0x40
     unsigned char field_0x044[0x60 - 0x44];
-    float field_0x60;                          // +0x60..+0x68 viewer position (0x00481cc0)
-    float field_0x64;
-    float field_0x68;
+    float viewerX;                             // +0x60..+0x68 viewer position (0x00481cc0)
+    float viewerY;
+    float viewerZ;
     int field_0x6c;
     int field_0x70;
     float field_0x74;
     float field_0x78;                          // +0x78 distance factor (Terrain.h: ratio squared)
     unsigned char field_0x07c[0x88 - 0x7c];
-    int field_0x88;                            // +0x88 indices drawn
-    int field_0x8c;                            // +0x8c vertices drawn
+    int indicesDrawn;                          // +0x88 indices drawn
+    int verticesDrawn;                         // +0x8c vertices drawn
     int field_0x90;                            // +0x90 incremented per vertex error test
     int field_0x94;
     int field_0x98;                            // +0x98 incremented per detail update (0x004815e0)
     int field_0x9c;                            // +0x9c incremented by 0x00482dd0
     int field_0xa0;                            // +0xa0 incremented by 0x00482c90
     int field_0xa4;                            // +0xa4 incremented per buffer rebuild (0x0047f840)
-    int field_0xa8;                            // +0xa8 vertices pinned by 0x00482760
-    int field_0xac;                            // +0xac vertices released by 0x00482760
+    int verticesPinned;                        // +0xa8 vertices pinned by 0x00482760
+    int verticesReleased;                      // +0xac vertices released by 0x00482760
     int field_0xb0;                            // +0xb0 incremented per vertex test (0x00482a40)
     int field_0xb4;                            // +0xb4 copied to the draw data's +0x130
     int field_0xb8[17 * 17];                   // +0xb8 cleared by the first node constructor
@@ -159,11 +159,11 @@ struct GridTerrain {
     unsigned char field_0xc35[3];
     int field_0xc38;                           // +0xc38 stream offset of the child tables
     int field_0xc3c;
-    GridVertexSink* field_0xc40;               // +0xc40
-    float field_0xc44[16];                     // +0xc44 transform
+    GridVertexSink* vertexSink;                // +0xc40
+    float transform[16];                       // +0xc44 transform
     int field_0xc84;
-    GridAgeManager* field_0xc88;               // +0xc88
-    GridCamera* field_0xc8c;                   // +0xc8c
+    GridAgeManager* ageManager;                // +0xc88
+    GridCamera* camera;                        // +0xc8c
     unsigned char field_0xc90[0xc9c - 0xc90];
     union {
         float field_0xc9c;                     // +0xc9c
@@ -173,10 +173,10 @@ struct GridTerrain {
         float field_0xca0;                     // +0xca0
         int unlitSpecular;
     };
-    int field_0xca4;                           // +0xca4 detail limit for the close-up stage state
-    int field_0xca8;
+    int qualityParamA;                         // +0xca4 detail limit for the close-up stage state
+    int qualityParamB;
     int field_0xcac;
-    int field_0xcb0;                           // +0xcb0
+    int lowestQualityOverride;                 // +0xcb0
     int field_0xcb4;                           // +0xcb4 close-up stage state set
 };
 
@@ -241,7 +241,7 @@ public:
     float field_0x18;
     float field_0x1c;
     unsigned short field_0x20;                 // +0x20 compared with the draw data's +0x122
-    unsigned short field_0x22;                 // +0x22 index into Terrain::blocks
+    unsigned short blockIndex;                 // +0x22 index into Terrain::blocks
     unsigned short gridX;                      // +0x24 position in units of 16 << shift
     unsigned short gridZ;                      // +0x26
     unsigned char level;                       // +0x28
@@ -261,23 +261,23 @@ struct GridBlockRecord {
     float field_0x1c;                          // +0x1c set to 1.0 after a rebuild (0x0047f210)
     float field_0x20;
     float field_0x24;
-    float field_0x28;                          // +0x28 detail of the block
+    float detail;                              // +0x28 detail of the block
 };
 
 // Block at DrawableGridNode+0x3c (inside the draw data at +0x180, or +0x240
 // for nodes with per-block ranges). Offsets tier 2.
 struct GridNodeExtra {
-    int field_0x00;                            // +0x00 byte count read from the stream
-    void* field_0x04;                          // +0x04 DebugMalloc'd, field_0x00 bytes
-    GridManagedTexture* field_0x08;            // +0x08 tested before slot 4(-1)
+    int byteCount;                             // +0x00 byte count read from the stream
+    void* data;                                // +0x04 DebugMalloc'd, field_0x00 bytes
+    GridManagedTexture* texture;               // +0x08 tested before slot 4(-1)
     int field_0x0c;
     int field_0x10;
     unsigned char field_0x14[0x28 - 0x14];
     float field_0x28;                          // +0x28 set to 1.0 after a rebuild
     float field_0x2c;
     float field_0x30;
-    float field_0x34;                          // +0x34 detail of the whole node
-    GridBlockRecord* field_0x38;               // +0x38 sixteen records or null
+    float detail;                              // +0x34 detail of the whole node
+    GridBlockRecord* blockRecords;             // +0x38 sixteen records or null
     unsigned char field_0x3c[4];
 };
 

@@ -49,7 +49,7 @@ MediaControl::MediaControl(int a)
 // 0x004a2490
 MediaControl::~MediaControl()
 {
-    UnknownFunction4a2940();
+    Stop();
     if (field_0x2c) {
         field_0x2c->UnknownMethod2();
         field_0x2c = 0;
@@ -94,11 +94,11 @@ int MediaControl::UnknownVirtualSlot10(float frameTime)
     if (!field_0x64) {
         return 0;
     }
-    if (UnknownFunction4a2a20()) {
-        UnknownFunction4a2a50(&time);
-        UnknownFunction4a2a70(&duration);
+    if (IsRunning()) {
+        GetPosition(&time);
+        GetDuration(&duration);
         if (time >= duration) {
-            UnknownFunction4a2940();
+            Stop();
             if (field_0x70) {
                 field_0x70(field_0x74);
             }
@@ -127,10 +127,10 @@ int MediaControl::UnknownVirtualSlot18()
 }
 
 // 0x004a2940
-void MediaControl::UnknownFunction4a2940()
+void MediaControl::Stop()
 {
-    if (UnknownFunction4a2a20() && field_0x50->UnknownMethod7(0) >= 0) {
-        UnknownFunction4a2a10();
+    if (IsRunning() && field_0x50->UnknownMethod7(0) >= 0) {
+        SeekToStart();
     }
 }
 
@@ -139,31 +139,31 @@ int MediaControl::UnknownVirtualSlot16(int value)
 {
     if (value) {
         if (!field_0x25_bit2) {
-            field_0x78_bit0 = UnknownFunction4a2a20();
-            UnknownFunction4a2a50(&field_0x68);
+            field_0x78_bit0 = IsRunning();
+            GetPosition(&field_0x68);
             field_0x50->UnknownMethod7(0);
         }
     } else if (field_0x78_bit0) {
-        UnknownFunction4a29f0(field_0x68);
+        Seek(field_0x68);
         field_0x50->UnknownMethod7(1);
     }
     return GameObject::UnknownVirtualSlot16(value);
 }
 
 // 0x004a29f0
-int MediaControl::UnknownFunction4a29f0(__int64 time)
+int MediaControl::Seek(__int64 time)
 {
     return field_0x50->UnknownMethod10(time) >= 0;
 }
 
 // 0x004a2a10
-int MediaControl::UnknownFunction4a2a10()
+int MediaControl::SeekToStart()
 {
-    return UnknownFunction4a29f0(0);
+    return Seek(0);
 }
 
 // 0x004a2a20
-int MediaControl::UnknownFunction4a2a20()
+int MediaControl::IsRunning()
 {
     int state;
     if (field_0x50->UnknownMethod6(&state) >= 0 && state == 1) {
@@ -173,13 +173,13 @@ int MediaControl::UnknownFunction4a2a20()
 }
 
 // 0x004a2a50
-int MediaControl::UnknownFunction4a2a50(__int64* time)
+int MediaControl::GetPosition(__int64* time)
 {
     return field_0x50->UnknownMethod8(time) >= 0;
 }
 
 // 0x004a2a70
-int MediaControl::UnknownFunction4a2a70(__int64* duration)
+int MediaControl::GetDuration(__int64* duration)
 {
     return field_0x50->UnknownMethod9(duration) >= 0;
 }

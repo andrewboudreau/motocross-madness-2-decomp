@@ -61,15 +61,15 @@ struct Grid1Terrain {
     ManagedTexture* AcquireOwnedObject();        // 0x00505600 (Terrain.h's name)
 
     unsigned char field_0x000[0x18];
-    GridRenderDevice* field_0x18;              // +0x18
+    GridRenderDevice* renderer;                // +0x18
     unsigned char field_0x01c[0x70 - 0x1c];
     int field_0x70;                            // +0x70
     unsigned char field_0x074[0x544 - 0x74];
     ManagedTexture* textures[(0xbec - 0x544) / 4];  // +0x544
     unsigned char field_0xbec[0xc24 - 0xbec];
-    int field_0xc24;                           // +0xc24 pixel format of the node textures
+    int nodeTextureFormat;                     // +0xc24 pixel format of the node textures
     unsigned char field_0xc28[0xc84 - 0xc28];
-    GridAgeManager* field_0xc84;               // +0xc84 texture AgeManager
+    GridAgeManager* textureAgeManager;         // +0xc84 texture AgeManager
 };
 
 // Grid1.cpp's view of the host object at Terrain+0x18 (Terrain.h: its +8
@@ -110,8 +110,8 @@ public:
 
 // AgeManager eviction callbacks registered for the node-wide texture and for
 // one block's texture (tier 3).
-int UnknownFunction47ca00(void* owner);
-int UnknownFunction47ca40(void* owner, int block);
+int EvictNodeTexture(void* owner);
+int EvictBlockTexture(void* owner, int block);
 
 // Texture use table (defined with Terrain's data; tier 3 names).
 extern int g_gridTextureCount;                 // 0x0068a2ec

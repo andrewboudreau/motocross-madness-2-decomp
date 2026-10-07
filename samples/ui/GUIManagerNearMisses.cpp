@@ -31,75 +31,75 @@
 #include "../../src/reconstructed/GUIManager.cpp"
 
 // 0x004853b0
-GUIManager* GUIManager::UnknownFunction4853b0(void* target, Palette8* palette, TextureMapManager* textures,
-                                              BackgroundImage* background, int startSound, SoundGroup* sound,
-                                              const char* font, int fontSize, const char* cursor,
-                                              int callback) {
+GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager* textures,
+                              BackgroundImage* background, int startSound, SoundGroup* sound,
+                              const char* font, int fontSize, const char* cursor,
+                              int callback) {
     ControlInterface* controls;
     int i;
 
     GameObject::UnknownVirtualSlot8(target);
-    field_0xd8 = textures;
-    field_0x44 = sound;
+    guiTextures = textures;
+    guiSoundGroup = sound;
     if (startSound && SoundSystem()->UnknownFunction4be5a0(22050, 1, 16, 4000000, 0) == 0)
         SoundSystem()->UnknownFunction4be910(22050, 1, 16);
     if (!sound) {
-        field_0x44 = new(__FILE__, 130) SoundGroup(1);
-        UnknownFunction469190(field_0x44, -1);
-        field_0x4c = 1;
+        guiSoundGroup = new(__FILE__, 130) SoundGroup(1);
+        UnknownFunction469190(guiSoundGroup, -1);
+        ownsSoundGroup = 1;
     }
-    field_0x344 = (GameObject*)UnknownFunction469190(new(__FILE__, 136) UIDlgContainer, -1);
+    dialogContainer = (GameObject*)UnknownFunction469190(new(__FILE__, 136) UIDlgContainer, -1);
     field_0x38 = palette;
-    field_0x34 = palette;
-    field_0x3c = background;
-    strcpy(field_0x50, font);
-    field_0xd0 = fontSize;
+    guiPalette = palette;
+    guiBackground = background;
+    strcpy(dialogFontName, font);
+    dialogFontSize = fontSize;
     if (cursor)
-        strcpy(field_0x200, cursor);
+        strcpy(cursorImage, cursor);
     UnknownVirtualSlot18();
     field_0xd4 = callback;
-    field_0x1fc = CreateFontA(12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 2, 2, "Arial");
+    toolTipFont = CreateFontA(12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 2, 2, "Arial");
     controls = g_UnknownGlobal56e26c->field_0x14;
     if (controls->mouse) {
-        field_0x308 = (GUIInputDevice*)UnknownFunction469190(
+        mouseDevice = (GUIInputDevice*)UnknownFunction469190(
             (new(__FILE__, 162) GUIInputDevice)
-                ->UnknownFunction486fb0(field_0x18, (InputDevice*)controls->mouse, 0, 0, 0, 0),
+                ->Bind(field_0x18, (InputDevice*)controls->mouse, 0, 0, 0, 0),
             -1);
-        field_0x308->UnknownFunction469260(field_0x344, -1);
-        field_0x308->UnknownFunction487150();
+        mouseDevice->UnknownFunction469260(dialogContainer, -1);
+        mouseDevice->Rebind();
     }
     if (controls->keyboard) {
-        field_0x30c = (GUIInputDevice*)UnknownFunction469190(
+        keyboardDevice = (GUIInputDevice*)UnknownFunction469190(
             (new(__FILE__, 169) GUIInputDevice)
-                ->UnknownFunction486fb0(field_0x18, (InputDevice*)controls->keyboard, 0, 0, 0, 0),
+                ->Bind(field_0x18, (InputDevice*)controls->keyboard, 0, 0, 0, 0),
             -1);
-        field_0x30c->UnknownFunction469260(field_0x344, -1);
-        field_0x30c->UnknownFunction487150();
+        keyboardDevice->UnknownFunction469260(dialogContainer, -1);
+        keyboardDevice->Rebind();
     }
     if (controls->joystickCount) {
         for (i = 0; i < controls->joystickCount; i++) {
-            field_0x310[i] = (GUIInputDevice*)UnknownFunction469190(
+            joystickDevices[i] = (GUIInputDevice*)UnknownFunction469190(
                 (new(__FILE__, 177) GUIInputDevice)
-                    ->UnknownFunction486fb0(field_0x18, (InputDevice*)controls->joysticks[i], -2.0f, 2.0f, -2.0f,
-                                            2.0f),
+                    ->Bind(field_0x18, (InputDevice*)controls->joysticks[i], -2.0f, 2.0f, -2.0f,
+                           2.0f),
                 -1);
-            field_0x310[i]->UnknownFunction469260(field_0x344, -1);
-            field_0x310[i]->UnknownFunction487150();
+            joystickDevices[i]->UnknownFunction469260(dialogContainer, -1);
+            joystickDevices[i]->Rebind();
         }
     }
-    field_0x330[0] = (GUIUser*)UnknownFunction469190(
+    users[0] = (GUIUser*)UnknownFunction469190(
         (new(__FILE__, 188) GUIUser)->UnknownFunction487650(field_0x18, this), -1);
-    if (field_0x330[0]) {
-        field_0x340 = 1;
-        field_0x330[0]->UnknownFunction487d00();
-        if (field_0x308) {
-            field_0x330[0]->UnknownFunction488120(field_0x308);
+    if (users[0]) {
+        userCount = 1;
+        users[0]->AcceptKeyboardAndJoysticks();
+        if (mouseDevice) {
+            users[0]->SetPointerDevice(mouseDevice);
             UnknownFunction486590(0, 1);
             UnknownFunction4865e0(0, 0);
         }
     }
-    field_0x330[0]->UnknownFunction487990(0);
-    field_0x348 = LoadLibraryA("uilang.dll");
+    users[0]->EnableImeInput(0);
+    languageModule = LoadLibraryA("uilang.dll");
     return this;
 }
 
@@ -111,7 +111,7 @@ UnknownGuiDialog* GUIManager::UnknownFunction485a70(UnknownGuiDialog* dialog, in
 
     if (!(flags & 4) && !(flags & 2)) {
         if (!UnknownFunction485df0() || !UnknownFunction485df0()->field_0x148)
-            UnknownFunction4860f0();
+            ReleaseBackgroundGrab();
     } else {
         rect = 0;
         if (flags & 0x10) {
@@ -123,27 +123,27 @@ UnknownGuiDialog* GUIManager::UnknownFunction485a70(UnknownGuiDialog* dialog, in
         if (parent)
             parent->UnknownFunction470070(1, flags & 8, rect);
         else if ((flags & 4) && (flags & 0x10))
-            UnknownFunction4860a0(flags & 8);
+            GrabBackground(flags & 8);
     }
     if (wait)
-        UnknownFunction4865e0(field_0x280, field_0x1f0 == 0);
-    if (dialog->UnknownVirtualSlot27(field_0x18, b, a, flags, field_0x44, field_0xd8, field_0xf0, parent,
-                                     field_0x3c, field_0x50, field_0xd0, this, field_0x330[0], d)) {
+        UnknownFunction4865e0(waitCursorImage, field_0x1f0 == 0);
+    if (dialog->UnknownVirtualSlot27(field_0x18, b, a, flags, guiSoundGroup, guiTextures, dialogDirectory, parent,
+                                     guiBackground, dialogFontName, dialogFontSize, this, users[0], d)) {
         dialog->field_0x144 = flags;
         UnknownFunction485bd0(dialog, a, wait);
         return dialog;
     }
     if (wait)
-        UnknownFunction4865e0(field_0x200, field_0x1f0 == 0);
+        UnknownFunction4865e0(cursorImage, field_0x1f0 == 0);
     return 0;
 }
 
 // 0x00485c80
-int GUIManager::UnknownFunction485c80(const char* resource) {
-    UnknownFunction485d50();
-    field_0x30 = (UnknownGuiDialog*)new(__FILE__, 523) UIDialog(0, resource);
-    if (field_0x30) {
-        field_0x30->UnknownVirtualSlot27(field_0x18, 0, 0, 0, field_0x44, field_0xd8, field_0xf0, 0, 0, "Arial",
+int GUIManager::OpenDialogResource(const char* resource) {
+    CloseDialogResource();
+    openedDialog = (UnknownGuiDialog*)new(__FILE__, 523) UIDialog(0, resource);
+    if (openedDialog) {
+        openedDialog->UnknownVirtualSlot27(field_0x18, 0, 0, 0, guiSoundGroup, guiTextures, dialogDirectory, 0, 0, "Arial",
                                          14, 0, 0, 0);
         return 1;
     }
@@ -151,7 +151,7 @@ int GUIManager::UnknownFunction485c80(const char* resource) {
 }
 
 // 0x00486170
-PCTextureMap* GUIManager::UnknownFunction486170(int dim, CameraRect* rect) {
+PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
     UnknownSurfaceDesc desc;
     UnknownSurfaceInterface* surface;
     UnknownDisplay* display;
@@ -176,8 +176,8 @@ PCTextureMap* GUIManager::UnknownFunction486170(int dim, CameraRect* rect) {
 
     format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
     bytesPerPixel = UnknownFunction511970(format);
-    if (field_0x3c)
-        field_0x3c->UnknownFunction404c80();
+    if (guiBackground)
+        guiBackground->UnknownFunction404c80();
     g_UnknownGlobal56e26c->field_0x34->UnknownFunction468dd0("GUICursor");
     g_UnknownGlobal56e26c->field_0x34->UnknownFunction468dd0("ToolTip");
     g_UnknownGlobal56e26c->UnknownVirtualSlot8();
@@ -240,7 +240,7 @@ PCTextureMap* GUIManager::UnknownFunction486170(int dim, CameraRect* rect) {
                 }
             }
         }
-        texture = new(__FILE__, 916) PCTextureMap(field_0xd8, 1);
+        texture = new(__FILE__, 916) PCTextureMap(guiTextures, 1);
         texture->UnknownVirtualSlot4(bits, width, height, width, width, format, format, 0, 4, 0, 0, 0, 2, 1, 0, 0x80,
                                      0xff00ff);
         DebugFree(bits, __FILE__, 921);
@@ -251,20 +251,20 @@ PCTextureMap* GUIManager::UnknownFunction486170(int dim, CameraRect* rect) {
 // 0x00486b10
 void ToolTip::UnknownFunction486b10(UnknownGuiControl* control) {
     int position[2];
-    GUIInputDevice* device = control->field_0xb8->field_0x34->field_0x2c;
+    GUIInputDevice* device = control->ownerDialog->guiUser->pointerDevice;
 
     if (device) {
-        position[0] = device->field_0xa4.x;
-        position[1] = device->field_0xa4.y + 16;
+        position[0] = device->pointerPosition.x;
+        position[1] = device->pointerPosition.y + 16;
     } else {
-        position[0] = control->field_0x3c.left + (control->field_0x3c.right - control->field_0x3c.left) / 2;
-        position[1] = control->field_0x3c.bottom;
+        position[0] = control->area.left + (control->area.right - control->area.left) / 2;
+        position[1] = control->area.bottom;
     }
-    UnknownFunction486b80(control->field_0xf0, position, 1.0f);
+    ShowText(control->toolTipText, position, 1.0f);
 }
 
 // 0x00486b80
-void ToolTip::UnknownFunction486b80(const char* text, int* position, float time) {
+void ToolTip::ShowText(const char* text, int* position, float time) {
     PCRenderTarget* target;
     PCTextureMap* texture;
     HDC dc;
@@ -274,17 +274,17 @@ void ToolTip::UnknownFunction486b80(const char* text, int* position, float time)
     int height;
     int x;
 
-    if (field_0x30) {
-        field_0x30->Release();
-        field_0x30 = 0;
+    if (textTexture) {
+        textTexture->Release();
+        textTexture = 0;
     }
     if (text) {
-        if (field_0x2c->field_0x3c && field_0x34 == -1) {
-            field_0x34 = field_0x2c->field_0x3c->UnknownFunction4040f0(0);
-            field_0x38 = 3;
+        if (tipGui->guiBackground && backgroundRegion == -1) {
+            backgroundRegion = tipGui->guiBackground->UnknownFunction4040f0(0);
+            restoreFrames = 3;
         }
         if (!((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod17((void**)&dc)) {
-            previous = SelectObject(dc, (HGDIOBJ)field_0x2c->field_0x1fc);
+            previous = SelectObject(dc, (HGDIOBJ)tipGui->toolTipFont);
             GetTextExtentPoint32A(dc, text, strlen(text), &size);
             SelectObject(dc, previous);
             ((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod26(dc);
@@ -293,40 +293,40 @@ void ToolTip::UnknownFunction486b80(const char* text, int* position, float time)
             if (width >= target->field_0x0c - 2)
                 width = target->field_0x0c - 2;
             height = size.cy + 2;
-            field_0x4c.top = 0;
-            field_0x4c.left = 0;
-            field_0x4c.right = width;
-            field_0x4c.bottom = height;
-            field_0x3c.left = position[0];
-            field_0x3c.top = position[1];
-            x = field_0x3c.left - width / 2;
+            textArea.top = 0;
+            textArea.left = 0;
+            textArea.right = width;
+            textArea.bottom = height;
+            screenArea.left = position[0];
+            screenArea.top = position[1];
+            x = screenArea.left - width / 2;
             x = x < 0 ? 0 : x;
-            field_0x3c.left = __min(target->field_0x0c - width, x);
-            field_0x3c.top = __min(target->field_0x10 - height, field_0x3c.top);
-            field_0x3c.right = field_0x3c.left + width;
-            field_0x3c.bottom = field_0x3c.top + height;
-            texture = field_0x2c->UnknownFunction486740(width, height, 0x808080);
-            field_0x30 = texture;
+            screenArea.left = __min(target->field_0x0c - width, x);
+            screenArea.top = __min(target->field_0x10 - height, screenArea.top);
+            screenArea.right = screenArea.left + width;
+            screenArea.bottom = screenArea.top + height;
+            texture = tipGui->CreateFilledTexture(width, height, 0x808080);
+            textTexture = texture;
             if (texture && texture->field_0x70) {
                 if (!texture->field_0x70->UnknownMethod17((void**)&dc)) {
-                    previous = SelectObject(dc, (HGDIOBJ)field_0x2c->field_0x1fc);
+                    previous = SelectObject(dc, (HGDIOBJ)tipGui->toolTipFont);
                     SetTextColor(dc, 0xcccccc);
                     SetBkColor(dc, 0x404040);
-                    DrawTextA(dc, text, strlen(text), &field_0x4c, 0x8025);
+                    DrawTextA(dc, text, strlen(text), &textArea, 0x8025);
                     SelectObject(dc, previous);
                     texture->field_0x70->UnknownMethod26(dc);
                 }
-                field_0x64 = 1;
-                field_0x60 = time;
+                shown = 1;
+                showDelay = time;
                 return;
             }
-            field_0x64 = 0;
-            field_0x60 = -1.0f;
+            shown = 0;
+            showDelay = -1.0f;
             return;
         }
     }
-    field_0x64 = 0;
-    field_0x60 = -1.0f;
+    shown = 0;
+    showDelay = -1.0f;
 }
 
 // 0x00487870
@@ -338,17 +338,17 @@ int GUIUser::UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl
     if (result) {
         if (field_0x1d8 && !field_0x1d8->field_0x25_bit3 && field_0x1d8 != control)
             field_0x1d8->UnknownVirtualSlot32(control);
-        if (field_0x1d4 && !field_0x1d4->field_0x25_bit3 && field_0x1d4 != control)
-            field_0x1d4->UnknownVirtualSlot33(control);
+        if (focusControl && !focusControl->field_0x25_bit3 && focusControl != control)
+            focusControl->UnknownVirtualSlot33(control);
         if (previous)
-            *previous = field_0x1d4;
+            *previous = focusControl;
         field_0x1d8 = control;
-        field_0x1d4 = control;
+        focusControl = control;
         if (g_UnknownGlobal56e26c->field_0x0c->field_0x6c) {
-            if (control->field_0x5c == 11) {
-                UnknownFunction487990(!control->field_0x210 || strcmp(control->field_0x210, "0123456789") != 0);
+            if (control->controlType == 11) {
+                EnableImeInput(!control->acceptedCharacters || strcmp(control->acceptedCharacters, "0123456789") != 0);
             } else {
-                UnknownFunction487990(0);
+                EnableImeInput(0);
             }
         }
     }
@@ -356,16 +356,16 @@ int GUIUser::UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl
 }
 
 // 0x00488120
-int GUIUser::UnknownFunction488120(GUIInputDevice* device) {
-    GUIUser* owner = device ? device->field_0xc0 : 0;
+int GUIUser::SetPointerDevice(GUIInputDevice* device) {
+    GUIUser* owner = device ? device->ownerUser : 0;
 
     if (owner) {
         if (owner != this)
             return 0;
     } else {
-        field_0x2c = device;
+        pointerDevice = device;
         if (device)
-            device->field_0xc0 = this;
+            device->ownerUser = this;
     }
     return 1;
 }

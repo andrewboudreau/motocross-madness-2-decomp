@@ -9,15 +9,15 @@ UnknownFontTextureManager FontTexture::s_UnknownManager65b478;
 
 // 0x00467180
 FontTexture::FontTexture(unsigned int count, const char* name)
-    : field_0x04(0), field_0x08(new(__FILE__, 22) EArray<CharacterCell*>(count)), field_0x0c(0) {
+    : fontName(0), cells(new(__FILE__, 22) EArray<CharacterCell*>(count)), field_0x0c(0) {
     int length;
     unsigned int i;
 
     length = strlen(name);
-    field_0x04 = new(__FILE__, 25) char[length + 1];
-    strcpy(field_0x04, name);
+    fontName = new(__FILE__, 25) char[length + 1];
+    strcpy(fontName, name);
     for (i = 0; i < count; i++)
-        (*field_0x08)[i] = 0;
+        (*cells)[i] = 0;
 }
 
 // 0x00467280
@@ -32,18 +32,18 @@ FontTexture::~FontTexture() {
     unsigned int i;
 
     s_UnknownManager65b478.UnknownFunction467760(this);
-    count = field_0x08->Count();
+    count = cells->Count();
     for (i = 0; i < count; i++) {
-        if ((*field_0x08)[i]) {
-            CharacterCell* cell = (*field_0x08)[i];
-            (*field_0x08)[i] = 0;
+        if ((*cells)[i]) {
+            CharacterCell* cell = (*cells)[i];
+            (*cells)[i] = 0;
             delete cell;
         }
     }
-    delete field_0x04;
-    field_0x04 = 0;
-    delete field_0x08;
-    field_0x08 = 0;
+    delete fontName;
+    fontName = 0;
+    delete cells;
+    cells = 0;
     if (field_0x0c) {
         field_0x0c->Release();
         field_0x0c = 0;
@@ -51,21 +51,21 @@ FontTexture::~FontTexture() {
 }
 
 // 0x00467380
-void FontTexture::UnknownFunction467380(unsigned int index, CharacterCell* cell) {
-    (*field_0x08)[index] = cell;
+void FontTexture::SetCell(unsigned int index, CharacterCell* cell) {
+    (*cells)[index] = cell;
 }
 
 // 0x004673a0
-void FontTexture::UnknownFunction4673a0(TextureMap* texture) {
+void FontTexture::SetTexture(TextureMap* texture) {
     field_0x0c = texture;
 }
 
 // 0x004673b0
 const char* FontTexture::UnknownFunction4673b0() {
-    return field_0x04;
+    return fontName;
 }
 
 // 0x004673c0
-TextureMap* FontTexture::UnknownFunction4673c0() {
+TextureMap* FontTexture::GetTexture() {
     return field_0x0c;
 }

@@ -63,15 +63,15 @@ public:
 
     // soultree.cpp helpers (thiscall).
     int UnknownFunction4fda30();                                   // 0x004fda30: node count of the subtree
-    void UnknownFunction4fda60(int* index, SoultreeObject** nodes); // 0x004fda60: collects the subtree
+    void CollectDescendants(int* index, SoultreeObject** nodes);    // 0x004fda60: collects the subtree
     void UnknownFunction4fdb40();                                  // 0x004fdb40
     void UnknownFunction4fdb50();                                  // 0x004fdb50
-    void UnknownFunction4fdb60(UnknownTextureStream* stream, int a); // 0x004fdb60: reads a .slt stream
+    void LoadFromParameters(UnknownTextureStream* stream, int a);    // 0x004fdb60: reads a .slt stream
     void UnknownFunction4fe0a0(Vector3* a, Vector3* b);            // 0x004fe0a0
     void UnknownFunction4fe0f0();                                  // 0x004fe0f0
-    void UnknownFunction4fb4f0();                                  // 0x004fb4f0: world matrix
+    void UpdateWorldMatrix();                                      // 0x004fb4f0: world matrix
     Vector3 UnknownFunction4fd660(const Vector3& p);               // 0x004fd660: local -> world point
-    void UnknownFunction4fedb0();                                  // 0x004fedb0: registers the node
+    void RegisterNode();                                           // 0x004fedb0: registers the node
     // Seen from Krusty3DObjects.cpp (src/krusty2/core/SoultreeObject.h
     // describes the same functions): 0x004fc690 (ret 0x10) moves the node
     // by `delta` in `frame`, 0x004fd090 (ret 0x10) sets the rotation about
@@ -79,19 +79,19 @@ public:
     // (ret 4) unlinks `child`.
     void UnknownFunction4fc690(SoultreeObject* frame, Vector3 delta);
     void UnknownFunction4fd090(float x, float y, float z, float angle);
-    void UnknownFunction4fd910(SoultreeObject* child);
+    void AddChild(SoultreeObject* child);
     void UnknownFunction4fd990(SoultreeObject* child);
 
     char field_0x038[0x80];                    // name
-    Matrix4 field_0x0b8;                       // local matrix
-    Matrix4 field_0x0f8;                       // world matrix
-    int field_0x138;                           // world matrix valid
-    SoultreeObject* field_0x13c;               // parent
-    SoultreeObject* field_0x140;               // first child
-    SoultreeObject* field_0x144;               // next sibling
+    Matrix4 localMatrix;                       // local matrix
+    Matrix4 worldMatrix;                       // world matrix
+    int worldValid;                            // world matrix valid
+    SoultreeObject* parent;                    // parent
+    SoultreeObject* firstChild;                // first child
+    SoultreeObject* nextSibling;               // next sibling
     unsigned char field_0x148[0x14c - 0x148];
     int field_0x14c;                           // Krusty3DObjects.cpp: hidden
-    int field_0x150;                           // bounds found (slot 5)
+    int boundsFound;                           // bounds found (slot 5)
     int field_0x154;                           // bounds valid
     Vector3 field_0x158;                       // bounds centre
     Vector3 field_0x164;                       // bounds half extent
@@ -101,50 +101,50 @@ public:
     int field_0x18c;                           // subtree dirty
     int field_0x190;                           // slot 12 tests it before the visibility test
     unsigned char field_0x194[0x1a0 - 0x194];
-    UnknownParameterBlock* field_0x1a0;        // .slt reader
+    UnknownParameterBlock* parameterBlock;     // .slt reader
 };
 
 // One 0x20-byte vertex in the D3DLVERTEX layout (drawn with FVF 0x1e2):
 // position, reserved, colour, specular, texture coordinates.
 struct UnknownSoultreeVertex {
-    Vector3 field_0x00;
-    int field_0x0c;
-    unsigned int field_0x10;
-    unsigned int field_0x14;
-    float field_0x18;
-    float field_0x1c;
+    Vector3 position;
+    int reserved;
+    unsigned int diffuse;
+    unsigned int specular;
+    float tu;
+    float tv;
 };
 
 // One 0x14-byte vertex group of a surface: the vertices one node moves.
 // 0x00440d40 transforms field_0x04 vertices by the node's world matrix.
 struct UnknownSoultreeFaceGroup {
-    SoultreeObject* field_0x00;                // node
-    int field_0x04;                            // vertex count
-    UnknownSoultreeVertex* field_0x08;         // source vertices
-    UnknownSoultreeVertex* field_0x0c;         // transformed vertices
-    Vector3* field_0x10;                       // normals
+    SoultreeObject* node;                      // node
+    int vertexCount;                           // vertex count
+    UnknownSoultreeVertex* sourceVertices;     // source vertices
+    UnknownSoultreeVertex* transformedVertices; // transformed vertices
+    Vector3* normals;                          // normals
 };
 
 // The texture coordinates of one vertex.
 struct UnknownSoultreeUV {
-    float field_0x00;
-    float field_0x04;
+    float u;
+    float v;
 };
 
 // One 0x38-byte surface of a level of detail ("LOD %i - Surface %i").
 // The destructor frees +0x1c, +0x04, +0x10, +0x14, +0x18, +0x28 and +0x24.
 struct UnknownSoultreeSurface {
-    int field_0x00;                            // face group count
-    UnknownSoultreeFaceGroup* field_0x04;
-    int field_0x08;                            // vertex count
-    int field_0x0c;                            // face count
-    UnknownSoultreeVertex* field_0x10;         // vertices
-    UnknownSoultreeVertex* field_0x14;         // drawn vertices
-    Vector3* field_0x18;                       // normals
-    unsigned short* field_0x1c;                // indices, three per face
-    int field_0x20;                            // material count
-    int* field_0x24;                           // material indices
-    UnknownSoultreeUV* field_0x28;             // texture coordinates
+    int groupCount;                            // face group count
+    UnknownSoultreeFaceGroup* groups;
+    int vertexCount;                           // vertex count
+    int faceCount;                             // face count
+    UnknownSoultreeVertex* vertices;           // vertices
+    UnknownSoultreeVertex* drawnVertices;      // drawn vertices
+    Vector3* normals;                          // normals
+    unsigned short* indices;                   // indices, three per face
+    int materialCount;                         // material count
+    int* materialIndices;                      // material indices
+    UnknownSoultreeUV* uvs;                    // texture coordinates
     float field_0x2c;                          // 1.0 after loading
     int field_0x30;
     int field_0x34;
@@ -161,23 +161,23 @@ struct UnknownSoultreeCounters {
 
 // One 8-byte level of detail at +0x28c.
 struct UnknownSoultreeLod {
-    int field_0x00;                            // surface count
-    UnknownSoultreeSurface* field_0x04;
+    int surfaceCount;                          // surface count
+    UnknownSoultreeSurface* surfaces;
 };
 
 // The camera fields 0x004439c0 reads (RenderTarget+0x08): the viewport
 // origin (ObjectPicker.h's UnknownPickCamera names the same fields).
 struct UnknownSoultreeCameraView {
     unsigned char field_0x000[0xec];
-    Matrix4 field_0x0ec;                       // view matrix (slot 12's visibility test)
+    Matrix4 viewMatrix;                        // view matrix (slot 12's visibility test)
     unsigned char field_0x12c[0x170 - 0x12c];
-    Vector3 field_0x170;                       // position
-    Vector3 field_0x17c;                       // view direction (drawing mode 5)
+    Vector3 position;                          // position
+    Vector3 viewDirection;                     // view direction (drawing mode 5)
     unsigned char field_0x188[0x198 - 0x188];
-    float field_0x198;                         // image plane distance
+    float imagePlaneDistance;                  // image plane distance
     int field_0x19c;
-    unsigned int field_0x1a0;                  // viewport x
-    unsigned int field_0x1a4;                  // viewport y
+    unsigned int viewportX;                    // viewport x
+    unsigned int viewportY;                    // viewport y
 };
 
 // The 16-byte rows of the global table at 0x00689f18 (0x004451e0).
@@ -190,7 +190,7 @@ struct UnknownSoultreeLodSetting {
 extern UnknownSoultreeLodSetting* g_UnknownSoultreeLodSettings689f18;
 
 // 0x004a1b00 (cdecl): transforms `count` points by `matrix`.
-void UnknownFunction4a1b00(const void* source, void* target, const Matrix4* matrix, int count,
+void TransformPoints(const void* source, void* target, const Matrix4* matrix, int count,
                            int sourceStride, int targetStride);
 
 class D3DIMSoultreeObject : public SoultreeObject {
@@ -241,19 +241,19 @@ public:
     // Not reconstructed: 0x00440810, the drawing function 0x00440f30, slot
     // 12 and 0x00443de0 (see samples/render/D3DIMSoulTreeNearMisses.cpp).
     void UnknownFunction440810();                  // 0x00440810
-    void UnknownFunction440d40(int lod);           // 0x00440d40 (ret 4): transforms the vertex groups
-    void UnknownFunction440f30();                  // 0x00440f30: draws the current level of detail
-    void UnknownFunction443de0(Vector3* center, Vector3* extents); // 0x00443de0 (ret 8): picks the level of detail
+    void TransformVertexGroups(int lod);           // 0x00440d40 (ret 4): transforms the vertex groups
+    void DrawCurrentLod();                         // 0x00440f30: draws the current level of detail
+    void SelectLod(Vector3* center, Vector3* extents);             // 0x00443de0 (ret 8): picks the level of detail
     void UnknownFunction4439c0(UnknownSoultreeCounters* counters); // 0x004439c0 (ret 4)
-    void UnknownFunction4434b0();                  // 0x004434b0: bounding boxes of the subtree
+    void ComputeSubtreeBounds();                   // 0x004434b0: bounding boxes of the subtree
     void UnknownFunction4435b0();                  // 0x004435b0: axes of the subtree
     void UnknownFunction443740(Vector3 center, Vector3 extents, int flag); // 0x00443740 (ret 0x1c)
-    void UnknownFunction442f70(UnknownSoultreeSurface* surface);  // 0x00442f70 (ret 4): wireframe
-    void UnknownFunction442fe0(UnknownSoultreeSurface* surface);  // 0x00442fe0 (ret 4): normals
-    void UnknownFunction4431f0(UnknownSoultreeSurface* surface);  // 0x004431f0 (ret 4): vertex crosses
+    void DrawWireframe(UnknownSoultreeSurface* surface);          // 0x00442f70 (ret 4): wireframe
+    void DrawNormals(UnknownSoultreeSurface* surface);            // 0x00442fe0 (ret 4): normals
+    void DrawVertexCrosses(UnknownSoultreeSurface* surface);      // 0x004431f0 (ret 4): vertex crosses
     void UnknownFunction4433f0(int surface, UnknownSoultreeVertex** vertices, int* vertexCount,
                                unsigned short** indices, int* indexCount, int a6, int lod); // 0x004433f0
-    int UnknownFunction440060();                   // 0x00440060: reads the levels of detail
+    int ReadLods();                                // 0x00440060: reads the levels of detail
     void UnknownFunction444440();                  // 0x00444440
     void UnknownFunction4444c0(int value);         // 0x004444c0
     void UnknownFunction4444e0();                  // 0x004444e0
@@ -266,8 +266,8 @@ public:
     void UnknownFunction444eb0(GameObject* modifier); // 0x00444eb0
     void UnknownFunction444fb0();                  // 0x00444fb0
     int UnknownFunction444fe0();                   // 0x00444fe0
-    int UnknownFunction445030(int lod);   // 0x00445030: surface count
-    int UnknownFunction445060(SoultreeObject* node, int lod); // 0x00445060: node moves vertices
+    int GetSurfaceCount(int lod);         // 0x00445030: surface count
+    int NodeMovesVertices(SoultreeObject* node, int lod);     // 0x00445060: node moves vertices
     void UnknownFunction4451e0(int index);         // 0x004451e0
 
     int field_0x1a4;
@@ -276,31 +276,31 @@ public:
     int field_0x1b0;
     int field_0x1b4;
     int field_0x1b8;
-    LightManager* field_0x1bc;                 // slot 9's `a`; lights the vertices
-    char field_0x1c0[0x80];                    // name (0x7f characters)
-    TextureMapManager* field_0x240;            // texture manager (first option dword)
-    int field_0x244;                           // texture format, 0x22b
-    int field_0x248[6];                        // texture options
+    LightManager* lightManager;                // slot 9's `a`; lights the vertices
+    char modelName[0x80];                      // name (0x7f characters)
+    TextureMapManager* textureManager;         // texture manager (first option dword)
+    int textureFormat;                         // texture format, 555
+    int textureOptions[6];                     // texture options
     int field_0x260;
-    int field_0x264;                           // first modifier list
-    GameObject** field_0x268;
-    int field_0x26c;                           // second modifier list
-    GameObject** field_0x270;
-    int field_0x274;                           // level-of-detail count
-    int field_0x278;                           // lowest level of detail
+    int modifierCount;                         // first modifier list
+    GameObject** modifierList;
+    int secondModifierCount;                   // second modifier list
+    GameObject** secondModifierList;
+    int lodCount;                              // level-of-detail count
+    int lowestLod;                             // lowest level of detail
     int field_0x27c;                           // current level of detail
-    float* field_0x280;                        // "AutoLOD#%i" distances
+    float* autoLodDistances;                   // "AutoLOD#%i" distances
     float field_0x284;
     int field_0x288;
-    UnknownSoultreeLod* field_0x28c;
-    SoultreeMaterial** field_0x290;            // materials
-    int field_0x294;                           // material count
+    UnknownSoultreeLod* lodTable;
+    SoultreeMaterial** materialTable;          // materials
+    int materialCount;                         // material count
     UnknownSoultreeCounters field_0x298;       // slot 14 counts frames in +0x08 / +0x0c
     UnknownSoultreeCounters field_0x2a8;
-    float field_0x2b8;                         // frame time (slot 10)
+    float lastFrameTime;                       // frame time (slot 10)
     Vector3 field_0x2bc;
-    float field_0x2c8;                         // texture scroll (drawing modes 1 and 2)
-    int field_0x2cc;                           // load flag (slot 9)
+    float textureScroll;                       // texture scroll (drawing modes 1 and 2)
+    int loadFlag;                              // load flag (slot 9)
     int field_0x2d0;
     int field_0x2d4;                           // 1 after construction
 };

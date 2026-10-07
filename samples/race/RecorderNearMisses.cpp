@@ -46,7 +46,7 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
     headerSize = params->field_0x04;
     name = (char*)params->field_0x08;
     vcr = params->owner;
-    file = (UnknownVcrFile*)vcr->field_0xac;
+    file = (UnknownVcrFile*)vcr->vcrFile;
     events[0] = vcr->field_0x30;
     events[1] = vcr->field_0x34;
     events[2] = vcr->field_0x38;
@@ -57,146 +57,146 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
     events[7] = vcr->field_0x4c;
     events[8] = vcr->field_0x50;
     events[9] = vcr->field_0x54;
-    events[10] = vcr->field_0x58;
+    events[10] = vcr->stopEvent;
     while ((result = WaitForMultipleObjects(11, events, FALSE, INFINITE)) != WAIT_FAILED) {
         switch (result) {
         case 0: // write the queued records
-            if (vcr->field_0xb0->UnknownFunction524350()) {
+            if (vcr->frameRing->UnknownFunction524350()) {
                 void* data;
                 int size;
                 int index;
 
                 data = 0;
-                EnterCriticalSection(&vcr->field_0x60);
-                vcr->field_0xb0->UnknownFunction524300(&data, &size, &index);
-                LeaveCriticalSection(&vcr->field_0x60);
-                if (!file->UnknownFunction5251f0(data, size, 1, handle)) {
+                EnterCriticalSection(&vcr->lock);
+                vcr->frameRing->UnknownFunction524300(&data, &size, &index);
+                LeaveCriticalSection(&vcr->lock);
+                if (!file->Write(data, size, 1, handle)) {
                     strcpy(message, "VCRtape file write error\n");
                     goto done;
                 }
-                EnterCriticalSection(&vcr->field_0x60);
-                vcr->field_0xb0->UnknownFunction524540(index);
-                LeaveCriticalSection(&vcr->field_0x60);
+                EnterCriticalSection(&vcr->lock);
+                vcr->frameRing->UnknownFunction524540(index);
+                LeaveCriticalSection(&vcr->lock);
             }
-            if (vcr->field_0xb0->UnknownFunction524350())
+            if (vcr->frameRing->UnknownFunction524350())
                 SetEvent(vcr->field_0x30);
             break;
         case 1: // create the file and write the header
-            EnterCriticalSection(&vcr->field_0x60);
+            EnterCriticalSection(&vcr->lock);
             vcr->field_0xbc = 1;
-            LeaveCriticalSection(&vcr->field_0x60);
-            handle = file->UnknownFunction524dd0(name, "wb");
+            LeaveCriticalSection(&vcr->lock);
+            handle = file->Open(name, "wb");
             if (handle == -1) {
                 strcpy(message, "Can't create VCRtape file\n");
                 goto done;
             }
-            if (!file->UnknownFunction5251f0(header, headerSize, 1, handle)) {
+            if (!file->Write(header, headerSize, 1, handle)) {
                 strcpy(message, "VCRtape file header write error\n");
                 goto done;
             }
             strcpy(message, name);
-            EnterCriticalSection(&vcr->field_0x60);
-            vcr->field_0xb4 = 0;
-            vcr->field_0xc8 = 1;
-            LeaveCriticalSection(&vcr->field_0x60);
+            EnterCriticalSection(&vcr->lock);
+            vcr->isStopped = 0;
+            vcr->workerAcknowledged = 1;
+            LeaveCriticalSection(&vcr->lock);
             break;
         case 2: // reopen the file for appending
-            EnterCriticalSection(&vcr->field_0x60);
+            EnterCriticalSection(&vcr->lock);
             vcr->field_0xbc = 1;
-            LeaveCriticalSection(&vcr->field_0x60);
-            handle = file->UnknownFunction524dd0(name, "rb+");
+            LeaveCriticalSection(&vcr->lock);
+            handle = file->Open(name, "rb+");
             if (handle == -1) {
                 strcpy(message, "Can't create VCRtape file\n");
                 goto done;
             }
-            if (!file->UnknownFunction525070(header, headerSize, 1, handle)) {
+            if (!file->Read(header, headerSize, 1, handle)) {
                 strcpy(message, "VCRtape file header (reopen) read error\n");
                 goto done;
             }
-            file->UnknownFunction5253d0(handle, headerSize, SEEK_SET);
+            file->Seek(handle, headerSize, SEEK_SET);
             strcpy(message, name);
-            EnterCriticalSection(&vcr->field_0x60);
-            vcr->field_0xb4 = 0;
-            vcr->field_0xc8 = 1;
-            LeaveCriticalSection(&vcr->field_0x60);
+            EnterCriticalSection(&vcr->lock);
+            vcr->isStopped = 0;
+            vcr->workerAcknowledged = 1;
+            LeaveCriticalSection(&vcr->lock);
             break;
         case 3: // read the next record into the ring
-            EnterCriticalSection(&vcr->field_0x60);
-            if (vcr->field_0xb8) {
-                LeaveCriticalSection(&vcr->field_0x60);
+            EnterCriticalSection(&vcr->lock);
+            if (vcr->isBusy) {
+                LeaveCriticalSection(&vcr->lock);
                 break;
             }
-            LeaveCriticalSection(&vcr->field_0x60);
-            if (vcr->field_0xb0->UnknownFunction524560()) {
+            LeaveCriticalSection(&vcr->lock);
+            if (vcr->frameRing->UnknownFunction524560()) {
                 void* data;
                 int position;
                 unsigned int size;
                 int index;
 
                 data = 0;
-                position = file->UnknownFunction525440(handle);
-                if (!file->UnknownFunction525070(&size, 4, 1, handle)) {
-                    if (!file->UnknownFunction5254a0(handle)) {
+                position = file->Tell(handle);
+                if (!file->Read(&size, 4, 1, handle)) {
+                    if (!file->IsEndOfFile(handle)) {
                         strcpy(message, "VCRtape file read error (size)\n");
                         goto done;
                     }
-                    EnterCriticalSection(&vcr->field_0x60);
-                    vcr->field_0xb0->UnknownFunction524940();
-                    LeaveCriticalSection(&vcr->field_0x60);
+                    EnterCriticalSection(&vcr->lock);
+                    vcr->frameRing->UnknownFunction524940();
+                    LeaveCriticalSection(&vcr->lock);
                     break;
                 }
                 if (size > 0x400) {
                     strcpy(message, "data size exceeds buffer.\n");
                     goto done;
                 }
-                EnterCriticalSection(&vcr->field_0x60);
-                vcr->field_0xb0->UnknownFunction524390(size, &index, &data);
-                LeaveCriticalSection(&vcr->field_0x60);
-                if (!file->UnknownFunction525070(data, size, 1, handle)) {
-                    if (!file->UnknownFunction5254a0(handle)) {
+                EnterCriticalSection(&vcr->lock);
+                vcr->frameRing->UnknownFunction524390(size, &index, &data);
+                LeaveCriticalSection(&vcr->lock);
+                if (!file->Read(data, size, 1, handle)) {
+                    if (!file->IsEndOfFile(handle)) {
                         strcpy(message, "VCRtape file read error (data)\n");
                         goto done;
                     }
                 } else {
-                    EnterCriticalSection(&vcr->field_0x60);
-                    vcr->field_0xb0->UnknownFunction524440(position, index);
-                    LeaveCriticalSection(&vcr->field_0x60);
+                    EnterCriticalSection(&vcr->lock);
+                    vcr->frameRing->UnknownFunction524440(position, index);
+                    LeaveCriticalSection(&vcr->lock);
                 }
-                if (vcr->field_0xb0->UnknownFunction524560())
+                if (vcr->frameRing->UnknownFunction524560())
                     SetEvent(vcr->field_0x40);
             }
             break;
         case 4: // open the file for playback
-            EnterCriticalSection(&vcr->field_0x60);
+            EnterCriticalSection(&vcr->lock);
             vcr->field_0xbc = 1;
-            LeaveCriticalSection(&vcr->field_0x60);
-            handle = file->UnknownFunction524dd0(name, "rb");
+            LeaveCriticalSection(&vcr->lock);
+            handle = file->Open(name, "rb");
             if (handle == -1) {
                 strcpy(message, "Can't create VCRtape file\n");
                 goto done;
             }
-            if (!file->UnknownFunction525070(header, headerSize, 1, handle)) {
+            if (!file->Read(header, headerSize, 1, handle)) {
                 strcpy(message, "VCRtape file header read error\n");
                 goto done;
             }
-            vcr->field_0xb0->UnknownFunction5248f0(file->UnknownFunction525440(handle));
-            EnterCriticalSection(&vcr->field_0x60);
-            vcr->field_0xb4 = 0;
-            LeaveCriticalSection(&vcr->field_0x60);
+            vcr->frameRing->UnknownFunction5248f0(file->Tell(handle));
+            EnterCriticalSection(&vcr->lock);
+            vcr->isStopped = 0;
+            LeaveCriticalSection(&vcr->lock);
             SetEvent(vcr->field_0x40);
             strcpy(message, name);
-            EnterCriticalSection(&vcr->field_0x60);
-            vcr->field_0xc8 = 1;
-            LeaveCriticalSection(&vcr->field_0x60);
+            EnterCriticalSection(&vcr->lock);
+            vcr->workerAcknowledged = 1;
+            LeaveCriticalSection(&vcr->lock);
             break;
         case 5: // read the record at the next recorded position
-            EnterCriticalSection(&vcr->field_0x60);
-            if (vcr->field_0xb8) {
-                LeaveCriticalSection(&vcr->field_0x60);
+            EnterCriticalSection(&vcr->lock);
+            if (vcr->isBusy) {
+                LeaveCriticalSection(&vcr->lock);
                 break;
             }
-            LeaveCriticalSection(&vcr->field_0x60);
-            if (vcr->field_0xb0->UnknownFunction524560()) {
+            LeaveCriticalSection(&vcr->lock);
+            if (vcr->frameRing->UnknownFunction524560()) {
                 void* data;
                 int position;
                 int extra;
@@ -204,51 +204,51 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
                 int index;
 
                 data = 0;
-                position = vcr->field_0xb0->UnknownFunction5246c0(&extra);
-                vcr->field_0xd4 = extra;
+                position = vcr->frameRing->UnknownFunction5246c0(&extra);
+                vcr->recordTimeMs = extra;
                 if (position == 0) {
-                    EnterCriticalSection(&vcr->field_0x60);
-                    vcr->field_0xb0->UnknownFunction524970();
-                    LeaveCriticalSection(&vcr->field_0x60);
+                    EnterCriticalSection(&vcr->lock);
+                    vcr->frameRing->UnknownFunction524970();
+                    LeaveCriticalSection(&vcr->lock);
                     break;
                 }
                 if (position == -1) {
-                    EnterCriticalSection(&vcr->field_0x60);
-                    vcr->field_0xb0->UnknownFunction524390(1, &index, &data);
+                    EnterCriticalSection(&vcr->lock);
+                    vcr->frameRing->UnknownFunction524390(1, &index, &data);
                     *(unsigned char*)data = 0xff;
-                    vcr->field_0xb0->UnknownFunction524440(-1, index);
-                    LeaveCriticalSection(&vcr->field_0x60);
+                    vcr->frameRing->UnknownFunction524440(-1, index);
+                    LeaveCriticalSection(&vcr->lock);
                 } else {
-                    file->UnknownFunction5253d0(handle, position, SEEK_SET);
-                    if (!file->UnknownFunction525070(&size, 4, 1, handle)) {
-                        if (!file->UnknownFunction5254a0(handle)) {
+                    file->Seek(handle, position, SEEK_SET);
+                    if (!file->Read(&size, 4, 1, handle)) {
+                        if (!file->IsEndOfFile(handle)) {
                             strcpy(message, "VCRtape file read error (size)\n");
                             goto done;
                         }
-                        EnterCriticalSection(&vcr->field_0x60);
-                        vcr->field_0xb0->UnknownFunction524970();
-                        LeaveCriticalSection(&vcr->field_0x60);
+                        EnterCriticalSection(&vcr->lock);
+                        vcr->frameRing->UnknownFunction524970();
+                        LeaveCriticalSection(&vcr->lock);
                         break;
                     }
                     if (size > 0x400) {
                         strcpy(message, "data size exceeds buffer.\n");
                         goto done;
                     }
-                    EnterCriticalSection(&vcr->field_0x60);
-                    vcr->field_0xb0->UnknownFunction524390(size, &index, &data);
-                    LeaveCriticalSection(&vcr->field_0x60);
-                    if (!file->UnknownFunction525070(data, size, 1, handle)) {
-                        if (!file->UnknownFunction5254a0(handle)) {
+                    EnterCriticalSection(&vcr->lock);
+                    vcr->frameRing->UnknownFunction524390(size, &index, &data);
+                    LeaveCriticalSection(&vcr->lock);
+                    if (!file->Read(data, size, 1, handle)) {
+                        if (!file->IsEndOfFile(handle)) {
                             strcpy(message, "VCRtape file read error (data)\n");
                             goto done;
                         }
                     } else {
-                        EnterCriticalSection(&vcr->field_0x60);
-                        vcr->field_0xb0->UnknownFunction524440(position, index);
-                        LeaveCriticalSection(&vcr->field_0x60);
+                        EnterCriticalSection(&vcr->lock);
+                        vcr->frameRing->UnknownFunction524440(position, index);
+                        LeaveCriticalSection(&vcr->lock);
                     }
                 }
-                if (vcr->field_0xb0->UnknownFunction524560())
+                if (vcr->frameRing->UnknownFunction524560())
                     SetEvent(vcr->field_0x44);
             }
             break;
@@ -258,13 +258,13 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
 
             ResetEvent(vcr->field_0x40);
             ResetEvent(vcr->field_0x44);
-            position = vcr->field_0xb0->UnknownFunction5247c0(&extra);
+            position = vcr->frameRing->UnknownFunction5247c0(&extra);
             if (position == -1)
-                position = vcr->field_0xb0->UnknownFunction5247c0(&extra);
-            file->UnknownFunction5253d0(handle, position, SEEK_SET);
-            EnterCriticalSection(&vcr->field_0x60);
-            vcr->field_0xb0->UnknownFunction524910();
-            LeaveCriticalSection(&vcr->field_0x60);
+                position = vcr->frameRing->UnknownFunction5247c0(&extra);
+            file->Seek(handle, position, SEEK_SET);
+            EnterCriticalSection(&vcr->lock);
+            vcr->frameRing->UnknownFunction524910();
+            LeaveCriticalSection(&vcr->lock);
             SetEvent(vcr->field_0x40);
             break;
         }
@@ -273,11 +273,11 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
 
             ResetEvent(vcr->field_0x40);
             ResetEvent(vcr->field_0x44);
-            position = vcr->field_0xb0->UnknownFunction524900();
-            EnterCriticalSection(&vcr->field_0x60);
-            vcr->field_0xb0->UnknownFunction524910();
-            LeaveCriticalSection(&vcr->field_0x60);
-            file->UnknownFunction5253d0(handle, position, SEEK_SET);
+            position = vcr->frameRing->UnknownFunction524900();
+            EnterCriticalSection(&vcr->lock);
+            vcr->frameRing->UnknownFunction524910();
+            LeaveCriticalSection(&vcr->lock);
+            file->Seek(handle, position, SEEK_SET);
             vcr->field_0xbc = 1;
             SetEvent(vcr->field_0x40);
             break;
@@ -285,21 +285,21 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
         case 8:
             ResetEvent(vcr->field_0x40);
             ResetEvent(vcr->field_0x44);
-            EnterCriticalSection(&vcr->field_0x60);
+            EnterCriticalSection(&vcr->lock);
             vcr->field_0xc0 = 1;
             vcr->field_0xbc = 1;
-            LeaveCriticalSection(&vcr->field_0x60);
+            LeaveCriticalSection(&vcr->lock);
             break;
         case 9: // rewrite the header and close the file
-            file->UnknownFunction5253d0(handle, 0, SEEK_SET);
-            if (!file->UnknownFunction5251f0(header, headerSize, 1, handle)) {
+            file->Seek(handle, 0, SEEK_SET);
+            if (!file->Write(header, headerSize, 1, handle)) {
                 strcpy(message, "VCRtape file header write error\n");
                 goto done;
             }
-            file->UnknownFunction525000(handle);
-            EnterCriticalSection(&vcr->field_0x60);
-            vcr->field_0xc8 = 1;
-            LeaveCriticalSection(&vcr->field_0x60);
+            file->Close(handle);
+            EnterCriticalSection(&vcr->lock);
+            vcr->workerAcknowledged = 1;
+            LeaveCriticalSection(&vcr->lock);
             handle = -1;
             break;
         case 10:
@@ -308,11 +308,11 @@ unsigned __stdcall UnknownRecorderThread(void* parameters) {
         }
     }
 done:
-    EnterCriticalSection(&vcr->field_0x60);
-    vcr->field_0xb4 = 0;
-    LeaveCriticalSection(&vcr->field_0x60);
+    EnterCriticalSection(&vcr->lock);
+    vcr->isStopped = 0;
+    LeaveCriticalSection(&vcr->lock);
     if (handle >= 0)
-        file->UnknownFunction525000(handle);
+        file->Close(handle);
     _endthreadex(0);
     return 0;
 }
@@ -330,50 +330,50 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
     int count;
     int result;
 
-    EnterCriticalSection(&field_0x60);
+    EnterCriticalSection(&lock);
     if (!field_0xbc) {
-        LeaveCriticalSection(&field_0x60);
+        LeaveCriticalSection(&lock);
         return 1;
     }
-    LeaveCriticalSection(&field_0x60);
-    if (field_0x78 != 1)
+    LeaveCriticalSection(&lock);
+    if (recordMode != 1)
         return 1;
     if (field_0x88) {
         int flag;
 
-        EnterCriticalSection(&field_0x60);
+        EnterCriticalSection(&lock);
         flag = field_0xc0;
-        LeaveCriticalSection(&field_0x60);
+        LeaveCriticalSection(&lock);
         if (flag) {
-            EnterCriticalSection(&field_0x60);
+            EnterCriticalSection(&lock);
             field_0xc0 = 0;
             field_0xc4 = 1;
-            LeaveCriticalSection(&field_0x60);
+            LeaveCriticalSection(&lock);
             UnknownFunction4e89c0();
             return 1;
         }
-        EnterCriticalSection(&field_0x60);
+        EnterCriticalSection(&lock);
         flag = field_0xc4;
-        LeaveCriticalSection(&field_0x60);
+        LeaveCriticalSection(&lock);
         if (!flag)
             return 1;
         for (;;) {
-            result = UnknownFunction4e8810(&field_0xa0, &field_0xa4, &value, field_0x7c, &size, 0);
+            result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 0);
             if (result == 0) {
-                if (field_0x80(field_0xa0, field_0x7c, 0, field_0xa4, &keep, field_0xd4, &milliseconds) != 11) {
+                if (recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds) != 11) {
                     field_0x88 = 0;
                     UnknownFunction4e8990();
-                    field_0xb0->UnknownFunction524870(value);
+                    frameRing->UnknownFunction524870(value);
                     UnknownFunction4e8a20(milliseconds);
                     field_0xc4 = 0;
                     return 1;
                 }
             } else if (result == 2) {
-                field_0x80(-3, 0, 0, 0, &keep, field_0xd4, &milliseconds);
+                recordCallback(-3, 0, 0, 0, &keep, recordTimeMs, &milliseconds);
                 field_0x88 = 0;
-                EnterCriticalSection(&field_0x60);
+                EnterCriticalSection(&lock);
                 field_0xc4 = 0;
-                LeaveCriticalSection(&field_0x60);
+                LeaveCriticalSection(&lock);
                 field_0x84 = 0;
                 UnknownFunction4e8a70();
                 return 1;
@@ -387,7 +387,7 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
     }
     queued = 0;
     if (field_0x84) {
-        result = field_0x80(field_0xa0, field_0x7c, 0, field_0xa4, &keep, field_0xd4, &milliseconds);
+        result = recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
         if (result == 3)
             return 1;
         if (result == 5) {
@@ -399,21 +399,21 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
             UnknownFunction4e8a70();
             return 1;
         }
-        record = (UnknownRecorderRecord*)field_0x7c;
-        field_0xd4 = (int)(record->time * 1000.0f);
+        record = (UnknownRecorderRecord*)recordBuffer;
+        recordTimeMs = (int)(record->time * 1000.0f);
         count = record->count;
         field_0x84 = 0;
         while (count--) {
-            result = UnknownFunction4e8810(&field_0xa0, &field_0xa4, &value, field_0x7c, &size, 1);
+            result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
             if (result == 0) {
-                field_0x80(field_0xa0, field_0x7c, 0, field_0xa4, &keep, field_0xd4, &milliseconds);
+                recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
                 if (keep) {
-                    field_0xb0->UnknownFunction524590(value, field_0xd4);
+                    frameRing->UnknownFunction524590(value, recordTimeMs);
                     queued = 1;
                 }
             } else {
                 if (result == 1 &&
-                    field_0x80(-2, 0, 0, 0, &keep, field_0xd4, &milliseconds) == 12) {
+                    recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
                     field_0x84 = 0;
                     UnknownFunction4e8a70();
                     return 1;
@@ -422,13 +422,13 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
             }
         }
         if (queued)
-            field_0xb0->UnknownFunction524590(-1, field_0xd4);
+            frameRing->UnknownFunction524590(-1, recordTimeMs);
         return 1;
     }
     field_0x84 = 0;
-    result = UnknownFunction4e8810(&field_0xa0, &field_0xa4, &field_0xa8, field_0x7c, &size, 1);
+    result = TakeRecord(&field_0xa0, &field_0xa4, &field_0xa8, recordBuffer, &size, 1);
     if (result == 1) {
-        result = field_0x80(-2, 0, 0, 0, &keep, field_0xd4, &milliseconds);
+        result = recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds);
         if (result == 11) {
             field_0x88 = 1;
             UnknownFunction4e8990();
@@ -442,11 +442,11 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
         return 1;
     if (field_0xa0 != -1)
         return 1;
-    field_0xb0->UnknownFunction524590(field_0xa8, field_0xd4);
-    record = (UnknownRecorderRecord*)field_0x7c;
-    field_0xd4 = (int)(record->time * 1000.0f);
+    frameRing->UnknownFunction524590(field_0xa8, recordTimeMs);
+    record = (UnknownRecorderRecord*)recordBuffer;
+    recordTimeMs = (int)(record->time * 1000.0f);
     count = record->count;
-    switch (field_0x80(field_0xa0, field_0x7c, 0, field_0xa4, &keep, field_0xd4, &milliseconds)) {
+    switch (recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds)) {
     case 5:
         field_0x84 = 1;
         return 1;
@@ -463,15 +463,15 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
     case 2:
         for (;;) {
             while (count--) {
-                result = UnknownFunction4e8810(&field_0xa0, &field_0xa4, &value, field_0x7c, &size, 1);
+                result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
                 if (result == 0) {
-                    field_0x80(field_0xa0, field_0x7c, 1, field_0xa4, &keep, field_0xd4, &milliseconds);
+                    recordCallback(field_0xa0, recordBuffer, 1, field_0xa4, &keep, recordTimeMs, &milliseconds);
                     if (keep) {
-                        field_0xb0->UnknownFunction524590(value, field_0xd4);
+                        frameRing->UnknownFunction524590(value, recordTimeMs);
                         queued = 1;
                     }
                 } else if (result == 1) {
-                    if (field_0x80(-2, 0, 0, 0, &keep, field_0xd4, &milliseconds) == 12) {
+                    if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
                         field_0x84 = 1;
                         UnknownFunction4e8a70();
                     }
@@ -481,11 +481,11 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
                 }
             }
             if (queued)
-                field_0xb0->UnknownFunction524590(-1, field_0xd4);
+                frameRing->UnknownFunction524590(-1, recordTimeMs);
             queued = 0;
-            result = UnknownFunction4e8810(&field_0xa0, &field_0xa4, &field_0xa8, field_0x7c, &size, 1);
+            result = TakeRecord(&field_0xa0, &field_0xa4, &field_0xa8, recordBuffer, &size, 1);
             if (result == 1) {
-                result = field_0x80(-2, 0, 0, 0, &keep, field_0xd4, &milliseconds);
+                result = recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds);
                 if (result == 11) {
                     field_0x88 = 1;
                     UnknownFunction4e8990();
@@ -497,21 +497,21 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
             }
             if (result == 4)
                 return 1;
-            result = field_0x80(field_0xa0, field_0x7c, 1, field_0xa4, &keep, field_0xd4, &milliseconds);
+            result = recordCallback(field_0xa0, recordBuffer, 1, field_0xa4, &keep, recordTimeMs, &milliseconds);
             if (result == 1) {
-                record = (UnknownRecorderRecord*)field_0x7c;
-                field_0xd4 = (int)(record->time * 1000.0f);
+                record = (UnknownRecorderRecord*)recordBuffer;
+                recordTimeMs = (int)(record->time * 1000.0f);
                 count = record->count;
                 while (count--) {
-                    result = UnknownFunction4e8810(&field_0xa0, &field_0xa4, &value, field_0x7c, &size, 1);
+                    result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
                     if (result == 0) {
-                        field_0x80(field_0xa0, field_0x7c, 0, field_0xa4, &keep, field_0xd4, &milliseconds);
+                        recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
                         if (keep) {
-                            field_0xb0->UnknownFunction524590(value, field_0xd4);
+                            frameRing->UnknownFunction524590(value, recordTimeMs);
                             queued = 1;
                         }
                     } else if (result == 1) {
-                        if (field_0x80(-2, 0, 0, 0, &keep, field_0xd4, &milliseconds) == 12) {
+                        if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
                             field_0x84 = 1;
                             UnknownFunction4e8a70();
                         }
@@ -535,22 +535,22 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
                 UnknownFunction4e8a70();
                 return 1;
             }
-            record = (UnknownRecorderRecord*)field_0x7c;
-            field_0xd4 = (int)(record->time * 1000.0f);
+            record = (UnknownRecorderRecord*)recordBuffer;
+            recordTimeMs = (int)(record->time * 1000.0f);
             count = record->count;
         }
         break;
     case 1:
         while (count--) {
-            result = UnknownFunction4e8810(&field_0xa0, &field_0xa4, &value, field_0x7c, &size, 1);
+            result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
             if (result == 0) {
-                field_0x80(field_0xa0, field_0x7c, 0, field_0xa4, &keep, field_0xd4, &milliseconds);
+                recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
                 if (keep) {
-                    field_0xb0->UnknownFunction524590(value, field_0xd4);
+                    frameRing->UnknownFunction524590(value, recordTimeMs);
                     queued = 1;
                 }
             } else if (result == 1) {
-                if (field_0x80(-2, 0, 0, 0, &keep, field_0xd4, &milliseconds) == 12) {
+                if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
                     field_0x84 = 1;
                     UnknownFunction4e8a70();
                 }
@@ -562,15 +562,15 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
         break;
     case 7:
         while (count--) {
-            result = UnknownFunction4e8810(&field_0xa0, &field_0xa4, &value, field_0x7c, &size, 1);
+            result = TakeRecord(&field_0xa0, &field_0xa4, &value, recordBuffer, &size, 1);
             if (result == 0) {
-                field_0x80(field_0xa0, field_0x7c, 0, field_0xa4, &keep, field_0xd4, &milliseconds);
+                recordCallback(field_0xa0, recordBuffer, 0, field_0xa4, &keep, recordTimeMs, &milliseconds);
                 if (keep) {
-                    field_0xb0->UnknownFunction524590(value, field_0xd4);
+                    frameRing->UnknownFunction524590(value, recordTimeMs);
                     queued = 1;
                 }
             } else if (result == 1) {
-                if (field_0x80(-2, 0, 0, 0, &keep, field_0xd4, &milliseconds) == 12) {
+                if (recordCallback(-2, 0, 0, 0, &keep, recordTimeMs, &milliseconds) == 12) {
                     field_0x84 = 1;
                     UnknownFunction4e8a70();
                 }
@@ -585,6 +585,6 @@ int VCRInterface::UnknownVirtualSlot10(float frameTime) {
         return 1;
     }
     if (queued)
-        field_0xb0->UnknownFunction524590(-1, field_0xd4);
+        frameRing->UnknownFunction524590(-1, recordTimeMs);
     return 1;
 }

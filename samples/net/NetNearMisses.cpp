@@ -1,23 +1,23 @@
 // Near-miss Net.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/NET.md.
 //
-// NetPendingMessage::UnknownFunction4aadc0 (0x004aadc0, 84 bytes): 87.5%.
+// NetPendingMessage::SetPending (0x004aadc0, 84 bytes): 87.5%.
 // Retail stores the type, the sequence and then field_0x8f4 (the size);
 // VC6 here hoists the field_0x8f4 store ahead of the other two.
 //
-// NetworkInterface::UnknownFunction4ab960 (0x004ab960, 989 bytes): about
+// NetworkInterface::ConnectUsingLobby (0x004ab960, 989 bytes): about
 // 15%; the candidate is 1072 bytes. Retail keeps the constant zero in ebx
 // and tail-merges the error paths; VC6 here keeps `connection` in ebx and
 // emits each NET_ERROR_TEXT expansion separately.
 //
-// NetworkInterface::UnknownFunction4abf10 (0x004abf10, 948 bytes): 92.4%.
+// NetworkInterface::CreateAddress (0x004abf10, 948 bytes): 92.4%.
 // The MODEM case keeps `port` in edx where retail uses ebx.
 //
-// NetworkInterface::UnknownFunction4ac7c0 (0x004ac7c0, 53 bytes): 86.8%.
+// NetworkInterface::NextPlayer (0x004ac7c0, 53 bytes): 86.8%.
 // The loop counter and *index swap ecx and edx. Caching *index in a local,
 // declaring the counter first and `*index = i + 1` (90.6%) do not fix it.
 //
-// NetworkInterface::UnknownFunction4aced0 (0x004aced0, 370 bytes): 95.5%.
+// NetworkInterface::DispatchMessages (0x004aced0, 370 bytes): 95.5%.
 // The ring-slot address uses [edi+eax+4] where retail has [eax+edi+4], and
 // after the slot-17 call retail reloads field_0x34 into edx and forms the
 // slot with lea; direct indexing throughout (53.3%) and a pointer for the
@@ -34,7 +34,7 @@
 #define NET_DPERR_BUFFERTOOSMALL 0x8877001e
 #define NET_E_OUTOFMEMORY        0x8007000e
 
-void UnknownFunction4ad5a0(long result, const char* file, int line);
+void ReportDirectPlayError(long result, const char* file, int line);
 
 extern "C" const GUID IID_IDirectPlay4A;                // 0x005567b0
 extern "C" const GUID IID_IDirectPlayLobby3A;           // 0x00556870
@@ -71,23 +71,23 @@ extern "C" long __stdcall DirectPlayLobbyCreateA(GUID* provider,
     }
 
 // 0x004aadc0
-int NetPendingMessage::UnknownFunction4aadc0(int type, short sequence, void* data,
-                                              unsigned int size, int from, int to)
+int NetPendingMessage::SetPending(int messageType, short sequence, void* source,
+                                              unsigned int length, int sender, int receiver)
 {
-    UnknownFunction4aacc0(data, size, from, to, 0);
-    field_0x00 = type;
-    *(short*)&field_0x14[2] = sequence;
-    field_0x8f4 = size;
-    field_0x8f8 = 0;
-    field_0x8fc = 0;
+    Set(source, length, sender, receiver, 0);
+    type = messageType;
+    *(short*)&data[2] = sequence;
+    sendSize = length;
+    resendTimer = 0;
+    next = 0;
     return 1;
 }
 
 // 0x004ab960: connects with the settings of a lobby that launched the game.
-long NetworkInterface::UnknownFunction4ab960()
+long NetworkInterface::ConnectUsingLobby()
 {
-    UnknownDirectPlayLobby3A* lobby = 0;
-    UnknownDirectPlay4A* directPlay = 0;
+    UnknownDirectPlayLobby3A* baseLobby = 0;
+    UnknownDirectPlay4A* baseDirectPlay = 0;
     NetConnection* connection = 0;
     UnknownDirectPlay4A* directPlay4 = 0;
     unsigned long size;
@@ -96,17 +96,17 @@ long NetworkInterface::UnknownFunction4ab960()
     long result;
 
     strcpy(error, "");
-    result = DirectPlayLobbyCreateA(0, &lobby, 0, 0, 0);
+    result = DirectPlayLobbyCreateA(0, &baseLobby, 0, 0, 0);
     if (result < 0) {
         NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::DirectPlayLobbyCreate");
         goto failed;
     }
-    result = lobby->QueryInterface(IID_IDirectPlayLobby3A, (void**)&field_0x08);
+    result = baseLobby->QueryInterface(IID_IDirectPlayLobby3A, (void**)&lobby);
     if (result < 0) {
         NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::QueryInterface");
         goto failed;
     }
-    result = field_0x08->GetConnectionSettings(0, 0, &size);
+    result = lobby->GetConnectionSettings(0, 0, &size);
     if (result >= 0 || result == NET_DPERR_BUFFERTOOSMALL) {
         connection = (NetConnection*)DebugMalloc(size, __FILE__, 778);
         if (!connection) {
@@ -114,72 +114,72 @@ long NetworkInterface::UnknownFunction4ab960()
             NET_ERROR_TEXT(error, "DPERR_OUTOFMEMORY");
             goto failed;
         }
-        result = field_0x08->GetConnectionSettings(0, connection, &size);
+        result = lobby->GetConnectionSettings(0, connection, &size);
     }
     if (result < 0) {
         NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::GetConnectionSettings");
         goto failed;
     }
-    UnknownFunction4acdb0(&flags);
+    GetSessionFlags(&flags);
     connection->session->flags = flags;
     connection->session->maxPlayers = 8;
-    result = field_0x08->SetConnectionSettings(0, 0, connection);
+    result = lobby->SetConnectionSettings(0, 0, connection);
     if (result < 0) {
         NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::SetConnectionSettings");
         goto failed;
     }
-    result = field_0x08->Connect(0, &directPlay, 0);
+    result = lobby->Connect(0, &baseDirectPlay, 0);
     if (result < 0) {
         NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::Connect");
         goto failed;
     }
-    result = directPlay->QueryInterface(IID_IDirectPlay4A, (void**)&directPlay4);
+    result = baseDirectPlay->QueryInterface(IID_IDirectPlay4A, (void**)&directPlay4);
     if (result < 0) {
         NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::QueryInterface");
         goto failed;
     }
-    EnterCriticalSection(NET_LOCK(field_0x48));
-    field_0x04 = directPlay4;
+    EnterCriticalSection(NET_LOCK(lock));
+    directPlay = directPlay4;
     isHost = (connection->flags >> 1) & 1;              // DPLCONNECTION_CREATESESSION
-    UnknownFunction4ad180((const GUID*)connection->provider);
-    if (field_0x18 == 2 && isHost)
-        result = field_0x04->CreatePlayer((unsigned long*)&field_0x0c, connection->playerName,
-                                          field_0x24, 0, 0, 0x100);
+    ReadProviderCaps((const GUID*)connection->provider);
+    if (connectionMode == 2 && isHost)
+        result = directPlay->CreatePlayer((unsigned long*)&localPlayer, connection->playerName,
+                                          receiveEvent, 0, 0, 0x100);
     else
-        result = field_0x04->CreatePlayer((unsigned long*)&field_0x0c, connection->playerName,
-                                          field_0x24, 0, 0, 0);
+        result = directPlay->CreatePlayer((unsigned long*)&localPlayer, connection->playerName,
+                                          receiveEvent, 0, 0, 0);
     if (result < 0) {
-        LeaveCriticalSection(NET_LOCK(field_0x48));
+        LeaveCriticalSection(NET_LOCK(lock));
         NET_ERROR_TEXT(error, "Error: ConnectUsingLobby::CreatePlayer");
         goto failed;
     }
-    UnknownFunction4ac980(field_0x0c, connection->playerName->shortName);
-    field_0x14 = 1;
-    LeaveCriticalSection(NET_LOCK(field_0x48));
-    if (directPlay) {
-        directPlay->Release();
-        directPlay = 0;
+    AddPlayer(localPlayer, connection->playerName->shortName);
+    lobbyConnected = 1;
+    LeaveCriticalSection(NET_LOCK(lock));
+    if (baseDirectPlay) {
+        baseDirectPlay->Release();
+        baseDirectPlay = 0;
     }
-    if (lobby) {
-        lobby->Release();
-        lobby = 0;
+    if (baseLobby) {
+        baseLobby->Release();
+        baseLobby = 0;
     }
     DebugFree(connection, __FILE__, 867);
     return 0;
 
 failed:
-    UnknownFunction4ad5a0(result, __FILE__, 887);
-    if (directPlay) {
-        directPlay->Release();
-        directPlay = 0;
+    ReportDirectPlayError(result, __FILE__, 887);
+    if (baseDirectPlay) {
+        baseDirectPlay->Release();
+        baseDirectPlay = 0;
     }
     if (directPlay4) {
         directPlay4->Release();
         directPlay4 = 0;
     }
-    if (lobby) {
-        lobby->Release();
-        lobby = 0;
+    if (baseLobby) {
+        baseLobby->Release();
+        baseLobby = 0;
     }
     if (connection)
         DebugFree(connection, __FILE__, 892);
@@ -187,7 +187,7 @@ failed:
 }
 
 // 0x004abf10: builds a DirectPlay address for `provider`.
-int NetworkInterface::UnknownFunction4abf10(GUID provider, char* address, char* port,
+int NetworkInterface::CreateAddress(GUID provider, char* address, char* port,
                                             void* comPort, void** result,
                                             unsigned long* resultSize)
 {
@@ -242,12 +242,12 @@ int NetworkInterface::UnknownFunction4abf10(GUID provider, char* address, char* 
     } else {
         return 0;
     }
-    if (field_0x08->CreateCompoundAddress(elements, count, 0, &size) != NET_DPERR_BUFFERTOOSMALL)
+    if (lobby->CreateCompoundAddress(elements, count, 0, &size) != NET_DPERR_BUFFERTOOSMALL)
         goto failed;
     buffer = DebugMalloc(size, __FILE__, 1115);
     if (!buffer)
         goto failed;
-    if (field_0x08->CreateCompoundAddress(elements, count, buffer, &size) < 0) {
+    if (lobby->CreateCompoundAddress(elements, count, buffer, &size) < 0) {
         DebugFree(buffer, __FILE__, 1135);
         goto failed;
     }
@@ -259,15 +259,15 @@ failed:
 }
 
 // 0x004ac7c0: the player at *index, advancing *index.
-NetPlayer* NetworkInterface::UnknownFunction4ac7c0(int* index)
+NetPlayer* NetworkInterface::NextPlayer(int* index)
 {
-    NetPlayer* player = field_0x30;
+    NetPlayer* player = players;
     if (!player)
         return 0;
     for (int i = 0; i != *index; i++) {
         if (!player)
             return 0;
-        player = player->field_0x1c;
+        player = player->next;
     }
     if (!player)
         return 0;
@@ -276,7 +276,7 @@ NetPlayer* NetworkInterface::UnknownFunction4ac7c0(int* index)
 }
 
 // 0x004aced0: dispatches the received messages in ring order.
-void NetworkInterface::UnknownFunction4aced0(int value)
+void NetworkInterface::DispatchMessages(int value)
 {
     char name[16];
     char systemName[16];
@@ -284,51 +284,51 @@ void NetworkInterface::UnknownFunction4aced0(int value)
     int last;
     int more;
 
-    UnknownFunction4acc50(value);
-    if (field_0x40 || field_0x3c) {
+    ResendPending(value);
+    if (nextMessage || field_0x3c) {
         if (!field_0x3c) {
             index = 0;
-            last = field_0x40 - 1;
+            last = nextMessage - 1;
         } else {
-            index = field_0x40;
-            last = field_0x40 - 1;
+            index = nextMessage;
+            last = nextMessage - 1;
             if (last < 0)
                 last = 0xff;
         }
         do {
             more = index != last;
-            if (field_0x34[index].field_0x04 && !UnknownFunction4ac800(field_0x34[index].field_0x04) &&
-                UnknownFunction4ac720(field_0x34[index].field_0x04, name))
-                UnknownFunction4ac980(field_0x34[index].field_0x04, name);
-            if (field_0x34[index].field_0x00 == 0x40) {
-                UnknownFunction4acca0(*(short*)(field_0x34[index].field_0x14 + 2));
+            if (messages[index].from && !FindPlayer(messages[index].from) &&
+                GetPlayerName(messages[index].from, name))
+                AddPlayer(messages[index].from, name);
+            if (messages[index].type == 0x40) {
+                AcknowledgeMessage(*(short*)(messages[index].data + 2));
             } else {
                 g_UnknownGlobal56e26c->UnknownVirtualSlot17(
-                    field_0x34[index].field_0x00, field_0x34[index].field_0x14,
-                    field_0x34[index].field_0x04, field_0x34[index].field_0x08,
-                    field_0x34[index].field_0x0c);
-                NetMessage* message = &field_0x34[index];
-                if (!message->field_0x04) {
+                    messages[index].type, messages[index].data,
+                    messages[index].from, messages[index].to,
+                    messages[index].flags);
+                NetMessage* message = &messages[index];
+                if (!message->from) {
                     // DirectPlay system message: type, player type, player id.
-                    int* system = (int*)message->field_0x14;
-                    switch (message->field_0x00) {
+                    int* system = (int*)message->data;
+                    switch (message->type) {
                     case DPSYS_CREATEPLAYERORGROUP:
                         if (system[2] && system[1] == 1) {
-                            UnknownFunction4ac720(system[2], systemName);
-                            UnknownFunction4ac980(system[2], systemName);
+                            GetPlayerName(system[2], systemName);
+                            AddPlayer(system[2], systemName);
                         }
                         break;
                     case DPSYS_DESTROYPLAYERORGROUP:
-                        UnknownFunction4aca80(system[2]);
+                        RemovePlayer(system[2]);
                         break;
                     }
                 }
             }
-            field_0x34[index].field_0x00 = 0;
+            messages[index].type = 0;
             if (++index >= 0x100)
                 index = 0;
         } while (more);
-        field_0x40 = 0;
+        nextMessage = 0;
         field_0x3c = 0;
     }
     field_0x38 = 0;

@@ -3,7 +3,7 @@
 // its matched functions). Check: compile this file and compare each function
 // with ProCircuitProcsNearMisses.bindings.json.
 //
-// PCLastRaceDlg::UnknownFunction4d8c40 (0x004d8c40, 883 bytes): the same
+// PCLastRaceDlg::PayOutRace (0x004d8c40, 883 bytes): the same
 //   flow, calls and x87 code; in the per-racer update retail loads +0x0c
 //   before +0x08 for `field_0x30 += stunt - medical - repairs - fee +
 //   winnings` and then adds +0x0c into +0x24 in memory, VC6 here loads +0x08
@@ -22,12 +22,12 @@
 //   `mov edx, [esp+4]` between the fs:[0] load and `push -1`, a shape
 //   mcm2tool/resolved_match.py's handler-push recognition does not accept, so
 //   the handler label stays unresolved.
-// PCStartupDlg::UnknownFunction4d59a0 (0x004d59a0, 756 bytes): exact in
+// PCStartupDlg::AddCircuitRow (0x004d59a0, 756 bytes): exact in
 //   some states of the shared headers; in others the only difference is the
 //   order of the two reloads after the shared strcpy of the "Class" column
 //   (retail reloads `this` before `row`). Unrelated declarations elsewhere in
 //   the translation unit flip it.
-// PCCentralBikeRiderDlg::UnknownFunction4d6fc0 (0x004d6fc0, 557 bytes, 555
+// PCCentralBikeRiderDlg::FillBikeRiderLists (0x004d6fc0, 557 bytes, 555
 //   match): retail reloads the bike row offset into ecx, VC6 here into ebp.
 // PCCentralBikeRiderDlg::UnknownVirtualSlot10 (0x004d72c0, 1291 bytes, 1233
 //   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
@@ -36,7 +36,7 @@
 #include "../../src/reconstructed/ProCircuitProcs.cpp"
 
 // 0x004d8c40
-void PCLastRaceDlg::UnknownFunction4d8c40()
+void PCLastRaceDlg::PayOutRace()
 {
     UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
     int fee = circuit->field_0x1229[circuit->field_0x40];
@@ -53,12 +53,12 @@ void PCLastRaceDlg::UnknownFunction4d8c40()
     int paid = 0;
     for (int j = 0; j < g_UnknownGlobal56e26c->eventManager->field_0x4c; j++) {
         UnknownProCircuitResult* result = &((UnknownProCircuitResult*)g_UnknownGlobal56e26c->eventManager->field_0x50)[j];
-        UnknownProCircuitRacer* racer = &circuit->field_0x465[result->field_0x00];
-        racer->field_0x00.field_0x0c = (int)__min(purse * circuit->field_0x1249, result->field_0x38 * 250.0f);
-        racer->field_0x00.field_0x08 = (int)__min(purse * circuit->field_0x1245, result->field_0x34 * 500.0f);
-        racer->field_0x00.field_0x14 = (int)__min(purse * circuit->field_0x124d, result->field_0x3c * 400.0f);
-        racer->field_0x00.field_0x04 = (int)ceil(purse * shares[result->field_0x04 - 1]);
-        racer->field_0x00.field_0x00 = result->field_0x28;
+        UnknownProCircuitRacer* racer = &circuit->field_0x465[result->racer];
+        racer->field_0x00.field_0x0c = (int)__min(purse * circuit->field_0x1249, result->medical * 250.0f);
+        racer->field_0x00.field_0x08 = (int)__min(purse * circuit->field_0x1245, result->repairs * 500.0f);
+        racer->field_0x00.field_0x14 = (int)__min(purse * circuit->field_0x124d, result->stunts * 400.0f);
+        racer->field_0x00.field_0x04 = (int)ceil(purse * shares[result->position - 1]);
+        racer->field_0x00.field_0x00 = result->points;
         paid += racer->field_0x00.field_0x04;
         racer->field_0x30 += racer->field_0x00.field_0x14 - racer->field_0x00.field_0x0c - racer->field_0x00.field_0x08 - fee +
                              racer->field_0x00.field_0x04;
@@ -71,23 +71,23 @@ void PCLastRaceDlg::UnknownFunction4d8c40()
 
     UnknownProCircuitRank order[11];
     for (i = 0; i < circuit->field_0x460; i++) {
-        order[i].field_0x00 = circuit->field_0x465[i].field_0x00.field_0x00;
-        order[i].field_0x04 = i;
+        order[i].points = circuit->field_0x465[i].field_0x00.field_0x00;
+        order[i].racer = i;
     }
-    qsort(order, circuit->field_0x460, sizeof(UnknownProCircuitRank), UnknownFunction4d8c20);
+    qsort(order, circuit->field_0x460, sizeof(UnknownProCircuitRank), CompareRankPoints);
     for (i = 0; i < circuit->field_0x460; i++)
-        circuit->field_0x465[order[i].field_0x04].field_0x00.field_0x10 = i + 1;
+        circuit->field_0x465[order[i].racer].field_0x00.field_0x10 = i + 1;
     int rest = purse - paid;
-    circuit->field_0x465[order[0].field_0x04].field_0x00.field_0x04 += rest;
-    circuit->field_0x465[order[0].field_0x04].field_0x18.field_0x04 += rest;
-    circuit->field_0x465[order[0].field_0x04].field_0x30 += rest;
+    circuit->field_0x465[order[0].racer].field_0x00.field_0x04 += rest;
+    circuit->field_0x465[order[0].racer].field_0x18.field_0x04 += rest;
+    circuit->field_0x465[order[0].racer].field_0x30 += rest;
     for (i = 0; i < circuit->field_0x460; i++) {
-        order[i].field_0x00 = circuit->field_0x465[i].field_0x18.field_0x00;
-        order[i].field_0x04 = i;
+        order[i].points = circuit->field_0x465[i].field_0x18.field_0x00;
+        order[i].racer = i;
     }
-    qsort(order, circuit->field_0x460, sizeof(UnknownProCircuitRank), UnknownFunction4d8c20);
+    qsort(order, circuit->field_0x460, sizeof(UnknownProCircuitRank), CompareRankPoints);
     for (i = 0; i < circuit->field_0x460; i++)
-        circuit->field_0x465[order[i].field_0x04].field_0x18.field_0x10 = i + 1;
+        circuit->field_0x465[order[i].racer].field_0x18.field_0x10 = i + 1;
 }
 
 // 0x004d8fc0
@@ -96,47 +96,47 @@ void PCBailoutDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
     UnknownGameUiControl* label;
     char text[128];
-    switch (event->field_0x08) {
-    case 5: {
-        field_0x7f58 = circuit->field_0x1229[circuit->field_0x40];
-        field_0x7f5c = circuit->field_0x465[0].field_0x30;
-        field_0x7f60 = field_0x7f58 - field_0x7f5c;
-        UnknownSetText(UnknownFunction46ebf0("TitleText", 12), 0x144a);
-        UnknownGameUiControl* description = UnknownFunction46ebf0("TxtDescription", 12);
+    switch (event->kind) {
+    case kDialogInit: {
+        entryFee = circuit->field_0x1229[circuit->field_0x40];
+        playerCash = circuit->field_0x465[0].field_0x30;
+        cashShortfall = entryFee - playerCash;
+        UnknownSetText(FindControl("TitleText", 12), 0x144a);
+        UnknownGameUiControl* description = FindControl("TxtDescription", 12);
         description->field_0x1e8 = 1;
         UnknownSetText(description, 0x1449);
         unsigned int color = circuit->field_0x465[0].field_0x30 < 0 ? 0xff : 0xff00;
-        UnknownSetText(UnknownFunction46ebf0("TxtItem1", 12), 0x144b);
-        UnknownGameUiControl* item = UnknownFunction46ebf0("Item1", 12);
-        sprintf(text, "$%d", field_0x7f5c);
-        item->UnknownFunction470b20(text);
-        item->UnknownFunction470d40(color);
-        UnknownSetText(UnknownFunction46ebf0("TxtItem2", 12), 0x144d);
-        item = UnknownFunction46ebf0("Item2", 12);
-        sprintf(text, "$%d", field_0x7f58);
-        item->UnknownFunction470b20(text);
-        item->UnknownFunction470d40(0xff);
-        UnknownSetText(UnknownFunction46ebf0("TxtItem4", 12), 0x144c);
-        item = UnknownFunction46ebf0("Item4", 12);
-        sprintf(text, "$%d", field_0x7f60);
-        item->UnknownFunction470b20(text);
-        item->UnknownFunction470d40(0xff00);
-        UnknownFunction46ebf0("Back", 1)->UnknownFunction470660(0, 1);
+        UnknownSetText(FindControl("TxtItem1", 12), 0x144b);
+        UnknownGameUiControl* item = FindControl("Item1", 12);
+        sprintf(text, "$%d", playerCash);
+        item->SetText(text);
+        item->SetFontColor(color);
+        UnknownSetText(FindControl("TxtItem2", 12), 0x144d);
+        item = FindControl("Item2", 12);
+        sprintf(text, "$%d", entryFee);
+        item->SetText(text);
+        item->SetFontColor(0xff);
+        UnknownSetText(FindControl("TxtItem4", 12), 0x144c);
+        item = FindControl("Item4", 12);
+        sprintf(text, "$%d", cashShortfall);
+        item->SetText(text);
+        item->SetFontColor(0xff00);
+        FindControl("Back", 1)->Show(0, 1);
         break;
     }
-    case 1:
-        if (_stricmp("ButAccept", event->field_0x04) == 0) {
-            circuit->field_0x465[0].field_0x30 += field_0x7f60;
-            circuit->field_0x465[0].field_0x34 += field_0x7f60;
-            g_UnknownGlobal56e26c->field_0x3444->UnknownFunction4d4150((char*)g_UnknownGlobal56e26c->field_0x3448);
+    case kDialogCommand:
+        if (_stricmp("ButAccept", event->controlName) == 0) {
+            circuit->field_0x465[0].field_0x30 += cashShortfall;
+            circuit->field_0x465[0].field_0x34 += cashShortfall;
+            g_UnknownGlobal56e26c->field_0x3444->Save((char*)g_UnknownGlobal56e26c->field_0x3448);
             PCCentralDlg* dialog = new(__FILE__, 1551) PCCentralDlg;
-            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-            UnknownFunction46ff30(0);
-        } else if (_stricmp("ButDecline", event->field_0x04) == 0) {
+            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
+        } else if (_stricmp("ButDecline", event->controlName) == 0) {
             circuit->field_0x464 |= 4;
             PCFailedDlg* dialog = new(__FILE__, 1556) PCFailedDlg;
-            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-            UnknownFunction46ff30(0);
+            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
         }
         break;
     }
@@ -147,58 +147,58 @@ void PCBunnyDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
     char text[128];
-    switch (event->field_0x08) {
-    case 5: {
+    switch (event->kind) {
+    case kDialogInit: {
         int debt = circuit->field_0x465[0].field_0x34;
         field_0x7f58 = circuit->field_0x1229[circuit->field_0x40];
         field_0x7f5c = circuit->field_0x465[0].field_0x30;
         field_0x7f60 = field_0x7f58 - field_0x7f5c + debt;
-        UnknownSetText(UnknownFunction46ebf0("TitleText", 12), 0x1452);
-        UnknownGameUiControl* description = UnknownFunction46ebf0("TxtDescription", 12);
+        UnknownSetText(FindControl("TitleText", 12), 0x1452);
+        UnknownGameUiControl* description = FindControl("TxtDescription", 12);
         description->field_0x1e8 = 1;
         UnknownSetText(description, 0x1451);
         unsigned int color = circuit->field_0x465[0].field_0x30 < 0 ? 0xff : 0xff00;
-        UnknownSetText(UnknownFunction46ebf0("TxtItem1", 12), 0x144b);
-        UnknownGameUiControl* item = UnknownFunction46ebf0("Item1", 12);
+        UnknownSetText(FindControl("TxtItem1", 12), 0x144b);
+        UnknownGameUiControl* item = FindControl("Item1", 12);
         sprintf(text, "$%d", field_0x7f5c);
-        item->UnknownFunction470b20(text);
-        item->UnknownFunction470d40(color);
-        UnknownSetText(UnknownFunction46ebf0("TxtItem2", 12), 0x144d);
-        item = UnknownFunction46ebf0("Item2", 12);
+        item->SetText(text);
+        item->SetFontColor(color);
+        UnknownSetText(FindControl("TxtItem2", 12), 0x144d);
+        item = FindControl("Item2", 12);
         sprintf(text, "$%d", field_0x7f58);
-        item->UnknownFunction470b20(text);
-        item->UnknownFunction470d40(0xff);
-        UnknownSetText(UnknownFunction46ebf0("TxtItem3", 12), 0x1453);
-        item = UnknownFunction46ebf0("Item3", 12);
+        item->SetText(text);
+        item->SetFontColor(0xff);
+        UnknownSetText(FindControl("TxtItem3", 12), 0x1453);
+        item = FindControl("Item3", 12);
         sprintf(text, "$%d", debt);
-        item->UnknownFunction470b20(text);
-        item->UnknownFunction470d40(0xff);
-        UnknownSetText(UnknownFunction46ebf0("TxtItem4", 12), 0x144f);
-        item = UnknownFunction46ebf0("Item4", 12);
+        item->SetText(text);
+        item->SetFontColor(0xff);
+        UnknownSetText(FindControl("TxtItem4", 12), 0x144f);
+        item = FindControl("Item4", 12);
         sprintf(text, "$%d", field_0x7f60);
-        item->UnknownFunction470b20(text);
-        item->UnknownFunction470d40(0xff00);
-        UnknownSetText(UnknownFunction46ebf0("TxtItem5", 12), 0x1450);
-        item = UnknownFunction46ebf0("Item5", 12);
+        item->SetText(text);
+        item->SetFontColor(0xff00);
+        UnknownSetText(FindControl("TxtItem5", 12), 0x1450);
+        item = FindControl("Item5", 12);
         sprintf(text, "$%d", 1000);
-        item->UnknownFunction470b20(text);
-        item->UnknownFunction470d40(0xff00);
-        UnknownFunction46ebf0("Back", 1)->UnknownFunction470660(0, 1);
+        item->SetText(text);
+        item->SetFontColor(0xff00);
+        FindControl("Back", 1)->Show(0, 1);
         break;
     }
-    case 1:
-        if (_stricmp("ButAccept", event->field_0x04) == 0) {
+    case kDialogCommand:
+        if (_stricmp("ButAccept", event->controlName) == 0) {
             circuit->field_0x465[0].field_0x30 += field_0x7f60 - circuit->field_0x465[0].field_0x34;
             circuit->field_0x465[0].field_0x34 = 0;
-            g_UnknownGlobal56e26c->field_0x3444->UnknownFunction4d4150((char*)g_UnknownGlobal56e26c->field_0x3448);
+            g_UnknownGlobal56e26c->field_0x3444->Save((char*)g_UnknownGlobal56e26c->field_0x3448);
             PCCentralDlg* dialog = new(__FILE__, 1744) PCCentralDlg;
-            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-            UnknownFunction46ff30(0);
-        } else if (_stricmp("ButDecline", event->field_0x04) == 0) {
+            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
+        } else if (_stricmp("ButDecline", event->controlName) == 0) {
             circuit->field_0x464 |= 4;
             PCFailedDlg* dialog = new(__FILE__, 1749) PCFailedDlg;
-            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-            UnknownFunction46ff30(0);
+            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            EndDialog(0);
         }
         break;
     }
@@ -209,8 +209,8 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
     char text[128];
-    switch (event->field_0x08) {
-    case 5: {
+    switch (event->kind) {
+    case kDialogInit: {
         UnknownTrackGameObject3444* current = g_UnknownGlobal56e26c->field_0x3444;
         // TrackGame+0x18fc: an int per series (the bonus track was offered).
         ((int*)g_UnknownGlobal56e26c->mode.field_0x1384)[current->field_0x40] = 1;
@@ -226,21 +226,21 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             description = 0x145a;
             break;
         }
-        UnknownSetText(UnknownFunction46ebf0("TitleText", 12), title);
-        UnknownGameUiControl* control = UnknownFunction46ebf0("TxtDescription", 12);
+        UnknownSetText(FindControl("TitleText", 12), title);
+        UnknownGameUiControl* control = FindControl("TxtDescription", 12);
         control->field_0x1e8 = 1;
         UnknownSetText(control, description);
-        UnknownSetText(UnknownFunction46ebf0("TxtItem1", 12), 0x145b);
-        UnknownGameUiControl* item = UnknownFunction46ebf0("Item1", 12);
+        UnknownSetText(FindControl("TxtItem1", 12), 0x145b);
+        UnknownGameUiControl* item = FindControl("Item1", 12);
         sprintf(text, "$%d", 3000);
-        item->UnknownFunction470b20(text);
-        item->UnknownFunction470d40(0xff00);
-        UnknownFunction46ebf0("Back", 1)->UnknownFunction470660(0, 1);
+        item->SetText(text);
+        item->SetFontColor(0xff00);
+        FindControl("Back", 1)->Show(0, 1);
         current->field_0x465[0].field_0x30 += 3000;
         break;
     }
-    case 1:
-        if (_stricmp("ButAccept", event->field_0x04) == 0) {
+    case kDialogCommand:
+        if (_stricmp("ButAccept", event->controlName) == 0) {
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45e520();
             g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 = circuit->field_0x40;
             g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 = 1;
@@ -260,10 +260,10 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             g_UnknownGlobal56e26c->mode.field_0x94 = circuit->field_0x50;
             UnknownFunction4536e0();
             UnknownVirtualSlot26();
-        } else if (_stricmp("ButDecline", event->field_0x04) == 0) {
-            circuit->UnknownFunction4d41a0();
-            UnknownFunction4d4ba0();
-            UnknownFunction46ff30(0);
+        } else if (_stricmp("ButDecline", event->controlName) == 0) {
+            circuit->AdvanceAfterRace();
+            OpenCareerDialog();
+            EndDialog(0);
         }
         break;
     }
@@ -273,8 +273,8 @@ void PCBonusTrackDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 void PCNewEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
     UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
-    switch (event->field_0x08) {
-    case 5: {
+    switch (event->kind) {
+    case kDialogInit: {
         int description;
         const char* image;
         switch (circuit->field_0x40) {
@@ -295,39 +295,39 @@ void PCNewEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             image = "SuperScreen";
             break;
         }
-        UnknownGameUiControl* control = UnknownFunction46ebf0("TxtDescription", 12);
+        UnknownGameUiControl* control = FindControl("TxtDescription", 12);
         control->field_0x1e8 = 1;
         UnknownSetText(control, description);
-        UnknownSetText(UnknownFunction46ebf0("TitleText", 12), 0x1467);
-        control = UnknownFunction46ebf0("ButDecline", 1);
-        control->UnknownFunction470660(0, 1);
-        UnknownSetText(UnknownFunction46ebf0("ButAccept", 1), 0x916);
-        control = UnknownFunction46ebf0("Pic", 5);
-        control->UnknownFunction470730(0, UnknownFunction46e9a0(image));
+        UnknownSetText(FindControl("TitleText", 12), 0x1467);
+        control = FindControl("ButDecline", 1);
+        control->Show(0, 1);
+        UnknownSetText(FindControl("ButAccept", 1), 0x916);
+        control = FindControl("Pic", 5);
+        control->SetImage(0, FindSectionObject(image));
         break;
     }
-    case 1: {
+    case kDialogCommand: {
         PCCentralDlg* dialog = new(__FILE__, 1896) PCCentralDlg;
-        field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
-        UnknownFunction46ff30(0);
+        guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+        EndDialog(0);
         break;
     }
     }
 }
 
 // 0x004d6fc0
-void PCCentralBikeRiderDlg::UnknownFunction4d6fc0()
+void PCCentralBikeRiderDlg::FillBikeRiderLists()
 {
     int bike = 0;
     int rider = 0;
     char text[128];
     PCCentralBikeRiderDlg* self = this;
-    UIListBox* list = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
-    list->UnknownFunction4775f0();
+    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+    list->RemoveAllRows();
     for (int i = 0; i < g_UnknownGlobal56e26c->ui->field_0x54; i++) {
         int rule = g_UnknownGlobal56e26c->field_0x3444->field_0x4c;
         if (rule != 3 && !((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i].field_0x88) {
-            int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i].field_0x8c);
+            int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i].engineSize);
             if (bikeClass != 0) {
                 if (bikeClass <= 0 || bikeClass > 2)
                     continue;
@@ -338,37 +338,37 @@ void PCCentralBikeRiderDlg::UnknownFunction4d6fc0()
             }
         }
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[i];
-        UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->field_0x00];
-        if (model->field_0xc4 > g_UnknownGlobal56e26c->field_0x3444->field_0x48)
+        UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[entry->model];
+        if (model->modelKind > g_UnknownGlobal56e26c->field_0x3444->field_0x48)
             continue;
-        sprintf(text, "%s %s", model->field_0x00, entry->field_0x04);
+        sprintf(text, "%s %s", model->displayName, entry->displayName);
         list->UnknownFunction476d80(text, i, 0);
         if (g_UnknownGlobal56e26c->field_0x3444->field_0x45c == i)
             bike = i;
     }
     if (bike)
-        list->UnknownFunction476b30(bike);
+        list->SelectRowByData(bike);
     else
-        list->UnknownFunction476a60(0);
+        list->SelectRow(0);
     list->UnknownFunction477900(1);
-    list = static_cast<UIDropDownList*>(self->UnknownFunction46ebf0("DDLRiders", 6))->field_0x1fc;
-    list->UnknownFunction4775f0();
+    list = static_cast<UIDropDownList*>(self->FindControl("DDLRiders", 6))->listPart;
+    list->RemoveAllRows();
     for (int j = 0; j < g_UnknownGlobal56e26c->ui->field_0x5c; j++) {
         UnknownKrustyUIModel* entry = &((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[j];
-        if (entry->field_0xc4 <= g_UnknownGlobal56e26c->field_0x3444->field_0x48 || entry->field_0xc0) {
-            list->UnknownFunction476d80(entry->field_0x00, j, 0);
+        if (entry->modelKind <= g_UnknownGlobal56e26c->field_0x3444->field_0x48 || entry->field_0xc0) {
+            list->UnknownFunction476d80(entry->displayName, j, 0);
             if (g_UnknownGlobal56e26c->field_0x3444->field_0x458 == j)
                 rider = j;
         }
     }
     if (rider)
-        list->UnknownFunction476b30(rider);
+        list->SelectRowByData(rider);
     else
-        list->UnknownFunction476a60(0);
+        list->SelectRow(0);
 }
 
 // 0x004d59a0
-void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, int row)
+void PCStartupDlg::AddCircuitRow(UnknownTrackGameObject3444* circuit, int row)
 {
     char name[64];
     char text[128];
@@ -377,11 +377,11 @@ void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, in
     const char* prefix = finished || failed ? "LstDone" : "Lst";
 
     sprintf(name, "%s%s", prefix, "Name");
-    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(circuit->field_0x00, row, 0);
+    static_cast<UIListBox*>(FindControl(name, 3))->UnknownFunction476d80(circuit->field_0x00, row, 0);
 
     sprintf(name, "%s%s", prefix, "Rank");
     sprintf(text, "%d / %d", circuit->field_0x465[0].field_0x18.field_0x10, circuit->field_0x460);
-    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(FindControl(name, 3))->UnknownFunction476d80(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Class");
     switch (circuit->field_0x4c) {
@@ -395,7 +395,7 @@ void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, in
         g_UnknownGlobal56e26c->UnknownFunction521970(0x14cf, text, 127);
         break;
     }
-    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(FindControl(name, 3))->UnknownFunction476d80(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Diff");
     switch (circuit->field_0x50) {
@@ -409,15 +409,15 @@ void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, in
         g_UnknownGlobal56e26c->UnknownFunction521970(0x14cc, text, 127);
         break;
     }
-    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(FindControl(name, 3))->UnknownFunction476d80(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Points");
     _itoa(circuit->field_0x465[0].field_0x18.field_0x00, text, 10);
-    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(FindControl(name, 3))->UnknownFunction476d80(text, row, 0);
 
     sprintf(name, "%s%s", prefix, "Cash");
     sprintf(text, "$%d", circuit->field_0x465[0].field_0x30);
-    static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
+    static_cast<UIListBox*>(FindControl(name, 3))->UnknownFunction476d80(text, row, 0);
 
     if (finished || failed) {
         sprintf(name, "%s%s", prefix, "Status");
@@ -425,21 +425,21 @@ void PCStartupDlg::UnknownFunction4d59a0(UnknownTrackGameObject3444* circuit, in
             g_UnknownGlobal56e26c->UnknownFunction521970(0x1442, text, 128);
         else if (finished)
             g_UnknownGlobal56e26c->UnknownFunction521970(0x1443, text, 128);
-        static_cast<UIListBox*>(UnknownFunction46ebf0(name, 3))->UnknownFunction476d80(text, row, 0);
+        static_cast<UIListBox*>(FindControl(name, 3))->UnknownFunction476d80(text, row, 0);
     }
 }
 
 // 0x004d72c0: as SPBikeRiderDlg slot 10 (dlgprocs.cpp 0x0044fae0).
 int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
 {
-    if (field_0x110)
-        field_0x110->UnknownFunction404da0();
+    if (dialogBackground)
+        dialogBackground->UnknownFunction404da0();
     Vector3 offset;
     Vector3 turned;
-    GUIInputDevice* pointer = field_0x34->field_0x2c;
+    GUIInputDevice* pointer = guiUser->pointerDevice;
     if (pointer && field_0x7f78 && field_0x7f7c) {
-        float dx = (float)(pointer->field_0xa4.x - field_0x34->field_0x34);
-        field_0x7f58.y += (pointer->field_0xa4.y - field_0x34->field_0x38) * 0.1f;
+        float dx = (float)(pointer->pointerPosition.x - guiUser->field_0x34);
+        field_0x7f58.y += (pointer->pointerPosition.y - guiUser->field_0x38) * 0.1f;
         field_0x7f58.y = __max(1.0f, __min(field_0x7f58.y, 10.0f));
         offset = UnknownVectorDifference(field_0x7f58, g_UnknownGlobal56e26c->ui->field_0x474);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, dx * 0.015707964f);
@@ -449,7 +449,7 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(&field_0x7f58, 0, 0, 0, 0);
         g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(field_0x7f64);
         field_0x7f78 = 1;
-        static_cast<UIMultiState*>(UnknownFunction46ebf0("ChkAutoRotate", 2))->UnknownFunction478cf0(0);
+        static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
     } else if (!field_0x7f78) {
         offset = UnknownVectorDifference(field_0x7f58, g_UnknownGlobal56e26c->ui->field_0x474);
         D3DRMVectorRotate(&turned, &offset, (Vector3*)&kVec3YAxis, frameTime * 0.39269909f);
@@ -461,8 +461,8 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
     g_UnknownGlobal56e26c->ui->field_0x46c->ModelVirtualSlot7(frameTime, 0, 0);
     g_UnknownGlobal56e26c->ui->field_0x470->ModelVirtualSlot7(frameTime, 0, 0);
     if (field_0x7f80 && rand() % 200 == 1) {
-        UIListBox* bikes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
-        bikes->UnknownFunction4768d0(-1);
+        UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+        bikes->GetRowData(-1);
         switch (rand() % 3) {
         case 0:
             g_UnknownGlobal56e26c->ui->field_0x46c->UnknownFunction4a8b10("LookLeftR");
@@ -476,16 +476,16 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot10(float frameTime)
         }
         field_0x7f80 = 0;
     }
-    if (!field_0x7f80 && g_UnknownGlobal56e26c->ui->field_0x46c->field_0x0c) {
-        UIListBox* bikes = static_cast<UIDropDownList*>(UnknownFunction46ebf0("DDLBikes", 6))->field_0x1fc;
+    if (!field_0x7f80 && g_UnknownGlobal56e26c->ui->field_0x46c->motionFinished) {
+        UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
         KrustyUI* ui = g_UnknownGlobal56e26c->ui;
         UnknownKrustyUIModel* model =
-            &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->UnknownFunction4768d0(-1)].field_0x00];
+            &((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bikes->GetRowData(-1)].model];
         model->field_0xc0->UnknownFunction4a8b10("WaitB");
         g_UnknownGlobal56e26c->ui->field_0x46c->UnknownFunction4a8b10("WaitR");
         field_0x7f80 = 1;
     }
-    if (field_0x110)
-        field_0x110->UnknownFunction404240(field_0x7f74, (CameraRect*)&field_0x7f8c);
+    if (dialogBackground)
+        dialogBackground->UnknownFunction404240(field_0x7f74, (CameraRect*)&field_0x7f8c);
     return UIDialog::UnknownVirtualSlot10(frameTime);
 }

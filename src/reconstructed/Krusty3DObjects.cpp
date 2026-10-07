@@ -52,9 +52,9 @@ static inline void Normalize(Vector3& v) {
 // 0x0048a5b0
 RunwayLights::RunwayLights(int flags) : GameObject(flags) {
     for (int i = 0; i < 5; i++)
-        field_0x38[i] = 0;
+        lightModels[i] = 0;
     field_0x30 = 0;
-    field_0x2c = 0;
+    blinkTimer = 0;
 }
 
 // 0x0048a600
@@ -67,13 +67,13 @@ RunwayLights* RunwayLights::UnknownFunction48a600(void* value, int a, int b, Unk
     int i = 0;
     Vector3 position(0.0f, 0.0f, 0.0f);
     for (; i < 5; i++) {
-        field_0x38[i] = (new (__FILE__, 0x40) ArcadeObject(1))
+        lightModels[i] = (new (__FILE__, 0x40) ArcadeObject(1))
                             ->UnknownFunction401310(value, a, b, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
-        if (!UnknownFunction469190(field_0x38[i], -1)) {
+        if (!UnknownFunction469190(lightModels[i], -1)) {
             Release();
             return 0;
         }
-        field_0x38[i]->field_0x30 = 0;
+        lightModels[i]->isVisible = 0;
     }
     return this;
 }
@@ -84,12 +84,12 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
     if (!field_0x30)
         return 1;
     for (int i = 0; i < 5; i++)
-        field_0x38[i]->field_0x30 = 0;
+        lightModels[i]->isVisible = 0;
     if (field_0x30->field_0x7a4)
         return 1;
-    field_0x2c += frameTime;
-    if (field_0x2c > 1.375f)
-        field_0x2c = 0;
+    blinkTimer += frameTime;
+    if (blinkTimer > 1.375f)
+        blinkTimer = 0;
     if (field_0x30->field_0x78c)
         return 1;
     Vector3 direction;
@@ -111,43 +111,43 @@ int RunwayLights::UnknownVirtualSlot10(float frameTime) {
     } else {
         Normalize(direction);
     }
-    if (field_0x2c > 1.125f)
-        field_0x38[0]->field_0x30 = 1;
-    else if (field_0x2c > 0.875f)
-        field_0x38[1]->field_0x30 = 1;
-    else if (field_0x2c > 0.625f)
-        field_0x38[2]->field_0x30 = 1;
-    else if (field_0x2c > 0.375f)
-        field_0x38[3]->field_0x30 = 1;
-    else if (field_0x2c > 0.125f)
-        field_0x38[4]->field_0x30 = 1;
+    if (blinkTimer > 1.125f)
+        lightModels[0]->isVisible = 1;
+    else if (blinkTimer > 0.875f)
+        lightModels[1]->isVisible = 1;
+    else if (blinkTimer > 0.625f)
+        lightModels[2]->isVisible = 1;
+    else if (blinkTimer > 0.375f)
+        lightModels[3]->isVisible = 1;
+    else if (blinkTimer > 0.125f)
+        lightModels[4]->isVisible = 1;
     Vector3 point;
     Vector3 normal;
     point = position + direction * 6.0f;
     field_0x34->UnknownFunction507c10(&point, &normal, 0, 0);
     point.y += 4.0f;
-    field_0x38[0]->UnknownFunction4014f0(&point);
-    field_0x38[0]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[0]->UnknownFunction4014f0(&point);
+    lightModels[0]->UnknownFunction401520(&direction, &normal, 1, 0);
     point = position + direction * 3.0f;
     field_0x34->UnknownFunction507c10(&point, &normal, 0, 0);
     point.y += 4.0f;
-    field_0x38[1]->UnknownFunction4014f0(&point);
-    field_0x38[1]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[1]->UnknownFunction4014f0(&point);
+    lightModels[1]->UnknownFunction401520(&direction, &normal, 1, 0);
     point = position;
     field_0x34->UnknownFunction507c10(&point, &normal, 0, 0);
     point.y += 4.0f;
-    field_0x38[2]->UnknownFunction4014f0(&point);
-    field_0x38[2]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[2]->UnknownFunction4014f0(&point);
+    lightModels[2]->UnknownFunction401520(&direction, &normal, 1, 0);
     point = position - direction * 3.0f;
     field_0x34->UnknownFunction507c10(&point, &normal, 0, 0);
     point.y += 4.0f;
-    field_0x38[3]->UnknownFunction4014f0(&point);
-    field_0x38[3]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[3]->UnknownFunction4014f0(&point);
+    lightModels[3]->UnknownFunction401520(&direction, &normal, 1, 0);
     point = position - direction * 6.0f;
     field_0x34->UnknownFunction507c10(&point, &normal, 0, 0);
     point.y += 4.0f;
-    field_0x38[4]->UnknownFunction4014f0(&point);
-    field_0x38[4]->UnknownFunction401520(&direction, &normal, 1, 0);
+    lightModels[4]->UnknownFunction4014f0(&point);
+    lightModels[4]->UnknownFunction401520(&direction, &normal, 1, 0);
     return 1;
 }
 
@@ -160,15 +160,15 @@ void RunwayLights::UnknownFunction48ad50(UnknownRunwayRacer* racer) {
 
 // 0x0048ad60
 VisualCue::VisualCue(int flags) : ArcadeObject(flags) {
-    field_0xa8 = 0;
+    cueView = 0;
     field_0xbc = 0;
-    field_0xc8 = 0;
-    field_0xc0 = 0;
-    field_0xc4 = -1;
-    field_0xf8 = 0;
+    skippedRacer = 0;
+    currentRacer = 0;
+    reportedRacer = -1;
+    cueRacerCount = 0;
     field_0xac = 0;
     for (int i = 0; i < 11; i++)
-        field_0xcc[i] = 0;
+        cueRacers[i] = 0;
 }
 
 // 0x0048adf0
@@ -180,8 +180,8 @@ VisualCue* VisualCue::UnknownFunction48adf0(void* value, int a, int b, UnknownRu
     if (pixels && camera && c != 0.0f && d != 0.0f) {
         sprintf(name, "%s\\%s", "Res", "viscue.slt");
         if (ArcadeObject::UnknownFunction401310(value, a, b, name, position, pixels, camera, size, c, d, 0)) {
-            field_0xa8 = view;
-            field_0xb0 = 0;
+            cueView = view;
+            builtFieldOfView = 0;
             field_0xac = terrain;
             return this;
         }
@@ -191,47 +191,47 @@ VisualCue* VisualCue::UnknownFunction48adf0(void* value, int a, int b, UnknownRu
 }
 
 // 0x0048af20
-void VisualCue::UnknownFunction48af20(UnknownVisualCueView* view) {
+void VisualCue::CollectRacers(UnknownVisualCueView* view) {
     int iterator;
     UnknownVisualCueRacer* racer;
 
-    field_0xf8 = 0;
+    cueRacerCount = 0;
     iterator = 0;
-    field_0xa8 = view;
-    while ((racer = field_0xa8->UnknownFunction4204e0(&iterator)) != 0) {
-        field_0xcc[field_0xf8] = racer;
-        field_0xf8++;
+    cueView = view;
+    while ((racer = cueView->UnknownFunction4204e0(&iterator)) != 0) {
+        cueRacers[cueRacerCount] = racer;
+        cueRacerCount++;
     }
-    if (field_0xf8)
-        field_0xc0++;
+    if (cueRacerCount)
+        currentRacer++;
 }
 
 // 0x0048afa0
 int VisualCue::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     int active = 0;
-    for (int i = 0; i < field_0xf8; i++)
-        if (field_0xcc[i]->UnknownIsEnabled())
+    for (int i = 0; i < cueRacerCount; i++)
+        if (cueRacers[i]->UnknownIsEnabled())
             active++;
-    if (UnknownFunction43caa0(0x14, 0, event, 0x80000000) && !field_0xa8->field_0x190 &&
-        field_0xa8->field_0x18a && active > 1) {
+    if (UnknownFunction43caa0(0x14, 0, event, 0x80000000) && !cueView->field_0x190 &&
+        cueView->field_0x18a && active > 1) {
         field_0xbc = 1 - field_0xbc;
         return 1;
     }
     if (UnknownFunction43caa0(0xd2, 0, event, 0x80000000)) {
-        if (++field_0xc0 >= active)
-            field_0xc0 = 0;
-        if (field_0xc0 == field_0xc8) {
-            if (++field_0xc0 >= active)
-                field_0xc0 = 0;
+        if (++currentRacer >= active)
+            currentRacer = 0;
+        if (currentRacer == skippedRacer) {
+            if (++currentRacer >= active)
+                currentRacer = 0;
         }
         return 1;
     }
     if (UnknownFunction43caa0(0xd3, 0, event, 0x80000000)) {
-        if (--field_0xc0 < 0)
-            field_0xc0 = active - 1;
-        if (field_0xc0 == field_0xc8) {
-            if (--field_0xc0 < 0)
-                field_0xc0 = active - 1;
+        if (--currentRacer < 0)
+            currentRacer = active - 1;
+        if (currentRacer == skippedRacer) {
+            if (--currentRacer < 0)
+                currentRacer = active - 1;
         }
         return 1;
     }
@@ -240,29 +240,29 @@ int VisualCue::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntr
 
 // 0x0048bc10
 int VisualCue::UnknownVirtualSlot14() {
-    if (field_0x30)
+    if (isVisible)
         return ArcadeObject::UnknownVirtualSlot14();
     return 1;
 }
 
 // 0x0048bc30
 int VisualCue::UnknownFunction48bc30() {
-    if (field_0xc4 != field_0xc0) {
-        field_0xc4 = field_0xc0;
-        return field_0xc0;
+    if (reportedRacer != currentRacer) {
+        reportedRacer = currentRacer;
+        return currentRacer;
     }
-    if (field_0xc0 == field_0xc8) {
-        if (++field_0xc0 >= field_0xf8)
-            field_0xc0 = 0;
-        field_0xc4 = field_0xc0;
-        return field_0xc0;
+    if (currentRacer == skippedRacer) {
+        if (++currentRacer >= cueRacerCount)
+            currentRacer = 0;
+        reportedRacer = currentRacer;
+        return currentRacer;
     }
     return -1;
 }
 
 // 0x0048bc80
 int VisualCue::UnknownFunction48bc80() {
-    return field_0xbc && field_0xf8 > 1;
+    return field_0xbc && cueRacerCount > 1;
 }
 
 // --------------------------------------------------------- NumberObjectManager
@@ -318,7 +318,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
     for (int i = 0; i < 5; i++)
         if (field_0x38[i])
-            field_0x38[i]->field_0x30 = 0;
+            field_0x38[i]->isVisible = 0;
     if (((UnknownNumberOwner*)field_0x18)->field_0x08 == field_0x34) {
         int counting = field_0x2c->field_0x15c > 0.0f && field_0x2c->field_0x6c == 0;
         if (!(field_0x2c->field_0x38->field_0x76c > 1.0f) && !counting)
@@ -333,7 +333,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
             index = (int)field_0x2c->field_0x15c;
             if (index >= 5 || index < 0 || !field_0x38[index])
                 return 1;
-            field_0x38[index]->field_0x30 = 1;
+            field_0x38[index]->isVisible = 1;
             field_0x38[index]->UnknownFunction401520(&forward, &up, 0, 1);
             Vector3 position = field_0x34->field_0x170;
             position += up * 2.5f;
@@ -343,7 +343,7 @@ int NumberObjectManager::UnknownVirtualSlot10(float frameTime) {
             index = 5 - (int)field_0x2c->field_0x38->field_0x76c;
             if (index >= 5 || index < 0 || !field_0x38[index])
                 return 1;
-            field_0x38[index]->field_0x30 = 1;
+            field_0x38[index]->isVisible = 1;
             field_0x38[index]->UnknownFunction401520(&forward, &up, 0, 1);
             Vector3 position = field_0x34->field_0x170;
             position += up * 2.5f;
@@ -380,14 +380,14 @@ static const UnknownBonusKey g_UnknownBonusKeys[7] = {
 
 // 0x0048c2b0
 BonusObjectManager::BonusObjectManager(int flags) : GameObject(flags) {
-    field_0x34 = 0;
+    elapsed = 0;
     field_0x38 = 0;
     field_0x1dc = 0;
     field_0x1ec = 0;
     field_0x1f0 = 0;
-    field_0x30 = -1;
+    currentKey = -1;
     field_0x1e0 = 60.0f;
-    field_0x1e8 = 1.0f;
+    sizeFactor = 1.0f;
 }
 
 // 0x0048c320
@@ -403,79 +403,79 @@ int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
 
     position = Vector3(0.74f, 0.0f, 0.0f);
     sprintf(name, "%s\\%1d.slt", "Res", 0);
-    field_0x40[0][0] = new (__FILE__, 0x2d3) D3DIMSoultreeObject(field_0x25_bit0);
-    field_0x40[0][0]->UnknownVirtualSlot9(value, name, a, b, 1);
-    field_0x40[0][0]->UnknownFunction4fc660(&position);
-    field_0x3c->UnknownFunction469190(field_0x40[0][0], -1);
-    field_0x40[0][0]->UnknownFunction4444e0();
+    digitModels[0][0] = new (__FILE__, 0x2d3) D3DIMSoultreeObject(field_0x25_bit0);
+    digitModels[0][0]->UnknownVirtualSlot9(value, name, a, b, 1);
+    digitModels[0][0]->UnknownFunction4fc660(&position);
+    baseFrame->UnknownFunction469190(digitModels[0][0], -1);
+    digitModels[0][0]->UnknownFunction4444e0();
     position.x = 0.37f;
-    field_0x40[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(field_0x25_bit0);
-    field_0x40[0][1]->UnknownVirtualSlot9(value, name, a, b, 1);
-    field_0x40[0][1]->UnknownFunction4fc660(&position);
-    field_0x3c->UnknownFunction469190(field_0x40[0][1], -1);
-    field_0x40[0][1]->UnknownFunction4444e0();
+    digitModels[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(field_0x25_bit0);
+    digitModels[0][1]->UnknownVirtualSlot9(value, name, a, b, 1);
+    digitModels[0][1]->UnknownFunction4fc660(&position);
+    baseFrame->UnknownFunction469190(digitModels[0][1], -1);
+    digitModels[0][1]->UnknownFunction4444e0();
     for (digit = 1; digit < 10; digit++) {
-        field_0x40[digit][0] = 0;
-        field_0x40[digit][1] = 0;
+        digitModels[digit][0] = 0;
+        digitModels[digit][1] = 0;
     }
     for (digit = 0; digit < 10; digit++) {
         sprintf(name, "%s\\%1d.slt", "Res", digit);
         position.x = 0.0f;
         for (place = 2; place < 5; place++) {
-            field_0x40[digit][place] = new (__FILE__, 0x2ec) D3DIMSoultreeObject(field_0x25_bit0);
-            field_0x40[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
-            field_0x40[digit][place]->UnknownFunction4fc660(&position);
-            field_0x3c->UnknownFunction469190(field_0x40[digit][place], -1);
-            field_0x40[digit][place]->UnknownFunction4444e0();
+            digitModels[digit][place] = new (__FILE__, 0x2ec) D3DIMSoultreeObject(field_0x25_bit0);
+            digitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
+            digitModels[digit][place]->UnknownFunction4fc660(&position);
+            baseFrame->UnknownFunction469190(digitModels[digit][place], -1);
+            digitModels[digit][place]->UnknownFunction4444e0();
             position.x -= 0.37f;
         }
     }
     for (place = 0; place < 5; place++)
-        field_0x108[place] = -1;
+        shownDigits[place] = -1;
     position.x = 1.18f;
     sprintf(name, "%s\\x.slt", "Res", 0);
-    field_0x11c = new (__FILE__, 0x2fe) D3DIMSoultreeObject(field_0x25_bit0);
-    field_0x11c->UnknownVirtualSlot9(value, name, a, b, 1);
-    field_0x11c->UnknownFunction4fc660(&position);
-    field_0x3c->UnknownFunction469190(field_0x11c, -1);
-    field_0x11c->UnknownFunction4444e0();
+    timesModel = new (__FILE__, 0x2fe) D3DIMSoultreeObject(field_0x25_bit0);
+    timesModel->UnknownVirtualSlot9(value, name, a, b, 1);
+    timesModel->UnknownFunction4fc660(&position);
+    baseFrame->UnknownFunction469190(timesModel, -1);
+    timesModel->UnknownFunction4444e0();
     position.x = 1.67f;
     sprintf(name, "%s\\DecimalPoint.slt", "Res", 0);
-    field_0x120 = new (__FILE__, 0x307) D3DIMSoultreeObject(field_0x25_bit0);
-    field_0x120->UnknownVirtualSlot9(value, name, a, b, 1);
-    field_0x120->UnknownFunction4fc660(&position);
-    field_0x3c->UnknownFunction469190(field_0x120, -1);
-    field_0x120->UnknownFunction4444e0();
+    decimalPointModel = new (__FILE__, 0x307) D3DIMSoultreeObject(field_0x25_bit0);
+    decimalPointModel->UnknownVirtualSlot9(value, name, a, b, 1);
+    decimalPointModel->UnknownFunction4fc660(&position);
+    baseFrame->UnknownFunction469190(decimalPointModel, -1);
+    decimalPointModel->UnknownFunction4444e0();
     for (digit = 0; digit < 10; digit++) {
         sprintf(name, "%s\\%1d.slt", "Res", digit);
         position.x = 1.87f;
         for (place = 0; place < 2; place++) {
-            field_0x124[digit][place] = new (__FILE__, 0x312) D3DIMSoultreeObject(field_0x25_bit0);
-            field_0x124[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
-            field_0x124[digit][place]->UnknownFunction4fc660(&position);
-            field_0x3c->UnknownFunction469190(field_0x124[digit][place], -1);
-            field_0x124[digit][place]->UnknownFunction4444e0();
+            fractionDigitModels[digit][place] = new (__FILE__, 0x312) D3DIMSoultreeObject(field_0x25_bit0);
+            fractionDigitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
+            fractionDigitModels[digit][place]->UnknownFunction4fc660(&position);
+            baseFrame->UnknownFunction469190(fractionDigitModels[digit][place], -1);
+            fractionDigitModels[digit][place]->UnknownFunction4444e0();
             position.x -= 0.41f;
         }
     }
     for (place = 0; place < 2; place++)
-        field_0x174[place] = -1;
+        shownFractionDigits[place] = -1;
     return 1;
 }
 
 // 0x0048c8a0
 int BonusObjectManager::UnknownFunction48c8a0(void* value, int a, int b) {
-    field_0x3c = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
-    if (!UnknownFunction469190(field_0x3c->UnknownVirtualSlot9(value, "", a, b, 1), -1))
+    baseFrame = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
+    if (!UnknownFunction469190(baseFrame->UnknownVirtualSlot9(value, "", a, b, 1), -1))
         return 0;
-    strcpy(field_0x3c->field_0x038, "Base Bonus Frame");
-    field_0x3c->field_0x174 = kVec3Zero;
-    field_0x3c->field_0x180 = Vector3(0.9f, 0.22f, 0.09f);
-    field_0x3c->field_0x170 = 1;
-    field_0x3c->field_0x158 = kVec3Zero;
-    field_0x3c->field_0x164 = Vector3(0.9f, 0.22f, 0.09f);
-    field_0x3c->field_0x154 = 1;
-    field_0x1e4 = field_0x3c->field_0x164.x + field_0x3c->field_0x164.x;
+    strcpy(baseFrame->field_0x038, "Base Bonus Frame");
+    baseFrame->field_0x174 = kVec3Zero;
+    baseFrame->field_0x180 = Vector3(0.9f, 0.22f, 0.09f);
+    baseFrame->field_0x170 = 1;
+    baseFrame->field_0x158 = kVec3Zero;
+    baseFrame->field_0x164 = Vector3(0.9f, 0.22f, 0.09f);
+    baseFrame->field_0x154 = 1;
+    field_0x1e4 = baseFrame->field_0x164.x + baseFrame->field_0x164.x;
     return 1;
 }
 
@@ -497,51 +497,51 @@ BonusObjectManager* BonusObjectManager::UnknownFunction48ca60(void* value, int a
 }
 
 // 0x0048cad0
-void BonusObjectManager::UnknownFunction48cad0() {
-    int i = ++field_0x30;
-    field_0x17c = g_UnknownBonusKeys[i + 1].field_0x04 - g_UnknownBonusKeys[i].field_0x04;
-    field_0x180 = g_UnknownBonusKeys[i].field_0x2c;
-    field_0x184 = g_UnknownBonusKeys[i + 1].field_0x2c - field_0x180;
+void BonusObjectManager::NextKey() {
+    int i = ++currentKey;
+    keyDuration = g_UnknownBonusKeys[i + 1].field_0x04 - g_UnknownBonusKeys[i].field_0x04;
+    keyAngle = g_UnknownBonusKeys[i].field_0x2c;
+    keyAngleChange = g_UnknownBonusKeys[i + 1].field_0x2c - keyAngle;
     Vector3 next = KEY_VECTOR(i + 1, field_0x14);
-    field_0x194 = KEY_VECTOR(i, field_0x14);
-    field_0x1a0 = next - field_0x194;
+    keyPosition = KEY_VECTOR(i, field_0x14);
+    keyPositionChange = next - keyPosition;
     next = KEY_VECTOR(i + 1, field_0x08);
-    field_0x1ac = KEY_VECTOR(i, field_0x08);
-    field_0x1b8 = next - field_0x1ac;
+    keyScale = KEY_VECTOR(i, field_0x08);
+    keyScaleChange = next - keyScale;
     next = KEY_VECTOR(i + 1, field_0x20);
-    field_0x1c4 = KEY_VECTOR(i, field_0x20);
-    field_0x1d0 = next - field_0x1c4;
+    keyAxis = KEY_VECTOR(i, field_0x20);
+    keyAxisChange = next - keyAxis;
 }
 
 // 0x0048d540
-void BonusObjectManager::UnknownFunction48d540() {
-    if (field_0x30 < 0)
+void BonusObjectManager::HideDigits() {
+    if (currentKey < 0)
         return;
     for (int i = 0; i < 5; i++) {
-        if (field_0x108[i] >= 0) {
-            field_0x3c->UnknownFunction4fd990(field_0x40[field_0x108[i]][i]);
-            field_0x40[field_0x108[i]][i]->UnknownFunction4444e0();
-            field_0x108[i] = -1;
+        if (shownDigits[i] >= 0) {
+            baseFrame->UnknownFunction4fd990(digitModels[shownDigits[i]][i]);
+            digitModels[shownDigits[i]][i]->UnknownFunction4444e0();
+            shownDigits[i] = -1;
         }
     }
-    if (field_0x174[0] >= 0) {
+    if (shownFractionDigits[0] >= 0) {
         for (int i = 0; i < 2; i++) {
-            field_0x3c->UnknownFunction4fd990(field_0x124[field_0x174[i]][i]);
-            field_0x124[field_0x174[i]][i]->UnknownFunction4444e0();
-            field_0x174[i] = -1;
+            baseFrame->UnknownFunction4fd990(fractionDigitModels[shownFractionDigits[i]][i]);
+            fractionDigitModels[shownFractionDigits[i]][i]->UnknownFunction4444e0();
+            shownFractionDigits[i] = -1;
         }
-        field_0x3c->UnknownFunction4fd990(field_0x11c);
-        field_0x11c->UnknownFunction4444e0();
-        field_0x3c->UnknownFunction4fd990(field_0x120);
-        field_0x120->UnknownFunction4444e0();
+        baseFrame->UnknownFunction4fd990(timesModel);
+        timesModel->UnknownFunction4444e0();
+        baseFrame->UnknownFunction4fd990(decimalPointModel);
+        decimalPointModel->UnknownFunction4444e0();
     }
-    field_0x34 = 0;
-    field_0x30 = -1;
+    elapsed = 0;
+    currentKey = -1;
 }
 
 // 0x0048d620
 int BonusObjectManager::UnknownVirtualSlot14() {
-    if (field_0x3c->field_0x2d4)
+    if (baseFrame->field_0x2d4)
         return GameObject::UnknownVirtualSlot14();
     return 1;
 }

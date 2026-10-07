@@ -40,3 +40,14 @@ the constructor (vptr store placement), slot 13, the region allocator
 `0x004040f0`, the depth clear `0x004043c0` (block layout only) and the DC
 lookup `0x004049d0` (retail stores its leading zeros as immediates; VC6
 here caches 0 in edi).
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x004040b0` `SetImage`
+- `0x004042e0` `RestoreRegions`
+- `0x004043c0` `ClearRegionDepth`
+- `0x00404cd0` `ResetPendingRects`

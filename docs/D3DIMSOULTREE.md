@@ -60,3 +60,27 @@ Header note: adding the node calls `0x004fca80`, `0x004fc9a0`,
 `0x004fd710`, `0x004fd7f0` and `0x004fd5c0` to `SoultreeObject` here
 changes VC6's operand order in SceneManager.cpp's exact `0x004eb570`, so
 the near-miss file declares them on a local view class.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x00440060` `ReadLods`
+- `0x00440d40` `TransformVertexGroups`
+- `0x00440f30` `DrawCurrentLod`
+- `0x00442f70` `DrawWireframe`
+- `0x00442fe0` `DrawNormals`
+- `0x004431f0` `DrawVertexCrosses`
+- `0x004434b0` `ComputeSubtreeBounds`
+- `0x00443de0` `SelectLod`
+- `0x00445030` `GetSurfaceCount`
+- `0x00445060` `NodeMovesVertices`
+- `0x004452f0` `AddObject`
+- `0x00445360` `RemoveObject`
+- `0x004a1b00` `TransformPoints`
+- `0x004fb4f0` `UpdateWorldMatrix`
+- `0x004fda60` `CollectDescendants`
+- `0x004fdb60` `LoadFromParameters`
+- `0x004fedb0` `RegisterNode`

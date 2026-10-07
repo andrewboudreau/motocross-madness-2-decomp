@@ -39,7 +39,7 @@ public:
 struct TrackGameViewOwner : public GameObject {
     // 0x004e0c30 (among QuarryStuntEvent.cpp's code): shows the on/off
     // message for string `id` (racesnd.cpp passes 0x1429 and 0x14c3).
-    void UnknownFunction4e0c30(int id, int value);
+    void ShowOnOffMessage(int id, int value);
     void UnknownFunction4e1f00();             // 0x004e1f00 (dlgprocs.cpp LoadingDlg)
     void UnknownFunction4a9d20();             // 0x004a9d20 (dlgprocs.cpp 0x004526b0)
     // 0x00404df0: bikerace.cpp passes a racer's +0x7b8, +0x7bc and the racer.
@@ -256,8 +256,8 @@ struct UnknownTrackGameRacerSlot {
 class TrackGameMode {
 public:
     TrackGameMode();             // 0x00522060
-    int UnknownFunction523bf0(); // 0x00523bf0 (TrackGame slot 1 retries until it passes)
-    int UnknownFunction523c90(); // 0x00523c90 (TrackGame slot 1)
+    int FindCdDirectory(); // 0x00523bf0 (TrackGame slot 1 retries until it passes)
+    int FindDataDirectory(); // 0x00523c90 (TrackGame slot 1)
     ~TrackGameMode();            // 0x005225f0
     int UnknownFunction524100(); // 0x00524100
     void UnknownFunction5240e0(int series); // 0x005240e0 (TrackRecord.cpp 0x00520390)
@@ -266,8 +266,8 @@ public:
     int UnknownFunction523d30(const char* topic, const char* parameters);
     void UnknownFunction522440();             // 0x00522440 (OptionProcs.cpp)
     void UnknownFunction523000();             // 0x00523000 (OptionProcs.cpp)
-    void UnknownFunction523130();             // 0x00523130: saves the controller choice
-    int UnknownFunction523800();              // 0x00523800: asks for the CD until it is found; 0 on cancel
+    void SaveControllerChoice();             // 0x00523130: saves the controller choice
+    int WaitForCd();              // 0x00523800: asks for the CD until it is found; 0 on cancel
     void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
     int UnknownFunction522680();              // 0x00522680 (TrackGame slot 4): resets the network race state
@@ -284,8 +284,8 @@ public:
     void UnknownFunction522cd0();
     // 0x00522e20: picks the display mode (640x480x16 preferred) on the
     // adapter whose GUID is `guid`, and stores the adapter GUID.
-    void UnknownFunction522e20(const void* guid, int* mode);
-    int UnknownFunction522d00();              // 0x00522d00 (TrackGame slot 4): creates the directory lists
+    void ChooseDisplayMode(const void* guid, int* mode);  // 0x00522e20
+    int CreateDirectoryLists();              // 0x00522d00 (TrackGame slot 4): creates the directory lists
     int UnknownFunction5231f0();              // 0x005231f0 (TrackGame slot 4)
     void UnknownFunction523e50();             // 0x00523e50 (KrustyUI 0x004988a0)
     void UnknownFunction523b70(char* name);   // 0x00523b70 (SelectGamePicProcs.cpp)
@@ -543,14 +543,15 @@ public:
 // (_vsnprintf into 0x200 bytes) and sends it through 0x0068a48c.
 void UnknownFunction520820(const char* format, ...);
 
-// Global object at 0x0068a48c, deleted by TrackGame's destructor.
-class UnknownTrackGameGlobal68a48c {
+// Global object at 0x0068a48c, deleted by TrackGame's destructor. Slot 4
+// connects it to the "debugIP"/"debugPort" registry settings (name tier 3).
+class DebugSocket {
 public:
-    UnknownTrackGameGlobal68a48c();           // 0x004ad3b0 (defined in Net.cpp)
-    ~UnknownTrackGameGlobal68a48c();          // 0x004ad3d0
-    int UnknownFunction4ad3e0(const char* address, int port); // 0x004ad3e0: 1 on failure
-    int UnknownFunction4ad530(const char* data, int length);  // 0x004ad530
-    int UnknownFunction4ad570(const char* text);              // 0x004ad570
+    DebugSocket();           // 0x004ad3b0 (defined in Net.cpp)
+    ~DebugSocket();          // 0x004ad3d0
+    int Connect(const char* address, int port); // 0x004ad3e0: 1 on failure
+    int SendData(const char* data, int length);  // 0x004ad530
+    int SendText(const char* text);              // 0x004ad570
 
     unsigned int field_0x00;                  // WinSock socket
     int field_0x04;                           // last WinSock result
@@ -558,7 +559,7 @@ public:
     int field_0x0c;                           // connected
     int field_0x10;                           // port
 };
-extern UnknownTrackGameGlobal68a48c* g_UnknownGlobal68a48c;
+extern DebugSocket* g_DebugSocket;
 
 class TrackGame : public PCGame {
 public:

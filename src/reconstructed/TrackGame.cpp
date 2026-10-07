@@ -71,7 +71,7 @@ enum {
     kSoundDeviceAlreadyAllocated = 0x8878000a
 };
 
-UnknownTrackGameGlobal68a48c* g_UnknownGlobal68a48c;
+DebugSocket* g_DebugSocket;
 
 // 0x00520870
 TrackGame::TrackGame() {
@@ -117,7 +117,7 @@ TrackGame::TrackGame() {
     field_0x3444 = 0;
     openLocalizedWebPageOnExit = 0;
     openStorePageOnExit = 0;
-    g_UnknownGlobal68a48c = 0;
+    g_DebugSocket = 0;
 }
 
 // 0x00521ae0: opens the requested web pages, deletes the owned objects,
@@ -143,7 +143,7 @@ TrackGame::~TrackGame() {
         languageModule = 0;
     }
     delete field_0x3444;
-    delete g_UnknownGlobal68a48c;
+    delete g_DebugSocket;
     if (field_0x424.platformId == kWindowsNtPlatform && screenSaverWasActive)
         SystemParametersInfoA(kSetScreenSaverActive, 1, 0, 2);
 }
@@ -155,13 +155,13 @@ TrackGame::~TrackGame() {
 int TrackGame::UnknownVirtualSlot1() {
     UnknownMemoryStatus status;
     char text[128];
-    if (!mode.UnknownFunction523c90() &&
+    if (!mode.FindDataDirectory() &&
         LoadStringA(field_0x420, 0x13b3, text, sizeof(text))) {
         ShowCursor(1);
         MessageBoxA(0, text, field_0x3a0, 0x10);
         return 0;
     }
-    while (!mode.UnknownFunction523bf0()) {
+    while (!mode.FindCdDirectory()) {
         if (LoadStringA(field_0x420, 0x13b5, text, sizeof(text))) {
             ShowCursor(1);
             if (MessageBoxA(0, text, field_0x3a0, 0x15) == 2)
@@ -242,7 +242,7 @@ int TrackGame::UnknownVirtualSlot4() {
     profileDirectory->UnknownFunction44a220("*.*", 1);
     profileDirectory->UnknownVirtualSlot1();
     field_0x3400 = new(__FILE__, 313) UnknownTrackGameObject3400;
-    mode.UnknownFunction522d00();
+    mode.CreateDirectoryLists();
     mode.UnknownFunction522680();
     g_MemTagStack->Push("Audio");
     if (((PCSoundInterface*)field_0x04)->UnknownFunction4be5a0(22050, 1, mode.field_0xa48 ? 16 : 8,
@@ -279,20 +279,20 @@ int TrackGame::UnknownVirtualSlot4() {
         UnknownVirtualSlot23("debugIP", "", address, &size);
         int port = UnknownVirtualSlot20("debugPort", 2001);
         if (address[0]) {
-            g_UnknownGlobal68a48c = new(__FILE__, 395) UnknownTrackGameGlobal68a48c;
-            if (g_UnknownGlobal68a48c) {
-                if (g_UnknownGlobal68a48c->UnknownFunction4ad3e0(address, port) == 1) {
-                    delete g_UnknownGlobal68a48c;
-                    g_UnknownGlobal68a48c = 0;
+            g_DebugSocket = new(__FILE__, 395) DebugSocket;
+            if (g_DebugSocket) {
+                if (g_DebugSocket->Connect(address, port) == 1) {
+                    delete g_DebugSocket;
+                    g_DebugSocket = 0;
                 }
                 UnknownFunction520820("Connected! to MCM2\n");
             }
         }
-        if (field_0x08->field_0x14) {
+        if (field_0x08->lobbyConnected) {
             ui->field_0x2c->UnknownFunction486630(1);
             ui->UnknownFunction498cf0(-1);
             char name[16];
-            field_0x08->UnknownFunction4ac720(field_0x08->field_0x0c, name);
+            field_0x08->GetPlayerName(field_0x08->localPlayer, name);
             if (strcmp(mode.field_0x00, name)) {
                 int count = strlen(name);
                 int length = count > 15 ? 15 : count;
@@ -303,7 +303,7 @@ int TrackGame::UnknownVirtualSlot4() {
             }
             networkGameObject = new(__FILE__, 430) UnknownTrackGameObject3410;
             if (networkGameObject)
-                networkGameObject->UnknownFunction4aa350(field_0x08->field_0x04, field_0x08->field_0x08);
+                networkGameObject->UnknownFunction4aa350(field_0x08->directPlay, field_0x08->lobby);
             ui->UnknownFunction499b20(0x866);
         }
     }

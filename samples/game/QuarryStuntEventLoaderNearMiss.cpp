@@ -277,7 +277,7 @@ struct UnknownQuarryOverlayHooks {
     void UnknownFunction519880(UnknownQuarryRace* race);       // 0x00519880 (StatsOverlay)
     void UnknownFunction51d730(UnknownQuarryRace* race);       // 0x0051d730 (ChatOverlay)
     void UnknownFunction51baf0(UnknownQuarryRace* race, void* chat); // 0x0051baf0 (RadarOverlay)
-    void UnknownFunction48af20(UnknownQuarryRace* race);       // 0x0048af20 (VisualCue)
+    void CollectRacers(UnknownQuarryRace* race);       // 0x0048af20 (VisualCue)
 };
 
 // The bytes the render target's colour buffers take.
@@ -498,15 +498,15 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("Audio");
-    field_0x9c = (new(__FILE__, 576) AuralScape(g_UnknownGlobal56e26c->mode.field_0xa28))
+    auralScape = (new(__FILE__, 576) AuralScape(g_UnknownGlobal56e26c->mode.field_0xa28))
                      ->UnknownFunction402f00(field_0x18, 16);
-    field_0x9c->field_0xa0_bit0 = g_UnknownGlobal56e26c->mode.field_0xa34;
-    field_0xa0 = field_0x9c->UnknownFunction403000();
-    field_0x9c->UnknownFunction403010(field_0xa0, 1.0f, 1.0f);
+    auralScape->field_0xa0_bit0 = g_UnknownGlobal56e26c->mode.field_0xa34;
+    auralScapeListener = auralScape->UnknownFunction403000();
+    auralScape->UnknownFunction403010(auralScapeListener, 1.0f, 1.0f);
     g_MemTagStack->Pop(0);
 
-    field_0x7c = new(__FILE__, 582) LightManager(1);
-    UnknownFunction469190(field_0x7c->UnknownVirtualSlot8(field_0x18), -1);
+    lightManager = new(__FILE__, 582) LightManager(1);
+    UnknownFunction469190(lightManager->UnknownVirtualSlot8(field_0x18), -1);
     presets[0] = 0;
     presets[1] = 1;
     presets[2] = 2;
@@ -515,9 +515,9 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     presets[5] = 5;
     presets[6] = 6;
     presets[7] = 7;
-    field_0x3c = (UnknownQuarryCamera*)(new(__FILE__, 585) UnknownQuarryBikeCamera(1))
+    raceCamera = (UnknownQuarryCamera*)(new(__FILE__, 585) UnknownQuarryBikeCamera(1))
                      ->UnknownFunction497d90(field_0x18, 0.55f, 0.3f, 27.0f, 7.0f, 1.0485f, 2, 8, presets);
-    if (!UnknownFunction469190((GameObject*)field_0x3c, -1)) {
+    if (!UnknownFunction469190((GameObject*)raceCamera, -1)) {
         sprintf(text, "KrustyBikeCamera not created.\n");
         return 0;
     }
@@ -526,15 +526,15 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     UnknownVirtualSlot29();
 
     g_MemTagStack->Push("Particles");
-    field_0x78 = new(__FILE__, 613) UnknownQuarryParticles(g_UnknownGlobal56e26c->mode.field_0xa54);
+    particleManager = new(__FILE__, 613) UnknownQuarryParticles(g_UnknownGlobal56e26c->mode.field_0xa54);
     g_MemTagStack->Push("Scene");
-    field_0x2c = (new(__FILE__, 624) Scene(field_0x25_bit0))
-                     ->UnknownFunction4ea7e0(g_UnknownGlobal56e26c->sceneObject, (int)field_0x9c, (int)&modelTextures, 8);
-    if (!field_0x2c) {
+    eventScene = (new(__FILE__, 624) Scene(field_0x25_bit0))
+                     ->UnknownFunction4ea7e0(g_UnknownGlobal56e26c->sceneObject, (int)auralScape, (int)&modelTextures, 8);
+    if (!eventScene) {
         sprintf(text, "Scene not created.\n");
         return 0;
     }
-    if (!field_0x2c->UnknownFunction4efb20(field_0x18, field_0x7c, (int)field_0x78, (int)g_UnknownGlobal56e26c->field_0x3c,
+    if (!eventScene->UnknownFunction4efb20(field_0x18, lightManager, (int)particleManager, (int)g_UnknownGlobal56e26c->field_0x3c,
                                            (int)&modelTextures, "Teraform\\Skies", (void (*)(int))progress,
                                            (int)ceil(sceneSteps * 0.1f)))
         return 0;
@@ -544,74 +544,74 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("QuadTree");
     UnknownQuarryVisibility* visibility = (UnknownQuarryVisibility*)(new(__FILE__, 659) UnknownQuarryVisibility(1))
         ->UnknownFunction52d460(field_0x18, 0, 0,
-                                field_0x2c->field_0xa4->terrainWidth * field_0x2c->field_0xa4->terrainWidthScale * 256.0f,
-                                field_0x2c->field_0xa4->terrainBreadth * field_0x2c->field_0xa4->terrainBreadthScale * 256.0f,
-                                field_0x2c, 96.0f);
+                                eventScene->field_0xa4->terrainWidth * eventScene->field_0xa4->terrainWidthScale * 256.0f,
+                                eventScene->field_0xa4->terrainBreadth * eventScene->field_0xa4->terrainBreadthScale * 256.0f,
+                                eventScene, 96.0f);
     if (!visibility)
         sprintf(text, "VisibilityQuadTree not created.\n");
     g_MemTagStack->Pop(0);
     UnknownSceneLight* shadowLight = 0;
     UnknownSceneLight* flareLight = 0;
-    for (int i = 0; i < field_0x2c->field_0xa8; i++) {
-        if (field_0x2c->field_0xac[i].emitsLight) {
-            if (field_0x2c->field_0xac[i].field_0x00) {
-                UnknownFunction469190(field_0x2c->field_0xac[i].field_0x00, -1);
-                if (field_0x2c->field_0xac[i].type == 6)
-                    field_0x84 = field_0x2c->field_0xac[i].field_0x00;
-                else if (field_0x2c->field_0xac[i].type == 2 || field_0x2c->field_0xac[i].type == 4)
-                    field_0x80 = field_0x2c->field_0xac[i].field_0x00;
+    for (int i = 0; i < eventScene->field_0xa8; i++) {
+        if (eventScene->field_0xac[i].emitsLight) {
+            if (eventScene->field_0xac[i].field_0x00) {
+                UnknownFunction469190(eventScene->field_0xac[i].field_0x00, -1);
+                if (eventScene->field_0xac[i].type == 6)
+                    ambientLight = eventScene->field_0xac[i].field_0x00;
+                else if (eventScene->field_0xac[i].type == 2 || eventScene->field_0xac[i].type == 4)
+                    sunLight = eventScene->field_0xac[i].field_0x00;
             }
-            if (!shadowLight && field_0x2c->field_0xac[i].castsShadows)
-                shadowLight = &field_0x2c->field_0xac[i];
-            if (!flareLight && field_0x2c->field_0xac[i].hasLensFlare)
-                flareLight = &field_0x2c->field_0xac[i];
+            if (!shadowLight && eventScene->field_0xac[i].castsShadows)
+                shadowLight = &eventScene->field_0xac[i];
+            if (!flareLight && eventScene->field_0xac[i].hasLensFlare)
+                flareLight = &eventScene->field_0xac[i];
         }
     }
     if (shadowLight) {
-        field_0x58 = new(__FILE__, 698) UnknownQuarryShadow(g_UnknownGlobal56e26c->mode.field_0xa50);
-        field_0x58 = ((UnknownQuarryShadow*)field_0x58)->UnknownFunction4da7b0(field_0x18, g_UnknownGlobal56e26c->field_0x3c);
+        projectedShadow = new(__FILE__, 698) UnknownQuarryShadow(g_UnknownGlobal56e26c->mode.field_0xa50);
+        projectedShadow = ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4da7b0(field_0x18, g_UnknownGlobal56e26c->field_0x3c);
     }
     if (!preloaded)
         stream = new(__FILE__, 713) UnknownTextureStream((int)g_UnknownResourceManager572b44);
 
     g_MemTagStack->Push("Sky");
-    char* cubeFile = field_0x2c->field_0xa4->cubeFile;
+    char* cubeFile = eventScene->field_0xa4->cubeFile;
     if (cubeFile && *cubeFile) {
-        field_0x88 = (new(__FILE__, 720) UnknownQuarryFog(1))
-                         ->UnknownFunction462680(field_0x18, field_0x2c->field_0xb0->color, field_0x2c->field_0xb0->visibility,
-                                                 field_0x2c->field_0xb0->haziness, 768.0f, 256.0f, 128.0f);
-        if (!UnknownFunction469190((GameObject*)field_0x88, -1))
+        eventFog = (new(__FILE__, 720) UnknownQuarryFog(1))
+                         ->UnknownFunction462680(field_0x18, eventScene->field_0xb0->color, eventScene->field_0xb0->visibility,
+                                                 eventScene->field_0xb0->haziness, 768.0f, 256.0f, 128.0f);
+        if (!UnknownFunction469190((GameObject*)eventFog, -1))
             sprintf(text, "Fog not created.\n");
-        if (field_0x88)
-            field_0x88->UnknownFunction462db0(g_UnknownGlobal56e26c->mode.field_0x195c[4]);
+        if (eventFog)
+            eventFog->UnknownFunction462db0(g_UnknownGlobal56e26c->mode.field_0x195c[4]);
         UnknownFunction469190((new(__FILE__, 729) UnknownQuarryFogObject(1))->UnknownVirtualSlot8(field_0x18), -1);
-        if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, field_0x2c->field_0xa4->cubeFile, "rb", 0)) {
+        if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, eventScene->field_0xa4->cubeFile, "rb", 0)) {
             sprintf(text, "No Sky found in resources.  Sky not created.\n");
             if (stream)
                 delete stream;
             return 0;
         }
-        field_0x30 = (new(__FILE__, 744) UnknownQuarrySkyCube(g_UnknownGlobal56e26c->mode.field_0xa5c))
+        skyCube = (new(__FILE__, 744) UnknownQuarrySkyCube(g_UnknownGlobal56e26c->mode.field_0xa5c))
                          ->UnknownFunction4fb230(field_0x18, stream, &skyTextures, 1024.0f);
-        if (!UnknownFunction469190((GameObject*)field_0x30, -1))
+        if (!UnknownFunction469190((GameObject*)skyCube, -1))
             sprintf(text, "SkyCube not created.\n");
-        UnknownFunction469190((new(__FILE__, 750) UnknownQuarryFogLink(1))->UnknownFunction486a10(field_0x18, field_0x88), -1);
-        field_0x88->UnknownFunction4627a0(field_0x2c->field_0xb0->color, field_0x88->field_0x38, field_0x88->field_0x40);
+        UnknownFunction469190((new(__FILE__, 750) UnknownQuarryFogLink(1))->UnknownFunction486a10(field_0x18, eventFog), -1);
+        eventFog->UnknownFunction4627a0(eventScene->field_0xb0->color, eventFog->field_0x38, eventFog->field_0x40);
     }
     if (progress)
         progress(0);
 
     g_MemTagStack->Push("Terrain");
-    if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(field_0x44, field_0x2c->field_0xa4->terrainFile, "rb",
+    if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(field_0x44, eventScene->field_0xa4->terrainFile, "rb",
                                                                    (int)terrainPath)) {
         sprintf(text, "No Terrain found in env file.  Terrain not created.\n");
         return 0;
     }
-    field_0x40 = (new(__FILE__, 799) UnknownQuarryTerrainObject(1))
+    eventTerrain = (new(__FILE__, 799) UnknownQuarryTerrainObject(1))
                      ->UnknownFunction5059d0(field_0x18, field_0x44, 1, &terrainTextures,
                                              g_UnknownGlobal56e26c->mode.field_0x195c[3], 0,
-                                             field_0x2c->field_0xa4->detailTexture, 0);
-    if (!UnknownFunction469190((GameObject*)field_0x40, -1)) {
+                                             eventScene->field_0xa4->detailTexture, 0);
+    if (!UnknownFunction469190((GameObject*)eventTerrain, -1)) {
         sprintf(text, "Terrain not created.\n");
         return 0;
     }
@@ -619,28 +619,28 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("Shadow");
-    if (field_0x58) {
-        field_0x54 = (new(__FILE__, 822) UnknownQuarryTerrainShadow(g_UnknownGlobal56e26c->mode.field_0xa50))
-                         ->UnknownFunction508b80(field_0x18, field_0x40, (UnknownQuarryShadow*)field_0x58);
-        UnknownFunction469190((GameObject*)field_0x54, -1);
+    if (projectedShadow) {
+        terrainShadow = (new(__FILE__, 822) UnknownQuarryTerrainShadow(g_UnknownGlobal56e26c->mode.field_0xa50))
+                         ->UnknownFunction508b80(field_0x18, eventTerrain, (UnknownQuarryShadow*)projectedShadow);
+        UnknownFunction469190((GameObject*)terrainShadow, -1);
     }
     UnknownFunction469190(visibility, -1);
 
     g_MemTagStack->Push("EcoSystem");
     if (!stream)
         stream = new(__FILE__, 848) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (strstr(field_0x2c->field_0xa4->ecosystemFile, ".est"))
-        strcpy(strstr(field_0x2c->field_0xa4->ecosystemFile, ".est"), ".esb");
-    if (stream && !g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, field_0x2c->field_0xa4->ecosystemFile,
+    if (strstr(eventScene->field_0xa4->ecosystemFile, ".est"))
+        strcpy(strstr(eventScene->field_0xa4->ecosystemFile, ".est"), ".esb");
+    if (stream && !g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, eventScene->field_0xa4->ecosystemFile,
                                                                            "rb", 0)) {
         sprintf(text, "No Ecosystem found in env file.  Ecosystem not created.\n");
     } else {
-        field_0x48 = (new(__FILE__, 870) UnknownQuarryEcoSystem(1))
-                         ->UnknownFunction4594d0(field_0x18, g_UnknownGlobal56e26c->field_0x3c, field_0x40, field_0x7c,
-                                                 field_0x2c->field_0xa4, stream, 0x115c,
+        ecoSystem = (new(__FILE__, 870) UnknownQuarryEcoSystem(1))
+                         ->UnknownFunction4594d0(field_0x18, g_UnknownGlobal56e26c->field_0x3c, eventTerrain, lightManager,
+                                                 eventScene->field_0xa4, stream, 0x115c,
                                                  g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10,
                                                  g_UnknownGlobal56e26c->mode.field_0x195c[1]);
-        if (!field_0x48)
+        if (!ecoSystem)
             sprintf(text, "EcoSystem not created.\n");
     }
     if (progress)
@@ -650,21 +650,21 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     if (!UnknownVirtualSlot35())
         return 0;
     g_MemTagStack->Push("BikeRace");
-    field_0x34 = (UnknownKrustyBikeView*)new(__FILE__, 898) UnknownQuarryRace(0);
+    raceView = (UnknownKrustyBikeView*)new(__FILE__, 898) UnknownQuarryRace(0);
     g_MemTagStack->Push("Particles");
-    if (field_0x78)
-        field_0x78 = ((UnknownQuarryParticles*)field_0x78)
+    if (particleManager)
+        particleManager = ((UnknownQuarryParticles*)particleManager)
                          ->UnknownVirtualSlot27(field_0x18, g_UnknownGlobal56e26c->field_0x3c,
-                                                field_0x2c->field_0xa4->particleTexture, field_0x7c);
+                                                eventScene->field_0xa4->particleTexture, lightManager);
     g_MemTagStack->Push("3DObjects");
     if (!UnknownVirtualSlot27((int)&modelTextures))
         return 0;
-    g_UnknownGlobal56e26c->mode.field_0x23a4 = field_0x2c->field_0xbc;
+    g_UnknownGlobal56e26c->mode.field_0x23a4 = eventScene->field_0xbc;
     g_MemTagStack->Push("BikeRace");
-    field_0x34 = (UnknownKrustyBikeView*)((UnknownQuarryRace*)field_0x34)
-                     ->UnknownFunction417ed0(field_0x18, field_0x78, field_0x7c, &modelTextures, field_0x40, field_0x3c,
-                                             field_0x2c, this, field_0x58);
-    if (!field_0x34) {
+    raceView = (UnknownKrustyBikeView*)((UnknownQuarryRace*)raceView)
+                     ->UnknownFunction417ed0(field_0x18, particleManager, lightManager, &modelTextures, eventTerrain, raceCamera,
+                                             eventScene, this, projectedShadow);
+    if (!raceView) {
         sprintf(text, "BikeRace create failed.\n");
         return 0;
     }
@@ -672,43 +672,43 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         progress(0);
 
     g_MemTagStack->Push("Collision");
-    if (field_0x2c->field_0xb8) {
-        for (int i = 0; i < field_0x2c->field_0xb8->field_0x00; i++) {
-            if (field_0x2c->field_0xb8->field_0x04[i].physics) {
-                ((UnknownQuarryPhysicsObject*)field_0x2c->field_0xb8->field_0x04[i].field_0x08)->field_0x1f4 = field_0x40;
-                if (field_0x40)
-                    ((UnknownQuarryPhysicsObject*)field_0x2c->field_0xb8->field_0x04[i].field_0x08)->field_0x1f8 =
-                        ((UnknownQuarryTerrain*)field_0x40)->field_0x40;
-                ((UnknownQuarryPhysicsObject*)field_0x2c->field_0xb8->field_0x04[i].field_0x08)->field_0x128->UnknownFunction435fe0();
-                ((UnknownQuarryPhysicsObject*)field_0x2c->field_0xb8->field_0x04[i].field_0x08)->field_0x128->UnknownFunction432120(1);
-                ((UnknownQuarryPhysicsObject*)field_0x2c->field_0xb8->field_0x04[i].field_0x08)->field_0x128->UnknownFunction4394d0(field_0x2c->field_0xb8->field_0x04[i].field_0x08, 0x68);
-            } else if (field_0x2c->field_0xb8->field_0x04[i].field_0x0c && ((D3DIMSoultreeObject*)field_0x2c->field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fda30() == 1) {
-                ((UnknownQuarryCollision*)field_0x2c->field_0xb8->field_0x04[i].field_0x0c)->UnknownFunction435fe0();
-                ((UnknownQuarryCollision*)field_0x2c->field_0xb8->field_0x04[i].field_0x0c)->UnknownFunction432120(1);
+    if (eventScene->field_0xb8) {
+        for (int i = 0; i < eventScene->field_0xb8->field_0x00; i++) {
+            if (eventScene->field_0xb8->field_0x04[i].physics) {
+                ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x1f4 = eventTerrain;
+                if (eventTerrain)
+                    ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x1f8 =
+                        ((UnknownQuarryTerrain*)eventTerrain)->field_0x40;
+                ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x128->UnknownFunction435fe0();
+                ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x128->UnknownFunction432120(1);
+                ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x128->UnknownFunction4394d0(eventScene->field_0xb8->field_0x04[i].field_0x08, 0x68);
+            } else if (eventScene->field_0xb8->field_0x04[i].field_0x0c && ((D3DIMSoultreeObject*)eventScene->field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fda30() == 1) {
+                ((UnknownQuarryCollision*)eventScene->field_0xb8->field_0x04[i].field_0x0c)->UnknownFunction435fe0();
+                ((UnknownQuarryCollision*)eventScene->field_0xb8->field_0x04[i].field_0x0c)->UnknownFunction432120(1);
             }
         }
     }
-    UnknownQuarryRace* race = (UnknownQuarryRace*)field_0x34;
+    UnknownQuarryRace* race = (UnknownQuarryRace*)raceView;
     if (race->field_0x6c && race->field_0x6c->field_0x210) {
         race->field_0x6c->field_0x210->Release();
-        ((UnknownQuarryRace*)field_0x34)->field_0x6c->field_0x210 = 0;
+        ((UnknownQuarryRace*)raceView)->field_0x6c->field_0x210 = 0;
     }
-    if (((UnknownQuarryRace*)field_0x34)->field_0x64 && ((UnknownQuarryRace*)field_0x34)->field_0x64->field_0x210) {
-        ((UnknownQuarryRace*)field_0x34)->field_0x64->field_0x210->Release();
-        ((UnknownQuarryRace*)field_0x34)->field_0x64->field_0x210 = 0;
+    if (((UnknownQuarryRace*)raceView)->field_0x64 && ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210) {
+        ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210->Release();
+        ((UnknownQuarryRace*)raceView)->field_0x64->field_0x210 = 0;
     }
-    if (field_0x2c->field_0xb4) {
-        for (int i = 0; i < field_0x2c->field_0xb4->field_0x00; i++) {
-            if (field_0x2c->field_0xb4->field_0x04[i].field_0x00_bit3) {
-                UnknownSceneObject* character = field_0x2c->field_0xb4->field_0x04[i].field_0x04;
+    if (eventScene->field_0xb4) {
+        for (int i = 0; i < eventScene->field_0xb4->field_0x00; i++) {
+            if (eventScene->field_0xb4->field_0x04[i].field_0x00_bit3) {
+                UnknownSceneObject* character = eventScene->field_0xb4->field_0x04[i].field_0x04;
                 if (character->field_0x210) {
                     ((UnknownQuarryCollision*)character->field_0x210)->UnknownFunction435fe0();
                     ((UnknownQuarryCollision*)character->field_0x210)->UnknownFunction432120(1);
                     ((UnknownQuarryCollision*)character->field_0x210)->UnknownFunction439400(0);
-                    if (i != ((UnknownQuarryRace*)field_0x34)->field_0x70 && i != ((UnknownQuarryRace*)field_0x34)->field_0x68) {
+                    if (i != ((UnknownQuarryRace*)raceView)->field_0x70 && i != ((UnknownQuarryRace*)raceView)->field_0x68) {
                         int iterator = 0;
-                        for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)field_0x34)->UnknownFunction4204e0(&iterator);
-                             racer; racer = ((UnknownQuarryRace*)field_0x34)->UnknownFunction4204e0(&iterator)) {
+                        for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->UnknownFunction4204e0(&iterator);
+                             racer; racer = ((UnknownQuarryRace*)raceView)->UnknownFunction4204e0(&iterator)) {
                             if (!racer->field_0x735) {
                                 ((UnknownQuarryCollision*)character->field_0x210)->UnknownFunction439410(racer->field_0x1418);
                                 ((UnknownQuarryCollision*)character->field_0x210)->UnknownFunction439410(racer->field_0x1414);
@@ -724,11 +724,11 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                     }
                 }
             } else {
-                UnknownSceneAnimatedObject* car = field_0x2c->field_0xb4->field_0x04[i].field_0x08;
-                ((UnknownQuarryCar*)car)->field_0x20c = field_0x40;
+                UnknownSceneAnimatedObject* car = eventScene->field_0xb4->field_0x04[i].field_0x08;
+                ((UnknownQuarryCar*)car)->field_0x20c = eventTerrain;
                 ((UnknownQuarryCollision*)car->field_0x38)->UnknownFunction439400(1);
-                for (int j = 0; j < field_0x2c->field_0xb4->field_0x00; j++) {
-                    UnknownSceneEntry* entry = &field_0x2c->field_0xb4->field_0x04[j];
+                for (int j = 0; j < eventScene->field_0xb4->field_0x00; j++) {
+                    UnknownSceneEntry* entry = &eventScene->field_0xb4->field_0x04[j];
                     ((UnknownQuarryCollision*)car->field_0x38)
                         ->UnknownFunction439410(entry->field_0x00_bit3 ? (UnknownQuarryCollision*)entry->field_0x04->field_0x210
                                                                        : (UnknownQuarryCollision*)entry->field_0x08->field_0x3c);
@@ -738,8 +738,8 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                 ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction4394d0(car, 0x69);
                 ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439400(0);
                 int iterator = 0;
-                for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)field_0x34)->UnknownFunction4204e0(&iterator); racer;
-                     racer = ((UnknownQuarryRace*)field_0x34)->UnknownFunction4204e0(&iterator)) {
+                for (UnknownQuarryRacer* racer = ((UnknownQuarryRace*)raceView)->UnknownFunction4204e0(&iterator); racer;
+                     racer = ((UnknownQuarryRace*)raceView)->UnknownFunction4204e0(&iterator)) {
                     if (!racer->field_0x735) {
                         ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439410(racer->field_0x1418);
                         ((UnknownQuarryCollision*)car->field_0x3c)->UnknownFunction439410(racer->field_0x1414);
@@ -753,16 +753,16 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     }
     if (progress)
         progress(0);
-    UnknownFunction469190(field_0x2c, -1);
+    UnknownFunction469190(eventScene, -1);
 
     g_MemTagStack->Push("Shadow");
-    field_0x2c->UnknownFunction4edf20((ProjectedShadow*)field_0x58, g_UnknownGlobal56e26c->mode.field_0xa50);
+    eventScene->UnknownFunction4edf20((ProjectedShadow*)projectedShadow, g_UnknownGlobal56e26c->mode.field_0xa50);
     g_MemTagStack->Pop(0);
-    if (field_0x48)
-        UnknownFunction469190((GameObject*)field_0x48, -1);
-    UnknownFunction469190(field_0x34, -1);
-    UnknownVirtualSlot32((int)field_0x34);
-    UnknownFunction469190((GameObject*)field_0x78, -1);
+    if (ecoSystem)
+        UnknownFunction469190((GameObject*)ecoSystem, -1);
+    UnknownFunction469190(raceView, -1);
+    UnknownVirtualSlot32((int)raceView);
+    UnknownFunction469190((GameObject*)particleManager, -1);
     UnknownVirtualSlot28();
     UnknownVirtualSlot30();
 
@@ -772,31 +772,31 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         sprintf(path, "%s\\%s", "Res", "podium.slt");
     else
         sprintf(path, "%s\\%s", "Res", "truckpodium.slt");
-    g_UnknownGlobal56e26c->eventManager->field_0x3d0 =
+    g_UnknownGlobal56e26c->eventManager->podiumObject =
         (ArcadeObject*)(new(__FILE__, 1093) ArcadeObject(0))
-            ->UnknownFunction401310(field_0x18, (int)field_0x7c, (int)&modelTextures, path,
+            ->UnknownFunction401310(field_0x18, (int)lightManager, (int)&modelTextures, path,
                                     g_UnknownGlobal56e26c->eventManager->field_0x3c4, 0, 0, 2.0f, 0.5f, 0.5f, 0);
-    if (!field_0x34->UnknownFunction469190((GameObject*)g_UnknownGlobal56e26c->eventManager->field_0x3d0, -1))
+    if (!raceView->UnknownFunction469190((GameObject*)g_UnknownGlobal56e26c->eventManager->podiumObject, -1))
         return 0;
-    if (field_0x9c) {
-        field_0x9c->field_0x98 = (UnknownFollowCameraSubject*)field_0x40;
-        UnknownFunction469190(field_0x9c, -1);
+    if (auralScape) {
+        auralScape->field_0x98 = (UnknownFollowCameraSubject*)eventTerrain;
+        UnknownFunction469190(auralScape, -1);
     }
 
     g_MemTagStack->Push("Shadow");
-    if (field_0x58) {
-        UnknownFunction469190((GameObject*)field_0x58, -1);
-        ((UnknownQuarryShadow*)field_0x58)->UnknownFunction4dab00(((UnknownQuarryRace*)field_0x34)->field_0x38->field_0x3bc);
-        ((UnknownQuarryShadow*)field_0x58)
-            ->UnknownFunction4dab00(((UnknownQuarryRace*)field_0x34)->field_0x38->field_0x5c4->field_0x1a0);
-        ((UnknownQuarryShadow*)field_0x58)->UnknownFunction4dae50(&shadowLight->position, &shadowLight->look, 3);
-        ((UnknownQuarryShadow*)field_0x58)->UnknownFunction4dace0(0x80);
-        int ambient = (int)(field_0x84->field_0x54[1] * 255.0f);
-        if (!field_0x84)
-            field_0x84 = field_0x7c->UnknownFunction4a0190(6);
-        if (field_0x84)
-            ambient = (int)(field_0x84->field_0x54[1] * 255.0f);
-        ((UnknownQuarryShadow*)field_0x58)->UnknownFunction4dae30(ambient);
+    if (projectedShadow) {
+        UnknownFunction469190((GameObject*)projectedShadow, -1);
+        ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dab00(((UnknownQuarryRace*)raceView)->field_0x38->field_0x3bc);
+        ((UnknownQuarryShadow*)projectedShadow)
+            ->UnknownFunction4dab00(((UnknownQuarryRace*)raceView)->field_0x38->field_0x5c4->field_0x1a0);
+        ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dae50(&shadowLight->position, &shadowLight->look, 3);
+        ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dace0(0x80);
+        int ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
+        if (!ambientLight)
+            ambientLight = lightManager->UnknownFunction4a0190(6);
+        if (ambientLight)
+            ambient = (int)(ambientLight->field_0x54[1] * 255.0f);
+        ((UnknownQuarryShadow*)projectedShadow)->UnknownFunction4dae30(ambient);
     }
     if (progress)
         progress(0);
@@ -805,11 +805,11 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     if (!UnknownVirtualSlot31())
         return 0;
     g_MemTagStack->Push("3DObjects");
-    UnknownVirtualSlot33((int)((UnknownQuarryRace*)field_0x34)->field_0x38);
+    UnknownVirtualSlot33((int)((UnknownQuarryRace*)raceView)->field_0x38);
     g_MemTagStack->Push("BikeRace");
-    ((UnknownQuarryBikeCamera*)field_0x3c)->UnknownFunction463600(field_0x40);
-    UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)field_0x3c;
-    UnknownQuarryRacer* bike = ((UnknownQuarryRace*)field_0x34)->field_0x38;
+    ((UnknownQuarryBikeCamera*)raceCamera)->UnknownFunction463600(eventTerrain);
+    UnknownQuarryBikeCamera* camera = (UnknownQuarryBikeCamera*)raceCamera;
+    UnknownQuarryRacer* bike = ((UnknownQuarryRace*)raceView)->field_0x38;
     if (camera->field_0x3b0 && !bike->field_0x740->field_0x18c) {
         camera->field_0x3b0->field_0x3bc->UnknownFunction444d40(1);
         camera->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d40(1);
@@ -833,14 +833,14 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         camera->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction444d40(0);
     }
     camera->field_0x274 = 0;
-    if (field_0x5c)
-        ((UnknownQuarryOverlayHooks*)field_0x5c)->UnknownFunction519880((UnknownQuarryRace*)field_0x34);
-    if (field_0x64)
-        ((UnknownQuarryOverlayHooks*)field_0x64)->UnknownFunction51d730((UnknownQuarryRace*)field_0x34);
-    if (field_0x60)
-        ((UnknownQuarryOverlayHooks*)field_0x60)->UnknownFunction51baf0((UnknownQuarryRace*)field_0x34, field_0x64);
-    if (field_0x38)
-        ((UnknownQuarryOverlayHooks*)field_0x38)->UnknownFunction48af20((UnknownQuarryRace*)field_0x34);
+    if (statsOverlay)
+        ((UnknownQuarryOverlayHooks*)statsOverlay)->UnknownFunction519880((UnknownQuarryRace*)raceView);
+    if (chatOverlay)
+        ((UnknownQuarryOverlayHooks*)chatOverlay)->UnknownFunction51d730((UnknownQuarryRace*)raceView);
+    if (radarOverlay)
+        ((UnknownQuarryOverlayHooks*)radarOverlay)->UnknownFunction51baf0((UnknownQuarryRace*)raceView, chatOverlay);
+    if (visualCue)
+        ((UnknownQuarryOverlayHooks*)visualCue)->CollectRacers((UnknownQuarryRace*)raceView);
     g_MemTagStack->Pop(0);
 
     if (!g_UnknownGlobal56e26c->mode.field_0x6ac)
@@ -856,15 +856,15 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
         UnknownFunction468dd0("TerrainShadow");
         UnknownFunction468dd0("D3DIMSoultreeShadow");
     }
-    ((RenderTarget*)field_0x18)->field_0x34 = !(field_0x30 && g_UnknownGlobal56e26c->mode.field_0xa5c);
+    ((RenderTarget*)field_0x18)->field_0x34 = !(skyCube && g_UnknownGlobal56e26c->mode.field_0xa5c);
     field_0x50 = (void*)1;
     if (g_UnknownGlobal56e26c->field_0x2d5_bit2) {
         g_MemTagStack->Push("TextureCache");
         g_UnknownGlobal56e26c->field_0x3c->UnknownFunction5113d0();
     }
     g_MemTagStack->Pop(0);
-    field_0x2c->UnknownFunction4eff30(g_UnknownGlobal56e26c->mode.field_0x195c[2]);
-    field_0x34->UnknownFunction423790(g_UnknownGlobal56e26c->mode.field_0x195c[2]);
+    eventScene->UnknownFunction4eff30(g_UnknownGlobal56e26c->mode.field_0x195c[2]);
+    raceView->UnknownFunction423790(g_UnknownGlobal56e26c->mode.field_0x195c[2]);
     if (progress)
         progress(0);
     UnknownQuarryRaceObject* last = new(__FILE__, 1251) UnknownQuarryRaceObject(1);

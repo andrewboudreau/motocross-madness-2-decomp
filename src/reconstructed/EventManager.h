@@ -35,18 +35,18 @@ struct UnknownEventStanding {
 
 // cdecl 0x0045d3d0: qsort order for standings (higher +0x00 first, then
 // lower +0x04 and +0x08, then the racer's name).
-int UnknownFunction45d3d0(const void* a, const void* b);
+int CompareStandings(const void* a, const void* b);  // 0x0045d3d0
 
 // cdecl 0x0045e930: qsort order for rankings (higher value first, then
 // higher +0x7a0, +0x790 and +0x744->+0x0c).
-int UnknownFunction45e930(const void* a, const void* b);
+int CompareRankings(const void* a, const void* b);  // 0x0045e930
 
 // cdecl 0x0045cb20: progress callback that 0x0045cb70 and 0x0045cdc0 pass
 // by address (near miss: samples/game/EventManagerNearMisses.cpp).
-void UnknownFunction45cb20(int* step);
+void LoadProgressCallback(int* step);  // 0x0045cb20
 
 // cdecl 0x0045fbb0: qsort order for unsigned values.
-int UnknownFunction45fbb0(const void* a, const void* b);
+int CompareUnsigned(const void* a, const void* b);  // 0x0045fbb0
 
 // Minimal view of RTTI classes Character : virtual GameObject and
 // D3DIMSoultreeCharacter : Character, declared in full in
@@ -108,16 +108,16 @@ public:
 // cdecl 0x004aef40: deletes TrackGame's NetworkInterface (+0x08), sets +0x18
 // to 1 and clears +0x3424, +0x2da5 and +0x2d98. EventManager slot 10 calls
 // it once when +0x3c is set.
-void UnknownFunction4aef40();
+void EndNetworkGame();  // 0x004aef40
 
 struct UnknownEventEntry {
     UnknownEventEntry();                           // 0x0045c830 (resets through 0x0045c840)
-    void UnknownFunction45c840();                  // 0x0045c840: reset
+    void Reset();                  // 0x0045c840: reset
 
     // 0x0045c8b0: copies the racer's id, name and the fields noted below
     // (dword moves; int/float types are from other readers). With racer
     // +0x4a0 set it clears them instead and sets position 99.
-    void UnknownFunction45c8b0(UnknownEventRacer* racer);
+    void CopyFromRacer(UnknownEventRacer* racer);  // 0x0045c8b0
 
     int field_0x00;                                // network player id
     int field_0x04;                                // finishing position (99 when racer +0x4a0 is set)
@@ -161,12 +161,12 @@ public:
     UnknownKrustyBikeView* UnknownFunction45d2f0(); // 0x0045d2f0
     TextQueueOverlay* UnknownFunction45d340(); // 0x0045d340
     void UnknownFunction45d270();                  // 0x0045d270: slot 5 on all three
-    int UnknownFunction45d390();                   // 0x0045d390: whether any mode is present
+    int HasRaceMode();                   // 0x0045d390: whether any mode is present
     void UnknownFunction45e520();                  // 0x0045e520: resets the entries
     // 0x0045e550: once every remote racer is ready, ends the network wait.
-    void UnknownFunction45e550(float frameTime);
+    void WaitForRemoteRacers(float frameTime);  // 0x0045e550
     // 0x0045f180: adds the championship points for `racer`'s position.
-    void UnknownFunction45f180(UnknownEventRacer* racer, int* points);
+    void AddChampionshipPoints(UnknownEventRacer* racer, int* points);  // 0x0045f180
     // 0x0045e600: starts the end-of-race block (or finishes at once), and
     // once it has run its course clears it and moves to the results.
     void UnknownFunction45e600();
@@ -174,7 +174,7 @@ public:
     // 0x0045d480: creates the camera (+0x3d4) and up to three characters
     // (+0x424) from "%s\\Winner.mcf" with "Podium3/4/5_%02d" motions (also
     // "CrowdLoop.wav"); nonzero when slot 10 should run that scene.
-    int UnknownFunction45d480();
+    int CreatePodiumScene();  // 0x0045d480
     void UnknownFunction45e710(int menu);          // 0x0045e710
     void UnknownFunction45e9d0();                  // 0x0045e9d0
     void UnknownFunction45eef0(float frameTime);   // 0x0045eef0
@@ -183,7 +183,7 @@ public:
     void UnknownFunction45fbd0(int player);        // 0x0045fbd0
     // 0x0045fce0: removes every Vegetation in the rectangle from the
     // collision quadtree (up to 1000).
-    void UnknownFunction45fce0(float x0, float z0, float x1, float z1);
+    void RemoveVegetationInRect(float x0, float z0, float x1, float z1);  // 0x0045fce0
     // 0x0045fdc0: calls GameObject slot 4 on every CollisionObject in the
     // rectangle.
     void UnknownFunction45fdc0(float x0, float z0, float x1, float z1);
@@ -203,13 +203,13 @@ public:
     UnknownEventEntry field_0x50[11];
     float field_0x3c0;                             // seconds since a racer finished (0x0045eef0)
     Vector3 field_0x3c4;
-    ArcadeObject* field_0x3d0;                     // the podium (0x0045d480)
-    Camera* field_0x3d4;                           // a PCCamera (0x0045d480; constructor 0x004bed80)
+    ArcadeObject* podiumObject;                     // the podium (0x0045d480)
+    Camera* podiumCamera;                           // a PCCamera (0x0045d480; constructor 0x004bed80)
     Vector3 field_0x3d8;
-    Vector3 field_0x3e4;                           // podium camera position (0x0045d480)
-    Vector3 field_0x3f0;                           // its look target
+    Vector3 podiumCameraPosition;                           // podium camera position (0x0045d480)
+    Vector3 podiumCameraTarget;                           // its look target
     unsigned char field_0x3fc[0x414 - 0x3fc];
-    Vector3 field_0x414;                           // pan speed (per 7 seconds)
+    Vector3 podiumPanSpeed;                           // pan speed (per 7 seconds)
     int podiumCharacterCount;                      // min(+0x4c, 3) (0x0045d480)
     D3DIMSoultreeCharacter* podiumCharacters[3];
     Motion* podiumMotions[3];                      // "Podium3/4/5_%02d", one per character

@@ -6,8 +6,8 @@
 D3DIMSoultreeModifier::D3DIMSoultreeModifier(int flags)
     : GraphicsTest(flags)
 {
-    field_0x38 = 0;
-    field_0x34 = 0;
+    objectCount = 0;
+    modifiedObjects = 0;
     field_0x3c = 1;
 }
 
@@ -21,43 +21,43 @@ GameObject* D3DIMSoultreeModifier::UnknownVirtualSlot8(void* value)
     return GameObject::UnknownVirtualSlot8(value);
 }
 
-void D3DIMSoultreeModifier::UnknownFunction4452f0(D3DIMSoultreeObject* object)
+void D3DIMSoultreeModifier::AddObject(D3DIMSoultreeObject* object)
 {
     D3DIMSoultreeObject** objects =
-        (D3DIMSoultreeObject**)DebugMalloc(field_0x38 * 4 + 4, __FILE__, 26);
-    for (int i = 0; i < field_0x38; i++)
-        objects[i] = field_0x34[i];
-    objects[field_0x38] = object;
-    field_0x38++;
-    DebugFree(field_0x34, __FILE__, 33);
-    field_0x34 = objects;
+        (D3DIMSoultreeObject**)DebugMalloc(objectCount * 4 + 4, __FILE__, 26);
+    for (int i = 0; i < objectCount; i++)
+        objects[i] = modifiedObjects[i];
+    objects[objectCount] = object;
+    objectCount++;
+    DebugFree(modifiedObjects, __FILE__, 33);
+    modifiedObjects = objects;
 }
 
-void D3DIMSoultreeModifier::UnknownFunction445360(D3DIMSoultreeObject* object)
+void D3DIMSoultreeModifier::RemoveObject(D3DIMSoultreeObject* object)
 {
     D3DIMSoultreeObject** objects;
-    if (field_0x38 > 1)
-        objects = (D3DIMSoultreeObject**)DebugMalloc(field_0x38 * 4 + 4, __FILE__, 41);
+    if (objectCount > 1)
+        objects = (D3DIMSoultreeObject**)DebugMalloc(objectCount * 4 + 4, __FILE__, 41);
     else
         objects = 0;
     int n = 0;
-    for (int i = 0; i < field_0x38; i++) {
-        if (field_0x34[i] != object)
-            objects[n++] = field_0x34[i];
+    for (int i = 0; i < objectCount; i++) {
+        if (modifiedObjects[i] != object)
+            objects[n++] = modifiedObjects[i];
     }
-    DebugFree(field_0x34, __FILE__, 53);
-    field_0x34 = objects;
-    field_0x38--;
+    DebugFree(modifiedObjects, __FILE__, 53);
+    modifiedObjects = objects;
+    objectCount--;
 }
 
 void D3DIMSoultreeModifier::UnknownFunction4453e0()
 {
-    if (field_0x38) {
+    if (objectCount) {
         D3DIMSoultreeObject** objects =
-            (D3DIMSoultreeObject**)DebugMalloc(field_0x38 * 4, __FILE__, 64);
-        for (int i = 0; i < field_0x38; i++)
-            objects[i] = field_0x34[i];
-        int count = field_0x38;
+            (D3DIMSoultreeObject**)DebugMalloc(objectCount * 4, __FILE__, 64);
+        for (int i = 0; i < objectCount; i++)
+            objects[i] = modifiedObjects[i];
+        int count = objectCount;
         for (int j = 0; j < count; j++) {
             if (field_0x3c)
                 objects[j]->UnknownFunction444de0(this);

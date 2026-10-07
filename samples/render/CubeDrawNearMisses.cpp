@@ -35,6 +35,7 @@
 #include "../../src/reconstructed/RenderTarget.h"
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/Tgafile.h"
+#include "../../src/reconstructed/D3DConstants.h"
 
 // CubeDraw.cpp's file statics (same names and addresses).
 static Vector3 s_viewPoints[25];
@@ -146,8 +147,8 @@ int DrawableCube::UnknownFunction43dc60()
 int DrawableCube::UnknownFunction43e0b0(Cube* cube, UnknownCubeTextureContext* context)
 {
     field_0x2c = cube;
-    cube->UnknownFunction43d630((UnknownTexturePalette*)field_0x30, context);
-    if (UnknownFunction511850(field_0x2c->field_0x0c)) {
+    cube->LoadMissingTextures((UnknownTexturePalette*)loadPalette, context);
+    if (HasMipLevels(field_0x2c->fileFormat)) {
         for (int face = 0; face < 6; face++) {
             for (int row = 0; row < 4; row++) {
                 UnknownCubeVertex* v = s_cellVertices[face][row * 4];
@@ -173,7 +174,7 @@ int DrawableCube::UnknownFunction43e0b0(Cube* cube, UnknownCubeTextureContext* c
         for (int row = 0; row < 4; row++) {
             UnknownCubeVertex* v = s_cellVertices[face][row * 4];
             for (int column = 0; column < 4; column++, v += 6) {
-                int size = UnknownFunction43d080(field_0x2c->field_0x38[face].field_0x00, column, row);
+                int size = UnknownFunction43d080(field_0x2c->field_0x38[face].sizeCodes, column, row);
                 float low = 1.0f / (float)size;
                 v[0].tu = low;
                 v[0].tv = low;
@@ -198,14 +199,14 @@ int DrawableCube::UnknownFunction43e0b0(Cube* cube, UnknownCubeTextureContext* c
 void DrawableCube::UnknownFunction43e330()
 {
     Vector3 forward;
-    forward.x = ((UnknownCubeCameraView*)Target()->field_0x08)->field_0xac.m[0][2];
-    forward.y = ((UnknownCubeCameraView*)Target()->field_0x08)->field_0xac.m[1][2];
-    forward.z = ((UnknownCubeCameraView*)Target()->field_0x08)->field_0xac.m[2][2];
+    forward.x = ((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix.m[0][2];
+    forward.y = ((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix.m[1][2];
+    forward.z = ((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix.m[2][2];
     const Vector3& center = field_0x2c->field_0x14;
-    const Vector3& eye = ((UnknownCubeCameraView*)Target()->field_0x08)->field_0x170;
+    const Vector3& eye = ((UnknownCubeCameraView*)Target()->field_0x08)->position;
     Vector3 offset(center.x - eye.x, center.y - eye.y, center.z - eye.z);
     for (int face = 0; face < 6; face++) {
-        field_0x2c->field_0x38[face].field_0xe8 = 0;
+        field_0x2c->field_0x38[face].visibleCells = 0;
         if (!g_UnknownCubeClipper575a98->UnknownFunction52f140(Target()->field_0x08, &forward,
                                                                 &s_faceNormals[face]))
             continue;
@@ -215,12 +216,12 @@ void DrawableCube::UnknownFunction43e330()
             s_viewPoints[k] = Vector3(offset.x + point.x, offset.y + point.y, offset.z + point.z);
         }
         g_UnknownCubeClipper575a98->UnknownFunction52f0a0(
-            s_viewPoints, s_viewPoints, &((UnknownCubeCameraView*)Target()->field_0x08)->field_0xac, 25);
+            s_viewPoints, s_viewPoints, &((UnknownCubeCameraView*)Target()->field_0x08)->viewMatrix, 25);
         for (int i = 0; i < 16; i++) {
             int corner = i + i / 4;
             if (g_UnknownCubeClipper575a98->UnknownFunction52f4d0(Target()->field_0x08, s_viewPoints, corner,
                                                                   corner + 1, corner + 6, corner + 5))
-                field_0x2c->field_0x38[face].field_0xe8 |= 1 << i;
+                field_0x2c->field_0x38[face].visibleCells |= 1 << i;
         }
     }
 }
@@ -238,45 +239,45 @@ int DrawableCube::UnknownVirtualSlot14()
     s_world.m[3][1] = field_0x2c->field_0x14.y;
     s_world.m[3][2] = field_0x2c->field_0x14.z;
     Target()->field_0x08->UnknownVirtualSlot30(&s_world);
-    Target()->UnknownVirtualSlot8(0x1b, 0, 0);
-    Target()->UnknownVirtualSlot8(0x29, 0, 0);
-    Target()->UnknownVirtualSlot8(0xf, 0, 0);
-    Target()->UnknownVirtualSlot8(0xe, 0, 0);
-    Target()->UnknownVirtualSlot8(7, 0, 0);
-    Target()->UnknownVirtualSlot7(0, 1, 2);
-    Target()->UnknownVirtualSlot7(0, 2, 2);
-    Target()->UnknownVirtualSlot7(0, 4, 1);
+    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 0, 0);
+    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 0, 0);
+    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 0, 0);
+    Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+    Target()->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+    Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
     int face;
     int i;
     for (face = 0; face < 6; face++) {
         for (i = 0; i < 16; i++) {
-            if (!(field_0x2c->field_0x38[face].field_0xe8 & (1 << i)))
+            if (!(field_0x2c->field_0x38[face].visibleCells & (1 << i)))
                 continue;
-            if (!(field_0x2c->field_0x38[face].field_0x04 & (1 << i)))
+            if (!(field_0x2c->field_0x38[face].presentTextures & (1 << i)))
                 continue;
-            if (!field_0x2c->field_0x38[face].field_0x08[i]->UnknownVirtualSlot7())
+            if (!field_0x2c->field_0x38[face].textures[i]->UnknownVirtualSlot7())
                 continue;
-            if (field_0x34 && (field_0x2c->field_0x38[face].field_0x08[i]->field_0x68 & 1)) {
+            if (textureGroup && (field_0x2c->field_0x38[face].textures[i]->field_0x68 & 1)) {
                 UnknownCubeTextureMapping* mapping = &s_cellMappings[face][i];
-                ((ManagedTexture*)field_0x2c->field_0x38[face].field_0x08[i])
+                ((ManagedTexture*)field_0x2c->field_0x38[face].textures[i])
                     ->UnknownFunction510910(&mapping->scale, &mapping->offsetU, &mapping->offsetV,
                                             &s_cellVertices[face][i][0].tu, &s_cellVertices[face][i][0].tv, 6,
                                             0x20);
             }
-            field_0x2c->field_0x38[face].field_0x08[i]->UnknownVirtualSlot19();
-            if (!Target()->UnknownVirtualSlot16(4, 0x1e2, (int)s_cellVertices[face][i], 6, 0))
+            field_0x2c->field_0x38[face].textures[i]->UnknownVirtualSlot19();
+            if (!Target()->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)s_cellVertices[face][i], 6, 0))
                 return 0;
         }
     }
-    Target()->UnknownVirtualSlot8(9, 1, 0);
-    Target()->UnknownVirtualSlot7(0, 4, 1);
-    Target()->UnknownVirtualSlot7(0, 1, 1);
+    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
+    Target()->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    Target()->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
     Target()->UnknownVirtualSlot11(0);
     for (face = 0; face < 6; face++) {
         for (i = 0; i < 16; i++) {
-            if (!(field_0x2c->field_0x38[face].field_0xe8 & (1 << i)))
+            if (!(field_0x2c->field_0x38[face].visibleCells & (1 << i)))
                 continue;
-            if (field_0x2c->field_0x38[face].field_0x04 & (1 << i))
+            if (field_0x2c->field_0x38[face].presentTextures & (1 << i))
                 continue;
             if (face >= 4 || i <= 7)
                 continue;
@@ -287,12 +288,12 @@ int DrawableCube::UnknownVirtualSlot14()
             v[3].diffuse = Target()->field_0x30;
             v[4].diffuse = Target()->field_0x30;
             v[5].diffuse = Target()->field_0x30;
-            if (!Target()->UnknownVirtualSlot16(4, 0x1e2, (int)v, 6, 0))
+            if (!Target()->UnknownVirtualSlot16(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, (int)v, 6, 0))
                 return 0;
         }
     }
-    Target()->UnknownVirtualSlot8(0xe, 1, 0);
-    Target()->UnknownVirtualSlot8(7, 1, 0);
-    Target()->UnknownVirtualSlot8(9, fog, 0);
+    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, 1, 0);
+    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, 1, 0);
+    Target()->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, fog, 0);
     return 1;
 }

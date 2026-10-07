@@ -7,9 +7,9 @@
 // RTTI: PCCamera : Camera. PCCamera introduces no primary slots; it overrides
 // (among others) slots 13, 27 (pure in Camera) and 30-32.
 //
-// The overrides forward Camera's matrices to method 11 of the device at
-// PCRenderTarget+0x50 (the camera's owner) with kind 1, 2 or 3; see
-// RenderInterfaces.h.
+// Slots 30-32 forward Camera's world, view and projection matrices to the
+// owner's device (method 11, SetTransform, with D3DTRANSFORMSTATE_WORLD, VIEW
+// and PROJECTION); slot 27 saves a screenshot.
 
 class PCCamera : public Camera {
 public:
@@ -19,9 +19,9 @@ public:
 
     virtual int UnknownVirtualSlot13();
     virtual void UnknownVirtualSlot27();
-    virtual int UnknownVirtualSlot30(const Matrix4* value);
-    virtual int UnknownVirtualSlot31(const Matrix4* value);
-    virtual int UnknownVirtualSlot32(const Matrix4* value);
+    virtual int UnknownVirtualSlot30(const Matrix4* value); // world matrix
+    virtual int UnknownVirtualSlot31(const Matrix4* value); // view matrix
+    virtual int UnknownVirtualSlot32(const Matrix4* value); // projection matrix
 
     // The owner of a PCCamera is a PCRenderTarget.
     PCRenderTarget* PCOwner() const { return static_cast<PCRenderTarget*>(Owner()); }

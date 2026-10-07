@@ -50,3 +50,11 @@ functions are now exact:
 So are its eight kVec3 `$E` (`0x0042f250..0x0042f38b`). That is 11 more
 calibration cases. The kVec3 statics sit at the end of Camera.cpp because
 the `$E` code follows every Camera function.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x004b6380` `LayOutQuad`

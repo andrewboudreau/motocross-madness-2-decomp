@@ -29,20 +29,20 @@
 int DebugOverlay::UnknownFunction447a00()
 {
     int c = 0;
-    field_0x36d8 = (PCTextureMap*)UnknownFunction50a590(g_UnknownGlobal56e26c->field_0x3c,
-                                                        "DebugOverlayText.tga", 0x613, 0, 0, 5, 6,
+    fontTexture = (PCTextureMap*)UnknownFunction50a590(g_UnknownGlobal56e26c->field_0x3c,
+                                                        "DebugOverlayText.tga", 1555, 0, 0, 5, 6,
                                                         0, 0x80, 0xff00ff, 1, 1);
-    if (field_0x36d8 == 0) {
-        field_0x36d8 = new(__FILE__, 59) PCTextureMap(field_0x36d4, 1);
-        field_0x36d8->UnknownVirtualSlot4(0, 0x100, 0x100, 0x100, 0x100, 0,
+    if (fontTexture == 0) {
+        fontTexture = new(__FILE__, 59) PCTextureMap(field_0x36d4, 1);
+        fontTexture->UnknownVirtualSlot4(0, 0x100, 0x100, 0x100, 0x100, 0,
                                           ((RenderTarget*)field_0x18)->field_0x28, 0, 8, 0, 1, 0,
                                           5, 6, 0, 0x80, 0xff00ff);
-        void* bits = field_0x36d8->UnknownVirtualSlot13(0, 0, 0);
-        memset(bits, 0, UnknownFunction511970(field_0x36d8->field_0x20) << 16);
-        field_0x36d8->UnknownVirtualSlot14(0);
+        void* bits = fontTexture->UnknownVirtualSlot13(0, 0, 0);
+        memset(bits, 0, UnknownFunction511970(fontTexture->field_0x20) << 16);
+        fontTexture->UnknownVirtualSlot14(0);
 
         LOGFONT font;
-        font.lfHeight = field_0x36d0;
+        font.lfHeight = fontHeight;
         font.lfWidth = 0;
         font.lfEscapement = 0;
         font.lfOrientation = 0;
@@ -69,7 +69,7 @@ int DebugOverlay::UnknownFunction447a00()
         for (int i = 0; i < 256; i++)
             characters[i] = (char)i;
         HDC dc;
-        if (field_0x36d8->field_0x70->UnknownMethod17((void**)&dc))
+        if (fontTexture->field_0x70->UnknownMethod17((void**)&dc))
             return 0;
         SetBkColor(dc, 1);
         SetBkMode(dc, 1);
@@ -79,8 +79,8 @@ int DebugOverlay::UnknownFunction447a00()
         SIZE size;
         GetTextExtentPoint32A(dc, characters, 256, &size);
         int top = 0;
-        field_0x26b4 = size.cy;
-        for (int bottom = size.cy; bottom < 256; bottom += field_0x26b4) {
+        lineHeight = size.cy;
+        for (int bottom = size.cy; bottom < 256; bottom += lineHeight) {
             if (c >= 256)
                 break;
             char* row = &characters[c];
@@ -109,10 +109,10 @@ int DebugOverlay::UnknownFunction447a00()
         }
         DeleteObject(handle);
         SelectObject(dc, previous);
-        if (field_0x36d8->field_0x70->UnknownMethod26(dc))
+        if (fontTexture->field_0x70->UnknownMethod26(dc))
             return 0;
     }
-    if (field_0x36d8->UnknownVirtualSlot8(1, 0, 0))
+    if (fontTexture->UnknownVirtualSlot8(1, 0, 0))
         return 1;
     return 0;
 }
@@ -122,24 +122,24 @@ DebugOverlay* DebugOverlay::UnknownFunction447de0(RenderTarget* a, TextureMapMan
                                                   int c, int d, int e)
 {
     GameObject::UnknownVirtualSlot8(a);
-    field_0x36d0 = c;
-    field_0x26bc = e;
-    field_0x26b8 = d;
+    fontHeight = c;
+    rowsTop = e;
+    rowsLeft = d;
     field_0x36d4 = b;
     if (UnknownFunction447a00()) {
         int y = e;
         int i = 0;
         do {
             field_0xb4[i].y = y;
-            field_0xb4[i].bottom = field_0x26b4 + y;
+            field_0xb4[i].bottom = lineHeight + y;
             field_0xb4[i].x = d;
             field_0xb4[i].right = 0x100;
             field_0xb4[i].text[0] = 0;
             field_0xb4[i].color = 0xffffff;
             i++;
-            y += field_0x26b4;
-        } while (field_0x26b4 + y <= 0x280 && i < 64);
-        field_0x26c8 = i;
+            y += lineHeight;
+        } while (lineHeight + y <= 0x280 && i < 64);
+        rowLimit = i;
         return this;
     }
     Release();

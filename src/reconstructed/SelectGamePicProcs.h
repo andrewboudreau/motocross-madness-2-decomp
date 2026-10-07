@@ -41,11 +41,11 @@ void UnknownFunction4536e0();
 void UnknownFunction451380(int value, char* text);
 // 0x004f17a0: fills the list `listName` of `dialog` with the `pattern`
 // files under `directory` and shows the first one's picture.
-int UnknownFunction4f17a0(DirectoryList* directories, const char* directory, const char* pattern, const char* kind,
-                          int a, const char* picture, const char* listName, char* name, int* value,
-                          UIDialog* dialog, int b, int append);
+int FillFileList(DirectoryList* directories, const char* directory, const char* pattern, const char* kind,
+                 int a, const char* picture, const char* listName, char* name, int* value,
+                 UIDialog* dialog, int b, int append);
 // 0x004f3080: the same for the track directories of the current game type.
-void UnknownFunction4f3080(int a, const char* picture, const char* listName, int* value, UIDialog* dialog, int append);
+void FillTrackList(int a, const char* picture, const char* listName, int* value, UIDialog* dialog, int append);
 
 // KrustyUI+0x50's 0x94-byte bike records and the 0xc8-byte model records
 // at KrustyUI+0x48 and +0x58 (bikes and riders) they index.
@@ -67,17 +67,17 @@ struct UnknownKrustyUIModelObject : virtual public GameObject {
     void UnknownFunction4a8b10(const char* motion); // 0x004a8b10: plays a motion ("WaitR")
 
     unsigned char field_0x008[0x0c - 0x08];
-    int field_0x0c;                           // the motion has finished
+    int motionFinished;                       // +0x0c: the motion has finished
     unsigned char field_0x010[0x1a0 - 0x10];
-    void* field_0x1a0;                        // the texture the plate number goes on
+    void* plateTexture;                       // +0x1a0: the texture the plate number goes on
 };
 
 struct UnknownKrustyUIModel {
-    char field_0x00[0x40];                    // display name
-    char field_0x40[0x40];                    // name
+    char displayName[0x40];                   // +0x00: display name
+    char modelName[0x40];                     // +0x40
     unsigned char field_0x80[0xc0 - 0x80];
     UnknownKrustyUIModelObject* field_0xc0;
-    int field_0xc4;                           // kind
+    int modelKind;                            // +0xc4: kind
 };
 
 // The plate number painter (0x2c bytes; constructor 0x00417500 loads
@@ -93,11 +93,11 @@ public:
 };
 
 struct UnknownKrustyUIBike {
-    int field_0x00;                           // model (KrustyUI+0x48)
-    char field_0x04[0x44];                    // display name
+    int model;                                // +0x00: model (KrustyUI+0x48)
+    char displayName[0x44];                   // +0x04: display name
     char field_0x48[0x40];
     int field_0x88;
-    int field_0x8c;                           // engine size
+    int engineSize;                           // +0x8c: engine size
     int field_0x90;
 };
 
@@ -105,36 +105,36 @@ struct UnknownKrustyUIBike {
 // saves and restores the block). Declared as a view: TrackGame.h names the
 // same fields individually.
 struct UnknownRaceSettings {
-    int field_0x00;                           // race mode (+0x2d70)
-    int field_0x04;                           // event type (+0x2d74)
+    int raceMode;                             // +0x00: race mode (+0x2d70)
+    int eventType;                            // +0x04: event type (+0x2d74)
     unsigned char field_0x08[0x0c - 0x08];
-    int field_0x0c;                           // races (+0x2d7c)
-    int field_0x10;                           // tree collision (+0x2d80)
+    int races;                                // +0x0c: races (+0x2d7c)
+    int treeCollision;                        // +0x10: tree collision (+0x2d80)
     unsigned char field_0x14[0x20 - 0x14];
-    int field_0x20;                           // laps (+0x2d90)
-    int field_0x24;                           // opponents (+0x2d94)
+    int laps;                                 // +0x20: laps (+0x2d90)
+    int opponents;                            // +0x24: opponents (+0x2d94)
     int field_0x28;
-    unsigned char field_0x2c;                 // random gates (+0x2d9c)
-    unsigned char field_0x2d;                 // gate count (+0x2d9d)
+    unsigned char randomGates;                // +0x2c: random gates (+0x2d9c)
+    unsigned char gateCount;                  // +0x2d: gate count (+0x2d9d)
     unsigned char field_0x2e[0x30 - 0x2e];
-    int field_0x30;                           // gate seed (+0x2da0)
-    unsigned char field_0x34;                 // track number (+0x2da4)
+    int gateSeed;                             // +0x30: gate seed (+0x2da0)
+    unsigned char trackNumber;                // +0x34: track number (+0x2da4)
     unsigned char field_0x35;
-    char field_0x36[0x100];                   // track name (+0x2da6)
+    char trackName[0x100];                    // +0x36: track name (+0x2da6)
     unsigned char field_0x136[0x138 - 0x136];
     int field_0x138;
     int field_0x13c;
-    float field_0x140;                        // minutes (+0x2eb0)
-    int field_0x144;                          // tag ball (+0x2eb4)
-    int field_0x148;                          // stunt mode (+0x2eb8)
+    float minutes;                            // +0x140: minutes (+0x2eb0)
+    int tagBall;                              // +0x144: tag ball (+0x2eb4)
+    int stuntMode;                            // +0x148: stunt mode (+0x2eb8)
     unsigned char field_0x14c[0x1ec - 0x14c];
 };
 
 // One lobby slot (MultiPlayerDlg+0x7f68 holds eight).
 struct UnknownLobbySlot {
-    int field_0x00;                           // player id (0 when free)
-    int field_0x04;                           // requested racers
-    int field_0x08;                           // granted racers
+    int playerId;                             // +0x00: player id (0 when free)
+    int requestedRacers;                      // +0x04: requested racers
+    int grantedRacers;                        // +0x08: granted racers
 };
 
 // MultiPlayerDlg+0x7f68. Its constructor 0x004f2f00 is out-of-line
@@ -142,8 +142,8 @@ struct UnknownLobbySlot {
 class UnknownLobbySlotTable {
 public:
     UnknownLobbySlotTable();                  // 0x004f2f00
-    void UnknownFunction4f2f20(int id, int value); // 0x004f2f20: adds or updates `id`
-    void UnknownFunction4f2f80(int id);       // 0x004f2f80: frees `id`'s slot
+    void SetSlot(int id, int value); // 0x004f2f20: adds or updates `id`
+    void FreeSlot(int id);       // 0x004f2f80: frees `id`'s slot
     int UnknownFunction4f2fe0(int count, int limit); // 0x004f2fe0
 
     UnknownLobbySlot field_0x00[8];
@@ -167,11 +167,11 @@ struct UnknownLobbySettingsMessage {
     unsigned char tagBall : 1;                // +0x2eb4
     unsigned char stuntMode : 1;              // +0x2eb8
     unsigned char detail : 2;                 // +0x60c
-    unsigned char field_0x09;                 // track number (+0x2da4)
+    unsigned char trackNumber;                // +0x09: track number (+0x2da4)
     int field_0x0c;                           // +0x2ea8
     int field_0x10;                           // +0x2eac
-    char field_0x14[0x40];                    // track name (+0x2da6)
-    UnknownLobbySlot field_0x54[8];           // MultiPlayerDlg+0x7f68
+    char trackName[0x40];                     // +0x14: track name (+0x2da6)
+    UnknownLobbySlot slots[8];                // +0x54: MultiPlayerDlg+0x7f68
 };
 
 // RTTI: MPEventDlg : UIDialog (vtable 0x00557a88; 0x7f5c bytes).
@@ -180,16 +180,16 @@ public:
     MPEventDlg() : UIDialog(1, "MPEvent.dtm") {}
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f5f30
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f6370
-    void UnknownFunction4f6070();             // 0x004f6070: shows the host's settings
+    void ShowHostSettings();             // 0x004f6070: shows the host's settings
     void UnknownFunction4f69d0();             // 0x004f69d0
-    void UnknownFunction4f6e60();             // 0x004f6e60: applies the event type
+    void ApplyEventType();             // 0x004f6e60: applies the event type
     void UnknownVirtualSlot31(int apply);     // 0x004f7210: stores (or shows) the event settings
-    void UnknownFunction4f75d0();             // 0x004f75d0: shows the track picture
+    void ShowTrackPicture();             // 0x004f75d0: shows the track picture
     void UnknownFunction4f7640(UnknownGameUiControl* picture, const char* directory, const char* name); // 0x004f7640
 
-    MultiPlayerDlg* field_0x2c;               // parent dialog
+    MultiPlayerDlg* parentDialog;             // +0x2c: parent dialog
     unsigned char field_0x30[0x7f3c - 0x30];
-    GameObject* field_0x7f3c;                 // the controls
+    GameObject* controlContainer;             // +0x7f3c: the controls
     unsigned char field_0x7f40[0x7f58 - 0x7f40];
     int field_0x7f58;
 };
@@ -204,28 +204,28 @@ public:
     void UnknownVirtualSlot31(int apply);     // 0x004f91e0: stores the chosen bike and rider
     void UnknownFunction4f8650();             // 0x004f8650
     void UnknownFunction4f8700();             // 0x004f8700
-    void UnknownFunction4f8570(int number);   // 0x004f8570: paints the plate number on every bike
-    void UnknownFunction4f8220();             // 0x004f8220: fills the bike and rider lists
+    void PaintPlateNumber(int number);   // 0x004f8570: paints the plate number on every bike
+    void FillBikeRiderLists();             // 0x004f8220: fills the bike and rider lists
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f78a0
-    void UnknownFunction4f8d20();             // 0x004f8d20: applies the chosen bike
-    void UnknownFunction4500d0();             // 0x004500d0 (in dlgprocs.cpp's code): applies the chosen rider
+    void ApplyChosenBike();             // 0x004f8d20: applies the chosen bike
+    void ApplyChosenRider();             // 0x004500d0 (in dlgprocs.cpp's code): applies the chosen rider
 
-    MultiPlayerDlg* field_0x2c;               // parent dialog
-    GUIManager* field_0x30;
-    GUIUser* field_0x34;
+    MultiPlayerDlg* parentDialog;             // +0x2c: parent dialog
+    GUIManager* guiManager;                   // +0x30
+    GUIUser* guiUser;                         // +0x34
     unsigned char field_0x38[0x110 - 0x38];
-    BackgroundImage* field_0x110;
+    BackgroundImage* dialogBackground;        // +0x110
     unsigned char field_0x114[0x7f58 - 0x114];
-    Vector3 field_0x7f58;                     // the bike view's eye
-    Vector3 field_0x7f64;                     // and target
-    float field_0x7f70;                       // their distance
-    int field_0x7f74;                         // background region
+    Vector3 viewEye;                          // +0x7f58: the bike view's eye
+    Vector3 viewTarget;                       // +0x7f64: and target
+    float viewDistance;                       // +0x7f70: their distance
+    int previewRegion;                        // +0x7f74: background region
     int field_0x7f78;
     int field_0x7f7c;
     int field_0x7f80;
     int field_0x7f84;
     int field_0x7f88;
-    RECT field_0x7f8c;                        // the bike view
+    RECT previewArea;                         // +0x7f8c: the bike view
 };
 
 // RTTI: MPRaceInfoDlg : UIDialog (vtable 0x00557980; 0x7f58 bytes; its
@@ -257,25 +257,25 @@ public:
     MultiPlayerDlg() : UIDialog(1, "MPBase.dtm") {} // inline (KrustyUI 0x00499b20)
     virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f3a70
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f4520
-    void UnknownFunction4f20d0();             // 0x004f20d0: fills the racer slots for the race
-    void UnknownFunction4f2340(short start);  // 0x004f2340: sends the lobby start message (type 0x83)
-    void UnknownFunction4f2b90();             // 0x004f2b90: sends the lobby settings
+    void FillRacerSlots();             // 0x004f20d0: fills the racer slots for the race
+    void SendStartMessage(short start);  // 0x004f2340: sends the lobby start message (type 0x83)
+    void SendSettings();             // 0x004f2b90: sends the lobby settings
     int UnknownFunction4f2ec0();              // 0x004f2ec0
     void UnknownFunction4f3260();             // 0x004f3260
     void UnknownFunction4f3620();             // 0x004f3620
-    void UnknownFunction4f3720(int player, const char* text); // 0x004f3720: adds a chat line
-    void UnknownFunction4f38a0();             // 0x004f38a0: sends the typed chat line
-    void UnknownFunction4f3980(const char* text); // 0x004f3980: sends a system chat line
-    void UnknownFunction4f3a10(int index);    // 0x004f3a10: removes player `index`
+    void AddChatLine(int player, const char* text); // 0x004f3720: adds a chat line
+    void SendChatLine();             // 0x004f38a0: sends the typed chat line
+    void SendSystemChatLine(const char* text); // 0x004f3980: sends a system chat line
+    void RemoveLobbyPlayer(int index);    // 0x004f3a10: removes player `index`
     void UnknownFunction4f57c0(int reason);   // 0x004f57c0
-    void UnknownFunction4f5a00(int page);     // 0x004f5a00: shows page `page`
-    void UnknownFunction4f5ca0();             // 0x004f5ca0: follows a track change
+    void ShowPage(int page);     // 0x004f5a00: shows page `page`
+    void FollowTrackChange();             // 0x004f5ca0: follows a track change
 
     unsigned char field_0x2c[0x30 - 0x2c];
-    GUIManager* field_0x30;
-    GUIUser* field_0x34;
+    GUIManager* guiManager;                   // +0x30
+    GUIUser* guiUser;                         // +0x34
     unsigned char field_0x38[0xc4 - 0x38];
-    int field_0xc4;                           // the menu that opened it (0x866, 0x868, 0x88e)
+    int openingMenu;                          // +0xc4: the menu that opened it (0x866, 0x868, 0x88e)
     unsigned char field_0xc8[0x118 - 0xc8];
     int field_0x118;                          // a color (0xfeb97a)
     unsigned char field_0x11c[0x7f58 - 0x11c];
@@ -284,7 +284,7 @@ public:
     MPRaceInfoDlg* field_0x7f60;
     MPOptionsDlg* field_0x7f64;
     UnknownLobbySlotTable field_0x7f68;
-    char field_0x7fc8[0x104];                 // track name the page was built for
+    char builtForTrack[0x104];                // +0x7fc8: track name the page was built for
     int field_0x80cc;
     char field_0x80d0[0x40];
 };

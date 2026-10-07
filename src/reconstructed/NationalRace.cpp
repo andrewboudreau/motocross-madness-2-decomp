@@ -35,17 +35,17 @@ public:
 
 // 0x004aa7f0
 NationalRace::NationalRace(int flags) : BaseQuarryEvent(flags) {
-    field_0xa4 = 0;
-    field_0xac = 0;
-    field_0xa8 = 0;
+    runwayLights = 0;
+    finishTextShown = 0;
+    finishText = 0;
 }
 
 // 0x004aa850
-NationalRace* NationalRace::UnknownFunction4aa850(RenderTarget* target, UnknownProgressCallback progress) {
-    if (!BaseQuarryEvent::UnknownFunction4de3b0(target, progress))
+NationalRace* NationalRace::Create(RenderTarget* target, UnknownProgressCallback progress) {
+    if (!BaseQuarryEvent::Create(target, progress))
         return 0;
-    if (field_0xa4)
-        field_0xa4->UnknownFunction48ad50((UnknownRunwayRacer*)field_0x34->field_0x38);
+    if (runwayLights)
+        runwayLights->UnknownFunction48ad50((UnknownRunwayRacer*)raceView->field_0x38);
     return this;
 }
 
@@ -55,9 +55,9 @@ int NationalRace::UnknownVirtualSlot27(int value) {
 
     if (!BaseQuarryEvent::UnknownVirtualSlot27(value))
         return 0;
-    field_0xa4 = (new (__FILE__, 53) RunwayLights(g_UnknownGlobal56e26c->mode.field_0x6a8))
-                     ->UnknownFunction48a600(field_0x18, (int)field_0x7c, value, (UnknownRunwayTerrain*)field_0x40);
-    if (!UnknownFunction469190(field_0xa4, -1)) {
+    runwayLights = (new (__FILE__, 53) RunwayLights(g_UnknownGlobal56e26c->mode.field_0x6a8))
+                     ->UnknownFunction48a600(field_0x18, (int)lightManager, value, (UnknownRunwayTerrain*)eventTerrain);
+    if (!UnknownFunction469190(runwayLights, -1)) {
         sprintf(message, "Runway Lights not loaded.\n");
         return 0;
     }
@@ -71,29 +71,29 @@ void NationalRace::UnknownVirtualSlot29() {
 
     BaseQuarryEvent::UnknownVirtualSlot29();
     g_UnknownGlobal56e26c->UnknownFunction521970(0x913, name, sizeof(name));
-    field_0xa8 = new (__FILE__, 71) DropTextOverlay(1);
-    field_0xa8 = field_0xa8->UnknownFunction51af00(field_0x18, g_UnknownGlobal56e26c->field_0x3c, 3.0f, 0,
+    finishText = new (__FILE__, 71) DropTextOverlay(1);
+    finishText = finishText->UnknownFunction51af00(field_0x18, g_UnknownGlobal56e26c->field_0x3c, 3.0f, 0,
                                                    sizeof(name), name);
-    if (!field_0xa8)
+    if (!finishText)
         sprintf(message, "Drop Text Overlay not created.\n");
 }
 
 // 0x004aaa50
 void NationalRace::UnknownVirtualSlot30() {
     BaseQuarryEvent::UnknownVirtualSlot30();
-    UnknownFunction469190(field_0xa8, -1);
+    UnknownFunction469190(finishText, -1);
 }
 
 // 0x004aaa70
 int NationalRace::UnknownVirtualSlot10(float frameTime) {
     BaseQuarryEvent::UnknownVirtualSlot10(frameTime);
     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4 &&
-        !g_UnknownGlobal56e26c->uiInteractionBlocked && !field_0xac) {
-        if (field_0x34->field_0x38->field_0x7a0 + 1 == g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20 &&
-            field_0x34->field_0x18a) {
-            if (field_0xa8)
-                field_0xa8->UnknownFunction51b1f0();
-            field_0xac = 1;
+        !g_UnknownGlobal56e26c->uiInteractionBlocked && !finishTextShown) {
+        if (raceView->field_0x38->field_0x7a0 + 1 == g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20 &&
+            raceView->field_0x18a) {
+            if (finishText)
+                finishText->UnknownFunction51b1f0();
+            finishTextShown = 1;
         }
     }
     return 1;

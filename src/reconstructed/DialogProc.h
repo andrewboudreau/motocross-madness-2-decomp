@@ -8,20 +8,18 @@
 // NetProcs.cpp). A dialog's message procedure is its vtable slot 29 (ret 4,
 // one argument). Names are provisional.
 
-// The message a dialog procedure receives. +0x08 is the kind: 1 a control
-// command (+0x04 names the control), 5 the dialog's initialisation, 9 a
-// notification whose code is +0x00. Other kinds occur in VCRDlg and
-// HostJoinDlg.
+// The message a dialog procedure receives. Kind 9 is a notification whose
+// code is +0x00 (UIDialog::NotifyParent).
 struct UnknownDialogEvent {
-    int field_0x00;                           // notification code
-    const char* field_0x04;                   // control name
-    int field_0x08;                           // kind
-    UIDialog* field_0x0c;                     // the dialog the message is for
-    GUIManager* field_0x10;                   // the GUI (OptionsDlg opens its sub-dialogs on it)
-    UnknownGameUiControl* field_0x14;         // the control (VCRDlg)
+    int code;                                 // +0x00 notification code
+    const char* controlName;                  // +0x04 the control a command comes from
+    int kind;                                 // +0x08 (UnknownDialogEventKind)
+    UIDialog* dialog;                         // +0x0c the dialog the message is for
+    GUIManager* gui;                          // +0x10 (OptionsDlg opens its sub-dialogs on it)
+    UnknownGameUiControl* control;            // +0x14 the sending control (VCRDlg)
     int field_0x18;                           // cleared by OptControlsDlg for kinds 11 and 12
-    int field_0x1c;                           // a kind 11 message's key (dlgprocs.cpp RemoveProfileDlg)
-    int field_0x20;                           // set to 1 once handled
+    int key;                                  // +0x1c a kind 11 message's key (dlgprocs.cpp RemoveProfileDlg)
+    int handled;                              // +0x20 set to 1 once handled
 };
 
 // The garage settings at TrackGame+0x1550 (OptionProcs.h's
@@ -35,17 +33,17 @@ struct UnknownDialogEvent {
 // loop counter, so it is a macro. Needs TrackGame.h and OptionProcs.h.
 #define UNKNOWN_APPLY_BIKE_CLASS(bikeClass, band)                                                     \
     {                                                                                                 \
-        UNKNOWN_GARAGE_SETTINGS->field_0x50 = g_UnknownGlobal56e26c->ui->field_0x2fc[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->firstBand = g_UnknownGlobal56e26c->ui->field_0x2fc[bikeClass];      \
         UNKNOWN_GARAGE_SETTINGS->field_0x54 = g_UnknownGlobal56e26c->ui->field_0x310[bikeClass];      \
-        UNKNOWN_GARAGE_SETTINGS->field_0x58 = g_UnknownGlobal56e26c->ui->field_0x414[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->bandStep = g_UnknownGlobal56e26c->ui->field_0x414[bikeClass];      \
         UNKNOWN_GARAGE_SETTINGS->field_0x08 = g_UnknownGlobal56e26c->ui->field_0x428[bikeClass];      \
         int curve = g_UnknownGlobal56e26c->mode.field_0xa0c[bikeClass];                              \
         for (band = 0; band < 11; band++) {                                                           \
             if (curve < 3)                                                                            \
-                UNKNOWN_GARAGE_SETTINGS->field_0x24[band] =                                           \
+                UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
                     g_UnknownGlobal56e26c->ui->field_0x68[bikeClass][curve][band];                    \
             else                                                                                      \
-                UNKNOWN_GARAGE_SETTINGS->field_0x24[band] =                                           \
+                UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
                     g_UnknownGlobal56e26c->mode.field_0x10f0[bikeClass][curve - 3][band];             \
         }                                                                                             \
     }
@@ -66,13 +64,13 @@ public:
     ChoiceDlg() : UIDialog(1, "messbox2.dtm") {}
     // 0x00455700: sets up the title, the message and the three buttons, each
     // from a text or (when its id is nonzero) a string resource id.
-    void UnknownFunction455700(const char* title, int titleId, const char* prompt, int promptId,
-                               const char* left, int leftId, const char* middle, int middleId,
-                               const char* right, int rightId);
+    void SetTextsOrResources(const char* title, int titleId, const char* prompt, int promptId,
+                             const char* left, int leftId, const char* middle, int middleId,
+                             const char* right, int rightId);
     // 0x00455630: sets the title, the message and the buttons' texts (an empty
     // button text hides the button).
-    void UnknownFunction455630(const char* title, const char* prompt, const char* left,
-                               const char* middle, const char* right);
+    void SetTexts(const char* title, const char* prompt, const char* left,
+                  const char* middle, const char* right);
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004555b0
 
     unsigned char field_0x2c[0x7f58 - 0x2c];
@@ -87,6 +85,6 @@ public:
     void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004aefd0
 
     unsigned char field_0x2c[0x34 - 0x2c];
-    GUIUser* field_0x34;
+    GUIUser* guiUser;                         // +0x34
     unsigned char field_0x38[0x7f58 - 0x38];
 };

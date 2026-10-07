@@ -27,7 +27,7 @@ void TrackGameMode::UnknownFunction522440() {
     UnknownFunction522720((UnknownTrackGameModeOptions6ac*)&field_0x6ac);
     UnknownFunction522780((UnknownTrackGameModeOptionsA20*)&field_0xa20);
     UnknownFunction5227d0((UnknownTrackGameModeOptionsA4c*)&field_0xa4c);
-    g_UnknownGlobal56e26c->mode.UnknownFunction522e20(0, &field_0xa4c);
+    g_UnknownGlobal56e26c->mode.ChooseDisplayMode(0, &field_0xa4c);
     UnknownFunction522800((UnknownTrackGameModeOptionsA68*)field_0xa68);
     UnknownFunction522840(field_0x145c);
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0xfd8);
@@ -91,7 +91,7 @@ int TrackGameMode::UnknownFunction5238f0(const char* name, char* path) {
     if (!file) {
         if (field_0x23cc == 2)
             return 0;
-        if (!UnknownFunction523bf0() && !UnknownFunction523800())
+        if (!FindCdDirectory() && !WaitForCd())
             return 0;
         sprintf(buffer, "%s\\%s", field_0x24d4, name + skip);
         file = fopen(buffer, "r");

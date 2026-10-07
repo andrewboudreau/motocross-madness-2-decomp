@@ -1,23 +1,23 @@
 // Near-miss Pixtrans.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/PIXTRANS.md.
 //
-// UnknownFunction4cdf10 (0x004cdf10, 636 bytes with its jump table): the
+// Halve8888 (0x004cdf10, 636 bytes with its jump table): the
 // 8888 halver. Control flow, the count switch and the retail alpha quirk
 // line up, but retail keeps the upper row pointer in ecx and the lower one
 // on the stack, VC6 here the other way round, so most registers differ.
 // Accumulator declaration order (all 120) and an indexed lower row do not
 // change it.
 //
-// UnknownFunction4d0700 (0x004d0700, 208 bytes): 565 to 8888 with a key.
+// Convert565To8888 (0x004d0700, 208 bytes): 565 to 8888 with a key.
 // The row pointers and the 0xff constant land in different registers and
 // slots (retail keeps 0xff in dl and both rows in argument slots); about 60
 // lines differ in every pointer-order and key-placement variant.
 //
-// UnknownFunction4d07d0 (0x004d07d0, 146 bytes): 1555 to 8888. Only the
+// Convert1555To8888 (0x004d07d0, 146 bytes): 1555 to 8888. Only the
 // pixel pointer's base offset differs (retail addresses the pixel from its
 // alpha byte, VC6 here from blue); 7 lines.
 //
-// UnknownFunction4ce420 (0x004ce420, 456 bytes; candidate 448): the 1555
+// Halve1555 (0x004ce420, 456 bytes; candidate 448): the 1555
 // halver behind 0x004d0170. The arithmetic, the >= 2 test and the packing
 // match. Retail loads the two lower-row pixels before the first test and
 // keeps them in frame slots (a 0x10-byte frame); VC6 here loads each where
@@ -39,7 +39,7 @@
 #include "../../src/reconstructed/TextureMap.h"
 
 // 0x004d0700: converts 565 to 8888; the key colour becomes opaque magenta.
-int UnknownFunction4d0700(void* destination, void* source, int width, int height, int destinationStride,
+int Convert565To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, unsigned int key) {
     unsigned short transparent = Pack565(key);
     unsigned short* sourceRow = (unsigned short*)source;
@@ -66,7 +66,7 @@ int UnknownFunction4d0700(void* destination, void* source, int width, int height
 }
 
 // 0x004d07d0: converts 1555 to 8888.
-int UnknownFunction4d07d0(void* destination, void* source, int width, int height, int destinationStride,
+int Convert1555To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
     UnknownPixel32* row = (UnknownPixel32*)destination;
@@ -88,7 +88,7 @@ int UnknownFunction4d07d0(void* destination, void* source, int width, int height
 // 0x004cdf10: halves 8888 pixels. Colour averages the 2x2 pixels whose
 // alpha is set; alpha is the block's sum / 4. (The fourth pixel adds the
 // third one's alpha, as in retail.)
-int UnknownFunction4cdf10(void* destination, void* source, int width, int height, int destinationStride,
+int Halve8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     UnknownPixel32* sourceRow = (UnknownPixel32*)source;
     UnknownPixel32* row = (UnknownPixel32*)destination;
@@ -188,7 +188,7 @@ int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int for
     int y;
 
     switch (format) {
-    case 0x235: {
+    case 565: {
         unsigned short* row = (unsigned short*)bits;
         for (y = 0; y < height; y++) {
             unsigned short* pixel = row;
@@ -201,7 +201,7 @@ int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int for
         }
         return UNKNOWN_ARGB(0xff, red * 8 / count, green * 4 / count, blue * 8 / count);
     }
-    case 0x22b: {
+    case 555: {
         unsigned short* row = (unsigned short*)bits;
         for (y = 0; y < height; y++) {
             unsigned short* pixel = row;
@@ -227,7 +227,7 @@ int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int for
         }
         break;
     }
-    case 0x378: {
+    case 888: {
         UnknownPixel24* row = (UnknownPixel24*)bits;
         for (y = 0; y < height; y++) {
             UnknownPixel24* pixel = row;
@@ -240,7 +240,7 @@ int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int for
         }
         break;
     }
-    case 0x22b8: {
+    case 8888: {
         UnknownPixel32* row = (UnknownPixel32*)bits;
         for (y = 0; y < height; y++) {
             UnknownPixel32* pixel = row;
@@ -254,7 +254,7 @@ int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int for
         }
         return UNKNOWN_ARGB(alpha / count, red / count, green / count, blue / count);
     }
-    case 0x115c: {
+    case 4444: {
         unsigned short* row = (unsigned short*)bits;
         for (y = 0; y < height; y++) {
             unsigned short* pixel = row;
@@ -276,7 +276,7 @@ int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int for
 
 // 0x004ce420: halves 1555 pixels; colour averages the opaque pixels of
 // each 2x2 block, which stays opaque when at least two of them are.
-int UnknownFunction4ce420(void* destination, void* source, int width, int height, int destinationStride,
+int Halve1555(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {
     unsigned short* sourceRow = (unsigned short*)source;
     unsigned short* row = (unsigned short*)destination;

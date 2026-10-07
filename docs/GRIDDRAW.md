@@ -199,3 +199,12 @@ tests in `0x0068a084`), recurses into the four quadrants until single
 child blocks, sets their masks (0x3fffff fully visible, 0x1fffff a leaf,
 cleared through the empty `0x00464e90`) and marks the ancestors dirty
 when the mask changed.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x0047ca00` `EvictNodeTexture`
+- `0x0047ca40` `EvictBlockTexture`

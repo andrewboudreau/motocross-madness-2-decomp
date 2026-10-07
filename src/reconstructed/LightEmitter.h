@@ -19,7 +19,7 @@ public:
     unsigned char field_0x00[0xb8];
     Vector3 field_0xb8;
     unsigned char field_0xc4[0xd0 - 0xc4];
-    unsigned int field_0xd0;                                   // colour without alpha
+    unsigned int rgbColor;                                     // colour without alpha
 };
 
 class LightManager;
@@ -40,28 +40,28 @@ public:
                                         int index);
     unsigned int UnknownFunction49dfd0();                  // 0x0049dfd0: packed ARGB colour
     void UnknownFunction49e020(unsigned int color);        // 0x0049e020: sets the colours
-    void UnknownFunction49e0f0(float range);               // 0x0049e0f0
-    void UnknownFunction49e150(const Vector3* position);   // 0x0049e150
-    void UnknownFunction49e1e0(const Vector3* direction);  // 0x0049e1e0
+    void SetRange(float range);                            // 0x0049e0f0
+    void SetPosition(const Vector3* position);             // 0x0049e150
+    void SetDirection(const Vector3* direction);           // 0x0049e1e0
 
-    int field_0x2c;                         // type (LightManager 0x004a0190 searches it)
+    int lightType;                          // type (LightManager 0x004a0190 searches it)
     int field_0x30;                         // derived from the type, default 3
-    float field_0x34[4];                    // colour (r, g, b, a)
+    float colorRGBA[4];                     // colour (r, g, b, a)
     float field_0x44[4];
     float field_0x54[4];
-    Vector3 field_0x64;                     // position
-    Vector3 field_0x70;                     // direction
-    float field_0x7c;                       // range, sqrt(FLT_MAX) when unbounded
+    Vector3 lightPosition;                  // position
+    Vector3 lightDirection;                 // direction
+    float lightRange;                       // range, sqrt(FLT_MAX) when unbounded
     float field_0x80;
     float field_0x84;
     float field_0x88;
     float field_0x8c;
     float field_0x90;                       // pi / 4
     float field_0x94;                       // pi / 2
-    D3DIMSoultreeObject* field_0x98;        // "sphere.slt" model
+    D3DIMSoultreeObject* debugSphere;       // "sphere.slt" model
     UnknownLightEmitterTarget* field_0x9c;
     int field_0xa0;
-    LightManager* field_0xa4;               // owner (set by 0x0049e470)
+    LightManager* manager;                  // owner (set by 0x0049e470)
     unsigned int field_0xa8;                // compared, never written here
 };
 
@@ -82,17 +82,17 @@ public:
     void UnknownFunction49e4a0(void* matrix, int count, void* vertices, void* buffer,
                                int stride, void* colors);
 
-    int field_0x2c;                         // light count
+    int lightCount;                         // light count
     LightEmitter* field_0x30[50];
-    int* field_0xf8;                        // per-vertex red (one allocation of 3 * capacity)
-    int* field_0xfc;                        // green
-    int* field_0x100;                       // blue
+    int* vertexRed;                         // per-vertex red (one allocation of 3 * capacity)
+    int* vertexGreen;                       // green
+    int* vertexBlue;                        // blue
     int field_0x104;
     int field_0x108;
     int field_0x10c;
-    int field_0x110;                        // capacity in vertices
+    int vertexCapacity;                     // capacity in vertices
     int field_0x114;
-    int field_0x118;                        // change counter
+    int changeCount;                        // change counter
 };
 
 // 0x0049f180 (cdecl): out-of-line negation, also called from the terrain.

@@ -29,3 +29,13 @@ Names are provisional.
   `0x004aa360` and `0x004aa4e0` (failure-block placement). The soultree
   physics inlines inside this TU (`0x004aa150..0x004aa340`) stay in
   `samples/physics`.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x0049e0f0` `SetRange`
+- `0x0049e150` `SetPosition`
+- `0x0049e1e0` `SetDirection`

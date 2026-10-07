@@ -61,20 +61,20 @@ MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, c
     block->UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
     sprintf(section, "MorphBastard Information");
     block->UnknownFunction4b78f0(section);
-    block->UnknownFunction4b7f10("NumberOfMorphBastards", 0, &field_0x44);
-    field_0x48 = new (__FILE__, 87) MorphBastardObject[field_0x44];
+    block->UnknownFunction4b7f10("NumberOfMorphBastards", 0, &objectCount);
+    morphObjects = new (__FILE__, 87) MorphBastardObject[objectCount];
 
-    for (int i = 0; i < field_0x44; i++) {
+    for (int i = 0; i < objectCount; i++) {
         sprintf(section, "MorphBastard %i", i);
         block->UnknownFunction4b78f0(section);
         block->UnknownFunction4b7b30("ObjectName", objectName, -1);
         MorphBastardNode* node = model->UnknownFunction4fdae0(objectName);
-        field_0x48[i].field_0x08 = node;
-        node->UnknownFunction4fca80(0, &field_0x48[i].field_0x0c);
-        MorphBastardInvertRigid(field_0x48[i].field_0x0c);
+        morphObjects[i].node = node;
+        node->UnknownFunction4fca80(0, &morphObjects[i].inverseRestMatrix);
+        MorphBastardInvertRigid(morphObjects[i].inverseRestMatrix);
         block->UnknownFunction4b7f10("NumberOfTargets", 0, &targetCount);
-        field_0x48[i].field_0x00 = 0;
-        field_0x48[i].field_0x04 = 0;
+        morphObjects[i].channelCount = 0;
+        morphObjects[i].channels = 0;
 
         for (int j = 0; j < targetCount; j++) {
             sprintf(section, "MorphBastard %i Target %i", i, j);
@@ -97,78 +97,78 @@ MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, c
                 }
                 if (!found)
                     continue;
-                for (int k = 0; k < field_0x48[i].field_0x00; k++) {
-                    MorphBastardChannel* channel = &field_0x48[i].field_0x04[k];
-                    if (channel->field_0x44 == controller && channel->field_0x00 == channelAxis) {
-                        channel->field_0x48 = (int*)DebugRealloc(
-                            channel->field_0x48, channel->field_0x4c * 4 + 4, __FILE__, 143);
-                        channel->field_0x48[channel->field_0x4c] = k;
-                        channel->field_0x4c++;
+                for (int k = 0; k < morphObjects[i].channelCount; k++) {
+                    MorphBastardChannel* channel = &morphObjects[i].channels[k];
+                    if (channel->controller == controller && channel->axis == channelAxis) {
+                        channel->targetNumbers = (int*)DebugRealloc(
+                            channel->targetNumbers, channel->targetCount * 4 + 4, __FILE__, 143);
+                        channel->targetNumbers[channel->targetCount] = k;
+                        channel->targetCount++;
                         isNew = 0;
                     }
                 }
                 if (isNew && controller) {
-                    field_0x48[i].field_0x04 = (MorphBastardChannel*)DebugRealloc(
-                        field_0x48[i].field_0x04,
-                        (field_0x48[i].field_0x00 + 1) * sizeof(MorphBastardChannel), __FILE__, 152);
-                    MorphBastardChannel* channel = &field_0x48[i].field_0x04[field_0x48[i].field_0x00];
-                    channel->field_0x44 = controller;
-                    channel->field_0x00 = channelAxis;
-                    channel->field_0x54 = 0;
-                    channel->field_0x58 = 0;
-                    channel->field_0x4c = 2;
-                    channel->field_0x50 = 0;
-                    channel->field_0x48 = (int*)DebugMalloc(12, __FILE__, 161);
-                    channel->field_0x48[0] = -1;
-                    channel->field_0x48[1] = j;
+                    morphObjects[i].channels = (MorphBastardChannel*)DebugRealloc(
+                        morphObjects[i].channels,
+                        (morphObjects[i].channelCount + 1) * sizeof(MorphBastardChannel), __FILE__, 152);
+                    MorphBastardChannel* channel = &morphObjects[i].channels[morphObjects[i].channelCount];
+                    channel->controller = controller;
+                    channel->axis = channelAxis;
+                    channel->minimumValue = 0;
+                    channel->maximumValue = 0;
+                    channel->targetCount = 2;
+                    channel->targets = 0;
+                    channel->targetNumbers = (int*)DebugMalloc(12, __FILE__, 161);
+                    channel->targetNumbers[0] = -1;
+                    channel->targetNumbers[1] = j;
                     channel->field_0x5c = -1;
-                    controller->UnknownFunction4fca80(0, &channel->field_0x04);
-                    MorphBastardInvertRigid(channel->field_0x04);
-                    field_0x48[i].field_0x00++;
+                    controller->UnknownFunction4fca80(0, &channel->inverseRestMatrix);
+                    MorphBastardInvertRigid(channel->inverseRestMatrix);
+                    morphObjects[i].channelCount++;
                 }
             }
         }
 
-        for (int k = 0; k < field_0x48[i].field_0x00; k++) {
-            MorphBastardChannel* channel = &field_0x48[i].field_0x04[k];
-            channel->field_0x50 = (MorphBastardTarget*)DebugMalloc(
-                channel->field_0x4c * sizeof(MorphBastardTarget), __FILE__, 178);
-            channel->field_0x50[0].field_0x00 = 0;
-            channel->field_0x50[0].field_0x04 = 0;
-            channel->field_0x50[0].field_0x0c = 0;
-            channel->field_0x50[0].field_0x08 = 0;
-            channel->field_0x50[0].field_0x10 = 0;
+        for (int k = 0; k < morphObjects[i].channelCount; k++) {
+            MorphBastardChannel* channel = &morphObjects[i].channels[k];
+            channel->targets = (MorphBastardTarget*)DebugMalloc(
+                channel->targetCount * sizeof(MorphBastardTarget), __FILE__, 178);
+            channel->targets[0].value = 0;
+            channel->targets[0].deltaCount = 0;
+            channel->targets[0].deltas = 0;
+            channel->targets[0].vertexIndices = 0;
+            channel->targets[0].lastWeights = 0;
             float targetValue = 0;
-            for (int t = 1; t < channel->field_0x4c; t++) {
-                sprintf(section, "MorphBastard %i Target %i", i, channel->field_0x48[t]);
+            for (int t = 1; t < channel->targetCount; t++) {
+                sprintf(section, "MorphBastard %i Target %i", i, channel->targetNumbers[t]);
                 block->UnknownFunction4b78f0(section);
-                if (channel->field_0x00 == 0)
+                if (channel->axis == 0)
                     block->UnknownFunction4b7e70("XAxis", &targetValue);
-                else if (channel->field_0x00 == 1)
+                else if (channel->axis == 1)
                     block->UnknownFunction4b7e70("YAxis", &targetValue);
-                else if (channel->field_0x00 == 2)
+                else if (channel->axis == 2)
                     block->UnknownFunction4b7e70("ZAxis", &targetValue);
-                channel->field_0x50[t].field_0x00 = targetValue;
-                if (targetValue < channel->field_0x54)
-                    channel->field_0x54 = targetValue;
-                if (targetValue > channel->field_0x58)
-                    channel->field_0x58 = targetValue;
-                MorphBastardTarget* target = &channel->field_0x50[t];
-                sprintf(section, "MorphBastard %i Target %i Deltas", i, channel->field_0x48[t]);
-                target->field_0x04 = block->UnknownFunction4b7f70(section);
-                target->field_0x08 = (int*)DebugMalloc(target->field_0x04 * 4, __FILE__, 217);
-                target->field_0x0c = (Vector3*)DebugMalloc(target->field_0x04 * 12, __FILE__, 218);
-                target->field_0x10 = (float*)DebugMalloc(target->field_0x04 * 4, __FILE__, 219);
-                for (int r = 0; r < target->field_0x04; r++) {
+                channel->targets[t].value = targetValue;
+                if (targetValue < channel->minimumValue)
+                    channel->minimumValue = targetValue;
+                if (targetValue > channel->maximumValue)
+                    channel->maximumValue = targetValue;
+                MorphBastardTarget* target = &channel->targets[t];
+                sprintf(section, "MorphBastard %i Target %i Deltas", i, channel->targetNumbers[t]);
+                target->deltaCount = block->UnknownFunction4b7f70(section);
+                target->vertexIndices = (int*)DebugMalloc(target->deltaCount * 4, __FILE__, 217);
+                target->deltas = (Vector3*)DebugMalloc(target->deltaCount * 12, __FILE__, 218);
+                target->lastWeights = (float*)DebugMalloc(target->deltaCount * 4, __FILE__, 219);
+                for (int r = 0; r < target->deltaCount; r++) {
                     block->UnknownFunction4b8010(0);
-                    block->UnknownFunction4b8180(1, &target->field_0x08[r]);
-                    block->UnknownFunction4b81c0(2, &target->field_0x0c[r].x);
-                    block->UnknownFunction4b81c0(3, &target->field_0x0c[r].y);
-                    block->UnknownFunction4b81c0(4, &target->field_0x0c[r].z);
+                    block->UnknownFunction4b8180(1, &target->vertexIndices[r]);
+                    block->UnknownFunction4b81c0(2, &target->deltas[r].x);
+                    block->UnknownFunction4b81c0(3, &target->deltas[r].y);
+                    block->UnknownFunction4b81c0(4, &target->deltas[r].z);
                 }
             }
-            qsort(channel->field_0x50, channel->field_0x4c, sizeof(MorphBastardTarget),
-                  UnknownFunction4a3bb0);
+            qsort(channel->targets, channel->targetCount, sizeof(MorphBastardTarget),
+                  CompareTargets);
         }
     }
 
@@ -183,58 +183,58 @@ MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, c
 void MorphBastardModifier::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultreeMesh* mesh,
                                                 UnknownSoultreeMesh** out)
 {
-    if (((MorphBastardSoultreeView*)object)->field_0x27c) {
+    if (((MorphBastardSoultreeView*)object)->drawUnchanged) {
         *out = mesh;
         return;
     }
     if (!field_0x40)
-        UnknownFunction4a5290(mesh);
-    memcpy(field_0x40->field_0x14, mesh->field_0x14, field_0x40->field_0x08 * sizeof(MorphBastardVertex));
+        CopyMesh(mesh);
+    memcpy(field_0x40->field_0x14, mesh->field_0x14, field_0x40->vertexCount * sizeof(MorphBastardVertex));
 
     float value;
-    for (int i = 0; i < field_0x44; i++) {
-        UnknownFunction4a4bb0(&field_0x48[i]);
+    for (int i = 0; i < objectCount; i++) {
+        UpdateChannels(&morphObjects[i]);
         UnknownFunction464e80(i);
         MorphBastardMeshGroup* group;
-        for (int g = 0; g < mesh->field_0x00; g++) {
-            if (mesh->field_0x04[g].field_0x00 == field_0x48[i].field_0x08)
+        for (int g = 0; g < mesh->groupCount; g++) {
+            if (mesh->field_0x04[g].node == morphObjects[i].node)
                 group = &mesh->field_0x04[g];
         }
-        if (!field_0x4c) {
-            field_0x4c = new (__FILE__, 541) Vector3[mesh->field_0x08];
-            field_0x50 = new (__FILE__, 542) Vector3[mesh->field_0x08];
-            field_0x54 = new (__FILE__, 543) Vector3[mesh->field_0x08];
+        if (!deltaSums) {
+            deltaSums = new (__FILE__, 541) Vector3[mesh->vertexCount];
+            deltaMinimums = new (__FILE__, 542) Vector3[mesh->vertexCount];
+            deltaMaximums = new (__FILE__, 543) Vector3[mesh->vertexCount];
         }
         int base = ((int)group->field_0x08 - (int)mesh->field_0x10) / 32;
-        memset(field_0x4c, 0, group->field_0x04 * sizeof(Vector3));
-        memset(field_0x50, 0, group->field_0x04 * sizeof(Vector3));
-        memset(field_0x54, 0, group->field_0x04 * sizeof(Vector3));
+        memset(deltaSums, 0, group->vertexCount * sizeof(Vector3));
+        memset(deltaMinimums, 0, group->vertexCount * sizeof(Vector3));
+        memset(deltaMaximums, 0, group->vertexCount * sizeof(Vector3));
 
-        for (int j = 0; j < field_0x48[i].field_0x00; j++) {
-            MorphBastardChannel* channel = &field_0x48[i].field_0x04[j];
-            if (channel->field_0x00 == 0)
-                value = channel->field_0x60;
-            else if (channel->field_0x00 == 1)
+        for (int j = 0; j < morphObjects[i].channelCount; j++) {
+            MorphBastardChannel* channel = &morphObjects[i].channels[j];
+            if (channel->axis == 0)
+                value = channel->currentValue;
+            else if (channel->axis == 1)
                 value = channel->field_0x64;
-            else if (channel->field_0x00 == 2)
+            else if (channel->axis == 2)
                 value = channel->field_0x68;
 
             float weight = 0.0f;
             float upper = 0.0f;
             int lo = -1;
             int hi = -1;
-            if (value <= channel->field_0x54) {
+            if (value <= channel->minimumValue) {
                 weight = 1.0f;
                 lo = 0;
-            } else if (value >= channel->field_0x58) {
+            } else if (value >= channel->maximumValue) {
                 weight = 1.0f;
-                lo = channel->field_0x4c - 1;
+                lo = channel->targetCount - 1;
             } else {
-                for (int k = 0; k < channel->field_0x4c - 1; k++) {
-                    if (value > channel->field_0x50[k].field_0x00 &&
-                        value <= channel->field_0x50[k + 1].field_0x00) {
-                        upper = (value - channel->field_0x50[k].field_0x00) /
-                                (channel->field_0x50[k + 1].field_0x00 - channel->field_0x50[k].field_0x00);
+                for (int k = 0; k < channel->targetCount - 1; k++) {
+                    if (value > channel->targets[k].value &&
+                        value <= channel->targets[k + 1].value) {
+                        upper = (value - channel->targets[k].value) /
+                                (channel->targets[k + 1].value - channel->targets[k].value);
                         weight = 1.0f - upper;
                         lo = k;
                         hi = k + 1;
@@ -247,49 +247,49 @@ void MorphBastardModifier::UnknownVirtualSlot27(D3DIMSoultreeObject* object, Unk
                 upper = 0.0f;
 
             if (weight != 0.0f) {
-                for (int d = 0; d < channel->field_0x50[lo].field_0x04; d++) {
-                    channel->field_0x50[lo].field_0x10[d] = weight;
-                    int index = channel->field_0x50[lo].field_0x08[d] - base;
-                    Vector3 delta = weight * channel->field_0x50[lo].field_0x0c[d];
-                    field_0x4c[index] += delta;
-                    if (delta.x < field_0x50[index].x)
-                        field_0x50[index].x = delta.x;
-                    else if (delta.x > field_0x54[index].x)
-                        field_0x54[index].x = delta.x;
-                    if (delta.y < field_0x50[index].y)
-                        field_0x50[index].y = delta.y;
-                    else if (delta.y > field_0x54[index].y)
-                        field_0x54[index].y = delta.y;
-                    if (delta.z < field_0x50[index].z)
-                        field_0x50[index].z = delta.z;
-                    else if (delta.z > field_0x54[index].z)
-                        field_0x54[index].z = delta.z;
+                for (int d = 0; d < channel->targets[lo].deltaCount; d++) {
+                    channel->targets[lo].lastWeights[d] = weight;
+                    int index = channel->targets[lo].vertexIndices[d] - base;
+                    Vector3 delta = weight * channel->targets[lo].deltas[d];
+                    deltaSums[index] += delta;
+                    if (delta.x < deltaMinimums[index].x)
+                        deltaMinimums[index].x = delta.x;
+                    else if (delta.x > deltaMaximums[index].x)
+                        deltaMaximums[index].x = delta.x;
+                    if (delta.y < deltaMinimums[index].y)
+                        deltaMinimums[index].y = delta.y;
+                    else if (delta.y > deltaMaximums[index].y)
+                        deltaMaximums[index].y = delta.y;
+                    if (delta.z < deltaMinimums[index].z)
+                        deltaMinimums[index].z = delta.z;
+                    else if (delta.z > deltaMaximums[index].z)
+                        deltaMaximums[index].z = delta.z;
                 }
             }
             if (upper != 0.0f) {
-                for (int d = 0; d < channel->field_0x50[hi].field_0x04; d++) {
-                    channel->field_0x50[hi].field_0x10[d] = upper;
-                    int index = channel->field_0x50[hi].field_0x08[d] - base;
-                    Vector3 delta = upper * channel->field_0x50[hi].field_0x0c[d];
-                    field_0x4c[index] += delta;
-                    if (delta.x < field_0x50[index].x)
-                        field_0x50[index].x = delta.x;
-                    else if (delta.x > field_0x54[index].x)
-                        field_0x54[index].x = delta.x;
-                    if (delta.y < field_0x50[index].y)
-                        field_0x50[index].y = delta.y;
-                    else if (delta.y > field_0x54[index].y)
-                        field_0x54[index].y = delta.y;
-                    if (delta.z < field_0x50[index].z)
-                        field_0x50[index].z = delta.z;
-                    else if (delta.z > field_0x54[index].z)
-                        field_0x54[index].z = delta.z;
+                for (int d = 0; d < channel->targets[hi].deltaCount; d++) {
+                    channel->targets[hi].lastWeights[d] = upper;
+                    int index = channel->targets[hi].vertexIndices[d] - base;
+                    Vector3 delta = upper * channel->targets[hi].deltas[d];
+                    deltaSums[index] += delta;
+                    if (delta.x < deltaMinimums[index].x)
+                        deltaMinimums[index].x = delta.x;
+                    else if (delta.x > deltaMaximums[index].x)
+                        deltaMaximums[index].x = delta.x;
+                    if (delta.y < deltaMinimums[index].y)
+                        deltaMinimums[index].y = delta.y;
+                    else if (delta.y > deltaMaximums[index].y)
+                        deltaMaximums[index].y = delta.y;
+                    if (delta.z < deltaMinimums[index].z)
+                        deltaMinimums[index].z = delta.z;
+                    else if (delta.z > deltaMaximums[index].z)
+                        deltaMaximums[index].z = delta.z;
                 }
             }
         }
 
-        for (int v = 0; v < group->field_0x04; v++) {
-            Vector3 offset = field_0x4c[v];
+        for (int v = 0; v < group->vertexCount; v++) {
+            Vector3 offset = deltaSums[v];
             field_0x40->field_0x14[base + v].x = offset.x + mesh->field_0x14[base + v].x;
             field_0x40->field_0x14[base + v].y = offset.y + mesh->field_0x14[base + v].y;
             field_0x40->field_0x14[base + v].z = offset.z + mesh->field_0x14[base + v].z;
@@ -340,7 +340,7 @@ void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, M
     identity.m[2][2] = 1.0f;
     identity.m[3][3] = 1.0f;
     Matrix4 controller;
-    channel->field_0x44->UnknownFunction4fca80(0, &controller);
+    channel->controller->UnknownFunction4fca80(0, &controller);
     Matrix4 world = controller;
     controller(0, 0) = world(0, 0) * inverse(0, 0) + world(0, 1) * inverse(1, 0) + world(0, 2) * inverse(2, 0) +
                        world(0, 3) * inverse(3, 0);
@@ -379,7 +379,7 @@ void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, M
     Vector3 from = *(Vector3*)&identity.m[0][0];
     Vector3 to = *(Vector3*)&controller.m[0][0];
     Vector3 axis = Vector3(from.y * to.z - from.z * to.y, from.z * to.x - to.z * from.x, to.y * from.x - from.y * to.x);
-    float angle = UnknownFunction4a3be0(from, to);
+    float angle = AngleBetween(from, to);
     if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
         axis = Vector3(1.0f, 0.0f, 0.0f);
     else
@@ -415,7 +415,7 @@ void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, M
     Vector3 cross(alignedY.y * controllerY.z - alignedY.z * controllerY.y,
                   alignedY.z * controllerY.x - alignedY.x * controllerY.z,
                   alignedY.x * controllerY.y - alignedY.y * controllerY.x);
-    float angleX = UnknownFunction4a3be0(alignedY, controllerY) * 57.2957764f;
+    float angleX = AngleBetween(alignedY, controllerY) * 57.2957764f;
     if (cross.y * to.y + cross.x * to.x + cross.z * to.z < 0.0f)
         angleX = -angleX;
 
@@ -423,7 +423,7 @@ void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, M
     from = *(Vector3*)&identity.m[1][0];
     to = *(Vector3*)&controller.m[1][0];
     axis = UnknownFunction515600(&from, &to);
-    angle = UnknownFunction4a3be0(from, to);
+    angle = AngleBetween(from, to);
     if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
         axis = Vector3(0.0f, 1.0f, 0.0f);
     else
@@ -431,7 +431,7 @@ void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, M
     UnknownFunction42de90(&rotation, axis.x, axis.y, axis.z, angle);
     UnknownFunction436500(&aligned, &identity, &rotation);
     cross = UnknownFunction515600(&UnknownFunction4a2350(&aligned, 2), &UnknownFunction4a2350(&controller, 2));
-    float angleY = UnknownFunction4a3be0(UnknownFunction4a2350(&aligned, 2), UnknownFunction4a2350(&controller, 2)) *
+    float angleY = AngleBetween(UnknownFunction4a2350(&aligned, 2), UnknownFunction4a2350(&controller, 2)) *
                    57.2957764f;
     if (UnknownFunction40ae30(&to, &cross) < 0.0f)
         angleY = -angleY;
@@ -440,7 +440,7 @@ void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, M
     from = UnknownFunction4a2350(&identity, 2);
     to = UnknownFunction4a2350(&controller, 2);
     axis = UnknownFunction515600(&from, &to);
-    angle = UnknownFunction4a3be0(from, to);
+    angle = AngleBetween(from, to);
     if (axis.x == 0.0f && axis.y == 0.0f && axis.z == 0.0f)
         axis = Vector3(0.0f, 0.0f, 1.0f);
     else
@@ -449,12 +449,12 @@ void MorphBastardModifier::UnknownFunction4a3c80(MorphBastardChannel* channel, M
     UnknownFunction436500(&aligned, &identity, &rotation);
     cross = UnknownFunction515600(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
     UnknownFunction40ae30(&UnknownFunction4a2350(&aligned, 0), &UnknownFunction4a2350(&controller, 0));
-    float angleZ = UnknownFunction4a3be0(UnknownFunction4a2350(&aligned, 0), UnknownFunction4a2350(&controller, 0)) *
+    float angleZ = AngleBetween(UnknownFunction4a2350(&aligned, 0), UnknownFunction4a2350(&controller, 0)) *
                    57.2957764f;
     if (UnknownFunction40ae30(&to, &cross) < 0.0f)
         angleZ = -angleZ;
 
-    channel->field_0x60 = -angleX;
+    channel->currentValue = -angleX;
     channel->field_0x64 = -angleZ;
     channel->field_0x68 = -angleY;
 }

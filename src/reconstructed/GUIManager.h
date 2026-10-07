@@ -136,7 +136,7 @@ struct UnknownGroundFogShader {
 
 // Cursor animation passed to GUICursor 0x00485150 (GUIUser+0x1c8).
 struct UnknownCursorAnimation {
-    int UnknownFunction4730b0();              // 0x004730b0: current frame
+    int AdvancePastSounds();              // 0x004730b0: current frame
     unsigned char field_0x00[0x08];
     int field_0x08;
     int field_0x0c;
@@ -169,26 +169,26 @@ public:
     virtual void UnknownVirtualSlot28(int value); // slot 28 (0x70)
 
     void UnknownFunction46ea60(int value);    // 0x0046ea60
-    int UnknownFunction46e9a0(int value);     // 0x0046e9a0
+    int FindSectionObject(int value);     // 0x0046e9a0
     void UnknownFunction46ffd0(int value);    // 0x0046ffd0
     void UnknownFunction470070(int a, int b, CameraRect* rect); // 0x00470070
 
-    UnknownGuiDialog* field_0x2c;             // parent dialog
+    UnknownGuiDialog* parentDialog;           // +0x2c: parent dialog
     unsigned char field_0x30[0x34 - 0x30];
-    GUIUser* field_0x34;
+    GUIUser* guiUser;                         // +0x34
     unsigned char field_0x38[0xc8 - 0x38];
     int field_0xc8;
     unsigned char field_0xcc[0xdc - 0xcc];
-    int field_0xdc;                           // font height
-    char field_0xe0[0x108 - 0xe0];            // font face
+    int dialogFontHeight;                     // +0xdc
+    char dialogFontFace[0x108 - 0xe0];        // +0xe0
     int field_0x108;                          // bold
     unsigned char field_0x10c[0x144 - 0x10c];
     int field_0x144;                          // flags from 0x00485a70
     int field_0x148;                          // takes the input first (0x00485df0)
     unsigned char field_0x14c[0x160 - 0x14c];
-    RECT field_0x160;                         // screen area
+    RECT screenArea;                          // +0x160
     unsigned char field_0x170[0x7f3c - 0x170];
-    GameObject* field_0x7f3c;                 // child dialogs are added here
+    GameObject* controlContainer;             // +0x7f3c: child dialogs are added here
 };
 
 // A dialog control as GUIUser and ToolTip see it. Never constructed as such.
@@ -203,21 +203,21 @@ public:
     virtual void UnknownVirtualSlot33(UnknownGuiControl* next);
 
     unsigned char field_0x2c[0x3c - 0x2c];
-    CameraRect field_0x3c;                    // area
+    CameraRect area;                          // +0x3c: area
     unsigned char field_0x4c[0x5c - 0x4c];
-    int field_0x5c;                           // control type (11: edit field)
+    int controlType;                          // +0x5c: control type (11: edit field)
     unsigned char field_0x60[0xb8 - 0x60];
-    UnknownGuiDialog* field_0xb8;
-    GUIManager* field_0xbc;
+    UnknownGuiDialog* ownerDialog;            // +0xb8
+    GUIManager* ownerGui;                     // +0xbc
     unsigned char field_0xc0[0xf0 - 0xc0];
-    char* field_0xf0;                         // tool tip text
+    char* toolTipText;                        // +0xf0: tool tip text
     unsigned char field_0xf4[0x130 - 0xf4];
-    char field_0x130[0x158 - 0x130];          // font face
-    int field_0x158;                          // bold
+    char fontFace[0x158 - 0x130];             // +0x130
+    int bold;                                 // +0x158: bold
     unsigned char field_0x15c[0x160 - 0x15c];
-    int field_0x160;                          // font height
+    int fontHeight;                           // +0x160
     unsigned char field_0x164[0x210 - 0x164];
-    char* field_0x210;                        // accepted characters
+    char* acceptedCharacters;                 // +0x210: accepted characters
     RECT field_0x214;
 };
 
@@ -241,17 +241,17 @@ public:
     ToolTip* UnknownFunction486a10(void* target, GUIManager* gui); // 0x00486a10
     void UnknownFunction486b10(UnknownGuiControl* control);        // 0x00486b10
     // 0x00486b80: shows `text` near `position` for `time` seconds.
-    void UnknownFunction486b80(const char* text, int* position, float time);
+    void ShowText(const char* text, int* position, float time);
 
-    GUIManager* field_0x2c;
-    PCTextureMap* field_0x30;                 // the rendered text
-    int field_0x34;                           // background region, -1 when none
-    int field_0x38;                           // frames left to restore
-    CameraRect field_0x3c;                    // screen area
-    RECT field_0x4c;                          // text area
-    int field_0x5c;                           // enabled
-    float field_0x60;                         // seconds left before showing
-    int field_0x64;                           // shown
+    GUIManager* tipGui;                       // +0x2c
+    PCTextureMap* textTexture;                // +0x30: the rendered text
+    int backgroundRegion;                     // +0x34: background region, -1 when none
+    int restoreFrames;                        // +0x38: frames left to restore
+    CameraRect screenArea;                    // +0x3c
+    RECT textArea;                            // +0x4c: text area
+    int enabled;                              // +0x5c: enabled
+    float showDelay;                          // +0x60: seconds left before showing
+    int shown;                                // +0x64
 };
 
 // RTTI: GUIInputDevice : GameObject (vtable 0x00554090; 0xc4 bytes).
@@ -266,19 +266,19 @@ public:
 
     // 0x00486fb0: binds to `device` within [minX, maxX] x [minY, maxY]
     // (all 0: the target's size).
-    GUIInputDevice* UnknownFunction486fb0(void* target, InputDevice* device, float minX, float maxX,
-                                          float minY, float maxY);
-    void UnknownFunction487150();             // 0x00487150: rebinds at the current position
+    GUIInputDevice* Bind(void* target, InputDevice* device, float minX, float maxX,
+                         float minY, float maxY);
+    void Rebind();             // 0x00487150: rebinds at the current position
 
-    UnknownControlBinding field_0x2c;         // x
-    UnknownControlBinding field_0x68;         // y
-    POINT field_0xa4;                         // position
-    InputDevice* field_0xac;
-    float field_0xb0;                         // minimum x
-    float field_0xb4;                         // maximum x
-    float field_0xb8;                         // minimum y
-    float field_0xbc;                         // maximum y
-    GUIUser* field_0xc0;                      // owning user
+    UnknownControlBinding bindingX;           // +0x2c: x
+    UnknownControlBinding bindingY;           // +0x68: y
+    POINT pointerPosition;                    // +0xa4: position
+    InputDevice* inputDevice;                 // +0xac
+    float rangeMinX;                          // +0xb0: minimum x
+    float rangeMaxX;                          // +0xb4: maximum x
+    float rangeMinY;                          // +0xb8: minimum y
+    float rangeMaxY;                          // +0xbc: maximum y
+    GUIUser* ownerUser;                       // +0xc0: owning user
 };
 
 // RTTI: GUIUser : GameObject (vtable 0x00554100; 0x1f4 bytes). One of
@@ -293,45 +293,45 @@ public:
 
     void UnknownFunction4875c0(int force);    // 0x004875c0
     GUIUser* UnknownFunction487650(void* target, GUIManager* gui); // 0x00487650
-    void UnknownFunction487680(void* target, GUIManager* gui); // 0x00487680: new tool tip
+    void CreateToolTip(void* target, GUIManager* gui); // 0x00487680: new tool tip
     void UnknownFunction487710();             // 0x00487710
     int UnknownFunction487730(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
     int UnknownFunction487790(UnknownGuiControl* control, UnknownGuiControl** previous, int update);
     int UnknownFunction487800(UnknownGuiControl* control, UnknownGuiControl** previous);
     int UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl** previous);
-    void UnknownFunction487990(int enable);   // 0x00487990: input method editor on/off
+    void EnableImeInput(int enable);   // 0x00487990: input method editor on/off
     int UnknownFunction487bf0(UnknownGuiControl** previous);
-    int UnknownFunction487c30(GUIInputDevice* device); // 0x00487c30: accepts a device
-    void UnknownFunction487d00();             // 0x00487d00: accepts the keyboard and joysticks
-    void UnknownFunction487d60();             // 0x00487d60: forgets every device
-    void UnknownFunction487dd0(const char* image, int visible); // 0x00487dd0: creates the cursor
+    int AcceptDevice(GUIInputDevice* device); // 0x00487c30: accepts a device
+    void AcceptKeyboardAndJoysticks();             // 0x00487d00: accepts the keyboard and joysticks
+    void ForgetDevices();             // 0x00487d60: forgets every device
+    void CreateCursor(const char* image, int visible); // 0x00487dd0: creates the cursor
     void UnknownFunction487fb0(UnknownCursorAnimation* animation);
     void UnknownFunction488010(const char* image, int redraw);
-    void UnknownFunction4880c0();             // 0x004880c0: releases the cursor
-    int UnknownFunction488120(GUIInputDevice* device); // 0x00488120: sets the pointer device
+    void ReleaseCursor();             // 0x004880c0: releases the cursor
+    int SetPointerDevice(GUIInputDevice* device); // 0x00488120: sets the pointer device
     int UnknownFunction488160(InputDevice* device);
     int UnknownFunction4881d0(UnknownControlEvent* event);
     GUIInputDevice* UnknownFunction488240(InputDevice* device);
     GUIInputDevice* UnknownFunction4882a0(UnknownControlEvent* event);
     GUIInputDevice* UnknownFunction488310(int index);
 
-    GUIInputDevice* field_0x2c;               // pointer device
-    GUICursor* field_0x30;
+    GUIInputDevice* pointerDevice;            // +0x2c: pointer device
+    GUICursor* userCursor;                    // +0x30
     int field_0x34;                           // pointer position
     int field_0x38;
     int field_0x3c[32];
-    GUIManager* field_0xbc;
-    ToolTip* field_0xc0;
+    GUIManager* userGui;                      // +0xbc
+    ToolTip* userToolTip;                     // +0xc0
     int field_0xc4;
-    char field_0xc8[0x80];                    // cursor image ("cursor.tga")
-    char field_0x148[0x80];                   // wait image ("wait.tga")
-    UnknownCursorAnimation* field_0x1c8;
+    char cursorImage[0x80];                   // +0xc8: cursor image ("cursor.tga")
+    char waitImage[0x80];                     // +0x148: wait image ("wait.tga")
+    UnknownCursorAnimation* cursorAnimation;  // +0x1c8
     UnknownGuiControl* field_0x1cc;
     UnknownGuiControl* field_0x1d0;
-    UnknownGuiControl* field_0x1d4;           // focus
+    UnknownGuiControl* focusControl;          // +0x1d4: focus
     UnknownGuiControl* field_0x1d8;
     int field_0x1dc;
-    ContainerList<GUIInputDevice*> field_0x1e0; // accepted devices
+    ContainerList<GUIInputDevice*> acceptedDevices; // +0x1e0: accepted devices
 };
 
 // RTTI: GUIManager : GameObject (vtable 0x00553f40; 0x3e0 bytes). KrustyUI
@@ -350,82 +350,82 @@ public:
     // 0x004853b0: sets the GUI up (KrustyUI 0x004988a0 passes its target,
     // Display+0x64, the textures, 0, 0, 0, "Arial", 15, "ui\\cursor.tga"
     // and a callback).
-    GUIManager* UnknownFunction4853b0(void* target, Palette8* palette, TextureMapManager* textures,
-                                      BackgroundImage* background, int startSound, SoundGroup* sound,
-                                      const char* font, int fontSize, const char* cursor,
-                                      int callback);
+    GUIManager* SetUp(void* target, Palette8* palette, TextureMapManager* textures,
+                      BackgroundImage* background, int startSound, SoundGroup* sound,
+                      const char* font, int fontSize, const char* cursor,
+                      int callback);
     // 0x00485a70: shows `dialog`.
     UnknownGuiDialog* UnknownFunction485a70(UnknownGuiDialog* dialog, int a, int flags, int b,
                                             UnknownGuiDialog* parent, int c, int d, int wait);
     void UnknownFunction485bd0(UnknownGuiDialog* dialog, int a, int wait);
-    int UnknownFunction485c80(const char* resource); // 0x00485c80: opens a dialog resource
-    void UnknownFunction485d50();             // 0x00485d50: closes it
+    int OpenDialogResource(const char* resource); // 0x00485c80: opens a dialog resource
+    void CloseDialogResource();             // 0x00485d50: closes it
     void UnknownFunction485d70(const char* directory); // 0x00485d70
     UnknownGuiDialog* UnknownFunction485df0(); // 0x00485df0: the dialog taking input
-    int UnknownFunction485ec0(int value);     // 0x00485ec0
+    int FindSectionObject(int value);     // 0x00485ec0
     int UnknownFunction485ee0(int value);     // 0x00485ee0: sets +0x2c, returns the old value
     void UnknownFunction485ef0();             // 0x00485ef0: creates the background
-    void UnknownFunction485fc0();             // 0x00485fc0: releases it
-    void UnknownFunction4860a0(int dim);      // 0x004860a0: grabs the screen as the background
-    void UnknownFunction4860f0();             // 0x004860f0: releases the grab
+    void ReleaseBackground();             // 0x00485fc0: releases it
+    void GrabBackground(int dim);      // 0x004860a0: grabs the screen as the background
+    void ReleaseBackgroundGrab();             // 0x004860f0: releases the grab
     void UnknownFunction486150(Palette8* palette); // 0x00486150
     // 0x00486170: copies the screen (or `rect`) into a new texture, halving
     // its brightness when `dim`.
-    PCTextureMap* UnknownFunction486170(int dim, CameraRect* rect);
+    PCTextureMap* CopyScreenToTexture(int dim, CameraRect* rect);
     int UnknownFunction4864f0();              // 0x004864f0
-    void UnknownFunction486500();             // 0x00486500: redraws a frame
+    void RedrawFrame();             // 0x00486500: redraws a frame
     GUIUser* UnknownFunction486540(int index); // 0x00486540: user `index` (0 past 3)
     void UnknownFunction486560(const char* image); // 0x00486560
     void UnknownFunction486590(const char* image, int visible); // 0x00486590
     void UnknownFunction4865e0(const char* image, int redraw); // 0x004865e0
     void UnknownFunction486630(int show);     // 0x00486630
-    void UnknownFunction486680();             // 0x00486680: releases the cursors
+    void ReleaseCursors();             // 0x00486680: releases the cursors
     void UnknownFunction4866c0(const char* font); // 0x004866c0
     // 0x00486740: a `width` x `height` texture filled with `color`.
-    PCTextureMap* UnknownFunction486740(int width, int height, unsigned long color);
+    PCTextureMap* CreateFilledTexture(int width, int height, unsigned long color);
     int UnknownFunction4868b0(int enable);    // 0x004868b0: window clipper on/off
     void UnknownFunction464e90();             // 0x00464e90 (shared empty body)
 
     int field_0x2c;
-    UnknownGuiDialog* field_0x30;             // dialog opened by 0x00485c80
-    Palette8* field_0x34;
+    UnknownGuiDialog* openedDialog;           // +0x30: dialog opened by 0x00485c80
+    Palette8* guiPalette;                     // +0x34
     Palette8* field_0x38;
-    BackgroundImage* field_0x3c;
-    BackgroundImage* field_0x40;              // redrawn when +0x1f4 runs out
-    SoundGroup* field_0x44;
-    int field_0x48;                           // owns +0x3c
-    int field_0x4c;                           // owns +0x44
-    char field_0x50[0x80];                    // dialog font
-    short field_0xd0;                         // dialog font size
+    BackgroundImage* guiBackground;           // +0x3c
+    BackgroundImage* redrawBackground;        // +0x40: redrawn when +0x1f4 runs out
+    SoundGroup* guiSoundGroup;                // +0x44
+    int ownsBackground;                       // +0x48: owns +0x3c
+    int ownsSoundGroup;                       // +0x4c: owns +0x44
+    char dialogFontName[0x80];                // +0x50: dialog font
+    short dialogFontSize;                     // +0xd0: dialog font size
     int field_0xd4;
-    TextureMapManager* field_0xd8;
-    PCTextureMap* field_0xdc;                 // screen grab
-    int field_0xe0;                           // draw the grab before the children
-    int field_0xe4;                           // its background region
+    TextureMapManager* guiTextures;           // +0xd8
+    PCTextureMap* screenGrab;                 // +0xdc: screen grab
+    int drawGrabFirst;                        // +0xe0: draw the grab before the children
+    int grabRegion;                           // +0xe4
     int field_0xe8;
     int field_0xec;                           // from TrackGame+0xc40 (KrustyUI 0x004988a0)
-    char field_0xf0[0x100];                   // dialog directory
+    char dialogDirectory[0x100];              // +0xf0: dialog directory
     int field_0x1f0;
-    int field_0x1f4;                          // frames to wait
+    int waitFrames;                           // +0x1f4: frames to wait
     int field_0x1f8;
-    void* field_0x1fc;                        // tool tip font (HFONT)
-    char field_0x200[0x80];                   // cursor image
-    char field_0x280[0x80];                   // wait cursor image
+    void* toolTipFont;                        // +0x1fc: tool tip font (HFONT)
+    char cursorImage[0x80];                   // +0x200: cursor image
+    char waitCursorImage[0x80];               // +0x280: wait cursor image
     unsigned char field_0x300[0x304 - 0x300];
     int field_0x304;
-    GUIInputDevice* field_0x308;              // mouse
-    GUIInputDevice* field_0x30c;              // keyboard
-    GUIInputDevice* field_0x310[8];           // joysticks
-    GUIUser* field_0x330[4];
-    int field_0x340;                          // users
-    GameObject* field_0x344;                  // the UIDlgContainer
-    void* field_0x348;                        // "uilang.dll" module
+    GUIInputDevice* mouseDevice;              // +0x308: mouse
+    GUIInputDevice* keyboardDevice;           // +0x30c: keyboard
+    GUIInputDevice* joystickDevices[8];       // +0x310: joysticks
+    GUIUser* users[4];                        // +0x330
+    int userCount;                            // +0x340: users
+    GameObject* dialogContainer;              // +0x344: the UIDlgContainer
+    void* languageModule;                     // +0x348: "uilang.dll" module
     int field_0x34c;
-    char field_0x350[0x80];                   // tool tip font face
+    char toolTipFontFace[0x80];               // +0x350: tool tip font face
     int field_0x3d0;
-    int field_0x3d4;                          // bold
-    int field_0x3d8;                          // italic
-    UnknownGuiClipper* field_0x3dc;
+    int toolTipBold;                          // +0x3d4: bold
+    int toolTipItalic;                        // +0x3d8: italic
+    UnknownGuiClipper* windowClipper;         // +0x3dc
 };
 
 // RTTI: HiResMeter : GameObject (vtable 0x00554170). A global instance at

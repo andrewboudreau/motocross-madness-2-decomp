@@ -27,8 +27,8 @@ SkyCube::SkyCube(int flags) : DrawableCube(flags) {
 // 0x004fb230
 SkyCube* SkyCube::UnknownFunction4fb230(void* value, UnknownTextureStream* stream, UnknownCubeTextureContext* context,
                                         float height) {
-    if (DrawableCube::UnknownFunction43d980(value, stream, context)) {
-        field_0x44 = height;
+    if (DrawableCube::Load(value, stream, context)) {
+        centerHeight = height;
         return this;
     }
     return 0;
@@ -38,7 +38,7 @@ SkyCube* SkyCube::UnknownFunction4fb230(void* value, UnknownTextureStream* strea
 int SkyCube::UnknownVirtualSlot10(float frameTime) {
     Vector3 center;
     center.x = CAMERA()->field_0x170.x;
-    center.y = CAMERA()->field_0x170.y + field_0x44;
+    center.y = CAMERA()->field_0x170.y + centerHeight;
     center.z = CAMERA()->field_0x170.z;
     field_0x2c->UnknownFunction43d400(&center, 0, 0);
     return 1;

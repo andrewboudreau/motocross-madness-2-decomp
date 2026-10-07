@@ -34,38 +34,38 @@ static int s_DebugRow;
 
 // 0x004de2a0
 BaseQuarryEvent::BaseQuarryEvent(int flags) : GameObject(flags) {
-    field_0x2c = 0;
-    field_0x3c = 0;
-    field_0x34 = 0;
-    field_0x30 = 0;
-    field_0x40 = 0;
-    field_0x48 = 0;
+    eventScene = 0;
+    raceCamera = 0;
+    raceView = 0;
+    skyCube = 0;
+    eventTerrain = 0;
+    ecoSystem = 0;
     field_0x4c = 0;
     field_0x50 = 0;
-    field_0x54 = 0;
-    field_0x58 = 0;
-    field_0x70 = 0;
-    field_0x74 = 0;
-    field_0x78 = 0;
-    field_0x7c = 0;
-    field_0x38 = 0;
+    terrainShadow = 0;
+    projectedShadow = 0;
+    clockMinutes = 0;
+    clockSeconds = 0;
+    particleManager = 0;
+    lightManager = 0;
+    visualCue = 0;
     field_0x94 = 0;
     field_0x98 = 0;
-    field_0x9c = 0;
-    field_0xa0 = 0;
-    field_0x60 = 0;
-    field_0x5c = 0;
-    field_0x64 = 0;
-    field_0x68 = 0;
-    field_0x6c = 0;
-    field_0x88 = 0;
+    auralScape = 0;
+    auralScapeListener = 0;
+    radarOverlay = 0;
+    statsOverlay = 0;
+    chatOverlay = 0;
+    instrumentOverlay = 0;
+    textQueue = 0;
+    eventFog = 0;
     field_0x44 = new(__FILE__, 92) UnknownTextureStream((int)g_UnknownResourceManager572b44);
     if (!field_0x44)
         return;
 }
 
 // 0x004de3b0
-BaseQuarryEvent* BaseQuarryEvent::UnknownFunction4de3b0(RenderTarget* target, UnknownProgressCallback progress) {
+BaseQuarryEvent* BaseQuarryEvent::Create(RenderTarget* target, UnknownProgressCallback progress) {
     GameObject::UnknownVirtualSlot8(target);
     g_MemTagStack->UnknownFunction4a2bc0("entering BaseQuarryEvent::Create");
     if (!UnknownFunction4de590(progress)) {
@@ -84,30 +84,30 @@ int BaseQuarryEvent::UnknownVirtualSlot14() {
 // 0x004de410
 int BaseQuarryEvent::UnknownVirtualSlot10(float frameTime) {
     GameObject::UnknownVirtualSlot10(frameTime);
-    if (field_0x9c)
-        field_0x9c->UnknownFunction4030a0(field_0xa0, &field_0x3c->field_0x170, &field_0x3c->field_0x17c,
-                                          &field_0x3c->field_0x188, &field_0x3c->field_0x3b0->field_0x64);
+    if (auralScape)
+        auralScape->UnknownFunction4030a0(auralScapeListener, &raceCamera->field_0x170, &raceCamera->field_0x17c,
+                                          &raceCamera->field_0x188, &raceCamera->field_0x3b0->field_0x64);
     if (g_UnknownGlobal56e26c->uiInteractionBlocked)
         return 1;
-    if (field_0x60 && field_0x38 && field_0x5c) {
-        field_0x38->field_0xc8 = field_0x60->field_0x170;
-        int index = field_0x38->UnknownFunction48bc30();
+    if (radarOverlay && visualCue && statsOverlay) {
+        visualCue->field_0xc8 = radarOverlay->field_0x170;
+        int index = visualCue->UnknownFunction48bc30();
         if (index != -1) {
-            field_0x60->field_0x16c = index;
-            field_0x5c->UnknownFunction464e80(index);
+            radarOverlay->field_0x16c = index;
+            statsOverlay->UnknownFunction464e80(index);
         }
-        field_0x60->field_0x174 = field_0x38->UnknownFunction48bc80();
-        field_0x64->UnknownFunction51d980(field_0x38->UnknownFunction48bc80());
+        radarOverlay->field_0x174 = visualCue->UnknownFunction48bc80();
+        chatOverlay->UnknownFunction51d980(visualCue->UnknownFunction48bc80());
     }
-    if (!g_UnknownGlobal56e26c->eventManager->field_0x34 && !field_0x34->field_0x18e && field_0x34->field_0x18a) {
-        field_0x74 += g_UnknownGlobal56e26c->field_0x2f0;
-        while (field_0x74 >= 60.0f) {
-            field_0x70 += 1.0f;
-            field_0x74 -= 60.0f;
-            if (field_0x74 < 0.0f)
-                field_0x74 = 0.0f;
+    if (!g_UnknownGlobal56e26c->eventManager->field_0x34 && !raceView->field_0x18e && raceView->field_0x18a) {
+        clockSeconds += g_UnknownGlobal56e26c->field_0x2f0;
+        while (clockSeconds >= 60.0f) {
+            clockMinutes += 1.0f;
+            clockSeconds -= 60.0f;
+            if (clockSeconds < 0.0f)
+                clockSeconds = 0.0f;
         }
-    } else if (field_0x34->field_0x18e) {
+    } else if (raceView->field_0x18e) {
         UnknownFunction4e1f00();
     }
     SoundSystem()->UnknownFunction4beb80();
@@ -141,10 +141,10 @@ int BaseQuarryEvent::UnknownFunction4e04f0(int* counts) {
 // 0x004e06a0
 int BaseQuarryEvent::UnknownVirtualSlot27(int value) {
     char message[388];
-    field_0x38 = (new(__FILE__, 1369) VisualCue(g_UnknownGlobal56e26c->mode.field_0x6a8))
-                     ->UnknownFunction48adf0(field_0x18, field_0x7c, value, field_0x40, Vector3(0.0f, 0.0f, 0.0f),
-                                             field_0x34, 45, field_0x3c, 3.0f, 0.1f, 0.85f);
-    if (!UnknownFunction469190(field_0x38, -1)) {
+    visualCue = (new(__FILE__, 1369) VisualCue(g_UnknownGlobal56e26c->mode.field_0x6a8))
+                     ->UnknownFunction48adf0(field_0x18, lightManager, value, eventTerrain, Vector3(0.0f, 0.0f, 0.0f),
+                                             raceView, 45, raceCamera, 3.0f, 0.1f, 0.85f);
+    if (!UnknownFunction469190(visualCue, -1)) {
         sprintf(message, "Visual Cue not loaded.\n");
         return 0;
     }
@@ -161,10 +161,10 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     int width;
     int height;
 
-    field_0x68 = new(__FILE__, 1412) InstrumentOverlay(g_UnknownGlobal56e26c->mode.field_0x6ac);
-    field_0x68 = field_0x68->UnknownFunction518770((RenderTarget*)field_0x18, g_UnknownGlobal56e26c->field_0x3c,
-                                                   (UnknownInstrumentSource*)field_0x3c);
-    if (!field_0x68)
+    instrumentOverlay = new(__FILE__, 1412) InstrumentOverlay(g_UnknownGlobal56e26c->mode.field_0x6ac);
+    instrumentOverlay = instrumentOverlay->UnknownFunction518770((RenderTarget*)field_0x18, g_UnknownGlobal56e26c->field_0x3c,
+                                                   (UnknownInstrumentSource*)raceCamera);
+    if (!instrumentOverlay)
         sprintf(message, "Instrument Overlay not created.\n");
 
     // One load each of the height and width feeds two copies: the cue's size
@@ -175,9 +175,9 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     screen.right = ((RenderTarget*)field_0x18)->field_0x0c;
     screen.top = 0;
     screen.left = 0;
-    if (field_0x38) {
-        cue.top = (int)((field_0x38->field_0x4c + 0.06f) * screen.bottom);
-        cue.left = (int)((field_0x38->field_0x48 - 0.04f) * screen.right);
+    if (visualCue) {
+        cue.top = (int)((visualCue->field_0x4c + 0.06f) * screen.bottom);
+        cue.left = (int)((visualCue->field_0x48 - 0.04f) * screen.right);
     } else {
         cue.top = 0;
         cue.left = 0;
@@ -185,21 +185,21 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     cue.bottom = cue.top - (int)(height * -0.020833334f);
     cue.right = cue.left - (int)(width * -0.046875f);
 
-    field_0x64 = new(__FILE__, 1433) ChatOverlay(1);
-    field_0x64 = field_0x64->UnknownFunction51cf80((RenderTarget*)field_0x18, g_UnknownGlobal56e26c->field_0x3c, field_0x3c, screen, cue);
-    if (!field_0x64)
+    chatOverlay = new(__FILE__, 1433) ChatOverlay(1);
+    chatOverlay = chatOverlay->UnknownFunction51cf80((RenderTarget*)field_0x18, g_UnknownGlobal56e26c->field_0x3c, raceCamera, screen, cue);
+    if (!chatOverlay)
         sprintf(message, "Chat Overlay not created.\n");
-    if (field_0x64 && g_UnknownGlobal56e26c->mode.field_0x6b4 == 1)
-        field_0x64->UnknownFunction51dd10();
+    if (chatOverlay && g_UnknownGlobal56e26c->mode.field_0x6b4 == 1)
+        chatOverlay->UnknownFunction51dd10();
 
-    field_0x60 = new(__FILE__, 1444) RadarOverlay(1);
-    field_0x60 = field_0x60->UnknownFunction51b840((RenderTarget*)field_0x18, g_UnknownGlobal56e26c->field_0x3c, (int)field_0x3c, screen);
-    if (!field_0x60)
+    radarOverlay = new(__FILE__, 1444) RadarOverlay(1);
+    radarOverlay = radarOverlay->UnknownFunction51b840((RenderTarget*)field_0x18, g_UnknownGlobal56e26c->field_0x3c, (int)raceCamera, screen);
+    if (!radarOverlay)
         sprintf(message, "Radar Overlay not created.\n");
 
-    field_0x5c = new(__FILE__, 1451) StatsOverlay(1);
-    field_0x5c = field_0x5c->UnknownFunction5194b0((RenderTarget*)field_0x18, g_UnknownGlobal56e26c->field_0x3c, field_0x3c, screen);
-    if (!field_0x5c)
+    statsOverlay = new(__FILE__, 1451) StatsOverlay(1);
+    statsOverlay = statsOverlay->UnknownFunction5194b0((RenderTarget*)field_0x18, g_UnknownGlobal56e26c->field_0x3c, raceCamera, screen);
+    if (!statsOverlay)
         sprintf(message, "Stats Overlay not created.\n");
 
     // Retail reads the height and loads 10 and 256 before the allocation and
@@ -207,13 +207,13 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
     text.bottom = ((RenderTarget*)field_0x18)->field_0x10;
     text.left = 10;
     text.right = 256;
-    field_0x6c = new(__FILE__, 1463) TextQueueOverlay(0);
+    textQueue = new(__FILE__, 1463) TextQueueOverlay(0);
     text.top = text.bottom - 20;
-    field_0x6c = field_0x6c->UnknownFunction51b320(field_0x18, text);
-    if (!field_0x6c)
+    textQueue = textQueue->UnknownFunction51b320(field_0x18, text);
+    if (!textQueue)
         sprintf(message, "TextQueueOverlay not created.\n");
 
-    if (field_0x6c) {
+    if (textQueue) {
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 1 || g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 5)
             g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea390(
                 name, g_UnknownGlobal56e26c->sceneObject->field_0x24c, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34);
@@ -221,21 +221,21 @@ void BaseQuarryEvent::UnknownVirtualSlot29() {
             g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea390(
                 name, g_UnknownGlobal56e26c->sceneObject->field_0x24c, 0);
         UnknownMessage line(name, 3.25f);
-        field_0x6c->UnknownFunction51b540(&line);
+        textQueue->UnknownFunction51b540(&line);
     }
 }
 
 // 0x004e0be0
 void BaseQuarryEvent::UnknownVirtualSlot30() {
-    UnknownFunction469190(field_0x68, -1);
-    UnknownFunction469190(field_0x64, -1);
-    UnknownFunction469190(field_0x60, -1);
-    UnknownFunction469190(field_0x5c, -1);
-    UnknownFunction469190(field_0x6c, -1);
+    UnknownFunction469190(instrumentOverlay, -1);
+    UnknownFunction469190(chatOverlay, -1);
+    UnknownFunction469190(radarOverlay, -1);
+    UnknownFunction469190(statsOverlay, -1);
+    UnknownFunction469190(textQueue, -1);
 }
 
 // 0x004e0c30
-void BaseQuarryEvent::UnknownFunction4e0c30(int id, int on) {
+void BaseQuarryEvent::ShowOnOffMessage(int id, int on) {
     char name[0x80];
     char state[0x80];
     char buffer[0x100];
@@ -247,7 +247,7 @@ void BaseQuarryEvent::UnknownFunction4e0c30(int id, int on) {
         g_UnknownGlobal56e26c->UnknownFunction521970(0x1408, state, 0x80);
     sprintf(buffer, "%s %s", name, state);
     UnknownMessage message(buffer, 1.5f);
-    field_0x6c->UnknownFunction51b540(&message);
+    textQueue->UnknownFunction51b540(&message);
 }
 
 // 0x004e0ce0
@@ -257,24 +257,24 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
     if (UnknownFunction43caa0(0x31, 0, event, 0xc)) {
         if (g_UnknownGlobal56e26c->mode.field_0x6bc && g_UnknownGlobal56e26c->mode.field_0x6c0) {
             g_UnknownGlobal56e26c->mode.field_0x6c0 = 0;
-            UnknownFunction4e0c30(0x1412, 1);
+            ShowOnOffMessage(0x1412, 1);
         } else if (g_UnknownGlobal56e26c->mode.field_0x6bc) {
             g_UnknownGlobal56e26c->mode.field_0x6bc = 0;
             g_UnknownGlobal56e26c->mode.field_0x6c0 = 1;
-            UnknownFunction4e0c30(0x1413, 1);
+            ShowOnOffMessage(0x1413, 1);
         } else if (g_UnknownGlobal56e26c->mode.field_0x6c0) {
             g_UnknownGlobal56e26c->mode.field_0x6c0 = 0;
-            UnknownFunction4e0c30(0x1414, 0);
+            ShowOnOffMessage(0x1414, 0);
         } else {
             g_UnknownGlobal56e26c->mode.field_0x6bc = 1;
             g_UnknownGlobal56e26c->mode.field_0x6c0 = 1;
-            UnknownFunction4e0c30(0x1414, 1);
+            ShowOnOffMessage(0x1414, 1);
         }
-        field_0x64->UnknownFunction51e910(-1);
+        chatOverlay->UnknownFunction51e910(-1);
         return 1;
     }
-    if (UnknownFunction43caa0(0x31, 0, event, 0x80000000) && field_0x5c) {
-        field_0x64->UnknownFunction51e7c0();
+    if (UnknownFunction43caa0(0x31, 0, event, 0x80000000) && statsOverlay) {
+        chatOverlay->UnknownFunction51e7c0();
         return 1;
     }
     if (UnknownFunction43caa0(0x3e, 0, event, 0x80000000)) {
@@ -286,12 +286,12 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             UnknownFunction468f10("VisualCue");
         }
         g_UnknownGlobal56e26c->mode.field_0x6a8 = 1 - g_UnknownGlobal56e26c->mode.field_0x6a8;
-        UnknownFunction4e0c30(0x13b6, g_UnknownGlobal56e26c->mode.field_0x6a8);
+        ShowOnOffMessage(0x13b6, g_UnknownGlobal56e26c->mode.field_0x6a8);
         return 1;
     }
     if (UnknownFunction43caa0(0x3f, 0, event, 0x80000000)) {
         g_UnknownGlobal56e26c->mode.field_0x6b0 = 1 - g_UnknownGlobal56e26c->mode.field_0x6b0;
-        UnknownFunction4e0c30(0x1415, g_UnknownGlobal56e26c->mode.field_0x6b0);
+        ShowOnOffMessage(0x1415, g_UnknownGlobal56e26c->mode.field_0x6b0);
         return 1;
     }
     if (UnknownFunction43caa0(0x40, 0, event, 0x80000000)) {
@@ -300,7 +300,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         else
             UnknownFunction468f10("RadarOverlay");
         g_UnknownGlobal56e26c->mode.field_0x6b8 = 1 - g_UnknownGlobal56e26c->mode.field_0x6b8;
-        UnknownFunction4e0c30(0x1441, g_UnknownGlobal56e26c->mode.field_0x6b8);
+        ShowOnOffMessage(0x1441, g_UnknownGlobal56e26c->mode.field_0x6b8);
         return 1;
     }
     if (UnknownFunction43caa0(0x41, 0, event, 0x80000000)) {
@@ -309,7 +309,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         else
             UnknownFunction468f10("InstrumentOverlay");
         g_UnknownGlobal56e26c->mode.field_0x6ac = 1 - g_UnknownGlobal56e26c->mode.field_0x6ac;
-        UnknownFunction4e0c30(0x1416, g_UnknownGlobal56e26c->mode.field_0x6ac);
+        ShowOnOffMessage(0x1416, g_UnknownGlobal56e26c->mode.field_0x6ac);
         return 1;
     }
     if (UnknownFunction43caa0(0x42, 0, event, 0x80000000)) {
@@ -318,8 +318,8 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         else
             UnknownFunction468f10("SkyCube");
         g_UnknownGlobal56e26c->mode.field_0xa5c = 1 - g_UnknownGlobal56e26c->mode.field_0xa5c;
-        UnknownFunction4e0c30(0x1411, g_UnknownGlobal56e26c->mode.field_0xa5c);
-        ((RenderTarget*)field_0x18)->field_0x34 = !(field_0x30 && g_UnknownGlobal56e26c->mode.field_0xa5c);
+        ShowOnOffMessage(0x1411, g_UnknownGlobal56e26c->mode.field_0xa5c);
+        ((RenderTarget*)field_0x18)->field_0x34 = !(skyCube && g_UnknownGlobal56e26c->mode.field_0xa5c);
         return 1;
     }
     if (UnknownFunction43caa0(0x43, 0, event, 0x80000000)) {
@@ -337,7 +337,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             UnknownFunction468f10("SteamParticleEmitter");
         }
         g_UnknownGlobal56e26c->mode.field_0xa54 = 1 - g_UnknownGlobal56e26c->mode.field_0xa54;
-        UnknownFunction4e0c30(0x140f, g_UnknownGlobal56e26c->mode.field_0xa54);
+        ShowOnOffMessage(0x140f, g_UnknownGlobal56e26c->mode.field_0xa54);
         return 1;
     }
     if (UnknownFunction43caa0(0x44, 0, event, 0x80000000)) {
@@ -351,7 +351,7 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
             UnknownFunction468f10("D3DIMSoultreeShadow");
         }
         g_UnknownGlobal56e26c->mode.field_0xa50 = 1 - g_UnknownGlobal56e26c->mode.field_0xa50;
-        UnknownFunction4e0c30(0x1410, g_UnknownGlobal56e26c->mode.field_0xa50);
+        ShowOnOffMessage(0x1410, g_UnknownGlobal56e26c->mode.field_0xa50);
         return 1;
     }
     if (UnknownFunction43caa0(0x57, 0, event, 0x80000000)) {
@@ -363,20 +363,20 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         g_UnknownGlobal56e26c->mode.field_0x195c[1] = level;
         g_UnknownGlobal56e26c->mode.field_0x195c[2] = level;
         g_UnknownGlobal56e26c->mode.field_0x195c[4] = level;
-        field_0x40->UnknownFunction507960(level);
-        if (field_0x48)
-            field_0x48->UnknownFunction4594c0(level);
-        if (field_0x88)
-            field_0x88->UnknownFunction462db0(level);
-        field_0x2c->UnknownFunction4eff30(level);
-        field_0x34->UnknownFunction423790(level);
-        if (field_0x6c) {
+        eventTerrain->UnknownFunction507960(level);
+        if (ecoSystem)
+            ecoSystem->UnknownFunction4594c0(level);
+        if (eventFog)
+            eventFog->UnknownFunction462db0(level);
+        eventScene->UnknownFunction4eff30(level);
+        raceView->UnknownFunction423790(level);
+        if (textQueue) {
             char text[0x80];
             char buffer[0x100];
             g_UnknownGlobal56e26c->UnknownFunction521970(0x14c4, text, 0x80);
             sprintf(buffer, "%s = %d", text, level + 1);
             UnknownMessage message(buffer, 1.5f);
-            field_0x6c->UnknownFunction51b540(&message);
+            textQueue->UnknownFunction51b540(&message);
         }
         return 1;
     }
@@ -389,20 +389,20 @@ int BaseQuarryEvent::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInp
         g_UnknownGlobal56e26c->mode.field_0x195c[1] = level;
         g_UnknownGlobal56e26c->mode.field_0x195c[2] = level;
         g_UnknownGlobal56e26c->mode.field_0x195c[4] = level;
-        field_0x40->UnknownFunction507960(level);
-        if (field_0x48)
-            field_0x48->UnknownFunction4594c0(level);
-        if (field_0x88)
-            field_0x88->UnknownFunction462db0(level);
-        field_0x2c->UnknownFunction4eff30(level);
-        field_0x34->UnknownFunction423790(level);
-        if (field_0x6c) {
+        eventTerrain->UnknownFunction507960(level);
+        if (ecoSystem)
+            ecoSystem->UnknownFunction4594c0(level);
+        if (eventFog)
+            eventFog->UnknownFunction462db0(level);
+        eventScene->UnknownFunction4eff30(level);
+        raceView->UnknownFunction423790(level);
+        if (textQueue) {
             char text[0x80];
             char buffer[0x100];
             g_UnknownGlobal56e26c->UnknownFunction521970(0x14c4, text, 0x80);
             sprintf(buffer, "%s = %d", text, level + 1);
             UnknownMessage message(buffer, 1.5f);
-            field_0x6c->UnknownFunction51b540(&message);
+            textQueue->UnknownFunction51b540(&message);
         }
         return 1;
     }
@@ -460,8 +460,8 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         g_UnknownGlobal56e26c->UnknownFunction521970(0xbd6, text, 0x80);
         sprintf(buffer, "%s %s", name, text);
         UnknownMessage message(buffer, 3.25f);
-        field_0x6c->UnknownFunction51b5e0(&message);
-        field_0x34->UnknownFunction420590(leave->field_0x08);
+        textQueue->UnknownFunction51b5e0(&message);
+        raceView->UnknownFunction420590(leave->field_0x08);
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45fbd0(leave->field_0x08);
     } else if (from && type == 0x89) {
@@ -470,8 +470,8 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
         g_UnknownGlobal56e26c->UnknownFunction521970(0xbd5, text, 0x80);
         sprintf(buffer, "%s %s", (char*)data + 4, text);
         UnknownMessage message(buffer, 3.25f);
-        field_0x6c->UnknownFunction51b5e0(&message);
-        field_0x34->UnknownFunction420590(from);
+        textQueue->UnknownFunction51b5e0(&message);
+        raceView->UnknownFunction420590(from);
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2)
             g_UnknownGlobal56e26c->eventManager->UnknownFunction45fbd0(from);
     }
@@ -480,8 +480,8 @@ int BaseQuarryEvent::UnknownVirtualSlot24(int type, void* data, int from, int to
 
 // 0x004e1f00
 void BaseQuarryEvent::UnknownFunction4e1f00() {
-    field_0x70 = 0.0f;
-    field_0x74 = 0.0f;
+    clockMinutes = 0.0f;
+    clockSeconds = 0.0f;
 }
 
 // 0x004e1f10

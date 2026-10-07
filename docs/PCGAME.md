@@ -96,3 +96,16 @@ calls last; its argument is the failure message buffer. In order, it:
 6. Selects the joystick (`0x004cd610`) on the ControlInterface.
 
 PCRenderTarget+0x54 receives that GUID.
+
+## Names
+
+Function names (tier 3, from behaviour): `0x004bfc50` `StartUp`,
+`0x004c0470` `SetWindowRect`, `0x004c0760` `LimitDisplayModes`,
+`0x004c0d10` `ProfileDisplays`, `0x004c1410` `IsAnyProfileStale`,
+`0x004c1610` `SaveDisplayProfile`, `0x004c16b0` `ProfileEveryDisplay`,
+`0x004c16f0` `LoadDisplayProfile`, `0x004c1a00` `DeleteDisplayProfiles`.
+Fields: `deviceGuid` (+0x2f8, "Renderer"), `companyName` (+0x320,
+"Rainbow Studios") and the texture-stage filters `magFilter`, `minFilter`,
+`mipFilter` (+0x54c..+0x554, D3DTSS_MAGFILTER/MINFILTER/MIPFILTER in slot
+7). The window, instance, string-instance, OS-version, IMM and registry-key
+fields keep their offset names because UI and TrackGame sources read them.

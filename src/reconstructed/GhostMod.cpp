@@ -11,8 +11,8 @@
 GhostMod1::GhostMod1(int flags)
     : D3DIMSoultreeModifier(flags)
 {
-    field_0x40 = 0;
-    field_0x44 = 0;
+    timeRemaining = 0;
+    totalDuration = 0;
 }
 
 // 0x0047bb70
@@ -20,11 +20,11 @@ void GhostMod1::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultre
                                      UnknownSoultreeMesh** out)
 {
     *out = mesh;
-    if (field_0x40 > 0.0f) {
-        unsigned int alpha = (unsigned char)(int)(200.0f - field_0x40 / field_0x44 * 100.0f) << 24;
-        for (int i = 0; i < mesh->field_0x08; i++) {
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].field_0x10 &= 0xffffff;
-            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].field_0x10 |= alpha;
+    if (timeRemaining > 0.0f) {
+        unsigned int alpha = (unsigned char)(int)(200.0f - timeRemaining / totalDuration * 100.0f) << 24;
+        for (int i = 0; i < mesh->vertexCount; i++) {
+            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse &= 0xffffff;
+            ((UnknownSoultreeVertex*)mesh->field_0x10)[i].diffuse |= alpha;
         }
     }
 }
@@ -33,20 +33,20 @@ void GhostMod1::UnknownVirtualSlot27(D3DIMSoultreeObject* object, UnknownSoultre
 void GhostMod1::UnknownFunction47bbf0(float duration)
 {
     if (duration == 0.0f) {
-        field_0x40 = GHOST_MOD_NONE;
-        field_0x44 = GHOST_MOD_NONE;
+        timeRemaining = GHOST_MOD_NONE;
+        totalDuration = GHOST_MOD_NONE;
     } else {
-        field_0x40 = duration;
-        field_0x44 = duration;
+        timeRemaining = duration;
+        totalDuration = duration;
     }
 }
 
 // 0x0047bc20
 int GhostMod1::UnknownVirtualSlot10(float frameTime)
 {
-    if (field_0x40 != GHOST_MOD_NONE) {
-        float remaining = field_0x40 - g_UnknownGlobal56e26c->field_0x2f0;
-        field_0x40 = remaining > 0.0f ? remaining : 0.0f;
+    if (timeRemaining != GHOST_MOD_NONE) {
+        float remaining = timeRemaining - g_UnknownGlobal56e26c->field_0x2f0;
+        timeRemaining = remaining > 0.0f ? remaining : 0.0f;
     }
     return GameObject::UnknownVirtualSlot10(frameTime);
 }

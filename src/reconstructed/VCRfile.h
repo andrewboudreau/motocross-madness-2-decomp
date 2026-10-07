@@ -29,15 +29,15 @@ class UnknownVcrFile {
 public:
     UnknownVcrFile(int memory, int count);                                  // 0x00524a50
     ~UnknownVcrFile();                                                      // 0x00524b10
-    void UnknownFunction524b80(char* path, char* name);                     // 0x00524b80: loads `path`
-    void UnknownFunction524d00(char* path);                                 // 0x00524d00: saves to `path`
-    int UnknownFunction524dd0(char* name, char* mode);                      // 0x00524dd0: open
-    void UnknownFunction525000(int handle);                                 // 0x00525000: close
-    int UnknownFunction525070(void* buffer, int size, int count, int handle);       // 0x00525070: read
-    int UnknownFunction5251f0(const void* buffer, int size, int count, int handle); // 0x005251f0: write
-    int UnknownFunction5253d0(int handle, int offset, int origin);          // 0x005253d0: seek
-    int UnknownFunction525440(int handle);                                  // 0x00525440: tell
-    int UnknownFunction5254a0(int handle);                                  // 0x005254a0: end of file
+    void Load(char* path, char* name);                     // 0x00524b80: loads `path`
+    void Save(char* path);                                 // 0x00524d00: saves to `path`
+    int Open(char* name, char* mode);                      // 0x00524dd0: open
+    void Close(int handle);                                 // 0x00525000: close
+    int Read(void* buffer, int size, int count, int handle);       // 0x00525070: read
+    int Write(const void* buffer, int size, int count, int handle); // 0x005251f0: write
+    int Seek(int handle, int offset, int origin);          // 0x005253d0: seek
+    int Tell(int handle);                                  // 0x00525440: tell
+    int IsEndOfFile(int handle);                                  // 0x005254a0: end of file
 
     int count;                          // +0x000, at most 2
     UnknownVcrFileEntry entries[2];     // +0x004

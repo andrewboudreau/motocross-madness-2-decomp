@@ -18,17 +18,17 @@ public:
     // through the resource manager (AddRef on reuse); 0 if there is none.
     static ColorMapper* UnknownFunction4dddd0(const char* name);
 
-    void UnknownFunction4ddec0();                        // 0x004ddec0: builds the 16-bit tables
+    void Build16BitTables();                             // 0x004ddec0: builds the 16-bit tables
     unsigned char* UnknownFunction4de270();              // 0x004de270: &field_0x10
     unsigned char* UnknownFunction4de280();              // 0x004de280: &field_0x710
     unsigned char* UnknownFunction4de290();              // 0x004de290: &field_0x8710
 
-    int field_0x08;                     // first palette index used
-    int field_0x0c;                     // number of palette entries
-    unsigned char field_0x10[256][3];   // RGB entries
-    unsigned short field_0x310[256];    // entries as 555
-    unsigned short field_0x510[256];    // entries as 565
-    unsigned char field_0x710[0x8000];  // 555 colour -> palette index
-    unsigned char field_0x8710[0x10000]; // 565 colour -> palette index
+    int firstIndex;                     // first palette index used
+    int entryCount;                     // number of palette entries
+    unsigned char entries[256][3];      // RGB entries
+    unsigned short entries555[256];     // entries as 555
+    unsigned short entries565[256];     // entries as 565
+    unsigned char indexFrom555[0x8000]; // 555 colour -> palette index
+    unsigned char indexFrom565[0x10000]; // 565 colour -> palette index
     unsigned char field_0x18710[0x400];  // allocation is 0x18b10 bytes; not touched here
 };

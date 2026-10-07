@@ -244,11 +244,11 @@ struct UnknownEcoCoordinates {
 
 // One "CollisionObject%i" entry of a definition (0x24 bytes).
 struct UnknownEcoCollisionDefinition {
-    int field_0x00;                           // 0 GEOMETRY, 1 CYLINDER, 2 SPHERE, 3 RADIUSEDLINE
-    Vector3 field_0x04;                       // centre / start
-    Vector3 field_0x10;                       // end
-    float field_0x1c;                         // radius
-    float field_0x20;                         // height
+    int type;                                 // 0 GEOMETRY, 1 CYLINDER, 2 SPHERE, 3 RADIUSEDLINE
+    Vector3 start;                            // centre / start
+    Vector3 end;                              // end
+    float radius;                             // radius
+    float height;                             // height
 };
 
 // One vegetation kind ("Vegetation_%d" section of the .est file), 0x210
@@ -259,52 +259,52 @@ public:
 
     UnknownEcoDefinition();                   // 0x00455de0
     ~UnknownEcoDefinition();                  // 0x00455e80
-    int UnknownFunction455f50();              // 0x00455f50: a random parameter byte
-    int UnknownFunction455f60(float height);  // 0x00455f60: a random parameter for `height`
-    float UnknownFunction455f90(unsigned char parameter); // 0x00455f90: height for a parameter
-    float UnknownFunction455ff0(unsigned char parameter); // 0x00455ff0: radius for a parameter
+    int RandomParameter();                    // 0x00455f50: a random parameter byte
+    int ParameterForHeight(float height);     // 0x00455f60: a random parameter for `height`
+    float HeightForParameter(unsigned char parameter);    // 0x00455f90: height for a parameter
+    float RadiusForParameter(unsigned char parameter);    // 0x00455ff0: radius for a parameter
     // 0x00456050: loads the billboard texture and the .slt model.
-    int UnknownFunction456050(TextureMapManager* textures, int modelFlags);
+    int LoadModel(TextureMapManager* textures, int modelFlags);
 
-    char field_0x000[0x80];                   // name
-    char field_0x080[0x80];                   // BillboardName
-    char field_0x100[0x80];                   // ProbabilityTga
-    float field_0x180;                        // MeanHeight
-    float field_0x184;                        // MinHeight
-    float field_0x188;                        // MaxHeight
-    float field_0x18c;                        // MeanRadius
-    float field_0x190;                        // MinRadius
-    float field_0x194;                        // MaxRadius
-    float field_0x198;                        // MeanSlope
-    float field_0x19c;                        // StandardDeviationSlope
-    float field_0x1a0;                        // MeanAspect
-    float field_0x1a4;                        // StandardDeviationAspect
-    float field_0x1a8;                        // MeanDrainage
-    float field_0x1ac;                        // StandardDeviationDrainage
-    float field_0x1b0;                        // MeanAltitude
-    float field_0x1b4;                        // StandardDeviationAltitude
-    float field_0x1b8;                        // ULeft
-    float field_0x1bc;                        // URight
-    float field_0x1c0;                        // UCenter
-    float field_0x1c4;                        // VBottom
-    float field_0x1c8;                        // VTop
-    float field_0x1cc;                        // model height scale
-    float field_0x1d0;                        // model radius scale
+    char name[0x80];                          // name
+    char billboardName[0x80];                 // BillboardName
+    char probabilityTga[0x80];                // ProbabilityTga
+    float meanHeight;                         // MeanHeight
+    float minHeight;                          // MinHeight
+    float maxHeight;                          // MaxHeight
+    float meanRadius;                         // MeanRadius
+    float minRadius;                          // MinRadius
+    float maxRadius;                          // MaxRadius
+    float meanSlope;                          // MeanSlope
+    float standardDeviationSlope;             // StandardDeviationSlope
+    float meanAspect;                         // MeanAspect
+    float standardDeviationAspect;            // StandardDeviationAspect
+    float meanDrainage;                       // MeanDrainage
+    float standardDeviationDrainage;          // StandardDeviationDrainage
+    float meanAltitude;                       // MeanAltitude
+    float standardDeviationAltitude;          // StandardDeviationAltitude
+    float uLeft;                              // ULeft
+    float uRight;                             // URight
+    float uCenter;                            // UCenter
+    float vBottom;                            // VBottom
+    float vTop;                               // VTop
+    float modelHeightScale;                   // model height scale
+    float modelRadiusScale;                   // model radius scale
     float field_0x1d4;
-    int field_0x1d8;                          // NumberOfLOD (at most kMaxLods)
-    unsigned int field_0x1dc;                 // key colour
-    UnknownEcoTexture* field_0x1e0;           // billboard texture
-    UnknownEcoTexture* field_0x1e4;           // model texture
-    unsigned short* field_0x1e8[kMaxLods];    // model indices (inside the vertex block)
-    UnknownEcoModelVertex* field_0x1ec[kMaxLods]; // model vertices
-    int field_0x1f0[kMaxLods];                // vertex count
-    int field_0x1f4[kMaxLods];                // index count
-    int field_0x1f8;                          // UsePlanarLighting
-    int field_0x1fc;                          // BlendLODs
-    float field_0x200;                        // PercentBias
-    int field_0x204;                          // NumCollisionObjects
-    UnknownEcoCollisionDefinition* field_0x208;
-    CollisionObject** field_0x20c;
+    int lodCount;                             // NumberOfLOD (at most kMaxLods)
+    unsigned int keyColor;                    // key colour
+    UnknownEcoTexture* billboardTexture;      // billboard texture
+    UnknownEcoTexture* modelTexture;          // model texture
+    unsigned short* modelIndices[kMaxLods];   // model indices (inside the vertex block)
+    UnknownEcoModelVertex* modelVertices[kMaxLods]; // model vertices
+    int modelVertexCount[kMaxLods];           // vertex count
+    int modelIndexCount[kMaxLods];            // index count
+    int usePlanarLighting;                    // UsePlanarLighting
+    int blendLods;                            // BlendLODs
+    float percentBias;                        // PercentBias
+    int collisionCount;                       // NumCollisionObjects
+    UnknownEcoCollisionDefinition* collisionDefinitions;
+    CollisionObject** collisionObjects;
 };
 
 // RTTI: Vegetation : QuadTreeObject (vtable 0x005524f8), 0x1c bytes
@@ -316,34 +316,34 @@ public:
     virtual unsigned int UnknownVirtualSlot1(UnknownEcoQuadTree* tree); // 0x00456720: cell code
 
     // 0x004567a0 / 0x004567e0: place the object (quantised or world
-    // coordinates); the first argument (EcoSystem::field_0x48) is not used.
-    void UnknownFunction4567a0(TextureMapManager* textures, unsigned char definition,
+    // coordinates); the first argument (EcoSystem::textureManager) is not used.
+    void PlaceQuantized(TextureMapManager* textures, unsigned char definition,
                                const UnknownEcoCoordinates* coordinates, unsigned char heightParameter,
                                unsigned char radiusParameter);
-    void UnknownFunction4567e0(TextureMapManager* textures, unsigned char definition,
+    void Place(TextureMapManager* textures, unsigned char definition,
                                const Vector3* position, unsigned char heightParameter,
                                unsigned char radiusParameter);
     // 0x00456890: distance test against the current detail band.
-    void UnknownFunction456890(int* billboard, int* fade);
+    void TestDistance(int* billboard, int* fade);
     // 0x00456a10: switches between the 3D geometry and the billboard.
-    void UnknownFunction456a10(int billboard, int fade);
-    void UnknownFunction457000(UnknownEcoRenderTarget* target); // 0x00457000: draws the geometry
-    int UnknownFunction457080();              // 0x00457080: the definition's collision count
+    void SetBillboard(int billboard, int fade);
+    void DrawGeometry(UnknownEcoRenderTarget* target);          // 0x00457000: draws the geometry
+    int GetCollisionCount();                  // 0x00457080: the definition's collision count
     // 0x004570a0: the definition's collision object `index`, placed here.
-    CollisionObject* UnknownFunction4570a0(int index);
-    float UnknownFunction457230();            // 0x00457230: the radius
+    CollisionObject* GetCollisionObject(int index);
+    float GetRadius();                        // 0x00457230: the radius
 
-    UnknownEcoCoordinates field_0x0c;         // in EcoSystem::field_0x5a8 units
-    unsigned char field_0x12;                 // definition index
-    unsigned char field_0x13;                 // fade (0..255)
-    unsigned char field_0x14;                 // height parameter
-    unsigned char field_0x15;                 // radius parameter
-    unsigned char field_0x16_bit0 : 1;        // drawn as a billboard
-    void* field_0x18;                         // geometry block (vertices, indices, AgeEntry)
+    UnknownEcoCoordinates quantizedPosition;  // in EcoSystem::unitsPerCoordinate units
+    unsigned char definitionIndex;            // definition index
+    unsigned char fadeLevel;                  // fade (0..255)
+    unsigned char heightParam;                // height parameter
+    unsigned char radiusParam;                // radius parameter
+    unsigned char isBillboard : 1;            // drawn as a billboard
+    void* geometryBlock;                      // geometry block (vertices, indices, AgeEntry)
 };
 
 // 0x00456850 (cdecl): the AgeManager eviction callback for a geometry block.
-int UnknownFunction456850(void* object, int context);
+int EvictGeometry(void* object, int context);
 
 // 0x0045c6a0 / 0x0045c7b0 (cdecl): fwrite / fread through a running
 // one-byte xor key.
@@ -403,14 +403,14 @@ int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* even
 
 // A detail band (0x20 bytes) of the two tables 0x0056a600 / 0x0056a740.
 struct UnknownEcoDetailBand {
-    int field_0x00;                           // 3D distance
-    int field_0x04;                           // fade start distance
-    int field_0x08;                           // model flags
-    int field_0x0c;                           // billboard range
-    int field_0x10;                           // billboard limit
-    int field_0x14;                           // texture-stage lighting
-    int field_0x18;                           // specular
-    int field_0x1c;                           // fog
+    int geometryDistance;                     // 3D distance
+    int fadeStartDistance;                    // fade start distance
+    int modelFlags;                           // model flags
+    int billboardRange;                       // billboard range
+    int billboardLimit;                       // billboard limit
+    int stageLighting;                        // texture-stage lighting
+    int specular;                             // specular
+    int fog;                                  // fog
 };
 
 class EcoSystem : public GameObject, public GroundFogableObject {
@@ -424,60 +424,60 @@ public:
 
     // 0x00457480: reads the .est file (or a .esb through 0x00458f70);
     // `path` is rewritten to the .esb name when one exists.
-    int UnknownFunction457480(char* path, UnknownTextureStream* stream);
+    int ReadEst(char* path, UnknownTextureStream* stream);
     // 0x00457ed0: builds the collision objects of a definition.
-    void UnknownFunction457ed0(UnknownEcoDefinition* definition);
+    void BuildCollisionObjects(UnknownEcoDefinition* definition);
     // 0x00458360: reads a definition's "CollisionObject%i" entries.
-    void UnknownFunction458360(const char* path, int index, UnknownEcoDefinition* definition);
-    int UnknownFunction4587b0(const char* path); // 0x004587b0: writes the .esb
-    void UnknownFunction458da0(const char* path); // 0x00458da0: writes the .txt listing
-    int UnknownFunction458f70(const char* path, UnknownTextureStream* stream); // 0x00458f70: reads the .esb
+    void ReadCollisionObjects(const char* path, int index, UnknownEcoDefinition* definition);
+    int WriteEsb(const char* path);              // 0x004587b0: writes the .esb
+    void WriteListing(const char* path);          // 0x00458da0: writes the .txt listing
+    int ReadEsb(const char* path, UnknownTextureStream* stream);               // 0x00458f70: reads the .esb
     void UnknownFunction4594c0(int level);    // 0x004594c0: detail level
     // 0x004594d0: creates the ecosystem.
     EcoSystem* UnknownFunction4594d0(void* view, TextureMapManager* textures, UnknownEcoTerrain* terrain,
                                      LightManager* lights, char* path, UnknownTextureStream* stream,
                                      int textureFormat, int collisions, int level);
-    int UnknownFunction4598d0();              // 0x004598d0: places the objects read from the .esb
-    int UnknownFunction459b40();              // 0x00459b40: places the authored objects
-    int UnknownFunction459ce0(int seed);      // 0x00459ce0: generates the objects
+    int PlaceStoredObjects();                 // 0x004598d0: places the objects read from the .esb
+    int PlaceAuthoredObjects();               // 0x00459b40: places the authored objects
+    int GenerateObjects(int seed);            // 0x00459ce0: generates the objects
     void UnknownFunction45a9a0();             // 0x0045a9a0: lighting changed
-    void UnknownFunction45ade0(int format);   // 0x0045ade0: render states for a texture format
-    int UnknownFunction45b136();              // 0x0045b136: draws the billboards
+    void SetRenderStates(int format);         // 0x0045ade0: render states for a texture format
+    int DrawBillboards();                     // 0x0045b136: draws the billboards
 
-    int field_0x30;                           // Method: 1 Authored, 2 Auto
-    int field_0x34;                           // TotalObjects
-    Vegetation* field_0x38;                   // the objects
-    Vegetation** field_0x3c;                  // objects drawn as billboards
-    Vegetation** field_0x40;                  // objects drawn as geometry
-    UnknownEcoTerrain* field_0x44;
-    TextureMapManager* field_0x48;
-    LightManager* field_0x4c;
-    UnknownEcoVertex* field_0x50;             // billboard vertices (120 * 6)
-    unsigned short* field_0x54;               // billboard indices (120 * 12)
-    UnknownEcoDefinition* field_0x58[256];
-    float field_0x458;                        // NorthAngle
-    char field_0x45c[0x80];                   // PlacementBmp
-    char field_0x4dc[0x80];                   // ProbabilityTga
-    int field_0x55c;                          // placed object count
-    int field_0x560;                          // texture format
-    Vector3 field_0x564;                      // directional light colour
-    Vector3 field_0x570;                      // ambient colour
-    Vector3 field_0x57c;                      // light direction
+    int method;                               // Method: 1 Authored, 2 Auto
+    int totalObjects;                         // TotalObjects
+    Vegetation* vegetation;                   // the objects
+    Vegetation** billboardList;               // objects drawn as billboards
+    Vegetation** geometryList;                // objects drawn as geometry
+    UnknownEcoTerrain* groundTerrain;
+    TextureMapManager* textureManager;
+    LightManager* lightManager;
+    UnknownEcoVertex* billboardVertices;      // billboard vertices (120 * 6)
+    unsigned short* billboardIndices;         // billboard indices (120 * 12)
+    UnknownEcoDefinition* definitionTable[256];
+    float northAngle;                         // NorthAngle
+    char placementBmp[0x80];                  // PlacementBmp
+    char probabilityTga[0x80];                // ProbabilityTga
+    int placedCount;                          // placed object count
+    int billboardFormat;                      // texture format
+    Vector3 lightColor;                       // directional light colour
+    Vector3 ambientLight;                     // ambient colour
+    Vector3 lightDirection;                   // light direction
     unsigned char field_0x588[8];
-    UnknownTextureStream* field_0x590;        // the .esb stream
-    int field_0x594;                          // nonzero: field_0x590 belongs to the archive
+    UnknownTextureStream* esbStream;          // the .esb stream
+    int esbStreamInArchive;                   // nonzero: esbStream belongs to the archive
     unsigned char field_0x598;
-    char field_0x599;                         // the Vegetation type id (TypeRegistry)
-    AgeManager* field_0x59c;
-    int field_0x5a0;                          // billboard count
-    int field_0x5a4;                          // geometry count
-    float field_0x5a8;                        // world units per coordinate unit
-    float field_0x5ac;                        // coordinate units per world unit
-    int field_0x5b0;                          // billboard list capacity
-    int field_0x5b4;                          // geometry list capacity
-    float field_0x5b8;                        // 65535 / far distance
-    float field_0x5bc;                        // far distance / 65536
-    int field_0x5c0;                          // detail level
+    char vegetationTypeId;                    // the Vegetation type id (TypeRegistry)
+    AgeManager* ageManager;
+    int billboardCount;                       // billboard count
+    int geometryCount;                        // geometry count
+    float unitsPerCoordinate;                 // world units per coordinate unit
+    float coordinatesPerUnit;                 // coordinate units per world unit
+    int billboardCapacity;                    // billboard list capacity
+    int geometryCapacity;                     // geometry list capacity
+    float depthScale;                         // 65535 / far distance
+    float depthUnit;                          // far distance / 65536
+    int detailLevel;                          // detail level
 };
 
 extern EcoSystem* g_UnknownGlobal59aebc;      // the one instance

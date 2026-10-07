@@ -58,35 +58,35 @@ public:
     // Game+0x10 is always the PCRenderTarget that slot 31 creates.
     PCRenderTarget* PCTarget() { return (PCRenderTarget*)field_0x10; }
 
-    void UnknownFunction4c0470(const UnknownRect* rect);  // 0x004c0470
+    void SetWindowRect(const UnknownRect* rect);          // 0x004c0470
     // 0x004c0760: in full screen, marks modes larger than width x height
     // unusable (unless the display keeps them).
-    int UnknownFunction4c0760(UnknownDisplay* display, int width, int height);
+    int LimitDisplayModes(UnknownDisplay* display, int width, int height);
     // 0x004bfc50: PCGame's start-up before Game's initialiser; fills
     // `message` on failure.
-    int UnknownFunction4bfc50(char* message);
-    void UnknownFunction4c0d10();                        // 0x004c0d10: profiles the displays (near miss, samples/game)
-    int UnknownFunction4c1610(UnknownDisplay* display);  // 0x004c1610: saves its profile
-    int UnknownFunction4c16b0();                         // 0x004c16b0: profiles every display
-    int UnknownFunction4c1410();                         // 0x004c1410: 1 if any profile is stale
-    int UnknownFunction4c1a00();                         // 0x004c1a00: deletes the profiles
-    int UnknownFunction4c16f0(UnknownDisplay* display);  // 0x004c16f0: loads its profile (near miss, samples/game)
+    int StartUp(char* message);
+    void ProfileDisplays();                              // 0x004c0d10: profiles the displays (near miss, samples/game)
+    int SaveDisplayProfile(UnknownDisplay* display);     // 0x004c1610: saves its profile
+    int ProfileEveryDisplay();                           // 0x004c16b0: profiles every display
+    int IsAnyProfileStale();                             // 0x004c1410: 1 if any profile is stale
+    int DeleteDisplayProfiles();                         // 0x004c1a00: deletes the profiles
+    int LoadDisplayProfile(UnknownDisplay* display);     // 0x004c16f0: loads its profile (near miss, samples/game)
 
-    UnknownGuid field_0x2f8;                  // Direct3D device GUID ("Renderer" setting)
+    UnknownGuid deviceGuid;                   // Direct3D device GUID ("Renderer" setting)
     UnknownRect field_0x308;                  // window rectangle (slot 32)
     void* field_0x318;                        // instance handle
     void* field_0x31c;                        // window handle
-    char field_0x320[0x80];                   // "Rainbow Studios"
+    char companyName[0x80];                   // "Rainbow Studios"
     char field_0x3a0[0x80];                   // "Rainbow Demo"
     void* field_0x420;                        // string resource instance (defaults to +0x318)
     UnknownOSVersionInfo field_0x424;
     char field_0x4b8[0x80];                   // "SOFTWARE\\Rainbow Studios\\Demo"
     void* field_0x538;                        // IMM32.DLL
     void* field_0x53c;                        // created input context
-    void* field_0x540;                        // previous input context
+    void* field_0x540;                        // previous input context (ImmAssociateContext result)
     int field_0x544;                          // disables the 0x004ccd60 first argument
     unsigned char field_0x548_bit0 : 1;
-    int field_0x54c;                          // texture stage 0 state 0x10 (slot 7)
-    int field_0x550;                          // state 0x11
-    int field_0x554;                          // state 0x12
+    int magFilter;                            // texture stage 0 D3DTSS_MAGFILTER (slot 7)
+    int minFilter;                            // D3DTSS_MINFILTER
+    int mipFilter;                            // D3DTSS_MIPFILTER
 };

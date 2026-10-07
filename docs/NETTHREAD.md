@@ -30,7 +30,7 @@ Open question: `0x004af6a0` passes a float (`fstp [esp]`) to
 NetworkInterface `0x004acc50`, but Net.cpp's body uses that argument as an
 int, as the initial value of the lost player id. The real parameter type
 is unresolved. NetThread.h therefore calls the method through
-`UnknownNetKeepAliveView`. A float overload in Net.h was tried and
+`NetKeepAliveView`. A float overload in Net.h was tried and
 rejected: it makes VC6 swap the operands of `availPhys + availPageFile` in
 TrackGame slot 1 (`0x00520ab0`). Equal-cost commutative operand order can
 depend on unrelated declarations in included headers.

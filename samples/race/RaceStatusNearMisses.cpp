@@ -1,7 +1,7 @@
 // Near-miss RaceStatus.cpp candidates, kept out of src/reconstructed until
 // they match. See docs/RACESTATUS.md.
 //
-// UnknownFunction4e6a50 (0x004e6a50, 1004 bytes): the gate-race update.
+// UpdateGateRace (0x004e6a50, 1004 bytes): the gate-race update.
 // Everything matches except one instruction: retail tests the laps left as
 // `cmp eax, 1; jl` (`remaining >= 1`), but written that way VC6 lays the
 // `else` (`remaining * lap time`) out of line, keeps the lap-time pointer in
@@ -11,7 +11,7 @@
 // fld/fstp. RaceStatus.cpp 0x004e63e0 has the same block and matches with
 // `>= 1` and if/else.
 //
-// UnknownFunction4e5d00 (0x004e5d00, 519 bytes): builds a view's status
+// BuildStatusList (0x004e5d00, 519 bytes): builds a view's status
 // list. The statements, calls and loops line up; only register allocation
 // differs: retail keeps the list pointer in ebp and the index in ebx (also
 // reusing it for the constant 1 in the calloc count and the race-mode test)
@@ -51,13 +51,13 @@ static inline float Length(Vector3 v) {
 }
 
 // 0x004e5d00
-int UnknownFunction4e5d00(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
+int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
     UnknownEventRacerPart* status;
     UnknownEventRacerPart** tail;
     int index;
     int i;
 
-    g_UnknownGlobal689c6c = 0;
+    g_ViewRacerFinished = 0;
     if (!list)
         return 0;
     index = 1;
@@ -73,7 +73,7 @@ int UnknownFunction4e5d00(UnknownEventRacerPart** list, UnknownKrustyBikeView* v
     tail = &status->field_0x50;
     if (g_UnknownGlobal56e26c->field_0x18 == 1 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
         for (i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++) {
-            if (!UnknownFunction4e5c70(*list, view->field_0x40[i])) {
+            if (!HasStatusNode(*list, view->field_0x40[i])) {
                 status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 235);
                 if (!status)
                     return 0;
@@ -90,7 +90,7 @@ int UnknownFunction4e5d00(UnknownEventRacerPart** list, UnknownKrustyBikeView* v
     }
     if (view->field_0x3c) {
         for (i = 0; i < view->field_0x158; i++) {
-            if (!UnknownFunction4e5c70(*list, view->field_0x3c[i]) && view->field_0x3c[i] != view->field_0x38) {
+            if (!HasStatusNode(*list, view->field_0x3c[i]) && view->field_0x3c[i] != view->field_0x38) {
                 status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 257);
                 if (!status)
                     return 0;
@@ -109,7 +109,7 @@ int UnknownFunction4e5d00(UnknownEventRacerPart** list, UnknownKrustyBikeView* v
 }
 
 // 0x004e6a50
-int UnknownFunction4e6a50(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate, float frameTime, int lapLimit,
+int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate, float frameTime, int lapLimit,
                           int unlimited) {
     UnknownEventRacerPart* previous = 0;
     UnknownEventRacerPart* status;
@@ -117,7 +117,7 @@ int UnknownFunction4e6a50(UnknownEventRacerPart** list, UnknownBikeRaceNode* fir
 
     if (!list || !firstGate)
         return 0;
-    UnknownFunction4e5ca0(list);
+    PruneStatusList(list);
     for (status = *list; status; previous = status, status = status->field_0x50) {
         racer = status->field_0x04;
         if (racer->field_0x7a4)
@@ -127,7 +127,7 @@ int UnknownFunction4e6a50(UnknownEventRacerPart** list, UnknownBikeRaceNode* fir
             status->field_0x1c.x = racer->field_0x5f0->field_0x200.x;
             status->field_0x1c.y = racer->field_0x5f0->field_0x200.y;
             status->field_0x1c.z = racer->field_0x5f0->field_0x200.z;
-            if (!UnknownFunction4e59c0(&status->field_0x1c, &status->field_0x28, &status->field_0x34, firstGate,
+            if (!AdvanceGate(&status->field_0x1c, &status->field_0x28, &status->field_0x34, firstGate,
                                        &racer->field_0x790, &racer->field_0x7b8, racer->field_0x780, racer->field_0x754,
                                        0, &racer->field_0x7a0, &racer->field_0x74c, &racer->field_0x750,
                                        &racer->field_0x774, &racer->field_0x7a4, lapLimit, unlimited,
@@ -141,7 +141,7 @@ int UnknownFunction4e6a50(UnknownEventRacerPart** list, UnknownBikeRaceNode* fir
             }
         }
         if (racer->field_0x7a4 && racer == racer->field_0x740->field_0x38)
-            g_UnknownGlobal689c6c = 1;
+            g_ViewRacerFinished = 1;
         float before = Length(status->field_0x34->field_0x00 - status->field_0x28);
         float after = Length(status->field_0x34->field_0x00 - status->field_0x1c);
         status->field_0x28.x = status->field_0x1c.x;
@@ -149,7 +149,7 @@ int UnknownFunction4e6a50(UnknownEventRacerPart** list, UnknownBikeRaceNode* fir
         status->field_0x28.z = status->field_0x1c.z;
         status->field_0x14 += before - after;
         status->field_0x08 = after;
-        if (g_UnknownGlobal56e26c->field_0x18 == 1 && g_UnknownGlobal689c6c) {
+        if (g_UnknownGlobal56e26c->field_0x18 == 1 && g_ViewRacerFinished) {
             if (racer->field_0x7a4)
                 continue;
             if (racer->field_0x734) {
@@ -177,7 +177,7 @@ int UnknownFunction4e6a50(UnknownEventRacerPart** list, UnknownBikeRaceNode* fir
         if (!racer->field_0x7a4)
             racer->field_0x754 += frameTime;
     }
-    if (!UnknownFunction4e6120(list))
+    if (!OrderByGates(list))
         return 0;
-    return UnknownFunction4e6210(*list, 1) != 0;
+    return ComputeTimeBehind(*list, 1) != 0;
 }

@@ -74,54 +74,54 @@ int BonusObjectManager::UnknownVirtualSlot10(float frameTime) {
     int digit;
     int place;
 
-    if (field_0x30 == -1 || g_UnknownKrustyGame56e26c->field_0x3430)
+    if (currentKey == -1 || g_UnknownKrustyGame56e26c->field_0x3430)
         return 1;
-    if (field_0x2c->field_0x38->field_0x444 && field_0x34 > 2.0f) {
-        UnknownFunction48d540();
+    if (field_0x2c->field_0x38->field_0x444 && elapsed > 2.0f) {
+        HideDigits();
         return 1;
     }
-    field_0x34 += frameTime;
-    if (field_0x34 < g_UnknownBonusKeys[6].field_0x04) {
-        while (field_0x34 > g_UnknownBonusKeys[field_0x30 + 1].field_0x04)
-            UnknownFunction48cad0();
-        float t = (field_0x34 - g_UnknownBonusKeys[field_0x30].field_0x04) / field_0x17c;
+    elapsed += frameTime;
+    if (elapsed < g_UnknownBonusKeys[6].field_0x04) {
+        while (elapsed > g_UnknownBonusKeys[currentKey + 1].field_0x04)
+            NextKey();
+        float t = (elapsed - g_UnknownBonusKeys[currentKey].field_0x04) / keyDuration;
         Vector3 position;
         field_0x2c->field_0x38->field_0x3bc->UnknownFunction4fc970(&position);
-        position += t * field_0x1a0 + field_0x194;
-        field_0x3c->UnknownFunction4fc690(0, position);
+        position += t * keyPositionChange + keyPosition;
+        baseFrame->UnknownFunction4fc690(0, position);
         if (field_0x38 != g_UnknownKrustyGame56e26c->field_0x10->field_0x08 || field_0x38->field_0x16c != field_0x1dc ||
             field_0x1f0) {
             field_0x38 = g_UnknownKrustyGame56e26c->field_0x10->field_0x08;
             field_0x1dc = field_0x38->field_0x16c;
             Vector3 delta = position - field_0x38->field_0x170;
             field_0x1f0 = 0;
-            field_0x1e8 = (field_0x1ec = Length(delta)) * field_0x1e0 / (field_0x38->field_0x198 * field_0x1e4);
+            sizeFactor = (field_0x1ec = Length(delta)) * field_0x1e0 / (field_0x38->field_0x198 * field_0x1e4);
         }
         position += field_0x2c->field_0x38->field_0x5f4->field_0x230 * 5.0f;
-        if (field_0x184 == 0.0f && field_0x180 == 0.0f) {
+        if (keyAngleChange == 0.0f && keyAngle == 0.0f) {
             field_0x188 = position - field_0x38->field_0x170;
             Vector3 forward = field_0x188;
             forward.y = 0.0f;
-            field_0x3c->UnknownFunction4fbd70(&forward, &kVec3YAxis, 1, 1);
+            baseFrame->UnknownFunction4fbd70(&forward, &kVec3YAxis, 1, 1);
         } else {
-            Vector3 axis = t * field_0x1d0 + field_0x1c4;
-            field_0x3c->UnknownFunction4fd090(axis.x, axis.y, axis.z, t * field_0x184 + field_0x180);
+            Vector3 axis = t * keyAxisChange + keyAxis;
+            baseFrame->UnknownFunction4fd090(axis.x, axis.y, axis.z, t * keyAngleChange + keyAngle);
         }
-        Vector3 scale = t * field_0x1b8 + field_0x1ac;
-        scale *= field_0x1e8;
-        field_0x3c->UnknownFunction4fd340(scale.x, scale.y, scale.z);
-        field_0x40[0][0]->field_0x18c = !field_0x40[0][0]->field_0x14c;
-        field_0x40[0][1]->field_0x18c = !field_0x40[0][0]->field_0x14c;
+        Vector3 scale = t * keyScaleChange + keyScale;
+        scale *= sizeFactor;
+        baseFrame->UnknownFunction4fd340(scale.x, scale.y, scale.z);
+        digitModels[0][0]->field_0x18c = !digitModels[0][0]->field_0x14c;
+        digitModels[0][1]->field_0x18c = !digitModels[0][0]->field_0x14c;
         for (digit = 0; digit < 10; digit++)
             for (place = 2; place < 5; place++)
-                field_0x40[digit][place]->field_0x18c = !field_0x40[digit][place]->field_0x14c;
+                digitModels[digit][place]->field_0x18c = !digitModels[digit][place]->field_0x14c;
         for (digit = 0; digit < 10; digit++)
             for (place = 0; place < 2; place++)
-                field_0x124[digit][place]->field_0x18c = !field_0x124[digit][place]->field_0x14c;
-        field_0x11c->field_0x18c = !field_0x11c->field_0x14c;
-        field_0x120->field_0x18c = !field_0x120->field_0x14c;
+                fractionDigitModels[digit][place]->field_0x18c = !fractionDigitModels[digit][place]->field_0x14c;
+        timesModel->field_0x18c = !timesModel->field_0x14c;
+        decimalPointModel->field_0x18c = !decimalPointModel->field_0x14c;
     } else {
-        UnknownFunction48d540();
+        HideDigits();
     }
     GameObject::UnknownVirtualSlot10(frameTime);
     return 1;
@@ -137,20 +137,20 @@ struct UnknownCueOwner {
 // Places the cue at its screen position in front of the camera, rebuilding
 // the screen offsets when the field of view changed.
 inline void VisualCue::UnknownPlace() {
-    Vector3 forward = Vector3(field_0x40->field_0x0ac[0][2], field_0x40->field_0x0ac[1][2], field_0x40->field_0x0ac[2][2]);
-    Vector3 up = Vector3(field_0x40->field_0x0ac[0][1], field_0x40->field_0x0ac[1][1], field_0x40->field_0x0ac[2][1]);
-    Vector3 right = Vector3(field_0x40->field_0x0ac[0][0], field_0x40->field_0x0ac[1][0], field_0x40->field_0x0ac[2][0]);
-    if (field_0x40->field_0x16c != field_0xb0) {
-        field_0xb0 = field_0x40->field_0x16c;
-        float half = (float)tan(UnknownDegreesToRadians(field_0xb0 * 0.5f)) * field_0x44;
-        field_0xb4 = (UnknownScreenX() - 0.5f) * half * 2.0f;
-        field_0xb8 = (0.5f - UnknownScreenY()) * field_0x40->field_0x1b8 * half * 2.0f;
-        field_0x34 = field_0x38 * field_0x44 / (field_0x40->field_0x198 * field_0x3c);
+    Vector3 forward = Vector3(arcadeView->field_0x0ac[0][2], arcadeView->field_0x0ac[1][2], arcadeView->field_0x0ac[2][2]);
+    Vector3 up = Vector3(arcadeView->field_0x0ac[0][1], arcadeView->field_0x0ac[1][1], arcadeView->field_0x0ac[2][1]);
+    Vector3 right = Vector3(arcadeView->field_0x0ac[0][0], arcadeView->field_0x0ac[1][0], arcadeView->field_0x0ac[2][0]);
+    if (arcadeView->field_0x16c != builtFieldOfView) {
+        builtFieldOfView = arcadeView->field_0x16c;
+        float half = (float)tan(UnknownDegreesToRadians(builtFieldOfView * 0.5f)) * field_0x44;
+        screenOffsetX = (UnknownScreenX() - 0.5f) * half * 2.0f;
+        screenOffsetY = (0.5f - UnknownScreenY()) * arcadeView->field_0x1b8 * half * 2.0f;
+        modelScale = field_0x38 * field_0x44 / (arcadeView->field_0x198 * field_0x3c);
     }
-    Vector3 position = field_0x40->field_0x170;
+    Vector3 position = arcadeView->field_0x170;
     position += forward * field_0x44;
-    position += right * field_0xb4;
-    position += up * field_0xb8;
+    position += right * screenOffsetX;
+    position += up * screenOffsetY;
     UnknownFunction4014f0(&position);
 }
 
@@ -161,34 +161,34 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     if (!ArcadeObject::UnknownVirtualSlot10(frameTime))
         return 1;
     if (!field_0xbc) {
-        if (((UnknownCueOwner*)field_0x18)->field_0x08 != field_0x40 ||
-            field_0xa8->field_0x50->field_0x3b0 != field_0xa8->field_0x38 || !field_0xa8->field_0x38 ||
-            field_0xa8->field_0x38->field_0x7a4) {
-            field_0x30 = 0;
+        if (((UnknownCueOwner*)field_0x18)->field_0x08 != arcadeView ||
+            cueView->field_0x50->field_0x3b0 != cueView->field_0x38 || !cueView->field_0x38 ||
+            cueView->field_0x38->field_0x7a4) {
+            isVisible = 0;
             return 1;
         }
     }
     switch (g_UnknownKrustyGame56e26c->field_0x2d74) {
     case 2:
     case 3: {
-        if (!field_0xa8->field_0x48)
+        if (!cueView->field_0x48)
             goto hide;
-        if (field_0xa8->field_0x38->field_0x78c) {
-            field_0x30 = 0;
+        if (cueView->field_0x38->field_0x78c) {
+            isVisible = 0;
             return 1;
         }
-        field_0x30 = 1;
+        isVisible = 1;
         UnknownPlace();
         Vector3 target;
-        if (field_0xa8->field_0x48)
-            field_0xa8->field_0x48->UnknownFunction518080(field_0xa8->field_0x38->field_0x744->field_0x44, &target);
+        if (cueView->field_0x48)
+            cueView->field_0x48->UnknownFunction518080(cueView->field_0x38->field_0x744->field_0x44, &target);
         else
-            target = field_0xa8->field_0x38->field_0x10c;
+            target = cueView->field_0x38->field_0x10c;
         field_0xac->UnknownFunction507c10(&target, 0, 0, 0);
-        Vector3 direction = target - field_0x40->field_0x170;
+        Vector3 direction = target - arcadeView->field_0x170;
         UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
-        scale = field_0x34;
-        field_0x2c->UnknownFunction4fd340(scale, scale, scale);
+        scale = modelScale;
+        arcadeModel->UnknownFunction4fd340(scale, scale, scale);
         return 1;
     }
     case 1:
@@ -198,27 +198,27 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         if (!ref)
             return 1;
         Vector3 direction =
-            g_UnknownKrustyGame56e26c->field_0x560->field_0xd8[ref->field_0x7b8].field_0x00 - field_0x40->field_0x170;
+            g_UnknownKrustyGame56e26c->field_0x560->field_0xd8[ref->field_0x7b8].field_0x00 - arcadeView->field_0x170;
         UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
-        scale = field_0x34;
+        scale = modelScale;
         break;
     }
     case 0: {
-        if (!field_0xbc || field_0xf8 <= 1)
+        if (!field_0xbc || cueRacerCount <= 1)
             goto hide;
-        field_0x30 = 1;
+        isVisible = 1;
         UnknownPlace();
         Vector3 target = kVec3Zero;
-        for (int i = 0; i < field_0xf8; i++) {
-            if (field_0xc0 == i) {
-                target = field_0xcc[i]->field_0x0c;
+        for (int i = 0; i < cueRacerCount; i++) {
+            if (currentRacer == i) {
+                target = cueRacers[i]->field_0x0c;
                 break;
             }
         }
-        Vector3 direction = target - field_0x40->field_0x170;
+        Vector3 direction = target - arcadeView->field_0x170;
         UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
-        scale = field_0x34;
-        field_0x2c->UnknownFunction4fd340(scale, scale, scale);
+        scale = modelScale;
+        arcadeModel->UnknownFunction4fd340(scale, scale, scale);
         return 1;
     }
     case 4: {
@@ -226,9 +226,9 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         if (g_UnknownKrustyGame56e26c->field_0x2eb4) {
             Vector3 target;
             g_UnknownKrustyGame56e26c->field_0x568->field_0xdc->field_0x21c.UnknownFunction4fc970(&target);
-            Vector3 direction = target - field_0x40->field_0x170;
+            Vector3 direction = target - arcadeView->field_0x170;
             UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
-            scale = field_0x34;
+            scale = modelScale;
         } else {
             UnknownVisualCueRacer* followed = 0;
             if (g_UnknownKrustyGame56e26c->field_0x568->field_0x3c->field_0x25 & 1)
@@ -237,20 +237,20 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
                 return 1;
             if (followed == g_UnknownKrustyGame56e26c->field_0x568->field_0xa8)
                 goto hide;
-            Vector3 direction = g_UnknownKrustyGame56e26c->field_0x568->field_0xa8->field_0x0c - field_0x40->field_0x170;
+            Vector3 direction = g_UnknownKrustyGame56e26c->field_0x568->field_0xa8->field_0x0c - arcadeView->field_0x170;
             UnknownFunction401520(&direction, &kVec3YAxis, 1, 1);
-            scale = field_0x34;
+            scale = modelScale;
         }
         break;
     }
     default:
         return 1;
     }
-    field_0x2c->UnknownFunction4fd340(scale, scale, scale);
-    field_0x30 = 1;
+    arcadeModel->UnknownFunction4fd340(scale, scale, scale);
+    isVisible = 1;
     return 1;
 hide:
-    field_0x30 = 0;
+    isVisible = 0;
     return 1;
 }
 

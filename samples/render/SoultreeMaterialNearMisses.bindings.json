@@ -1,5 +1,5 @@
 {
   "?Select@SurfaceMap@@QAEXXZ": "0x00505310",
-  "?UnknownFunction4ff180@SoultreeMaterial@@QAEXXZ": "0x004ff180",
+  "?ApplyRenderStates@SoultreeMaterial@@QAEXXZ": "0x004ff180",
   "?g_UnknownInt689ed0@@3HA": "0x00689ed0"
 }

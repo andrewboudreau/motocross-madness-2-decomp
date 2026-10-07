@@ -16,6 +16,7 @@
 #include "TypeRegistry.h"
 #include "UnknownResourceManager.h"
 #include "bmpfile.h"
+#include "D3DConstants.h"
 
 // The four vector constants that open about 73 retail files
 // (0x0059aea0, 0x0059aeb0, 0x0059aed8, 0x0059ae90; $E 0x00459830..0x00459b3b).
@@ -71,98 +72,98 @@ static inline float UnknownSquareMagnitude(const Vector3* v) {
 
 // 0x00455de0
 UnknownEcoDefinition::UnknownEcoDefinition() {
-    field_0x000[0] = 0;
-    field_0x080[0] = 0;
-    field_0x100[0] = 0;
-    field_0x180 = 0.0f;
-    field_0x184 = 0.0f;
-    field_0x188 = 0.0f;
-    field_0x18c = 0.0f;
-    field_0x190 = 0.0f;
-    field_0x194 = 0.0f;
-    field_0x198 = 0.0f;
-    field_0x19c = 0.0f;
-    field_0x1a0 = 0.0f;
-    field_0x1a4 = 0.0f;
-    field_0x1a8 = 0.0f;
-    field_0x1ac = 0.0f;
-    field_0x1b0 = 0.0f;
-    field_0x1b4 = 0.0f;
-    field_0x1b8 = 0.0f;
-    field_0x1bc = 1.0f;
-    field_0x1c0 = 1.0f;
-    field_0x1c4 = 0.0f;
-    field_0x1c8 = 0.5f;
-    field_0x204 = 0;
-    field_0x20c = 0;
-    field_0x208 = 0;
+    name[0] = 0;
+    billboardName[0] = 0;
+    probabilityTga[0] = 0;
+    meanHeight = 0.0f;
+    minHeight = 0.0f;
+    maxHeight = 0.0f;
+    meanRadius = 0.0f;
+    minRadius = 0.0f;
+    maxRadius = 0.0f;
+    meanSlope = 0.0f;
+    standardDeviationSlope = 0.0f;
+    meanAspect = 0.0f;
+    standardDeviationAspect = 0.0f;
+    meanDrainage = 0.0f;
+    standardDeviationDrainage = 0.0f;
+    meanAltitude = 0.0f;
+    standardDeviationAltitude = 0.0f;
+    uLeft = 0.0f;
+    uRight = 1.0f;
+    uCenter = 1.0f;
+    vBottom = 0.0f;
+    vTop = 0.5f;
+    collisionCount = 0;
+    collisionObjects = 0;
+    collisionDefinitions = 0;
 }
 
 // 0x00455e80
 UnknownEcoDefinition::~UnknownEcoDefinition() {
     int i;
-    if (field_0x1e0) {
-        field_0x1e0->UnknownVirtualSlot2();
+    if (billboardTexture) {
+        billboardTexture->UnknownVirtualSlot2();
         if (g_UnknownGlobal59aefc)
-            field_0x1e0->UnknownVirtualSlot2();
+            billboardTexture->UnknownVirtualSlot2();
     }
-    if (field_0x1e4) {
-        field_0x1e4->UnknownVirtualSlot2();
+    if (modelTexture) {
+        modelTexture->UnknownVirtualSlot2();
         if (g_UnknownGlobal59aefc)
-            field_0x1e4->UnknownVirtualSlot2();
+            modelTexture->UnknownVirtualSlot2();
     }
-    for (i = 0; i < field_0x1d8; i++) {
-        if (field_0x1ec[i])
-            DebugFree(field_0x1ec[i], __FILE__, 0x66);
+    for (i = 0; i < lodCount; i++) {
+        if (modelVertices[i])
+            DebugFree(modelVertices[i], __FILE__, 0x66);
     }
-    if (field_0x208)
-        DebugFree(field_0x208, __FILE__, 0x6a);
-    if (field_0x20c)
-        DebugFree(field_0x20c, __FILE__, 0x6e);
+    if (collisionDefinitions)
+        DebugFree(collisionDefinitions, __FILE__, 0x6a);
+    if (collisionObjects)
+        DebugFree(collisionObjects, __FILE__, 0x6e);
     g_UnknownGlobal59af10 = 0;
 }
 
 // 0x00455f50
-int UnknownEcoDefinition::UnknownFunction455f50() {
+int UnknownEcoDefinition::RandomParameter() {
     return rand() >> 8;
 }
 
 // 0x00455f60
-int UnknownEcoDefinition::UnknownFunction455f60(float height) {
-    return (int)(rand() * height / field_0x188) >> 8;
+int UnknownEcoDefinition::ParameterForHeight(float height) {
+    return (int)(rand() * height / maxHeight) >> 8;
 }
 
 // 0x00455f90
-float UnknownEcoDefinition::UnknownFunction455f90(unsigned char parameter) {
+float UnknownEcoDefinition::HeightForParameter(unsigned char parameter) {
     if (parameter < 0x80)
-        return field_0x180 - (field_0x180 - field_0x184) * parameter * (1.0f / 128.0f);
-    return field_0x180 + (field_0x188 - field_0x180) * (255 - parameter) * (1.0f / 128.0f);
+        return meanHeight - (meanHeight - minHeight) * parameter * (1.0f / 128.0f);
+    return meanHeight + (maxHeight - meanHeight) * (255 - parameter) * (1.0f / 128.0f);
 }
 
 // 0x00455ff0
-float UnknownEcoDefinition::UnknownFunction455ff0(unsigned char parameter) {
+float UnknownEcoDefinition::RadiusForParameter(unsigned char parameter) {
     if (parameter < 0x80)
-        return field_0x18c - (field_0x18c - field_0x190) * parameter * (1.0f / 128.0f);
-    return field_0x18c + (field_0x194 - field_0x18c) * (255 - parameter) * (1.0f / 128.0f);
+        return meanRadius - (meanRadius - minRadius) * parameter * (1.0f / 128.0f);
+    return meanRadius + (maxRadius - meanRadius) * (255 - parameter) * (1.0f / 128.0f);
 }
 
 // 0x00456650
 Vegetation::Vegetation() {
-    field_0x0c.x = 0;
-    field_0x0c.y = 0;
-    field_0x0c.z = 0;
-    field_0x14 = 0;
-    field_0x15 = 0;
-    field_0x12 = 0;
-    field_0x18 = 0;
-    field_0x08 = g_UnknownGlobal59aebc->field_0x599;
+    quantizedPosition.x = 0;
+    quantizedPosition.y = 0;
+    quantizedPosition.z = 0;
+    heightParam = 0;
+    radiusParam = 0;
+    definitionIndex = 0;
+    geometryBlock = 0;
+    field_0x08 = g_UnknownGlobal59aebc->vegetationTypeId;
 }
 
 // 0x00456690
 unsigned short Vegetation::UnknownVirtualSlot0() {
     Matrix4* m = g_UnknownGlobal59af00;
-    float depth = ((field_0x0c.z * (*m)(2, 2) + field_0x0c.x * (*m)(0, 2)) * g_UnknownGlobal59aebc->field_0x5a8
-                   + (*m)(3, 2)) * g_UnknownGlobal59aebc->field_0x5b8;
+    float depth = ((quantizedPosition.z * (*m)(2, 2) + quantizedPosition.x * (*m)(0, 2)) * g_UnknownGlobal59aebc->unitsPerCoordinate
+                   + (*m)(3, 2)) * g_UnknownGlobal59aebc->depthScale;
     if (depth < 0.0)
         field_0x06 = 0;
     else if ((int)depth >= 0xffff)
@@ -174,106 +175,106 @@ unsigned short Vegetation::UnknownVirtualSlot0() {
 
 // 0x00456720
 unsigned int Vegetation::UnknownVirtualSlot1(UnknownEcoQuadTree* tree) {
-    float radius = g_UnknownGlobal59aebc->field_0x58[field_0x12]->UnknownFunction455ff0(field_0x15);
-    float x = field_0x0c.x * g_UnknownGlobal59aebc->field_0x5a8;
-    float z = field_0x0c.z * g_UnknownGlobal59aebc->field_0x5a8;
+    float radius = g_UnknownGlobal59aebc->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
+    float x = quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+    float z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
     return tree->ComputeCode(x - radius, z - radius, x + radius, z + radius);
 }
 
 // 0x004567a0
-void Vegetation::UnknownFunction4567a0(TextureMapManager* textures, unsigned char definition,
+void Vegetation::PlaceQuantized(TextureMapManager* textures, unsigned char definition,
                                        const UnknownEcoCoordinates* coordinates, unsigned char heightParameter,
                                        unsigned char radiusParameter) {
-    field_0x12 = definition;
-    field_0x0c = *coordinates;
-    field_0x15 = radiusParameter;
-    field_0x14 = heightParameter;
-    field_0x16_bit0 = 1;
+    definitionIndex = definition;
+    quantizedPosition = *coordinates;
+    radiusParam = radiusParameter;
+    heightParam = heightParameter;
+    isBillboard = 1;
 }
 
 // 0x00456850
-int UnknownFunction456850(void* owner, int context) {
+int EvictGeometry(void* owner, int context) {
     Vegetation* object = (Vegetation*)owner;
-    DebugFree(object->field_0x18, __FILE__, 0x1a1);
-    object->field_0x18 = 0;
-    object->field_0x16_bit0 = 1;
+    DebugFree(object->geometryBlock, __FILE__, 0x1a1);
+    object->geometryBlock = 0;
+    object->isBillboard = 1;
     return 1;
 }
 
 // 0x00457000
-void Vegetation::UnknownFunction457000(UnknownEcoRenderTarget* target) {
-    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->field_0x58[field_0x12];
-    definition->field_0x1e4->UnknownVirtualSlot19();
-    int vertexCount = definition->field_0x1f0[field_0x16_bit0];
-    int indexCount = definition->field_0x1f4[field_0x16_bit0];
-    target->UnknownVirtualSlot15(4, 0x1e2, field_0x18, vertexCount, (UnknownEcoVertex*)field_0x18 + vertexCount,
+void Vegetation::DrawGeometry(UnknownEcoRenderTarget* target) {
+    UnknownEcoDefinition* definition = g_UnknownGlobal59aebc->definitionTable[definitionIndex];
+    definition->modelTexture->UnknownVirtualSlot19();
+    int vertexCount = definition->modelVertexCount[isBillboard];
+    int indexCount = definition->modelIndexCount[isBillboard];
+    target->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, geometryBlock, vertexCount, (UnknownEcoVertex*)geometryBlock + vertexCount,
                                  indexCount, 0);
-    g_UnknownGlobal59aebc->field_0x59c->UnknownFunction401250(
-        (AgeEntry*)((int*)field_0x18 + vertexCount * 8 + (indexCount + 1) / 2));
+    g_UnknownGlobal59aebc->ageManager->UnknownFunction401250(
+        (AgeEntry*)((int*)geometryBlock + vertexCount * 8 + (indexCount + 1) / 2));
 }
 
 // 0x00457080
-int Vegetation::UnknownFunction457080() {
-    return g_UnknownGlobal59aebc->field_0x58[field_0x12]->field_0x204;
+int Vegetation::GetCollisionCount() {
+    return g_UnknownGlobal59aebc->definitionTable[definitionIndex]->collisionCount;
 }
 
 // 0x00457230
-float Vegetation::UnknownFunction457230() {
-    return g_UnknownGlobal59aebc->field_0x58[field_0x12]->UnknownFunction455ff0(field_0x15);
+float Vegetation::GetRadius() {
+    return g_UnknownGlobal59aebc->definitionTable[definitionIndex]->RadiusForParameter(radiusParam);
 }
 
 // 0x00457250
 EcoSystem::EcoSystem(int flags) : GameObject(flags) {
-    field_0x34 = 0;
-    field_0x38 = 0;
-    field_0x3c = 0;
-    field_0x40 = 0;
-    field_0x44 = 0;
-    field_0x48 = 0;
-    field_0x50 = 0;
-    field_0x54 = 0;
-    field_0x59c = 0;
-    field_0x30 = 0;
-    field_0x55c = 0;
-    field_0x560 = 0x22b;
-    memset(field_0x58, 0, sizeof(field_0x58));
-    field_0x590 = 0;
+    totalObjects = 0;
+    vegetation = 0;
+    billboardList = 0;
+    geometryList = 0;
+    groundTerrain = 0;
+    textureManager = 0;
+    billboardVertices = 0;
+    billboardIndices = 0;
+    ageManager = 0;
+    method = 0;
+    placedCount = 0;
+    billboardFormat = 555;
+    memset(definitionTable, 0, sizeof(definitionTable));
+    esbStream = 0;
     field_0x598 = 0xcd;
     g_UnknownGlobal59aebc = this;
-    field_0x5a8 = 1.0f;
-    field_0x5ac = 1.0f;
+    unitsPerCoordinate = 1.0f;
+    coordinatesPerUnit = 1.0f;
 }
 
 // 0x00457330
 EcoSystem::~EcoSystem() {
     int i;
     for (i = 0; i < 256; i++) {
-        if (field_0x58[i])
-            delete field_0x58[i];
+        if (definitionTable[i])
+            delete definitionTable[i];
     }
-    if (field_0x38) {
-        for (i = 0; i < field_0x55c; i++) {
-            if (field_0x38[i].field_0x18)
-                DebugFree(field_0x38[i].field_0x18, __FILE__, 0x2cd);
+    if (vegetation) {
+        for (i = 0; i < placedCount; i++) {
+            if (vegetation[i].geometryBlock)
+                DebugFree(vegetation[i].geometryBlock, __FILE__, 0x2cd);
         }
-        delete field_0x38;
+        delete vegetation;
     }
-    if (field_0x50)
-        DebugFree(field_0x50, __FILE__, 0x2d2);
-    if (field_0x54)
-        DebugFree(field_0x54, __FILE__, 0x2d3);
-    if (field_0x3c)
-        DebugFree(field_0x3c, __FILE__, 0x2d4);
-    if (field_0x40)
-        DebugFree(field_0x40, __FILE__, 0x2d5);
-    if (field_0x59c)
-        delete field_0x59c;
+    if (billboardVertices)
+        DebugFree(billboardVertices, __FILE__, 0x2d2);
+    if (billboardIndices)
+        DebugFree(billboardIndices, __FILE__, 0x2d3);
+    if (billboardList)
+        DebugFree(billboardList, __FILE__, 0x2d4);
+    if (geometryList)
+        DebugFree(geometryList, __FILE__, 0x2d5);
+    if (ageManager)
+        delete ageManager;
     g_UnknownGlobal59aebc = 0;
     g_UnknownGlobal59aefc = 0;
 }
 
 // 0x004587b0: writes the .esb next to the .est.
-int EcoSystem::UnknownFunction4587b0(const char* path) {
+int EcoSystem::WriteEsb(const char* path) {
     char name[0x104];
     unsigned char present;
     unsigned char length;
@@ -286,96 +287,96 @@ int EcoSystem::UnknownFunction4587b0(const char* path) {
     FILE* file = fopen(name, "wb");
     if (!file)
         return 0;
-    fwrite(&field_0x30, 4, 1, file);
+    fwrite(&method, 4, 1, file);
     for (i = 0; i < 256; i++) {
-        present = field_0x58[i] != 0;
+        present = definitionTable[i] != 0;
         fwrite(&present, 1, 1, file);
         if (present) {
             int j;
-            length = strlen(field_0x58[i]->field_0x000) + 1;
+            length = strlen(definitionTable[i]->name) + 1;
             fwrite(&length, 1, 1, file);
-            fwrite(field_0x58[i]->field_0x000, length, 1, file);
-            length = strlen(field_0x58[i]->field_0x080) + 1;
+            fwrite(definitionTable[i]->name, length, 1, file);
+            length = strlen(definitionTable[i]->billboardName) + 1;
             fwrite(&length, 1, 1, file);
-            fwrite(field_0x58[i]->field_0x080, length, 1, file);
-            fwrite(&field_0x58[i]->field_0x180, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x184, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x188, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x18c, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x190, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x194, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x1b8, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x1bc, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x1c4, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x1c0, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x1c8, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x1f8, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x1fc, 4, 1, file);
-            fwrite(&field_0x58[i]->field_0x1dc, 4, 1, file);
-            if (field_0x30 == 2) {
-                fwrite(&field_0x58[i]->field_0x200, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x198, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x19c, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x1a0, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x1a4, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x1a8, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x1ac, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x1b0, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x1b4, 4, 1, file);
-                present = field_0x58[i]->field_0x100[0] != 0;
+            fwrite(definitionTable[i]->billboardName, length, 1, file);
+            fwrite(&definitionTable[i]->meanHeight, 4, 1, file);
+            fwrite(&definitionTable[i]->minHeight, 4, 1, file);
+            fwrite(&definitionTable[i]->maxHeight, 4, 1, file);
+            fwrite(&definitionTable[i]->meanRadius, 4, 1, file);
+            fwrite(&definitionTable[i]->minRadius, 4, 1, file);
+            fwrite(&definitionTable[i]->maxRadius, 4, 1, file);
+            fwrite(&definitionTable[i]->uLeft, 4, 1, file);
+            fwrite(&definitionTable[i]->uRight, 4, 1, file);
+            fwrite(&definitionTable[i]->vBottom, 4, 1, file);
+            fwrite(&definitionTable[i]->uCenter, 4, 1, file);
+            fwrite(&definitionTable[i]->vTop, 4, 1, file);
+            fwrite(&definitionTable[i]->usePlanarLighting, 4, 1, file);
+            fwrite(&definitionTable[i]->blendLods, 4, 1, file);
+            fwrite(&definitionTable[i]->keyColor, 4, 1, file);
+            if (method == 2) {
+                fwrite(&definitionTable[i]->percentBias, 4, 1, file);
+                fwrite(&definitionTable[i]->meanSlope, 4, 1, file);
+                fwrite(&definitionTable[i]->standardDeviationSlope, 4, 1, file);
+                fwrite(&definitionTable[i]->meanAspect, 4, 1, file);
+                fwrite(&definitionTable[i]->standardDeviationAspect, 4, 1, file);
+                fwrite(&definitionTable[i]->meanDrainage, 4, 1, file);
+                fwrite(&definitionTable[i]->standardDeviationDrainage, 4, 1, file);
+                fwrite(&definitionTable[i]->meanAltitude, 4, 1, file);
+                fwrite(&definitionTable[i]->standardDeviationAltitude, 4, 1, file);
+                present = definitionTable[i]->probabilityTga[0] != 0;
                 fwrite(&present, 1, 1, file);
                 if (present) {
-                    length = strlen(field_0x58[i]->field_0x100) + 1;
+                    length = strlen(definitionTable[i]->probabilityTga) + 1;
                     fwrite(&length, 1, 1, file);
-                    fwrite(field_0x58[i]->field_0x100, length, 1, file);
+                    fwrite(definitionTable[i]->probabilityTga, length, 1, file);
                 }
             }
-            fwrite(&field_0x58[i]->field_0x204, 4, 1, file);
-            for (j = 0; j < field_0x58[i]->field_0x204; j++) {
-                fwrite(&field_0x58[i]->field_0x208[j].field_0x00, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x208[j].field_0x04, 0xc, 1, file);
-                fwrite(&field_0x58[i]->field_0x208[j].field_0x10, 0xc, 1, file);
-                fwrite(&field_0x58[i]->field_0x208[j].field_0x1c, 4, 1, file);
-                fwrite(&field_0x58[i]->field_0x208[j].field_0x20, 4, 1, file);
+            fwrite(&definitionTable[i]->collisionCount, 4, 1, file);
+            for (j = 0; j < definitionTable[i]->collisionCount; j++) {
+                fwrite(&definitionTable[i]->collisionDefinitions[j].type, 4, 1, file);
+                fwrite(&definitionTable[i]->collisionDefinitions[j].start, 0xc, 1, file);
+                fwrite(&definitionTable[i]->collisionDefinitions[j].end, 0xc, 1, file);
+                fwrite(&definitionTable[i]->collisionDefinitions[j].radius, 4, 1, file);
+                fwrite(&definitionTable[i]->collisionDefinitions[j].height, 4, 1, file);
             }
         }
     }
-    present = field_0x45c[0] != 0;
+    present = placementBmp[0] != 0;
     fwrite(&present, 1, 1, file);
     if (present) {
-        length = strlen(field_0x45c) + 1;
+        length = strlen(placementBmp) + 1;
         fwrite(&length, 1, 1, file);
-        fwrite(field_0x45c, length, 1, file);
+        fwrite(placementBmp, length, 1, file);
     }
-    if (field_0x30 == 2) {
-        fwrite(&field_0x458, 4, 1, file);
-        present = field_0x4dc[0] != 0;
+    if (method == 2) {
+        fwrite(&northAngle, 4, 1, file);
+        present = probabilityTga[0] != 0;
         fwrite(&present, 1, 1, file);
         if (present) {
-            length = strlen(field_0x4dc) + 1;
+            length = strlen(probabilityTga) + 1;
             fwrite(&length, 1, 1, file);
-            fwrite(field_0x4dc, length, 1, file);
+            fwrite(probabilityTga, length, 1, file);
         }
     }
-    fwrite(&field_0x55c, 4, 1, file);
-    for (i = 0; i < field_0x55c; i++) {
-        unsigned char definition = field_0x38[i].field_0x12;
+    fwrite(&placedCount, 4, 1, file);
+    for (i = 0; i < placedCount; i++) {
+        unsigned char definition = vegetation[i].definitionIndex;
         fwrite(&definition, 1, 1, file);
-        fwrite(&field_0x38[i].field_0x0c, 6, 1, file);
-        fwrite(&field_0x38[i].field_0x14, 1, 1, file);
-        fwrite(&field_0x38[i].field_0x15, 1, 1, file);
+        fwrite(&vegetation[i].quantizedPosition, 6, 1, file);
+        fwrite(&vegetation[i].heightParam, 1, 1, file);
+        fwrite(&vegetation[i].radiusParam, 1, 1, file);
     }
     fclose(file);
-    UnknownFunction458da0(path);
+    WriteListing(path);
     return 1;
 }
 
 // 0x00458f70: reads the .esb (the stream's own, the archive's, or a new one).
-int EcoSystem::UnknownFunction458f70(const char* path, UnknownTextureStream* stream) {
+int EcoSystem::ReadEsb(const char* path, UnknownTextureStream* stream) {
     unsigned char present;
     unsigned char length;
     int i;
-    field_0x594 = 0;
+    esbStreamInArchive = 0;
     if (!stream) {
         UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(path, 1);
         if (!entry) {
@@ -387,85 +388,85 @@ int EcoSystem::UnknownFunction458f70(const char* path, UnknownTextureStream* str
             }
         } else {
             stream = entry->field_0x14;
-            field_0x594 = 1;
+            esbStreamInArchive = 1;
         }
     } else {
-        field_0x594 = 1;
+        esbStreamInArchive = 1;
     }
-    field_0x590 = stream;
-    stream->UnknownFunction461640(&field_0x30, 4, 1);
+    esbStream = stream;
+    stream->UnknownFunction461640(&method, 4, 1);
     for (i = 0; i < 256; i++) {
         stream->UnknownFunction461640(&present, 1, 1);
         if (present) {
             int j;
             stream->UnknownFunction461640(&length, 1, 1);
-            field_0x58[i] = new(__FILE__, 0x543) UnknownEcoDefinition;
-            stream->UnknownFunction461640(field_0x58[i]->field_0x000, length, 1);
+            definitionTable[i] = new(__FILE__, 0x543) UnknownEcoDefinition;
+            stream->UnknownFunction461640(definitionTable[i]->name, length, 1);
             stream->UnknownFunction461640(&length, 1, 1);
-            stream->UnknownFunction461640(field_0x58[i]->field_0x080, length, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x180, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x184, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x188, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x18c, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x190, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x194, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x1b8, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x1bc, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x1c4, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x1c0, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x1c8, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x1f8, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x1fc, 4, 1);
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x1dc, 4, 1);
-            if (field_0x30 == 2) {
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x200, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x198, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x19c, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x1a0, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x1a4, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x1a8, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x1ac, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x1b0, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x1b4, 4, 1);
+            stream->UnknownFunction461640(definitionTable[i]->billboardName, length, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->meanHeight, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->minHeight, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->maxHeight, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->meanRadius, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->minRadius, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->maxRadius, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->uLeft, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->uRight, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->vBottom, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->uCenter, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->vTop, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->usePlanarLighting, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->blendLods, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->keyColor, 4, 1);
+            if (method == 2) {
+                stream->UnknownFunction461640(&definitionTable[i]->percentBias, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->meanSlope, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->standardDeviationSlope, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->meanAspect, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->standardDeviationAspect, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->meanDrainage, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->standardDeviationDrainage, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->meanAltitude, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->standardDeviationAltitude, 4, 1);
                 stream->UnknownFunction461640(&present, 1, 1);
                 if (present) {
                     stream->UnknownFunction461640(&length, 1, 1);
-                    stream->UnknownFunction461640(field_0x58[i]->field_0x100, length, 1);
+                    stream->UnknownFunction461640(definitionTable[i]->probabilityTga, length, 1);
                 }
             }
-            stream->UnknownFunction461640(&field_0x58[i]->field_0x204, 4, 1);
-            field_0x58[i]->field_0x208 = (UnknownEcoCollisionDefinition*)DebugMalloc(
-                field_0x58[i]->field_0x204 * sizeof(UnknownEcoCollisionDefinition), __FILE__, 0x56d);
-            for (j = 0; j < field_0x58[i]->field_0x204; j++) {
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x208[j].field_0x00, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x208[j].field_0x04, 0xc, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x208[j].field_0x10, 0xc, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x208[j].field_0x1c, 4, 1);
-                stream->UnknownFunction461640(&field_0x58[i]->field_0x208[j].field_0x20, 4, 1);
+            stream->UnknownFunction461640(&definitionTable[i]->collisionCount, 4, 1);
+            definitionTable[i]->collisionDefinitions = (UnknownEcoCollisionDefinition*)DebugMalloc(
+                definitionTable[i]->collisionCount * sizeof(UnknownEcoCollisionDefinition), __FILE__, 0x56d);
+            for (j = 0; j < definitionTable[i]->collisionCount; j++) {
+                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].type, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].start, 0xc, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].end, 0xc, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].radius, 4, 1);
+                stream->UnknownFunction461640(&definitionTable[i]->collisionDefinitions[j].height, 4, 1);
             }
         }
     }
     stream->UnknownFunction461640(&present, 1, 1);
     if (present) {
         stream->UnknownFunction461640(&length, 1, 1);
-        stream->UnknownFunction461640(field_0x45c, length, 1);
+        stream->UnknownFunction461640(placementBmp, length, 1);
     }
-    if (field_0x30 == 2) {
-        stream->UnknownFunction461640(&field_0x458, 4, 1);
+    if (method == 2) {
+        stream->UnknownFunction461640(&northAngle, 4, 1);
         stream->UnknownFunction461640(&present, 1, 1);
         if (present) {
             stream->UnknownFunction461640(&length, 1, 1);
-            stream->UnknownFunction461640(field_0x4dc, length, 1);
+            stream->UnknownFunction461640(probabilityTga, length, 1);
         }
     }
-    stream->UnknownFunction461640(&field_0x55c, 4, 1);
-    field_0x34 = field_0x55c;
+    stream->UnknownFunction461640(&placedCount, 4, 1);
+    totalObjects = placedCount;
     return 1;
 }
 
 // 0x004594c0
 void EcoSystem::UnknownFunction4594c0(int level) {
-    field_0x5c0 = level;
+    detailLevel = level;
 }
 
 // 0x004594d0
@@ -476,107 +477,107 @@ EcoSystem* EcoSystem::UnknownFunction4594d0(void* view, TextureMapManager* textu
     GameObject::UnknownVirtualSlot8(view);
     g_UnknownGlobal59af14 = g_UnknownGlobal56e26c->field_0x2d0 ? g_UnknownGlobal56a600 : g_UnknownGlobal56a740;
     UnknownFunction4594c0(level);
-    field_0x44 = terrain;
-    field_0x48 = textures;
-    field_0x4c = lights;
-    field_0x560 = textureFormat;
+    groundTerrain = terrain;
+    textureManager = textures;
+    lightManager = lights;
+    billboardFormat = textureFormat;
     float size = g_collisionQuadTree->field_0x54;
     float width = g_collisionQuadTree->field_0x50;
     if (width > size)
         size = width;
-    field_0x5ac = 65536.0f / size;
-    field_0x5a8 = size * (1.0f / 65536.0f);
-    field_0x59c = new(__FILE__, 0x5ca) AgeManager;
+    coordinatesPerUnit = 65536.0f / size;
+    unitsPerCoordinate = size * (1.0f / 65536.0f);
+    ageManager = new(__FILE__, 0x5ca) AgeManager;
     UnknownFunction45a9a0();
-    if (!UnknownFunction457480(path, stream)) {
+    if (!ReadEst(path, stream)) {
         Release();
         return 0;
     }
     for (i = 0; i < 256; i++) {
-        if (field_0x58[i]) {
-            field_0x58[i]->UnknownFunction456050(textures, g_UnknownGlobal59af14[field_0x5c0].field_0x08);
+        if (definitionTable[i]) {
+            definitionTable[i]->LoadModel(textures, g_UnknownGlobal59af14[detailLevel].modelFlags);
             if (collisions)
-                UnknownFunction457ed0(field_0x58[i]);
+                BuildCollisionObjects(definitionTable[i]);
             else
-                field_0x58[i]->field_0x204 = 0;
+                definitionTable[i]->collisionCount = 0;
         }
     }
-    field_0x599 = g_TypeRegistry->FindTypeId("Vegetation");
-    field_0x38 = new(__FILE__, 0x5eb) Vegetation[field_0x34];
-    field_0x3c = (Vegetation**)DebugMalloc(0x1f40, __FILE__, 0x5ec);
-    field_0x40 = (Vegetation**)DebugMalloc(0x190, __FILE__, 0x5ed);
-    field_0x5b0 = 2000;
-    field_0x5b4 = 100;
-    field_0x50 = (UnknownEcoVertex*)DebugMalloc(0x5a00, __FILE__, 0x5f1);
-    field_0x54 = (unsigned short*)DebugMalloc(0xb40, __FILE__, 0x5f2);
+    vegetationTypeId = g_TypeRegistry->FindTypeId("Vegetation");
+    vegetation = new(__FILE__, 0x5eb) Vegetation[totalObjects];
+    billboardList = (Vegetation**)DebugMalloc(0x1f40, __FILE__, 0x5ec);
+    geometryList = (Vegetation**)DebugMalloc(0x190, __FILE__, 0x5ed);
+    billboardCapacity = 2000;
+    geometryCapacity = 100;
+    billboardVertices = (UnknownEcoVertex*)DebugMalloc(0x5a00, __FILE__, 0x5f1);
+    billboardIndices = (unsigned short*)DebugMalloc(0xb40, __FILE__, 0x5f2);
     for (i = 0; i < 720; i++) {
-        field_0x50[i].reserved = 0;
-        field_0x50[i].specular = 0;
+        billboardVertices[i].reserved = 0;
+        billboardVertices[i].specular = 0;
     }
     int index = 0;
     for (i = 0; i < 120; i++) {
-        field_0x54[index++] = i * 6;
-        field_0x54[index++] = i * 6 + 4;
-        field_0x54[index++] = i * 6 + 5;
-        field_0x54[index++] = i * 6;
-        field_0x54[index++] = i * 6 + 5;
-        field_0x54[index++] = i * 6 + 3;
-        field_0x54[index++] = i * 6 + 4;
-        field_0x54[index++] = i * 6 + 1;
-        field_0x54[index++] = i * 6 + 2;
-        field_0x54[index++] = i * 6 + 4;
-        field_0x54[index++] = i * 6 + 2;
-        field_0x54[index++] = i * 6 + 5;
+        billboardIndices[index++] = i * 6;
+        billboardIndices[index++] = i * 6 + 4;
+        billboardIndices[index++] = i * 6 + 5;
+        billboardIndices[index++] = i * 6;
+        billboardIndices[index++] = i * 6 + 5;
+        billboardIndices[index++] = i * 6 + 3;
+        billboardIndices[index++] = i * 6 + 4;
+        billboardIndices[index++] = i * 6 + 1;
+        billboardIndices[index++] = i * 6 + 2;
+        billboardIndices[index++] = i * 6 + 4;
+        billboardIndices[index++] = i * 6 + 2;
+        billboardIndices[index++] = i * 6 + 5;
     }
     if (strstr(path, ".esb")) {
-        UnknownFunction4598d0();
+        PlaceStoredObjects();
     } else {
-        if (field_0x30 == 1)
-            UnknownFunction459b40();
+        if (method == 1)
+            PlaceAuthoredObjects();
         else
-            UnknownFunction459ce0(UnknownFunction511ad0(textureFormat));
-        UnknownFunction4587b0(path);
+            GenerateObjects(UnknownFunction511ad0(textureFormat));
+        WriteEsb(path);
     }
     return this;
 }
 
 // 0x0045a9a0
 void EcoSystem::UnknownFunction45a9a0() {
-    UnknownEcoLight* light = field_0x4c->UnknownFunction4a0190(6);
+    UnknownEcoLight* light = lightManager->UnknownFunction4a0190(6);
     if (light) {
-        field_0x570.x = light->field_0x54[0];
-        field_0x570.y = light->field_0x54[1];
-        field_0x570.z = light->field_0x54[2];
+        ambientLight.x = light->field_0x54[0];
+        ambientLight.y = light->field_0x54[1];
+        ambientLight.z = light->field_0x54[2];
     } else {
-        field_0x570.z = 0.0f;
-        field_0x570.y = 0.0f;
-        field_0x570.x = 0.0f;
+        ambientLight.z = 0.0f;
+        ambientLight.y = 0.0f;
+        ambientLight.x = 0.0f;
     }
-    light = field_0x4c->UnknownFunction4a0190(4);
+    light = lightManager->UnknownFunction4a0190(4);
     if (!light) {
-        light = field_0x4c->UnknownFunction4a0190(2);
+        light = lightManager->UnknownFunction4a0190(2);
         if (!light) {
-            field_0x564.z = 0.0f;
-            field_0x564.y = 0.0f;
-            field_0x564.x = 0.0f;
+            lightColor.z = 0.0f;
+            lightColor.y = 0.0f;
+            lightColor.x = 0.0f;
             return;
         }
     }
-    field_0x564.x = light->field_0x54[0];
-    field_0x564.y = light->field_0x54[1];
-    field_0x564.z = light->field_0x54[2];
-    field_0x57c.x = light->field_0x70.x;
-    field_0x57c.y = 0.0f;
-    field_0x57c.z = light->field_0x70.z;
-    float length = UnknownSquareMagnitude(&field_0x57c);
+    lightColor.x = light->field_0x54[0];
+    lightColor.y = light->field_0x54[1];
+    lightColor.z = light->field_0x54[2];
+    lightDirection.x = light->field_0x70.x;
+    lightDirection.y = 0.0f;
+    lightDirection.z = light->field_0x70.z;
+    float length = UnknownSquareMagnitude(&lightDirection);
     if (length == 0.0f) {
-        field_0x57c = kVec3Zero;
+        lightDirection = kVec3Zero;
         return;
     }
     length = FastInvSqrt(length);
-    field_0x57c.x = length * field_0x57c.x;
-    field_0x57c.y = length * field_0x57c.y;
-    field_0x57c.z = length * field_0x57c.z;
+    lightDirection.x = length * lightDirection.x;
+    lightDirection.y = length * lightDirection.y;
+    lightDirection.z = length * lightDirection.z;
 }
 
 // 0x0045aad0
@@ -585,64 +586,64 @@ int EcoSystem::UnknownVirtualSlot12() {
         return 1;
     int category = g_MemTagStack->Push("EcoSystem");
     unsigned int start = ReadClock();
-    if (!field_0x34)
+    if (!totalObjects)
         return 1;
-    if (field_0x59c) {
+    if (ageManager) {
         int stale;
-        int total = field_0x59c->UnknownFunction401130(&stale);
+        int total = ageManager->UnknownFunction401130(&stale);
         if (stale > 0x40000)
-            field_0x59c->UnknownFunction4011b0(total - stale);
-        field_0x59c->UnknownFunction401040();
+            ageManager->UnknownFunction4011b0(total - stale);
+        ageManager->UnknownFunction401040();
     }
     g_UnknownGlobal59af00 = &ECO_VIEW->field_0x08->field_0xac;
-    field_0x5b8 = 65535.0f / ECO_VIEW->field_0x08->field_0x1c0;
-    field_0x5bc = ECO_VIEW->field_0x08->field_0x1c0 * (1.0f / 65535.0f);
-    field_0x5a0 = 0;
-    field_0x5a4 = 0;
+    depthScale = 65535.0f / ECO_VIEW->field_0x08->field_0x1c0;
+    depthUnit = ECO_VIEW->field_0x08->field_0x1c0 * (1.0f / 65535.0f);
+    billboardCount = 0;
+    geometryCount = 0;
     g_collisionQuadTree->RestartQuery();
     Vegetation* object = (Vegetation*)g_collisionQuadTree->NextObjectSorted();
     while (object) {
-        if (object->field_0x08 == field_0x599) {
-            int billboard = object->field_0x16_bit0;
-            int fade = object->field_0x13;
-            object->UnknownFunction456890(&billboard, &fade);
-            UnknownEcoDefinition* definition = field_0x58[object->field_0x12];
+        if (object->field_0x08 == vegetationTypeId) {
+            int billboard = object->isBillboard;
+            int fade = object->fadeLevel;
+            object->TestDistance(&billboard, &fade);
+            UnknownEcoDefinition* definition = definitionTable[object->definitionIndex];
             int visible = 1;
             if (!billboard) {
-                float radius = definition->UnknownFunction455ff0(object->field_0x15);
-                float height = definition->UnknownFunction455f90(object->field_0x14) * 0.5;
+                float radius = definition->RadiusForParameter(object->radiusParam);
+                float height = definition->HeightForParameter(object->heightParam) * 0.5;
                 Vector3 center;
                 if (radius <= height)
                     radius = height;
-                center.x = object->field_0x0c.x * g_UnknownGlobal59aebc->field_0x5a8;
-                center.y = object->field_0x0c.y * g_UnknownGlobal59aebc->field_0x5a8 + height;
-                center.z = object->field_0x0c.z * g_UnknownGlobal59aebc->field_0x5a8;
+                center.x = object->quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+                center.y = object->quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate + height;
+                center.z = object->quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
                 visible = g_visibilityClipper->SphereInFrustum(ECO_VIEW->field_0x08, &ECO_VIEW->field_0x08->field_0xec,
                                                                &center, radius, 0);
             }
             if (visible) {
-                object->UnknownFunction456a10(billboard, fade);
-                if (object->field_0x13) {
-                    if (field_0x5a0 == field_0x5b0) {
-                        Vegetation** old = field_0x3c;
-                        field_0x3c = (Vegetation**)DebugRealloc(old, (field_0x5b0 + 100) * sizeof(Vegetation*),
+                object->SetBillboard(billboard, fade);
+                if (object->fadeLevel) {
+                    if (billboardCount == billboardCapacity) {
+                        Vegetation** old = billboardList;
+                        billboardList = (Vegetation**)DebugRealloc(old, (billboardCapacity + 100) * sizeof(Vegetation*),
                                                                 __FILE__, 0x8dd);
-                        if (field_0x3c != old)
-                            field_0x5b0 += 100;
+                        if (billboardList != old)
+                            billboardCapacity += 100;
                     }
-                    field_0x3c[field_0x5a0] = object;
-                    field_0x5a0++;
+                    billboardList[billboardCount] = object;
+                    billboardCount++;
                 }
-                if (object->field_0x16_bit0 < definition->field_0x1d8) {
-                    if (field_0x5a4 == field_0x5b4) {
-                        Vegetation** old = field_0x40;
-                        field_0x40 = (Vegetation**)DebugRealloc(old, (field_0x5b4 + 20) * sizeof(Vegetation*),
+                if (object->isBillboard < definition->lodCount) {
+                    if (geometryCount == geometryCapacity) {
+                        Vegetation** old = geometryList;
+                        geometryList = (Vegetation**)DebugRealloc(old, (geometryCapacity + 20) * sizeof(Vegetation*),
                                                                 __FILE__, 0x8ea);
-                        if (field_0x40 != old)
-                            field_0x5b4 += 20;
+                        if (geometryList != old)
+                            geometryCapacity += 20;
                     }
-                    field_0x40[field_0x5a4] = object;
-                    field_0x5a4++;
+                    geometryList[geometryCount] = object;
+                    geometryCount++;
                 }
             }
         }
@@ -654,69 +655,69 @@ int EcoSystem::UnknownVirtualSlot12() {
 }
 
 // 0x0045ade0: the render and texture-stage states for `format`.
-void EcoSystem::UnknownFunction45ade0(int format) {
+void EcoSystem::SetRenderStates(int format) {
     float alphaReference;
-    if (format == 0x613) {
+    if (format == 1555) {
         alphaReference = (float)(g_UnknownGlobal56e26c->field_0x2d0 ? 0 : 0xc0);
-        ECO_VIEW->UnknownVirtualSlot8(0x1b, 0, 0);
-        ECO_VIEW->UnknownVirtualSlot8(0x29, 0, 0);
-    } else if (format == 0x115c || format == 0x22b8) {
+        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
+    } else if (format == 4444 || format == 8888) {
         alphaReference = 0.0f;
-        ECO_VIEW->UnknownVirtualSlot8(0x1b, 1, 0);
-        ECO_VIEW->UnknownVirtualSlot8(0x29, 0, 0);
+        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 1, 0);
+        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 0, 0);
     } else {
         alphaReference = 0.0f;
-        ECO_VIEW->UnknownVirtualSlot8(0x1b, 0, 0);
-        ECO_VIEW->UnknownVirtualSlot8(0x29, 1, 0);
+        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 0);
+        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_COLORKEYENABLE, 1, 0);
     }
     ECO_VIEW->UnknownVirtualSlot18((int)alphaReference);
-    if (g_UnknownGlobal59af14[field_0x5c0].field_0x14) {
-        ECO_VIEW->UnknownVirtualSlot7(0, 1, 4);
-        ECO_VIEW->UnknownVirtualSlot7(0, 2, 2);
-        ECO_VIEW->UnknownVirtualSlot7(0, 3, 0);
-        if (g_UnknownGlobal59af14[field_0x5c0].field_0x18)
-            ECO_VIEW->UnknownVirtualSlot8(9, 2, 0);
+    if (g_UnknownGlobal59af14[detailLevel].stageLighting) {
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+        if (g_UnknownGlobal59af14[detailLevel].specular)
+            ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 0);
         else
-            ECO_VIEW->UnknownVirtualSlot8(9, 1, 0);
-        if (format == 0x115c || format == 0x22b8) {
-            ECO_VIEW->UnknownVirtualSlot7(0, 4, 4);
-            ECO_VIEW->UnknownVirtualSlot7(0, 5, 2);
-            ECO_VIEW->UnknownVirtualSlot7(0, 6, 0);
+            ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
+        if (format == 4444 || format == 8888) {
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
         } else {
-            ECO_VIEW->UnknownVirtualSlot7(0, 4, 2);
-            ECO_VIEW->UnknownVirtualSlot7(0, 5, 2);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         }
     } else {
-        ECO_VIEW->UnknownVirtualSlot7(0, 1, 2);
-        ECO_VIEW->UnknownVirtualSlot7(0, 2, 2);
-        ECO_VIEW->UnknownVirtualSlot8(9, 1, 0);
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 0);
         // Both arms are the same in retail (the second is reached by jump
         // threading from the format test below).
-        if (format == 0x115c) {
-            ECO_VIEW->UnknownVirtualSlot7(0, 4, 2);
-            ECO_VIEW->UnknownVirtualSlot7(0, 5, 2);
+        if (format == 4444) {
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         } else {
-            ECO_VIEW->UnknownVirtualSlot7(0, 4, 2);
-            ECO_VIEW->UnknownVirtualSlot7(0, 5, 2);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
         }
     }
-    if (format == 0x613) {
-        ECO_VIEW->UnknownVirtualSlot7(0, 0x12, 1);
+    if (format == 1555) {
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
         if (g_UnknownGlobal56e26c->field_0x2d0) {
-            ECO_VIEW->UnknownVirtualSlot7(0, 0x10, 1);
-            ECO_VIEW->UnknownVirtualSlot7(0, 0x11, 1);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_POINT);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_POINT);
         } else {
-            ECO_VIEW->UnknownVirtualSlot7(0, 0x10, 2);
-            ECO_VIEW->UnknownVirtualSlot7(0, 0x11, 2);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+            ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_LINEAR);
         }
-    } else if (format == 0x115c) {
-        ECO_VIEW->UnknownVirtualSlot7(0, 0x12, 1);
-        ECO_VIEW->UnknownVirtualSlot7(0, 0x10, 2);
-        ECO_VIEW->UnknownVirtualSlot7(0, 0x11, 2);
+    } else if (format == 4444) {
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_LINEAR);
     } else {
-        ECO_VIEW->UnknownVirtualSlot7(0, 0x12, 1);
-        ECO_VIEW->UnknownVirtualSlot7(0, 0x10, 2);
-        ECO_VIEW->UnknownVirtualSlot7(0, 0x11, 2);
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, D3DTFP_NONE);
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
+        ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, D3DTFN_LINEAR);
     }
 }
 

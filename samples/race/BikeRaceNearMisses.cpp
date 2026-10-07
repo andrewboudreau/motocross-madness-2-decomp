@@ -77,28 +77,28 @@ int BikeRace::UnknownFunction41eb20(int caster) {
         if (g_UnknownGlobal56e26c->field_0x18 > 1) {
             UnknownFunctionCameraView()->field_0x3b0->field_0x3bc->UnknownFunction4fdb50();
             UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdb50();
-            UnknownFunctionCameraView()->UnknownFunctionFollow(field_0x03c[field_0x14c]);
+            UnknownFunctionCameraView()->UnknownFunctionFollow(racerSlots[field_0x14c]);
             if (field_0x05c != 0) {
                 field_0x05c->UnknownFunction4dab90();
-                field_0x05c->UnknownFunction4dab00(field_0x03c[field_0x14c]->field_0x3bc);
-                field_0x05c->UnknownFunction4dab00(field_0x03c[field_0x14c]->field_0x5c4->field_0x1a0);
+                field_0x05c->UnknownFunction4dab00(racerSlots[field_0x14c]->field_0x3bc);
+                field_0x05c->UnknownFunction4dab00(racerSlots[field_0x14c]->field_0x5c4->field_0x1a0);
             }
             if (g_UnknownGlobal56e26c->field_0x560 != 0) {
-                UnknownBikeRaceRacer* racer = field_0x03c[field_0x14c];
+                UnknownBikeRaceRacer* racer = racerSlots[field_0x14c];
                 g_UnknownGlobal56e26c->field_0x560->UnknownFunction404df0(racer->field_0x7b8,
                                                                           racer->field_0x7bc, racer);
             }
         } else if (field_0x14c == 0) {
             UnknownFunctionCameraView()->field_0x3b0->field_0x3bc->UnknownFunction4fdb50();
             UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdb50();
-            UnknownFunctionCameraView()->UnknownFunctionFollow(field_0x038);
+            UnknownFunctionCameraView()->UnknownFunctionFollow(localRacer);
             if (field_0x05c != 0) {
                 field_0x05c->UnknownFunction4dab90();
-                field_0x05c->UnknownFunction4dab00(field_0x038->field_0x3bc);
-                field_0x05c->UnknownFunction4dab00(field_0x038->field_0x5c4->field_0x1a0);
+                field_0x05c->UnknownFunction4dab00(localRacer->field_0x3bc);
+                field_0x05c->UnknownFunction4dab00(localRacer->field_0x5c4->field_0x1a0);
             }
             if (g_UnknownGlobal56e26c->field_0x560 != 0) {
-                UnknownBikeRaceRacer* racer = field_0x038;
+                UnknownBikeRaceRacer* racer = localRacer;
                 g_UnknownGlobal56e26c->field_0x560->UnknownFunction404df0(racer->field_0x7b8,
                                                                           racer->field_0x7bc, racer);
             }
@@ -106,14 +106,14 @@ int BikeRace::UnknownFunction41eb20(int caster) {
             UnknownFunctionCameraView()->field_0x3b0->field_0x3bc->UnknownFunction4fdb50();
             UnknownFunctionCameraView()->field_0x3b0->field_0x5c4->field_0x1a0->UnknownFunction4fdb50();
             int index = field_0x14c - 1;
-            UnknownFunctionCameraView()->UnknownFunctionFollow(field_0x040[index]);
+            UnknownFunctionCameraView()->UnknownFunctionFollow(aiRacers[index]);
             if (field_0x05c != 0) {
                 field_0x05c->UnknownFunction4dab90();
-                field_0x05c->UnknownFunction4dab00(field_0x040[index]->field_0x3bc);
-                field_0x05c->UnknownFunction4dab00(field_0x040[index]->field_0x5c4->field_0x1a0);
+                field_0x05c->UnknownFunction4dab00(aiRacers[index]->field_0x3bc);
+                field_0x05c->UnknownFunction4dab00(aiRacers[index]->field_0x5c4->field_0x1a0);
             }
             if (g_UnknownGlobal56e26c->field_0x560 != 0) {
-                UnknownBikeRaceRacer* racer = field_0x040[index];
+                UnknownBikeRaceRacer* racer = aiRacers[index];
                 g_UnknownGlobal56e26c->field_0x560->UnknownFunction404df0(racer->field_0x7b8,
                                                                           racer->field_0x7bc, racer);
             }
@@ -122,23 +122,23 @@ int BikeRace::UnknownFunction41eb20(int caster) {
     if (caster) {
         field_0x0b0 = 0;
         field_0x0ac = field_0x154;
-        if (field_0x058->field_0xb8 != 0 && field_0x058->field_0xb8->field_0x00 > 0) {
+        if (raceScene->field_0xb8 != 0 && raceScene->field_0xb8->field_0x00 > 0) {
             if (field_0x05c != 0) {
                 field_0x05c->UnknownFunction4dab90();
             }
             UnknownFunctionCameraView()->UnknownFunctionTargetCaster(
-                field_0x058->field_0xb8->field_0x04[field_0x154].field_0x04);
+                raceScene->field_0xb8->field_0x04[field_0x154].field_0x04);
         } else {
             UnknownFunctionCameraView()->field_0x390 = 1;
         }
     } else {
         field_0x0b0 = 1;
         field_0x0ac = field_0x150;
-        if (field_0x058->field_0xb4 != 0 && field_0x058->field_0xb4->field_0x00 != 0) {
+        if (raceScene->field_0xb4 != 0 && raceScene->field_0xb4->field_0x00 != 0) {
             if (field_0x05c != 0) {
                 field_0x05c->UnknownFunction4dab90();
             }
-            UnknownSceneEntry* entry = &field_0x058->field_0xb4->field_0x04[field_0x150];
+            UnknownSceneEntry* entry = &raceScene->field_0xb4->field_0x04[field_0x150];
             if (entry->field_0x00_bit3) {
                 UnknownBikeRaceSceneCharacter* character =
                     (UnknownBikeRaceSceneCharacter*)entry->field_0x04;
@@ -172,12 +172,12 @@ int BikeRace::UnknownFunction41eb20(int caster) {
 inline UnknownBikeRaceRacer* BikeRace::UnknownFunctionRacerAt(int index) {
     int players = g_UnknownGlobal56e26c->field_0x18;
     if (players == 1 && index == 0) {
-        return field_0x038;
+        return localRacer;
     }
     if (players > 1 || index < players) {
-        return field_0x03c[index];
+        return racerSlots[index];
     }
-    return field_0x040[index - players];
+    return aiRacers[index - players];
 }
 
 // 0x0041f1d0
@@ -230,7 +230,7 @@ void BikeRace::UnknownFunction41f1d0(int forward, int racers, int objects) {
         } while (UnknownFunctionRacerAt(field_0x14c)->field_0x4a0 != 0);
     } else if (objects) {
         caster = 0;
-        Scene* scene = field_0x058;
+        Scene* scene = raceScene;
         if (scene->field_0xb4 == 0 || scene->field_0xb4->field_0x00 <= 0) {
             UnknownFunctionCameraView()->field_0x390 = 1;
             return;
@@ -281,7 +281,7 @@ void BikeRace::UnknownFunction41f1d0(int forward, int racers, int objects) {
         } while (hidden);
     } else {
         caster = 1;
-        UnknownSceneBuffer* casters = field_0x058->field_0xb8;
+        UnknownSceneBuffer* casters = raceScene->field_0xb8;
         if (casters == 0 || casters->field_0x00 <= 0) {
             UnknownFunctionCameraView()->field_0x390 = 1;
             return;
@@ -289,9 +289,9 @@ void BikeRace::UnknownFunction41f1d0(int forward, int racers, int objects) {
         int old = field_0x154;
         field_0x154 = forward ? old + 1 : old - 1;
         if (field_0x154 < 0) {
-            field_0x154 = field_0x058->field_0xb8->field_0x00 - 1;
+            field_0x154 = raceScene->field_0xb8->field_0x00 - 1;
         }
-        if (field_0x154 >= field_0x058->field_0xb8->field_0x00) {
+        if (field_0x154 >= raceScene->field_0xb8->field_0x00) {
             field_0x154 = 0;
         }
         if (old == field_0x154 && UnknownFunctionCameraView()->field_0x38c != 0) {
@@ -427,7 +427,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         case 0x22:
             if (UnknownFunction43caa0(0x22, 0, event, 0xc)) {
                 g_UnknownGlobal56e26c->mode.field_0xa8c = 1 - g_UnknownGlobal56e26c->mode.field_0xa8c;
-                field_0x038->field_0x5bc = g_UnknownGlobal56e26c->mode.field_0xa8c;
+                localRacer->field_0x5bc = g_UnknownGlobal56e26c->mode.field_0xa8c;
                 TextQueueOverlay* overlay = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
                 if (overlay == 0) {
                     return 1;
@@ -436,7 +436,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 char value[0x80];
                 char text[0x100];
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x140d, title, 0x80);
-                g_UnknownGlobal56e26c->UnknownFunction521970(field_0x038->field_0x5bc ? 0x1407 : 0x1408,
+                g_UnknownGlobal56e26c->UnknownFunction521970(localRacer->field_0x5bc ? 0x1407 : 0x1408,
                                                              value, 0x80);
                 sprintf(text, "%s %s", title, value);
                 UnknownMessage message(text, 1.5f);
@@ -447,7 +447,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
         case 0x30:
             if (UnknownFunction43caa0(0x30, 0, event, 0xc)) {
                 g_UnknownGlobal56e26c->mode.field_0xa90 = 1 - g_UnknownGlobal56e26c->mode.field_0xa90;
-                field_0x038->field_0x5c0 = g_UnknownGlobal56e26c->mode.field_0xa90;
+                localRacer->field_0x5c0 = g_UnknownGlobal56e26c->mode.field_0xa90;
                 TextQueueOverlay* overlay = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
                 if (overlay == 0) {
                     return 1;
@@ -456,7 +456,7 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 char value[0x80];
                 char text[0x100];
                 g_UnknownGlobal56e26c->UnknownFunction521970(0x142d, title, 0x80);
-                g_UnknownGlobal56e26c->UnknownFunction521970(field_0x038->field_0x5c0 ? 0x1407 : 0x1408,
+                g_UnknownGlobal56e26c->UnknownFunction521970(localRacer->field_0x5c0 ? 0x1407 : 0x1408,
                                                              value, 0x80);
                 sprintf(text, "%s %s", title, value);
                 UnknownMessage message(text, 1.5f);
@@ -495,12 +495,12 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                     } else if (g_UnknownGlobal567a88 > 5) {
                         g_UnknownGlobal567a88 = 2;
                     }
-                } else if (field_0x0b4 == 0) {
-                    field_0x0b4 = new (__FILE__, 0xed2) ObjectPicker(1);
-                    field_0x0b4->UnknownFunction4b0210(
+                } else if (objectPicker == 0) {
+                    objectPicker = new (__FILE__, 0xed2) ObjectPicker(1);
+                    objectPicker->UnknownFunction4b0210(
                         g_UnknownGlobal56e26c->field_0x10, 0, UnknownFunction417b00,
                         (GameCursor*)g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction486540(0)->field_0x30);
-                    if (UnknownFunction469190(field_0x0b4, -1)) {
+                    if (UnknownFunction469190(objectPicker, -1)) {
                         g_UnknownGlobal56e26c->ui->UnknownFunction499b00();
                     }
                 } else {
@@ -508,9 +508,9 @@ int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry
                 }
             }
             if (UnknownFunction43caa0(0, 1, event, 0x80000000)) {
-                int picked = field_0x0b4->UnknownFunction4b04c0();
+                int picked = objectPicker->UnknownFunction4b04c0();
                 if (picked != 0) {
-                    Scene* scene = field_0x058;
+                    Scene* scene = raceScene;
                     if (scene->field_0xb8 != 0) {
                         int count = scene->field_0xb8->field_0x00;
                         UnknownBikeRacePickCaster* casters =
@@ -600,35 +600,35 @@ static inline Vector3 Normalize(const Vector3& v) {
 // 0x004210f0
 void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, int count) {
     if (field_0x188 && count != 0) {
-        *a = Scale(field_0x170, (float)count) + field_0x164;
-        *b = field_0x17c;
+        *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
+        *b = gridDirection;
         return;
     }
     switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
     case 2:
     case 3: {
         if (field_0x144) {
-            a->x = field_0x0cc.field_0x00.x;
-            a->z = field_0x0cc.field_0x00.z;
+            a->x = startProbe.field_0x00.x;
+            a->z = startProbe.field_0x00.z;
             a->y = 0.0f;
-            b->x = field_0x0cc.field_0x0c.x;
-            b->z = field_0x0cc.field_0x0c.z;
+            b->x = startProbe.field_0x0c.x;
+            b->z = startProbe.field_0x0c.z;
             b->y = 0.0f;
         } else {
-            *a = field_0x058->field_0x70;
-            *b = Normalize(field_0x058->field_0x7c);
+            *a = raceScene->field_0x70;
+            *b = Normalize(raceScene->field_0x7c);
         }
         if (count <= 0) {
             return;
         }
         float side;
-        if (field_0x048->field_0x00 != 0 && field_0x048->field_0x00->field_0x08 != 0 &&
-            field_0x048->field_0x00->field_0x08->field_0x2c != 0 &&
-            field_0x048->field_0x00->field_0x08->field_0x2c->field_0x2c != 0) {
+        if (raceTrack->field_0x00 != 0 && raceTrack->field_0x00->field_0x08 != 0 &&
+            raceTrack->field_0x00->field_0x08->field_0x2c != 0 &&
+            raceTrack->field_0x00->field_0x08->field_0x2c->field_0x2c != 0) {
             TrackVec3 p0;
             TrackVec3 p1;
-            field_0x048->UnknownFunction518130(field_0x048->field_0x00->field_0x08, &p0);
-            field_0x048->UnknownFunction518130(field_0x048->field_0x00->field_0x08->field_0x2c, &p1);
+            raceTrack->UnknownFunction518130(raceTrack->field_0x00->field_0x08, &p0);
+            raceTrack->UnknownFunction518130(raceTrack->field_0x00->field_0x08->field_0x2c, &p1);
             if (p0.z * p1.x - p1.z * p0.x <= 0.0f) {
                 side = 1.0f;
             } else {
@@ -637,26 +637,26 @@ void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, in
         } else {
             side = -1.0f;
         }
-        field_0x17c = *b;
+        gridDirection = *b;
         *a -= Scale(*b, 4.66f);
-        field_0x170 = Vector3(b->z, 0.0f, -b->x);
-        field_0x164 = *a - Scale(Scale(Scale(field_0x170, 6.75f), field_0x04c->field_0x40), side);
-        field_0x170 *= field_0x04c->field_0x40 * 15.5f / (field_0x158 + 1) * side;
-        *a = Scale(field_0x170, (float)count) + field_0x164;
+        gridSlotStep = Vector3(b->z, 0.0f, -b->x);
+        gridFirstSlot = *a - Scale(Scale(Scale(gridSlotStep, 6.75f), field_0x04c->field_0x40), side);
+        gridSlotStep *= field_0x04c->field_0x40 * 15.5f / (racerCount + 1) * side;
+        *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
         break;
     }
     case 0:
-        *a = field_0x058->field_0x70;
-        *b = Normalize(field_0x058->field_0x7c);
+        *a = raceScene->field_0x70;
+        *b = Normalize(raceScene->field_0x7c);
         if (count <= 0) {
             return;
         }
-        field_0x17c = *b;
+        gridDirection = *b;
         *a -= Scale(*b, 4.66f);
-        field_0x170 = Vector3(b->z, 0.0f, -b->x);
-        field_0x164 = *a - Scale(field_0x170, 20.0f);
-        field_0x170 = Scale(Vector3(b->z, 0.0f, -b->x), 20.0f);
-        *a = Scale(field_0x170, (float)count) + field_0x164;
+        gridSlotStep = Vector3(b->z, 0.0f, -b->x);
+        gridFirstSlot = *a - Scale(gridSlotStep, 20.0f);
+        gridSlotStep = Scale(Vector3(b->z, 0.0f, -b->x), 20.0f);
+        *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
         break;
     case 1:
     case 5: {
@@ -671,29 +671,29 @@ void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, in
             return;
         }
         float width = owner->field_0x420[owner->field_0x0ac - 1]->field_0x50 * 1.05f;
-        float spacing = width / (field_0x158 + 1);
+        float spacing = width / (racerCount + 1);
         if (3.4f > spacing) {
             spacing = 3.4f;
         }
-        field_0x17c = *b;
-        field_0x170 = Vector3(b->z, 0.0f, -b->x);
-        field_0x164 = *a - Scale(field_0x170, width * 0.48f);
-        field_0x170 = Scale(Vector3(b->z, 0.0f, -b->x), spacing);
-        *a = Scale(field_0x170, (float)count) + field_0x164;
+        gridDirection = *b;
+        gridSlotStep = Vector3(b->z, 0.0f, -b->x);
+        gridFirstSlot = *a - Scale(gridSlotStep, width * 0.48f);
+        gridSlotStep = Scale(Vector3(b->z, 0.0f, -b->x), spacing);
+        *a = Scale(gridSlotStep, (float)count) + gridFirstSlot;
         break;
     }
     case 4:
-        *a = field_0x058->field_0x70;
-        *b = Normalize(field_0x058->field_0x7c);
+        *a = raceScene->field_0x70;
+        *b = Normalize(raceScene->field_0x7c);
         if (count <= 0) {
             return;
         }
-        field_0x17c = *b;
+        gridDirection = *b;
         *a -= Scale(*b, 4.66f);
-        field_0x170 = Vector3(b->z, 0.0f, -b->x);
-        field_0x164 = *a - Scale(field_0x170, 20.0f);
-        field_0x170 = Scale(Vector3(b->z, 0.0f, -b->x), 20.0f);
-        *a = field_0x164 + Scale(field_0x170, (float)count);
+        gridSlotStep = Vector3(b->z, 0.0f, -b->x);
+        gridFirstSlot = *a - Scale(gridSlotStep, 20.0f);
+        gridSlotStep = Scale(Vector3(b->z, 0.0f, -b->x), 20.0f);
+        *a = gridFirstSlot + Scale(gridSlotStep, (float)count);
         break;
     default:
         return;
@@ -757,18 +757,18 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     field_0x07c[10] = 100.0f;
     field_0x0b8 = 0;
     field_0x054 = (int)particles;
-    field_0x058 = scene;
+    raceScene = scene;
     field_0x05c = shadow;
     if (!g_UnknownGlobal56e26c->field_0x1cc) {
         Release();
         return 0;
     }
     field_0x04c = terrain;
-    field_0x050 = camera;
+    raceCamera = camera;
     field_0x3f8 = false;
     field_0x3f9 = false;
-    field_0x1b8 = 0;
-    field_0x1bc = 0;
+    replayTime = 0;
+    replayLength = 0;
     field_0x1d4 = 0;
     field_0x1d8 = 0;
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
@@ -777,7 +777,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     switch (mode) {
     case 2:
     case 3: {
-        COPY_TEXT(path, field_0x058->field_0xa4->terrainFile, 0x104);
+        COPY_TEXT(path, raceScene->field_0xa4->terrainFile, 0x104);
         strcpy(strrchr(path, '.'), ".tdf");
         UnknownTextureStream* stream =
             new(__FILE__, 0x193) UnknownTextureStream((int)g_UnknownResourceManager572b44);
@@ -788,15 +788,15 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             return 0;
         }
         if (stream) {
-            field_0x048 = new(__FILE__, 0x1a5) Track;
-            field_0x18d = field_0x048->UnknownFunction515ed0(stream, &field_0x0cc, &field_0x108, &field_0x144,
+            raceTrack = new(__FILE__, 0x1a5) Track;
+            trackLoaded = raceTrack->UnknownFunction515ed0(stream, &startProbe, &finishProbe, &field_0x144,
                                                              &field_0x148);
             delete stream;
         }
         if (field_0x148)
-            field_0x04c->UnknownFunction507c10(&field_0x108.field_0x00, 0, 0, 0);
+            field_0x04c->UnknownFunction507c10(&finishProbe.field_0x00, 0, 0, 0);
         if (field_0x144)
-            field_0x04c->UnknownFunction507c10(&field_0x0cc.field_0x00, 0, 0, 0);
+            field_0x04c->UnknownFunction507c10(&startProbe.field_0x00, 0, 0, 0);
         if (field_0x148 && field_0x144)
             UnknownFunction41d1e0();
         break;
@@ -813,11 +813,11 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 delete stream;
             } else if (stream) {
                 {
-                    field_0x048 = new(__FILE__, 0x1d0) Track;
-                    field_0x18d = field_0x048->UnknownFunction515ed0(stream, &field_0x0cc, &field_0x108,
+                    raceTrack = new(__FILE__, 0x1d0) Track;
+                    trackLoaded = raceTrack->UnknownFunction515ed0(stream, &startProbe, &finishProbe,
                                                                      &field_0x144, &field_0x148);
-                    if (!field_0x18d) {
-                        Track* track = field_0x048;
+                    if (!trackLoaded) {
+                        Track* track = raceTrack;
                         if (track != 0) {
                             if (track->field_0x00 != 0)
                                 track->UnknownFunction516870(&track->field_0x00);
@@ -828,7 +828,7 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 }
             }
         }
-        field_0x18d = UnknownFunction41d170(event);
+        trackLoaded = UnknownFunction41d170(event);
         break;
     }
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
@@ -836,21 +836,21 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
     UnknownFunction4210f0(&position, &direction, event, 0);
     mode = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04;
     if (mode == 3 || mode == 2) {
-        if (field_0x048) {
+        if (raceTrack) {
             if (!g_UnknownGlobal56e26c->field_0x3428) {
                 if (field_0x144) {
-                    direction.x = -field_0x0cc.field_0x0c.x;
-                    direction.z = -field_0x0cc.field_0x0c.z;
-                    point.x = field_0x0cc.field_0x00.x - direction.x * 15.0f;
-                    point.z = field_0x0cc.field_0x00.z - direction.z * 15.0f;
+                    direction.x = -startProbe.field_0x0c.x;
+                    direction.z = -startProbe.field_0x0c.z;
+                    point.x = startProbe.field_0x00.x - direction.x * 15.0f;
+                    point.z = startProbe.field_0x00.z - direction.z * 15.0f;
                 } else {
                     point = position;
                 }
                 terrain->UnknownFunction507c10(&point, &normal, 0, 0);
-                field_0x06c = (UnknownBikeRaceView6c*)field_0x058->UnknownFunction4eaec0("30SecMan.slt", &field_0x070);
+                field_0x06c = (UnknownBikeRaceView6c*)raceScene->UnknownFunction4eaec0("30SecMan.slt", &field_0x070);
                 if (field_0x06c) {
-                    field_0x058->UnknownFunction4eb040(field_0x070, 0, 0, 0);
-                    field_0x058->field_0xb4->field_0x04[field_0x070].field_0x00_bit5 = 1;
+                    raceScene->UnknownFunction4eb040(field_0x070, 0, 0, 0);
+                    raceScene->field_0xb4->field_0x04[field_0x070].field_0x00_bit5 = 1;
                     if (field_0x06c->field_0x210) {
                         field_0x06c->field_0x210->Release();
                         field_0x06c->field_0x210 = 0;
@@ -864,19 +864,19 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 if (field_0x06c)
                     field_0x06c->UnknownVirtualSlot4();
                 if (field_0x144) {
-                    point.x = field_0x0cc.field_0x00.x;
-                    point.z = field_0x0cc.field_0x00.z;
-                    direction.x = field_0x0cc.field_0x0c.x;
-                    direction.z = field_0x0cc.field_0x0c.z;
+                    point.x = startProbe.field_0x00.x;
+                    point.z = startProbe.field_0x00.z;
+                    direction.x = startProbe.field_0x0c.x;
+                    direction.z = startProbe.field_0x0c.z;
                 } else {
                     point = position;
                 }
                 terrain->UnknownFunction507c10(&point, &normal, 0, 0);
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 3) {
                     field_0x064 =
-                        (UnknownBikeRaceView6c*)field_0x058->UnknownFunction4eaec0("StartGate.slb", &field_0x068);
+                        (UnknownBikeRaceView6c*)raceScene->UnknownFunction4eaec0("StartGate.slb", &field_0x068);
                     if (field_0x064) {
-                        field_0x058->UnknownFunction4eb040(field_0x068, 0, 0, 0);
+                        raceScene->UnknownFunction4eb040(field_0x068, 0, 0, 0);
                         if (field_0x064->field_0x210) {
                             field_0x064->field_0x210->Release();
                             field_0x064->field_0x210 = 0;
@@ -894,12 +894,12 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
                 }
             }
             if (field_0x148) {
-                point.x = field_0x108.field_0x00.x;
-                point.z = field_0x108.field_0x00.z;
+                point.x = finishProbe.field_0x00.x;
+                point.z = finishProbe.field_0x00.z;
                 terrain->UnknownFunction507c10(&point, 0, 0, 0);
-                direction.x = field_0x108.field_0x0c.x;
+                direction.x = finishProbe.field_0x0c.x;
                 direction.y = 0.0f;
-                direction.z = field_0x108.field_0x0c.z;
+                direction.z = finishProbe.field_0x0c.z;
             }
 
             sprintf(name, "%s\\%s", "Res", "MetalArch.slt");
@@ -907,10 +907,10 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             arch = arch->UnknownFunction401310(field_0x18, (int)lights, (int)textures, name, kVec3Zero, 0, 0,
                                                2.0f, 0.5f, 0.5f, 0);
             UnknownFunction469190(arch, -1);
-            arch->field_0x2c->UnknownFunction4444c0(1);
-            float scale = field_0x108.field_0x24 / arch->field_0x50 * 1.111f;
-            arch->field_0x2c->UnknownFunction4fd340(scale, scale, scale);
-            arch->field_0x2c->SoultreeVirtualSlot6();
+            arch->arcadeModel->UnknownFunction4444c0(1);
+            float scale = finishProbe.field_0x24 / arch->modelWidth * 1.111f;
+            arch->arcadeModel->UnknownFunction4fd340(scale, scale, scale);
+            arch->arcadeModel->SoultreeVirtualSlot6();
             arch->UnknownFunction4014f0(&point);
             arch->UnknownFunction401520(&direction, &kVec3YAxis, 1, 0);
             arch->UnknownFunction401540(name, 0x6a, 0, 0, 0, 1);
@@ -939,15 +939,15 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 0 &&
                 g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
                 sprintf(modelName, "%s\\%s", "Res", "FlagGirl.mcf");
-                field_0x074 = (UnknownBikeRaceCharacter*)new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
-                UnknownFunction469190(field_0x074->UnknownVirtualSlot11(field_0x18, modelName, lights, textures, 1, 1),
+                flagGirl = (UnknownBikeRaceCharacter*)new(__FILE__, 0x26f) D3DIMSoultreeCharacter(1);
+                UnknownFunction469190(flagGirl->UnknownVirtualSlot11(field_0x18, modelName, lights, textures, 1, 1),
                                       -1);
-                UnknownFunction41ea60(field_0x074, 1, 2);
-                field_0x074->field_0x1a0->UnknownFunction4444c0(1);
-                field_0x074->field_0x1a0->UnknownFunction4fc630(girlPosition);
-                field_0x074->field_0x1a0->UnknownFunction4fbd70(&direction, &kVec3YAxis, 1, 0);
-                field_0x074->UnknownFunction4a8b10("Stand");
-                field_0x074->UnknownVirtualSlot7(0.001f, 0, 0);
+                UnknownFunction41ea60(flagGirl, 1, 2);
+                flagGirl->field_0x1a0->UnknownFunction4444c0(1);
+                flagGirl->field_0x1a0->UnknownFunction4fc630(girlPosition);
+                flagGirl->field_0x1a0->UnknownFunction4fbd70(&direction, &kVec3YAxis, 1, 0);
+                flagGirl->UnknownFunction4a8b10("Stand");
+                flagGirl->UnknownVirtualSlot7(0.001f, 0, 0);
             }
 
             sprintf(name, "%s\\%s", "Res", "GirlBox.slt");
@@ -955,28 +955,28 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             box = box->UnknownFunction401310(field_0x18, (int)lights, (int)textures, name, kVec3Zero, 0, 0, 2.0f,
                                              0.5f, 0.5f, 0);
             UnknownFunction469190(box, -1);
-            box->field_0x2c->UnknownFunction4444c0(1);
+            box->arcadeModel->UnknownFunction4444c0(1);
             box->UnknownFunction4014f0(&boxPosition);
             box->UnknownFunction401520(&direction, &kVec3YAxis, 1, 0);
             box->UnknownFunction401540(name, 0x6a, 0, 0, 0, 1);
-            g_UnknownGlobal56e26c->eventManager->UnknownFunction45fce0(girlPosition.x - 4.0f, girlPosition.z - 4.0f,
+            g_UnknownGlobal56e26c->eventManager->RemoveVegetationInRect(girlPosition.x - 4.0f, girlPosition.z - 4.0f,
                                                                        girlPosition.x + 4.0f, girlPosition.z + 4.0f);
         }
     } else if (mode == 0 || (mode == 4 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x148)) {
         BonusObjectManager* bonus = new(__FILE__, 0x28e) BonusObjectManager(1);
         field_0x0bc = (int)bonus->UnknownFunction48ca60(field_0x18, (int)lights, (int)textures,
-                                                        (UnknownBonusRacer*)this, (UnknownBonusCamera*)field_0x050);
+                                                        (UnknownBonusRacer*)this, (UnknownBonusCamera*)raceCamera);
         if (!UnknownFunction469190((GameObject*)field_0x0bc, -1))
             return 0;
     }
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
 
     UnknownFunction41d2a0(0.0f);
-    field_0x058->field_0x7c0 = 1;
+    raceScene->field_0x7c0 = 1;
     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00) {
         NumberObjectManager* numbers = new(__FILE__, 0x29b) NumberObjectManager(1);
         field_0x0c0 = (int)numbers->UnknownFunction48bd00(field_0x18, (int)textures, (UnknownNumberRacer*)this, 0x1e,
-                                                          (UnknownNumberCamera*)field_0x050, 3.0f);
+                                                          (UnknownNumberCamera*)raceCamera, 3.0f);
         if (!UnknownFunction469190((GameObject*)field_0x0c0, -1))
             return 0;
     }
@@ -990,30 +990,30 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
         UnknownFunction469190(field_0x060, -1);
         Vector3 axis(0.0f, 1.0f, 0.0f);
         ((ArcadeObject*)field_0x060)->UnknownFunction4017a0(axis, 75.0f);
-        ((ArcadeObject*)field_0x060)->field_0x2c->UnknownFunction4fd340(0.6f, 0.6f, 0.6f);
+        ((ArcadeObject*)field_0x060)->arcadeModel->UnknownFunction4fd340(0.6f, 0.6f, 0.6f);
     }
     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
         field_0x1a8 = new(__FILE__, 0x2b6) UnknownVcrFile(1, 2);
         if (g_UnknownGlobal56e26c->mode.field_0x25ec[0]) {
-            field_0x1a8->UnknownFunction524b80(g_UnknownGlobal56e26c->mode.field_0x25ec, "VCRgtemp.dat");
-            field_0x1a4 = new(__FILE__, 0x2b9) KrustyVCR;
+            field_0x1a8->Load(g_UnknownGlobal56e26c->mode.field_0x25ec, "VCRgtemp.dat");
+            ghostVcr = new(__FILE__, 0x2b9) KrustyVCR;
         }
-        field_0x1a0 = new(__FILE__, 0x2bd) KrustyVCR;
+        replayVcr = new(__FILE__, 0x2bd) KrustyVCR;
         field_0x1e8 = 0;
     } else if (g_UnknownGlobal56e26c->field_0x342c) {
         field_0x1a8 = new(__FILE__, 0x2c2) UnknownVcrFile(0, 1);
-        field_0x1a0 = new(__FILE__, 0x2c3) KrustyVCR;
+        replayVcr = new(__FILE__, 0x2c3) KrustyVCR;
         if (g_UnknownGlobal56e26c->field_0x3428) {
             if (g_UnknownGlobal56e26c->ui->field_0x4a8) {
-                field_0x1a0->UnknownFunction49bf10(UnknownFunction4230e0, 1, "ui\\demo.rpl", field_0x1a8);
-                UnknownFunction469190(field_0x1a0, -1);
+                replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 1, "ui\\demo.rpl", field_0x1a8);
+                UnknownFunction469190(replayVcr, -1);
             } else {
-                field_0x1a0->UnknownFunction49bf10(UnknownFunction4230e0, 1, g_UnknownGlobal56e26c->mode.field_0x26f4,
+                replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 1, g_UnknownGlobal56e26c->mode.field_0x26f4,
                                                    field_0x1a8);
-                UnknownFunction469190(field_0x1a0, -1);
+                UnknownFunction469190(replayVcr, -1);
             }
             field_0x1ec = UnknownFunctionCameraView()->field_0x244;
-            field_0x050->UnknownVirtualSlot71(1);
+            raceCamera->UnknownVirtualSlot71(1);
         }
     }
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
@@ -1024,9 +1024,9 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
 
     if (field_0x06c) {
         if (field_0x144) {
-            field_0x038->field_0x3bc->UnknownFunction4fc970(&point);
-            point.x += field_0x038->field_0x088.x * 15.0f;
-            point.z += field_0x038->field_0x088.z * 15.0f;
+            localRacer->field_0x3bc->UnknownFunction4fc970(&point);
+            point.x += localRacer->field_0x088.x * 15.0f;
+            point.z += localRacer->field_0x088.z * 15.0f;
         }
         terrain->UnknownFunction507c10(&point, 0, 0, 0);
         field_0x06c->field_0x1a0->UnknownFunction4fc630(point);
@@ -1042,75 +1042,75 @@ BikeRace* BikeRace::UnknownFunction417ed0(void* owner, void* particles, LightMan
             g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 1, 0, 0, 0, 0, 1);
         }
     }
-    if (field_0x1a0 && !g_UnknownGlobal56e26c->field_0x3428) {
+    if (replayVcr && !g_UnknownGlobal56e26c->field_0x3428) {
         g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
-            COPY_TEXT(field_0x2f4, "VCRghost.dat", 0x104);
-            field_0x1a0->UnknownFunction49bf10(UnknownFunction4230e0, 0, field_0x2f4, field_0x1a8);
-            if (field_0x1a4) {
-                COPY_TEXT(field_0x1f0, "VCRgtemp.dat", 0x104);
-                field_0x1a4->UnknownFunction49bf10(UnknownFunction4230e0, 1, field_0x1f0, field_0x1a8);
-                field_0x1c8 = field_0x1a4->UnknownFunction49c000();
-                field_0x040[0]->UnknownFunction496e20(field_0x1a4);
+            COPY_TEXT(ghostFileRecorded, "VCRghost.dat", 0x104);
+            replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 0, ghostFileRecorded, field_0x1a8);
+            if (ghostVcr) {
+                COPY_TEXT(ghostFilePlayed, "VCRgtemp.dat", 0x104);
+                ghostVcr->UnknownFunction49bf10(UnknownFunction4230e0, 1, ghostFilePlayed, field_0x1a8);
+                field_0x1c8 = ghostVcr->UnknownFunction49c000();
+                aiRacers[0]->UnknownFunction496e20(ghostVcr);
                 if (field_0x189)
-                    field_0x040[0]->UnknownVirtualSlot4();
+                    aiRacers[0]->UnknownVirtualSlot4();
                 else
-                    field_0x040[0]->UnknownVirtualSlot5();
-                UnknownFunction469190(field_0x1a4, -1);
+                    aiRacers[0]->UnknownVirtualSlot5();
+                UnknownFunction469190(ghostVcr, -1);
             }
         } else {
-            field_0x1a0->UnknownFunction49bf10(UnknownFunction4230e0, 0, "VCRtape.dat", field_0x1a8);
+            replayVcr->UnknownFunction49bf10(UnknownFunction4230e0, 0, "VCRtape.dat", field_0x1a8);
         }
-        UnknownFunction469190(field_0x1a0, -1);
-        field_0x3fc = 1;
+        UnknownFunction469190(replayVcr, -1);
+        isRecording = 1;
     }
     if (g_UnknownGlobal56e26c->field_0x18 == 1 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
         int count = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24;
-        field_0x038->UnknownRacerVirtualSlot50(1, field_0x038->UnknownRacerVirtualSlot45(), 0);
+        localRacer->UnknownRacerVirtualSlot50(1, localRacer->UnknownRacerVirtualSlot45(), 0);
         for (int i = 0; i < count; i++)
-            field_0x040[i]->UnknownRacerVirtualSlot50(1, field_0x040[i]->UnknownRacerVirtualSlot45(), 0);
+            aiRacers[i]->UnknownRacerVirtualSlot50(1, aiRacers[i]->UnknownRacerVirtualSlot45(), 0);
     }
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
 
     g_MemTagStack->Push("Audio");
     RaceSound* sound = new(__FILE__, 0x347) RaceSound(1);
-    field_0x044 = (UnknownBikeRaceViews*)sound->UnknownFunction4e23f0(field_0x18, (UnknownKrustyBikeView*)this,
-                                                                      (UnknownRaceSoundCamera*)field_0x050, 6);
+    field_0x044 = (UnknownBikeRaceViews*)sound->Create(field_0x18, (UnknownKrustyBikeView*)this,
+                                                                      (UnknownRaceSoundCamera*)raceCamera, 6);
     UnknownFunction469190((GameObject*)field_0x044, -1);
     g_MemTagStack->Push("BikeRace");
     if (g_UnknownGlobal56e26c->mode.field_0xa88) {
         g_UnknownGlobal56e26c->field_0x14->activeJoystick->UnknownMethod4c26d0(0);
         g_UnknownGlobal56e26c->field_0x14->activeJoystick->UnknownVirtualSlot5(g_UnknownGlobal56e26c->mode.field_0xa88);
-        field_0x038->UnknownRacerVirtualSlot93();
+        localRacer->UnknownRacerVirtualSlot93();
         g_UnknownGlobal56e26c->field_0x14->activeJoystick->UnknownMethod4c26d0(1);
     }
     if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04)
-        UnknownFunction4e5d00(&field_0x0c4, (UnknownKrustyBikeView*)this);
-    if (field_0x1a4)
-        field_0x038->field_0x750 = field_0x1c8;
+        BuildStatusList(&field_0x0c4, (UnknownKrustyBikeView*)this);
+    if (ghostVcr)
+        localRacer->field_0x750 = field_0x1c8;
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
 
     UnknownBikeNumberPainter* painter = new(__FILE__, 0x367) UnknownBikeNumberPainter(textures->field_0x00);
     if (g_UnknownGlobal56e26c->field_0x3428) {
-        painter->UnknownFunction417670(field_0x038->field_0x3bc, field_0x038->field_0x73c);
+        painter->UnknownFunction417670(localRacer->field_0x3bc, localRacer->field_0x73c);
         for (int i = 0; i < UnknownFunctionRacerCount() - 1; i++)
-            painter->UnknownFunction417670(field_0x040[i]->field_0x3bc, field_0x040[i]->field_0x73c);
+            painter->UnknownFunction417670(aiRacers[i]->field_0x3bc, aiRacers[i]->field_0x73c);
     } else if (g_UnknownGlobal56e26c->field_0x18 > 1) {
         for (int i = 0; i < UnknownFunctionRacerCount(); i++) {
             for (int j = 0; j < UnknownFunctionRacerCount(); j++) {
-                UnknownBikeRaceRacer* racer = field_0x03c[i];
+                UnknownBikeRaceRacer* racer = racerSlots[i];
                 UnknownTrackGameRacerSlot* slot = &g_UnknownGlobal56e26c->mode.field_0x1be4[j];
                 if (racer->field_0x11bc == slot->field_0xd4 && racer->field_0x11c0 == slot->field_0xd8)
                     painter->UnknownFunction417670(racer->field_0x3bc, slot->field_0xc0);
             }
         }
     } else {
-        painter->UnknownFunction417670(field_0x038->field_0x3bc, g_UnknownGlobal56e26c->mode.field_0x1bcc);
+        painter->UnknownFunction417670(localRacer->field_0x3bc, g_UnknownGlobal56e26c->mode.field_0x1bcc);
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
-            painter->UnknownFunction417670(field_0x040[0]->field_0x3bc, g_UnknownGlobal56e26c->mode.field_0x1bcc);
+            painter->UnknownFunction417670(aiRacers[0]->field_0x3bc, g_UnknownGlobal56e26c->mode.field_0x1bcc);
         } else {
             for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++)
-                painter->UnknownFunction417670(field_0x040[i]->field_0x3bc, field_0x040[i]->field_0x73c);
+                painter->UnknownFunction417670(aiRacers[i]->field_0x3bc, aiRacers[i]->field_0x73c);
         }
     }
     delete painter;
@@ -1161,28 +1161,28 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
 
     if (g_UnknownGlobal56e26c->field_0x3428) {
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35) {
-            field_0x158 = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35 +
+            racerCount = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35 +
                           g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28;
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 = field_0x158 - 1;
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 = racerCount - 1;
             g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35 = 0;
         } else {
-            field_0x158 = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 + g_UnknownGlobal56e26c->field_0x18;
+            racerCount = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 + g_UnknownGlobal56e26c->field_0x18;
         }
     } else {
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4)
-            field_0x158 = 1;
+            racerCount = 1;
         else
-            field_0x158 = UnknownFunctionRacerCount();
+            racerCount = UnknownFunctionRacerCount();
         recordIndex = 0;
-        if (field_0x1a0)
-            field_0x1a0->field_0x2fc = field_0x158;
+        if (replayVcr)
+            replayVcr->field_0x2fc = racerCount;
     }
     if (g_UnknownGlobal56e26c->field_0x3428 || g_UnknownGlobal56e26c->field_0x18 == 1) {
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2) {
             int ranking[11];
             UnknownFunction417bc0(ranking);
-            for (int i = 0; i < field_0x158; i++) {
-                for (int j = 0; j < field_0x158; j++) {
+            for (int i = 0; i < racerCount; i++) {
+                for (int j = 0; j < racerCount; j++) {
                     if (ranking[j] == i + 1) {
                         order[i] = j + 1;
                         break;
@@ -1190,7 +1190,7 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                 }
             }
         } else {
-            for (int i = 0; i < field_0x158; i++)
+            for (int i = 0; i < racerCount; i++)
                 order[i] = i + 1;
         }
     }
@@ -1229,30 +1229,30 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
             Release();
             return 0;
         }
-        field_0x038 = new(__FILE__, 0x42a) UnknownBikeRaceRacer(1);
-        field_0x038->UnknownFunction48fc80(owner, "", bikeFile, circuitRiderFile, lights, textures, position,
+        localRacer = new(__FILE__, 0x42a) UnknownBikeRaceRacer(1);
+        localRacer->UnknownFunction48fc80(owner, "", bikeFile, circuitRiderFile, lights, textures, position,
                                            direction, up, terrain, g_UnknownGlobal56e26c->field_0x14, 0, 0, this,
                                            g_UnknownGlobal56e26c->mode.field_0x00, 0, 0, &setup,
                                            g_UnknownGlobal56e26c->mode.field_0xa8c,
-                                           g_UnknownGlobal56e26c->mode.field_0xa90, field_0x054, field_0x058,
-                                           field_0x1a0, 0, !(circuit->field_0x464 & 2));
-        UnknownFunction469190(field_0x038, -1);
+                                           g_UnknownGlobal56e26c->mode.field_0xa90, field_0x054, raceScene,
+                                           replayVcr, 0, !(circuit->field_0x464 & 2));
+        UnknownFunction469190(localRacer, -1);
         char ownBikeTexture[0x40];
         g_UnknownGlobal56e26c->ui->UnknownFunction49b560(circuit->field_0x465[0].field_0x78, ownBikeTexture, 0x3f);
-        field_0x038->field_0x3bc->UnknownFunction444c70(0, ownBikeTexture, (int)textures);
+        localRacer->field_0x3bc->UnknownFunction444c70(0, ownBikeTexture, (int)textures);
         if (!(circuit->field_0x464 & 2)) {
             char ownRiderTexture[0x40];
             g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(circuit->field_0x465[0].field_0xb8, ownRiderTexture,
                                                              0x3f);
-            field_0x038->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, ownRiderTexture, (int)textures);
+            localRacer->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, ownRiderTexture, (int)textures);
         }
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 1) {
             id = 1;
-            field_0x040 = (UnknownBikeRaceRacer**)DebugMalloc(
+            aiRacers = (UnknownBikeRaceRacer**)DebugMalloc(
                 (g_UnknownGlobal56e26c->field_0x3444->field_0x460 - 1) * sizeof(UnknownBikeRaceRacer*), __FILE__,
                 0x44f);
             for (int i = 0; i < g_UnknownGlobal56e26c->field_0x3444->field_0x460 - 1; i++)
-                field_0x040[i] = 0;
+                aiRacers[i] = 0;
             for (int n = 1; n < g_UnknownGlobal56e26c->field_0x3444->field_0x460; n++) {
                 UnknownProCircuitRacer* racer = &g_UnknownGlobal56e26c->field_0x3444->field_0x465[n];
                 UnknownFunction4210f0(&position, &direction, event, order[n]);
@@ -1274,14 +1274,14 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                 setup.field_0x58 = (setup.field_0x54 - setup.field_0x50) / 10;
                 setup.field_0x08 = g_UnknownGlobal56e26c->ui->field_0x428[bikeClass];
                 skill = UnknownRandomSkill(field_0x07c[0], field_0x07c[1]);
-                field_0x040[n - 1] = new(__FILE__, 0x47c) UnknownBikeRaceRacer(1);
-                field_0x040[n - 1]->UnknownFunction48fc80(owner, empty, bikeFile, riderFile, lights, textures,
+                aiRacers[n - 1] = new(__FILE__, 0x47c) UnknownBikeRaceRacer(1);
+                aiRacers[n - 1]->UnknownFunction48fc80(owner, empty, bikeFile, riderFile, lights, textures,
                                                           position, direction, up, terrain, 0, 1, 0, this,
                                                           racer->field_0xf8, 0, id, &setup, 1, 1, field_0x054,
-                                                          field_0x058, field_0x1a0, skill, 1);
-                UnknownFunction469190(field_0x040[n - 1], -1);
-                field_0x040[n - 1]->field_0x3bc->UnknownFunction444c70(0, racer->field_0x78, (int)textures);
-                field_0x040[n - 1]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, racer->field_0xb8,
+                                                          raceScene, replayVcr, skill, 1);
+                UnknownFunction469190(aiRacers[n - 1], -1);
+                aiRacers[n - 1]->field_0x3bc->UnknownFunction444c70(0, racer->field_0x78, (int)textures);
+                aiRacers[n - 1]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, racer->field_0xb8,
                                                                                      (int)textures);
                 id++;
             }
@@ -1290,15 +1290,15 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
     }
 
     if (!g_UnknownGlobal56e26c->field_0x3428 && g_UnknownGlobal56e26c->field_0x18 > 1) {
-        field_0x03c = new(__FILE__, 0x4a3) UnknownBikeRaceRacer*[field_0x158];
+        racerSlots = new(__FILE__, 0x4a3) UnknownBikeRaceRacer*[racerCount];
     }
     int used[8];
     memset(used, 0, sizeof(used));
     g_UnknownGlobal56e26c->ui->UnknownFunction49b530();
     char ai = 0;
-    int* bikes = (int*)DebugCalloc(field_0x158, 4, __FILE__, 0x4af);
-    int* riders = (int*)DebugCalloc(field_0x158, 4, __FILE__, 0x4b0);
-    const char** names = (const char**)DebugMalloc(field_0x158 * 4, __FILE__, 0x4b1);
+    int* bikes = (int*)DebugCalloc(racerCount, 4, __FILE__, 0x4af);
+    int* riders = (int*)DebugCalloc(racerCount, 4, __FILE__, 0x4b0);
+    const char** names = (const char**)DebugMalloc(racerCount * 4, __FILE__, 0x4b1);
     int plate;
     int engineSize;
     int engineKind;
@@ -1309,7 +1309,7 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
         char recordedBike[0x40];
         char recordedRider[0x40];
         recordIndex = 1;
-        field_0x1a0->UnknownFunction49c1e0(&id, &ai, 0, name, bikeFile, riderFile, recordedBike, recordedRider,
+        replayVcr->UnknownFunction49c1e0(&id, &ai, 0, name, bikeFile, riderFile, recordedBike, recordedRider,
                                            &engineSize, &engineKind, &plate);
         g_UnknownGlobal56e26c->ui->UnknownFunction49b560(recordedBike, bikeTexture, 0x3f);
         g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(recordedRider, riderTexture, 0x3f);
@@ -1326,8 +1326,8 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
         g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80,
                                                          riderTexture, 0x3f);
         if (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28) {
-            g_UnknownGlobal56e26c->ui->UnknownFunction49b0d0(bikes, field_0x158, riders);
-            g_UnknownGlobal56e26c->ui->UnknownFunction49b020(names, field_0x158);
+            g_UnknownGlobal56e26c->ui->UnknownFunction49b0d0(bikes, racerCount, riders);
+            g_UnknownGlobal56e26c->ui->UnknownFunction49b020(names, racerCount);
         }
         strcpy(name, g_UnknownGlobal56e26c->mode.field_0x00);
         plate = g_UnknownGlobal56e26c->mode.field_0x1bcc;
@@ -1338,13 +1338,13 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
     if (!g_UnknownGlobal56e26c->field_0x3428 && g_UnknownGlobal56e26c->field_0x18 != 1) {
         // A network race: this player's racer, the other players' and the
         // AI racers of other hosts.
-        playerId = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
+        playerId = g_UnknownGlobal56e26c->field_0x08->localPlayer;
         int i;
-        for (i = 0; i < field_0x158; i++) {
+        for (i = 0; i < racerCount; i++) {
             if (players[i].field_0x00 == playerId && !players[i].field_0x05)
                 break;
         }
-        if (i < field_0x158) {
+        if (i < racerCount) {
             int j;
             for (j = 0; j < g_UnknownGlobal56e26c->mode.field_0x1be0; j++) {
                 if (players[i].field_0x00 == slots[j].field_0xd4 && slots[j].field_0xd8 == 0) {
@@ -1353,14 +1353,14 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                 }
             }
             UnknownFunction4210f0(&position, &direction, event, i + 1);
-            field_0x03c[j] = new(__FILE__, 0x53b) UnknownBikeRaceRacer(1);
+            racerSlots[j] = new(__FILE__, 0x53b) UnknownBikeRaceRacer(1);
             if (!UnknownFunction469190(
-                    field_0x03c[j]->UnknownFunction48fc80(
+                    racerSlots[j]->UnknownFunction48fc80(
                         owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
                         g_UnknownGlobal56e26c->field_0x14, 0, 0, this, g_UnknownGlobal56e26c->mode.field_0x00, 0,
                         playerId, (UnknownBikeRaceBikeSetup*)g_UnknownGlobal56e26c->mode.field_0xfd8,
                         g_UnknownGlobal56e26c->mode.field_0xa8c, g_UnknownGlobal56e26c->mode.field_0xa90,
-                        field_0x054, field_0x058, field_0x1a0, 0, 1),
+                        field_0x054, raceScene, replayVcr, 0, 1),
                     -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
                 if (riders)
@@ -1378,23 +1378,23 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
             g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80,
                                                              ownRiderTexture, 0x3f);
             if (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10) {
-                field_0x03c[j]->field_0x128->field_0x68 = 1;
-                field_0x03c[j]->field_0x5f0->field_0x68 = 1;
-                field_0x03c[j]->field_0x5f4->field_0x68 = 1;
+                racerSlots[j]->field_0x128->field_0x68 = 1;
+                racerSlots[j]->field_0x5f0->field_0x68 = 1;
+                racerSlots[j]->field_0x5f4->field_0x68 = 1;
             }
-            field_0x03c[j]->field_0x3bc->UnknownFunction444c70(0, ownBikeTexture, (int)textures);
-            field_0x03c[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, ownRiderTexture, (int)textures);
-            field_0x03c[j]->field_0x73c = g_UnknownGlobal56e26c->mode.field_0x1bcc;
-            if (field_0x1a0 && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
-                field_0x1a0->UnknownFunction49c070(playerId, 0, recordIndex++, g_UnknownGlobal56e26c->mode.field_0x00,
+            racerSlots[j]->field_0x3bc->UnknownFunction444c70(0, ownBikeTexture, (int)textures);
+            racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, ownRiderTexture, (int)textures);
+            racerSlots[j]->field_0x73c = g_UnknownGlobal56e26c->mode.field_0x1bcc;
+            if (replayVcr && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
+                replayVcr->UnknownFunction49c070(playerId, 0, recordIndex++, g_UnknownGlobal56e26c->mode.field_0x00,
                                                    bikeFile, riderFile, ownBikeTexture, ownRiderTexture,
-                                                   field_0x03c[j]->field_0x738,
-                                                   (unsigned char)field_0x03c[j]->field_0x737, slots[j].field_0xc0);
+                                                   racerSlots[j]->field_0x738,
+                                                   (unsigned char)racerSlots[j]->field_0x737, slots[j].field_0xc0);
             }
             field_0x14c = j;
-            field_0x038 = field_0x03c[j];
+            localRacer = racerSlots[j];
         }
-        for (i = 0; i < field_0x158; i++) {
+        for (i = 0; i < racerCount; i++) {
             if (players[i].field_0x00 == playerId || players[i].field_0x05)
                 continue;
             int j;
@@ -1416,41 +1416,41 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
             setup.field_0x58 = (setup.field_0x54 - setup.field_0x50) / 10;
             sprintf(path, "%s\\%s", "Res", slots[j].field_0x00);
             setup.field_0x08 = g_UnknownGlobal56e26c->ui->field_0x428[bikeClass];
-            field_0x03c[j] = new(__FILE__, 0x5a3) UnknownBikeRaceRacer(1);
-            if (!UnknownFunction469190(field_0x03c[j]->UnknownFunction48fc80(
+            racerSlots[j] = new(__FILE__, 0x5a3) UnknownBikeRaceRacer(1);
+            if (!UnknownFunction469190(racerSlots[j]->UnknownFunction48fc80(
                                            owner, empty, path, riderFile, lights, textures, position, direction,
                                            up, terrain, 0, 0, 1, this, slots[j].field_0xdc, 0, slots[j].field_0xd4,
-                                           &setup, 0, 1, field_0x054, field_0x058, field_0x1a0, 0, 1),
+                                           &setup, 0, 1, field_0x054, raceScene, replayVcr, 0, 1),
                                        -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
             g_UnknownGlobal56e26c->ui->UnknownFunction49b560(slots[j].field_0x40, bikeTexture, 0x3f);
-            field_0x03c[j]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
+            racerSlots[j]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
             if (g_UnknownGlobal56e26c->UnknownVirtualSlot20("MPR", 0) == 123 && slots[j].field_0xf4) {
-                field_0x03c[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, "MPR.tga", (int)textures);
+                racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, "MPR.tga", (int)textures);
             } else {
                 g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(slots[j].field_0x80, riderTexture, 0x3f);
-                field_0x03c[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+                racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
             }
             if (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10) {
-                field_0x03c[j]->field_0x128->field_0x68 = 1;
-                field_0x03c[j]->field_0x5f0->field_0x68 = 1;
-                field_0x03c[j]->field_0x5f4->field_0x68 = 1;
+                racerSlots[j]->field_0x128->field_0x68 = 1;
+                racerSlots[j]->field_0x5f0->field_0x68 = 1;
+                racerSlots[j]->field_0x5f4->field_0x68 = 1;
             }
-            field_0x03c[j]->UnknownVirtualSlot4();
-            field_0x03c[j]->field_0x11c4 = slots[j].field_0xd0;
-            if (field_0x1a0 && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
-                field_0x1a0->UnknownFunction49c070(slots[j].field_0xd4, 0, recordIndex++, slots[j].field_0xdc, path,
-                                                   riderFile, bikeTexture, riderTexture, field_0x03c[j]->field_0x738,
-                                                   (unsigned char)field_0x03c[j]->field_0x737, slots[j].field_0xc0);
+            racerSlots[j]->UnknownVirtualSlot4();
+            racerSlots[j]->field_0x11c4 = slots[j].field_0xd0;
+            if (replayVcr && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
+                replayVcr->UnknownFunction49c070(slots[j].field_0xd4, 0, recordIndex++, slots[j].field_0xdc, path,
+                                                   riderFile, bikeTexture, riderTexture, racerSlots[j]->field_0x738,
+                                                   (unsigned char)racerSlots[j]->field_0x737, slots[j].field_0xc0);
             }
         }
-        for (i = 0; i < field_0x158; i++) {
+        for (i = 0; i < racerCount; i++) {
             int other = players[i].field_0x00;
             if (other == playerId || !players[i].field_0x05)
                 continue;
             int j;
-            for (j = 0; j < field_0x158; j++) {
+            for (j = 0; j < racerCount; j++) {
                 if (other == slots[j].field_0xd4 && slots[j].field_0xd8 != 0 && !used[j]) {
                     used[j] = 1;
                     break;
@@ -1467,43 +1467,43 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                 setup.field_0x24[k] = g_UnknownGlobal56e26c->ui->field_0x68[bikeClass][0][k];
             setup.field_0x58 = (setup.field_0x54 - setup.field_0x50) / 10;
             setup.field_0x08 = g_UnknownGlobal56e26c->ui->field_0x428[bikeClass];
-            field_0x03c[j] = new(__FILE__, 0x61f) UnknownBikeRaceRacer(1);
-            if (!UnknownFunction469190(field_0x03c[j]->UnknownFunction48fc80(
+            racerSlots[j] = new(__FILE__, 0x61f) UnknownBikeRaceRacer(1);
+            if (!UnknownFunction469190(racerSlots[j]->UnknownFunction48fc80(
                                            owner, empty, slots[j].field_0x00, riderFile, lights, textures, position,
                                            direction, up, terrain, 0, (char)slots[j].field_0xd8, 1, this,
                                            slots[j].field_0xdc, 0, slots[j].field_0xd4, &setup, 0, 1, field_0x054,
-                                           field_0x058, field_0x1a0, 0, 1),
+                                           raceScene, replayVcr, 0, 1),
                                        -1)) {
                 sprintf(message, "Net Bike%d not loaded\n", j);
             }
-            field_0x03c[j]->field_0x3bc->UnknownFunction444c70(0, slots[j].field_0x40, (int)textures);
-            field_0x03c[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, slots[j].field_0x80, (int)textures);
+            racerSlots[j]->field_0x3bc->UnknownFunction444c70(0, slots[j].field_0x40, (int)textures);
+            racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, slots[j].field_0x80, (int)textures);
             if (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10) {
-                field_0x03c[j]->field_0x128->field_0x68 = 1;
-                field_0x03c[j]->field_0x5f0->field_0x68 = 1;
-                field_0x03c[j]->field_0x5f4->field_0x68 = 1;
+                racerSlots[j]->field_0x128->field_0x68 = 1;
+                racerSlots[j]->field_0x5f0->field_0x68 = 1;
+                racerSlots[j]->field_0x5f4->field_0x68 = 1;
             }
-            field_0x03c[j]->UnknownVirtualSlot4();
-            field_0x03c[j]->field_0x11c4 = slots[j].field_0xd0;
-            if (field_0x1a0 && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
-                field_0x1a0->UnknownFunction49c070(slots[j].field_0xd4, (char)slots[j].field_0xd8, recordIndex++,
+            racerSlots[j]->UnknownVirtualSlot4();
+            racerSlots[j]->field_0x11c4 = slots[j].field_0xd0;
+            if (replayVcr && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
+                replayVcr->UnknownFunction49c070(slots[j].field_0xd4, (char)slots[j].field_0xd8, recordIndex++,
                                                    slots[j].field_0xdc, slots[j].field_0x00, riderFile,
                                                    slots[j].field_0x40, slots[j].field_0x80,
-                                                   field_0x03c[j]->field_0x738,
-                                                   (unsigned char)field_0x03c[j]->field_0x737, slots[j].field_0xc0);
+                                                   racerSlots[j]->field_0x738,
+                                                   (unsigned char)racerSlots[j]->field_0x737, slots[j].field_0xc0);
             }
         }
     } else {
         // The player's racer offline (or in a replay).
         UnknownFunction4210f0(&position, &direction, event, order[0]);
-        field_0x038 = new(__FILE__, 0x4ea) UnknownBikeRaceRacer(1);
+        localRacer = new(__FILE__, 0x4ea) UnknownBikeRaceRacer(1);
         if (!UnknownFunction469190(
-                field_0x038->UnknownFunction48fc80(
+                localRacer->UnknownFunction48fc80(
                     owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain,
                     g_UnknownGlobal56e26c->field_0x14, 0, 0, this, name, 0, id,
                     (UnknownBikeRaceBikeSetup*)g_UnknownGlobal56e26c->mode.field_0xfd8,
                     g_UnknownGlobal56e26c->mode.field_0xa8c, g_UnknownGlobal56e26c->mode.field_0xa90, field_0x054,
-                    field_0x058, field_0x1a0, 0, 1),
+                    raceScene, replayVcr, 0, 1),
                 -1)) {
             sprintf(message, "Player Bike not loaded\n");
             if (riders)
@@ -1516,64 +1516,64 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
             Release();
             return 0;
         }
-        field_0x038->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
-        field_0x038->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+        localRacer->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
+        localRacer->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
         if (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10) {
-            field_0x038->field_0x128->field_0x68 = 1;
-            field_0x038->field_0x5f0->field_0x68 = 1;
-            field_0x038->field_0x5f4->field_0x68 = 1;
+            localRacer->field_0x128->field_0x68 = 1;
+            localRacer->field_0x5f0->field_0x68 = 1;
+            localRacer->field_0x5f4->field_0x68 = 1;
         }
-        field_0x038->field_0x738 = ((UnknownBikeRaceBikeSetup*)g_UnknownGlobal56e26c->mode.field_0xfd8)->field_0x00;
-        field_0x038->field_0x737 = (char)((UnknownBikeRaceBikeSetup*)g_UnknownGlobal56e26c->mode.field_0xfd8)->field_0x04;
-        field_0x038->field_0x73c = plate;
-        if ((field_0x1a0 && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) ||
+        localRacer->field_0x738 = ((UnknownBikeRaceBikeSetup*)g_UnknownGlobal56e26c->mode.field_0xfd8)->field_0x00;
+        localRacer->field_0x737 = (char)((UnknownBikeRaceBikeSetup*)g_UnknownGlobal56e26c->mode.field_0xfd8)->field_0x04;
+        localRacer->field_0x73c = plate;
+        if ((replayVcr && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) ||
             g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
-            field_0x1a0->UnknownFunction49c070(0, 0, recordIndex++, g_UnknownGlobal56e26c->mode.field_0x00, bikeFile,
-                                               riderFile, bikeTexture, riderTexture, field_0x038->field_0x738,
-                                               (unsigned char)field_0x038->field_0x737, plate);
+            replayVcr->UnknownFunction49c070(0, 0, recordIndex++, g_UnknownGlobal56e26c->mode.field_0x00, bikeFile,
+                                               riderFile, bikeTexture, riderTexture, localRacer->field_0x738,
+                                               (unsigned char)localRacer->field_0x737, plate);
         }
     }
 
-    ((FollowCamera*)field_0x050)->UnknownFunction463520(position, 140.0f, 5.0f, 5.0f, 2.5f, 2.3f);
-    ((FollowCamera*)field_0x050)->UnknownFunction463520(position, 140.0f, 5.0f, 5.0f, 2.5f, 2.3f);
+    ((FollowCamera*)raceCamera)->UnknownFunction463520(position, 140.0f, 5.0f, 5.0f, 2.5f, 2.3f);
+    ((FollowCamera*)raceCamera)->UnknownFunction463520(position, 140.0f, 5.0f, 5.0f, 2.5f, 2.3f);
 
     int fromEvent = 0;
-    if ((g_UnknownGlobal56e26c->field_0x3428 && field_0x1a0->field_0x2fc > 1) || g_UnknownGlobal56e26c->field_0x18 == 1) {
+    if ((g_UnknownGlobal56e26c->field_0x3428 && replayVcr->field_0x2fc > 1) || g_UnknownGlobal56e26c->field_0x18 == 1) {
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4) {
             // The ghost.
-            field_0x040 = new(__FILE__, 0x674) UnknownBikeRaceRacer*[1];
+            aiRacers = new(__FILE__, 0x674) UnknownBikeRaceRacer*[1];
             UnknownFunction4210f0(&position, &direction, event, order[0]);
             sprintf(bikeFile, "%s\\%s", "Res", "Ghost.mcf");
             sprintf(riderFile, "%s\\GhostRider.mcf", "Res");
-            field_0x040[0] = new(__FILE__, 0x67c) UnknownBikeRaceRacer(1);
+            aiRacers[0] = new(__FILE__, 0x67c) UnknownBikeRaceRacer(1);
             if (!UnknownFunction469190(
-                    field_0x040[0]->UnknownFunction48fc80(
+                    aiRacers[0]->UnknownFunction48fc80(
                         owner, empty, bikeFile, riderFile, lights, textures, position, direction, up, terrain, 0, -1,
                         0, this, "Ghost", 0, 0, (UnknownBikeRaceBikeSetup*)g_UnknownGlobal56e26c->mode.field_0xfd8,
                         g_UnknownGlobal56e26c->mode.field_0xa8c, g_UnknownGlobal56e26c->mode.field_0xa90,
-                        field_0x054, field_0x058, field_0x1a0, 0, 1),
+                        field_0x054, raceScene, replayVcr, 0, 1),
                     -1)) {
                 sprintf(message, "Ghost Bike not loaded\n");
             }
-            field_0x1a0->UnknownFunction49c070(0, 0, recordIndex, g_UnknownGlobal56e26c->mode.field_0x00, bikeFile,
-                                               riderFile, bikeTexture, riderTexture, field_0x040[0]->field_0x738,
-                                               (unsigned char)field_0x040[0]->field_0x737,
+            replayVcr->UnknownFunction49c070(0, 0, recordIndex, g_UnknownGlobal56e26c->mode.field_0x00, bikeFile,
+                                               riderFile, bikeTexture, riderTexture, aiRacers[0]->field_0x738,
+                                               (unsigned char)aiRacers[0]->field_0x737,
                                                g_UnknownGlobal56e26c->mode.field_0x1bcc);
-            field_0x040[0]->UnknownRacerVirtualSlot50(1, 0, 1);
-            field_0x040[0]->UnknownVirtualSlot4();
+            aiRacers[0]->UnknownRacerVirtualSlot50(1, 0, 1);
+            aiRacers[0]->UnknownVirtualSlot4();
         } else if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 > 0) {
             // The AI racers.
             id = 1;
-            field_0x040 = new(__FILE__, 0x6a5) UnknownBikeRaceRacer*[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24];
+            aiRacers = new(__FILE__, 0x6a5) UnknownBikeRaceRacer*[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24];
             for (int i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++)
-                field_0x040[i] = 0;
+                aiRacers[i] = 0;
             UnknownBikeRaceEventAi* eventAi = (UnknownBikeRaceEventAi*)g_UnknownGlobal56e26c->eventManager->field_0x444;
             for (int n = 0; n < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; n++) {
                 char aiName[0x10];
                 if (g_UnknownGlobal56e26c->field_0x3428) {
                     char recordedBike[0x40];
                     char recordedRider[0x40];
-                    field_0x1a0->UnknownFunction49c1e0(&id, &ai, recordIndex, aiName, bikeFile, riderFile,
+                    replayVcr->UnknownFunction49c1e0(&id, &ai, recordIndex, aiName, bikeFile, riderFile,
                                                        recordedBike, recordedRider, &engineSize, &engineKind,
                                                        &plate);
                     setup = *(UnknownBikeRaceBikeSetup*)g_UnknownGlobal56e26c->mode.field_0xfd8;
@@ -1626,11 +1626,11 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                     setup.field_0x24[k] = g_UnknownGlobal56e26c->ui->field_0x68[bikeClass][0][k];
                 setup.field_0x58 = (setup.field_0x54 - setup.field_0x50) / 10;
                 setup.field_0x08 = g_UnknownGlobal56e26c->ui->field_0x428[bikeClass];
-                field_0x040[n] = new(__FILE__, 0x718) UnknownBikeRaceRacer(1);
-                if (!UnknownFunction469190(field_0x040[n]->UnknownFunction48fc80(
+                aiRacers[n] = new(__FILE__, 0x718) UnknownBikeRaceRacer(1);
+                if (!UnknownFunction469190(aiRacers[n]->UnknownFunction48fc80(
                                                owner, empty, bikeFile, riderFile, lights, textures, position,
                                                direction, up, terrain, 0, ai, 0, this, aiName, 0, id, &setup, 1, 1,
-                                               field_0x054, field_0x058, field_0x1a0, skill, 1),
+                                               field_0x054, raceScene, replayVcr, skill, 1),
                                            -1)) {
                     sprintf(message, "AI Bike%d not loaded\n", n);
                 }
@@ -1638,37 +1638,37 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                     char text[0x40];
                     COPY_TEXT(text, bikeTexture, 0x40);
                     g_UnknownGlobal56e26c->ui->UnknownFunction49b560(text, bikeTexture, 0x3f);
-                    field_0x040[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
+                    aiRacers[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
                     COPY_TEXT(text, riderTexture, 0x40);
                     g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(text, riderTexture, 0x3f);
-                    field_0x040[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
-                    field_0x040[n]->field_0x73c = plate;
+                    aiRacers[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+                    aiRacers[n]->field_0x73c = plate;
                     recordIndex++;
                 } else if (fromEvent) {
                     g_UnknownGlobal56e26c->ui->UnknownFunction49b560(eventAi[n].field_0x40, bikeTexture, 0x3f);
-                    field_0x040[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
+                    aiRacers[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
                     g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(eventAi[n].field_0x00, riderTexture, 0x3f);
-                    field_0x040[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
-                    field_0x040[n]->field_0x73c = plate;
+                    aiRacers[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+                    aiRacers[n]->field_0x73c = plate;
                 } else {
                     UnknownBikeRaceUiChoice* choices = (UnknownBikeRaceUiChoice*)g_UnknownGlobal56e26c->ui->field_0x50;
                     UnknownBikeRaceUiModel* riderModels = (UnknownBikeRaceUiModel*)g_UnknownGlobal56e26c->ui->field_0x58;
                     g_UnknownGlobal56e26c->ui->UnknownFunction49b560(choices[bikes[n]].field_0x48, bikeTexture, 0x3f);
-                    field_0x040[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
+                    aiRacers[n]->field_0x3bc->UnknownFunction444c70(0, bikeTexture, (int)textures);
                     g_UnknownGlobal56e26c->ui->UnknownFunction49b7f0(riderModels[riders[n]].field_0x40, riderTexture,
                                                                      0x3f);
-                    field_0x040[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
-                    field_0x040[n]->field_0x73c = plate;
+                    aiRacers[n]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, riderTexture, (int)textures);
+                    aiRacers[n]->field_0x73c = plate;
                 }
                 if (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10) {
-                    field_0x040[n]->field_0x128->field_0x68 = 1;
-                    field_0x040[n]->field_0x5f0->field_0x68 = 1;
-                    field_0x040[n]->field_0x5f4->field_0x68 = 1;
+                    aiRacers[n]->field_0x128->field_0x68 = 1;
+                    aiRacers[n]->field_0x5f0->field_0x68 = 1;
+                    aiRacers[n]->field_0x5f4->field_0x68 = 1;
                 }
-                if (field_0x1a0 && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
-                    field_0x1a0->UnknownFunction49c070(id, 1, recordIndex++, aiName, path, riderFile, bikeTexture,
-                                                       riderTexture, field_0x040[n]->field_0x738,
-                                                       (unsigned char)field_0x040[n]->field_0x737, plate);
+                if (replayVcr && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
+                    replayVcr->UnknownFunction49c070(id, 1, recordIndex++, aiName, path, riderFile, bikeTexture,
+                                                       riderTexture, aiRacers[n]->field_0x738,
+                                                       (unsigned char)aiRacers[n]->field_0x737, plate);
                 }
                 id++;
                 if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 &&
@@ -1687,8 +1687,8 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
         // A network race: the AI racers this host runs.
         id = 1;
         if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 > 0) {
-            field_0x040 = new(__FILE__, 0x770) UnknownBikeRaceRacer*[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24];
-            for (int i = 0; i < field_0x158; i++) {
+            aiRacers = new(__FILE__, 0x770) UnknownBikeRaceRacer*[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24];
+            for (int i = 0; i < racerCount; i++) {
                 int other = players[i].field_0x00;
                 if (other != playerId || !players[i].field_0x05)
                     continue;
@@ -1710,69 +1710,69 @@ int BikeRace::UnknownFunction419970(void* owner, LightManager* lights, UnknownTe
                     setup.field_0x24[k] = g_UnknownGlobal56e26c->ui->field_0x68[bikeClass][0][k];
                 setup.field_0x58 = (setup.field_0x54 - setup.field_0x50) / 10;
                 setup.field_0x08 = g_UnknownGlobal56e26c->ui->field_0x428[bikeClass];
-                field_0x03c[j] = new(__FILE__, 0x78f) UnknownBikeRaceRacer(1);
-                if (!UnknownFunction469190(field_0x03c[j]->UnknownFunction48fc80(
+                racerSlots[j] = new(__FILE__, 0x78f) UnknownBikeRaceRacer(1);
+                if (!UnknownFunction469190(racerSlots[j]->UnknownFunction48fc80(
                                                owner, empty, slots[j].field_0x00, riderFile, lights, textures,
                                                position, direction, up, terrain, 0, (char)slots[j].field_0xd8, 0,
                                                this, slots[j].field_0xdc, 0, slots[j].field_0xd4, &setup, 0, 1,
-                                               field_0x054, field_0x058, field_0x1a0, 0, 1),
+                                               field_0x054, raceScene, replayVcr, 0, 1),
                                            -1)) {
                     sprintf(message, "Net Bike%d not loaded\n", j);
                 }
-                field_0x03c[j]->field_0x3bc->UnknownFunction444c70(0, slots[j].field_0x40, (int)textures);
-                field_0x03c[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, slots[j].field_0x80, (int)textures);
+                racerSlots[j]->field_0x3bc->UnknownFunction444c70(0, slots[j].field_0x40, (int)textures);
+                racerSlots[j]->field_0x5c4->field_0x1a0->UnknownFunction444c70(0, slots[j].field_0x80, (int)textures);
                 if (!g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10) {
-                    field_0x03c[j]->field_0x128->field_0x68 = 1;
-                    field_0x03c[j]->field_0x5f0->field_0x68 = 1;
-                    field_0x03c[j]->field_0x5f4->field_0x68 = 1;
+                    racerSlots[j]->field_0x128->field_0x68 = 1;
+                    racerSlots[j]->field_0x5f0->field_0x68 = 1;
+                    racerSlots[j]->field_0x5f4->field_0x68 = 1;
                 }
-                if (field_0x1a0 && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
-                    field_0x1a0->UnknownFunction49c070(slots[j].field_0xd4, (char)slots[j].field_0xd8, recordIndex++,
+                if (replayVcr && g_UnknownGlobal56e26c->field_0x342c && !g_UnknownGlobal56e26c->field_0x3428) {
+                    replayVcr->UnknownFunction49c070(slots[j].field_0xd4, (char)slots[j].field_0xd8, recordIndex++,
                                                        slots[j].field_0xdc, slots[j].field_0x00, riderFile,
                                                        slots[j].field_0x40, slots[j].field_0x80,
-                                                       field_0x03c[j]->field_0x738,
-                                                       (unsigned char)field_0x03c[j]->field_0x737,
+                                                       racerSlots[j]->field_0x738,
+                                                       (unsigned char)racerSlots[j]->field_0x737,
                                                        slots[j].field_0xc0);
                 }
-                field_0x040[id - 1] = field_0x03c[j];
+                aiRacers[id - 1] = racerSlots[j];
                 id++;
             }
         }
         // Every racer's collisions against every other racer's.
-        for (int a = 0; a < field_0x158; a++) {
-            if (!field_0x03c[a]->field_0x735)
+        for (int a = 0; a < racerCount; a++) {
+            if (!racerSlots[a]->field_0x735)
                 continue;
-            for (int b = 0; b < field_0x158; b++) {
+            for (int b = 0; b < racerCount; b++) {
                 if (a == b)
                     continue;
-                if (field_0x03c[b]->field_0x735) {
-                    field_0x03c[a]->field_0x1418->UnknownFunction439410(field_0x03c[b]->field_0x1418);
-                    field_0x03c[a]->field_0x1418->UnknownFunction439410(field_0x03c[b]->field_0x1414);
-                    field_0x03c[a]->field_0x1418->UnknownFunction439410(field_0x03c[b]->field_0x5f0);
-                    field_0x03c[a]->field_0x1418->UnknownFunction439410(field_0x03c[b]->field_0x5f4);
-                    field_0x03c[a]->field_0x1418->UnknownFunction439410(field_0x03c[b]->field_0x604->field_0x38);
-                    field_0x03c[a]->field_0x1414->UnknownFunction439410(field_0x03c[b]->field_0x1418);
-                    field_0x03c[a]->field_0x1414->UnknownFunction439410(field_0x03c[b]->field_0x1414);
-                    field_0x03c[a]->field_0x1414->UnknownFunction439410(field_0x03c[b]->field_0x5f0);
-                    field_0x03c[a]->field_0x1414->UnknownFunction439410(field_0x03c[b]->field_0x5f4);
-                    field_0x03c[a]->field_0x1414->UnknownFunction439410(field_0x03c[b]->field_0x604->field_0x38);
+                if (racerSlots[b]->field_0x735) {
+                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x1418);
+                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x1414);
+                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x5f0);
+                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x5f4);
+                    racerSlots[a]->field_0x1418->UnknownFunction439410(racerSlots[b]->field_0x604->field_0x38);
+                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x1418);
+                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x1414);
+                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x5f0);
+                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x5f4);
+                    racerSlots[a]->field_0x1414->UnknownFunction439410(racerSlots[b]->field_0x604->field_0x38);
                 }
-                field_0x03c[a]->field_0x5f0->UnknownFunction439410(field_0x03c[b]->field_0x1418);
-                field_0x03c[a]->field_0x5f0->UnknownFunction439410(field_0x03c[b]->field_0x1414);
-                field_0x03c[a]->field_0x5f0->UnknownFunction439410(field_0x03c[b]->field_0x5f0);
-                field_0x03c[a]->field_0x5f0->UnknownFunction439410(field_0x03c[b]->field_0x5f4);
-                field_0x03c[a]->field_0x5f0->UnknownFunction439410(field_0x03c[b]->field_0x604->field_0x38);
-                field_0x03c[a]->field_0x5f4->UnknownFunction439410(field_0x03c[b]->field_0x1418);
-                field_0x03c[a]->field_0x5f4->UnknownFunction439410(field_0x03c[b]->field_0x1414);
-                field_0x03c[a]->field_0x5f4->UnknownFunction439410(field_0x03c[b]->field_0x5f0);
-                field_0x03c[a]->field_0x5f4->UnknownFunction439410(field_0x03c[b]->field_0x5f4);
-                field_0x03c[a]->field_0x5f4->UnknownFunction439410(field_0x03c[b]->field_0x604->field_0x38);
-                field_0x03c[a]->field_0x604->field_0x38->UnknownFunction439410(field_0x03c[b]->field_0x1418);
-                field_0x03c[a]->field_0x604->field_0x38->UnknownFunction439410(field_0x03c[b]->field_0x1414);
-                field_0x03c[a]->field_0x604->field_0x38->UnknownFunction439410(field_0x03c[b]->field_0x5f0);
-                field_0x03c[a]->field_0x604->field_0x38->UnknownFunction439410(field_0x03c[b]->field_0x5f4);
-                field_0x03c[a]->field_0x604->field_0x38->UnknownFunction439410(
-                    field_0x03c[b]->field_0x604->field_0x38);
+                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x1418);
+                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x1414);
+                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x5f0);
+                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x5f4);
+                racerSlots[a]->field_0x5f0->UnknownFunction439410(racerSlots[b]->field_0x604->field_0x38);
+                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x1418);
+                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x1414);
+                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x5f0);
+                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x5f4);
+                racerSlots[a]->field_0x5f4->UnknownFunction439410(racerSlots[b]->field_0x604->field_0x38);
+                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(racerSlots[b]->field_0x1418);
+                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(racerSlots[b]->field_0x1414);
+                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(racerSlots[b]->field_0x5f0);
+                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(racerSlots[b]->field_0x5f4);
+                racerSlots[a]->field_0x604->field_0x38->UnknownFunction439410(
+                    racerSlots[b]->field_0x604->field_0x38);
             }
         }
     }

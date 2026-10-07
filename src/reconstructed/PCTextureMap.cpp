@@ -6,22 +6,23 @@
 #include "DebugAlloc.h"
 #include "PCRenderTarget.h"
 #include "TrackGame.h"
+#include "D3DConstants.h"
 
 // 0x004c5f00
 PCTextureMap::PCTextureMap(TextureMapManager* manager, int value) : TextureMap(manager, value) {
     field_0x70 = 0;
     field_0x74 = 0;
     field_0x78 = 0;
-    field_0x7c = 0;
+    videoDecoder = 0;
 }
 
 // 0x004c5f50: frees the decoder, takes the system-memory surface's size
 // (bytes per pixel x height x width, 4/3 more with mip levels) off the
 // DirectX memory count and releases it, then releases the texture surface.
 PCTextureMap::~PCTextureMap() {
-    if (field_0x7c) {
-        delete field_0x7c;
-        field_0x7c = 0;
+    if (videoDecoder) {
+        delete videoDecoder;
+        videoDecoder = 0;
     }
     if (field_0x70) {
         float scale = 1.0f;
@@ -65,7 +66,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
     int offsets[12];
     UnknownSurfaceCaps caps;
     UnknownSurfaceDesc desc;
-    int sourceFormat = UnknownFunction5118a0(fileFormat);
+    int sourceFormat = DecodedFormat(fileFormat);
     if (choice) {
         format = UnknownFunction511ad0(format) ? choice->field_0x10 : choice->field_0x0c;
         field_0x6c = choice->field_0x14;
@@ -78,7 +79,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
     void* bits = field_0x10->UnknownFunction511370(LargerPixelSize(sourceFormat, format) * width * height + 4);
     if (!bits)
         return 0;
-    if (UnknownFunction511850(fileFormat)) {
+    if (HasMipLevels(fileFormat)) {
         int levelWidth = width;
         if (choice) {
             for (int i = 0; i < choice->field_0x14 && levelWidth > 32; i++) {
@@ -111,8 +112,8 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
         level = 0;
         do {
             dataSize = offsets[level + 1] - offsets[level];
-            if (UnknownFunction511800(fileFormat) &&
-                dataSize != UnknownFunction511740(fileFormat) * levelHeight * levelSide) {
+            if (IsCompressedFormat(fileFormat) &&
+                dataSize != BytesPerPixel(fileFormat) * levelHeight * levelSide) {
                 if (!dataSize && stream->UnknownFunction461640(&dataSize, 4, 1) != 1)
                     return 0;
                 if (stream->UnknownFunction461640(buffer, 1, dataSize) != dataSize)
@@ -125,7 +126,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                 case 0x19:
                 case 0x1a:
                 case 0x1b:
-                    UnknownFunction4a03d0(bits, buffer, UnknownFunction511740(fileFormat) * levelHeight * levelSide);
+                    UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * levelHeight * levelSide);
                     break;
                 case 0x14:
                     bits = field_0x10->UnknownFunction511370(UnknownFunction511970(sourceFormat) * levelHeight *
@@ -134,7 +135,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                         return 0;
                     break;
                 }
-            } else if (!ReadRows(stream, bits, UnknownFunction511740(fileFormat) * levelSide, levelHeight)) {
+            } else if (!ReadRows(stream, bits, BytesPerPixel(fileFormat) * levelSide, levelHeight)) {
                 return 0;
             }
             if (levelSide >= minimumSize) {
@@ -145,14 +146,14 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
                 for (; surfaceSide > levelSide; surfaceSide /= 2) {
                     UnknownSurfaceInterface* next;
                     long result = surface->UnknownMethod12(&caps, &next);
-                    if (result && result != (long)0x887600ff)
+                    if (result && result != (long)DDERR_NOTFOUND)
                         return 0;
                     surface = next;
                 }
                 if (surfaceSide == levelSide) {
                     memset(&desc, 0, sizeof(desc));
                     desc.size = sizeof(desc);
-                    if (surface->UnknownMethod25(0, &desc, 0x801, 0))
+                    if (surface->UnknownMethod25(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
                         return 0;
                     int stride = desc.pitch / UnknownFunction511970(format);
                     UnknownFunction4d1d20(desc.surface, bits, levelSide, levelHeight, stride, levelSide, field_0x20,
@@ -169,13 +170,13 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
         if (levelWidth < width) {
             do {
                 dataSize = offsets[level + 1] - offsets[level];
-                if (UnknownFunction511800(fileFormat) &&
-                    dataSize != UnknownFunction511740(fileFormat) * levelHeight * levelSide) {
+                if (IsCompressedFormat(fileFormat) &&
+                    dataSize != BytesPerPixel(fileFormat) * levelHeight * levelSide) {
                     if (!dataSize && stream->UnknownFunction461640(&dataSize, 4, 1) != 1)
                         return 0;
                     if (stream->UnknownFunction461640(buffer, 1, dataSize) != dataSize)
                         return 0;
-                } else if (!ReadRows(stream, bits, UnknownFunction511740(fileFormat) * levelSide, levelHeight)) {
+                } else if (!ReadRows(stream, bits, BytesPerPixel(fileFormat) * levelSide, levelHeight)) {
                     return 0;
                 }
                 level++;
@@ -186,7 +187,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
         return 1;
     }
 
-    if (UnknownFunction511800(fileFormat) && dataSize != UnknownFunction511740(fileFormat) * width * height) {
+    if (IsCompressedFormat(fileFormat) && dataSize != BytesPerPixel(fileFormat) * width * height) {
         if (!dataSize && stream->UnknownFunction461640(&dataSize, 4, 1) != 1)
             return 0;
         if (stream->UnknownFunction461640(buffer, 1, dataSize) != dataSize)
@@ -199,7 +200,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
         case 10:
         case 11:
         case 12:
-            UnknownFunction4a03d0(bits, buffer, UnknownFunction511740(fileFormat) * width * height);
+            UnknownFunction4a03d0(bits, buffer, BytesPerPixel(fileFormat) * width * height);
             break;
         case 5:
             bits = field_0x10->UnknownFunction511370(UnknownFunction511970(sourceFormat) * width * height + 4);
@@ -208,7 +209,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
             break;
         }
     } else {
-        dataSize = UnknownFunction511740(fileFormat) * width * height;
+        dataSize = BytesPerPixel(fileFormat) * width * height;
         if (stream->UnknownFunction461640(bits, 1, dataSize) != dataSize)
             return 0;
     }
@@ -231,7 +232,7 @@ int PCTextureMap::UnknownVirtualSlot5(UnknownTextureStream* stream, int width, i
 // creates +0x70 from `desc` in one the render target accepts (flag 4 skips
 // that check), then counts the surface (4/3 more with mip levels) in DirectX
 // memory.
-int PCTextureMap::UnknownFunction4c68e0(UnknownSurfaceDesc* desc, int flags, int* formats) {
+int PCTextureMap::CreateSystemSurface(UnknownSurfaceDesc* desc, int flags, int* formats) {
     for (; *formats; formats++) {
         field_0x20 = *formats;
         if (desc->flags & 0x1000)
@@ -277,7 +278,7 @@ void PCTextureMap::UnknownVirtualSlot10() {
 // 0x004c7970
 int PCTextureMap::UnknownVirtualSlot11() {
     if (field_0x74 &&
-        !((PCRenderTarget*)g_UnknownGlobal56e26c->field_0x10)->field_0x50->UnknownMethod35(0, field_0x74))
+        !((PCRenderTarget*)g_UnknownGlobal56e26c->field_0x10)->device->UnknownMethod35(0, field_0x74))
         return 1;
     return 0;
 }
@@ -308,12 +309,12 @@ int PCTextureMap::UnknownVirtualSlot14(void* rect) {
 
 // 0x004c7a70
 void* PCTextureMap::UnknownVirtualSlot16(int level) {
-    UnknownSurfaceInterface* surface = UnknownFunction4c83a0(level);
+    UnknownSurfaceInterface* surface = FindMipLevel(level);
     if (surface) {
         UnknownSurfaceDesc desc;
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        if (!surface->UnknownMethod25(0, &desc, 0x801, 0))
+        if (!surface->UnknownMethod25(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
             return desc.surface;
     }
     return 0;
@@ -321,14 +322,14 @@ void* PCTextureMap::UnknownVirtualSlot16(int level) {
 
 // 0x004c7ad0
 int PCTextureMap::UnknownVirtualSlot17(int level) {
-    UnknownSurfaceInterface* surface = UnknownFunction4c83a0(level);
+    UnknownSurfaceInterface* surface = FindMipLevel(level);
     if (surface && !surface->UnknownMethod32(0))
         return 1;
     return 0;
 }
 
 // 0x004c7420
-int PCTextureMap::UnknownFunction4c7420() {
+int PCTextureMap::RestoreTextureSurface() {
     if (field_0x74 && field_0x74->UnknownMethod24()) {
         field_0x74->UnknownMethod2();
         if (field_0x70 == field_0x74)
@@ -340,7 +341,7 @@ int PCTextureMap::UnknownFunction4c7420() {
 }
 
 // 0x004c7b00
-int PCTextureMap::UnknownFunction4c7b00(void* destinationRect, UnknownSurfaceInterface* destination,
+int PCTextureMap::BlitTo(void* destinationRect, UnknownSurfaceInterface* destination,
                                         void* sourceRect, int flags, int skip) {
     if (!skip)
         return !destination->UnknownMethod5(destinationRect, field_0x70, sourceRect, flags, 0);
@@ -350,7 +351,7 @@ int PCTextureMap::UnknownFunction4c7b00(void* destinationRect, UnknownSurfaceInt
 // 0x004c83a0: follows the attached mip surfaces, halving the width, until it
 // reaches `width`. (`next` shares the dead parameter's stack slot, as in
 // retail.)
-UnknownSurfaceInterface* PCTextureMap::UnknownFunction4c83a0(int width) {
+UnknownSurfaceInterface* PCTextureMap::FindMipLevel(int width) {
     UnknownSurfaceCaps caps;
     memset(&caps, 0, sizeof(caps));
     int size = field_0x14;
@@ -365,7 +366,7 @@ UnknownSurfaceInterface* PCTextureMap::UnknownFunction4c83a0(int width) {
         surface = next;
         size /= 2;
     }
-    if (result && result != (long)0x887600ff)
+    if (result && result != (long)DDERR_NOTFOUND)
         UnknownReportDirectDrawError(result, __FILE__, 2034);
     else if (size == width)
         return surface;
@@ -375,7 +376,7 @@ UnknownSurfaceInterface* PCTextureMap::UnknownFunction4c83a0(int width) {
 // 0x004c8430: dumps every mip level (0x004c84e0).
 int PCTextureMap::UnknownVirtualSlot20() {
     if (field_0x70) {
-        UnknownFunction4c84e0(field_0x70, 0);
+        DumpLevel(field_0x70, 0);
         if (field_0x24 > 1) {
             UnknownSurfaceInterface* surface;
             UnknownSurfaceCaps caps;
@@ -384,10 +385,10 @@ int PCTextureMap::UnknownVirtualSlot20() {
             caps.caps = 0x401000;
             long result = top->UnknownMethod12(&caps, &surface);
             while (!result) {
-                UnknownFunction4c84e0(surface, 0);
+                DumpLevel(surface, 0);
                 result = surface->UnknownMethod12(&caps, &surface);
             }
-            if (result != (long)0x887600ff) {
+            if (result != (long)DDERR_NOTFOUND) {
                 UnknownReportDirectDrawError(result, __FILE__, 2084);
                 return 0;
             }
@@ -397,12 +398,12 @@ int PCTextureMap::UnknownVirtualSlot20() {
 }
 
 // 0x004c84e0: locks a level and writes it to a file (0x004c8550).
-int PCTextureMap::UnknownFunction4c84e0(UnknownSurfaceInterface* surface, const char* name) {
+int PCTextureMap::DumpLevel(UnknownSurfaceInterface* surface, const char* name) {
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    surface->UnknownMethod25(0, &desc, 0x811, 0);
-    UnknownFunction4c8550(&desc, name);
+    surface->UnknownMethod25(0, &desc, DDLOCK_WAIT | DDLOCK_READONLY | DDLOCK_NOSYSLOCK, 0);
+    WriteLevel(&desc, name);
     surface->UnknownMethod32(0);
     return 1;
 }
@@ -417,7 +418,7 @@ int PCTextureMap::UnknownVirtualSlot8(int a, int b, int c) {
         UnknownSurfaceCaps caps;
         if (field_0x70->UnknownMethod14(&caps))
             goto failed;
-        if (caps.caps & 0x20000000 && !c || g_UnknownGlobal56e26c->field_0x2d0) {
+        if (caps.caps & DDSCAPS_NONLOCALVIDMEM && !c || g_UnknownGlobal56e26c->field_0x2d0) {
             field_0x74 = field_0x70;
             field_0x70->UnknownMethod1();
         } else {
@@ -427,9 +428,9 @@ int PCTextureMap::UnknownVirtualSlot8(int a, int b, int c) {
             if (field_0x70->UnknownMethod22(&desc))
                 goto failed;
             desc.flags &= 0x3f087;
-            desc.caps[0] = desc.caps[0] & 0xcffff7ff | (b ? 0x2000 : 0) | 0x4000;
+            desc.caps[0] = desc.caps[0] & 0xcffff7ff | (b ? 0x2000 : 0) | DDSCAPS_VIDEOMEMORY;
             if (g_UnknownGlobal56e26c->field_0x0c->field_0x9f0 && c)
-                desc.caps[0] |= 0x10000000;
+                desc.caps[0] |= DDSCAPS_LOCALVIDMEM;
             desc.pitch = 0;
             if (!field_0x74 &&
                 g_UnknownGlobal56e26c->field_0x0c->field_0x190->UnknownMethod6(&desc, &field_0x74, 0))
@@ -501,7 +502,7 @@ int PCTextureMap::UnknownVirtualSlot9(UnknownRect* rect, int mode) {
     }
     if (destination != source)
         ((PCRenderTarget*)g_UnknownGlobal56e26c->field_0x10)
-            ->field_0x50->UnknownMethod43(destination, 0, source, 0, 0);
+            ->device->UnknownMethod43(destination, 0, source, 0, 0);
     return 0;
 }
 
@@ -520,7 +521,7 @@ int PCTextureMap::UnknownVirtualSlot15(int filter) {
     UnknownSurfaceInterface* parent = field_0x70;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    if (parent->UnknownMethod25(0, &desc, 0x801, 0))
+    if (parent->UnknownMethod25(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
         goto failed;
     stride = desc.pitch / bytesPerPixel;
     sourceBits = desc.surface;
@@ -528,7 +529,7 @@ int PCTextureMap::UnknownVirtualSlot15(int filter) {
     while (!result) {
         memset(&desc, 0, sizeof(desc));
         desc.size = sizeof(desc);
-        if (level->UnknownMethod25(0, &desc, 0x801, 0))
+        if (level->UnknownMethod25(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
             goto failed;
         int sourceStride = stride;
         stride = desc.pitch / bytesPerPixel;
@@ -540,7 +541,7 @@ int PCTextureMap::UnknownVirtualSlot15(int filter) {
         parent = level;
         result = parent->UnknownMethod12(&caps, &level);
     }
-    if (result != (long)0x887600ff) {
+    if (result != (long)DDERR_NOTFOUND) {
         UnknownReportDirectDrawError(result, __FILE__, 1421);
         return 0;
     }
@@ -570,11 +571,11 @@ static inline void SetRenderStatePair(TextureMap* map, int state, int value) {
 
 // 0x004c7e30: converts a 24-bit colour to the texture's format (555, 565 or
 // a palette index) and stores it as the colour key.
-void PCTextureMap::UnknownFunction4c7e30(unsigned int color) {
+void PCTextureMap::SetColorKey(unsigned int color) {
     int key;
-    if (field_0x20 == 0x22b)
+    if (field_0x20 == 555)
         key = Pack555(color);
-    else if (field_0x20 == 0x235)
+    else if (field_0x20 == 565)
         key = Pack565(color);
     else if (field_0x20 == 8)
         key = field_0x2c->field_0x710[Pack555(color)];
@@ -585,19 +586,19 @@ void PCTextureMap::UnknownFunction4c7e30(unsigned int color) {
 
 // 0x004c7ef0: replaces magenta in `surface` with `color` and makes `color`
 // (converted to the texture's format) the colour key. Magenta itself only
-// sets the key, except in format 0x22b8, where the key pixels also lose
+// sets the key, except in format 8888, where the key pixels also lose
 // their alpha.
-int PCTextureMap::UnknownFunction4c7ef0(UnknownSurfaceInterface* surface, unsigned int color) {
-    if (color == 0xff00ff && field_0x20 != 0x22b8) {
-        UnknownFunction4c7e30(color);
+int PCTextureMap::ColorKeyLevel(UnknownSurfaceInterface* surface, unsigned int color) {
+    if (color == 0xff00ff && field_0x20 != 8888) {
+        SetColorKey(color);
         return 1;
     }
     UnknownSurfaceDesc desc;
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    if (surface->UnknownMethod25(0, &desc, 0x801, 0))
+    if (surface->UnknownMethod25(0, &desc, DDLOCK_WAIT | DDLOCK_NOSYSLOCK, 0))
         goto failed;
-    if (field_0x20 == 0x22b8) {
+    if (field_0x20 == 8888) {
         UnknownPixel32 from;
         UnknownPixel32 to;
         field_0x34 = field_0x38 = color;
@@ -609,10 +610,10 @@ int PCTextureMap::UnknownFunction4c7ef0(UnknownSurfaceInterface* surface, unsign
         to.green = (unsigned char)(color >> 8);
         to.blue = (unsigned char)color;
         to.alpha = 0;
-        UnknownFunction4d1970(desc.surface, from, to, desc.width, desc.height,
-                              desc.pitch / UnknownFunction511970(0x22b8));
+        ReplaceColor32(desc.surface, from, to, desc.width, desc.height,
+                              desc.pitch / UnknownFunction511970(8888));
     }
-    if (field_0x20 == 0x378) {
+    if (field_0x20 == 888) {
         UnknownPixel24 from;
         UnknownPixel24 to;
         field_0x34 = field_0x38 = color;
@@ -622,20 +623,20 @@ int PCTextureMap::UnknownFunction4c7ef0(UnknownSurfaceInterface* surface, unsign
         to.red = (unsigned char)(color >> 16);
         to.green = (unsigned char)(color >> 8);
         to.blue = (unsigned char)color;
-        UnknownFunction4d1a20(desc.surface, from, to, desc.width, desc.height,
-                              desc.pitch / UnknownFunction511970(0x378));
+        ReplaceColor24(desc.surface, from, to, desc.width, desc.height,
+                              desc.pitch / UnknownFunction511970(888));
     }
-    if (field_0x20 == 0x22b || field_0x20 == 0x613) {
+    if (field_0x20 == 555 || field_0x20 == 1555) {
         field_0x34 = field_0x38 = Pack555(color);
-        UnknownFunction4d1ac0(desc.surface, 0x7c1f, Pack555(color), desc.width, desc.height,
+        ReplaceColor16(desc.surface, 0x7c1f, Pack555(color), desc.width, desc.height,
                               desc.pitch / UnknownFunction511970(field_0x20));
-    } else if (field_0x20 == 0x235) {
+    } else if (field_0x20 == 565) {
         field_0x34 = field_0x38 = Pack565(color);
-        UnknownFunction4d1ac0(desc.surface, 0xf81f, Pack565(color), desc.width, desc.height,
-                              desc.pitch / UnknownFunction511970(0x235));
+        ReplaceColor16(desc.surface, 0xf81f, Pack565(color), desc.width, desc.height,
+                              desc.pitch / UnknownFunction511970(565));
     } else if (field_0x20 == 8) {
         field_0x34 = field_0x38 = field_0x2c->field_0x710[Pack555(color)];
-        UnknownFunction4d1b40(desc.surface, field_0x2c->field_0x710[0x7c1f],
+        ReplaceColor8(desc.surface, field_0x2c->field_0x710[0x7c1f],
                               field_0x2c->field_0x710[Pack555(color)], desc.width, desc.height, desc.pitch);
     }
     if (surface->UnknownMethod32(0))
@@ -649,10 +650,10 @@ failed:
 // key on every level (0x004c7ef0), re-uploads, sets the surfaces' colour key
 // and records render states 0x29 = 1 and 0x1b = 0.
 int PCTextureMap::UnknownVirtualSlot18(unsigned int color) {
-    if (field_0x20 != 0x22b && field_0x20 != 0x235 && field_0x20 != 0x378 && field_0x20 != 0x613)
+    if (field_0x20 != 555 && field_0x20 != 565 && field_0x20 != 888 && field_0x20 != 1555)
         return 0;
     if (field_0x70) {
-        UnknownFunction4c7ef0(field_0x70, color);
+        ColorKeyLevel(field_0x70, color);
         if (field_0x24 > 1) {
             UnknownSurfaceInterface* surface;
             UnknownSurfaceCaps caps;
@@ -661,18 +662,18 @@ int PCTextureMap::UnknownVirtualSlot18(unsigned int color) {
             caps.caps = 0x401000;
             long result = top->UnknownMethod12(&caps, &surface);
             while (!result) {
-                UnknownFunction4c7ef0(surface, color);
+                ColorKeyLevel(surface, color);
                 result = surface->UnknownMethod12(&caps, &surface);
             }
-            if (result != (long)0x887600ff) {
+            if (result != (long)DDERR_NOTFOUND) {
                 UnknownReportDirectDrawError(result, __FILE__, 1811);
                 return 0;
             }
         }
     }
-    if ((color != 0xff00ff || field_0x20 == 0x22b8) && field_0x74)
+    if ((color != 0xff00ff || field_0x20 == 8888) && field_0x74)
         UnknownVirtualSlot9(0, -1);
-    if (field_0x20 == 0x613)
+    if (field_0x20 == 1555)
         return 1;
     if (field_0x70 && field_0x70->UnknownMethod29(8, &field_0x34) ||
         field_0x74 && field_0x74->UnknownMethod29(8, &field_0x34))

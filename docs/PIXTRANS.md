@@ -122,3 +122,63 @@ and `0x004cee30` and the ditherer `0x004cf2a0`. The table getters
 `0x004de280`/`0x004de290` are exact in `src/reconstructed/Quantize.cpp`.
 `0x004cf162` and `0x004d0000` are not function
 starts (inside the ditherer and `0x004cfe70`).
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x004cde20` `Halve24`
+- `0x004cdf10` `Halve8888`
+- `0x004ce190` `Halve4444`
+- `0x004ce420` `Halve1555`
+- `0x004ce5f0` `Halve555`
+- `0x004cea10` `Halve565`
+- `0x004cee30` `Halve8`
+- `0x004cf2a0` `DitherConvert`
+- `0x004cf980` `ReadRow24`
+- `0x004cf9c0` `ReadRow565`
+- `0x004cfa10` `ReadRow555`
+- `0x004cfa60` `Convert565To24`
+- `0x004cfaf0` `Downsample24`
+- `0x004cfc40` `Downsample8888`
+- `0x004cfda0` `Convert24To8888`
+- `0x004d0020` `Downsample4444`
+- `0x004d0170` `Downsample1555`
+- `0x004d02c0` `Downsample565`
+- `0x004d0440` `Downsample555`
+- `0x004d05c0` `Downsample8`
+- `0x004d0700` `Convert565To8888`
+- `0x004d07d0` `Convert1555To8888`
+- `0x004d0870` `Convert4444To8888`
+- `0x004d0900` `Convert24To565`
+- `0x004d09d0` `Convert24To555`
+- `0x004d0aa0` `Convert24To8`
+- `0x004d0b90` `Convert565To8`
+- `0x004d0c40` `Convert555To8`
+- `0x004d0d40` `Convert555To8Fast`
+- `0x004d0e40` `Convert555To8888`
+- `0x004d0f10` `Convert555To24`
+- `0x004d0fb0` `Convert555To565`
+- `0x004d1030` `Convert565To555`
+- `0x004d10b0` `Convert8To24`
+- `0x004d1230` `Convert8888To4444`
+- `0x004d12d0` `Convert8888To1555`
+- `0x004d1370` `Convert24To1555`
+- `0x004d1440` `Convert4444To555`
+- `0x004d1530` `Convert4444To1555`
+- `0x004d15f0` `Convert4444To565`
+- `0x004d16e0` `Convert555To1555`
+- `0x004d1780` `Convert1555To555`
+- `0x004d1810` `Convert565To1555`
+- `0x004d18c0` `Convert1555To565`
+- `0x004d1970` `ReplaceColor32`
+- `0x004d1a20` `ReplaceColor24`
+- `0x004d1ac0` `ReplaceColor16`
+- `0x004d1b40` `ReplaceColor8`
+- `0x004ddec0` `Build16BitTables`
+
+Texture formats are written as their decimal bit layouts (8, 555, 565, 888,
+1555, 4444, 8888); retail's 0x22b, 0x235, 0x378, 0x613, 0x115c and 0x22b8
+are exactly those numbers.

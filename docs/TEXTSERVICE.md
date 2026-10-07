@@ -26,3 +26,14 @@ from the sample). Near misses
 `0x0050ade0` (retail keeps the loop test at the top), the layout
 `0x0050ba00` (store scheduling) and the three blitters (register and
 stack-slot assignment).
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x0050ade0` `SelectFont`
+- `0x0050ae60` `SetFont`
+- `0x0050ae80` `Create`
+- `0x0050bd30` `DrawVertices`

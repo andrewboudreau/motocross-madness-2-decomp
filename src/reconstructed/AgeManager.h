@@ -39,9 +39,9 @@ public:
     int UnknownFunction4011b0(int limit);
     void UnknownFunction401250(AgeEntry* entry);    // 0x00401250: marks `entry` used
 
-    unsigned int field_0x00;                   // current age
-    int field_0x04;                            // entry count
-    int field_0x08;                            // capacity
-    AgeEntry** field_0x0c;                     // entries
-    int field_0x10;                            // accounted bytes
+    unsigned int currentAge;                   // current age
+    int entryCount;                            // entry count
+    int entryCapacity;                            // capacity
+    AgeEntry** entryList;                     // entries
+    int totalBytes;                            // accounted bytes
 };

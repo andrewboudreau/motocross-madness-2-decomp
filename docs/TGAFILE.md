@@ -93,3 +93,25 @@ the stream on its own path: an early return after a failed open, another
 after a failed header read, and a `failed:` block that frees the file and
 then the stream. A single `delete stream` after nested ifs swaps the two
 registers.
+
+## Function names
+
+Names given from each function's behaviour (string literals, D3D/DirectDraw
+method slots and arguments, callers); the address-derived names they
+replace are in Git history. Tier 3 unless the entry says otherwise.
+
+- `0x00511740` `BytesPerPixel`
+- `0x00511800` `IsCompressedFormat`
+- `0x00511850` `HasMipLevels`
+- `0x005118a0` `DecodedFormat`
+- `0x00511af0` `FormatFromPixelFormat`
+- `0x00511b40` `ReadTgaHeader`
+- `0x00511e80` `ReadTgaPixels24`
+- `0x00512100` `ReadTgaPixels32`
+- `0x00512370` `ReadTgaPixels16`
+- `0x00512720` `WriteTga24`
+- `0x005127a0` `FillTgaHeader24`
+- `0x005127f0` `WriteTga32`
+- `0x00512870` `FillTgaHeader32`
+- `0x005128c0` `WriteTga16`
+- `0x00512940` `FillTgaHeader16`

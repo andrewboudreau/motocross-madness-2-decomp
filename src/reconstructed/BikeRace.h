@@ -818,7 +818,7 @@ public:
     virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry);
 
     UnknownBikeRaceCameraView* UnknownFunctionCameraView() {
-        return (UnknownBikeRaceCameraView*)field_0x050;
+        return (UnknownBikeRaceCameraView*)raceCamera;
     }
 
     // Inline (bikerace.h line 0xd3; the destructor 0x0041cf30): frees the
@@ -887,53 +887,53 @@ public:
 
     unsigned char field_0x034;
     unsigned char field_0x035[0x38 - 0x35];
-    UnknownBikeRaceRacer* field_0x038;        // its own racer
-    UnknownBikeRaceRacer** field_0x03c;       // all racers, by racer slot
-    UnknownBikeRaceRacer** field_0x040;       // AI racers (TrackGame+0x2d94 of them)
+    UnknownBikeRaceRacer* localRacer;        // its own racer
+    UnknownBikeRaceRacer** racerSlots;       // all racers, by racer slot
+    UnknownBikeRaceRacer** aiRacers;       // AI racers (TrackGame+0x2d94 of them)
     UnknownBikeRaceViews* field_0x044;
-    Track* field_0x048;
+    Track* raceTrack;
     UnknownBikeRaceProjector* field_0x04c;
-    KrustyBikeCamera* field_0x050;            // the race camera
+    KrustyBikeCamera* raceCamera;            // the race camera
     int field_0x054;
-    Scene* field_0x058;
+    Scene* raceScene;
     UnknownBikeRaceShadow* field_0x05c;
     GameObject* field_0x060;
     UnknownBikeRaceView6c* field_0x064;       // reset by a restart (slot 5)
     int field_0x068;
     UnknownBikeRaceView6c* field_0x06c;
     int field_0x070;
-    UnknownBikeRaceCharacter* field_0x074;    // the flag girl (0x0041ea60's argument)
+    UnknownBikeRaceCharacter* flagGirl;    // the flag girl (0x0041ea60's argument)
     int field_0x078;
     float field_0x07c[11];
     int field_0x0a8;
     int field_0x0ac;
     unsigned char field_0x0b0;
     unsigned char field_0x0b1[0xb4 - 0xb1];
-    ObjectPicker* field_0x0b4;                // debug object picker
+    ObjectPicker* objectPicker;                // debug object picker
     int field_0x0b8;
     int field_0x0bc;
     int field_0x0c0;
     UnknownEventRacerPart* field_0x0c4;
     UnknownBikeRaceNode* field_0x0c8;
-    UnknownBikeRaceNode field_0x0cc;          // start probe
-    UnknownBikeRaceNode field_0x108;          // finish probe
+    UnknownBikeRaceNode startProbe;          // start probe
+    UnknownBikeRaceNode finishProbe;          // finish probe
     int field_0x144;
     int field_0x148;
     int field_0x14c;
     int field_0x150;
     int field_0x154;
-    int field_0x158;                          // racer count
+    int racerCount;                          // racer count
     float field_0x15c;
     float field_0x160;                        // seconds until +0x64 is shown (slot 10)
-    Vector3 field_0x164;                      // start grid: first slot (0x004210f0)
-    Vector3 field_0x170;                      // start grid: step between slots
-    Vector3 field_0x17c;                      // start grid: direction
+    Vector3 gridFirstSlot;                      // start grid: first slot (0x004210f0)
+    Vector3 gridSlotStep;                      // start grid: step between slots
+    Vector3 gridDirection;                      // start grid: direction
     bool field_0x188;
     unsigned char field_0x189;
-    bool field_0x18a;                         // racing
+    bool isRacing;                         // racing
     bool field_0x18b;
-    unsigned char field_0x18c;                // "ForceHighLOD"
-    unsigned char field_0x18d;                // the track file loaded (the setup)
+    unsigned char forceHighLod;                // "ForceHighLOD"
+    unsigned char trackLoaded;                // the track file loaded (the setup)
     bool field_0x18e;
     bool field_0x18f;
     bool field_0x190;
@@ -941,33 +941,33 @@ public:
     float field_0x194;
     int field_0x198;
     UnknownBikeRaceOverlay19c* field_0x19c;
-    KrustyVCR* field_0x1a0;                   // replay being recorded or played
-    KrustyVCR* field_0x1a4;                   // ghost
+    KrustyVCR* replayVcr;                   // replay being recorded or played
+    KrustyVCR* ghostVcr;                   // ghost
     UnknownVcrFile* field_0x1a8;
     float field_0x1ac;                        // the record slot 10 queues (+0x1ac..+0x1b7)
     int field_0x1b0;
     int field_0x1b4;
-    float field_0x1b8;                        // replay time
-    float field_0x1bc;                        // replay length
-    float field_0x1c0;                        // seconds since the last recorder tick (slot 10)
-    float field_0x1c4;                        // replay seek target, -1 when none
+    float replayTime;                        // replay time
+    float replayLength;                        // replay length
+    float recorderTickElapsed;                        // seconds since the last recorder tick (slot 10)
+    float replaySeekTarget;                        // replay seek target, -1 when none
     float field_0x1c8;
-    float field_0x1cc;                        // "VCRGhostTimeLimit"
-    float field_0x1d0;                        // "VCRRecordTimeLimit"
+    float ghostTimeLimit;                        // "VCRGhostTimeLimit"
+    float recordTimeLimit;                        // "VCRRecordTimeLimit"
     int field_0x1d4;
     int field_0x1d8;
-    int field_0x1dc;                          // replay mode
+    int replayMode;                          // replay mode
     int field_0x1e0;
     int field_0x1e4;
     int field_0x1e8;
     int field_0x1ec;
-    char field_0x1f0[0x104];                  // ghost file played
-    char field_0x2f4[0x104];                  // ghost file recorded ("VCRghost.dat"/"VCRgtemp.dat")
+    char ghostFilePlayed[0x104];                  // ghost file played
+    char ghostFileRecorded[0x104];                  // ghost file recorded ("VCRghost.dat"/"VCRgtemp.dat")
     bool field_0x3f8;
     bool field_0x3f9;
     bool field_0x3fa;
     bool field_0x3fb;
-    unsigned char field_0x3fc;                // recording (0x00420650)
+    unsigned char isRecording;                // recording (0x00420650)
     unsigned char field_0x3fd;                // toggled by slot 22
 };
 

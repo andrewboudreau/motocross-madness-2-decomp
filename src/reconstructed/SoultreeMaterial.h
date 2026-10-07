@@ -36,10 +36,10 @@ public:
 // The two ManagedTextureGroups at +0x04/+0x08 receive the procedural managed
 // textures (0x0050c6c0), by whether the format has alpha (0x00511ad0).
 struct SoultreeTextureOptions {
-    TextureMapManager* field_0x00;     // creates procedural textures
-    ManagedTextureGroup* field_0x04;   // textures without alpha
-    ManagedTextureGroup* field_0x08;   // textures with alpha
-    int field_0x0c;                    // format; 0x613 when colour keyed
+    TextureMapManager* textureManager; // creates procedural textures
+    ManagedTextureGroup* opaqueTextures; // textures without alpha
+    ManagedTextureGroup* alphaTextures; // textures with alpha
+    int format;                               // format; 1555 when colour keyed
     int field_0x10;
     int field_0x14;
 };
@@ -57,36 +57,36 @@ public:
     virtual ~SoultreeMaterial();               // 0x004ff120 (deleting wrapper 0x004ff090)
 
     // 0x004ff0b0: attaches the render target and the texture options.
-    SoultreeMaterial* UnknownFunction4ff0b0(RenderTarget* target, const SoultreeTextureOptions* options,
+    SoultreeMaterial* Attach(RenderTarget* target, const SoultreeTextureOptions* options,
                                TextureMapManager* manager, int format);
-    void UnknownFunction4ff180();             // 0x004ff180: sets the render states
-    void UnknownFunction4ff410();             // 0x004ff410: restores them
-    void UnknownFunction4ff450(UnknownParameterStream* stream); // 0x004ff450: reads a saved material
-    void UnknownFunction4ff620();             // 0x004ff620: (re)loads the texture
+    void ApplyRenderStates();                 // 0x004ff180: sets the render states
+    void RestoreRenderStates();               // 0x004ff410: restores them
+    void ReadSaved(UnknownParameterStream* stream);             // 0x004ff450: reads a saved material
+    void LoadTexture();                       // 0x004ff620: (re)loads the texture
     // 0x004ff9e0: reads the material keys; loads the texture when `load`.
-    void UnknownFunction4ff9e0(UnknownParameterBlock* block, int load);
-    void UnknownFunction5000b0();             // 0x005000b0: an untextured "NONE" material
-    void UnknownFunction5000f0(const SoultreeMaterial* other); // 0x005000f0: copies `other`
+    void ReadKeys(UnknownParameterBlock* block, int load);
+    void MakeUntextured();                    // 0x005000b0: an untextured "NONE" material
+    void CopyFrom(const SoultreeMaterial* other);              // 0x005000f0: copies `other`
 
-    char field_0x2c[0x40];                    // texture name ("TextureMap")
-    TextureMapManager* field_0x6c;            // loads named textures
+    char textureName[0x40];                   // texture name ("TextureMap")
+    TextureMapManager* textureManager;        // loads named textures
     SurfaceMap* field_0x70;
     SoultreeTextureOptions field_0x74;
-    int field_0x8c;                           // "TextureFormat"
-    unsigned int field_0x90;                  // colour key, 0x00rrggbb ("ColorKey")
-    int field_0x94;                           // "SourceBlend" (1 ZERO .. 13 BOTHINVSRCALPHA)
-    int field_0x98;                           // "DestBlend"
-    int field_0x9c;                           // has a texture name
-    int field_0xa0;                           // "UseVertexColor"
-    int field_0xa4;                           // "MipMapped" (default 1)
-    int field_0xa8;                           // colour key given
-    int field_0xac;                           // source blend given
-    int field_0xb0;                           // dest blend given
-    int field_0xb4;                           // "ClampTexture"
+    int textureFormat;                        // "TextureFormat"
+    unsigned int colorKey;                    // colour key, 0x00rrggbb ("ColorKey")
+    int sourceBlend;                          // "SourceBlend" (1 ZERO .. 13 BOTHINVSRCALPHA)
+    int destBlend;                            // "DestBlend"
+    int hasTextureName;                       // has a texture name
+    int useVertexColor;                       // "UseVertexColor"
+    int mipMapped;                            // "MipMapped" (default 1)
+    int hasColorKey;                          // colour key given
+    int hasSourceBlend;                       // source blend given
+    int hasDestBlend;                         // dest blend given
+    int clampTexture;                         // "ClampTexture"
     int field_0xb8;                           // 1 after construction
-    int field_0xbc;                           // alpha given
-    float field_0xc0;                         // "Alpha" (default 1.0)
-    float field_0xc4;                         // "TextureSpeed"
-    unsigned short field_0xc8;                       // "MappingType" (0 STANDARD .. 9 NONE)
+    int hasAlpha;                             // alpha given
+    float materialAlpha;                      // "Alpha" (default 1.0)
+    float textureSpeed;                       // "TextureSpeed"
+    unsigned short mappingType;                      // "MappingType" (0 STANDARD .. 9 NONE)
     int field_0xcc;
 };
