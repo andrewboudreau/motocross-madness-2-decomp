@@ -1,12 +1,6 @@
 // Near-miss ControlInterface candidates, kept out of src/reconstructed until
 // they match. See docs/INPUT_DEVICES.md.
 //
-// ControlInterface::UnknownFunction43cf00 (0x0043cf00, 363 bytes + jump
-// table): everything matches except the modifier stamp. Retail loads the
-// keyboard pointer, skips the load of +0x16d8 when it is null and stores
-// the (zero) pointer itself; VC6 here emits `jmp` + `xor eax, eax` for the
-// zero. Ternary, if/else, local-variable and inline-helper forms all do.
-//
 // PCControlInterface::UnknownVirtualSlot3 (0x004bf4f0, 88 bytes + jump
 // table): the keyboard and mouse cases call the same slot, so their tails
 // merge. Retail keeps the keyboard case whole and has the mouse case jump
@@ -26,55 +20,6 @@
 #include "../../src/reconstructed/KeyboardDevice.h"
 #include "../../src/reconstructed/MouseDevice.h"
 #include "../../src/reconstructed/TrackGame.h"
-
-// 0x0043cf00: has the keyboard, mouse and joysticks read their input, then
-// passes each queued event, stamped with the keyboard's modifier state, to
-// the global object (slot 13 for releases, 14 for presses) with the
-// device's entry for that control.
-int ControlInterface::UnknownFunction43cf00(int value) {
-    queuedEventCount = 0;
-    if (keyboard)
-        keyboard->UnknownVirtualSlot6(value);
-    if (mouse)
-        mouse->UnknownVirtualSlot6(value);
-    for (int i = 0; i < 8; i++) {
-        if (joysticks[i])
-            joysticks[i]->UnknownVirtualSlot20(value);
-    }
-    for (int j = 0; j < queuedEventCount; j++) {
-        UnknownControlEvent* event = &events[j];
-        if (keyboard)
-            event->modifiers = keyboard->modifierState;
-        else
-            event->modifiers = 0;
-        switch (event->kind) {
-        case 0:
-            if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(
-                    event, &keyboard->keyStates[event->control]);
-            if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(
-                    event, &keyboard->keyStates[event->control]);
-            break;
-        case 1:
-            if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(event, &mouse->buttonStates[event->control]);
-            if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(event, &mouse->buttonStates[event->control]);
-            break;
-        case 2:
-        case 3:
-            if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(
-                    event, &joysticks[event->device]->buttonStates[event->control]);
-            if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(
-                    event, &joysticks[event->device]->buttonStates[event->control]);
-            break;
-        }
-    }
-    return 1;
-}
 
 // 0x004bf4f0: `control` on one device: kind 0 the keyboard, 1 the mouse,
 // 2 and 3 joystick `device`.

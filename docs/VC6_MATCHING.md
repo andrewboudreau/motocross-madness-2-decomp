@@ -341,9 +341,10 @@ Subject to the open-PR check, prefer:
    loop's SIB base/index order follows the index expression: a count-down
    loop with a `count - remaining` index puts the induction register first;
    ascending `i`, pointer walks, `i[table]` and byte offsets do not.
-2. `ControlInterface` update `0x0043cf00`: the devices, event layout and dispatch
-   are established, and the remaining discrepancy is confined to modifier null
-   handling.
+2. `ControlInterface` update `0x0043cf00`: exact in `ControlInterface.cpp`.
+   Retail reuses the null keyboard pointer as the zero modifier state, which
+   only an int local that holds the pointer, is tested, and then receives
+   the field reproduces; every zero-constant spelling emits `xor eax, eax`.
 3. Event progress callback `0x0045cb20`: exact in `EventManager.cpp` since the
    Game pointer is re-read at each use (a KrustyUI local swapped the two
    registers of the final add; no flag or `+=` spelling moved it).

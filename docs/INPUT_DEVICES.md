@@ -192,10 +192,14 @@ input code uses. Its layout:
 | +0x3c | 160 queued 20-byte events, added by `0x0043cea0` |
 | +0xcbc | Mapping table, set by `0x0043ce70` |
 
-Its update, `0x0043cf00`, is a near miss (`samples/control`); only the
-modifier stamp's null handling differs. It has every device read, then
-hands each queued event, with the keyboard's modifier mask and the device's
-entry, to the global object's slot 13 (release) or slot 14 (press).
+Its update, `0x0043cf00` (380 bytes with its jump table, exact), has every
+device read, then hands each queued event, with the keyboard's modifier
+mask and the device's entry, to the global object's slot 13 (release) or
+slot 14 (press). Retail stores the null keyboard pointer itself as the
+modifier state when there is no keyboard: the only source shape VC6 turns
+into that code tests the pointer as the int that then receives the state.
+Ternary, if/else, zero-initialised local and inline-helper forms all emit a
+separate `xor eax, eax`.
 
 The mapping table (`0x0043cae0`–`0x0043cc10`) holds, for each of 50
 controls, a keyboard key, a button for each of 8 joysticks and a mouse

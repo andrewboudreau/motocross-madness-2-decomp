@@ -1525,6 +1525,15 @@ CASES = [
         'reason': 'count re-read for each store',
     },
     {
+        'name': 'ControlInterface ControlInterface 0x43cf00 update',
+        'bindings': 'src/reconstructed/ControlInterface.bindings.json',
+        'source': 'src/reconstructed/ControlInterface.cpp',
+        'symbol': '?UnknownFunction43cf00@ControlInterface@@QAEHH@Z',
+        'target_va': '0x0043cf00',
+        'target_size': 380,
+        'reason': 'device slots 6/20, global slots 13/14; the null keyboard pointer doubles as the modifier state; four-case jump table in extent',
+    },
+    {
         'name': 'JoystickDevice slot 0 unbind by id',
         'bindings': 'src/reconstructed/JoystickDevice.bindings.json',
         'source': 'src/reconstructed/JoystickDevice.cpp',
