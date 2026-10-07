@@ -203,8 +203,9 @@ and 8 `$E`) and Point2D's inline methods (5) match strictly; see
 dlgprocs.cpp (the front-end dialogs) matches strictly in 89 functions;
 see [DIALOGPROCS](DIALOGPROCS.md).
 
-A coverage round-out adds PCRenderTarget.cpp (+12), gameobj.cpp (+13,
-including GameObjectIterator), PCAudio.cpp's two deleting destructors,
+A coverage round-out adds PCRenderTarget.cpp (+12), gameobj.cpp (+14,
+including GameObjectIterator and the int-returning unlink 0x4691f0),
+Pixtrans.cpp's seven downsamplers and keyed 24-bit converter (+8), PCAudio.cpp's two deleting destructors,
 the BikeCamera/VehicleCamera/KrustyBikeCamera init chain (+3) and
 BikeCamera.cpp's vector set (+8); see [RENDER_TARGET](RENDER_TARGET.md)
 and [GAMEOBJECT](GAMEOBJECT.md). In krusty2, Bike.cpp, CollisionObject.cpp,

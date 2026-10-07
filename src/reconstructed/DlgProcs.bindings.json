@@ -301,7 +301,7 @@
   "?UnknownFunction45e520@EventManager@@QAEXXZ": "0x0045e520",
   "?UnknownFunction45e710@EventManager@@QAEXH@Z": "0x0045e710",
   "?UnknownFunction468880@Game@@QAEXXZ": "0x00468880",
-  "?UnknownFunction4691f0@GameObject@@QAEXXZ": "0x004691f0",
+  "?UnknownFunction4691f0@GameObject@@QAEHXZ": "0x004691f0",
   "?UnknownFunction469260@GameObject@@QAEHPAV1@H@Z": "0x00469260",
   "?UnknownFunction46a8a0@UIDialog@@QAEPAVGameObject@@PAV2@HH@Z": "0x0046a8a0",
   "?UnknownFunction46e9a0@UIDialog@@QAEPAVSound@@PBD@Z": "0x0046e9a0",

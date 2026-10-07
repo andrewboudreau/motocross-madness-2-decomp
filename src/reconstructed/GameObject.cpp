@@ -402,6 +402,26 @@ int GameObject::UnknownFunction469190(GameObject* child, int value) {
     return (int)child;
 }
 
+// 0x004691f0
+int GameObject::UnknownFunction4691f0() {
+    if (g_UnknownGlobal65b548)
+        return 0;
+    if (field_0x08)
+        field_0x08->field_0x0C = field_0x0C;
+    if (field_0x0C)
+        field_0x0C->field_0x08 = field_0x08;
+    if (field_0x14 && field_0x14->field_0x10 == this)
+        field_0x14->field_0x10 = field_0x0C;
+    GameObject* root = this;
+    while (root->field_0x14)
+        root = root->field_0x14;
+    root->UnknownFunction469100();
+    field_0x14 = 0;
+    field_0x0C = 0;
+    field_0x08 = 0;
+    return 1;
+}
+
 // 0x00469260: unlinks this object and inserts it before `next`.
 int GameObject::UnknownFunction469260(GameObject* next, int value) {
     if (g_UnknownGlobal65b548)

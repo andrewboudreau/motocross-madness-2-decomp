@@ -1,5 +1,7 @@
 // Pixtrans.cpp's pixel converters. Names are provisional; see Pixtrans.h.
 
+#include <string.h>
+
 #include "Pixtrans.h"
 
 #include "DebugAlloc.h"
@@ -637,6 +639,228 @@ int UnknownFunction4cfa60(void* destination, void* source, int width, int height
         row += destinationStride;
     }
     return 1;
+}
+
+// 0x004cfaf0: shrinks 24-bit `source` by `levels` halvings into the width x
+// height `destination` (0: a plain copy). Intermediate levels go through a
+// buffer of the first level's size.
+int UnknownFunction4cfaf0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int levels) {
+    if (levels == 0) {
+        for (int y = 0; y < height; y++)
+            memcpy((UnknownPixel24*)destination + y * destinationStride, (UnknownPixel24*)source + y * sourceStride,
+                   width * 3);
+        return 1;
+    }
+    if (levels == 1) {
+        UnknownFunction4cde20(destination, source, width, height, destinationStride, sourceStride);
+        return 1;
+    }
+    int levelWidth = width << (levels - 1);
+    int levelHeight = height << (levels - 1);
+    void* buffer = DebugMalloc(levelHeight * levelWidth * 3, __FILE__, 1329);
+    UnknownFunction4cde20(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
+    for (int i = 2; i < levels; i++) {
+        levelWidth /= 2;
+        levelHeight /= 2;
+        UnknownFunction4cde20(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
+    }
+    UnknownFunction4cde20(destination, buffer, width, height, destinationStride, levelWidth);
+    operator delete(buffer, __FILE__, 1350);
+    return 1;
+}
+
+// 0x004cfc40: shrinks 8888 `source` by `levels` halvings (0: a plain
+// copy), like 0x004cfaf0.
+int UnknownFunction4cfc40(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int levels) {
+    if (levels == 0) {
+        for (int y = 0; y < height; y++)
+            memcpy((UnknownPixel32*)destination + y * destinationStride, (UnknownPixel32*)source + y * sourceStride,
+                   width * 4);
+        return 1;
+    }
+    if (levels == 1) {
+        UnknownFunction4cdf10(destination, source, width, height, destinationStride, sourceStride);
+        return 1;
+    }
+    int levelWidth = width << (levels - 1);
+    int levelHeight = height << (levels - 1);
+    void* buffer = DebugMalloc(levelHeight * levelWidth * 4, __FILE__, 1390);
+    if (!buffer)
+        return 0;
+    UnknownFunction4cdf10(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
+    for (int i = 2; i < levels; i++) {
+        levelWidth /= 2;
+        levelHeight /= 2;
+        UnknownFunction4cdf10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
+    }
+    UnknownFunction4cdf10(destination, buffer, width, height, destinationStride, levelWidth);
+    operator delete(buffer, __FILE__, 1412);
+    return 1;
+}
+
+// 0x004d0020: shrinks 4444 `source` by `levels` halvings through 0x004ce190.
+int UnknownFunction4d0020(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int levels) {
+    if (levels == 0) {
+        for (int y = 0; y < height; y++)
+            memcpy((unsigned short*)destination + y * destinationStride, (unsigned short*)source + y * sourceStride,
+                   width * 2);
+        return 1;
+    }
+    if (levels == 1) {
+        UnknownFunction4ce190(destination, source, width, height, destinationStride, sourceStride, 0);
+        return 1;
+    }
+    int levelWidth = width << (levels - 1);
+    int levelHeight = height << (levels - 1);
+    void* buffer = DebugMalloc(levelHeight * levelWidth * 2, __FILE__, 1572);
+    UnknownFunction4ce190(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, 0);
+    for (int i = 2; i < levels; i++) {
+        levelWidth /= 2;
+        levelHeight /= 2;
+        UnknownFunction4ce190(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, 0);
+    }
+    UnknownFunction4ce190(destination, buffer, width, height, destinationStride, levelWidth, 0);
+    operator delete(buffer, __FILE__, 1593);
+    return 1;
+}
+
+// 0x004d0170: shrinks 1555 `source` by `levels` halvings through 0x004ce420.
+int UnknownFunction4d0170(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int levels) {
+    if (levels == 0) {
+        for (int y = 0; y < height; y++)
+            memcpy((unsigned short*)destination + y * destinationStride, (unsigned short*)source + y * sourceStride,
+                   width * 2);
+        return 1;
+    }
+    if (levels == 1) {
+        UnknownFunction4ce420(destination, source, width, height, destinationStride, sourceStride);
+        return 1;
+    }
+    int levelWidth = width << (levels - 1);
+    int levelHeight = height << (levels - 1);
+    void* buffer = DebugMalloc(levelHeight * levelWidth * 2, __FILE__, 1632);
+    UnknownFunction4ce420(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
+    for (int i = 2; i < levels; i++) {
+        levelWidth /= 2;
+        levelHeight /= 2;
+        UnknownFunction4ce420(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
+    }
+    UnknownFunction4ce420(destination, buffer, width, height, destinationStride, levelWidth);
+    operator delete(buffer, __FILE__, 1653);
+    return 1;
+}
+
+// 0x004d02c0: shrinks 565 `source` by `levels` halvings through 0x004cea10
+// (magenta 0xf81f is the key).
+int UnknownFunction4d02c0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int levels, int filter) {
+    if (levels == 0) {
+        for (int y = 0; y < height; y++)
+            memcpy((unsigned short*)destination + y * destinationStride, (unsigned short*)source + y * sourceStride,
+                   width * 2);
+        return 1;
+    }
+    if (levels == 1) {
+        UnknownFunction4cea10(destination, source, width, height, destinationStride, sourceStride, filter, 0xf81f);
+        return 1;
+    }
+    int levelWidth = width << (levels - 1);
+    int levelHeight = height << (levels - 1);
+    void* buffer = DebugMalloc(levelHeight * levelWidth * 2, __FILE__, 1693);
+    UnknownFunction4cea10(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, filter, 0xf81f);
+    for (int i = 2; i < levels; i++) {
+        levelWidth /= 2;
+        levelHeight /= 2;
+        UnknownFunction4cea10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, filter, 0xf81f);
+    }
+    UnknownFunction4cea10(destination, buffer, width, height, destinationStride, levelWidth, filter, 0xf81f);
+    operator delete(buffer, __FILE__, 1714);
+    return 1;
+}
+
+// 0x004d0440: shrinks 555 `source` by `levels` halvings through 0x004ce5f0
+// (magenta 0x7c1f is the key).
+int UnknownFunction4d0440(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int levels, int filter) {
+    if (levels == 0) {
+        for (int y = 0; y < height; y++)
+            memcpy((unsigned short*)destination + y * destinationStride, (unsigned short*)source + y * sourceStride,
+                   width * 2);
+        return 1;
+    }
+    if (levels == 1) {
+        UnknownFunction4ce5f0(destination, source, width, height, destinationStride, sourceStride, filter, 0x7c1f);
+        return 1;
+    }
+    int levelWidth = width << (levels - 1);
+    int levelHeight = height << (levels - 1);
+    void* buffer = DebugMalloc(levelHeight * levelWidth * 2, __FILE__, 1754);
+    UnknownFunction4ce5f0(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, filter, 0x7c1f);
+    for (int i = 2; i < levels; i++) {
+        levelWidth /= 2;
+        levelHeight /= 2;
+        UnknownFunction4ce5f0(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, filter, 0x7c1f);
+    }
+    UnknownFunction4ce5f0(destination, buffer, width, height, destinationStride, levelWidth, filter, 0x7c1f);
+    operator delete(buffer, __FILE__, 1775);
+    return 1;
+}
+
+// 0x004d05c0: shrinks palette-index `source` by `levels` halvings through
+// 0x004cee30.
+int UnknownFunction4d05c0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int levels, UnknownTexturePalette* palette) {
+    if (levels == 0) {
+        for (int y = 0; y < height; y++)
+            memcpy((unsigned char*)destination + y * destinationStride, (unsigned char*)source + y * sourceStride,
+                   width);
+        return 1;
+    }
+    if (levels == 1) {
+        UnknownFunction4cee30(destination, source, width, height, destinationStride, sourceStride, palette);
+        return 1;
+    }
+    int levelWidth = width << (levels - 1);
+    int levelHeight = height << (levels - 1);
+    void* buffer = DebugMalloc(levelHeight * levelWidth, __FILE__, 1816);
+    UnknownFunction4cee30(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride, palette);
+    for (int i = 2; i < levels; i++) {
+        levelWidth /= 2;
+        levelHeight /= 2;
+        UnknownFunction4cee30(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2, palette);
+    }
+    UnknownFunction4cee30(destination, buffer, width, height, destinationStride, levelWidth, palette);
+    operator delete(buffer, __FILE__, 1840);
+    return 1;
+}
+
+// 0x004cfda0: converts 24-bit to 8888; the 0xRRGGBB `key` becomes
+// transparent. Rows are addressed from the row index.
+void UnknownFunction4cfda0(void* destination, void* source, int width, int height, int destinationStride,
+                           int sourceStride, unsigned int key) {
+    int keyColor[3];
+    keyColor[0] = (key >> 16) & 0xff;
+    keyColor[1] = (key >> 8) & 0xff;
+    keyColor[2] = key & 0xff;
+    for (int y = 0; y < height; y++) {
+        unsigned char* from = (unsigned char*)source + y * sourceStride * 3;
+        unsigned char* to = (unsigned char*)destination + y * destinationStride * 4;
+        for (int x = 0; x < width; x++) {
+            to[0] = from[0];
+            to[1] = from[1];
+            to[2] = from[2];
+            if (from[0] == keyColor[0] && from[1] == keyColor[1] && from[2] == keyColor[2])
+                to[3] = 0;
+            else
+                to[3] = 0xff;
+            from += 3;
+            to += 4;
+        }
+    }
 }
 
 // 0x004cfe70: converts 24-bit to 8888 (0x004cfda0, keyed) at `levels`

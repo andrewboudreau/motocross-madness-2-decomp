@@ -247,6 +247,9 @@ public:
     void UnknownFunction51bdc0();             // 0x0051bdc0: frame-rate readout
     int UnknownFunction51bed0(int mode);      // 0x0051bed0 (not reconstructed)
     void UnknownFunction51cb20();             // 0x0051cb20: the next two gates (not reconstructed)
+    // 0x0051c720: draws the track outline (mode 1 or 2 picks the segment
+    // edge), clipped to the map circle (near miss).
+    void UnknownFunction51c720(int mode);
     // 0x0051c360: maps the world point `point` to the map pixel (*x, *y);
     // when it lies beyond the map radius, returns 1 with the rim point in
     // (*rimX, *rimY).
@@ -401,18 +404,16 @@ public:
     int field_0x134;                          // the large layout (set by 0x0051cf80)
     int field_0x138;                          // input line shown
     UnknownChatInput* field_0x13c;
-    unsigned char field_0x140[0x150 - 0x140];
-    int field_0x150;                          // the extra name tag's position (0x0051d730)
-    int field_0x154;
-    unsigned char field_0x158[0x160 - 0x158];
+    UnknownOverlayRect field_0x140;           // chat rectangle (set by 0x0051cf80)
+    UnknownOverlayRect field_0x150;           // cue rectangle; left/top place the extra name tag (0x0051d730)
     int field_0x160;
     int field_0x164;
     int field_0x168;                          // name changed
     UnknownChatRacer* field_0x16c[11];
     int field_0x198;                          // name tag index
     int field_0x19c[11];                      // field_0x16c[i]->field_0x784 last seen
-    GameObject* field_0x1c8;
-    GameObject* field_0x1cc;
+    Overlay* field_0x1c8;                     // side panels on wide screens (0x0051cf80)
+    Overlay* field_0x1cc;
     float field_0x1d0;
     char field_0x1d4[0x104];                  // name
     NameOverlay* field_0x2d8[13];

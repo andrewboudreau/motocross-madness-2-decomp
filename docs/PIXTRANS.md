@@ -8,7 +8,12 @@ provisional.
 Extent: `0x004cde20..0x004d28af` (strong inference; no `$E`). The code
 before it is window code called from PCGame, with its own bss.
 
-Exact: 35 calibration cases. This pass added nine:
+Exact: 35 calibration cases, plus eight more in `Pixtrans.cpp` (strict
+exact, not yet calibration cases): the seven per-format downsamplers
+`0x004cfaf0` (24-bit), `0x004cfc40` (8888), `0x004d0020` (4444),
+`0x004d0170` (1555), `0x004d02c0` (565), `0x004d0440` (555) and
+`0x004d05c0` (palette), and the keyed 24-bit to 8888 converter
+`0x004cfda0`. Calibration cases include:
 - The three ditherer row readers `0x004cf980`, `0x004cf9c0` and
   `0x004cfa10`.
 - 565 to 24-bit `0x004cfa60`.
@@ -86,12 +91,23 @@ Each copies rows for 0 levels, halves once through a per-format halver
 `top[sourceStride]`) for 1, and otherwise halves through a temporary of the
 first level's size (Pixtrans.cpp lines 1329/1350 in the 24-bit one).
 
-Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004cfaf0`, whose
-plain-copy path's hoisted strides land in different argument slots;
+The downsamplers' plain-copy path and `0x004cfda0` address each row from
+the row index (`(UnknownPixel32*)source + y * sourceStride`); VC6 then
+strength-reduces the row offsets and keeps the hoisted steps in the dead
+argument slots exactly as retail does. Walking row pointers advanced by the
+stride put the steps in other slots. The downsamplers' halvers are declared
+in `Pixtrans.h` and bound but not reconstructed: 4444 `0x004ce190` (last
+argument always 0; bit 0 of it selects a packed-arithmetic path), 1555
+`0x004ce420`, 555 `0x004ce5f0` and 565 `0x004cea10` (filter flag, then the
+magenta key 0x7c1f/0xf81f; both have an ebp frame) and palette
+`0x004cee30`. The `DebugMalloc`/`delete` line numbers of the downsamplers
+run from 1329 (24-bit) to 1840 (palette).
+
+Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004ce420` (the
+1555 halver; retail keeps the two lower-row pixels in frame slots),
 `0x004d0700` (565 to 8888, keyed; register and slot choice) and
 `0x004d07d0` (1555 to 8888; only the pixel pointer's base offset);
-`0x004d0aa0`/`0x004d0b90` (24-bit/565 to palette indices; only where the
-`palette` argument is loaded); `0x004cdf10`, the 8888 halver, which
+`0x004d24d0` (average colour; the shared return's position); `0x004cdf10`, the 8888 halver, which
 averages colour over the 2x2 pixels with alpha set (the fourth pixel adds
 the third one's alpha in retail) and differs in register assignment.
 
@@ -101,6 +117,7 @@ converters `0x004d0aa0`/`0x004d0b90`/`0x004d0c40` (24-bit, 565, 555) dither
 through `0x004cf2a0` when asked and otherwise map through the 555-to-index
 and 565-to-index tables `0x004de280`/`0x004de290`.
 
-Not reconstructed: the other downsamplers and halvers, the 555-to-index
-converter `0x004d0c40`, the ditherer `0x004cf2a0`, the table getters
-`0x004de280`/`0x004de290`, the converter `0x004d1d20` and `0x004d24d0`.
+Not reconstructed: the halvers `0x004ce190`, `0x004ce5f0`, `0x004cea10`
+and `0x004cee30`, the ditherer `0x004cf2a0` and the table getters
+`0x004de280`/`0x004de290`. `0x004cf162` and `0x004d0000` are not function
+starts (inside the ditherer and `0x004cfe70`).

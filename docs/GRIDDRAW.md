@@ -181,3 +181,9 @@ python tools/match.py --exe "$MCM2_EXE" --target-va 0x0047ef80 \
   --symbol '?UnknownFunction47ef80@DrawableGridNode@@QAEHHHHH@Z' \
   --bindings src/reconstructed/Griddraw.bindings.json --json
 ```
+
+Not function starts (branch targets inside the functions above):
+`0x0047f190`, `0x0047f470`, `0x00480020`, `0x00480074`, `0x00481330`,
+`0x004831a0` and `0x00483510`. Not reconstructed or attempted:
+`0x004815e0` (1082 bytes, an x87 viewer-distance test with a `FastSqrt`
+call) and `0x00481de0` (1750 bytes, a recursive node walk).

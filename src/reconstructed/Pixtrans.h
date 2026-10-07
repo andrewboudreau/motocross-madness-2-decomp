@@ -123,6 +123,21 @@ int UnknownFunction4cde20(void* destination, void* source, int width, int height
 int UnknownFunction4cdf10(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride);
 
+// Per-format halvers behind the downsamplers (not reconstructed): 4444
+// 0x004ce190 (its last argument is always 0), 1555 0x004ce420, 555
+// 0x004ce5f0 and 565 0x004cea10 (with the filter flag and the magenta key)
+// and palette indices 0x004cee30.
+int UnknownFunction4ce190(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int value);
+int UnknownFunction4ce420(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride);
+int UnknownFunction4ce5f0(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int filter, unsigned short key);
+int UnknownFunction4cea10(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int filter, unsigned short key);
+int UnknownFunction4cee30(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, UnknownTexturePalette* palette);
+
 // Per-format halving downsamplers behind 0x004d1b90 (8888, 24-bit, 4444,
 // 1555, 565, 555, palette); `levels` (the number of halvings) and `filter`
 // are passed through.

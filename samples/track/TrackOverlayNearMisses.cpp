@@ -47,6 +47,27 @@
 // branches, a racer local, a game local and an explicit double do not
 // change it.
 
+// RadarOverlay::UnknownFunction51c720 (0x0051c720, 1016 bytes; candidate
+// 1002): draws the track outline through a TrackListItem work list. The
+// control flow, the calls and the stores match once the node is read
+// through a reference to the list entry (`TrackNode*& node`, retail keeps
+// &list->field_0x04 in edi), the visited/unvisited branches are an if/else
+// and the segment walk is `if (segment) do ... while (segment)`. Left: the
+// frame (retail 0x8c bytes, here 0x74; retail groups the clip arrays as
+// both circles, both line ends, both hits, and keeps the work list and the
+// node reference in frame slots below the point), the store order of the
+// entering clip's hit point, and the child loop, where retail reloads the
+// node from edi in the body instead of reusing the loop test's eax.
+
+// ChatOverlay::UnknownFunction51cf80 (0x0051cf80, 1953 bytes; candidate
+// 1947): the loader. Frame layout, calls, the font set-up and the
+// rectangles match once the side-panel rectangle is declared inside the
+// wide-screen block. Left: scheduling in that block (retail keeps the chat
+// rectangle's left edge in ebx and later -1 in ebx for both the EH state and
+// the 0x00469190 argument), the order of the LOGFONT field stores, and the
+// thirteenth name-tag rectangle, whose constructor temporary retail places
+// in a separate frame slot (0x74) where VC6 here reuses the first one.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -200,7 +221,7 @@ int ChatOverlay::UnknownFunction51d730(UnknownChatView* view)
             (UnknownNameOverlayWorld*)field_0x12c, i);
         UnknownFunction469190(field_0x2d8[field_0x198], -1);
         if (field_0x2d8[field_0x198]) {
-            field_0x2d8[field_0x198]->UnknownFunction519080(Vector3(field_0x150, field_0x154, 0));
+            field_0x2d8[field_0x198]->UnknownFunction519080(Vector3(field_0x150.left, field_0x150.top, 0));
             field_0x2d8[field_0x198]->UnknownVirtualSlot4();
             field_0x160 = field_0x30c[field_0x198].right;
             field_0x2d8[field_0x198]->field_0x124 = 0;
@@ -447,4 +468,221 @@ void ChatOverlay::UnknownFunction51e3f0(void* dc, int index)
         }
     }
     SelectObject(dc, font);
+}
+
+// The view RadarOverlay draws (+0x12c) holds its track at +0x48.
+struct UnknownRadarView {
+    unsigned char field_0x00[0x48];
+    Track* field_0x48;
+};
+
+// 0x0051c720: draws the track outline (mode 1: the +0x18 edge of every
+// segment, 2: the +0x0c edge), clipped to the map circle, walking every node
+// once through a work list.
+void RadarOverlay::UnknownFunction51c720(int mode)
+{
+    TrackListItem* list = 0;
+    TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1992);
+    item->field_0x04 = ((UnknownRadarView*)field_0x12c)->field_0x48->field_0x00;
+    item->field_0x0c = list;
+    list = item;
+    while (list) {
+        TrackNode*& node = list->field_0x04;
+        if (node->field_0x00 & 4) {
+            node->field_0x00 &= ~4;
+            item = list;
+            list = list->field_0x0c;
+            operator delete(item, __FILE__, 2001);
+        } else {
+        node->field_0x00 |= 4;
+        TrackSegment* first = node->field_0x08;
+        Vector3 point;
+        if (mode == 1)
+            point = *(Vector3*)&first->field_0x18;
+        else if (mode == 2)
+            point = *(Vector3*)&first->field_0x0c;
+        int startX;
+        int startY;
+        float rim[2];
+        int outside = UnknownFunction51c360(point, &startX, &startY, &rim[0], &rim[1]);
+        field_0x1b8.sx = (float)startX;
+        field_0x1b8.sy = (float)startY;
+        field_0x1b8.color = 0xedea5e;
+        field_0x1d8.color = 0xedea5e;
+        int x = startX;
+        int y = startY;
+        TrackSegment* segment = first->field_0x2c;
+        if (segment) do {
+            if (mode == 1)
+                point = *(Vector3*)&segment->field_0x18;
+            else if (mode == 2)
+                point = *(Vector3*)&segment->field_0x0c;
+            int wasOutside = outside;
+            float from[2];
+            from[0] = (float)x;
+            from[1] = (float)y;
+            outside = UnknownFunction51c360(point, &x, &y, &rim[0], &rim[1]);
+            if (outside) {
+                if (wasOutside) {
+                    field_0x1b8.sx = (float)x;
+                    field_0x1b8.sy = (float)y;
+                } else {
+                    float to[2];
+                    float circle[3];
+                    float hit[2];
+                    to[0] = (float)x;
+                    to[1] = (float)y;
+                    circle[2] = field_0x19c;
+                    circle[0] = (float)field_0x1a0;
+                    circle[1] = (float)field_0x1a4;
+                    if (UnknownFunction51c4f0(from, to, circle, rim, hit) != -1) {
+                        field_0x1d8.sx = hit[0];
+                        field_0x1d8.sy = hit[1];
+                        Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+                        field_0x1b8 = field_0x1d8;
+                    }
+                }
+            } else if (wasOutside) {
+                float to[2];
+                float circle[3];
+                float hit[2];
+                to[0] = (float)x;
+                to[1] = (float)y;
+                circle[2] = field_0x19c;
+                circle[0] = (float)field_0x1a0;
+                circle[1] = (float)field_0x1a4;
+                if (UnknownFunction51c4f0(from, to, circle, rim, hit) != -1) {
+                    field_0x1b8.sy = hit[1];
+                    field_0x1d8.sy = (float)y;
+                    field_0x1d8.sx = (float)x;
+                    field_0x1b8.sx = hit[0];
+                    Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+                    field_0x1b8 = field_0x1d8;
+                }
+            } else {
+                field_0x1d8.sx = (float)x;
+                field_0x1d8.sy = (float)y;
+                Target()->UnknownVirtualSlot16(3, 0x1c4, (int)&field_0x1b8, 2, 0);
+                field_0x1b8 = field_0x1d8;
+            }
+            segment = segment->field_0x2c;
+            if (segment == node->field_0x08) {
+                field_0x1d8.sx = (float)startX;
+                field_0x1d8.sy = (float)startY;
+                break;
+            }
+        } while (segment);
+        for (int i = 0; i < node->field_0x10; i++) {
+            if (!(node->field_0x14[i]->field_0x00 & 4)) {
+                item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 2094);
+                item->field_0x04 = node->field_0x14[i];
+                item->field_0x0c = list;
+                list = item;
+            }
+        }
+        }
+    }
+}
+
+extern "C" __declspec(dllimport) void* __stdcall CreatePen(int style, int width, unsigned long color);
+
+// 0x0051cf80: sets the chat overlay up: the chat and cue rectangles, the
+// texture, the side panels on wide screens, the pen, two fonts and the
+// thirteen name-tag rectangles.
+ChatOverlay* ChatOverlay::UnknownFunction51cf80(RenderTarget* target, TextureMapManager* manager, void* camera,
+                                                UnknownOverlayRect screen, UnknownOverlayRect cue)
+{
+    const char* font;
+    UnknownOverlayRect source;
+    UnknownLogFont logFont;
+    char name[260];
+    char path[260];
+
+    field_0x134 = 1;
+    field_0x140.left = screen.right / 2 - 128;
+    field_0x140.top = 0;
+    field_0x140.right = field_0x140.left + 256;
+    field_0x140.bottom = 68;
+    strcpy(name, "chat256.tga");
+    field_0x128 = (UnknownChatCamera*)camera;
+    field_0x150 = cue;
+    field_0x130 = 0.08f;
+    field_0x30 = UnknownFunction50a590(manager, name, 0x115c, 0, 8, 5, 6, 0, 0x10, 0xff00ff, 1, 1);
+    if (!field_0x30) {
+        Release();
+        return 0;
+    }
+    field_0x2c = field_0x30->UnknownVirtualSlot6();
+    if (field_0x2c->field_0x20 == 0x115c)
+        field_0x2c->UnknownFunction50abd0(5, 6);
+    field_0x2c->UnknownVirtualSlot8(1, 0, 0);
+    source.left = 0;
+    source.right = field_0x134 ? 256 : 128;
+    source.top = 0;
+    source.bottom = field_0x134 ? 68 : 37;
+    font = "arialsm";
+    sprintf(path, "%s\\%s", "Res", "Fonts.res");
+    UnknownFunction4b5f50(target, field_0x2c, &field_0x140, 0, &source, 0.00001f, 1, path, &font, 1, 0x115c, 0);
+    if (screen.right - screen.left > 512) {
+        UnknownOverlayRect rect = field_0x140;
+        source.left = 3;
+        source.top = 69;
+        rect.right = rect.left;
+        rect.left -= field_0x134 ? 38 : 19;
+        source.right = field_0x134 ? 38 : 19;
+        source.bottom = field_0x134 ? 137 : 103;
+        field_0x1c8 = new (__FILE__, 2284) Overlay(0, 1);
+        field_0x1c8->UnknownFunction4b5f50(target, field_0x2c, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 0x613, 0);
+        UnknownFunction469190(field_0x1c8, -1);
+        source.left += field_0x134 ? 38 : 19;
+        source.top = 69;
+        source.right += field_0x134 ? 38 : 19;
+        source.bottom = field_0x134 ? 137 : 103;
+        rect.left = field_0x140.right;
+        rect.right = field_0x140.right + (field_0x134 ? 38 : 19);
+        field_0x1cc = new (__FILE__, 2294) Overlay(0, 1);
+        field_0x1cc->UnknownFunction4b5f50(target, field_0x2c, &rect, 0, &source, 0.00001f, 0, 0, 0, 0, 0x613, 0);
+        UnknownFunction469190(field_0x1cc, -1);
+    }
+    field_0x11c = CreatePen(0, 3, 0xc0c0c0);
+    logFont.lfHeight = 9;
+    logFont.lfWidth = 0;
+    logFont.lfEscapement = 0;
+    logFont.lfOrientation = 0;
+    logFont.lfItalic = 0;
+    logFont.lfUnderline = 0;
+    logFont.lfStrikeOut = 0;
+    logFont.lfCharSet = 1;
+    logFont.lfOutPrecision = 0;
+    logFont.lfClipPrecision = 0;
+    logFont.lfQuality = 2;
+    logFont.lfPitchAndFamily = 2;
+    UnknownKrustyUIGui* gui = g_UnknownGlobal56e26c->ui->field_0x2c;
+    const char* face = gui ? gui->field_0x350 : "";
+    if (*face != '\0') {
+        logFont.lfWeight = gui->field_0x3d4 ? 700 : 500;
+        strcpy(logFont.lfFaceName, face);
+    } else {
+        logFont.lfWeight = 400;
+        strcpy(logFont.lfFaceName, "Lucida Console");
+    }
+    field_0x120 = CreateFontIndirectA(&logFont);
+    if (*face == '\0')
+        strcpy(logFont.lfFaceName, "Small Fonts");
+    logFont.lfHeight = 10;
+    field_0x124 = CreateFontIndirectA(&logFont);
+    field_0x30c[0] = UnknownTrackOverlayRect(0, 0x80, 0x89, 0x93);
+    field_0x30c[1] = UnknownTrackOverlayRect(0x81, 0xff, 0x89, 0x93);
+    field_0x30c[2] = UnknownTrackOverlayRect(0, 0x80, 0x94, 0x9e);
+    field_0x30c[3] = UnknownTrackOverlayRect(0x81, 0xff, 0x94, 0x9e);
+    field_0x30c[4] = UnknownTrackOverlayRect(0, 0x80, 0x9f, 0xa9);
+    field_0x30c[5] = UnknownTrackOverlayRect(0x81, 0xff, 0x9f, 0xa9);
+    field_0x30c[6] = UnknownTrackOverlayRect(0, 0x80, 0xaa, 0xb4);
+    field_0x30c[7] = UnknownTrackOverlayRect(0x81, 0xff, 0xaa, 0xb4);
+    field_0x30c[8] = UnknownTrackOverlayRect(0, 0x80, 0xb5, 0xbf);
+    field_0x30c[9] = UnknownTrackOverlayRect(0x81, 0xff, 0xb5, 0xbf);
+    field_0x30c[10] = UnknownTrackOverlayRect(0, 0x80, 0xc0, 0xca);
+    field_0x30c[11] = UnknownTrackOverlayRect(0x81, 0xff, 0xc0, 0xca);
+    field_0x30c[12] = UnknownTrackOverlayRect(0, 0x80, 0xcb, 0xd5);
+    return this;
 }

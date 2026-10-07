@@ -38,6 +38,10 @@ The TU covers `0x00518720..0x0051ee90`. TrackRecord.cpp starts at
 
 UnknownChatInput (0x1c4 bytes, no vtable) lives at ChatOverlay+0x13c. It
 holds the line being typed and four history entries.
+ChatOverlay+0x140 is the chat rectangle (centred, 256 x 68), +0x150 the cue
+rectangle the loader is given, and +0x1c8/+0x1cc two plain Overlay side
+panels created only when the screen is wider than 512 pixels (allocations
+at lines 2284 and 2294).
 
 ## Status
 
@@ -89,19 +93,31 @@ These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
 - `0x0051bb60` (RadarOverlay slot 23, the zoom keys, 89.69%): retail keeps a
   dead `field_0x178` test. It schedules the fld/fmul/fidiv sequence before
   that test; VC6 schedules it after.
+- `0x0051c720` (track outline, 1016 bytes; candidate 1002): walks the
+  track graph (`Track.h`: TrackNode, TrackSegment, TrackListItem; the
+  view's +0x48 is the Track) and draws each node's segment edge clipped to
+  the map circle. Code and stores match with the node read through a
+  reference to the list entry, an if/else for visited nodes and a
+  `do ... while` segment walk; the frame (0x8c in retail, 0x74 here) and
+  two store/reload orders differ.
+- `0x0051cf80` (ChatOverlay loader, 1953 bytes; candidate 1947): frame and
+  calls match with the side-panel rectangle declared inside the wide-screen
+  block; that block's scheduling, the LOGFONT store order and the
+  thirteenth name-tag rectangle's temporary slot differ.
 
 ### Not reconstructed
 
 - **Inline-asm float-to-int.** `0x00518f30`, `0x0051af00` and `0x0051b070`
   use a `fistp` helper that the project rules exclude.
+- `0x00518c20` is not a function start (inside the InstrumentOverlay
+  destructor `0x00518c00`).
 - **Shared tiny address.** `0x0051eae0` is a 3-byte `mov eax, ecx; ret`
   (UnknownChatInput's line accessor; `0x0051da30` calls it).
 - **Not attempted or abandoned:**
-  - RadarOverlay: `0x0051bed0` (1160 bytes), `0x0051c720` (1016 bytes, a
-    track graph walk), `0x0051cb20` (640 bytes; the gate offsets are an
-    inlined cross product with (0, 1, 0), whose temporaries no tried
+  - RadarOverlay: `0x0051bed0` (1160 bytes; calls `0x0051c720` with modes
+    1 and 2 and `0x0051cb20`), `0x0051cb20` (640 bytes; the gate offsets are
+    an inlined cross product with (0, 1, 0), whose temporaries no tried
     Vector3 form reproduces).
-  - ChatOverlay: the loader `0x0051cf80` (1953 bytes).
 
 ## Codegen notes
 

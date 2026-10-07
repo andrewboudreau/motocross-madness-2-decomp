@@ -17,30 +17,13 @@
 // pixel pointer's base offset differs (retail addresses the pixel from its
 // alpha byte, VC6 here from blue); 7 lines.
 //
-// UnknownFunction4cfaf0 (0x004cfaf0, 327 bytes): the 24-bit downsampler
-// behind 0x004d1b90. Everything but the plain-copy path (levels == 0)
-// matches: retail hoists width * 3, destinationStride * 3 and
-// sourceStride * 3 in that order into the height, destination-stride and
-// width argument slots; VC6 here computes the source step first and puts
-// it in the source-stride slot. Advancing the parameters themselves is
-// required (pointer locals cost 50 lines); reordering the advances, typed
-// strides, a down-counting loop and for-increment advances do not fix the
-// slots. Its 32-bit sibling 0x004cfc40 has the same copy path.
-//
-// UnknownFunction4cfc40 (0x004cfc40, 351 bytes): the 8888 downsampler; all
-// but the copy path matches (7 lines). Retail computes width * 4,
-// destinationStride * 4 and sourceStride * 4 in that order into the height,
-// destination-stride and width slots. Advancing `destination` first gives
-// that order but puts the destination step in the width slot;
-// `destinationStride *= 4` before the loop gives the slots but computes it
-// before the height test. Operand order, typed advances and a helper do not
-// help.
-//
-// UnknownFunction4cfda0 (0x004cfda0, 208 bytes): 24-bit to 8888, keyed
-// (behind 0x004cfe70, which matches). Retail walks plain byte pointers from
-// the row start and hoists both row steps into argument slots; VC6 here
-// biases the pixel pointers (+2/+3) and recomputes the steps (about 50
-// lines in every struct, byte-pointer and parameter-advancing form).
+// UnknownFunction4ce420 (0x004ce420, 456 bytes; candidate 448): the 1555
+// halver behind 0x004d0170. The arithmetic, the >= 2 test and the packing
+// match. Retail loads the two lower-row pixels before the first test and
+// keeps them in frame slots (a 0x10-byte frame); VC6 here loads each where
+// it is first tested (0x8 frame). Locals in every declaration order, a
+// lower-row pointer, function-scope pixels, a 1555 bitfield struct and
+// direct indexing do not keep them.
 //
 // UnknownFunction4d24d0 (0x004d24d0, 987 bytes): a bitmap's average colour
 // (0xAARRGGBB) by format. Every case body matches; the shared palette and
@@ -54,37 +37,6 @@
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/Pixtrans.h"
 #include "../../src/reconstructed/TextureMap.h"
-
-// 0x004cfaf0: shrinks 24-bit `source` by `levels` halvings into the width x
-// height `destination` (0: a plain copy). Intermediate levels go through a
-// buffer of the first level's size.
-int UnknownFunction4cfaf0(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int levels) {
-    if (levels == 0) {
-        for (int y = 0; y < height; y++) {
-            memcpy(destination, source, width * 3);
-            source = (unsigned char*)source + sourceStride * 3;
-            destination = (unsigned char*)destination + destinationStride * 3;
-        }
-        return 1;
-    }
-    if (levels == 1) {
-        UnknownFunction4cde20(destination, source, width, height, destinationStride, sourceStride);
-        return 1;
-    }
-    int levelWidth = width << (levels - 1);
-    int levelHeight = height << (levels - 1);
-    void* buffer = DebugMalloc(levelHeight * levelWidth * 3, __FILE__, 1329);
-    UnknownFunction4cde20(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
-    for (int i = 2; i < levels; i++) {
-        levelWidth /= 2;
-        levelHeight /= 2;
-        UnknownFunction4cde20(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
-    }
-    UnknownFunction4cde20(destination, buffer, width, height, destinationStride, levelWidth);
-    operator delete(buffer, __FILE__, 1350);
-    return 1;
-}
 
 // 0x004d0700: converts 565 to 8888; the key colour becomes opaque magenta.
 int UnknownFunction4d0700(void* destination, void* source, int width, int height, int destinationStride,
@@ -220,65 +172,6 @@ int UnknownFunction4cdf10(void* destination, void* source, int width, int height
     return 1;
 }
 
-// 0x004cfc40: shrinks 8888 `source` by `levels` halvings (0: a plain
-// copy), like 0x004cfaf0.
-int UnknownFunction4cfc40(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, int levels) {
-    if (levels == 0) {
-        for (int y = 0; y < height; y++) {
-            memcpy(destination, source, width * 4);
-            source = (unsigned char*)source + sourceStride * 4;
-            destination = (unsigned char*)destination + destinationStride * 4;
-        }
-        return 1;
-    }
-    if (levels == 1) {
-        UnknownFunction4cdf10(destination, source, width, height, destinationStride, sourceStride);
-        return 1;
-    }
-    int levelWidth = width << (levels - 1);
-    int levelHeight = height << (levels - 1);
-    void* buffer = DebugMalloc(levelHeight * levelWidth * 4, __FILE__, 1390);
-    if (!buffer)
-        return 0;
-    UnknownFunction4cdf10(buffer, source, levelWidth, levelHeight, levelWidth, sourceStride);
-    for (int i = 2; i < levels; i++) {
-        levelWidth /= 2;
-        levelHeight /= 2;
-        UnknownFunction4cdf10(buffer, buffer, levelWidth, levelHeight, levelWidth, levelWidth * 2);
-    }
-    UnknownFunction4cdf10(destination, buffer, width, height, destinationStride, levelWidth);
-    operator delete(buffer, __FILE__, 1412);
-    return 1;
-}
-
-// 0x004cfda0: converts 24-bit to 8888; the 0xRRGGBB `key` becomes
-// transparent.
-void UnknownFunction4cfda0(void* destination, void* source, int width, int height, int destinationStride,
-                           int sourceStride, unsigned int key) {
-    int keyColor[3];
-    keyColor[0] = (key >> 16) & 0xff;
-    keyColor[1] = (key >> 8) & 0xff;
-    keyColor[2] = key & 0xff;
-    for (int y = 0; y < height; y++) {
-        unsigned char* from = (unsigned char*)source;
-        unsigned char* to = (unsigned char*)destination;
-        for (int x = 0; x < width; x++) {
-            to[0] = from[0];
-            to[1] = from[1];
-            to[2] = from[2];
-            if (from[0] == keyColor[0] && from[1] == keyColor[1] && from[2] == keyColor[2])
-                to[3] = 0;
-            else
-                to[3] = 0xff;
-            from += 3;
-            to += 4;
-        }
-        source = (unsigned char*)source + sourceStride * 3;
-        destination = (unsigned char*)destination + destinationStride * 4;
-    }
-}
-
 #define UNKNOWN_ARGB(a, r, g, b) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b))
 
 // 0x004d24d0: the average colour of a width x height bitmap of `format`
@@ -379,4 +272,62 @@ int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int for
         return 0;
     }
     return UNKNOWN_ARGB(0xff, red / count, green / count, blue / count);
+}
+
+// 0x004ce420: halves 1555 pixels; colour averages the opaque pixels of
+// each 2x2 block, which stays opaque when at least two of them are.
+int UnknownFunction4ce420(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride) {
+    unsigned short* sourceRow = (unsigned short*)source;
+    unsigned short* row = (unsigned short*)destination;
+    for (int y = 0; y < height; y++) {
+        unsigned short* top = sourceRow;
+        unsigned short* to = row;
+        for (int x = 0; x < width; x++, to++, top += 2) {
+            unsigned short pixel0 = top[0];
+            unsigned short pixel1 = top[1];
+            unsigned short pixel2 = top[sourceStride];
+            unsigned short pixel3 = top[sourceStride + 1];
+            int count = 0;
+            int red = 0;
+            int green = 0;
+            int blue = 0;
+            if (pixel0 & 0x8000) {
+                red += (pixel0 >> 7) & 0xf8;
+                green += (pixel0 >> 2) & 0xf8;
+                blue += (pixel0 & 0x1f) << 3;
+                count++;
+            }
+
+            if (pixel1 & 0x8000) {
+                red += (pixel1 >> 7) & 0xf8;
+                green += (pixel1 >> 2) & 0xf8;
+                blue += (pixel1 & 0x1f) << 3;
+                count++;
+            }
+            if (pixel2 & 0x8000) {
+                red += (pixel2 >> 7) & 0xf8;
+                green += (pixel2 >> 2) & 0xf8;
+                blue += (pixel2 & 0x1f) << 3;
+                count++;
+            }
+            if (pixel3 & 0x8000) {
+                red += (pixel3 >> 7) & 0xf8;
+                green += (pixel3 >> 2) & 0xf8;
+                blue += (pixel3 & 0x1f) << 3;
+                count++;
+            }
+            if (count >= 2) {
+                red = (red + count * 4) / count;
+                green = (green + count * 4) / count;
+                blue = (blue + count * 4) / count;
+                *to = 0x8000 | ((red >> 3) << 10) | ((green >> 3) << 5) | (blue >> 3);
+            } else {
+                *to = 0;
+            }
+        }
+        sourceRow += sourceStride * 2;
+        row += destinationStride;
+    }
+    return 1;
 }

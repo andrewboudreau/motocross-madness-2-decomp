@@ -54,7 +54,9 @@ public:
     int UnknownFunction469260(GameObject* parent, int value); // 0x00469260 (GUIManager.cpp)
     // 0x00469770: finds a descendant by name (GUIManager.cpp passes 1, "GroundFog").
     GameObject* UnknownFunction469770(int mode, const char* name);
-    void UnknownFunction4691f0();          // 0x004691f0
+    // 0x004691f0: unlinks this object from its siblings and parent and
+    // recomputes the root's flags; returns 1 (0 while the global is set).
+    int UnknownFunction4691f0();
     // 0x00469680: releases this object and every later sibling, back to front.
     int UnknownFunction469680();
     // 0x00469ce0: appends the RTTI class name of `object` to field_0x28.

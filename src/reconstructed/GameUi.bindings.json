@@ -146,7 +146,7 @@
   "?UnknownFunction404da0@BackgroundImage@@QAEXXZ": "0x00404da0",
   "?UnknownFunction460f50@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?UnknownFunction469190@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?UnknownFunction4691f0@GameObject@@QAEXXZ": "0x004691f0",
+  "?UnknownFunction4691f0@GameObject@@QAEHXZ": "0x004691f0",
   "?UnknownFunction469ce0@GameObject@@QAEXPAV1@@Z": "0x00469ce0",
   "?UnknownFunction46a840@UIDialog@@QAEPAVUnknownGameUiControl@@PAV2@HH@Z": "0x0046a840",
   "?UnknownFunction46a8a0@UIDialog@@QAEPAVGameObject@@PAV2@HH@Z": "0x0046a8a0",

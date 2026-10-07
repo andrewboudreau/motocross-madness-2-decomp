@@ -87,11 +87,13 @@ Tree helpers and the iterator (strict exact, not yet calibration cases):
 | `0x00469100` | `0x00469100` | 42 | Recomputes +0x20 from the children (recursive); returns it with +0x1c |
 | `0x00469130` | `0x00469130` | 86 | Appends an object chain after the last sibling |
 | `0x00469190` | `0x00469190` | 96 | Appends an object chain to the children |
+| `0x004691f0` | `0x004691f0` | 111 | Unlinks from siblings and parent, recomputes the root's +0x20 (`0x00469100`); returns 1, 0 while `0x0065b548` is set |
 | `0x00469260` | `0x00469260` | 93 | Unlinks (`0x004691f0`) and inserts before `next` |
 | `0x00468dd0` / `0x00468f10` | | 308 each | Slot 4 / slot 5 on descendants whose name list or RTTI name matches `"<name>,"` |
 | `0x00469770` | `0x00469770` | 472 | Find by name; modes 0 children, 1 depth first, 2 siblings, 3 parent, 4 ancestors |
 | `0x00469c80` | `0x00469c80` | 81 | Unlinks and releases descendants with +0x25 bit 3 (memory tag "UI") |
 | `GameObjectIterator` ctor / `0x00469a20` / dtor / `Next` | `0x00469950` / `0x00469a20` / `0x00469a40` / `0x00469a50` | 204 / 22 / 5 / 424 | The same walk as an iterator (0x94 bytes, `GameObjectIterator.h`); holds `0x0065b548` while running |
 
-`0x004691f0` (unlink) returns 1 in retail but stays declared `void`: other
-units' bindings use the `void` mangled name.
+`0x004691f0` returns `int` (`?UnknownFunction4691f0@GameObject@@QAEHXZ`);
+every unit that calls it binds that name. `0x00469920` is the jump table of
+`0x00469770`, not a function.

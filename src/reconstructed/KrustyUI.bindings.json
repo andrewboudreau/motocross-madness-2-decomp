@@ -86,7 +86,7 @@
   "?UnknownFunction468880@Game@@QAEXXZ": "0x00468880",
   "?UnknownFunction468dd0@GameObject@@IAEXPBD@Z": "0x00468dd0",
   "?UnknownFunction469190@GameObject@@QAEHPAV1@H@Z": "0x00469190",
-  "?UnknownFunction4691f0@GameObject@@QAEXXZ": "0x004691f0",
+  "?UnknownFunction4691f0@GameObject@@QAEHXZ": "0x004691f0",
   "?UnknownFunction46ebf0@UnknownGameUiPage@@QAEPAVUnknownGameUiControl@@PBDH@Z": "0x0046ebf0",
   "?UnknownFunction47b370@UIProgressBar@@QAEXH@Z": "0x0047b370",
   "?UnknownFunction47b570@@YAPAXPAXI@Z": "0x0047b570",

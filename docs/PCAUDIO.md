@@ -102,4 +102,8 @@ loop shape; in the samples file it also gains an EH frame because the
 notifier's constructor is not defined there).
 
 Every function of PCAudio.cpp (`0x004bb630`–`0x004bed40`) is now either
-exact or a documented near miss.
+exact or a documented near miss. `0x004be330` is not a function start (inside
+`0x004be2d0`). For the setters, a `break` with a later index test, a
+`while` loop, `continue` on an empty duplicate and a `goto` around the
+failure return were also tried; VC6 still places the `return 0` after the
+store.
