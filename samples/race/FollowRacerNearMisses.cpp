@@ -110,7 +110,7 @@ void TrackGameViewOwner::UnknownFunction4a9e80(UnknownEventRacer* racer, Unknown
         if (field_0xdc)
             field_0xdc->field_0x10a = 0;
     }
-    field_0xac_seconds = 5.0f;
+    *(float*)&field_0xac = 5.0f;
     if (tell)
         field_0x34->field_0x38->UnknownFunction4925a0(racer, false);
     if (racer) {

@@ -78,11 +78,9 @@ struct TrackGameViewOwner : public GameObject {
     UnknownEventRacer* field_0xa8;            // the followed racer (0x004a9d20 picks it, 0x004a9e80 switches it)
     // One struct stands in for the three owners at TrackGame +0x55c/+0x560/
     // +0x568; +0xac is a gate count in the quarry/course owners and a float
-    // in the bike race owner.
-    union {
-        int field_0xac;                       // RaceStatus.cpp 0x004e6a50 wraps a racer's next gate by it
-        float field_0xac_seconds;             // 0x004a9e80 resets it to 5.0 on a switch
-    };
+    // (stored through a cast: a float member here moves TrackGame slot 1 and
+    // TrackOverlay 0x0051a560) in the bike race owner.
+    int field_0xac;                           // RaceStatus.cpp 0x004e6a50 wraps a racer's next gate by it
     unsigned char field_0xb0[0xdc - 0xb0];
     UnknownTrackGameViewOwnerDc* field_0xdc;
 };
