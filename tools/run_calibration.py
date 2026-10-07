@@ -2992,6 +2992,15 @@ CASES = [
         'reason': 'whole-record struct copies (rep movsd) and qsort',
     },
     {
+        'name': 'EventManager progress callback 0x45cb20',
+        'bindings': 'src/reconstructed/EventManager.bindings.json',
+        'source': 'src/reconstructed/EventManager.cpp',
+        'symbol': '?LoadProgressCallback@@YAXPAH@Z',
+        'target_va': '0x0045cb20',
+        'target_size': 67,
+        'reason': 'passed by address from 0x45cb70/0x45cdc0; "ProgressBar" lookup through KrustyUI+0x490',
+    },
+    {
         'name': 'EventManager load race 0x45cb70',
         'bindings': 'src/reconstructed/EventManager.bindings.json',
         'source': 'src/reconstructed/EventManager.cpp',

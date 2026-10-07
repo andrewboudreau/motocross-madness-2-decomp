@@ -129,9 +129,13 @@ Near miss (draft):
   the podium characters' slot 11 and motion calls, +0x3d0 as the podium
   `ArcadeObject` and +0x3f0 as the camera's look target.
 
+The cdecl progress callback `0x0045cb20` (67 bytes, exact) adds `*step` to
+the "ProgressBar" control of the page at KrustyUI+0x490, or resets the UI
+(`0x0049b530`) when called without a step. It reads the Game pointer at each
+use: holding the KrustyUI in a local swaps the two registers of its final
+add.
+
 Near misses (`samples/game/EventManagerNearMisses.cpp`):
-- the cdecl progress callback `0x0045cb20` (63 of 67 bytes; retail swaps
-  two registers);
 - `0x0045e710`, which leaves the race for a menu: it restores the UI and
   640x480x16 and shows a `TransDlg` ("Trans.dtm", retail line 1064).
   454 of 533 bytes; retail picks eax/edx where VC6 here picks ecx/eax

@@ -343,8 +343,9 @@ Subject to the open-PR check, prefer:
 2. `ControlInterface` update `0x0043cf00`: the devices, event layout and dispatch
    are established, and the remaining discrepancy is confined to modifier null
    handling.
-3. Event progress callback `0x0045cb20` (63/67 bytes): isolate the two-register
-   swap without moving provisional GUI types into shared headers.
+3. Event progress callback `0x0045cb20`: exact in `EventManager.cpp` since the
+   Game pointer is re-read at each use (a KrustyUI local swapped the two
+   registers of the final add; no flag or `+=` spelling moved it).
 
 For each body, first confirm its VA/extent and direct bindings against the current
 retail image, keep experiments in the existing `samples/` near-miss file, and
