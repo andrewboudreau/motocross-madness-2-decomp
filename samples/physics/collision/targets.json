@@ -165,7 +165,7 @@
     "target_va": "0x0043aa30",
     "target_size": 845,
     "expect": "partial",
-    "notes": "5.5%: reduces contact manifold (mean position, summed+normalised normal, deepest penetration, angular/linear terms); retail reuses argument slots for scalars (deepest in a2 slot, len2 in a9 slot) and orders sums differently (772 vs 845)"
+    "notes": "3.6%: reduces contact manifold (mean position, summed+normalised normal, deepest penetration, angular/linear terms); retail reuses argument slots for scalars (deepest in a2 slot, len2 in a9 slot) and orders sums differently (772 vs 845)"
   },
   {
     "class": "CollisionPoint",

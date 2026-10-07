@@ -56,12 +56,27 @@ public:
 // direction at +0xc0 and drives the node's position along it; B keeps a rest matrix at
 // +0x04, a rotation axis at +0xd4 and divides +0x98 by +0xc8 for the angle.
 class TireNode;
+// 0x00513c70 (UpdateShock) reads +0x54 (an "extending" flag copied to Tire+0x26c),
+// +0x70 (a ratio tested against zero) and adds the vector at +0x80 to the contact's
+// world position after the shock solve: InlineShock::SolveContact 0x004fa400 and
+// RotatingShock::SolveContact 0x004fac60 (samples/physics/suspension/Suspension.h).
+// The solves are declared as in Suspension.h; the caller's dt and velocity slots are
+// dead after the call and hold its `active` and `load` outputs.
 class TireAttachA {
 public:
     ~TireAttachA();                      // 0x004f9f80
+    void SolveContact(float dt, const CollisionVec3* offset, const CollisionVec3* base, const CollisionVec3* point,
+                      const CollisionVec3* normal, float limit, float* outLoad,
+                      int* outActive);   // 0x004fa400 (ret 0x20)
     char field_0x00[0x44];
     TireNode* node;                      // +0x44
-    char field_0x48[0x98 - 0x48];
+    char field_0x48[0x54 - 0x48];
+    int extending;                       // +0x54
+    char field_0x58[0x70 - 0x58];
+    float ratio;                         // +0x70
+    char field_0x74[0x80 - 0x74];
+    CollisionVec3 field_0x80;            // +0x80
+    char field_0x8c[0x98 - 0x8c];
     float position;                      // +0x98
     char field_0x9c[0xc0 - 0x9c];
     CollisionVec3 direction;             // +0xc0
@@ -69,10 +84,20 @@ public:
 class TireAttachB {
 public:
     ~TireAttachB();                      // 0x004fa8a0
+    void SolveContact(float dt, const CollisionVec3* axisA, const CollisionVec3* axisB,
+                      const CollisionVec3* point, const CollisionVec3* normal, const CollisionVec3* offsetA,
+                      const CollisionVec3* offsetB, float limit, float* outLoad,
+                      int* outActive);   // 0x004fac60 (ret 0x28)
     int field_0x00;
     CollisionMatrix4 restMatrix;         // +0x04
     TireNode* node;                      // +0x44
-    char field_0x48[0x98 - 0x48];
+    char field_0x48[0x54 - 0x48];
+    int extending;                       // +0x54
+    char field_0x58[0x70 - 0x58];
+    float ratio;                         // +0x70
+    char field_0x74[0x80 - 0x74];
+    CollisionVec3 field_0x80;            // +0x80
+    char field_0x8c[0x98 - 0x8c];
     float position;                      // +0x98
     char field_0x9c[0xc8 - 0x9c];
     float scale;                         // +0xc8
@@ -203,6 +228,13 @@ public:
     void ApplyDrive(float share, float stepTime, int forward, float mass, float* speed,
                     CollisionVec3* torque, CollisionVec3* force);
     void UpdateRoll(float dt, float distanceScale, int locked, int driven, int a5, float driveScale);
+    // 0x00513c70 (ret 0x18), tier 3 name: runs the attached shock (+0x2b0, else +0x2ac)
+    // against the contact while the wheel touches; the solve's load and active flag
+    // become the contact's penetration and inContact. Vehicle.cpp 0x00529ad4 is the
+    // only caller (dt = +0x1e8, a2 = byte +0x1d0, crashed = +0x444, offset = +0xbc,
+    // velocity = &+0x64, axisB = &+0xa0); a2 and offset are unused.
+    void UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
+                     const CollisionVec3* velocity, const CollisionVec3* axisB);
 
     // 0x00515c90 (thiscall, three vector pointers and a hidden result pointer first).
     CollisionVec3* Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,

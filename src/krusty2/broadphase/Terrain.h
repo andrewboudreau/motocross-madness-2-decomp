@@ -44,6 +44,7 @@ class TerrainOwned {
 public:
     ~TerrainOwned();                                            // 0x00401020
     int Purge(int target);                                      // 0x004011b0 (ret 4; 0x00505600 calls it with 0 between --age and ++age)
+    void MarkUsed(void* entry);                                 // 0x00401250 (ret 4; AgeManager::MarkUsed; TerrainShadow slot 30 passes a cell mesh's +0x144)
     int age;                                                    // +0x00 decremented around Purge by Terrain::AcquireOwnedObject
 };
 
@@ -83,16 +84,32 @@ struct TerrainVec3;
 // call to 0x0047edb0(1).
 // PROVISIONAL cell of the height field's quadtree (0x00484d70 returns one): +0x24/+0x26 hold the
 // 16-bit cell coordinates compared with the lookup arguments, +0x08 is a pointer returned as the
-// key, +0x38 an object whose halfword at +0x13c selects it.  Tier 2 offsets, tier 3 names.
+// key, +0x38 the cell's mesh (TerrainShadow slot 30 reads its lit vertices, index list and
+// 16 section records; +0x121 bit 3 selects the sectioned layout).  Tier 2 offsets, tier 3 names.
+struct TerrainCellSection {
+    short vertexBase;                                          // +0x00 vertex base of the following section
+    short indexEnd;                                            // +0x02 cumulative index count
+    char pad_0x04[0x0c - 0x04];
+};
 struct TerrainCellOwner {
-    char pad_0x00[0x13c];
-    short selector;                                            // +0x13c
+    char pad_0x00[0x121];
+    unsigned char flags_0x121;                                 // +0x121 bit 3: 16 sections instead of one
+    char pad_0x122[0x134 - 0x122];
+    void* vertices;                                            // +0x134 32-byte lit vertices (x, y, z first)
+    short* indices;                                            // +0x138
+    short vertexCount;                                         // +0x13c (0 selects the cell key in TerrainShadow slot 29)
+    short indexCount;                                          // +0x13e
+    char pad_0x140[0x144 - 0x140];
+    char ageEntry[0x17c - 0x144];                              // +0x144 passed to TerrainOwned::MarkUsed
+    TerrainCellSection sections[0x10];                         // +0x17c
 };
 struct TerrainCell {
     char pad_0x00[8];
     void* key;                                                 // +0x08
     char pad_0x0c[0x38 - 0x0c];
     TerrainCellOwner* owner;                                   // +0x38
+    char pad_0x3c[4];
+    int field_0x40;                                            // +0x40 nonzero lets TerrainShadow slot 30 emit the cell's vertices
 };
 
 class TerrainShutdownObject {

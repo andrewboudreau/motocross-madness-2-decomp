@@ -42,6 +42,26 @@
   {
     "class": "TerrainShadow",
     "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot14@TerrainShadow",
+    "target_va": "0x0050a1a0",
+    "target_size": 498,
+    "expect": "exact",
+    "notes": "slot 14 render: texture bind, saved address mode / render state 4, format 0x613 branch, indexed draw of the inline +0x34 vertices with indexTable; same statement order as D3DIMSoultreeShadow slot 14 minus the world matrix",
+    "bindings": "TerrainShadow.bindings.json"
+  },
+  {
+    "class": "TerrainShadow",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot30@TerrainShadow",
+    "target_va": "0x00509aa0",
+    "target_size": 1788,
+    "expect": "partial",
+    "notes": "slot 30 vertex build, 4.9% (1636/1788 B). Inherent partial: retail converts clipped points with an inline __asm fistp helper (float temp at ebp-8, pointer at ebp-0x10, `fld; mov eax,[ptr]; fistp [eax]`), which forces its ebp frame and 0x3728 locals; the (int) casts here call __ftol instead. Everything else (clip rect set-up, outcodes, section walk, back-face test, ClipPolygon, vertex copy order x,y,z,diffuse,reserved,specular,tu,tv, MarkUsed) follows the retail order",
+    "bindings": "TerrainShadow.bindings.json"
+  },
+  {
+    "class": "TerrainShadow",
+    "source": "TerrainShadow.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot28@TerrainShadow",
     "target_va": "0x005097d0",
     "target_size": 486,

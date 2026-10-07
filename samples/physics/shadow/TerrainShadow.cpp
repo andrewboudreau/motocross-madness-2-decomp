@@ -4,6 +4,7 @@
 // 0x005089a0 just before it closes Terrain.cpp (docs/INITIALIZERS.md), so this code starts a unit
 // of its own or continues Terrain.cpp (tier 3).
 #include "TerrainShadow.h"
+#include "../../../src/reconstructed/ClipRectangle.h"
 
 // ---------------------------------------------------------------------------------------------
 // TerrainShadow (vtable 0x005582d4).  owner: bracket only.  No __FILE__ xref lies in
@@ -16,7 +17,7 @@ TerrainShadow::TerrainShadow(int flags)
     : ShadowReceiver(flags)
 {
     caster = 0;
-    field_0x6654 = 0;
+    vertexCount = 0;
     for (int i = 0; i < 0x300; i++)
         indexTable[i] = (short)i;
     minX = 0x7fffffff;
@@ -56,7 +57,7 @@ int TerrainShadow::UnknownVirtualSlot29()
         for (int x = minX; x <= maxX; x += 16) {
             TerrainCell* cell = caster->heightField->LookupCell(x, z);
             if (cell) {
-                if (cell->owner->selector == 0)
+                if (cell->owner->vertexCount == 0)
                     cell = (TerrainCell*)cell->key;
                 void* key = cell;
                 int i = 0;
@@ -68,7 +69,7 @@ int TerrainShadow::UnknownVirtualSlot29()
                 }
                 if (cellCount == 0x40) {
                     cellCount = 0;
-                    field_0x6654 = 0;
+                    vertexCount = 0;
                     return 0;
                 }
             }
@@ -121,4 +122,246 @@ int TerrainShadow::UnknownVirtualSlot28()
         return 1;
     }
     return 0;
+}
+
+// The render target at GameObject::field_0x18 as slot 14 uses it (RTTI PCRenderTarget; the
+// same local view D3DIMSoultreeShadow.cpp keeps).  Tier 3.
+class TerrainShadowRenderTarget {
+public:
+    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
+    virtual void Slot4(); virtual void Slot5();
+    virtual long GetTextureStageState(int stage, int type, int* value);  // slot 6
+    virtual long SetTextureStageState(int stage, int type, int value);   // slot 7
+    virtual void SetRenderState(int state, int value, int force);        // slot 8
+    virtual long GetRenderState(int state, int* value);                  // slot 9
+    virtual void Slot10(); virtual void Slot11(); virtual void Slot12(); virtual void Slot13();
+    virtual void Slot14();
+    // slot 15: indexed draw (type, FVF, vertices, vertex count, indices, index count, flags).
+    virtual int DrawIndexed(int type, int fvf, void* vertices, int vertexCount, short* indices,
+                            int indexCount, int flags);
+    virtual void Slot16(); virtual void Slot17();
+    virtual void Slot18(int value);
+    char pad_0x04[0x1c8 - 0x04];
+    unsigned char field_0x1c8;                   // bit 2 tested by slot 14
+};
+
+// The shadow texture's slot 19 (0x4c) binds it to texture stage 0 (PCTextureMap slot 19).  Tier 3.
+class TerrainShadowTextureView {
+public:
+    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
+    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
+    virtual void Slot8(); virtual void Slot9(); virtual void Slot10(); virtual void Slot11();
+    virtual void Slot12(); virtual void Slot13(); virtual void Slot14(); virtual void Slot15();
+    virtual void Slot16(); virtual void Slot17(); virtual void Slot18();
+    virtual void Bind();                                          // slot 19
+};
+
+// 0x0050a1a0 (slot 14): draws the collected terrain vertices (+0x34, vertexCount of them) with the
+// shadow texture and modulating texture stages; D3DIMSoultreeShadow slot 14 without the world
+// matrix.  The address mode and render state 4 are restored afterwards; format 0x613 textures
+// also switch render state 0x21 on around the draw.
+int TerrainShadow::GameObjectVirtualSlot14()
+{
+    if (vertexCount) {
+        ((TerrainShadowTextureView*)shadow->texture)->Bind();
+        int address;
+        ((TerrainShadowRenderTarget*)field_0x18)->GetTextureStageState(0, 0xc, &address);
+        if (address != 3)
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 0xc, 3);
+        if (shadow->surfaceFormat == 0x613) {
+            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x21, 1, 0);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
+            if (((TerrainShadowRenderTarget*)field_0x18)->field_0x1c8 & 4) {
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 4);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 5, 2);
+                ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 6, 0);
+            }
+        } else {
+            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 4);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 5, 2);
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 6, 0);
+        }
+        int blend;
+        ((TerrainShadowRenderTarget*)field_0x18)->GetRenderState(4, &blend);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(4, 1, 0);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0xe, 0, 0);
+        ((TerrainShadowRenderTarget*)field_0x18)->Slot18(0);
+        ((TerrainShadowRenderTarget*)field_0x18)->DrawIndexed(4, 0x1e2, vertices, vertexCount, indexTable,
+                                                              vertexCount, 0);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0xe, 1, 0);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x1b, 0, 0);
+        if (address != 3)
+            ((TerrainShadowRenderTarget*)field_0x18)->SetTextureStageState(0, 0xc, address);
+        ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(4, blend, 0);
+        if (shadow->surfaceFormat == 0x613)
+            ((TerrainShadowRenderTarget*)field_0x18)->SetRenderState(0x21, 0, 0);
+    }
+    return 1;
+}
+
+// 0x00509aa0 (slot 30): builds the shadowed terrain vertices.  Every cell key slot 29 gathered has
+// its mesh transformed by the shadow's light matrix (perspective in mode 3), each triangle is
+// outcode-rejected against the clip rectangle (doubled while the shadow is not being updated),
+// back-face culled, clipped, and then either rasterised into the shadow texture's height map
+// (all three corners nearer than minDepth) or copied into the vertex array with the shadow colour
+// and texture coordinates scaled by field_0x677c.  Cells that were drawn into are marked used.
+// Tier 3 semantics; the retail body converts with an inline __asm fistp helper, so this stays a
+// documented partial (see targets.json).
+void TerrainShadow::UnknownVirtualSlot30()
+{
+    enum { kMaxMeshVertices = 867 };
+    ShadowVec3 transformed[kMaxMeshVertices];
+    int outcodes[kMaxMeshVertices];
+    ClipPoint clipped[8];
+    ClipPoint tri[3];
+    int points[6];
+    short corner[3];
+    int pitch;
+
+    if (cellCount <= 0) {
+        vertexCount = 0;
+        return;
+    }
+    ProjectedShadow* s = shadow;
+    if (s->updateThisFrame)
+        g_clipRectangle->Set((float)s->clipRect.left, (float)s->clipRect.top, (float)s->clipRect.right,
+                             (float)s->clipRect.bottom);
+    else
+        g_clipRectangle->Set((float)s->clipRect.left * 2.0f, (float)s->clipRect.top * 2.0f,
+                             (float)s->clipRect.right * 2.0f, (float)s->clipRect.bottom * 2.0f);
+    short* pixels = s->texture->LockPixels(0, &pitch, 0);
+    unsigned int color;
+    if (shadow->surfaceFormat == 0x613)
+        color = 0x7fffffff;
+    else
+        color = ((0xff - (shadow->shadowColor & 0xff)) << 24) | 0xffffff;
+
+    vertexCount = 0;
+    for (int i = 0; i < cellCount; i++) {
+        int used = 0;
+        TerrainCell* cell = (TerrainCell*)cellKeys[i];
+        TerrainCellOwner* mesh = cell->owner;
+        if (!mesh->vertices)
+            continue;
+        if (shadow->mode == 3)
+            ShadowTransformPointsOrtho(transformed, mesh->vertices, &shadow->lightMatrix, mesh->vertexCount, 0xc, 0x20);
+        else
+            ShadowTransformPointsProjective(transformed, mesh->vertices, &shadow->lightMatrix, mesh->vertexCount, 0xc, 0x20);
+
+        int n = mesh->vertexCount;
+        if (n > 0) {
+            ProjectedShadow* ps = shadow;
+            int* code = outcodes;
+            ShadowVec3* v = transformed;
+            do {
+                *code = 0;
+                if (ps->updateThisFrame) {
+                    if ((float)ps->clipRect.left > v->x)
+                        *code |= 1;
+                    if ((float)ps->clipRect.right < v->x)
+                        *code |= 2;
+                    if ((float)ps->clipRect.top > v->y)
+                        *code |= 4;
+                    if ((float)ps->clipRect.bottom < v->y)
+                        *code |= 8;
+                } else {
+                    if ((float)(ps->clipRect.left * 2) > v->x)
+                        *code |= 1;
+                    if ((float)(ps->clipRect.right * 2) < v->x)
+                        *code |= 2;
+                    if ((float)(ps->clipRect.top * 2) > v->y)
+                        *code |= 4;
+                    if ((float)(ps->clipRect.bottom * 2) < v->y)
+                        *code |= 8;
+                }
+                v++;
+                code++;
+            } while (--n);
+        }
+
+        int sectionCount = 1;
+        if (mesh->flags_0x121 & 8)
+            sectionCount = 0x10;
+        for (int sec = 0; sec < sectionCount; sec++) {
+            int indexStart;
+            int indexCount;
+            int vertexBase;
+            if (sectionCount == 1) {
+                indexStart = 0;
+                vertexBase = 0;
+                indexCount = mesh->indexCount;
+            } else if (sec == 0) {
+                indexStart = 0;
+                vertexBase = 0;
+                indexCount = mesh->sections[0].indexEnd;
+            } else {
+                indexStart = mesh->sections[sec - 1].indexEnd;
+                indexCount = mesh->sections[sec].indexEnd - indexStart;
+                vertexBase = mesh->sections[sec - 1].vertexBase;
+            }
+            for (int t = 0; t < indexCount; t += 3) {
+                const short* index = mesh->indices + indexStart + t;
+                corner[0] = index[0];
+                corner[1] = index[1];
+                corner[2] = index[2];
+                int i0 = (unsigned short)corner[0] + vertexBase;
+                int i1 = (unsigned short)corner[1] + vertexBase;
+                int i2 = (unsigned short)corner[2] + vertexBase;
+                if (outcodes[i0] & outcodes[i1] & outcodes[i2])
+                    continue;
+                tri[0] = *(ClipPoint*)&transformed[i0];
+                tri[1] = *(ClipPoint*)&transformed[i1];
+                tri[2] = *(ClipPoint*)&transformed[i2];
+                if ((tri[1].x - tri[0].x) * (tri[2].y - tri[0].y) - (tri[2].x - tri[0].x) * (tri[1].y - tri[0].y) <= 0.0f)
+                    continue;
+                int count = g_clipRectangle->ClipPolygon(tri, clipped, 3);
+                if (!count)
+                    continue;
+                if (tri[0].z < shadow->minDepth && tri[1].z < shadow->minDepth && tri[2].z < shadow->minDepth) {
+                    used = 1;
+                    if (!shadow->updateThisFrame)
+                        continue;
+                    points[0] = (int)(clipped[0].x - 0.5f);
+                    points[1] = (int)(clipped[0].y - 0.5f);
+                    for (int k = 0; k < count - 2; k++) {
+                        points[2] = (int)(clipped[k + 1].x - 0.5f);
+                        points[3] = (int)(clipped[k + 1].y - 0.5f);
+                        points[4] = (int)(clipped[k + 2].x - 0.5f);
+                        points[5] = (int)(clipped[k + 2].y - 0.5f);
+                        ShadowFillTriangle(shadow->sizeShift, pixels, shadow->colorKeyLow, points, 0);
+                    }
+                } else if (cell->field_0x40) {
+                    for (int k = 0; k < 3; k++) {
+                        int idx = (unsigned short)corner[k] + vertexBase;
+                        const float* src = (const float*)((char*)mesh->vertices + idx * 0x20);
+                        TerrainShadowVertex* out = &vertices[vertexCount];
+                        out->x = src[0];
+                        out->y = src[1];
+                        out->z = src[2];
+                        out->diffuse = color;
+                        out->reserved = 0;
+                        out->specular = 0;
+                        out->tu = transformed[idx].x * field_0x677c;
+                        out->tv = transformed[idx].y * field_0x677c;
+                        vertexCount++;
+                        if (vertexCount == 0x300)
+                            goto full;
+                    }
+                }
+            }
+        }
+full:
+        if (used)
+            caster->field_0xc88->MarkUsed(mesh->ageEntry);
+        if (vertexCount == 0x300)
+            break;
+    }
+    shadow->texture->UnlockPixels(0);
 }
