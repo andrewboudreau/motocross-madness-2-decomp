@@ -1,0 +1,17 @@
+{
+  "_$E4": "0x004312b0",
+  "_$E1": "0x004312c0",
+  "_$E3": "0x004312d0",
+  "_$E2": "0x004312e0",
+  "??0ClipRectangle@@QAE@XZ": "0x004312f0",
+  "??1ClipRectangle@@QAE@XZ": "0x00464e90",
+  "?Set@ClipRectangle@@QAEXMMMM@Z": "0x00431350",
+  "?Outcode@ClipRectangle@@QAEHUClipPoint@@@Z": "0x004313d0",
+  "?IntersectEdge@ClipRectangle@@QAEHPBUClipSegment@@HPAUClipPoint@@@Z": "0x00431430",
+  "?ClipLine@ClipRectangle@@QAEHPBUClipSegment@@PAU2@PAH2@Z": "0x004314e0",
+  "?ClipPolygon@ClipRectangle@@QAEHPAUClipPoint@@0H@Z": "0x00431680",
+  "?s_outcodeRegion@@3PAHA": "0x00568500",
+  "?g_clipRectangle@@3PAVClipRectangle@@A": "0x0056852c",
+  "_s_clipRectangle": "0x00579730",
+  "_atexit": "0x00535430"
+}

@@ -1,0 +1,22 @@
+{
+  "??0CDAudio@@QAE@XZ": "0x00431050",
+  "??1CDAudio@@QAE@XZ": "0x004310b0",
+  "?Close@CDAudio@@QAEXXZ": "0x00431270",
+  "?GetVolume@CDAudio@@QAEHPAM@Z": "0x00431180",
+  "?Initialize@CDAudio@@QAEHXZ": "0x004310c0",
+  "?IsPlaying@CDAudio@@QAEHXZ": "0x00431100",
+  "?Open@CDAudio@@QAEHXZ": "0x004311e0",
+  "?SetVolume@CDAudio@@QAEHM@Z": "0x00431140",
+  "?Stop@CDAudio@@QAEXXZ": "0x004310e0",
+  "__imp__auxGetDevCapsA@12": "0x005503a0",
+  "__imp__auxGetNumDevs@0": "0x005503a8",
+  "__imp__mciSendCommandA@16": "0x005503ac",
+  "__imp__auxSetVolume@8": "0x005503b0",
+  "__imp__auxGetVolume@8": "0x005503b4",
+  "__real@4@3ff8a3d70a3d70a3d800": "0x005507a4",
+  "__real@4@400effff000000000000": "0x00551090",
+  "__real@4@3fef8000800080008000": "0x00551094",
+  "__real@4@4005c800000000000000": "0x005505ec",
+  "__ftol": "0x00534a88",
+  "??_C@_07JNJJ@cdaudio?$AA@": "0x00568460"
+}

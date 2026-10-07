@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CDAudio.h"
 #include "ControlInterface.h"
 #include "DirectoryList.h"
 #include "EventManager.h"
@@ -462,16 +463,7 @@ public:
 };
 
 // Object at TrackGame+0x3338, deleted through its virtual destructor.
-// Object at TrackGame+0x3340 (0x00521a40 calls 0x004310e0 on it).
-class UnknownTrackGameObject3340 {
-public:
-    UnknownTrackGameObject3340();             // 0x00431050
-    ~UnknownTrackGameObject3340();            // 0x004310b0
-    void UnknownFunction4310c0();             // 0x004310c0
-    void UnknownFunction4310e0();             // 0x004310e0
-
-    unsigned char field_0x00[0x10];
-};
+// The object at TrackGame+0x3340 is CDAudio (CDAudio.h).
 
 // UnknownTrackGameObject3400, the object at TrackGame+0x3400, is in TrackRecord.h.
 
@@ -599,7 +591,7 @@ public:
     TrackGameMode mode;                       // +0x578..+0x3337
     DirectoryList* profileDirectory;
     int menuIsOpen;
-    UnknownTrackGameObject3340* field_0x3340;
+    CDAudio* field_0x3340;
     UnknownControlBinding field_0x3344;
     UnknownControlBinding field_0x3380;
     UnknownControlBinding field_0x33bc;

@@ -217,6 +217,11 @@ EcoSystem.cpp (EcoSystem, Vegetation and the vegetation definitions)
 matches strictly in 37 functions, including the .esb reader and writer and
 slot 12's classification pass; see [ECOSYSTEM](ECOSYSTEM.md).
 
+The CarProcedural..CollisionCharacter gap holds two units without RTTI or
+`__FILE__`: CDAudio (9, TrackGame+0x3340's MCI player) and ClipRectangle
+(10, the shadow clipper with its static instance and `$E` set) both match
+strictly; see [CDAUDIO_CLIPRECT](CDAUDIO_CLIPRECT.md).
+
 From the unattributed-code map ([UNATTRIBUTED](UNATTRIBUTED.md)):
 NationalRace.cpp (8, `__FILE__` 0x56e338 and RTTI NationalRace :
 BaseQuarryEvent), Rectangle2D (5) and SkyCube (5) match strictly; the last
