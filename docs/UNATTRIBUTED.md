@@ -86,7 +86,7 @@ neighbours' `__FILE__` xrefs).
 | `0x004cb6e0..0x004cbc50` | 1392 | 9 (9 unreg., 1318 B) | physics helper + kVec3 set XCU 220-223 (Pe..Ph, unknown) | 0x4cb6e0 (1058 B) called from KrustyBike 0x495d51 and SoulTreePhysics 0x50229f; the set 0x4cbb10 (0x689970..) has no reader; PhysicsBody owns the next set, so this is a separate unit | 3 |
 | `0x004cbc50..0x004cc120` | 1232 | 23 (10 unreg., 632 B) | PhysicsBody (samples/physics/rigidbody PhysicsBody.cpp) | RTTI PhysicsBody slots; 0x4cbc50 reads the XCU 224-227 set (0x6899c0..) that sits mid-file at 0x4cbf20 | 2 |
 | `0x004cc120..0x004ccbd0` | 2736 | 21 (10 unreg., 431 B) | PhysicsRigidBody (samples/physics/rigidbody PhysicsRigidBody.cpp) | RTTI PhysicsRigidBody slots; XCU 228-231 set 0x4cca90 (0x6899f0..) read by 0x4cc120/0x4cc500/0x4cc630 (closes the unit) | 2 |
-| `0x004ccbd0..0x004cde20` | 4688 | 8 (8 unreg., 4618 B) | display / controller selection dialogs (Ph..Pi, provisional 'PickDevice.cpp') | 0x4ccd60 chooses the display and 0x4cd610 the joystick (PCGAME.md), registry 'VideoCardClass'/'InputDeviceClass'/'UseVideoCardIdx'/'UseControllerId', Win32 'STATIC'/'BUTTON'/'LISTBOX' controls, two dialog procs 0x4ccbd0/0x4cd430; before Pixtrans.cpp (0x4cf2f2); no __FILE__/RTTI | 3 |
+| `0x004ccbd0..0x004cde20` | 4688 | 8 (2 unreg., 3797 B) | display / controller selection dialogs (Ph..Pi, provisional 'PickDevice.cpp') | 0x4ccd60 chooses the display and 0x4cd610 the joystick (PCGAME.md), registry 'VideoCardClass'/'InputDeviceClass'/'UseVideoCardIdx'/'UseControllerId', Win32 'STATIC'/'BUTTON'/'LISTBOX' controls; window procs 0x4ccc50/0x4cd4b0 (the classes' lpfnWndProc) and accept/cancel helpers 0x4ccbd0/0x4ccc20/0x4cd430/0x4cd480 strict exact in src/reconstructed/PickDevice.cpp ([PICKDEVICE](PICKDEVICE.md)); the builders 0x4ccd60/0x4cd610 remain; before Pixtrans.cpp (0x4cf2f2); no __FILE__/RTTI | 3 |
 | `0x004da520..0x004dc620` | 8448 | 31 (1 unreg., 5 B) | ShadowCamera (registered) + ProjectedShadow.cpp (samples/physics/shadow) | __FILE__ ProjectedShadow.cpp xrefs 0x4da745..0x4dacbc; RTTI ProjectedShadow; XCU 244-247; 0x4dc610 shared slot-0 stub | 1 |
 | `0x004e8ad0..0x004e8c50` | 384 | 5 (0 unreg., 0 B) | Rectangle2D (provisional 'Rectangle2D.cpp') | RTTI Rectangle2D (vtable 0x5577fc, dtor 0x4e8bc0); ctor/copy/dtor/operator= 0x4e8ad0/0x4e8b60/0x4e8bc0/0x4e8c20 called by TextService and FontTexture; between recorder.cpp (0x4e7ceb) and ResourceManager.cpp (0x4e8de6); Rectangle2D.h declares it; reconstructed in src/reconstructed/Rectangle2D.cpp, all 5 functions strict exact | 2 |
 | `0x004e8c50..0x004e8d30` | 224 | 6 (0 unreg., 0 B) | RenderTarget.cpp (registered, name ours) | RTTI RenderTarget; all registered | 2 |
@@ -137,7 +137,7 @@ neighbours' `__FILE__` xrefs).
 - Provisional file names (`CDAudio`, `ClipRectangle`, `DeviceSetup`,
   `ErrorLog`, `FileStream`, `Fog`, `GhostMod`, `GraphicsTest`, `GridNode`,
   `main`, `MediaControl`, `MemTag`, `PickDevice`, `Rectangle2D`, `SkyCube`,
-  `TransparencyMod`, `KrustyVCR`) are ours. None appears in `analysis/source_paths.txt`; they are
+  `TransparencyMod`, `KrustyVCR`, `ZoneReport`) are ours. None appears in `analysis/source_paths.txt`; they are
   bounded only by the alphabetical bracket given in the evidence column. The
   RTTI class names in them are confirmed; the file ownership is not.
 - `0x00448560..0x00449e60`, `0x0045ff80..0x004624d0` and
