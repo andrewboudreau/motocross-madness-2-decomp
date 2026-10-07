@@ -23,11 +23,13 @@ timings, counters, the view matrix pointer and the detail-band pointer);
 right before the string literals, and the two detail-band tables
 `0x0056a600` (1555) / `0x0056a740` (4444).
 
-Linear function-start lists show 52 starts in the extent; two are labels
-inside bigger functions: `0x004584d0` is inside the "CollisionObject%i"
-reader `0x00458360..0x004587aa` (1104 bytes) and `0x00458ae0` inside the
-.esb writer `0x004587b0..0x00458d99` (1513 bytes). That leaves 50
-functions.
+Linear function-start lists show 52 starts in the extent; three are not
+functions: `0x004584d0` is inside the "CollisionObject%i" reader
+`0x00458360..0x004587aa` (1104 bytes), `0x00458ae0` inside the .esb writer
+`0x004587b0..0x00458d99` (1513 bytes), and `0x0045b136` falls in the middle
+of an instruction of slot 14, which is one 3967-byte function
+`0x0045b060..0x0045bfdf` (the billboard pass is not a separate routine).
+That leaves 49 functions.
 
 ## Classes
 
@@ -112,32 +114,43 @@ Source forms that mattered:
 
 ## Near misses (`samples/ecosystem/EcoSystemNearMisses.cpp`)
 
-Scores are matching / compared bytes in the src unit's context.
+Scores are matching / compared bytes with every relocation bound (the
+sample's bindings file; `$ehhandler` keys for the EH prologues).
 
 | VA | Function | State |
 |---|---|---|
 | `0x004567e0` | world-position placement | 82/112: VC6 orders `position->x * scale` as `fld scale; fmul x`; retail loads x first. Only a by-value float accessor (`position->X()`) reproduces it; the project's `Vector3` has none. |
 | `0x00456890` | fade / distance band | 356/369: retail schedules the camera pointer load and the z store before the first `fmul`. The block is scheduling-invariant: eighteen data-flow-equivalent spellings (locals before or after the camera load, no camera local, the view in a local, one declaration per statement, a position reference, the products computed before the camera, `-=`, int locals and casts, a `Vector3` position, z first, a delta vector) give the same bytes, and every statement reordering scores lower. Helper boundaries do not move it either: inline and static accessors for the eye and the scaled coordinate, pointer, reference and by-value helpers, a struct copy and the difference as a `Vector3` all give the identical 356 or less, and `/G6` scores 267. |
 | `0x004570a0` | collision object placement | 74/349: retail does not fold the definition lookup across the position conversions; the radius and height divide by the definition's mean values. |
-| `0x00456050` | definition load (.slt) | 195/1496: `this` / `textures` register roles and the local layout (the loop extremes, a/b/c, faces) differ; the frame is 0x1b8 for 0x1b4. |
-| `0x00457480` | .est reader (2626 bytes) | 380/2624 with the handler label bound by hand (the matcher does not recognise the `push ebp; mov ebp, esp; and esp, -8; push -1; push handler` prologue, so the case cannot be registered yet); the only other difference is the probe stream kept in `esi` as well as its EH slot. |
-| `0x00457ed0` | collision objects (1150 bytes) | 1094/1153: one instruction, the height load `mov edx, [edi+0x20]` scheduled before the cosine in retail. The vector offset needs `b.x + a.x, a.y + b.y, a.z + b.z` (`UnknownEcoOffset`). |
+| `0x00456050` | definition load (.slt) | 163/1513: `this` / `textures` register roles and the local layout (the loop extremes, a/b/c, faces) differ; the frame is 0x1b8 for 0x1b4. |
+| `0x00457480` | .est reader (2626 bytes) | 371/2646 (the matcher now binds the handler of the `push ebp; mov ebp, esp; and esp, -8; push -1; push handler` prologue); the probe stream is kept in `esi` as well as its EH slot, and the local layout follows from that. |
+| `0x00457ed0` | collision objects (1150 bytes) | 1101/1153: the cylinder height load `mov edx, [edi+0x20]` is scheduled before the cosine in retail (every placement of the `.y` store scores lower), and the z component of the offset is summed vertex-first (`fld [eax-4]; fadd [edi+0xc]`) whatever the source order. The offset is `operator+` shaped (`Vector3(a.x + b.x, ...)`, `UnknownEcoOffset(shape->start, vertices[j])`); the named-result form scores 1094. |
 | `0x00458360` | "CollisionObject%i" reader (1104 bytes) | 113/1112: retail keeps 0 in `ebp` (`cmp eax, ebp`, `push ebp`) and tests the count twice; the local arrays are key, value, section, kind in that order. |
 | `0x00458da0` | .txt listing | 457/461: four SIB operands are `[esi + eax]` instead of retail's `[eax + esi]` (array base / induction order); no source form found yet. |
 | `0x004598d0` | placement from the .esb | 34/462: the loop keeps `i` in memory and the definition byte zero-extended in a register; local layout. |
 | `0x00459b40` | placement from the PlacementBmp | 56/412: `fidiv` for the cell size, the bitmap pointer in `ebp`, pixel pointer kept in memory. |
 | `0x0045c6a0` | xor fwrite | 14/254: retail walks a pointer and a 1024 count-down per block, with the block count in a local. |
 | `0x0045c7b0` | xor fread | 90/115: register roles (total in `edi`, key in `ebx`) and the byte update order. |
+| `0x0045c040` | texture preload (1619 bytes) | 1618/1619: one byte, the spill slot of the probe stream's `new` temporary (`[esp+0x20]`, shared with the dead `collisionCount`, where VC6 here shares `[esp+0x1c]` with the second loop's induction temporary). Declaration order of the six scalars, scoping `collisionCount`, a function-scope probe, `delete probe` without the test, a split condition and a named open result all give the same 1618. Everything else is reproduced: the `.est` to `.esb` probe, the archive entry or a new owned stream (the stream is a separate local, `esb = stream`; keeping the parameter keeps it in `ebp`), the 256-entry skim with 0x34 / 0x24 / `count * 0x24` seeks, the per-name billboard and `.slt` texture loads with the "KeyColorTrees" format. |
+| `0x00459ce0` | Auto-method generator (3257 bytes) | 323/3300: the control flow and every expression match; the frame (0xe14) is the same size but the slots are assigned differently (VC6 assigns the generator's locals and temporaries to slots by first use and liveness, not by declaration order, and the retail order interleaves the per-draw scalars with the two `Vector3` temporaries), so most memory operands differ by their displacement. Source forms that mattered: the two `rand()` scales stay separate only through a named local (`random = UnknownEcoRandom(); threshold = random * 3.0f`); the draw is `rand() * (100.0f / 32767.0f)` (RAND_MAX), the position `rand() * (1 / 32768.0f) * range`; the TGA sampler divides by a local copy of the QuadTree extent (`x / worldX * width` gives retail's `fld; fdivr`); the ring tables are `Vector3(i * spacing, 0, (mode - 1) * spacing)` constructor temporaries; `tga = 0` precedes the `memset`; the registry query is Game slot 20, not slot 22. |
+| `0x0045b060` | slot 14, the draw (3967 bytes) | 461/3919: the structure matches (identity world matrix, saved TEXTUREPERSPECTIVE / SHADEMODE, three leaned face normals, their lit colours, the geometry list, the 120-quad billboard batches with the four- and six-vertex forms and index patterns, the overlay rows, the state restore) but the frame is 0xe0 for 0xf0 and the slots differ: retail keeps the `back * 0.1f` lean of x on the x87 stack and spills the z lean twice (`[esp+0x20]` and `[esp+0xbc]`), and the per-quad locals interleave with the function's. The lit colour clamps are conditional expressions (`v < 1.0f ? v : 1.0f`, the value stays on the stack); the intensities are a `Vector3` (memory, read three times each); the dot products sum as `z + (x + y)`. |
 
-Not attempted: the texture preload `0x0045c040` (1619 bytes: reads the .esb
-names, seeks the rest and loads every texture), the Auto-method generator
-`0x00459ce0` (3257 bytes: PercentBias cumulative table, TGA probability maps,
-slope / aspect / drainage / altitude gaussians, QuadTree code checks) and
-the billboard renderer `0x0045b136` (3753 bytes: view-aligned quads with
-the band's range, two lit colour sets, the "EcoGen"/"QuadTree" debug
-counters and the peak holds).
+With the three large functions decoded there are no unattempted functions
+left in the unit.
 
 ## Evidence notes
+
+- Slot 14 reads the camera's +0x198 as the projection scale of the
+  billboard size test (`radius * scale / depth > 2`), saves and restores
+  render states 4 and 9 through the view's slots 9 / 8, and prints its rows
+  with the overlay's `0x00447fa0` / `0x00447f40` on the page `0x0056a128`
+  takes from the overlay's +0x26c0; the "Memory %d" row is
+  `MemTagStack::UnknownFunction4a2d20("EcoSystem")`.
+- The generator weighs slope and altitude with the tabulated bell curve
+  `0x0056ece0` (`NormalDistribution::Lookup(value, mean, sigma)`,
+  `0x004b0070`; src/krusty2/effects), reads the "EcoGen" registry integer
+  through Game slot 20 (5 and 6 select the 5x5 / 6x6 rings), and samples
+  the probability TGAs' green channel (bits 5..9 of a 16-bit pixel).
 
 - `0x00456850` is registered with the AgeManager as the geometry's eviction
   callback; the AgeEntry lies after the vertices and the 4-byte-padded
@@ -186,3 +199,5 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x00459b40` `PlaceAuthoredObjects`
 - `0x00459ce0` `GenerateObjects`
 - `0x0045ade0` `SetRenderStates`
+- `0x0045b060` slot 14 (the draw; `UnknownVirtualSlot14`)
+- `0x0045c040` `UnknownFunction45c040` (the texture preload, cdecl)

@@ -136,13 +136,50 @@ public:
 };
 
 // RenderTarget.h: the view at GameObject+0x18 and its Camera (+0x08).
-struct UnknownEcoCamera {
-    unsigned char field_0x000[0xac];
+class UnknownEcoCamera {
+public:
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6();
+    virtual void UnknownVirtualSlot7();
+    virtual void UnknownVirtualSlot8();
+    virtual void UnknownVirtualSlot9();
+    virtual void UnknownVirtualSlot10();
+    virtual void UnknownVirtualSlot11();
+    virtual void UnknownVirtualSlot12();
+    virtual void UnknownVirtualSlot13();
+    virtual void UnknownVirtualSlot14();
+    virtual void UnknownVirtualSlot15();
+    virtual void UnknownVirtualSlot16();
+    virtual void UnknownVirtualSlot17();
+    virtual void UnknownVirtualSlot18();
+    virtual void UnknownVirtualSlot19();
+    virtual void UnknownVirtualSlot20();
+    virtual void UnknownVirtualSlot21();
+    virtual void UnknownVirtualSlot22();
+    virtual void UnknownVirtualSlot23();
+    virtual void UnknownVirtualSlot24();
+    virtual void UnknownVirtualSlot25();
+    virtual void UnknownVirtualSlot26();
+    virtual void UnknownVirtualSlot27();
+    virtual void UnknownVirtualSlot28();
+    virtual void UnknownVirtualSlot29();
+    virtual int UnknownVirtualSlot30(const Matrix4* value); // world matrix
+    virtual int UnknownVirtualSlot31(const Matrix4* value); // view matrix
+    virtual int UnknownVirtualSlot32(const Matrix4* value); // projection matrix
+
+    unsigned char field_0x004[0xac - 4];
     Matrix4 field_0xac;                       // view matrix
     unsigned char field_0xec[0x170 - 0xec];   // the clipper's matrix
     Vector3 field_0x170;                      // position
     Vector3 field_0x17c;                      // direction
-    unsigned char field_0x188[0x1c0 - 0x188];
+    unsigned char field_0x188[0x198 - 0x188];
+    float field_0x198;                        // projection scale (the billboard size test)
+    unsigned char field_0x19c[0x1c0 - 0x19c];
     float field_0x1c0;                        // far distance
 };
 class UnknownEcoRenderTarget {
@@ -366,6 +403,16 @@ struct UnknownEcoDisplay {
     unsigned char field_0x02c[0x1c0 - 0x2c];
     int field_0x1c0;                          // capability bits
 };
+// DebugOverlay.h: the overlay the draw prints its statistics on.
+class UnknownEcoDebugOverlay {
+public:
+    // 0x00447f40 / 0x00447fa0: format a row onto page `page` (cdecl, `this`
+    // on the stack).
+    void UnknownFunction447f40(int page, const char* format, ...);
+    void UnknownFunction447fa0(int page, const char* format, ...);
+    unsigned char field_0x0000[0x26c0];
+    int field_0x26c0;                         // next free page
+};
 class UnknownEcoTrackGame {
 public:
     virtual void UnknownVirtualSlot0();
@@ -388,14 +435,20 @@ public:
     virtual void UnknownVirtualSlot17();
     virtual void UnknownVirtualSlot18();
     virtual void UnknownVirtualSlot19();
-    virtual void UnknownVirtualSlot20();
+    virtual int UnknownVirtualSlot20(const char* name, int defaultValue); // registry integer (Game slot 20)
     virtual void UnknownVirtualSlot21();
     virtual int GetRegistryFlag(const char* name, int defaultValue); // registry value (Game slot 22)
 
     unsigned char field_0x004[0x10 - 4];
     UnknownEcoDisplay* field_0x10;
-    unsigned char field_0x014[0x2d0 - 0x14];
+    unsigned char field_0x014[0x38 - 0x14];
+    UnknownEcoDebugOverlay* field_0x38;       // the debug overlay (DebugOverlay.h), or 0
+    unsigned char field_0x03c[0x2d0 - 0x3c];
     int field_0x2d0;                          // software rendering
+    unsigned char field_0x2d4[0x54c - 0x2d4];
+    int field_0x54c;                          // the default texture-stage filters (MAG, MIN, MIP)
+    int field_0x550;
+    int field_0x554;
 };
 extern UnknownEcoTrackGame* g_TrackGame;   // 0x0056e26c (local view of TrackGame)
 unsigned int ReadClock();                     // 0x004bfa80
@@ -419,7 +472,9 @@ public:
     explicit EcoSystem(int flags);            // 0x00457250
     virtual ~EcoSystem();                     // 0x00457330 (deleting wrapper 0x00457310)
     virtual int UnknownVirtualSlot12();       // 0x0045aad0: classifies the visible objects
-    virtual int UnknownVirtualSlot14();       // 0x0045b060: draws them
+    // 0x0045b060 (3967 bytes, one function; 0x0045b136 is not a start):
+    // draws the geometry list, then the billboards 120 at a time.
+    virtual int UnknownVirtualSlot14();
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x0045bfe0
 
     // 0x00457480: reads the .est file (or a .esb through 0x00458f70);
@@ -442,7 +497,6 @@ public:
     int GenerateObjects(int seed);            // 0x00459ce0: generates the objects
     void UnknownFunction45a9a0();             // 0x0045a9a0: lighting changed
     void SetRenderStates(int format);         // 0x0045ade0: render states for a texture format
-    int DrawBillboards();                     // 0x0045b136: draws the billboards
 
     int method;                               // Method: 1 Authored, 2 Auto
     int totalObjects;                         // TotalObjects
@@ -481,6 +535,14 @@ public:
 };
 
 extern EcoSystem* g_UnknownGlobal59aebc;      // the one instance
+
+// NormalDistribution.cpp (src/krusty2/effects): the tabulated bell curve
+// the generator weighs the slope and altitude with (0x0056ece0).
+class UnknownEcoNormalDistribution {
+public:
+    float Lookup(float value, float mean, float sigma); // 0x004b0070
+};
+extern UnknownEcoNormalDistribution* g_UnknownGlobal56ece0;
 
 // 0x0045c040 (cdecl): loads every texture a .esb names ahead of the
 // ecosystem itself.

@@ -21,11 +21,18 @@
 //   0x00457480  the probe stream also lives in esi; the aligned-frame EH
 //               prologue is not recognised by the matcher
 //   0x00457ed0  one scheduled load (the cylinder height) in the vertex loop
+//               and the operand order of the offset's z component
 //   0x00458360  zero kept in ebp, the count tested twice
 //   0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
 //   0x004598d0  loop counter in memory, definition byte cached in a register
 //   0x00459b40  fidiv for the cell size, bitmap pointer in ebp
 //   0x0045c6a0  pointer/count-down block loop
+//   0x0045c040  one byte: the spill slot of the probe stream's `new`
+//               temporary (1618/1619)
+//   0x00459ce0  the frame slots: same size, the locals and temporaries
+//               are assigned in a different order (323/3300)
+//   0x0045b060  frame 0xe0 for 0xf0 and the slot order; the lean of the
+//               side normals is spilled differently (461/3919)
 //   0x0045c7b0  register roles and byte update order
 
 #include <float.h>
@@ -38,15 +45,29 @@
 #include "../../src/reconstructed/EcoSystem.h"
 
 #include "../../src/reconstructed/MemTag.h"
+#include "../../src/reconstructed/PeakHold.h"
+#include "../../src/reconstructed/D3DConstants.h"
 #include "../../src/reconstructed/Parameterblocks.h"
 #include "../../src/reconstructed/TypeRegistry.h"
 #include "../../src/reconstructed/UnknownResourceManager.h"
 #include "../../src/reconstructed/bmpfile.h"
+#include "../../src/reconstructed/Tgafile.h"
 
 // The unit's file statics these candidates read (same addresses as the src
 // unit; see its definitions).
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+static int g_UnknownGlobal56a128 = -1;        // 0x0056a128: the overlay page
+static int g_UnknownGlobal56a12c = 1;         // 0x0056a12c: drawing enabled
+static int g_UnknownGlobal59aec0;             // 0x0059aec0: geometry draw time
+static UnknownPeakHold g_UnknownGlobal59aef0(5000); // 0x0059aef0
+static UnknownPeakHold g_UnknownGlobal59aec8(5000); // 0x0059aec8
+static int g_UnknownGlobal59aee4;             // 0x0059aee4: draw time
+static int g_UnknownGlobal59aee8;             // 0x0059aee8: classification time
+static int g_UnknownGlobal59af04;             // 0x0059af04: geometry objects drawn
+static int g_UnknownGlobal59af08;             // 0x0059af08: billboards drawn
+static int g_UnknownGlobal59aefc;             // 0x0059aefc: textures were preloaded
 static int g_UnknownGlobal59af0c;             // 0x0059af0c
+static int g_UnknownGlobal59af10;             // 0x0059af10: textures preloaded
 static UnknownEcoDetailBand* g_UnknownGlobal59af14; // 0x0059af14
 
 // The view (RenderTarget.h) the object was attached to, GameObject+0x18.
@@ -65,14 +86,10 @@ static inline void UnknownSetIdentity(Matrix4* m) {
     (*m)(0, 0) = 1.0f;
 }
 
-// The vector sum as 0x00458246 computes it (a value-returning inline; the
-// operand order per component is what VC6 reproduces).
-static inline Vector3 UnknownEcoOffset(const Vector3* a, const Vector3* b) {
-    Vector3 r;
-    r.x = b->x + a->x;
-    r.y = a->y + b->y;
-    r.z = a->z + b->z;
-    return r;
+// The vector sum as 0x00458246 computes it (a value-returning inline in
+// operator+ form; VC6 picks the operand order per component itself).
+static inline Vector3 UnknownEcoOffset(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
 // 0x004567e0
@@ -480,7 +497,7 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
                 vertices[j + 16].y = 0.0f;
             }
             for (j = 0; j < 32; j++)
-                vertices[j] = UnknownEcoOffset(&vertices[j], &shape->start);
+                vertices[j] = UnknownEcoOffset(shape->start, vertices[j]);
             for (j = 0; j < 16; j++) {
                 int next = j + 1;
                 if (next >= 16)
@@ -656,4 +673,644 @@ int EcoSystem::PlaceAuthoredObjects() {
 done:
     UnknownFunction4245b0(bitmap);
     return 1;
+}
+
+// 0x0045c040 (cdecl): loads every texture the .esb names before the
+// ecosystem itself is created (the loader then finds them in the manager).
+// `path` is rewritten to the .esb name when one exists next to the .est.
+int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags) {
+    char names[256][0x80];
+    char billboardNames[256][0x80];
+    unsigned int keyColors[256];
+    char esbName[0x104];
+    char sltName[0x104];
+    unsigned char present;
+    unsigned char length;
+    int method;
+    int collisionCount;
+    int ownsStream = 0;
+    int i;
+    memset(billboardNames, 0, sizeof(billboardNames));
+    memset(names, 0, sizeof(names));
+    g_UnknownGlobal59af10 = 0;
+    if (!stream && strstr(path, ".est")) {
+        int pathLength = strlen(path);
+        int count = pathLength > 0x103 ? 0x103 : pathLength;
+        strncpy(esbName, path, count);
+        esbName[count] = 0;
+        strcpy(strstr(esbName, ".est"), ".esb");
+        UnknownTextureStream* probe = new(__FILE__, 0xad7) UnknownTextureStream(g_UnknownResourceManager572b44);
+        if (probe->UnknownFunction460f50(esbName, "rb", 0))
+            strcpy(strstr(path, ".est"), ".esb");
+        if (probe)
+            delete probe;
+    }
+    if (!strstr(path, ".esb"))
+        return 0;
+    UnknownTextureStream* esb = stream;
+    if (!esb) {
+        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(path, 1);
+        if (!entry) {
+            esb = new(__FILE__, 0xaf8) UnknownTextureStream(g_UnknownResourceManager572b44);
+            if (!esb->UnknownFunction460f50(path, "rb", 0)) {
+                if (esb)
+                    delete esb;
+                return 0;
+            }
+            ownsStream = 1;
+        } else {
+            esb = entry->field_0x14;
+        }
+    }
+    esb->UnknownFunction461640(&method, 4, 1);
+    for (i = 0; i < 256; i++) {
+        esb->UnknownFunction461640(&present, 1, 1);
+        if (present) {
+            esb->UnknownFunction461640(&length, 1, 1);
+            esb->UnknownFunction461640(names[i], length, 1);
+            esb->UnknownFunction461640(&length, 1, 1);
+            esb->UnknownFunction461640(billboardNames[i], length, 1);
+            esb->UnknownFunction461340(0x34, 1, 1);
+            esb->UnknownFunction461640(&keyColors[i], 4, 1);
+            if (method == 2) {
+                esb->UnknownFunction461340(0x24, 1, 1);
+                esb->UnknownFunction461640(&present, 1, 1);
+                if (present) {
+                    esb->UnknownFunction461640(&length, 1, 1);
+                    esb->UnknownFunction461340(length, 1, 1);
+                }
+            }
+            esb->UnknownFunction461640(&collisionCount, 4, 1);
+            esb->UnknownFunction461340(collisionCount * sizeof(UnknownEcoCollisionDefinition), 1, 1);
+        }
+    }
+    if (ownsStream) {
+        if (esb)
+            delete esb;
+    }
+    for (i = 0; i < 256; i++) {
+        if (billboardNames[i][0]) {
+            UnknownEcoTexture* texture = UnknownFunction50a590(textures, billboardNames[i], modelFlags, 0, 2, 5, 6, 0, 0x80,
+                                                               0xff00ff, 1, 1);
+            if (!texture->UnknownVirtualSlot7()) {
+                texture->UnknownVirtualSlot8(1, 0, 0);
+                g_UnknownGlobal59af10++;
+            }
+        }
+        if (names[i][0]) {
+            strcpy(sltName, names[i]);
+            strcat(sltName, ".slt");
+            UnknownTextureStream* sltStream = new(__FILE__, 0xb50) UnknownTextureStream(g_UnknownResourceManager572b44);
+            if (sltStream->UnknownFunction460f50(sltName, "r", 0)) {
+                UnknownParameterBlock* block = new(__FILE__, 0xb52) UnknownParameterBlock;
+                block->UnknownFunction4b77a0((UnknownParameterStream*)sltStream, 0, 1);
+                block->UnknownFunction4b78f0("Material - 0");
+                block->UnknownFunction4b7b30("TextureMap", sltName, -1);
+                int format = 1555;
+                if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->field_0x1c0 & 8)
+                    && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
+                    format = g_TrackGame->field_0x10->field_0x28;
+                UnknownEcoTexture* texture = UnknownFunction50a590(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
+                if (!texture->UnknownVirtualSlot7()) {
+                    g_UnknownGlobal59af10++;
+                    int loaded = texture->field_0x20;
+                    if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
+                        texture->UnknownVirtualSlot18(keyColors[i]);
+                    texture->UnknownVirtualSlot8(1, 0, 0);
+                }
+                if (block)
+                    delete block;
+            }
+            if (sltStream)
+                delete sltStream;
+        }
+    }
+    g_UnknownGlobal59aefc = 1;
+    return 1;
+}
+
+// A random number in 0..1 (inline shape only: the helper boundary is what
+// keeps VC6 from folding the scale into the generator's other constants).
+static inline float UnknownEcoRandom() {
+    return rand() * (1.0f / 32768.0f);
+}
+
+// The value a probability TGA holds at the terrain position (`x`, `z`):
+// the green channel of a 32- or 24-bit image, the green field of a 16-bit
+// one, scaled to 0..1. Inline shape only (the three branches are expanded
+// at every sample site of the generator).
+static inline float UnknownEcoSampleTga(UnknownTgaFile* tga, float x, float z) {
+    float worldX = g_collisionQuadTree->field_0x50;
+    int width = tga->width;
+    int column = (int)(x / worldX * width);
+    float worldZ = g_collisionQuadTree->field_0x54;
+    int height = tga->height;
+    int row = (int)((1.0f - z / worldZ) * height);
+    if (column >= width)
+        column = width - 1;
+    if (row >= height)
+        row = height - 1;
+    int index = row * width + column;
+    if (tga->bitsPerPixel == 32)
+        return ((unsigned char*)tga->bits)[index * 4 + 1] * (1.0f / 255.0f);
+    if (tga->bitsPerPixel == 24)
+        return ((unsigned char*)tga->bits)[index * 3 + 1] * (1.0f / 255.0f);
+    return ((((unsigned short*)tga->bits)[index] >> 5) & 0x1f) * (1.0f / 31.0f);
+}
+
+// Whether the probability TGA is nonzero at the terrain position.
+static inline int UnknownEcoTgaIsSet(UnknownTgaFile* tga, float x, float z) {
+    float worldX = g_collisionQuadTree->field_0x50;
+    int width = tga->width;
+    int column = (int)(x / worldX * width);
+    float worldZ = g_collisionQuadTree->field_0x54;
+    int height = tga->height;
+    int row = (int)((1.0f - z / worldZ) * height);
+    if (column >= width)
+        column = width - 1;
+    if (row >= height)
+        row = height - 1;
+    int index = row * width + column;
+    if (tga->bitsPerPixel == 32)
+        return ((unsigned char*)tga->bits)[index * 4 + 1] != 0;
+    if (tga->bitsPerPixel == 24)
+        return ((unsigned char*)tga->bits)[index * 3 + 1] != 0;
+    return (((unsigned short*)tga->bits)[index] & 0x3e0) != 0;
+}
+
+// 0x00459ce0: the Auto method. Places the authored objects, then draws
+// random positions (in 5x5 / 6x6 "EcoGen" rings when the registry asks
+// for them) until TotalObjects are placed or 10000 draws in a row failed.
+// A draw picks a definition from the PercentBias table and must pass the
+// probability TGAs, the slope and altitude bell curves and, with
+// `checkCodes`, the QuadTree code test.
+int EcoSystem::GenerateObjects(int checkCodes) {
+    UnknownTgaFile* tgas[256];
+    float definitionIndex[256];
+    float cumulative[256];
+    Vector3 outerRing[20];
+    Vector3 innerRing[12];
+    Vector3 normal;
+    float minHeight;
+    float maxHeight;
+    float spacing;
+    float rangeX;
+    float rangeZ;
+    int i;
+    int j;
+    PlaceAuthoredObjects();
+    UnknownTgaFile* tga = 0;
+    memset(tgas, 0, sizeof(tgas));
+    if (probabilityTga[0])
+        tga = UnknownFunction5125c0(probabilityTga, 0, (int)g_UnknownResourceManager572b44);
+    for (i = 0; i < 256; i++) {
+        if (definitionTable[i] && definitionTable[i]->probabilityTga[0])
+            tgas[i] = UnknownFunction5125c0(definitionTable[i]->probabilityTga, 0, (int)g_UnknownResourceManager572b44);
+    }
+    groundTerrain->GetHeightRange(&minHeight, &maxHeight);
+    unsigned int attempt = 0;
+    float total = 0.0f;
+    int count = 0;
+    int failures = 0;
+    for (i = 0; i < 256; i++) {
+        if (definitionTable[i]) {
+            definitionIndex[count] = (float)i;
+            total += definitionTable[i]->percentBias;
+            cumulative[count] = total;
+            count++;
+        }
+    }
+    int mode = g_TrackGame->UnknownVirtualSlot20("EcoGen", 0);
+    rangeX = g_collisionQuadTree->field_0x50;
+    rangeZ = g_collisionQuadTree->field_0x54;
+    if (mode == 5) {
+        spacing = g_collisionQuadTree->field_0x50 * (1.0f / 5.0f);
+        rangeX = rangeZ = spacing;
+    } else if (mode == 6) {
+        spacing = g_collisionQuadTree->field_0x50 * (1.0f / 6.0f);
+        rangeX = rangeZ = spacing;
+    }
+    if (mode) {
+        int k = 0;
+        for (i = 0; i < mode; i++) {
+            outerRing[k++] = Vector3(i * spacing, 0.0f, 0.0f);
+            outerRing[k++] = Vector3(i * spacing, 0.0f, (mode - 1) * spacing);
+        }
+        for (i = 1; i < mode - 1; i++) {
+            outerRing[k++] = Vector3(0.0f, 0.0f, i * spacing);
+            outerRing[k++] = Vector3((mode - 1) * spacing, 0.0f, i * spacing);
+        }
+        k = 0;
+        for (i = 1; i < mode - 1; i++) {
+            innerRing[k++] = Vector3(i * spacing - spacing, 0.0f, 0.0f);
+            innerRing[k++] = Vector3(i * spacing - spacing, 0.0f, (mode - 2) * spacing - spacing);
+        }
+        for (i = 2; i < mode - 2; i++) {
+            innerRing[k++] = Vector3(0.0f, 0.0f, i * spacing - spacing);
+            innerRing[k++] = Vector3((mode - 2) * spacing - spacing, 0.0f, i * spacing - spacing);
+        }
+    }
+    while (placedCount < totalObjects && failures < 10000) {
+        Vector3 position;
+        Vector3 probe;
+        failures++;
+        attempt++;
+        int selected = (int)definitionIndex[count - 1];
+        float draw = rand() * (100.0f / 32767.0f);
+        for (i = 0; i < count; i++) {
+            if (draw <= cumulative[i]) {
+                selected = (int)definitionIndex[i];
+                break;
+            }
+        }
+        position.x = UnknownEcoRandom() * rangeX;
+        int clusterCount = 1;
+        Vector3* cluster = 0;
+        position.y = 0.0f;
+        position.z = UnknownEcoRandom() * rangeZ;
+        if (mode == 5) {
+            if (attempt % 3 == 0) {
+                clusterCount = 16;
+                cluster = outerRing;
+            } else if (attempt % 3 == 1) {
+                clusterCount = 8;
+                position.x += spacing;
+                cluster = innerRing;
+                position.z += spacing;
+            } else {
+                clusterCount = 1;
+                cluster = 0;
+                position.x = spacing * 2.0f + position.x;
+                position.z = spacing * 2.0f + position.z;
+            }
+        } else if (mode == 6) {
+            if (attempt % 6 == 0) {
+                clusterCount = 20;
+                cluster = outerRing;
+            } else if (attempt % 6 == 1) {
+                clusterCount = 12;
+                position.x += spacing;
+                cluster = innerRing;
+                position.z += spacing;
+            } else {
+                clusterCount = 1;
+                cluster = 0;
+                position.x = (position.x + spacing) * 2.0f;
+                position.z = (position.z + spacing) * 2.0f;
+            }
+        }
+        if (placedCount + clusterCount > totalObjects)
+            continue;
+        unsigned char heightParameter = definitionTable[selected]->RandomParameter();
+        unsigned char radiusParameter = definitionTable[selected]->ParameterForHeight(
+            definitionTable[selected]->HeightForParameter(heightParameter));
+        float radius = definitionTable[selected]->RadiusForParameter(radiusParameter);
+        float height = definitionTable[selected]->HeightForParameter(heightParameter);
+        probe = position;
+        unsigned int code = g_collisionQuadTree->ComputeCode(position.x - radius, position.z - radius,
+                                                             radius + position.x, radius + position.z);
+        if (checkCodes && !g_collisionQuadTree->IsValidCode(code))
+            continue;
+        // The named local keeps VC6 from folding the two scales into one.
+        float random = UnknownEcoRandom();
+        float threshold = random * 3.0f;
+        float probability;
+        if (tga)
+            probability = UnknownEcoSampleTga(tga, probe.x, probe.z);
+        else
+            probability = 1.0f;
+        if (probability <= threshold)
+            continue;
+        if (tgas[selected])
+            probability = UnknownEcoSampleTga(tgas[selected], probe.x, probe.z) * probability;
+        if (probability <= threshold)
+            continue;
+        groundTerrain->QueryGround(&probe, &normal, 0, 0);
+        float slope = (float)acos(normal.y);
+        float altitude = probe.y;
+        if (slope < 0.0f)
+            slope = 0.0f;
+        slope *= (float)(2.0 / 3.14159265358979);
+        probability *= g_UnknownGlobal56ece0->Lookup(slope, definitionTable[selected]->meanSlope,
+                                                      definitionTable[selected]->standardDeviationSlope);
+        if (probability <= threshold)
+            continue;
+        altitude = (altitude - minHeight) / (maxHeight - minHeight);
+        probability *= g_UnknownGlobal56ece0->Lookup(altitude, definitionTable[selected]->meanAltitude,
+                                                      definitionTable[selected]->standardDeviationAltitude);
+        if (probability <= threshold)
+            continue;
+        for (j = 1; j < clusterCount; j++) {
+            probe = Vector3(position.x + cluster[j].x, cluster[j].y, position.z + cluster[j].z);
+            if (tga && !UnknownEcoTgaIsSet(tga, probe.x, probe.z))
+                break;
+            if (tgas[selected] && !UnknownEcoTgaIsSet(tgas[selected], probe.x, probe.z))
+                break;
+        }
+        if (j != clusterCount)
+            continue;
+        for (j = 0; j < clusterCount; j++) {
+            if (clusterCount == 1)
+                probe = position;
+            else
+                probe = Vector3(position.x + cluster[j].x, cluster[j].y, position.z + cluster[j].z);
+            groundTerrain->QueryGround(&probe, 0, 0, 0);
+            code = g_collisionQuadTree->ComputeCode(probe.x - radius, probe.z - radius, probe.x + radius,
+                                                    probe.z + radius);
+            vegetation[placedCount].Place(textureManager, selected, &probe, heightParameter, radiusParameter);
+            g_MemTagStack->Push("QuadTree");
+            g_collisionQuadTree->Insert(&vegetation[placedCount], code, probe.y, probe.y + height);
+            g_MemTagStack->Push("EcoSystem");
+            placedCount++;
+        }
+        failures = 0;
+    }
+    if (tga)
+        UnknownFunction512dd0(tga);
+    for (i = 0; i < 256; i++) {
+        if (tgas[i])
+            UnknownFunction512dd0(tgas[i]);
+    }
+    return 1;
+}
+
+// An xz direction normalised in place (the y component is cleared), zero
+// when it has no length. Inline shape only.
+static inline void UnknownEcoNormalizeXZ(Vector3* v) {
+    float length = v->x * v->x + v->z * v->z;
+    if (length == 0.0f) {
+        *v = kVec3Zero;
+    } else {
+        length = FastInvSqrt(length);
+        v->x = length * v->x;
+        v->y = 0.0f;
+        v->z = length * v->z;
+    }
+}
+
+// The lit colour (no alpha) of a billboard face whose normal has the light
+// intensity `intensity`. Inline shape only.
+static inline float UnknownEcoMin1(float v) {
+    return v < 1.0f ? v : 1.0f;
+}
+static inline unsigned int UnknownEcoLitColor(const EcoSystem* eco, float intensity) {
+    float r = UnknownEcoMin1(intensity * eco->lightColor.x + eco->ambientLight.x);
+    float g = UnknownEcoMin1(intensity * eco->lightColor.y + eco->ambientLight.y);
+    float b = UnknownEcoMin1(intensity * eco->lightColor.z + eco->ambientLight.z);
+    return ((int)(r * 255.0f) << 16) | ((int)(g * 255.0f) << 8) | (int)(b * 255.0f);
+}
+
+// The light falling on a face with normal `n` (the dot product is summed
+// as z + (x + y), the order VC6 emits for retail; see UnknownSquareMagnitude).
+static inline float UnknownEcoLightOn(const EcoSystem* eco, const Vector3* n) {
+    return -(n->z * eco->lightDirection.z + (n->x * eco->lightDirection.x + n->y * eco->lightDirection.y));
+}
+
+// 0x0045b060: slot 14, the draw. The geometry list is drawn object by
+// object; the billboards are built 120 at a time into the vertex buffer as
+// view-aligned quads (or, when the band lights them, as three lit faces
+// folded towards the camera) and drawn in one call. The timings and counts
+// go to the "EcoSystem" debug overlay page.
+int EcoSystem::UnknownVirtualSlot14() {
+    Matrix4 identity;
+    int savedPerspective;
+    int savedShadeMode;
+    Vector3 right;
+    Vector3 left;
+    Vector3 back;
+    int i;
+    if (!g_UnknownGlobal56a12c)
+        return 1;
+    unsigned int start = ReadClock();
+    int category = g_MemTagStack->Push("EcoSystem");
+    UnknownEcoCamera* camera = ECO_VIEW->field_0x08;
+    int verticesBefore = ECO_VIEW->field_0x38;
+    int trianglesBefore = ECO_VIEW->field_0x44;
+    float projectionScale = camera->field_0x198;
+    identity(0, 0) = 1.0f;
+    identity(0, 1) = 0.0f;
+    identity(0, 2) = 0.0f;
+    identity(0, 3) = 0.0f;
+    identity(1, 0) = 0.0f;
+    identity(1, 1) = 1.0f;
+    identity(1, 2) = 0.0f;
+    identity(1, 3) = 0.0f;
+    identity(2, 0) = 0.0f;
+    identity(2, 1) = 0.0f;
+    identity(2, 2) = 1.0f;
+    identity(2, 3) = 0.0f;
+    identity(3, 0) = 0.0f;
+    identity(3, 1) = 0.0f;
+    identity(3, 2) = 0.0f;
+    identity(3, 3) = 1.0f;
+    ECO_VIEW->field_0x08->UnknownVirtualSlot30(&identity);
+    ECO_VIEW->UnknownVirtualSlot9(D3DRENDERSTATE_TEXTUREPERSPECTIVE, &savedPerspective);
+    ECO_VIEW->UnknownVirtualSlot9(D3DRENDERSTATE_SHADEMODE, &savedShadeMode);
+    // The three face normals: the quad's two sides and the face towards
+    // the camera, the sides leaned back by a tenth of it.
+    right.x = -camera->field_0x17c.z;
+    right.z = camera->field_0x17c.x;
+    left.x = camera->field_0x17c.z;
+    left.z = -camera->field_0x17c.x;
+    back.x = -camera->field_0x17c.x;
+    back.z = -camera->field_0x17c.z;
+    right.x = right.x - back.x * 0.1f;
+    right.z = right.z - back.z * 0.1f;
+    left.x = left.x - back.x * 0.1f;
+    left.z = left.z - back.z * 0.1f;
+    UnknownEcoNormalizeXZ(&right);
+    UnknownEcoNormalizeXZ(&left);
+    UnknownEcoNormalizeXZ(&back);
+    // The three intensities (x right, y left, z back).
+    Vector3 intensity;
+    intensity.x = UnknownEcoLightOn(this, &right);
+    if (intensity.x < 0.0f)
+        intensity.x = 0.0f;
+    intensity.y = UnknownEcoLightOn(this, &left);
+    if (intensity.y < 0.0f)
+        intensity.y = 0.0f;
+    intensity.z = UnknownEcoLightOn(this, &back);
+    if (intensity.z < 0.0f)
+        intensity.z = 0.0f;
+    unsigned int backColor = UnknownEcoLitColor(this, intensity.z);
+    unsigned int rightColor = UnknownEcoLitColor(this, intensity.x);
+    unsigned int leftColor = UnknownEcoLitColor(this, intensity.y);
+    float inverse = UnknownFunction460c70(camera->field_0x17c.x * camera->field_0x17c.x
+                                          + camera->field_0x17c.z * camera->field_0x17c.z);
+    float sine = inverse * camera->field_0x17c.x;
+    float cosine = inverse * camera->field_0x17c.z;
+    g_UnknownGlobal59af08 = 0;
+    g_UnknownGlobal59af04 = 0;
+    if (g_TrackGame->field_0x2d0)
+        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, g_UnknownGlobal59af14[detailLevel].fog, 0);
+    if (geometryCount) {
+        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->modelTexture->field_0x20);
+        for (i = 0; i < geometryCount; i++) {
+            if (g_UnknownGlobal56a12c)
+                geometryList[i]->DrawGeometry(ECO_VIEW);
+            g_UnknownGlobal59af04++;
+        }
+    }
+    g_UnknownGlobal59aec0 = ReadClock() - start;
+    if (g_TrackGame->field_0x2d0)
+        ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 0);
+    if (billboardCount) {
+        definitionTable[vegetation[0].definitionIndex]->billboardTexture->UnknownVirtualSlot19();
+        SetRenderStates(definitionTable[vegetation[0].definitionIndex]->billboardTexture->field_0x20);
+        int next = 0;
+        int remaining = billboardCount;
+        float widthScale = (float)(15.0 / ECO_VIEW->field_0x0c);
+        int stageLighting = g_UnknownGlobal59af14[detailLevel].stageLighting;
+        float billboardRange = (float)g_UnknownGlobal59af14[detailLevel].billboardRange;
+        int billboardLimit = g_UnknownGlobal59af14[detailLevel].billboardLimit;
+        while (remaining) {
+            int vertexCount = 0;
+            int indexCount = 0;
+            int offset0 = 0;
+            int offset5 = 0xa0;
+            int offset2 = 0x40;
+            int offset1 = 0x20;
+            int offset3 = 0x60;
+            for (i = 0; i < remaining && i < 120; i++) {
+                Vegetation* object = billboardList[next];
+                UnknownEcoDefinition* definition = definitionTable[object->definitionIndex];
+                float radius = definition->RadiusForParameter(object->radiusParam);
+                int depthKey = (unsigned short)object->field_0x06;
+                float depth = depthKey * depthUnit;
+                if (depth < billboardRange && radius * projectionScale / depth > 2.0f) {
+                    float height = definition->HeightForParameter(object->heightParam);
+                    float uScale = (definition->uRight - definition->uLeft) / (radius + radius);
+                    float uLeftWidth = (definition->vTop - definition->uLeft) * uScale;
+                    float uRightWidth = (definition->uRight - definition->vTop) * uScale;
+                    float x = object->quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+                    float y = object->quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
+                    float z = object->quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
+#define VERTEX(o) (*(UnknownEcoVertex*)((char*)billboardVertices + (o)))
+                    VERTEX(offset0).position.x = uRightWidth * cosine + x;
+                    VERTEX(offset3).position.x = VERTEX(offset0).position.x;
+                    VERTEX(offset1).position.x = x - uLeftWidth * cosine;
+                    VERTEX(offset2).position.x = VERTEX(offset1).position.x;
+                    VERTEX(offset0).position.z = z - uRightWidth * sine;
+                    VERTEX(offset0 + 0x60).position.z = VERTEX(offset0).position.z;
+                    VERTEX(offset0 + 0x20).position.z = z + uLeftWidth * sine;
+                    VERTEX(offset0 + 0x40).position.z = VERTEX(offset0 + 0x20).position.z;
+                    VERTEX(offset0).position.y = height * definition->field_0x1d4 + y;
+                    VERTEX(offset0 + 0x20).position.y = VERTEX(offset0).position.y;
+                    VERTEX(offset0 + 0x40).position.y = height + VERTEX(offset0).position.y;
+                    VERTEX(offset0 + 0x60).position.y = VERTEX(offset0 + 0x40).position.y;
+                    unsigned int alpha;
+                    if (object->isBillboard < definition->lodCount)
+                        alpha = object->fadeLevel << 24;
+                    else
+                        alpha = 0xff000000;
+                    int stride;
+                    if (billboardLimit && ((stageLighting && depth < 20.0f) || depth * widthScale < radius)) {
+                        VERTEX(offset5).position.x = x;
+                        VERTEX(offset0 + 0x80).position.x = x;
+                        VERTEX(offset0 + 0xa0).position.z = z;
+                        VERTEX(offset0 + 0x80).position.z = z;
+                        VERTEX(offset0 + 0x80).position.y = VERTEX(offset0).position.y;
+                        VERTEX(offset0 + 0xa0).position.y = VERTEX(offset0 + 0x60).position.y;
+                        VERTEX(offset0 + 0x40).tu = definition->uLeft;
+                        VERTEX(offset0 + 0x20).tu = VERTEX(offset0 + 0x40).tu;
+                        VERTEX(offset0 + 0xa0).tu = definition->vTop;
+                        VERTEX(offset0 + 0x80).tu = VERTEX(offset0 + 0xa0).tu;
+                        VERTEX(offset0 + 0x60).tu = definition->uRight;
+                        VERTEX(offset0).tu = VERTEX(offset0 + 0x60).tu;
+                        VERTEX(offset0 + 0xa0).tv = definition->uCenter;
+                        VERTEX(offset0 + 0x60).tv = VERTEX(offset0 + 0xa0).tv;
+                        VERTEX(offset0 + 0x40).tv = VERTEX(offset0 + 0x60).tv;
+                        VERTEX(offset0 + 0x80).tv = definition->vBottom;
+                        VERTEX(offset0 + 0x20).tv = VERTEX(offset0 + 0x80).tv;
+                        VERTEX(offset0).tv = VERTEX(offset0 + 0x20).tv;
+                        VERTEX(offset0 + 0x40).diffuse = alpha | rightColor;
+                        VERTEX(offset0 + 0x20).diffuse = VERTEX(offset0 + 0x40).diffuse;
+                        VERTEX(offset0 + 0x60).diffuse = alpha | leftColor;
+                        VERTEX(offset0).diffuse = VERTEX(offset0 + 0x60).diffuse;
+                        VERTEX(offset0 + 0xa0).diffuse = alpha | backColor;
+                        VERTEX(offset0 + 0x80).diffuse = VERTEX(offset0 + 0xa0).diffuse;
+                        billboardIndices[indexCount++] = vertexCount;
+                        billboardIndices[indexCount++] = vertexCount + 4;
+                        billboardIndices[indexCount++] = vertexCount + 5;
+                        billboardIndices[indexCount++] = vertexCount;
+                        billboardIndices[indexCount++] = vertexCount + 5;
+                        billboardIndices[indexCount++] = vertexCount + 3;
+                        billboardIndices[indexCount++] = vertexCount + 4;
+                        billboardIndices[indexCount++] = vertexCount + 1;
+                        billboardIndices[indexCount++] = vertexCount + 2;
+                        billboardIndices[indexCount++] = vertexCount + 4;
+                        billboardIndices[indexCount++] = vertexCount + 2;
+                        billboardIndices[indexCount++] = vertexCount + 5;
+                        vertexCount += 6;
+                        stride = 0xc0;
+                    } else {
+                        VERTEX(offset0 + 0x60).tu = definition->uRight;
+                        VERTEX(offset0).tu = VERTEX(offset0 + 0x60).tu;
+                        VERTEX(offset0 + 0x40).tu = definition->uLeft;
+                        VERTEX(offset0 + 0x20).tu = VERTEX(offset0 + 0x40).tu;
+                        VERTEX(offset0 + 0x60).tv = definition->uCenter;
+                        VERTEX(offset0 + 0x40).tv = VERTEX(offset0 + 0x60).tv;
+                        VERTEX(offset0 + 0x20).tv = definition->vBottom;
+                        VERTEX(offset0).tv = VERTEX(offset0 + 0x20).tv;
+                        VERTEX(offset0 + 0x60).diffuse = alpha | backColor;
+                        VERTEX(offset0).diffuse = VERTEX(offset0 + 0x60).diffuse;
+                        VERTEX(offset0 + 0x40).diffuse = VERTEX(offset0).diffuse;
+                        VERTEX(offset0 + 0x20).diffuse = VERTEX(offset0 + 0x40).diffuse;
+                        billboardIndices[indexCount++] = vertexCount;
+                        billboardIndices[indexCount++] = vertexCount + 1;
+                        billboardIndices[indexCount++] = vertexCount + 2;
+                        billboardIndices[indexCount++] = vertexCount;
+                        billboardIndices[indexCount++] = vertexCount + 2;
+                        billboardIndices[indexCount++] = vertexCount + 3;
+                        vertexCount += 4;
+                        stride = 0x80;
+                    }
+#undef VERTEX
+                    offset3 += stride;
+                    offset1 += stride;
+                    offset2 += stride;
+                    offset5 += stride;
+                    offset0 += stride;
+                    g_UnknownGlobal59af08++;
+                }
+                next++;
+            }
+            if (g_UnknownGlobal56a12c && vertexCount)
+                ECO_VIEW->UnknownVirtualSlot15(D3DPT_TRIANGLELIST, D3DFVF_LVERTEX, billboardVertices, vertexCount,
+                                               billboardIndices, indexCount, 0);
+            remaining -= i;
+        }
+    }
+    g_UnknownGlobal59aee4 = ReadClock() - start;
+    UnknownEcoDebugOverlay* overlay = g_TrackGame->field_0x38;
+    if (overlay) {
+        if (g_UnknownGlobal56a128 < 0)
+            g_UnknownGlobal56a128 = overlay->field_0x26c0++;
+        g_UnknownGlobal59aef0.UnknownFunction4cb6b0(g_UnknownGlobal59aee8);
+        g_UnknownGlobal59aec8.UnknownFunction4cb6b0(g_UnknownGlobal59aee4);
+        g_TrackGame->field_0x38->UnknownFunction447fa0(g_UnknownGlobal56a128, "Ecosystem:%d objects", totalObjects);
+        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Visible  2D %d 3D %d", billboardCount,
+                                                       geometryCount);
+        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Rendered 2D %d 3D %d",
+                                                       g_UnknownGlobal59af08, g_UnknownGlobal59af04);
+        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Memory %d",
+                                                       g_MemTagStack->UnknownFunction4a2d20("EcoSystem"));
+        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "PrepareGeometry %d %d",
+                                                       g_UnknownGlobal59aee8, g_UnknownGlobal59aef0.UnknownFunction4cb690());
+        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Render %d(3d:%d) %d",
+                                                       g_UnknownGlobal59aee4, g_UnknownGlobal59aec0,
+                                                       g_UnknownGlobal59aec8.UnknownFunction4cb690());
+        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Total Transforms %d",
+                                                       ECO_VIEW->field_0x38 - verticesBefore);
+        g_TrackGame->field_0x38->UnknownFunction447f40(g_UnknownGlobal56a128, "Total Triangles  %d",
+                                                       ECO_VIEW->field_0x44 - trianglesBefore);
+    }
+    g_MemTagStack->Pop(category);
+    ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, savedShadeMode, 0);
+    ECO_VIEW->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, savedPerspective, 0);
+    ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MAGFILTER, g_TrackGame->field_0x54c);
+    ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MINFILTER, g_TrackGame->field_0x550);
+    ECO_VIEW->UnknownVirtualSlot7(0, D3DTSS_MIPFILTER, g_TrackGame->field_0x554);
+    ECO_VIEW->UnknownVirtualSlot19();
+    return GameObject::UnknownVirtualSlot14();
 }

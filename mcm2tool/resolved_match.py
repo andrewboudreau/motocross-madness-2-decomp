@@ -63,7 +63,13 @@ def compare_bytes(retail: bytes, candidate: bytes) -> dict:
 
 _EH_PROLOGUES = {
     3: (b'\x6a\xff\x68',),
-    9: (b'\x64\xa1\x00\x00\x00\x00\x6a\xff\x68',),
+    # `mov eax, fs:[0]; push -1; push handler` and VC6's other order
+    # `push -1; mov eax, fs:[0]; push handler` (EcoSystem 0x0045c040); an
+    # 8-byte-aligned frame opens with `push ebp; mov ebp, esp; and esp, -8`
+    # before `push -1; push handler` (EcoSystem 0x00457480).
+    9: (b'\x64\xa1\x00\x00\x00\x00\x6a\xff\x68',
+        b'\x6a\xff\x64\xa1\x00\x00\x00\x00\x68',
+        b'\x55\x8b\xec\x83\xe4\xf8\x6a\xff\x68'),
 }
 
 

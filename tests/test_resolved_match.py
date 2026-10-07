@@ -142,6 +142,19 @@ class EhPrologueShapeTests(unittest.TestCase):
         prefix = b'\x64\xa1\x00\x00\x00\x00' + b'\x8b\x51\x00' + b'\x6a\xff\x68'
         self.assertFalse(_is_eh_handler_push(prefix))
 
+    def test_push_minus_one_before_fs_load(self):
+        from mcm2tool.resolved_match import _is_eh_handler_push
+        # push -1; mov eax, fs:[0]; push offset handler (EcoSystem 0x0045c040)
+        self.assertTrue(_is_eh_handler_push(b'\x6a\xff\x64\xa1\x00\x00\x00\x00\x68'))
+
+    def test_aligned_frame_prologue(self):
+        from mcm2tool.resolved_match import _is_eh_handler_push
+        # push ebp; mov ebp, esp; and esp, -8; push -1; push offset handler
+        # (EcoSystem 0x00457480)
+        self.assertTrue(_is_eh_handler_push(b'\x55\x8b\xec\x83\xe4\xf8\x6a\xff\x68'))
+        # and esp, -16 is not a shape VC6 emits for these frames
+        self.assertFalse(_is_eh_handler_push(b'\x55\x8b\xec\x83\xe4\xf0\x6a\xff\x68'))
+
 
 if __name__ == '__main__':
     unittest.main()

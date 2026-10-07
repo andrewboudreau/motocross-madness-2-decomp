@@ -115,6 +115,7 @@
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
   "?RestartQuery@UnknownEcoQuadTree@@QAEXXZ": "0x004dd750",
   "?SphereInFrustum@UnknownEcoVisibilityClipper@@QAEHPBUUnknownEcoCamera@@PBXPBUVector3@@MPAH@Z": "0x0052fbb0",
+  "?SphereInFrustum@UnknownEcoVisibilityClipper@@QAEHPBVUnknownEcoCamera@@PBXPBUVector3@@MPAH@Z": "0x0052fbb0",
   "?AdvanceAge@AgeManager@@QAEXXZ": "0x00401040",
   "?Register@AgeManager@@QAEXPAUAgeEntry@@P6AHPAXH@Z1HH@Z": "0x00401050",
   "?TotalSize@AgeManager@@QAEHPAH@Z": "0x00401130",
