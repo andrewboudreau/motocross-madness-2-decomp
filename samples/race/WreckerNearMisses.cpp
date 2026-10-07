@@ -17,12 +17,12 @@
 //
 // UnknownFunction532580 (0x00532580, 562 bytes): rebuilds the wreck pose's
 // linear (field_0xbc) and angular (field_0xc8) step from the node's frame.
-// The data flow is decoded, but VC6 here copies the old position directly
-// into field_0xbc. Retail copies it through a stack temporary, holds the
-// old up row in three FPU registers and copies the old forward row with
-// integer moves. Named locals, copy-initialised and float-constructed
-// locals, and by-value accessors on the frame all fail to give that mix.
-// Positional score 45/552; the branch skeleton and the arithmetic match.
+// 490/562: the temporaries (a member-by-member copy helper), the FPU-held
+// up row (float locals) and the branch layout match. Left: each cross
+// product's loads are swapped (retail `fld pose.z; fmul old.y`, VC6 here
+// `fld old.y; fmul pose.z` whatever the operand order, argument order,
+// sign convention, by-value or matrix form) and its `fsubp` is scheduled
+// after the destination pointer copy.
 //
 // UnknownFunction5329e0 (0x005329e0, 1312 bytes): pushes probes back out of
 // the box field_0xe8/field_0xf4 and turns the mean push into the impulse
@@ -99,22 +99,33 @@ void Wrecker::UnknownFunction531da0(Vector3 from, Vector3 to, float frameTime) {
     }
 }
 
+// Copies a vector member by member into a returned local: retail copies
+// the old position (and forward row) through a stack temporary this way.
+static inline Vector3 WreckerCopy(const Vector3& v) {
+    Vector3 r;
+    r.x = v.x;
+    r.y = v.y;
+    r.z = v.z;
+    return r;
+}
+
 void Wrecker::UnknownFunction532580() {
     UnknownWreckerFrame pose;
-    Vector3 last = field_0x6c.position;
-    field_0xbc = last;
+    field_0xbc = WreckerCopy(field_0x6c.position);
     field_0xb8->UnknownFunction4fca80(0, &pose);
-    field_0xbc = Vector3(pose.position.x - field_0xbc.x, pose.position.y - field_0xbc.y,
-                         pose.position.z - field_0xbc.z);
-    Vector3 up = field_0x6c.up;
-    Vector3 forward = field_0x6c.forward;
-    if (up.x == pose.up.x && up.y == pose.up.y && up.z == pose.up.z) {
+    field_0xbc = pose.position - field_0xbc;
+    Vector3 forward = WreckerCopy(field_0x6c.forward);
+    // The old up row stays on the FPU stack: float locals.
+    float upX = field_0x6c.up.x;
+    float upY = field_0x6c.up.y;
+    float upZ = field_0x6c.up.z;
+    if (upX == pose.up.x && upY == pose.up.y && upZ == pose.up.z) {
         if (forward.x == pose.forward.x && forward.y == pose.forward.y && forward.z == pose.forward.z)
             field_0xc8 = Vector3(0.0f, 0.0f, 0.0f);
         else
             field_0xc8 = WreckerCross(forward, pose.forward);
     } else {
-        field_0xc8 = WreckerCross(up, pose.up);
+        field_0xc8 = WreckerCross(Vector3(upX, upY, upZ), pose.up);
     }
     field_0xc8 = UnknownFunction5015b0(field_0xc8, 1.0f);
 }

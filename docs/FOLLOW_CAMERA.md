@@ -63,8 +63,11 @@ Two near misses are kept in `samples/camera/FollowCameraNearMisses.cpp`:
   slot where retail used +0x2e4/+0x276. Moving those statements does not fix
   it.
 
-Slots 10, 23, 38, 45–47 and 49 and the initializer `0x00463140` are not yet
-reconstructed.
+The initializer `0x00463140` (520 bytes) is exact: it allocates the
++0x294/+0x298 values (lines 0x78/0x79) and the point table (line 0x88).
+It matched once the value constructor stores `value, rate, maximum,
+minimum, scale` in that order, which slot 10's six inlined constructions
+also show.
 
 Two shapes are evidence for helper functions in the original. The 20-byte
 values at +0x27c..+0x298 have an inline `Set` (the rate is skipped when it is
@@ -288,10 +291,19 @@ The 0x344 matrix belongs to FollowCamera, not VehicleCamera.
 
 Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
 - The constructor and slot 36, both already known.
-- Init `0x00463140`: an `offset + points` operand order.
+- Slot 10 `0x00465c20` (3672 bytes, the per-frame update): 13 bytes differ
+  when slots 55 and 75 return `bool` (retail uses their `al` directly);
+  `FollowCamera.h` keeps them `void`/`int` because the registered symbols
+  use those names, so the sample calls slot 55 through a member pointer.
+  The remaining bytes are two scheduling choices: the second
+  D3DRMVectorRotate's `&direction` is formed before `&position` is pushed,
+  and in state 5 the 0x00460b50 argument slot is reserved after the two
+  squares. The state-5 distance is `dz*dz + dx*dx + dy` (the y delta is not
+  squared in retail).
 - Slot 46 `0x004654e0`: two late `fsubp`.
 - Slot 47 `0x00465720`.
 - The CAMERA-file loader `0x004650e0`: retail keeps cross products in memory.
 - Slot 45 `0x00463a30`: joystick pointer reloads.
 
-Slot 10 `0x00465c20` (about 3.6 KB) is not attempted.
+`FollowCamera.h` also types slot 41 as returning `Vector3` (slot 10 stores
+it at +0x29c) and +0x304 as a float (slot 10's blend clock, clamped to 1).

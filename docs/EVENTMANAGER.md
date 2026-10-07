@@ -7,9 +7,12 @@ RTTI: `EventManager : GameObject : BaseObject` (vtable `0x0055259c`;
 provisional. Its `new` calls pass
 `D:\aardvark\VC\krusty2\EventManager.cpp` as `__FILE__` (`0x0056a940`),
 which confirms the original translation unit's name. The TU runs from
-`0x0045c830` to `0x0045fe3f` (strong inference: EcoSystem.cpp code precedes
-it, and the `$E` initializer pairs that open the next TU start at
-`0x0045fe40`).
+`0x0045c830` to `0x0045ff7b` (strong inference: EcoSystem.cpp code precedes
+it; it closes with its own per-file vector set, the four `$E` pairs
+`0x0045fe40..0x0045ff7b` that build (0,0,0), (1,0,0), (0,1,0) and (0,0,1)
+at `0x0059af28`, `0x0059af38`, `0x0059af48` and `0x0059af18`; the podium
+scene reads the last two; the next TU starts at `0x0045ff80`). The eight
+`$E` bodies are exact.
 
 TrackGame keeps it at +0x570 (it was the placeholder `TrackGameList`).
 
@@ -113,14 +116,18 @@ That is inference from their use (slots 4 and 5, the +0x25 flag bits), and
 it fits KrustyBike's primary base chain for the views. Their classes are not
 established; `src/reconstructed/RaceView.h` declares them.
 
-Not reconstructed:
+Near miss (draft):
 - `0x0045d480` (4247 bytes): the podium scene. It calls `0x0045cdc0(1)`,
   creates a `PCCamera` (constructor `0x004bed80`) at +0x3d4 and, for places
   1 to min(+0x4c, 3), a `D3DIMSoultreeCharacter` (0x240 bytes, constructor
   `0x004455b0`) at +0x424 from "%s\Winner.mcf" (or "Winnerd.mcf") with a
   "Podium3/4/5_%02d" motion kept at +0x430; it also uses "CrowdLoop.wav"
-  and clears the podium area with `0x0045fce0` / `0x0045fdc0`. Heavy x87
-  code with many inline vector temporaries; not attempted. A nonzero result makes `0x0045e600` block UI interaction for slot 10.
+  and clears the podium area with `0x0045fce0` / `0x0045fdc0`. A nonzero
+  result makes `0x0045e600` block UI interaction for slot 10. The decoded
+  draft is in `samples/game/EventManagerNearMisses.cpp` (about 500
+  instructions still differ; see its header). `EventManager.h` now gives
+  the podium characters' slot 11 and motion calls, +0x3d0 as the podium
+  `ArcadeObject` and +0x3f0 as the camera's look target.
 
 Near misses (`samples/game/EventManagerNearMisses.cpp`):
 - the cdecl progress callback `0x0045cb20` (63 of 67 bytes; retail swaps

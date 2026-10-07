@@ -226,8 +226,11 @@ BoundingBoxTreeBuild.cpp (27) and GR_BitString (8) match strictly; see
 D3DIMSoulTree.CPP (D3DIMSoultreeObject) matches strictly in 43 functions;
 see [D3DIMSOULTREE](D3DIMSOULTREE.md).
 
-FollowCam.cpp gains 13 more strict functions (slots 23, 38 and 49, two
-helpers and its eight `$E`); see [FollowCamera](FOLLOW_CAMERA.md).
+FollowCam.cpp gains 14 more strict functions (slots 23, 38 and 49, three
+helpers including the 0x463140 initializer, and its eight `$E`); see
+[FollowCamera](FOLLOW_CAMERA.md). EventManager.cpp's own vector set
+(`0x0045fe40..0x0045ff7b`) adds eight `$E`; see
+[EVENTMANAGER](EVENTMANAGER.md).
 
 Krusty3DObjects.cpp (RunwayLights, VisualCue and the number/bonus object
 managers) matches strictly in 36 functions; see

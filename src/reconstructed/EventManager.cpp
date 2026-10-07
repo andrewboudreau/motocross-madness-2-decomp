@@ -19,6 +19,15 @@ extern "C" __declspec(dllimport) int __stdcall GetTimeFormatA(unsigned long loca
                                                               const void* time, const char* format,
                                                               char* buffer, int size);
 
+// EventManager.cpp's per-file vector set (0x0059af28, 0x0059af38,
+// 0x0059af48 and 0x0059af18), initialised by 0x0045fe40..0x0045ff7b; the
+// podium scene 0x0045d480 reads the y and z axes. Not const: the podium
+// passes the y axis to D3DRMVectorRotate (LPD3DVECTOR).
+static Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
+static Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
+static Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
+static Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
+
 // Characters kept in recording file names.
 #define FILE_NAME_CHARACTERS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-()$#"
 

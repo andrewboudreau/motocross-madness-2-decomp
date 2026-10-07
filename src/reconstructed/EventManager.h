@@ -4,6 +4,7 @@
 #include "MatrixUtil.h"
 #include "RaceView.h"
 
+class ArcadeObject;
 class TextQueueOverlay;
 struct TrackGameViewOwner;
 struct UnknownKrustyBikeView;
@@ -65,10 +66,44 @@ public:
     // 0x004a70c0 (ret 0xc): adds `time` (fld of the first argument) to +0x10.
     virtual int CharacterVirtualSlot7(float time, int a, int b);
 };
-class D3DIMSoultreeCharacter : public Character {};
+// The Soultree object at a podium character's +0x1a0 (D3DIMSoulTree.h's
+// D3DIMSoultreeObject methods, seen from the podium scene).
+struct UnknownPodiumTextureEntry {
+    unsigned char field_0x00[0x2c];
+    char field_0x2c[4];                            // texture name
+};
+struct UnknownPodiumSoultree {
+    void UnknownFunction4444c0(int value);                      // 0x004444c0
+    void UnknownFunction4fc660(const Vector3* position);        // 0x004fc660
+    void UnknownFunction4fbd70(const Vector3* look, const Vector3* up, int a, int b); // 0x004fbd70
+    void UnknownFunction444c70(int index, const char* name, void* context); // 0x00444c70
+
+    unsigned char field_0x000[0x290];
+    UnknownPodiumTextureEntry** field_0x290;       // the racer model's texture
+};
+
+struct Motion;
+
+class D3DIMSoultreeCharacter : public Character {
+public:
+    explicit D3DIMSoultreeCharacter(int flags);    // 0x004455b0 (0x240 bytes)
+    virtual void CharacterVirtualSlot8();
+    virtual void CharacterVirtualSlot9();
+    virtual void CharacterVirtualSlot10();
+    // Loads the model file `name`; returns the GameObject to add.
+    virtual GameObject* CharacterVirtualSlot11(void* owner, const char* name, GameObject* lights,
+                                               void* context, int a, int b);
+    Motion* UnknownFunction4a6b30(const char* name, int a); // 0x004a6b30: finds a motion
+    void UnknownFunction4a8b40(Motion* motion);    // 0x004a8b40: plays it
+
+    unsigned char field_0x008[0x10 - 0x8];
+    int field_0x10;                                // the motion time
+    unsigned char field_0x014[0x1a0 - 0x14];
+    UnknownPodiumSoultree* field_0x1a0;
+    unsigned char field_0x1a4[0x214 - 0x1a4];
+};
 
 // Motion record (src/krusty2/motion): 0x004a6b30's result, 0x004a8b40's argument.
-struct Motion;
 
 // cdecl 0x004aef40: deletes TrackGame's NetworkInterface (+0x08), sets +0x18
 // to 1 and clears +0x3424, +0x2da5 and +0x2d98. EventManager slot 10 calls
@@ -168,11 +203,12 @@ public:
     UnknownEventEntry field_0x50[11];
     float field_0x3c0;                             // seconds since a racer finished (0x0045eef0)
     Vector3 field_0x3c4;
-    int field_0x3d0;
+    ArcadeObject* field_0x3d0;                     // the podium (0x0045d480)
     Camera* field_0x3d4;                           // a PCCamera (0x0045d480; constructor 0x004bed80)
     Vector3 field_0x3d8;
-    Vector3 field_0x3e4;
-    unsigned char field_0x3f0[0x414 - 0x3f0];
+    Vector3 field_0x3e4;                           // podium camera position (0x0045d480)
+    Vector3 field_0x3f0;                           // its look target
+    unsigned char field_0x3fc[0x414 - 0x3fc];
     Vector3 field_0x414;                           // pan speed (per 7 seconds)
     int podiumCharacterCount;                      // min(+0x4c, 3) (0x0045d480)
     D3DIMSoultreeCharacter* podiumCharacters[3];

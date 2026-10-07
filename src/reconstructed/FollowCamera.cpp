@@ -1,5 +1,7 @@
 #include "FollowCamera.h"
 
+#include "DebugAlloc.h"
+
 // FollowCam.cpp's per-file vector constants: 0x0065b448, 0x0065b458,
 // 0x0065b468 and 0x0065b438, initialised by 0x00466f10..0x004670fb
 // (.CRT$XCU entries 113-116). Only FollowCam.cpp code reads them. Not const:
@@ -96,6 +98,49 @@ bool FollowCamera::UnknownFunction463520(const Vector3& position, float a, float
         return true;
     }
     return false;
+}
+
+// 0x00463140: Camera slot 8, then the +0x294/+0x298 values, presets, the
+// point table and the state list (states 5-7 and values outside 0..7 are
+// dropped); releases itself when no state is left.
+FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, float rate298,
+                                                  float value228, float value2d0, float value2e8,
+                                                  int capacity, int count, const int* list) {
+    if (!Camera::UnknownVirtualSlot8(value))
+        return 0;
+    field_0x294 = new(__FILE__, 0x78) UnknownFollowCameraValue(field_0x16c, rate294);
+    field_0x298 = new(__FILE__, 0x79) UnknownFollowCameraValue(field_0x220, rate298);
+    field_0x228 = value228;
+    field_0x2d0 = value2d0;
+    field_0x2d4 = value2d0;
+    field_0x2dc = capacity;
+    if (capacity > 0) {
+        points = new(__FILE__, 0x88) UnknownFollowCameraPoint[capacity];
+        for (int i = 0; i < field_0x2dc; i++) {
+            points[i].position = kVec3Zero;
+            points[i].field_0x0c = 0.0f;
+            points[i].field_0x10 = 0.0f;
+            points[i].field_0x14 = 0.0f;
+            points[i].field_0x18 = 0.0f;
+            points[i].field_0x1c = 0.0f;
+            points[i].field_0x20 = kVec3Zero;
+        }
+    }
+    field_0x2e8 = value2e8;
+    stateCount = count;
+    int kept = 0;
+    for (int j = 0; j < count; j++) {
+        int entry = list[j];
+        if (entry < 0 || entry >= 8 || entry == 6 || entry == 7 || entry == 5)
+            stateCount--;
+        else
+            states[kept++] = entry;
+    }
+    if (stateCount <= 0) {
+        Release();
+        return 0;
+    }
+    return this;
 }
 
 // 0x00463600

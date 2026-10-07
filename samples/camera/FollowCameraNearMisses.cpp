@@ -2,12 +2,17 @@
 // match. See docs/FOLLOW_CAMERA.md. Bindings:
 // FollowCameraNearMisses.bindings.json.
 //
-// FollowCamera::UnknownFunction463140 (0x00463140, 520 bytes): only the
-// point-table reset loop differs (about 45 bytes). Retail forms each entry
-// address as `offset + points` (mov ebx, points; mov edi, eax; add edi, ebx)
-// and loads the zero vector after it; VC6 emits `points + offset` for every
-// indexing form tried (points[i], (points + i)->, i[points], a pointer local,
-// unsigned index).
+// FollowCamera::UnknownVirtualSlot10 (0x00465c20, 3672 bytes): the per-frame
+// update. With slot 75 and slot 55 declared bool (both results are used as
+// al in retail) the body matches except 13 bytes: retail computes the second
+// D3DRMVectorRotate call's `&direction` before pushing `&position`, and in
+// state 5 reserves the 0x00460b50 argument slot (`push ecx`) after the two
+// squares, not before. As written here (headers unchanged) slot 55 is called
+// through a member pointer (a vcall thunk); see the function's comments.
+// Source shapes it needs: one function-scope `position`/`target` pair shared
+// with the first-frame block, `if/else` (not ?:) for +0x2b4, the state 5
+// deltas as member arithmetic, Set(field_0x258, FLT_MAX) for every +0x294
+// write, and the store orders below (found by permutation).
 //
 // FollowCamera::UnknownVirtualSlot46 (0x004654e0, 576 bytes): 563/576. Two
 // `fsubp` instructions of the second cross product are scheduled one
@@ -222,48 +227,6 @@ bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool 
     field_0x277 = false;
     return false;
 }
-
-// 0x00463140
-FollowCamera* FollowCamera::UnknownFunction463140(void* value, float rate294, float rate298,
-                                                  float value228, float value2d0, float value2e8,
-                                                  int capacity, int count, const int* list) {
-    if (!Camera::UnknownVirtualSlot8(value))
-        return 0;
-    field_0x294 = new(__FILE__, 0x78) UnknownFollowCameraValue(field_0x16c, rate294);
-    field_0x298 = new(__FILE__, 0x79) UnknownFollowCameraValue(field_0x220, rate298);
-    field_0x228 = value228;
-    field_0x2d0 = value2d0;
-    field_0x2d4 = value2d0;
-    field_0x2dc = capacity;
-    if (capacity > 0) {
-        points = new(__FILE__, 0x88) UnknownFollowCameraPoint[capacity];
-        for (int i = 0; i < field_0x2dc; i++) {
-            points[i].position = kVec3Zero;
-            points[i].field_0x0c = 0.0f;
-            points[i].field_0x10 = 0.0f;
-            points[i].field_0x14 = 0.0f;
-            points[i].field_0x18 = 0.0f;
-            points[i].field_0x1c = 0.0f;
-            points[i].field_0x20 = kVec3Zero;
-        }
-    }
-    field_0x2e8 = value2e8;
-    stateCount = count;
-    int kept = 0;
-    for (int j = 0; j < count; j++) {
-        int entry = list[j];
-        if (entry < 0 || entry >= 8 || entry == 6 || entry == 7 || entry == 5)
-            stateCount--;
-        else
-            states[kept++] = entry;
-    }
-    if (stateCount <= 0) {
-        Release();
-        return 0;
-    }
-    return this;
-}
-
 
 // 0x004654e0: an orthonormal basis from `forward` and `up` (up is made
 // perpendicular to forward, both are normalised) stored with the side vector
@@ -594,4 +557,224 @@ bool FollowCamera::UnknownVirtualSlot45(bool active, float dt) {
         field_0x274 = 0;
     }
     return moved;
+}
+
+// Slot 10 tests slot 55's al (the keyboard test's bool), but FollowCamera.h
+// declares slot 55 void to keep its registered symbols; this sample calls it
+// through a bool-returning member pointer, which VC6 compiles as a vcall
+// thunk (not retail's direct vtable call).
+static inline bool FollowCameraSlot55(FollowCamera* camera) {
+    typedef bool (FollowCamera::*BoolMethod)();
+    return (camera->*reinterpret_cast<BoolMethod>(&FollowCamera::UnknownVirtualSlot55))();
+}
+
+static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+// 0x00465c20 (3672 bytes; near miss, see the header comment).
+int FollowCamera::UnknownVirtualSlot10(float dt) {
+    Vector3 position;
+    Vector3 target;
+    Vector3 smoothed;
+    bool current = ((RenderTarget*)field_0x18)->field_0x08 == this;
+    field_0x29c = UnknownVirtualSlot41();
+    if (!field_0x275) {
+        field_0x275 = 1;
+        targetPoint = UnknownVirtualSlot57(0);
+        position = field_0x29c * -field_0x220;
+        position += targetPoint;
+        field_0x240->UnknownFunction507c10(&position, 0, 0, 0);
+        Vector3 direction = position - targetPoint;
+        D3DRMVectorRotate(&position, &direction, &kVec3XAxis, field_0x22c);
+        D3DRMVectorRotate(&direction, &position, &kVec3YAxis, field_0x234);
+        direction *= field_0x220;
+        position = direction + targetPoint;
+        UnknownFunction42e9b0(&position, 0, 0, 0, 0);
+        target = field_0x29c * field_0x228;
+        target += targetPoint;
+        field_0x240->UnknownFunction507c10(&target, 0, 0, 0);
+        UnknownVirtualSlot29(target);
+        field_0x278 = FollowCameraAbs(field_0x234) > 2.0f;
+    }
+    if (cameraState != 6 && field_0x276 && !UnknownVirtualSlot74()) {
+        field_0x276 = 0;
+        field_0x220 = field_0x2c4;
+        field_0x22c = field_0x2c8;
+        field_0x234 = field_0x2cc;
+    }
+    bool wide = FollowCameraAbs(field_0x234) > 2.0f;
+    if (cameraState != 6 && !field_0x278 && wide)
+        field_0x279 = 1;
+    if (overrideActive)
+        targetPoint = cachedTarget;
+    else
+        targetPoint = UnknownVirtualSlot57(*(int*)&dt);
+    if (cameraState == 5) {
+        float dx = field_0x170.x - targetPoint.x;
+        float dy = field_0x170.y - targetPoint.y;
+        float dz = field_0x170.z - targetPoint.z;
+        field_0x2c0 = UnknownFunction460b50(dz * dz + dx * dx + dy);
+    }
+    bool moved = UnknownVirtualSlot45(current, dt);
+    UnknownVirtualSlot42(wide);
+    // Slot 75 returns bool in retail (its al is stored as is); FollowCamera.h
+    // declares it int to keep the registered symbols.
+    int following75 = UnknownVirtualSlot75();
+    bool following = (bool&)following75;
+    target = UnknownVirtualSlot48(wide || field_0x274, following, *(int*)&dt);
+    position = UnknownVirtualSlot49(following, target, dt);
+    if (!field_0x288) {
+        field_0x284 = new(__FILE__, 0x4b0) UnknownFollowCameraValue(target.z, 0.3f);
+        field_0x27c = new(__FILE__, 0x4b1) UnknownFollowCameraValue(target.x, 0.3f);
+        field_0x280 = new(__FILE__, 0x4b2) UnknownFollowCameraValue(target.y, 0.3f);
+        UnknownVirtualSlot43(target);
+        field_0x288 = new(__FILE__, 0x4b4) UnknownFollowCameraValue(position.x, 0.3f);
+        field_0x28c = new(__FILE__, 0x4b5) UnknownFollowCameraValue(position.y, 0.3f);
+        field_0x290 = new(__FILE__, 0x4b6) UnknownFollowCameraValue(position.z, 0.3f);
+        UnknownVirtualSlot44(position);
+    }
+    if (cameraState == 5) {
+        if (!overrideActive) {
+            field_0x258 = (field_0x2f8 - field_0x2c0) / (field_0x2f8 - field_0x300) *
+                              (field_0x2fc - field_0x2f4) + field_0x2f4;
+            if (field_0x258 < field_0x2f4)
+                field_0x258 = field_0x2f4;
+            if (field_0x258 > field_0x2fc)
+                field_0x258 = field_0x2fc;
+            if (moved)
+                field_0x258 = (field_0x258 - field_0x16c) * 0.75f + field_0x16c;
+        }
+    } else if (cameraState == 7) {
+        float dx = field_0x170.x - target.x;
+        if (dx < 0.0f) dx = -dx;
+        float dz = field_0x170.z - target.z;
+        if (dz < 0.0f) dz = -dz;
+        field_0x258 = ((200.0f - UnknownFunction460b50(dz * dz + dx * dx)) / 180.0f) * 60.0f + 10.0f;
+        if (field_0x258 < 10.0f) field_0x258 = 10.0f;
+        if (field_0x258 > 70.0f) field_0x258 = 70.0f;
+        field_0x294->Set(field_0x258, FLT_MAX);
+    } else if (following) {
+        if (cameraState != 3) {
+            if (cameraState == 4)
+                UnknownVirtualSlot59();
+            field_0x274 = UnknownVirtualSlot36(position, wide, moved);
+        }
+    } else if (UnknownVirtualSlot74()) {
+        field_0x276 = 1;
+    }
+    cachedTarget.x = field_0x27c->Update(target.x, dt);
+    cachedTarget.y = field_0x280->Update(target.y, dt);
+    cachedTarget.z = field_0x284->Update(target.z, dt);
+    smoothed.x = field_0x288->Update(position.x, dt);
+    smoothed.y = field_0x28c->Update(position.y, dt);
+    smoothed.z = field_0x290->Update(position.z, dt);
+    if (field_0x279) {
+        UnknownVirtualSlot33();
+        field_0x304 += dt;
+        field_0x304 = FollowCameraMin(field_0x304, 1.0f);
+        float blend = field_0x304;
+        field_0x274 = 0;
+        smoothed.x = (position.x - smoothed.x) * blend + smoothed.x;
+        smoothed.y = (position.y - smoothed.y) * blend + smoothed.y;
+        smoothed.z = (position.z - smoothed.z) * blend + smoothed.z;
+        if (!moved && blend >= 1.0f) {
+            UnknownVirtualSlot44(position);
+            UnknownVirtualSlot43(cachedTarget);
+            field_0x304 = 0.0f;
+            field_0x279 = moved;
+        }
+    }
+    if (savedCameraState == 6 || field_0x250 == 7) {
+        field_0x274 = 1;
+        if (field_0x250 == 7)
+            field_0x250 = cameraState;
+        else
+            savedCameraState = cameraState;
+        UnknownVirtualSlot44(position);
+        UnknownVirtualSlot43(target);
+        smoothed = position;
+        cachedTarget = target;
+    } else if (field_0x274) {
+        smoothed = position;
+        if (!overrideActive)
+            cachedTarget = target;
+    }
+    UnknownVirtualSlot52(&smoothed);
+    if (current) {
+        float roll;
+        if (cameraState == 3 && following) {
+            roll = UnknownVirtualSlot51();
+            UnknownVirtualSlot53();
+        } else {
+            roll = 0.0f;
+            UnknownVirtualSlot54();
+        }
+        UnknownFunction42e9b0(&smoothed, 0, 0, (int)&roll, 0);
+        UnknownVirtualSlot29(cachedTarget);
+        if (UnknownVirtualSlot56()) {
+            if (cameraState != 7 && !field_0x276) {
+                field_0x250 = cameraState;
+                field_0x254 = field_0x258;
+                field_0x230 = field_0x22c;
+                field_0x238 = field_0x234;
+                field_0x224 = field_0x220;
+                cameraState = 7;
+                field_0x25c = field_0x170;
+                UnknownVirtualSlot68();
+                field_0x294->Set(field_0x258, FLT_MAX);
+            }
+        } else if (cameraState == 7) {
+            cameraState = field_0x250;
+            field_0x22c = field_0x230;
+            field_0x234 = field_0x238;
+            field_0x220 = field_0x224;
+            field_0x258 = field_0x254;
+            field_0x170 = field_0x25c;
+            field_0x250 = 7;
+            field_0x294->Set(field_0x258, FLT_MAX);
+        }
+        if (cameraState != 5 && cameraState != 7) {
+            if (FollowCameraSlot55(this)) {
+                if (cameraState != 6 && !field_0x276) {
+                    savedCameraState = cameraState;
+                    field_0x230 = field_0x22c;
+                    field_0x238 = field_0x234;
+                    field_0x224 = field_0x220;
+                    cameraState = 6;
+                    savedParameter = field_0x258;
+                    UnknownVirtualSlot67();
+                    field_0x294->Set(field_0x258, FLT_MAX);
+                }
+            } else if (cameraState == 6) {
+                cameraState = savedCameraState;
+                field_0x258 = savedParameter;
+                savedCameraState = 6;
+                field_0x22c = field_0x230;
+                field_0x234 = field_0x238;
+                field_0x220 = field_0x224;
+                field_0x294->Set(field_0x258 = savedParameter, FLT_MAX);
+
+            }
+        }
+        if (g_UnknownGlobal56e26c->field_0x1c4 || (cameraState != 5 && cameraState != 7)) {
+            if (g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xc7, 0, 0x80000000, 0)) {
+                field_0x258 -= 3.0f;
+                if (field_0x258 < field_0x1e0)
+                    field_0x258 = field_0x1e0;
+            }
+            if (g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xcf, 0, 0x80000000, 0)) {
+                field_0x258 += 3.0f;
+                if (field_0x258 > field_0x1dc)
+                    field_0x258 = field_0x1dc;
+            }
+        }
+        UnknownFunction42e930(field_0x294->Update(field_0x258, dt));
+        UnknownFunction42e690(dt);
+        field_0x278 = wide;
+        return 1;
+    }
+    UnknownVirtualSlot54();
+    field_0x278 = wide;
+    return 1;
 }

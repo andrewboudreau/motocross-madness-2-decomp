@@ -36,11 +36,12 @@ inline float FollowCameraAbs(float value) {
 // Set() is inlined by slots 43 and 44: the value always changes, the rate (and
 // a 1.0 scale) only when one is given.
 struct UnknownFollowCameraValue {
-    // Inlined by 0x00463140: scale 1, open [-FLT_MAX, FLT_MAX] limits.
+    // Inlined by 0x00463140 and slot 10: scale 1, open [-FLT_MAX, FLT_MAX]
+    // limits. Slot 10 stores the members in this order.
     UnknownFollowCameraValue(float initialValue, float initialRate) {
-        maximum = FLT_MAX;
         value = initialValue;
         rate = initialRate;
+        maximum = FLT_MAX;
         minimum = -FLT_MAX;
         scale = 1.0f;
     }
@@ -127,7 +128,7 @@ public:
     explicit FollowCamera(int flags); // 0x00462ee0 (near miss: samples/camera)
     virtual ~FollowCamera();          // destructor core 0x00463350
 
-    virtual int UnknownVirtualSlot10(float frameTime); // 0x00465c20, not reconstructed
+    virtual int UnknownVirtualSlot10(float frameTime); // 0x00465c20 (near miss: samples/camera)
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00466ad0, not reconstructed
 
     virtual Vector3 UnknownVirtualSlot33() = 0;
@@ -140,7 +141,8 @@ public:
     virtual void UnknownVirtualSlot38(float dt, bool blend, bool pitch);
     virtual float UnknownVirtualSlot39() = 0;
     virtual void UnknownVirtualSlot40(float a);
-    virtual void UnknownVirtualSlot41() = 0;
+    // Slot 10 stores the returned vector at +0x29c.
+    virtual Vector3 UnknownVirtualSlot41() = 0;
     virtual void UnknownVirtualSlot42(bool flag) = 0;
     virtual void UnknownVirtualSlot43(const Vector3& value);
     virtual void UnknownVirtualSlot44(const Vector3& value);
@@ -263,7 +265,7 @@ protected:
     float field_0x2f8;          // 280.0f
     float field_0x2fc;          // 70.0f
     float field_0x300;          // 20.0f
-    int field_0x304;
+    float field_0x304;          // blend clock, advanced by slot 10 up to 1
     float field_0x308;          // set by KrustyBikeCamera slot 42
     int stateIndex;                  // +0x30c, cyclic index into states (slot 72)
     int stateCount;                  // +0x310, number of entries in states

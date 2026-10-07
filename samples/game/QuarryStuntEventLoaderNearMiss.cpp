@@ -773,7 +773,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     else
         sprintf(path, "%s\\%s", "Res", "truckpodium.slt");
     g_UnknownGlobal56e26c->eventManager->field_0x3d0 =
-        (int)(new(__FILE__, 1093) ArcadeObject(0))
+        (ArcadeObject*)(new(__FILE__, 1093) ArcadeObject(0))
             ->UnknownFunction401310(field_0x18, (int)field_0x7c, (int)&modelTextures, path,
                                     g_UnknownGlobal56e26c->eventManager->field_0x3c4, 0, 0, 2.0f, 0.5f, 0.5f, 0);
     if (!field_0x34->UnknownFunction469190((GameObject*)g_UnknownGlobal56e26c->eventManager->field_0x3d0, -1))

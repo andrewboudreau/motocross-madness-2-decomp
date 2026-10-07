@@ -104,7 +104,7 @@ relocation resolved by the bindings. Three near misses are parked in
 | VA | Size | Score | Remaining difference |
 |---|---:|---|---|
 | `0x00531da0` | 634 | 629/634 | one `fld`/`fmul` operand pair in the first component of `step` |
-| `0x00532580` | 562 | 45/552 | retail copies the old position through a temporary and keeps the old up row in FPU registers |
+| `0x00532580` | 562 | 490/562 | the copies go through a member-by-member copy helper and the old up row is three float locals (both now match); each cross product's two loads are swapped and its `fsubp` is scheduled after the destination pointer copy |
 | `0x005329e0` | 1312 | 213/1314 | stack frame 0xa0 here, 0x94 in retail; the out-of-line `Vector3` constructor call (`0x00404e60`) is inlined here |
 
 ## Not reconstructed
@@ -113,11 +113,17 @@ relocation resolved by the bindings. Three near misses are parked in
   update. It drives the gravity model and rigid body, runs `0x00532020` and
   `0x005329e0`, and steps the rider pose. A function-start scan that
   trusts alignment splits it at `0x00530880`; the body continues past it.
-  Not attempted (size).
+  Not attempted: like `0x00531740` it calls the out-of-line Vector3
+  constructor (`0x00404e60`), normalisation (`0x005087b0`) and cross
+  product (`0x00515600`), so it depends on reproducing VC6's inline budget.
 - `0x00531740` (1624 bytes): contact response per probe. It uses
   `0x00460b50`/`0x00460c00`, `0x0040ae30`, `0x005015b0`, `0x00421cb0` and
   calls the out-of-line `Vector3` constructor (`0x00404e60`) nine times,
-  where every exact function of the unit inlines it. Not attempted.
+  where every exact function of the unit inlines it, and the out-of-line
+  dot product (`0x0040ae30`), scale (`0x005015b0`) and sum (`0x00421cb0`).
+  Decoded (contact particles: a spray along the slide, `dt * 200` per
+  frame, from the particle manager's free list at +0x2c/+0x40) but not
+  written: the inline/out-of-line mix is the blocker.
 - `0x0052ff00`, `0x0052ff20`: ownership open (see Evidence).
 
 The near miss `0x00531da0` also keeps its `fld [delta.x]; fmul st(1)` with

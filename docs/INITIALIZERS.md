@@ -1,7 +1,7 @@
 # Dynamic initializers (`$E`) and unit attribution
 
 This page lists every registered `$E` case and the unit it belongs to. That
-covers 450 cases: `_$E*` symbols in `tools/run_calibration.py`, and `$E`
+covers 458 cases: `_$E*` symbols in `tools/run_calibration.py`, and `$E`
 entries in the `targets.json` files under `src/krusty2` and `samples/physics`.
 Most of them are the per-file vector sets. Each set is four thunk/body pairs
 that build (0,0,0), (1,0,0), (0,1,0) and (0,0,1) into four 12-byte `.bss`
@@ -129,3 +129,4 @@ The audit itself was a linear capstone pass over `.text`, using
 | `0x00429400..0x0042953b` + five empty pairs `0x00424690..0x0042472f` | BoundingBoxTreeQuery.cpp (unattested) | this unit | consistent; vectors listed first |
 | `0x00466f10..0x004670fb` (XCU 113-116, vectors `0x0065b438..0x0065b468`) | FollowCam.cpp | FollowCam code only | consistent; closes the unit |
 | `0x00442e00..0x00442f3b` (XCU 82-85) | D3DIMSoulTree.CPP | not traced | mid-file |
+| `0x0045fe40..0x0045ff7b` (vectors `0x0059af18..0x0059af50`) | EventManager.cpp | the podium scene `0x0045d480` reads y and z | consistent; closes the unit |

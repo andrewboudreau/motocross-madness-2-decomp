@@ -26,7 +26,16 @@ Source forms needed:
 
 Near miss (`samples/race/CarProceduralNearMisses.cpp`): the path evaluation
 `0x00430b10`. Retail inlines all 14 vector operators, but VC6 runs out of
-inline budget. Slot 10 `0x0042fd80` (2907 bytes) is not attempted.
+inline budget. Retail's final sum evaluates `t1 * time` first, then
+`t0 * h2`, `h1 * b`, `h0 * a` (VC6's right-to-left argument order through
+the nested `operator+`). The budget grows with the caller's statement
+count: with the operator forms, about 100 extra empty statements make every
+site inline (112 instructions then differ), so the original very likely had
+more statements (for example compiled-out checks) than the decoded code
+shows; no such source is kept. Slot 10 `0x0042fd80` (2907 bytes) is decoded
+in outline (path step, wheel spin, steering through `0x004308e0` /
+`0x00430b10`, the collision objects' frames through out-of-line cross
+product `0x00515600` and normalisation `0x005087b0`) but not written.
 
 **Grid1.cpp** (`0x0047c880..0x0047db5f`). Evidence: the `__FILE__` literal
 at `0x0056c0a0` (xrefs `0x0047c97a`, `0x0047d49b`) and RTTI
