@@ -42,7 +42,7 @@ neighbours' `__FILE__` xrefs).
 | `0x00404e80..0x00405120` | 672 | 17 (16 unreg., 520 B) | two Math3D vector sets, units between AuralScape.cpp and Bike.cpp (.CRT$XCU 6-13) | two four-pair kVec3 sets (0x577818.., 0x577858..); no reader anywhere in .text; link order puts their units after AuralScape.cpp and before Bike.cpp (BackgroundImage.cpp and BaseObject.cpp are the known units in that span) | 3 |
 | `0x00405120..0x00405190` | 112 | 5 (1 unreg., 8 B) | BaseObject.cpp (registered, name ours) | src/reconstructed/BaseObject.cpp; 0x405160 is the shared slot-1 stub of every BaseObject vtable | 2 |
 | `0x0042e2a4..0x0042f390` | 4332 | 31 (6 unreg., 2374 B) | Camera.cpp (registered, name ours) | RTTI Camera vtable slots 10/28/29 and the Camera $E set XCU 49-52; bracket BoundingBoxTreeBuild.cpp 0x42e257 .. CarProcedural.cpp 0x42f657; six slot/helper functions unregistered | 2 |
-| `0x00430ff0..0x004318d0` | 2272 | 20 (20 unreg., 2144 B) | CD-audio / TrackGame+0x3340 helper unit (Ca..Co, provisional 'CDAudio.cpp') | literal 'cdaudio' at 0x4311e0 (MCI string), TrackGame+0x3340 object ctor/dtor 0x431050/0x4310b0, own $E static XCU 57 (0x4312b0 -> 0x579730); between CarProcedural.cpp (last xref 0x42fb52) and CollisionCharacter.cpp (0x431a12); no __FILE__, no RTTI | 3 |
+| `0x00430ff0..0x004318d0` | 2272 | 20 (1 unreg., 71 B) | CDAudio.cpp and ClipRectangle.cpp (registered, names ours; [CDAUDIO_CLIPRECT.md](CDAUDIO_CLIPRECT.md)) | literal 'cdaudio' at 0x4311e0 (MCI string), TrackGame+0x3340 object ctor/dtor 0x431050/0x4310b0, own $E static XCU 57 (0x4312b0 -> 0x579730, the clip rectangle); between CarProcedural.cpp (last xref 0x42fb52) and CollisionCharacter.cpp (0x431a12); no __FILE__, no RTTI; 0x430ff0 is the TextureMap.h inline copy | 3 |
 | `0x004318d0..0x00431da0` | 1232 | 11 (0 unreg., 0 B) | CollisionCharacter.cpp (samples/physics/tire) | __FILE__ xref 0x431a12; RTTI CollisionCharacter; all registered | 1 |
 | `0x0043a130..0x0043b320` | 4592 | 20 (8 unreg., 260 B) | CollisionPoint.cpp (samples/physics/collision) | __FILE__ xref 0x43a347; RTTI CollisionPoint; XCU 62-65 kVec3 set sits mid-file (no readers; XCU order between CollisionObject.cpp and ConstraintMethodCollisionModel.cpp) | 1 |
 | `0x0043b320..0x0043b950` | 1584 | 6 (0 unreg., 0 B) | registered samples/physics/constraint helpers (TextService callers) | registered exact in samples/physics/constraint/targets.json; no literal | 2 |
@@ -134,10 +134,10 @@ neighbours' `__FILE__` xrefs).
   Terrain.cpp's vector set (300-303) and its timer initializers (305-314), so it
   is Terrain.cpp's. Whether the keyboard-hook code before it (`0x005053b0..`)
   is Terrain.cpp's top or a separate Sv..Te unit is open.
-- Provisional file names (`CDAudio`, `DeviceSetup`, `ErrorLog`, `FileStream`,
-  `Fog`, `GhostMod`, `GraphicsTest`, `GridNode`, `main`, `MediaControl`,
-  `MemTag`, `PickDevice`, `Rectangle2D`, `SkyCube`, `TransparencyMod`,
-  `KrustyVCR`) are ours. None appears in `analysis/source_paths.txt`; they are
+- Provisional file names (`CDAudio`, `ClipRectangle`, `DeviceSetup`,
+  `ErrorLog`, `FileStream`, `Fog`, `GhostMod`, `GraphicsTest`, `GridNode`,
+  `main`, `MediaControl`, `MemTag`, `PickDevice`, `Rectangle2D`, `SkyCube`,
+  `TransparencyMod`, `KrustyVCR`) are ours. None appears in `analysis/source_paths.txt`; they are
   bounded only by the alphabetical bracket given in the evidence column. The
   RTTI class names in them are confirmed; the file ownership is not.
 - `0x00448560..0x00449e60`, `0x0045ff80..0x004624d0` and

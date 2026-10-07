@@ -217,6 +217,11 @@ EcoSystem.cpp (EcoSystem, Vegetation and the vegetation definitions)
 matches strictly in 37 functions, including the .esb reader and writer and
 slot 12's classification pass; see [ECOSYSTEM](ECOSYSTEM.md).
 
+The CarProcedural..CollisionCharacter gap holds two units without RTTI or
+`__FILE__`: CDAudio (9, TrackGame+0x3340's MCI player) and ClipRectangle
+(10, the shadow clipper with its static instance and `$E` set) both match
+strictly; see [CDAUDIO_CLIPRECT](CDAUDIO_CLIPRECT.md).
+
 From the unattributed-code map ([UNATTRIBUTED](UNATTRIBUTED.md)):
 NationalRace.cpp (8, `__FILE__` 0x56e338 and RTTI NationalRace :
 BaseQuarryEvent), Rectangle2D (5) and SkyCube (5) match strictly; the last
@@ -337,14 +342,17 @@ allocation in other translation units.
 
 Subject to the open-PR check, prefer:
 
-1. `PCGame` profile loader `0x004c16f0` (767/771 bytes): the behavior, extent and
-   calls are already reconstructed; only the copy loop's SIB base/index choice
-   differs.
-2. `ControlInterface` update `0x0043cf00`: the devices, event layout and dispatch
-   are established, and the remaining discrepancy is confined to modifier null
-   handling.
-3. Event progress callback `0x0045cb20` (63/67 bytes): isolate the two-register
-   swap without moving provisional GUI types into shared headers.
+1. `PCGame` profile loader `0x004c16f0`: exact in `PCGame.cpp`. The copy
+   loop's SIB base/index order follows the index expression: a count-down
+   loop with a `count - remaining` index puts the induction register first;
+   ascending `i`, pointer walks, `i[table]` and byte offsets do not.
+2. `ControlInterface` update `0x0043cf00`: exact in `ControlInterface.cpp`.
+   Retail reuses the null keyboard pointer as the zero modifier state, which
+   only an int local that holds the pointer, is tested, and then receives
+   the field reproduces; every zero-constant spelling emits `xor eax, eax`.
+3. Event progress callback `0x0045cb20`: exact in `EventManager.cpp` since the
+   Game pointer is re-read at each use (a KrustyUI local swapped the two
+   registers of the final add; no flag or `+=` spelling moved it).
 
 For each body, first confirm its VA/extent and direct bindings against the current
 retail image, keep experiments in the existing `samples/` near-miss file, and
@@ -356,9 +364,14 @@ calibration cases still pass.
 
 ### 3. Take bounded helpers before large orchestrators
 
-After the quick wins, close EcoSystem's record helpers `0x00456890` (356/369)
-and `0x00456a10`: both are reconstructed near misses in
-`samples/ecosystem/EcoSystemNearMisses.cpp` (see [ECOSYSTEM](ECOSYSTEM.md)). In parallel
+After the quick wins, close EcoSystem's record helpers `0x00456890` (356/369:
+its thirteen-byte scheduling block is invariant under every data-flow-equivalent
+spelling tried, so the next experiment is a different helper boundary, not a
+reordering) and `0x00456a10` (810/1512 since the output vertex is indexed off
+the re-read `geometryBlock`, which fixed the frame and loop shape; the slot
+assignment and the loop's zero register remain): both are reconstructed near
+misses in `samples/ecosystem/EcoSystemNearMisses.cpp` (see
+[ECOSYSTEM](ECOSYSTEM.md)). In parallel
 conceptually—but as separate commits—trace Terrain construction/acquisition sites
 before attempting its cleanup, so member types and lifetime order are supported
 independently.

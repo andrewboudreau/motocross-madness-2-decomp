@@ -72,9 +72,13 @@ The display's identifier (+0x5c0) is 0x430 bytes, the size of
 DDDEVICEIDENTIFIER2 (inference). Its description at +0x7c0 is what Game
 slot 8 prints.
 
-Near miss: the profile loader `0x004c16f0` (767/771,
-`samples/game/PCGameNearMisses.cpp`). Its copy loop swaps the SIB base and
-index registers.
+The profile loader `0x004c16f0` (771 bytes, exact) reads the cache limit,
+video memory and mode count, compares the saved mode list with the
+display's and copies the saved per-mode flags across, then the partial blit,
+8-bit texture, AGP and disabled settings. Its copy loop counts the remaining
+modes down with a named `count - remaining` index: an ascending index swaps
+the SIB base and index registers of the four stores (the same difference as
+EcoSystem's `0x00458da0`).
 
 Near miss: the profiling pass `0x004c0d10` (1790 bytes,
 `samples/game/PCGameNearMisses.cpp`). Its control flow and calls line up, but

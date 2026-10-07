@@ -1,14 +1,6 @@
 // Near-miss EventManager candidates, kept out of src/reconstructed until
 // they match. See docs/EVENTMANAGER.md.
 //
-// LoadProgressCallback (0x0045cb20, 67 bytes): cdecl progress callback that
-// 0x0045cb70 and 0x0045cdc0 pass by address. 63 of 67 bytes match: retail
-// loads *step into edx and the bar value into ecx; VC6 here swaps them.
-// Compound, spelled-out, commuted, local-variable, void* and struct
-// parameter forms, and compiling the function alone, do not change it;
-// neither do a non-union stand-in struct for the bar, a pointer to the
-// value or an early-return layout.
-//
 // EventManager::UnknownFunction45e710 (0x0045e710, 531 bytes): leaves the
 // race for a menu. Control flow, calls, the TransDlg `new` (retail line 1064)
 // and its EH state match; 454 of 533 bytes. After the `new` retail loads the
@@ -43,20 +35,6 @@ static Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
 // IMM32, called through the linker's import thunk.
 extern "C" void* __stdcall ImmAssociateContext(void* window, void* context);
-
-// 0x0045cb20: adds *step to KrustyUI's "ProgressBar"; without a step it
-// calls KrustyUI 0x0049b530.
-void LoadProgressCallback(int* step) {
-    KrustyUI* ui = g_TrackGame->ui;
-    if (step) {
-        if (ui->field_0x490) {
-            UIControl* bar = ui->field_0x490->UnknownFunction46ebf0("ProgressBar", 0);
-            static_cast<UIProgressBar*>(bar)->field_0x1f0 += *step;
-        }
-    } else {
-        ui->UnknownFunction49b530();
-    }
-}
 
 // 0x0045e710: leaves the race for `menu`: restores the UI, the window's
 // input context and 640x480x16, and shows the transition dialog.

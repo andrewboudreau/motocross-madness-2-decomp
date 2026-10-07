@@ -9,6 +9,7 @@
 #include "DebugAlloc.h"
 #include "DirectPlayMessages.h"
 #include "ControlInterface.h"
+#include "GameUi.h"
 #include "QuarryEvent.h"
 #include "TrackGame.h"
 
@@ -581,6 +582,22 @@ void EventManager::UnknownFunction45f9a0() {
     g_TrackGame->network->StartKeepAlive(keepAliveTimeout, keepAliveInterval);
     view->UnknownVirtualSlot4();
     field_0x34 = 1;
+}
+
+// 0x0045cb20: adds *step to KrustyUI's "ProgressBar"; without a step it
+// calls KrustyUI 0x0049b530. The Game pointer is re-read at each use: a
+// KrustyUI local gives the same code but with the two registers of the
+// final add swapped.
+void LoadProgressCallback(int* step) {
+    if (step) {
+        if (g_TrackGame->ui->field_0x490) {
+            UIControl* bar =
+                g_TrackGame->ui->field_0x490->UnknownFunction46ebf0("ProgressBar", 0);
+            static_cast<UIProgressBar*>(bar)->field_0x1f0 += *step;
+        }
+    } else {
+        g_TrackGame->ui->UnknownFunction49b530();
+    }
 }
 
 // Global at 0x0059af54; 0x0045cb70 clears it first.

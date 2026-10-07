@@ -3,8 +3,18 @@
 // the reconstructed header; the exact functions they call live in the src
 // unit (bound by address). What differs from retail (docs/ECOSYSTEM.md):
 //   0x004567e0  operand order of `position->x * scale` (retail loads x first)
-//   0x00456890  the camera pointer is loaded before the first fmul in retail
-//   0x00456a10  local slot layout (frame 0x50 in retail, 0x4c here)
+//   0x00456890  the camera pointer and the z store are scheduled before the
+//               first fmul in retail (13 bytes); the block compiles the same
+//               under every data-flow-equivalent spelling tried (locals
+//               before/after the camera load, no camera local, the view as
+//               a local, one declaration per statement, a position
+//               reference, the products before the camera, `-=`, int
+//               locals/casts, a Vector3 for the position, z first, a delta
+//               vector), and every statement reordering only moves further
+//               away
+//   0x00456a10  local slot layout and the ecx/edx roles of the loop (retail
+//               keeps a zero register); the frame (0x50) and the loop shape
+//               need the vertex indexed off the re-read `geometryBlock`
 //   0x004570a0  retail re-reads the definition after the position conversions
 //   0x00456050  register roles of this/textures and the local layout
 //   0x00457480  the probe stream also lives in esi; the aligned-frame EH
@@ -153,23 +163,32 @@ void Vegetation::SetBillboard(int billboard, int fade) {
         unsigned int ambientColor = ECO_RGBA((int)(ambient.x * 255.0f), (int)(ambient.y * 255.0f),
                                              (int)(ambient.z * 255.0f), 255);
         UnknownEcoModelVertex* source = definition->modelVertices[billboard];
-        UnknownEcoVertex* vertex = (UnknownEcoVertex*)geometryBlock;
         int i;
+        // Retail indexes the output vertex off `geometryBlock` and re-reads
+        // the member before every store (the void* member aliases the
+        // stores). A walking `UnknownEcoVertex*` local compiles a different
+        // loop with a 0x4c frame; the indexed form gives retail's 0x50
+        // frame and loop, leaving the slot numbers and the zero register.
+#define VERTEX ((UnknownEcoVertex*)geometryBlock)[i]
         for (i = 0; i < vertexCount; i++) {
             int unlit = 0;
             Vector3 normal;
-            vertex->position.x = c * source->position.x - s * source->position.z
-                                 + quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
-            vertex->position.y = quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate + heightScale * source->position.y;
-            vertex->position.z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate + c * source->position.z
-                                 + s * source->position.x;
+            VERTEX.position.x = c * source->position.x - s * source->position.z
+                                + quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
+            VERTEX.position.y = quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate + heightScale * source->position.y;
+            VERTEX.position.z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate + c * source->position.z
+                                + s * source->position.x;
             if (definition->usePlanarLighting) {
                 if (source->normal.y < 0.0f) {
                     unlit = 1;
                 } else {
+                    // The planar normal is the rotated model position (its
+                    // radial direction), not the model normal; the explicit
+                    // `unlit = 0` here reproduces retail's branch bodies.
                     float length;
-                    normal.x = c * source->normal.x - s * source->normal.z;
-                    normal.z = c * source->normal.z + s * source->normal.x;
+                    unlit = 0;
+                    normal.x = c * source->position.x - s * source->position.z;
+                    normal.z = c * source->position.z + s * source->position.x;
                     length = normal.x * normal.x + normal.z * normal.z;
                     if (length == 0.0f) {
                         normal = kVec3Zero;
@@ -195,10 +214,10 @@ void Vegetation::SetBillboard(int billboard, int fade) {
                     normal.z = length * normal.z;
                 }
             }
-            if (vertex->position.x > maxX)
-                maxX = vertex->position.x;
-            if (vertex->position.x < minX)
-                minX = vertex->position.x;
+            if (VERTEX.position.x > maxX)
+                maxX = VERTEX.position.x;
+            if (VERTEX.position.x < minX)
+                minX = VERTEX.position.x;
             float intensity = -(normal.y * g_UnknownGlobal59aebc->lightDirection.y
                                 + normal.x * g_UnknownGlobal59aebc->lightDirection.x
                                 + normal.z * g_UnknownGlobal59aebc->lightDirection.z);
@@ -212,17 +231,17 @@ void Vegetation::SetBillboard(int billboard, int fade) {
                     g = 1.0f;
                 if (b > 1.0f)
                     b = 1.0f;
-                vertex->diffuse = ECO_RGBA((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f), 255);
+                VERTEX.diffuse = ECO_RGBA((int)(r * 255.0f), (int)(g * 255.0f), (int)(b * 255.0f), 255);
             } else {
-                vertex->diffuse = ambientColor;
+                VERTEX.diffuse = ambientColor;
             }
-            vertex->reserved = 0;
-            vertex->specular = 0;
-            vertex->tu = source->tu;
-            vertex->tv = source->tv;
+            VERTEX.reserved = 0;
+            VERTEX.specular = 0;
+            VERTEX.tu = source->tu;
+            VERTEX.tv = source->tv;
             source++;
-            vertex++;
         }
+#undef VERTEX
     }
     isBillboard = billboard;
 }

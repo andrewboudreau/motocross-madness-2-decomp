@@ -42,7 +42,7 @@ int CompareStandings(const void* a, const void* b);  // 0x0045d3d0
 int CompareRankings(const void* a, const void* b);  // 0x0045e930
 
 // cdecl 0x0045cb20: progress callback that 0x0045cb70 and 0x0045cdc0 pass
-// by address (near miss: samples/game/EventManagerNearMisses.cpp).
+// by address.
 void LoadProgressCallback(int* step);  // 0x0045cb20
 
 // cdecl 0x0045fbb0: qsort order for unsigned values.

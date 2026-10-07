@@ -1,6 +1,8 @@
 #include "ControlInterface.h"
 #include "InputDevice.h"
+#include "JoystickDevice.h"
 #include "KeyboardDevice.h"
+#include "MouseDevice.h"
 #include "TrackGame.h"
 
 // Two-value helpers; inline functions keep their operands as spilled
@@ -186,6 +188,61 @@ void ControlInterface::UnknownFunction43cea0(int control, int kind, int pressed,
     events[queuedEventCount].pressed = pressed;
     events[queuedEventCount].modifiers = 0x3f;
     queuedEventCount++;
+}
+
+// 0x0043cf00: has the keyboard, mouse and joysticks read their input, then
+// passes each queued event, stamped with the keyboard's modifier state, to
+// the global object (slot 13 for releases, 14 for presses) with the
+// device's entry for that control.
+int ControlInterface::UnknownFunction43cf00(int value) {
+    queuedEventCount = 0;
+    if (keyboard)
+        keyboard->UnknownVirtualSlot6(value);
+    if (mouse)
+        mouse->UnknownVirtualSlot6(value);
+    for (int i = 0; i < 8; i++) {
+        if (joysticks[i])
+            joysticks[i]->UnknownVirtualSlot20(value);
+    }
+    for (int j = 0; j < queuedEventCount; j++) {
+        UnknownControlEvent* event = &events[j];
+        // Retail stores the null keyboard pointer itself as the modifier
+        // state: the pointer is tested as the int that then receives the
+        // state. `keyboard ? keyboard->modifierState : 0` and every other
+        // zero-constant form emit a separate `xor eax, eax` instead.
+        int modifiers = (int)keyboard;
+        if (modifiers)
+            modifiers = keyboard->modifierState;
+        event->modifiers = modifiers;
+        switch (event->kind) {
+        case 0:
+            if (event->pressed == 0)
+                g_TrackGame->UnknownVirtualSlot13(
+                    event, &keyboard->keyStates[event->control]);
+            if (event->pressed == 1)
+                g_TrackGame->UnknownVirtualSlot14(
+                    event, &keyboard->keyStates[event->control]);
+            break;
+        case 1:
+            if (event->pressed == 0)
+                g_TrackGame->UnknownVirtualSlot13(
+                    event, &mouse->buttonStates[event->control]);
+            if (event->pressed == 1)
+                g_TrackGame->UnknownVirtualSlot14(
+                    event, &mouse->buttonStates[event->control]);
+            break;
+        case 2:
+        case 3:
+            if (event->pressed == 0)
+                g_TrackGame->UnknownVirtualSlot13(
+                    event, &joysticks[event->device]->buttonStates[event->control]);
+            if (event->pressed == 1)
+                g_TrackGame->UnknownVirtualSlot14(
+                    event, &joysticks[event->device]->buttonStates[event->control]);
+            break;
+        }
+    }
+    return 1;
 }
 
 // 0x0043d080

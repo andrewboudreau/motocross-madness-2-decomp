@@ -70,7 +70,7 @@ public:
     int ProfileEveryDisplay();                           // 0x004c16b0: profiles every display
     int IsAnyProfileStale();                             // 0x004c1410: 1 if any profile is stale
     int DeleteDisplayProfiles();                         // 0x004c1a00: deletes the profiles
-    int LoadDisplayProfile(UnknownDisplay* display);     // 0x004c16f0: loads its profile (near miss, samples/game)
+    int LoadDisplayProfile(UnknownDisplay* display);     // 0x004c16f0: loads its profile
 
     UnknownGuid deviceGuid;                   // Direct3D device GUID ("Renderer" setting)
     UnknownRect field_0x308;                  // window rectangle (slot 32)
