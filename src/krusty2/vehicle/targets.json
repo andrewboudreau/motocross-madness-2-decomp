@@ -1588,5 +1588,35 @@
     "expect": "partial",
     "notes": "349/866. First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). Retail stores Vec3 results with direct [wheel+disp] moves; VC6 forms every struct-assignment destination address in a register.",
     "bindings": "Vehicle.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
+    "candidate_symbol_contains": "Method_0x0040a520@Bike",
+    "target_va": "0x0040a520",
+    "target_size": 2272,
+    "expect": "partial",
+    "notes": "19% (439/2265 aligned; 2265 vs 2272 bytes). Same call sequence and control flow; differs by the local slot layout (retail: result 0xc, len 0x10, cross temp 0x14, offset 0x20, torque 0x2c, base 0x38, temps 0x44), frontWheel kept in eax (ours edx) and the constant 2 of the state stores materialised in edi. Declaration order does not move the slots.",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "LoadVehicle@Vehicle",
+    "target_va": "0x00525e20",
+    "target_size": 1373,
+    "expect": "partial",
+    "notes": "1372/1373 bytes: every byte matches except one load. The gearbox constructor's name argument is read from the EH temporary of the `new` (the dead slot of the map parameter, [esp+0x48] at 0x005260d3); an uninitialised local name reproduces the uninitialised read but VC6 homes it in the gearArg slot ([esp+0xc0], 7-byte vs 4-byte encoding), so everything after it is shifted by 3 bytes. Not a vtable entry (`ret 0x94`; Bike's loader 0x004079c0 calls it directly).",
+    "bindings": "Vehicle.bindings.json"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "Method_00529450@Vehicle",
+    "target_va": "0x00529450",
+    "target_size": 1415,
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml. Inline budget reproduced with per-site call views (Vec3 ctor 0x00404e60, operator+= 0x00428060, DotProduct 0x0040ae30, operator* 0x005015b0, equality 0x005299e0); the secondary-shock `*up +=` needs a reference to scratchVector2 to load its x first.",
+    "bindings": "Vehicle.bindings.json"
   }
 ]

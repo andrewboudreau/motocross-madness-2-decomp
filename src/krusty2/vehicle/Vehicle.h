@@ -148,15 +148,32 @@ struct VehicleSpeedState {
     float randomStart;                // +0x78 randomised start value (slot 1)
     char pad_0x7C[0x8];
     int field_0x84;
+    char pad_0x88[0x15c];           // the object is 0x1e4 bytes (LoadVehicle's allocation)
     ~VehicleSpeedState();                           // 0x00464e90, the shared empty out-of-line destructor (~Vehicle)
+    // 0x004d2940 (ret 0x24): the gearbox constructor (src/reconstructed/GearRatios.h names the
+    // parameters); LoadVehicle passes 0.02f, the table/rpm arguments or zeros, and field_0x524[2..3].
+    VehicleSpeedState(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
+                      int rpmStep, int a6, float riseRate, float fallRate);
     void Method_004D2F50(float dt, int a, int b);   // 0x004d2f50, purpose unknown
     void Method_004D3030(int a, float speed);       // 0x004d3030, purpose unknown
 };
 // Exponential smoother objects at Vehicle+0x58c / +0x598 (provisional): f0 is the smoothed value.
+// 0x14 bytes: LoadVehicle allocates two with `new(__FILE__, 0x19d/0x1a0)` and fills all five
+// fields inline (no EH state, so the constructor is inline and calls nothing).
 struct VehicleSmoother {
+    VehicleSmoother(float tc)
+    {
+        smoothedValue = 0.0f;
+        timeConstant = tc;
+        minValue = 3.402823466e+38f;
+        maxValue = -3.402823466e+38f;
+        blendFactor = 1.0f;
+    }
     float smoothedValue;  // +0x00 slot 49 VehSmooth: x += (target-x)*blend
     float timeConstant;                // +0x04 time constant / cap
     float blendFactor;                // +0x08 last blend factor
+    float minValue;                   // +0x0c FLT_MAX at construction
+    float maxValue;                   // +0x10 -FLT_MAX at construction
 };
 struct VehicleContactSet;            // object at SoultreePhysicsCharacter+0x128
 // Object at Vehicle+0x47c (provisional layout: only what Vehicle touches).
@@ -164,9 +181,14 @@ struct VehicleSteerState {
     SoultreeObject* steerNode;  // +0x00 scene node positioned/oriented in slots 36/58
     float steerAngle;  // +0x04 slot 60 subtracts it; slot 73 uses sin(it) and |it|
     float field_0x08;
+    char pad_0x0c[0xc];              // 0x18 bytes (LoadVehicle's allocation)
     ~VehicleSteerState();                                      // 0x00504c50 (~Vehicle deletes it)
+    // 0x00504b60 / 0x00504c70: SteeringControl's constructor and SetAxisFromDirection
+    // (motion/SteeringControl.h); LoadVehicle builds the object with its two axes.
+    VehicleSteerState(float scale, float t, const Vec3* axisZ, const Vec3* axisY);
+    int SetAxisFromDirection(const Vec3* worldDir, SoultreeObject* frame);
     void AddAngle(float value, SoultreeObject* node);   // 0x00504ec0, purpose unknown
-    void SetAngle(int a, SoultreeObject* node);         // 0x00504e20, purpose unknown
+    void SetAngle(float a, SoultreeObject* node);       // 0x00504e20 (SteeringControl::SetAngle)
 };
 struct VehicleAxisSource {           // object at VehicleAxis+0x00 (provisional)
     char pad_0x00[0xC];
@@ -178,7 +200,30 @@ struct VehicleAxis {                 // objects at Vehicle+0x4f8/0x4fc/0x500 (pr
     char pad_0x04[0x20];
     float axisValue;                // +0x24 axis value (slot 63 reads it)
 };
-struct VehicleCamera;                // object at Vehicle+0x5ac
+// Object at Vehicle+0x5ac: the SparkParticleEmitter (vtable 0x00555c1c, ctor 0x004b9830,
+// 0x60c bytes; samples/physics/effects/ParticleEmitters.h).  LoadVehicle builds it and hands the
+// result of its virtual slot 27 to GameObject::Method_0x00469190; the impact handlers view
+// it as VehicleImpactSink.  Provisional view.
+struct VehicleSparkEmitter {
+    explicit VehicleSparkEmitter(int flags);
+    virtual void UnknownVirtualSlot0(); virtual void UnknownVirtualSlot1(); virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3(); virtual void UnknownVirtualSlot4(); virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6(); virtual void UnknownVirtualSlot7(); virtual void UnknownVirtualSlot8();
+    virtual void UnknownVirtualSlot9(); virtual void UnknownVirtualSlot10(); virtual void UnknownVirtualSlot11();
+    virtual void UnknownVirtualSlot12(); virtual void UnknownVirtualSlot13(); virtual void UnknownVirtualSlot14();
+    virtual void UnknownVirtualSlot15(); virtual void UnknownVirtualSlot16(); virtual void UnknownVirtualSlot17();
+    virtual void UnknownVirtualSlot18(); virtual void UnknownVirtualSlot19(); virtual void UnknownVirtualSlot20();
+    virtual void UnknownVirtualSlot21(); virtual void UnknownVirtualSlot22(); virtual void UnknownVirtualSlot23();
+    virtual void UnknownVirtualSlot24(); virtual void UnknownVirtualSlot25(); virtual void UnknownVirtualSlot26();
+    virtual void* UnknownVirtualSlot27(void* a, GameObject* manager);
+    char pad_0x04[0x608];            // 0x60c bytes (LoadVehicle's allocation)
+};
+// The track object (SoultreeSlot1f0) as LoadVehicle reads it: only the byte at +0x88, forwarded
+// to the base loader's a20.
+struct VehicleTrackView {
+    char pad_0x00[0x88];
+    unsigned char field_0x88;
+};
 struct VehicleTicker {               // elements of Vehicle+0x554/+0x560 (provisional): only virtual slot 0 is called
     virtual void UnknownVirtualSlot0();
 };
@@ -194,6 +239,12 @@ class Vehicle;
 // reads them as InlineShock / RotatingShock.
 struct VehicleWheel;
 struct VehicleShock {
+    char pad_0x00[0x58];
+    Vec3 spring;                     // +0x58 spring force (Suspension.h name); Method_00529450 projects it on the ground normal
+    char pad_0x64[0x10];
+    Vec3 displacement;               // +0x74 Suspension.h name; scaled by field_0x94 and projected on the Y axis
+    char pad_0x80[0x14];
+    float field_0x94;                // scale of the displacement impulse, consumed (zeroed) by Method_00529450
     void ClearForces();                                         // 0x004f9c70
 };
 struct VehicleInlineShock : VehicleShock {
@@ -403,6 +454,17 @@ public:
     // 0x00526830 (next to slot 70): stores the crash answer in crashState and, when crashed,
     // clears the controls and records the heading; returns it (tier 3 name).
     int CheckCrash();
+    // 0x00525e20 (`ret 0x94` = 37 argument dwords; not in any vtable: Bike's loader 0x004079c0
+    // calls it directly).  Forwards a1..a11, a13, a14 and a21 to SoultreePhysicsCharacter slot
+    // 40 with (0.02f, 100, 0.001f, 0.1f, 3) and the track byte; the other arguments configure
+    // the vehicle (names tier 3).
+    GameObject* LoadVehicle(int a1, int a2, const char* a3, const SoultreeLoadDesc* a4, int a5,
+                            Vec3 a6, Vec3 a7, Vec3 a8, void* a9, VehicleInputMap* map, void* a10,
+                            float a11, float arg18, float steerScale, void* device, int wheelCap,
+                            int extraContacts, int a13, int earlyCap, int lateCap, int defaultEngine,
+                            int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, int gearArg,
+                            VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
+                            SoultreeSlot1f0* a14, int a21);
     int Method_00478FE0();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from CheckCrash)
     int AddEarlyTicker(VehicleTicker* ticker);                  // 0x00525cb0, append to earlyTickers
     int AddLateTicker(VehicleTicker* ticker);                   // 0x00525cf0, append to lateTickers
@@ -507,7 +569,7 @@ public:
     int field_0x5a0;
     int anyWheelInContact;  // +0x5a4 slot 49: = (wheelsInContact != 0)
     int allWheelsInContact;  // +0x5a8 slot 49: = (wheelsInContact == wheelCount)
-    VehicleCamera* field_0x5ac;
+    VehicleSparkEmitter* field_0x5ac;  // spark emitter built by LoadVehicle (impact handlers cast it to VehicleImpactSink)
     float field_0x5b0;
     int prevCrashState;  // +0x5b4 slot 49 stores crashState there at the end of each step; slots 1/67 clear it
     char pad_0x5B8[0x4];      // own data ends at 0x5bc; the compiler places the vtordisp there

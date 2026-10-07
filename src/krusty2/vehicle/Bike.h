@@ -42,6 +42,23 @@ struct BikeA60C {
 };
 
 // Objects reached through Bike fields.  Layout is only known where accessed.
+// Frame object at BikeWheel+0x1c0 (provisional): only the vector at +0xc is read.
+struct BikeWheelFrame {
+    char pad_0x00[0xc];
+    Vec3 axis;
+};
+// Objects at Bike+0x5f8 / +0x5fc (provisional, Method_0x0040a520): a point, an axis, an
+// active flag and a state code that the method sets to 2.
+struct BikeA5F8 {
+    char pad_0x00[0x14];
+    Vec3 point;               // +0x14
+    char pad_0x20[0xc];
+    Vec3 axis;                // +0x2c
+    char pad_0x38[0x6c];
+    int active;               // +0xa4
+    char pad_0xa8[0xc];
+    int state;                // +0xb4
+};
 struct BikeWheel {
     char pad_0x000[184];
     char contactPoint_0x0b8[20];   // registered in the owner's collisionPoints list; ~Bike removes it (0x00409a10)
@@ -51,14 +68,23 @@ struct BikeWheel {
     char pad_0x0f0[12];
     Vec3 appliedShare;
     Vec3 w_0x108;
-    char pad_0x114[48];
+    char pad_0x114[12];
+    Vec3 w_0x120;             // Method_0x0040a520 crosses the wheel offset with it while in contact
+    char pad_0x12c[24];
     float contactLoad;
     float w_0x148;
     char pad_0x14c[4];
     float w_0x150;
     char pad_0x154[4];
     float loadWeight;
-    char pad_0x15c[212];
+    char pad_0x15c[16];
+    int w_0x16c;              // Method_0x0040a520 sets it to 2 while the wheel is in contact
+    char pad_0x170[80];
+    BikeWheelFrame* w_0x1c0;  // frame whose +0xc axis Method_0x0040a520 projects on
+    char pad_0x1c4[60];
+    Vec3 nodePosition;        // +0x200 (VehicleWheel name)
+    Vec3 w_0x20c;             // scaled by w_0x274 while airborne (Method_0x0040a520)
+    char pad_0x218[24];
     Vec3 w_0x230;
     Vec3 w_0x23c;
     Vec3 w_0x248;             // KrustyBike slot 48 (0x004964e0) zeroes it
@@ -66,7 +92,9 @@ struct BikeWheel {
     int inContact;
     char pad_0x264[4];
     int w_0x268;
-    char pad_0x26c[16];
+    char pad_0x26c[8];
+    float w_0x274;
+    char pad_0x278[4];
     float w_0x27c;
     float w_0x280;
     char pad_0x284[4];
@@ -249,6 +277,9 @@ public:
     virtual void UnknownVirtualSlot101();
     virtual void UnknownVirtualSlot102(float arg);
     
+    // 0x0040a520 (2272 bytes): integrates a steering torque from the angular velocity, the
+    // front wheel's contact and the two +0x5f8/+0x5fc contacts, turns it by the steer state
+    // and returns the normalised projection (0 when nothing drives it).
     float Method_0x0040a520();
 
     // Inherited members whose canonical types are still generic are viewed through
@@ -264,14 +295,14 @@ public:
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
     BikeWheel* frontWheel;       // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3
     BikeWheel* rearWheel;       // +0x5f4 rear wheel (smallest config z, 0x408728); tier 3
-    int field_0x5f8;               // +0x5f8 cleared in the ctor (0x00407700)
-    int field_0x5fc;               // +0x5fc cleared in the ctor
+    BikeA5F8* field_0x5f8;         // +0x5f8 cleared in the ctor (0x00407700); Method_0x0040a520 reads it
+    BikeA5F8* field_0x5fc;         // +0x5fc cleared in the ctor
     int field_0x600;               // +0x600 cleared in the ctor
     BikeA604* field_0x604;
     Vehicle* linkedVehicle;  // +0x608 cleared in ctor and reset (lines near linkedVehicle = 0), set reciprocally in the slot 38 pairing code: linkedVehicle = other; ((Bike*)other)->linkedVehicle = this
     BikeA60C* field_0x60c;         // +0x60c cleared in the ctor; ~Bike calls 0x00464e90 on it, then operator delete
-    char pad_0x610[12];
-    Vec3 field_0x61c;
+    Vec3 field_0x610;              // per-axis gains of the steering torque integrator (Method_0x0040a520)
+    Vec3 field_0x61c;              // integrated steering torque; decays by 0.99 (or -0.02/-0.1 at the limit) per step
     float field_0x628;
     float field_0x62c;
     int field_0x630;

@@ -7,6 +7,7 @@
 
 static inline float BikeMin(float a, float b) { return a < b ? a : b; }
 static inline float BikeMaxF(float a, float b) { return a > b ? a : b; }
+static inline float BikeAbs(float x);   // defined below (slot 99 region)
 
 float Bike::UnknownVirtualSlot32()
 {
@@ -52,6 +53,149 @@ float Bike::UnknownVirtualSlot75()
     if (d < 0.0f)
         d = -d;
     return d;
+}
+
+// Out-of-line call views for Method_0x0040a520 (see math/Math3D.h): the Vec3 constructor
+// 0x00404e60 and operator*= 0x0040ae00 (Bike.cpp's own COMDAT copy) are called at the
+// marked sites.
+struct BikeVec3Call : Vec3 {
+    BikeVec3Call(float x_, float y_, float z_);
+};
+// Dot product in the operand order retail 0x0040a520 evaluates (y and x terms, then z).
+static inline float BikeDotZ(const Vec3& a, const Vec3& b)
+{
+    return a.z * b.z + (a.x * b.x + a.y * b.y);
+}
+struct BikeVec3ScaleAssign : Vec3 {
+    BikeVec3ScaleAssign& operator*=(float s);
+};
+// By-value views of the out-of-line operators (hidden result pointer first, same ABI as
+// the pointer forms in math/Math3D.h): operator- 0x00421d00, operator*(Vec3, float)
+// 0x005015b0 and DotProduct 0x0040ae30.
+Vec3 BikeVec3Sub(const Vec3& a, const Vec3& b);
+Vec3 BikeVec3Scale(const Vec3& v, float s);
+float BikeVec3Dot(const Vec3& a, const Vec3& b);
+
+// 0x0040a520 (tier 3 reading).  Builds a world-space steering torque `torque`: a quarter of
+// the force accumulator weightForce, turned by the front wheel's contact (offset x w_0x120) and by each
+// active +0x5f8/+0x5fc contact (offset x the contact's axis scaled by the negative
+// projection), or by w_0x274 * w_0x20c while airborne.  Its body-space direction
+// (projected on the wheel frame's axis, normalised) scales the per-axis gains into the
+// integrator field_0x61c; the integrator's length, signed by that axis, is the angle fed to
+// the steer state unless the limit (0.785 rad) is reached, in which case the angle is
+// clamped and the integrator reversed.  Returns the normalised projection.
+float Bike::Method_0x0040a520()
+{
+    Vec3 push;
+    Vec3 base;
+    Vec3 torque;
+    Vec3 offset;
+    float len;
+    float result;
+    torque.x = weightForce.x * 0.25f;
+    torque.y = weightForce.y * 0.25f;
+    torque.z = weightForce.z * 0.25f;
+    base = torque;
+    int driven = 0;
+
+    if (airborne) {
+        Vec3 spin = frontWheel->w_0x274 * frontWheel->w_0x20c;
+        torque = CrossProduct(spin, torque);
+        result = 0.0f;
+    } else {
+        if (frontWheel->inContact) {
+            offset = BikeVec3Sub(frontWheel->wheelPosition, frontWheel->nodePosition);
+            driven = 1;
+            torque = CrossProduct(offset, frontWheel->w_0x120);
+            frontWheel->w_0x16c = 2;
+            if (field_0x5f8->active) {
+                torque = BikeVec3Sub(field_0x5f8->point, frontWheel->nodePosition);
+                float d = BikeVec3Dot(torque, field_0x5f8->axis);
+                if (d < 0.0f)
+                    push = BikeVec3Scale(field_0x5f8->axis, -d);
+                else
+                    push = Vec3(0.0f, 0.0f, 0.0f);
+                torque += CrossProduct(offset, push);
+                field_0x5f8->state = 2;
+            } else if (field_0x5fc->active) {
+                float d = BikeVec3Dot(base, field_0x5fc->axis);
+                if (d < 0.0f)
+                    push = BikeVec3Scale(field_0x5fc->axis, -d);
+                else
+                    push = BikeVec3Call(0.0f, 0.0f, 0.0f);
+                offset = BikeVec3Sub(field_0x5fc->point, frontWheel->nodePosition);
+                torque += CrossProduct(offset, push);
+                field_0x5fc->state = 2;
+            }
+        } else if (field_0x5f8->active) {
+            torque = BikeVec3Sub(field_0x5f8->point, frontWheel->nodePosition);
+            driven = 1;
+            float d = BikeVec3Dot(torque, field_0x5f8->axis);
+            if (d < 0.0f)
+                push = BikeVec3Scale(field_0x5f8->axis, -d);
+            else
+                push = BikeVec3Call(0.0f, 0.0f, 0.0f);
+            torque = CrossProduct(offset, push);
+            field_0x5f8->state = 2;
+        } else if (field_0x5fc->active) {
+            driven = 1;
+            float d = BikeVec3Dot(base, field_0x5fc->axis);
+            if (d < 0.0f)
+                push = BikeVec3Scale(field_0x5fc->axis, -d);
+            else
+                push = BikeVec3Call(0.0f, 0.0f, 0.0f);
+            offset = BikeVec3Sub(field_0x5fc->point, frontWheel->nodePosition);
+            torque = CrossProduct(offset, push);
+            field_0x5fc->state = 2;
+        } else {
+            result = 0.0f;
+            goto integrate;
+        }
+        float lenSq = BikeVec3Dot(torque, torque);
+        if (lenSq == 1.0f) {
+            len = 1.0f;
+        } else {
+            len = (float)sqrt(lenSq);
+            if (len <= 0.001f) {
+                result = 0.0f;
+                goto integrate;
+            }
+        }
+        offset = modelNode->WorldToLocalDirection(torque);
+        float d = BikeDotZ(offset, frontWheel->w_0x1c0->axis);
+        if (d < 0.0f)
+            d = -d;
+        result = d / len;
+        float k = result * stepTime;
+        field_0x61c += BikeVec3Call(offset.x * field_0x610.x * k, offset.y * field_0x610.y * k,
+                                    offset.z * field_0x610.z * k);
+    }
+integrate:
+    float sign = -1.0f;
+    if (BikeDotZ(field_0x61c, frontWheel->w_0x1c0->axis) >= 0.0f)
+        sign = 1.0f;
+    float lenSq = BikeVec3Dot(field_0x61c, field_0x61c);
+    if (lenSq == 1.0f)
+        len = 1.0f;
+    else
+        len = (float)sqrt(lenSq);
+    float angle = len * stepTime * sign;
+    if (BikeAbs(angle + steerState->steerAngle) < 0.785f) {
+        steerState->AddAngle(angle, poseNode);
+        *(BikeVec3ScaleAssign*)&field_0x61c *= 0.99f;
+        return result;
+    }
+    if (BikeAbs(steerState->steerAngle) < 0.785f) {
+        steerState->SetAngle((steerState->steerAngle < 0.0f ? -1.0f : 1.0f) * 0.7851f, poseNode);
+        float decay = -0.02f;
+        if (!driven)
+            decay = -0.1f;
+        *(BikeVec3ScaleAssign*)&field_0x61c *= decay;
+        return result;
+    }
+    steerState->AddAngle(angle, poseNode);
+    *(BikeVec3ScaleAssign*)&field_0x61c *= 0.99f;
+    return 0.0f;
 }
 
 float Bike::UnknownVirtualSlot53()

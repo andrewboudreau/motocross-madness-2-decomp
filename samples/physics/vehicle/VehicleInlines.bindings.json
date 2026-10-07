@@ -1,5 +1,5 @@
 {
-  "?SetAngle@VehicleSteerState@@QAEXHPAVSoultreeObject@@@Z": "0x00504e20",
+  "?SetAngle@VehicleSteerState@@QAEXMPAVSoultreeObject@@@Z": "0x00504e20",
   "?SetAxesPtr@VehSceneNodeView@@QAEXPBUVec3@@0HH@Z": "0x004fbd70",
   "?SetPosition@SoultreeObject@@QAEXABUVec3@@@Z": "0x004fc660",
   "?g_VehZeroVec3_005778a8@@3UVec3@@A": "0x005778a8",

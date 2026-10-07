@@ -71,8 +71,10 @@ comparison:
 
 - `src/krusty2/collision/CollisionObject.cpp`: 44 of 61 targets.
 - `src/krusty2/vehicle/Vehicle.cpp`: 57 of 77 targets at promotion; see the
-  Vehicle/Bike round-out below for the current state.
-- `src/krusty2/vehicle/Bike.cpp`: 31 of 45 targets at promotion.
+  Vehicle/Bike round-out below for the current state (the shock pass `0x00529450` and
+  the loader `0x00525e20` were added later).
+- `src/krusty2/vehicle/Bike.cpp`: 31 of 45 targets at promotion (`0x0040a520` added
+  later as a partial).
 - `src/krusty2/soultree/SoulTreePhysics.cpp`: 37 of 43 targets at promotion; see the
   SoulTreePhysics round-out below for the current state.
 
@@ -245,11 +247,59 @@ x87 operand order facts measured on these targets (they add to the list below):
   (the displacement-free `[eax]`) first in two cross-product terms; no cross-product
   form tried (member, pointer, by-value, explicit terms, named `nx`) does (717/724).
 
-Still unregistered in the Vehicle extent: the slot 40 override `0x00525e20` (`ret 0x94`,
-four `new(__FILE__, line)` allocations under EH states, calls `0x00503de0`) and the
-per-wheel shock solve `0x00529450` (inlined vector projections through `0x0040ae30` /
-`0x005015b0`); in Bike: `0x004079c0` (6745 bytes) and `0x0040a520`.  `0x00526e80` is
-slot 38's jump table, `0x0040ca40`/`0x0052b690` are vtordisp thunks.
+Large functions of the two units (all registered in `src/krusty2/vehicle/targets.json`):
+
+- `Vehicle::Method_00529450` `0x00529450` (1415 bytes) is strict exact: the per-wheel shock
+  pass projects the shock's spring force (+0x58) on the ground normal and a pending
+  displacement impulse (+0x94 * +0x74) on the Y axis, scales both by `leanCos`, and folds
+  them into the wheel's applied share, `*up` and (as a body-space x moment) `*zero`.  Its
+  inline budget is reproduced with per-site call views (`VehVec3Call` for the constructor
+  `0x00404e60`, `VehVec3AddAssign` for `+=` `0x00428060`, `Vec3DotCall`, `Vec3ScaleCall`,
+  `CrossProductCall`, and the equality `0x005299e0` called at three of its four sites while
+  `VehVec3EqualInline` expands the first).  The secondary-shock `*up += scratchVector2`
+  loads `scratchVector2.x` first only through a reference (`Vec3& impulse = scratchVector2`).
+- `Vehicle::LoadVehicle` `0x00525e20` (1373 bytes, `ret 0x94`; `allfn` lists 895 because a
+  jump target splits it) is not a vtable entry: Bike's loader `0x004079c0` calls it directly
+  after the three by-value vectors, and the Vehicle vtable's slot 40 is the inherited
+  `0x00503de0`.  It allocates the wheel and ticker arrays (`new(__FILE__, 0x151/0x15c/0x167)`),
+  the two 0x14-byte smoothers (inline constructor: 0, time constant, FLT_MAX, -FLT_MAX, 1),
+  the 0x1e4-byte gearbox `0x004d2940` with the caller's tables or zeros (EH states 0/1),
+  runs `SoultreePhysicsCharacter` slot 40 with `(0.02f, 100, 0.001f, 0.1f, 3)` and the track
+  byte, builds the spark emitter `0x004b9830` (state 2, child via its slot 27 and
+  `GameObject::Method_0x00469190`) and the steering control `0x00504b60` (state 3, axis
+  `a8 * -1.0f`), then installs `VehicleHit`/`VehicleHitBy`.  1372 of 1373 bytes match: the
+  gearbox's name argument is loaded from the `new` temporary's slot (the dead `map`
+  parameter home, `[esp+0x48]` at `0x005260d3`, i.e. an uninitialised value); an
+  uninitialised local reproduces the read but VC6 homes it in the dead `gearArg` slot
+  (`[esp+0xc0]`), which costs 3 bytes.  `maxLeanAngle`/`maxLeanRate` are
+  `40.0f * 0.01745329f` / `120.0f * 0.01745329f` (the `(float)(deg * pi / 180)` forms are
+  one ulp off).
+- `Bike::Method_0x0040a520` `0x0040a520` (2272 bytes) is a partial (2265 bytes, same calls
+  and flow): a steering torque from a quarter of `weightForce`, the front wheel's contact
+  offset x `w_0x120`, the active `+0x5f8`/`+0x5fc` contacts (offset x axis scaled by the
+  negative projection) or `w_0x274 * w_0x20c` while airborne, normalised and projected on
+  the wheel frame's axis into the integrator `field_0x61c`; the integrator's length, signed
+  by that axis, is the steer angle unless 0.785 rad is reached.  The by-value views
+  (`BikeVec3Sub`, `BikeVec3Scale`, `BikeVec3Dot`) give retail's temp-then-copy shape; what
+  remains is the local slot layout (retail: result 0xc, len 0x10, cross temp 0x14, offset
+  0x20, torque 0x2c, base 0x38, temps 0x44, unmoved by declaration order), `frontWheel` in
+  eax and the constant 2 of the state stores kept in edi.
+- `Method_00527A20` `0x00527a20` stays at 349/866: references to the wheel or to the
+  destination vector do not change the struct-assignment addressing.
+- Bike's loader `0x004079c0` (6745 bytes, `ret 0xa0` = 40 argument dwords, 8 EH states,
+  0x2cc-byte frame) is not reconstructed.  Decoded so far: it calls `LoadVehicle` with
+  `(a, 1, 1, 3, 3, 2, 0.698f, 0.9f, ...)`, copies the 16-byte name with `strncpy`, sets
+  `field_0x15c = 165`, `field_0x724 = 32`, `sideLieThreshold = cos(0.785)`, the pose
+  bounds 0.8/0.55/1.8, allocates the rider (`new(__FILE__, 0x583)`, 0x240 bytes, ctor
+  `0x004455b0`), the 0x4c-byte object at +0x60c (line 0x660, ctor `0x004a23a0` with a
+  literal), compares the wheel names against two local literal tables (`strcmp`
+  `0x00536070`), builds the shocks (`0x004fa700`, 0xe4 bytes, line 0x683; `0x004f9ee0`,
+  0xd8 bytes, line 0x696) and the tires (`0x00512f10`, 0x2c0 bytes, line 0x6b8) and registers
+  them through `AddLateTicker`/`AddEarlyTicker`/`AddWheel`.  The local literal tables and
+  the per-wheel configuration loop make it a multi-session job.
+- `0x00526e80` is slot 38's jump table, `0x0040ca40`/`0x0052b690` are vtordisp thunks;
+  `0x0040ae00` is Bike.cpp's COMDAT copy of `Vec3::operator*=` (the `BikeVec3ScaleAssign`
+  view calls it).
 
 ```bash
 python tools/run_physics_samples.py --strict --root src/krusty2/vehicle \

@@ -1765,6 +1765,92 @@ int __cdecl VehVec3Equal(const Vec3* a, const Vec3* b)
     return 0;
 }
 
+// Out-of-line call views for Method_00529450 (see math/Math3D.h): the retail function has
+// used up its inline budget by its second helper site, so the Vec3 constructor
+// (0x00404e60), operator+= (0x00428060), DotProduct (0x0040ae30), operator*(Vec3, float)
+// (0x005015b0) and the equality 0x005299e0 are called at the sites marked below.
+struct VehVec3Call : Vec3 {
+    VehVec3Call(float x_, float y_, float z_);
+};
+struct VehVec3AddAssign : Vec3 {
+    VehVec3AddAssign& operator+=(const Vec3& v);
+};
+// operator*(const Vec3&, float) expanded around the out-of-line constructor (the nested
+// expansion is the first one VC6 gives up).
+static inline Vec3 VehScaleCtorCall(const Vec3& v, float s)
+{
+    return VehVec3Call(s * v.x, s * v.y, s * v.z);
+}
+// The equality 0x005299e0 as retail expands it at the first site of Method_00529450.
+static inline int VehVec3EqualInline(const Vec3* a, const Vec3* b)
+{
+    if (a->x == b->x && a->y == b->y && a->z == b->z)
+        return 1;
+    return 0;
+}
+// Projection of v on `onto` (zero when `onto` is the zero vector): the dot products and
+// the scale are called out of line at every site.
+static inline Vec3 VehProjectTail(const Vec3& v, const Vec3& onto)
+{
+    if (VehVec3Equal(&onto, &kVec3Zero))
+        return kVec3Zero;
+    Vec3 r;
+    return *Vec3ScaleCall(&r, &onto, Vec3DotCall(&v, &onto) / Vec3DotCall(&onto, &onto));
+}
+static inline Vec3 VehProjectFirst(const Vec3& v, const Vec3& onto)
+{
+    if (VehVec3EqualInline(&onto, &kVec3Zero))
+        return kVec3Zero;
+    Vec3 r;
+    return *Vec3ScaleCall(&r, &onto, Vec3DotCall(&v, &onto) / Vec3DotCall(&onto, &onto));
+}
+
+// 0x00529450: folds each wheel's shock forces into the accumulators.  For a wheel with a
+// shock (primary first, else the rotating one) the spring force projected on the ground
+// normal, scaled by leanCos, becomes scratchVector; a pending displacement impulse
+// (field_0x94 * displacement, projected on the Y axis and scaled the same way) is added to
+// *up and consumed.  Then scratchVector is added to the wheel's applied share and to *up,
+// and its moment about field_0xf0 (in body space, x only) to *zero.
+void Vehicle::Method_00529450(Vec3* up, Vec3* zero)
+{
+    for (int i = 0; i < wheelCount; i++) {
+        VehicleWheel* wheel = wheelList[i];
+        if (!wheel->field_0x268 || wheel->field_0x15c)
+            continue;
+        if (wheel->primaryAux) {
+            Vec3 p = VehProjectFirst(((VehicleShock*)wheel->primaryAux)->spring, wheel->groundNormal);
+            scratchVector = p * leanCos;
+            if (((VehicleShock*)wheel->primaryAux)->field_0x94 != 0.0f) {
+                Vec3 v = ((VehicleShock*)wheel->primaryAux)->field_0x94
+                         * ((VehicleShock*)wheel->primaryAux)->displacement;
+                Vec3 q = VehProjectTail(v, kVec3YAxis);
+                scratchVector2 = VehScaleCtorCall(q, leanCos);
+                *up += scratchVector2;
+                ((VehicleShock*)wheel->primaryAux)->field_0x94 = 0.0f;
+            }
+        } else if (wheel->secondaryAux) {
+            Vec3 p = VehProjectTail(((VehicleShock*)wheel->secondaryAux)->spring, wheel->groundNormal);
+            scratchVector = VehScaleCtorCall(p, leanCos);
+            if (((VehicleShock*)wheel->secondaryAux)->field_0x94 != 0.0f) {
+                Vec3 v = VehScaleCtorCall(((VehicleShock*)wheel->secondaryAux)->displacement,
+                                          ((VehicleShock*)wheel->secondaryAux)->field_0x94);
+                Vec3 q = VehProjectTail(v, kVec3YAxis);
+                Vec3& impulse = scratchVector2;
+                impulse = VehScaleCtorCall(q, leanCos);
+                *up += impulse;   // through the reference: loads impulse.x first (byte-exact)
+                ((VehicleShock*)wheel->secondaryAux)->field_0x94 = 0.0f;
+            }
+        }
+        wheel->appliedShare += scratchVector;
+        *(VehVec3AddAssign*)up += scratchVector;
+        scratchVector2 = CrossProductCall(wheel->field_0xf0, scratchVector);
+        scratchVector = modelNode->WorldToLocalDirection(scratchVector2);
+        scratchVector.y = 0.0f;
+        scratchVector.z = 0.0f;
+        *(VehVec3AddAssign*)zero += scratchVector;
+    }
+}
+
 // 0x00529280: asks every wheel (slot 83) and ramps its +0x29c level toward 1 when the answer is
 // non-zero, toward 0 otherwise. Returns the first non-zero answer.
 int Vehicle::UpdateWheelRampLevels()
@@ -1907,6 +1993,86 @@ void VehicleHit(CollisionObject* a, CollisionObject* b)
 void VehicleHitBy(CollisionObject* a, CollisionObject* b)
 {
     VehicleHit(a, b);
+}
+
+// 0x00525e20: the vehicle loader (`ret 0x94`; Bike's loader 0x004079c0 calls it directly).  Allocates the wheel and
+// ticker arrays and the two acceleration smoothers, builds the gearbox (0x004d2940) from
+// the caller's tables or with zeros, runs the base loader, then the spark emitter
+// (0x004b9830, registered as a child through its slot 27) and the steering control
+// (0x00504b60) aligned with the negated third axis, and installs the hit callbacks.
+GameObject* Vehicle::LoadVehicle(int a1, int a2, const char* a3, const SoultreeLoadDesc* a4, int a5,
+                                 Vec3 a6, Vec3 a7, Vec3 a8, void* a9, VehicleInputMap* map, void* a10,
+                                 float a11, float arg18, float steerScale, void* device, int wheelCap,
+                                 int extraContacts, int a13, int earlyCap, int lateCap, int defaultEngine,
+                                 int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, int gearArg,
+                                 VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
+                                 SoultreeSlot1f0* a14, int a21)
+{
+    const char* engineName;
+    int i;
+
+    inputMap = map;
+    steerAxis = steer;
+    leanAxis = lean;
+    throttleAxis = throttle;
+    field_0x4d8 = arg18;
+    inputDevice = device;
+    wheelCapacity = wheelCap;
+    if (wheelCapacity > 0) {
+        wheelList = (VehicleWheel**)new(__FILE__, 0x151) char[wheelCapacity * sizeof(VehicleWheel*)];
+        for (i = 0; i < wheelCapacity; i++)
+            wheelList[i] = 0;
+    }
+    earlyTickerCapacity = earlyCap;
+    if (earlyCap > 0) {
+        earlyTickers = (VehicleTicker**)new(__FILE__, 0x15c) char[earlyCap * sizeof(VehicleTicker*)];
+        for (i = 0; i < earlyCap; i++)
+            earlyTickers[i] = 0;
+    }
+    lateTickerCapacity = lateCap;
+    if (lateCap > 0) {
+        lateTickers = (VehicleTicker**)new(__FILE__, 0x167) char[lateCap * sizeof(VehicleTicker*)];
+        for (i = 0; i < lateCap; i++)
+            lateTickers[i] = 0;
+    }
+    crashReason = 0;
+    justLanded = 0;
+    field_0x438 = 180.0f;
+    maxLeanAngle = 40.0f * 0.01745329f;
+    maxLeanRate = 120.0f * 0.01745329f;
+    crashTimerReload = 2.0f;
+    field_0x44c = 200.0f;
+    speedGainLimit = -1000.0f;
+    verticalAccelSmoother = new(__FILE__, 0x19d) VehicleSmoother(0.14f);
+    forwardAccelSmoother = new(__FILE__, 0x1a0) VehicleSmoother(0.5f);
+    UnknownVirtualSlot96();
+    if (defaultEngine)
+        engineState = new(__FILE__, 0x1aa) VehicleSpeedState(engineName, 0.02f, 0, 0, 0, 0, gearArg,
+                                                             field_0x524[2], field_0x524[3]);
+    else
+        engineState = new(__FILE__, 0x1b5) VehicleSpeedState(engineName, 0.02f, torqueTable, rpmLow,
+                                                             rpmHigh, rpmStep, gearArg,
+                                                             field_0x524[2], field_0x524[3]);
+    SoultreePhysicsCharacter::UnknownVirtualSlot40(a1, 0, a3, a4, a5, a6, a7, a8, a9, a10, a11,
+                                                   wheelCap + extraContacts, a13, a14, 0.02f,
+                                                   100, 0.001f, 0.1f, 3,
+                                                   a14 ? ((VehicleTrackView*)a14)->field_0x88 : 0,
+                                                   a21);
+    if (field_0x124) {
+        field_0x5ac = new(__FILE__, 0x1dc) VehicleSparkEmitter(1);
+        GameObject::Method_0x00469190(field_0x5ac->UnknownVirtualSlot27(field_0x18, field_0x124), -1);
+    }
+    steerState = new(__FILE__, 0x1e0) VehicleSteerState(steerScale, field_0x524[0], &a7, &a8);
+    Vec3 down = a8 * -1.0f;
+    steerState->SetAxisFromDirection(&down, modelNode);
+    steerState->SetAngle(0, modelNode);
+    spawnProtectTimer = 0.0f;
+    crashDirection = 0;
+    if (collisionObject) {
+        collisionObject->onHitCallback = VehicleHit;
+        collisionObject->onHitByCallback = VehicleHitBy;
+    }
+    return this;
 }
 
 // owner: Vehicle.cpp (__FILE__ 0x005257a0 region), PARTIAL 90.89%: remaining diff is store
