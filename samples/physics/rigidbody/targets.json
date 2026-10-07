@@ -2,6 +2,106 @@
   {
     "class": "PhysicsBody",
     "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "??0PhysicsBody@@QAE@H@Z",
+    "target_va": "0x004cbc50",
+    "target_size": 361,
+    "expect": "exact",
+    "notes": "constructor: GraphicsTest(flags), vptr 0x00556e0c, the kVec3Zero copies read this TU's copy at 0x006899c0, two MatrixZero() copies, integrate = IntegrateAdamsBashforth2 (0x004a1d10)",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "??1PhysicsBody@@UAE@XZ",
+    "target_va": "0x004cbde0",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "destructor core: vptr store and tail jump to GraphicsTest::~GraphicsTest 0x0047bd00",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004cbf20",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser jmp thunk (per-TU Math3D.h copy; the set 0x004cbf20..0x004cc05c closes this TU, its globals 0x006899b0..0x006899e8 are the ones the constructor reads)",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004cbf30",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser body: temporary copied to 0x006899c0",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004cbf70",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser jmp thunk",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004cbf80",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser body: temporary copied to 0x006899d0",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004cbfc0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser jmp thunk",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004cbfd0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser body: temporary copied to 0x006899e0",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004cc010",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser jmp thunk",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004cc020",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser body: temporary copied to 0x006899b0",
+    "bindings": "PhysicsBody.bindings.json"
+  },
+  {
+    "class": "PhysicsBody",
+    "source": "PhysicsBody.cpp",
     "candidate_symbol_contains": "??_GPhysicsBody@@",
     "target_va": "0x004cbdc0",
     "target_size": 30,
@@ -127,6 +227,106 @@
     "target_size": 15,
     "expect": "exact",
     "notes": "slot 35",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "??0PhysicsRigidBody@@QAE@H@Z",
+    "target_va": "0x004cc120",
+    "target_size": 160,
+    "expect": "exact",
+    "notes": "constructor: PhysicsBody(flags), vptr 0x00556ec0, force/torque from this TU's kVec3Zero 0x00689a00, ResetState() 0x004cc500, stepDisabled = 0",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "??1PhysicsRigidBody@@UAE@XZ",
+    "target_va": "0x004cc1e0",
+    "target_size": 11,
+    "expect": "exact",
+    "notes": "destructor core: vptr store and tail jump to PhysicsBody::~PhysicsBody 0x004cbde0",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004cca90",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser jmp thunk (per-TU Math3D.h copy; the set 0x004cca90..0x004ccbcc closes this TU, its kVec3Zero 0x00689a00 is the one the constructor reads)",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x004ccaa0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,0) initialiser body: temporary copied to 0x00689a00",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004ccae0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser jmp thunk",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004ccaf0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (1,0,0) initialiser body: temporary copied to 0x00689a10",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004ccb30",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser jmp thunk",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x004ccb40",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,1,0) initialiser body: temporary copied to 0x00689a20",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004ccb80",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser jmp thunk",
+    "bindings": "PhysicsRigidBody.bindings.json"
+  },
+  {
+    "class": "PhysicsRigidBody",
+    "source": "PhysicsRigidBody.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x004ccb90",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "static const Vec3 (0,0,1) initialiser body: temporary copied to 0x006899f0",
     "bindings": "PhysicsRigidBody.bindings.json"
   },
   {
