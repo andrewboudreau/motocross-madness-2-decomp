@@ -91,7 +91,7 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
 
     The paths are at `+0x3c/+0x8c/+0xdc/+0x12c`. `motions` is at `+0x180`, the `MotionPoseList` is at `+0x190` and
     `vutLoaded` is at `+0x19c`. These fields are named in `src/krusty2/motion/D3DIMSoultreeCharacter.h`.
-- **Coverage**: 40 strict exact in `src/krusty2/motion/Motnctrl.cpp`, plus ClampFloat and 4 partials in the sample.
+- **Coverage**: 40 strict exact in `src/krusty2/motion/Motnctrl.cpp`, plus ClampFloat and 5 partials in the sample.
   - The exact targets are:
     - two `$E` initialisers
     - the pose comparator and the two frame-advance helpers
@@ -110,15 +110,19 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
     - **RotatePose `0x4a7dc0`, 90.66%**: the Vec3Normalize temporaries use a different stack slot.
     - **PoseRotation `0x4a7fd0`, 55.70%**: the inline budget differs.
     - **InterpolatePose `0x4a8470`, 19.40%**: VC6 inlines the first CrossProduct, where retail calls `0x515600`.
+    - **AdvanceMotion `0x4a6bb0`, 29.06%** (1295 vs 1293 bytes): the per-frame advance and blend (`lastFrame` /
+      `lastFrameTime` at `+0x24/+0x28`, declared in `D3DIMSoultreeCharacter.h`). Identical through the blend-weight
+      clamp (`+0x127`); retail keeps the smoothstep input on the FPU stack (`fld st0` / `fmul st1` twice) where every
+      float spelling reloads it (a double parameter keeps it, but also across the clamp), and the 2-byte shift moves
+      the rest.
 - **Inline budget**: VC6 spends its per-function inline budget breadth-first over call sites in source order. The
   calls inside inlined bodies are considered after all direct call sites. In these FPU helpers retail calls the
   out-of-line COMDAT copies of `Vec3::Vec3` (`0x404e60`), DotProduct (`0x40ae30`), `operator*` (`0x5015b0`),
   `operator+`/`operator-` (`0x421cb0`/`0x421d00`) and CrossProduct (`0x515600`) at specific sites. Moving the identity
   branch of PoseRotation last gave the biggest gain. Helper spellings and dummy preceding functions had no effect.
 - **Not reconstructed**:
-  - `0x4a6bb0` (1293 bytes): the per-frame motion advance and blend. It advances the time, returns early when
-    finished, smoothsteps the blend weight, lerps the poses and dispatches slot 4/5.
-  - Slot 7 `0x4a70c0` (3327 bytes).
-  - `0x4a9050` (2138 bytes).
+  - Slot 7 `0x4a70c0` (3327 bytes): it inlines the same InterpolatePose and smoothstep pattern that keeps
+    AdvanceMotion partial, so a byte match needs that resolved first.
   - The functions after `0x4a9aa0`.
-  - `0x4a8bf0` and `0x4a8c50`, which contain inline fistp instructions; the original source mechanism is unproven.
+  - `0x4a8bf0`, `0x4a8c50` and `0x4a9050` (2138 bytes), which round with direct `fistp` instructions (no
+    `_ftol` call): `__asm` in the original, which the readable-C++ rule excludes.

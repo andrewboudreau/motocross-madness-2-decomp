@@ -102,6 +102,7 @@ public:
     void SetMotion(Motion* motion);                         // 0x004a8b40, ret 4
     void BlendToMotion(Motion* motion);                     // 0x004a8b60, ret 4
     void BlendToMotion(Motion* motion, float time);         // 0x004a8b80, ret 8
+    int AdvanceMotion(float dt, int mirror, int mask);      // 0x004a6bb0, ret 0xc: per-frame playback, returns the frame number
     void Method_0x004a8bf0(int a, float b);                 // ret 8
     void Method_0x004a8c50(int a, int b, float c, float d); // ret 0x10
 
@@ -115,8 +116,8 @@ public:
     Motion* currentMotion;          // +0x018 SetMotion stores the motion; cleared by LoadMotions and the dtor
     MotionPoseList* currentFrame;   // +0x01c SetMotion stores the motion's first frame; cleared by the dtor
     Motion* blendFromMotion;        // +0x020 BlendToMotion saves currentMotion here before switching
-    int chr_field_0x24;             // +0x024 BlendToMotion only blends when it is nonzero
-    int chr_field_0x28;             // +0x028 ctor 0; not copied by slot 8
+    MotionPoseList* lastFrame;      // +0x024 AdvanceMotion (0x004a6bb0): the frame applied last; a blend interpolates from it
+    float lastFrameTime;            // +0x028 AdvanceMotion: chr_field_0x10 when lastFrame was applied; not copied by slot 8
     float blendFromTime;            // +0x02c BlendToMotion: chr_field_0x10 at the switch
     float blendDuration;            // +0x030 BlendToMotion: the transition time argument
     int blendActive;                // +0x034 BlendToMotion sets 1; SetMotion clears it
