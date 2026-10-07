@@ -123,8 +123,8 @@ struct VehicleImpactSink {
     int updatePending;  // +0x60 set to 1 by VehCommitImpact
     char pad_0x64[0x10];
     Vec3 scrapeVector;  // +0x74 slots 19/20 write the clamped scrape vector
-    void Method_004B8D90(Vec3 pos, float intensity);   // 0x004b8d90, purpose unknown (impact/sound post)
-    void Method_004B9DC0(Vec3 pos);                    // 0x004b9dc0, purpose unknown (impact/sound post)
+    void SetPosition(Vec3 pos, float intensity);   // 0x004b8d90, emitter position setter (samples/physics/effects/ParticleEmitters.h)
+    void SetPosition(Vec3 pos);                    // 0x004b9dc0, the other emitter class's position setter (ParticleEmitters.h)
 };
 struct VehicleImpactEvent {          // argument of slots 18..20 (provisional)
     char pad_0x00[4];
@@ -165,8 +165,8 @@ struct VehicleSteerState {
     float steerAngle;  // +0x04 slot 60 subtracts it; slot 73 uses sin(it) and |it|
     float field_0x08;
     ~VehicleSteerState();                                      // 0x00504c50 (~Vehicle deletes it)
-    void Method_00504EC0(float value, SoultreeObject* node);   // 0x00504ec0, purpose unknown
-    void Method_00504E20(int a, SoultreeObject* node);         // 0x00504e20, purpose unknown
+    void AddAngle(float value, SoultreeObject* node);   // 0x00504ec0, purpose unknown
+    void SetAngle(int a, SoultreeObject* node);         // 0x00504e20, purpose unknown
 };
 struct VehicleAxisSource {           // object at VehicleAxis+0x00 (provisional)
     char pad_0x00[0xC];
@@ -187,7 +187,7 @@ class SoultreeContact;
 extern void __cdecl VehAddContact(int capacity, SoultreeContact** arr, int a2, int* count, void* contact);
 extern void __stdcall VehWheelApply(float weight, float a, float b, float* speed);
 class Vehicle;
-// Suspension objects hung on a wheel (VehicleWheel+0x2b0 / +0x2ac).  Method_00528EB0 retracts
+// Suspension objects hung on a wheel (VehicleWheel+0x2b0 / +0x2ac).  PlaceWheels retracts
 // them by a fraction of the last step and clears their forces while the wheel is in contact;
 // the two Retract bodies differ (0x004fa310 / 0x004fab60), the ClearForces body 0x004f9c70 is
 // shared and called directly.  Provisional views; samples/physics/suspension/Suspension.h
@@ -217,11 +217,11 @@ struct VehicleContactPoint {
 // Elements of Vehicle+0x53c (provisional: only touched offsets are named).
 struct VehicleWheel {
     char pad_0x00[0xB8];
-    VehicleContactPoint contactPoint;  // +0xb8 Method_00525D30 registers it in collisionPoints
+    VehicleContactPoint contactPoint;  // +0xb8 AddWheel registers it in collisionPoints
     char pad_0xBC[0x10];
     Vec3 wheelPosition;              // +0xcc wheel contact position (slot 7 distance source)
     Vec3 groundPoint;              // +0xd8 (y at +0xdc is read as a height by slot 58)
-    Vec3 groundNormal;              // +0xe4 contact normal (averaged by Method_00528400)
+    Vec3 groundNormal;              // +0xe4 contact normal (averaged by GetAverageGroundNormal)
     Vec3 field_0xf0;
     Vec3 appliedShare;              // +0xfc per-wheel share of the applied vector
     Vec3 field_0x108;
@@ -248,53 +248,53 @@ struct VehicleWheel {
     SoultreeObject* sceneNode;     // +0x1bc wheel scene node (slot 33 reads its position)
     int field_0x1c0;
     char pad_0x1C4[0x18];
-    float levelRiseRate;               // +0x1dc +0x29c ramp-up rate (Method_00529280)
+    float levelRiseRate;               // +0x1dc +0x29c ramp-up rate (UpdateWheelRampLevels)
     float levelFallRate;               // +0x1e0 +0x29c ramp-down rate
     char pad_0x1E4[4];
-    Vec3 field_0x1e8;
+    Vec3 slipVector;                 // +0x1e8 Tire.h slipVector (UpdateContactPatch)
     char pad_0x1F4[0xC];
     Vec3 nodePosition;                // +0x200 wheel node position (written by slot 33)
     char pad_0x20C[0x1C];
     float field_0x228;
     char pad_0x22C[4];
-    Vec3 field_0x230;
-    Vec3 field_0x23c;
+    Vec3 rollDirection;              // +0x230 Tire.h: normalise(cross(normal, side))
+    Vec3 sideAxis;                   // +0x23c Tire.h: wheel axle direction
     Vec3 field_0x248;
     Vec3 field_0x254;
     int inContact;  // +0x260 selects wheels touching the ground (slots 7, 54, 72, 75-86); count equals Vehicle::wheelsInContact
-    int field_0x264;  // Method_00528EB0 sets it on the first in-contact wheel without field_0x1c0 (else on wheel 0)
+    int reportContactOutputs;  // +0x264 (Tire.h name) PlaceWheels sets it on the first in-contact wheel without field_0x1c0 (else on wheel 0)
     int field_0x268;
     int field_0x26c;
     char pad_0x270[8];
     int field_0x278;
     int field_0x27c;
     Vec3 field_0x280;
-    float field_0x28c;
+    float tangentCos;              // +0x28c Tire.h: |tangent . rollDirection| clamped to 1
     float field_0x290;
     float field_0x294;
     char pad_0x298[0x4];
     float rampLevel;               // +0x29c 0 selects a flag passed to slot 77 (slot 83)
-    float field_0x2a0;             // Method_00527A20 counts the in-contact wheels where it is nonzero
+    float driveStrength;           // +0x2a0 Tire.h ctor arg a10, read by 0x00514170; Method_00527A20 counts the in-contact wheels where it is nonzero
     float field_0x2a4;
-    VehicleWheelAux* field_0x2a8;
-    int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (Method_00529A20, 005293E0)
-    int primaryAux;  // +0x2b0 Method_00525D30 stores an attachment here; Method_00529A20 treats it as an object whose +0x8c is reset from +0x90
+    VehicleWheelAux* aux;          // +0x2a8 Tire.h TireAux
+    int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (UpdateWheelsInContact, Method_005293E0)
+    int primaryAux;  // +0x2b0 AddWheel stores an attachment here; UpdateWheelsInContact treats it as an object whose +0x8c is reset from +0x90
     char pad_0x2B4[0x4];
     float field_0x2b8;
     float field_0x2bc;
-    void Method_005143D0(float a, float b, int c, int d, int e, float f);   // 0x005143d0
-    void Method_005135F0(Vec3* origin, Vec3 position, Vec3 velocity, float speed, float* outA, int* outB);   // 0x005135f0
+    void UpdateRoll(float a, float b, int c, int d, int e, float f);   // 0x005143d0
+    void UpdateContactPatch(Vec3* origin, Vec3 position, Vec3 velocity, float speed, float* outA, int* outB);   // 0x005135f0 (Tire.h name)
     void Method_00513C70(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70
-    void Method_00513F90(Vehicle* owner);                                 // 0x00513f90
-    void Method_00515660();                    // 0x00515660, called per wheel by Bike slot 41 (0x0040cbd0)
+    void UpdateDriveShare(Vehicle* owner);       // 0x00513f90, Tire.h: drive share +0x2b8 from the vehicle speed
+    void UpdateAttachment();                    // 0x00515660, called per wheel by Bike slot 41 (0x0040cbd0)
     // 0x00514170 (ret 0x1c): per-wheel drive/brake step called by Method_00527A20 with the
     // reciprocal of the driven-wheel count, the body's step time, direction flag and mass.
-    void Method_00514170(float share, float stepTime, int movingForward, float bodyMass,
+    void ApplyDrive(float share, float stepTime, int movingForward, float bodyMass,
                          float* speed, Vec3* force, Vec3* torque);
     // 0x00514550 (ret 0x20): places the wheel on the ground (samples/physics/tire/Tire.h
-    // UpdateSuspensionProbe); Method_00528EB0 passes the body's probe, position, saved
+    // UpdateSuspensionProbe); PlaceWheels passes the body's probe, position, saved
     // pitch/sin-roll/yaw, saved forward/up and the pose node.
-    void Method_00514550(SoultreeProbe* world, const Vec3* position, float pitch, float sinRoll,
+    void UpdateSuspensionProbe(SoultreeProbe* world, const Vec3* position, float pitch, float sinRoll,
                          float yaw, const Vec3* forward, const Vec3* up, SoultreeObject* node);
 };
 
@@ -400,24 +400,25 @@ public:
     virtual void UnknownVirtualSlot95();
     virtual void UnknownVirtualSlot96();
 
-    // non-virtual helper (retail 0x00526830, next to slot 70; tier 3 name)
-    int Method_00526830();
-    int Method_00478FE0();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from Method_00526830)
-    int Method_00525CB0(VehicleTicker* t);                       // 0x00525cb0, append to earlyTickers
-    int Method_00525CF0(VehicleTicker* t);                       // 0x00525cf0, append to lateTickers
-    int Method_00525D30(VehicleWheel* wheel, int a2, int a3, int a4, VehicleWheelAux* aux);   // 0x00525d30, add a wheel
+    // 0x00526830 (next to slot 70): stores the crash answer in crashState and, when crashed,
+    // clears the controls and records the heading; returns it (tier 3 name).
+    int CheckCrash();
+    int Method_00478FE0();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from CheckCrash)
+    int AddEarlyTicker(VehicleTicker* ticker);                  // 0x00525cb0, append to earlyTickers
+    int AddLateTicker(VehicleTicker* ticker);                   // 0x00525cf0, append to lateTickers
+    int AddWheel(VehicleWheel* wheel, int a2, int a3, int a4, VehicleWheelAux* aux);   // 0x00525d30, appends a wheel and registers its contact point
     // 0x00528400: normalized average of the wheels' contact normals (+0xe4); returns out.
-    Vec3* Method_00528400(Vec3* out);
-    int   Method_00529280();                                     // 0x00529280
-    void  Method_00528EB0();                                     // 0x00528eb0
-    void  Method_00529A20();                                     // 0x00529a20
+    Vec3* GetAverageGroundNormal(Vec3* out);
+    int   UpdateWheelRampLevels();       // 0x00529280, ramps each wheel's rampLevel by its slot 83 answer
+    void  PlaceWheels();                 // 0x00528eb0, retracts the shocks and probes each wheel against the ground
+    void  UpdateWheelsInContact();       // 0x00529a20, updates in-contact wheels, resets the aux ramp of the others
     void  Method_00527A20(float* speed, Vec3* zero, Vec3* up);   // 0x00527a20
     void  Method_005293E0(float* speed);                         // 0x005293e0
     void  Method_00529450(Vec3* up, Vec3* zero);           // 0x00529450
-    void  Method_00529C20(Vec3* up, Vec3* zero, float d);  // 0x00529c20
+    void  AccumulateWheelContacts(Vec3* up, Vec3* zero, float d);  // 0x00529c20, folds in-contact wheel vectors into the accumulators
     // 0x00525c60: calls virtual slot 0 of every object in the two owned arrays (+0x554/+0x55c, +0x560/+0x568).
-    void Method_00525C60();
-    void Method_00525A90();                                      // 0x00525a90, purpose unknown
+    void RunTickers();
+    void ResetWheelContacts();           // 0x00525a90, resets every wheel's contact state and vectors
 
     // Inherited members whose canonical types are still separate classes are viewed
     // through casts at the use site (MIGRATION.md rule 6): field_0x12c as
@@ -481,18 +482,18 @@ public:
     int field_0x520;
     float field_0x524[6];
     VehicleWheel** wheelList;  // +0x53c array of VehicleWheel*, iterated up to wheelCount in slots 7/54/72/75/85/86
-    int wheelCapacity;               // +0x540 wheel capacity (Method_00525D30)
+    int wheelCapacity;               // +0x540 wheel capacity (AddWheel)
     int wheelCount;  // +0x544 loop bound over wheelList in every wheel loop
     VehicleWheel* primaryWheel;  // +0x548 slot 7 (single contact) and slot 58 (single wheel) use it as the lead wheel; slot 46 pairs it with secondaryWheel
     VehicleWheel* secondaryWheel;  // +0x54c partner of primaryWheel in slot 46 (two-wheel case)
     int field_0x550;
-    VehicleTicker** lateTickers;   // +0x554 owned arrays of objects with a virtual slot 0 (Method_00525C60)
+    VehicleTicker** lateTickers;   // +0x554 owned arrays of objects with a virtual slot 0 (RunTickers)
     int lateTickerCapacity;               // +0x558 capacity of lateTickers
     int lateTickerCount;               // +0x55c count of lateTickers
-    VehicleTicker** earlyTickers;  // +0x560 array of objects whose virtual slot 0 is called first by Method_00525C60; Method_00525CB0 appends to it
+    VehicleTicker** earlyTickers;  // +0x560 array of objects whose virtual slot 0 is called first by RunTickers; AddEarlyTicker appends to it
     int earlyTickerCapacity;               // +0x564 capacity of earlyTickers
     int earlyTickerCount;               // +0x568 count of earlyTickers
-    int auxWheelCount;               // +0x56c wheels added with an aux object (Method_00525D30)
+    int auxWheelCount;               // +0x56c wheels added with an aux object (AddWheel)
     int contactTotal;  // +0x570 = field_0x1cc + wheelsInContact (body contacts plus wheels in contact) in slot 7; slot 49 branches on > 0
     Vec3 field_0x574;      // Bike slot 100 (0x0040a090) builds (a0.x, 0, a0.z) here
     float maxLeanAngle;  // +0x580 Bike clamps the target lean to +-maxLeanAngle
@@ -604,7 +605,7 @@ struct VehV3 : Vec3
 // node through a local stand-in that declares it.
 struct VehSceneNodeView {
     void Method_004444E0();
-    void Method_004FBD70(const Vec3* axisZ, const Vec3* axisY, int a, int b);   // 0x004fbd70, purpose unknown
+    void SetAxesPtr(const Vec3* axisZ, const Vec3* axisY, int a, int b);   // 0x004fbd70, purpose unknown
 };
 
 #endif

@@ -1,4 +1,4 @@
-// Follow-up to CollisionPoint::Fn_0043a640: per-contact refresh (tier 3 semantics).
+// Follow-up to CollisionPoint::UpdateRelativeMotion: per-contact refresh (tier 3 semantics).
 // Provisional TU: proximity to CollisionPoint.cpp is not evidence of the retail file split.
 #include "collision/CollisionPoint.h"
 
@@ -7,14 +7,14 @@
 class CollisionFrameHelper {
 public:
     // 0x00507c10, ret 0x10: transforms/projects a vector by the frame; last arg receives a small flag byte.
-    void Fn_00507c10(CollisionVec3* v, const CollisionVec3* n, int a, char* flagOut);
+    void QueryGround(CollisionVec3* v, const CollisionVec3* n, int a, char* flagOut);
 };
 
 // Recomputes the contact position/penetration field_0x98 and tallies the contacts that
 // penetrate (field_0xa4). Both the 1-contact and N-contact shapes exist in retail.
 static void CollisionRefreshContact(CollisionPoint* p, CollisionFrameHelper* frame, int* penetrating)
 {
-    frame->Fn_00507c10(&p->surfacePosition, &p->surfaceNormal, 0, &p->surfaceType);
+    frame->QueryGround(&p->surfacePosition, &p->surfaceNormal, 0, &p->surfaceType);
     p->penetration = (p->surfacePosition.y - p->worldPosition.y) * p->surfaceNormal.y;
     p->surfaceType &= 7;
     p->inContact = (p->penetration >= p->penetrationThreshold) ? 1.0f : 0.0f;
@@ -30,7 +30,7 @@ static void CollisionRefreshContact(CollisionPoint* p, CollisionFrameHelper* fra
 }
 
 // 0x0043ad80 (cdecl).  Provisional signature.
-int Fn_0043ad80(void* a1, int* penetrating, int count, CollisionPoint** points,
+int SoultreeRefreshContacts(void* a1, int* penetrating, int count, CollisionPoint** points,
                 CollisionFrameHelper* frame, CollisionVec3* offset, int mode, float k)
 {
     if (!a1)
@@ -41,7 +41,7 @@ int Fn_0043ad80(void* a1, int* penetrating, int count, CollisionPoint** points,
         CollisionPoint* p = points[0];
         if (p->ownerNode) {
             CollisionVec3 tmp = *offset;
-            frame->Fn_00507c10(&tmp, &p->surfaceNormal, 0, 0);
+            frame->QueryGround(&tmp, &p->surfaceNormal, 0, 0);
             p->worldPosition.x = -k * p->surfaceNormal.x + offset->x;
             p->worldPosition.y = -k * p->surfaceNormal.y + offset->y;
             p->worldPosition.z = -k * p->surfaceNormal.z + offset->z;
@@ -54,7 +54,7 @@ int Fn_0043ad80(void* a1, int* penetrating, int count, CollisionPoint** points,
         CollisionPoint* p = points[i];
         if (p->ownerNode) {
             CollisionVec3 tmp;
-            CollisionVec3* r = p->ownerNode->Fn_004fd660(&tmp, &p->localPosition);
+            CollisionVec3* r = p->ownerNode->LocalToWorldPoint(&tmp, &p->localPosition);
             p->worldPosition = *r;
             p->surfacePosition = *r;
             CollisionRefreshContact(p, frame, penetrating);
@@ -66,7 +66,7 @@ int Fn_0043ad80(void* a1, int* penetrating, int count, CollisionPoint** points,
 // 0x0043aa30 (cdecl, provisional signature).  Merges the penetrating contacts of a manifold
 // (tier 3 semantics): mean position, summed and normalised normal, deepest penetration, and
 // the resulting linear (out1/out2) and angular (out3) response terms.  Returns the merged count.
-int Fn_0043aa30(int count, CollisionPoint** points, const CollisionVec3* scaleA, const CollisionVec3* scaleB,
+int SoultreeMergeContacts(int count, CollisionPoint** points, const CollisionVec3* scaleA, const CollisionVec3* scaleB,
                 const CollisionVec3* bias, CollisionVec3* origin, CollisionVec3* linA,
                 CollisionVec3* delta, CollisionVec3* normal, CollisionVec3* angular)
 {

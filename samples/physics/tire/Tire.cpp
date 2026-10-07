@@ -172,7 +172,7 @@ GameObject* Tire::GameObjectVirtualSlot8(int a)
     };
     TirePoint pts[8];
 
-    Fn_004320f0(a, 1, 1, 1);
+    Configure(a, 1, 1, 1);
     // The zero vector is built from a zero float (not three literals): VC6 then keeps the
     // zero in registers across the loop instead of reloading it from the stack.
     float zeroValue = 0.0f;
@@ -189,7 +189,7 @@ GameObject* Tire::GameObjectVirtualSlot8(int a)
         pts[i].rim.y = -cos(angle) * wheelRadius;
         pts[i].rim.z = sin(angle) * wheelRadius;
     }
-    Fn_00432ab0(8, pts);
+    SetMeshShape(8, pts);
     CollisionObject::onHitCallback = TireCollisionCallback;
     CollisionObject::onHitByCallback = 0;
     ownerObject = this;
@@ -268,7 +268,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
     if (minLength > 0.001f) {
         if (CollisionRejectFrom(&axis, &ref, &this->CollisionPoint::surfaceNormal)) {
             CollisionVec3 n;
-            axis = *Fn_005087b0(&n, &axis);
+            axis = *Vec3Normalize(&n, &axis);
         }
         float d = axis.y * ref.y + axis.x * ref.x + axis.z * ref.z;
         this->CollisionPoint::tangentSpeed = d;
@@ -426,22 +426,22 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3& forward = rollDirection;
     CollisionVec3& side = sideAxis;
 
-    MovingPart::sceneNode->Fn_004fc9a0(0, &origin);
+    MovingPart::sceneNode->GetPositionIn(0, &origin);
     curPos = origin;
-    world->Fn_00507c10(&curPos, &normal, 0, surface);
+    world->QueryGround(&curPos, &normal, 0, surface);
 
     if (MovingPart::ownerRef) {
         TireOwnerRef* owner = (TireOwnerRef*)MovingPart::ownerRef;
         CollisionVec3 t0;
         CollisionVec3 t1;
-        up = *owner->node->Fn_004fd5c0(&t0, &kVec3ZAxis);
-        CollisionVec3 b = *owner->node->Fn_004fd5c0(&t1, &kVec3YAxis);
+        up = *owner->node->LocalToWorldDirection(&t0, &kVec3ZAxis);
+        CollisionVec3 b = *owner->node->LocalToWorldDirection(&t1, &kVec3YAxis);
         side = TireCross(up, b);
     } else {
         up = *a6;
         if (a7 == 0) {
             CollisionVec3 t0;
-            CollisionVec3 b = *a8->Fn_004fd5c0(&t0, &kVec3YAxis);
+            CollisionVec3 b = *a8->LocalToWorldDirection(&t0, &kVec3YAxis);
             side = TireCross(up, b);
         } else {
             side = TireCross(up, *a7);
@@ -474,7 +474,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     prevPos = p;
     curPos = p;
     CollisionVec3 n1;
-    world->Fn_00507c10(&curPos, &n1, 0, surface);
+    world->QueryGround(&curPos, &n1, 0, surface);
     depth = (curPos.y - prevPos.y) * n1.y;
 
     // Second probe position pt: on the wheel rim, in the direction selected by `angle`.
@@ -526,7 +526,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     // Second probe at pt, then a refinement using the axes found there.
     CollisionVec3 n2;
     unsigned char kind;
-    world->Fn_00507c10(&pt, &n2, 0, &kind);
+    world->QueryGround(&pt, &n2, 0, &kind);
     CollisionVec3 v = TireNormalizeOr(TireCross(n2, side), up);
     CollisionVec3 u = CollisionCross(v, side);
     CollisionVec3 lateral2 = u;
@@ -540,7 +540,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionVec3 r = CollisionVec3(scaled.x + origin.x, scaled.y + origin.y, scaled.z + origin.z);
     pt = r;
     CollisionVec3 n3;
-    world->Fn_00507c10(&pt, &n3, 0, &kind);
+    world->QueryGround(&pt, &n3, 0, &kind);
     float delta = pt.y - r.y;
     float score = delta * n3.y;
     if (score > depth) {
@@ -570,7 +570,7 @@ void Tire::UpdateSuspensionProbe(TireWorld* world, const CollisionVec3* velocity
     CollisionMatrix4 frame;
     TireBuildFrame(&frame, &origin, &up, &lateral, 1, 1);
     SetTransform((const Matrix4*)&frame);   // CollisionObject 0x00435830
-    Fn_00438e70();
+    QueryCollisions();
 
     if (CollisionObject::hasContact) {
         TireBoundsRef* bounds = (TireBoundsRef*)CollisionObject::contactRecord;
@@ -652,11 +652,11 @@ Tire::Tire(void* a1, int a2, float a3, float a4, int a5, int a6, float a7, float
 {
     CollisionVec3 extentA;
     CollisionVec3 extentB;
-    MovingPart::sceneNode->Fn_004fe0a0(&extentA, &extentB);
+    MovingPart::sceneNode->GetLocalBounds(&extentA, &extentB);
     wheelRadius = extentB.y;
     invWheelRadius = 1.0f / extentB.y;
     rollAngle = 0.0f;
-    MovingPart::sceneNode->Fn_004fc9a0(0, &wheelCenter);
+    MovingPart::sceneNode->GetPositionIn(0, &wheelCenter);
     slipVector = kVec3Zero;
     inContact = 0;
     wheelVelocity = kVec3Zero;

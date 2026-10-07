@@ -492,7 +492,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00525A90",
+    "candidate_symbol_contains": "ResetWheelContacts",
     "target_va": "0x00525a90",
     "target_size": 461,
     "expect": "exact",
@@ -502,7 +502,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00525C60",
+    "candidate_symbol_contains": "RunTickers",
     "target_va": "0x00525c60",
     "target_size": 79,
     "expect": "exact",
@@ -512,7 +512,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00525CB0",
+    "candidate_symbol_contains": "AddEarlyTicker",
     "target_va": "0x00525cb0",
     "target_size": 57,
     "expect": "exact",
@@ -522,7 +522,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00525CF0",
+    "candidate_symbol_contains": "AddLateTicker",
     "target_va": "0x00525cf0",
     "target_size": 57,
     "expect": "exact",
@@ -532,7 +532,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00525D30",
+    "candidate_symbol_contains": "AddWheel",
     "target_va": "0x00525d30",
     "target_size": 160,
     "expect": "exact",
@@ -592,7 +592,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00526830",
+    "candidate_symbol_contains": "CheckCrash",
     "target_va": "0x00526830",
     "target_size": 150,
     "expect": "exact",
@@ -802,7 +802,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00528400",
+    "candidate_symbol_contains": "GetAverageGroundNormal",
     "target_va": "0x00528400",
     "target_size": 291,
     "expect": "exact",
@@ -942,7 +942,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00529280",
+    "candidate_symbol_contains": "UpdateWheelRampLevels",
     "target_va": "0x00529280",
     "target_size": 221,
     "expect": "exact",
@@ -982,7 +982,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00529A20",
+    "candidate_symbol_contains": "UpdateWheelsInContact",
     "target_va": "0x00529a20",
     "target_size": 273,
     "expect": "exact",
@@ -1012,7 +1012,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "Method_00529C20",
+    "candidate_symbol_contains": "AccumulateWheelContacts",
     "target_va": "0x00529c20",
     "target_size": 320,
     "expect": "exact",
@@ -1302,7 +1302,7 @@
   {
     "class": "BikeAI",
     "source": "BikeAI.cpp",
-    "candidate_symbol_contains": "UnknownFunction40d120",
+    "candidate_symbol_contains": "SafeNormalize",
     "target_va": "0x0040d120",
     "target_size": 182,
     "expect": "exact",
@@ -1332,7 +1332,7 @@
   {
     "class": "BikeAI",
     "source": "BikeAI.cpp",
-    "candidate_symbol_contains": "UnknownFunction40e370",
+    "candidate_symbol_contains": "PredictLanding",
     "target_va": "0x0040e370",
     "target_size": 412,
     "expect": "exact",
@@ -1342,7 +1342,7 @@
   {
     "class": "BikeAI",
     "source": "BikeAI.cpp",
-    "candidate_symbol_contains": "UnknownFunction413190",
+    "candidate_symbol_contains": "Vec3Magnitude",
     "target_va": "0x00413190",
     "target_size": 106,
     "expect": "exact",
@@ -1572,7 +1572,7 @@
   {
     "class": "Vehicle",
     "source": "Vehicle.cpp",
-    "candidate_symbol_contains": "?Method_00528EB0@Vehicle@@QAEXXZ",
+    "candidate_symbol_contains": "?PlaceWheels@Vehicle@@QAEXXZ",
     "target_va": "0x00528eb0",
     "target_size": 505,
     "expect": "exact",

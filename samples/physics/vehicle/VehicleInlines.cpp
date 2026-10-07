@@ -51,8 +51,8 @@ void Vehicle::UnknownVirtualSlot36()
     savedCosPitch = bodyCosPitch;
     savedSinPitch = bodySinPitch;
     steerState->steerNode->SetPosition(g_VehZeroVec3_005778a8);
-    ((VehSceneNodeView*)steerState->steerNode)->Method_004FBD70(&bodyForward, &bodyUp, 0, 1);
-    steerState->Method_00504E20(0, poseNode);
+    ((VehSceneNodeView*)steerState->steerNode)->SetAxesPtr(&bodyForward, &bodyUp, 0, 1);
+    steerState->SetAngle(0, poseNode);
 }
 
 float Vehicle::UnknownVirtualSlot45() { return 3.0f; }

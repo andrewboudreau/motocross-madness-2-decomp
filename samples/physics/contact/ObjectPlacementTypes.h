@@ -2,7 +2,7 @@
 // PROVISIONAL (tier 3 names).  Offsets, argument counts and calling conventions are
 // decoded from the target bytes (tier 1); the names are guesses.
 //
-// The CollisionObject members 0x00435830 SetTransform, 0x00439400 SetField_0x74 and
+// The CollisionObject members 0x00435830 SetTransform, 0x00439400 SetIgnoreListMode and
 // 0x00439410 AddIgnoredOwner are declared in collision/CollisionObject.h (src/krusty2).
 // Virtual: slot 2 of the GraphicsTest subobject at +0xc (BaseObjectVirtualSlot2, the
 // Release-style slot, called through [ [obj+0xc] + 8 ]) is invoked after use.
@@ -15,7 +15,7 @@
 // Ground/probe query object (SoultreeProbe in SoultreePhysicsCallees.h is only forward
 // declared).  0x00507c10 is thiscall, ret 0x10: (point, out point, 1, out flag byte).
 struct PlacementProbe {
-    void Fn_507c10(const Vec3* point, Vec3* out, int one, unsigned char* flag);
+    void QueryGround(const Vec3* point, Vec3* out, int one, unsigned char* flag);
 };
 
 // cdecl helpers (call targets are relocation-masked; only shapes matter).

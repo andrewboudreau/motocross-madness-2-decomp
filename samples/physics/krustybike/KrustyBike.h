@@ -74,7 +74,7 @@ public:
     void Fn_0048D8B0();
     void Fn_0048D910(int idx);
     void Fn_0048D990(int idx);
-    KrustyBike* Fn_0048E190(float* outDistance);
+    KrustyBike* FindNearestRival(float* outDistance);
     void Fn_0048E280();
     void Fn_004925A0(Vehicle* who, bool flag);
     void Fn_00496E20(KbRecorder* a);
@@ -183,7 +183,7 @@ public:
     float field_0x1550; // 0x1550  Fn_0048E280 stores a clamped, scaled bearing to the nearest rival
     int field_0x1554; // 0x1554  Fn_0048E280 clears it
     float field_0x1558; // 0x1558  Fn_0048E280: wrapped bearing to the rival relative to heading +0x50, clamped to +-2.7
-    KrustyBike* nearestRival; // 0x155C  Fn_0048E190 result (closest other bike of the race; tier 3 name)
+    KrustyBike* nearestRival; // 0x155C  FindNearestRival result (closest other bike of the race; tier 3 name)
     char pad_0x1560[0x68];
     int field_0x15c8; // 0x15C8
     char pad_0x15CC[0x4];

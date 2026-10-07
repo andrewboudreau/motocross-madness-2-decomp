@@ -29,14 +29,18 @@ public:
     virtual ~GraphicsTest();                    // slot 0: deleting 0x0047bce0, core 0x0047bd00
 
     // Non-virtual GraphicsTest methods used by CollisionObject::GameObjectVirtualSlot14.
-    void Fn_0047c6c0(int a, int b, int c, int d);
-    void Fn_0047c6f0();
+    // 0x0047c6c0 (ret 0x10): drawColor = a<<24 | r<<16 | g<<8 | b (decoded); SetDrawColor with alpha.
+    void SetDrawRGBA(int r, int g, int b, int a);
+    // 0x0047c6f0: no texture, diffuse alpha stage states, alpha blending on (render state 0x1b).
+    void BeginAlphaBlend();
     // 0x0047c0b0 (ret 0xc): a wire sphere of `segments` rings (center, radius, segments; the
     // radius is pushed as a float by CollisionObject slot 14).  Name tier 3.
-    void Fn_0047c0b0(const Vec3* center, float radius, int segments);
+    void DrawSphere(const Vec3* center, float radius, int segments);
     // 0x0047bd10 (ret 0x10): a circle (center, radius, axis, segments, clamped to 64); tier 3.
-    void Fn_0047bd10(const Vec3* center, float radius, const Vec3* axis, int segments);
-    void Fn_00469ce0(GraphicsTest* owner);   // 0x00469ce0, registers the object (thiscall, 1 arg)
+    void DrawCircle(const Vec3* center, float radius, const Vec3* axis, int segments);
+    // 0x00469ce0 (thiscall, 1 arg): appends the RTTI class name of `owner` to the debug name
+    // string at GameObject+0x28 (src/reconstructed/GameObject.h UnknownFunction469ce0).
+    void AppendClassName(GraphicsTest* owner);
     // Debug line drawing, used by collision/CollisionDebugDraw.cpp.  Names are tier 3.
     //  * 0x0047c690 (ret 0xc) packs 0xff000000 | r<<16 | g<<8 | b into drawColor (decoded).
     //  * 0x0047c4f0 (ret 8): a line between two world points.

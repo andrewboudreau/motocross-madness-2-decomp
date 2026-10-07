@@ -217,13 +217,13 @@ public:
     // 0x004fe850. thiscall, ret 8: *center / *extents = subtreeBoundsA / subtreeBoundsB, after
     // UpdateSubtreeBounds when subtreeDirty is set (SoultreePhysicsBaseObject slot 2 derives the
     // box inertia from the extents).
-    void Fn_004fe850(Vec3* center, Vec3* extents);
+    void GetSubtreeBounds(Vec3* center, Vec3* extents);
 
     // 0x004fbd10, thiscall, ret 0x20: SetAxesPtr with the two axes as loose floats. The
     // seventh and eighth arguments are copied through unchanged into SetAxesPtr's int
     // 'orthogonalize' and 'keepZ' (mov/push, no conversion), so both are ints (tier 1). The
     // caller (SoultreePhysicsBaseObject slot 2) passes 0,0,1, 0,1,0, 0, 1.
-    void Fn_004fbd10(float zx, float zy, float zz, float yx, float yy, float yz,
+    void SetAxes(float zx, float zy, float zz, float yx, float yy, float yz,
                      int orthogonalize, int keepZ);
 
     // ---- soultree.cpp members added with the unit's promotion (names tier 3) ----
@@ -281,11 +281,11 @@ public:
 
     // 0x004fecd0: inserts this node in the global quadtree (0x0068aba4) or updates its range,
     // using GetWorldBounds; the quadtree code is kept in field_0x198 (15 = none).
-    void Fn_4fecd0();
+    void UpdateQuadtreeCell();
 
     // 0x004fed70: removes this node from the quadtree when field_0x194 is set and resets
     // field_0x194 / field_0x198.
-    void Fn_4fed70();
+    void RemoveFromQuadtree();
 
     // 0x004fefb0 is the out-of-line copy of an inline 3x3 transpose (cdecl, Matrix4*).
 
@@ -296,7 +296,7 @@ public:
     virtual ~SoultreeObject();
     // Primary vtable 0x00557c18 (QuadTreeObject's): slots 0/1 inherited, 2..8 introduced.
     virtual void UnknownVirtualSlot2(SoultreeFileStream* stream);      // 0x004fdc00, ret 4: loads a hierarchy
-    virtual void UnknownVirtualSlot3();                                // 0x004fddc0: loads from field_0x1a0
+    virtual void UnknownVirtualSlot3();                                // 0x004fddc0: loads from parameterBlock
     virtual void UnknownVirtualSlot4(SoultreeObject** out);            // 0x004fe020, ret 4: *out = new node
     virtual void UnknownVirtualSlot5();                                // 0x00464e90 (shared empty body)
     virtual void UnknownVirtualSlot6();                                // 0x004fec70: identity local matrices
@@ -318,7 +318,7 @@ public:
     SoultreeObject* parent;        // 0x13c
     SoultreeObject* firstChild;    // 0x140
     SoultreeObject* nextSibling;   // 0x144
-    int field_0x148;               // 0x148, previous sibling (AppendSibling/RemoveChild)
+    SoultreeObject* prevSibling;   // 0x148, previous sibling (AppendSibling/RemoveChild link it)
     // 0x14c..0x188 are zeroed by the constructor. The stream load (slot 2,
     // 0x004fdc00) reads 0x14c, 0x154..0x18b in this order; the clone (slot 8)
     // copies 0x14c and clears 0x154 (tier 1 offsets, tier 3 roles).
@@ -332,10 +332,10 @@ public:
     Vec3 subtreeBoundsB;           // 0x180
     int subtreeDirty;              // 0x18c, set on self and all ancestors by 0x004fdab0
     int field_0x190;               // 0x190, 1 after construction
-    int field_0x194;               // 0x194, nonzero while inserted in the quadtree
-    int field_0x198;               // 0x198, quadtree code (0xf = none) after construction
-    int field_0x19c;               // 0x19c, node count of a loaded hierarchy (slots 2/3)
-    UnknownParameterBlock* field_0x1a0; // 0x1a0, parameter block used by 0x004fdb60/slot 3;
+    int inQuadtree;                // 0x194, nonzero while inserted in the quadtree (0x004fed70 tests and clears it)
+    int quadtreeCell;              // 0x198, quadtree cell code (15 = none) passed to Remove/UpdateRange
+    int loadedNodeCount;           // 0x19c, node count of a loaded hierarchy (slot 2 reads it, slot 3 stores the "Object Hierarchy" count)
+    UnknownParameterBlock* parameterBlock; // 0x1a0, parameter block used by 0x004fdb60/slot 3;
                                    // sizeof 0x1a4 from the operator new in
                                    // SoultreePhysicsBaseObject slot 2 (tier 1)
 };

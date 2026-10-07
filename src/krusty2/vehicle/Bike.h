@@ -83,7 +83,7 @@ struct BikeWheel {
     char pad_0x2b4[4];
     float w_0x2b8;
     float w_0x2bc;
-    void Fn_00513F90(void* owner);   // 0x00513F90 (KrustyBike; purpose unknown)
+    void UpdateDriveShare(void* owner);   // 0x00513f90 (Tire.h name: drive share from the vehicle speed)
 };
 
 // Query object at BikeWheel+0x2a8.
@@ -133,7 +133,7 @@ struct BikeA5C4 {
 struct BikeA1A0 {
     char pad_0x000[320];
     SoultreeObject* d_0x140;           // SoultreeObject::firstChild
-    int Method_0x004fdae0(const char* name);
+    int FindByName(const char* name);     // 0x004fdae0, SoultreeObject::FindByName (soultree.cpp)
     void Method_0x004444e0();
     void Method_0x004fb8c0(int a, Matrix4* b);
 };

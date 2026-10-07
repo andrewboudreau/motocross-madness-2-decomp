@@ -452,7 +452,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?Method_0x004a62d0@Character@@",
+    "candidate_symbol_contains": "?LoadVut@Character@@",
     "target_va": "0x004a62d0",
     "target_size": 555,
     "expect": "exact",
@@ -462,7 +462,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?Method_0x004a6500@Character@@",
+    "candidate_symbol_contains": "?LoadMir@Character@@",
     "target_va": "0x004a6500",
     "target_size": 441,
     "expect": "exact",
@@ -542,7 +542,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?Method_0x004a6b10@Character@@",
+    "candidate_symbol_contains": "?SortPoseList@Character@@",
     "target_va": "0x004a6b10",
     "target_size": 30,
     "expect": "exact",
@@ -602,7 +602,7 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?Method_0x004a8b00@Character@@",
+    "candidate_symbol_contains": "?ApplyRestPose@Character@@",
     "target_va": "0x004a8b00",
     "target_size": 15,
     "expect": "exact",

@@ -34,7 +34,7 @@ struct VisibilityCamera {
     float matrixB[4][4];          // +0xb4 second 4x4 (0x0052fbb0 reads +0xb4/+0xc4/+0xd4/+0xe4 as the columns of x/y/z/translation)
     char field_0xf4[0x38];
     float matrixC[4][4];          // +0x12c third 4x4 (0x0052fbb0)
-    float field_0x16c;  // +0x16c compared with a dot product after (field - 10.0f) * 0.00461538f in 0x0052f140
+    float fieldOfView;  // +0x16c degrees (Camera.h: 77.0f; tested <= 90 in 0x0052fac0); compared with a dot product after (field - 10.0f) * 0.00461538f in 0x0052f140
     float worldX;       // +0x170 passed first to VisibilityQuadTree::Query (made tree-relative there)
     float field_0x174;
     float worldZ;       // +0x178 passed second to Query (multiplied by the tree's quantScale)
@@ -42,9 +42,9 @@ struct VisibilityCamera {
     unsigned int viewportWidth;   // +0x1a8 converted as an unsigned value (fild qword) in 0x0052f340 / 0x0052f190
     unsigned int viewportHeight;  // +0x1ac
     char field_0x1b0[8];
-    float field_0x1b8;  // +0x1b8 multiplied by a point's z and compared with its y in 0x0052fac0 (y slope)
-    float field_0x1bc;  // +0x1bc compared with a point's z in 0x0052fac0
-    float field_0x1c0;  // +0x1c0 compared with a bounding sphere's near depth in 0x0052fbb0 (far limit)
+    float aspectRatio;  // +0x1b8 Camera.h: height/width ratio; multiplied by a point's z and compared with its y in 0x0052fac0 (y slope)
+    float nearPlane;    // +0x1bc Camera.h: near clip (1.0f); compared with a point's z in 0x0052fac0
+    float farPlane;     // +0x1c0 Camera.h: far clip (100000.0f); compared with a bounding sphere's near depth in 0x0052fbb0 (far limit)
     char field_0x1c4[0x5c];
 };   // 0x220 bytes: slot 23 copies this much (0x88 dwords) into g_frozenCamera
 

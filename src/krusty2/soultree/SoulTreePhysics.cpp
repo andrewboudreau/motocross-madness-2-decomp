@@ -69,7 +69,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot3(const Vec3* a1, const Vec3* 
                                                     const Vec3* a3, const Vec3* a4,
                                                     int a5, int a6, float* a7)
 {
-    Fn_500220(restitution, invMass, sceneNode, a1, a2, a3, &invInertia, a4, &angularVelocity,
+    ResolveContactImpulse(restitution, invMass, sceneNode, a1, a2, a3, &invInertia, a4, &angularVelocity,
               &velocity, a7, a6);
     linearSpeed = VecLength(velocity);
     worldAngularVelocity = sceneNode->LocalToWorldDirection(angularVelocity);
@@ -177,7 +177,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot9(float dt, int* steps)
 int SoultreePhysicsBaseObject::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3,
                                                     Vec3* a4, int* a5)
 {
-    return Fn_4b0df0(collisionObject, terrain, &position, terrainScale, 0, 0x7fffffff,
+    return FindObjectPlacement(collisionObject, terrain, &position, terrainScale, 0, 0x7fffffff,
                      0x7fffffff, 0, 3.0f, groundProbeMask, &savedForward, 0, !respawnPending,
                      a2, a3, a4, a5);
 }
@@ -247,7 +247,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot18(SoultreeAttachment* a)
         if (c->touching && !c->effectSpawned &&
             track->trackData->materialEffectFlags[(unsigned char)c->materialId] != 0) {
             c->effectSpawned = 1;
-            a->contactEmitter->Fn_4b8d90(c->field_0x20, 0);
+            a->contactEmitter->SetPosition(c->field_0x20, 0);
             if (a->resetTrail)
                 a->contactEmitter->previousPosition = a->contactEmitter->currentPosition;
             a->contactEmitter->activeThisFrame = 1;
@@ -260,12 +260,12 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot18(SoultreeAttachment* a)
 // slot 28 (0x00502950)
 int SoultreePhysicsBaseObject::UnknownVirtualSlot28(int a)
 {
-    collisionObject->Fn_00435fb0();
-    collisionObject->Fn_00438e70();
+    collisionObject->UpdatePlacement();
+    collisionObject->QueryCollisions();
     if (collisionObject->hasContact) {
         position -= *(Vec3*)collisionObject->contactRecord;
         sceneNode->SetPosition(position);
-        collisionObject->Fn_00435fb0();
+        collisionObject->UpdatePlacement();
     }
     if (field_0x138) {
         UnknownVirtualSlot27();
@@ -306,7 +306,7 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot31()
         if (c->ownerNode && c->field_0x98 >= 0.0f) {
             if (c->contactState != 2)
                 c->contactState = 1;
-            c->Fn_43a640(&centerOfMass, &worldAngularVelocity, &velocity, &c->leverArm, linearSpeed);
+            c->UpdateRelativeMotion(&centerOfMass, &worldAngularVelocity, &velocity, &c->leverArm, linearSpeed);
         } else {
             c->contactState = 0;
         }
@@ -639,9 +639,9 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot21()
         if (h->kind == 2) {
             Vec3 to = pos + Vec3(h->lightDirX * -3000.0f, h->lightDirY * -3000.0f,
                                  h->lightDirZ * -3000.0f);
-            hit = terrain->Fn_506e90(&pos, &to, &out, 0, 0, 0);
+            hit = terrain->CastSegment(&pos, &to, &out, 0, 0, 0);
         } else {
-            hit = terrain->Fn_506e90(&pos, &h->lightPosition, &out, 0, 0, 0);
+            hit = terrain->CastSegment(&pos, &h->lightPosition, &out, 0, 0, 0);
         }
         if (hit != (unsigned char)inShadow) {
             for (int i = 0; i < attachmentCount; i++) {
@@ -783,13 +783,13 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     stepRemainder = 0.0f;
     UnknownVirtualSlot1(0.0f);
     sceneNode->SetPosition(0.0f, 0.0f, 0.0f);
-    sceneNode->Fn_004fbd10(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
+    sceneNode->SetAxes(0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0, 1);
     localCenterOfMass = g_Zero;
     rotationPivot = g_Zero;
 
     Vec3 extents;
     Vec3 center;
-    sceneNode->Fn_004fe850(&center, &extents);
+    sceneNode->GetSubtreeBounds(&center, &extents);
     float mass = bodyMass;
     Vec3* inertia = &shapeInvInertia;   // always non-null; the test only steers codegen
     float ident[9];
@@ -823,8 +823,8 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
     int prevTag = g_MemTagStack->Push("Collision");
     if (a20) {
         collisionObject = new(SP_FILE, 0x245) CollisionObject(1);
-        Fn_501230();
-        collisionObject->Fn_004320f0(a1, 0, 1, 1);
+        InstallCollisionCallbacks();
+        collisionObject->Configure(a1, 0, 1, 1);
     } else {
         collisionObject = 0;
     }
@@ -864,7 +864,7 @@ GameObject* SoultreePhysicsBaseObject::UnknownVirtualSlot2(int a1, int a2, Vec3 
 // ==== wave 3 (fork B): constructor, destructor, collision callbacks, frame step ====
 
 // ---- collision callbacks (0x00500c00, 0x00500c30) ----------------------------------------
-// Installed into the CollisionObject at field_0x128 by Fn_501230 (+0x88 / +0x8c).  The
+// Installed into the CollisionObject at field_0x128 by InstallCollisionCallbacks (+0x88 / +0x8c).  The
 // collision object's field_0x60 is its owner (this body) and the other object's field_0x64
 // its type tag (0x68 = another physics body).  The tag is recorded in field_0x134 and
 // forwarded to slot 38 together with the other collision object (tier 1 data flow).
@@ -884,7 +884,7 @@ static void SoultreeStaticCollisionCallback(CollisionObject* self, CollisionObje
 }
 
 // 0x00501230
-void SoultreePhysicsBaseObject::Fn_501230()
+void SoultreePhysicsBaseObject::InstallCollisionCallbacks()
 {
     collisionObject->onHitCallback = SoultreeCollisionCallback;
     collisionObject->onHitByCallback = SoultreeStaticCollisionCallback;
@@ -943,7 +943,7 @@ SoultreePhysicsBaseObject::~SoultreePhysicsBaseObject()
 }
 
 // ---- rest / settle check (0x00502c40) ------------------------------------------------------
-// Called once per frame by Fn_502f60.  Tier 3 reading: when the body is slow (speed
+// Called once per frame by RunSteps.  Tier 3 reading: when the body is slow (speed
 // field_0xbc < 2) and its angular velocity field_0xd8 is small on every axis, with at least
 // field_0x210 - 1 active contacts (field_0x1cc), the timer field_0x214 runs; after 0.5 s,
 // on more than one contact or on a single near-flat one (normal y > 0.95), the body is put
@@ -957,7 +957,7 @@ static inline float AbsF(float v)
     return v;
 }
 
-void SoultreePhysicsBaseObject::Fn_502c40()
+void SoultreePhysicsBaseObject::UpdateRestState()
 {
     int spinSlow;
     if (linearSpeed < 5.0f && AbsF(angularVelocity.y) < 0.98f && AbsF(angularVelocity.x) < 0.98f &&
@@ -1006,7 +1006,7 @@ int SoultreeRefreshContacts(int enabled, int* activeCount, int count, SoultreeCo
 
 // Per-frame update: skipped while asleep (field_0x10a); otherwise slot 9 splits dt into
 // fixed steps, slot 30 clears the contact flags, slot 39 handles a pending reset, the
-// contacts are refreshed (field_0x1d0 = any contact active), Fn_502f60 runs the steps and
+// contacts are refreshed (field_0x1d0 = any contact active), RunSteps runs the steps and
 // slot 21 refreshes the attachments.  Tier 2 for the call structure.
 int SoultreePhysicsBaseObject::GameObjectVirtualSlot10(float dt)
 {
@@ -1026,7 +1026,7 @@ int SoultreePhysicsBaseObject::GameObjectVirtualSlot10(float dt)
         if (refreshed)
             pointsTouching = touchingPointCount > 0;
     }
-    Fn_502f60(steps, held, refreshed);
+    RunSteps(steps, held, refreshed);
     UnknownVirtualSlot21();
     return 1;
 }
@@ -1098,7 +1098,7 @@ static inline float VecLengthRsq(const Vec3& v)
 // the residue is stack-slot packing (retail packs the integration temporary into the
 // respawn path's first vector and the merge outputs o3/o1 into its other two, with
 // `impulse` below `o2`).  Declaration order and scoping of the locals do not move it.
-void SoultreePhysicsBaseObject::Fn_502f60(int steps, int held, int refreshed)
+void SoultreePhysicsBaseObject::RunSteps(int steps, int held, int refreshed)
 {
     Vec3 up;
     float speed;
@@ -1164,7 +1164,7 @@ void SoultreePhysicsBaseObject::Fn_502f60(int steps, int held, int refreshed)
         }
         Vec3 zeroB = kVec3Zero;
         UnknownVirtualSlot13(&up, &zeroB, 1.0f);
-        Fn_502c40();
+        UpdateRestState();
         UnknownVirtualSlot14(&up, &zeroB, &zero);
         UnknownVirtualSlot26();
         position += (velocity * 3.0f - prevVelocity) * 0.5f * stepTime;
@@ -1222,7 +1222,7 @@ void SoultreePhysicsBaseObject::Fn_502f60(int steps, int held, int refreshed)
 // body-space angular velocity gains I^-1 (arm x n) * j, scaled per axis by *angScale.
 // Slot 3 passes field_0x14c, field_0x24, field_0x08, &field_0xe4 (body-space inverse
 // inertia diagonal), &field_0xd8 and &field_0x64.
-void Fn_500220(float restitution, float invMass, SoultreeObject* node, const Vec3* normal,
+void ResolveContactImpulse(float restitution, float invMass, SoultreeObject* node, const Vec3* normal,
                const Vec3* relVel, const Vec3* arm, Vec3* invInertia, const Vec3* angScale,
                Vec3* angVel, Vec3* velocity, float* impulseOut, int scaleBits)
 {

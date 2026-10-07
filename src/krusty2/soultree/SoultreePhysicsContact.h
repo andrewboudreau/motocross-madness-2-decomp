@@ -39,7 +39,7 @@ public:
     char materialId;  // +0xbc slot 18 indexes the track's per-material byte table (+0x400) with (unsigned char)materialId
 
     // 0x0043a640, thiscall, callee pops 5 args
-    void Fn_43a640(Vec3* a, Vec3* b, Vec3* c, Vec3* d, float e);
+    void UpdateRelativeMotion(Vec3* a, Vec3* b, Vec3* c, Vec3* d, float e);
 };
 
 // The object at SoultreePhysicsBaseObject::field_0x128 is a CollisionObject (0xb8 bytes,
@@ -57,7 +57,7 @@ public:
     int activeThisFrame;  // +0x60 slot 21 clears it every frame; slot 18 sets it to 1 when the emitter is placed at a contact
     char field_0x64[0x10];
     int renderFlags;                          // +0x74 flag word (slot 21 sets/clears bit 0x800)
-    void Fn_4b8d90(Vec3 v, int a);   // thiscall, callee pops 0x10
+    void SetPosition(Vec3 v, int a);   // 0x004b8d90 emitter position setter (ParticleEmitters.h: float intensity); thiscall, callee pops 0x10
     void Fn_4b8dd0(int a, int b, int c);     // thiscall, callee pops 0xc (slot 21: 0x40/0xff tint)
 };
 

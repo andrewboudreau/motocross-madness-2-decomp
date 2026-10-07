@@ -80,16 +80,16 @@ public:
     // which is both the Character and the D3DIMSoultreeCharacter start).
     // 0x004a6b10, thiscall, ret 4: takes a pointer to {int, elements, count} and qsorts (0x534426)
     // the 0x2c-byte records (tier 1 decode); D3DIM slot 2 passes the address of its pose list.
-    void Method_0x004a6b10(void* poseList);
+    void SortPoseList(void* poseList);
     // 0x004a6910, thiscall, ret 8: calls GameObject slot 8's body (0x004692f0, stores its argument in
     // field_0x18) with the first argument; the second argument is unused (tier 1 decode).
     void Method_0x004a6910(int a, int b);
     // 0x004a62d0 and 0x004a6500, thiscall, no arguments (plain ret). Both reference Motnctrl.cpp's
     // __FILE__ (0x0056e034) with debug new (lines 0x26b, 0x29d) and use the name strings at +0x8c / +0xdc /
     // +0x12c, so they belong to a different TU than D3DIMSoultreeMotnctrl.cpp (tier 1 decode).
-    void Method_0x004a62d0();
-    void Method_0x004a6500();
-    void Method_0x004a8b00();                               // ret
+    void LoadVut();
+    void LoadMir();
+    void ApplyRestPose();                               // ret
     // Motion control (src/krusty2/motion/Motnctrl.cpp; names tier 3, ABI from each body's ret N).
     int LoadMotions();                                      // 0x004a66c0
     void CaptureMotion(Motion* motion);                     // 0x004a6a60, ret 4

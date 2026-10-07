@@ -58,7 +58,7 @@ float Bike::UnknownVirtualSlot53()
 {
     if (crashState == 0) {
         float f = steerRate * stepTime;
-        steerState->Method_00504EC0(f, poseNode);
+        steerState->AddAngle(f, poseNode);
         return 1.0f;
     }
     return 1.0f - Method_0x0040a520();
@@ -294,7 +294,7 @@ int Bike::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,
                                const Vec3* d, int e, float f)
 {
     Matrix4 tmp;
-    Method_00525C60();
+    RunTickers();
     int r = Vehicle::UnknownVirtualSlot33(a, b, c, d, e, f);
     int mode = field_0x604->a_0x44;
     if (mode == 0 || mode == 1) {
@@ -511,7 +511,7 @@ void Bike::UnknownVirtualSlot41()
         return;
     poseNode->GetAxesIn(0, &savedForward, &savedUp);
     modelNode->SetAxesIn(0, &savedForward, &savedUp, 1, 0);
-    D3DIMSoultreeCharacter::Method_0x004a8b00();
+    D3DIMSoultreeCharacter::ApplyRestPose();
     field_0x430 = 0;
     UnknownVirtualSlot34();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
@@ -542,7 +542,7 @@ void Bike::UnknownVirtualSlot41()
             field_0x520 = 5;
     }
     for (int i = 0; i < wheelCount; i++)
-        wheelList[i]->Method_00515660();
+        wheelList[i]->UpdateAttachment();
 }
 
 void Bike::UnknownVirtualSlot102(float)
@@ -768,7 +768,7 @@ static __forceinline void BikeAttachBone(Bike* self, const char* name, float x, 
     offset.x = x;
     offset.y = y;
     offset.z = z;
-    int bone = self->field_0x604->a_0x34->r_0x1a0->Method_0x004fdae0(name);
+    int bone = self->field_0x604->a_0x34->r_0x1a0->FindByName(name);
     self->field_0x604->Method_0x00532900(offset, bone);
 }
 
@@ -1333,7 +1333,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         }
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
             Vec3 pos = ((BikeContactSet*)collisionObject)->field_0xa0;
-            ((VehicleImpactSink*)field_0x5ac)->Method_004B9DC0(pos);
+            ((VehicleImpactSink*)field_0x5ac)->SetPosition(pos);
             Vec3 p;
             p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
             ((VehicleImpactSink*)field_0x5ac)->scrapeVector = p;
@@ -1367,7 +1367,7 @@ void Bike::UnknownVirtualSlot38(int a, int b, void* c)
         s.x = 1.0f; s.y = 1.0f; s.z = 1.0f;
         if (field_0x124 && (field_0x124->statusFlags & 1)) {
             Vec3 pos = ((BikeContactSet*)collisionObject)->field_0xa0;
-            ((VehicleImpactSink*)field_0x5ac)->Method_004B9DC0(pos);
+            ((VehicleImpactSink*)field_0x5ac)->SetPosition(pos);
             Vec3 p;
             p.x = 0.0f; p.y = 12.0f; p.z = 0.0f;
             ((VehicleImpactSink*)field_0x5ac)->scrapeVector = p;

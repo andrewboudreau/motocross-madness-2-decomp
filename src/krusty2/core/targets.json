@@ -32,7 +32,7 @@
   {
     "class": "GraphicsTest",
     "source": "GraphicsTest.cpp",
-    "candidate_symbol_contains": "?Fn_0047c0b0",
+    "candidate_symbol_contains": "?DrawSphere",
     "target_va": "0x0047c0b0",
     "target_size": 434,
     "expect": "exact",
@@ -72,7 +72,7 @@
   {
     "class": "GraphicsTest",
     "source": "GraphicsTest.cpp",
-    "candidate_symbol_contains": "?Fn_0047c6c0",
+    "candidate_symbol_contains": "?SetDrawRGBA",
     "target_va": "0x0047c6c0",
     "target_size": 37,
     "expect": "exact",
@@ -82,7 +82,7 @@
   {
     "class": "GraphicsTest",
     "source": "GraphicsTest.cpp",
-    "candidate_symbol_contains": "?Fn_0047c6f0",
+    "candidate_symbol_contains": "?BeginAlphaBlend",
     "target_va": "0x0047c6f0",
     "target_size": 71,
     "expect": "exact",

@@ -209,7 +209,7 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot2()
         poseList.poses[i].axisZ = axisZ;
         poseList.poses[i].axisY = axisY;
     }
-    Method_0x004a6b10(&poseList);
+    SortPoseList(&poseList);
 }
 
 // Global registry (pointer at 0x00572b44): a list of entries keyed by an owner pointer at entry+0x10.
@@ -330,8 +330,8 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot9(int a)
     nodeCount = modelNode->CountNodes();
     nodeNames = (NodeNameEntry*)operator new(nodeCount << 6, __FILE__, 0x11b);
     FillNodeNames(0, nodeNames, modelNode);
-    Method_0x004a6500();
-    Method_0x004a62d0();
+    LoadMir();
+    LoadVut();
     modelNode->RegisterNode();
 }
 
@@ -387,8 +387,8 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot0()
     nodeCount = modelNode->CountNodes();
     nodeNames = (NodeNameEntry*)operator new(nodeCount << 6, __FILE__, 0x100);
     FillNodeNames(0, nodeNames, modelNode);
-    Method_0x004a6500();
-    Method_0x004a62d0();
+    LoadMir();
+    LoadVut();
 }
 
 // Helpers of slot 11 (all names tier 3).

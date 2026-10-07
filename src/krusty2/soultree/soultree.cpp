@@ -113,14 +113,14 @@ SoultreeObject::SoultreeObject(int a)
 {
     parent = 0;
     firstChild = 0;
-    field_0x148 = 0;
+    prevSibling = 0;
     nextSibling = 0;
     SetIdentity(&localMatrix);
     memset(&worldMatrix, 0, sizeof(worldMatrix));
     worldValid = 0;
     field_0x190 = 1;
-    field_0x198 = 15;
-    field_0x194 = 0;
+    quadtreeCell = 15;
+    inQuadtree = 0;
     field_0x14c = 0;
     field_0x150 = 0;
     localBoundsValid = 0;
@@ -138,7 +138,7 @@ SoultreeObject::SoultreeObject(int a)
     subtreeBoundsB.y = 0;
     subtreeBoundsB.z = 0;
     name[0] = 0;
-    field_0x19c = 0;
+    loadedNodeCount = 0;
     field_0x1c[8] = objectTypeId = g_TypeRegistry->FindTypeId("SoultreeObject");
 }
 
@@ -153,7 +153,7 @@ SoultreeObject::~SoultreeObject()
             firstChild->nextSibling->BaseObjectVirtualSlot2();
         firstChild->BaseObjectVirtualSlot2();
     }
-    Fn_4fed70();
+    RemoveFromQuadtree();
     UnregisterNode();
 }
 
@@ -201,7 +201,7 @@ void SoultreeObject::InvalidateSiblingChain()
 }
 
 // 0x004fbd10.
-void SoultreeObject::Fn_004fbd10(float zx, float zy, float zz, float yx, float yy, float yz,
+void SoultreeObject::SetAxes(float zx, float zy, float zz, float yx, float yy, float yz,
                                  int orthogonalize, int keepZ)
 {
     Vec3 z(zx, zy, zz);
@@ -484,7 +484,7 @@ void SoultreeObject::AppendSibling(SoultreeObject* node)
         nextSibling->AppendSibling(node);
     } else {
         nextSibling = node;
-        node->field_0x148 = (int)this;
+        node->prevSibling = this;
     }
 }
 
@@ -499,15 +499,15 @@ void SoultreeObject::RemoveChild(SoultreeObject* child)
     if (n == firstChild)
         firstChild = n->nextSibling;
     if (n->nextSibling)
-        n->nextSibling->field_0x148 = n->field_0x148;
-    if (n->field_0x148)
-        ((SoultreeObject*)n->field_0x148)->nextSibling = n->nextSibling;
+        n->nextSibling->prevSibling = n->prevSibling;
+    if (n->prevSibling)
+        n->prevSibling->nextSibling = n->nextSibling;
     if (n->parent)
         n->parent = 0;
     if (n->nextSibling)
         n->nextSibling = 0;
-    if (n->field_0x148)
-        n->field_0x148 = 0;
+    if (n->prevSibling)
+        n->prevSibling = 0;
 }
 
 // 0x004fda30. Nodes in this node's sibling chain and below it, this node included.
@@ -573,11 +573,11 @@ void SoultreeObject::ClearFlag14c()
 // 0x004fdb60.
 void SoultreeObject::LoadFromParameters(UnknownParameterStream* stream, int offset)
 {
-    field_0x1a0 = new(__FILE__, 0x346) UnknownParameterBlock;
-    field_0x1a0->UnknownFunction4b77a0(stream, offset, 1);
+    parameterBlock = new(__FILE__, 0x346) UnknownParameterBlock;
+    parameterBlock->UnknownFunction4b77a0(stream, offset, 1);
     UnknownVirtualSlot3();
-    if (field_0x1a0)
-        delete field_0x1a0;
+    if (parameterBlock)
+        delete parameterBlock;
 }
 
 // 0x004fdc00. Slot 2: reads a whole hierarchy from a binary stream: the node count, then per
@@ -587,9 +587,9 @@ void SoultreeObject::UnknownVirtualSlot2(SoultreeFileStream* stream)
 {
     SoultreeObject* nodes[256];
     int i;
-    stream->Read(&field_0x19c, 4, 1);
+    stream->Read(&loadedNodeCount, 4, 1);
     nodes[0] = this;
-    for (i = 0; i < field_0x19c; i++) {
+    for (i = 0; i < loadedNodeCount; i++) {
         if (i != 0)
             UnknownVirtualSlot4(&nodes[i]);
         stream->Read(nodes[i]->name, 0x80, 1);
@@ -604,20 +604,20 @@ void SoultreeObject::UnknownVirtualSlot2(SoultreeFileStream* stream)
         nodes[i]->parent = 0;
         nodes[i]->firstChild = 0;
         nodes[i]->nextSibling = 0;
-        nodes[i]->field_0x148 = 0;
+        nodes[i]->prevSibling = 0;
         nodes[i]->worldValid = 0;
-        nodes[i]->field_0x1a0 = 0;
+        nodes[i]->parameterBlock = 0;
     }
-    int* parents = new(__FILE__, 0x370) int[field_0x19c];
-    stream->Read(parents, 4, field_0x19c);
-    for (i = 0; i < field_0x19c; i++) {
+    int* parents = new(__FILE__, 0x370) int[loadedNodeCount];
+    stream->Read(parents, 4, loadedNodeCount);
+    for (i = 0; i < loadedNodeCount; i++) {
         if (parents[i] != -1)
             nodes[parents[i]]->AddChild(nodes[i]);
     }
 }
 
 // 0x004fddc0. Slot 3: reads the "Object Hierarchy" section of the parameter block
-// field_0x1a0: one row per node with its name, its parent's name and the 3x4 local matrix.
+// parameterBlock: one row per node with its name, its parent's name and the 3x4 local matrix.
 // Rows whose parent is not "NONE" are attached to the node of that name.
 void SoultreeObject::UnknownVirtualSlot3()
 {
@@ -627,27 +627,27 @@ void SoultreeObject::UnknownVirtualSlot3()
     int count;
     int i, j;
     parent = 0;
-    count = field_0x1a0->UnknownFunction4b7f70("Object Hierarchy");
-    field_0x19c = count;
+    count = parameterBlock->UnknownFunction4b7f70("Object Hierarchy");
+    loadedNodeCount = count;
     nodes[0] = this;
     for (i = 1; i < count; i++)
         UnknownVirtualSlot4(&nodes[i]);
     for (i = 0; i < count; i++) {
-        field_0x1a0->UnknownFunction4b8010(0);
-        field_0x1a0->UnknownFunction4b8200(0, nodes[i]->name);
-        field_0x1a0->UnknownFunction4b8200(1, parentNames[i]);
-        field_0x1a0->UnknownFunction4b81c0(2, &nodes[i]->localMatrix._11);
-        field_0x1a0->UnknownFunction4b81c0(3, &nodes[i]->localMatrix._12);
-        field_0x1a0->UnknownFunction4b81c0(4, &nodes[i]->localMatrix._13);
-        field_0x1a0->UnknownFunction4b81c0(5, &nodes[i]->localMatrix._21);
-        field_0x1a0->UnknownFunction4b81c0(6, &nodes[i]->localMatrix._22);
-        field_0x1a0->UnknownFunction4b81c0(7, &nodes[i]->localMatrix._23);
-        field_0x1a0->UnknownFunction4b81c0(8, &nodes[i]->localMatrix._31);
-        field_0x1a0->UnknownFunction4b81c0(9, &nodes[i]->localMatrix._32);
-        field_0x1a0->UnknownFunction4b81c0(10, &nodes[i]->localMatrix._33);
-        field_0x1a0->UnknownFunction4b81c0(11, &nodes[i]->localMatrix._41);
-        field_0x1a0->UnknownFunction4b81c0(12, &nodes[i]->localMatrix._42);
-        field_0x1a0->UnknownFunction4b81c0(13, &nodes[i]->localMatrix._43);
+        parameterBlock->UnknownFunction4b8010(0);
+        parameterBlock->UnknownFunction4b8200(0, nodes[i]->name);
+        parameterBlock->UnknownFunction4b8200(1, parentNames[i]);
+        parameterBlock->UnknownFunction4b81c0(2, &nodes[i]->localMatrix._11);
+        parameterBlock->UnknownFunction4b81c0(3, &nodes[i]->localMatrix._12);
+        parameterBlock->UnknownFunction4b81c0(4, &nodes[i]->localMatrix._13);
+        parameterBlock->UnknownFunction4b81c0(5, &nodes[i]->localMatrix._21);
+        parameterBlock->UnknownFunction4b81c0(6, &nodes[i]->localMatrix._22);
+        parameterBlock->UnknownFunction4b81c0(7, &nodes[i]->localMatrix._23);
+        parameterBlock->UnknownFunction4b81c0(8, &nodes[i]->localMatrix._31);
+        parameterBlock->UnknownFunction4b81c0(9, &nodes[i]->localMatrix._32);
+        parameterBlock->UnknownFunction4b81c0(10, &nodes[i]->localMatrix._33);
+        parameterBlock->UnknownFunction4b81c0(11, &nodes[i]->localMatrix._41);
+        parameterBlock->UnknownFunction4b81c0(12, &nodes[i]->localMatrix._42);
+        parameterBlock->UnknownFunction4b81c0(13, &nodes[i]->localMatrix._43);
     }
     for (i = 0; i < count; i++) {
         if (_stricmp(parentNames[i], "NONE")) {
@@ -701,7 +701,7 @@ void SoultreeObject::UpdateSubtreeBounds()
 }
 
 // 0x004fe850.
-void SoultreeObject::Fn_004fe850(Vec3* center, Vec3* extents)
+void SoultreeObject::GetSubtreeBounds(Vec3* center, Vec3* extents)
 {
     if (subtreeDirty)
         UpdateSubtreeBounds();
@@ -728,7 +728,7 @@ void SoultreeObject::UnknownVirtualSlot8(SoultreeObject* src, SoultreeObject* ds
     if (src->nextSibling) {
         UnknownVirtualSlot4(&dst->nextSibling);
         dst->nextSibling->parent = dst->parent;
-        dst->nextSibling->field_0x148 = (int)dst;
+        dst->nextSibling->prevSibling = dst;
         UnknownVirtualSlot8(src->nextSibling, dst->nextSibling);
     } else {
         dst->nextSibling = 0;
@@ -763,29 +763,29 @@ void SoultreeObject::UnknownVirtualSlot6()
 }
 
 // 0x004fecd0.
-void SoultreeObject::Fn_4fecd0()
+void SoultreeObject::UpdateQuadtreeCell()
 {
     Vec3 lo, hi;
     GetWorldBounds(&lo, &hi);
     unsigned int code = g_quadTree->ComputeCode(lo.x, lo.z, hi.x, hi.z);
-    if (code != (unsigned int)field_0x198) {
-        if (field_0x198 != 15)
-            g_quadTree->Remove(this, field_0x198);
-        field_0x198 = code;
+    if (code != (unsigned int)quadtreeCell) {
+        if (quadtreeCell != 15)
+            g_quadTree->Remove(this, quadtreeCell);
+        quadtreeCell = code;
         if (code != 15)
             g_quadTree->Insert(this, code, lo.y, hi.y);
     } else {
-        g_quadTree->UpdateRange(this, field_0x198, lo.y, hi.y);
+        g_quadTree->UpdateRange(this, quadtreeCell, lo.y, hi.y);
     }
 }
 
 // 0x004fed70.
-void SoultreeObject::Fn_4fed70()
+void SoultreeObject::RemoveFromQuadtree()
 {
-    if (field_0x194 && g_quadTree && field_0x198 != 15)
-        g_quadTree->Remove(this, field_0x198);
-    field_0x194 = 0;
-    field_0x198 = 15;
+    if (inQuadtree && g_quadTree && quadtreeCell != 15)
+        g_quadTree->Remove(this, quadtreeCell);
+    inQuadtree = 0;
+    quadtreeCell = 15;
 }
 
 // 0x004fedb0. Appends this node to the node array unless it is listed already; the array

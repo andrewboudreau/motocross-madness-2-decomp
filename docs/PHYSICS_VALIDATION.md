@@ -178,7 +178,7 @@ partial `UpdateWorldMatrix`.
 - `core/SoultreeObject.h` gives the real QuadTreeObject + GameObject bases
   only when `SOULTREE_OBJECT_WITH_BASES` is defined. Other physics code
   keeps the flat view.
-- `Fn_004fbd10`'s seventh argument is an int.
+- `SetAxes`'s seventh argument is an int.
 - The helpers samples keep the near misses: LocalToWorldPoint,
   WorldToLocalDirection, WorldToLocalPoint, SetAxesPtr, SetMatrixIn,
   GetMatrixIn, SetAxesIn and RotateAboutPoint.
@@ -215,12 +215,12 @@ Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.jso
   the input map's value source via its slots 15/16), the GameObject slot 10 override
   `0x0052a830` (vtordisp thunk `0x0052b690`; calls `GameObject::GameObjectVirtualSlot10`
   directly, not SoultreePhysicsCharacter's) and the wheel placement pass
-  `Method_00528EB0` `0x00528eb0` (shock retract 0.25/0.75 of the last step via
+  `PlaceWheels` `0x00528eb0` (shock retract 0.25/0.75 of the last step via
   `0x004fa310`/`0x004fab60`, probe `0x00514550`, `ClearForces` `0x004f9c70` called
   non-virtually; the flag `unflagged = 1` must be set after the `wheelCount == 0` return).
 - Vehicle.cpp, former partials: slot 58 `0x005289c0` (`top = wheelList[i]; second = top;`
-  instead of `second = top = w`), `Method_00528400` `0x00528400`, slot 54 `0x00528530`,
-  slot 75 `0x0052b790` and `Method_00529C20` `0x00529c20` (plain `*up += ...;
+  instead of `second = top = w`), `GetAverageGroundNormal` `0x00528400`, slot 54 `0x00528530`,
+  slot 75 `0x0052b790` and `AccumulateWheelContacts` `0x00529c20` (plain `*up += ...;
   scratchVector2 = slot76(...); scratchVector = WorldToLocalDirection(...)`).
 - Bike.cpp: slot 76 `0x00406840`; slots 1, 5, 39, 41, 56, 57, 59, 73 and 75 were already
   exact with the promoted source and only carried stale `partial` notes.
@@ -282,7 +282,7 @@ Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
 
 Still partial in SoulTreePhysics.cpp:
 
-- The sub-step loop `Fn_502f60` `0x00502f60` (1921 bytes) is now written out:
+- The sub-step loop `RunSteps` `0x00502f60` (1921 bytes) is now written out:
   1366/1942 bytes, every call, branch and x87 sequence in retail order.  What was learned:
   `prevSpeed = linearSpeed;` followed by a test of `prevSpeed` (not `linearSpeed`) gives
   retail's single `fld`/`fst`/`fcom`; the loop is `if (steps <= 0) return; do { ... } while

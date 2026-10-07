@@ -84,7 +84,7 @@ int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, int u
         Vec3 seg;
         if (nearest > 0) {
             seg = path->points[nearest] - path->points[nearest - 1];
-            Vec3 n = UnknownFunction40d120(Vec3(seg.z, 0.0f, -seg.x));
+            Vec3 n = SafeNormalize(Vec3(seg.z, 0.0f, -seg.x));
             if (!UnknownFunction47b800(path->points[nearest - 1].x, path->points[nearest - 1].z, seg.x, seg.z,
                                        pos.x, pos.z, n.x, n.z, &t, &offset))
                 return 0;
@@ -96,7 +96,7 @@ int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, int u
         }
         if (nearest < path->count - 1) {
             seg = path->points[nearest + 1] - path->points[nearest];
-            Vec3 n = UnknownFunction40d120(Vec3(seg.z, 0.0f, -seg.x));
+            Vec3 n = SafeNormalize(Vec3(seg.z, 0.0f, -seg.x));
             if (!UnknownFunction47b800(path->points[nearest].x, path->points[nearest].z, seg.x, seg.z,
                                        pos.x, pos.z, n.x, n.z, &t, &offset))
                 return 0;
@@ -122,7 +122,7 @@ int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, int u
                 len = BikeAILength(dir);
             }
         }
-        Vec3 n = UnknownFunction40d120(Vec3(dir.z, 0.0f, -dir.x));
+        Vec3 n = SafeNormalize(Vec3(dir.z, 0.0f, -dir.x));
         Vec3 target;
         if (best >= path->count - 1) {
             t = 0.0f;
@@ -139,7 +139,7 @@ int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, int u
             outDir->z = 1.0f;
             return 1;
         }
-        *outDir = UnknownFunction40d120(*outDir);
+        *outDir = SafeNormalize(*outDir);
         return 1;
     }
     Vec3 d = path->points[0] - pos;
@@ -147,7 +147,7 @@ int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, int u
     if (outDir->x == 0.0f && outDir->z == 0.0f)
         outDir->z = 1.0f;
     else
-        *outDir = UnknownFunction40d120(d);
+        *outDir = SafeNormalize(d);
     path->index = 0;
     path->t = 0.0f;
     return 1;

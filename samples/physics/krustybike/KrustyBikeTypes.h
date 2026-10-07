@@ -39,7 +39,7 @@ struct KbMode { char pad_0x00[0x94]; int Fn_00524100(); };
 struct KbGameCfg {
     char pad_0x0000[0x10]; int field_0x10;
     // 0x004AC830 (Net.cpp): send a message (type, data, size, destination id, flags); returns 1 on success.
-    int Fn_004AC830(int type, void* data, int size, int dest, int flags);
+    int Send(int type, void* data, int size, int dest, int flags);
 };
 // Object behind KrustyBike+0x13fc (tier 3); 0x004E8720 appends a record (type, id, data, flag).
 struct KbRecorder { int Fn_004E8720(int type, int id, void* data, int flag); };
@@ -90,7 +90,7 @@ struct KbNetPacket { int field_0x0; char field_0x4; char pad_0x5[3]; int field_0
 // On-screen message object (0x8C bytes; ctor 0x0051B200 takes the text and a display time).
 struct KbMessage { char data[0x8C]; KbMessage(const char* text, float seconds); };
 struct KbGame {
-    void Fn_00521970(int id, char* buffer, int size);   // 0x00521970: fetch text for a string id
+    void GetStringText(int id, char* buffer, int size);   // 0x00521970: fetch text for a string id
     char pad_0x0000[0x8];
     KbGameCfg* field_0x8; // 0x8
     char pad_0x000C[0xC];
@@ -167,7 +167,7 @@ struct KbRacer {
 
 struct KbRaceHandler {
     void Fn_004DE580(void* who, float a, int b);
-    void Fn_004E57D0(KrustyBike* who, float score);   // 0x004e57d0: reports a trick score
+    void ReportTrickScore(KrustyBike* who, float score);   // 0x004e57d0: reports a trick score
 };
 // Object at KbRace+0xbc: 0x00495ff0 hands it the trick angle and multiplier.
 struct KbScoreBoard { void Fn_0048D1E0(float angle, float multiplier); };
@@ -187,7 +187,7 @@ struct KbBonusTable {
 // Object reached through KrustyBike+0x740 (event/race context).
 struct KbRaceSub { int* field_0x0; };
 struct KbRace {
-    KrustyBike* Fn_004204E0(int* cursor);   // 0x004204E0: next bike of the race (cursor starts at 0)
+    KrustyBike* NextBike(int* cursor);   // 0x004204E0: next bike of the race (cursor starts at 0)
     char pad_0x0000[0x38];
     void* field_0x38; // 0x38
     char pad_0x003C[0x8];
@@ -239,7 +239,7 @@ struct KbSink {
 // transforms a vector.
 struct KbXform {
     void Fn_00444D80(KbObj128* who);   // 0x00444D80 (tier 3: attach/detach with a scene object)
-    Vec3 Fn_004FD710(const Vec3* v);
+    Vec3 WorldToLocalDirection(const Vec3* v);
 };
 // Element of the array at Bike+0x12c (count at +0x130).
 struct KbChild {
@@ -262,7 +262,7 @@ struct KbObj128 {
     void Fn_0047BBF0(float a);   // 0x0047BBF0 (tier 3)
 };
 struct KbDirector {
-    void Fn_004DCF20(KbObj128* who, int a);
+    void Remove(KbObj128* who, int a);
 };
 extern KbDirector* g_kbDirector; // pointer global at 0x0068ABA4
 
@@ -294,8 +294,8 @@ struct KbAnim;
 struct KbA5C4 {
     char pad_0x00[0x10];
     int field_0x10; // 0x10
-    KbAnim* Fn_004A6B30(const char* name, int a);
-    void Fn_004A8B40(int a);
+    KbAnim* FindMotion(const char* name, int a);
+    void SetMotion(int a);
     void Fn_004A8BF0(int a, float b);   // 0x004A8BF0 (ret 8): same as D3DIMSoultreeCharacter::Method_0x004a8bf0
 };
 struct KbA604 {
@@ -318,14 +318,14 @@ struct KbPlayer {
     Vehicle* field_0xdc;   // 0xDC
     void Fn_004A9E80(Vehicle* who, int a, int b);
 };
-// Bounds/collision body at Vehicle::field_0x128 (canonical: CollisionObject::Fn_004392c0).
-struct KbBody { int Fn_004392C0(KbBody* other); };
+// Bounds/collision body at Vehicle::field_0x128 (canonical: CollisionObject::TestMeshBounds).
+struct KbBody { int TestMeshBounds(KbBody* other); };
 
 // Non-virtual callees of slot 11 (cdecl; call targets are relocation-masked).  Tier 3 names.
 // 0x004B0AC0: probe at a position with three radii and a scale; returns a byte flag.
 unsigned char Kb_004B0AC0(Vec3* pos, float r0, float r1, float r2, float scale,
                           int a, int b, int c, int d);
-// 0x004B0DF0 (the query the base slot 11 issues) is Fn_4b0df0, declared in
+// 0x004B0DF0 (the query the base slot 11 issues) is FindObjectPlacement, declared in
 // ../contact/ObjectPlacement.h.
 
 #endif

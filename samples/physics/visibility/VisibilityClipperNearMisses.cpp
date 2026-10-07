@@ -75,12 +75,12 @@ int VisibilityClipper::SphereInFrustum(const VisibilityCamera* camera, const Vis
     depth += center->x * camera->matrixB[0][0];
     depth += camera->matrixB[3][0];
     nearDepth = depth - radius;
-    if (nearDepth > camera->field_0x1c0 || depth + radius < camera->field_0x1bc) {
+    if (nearDepth > camera->farPlane || depth + radius < camera->nearPlane) {
         if (fullyInside)
             *fullyInside = 0;
         return 0;
     }
-    if (depth + radius > camera->field_0x1c0 || nearDepth < camera->field_0x1bc)
+    if (depth + radius > camera->farPlane || nearDepth < camera->nearPlane)
         crosses = 1;
     spread = (camera->matrixC[1][0] + camera->matrixC[0][0]) * radius;
     spread += depth * camera->matrixC[2][0];

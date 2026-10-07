@@ -46,7 +46,7 @@ The committed files under `samples/physics/` are now the hand-edited source of t
 No generators wrote into `collision/` or `constraint/`. The scripts in `work/b2_collision`, `work/b_soultree_collision` and `work/f_constraint` only compile and match, so there was nothing to retire.
 
 - **`collision/SoultreePhysicsCharacter.h` is deleted.** `collision/SoultreePhysicsCharacter.cpp` includes the canonical header and `SoultreePhysicsCallees.h`.
-  - `field_0x21c.Fn_4a8b00()` became `Method_0x004a8b00()`.
+  - `field_0x21c.Fn_4a8b00()` became `ApplyRestPose()`.
   - `field_0x3bc` became `d3d_field_0x1a0`.
   - Slot 33's `a4` is `const SoultreeVec3*`.
 - **`collision/CollisionObject.h` is canonical.** `constraint/ConstraintBase.h` is deleted, and constraint includes `../collision/CollisionObject.h`.
@@ -136,7 +136,7 @@ A trial migration compiled against the canonical header and reproduced the same 
   - `#include "../hierarchy/SoultreePhysicsCharacter.h"`
   - `#include "../soultree_base/SoultreePhysicsCallees.h"`
 - **Code:**
-  - `field_0x21c.Fn_4a8b00()` becomes `Method_0x004a8b00()`.
+  - `field_0x21c.Fn_4a8b00()` becomes `ApplyRestPose()`.
   - `field_0x3bc->` becomes `d3d_field_0x1a0->`.
 - **Offset fixes:** none. 0x42c and 0x430..0x433 already sit in SoultreePhysicsCharacter.
 - **Placement:** `SoultreePhysicsObject` and `D3DIMSoultreeObject` are declared in `src/krusty2/soultree/SoultreePhysicsObject.h` (the SoultreeObject level is folded into D3DIMSoultreeObject); its ctor/dtor/slot 10 are in `SoulTreePhysics.cpp`, slot 40 (0x00503970) stays in collision.
@@ -171,7 +171,7 @@ A trial migration compiled against the canonical header and reproduced the same 
   - the stand-in `Vehicle`
 - **Include** `"../vehicle/Vehicle.h"` once it is migrated. Until then, include `"../hierarchy/SoultreePhysicsCharacter.h"` and keep a Vehicle stand-in with `char pad_0x434[0x188]` for 0x434..0x5bc, plus Vehicle's slot list.
 - **Code:**
-  - `D3IMSoultreeCharacter::Method_0x004a8b00/8bf0/8c50` becomes `D3DIMSoultreeCharacter::` (declared on `Character`, reachable through D3DIM).
+  - `D3IMSoultreeCharacter::ApplyRestPose/8bf0/8c50` becomes `D3DIMSoultreeCharacter::` (declared on `Character`, reachable through D3DIM).
   - `go_0x1c` becomes `field_0x18`, and `BikeGameObject::field_0x4.Method_0x00469190(...)` becomes `GameObject::Method_0x00469190(...)`.
 - **Offset fixes:**
   - The stand-in Vehicle's `int field_0x5bc` is Bike's own first field, since Vehicle's data ends at 0x5bc. Move it into Bike.

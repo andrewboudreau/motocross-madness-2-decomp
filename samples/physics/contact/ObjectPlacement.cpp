@@ -44,7 +44,7 @@ static void PlacementNormalizeInPlace(Vec3* v)
         *v *= FastInvSqrt(lenSq);
 }
 
-int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int f, int g, int h,
+int FindObjectPlacement(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int f, int g, int h,
               float i, unsigned char j, const Vec3* k, const Vec3* l, int m, Vec3* n, Vec3* o,
               Vec3* p, int* q)
 {
@@ -70,7 +70,7 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
 
         if (firstPass) {
             centerPt = *c;
-            ((PlacementProbe*)b)->Fn_507c10(&centerPt, &centerOut, 1, &centerHit);
+            ((PlacementProbe*)b)->QueryGround(&centerPt, &centerOut, 1, &centerHit);
             centerHit &= j;
         }
 
@@ -78,9 +78,9 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
             canPlace = 0;
             if (q && !centerHit) {
                 CollisionObject* obj = new(__FILE__, 0x172) CollisionObject(1);
-                obj->Fn_004320f0(0, 1, 1, 0);
+                obj->Configure(0, 1, 1, 0);
                 obj->ignoreVegetation = 1;
-                obj->SetField_0x74(1);
+                obj->SetIgnoreListMode(1);
                 obj->AddIgnoredOwner(a);
 
                 // two-point vertical sweep: (0,1,0) and (0,-1,0)
@@ -89,7 +89,7 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
                 sweep[1] = g_PlacementZero;
                 sweep[0].y = 1.0f;
                 sweep[1].y = -1.0f;
-                obj->Fn_00432ab0(1, sweep);
+                obj->SetMeshShape(1, sweep);
 
                 // orthonormal basis from the axes
                 Vec3 forward = g_PlacementAxisZ;
@@ -111,7 +111,7 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
                 xf._31 = forward.x; xf._32 = forward.y; xf._33 = forward.z; xf._34 = 0.0f;
                 xf._41 = c->x;      xf._42 = c->y;      xf._43 = c->z;      xf._44 = 1.0f;
                 obj->SetTransform(&xf);
-                obj->Fn_00438e70();
+                obj->QueryCollisions();
 
                 if (obj->hasContact != 0) {
                     // contact: rec[0] = fraction, rec + 8 = contact normal (tier 3)
@@ -146,7 +146,7 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
         else if (Fn_4b08f0(&plusAPt, margin, a, f, g, 1, 0))
             plusAHit = 1;
         else {
-            ((PlacementProbe*)b)->Fn_507c10(&plusAPt, &plusAOut, 1, &plusAHit);
+            ((PlacementProbe*)b)->QueryGround(&plusAPt, &plusAOut, 1, &plusAHit);
             plusAHit &= j;
         }
 
@@ -156,7 +156,7 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
         else if (Fn_4b08f0(&minusAPt, margin, a, f, g, 1, 0))
             minusAHit = 1;
         else {
-            ((PlacementProbe*)b)->Fn_507c10(&minusAPt, &minusAOut, 1, &minusAHit);
+            ((PlacementProbe*)b)->QueryGround(&minusAPt, &minusAOut, 1, &minusAHit);
             minusAHit &= j;
         }
 
@@ -166,7 +166,7 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
         else if (Fn_4b08f0(&plusCPt, margin, a, f, g, 1, 0))
             plusCHit = 1;
         else {
-            ((PlacementProbe*)b)->Fn_507c10(&plusCPt, &plusCOut, 1, &plusCHit);
+            ((PlacementProbe*)b)->QueryGround(&plusCPt, &plusCOut, 1, &plusCHit);
             plusCHit &= j;
         }
 
@@ -176,7 +176,7 @@ int Fn_4b0df0(CollisionObject* a, SoultreeProbe* b, Vec3* c, float d, int e, int
         else if (Fn_4b08f0(&minusCPt, margin, a, f, g, 1, 0))
             minusCHit = 1;
         else {
-            ((PlacementProbe*)b)->Fn_507c10(&minusCPt, &minusCOut, 1, &minusCHit);
+            ((PlacementProbe*)b)->QueryGround(&minusCPt, &minusCOut, 1, &minusCHit);
             minusCHit &= j;
         }
 

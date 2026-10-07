@@ -57,7 +57,7 @@ GraphicsTest::~GraphicsTest()
 }
 
 // 0x0047c0b0: a wire sphere: `segments` circles about the y axis, then about the z axis.
-void GraphicsTest::Fn_0047c0b0(const Vec3* center, float radius, int segments)
+void GraphicsTest::DrawSphere(const Vec3* center, float radius, int segments)
 {
     int i;
     Vec3 axis = Vec3(0.0f, 1.0f, 0.0f);
@@ -66,7 +66,7 @@ void GraphicsTest::Fn_0047c0b0(const Vec3* center, float radius, int segments)
     for (i = 0; i < segments; i++) {
         float h = radius - i * (radius / (segments * 0.5f));
         float r = FastSqrt(radius * radius - h * h);
-        Fn_0047bd10(&p, r, &axis, segments);
+        DrawCircle(&p, r, &axis, segments);
         p.y += radius / (segments * 0.5f);
     }
     axis = Vec3(0.0f, 0.0f, 1.0f);
@@ -75,7 +75,7 @@ void GraphicsTest::Fn_0047c0b0(const Vec3* center, float radius, int segments)
     for (i = 0; i < segments; i++) {
         float h = radius - i * (radius / (segments * 0.5f));
         float r = FastSqrt(radius * radius - h * h);
-        Fn_0047bd10(&p, r, &axis, segments);
+        DrawCircle(&p, r, &axis, segments);
         p.z += radius / (segments * 0.5f);
     }
 }
@@ -140,13 +140,13 @@ void GraphicsTest::SetDrawColor(int r, int g, int b)
 }
 
 // 0x0047c6c0
-void GraphicsTest::Fn_0047c6c0(int a, int b, int c, int d)
+void GraphicsTest::SetDrawRGBA(int r, int g, int b, int a)
 {
-    drawColor = RGBA_MAKE(a, b, c, d);
+    drawColor = RGBA_MAKE(r, g, b, a);
 }
 
 // 0x0047c6f0: untextured, diffuse alpha, alpha blending on.
-void GraphicsTest::Fn_0047c6f0()
+void GraphicsTest::BeginAlphaBlend()
 {
     RENDERER()->SetTexture(0);
     RENDERER()->SetTextureStageState(0, 1, 1);

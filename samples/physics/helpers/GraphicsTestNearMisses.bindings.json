@@ -2,7 +2,7 @@
   "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600",
   "?DrawBox@GraphicsTest@@QAEXPBUVec3@@0PBUMatrix4@@@Z": "0x0047c270",
   "?DrawLine@GraphicsTest@@QAEXPBUVec3@@0@Z": "0x0047c4f0",
-  "?Fn_0047bd10@GraphicsTest@@QAEXPBUVec3@@M0H@Z": "0x0047bd10",
+  "?DrawCircle@GraphicsTest@@QAEXPBUVec3@@M0H@Z": "0x0047bd10",
   "?Vec3Normalize@@YA?AUVec3@@ABU1@@Z": "0x005087b0",
   "_$E1": "0x0047c750",
   "_$E10": "0x0047c840",

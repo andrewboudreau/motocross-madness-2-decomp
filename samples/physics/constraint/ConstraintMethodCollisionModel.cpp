@@ -66,7 +66,7 @@ ConstraintMethodCollisionModel::~ConstraintMethodCollisionModel()
 
 GameObject* ConstraintMethodCollisionModel::GameObjectVirtualSlot8(int a)
 {
-    Fn_004320f0(a, 1, 1, 1);
+    Configure(a, 1, 1, 1);
     onHitCallback = ConstraintContactCallback;
     onHitByCallback = CollisionEmptyCallback;
     ownerObject = this;
@@ -89,10 +89,10 @@ void ConstraintMethodCollisionModel::SetBody(ConBody* b, int useNodeModel, const
 {
     body = b;
     if (useNodeModel && !arg)
-        Fn_004324b0(b->node, 1, 0, 0, 0);
+        SetModelShape(b->node, 1, 0, 0, 0);
     else
-        Fn_00432800(b->node, arg);
-    Fn_00435fb0();
+        LoadShape(b->node, arg);
+    UpdatePlacement();
 }
 
 void ConstraintMethodCollisionModel::AddProbePoint(ConVec3 point, ConNode* node)
@@ -120,9 +120,9 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
             Fn_00435fe0();
             refreshPending = 0;
         } else {
-            Fn_00435fb0();
+            UpdatePlacement();
         }
-        if (shapeCollisionEnabled && Fn_00438e70()) {
+        if (shapeCollisionEnabled && QueryCollisions()) {
             const ConVec3* n = (const ConVec3*)contactRecord;
             ConVec3 pos;
             body->node->GetPositionIn(0, &pos);
@@ -134,7 +134,7 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
             pos.y -= d.y;
             pos.z -= d.z;
             body->node->SetPositionIn(0, &pos);
-            Fn_00435fb0();
+            UpdatePlacement();
         }
     }
     if (groundQuery) {
@@ -178,7 +178,7 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
             pos.y -= step.y;
             pos.z -= step.z;
             body->node->SetPositionIn(0, &pos);
-            Fn_00435fb0();
+            UpdatePlacement();
             hasContact = 1;
         }
     }

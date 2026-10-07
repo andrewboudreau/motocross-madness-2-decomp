@@ -1,10 +1,10 @@
 {
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
-  "?UnknownFunction40d120@@YA?AUVec3@@U1@@Z": "0x0040d120",
-  "?UnknownFunction40e370@@YAHUVec3@@0PAMPAU1@2PAVTerrain@@@Z": "0x0040e370",
+  "?SafeNormalize@@YA?AUVec3@@U1@@Z": "0x0040d120",
+  "?PredictLanding@@YAHUVec3@@0PAMPAU1@2PAVTerrain@@@Z": "0x0040e370",
   "?UnknownFunction40e510@@YAHPAUVec3@@U1@PAUUnknownBikeAIPath@@HM@Z": "0x0040e510",
-  "?UnknownFunction413190@@YAMPBUVec3@@@Z": "0x00413190",
+  "?Vec3Magnitude@@YAMPBUVec3@@@Z": "0x00413190",
   "?UnknownFunction47b800@@YAHMMMMMMMMPAM0@Z": "0x0047b800",
   "?g_BikeAIFilter_00577ac0@@3UUnknownBikeAIFilter@@A": "0x00577ac0",
   "?g_BikeAIGame_0056e26c@@3PAUUnknownBikeAIGameView@@A": "0x0056e26c",

@@ -62,7 +62,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00432120@CollisionObject",
+    "candidate_symbol_contains": "SetUseBroadphase@CollisionObject",
     "target_va": "0x00432120",
     "target_size": 93,
     "expect": "exact",
@@ -102,7 +102,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_004324b0",
+    "candidate_symbol_contains": "SetModelShape",
     "target_va": "0x004324b0",
     "target_size": 615,
     "expect": "exact",
@@ -112,7 +112,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00432720",
+    "candidate_symbol_contains": "SetHullShape",
     "target_va": "0x00432720",
     "target_size": 214,
     "expect": "exact",
@@ -122,7 +122,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00432800",
+    "candidate_symbol_contains": "LoadShape",
     "target_va": "0x00432800",
     "target_size": 164,
     "expect": "exact",
@@ -132,7 +132,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_004328b0",
+    "candidate_symbol_contains": "SetTriangleMeshHullShape",
     "target_va": "0x004328b0",
     "target_size": 231,
     "expect": "exact",
@@ -162,7 +162,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00432ab0@CollisionObject",
+    "candidate_symbol_contains": "SetMeshShape@CollisionObject",
     "target_va": "0x00432ab0",
     "target_size": 122,
     "expect": "exact",
@@ -252,7 +252,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00434a10@CollisionObject",
+    "candidate_symbol_contains": "ResetHitState@CollisionObject",
     "target_va": "0x00434a10",
     "target_size": 407,
     "expect": "exact",
@@ -262,7 +262,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00434bb0@CollisionObject",
+    "candidate_symbol_contains": "StoreHitResult@CollisionObject",
     "target_va": "0x00434bb0",
     "target_size": 303,
     "expect": "partial",
@@ -272,7 +272,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00434cf0@CollisionObject",
+    "candidate_symbol_contains": "StoreHitNormal@CollisionObject",
     "target_va": "0x00434cf0",
     "target_size": 446,
     "expect": "partial",
@@ -312,7 +312,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00435f10@CollisionObject",
+    "candidate_symbol_contains": "SyncTransformFromNode@CollisionObject",
     "target_va": "0x00435f10",
     "target_size": 160,
     "expect": "exact",
@@ -322,7 +322,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00435fb0@CollisionObject",
+    "candidate_symbol_contains": "UpdatePlacement@CollisionObject",
     "target_va": "0x00435fb0",
     "target_size": 36,
     "expect": "exact",
@@ -352,7 +352,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00436080@CollisionObject",
+    "candidate_symbol_contains": "UpdateQuadtreeCell@CollisionObject",
     "target_va": "0x00436080",
     "target_size": 115,
     "expect": "exact",
@@ -542,7 +542,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_004392c0@CollisionObject",
+    "candidate_symbol_contains": "TestMeshBounds@CollisionObject",
     "target_va": "0x004392c0",
     "target_size": 311,
     "expect": "partial",
@@ -552,7 +552,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "SetField_0x74@CollisionObject",
+    "candidate_symbol_contains": "SetIgnoreListMode@CollisionObject",
     "target_va": "0x00439400",
     "target_size": 10,
     "expect": "exact",
@@ -602,7 +602,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00439e10",
+    "candidate_symbol_contains": "ReadShape",
     "target_va": "0x00439e10",
     "target_size": 178,
     "expect": "exact",
@@ -612,7 +612,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "?Fn_004394f0@@",
+    "candidate_symbol_contains": "?SphereTouchesObject@@",
     "target_va": "0x004394f0",
     "target_size": 257,
     "expect": "exact",
@@ -702,7 +702,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00439ed0@CollisionObject",
+    "candidate_symbol_contains": "ReadHullShape@CollisionObject",
     "target_va": "0x00439ed0",
     "target_size": 376,
     "expect": "exact",
@@ -712,7 +712,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_0043a050@CollisionObject",
+    "candidate_symbol_contains": "ReadModelShape@CollisionObject",
     "target_va": "0x0043a050",
     "target_size": 387,
     "expect": "exact",
@@ -742,7 +742,7 @@
   {
     "class": "CollisionObject",
     "source": "CollisionObject.cpp",
-    "candidate_symbol_contains": "Fn_00438e70@CollisionObject",
+    "candidate_symbol_contains": "QueryCollisions@CollisionObject",
     "target_va": "0x00438e70",
     "target_size": 1102,
     "expect": "exact",

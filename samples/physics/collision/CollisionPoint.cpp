@@ -38,7 +38,7 @@ CollisionPoint* AddCollisionPoint(int capacity, CollisionPoint** points, const C
 //               otherwise normalise(c); field_0x94 = |c|
 //   otherwise:  field_0x90 = 0, tangent = normalise(c), field_0x94 = |c|
 // The tangent is stored in field_0x50; a degenerate (|c| <= 0.001) tangent is zero.
-void CollisionPoint::Fn_0043a640(const CollisionVec3* a1, const CollisionVec3* a2, const CollisionVec3* a3,
+void CollisionPoint::UpdateRelativeMotion(const CollisionVec3* a1, const CollisionVec3* a2, const CollisionVec3* a3,
                                  const CollisionVec3* a4, float a5)
 {
     relativePosition = worldPosition - *a1;
@@ -51,14 +51,14 @@ void CollisionPoint::Fn_0043a640(const CollisionVec3* a1, const CollisionVec3* a
         CollisionVec3 t;
         if (CollisionRejectFrom(&t, a3, &surfaceNormal)) {
             CollisionVec3 n;
-            t = *Fn_005087b0(&n, &t);
+            t = *Vec3Normalize(&n, &t);
         }
-        float f = Fn_0040ae30(&t, a3);
+        float f = Vec3DotCall(&t, a3);
         tangentSpeed = f;
         if (f > 0.001f) {
             CollisionVec3 v1 = CollisionVec3(t.x * f, t.y * f, t.z * f);
             CollisionVec3 w = CollisionVec3(v1.x + c.x, v1.y + c.y, v1.z + c.z);
-            float m = Fn_0040ae30(&w, &w);
+            float m = Vec3DotCall(&w, &w);
             float len;
             if (m == 0.0f)
                 len = 0.0f;
@@ -68,14 +68,14 @@ void CollisionPoint::Fn_0043a640(const CollisionVec3* a1, const CollisionVec3* a
                 len = 1.0f / FastInvSqrt(m);
             float k = 1.0f / len;
             frictionDirection = CollisionVec3(w.x * k, w.y * k, w.z * k);
-            float cm = Fn_0040ae30(&c, &c);
+            float cm = Vec3DotCall(&c, &c);
             if (cm == 1.0f)
                 spinSpeed = 1.0f;
             else
                 spinSpeed = FastSqrt(cm);
         } else {
             tangentSpeed = 0.0f;
-            float cm = Fn_0040ae30(&c, &c);
+            float cm = Vec3DotCall(&c, &c);
             float len;
             if (cm == 1.0f)
                 len = 1.0f;
@@ -142,7 +142,7 @@ void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {
     for (int i = count; i > 0; i--, points++) {
         CollisionPoint* p = *points;
         if (p->ownerNode && *(int*)&p->inContact) {
-            CollisionVec3* world = p->ownerNode->Fn_004fd660(&tmp, &p->localPosition);
+            CollisionVec3* world = p->ownerNode->LocalToWorldPoint(&tmp, &p->localPosition);
             (*points)->worldPosition = *world;
         }
     }

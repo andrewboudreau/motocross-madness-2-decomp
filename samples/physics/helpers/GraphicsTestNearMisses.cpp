@@ -46,7 +46,7 @@ inline void GraphicsTestTransform(Vec3* out, Vec3 v, const Matrix4* m)
 
 // 0x0047bd10: a circle of `segments` line segments (at most 64) around `axis` (the
 // circle's normal; null draws it in the xz plane).
-void GraphicsTest::Fn_0047bd10(const Vec3* center, float radius, const Vec3* axis, int segments)
+void GraphicsTest::DrawCircle(const Vec3* center, float radius, const Vec3* axis, int segments)
 {
     Matrix4 m;
     Vec3 points[64];

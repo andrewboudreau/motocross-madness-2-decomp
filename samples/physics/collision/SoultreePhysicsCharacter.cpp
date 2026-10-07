@@ -82,7 +82,7 @@ int SoultreePhysicsCharacter::UnknownVirtualSlot33(const Vec3* a1, const Vec3* a
     } else {
         sceneNode->GetPositionIn(0, &centerOfMass);
     }
-    Method_0x004a8b00();
+    ApplyRestPose();
     collisionObject->Fn_00435fe0();
     respawnPending = 0;
     justReset = 1;
@@ -95,7 +95,7 @@ void SoultreePhysicsCharacter::UnknownVirtualSlot41()
 {
     poseNode->GetAxesIn(0, &savedForward, &savedUp);
     modelNode->SetAxesIn(0, &savedForward, &savedUp, 1, 0);
-    Method_0x004a8b00();
+    ApplyRestPose();
     field_0x430 = 0;
     UnknownVirtualSlot34();
     OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll, &bodySinRoll,
@@ -149,9 +149,9 @@ GameObject* SoultreePhysicsCharacter::UnknownVirtualSlot40(int a1, int a2, const
 
     if (collisionObject) {
         if (colPath[0]) {
-            collisionObject->Fn_00432800(sceneNode, colPath);
+            collisionObject->LoadShape(sceneNode, colPath);
         } else {
-            collisionObject->Fn_004324b0(sceneNode, 1, 0, 0, 0);
+            collisionObject->SetModelShape(sceneNode, 1, 0, 0, 0);
         }
         collisionObject->ownerType = 0;
         collisionObject->ownerObject = this;
@@ -201,9 +201,9 @@ GameObject* SoultreePhysicsObject::UnknownVirtualSlot40(int a1, const char* a2,
 
     if (collisionObject) {
         if (colPath[0]) {
-            collisionObject->Fn_00432800(SoultreePhysicsBaseObject::sceneNode, colPath);
+            collisionObject->LoadShape(SoultreePhysicsBaseObject::sceneNode, colPath);
         } else {
-            collisionObject->Fn_00432720(SoultreePhysicsBaseObject::sceneNode, 1, 0, 0, 0);
+            collisionObject->SetHullShape(SoultreePhysicsBaseObject::sceneNode, 1, 0, 0, 0);
         }
         collisionObject->ownerType = 0;
         collisionObject->ownerObject = this;

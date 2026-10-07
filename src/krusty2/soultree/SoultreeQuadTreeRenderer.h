@@ -34,11 +34,11 @@ public:
     int field_0x14c;                  // tested by slot 12
     char pad_0x150[0x18c - 0x150];
     int subtreeDirty;                 // +0x18c (common/SoultreeObject.h); set to 1 by 0x5046e0
-    int field_0x190;                  // +0x190 cleared by 0x5046e0, set to 1 by 0x5047f0
-    int field_0x194;                  // +0x194 set to 1 by 0x5046e0; tested by slot 10
-    int field_0x198;                  // +0x198
-    void Fn_4fecd0();                 // thiscall, plain ret
-    void Fn_4fed70();                 // thiscall, plain ret: releases the +0x194 entry
+    int field_0x190;                  // +0x190 cleared by InsertNodesInQuadtree, set to 1 by RemoveNodesFromQuadtree
+    int inQuadtree;                   // +0x194 set to 1 by InsertNodesInQuadtree; tested by slot 10
+    int quadtreeCell;                 // +0x198 quadtree cell code (core/SoultreeObject.h)
+    void UpdateQuadtreeCell();                 // thiscall, plain ret
+    void RemoveFromQuadtree();                 // thiscall, plain ret: releases the inQuadtree entry
 };
 
 // RTTI .?AVD3DIMSoultreeObject@@ : SoultreeObject (plain inheritance).
@@ -48,7 +48,7 @@ public:
     int field_0x28c;                  // nonzero gates the work in 0x5046e0
     char pad_0x290[0x2d4 - 0x290];
     int field_0x2d4;                  // set to 1 by slot 12
-    void Fn_440d40(int a);            // thiscall, ret 4
+    void SelectLod(int a);            // thiscall, ret 4
     void Fn_443de0(int a, int b);     // thiscall, ret 8
 };
 
@@ -88,8 +88,8 @@ public:
     virtual int GameObjectVirtualSlot14();                            // 0x00504570
     virtual int GameObjectVirtualSlot23(int a, int b);                // 0x005048d0
 
-    void Fn_5046e0();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x63)
-    void Fn_5047f0();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x7f)
+    void InsertNodesInQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x63)
+    void RemoveNodesFromQuadtree();    // owner: SoultreeQuadTreeRenderer.cpp (__FILE__ line 0x7f)
 
     // +0x34 (GraphicsTest::field_0x34) counts the nodes 0x5046e0 switched on.
     int statsId;                      // +0x38 -1 until slot 14 takes an id from the stats table

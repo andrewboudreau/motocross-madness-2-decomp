@@ -1,6 +1,6 @@
 [
   {
-    "candidate_symbol_contains": "?Fn_500220@@YAXMMPAVSoultreeObject@@",
+    "candidate_symbol_contains": "?ResolveContactImpulse@@YAXMMPAVSoultreeObject@@",
     "target_va": "0x00500220",
     "target_size": 639,
     "expect": "partial",
@@ -70,7 +70,7 @@
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
-    "candidate_symbol_contains": "?Fn_501230@SoultreePhysicsBaseObject@@",
+    "candidate_symbol_contains": "?InstallCollisionCallbacks@SoultreePhysicsBaseObject@@",
     "target_va": "0x00501230",
     "target_size": 33,
     "notes": "Exact. Installs the two collision callbacks.",
@@ -350,7 +350,7 @@
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
-    "candidate_symbol_contains": "?Fn_502c40@SoultreePhysicsBaseObject@@",
+    "candidate_symbol_contains": "?UpdateRestState@SoultreePhysicsBaseObject@@",
     "target_va": "0x00502c40",
     "target_size": 632,
     "notes": "Exact. Rest/settle check. Needed field_0x214 typed float (it was int); abs written as an inline `if (v < 0) v = -v`.",
@@ -492,7 +492,7 @@
   {
     "class": "SoultreeQuadTreeRenderer",
     "source": "SoultreeQuadTreeRenderer.cpp",
-    "candidate_symbol_contains": "Fn_5046e0@SoultreeQuadTreeRenderer",
+    "candidate_symbol_contains": "InsertNodesInQuadtree@SoultreeQuadTreeRenderer",
     "target_va": "0x005046e0",
     "target_size": 259,
     "expect": "exact",
@@ -502,7 +502,7 @@
   {
     "class": "SoultreeQuadTreeRenderer",
     "source": "SoultreeQuadTreeRenderer.cpp",
-    "candidate_symbol_contains": "Fn_5047f0@SoultreeQuadTreeRenderer",
+    "candidate_symbol_contains": "RemoveNodesFromQuadtree@SoultreeQuadTreeRenderer",
     "target_va": "0x005047f0",
     "target_size": 223,
     "expect": "exact",
@@ -572,7 +572,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?Fn_004fbd10@SoultreeObject@@QAEXMMMMMMHH@Z",
+    "candidate_symbol_contains": "?SetAxes@SoultreeObject@@QAEXMMMMMMHH@Z",
     "target_va": "0x004fbd10",
     "target_size": 82,
     "expect": "exact",
@@ -902,7 +902,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?Fn_004fe850@SoultreeObject@@QAEXPAUVec3@@0@Z",
+    "candidate_symbol_contains": "?GetSubtreeBounds@SoultreeObject@@QAEXPAUVec3@@0@Z",
     "target_va": "0x004fe850",
     "target_size": 74,
     "expect": "exact",
@@ -952,7 +952,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?Fn_4fecd0@SoultreeObject@@QAEXXZ",
+    "candidate_symbol_contains": "?UpdateQuadtreeCell@SoultreeObject@@QAEXXZ",
     "target_va": "0x004fecd0",
     "target_size": 154,
     "expect": "exact",
@@ -962,7 +962,7 @@
   {
     "class": "SoultreeObject",
     "source": "soultree.cpp",
-    "candidate_symbol_contains": "?Fn_4fed70@SoultreeObject@@QAEXXZ",
+    "candidate_symbol_contains": "?RemoveFromQuadtree@SoultreeObject@@QAEXXZ",
     "target_va": "0x004fed70",
     "target_size": 61,
     "expect": "exact",
@@ -1142,7 +1142,7 @@
   {
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "candidate_symbol_contains": "?Fn_502f60@SoultreePhysicsBaseObject@@QAEXHHH@Z",
+    "candidate_symbol_contains": "?RunSteps@SoultreePhysicsBaseObject@@QAEXHHH@Z",
     "target_va": "0x00502f60",
     "target_size": 1921,
     "expect": "partial",

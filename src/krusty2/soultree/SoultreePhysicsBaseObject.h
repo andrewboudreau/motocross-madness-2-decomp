@@ -31,7 +31,7 @@ struct SoultreeProbe {
     char pad_0x00[0x40];
     float worldScale;              // +0x40 copied to field_0x1f8 by slot 2
     // thiscall, callee pops 6 args
-    int Fn_506e90(const Vec3* from, const Vec3* to, Vec3* out, int a, int b,
+    int CastSegment(const Vec3* from, const Vec3* to, Vec3* out, int a, int b,
                   int c);
 };
 class SoultreeSlot1f0;
@@ -53,9 +53,9 @@ public:
     // Slot 2 (0x00500c50): `ret 0x68` = 26 argument dwords (tier 1).  Grouping and types
     // are tier 2, from the body's stores and the struct-copy shape at both callers
     // (SoultreePhysicsCharacter slot 40 0x00503de0, SoultreePhysicsObject slot 40 0x00503970):
-    //   a1 -> collisionObject->Fn_004320f0(a1, 0, 1, 1) after the CollisionObject is created
+    //   a1 -> collisionObject->Configure(a1, 0, 1, 1) after the CollisionObject is created
     //   a2 != 0: new node (0x1a4 bytes, ctor 0x004fb2b0(1)) stored in centerNode
-    //   a3 -> respawnPosition and the node position (sceneNode->Fn_4fc630(a3.x, a3.y, a3.z))
+    //   a3 -> respawnPosition and the node position (sceneNode->SetPosition(a3.x, a3.y, a3.z))
     //   a4 -> respawnHeading and bodyForward;  a5 -> bodyUp
     //   a6 -> terrain (pointer: if non-null, its float at +0x40 goes to terrainScale)
     //   a7 -> field_0x124;  a8 -> baseWeight
@@ -144,12 +144,12 @@ public:
 
     // Non-virtual helper 0x00501230 (thiscall, no args): installs the two TU-local contact
     // callbacks 0x00500c00/0x00500c30 into collisionObject (+0x88/+0x8c).  Tier 2; called by slot 2.
-    void Fn_501230();
+    void InstallCollisionCallbacks();
     // Non-virtual helpers reached from the GameObject slot 10 override 0x005036f0 (tier 1 call
     // shapes): 0x00502f60 (thiscall, ret 0xc) is the per-frame step, 0x00502c40 (thiscall, no
     // arguments) the rest/settle check it calls.
-    void Fn_502f60(int steps, int held, int refreshed);
-    void Fn_502c40();
+    void RunSteps(int steps, int held, int refreshed);
+    void UpdateRestState();
 
     // --- data members (offsets confirmed by decoded accesses; names provisional) ---
     // vfptr at +0, vbptr at +4 (compiler generated)
@@ -183,13 +183,13 @@ public:
     float linearSpeed;                   // +0xbc |velocity| (slots 3, 4, 14)
     Vec3 angularAcceleration;  // +0xc0 slot 14: angularVelocity += angularAcceleration * stepTime; produced from torque by slot 16 (per-axis invInertia * torque) and adjusted by slot 15
     Vec3 worldAngularVelocity;  // +0xcc worldAngularVelocity = sceneNode->LocalToWorldDirection(angularVelocity) after each solve (slots 3, 4, 38, Vehicle slot 49); passed with the lever arm to 0x0043a640 (slot 31) for the point velocity; read as the other body's angular velocity in slot 38
-    Vec3 angularVelocity;  // +0xd8 body-frame angular velocity: slot 14 angularVelocity += angularAcceleration * stepTime then damped (* 0.999); passed as the angular velocity to ContactSolveImpulse (slot 4) and Fn_500220 (slot 3)
-    Vec3 invInertia;  // +0xe4 body-frame inverse inertia diagonal in use: slot 16 multiplies torque by it per axis; passed as the inverse inertia to ContactSolveImpulse / Fn_500220; slot 2 initialises it from shapeInvInertia
+    Vec3 angularVelocity;  // +0xd8 body-frame angular velocity: slot 14 angularVelocity += angularAcceleration * stepTime then damped (* 0.999); passed as the angular velocity to ContactSolveImpulse (slot 4) and ResolveContactImpulse (slot 3)
+    Vec3 invInertia;  // +0xe4 body-frame inverse inertia diagonal in use: slot 16 multiplies torque by it per axis; passed as the inverse inertia to ContactSolveImpulse / ResolveContactImpulse; slot 2 initialises it from shapeInvInertia
     Vec3 shapeInvInertia;  // +0xf0 computed by slot 2 from the shape: 1/(0.4 m r^2) for a sphere (collisionShape == 1), box formula m/12 (h^2 + d^2) per axis otherwise; slots 15/16 use it instead of invInertia while slot 10 reports the body unloaded
     char field_0xfc[12];
     char airborne;  // +0x108 Vehicle slot 49: airborne = !wheel contact && !pointsTouching (no body point touching); slot 23 (moving on ground) requires !airborne; cleared by slot 1. Vehicle's comment calls it 'settled', which the assignment contradicts
     char respawnPending;  // +0x109 slot 39: when set, position = respawnPosition and the node is moved there; slot 11 uses respawnHeading as the placement heading while set; slot 2 clears it
-    char asleep;  // +0x10a rest check Fn_502c40 (0x00502c40) zeroes the velocities and sets it once the body has rested 0.5 s on its contacts; GameObject slot 10 (0x005036f0) skips the whole update while it is set; slot 38 clears the other body's flag on a body-to-body hit; the ctor clears it
+    char asleep;  // +0x10a rest check UpdateRestState (0x00502c40) zeroes the velocities and sets it once the body has rested 0.5 s on its contacts; GameObject slot 10 (0x005036f0) skips the whole update while it is set; slot 38 clears the other body's flag on a body-to-body hit; the ctor clears it
     Vec3 respawnPosition;  // +0x10c slot 2 stores the start position (a3) here; Vehicle slot 43 snapshots position into it; slot 39 restores position from it
     Vec3 respawnHeading;  // +0x118 slot 2 stores the start forward vector (a4); Vehicle slot 43 stores the horizontal, normalised savedForward; the placement search uses it as the reference direction while respawning
     GameObject* field_0x124;            // tier 3: only its byte +0x25 bit 0 is read (slot 21, Vehicle slot 38);
@@ -203,7 +203,7 @@ public:
     float invStepTime;  // +0x140 slot 9: invStepTime = 1.0f / stepTime
     float frameTime;  // +0x144 slot 9: frameTime = dt + stepRemainder (time to simulate this frame including the carried remainder); clamped to one fixed step when shorter
     float dragCoefficient;  // +0x148 slot 6: drag force = velocity * -(dragCoefficient * linearSpeed) (quadratic drag); stored from slot 2's a14
-    float restitution;  // +0x14c first argument of ContactSolveImpulse (contact/ContactImpulse.cpp uses (restitution + 1)) in slot 4 and of Fn_500220 in slot 3; stored from slot 2's a15
+    float restitution;  // +0x14c first argument of ContactSolveImpulse (contact/ContactImpulse.cpp uses (restitution + 1)) in slot 4 and of ResolveContactImpulse in slot 3; stored from slot 2's a15
     float baseWeight;  // +0x150 slot 2's a8; slot 0: totalWeight = load + baseWeight; Vehicle derives mass from it with the same 1/32.2 factor
     float totalWeight;  // +0x154 slot 0: totalWeight = load + baseWeight; weightForce.y = -totalWeight (gravity); mass = totalWeight * 0.0310559 (1/32.2 ft/s^2)
     float bodyMass;  // +0x158 totalWeight / 32.2 in slot 0 (renamed from 'mass', which collides with a local in slot 2)
@@ -217,7 +217,7 @@ public:
     Vec3 scratchVector2;  // +0x1b8 second member temporary: the applied drag force in slot 6, temporaries in Vehicle/Bike
     int collisionShape;  // +0x1c4 slot 2's a17: 1 = sphere (inertia from collisionRadius), otherwise box inertia from the node extents; passed with collisionRadius to the Vehicle contact query
     int collisionPointCapacity;  // +0x1c8 slot 2: collisionPointCapacity = a9, the allocation size of collisionPoints (entries zeroed up to it)
-    int touchingPointCount;  // +0x1cc active-contact count written by the contact refresh 0x0043ad80 in GameObject slot 10 (0x005036f0) and by the Vehicle contact query; pointsTouching = touchingPointCount > 0; Fn_502c40 compares it with restContactThreshold; slot 13 returns early when 0; cleared by slot 1
+    int touchingPointCount;  // +0x1cc active-contact count written by the contact refresh 0x0043ad80 in GameObject slot 10 (0x005036f0) and by the Vehicle contact query; pointsTouching = touchingPointCount > 0; UpdateRestState compares it with restContactThreshold; slot 13 returns early when 0; cleared by slot 1
     char pointsTouching;  // +0x1d0 GameObject slot 10 (0x005036f0) and Vehicle slot 49: pointsTouching = any contact active (touchingPointCount > 0); slot 7 distributes the force over touching contacts only when set; airborne = !wheels && !pointsTouching
     SoultreeAttachment* attachments;    // +0x1d4 array of 40-byte records
     int attachmentCapacity;                    // +0x1d8 capacity
@@ -238,8 +238,8 @@ public:
     char justReset;  // +0x20d set on (re)initialisation, cleared by the Vehicle step; slot 21 ORs it into each attachment's trail-reset flag (+0x24) and skips moving type-4 emitters while set
     char field_0x20e;
     unsigned char groundProbeMask;  // +0x20f slot 2's a19 (byte); slot 11 passes it as the probe-result AND mask of the placement search 0x004b0df0 (contact/ObjectPlacement.cpp parameter j)
-    int restContactThreshold;  // +0x210 slot 2's a18 (ctor default 1); Fn_502c40 runs the rest timer only with at least restContactThreshold - 1 active contacts (touchingPointCount) and sleeps the body when touchingPointCount reaches it
-    float restTimer;                  // +0x214 float timer: Fn_502c40 adds stepTime and compares with 0.5/3.0 (tier 1)
+    int restContactThreshold;  // +0x210 slot 2's a18 (ctor default 1); UpdateRestState runs the rest timer only with at least restContactThreshold - 1 active contacts (touchingPointCount) and sleeps the body when touchingPointCount reaches it
+    float restTimer;                  // +0x214 float timer: UpdateRestState adds stepTime and compares with 0.5/3.0 (tier 1)
     SoultreeObject* centerNode;  // +0x218 child SoultreeObject created by slot 2 when a2 != 0 (AddChild, SetPosition at the bounds centre); its world position becomes centerOfMass
 };
 

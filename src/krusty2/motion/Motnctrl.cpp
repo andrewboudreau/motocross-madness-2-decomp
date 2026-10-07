@@ -229,7 +229,7 @@ Motion* MotionManager::Find(const char* name, int unused)
 // owner: Motnctrl.cpp (__FILE__ 0x56e034, line 0x26b)
 // 0x004a62d0 (LoadVUT, tier 3): reads the .VUT node table once: per line a node name, its display
 // name and an optional flag ('T' enables the position).
-void Character::Method_0x004a62d0()
+void Character::LoadVut()
 {
     char line[0x100];
     if (vutLoaded)
@@ -267,7 +267,7 @@ void Character::Method_0x004a62d0()
 
 // owner: Motnctrl.cpp (__FILE__ 0x56e034, lines 0x29d, 0x2ab)
 // 0x004a6500 (LoadMIR, tier 3): reads the .MIR file of node pairs into the symmetric mirror map.
-void Character::Method_0x004a6500()
+void Character::LoadMir()
 {
     char line[0x100];
     ArchiveFile* file = new(__FILE__, 0x29d) ArchiveFile(g_pOwnerRegistry);
@@ -364,7 +364,7 @@ void Character::CharacterVirtualSlot1()
     CharacterVirtualSlot0();
     CharacterVirtualSlot2();
     LoadMotions();
-    Method_0x004a8b00();
+    ApplyRestPose();
 }
 
 // owner: Motnctrl.cpp (__FILE__ 0x56e034, lines 0x337, 0x343)
@@ -386,7 +386,7 @@ Character::~Character()
 // 0x004a6a60: stores the current node pose of every frame of 'motion' (slot 3 per frame).
 void Character::CaptureMotion(Motion* motion)
 {
-    Method_0x004a8b00();
+    ApplyRestPose();
     motion->captured = 1;
     for (int i = 0; i < motion->frameCount; i++)
         CharacterVirtualSlot3((int)&motion->frames[i]);
@@ -397,13 +397,13 @@ void Character::CaptureMotion(Motion* motion)
 void Character::SortMotion(Motion* motion)
 {
     for (int i = 0; i < motion->frameCount; i++)
-        Method_0x004a6b10(&motion->frames[i]);
+        SortPoseList(&motion->frames[i]);
     motion->sorted = 1;
 }
 
 // owner: bracket only
 // 0x004a6b10: sorts a pose list by descending node index.
-void Character::Method_0x004a6b10(void* poseList)
+void Character::SortPoseList(void* poseList)
 {
     MotionPoseList* list = (MotionPoseList*)poseList;
     qsort(list->poses, list->count, sizeof(CharacterPose), ComparePoses);
@@ -459,7 +459,7 @@ void Character::ApplyPoseListSlot6(MotionPoseList* list, int mask)
 
 // owner: bracket only
 // 0x004a8b00: applies the rest pose list.
-void Character::Method_0x004a8b00()
+void Character::ApplyRestPose()
 {
     ApplyPoseListSlot6(&poseList, 0);
 }
@@ -532,7 +532,7 @@ void Character::CharacterVirtualSlot8(int a)
     for (int i = 0; i < poseList.count; i++)
         poseList.poses[i] = source->poseList.poses[i];
     vutLoaded = 1;
-    Method_0x004a8b00();
+    ApplyRestPose();
 }
 
 // owner: Motnctrl.cpp (__FILE__ 0x56e034, lines 0x5a5, 0x5a7)

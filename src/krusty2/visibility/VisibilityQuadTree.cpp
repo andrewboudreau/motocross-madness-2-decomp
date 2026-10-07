@@ -297,7 +297,7 @@ int VisibilityClipper::TestDot(const VisibilityCamera* camera, const VisibilityB
     float dot = a->y * b->y;
     dot += a->x * b->x;
     dot += a->z * b->z;
-    if (dot > (camera->field_0x16c - 10.0f) * 0.00461538f)
+    if (dot > (camera->fieldOfView - 10.0f) * 0.00461538f)
         return 0;
     return 1;
 }
@@ -382,17 +382,17 @@ int VisibilityClipper::CullPolygon(const VisibilityCamera* camera, VisibilityCul
     int i;
     int allBehind = 1;
     for (i = 0; i < count; i++) {
-        if (points[i].z < camera->field_0x1bc && allBehind)
+        if (points[i].z < camera->nearPlane && allBehind)
             allBehind = 1;
         else
             allBehind = 0;
     }
     if (allBehind)
         return 0;
-    if (camera->field_0x16c <= 90.0) {
+    if (camera->fieldOfView <= 90.0) {
         for (i = 0; i < count; i++) {
             unsigned int code = 0;
-            float slope = points[i].z * camera->field_0x1b8;
+            float slope = points[i].z * camera->aspectRatio;
             if (slope < points[i].y)
                 code = 4;
             else if (-slope > points[i].y)

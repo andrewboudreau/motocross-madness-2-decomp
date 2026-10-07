@@ -83,9 +83,9 @@ public:
 // Provisional area-local stand-ins for two scene-side classes only known by their calls.
 class TireNode {                                       // scene node, MovingPart::field_0x40
 public:
-    void Fn_004fc9a0(TireNode* parent, CollisionVec3* out);                        // world position
-    void Fn_004fe0a0(CollisionVec3* a, CollisionVec3* b);                          // extents, b.y = wheel radius
-    CollisionVec3* Fn_004fd5c0(CollisionVec3* out, const CollisionVec3* in);       // rotate a direction
+    void GetPositionIn(TireNode* parent, CollisionVec3* out);                        // world position
+    void GetLocalBounds(CollisionVec3* a, CollisionVec3* b);                          // extents, b.y = wheel radius
+    CollisionVec3* LocalToWorldDirection(CollisionVec3* out, const CollisionVec3* in);       // rotate a direction
     void RotateAbout(float x, float y, float z, float angle);                      // 0x004fcce0
     void SetPosition(CollisionVec3 position);                                      // 0x004fc630
     void SetLocalMatrix(const CollisionMatrix4* m);                                // 0x004fca30
@@ -93,7 +93,7 @@ public:
 };
 class TireWorld {                                      // world/terrain query object (arg 1 of 0x00514550)
 public:
-    int Fn_00507c10(CollisionVec3* pos, CollisionVec3* outNormal, int flags, unsigned char* outSurface);
+    int QueryGround(CollisionVec3* pos, CollisionVec3* outNormal, int flags, unsigned char* outSurface);
 };
 
 // The vehicle passed to 0x00513f90 (Vehicle.cpp 0x00525d.. passes `this`): only the

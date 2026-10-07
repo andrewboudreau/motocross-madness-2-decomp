@@ -1,7 +1,7 @@
 // SoultreeQuadTreeRenderer.cpp -- SoultreeQuadTreeRenderer : GraphicsTest.
 // owner: SoultreeQuadTreeRenderer.cpp (retail __FILE__ 0x005743f4; bracket 0x504490..0x5048cf,
 // between SoulTreePhysics.cpp and the next file).  Every function below is either a direct
-// referrer of that string (Fn_5046e0, Fn_5047f0) or a method of the same class laid out
+// referrer of that string (InsertNodesInQuadtree, RemoveNodesFromQuadtree) or a method of the same class laid out
 // contiguously with them, so the promotion rule is met.
 #include "SoultreeQuadTreeRenderer.h"
 #include "core/DebugAlloc.h"
@@ -34,7 +34,7 @@ SoultreeQuadTreeRenderer::SoultreeQuadTreeRenderer(int flags)
 // slot 0: scalar deleting 0x00504500 is compiler generated; this is the core 0x00504520.
 SoultreeQuadTreeRenderer::~SoultreeQuadTreeRenderer()
 {
-    Fn_5047f0();
+    RemoveNodesFromQuadtree();
 }
 
 // slot 14, 0x00504570: publishes the node counters on the statistics overlay.
@@ -78,14 +78,14 @@ int SoultreeQuadTreeRenderer::GameObjectVirtualSlot10(float dt)
 {
     for (int i = 0; i < g_soultreeNodeCount; i++) {
         SoultreeObject* node = g_soultreeNodes[i];
-        if (node->subtreeDirty && node->field_0x194)
-            node->Fn_4fecd0();
+        if (node->subtreeDirty && node->inQuadtree)
+            node->UpdateQuadtreeCell();
     }
     return GraphicsTest::GameObjectVirtualSlot10(dt);
 }
 
 // 0x005046e0: walks every D3DIMSoultreeObject below the tree root and switches it on.
-void SoultreeQuadTreeRenderer::Fn_5046e0()
+void SoultreeQuadTreeRenderer::InsertNodesInQuadtree()
 {
     GameObject* root = this;
     while (root->parent)
@@ -97,16 +97,16 @@ void SoultreeQuadTreeRenderer::Fn_5046e0()
             field_0x34++;
             node->field_0x190 = 0;
             node->subtreeDirty = 1;
-            node->field_0x194 = 1;
-            node->Fn_4fecd0();
-            node->Fn_440d40(-1);
+            node->inQuadtree = 1;
+            node->UpdateQuadtreeCell();
+            node->SelectLod(-1);
         }
     }
     delete it;
 }
 
 // 0x005047f0: the inverse walk; resets the +0x34 count.
-void SoultreeQuadTreeRenderer::Fn_5047f0()
+void SoultreeQuadTreeRenderer::RemoveNodesFromQuadtree()
 {
     GameObject* root = this;
     while (root->parent)
@@ -115,7 +115,7 @@ void SoultreeQuadTreeRenderer::Fn_5047f0()
     while (GameObject* obj = it->Next()) {
         SoultreeObject* node = dynamic_cast<SoultreeObject*>(obj);
         if (node) {
-            node->Fn_4fed70();
+            node->RemoveFromQuadtree();
             node->field_0x190 = 1;
         }
     }
@@ -124,14 +124,14 @@ void SoultreeQuadTreeRenderer::Fn_5047f0()
 }
 
 // slot 23, 0x005048d0: with the debug keys enabled, key 0x2d switches every
-// node on (Fn_5046e0) or, when some are on, off again (Fn_5047f0).
+// node on (InsertNodesInQuadtree) or, when some are on, off again (RemoveNodesFromQuadtree).
 int SoultreeQuadTreeRenderer::GameObjectVirtualSlot23(int a, int b)
 {
     if ((g_soultreeStats->debugFlags & 4) && CheckKey(0x2d, 0, a, 0x80)) {
         if (!field_0x34)
-            Fn_5046e0();
+            InsertNodesInQuadtree();
         else
-            Fn_5047f0();
+            RemoveNodesFromQuadtree();
     }
     return GraphicsTest::GameObjectVirtualSlot23(a, b);
 }

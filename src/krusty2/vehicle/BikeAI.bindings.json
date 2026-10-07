@@ -1,9 +1,9 @@
 {
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?QueryGround@Terrain@@QAEXPAUTerrainVec3@@0HPAE@Z": "0x00507c10",
-  "?UnknownFunction40d120@@YA?AUVec3@@U1@@Z": "0x0040d120",
-  "?UnknownFunction40e370@@YAHUVec3@@0PAMPAU1@2PAVTerrain@@@Z": "0x0040e370",
-  "?UnknownFunction413190@@YAMPBUVec3@@@Z": "0x00413190",
+  "?SafeNormalize@@YA?AUVec3@@U1@@Z": "0x0040d120",
+  "?PredictLanding@@YAHUVec3@@0PAMPAU1@2PAVTerrain@@@Z": "0x0040e370",
+  "?Vec3Magnitude@@YAMPBUVec3@@@Z": "0x00413190",
   "?g_BikeAIFilter_00577ac0@@3UUnknownBikeAIFilter@@A": "0x00577ac0",
   "_$E1": "0x00414220",
   "_$E10": "0x00414310",

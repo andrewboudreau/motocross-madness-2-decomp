@@ -30,15 +30,15 @@ int Fn_00439600(CollisionVec3* ends, float radius, float radiusSq, CollisionObje
             switch (object->shapeType) {
             case 0: {
                 CollisionHullBody* hull = (CollisionHullBody*)object->shape;
-                return Fn_00429890(ends, radius, radiusSq, hull->triangleTree, &hull->worldTransform, 1,
+                return CapsuleTreeQueryWithVertices(ends, radius, radiusSq, hull->triangleTree, &hull->worldTransform, 1,
                                    hull->vertices);
             }
             case 1: {
                 CollisionModelBody* model = (CollisionModelBody*)object->shape;
-                if (Fn_00425900(&model->center, &model->halfExtents, ends, radius, radiusSq, &model->field_0x88)) {
+                if (BoxCapsuleOverlap(&model->center, &model->halfExtents, ends, radius, radiusSq, &model->field_0x88)) {
                     for (int i = 0; i < model->elementCount; i++) {
                         CollisionHullBody* hull = &model->elements[i];
-                        if (Fn_00429890(ends, radius, radiusSq, hull->triangleTree, &hull->worldTransform, 1,
+                        if (CapsuleTreeQueryWithVertices(ends, radius, radiusSq, hull->triangleTree, &hull->worldTransform, 1,
                                         hull->vertices))
                             return 1;
                     }

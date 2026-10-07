@@ -606,7 +606,7 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
-    "candidate_symbol_contains": "Fn_0048E190",
+    "candidate_symbol_contains": "FindNearestRival",
     "target_va": "0x0048e190",
     "target_size": 225,
     "expect": "exact",

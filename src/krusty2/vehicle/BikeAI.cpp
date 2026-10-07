@@ -50,7 +50,7 @@ static Vec3 s_BikeAIUnknownStatic_2;
 
 // 0x0040d120, 182 bytes, cdecl, hidden result pointer: returns v unchanged when it is
 // the zero vector, otherwise v * FastInvSqrt(|v|^2).
-Vec3 UnknownFunction40d120(Vec3 v)
+Vec3 SafeNormalize(Vec3 v)
 {
     if (v.x == 0.0f && v.y == 0.0f && v.z == 0.0f)
         return v;
@@ -62,7 +62,7 @@ static Vec3 s_BikeAIUnknownStatic_3;
 static Vec3 s_BikeAIUnknownStatic_4;
 
 // 0x00413190, 106 bytes, cdecl: |v|, with 0 and 1 returned exactly.
-float UnknownFunction413190(const Vec3* v)
+float Vec3Magnitude(const Vec3* v)
 {
     float lenSq = (v->x * v->x + v->y * v->y) + v->z * v->z;
     if (lenSq == 0.0f)
@@ -77,7 +77,7 @@ float UnknownFunction413190(const Vec3* v)
 // vy -= 3.2) until it is no longer 6 units above the ground under it.  Writes the
 // elapsed time, the displacement and the last ground normal; always returns 1.
 // Tier 1 arithmetic; tier 3 names.  Callers: 0x004134f6 and 0x00415544.
-int UnknownFunction40e370(Vec3 start, Vec3 velocity, float* outTime, Vec3* outDelta,
+int PredictLanding(Vec3 start, Vec3 velocity, float* outTime, Vec3* outDelta,
                           Vec3* outNormal, Terrain* terrain)
 {
     Vec3 v = velocity;

@@ -34,7 +34,7 @@ struct CollisionHullBody {
     int swept;                // +0x00 nonzero: use the swept/matrix-history test
     void* sceneNode;              // +0x04 scene node; 0x004fc9a0 reads its world position
     Matrix4 motionTransform;  // +0x08 SetTransform 0x00435830 builds it with CollisionRelativeTransform 0x00432180 from the current and previous body matrices; DrawTreeMotion receives it as the motion matrix
-    Matrix4 worldTransform;  // +0x48 SetTransform: 3x3 of localTransform (+0x88) times the body matrix plus translation; used as the frame by every hull test (Fn_00428950, 0x00429570/890)
+    Matrix4 worldTransform;  // +0x48 SetTransform: 3x3 of localTransform (+0x88) times the body matrix plus translation; used as the frame by every hull test (TreeTreeQuery, 0x00429570/890)
     Matrix4 localTransform;  // +0x88 SetTransform multiplies it by the new body matrix to produce +0x48
     Matrix4 bodyTransform;  // +0xc8 SetTransform copies the argument matrix here after moving the old one to +0x108; the swept tests use it as the current frame
     Matrix4 prevBodyTransform;  // +0x108 SetTransform: rep movsd +0xc8 -> +0x108 before the new matrix is stored in +0xc8
@@ -62,7 +62,7 @@ struct CollisionModelBody {
     Matrix4 field_0x88;
     Matrix4 field_0xc8;
     CollisionVec3 sweptCenter;     // +0x108 written by the swept variants (0x00437ef0)
-    CollisionVec3 sweptHalfExtents;  // +0x114 second output of Fn_004290d0, passed as A half extents to 0x00424730
+    CollisionVec3 sweptHalfExtents;  // +0x114 second output of GrowBoxByTransformedBox, passed as A half extents to 0x00424730
 };
 
 // View of a type-2 static-mesh payload (only the parts 0x00436100 / 0x00438c90 read).
@@ -80,38 +80,38 @@ struct CollisionMeshBody {
 // 0x00428950: oriented-box (hull) vs oriented-box test.  Copies both transforms into
 // file-scope scratch (0x00578ef0...), leaves contact points in g_CollisionScratchPoints
 // and their count in g_CollisionScratchCount.
-int Fn_00428950(void* geomA, void* geomB, const Matrix4* xfA, const Matrix4* xfB,
+int TreeTreeQuery(void* geomA, void* geomB, const Matrix4* xfA, const Matrix4* xfB,
                 int mode, void* aux, void* out);
 // 0x00429570: hull vs sphere (world center, r, r*r).  0x00429890: hull vs capsule (two
 // world endpoints, r, r*r).  Same trailing arguments as the box test.  The second
 // argument is the radius: every caller stores r into a dead argument slot and pushes that
 // dword (0x004379c0 +0xaf..+0xc9), so it is a float, not the shape pointer.
-int Fn_00429570(CollisionVec3* worldCenter, float radius, float radiusSq, void* geom,
+int SphereTreeQuery(CollisionVec3* worldCenter, float radius, float radiusSq, void* geom,
                 const Matrix4* xf, int mode);
-int Fn_00429890(CollisionVec3* worldEnds, float radius, float radiusSq, void* geom,
+int CapsuleTreeQueryWithVertices(CollisionVec3* worldEnds, float radius, float radiusSq, void* geom,
                 const Matrix4* xf, int mode, void* aux);
 // 0x00429540: the sphere test of 0x00429570 with a vertex array (BoundingBoxTreeQuery.h's
 // SphereTreeQueryWithVertices).
-int Fn_00429540(const CollisionVec3* worldCenter, float radius, float radiusSq, void* geom,
+int SphereTreeQueryWithVertices(const CollisionVec3* worldCenter, float radius, float radiusSq, void* geom,
                 const Matrix4* xf, int mode, void* vertices);
 // 0x00424730: broad-phase box overlap in a relative frame (center/half extents of box A by
 // value, box B by pointer, relative transform, transform of A).
-int Fn_00424730(CollisionVec3 aCenter, CollisionVec3 aHalf, const CollisionVec3* bCenter,
+int SweptBoxOverlap(CollisionVec3 aCenter, CollisionVec3 aHalf, const CollisionVec3* bCenter,
                 const CollisionVec3* bHalf, const Matrix4* rel, const Matrix4* xfA);
 
 // 0x00425750 / 0x00425900: broad-phase overlap of a model's bounds (center, half extents,
 // in the frame of `xf`) with a sphere (world center by value) / capsule (pointer to the two
 // world endpoints), given radius and radius squared.  Nonzero = may touch.
-int Fn_00425750(const CollisionVec3* boundsCenter, const CollisionVec3* boundsHalf,
+int BoxSphereOverlap(const CollisionVec3* boundsCenter, const CollisionVec3* boundsHalf,
                 CollisionVec3 worldCenter, float radius, float radiusSq, const Matrix4* xf);
-int Fn_00425900(const CollisionVec3* boundsCenter, const CollisionVec3* boundsHalf,
+int BoxCapsuleOverlap(const CollisionVec3* boundsCenter, const CollisionVec3* boundsHalf,
                 const CollisionVec3* worldEnds, float radius, float radiusSq, const Matrix4* xf);
 
 // 0x0042a450: out = v * M3x3 (rotate by the matrix, no translation); 0x0042a4b0:
 // out = M3x3 * v (rotate by the transpose); 0x0042a510: out = v * M + translation row.
-void Fn_0042a450(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
-void Fn_0042a4b0(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
-void Fn_0042a510(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
+void Vec3TransformNormal(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
+void Vec3TransformNormalTranspose(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
+void Vec3TransformPoint(CollisionVec3* out, CollisionVec3 v, const Matrix4* m);
 
 // 0x004fc9a0 (thiscall on a scene node): position of the node relative to `parent`
 // (parent == 0 gives the world position).
@@ -226,7 +226,7 @@ struct CollisionContactSum {
 // 0x004290d0: bounds of a swept box in another frame (provisional signature: two output
 // vec3s, two input vec3s by value, a transform).  Results land in CollisionModelBody
 // field_0x108 / field_0x114 in 0x00437ef0 and 0x00438550.
-void Fn_004290d0(CollisionVec3* outCenter, CollisionVec3* outHalf, CollisionVec3 center,
+void GrowBoxByTransformedBox(CollisionVec3* outCenter, CollisionVec3* outHalf, CollisionVec3 center,
                  CollisionVec3 half, const Matrix4* xf);
 
 // 0x00432180 (cdecl): out = to * inverse(from) for rigid transforms.
