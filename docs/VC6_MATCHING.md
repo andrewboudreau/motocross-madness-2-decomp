@@ -233,7 +233,8 @@ NationalRace.cpp (8, `__FILE__` 0x56e338 and RTTI NationalRace :
 BaseQuarryEvent), Rectangle2D (5) and SkyCube (5) match strictly; the last
 two are named from RTTI, their file names are unattested. Further units from
 that map: TransparencyMod (4), GhostMod1 (6), Fog/FogOff/FogOn (14),
-MediaControl (15), GridNode (2), MatrixUtil's vector set (8), the
+MediaControl (15), GridNode (2), MatrixUtil's vector set with the reflect,
+line/plane and MatrixInverse helpers (11; [MATRIX_UTIL](MATRIX_UTIL.md)), the
 allocation-accounting unit (22, in samples: no RTTI or `__FILE__`), file
 stream helpers (10, samples; [FILESTREAM](FILESTREAM.md)), KrustyVCR (6,
 [KRUSTYVCR](KRUSTYVCR.md)), VehicleCamera (+12) and KrustyBikeCamera's
