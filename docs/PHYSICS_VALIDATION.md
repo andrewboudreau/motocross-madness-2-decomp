@@ -73,7 +73,8 @@ comparison:
 - `src/krusty2/vehicle/Vehicle.cpp`: 57 of 77 targets at promotion; see the
   Vehicle/Bike round-out below for the current state.
 - `src/krusty2/vehicle/Bike.cpp`: 31 of 45 targets at promotion.
-- `src/krusty2/soultree/SoulTreePhysics.cpp`: 37 of 43 targets.
+- `src/krusty2/soultree/SoulTreePhysics.cpp`: 37 of 43 targets at promotion; see the
+  SoulTreePhysics round-out below for the current state.
 
 Three targets are `expect: "masked"` because one called constructor or helper has no
 independent identity yet. The rest are documented `partial` code-generation
@@ -257,6 +258,54 @@ python tools/run_physics_samples.py --strict --root src/krusty2/vehicle \
 
 This run reports `130/158 strict exact` with the pre-existing masked `0x409420` as the
 only required failure.
+
+## SoulTreePhysics round-out
+
+Strict exact under `vc6_o2_ml` with `SoulTreePhysics.bindings.json`:
+
+- The GameObject slot 10 override `0x005036f0` was `masked` only because the contact
+  refresh it calls had no binding; `SoultreeRefreshContacts` is `0x0043ad80`
+  (collision/CollisionContactUpdate.cpp) and the target is strict exact.
+- SoultreePhysicsObject (`soultree/SoultreePhysicsObject.h`, formerly a collision sample
+  header): ctor `0x005037c0` (`GameObject(1)`, `SoultreePhysicsBaseObject(flags)`,
+  `D3DIMSoultreeObject(flags)`, then `sceneNode = this` converted to the D3DIM subobject),
+  dtor core `0x005038d0` (empty body), GameObject slot 10 `0x00503c50`
+  (`SoultreePhysicsBaseObject::GameObjectVirtualSlot10(dt)` then
+  `D3DIMSoultreeObject::GameObjectVirtualSlot10(dt)`, 0x00443490), and the compiler-emitted
+  deleting destructor `0x00503890` and vbase-vtable thunks `0x00504260`/`0x00504270`.
+  The class has two GameObject bases (the virtual one and D3DIMSoultreeObject's plain one at
+  +0x228); VC6 compiles the destructor and the slot 10 override against the plain one, which
+  is why those bodies take `this` at +0x228 and the vbase thunks subtract
+  `0x2d0 = 0x4f8 - 0x228`.  Declaring D3DIMSoultreeObject with QuadTreeObject and GameObject
+  as direct bases (its own dtor 0x0043f2b0 writes the primary vptr through `edi-0xc`)
+  reproduces all of it.
+
+Still partial in SoulTreePhysics.cpp:
+
+- The sub-step loop `Fn_502f60` `0x00502f60` (1921 bytes) is now written out:
+  1366/1942 bytes, every call, branch and x87 sequence in retail order.  What was learned:
+  `prevSpeed = linearSpeed;` followed by a test of `prevSpeed` (not `linearSpeed`) gives
+  retail's single `fld`/`fst`/`fcom`; the loop is `if (steps <= 0) return; do { ... } while
+  (steps > 0);` (the rematerialised `xor ebx,ebx` sits on the back edge); the leftover
+  remainder block reads `stepRemainder` once into a local (`stepTime = t; invStepTime =
+  1.0f / t;`).  The residue is stack-slot packing: retail packs the integration
+  temporary into the slot of the respawn path's first vector and keeps the merge outputs
+  `o3`/`o1` in the slots of its other two, with `impulse` below `o2`; VC6 here packs the
+  respawn vectors into the merge outputs instead (frame size and every other slot agree).
+  Declaration order and block scoping of the locals do not move the packing; sharing the
+  vectors between the two paths or hoisting them to function scope makes it worse.
+- Slot 4 `0x005013d0`: retail loads the a3 component first in all six products of the
+  first cross product; VC6 loads a4 first in the term it evaluates second (87.5%).
+- SteeringControl::SetAxisFromPoints `0x00504d30` (samples/physics/motion): only the
+  scaling differs.  Retail keeps the inverse length duplicated (`fld st(0); fmul st(3)` for
+  x, `fld [d.y]; fmul st(1)` for y, `fxch; fmul` for z) and pops `d.x` at the end; the
+  `Vec3(d.x * inv, ...)`, `d * inv`, `inv * d` and `d * (1.0f / len)` forms all consume
+  `d.x` first (`fxch st(2); fmul st(2)`).
+
+```bash
+python tools/run_physics_samples.py --strict --source src/krusty2/soultree/SoulTreePhysics.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
 
 ## Code-generation limits behind the remaining partials
 

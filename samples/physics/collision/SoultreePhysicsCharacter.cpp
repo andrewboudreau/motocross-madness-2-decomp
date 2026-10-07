@@ -3,7 +3,7 @@
 #include <string.h>
 #include "soultree/SoultreePhysicsCharacter.h"
 #include "soultree/SoultreePhysicsCallees.h"
-#include "SoultreePhysicsObject.h"
+#include "soultree/SoultreePhysicsObject.h"
 
 // SoultreePhysicsBaseObject::field_0x128 is the CollisionObject that slot 2 creates
 // (`new` of 0xb8 bytes, ctor 0x00431e70, tier 1).

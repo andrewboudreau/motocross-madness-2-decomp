@@ -139,7 +139,7 @@ A trial migration compiled against the canonical header and reproduced the same 
   - `field_0x21c.Fn_4a8b00()` becomes `Method_0x004a8b00()`.
   - `field_0x3bc->` becomes `d3d_field_0x1a0->`.
 - **Offset fixes:** none. 0x42c and 0x430..0x433 already sit in SoultreePhysicsCharacter.
-- **Placement:** `SoultreePhysicsObject` (0x00503970) is not in the canonical header. Keep its declaration in collision until its RTTI position is placed.
+- **Placement:** `SoultreePhysicsObject` and `D3DIMSoultreeObject` are declared in `src/krusty2/soultree/SoultreePhysicsObject.h` (the SoultreeObject level is folded into D3DIMSoultreeObject); its ctor/dtor/slot 10 are in `SoulTreePhysics.cpp`, slot 40 (0x00503970) stays in collision.
 
 ## Vehicle: `vehicle/Vehicle.h`, generated from `work/c_vehicle/Vehicle.h.tpl` and `gen.py`
 

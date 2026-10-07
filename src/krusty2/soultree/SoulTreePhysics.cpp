@@ -4,11 +4,13 @@
 // plus the same __FILE__ string).
 #include <math.h>
 #include <string.h>
+#include <float.h>
 #include "soultree/SoultreePhysicsBaseObject.h"
 #include "soultree/SoultreePhysicsCallees.h"
 #include "core/DebugAlloc.h"
 #include "core/MemTag.h"
 #include "soultree/SoultreePhysicsContact.h"
+#include "soultree/SoultreePhysicsObject.h"
 
 #define g_Zero kVec3Zero
 
@@ -1027,6 +1029,188 @@ int SoultreePhysicsBaseObject::GameObjectVirtualSlot10(float dt)
     Fn_502f60(steps, held, refreshed);
     UnknownVirtualSlot21();
     return 1;
+}
+
+// ---- SoultreePhysicsObject (0x005037c0, 0x005038d0, 0x00503c50) -------------------------
+// The physics body that owns its own D3DIMSoultreeObject model node (the sibling of
+// SoultreePhysicsCharacter).  The constructor makes that node the scene node; the
+// destructor has no own cleanup (VC6 runs ~D3DIMSoultreeObject 0x0043f2b0 and
+// ~SoultreePhysicsBaseObject 0x00501260).  Defining them here also emits the deleting
+// destructor 0x00503890 and the vbase-vtable thunks 0x00504260/0x00504270.
+SoultreePhysicsObject::SoultreePhysicsObject(int flags)
+    : GameObject(1), SoultreePhysicsBaseObject(flags), D3DIMSoultreeObject(flags)
+{
+    sceneNode = (SoultreeObject*)(D3DIMSoultreeObject*)this;
+}
+
+SoultreePhysicsObject::~SoultreePhysicsObject()
+{
+}
+
+// GameObject slot 10: the physics update (0x005036f0), then the model node's own update
+// (D3DIMSoultreeObject's override 0x00443490) with the same frame time.
+int SoultreePhysicsObject::GameObjectVirtualSlot10(float dt)
+{
+    SoultreePhysicsBaseObject::GameObjectVirtualSlot10(dt);
+    return D3DIMSoultreeObject::GameObjectVirtualSlot10(dt);
+}
+
+// ---- per-frame step loop (0x00502f60) ----------------------------------------------------
+// 0x0043aa30 (cdecl, collision/CollisionObject.cpp area): merges the penetrating contacts
+// into one response (mean position, summed normal, deepest penetration); the three outputs
+// feed slot 3.  0x0043aff0 (cdecl) resets the contact records when the refresh did not run.
+// Parameter names tier 3; the Vehicle step 0x0052a940 calls the same three helpers.
+void SoultreeMergeContacts(int count, SoultreeContact** contacts, Vec3* scale, Vec3* angVel,
+                           Vec3* vel, Vec3* center, Vec3* pos, Vec3* outArm, Vec3* outVel,
+                           Vec3* outNormal);
+void SoultreeResetContacts(int count, SoultreeContact** contacts);
+
+// Squared length with the components read into locals first (retail loads y, x, z; the
+// same shape as Vec3Normalize 0x005087b0).
+static inline float SquareMagnitudeYXZ(const Vec3& v)
+{
+    float y = v.y, x = v.x, z = v.z;
+    return z * z + (x * x + y * y);
+}
+
+// Length through the reciprocal square-root table: 0 and 1 are returned for squared
+// lengths of exactly 0 and 1.
+static inline float VecLengthRsq(const Vec3& v)
+{
+    float sq = SquareMagnitudeYXZ(v);
+    if (sq == 0.0f)
+        return 0.0f;
+    if (sq == 1.0f)
+        return 1.0f;
+    return 1.0f / FastInvSqrt(sq);
+}
+
+// Runs `steps` fixed sub-steps (tier 3 reading, call structure tier 1).  Each step:
+// records the previous speed, gathers the contacts (refresh 0x0043ad80, slots 8/6/7/31),
+// merges the penetrating contacts into one impulse (slot 3) with a speed clamp, integrates
+// the forces (slots 13/14, rest check), advances the node position by the Adams-Bashforth
+// estimate (3v - v_prev)/2 * dt, rotates the node about the pivot by |w| * dt, then
+// refreshes the cached world state (slots 28/34/29, orientation angles).  A leftover
+// remainder after the last step is run as one extra short step.  `refreshed` is unused.
+// While a respawn is pending (`held`), the placement search (slot 11) and reset (slot 33)
+// replace the step.
+// Near miss (1366/1942 bytes): every call, branch and x87 sequence is in retail order;
+// the residue is stack-slot packing (retail packs the integration temporary into the
+// respawn path's first vector and the merge outputs o3/o1 into its other two, with
+// `impulse` below `o2`).  Declaration order and scoping of the locals do not move it.
+void SoultreePhysicsBaseObject::Fn_502f60(int steps, int held, int refreshed)
+{
+    Vec3 up;
+    float speed;
+
+    if (steps <= 0)
+        return;
+    do {
+        int res;
+        Vec3 zero = kVec3Zero;
+        prevSpeed = linearSpeed;
+        if (prevSpeed < 0.001f || !_finite(prevSpeed)) {
+            prevSpeed = 0.0f;
+            velocity = kVec3Zero;
+            linearSpeed = 0.0f;
+        }
+        if (held) {
+            int dummy;
+            Vec3 a, b, c;
+            UnknownVirtualSlot11(held, &a, &b, &c, &dummy);
+            UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, UnknownVirtualSlot32());
+            stepRemainder = 0.0f;
+            break;
+        }
+        if (centerNode)
+            centerNode->GetPositionIn(0, &centerOfMass);
+        else
+            sceneNode->GetPositionIn(0, &centerOfMass);
+        speed = prevSpeed;
+        up = weightForce;
+        res = SoultreeRefreshContacts(UnknownVirtualSlot5(0), &touchingPointCount, collisionPointCount,
+                                      collisionPoints, terrain, &centerOfMass, collisionShape,
+                                      collisionRadius);
+        if (res)
+            pointsTouching = touchingPointCount > 0;
+        UnknownVirtualSlot8();
+        UnknownVirtualSlot6(&up, &speed);
+        UnknownVirtualSlot7(&up);
+        airborne = !pointsTouching;
+        if (pointsTouching) {
+            if (!res)
+                SoultreeResetContacts(collisionPointCount, collisionPoints);
+            UnknownVirtualSlot31();
+        }
+        if (pointsTouching) {
+            Vec3 scale;
+            Vec3 o1, o2, o3;
+            float impulse;
+            scale = Vec3(1.0f, 1.0f, 1.0f);
+            SoultreeMergeContacts(collisionPointCount, collisionPoints, &scale, &worldAngularVelocity,
+                                  &velocity, &centerOfMass, &position, &o3, &o2, &o1);
+            UnknownVirtualSlot3(&o2, &o1, &o3, &scale, 0x67, 0, &impulse);
+            if (prevSpeed * 5.0f < linearSpeed && linearSpeed > 5.0f) {
+                float r = prevSpeed / linearSpeed;
+                velocity.x *= r;
+                velocity.y *= r;
+                velocity.z *= r;
+                linearSpeed = prevSpeed;
+            }
+            if (prevSpeed < 0.001f && linearSpeed < 0.1f) {
+                velocity = kVec3Zero;
+                linearSpeed = 0.0f;
+            }
+        }
+        Vec3 zeroB = kVec3Zero;
+        UnknownVirtualSlot13(&up, &zeroB, 1.0f);
+        Fn_502c40();
+        UnknownVirtualSlot14(&up, &zeroB, &zero);
+        UnknownVirtualSlot26();
+        position += (velocity * 3.0f - prevVelocity) * 0.5f * stepTime;
+        sceneNode->SetPosition(position);
+        float mag = VecLengthRsq(angularVelocity) * stepTime;
+        if (_finite(mag) && mag >= 0.0001f) {
+            scratchVector = angularVelocity;
+            float sq = SquareMagnitudeYXZ(scratchVector);
+            if (sq == 0.0f) {
+                scratchVector = kVec3Zero;
+            } else {
+                float inv = FastInvSqrt(sq);
+                scratchVector.x *= inv;
+                scratchVector.y *= inv;
+                scratchVector.z *= inv;
+            }
+            if (mag > 2.0f) {
+                mag *= 0.95f;
+                angularVelocity.x *= 0.95f;
+                angularVelocity.y *= 0.95f;
+                angularVelocity.z *= 0.95f;
+            }
+            sceneNode->RotateAboutPoint(rotationPivot, scratchVector, mag);
+        }
+        sceneNode->GetPosition(&position);
+        if (centerNode)
+            centerNode->GetPositionIn(0, &centerOfMass);
+        else
+            centerOfMass = position;
+        worldAngularVelocity = sceneNode->LocalToWorldDirection(angularVelocity);
+        steps = UnknownVirtualSlot28(steps);
+        lastStepTime = stepTime;
+        steps--;
+        if (steps == 0 && stepRemainder > 0.0001f) {
+            float t = stepRemainder;
+            steps = 1;
+            stepRemainder = 0.0f;
+            stepTime = t;
+            invStepTime = 1.0f / t;
+        }
+        UnknownVirtualSlot34();
+        OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll, &bodySinRoll,
+                                     &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+        prevVelocity = velocity;
+        UnknownVirtualSlot29(steps == 0);
+    } while (steps > 0);
 }
 
 // 0x00500220 (cdecl, called by slot 3): impulse response of one contact.  Tier 3 reading

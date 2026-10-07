@@ -393,10 +393,10 @@
     "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsBaseObject@@UAEHM@Z",
     "target_va": "0x005036f0",
     "target_size": 202,
-    "notes": "Exact. Per-frame update. Declaring `refreshed = 0` at the top (before the field_0x20d store) gives retail's xor ebx,ebx / mov [..],bl.; strict: unresolved symbol: ?SoultreeRefreshContacts@@YAHHPAHHPAPAVSoultreeContact@@PAUSoultreeProbe@@PAUVec3@@HM@Z",
+    "notes": "Strict exact once SoultreeRefreshContacts 0x43ad80 is bound.",
     "class": "SoultreePhysicsBaseObject",
     "source": "SoulTreePhysics.cpp",
-    "expect": "masked",
+    "expect": "exact",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
@@ -1078,5 +1078,75 @@
     "expect": "exact",
     "notes": "vtable 0x558168 slot 23",
     "bindings": "SoultreeQuadTreeRenderer.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "??0SoultreePhysicsObject@@QAE@H@Z",
+    "target_va": "0x005037c0",
+    "target_size": 194,
+    "expect": "exact",
+    "notes": "ctor: GameObject(1) vbase, SoultreePhysicsBaseObject(flags), D3DIMSoultreeObject(flags), sceneNode = this; EH handler 0x54e39b",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "??1SoultreePhysicsObject@@UAE@XZ",
+    "target_va": "0x005038d0",
+    "target_size": 156,
+    "expect": "exact",
+    "notes": "dtor core, this = plain GameObject +0x228; runs ~D3DIMSoultreeObject 0x43f2b0 and ~SoultreePhysicsBaseObject 0x501260",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "??_GSoultreePhysicsObject@@UAEPAXI@Z",
+    "target_va": "0x00503890",
+    "target_size": 51,
+    "expect": "exact",
+    "notes": "deleting dtor (lea esi,[ecx-0x228]); slot 0 of vtable 0x557eb8",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsObject@@UAEHM@Z",
+    "target_va": "0x00503c50",
+    "target_size": 30,
+    "expect": "exact",
+    "notes": "base physics update 0x5036f0 then D3DIMSoultreeObject slot 10 0x443490",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "??_ESoultreePhysicsObject@@$4PPPPPPPM@CNA@AEPAXI@Z",
+    "target_va": "0x00504260",
+    "target_size": 14,
+    "expect": "exact",
+    "notes": "vbase vtable 0x557e48 slot 0 thunk: sub ecx,[ecx-4]; sub ecx,0x2d0; jmp 0x503890",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@SoultreePhysicsObject@@$4PPPPPPPM@CNA@AEHM@Z",
+    "target_va": "0x00504270",
+    "target_size": 14,
+    "expect": "exact",
+    "notes": "vbase vtable slot 10 thunk -> 0x503c50",
+    "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreePhysicsBaseObject",
+    "source": "SoulTreePhysics.cpp",
+    "candidate_symbol_contains": "?Fn_502f60@SoultreePhysicsBaseObject@@QAEXHHH@Z",
+    "target_va": "0x00502f60",
+    "target_size": 1921,
+    "expect": "partial",
+    "notes": "1366/1942; all calls, branches and x87 sequences in retail order; residue is stack-slot packing.",
+    "bindings": "SoulTreePhysics.bindings.json"
   }
 ]

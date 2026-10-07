@@ -1,33 +1,47 @@
-// SoultreePhysicsObject and D3DIMSoultreeObject -- minimal class shapes for the slot 40
-// loader 0x00503970 (SoulTreePhysics.cpp).
+// SoultreePhysicsObject and D3DIMSoultreeObject -- class shapes for the SoulTreePhysics.cpp
+// members of SoultreePhysicsObject (ctor 0x005037c0, dtor 0x005038d0, GameObject slot 10
+// 0x00503c50) and the slot 40 loader 0x00503970 (samples/physics/collision).
 //
 // Evidence (tier 1, analysis/rtti_classes.json and analysis/vtables.json):
 //  * SoultreePhysicsObject : SoultreePhysicsBaseObject (+0), D3DIMSoultreeObject (+540).
 //    COL/vtable records: 0x00557f54 @0 (41 slots, slot 40 = 0x00503970 introduced here),
-//    0x00557f28 @540 (10 slots), 0x00557eb8 @552 (27), 0x00557e48 @1272 (27, the
-//    SoultreePhysicsBaseObject virtual GameObject; slot 0 is the vtordisp thunk 0x00504260,
-//    `sub ecx,[ecx-4]`, so a vtordisp dword sits at 0x4f4).
+//    0x00557f28 @540 (10 slots), 0x00557eb8 @552 (27, D3DIMSoultreeObject's plain GameObject:
+//    slot 0 = 0x00503890, slot 10 = 0x00503c50), 0x00557e48 @1272 (27, the
+//    SoultreePhysicsBaseObject virtual GameObject; slot 0 is the vtordisp thunk 0x00504260
+//    `sub ecx,[ecx-4]; sub ecx,0x2d0; jmp 0x00503890`, slot 10 the thunk 0x00504270 ->
+//    0x00503c50, so a vtordisp dword sits at 0x4f4).
 //  * D3DIMSoultreeObject : SoultreeObject : QuadTreeObject (+0), GameObject (+12), all
 //    non-virtual (pdisp -1).  So SoultreePhysicsObject holds TWO GameObjects: the virtual
 //    one from SoultreePhysicsBaseObject and a plain one at 0x21c + 12 = 0x228.
+//  * VC6 gives the destructor and the GameObject slot 10 override of SoultreePhysicsObject a
+//    `this` of that plain GameObject (+0x228): the deleting destructor 0x00503890 does
+//    `lea esi,[ecx-0x228]`, the core 0x005038d0 restores the vptrs through esi-0x228 and
+//    the vbase-vtable thunks adjust by 0x2d0 = 0x4f8 - 0x228.  The same holds for
+//    D3DIMSoultreeObject itself (dtor 0x0043f2b0: `mov [edi-0xc], 0x005513ec`).  That is
+//    what the two GameObject bases below produce.
 //  * D3DIMSoultreeObject primary vtable 0x005513ec: QuadTreeObject's two slots, then slots
-//    2..9 (slot 9 = 0x0043f4b0, `ret 0x14`).
+//    2..9 (slot 9 = 0x0043f4b0, `ret 0x14`).  Its GameObject vtable 0x0055137c overrides
+//    slots 0 (0x0043f280), 4 (0x00444540), 5 (0x00444520) and 10 (0x00443490).
 //
 // Deliberate simplification (listed in hierarchy/MIGRATION.md): the SoultreeObject level is
-// folded into D3DIMSoultreeObject, because common/SoultreeObject.h is the flat,
+// folded into D3DIMSoultreeObject, because core/SoultreeObject.h is the flat,
 // non-polymorphic view of that class ("do not derive from it").  The base offsets and
 // vtable shapes are the same.  Slot names are D3DIMObjectVirtualSlotN so they cannot
-// override SoultreePhysicsBaseObject::UnknownVirtualSlotN by accident.  Only what the loader
-// needs is declared; GameObject overrides (D3DIM slots 0/4/5/10/12/14, SoultreePhysicsObject
-// slots 0/10) are left out.
-#ifndef COLLISION_SOULTREE_PHYSICS_OBJECT_H
-#define COLLISION_SOULTREE_PHYSICS_OBJECT_H
+// override SoultreePhysicsBaseObject::UnknownVirtualSlotN by accident.
+#ifndef SOULTREE_PHYSICS_OBJECT_H
+#define SOULTREE_PHYSICS_OBJECT_H
 
 #include "motion/D3DIMSoultreeCharacter.h"   // SoultreePhysicsBaseObject, SoultreeLoadDesc
-#include "collision/CollisionObject.h"                       // QuadTreeObject, GameObject
+#include "collision/CollisionObject.h"       // QuadTreeObject, GameObject
+#include "soultree/SoultreePhysicsBaseObject.h"
 
 class D3DIMSoultreeObject : public QuadTreeObject, public GameObject {
 public:
+    explicit D3DIMSoultreeObject(int a);          // 0x0043f160 (thiscall, ret 4)
+    virtual ~D3DIMSoultreeObject();               // core 0x0043f2b0, deleting 0x0043f280
+    virtual void GameObjectVirtualSlot4();        // 0x00444540
+    virtual void GameObjectVirtualSlot5();        // 0x00444520
+    virtual int GameObjectVirtualSlot10(float dt); // 0x00443490
     virtual void D3DIMObjectVirtualSlot2();       // 0x0043f950
     virtual void D3DIMObjectVirtualSlot3();       // 0x0043fe40
     virtual void D3DIMObjectVirtualSlot4();       // 0x004440a0
@@ -47,6 +61,12 @@ public:
 
 class SoultreePhysicsObject : public SoultreePhysicsBaseObject, public D3DIMSoultreeObject {
 public:
+    // 0x005037c0 (thiscall, ret 8 = flags + the hidden most-derived flag): GameObject(1) when
+    // most-derived, SoultreePhysicsBaseObject(flags), D3DIMSoultreeObject(flags), then
+    // sceneNode = this (the D3DIMSoultreeObject subobject at +0x21c).
+    explicit SoultreePhysicsObject(int flags);
+    virtual ~SoultreePhysicsObject();             // core 0x005038d0, deleting 0x00503890
+    virtual int GameObjectVirtualSlot10(float dt); // 0x00503c50 (vbase thunk 0x00504270)
     // Slot 40 (0x00503970, `ret 0x70` = 28 argument dwords, tier 1).  Grouping (tier 2):
     //  * a1..a4 go to D3DIMObjectVirtualSlot9 as (a1, a2, a3, a4, 1); a2 is also the name the
     //    ".col" path is built from, a3 is tested at +0x25.

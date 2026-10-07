@@ -37,7 +37,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `math/` | `FastMath.h` (FastSqrt / FastInvSqrt) |
 | `collision/` | `CollisionObject.cpp` (+ `CollisionObject.h`, `CollisionShapeTests.h`, `CollisionPoint.h`, `CollisionTypes.h`): 44 strict cases |
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts) |
-| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character headers: 37 strict cases; `SoultreeQuadTreeRenderer.cpp`: 8 strict cases; `soultree.cpp` (SoultreeObject): 56 strict cases |
+| `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 44 strict cases; `SoultreeQuadTreeRenderer.cpp`: 8 strict cases; `soultree.cpp` (SoultreeObject): 56 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
 | `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (42 strict cases of 55) and `BikeAI.cpp` (23 strict cases), `Vehicle.h`, `Bike.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
