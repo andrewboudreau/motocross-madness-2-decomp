@@ -16,12 +16,16 @@
 #include "DialogProc.h"
 #include "GUIManager.h"
 #include "InputDevice.h"
+#include "KeyboardDevice.h"
 #include "MatrixUtil.h"
 #include "PCAudio.h"
+#include "PCTextureMap.h"
+#include "Palette8.h"
 #include "PCRenderTarget.h"
 #include "RenderTarget.h"
 #include "RenderInterfaces.h"
 #include "TextureMap.h"
+#include "Tgafile.h"
 #include "TrackGame.h"
 #include "UIDialog.h"
 #include "UnknownResourceManager.h"
@@ -48,12 +52,17 @@ static inline int UnknownMaxInt(int a, int b) { return a < b ? b : a; }
 void* UnknownFunction47b570(void* block, unsigned int size);
 // 0x0065b608: the dialog whose list box is being sorted (0x00477900).
 UnknownGameUiDialog* g_UnknownGlobal65b608;
+// 0x0065b60c: the frames of the zoom transition (UIControl slot 41).
+int g_UnknownGlobal65b60c;
 
 // cdecl 0x00477b60: the list rows' default order (by text).
 int UnknownFunction477b60(const void* a, const void* b);
 // cdecl 0x00477800: the qsort comparison 0x00477900 sorts with
 // (samples/ui/GameUiNearMisses.cpp).
 int UnknownFunction477800(const void* a, const void* b);
+// cdecl 0x0047b490: whether `texture` has a pixel of colour `key`
+// (samples/ui/GameUiNearMisses.cpp).
+int UnknownFunction47b490(TextureMap* texture, int key);
 
 // One .dtm section of a dialog (0x3c bytes; the table is at UIDialog+0x9cc):
 // its name and the control, image or sound built for it
@@ -4410,4 +4419,269 @@ int UIProgressBar::UnknownVirtualSlot40() {
 void UIProgressBar::UnknownFunction47b3d0(int texture, int owned) {
     barTexture = (TextureMap*)texture;
     ownsBarTexture = owned;
+}
+
+// ---------------------------------------------------------------------------
+// Input, image and list slots promoted from the near-miss sample
+
+// 0x004715d0
+int UIControl::UnknownVirtualSlot41() {
+    if (field_0x164 == 0 && field_0xb0 && !field_0x25_bit2) {
+        g_UnknownGlobal65b60c = field_0xb0 < 0 ? 7 : field_0xb0;
+        field_0x88 = 21.0f;
+        field_0x8c = 11.0f;
+        int left = field_0x3c[0];
+        int width = field_0x3c[2] - left;
+        field_0x80 = max(0.0f, (float)(width / 2 + left) - 10.5f);
+        int top = field_0x3c[1];
+        int height = field_0x3c[3] - top;
+        field_0x84 = max(0.0f, (float)(height / 2 + top) - 5.5f);
+        field_0x90 = ((float)left - field_0x80) / g_UnknownGlobal65b60c;
+        field_0x94 = ((float)top - field_0x84) / g_UnknownGlobal65b60c;
+        field_0x98 = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
+        field_0x9c = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
+        if (slideSound) {
+            slideSound->SetVolume(ownerGui->field_0x34c, 0);
+            slideSound->PlayWithOptions(1, 0, 0);
+        }
+    } else {
+        field_0x80 += field_0x90;
+        field_0x84 += field_0x94;
+        field_0x88 += field_0x98;
+        field_0x8c += field_0x9c;
+    }
+    if (field_0x164 == g_UnknownGlobal65b60c)
+        return 1;
+    UnknownVirtualSlot50();
+    if (!field_0x25_bit2 || field_0x164) {
+        float width = field_0x88;
+        field_0x2c[0] = (int)field_0x80;
+        field_0x2c[1] = (int)field_0x84;
+        field_0x2c[2] = (int)(width + field_0x80);
+        field_0x2c[3] = (int)(field_0x84 + field_0x8c);
+        switch (controlType) {
+        case 1:
+        case 4:
+        case 5:
+        case 9:
+        case 10:
+            drawnTexture = stateImages[currentState]->GetCurrentTexture();
+            field_0x164++;
+            break;
+        default:
+            drawnTexture = 0;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// 0x00472130
+int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    int handled = 0;
+    GUIInputDevice* device = ownerDialog->guiUser->UnknownFunction4882a0(event);
+    if (device) {
+        POINT position = device->pointerPosition;
+        if (event->kind)
+            handled = UnknownVirtualSlot56(event->control, (int*)&position);
+    }
+    if (!handled)
+        return GameObject::UnknownVirtualSlot22(event, entry);
+    return 1;
+}
+
+// 0x004753c0
+int UIScrollBar::UnknownFunction4753c0(int value, int range) {
+    unsigned int position = field_0x21c ? range - value : value;
+    UnknownVirtualSlot50();
+    if (!field_0x1f0 && UnknownFunction475300(range) == position)
+        return 1;
+    if (!range) {
+        field_0x1ec_float = position;
+        return 1;
+    }
+    unsigned int travel = controlType == 8 ? UnknownVirtualSlot61() - thumbWidth : UnknownVirtualSlot62() - thumbHeight;
+    if ((unsigned int)range > 0) {
+        float limit = travel;
+        float scaled = (double)(travel * position) / (unsigned int)range;
+        field_0x1ec_float = scaled < limit ? scaled : limit;
+        return 1;
+    }
+    return 0;
+}
+
+// 0x00477730
+void UIListBox::ScrollBy(int delta) {
+    int handled = 0;
+    int count = rowCount;
+    if (!count)
+        return;
+    int first = firstVisibleRow += delta;
+    if (field_0x244) {
+        if (first < 0)
+            firstVisibleRow = first + count;
+        int index = firstVisibleRow % count;
+        if (index < 0)
+            index = -index;
+        firstVisibleRow = index;
+    } else {
+        int last = count - visibleRowCount;
+        if (last < first)
+            first = last;
+        firstVisibleRow = UnknownMaxInt(first, 0);
+    }
+    if (visibleRowCount == 1) {
+        UnknownVirtualSlot65(firstVisibleRow);
+        UnknownVirtualSlot66(&handled);
+        if (handled)
+            return;
+    }
+    UnknownVirtualSlot50();
+    UpdateScrollBars();
+}
+
+// 0x00477ff0
+int UIListBox::UnknownVirtualSlot56(int a, int* position) {
+    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && a == 1) {
+        field_0x230 += field_0x234;
+        field_0x234 = 0;
+    }
+    return UIControl::UnknownVirtualSlot56(a, position);
+}
+
+// 0x00478040
+int UIListBox::UnknownVirtualSlot21(int key) {
+    if (!UIControl::UnknownVirtualSlot21(key) &&
+        ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this && selectable) {
+        int row;
+        switch (key) {
+        case VK_LEFT:
+        case VK_UP:
+            if (GetSelectedRow() <= 0)
+                return 0;
+            SelectRow(GetSelectedRow() - 1);
+            break;
+        case VK_RIGHT:
+        case VK_DOWN:
+            if (GetSelectedRow() >= rowCount - 1)
+                return 0;
+            SelectRow(GetSelectedRow() + 1);
+            break;
+        case VK_HOME:
+            if (GetSelectedRow() <= 0)
+                return 0;
+            SelectRow(0);
+            break;
+        case VK_END:
+            if (GetSelectedRow() >= rowCount - 1)
+                return 0;
+            SelectRow(rowCount - 1);
+            break;
+        case VK_PRIOR:
+            row = GetSelectedRow() - visibleRowCount;
+            if (row < 0)
+                row = 0;
+            if (row == GetSelectedRow())
+                return 0;
+            SelectRow(row);
+            break;
+        case VK_NEXT:
+            row = GetSelectedRow() + visibleRowCount;
+            if (row > rowCount - 1)
+                row = rowCount - 1;
+            if (row == GetSelectedRow())
+                return 0;
+            SelectRow(row);
+            break;
+        default:
+            return 0;
+        }
+        int handled;
+        UnknownVirtualSlot66(&handled);
+        return 1;
+    }
+    return 0;
+}
+
+// 0x00478810
+TextureMap* UIMultiState::UnknownVirtualSlot48(int state) {
+    UIAnim* image;
+    if (currentState == 4 && stateTable[selectedState].focusImage)
+        image = stateTable[selectedState].focusImage;
+    else
+        image = stateTable[selectedState].image;
+    if (image)
+        return image->GetCurrentTexture();
+    return 0;
+}
+
+// 0x00479df0
+void UIDDLListBox::UnknownVirtualSlot66(int* handled) {
+    UnknownDialogEvent event;
+    event.handled = 0;
+    ownerList->SetText(GetRowText(GetSelectedRow()));
+    ownerList->UnknownFunction47a2d0(0);
+    event.kind = kDialogListSelect;
+    event.code = eventCode;
+    event.controlName = ownerList->GetName();
+    event.dialog = ownerDialog;
+    event.control = this;
+    event.gui = ownerDialog->guiManager;
+    ownerDialog->UnknownVirtualSlot29(&event);
+}
+
+// 0x00472bc0
+int UIFrame::UnknownFunction472bc0(void* stream, int offset, void* palette) {
+    if (stream) {
+        UnknownTgaFile* image = UnknownFunction511dd0((UnknownTextureStream*)stream, 0, offset);
+        if (image) {
+            int format = g_TrackGame->renderTarget->field_0x28;
+            frameWidth = image->width;
+            frameHeight = image->height;
+            frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)field_0x20, 1);
+            Palette8* pal = (Palette8*)palette;
+            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
+                                            image->width, 0x22b, format,
+                                            (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
+                                            pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+            if (UnknownFunction47b490(frameTexture, 0xff00ff))
+                frameTexture->UnknownVirtualSlot18(0xff00ff);
+            UnknownFunction512dd0(image);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// 0x00471fd0: a key or button press. A keyboard press of this control's
+// "KeyBind" without Shift focuses it and presses it (slots 55 and 56);
+// other presses go to slot 55 with the pointer position.
+int UIControl::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    int handled = 0;
+    if (ownerDialog->guiUser->UnknownFunction4881d0(event)) {
+        if (event->kind == 0) {
+            if (keyBind && keyBind == event->control &&
+                !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&
+                !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0) &&
+                IsEnabled() && field_0x70) {
+                ownerDialog->guiUser->UnknownFunction487730((UnknownGuiControl*)this, 0, 1);
+                UnknownVirtualSlot55(0, 0);
+                UnknownVirtualSlot56(0, 0);
+                return 1;
+            }
+            if (UnknownFunction43caa0(0x32, event->kind, event, 0x80) &&
+                ownerDialog->guiUser->field_0x1dc == (int)this)
+                moveable = 1;
+        }
+        if (event->kind) {
+            POINT position;
+            GUIInputDevice* device = ownerDialog->guiUser->pointerDevice;
+            if (device)
+                position = device->pointerPosition;
+            handled = UnknownVirtualSlot55(event->control, ownerDialog->guiUser->pointerDevice ? (int)&position : 0);
+        }
+    }
+    if (!handled)
+        return GameObject::UnknownVirtualSlot23(event, entry);
+    return 1;
 }

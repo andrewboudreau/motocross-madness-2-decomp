@@ -16,9 +16,12 @@ Extent: `0x00469db0..0x0047b66f`. Evidence:
 - **Vtables:** UIDialog `0x00552a9c` through UIProgressBar `0x00553c68`.
 - **`$E`:** its four kVec3 initializers sit at `0x0046e870..0x0046ea5b`.
 
-Exact: 302 functions compile strict-exact from GameUi.cpp. 295 are
+Exact: 312 functions compile strict-exact from GameUi.cpp. 305 are
 registered as calibration cases, including the 13 drawing, input and layout
-functions in the file's last section ("Drawing and input slots"). Seven sit
+functions in the file's last section ("Drawing and input slots") and the ten
+promoted from the near-miss sample (UIControl slots 22, 23 and 41, UIScrollBar
+`0x004753c0`, UIListBox slots 21 and 56 and `ScrollBy`, UIMultiState slot 48,
+UIDDLListBox slot 66 and UIFrame `0x00472bc0`). Seven sit
 at the addresses of the deliberately non-strict compiler-shape probes in
 `samples/calibration/CompilerShapeProbe.cpp`; those probes are kept
 unchanged as regression probes. The 17 added with the class-size
@@ -32,6 +35,41 @@ UIVideoStatic; the bodies are shared), UIVideoStatic's constructor,
 destructor pair, slots 40 and 48 and `0x0047b3d0`. The
 UIDDLListBox constructor case (`0x00479d10`) is re-keyed to its retail argument order
 `??0UIDDLListBox@@QAE@HHPAUCameraRect@@PAVUnknownGameUiDialog@@PAVUIDropDownList@@@Z`.
+
+Source forms the promoted functions needed (each one byte-exact only this way):
+- UIControl slot 23 (`0x00471fd0`, a key or button press) and slot 22
+  (`0x00472130`): the result of slot 55/56 goes into a local `handled` that
+  one final `if (!handled) return GameObject::...; return 1;` tests. Every
+  `return 1` inside the branches, with or without a goto, duplicates the
+  epilogue; retail jumps back to one.
+- UIControl slot 41 (`0x004715d0`): the zoom's right edge is
+  `(int)(width + field_0x80)` with `float width = field_0x88` loaded into a
+  local first (both member orders give `fld +0x80`), and the switch has
+  cases 1, 4, 5, 9 and 10 (the retail index table maps type 2 to default).
+- UIScrollBar `0x004753c0`: `float limit = travel` before the division, so
+  the unsigned travel is converted once and held on the FPU stack.
+- UIListBox `ScrollBy` (`0x00477730`): the clamp is `UnknownMaxInt(first, 0)`;
+  the ternary and `max` forms and the result through another register.
+- UIListBox slot 21 (`0x00478040`): VK_END compares and selects
+  `rowCount - 1` twice (VC6 keeps it in a `lea`); a local gives `dec`.
+- UIListBox slot 56 (`0x00477ff0`): `guiUser->field_0x1d8 == this` in that
+  operand order and `field_0x230 += field_0x234; field_0x234 = 0;`.
+- UIMultiState slot 48 (`0x00478810`): `if (currentState == 4 &&
+  stateTable[..].focusImage) image = focusImage; else image = image;` then
+  one `if (image)`.
+- UIDDLListBox slot 66 (`0x00479df0`): the event code is this control's own
+  `eventCode` (+0x74), not the drop-down list's.
+- UIFrame `0x00472bc0`: the palette's two members are passed as inline
+  conditionals (`pal ? pal->field_0x708 : 0`, as GUIManager.cpp does); named
+  locals swap ecx/ebx.
+
+Not reconstructed: UIDialog's constructor `0x00469db0`, deleting destructor
+`0x00469ff0` and destructor `0x0046a070`. They construct and destroy the
+timer list (a ContainerList at +0x7f24, `ContainerList.h` line 59 `new`) as a
+member with an EH state, which needs UIDialog.h to declare the real 0x7f58-byte
+layout; today UIDialog declares no members and 65 derived dialog classes in
+ten headers pad from +0x2c, so the layout stays with UnknownGameUiDialog in
+GameUi.cpp.
 
 Class layout (sizes from the `new` sites in `0x0046a920`, `0x00479ea0` and
 dlgprocs.cpp, and from the constructors):
@@ -117,14 +155,17 @@ Other header facts:
   +0x7f1c and +0x7f40.
 - GameObject.h befriends UICtlContainer, UIControl and UIDialog.
 
-Near misses (`samples/ui/GameUiNearMisses.cpp`): 38 functions, listed with
+Near misses (`samples/ui/GameUiNearMisses.cpp`): 29 functions, listed with
 their differences at the top of the sample, among them the UIControl and
 UIListBox constructors, the UIControl destructor, UIListBox `0x00477110`
 (adds an image row and returns 0/1; retail places the epilogue after the
 stream-failure block), several list-box and scroll slots and the resource
-parser. UIControl's deleting destructor
-(`0x00470430`) is byte-exact but VC6 emits it only alongside the near-miss
-UIControl constructor, so it is not registered.
+parser. Most of the remaining ones differ only in register choice (slots 49
+of UIControl and UIButton, UIAnim's constructor and advance, the colour-key
+test) or in block placement (UIScrollCtl slot 60, UIFrame's file
+constructor); the forms tried are noted in the sample. UIControl's deleting
+destructor (`0x00470430`) is byte-exact but VC6 emits it only alongside the
+near-miss UIControl constructor, so it is not registered.
 
 The resource parser `0x0046a920` (16 KB, in the sample): it lists the
 resource's sections between "Set_Anim", "Set_Sound" and "Set_Control"
@@ -132,5 +173,15 @@ markers into the dialog's named entries, then reads them in four passes
 ("Set_Info", images, sounds, then "Set_Default" and the controls). 92% of
 its instructions agree once stack offsets and relocations are ignored; the
 differences are register allocation (retail keeps the current control in
-ebx) and a frame 0x80 bytes larger in retail (a buffer at +0x2174 that no
-instruction reads), which shifts the stack offsets.
+ebx) and the frame, 0x9c74 bytes in retail against 0x9bf4 here. The large
+arrays (`buffer`, `tip`, the three 50-entry default tables) and the scalars
+at the frame's base have the same offsets; the 0x80-byte key buffers
+between them do not. Probes (`char` buffers with chosen use counts) show how
+VC6 lays a frame out: locals are sorted by static use count, the most used
+nearest esp, equal counts by size (bigger higher) and then by a fixed
+permutation of the use order (10 equally used buffers come out as uses
+10 1 9 3 8 4 7 2 6 5 from the top); declaration order plays no part. Retail
+therefore encodes different use counts for the key buffers, and it has one
+0x80-byte local that no instruction references, allocated between `toolTip`
+and `fxSoundOut` (esp+0x2184 at the frame's base), which shifts the buffers
+below it by 0x80.

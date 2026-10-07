@@ -2,29 +2,35 @@
 // included below for its types and matched functions). Check: compile this
 // file and compare each function with GameUiNearMisses.bindings.json.
 //
-// 0x0046e8c0 dialog slot 28 (55/64): retail swaps eax and edx.
+// 0x0046e8c0 dialog slot 28 (55/64): retail stores the value before loading
+//   the vtable (and so keeps the vtable in eax); every store order gives the
+//   hoisted load.
 // 0x0046ea80 (160/164): the two arguments are loaded into the opposite
-//   registers.
+//   registers (id in esi in retail); a local copy of either does not change it.
 // 0x0046ff70 (23/71): the same event stores; retail schedules them in field
 //   order, VC6 here hoists `this` and the parent's GUI. Seven store orders were
-//   tried.
+//   tried, plus every position of the control store.
 // 0x00470170 UIControl constructor (535/578): retail places the owner == 0
 //   block differently.
 // 0x00470450 UIControl destructor (88/386): retail threads the tool-tip jumps
 //   and keeps a value in edi.
-// 0x004705d0 UIControl slot 49 (91/101): a register swap.
+// 0x004705d0 UIControl slot 49 (91/101) and 0x004733a0 UIButton slot 49
+//   (85/99): the value loaded for each call lands in another register
+//   (retail: ecx/edx, VC6 here: edx/eax); an int SetFontColor, a local for the
+//   state, `if (enabled)` and the inverted branch order give the same bytes.
 // 0x00470f10 UIControl slot 39 (226/332): a register permutation.
-// 0x004715d0 UIControl slot 41, the zoom (635/638): retail loads +0x88 before
-//   adding +0x80 for the right edge; both source orders give fld +0x80.
-// 0x00472130 UIControl slot 22 (82/113): block layout.
-// 0x00472e30 UIAnim constructor (34/82): store order.
-// 0x00472fe0 UIAnim advance (77/194): retail copies the index with `mov ecx,
-//   eax`.
-// 0x004733a0 UIButton slot 49 (85/99): a register swap.
+// 0x00472e30 UIAnim constructor (34/82): retail stores the palette (+0xf4)
+//   after the zeroed members, right before the frame-list memset; VC6 here
+//   hoists it next to the texture store whatever the statement, initializer
+//   list or loop form.
+// 0x00472fe0 UIAnim advance (77/194): retail copies the frame index into ecx
+//   before indexing the frame list (`mov ecx, eax`); a local index, a
+//   reloaded member and GetCurrentFrame() all index with eax.
 // 0x004749f0 UIScrollCtl slot 60 (52/274): retail lets case 10 fall into the
-//   shared tail and places case 9 after the return; switch, if/else and goto
-//   forms all lay case 9 last.
-// 0x004753c0 (165/262): the operand order of the double / unsigned division.
+//   shared event tail (ending in its own ret) and places case 9 after it,
+//   then case 0x101; VC6 here places the tail after case 9. Switch (either
+//   case order, `break` or `return` after the tail), if/else and goto forms
+//   all give the same layout.
 // 0x00475c70 UIListBox constructor (319/382): retail re-tests the row height
 //   after the owner's font height test and reloads the owner for it; VC6
 //   here threads both tests (five if/ternary forms tried).
@@ -39,28 +45,24 @@
 // 0x004773a0 adds an image row (169/232): retail loads the frame's width
 //   before its height and stores the row's +0x18 later; 40 store orders were
 //   tried.
-// 0x00477730 UIListBox scroll (188/190): the operand order of an `and`.
 // 0x00477800 qsort compare (5/262).
 // 0x00477bc0 (89/286): retail keeps zero in a different register.
 // 0x00477e90 UIListBox slot 55 (155/344): retail keeps the point in ebx and
 //   the row offset in ebp; VC6 here swaps them.
-// 0x00477ff0 UIListBox slot 56 (62/74): load order.
-// 0x00478040 UIListBox slot 21, the arrow keys (185/324): for VK_END retail
-//   computes the last row with `lea edi, [eax - 1]`, VC6 here with `mov edi,
-//   ...; dec edi`.
-// 0x00478810 UIMultiState slot 48 (13/66): register choice.
-// 0x00479df0 UIDDLListBox slot 66 (104/120).
-// 0x0047b490 colour-key test (116/210): retail keeps the key pixel in esi and
-//   the row count in the key's argument slot.
-// 0x00472960 UIFrame constructor from a file (377/562): retail re-tests the
-//   loaded image before freeing it on both paths; VC6 here threads the test.
-// 0x00472bc0 UIFrame image from a stream (295/315): the palette's two members
-//   land in ecx/ebx swapped.
+// 0x0047b490 colour-key test (116/210): retail keeps the key pixel in esi,
+//   the width in edx and spills the row counter into the key's argument
+//   slot; VC6 here spills the pixel instead. Hoisting the width or
+//   reordering the red/green/blue terms moves the register pressure
+//   elsewhere.
+// 0x00472960 UIFrame constructor from a file (352/562): retail places the
+//   sprintf (image missing) block after the epilogue, jumping back to the
+//   `if (image)` free test; VC6 here lays it inline.
 // 0x0046ef00 UIDialog slot 10 (352/555): the timer's +0x0c is cleared before
 //   +0x14 is loaded, and the joystick branches sit after the epilogue.
 // 0x004734c0 UIButton slot 28 (256/328) and 0x00478e10 UIMultiState slot 28
-//   (28/328): retail keeps the result partly in edi, tests Unlock's result
-//   and returns separately when Lock fails.
+//   (28/328): retail keeps the 8-bit result in edi and the 16-bit one in
+//   memory, tests Unlock's result and returns separately when Lock fails.
+//   Ternary, separate-result and goto forms keep the result in memory.
 // 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
 //   redraw count in memory.
 // 0x00474150 UIEditBox slot 20 (339/1048): Backspace: retail loads the
@@ -68,7 +70,8 @@
 // 0x00474880 UIScrollCtl slot 55 (254/355): retail pushes every register in
 //   the prologue and keeps `this` in esi.
 // 0x00479710 UIDDLScrollBar slot 57 (736/738): the list's +0x204 goes through
-//   ebp instead of ecx.
+//   ebp instead of ecx (retail keeps `position`'s register busy there).
+//   Inlining the row expression costs a prologue push instead.
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
 // 0x0047a400 drop-down layout (320/960): store scheduling of the part rects.
@@ -77,9 +80,12 @@
 //   calls and constants follow retail. Retail keeps the current control in
 //   ebx across the section loop and the pass counter in memory; VC6 here
 //   gives ebx to the pass counter (and to the state/item counters), so the
-//   control is spilled. Its frame is 0x80 bytes smaller (retail allocates a
-//   0x80-byte buffer at frame +0x2174 that no instruction reads), which
-//   shifts most stack offsets. The jump table makes ckm report an unresolved
+//   control is spilled. Retail's frame is 0x80 bytes larger: VC6 lays locals
+//   out by use count (most used nearest esp; ties by size, then by a fixed
+//   permutation of the use order), and retail has an extra, never-referenced
+//   0x80-byte local between `toolTip` and `fxSoundOut` (esp+0x2184 of the
+//   0x9c74 frame) and a different use-count order for the key buffers, so
+//   most stack offsets differ. The jump table makes ckm report an unresolved
 //   $L label; compare with sdiff.
 
 #include "../../src/reconstructed/GameUi.cpp"
@@ -87,6 +93,7 @@
 #include <imm.h>
 
 #include "../../src/reconstructed/Display.h"
+#include "../../src/reconstructed/KeyboardDevice.h"
 #include "../../src/reconstructed/PCTextureMap.h"
 #include "../../src/reconstructed/Palette8.h"
 #include "../../src/reconstructed/Parameterblocks.h"
@@ -94,7 +101,6 @@
 
 // 0x0065b5c8: the time stamp of the last image step (UIAnim 0x00472fe0).
 int g_UnknownGlobal65b5c8;
-int g_UnknownGlobal65b60c;                    // frames of the zoom (slot 41)
 
 // 0x0046e8c0
 void UnknownGameUiDialog::UnknownVirtualSlot28(int value) {
@@ -301,69 +307,6 @@ void UIControl::UnknownVirtualSlot39() {
     field_0x4c[3] = height;
 }
 
-// 0x004715d0
-int UIControl::UnknownVirtualSlot41() {
-    if (field_0x164 == 0 && field_0xb0 && !field_0x25_bit2) {
-        g_UnknownGlobal65b60c = field_0xb0 < 0 ? 7 : field_0xb0;
-        field_0x88 = 21.0f;
-        field_0x8c = 11.0f;
-        int left = field_0x3c[0];
-        int width = field_0x3c[2] - left;
-        field_0x80 = max(0.0f, (float)(width / 2 + left) - 10.5f);
-        int top = field_0x3c[1];
-        int height = field_0x3c[3] - top;
-        field_0x84 = max(0.0f, (float)(height / 2 + top) - 5.5f);
-        field_0x90 = ((float)left - field_0x80) / g_UnknownGlobal65b60c;
-        field_0x94 = ((float)top - field_0x84) / g_UnknownGlobal65b60c;
-        field_0x98 = ((float)width - 21.0f) / g_UnknownGlobal65b60c;
-        field_0x9c = ((float)height - 11.0f) / g_UnknownGlobal65b60c;
-        if (slideSound) {
-            slideSound->SetVolume(ownerGui->field_0x34c, 0);
-            slideSound->PlayWithOptions(1, 0, 0);
-        }
-    } else {
-        field_0x80 += field_0x90;
-        field_0x84 += field_0x94;
-        field_0x88 += field_0x98;
-        field_0x8c += field_0x9c;
-    }
-    if (field_0x164 == g_UnknownGlobal65b60c)
-        return 1;
-    UnknownVirtualSlot50();
-    if (!field_0x25_bit2 || field_0x164) {
-        field_0x2c[0] = (int)field_0x80;
-        field_0x2c[1] = (int)field_0x84;
-        field_0x2c[2] = (int)(field_0x80 + field_0x88);
-        field_0x2c[3] = (int)(field_0x8c + field_0x84);
-        switch (controlType) {
-        case 1:
-        case 2:
-        case 4:
-        case 5:
-        case 9:
-        case 10:
-            drawnTexture = stateImages[currentState]->GetCurrentTexture();
-            field_0x164++;
-            break;
-        default:
-            drawnTexture = 0;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-// 0x00472130
-int UIControl::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    GUIInputDevice* device = ownerDialog->guiUser->UnknownFunction4882a0(event);
-    if (device) {
-        POINT position = device->pointerPosition;
-        if (event->kind && UnknownVirtualSlot56(event->control, (int*)&position))
-            return 1;
-    }
-    return GameObject::UnknownVirtualSlot22(event, entry);
-}
-
 // 0x00472e30
 UIAnim::UIAnim(void* textures, void* palette) {
     animTextures = textures;
@@ -460,25 +403,6 @@ void UIScrollCtl::UnknownVirtualSlot60(int value) {
         }
         break;
     }
-}
-
-// 0x004753c0
-int UIScrollBar::UnknownFunction4753c0(int value, int range) {
-    unsigned int position = field_0x21c ? range - value : value;
-    UnknownVirtualSlot50();
-    if (!field_0x1f0 && UnknownFunction475300(range) == position)
-        return 1;
-    if (!range) {
-        field_0x1ec_float = position;
-        return 1;
-    }
-    unsigned int travel = controlType == 8 ? UnknownVirtualSlot61() - thumbWidth : UnknownVirtualSlot62() - thumbHeight;
-    if ((unsigned int)range > 0) {
-        float scaled = (double)(travel * position) / (unsigned int)range;
-        field_0x1ec_float = scaled < travel ? scaled : travel;
-        return 1;
-    }
-    return 0;
 }
 
 // 0x00475c70
@@ -597,36 +521,6 @@ int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
     return 1;
 }
 
-// 0x00477730
-void UIListBox::ScrollBy(int delta) {
-    int handled = 0;
-    int count = rowCount;
-    if (!count)
-        return;
-    int first = firstVisibleRow += delta;
-    if (field_0x244) {
-        if (first < 0)
-            firstVisibleRow = first + count;
-        int index = firstVisibleRow % count;
-        if (index < 0)
-            index = -index;
-        firstVisibleRow = index;
-    } else {
-        int last = count - visibleRowCount;
-        if (last < first)
-            first = last;
-        firstVisibleRow = first < 0 ? 0 : first;
-    }
-    if (visibleRowCount == 1) {
-        UnknownVirtualSlot65(firstVisibleRow);
-        UnknownVirtualSlot66(&handled);
-        if (handled)
-            return;
-    }
-    UnknownVirtualSlot50();
-    UpdateScrollBars();
-}
-
 // 0x00477800: the order 0x00477900 sorts by, then the linked lists' orders.
 static int UnknownFunction477800(const void* a, const void* b) {
     if (!g_UnknownGlobal65b608->sortingList)
@@ -705,95 +599,6 @@ int UIListBox::UnknownVirtualSlot55(int a, int b) {
     return UIControl::UnknownVirtualSlot55(a, b);
 }
 
-// 0x00477ff0
-int UIListBox::UnknownVirtualSlot56(int a, int* position) {
-    if ((UnknownGuiControl*)this == ownerDialog->guiUser->field_0x1d8 && a == 1) {
-        int delta = field_0x234;
-        field_0x234 = 0;
-        field_0x230 += delta;
-    }
-    return UIControl::UnknownVirtualSlot56(a, position);
-}
-
-// 0x00478040
-int UIListBox::UnknownVirtualSlot21(int key) {
-    if (!UIControl::UnknownVirtualSlot21(key) &&
-        ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this && selectable) {
-        int row;
-        switch (key) {
-        case VK_LEFT:
-        case VK_UP:
-            if (GetSelectedRow() <= 0)
-                return 0;
-            SelectRow(GetSelectedRow() - 1);
-            break;
-        case VK_RIGHT:
-        case VK_DOWN:
-            if (GetSelectedRow() >= rowCount - 1)
-                return 0;
-            SelectRow(GetSelectedRow() + 1);
-            break;
-        case VK_HOME:
-            if (GetSelectedRow() <= 0)
-                return 0;
-            SelectRow(0);
-            break;
-        case VK_END:
-            row = rowCount - 1;
-            if (GetSelectedRow() >= row)
-                return 0;
-            SelectRow(row);
-            break;
-        case VK_PRIOR:
-            row = GetSelectedRow() - visibleRowCount;
-            if (row < 0)
-                row = 0;
-            if (row == GetSelectedRow())
-                return 0;
-            SelectRow(row);
-            break;
-        case VK_NEXT:
-            row = GetSelectedRow() + visibleRowCount;
-            if (row > rowCount - 1)
-                row = rowCount - 1;
-            if (row == GetSelectedRow())
-                return 0;
-            SelectRow(row);
-            break;
-        default:
-            return 0;
-        }
-        int handled;
-        UnknownVirtualSlot66(&handled);
-        return 1;
-    }
-    return 0;
-}
-
-// 0x00478810
-TextureMap* UIMultiState::UnknownVirtualSlot48(int state) {
-    UIAnim* image;
-    if ((currentState == 4 && (image = stateTable[selectedState].focusImage) != 0) ||
-        (image = stateTable[selectedState].image) != 0)
-        return image->GetCurrentTexture();
-    return 0;
-}
-
-// 0x00479df0
-void UIDDLListBox::UnknownVirtualSlot66(int* handled) {
-    UnknownDialogEvent event;
-    event.handled = 0;
-    ownerList->SetText(GetRowText(GetSelectedRow()));
-    ownerList->UnknownFunction47a2d0(0);
-    event.kind = kDialogListSelect;
-    event.code = ownerList->eventCode;
-    event.controlName = ownerList->GetName();
-    event.dialog = ownerDialog;
-    event.control = this;
-    event.gui = ownerDialog->guiManager;
-    ownerDialog->UnknownVirtualSlot29(&event);
-}
-
 // ---------------------------------------------------------------------------
 // Drawing, input and loading near misses
 
@@ -847,18 +652,11 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
             frameWidth = image->width;
             frameHeight = image->height;
             frameTexture = new(__FILE__, 0x1393) PCTextureMap((TextureMapManager*)field_0x20, 1);
-            ColorMapper* mapper;
-            UnknownPaletteInterface* surfacePalette;
-            if (palette) {
-                surfacePalette = ((Palette8*)palette)->field_0x70c;
-                mapper = ((Palette8*)palette)->field_0x708;
-            } else {
-                surfacePalette = 0;
-                mapper = 0;
-            }
+            Palette8* pal = (Palette8*)palette;
             frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
-                                            image->width, 0x22b, format, (UnknownTexturePalette*)mapper, 4,
-                                            surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
+                                            image->width, 0x22b, format,
+                                            (UnknownTexturePalette*)(pal ? pal->field_0x708 : 0), 4,
+                                            pal ? pal->field_0x70c : 0, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
             if (UnknownFunction47b490(frameTexture, 0xff00ff))
                 frameTexture->UnknownVirtualSlot18(0xff00ff);
         } else {
@@ -877,36 +675,6 @@ UIFrame::UIFrame(const char* file, void* textures, int a, int b, void* palette) 
         frameHeight = 0;
         frameTexture = 0;
     }
-}
-
-// 0x00472bc0
-int UIFrame::UnknownFunction472bc0(void* stream, int offset, void* palette) {
-    if (stream) {
-        UnknownTgaFile* image = UnknownFunction511dd0((UnknownTextureStream*)stream, 0, offset);
-        if (image) {
-            int format = g_TrackGame->renderTarget->field_0x28;
-            frameWidth = image->width;
-            frameHeight = image->height;
-            frameTexture = new(__FILE__, 0x13d6) PCTextureMap((TextureMapManager*)field_0x20, 1);
-            ColorMapper* mapper;
-            UnknownPaletteInterface* surfacePalette;
-            if (palette) {
-                surfacePalette = ((Palette8*)palette)->field_0x70c;
-                mapper = ((Palette8*)palette)->field_0x708;
-            } else {
-                surfacePalette = 0;
-                mapper = 0;
-            }
-            frameTexture->UnknownVirtualSlot4(image->bits, image->width, image->height, image->width,
-                                            image->width, 0x22b, format, (UnknownTexturePalette*)mapper, 4,
-                                            surfacePalette, 0, 0, 2, 1, 0, 0x80, 0xff00ff);
-            if (UnknownFunction47b490(frameTexture, 0xff00ff))
-                frameTexture->UnknownVirtualSlot18(0xff00ff);
-            UnknownFunction512dd0(image);
-            return 1;
-        }
-    }
-    return 0;
 }
 
 // 0x0046ef00: runs the timers and the joystick focus moves.
@@ -1372,7 +1140,7 @@ void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
                 UIListBox* list = ownerList->listPart;
                 if (list) {
                     int rows = list->rowCount - list->lastPageRowCount;
-                    static_cast<UIListBox*>(list)->ScrollToRow(UnknownFunction475300(rows), 0);
+                    list->ScrollToRow(UnknownFunction475300(rows), 0);
                 }
             }
         }
