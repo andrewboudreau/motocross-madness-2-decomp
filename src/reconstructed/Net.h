@@ -312,10 +312,9 @@ public:
         field_0x04 = 0;
         field_0x08[0] = 0;
     }
-    virtual void UnknownVirtualSlot1() {                // 0x004add00
-        field_0x04 = 0;
-        field_0x08[0] = 0;
-    }
+    // 0x004add00 (Net.cpp). Out of line: SelectGamePicProcs.cpp 0x004f53c1
+    // calls it on each 0x00689d08 record instead of inlining it.
+    virtual void UnknownVirtualSlot1();
 
     int field_0x04;                                     // DirectPlay id
     char field_0x08[16];                                // name

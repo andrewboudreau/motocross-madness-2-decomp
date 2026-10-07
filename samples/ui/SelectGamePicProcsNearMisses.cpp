@@ -25,6 +25,14 @@
 // MPBikeRiderDlg::UnknownVirtualSlot10 (0x004f8820, 1268 bytes, 1214
 //   match): as SPBikeRiderDlg slot 10 (DlgProcsNearMisses.cpp), only the
 //   scheduling of the by-value Vector3 copies for the camera call differs.
+// MultiPlayerDlg::UnknownFunction4f2340 (0x004f2340, 2120 bytes): the
+//   same flow, calls, frame size and message layout; register allocation
+//   differs: retail keeps the racer total in memory (+0x1c) and the bike,
+//   rider and name arrays in edi/ebx/ebp, VC6 here enregisters the total.
+// MultiPlayerDlg::UnknownVirtualSlot24 (0x004f3a70, 2729 bytes, 2714
+//   match): only the scheduling of the arrival-delay conversion differs
+//   (retail stores the sent time before the fild, VC6 here after loading
+//   TrackGame).
 
 #include "../../src/reconstructed/SelectGamePicProcs.cpp"
 
@@ -499,4 +507,326 @@ int MPBikeRiderDlg::UnknownVirtualSlot10(float frameTime) {
     if (field_0x110)
         field_0x110->UnknownFunction404240(field_0x7f74, (CameraRect*)&field_0x7f8c);
     return UIDialog::UnknownVirtualSlot10(frameTime);
+}
+
+#include "../../src/reconstructed/DlgProcs.h" // MainDlg, built inline by slot 24 (0x004f43c1)
+
+// The player left message (type 5).
+struct UnknownPlayerLeftMessage {
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;                           // player id
+};
+
+// The lobby start message (type 0x83, 0x8d8 bytes).
+struct UnknownLobbyStartMessage {
+    int field_0x00;
+    short field_0x04;                         // start
+    UnknownTrackGameModeSettings field_0x08;  // TrackGame+0x2d70
+    int field_0x1f4;                          // TrackGame+0x60c
+    int field_0x1f8[8];                       // racer slot +0xc0
+    char field_0x218[8][0x10];                // racer slot +0xdc (name)
+    char field_0x298[8][0x40];                // racer slot +0x00
+    char field_0x498[8][0x40];                // racer slot +0x40
+    char field_0x698[8][0x40];                // racer slot +0x80
+    int field_0x898[8];                       // racer slot +0xec
+    int field_0x8b8[8];                       // racer slot +0xf0
+};
+
+// A grid entry at race settings +0x14c (TrackGame.h's
+// UnknownTrackGameModeEntry) with the racer index at +5.
+struct UnknownGridEntry {
+    UnknownGridEntry() {
+        field_0x00 = 0;
+        field_0x04 = 0;
+    }
+
+    int field_0x00;                           // player id
+    char field_0x04;                          // championship points
+    char field_0x05;                          // racer index
+};
+
+// A random value in [0, 1) (as in KrustyUI.cpp).
+static inline float RandomUnit() {
+    return (float)(rand() * (1.0f / 32768));
+}
+
+// 0x004f2340: sends the lobby start message; with `start` it first draws
+// the AI racers and the starting grid.
+void MultiPlayerDlg::UnknownFunction4f2340(short start) {
+    int i;
+    g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35 = g_UnknownGlobal689df8 + 1;
+    g_UnknownGlobal56e26c->field_0x18 = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35;
+    g_UnknownGlobal56e26c->field_0x3424 = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28;
+    g_UnknownGlobal56e26c->mode.field_0x1be0 = g_UnknownGlobal56e26c->field_0x3424 + g_UnknownGlobal56e26c->field_0x18;
+    int total = g_UnknownGlobal56e26c->mode.field_0x1be0;
+    g_UnknownGlobal56e26c->mode.field_0x1bd8 =
+        field_0x7f68.UnknownFunction4f2fe0(g_UnknownGlobal689df8 + 1, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28);
+    if (g_UnknownGlobal56e26c->mode.field_0x1bd8 < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28)
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = g_UnknownGlobal56e26c->mode.field_0x1bd8;
+    if (start) {
+        int* bikes = (int*)DebugCalloc(total, 4, __FILE__, 0x1f4);
+        int* riders = (int*)DebugCalloc(total, 4, __FILE__, 0x1f5);
+        const char** names = (const char**)DebugMalloc(total * 4, __FILE__, 0x1f6);
+        g_UnknownGlobal56e26c->ui->UnknownFunction49b0d0(bikes, total, riders);
+        g_UnknownGlobal56e26c->ui->UnknownFunction49b020(names, total);
+        for (i = 0; i < g_UnknownGlobal56e26c->field_0x18 - 1; i++) {
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xd4 = g_UnknownGlobal689d08[i].field_0x04;
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xd8 = 0;
+        }
+        g_UnknownGlobal56e26c->mode.field_0x1be4[0].field_0xd4 = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
+        g_UnknownGlobal56e26c->mode.field_0x1be4[0].field_0xd8 = 0;
+        int racer = g_UnknownGlobal689df8 + 1;
+        for (int j = 0; j < 8; j++) {
+            for (int k = 0; k < field_0x7f68.field_0x00[j].field_0x08; k++) {
+                g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0xd4 = field_0x7f68.field_0x00[j].field_0x00;
+                g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0xd8 = racer;
+                COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0xdc, names[racer], 0x10);
+                g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0xc0 = 100 - (int)(RandomUnit() * -899.0f);
+                COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0x00,
+                          ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)
+                              [((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bikes[racer]].field_0x00]
+                                  .field_0x40,
+                          0x40);
+                COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0x40,
+                          ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bikes[racer]].field_0x48, 0x40);
+                COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0x80,
+                          ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[riders[racer]].field_0x40, 0x40);
+                g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0xec =
+                    ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bikes[racer]].field_0x8c;
+                g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0xf0 =
+                    ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bikes[racer]].field_0x90;
+                racer++;
+            }
+        }
+        g_UnknownGlobal56e26c->mode.UnknownFunction522cd0();
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && g_UnknownGlobal56e26c->eventManager->field_0x48 > 0) {
+            // By the championship points.
+            for (i = 0; i < racer; i++) {
+                UnknownGridEntry entry;
+                entry.field_0x00 = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4;
+                entry.field_0x04 = g_UnknownGlobal56e26c->eventManager->field_0x50[i].field_0x28;
+                entry.field_0x05 = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd8;
+                ((UnknownGridEntry*)g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x14c)[i] = entry;
+            }
+            qsort(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x14c, racer, sizeof(UnknownGridEntry),
+                  UnknownFunction4f2080);
+        } else {
+            // At random.
+            UnknownGridDraw draws[8];
+            for (i = 0; i < racer; i++) {
+                UnknownGridDraw draw;
+                draw.field_0x00 = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd4;
+                draw.field_0x04 = RandomUnit() * 10.0f;
+                draw.field_0x08 = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd8;
+                draws[i] = draw;
+            }
+            qsort(draws, racer, sizeof(UnknownGridDraw), UnknownFunction4f20a0);
+            for (i = 0; i < racer; i++) {
+                UnknownGridEntry entry;
+                entry.field_0x00 = draws[i].field_0x00;
+                entry.field_0x05 = draws[i].field_0x08;
+                ((UnknownGridEntry*)g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x14c)[i] = entry;
+            }
+        }
+        if (names)
+            operator delete(names, __FILE__, 0x23e);
+    }
+    UnknownLobbyStartMessage message;
+    message.field_0x04 = start;
+    message.field_0x08 = g_UnknownGlobal56e26c->mode.field_0x27f8;
+    message.field_0x1f4 = g_UnknownGlobal56e26c->mode.field_0x94;
+    memcpy(message.field_0x08.field_0x18c, field_0x7f68.field_0x00, sizeof(field_0x7f68.field_0x00));
+    if (start) {
+        char name[0x80];
+        message.field_0x1f8[0] = g_UnknownGlobal56e26c->mode.field_0x1bcc;
+        g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac720(g_UnknownGlobal56e26c->field_0x08->field_0x0c, name);
+        strcpy(message.field_0x218[0], name);
+        int humans = g_UnknownGlobal689df8 + 1;
+        for (i = 1; i < humans; i++) {
+            message.field_0x1f8[i] = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xc0;
+            strcpy(message.field_0x218[i], g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xdc);
+        }
+        for (i = humans; i < total; i++) {
+            message.field_0x1f8[i] = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xc0;
+            strcpy(message.field_0x218[i], g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xdc);
+            strcpy(message.field_0x298[i], g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0x00);
+            strcpy(message.field_0x498[i], g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0x40);
+            strcpy(message.field_0x698[i], g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0x80);
+            message.field_0x898[i] = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xec;
+            message.field_0x8b8[i] = g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xf0;
+        }
+    }
+    g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(0x83, &message, sizeof(message), g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
+    if (start)
+        UnknownFunction4f20d0();
+}
+
+// 0x004f3a70: the lobby's network messages.
+int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
+    int i;
+    if (from && type == 2) {
+        UnknownPlayerStateMessage* state = (UnknownPlayerStateMessage*)data;
+        for (i = 0; i < 7; i++) {
+            if (g_UnknownGlobal689d08[i].field_0x04 != from)
+                continue;
+            char name[0x80];
+            sprintf(name, "ButRdyPlayer%d", i + 2);
+            UnknownGameUiControl* button = UnknownFunction46ebf0(name, 1);
+            if (button) {
+                if (state->field_0x01) {
+                    button->UnknownFunction470d40(0xffffff);
+                    g_UnknownGlobal689dbc[i] = 1;
+                    field_0x7f68.UnknownFunction4f2f20(from, state->field_0xc3);
+                    if (!g_UnknownGlobal689dd8[i]) {
+                        char text[0x80];
+                        char line[0x80];
+                        g_UnknownGlobal56e26c->UnknownFunction521970(0x14d5, text, 0x80);
+                        sprintf(line, text, g_UnknownGlobal689d08[i].field_0x08, state->field_0xc8);
+                        UnknownFunction4f3720(-1, line);
+                        g_UnknownGlobal689dd8[i] = 1;
+                    }
+                } else {
+                    button->UnknownFunction470d40(0x808080);
+                    g_UnknownGlobal689dbc[i] = 0;
+                    g_UnknownGlobal689dd8[i] = 0;
+                    field_0x7f68.UnknownFunction4f2f80(from);
+                }
+            }
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xd4 = g_UnknownGlobal689d08[i].field_0x04;
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xd8 = 0;
+            COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xdc, g_UnknownGlobal689d08[i].field_0x08, 0x10);
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].UnknownFunction521fb0(state->field_0x42, state->field_0x02,
+                                                                                 state->field_0x82);
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xec = state->field_0xc8;
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xf0 = state->field_0xcc;
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xf4 = state->field_0xcd;
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xc0 = state->field_0xd0;
+            g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xc4 = state->field_0xc2;
+            float delay = (float)(unsigned int)flags - (float)(unsigned int)state->field_0xc4;
+            if (delay < g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xd0)
+                g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xd0 = delay;
+            field_0x7f68.UnknownFunction4f2f20(from, state->field_0xc3);
+            if (g_UnknownGlobal56e26c->field_0x08->isHost && field_0x7f58) {
+                UnknownGameUiControl* list = field_0x7f58->UnknownFunction46ebf0("OpponentsListBox", 0);
+                if (list && list->field_0x1ec - 1 != g_UnknownGlobal56e26c->mode.field_0x1bd8) {
+                    int selection = list->UnknownFunction476950();
+                    list->UnknownFunction4775f0();
+                    for (int j = 0; j <= g_UnknownGlobal56e26c->mode.field_0x1bd8; j++) {
+                        char number[0x80];
+                        sprintf(number, "%d", j);
+                        list->UnknownFunction476d80(number, j, 0);
+                    }
+                    if (g_UnknownGlobal56e26c->mode.field_0x1bd8 < selection)
+                        list->UnknownFunction476a60(g_UnknownGlobal56e26c->mode.field_0x1bd8);
+                    else
+                        list->UnknownFunction476a60(selection);
+                }
+            }
+        }
+    } else if (from && type == 0x83) {
+        UnknownLobbyStartMessage* start = (UnknownLobbyStartMessage*)data;
+        g_UnknownGlobal56e26c->mode.field_0x27f8 = start->field_0x08;
+        g_UnknownGlobal56e26c->mode.field_0x94 = start->field_0x1f4;
+        int total = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35 + g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28;
+        if (start->field_0x04) {
+            for (i = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35; i < total; i++) {
+                g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xc0 = start->field_0x1f8[i];
+                COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xdc, start->field_0x218[i], 0x10);
+                g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xd8 = i;
+                COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0x00, start->field_0x298[i], 0x40);
+                COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0x40, start->field_0x498[i], 0x40);
+                COPY_TEXT(g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0x80, start->field_0x698[i], 0x40);
+                g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xec = start->field_0x898[i];
+                g_UnknownGlobal56e26c->mode.field_0x1be4[i].field_0xf0 = start->field_0x8b8[i];
+            }
+            memcpy(field_0x7f68.field_0x00, start->field_0x08.field_0x18c, sizeof(field_0x7f68.field_0x00));
+            UnknownFunction4f20d0();
+        } else {
+            UnknownFunction4f5ca0();
+        }
+    } else if (from && type == 0xf) {
+        UnknownLobbySettingsMessage* settings = (UnknownLobbySettingsMessage*)data;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140 = settings->minutes;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 = settings->eventType;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 = settings->raceMode;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x08 = settings->field_0x2d78;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20 = settings->laps;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = settings->opponents;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35 = settings->players;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c = settings->races;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x144 = settings->tagBall;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x148 = settings->stuntMode;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10 = settings->treeCollision;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x14 = settings->riderCollision;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x18 = settings->fastFinishes;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c = settings->bikeClass;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34 = settings->field_0x09;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x138 = settings->field_0x0c;
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x13c = settings->field_0x10;
+        g_UnknownGlobal56e26c->mode.field_0x94 = settings->detail;
+        g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x08);
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36[0] = 0;
+        strncat(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, settings->field_0x14, 0x3f);
+        memcpy(field_0x7f68.field_0x00, settings->field_0x54, sizeof(field_0x7f68.field_0x00));
+        UnknownFunction4f5ca0();
+    } else if (from && type == 0x85) {
+        UnknownFunction4f3720(from, (const char*)data + 4);
+        return 1;
+    } else if (from && type == 0x92) {
+        UnknownFunction4f3720(-1, (const char*)data + 4);
+        return 1;
+    } else if (type == 5) {
+        field_0x7f68.UnknownFunction4f2f80(((UnknownPlayerLeftMessage*)data)->field_0x08);
+        if (field_0x7f58) {
+            UnknownGameUiControl* list = field_0x7f58->UnknownFunction46ebf0("OpponentsListBox", 0);
+            if (g_UnknownGlobal56e26c->field_0x08->isHost && list &&
+                list->field_0x1ec - 1 != g_UnknownGlobal56e26c->mode.field_0x1bd8) {
+                int selection = list->UnknownFunction476950();
+                list->UnknownFunction4775f0();
+                for (int j = 0; j <= g_UnknownGlobal56e26c->mode.field_0x1bd8; j++) {
+                    char number[0x80];
+                    sprintf(number, "%d", j);
+                    list->UnknownFunction476d80(number, j, 0);
+                }
+                if (g_UnknownGlobal56e26c->mode.field_0x1bd8 < selection)
+                    list->UnknownFunction476a60(g_UnknownGlobal56e26c->mode.field_0x1bd8);
+                else
+                    list->UnknownFunction476a60(selection);
+            }
+        }
+    } else if (from && type == 0x8e) {
+        UnknownKickMessage* kick = (UnknownKickMessage*)data;
+        int player = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
+        if (kick->field_0x04 == player) {
+            if (g_UnknownGlobal56e26c->field_0x08->field_0x14) {
+                UnknownFunction46ff30(0);
+                g_UnknownGlobal56e26c->ui->UnknownFunction49a4a0();
+                return 1;
+            }
+            UnknownFunction46ff30(0);
+            g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(new(__FILE__, 0x537) MainDlg, 0x64, 2, 0, 0, 0x63,
+                                                                         0, 1);
+            return 1;
+        }
+        field_0x7f68.UnknownFunction4f2f80(kick->field_0x04);
+        if (field_0x7f58) {
+            UnknownGameUiControl* list = field_0x7f58->UnknownFunction46ebf0("OpponentsListBox", 0);
+            if (g_UnknownGlobal56e26c->field_0x08->isHost && list &&
+                list->field_0x1ec - 1 != g_UnknownGlobal56e26c->mode.field_0x1bd8) {
+                int selection = list->UnknownFunction476950();
+                list->UnknownFunction4775f0();
+                for (int j = 0; j <= g_UnknownGlobal56e26c->mode.field_0x1bd8; j++) {
+                    char number[0x80];
+                    sprintf(number, "%d", j);
+                    list->UnknownFunction476d80(number, j, 0);
+                }
+                if (g_UnknownGlobal56e26c->mode.field_0x1bd8 < selection)
+                    list->UnknownFunction476a60(g_UnknownGlobal56e26c->mode.field_0x1bd8);
+                else
+                    list->UnknownFunction476a60(selection);
+            }
+        }
+    }
+    return GameObject::UnknownVirtualSlot24(type, data, from, to, flags);
 }

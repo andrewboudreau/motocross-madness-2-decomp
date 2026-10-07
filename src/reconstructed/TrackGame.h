@@ -243,7 +243,8 @@ struct UnknownTrackGameRacerSlot {
     int field_0xd4;                           // network player id
     int field_0xd8;                           // player's racer index (EventManager slot 24)
     char field_0xdc[0x10];                    // player name (SelectGamePicProcs.cpp)
-    unsigned char field_0xec[0xf4 - 0xec];
+    int field_0xec;                           // bike record +0x8c (SelectGamePicProcs.cpp 0x004f2340)
+    int field_0xf0;                           // bike record +0x90
     unsigned char field_0xf4;                 // 1 (constructor)
     unsigned char field_0xf5[0xf8 - 0xf5];
 };
@@ -530,6 +531,8 @@ public:
     int UnknownFunction4aa4e0(char* buffer, unsigned int size);
     int UnknownFunction4aa670(unsigned int count, void* a, void* b);
     void UnknownFunction49c770();             // 0x0049c770 (EventManager 0x0045e550)
+    void UnknownFunction49c2f0(int* value);   // 0x0049c2f0 (SelectGamePicProcs.cpp: TrackGameMode+0x1bd4)
+    void UnknownFunction49c600();             // 0x0049c600 (SelectGamePicProcs.cpp)
 };
 
 // Object at TrackGame+0x3444 (0x00521cd0 tests that it exists): the pro

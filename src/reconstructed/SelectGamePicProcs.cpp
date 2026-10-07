@@ -18,6 +18,7 @@
 #include "BackgroundImage.h"
 #include "Camera.h"
 #include "DebugAlloc.h"
+#include "EventManager.h"
 #include "../krusty2/math/FastMath.h"
 #include "MatrixUtil.h"
 #include "Net.h"
@@ -75,6 +76,8 @@ static inline Vector3& operator*=(Vector3& v, float scale) {
     return v;
 }
 
+int g_UnknownGlobal689dbc[7];
+int g_UnknownGlobal689dd8[7];
 int g_UnknownGlobal689df4;
 int g_UnknownGlobal689df8;
 int g_UnknownGlobal689dfc;
@@ -85,11 +88,55 @@ struct UnknownChatMessage {
     char field_0x04[0x4a];
 };
 
+// A player's state (type 2).
+struct UnknownPlayerStateMessage {
+    unsigned char field_0x00;
+    unsigned char field_0x01;                 // ready
+    char field_0x02[0x40];                    // bike name (racer slot +0x40)
+    char field_0x42[0x40];                    // bike model name (racer slot +0x00)
+    char field_0x82[0x40];                    // rider name (racer slot +0x80)
+    unsigned char field_0xc2;                 // racer slot +0xc4
+    unsigned char field_0xc3;                 // requested racers
+    int field_0xc4;                           // send time
+    int field_0xc8;                           // racer slot +0xec
+    unsigned char field_0xcc;                 // racer slot +0xf0
+    unsigned char field_0xcd;                 // racer slot +0xf4
+    int field_0xd0;                           // racer slot +0xc0
+};
+
 // The player removal message (type 0x8e).
 struct UnknownKickMessage {
     int field_0x00;
     int field_0x04;                           // player id
 };
+
+// A racer's random grid key (12 bytes; 0x004f2340 sorts them).
+struct UnknownGridDraw {
+    int field_0x00;                           // player id
+    float field_0x04;                         // random key
+    char field_0x08;                          // racer index
+};
+
+// 0x004f2080: qsort order of the grid entries, by +0x04, largest first
+// (0x004f2340, in the near-miss sample, sorts with it and 0x004f20a0).
+int UnknownFunction4f2080(const void* a, const void* b) {
+    unsigned char x = ((const UnknownTrackGameModeEntry*)a)->field_0x04;
+    unsigned char y = ((const UnknownTrackGameModeEntry*)b)->field_0x04;
+    if (x > y)
+        return -1;
+    return x != y;
+}
+
+// 0x004f20a0: qsort order of the grid draws, by the key, largest first.
+int UnknownFunction4f20a0(const void* a, const void* b) {
+    const UnknownGridDraw* x = (const UnknownGridDraw*)a;
+    const UnknownGridDraw* y = (const UnknownGridDraw*)b;
+    if (x->field_0x04 > y->field_0x04)
+        return -1;
+    if (x->field_0x04 == y->field_0x04)
+        return 0;
+    return 1;
+}
 
 // 0x004f20d0
 void MultiPlayerDlg::UnknownFunction4f20d0() {
@@ -448,6 +495,359 @@ void MultiPlayerDlg::UnknownFunction4f3a10(int index) {
         message.field_0x04 = player;
         network->UnknownFunction4ac830(0x8e, &message, sizeof(message), network->field_0x0c, player);
         field_0x7f68.UnknownFunction4f2f80(message.field_0x04);
+    }
+}
+
+// 0x00689e04: only written (0x004f4520).
+int g_UnknownGlobal689e04;
+
+// 0x004f4520: the lobby's dialog procedure.
+void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+    char name[0x10];
+    char text[0x80];
+    UnknownPlayerStateMessage state;
+    char prompt[1024];
+    int i;
+    switch (event->field_0x08) {
+    case 5: {
+        field_0x7f58 = 0;
+        field_0x7f5c = 0;
+        field_0x7f60 = 0;
+        field_0x7f64 = 0;
+        field_0x80d0[0] = 0;
+        UnknownGameUiControl* tab = UnknownFunction46ebf0("EventTab", 4);
+        tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e3);
+        tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e3);
+        tab->UnknownFunction470da0(0x22);
+        tab = UnknownFunction46ebf0("BikeRiderTab", 4);
+        tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e4);
+        tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e4);
+        tab->UnknownFunction470da0(0x22);
+        tab = UnknownFunction46ebf0("RaceInfoTab", 4);
+        tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x13e5);
+        tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x13e5);
+        tab->UnknownFunction470da0(0x22);
+        tab = UnknownFunction46ebf0("OptionsTab", 4);
+        tab->UnknownFunction478a50(0, g_UnknownGlobal56e26c->field_0x420, 0x1468);
+        tab->UnknownFunction478a50(1, g_UnknownGlobal56e26c->field_0x420, 0x1468);
+        tab->UnknownFunction470da0(0x22);
+        memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &g_UnknownGlobal56e26c->mode.field_0x2bd0,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x27f8));
+        memcpy(g_UnknownGlobal56e26c->mode.field_0xfd8, g_UnknownGlobal56e26c->mode.field_0x1090,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0xfd8));
+        memcpy(&g_UnknownGlobal56e26c->mode.field_0x1974, g_UnknownGlobal56e26c->mode.field_0x1b04,
+               sizeof(g_UnknownGlobal56e26c->mode.field_0x1974));
+        strcpy(field_0x7fc8, "");
+        field_0x80cc = 0;
+        g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds =
+            g_UnknownGlobal56e26c->UnknownVirtualSlot20("IntervalBetweenFullPacketsMS", -1000) * 0.001f;
+        if (g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds < 0.0f)
+            g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds = 2.0f;
+        else if (g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds < 2.0)
+            g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds = 2.0f;
+        else if (g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds > 4.0f)
+            g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds = 4.0f;
+        g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds =
+            g_UnknownGlobal56e26c->UnknownVirtualSlot20("IntervalBetweenShortPacketsMS", -1000) * 0.001f;
+        if (g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds < 0.0f) {
+            int connection = g_UnknownGlobal56e26c->field_0x08->field_0xf4;
+        char address[0x80];
+        char line[0x80];
+            if (connection == 1 || connection == 2 || connection == 8)
+                g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds = 0.067f;
+            else
+                g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds = 0.2f;
+        } else if (g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds < 0.067f) {
+            g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds = 0.067f;
+        } else if (g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds > 0.2f) {
+            g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds = 0.2f;
+        }
+        s_UnknownStatic573c0c = 2;
+        g_UnknownGlobal56e26c->mode.UnknownFunction522680();
+        if (field_0xc4 != 0x868)
+            g_UnknownGlobal56e26c->eventManager->UnknownFunction45e520();
+        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x2c = 0;
+        g_UnknownGlobal689dfc = g_UnknownGlobal56e26c->field_0x08->isHost == 0;
+        g_UnknownGlobal689e04 = 2;
+        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 4) {
+            g_UnknownGlobal689e04 = 0;
+            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 = 0;
+        } else {
+            g_UnknownGlobal689e04 = 2;
+        }
+        UnknownGameUiControl* chat = UnknownFunction46ebf0("ListChat", 0);
+        chat->UnknownFunction477bb0(0);
+        chat->UnknownFunction470da0(0x11);
+        UIEditBox* edit = (UIEditBox*)UnknownFunction46ebf0("EditChat", 0);
+        edit->UnknownFunction473c70(0x3c);
+        edit->UnknownFunction470da0(0x11);
+        edit->UnknownFunction474060(0xffffff);
+        if (g_UnknownGlobal56e26c->ui->field_0x3c == 0x866 && !g_UnknownGlobal56e26c->field_0x08->field_0x14)
+            UnknownFunction4f2ec0();
+        g_UnknownGlobal689df4 = 0;
+        UnknownGameUiControl* user = UnknownFunction46ebf0("UserName", 0xc);
+        g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac720(g_UnknownGlobal56e26c->field_0x08->field_0x0c, name);
+        user->UnknownFunction470b20(name);
+        user->UnknownFunction470d60(0);
+        user->UnknownFunction470da0(0x12);
+        UnknownGameUiControl* ready = UnknownFunction46ebf0("ButRdyUser", 0);
+        ready->UnknownFunction470d40(0x808080);
+        ready->UnknownFunction470da0(0x12);
+        for (i = 0; i < 7; i++) {
+            sprintf(text, "ButRdyPlayer%d", i + 2);
+            UnknownGameUiControl* button = UnknownFunction46ebf0(text, 0);
+            button->UnknownFunction470d40(0x808080);
+            button->UnknownFunction470da0(0x12);
+        }
+        for (i = 0; i < 7; i++) {
+            sprintf(text, "NamePlayer%d", i + 2);
+            UnknownGameUiControl* label = UnknownFunction46ebf0(text, 0);
+            label->UnknownFunction470d60(0);
+            label->UnknownFunction470da0(0x12);
+            g_UnknownGlobal689dbc[i] = 0;
+            g_UnknownGlobal689dd8[i] = 0;
+        }
+        UnknownFunction4f3620();
+        chat = UnknownFunction46ebf0("ListChat", 0);
+        chat->UnknownFunction477bb0(0);
+        UnknownFunction46ea80(0x258, 0);
+        UnknownFunction4f3260();
+        if (g_UnknownGlobal56e26c->field_0x08->field_0x14) {
+            if (g_UnknownGlobal56e26c->mode.field_0x1bd4 == -1) {
+                g_UnknownGlobal56e26c->networkGameObject->UnknownFunction49c2f0(&g_UnknownGlobal56e26c->mode.field_0x1bd4);
+                g_UnknownGlobal56e26c->networkGameObject->UnknownFunction49c600();
+                if (field_0x7f58) {
+                    field_0x7f58->UnknownFunction46ecc0(0);
+                    field_0x7f58->UnknownFunction4f6e60();
+                    field_0x7f58->UnknownFunction46ecc0(0);
+                }
+            }
+        } else {
+            g_UnknownGlobal56e26c->mode.field_0x1bd4 = 0;
+        }
+        if (field_0xc4 == 0x88e || field_0xc4 == 0x868) {
+            UnknownFunction46ebf0("RaceInfoTab", 4)->UnknownFunction479310(0);
+            UnknownFunction4f5a00(2);
+        } else {
+            UnknownFunction46ebf0("EventTab", 4)->UnknownFunction479310(0);
+            UnknownFunction4f5a00(0);
+        }
+        field_0x118 = 0xfeb97a;
+        int connection = g_UnknownGlobal56e26c->field_0x08->field_0xf4;
+        char address[0x80];
+        char line[0x80];
+        if ((connection == 4 || connection == 2) && g_UnknownGlobal56e26c->field_0x08->isHost) {
+            g_UnknownGlobal56e26c->UnknownFunction521970(0x14b9, text, 0x80);
+            g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac2d0(address);
+            sprintf(line, "%s %s", text, address);
+            UnknownFunction4f3720(-1, line);
+        }
+        UnknownFunction46fce0(0, 0x3e8, 0);
+        field_0x34->UnknownFunction487790((UnknownGuiControl*)UnknownFunction46ebf0("EditChat", 0xb), 0, 0);
+        break;
+    }
+    case 1:
+        if (!_stricmp("EventTab", event->field_0x04)) {
+            UnknownFunction4f5a00(0);
+        } else if (!_stricmp("BikeRiderTab", event->field_0x04)) {
+            UnknownFunction4f5a00(1);
+        } else if (!_stricmp("RaceInfoTab", event->field_0x04)) {
+            UnknownFunction4f5a00(2);
+        } else if (!_stricmp("OptionsTab", event->field_0x04)) {
+            UnknownFunction4f5a00(3);
+        } else if (!_stricmp("Back", event->field_0x04)) {
+            if (field_0x7f58)
+                field_0x7f58->UnknownFunction46ecc0(1);
+            if (field_0x7f5c)
+                field_0x7f5c->UnknownFunction46ecc0(1);
+            UnknownFunction46ecc0(1);
+            memcpy(&g_UnknownGlobal56e26c->mode.field_0x2bd0, &g_UnknownGlobal56e26c->mode.field_0x27f8,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x2bd0));
+            memcpy(g_UnknownGlobal56e26c->mode.field_0x1090, g_UnknownGlobal56e26c->mode.field_0xfd8,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1090));
+            memcpy(g_UnknownGlobal56e26c->mode.field_0x1b04, &g_UnknownGlobal56e26c->mode.field_0x1974,
+                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1b04));
+            if (g_UnknownGlobal56e26c->field_0x08->field_0x14) {
+                UnknownFunction46ff30(0);
+                g_UnknownGlobal56e26c->ui->UnknownFunction49a4a0();
+                return;
+            }
+            g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac630();
+            UnknownFunction4aef40();
+            event->field_0x0c->UnknownFunction46ff30(0);
+            event->field_0x20 = 1;
+            g_UnknownGlobal56e26c->ui->UnknownFunction499b20(100);
+        } else if (!_stricmp("ButRdyUser", event->field_0x04)) {
+            int tooBig = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00) > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c;
+            if (g_UnknownGlobal56e26c->mode.field_0x1bd4)
+                tooBig = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->field_0x00) > 2;
+            if (!tooBig) {
+                if (!g_UnknownGlobal689dfc)
+                    g_UnknownGlobal689df4 = !g_UnknownGlobal689df4;
+            } else {
+                UnknownFunction4f57c0(1);
+            }
+            if (g_UnknownGlobal689dfc == 2 || g_UnknownGlobal689dfc == 3)
+                UnknownFunction4f57c0(g_UnknownGlobal689dfc);
+            UnknownGameUiControl* button = UnknownFunction46ebf0("ButRdyUser", 0);
+            if (g_UnknownGlobal689df4) {
+                char format[0x80];
+                char line[0x80];
+                UnknownFunction4f3260();
+                button->UnknownFunction470d40(0xffffff);
+                g_UnknownGlobal56e26c->UnknownFunction521970(0x14d3, format, 0x80);
+                sprintf(line, format, g_UnknownGlobal56e26c->mode.field_0x00);
+                UnknownFunction4f3980(line);
+            } else {
+                button->UnknownFunction470d40(0x808080);
+            }
+        } else if (!_stricmp("Start", event->field_0x04)) {
+            if (g_UnknownGlobal689df4) {
+                UnknownFunction46ecc0(1);
+                if (field_0x7f58)
+                    field_0x7f58->UnknownFunction46ecc0(1);
+                if (field_0x7f5c)
+                    field_0x7f5c->UnknownFunction46ecc0(1);
+                if (field_0x7f64)
+                    field_0x7f64->UnknownFunction46ecc0(1);
+                if (field_0x7f58)
+                    field_0x7f58->UnknownFunction46ecc0(1);
+                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x08 == -1) {
+                    ChoiceDlg* dialog = new(__FILE__, 0x6a4) ChoiceDlg;
+                    field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+                    strcpy(prompt, "You must choose one of the following trial version tracks:\n"
+                                   "Stunt Event: Donner Pass, or\n"
+                                   "Nationals Race: A Voodoo Basin\n");
+                    dialog->UnknownFunction455700("Trial Version", 0, prompt, 0, 0, 0, 0, 0x13e9, 0, 0);
+                    dialog->UnknownFunction46ebf0("TxtPrompt", 0)->field_0x1e8 = 1;
+                    return;
+                }
+                memcpy(&g_UnknownGlobal56e26c->mode.field_0x2bd0, &g_UnknownGlobal56e26c->mode.field_0x27f8,
+                       sizeof(g_UnknownGlobal56e26c->mode.field_0x2bd0));
+                memcpy(g_UnknownGlobal56e26c->mode.field_0x1090, g_UnknownGlobal56e26c->mode.field_0xfd8,
+                       sizeof(g_UnknownGlobal56e26c->mode.field_0x1090));
+                memcpy(g_UnknownGlobal56e26c->mode.field_0x1b04, &g_UnknownGlobal56e26c->mode.field_0x1974,
+                       sizeof(g_UnknownGlobal56e26c->mode.field_0x1b04));
+                UnknownFunction4f2340(1);
+            }
+        } else if (!_stricmp("ButChatSend", event->field_0x04)) {
+            UnknownFunction4f38a0();
+            field_0x34->UnknownFunction487790((UnknownGuiControl*)UnknownFunction46ebf0("EditChat", 0xb), 0, 0);
+        } else if (!_stricmp("ButRdyPlayer2", event->field_0x04)) {
+            UnknownFunction4f3a10(0);
+        } else if (!_stricmp("ButRdyPlayer3", event->field_0x04)) {
+            UnknownFunction4f3a10(1);
+        } else if (!_stricmp("ButRdyPlayer4", event->field_0x04)) {
+            UnknownFunction4f3a10(2);
+        } else if (!_stricmp("ButRdyPlayer5", event->field_0x04)) {
+            UnknownFunction4f3a10(3);
+        } else if (!_stricmp("ButRdyPlayer6", event->field_0x04)) {
+            UnknownFunction4f3a10(4);
+        } else if (!_stricmp("ButRdyPlayer7", event->field_0x04)) {
+            UnknownFunction4f3a10(5);
+        } else if (!_stricmp("ButRdyPlayer8", event->field_0x04)) {
+            UnknownFunction4f3a10(6);
+        } else if (!_stricmp("Options", event->field_0x04)) {
+            OptionsDlg* dialog = new(__FILE__, 0x6d5) OptionsDlg;
+            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+        } else if (!_stricmp("Joystick", event->field_0x04)) {
+            OptionsDlg* dialog = new(__FILE__, 0x6d8) OptionsDlg;
+            field_0x30->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 1, 0, 1);
+        } else if (!_stricmp("Help", event->field_0x04)) {
+            g_UnknownGlobal56e26c->mode.UnknownFunction523d30("MCM2HELP", 0);
+        }
+        if (_stricmp("Back", event->field_0x04) && _stricmp("Start", event->field_0x04))
+            field_0x34->UnknownFunction487790((UnknownGuiControl*)UnknownFunction46ebf0("EditChat", 0xb), 0, 0);
+        break;
+    case 10:
+        _stricmp("EditChat", event->field_0x04);
+        break;
+    case 11:
+        if (event->field_0x1c == 0x2f) {
+            UnknownGuiControl* focus = field_0x34->field_0x1d4;
+            if (focus != (UnknownGuiControl*)UnknownFunction46ebf0("EditChat", 0))
+                field_0x34->UnknownFunction487790((UnknownGuiControl*)UnknownFunction46ebf0("EditChat", 0xb), 0, 0);
+        }
+        if (event->field_0x1c == 0xd) {
+            UnknownFunction46ebf0("ButChatSend", 0)->UnknownVirtualSlot58(2, 0);
+            UnknownFunction4f38a0();
+        }
+        break;
+    case 7: {
+        for (i = 0; i < 7; i++)
+            g_UnknownGlobal689d08[i].UnknownVirtualSlot1();
+        int index = 0;
+        g_UnknownGlobal689df8 = 0;
+        int me = g_UnknownGlobal56e26c->field_0x08->field_0x0c;
+        NetPlayer* player;
+        while ((player = g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac7c0(&index)) != 0) {
+            if (player->field_0x00 != me) {
+                g_UnknownGlobal689d08[g_UnknownGlobal689df8].field_0x04 = player->field_0x00;
+                COPY_TEXT(g_UnknownGlobal689d08[g_UnknownGlobal689df8].field_0x08, player->field_0x04, 0x10);
+                field_0x7f68.UnknownFunction4f2f20(player->field_0x00, -1);
+                g_UnknownGlobal689df8++;
+            }
+        }
+        for (i = 0; i < 7; i++) {
+            sprintf(text, "NamePlayer%d", i + 2);
+            UnknownGameUiControl* label = UnknownFunction46ebf0(text, 0);
+            label->UnknownFunction470b20(g_UnknownGlobal689d08[i].field_0x08);
+        }
+        for (i = 0; i < 7; i++) {
+            sprintf(text, "ButRdyPlayer%d", i + 2);
+            UnknownGameUiControl* button = UnknownFunction46ebf0(text, 0);
+            if (!g_UnknownGlobal689d08[i].field_0x08[0])
+                button->UnknownFunction470d40(0x808080);
+        }
+        if (field_0x7f5c)
+            field_0x7f5c->UnknownFunction46ecc0(1);
+        UnknownFunction4f3620();
+        if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+            int allReady = 1;
+            UnknownGameUiControl* start = UnknownFunction46ebf0("Start", 0);
+            for (i = 0; i < g_UnknownGlobal689df8; i++) {
+                if (!g_UnknownGlobal689dbc[i])
+                    allReady = 0;
+            }
+            if (g_UnknownGlobal689df4 && allReady && g_UnknownGlobal689df8 >= 1)
+                start->UnknownVirtualSlot49(1);
+            else
+                start->UnknownVirtualSlot49(0);
+            field_0x7f68.UnknownFunction4f2f20(me, g_UnknownGlobal56e26c->mode.field_0x6dc);
+            UnknownFunction4f2b90();
+        }
+        state.field_0x01 = g_UnknownGlobal689df4;
+        COPY_TEXT(state.field_0x42, g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00, 0x40);
+        COPY_TEXT(state.field_0x02, g_UnknownGlobal56e26c->mode.field_0x1974.field_0x40, 0x40);
+        COPY_TEXT(state.field_0x82, g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80, 0x40);
+        state.field_0xc2 = g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4;
+        state.field_0xc3 = g_UnknownGlobal56e26c->mode.field_0x6dc;
+        state.field_0xc8 = UNKNOWN_GARAGE_SETTINGS->field_0x00;
+        state.field_0xcc = UNKNOWN_GARAGE_SETTINGS->field_0x04;
+        if (g_UnknownGlobal56e26c->mode.field_0x1bd0 > 0 && g_UnknownGlobal56e26c->mode.field_0x1bd0 < 0x65)
+            g_UnknownGlobal56e26c->mode.field_0x1bcc = g_UnknownGlobal56e26c->mode.field_0x1bd0;
+        state.field_0xd0 = g_UnknownGlobal56e26c->mode.field_0x1bcc;
+        state.field_0xc4 = ReadClock();
+        g_UnknownGlobal56e26c->field_0x08->UnknownFunction4ac830(2, &state, sizeof(state),
+                                                               g_UnknownGlobal56e26c->field_0x08->field_0x0c, 0);
+        break;
+    }
+    case 9:
+        if (event->field_0x00 == 0x51) {
+            if (field_0x7f5c) {
+                field_0x7f5c->UnknownFunction46ecc0(0);
+                field_0x7f5c->UnknownFunction4f8220();
+                field_0x7f5c->UnknownFunction4500d0();
+                field_0x7f5c->UnknownFunction4f8d20();
+            }
+        } else if (event->field_0x00 == 0x66) {
+            UnknownFunction46ebf0("EventTab", 4)->UnknownFunction479310(0);
+            UnknownFunction4f5a00(0);
+        }
+        break;
+    case 6:
+        UnknownFunction46fe40(0);
+        break;
     }
 }
 

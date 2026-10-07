@@ -1467,6 +1467,13 @@ int __stdcall UnknownFunction4ae270(unsigned long id, unsigned long, const NetNa
     return ++g_UnknownGlobal6886b4 < 7;
 }
 
+// 0x004add00
+void PlayerInfoType::UnknownVirtualSlot1()
+{
+    field_0x04 = 0;
+    field_0x08[0] = 0;
+}
+
 // 0x004adc90
 void SessionInfoType::UnknownVirtualSlot1()
 {

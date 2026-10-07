@@ -20,6 +20,11 @@ class PlayerInfoType;
 // 0x004f1740..0x004f1793 (see docs/INITIALIZERS.md).
 extern PlayerInfoType g_UnknownGlobal689d08[7];
 
+// 0x00689dbc and 0x00689dd8: per remote player, ready and whether the
+// ready line was shown.
+extern int g_UnknownGlobal689dbc[7];
+extern int g_UnknownGlobal689dd8[7];
+
 // 0x00689df4: set while the local player is ready.
 extern int g_UnknownGlobal689df4;
 
@@ -250,7 +255,10 @@ public:
 class MultiPlayerDlg : public UIDialog {
 public:
     MultiPlayerDlg() : UIDialog(1, "MPBase.dtm") {} // inline (KrustyUI 0x00499b20)
+    virtual int UnknownVirtualSlot24(int type, void* data, int from, int to, int flags); // 0x004f3a70
+    void UnknownVirtualSlot29(UnknownDialogEvent* event); // 0x004f4520
     void UnknownFunction4f20d0();             // 0x004f20d0: fills the racer slots for the race
+    void UnknownFunction4f2340(short start);  // 0x004f2340: sends the lobby start message (type 0x83)
     void UnknownFunction4f2b90();             // 0x004f2b90: sends the lobby settings
     int UnknownFunction4f2ec0();              // 0x004f2ec0
     void UnknownFunction4f3260();             // 0x004f3260
@@ -263,9 +271,14 @@ public:
     void UnknownFunction4f5a00(int page);     // 0x004f5a00: shows page `page`
     void UnknownFunction4f5ca0();             // 0x004f5ca0: follows a track change
 
-    unsigned char field_0x2c[0x34 - 0x2c];
+    unsigned char field_0x2c[0x30 - 0x2c];
+    GUIManager* field_0x30;
     GUIUser* field_0x34;
-    unsigned char field_0x38[0x7f58 - 0x38];
+    unsigned char field_0x38[0xc4 - 0x38];
+    int field_0xc4;                           // the menu that opened it (0x866, 0x868, 0x88e)
+    unsigned char field_0xc8[0x118 - 0xc8];
+    int field_0x118;                          // a color (0xfeb97a)
+    unsigned char field_0x11c[0x7f58 - 0x11c];
     MPEventDlg* field_0x7f58;
     MPBikeRiderDlg* field_0x7f5c;
     MPRaceInfoDlg* field_0x7f60;

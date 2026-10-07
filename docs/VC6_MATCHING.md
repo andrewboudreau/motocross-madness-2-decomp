@@ -191,7 +191,7 @@ MorphBastardModifier.cpp (the rider morph) matches strictly in 15
 functions; see [MORPHBASTARDMODIFIER](MORPHBASTARDMODIFIER.md).
 
 SelectGamePicProcs.cpp (the multiplayer lobby dialogs) matches strictly
-in 48 functions; see [SELECTGAMEPICPROCS](SELECTGAMEPICPROCS.md).
+in 51 functions; see [SELECTGAMEPICPROCS](SELECTGAMEPICPROCS.md).
 
 ProCircuit.cpp (17) and ProCircuitProcs.cpp (33), the pro circuit career
 and its dialogs, match strictly; see [PROCIRCUIT](PROCIRCUIT.md).
