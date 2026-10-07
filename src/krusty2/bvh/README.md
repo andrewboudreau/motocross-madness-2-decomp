@@ -44,3 +44,23 @@ Notes
   (`InvertRigid(&m)`, `TransformPoint(&out, v, &m)`). Writing the same statements on a local
   matrix makes VC6 order the x87 operands differently.
 - DebugMalloc 0x4a2e20 uses the shared declaration in core/DebugAlloc.h.
+
+# BoundingBoxTreeQuery.cpp (bvh)
+
+Strict exact beyond the registered 33 cases (pending registration, all in
+`BoundingBoxTreeQuery.cpp` with its bindings):
+- SegmentTreeQuery 0x429e90: needs `hit = ScaleCtorCall(d, t); hit += p;` (retail adds into
+  the constructor's temporary) and the box recursion as the `else if` branch so that both
+  failures share one `return 0` tail.
+- LeafNodeQuery 0x4269e0 and LeafPairQuery 0x4275f0 (formerly 12-byte-frame near misses):
+  case 1 reaches the second end point as `ends[1]` from a `const Vec3* ends = leaf->end`
+  pointer, LeafNodeQuery copies the half extents before the centre, and LeafPairQuery's
+  case-2 `segment[2]` is declared at function scope (retail gives it its own slots above
+  case 1's locals, which is where the extra 12 bytes came from).
+
+Near misses with their current scores are listed at the top of
+`samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`.
+- 0x424730 (the box swept by a motion matrix, then BoxOverlap) materialises each axis
+  vector in a stack temporary before copying it to a named local, and calls the out-of-line
+  0x42a450 / 0x42a580 helpers; a natural reconstruction is 764 of 891 bytes.
+

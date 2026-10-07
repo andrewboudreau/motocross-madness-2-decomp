@@ -301,7 +301,75 @@ public:
     int CountNodes();                                        // 0x004fda30
     void CollectNodes(int* count, CollisionSourceNode** list);   // 0x004fda60 (ret 8)
     int Accepts(CollisionSourceNode* child, int filter);     // 0x00445060 (ret 8), tier 3 name
+    char field_0x00[0x13c];
+    CollisionSourceNode* parent;   // +0x13c 0x0043a050 climbs it to the root before collecting
 };
+
+// Box-tree stream readers (BoundingBoxTreeBuild.cpp; void* stand-ins for the bvh types).
+void ReadTriangleMesh(void** tree, void** vertices, CollisionFileStream* stream);   // 0x0042e0f0
+void ReadPointNode(void** tree, CollisionFileStream* stream);                       // 0x0042e190
+
+// 0x00439ed0 (ret 8): reads one hull payload: the 3x4 local transform (the w column is set
+// to 0,0,0,1 here), the swept flag, then the triangle tree with its vertices and the point
+// tree, each behind a presence flag.
+void CollisionObject::Fn_00439ed0(CollisionFileStream* stream, CollisionHullBody* hull)
+{
+    stream->Read(&hull->localTransform.m[0][0], 4, 1);
+    stream->Read(&hull->localTransform.m[0][1], 4, 1);
+    stream->Read(&hull->localTransform.m[0][2], 4, 1);
+    hull->localTransform.m[0][3] = 0.0f;
+    stream->Read(&hull->localTransform.m[1][0], 4, 1);
+    stream->Read(&hull->localTransform.m[1][1], 4, 1);
+    stream->Read(&hull->localTransform.m[1][2], 4, 1);
+    hull->localTransform.m[1][3] = 0.0f;
+    stream->Read(&hull->localTransform.m[2][0], 4, 1);
+    stream->Read(&hull->localTransform.m[2][1], 4, 1);
+    stream->Read(&hull->localTransform.m[2][2], 4, 1);
+    hull->localTransform.m[2][3] = 0.0f;
+    stream->Read(&hull->localTransform.m[3][0], 4, 1);
+    stream->Read(&hull->localTransform.m[3][1], 4, 1);
+    stream->Read(&hull->localTransform.m[3][2], 4, 1);
+    hull->localTransform.m[3][3] = 1.0f;
+    stream->Read(&hull->swept, 4, 1);
+    int hasTriangles;
+    stream->Read(&hasTriangles, 4, 1);
+    if (hasTriangles)
+        ReadTriangleMesh((void**)&hull->triangleTree, &hull->vertices, stream);
+    hull->pointTree = 0;
+    int hasPoints;
+    stream->Read(&hasPoints, 4, 1);
+    if (hasPoints)
+        ReadPointNode(&hull->pointTree, stream);
+}
+
+// 0x0043a050 (ret 0xc): reads a model payload.  The node's root (followed through +0x13c) is
+// expanded into a node list; each element record names its scene node by index into it.
+void CollisionObject::Fn_0043a050(void* nodeArg, CollisionFileStream* stream, CollisionModelBody* model)
+{
+    CollisionSourceNode* node = (CollisionSourceNode*)nodeArg;
+    while (node->parent)
+        node = node->parent;
+    int total = node->CountNodes();
+    CollisionSourceNode** list = (CollisionSourceNode**)operator new(total * 4, __FILE__, 0xa9e);
+    int one = 1;
+    list[0] = node;
+    node->CollectNodes(&one, list);
+    stream->Read(&model->elementCount, 4, 1);
+    stream->Read(&model->swept, 4, 1);
+    model->elements = new(__FILE__, 0xaa8) CollisionHullElement[model->elementCount];
+    model->elementEnabled = (int*)operator new(model->elementCount * 4, __FILE__, 0xaa9);
+    model->elementHighlight = (int*)operator new(model->elementCount * 4, __FILE__, 0xaaa);
+    for (int i = 0; i < model->elementCount; i++) {
+        int index;
+        stream->Read(&index, 4, 1);
+        model->elements[i].sceneNode = list[index];
+        Matrix4 tmp;
+        model->elements[i].relativeFrame = *Fn_004a1410(&tmp);
+        Fn_00439ed0(stream, &model->elements[i]);
+        model->elementEnabled[i] = 1;
+    }
+    Fn_004a30c0(list);
+}
 
 
 // 0x004324b0 (ret 0x14): model shape = one hull per accepted node of the scene subtree.
@@ -710,6 +778,8 @@ int Fn_00428c20(CollisionBoxBounds* boundsA, CollisionBoxBounds* boundsB, const 
                 const Matrix4* xfB);
 
 // 0x004392c0: bounds-only overlap of this object against `other` (used by TestMeshAgainst).
+// Partial 303/311 (same size and frame): retail holds `other` in ecx and its shape type in eax
+// for the second switch, VC6 swaps the two registers here.
 int CollisionObject::Fn_004392c0(CollisionObject* other)
 {
     CollisionBoxBounds modelBoundsA;
@@ -728,9 +798,9 @@ int CollisionObject::Fn_004392c0(CollisionObject* other)
     }
     case 1: {
         CollisionModelBody* model = (CollisionModelBody*)shape;
-        modelBoundsA.center = model->center;
-        modelBoundsA.halfExtents = model->halfExtents;
         boundsA = &modelBoundsA;
+        boundsA->center = model->center;
+        boundsA->halfExtents = model->halfExtents;
         xfA = &model->field_0x88;
         break;
     }
@@ -750,9 +820,9 @@ int CollisionObject::Fn_004392c0(CollisionObject* other)
     }
     case 1: {
         CollisionModelBody* model = (CollisionModelBody*)other->shape;
-        modelBoundsB.center = model->center;
-        modelBoundsB.halfExtents = model->halfExtents;
         boundsB = &modelBoundsB;
+        boundsB->center = model->center;
+        boundsB->halfExtents = model->halfExtents;
         xfB = &model->field_0x88;
         break;
     }
@@ -806,6 +876,12 @@ struct CollisionTreeTriangle {
     float field_0x00;
     unsigned short vertex[3];      // +0x04, indices into the vertex array
     Vec3 normal;                   // +0x0c
+};
+
+// Segment leaf view (polyline trees, field_0x00 < 0): the two end points.
+struct CollisionTreeSegment {
+    float field_0x00;
+    Vec3 end[2];                   // +0x04, +0x10
 };
 
 // 0x00428db0 (cdecl, 3 args): moves the box (center, half extents) by the second
@@ -996,6 +1072,168 @@ void CollisionObject::DrawBoxTree(CollisionTreeNode* node, int depth, const Matr
     }
 }
 
+// 0x004341b0 (ret 8).  Draws every leaf of a polyline (type 2) tree: a leaf holds a segment
+// (its two end points at +0x04 / +0x10), drawn as two magenta markers joined by a green line.
+// VC6 turns the second recursive call into the loop retail shows.
+void CollisionObject::DrawSegmentTree(CollisionTreeNode* node, const Matrix4* xf)
+{
+    if (node->field_0x00 >= 0.0f) {
+        DrawSegmentTree(node->child[0], xf);
+        DrawSegmentTree(node->child[1], xf);
+    } else {
+        SetDrawColor(0xff, 0, 0xff);
+        Vec3 p, q;
+        const Vec3* ends = &((const CollisionTreeSegment*)node)->end[0];
+        DebugTransformPoint(&p, ends[0], xf);
+        DebugTransformPoint(&q, ends[1], xf);
+        DrawMarker(&p, 0.25f);
+        DrawMarker(&q, 0.25f);
+        SetDrawColor(0, 0xff, 0);
+        DrawLine(&p, &q);
+    }
+}
+
+// 0x00434340 (ret 0xc).  DrawBoxTree for a polyline tree: at depth 0 a box node is drawn red
+// and a segment leaf as in DrawSegmentTree.
+void CollisionObject::DrawSegmentTreeLevel(CollisionTreeNode* node, int depth, const Matrix4* xf)
+{
+    if (depth == 0) {
+        if (node->field_0x00 < 0.0f) {
+            SetDrawColor(0, 0, 0xff);
+        } else {
+            SetDrawColor(0xff, 0, 0);
+        }
+        if (node->field_0x00 >= 0.0f) {
+            DrawBox(&node->center, &node->halfExtents, xf);
+        } else {
+            SetDrawColor(0xff, 0, 0xff);
+            Vec3 p, q;
+            const Vec3* ends = &((const CollisionTreeSegment*)node)->end[0];
+            DebugTransformPoint(&p, ends[0], xf);
+            DebugTransformPoint(&q, ends[1], xf);
+            DrawMarker(&p, 0.25f);
+            DrawMarker(&q, 0.25f);
+            SetDrawColor(0, 0xff, 0);
+            DrawLine(&p, &q);
+        }
+    } else if (node->field_0x00 >= 0.0f) {
+        DrawSegmentTreeLevel(node->child[0], depth - 1, xf);
+        DrawSegmentTreeLevel(node->child[1], depth - 1, xf);
+    }
+}
+
+// Normalise as slot 14 emits it: |v|^2 summed (y*y + x*x) + z*z, exactly 1.0f returns v,
+// and the result goes through the out-of-line constructor 0x00404e60 (CollisionVec3's).
+inline CollisionVec3 DebugNormalized(const CollisionVec3& v)
+{
+    float lengthSquared = v.z * v.z + (v.y * v.y + v.x * v.x);
+    if (lengthSquared == 1.0f)
+        return v;
+    float inverseLength = FastInvSqrt(lengthSquared);
+    return CollisionVec3(v.x * inverseLength, v.y * inverseLength, v.z * inverseLength);
+}
+
+// Device behind GameObject::field_0x18 as slot 14 drives it (render-state style calls with
+// small enum arguments); tier 3 stand-in, only the slots used here.
+class CollisionDebugDevice {
+public:
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6();
+    virtual void UnknownVirtualSlot7(int a, int b, int c);   // +0x1c
+    virtual void UnknownVirtualSlot8(int a, int b, int c);   // +0x20
+    virtual void UnknownVirtualSlot9();
+    virtual void UnknownVirtualSlot10(int a, int b);         // +0x28
+};
+
+// Math3D views of the sphere / capsule payloads (same layouts as CollisionSphereShape and
+// CollisionCapsuleShape in CollisionObject.h).
+struct CollisionSphereView {
+    Vec3 center;
+    float radius;
+    float radiusSquared;
+    float radiusScale;      // +0x14
+    float centerScale;      // +0x18
+    Matrix4 transform;      // +0x1c
+};
+struct CollisionCapsuleView {
+    Vec3 p0;
+    Vec3 p1;
+    float radius;           // +0x18
+    float radiusSquared;
+    float radiusScale;
+    float endpointScale;
+    Matrix4 transform;      // +0x28
+};
+
+// 0x00434540 (slot 14 of the GraphicsTest table, this = the GraphicsTest subobject): the
+// collision debug overlay.  debugDrawMode 0 draws nothing, 5 adds the translucent bounding
+// sphere; hulls and models draw their trees, a polyline its segment tree, a sphere a wire
+// sphere and a capsule its two end spheres joined by ten rings along the axis.
+// Near miss (1054/1068, size and frame exact): only the capsule end-point transforms differ in
+// x87 operand order (retail sums p0's terms y, z, x and loads m->_11 before p1.x).
+// The ring step is d / 10.0f: VC6 turns it into a multiply by the reciprocal constant
+// 0x005511cc, a separate pool entry from the literal 0.1f at 0x005507d0.
+int CollisionObject::GameObjectVirtualSlot14()
+{
+    ((CollisionDebugDevice*)field_0x18)->UnknownVirtualSlot8(0x1b, 0, 0);
+    ((CollisionDebugDevice*)field_0x18)->UnknownVirtualSlot10(7, 0);
+    ((CollisionDebugDevice*)field_0x18)->UnknownVirtualSlot7(0, 1, 1);
+    Vec3 center;
+    if (shape && debugDrawMode) {
+        if (debugDrawMode == 5) {
+            Fn_0047c6c0(0, 0xff, 0xff, 0x80);
+            Fn_0047c6f0();
+            Fn_0047c0b0((const Vec3*)&field_0x34, boundRadius, 8);
+        }
+        switch (shapeType) {
+        case 0:
+            DrawHull((CollisionHullBody*)shape, debugTreeDepth, debugDrawMode);
+            break;
+        case 1:
+            DrawModel((CollisionModelBody*)shape, debugTreeDepth, debugDrawMode);
+            break;
+        case 2:
+            DrawSegmentTreeLevel((CollisionTreeNode*)((CollisionMeshBody*)shape)->field_0x04,
+                                 debugTreeDepth, &((CollisionMeshBody*)shape)->field_0x08);
+            DrawSegmentTree((CollisionTreeNode*)((CollisionMeshBody*)shape)->field_0x04,
+                            &((CollisionMeshBody*)shape)->field_0x08);
+            break;
+        case 4: {
+            SetDrawColor(0xff, 0xff, 0xff);
+            CollisionSphereView* sphere = (CollisionSphereView*)shape;
+            center = sphere->center * sphere->centerScale;
+            DebugTransformPoint(&center, center, &sphere->transform);
+            Fn_0047c0b0(&center, sphere->radius * sphere->radiusScale, 8);
+            break;
+        }
+        case 3: {
+            SetDrawColor(0xff, 0xff, 0xff);
+            CollisionCapsuleView* capsule = (CollisionCapsuleView*)shape;
+            Vec3 ends[2];
+            DebugTransformPointRef(&ends[0], capsule->p0, &capsule->transform);
+            DebugTransformPointRef(&ends[1], capsule->p1, &capsule->transform);
+            Fn_0047c0b0(&ends[0], capsule->radius, 0x10);
+            Fn_0047c0b0(&ends[1], ((CollisionCapsuleView*)shape)->radius, 0x10);
+            Vec3 d = ends[1] - ends[0];
+            CollisionVec3 axis = DebugNormalized(*(CollisionVec3*)&d);
+            Vec3 step = d / 10.0f;
+            for (int i = 0; i < 10; i++) {
+                Vec3 ring = ends[0] + step * (float)i;
+                Fn_0047bd10(&ring, ((CollisionCapsuleView*)shape)->radius, (Vec3*)&axis, 0x20);
+            }
+            break;
+        }
+        }
+    }
+    field_0x98 = 0;
+    return GameObject::GameObjectVirtualSlot14();
+}
+
 // 0x00432d30 (ret 0xc).  Draws one hull's trees; `mode` (1..7) picks the view.  Mode 4
 // also draws the tree under field_0x88 * field_0x108.
 void CollisionObject::DrawHull(CollisionHullBody* hull, int depth, int mode)
@@ -1147,6 +1385,117 @@ void CollisionMatrixMultiply(Matrix4* out, const Matrix4* a, const Matrix4* b)
                    b->m[3][2] * a->m[2][2] + b->m[3][3] * a->m[3][2];
     out->m[3][3] = b->m[3][0] * a->m[0][3] + b->m[3][1] * a->m[1][3] +
                    b->m[3][2] * a->m[2][3] + b->m[3][3] * a->m[3][3];
+}
+
+// Collision queries over the broad phase (0x00438e70).
+// Vegetation patch as 0x00438e70 sees a quadtree object whose objectTypeId is Vegetation's:
+// cell coordinates at +0x0c / +0x10 and thiscall accessors (tier 3 stand-in).
+class CollisionVegetation : public QuadTreeObject {
+public:
+    float GetRadius();                        // 0x00457230
+    int GetObjectCount();                     // 0x00457080
+    CollisionObject* GetObject(int index);    // 0x004570a0 (ret 4)
+    unsigned short cellX;                     // +0x0c
+    unsigned short field_0x0e;
+    unsigned short cellZ;                     // +0x10
+};
+struct CollisionVegetationGrid {   // object at *0x0059aebc (tier 3)
+    char field_0x00[0x5a8];
+    float cellSize;                // +0x5a8 world size of one vegetation cell
+};
+extern CollisionVegetationGrid* g_vegetationGrid;   // 0x0059aebc
+struct CollisionGameContext {      // object at *0x0056e26c (tier 3; root of the object tree at +0x34)
+    char field_0x00[0x34];
+    GameObject* root;              // +0x34
+};
+extern CollisionGameContext* g_collisionGameContext;   // 0x0056e26c
+// gameobj.cpp's iterator (src/reconstructed/GameObjectIterator.h; local stand-in, 0x94 bytes).
+class GameObjectIterator {
+public:
+    GameObjectIterator(GameObject* root, int mode, const char* filter);   // 0x00469950
+    ~GameObjectIterator();                                                  // 0x00469a40
+    GameObject* Next();                                                     // 0x00469a50
+private:
+    char field_0x00[0x94];
+};
+struct CollisionBoundingSphere;
+int SphereContainsPointXZ(const CollisionBoundingSphere* sphere, const Vec3* p, float r);   // 0x0043a1e0
+int BoundingSpheresOverlap(const CollisionBoundingSphere* a, const CollisionBoundingSphere* b);   // 0x0043a270
+
+// The hit bookkeeping 0x00438e70 repeats after every successful TestAgainst(hitObject).
+inline void CollisionObject::ReportHit()
+{
+    hasContact = 1;
+    Fn_00434bb0();
+    hitObject->hitPoint = hitPoint;
+    hitObject->hitNormal = hitNormal;
+    if (onHitCallback)
+        onHitCallback(this, hitObject);
+    if (hitObject->onHitByCallback)
+        hitObject->onHitByCallback(hitObject, this);
+}
+
+// 0x00438e70: tests this object against everything near it.  With the global collision
+// quadtree (and useBroadphase) the candidates are the quadtree objects overlapping the world
+// bounds: collision objects (bounding spheres first) and vegetation patches (their objects,
+// after an XZ circle test); without it every CollisionObject of the game-object tree.
+// Returns hasContact.
+int CollisionObject::Fn_00438e70()
+{
+    if (!collisionEnabled) {
+        hasContact = 0;
+        return 0;
+    }
+    Fn_00434a10();
+    if (g_collisionQuadTree && useBroadphase) {
+        field_0x98 = 1;
+        CollisionVec3 maxBounds;
+        CollisionVec3 minBounds;
+        GetWorldBounds(&minBounds, &maxBounds);
+        g_collisionQuadTree->BeginQuery(minBounds.x, minBounds.z, maxBounds.x, maxBounds.z);
+        for (QuadTreeObject* o = g_collisionQuadTree->NextObject(); o; o = g_collisionQuadTree->NextObject()) {
+            if (o->objectTypeId == g_CollisionObjectTypeId) {
+                hitObject = (CollisionObject*)o;
+                hitObject->field_0x98 = 1;
+                if (BoundingSpheresOverlap((CollisionBoundingSphere*)this, (CollisionBoundingSphere*)hitObject)
+                    && TestAgainst(hitObject))
+                    ReportHit();
+            } else if (!ignoreVegetation && o->objectTypeId == g_VegetationTypeId) {
+                CollisionVegetation* vegetation = (CollisionVegetation*)o;
+                Vec3 center;
+                center.x = vegetation->cellX * g_vegetationGrid->cellSize;
+                center.z = vegetation->cellZ * g_vegetationGrid->cellSize;
+                float radius = vegetation->GetRadius();   // unused: retail calls it and pops the result
+                if (SphereContainsPointXZ((CollisionBoundingSphere*)this, &center, vegetation->GetRadius())) {
+                    for (int i = 0; i < vegetation->GetObjectCount(); i++) {
+                        hitObject = vegetation->GetObject(i);
+                        hitObject->field_0x98 = 1;
+                        if (TestAgainst(hitObject))
+                            ReportHit();
+                    }
+                }
+            }
+        }
+        g_collisionQuadTree->EndQuery();
+    } else {
+        field_0x98 = 1;
+        GameObjectIterator* it = new(__FILE__, 0x7da) GameObjectIterator(g_collisionGameContext->root, 1, "");
+        // Retail null-checks the CollisionObject* and then the GameObject* again (three tests
+        // per step), which is this round trip through the derived pointer type.
+        GameObject* object;
+        while ((object = (CollisionObject*)it->Next()) != 0) {
+            hitObject = dynamic_cast<CollisionObject*>(object);
+            if (hitObject) {
+                hitObject->field_0x98 = 1;
+                if (TestAgainst(hitObject))
+                    ReportHit();
+            }
+        }
+        delete it;
+    }
+    if (hasContact)
+        Fn_00434cf0();
+    return hasContact;
 }
 
 // 0x00436430: can this object collide with `other`, and if so run the shape test.

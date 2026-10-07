@@ -106,6 +106,83 @@ int BoxSphereOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 sphereCen
     return 0;
 }
 
+// 0x004269e0.  A leaf against an interior node: a segment leaf of A against a box of B, or a
+// box of A (moved by the motion matrix when useMotion is set) against a triangle leaf of B.
+int LeafNodeQuery(QueryTreeNode* a, QueryTreeNode* b, int useMotion)
+{
+    if (a->volume < 0.0f) {
+        QuerySegmentLeaf* seg = (QuerySegmentLeaf*)a;
+        switch (s_mode) {
+        case 0:
+            return 0;
+        case 1: {
+            const Vec3* ends = seg->end;
+            return SegmentBoxOverlap(&b->center, &b->halfExtents, ends[0], ends[1], &s_relativeBA);
+        }
+        case 2: {
+            Vec3 segment[2];
+            segment[0] = seg->end[0];
+            TransformPointInline(&segment[1], seg->end[0], &s_motion);
+            return SegmentBoxOverlap(&b->center, &b->halfExtents, seg->end[0], segment[1], &s_relativeBA);
+        }
+        }
+        return 0;
+    }
+    if (useMotion) {
+        Vec3 halfExtents = a->halfExtents;
+        Vec3 center = a->center;
+        MoveBox(&center, &halfExtents, &s_motion);
+        return BoxTriangleQuery(&center, &halfExtents, &((QueryTriangleLeaf*)b)->tri, &s_relativeAB);
+    }
+    return BoxTriangleQuery(&a->center, &a->halfExtents, &((QueryTriangleLeaf*)b)->tri, &s_relativeAB);
+}
+
+// 0x004275f0.  Leaf against leaf: a segment leaf of tree A (mode 1: its two points; mode 2:
+// its first point and where the motion matrix moves it) against a triangle leaf of tree B.
+int LeafPairQuery(QuerySegmentLeaf* a, QueryTriangleLeaf* b)
+{
+    QueryTriangle* tri = &b->tri;
+    Vec3 segment[2];   // case 2's; retail gives it its own frame slots, as at function scope
+    switch (s_mode) {
+    case 1: {
+        const Vec3* ends = a->end;
+        Vec3 p = ends[0];
+        Vec3 start;
+        TransformPointInline(&start, p, &s_relativeBA);
+        Vec3 dir;
+        Vec3 delta;
+        Vec3TransformNormal(&dir, *Vec3SubtractCall(&delta, &ends[1], &ends[0]), &s_relativeBA);
+        if (Vec3DotCall(&dir, &tri->normal) >= 0.0f)
+            return 0;
+        float t = -((Vec3DotCall(&tri->normal, &start) + tri->planeOffset) / Vec3DotCall(&tri->normal, &dir));
+        if (t < 0.0f || t > 1.0f)
+            return 0;
+        Vec3 scaled;
+        Vec3AddAssignCall hit;
+        (Vec3&)hit = *Vec3ScaleCall(&scaled, &dir, t);
+        hit += start;
+        if (!PointInTriangle(&hit, tri))
+            return 0;
+        if (t > g_CollisionBoxResult->fraction)
+            return 0;
+        g_CollisionBoxResult->fraction = t;
+        g_CollisionBoxResult->point = &a->end[0];
+        g_CollisionBoxResult->normal = tri->normal;
+        return 1;
+    }
+    case 2: {
+        segment[0] = a->end[0];
+        Vec3 p = a->end[0];
+        RotateVectorInline(&segment[1], p, &s_motion);
+        segment[1].x = s_motion._41 + segment[1].x;
+        segment[1].y = s_motion._42 + segment[1].y;
+        segment[1].z = s_motion._43 + segment[1].z;
+        return SegmentTriangleQuery(tri, segment, &s_relativeBA);
+    }
+    }
+    return 0;
+}
+
 // 0x00428950.  Tree against tree: sets up both relative frames (and the motion matrix when
 // given), then walks the two trees.
 int TreeTreeQuery(QueryTreeNode* a, QueryTreeNode* b, const Matrix4* xfA, const Matrix4* xfB,
@@ -159,6 +236,39 @@ int SegmentTreeQueryWithVertices(const Vec3* ends, QueryTreeNode* node, const Ma
 {
     s_vertices = vertices;
     return SegmentTreeQuery(ends, node, xf);
+}
+
+// 0x00429e90.  Segment (ends[0] -> ends[1], moved by xf) against a tree: box nodes are
+// culled with SegmentBoxOverlap; a triangle leaf is hit where the segment crosses its plane
+// inside the triangle, and the nearest hit so far is kept in g_CollisionBoxResult.
+int SegmentTreeQuery(const Vec3* ends, QueryTreeNode* node, const Matrix4* xf)
+{
+    if (node->volume < 0.0f) {
+        const QueryTriangle* tri = &((QueryTriangleLeaf*)node)->tri;
+        Vec3 p;
+        TransformPointInline(&p, ends[0], xf);
+        Vec3 d;
+        RotateVectorInline(&d, ends[1] - ends[0], xf);
+        if (QueryDot(d, tri->normal) < 0.0f) {
+            float t = -((QueryDot(p, tri->normal) + tri->planeOffset) / QueryDot(d, tri->normal));
+            if (t >= 0.0f && t <= 1.0f) {
+                Vec3 hit = ScaleCtorCall(d, t);
+                hit += p;
+                if (PointInTriangle(&hit, tri) && t <= g_CollisionBoxResult->fraction) {
+                    g_CollisionBoxResult->fraction = t;
+                    g_CollisionBoxResult->point = ends;
+                    g_CollisionBoxResult->normal = tri->normal;
+                    return 1;
+                }
+            }
+        }
+    } else if (SegmentBoxOverlap(&node->center, &node->halfExtents, ends[0], ends[1], xf)) {
+        int hit = SegmentTreeQuery(ends, node->child[0], xf);
+        if (SegmentTreeQuery(ends, node->child[1], xf))
+            hit = 1;
+        return hit;
+    }
+    return 0;
 }
 
 // 0x0042a160.  Frees a box tree: interior nodes (volume >= 0) free both subtrees first.

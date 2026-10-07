@@ -338,5 +338,55 @@
     "expect": "exact",
     "notes": "VisibilityQuadTree.cpp initializer (.CRT$XCU entries 340-347)",
     "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityClipper",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "?TransformVectors@VisibilityClipper",
+    "target_va": "0x0052f0a0",
+    "target_size": 156,
+    "expect": "exact",
+    "notes": "all callers load ecx from 0x575a98 (thiscall); in the unit range between 0x52f080 and the Math3D $E at 0x52fdc0",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityClipper",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "?TestDot@VisibilityClipper",
+    "target_va": "0x0052f140",
+    "target_size": 72,
+    "expect": "exact",
+    "notes": "all callers load ecx from 0x575a98 (thiscall); in the unit range between 0x52f080 and the Math3D $E at 0x52fdc0",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityClipper",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "?ProjectPoint@VisibilityClipper",
+    "target_va": "0x0052f340",
+    "target_size": 389,
+    "expect": "exact",
+    "notes": "all callers load ecx from 0x575a98 (thiscall); in the unit range between 0x52f080 and the Math3D $E at 0x52fdc0; argument 0 is the camera, argument 1 the matrix",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityClipper",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "?CullQuad@VisibilityClipper",
+    "target_va": "0x0052f4d0",
+    "target_size": 155,
+    "expect": "exact",
+    "notes": "all callers load ecx from 0x575a98 (thiscall); in the unit range between 0x52f080 and the Math3D $E at 0x52fdc0",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityClipper",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "?CullPolygon@VisibilityClipper",
+    "target_va": "0x0052fac0",
+    "target_size": 234,
+    "expect": "exact",
+    "notes": "all callers load ecx from 0x575a98 (thiscall); in the unit range between 0x52f080 and the Math3D $E at 0x52fdc0",
+    "bindings": "VisibilityQuadTree.bindings.json"
   }
 ]

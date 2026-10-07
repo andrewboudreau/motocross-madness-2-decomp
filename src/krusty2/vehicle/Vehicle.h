@@ -61,6 +61,19 @@ struct VehicleValueSource {          // object at VehicleInputMap+0x0c (provisio
     virtual void UnknownVirtualSlot1();
     virtual void UnknownVirtualSlot2();
     virtual int  UnknownVirtualSlot3(int a, float* out);
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6();
+    virtual void UnknownVirtualSlot7();
+    virtual void UnknownVirtualSlot8();
+    virtual void UnknownVirtualSlot9();
+    virtual void UnknownVirtualSlot10();
+    virtual void UnknownVirtualSlot11();
+    virtual void UnknownVirtualSlot12();
+    virtual void UnknownVirtualSlot13();
+    virtual void UnknownVirtualSlot14();
+    virtual void UnknownVirtualSlot15();   // ~Vehicle (0x00526380) calls slots 15 and 16 on it
+    virtual void UnknownVirtualSlot16();
 };
 struct VehicleKeyTable {             // object at VehicleInputMap+0x34 (provisional)
     virtual void UnknownVirtualSlot0();
@@ -135,6 +148,7 @@ struct VehicleSpeedState {
     float randomStart;                // +0x78 randomised start value (slot 1)
     char pad_0x7C[0x8];
     int field_0x84;
+    ~VehicleSpeedState();                           // 0x00464e90, the shared empty out-of-line destructor (~Vehicle)
     void Method_004D2F50(float dt, int a, int b);   // 0x004d2f50, purpose unknown
     void Method_004D3030(int a, float speed);       // 0x004d3030, purpose unknown
 };
@@ -150,6 +164,7 @@ struct VehicleSteerState {
     SoultreeObject* steerNode;  // +0x00 scene node positioned/oriented in slots 36/58
     float steerAngle;  // +0x04 slot 60 subtracts it; slot 73 uses sin(it) and |it|
     float field_0x08;
+    ~VehicleSteerState();                                      // 0x00504c50 (~Vehicle deletes it)
     void Method_00504EC0(float value, SoultreeObject* node);   // 0x00504ec0, purpose unknown
     void Method_00504E20(int a, SoultreeObject* node);         // 0x00504e20, purpose unknown
 };
@@ -172,15 +187,38 @@ class SoultreeContact;
 extern void __cdecl VehAddContact(int capacity, SoultreeContact** arr, int a2, int* count, void* contact);
 extern void __stdcall VehWheelApply(float weight, float a, float b, float* speed);
 class Vehicle;
+// Suspension objects hung on a wheel (VehicleWheel+0x2b0 / +0x2ac).  Method_00528EB0 retracts
+// them by a fraction of the last step and clears their forces while the wheel is in contact;
+// the two Retract bodies differ (0x004fa310 / 0x004fab60), the ClearForces body 0x004f9c70 is
+// shared and called directly.  Provisional views; samples/physics/suspension/Suspension.h
+// reads them as InlineShock / RotatingShock.
+struct VehicleWheel;
+struct VehicleShock {
+    void ClearForces();                                         // 0x004f9c70
+};
+struct VehicleInlineShock : VehicleShock {
+    void Retract(float amount, const VehicleWheel* carrier);   // 0x004fa310
+};
+struct VehicleRotatingShock : VehicleShock {
+    void Retract(float amount, const VehicleWheel* carrier);   // 0x004fab60
+};
 struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional)
     char pad_0x00[0x8C];
     int field_0x8c;
     int field_0x90;
     void Method_004D31B0(float a, Vec3* b, float c, bool d, float e, Vec3* f, Vec3* g);
 };
+// The wheel's collision point (VehicleWheel+0xb8, the CollisionPoint base of Tire): only its
+// virtual slot 1 (friction update) is called here, by Method_00527A20.  Provisional view.
+struct VehicleContactPoint {
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+};
 // Elements of Vehicle+0x53c (provisional: only touched offsets are named).
 struct VehicleWheel {
-    char pad_0x00[0xCC];
+    char pad_0x00[0xB8];
+    VehicleContactPoint contactPoint;  // +0xb8 Method_00525D30 registers it in collisionPoints
+    char pad_0xBC[0x10];
     Vec3 wheelPosition;              // +0xcc wheel contact position (slot 7 distance source)
     Vec3 groundPoint;              // +0xd8 (y at +0xdc is read as a height by slot 58)
     Vec3 groundNormal;              // +0xe4 contact normal (averaged by Method_00528400)
@@ -189,13 +227,13 @@ struct VehicleWheel {
     Vec3 field_0x108;
     Vec3 field_0x114;
     Vec3 field_0x120;
-    int field_0x12c;
+    float field_0x12c;  // Method_00527A20: -(appliedShare . groundNormal) when that is negative, else 0
     Vec3 field_0x130;
-    float field_0x13c;
+    float field_0x13c;  // Method_00527A20: contact time scale (the impulse is limited by it)
     char pad_0x140[4];
     float contactLoad;  // +0x144 slot 72 accumulates it over wheels and averages by the contact count
-    int field_0x148;
-    int field_0x14c;
+    float field_0x148;  // Method_00527A20 adds it to field_0x14c for the available load
+    float field_0x14c;
     float field_0x150;
     char pad_0x154[4];
     float loadWeight;               // +0x158 blend weight
@@ -224,7 +262,7 @@ struct VehicleWheel {
     Vec3 field_0x248;
     Vec3 field_0x254;
     int inContact;  // +0x260 selects wheels touching the ground (slots 7, 54, 72, 75-86); count equals Vehicle::wheelsInContact
-    char pad_0x264[0x4];
+    int field_0x264;  // Method_00528EB0 sets it on the first in-contact wheel without field_0x1c0 (else on wheel 0)
     int field_0x268;
     int field_0x26c;
     char pad_0x270[8];
@@ -236,7 +274,7 @@ struct VehicleWheel {
     float field_0x294;
     char pad_0x298[0x4];
     float rampLevel;               // +0x29c 0 selects a flag passed to slot 77 (slot 83)
-    char pad_0x2A0[4];
+    float field_0x2a0;             // Method_00527A20 counts the in-contact wheels where it is nonzero
     float field_0x2a4;
     VehicleWheelAux* field_0x2a8;
     int secondaryAux;  // +0x2ac same use as primaryAux, the fallback when it is null (Method_00529A20, 005293E0)
@@ -249,6 +287,15 @@ struct VehicleWheel {
     void Method_00513C70(float bias, int flag, int crashState, float speed, Vec3* velocity, Vec3* anchor);   // 0x00513c70
     void Method_00513F90(Vehicle* owner);                                 // 0x00513f90
     void Method_00515660();                    // 0x00515660, called per wheel by Bike slot 41 (0x0040cbd0)
+    // 0x00514170 (ret 0x1c): per-wheel drive/brake step called by Method_00527A20 with the
+    // reciprocal of the driven-wheel count, the body's step time, direction flag and mass.
+    void Method_00514170(float share, float stepTime, int movingForward, float bodyMass,
+                         float* speed, Vec3* force, Vec3* torque);
+    // 0x00514550 (ret 0x20): places the wheel on the ground (samples/physics/tire/Tire.h
+    // UpdateSuspensionProbe); Method_00528EB0 passes the body's probe, position, saved
+    // pitch/sin-roll/yaw, saved forward/up and the pose node.
+    void Method_00514550(SoultreeProbe* world, const Vec3* position, float pitch, float sinRoll,
+                         float yaw, const Vec3* forward, const Vec3* up, SoultreeObject* node);
 };
 
 class Vehicle : public SoultreePhysicsCharacter {

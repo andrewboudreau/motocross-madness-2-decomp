@@ -125,8 +125,8 @@
     "candidate_symbol_contains": "Fn_00432800",
     "target_va": "0x00432800",
     "target_size": 164,
-    "expect": "masked",
-    "notes": "point-tree setup; owner: bracket only; strict: unresolved symbol: ??0CollisionFileStream@@QAE@H@Z",
+    "expect": "exact",
+    "notes": "Strict exact once the CollisionFileStream constructor 0x460d10 and destructor 0x460d60 are bound as its direct call targets.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -546,7 +546,7 @@
     "target_va": "0x004392c0",
     "target_size": 311,
     "expect": "partial",
-    "notes": "structure matches (uninitialised default arm even reads `other` like retail) but retail reserves 0x48 stack bytes vs 0x38 and copies the model bounds Vec3s through an lea-based sequence; local layout not reproduced",
+    "notes": "303/311, same size; only an ecx/eax swap for other remains.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -697,6 +697,66 @@
     "target_size": 60,
     "expect": "exact",
     "notes": "CollisionObject.cpp Math3D vector set (vectors 0x5797a0..0x5797d0)",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "Fn_00439ed0@CollisionObject",
+    "target_va": "0x00439ed0",
+    "target_size": 376,
+    "expect": "exact",
+    "notes": "reads a hull payload from a .col stream: local 3x4 transform, swept flag, triangle tree (0x42e0f0) and point tree (0x42e190) behind presence flags",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "Fn_0043a050@CollisionObject",
+    "target_va": "0x0043a050",
+    "target_size": 387,
+    "expect": "exact",
+    "notes": "reads a model payload: root via +0x13c, CountNodes/CollectNodes, array new (lines 0xa9e..0xaaa), 0x439ed0 per element",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "DrawSegmentTree@CollisionObject",
+    "target_va": "0x004341b0",
+    "target_size": 397,
+    "expect": "exact",
+    "notes": "debug draw of a polyline (type 2) tree segment leaves",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "DrawSegmentTreeLevel@CollisionObject",
+    "target_va": "0x00434340",
+    "target_size": 505,
+    "expect": "exact",
+    "notes": "depth-limited version of 0x4341b0, shaped like DrawBoxTree",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "Fn_00438e70@CollisionObject",
+    "target_va": "0x00438e70",
+    "target_size": 1102,
+    "expect": "exact",
+    "notes": "broad-phase query: quadtree, vegetation and game-object iterator paths; new(__FILE__, 0x7da); hit blocks are one inline ReportHit",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "GameObjectVirtualSlot14@CollisionObject",
+    "target_va": "0x00434540",
+    "target_size": 1068,
+    "expect": "partial",
+    "notes": "1054/1068: size and frame exact; only the capsule end-point transforms differ in x87 operand order.",
     "bindings": "CollisionObject.bindings.json"
   }
 ]

@@ -6,7 +6,9 @@ partial candidate; the separate helper samples are not covered by that claim.
 
 - `__FILE__` string at 0x575a3c, xref 0x52d4c9 (node factory, `new(__FILE__, 0x4f)`).
 - Bracket 0x52d22a..0x5300f8. The front (0x52d240, 0x52d250, 0x52d2f0) is VideoCard;
-  0x52ff90/0x5300a0/0x5300c0 are Wrecker; 0x52ff00/0x52ff20 are not VisibilityQuadTree.
+  0x52ff90/0x5300a0/0x5300c0 are Wrecker; 0x52ff00/0x52ff20 are not VisibilityQuadTree
+  (they call the import at [0x5502c0] with 0x6e / 0x6f around a message loop over three
+  other imports; their callers are 0x4c9cd5..0x4c9ea8 and 0x4a0ea1).
 - `VisibilityQuadTree : QuadTree (+0), GameObject (+0x874)`; primary vtable 0x558dfc,
   secondary (GameObject shape) 0x558d8c. `VisibilityQuadTreeNode : QuadTreeNode`, vtable 0x558e08.
 - 16 exact (see targets.json), Traverse 0x52d610 partial (72.7%, 3026 vs 3027 bytes, call-site arg scheduling). Samples: 3 exact, 3 partial (VisProjectPoint, VisCullQuad, VisSphereInFrustum).
@@ -16,7 +18,21 @@ partial candidate; the separate helper samples are not covered by that claim.
   (0x52d2e0..0x52d310), the query timer 0x68ab90 (`UnknownPeakHold`-shaped, 5000;
   0x52d320/0x52d330), Math3D.h's four vectors (0x52fdc0..0x52fefb) and a second empty static
   (0x52f080/0x52f090). All 18 initializer functions are strict exact.
-- Not done: 0x52f570 (box test, VisibilityClipper thiscall, 1358 bytes), 0x52f190 (argument layout still unclear).
+- VisibilityClipper (the object at 0x575a98): every caller loads ecx from that pointer, so
+  the helpers 0x52f0a0..0x52fdbf are thiscall methods that never read `this`; CullQuad keeps
+  ecx untouched to pass it on to CullPolygon, which is why the old `__stdcall` sample of
+  CullQuad could not match. They lie between the unit's second empty static (0x52f080) and
+  its Math3D.h initializers (0x52fdc0), and .CRT$XCU lists those initializers inside the
+  unit's own run (entries 340-347), so they are this unit's code (strong inference).
+  Strict exact in VisibilityQuadTree.cpp (pending registration): TransformVectors 0x52f0a0,
+  TestDot 0x52f140, ProjectPoint 0x52f340, CullQuad 0x52f4d0, CullPolygon 0x52fac0.
+  ProjectPoint's first argument is the camera (viewport size at +0x1a8/+0x1ac) and its
+  second the matrix; CullQuad needs the per-component copy; ProjectPoint and the two near
+  misses need the 0x20-byte clip-point local (retail's frame size).
+- Near misses (`samples/physics/visibility/VisibilityClipperNearMisses.cpp`): ProjectVertices
+  0x52f190 (382/418, x87 load order only) and SphereInFrustum 0x52fbb0 (517/526, two stack
+  slots swapped).
+- Not done: TestBox 0x52f570 (1358 bytes, ebp frame with inline `fistp` rounding, excluded).
 - The verified debug walk uses a typed renderer pointer at camera+0x18. The partial
   projection probe has a separate provisional `VisProjectionRecord`; its matrix-prefix
   hypothesis is not asserted as part of VisibilityCamera.

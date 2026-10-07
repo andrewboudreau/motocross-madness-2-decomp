@@ -483,7 +483,8 @@ void Vehicle::UnknownVirtualSlot58(Vec3* a, int b)
             for (int i = 1; i < wheelCount; i++) {
                 VehicleWheel* w = wheelList[i];
                 if (w->groundPoint.y > top->groundPoint.y) {
-                    second = top = w;
+                    top = wheelList[i];
+                    second = top;
                 } else if (w->groundPoint.y > second->groundPoint.y) {
                     second = w;
                 }
@@ -1426,6 +1427,12 @@ int Vehicle::UnknownVirtualSlot88()
 // Tier 3 reading: sums the +0x230 vectors of the wheels without the +0x1c0 flag, normalises
 // the sum when more than one wheel contributed (zero stays zero) and returns |sum . field_0xa0|;
 // 1.0 when no wheel contributed.
+// z*z + (x*x + y*y) through a reference: the grouping and the helper give retail's x87 order.
+static inline float VehLenSqZ(const Vec3& v)
+{
+    return v.z * v.z + (v.x * v.x + v.y * v.y);
+}
+
 float Vehicle::UnknownVirtualSlot75()
 {
     Vec3 sum = kVec3Zero;
@@ -1438,7 +1445,7 @@ float Vehicle::UnknownVirtualSlot75()
         }
     }
     if (n > 1) {
-        float scale = sum.x * sum.x + sum.z * sum.z + sum.y * sum.y;
+        float scale = VehLenSqZ(sum);
         if (scale == 0.0f) {
             sum = kVec3Zero;
         } else {
@@ -1450,10 +1457,31 @@ float Vehicle::UnknownVirtualSlot75()
     } else if (n == 0) {
         return 1.0f;
     }
-    float d = sum.y * savedForward.y + sum.x * savedForward.x + sum.z * savedForward.z;
+    float d = sum.z * savedForward.z + (sum.x * savedForward.x + sum.y * savedForward.y);
     if (d < 0.0f)
         d = -d;
     return d;
+}
+
+// Mean of a sum over n entries.  VC6 keeps the x87 order of the retail products (`fld st(0);
+// fmul [sum.x]`) only when the reciprocal is a local of the inlined helper: a caller-side
+// `k = 1.0f / n; sum * k` loads sum.x first.
+static inline Vec3 VehMean(const Vec3& sum, int n)
+{
+    float k = 1.0f / n;
+    return Vec3(k * sum.x, k * sum.y, k * sum.z);
+}
+
+// Normalise with the fast inverse square root; |v|^2 == 1 returns v as is.  The by-value
+// parameter is what gives retail's `fld st(0); fmul [v.x]` scaling (a const reference loads
+// v.x first); the squared terms must be grouped (x*x + y*y) + z*z.
+static inline Vec3 VehNormalizedV(Vec3 v)
+{
+    float len2 = (v.x * v.x + v.y * v.y) + v.z * v.z;
+    if (len2 == 1.0f)
+        return v;
+    float inv = FastInvSqrt(len2);
+    return Vec3(v.x * inv, v.y * inv, v.z * inv);
 }
 
 // 0x00528400: average of the wheels' contact normals (+0xe4), normalised (tier 3 reading).
@@ -1463,9 +1491,8 @@ Vec3* Vehicle::Method_00528400(Vec3* out)
     int n = wheelCount;
     for (int i = 1; i < n; i++)
         sum += wheelList[i]->groundNormal;
-    float k = 1.0f / n;
-    Vec3 avg = sum * k;
-    *out = VehNormalized(avg);
+    Vec3 avg = VehMean(sum, n);
+    *out = VehNormalizedV(avg);
     return out;
 }
 
@@ -1491,9 +1518,8 @@ Vec3* Vehicle::UnknownVirtualSlot54(Vec3* out)
             }
         }
     }
-    float k = 1.0f / count;
-    Vec3 avg = sum * k;
-    *out = VehNormalized(avg);
+    Vec3 avg = VehMean(sum, count);
+    *out = VehNormalizedV(avg);
     return out;
 }
 
@@ -1806,17 +1832,10 @@ void Vehicle::Method_00529C20(Vec3* up, Vec3* zero, float d)
                     wheel->field_0x16c = 0;
                 }
                 if (wheel->field_0x2a8) {
-                    up->x = up->x + wheel->field_0x248.x;
-                    Vec3* force = &wheel->field_0x248;
-                    up->y = force->y + up->y;
-                    up->z = force->z + up->z;
-                    Vec3* world = &scratchVector2;
-                    Vec3* local = &scratchVector;
-                    *world = UnknownVirtualSlot76(&wheel->field_0xf0, force);
-                    *local = modelNode->WorldToLocalDirection(*world);
-                    zero->x = zero->x + local->x;
-                    zero->y = local->y + zero->y;
-                    zero->z = local->z + zero->z;
+                    *up += wheel->field_0x248;
+                    scratchVector2 = UnknownVirtualSlot76(&wheel->field_0xf0, &wheel->field_0x248);
+                    scratchVector = modelNode->WorldToLocalDirection(scratchVector2);
+                    *zero += scratchVector;
                 }
             }
         }
@@ -1964,4 +1983,181 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     spawnProtected = 0;
     takeoffVelocity = kVec3Zero;
     takeoffPosition = kVec3Zero;
+}
+
+// 0x00526380, ~Vehicle's body (entered through the vbase-adjusted deleting destructor
+// 0x0052b630, like ~Bike 0x00409a10).  The smoothers are plain structs; the engine and steer
+// states have out-of-line destructors (0x00464e90 is the shared empty one); the three owned
+// arrays are freed and cleared; the input map's value source is told to detach (slots 15/16).
+// ~SoultreePhysicsCharacter (0x00503d40) follows implicitly.
+Vehicle::~Vehicle()
+{
+    if (verticalAccelSmoother)
+        delete verticalAccelSmoother;
+    if (forwardAccelSmoother)
+        delete forwardAccelSmoother;
+    if (engineState)
+        delete engineState;
+    if (steerState)
+        delete steerState;
+    if (wheelList) {
+        delete wheelList;
+        wheelList = 0;
+    }
+    if (lateTickers) {
+        delete lateTickers;
+        lateTickers = 0;
+    }
+    if (earlyTickers) {
+        delete earlyTickers;
+        earlyTickers = 0;
+    }
+    if (inputMap && inputMap->valueSource) {
+        inputMap->valueSource->UnknownVirtualSlot15();
+        inputMap->valueSource->UnknownVirtualSlot16();
+    }
+}
+
+// 0x0052a830 (GameObject slot 10 via the vtordisp thunk 0x0052b690): when the vehicle is
+// controllable (slot 42) the character flags 0x430/0x431 are reset, then the per-frame step
+// (slot 49) runs and GameObject's own slot 10 is called directly, bypassing
+// SoultreePhysicsCharacter's version (0x00504210).
+int Vehicle::GameObjectVirtualSlot10(float dt)
+{
+    if (UnknownVirtualSlot42()) {
+        field_0x430 = 0;
+        field_0x431 = 1;
+    }
+    UnknownVirtualSlot49(dt);
+    return GameObject::GameObjectVirtualSlot10(dt);
+}
+
+// 0x00528eb0: wheel placement pass.  Each wheel's shock is retracted by a quarter of the last
+// step and the wheel is probed against the ground; a wheel that is not in contact is retracted
+// by three quarters and probed again, one in contact has its shock forces cleared.  The second
+// loop counts the wheels in contact (primary/secondary wheel = first/second), counts those with
+// field_0x1c0 into field_0x550 and flags (field_0x264) the first in-contact wheel without it,
+// else wheel 0.
+void Vehicle::Method_00528EB0()
+{
+    int i;
+    int unflagged;
+    if (wheelCount == 0)
+        return;
+    wheelsInContact = 0;
+    unflagged = 1;
+    field_0x550 = 0;
+    for (i = 0; i < wheelCount; i++) {
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->primaryAux)
+            ((VehicleInlineShock*)wheel->primaryAux)->Retract(lastStepTime * 0.25f, wheel);
+        else if (wheel->secondaryAux)
+            ((VehicleRotatingShock*)wheel->secondaryAux)->Retract(lastStepTime * 0.25f, wheel);
+        wheel->Method_00514550(terrain, &position, savedPitch, savedSinRoll, savedYaw,
+                               &savedForward, &savedUp, poseNode);
+        if (!wheel->inContact) {
+            if (wheel->primaryAux)
+                ((VehicleInlineShock*)wheel->primaryAux)->Retract(lastStepTime * 0.75f, wheel);
+            else if (wheel->secondaryAux)
+                ((VehicleRotatingShock*)wheel->secondaryAux)->Retract(lastStepTime * 0.75f, wheel);
+            wheel->Method_00514550(terrain, &position, savedPitch, savedSinRoll, savedYaw,
+                                   &savedForward, &savedUp, poseNode);
+        } else if (wheel->primaryAux) {
+            ((VehicleShock*)wheel->primaryAux)->ClearForces();
+        } else if (wheel->secondaryAux) {
+            ((VehicleShock*)wheel->secondaryAux)->ClearForces();
+        }
+    }
+    for (i = 0; i < wheelCount; i++) {
+        VehicleWheel* wheel = wheelList[i];
+        if (wheel->inContact) {
+            if (wheel->field_0x1c0) {
+                field_0x550++;
+            } else if (unflagged) {
+                wheel->field_0x264 = 1;
+                unflagged = 0;
+            }
+            if (wheelsInContact == 0)
+                primaryWheel = wheelList[i];
+            else if (wheelsInContact == 1)
+                secondaryWheel = wheelList[i];
+            wheelsInContact++;
+        }
+    }
+    if (unflagged)
+        wheelList[0]->field_0x264 = 1;
+}
+
+// (x*x + y*y) + z*z grouping: VC6 then loads the y, x, z products in retail's order.
+static inline float VehDotG(const Vec3& a, const Vec3& b)
+{
+    return (a.x * b.x + a.y * b.y) + a.z * b.z;
+}
+
+// 0x00527a20 (PARTIAL, 349/866 bytes aligned): the first 0x120 bytes (count loop, drive
+// loop, dot product and the branch on its sign) match; from there retail copies Vec3 values
+// into the wheel with direct [wheel+disp] stores while VC6 forms the destination address in a
+// register for every struct assignment (lea/add), which shifts register use through the
+// impulse block.  Memberwise helpers give the direct stores for the two member copies but let
+// VC6 fold the (0,0,0) temporary that retail materialises on the stack.
+// Wheel drive and contact impulse pass (tier 3 reading).  Counts the in-contact
+// wheels with a nonzero +0x2a0 and, unless crashed, lets each wheel apply its share of the
+// drive (0x00514170).  Then for every wheel in contact: the load pushing into the ground
+// (-(appliedShare . groundNormal), floored at 0) is stored with its vector, the contact
+// point's friction update runs, and while the wheel's time scale and its load budget
+// (field_0x148 + field_0x14c) are positive an impulse limited by min(*speed, budget) is taken
+// from *speed: the wheel's field_0x130 scaled by (mass/dt * m) / timeScale, or unscaled when
+// the time scale is the smaller, is added to *force and its moment about field_0xf0 to *torque.
+void Vehicle::Method_00527A20(float* speed, Vec3* torque, Vec3* force)
+{
+    int i;
+    float driven = 0.0f;
+    for (i = 0; i < wheelCount; i++) {
+        VehicleWheel* w = wheelList[i];
+        if (w->inContact && w->field_0x2a0 != 0.0f)
+            driven += 1.0f;
+    }
+    if (crashState == 0 && driven != 0.0f) {
+        float share = 1.0f / driven;
+        for (i = 0; i < wheelCount; i++)
+            wheelList[i]->Method_00514170(share, stepTime, movingForward, bodyMass, speed, torque, force);
+    }
+    for (i = 0; i < wheelCount; i++) {
+        VehicleWheel* w = wheelList[i];
+        if (!w->inContact)
+            continue;
+        float d = VehDotG(w->appliedShare, w->groundNormal);
+        w->field_0x12c = d;
+        if (d >= 0.0f) {
+            w->field_0x120 = Vec3(0.0f, 0.0f, 0.0f);
+            w->field_0x12c = 0.0f;
+        } else {
+            Vec3 t;
+            d = -d;
+            w->field_0x12c = d;
+            w->field_0x120 = *Vec3ScaleCall(&t, &w->groundNormal, d);
+        }
+        w->contactPoint.UnknownVirtualSlot1();
+        float budget = w->field_0x14c + w->field_0x148;
+        float timeScale = w->field_0x13c;
+        if (timeScale > 0.0f && budget != 0.0f) {
+            float dt = stepTime;
+            float mass = bodyMass;
+            float m = (*speed < budget) ? *speed : budget;
+            if (m <= 0.0f)
+                m = 0.0f;
+            float rate = mass / dt;
+            Vec3 v;
+            if (timeScale > rate * m) {
+                float k = rate * m / timeScale;
+                v = w->field_0x130 * k;
+                *speed = *speed - m;
+            } else {
+                *speed = *speed - timeScale / rate;
+                v = w->field_0x130;
+            }
+            *force += v;
+            *torque += CrossProduct(w->field_0xf0, v);
+        }
+    }
 }

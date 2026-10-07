@@ -22,6 +22,8 @@ struct CollisionBoxBounds {
     int field_0x00;
     CollisionVec3 center;          // +0x04
     CollisionVec3 halfExtents;     // +0x10
+    void* child[2];                // +0x1c, +0x20: the root is a 0x24-byte tree node; 0x004392c0's
+                                   // two model-bounds locals take 0x24 bytes each
 };
 
 // View of a type-0 hull payload (0x198 bytes, the same payload as CollisionHullShape,

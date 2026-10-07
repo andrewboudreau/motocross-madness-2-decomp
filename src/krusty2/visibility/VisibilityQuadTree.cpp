@@ -259,3 +259,155 @@ void VisibilityQuadTreeNode::DebugDraw(int x, int z, int nodeX, int nodeZ, int s
 
 // 0x0052f080 / 0x0052f090: the second empty file static (see the top).
 static UnknownVisibilityStatic s_visibilityUnknownStatic1;
+
+// ==============================================================================================
+// VisibilityClipper (the object at 0x00575a98; see VisibilityQuadTree.h).  None of these
+// reads `this`.  Names are tier 3; the arithmetic is decoded.
+// ==============================================================================================
+
+// 0x0052f0a0 (ret 0x10).  Rotates `count` vectors by the upper 3x3 of the matrix (row-vector
+// convention: x' = x*m[0][0] + y*m[1][0] + z*m[2][0]); the translation row is not applied.
+// Accumulating `t += ...` statements keep retail's x, z, y term order; a single sum expression
+// is re-ordered by VC6 (the term order of a + b + c does not follow the source).
+void VisibilityClipper::TransformVectors(const VisibilityBoxVec* src, VisibilityBoxVec* dst,
+                                         const VisibilityMatrix* m, int count)
+{
+    for (int i = 0; i < count; i++) {
+        VisibilityBoxVec v = src[i];
+        float t = v.x * m->m[0][0];
+        t += v.z * m->m[2][0];
+        t += v.y * m->m[1][0];
+        dst[i].x = t;
+        t = v.x * m->m[0][1];
+        t += v.z * m->m[2][1];
+        t += v.y * m->m[1][1];
+        dst[i].y = t;
+        t = v.x * m->m[0][2];
+        t += v.z * m->m[2][2];
+        t += v.y * m->m[1][2];
+        dst[i].z = t;
+    }
+}
+
+// 0x0052f140 (ret 0xc).  Compares a dot product against a threshold derived from the
+// camera record's float at +0x16c (10.0f at 0x00550780 and 0.00461538f at 0x00558e14).
+int VisibilityClipper::TestDot(const VisibilityCamera* camera, const VisibilityBoxVec* a,
+                               const VisibilityBoxVec* b)
+{
+    float dot = a->y * b->y;
+    dot += a->x * b->x;
+    dot += a->z * b->z;
+    if (dot > (camera->field_0x16c - 10.0f) * 0.00461538f)
+        return 0;
+    return 1;
+}
+
+// 0x0052f340 (ret 0x14).  Projects a point with the matrix, writes the outcode (x: 1 / 2 for
+// x' < 0 / x' > w, y: 4 / 8, z: 0x10 / 0x20) and, when `screen` is given, the coordinates
+// scaled by the camera's viewport size (converted as unsigned values).  Returns 1 when the
+// point is inside.
+int VisibilityClipper::ProjectPoint(const VisibilityCamera* camera, const VisibilityMatrix* m,
+                                    const VisibilityBoxVec* p, VisibilityBoxVec* screen,
+                                    unsigned int* outCode)
+{
+    unsigned int code = 0;
+    VisibilityClipPoint c;
+    c.w = p->z * m->m[2][3];
+    c.w += p->y * m->m[1][3];
+    c.w += p->x * m->m[0][3];
+    c.w += m->m[3][3];
+    c.x = p->z * m->m[2][0];
+    c.x += p->y * m->m[1][0];
+    c.x += p->x * m->m[0][0];
+    c.x += m->m[3][0];
+    if (c.x < 0.0)
+        code = 1;
+    else if (c.w - c.x < 0.0)
+        code = 2;
+    c.y = p->z * m->m[2][1];
+    c.y += p->y * m->m[1][1];
+    c.y += p->x * m->m[0][1];
+    c.y += m->m[3][1];
+    if (c.y < 0.0)
+        code |= 4;
+    else if (c.w - c.y < 0.0)
+        code |= 8;
+    c.z = p->z * m->m[2][2];
+    c.z += p->y * m->m[1][2];
+    c.z += p->x * m->m[0][2];
+    c.z += m->m[3][2];
+    if (c.z < 0.0)
+        code |= 0x10;
+    else if (c.w - c.z < 0.0)
+        code |= 0x20;
+    if (screen) {
+        float inv = 1.0f / c.w;
+        screen->x = camera->viewportWidth * inv * c.x;
+        screen->y = camera->viewportHeight * inv * c.y;
+        screen->z = camera->viewportHeight * inv * c.z;
+    }
+    if (outCode)
+        *outCode = code;
+    return code == 0;
+}
+
+// 0x0052f4d0 (ret 0x18).  Gathers four points by index (12-byte stride) into a 4-point
+// polygon and culls it with CullPolygon.
+int VisibilityClipper::CullQuad(const VisibilityCamera* camera, const VisibilityBoxVec* points,
+                                int i0, int i1, int i2, int i3)
+{
+    VisibilityCullPoint quad[4];
+    quad[0].x = points[i0].x;
+    quad[0].y = points[i0].y;
+    quad[0].z = points[i0].z;
+    quad[1].x = points[i1].x;
+    quad[1].y = points[i1].y;
+    quad[1].z = points[i1].z;
+    quad[2].x = points[i2].x;
+    quad[2].y = points[i2].y;
+    quad[2].z = points[i2].z;
+    quad[3].x = points[i3].x;
+    quad[3].y = points[i3].y;
+    quad[3].z = points[i3].z;
+    return CullPolygon(camera, quad, 4);
+}
+
+// 0x0052fac0 (ret 0xc).  View-space polygon cull.  Returns 0 when every point has z below the
+// camera's +0x1bc, or when the points' outcodes (|y| against z * +0x1b8, |x| against z) share
+// a bit, i.e. the polygon is entirely outside one frustum side; the second test is skipped
+// when the camera's +0x16c (a field of view in degrees, compared with 90.0) is above 90.
+int VisibilityClipper::CullPolygon(const VisibilityCamera* camera, VisibilityCullPoint* points,
+                                   int count)
+{
+    int i;
+    int allBehind = 1;
+    for (i = 0; i < count; i++) {
+        if (points[i].z < camera->field_0x1bc && allBehind)
+            allBehind = 1;
+        else
+            allBehind = 0;
+    }
+    if (allBehind)
+        return 0;
+    if (camera->field_0x16c <= 90.0) {
+        for (i = 0; i < count; i++) {
+            unsigned int code = 0;
+            float slope = points[i].z * camera->field_0x1b8;
+            if (slope < points[i].y)
+                code = 4;
+            else if (-slope > points[i].y)
+                code = 8;
+            if (points[i].x > points[i].z)
+                code |= 2;
+            else if (-points[i].z > points[i].x)
+                code |= 1;
+            points[i].code = code;
+        }
+        unsigned int common = 0xffffffff;
+        for (i = 0; i < count; i++)
+            common &= points[i].code;
+        if (common)
+            return 0;
+    }
+    return 1;
+}

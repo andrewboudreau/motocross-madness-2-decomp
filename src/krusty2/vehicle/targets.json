@@ -25,8 +25,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot73@Bike",
     "target_va": "0x00406090",
     "target_size": 44,
-    "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 67.50%]",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -55,8 +55,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot76@Bike",
     "target_va": "0x00406840",
     "target_size": 395,
-    "expect": "partial",
-    "notes": "98.4% (395/395). Only diff: retail scales with the FPU-resident scalar as fld st(0); fmul [x]; fld [y]; fmul st(1); fld [z]; fmul st(1); fstp st(0) (the final pop shows the scalar had one more use). Ours emits fld [x]; fmul st(1) ... and consumes. Tried *=, operator*, ctor, double scalar, by-value copy, ternary; same family as slots 54/55.",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -105,8 +105,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot1@Bike",
     "target_va": "0x00407630",
     "target_size": 205,
-    "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 15.71%]",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -175,8 +175,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot39@Bike",
     "target_va": "0x0040a1f0",
     "target_size": 306,
-    "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 44.05%]",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -185,8 +185,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot59@Bike",
     "target_va": "0x0040a330",
     "target_size": 125,
-    "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 28.44%]",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -195,8 +195,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot56@Bike",
     "target_va": "0x0040a3b0",
     "target_size": 71,
-    "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 50.85%]",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -205,8 +205,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot57@Bike",
     "target_va": "0x0040a400",
     "target_size": 117,
-    "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 41.90%]",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -365,8 +365,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot41@Bike",
     "target_va": "0x0040cbd0",
     "target_size": 486,
-    "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 65.51%]",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -395,8 +395,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot75@Bike",
     "target_va": "0x0040ce20",
     "target_size": 64,
-    "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 66.10%]",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -415,8 +415,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot5@Bike",
     "target_va": "0x0040cf60",
     "target_size": 103,
-    "expect": "partial",
-    "notes": "Readable reconstruction of the decoded behavior; instruction scheduling/branch layout still differs from retail. [vc6_o2_ml match 24.14%]",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -805,8 +805,8 @@
     "candidate_symbol_contains": "Method_00528400",
     "target_va": "0x00528400",
     "target_size": 291,
-    "expect": "partial",
-    "notes": "94.3% (291/291). Helper shared with slot 54: normalized average; same fld st(0)/fmul mem difference.",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -815,8 +815,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot54@Vehicle",
     "target_va": "0x00528530",
     "target_size": 358,
-    "expect": "partial",
-    "notes": "95.4% (358/358). Retail does fld st(0); fmul mem for k*sum and inv*avg; ours emits fld mem; fmul st(1).",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -845,8 +845,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot58@Vehicle",
     "target_va": "0x005289c0",
     "target_size": 938,
-    "expect": "partial",
-    "notes": "99.77% (938/938). Snap pose to wheels. Only divergence: ordering of one mov edx,edi at +0xbd (retail mov edi,ecx; mov edx,edi). Needs ternary abs (VehAbsT); the reordered second=top/top=w form regresses to 23%.",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -1015,8 +1015,8 @@
     "candidate_symbol_contains": "Method_00529C20",
     "target_va": "0x00529c20",
     "target_size": 320,
-    "expect": "partial",
-    "notes": "wave3: 63.9% (322/320). Retail copies slot-76 result through a pointer held in ebx but pushes a fresh lea for the &field_0x1b8 argument; ours reuses ebx. Add operand order (fld up.x; fadd w.x) is canonicalised by VC6 and cannot be forced.",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -1205,8 +1205,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot75@Vehicle",
     "target_va": "0x0052b790",
     "target_size": 337,
-    "expect": "partial",
-    "notes": "94.4% (337/337). x87 order of the squared terms and the z term of the dot product differ; operand permutations had no effect.",
+    "expect": "exact",
+    "notes": "Strict exact under vc6_o2_ml.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -1548,5 +1548,45 @@
     "expect": "exact",
     "notes": "Bike.cpp Math3D vector set (vectors from 0x5778a8)",
     "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "??1Vehicle@@UAE@XZ",
+    "target_va": "0x00526380",
+    "target_size": 319,
+    "expect": "exact",
+    "notes": "~Vehicle body entered through the vbase-adjusted deleting dtor 0x0052b630: deletes the smoothers, engineState (dtor 0x464e90) and steerState (dtor 0x504c50), frees wheelList/lateTickers/earlyTickers, then inputMap->valueSource slots 15 and 16. EH handler 0x54f0ee bound.",
+    "bindings": "Vehicle.bindings.json"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot10@Vehicle@@UAEHM@Z",
+    "target_va": "0x0052a830",
+    "target_size": 86,
+    "expect": "exact",
+    "notes": "GameObject slot 10 override via vtordisp thunk 0x52b690: slot 42 test, slot 49(dt), then GameObject::GameObjectVirtualSlot10 directly.",
+    "bindings": "Vehicle.bindings.json"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "?Method_00528EB0@Vehicle@@QAEXXZ",
+    "target_va": "0x00528eb0",
+    "target_size": 505,
+    "expect": "exact",
+    "notes": "Wheel placement pass: retract shocks by lastStepTime*0.25, probe 0x514550, retract 0.75 and re-probe or ClearForces 0x4f9c70; second loop counts wheels in contact.",
+    "bindings": "Vehicle.bindings.json"
+  },
+  {
+    "class": "Vehicle",
+    "source": "Vehicle.cpp",
+    "candidate_symbol_contains": "?Method_00527A20@Vehicle@@QAEXPAMPAUVec3@@1@Z",
+    "target_va": "0x00527a20",
+    "target_size": 870,
+    "expect": "partial",
+    "notes": "349/866. First 0x120 bytes exact (driven-wheel count, 0x514170 drive loop, (x*x+y*y)+z*z dot, zero branch first). Retail stores Vec3 results with direct [wheel+disp] moves; VC6 forms every struct-assignment destination address in a register.",
+    "bindings": "Vehicle.bindings.json"
   }
 ]

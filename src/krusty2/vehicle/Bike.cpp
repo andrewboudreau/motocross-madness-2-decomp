@@ -453,13 +453,6 @@ void Bike::UnknownVirtualSlot8()
     field_0x700 = (wheelsInContact > 0 && frontWheel->w_0x150 < -2.5f);
 }
 
-static inline void BikeScale(Vec3* v, float s)
-{
-    v->x *= s;
-    v->y *= s;
-    v->z *= s;
-}
-
 Vec3 Bike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
 {
     Vec3 v = Vehicle::UnknownVirtualSlot76(a, b);
@@ -476,7 +469,13 @@ Vec3 Bike::UnknownVirtualSlot76(const Vec3* a, const Vec3* b)
         lean = BikeMin(lean, 1.0f);
         float k = -(controlInput.y + 0.125f);
         k = (0.0f > k) ? 0.0f : k;
-        BikeScale(&v, (1.4f - lean) * k * 1.6f);
+        // Retail multiplies v.x by the freshly computed scale (fld st(0); fmul [v.x]) and
+        // v.y/v.z by the stored copy; only the assignment-expression form reproduces that
+        // (a named `s` first, then `v *= s` or per-component scaling, loads v.x first: 389/395).
+        float s;
+        v.x *= (s = (1.4f - lean) * k * 1.6f);
+        v.y *= s;
+        v.z *= s;
     }
     return v;
 }

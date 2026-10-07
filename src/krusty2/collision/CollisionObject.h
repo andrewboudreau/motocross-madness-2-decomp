@@ -116,6 +116,7 @@ public:
     void Fn_00436080();                                       // 0x00436080, refreshes the quadtree cell from the world bounds
     void Fn_00435fe0();                                       // 0x00435fe0
     int Fn_00438e70();                                        // 0x00438e70
+    inline void ReportHit();                                  // inlined three times in 0x00438e70
     // 0x00435830, thiscall, ret 4 (tier 1): switches on the shape type shapeType (0..4,
     // jump table 0x435ea8), copies the 16 floats of *m into the shape payload at
     // shape and derives values from them. Name tier 3. Callers: ObjectPlacement
@@ -166,6 +167,8 @@ public:
     void DrawTreeNormals(CollisionTreeNode* node, const Vec3* verts,
                          const Matrix4* xf);                             // 0x00433be0
     void DrawBoxTree(CollisionTreeNode* node, int depth, const Matrix4* xf); // 0x00434040
+    void DrawSegmentTree(CollisionTreeNode* node, const Matrix4* xf);       // 0x004341b0
+    void DrawSegmentTreeLevel(CollisionTreeNode* node, int depth, const Matrix4* xf); // 0x00434340
     void DrawHull(CollisionHullBody* hull, int depth, int mode);         // 0x00432d30
     void DrawModel(CollisionModelBody* model, int depth, int mode);      // 0x00432b30
 
@@ -194,7 +197,7 @@ public:
     int debugTreeDepth;  // +0x90 slot 23 (0x00434970) decrements it (clamped at 0) on key 10 and increments it on key 11; slot 14 (0x00434540) passes it as the depth argument of DrawHull 0x00432d30 / DrawModel 0x00432b30 and DrawBoxTree
     int debugDrawMode;  // +0x94 slot 23 (0x00434970) increments it on key 0x2e and wraps to 0 above 7; slot 14 (0x00434540) passes it as the mode argument of DrawHull / DrawModel
     int field_0x98;
-    int hitObject;  // +0x9c 0x00438e70 stores each broad-phase candidate here before TestAgainst(candidate) and then passes it to the callbacks
+    CollisionObject* hitObject;  // +0x9c 0x00438e70 stores each broad-phase candidate here before TestAgainst(candidate) and then passes it to the callbacks
     CollisionVec3 hitPoint;  // +0xa0 0x00434bb0 fills it from the contact record +0x18, 0x00438e70 copies it into the hit object +0xa0; SoultreePhysics slots 28/38 read it as contact point
     CollisionVec3 hitNormal;  // +0xac 0x00434bb0 fills it from the normalised accumulated scratch points; 0x00438e70 copies it into the hit object +0xac; read as contact normal by SoultreePhysics
 };

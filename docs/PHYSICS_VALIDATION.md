@@ -70,8 +70,9 @@ binding evidence is in `src/krusty2/README.md`. 169 cases pass strict VC6 SP3
 comparison:
 
 - `src/krusty2/collision/CollisionObject.cpp`: 44 of 61 targets.
-- `src/krusty2/vehicle/Vehicle.cpp`: 57 of 77 targets.
-- `src/krusty2/vehicle/Bike.cpp`: 31 of 45 targets.
+- `src/krusty2/vehicle/Vehicle.cpp`: 57 of 77 targets at promotion; see the
+  Vehicle/Bike round-out below for the current state.
+- `src/krusty2/vehicle/Bike.cpp`: 31 of 45 targets at promotion.
 - `src/krusty2/soultree/SoulTreePhysics.cpp`: 37 of 43 targets.
 
 Three targets are `expect: "masked"` because one called constructor or helper has no
@@ -203,6 +204,60 @@ The second run reports `33/33 strict exact`. The soultree root reports one
 required failure, SoulTreePhysics'
 `0x5036f0`, which predates this slice.
 
+## Vehicle and Bike round-out
+
+Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.json`:
+
+- Vehicle.cpp, new: `~Vehicle` `0x00526380` (body entered through the vbase-adjusted
+  deleting destructor; frees the smoothers, the engine/steer states through their
+  out-of-line destructors `0x00464e90`/`0x00504c50`, the three arrays, then detaches
+  the input map's value source via its slots 15/16), the GameObject slot 10 override
+  `0x0052a830` (vtordisp thunk `0x0052b690`; calls `GameObject::GameObjectVirtualSlot10`
+  directly, not SoultreePhysicsCharacter's) and the wheel placement pass
+  `Method_00528EB0` `0x00528eb0` (shock retract 0.25/0.75 of the last step via
+  `0x004fa310`/`0x004fab60`, probe `0x00514550`, `ClearForces` `0x004f9c70` called
+  non-virtually; the flag `unflagged = 1` must be set after the `wheelCount == 0` return).
+- Vehicle.cpp, former partials: slot 58 `0x005289c0` (`top = wheelList[i]; second = top;`
+  instead of `second = top = w`), `Method_00528400` `0x00528400`, slot 54 `0x00528530`,
+  slot 75 `0x0052b790` and `Method_00529C20` `0x00529c20` (plain `*up += ...;
+  scratchVector2 = slot76(...); scratchVector = WorldToLocalDirection(...)`).
+- Bike.cpp: slot 76 `0x00406840`; slots 1, 5, 39, 41, 56, 57, 59, 73 and 75 were already
+  exact with the promoted source and only carried stale `partial` notes.
+
+x87 operand order facts measured on these targets (they add to the list below):
+
+- A scalar multiplied into a vector is loaded first (`fld st(0); fmul [v.x]`) when it
+  is a local of the inlined helper that computes it (`VehMean`: `k = 1.0f / n` inside
+  the helper) or when the vector is the helper's by-value parameter (`VehNormalizedV(Vec3
+  v)`); a caller-side `k = 1.0f / n; sum * k` or a `const Vec3&` parameter loads the
+  vector component first.  Squared lengths need `(x*x + y*y) + z*z`, or
+  `z*z + (x*x + y*y)` through a reference helper (`VehLenSqZ`, slot 75).
+- Bike slot 76 scales v.x by the freshly computed factor and v.y/v.z by its stored
+  copy, then pops it: only `v.x *= (s = expr); v.y *= s; v.z *= s;` reproduces that
+  (a named `s` first, `v *= s`, `Vec3::operator*=` or a scaling helper give 389/395).
+- VC6 always forms the destination address of a `Vec3` struct assignment in a register
+  (`lea`/`add`); retail `Method_00527A20` `0x00527a20` stores through `[wheel+disp]`
+  directly, which memberwise helpers reproduce for member copies but not for the
+  `(0,0,0)` temporary (VC6 folds it).  That function stays `partial` (349/866, first
+  0x120 bytes exact).  Vehicle slot 55 `0x0052b6d0` reloads `out` between its two
+  copies (VC6 keeps it in a register: 28/59).  Bike slot 72 `0x00405db0` loads `n.x`
+  (the displacement-free `[eax]`) first in two cross-product terms; no cross-product
+  form tried (member, pointer, by-value, explicit terms, named `nx`) does (717/724).
+
+Still unregistered in the Vehicle extent: the slot 40 override `0x00525e20` (`ret 0x94`,
+four `new(__FILE__, line)` allocations under EH states, calls `0x00503de0`) and the
+per-wheel shock solve `0x00529450` (inlined vector projections through `0x0040ae30` /
+`0x005015b0`); in Bike: `0x004079c0` (6745 bytes) and `0x0040a520`.  `0x00526e80` is
+slot 38's jump table, `0x0040ca40`/`0x0052b690` are vtordisp thunks.
+
+```bash
+python tools/run_physics_samples.py --strict --root src/krusty2/vehicle \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+```
+
+This run reports `130/158 strict exact` with the pre-existing masked `0x409420` as the
+only required failure.
+
 ## Code-generation limits behind the remaining partials
 
 These were measured with VC6 SP3 `/O2` on the real targets and on small synthetic
@@ -294,6 +349,16 @@ Strict exact with the units' existing sources (registration pending):
   and the sphere query `0x004394f0` (ObjectPicker.cpp's caller `0x004b0a46`). The capsule
   query `0x00439600` is a near miss (516/532) in
   `samples/physics/collision/CollisionObjectNearMisses.cpp`.
-- VisibilityQuadTree.cpp: the unit's 18 initializer functions (see its README).
+  Also exact: the .col readers `0x00439ed0` (hull) and `0x0043a050` (model), the
+  polyline-tree debug draws `0x004341b0` / `0x00434340` (segment leaves), the broad-phase
+  query `0x00438e70` (quadtree, vegetation and game-object-tree paths; the three hit
+  blocks are one inline `ReportHit`), and `0x00432800` once the CollisionFileStream
+  constructor/destructor are bound. Slot 14 `0x00434540` is 1054/1068 (size and frame
+  exact; only the capsule end-point transforms differ in x87 operand order).
+- BoundingBoxTreeQuery.cpp: SegmentTreeQuery `0x00429e90`, LeafNodeQuery `0x004269e0` and
+  LeafPairQuery `0x004275f0` (see `src/krusty2/bvh/README.md`).
+- VisibilityQuadTree.cpp: the unit's 18 initializer functions (see its README) and the
+  five VisibilityClipper helpers 0x0052f0a0, 0x0052f140, 0x0052f340, 0x0052f4d0,
+  0x0052fac0, which are thiscall methods of the object at 0x00575a98.
 - SoultreeQuadTreeRenderer.cpp: slot 23 `0x005048d0` (debug key 0x2d toggles the nodes).
 - SteeringControl.cpp: promoted from samples (see `src/krusty2/motion/README.md`).

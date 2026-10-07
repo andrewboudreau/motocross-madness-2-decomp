@@ -328,5 +328,35 @@
     "expect": "exact",
     "notes": "point-to-segment distance (FastSqrt 0x460b50)",
     "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SegmentTreeQuery@",
+    "target_va": "0x00429e90",
+    "target_size": 712,
+    "expect": "exact",
+    "notes": "segment against a tree; nearest hit to g_CollisionBoxResult",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?LeafNodeQuery@",
+    "target_va": "0x004269e0",
+    "target_size": 509,
+    "expect": "exact",
+    "notes": "moved from samples",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?LeafPairQuery@",
+    "target_va": "0x004275f0",
+    "target_size": 736,
+    "expect": "exact",
+    "notes": "moved from samples; segment[2] at function scope",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
   }
 ]

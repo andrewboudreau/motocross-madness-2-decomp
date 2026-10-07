@@ -39,7 +39,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts) |
 | `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character headers: 37 strict cases; `SoultreeQuadTreeRenderer.cpp`: 8 strict cases; `soultree.cpp` (SoultreeObject): 56 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
-| `vehicle/` | `Vehicle.cpp` (57 strict cases), `Bike.cpp` (31 strict cases) and `BikeAI.cpp` (23 strict cases), `Vehicle.h`, `Bike.h` |
+| `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (42 strict cases of 55) and `BikeAI.cpp` (23 strict cases), `Vehicle.h`, `Bike.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h`, `Terrain.cpp`/`.h` |
 | `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 33 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
@@ -147,11 +147,15 @@ sphere (4) cases in the opposite source order to retail's jump table. The masked
 hid it.
 
 Strict failures that remain are missing evidence, not byte differences:
-- the CollisionFileStream constructor 0x460d10, which has no RTTI;
 - the BikeA604 constructor 0x52ff90, called from Bike slot 97;
 - SoultreeRefreshContacts 0x43ad80, called from GameObjectVirtualSlot10. Its body is still a partial in samples.
 
 These targets are `expect: "masked"`.
+
+The CollisionFileStream constructor 0x460d10 and destructor 0x460d60 are now bound as the
+direct call targets of 0x00432800 (a 0x134-byte object from `new(__FILE__, 0x12f)`, opened
+with "rb" by 0x460f50 and read through 0x461640, the same file object other areas call
+SoultreeFile / TreeFile); 0x00432800 is strict exact with them.
 
 ## Gate
 

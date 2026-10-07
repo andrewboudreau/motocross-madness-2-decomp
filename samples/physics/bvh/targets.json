@@ -31,26 +31,6 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?LeafPairQuery@@YAHPAUQuerySegmentLeaf@@PAUQueryTriangleLeaf@@@Z",
-    "target_va": "0x004275f0",
-    "target_size": 736,
-    "expect": "partial",
-    "notes": "near miss: instruction-identical, retail frame 12 bytes larger (stack offsets)",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?LeafNodeQuery@@YAHPAUQueryTreeNode@@0H@Z",
-    "target_va": "0x004269e0",
-    "target_size": 509,
-    "expect": "partial",
-    "notes": "near miss: instruction-identical, retail frame 12 bytes larger (stack offsets)",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
     "candidate_symbol_contains": "?MoveBox@@YAXPAUVec3@@0PBUMatrix4@@@Z",
     "target_va": "0x00428db0",
     "target_size": 789,
