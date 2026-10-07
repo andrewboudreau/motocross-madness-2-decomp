@@ -46,7 +46,7 @@
   "?UnknownFunction43caa0@@YAHHHPBUUnknownControlEvent@@H@Z": "0x0043caa0",
   "?UnknownFunction4444e0@D3DIMSoultreeObject@@QAEXXZ": "0x004444e0",
   "?UnknownFunction460c00@@YAMM@Z": "0x00460c00",
-  "?UnknownFunction469190@GameObject@@QAEHPAV1@H@Z": "0x00469190",
+  "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?UnknownFunction48a600@RunwayLights@@QAEPAV1@PAXHHPAUUnknownRunwayTerrain@@@Z": "0x0048a600",
   "?UnknownFunction48a600@RunwayLights@@QAEPAV1@PAXHHPAUUnknownRunwayTerrain@@@Z$ehhandler": "0x0054bb47",
   "?UnknownFunction48ad50@RunwayLights@@QAEXPAUUnknownRunwayRacer@@@Z": "0x0048ad50",

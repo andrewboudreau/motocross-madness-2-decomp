@@ -92,7 +92,7 @@ int ManagedTextureGroup::UnknownFunction50c4a0(int count) {
         while (change-- > 0) {
             CacheTexture* page = new(__FILE__, 121) CacheTexture(field_0x40, this, 8);
             page->field_0x70 = field_0x1c0->field_0x70;
-            page->field_0x70->UnknownMethod1();
+            page->field_0x70->AddRef();
             if (!page->UnknownVirtualSlot4(0, 256, 256, 0, 1, field_0x0c, field_0x0c, 0, 2, field_0x1bc, 1, 0,
                                            field_0x10, field_0x14, 0, 0x80, 0xff00ff)) {
                 delete page;
@@ -126,8 +126,8 @@ void ManagedTextureGroup::UnknownFunction50c6c0(ManagedTexture* texture) {
         for (TextureMap* page = field_0x54.First(); page; page = field_0x54.Next()) {
             CacheTexture* cache = static_cast<CacheTexture*>(page);
             cache->field_0x78 = field_0x1bc;
-            cache->field_0x70->UnknownMethod31(field_0x1bc);
-            cache->field_0x74->UnknownMethod31(field_0x1bc);
+            cache->field_0x70->SetPalette(field_0x1bc);
+            cache->field_0x74->SetPalette(field_0x1bc);
             cache->field_0x2c = texture->field_0x2c;
         }
     }
@@ -148,7 +148,7 @@ void ManagedTextureGroup::UnknownFunction50c760() {
 void ManagedTextureGroup::UnknownFunction50c790() {
     for (TextureMap* page = field_0x54.First(); page; page = field_0x54.Next()) {
         CacheTexture* cache = static_cast<CacheTexture*>(page);
-        if (cache->field_0x74 && cache->field_0x74->UnknownMethod24()) {
+        if (cache->field_0x74 && cache->field_0x74->IsLost()) {
             cache->UnknownVirtualSlot10();
             cache->UnknownVirtualSlot8(1, 0, 0);
             cache->UnknownFunction50fc40();
@@ -180,12 +180,12 @@ void ManagedTextureGroup::UnknownFunction50c7e0() {
 // 0x0050c8c0: unless frozen by the debug key, empties the size lists and
 // repacks the pages (through 0x0050dad0 when partial texture blits are on).
 void ManagedTextureGroup::UnknownFunction50c8c0() {
-    if (g_UnknownGlobal56e26c->field_0x2d4_bit2 && field_0x08)
+    if (g_TrackGame->field_0x2d4_bit2 && field_0x08)
         return;
     field_0x7c.Clear();
     for (int i = 0; i < 9; i++)
         field_0x90[i].Clear();
-    if (g_UnknownGlobal56e26c->field_0x0c->field_0x5bc <= 0)
+    if (g_TrackGame->display->field_0x5bc <= 0)
         UnknownFunction50c960();
     else
         UnknownFunction50dad0();

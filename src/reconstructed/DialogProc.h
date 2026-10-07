@@ -16,7 +16,7 @@ struct UnknownDialogEvent {
     int kind;                                 // +0x08 (UnknownDialogEventKind)
     UIDialog* dialog;                         // +0x0c the dialog the message is for
     GUIManager* gui;                          // +0x10 (OptionsDlg opens its sub-dialogs on it)
-    UnknownGameUiControl* control;            // +0x14 the sending control (VCRDlg)
+    UIControl* control;            // +0x14 the sending control (VCRDlg)
     int field_0x18;                           // cleared by OptControlsDlg for kinds 11 and 12
     int key;                                  // +0x1c a kind 11 message's key (dlgprocs.cpp RemoveProfileDlg)
     int handled;                              // +0x20 set to 1 once handled
@@ -24,7 +24,7 @@ struct UnknownDialogEvent {
 
 // The garage settings at TrackGame+0x1550 (OptionProcs.h's
 // UnknownOptGarageSettings; TrackGame.h declares the block as bytes).
-#define UNKNOWN_GARAGE_SETTINGS ((UnknownOptGarageSettings*)g_UnknownGlobal56e26c->mode.field_0xfd8)
+#define UNKNOWN_GARAGE_SETTINGS ((UnknownOptGarageSettings*)g_TrackGame->mode.field_0xfd8)
 
 // Loads bike class `bikeClass`'s garage defaults (KrustyUI's tables) and its
 // chosen power curve into the garage settings, counting the bands with
@@ -33,18 +33,18 @@ struct UnknownDialogEvent {
 // loop counter, so it is a macro. Needs TrackGame.h and OptionProcs.h.
 #define UNKNOWN_APPLY_BIKE_CLASS(bikeClass, band)                                                     \
     {                                                                                                 \
-        UNKNOWN_GARAGE_SETTINGS->firstBand = g_UnknownGlobal56e26c->ui->field_0x2fc[bikeClass];      \
-        UNKNOWN_GARAGE_SETTINGS->field_0x54 = g_UnknownGlobal56e26c->ui->field_0x310[bikeClass];      \
-        UNKNOWN_GARAGE_SETTINGS->bandStep = g_UnknownGlobal56e26c->ui->field_0x414[bikeClass];      \
-        UNKNOWN_GARAGE_SETTINGS->field_0x08 = g_UnknownGlobal56e26c->ui->field_0x428[bikeClass];      \
-        int curve = g_UnknownGlobal56e26c->mode.field_0xa0c[bikeClass];                              \
+        UNKNOWN_GARAGE_SETTINGS->firstBand = g_TrackGame->ui->field_0x2fc[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->field_0x54 = g_TrackGame->ui->field_0x310[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->bandStep = g_TrackGame->ui->field_0x414[bikeClass];      \
+        UNKNOWN_GARAGE_SETTINGS->field_0x08 = g_TrackGame->ui->field_0x428[bikeClass];      \
+        int curve = g_TrackGame->mode.field_0xa0c[bikeClass];                              \
         for (band = 0; band < 11; band++) {                                                           \
             if (curve < 3)                                                                            \
                 UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
-                    g_UnknownGlobal56e26c->ui->field_0x68[bikeClass][curve][band];                    \
+                    g_TrackGame->ui->field_0x68[bikeClass][curve][band];                    \
             else                                                                                      \
                 UNKNOWN_GARAGE_SETTINGS->eqBands[band] =                                           \
-                    g_UnknownGlobal56e26c->mode.field_0x10f0[bikeClass][curve - 3][band];             \
+                    g_TrackGame->mode.field_0x10f0[bikeClass][curve - 3][band];             \
         }                                                                                             \
     }
 

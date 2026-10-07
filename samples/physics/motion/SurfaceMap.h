@@ -90,7 +90,7 @@ public:
     SurfaceDisplay* display;   // +0x10
 };
 
-extern SurfaceGame* g_pGame;   // 0x0056e26c (g_UnknownGlobal56e26c in src/reconstructed, a TrackGame*)
+extern SurfaceGame* g_pGame;   // 0x0056e26c (g_TrackGame in src/reconstructed, a TrackGame*)
 
 // Local copy of BaseObject's shape with the out-of-line constructor (0x00405120, called from
 // SurfaceMap's ctor) declared.  core/GameObject.h's BaseObject has no declared constructor, so a

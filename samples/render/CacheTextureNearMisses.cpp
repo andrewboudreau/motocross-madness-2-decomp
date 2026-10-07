@@ -51,7 +51,7 @@ int CacheTexture::UnknownFunction5102d0(UnknownTextureRegion* region, int level)
     caps.caps = 0x401000;
     long result = 0;
     while (sourceSide > side) {
-        result = source->UnknownMethod12(&caps, &nextSource);
+        result = source->GetAttachedSurface(&caps, &nextSource);
         if (result)
             break;
         source = nextSource;
@@ -59,11 +59,11 @@ int CacheTexture::UnknownFunction5102d0(UnknownTextureRegion* region, int level)
     }
     if (!result) {
         while (sourceSide > 0) {
-            if (destination->UnknownMethod5(&rect, source, 0, 0x1000000, 0))
+            if (destination->Blt(&rect, source, 0, 0x1000000, 0))
                 return 0;
             field_0x80->field_0x1d0 += (rect.bottom - rect.top) * (rect.right - rect.left);
-            long sourceResult = source->UnknownMethod12(&caps, &nextSource);
-            long destinationResult = destination->UnknownMethod12(&caps, &nextDestination);
+            long sourceResult = source->GetAttachedSurface(&caps, &nextSource);
+            long destinationResult = destination->GetAttachedSurface(&caps, &nextDestination);
             if (sourceResult || destinationResult)
                 break;
             source = nextSource;
@@ -79,7 +79,7 @@ int CacheTexture::UnknownFunction5102d0(UnknownTextureRegion* region, int level)
     } else {
         return 0;
     }
-    if (g_UnknownGlobal56e26c->field_0x0c->field_0x5bc > 0)
+    if (g_TrackGame->display->field_0x5bc > 0)
         UnknownVirtualSlot9(&whole, -1);
     else
         field_0x188 = 1;

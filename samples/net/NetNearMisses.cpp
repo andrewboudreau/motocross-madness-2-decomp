@@ -303,7 +303,7 @@ void NetworkInterface::DispatchMessages(int value)
             if (messages[index].type == 0x40) {
                 AcknowledgeMessage(*(short*)(messages[index].data + 2));
             } else {
-                g_UnknownGlobal56e26c->UnknownVirtualSlot17(
+                g_TrackGame->UnknownVirtualSlot17(
                     messages[index].type, messages[index].data,
                     messages[index].from, messages[index].to,
                     messages[index].flags);

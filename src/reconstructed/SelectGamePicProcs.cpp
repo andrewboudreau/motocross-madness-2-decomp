@@ -142,52 +142,52 @@ int UnknownFunction4f20a0(const void* a, const void* b) {
 
 // 0x004f20d0
 void MultiPlayerDlg::FillRacerSlots() {
-    int player = g_UnknownGlobal56e26c->field_0x08->localPlayer;
-    g_UnknownGlobal56e26c->field_0x18 = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35;
-    g_UnknownGlobal56e26c->field_0x3424 = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28;
-    g_UnknownGlobal56e26c->mode.field_0x1be0 = g_UnknownGlobal56e26c->field_0x3424 + g_UnknownGlobal56e26c->field_0x18;
-    for (int i = 0; i < g_UnknownGlobal56e26c->field_0x18 - 1; i++) {
-        g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xd4 = g_UnknownGlobal689d08[i].id;
-        g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xd8 = 0;
+    int player = g_TrackGame->network->localPlayer;
+    g_TrackGame->field_0x18 = g_TrackGame->mode.field_0x27f8.field_0x35;
+    g_TrackGame->field_0x3424 = g_TrackGame->mode.field_0x27f8.field_0x28;
+    g_TrackGame->mode.field_0x1be0 = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
+    for (int i = 0; i < g_TrackGame->field_0x18 - 1; i++) {
+        g_TrackGame->mode.field_0x1be4[i + 1].field_0xd4 = g_UnknownGlobal689d08[i].id;
+        g_TrackGame->mode.field_0x1be4[i + 1].field_0xd8 = 0;
         int length = strlen(g_UnknownGlobal689d08[i].name);
         int count = length > 0xf ? 0xf : length;
-        strncpy(g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xdc, g_UnknownGlobal689d08[i].name, count);
-        g_UnknownGlobal56e26c->mode.field_0x1be4[i + 1].field_0xdc[count] = 0;
+        strncpy(g_TrackGame->mode.field_0x1be4[i + 1].field_0xdc, g_UnknownGlobal689d08[i].name, count);
+        g_TrackGame->mode.field_0x1be4[i + 1].field_0xdc[count] = 0;
     }
-    g_UnknownGlobal56e26c->mode.field_0x1be4[0].field_0xd4 = player;
+    g_TrackGame->mode.field_0x1be4[0].field_0xd4 = player;
     {
-        int length = strlen(g_UnknownGlobal56e26c->mode.field_0x00);
+        int length = strlen(g_TrackGame->mode.field_0x00);
         int count = length > 0xf ? 0xf : length;
-        strncpy(g_UnknownGlobal56e26c->mode.field_0x1be4[0].field_0xdc, g_UnknownGlobal56e26c->mode.field_0x00, count);
-        g_UnknownGlobal56e26c->mode.field_0x1be4[0].field_0xdc[count] = 0;
+        strncpy(g_TrackGame->mode.field_0x1be4[0].field_0xdc, g_TrackGame->mode.field_0x00, count);
+        g_TrackGame->mode.field_0x1be4[0].field_0xdc[count] = 0;
     }
-    g_UnknownGlobal56e26c->mode.field_0x1be4[0].field_0xd8 = 0;
-    g_UnknownGlobal56e26c->mode.field_0x1be4[0].UnknownFunction521fb0(
-        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00, g_UnknownGlobal56e26c->mode.field_0x1974.field_0x40,
-        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80);
-    g_UnknownGlobal56e26c->mode.field_0x1be4[0].field_0xc4 =
-        g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4;
-    if (g_UnknownGlobal56e26c->mode.field_0x1bd0 > 0 && g_UnknownGlobal56e26c->mode.field_0x1bd0 < 0x65)
-        g_UnknownGlobal56e26c->mode.field_0x1bcc = g_UnknownGlobal56e26c->mode.field_0x1bd0;
-    g_UnknownGlobal56e26c->mode.field_0x1be4[0].field_0xc0 = g_UnknownGlobal56e26c->mode.field_0x1bcc;
+    g_TrackGame->mode.field_0x1be4[0].field_0xd8 = 0;
+    g_TrackGame->mode.field_0x1be4[0].UnknownFunction521fb0(
+        g_TrackGame->mode.field_0x1974.field_0x00, g_TrackGame->mode.field_0x1974.field_0x40,
+        g_TrackGame->mode.field_0x1974.field_0x80);
+    g_TrackGame->mode.field_0x1be4[0].field_0xc4 =
+        g_TrackGame->mode.field_0x1974.field_0xc4;
+    if (g_TrackGame->mode.field_0x1bd0 > 0 && g_TrackGame->mode.field_0x1bd0 < 0x65)
+        g_TrackGame->mode.field_0x1bcc = g_TrackGame->mode.field_0x1bd0;
+    g_TrackGame->mode.field_0x1be4[0].field_0xc0 = g_TrackGame->mode.field_0x1bcc;
     int racer = g_UnknownGlobal689df8 + 1;
     for (int j = 0; j < 8; j++) {
         for (int k = 0; k < field_0x7f68.field_0x00[j].grantedRacers; k++) {
-            g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0xd4 = field_0x7f68.field_0x00[j].playerId;
-            g_UnknownGlobal56e26c->mode.field_0x1be4[racer].field_0xd8 = racer;
+            g_TrackGame->mode.field_0x1be4[racer].field_0xd4 = field_0x7f68.field_0x00[j].playerId;
+            g_TrackGame->mode.field_0x1be4[racer].field_0xd8 = racer;
             racer++;
         }
         if (field_0x7f68.field_0x00[j].playerId == player)
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 = field_0x7f68.field_0x00[j].grantedRacers;
+            g_TrackGame->mode.field_0x27f8.field_0x24 = field_0x7f68.field_0x00[j].grantedRacers;
     }
-    g_UnknownGlobal56e26c->field_0x08->SetSessionJoinable(0);
-    if (g_UnknownGlobal56e26c->ui->field_0x2c) {
-        if (g_UnknownGlobal56e26c->mode.field_0x2dbc) {
-            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 4) {
-                g_UnknownGlobal56e26c->field_0x342c = 1;
-                g_UnknownGlobal56e26c->field_0x3428 = 0;
+    g_TrackGame->network->SetSessionJoinable(0);
+    if (g_TrackGame->ui->field_0x2c) {
+        if (g_TrackGame->mode.field_0x2dbc) {
+            if (g_TrackGame->mode.field_0x27f8.field_0x04 != 4) {
+                g_TrackGame->field_0x342c = 1;
+                g_TrackGame->field_0x3428 = 0;
             } else {
-                g_UnknownGlobal56e26c->mode.field_0x2dbc = 0;
+                g_TrackGame->mode.field_0x2dbc = 0;
             }
         }
         UnknownFunction4536e0();
@@ -201,35 +201,35 @@ static int s_UnknownStatic573c0c = 2;
 // 0x004f2b90
 void MultiPlayerDlg::SendSettings() {
     UnknownLobbySlotTable* slots = &field_0x7f68;
-    g_UnknownGlobal56e26c->mode.field_0x1bd8 = slots->UnknownFunction4f2fe0(g_UnknownGlobal689df8 + 1, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28);
-    if (g_UnknownGlobal56e26c->mode.field_0x1bd8 < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28)
-        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = g_UnknownGlobal56e26c->mode.field_0x1bd8;
+    g_TrackGame->mode.field_0x1bd8 = slots->UnknownFunction4f2fe0(g_UnknownGlobal689df8 + 1, g_TrackGame->mode.field_0x27f8.field_0x28);
+    if (g_TrackGame->mode.field_0x1bd8 < g_TrackGame->mode.field_0x27f8.field_0x28)
+        g_TrackGame->mode.field_0x27f8.field_0x28 = g_TrackGame->mode.field_0x1bd8;
     if (field_0x7f58) {
         UIListBox* list = static_cast<UIListBox*>(field_0x7f58->FindControl("OpponentsListBox", 0));
-        if (list && list->rowCount - 1 != g_UnknownGlobal56e26c->mode.field_0x1bd8) {
+        if (list && list->rowCount - 1 != g_TrackGame->mode.field_0x1bd8) {
             int selection = list->GetSelectedRow();
             list->RemoveAllRows();
-            for (int i = 0; i <= g_UnknownGlobal56e26c->mode.field_0x1bd8; i++) {
+            for (int i = 0; i <= g_TrackGame->mode.field_0x1bd8; i++) {
                 char text[0x80];
                 sprintf(text, "%d", i);
-                list->UnknownFunction476d80(text, i, 0);
+                list->AddRow(text, i, 0);
             }
-            if (g_UnknownGlobal56e26c->mode.field_0x1bd8 < selection)
-                list->SelectRow(g_UnknownGlobal56e26c->mode.field_0x1bd8);
+            if (g_TrackGame->mode.field_0x1bd8 < selection)
+                list->SelectRow(g_TrackGame->mode.field_0x1bd8);
             else
                 list->SelectRow(selection);
         }
     }
     if (++s_UnknownStatic573c0c >= 2) {
-        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35 = g_UnknownGlobal689df8 + 1;
-        g_UnknownGlobal56e26c->field_0x18 = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x35;
-        g_UnknownGlobal56e26c->field_0x3424 = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28;
-        g_UnknownGlobal56e26c->mode.field_0x1be0 = g_UnknownGlobal56e26c->field_0x3424 + g_UnknownGlobal56e26c->field_0x18;
+        g_TrackGame->mode.field_0x27f8.field_0x35 = g_UnknownGlobal689df8 + 1;
+        g_TrackGame->field_0x18 = g_TrackGame->mode.field_0x27f8.field_0x35;
+        g_TrackGame->field_0x3424 = g_TrackGame->mode.field_0x27f8.field_0x28;
+        g_TrackGame->mode.field_0x1be0 = g_TrackGame->field_0x3424 + g_TrackGame->field_0x18;
         if (field_0x7f58)
             field_0x7f58->UpdateBoundValues(1);
         if (field_0x7f64)
             field_0x7f64->UpdateBoundValues(1);
-        TrackGame* game = g_UnknownGlobal56e26c;
+        TrackGame* game = g_TrackGame;
         UnknownLobbySettingsMessage message;
         message.minutes = (int)game->mode.field_0x27f8.field_0x140;
         message.eventType = game->mode.field_0x27f8.field_0x04;
@@ -252,17 +252,17 @@ void MultiPlayerDlg::SendSettings() {
         memcpy(message.slots, slots->field_0x00, sizeof(message.slots));
         message.trackName[0] = 0;
         strncat(message.trackName, game->mode.field_0x27f8.field_0x36, 0x3f);
-        g_UnknownGlobal56e26c->field_0x08->Send(0xf, &message, sizeof(message),
-                                                                   g_UnknownGlobal56e26c->field_0x08->localPlayer, 0);
+        g_TrackGame->network->Send(0xf, &message, sizeof(message),
+                                                                   g_TrackGame->network->localPlayer, 0);
         s_UnknownStatic573c0c = 0;
     }
 }
 
 // 0x004f2ec0
 int MultiPlayerDlg::UnknownFunction4f2ec0() {
-    UnknownGameUiControl* button = FindControl("ButRdyUser", 1);
+    UIControl* button = FindControl("ButRdyUser", 1);
     button->SetFontColor(0x808080);
-    return g_UnknownGlobal56e26c->field_0x08->CreateLocalPlayer(g_UnknownGlobal56e26c->mode.field_0x00) != 0;
+    return g_TrackGame->network->CreateLocalPlayer(g_TrackGame->mode.field_0x00) != 0;
 }
 
 // 0x004f2f00
@@ -351,28 +351,28 @@ int UnknownLobbySlotTable::UnknownFunction4f2fe0(int count, int limit) {
 void FillTrackList(int a, const char* picture, const char* listName, int* value, UIDialog* dialog, int append) {
     char name[0x80];
     if (!dialog)
-        dialog = (UIDialog*)g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485df0();
+        dialog = (UIDialog*)g_TrackGame->ui->field_0x2c->FindInputDialog();
     name[0] = 0;
-    switch (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04) {
+    switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
     case 3:
-        FillFileList(g_UnknownGlobal56e26c->mode.field_0x25e4, "Teraform\\SX", "*.env", "env", a, picture, listName,
+        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\SX", "*.env", "env", a, picture, listName,
                      name, value, dialog, 0, 0);
         break;
     case 1:
-        FillFileList(g_UnknownGlobal56e26c->mode.field_0x25e4, "Teraform\\Baja", "*.env", "env", a, picture, listName,
-                     name, value, dialog, g_UnknownGlobal56e26c->mode.field_0x9f4[1], 0);
+        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\Baja", "*.env", "env", a, picture, listName,
+                     name, value, dialog, g_TrackGame->mode.field_0x9f4[1], 0);
         break;
     case 5:
-        FillFileList(g_UnknownGlobal56e26c->mode.field_0x25e4, "Teraform\\Enduro", "*.env", "env", a, picture,
-                     listName, name, value, dialog, g_UnknownGlobal56e26c->mode.field_0x9f4[5], 0);
+        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\Enduro", "*.env", "env", a, picture,
+                     listName, name, value, dialog, g_TrackGame->mode.field_0x9f4[5], 0);
         break;
     case 0:
     case 4:
-        FillFileList(g_UnknownGlobal56e26c->mode.field_0x25e4, (const char*)g_UnknownGlobal56e26c->mode.field_0x6a0,
+        FillFileList(g_TrackGame->mode.field_0x25e4, (const char*)g_TrackGame->mode.field_0x6a0,
                      "*.env", "env", a, picture, listName, name, value, dialog, 0, append);
         break;
     case 2:
-        FillFileList(g_UnknownGlobal56e26c->mode.field_0x25e4, "Teraform\\National", "*.env", "env", a, picture,
+        FillFileList(g_TrackGame->mode.field_0x25e4, "Teraform\\National", "*.env", "env", a, picture,
                      listName, name, value, dialog, 0, 0);
         break;
     }
@@ -380,15 +380,15 @@ void FillTrackList(int a, const char* picture, const char* listName, int* value,
 
 // 0x004f3260: enables the controls for the ready state.
 void MultiPlayerDlg::UnknownFunction4f3260() {
-    if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+    if (g_TrackGame->network->isHost) {
         if (field_0x7f58)
             field_0x7f58->UnknownFunction4f69d0();
-        if (!strcmp(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, ""))
+        if (!strcmp(g_TrackGame->mode.field_0x27f8.field_0x36, ""))
             EnableGroup(0x514, 1);
         EnableGroup(0x3e8, 1);
     } else {
-        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_UnknownGlobal56e26c->mode.field_0xfd8)->engineSize) >
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c &&
+        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.field_0xfd8)->engineSize) >
+                g_TrackGame->mode.field_0x27f8.field_0x1c &&
             g_UnknownGlobal689df4)
             UnknownFunction4f57c0(1);
         EnableGroup(0x514, 0);
@@ -405,7 +405,7 @@ void MultiPlayerDlg::UnknownFunction4f3260() {
             field_0x7f5c->FindControl("BikeRight", 0)->Show(0, 1);
             field_0x7f5c->FindControl("DDLEngineSize", 0)->UnknownVirtualSlot49(0);
             static_cast<UIDropDownList*>(field_0x7f5c->FindControl("DDLEngineSize", 0))->UnknownInlineButton()->Show(0, 1);
-            if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+            if (g_TrackGame->network->isHost) {
                 field_0x7f5c->FindControl("LargestOpponentDropDown", 0)->UnknownVirtualSlot49(0);
                 static_cast<UIDropDownList*>(field_0x7f5c->FindControl("LargestOpponentDropDown", 0))->UnknownInlineButton()
                     ->Show(0, 1);
@@ -422,7 +422,7 @@ void MultiPlayerDlg::UnknownFunction4f3260() {
             field_0x7f5c->FindControl("BikeRight", 0)->Show(1, 1);
             field_0x7f5c->FindControl("DDLEngineSize", 0)->UnknownVirtualSlot49(1);
             static_cast<UIDropDownList*>(field_0x7f5c->FindControl("DDLEngineSize", 0))->UnknownInlineButton()->Show(1, 1);
-            if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+            if (g_TrackGame->network->isHost) {
                 field_0x7f5c->FindControl("LargestOpponentDropDown", 0)->UnknownVirtualSlot49(1);
                 static_cast<UIDropDownList*>(field_0x7f5c->FindControl("LargestOpponentDropDown", 0))->UnknownInlineButton()
                     ->Show(1, 1);
@@ -435,18 +435,18 @@ void MultiPlayerDlg::UnknownFunction4f3260() {
 void MultiPlayerDlg::UnknownFunction4f3620() {
     char text[0x80];
     char name[0x80];
-    if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+    if (g_TrackGame->network->isHost) {
         ShowGroup(0x514, 1);
         FindControl("Start", 0)->UnknownVirtualSlot49(1);
     } else {
         ShowGroup(0x514, 0);
     }
     UnknownFunction4f3260();
-    g_UnknownGlobal56e26c->UnknownFunction521970(0x610, text, 0x80);
-    UnknownGameUiControl* button = FindControl("ButRdyUser", 1);
+    g_TrackGame->LoadResourceString(0x610, text, 0x80);
+    UIControl* button = FindControl("ButRdyUser", 1);
     button->SetText(text);
-    if (g_UnknownGlobal56e26c->field_0x08->isHost)
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x925, text, 0x80);
+    if (g_TrackGame->network->isHost)
+        g_TrackGame->LoadResourceString(0x925, text, 0x80);
     for (int i = 0; i < 7; i++) {
         sprintf(name, "ButRdyPlayer%d", i + 2);
         button = FindControl(name, 1);
@@ -464,7 +464,7 @@ void MultiPlayerDlg::SendChatLine() {
     message.field_0x04[count] = 0;
     edit->GetEditText(message.field_0x04, 0x4a);
     if (strcmp(message.field_0x04, "")) {
-        NetworkInterface* network = g_UnknownGlobal56e26c->field_0x08;
+        NetworkInterface* network = g_TrackGame->network;
         int player = network->localPlayer;
         network->Send(0x85, &message, 0x4e, player, 0);
         edit->SetEditText("");
@@ -480,8 +480,8 @@ void MultiPlayerDlg::SendSystemChatLine(const char* text) {
     int count = length > 0x49 ? 0x49 : length;
     strncpy(message.field_0x04, text, count);
     message.field_0x04[count] = 0;
-    g_UnknownGlobal56e26c->field_0x08->Send(
-        0x92, &message, 0x4e, g_UnknownGlobal56e26c->field_0x08->localPlayer, 0);
+    g_TrackGame->network->Send(
+        0x92, &message, 0x4e, g_TrackGame->network->localPlayer, 0);
     AddChatLine(-1, message.field_0x04);
     guiUser->UnknownFunction487790((UnknownGuiControl*)FindControl("EditChat", 0xb), 0, 0);
 }
@@ -489,9 +489,9 @@ void MultiPlayerDlg::SendSystemChatLine(const char* text) {
 // 0x004f3a10
 void MultiPlayerDlg::RemoveLobbyPlayer(int index) {
     int player = g_UnknownGlobal689d08[index].id;
-    if (player && player != g_UnknownGlobal56e26c->field_0x08->localPlayer) {
+    if (player && player != g_TrackGame->network->localPlayer) {
         UnknownKickMessage message;
-        NetworkInterface* network = g_UnknownGlobal56e26c->field_0x08;
+        NetworkInterface* network = g_TrackGame->network;
         message.field_0x04 = player;
         network->Send(0x8e, &message, sizeof(message), network->localPlayer, player);
         field_0x7f68.FreeSlot(message.field_0x04);
@@ -516,92 +516,92 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         field_0x7f64 = 0;
         field_0x80d0[0] = 0;
         UIMultiState* tab = static_cast<UIMultiState*>(FindControl("EventTab", 4));
-        tab->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x13e3);
-        tab->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x13e3);
+        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13e3);
+        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13e3);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("BikeRiderTab", 4));
-        tab->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x13e4);
-        tab->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x13e4);
+        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13e4);
+        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13e4);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("RaceInfoTab", 4));
-        tab->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x13e5);
-        tab->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x13e5);
+        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x13e5);
+        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x13e5);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIMultiState*>(FindControl("OptionsTab", 4));
-        tab->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1468);
-        tab->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1468);
+        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1468);
+        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1468);
         tab->SetTextAlign(0x22);
-        memcpy(&g_UnknownGlobal56e26c->mode.field_0x27f8, &g_UnknownGlobal56e26c->mode.field_0x2bd0,
-               sizeof(g_UnknownGlobal56e26c->mode.field_0x27f8));
-        memcpy(g_UnknownGlobal56e26c->mode.field_0xfd8, g_UnknownGlobal56e26c->mode.field_0x1090,
-               sizeof(g_UnknownGlobal56e26c->mode.field_0xfd8));
-        memcpy(&g_UnknownGlobal56e26c->mode.field_0x1974, g_UnknownGlobal56e26c->mode.field_0x1b04,
-               sizeof(g_UnknownGlobal56e26c->mode.field_0x1974));
+        memcpy(&g_TrackGame->mode.field_0x27f8, &g_TrackGame->mode.field_0x2bd0,
+               sizeof(g_TrackGame->mode.field_0x27f8));
+        memcpy(g_TrackGame->mode.field_0xfd8, g_TrackGame->mode.field_0x1090,
+               sizeof(g_TrackGame->mode.field_0xfd8));
+        memcpy(&g_TrackGame->mode.field_0x1974, g_TrackGame->mode.field_0x1b04,
+               sizeof(g_TrackGame->mode.field_0x1974));
         strcpy(builtForTrack, "");
         field_0x80cc = 0;
-        g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds =
-            g_UnknownGlobal56e26c->UnknownVirtualSlot20("IntervalBetweenFullPacketsMS", -1000) * 0.001f;
-        if (g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds < 0.0f)
-            g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds = 2.0f;
-        else if (g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds < 2.0)
-            g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds = 2.0f;
-        else if (g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds > 4.0f)
-            g_UnknownGlobal56e26c->fullNetPacketIntervalSeconds = 4.0f;
-        g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds =
-            g_UnknownGlobal56e26c->UnknownVirtualSlot20("IntervalBetweenShortPacketsMS", -1000) * 0.001f;
-        if (g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds < 0.0f) {
-            int connection = g_UnknownGlobal56e26c->field_0x08->providerKind;
+        g_TrackGame->fullNetPacketIntervalSeconds =
+            g_TrackGame->GetRegistryInt("IntervalBetweenFullPacketsMS", -1000) * 0.001f;
+        if (g_TrackGame->fullNetPacketIntervalSeconds < 0.0f)
+            g_TrackGame->fullNetPacketIntervalSeconds = 2.0f;
+        else if (g_TrackGame->fullNetPacketIntervalSeconds < 2.0)
+            g_TrackGame->fullNetPacketIntervalSeconds = 2.0f;
+        else if (g_TrackGame->fullNetPacketIntervalSeconds > 4.0f)
+            g_TrackGame->fullNetPacketIntervalSeconds = 4.0f;
+        g_TrackGame->shortNetPacketIntervalSeconds =
+            g_TrackGame->GetRegistryInt("IntervalBetweenShortPacketsMS", -1000) * 0.001f;
+        if (g_TrackGame->shortNetPacketIntervalSeconds < 0.0f) {
+            int connection = g_TrackGame->network->providerKind;
         char address[0x80];
         char line[0x80];
             if (connection == 1 || connection == 2 || connection == 8)
-                g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds = 0.067f;
+                g_TrackGame->shortNetPacketIntervalSeconds = 0.067f;
             else
-                g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds = 0.2f;
-        } else if (g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds < 0.067f) {
-            g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds = 0.067f;
-        } else if (g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds > 0.2f) {
-            g_UnknownGlobal56e26c->shortNetPacketIntervalSeconds = 0.2f;
+                g_TrackGame->shortNetPacketIntervalSeconds = 0.2f;
+        } else if (g_TrackGame->shortNetPacketIntervalSeconds < 0.067f) {
+            g_TrackGame->shortNetPacketIntervalSeconds = 0.067f;
+        } else if (g_TrackGame->shortNetPacketIntervalSeconds > 0.2f) {
+            g_TrackGame->shortNetPacketIntervalSeconds = 0.2f;
         }
         s_UnknownStatic573c0c = 2;
-        g_UnknownGlobal56e26c->mode.UnknownFunction522680();
+        g_TrackGame->mode.ResetNetworkRace();
         if (openingMenu != 0x868)
-            g_UnknownGlobal56e26c->eventManager->UnknownFunction45e520();
-        g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x2c = 0;
-        g_UnknownGlobal689dfc = g_UnknownGlobal56e26c->field_0x08->isHost == 0;
+            g_TrackGame->eventManager->ResetEntries();
+        g_TrackGame->mode.field_0x27f8.field_0x2c = 0;
+        g_UnknownGlobal689dfc = g_TrackGame->network->isHost == 0;
         g_UnknownGlobal689e04 = 2;
-        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 4) {
+        if (g_TrackGame->mode.field_0x27f8.field_0x04 == 4) {
             g_UnknownGlobal689e04 = 0;
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 = 0;
+            g_TrackGame->mode.field_0x27f8.field_0x00 = 0;
         } else {
             g_UnknownGlobal689e04 = 2;
         }
         UIListBox* chat = static_cast<UIListBox*>(FindControl("ListChat", 0));
-        chat->UnknownFunction477bb0(0);
+        chat->SetSelectable(0);
         chat->SetTextAlign(0x11);
         UIEditBox* edit = (UIEditBox*)FindControl("EditChat", 0);
         edit->SetCapacity(0x3c);
         edit->SetTextAlign(0x11);
         edit->SetBackgroundColor(0xffffff);
-        if (g_UnknownGlobal56e26c->ui->field_0x3c == 0x866 && !g_UnknownGlobal56e26c->field_0x08->lobbyConnected)
+        if (g_TrackGame->ui->field_0x3c == 0x866 && !g_TrackGame->network->lobbyConnected)
             UnknownFunction4f2ec0();
         g_UnknownGlobal689df4 = 0;
-        UnknownGameUiControl* user = FindControl("UserName", 0xc);
-        g_UnknownGlobal56e26c->field_0x08->GetPlayerName(g_UnknownGlobal56e26c->field_0x08->localPlayer, name);
+        UIControl* user = FindControl("UserName", 0xc);
+        g_TrackGame->network->GetPlayerName(g_TrackGame->network->localPlayer, name);
         user->SetText(name);
         user->SetTextDrop(0);
         user->SetTextAlign(0x12);
-        UnknownGameUiControl* ready = FindControl("ButRdyUser", 0);
+        UIControl* ready = FindControl("ButRdyUser", 0);
         ready->SetFontColor(0x808080);
         ready->SetTextAlign(0x12);
         for (i = 0; i < 7; i++) {
             sprintf(text, "ButRdyPlayer%d", i + 2);
-            UnknownGameUiControl* button = FindControl(text, 0);
+            UIControl* button = FindControl(text, 0);
             button->SetFontColor(0x808080);
             button->SetTextAlign(0x12);
         }
         for (i = 0; i < 7; i++) {
             sprintf(text, "NamePlayer%d", i + 2);
-            UnknownGameUiControl* label = FindControl(text, 0);
+            UIControl* label = FindControl(text, 0);
             label->SetTextDrop(0);
             label->SetTextAlign(0x12);
             g_UnknownGlobal689dbc[i] = 0;
@@ -609,13 +609,13 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         }
         UnknownFunction4f3620();
         chat = static_cast<UIListBox*>(FindControl("ListChat", 0));
-        chat->UnknownFunction477bb0(0);
+        chat->SetSelectable(0);
         EnableGroup(0x258, 0);
         UnknownFunction4f3260();
-        if (g_UnknownGlobal56e26c->field_0x08->lobbyConnected) {
-            if (g_UnknownGlobal56e26c->mode.field_0x1bd4 == -1) {
-                g_UnknownGlobal56e26c->networkGameObject->UnknownFunction49c2f0(&g_UnknownGlobal56e26c->mode.field_0x1bd4);
-                g_UnknownGlobal56e26c->networkGameObject->UnknownFunction49c600();
+        if (g_TrackGame->network->lobbyConnected) {
+            if (g_TrackGame->mode.field_0x1bd4 == -1) {
+                g_TrackGame->networkGameObject->UnknownFunction49c2f0(&g_TrackGame->mode.field_0x1bd4);
+                g_TrackGame->networkGameObject->UnknownFunction49c600();
                 if (field_0x7f58) {
                     field_0x7f58->UpdateBoundValues(0);
                     field_0x7f58->ApplyEventType();
@@ -623,7 +623,7 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 }
             }
         } else {
-            g_UnknownGlobal56e26c->mode.field_0x1bd4 = 0;
+            g_TrackGame->mode.field_0x1bd4 = 0;
         }
         if (openingMenu == 0x88e || openingMenu == 0x868) {
             static_cast<UIRadioButton*>(FindControl("RaceInfoTab", 4))->SelectInGroup(0);
@@ -633,12 +633,12 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             ShowPage(0);
         }
         field_0x118 = 0xfeb97a;
-        int connection = g_UnknownGlobal56e26c->field_0x08->providerKind;
+        int connection = g_TrackGame->network->providerKind;
         char address[0x80];
         char line[0x80];
-        if ((connection == 4 || connection == 2) && g_UnknownGlobal56e26c->field_0x08->isHost) {
-            g_UnknownGlobal56e26c->UnknownFunction521970(0x14b9, text, 0x80);
-            g_UnknownGlobal56e26c->field_0x08->GetLocalAddress(address);
+        if ((connection == 4 || connection == 2) && g_TrackGame->network->isHost) {
+            g_TrackGame->LoadResourceString(0x14b9, text, 0x80);
+            g_TrackGame->network->GetLocalAddress(address);
             sprintf(line, "%s %s", text, address);
             AddChatLine(-1, line);
         }
@@ -661,25 +661,25 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             if (field_0x7f5c)
                 field_0x7f5c->UpdateBoundValues(1);
             UpdateBoundValues(1);
-            memcpy(&g_UnknownGlobal56e26c->mode.field_0x2bd0, &g_UnknownGlobal56e26c->mode.field_0x27f8,
-                   sizeof(g_UnknownGlobal56e26c->mode.field_0x2bd0));
-            memcpy(g_UnknownGlobal56e26c->mode.field_0x1090, g_UnknownGlobal56e26c->mode.field_0xfd8,
-                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1090));
-            memcpy(g_UnknownGlobal56e26c->mode.field_0x1b04, &g_UnknownGlobal56e26c->mode.field_0x1974,
-                   sizeof(g_UnknownGlobal56e26c->mode.field_0x1b04));
-            if (g_UnknownGlobal56e26c->field_0x08->lobbyConnected) {
+            memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.field_0x27f8,
+                   sizeof(g_TrackGame->mode.field_0x2bd0));
+            memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.field_0xfd8,
+                   sizeof(g_TrackGame->mode.field_0x1090));
+            memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.field_0x1974,
+                   sizeof(g_TrackGame->mode.field_0x1b04));
+            if (g_TrackGame->network->lobbyConnected) {
                 EndDialog(0);
-                g_UnknownGlobal56e26c->ui->OpenExitDialog();
+                g_TrackGame->ui->OpenExitDialog();
                 return;
             }
-            g_UnknownGlobal56e26c->field_0x08->DestroyLocalPlayer();
+            g_TrackGame->network->DestroyLocalPlayer();
             EndNetworkGame();
             event->dialog->EndDialog(0);
             event->handled = 1;
-            g_UnknownGlobal56e26c->ui->UnknownFunction499b20(100);
+            g_TrackGame->ui->OpenMenu(100);
         } else if (!_stricmp("ButRdyUser", event->controlName)) {
-            int tooBig = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c;
-            if (g_UnknownGlobal56e26c->mode.field_0x1bd4)
+            int tooBig = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > g_TrackGame->mode.field_0x27f8.field_0x1c;
+            if (g_TrackGame->mode.field_0x1bd4)
                 tooBig = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize) > 2;
             if (!tooBig) {
                 if (!g_UnknownGlobal689dfc)
@@ -689,14 +689,14 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             }
             if (g_UnknownGlobal689dfc == 2 || g_UnknownGlobal689dfc == 3)
                 UnknownFunction4f57c0(g_UnknownGlobal689dfc);
-            UnknownGameUiControl* button = FindControl("ButRdyUser", 0);
+            UIControl* button = FindControl("ButRdyUser", 0);
             if (g_UnknownGlobal689df4) {
                 char format[0x80];
                 char line[0x80];
                 UnknownFunction4f3260();
                 button->SetFontColor(0xffffff);
-                g_UnknownGlobal56e26c->UnknownFunction521970(0x14d3, format, 0x80);
-                sprintf(line, format, g_UnknownGlobal56e26c->mode.field_0x00);
+                g_TrackGame->LoadResourceString(0x14d3, format, 0x80);
+                sprintf(line, format, g_TrackGame->mode.field_0x00);
                 SendSystemChatLine(line);
             } else {
                 button->SetFontColor(0x808080);
@@ -712,9 +712,9 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     field_0x7f64->UpdateBoundValues(1);
                 if (field_0x7f58)
                     field_0x7f58->UpdateBoundValues(1);
-                if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x08 == -1) {
+                if (g_TrackGame->mode.field_0x27f8.field_0x08 == -1) {
                     ChoiceDlg* dialog = new(__FILE__, 0x6a4) ChoiceDlg;
-                    guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+                    guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
                     strcpy(prompt, "You must choose one of the following trial version tracks:\n"
                                    "Stunt Event: Donner Pass, or\n"
                                    "Nationals Race: A Voodoo Basin\n");
@@ -722,12 +722,12 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                     dialog->FindControl("TxtPrompt", 0)->field_0x1e8 = 1;
                     return;
                 }
-                memcpy(&g_UnknownGlobal56e26c->mode.field_0x2bd0, &g_UnknownGlobal56e26c->mode.field_0x27f8,
-                       sizeof(g_UnknownGlobal56e26c->mode.field_0x2bd0));
-                memcpy(g_UnknownGlobal56e26c->mode.field_0x1090, g_UnknownGlobal56e26c->mode.field_0xfd8,
-                       sizeof(g_UnknownGlobal56e26c->mode.field_0x1090));
-                memcpy(g_UnknownGlobal56e26c->mode.field_0x1b04, &g_UnknownGlobal56e26c->mode.field_0x1974,
-                       sizeof(g_UnknownGlobal56e26c->mode.field_0x1b04));
+                memcpy(&g_TrackGame->mode.field_0x2bd0, &g_TrackGame->mode.field_0x27f8,
+                       sizeof(g_TrackGame->mode.field_0x2bd0));
+                memcpy(g_TrackGame->mode.field_0x1090, g_TrackGame->mode.field_0xfd8,
+                       sizeof(g_TrackGame->mode.field_0x1090));
+                memcpy(g_TrackGame->mode.field_0x1b04, &g_TrackGame->mode.field_0x1974,
+                       sizeof(g_TrackGame->mode.field_0x1b04));
                 SendStartMessage(1);
             }
         } else if (!_stricmp("ButChatSend", event->controlName)) {
@@ -749,12 +749,12 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             RemoveLobbyPlayer(6);
         } else if (!_stricmp("Options", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 0x6d5) OptionsDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
         } else if (!_stricmp("Joystick", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 0x6d8) OptionsDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 1, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 1, 0, 1);
         } else if (!_stricmp("Help", event->controlName)) {
-            g_UnknownGlobal56e26c->mode.UnknownFunction523d30("MCM2HELP", 0);
+            g_TrackGame->mode.OpenHelp("MCM2HELP", 0);
         }
         if (_stricmp("Back", event->controlName) && _stricmp("Start", event->controlName))
             guiUser->UnknownFunction487790((UnknownGuiControl*)FindControl("EditChat", 0xb), 0, 0);
@@ -778,9 +778,9 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             g_UnknownGlobal689d08[i].UnknownVirtualSlot1();
         int index = 0;
         g_UnknownGlobal689df8 = 0;
-        int me = g_UnknownGlobal56e26c->field_0x08->localPlayer;
+        int me = g_TrackGame->network->localPlayer;
         NetPlayer* player;
-        while ((player = g_UnknownGlobal56e26c->field_0x08->NextPlayer(&index)) != 0) {
+        while ((player = g_TrackGame->network->NextPlayer(&index)) != 0) {
             if (player->id != me) {
                 g_UnknownGlobal689d08[g_UnknownGlobal689df8].id = player->id;
                 COPY_TEXT(g_UnknownGlobal689d08[g_UnknownGlobal689df8].name, player->name, 0x10);
@@ -790,21 +790,21 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         }
         for (i = 0; i < 7; i++) {
             sprintf(text, "NamePlayer%d", i + 2);
-            UnknownGameUiControl* label = FindControl(text, 0);
+            UIControl* label = FindControl(text, 0);
             label->SetText(g_UnknownGlobal689d08[i].name);
         }
         for (i = 0; i < 7; i++) {
             sprintf(text, "ButRdyPlayer%d", i + 2);
-            UnknownGameUiControl* button = FindControl(text, 0);
+            UIControl* button = FindControl(text, 0);
             if (!g_UnknownGlobal689d08[i].name[0])
                 button->SetFontColor(0x808080);
         }
         if (field_0x7f5c)
             field_0x7f5c->UpdateBoundValues(1);
         UnknownFunction4f3620();
-        if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+        if (g_TrackGame->network->isHost) {
             int allReady = 1;
-            UnknownGameUiControl* start = FindControl("Start", 0);
+            UIControl* start = FindControl("Start", 0);
             for (i = 0; i < g_UnknownGlobal689df8; i++) {
                 if (!g_UnknownGlobal689dbc[i])
                     allReady = 0;
@@ -813,23 +813,23 @@ void MultiPlayerDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
                 start->UnknownVirtualSlot49(1);
             else
                 start->UnknownVirtualSlot49(0);
-            field_0x7f68.SetSlot(me, g_UnknownGlobal56e26c->mode.field_0x6dc);
+            field_0x7f68.SetSlot(me, g_TrackGame->mode.field_0x6dc);
             SendSettings();
         }
         state.field_0x01 = g_UnknownGlobal689df4;
-        COPY_TEXT(state.field_0x42, g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00, 0x40);
-        COPY_TEXT(state.field_0x02, g_UnknownGlobal56e26c->mode.field_0x1974.field_0x40, 0x40);
-        COPY_TEXT(state.field_0x82, g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80, 0x40);
-        state.field_0xc2 = g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4;
-        state.field_0xc3 = g_UnknownGlobal56e26c->mode.field_0x6dc;
+        COPY_TEXT(state.field_0x42, g_TrackGame->mode.field_0x1974.field_0x00, 0x40);
+        COPY_TEXT(state.field_0x02, g_TrackGame->mode.field_0x1974.field_0x40, 0x40);
+        COPY_TEXT(state.field_0x82, g_TrackGame->mode.field_0x1974.field_0x80, 0x40);
+        state.field_0xc2 = g_TrackGame->mode.field_0x1974.field_0xc4;
+        state.field_0xc3 = g_TrackGame->mode.field_0x6dc;
         state.field_0xc8 = UNKNOWN_GARAGE_SETTINGS->engineSize;
         state.field_0xcc = UNKNOWN_GARAGE_SETTINGS->field_0x04;
-        if (g_UnknownGlobal56e26c->mode.field_0x1bd0 > 0 && g_UnknownGlobal56e26c->mode.field_0x1bd0 < 0x65)
-            g_UnknownGlobal56e26c->mode.field_0x1bcc = g_UnknownGlobal56e26c->mode.field_0x1bd0;
-        state.field_0xd0 = g_UnknownGlobal56e26c->mode.field_0x1bcc;
+        if (g_TrackGame->mode.field_0x1bd0 > 0 && g_TrackGame->mode.field_0x1bd0 < 0x65)
+            g_TrackGame->mode.field_0x1bcc = g_TrackGame->mode.field_0x1bd0;
+        state.field_0xd0 = g_TrackGame->mode.field_0x1bcc;
         state.field_0xc4 = ReadClock();
-        g_UnknownGlobal56e26c->field_0x08->Send(2, &state, sizeof(state),
-                                                               g_UnknownGlobal56e26c->field_0x08->localPlayer, 0);
+        g_TrackGame->network->Send(2, &state, sizeof(state),
+                                                               g_TrackGame->network->localPlayer, 0);
         break;
     }
     case 9:
@@ -858,15 +858,15 @@ void MultiPlayerDlg::UnknownFunction4f57c0(int reason) {
     char message[0x80];
     switch (reason) {
     case 1:
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x146a, text, 0x80);
-        sprintf(value, text, g_UnknownGlobal56cb6c[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c]);
-        if (g_UnknownGlobal56e26c->mode.field_0x1bd4)
+        g_TrackGame->LoadResourceString(0x146a, text, 0x80);
+        sprintf(value, text, g_UnknownGlobal56cb6c[g_TrackGame->mode.field_0x27f8.field_0x1c]);
+        if (g_TrackGame->mode.field_0x1bd4)
             sprintf(value, text, g_UnknownGlobal56cb6c[2]);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x14d1, text, 0x80);
+        g_TrackGame->LoadResourceString(0x14d1, text, 0x80);
         sprintf(message, text, value);
         break;
     case 2: {
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x14d2, text, 0x80);
+        g_TrackGame->LoadResourceString(0x14d2, text, 0x80);
         int length = strlen(text);
         int count = length > 0x7f ? 0x7f : length;
         strncpy(message, text, count);
@@ -874,7 +874,7 @@ void MultiPlayerDlg::UnknownFunction4f57c0(int reason) {
         break;
     }
     case 3: {
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x14da, text, 0x80);
+        g_TrackGame->LoadResourceString(0x14da, text, 0x80);
         int length = strlen(text);
         int count = length > 0x7f ? 0x7f : length;
         strncpy(message, text, count);
@@ -885,12 +885,12 @@ void MultiPlayerDlg::UnknownFunction4f57c0(int reason) {
     AddChatLine(-1, message);
     g_UnknownGlobal689df4 = 0;
     if (reason == 2) {
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x14d4, text, 0x80);
-        sprintf(value, text, g_UnknownGlobal56e26c->mode.field_0x00);
+        g_TrackGame->LoadResourceString(0x14d4, text, 0x80);
+        sprintf(value, text, g_TrackGame->mode.field_0x00);
         SendSystemChatLine(value);
     } else if (reason == 3) {
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x14db, text, 0x80);
-        sprintf(value, text, g_UnknownGlobal56e26c->mode.field_0x00);
+        g_TrackGame->LoadResourceString(0x14db, text, 0x80);
+        sprintf(value, text, g_TrackGame->mode.field_0x00);
         SendSystemChatLine(value);
     }
     FindControl("ButRdyUser", 1)->SetFontColor(0x808080);
@@ -919,28 +919,28 @@ void MultiPlayerDlg::ShowPage(int page) {
     case 0:
         if (!field_0x7f58) {
             field_0x7f58 = new(__FILE__, 0x7a4) MPEventDlg;
-            g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(field_0x7f58, 0, 1, (int)&area, (int)this,
+            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f58, 0, 1, (int)&area, (int)this,
                                                                          0, 0, 1);
         }
         break;
     case 1:
         if (!field_0x7f5c) {
             field_0x7f5c = new(__FILE__, 0x7aa) MPBikeRiderDlg;
-            g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(field_0x7f5c, 0, 1, (int)&area, (int)this,
+            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f5c, 0, 1, (int)&area, (int)this,
                                                                          0, 0, 1);
         }
         break;
     case 2:
         if (!field_0x7f60) {
             field_0x7f60 = new(__FILE__, 0x7b0) MPRaceInfoDlg;
-            g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(field_0x7f60, 0, 1, (int)&area, (int)this,
+            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f60, 0, 1, (int)&area, (int)this,
                                                                          0, 0, 1);
         }
         break;
     case 3:
         if (!field_0x7f64) {
             field_0x7f64 = new(__FILE__, 0x7b6) MPOptionsDlg;
-            g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(field_0x7f64, 0, 1, (int)&area, (int)this,
+            g_TrackGame->ui->field_0x2c->ShowDialog(field_0x7f64, 0, 1, (int)&area, (int)this,
                                                                          0, 0, 1);
         }
         break;
@@ -954,26 +954,26 @@ void MultiPlayerDlg::FollowTrackChange() {
     char scene[0x104];
     char path[0x104];
     UnknownFunction4f3260();
-    if (!strcmp(builtForTrack, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36) && field_0x80cc == g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34)
+    if (!strcmp(builtForTrack, g_TrackGame->mode.field_0x27f8.field_0x36) && field_0x80cc == g_TrackGame->mode.field_0x27f8.field_0x34)
         return;
-    g_UnknownGlobal56e26c->mode.UnknownFunction523b70(scene);
-    g_UnknownGlobal56e26c->mode.UnknownFunction523a60((int)scene, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, "env", path);
+    g_TrackGame->mode.UnknownFunction523b70(scene);
+    g_TrackGame->mode.FindFileDirectory((int)scene, g_TrackGame->mode.field_0x27f8.field_0x36, "env", path);
     index = 0;
     value = 0;
-    g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9b80(path);
-    if (g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 1 || g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 5)
-        g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea010(field_0x80d0, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36,
-                                                                  g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34, "scn", &index,
+    g_TrackGame->sceneObject->UnknownFunction4e9b80(path);
+    if (g_TrackGame->mode.UnknownFunction524100() == 1 || g_TrackGame->mode.UnknownFunction524100() == 5)
+        g_TrackGame->sceneObject->UnknownFunction4ea010(field_0x80d0, g_TrackGame->mode.field_0x27f8.field_0x36,
+                                                                  g_TrackGame->mode.field_0x27f8.field_0x34, "scn", &index,
                                                                   &value);
     else
-        g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea010(field_0x80d0, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, 0,
+        g_TrackGame->sceneObject->UnknownFunction4ea010(field_0x80d0, g_TrackGame->mode.field_0x27f8.field_0x36, 0,
                                                                   "scn", &index, &value);
     if (!_stricmp("no name", field_0x80d0)) {
         g_UnknownGlobal689dfc = 2;
         if (g_UnknownGlobal689df4)
             UnknownFunction4f57c0(2);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x143b, field_0x80d0, 0x80);
-    } else if (value != g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x13c) {
+        g_TrackGame->LoadResourceString(0x143b, field_0x80d0, 0x80);
+    } else if (value != g_TrackGame->mode.field_0x27f8.field_0x13c) {
         g_UnknownGlobal689dfc = 3;
         if (g_UnknownGlobal689df4)
             UnknownFunction4f57c0(3);
@@ -983,17 +983,17 @@ void MultiPlayerDlg::FollowTrackChange() {
     if (field_0x7f58)
         field_0x7f58->ShowTrackPicture();
     {
-        int length = strlen(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36);
+        int length = strlen(g_TrackGame->mode.field_0x27f8.field_0x36);
         int count = length > 0x103 ? 0x103 : length;
-        strncpy(builtForTrack, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, count);
+        strncpy(builtForTrack, g_TrackGame->mode.field_0x27f8.field_0x36, count);
         builtForTrack[count] = 0;
     }
-    field_0x80cc = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34;
+    field_0x80cc = g_TrackGame->mode.field_0x27f8.field_0x34;
     {
         int length = strlen(field_0x80d0);
         int count = length > 0x7f ? 0x7f : length;
-        strncpy(g_UnknownGlobal56e26c->mode.field_0x6f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04], field_0x80d0, count);
-        g_UnknownGlobal56e26c->mode.field_0x6f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04][count] = 0;
+        strncpy(g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04], field_0x80d0, count);
+        g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04][count] = 0;
     }
 }
 
@@ -1001,21 +1001,21 @@ void MultiPlayerDlg::FollowTrackChange() {
 int MPEventDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
     char text[0x80];
     if (type == 0x101) {
-        int count = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28;
+        int count = g_TrackGame->mode.field_0x27f8.field_0x28;
         field_0x7f58 = 0;
         UpdateBoundValues(0);
         ApplyEventType();
         field_0x7f58 = 1;
         UpdateBoundValues(0);
         UIListBox* list = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
-        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 4 && list->rowCount - 1 != g_UnknownGlobal56e26c->mode.field_0x1bd8) {
+        if (g_TrackGame->mode.field_0x27f8.field_0x04 != 4 && list->rowCount - 1 != g_TrackGame->mode.field_0x1bd8) {
             list->RemoveAllRows();
-            for (int i = 0; i <= g_UnknownGlobal56e26c->mode.field_0x1bd8; i++) {
+            for (int i = 0; i <= g_TrackGame->mode.field_0x1bd8; i++) {
                 sprintf(text, "%d", i);
-                list->UnknownFunction476d80(text, i, 0);
+                list->AddRow(text, i, 0);
             }
-            if (g_UnknownGlobal56e26c->mode.field_0x1bd8 < count)
-                list->SelectRow(g_UnknownGlobal56e26c->mode.field_0x1bd8);
+            if (g_TrackGame->mode.field_0x1bd8 < count)
+                list->SelectRow(g_TrackGame->mode.field_0x1bd8);
             else
                 list->SelectRow(count);
         }
@@ -1032,50 +1032,50 @@ void MPEventDlg::ShowHostSettings() {
     MultiPlayerDlg* parent = parentDialog;
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
     list->RemoveAllRows();
-    list->UnknownFunction476d80(parent->field_0x80d0, 0, 0);
+    list->AddRow(parent->field_0x80d0, 0, 0);
     list->SelectRow(0);
     list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
-    list->SelectRowByData(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04);
+    list->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x04);
     list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
-    list->SelectRowByData(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00);
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 4) {
+    list->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x00);
+    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 4) {
         FindControl("OpponentsControlBox", 5)->Show(0, 1);
         UIMultiState* check = static_cast<UIMultiState*>(FindControl("ChkTagBall", 2));
         check->Show(1, 1);
-        check->SetCurrentState(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x144);
+        check->SetCurrentState(g_TrackGame->mode.field_0x27f8.field_0x144);
         check = static_cast<UIMultiState*>(FindControl("ChkStuntMode", 2));
         check->Show(1, 1);
-        check->SetCurrentState(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x148);
+        check->SetCurrentState(g_TrackGame->mode.field_0x27f8.field_0x148);
     } else {
         FindControl("OpponentsControlBox", 5)->Show(1, 1);
         UIListBox* opponents = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
         if (opponents) {
             opponents->RemoveAllRows();
-            UnknownFunction451380(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28, text);
-            opponents->UnknownFunction476d80(text, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28, 0);
+            UnknownFunction451380(g_TrackGame->mode.field_0x27f8.field_0x28, text);
+            opponents->AddRow(text, g_TrackGame->mode.field_0x27f8.field_0x28, 0);
         }
         FindControl("ChkTagBall", 2)->Show(0, 1);
         FindControl("ChkStuntMode", 2)->Show(0, 1);
     }
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 2)
-        g_UnknownGlobal56e26c->mode.field_0x10ec = 0;
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 0 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 4) {
-        UnknownGameUiControl* label = FindControl("LapsLabel", 0xc);
-        label->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x929);
+    if (g_TrackGame->mode.field_0x27f8.field_0x00 != 2)
+        g_TrackGame->mode.field_0x10ec = 0;
+    if (g_TrackGame->mode.field_0x27f8.field_0x04 != 0 && g_TrackGame->mode.field_0x27f8.field_0x04 != 4) {
+        UIControl* label = FindControl("LapsLabel", 0xc);
+        label->SetTextFromResource(g_TrackGame->field_0x420, 0x929);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
         laps->RemoveAllRows();
-        UnknownFunction451380(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20, text);
-        laps->UnknownFunction476d80(text, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20, 0);
+        UnknownFunction451380(g_TrackGame->mode.field_0x27f8.field_0x20, text);
+        laps->AddRow(text, g_TrackGame->mode.field_0x27f8.field_0x20, 0);
     } else {
-        UnknownGameUiControl* label = FindControl("LapsLabel", 0xc);
-        label->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x92f);
+        UIControl* label = FindControl("LapsLabel", 0xc);
+        label->SetTextFromResource(g_TrackGame->field_0x420, 0x92f);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
         laps->RemoveAllRows();
-        UnknownFunction518640(text, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140 * 60.0f);
-        laps->UnknownFunction476d80(text, (int)g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140, 0);
+        UnknownFunction518640(text, g_TrackGame->mode.field_0x27f8.field_0x140 * 60.0f);
+        laps->AddRow(text, (int)g_TrackGame->mode.field_0x27f8.field_0x140, 0);
     }
-    if (g_UnknownGlobal56e26c->mode.field_0x1bd0 > 0 && g_UnknownGlobal56e26c->mode.field_0x1bd0 < 0x65)
-        g_UnknownGlobal56e26c->mode.field_0x1bcc = g_UnknownGlobal56e26c->mode.field_0x1bd0;
+    if (g_TrackGame->mode.field_0x1bd0 > 0 && g_TrackGame->mode.field_0x1bd0 < 0x65)
+        g_TrackGame->mode.field_0x1bcc = g_TrackGame->mode.field_0x1bd0;
 }
 
 // 0x004f6370
@@ -1085,48 +1085,48 @@ void MPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     switch (event->kind) {
     case kDialogInit: {
         field_0x7f58 = 0;
-        UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00;
+        UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.field_0x27f8.field_0x00;
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13ed, text, 0x80);
-        list->UnknownFunction476d80(text, 1, 0);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13ee, text, 0x80);
-        list->UnknownFunction476d80(text, 0, 0);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f0, text, 0x80);
-        list->UnknownFunction476d80(text, 5, 0);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13ef, text, 0x80);
-        list->UnknownFunction476d80(text, 2, 0);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f2, text, 0x80);
-        list->UnknownFunction476d80(text, 3, 0);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f1, text, 0x80);
+        g_TrackGame->LoadResourceString(0x13ed, text, 0x80);
+        list->AddRow(text, 1, 0);
+        g_TrackGame->LoadResourceString(0x13ee, text, 0x80);
+        list->AddRow(text, 0, 0);
+        g_TrackGame->LoadResourceString(0x13f0, text, 0x80);
+        list->AddRow(text, 5, 0);
+        g_TrackGame->LoadResourceString(0x13ef, text, 0x80);
+        list->AddRow(text, 2, 0);
+        g_TrackGame->LoadResourceString(0x13f2, text, 0x80);
+        list->AddRow(text, 3, 0);
+        g_TrackGame->LoadResourceString(0x13f1, text, 0x80);
         list->SelectRowByData(settings->eventType);
         list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f3, text, 0x80);
-        list->UnknownFunction476d80(text, 0, 0);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f4, text, 0x80);
-        list->UnknownFunction476d80(text, 1, 0);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f5, text, 0x80);
-        list->UnknownFunction476d80(text, 2, 1);
+        g_TrackGame->LoadResourceString(0x13f3, text, 0x80);
+        list->AddRow(text, 0, 0);
+        g_TrackGame->LoadResourceString(0x13f4, text, 0x80);
+        list->AddRow(text, 1, 0);
+        g_TrackGame->LoadResourceString(0x13f5, text, 0x80);
+        list->AddRow(text, 2, 1);
         list->SelectRow(settings->raceMode);
         FindControl("ChkTagBall", 0)->UnknownVirtualSlot54(&settings->tagBall);
         FindControl("ChkStuntMode", 0)->UnknownVirtualSlot54(&settings->stuntMode);
-        int count = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28;
+        int count = g_TrackGame->mode.field_0x27f8.field_0x28;
         UpdateBoundValues(0);
         ApplyEventType();
         UnknownFunction4f69d0();
         UIListBox* opponents = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
-        if (g_UnknownGlobal56e26c->field_0x08->isHost && settings->eventType != 4 &&
-            opponents->rowCount - 1 != g_UnknownGlobal56e26c->mode.field_0x1bd8) {
+        if (g_TrackGame->network->isHost && settings->eventType != 4 &&
+            opponents->rowCount - 1 != g_TrackGame->mode.field_0x1bd8) {
             opponents->RemoveAllRows();
-            for (int i = 0; i <= g_UnknownGlobal56e26c->mode.field_0x1bd8; i++) {
+            for (int i = 0; i <= g_TrackGame->mode.field_0x1bd8; i++) {
                 sprintf(number, "%d", i);
-                opponents->UnknownFunction476d80(number, i, 0);
+                opponents->AddRow(number, i, 0);
             }
-            if (g_UnknownGlobal56e26c->mode.field_0x1bd8 < count)
-                opponents->SelectRow(g_UnknownGlobal56e26c->mode.field_0x1bd8);
+            if (g_TrackGame->mode.field_0x1bd8 < count)
+                opponents->SelectRow(g_TrackGame->mode.field_0x1bd8);
             else
                 opponents->SelectRow(count);
         }
-        if (!g_UnknownGlobal56e26c->field_0x08->isHost)
+        if (!g_TrackGame->network->isHost)
             ShowTrackPicture();
         break;
     }
@@ -1142,17 +1142,17 @@ void MPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             list->SelectRow((list->GetSelectedRow() + 1) % rows);
             list->UnknownVirtualSlot66(0);
         } else if (!_stricmp("RacesLeftArrow", event->controlName) || !_stricmp("RacesRightArrow", event->controlName)) {
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
+            g_TrackGame->mode.field_0x27f8.field_0x0c = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
         }
         break;
     case kDialogListSelect:
         if (!_stricmp("RaceModeDropDown", event->controlName)) {
             UIListBox* list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 = list->GetRowData(-1);
+            g_TrackGame->mode.field_0x27f8.field_0x00 = list->GetRowData(-1);
             UnknownFunction4f69d0();
             if (static_cast<UIListBox*>(event->control)->GetRowData(-1) != 2) {
-                g_UnknownGlobal56e26c->mode.field_0x10ec = 0;
-                g_UnknownGlobal56e26c->field_0x08->SetSessionJoinable(1);
+                g_TrackGame->mode.field_0x10ec = 0;
+                g_TrackGame->network->SetSessionJoinable(1);
             }
         } else if (!_stricmp("EventTypeDropDown", event->controlName)) {
             UpdateBoundValues(1);
@@ -1160,28 +1160,28 @@ void MPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             UnknownFunction4f69d0();
         } else if (!_stricmp("DDLTextBox", event->controlName)) {
             int index = static_cast<UIListBox*>(event->control)->GetRowData(-1);
-            UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00;
-            g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x08);
+            UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.field_0x27f8.field_0x00;
+            g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->field_0x60[index].field_0x08);
             {
-                char* name = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x14;
+                char* name = g_TrackGame->ui->field_0x60[index].field_0x14;
                 int length = strlen(name);
                 int count = length > 0xff ? 0xff : length;
                 strncpy(settings->trackName, name, count);
                 settings->trackName[count] = 0;
             }
-            settings->trackNumber = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x04;
-            settings->field_0x138 = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x0c;
-            settings->field_0x13c = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x10;
-            strcpy(g_UnknownGlobal56e26c->mode.field_0x6f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04],
+            settings->trackNumber = g_TrackGame->ui->field_0x60[index].field_0x04;
+            settings->field_0x138 = g_TrackGame->ui->field_0x60[index].field_0x0c;
+            settings->field_0x13c = g_TrackGame->ui->field_0x60[index].field_0x10;
+            strcpy(g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04],
                    static_cast<UIListBox*>(event->control)->GetRowText(-1));
         }
         break;
     case kDialogClose:
-        if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 != 4) {
+        if (g_TrackGame->mode.field_0x27f8.field_0x04 != 4) {
             UIListBox* opponents = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = opponents->GetRowData(-1);
+            g_TrackGame->mode.field_0x27f8.field_0x28 = opponents->GetRowData(-1);
         } else
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = 0;
+            g_TrackGame->mode.field_0x27f8.field_0x28 = 0;
         break;
     }
 }
@@ -1190,9 +1190,9 @@ void MPEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
 void MPEventDlg::UnknownFunction4f69d0() {
     char text[0x20];
     GameObjectIterator controls(controlContainer, 1, "UIControl");
-    int enable = g_UnknownGlobal56e26c->field_0x08->isHost && !(g_UnknownGlobal56e26c->mode.field_0x1bd4 & 1);
+    int enable = g_TrackGame->network->isHost && !(g_TrackGame->mode.field_0x1bd4 & 1);
     for (GameObject* control = controls.Next(); control; control = controls.Next())
-        ((UnknownGameUiControl*)control)->UnknownVirtualSlot49(enable);
+        ((UIControl*)control)->UnknownVirtualSlot49(enable);
     if (enable) {
         ShowGroup(0x141, 1);
         static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->UnknownInlineButton()->Show(1, 1);
@@ -1201,7 +1201,7 @@ void MPEventDlg::UnknownFunction4f69d0() {
         ShowGroup(0x141, 0);
         static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->UnknownInlineButton()->Show(0, 1);
         static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->UnknownInlineButton()->Show(0, 1);
-        if (g_UnknownGlobal56e26c->field_0x08->isHost && !(g_UnknownGlobal56e26c->mode.field_0x1bd4 & 2)) {
+        if (g_TrackGame->network->isHost && !(g_TrackGame->mode.field_0x1bd4 & 2)) {
             FindControl("DDLTextBox", 6)->UnknownVirtualSlot49(1);
             FindControl("TrackLeft", 0)->UnknownVirtualSlot49(1);
             FindControl("TrackLeft", 0)->Show(1, 1);
@@ -1211,8 +1211,8 @@ void MPEventDlg::UnknownFunction4f69d0() {
     }
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
     int mode = list->GetRowData(-1);
-    UnknownGameUiControl* lapsBox = FindControl("LapsControlBox", 5);
-    UnknownGameUiControl* racesBox = FindControl("RacesControlBox", 5);
+    UIControl* lapsBox = FindControl("LapsControlBox", 5);
+    UIControl* racesBox = FindControl("RacesControlBox", 5);
     switch (mode) {
     case 0:
         lapsBox->Show(0, 1);
@@ -1227,62 +1227,62 @@ void MPEventDlg::UnknownFunction4f69d0() {
         racesBox->Show(1, 1);
         break;
     }
-    UnknownGameUiControl* racesLeft = FindControl("RacesLeftArrow", 9);
-    UnknownGameUiControl* racesRight = FindControl("RacesRightArrow", 0xa);
-    UnknownGameUiControl* opponentsLeft = FindControl("OpponentsLeftArrow", 0);
-    UnknownGameUiControl* opponentsRight = FindControl("OpponentsRightArrow", 0);
-    UnknownGameUiControl* racesLabel = FindControl("RacesLabel", 0xc);
+    UIControl* racesLeft = FindControl("RacesLeftArrow", 9);
+    UIControl* racesRight = FindControl("RacesRightArrow", 0xa);
+    UIControl* opponentsLeft = FindControl("OpponentsLeftArrow", 0);
+    UIControl* opponentsRight = FindControl("OpponentsRightArrow", 0);
+    UIControl* racesLabel = FindControl("RacesLabel", 0xc);
     UIListBox* races = static_cast<UIListBox*>(FindControl("RacesListBox", 3));
-    UnknownGameUiControl* opponents = FindControl("OpponentsListBox", 3);
+    UIControl* opponents = FindControl("OpponentsListBox", 3);
     int selection;
-    if (g_UnknownGlobal56e26c->field_0x08->isHost && races->rowCount)
+    if (g_TrackGame->network->isHost && races->rowCount)
         selection = races->GetRowData(-1);
     else
-        selection = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c;
+        selection = g_TrackGame->mode.field_0x27f8.field_0x0c;
     races->RemoveAllRows();
     for (int i = 3; i <= 7; i += 2) {
         sprintf(text, "%d", i);
-        races->UnknownFunction476d80(text, i - 1, 0);
+        races->AddRow(text, i - 1, 0);
     }
     races->SelectRowByData(selection);
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 2 && g_UnknownGlobal56e26c->mode.field_0x10ec) {
-        if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+    if (g_TrackGame->mode.field_0x27f8.field_0x00 == 2 && g_TrackGame->mode.field_0x10ec) {
+        if (g_TrackGame->network->isHost) {
             opponentsLeft->Show(0, 1);
             opponentsRight->Show(0, 1);
             opponents->UnknownVirtualSlot49(0);
             racesLeft->Show(0, 1);
             racesRight->Show(0, 1);
         }
-        racesLabel->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x92b);
-        sprintf(text, "%d/%d", g_UnknownGlobal56e26c->eventManager->field_0x48 + 1, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x0c + 1);
+        racesLabel->SetTextFromResource(g_TrackGame->field_0x420, 0x92b);
+        sprintf(text, "%d/%d", g_TrackGame->eventManager->field_0x48 + 1, g_TrackGame->mode.field_0x27f8.field_0x0c + 1);
         races->RemoveAllRows();
-        races->UnknownFunction476d80(text, 0, 0);
+        races->AddRow(text, 0, 0);
     } else {
-        if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+        if (g_TrackGame->network->isHost) {
             opponentsLeft->Show(1, 1);
             opponentsRight->Show(1, 1);
             opponents->UnknownVirtualSlot49(1);
             racesLeft->Show(1, 1);
             racesRight->Show(1, 1);
         }
-        racesLabel->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x92a);
+        racesLabel->SetTextFromResource(g_TrackGame->field_0x420, 0x92a);
     }
 }
 
 // 0x004f6e60
 void MPEventDlg::ApplyEventType() {
     char text[0x100];
-    if (g_UnknownGlobal56e26c->field_0x08->isHost)
+    if (g_TrackGame->network->isHost)
         g_UnknownGlobal689dfc = 0;
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
     int type = list->GetRowData(-1);
-    int& eventType = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04;
+    int& eventType = g_TrackGame->mode.field_0x27f8.field_0x04;
     eventType = type;
     FindControl("OpponentsListBox", 3);
     UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
     FindControl("RacesListBox", 3);
-    UnknownGameUiControl* label = FindControl("LapsLabel", 0xc);
-    label->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x929);
+    UIControl* label = FindControl("LapsLabel", 0xc);
+    label->SetTextFromResource(g_TrackGame->field_0x420, 0x929);
     if (type != 4) {
         FindControl("OpponentsControlBox", 5)->Show(1, 1);
         FindControl("ChkTagBall", 2)->Show(0, 1);
@@ -1296,86 +1296,86 @@ void MPEventDlg::ApplyEventType() {
         laps->RemoveAllRows();
         for (int i = type == 2 || type == 3 ? 2 : 1; i <= 5; i++) {
             sprintf(text, "%d", i);
-            laps->UnknownFunction476d80(text, i, 0);
+            laps->AddRow(text, i, 0);
         }
-        laps->SelectRowByData(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20);
+        laps->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x20);
     } else {
-        label->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x92f);
+        label->SetTextFromResource(g_TrackGame->field_0x420, 0x92f);
         laps->RemoveAllRows();
         for (int i = 2; i <= 5; i++) {
             UnknownFunction518640(text, i * 60.0f);
-            laps->UnknownFunction476d80(text, i, 0);
+            laps->AddRow(text, i, 0);
         }
-        laps->SelectRowByData((int)g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x140);
+        laps->SelectRowByData((int)g_TrackGame->mode.field_0x27f8.field_0x140);
     }
-    if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+    if (g_TrackGame->network->isHost) {
         if (eventType == 0) {
-            g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(0);
+            g_TrackGame->mode.UnknownFunction5240e0(0);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 0);
-            g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(5);
+            g_TrackGame->mode.UnknownFunction5240e0(5);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 1);
         } else if (eventType == 4) {
-            g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(4);
+            g_TrackGame->mode.UnknownFunction5240e0(4);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 0);
-            g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(1);
+            g_TrackGame->mode.UnknownFunction5240e0(1);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 1);
-            g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(5);
+            g_TrackGame->mode.UnknownFunction5240e0(5);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 1);
-            g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(0);
+            g_TrackGame->mode.UnknownFunction5240e0(0);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 1);
         } else {
-            g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(type);
+            g_TrackGame->mode.UnknownFunction5240e0(type);
             FillTrackList(0, "PictureBox", "DDLTextBox", 0, this, 0);
         }
         list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
-        list->SelectRowByText(g_UnknownGlobal56e26c->mode.field_0x6f4[type]);
+        list->SelectRowByText(g_TrackGame->mode.field_0x6f4[type]);
     } else {
         MultiPlayerDlg* parent = parentDialog;
         list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
         list->RemoveAllRows();
-        list->UnknownFunction476d80(parent->field_0x80d0, 0, 0);
+        list->AddRow(parent->field_0x80d0, 0, 0);
         list->SelectRow(0);
     }
-    g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x08);
+    g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->mode.field_0x27f8.field_0x08);
 }
 
 // 0x004f7210
 void MPEventDlg::UnknownVirtualSlot31(int apply) {
-    UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00;
-    if (!g_UnknownGlobal56e26c->field_0x08 || !g_UnknownGlobal56e26c->field_0x08->isHost)
+    UnknownRaceSettings* settings = (UnknownRaceSettings*)&g_TrackGame->mode.field_0x27f8.field_0x00;
+    if (!g_TrackGame->network || !g_TrackGame->network->isHost)
         return;
     if (apply) {
         if (settings->eventType != 0 && settings->eventType != 4)
             settings->laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
         else
             settings->minutes = (float)static_cast<UIListBox*>(FindControl("LapsListBox", 3))->GetRowData(-1);
-        if (!g_UnknownGlobal56e26c->mode.field_0x10ec)
+        if (!g_TrackGame->mode.field_0x10ec)
             settings->races = static_cast<UIListBox*>(FindControl("RacesListBox", 3))->GetRowData(-1);
         strcpy(settings->trackName, "");
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
         int index = list->GetRowData(-1);
         {
-            char* name = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x14;
+            char* name = g_TrackGame->ui->field_0x60[index].field_0x14;
             int length = strlen(name);
             int count = length > 0xff ? 0xff : length;
             strncpy(settings->trackName, name, count);
             settings->trackName[count] = 0;
         }
-        g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x08);
-        settings->trackNumber = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x04;
-        settings->field_0x138 = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x0c;
-        settings->field_0x13c = g_UnknownGlobal56e26c->ui->field_0x60[index].field_0x10;
-        strcpy(g_UnknownGlobal56e26c->mode.field_0x6f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04], list->GetRowText(-1));
-        g_UnknownGlobal56e26c->mode.field_0x9f4[g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04] = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34;
+        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->ui->field_0x60[index].field_0x08);
+        settings->trackNumber = g_TrackGame->ui->field_0x60[index].field_0x04;
+        settings->field_0x138 = g_TrackGame->ui->field_0x60[index].field_0x0c;
+        settings->field_0x13c = g_TrackGame->ui->field_0x60[index].field_0x10;
+        strcpy(g_TrackGame->mode.field_0x6f4[g_TrackGame->mode.field_0x27f8.field_0x04], list->GetRowText(-1));
+        g_TrackGame->mode.field_0x9f4[g_TrackGame->mode.field_0x27f8.field_0x04] = g_TrackGame->mode.field_0x27f8.field_0x34;
         list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
         settings->eventType = list->GetRowData(-1);
         list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
         settings->raceMode = list->GetRowData(-1);
         UIListBox* opponents = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
         if (settings->eventType != 4)
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = opponents->GetRowData(-1);
+            g_TrackGame->mode.field_0x27f8.field_0x28 = opponents->GetRowData(-1);
         else
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = 0;
+            g_TrackGame->mode.field_0x27f8.field_0x28 = 0;
     } else {
         static_cast<UIListBox*>(FindControl("RacesListBox", 3))->SelectRowByData(settings->races);
         UIListBox* laps = static_cast<UIListBox*>(FindControl("LapsListBox", 3));
@@ -1384,14 +1384,14 @@ void MPEventDlg::UnknownVirtualSlot31(int apply) {
         else
             laps->SelectRowByData((int)settings->minutes);
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("EventTypeDropDown", 6))->listPart;
-        list->SelectRowByData(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04);
+        list->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x04);
         list = static_cast<UIDropDownList*>(FindControl("RaceModeDropDown", 6))->listPart;
-        list->SelectRowByData(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00);
-        if (g_UnknownGlobal56e26c->field_0x08->lobbyConnected && field_0x7f58) {
+        list->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x00);
+        if (g_TrackGame->network->lobbyConnected && field_0x7f58) {
             list = static_cast<UIDropDownList*>(FindControl("DDLTextBox", 6))->listPart;
             for (int i = 0; i < list->rowCount; i++) {
                 int row = list->GetRowData(i);
-                if (!_stricmp(g_UnknownGlobal56e26c->ui->field_0x60[row].field_0x14, settings->trackName)) {
+                if (!_stricmp(g_TrackGame->ui->field_0x60[row].field_0x14, settings->trackName)) {
                     list->SelectRowByData(row);
                     return;
                 }
@@ -1405,14 +1405,14 @@ void MPEventDlg::ShowTrackPicture() {
     char path[0x104];
     UIListBox* picture = static_cast<UIListBox*>(FindControl("PictureBox", 3));
     picture->RemoveAllRows();
-    g_UnknownGlobal56e26c->mode.UnknownFunction523a60(g_UnknownGlobal56e26c->mode.field_0x6a0, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36,
+    g_TrackGame->mode.FindFileDirectory(g_TrackGame->mode.field_0x6a0, g_TrackGame->mode.field_0x27f8.field_0x36,
                                                       "env", path);
-    UnknownFunction4f7640(picture, path, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36);
+    UnknownFunction4f7640(picture, path, g_TrackGame->mode.field_0x27f8.field_0x36);
 }
 
 // 0x004f7640: loads the track's picture from `directory` (else the
 // "unarts.tga" placeholder).
-void MPEventDlg::UnknownFunction4f7640(UnknownGameUiControl* picture, const char* directory, const char* name) {
+void MPEventDlg::UnknownFunction4f7640(UIControl* picture, const char* directory, const char* name) {
     char file[0x104];
     char path[0x104];
     char found[0x104];
@@ -1420,25 +1420,25 @@ void MPEventDlg::UnknownFunction4f7640(UnknownGameUiControl* picture, const char
         return;
     if (!*directory) {
         sprintf(path, "%s\\unarts.tga", "ui");
-        g_UnknownGlobal56e26c->UnknownVirtualSlot18(path, file);
+        g_TrackGame->UnknownVirtualSlot18(path, file);
         static_cast<UIListBox*>(picture)->AddImageFileRow(file, 0, 1, 0);
         return;
     }
     UnknownTextureStream* stream = new(__FILE__, 0xa72) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 1 || g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 5)
-        sprintf(file, "%s%02ds.tga", name, g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34);
-    else if (g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 1 || g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 5)
+    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 1 || g_TrackGame->mode.field_0x27f8.field_0x04 == 5)
+        sprintf(file, "%s%02ds.tga", name, g_TrackGame->mode.field_0x27f8.field_0x34);
+    else if (g_TrackGame->mode.UnknownFunction524100() == 1 || g_TrackGame->mode.UnknownFunction524100() == 5)
         sprintf(file, "%s01s.tga", name);
     else
         sprintf(file, "%ss.tga", name);
     sprintf(path, "%s\\%s", directory, file);
-    if (g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)file)) {
+    if (g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)file)) {
         static_cast<UIListBox*>(picture)->AddImageFileRow(file, 0, 1, 0);
-    } else if (g_UnknownGlobal56e26c->UnknownVirtualSlot18(path, found)) {
+    } else if (g_TrackGame->UnknownVirtualSlot18(path, found)) {
         static_cast<UIListBox*>(picture)->AddImageFileRow(found, 0, 1, 0);
     } else {
         sprintf(path, "%s\\unarts.tga", "ui");
-        g_UnknownGlobal56e26c->UnknownVirtualSlot18(path, file);
+        g_TrackGame->UnknownVirtualSlot18(path, file);
         static_cast<UIListBox*>(picture)->AddImageFileRow(file, 0, 1, 0);
     }
     if (stream)
@@ -1447,10 +1447,10 @@ void MPEventDlg::UnknownFunction4f7640(UnknownGameUiControl* picture, const char
 
 // 0x004f8570
 void MPBikeRiderDlg::PaintPlateNumber(int number) {
-    UnknownBikeNumberPainter painter(g_UnknownGlobal56e26c->field_0x1c);
-    for (int i = 0; i < g_UnknownGlobal56e26c->ui->field_0x4c; i++)
+    UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
+    for (int i = 0; i < g_TrackGame->ui->field_0x4c; i++)
         painter.UnknownFunction417670(
-            ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[i].field_0xc0->plateTexture, number);
+            ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[i].field_0xc0->plateTexture, number);
 }
 
 // 0x004f8620
@@ -1466,11 +1466,11 @@ int MPBikeRiderDlg::UnknownVirtualSlot24(int type, void* data, int from, int to,
 
 // 0x004f8650
 void MPBikeRiderDlg::UnknownFunction4f8650() {
-    if (!g_UnknownGlobal56e26c->field_0x08->isHost) {
+    if (!g_TrackGame->network->isHost) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
-        list->SelectRowByData(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c);
-        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_UnknownGlobal56e26c->mode.field_0xfd8)->engineSize) >
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x1c &&
+        list->SelectRowByData(g_TrackGame->mode.field_0x27f8.field_0x1c);
+        if (UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.field_0xfd8)->engineSize) >
+                g_TrackGame->mode.field_0x27f8.field_0x1c &&
             g_UnknownGlobal689df4)
             parentDialog->UnknownFunction4f57c0(1);
     }
@@ -1478,7 +1478,7 @@ void MPBikeRiderDlg::UnknownFunction4f8650() {
 
 // 0x004f8700
 void MPBikeRiderDlg::UnknownFunction4f8700() {
-    if (g_UnknownGlobal56e26c->field_0x08->isHost) {
+    if (g_TrackGame->network->isHost) {
         FindControl("LargestOpponentDropDown", 0)->UnknownVirtualSlot49(1);
         static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->UnknownInlineButton()->Show(1, 1);
     } else {
@@ -1508,19 +1508,19 @@ int MPBikeRiderDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInpu
 void MPBikeRiderDlg::ApplyChosenBike() {
     char text[12];
     UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
-    KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+    KrustyUI* ui = g_TrackGame->ui;
     UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->field_0x50)[bikes->GetRowData(-1)];
     UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)ui->field_0x48)[bike->model];
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
     for (i = 0; i < ui->field_0x4c; i++) {
         ((UnknownKrustyUIModel*)ui->field_0x48)[i].field_0xc0->UnknownVirtualSlot4();
-        ui = g_UnknownGlobal56e26c->ui;
+        ui = g_TrackGame->ui;
     }
     model->field_0xc0->UnknownVirtualSlot5();
     field_0x7f84 = 1;
     if (bike->field_0x88) {
-        UnknownGameUiControl* engine = FindControl("DDLEngineSize", 0);
+        UIControl* engine = FindControl("DDLEngineSize", 0);
         if (!engine->field_0x70) {
             engine->Show(1, 1);
             FindControl("TxtEngineSize", 0)->Show(1, 1);
@@ -1530,7 +1530,7 @@ void MPBikeRiderDlg::ApplyChosenBike() {
                 engine->UnknownVirtualSlot49(0);
         }
     } else {
-        UnknownGameUiControl* engine = FindControl("DDLEngineSize", 0);
+        UIControl* engine = FindControl("DDLEngineSize", 0);
         if (engine->field_0x70) {
             engine->Show(0, 1);
             FindControl("TxtEngineSize", 0)->Show(0, 1);
@@ -1538,30 +1538,30 @@ void MPBikeRiderDlg::ApplyChosenBike() {
                 dialogBackground->UnknownFunction404da0();
         }
     }
-    g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4 = bikes->GetRowData(-1);
+    g_TrackGame->mode.field_0x1974.field_0xc4 = bikes->GetRowData(-1);
     if (bike->field_0x88) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
         UNKNOWN_GARAGE_SETTINGS->engineSize = g_UnknownGlobal56cb6c[size];
         UNKNOWN_GARAGE_SETTINGS->field_0x04 = size == 2 || size == 4 ? 1 : 0;
         UNKNOWN_APPLY_BIKE_CLASS(size, i);
-        ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4]
+        ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[g_TrackGame->mode.field_0x1974.field_0xc4]
             .engineSize = UNKNOWN_GARAGE_SETTINGS->engineSize;
-        ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[g_UnknownGlobal56e26c->mode.field_0x1974.field_0xc4]
+        ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[g_TrackGame->mode.field_0x1974.field_0xc4]
             .field_0x90 = UNKNOWN_GARAGE_SETTINGS->field_0x04;
     } else {
         int row = bikes->GetRowData(-1);
-        UNKNOWN_GARAGE_SETTINGS->engineSize = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[row].engineSize;
-        UNKNOWN_GARAGE_SETTINGS->field_0x04 = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[row].field_0x90;
+        UNKNOWN_GARAGE_SETTINGS->engineSize = ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].engineSize;
+        UNKNOWN_GARAGE_SETTINGS->field_0x04 = ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].field_0x90;
         int bikeClass = UnknownBikeClassOf(UNKNOWN_GARAGE_SETTINGS->engineSize);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
     UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
-    if (g_UnknownGlobal56e26c->mode.field_0x1bd0 > 0 && g_UnknownGlobal56e26c->mode.field_0x1bd0 < 101) {
-        g_UnknownGlobal56e26c->mode.field_0x1bcc = g_UnknownGlobal56e26c->mode.field_0x1bd0;
-        sprintf(text, "%d", g_UnknownGlobal56e26c->mode.field_0x1bcc);
+    if (g_TrackGame->mode.field_0x1bd0 > 0 && g_TrackGame->mode.field_0x1bd0 < 101) {
+        g_TrackGame->mode.field_0x1bcc = g_TrackGame->mode.field_0x1bd0;
+        sprintf(text, "%d", g_TrackGame->mode.field_0x1bcc);
     } else {
-        _itoa(g_UnknownGlobal56e26c->mode.field_0x1bcc, text, 10);
+        _itoa(g_TrackGame->mode.field_0x1bcc, text, 10);
     }
     plate->SetEditText(text);
 }
@@ -1573,40 +1573,40 @@ void MPBikeRiderDlg::UnknownVirtualSlot31(int apply) {
     {
         int length = strlen("");
         int count = length > 0x3f ? 0x3f : length;
-        strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00, "", count);
-        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00[count] = 0;
+        strncpy(g_TrackGame->mode.field_0x1974.field_0x00, "", count);
+        g_TrackGame->mode.field_0x1974.field_0x00[count] = 0;
     }
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     int bike = list->GetRowData(-1);
     {
-        UnknownKrustyUIBike* bikes = (UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50;
-        char* name = ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[bikes[bike].model].modelName;
+        UnknownKrustyUIBike* bikes = (UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50;
+        char* name = ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[bikes[bike].model].modelName;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
-        strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00, name, count);
-        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x00[count] = 0;
+        strncpy(g_TrackGame->mode.field_0x1974.field_0x00, name, count);
+        g_TrackGame->mode.field_0x1974.field_0x00[count] = 0;
     }
     {
-        char* name = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].field_0x48;
+        char* name = ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bike].field_0x48;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
-        strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x40, name, count);
-        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x40[count] = 0;
+        strncpy(g_TrackGame->mode.field_0x1974.field_0x40, name, count);
+        g_TrackGame->mode.field_0x1974.field_0x40[count] = 0;
     }
     {
         int length = strlen("");
         int count = length > 0x3f ? 0x3f : length;
-        strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80, "", count);
-        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80[count] = 0;
+        strncpy(g_TrackGame->mode.field_0x1974.field_0x80, "", count);
+        g_TrackGame->mode.field_0x1974.field_0x80[count] = 0;
     }
     list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
     int rider = list->GetRowData(-1);
     {
-        char* name = ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[rider].modelName;
+        char* name = ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[rider].modelName;
         int length = strlen(name);
         int count = length > 0x3f ? 0x3f : length;
-        strncpy(g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80, name, count);
-        g_UnknownGlobal56e26c->mode.field_0x1974.field_0x80[count] = 0;
+        strncpy(g_TrackGame->mode.field_0x1974.field_0x80, name, count);
+        g_TrackGame->mode.field_0x1974.field_0x80[count] = 0;
     }
 }
 
@@ -1619,14 +1619,14 @@ void MPOptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
             event->control->UnknownVirtualSlot59(1);
         break;
     case kDialogInit: {
-        FindControl("FastFinishesCheckBox", 0)->UnknownVirtualSlot54(&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x18);
-        FindControl("ChkTreeCollision", 0)->UnknownVirtualSlot54(&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10);
-        FindControl("ChkRiderCollision", 0)->UnknownVirtualSlot54(&g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x14);
-        FindControl("RadLODEasy", 0)->UnknownVirtualSlot54(&g_UnknownGlobal56e26c->mode.field_0x94);
+        FindControl("FastFinishesCheckBox", 0)->UnknownVirtualSlot54(&g_TrackGame->mode.field_0x27f8.field_0x18);
+        FindControl("ChkTreeCollision", 0)->UnknownVirtualSlot54(&g_TrackGame->mode.field_0x27f8.field_0x10);
+        FindControl("ChkRiderCollision", 0)->UnknownVirtualSlot54(&g_TrackGame->mode.field_0x27f8.field_0x14);
+        FindControl("RadLODEasy", 0)->UnknownVirtualSlot54(&g_TrackGame->mode.field_0x94);
         FindControl("ChkRecordRace", 0)->Show(0, 1);
         static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb))->SetAcceptedCharacters("0123456789");
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb));
-        edit->SetEditText(_itoa(g_UnknownGlobal56e26c->mode.field_0x6dc, text, 10));
+        edit->SetEditText(_itoa(g_TrackGame->mode.field_0x6dc, text, 10));
         UpdateBoundValues(0);
         UnknownFunction4f95b0();
         break;
@@ -1634,7 +1634,7 @@ void MPOptionsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     case kDialogClose:
     {
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditMaxAIBikes", 0xb));
-        g_UnknownGlobal56e26c->mode.field_0x6dc = atoi(edit->GetEditText(text, 0x80));
+        g_TrackGame->mode.field_0x6dc = atoi(edit->GetEditText(text, 0x80));
     }
         break;
     }
@@ -1656,9 +1656,9 @@ void MPOptionsDlg::UnknownFunction4f95a0() {
 
 // 0x004f95b0
 void MPOptionsDlg::UnknownFunction4f95b0() {
-    EnableGroup(0x3f3, g_UnknownGlobal56e26c->field_0x08->isHost &&
-                                     !g_UnknownGlobal56e26c->mode.field_0x1bd4);
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 == 4)
+    EnableGroup(0x3f3, g_TrackGame->network->isHost &&
+                                     !g_TrackGame->mode.field_0x1bd4);
+    if (g_TrackGame->mode.field_0x27f8.field_0x04 == 4)
         FindControl("ChkRecordRace", 0)->UnknownVirtualSlot49(0);
     else
         FindControl("ChkRecordRace", 0)->UnknownVirtualSlot49(1);

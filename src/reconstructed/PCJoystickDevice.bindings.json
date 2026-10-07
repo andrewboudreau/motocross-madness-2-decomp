@@ -35,7 +35,7 @@
   "?UnknownReportError@@YAXJPBDH@Z": "0x004bf6a0",
   "?UnknownVirtualSlot15@PCJoystickDevice@@UAEXXZ": "0x004c4320",
   "?UnknownVirtualSlot16@PCJoystickDevice@@UAEHXZ": "0x004c4350",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_GUID_ConstantForce": "0x00556b90",
   "_GUID_RxAxis": "0x00556aa0",
   "_GUID_RyAxis": "0x00556ab0",

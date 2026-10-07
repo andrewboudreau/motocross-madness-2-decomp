@@ -81,7 +81,7 @@ int UnknownDisplay::UnknownFunction4ca5a0(int* value, RenderTarget* target) {
     desc.flags = 0x1007;                          // caps, height, width, pixel format
     desc.caps[0] = 0x20005000;
     if (field_0x190->UnknownMethod6(&desc, &surface, 0) == 0) {
-        if (surface->UnknownMethod14(&caps)) {
+        if (surface->GetCaps(&caps)) {
             *value = 0;
             result = 0;
         } else if (caps.caps & 0x20000000) {
@@ -186,8 +186,8 @@ void UnknownDisplay::UnknownFunction4cab00(RenderTarget* target) {
                                  ->UnknownFunction4c4f80(this, &IID_IDirect3DHALDevice, field_0x1a0, 1, field_0x78);
                     if (render) {
                         result = 1;
-                        g_UnknownGlobal56e26c->field_0x10 = render;
-                        g_UnknownGlobal56e26c->field_0x0c = this;
+                        g_TrackGame->renderTarget = render;
+                        g_TrackGame->display = this;
                         break;
                     }
                     result = -3;
@@ -245,8 +245,8 @@ void UnknownDisplay::UnknownFunction4cab00(RenderTarget* target) {
         }
         if (!target && render) {
             delete render;
-            g_UnknownGlobal56e26c->field_0x10 = 0;
-            g_UnknownGlobal56e26c->field_0x0c = 0;
+            g_TrackGame->renderTarget = 0;
+            g_TrackGame->display = 0;
         }
     }
     field_0x5bc = result;
@@ -263,11 +263,11 @@ void UnknownDisplay::UnknownFunction4cb5b0(int enable) {
             if (gdi)
                 gdi->UnknownMethod2();
             gdi = 0;
-            if (field_0x19c->UnknownMethod11(0, 1))
+            if (field_0x19c->Flip(0, 1))
                 return;
             if (field_0x190->UnknownMethod14(&gdi))
                 return;
-            g_UnknownGlobal56e26c->field_0x10->UnknownFunction4e8cc0();
+            g_TrackGame->renderTarget->UnknownFunction4e8cc0();
             if (++i > field_0x78)
                 return;
         }

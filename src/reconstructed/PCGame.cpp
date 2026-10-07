@@ -159,7 +159,7 @@ int PCGame::StartUp(char* message) {
     if (!field_0x420)
         field_0x420 = field_0x318;
     size = sizeof(renderer);
-    UnknownVirtualSlot23("Renderer", "HAL", renderer, &size);
+    GetRegistryString("Renderer", "HAL", renderer, &size);
     field_0x2d0 = 0;
     if (!_stricmp(renderer, "RGB")) {
         deviceGuid = IID_IDirect3DRGBDevice;
@@ -177,7 +177,7 @@ int PCGame::StartUp(char* message) {
     } else {
         deviceGuid = IID_IDirect3DHALDevice;
     }
-    field_0x2d4_bit1 = UnknownVirtualSlot22("FullScreen", field_0x2d4_bit1);
+    field_0x2d4_bit1 = GetRegistryFlag("FullScreen", field_0x2d4_bit1);
     if (!UnknownVirtualSlot37()) {
         if (message)
             LoadStringA(field_0x420, 0x13d6, message, 0x100);
@@ -196,34 +196,34 @@ int PCGame::StartUp(char* message) {
             ShowCursor(0);
         }
         DeleteDisplayProfiles();
-        UnknownVirtualSlot27("UseLastVideoCard", 0);
+        SetRegistryFlag("UseLastVideoCard", 0);
         ProfileEveryDisplay();
     }
     ProfileDisplays();
-    field_0x0c = g_UnknownDisplays68a754[0];
+    display = g_UnknownDisplays68a754[0];
     int flag = field_0x2d5_bit3 && !field_0x544;
-    int useLast = UnknownVirtualSlot22("UseLastVideoCard", 0);
-    field_0x0c = UnknownFunction4ccd60(flag, useLast, &field_0x2d0);
-    if (!field_0x0c) {
+    int useLast = GetRegistryFlag("UseLastVideoCard", 0);
+    display = UnknownFunction4ccd60(flag, useLast, &field_0x2d0);
+    if (!display) {
         *message = 0;
         return 0;
     }
     if (field_0x2d0)
         deviceGuid = g_UnknownBladeDevice556040;
-    sprintf(name, "DriverInfo\\%s\\AllowDither", field_0x0c->field_0x4bc);
-    field_0x2d4_bit3 = UnknownVirtualSlot22(name, field_0x2d4_bit3);
-    sprintf(name, "DriverInfo\\%s\\AllowMipMapping", field_0x0c->field_0x4bc);
-    field_0x2d4_bit4 = UnknownVirtualSlot22(name, field_0x2d4_bit4);
-    sprintf(name, "DriverInfo\\%s\\AllowBiLinear", field_0x0c->field_0x4bc);
-    field_0x2d4_bit5 = UnknownVirtualSlot22(name, field_0x2d4_bit5);
-    sprintf(name, "DriverInfo\\%s\\AllowSortIndependantAntiAliasing", field_0x0c->field_0x4bc);
-    field_0x2d4_bit6 = UnknownVirtualSlot22(name, field_0x2d4_bit6);
-    sprintf(name, "DriverInfo\\%s\\AllowTriLinear", field_0x0c->field_0x4bc);
-    field_0x2d4_bit7 = UnknownVirtualSlot22(name, field_0x2d4_bit7);
-    int joystick = UnknownFunction4cd610(UnknownVirtualSlot22("UseLastController", 0));
+    sprintf(name, "DriverInfo\\%s\\AllowDither", display->field_0x4bc);
+    field_0x2d4_bit3 = GetRegistryFlag(name, field_0x2d4_bit3);
+    sprintf(name, "DriverInfo\\%s\\AllowMipMapping", display->field_0x4bc);
+    field_0x2d4_bit4 = GetRegistryFlag(name, field_0x2d4_bit4);
+    sprintf(name, "DriverInfo\\%s\\AllowBiLinear", display->field_0x4bc);
+    field_0x2d4_bit5 = GetRegistryFlag(name, field_0x2d4_bit5);
+    sprintf(name, "DriverInfo\\%s\\AllowSortIndependantAntiAliasing", display->field_0x4bc);
+    field_0x2d4_bit6 = GetRegistryFlag(name, field_0x2d4_bit6);
+    sprintf(name, "DriverInfo\\%s\\AllowTriLinear", display->field_0x4bc);
+    field_0x2d4_bit7 = GetRegistryFlag(name, field_0x2d4_bit7);
+    int joystick = UnknownFunction4cd610(GetRegistryFlag("UseLastController", 0));
     if (joystick >= 0) {
-        field_0x14->activeJoystickIndex = joystick;
-        field_0x14->activeJoystick = field_0x14->joysticks[joystick];
+        controlInterface->activeJoystickIndex = joystick;
+        controlInterface->activeJoystick = controlInterface->joysticks[joystick];
     } else if (joystick == -2) {
         *message = 0;
         return 0;
@@ -241,27 +241,27 @@ int PCGame::UnknownVirtualSlot15() {
 // 0x004c0250: while the window is active, hides the cursor (full screen),
 // restores lost surfaces and runs the root object's slot 18.
 int PCGame::UnknownVirtualSlot5() {
-    if (field_0x0c && GetActiveWindow() == field_0x31c) {
+    if (display && GetActiveWindow() == field_0x31c) {
         if (field_0x2d4_bit1)
             while (ShowCursor(0) >= 0)
                 ;
-        if ((field_0x0c && field_0x0c->field_0x19c &&
-             field_0x0c->field_0x19c->UnknownMethod24() &&
-             field_0x0c->field_0x19c->UnknownMethod27()) ||
-            (field_0x2d5_bit3 && field_0x10 && PCTarget()->zbuffer &&
-             PCTarget()->zbuffer->UnknownMethod24() &&
-             PCTarget()->zbuffer->UnknownMethod27()))
+        if ((display && display->field_0x19c &&
+             display->field_0x19c->IsLost() &&
+             display->field_0x19c->Restore()) ||
+            (field_0x2d5_bit3 && renderTarget && PCTarget()->zbuffer &&
+             PCTarget()->zbuffer->IsLost() &&
+             PCTarget()->zbuffer->Restore()))
             return 0;
-        if (field_0x2f4)
-            field_0x2f4->UnknownVirtualSlot18();
+        if (rootObject)
+            rootObject->UnknownVirtualSlot18();
     }
     return 1;
 }
 
 // 0x004c0310
 int PCGame::UnknownVirtualSlot6() {
-    if (field_0x2f4)
-        field_0x2f4->UnknownVirtualSlot17();
+    if (rootObject)
+        rootObject->UnknownVirtualSlot17();
     if (field_0x2d4_bit1)
         ShowCursor(1);
     return 1;
@@ -271,14 +271,14 @@ int PCGame::UnknownVirtualSlot6() {
 int PCGame::UnknownVirtualSlot35(int value) {
     if (field_0x2d5_bit0)
         return 1;
-    return field_0x2f4->UnknownVirtualSlot20(value);
+    return rootObject->UnknownVirtualSlot20(value);
 }
 
 // 0x004c0370
 int PCGame::UnknownVirtualSlot36(int value) {
     if (field_0x2d5_bit0)
         return 1;
-    return field_0x2f4->UnknownVirtualSlot21(value);
+    return rootObject->UnknownVirtualSlot21(value);
 }
 
 // 0x004c03a0: control 0xb7 released (kind 0) triggers the +0x10 object.
@@ -286,7 +286,7 @@ int PCGame::UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* 
     if (Game::UnknownVirtualSlot13(event, entry))
         return 1;
     if (event->kind == 0 && event->control == 0xb7) {
-        if (field_0x10 && !field_0x10->field_0x08)
+        if (renderTarget && !renderTarget->field_0x08)
             PCTarget()->SaveScreenshot();
         return 1;
     }
@@ -310,31 +310,31 @@ int PCGame::UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* 
 // reattaches the camera.
 int PCGame::UnknownVirtualSlot19(int mode) {
     Camera* camera = 0;
-    if (field_0x10)
-        camera = field_0x10->field_0x08;
+    if (renderTarget)
+        camera = renderTarget->field_0x08;
     if (field_0x2d4_bit1) {
-        if (mode != field_0x0c->field_0x0c) {
-            if (field_0x10) {
-                delete field_0x10;
-                field_0x10 = 0;
+        if (mode != display->field_0x0c) {
+            if (renderTarget) {
+                delete renderTarget;
+                renderTarget = 0;
             }
-            field_0x0c->UnknownFunction4ca900(mode, field_0x2d0 == 0);
+            display->UnknownFunction4ca900(mode, field_0x2d0 == 0);
             if (!UnknownVirtualSlot33())
                 return 0;
         }
     } else if (field_0x308.bottom - field_0x308.top != 480) {
-        if (field_0x10) {
-            delete field_0x10;
-            field_0x10 = 0;
+        if (renderTarget) {
+            delete renderTarget;
+            renderTarget = 0;
         }
-        field_0x0c->UnknownFunction4ca790(640, 480, field_0x2d0 == 0);
+        display->UnknownFunction4ca790(640, 480, field_0x2d0 == 0);
         if (!UnknownVirtualSlot33())
             return 0;
     }
-    if (field_0x10 && camera) {
-        camera->field_0x18 = field_0x10;
-        field_0x10->UnknownFunction4e8cf0(camera);
-        field_0x10->UnknownVirtualSlot14(camera->field_0x1a0);
+    if (renderTarget && camera) {
+        camera->field_0x18 = renderTarget;
+        renderTarget->UnknownFunction4e8cf0(camera);
+        renderTarget->UnknownVirtualSlot14(camera->field_0x1a0);
     }
     return 1;
 }
@@ -348,10 +348,10 @@ void PCGame::SetWindowRect(const UnknownRect* rect) {
 // keeps the last of each), modes other than 16-bit, and modes the video
 // memory cannot hold with "MinimumTextureMB" left over.
 int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
-    int reserve = g_UnknownGlobal56e26c->UnknownVirtualSlot20("MinimumTextureMB", 2) << 20;
+    int reserve = g_TrackGame->GetRegistryInt("MinimumTextureMB", 2) << 20;
     if (field_0x2d4_bit1 && !display->field_0xb74_bit1) {
         int i;
-        if (UnknownVirtualSlot22("HighestRefreshOnly", 1)) {
+        if (GetRegistryFlag("HighestRefreshOnly", 1)) {
             for (i = 0; i < display->field_0x08; i++) {
                 if (i > 0 && display->field_0x10[i].width == display->field_0x10[i - 1].width &&
                     display->field_0x10[i].height == display->field_0x10[i - 1].height &&
@@ -396,35 +396,35 @@ int PCGame::UnknownVirtualSlot34(UnknownDisplay* display) {
 // filters from the "DriverInfo\<driver>\Allow..." bits (+0x2d4) and the
 // device capabilities.
 int PCGame::UnknownVirtualSlot7() {
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_DITHERENABLE,
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_DITHERENABLE,
                                     field_0x2d4_bit3 && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_DITHER), 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_EDGEANTIALIAS, 0, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_EDGEANTIALIAS, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 0, 1);
     if (field_0x2d4_bit6 && (PCTarget()->triRasterCaps & D3DPRASTERCAPS_ANTIALIASSORTINDEPENDENT))
-        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 2, 1); // D3DANTIALIAS_SORTINDEPENDENT
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_RANGEFOGENABLE, 0, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, PCTarget()->fillMode, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, field_0x2d5_bit3, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, field_0x2d5_bit3, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 1);
-    field_0x10->UnknownVirtualSlot10(7, 0);
+        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ANTIALIAS, 2, 1); // D3DANTIALIAS_SORTINDEPENDENT
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_FOGENABLE, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_RANGEFOGENABLE, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, PCTarget()->fillMode, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZENABLE, field_0x2d5_bit3, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZWRITEENABLE, field_0x2d5_bit3, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHABLENDENABLE, 0, 1);
+    renderTarget->UnknownVirtualSlot10(7, 0);
     if (field_0x2d0) {
-        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 1);
-        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 1);
+        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_FLAT, 1);
+        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 0, 1);
     } else {
-        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 1);
-        field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 1);
+        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_SHADEMODE, D3DSHADE_GOURAUD, 1);
+        renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_TEXTUREPERSPECTIVE, 1, 1);
     }
-    PCTarget()->device->UnknownMethod37(0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_SPECULARENABLE, 0, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZVISIBLE, 0, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_LASTPIXEL, 0, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_STIPPLEDALPHA, 0, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 1, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAREF, 0, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 1);
+    PCTarget()->device->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_SPECULARENABLE, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZVISIBLE, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_LASTPIXEL, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_STIPPLEDALPHA, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHATESTENABLE, 1, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAREF, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ALPHAFUNC, D3DCMP_GREATER, 1);
     magFilter = field_0x2d4_bit5 && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFG_LINEAR
                                                                                                : D3DTFG_POINT;
     minFilter = field_0x2d4_bit5 && (PCTarget()->triTextureFilterCaps & D3DPTFILTERCAPS_LINEAR) ? D3DTFN_LINEAR
@@ -436,13 +436,13 @@ int PCGame::UnknownVirtualSlot7() {
         else
             mipFilter = D3DTFP_POINT;
     }
-    PCTarget()->device->UnknownMethod37(0, D3DTSS_MAGFILTER, magFilter);
-    PCTarget()->device->UnknownMethod37(0, D3DTSS_MINFILTER, minFilter);
-    PCTarget()->device->UnknownMethod37(0, D3DTSS_MIPFILTER, mipFilter);
-    PCTarget()->device->UnknownMethod37(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    PCTarget()->device->UnknownMethod37(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_LIGHTING, 0, 1);
-    field_0x10->UnknownVirtualSlot8(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
+    PCTarget()->device->SetTextureStageState(0, D3DTSS_MAGFILTER, magFilter);
+    PCTarget()->device->SetTextureStageState(0, D3DTSS_MINFILTER, minFilter);
+    PCTarget()->device->SetTextureStageState(0, D3DTSS_MIPFILTER, mipFilter);
+    PCTarget()->device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    PCTarget()->device->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_LIGHTING, 0, 1);
+    renderTarget->UnknownVirtualSlot8(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL, 1);
     return 1;
 }
 
@@ -461,26 +461,26 @@ int PCGame::LimitDisplayModes(UnknownDisplay* display, int width, int height) {
 // 0x004c0a90: creates the PCRenderTarget on the display's surface and
 // records the display's two mode values (+0x58, +0x5c).
 RenderTarget* PCGame::UnknownVirtualSlot31() {
-    int frames = field_0x0c->field_0x1a8 ? 1 : field_0x0c->field_0x78;
+    int frames = display->field_0x1a8 ? 1 : display->field_0x78;
     UnknownSurfaceInterface* surface =
-        field_0x0c->field_0x1a8 ? field_0x0c->field_0x1a8 : field_0x0c->field_0x1a0;
+        display->field_0x1a8 ? display->field_0x1a8 : display->field_0x1a0;
     RenderTarget* target = (new(__FILE__, 984) PCRenderTarget)
-        ->UnknownFunction4c4f80(field_0x0c, &deviceGuid, surface, field_0x2d5_bit3, frames);
+        ->UnknownFunction4c4f80(display, &deviceGuid, surface, field_0x2d5_bit3, frames);
     if (!target)
         return 0;
     if (field_0x2d4_bit1) {
-        field_0x0c->field_0x58 = field_0x0c->field_0x10[field_0x0c->field_0x0c].field_0x1c;
-        field_0x0c->field_0x5c = field_0x0c->field_0x10[field_0x0c->field_0x0c].field_0x20;
+        display->field_0x58 = display->field_0x10[display->field_0x0c].field_0x1c;
+        display->field_0x5c = display->field_0x10[display->field_0x0c].field_0x20;
     } else {
         int value;
-        if (field_0x0c->UnknownFunction4ca5a0(&value, field_0x10)) {
-            field_0x0c->field_0x5c = value;
+        if (display->UnknownFunction4ca5a0(&value, renderTarget)) {
+            display->field_0x5c = value;
             PCTarget()->MeasureTextureMemory(&value);
-            field_0x0c->field_0x58 = value;
+            display->field_0x58 = value;
         } else {
-            field_0x0c->field_0x5c = 0;
+            display->field_0x5c = 0;
             PCTarget()->MeasureTextureMemory(&value);
-            field_0x0c->field_0x58 = value;
+            display->field_0x58 = value;
         }
     }
     return target;
@@ -494,7 +494,7 @@ int PCGame::UnknownVirtualSlot37() {
         while (i > 0) {
             i--;
             if (!_stricmp(__argv[i], "lobby")) {
-                if (!UnknownVirtualSlot16(4))
+                if (!CreateNetworkInterface(4))
                     return 0;
                 break;
             }
@@ -508,15 +508,15 @@ int PCGame::UnknownVirtualSlot37() {
 int PCGame::UnknownVirtualSlot32() {
     GetWindowRect(field_0x31c, &field_0x308);
     if (field_0x2d4_bit1) {
-        if (!field_0x0c->UnknownFunction4c9c90())
+        if (!display->UnknownFunction4c9c90())
             return 0;
         while (ShowCursor(0) >= 0)
             ;
     } else {
-        if (!field_0x0c->UnknownFunction4c9d20(0, 0, 640, 480))
+        if (!display->UnknownFunction4c9d20(0, 0, 640, 480))
             return 0;
     }
-    if (!field_0x0c->UnknownVirtualSlot2(640, 480, 16, 2, 0, field_0x2d0 == 0, 1))
+    if (!display->UnknownVirtualSlot2(640, 480, 16, 2, 0, field_0x2d0 == 0, 1))
         return 0;
     return UnknownVirtualSlot33() != 0;
 }
@@ -538,11 +538,11 @@ int PCGame::UnknownVirtualSlot32() {
 int PCGame::SaveDisplayProfile(UnknownDisplay* display) {
     char name[256];
     sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", display->field_0x4bc);
-    UnknownVirtualSlot29(name, &display->field_0x5c0, sizeof(display->field_0x5c0));
+    SetRegistryBinary(name, &display->field_0x5c0, sizeof(display->field_0x5c0));
     sprintf(name, "DriverInfo\\%s\\ProfiledCard", display->field_0x4bc);
-    UnknownVirtualSlot27(name, 0);
+    SetRegistryFlag(name, 0);
     sprintf(name, "DriverInfo\\%s\\ProfileVersion", display->field_0x4bc);
-    UnknownVirtualSlot25(name, 7);
+    SetRegistryInt(name, 7);
     return 1;
 }
 
@@ -554,10 +554,10 @@ int PCGame::IsAnyProfileStale() {
         UnknownDeviceIdentifier saved;
         unsigned long size = sizeof(saved);
         sprintf(name, "DriverInfo\\%s\\ProfileVersion", g_UnknownDisplays68a754[i]->field_0x4bc);
-        if (UnknownVirtualSlot20(name, 0) != 7)
+        if (GetRegistryInt(name, 0) != 7)
             return 1;
         sprintf(name, "DriverInfo\\%s\\DeviceIdentifier", g_UnknownDisplays68a754[i]->field_0x4bc);
-        if (!UnknownVirtualSlot24(name, &saved, &size) || size != sizeof(saved) ||
+        if (!GetRegistryBinary(name, &saved, &size) || size != sizeof(saved) ||
             strcmp(g_UnknownDisplays68a754[i]->field_0x5c0.driver, saved.driver) ||
             strcmp(g_UnknownDisplays68a754[i]->field_0x5c0.description, saved.description) ||
             memcmp(g_UnknownDisplays68a754[i]->field_0x5c0.driverVersion, saved.driverVersion,
@@ -588,13 +588,13 @@ int PCGame::ProfileEveryDisplay() {
 int PCGame::LoadDisplayProfile(UnknownDisplay* display) {
     char name[256];
     sprintf(name, "DriverInfo\\%s\\TextureCacheLimit", display->field_0x4bc);
-    display->field_0x60 = UnknownVirtualSlot20(name, 0);
+    display->field_0x60 = GetRegistryInt(name, 0);
     if (display->field_0x60 <= 0)
         display->field_0x60 = 0x7fffffff;
     sprintf(name, "DriverInfo\\%s\\TotalVideoMemory", display->field_0x4bc);
-    display->field_0x54 = UnknownVirtualSlot20(name, 0);
+    display->field_0x54 = GetRegistryInt(name, 0);
     sprintf(name, "DriverInfo\\%s\\NumberOfModes", display->field_0x4bc);
-    int count = UnknownVirtualSlot20(name, 0);
+    int count = GetRegistryInt(name, 0);
     if (count != display->field_0x08)
         return 0;
     unsigned long size = count * sizeof(UnknownDisplayMode);
@@ -602,7 +602,7 @@ int PCGame::LoadDisplayProfile(UnknownDisplay* display) {
     UnknownDisplayMode* saved = (UnknownDisplayMode*)DebugMalloc(size, __FILE__, 1726);
     if (!saved)
         return 0;
-    UnknownVirtualSlot24(name, saved, &size);
+    GetRegistryBinary(name, saved, &size);
     int i;
     for (i = 0; i < count; i++) {
         if (display->field_0x10[i].width != saved[i].width ||
@@ -626,21 +626,21 @@ int PCGame::LoadDisplayProfile(UnknownDisplay* display) {
         display->field_0x10[index].field_0x20 = saved[index].field_0x20;
     }
     sprintf(name, "DriverInfo\\%s\\PartialTextureBlt", display->field_0x4bc);
-    display->field_0x5bc = UnknownVirtualSlot20(name, 0);
+    display->field_0x5bc = GetRegistryInt(name, 0);
     sprintf(name, "DriverInfo\\%s\\Use8BitTextures", display->field_0x4bc);
-    display->field_0x70_bit0 = UnknownVirtualSlot22(name, 1);
+    display->field_0x70_bit0 = GetRegistryFlag(name, 1);
     sprintf(name, "DriverInfo\\%s\\IsAGP", display->field_0x4bc);
-    display->field_0x9f0 = UnknownVirtualSlot22(name, 0);
+    display->field_0x9f0 = GetRegistryFlag(name, 0);
     if (field_0x2d4_bit1)
         sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", display->field_0x4bc);
     else
         sprintf(name, "DriverInfo\\%s\\DisabledWindowed", display->field_0x4bc);
-    if (UnknownVirtualSlot22(name, 0)) {
+    if (GetRegistryFlag(name, 0)) {
         display->field_0xb74_bit1 = 1;
         return 1;
     }
     sprintf(name, "DriverInfo\\%s\\DisabledHardware", display->field_0x4bc);
-    if (UnknownVirtualSlot22(name, 0)) {
+    if (GetRegistryFlag(name, 0)) {
         display->field_0xb74_bit1 = 1;
         return 1;
     }
@@ -688,7 +688,7 @@ int PCGame::DeleteDisplayProfiles() {
 }
 
 // 0x004c1c20: a DWORD setting.
-int PCGame::UnknownVirtualSlot20(const char* name, int defaultValue) {
+int PCGame::GetRegistryInt(const char* name, int defaultValue) {
     unsigned long size = sizeof(int);
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)
@@ -704,7 +704,7 @@ int PCGame::UnknownVirtualSlot20(const char* name, int defaultValue) {
 }
 
 // 0x004c1d50: a float setting, stored as a DWORD.
-float PCGame::UnknownVirtualSlot21(const char* name, float defaultValue) {
+float PCGame::GetRegistryFloat(const char* name, float defaultValue) {
     unsigned long size = sizeof(float);
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)
@@ -720,7 +720,7 @@ float PCGame::UnknownVirtualSlot21(const char* name, float defaultValue) {
 }
 
 // 0x004c1e80: a boolean setting.
-int PCGame::UnknownVirtualSlot22(const char* name, int defaultValue) {
+int PCGame::GetRegistryFlag(const char* name, int defaultValue) {
     unsigned long size = sizeof(int);
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)
@@ -738,8 +738,8 @@ int PCGame::UnknownVirtualSlot22(const char* name, int defaultValue) {
 }
 
 // 0x004c1fc0: a string setting; copies the default when it is missing.
-int PCGame::UnknownVirtualSlot23(const char* name, const char* defaultValue, char* buffer,
-                                 unsigned long* size) {
+int PCGame::GetRegistryString(const char* name, const char* defaultValue, char* buffer,
+                              unsigned long* size) {
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)
     void* key;
@@ -758,7 +758,7 @@ int PCGame::UnknownVirtualSlot23(const char* name, const char* defaultValue, cha
 }
 
 // 0x004c2110: a binary setting.
-int PCGame::UnknownVirtualSlot24(const char* name, void* data, unsigned long* size) {
+int PCGame::GetRegistryBinary(const char* name, void* data, unsigned long* size) {
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)
     void* key;
@@ -775,7 +775,7 @@ int PCGame::UnknownVirtualSlot24(const char* name, void* data, unsigned long* si
 }
 
 // 0x004c2240 (slots 25-27 fold to this body): writes a DWORD setting.
-int PCGame::UnknownVirtualSlot25(const char* name, int value) {
+int PCGame::SetRegistryInt(const char* name, int value) {
     int result = 1;
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)
@@ -805,7 +805,7 @@ int PCGame::UnknownVirtualSlot26(const char* name, int value) {
     return result;
 }
 
-int PCGame::UnknownVirtualSlot27(const char* name, int value) {
+int PCGame::SetRegistryFlag(const char* name, int value) {
     int result = 1;
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)
@@ -821,7 +821,7 @@ int PCGame::UnknownVirtualSlot27(const char* name, int value) {
 }
 
 // 0x004c2370: writes a string setting.
-int PCGame::UnknownVirtualSlot28(const char* name, const char* value) {
+int PCGame::SetRegistryString(const char* name, const char* value) {
     int result = 1;
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)
@@ -837,7 +837,7 @@ int PCGame::UnknownVirtualSlot28(const char* name, const char* value) {
 }
 
 // 0x004c24b0: writes a binary setting.
-int PCGame::UnknownVirtualSlot29(const char* name, const void* data, unsigned long size) {
+int PCGame::SetRegistryBinary(const char* name, const void* data, unsigned long size) {
     int result = 1;
     char path[256];
     UNKNOWN_SETTING_PATH(path, name)

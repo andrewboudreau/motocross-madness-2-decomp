@@ -38,7 +38,7 @@ KrustyBikeCamera* KrustyBikeCamera::UnknownFunction497d90(void* value, float rat
 
 // 0x00497df0: the FollowCamera search, unless the global +0x3430 blocks it.
 int KrustyBikeCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    if (g_UnknownGlobal56e26c->uiInteractionBlocked)
+    if (g_TrackGame->uiInteractionBlocked)
         return 0;
     return BikeCamera::UnknownVirtualSlot23(event, entry);
 }
@@ -46,8 +46,8 @@ int KrustyBikeCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownIn
 // 0x00497fa0: keeps the point at least 3.5 above the subject's ground height
 // (easing +0x22c when it lifts it), and in modes 3 and 4 no higher than 400.
 void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
-    bool capped = g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 3 ||
-                  g_UnknownGlobal56e26c->mode.UnknownFunction524100() == 4;
+    bool capped = g_TrackGame->mode.UnknownFunction524100() == 3 ||
+                  g_TrackGame->mode.UnknownFunction524100() == 4;
     Vector3 ground = *point;
     field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
     float minimum = ground.y + 3.5f;
@@ -62,7 +62,7 @@ void KrustyBikeCamera::UnknownVirtualSlot52(Vector3* point) {
 
 // 0x00498080
 unsigned char KrustyBikeCamera::UnknownVirtualSlot55() {
-    return g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot2(0x0B, 0x3F);
+    return g_TrackGame->controlInterface->UnknownVirtualSlot2(0x0B, 0x3F);
 }
 
 // 0x004980a0: input 0x0a (unless +0x38c) clears +0x391/+0x392 when absent;
@@ -70,7 +70,7 @@ unsigned char KrustyBikeCamera::UnknownVirtualSlot55() {
 // +0x735 in vehicle mode.
 bool KrustyBikeCamera::UnknownVirtualSlot56() {
     bool pressed;
-    if (!field_0x38c && g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot2(0x0A, 0x3F)) {
+    if (!field_0x38c && g_TrackGame->controlInterface->UnknownVirtualSlot2(0x0A, 0x3F)) {
         pressed = true;
     } else {
         pressed = false;
@@ -91,7 +91,7 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
     float ratio = field_0x16c / field_0x1dc;
     if (cameraState != 3) {
         if (vehicleMode && !flag &&
-            (!krustyBike->field_0x7a4 || g_UnknownGlobal56e26c->field_0x18 > 1))
+            (!krustyBike->field_0x7a4 || g_TrackGame->field_0x18 > 1))
             field_0x308 = ratio * krustyBike->field_0x43c * 0.42f;
         else
             field_0x308 = 0.0f;
@@ -103,38 +103,38 @@ void KrustyBikeCamera::UnknownVirtualSlot42(bool flag) {
 // 0x004981d0: saves the presets while in vehicle mode with the bike idle.
 void KrustyBikeCamera::UnknownVirtualSlot59() {
     if (vehicleMode && !bike->field_0x444) {
-        g_UnknownGlobal56e26c->mode.field_0x23c0 = field_0x22c;
-        g_UnknownGlobal56e26c->mode.field_0x23c4 = field_0x234;
-        g_UnknownGlobal56e26c->mode.field_0x23bc = field_0x220;
-        g_UnknownGlobal56e26c->mode.field_0x23c8 = field_0x258;
+        g_TrackGame->mode.field_0x23c0 = field_0x22c;
+        g_TrackGame->mode.field_0x23c4 = field_0x234;
+        g_TrackGame->mode.field_0x23bc = field_0x220;
+        g_TrackGame->mode.field_0x23c8 = field_0x258;
     }
 }
 
 // 0x00498230: restores the saved presets.
 void KrustyBikeCamera::UnknownVirtualSlot60() {
-    field_0x22c = g_UnknownGlobal56e26c->mode.field_0x23c0;
-    field_0x234 = g_UnknownGlobal56e26c->mode.field_0x23c4;
-    field_0x220 = g_UnknownGlobal56e26c->mode.field_0x23bc;
-    field_0x258 = g_UnknownGlobal56e26c->mode.field_0x23c8;
+    field_0x22c = g_TrackGame->mode.field_0x23c0;
+    field_0x234 = g_TrackGame->mode.field_0x23c4;
+    field_0x220 = g_TrackGame->mode.field_0x23bc;
+    field_0x258 = g_TrackGame->mode.field_0x23c8;
 }
 
 // 0x00498280: restores the saved state.
 void KrustyBikeCamera::UnknownVirtualSlot62() {
-    cameraState = g_UnknownGlobal56e26c->mode.field_0x23b8;
+    cameraState = g_TrackGame->mode.field_0x23b8;
 }
 
 // 0x004982a0: saves the state.
 void KrustyBikeCamera::UnknownVirtualSlot61() {
-    g_UnknownGlobal56e26c->mode.field_0x23b8 = cameraState;
+    g_TrackGame->mode.field_0x23b8 = cameraState;
 }
 
 // 0x004982c0: shows the state's name (string 0x13b9 + state) for 1.5 s,
 // except in state 6.
 void KrustyBikeCamera::UnknownVirtualSlot58() {
-    TextQueueOverlay* target = g_UnknownGlobal56e26c->eventManager->UnknownFunction45d340();
+    TextQueueOverlay* target = g_TrackGame->eventManager->FindTextQueue();
     if (target && cameraState != 6) {
         char text[260];
-        g_UnknownGlobal56e26c->UnknownFunction521970(cameraState + 0x13B9, text, 0x80);
+        g_TrackGame->LoadResourceString(cameraState + 0x13B9, text, 0x80);
         UnknownMessage message(text, 1.5f);
         target->UnknownFunction51b540(&message);
     }

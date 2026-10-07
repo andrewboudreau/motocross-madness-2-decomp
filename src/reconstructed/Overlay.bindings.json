@@ -24,7 +24,7 @@
   "?UnknownFunction511970@@YAHH@Z": "0x00511970",
   "?UnknownVirtualSlot14@Overlay@@UAEHXZ": "0x004b61a0",
   "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__FILE__:containerlist.h": "0x005666e4",
   "__FILE__:overlay.cpp": "0x0056f758",
   "__FILE__:overlayiconservice.h": "0x0056f77c",

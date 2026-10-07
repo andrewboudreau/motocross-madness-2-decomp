@@ -22,7 +22,7 @@
   "?UnknownFunction518080@Track@@QAEHUTrackPos@@PAUTrackVec3@@@Z": "0x00518080",
   "?UnknownFunction518130@Track@@QAEHPAUTrackSegment@@PAUTrackVec3@@@Z": "0x00518130",
   "?UnknownFunction5199f0@@YAHPBX0@Z": "0x005199f0",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownGlobal572988@@3MA": "0x00572988",
   "?g_UnknownGlobal57298c@@3MA": "0x0057298c",
   "?g_UnknownGlobal689c30@@3PAUVector3@@A": "0x00689c30",

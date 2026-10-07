@@ -69,7 +69,7 @@ RunwayLights* RunwayLights::UnknownFunction48a600(void* value, int a, int b, Unk
     for (; i < 5; i++) {
         lightModels[i] = (new (__FILE__, 0x40) ArcadeObject(1))
                             ->UnknownFunction401310(value, a, b, name, position, 0, 0, 2.0f, 0.5f, 0.5f, 0);
-        if (!UnknownFunction469190(lightModels[i], -1)) {
+        if (!AppendChild(lightModels[i], -1)) {
             Release();
             return 0;
         }
@@ -297,7 +297,7 @@ NumberObjectManager* NumberObjectManager::UnknownFunction48bd00(void* value, int
         field_0x38[i] = (new (__FILE__, 0x240) ArcadeObject(1))
                             ->UnknownFunction401310(value, 0, b, name, position, pixels,
                                                     (UnknownArcadeView*)camera, size, 0.5f, 0.1f, 0);
-        if (!UnknownFunction469190(field_0x38[i], -1)) {
+        if (!AppendChild(field_0x38[i], -1)) {
             Release();
             return 0;
         }
@@ -406,13 +406,13 @@ int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
     digitModels[0][0] = new (__FILE__, 0x2d3) D3DIMSoultreeObject(field_0x25_bit0);
     digitModels[0][0]->UnknownVirtualSlot9(value, name, a, b, 1);
     digitModels[0][0]->UnknownFunction4fc660(&position);
-    baseFrame->UnknownFunction469190(digitModels[0][0], -1);
+    baseFrame->AppendChild(digitModels[0][0], -1);
     digitModels[0][0]->UnknownFunction4444e0();
     position.x = 0.37f;
     digitModels[0][1] = new (__FILE__, 0x2da) D3DIMSoultreeObject(field_0x25_bit0);
     digitModels[0][1]->UnknownVirtualSlot9(value, name, a, b, 1);
     digitModels[0][1]->UnknownFunction4fc660(&position);
-    baseFrame->UnknownFunction469190(digitModels[0][1], -1);
+    baseFrame->AppendChild(digitModels[0][1], -1);
     digitModels[0][1]->UnknownFunction4444e0();
     for (digit = 1; digit < 10; digit++) {
         digitModels[digit][0] = 0;
@@ -425,7 +425,7 @@ int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
             digitModels[digit][place] = new (__FILE__, 0x2ec) D3DIMSoultreeObject(field_0x25_bit0);
             digitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
             digitModels[digit][place]->UnknownFunction4fc660(&position);
-            baseFrame->UnknownFunction469190(digitModels[digit][place], -1);
+            baseFrame->AppendChild(digitModels[digit][place], -1);
             digitModels[digit][place]->UnknownFunction4444e0();
             position.x -= 0.37f;
         }
@@ -437,14 +437,14 @@ int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
     timesModel = new (__FILE__, 0x2fe) D3DIMSoultreeObject(field_0x25_bit0);
     timesModel->UnknownVirtualSlot9(value, name, a, b, 1);
     timesModel->UnknownFunction4fc660(&position);
-    baseFrame->UnknownFunction469190(timesModel, -1);
+    baseFrame->AppendChild(timesModel, -1);
     timesModel->UnknownFunction4444e0();
     position.x = 1.67f;
     sprintf(name, "%s\\DecimalPoint.slt", "Res", 0);
     decimalPointModel = new (__FILE__, 0x307) D3DIMSoultreeObject(field_0x25_bit0);
     decimalPointModel->UnknownVirtualSlot9(value, name, a, b, 1);
     decimalPointModel->UnknownFunction4fc660(&position);
-    baseFrame->UnknownFunction469190(decimalPointModel, -1);
+    baseFrame->AppendChild(decimalPointModel, -1);
     decimalPointModel->UnknownFunction4444e0();
     for (digit = 0; digit < 10; digit++) {
         sprintf(name, "%s\\%1d.slt", "Res", digit);
@@ -453,7 +453,7 @@ int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
             fractionDigitModels[digit][place] = new (__FILE__, 0x312) D3DIMSoultreeObject(field_0x25_bit0);
             fractionDigitModels[digit][place]->UnknownVirtualSlot9(value, name, a, b, 1);
             fractionDigitModels[digit][place]->UnknownFunction4fc660(&position);
-            baseFrame->UnknownFunction469190(fractionDigitModels[digit][place], -1);
+            baseFrame->AppendChild(fractionDigitModels[digit][place], -1);
             fractionDigitModels[digit][place]->UnknownFunction4444e0();
             position.x -= 0.41f;
         }
@@ -466,7 +466,7 @@ int BonusObjectManager::UnknownFunction48c330(void* value, int a, int b) {
 // 0x0048c8a0
 int BonusObjectManager::UnknownFunction48c8a0(void* value, int a, int b) {
     baseFrame = new (__FILE__, 0x326) D3DIMSoultreeObject(1);
-    if (!UnknownFunction469190(baseFrame->UnknownVirtualSlot9(value, "", a, b, 1), -1))
+    if (!AppendChild(baseFrame->UnknownVirtualSlot9(value, "", a, b, 1), -1))
         return 0;
     strcpy(baseFrame->field_0x038, "Base Bonus Frame");
     baseFrame->field_0x174 = kVec3Zero;

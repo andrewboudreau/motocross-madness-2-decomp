@@ -98,23 +98,23 @@ ObjectPicker* ObjectPicker::UnknownFunction4b0210(void* target, TextureMapManage
     field_0x30->UnknownFunction432ab0(1, segment);
     field_0x30->field_0x88 = callback;
     field_0x30->field_0x68 = 1;
-    UnknownFunction469190(field_0x30, -1);
+    AppendChild(field_0x30, -1);
     if (cursor) {
         field_0x34 = cursor;
     } else {
         field_0x40 = new(__FILE__, 59)
             UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)field_0x18)->field_0x08)->field_0x1c4,
-                                  0.0f, g_UnknownGlobal56e26c->field_0x14->UnknownFunction43ce90(), 0, 0.1f);
+                                  0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 0, 0.1f);
         field_0x44 = new(__FILE__, 60)
             UnknownControlBinding(0.0f, (float)((UnknownPickCamera*)((RenderTarget*)field_0x18)->field_0x08)->field_0x1c8,
-                                  0.0f, g_UnknownGlobal56e26c->field_0x14->UnknownFunction43ce90(), 1, 0.1f);
-        if (g_UnknownGlobal56e26c->field_0x14->mouse) {
-            g_UnknownGlobal56e26c->field_0x14->mouse->UnknownFunction48a420(field_0x40);
-            g_UnknownGlobal56e26c->field_0x14->mouse->UnknownFunction48a420(field_0x44);
+                                  0.0f, g_TrackGame->controlInterface->UnknownFunction43ce90(), 1, 0.1f);
+        if (g_TrackGame->controlInterface->mouse) {
+            g_TrackGame->controlInterface->mouse->UnknownFunction48a420(field_0x40);
+            g_TrackGame->controlInterface->mouse->UnknownFunction48a420(field_0x44);
         }
         field_0x34 = (GameCursor*)(new(__FILE__, 66) GameCursor(1))
                          ->UnknownFunction43ea70(field_0x18, field_0x40, field_0x44, "cursor.tga", textures, 0, 0, 0);
-        UnknownFunction469190(field_0x34, -1);
+        AppendChild(field_0x34, -1);
     }
     if (!field_0x34) {
         delete this;

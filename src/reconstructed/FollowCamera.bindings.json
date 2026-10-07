@@ -19,7 +19,7 @@
   "?UnknownVirtualSlot71@FollowCamera@@UAEXH@Z": "0x00466e50",
   "?UnknownVirtualSlot8@Camera@@UAEPAVGameObject@@PAX@Z": "0x0042e500",
   "?g_UnknownFollowCameraProjector575a98@@3PAVUnknownFollowCameraProjector@@A": "0x00575a98",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_$E1": "0x00466f20",
   "_$E10": "0x004670c0",
   "_$E11": "0x004670b0",

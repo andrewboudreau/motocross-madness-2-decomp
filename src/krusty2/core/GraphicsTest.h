@@ -39,7 +39,7 @@ public:
     // 0x0047bd10 (ret 0x10): a circle (center, radius, axis, segments, clamped to 64); tier 3.
     void DrawCircle(const Vec3* center, float radius, const Vec3* axis, int segments);
     // 0x00469ce0 (thiscall, 1 arg): appends the RTTI class name of `owner` to the debug name
-    // string at GameObject+0x28 (src/reconstructed/GameObject.h UnknownFunction469ce0).
+    // string at GameObject+0x28 (src/reconstructed/GameObject.h AppendClassName).
     void AppendClassName(GraphicsTest* owner);
     // Debug line drawing, used by collision/CollisionDebugDraw.cpp.  Names are tier 3.
     //  * 0x0047c690 (ret 0xc) packs 0xff000000 | r<<16 | g<<8 | b into drawColor (decoded).

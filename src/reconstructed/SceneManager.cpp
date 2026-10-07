@@ -315,7 +315,7 @@ Scene* Scene::UnknownFunction4ea7e0(UnknownTrackGameObject574* manager, int valu
     auralScape = value;
     field_0x88 = flag;
     soundGroup = new(__FILE__, 622) SoundGroup(field_0x25_bit0);
-    UnknownFunction469190(soundGroup, -1);
+    AppendChild(soundGroup, -1);
     return this;
 }
 
@@ -940,7 +940,7 @@ int Scene::OpenResourceFiles()
         sprintf(key, "ResourceFile%d", i);
         while (parameters.UnknownFunction4b7ec0(key, "", file, 0x7f)) {
             sprintf(name, "%s\\%s", "Res", file);
-            if (!g_UnknownGlobal56e26c->UnknownVirtualSlot18(name, path))
+            if (!g_TrackGame->UnknownVirtualSlot18(name, path))
                 return 0;
             g_UnknownResourceManager572b44->UnknownFunction4e9030(path, 0);
             sprintf(key, "ResourceFile%d", ++i);
@@ -979,7 +979,7 @@ void Scene::UnknownFunction4edf20(ProjectedShadow* shadow, int flags)
 {
     if (shadow && field_0xb8) {
         for (int i = 0; i < field_0xb8->field_0x00; i++)
-            UnknownFunction469190((new(__FILE__, 2136) D3DIMSoultreeShadow(flags))
+            AppendChild((new(__FILE__, 2136) D3DIMSoultreeShadow(flags))
                                       ->Attach((int)field_0x18, field_0xb8->field_0x04[i].field_0x04,
                                                shadow),
                                   -1);
@@ -1032,7 +1032,7 @@ int Scene::ReadSounds()
                                  SoundEmitter((AuralScape*)auralScape, soundGroup, 1, field_0x25_bit0))
                                 ->UnknownFunction402260(field_0x18, file, params, flags, oneShotDistance,
                                                         randomTriggerPercent, 0, force2D);
-                        UnknownFunction469190(emitter, -1);
+                        AppendChild(emitter, -1);
                         if (!emitter) {
                             sprintf(text, "\nScene::SoundEmitter(%s) not created\n", file);
                             UnknownFunction464e80(text);
@@ -1162,7 +1162,7 @@ int Scene::UnknownFunction4efb20(void* owner, LightManager* lights, int a3, int 
             return 0;
         if (field_0xac[i].emitsLight) {
             const char* flare = field_0xac[i].hasLensFlare ? field_0xac[i].lensFlareTexture : 0;
-            int camera = field_0xac[i].hasLensFlare ? (int)g_UnknownGlobal56e26c->field_0x3c : 0;
+            int camera = field_0xac[i].hasLensFlare ? (int)g_TrackGame->field_0x3c : 0;
             field_0xac[i].field_0x00 =
                 (new(__FILE__, 2798) LightEmitter(1))
                     ->UnknownFunction49e230(field_0x18, field_0xac[i].type, field_0xac[i].color,
@@ -1190,7 +1190,7 @@ int Scene::UnknownFunction4efb20(void* owner, LightManager* lights, int a3, int 
 // object and to the shadow casters, re-enabling those without flag 2.
 void Scene::UnknownFunction4eff30(int level)
 {
-    g_UnknownGlobal689f18 = g_UnknownGlobal56e26c->field_0x2d0 ? g_UnknownGlobal5744c8
+    g_UnknownGlobal689f18 = g_TrackGame->field_0x2d0 ? g_UnknownGlobal5744c8
                                                               : g_UnknownGlobal574428;
     if (field_0xb4) {
         int i;

@@ -46,7 +46,7 @@ Exact: all 16 functions (6 and 10). Source forms needed:
 - WaitOrCallDlg sets `event->field_0x20 = 1` in both branches.
 
 Header changes, all layout-preserving:
-- GameUi.h's UnknownGameUiControl derives from GameObject, as RTTI
+- GameUi.h's UIControl derives from GameObject, as RTTI
   UIControl does.
 - UIDialog.h, TrackGame.h and RaceView.h gained the members these
   procedures use.

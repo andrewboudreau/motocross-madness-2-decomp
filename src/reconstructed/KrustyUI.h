@@ -40,16 +40,16 @@ public:
     void UnknownFunction485d70(const char* directory);       // 0x00485d70 ("ui")
     void UnknownFunction486560(const char* image);           // 0x00486560 ("ui\\wait.tga")
     void UnknownFunction4866c0(char* font);                  // 0x004866c0
-    void UnknownFunction486630(int value);                   // 0x00486630
+    void ShowCursors(int value);                             // 0x00486630
     void CloseDialogResource();                            // 0x00485d50 (KrustyUI 0x004999b0)
-    UnknownTrackGameObject56cItem* UnknownFunction485df0();  // 0x00485df0
-    void UnknownFunction485ef0();                            // 0x00485ef0
-    UnknownKrustyUIGuiLayer* UnknownFunction486540(int index); // 0x00486540: layer `index` (0 past 3)
+    UnknownTrackGameObject56cItem* FindInputDialog();        // 0x00485df0
+    void CreateBackground();                                 // 0x00485ef0
+    UnknownKrustyUIGuiLayer* GetUser(int index); // 0x00486540: layer `index` (0 past 3)
     void UnknownFunction486590(const char* image, int visible); // 0x00486590 (bikerace.cpp: "ui\\cursor.tga")
-    void UnknownFunction4868b0(int value);                   // 0x004868b0
+    void EnableWindowClipper(int value);                     // 0x004868b0
     // 0x00485a70: shows `dialog` (EventManager 0x0045e710 passes 0, 2, 0, 0,
     // 0, 0, 1).
-    void UnknownFunction485a70(GameObject* dialog, int a, int b, int c, int d, int e, int f, int g);
+    void ShowDialog(GameObject* dialog, int a, int b, int c, int d, int e, int f, int g);
     void ReleaseBackground();                            // 0x00485fc0: releases the background
 
     unsigned char field_0x000[0x3c];
@@ -129,7 +129,7 @@ public:
     void UnknownFunction49a8b0();             // 0x0049a8b0
     GameObject* UnknownFunction4988a0(RenderTarget* target, int value); // 0x004988a0
     void UnknownFunction498cf0(int value);                         // 0x00498cf0
-    void UnknownFunction499b20(int menu);                          // 0x00499b20: opens a menu
+    void OpenMenu(int menu);                                       // 0x00499b20: opens a menu
     void UnknownFunction49b530();                                  // 0x0049b530
     // 0x0049bbb0: records the finished race in the high-score tables
     // (TrackGame+0x3400): table 0, then 1 and 2 by laps (5, 10) or, in

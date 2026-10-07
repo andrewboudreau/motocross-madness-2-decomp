@@ -42,6 +42,6 @@
   "?UnknownVirtualSlot8@ManagedTexture@@UAEHHHH@Z": "0x00510750",
   "?UnknownVirtualSlot8@PCTextureMap@@UAEHHHH@Z": "0x004c7480",
   "?UnknownVirtualSlot9@PCTextureMap@@UAEHPAUUnknownRect@@H@Z": "0x004c7640",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__real@4@40029000000000000000": "0x00558484"
 }

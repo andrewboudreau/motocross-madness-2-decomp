@@ -50,7 +50,7 @@
   "?UnknownVirtualSlot7@GameObject@@UAEXXZ": "0x00469070",
   "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@3ffbcccccd0000000000": "0x005507d0",
   "__real@4@3fff8000000000000000": "0x00550748",

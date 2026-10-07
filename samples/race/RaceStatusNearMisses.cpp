@@ -71,8 +71,8 @@ int BuildStatusList(UnknownEventRacerPart** list, UnknownKrustyBikeView* view) {
     status->field_0x28 = view->field_0x38->field_0x00c;
     *list = status;
     tail = &status->field_0x50;
-    if (g_UnknownGlobal56e26c->field_0x18 == 1 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4) {
-        for (i = 0; i < g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24; i++) {
+    if (g_TrackGame->field_0x18 == 1 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4) {
+        for (i = 0; i < g_TrackGame->mode.field_0x27f8.field_0x24; i++) {
             if (!HasStatusNode(*list, view->field_0x40[i])) {
                 status = (UnknownEventRacerPart*)DebugCalloc(1, sizeof(UnknownEventRacerPart), __FILE__, 235);
                 if (!status)
@@ -133,10 +133,10 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
                                        &racer->field_0x774, &racer->field_0x7a4, lapLimit, unlimited,
                                        racer->field_0x735, racer->field_0x7c0))
                 return 0;
-            if (g_UnknownGlobal56e26c->field_0x560 && gate != racer->field_0x7b8) {
-                racer->field_0x7bc = (racer->field_0x7b8 + 1) % g_UnknownGlobal56e26c->field_0x560->field_0xac;
+            if (g_TrackGame->field_0x560 && gate != racer->field_0x7b8) {
+                racer->field_0x7bc = (racer->field_0x7b8 + 1) % g_TrackGame->field_0x560->field_0xac;
                 if (racer == ((UnknownRaceStatusCamera*)racer->field_0x740->field_0x50)->field_0x3b4)
-                    g_UnknownGlobal56e26c->field_0x560->UnknownFunction404df0(racer->field_0x7b8, racer->field_0x7bc,
+                    g_TrackGame->field_0x560->UnknownFunction404df0(racer->field_0x7b8, racer->field_0x7bc,
                                                                               racer);
             }
         }
@@ -149,7 +149,7 @@ int UpdateGateRace(UnknownEventRacerPart** list, UnknownBikeRaceNode* firstGate,
         status->field_0x28.z = status->field_0x1c.z;
         status->field_0x14 += before - after;
         status->field_0x08 = after;
-        if (g_UnknownGlobal56e26c->field_0x18 == 1 && g_ViewRacerFinished) {
+        if (g_TrackGame->field_0x18 == 1 && g_ViewRacerFinished) {
             if (racer->field_0x7a4)
                 continue;
             if (racer->field_0x734) {

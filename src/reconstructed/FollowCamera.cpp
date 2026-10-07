@@ -492,12 +492,12 @@ void FollowCamera::UnknownVirtualSlot62() {}
 // 0x00464ea0 and 0x00464ec0: slot 5 of the interface behind the 0x0056e26c
 // object, with codes 0x38 and 0x2a.
 unsigned char FollowCamera::UnknownVirtualSlot55() {
-    return ((UnknownKeyboardBoolView*)g_UnknownGlobal56e26c->field_0x14->keyboard)
+    return ((UnknownKeyboardBoolView*)g_TrackGame->controlInterface->keyboard)
         ->UnknownVirtualSlot5(0x38, 0x3F, 0);
 }
 
 bool FollowCamera::UnknownVirtualSlot56() {
-    return ((UnknownKeyboardBoolView*)g_UnknownGlobal56e26c->field_0x14->keyboard)
+    return ((UnknownKeyboardBoolView*)g_TrackGame->controlInterface->keyboard)
         ->UnknownVirtualSlot5(0x2A, 0x3F, 0);
 }
 
@@ -509,9 +509,9 @@ bool FollowCamera::UnknownVirtualSlot56() {
 int FollowCamera::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
     if (Camera::UnknownVirtualSlot23(event, entry) || event->kind)
         return 0;
-    if (g_UnknownGlobal56e26c->field_0x2d4_bit0) {
+    if (g_TrackGame->field_0x2d4_bit0) {
         if (UnknownFunction43caa0(0x21, 0, event, 0xc) && cameraState != 6) {
-            UnknownVirtualSlot70(g_UnknownGlobal56e26c->field_0x1c4);
+            UnknownVirtualSlot70(g_TrackGame->field_0x1c4);
             return 1;
         }
         if (overrideActive) {

@@ -29,7 +29,7 @@ RenderTarget::~RenderTarget() {}
 // 0x004e8cc0: unless the global's +0x0c object says otherwise, the frame index
 // advances modulo field_0x14; the frame count always does.
 void RenderTarget::UnknownFunction4e8cc0() {
-    if (!g_UnknownGlobal56e26c->field_0x0c->field_0x6c) {
+    if (!g_TrackGame->display->field_0x6c) {
         if (++field_0x18 == field_0x14)
             field_0x18 = 0;
     }

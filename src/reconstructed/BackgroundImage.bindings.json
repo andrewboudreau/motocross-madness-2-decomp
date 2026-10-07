@@ -53,7 +53,7 @@
   "?UnknownVirtualSlot8@BackgroundImage@@UAEPAVGameObject@@PAX@Z": "0x00403f30",
   "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownGlobal577790@@3UCameraRect@@A": "0x00577790",
   "?g_UnknownGlobal5777b8@@3UCameraRect@@A": "0x005777b8",
   "?g_UnknownGlobal5777c8@@3UUnknownRect@@A": "0x005777c8",

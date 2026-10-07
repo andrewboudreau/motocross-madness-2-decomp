@@ -100,13 +100,13 @@ public:
     void* animPalette;                        // +0xf4
 };
 
-class UnknownGameUiControl;
+class UIControl;
 
 // RTTI: UITimer : BaseObject (vtable 0x00552b90; 0x18 bytes).
 class UITimer : public BaseObject {
 public:
     // Inline in UIDialog 0x0046fce0.
-    UITimer(int id, int time, UnknownGameUiControl* control) {
+    UITimer(int id, int time, UIControl* control) {
         timerId = id;
         periodTime = time;
         elapsedTime = 0;
@@ -117,7 +117,7 @@ public:
     int timerId;                              // +0x08
     int elapsedTime;                          // +0x0c
     int periodTime;                           // +0x10
-    UnknownGameUiControl* targetControl;      // +0x14: the control told
+    UIControl* targetControl;      // +0x14: the control told
 };
 
 // RTTI: UICtlContainer : GameObject (vtable 0x00552b20; 0x2c bytes): the
@@ -147,11 +147,11 @@ struct UnknownGameUiState {
 // the derived controls' members follow it). The dialog procedures find
 // controls through this type and cast them to the derived control a method
 // belongs to.
-class UnknownGameUiControl : public GameObject {
+class UIControl : public GameObject {
 public:
     // 0x00470170: `type` is the control kind (5 a static, 12 a static text).
-    UnknownGameUiControl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner);
-    virtual ~UnknownGameUiControl();          // 0x00470450 (deleting wrapper 0x00470430)
+    UIControl(int type, int id, CameraRect* area, UnknownGameUiDialog* owner);
+    virtual ~UIControl();          // 0x00470450 (deleting wrapper 0x00470430)
     virtual int UnknownVirtualSlot10(float frameTime); // 0x00470e00
     virtual int UnknownVirtualSlot13();       // 0x00471140
     virtual int UnknownVirtualSlot15();       // 0x004711a0
@@ -210,8 +210,8 @@ public:
     void SetImage(int state, void* image);    // 0x00470730: a state's UIAnim
     int IsEnabled();                          // 0x00470720: returns +0x6c
     void SetSound(int index, Sound* sound);   // 0x00470810: "SoundNorm", "SoundFocus", "SoundPush", "SoundClick"
-    void SetAnchor(UnknownGameUiControl* anchor, int relative); // 0x00470830: "Anchor" and "RelAnchor"
-    UnknownGameUiControl* UnknownFunction470850(UnknownGameUiControl* none); // 0x00470850: the last linked control
+    void SetAnchor(UIControl* anchor, int relative); // 0x00470830: "Anchor" and "RelAnchor"
+    UIControl* UnknownFunction470850(UIControl* none); // 0x00470850: the last linked control
     void SetShapeBounds(int value);           // 0x004709d0: "ShapeBounds"
     void SetTextDrop(int value);              // 0x00470d60: "TextDrop"
     void SetDropColor(int value);             // 0x00470d80: "DropColor"
@@ -225,11 +225,11 @@ public:
     GameObjectIterator* UnknownFunction4726b0(); // slot 53's body: an iterator over the owner's controls
     void UnknownFunction472730(GameObjectIterator* iterator); // 0x00472730: deletes it
     // 0x00472750: the next control with this control's id.
-    UnknownGameUiControl* UnknownFunction472750(GameObjectIterator* iterator);
+    UIControl* UnknownFunction472750(GameObjectIterator* iterator);
     // 0x00472790: the next control with this control's id and another type.
-    UnknownGameUiControl* UnknownFunction472790(GameObjectIterator* iterator);
-    UnknownGameUiControl* UnknownFunction4727c0(); // 0x004727c0: the previous focusable control
-    UnknownGameUiControl* UnknownFunction472810(); // 0x00472810: the next focusable control
+    UIControl* UnknownFunction472790(GameObjectIterator* iterator);
+    UIControl* UnknownFunction4727c0(); // 0x004727c0: the previous focusable control
+    UIControl* UnknownFunction472810(); // 0x00472810: the next focusable control
     int UnknownFunction472480(int* position); // 0x00472480
 
     int field_0x2c[4];                        // screen area (scaled +0x3c)
@@ -296,7 +296,7 @@ public:
     int mouseAnim;                            // +0x180: "MouseAnim" (a UnknownCursorAnimation*)
     UIAnim* fxAnimIn;                         // +0x184: "FXAnimIn"
     UIAnim* fxAnimOut;                        // +0x188: "FXAnimOut"
-    UnknownGameUiControl* anchorControl;      // +0x18c: "Anchor"
+    UIControl* anchorControl;      // +0x18c: "Anchor"
     int relAnchor;                            // +0x190: "RelAnchor"
     Sound* sounds[5];                         // +0x194: "SoundNorm", "SoundFocus", "SoundPush", "SoundClick"
     Sound* slideSound;                        // +0x1a8
@@ -309,7 +309,7 @@ public:
     void* field_0x1c4;
     int field_0x1c8;
     TextureMap* drawnTexture;                 // +0x1cc: the texture drawn
-    int (UnknownGameUiControl::*field_0x1d0)(); // the running transition (slots 41-47)
+    int (UIControl::*field_0x1d0)(); // the running transition (slots 41-47)
     int field_0x1d4;
     int keyBind;                              // +0x1d8: "KeyBind"
     int post3D;                               // +0x1dc: "Pre3D" == 0
@@ -320,7 +320,7 @@ public:
 
 // RTTI: UIButton : UIControl (vtable 0x00552ce0; 0x1f0 bytes: gameui.cpp's
 // `new` at 0x0046c019 and the UIScrollCtl ones push 0x1f0).
-class UIButton : public UnknownGameUiControl {
+class UIButton : public UIControl {
 public:
     UIButton(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x004731f0
     virtual ~UIButton();                      // 0x004732c0 (deleting wrapper 0x004732a0)
@@ -341,7 +341,7 @@ public:
 
 // RTTI: UIStatic : UIControl (vtable 0x00553318; 0x1ec bytes, `new` at
 // 0x0046cace): no members of its own.
-class UIStatic : public UnknownGameUiControl {
+class UIStatic : public UIControl {
 public:
     UIStatic(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00478f60
     virtual ~UIStatic();                      // 0x00478fb0 (deleting wrapper 0x00478f90)
@@ -351,7 +351,7 @@ public:
 
 // RTTI: UIEditBox : UIControl (vtable 0x00552de8; 0x230 bytes, `new` at
 // 0x0046ce50).
-class UIEditBox : public UnknownGameUiControl {
+class UIEditBox : public UIControl {
 public:
     // 0x00473630: `size` is the text's capacity.
     UIEditBox(int id, CameraRect* area, UnknownGameUiDialog* owner, int size, int a, int b);
@@ -414,7 +414,7 @@ public:
 
 // RTTI: UIScrollBar : UIControl (vtable 0x00552ff8; 0x220 bytes, `new` at
 // 0x0046cc82; its constructor clears +0x1ec..+0x21c).
-class UIScrollBar : public UnknownGameUiControl {
+class UIScrollBar : public UIControl {
 public:
     UIScrollBar(int type, int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x00474ba0
     virtual ~UIScrollBar();                   // 0x00474c50 (deleting wrapper 0x00474c30)
@@ -461,7 +461,7 @@ public:
 
 // RTTI: UIListBox : UIControl (vtable 0x00553100; 0x250 bytes, `new` at
 // 0x0046c5b0).
-class UIListBox : public UnknownGameUiControl {
+class UIListBox : public UIControl {
 public:
     // 0x00475c70: `rows` is the row capacity (it passes (id, area, owner) on
     // to UIControl from its first, third and fourth arguments).
@@ -496,7 +496,7 @@ public:
     void SetRowTextColor(unsigned int color, int row); // 0x00476c70 (row -1: the control's)
     void SetSelectBoxColor(unsigned int color); // 0x00476cd0: "SelectBoxColor"
     char* GetRowText(int row);                // 0x00476d20: (-1: the selected one)
-    int UnknownFunction476d80(const char* text, int data, int a); // 0x00476d80: adds a row ("Item%d")
+    int AddRow(const char* text, int data, int a); // 0x00476d80: adds a row ("Item%d")
     int CountVisibleRows();                   // 0x00476ee0: the rows that fit from the first shown
     int UnknownFunction476f50(int rows);      // 0x00476f50: grows the rows to `rows`
     void SetRowText(int row, const char* text); // 0x00476ff0
@@ -505,8 +505,8 @@ public:
     int RemoveRow(int row);                   // 0x00477490
     void RemoveAllRows();                     // 0x004775f0
     void SetSortCompare(int (*compare)(const void* a, const void* b)); // 0x004777f0: qsort callback
-    void UnknownFunction477900(int a);        // 0x00477900: sorts the rows
-    void UnknownFunction477bb0(int a);        // 0x00477bb0: "Selectable" (+0x224)
+    void Sort(int a);                         // 0x00477900: qsorts the rows
+    void SetSelectable(int a);                // 0x00477bb0: "Selectable" (+0x224)
     void UpdateScrollBars();                  // 0x00477bc0: the attached scroll bars follow
     void UnknownFunction477e60(int a);        // 0x00477e60
     char* UnknownFunction476970(int row);     // 0x00476970
@@ -547,7 +547,7 @@ public:
 
 // RTTI: UIMultiState : UIControl (vtable 0x00553210; 0x1f8 bytes, `new` at
 // 0x0046c2b4).
-class UIMultiState : public UnknownGameUiControl {
+class UIMultiState : public UIControl {
 public:
     UIMultiState(int id, CameraRect* area, UnknownGameUiDialog* owner); // 0x004781f0
     virtual ~UIMultiState();                  // 0x00478300 (deleting wrapper 0x004782e0)
@@ -579,7 +579,7 @@ public:
 
 // RTTI: UIStaticText : UIControl (vtable 0x00553420; 0x1ec bytes, `new` at
 // 0x0046d033): no members of its own.
-class UIStaticText : public UnknownGameUiControl {
+class UIStaticText : public UIControl {
 public:
     UIStaticText(int id, CameraRect* area, UnknownGameUiDialog* owner, const char* text,
                  unsigned int color);         // 0x00478ff0
@@ -675,7 +675,7 @@ public:
     void UnknownFunction47a970(UIAnim* image); // 0x0047a970: the static part's image
     void UnknownFunction47aa40(UIAnim* image); // 0x0047aa40: the button's image
     void UnknownFunction47ab20(UIAnim* image); // 0x0047ab20: the corner image; lays the parts out around it
-    int UnknownFunction47a800(UnknownGameUiControl* control); // 0x0047a800: whether `control` is a part
+    int UnknownFunction47a800(UIControl* control); // 0x0047a800: whether `control` is a part
     // Inline: the button. SelectGamePicProcs.cpp reads it through this
     // accessor; reading field_0x1ec directly lets VC6 merge the two branches
     // of 0x004f3260 and 0x004f8700, which retail does not. Defined after the
@@ -739,5 +739,5 @@ public:
 // Page object at KrustyUI+0x490.
 class UnknownGameUiPage {
 public:
-    UnknownGameUiControl* UnknownFunction46ebf0(const char* name, int flags); // 0x0046ebf0
+    UIControl* UnknownFunction46ebf0(const char* name, int flags); // 0x0046ebf0
 };

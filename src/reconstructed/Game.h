@@ -61,7 +61,7 @@ public:
     virtual int UnknownVirtualSlot13(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468900
     virtual int UnknownVirtualSlot14(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x00468930
     virtual int UnknownVirtualSlot15();       // 0x00468a30: shutdown
-    virtual int UnknownVirtualSlot16(int value); // 0x00468ae0: network object
+    virtual int CreateNetworkInterface(int value); // 0x00468ae0: news the NetworkInterface into +0x08
     // 0x00468ba0: network messages; NetworkInterface 0x004aced0 passes a
     // NetMessage's type, data, from, to and flags.
     virtual int UnknownVirtualSlot17(int type, void* data, int from, int to, int flags);
@@ -70,19 +70,22 @@ public:
     // Slots 20-29 are PCGame's registry accessors under its key
     // (RegQueryValueExA / RegSetValueExA, PCGame.cpp): 20 reads a DWORD, 21
     // a float, 22 a DWORD as a flag, 23 a string, 24 binary data; 25-27
-    // write a DWORD, 28 a string and 29 binary data.
-    virtual int UnknownVirtualSlot20(const char* name, int defaultValue) = 0; // "VideoMemoryMB"
-    virtual float UnknownVirtualSlot21(const char* name, float defaultValue) = 0;
+    // write a DWORD (one folded body), 28 a string and 29 binary data.
+    // Slot 25's callers write values read back with slot 20 (the display
+    // profile's 7), slot 27's write flags read back with slot 22
+    // ("UseLastVideoCard", "UseLastController"); slot 26 has no caller yet.
+    virtual int GetRegistryInt(const char* name, int defaultValue) = 0; // "VideoMemoryMB"
+    virtual float GetRegistryFloat(const char* name, float defaultValue) = 0;
     // Named setting (JoystickDevice asks for "JoyDirectionFlipped").
-    virtual int UnknownVirtualSlot22(const char* name, int defaultValue) = 0;
-    virtual int UnknownVirtualSlot23(const char* name, const char* defaultValue, char* buffer,
-                                     unsigned long* size) = 0;
-    virtual int UnknownVirtualSlot24(const char* name, void* data, unsigned long* size) = 0;
-    virtual int UnknownVirtualSlot25(const char* name, int value) = 0;
+    virtual int GetRegistryFlag(const char* name, int defaultValue) = 0;
+    virtual int GetRegistryString(const char* name, const char* defaultValue, char* buffer,
+                                  unsigned long* size) = 0;
+    virtual int GetRegistryBinary(const char* name, void* data, unsigned long* size) = 0;
+    virtual int SetRegistryInt(const char* name, int value) = 0;
     virtual int UnknownVirtualSlot26(const char* name, int value) = 0;
-    virtual int UnknownVirtualSlot27(const char* name, int value) = 0;
-    virtual int UnknownVirtualSlot28(const char* name, const char* value) = 0;
-    virtual int UnknownVirtualSlot29(const char* name, const void* data, unsigned long size) = 0;
+    virtual int SetRegistryFlag(const char* name, int value) = 0;
+    virtual int SetRegistryString(const char* name, const char* value) = 0;
+    virtual int SetRegistryBinary(const char* name, const void* data, unsigned long size) = 0;
     virtual int UnknownVirtualSlot30(int id, char* text);                                 // 0x00468c60
     virtual RenderTarget* UnknownVirtualSlot31() = 0;
     virtual int UnknownVirtualSlot32() = 0;
@@ -94,11 +97,11 @@ public:
     int UnknownFunction467b70(char* message);
     void UnknownFunction468880();             // 0x00468880 (PCCamera slot 27)
 
-    SoundInterface* field_0x04;               // the sound interface: a PCSoundInterface (initialiser)
-    NetworkInterface* field_0x08;             // the network interface: created by slot 16, deleted by NetProcs.cpp's EndNetworkGame
-    UnknownDisplay* field_0x0c;               // the display (video card and modes; slot 8's profile page)
-    RenderTarget* field_0x10;                 // a PCRenderTarget (PCGame slot 31)
-    ControlInterface* field_0x14;             // the control interface: a PCControlInterface (slot 2)
+    SoundInterface* soundInterface;           // a PCSoundInterface (initialiser)
+    NetworkInterface* network;                // created by slot 16, deleted by NetProcs.cpp's EndNetworkGame
+    UnknownDisplay* display;                  // video card and modes (slot 8's profile page)
+    RenderTarget* renderTarget;               // a PCRenderTarget (PCGame slot 31)
+    ControlInterface* controlInterface;       // a PCControlInterface (slot 2)
     int field_0x18;                           // 1 initially; KrustyBikeCamera slot 42 tests > 1
     TextureMapManager* field_0x1c;
     int field_0x20;
@@ -107,7 +110,7 @@ public:
     int field_0x2c;                           // 0x115c after initialisation
     int field_0x30;
     GameObject* field_0x34;                   // second root object (initialiser 0x00467b70)
-    DebugOverlay* field_0x38;                 // the debug overlay, created with the "DebugOverlay" registry flag
+    DebugOverlay* debugOverlay;               // created with the "DebugOverlay" registry flag
     TextureMapManager* field_0x3c;
     char field_0x40[0x1c4 - 0x40];            // empty string initially
     int field_0x1c4;
@@ -134,6 +137,6 @@ public:
     float field_0x2e4;
     float field_0x2e8;
     float field_0x2ec;
-    float field_0x2f0;                        // frame time in seconds (KeyboardDevice 0x0048a0c0; Net.cpp's resend timers add it)
-    GameObject* field_0x2f4;                  // root object; most slots forward to it
+    float frameTime;                          // seconds since the previous frame (slot 10 stores it; KeyboardDevice and Net.cpp timers add it)
+    GameObject* rootObject;                   // root object; most slots forward to it
 };

@@ -28,7 +28,7 @@ ends with the shared dialog deleting destructor and its vector set:
 
 ## Status
 
-Exact (43 functions, including the open-menu routine `0x00499b20`):
+Exact (43 functions, including the open-menu routine `OpenMenu` `0x00499b20`):
 - the constructor `0x004987f0`. Eight 8-byte `{int, char}` records at
   +0x634 have an inline constructor, so VC6 emits the clearing loop before
   the vtable store; the body then clears the other fields in retail order;
@@ -48,8 +48,8 @@ Exact (43 functions, including the open-menu routine `0x00499b20`):
   and 25 (also forwards the value to the +0x464 scene);
 - `0x004999f0` and `0x00499a20`, which show and hide the +0x464 scene and
   set the owner render target's camera (+0x468, or none);
-- `0x00499b00` and `0x00499b10`, which call the GUI's `0x00486630` with 1 and
-  0;
+- `0x00499b00` and `0x00499b10`, which call the GUI's `ShowCursors`
+  `0x00486630` with 1 and 0;
 - `0x0049a4a0`, which turns "MediaControl" on, hides the GUI and opens
   `Exit1Dlg` ("Exit1.dtm", line 836);
 - `0x0049ba70`, which appends a 0x54-byte entry (five ints and a 64-char

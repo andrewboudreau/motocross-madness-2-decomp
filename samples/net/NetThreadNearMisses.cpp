@@ -40,24 +40,24 @@ static int g_UnknownGlobal6886e4;                       // duplicate filter enab
 long ReceiveMessages(unsigned int time)
 {
     char text[256];
-    EnterCriticalSection(NET_LOCK(g_UnknownGlobal56e26c->field_0x08->lock));
-    if (!g_UnknownGlobal56e26c->field_0x08) {
+    EnterCriticalSection(NET_LOCK(g_TrackGame->network->lock));
+    if (!g_TrackGame->network) {
         sprintf(text, "LpGame->LpNetworkInterface invalid = 0x%x\n",
-                g_UnknownGlobal56e26c->field_0x08);
-        LeaveCriticalSection(NET_LOCK(g_UnknownGlobal56e26c->field_0x08->lock));
+                g_TrackGame->network);
+        LeaveCriticalSection(NET_LOCK(g_TrackGame->network->lock));
         return NET_E_INVALIDARG;
     }
-    if (!g_UnknownGlobal56e26c->field_0x08->directPlay) {
+    if (!g_TrackGame->network->directPlay) {
         sprintf(text, "LpDirectPlayX invalid = 0x%x\n",
-                g_UnknownGlobal56e26c->field_0x08->directPlay);
-        LeaveCriticalSection(NET_LOCK(g_UnknownGlobal56e26c->field_0x08->lock));
+                g_TrackGame->network->directPlay);
+        LeaveCriticalSection(NET_LOCK(g_TrackGame->network->lock));
         return NET_E_INVALIDARG;
     }
     unsigned long size = g_UnknownGlobal6886dc;
     for (;;) {
         unsigned long from = 0;
         unsigned long to = 0;
-        long result = g_UnknownGlobal56e26c->field_0x08->directPlay->Receive(
+        long result = g_TrackGame->network->directPlay->Receive(
             &from, &to, 1 /* DPRECEIVE_ALL */, s_ReceiveBuffer, &size);
         if (result == NET_DPERR_BUFFERTOOSMALL) {
             if (s_ReceiveBuffer)
@@ -74,7 +74,7 @@ long ReceiveMessages(unsigned int time)
                 HandleReceivedMessage(s_ReceiveBuffer, size, from, to, time);
         }
     }
-    LeaveCriticalSection(NET_LOCK(g_UnknownGlobal56e26c->field_0x08->lock));
+    LeaveCriticalSection(NET_LOCK(g_TrackGame->network->lock));
     return 0;
 }
 
@@ -82,7 +82,7 @@ void HandleReceivedMessage(unsigned char* data, unsigned int size, int from, int
                            unsigned int time)
 {
     int last = -1;
-    NetworkInterface* net = g_UnknownGlobal56e26c->field_0x08;
+    NetworkInterface* net = g_TrackGame->network;
     if (net->nextMessage == 0) {
         if (net->field_0x38 != 0)
             last = 0xff;
@@ -96,7 +96,7 @@ void HandleReceivedMessage(unsigned char* data, unsigned int size, int from, int
     else
         type = data[0];
     if (last >= 0) {
-        NetMessage* message = &g_UnknownGlobal56e26c->field_0x08->messages[last];
+        NetMessage* message = &g_TrackGame->network->messages[last];
         if (IsSameMessage(data, size, from, type, message->data,
                                   message->size, message->from, message->type)
             && g_UnknownGlobal6886e4) {
@@ -109,10 +109,10 @@ void HandleReceivedMessage(unsigned char* data, unsigned int size, int from, int
     int sequence = 0;
     int target = 0;
     int deliver = 1;
-    if (g_UnknownGlobal56e26c->field_0x08->connectionMode == 3
-        && g_UnknownGlobal56e26c->field_0x08->isHost && from != 0 && (type & 0x20)) {
+    if (g_TrackGame->network->connectionMode == 3
+        && g_TrackGame->network->isHost && from != 0 && (type & 0x20)) {
         int guaranteed;
-        g_UnknownGlobal56e26c->field_0x08->StripMessageTrailer(&data, (unsigned long*)&size,
+        g_TrackGame->network->StripMessageTrailer(&data, (unsigned long*)&size,
                                                                  &guaranteed, &sequence, &target);
         unsigned char* routed = data;
         if (guaranteed) {
@@ -121,60 +121,60 @@ void HandleReceivedMessage(unsigned char* data, unsigned int size, int from, int
         } else {
             to = target;
         }
-        if (to == 0 || to == g_UnknownGlobal56e26c->field_0x08->localPlayer)
+        if (to == 0 || to == g_TrackGame->network->localPlayer)
             deliver = 1;
         else
             deliver = 0;
-        if (to != g_UnknownGlobal56e26c->field_0x08->localPlayer) {
+        if (to != g_TrackGame->network->localPlayer) {
             NetIncomingMessage* incoming = new(__FILE__, 414) NetIncomingMessage;
             incoming->SetReceived(routed, size, from, to);
-            g_UnknownGlobal56e26c->field_0x08->heldMessages.Add(incoming);
+            g_TrackGame->network->heldMessages.Add(incoming);
         }
     }
 
     if (from == 0) {
         if (*(int*)data == DPSYS_HOST)
-            g_UnknownGlobal56e26c->field_0x08->isHost = 1;
+            g_TrackGame->network->isHost = 1;
     } else {
         if (type & 0x80) {
             short ack[2];
             ack[1] = *(short*)(data + 2);
-            g_UnknownGlobal56e26c->field_0x08->SendRaw(
+            g_TrackGame->network->SendRaw(
                 0x40, ack, 4, *(short*)(data + 2),
-                g_UnknownGlobal56e26c->field_0x08->localPlayer, from, 0, 0);
+                g_TrackGame->network->localPlayer, from, 0, 0);
         }
         if (type == 0x4b) {
-            EnterCriticalSection(NET_LOCK(g_UnknownGlobal56e26c->field_0x08->keepAliveLock));
-            NetPlayer* player = g_UnknownGlobal56e26c->field_0x08->FindPlayer(*(int*)(data + 4));
+            EnterCriticalSection(NET_LOCK(g_TrackGame->network->keepAliveLock));
+            NetPlayer* player = g_TrackGame->network->FindPlayer(*(int*)(data + 4));
             if (player)
                 player->lastKeepAliveTime = UnknownFunction4bfa80();
-            LeaveCriticalSection(NET_LOCK(g_UnknownGlobal56e26c->field_0x08->keepAliveLock));
+            LeaveCriticalSection(NET_LOCK(g_TrackGame->network->keepAliveLock));
             return;
         } else if (type == 0xcc) {
-            if (*(int*)(data + 4) == g_UnknownGlobal56e26c->field_0x08->localPlayer)
-                g_UnknownGlobal56e26c->field_0x08->StopKeepAlive();
+            if (*(int*)(data + 4) == g_TrackGame->network->localPlayer)
+                g_TrackGame->network->StopKeepAlive();
         } else if (type == 0xcd) {
             NetFileHeader* header = (NetFileHeader*)data;
             NetFile* file = new(__FILE__, 484) NetFile;
             file->BeginReceive(from, header);
         } else if (type == 0xcf) {
             NetFileChunk* chunk = (NetFileChunk*)data;
-            for (int i = 0; i < g_UnknownGlobal56e26c->field_0x08->files.m_count; i++) {
-                NetFile* file = g_UnknownGlobal56e26c->field_0x08->files.Get(i);
+            for (int i = 0; i < g_TrackGame->network->files.m_count; i++) {
+                NetFile* file = g_TrackGame->network->files.Get(i);
                 if (file->sourceId == from)
                     file->ReceiveChunk(from, chunk);
             }
             return;
         } else if (type == 0xce) {
-            for (int i = 0; i < g_UnknownGlobal56e26c->field_0x08->files.m_count; i++) {
-                NetFile* file = g_UnknownGlobal56e26c->field_0x08->files.Get(i);
+            for (int i = 0; i < g_TrackGame->network->files.m_count; i++) {
+                NetFile* file = g_TrackGame->network->files.Get(i);
                 if (file->sourceId == from) {
-                    g_UnknownGlobal56e26c->field_0x08->files.Remove(file);
+                    g_TrackGame->network->files.Remove(file);
                     delete file;
                 }
             }
         }
     }
     if (deliver)
-        g_UnknownGlobal56e26c->field_0x08->QueueMessage(data, size, from, to, time);
+        g_TrackGame->network->QueueMessage(data, size, from, to, time);
 }

@@ -24,7 +24,7 @@ int g_UnknownGlobal689938;
 
 // The started sound interface (Game+0x04). A macro: as an inline function
 // VC6 allocates the two loads to different registers than retail.
-#define SoundSystem() ((PCSoundInterface*)g_UnknownGlobal56e26c->field_0x04)
+#define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
 // 0x004bb630: waits for the half-played events and refills the half that
 // just finished playing, until the stop event.
@@ -914,8 +914,8 @@ failed:
 // 0x004be370: reads the sound options; the bitfield stores are VC6's
 // bitfield code shape.
 PCSoundInterface::PCSoundInterface() {
-    field_0x45c_bit0 = g_UnknownGlobal56e26c->UnknownVirtualSlot22("AllowSoundHardware", 1);
-    field_0x45c_bit1 = g_UnknownGlobal56e26c->UnknownVirtualSlot22("AllowSoundEnumeration", 1);
+    field_0x45c_bit0 = g_TrackGame->GetRegistryFlag("AllowSoundHardware", 1);
+    field_0x45c_bit1 = g_TrackGame->GetRegistryFlag("AllowSoundEnumeration", 1);
     field_0x30 = 0;
     field_0x34 = 0;
     field_0x460 = 0;
@@ -925,7 +925,7 @@ PCSoundInterface::PCSoundInterface() {
     field_0x3f8 = 0;
     memset(&field_0x3fc, 0, sizeof(field_0x3fc));
     field_0x45c_bit2 = 0;
-    field_0x45c_bit3 = g_UnknownGlobal56e26c->UnknownVirtualSlot22("AllowEAXExtension", 0);
+    field_0x45c_bit3 = g_TrackGame->GetRegistryFlag("AllowEAXExtension", 0);
     field_0x474 = 0;
     field_0x470 = 0;
 }
@@ -990,7 +990,7 @@ long PCSoundInterface::UnknownFunction4be5a0(int rate, int stereo, int bits, int
     } else if ((result = DirectSoundCreate(0, &field_0x460, 0)) != 0) {
         goto done;
     }
-    if ((result = field_0x460->SetCooperativeLevel(g_UnknownGlobal56e26c->field_0x31c, 2)) != 0)
+    if ((result = field_0x460->SetCooperativeLevel(g_TrackGame->field_0x31c, 2)) != 0)
         goto done;
     field_0x468 = UnknownFunction4beb10();
     if (!field_0x468)

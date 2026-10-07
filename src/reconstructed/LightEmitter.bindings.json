@@ -20,7 +20,7 @@
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?GetRefCount@BaseObject@@UAEHXZ": "0x00401940",
   "?Release@GameObject@@UAEHXZ": "0x004696c0",
-  "?UnknownFunction469190@GameObject@@QAEHPAV1@H@Z": "0x00469190",
+  "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?UnknownFunction49de70@UnknownLightEmitterTarget@@QAEXI@Z": "0x0049de70",
   "?UnknownFunction49de90@UnknownLightEmitterTarget@@QAEXPBUVector3@@@Z": "0x0049de90",
   "?UnknownFunction49dfd0@LightEmitter@@QAEIXZ": "0x0049dfd0",

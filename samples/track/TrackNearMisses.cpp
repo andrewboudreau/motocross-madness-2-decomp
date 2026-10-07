@@ -295,7 +295,7 @@ int Track::UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegmen
 
 // 0x0051ffe0: lists the tracks with a high-score file. For series 1 and 5
 // the name's last character is a digit that selects the variant.
-void TrackRecordDlg::UnknownFunction51ffe0(UnknownGameUiControl* list, DirectoryList* directory, int series)
+void TrackRecordDlg::UnknownFunction51ffe0(UIControl* list, DirectoryList* directory, int series)
 {
     char found[128];
     char track[128];
@@ -311,8 +311,8 @@ void TrackRecordDlg::UnknownFunction51ffe0(UnknownGameUiControl* list, Directory
     else
         prefixed = 0;
     UnknownFunction51ff40();
-    directory->UnknownFunction44a1d0((const char*)g_UnknownGlobal56e26c->mode.field_0x6a0);
-    sprintf(pattern, "*%s", g_UnknownGlobal56e26c->field_0x3400->field_0x04[g_UnknownGlobal56e26c->field_0x3400->field_0x00]);
+    directory->UnknownFunction44a1d0((const char*)g_TrackGame->mode.field_0x6a0);
+    sprintf(pattern, "*%s", g_TrackGame->field_0x3400->field_0x04[g_TrackGame->field_0x3400->field_0x00]);
     directory->UnknownFunction44a220(pattern, 1);
     directory->UnknownVirtualSlot1();
     if (directory->UnknownFunction44a550(found)) {
@@ -327,19 +327,19 @@ void TrackRecordDlg::UnknownFunction51ffe0(UnknownGameUiControl* list, Directory
         }
         track[n] = 0;
         for (;;) {
-            int directoryIndex = g_UnknownGlobal56e26c->mode.UnknownFunction524100();
-            sprintf(path, "%s\\%s%s", (const char*)g_UnknownGlobal56e26c->mode.field_0x6a0, found,
-                    g_UnknownGlobal56e26c->field_0x3400->field_0x04[g_UnknownGlobal56e26c->field_0x3400->field_0x00]);
+            int directoryIndex = g_TrackGame->mode.UnknownFunction524100();
+            sprintf(path, "%s\\%s%s", (const char*)g_TrackGame->mode.field_0x6a0, found,
+                    g_TrackGame->field_0x3400->field_0x04[g_TrackGame->field_0x3400->field_0x00]);
             FILE* file = fopen(path, "r");
             if (file) {
                 fread(&directoryIndex, 4, 1, file);
                 fclose(file);
             }
-            g_UnknownGlobal56e26c->mode.UnknownFunction523a60((int)g_UnknownGlobal56e26c->mode.field_0xa0[directoryIndex],
+            g_TrackGame->mode.FindFileDirectory((int)g_TrackGame->mode.field_0xa0[directoryIndex],
                                                               track, "env", pattern);
-            g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9b80(pattern);
-            g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea010(display, track, digit, "scn", 0, 0);
-            static_cast<UIListBox*>(list)->UnknownFunction476d80(display, field_0x7f64, 0);
+            g_TrackGame->sceneObject->UnknownFunction4e9b80(pattern);
+            g_TrackGame->sceneObject->UnknownFunction4ea010(display, track, digit, "scn", 0, 0);
+            static_cast<UIListBox*>(list)->AddRow(display, field_0x7f64, 0);
             count++;
             field_0x7f60 = (UnknownTrackRecordRow**)DebugRealloc(field_0x7f60, (field_0x7f64 + 1) * 4, __FILE__, 534);
             field_0x7f60[field_0x7f64] = new(__FILE__, 535) UnknownTrackRecordRow;
@@ -359,13 +359,13 @@ void TrackRecordDlg::UnknownFunction51ffe0(UnknownGameUiControl* list, Directory
             }
         }
     }
-    static_cast<UIListBox*>(list)->UnknownFunction477900(1);
+    static_cast<UIListBox*>(list)->Sort(1);
     if (count == 0) {
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x142e, path, 128);
-        static_cast<UIListBox*>(list)->UnknownFunction476d80(path, 0, 0);
-        static_cast<UIListBox*>(list)->UnknownFunction477bb0(0);
+        g_TrackGame->LoadResourceString(0x142e, path, 128);
+        static_cast<UIListBox*>(list)->AddRow(path, 0, 0);
+        static_cast<UIListBox*>(list)->SetSelectable(0);
     } else {
-        static_cast<UIListBox*>(list)->UnknownFunction477bb0(1);
+        static_cast<UIListBox*>(list)->SetSelectable(1);
     }
 }
 

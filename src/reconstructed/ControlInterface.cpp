@@ -18,8 +18,8 @@ static inline float BindingMin(float a, float b) {
 // 0x0043caa0
 int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* event, int modifier) {
     if (event->control == control && event->kind == kind &&
-        (!g_UnknownGlobal56e26c->field_0x14->keyboard ||
-         g_UnknownGlobal56e26c->field_0x14->keyboard->UnknownFunction48a240(modifier)))
+        (!g_TrackGame->controlInterface->keyboard ||
+         g_TrackGame->controlInterface->keyboard->UnknownFunction48a240(modifier)))
         return 1;
     return 0;
 }
@@ -152,7 +152,7 @@ void UnknownControlBinding::UnknownFunction43cd90(float delta) {
 
 // 0x0043cde0: asks the owning device to drop bindings with this id.
 void UnknownControlBinding::UnknownFunction43cde0() {
-    if (g_UnknownGlobal56e26c->field_0x14 && field_0x00)
+    if (g_TrackGame->controlInterface && field_0x00)
         field_0x00->UnknownVirtualSlot0(field_0x04);
 }
 
@@ -217,27 +217,27 @@ int ControlInterface::UnknownFunction43cf00(int value) {
         switch (event->kind) {
         case 0:
             if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(
+                g_TrackGame->UnknownVirtualSlot13(
                     event, &keyboard->keyStates[event->control]);
             if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(
+                g_TrackGame->UnknownVirtualSlot14(
                     event, &keyboard->keyStates[event->control]);
             break;
         case 1:
             if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(
+                g_TrackGame->UnknownVirtualSlot13(
                     event, &mouse->buttonStates[event->control]);
             if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(
+                g_TrackGame->UnknownVirtualSlot14(
                     event, &mouse->buttonStates[event->control]);
             break;
         case 2:
         case 3:
             if (event->pressed == 0)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot13(
+                g_TrackGame->UnknownVirtualSlot13(
                     event, &joysticks[event->device]->buttonStates[event->control]);
             if (event->pressed == 1)
-                g_UnknownGlobal56e26c->UnknownVirtualSlot14(
+                g_TrackGame->UnknownVirtualSlot14(
                     event, &joysticks[event->device]->buttonStates[event->control]);
             break;
         }

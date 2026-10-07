@@ -58,7 +58,7 @@
   "?g_UnknownDisplayCount68a764@@3HA": "0x0068a764",
   "?g_UnknownDisplays68a754@@3PAPAUUnknownDisplay@@A": "0x0068a754",
   "?g_UnknownGammaRamp570570@@3PAY0BAA@GA": "0x00570570",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "_DirectDrawCreateEx@16": "0x00533046",
   "_DirectDrawEnumerateA@8": "0x00533040",
   "_IID_IDirect3D7": "0x00556180",

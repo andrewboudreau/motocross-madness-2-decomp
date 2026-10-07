@@ -9,12 +9,12 @@ PCKeyboardDevice::PCKeyboardDevice() {}
 // format, cooperative level 6 and a 16-entry buffer, then acquires it; on
 // any failure the device is released.
 int PCKeyboardDevice::UnknownVirtualSlot2() {
-    if (g_UnknownGlobal56e26c->field_0x14->directInput->CreateDeviceEx(
+    if (g_TrackGame->controlInterface->directInput->CreateDeviceEx(
             GUID_SysKeyboard, IID_IDirectInputDevice7A, &device, 0) < 0)
         goto failed;
     if (device->SetDataFormat(&c_dfDIKeyboard) < 0)
         goto failed;
-    if (device->SetCooperativeLevel(g_UnknownGlobal56e26c->field_0x31c, 6) < 0)
+    if (device->SetCooperativeLevel(g_TrackGame->field_0x31c, 6) < 0)
         goto failed;
     deviceInfo.size = sizeof(deviceInfo);
     device->GetDeviceInfo(&deviceInfo);
@@ -34,7 +34,7 @@ failed:
 
 // 0x004c4520: `control` through the mapping table, then slot 5.
 int PCKeyboardDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInputEntry* entry) {
-    UnknownControlMapping* mapping = g_UnknownGlobal56e26c->field_0x14->mapping;
+    UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
     mapping->UnknownFunction43cba0(control, &control);
@@ -104,12 +104,12 @@ int PCKeyboardDevice::UnknownVirtualSlot6(int value) {
             keyStates[key].state = 1;
             keyStates[key].previousPressTime = keyStates[key].pressTime;
             keyStates[key].pressTime = events[i].timeStamp;
-            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(key, deviceKind, 1, 0);
+            g_TrackGame->controlInterface->UnknownFunction43cea0(key, deviceKind, 1, 0);
         } else if (key != 0x45) {
             keyStates[key].state = 0;
             keyStates[key].previousReleaseTime = keyStates[key].releaseTime;
             keyStates[key].releaseTime = events[i].timeStamp;
-            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(key, deviceKind, 0, 0);
+            g_TrackGame->controlInterface->UnknownFunction43cea0(key, deviceKind, 0, 0);
         }
     }
     for (int list = 0; list < 6; list++)

@@ -75,7 +75,7 @@
   "?UnknownVirtualSlot7@GameObject@@UAEXXZ": "0x00469070",
   "?UnknownVirtualSlot8@GameObject@@UAEPAV1@PAX@Z": "0x004692f0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownSharedMipSurfaces68a36c@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a36c",
   "?g_UnknownSharedSurfaces68a394@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a394",
   "__FILE__": "0x00574f00",

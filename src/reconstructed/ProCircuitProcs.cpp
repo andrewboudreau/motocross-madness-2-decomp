@@ -67,9 +67,9 @@ static inline int UnknownFileExists(const char* path)
 }
 
 // Sets `control`'s text from string resource `id`.
-static inline void UnknownSetText(UnknownGameUiControl* control, int id)
+static inline void UnknownSetText(UIControl* control, int id)
 {
-    control->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, id);
+    control->SetTextFromResource(g_TrackGame->field_0x420, id);
 }
 
 // 0x004d4b20
@@ -95,16 +95,16 @@ int CompareCashDescending(const void* a, const void* b)
 // 0x004d4ba0
 void OpenCareerDialog()
 {
-    UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     if (circuit->field_0x464 & 8) {
         PCCompleteDlg* dialog = new(__FILE__, 78) PCCompleteDlg;
-        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
+        g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
     } else if (circuit->field_0x44 == 1) {
         PCNewEventDlg* dialog = new(__FILE__, 80) PCNewEventDlg;
-        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
+        g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
     } else {
         PCCentralDlg* dialog = new(__FILE__, 82) PCCentralDlg;
-        g_UnknownGlobal56e26c->ui->field_0x2c->UnknownFunction485a70(dialog, 0, 2, 0, 0, 0, 0, 1);
+        g_TrackGame->ui->field_0x2c->ShowDialog(dialog, 0, 2, 0, 0, 0, 0, 1);
     }
 }
 
@@ -142,35 +142,35 @@ void PCStartupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case kDialogCommand:
         if (_stricmp("ButNew", event->controlName) == 0) {
             PCNewDlg* dialog = new(__FILE__, 135) PCNewDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
             dialog->SetAnswerTargets(field_0x7f60, &field_0x8060, &field_0x8064, &field_0x8068);
         } else if (_stricmp("ButContinue", event->controlName) == 0) {
             int row = static_cast<UIListBox*>(FindControl("LstRank", 3))->GetRowData(-1);
-            g_UnknownGlobal56e26c->field_0x3444 = new(__FILE__, 142) UnknownTrackGameObject3444;
-            strcpy((char*)g_UnknownGlobal56e26c->field_0x3448, field_0x7f58[row]);
-            if (g_UnknownGlobal56e26c->field_0x3444->LoadSaved((char*)g_UnknownGlobal56e26c->field_0x3448)) {
+            g_TrackGame->field_0x3444 = new(__FILE__, 142) UnknownTrackGameObject3444;
+            strcpy((char*)g_TrackGame->field_0x3448, field_0x7f58[row]);
+            if (g_TrackGame->field_0x3444->LoadSaved((char*)g_TrackGame->field_0x3448)) {
                 PCCentralDlg* dialog = new(__FILE__, 146) PCCentralDlg;
-                guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             }
             EndDialog(0);
         } else if (_stricmp("ButDelete", event->controlName) == 0) {
             field_0x8070 = 0;
             field_0x806c = new(__FILE__, 152) ChoiceDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)field_0x806c, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)field_0x806c, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
             field_0x806c->SetTextsOrResources(0, 0x143c, 0, 0, 0, 0x143e, 0, 0, 0, 0x143d);
         } else if (_stricmp("ButDoneDelete", event->controlName) == 0) {
             field_0x806c = 0;
             field_0x8070 = new(__FILE__, 162) ChoiceDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)field_0x8070, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)field_0x8070, 0, 4, 0, (UnknownGuiDialog*)this, 0, 0, 1);
             field_0x8070->SetTextsOrResources(0, 0x143c, 0, 0, 0, 0x143e, 0, 0, 0, 0x143d);
         } else if (_stricmp("Back", event->controlName) == 0) {
-            g_UnknownGlobal56e26c->ui->UnknownFunction499b20(100);
+            g_TrackGame->ui->OpenMenu(100);
             EndDialog(0);
         }
         break;
     case 9:
         if (event->code == 0x3e9) {
-            g_UnknownGlobal56e26c->field_0x3444 = new(__FILE__, 182) UnknownTrackGameObject3444;
+            g_TrackGame->field_0x3444 = new(__FILE__, 182) UnknownTrackGameObject3444;
             int difficulty;
             switch (field_0x8060) {
             case 1:
@@ -183,19 +183,19 @@ void PCStartupDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
                 difficulty = 3;
                 break;
             }
-            g_UnknownGlobal56e26c->field_0x3444->UnknownFunction4d3b00(field_0x7f60, difficulty, field_0x8064,
+            g_TrackGame->field_0x3444->UnknownFunction4d3b00(field_0x7f60, difficulty, field_0x8064,
                                                                         field_0x8068 + 1);
             char path[128];
             // The first free CircuitNNN.pc.
             int number = 1;
-            sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_UnknownGlobal56e26c->mode.field_0x00, number);
+            sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.field_0x00, number);
             while (UnknownFileExists(path))
-                sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_UnknownGlobal56e26c->mode.field_0x00, ++number);
-            strcpy((char*)g_UnknownGlobal56e26c->field_0x3448, path);
-            g_UnknownGlobal56e26c->field_0x3444->Save((char*)g_UnknownGlobal56e26c->field_0x3448);
+                sprintf(path, "%s\\%s\\Circuit%03d.pc", "ui\\profile", g_TrackGame->mode.field_0x00, ++number);
+            strcpy((char*)g_TrackGame->field_0x3448, path);
+            g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
             EndDialog(0);
             PCNewEventDlg* dialog = new(__FILE__, 214) PCNewEventDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
         } else if (event->code == 0x65) {
             if (field_0x806c)
                 DeleteFileA(field_0x7f58[static_cast<UIListBox*>(FindControl("LstRank", 3))->GetRowData(-1)]);
@@ -254,7 +254,7 @@ void PCStartupDlg::FillLists()
     char directory[128];
     char pattern[128];
     WIN32_FIND_DATA data;
-    sprintf(directory, "%s\\%s\\", "ui\\profile", g_UnknownGlobal56e26c->mode.field_0x00);
+    sprintf(directory, "%s\\%s\\", "ui\\profile", g_TrackGame->mode.field_0x00);
     sprintf(pattern, "%s*.pc", directory);
     HANDLE find = FindFirstFileA(pattern, &data);
     if (find != INVALID_HANDLE_VALUE) {
@@ -305,12 +305,12 @@ void PCNewDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     case kDialogInit: {
         static_cast<UIRadioButton*>(FindControl("RadClass250", 4))->SelectInGroup(0);
         static_cast<UIRadioButton*>(FindControl("RadLODMedium", 4))->SelectInGroup(0);
-        static_cast<UIEditBox*>(FindControl("EditBox", 11))->SetEditText(g_UnknownGlobal56e26c->mode.field_0x00);
+        static_cast<UIEditBox*>(FindControl("EditBox", 11))->SetEditText(g_TrackGame->mode.field_0x00);
         UIListBox* list = static_cast<UIListBox*>(FindControl("OpponentsListBox", 3));
         list->RemoveAllRows();
         for (int i = 3; i < 11; i++) {
             sprintf(number, "%d", i);
-            list->UnknownFunction476d80(number, i, 0);
+            list->AddRow(number, i, 0);
         }
         list->SelectRowByData(7);
         guiUser->UnknownFunction487790((UnknownGuiControl*)FindControl("EditBox", 11), 0, 0);
@@ -352,17 +352,17 @@ void PCCentralDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         field_0x7f5c = 0;
         field_0x7f60 = 0;
         UIRadioButton* tab = static_cast<UIRadioButton*>(FindControl("TabNext", 4));
-        tab->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1446);
-        tab->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1446);
+        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1446);
+        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1446);
         tab->SetTextAlign(0x22);
         tab->SelectInGroup(0);
         tab = static_cast<UIRadioButton*>(FindControl("TabBikeRider", 4));
-        tab->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1447);
-        tab->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1447);
+        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1447);
+        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1447);
         tab->SetTextAlign(0x22);
         tab = static_cast<UIRadioButton*>(FindControl("TabStandings", 4));
-        tab->SetStateTextFromResource(0, g_UnknownGlobal56e26c->field_0x420, 0x1448);
-        tab->SetStateTextFromResource(1, g_UnknownGlobal56e26c->field_0x420, 0x1448);
+        tab->SetStateTextFromResource(0, g_TrackGame->field_0x420, 0x1448);
+        tab->SetStateTextFromResource(1, g_TrackGame->field_0x420, 0x1448);
         tab->SetTextAlign(0x22);
         static_cast<UIRadioButton*>(FindControl("TabNext", 4))->SelectInGroup(0);
         OpenPage(0);
@@ -370,46 +370,46 @@ void PCCentralDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case kDialogCommand:
         if (_stricmp("Back", event->controlName) == 0) {
-            g_UnknownGlobal56e26c->field_0x3444->Save((char*)g_UnknownGlobal56e26c->field_0x3448);
+            g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
             PCStartupDlg* dialog = new(__FILE__, 488) PCStartupDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             event->dialog->EndDialog(0);
             event->handled = 1;
         } else if (_stricmp("Start", event->controlName) == 0 || _stricmp("Practice", event->controlName) == 0) {
-            UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
-            g_UnknownGlobal56e26c->ui->HideScene();
-            g_UnknownGlobal56e26c->mode.field_0x25ec[0] = 0;
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 = 0;
+            UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+            g_TrackGame->ui->HideScene();
+            g_TrackGame->mode.field_0x25ec[0] = 0;
+            g_TrackGame->mode.field_0x27f8.field_0x28 = 0;
             if (field_0x7f58)
                 field_0x7f58->UpdateBoundValues(1);
             if (field_0x7f5c)
                 field_0x7f5c->UpdateBoundValues(1);
             if (field_0x7f60)
                 field_0x7f60->UpdateBoundValues(1);
-            g_UnknownGlobal56e26c->eventManager->UnknownFunction45e520();
+            g_TrackGame->eventManager->ResetEntries();
             if (_stricmp("Start", event->controlName) == 0) {
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 = circuit->field_0x40;
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 = 1;
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20 = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 = circuit->field_0x460 - 1;
+                g_TrackGame->mode.field_0x27f8.field_0x04 = circuit->field_0x40;
+                g_TrackGame->mode.field_0x27f8.field_0x00 = 1;
+                g_TrackGame->mode.field_0x27f8.field_0x20 = circuit->field_0x1285[circuit->field_0x40].field_0x0c;
+                g_TrackGame->mode.field_0x27f8.field_0x24 = circuit->field_0x460 - 1;
             } else {
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04 = circuit->field_0x40;
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 = 0;
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 = 0;
+                g_TrackGame->mode.field_0x27f8.field_0x04 = circuit->field_0x40;
+                g_TrackGame->mode.field_0x27f8.field_0x00 = 0;
+                g_TrackGame->mode.field_0x27f8.field_0x24 = 0;
             }
-            g_UnknownGlobal56e26c->mode.UnknownFunction5240e0(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x04);
+            g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->mode.field_0x27f8.field_0x04);
             char name[128];
             strcpy(name, circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00);
             char* extension = strrchr(name, '.');
             if (extension)
                 *extension = 0;
-            strcpy(g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x36, name);
+            strcpy(g_TrackGame->mode.field_0x27f8.field_0x36, name);
             if (circuit->field_0x40 == 1 || circuit->field_0x40 == 5)
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34 = 1;
+                g_TrackGame->mode.field_0x27f8.field_0x34 = 1;
             else
-                g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x34 = 0;
-            g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x10 = 1;
-            g_UnknownGlobal56e26c->mode.field_0x94 = circuit->field_0x50;
+                g_TrackGame->mode.field_0x27f8.field_0x34 = 0;
+            g_TrackGame->mode.field_0x27f8.field_0x10 = 1;
+            g_TrackGame->mode.field_0x94 = circuit->field_0x50;
             UnknownFunction4536e0();
             UnknownVirtualSlot26();
         } else if (_stricmp("TabNext", event->controlName) == 0) {
@@ -420,12 +420,12 @@ void PCCentralDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             OpenPage(2);
         } else if (_stricmp("Options", event->controlName) == 0) {
             OptionsDlg* dialog = new(__FILE__, 554) OptionsDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 0, 0, 1);
         } else if (_stricmp("Controls", event->controlName) == 0) {
             OptionsDlg* dialog = new(__FILE__, 557) OptionsDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 1, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, (UnknownGuiDialog*)this, 1, 0, 1);
         } else if (_stricmp("Help", event->controlName) == 0) {
-            g_UnknownGlobal56e26c->mode.UnknownFunction523d30("MCM2HELP", 0);
+            g_TrackGame->mode.OpenHelp("MCM2HELP", 0);
         }
         break;
     }
@@ -455,19 +455,19 @@ void PCCentralDlg::OpenPage(int page)
     case 0:
         if (!field_0x7f58) {
             field_0x7f58 = new(__FILE__, 584) PCCentralNextDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)field_0x7f58, 0, 1, (int)&area, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)field_0x7f58, 0, 1, (int)&area, (UnknownGuiDialog*)this, 0, 0, 1);
         }
         break;
     case 1:
         if (!field_0x7f5c) {
             field_0x7f5c = new(__FILE__, 590) PCCentralBikeRiderDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)field_0x7f5c, 0, 1, (int)&area, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)field_0x7f5c, 0, 1, (int)&area, (UnknownGuiDialog*)this, 0, 0, 1);
         }
         break;
     case 2:
         if (!field_0x7f60) {
             field_0x7f60 = new(__FILE__, 596) PCCentralStandingsDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)field_0x7f60, 0, 1, (int)&area, (UnknownGuiDialog*)this, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)field_0x7f60, 0, 1, (int)&area, (UnknownGuiDialog*)this, 0, 0, 1);
         }
         break;
     }
@@ -476,11 +476,11 @@ void PCCentralDlg::OpenPage(int page)
 // 0x004d7f40
 void PCCentralNextDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     if (event->kind != kDialogInit)
         return;
     const char* directory;
-    UnknownGameUiControl* picture;
+    UIControl* picture;
     char text[128];
     char image[128];
     char path[260];
@@ -493,16 +493,16 @@ void PCCentralNextDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         ->SetText(circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x04);
     switch (circuit->field_0x40) {
     case 5:
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f0, text, 128);
+        g_TrackGame->LoadResourceString(0x13f0, text, 128);
         break;
     case 1:
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13ed, text, 128);
+        g_TrackGame->LoadResourceString(0x13ed, text, 128);
         break;
     case 2:
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13ef, text, 128);
+        g_TrackGame->LoadResourceString(0x13ef, text, 128);
         break;
     case 3:
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x13f2, text, 128);
+        g_TrackGame->LoadResourceString(0x13f2, text, 128);
         break;
     }
     FindControl("TxtNextType", 12)->SetText(text);
@@ -518,7 +518,7 @@ void PCCentralNextDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     FindControl("TxtRepairs", 12)->SetText(text);
     sprintf(text, "$%d", circuit->field_0x465[0].field_0x18.field_0x0c);
     FindControl("TxtMedical", 12)->SetText(text);
-    UnknownGameUiControl* announcement = FindControl("TxtAnnouncement", 12);
+    UIControl* announcement = FindControl("TxtAnnouncement", 12);
     announcement->field_0x1e8 = 1;
     announcement->SetText(circuit->field_0x54);
 
@@ -546,10 +546,10 @@ void PCCentralNextDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         strcat(image, "s.tga");
         break;
     }
-    g_UnknownGlobal56e26c->mode.UnknownFunction523a60(
+    g_TrackGame->mode.FindFileDirectory(
         (int)directory, circuit->field_0x1285[series].field_0x00[circuit->field_0x44 - 1].field_0x00, "env", path);
-    g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9b80(path);
-    g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9e30(
+    g_TrackGame->sceneObject->UnknownFunction4e9b80(path);
+    g_TrackGame->sceneObject->UnknownFunction4e9e30(
         circuit->field_0x1285[circuit->field_0x40].field_0x00[circuit->field_0x44 - 1].field_0x00, "scn", 0);
     picture->SetImageFile(0, image);
 }
@@ -559,7 +559,7 @@ void PCCentralStandingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
     if (event->kind != kDialogInit)
         return;
-    UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     UIListBox* rank = static_cast<UIListBox*>(FindControl("LstRank", 3));
     UIListBox* name = static_cast<UIListBox*>(FindControl("LstName", 3));
     UIListBox* points = static_cast<UIListBox*>(FindControl("LstPoints", 3));
@@ -570,18 +570,18 @@ void PCCentralStandingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     char text[128];
     for (int i = 0; i < circuit->field_0x460; i++) {
         _itoa(circuit->field_0x465[i].field_0x18.field_0x10, text, 10);
-        rank->UnknownFunction476d80(text, i, 0);
-        name->UnknownFunction476d80(circuit->field_0x465[i].field_0xf8, i, 0);
+        rank->AddRow(text, i, 0);
+        name->AddRow(circuit->field_0x465[i].field_0xf8, i, 0);
         _itoa(circuit->field_0x465[i].field_0x18.field_0x00, text, 10);
-        points->UnknownFunction476d80(text, i, 0);
-        bike->UnknownFunction476d80(circuit->field_0x465[i].field_0x118, i, 0);
+        points->AddRow(text, i, 0);
+        bike->AddRow(circuit->field_0x465[i].field_0x118, i, 0);
         sprintf(text, "$%d", circuit->field_0x465[i].field_0x30);
-        cash->UnknownFunction476d80(text, i, 0);
+        cash->AddRow(text, i, 0);
         sprintf(text, "$%d", circuit->field_0x465[i].field_0x18.field_0x04 + circuit->field_0x465[i].field_0x18.field_0x14);
-        winnings->UnknownFunction476d80(text, i, 0);
+        winnings->AddRow(text, i, 0);
         sprintf(text, "$%d", circuit->field_0x465[i].field_0x18.field_0x08 + circuit->field_0x465[i].field_0x18.field_0x0c +
                                  circuit->field_0x454);
-        expenses->UnknownFunction476d80(text, i, 0);
+        expenses->AddRow(text, i, 0);
     }
     static_cast<UIButton*>(FindControl("ButRank", 1))->SetSortList(rank);
     rank->SetSortCompare(CompareRowNumbersAscending);
@@ -595,13 +595,13 @@ void PCCentralStandingsDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     winnings->SetSortCompare(CompareCashDescending);
     static_cast<UIButton*>(FindControl("ButExpenses", 1))->SetSortList(expenses);
     expenses->SetSortCompare(CompareCashAscending);
-    rank->UnknownFunction477900(1);
+    rank->Sort(1);
 }
 
 // 0x004d8660
 void PCLastRaceDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     switch (event->kind) {
     case kDialogInit: {
         UIListBox* rank = static_cast<UIListBox*>(FindControl("LstRank", 3));
@@ -613,19 +613,19 @@ void PCLastRaceDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         UIListBox* medical = static_cast<UIListBox*>(FindControl("LstMedical", 3));
         PayOutRace();
         char text[128];
-        for (int i = 0; i < g_UnknownGlobal56e26c->field_0x3444->field_0x460; i++) {
-            _itoa(g_UnknownGlobal56e26c->field_0x3444->field_0x465[i].field_0x00.field_0x10, text, 10);
-            rank->UnknownFunction476d80(text, i, 0);
-            name->UnknownFunction476d80(g_UnknownGlobal56e26c->field_0x3444->field_0x465[i].field_0xf8, i, 0);
-            _itoa(g_UnknownGlobal56e26c->field_0x3444->field_0x465[i].field_0x00.field_0x00, text, 10);
-            points->UnknownFunction476d80(text, i, 0);
-            bike->UnknownFunction476d80(g_UnknownGlobal56e26c->field_0x3444->field_0x465[i].field_0x118, i, 0);
-            sprintf(text, "$%d", g_UnknownGlobal56e26c->field_0x3444->field_0x465[i].field_0x00.field_0x04);
-            winnings->UnknownFunction476d80(text, i, 0);
-            sprintf(text, "$%d", g_UnknownGlobal56e26c->field_0x3444->field_0x465[i].field_0x00.field_0x08);
-            repairs->UnknownFunction476d80(text, i, 0);
-            sprintf(text, "$%d", g_UnknownGlobal56e26c->field_0x3444->field_0x465[i].field_0x00.field_0x0c);
-            medical->UnknownFunction476d80(text, i, 0);
+        for (int i = 0; i < g_TrackGame->field_0x3444->field_0x460; i++) {
+            _itoa(g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x10, text, 10);
+            rank->AddRow(text, i, 0);
+            name->AddRow(g_TrackGame->field_0x3444->field_0x465[i].field_0xf8, i, 0);
+            _itoa(g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x00, text, 10);
+            points->AddRow(text, i, 0);
+            bike->AddRow(g_TrackGame->field_0x3444->field_0x465[i].field_0x118, i, 0);
+            sprintf(text, "$%d", g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x04);
+            winnings->AddRow(text, i, 0);
+            sprintf(text, "$%d", g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x08);
+            repairs->AddRow(text, i, 0);
+            sprintf(text, "$%d", g_TrackGame->field_0x3444->field_0x465[i].field_0x00.field_0x0c);
+            medical->AddRow(text, i, 0);
         }
         static_cast<UIButton*>(FindControl("ButRank", 1))->SetSortList(rank);
         rank->SetSortCompare(CompareRowNumbersAscending);
@@ -639,9 +639,9 @@ void PCLastRaceDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         repairs->SetSortCompare(CompareCashAscending);
         static_cast<UIButton*>(FindControl("ButMedical", 1))->SetSortList(medical);
         medical->SetSortCompare(CompareCashAscending);
-        rank->UnknownFunction477900(1);
-        g_UnknownGlobal56e26c->field_0x3444->AdvanceAfterRace();
-        g_UnknownGlobal56e26c->field_0x3444->Save((char*)g_UnknownGlobal56e26c->field_0x3448);
+        rank->Sort(1);
+        g_TrackGame->field_0x3444->AdvanceAfterRace();
+        g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
         break;
     }
     case kDialogCommand:
@@ -649,21 +649,21 @@ void PCLastRaceDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             int bonus = circuit->field_0x44 == circuit->field_0x1285[circuit->field_0x40].field_0x08;
             if (bonus && circuit->field_0x465[0].field_0x18.field_0x10 == 1) {
                 PCBonusTrackDlg* dialog = new(__FILE__, 1368) PCBonusTrackDlg;
-                guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             } else if (circuit->field_0x465[0].field_0x30 <
-                       circuit->field_0x1229[g_UnknownGlobal56e26c->field_0x3444->field_0x40]) {
+                       circuit->field_0x1229[g_TrackGame->field_0x3444->field_0x40]) {
                 if (!(circuit->field_0x464 & 1)) {
                     PCBailoutDlg* dialog = new(__FILE__, 1374) PCBailoutDlg;
-                    guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                    guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
                     circuit->field_0x464 |= 1;
                 } else if (!(circuit->field_0x464 & 2)) {
                     PCBunnyDlg* dialog = new(__FILE__, 1378) PCBunnyDlg;
-                    guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                    guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
                     circuit->field_0x464 |= 2;
                 } else {
                     circuit->field_0x464 |= 4;
                     PCFailedDlg* dialog = new(__FILE__, 1383) PCFailedDlg;
-                    guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+                    guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
                 }
             } else {
                 OpenCareerDialog();
@@ -687,26 +687,26 @@ int CompareRankPoints(const void* a, const void* b)
 // 0x004d9340
 void PCFailedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
-    UnknownGameUiControl* label;
+    UIControl* label;
     switch (event->kind) {
     case kDialogInit: {
-        g_UnknownGlobal56e26c->field_0x3444->Save((char*)g_UnknownGlobal56e26c->field_0x3448);
-        UnknownGameUiControl* description = FindControl("TxtDescription", 12);
+        g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
+        UIControl* description = FindControl("TxtDescription", 12);
         description->field_0x1e8 = 1;
-        description->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x1464);
+        description->SetTextFromResource(g_TrackGame->field_0x420, 0x1464);
         label = FindControl("TitleText", 12);
-        label->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x1467);
+        label->SetTextFromResource(g_TrackGame->field_0x420, 0x1467);
         label = FindControl("ButDecline", 1);
         label->Show(0, 1);
         label = FindControl("ButAccept", 1);
-        label->SetTextFromResource(g_UnknownGlobal56e26c->field_0x420, 0x144e);
-        UnknownGameUiControl* picture = FindControl("Pic", 5);
+        label->SetTextFromResource(g_TrackGame->field_0x420, 0x144e);
+        UIControl* picture = FindControl("Pic", 5);
         picture->SetImage(0, FindSectionObject("FailScreen"));
         break;
     }
     case kDialogCommand: {
         PCFinishedDlg* dialog = new(__FILE__, 1593) PCFinishedDlg;
-        guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+        guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
         EndDialog(0);
         break;
     }
@@ -716,7 +716,7 @@ void PCFailedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 // 0x004d94e0
 void PCFinishedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     switch (event->kind) {
     case kDialogInit: {
         UIListBox* rank = static_cast<UIListBox*>(FindControl("LstRank", 3));
@@ -729,17 +729,17 @@ void PCFinishedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         char text[128];
         for (int i = 0; i < circuit->field_0x460; i++) {
             _itoa(circuit->field_0x465[i].field_0x18.field_0x10, text, 10);
-            rank->UnknownFunction476d80(text, i, 0);
-            name->UnknownFunction476d80(circuit->field_0x465[i].field_0xf8, i, 0);
+            rank->AddRow(text, i, 0);
+            name->AddRow(circuit->field_0x465[i].field_0xf8, i, 0);
             _itoa(circuit->field_0x465[i].field_0x18.field_0x00, text, 10);
-            points->UnknownFunction476d80(text, i, 0);
-            bike->UnknownFunction476d80(circuit->field_0x465[i].field_0x118, i, 0);
+            points->AddRow(text, i, 0);
+            bike->AddRow(circuit->field_0x465[i].field_0x118, i, 0);
             sprintf(text, "$%d", circuit->field_0x465[i].field_0x30);
-            cash->UnknownFunction476d80(text, i, 0);
+            cash->AddRow(text, i, 0);
             sprintf(text, "$%d", circuit->field_0x465[i].field_0x18.field_0x08);
-            repairs->UnknownFunction476d80(text, i, 0);
+            repairs->AddRow(text, i, 0);
             sprintf(text, "$%d", circuit->field_0x465[i].field_0x18.field_0x0c);
-            medical->UnknownFunction476d80(text, i, 0);
+            medical->AddRow(text, i, 0);
         }
         static_cast<UIButton*>(FindControl("ButRank", 1))->SetSortList(rank);
         rank->SetSortCompare(CompareRowNumbersAscending);
@@ -753,13 +753,13 @@ void PCFinishedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         repairs->SetSortCompare(CompareCashAscending);
         static_cast<UIButton*>(FindControl("ButMedical", 1))->SetSortList(medical);
         medical->SetSortCompare(CompareCashAscending);
-        rank->UnknownFunction477900(1);
+        rank->Sort(1);
         break;
     }
     case kDialogCommand:
         if (_stricmp("Back", event->controlName) == 0) {
             PCStartupDlg* dialog = new(__FILE__, 1659) PCStartupDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
             EndDialog(0);
         }
         break;
@@ -769,23 +769,23 @@ void PCFinishedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 // 0x004da1b0
 void PCCompleteDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {
-    UnknownTrackGameObject3444* circuit = g_UnknownGlobal56e26c->field_0x3444;
+    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     switch (event->kind) {
     case kDialogInit: {
         char rank[1024];
         char text[1024];
         char message[2048];
-        g_UnknownGlobal56e26c->field_0x3444->Save((char*)g_UnknownGlobal56e26c->field_0x3448);
+        g_TrackGame->field_0x3444->Save((char*)g_TrackGame->field_0x3448);
         UnknownSetText(FindControl("TitleText", 12), 0x145d);
-        UnknownGameUiControl* description = FindControl("TxtDescription", 12);
-        g_UnknownGlobal56e26c->UnknownFunction521970(0x145e, text, 1023);
+        UIControl* description = FindControl("TxtDescription", 12);
+        g_TrackGame->LoadResourceString(0x145e, text, 1023);
         strcpy(rank, "");
         if (circuit->field_0x465[0].field_0x18.field_0x10 == 1)
-            g_UnknownGlobal56e26c->UnknownFunction521970(0x145f, rank, 1023);
+            g_TrackGame->LoadResourceString(0x145f, rank, 1023);
         sprintf(message, "%s\n%s", text, rank);
         description->field_0x1e8 = 1;
         description->SetText(message);
-        UnknownGameUiControl* control = FindControl("ButDecline", 1);
+        UIControl* control = FindControl("ButDecline", 1);
         control->Show(0, 1);
         UnknownSetText(FindControl("ButAccept", 1), 0x144e);
         control = FindControl("Pic", 5);
@@ -794,7 +794,7 @@ void PCCompleteDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
     case kDialogCommand: {
         PCFinishedDlg* dialog = new(__FILE__, 1941) PCFinishedDlg;
-        guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+        guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
         EndDialog(0);
         break;
     }
@@ -804,16 +804,16 @@ void PCCompleteDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 // 0x004d71f0
 void PCCentralBikeRiderDlg::PaintPlateNumber(int number)
 {
-    UnknownBikeNumberPainter painter(g_UnknownGlobal56e26c->field_0x1c);
-    for (int i = 0; i < g_UnknownGlobal56e26c->ui->field_0x4c; i++)
+    UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
+    for (int i = 0; i < g_TrackGame->ui->field_0x4c; i++)
         painter.UnknownFunction417670(
-            ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[i].field_0xc0->plateTexture, number);
+            ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[i].field_0xc0->plateTexture, number);
 }
 
 // 0x004d72a0
 void PCCentralBikeRiderDlg::UnknownVirtualSlot26()
 {
-    g_UnknownGlobal56e26c->ui->HideScene();
+    g_TrackGame->ui->HideScene();
     UIDialog::UnknownVirtualSlot26();
 }
 
@@ -822,7 +822,7 @@ void PCCentralBikeRiderDlg::ApplyChosenRider()
 {
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
     field_0x7f88 = 1;
-    g_UnknownGlobal56e26c->field_0x3444->field_0x458 = list->GetRowData(-1);
+    g_TrackGame->field_0x3444->field_0x458 = list->GetRowData(-1);
 }
 
 // 0x004d7900: shows the chosen bike and loads its class's garage defaults.
@@ -830,19 +830,19 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
 {
     char text[12];
     UIListBox* bikes = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
-    KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+    KrustyUI* ui = g_TrackGame->ui;
     UnknownKrustyUIBike* bike = &((UnknownKrustyUIBike*)ui->field_0x50)[bikes->GetRowData(-1)];
     UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)ui->field_0x48)[bike->model];
     int i;
     // Retail re-reads TrackGame's KrustyUI after each model is hidden.
     for (i = 0; i < ui->field_0x4c; i++) {
         ((UnknownKrustyUIModel*)ui->field_0x48)[i].field_0xc0->UnknownVirtualSlot4();
-        ui = g_UnknownGlobal56e26c->ui;
+        ui = g_TrackGame->ui;
     }
     model->field_0xc0->UnknownVirtualSlot5();
     field_0x7f84 = 1;
     if (bike->field_0x88) {
-        UnknownGameUiControl* engine = FindControl("DDLEngineSize", 0);
+        UIControl* engine = FindControl("DDLEngineSize", 0);
         if (!engine->field_0x70) {
             engine->Show(1, 1);
             FindControl("TxtEngineSize", 0)->Show(1, 1);
@@ -850,7 +850,7 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
                 dialogBackground->UnknownFunction404da0();
         }
     } else {
-        UnknownGameUiControl* engine = FindControl("DDLEngineSize", 0);
+        UIControl* engine = FindControl("DDLEngineSize", 0);
         if (engine->field_0x70) {
             engine->Show(0, 1);
             FindControl("TxtEngineSize", 0)->Show(0, 1);
@@ -858,26 +858,26 @@ void PCCentralBikeRiderDlg::ApplyChosenBike()
                 dialogBackground->UnknownFunction404da0();
         }
     }
-    g_UnknownGlobal56e26c->field_0x3444->field_0x45c = bikes->GetRowData(-1);
+    g_TrackGame->field_0x3444->field_0x45c = bikes->GetRowData(-1);
     if (bike->field_0x88) {
         UIListBox* sizes = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         int size = sizes->GetRowData(-1);
-        g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x138 = g_UnknownGlobal56cb6c[size];
-        g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x13c = size == 2 || size == 4 ? 1 : 0;
+        g_TrackGame->field_0x3444->field_0x465[0].field_0x138 = g_UnknownGlobal56cb6c[size];
+        g_TrackGame->field_0x3444->field_0x465[0].field_0x13c = size == 2 || size == 4 ? 1 : 0;
         UNKNOWN_APPLY_BIKE_CLASS(size, i);
     } else {
         int row = bikes->GetRowData(-1);
-        g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x138 =
-            ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[row].engineSize;
-        g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x13c =
-            ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[row].field_0x90;
-        int bikeClass = UnknownBikeClassOf(g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x138);
+        g_TrackGame->field_0x3444->field_0x465[0].field_0x138 =
+            ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].engineSize;
+        g_TrackGame->field_0x3444->field_0x465[0].field_0x13c =
+            ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[row].field_0x90;
+        int bikeClass = UnknownBikeClassOf(g_TrackGame->field_0x3444->field_0x465[0].field_0x138);
         UNKNOWN_APPLY_BIKE_CLASS(bikeClass, i);
     }
-    UNKNOWN_GARAGE_SETTINGS->engineSize = g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x138;
-    UNKNOWN_GARAGE_SETTINGS->field_0x04 = g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x13c;
+    UNKNOWN_GARAGE_SETTINGS->engineSize = g_TrackGame->field_0x3444->field_0x465[0].field_0x138;
+    UNKNOWN_GARAGE_SETTINGS->field_0x04 = g_TrackGame->field_0x3444->field_0x465[0].field_0x13c;
     UIEditBox* plate = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
-    _itoa(g_UnknownGlobal56e26c->mode.field_0x1bcc, text, 10);
+    _itoa(g_TrackGame->mode.field_0x1bcc, text, 10);
     plate->SetEditText(text);
 }
 
@@ -886,21 +886,21 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot31(int apply)
 {
     if (!apply)
         return;
-    strcpy(g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x38, "");
+    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0x38, "");
     UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
     int bike = list->GetRowData(-1);
-    strcpy(g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x38,
-           ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)
-               [((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].model].modelName);
-    strcpy(g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x78,
-           ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].field_0x48);
-    strcpy(g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x118,
-           ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].displayName);
-    strcpy(g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0xb8, "");
+    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0x38,
+           ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)
+               [((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bike].model].modelName);
+    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0x78,
+           ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bike].field_0x48);
+    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0x118,
+           ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bike].displayName);
+    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0xb8, "");
     list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
     int rider = list->GetRowData(-1);
-    strcpy(g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0xb8,
-           ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x58)[rider].modelName);
+    strcpy(g_TrackGame->field_0x3444->field_0x465[0].field_0xb8,
+           ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[rider].modelName);
 }
 
 // 0x004d6770: as SPBikeRiderDlg slot 29 (dlgprocs.cpp 0x0044ef70); the
@@ -918,20 +918,20 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         FillBikeRiderLists();
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
         list->RemoveAllRows();
-        if (g_UnknownGlobal56e26c->field_0x3444->field_0x4c == 1 || g_UnknownGlobal56e26c->field_0x3444->field_0x4c == 3)
-            list->UnknownFunction476d80("125cc 2-stroke", UnknownBikeClassOf(125), 0);
-        if (g_UnknownGlobal56e26c->field_0x3444->field_0x4c == 2 || g_UnknownGlobal56e26c->field_0x3444->field_0x4c == 3) {
-            list->UnknownFunction476d80("250cc 2-stroke", UnknownBikeClassOf(250), 0);
-            list->UnknownFunction476d80("400cc 4-stroke", UnknownBikeClassOf(400), 0);
+        if (g_TrackGame->field_0x3444->field_0x4c == 1 || g_TrackGame->field_0x3444->field_0x4c == 3)
+            list->AddRow("125cc 2-stroke", UnknownBikeClassOf(125), 0);
+        if (g_TrackGame->field_0x3444->field_0x4c == 2 || g_TrackGame->field_0x3444->field_0x4c == 3) {
+            list->AddRow("250cc 2-stroke", UnknownBikeClassOf(250), 0);
+            list->AddRow("400cc 4-stroke", UnknownBikeClassOf(400), 0);
         }
-        if (g_UnknownGlobal56e26c->field_0x3444->field_0x4c == 3) {
-            list->UnknownFunction476d80("500cc 2-stroke", UnknownBikeClassOf(500), 0);
-            list->UnknownFunction476d80("600cc 4-stroke", UnknownBikeClassOf(600), 0);
+        if (g_TrackGame->field_0x3444->field_0x4c == 3) {
+            list->AddRow("500cc 2-stroke", UnknownBikeClassOf(500), 0);
+            list->AddRow("600cc 4-stroke", UnknownBikeClassOf(600), 0);
         }
-        list->SelectRowByData(UnknownBikeClassOf(g_UnknownGlobal56e26c->field_0x3444->field_0x465[0].field_0x138));
+        list->SelectRowByData(UnknownBikeClassOf(g_TrackGame->field_0x3444->field_0x465[0].field_0x138));
         UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
         edit->SetAcceptedCharacters("0123456789");
-        g_UnknownGlobal56e26c->ui->ShowScene(this);
+        g_TrackGame->ui->ShowScene(this);
         Vector3* eye = &field_0x7f58;
         field_0x7f8c.left = 0x52;
         field_0x7f8c.right = 0x216;
@@ -942,17 +942,17 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         Vector3* target = &field_0x7f64;
         field_0x7f58.z = 15.0f;
         field_0x7f58.y = 1.0f;
-        *target = g_UnknownGlobal56e26c->ui->field_0x474;
+        *target = g_TrackGame->ui->field_0x474;
         field_0x7f64.y += 3.0f;
-        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42e9b0(eye, 0, 0, 0, (int)&fov);
-        g_UnknownGlobal56e26c->ui->field_0x468->UnknownVirtualSlot29(*target);
-        g_UnknownGlobal56e26c->ui->field_0x468->UnknownFunction42f190(
+        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(eye, 0, 0, 0, (int)&fov);
+        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(*target);
+        g_TrackGame->ui->field_0x468->UnknownFunction42f190(
             field_0x7f8c.left, field_0x7f8c.top, field_0x7f8c.right - field_0x7f8c.left,
             field_0x7f8c.bottom - field_0x7f8c.top);
-        field_0x7f70 = UnknownVectorLength(UnknownVectorDifference(*eye, g_UnknownGlobal56e26c->ui->field_0x474));
+        field_0x7f70 = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->field_0x474));
         ApplyChosenRider();
         ApplyChosenBike();
-        PaintPlateNumber(g_UnknownGlobal56e26c->mode.field_0x1bcc);
+        PaintPlateNumber(g_TrackGame->mode.field_0x1bcc);
         srand(ReadClock());
         if (dialogBackground)
             field_0x7f74 = dialogBackground->UnknownFunction4040f0(0);
@@ -991,7 +991,7 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             field_0x7f78 = !static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->UnknownFunction4755c0();
         } else if (!_stricmp("ButWrench", event->controlName)) {
             OptionsDlg* dialog = new(__FILE__, 719) OptionsDlg;
-            guiManager->UnknownFunction485a70((UnknownGuiDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);
+            guiManager->ShowDialog((UnknownGuiDialog*)dialog, 0, 2, 0, parentDialog, 2, 0, 1);
         }
         break;
     case kDialogEditDone:
@@ -1006,7 +1006,7 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             } else {
                 number = 101;
             }
-            g_UnknownGlobal56e26c->mode.field_0x1bcc = number;
+            g_TrackGame->mode.field_0x1bcc = number;
             _itoa(number, plate, 10);
             static_cast<UIEditBox*>(event->control)->SetEditText(plate);
             PaintPlateNumber(number);
@@ -1018,12 +1018,12 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
             int number = atoi(typed);
             if (number >= 100 && number <= 999) {
                 PaintPlateNumber(number);
-                g_UnknownGlobal56e26c->mode.field_0x1bcc = number;
+                g_TrackGame->mode.field_0x1bcc = number;
             }
         }
         break;
     case kDialogClose:
-        g_UnknownGlobal56e26c->ui->HideScene();
+        g_TrackGame->ui->HideScene();
         if (dialogBackground)
             dialogBackground->UnknownFunction404200(field_0x7f74);
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
@@ -1037,19 +1037,19 @@ int PCCentralBikeRiderDlg::UnknownVirtualSlot13()
 {
     if (field_0x7f84) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
-        KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+        KrustyUI* ui = g_TrackGame->ui;
         int bike = list->GetRowData(-1);
         UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)ui->field_0x50)[bike];
         ((UnknownProCircuitSkinned*)((UnknownKrustyUIModel*)ui->field_0x48)[entry->model].field_0xc0->plateTexture)
-            ->UnknownFunction444c70(0, entry->field_0x48, &g_UnknownGlobal56e26c->field_0x1c);
+            ->UnknownFunction444c70(0, entry->field_0x48, &g_TrackGame->field_0x1c);
         field_0x7f84 = 0;
     }
     if (field_0x7f88) {
         UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
-        KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+        KrustyUI* ui = g_TrackGame->ui;
         UnknownKrustyUIModel* rider = &((UnknownKrustyUIModel*)ui->field_0x58)[list->GetRowData(-1)];
         ((UnknownProCircuitSkinned*)ui->field_0x46c->plateTexture)
-            ->UnknownFunction444c70(0, rider->modelName, &g_UnknownGlobal56e26c->field_0x1c);
+            ->UnknownFunction444c70(0, rider->modelName, &g_TrackGame->field_0x1c);
         field_0x7f88 = 0;
     }
     return UIDialog::UnknownVirtualSlot13();

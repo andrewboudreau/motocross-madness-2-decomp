@@ -170,14 +170,14 @@ void UnknownTrackGameObject3444::UnknownFunction4d3b00(const char* name, int a, 
     field_0x00[strlen(name) > 63 ? 63 : strlen(name)] = 0;
 
     char text[256];
-    g_UnknownGlobal56e26c->UnknownFunction521970(0x14bc, field_0x54, 128);
-    g_UnknownGlobal56e26c->UnknownFunction521970(0x14bd, text, 128);
+    g_TrackGame->LoadResourceString(0x14bc, field_0x54, 128);
+    g_TrackGame->LoadResourceString(0x14bd, text, 128);
     strcat(field_0x54, "\n");
     strcat(field_0x54, text);
-    g_UnknownGlobal56e26c->UnknownFunction521970(0x14be, text, 128);
+    g_TrackGame->LoadResourceString(0x14be, text, 128);
     strcat(field_0x54, "\n");
     strcat(field_0x54, text);
-    g_UnknownGlobal56e26c->UnknownFunction521970(0x14bf, text, 128);
+    g_TrackGame->LoadResourceString(0x14bf, text, 128);
     strcat(field_0x54, "\n");
     strcat(field_0x54, text);
     field_0x464 = 0;
@@ -203,13 +203,13 @@ void UnknownTrackGameObject3444::UnknownFunction4d3b00(const char* name, int a, 
             UNKNOWN_COPY_TEXT(field_0x465[i].field_0xf8, field_0x127d[n])
             used[n] = 1;
         } else {
-            UNKNOWN_COPY_TEXT(field_0x465[i].field_0xf8, g_UnknownGlobal56e26c->mode.field_0x00)
+            UNKNOWN_COPY_TEXT(field_0x465[i].field_0xf8, g_TrackGame->mode.field_0x00)
         }
         field_0x465[i].field_0x00 = zero;
         field_0x465[i].field_0x18 = zero;
     }
 
-    KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+    KrustyUI* ui = g_TrackGame->ui;
     int rider;
     for (rider = 0; rider < ui->field_0x5c; rider++) {
         if (((UnknownKrustyUIModel*)ui->field_0x58)[rider].modelKind == 1)
@@ -217,7 +217,7 @@ void UnknownTrackGameObject3444::UnknownFunction4d3b00(const char* name, int a, 
     }
     UNKNOWN_COPY_TEXT(field_0x465[0].field_0xb8, ((UnknownKrustyUIModel*)ui->field_0x58)[rider].modelName)
 
-    ui = g_UnknownGlobal56e26c->ui;
+    ui = g_TrackGame->ui;
     int bike;
     for (bike = 0; bike < ui->field_0x54; bike++) {
         if (((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bike].model].modelKind == 1) {
@@ -240,11 +240,11 @@ found:
     UNKNOWN_COPY_TEXT(field_0x465[0].field_0x38,
                       ((UnknownKrustyUIModel*)ui->field_0x48)[((UnknownKrustyUIBike*)ui->field_0x50)[bike].model].modelName)
     UNKNOWN_COPY_TEXT(field_0x465[0].field_0x78,
-                    ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].field_0x48)
+                    ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bike].field_0x48)
     UNKNOWN_COPY_TEXT(field_0x465[0].field_0x118,
-                    ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].displayName)
-    field_0x465[0].field_0x138 = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].engineSize;
-    field_0x465[0].field_0x13c = ((UnknownKrustyUIBike*)g_UnknownGlobal56e26c->ui->field_0x50)[bike].field_0x90;
+                    ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bike].displayName)
+    field_0x465[0].field_0x138 = ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bike].engineSize;
+    field_0x465[0].field_0x13c = ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[bike].field_0x90;
     DebugFree(used, __FILE__, 273);
 }
 
@@ -290,7 +290,7 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
             field_0x44 = 1;
             field_0x48 = 3;
             PickComputerRacers();
-            g_UnknownGlobal56e26c->UnknownFunction521970(0x145c, title, 128);
+            g_TrackGame->LoadResourceString(0x145c, title, 128);
         }
         break;
     case 2:
@@ -298,16 +298,16 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
             field_0x40 = 3;
             field_0x44 = 1;
             PickComputerRacers();
-            g_UnknownGlobal56e26c->UnknownFunction521970(0x145c, title, 128);
+            g_TrackGame->LoadResourceString(0x145c, title, 128);
         }
         break;
     case 3:
         if (done || (bonus && !placed)) {
             field_0x464 |= 8;
             field_0x465[0].field_0x30 += (int)(field_0x465[0].field_0x34 * -1.1f);
-            g_UnknownGlobal56e26c->UnknownFunction521970(0x145c, title, 128);
+            g_TrackGame->LoadResourceString(0x145c, title, 128);
             if (field_0x465[0].field_0x18.field_0x10 <= 3)
-                *(unsigned char*)&g_UnknownGlobal56e26c->mode.field_0x1970 |= 1; // retail ORs the low byte
+                *(unsigned char*)&g_TrackGame->mode.field_0x1970 |= 1; // retail ORs the low byte
         }
         break;
     default:
@@ -316,7 +316,7 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
             field_0x40 = 1;
             field_0x44 = 1;
             PickComputerRacers();
-            g_UnknownGlobal56e26c->UnknownFunction521970(0x145c, title, 128);
+            g_TrackGame->LoadResourceString(0x145c, title, 128);
         }
         break;
     }
@@ -335,7 +335,7 @@ int UnknownTrackGameObject3444::AdvanceAfterRace()
         id = field_0x44 + 0x1517;
         break;
     }
-    g_UnknownGlobal56e26c->UnknownFunction521970(id, text, 1024);
+    g_TrackGame->LoadResourceString(id, text, 1024);
     if (title[0]) {
         sprintf(field_0x54, "%s\n\n%s", title, text);
         return 1;
@@ -362,10 +362,10 @@ int UnknownTrackGameObject3444::UnknownFunction4d4420(UnknownParameterBlock* blo
             block->UnknownFunction4b7ec0(key, "", value, -1);
             schedule->field_0x00[i].field_0x00 = (char*)DebugMalloc(strlen(value) + 1, __FILE__, 438);
             sprintf(schedule->field_0x00[i].field_0x00, "%s", value);
-            g_UnknownGlobal56e26c->mode.UnknownFunction523a60((int)directory, schedule->field_0x00[i].field_0x00,
+            g_TrackGame->mode.FindFileDirectory((int)directory, schedule->field_0x00[i].field_0x00,
                                                              "env", path);
-            g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9b80(path);
-            g_UnknownGlobal56e26c->sceneObject->UnknownFunction4ea010(key, schedule->field_0x00[i].field_0x00, 0,
+            g_TrackGame->sceneObject->UnknownFunction4e9b80(path);
+            g_TrackGame->sceneObject->UnknownFunction4ea010(key, schedule->field_0x00[i].field_0x00, 0,
                                                                       "scn", 0, 0);
             schedule->field_0x00[i].field_0x04 = (char*)DebugMalloc(strlen(key) + 1, __FILE__, 453);
             strcpy(schedule->field_0x00[i].field_0x04, key);
@@ -383,7 +383,7 @@ int UnknownTrackGameObject3444::UnknownFunction4d4420(UnknownParameterBlock* blo
 // 0x004d4670
 void UnknownTrackGameObject3444::PickComputerRacers()
 {
-    KrustyUI* ui = g_UnknownGlobal56e26c->ui;
+    KrustyUI* ui = g_TrackGame->ui;
     int bikeKind = 0;
     int riderKind = 0;
     int i;
@@ -401,14 +401,14 @@ void UnknownTrackGameObject3444::PickComputerRacers()
     for (int racer = 1; racer < field_0x460; racer++) {
         UnknownKrustyUIModel* rider;
         do {
-            ui = g_UnknownGlobal56e26c->ui;
+            ui = g_TrackGame->ui;
             rider = &((UnknownKrustyUIModel*)ui->field_0x58)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->field_0x5c - 1))];
         } while (rider->field_0xc0 || rider->modelKind != riderKind);
         UNKNOWN_COPY_TEXT(field_0x465[racer].field_0xb8, rider->modelName)
 
         UnknownKrustyUIBike* bike;
         for (;;) {
-            ui = g_UnknownGlobal56e26c->ui;
+            ui = g_TrackGame->ui;
             bike = &((UnknownKrustyUIBike*)ui->field_0x50)[(int)(UNKNOWN_RANDOM_UNIT() * (ui->field_0x54 - 1))];
             if (bike->field_0x88)
                 continue;
@@ -438,7 +438,7 @@ void UnknownTrackGameObject3444::PickComputerRacers()
         }
     found:
         UNKNOWN_COPY_TEXT(field_0x465[racer].field_0x38,
-                        ((UnknownKrustyUIModel*)g_UnknownGlobal56e26c->ui->field_0x48)[bike->model].modelName)
+                        ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[bike->model].modelName)
         UNKNOWN_COPY_TEXT(field_0x465[racer].field_0x78, bike->field_0x48)
         UNKNOWN_COPY_TEXT(field_0x465[racer].field_0x118, bike->displayName)
         field_0x465[racer].field_0x138 = bike->engineSize;

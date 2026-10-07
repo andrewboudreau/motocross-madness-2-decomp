@@ -50,7 +50,7 @@ int UnknownTrackGameObject3410::UnknownFunction4aa360(char* buffer, unsigned int
             return 0;
         }
         memcpy(buffer, response->data, response->dataSize);
-        UnknownFunction520820("\nGot Preset from The Zone\n%s\n", response->data);
+        SendDebugMessage("\nGot Preset from The Zone\n%s\n", response->data);
     }
     DebugFree(response, __FILE__, 114);
     return 1;
@@ -89,7 +89,7 @@ int UnknownTrackGameObject3410::UnknownFunction4aa4e0(char* buffer, unsigned int
             return 0;
         }
         memcpy(buffer, response->data, response->dataSize);
-        UnknownFunction520820("\nGot Rank# from The Zone\n%s\n", response->data);
+        SendDebugMessage("\nGot Rank# from The Zone\n%s\n", response->data);
     }
     DebugFree(response, __FILE__, 194);
     return 1;

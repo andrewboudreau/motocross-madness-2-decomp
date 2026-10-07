@@ -107,7 +107,7 @@
   "?UnknownThreadProc@UnknownPCAudioObject@@SGIPAX@Z": "0x004bdc00",
   "?UnknownThreadProc@UnknownSoundNotifier@@SGIPAX@Z": "0x004bb630",
   "?g_MemTagStack@@3PAVMemTagStack@@A": "0x0056df04",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "?g_UnknownGlobal689938@@3HA": "0x00689938",
   "?g_UnknownResourceManager572b44@@3PAVUnknownResourceManager@@A": "0x00572b44",
   "_DSPROPSETID_EAX_ListenerProperties": "0x00556d20",

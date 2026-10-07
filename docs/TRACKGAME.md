@@ -20,8 +20,8 @@ derives from PCGame.
 Every TrackGame function is exact (18 calibration cases):
 - the constructor and both destructors;
 - every override: slots 1, 2, 3, 4, 5, 10, 13, 14, 15 and 18;
-- the menu toggle `0x00521860`;
-- the string-resource loader `0x00521970`;
+- the menu toggle `SetMenuOpen` `0x00521860`;
+- the string-resource loader `LoadResourceString` `0x00521970`;
 - the helpers `0x00521a30`, `0x00521a40` and `0x00521cd0`.
 
 Slot 1 is sensitive to unrelated header content. VC6's register choice for

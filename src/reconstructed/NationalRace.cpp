@@ -55,9 +55,9 @@ int NationalRace::UnknownVirtualSlot27(int value) {
 
     if (!BaseQuarryEvent::UnknownVirtualSlot27(value))
         return 0;
-    runwayLights = (new (__FILE__, 53) RunwayLights(g_UnknownGlobal56e26c->mode.field_0x6a8))
+    runwayLights = (new (__FILE__, 53) RunwayLights(g_TrackGame->mode.field_0x6a8))
                      ->UnknownFunction48a600(field_0x18, (int)lightManager, value, (UnknownRunwayTerrain*)eventTerrain);
-    if (!UnknownFunction469190(runwayLights, -1)) {
+    if (!AppendChild(runwayLights, -1)) {
         sprintf(message, "Runway Lights not loaded.\n");
         return 0;
     }
@@ -70,9 +70,9 @@ void NationalRace::UnknownVirtualSlot29() {
     char message[128];
 
     BaseQuarryEvent::UnknownVirtualSlot29();
-    g_UnknownGlobal56e26c->UnknownFunction521970(0x913, name, sizeof(name));
+    g_TrackGame->LoadResourceString(0x913, name, sizeof(name));
     finishText = new (__FILE__, 71) DropTextOverlay(1);
-    finishText = finishText->UnknownFunction51af00(field_0x18, g_UnknownGlobal56e26c->field_0x3c, 3.0f, 0,
+    finishText = finishText->UnknownFunction51af00(field_0x18, g_TrackGame->field_0x3c, 3.0f, 0,
                                                    sizeof(name), name);
     if (!finishText)
         sprintf(message, "Drop Text Overlay not created.\n");
@@ -81,15 +81,15 @@ void NationalRace::UnknownVirtualSlot29() {
 // 0x004aaa50
 void NationalRace::UnknownVirtualSlot30() {
     BaseQuarryEvent::UnknownVirtualSlot30();
-    UnknownFunction469190(finishText, -1);
+    AppendChild(finishText, -1);
 }
 
 // 0x004aaa70
 int NationalRace::UnknownVirtualSlot10(float frameTime) {
     BaseQuarryEvent::UnknownVirtualSlot10(frameTime);
-    if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 && g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 != 4 &&
-        !g_UnknownGlobal56e26c->uiInteractionBlocked && !finishTextShown) {
-        if (raceView->field_0x38->field_0x7a0 + 1 == g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x20 &&
+    if (g_TrackGame->mode.field_0x27f8.field_0x00 && g_TrackGame->mode.field_0x27f8.field_0x00 != 4 &&
+        !g_TrackGame->uiInteractionBlocked && !finishTextShown) {
+        if (raceView->field_0x38->field_0x7a0 + 1 == g_TrackGame->mode.field_0x27f8.field_0x20 &&
             raceView->field_0x18a) {
             if (finishText)
                 finishText->UnknownFunction51b1f0();

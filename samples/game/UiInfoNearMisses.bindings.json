@@ -14,7 +14,7 @@
   "?WaitForCd@TrackGameMode@@QAEHXZ": "0x00523800",
   "?UnknownFunction5238f0@TrackGameMode@@QAEHPBDPAD@Z": "0x005238f0",
   "?FindCdDirectory@TrackGameMode@@QAEHXZ": "0x00523bf0",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__strnicmp": "0x005476f0",
   "_fclose": "0x00534c3d",
   "_fopen": "0x00534ceb",

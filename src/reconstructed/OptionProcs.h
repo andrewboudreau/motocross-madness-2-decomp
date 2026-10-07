@@ -216,7 +216,7 @@ public:
     virtual void UnknownVirtualSlot30();
     virtual void UnknownVirtualSlot31(int save);                    // 0x004b3e70
     void FillCurveList();             // 0x004b38f0: fills DDLCurves
-    void EqSliderMoved(UnknownGameUiControl* slider); // 0x004b3aa0: an SldEQ slider moved
+    void EqSliderMoved(UIControl* slider); // 0x004b3aa0: an SldEQ slider moved
     void ShowCurve();             // 0x004b3bc0: shows the curve
 
     unsigned char field_0x2c[0x30 - 0x2c];

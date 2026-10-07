@@ -241,7 +241,7 @@ struct UnknownBonusCamera {
     float field_0x198;
 };
 
-// The game global at 0x0056e26c (TrackGame.h's g_UnknownGlobal56e26c) as
+// The game global at 0x0056e26c (TrackGame.h's g_TrackGame) as
 // this file reads it: +0x10 is the render target, whose +0x08 is the
 // current camera; +0x2d74 the camera mode; +0x3430 blocks the UI.
 struct UnknownBonusRenderTarget {

@@ -264,14 +264,16 @@ public:
     void UnknownFunction5240e0(int series); // 0x005240e0 (TrackRecord.cpp 0x00520390)
     // 0x00523d30 (OptionProcs.cpp: "MCM2HELP"): opens `topic`'s .hlp file
     // with ShellExecuteA (passing `parameters`); 1 when found.
-    int UnknownFunction523d30(const char* topic, const char* parameters);
+    int OpenHelp(const char* topic, const char* parameters);
     void UnknownFunction522440();             // 0x00522440 (OptionProcs.cpp)
     void UnknownFunction523000();             // 0x00523000 (OptionProcs.cpp)
     void SaveControllerChoice();             // 0x00523130: saves the controller choice
     int WaitForCd();              // 0x00523800: asks for the CD until it is found; 0 on cancel
     void UnknownFunction523580();                           // 0x00523580 (TrackGame slot 15)
     int UnknownFunction5238f0(const char* name, char* path); // 0x005238f0 (TrackGame slot 18)
-    int UnknownFunction522680();              // 0x00522680 (TrackGame slot 4): resets the network race state
+    // 0x00522680 (TrackGame slot 4; SelectGamePicProcs.cpp's network start):
+    // clears the selected session, the racers and the entries.
+    int ResetNetworkRace();
     // Reset helpers called by 0x00522440.
     void UnknownFunction522720(UnknownTrackGameModeOptions6ac* options);
     void UnknownFunction522780(UnknownTrackGameModeOptionsA20* options);
@@ -290,11 +292,12 @@ public:
     int UnknownFunction5231f0();              // 0x005231f0 (TrackGame slot 4)
     void UnknownFunction523e50();             // 0x00523e50 (KrustyUI 0x004988a0)
     void UnknownFunction523b70(char* name);   // 0x00523b70 (SelectGamePicProcs.cpp)
-    int UnknownFunction523bb0(short a, short b, char* name); // 0x00523bb0: copies the series' directory
-    // 0x00523a60 (near uiinfo.cpp's literals): builds the path of `name`'s
-    // `kind` file (EventManager 0x0045cb70 asks for "env").
+    int CopySeriesDirectory(short a, short b, char* name); // 0x00523bb0: copies the series' directory
+    // 0x00523a60 (near uiinfo.cpp's literals): finds `name`.`kind` (under
+    // directory `value` when nonempty) and stores the directory it is in
+    // (EventManager 0x0045cb70 asks for "env", OpenHelp for "hlp").
     // Returns 0 when the file is not found.
-    int UnknownFunction523a60(int value, char* name, const char* kind, char* path);
+    int FindFileDirectory(int value, char* name, const char* kind, char* path);
 
     char field_0x00[16];                      // name; slot 4 sets it from the network object
     char field_0x10[0x80];                    // player name (NetProcs.cpp opens sessions with it)
@@ -533,7 +536,7 @@ public:
 
 // cdecl 0x00520820 (near TrackRecord.cpp's literals): formats a message
 // (_vsnprintf into 0x200 bytes) and sends it through 0x0068a48c.
-void UnknownFunction520820(const char* format, ...);
+void SendDebugMessage(const char* format, ...);
 
 // Global object at 0x0068a48c, deleted by TrackGame's destructor. Slot 4
 // connects it to the "debugIP"/"debugPort" registry settings (name tier 3).
@@ -574,9 +577,9 @@ public:
 
     // 0x00521970: loads string resource `id` into buffer (size bytes), or
     // "Resource String Unavailable"; 1 when loaded.
-    int UnknownFunction521970(int id, char* buffer, int size);
+    int LoadResourceString(int id, char* buffer, int size);
     // 0x00521860: opens (`open`) or closes the in-game menu `id`.
-    void UnknownFunction521860(int open, int id, int sound);
+    void SetMenuOpen(int open, int id, int sound);
 
     // Objects whose +0x34 KrustyBikeCamera slot 10 takes as its view, by
     // mode.field_0x27f8.field_0x04.
@@ -618,4 +621,4 @@ public:
     int screenSaverWasActive;
 };
 
-extern TrackGame* g_UnknownGlobal56e26c;
+extern TrackGame* g_TrackGame;   // 0x0056e26c: initialised to the TrackGame singleton 0x006851a0

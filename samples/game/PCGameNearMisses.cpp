@@ -33,26 +33,26 @@ void PCGame::ProfileDisplays() {
     for (i = 0; i < g_UnknownDisplayCount68a764; i++) {
         char name[128];
         sprintf(name, "DriverInfo\\%s\\ProfiledCard", g_UnknownDisplays68a754[i]->field_0x4bc);
-        UnknownVirtualSlot27(name, 1);
+        SetRegistryFlag(name, 1);
         sprintf(name, "DriverInfo\\%s\\TextureCacheLimit", g_UnknownDisplays68a754[i]->field_0x4bc);
-        UnknownVirtualSlot25(name, 0);
+        SetRegistryInt(name, 0);
         sprintf(name, "DriverInfo\\%s\\NumberOfModes", g_UnknownDisplays68a754[i]->field_0x4bc);
-        UnknownVirtualSlot25(name, g_UnknownDisplays68a754[i]->field_0x08);
+        SetRegistryInt(name, g_UnknownDisplays68a754[i]->field_0x08);
         sprintf(name, "DriverInfo\\%s\\Modes", g_UnknownDisplays68a754[i]->field_0x4bc);
-        UnknownVirtualSlot29(name, g_UnknownDisplays68a754[i]->field_0x10,
+        SetRegistryBinary(name, g_UnknownDisplays68a754[i]->field_0x10,
                              g_UnknownDisplays68a754[i]->field_0x08 * sizeof(UnknownDisplayMode));
         sprintf(name, "DriverInfo\\%s\\IsAGP", g_UnknownDisplays68a754[i]->field_0x4bc);
-        UnknownVirtualSlot27(name, 0);
+        SetRegistryFlag(name, 0);
         sprintf(name, "DriverInfo\\%s\\DisabledWindowed", g_UnknownDisplays68a754[i]->field_0x4bc);
-        if (!UnknownVirtualSlot22(name, 0)) {
-            UnknownVirtualSlot27(name, 1);
+        if (!GetRegistryFlag(name, 0)) {
+            SetRegistryFlag(name, 1);
             if (g_UnknownDisplays68a754[i]->UnknownFunction4c9d20(0, 0, 640, 480))
-                UnknownVirtualSlot27(name, 0);
+                SetRegistryFlag(name, 0);
         }
         sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", g_UnknownDisplays68a754[i]->field_0x4bc);
-        if (UnknownVirtualSlot22(name, 0))
+        if (GetRegistryFlag(name, 0))
             continue;
-        UnknownVirtualSlot27(name, 1);
+        SetRegistryFlag(name, 1);
         if (g_UnknownDisplays68a754[i]->UnknownFunction4c9c90() &&
             g_UnknownDisplays68a754[i]->field_0x190->UnknownMethod21(640, 480, 16, 0, 0) == 0) {
             UnknownSurfaceCaps caps;
@@ -65,22 +65,22 @@ void PCGame::ProfileDisplays() {
             g_UnknownDisplays68a754[i]->field_0x190->UnknownMethod23(&caps, &total, &free);
             g_UnknownDisplays68a754[i]->field_0x54 = total;
             sprintf(name, "DriverInfo\\%s\\TotalVideoMemory", g_UnknownDisplays68a754[i]->field_0x4bc);
-            UnknownVirtualSlot25(name, total);
+            SetRegistryInt(name, total);
             sprintf(name, "DriverInfo\\%s\\DisabledFullScreen", g_UnknownDisplays68a754[i]->field_0x4bc);
-            UnknownVirtualSlot27(name, 0);
+            SetRegistryFlag(name, 0);
             UnknownVirtualSlot34(g_UnknownDisplays68a754[i]);
             sprintf(name, "DriverInfo\\%s\\Modes", g_UnknownDisplays68a754[i]->field_0x4bc);
-            UnknownVirtualSlot29(name, g_UnknownDisplays68a754[i]->field_0x10,
+            SetRegistryBinary(name, g_UnknownDisplays68a754[i]->field_0x10,
                                  g_UnknownDisplays68a754[i]->field_0x08 * sizeof(UnknownDisplayMode));
             sprintf(name, "DriverInfo\\%s\\DisabledSoftware", g_UnknownDisplays68a754[i]->field_0x4bc);
-            if (!UnknownVirtualSlot22(name, 0)) {
-                UnknownVirtualSlot27(name, 1);
+            if (!GetRegistryFlag(name, 0)) {
+                SetRegistryFlag(name, 1);
                 if (g_UnknownDisplays68a754[i]->UnknownVirtualSlot2(640, 480, 16, 2, 0, 0, 0))
-                    UnknownVirtualSlot27(name, 0);
+                    SetRegistryFlag(name, 0);
             }
             sprintf(name, "DriverInfo\\%s\\DisabledHardware", g_UnknownDisplays68a754[i]->field_0x4bc);
-            if (!UnknownVirtualSlot22(name, 0)) {
-                UnknownVirtualSlot27(name, 1);
+            if (!GetRegistryFlag(name, 0)) {
+                SetRegistryFlag(name, 1);
                 if (g_UnknownDisplays68a754[i]->UnknownVirtualSlot2(640, 480, 16, 2, 0, 1, 0)) {
                     g_UnknownDisplays68a754[i]->UnknownFunction4c9b50();
                     if (g_UnknownDisplays68a754[i]->field_0x1b8 & 1) {
@@ -97,7 +97,7 @@ void PCGame::ProfileDisplays() {
                                     LimitDisplayModes(g_UnknownDisplays68a754[i], 640, 480);
                                 sprintf(name, "DriverInfo\\%s\\Modes",
                                         g_UnknownDisplays68a754[i]->field_0x4bc);
-                                UnknownVirtualSlot29(name, g_UnknownDisplays68a754[i]->field_0x10,
+                                SetRegistryBinary(name, g_UnknownDisplays68a754[i]->field_0x10,
                                                      g_UnknownDisplays68a754[i]->field_0x08 *
                                                          sizeof(UnknownDisplayMode));
                             }
@@ -105,7 +105,7 @@ void PCGame::ProfileDisplays() {
                             g_UnknownDisplays68a754[i]->field_0x9f0 =
                                 g_UnknownDisplays68a754[i]->UnknownFunction4ca5a0(&value, target);
                             sprintf(name, "DriverInfo\\%s\\IsAGP", g_UnknownDisplays68a754[i]->field_0x4bc);
-                            UnknownVirtualSlot27(name, g_UnknownDisplays68a754[i]->field_0x9f0);
+                            SetRegistryFlag(name, g_UnknownDisplays68a754[i]->field_0x9f0);
                             UnknownSurfaceInterface* surfaces[10];
                             int count;
                             for (count = 0; count < 10; count++) {
@@ -125,18 +125,18 @@ void PCGame::ProfileDisplays() {
                             if (count == 10) {
                                 sprintf(name, "DriverInfo\\%s\\DisabledHardware",
                                         g_UnknownDisplays68a754[i]->field_0x4bc);
-                                UnknownVirtualSlot27(name, 0);
+                                SetRegistryFlag(name, 0);
                                 sprintf(name, "DriverInfo\\%s\\PartialTextureBlt",
                                         g_UnknownDisplays68a754[i]->field_0x4bc);
-                                if (UnknownVirtualSlot20(name, 1) > 0) {
+                                if (GetRegistryInt(name, 1) > 0) {
                                     g_UnknownDisplays68a754[i]->field_0x5bc = 0;
-                                    UnknownVirtualSlot25(name, g_UnknownDisplays68a754[i]->field_0x5bc);
-                                    field_0x10 = target;
-                                    field_0x0c = g_UnknownDisplays68a754[i];
+                                    SetRegistryInt(name, g_UnknownDisplays68a754[i]->field_0x5bc);
+                                    renderTarget = target;
+                                    display = g_UnknownDisplays68a754[i];
                                     g_UnknownDisplays68a754[i]->UnknownFunction4cab00(target);
-                                    field_0x0c = 0;
-                                    field_0x10 = 0;
-                                    UnknownVirtualSlot25(name, g_UnknownDisplays68a754[i]->field_0x5bc);
+                                    display = 0;
+                                    renderTarget = 0;
+                                    SetRegistryInt(name, g_UnknownDisplays68a754[i]->field_0x5bc);
                                 }
                                 delete target;
                             } else {

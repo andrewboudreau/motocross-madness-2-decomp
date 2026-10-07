@@ -80,7 +80,7 @@ Palette8::Palette8(UnknownTextureStream* stream) {
             field_0x308[i].flags = 0x40;
         }
     }
-    if (g_UnknownGlobal56e26c->field_0x0c->field_0x190->UnknownMethod5(0x44, field_0x308, &field_0x70c, 0) == 0
+    if (g_TrackGame->display->field_0x190->UnknownMethod5(0x44, field_0x308, &field_0x70c, 0) == 0
         && *name)
         field_0x708 = ColorMapper::UnknownFunction4dddd0(name);
     DebugFree(name, __FILE__, 170);

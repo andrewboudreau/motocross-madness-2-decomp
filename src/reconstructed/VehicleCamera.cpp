@@ -104,7 +104,7 @@ Vector3 VehicleCamera::UnknownFunction52bc50() {
 // scaled by dt (at most 0.2) while the camera is free to follow.
 Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {
     Vector3 result = UnknownFunction52bb60();
-    if (cameraState != 7 && !g_UnknownGlobal56e26c->field_0x1c4) {
+    if (cameraState != 7 && !g_TrackGame->field_0x1c4) {
         if (vehicleMode) {
             if (!vehicle->field_0x444) {
                 float lead = 0.2f < dt ? 0.2f : dt;

@@ -91,7 +91,7 @@
   "?UnknownFunction460f50@UnknownTextureStream@@QAEHPBD0H@Z": "0x00460f50",
   "?UnknownFunction461340@UnknownTextureStream@@QAEHHHH@Z": "0x00461340",
   "?UnknownFunction461640@UnknownTextureStream@@QAEHPAXHH@Z": "0x00461640",
-  "?UnknownFunction469190@GameObject@@QAEHPAV1@H@Z": "0x00469190",
+  "?AppendChild@GameObject@@QAEHPAV1@H@Z": "0x00469190",
   "?UnknownFunction49e4a0@LightManager@@QAEXPAXH00H0@Z": "0x0049e4a0",
   "?UnknownFunction4a10e0@@YAXPBUVector3@@0PAU1@@Z": "0x004a10e0",
   "?TransformPoints@@YAXPBXPAXPBUMatrix4@@HHH@Z": "0x004a1b00",

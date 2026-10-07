@@ -50,7 +50,7 @@ ArcadeObject* ArcadeObject::UnknownFunction401310(void* value, int a, int b, con
 
     GameObject::UnknownVirtualSlot8(value);
     arcadeModel = new (__FILE__, 78) D3DIMSoultreeObject(1);
-    if (!UnknownFunction469190(arcadeModel->UnknownVirtualSlot9(field_0x18, name, a, b, 1), -1)) {
+    if (!AppendChild(arcadeModel->UnknownVirtualSlot9(field_0x18, name, a, b, 1), -1)) {
         Release();
         return 0;
     }
@@ -75,7 +75,7 @@ ArcadeObject* ArcadeObject::UnknownFunction401310(void* value, int a, int b, con
     }
     if (alpha) {
         field_0x58 = new (__FILE__, 104) TransparencyMod(1);
-        UnknownFunction469190(field_0x58, -1);
+        AppendChild(field_0x58, -1);
         field_0x58->field_0x48 = alpha;
         arcadeModel->UnknownFunction444d80(field_0x58);
     }
@@ -108,7 +108,7 @@ int ArcadeObject::UnknownFunction401540(const char* name, int value, UnknownPick
     strcpy(path, name);
     strcpy(strrchr(path, '.'), ".col");
     UnknownTextureStream* stream = new (__FILE__, 160) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-    if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)found))
+    if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)found))
         found[0] = 0;
     if (stream)
         delete stream;
@@ -120,7 +120,7 @@ int ArcadeObject::UnknownFunction401540(const char* name, int value, UnknownPick
     field_0x5c->UnknownFunction435fe0();
     field_0x5c->field_0x88 = callback;
     field_0x5c->field_0x8c = context;
-    UnknownFunction469190(field_0x5c, -1);
+    AppendChild(field_0x5c, -1);
     g_MemTagStack->Push(tag);
     field_0x60 = 1;
     return 1;
@@ -143,10 +143,10 @@ int ArcadeObject::UnknownVirtualSlot10(float frameTime) {
         if (field_0x70 > field_0x68)
             isVisible = 0;
         else
-            field_0x70 += g_UnknownGlobal56e26c->field_0x2f0;
+            field_0x70 += g_TrackGame->frameTime;
     }
     if (field_0x78 && !field_0x74) {
-        field_0x80 += g_UnknownGlobal56e26c->field_0x2f0;
+        field_0x80 += g_TrackGame->frameTime;
         if (field_0x80 > field_0x7c) {
             if (field_0x88 < field_0x84 || field_0x84 == 999) {
                 field_0x88++;
@@ -156,7 +156,7 @@ int ArcadeObject::UnknownVirtualSlot10(float frameTime) {
         }
     }
     if (field_0x74 && field_0x90) {
-        field_0xa0 = g_UnknownGlobal56e26c->field_0x2f0 * field_0xa4;
+        field_0xa0 = g_TrackGame->frameTime * field_0xa4;
         while (field_0xa0 > 6.2831855f)
             field_0xa0 -= 6.2831855f;
         arcadeModel->UnknownFunction4fceb0(field_0x94, field_0xa0);

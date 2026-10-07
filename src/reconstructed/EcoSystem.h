@@ -390,14 +390,14 @@ public:
     virtual void UnknownVirtualSlot19();
     virtual void UnknownVirtualSlot20();
     virtual void UnknownVirtualSlot21();
-    virtual int UnknownVirtualSlot22(const char* name, int defaultValue); // registry value
+    virtual int GetRegistryFlag(const char* name, int defaultValue); // registry value (Game slot 22)
 
     unsigned char field_0x004[0x10 - 4];
     UnknownEcoDisplay* field_0x10;
     unsigned char field_0x014[0x2d0 - 0x14];
     int field_0x2d0;                          // software rendering
 };
-extern UnknownEcoTrackGame* g_UnknownGlobal56e26c;
+extern UnknownEcoTrackGame* g_TrackGame;   // 0x0056e26c (local view of TrackGame)
 unsigned int ReadClock();                     // 0x004bfa80
 int UnknownFunction43caa0(int control, int kind, const UnknownControlEvent* event, int modifier); // 0x0043caa0
 

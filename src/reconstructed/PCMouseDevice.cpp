@@ -14,7 +14,7 @@ PCMouseDevice::PCMouseDevice() {
 // buffer, then acquires it.
 int PCMouseDevice::UnknownVirtualSlot2() {
     UnknownDeviceCaps caps;
-    if (g_UnknownGlobal56e26c->field_0x14->directInput->CreateDeviceEx(
+    if (g_TrackGame->controlInterface->directInput->CreateDeviceEx(
             GUID_SysMouse, IID_IDirectInputDevice7A, &device, 0) < 0)
         goto failed;
     caps.size = sizeof(caps);
@@ -24,7 +24,7 @@ int PCMouseDevice::UnknownVirtualSlot2() {
     axisCount = caps.axes;
     if (device->SetDataFormat(&c_dfDIMouse) < 0)
         goto failed;
-    if (device->SetCooperativeLevel(g_UnknownGlobal56e26c->field_0x31c, 5) < 0)
+    if (device->SetCooperativeLevel(g_TrackGame->field_0x31c, 5) < 0)
         goto failed;
     deviceInfo.size = sizeof(deviceInfo);
     device->GetDeviceInfo(&deviceInfo);
@@ -52,7 +52,7 @@ void PCMouseDevice::UnknownVirtualSlot3() {
 // 0x004c4a90: whether `button` is down (with `modifier` held, when there is
 // a keyboard); copies its entry.
 int PCMouseDevice::UnknownVirtualSlot5(int button, int modifier, UnknownInputEntry* entry) {
-    KeyboardDevice* keyboard = g_UnknownGlobal56e26c->field_0x14->keyboard;
+    KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
     if ((!keyboard || keyboard->UnknownFunction48a240(modifier)) &&
         buttonStates[button].state == 1) {
         if (entry) {
@@ -121,7 +121,7 @@ int PCMouseDevice::UnknownVirtualSlot4(int control, int modifier, UnknownInputEn
         }
         return 0;
     }
-    UnknownControlMapping* mapping = g_UnknownGlobal56e26c->field_0x14->mapping;
+    UnknownControlMapping* mapping = g_TrackGame->controlInterface->mapping;
     if (!mapping)
         return 0;
     mapping->UnknownFunction43cc10(control, &control);
@@ -175,12 +175,12 @@ int PCMouseDevice::UnknownVirtualSlot6(int value) {
             buttonStates[button].state = 1;
             buttonStates[button].previousPressTime = buttonStates[button].pressTime;
             buttonStates[button].pressTime = events[i].timeStamp;
-            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(button, deviceKind, 1, 0);
+            g_TrackGame->controlInterface->UnknownFunction43cea0(button, deviceKind, 1, 0);
         } else {
             buttonStates[button].state = 0;
             buttonStates[button].previousReleaseTime = buttonStates[button].releaseTime;
             buttonStates[button].releaseTime = events[i].timeStamp;
-            g_UnknownGlobal56e26c->field_0x14->UnknownFunction43cea0(button, deviceKind, 0, 0);
+            g_TrackGame->controlInterface->UnknownFunction43cea0(button, deviceKind, 0, 0);
         }
     }
     if (device->GetDeviceState(sizeof(movement), movement) < 0)

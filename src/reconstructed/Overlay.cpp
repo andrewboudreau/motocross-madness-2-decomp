@@ -73,7 +73,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
 
     if (a7)
         field_0x38 = UnknownOverlayText::Create(
-            a8, a9, a10, a11, g_UnknownGlobal56e26c->field_0x3c, quadVertices[0].sx, quadVertices[0].sy,
+            a8, a9, a10, a11, g_TrackGame->field_0x3c, quadVertices[0].sx, quadVertices[0].sy,
             quadVertices[2].sx - quadVertices[0].sx, quadVertices[2].sy - quadVertices[0].sy, a12);
     else
         field_0x38 = 0;
@@ -82,7 +82,7 @@ Overlay* Overlay::Attach(RenderTarget* target, TextureMap* texture,
 
     if (!g_UnknownOverlayTexture689110) {
         g_UnknownOverlayTexture689110 =
-            new(__FILE__, 107) PCTextureMap(g_UnknownGlobal56e26c->field_0x3c, 1);
+            new(__FILE__, 107) PCTextureMap(g_TrackGame->field_0x3c, 1);
         g_UnknownOverlayTexture689110->UnknownVirtualSlot4(0, 0x100, 0x100, 0x100, 0x100,
                                                            Target()->field_0x28, Target()->field_0x28,
                                                            0, 8, 0, 1, 0, 5, 6, 0, 0x80, 0xff00ff);

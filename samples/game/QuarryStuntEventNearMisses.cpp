@@ -49,45 +49,45 @@ struct UnknownQuarryBikeChoice {
 int BaseQuarryEvent::UnknownFunction4e0560() {
     int players = 0;
     int opponents = 0;
-    if (g_UnknownGlobal56e26c->UnknownFunction521cd0()) {
+    if (g_TrackGame->UnknownFunction521cd0()) {
         int i;
-        for (i = 0; i < g_UnknownGlobal56e26c->ui->field_0x54; i++) {
-            if (((UnknownQuarryBikeModel*)g_UnknownGlobal56e26c->ui->field_0x48)[((UnknownQuarryBikeChoice*)g_UnknownGlobal56e26c->ui->field_0x50)[i].field_0x00].field_0xc4 <= g_UnknownGlobal56e26c->field_0x3444->field_0x48)
+        for (i = 0; i < g_TrackGame->ui->field_0x54; i++) {
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->field_0x48)[((UnknownQuarryBikeChoice*)g_TrackGame->ui->field_0x50)[i].field_0x00].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
                 players++;
         }
-        for (i = 0; i < g_UnknownGlobal56e26c->ui->field_0x5c; i++) {
-            if (((UnknownQuarryBikeModel*)g_UnknownGlobal56e26c->ui->field_0x58)[i].field_0xc4 <= g_UnknownGlobal56e26c->field_0x3444->field_0x48)
+        for (i = 0; i < g_TrackGame->ui->field_0x5c; i++) {
+            if (((UnknownQuarryBikeModel*)g_TrackGame->ui->field_0x58)[i].field_0xc4 <= g_TrackGame->field_0x3444->field_0x48)
                 opponents++;
         }
-        if (players >= g_UnknownGlobal56e26c->field_0x3444->field_0x460)
-            players = g_UnknownGlobal56e26c->field_0x3444->field_0x460;
-        if (opponents >= g_UnknownGlobal56e26c->field_0x3444->field_0x460)
-            opponents = g_UnknownGlobal56e26c->field_0x3444->field_0x460;
+        if (players >= g_TrackGame->field_0x3444->field_0x460)
+            players = g_TrackGame->field_0x3444->field_0x460;
+        if (opponents >= g_TrackGame->field_0x3444->field_0x460)
+            opponents = g_TrackGame->field_0x3444->field_0x460;
     } else {
-        if (g_UnknownGlobal56e26c->field_0x18 == 1) {
-            if (g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x00 == 4)
+        if (g_TrackGame->field_0x18 == 1) {
+            if (g_TrackGame->mode.field_0x27f8.field_0x00 == 4)
                 opponents = 1;
             else
-                opponents = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x24 + 1;
+                opponents = g_TrackGame->mode.field_0x27f8.field_0x24 + 1;
         } else {
-            opponents = g_UnknownGlobal56e26c->mode.field_0x27f8.field_0x28 + g_UnknownGlobal56e26c->field_0x18;
+            opponents = g_TrackGame->mode.field_0x27f8.field_0x28 + g_TrackGame->field_0x18;
         }
         players = opponents;
     }
     return opponents * 0x80000 / 3 + opponents * 0x8000 / 3 + players * 0x80000 / 3 + 0x80000 / 3 +
-           (g_UnknownGlobal56e26c->field_0x560 ? 2 * (0x80000 / 3) : 3 * (0x80000 / 3));
+           (g_TrackGame->field_0x560 ? 2 * (0x80000 / 3) : 3 * (0x80000 / 3));
 }
 
 // 0x004e14a0
 int BaseQuarryEvent::UnknownVirtualSlot12() {
     GameObject::UnknownVirtualSlot12();
-    if (g_UnknownGlobal56e26c->field_0x2d4_bit2 && g_UnknownGlobal56e26c->field_0x38) {
+    if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay) {
         if (s_DebugPage < 0)
-            s_DebugPage = g_UnknownGlobal56e26c->field_0x38->NewPage();
-        if (g_UnknownGlobal56e26c->field_0x38->field_0x26c4 == s_DebugPage) {
+            s_DebugPage = g_TrackGame->debugOverlay->NewPage();
+        if (g_TrackGame->debugOverlay->field_0x26c4 == s_DebugPage) {
             char atmosphere[0x40];
-            int down = g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xd0, 0, 0x80, 0);
-            int up = g_UnknownGlobal56e26c->field_0x14->UnknownVirtualSlot3(0xc8, 0, 0x80, 0);
+            int down = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd0, 0, 0x80, 0);
+            int up = g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc8, 0, 0x80, 0);
             if (up || down) {
                 unsigned int sun = sunLight->UnknownFunction49dfd0();
                 unsigned int ambient = ambientLight->UnknownFunction49dfd0();
@@ -245,21 +245,21 @@ int BaseQuarryEvent::UnknownVirtualSlot12() {
             } else {
                 strcpy(atmosphere, "(No Fog)");
             }
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447fa0(s_DebugPage, "Atmosphere %s", atmosphere);
+            g_TrackGame->debugOverlay->UnknownFunction447fa0(s_DebugPage, "Atmosphere %s", atmosphere);
             if (eventFog) {
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Visibility %f", eventFog->field_0x38);
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Haziness %f", eventFog->field_0x40);
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Fog R      %d", (eventFog->field_0x2c >> 16) & 0xff);
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Fog G      %d", (eventFog->field_0x2c >> 8) & 0xff);
-                g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Fog B      %d", eventFog->field_0x2c & 0xff);
+                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Visibility %f", eventFog->field_0x38);
+                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Haziness %f", eventFog->field_0x40);
+                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Fog R      %d", (eventFog->field_0x2c >> 16) & 0xff);
+                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Fog G      %d", (eventFog->field_0x2c >> 8) & 0xff);
+                g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Fog B      %d", eventFog->field_0x2c & 0xff);
             }
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "SunLight R %d", (sunLight->UnknownFunction49dfd0() >> 16) & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "SunLight G %d", (sunLight->UnknownFunction49dfd0() >> 8) & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "SunLight B %d", sunLight->UnknownFunction49dfd0() & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Ambient  R %d", (ambientLight->UnknownFunction49dfd0() >> 16) & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Ambient  G %d", (ambientLight->UnknownFunction49dfd0() >> 8) & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction447f40(s_DebugPage, "Ambient  B %d", ambientLight->UnknownFunction49dfd0() & 0xff);
-            g_UnknownGlobal56e26c->field_0x38->UnknownFunction448000(s_DebugPage, s_DebugRow + 1, 1);
+            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "SunLight R %d", (sunLight->UnknownFunction49dfd0() >> 16) & 0xff);
+            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "SunLight G %d", (sunLight->UnknownFunction49dfd0() >> 8) & 0xff);
+            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "SunLight B %d", sunLight->UnknownFunction49dfd0() & 0xff);
+            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Ambient  R %d", (ambientLight->UnknownFunction49dfd0() >> 16) & 0xff);
+            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Ambient  G %d", (ambientLight->UnknownFunction49dfd0() >> 8) & 0xff);
+            g_TrackGame->debugOverlay->UnknownFunction447f40(s_DebugPage, "Ambient  B %d", ambientLight->UnknownFunction49dfd0() & 0xff);
+            g_TrackGame->debugOverlay->UnknownFunction448000(s_DebugPage, s_DebugRow + 1, 1);
         }
     }
     return 0;

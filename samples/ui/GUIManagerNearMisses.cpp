@@ -45,10 +45,10 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
         SoundSystem()->UnknownFunction4be910(22050, 1, 16);
     if (!sound) {
         guiSoundGroup = new(__FILE__, 130) SoundGroup(1);
-        UnknownFunction469190(guiSoundGroup, -1);
+        AppendChild(guiSoundGroup, -1);
         ownsSoundGroup = 1;
     }
-    dialogContainer = (GameObject*)UnknownFunction469190(new(__FILE__, 136) UIDlgContainer, -1);
+    dialogContainer = (GameObject*)AppendChild(new(__FILE__, 136) UIDlgContainer, -1);
     field_0x38 = palette;
     guiPalette = palette;
     guiBackground = background;
@@ -59,9 +59,9 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     UnknownVirtualSlot18();
     field_0xd4 = callback;
     toolTipFont = CreateFontA(12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 2, 2, "Arial");
-    controls = g_UnknownGlobal56e26c->field_0x14;
+    controls = g_TrackGame->controlInterface;
     if (controls->mouse) {
-        mouseDevice = (GUIInputDevice*)UnknownFunction469190(
+        mouseDevice = (GUIInputDevice*)AppendChild(
             (new(__FILE__, 162) GUIInputDevice)
                 ->Bind(field_0x18, (InputDevice*)controls->mouse, 0, 0, 0, 0),
             -1);
@@ -69,7 +69,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
         mouseDevice->Rebind();
     }
     if (controls->keyboard) {
-        keyboardDevice = (GUIInputDevice*)UnknownFunction469190(
+        keyboardDevice = (GUIInputDevice*)AppendChild(
             (new(__FILE__, 169) GUIInputDevice)
                 ->Bind(field_0x18, (InputDevice*)controls->keyboard, 0, 0, 0, 0),
             -1);
@@ -78,7 +78,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
     }
     if (controls->joystickCount) {
         for (i = 0; i < controls->joystickCount; i++) {
-            joystickDevices[i] = (GUIInputDevice*)UnknownFunction469190(
+            joystickDevices[i] = (GUIInputDevice*)AppendChild(
                 (new(__FILE__, 177) GUIInputDevice)
                     ->Bind(field_0x18, (InputDevice*)controls->joysticks[i], -2.0f, 2.0f, -2.0f,
                            2.0f),
@@ -87,7 +87,7 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
             joystickDevices[i]->Rebind();
         }
     }
-    users[0] = (GUIUser*)UnknownFunction469190(
+    users[0] = (GUIUser*)AppendChild(
         (new(__FILE__, 188) GUIUser)->UnknownFunction487650(field_0x18, this), -1);
     if (users[0]) {
         userCount = 1;
@@ -104,13 +104,13 @@ GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager
 }
 
 // 0x00485a70
-UnknownGuiDialog* GUIManager::UnknownFunction485a70(UnknownGuiDialog* dialog, int a, int flags, int b,
+UnknownGuiDialog* GUIManager::ShowDialog(UnknownGuiDialog* dialog, int a, int flags, int b,
                                                    UnknownGuiDialog* parent, int c, int d, int wait) {
     CameraRect screen;
     CameraRect* rect;
 
     if (!(flags & 4) && !(flags & 2)) {
-        if (!UnknownFunction485df0() || !UnknownFunction485df0()->field_0x148)
+        if (!FindInputDialog() || !FindInputDialog()->field_0x148)
             ReleaseBackgroundGrab();
     } else {
         rect = 0;
@@ -174,25 +174,25 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
     unsigned int line;
     unsigned int x;
 
-    format = g_UnknownGlobal56e26c->field_0x10->field_0x28;
+    format = g_TrackGame->renderTarget->field_0x28;
     bytesPerPixel = UnknownFunction511970(format);
     if (guiBackground)
         guiBackground->UnknownFunction404c80();
-    g_UnknownGlobal56e26c->field_0x34->UnknownFunction468dd0("GUICursor");
-    g_UnknownGlobal56e26c->field_0x34->UnknownFunction468dd0("ToolTip");
-    g_UnknownGlobal56e26c->UnknownVirtualSlot8();
-    g_UnknownGlobal56e26c->UnknownVirtualSlot9();
-    g_UnknownGlobal56e26c->field_0x10->UnknownFunction4e8cc0();
-    g_UnknownGlobal56e26c->field_0x34->UnknownFunction468f10("GUICursor");
-    g_UnknownGlobal56e26c->field_0x34->UnknownFunction468f10("ToolTip");
+    g_TrackGame->field_0x34->UnknownFunction468dd0("GUICursor");
+    g_TrackGame->field_0x34->UnknownFunction468dd0("ToolTip");
+    g_TrackGame->UnknownVirtualSlot8();
+    g_TrackGame->UnknownVirtualSlot9();
+    g_TrackGame->renderTarget->UnknownFunction4e8cc0();
+    g_TrackGame->field_0x34->UnknownFunction468f10("GUICursor");
+    g_TrackGame->field_0x34->UnknownFunction468f10("ToolTip");
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
-    display = g_UnknownGlobal56e26c->field_0x0c;
+    display = g_TrackGame->display;
     if (display->field_0x1a8)
         surface = display->field_0x1a8;
     else
         surface = display->field_0x19c;
-    if (!surface->UnknownMethod25(0, &desc, 0x811, 0)) {
+    if (!surface->Lock(0, &desc, 0x811, 0)) {
         if (rect) {
             left = rect->left;
             top = rect->top;
@@ -214,7 +214,7 @@ PCTextureMap* GUIManager::CopyScreenToTexture(int dim, CameraRect* rect) {
                    width * bytesPerPixel);
             row += width * bytesPerPixel;
         }
-        surface->UnknownMethod32(0);
+        surface->Unlock(0);
         if (dim) {
             if (bytesPerPixel == 1) {
                 for (line = 0; line < (unsigned int)height; line++) {
@@ -283,11 +283,11 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
             backgroundRegion = tipGui->guiBackground->UnknownFunction4040f0(0);
             restoreFrames = 3;
         }
-        if (!((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod17((void**)&dc)) {
+        if (!((PCRenderTarget*)field_0x18)->field_0x48->GetDC((void**)&dc)) {
             previous = SelectObject(dc, (HGDIOBJ)tipGui->toolTipFont);
             GetTextExtentPoint32A(dc, text, strlen(text), &size);
             SelectObject(dc, previous);
-            ((PCRenderTarget*)field_0x18)->field_0x48->UnknownMethod26(dc);
+            ((PCRenderTarget*)field_0x18)->field_0x48->ReleaseDC(dc);
             target = (PCRenderTarget*)field_0x18;
             width = size.cx + 2;
             if (width >= target->field_0x0c - 2)
@@ -308,13 +308,13 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
             texture = tipGui->CreateFilledTexture(width, height, 0x808080);
             textTexture = texture;
             if (texture && texture->field_0x70) {
-                if (!texture->field_0x70->UnknownMethod17((void**)&dc)) {
+                if (!texture->field_0x70->GetDC((void**)&dc)) {
                     previous = SelectObject(dc, (HGDIOBJ)tipGui->toolTipFont);
                     SetTextColor(dc, 0xcccccc);
                     SetBkColor(dc, 0x404040);
                     DrawTextA(dc, text, strlen(text), &textArea, 0x8025);
                     SelectObject(dc, previous);
-                    texture->field_0x70->UnknownMethod26(dc);
+                    texture->field_0x70->ReleaseDC(dc);
                 }
                 shown = 1;
                 showDelay = time;
@@ -344,7 +344,7 @@ int GUIUser::UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl
             *previous = focusControl;
         field_0x1d8 = control;
         focusControl = control;
-        if (g_UnknownGlobal56e26c->field_0x0c->field_0x6c) {
+        if (g_TrackGame->display->field_0x6c) {
             if (control->controlType == 11) {
                 EnableImeInput(!control->acceptedCharacters || strcmp(control->acceptedCharacters, "0123456789") != 0);
             } else {

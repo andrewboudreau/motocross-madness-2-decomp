@@ -25,7 +25,7 @@ CameraRect g_UnknownGlobal5777e8;
 // 0x00404010
 BackgroundImage::~BackgroundImage() {
     if (heldDc && heldDcSurface)
-        heldDcSurface->UnknownMethod26(heldDc);
+        heldDcSurface->ReleaseDC(heldDc);
     if (offscreenCopy) {
         offscreenCopy->UnknownMethod2();
         offscreenCopy = 0;
@@ -62,7 +62,7 @@ GameObject* BackgroundImage::UnknownVirtualSlot8(void* value) {
     memset(&desc, 0, sizeof(desc));
     desc.size = sizeof(desc);
     desc.flags = 0x1006;
-    if (Target()->field_0x48->UnknownMethod22(&desc) != 0)
+    if (Target()->field_0x48->GetSurfaceDesc(&desc) != 0)
         goto failed;
     desc.flags = 0x1007;
     desc.caps[0] = 0x2800;
@@ -123,7 +123,7 @@ int BackgroundImage::RestoreRegions() {
             if (regionTable[i].framesLeft) {
                 if (CurrentRegionRect(i).right - CurrentRegionRect(i).left > 0 &&
                     CurrentRegionRect(i).bottom - CurrentRegionRect(i).top > 0 && !regionTable[i].owner)
-                    Target()->field_0x48->UnknownMethod7(CurrentRegionRect(i).left, CurrentRegionRect(i).top,
+                    Target()->field_0x48->BltFast(CurrentRegionRect(i).left, CurrentRegionRect(i).top,
                                                          offscreenCopy, &CurrentRegionRect(i), 0x10);
                 if (regionTable[i].framesLeft != Target()->field_0x14)
                     regionTable[i].framesLeft--;
@@ -251,7 +251,7 @@ int BackgroundImage::UnknownFunction404700(PCTextureMap* image, int x, int y, Ca
 // 0x00404c80
 int BackgroundImage::UnknownFunction404c80() {
     if (heldDcSurface)
-        heldDcSurface->UnknownMethod26(heldDc);
+        heldDcSurface->ReleaseDC(heldDc);
     heldDcSurface = 0;
     heldDc = 0;
     return 1;

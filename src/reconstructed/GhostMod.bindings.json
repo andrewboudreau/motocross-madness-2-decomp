@@ -36,7 +36,7 @@
   "?UnknownVirtualSlot7@GameObject@@UAEXXZ": "0x00469070",
   "?UnknownVirtualSlot8@D3DIMSoultreeModifier@@UAEPAVGameObject@@PAX@Z": "0x004452e0",
   "?UnknownVirtualSlot9@GameObject@@UAEHH@Z": "0x00469430",
-  "?g_UnknownGlobal56e26c@@3PAVTrackGame@@A": "0x0056e26c",
+  "?g_TrackGame@@3PAVTrackGame@@A": "0x0056e26c",
   "__ftol": "0x00534a88",
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@4005c800000000000000": "0x005505ec",

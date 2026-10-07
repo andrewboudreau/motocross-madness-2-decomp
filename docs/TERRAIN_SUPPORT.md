@@ -26,8 +26,9 @@ ManagedTexture (`0x00510500`); the managed path registers through
 ManagedTextureGroup at `0x0050c6c0`. All three identities and signatures have
 independent canonical reconstructions and RTTI evidence. Physics boundary
 views remain explicitly named as such, and the constructor inputs are typed
-TextureMapManager pointers. The age/purge callee at `0x004011b0` operates on
-the age manager's records, sorting its pointer array through CRT qsort.
+TextureMapManager pointers. The age/purge callee `AgeManager::EvictStale`
+at `0x004011b0` operates on the age manager's records, sorting its pointer
+array through CRT qsort.
 
 The owned-object function's registration prologue selects EH stub `0x0054e5b8`:
 it loads FuncInfo `0x00563c28` (magic `0x19930520`) and jumps to `0x0053471a`.

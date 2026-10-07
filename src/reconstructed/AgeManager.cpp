@@ -20,12 +20,12 @@ AgeManager::~AgeManager() {
 }
 
 // 0x00401040
-void AgeManager::UnknownFunction401040() {
+void AgeManager::AdvanceAge() {
     currentAge++;
 }
 
 // 0x00401050
-void AgeManager::UnknownFunction401050(AgeEntry* entry, int (*callback)(void* owner, int context),
+void AgeManager::Register(AgeEntry* entry, int (*callback)(void* owner, int context),
                                        void* owner, int context, int size) {
     if (entryCount == entryCapacity) {
         AgeEntry** entries = (AgeEntry**)DebugRealloc(entryList, (entryCapacity + 1000) * sizeof(AgeEntry*),
@@ -46,7 +46,7 @@ void AgeManager::UnknownFunction401050(AgeEntry* entry, int (*callback)(void* ow
 }
 
 // 0x004010d0
-void AgeManager::UnknownFunction4010d0(AgeEntry* entry) {
+void AgeManager::Unregister(AgeEntry* entry) {
     if (entryList && entryCount) {
         for (int i = 0; i < entryCount; i++) {
             if (entryList[i] == entry) {
@@ -63,7 +63,7 @@ void AgeManager::UnknownFunction4010d0(AgeEntry* entry) {
 }
 
 // 0x00401130
-int AgeManager::UnknownFunction401130(int* stale) {
+int AgeManager::TotalSize(int* stale) {
     if (stale) {
         *stale = 0;
         for (int i = 0; i < entryCount; i++) {
@@ -84,7 +84,7 @@ static int UnknownFunction401180(const void* a, const void* b) {
 }
 
 // 0x004011b0
-int AgeManager::UnknownFunction4011b0(int limit) {
+int AgeManager::EvictStale(int limit) {
     if (totalBytes < limit)
         return 0;
     qsort(entryList, entryCount, sizeof(AgeEntry*), UnknownFunction401180);
@@ -108,6 +108,6 @@ int AgeManager::UnknownFunction4011b0(int limit) {
 }
 
 // 0x00401250
-void AgeManager::UnknownFunction401250(AgeEntry* entry) {
+void AgeManager::MarkUsed(AgeEntry* entry) {
     entry->age = currentAge;
 }

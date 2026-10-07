@@ -258,7 +258,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
         sprintf(sltPath, "%s\\%s", "Res", slt);
         strcpy(strrchr(slt, '.'), ".col");
         sprintf(path, "%s\\%s", "Res", slt);
-        if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)colPath)) {
+        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)colPath)) {
             strcpy(strrchr(slt, '.'), "");
             colPath[0] = 0;
         }
@@ -283,7 +283,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             if (minPoints >= points - 1)
                 minPoints = points - 1;
             UnknownScenePhysicsObject* object = new(__FILE__, 1845) UnknownScenePhysicsObject(1, 1);
-            UnknownFunction469190(object->UnknownVirtualSlot40(field_0x18, sltPath, lights, a4, position, look, up,
+            AppendChild(object->UnknownVirtualSlot40(field_0x18, sltPath, lights, a4, position, look, up,
                                                                0, a2, 5.0f, points, emitters, this,
                                                                0.033333f, 10, 0.025f, 0.05f, radius, shape,
                                                                minPoints, field_0x88, 1),
@@ -322,7 +322,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneDustEmitter* emitter = new(__FILE__, 1917) UnknownSceneDustEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->UnknownFunction469190(emitter->UnknownVirtualSlot27(field_0x18, a2), -1);
+                            node->AppendChild(emitter->UnknownVirtualSlot27(field_0x18, a2), -1);
                             object->UnknownVirtualSlot37(1, emitter, *object->field_0x12c, 0);
                             dust = 1;
                         }
@@ -334,7 +334,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneChunkEmitter* emitter = new(__FILE__, 1927) UnknownSceneChunkEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->UnknownFunction469190(emitter->UnknownVirtualSlot27(field_0x18, a2), -1);
+                            node->AppendChild(emitter->UnknownVirtualSlot27(field_0x18, a2), -1);
                             object->UnknownVirtualSlot37(2, emitter, *object->field_0x12c, 0);
                             chunk = 1;
                         }
@@ -346,7 +346,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         } else {
                             UnknownSceneSprayEmitter* emitter = new(__FILE__, 1937) UnknownSceneSprayEmitter(1);
                             D3DIMSoultreeObject* node = object;
-                            node->UnknownFunction469190(emitter->UnknownVirtualSlot27(field_0x18, a2), -1);
+                            node->AppendChild(emitter->UnknownVirtualSlot27(field_0x18, a2), -1);
                             object->UnknownVirtualSlot37(3, emitter, *object->field_0x12c, 0);
                             spray = 1;
                         }
@@ -365,7 +365,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
             field_0xb8->field_0x04[i].field_0x08 = 0;
             D3DIMSoultreeObject* object = new(__FILE__, 1956) D3DIMSoultreeObject(1);
             field_0xb8->field_0x04[i].field_0x04 = (ShadowCaster*)object;
-            UnknownFunction469190(object->UnknownVirtualSlot9(field_0x18, sltPath, (int)lights, a4, 1), -1);
+            AppendChild(object->UnknownVirtualSlot9(field_0x18, sltPath, (int)lights, a4, 1), -1);
             int length = strcspn(sltPath, ".");
             int count = length < 0x14 ? length : 0x14;
             strncpy(field_0xb8->field_0x04[i].field_0x10, sltPath, count);
@@ -389,7 +389,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                         (D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04, colPath);
                 field_0xb8->field_0x04[i].field_0x0c->UnknownFunction435fe0();
                 ((D3DIMSoultreeObject*)field_0xb8->field_0x04[i].field_0x04)
-                    ->UnknownFunction469190(field_0xb8->field_0x04[i].field_0x0c, -1);
+                    ->AppendChild(field_0xb8->field_0x04[i].field_0x0c, -1);
                 g_MemTagStack->Push("Scene");
             }
             field_0xb8->field_0x04[i].physics = 0;
@@ -410,7 +410,7 @@ int Scene::ReadStaticModels(LightManager* lights, int a2, int a3, int a4, void (
                                                 (UnknownVehiclePart*)field_0xb8->field_0x04[i].field_0x04,
                                                 params, flags, oneShotDistance, randomTriggerPercent, 0,
                                                 force2D);
-                UnknownFunction469190(emitter, -1);
+                AppendChild(emitter, -1);
                 if (!emitter) {
                     sprintf(text, "\nScene::SoundEmitter(%s) not created\n", sound);
                     UnknownFunction464e80(text);
@@ -512,7 +512,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
             sprintf(text, "%s\\%s", "Res", vue);
             UnknownTextureStream* stream =
                 new(__FILE__, 2216) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-            if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, text, "rb", (int)vuePath)) {
+            if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, text, "rb", (int)vuePath)) {
                 sprintf(sound, "No procedural vue file found in resources.  Aborting.\n");
                 delete stream;
                 return 0;
@@ -569,7 +569,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         UnknownTextureStream* stream =
             new(__FILE__, 2281) UnknownTextureStream((int)g_UnknownResourceManager572b44);
         sprintf(text, "%s\\%s", "Res", colPath);
-        if (!g_UnknownGlobal56e26c->sceneObject->UnknownFunction4e9cd0(stream, text, "rb", (int)colPath))
+        if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, text, "rb", (int)colPath))
             colPath[0] = 0;
         delete stream;
         if (!ReadVector(&field_0xb4->field_0x04[i].position, name, "Position", "0.0,0.0,0.0", 0, 0))
@@ -577,7 +577,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         if (field_0xb4->field_0x04[i].field_0x00_bit3) {
             UnknownSceneObject* character = new(__FILE__, 2300) UnknownSceneObject(1);
             field_0xb4->field_0x04[i].field_0x04 = character;
-            if (!UnknownFunction469190(character->UnknownFunction4319c0(field_0x18, sltPath, colPath, lights, a4, 1, 1),
+            if (!AppendChild(character->UnknownFunction4319c0(field_0x18, sltPath, colPath, lights, a4, 1, 1),
                                        -1)) {
                 sprintf(message, "\nScene: Cannot create character from %s.\n\n", file);
                 UnknownFunction464e80(message);
@@ -587,7 +587,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
         if (!field_0xb4->field_0x04[i].field_0x00_bit3) {
             UnknownSceneAnimatedObject* car = new(__FILE__, 2305) UnknownSceneAnimatedObject(1);
             field_0xb4->field_0x04[i].field_0x08 = car;
-            if (!UnknownFunction469190(car->UnknownVirtualSlot27(field_0x18, sltPath, colPath, lights, a4, 0, vuePath,
+            if (!AppendChild(car->UnknownVirtualSlot27(field_0x18, sltPath, colPath, lights, a4, 0, vuePath,
                                                                  &field_0xb4->field_0x04[i].position, fps,
                                                                  frontWheelsTurn, lagDistance, 1.0f, tires, 0, 0, 0),
                                        -1)) {
@@ -694,7 +694,7 @@ int Scene::ReadAnimations(LightManager* lights, int a3, int a4, void (*progress)
                         sprintf(text, "\nScene::SoundEmitter(%s) not created\n", sound);
                         UnknownFunction464e80(text);
                     } else {
-                        UnknownFunction469190(emitter, -1);
+                        AppendChild(emitter, -1);
                     }
                 }
             } else {
