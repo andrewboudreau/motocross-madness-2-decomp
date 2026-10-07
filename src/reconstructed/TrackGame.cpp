@@ -256,8 +256,8 @@ int TrackGame::UnknownVirtualSlot4() {
         PostMessageA(field_0x31c, kCloseWindow, 0, 0);
         return 1;
     }
-    field_0x3340 = new(__FILE__, 343) UnknownTrackGameObject3340;
-    field_0x3340->UnknownFunction4310c0();
+    field_0x3340 = new(__FILE__, 343) CDAudio;
+    field_0x3340->Initialize();
     g_MemTagStack->Push("Startup");
     controlMapping = new(__FILE__, 350) UnknownControlMapping;
     if (!controlMapping)
@@ -443,7 +443,7 @@ void TrackGame::UnknownFunction521a30() {
 // 0x00521a40
 void TrackGame::UnknownFunction521a40() {
     if (field_0x3340)
-        field_0x3340->UnknownFunction4310e0();
+        field_0x3340->Stop();
 }
 
 // 0x00521a50
