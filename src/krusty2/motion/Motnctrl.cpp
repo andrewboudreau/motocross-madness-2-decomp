@@ -12,9 +12,9 @@
 // mid-file and FreeMotion (line 0x5a7) last.  Every function here is strict exact with all
 // relocations resolved (Motnctrl.bindings.json).  Not here: the text .VUE loader 0x004a5e40,
 // the slot 7 helpers 0x004a7dc0, 0x004a7fd0, 0x004a8440 (an out-of-line copy of an inline) and
-// 0x004a8470, and AdvanceMotion 0x004a6bb0 (near misses, samples/physics/motion/Motnctrl.cpp),
-// slot 7 0x004a70c0 (not reconstructed) and 0x004a8bf0, 0x004a8c50 and 0x004a9050 (they round with
-// direct fistp instructions where the rest of the unit calls __ftol: __asm, not reproducible here).
+// 0x004a8470, and slot 7 0x004a70c0 itself (near misses, samples/physics/motion/Motnctrl.cpp),
+// and 0x004a8bf0, 0x004a8c50 and 0x004a9050 (they round with direct fistp instructions where the
+// rest of the unit calls __ftol: __asm, not reproducible here).
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -440,6 +440,107 @@ void Character::CharacterVirtualSlot5(int a, int b)
 
 void Character::CharacterVirtualSlot6(int a, int b)
 {
+}
+
+// Inline helper of the playback methods: clamps *value to [low, high].  The out-of-line copy VC6
+// emits for it is 0x004a8440 (exact in samples/physics/motion/Motnctrl.cpp, where PoseRotation
+// calls it once).
+inline void ClampFloat(float low, float high, float* value)
+{
+    if (*value < low) {
+        *value = low;
+        return;
+    }
+    if (*value > high)
+        *value = high;
+}
+
+// The cubic ease 3x^2 - 2x^3 of the blend weight.  Retail (0x004a6cd3, and slot 7 at 0x004a7711)
+// loads the memory-homed weight once and keeps a copy on the FPU stack (fld st0; fadd st0,st0;
+// fsubr 3.0f; fmul st1; fmul st1; fstp w; fstp st0).  A float spelling of the ease reloads the
+// weight for every use, and any double-typed use of the weight makes VC6 keep it on the stack
+// through the preceding clamp as well (retail reloads it there).  The float copy made through a
+// double expression that folds away gives both: VC6 drops the `* 1.0` but keeps the conversion
+// nodes, so the copy is a register temporary distinct from the weight in memory.
+inline float SmoothStep(float x)
+{
+    float t = (float)(x * 1.0);
+    return (3.0f - (t + t)) * t * t;
+}
+
+// The inlined form of InterpolatePose (0x004a8470) as AdvanceMotion expands it: VC6 inlines the
+// operators of the first term (calling Vec3::Vec3 0x404e60 for their results) and calls the
+// out-of-line copies (0x421d00, 0x5015b0, 0x421cb0, 0x515600) for the rest, which the call views
+// of Math3D.h reproduce.  The three weighted sums at the end are never used.
+inline void BlendPose(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
+{
+    ClampFloat(0.0f, 1.0f, &t);
+    float s = 1.0f - t;
+    out->nodeIndex = a->nodeIndex;
+    out->hasPose = a->hasPose;
+    out->axisZ = Vec3Normalize(a->axisZ + (b->axisZ - a->axisZ) * t);
+    Vec3 deltaY, scaledY, sumY;
+    out->axisY = Vec3Normalize(*Vec3AddCall(&sumY, &a->axisY,
+                                            Vec3ScaleCall(&scaledY, Vec3SubtractCall(&deltaY, &b->axisY, &a->axisY), t)));
+    Vec3 deltaP, scaledP, sumP;
+    out->position = *Vec3AddCall(&sumP, &a->position,
+                                 Vec3ScaleCall(&scaledP, Vec3SubtractCall(&deltaP, &b->position, &a->position), t));
+    Vec3 axisX = CrossProductCall(out->axisZ, out->axisY);
+    out->axisY = CrossProductCall(axisX, out->axisZ);
+    Vec3 weightedZA, weightedZB, blendedZ;
+    Vec3AddCall(&blendedZ, Vec3ScaleCall(&weightedZA, &a->axisZ, s), Vec3ScaleCall(&weightedZB, &b->axisZ, t));
+    Vec3 weightedYA, weightedYB, blendedY;
+    Vec3AddCall(&blendedY, Vec3ScaleCall(&weightedYA, &a->axisY, s), Vec3ScaleCall(&weightedYB, &b->axisY, t));
+    Vec3 weightedPA, weightedPB, blendedPosition;
+    Vec3AddCall(&blendedPosition, Vec3ScaleCall(&weightedPA, &a->position, s), Vec3ScaleCall(&weightedPB, &b->position, t));
+}
+
+// owner: bracket only (Character method contiguous with its Motnctrl.cpp methods)
+// 0x004a6bb0 (ret 0xc; callers 0x49945f, 0x499627, 0x4997b1, 0x4ead18, 0x4eae78, 0x4eb108):
+// per-frame playback.  Advances the current motion by dt (a finished non-looping motion sets
+// chr_field_0x0c and returns 0), then applies every pose of the current frame through slot 4
+// (mirror == 0) or slot 5.  While a blend is active each pose is interpolated from the frame
+// applied last with a smoothstep weight over blendDuration.  Returns the frame number.
+int Character::AdvanceMotion(float dt, int mirror, int mask)
+{
+    if (chr_field_0x0c)
+        return 0;
+    chr_field_0x10 += dt;
+    if (!AdvanceLooping(currentMotion, &currentFrame, &chr_field_0x10) && currentMotion->looping == 0) {
+        chr_field_0x10 = 0.0f;
+        chr_field_0x0c = 1;
+        return 0;
+    }
+    if (blendActive == 0) {
+        lastFrame = currentFrame;
+        lastFrameTime = chr_field_0x10;
+        for (int i = 0; i < currentFrame->count; i++) {
+            if (mirror == 0)
+                CharacterVirtualSlot4((int)&currentFrame->poses[i], mask);
+            else
+                CharacterVirtualSlot5((int)&currentFrame->poses[i], mask);
+        }
+    } else {
+        blendFromTime += dt;
+        float w = blendFromTime / blendDuration;
+        if (w < 0.0f)
+            w = 0.0f;
+        else if (w >= 1.0f)
+            w = 1.0f;
+        else
+            w = SmoothStep(w);
+        for (int j = 0; j < currentFrame->count; j++) {
+            CharacterPose pose;
+            BlendPose(&lastFrame->poses[j], &currentFrame->poses[j], &pose, w);
+            if (mirror == 0)
+                CharacterVirtualSlot4((int)&pose, mask);
+            else
+                CharacterVirtualSlot5((int)&pose, mask);
+        }
+        if (blendFromTime >= blendDuration)
+            blendActive = 0;
+    }
+    return currentFrame->field_0x00;
 }
 
 // owner: bracket only

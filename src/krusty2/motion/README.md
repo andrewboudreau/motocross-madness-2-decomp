@@ -91,7 +91,7 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
 
     The paths are at `+0x3c/+0x8c/+0xdc/+0x12c`. `motions` is at `+0x180`, the `MotionPoseList` is at `+0x190` and
     `vutLoaded` is at `+0x19c`. These fields are named in `src/krusty2/motion/D3DIMSoultreeCharacter.h`.
-- **Coverage**: 40 strict exact in `src/krusty2/motion/Motnctrl.cpp`, plus ClampFloat and 5 partials in the sample.
+- **Coverage**: 41 strict exact in `src/krusty2/motion/Motnctrl.cpp`, plus ClampFloat and 5 partials in the sample.
   - The exact targets are:
     - two `$E` initialisers
     - the pose comparator and the two frame-advance helpers
@@ -102,6 +102,13 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
     - ApplyPoseList (slots 4 and 6), SetMotion and SetMotionByName
     - both BlendToMotion overloads
     - FreeMotion
+    - AdvanceMotion `0x4a6bb0` (the per-frame advance and blend; `lastFrame` / `lastFrameTime` at `+0x24/+0x28`).
+      Retail keeps the smoothstep input on the FPU stack (`fld st0` / `fmul st1` twice) after a memory-homed clamp.
+      Every plain float spelling reloads it from memory for each multiply, and every double-typed use (double
+      parameter, `double d = x`, `(double)` cast, `const float&` into a double, pointer or reference helper, long
+      double) keeps it on the stack through the clamp too. The one spelling that reproduces retail is a float copy
+      through a double expression VC6 folds away, `float t = (float)(x * 1.0);` (also `(float)(x + 0.0)`), in
+      `SmoothStep`.
     - the `.CRT$XCU` 188-191 `Vec3` set (`0x4a8940..0x4a8a7b`, 8 functions)
     - ClampFloat `0x4a8440` (sample; an out-of-line copy of an inline)
   - The partial targets are:
@@ -110,19 +117,23 @@ stay in `samples/physics/motion/Motnctrl.cpp`.
     - **RotatePose `0x4a7dc0`, 90.66%**: the Vec3Normalize temporaries use a different stack slot.
     - **PoseRotation `0x4a7fd0`, 55.70%**: the inline budget differs.
     - **InterpolatePose `0x4a8470`, 19.40%**: VC6 inlines the first CrossProduct, where retail calls `0x515600`.
-    - **AdvanceMotion `0x4a6bb0`, 29.06%** (1295 vs 1293 bytes): the per-frame advance and blend (`lastFrame` /
-      `lastFrameTime` at `+0x24/+0x28`, declared in `D3DIMSoultreeCharacter.h`). Identical through the blend-weight
-      clamp (`+0x127`); retail keeps the smoothstep input on the FPU stack (`fld st0` / `fmul st1` twice) where every
-      float spelling reloads it (a double parameter keeps it, but also across the clamp), and the 2-byte shift moves
-      the rest.
+    - **Slot 7 `0x4a70c0`, 4.79%** (3330 vs 3327 bytes): the frame-accurate advance with pose extrapolation and
+      blending. The call sequence is retail's (Vec3Normalize, the `operator+`/`operator-`/`operator*`/CrossProduct
+      COMDATs inside the two pose-blend expansions, `_ftol`, FindNode, ClampFloat inlined) and the clamp/smoothstep
+      region matches byte for byte, but VC6 distributes the inline budget differently: it calls
+      `CharacterPose::CharacterPose` (`0x4a8930`) 3 then 2 times for the unused pose locals where retail calls it 2
+      then 4 times (the count follows the number of unused `CharacterPose` locals in the blend helper: 4 gives 3/2,
+      6 gives 5/4, 2 gives 1/0, 0 makes `Vec3::Vec3` be called at the first operator sites instead; declaring them
+      before ClampFloat makes ClampFloat be called), and it inlines the `operator*`/`operator+` of the first
+      extrapolation loop that retail calls (retail inlines only the `operator-` there, calling `Vec3::Vec3` for its
+      result). The frame is 0x284 against retail's 0x2dc and every byte after the first expansion shifts. A
+      call-view variant (helpers taking pointers) came closer in size (3182-3190 bytes) but lost the call sequence.
 - **Inline budget**: VC6 spends its per-function inline budget breadth-first over call sites in source order. The
   calls inside inlined bodies are considered after all direct call sites. In these FPU helpers retail calls the
   out-of-line COMDAT copies of `Vec3::Vec3` (`0x404e60`), DotProduct (`0x40ae30`), `operator*` (`0x5015b0`),
   `operator+`/`operator-` (`0x421cb0`/`0x421d00`) and CrossProduct (`0x515600`) at specific sites. Moving the identity
   branch of PoseRotation last gave the biggest gain. Helper spellings and dummy preceding functions had no effect.
 - **Not reconstructed**:
-  - Slot 7 `0x4a70c0` (3327 bytes): it inlines the same InterpolatePose and smoothstep pattern that keeps
-    AdvanceMotion partial, so a byte match needs that resolved first.
   - The functions after `0x4a9aa0`.
   - `0x4a8bf0`, `0x4a8c50` and `0x4a9050` (2138 bytes), which round with direct `fistp` instructions (no
     `_ftol` call): `__asm` in the original, which the readable-C++ rule excludes.
