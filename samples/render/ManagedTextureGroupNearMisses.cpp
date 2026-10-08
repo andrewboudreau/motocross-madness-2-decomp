@@ -7,31 +7,50 @@
 // retail does, once the TexMem figures go through TexelMegabytes and
 // PageMegabytes and the page search through LeastWantedPage (VC6's inline
 // budget scales with the function's size, so without those helpers it
-// inlines every Reserve). What remains is stack-slot packing: retail
-// overlaps the 12-byte format buffer with three scalars and keeps "now" in
-// ebp through the overlay block; VC6 here packs the slots in another order
-// (a frame 8 bytes larger). About 250 of 1150 instructions differ, almost
-// all in register or slot choice. Declaration order and block scopes do
-// not change the packing.
+// inlines every Reserve). The helpers take their counts by const reference:
+// retail multiplies straight from the fields (`fimul [ebx+0x244]`), which
+// a by-value parameter turns into a stack copy (304 -> 158 differing
+// instructions). What remains is stack-slot packing: retail has two scalar
+// slots fewer (frame 0x78 against 0x80), puts the 12-byte format buffer
+// over the dead `i`/`smallest` slots and `filled` over `texels`, keeps
+// `now` in ebp through the overlay block and hoists the level-count loop's
+// bound. About 158 of 1150 instructions differ, almost all in slot or
+// register choice. Tried without effect: block scopes around the emptying
+// section, the first pass (`requested`), the levels loop and the
+// refill+overlay section; a hoisted count (frame shrinks by 4 but the loop
+// registers rotate); an `elapsed` local for `now - field_0x250` (worse).
 //
 // ManagedTextureGroup::UnknownFunction50dad0 (0x0050dad0, 5020 bytes): the
 // repack with partial texture blits, chosen by 0x0050c8c0. Control flow,
 // calls, inlining and the scalar stack slots line up (the slots only once
 // one `managed` variable serves every loop, and the blit-pass loop only as
 // `while (pass < 3 && ...)`). Left: retail places `unused`'s neighbours
-// `levels` and `spare` the other way round (0x8c/0xb0), the stores of
-// `dropped = 0` and the 9-entry loop's registers follow from that, and from
-// the "ManagedTextures" row on the overlay calls rotate eax/ecx/edx. About
-// 145 of 1600 instructions differ; the size is 5022 against 5020.
-// Declaration order does not move the arrays.
+// `levels` and `spare` the other way round (0x8c/0xb0), the 9-entry loop's
+// registers follow from that, retail stores `dropped = 0` after the
+// empty-list return (moving the declaration or the store there costs 130
+// more differences), and from the "ManagedTextures" row on the overlay
+// calls rotate eax/ecx/edx. About 216 of 1600 instructions differ; the
+// size is 5022 against 5020. Declaration order, block scopes around the
+// arrays and the memset order do not move the arrays; computing
+// `managedTexels` at its row is worse.
 //
-// ManagedTextureGroup::UnknownFunction50ef70 (0x0050ef70, 1832 bytes): the
-// debug display behind manager slot 15. Everything lines up except that
-// retail saves ebx/esi only after the "not the selected group" return
-// (VC6 here saves all four registers in the prologue, shifting the stack
-// offsets of the entry block and the return-1 epilogues), two stack slots
-// (the two device contexts, the page) and one block's scheduling. About 60
-// of 550 instructions differ.
+// ManagedTextureGroup::UnknownFunction50ef70 (0x0050ef70, 1834 bytes): the
+// debug display behind manager slot 15. Every stack slot matches once the
+// page-drawing tail sits in its own block (`if (page) { ... }`): VC6 lets
+// block-scoped locals reuse the slots of dead earlier locals, but gives a
+// function-scope local its own slot wherever it is declared (101 -> 35
+// differing instructions; declaration order and names change nothing).
+// Reading the outline's fields through `const ManagedTexture& t` fixes the
+// fadd load order (35 -> 31). Left: retail saves ebx/esi only after the
+// "not the selected group" return (VC6 here saves all four registers in
+// the prologue, shifting the entry block and the return-1 epilogues; not
+// changed by a manager local, the comparison order or nesting the body
+// under either test), retail reloads the page into ebx at the bottom of
+// the texture loop (VC6 at its top and after it; a while loop is worse),
+// and retail multiplies `left`/`top` as `fld [field]; fmul st(1)` where
+// VC6 emits `fld st(0); fmul [field]` (not moved by float/double temps,
+// pointer locals, by-value or by-reference inline helpers). About 31 of
+// 575 instructions differ; the size is 1840 against 1834.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,7 +71,7 @@ static inline int LevelArea(int level) {
     return side * side;
 }
 
-static inline float TexelMegabytes(ManagedTextureGroup* group, int texels) {
+static inline float TexelMegabytes(ManagedTextureGroup* group, const int& texels) {
     return (float)UnknownFunction511970(group->field_0x0c) * texels * 1.2715658e-06f;
 }
 
@@ -69,7 +88,7 @@ static inline CacheTexture* LeastWantedPage(UnknownTextureMapList* pages, int* l
     return best;
 }
 
-static inline float PageMegabytes(ManagedTextureGroup* group, int pages) {
+static inline float PageMegabytes(ManagedTextureGroup* group, const int& pages) {
     return (UnknownFunction511970(group->field_0x0c) * pages << 18) * 3.1789145e-07f;
 }
 
@@ -640,7 +659,6 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
     if (!g_TrackGame->field_0x2d4_bit2)
         return 1;
     char text[0x50];
-    void* dc;
     ManagedTexture* selected = 0;
     TextureMap* page;
     int mode = field_0x40->field_0x58;
@@ -677,14 +695,14 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
             }
             _snprintf(text, sizeof(text), "%d %0.2f->%d,%s", field_0x1c8 + 1, selected->field_0xa4,
                       selected->field_0xa8, state);
-            if (!target->renderSurface->GetDC(&dc)) {
-                TextOutA(dc, x, 20, text, strlen(text));
-                target->renderSurface->ReleaseDC(dc);
+            void* textDc;
+            if (!target->renderSurface->GetDC(&textDc)) {
+                TextOutA(textDc, x, 20, text, strlen(text));
+                target->renderSurface->ReleaseDC(textDc);
             }
         }
     }
-    mode = field_0x40->field_0x58;
-    if (mode == 1 && selected) {
+    if (field_0x40->field_0x58 == 1 && selected) {
         int index = 0;
         for (page = field_0x54.First(); page; page = field_0x54.Next(), index++) {
             if (page == selected->field_0x80)
@@ -693,91 +711,92 @@ int ManagedTextureGroup::UnknownFunction50ef70(PCRenderTarget* target) {
         if (!page)
             return 1;
         field_0x1c4 = index;
-    } else if (mode == 2) {
+    } else if (field_0x40->field_0x58 == 2) {
         page = field_0x54.First();
         for (int i = 0; i < field_0x1c4; i++)
             page = field_0x54.Next();
     } else {
         return 1;
     }
-    if (!page)
-        return 1;
-
-    UnknownBltEffects effects;
-    memset(&effects, 0, sizeof(effects));
-    effects.size = sizeof(effects);
-    effects.fillColor = 0;
-    UnknownBltRect rect;
-    rect.left = 0;
-    rect.top = 20;
-    rect.right = page->field_0x14;
-    rect.bottom = page->field_0x18 + 20;
-    surface->Blt(&rect, 0, 0, 0x400, &effects);
-    static_cast<CacheTexture*>(page)->UnknownFunction50f890(&field_0x1a8);
-    long pitch;
-    unsigned char* bits = (unsigned char*)target->UnknownVirtualSlot4(0, &pitch, 0x821);
-    if (bits) {
-        for (int j = 0; j < field_0x1a8.m_count; j++) {
-            ManagedTexture* managed = field_0x1a8.Get(j);
-            UnknownTextureRegion* region = managed->field_0x94;
-            int left = (int)(page->field_0x14 * region->field_0x1c);
-            int top = (int)(page->field_0x18 * region->field_0x20) + 20;
-            int side = (int)(managed->field_0x84 * 256.0f);
-            int levelSide = managed->field_0x14;
-            UnknownSurfaceInterface* level = managed->systemSurface;
-            UnknownSurfaceDesc desc;
-            memset(&desc, 0, sizeof(desc));
-            desc.size = sizeof(desc);
-            level->GetSurfaceDesc(&desc);
-            while (side < levelSide) {
-                levelSide >>= 1;
-                level->GetAttachedSurface((UnknownSurfaceCaps*)desc.caps, &level);
+    if (page) {
+        UnknownBltEffects effects;
+        memset(&effects, 0, sizeof(effects));
+        effects.size = sizeof(effects);
+        effects.fillColor = 0;
+        UnknownBltRect rect;
+        rect.left = 0;
+        rect.top = 20;
+        rect.right = page->field_0x14;
+        rect.bottom = page->field_0x18 + 20;
+        surface->Blt(&rect, 0, 0, 0x400, &effects);
+        static_cast<CacheTexture*>(page)->UnknownFunction50f890(&field_0x1a8);
+        long pitch;
+        unsigned char* bits = (unsigned char*)target->UnknownVirtualSlot4(0, &pitch, 0x821);
+        if (bits) {
+            for (int j = 0; j < field_0x1a8.m_count; j++) {
+                ManagedTexture* managed = field_0x1a8.Get(j);
+                UnknownTextureRegion* region = managed->field_0x94;
+                int left = (int)(page->field_0x14 * region->field_0x1c);
+                int top = (int)(page->field_0x18 * region->field_0x20) + 20;
+                int side = (int)(managed->field_0x84 * 256.0f);
+                int levelSide = managed->field_0x14;
+                UnknownSurfaceInterface* level = managed->systemSurface;
+                UnknownSurfaceDesc desc;
+                memset(&desc, 0, sizeof(desc));
+                desc.size = sizeof(desc);
                 level->GetSurfaceDesc(&desc);
-            }
-            if (desc.height == side && desc.width == side) {
-                UnknownSurfaceDesc locked;
-                memset(&locked, 0, sizeof(locked));
-                locked.size = sizeof(locked);
-                if (!level->Lock(0, &locked, 0x811, 0)) {
-                    int sourceSize = UnknownFunction511970(managed->field_0x20);
-                    int size = UnknownFunction511970(target->field_0x28);
-                    UnknownFunction4d1d20(bits + top * pitch + left * size, locked.surface, levelSide, levelSide,
-                                          pitch / size, locked.pitch / sourceSize, target->field_0x28,
-                                          managed->field_0x20, 0, managed->field_0x2c, 0, 0);
-                    level->Unlock(0);
+                while (side < levelSide) {
+                    levelSide >>= 1;
+                    level->GetAttachedSurface((UnknownSurfaceCaps*)desc.caps, &level);
+                    level->GetSurfaceDesc(&desc);
+                }
+                if (desc.height == side && desc.width == side) {
+                    UnknownSurfaceDesc locked;
+                    memset(&locked, 0, sizeof(locked));
+                    locked.size = sizeof(locked);
+                    if (!level->Lock(0, &locked, 0x811, 0)) {
+                        int sourceSize = UnknownFunction511970(managed->field_0x20);
+                        int size = UnknownFunction511970(target->field_0x28);
+                        UnknownFunction4d1d20(bits + top * pitch + left * size, locked.surface, levelSide, levelSide,
+                                              pitch / size, locked.pitch / sourceSize, target->field_0x28,
+                                              managed->field_0x20, 0, managed->field_0x2c, 0, 0);
+                        level->Unlock(0);
+                    }
                 }
             }
+            surface->Unlock(0);
         }
-        surface->Unlock(0);
-    }
-    field_0x1a8.Clear();
+        field_0x1a8.Clear();
 
-    int failed = surface->GetDC(&dc);
-    if (!failed) {
-        if (!field_0x1f8)
-            field_0x1f8 = CreatePen(0, 1, 0xff00);
-        if (field_0x1f8)
-            SelectObject(dc, field_0x1f8);
-    }
-    if (selected) {
-        if (failed)
+        void* dc;
+        int failed = surface->GetDC(&dc);
+        if (!failed) {
+            if (!field_0x1f8)
+                field_0x1f8 = CreatePen(0, 1, 0xff00);
+            if (field_0x1f8)
+                SelectObject(dc, field_0x1f8);
+        }
+        if (selected) {
+            if (failed)
+                return 1;
+            const ManagedTexture& t = *selected; // reads the fields in retail's order
+            float width = (float)page->field_0x14;
+            int left = (int)(width * t.field_0x88);
+            int right = (int)((t.field_0x84 + t.field_0x88) * width);
+            float height = (float)page->field_0x18;
+            int top = (int)(height * t.field_0x8c + 20.0f);
+            int bottom = (int)((t.field_0x84 + t.field_0x8c) * height + 20.0f);
+            MoveToEx(dc, left, top, 0);
+            LineTo(dc, right, top);
+            LineTo(dc, right, bottom);
+            LineTo(dc, left, bottom);
+            LineTo(dc, left, top);
+        } else if (failed) {
             return 1;
-        float width = (float)page->field_0x14;
-        int left = (int)(selected->field_0x88 * width);
-        int right = (int)((selected->field_0x84 + selected->field_0x88) * width);
-        float height = (float)page->field_0x18;
-        int top = (int)(selected->field_0x8c * height + 20.0f);
-        int bottom = (int)((selected->field_0x84 + selected->field_0x8c) * height + 20.0f);
-        MoveToEx(dc, left, top, 0);
-        LineTo(dc, right, top);
-        LineTo(dc, right, bottom);
-        LineTo(dc, left, bottom);
-        LineTo(dc, left, top);
-    } else if (failed) {
-        return 1;
+        }
+        sprintf(text, "#%d", field_0x1c4 + 1);
+        TextOutA(dc, 0, 20, text, strlen(text));
+        surface->ReleaseDC(dc);
     }
-    sprintf(text, "#%d", field_0x1c4 + 1);
-    TextOutA(dc, 0, 20, text, strlen(text));
-    surface->ReleaseDC(dc);
     return 1;
 }
