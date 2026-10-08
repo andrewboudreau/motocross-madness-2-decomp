@@ -211,9 +211,9 @@ destructor `0x004838a0` and its deleting wrapper `0x004838f0`. Near misses
 
 | Function | Bytes | What differs |
 |---|---:|---|
-| `0x00483910` (cell sampler, Terrain `0x00507cf8`) | 48/1027 | retail keeps x and z in their argument homes across the descent loop (VC6's tail-recursion elimination of the child call) and a copy of x in ebp; the leaf paths and the default fill are the same code |
-| `0x00483d40` (GridNode slot 1, 4140 B) | 96/4189 | ebp frame; the cell indices are rounded with a bare `fistp` (the `__asm` helper this project leaves out); the crossing loops keep the running y/z on the x87 stack |
-| `0x00484d70` (leaf lookup) | 81/90 | register choice for the table index |
+| `0x00483910` (cell sampler, Terrain `0x00507cf8`) | 1040/1067 | only the shift setup: retail reuses the level byte loaded for the leaf test (`and eax, 0xff ; shl eax, 2`, so `this` dies and the children go to ecx) where VC6 re-reads `level` through `this`. The rest (leaf-first layout, the descent loop as VC6's tail-recursion elimination with clamped copies `xx`/`zz` of x and z, the two leaf paths, the GridVec3-temporary fill) is byte-exact |
+| `0x00483d40` (GridNode slot 1, 4140 B) | 96/4189 | ebp frame and four bare `fistp dword ptr [eax]` (0x4844aa, 0x4844be, 0x484670, 0x484687) from an `__asm fld/fistp` rounding helper while `__ftol` is still called for the other casts, which the no-inline-asm rule rules out; `/Oy-` only fakes the frame and leaves the x87 crossing loops different |
+| `0x00484d70` (leaf lookup) | 81/90 | register choice for the table index (eax vs ecx) and the gridX/gridZ compare order; invariant under ~30 spellings, /G6, /O1 and /Oy- |
 
 What the two large functions do (names tier 3): `0x00483910(x, z, heights,
 normals, bytes)` descends to the leaf holding sample (x, z), clamping out of

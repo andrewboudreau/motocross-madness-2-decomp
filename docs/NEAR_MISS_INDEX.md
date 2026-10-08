@@ -272,8 +272,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/Grid1 | `0x0047d470` | 309/786 | b | 31 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x838 vs 0x834, slot order differs |
 | render/Grid1 | `0x0047d780` | 216/1008 | b | 50 code diffs: `je @321 ; mov esi, [esp + N]` vs `je @315`; `mov eax, [esi]` vs `mov edi, [esp + N]`; slot order differs |
 | render/GridNode | `0x00484d70` | 81/90 | c | 3 code diffs: `mov ecx, [eax*4 + A] ; add ecx, ebx ; m~` vs `mov eax, [eax*4 + A] ; add eax, ebx ; m~`; retail adds `xor ecx, ecx ; mov cx, word ptr [eax + ~` |
-| render/GridNode | `0x00483910` | 48/1027 | b | cell sampler: x/z kept in their argument homes across the descent loop in retail (frame 0x14 vs 0xc), every register differs |
-| render/GridNode | `0x00483d40` | 96/4189 | b | slot 1: ebp frame, bare fistp rounding (`__asm` helper), running y/z of the crossing loops on the x87 stack |
+| render/GridNode | `0x00483910` | 1040/1067 | c | cell sampler: 4 code diffs in the shift setup only; retail reuses the level byte of the leaf test (`and eax, 0xff ; shl eax, 2`, children into ecx), VC6 re-reads it (`xor eax, eax ; mov al, [ecx + 0x28]`) |
+| render/GridNode | `0x00483d40` | 96/4189 | b | slot 1: ebp frame and four bare `fistp [eax]` from an `__asm` rounding helper (`__ftol` still used elsewhere), so unreachable under the no-inline-asm rule; `/Oy-` changes nothing else |
 | render/Griddraw | `0x0047de90` | 977/1083 (masked) | c | 30 code diffs: retail lacks `mov esi, [esp + N]`; `mov edi, [ebp*N + N]` vs `mov edi, [esp + N]` |
 | render/Griddraw | `0x0047e430` | 140/144 (masked) | c | 1 code diffs: `mov edx, esi ; add edx, [ebp + N]` vs `mov edx, [ebp + N] ; add edx, esi` |
 | render/Griddraw | `0x0047e600` | 994/1477 (masked) | b | 15 code diffs: `fld [edx + 0x40] ; fmul [ecx + 0x164]` vs `fld [ecx + 0x164] ; fmul [edx + 0x40]`; `fld [edx + 0x40] ; fmul [esi + 0x18]` vs `fld [esi + 0x18] ; fmul [edx + 0x40]`; slots differ |
