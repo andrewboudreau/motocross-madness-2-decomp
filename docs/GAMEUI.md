@@ -222,15 +222,16 @@ markers into the dialog's named entries, then reads them in four passes
 ("Set_Info", images, sounds, then "Set_Default" and the controls). 92% of
 its instructions agree once stack offsets and relocations are ignored; the
 differences are register allocation (retail keeps the current control in
-ebx) and the frame, 0x9c74 bytes in retail against 0x9bf4 here. The large
-arrays (`buffer`, `tip`, the three 50-entry default tables) and the scalars
-at the frame's base have the same offsets; the 0x80-byte key buffers
-between them do not. Probes (`char` buffers with chosen use counts) show how
-VC6 lays a frame out: locals are sorted by static use count, the most used
-nearest esp, equal counts by size (bigger higher) and then by a fixed
-permutation of the use order (10 equally used buffers come out as uses
-10 1 9 3 8 4 7 2 6 5 from the top); declaration order plays no part. Retail
-therefore encodes different use counts for the key buffers, and it has one
-0x80-byte local that no instruction references, allocated between `toolTip`
-and `fxSoundOut` (esp+0x2184 at the frame's base), which shifts the buffers
-below it by 0x80.
+ebx) and the frame, 0x9c74 bytes in retail against 0x9bf4 here. The frame
+rule (`docs/VC6_FRAME_LAYOUT.md`: slots by uses per byte, ties permuted by a
+quicksort over the last-use order) and `tools/frame_layout.py` map every
+buffer and array of the candidate to its retail slot. The large arrays
+(`buffer`, `tip`, the three 50-entry default tables), `parameters` and the
+most used key buffers (`fx` .. `defaultSoundNorm`) have the same offsets;
+`toolTip` has four references here and two in retail, `defaultFontName` two
+here and three in retail, the two-use key buffers come out of the control
+loop in another last-use order, three retail scalar slots are spill homes
+the candidate keeps in registers, and retail has one 0x80-byte local at
+`esp+0x2174` of the frame base (between `toolTip` and `fxSoundOut`) that no
+instruction references and that no source form reproduces (locals used only
+in dead code get no slot).

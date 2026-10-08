@@ -78,11 +78,17 @@
 //   ebx across the section loop and the pass counter in memory; VC6 here
 //   gives ebx to the pass counter (and to the state/item counters), so the
 //   control is spilled. Retail's frame is 0x80 bytes larger: VC6 lays locals
-//   out by use count (most used nearest esp; ties by size, then by a fixed
-//   permutation of the use order), and retail has an extra, never-referenced
-//   0x80-byte local between `toolTip` and `fxSoundOut` (esp+0x2184 of the
-//   0x9c74 frame) and a different use-count order for the key buffers, so
-//   most stack offsets differ. The jump table makes ckm report an unresolved
+//   out by uses per byte, ties permuted by a quicksort over the last-use
+//   order (docs/VC6_FRAME_LAYOUT.md; `python3 tools/frame_layout.py OBJ
+//   UnknownFunction46a920 --va 0x46a920` maps the slots). The large arrays,
+//   `parameters` and the most used key buffers have retail's offsets;
+//   `toolTip` has four references here and two in retail, `defaultFontName`
+//   two here and three in retail, the two-use key buffers leave the control
+//   loop in another last-use order, three retail scalar slots are spill
+//   homes the candidate keeps in registers, and retail has one 0x80-byte
+//   local at frame offset 0x2174 (between `toolTip` and `fxSoundOut`) that no
+//   instruction references and no source form reproduces (locals used only
+//   in dead code get no slot). The jump table makes ckm report an unresolved
 //   $L label; compare with sdiff.
 
 #include "../../src/reconstructed/GameUi.cpp"
