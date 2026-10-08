@@ -388,6 +388,20 @@ Counts: a 3, b 195, c 168, total 366.
 | ui/SelectGamePicProcs | `0x004f8220` | 110/840 | b | 57 code diffs: `xor ebp, ebp` vs `xor edi, edi`; `mov [esp + N], ebp ; mov [esp + N], ebp` vs `mov [esp + N], edi ; mov [esp + N], edi`; slot order differs |
 | ui/SelectGamePicProcs | `0x004f8820` | 1214/1268 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 
+## Declaration-shift scan of class (c)
+
+The class (c) near misses above whose files compile standalone with the
+default include paths (81 functions in 78 files) were also compiled with
+0..63 unrelated typedefs prepended to the file (`tools/decl_shift_scan.py`,
+one full period of VC6's symbol-arena tie-break, docs/VC6_OPERAND_ORDER.md).
+None changes score at any count, and of the 1356 other bound functions in
+those files only BikeRace `0x00419970` (itself a partial) moves. The header
+sensitivity of
+TrackGame slot 1 is therefore not what keeps these functions from matching;
+their differences (x87 load order, `[base+index]` order, register choice)
+follow the deterministic leaf-age rule of that document and are source-form
+differences.
+
 ## Reproduction
 
 For one function: compile its file with `tools/compile.py --compiler vc6`
