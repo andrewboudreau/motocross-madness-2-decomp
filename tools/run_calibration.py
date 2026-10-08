@@ -24985,7 +24985,7 @@ CASES = [
         'symbol': '?UnknownFunction483910@GridNode@@QAEHHHPAMPAUGridVec3@@PAE@Z',
         'target_va': '0x00483910',
         'target_size': 1067,
-        'reason': 'near miss (3%, same instruction order): corner fetch; VC6 register-homes x and spills its clamped copy and the level byte, shifting every stack slot, and emits the failure loop before the no-normals block',
+        'reason': 'near miss (1040/1067, 97%): corner fetch; only the shift setup differs, retail reuses the level byte from the leaf test (and eax,0xff; shl eax,2) where VC6 re-reads it through this',
     },
     {
         'name': 'GridNodeNearMisses.cpp 0x484d70 GridNode::UnknownFunction484d70',

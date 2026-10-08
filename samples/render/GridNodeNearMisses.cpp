@@ -3,22 +3,31 @@
 //
 // 0x00484d70 (leaf lookup, 90 bytes): 81/90. Same instructions; retail forms the table
 // index in eax (reusing the node register) and compares gridX through ecx and gridZ
-// through edx, VC6 here swaps them. Index locals, operand order and the shape of the
-// final test do not change it.
+// through edx, VC6 here swaps them. Index locals, operand order, pointer walks, the
+// shape of the final test, recursive forms, /G6, /O1 and /Oy- (about thirty
+// spellings) do not change it.
 //
-// 0x00483910 (cell sampler, 1067 bytes): same operations and layout (descent loop as
-// VC6's tail-recursion elimination of the child call, the two leaf paths, the default
-// fill). Retail keeps x and z in their argument homes across the loop (stores at the
-// loop bottom, reload in the fast path) and a copy of x in ebp/[esp+0x14]; VC6 here
-// keeps them in ebx/ebp, so the frame is 0xc instead of 0x14 and every register
-// differs. Loop forms, a `level` local, `x &= mask` before the call and a single call
-// site do not change it.
+// 0x00483910 (cell sampler, 1067 bytes): 1040/1067, 331 vs 330 instructions. The
+// frame (0x14), the leaf-first layout, the descent loop (VC6's tail-recursion
+// elimination of the child call, with the clamped copies xx/zz living in
+// ebp/[esp+0x14] and in z's argument home), both leaf paths and the fill loop
+// (GridVec3 temporary, unconditional bytes store) are byte-exact. What is left is
+// the shift setup at 0x483943: retail reuses the level byte already in al from the
+// leaf test (`and eax, 0xff ; shl eax, 2`, so `this` is dead and the children go to
+// ecx) while VC6 here re-reads it (`xor eax, eax ; mov al, [ecx+0x28]`, children in
+// eax). A byte local for level gets a stack home and shifts the frame; an int local,
+// a top-level shift, a children local or a leaf/descend swap make it worse.
 //
-// 0x00483d40 (GridNode slot 1, 4140 bytes): readable reconstruction of the decoded
-// control flow (grid-line crossings, merge, child recursion, leaf triangles). Retail
-// rounds the cell indices with a bare `fistp` (the `__asm fld/fistp` helper this
-// project leaves out), written here as a cast; the x87 scheduling of the crossing
-// loops (running y/z kept on the stack) and the frame are not reproduced.
+// 0x00483d40 (GridNode slot 1, 4140 bytes): 96/4189. Readable reconstruction of the
+// decoded control flow (grid-line crossings, merge, child recursion, leaf triangles).
+// Retail has an ebp frame (`sub esp, 0x43c`) and rounds the cell indices with four
+// bare `fistp dword ptr [eax]` (0x4844aa, 0x4844be, 0x484670, 0x484687; the
+// `fstp [ebp+8] ; fld [ebp+8] ; mov eax, [ebp+0xc] ; fistp [eax]` pattern of an
+// inlined `__asm { fld f ; mov eax, out ; fistp [eax] }` helper) while `__ftol` is
+// still called for the other casts (0x483dd2, 0x483f96, 0x484d40, 0x484d57), so
+// /QIfist is excluded and the match is out of reach under the no-inline-asm rule;
+// `/Oy-` only fakes the frame (still 96/4189) and the x87 scheduling of the crossing
+// loops (running y/z kept on the stack) stays different. Written here as casts.
 #include "../../src/reconstructed/Griddraw.h"
 #include "../../src/reconstructed/MatrixUtil.h"
 
@@ -52,42 +61,13 @@ GridNode* GridNode::UnknownFunction484d70(int x, int z)
 // 0x00483910. The block's cells hold the height relative to the block's
 // base (+0xd4c) and a signed-byte normal scaled by 1/127 (0x00553ec8, the
 // float right after the GridNode vtable). Retail's loop is VC6's
-// tail-recursion elimination of the child call.
+// tail-recursion elimination of the child call; the clamped copies of x and
+// z (xx, zz) are what retail keeps in ebp/[esp+0x14] and in z's argument home.
 int GridNode::UnknownFunction483910(int x, int z, float* heights, GridVec3* normals, unsigned char* bytes)
 {
-    if (level != 0) {
-        if (children != 0) {
-            int shift = level * 4;
-            int cx = x >> shift;
-            int cz = z >> shift;
-            int mask = ~(-1 << shift);
-            int one = 1 << shift;
-            GridNode* child;
-            if (cx >= 16 || cz >= 16 || (child = children[g_gridRow16[cz] + cx]) == 0) {
-                if (cx < 0) {
-                    cx = 0;
-                    x = 0;
-                }
-                if (cz < 0) {
-                    cz = 0;
-                    z = 0;
-                }
-                if (cx >= 16) {
-                    cx = 15;
-                    x = one - 1;
-                }
-                if (cz >= 16) {
-                    cz = 15;
-                    z = one - 1;
-                }
-                child = children[g_gridRow16[cz] + cx];
-                if (child == 0) {
-                    goto missing;
-                }
-            }
-            return child->UnknownFunction483910(x & mask, z & mask, heights, normals, bytes);
-        }
-    } else {
+    int xx = x;
+    int zz = z;
+    if (level == 0) {
         GridBaseCell* cell = &block->cells[g_gridRow17[z] + x];
         if (normals) {
             float scale = field_0x10 * (1.0f / 127.0f);
@@ -144,6 +124,38 @@ int GridNode::UnknownFunction483910(int x, int z, float* heights, GridVec3* norm
             }
         }
         return 1;
+    }
+    if (children != 0) {
+        int shift = level * 4;
+        int cx = x >> shift;
+        int cz = z >> shift;
+        int mask = ~(-1 << shift);
+        int one = 1 << shift;
+        GridNode* child;
+        if (cx < 16 && cz < 16 && (child = children[g_gridRow16[cz] + cx]) != 0) {
+            return child->UnknownFunction483910(x & mask, z & mask, heights, normals, bytes);
+        }
+        if (cx < 0) {
+            cx = 0;
+            xx = 0;
+        }
+        if (cz < 0) {
+            cz = 0;
+            zz = 0;
+        }
+        if (cx >= 16) {
+            cx = 15;
+            xx = one - 1;
+        }
+        if (cz >= 16) {
+            cz = 15;
+            zz = one - 1;
+        }
+        child = children[g_gridRow16[cz] + cx];
+        if (child == 0) {
+            goto missing;
+        }
+        return child->UnknownFunction483910(xx & mask, zz & mask, heights, normals, bytes);
     }
 missing:
     for (int i = 0; i < 4; i++) {
