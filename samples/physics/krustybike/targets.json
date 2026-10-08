@@ -739,7 +739,7 @@
     "target_va": "0x00492ad0",
     "target_size": 2315,
     "expect": "partial",
-    "notes": "message 13 encoder; frame 0x30 vs 0x34 (diff/int-temp packing) and record-timeout tail not cross-jumped",
+    "notes": "message 13 encoder; 2312/2315 bytes, frame 0x34 exact; only the record-interval branch differs (retail: jne deltas; jmp to the end block, network branch push 0; jmp into it; candidate: je end block; jmp deltas, network branch conditional jump) plus the register choice it drags along",
     "bindings": "KrustyBike.bindings.json"
   },
   {

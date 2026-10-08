@@ -1709,18 +1709,43 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
     }
 }
 
-// |v| < 30, the range a message 13 delta may carry (written out at every use in retail).
-#define KB_DELTA_FITS(v) (((v) < 0.0f ? -(v) : (v)) < 30.0f)
+// |v| < limit, the range a message 13 delta may carry (written out at every use in retail):
+// 30 for velocity and position, 2 pi for angular velocity and the three angles.
+#define KB_DELTA_FITS(v, limit) (((v) < 0.0f ? -(v) : (v)) < (limit))
+
+static inline void KbCopy(Vec3* out, const Vec3& a)
+{
+    out->x = a.x;
+    out->y = a.y;
+    out->z = a.z;
+}
+
+static inline void KbSub(Vec3* out, const Vec3& a, const Vec3& b)
+{
+    out->x = a.x - b.x;
+    out->y = a.y - b.y;
+    out->z = a.z - b.z;
+}
 
 // 0x00492ad0: sends (or, with `record`, records) message 13, this bike's change since the
 // last state as byte deltas plus the pose and flags, carrying what the bytes lose over to the
 // next message. A full message 1 (0x00492670) goes instead when a delta does not fit, 1 s
 // has passed, or the full interval is due; peers otherwise get one every short interval.
-// Near miss (190/2315 positions; same instructions but for these): VC6 packs `diff` over the
-// int temporary (frame 0x30, retail 0x34, shifting the stack offsets) and keeps the full
-// message call after the record-interval test in place, where retail cross-jumps it (and the
-// network one, with 0 pushed) to the final call site. Declaration order, scopes, separate
-// per-vector variables and early-return forms were tried.
+// Near miss (2312 of 2315 bytes, 631 of 641 instructions aligned; frame 0x34 exact): all
+// that differs is the record-interval branch and what it drags along. Retail keeps the full
+// message block at the end, entered by `jne deltas; jmp sendFull` from the record branch and
+// by `push 0; jmp sendFull+1` (record known zero) from the network branch, and the register
+// choice in the network branch follows. With the shared `sendFull` label VC6 places the block
+// at the end too but inverts the record test (`je sendFull; jmp deltas`) and makes the
+// network branch jump there conditionally instead of duplicating the push. Inline calls,
+// a literal 0, a boolean flag, explicit gotos to `deltas`, swapped branches, an inverted
+// test with an empty then-block and an explicit final return were tried.
+// Shapes that mattered: `KbSub` through an out-pointer keeps `diff` a 12-byte slot (the
+// operator form is scalar-replaced and repacks the frame); one `ping` next to `message`
+// overlays the dead `d` slots; the angular-velocity and angle limits are 2 pi, not 30;
+// `scratchVector[1] += turnRate` and `KbCopy` before `state->angularVelocity.y += turnRate`
+// make VC6 load turnRate first (a plain aggregate copy before `.y +=` yields the
+// read-modify-write order instead).
 void KrustyBike::Fn_00492AD0(float dt, int record)
 {
     if (!g_kbGame->field_0x8 && (!record || !netRecorder))
@@ -1743,19 +1768,22 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
     }
     {
         KbBikeDeltaMessage message;
+        KbBikePing ping;
+        Vec3 d;
+        Vec3 diff;
         message.field_0x16 = field_0x11c0;
-        Vec3 diff = velocity - state->velocity;
-        Vec3 d = diff + state->velocityError;
-        if (KB_DELTA_FITS(d.x) && KB_DELTA_FITS(d.y) && KB_DELTA_FITS(d.z)) {
+        KbSub(&diff, velocity, state->velocity);
+        d = diff + state->velocityError;
+        if (KB_DELTA_FITS(d.x, 30.0f) && KB_DELTA_FITS(d.y, 30.0f) && KB_DELTA_FITS(d.z, 30.0f)) {
             message.velocity[0] = (signed char)(d.x * 4.2666669f);
             state->velocityError.x = d.x - message.velocity[0] * 0.234375f;
             message.velocity[1] = (signed char)(d.y * 4.2666669f);
             state->velocityError.y = d.y - message.velocity[1] * 0.234375f;
             message.velocity[2] = (signed char)(d.z * 4.2666669f);
             state->velocityError.z = d.z - message.velocity[2] * 0.234375f;
-            diff = position - state->position;
+            KbSub(&diff, position, state->position);
             d = diff + state->positionError;
-            if (KB_DELTA_FITS(d.x) && KB_DELTA_FITS(d.y) && KB_DELTA_FITS(d.z)) {
+            if (KB_DELTA_FITS(d.x, 30.0f) && KB_DELTA_FITS(d.y, 30.0f) && KB_DELTA_FITS(d.z, 30.0f)) {
                 message.position[0] = (signed char)(d.x * 4.2666669f);
                 state->positionError.x = d.x - message.position[0] * 0.234375f;
                 message.position[1] = (signed char)(d.y * 4.2666669f);
@@ -1763,10 +1791,10 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                 message.position[2] = (signed char)(d.z * 4.2666669f);
                 state->positionError.z = d.z - message.position[2] * 0.234375f;
                 scratchVector = angularVelocity;
-                scratchVector.y += turnRate;
-                diff = scratchVector - state->angularVelocity;
+                scratchVector[1] += turnRate;
+                KbSub(&diff, scratchVector, state->angularVelocity);
                 d = diff + state->angularVelocityError;
-                if (KB_DELTA_FITS(d.x) && KB_DELTA_FITS(d.y) && KB_DELTA_FITS(d.z)) {
+                if (KB_DELTA_FITS(d.x, 6.28318548f) && KB_DELTA_FITS(d.y, 6.28318548f) && KB_DELTA_FITS(d.z, 6.28318548f)) {
                     message.angularVelocity[0] = (signed char)(d.x * 20.371832f);
                     state->angularVelocityError.x = d.x - message.angularVelocity[0] * 0.049087387f;
                     message.angularVelocity[1] = (signed char)(d.y * 20.371832f);
@@ -1774,15 +1802,15 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                     message.angularVelocity[2] = (signed char)(d.z * 20.371832f);
                     state->angularVelocityError.z = d.z - message.angularVelocity[2] * 0.049087387f;
                     float a = bodyYaw - state->yaw + state->yawError;
-                    if (KB_DELTA_FITS(a)) {
+                    if (KB_DELTA_FITS(a, 6.28318548f)) {
                         message.yaw = (signed char)(a * 20.371832f);
                         state->yawError = a - message.yaw * 0.049087387f;
                         a = bodyRoll - state->roll + state->rollError;
-                        if (KB_DELTA_FITS(a)) {
+                        if (KB_DELTA_FITS(a, 6.28318548f)) {
                             message.roll = (signed char)(a * 20.371832f);
                             state->rollError = a - message.roll * 0.049087387f;
                             a = bodyPitch - state->pitch + state->pitchError;
-                            if (KB_DELTA_FITS(a)) {
+                            if (KB_DELTA_FITS(a, 6.28318548f)) {
                                 message.pitch = (signed char)(a * 20.371832f);
                                 state->pitchError = a - message.pitch * 0.049087387f;
                                 unsigned int now = UnknownFunction4bfa80();
@@ -1831,7 +1859,7 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                     state->pitch = bodyPitch;
                                     state->yaw = bodyYaw;
                                     state->velocity = velocity;
-                                    state->angularVelocity = angularVelocity;
+                                    KbCopy(&state->angularVelocity, angularVelocity);
                                     state->angularVelocity.y += turnRate;
                                     state->time = now;
                                     if (!record) {
@@ -1839,7 +1867,6 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                             (!g_kbGame->field_0x2d74 || (g_kbGame->field_0x2d74 == 4 && g_kbGame->field_0x2eb8))) {
                                             field_0x1604 -= g_kbGame->field_0x2f0;
                                             if (field_0x1604 < 0.0f) {
-                                                KbBikePing ping;
                                                 ping.field_0x04 = field_0x768;
                                                 ping.field_0x01 = field_0x11c0;
                                                 g_kbGame->field_0x8->Send(10, &ping, sizeof(ping), field_0x11bc, 0);
@@ -1847,7 +1874,6 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                             }
                                         }
                                     } else if (netRecorder && field_0x740->field_0x3fb) {
-                                        KbBikePing ping;
                                         ping.field_0x04 = field_0x768;
                                         ping.field_0x01 = field_0x11c0;
                                         netRecorder->Fn_004E8720(10, field_0x11bc, &ping, sizeof(ping));
