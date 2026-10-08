@@ -15,21 +15,21 @@
 //               pointer/reference/by-value helpers, a struct copy, the
 //               difference as a Vector3: identical bytes or worse), and
 //               /G6 scores lower (267)
-//   0x004570a0  retail re-reads the definition after the position conversions
+//   0x004570a0  retail loads the definition-table entry once into edi before
+//               the position conversions and picks other registers for the
+//               shape store blocks (103/386)
 //   0x00456050  register roles of this/textures and the local layout
 //   0x00457480  the probe stream also lives in esi; the aligned-frame EH
 //               prologue is not recognised by the matcher
 //   0x00457ed0  one scheduled load (the cylinder height) in the vertex loop
-//   0x00458360  zero kept in ebp, the count tested twice
+//               (1105/1153)
 //   0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
-//   0x004598d0  loop counter in memory, definition byte cached in a register
-//   0x00459b40  fidiv for the cell size, bitmap pointer in ebp
-//   0x0045c6a0  pointer/count-down block loop
+//   0x004598d0  only where `mov ecx, [g_collisionQuadTree]` sits among the
+//               last ComputeCode argument's fsub/fstp (445/455)
 //   0x00459ce0  the frame slots: same size, the locals and temporaries
 //               are assigned in a different order (323/3300)
 //   0x0045b060  frame 0xe0 for 0xf0 and the slot order; the lean of the
 //               side normals is spilled differently (461/3919)
-//   0x0045c7b0  register roles and byte update order
 
 #include <float.h>
 #include <math.h>
@@ -126,9 +126,16 @@ void Vegetation::TestDistance(int* billboard, int* fade) {
     }
 }
 
-// 0x004570a0
+// 0x004570a0: the definition's collision object `index`, placed at this
+// object. Retail re-reads the shape pointer for every store (hence the
+// per-statement casts) and the hull copy stores y before x.
+#define ECO_SPHERE ((UnknownEcoSphereShape*)object->field_0x54)
+#define ECO_CAPSULE ((UnknownEcoCapsuleShape*)object->field_0x54)
+#define ECO_HULL ((UnknownEcoHullShape*)object->field_0x54)
+
 CollisionObject* Vegetation::GetCollisionObject(int index) {
-    CollisionObject* object = g_UnknownGlobal59aebc->definitionTable[definitionIndex]->collisionObjects[index];
+    int table = definitionIndex;
+    CollisionObject* object = g_UnknownGlobal59aebc->definitionTable[table]->collisionObjects[index];
     float x = quantizedPosition.x * g_UnknownGlobal59aebc->unitsPerCoordinate;
     float y = quantizedPosition.y * g_UnknownGlobal59aebc->unitsPerCoordinate;
     float z = quantizedPosition.z * g_UnknownGlobal59aebc->unitsPerCoordinate;
@@ -137,78 +144,27 @@ CollisionObject* Vegetation::GetCollisionObject(int index) {
     float height = definition->HeightForParameter(heightParam)
                    / g_UnknownGlobal59aebc->definitionTable[definitionIndex]->meanHeight;
     if (object->field_0x50 == 4) {
-        UnknownEcoSphereShape* shape = (UnknownEcoSphereShape*)object->field_0x54;
-        shape->field_0x14 = radius;
-        shape->field_0x18 = height;
-        shape->field_0x1c(3, 0) = x;
-        shape->field_0x1c(3, 1) = y;
-        shape->field_0x1c(3, 2) = z;
+        ECO_SPHERE->field_0x14 = radius;
+        ECO_SPHERE->field_0x18 = height;
+        ECO_SPHERE->field_0x1c(3, 0) = x;
+        ECO_SPHERE->field_0x1c(3, 1) = y;
+        ECO_SPHERE->field_0x1c(3, 2) = z;
     } else if (object->field_0x50 == 3) {
-        UnknownEcoCapsuleShape* shape = (UnknownEcoCapsuleShape*)object->field_0x54;
-        shape->field_0x20 = radius;
-        shape->field_0x24 = height;
-        shape->field_0x28(3, 0) = x;
-        shape->field_0x28(3, 1) = y;
-        shape->field_0x28(3, 2) = z;
+        ECO_CAPSULE->field_0x20 = radius;
+        ECO_CAPSULE->field_0x24 = height;
+        ECO_CAPSULE->field_0x28(3, 0) = x;
+        ECO_CAPSULE->field_0x28(3, 1) = y;
+        ECO_CAPSULE->field_0x28(3, 2) = z;
     } else if (object->field_0x50 == 0) {
-        UnknownEcoHullShape* shape = (UnknownEcoHullShape*)object->field_0x54;
-        Matrix4 m = shape->field_0xc8;
-        m(3, 0) = x;
+        Matrix4 m = ECO_HULL->field_0xc8;
         m(3, 1) = y;
+        m(3, 0) = x;
         m(3, 2) = z;
-        shape->field_0xc8(3, 1) = y;
-        shape->field_0xc8(3, 2) = z;
+        ECO_HULL->field_0xc8(3, 1) = y;
+        ECO_HULL->field_0xc8(3, 2) = z;
         object->UnknownFunction435830(&m);
     }
     return object;
-}
-
-// 0x0045c6a0 (cdecl): fwrite through a running xor key, 1 KB at a time.
-int UnknownFunction45c6a0(const unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
-    unsigned char buffer[0x400];
-    int total = size * count;
-    int blocks = total / 0x400;
-    int block;
-    int i;
-    for (block = 0; block < blocks; block++) {
-        for (i = 0; i < 0x400; i++) {
-            buffer[i] = *data++ ^ *key;
-            *key += buffer[i];
-        }
-        if (fwrite(buffer, 0x400, 1, file) != 1)
-            return 0;
-    }
-    total %= 0x400;
-    if (total == 0)
-        return 1;
-    for (i = 0; i < total; i++) {
-        buffer[i] = *data++ ^ *key;
-        *key += buffer[i];
-    }
-    return fwrite(buffer, total, 1, file) == 1;
-}
-
-// 0x0045c7b0 (cdecl): fread through the running xor key.
-int UnknownFunction45c7b0(unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
-    int total = size * count;
-    int read = fread(data, size, count, file);
-    int i;
-    if (read != count) {
-        if (file->_flag & 0x10) {
-            if (!read)
-                return 0;
-            total = read * size;
-        }
-        if (file->_flag & 0x20)
-            return 0;
-    }
-    for (i = 0; i < total; i++) {
-        unsigned char value = *data;
-        *data = *key ^ value;
-        *key += value;
-        data++;
-    }
-    return 1;
 }
 
 // 0x00456050: loads the billboard texture and the .slt model (vertices,
@@ -506,66 +462,6 @@ void EcoSystem::BuildCollisionObjects(UnknownEcoDefinition* definition) {
     g_MemTagStack->Pop(category);
 }
 
-// 0x00458360
-void EcoSystem::ReadCollisionObjects(const char* path, int index, UnknownEcoDefinition* definition) {
-    char key[0x80];
-    char value[0x80];
-    char section[0x100];
-    char kind[0x80];
-    int i;
-    sprintf(section, "Vegetation_%d", index);
-    int count = GetPrivateProfileInt(section, "NumCollisionObjects", 0, path);
-    definition->collisionCount = count;
-    if (count > 0) {
-    definition->collisionDefinitions = (UnknownEcoCollisionDefinition*)DebugMalloc(count * sizeof(UnknownEcoCollisionDefinition),
-                                                                          __FILE__, 0x40c);
-    for (i = 1; i - 1 < definition->collisionCount; i++) {
-        UnknownEcoCollisionDefinition* shape = &definition->collisionDefinitions[i - 1];
-        sprintf(key, "CollisionObject%i", i);
-        GetPrivateProfileString(section, key, "NONE", kind, 0x80, path);
-        if (!_stricmp(kind, "GEOMETRY")) {
-            shape->type = 0;
-        } else if (!_stricmp(kind, "SPHERE")) {
-            shape->type = 2;
-            sprintf(key, "CollisionObject%iCenter", i);
-            GetPrivateProfileString(section, key, "NONE", value, 0x80, path);
-            shape->start.x = (float)atof(strtok(value, ","));
-            shape->start.y = (float)atof(strtok(0, ","));
-            shape->start.z = (float)atof(strtok(0, "\n"));
-            sprintf(key, "CollisionObject%iRadius", i);
-            shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
-        } else if (!_stricmp(kind, "RADIUSEDLINE")) {
-            shape->type = 3;
-            sprintf(key, "CollisionObject%iStart", i);
-            GetPrivateProfileString(section, key, "NONE", value, 0x80, path);
-            shape->start.x = (float)atof(strtok(value, ","));
-            shape->start.y = (float)atof(strtok(0, ","));
-            shape->start.z = (float)atof(strtok(0, "\n"));
-            sprintf(key, "CollisionObject%iEnd", i);
-            GetPrivateProfileString(section, key, "NONE", value, 0x80, path);
-            shape->end.x = (float)atof(strtok(value, ","));
-            shape->end.y = (float)atof(strtok(0, ","));
-            shape->end.z = (float)atof(strtok(0, "\n"));
-            sprintf(key, "CollisionObject%iRadius", i);
-            shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
-        } else if (!_stricmp(kind, "CYLINDER")) {
-            shape->type = 1;
-            sprintf(key, "CollisionObject%iBottom", i);
-            GetPrivateProfileString(section, key, "NONE", value, 0x80, path);
-            shape->start.x = (float)atof(strtok(value, ","));
-            shape->start.y = (float)atof(strtok(0, ","));
-            shape->start.z = (float)atof(strtok(0, "\n"));
-            sprintf(key, "CollisionObject%iRadius", i);
-            shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
-            sprintf(key, "CollisionObject%iHeight", i);
-            shape->height = UnknownFunction47b8a0(section, key, 0.0, path);
-        }
-    }
-    } else {
-        definition->collisionDefinitions = 0;
-    }
-}
-
 // 0x00458da0: writes the placed objects as text next to the .est.
 void EcoSystem::WriteListing(const char* path) {
     char name[0x104];
@@ -593,16 +489,19 @@ void EcoSystem::WriteListing(const char* path) {
     fclose(file);
 }
 
-// 0x004598d0: places the objects the .esb lists.
+// 0x004598d0: places the objects the .esb lists. The definition byte is
+// widened to `int` right after its read (that hoists the zero-extension
+// into a register and spills the loop counter as retail does).
 int EcoSystem::PlaceStoredObjects() {
     UnknownTextureStream* stream = esbStream;
     int i;
     for (i = 0; i < placedCount; i++) {
-        unsigned char definition;
+        unsigned char definitionByte;
         UnknownEcoCoordinates coordinates;
         unsigned char heightParameter;
         unsigned char radiusParameter;
-        stream->UnknownFunction461640(&definition, 1, 1);
+        stream->UnknownFunction461640(&definitionByte, 1, 1);
+        int definition = definitionByte;
         stream->UnknownFunction461640(&coordinates, 6, 1);
         stream->UnknownFunction461640(&heightParameter, 1, 1);
         stream->UnknownFunction461640(&radiusParameter, 1, 1);
@@ -622,46 +521,6 @@ int EcoSystem::PlaceStoredObjects() {
             delete esbStream;
         esbStream = 0;
     }
-    return 1;
-}
-
-// 0x00459b40: places the objects the PlacementBmp paints (one pixel per
-// terrain cell, the palette index selecting the definition).
-int EcoSystem::PlaceAuthoredObjects() {
-    if (!placementBmp[0])
-        return 0;
-    UnknownBitmapFile* bitmap = UnknownFunction424140(placementBmp, 0);
-    if (!bitmap)
-        return 0;
-    int width = bitmap->infoHeader.width;
-    int height = bitmap->infoHeader.height;
-    float cellX = g_collisionQuadTree->field_0x50 / width;
-    float cellZ = g_collisionQuadTree->field_0x54 / height;
-    unsigned char* pixel = (unsigned char*)bitmap->bits;
-    int row;
-    int column;
-    for (row = 0; row < height; row++) {
-        for (column = 0; column < width; column++) {
-            int index = *pixel++;
-            if (index && definitionTable[index]) {
-                Vector3 position;
-                if (placedCount == totalObjects)
-                    goto done;
-                position.x = (column + 0.5f) * cellX;
-                position.y = 0.0f;
-                position.z = (row + 0.5f) * cellZ;
-                groundTerrain->QueryGround(&position, 0, 0, 0);
-                unsigned char heightParameter = definitionTable[index]->RandomParameter();
-                unsigned char radiusParameter = definitionTable[index]->ParameterForHeight(
-                    definitionTable[index]->HeightForParameter(heightParameter));
-                vegetation[placedCount].Place(textureManager, index, &position, heightParameter,
-                                                             radiusParameter);
-                placedCount++;
-            }
-        }
-    }
-done:
-    UnknownFunction4245b0(bitmap);
     return 1;
 }
 

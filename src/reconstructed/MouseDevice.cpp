@@ -14,6 +14,13 @@ MouseDevice::MouseDevice() : PCInputDevice(1) {
     }
 }
 
+// 0x0048a420: attaches `binding` to this device's list for its axis.
+int MouseDevice::UnknownFunction48a420(UnknownControlBinding* binding) {
+    binding->field_0x00 = this;
+    axisBindings[binding->field_0x08].Add(binding);
+    return 1;
+}
+
 // 0x0048a4c0: drops every binding with id `id`.
 void MouseDevice::UnknownVirtualSlot0(int id) {
     for (int list = 0; list < 2; list++) {

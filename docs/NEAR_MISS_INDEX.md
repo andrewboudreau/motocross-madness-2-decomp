@@ -48,17 +48,13 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | control/ControlInterface | `0x004bf6a0` | 438/726 (masked) | c | 58 code diffs: `jne @158` vs `jne @165 ; lea eax, [esp + N]`; `jmp @169 ; lea ecx, [esp + N]` vs `push eax ; jmp @178` |
 | ecosystem/EcoSystem | `0x00456050` | 163/1522 | b | 80 code diffs: retail adds `mov ebx, ecx ; mov cl, byte ptr [ebx + ~`; `mov ebp, ecx ; mov ebx, [esp + N] ; mov~` vs `mov ebp, [esp + N] ; lea eax, [ebx + 0x~`; frame 0x1b8 vs 0x1b4, slot order differs |
 | ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]` |
-| ecosystem/EcoSystem | `0x004570a0` | 74/386 | b | 17 code diffs: `mov edi, [eax + ecx*4 + 0x58]` vs `mov ecx, [eax + ecx*4 + 0x58] ; mov edx~`; retail lacks `mov edx, [edi + 0x20c]`; slot order differs |
+| ecosystem/EcoSystem | `0x004570a0` | 103/386 | b | retail keeps the definition-table entry in `edi` across the position conversions (`mov edi, [eax + ecx*4 + 0x58]`); register choice in the shape store blocks |
 | ecosystem/EcoSystem | `0x00457480` | 371/2646 | c | 59 code diffs: `mov [esp + N], eax ; jmp @74` vs `mov esi, eax ; mov [esp + N], esi ; jmp~` |
 | ecosystem/EcoSystem | `0x00457ed0` | 1105/1153 | b | 4 code diffs: retail adds `mov edx, [edi + 0x20]`; retail adds `fmul [A]`; slots differ |
-| ecosystem/EcoSystem | `0x00458360` | 66/1112 | c | 16 code diffs: retail adds `push ebp`; retail lacks `push edi` |
 | ecosystem/EcoSystem | `0x00458da0` | 457/461 | c | 4 code diffs: `mov cl, byte ptr [esi + eax + 0x14]` vs `mov cl, byte ptr [eax + esi + 0x14]`; `lea eax, [esi + edx]` vs `lea eax, [edx + esi]` |
-| ecosystem/EcoSystem | `0x004598d0` | 34/462 | b | 28 code diffs: retail adds `push ebx`; `mov edi, [esi + 0x590] ; test eax, eax ~` vs `mov ebx, [esi + 0x590] ; cmp eax, ebp ;~`; frame 0x24 vs 0x28 |
-| ecosystem/EcoSystem | `0x00459b40` | 56/412 | b | 22 code diffs: retail adds `push ebp`; `jne @11` vs `jne @13 ; pop esi`; frame 0x30 vs 0x28 |
+| ecosystem/EcoSystem | `0x004598d0` | 445/455 | c | 1 code diff: `mov ecx, [0x68aba4]` sits between the last ComputeCode argument's `fsub` and `fstp` in retail |
 | ecosystem/EcoSystem | `0x00459ce0` | 323/3300 | b | 112 code diffs: retail adds `xor edi, edi`; retail adds `mov [esp + N], edi`; slot order differs |
 | ecosystem/EcoSystem | `0x0045b060` | 195/3919 | c | 5 code diffs: `sub esp, 0xe0` vs `sub esp, 0xf0`; `add esp, 0xe0` vs `add esp, 0xf0` |
-| ecosystem/EcoSystem | `0x0045c6a0` | 14/260 | b | 19 code diffs: retail lacks `mov ebx, [esp + N] ; imul ebx, [esp + N~`; retail adds `mov ebp, [esp + N] ; push esi ; imul eb~`; frame 0x404 vs 0x408 |
-| ecosystem/EcoSystem | `0x0045c7b0` | 90/115 | c | 7 code diffs: retail adds `mov esi, [esp + N]`; retail lacks `mov edi, [esp + N]` |
 | game/DeviceSetup | `0x00448560` | 148/1006 | b | 35 code diffs: retail adds `push edi`; `push edi ; xor ebp, ebp` vs `xor edi, edi`; frame 0x11c vs 0x118 |
 | game/EventManager | `0x0045d480` | 331/3715 (masked) | b | 85 code diffs: `cmp [edi + 0x44], eax ; je @58 ; jmp @8~` vs `mov edx, [edi + 0x44] ; xor ecx, ecx ; ~`; frame 0x478 vs 0x460, slot order differs |
 | game/EventManager | `0x0045e710` | 322/379 (masked) | c | 10 code diffs: `mov edx, [ecx + 0xc4c] ; mov [eax + 0x5~` vs `mov ecx, [ecx + 0xc4c] ; mov [eax + 0x5~`; `mov eax, [eax + 0x56c]` vs `mov edx, [eax + 0x56c]` |
