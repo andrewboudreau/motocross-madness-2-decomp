@@ -148,7 +148,10 @@ public:
     char pad_0x11B9[0x3];
     int field_0x11bc; // 0x11BC  network id (KbNetBike)
     unsigned char field_0x11c0; // 0x11C0
-    char pad_0x11C1[0x1358 - 0x11c1];
+    char pad_0x11C1[0x3];
+    float field_0x11c4; // 0x11C4  clock offset subtracted by 0x00493660 (not UseTimeReceived)
+    KbBikeNetState* states[4]; // 0x11C8  received states, newest first (buffers at 0x11d8..)
+    char pad_0x11D8[0x1358 - 0x11d8];
     Vec3 field_0x1358; // 0x1358
     Vec3 field_0x1364; // 0x1364
     Vec3 field_0x1370; // 0x1370
@@ -156,7 +159,7 @@ public:
     float field_0x1380; // 0x1380
     float field_0x1384; // 0x1384
     int field_0x1388; // 0x1388
-    int field_0x138c; // 0x138C
+    float field_0x138c; // 0x138C  seconds left of the slot-50 hold 0x00493660 starts
     KbBikeState recordState; // 0x1390  last state recorded (0x00492ad0 with record set)
     KbRecorder* netRecorder; // 0x13FC
     int field_0x1400; // 0x1400
@@ -200,7 +203,12 @@ public:
     char field_0x15e6; // 0x15E6
     char pad_0x15E7[0x1];
     KbObj128* field_0x15e8; // 0x15E8
-    char pad_0x15EC[0x18];
+    float field_0x15ec; // 0x15EC  seconds into the current state interval (0x00493660)
+    float field_0x15f0; // 0x15F0  length of the current state interval in seconds
+    int field_0x15f4; // 0x15F4  first-packet latch
+    unsigned int field_0x15f8; // 0x15F8  timeReceived of the last newest state seen
+    KbBikeNetState* field_0x15fc; // 0x15FC  interpolation target state
+    KbBikeNetState* field_0x1600; // 0x1600  interpolation source state
     float field_0x1604; // 0x1604  seconds to the next message 10 (0x00492670)
     // own data ends at 0x1608; the compiler places the vtordisp there
 };

@@ -122,6 +122,11 @@ struct KbBikeMessage {
     unsigned char field_0x53;            // +0x7b8 (+0x7a0 in modes 2 and 3)
     unsigned char field_0x54;            // +0x11c0
 };
+// Received copy of message 1 (0x60 bytes, four at KrustyBike+0x11d8) that 0x00493660 reads.
+struct KbBikeNetState : KbBikeMessage {
+    unsigned int timeReceived;           // +0x58 local clock when it arrived
+    int field_0x5c;                      // +0x5c set when the lap/race fields are valid
+};
 // Message type 10 (8 bytes): the bike's +0x11c0 flag and +0x768.
 struct KbBikePing {
     char field_0x00;
@@ -240,6 +245,32 @@ struct KbGame {
 extern KbGame* g_kbGame;
 // 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).
 unsigned int UnknownFunction4bfa80();
+// 0x004B5D00 (cdecl): forward/up axes from roll, pitch and yaw (tier 3 names).
+void UnknownFunction4b5d00(Vec3* forward, Vec3* up, float roll, float pitch, float yaw);
+// 0x00460C70: 1/sqrt estimate (name from samples/physics/helpers/FastMath.bindings.json).
+float FastInvSqrtEstimate(float v);
+// Network smoothing settings 0x00493660 reads; 0x0048fc80 loads them from the game config.
+extern int g_kbLatencyHiding;        // 0x0056CB3C
+extern int g_kbRateLimiting;         // 0x0056CB40
+extern int g_kbAllowWarping;         // 0x0056CB44
+extern int g_kbUseLatencyThreshold;  // 0x0067C3A0
+extern int g_kbUseExtrapLimit;       // 0x0056CB48
+extern float g_kbExtrapLimit;        // 0x0056CB4C
+extern float g_kbLatencyThreshold;   // 0x0056CB50
+extern float g_kbWarpThreshold;      // 0x0056CB54
+extern int g_kbUseTimeReceived;      // 0x0056CB58
+extern int g_kbAllowNegative;        // 0x0056CB5C
+extern int g_kbInterpolate;          // 0x0056CB60
+extern float g_kbStallThreshold;     // 0x0056CB64  interval time below which slot 50 holds
+extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
+// Track view behind KbGame+0x560 (tier 3): checkpoint count at +0xac.
+struct KbTrack {
+    char pad_0x00[0xac];
+    int field_0xac;
+    void UnknownFunction404df0(int a, int b, KrustyBike* bike);   // 0x00404DF0
+};
+// BikeWheel view for 0x00513560 (tier 3 name).
+struct KbWheel { void SetRollDistance(float d); };
 
 // Part table at Vehicle+0x1f0 -> +0xb4 (tier 3): count at +0, 0x44-byte records at +4.  A record
 // with flag bit 3 clear owns a collision object at record+8 -> +0x3c.
@@ -320,10 +351,15 @@ struct KbRace {
     char field_0x18e; // 0x18E
     char pad_0x018F[0xD];
     KbSensor* field_0x19c; // 0x19C
-    char pad_0x01A0[0x1dc - 0x1a0];
+    char pad_0x01A0[0x1b8 - 0x1a0];
+    float field_0x1b8; // 0x1B8  race clock in seconds (0x00493660 replays against it)
+    char pad_0x01BC[0x1dc - 0x1bc];
     int field_0x1dc; // 0x1DC  GameObject slot 10 runs the base update when both are 4
     int field_0x1e0; // 0x1E0
-    char pad_0x01E4[0x3fa - 0x1e4];
+    int field_0x1e4; // 0x1E4  -2 while the race has not started (0x00493660)
+    char pad_0x01E8[0x3f8 - 0x1e8];
+    char field_0x3f8; // 0x3F8  0x00493660: skips the wheel roll and the +0x478 flag
+    char pad_0x03F9[0x1];
     char field_0x3fa; // 0x3FA  GameObject slot 10 calls 0x00492ad0 when set
     char field_0x3fb; // 0x3FB  0x00492670 records message 10 when set
 };

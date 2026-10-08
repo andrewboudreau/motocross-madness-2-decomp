@@ -761,5 +761,15 @@
     "expect": "exact",
     "notes": "message 1 builder; +0x11c0/+0x74c/+0x750/+0x770 store order",
     "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00493660@KrustyBike",
+    "target_va": "0x00493660",
+    "target_size": 8545,
+    "expect": "partial",
+    "notes": "remote-bike network update; 23.5% bytes, aligned instruction ratio 0.88 with the retail frame 0x58 and slots; remaining: 1-in-ebp/0-in-edi allocation from the second SetAxesPtr call on, limitSq store before the AllowWarping test, velocity y/z fmul operand order, pose lerp c-b recompute, and the 100.0f pool (retail 0x5505ec, bound 0x551420 for 0x492670)",
+    "bindings": "KrustyBike.bindings.json"
   }
 ]

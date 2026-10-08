@@ -1894,3 +1894,645 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
 sendFull:
     Fn_00492670(state, g_kbGame->field_0x2f0, record);
 }
+
+// Byte-coded pose values of message 1 are 0..255 (tier 3: 1/255 constant at 0x005511e4).
+#define KB_BYTE_SCALE (1.0f / 255.0f)
+
+// Retail tests the byte deltas with a copying conditional negate (`mov edx, eax; jns; neg
+// edx`), not the `abs` intrinsic (`cdq; xor; sub`).
+#define KB_ABS(x) ((x) < 0 ? -(x) : (x))
+
+// Provisional: `dist2` is a squared change in units of the rate limit; the change is
+// smoothed (rate limited) only when it is more than one frame's worth and below the warp
+// threshold (seconds), and warped otherwise.
+static inline int KbWithinWarpBand(float dist2, float frame, float warp)
+{
+    return dist2 > frame * frame && dist2 < warp * warp;
+}
+
+// 0x00493660: the network update of a remote bike. Places the bike from the received
+// states (states[0] newest): either interpolating between the two states around the
+// current time (g_kbInterpolate) or extrapolating the newest one, with optional latency
+// hiding, rate limiting and warping of the velocity and position; then applies the pose,
+// lap and crash flags of the state and runs the physics bookkeeping of a step.
+// `dt` is unused; `a` is set for the live game (lap and race fields are taken over).
+//
+// Partial (8545 bytes retail): the instruction streams align block for block with the
+// retail frame (0x58) and stack slots. What fixed the shape so far: 4-byte locals are
+// declared at function scope in retail slot order (ratio, dist2, len, reset) ahead of the
+// 12-byte vectors (step, delta, savedPos, localFwd, localUp); `float clock` hoists the
+// race clock read above the replay-mode test; `float ff = f * f` keeps VC6 from
+// refactoring `f*f*50 + len*f`; the named `scale` stays FPU resident across the three
+// `delta * scale` products; the pose clamps follow both modes; KB_ABS on a variable
+// gives the copying `jns; neg`; `states[0]->` is re-read after every call and store
+// (no `s` alias); the lap/pose flags are 1/0 if-else stores; the crash-flip test reads
+// bodyUp.y; `char m` keeps the motion compare byte sized.
+// Still different: retail keeps 1 in ebp from the second SetAxesPtr call on and 0 in edi
+// (candidate: 0 in ebp, 1 in ebx, and a zero register through the tail where retail
+// uses `test`/`push 0`), which also forces `c` through a stack byte; retail stores
+// `(len+50)*(len+50)` before the AllowWarping test; the velocity y/z `fld s; fmul` order;
+// retail recomputes `c - b` for the pose lerps while the candidate reuses `d`; the retail
+// 100.0f lives at 0x5505ec while the shared bindings bind it to 0x551420 (0x492670).
+void KrustyBike::Fn_00493660(float dt, int a)
+{
+    KbBikeNetState* cur;
+    KbBikeNetState* s;
+    Vec3 step;
+    Vec3 delta;
+    Vec3 savedPos;
+    Vec3 localFwd;
+    Vec3 localUp;
+    float ratio;
+    float dist2;
+    float len;
+    int reset;
+
+    justLanded = 0;
+    justReset = 0;
+    reset = 0;
+    if (g_kbGame->field_0x2f0 <= 0.0f)
+        return;
+    cur = states[g_kbGame->field_0x3428 ? 3 : 2];
+    if (cur->position.x != 0.0f && cur->position.y != 0.0f && cur->position.z != 0.0f) {
+        if (g_kbGame->field_0x3428 == 0 && g_kbGame->field_0x2d70 != 4) {
+            if (field_0x15f8 != states[0]->timeReceived) {
+                field_0x15f8 = states[0]->timeReceived;
+                if (field_0x15f4 == 0) {
+                    field_0x15f4 = 1;
+                } else {
+                    field_0x15f0 = (float)(states[1]->time - states[2]->time) * 0.001f;
+                    field_0x15fc = states[1];
+                    field_0x1600 = states[2];
+                    while (field_0x15ec > field_0x15f0 && field_0x15f0 > 0.0f)
+                        field_0x15ec -= field_0x15f0;
+                    if (field_0x15ec < 0.0f)
+                        field_0x15ec = 0.0f;
+                }
+            }
+            if (field_0x15ec > field_0x15f0) {
+                if (field_0x15f4 == 1) {
+                    field_0x15f4 = 0;
+                    while (field_0x15ec > field_0x15f0 && field_0x15f0 > 0.0f)
+                        field_0x15ec -= field_0x15f0;
+                    field_0x15f0 = (float)(states[0]->time - states[1]->time) * 0.001f;
+                    field_0x15fc = states[0];
+                    field_0x1600 = states[1];
+                } else {
+                    field_0x15ec = field_0x15f0;
+                }
+            }
+        } else {
+            // replay: the race clock, less a fixed lag, picks the state interval
+            float clock = field_0x740->field_0x1b8;
+            if (g_kbGame->field_0x2d70 == 4) {
+                float adj;
+                field_0x15ec = (clock - 0.17f) - (float)states[2]->time * 0.001f;
+                adj = field_0x740->field_0x1b8 - 0.17f;
+                if (adj > (float)states[0]->time * 0.001f && field_0x740->field_0x1e4 == -2) {
+                    field_0x15ec = field_0x15f0;
+                } else if (adj > (float)states[1]->time * 0.001f) {
+                    field_0x15f0 = (float)(states[0]->time - states[1]->time) * 0.001f;
+                    field_0x15ec -= (float)(states[1]->time - states[2]->time) * 0.001f;
+                    field_0x15fc = states[0];
+                    field_0x1600 = states[1];
+                } else {
+                    field_0x15f0 = (float)(states[1]->time - states[2]->time) * 0.001f;
+                    field_0x15fc = states[1];
+                    field_0x1600 = states[2];
+                }
+            } else {
+                float adj;
+                field_0x15ec = (clock - 0.27f) - (float)states[3]->time * 0.001f;
+                adj = field_0x740->field_0x1b8 - 0.27f;
+                if (adj > (float)states[0]->time * 0.001f && field_0x740->field_0x1e4 == -2) {
+                    field_0x15ec = field_0x15f0;
+                } else if (adj < (float)states[2]->time * 0.001f) {
+                    field_0x15f0 = (float)(states[2]->time - states[3]->time) * 0.001f;
+                    field_0x15fc = states[2];
+                    field_0x1600 = states[3];
+                } else if (adj < (float)states[1]->time * 0.001f) {
+                    field_0x15f0 = (float)(states[1]->time - states[2]->time) * 0.001f;
+                    field_0x15ec -= (float)(states[2]->time - states[3]->time) * 0.001f;
+                    field_0x15fc = states[1];
+                    field_0x1600 = states[2];
+                } else {
+                    field_0x15f0 = (float)(states[0]->time - states[1]->time) * 0.001f;
+                    field_0x15ec -= (float)(states[1]->time - states[3]->time) * 0.001f;
+                    if (field_0x15ec > field_0x15f0)
+                        field_0x15ec = field_0x15f0;
+                    field_0x15fc = states[0];
+                    field_0x1600 = states[1];
+                }
+                if (field_0x15ec < 0.0f)
+                    field_0x15ec = 0.0f;
+            }
+        }
+        if (!g_kbInterpolate) {
+            unsigned int now = UnknownFunction4bfa80();
+            if (!g_kbUseTimeReceived)
+                field_0x15ec = ((float)now - (float)states[0]->time - field_0x11c4) * 0.001f;
+            else
+                field_0x15ec = ((float)now - (float)states[0]->timeReceived) * 0.001f;
+            if (!g_kbAllowNegative && field_0x15ec < 0.0f)
+                field_0x15ec = 0.0f;
+            if (g_kbUseExtrapLimit && field_0x15ec > g_kbExtrapLimit)
+                field_0x15ec = g_kbExtrapLimit;
+            field_0x15f0 = (float)(states[0]->time - states[1]->time) * 0.001f;
+        }
+        if (field_0x15f0 > 0.0f)
+            ratio = field_0x15ec / field_0x15f0;
+        else
+            ratio = 0.0f;
+
+        // velocity
+        if (!g_kbInterpolate) {
+            if (g_kbLatencyHiding) {
+                if (g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold)
+                    delta = states[0]->velocity - velocity;
+                else
+                    delta = (states[0]->velocity - states[1]->velocity) * ratio + states[0]->velocity - velocity;
+                if (g_kbRateLimiting) {
+                    dist2 = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
+                    // warp when the change (in units of the 100/s rate) is below a frame's
+                    // worth or beyond the warp threshold; otherwise move at the rate
+                    if (g_kbAllowWarping
+                        && !KbWithinWarpBand(dist2 * 0.0001f, g_kbGame->field_0x2f0, g_kbWarpThreshold)) {
+                        velocity += delta;
+                    } else {
+                        step = delta * 100.0f * g_kbGame->field_0x2f0;
+                        velocity += step * FastInvSqrtEstimate(dist2);
+                    }
+                } else {
+                    velocity += delta;
+                }
+            } else {
+                velocity = states[0]->velocity;
+            }
+        } else {
+            velocity = (field_0x15fc->velocity - field_0x1600->velocity) * ratio + field_0x1600->velocity;
+        }
+        smoothedVerticalAccel = (velocity.y - prevVelocity.y) / g_kbGame->field_0x2f0;
+        prevSpeed = linearSpeed;
+        len = KbLength(velocity);
+        linearSpeed = len;
+
+        // position
+        if (!g_kbInterpolate) {
+            if (g_kbLatencyHiding) {
+                if (g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold)
+                    delta = states[0]->position - position;
+                else
+                    delta = states[0]->velocity * field_0x15ec + states[0]->position - position;
+                if (g_kbRateLimiting) {
+                    dist2 = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
+                    // the position may move at speed + 50 per second
+                    // the position may move at speed + 50 per second; retail stores limitSq
+                    // before the AllowWarping test, VC6 propagates it here into the division
+                    float limitSq = (len + 50.0f) * (len + 50.0f);
+                    if (g_kbAllowWarping
+                        && !KbWithinWarpBand(dist2 / limitSq, g_kbGame->field_0x2f0, g_kbWarpThreshold)) {
+                        position += delta;
+                    } else {
+                        float ff = g_kbGame->field_0x2f0 * g_kbGame->field_0x2f0;
+                        float scale = ff * 50.0f + len * g_kbGame->field_0x2f0;
+                        step = delta * scale;
+                        position += step * FastInvSqrtEstimate(dist2);
+                    }
+                } else {
+                    position += delta;
+                }
+            } else {
+                position = states[0]->position;
+            }
+        } else {
+            position = (field_0x15fc->position - field_0x1600->position) * ratio + field_0x1600->position;
+        }
+
+        // orientation
+        if (!g_kbInterpolate) {
+            UnknownFunction4b5d00(&bodyForward, &bodyUp, states[0]->roll, states[0]->pitch, states[0]->yaw);
+            s = states[1];
+        } else {
+            UnknownFunction4b5d00(&bodyForward, &bodyUp, field_0x15fc->roll, field_0x15fc->pitch, field_0x15fc->yaw);
+            s = field_0x1600;
+        }
+        UnknownFunction4b5d00(&localFwd, &localUp, s->roll, s->pitch, s->yaw);
+        if (!g_kbInterpolate) {
+            if (g_kbLatencyHiding) {
+                if (g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold) {
+                    angularVelocity = states[0]->angularVelocity;
+                } else {
+                    bodyForward = (bodyForward - localFwd) * ratio + localFwd;
+                    bodyUp = (bodyUp - localUp) * ratio + localUp;
+                    angularVelocity = (states[0]->angularVelocity - states[1]->angularVelocity) * ratio + states[0]->angularVelocity;
+                }
+            } else {
+                angularVelocity = states[0]->angularVelocity;
+            }
+        } else {
+            bodyForward = (bodyForward - localFwd) * ratio + localFwd;
+            bodyUp = (bodyUp - localUp) * ratio + localUp;
+            angularVelocity = (field_0x15fc->angularVelocity - field_0x1600->angularVelocity) * ratio + field_0x1600->angularVelocity;
+        }
+
+        savedPos = position;
+        modelNode->SetPosition(position);
+        modelNode->SetAxesPtr(&bodyForward, &bodyUp, 1, 1);
+        UnknownVirtualSlot34();
+        OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
+                                     &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+        if (!field_0x6fc && !field_0x430) {
+            savedForward = bodyForward;
+            savedUp = bodyUp;
+            savedYaw = bodyYaw;
+            savedPitch = bodyPitch;
+            savedRoll = bodyRoll;
+            savedSinRoll = bodySinRoll;
+            savedCosRoll = bodyCosRoll;
+            savedCosPitch = bodyCosPitch;
+            savedSinPitch = bodySinPitch;
+        } else {
+            poseNode->GetAxesIn(0, &savedForward, &savedUp);
+            OrientationAnglesFromVectors(savedForward, savedUp, &savedYaw, &savedPitch, &savedRoll,
+                                         &savedSinRoll, &savedCosRoll, &savedCosPitch, &savedSinPitch);
+        }
+        ((SoultreeObject*)riderCharacter->c_0x1a0)->SetPosition(position);
+        ((SoultreeObject*)riderCharacter->c_0x1a0)->SetAxesPtr(&bodyForward, &bodyUp, 1, 1);
+        centerNode->GetPositionIn(0, &centerOfMass);
+        worldAngularVelocity = modelNode->LocalToWorldDirection(angularVelocity);
+        ((KbSink*)frontWheel->w_0x2b0)->UnknownVirtualSlot0();
+        ((KbSink*)rearWheel->w_0x2ac)->UnknownVirtualSlot0();
+        PlaceWheels();
+        allWheelsInContact = wheelsInContact == wheelCount;
+        anyWheelInContact = wheelsInContact != 0;
+        UpdateWheelsInContact();
+        {
+            bool settled = !anyWheelInContact;
+            UnknownVirtualSlot71(settled);
+            airborne = settled;
+            if (settled)
+                landingLatched = 0;
+        }
+        movingForward = 1;
+
+        // wheel roll from the horizontal speed
+        if (!(field_0x740->field_0x3f8 && field_0x740->field_0x1e4 != -2)) {
+            float d;
+            float roll;
+            scratchVector = velocity;
+            scratchVector.y = 0.0f;
+            d = SquareMagnitude(scratchVector);
+            if (d == 1.0f)
+                roll = 1.0f;
+            else
+                roll = FastSqrt(d);
+            ((KbWheel*)frontWheel)->SetRollDistance(roll * g_kbGame->field_0x2f0);
+            ((KbWheel*)rearWheel)->SetRollDistance(roll * g_kbGame->field_0x2f0);
+        }
+        if (!g_kbInterpolate)
+            turnRate = states[0]->angularVelocity.y;
+        else
+            turnRate = (field_0x15fc->angularVelocity.y - field_0x1600->angularVelocity.y) * ratio + field_0x1600->angularVelocity.y;
+
+        // pose parameter; the clamp follows both modes
+        if (!g_kbInterpolate) {
+            int d = field_0x15fc->poseParam - field_0x1600->poseParam;
+            if (KB_ABS(d) >= 0x40) {
+                poseParam = (float)states[0]->poseParam * KB_BYTE_SCALE;
+            } else {
+                float p = (float)states[0]->poseParam * KB_BYTE_SCALE;
+                poseParam = p;
+                if (!(g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold))
+                    poseParam = (p - (float)states[1]->poseParam * KB_BYTE_SCALE) * ratio + p;
+            }
+        } else {
+            int b = field_0x1600->poseParam;
+            unsigned char c = field_0x15fc->poseParam;
+            int d = c - b;
+            if (KB_ABS(d) >= 0x40 && KB_ABS(d) <= 0x7c) {
+                if (!field_0x1400) {
+                    field_0x1400 = 1;
+                    field_0x1408 = field_0x1600->poseParam;
+                }
+                poseParam = (float)field_0x1408 * KB_BYTE_SCALE;
+            } else if (field_0x1400) {
+                if (c <= 3 || (c >= 0x7e && c <= 0x82))
+                    field_0x1400 = 0;
+                poseParam = (float)field_0x1408 * KB_BYTE_SCALE;
+            } else if (KB_ABS(d) <= 0x18) {
+                poseParam = (float)((int)((float)(c - b) * ratio) + b) * KB_BYTE_SCALE;
+            } else {
+                poseParam = (float)b * KB_BYTE_SCALE;
+            }
+        }
+        if (poseParam > 1.0f)
+            poseParam = 1.0f;
+        else if (poseParam < 0.0f)
+            poseParam = 0.0f;
+
+        // pose lean blend
+        if (!g_kbInterpolate) {
+            int a = states[0]->poseLeanBlend;
+            int d = a - states[1]->poseLeanBlend;
+            float v;
+            d = KB_ABS(d);
+            v = (float)a * KB_BYTE_SCALE;
+            if (d >= 0x40) {
+                poseLeanBlend = v;
+            } else {
+                poseLeanBlend = v;
+                if (!(g_kbUseLatencyThreshold && field_0x15ec > g_kbLatencyThreshold))
+                    poseLeanBlend = (v - (float)states[1]->poseLeanBlend * KB_BYTE_SCALE) * ratio + v;
+            }
+        } else {
+            int b = field_0x1600->poseLeanBlend;
+            unsigned char c = field_0x15fc->poseLeanBlend;
+            int d = c - b;
+            if (KB_ABS(d) >= 0x40 && KB_ABS(d) <= 0x7c) {
+                if (!field_0x1404) {
+                    field_0x1404 = 1;
+                    field_0x1408 = field_0x1600->poseLeanBlend;   // retail stores +0x1408 but reads +0x140c
+                }
+                poseLeanBlend = (float)field_0x140c * KB_BYTE_SCALE;
+            } else if (field_0x1404) {
+                if (c <= 2 || (c >= 0x7f && c <= 0x81))
+                    field_0x1404 = 0;
+                poseLeanBlend = (float)field_0x140c * KB_BYTE_SCALE;
+            } else if (KB_ABS(d) <= 0x20) {
+                poseLeanBlend = (float)((int)((float)(c - b) * ratio) + b) * KB_BYTE_SCALE;
+            } else {
+                poseLeanBlend = (float)b * KB_BYTE_SCALE;
+            }
+        }
+        if (poseLeanBlend > 1.0f)
+            poseLeanBlend = 1.0f;
+        else if (poseLeanBlend < 0.0f)
+            poseLeanBlend = 0.0f;
+
+        // pose blend; only the interpolated value is smoothed through the steer axis
+        if (!g_kbInterpolate) {
+            int b1 = states[1]->poseBlend;
+            int b0 = states[0]->poseBlend;
+            int d = b0 - b1;
+            if (KB_ABS(d) >= 0x40)
+                poseBlend = (float)b1 * KB_BYTE_SCALE;
+            else
+                poseBlend = (float)b0 * KB_BYTE_SCALE;
+        } else {
+            int b = field_0x1600->poseBlend;
+            int c = field_0x15fc->poseBlend;
+            int d = c - b;
+            float v;
+            float lim;
+            float t;
+            float r;
+            if (KB_ABS(d) >= 0x40)
+                v = (float)b;
+            else
+                v = (float)((int)((float)(c - b) * ratio) + b);
+            v *= KB_BYTE_SCALE;
+            lim = steerAxis->l_0x4;
+            t = g_kbGame->field_0x2f0;
+            if (t >= lim)
+                t = lim;
+            r = t / steerAxis->l_0x4;
+            steerAxis->l_0x8 = r;
+            v = (v - steerAxis->steerValue) * r + steerAxis->steerValue;
+            steerAxis->steerValue = v;
+            poseBlend = v;
+        }
+        if (poseBlend > 1.0f)
+            poseBlend = 1.0f;
+        else if (poseBlend < 0.0f)
+            poseBlend = 0.0f;
+
+        // pose, lap and crash flags (retail keeps two copies of this block, one per mode;
+        // they differ in the +0x478 flag only)
+        if (!g_kbInterpolate) {
+            int lean;
+            int prevCrash;
+            poseIndex = states[0]->poseIndex;
+            lean = poseIndex == 11 || poseIndex == 12;
+            if (field_0x6fc && !lean) {
+                UnknownVirtualSlot41();
+                field_0x431 = 0;
+            }
+            field_0x6fc = lean;
+            poseState = states[0]->poseState;
+            if (g_kbGame->field_0x560) {
+                if (field_0x7b8 == states[0]->field_0x53 - 1 || (field_0x7b8 == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && states[0]->field_0x53 == 0))
+                    field_0x7c0 = 1;
+                else
+                    field_0x7c0 = 0;
+                if (a) {
+                    int prev = field_0x7b8;
+                    field_0x7b8 = states[0]->field_0x53;
+                    if (prev != field_0x7b8) {
+                        if (field_0x7b8 == 0)
+                            field_0x7a0++;
+                        field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
+                        if (this == field_0x740->field_0x50->field_0x3b4)
+                            ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
+                    }
+                }
+            } else {
+                if (!states[0]->field_0x5c)
+                    states[0]->field_0x04 = (short)((field_0x7a0 & 0xff00) | states[0]->field_0x53);
+                if ((unsigned short)field_0x7a0 == (unsigned short)states[0]->field_0x04 - 1)
+                    field_0x7c0 = 1;
+                else
+                    field_0x7c0 = 0;
+                if (a)
+                    field_0x7a0 = states[0]->field_0x04;
+            }
+            if (states[0]->field_0x5c) {
+                field_0x74c = states[0]->field_0x20;
+                field_0x750 = states[0]->field_0x28;
+                if (a) {
+                    field_0x770 = states[0]->field_0x2c;
+                    field_0x784 = states[0]->field_0x01;
+                }
+            }
+            if (!field_0x736) {
+                UnknownVirtualSlot50(states[0]->flag4, 5.0f, 0);
+                if (field_0x7a5) {
+                    Fn_00496E30(0);
+                    field_0x7a5 = 0;
+                }
+            }
+            if (states[0]->flag6)
+                field_0x78c = 1;
+            else
+                field_0x78c = 0;
+            prevCrash = crashState;
+            crashState = states[0]->crashed;
+            field_0x478 = states[0]->flag7;
+            field_0x479 = states[0]->flag8;
+            field_0x153c = states[0]->flag9;
+            if (crashState && !prevCrash) {
+                field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
+                field_0x464 = bodyUp.y < 0.0f;
+                field_0x45c = savedYaw;
+                if (field_0x430)
+                    field_0x604->Method_0x00532310();
+                else
+                    field_0x604->Method_0x00532220(states[0]->crashDirection);
+                field_0x433 = 0;
+                UnknownVirtualSlot41();
+                field_0x431 = 0;
+                Fn_00496D20();
+            } else if (!crashState && prevCrash) {
+                field_0x604->Method_0x005327c0();
+                Fn_00496DA0();
+                field_0x430 = 0;
+                field_0x433 = 0;
+                reset = 1;
+            } else if (UnknownVirtualSlot42()) {
+                field_0x430 = 0;
+                field_0x433 = 0;
+            } else if (!field_0x430) {
+                char m = states[0]->motion;
+                if (m) {
+                    if (m < 0x11)
+                        Fn_0048D910(m - 1);
+                    else if (m == 0x11)
+                        Fn_0048E280();
+                }
+            } else if (!field_0x153f) {
+                char m = field_0x1600->motion;
+                if (m > 0x11 && m - 0x11 == field_0x433)
+                    Fn_0048D990(field_0x433);
+            }
+        } else {
+            int lean;
+            int prevCrash;
+            poseIndex = field_0x1600->poseIndex;
+            lean = poseIndex == 11 || poseIndex == 12;
+            if (field_0x6fc && !lean) {
+                UnknownVirtualSlot41();
+                field_0x431 = 0;
+            }
+            field_0x6fc = lean;
+            poseState = field_0x1600->poseState;
+            if (g_kbGame->field_0x560) {
+                if (field_0x7b8 == field_0x1600->field_0x53 - 1 || (field_0x7b8 == ((KbTrack*)g_kbGame->field_0x560)->field_0xac - 1 && field_0x1600->field_0x53 == 0))
+                    field_0x7c0 = 1;
+                else
+                    field_0x7c0 = 0;
+                if (a) {
+                    int prev = field_0x7b8;
+                    field_0x7b8 = field_0x1600->field_0x53;
+                    if (prev != field_0x7b8) {
+                        if (field_0x7b8 == 0)
+                            field_0x7a0++;
+                        field_0x7bc = (field_0x7b8 + 1) % ((KbTrack*)g_kbGame->field_0x560)->field_0xac;
+                        if (this == field_0x740->field_0x50->field_0x3b4)
+                            ((KbTrack*)g_kbGame->field_0x560)->UnknownFunction404df0(field_0x7b8, field_0x7bc, this);
+                    }
+                }
+            } else {
+                if (!field_0x1600->field_0x5c)
+                    field_0x1600->field_0x04 = (short)((field_0x7a0 & 0xff00) | field_0x1600->field_0x53);
+                if ((unsigned short)field_0x7a0 == (unsigned short)field_0x1600->field_0x04 - 1)
+                    field_0x7c0 = 1;
+                else
+                    field_0x7c0 = 0;
+                if (a)
+                    field_0x7a0 = field_0x1600->field_0x04;
+            }
+            if (field_0x1600->field_0x5c) {
+                field_0x74c = field_0x1600->field_0x20;
+                field_0x750 = field_0x1600->field_0x28;
+                if (a) {
+                    field_0x770 = field_0x1600->field_0x2c;
+                    field_0x784 = field_0x1600->field_0x01;
+                }
+            }
+            if (!field_0x736) {
+                UnknownVirtualSlot50(field_0x1600->flag4, 5.0f, 0);
+                if (field_0x7a5) {
+                    Fn_00496E30(0);
+                    field_0x7a5 = 0;
+                }
+            }
+            if (field_0x1600->flag6)
+                field_0x78c = 1;
+            else
+                field_0x78c = 0;
+            prevCrash = crashState;
+            crashState = field_0x1600->crashed;
+            if (!field_0x740->field_0x3f8 && field_0x740->field_0x1e4 != -2)
+                field_0x478 = field_0x1600->flag7;
+            else
+                field_0x478 = 0;
+            field_0x479 = field_0x1600->flag8;
+            field_0x153c = field_0x1600->flag9;
+            if (crashState && !prevCrash) {
+                field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
+                field_0x464 = bodyUp.y < 0.0f;
+                field_0x45c = savedYaw;
+                if (field_0x430)
+                    field_0x604->Method_0x00532310();
+                else
+                    field_0x604->Method_0x00532220(field_0x1600->crashDirection);
+                field_0x433 = 0;
+                UnknownVirtualSlot41();
+                field_0x431 = 0;
+                Fn_00496D20();
+            } else if (!crashState && prevCrash) {
+                field_0x604->Method_0x005327c0();
+                Fn_00496DA0();
+                field_0x430 = 0;
+                field_0x433 = 0;
+                reset = 1;
+            } else if (UnknownVirtualSlot42()) {
+                field_0x430 = 0;
+                field_0x433 = 0;
+            } else if (!field_0x430) {
+                char m = field_0x1600->motion;
+                if (m) {
+                    if (m < 0x11)
+                        Fn_0048D910(m - 1);
+                    else if (m == 0x11)
+                        Fn_0048E280();
+                }
+            } else if (!field_0x153f) {
+                char m = field_0x1600->motion;
+                if (m > 0x11 && m - 0x11 == field_0x433)
+                    Fn_0048D990(field_0x433);
+            }
+        }
+
+        UnknownVirtualSlot30();
+        justReset = reset;
+        attachmentResetPending = reset;
+        UnknownVirtualSlot21();
+        prevCrashState = crashState;
+        UnknownVirtualSlot102(g_kbGame->field_0x2f0);
+    } else {
+        savedPos = position;
+    }
+
+    if (g_kbInterpolate)
+        field_0x15ec = g_kbGame->field_0x2f0 + field_0x15ec;
+    if (!a && !field_0x7a4) {
+        if (field_0x15ec >= g_kbStallThreshold) {
+            field_0x138c = g_kbStallHoldSec;
+            UnknownVirtualSlot50(1, 0.0f, 0);
+        } else if (field_0x138c > 0.0f) {
+            field_0x138c -= g_kbGame->field_0x2f0;
+            if (field_0x138c < 0.0f)
+                field_0x138c = 0.0f;
+        } else if (!field_0x736) {
+            UnknownVirtualSlot50(0, 0.0f, 0);
+        }
+    }
+    if (!g_kbGame->field_0x3428) {
+        collisionObject->UpdatePlacement();
+        if (g_kbGame->field_0x2d74 == 4)
+            UnknownVirtualSlot28(1);
+    }
+    prevVelocity = velocity;
+    position = savedPos;
+    lastStepTime = g_kbGame->field_0x2f0;
+}
