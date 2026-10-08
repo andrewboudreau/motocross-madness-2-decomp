@@ -43,6 +43,19 @@ public:
     KrustyVCR* field_0x708;
 };
 
+// The entries at TrackGameViewOwner+0x420 (BikeRace.h walks them as
+// UnknownBikeRaceNodeEntry): +0x58 points at an object whose +0x44 flag
+// 0x00404df0 raises for the two entries it leaves and clears for the two
+// it picks.
+struct UnknownTrackGameViewEntryTarget {
+    unsigned char field_0x00[0x44];
+    int field_0x44;
+};
+struct UnknownTrackGameViewEntry {
+    unsigned char field_0x00[0x58];
+    UnknownTrackGameViewEntryTarget* field_0x58;
+};
+
 struct TrackGameViewOwner : public GameObject {
     // 0x004e0c30 (among QuarryStuntEvent.cpp's code): shows the on/off
     // message for string `id` (racesnd.cpp passes 0x1429 and 0x14c3).
@@ -56,7 +69,9 @@ struct TrackGameViewOwner : public GameObject {
     void UnknownFunction4a9e80(UnknownEventRacer* racer, UnknownEventRacer* previous, int tell);
     // 0x004a9f90: lets every other racer know about the switch.
     void UnknownFunction4a9f90(UnknownEventRacer* racer, UnknownEventRacer* previous);
-    // 0x00404df0: bikerace.cpp passes a racer's +0x7b8, +0x7bc and the racer.
+    // 0x00404df0: bikerace.cpp passes a racer's +0x7b8, +0x7bc and the racer
+    // (0x00420650 passes 0, 1): picks entries `a` and `b` at +0x420 after
+    // flagging the two it leaves; `racer` is unused.
     void UnknownFunction404df0(int a, int b, void* racer);
 
     UnknownTrackGameViewPart* field_0x2c;
@@ -81,8 +96,12 @@ struct TrackGameViewOwner : public GameObject {
     // (stored through a cast: a float member here moves TrackGame slot 1 and
     // TrackOverlay 0x0051a560) in the bike race owner.
     int field_0xac;                           // RaceStatus.cpp 0x004e6a50 wraps a racer's next gate by it
-    unsigned char field_0xb0[0xdc - 0xb0];
+    int field_0xb0;                           // the two picked entries (0x00404df0)
+    int field_0xb4;
+    unsigned char field_0xb8[0xdc - 0xb8];
     UnknownTrackGameViewOwnerDc* field_0xdc;
+    unsigned char field_0xe0[0x420 - 0xe0];
+    UnknownTrackGameViewEntry* field_0x420[1];  // +0xac counts them (BikeRace.h)
 };
 
 // Settings blocks of TrackGameMode, passed to its reset helpers (0x00522720,

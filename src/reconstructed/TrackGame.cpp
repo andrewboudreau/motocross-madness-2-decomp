@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -72,6 +73,21 @@ enum {
 };
 
 DebugSocket* g_DebugSocket;
+
+// 0x00520820: the function right before this file's first (0x00520870),
+// after TrackRecord.cpp's last literal reference (0x0052022d); ownership by
+// position only. Formats `format` into 0x200 bytes and sends the text to
+// the debug socket when one is open.
+void SendDebugMessage(const char* format, ...)
+{
+    if (g_DebugSocket) {
+        char buffer[0x200];
+        va_list args;
+        va_start(args, format);
+        _vsnprintf(buffer, 0x200, format, args);
+        g_DebugSocket->SendText(buffer);
+    }
+}
 
 // 0x00520870
 TrackGame::TrackGame() {

@@ -302,3 +302,18 @@ int BackgroundImage::UnknownVirtualSlot18() {
     UnknownFunction404da0();
     return 1;
 }
+
+// 0x00404df0: the function after this file's last method and before its
+// Vec3 constructor copy (0x00404e60); ownership by position only. Flags
+// the +0x58 objects of the two entries the owner currently picks, then
+// picks `a` and `b` and clears theirs.
+void TrackGameViewOwner::UnknownFunction404df0(int a, int b, void* racer) {
+    if (field_0x420[field_0xb0]->field_0x58) {
+        field_0x420[field_0xb0]->field_0x58->field_0x44 = 1;
+        field_0x420[field_0xb4]->field_0x58->field_0x44 = 1;
+        field_0xb0 = a;
+        field_0xb4 = b;
+        field_0x420[field_0xb0]->field_0x58->field_0x44 = 0;
+        field_0x420[field_0xb4]->field_0x58->field_0x44 = 0;
+    }
+}
