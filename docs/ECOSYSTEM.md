@@ -25,7 +25,7 @@ right before the string literals, and the two detail-band tables
 
 Linear function-start lists show 52 starts in the extent; three are not
 functions: `0x004584d0` is inside the "CollisionObject%i" reader
-`0x00458360..0x004587aa` (1104 bytes), `0x00458ae0` inside the .esb writer
+`0x00458360..0x004587ac` (1101 bytes), `0x00458ae0` inside the .esb writer
 `0x004587b0..0x00458d99` (1513 bytes), and `0x0045b136` falls in the middle
 of an instruction of slot 14, which is one 3967-byte function
 `0x0045b060..0x0045bfdf` (the billboard pass is not a separate routine).
@@ -64,7 +64,7 @@ That leaves 49 functions.
   3D and fade distances, model flags, billboard range and limit, and three
   render-state switches.
 
-## Exact (40 calibration cases)
+## Exact (44 calibration cases)
 
 Small: the two peak-hold `$E` pairs and the four vector `$E` pairs; the
 definition constructor / destructor and its four parameter helpers
@@ -75,7 +75,10 @@ Vegetation constructor, slot 0 (view depth as a 16-bit sort key), slot 1
 `0x004567a0` and the world-position placement `0x004567e0`, the AgeManager eviction callback `0x00456850`, the
 collision-count and radius getters `0x00457080` / `0x00457230`; the
 EcoSystem constructor, destructor and deleting destructor, the detail-level
-setter `0x004594c0`, the geometry draw `0x00457000` and slot 23.
+setter `0x004594c0`, the geometry draw `0x00457000`, slot 23, the
+PlacementBmp placement `0x00459b40` and the two xor stream helpers
+`0x0045c6a0` / `0x0045c7b0` (the .esb's fwrite / fread through a running
+one-byte key).
 
 Medium and large: the geometry build `0x00456a10` (1512 bytes: the
 AgeManager-registered vertex block, rotation from the camera's horizontal
@@ -84,7 +87,8 @@ direction, the planar and model-normal lighting paths); the lighting update
 (the classification pass: AgeManager trim, view matrix publication, the
 sorted QuadTree query, the fade helper, the frustum test and the two draw
 lists with their 100/20-entry growth); the render-state setter
-`0x0045ade0`; the .esb writer `0x004587b0` (1513 bytes); the .esb reader
+`0x0045ade0`; the "CollisionObject%i" reader `0x00458360` (1101 bytes);
+the .esb writer `0x004587b0` (1513 bytes); the .esb reader
 `0x00458f70` (1351 bytes); the creator `0x004594d0` (859 bytes: table
 selection, scale from the QuadTree extents, load, textures, collisions,
 object array, buffers, placement by method, .esb write); the texture
@@ -129,6 +133,26 @@ Source forms that mattered:
 - `0x004594d0`: the band table is a conditional expression; the index
   buffer is filled through a running index; `unitsPerCoordinate = size *
   (1.0f / 65536.0f)`.
+- `0x00458360`: the loop is zero-based with `i + 1` in every `sprintf`
+  (retail keeps a separate `i + 1` induction register next to the index);
+  the five `GetPrivateProfileString` defaults inside the loop are the
+  shared `""` literal `0x00577738`, not the "NONE" the .est reader uses
+  (binding `??_C@_00A@?$AA@`). The retail extent is 1101 bytes plus three
+  `nop`s of padding.
+- `0x00459b40`: `float cellX = extent; cellX /= bitmap->infoHeader.width;`
+  gives retail's `fld [extent]; fidiv [slot]` (the `a / b` spelling
+  converts first and emits `fild; fdivr`); both conversions share one slot
+  that the row counter then reuses. The pixel pointer is read before the
+  divisions, and both loop bounds re-read the bitmap header (a local copy
+  would be spilled to its own slot).
+- `0x0045c6a0`: the block loop's bound is the expression `block < total /
+  0x400` (the quotient stays in a frame slot), the body is a pointer walk
+  `c = *data++; c ^= *key; *key += c; *out++ = c;` (the data byte is
+  loaded before the key), and the tail loop counts down from the remainder.
+- `0x0045c7b0`: the decoded byte is computed into a temporary before the
+  key accumulates the encoded byte (`v = *data; x = *key ^ v; *key += v;
+  *data = x;`): that is what gives `mov cl, al; add al, dl; xor cl, dl`
+  with the key pointer in `ebx`.
 
 ## Near misses (`samples/ecosystem/EcoSystemNearMisses.cpp`)
 
@@ -138,16 +162,12 @@ sample's bindings file; `$ehhandler` keys for the EH prologues).
 | VA | Function | State |
 |---|---|---|
 | `0x00456890` | fade / distance band | 356/369: retail schedules the camera pointer load and the z store before the first `fmul`. The block is scheduling-invariant: eighteen data-flow-equivalent spellings (locals before or after the camera load, no camera local, the view in a local, one declaration per statement, a position reference, the products computed before the camera, `-=`, int locals and casts, a `Vector3` position, z first, a delta vector) give the same bytes, and every statement reordering scores lower. Helper boundaries do not move it either: inline and static accessors for the eye and the scaled coordinate, pointer, reference and by-value helpers, a struct copy and the difference as a `Vector3` all give the identical 356 or less, and `/G6` scores 267. |
-| `0x004570a0` | collision object placement | 74/349: retail does not fold the definition lookup across the position conversions; the radius and height divide by the definition's mean values. |
+| `0x004570a0` | collision object placement | 103/386: retail loads the definition-table entry once into `edi` before the position conversions and keeps it (the candidate re-reads the table per use), and picks other registers for the three shape store blocks. Writing the shape stores through per-statement casts of `object->field_0x54` (`ECO_SPHERE->...`) reproduces retail's re-read of the shape pointer for every store, and the hull copy stores y before x. |
 | `0x00456050` | definition load (.slt) | 163/1513: `this` / `textures` register roles and the local layout (the loop extremes, a/b/c, faces) differ; the frame is 0x1b8 for 0x1b4. |
 | `0x00457480` | .est reader (2626 bytes) | 371/2646 (the matcher now binds the handler of the `push ebp; mov ebp, esp; and esp, -8; push -1; push handler` prologue); the probe stream is kept in `esi` as well as its EH slot, and the local layout follows from that. |
 | `0x00457ed0` | collision objects (1150 bytes) | 1105/1153: the cylinder height load `mov edx, [edi+0x20]` is scheduled before the cosine in retail (every placement of the `.y` store scores lower). The offset is `operator+` shaped (`Vector3(a.x + b.x, ...)`, `UnknownEcoOffset(shape->start, vertices[j])`; the named-result form scores less); its z component is summed vertex-first as in retail only when the vertex's z is read through a by-value accessor. |
-| `0x00458360` | "CollisionObject%i" reader (1104 bytes) | 113/1112: retail keeps 0 in `ebp` (`cmp eax, ebp`, `push ebp`) and tests the count twice; the local arrays are key, value, section, kind in that order. |
-| `0x00458da0` | .txt listing | 457/461: four SIB operands are `[esi + eax]` instead of retail's `[eax + esi]` (array base / induction order); no source form found yet. |
-| `0x004598d0` | placement from the .esb | 34/462: the loop keeps `i` in memory and the definition byte zero-extended in a register; local layout. |
-| `0x00459b40` | placement from the PlacementBmp | 56/412: `fidiv` for the cell size, the bitmap pointer in `ebp`, pixel pointer kept in memory. |
-| `0x0045c6a0` | xor fwrite | 14/254: retail walks a pointer and a 1024 count-down per block, with the block count in a local. |
-| `0x0045c7b0` | xor fread | 90/115: register roles (total in `edi`, key in `ebx`) and the byte update order. |
+| `0x00458da0` | .txt listing | 457/461: four SIB operands are `[esi + eax]` instead of retail's `[eax + esi]` (array base / induction order); no source form found yet (`i[vegetation]` and an `int index = i` copy compile to the same bytes). |
+| `0x004598d0` | placement from the .esb | 445/455 (the documented 462 included seven bytes of padding): only where `mov ecx, [g_collisionQuadTree]` sits among the last `ComputeCode` argument's `fsub` / `fstp` differs. Widening the definition byte to `int` right after its read (`int definition = definitionByte;`) hoists the zero-extension into a register and spills the loop counter as retail does. |
 | `0x00459ce0` | Auto-method generator (3257 bytes) | 323/3300: the control flow and every expression match; the frame (0xe14) is the same size and the arrays (`tgas`, `cumulative`, the rings) sit at retail's offsets, but the scalar slots differ. Retail's slot order by use count is reproduced except for how VC6's slot sharing groups the temporaries: retail shares the int-to-float conversion temporaries (`fild [esp+0x10]`) with the first loops' 256 count-down and the placement loop's `j` (34 uses at `[esp+0x10]`), `i` of the ring loops with `probability` (28 uses at `+0x14`), and the `fimul` products with their `(int)` results (`+0x28`, 12 uses); here the conversion temporaries share with the `fimul` products (36 uses), `i` with `clusterCount` (27) and `probability` stands alone (11), so `tga`, `heightParameter`, `radius` / `threshold` and the four-use scalars shift by one or two slots. Source forms that mattered: the two `rand()` scales stay separate only through a named local (`random = UnknownEcoRandom(); threshold = random * 3.0f`); the draw is `rand() * (100.0f / 32767.0f)` (RAND_MAX), the position `rand() * (1 / 32768.0f) * range`; the TGA sampler divides by a local copy of the QuadTree extent (`x / worldX * width` gives retail's `fld; fdivr`); the ring tables are `Vector3(i * spacing, 0, (mode - 1) * spacing)` constructor temporaries; `tga = 0` precedes the `memset`; the registry query is Game slot 20, not slot 22. |
 | `0x0045b060` | slot 14, the draw (3967 bytes) | 461/3919: the structure matches (identity world matrix, saved TEXTUREPERSPECTIVE / SHADEMODE, three leaned face normals, their lit colours, the geometry list, the 120-quad billboard batches with the four- and six-vertex forms and index patterns, the overlay rows, the state restore) but the frame is 0xe0 for 0xf0 and the slot sharing differs: retail folds the per-quad vertex offset temporaries (separate 2- to 4-use slots here at `+0x44`..`+0x5c`) into its 9-use classes at `+0x4` / `+0x8` / `+0xc`, splits the `intensity` / `right` class (14 uses here at `+0`) over `+0x4`, `+0x18` and `+0x20`, keeps `z` of the lean as its 14-use `[esp+0x10]` (11 uses here) and `object` at `+0x14` with 8 uses (3 here), and spends four more scalar slots (3- and 4-use classes at `+0x1c`, `+0x28`, `+0x30`, `+0x38`, `+0x64`, `+0xac`), so only the identity matrix, the saved states and the two-use scalars (`+0x6c`..`+0xa0`, `+0xb0`..) sit at retail's offsets. The lit colour clamps are conditional expressions (`v < 1.0f ? v : 1.0f`, the value stays on the stack); the intensities are a `Vector3` (memory, read three times each); the dot products sum as `z + (x + y)`. |
 

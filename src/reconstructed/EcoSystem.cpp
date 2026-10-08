@@ -427,6 +427,68 @@ EcoSystem::~EcoSystem() {
     g_UnknownGlobal59aefc = 0;
 }
 
+// 0x00458360: reads a definition's "CollisionObject%i" entries. The keys
+// count from 1 over a zero-based loop (`i + 1`), and the profile defaults
+// are the empty string (the shared "" literal 0x00577738), not "NONE".
+void EcoSystem::ReadCollisionObjects(const char* path, int index, UnknownEcoDefinition* definition) {
+    char key[0x80];
+    char value[0x80];
+    char section[0x100];
+    char kind[0x80];
+    int i;
+    sprintf(section, "Vegetation_%d", index);
+    int count = GetPrivateProfileInt(section, "NumCollisionObjects", 0, path);
+    definition->collisionCount = count;
+    if (count > 0) {
+        definition->collisionDefinitions = (UnknownEcoCollisionDefinition*)DebugMalloc(
+            count * sizeof(UnknownEcoCollisionDefinition), __FILE__, 0x40c);
+        for (i = 0; i < definition->collisionCount; i++) {
+            UnknownEcoCollisionDefinition* shape = &definition->collisionDefinitions[i];
+            sprintf(key, "CollisionObject%i", i + 1);
+            GetPrivateProfileString(section, key, "", kind, 0x80, path);
+            if (!_stricmp(kind, "GEOMETRY")) {
+                shape->type = 0;
+            } else if (!_stricmp(kind, "SPHERE")) {
+                shape->type = 2;
+                sprintf(key, "CollisionObject%iCenter", i + 1);
+                GetPrivateProfileString(section, key, "", value, 0x80, path);
+                shape->start.x = (float)atof(strtok(value, ","));
+                shape->start.y = (float)atof(strtok(0, ","));
+                shape->start.z = (float)atof(strtok(0, "\n"));
+                sprintf(key, "CollisionObject%iRadius", i + 1);
+                shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
+            } else if (!_stricmp(kind, "RADIUSEDLINE")) {
+                shape->type = 3;
+                sprintf(key, "CollisionObject%iStart", i + 1);
+                GetPrivateProfileString(section, key, "", value, 0x80, path);
+                shape->start.x = (float)atof(strtok(value, ","));
+                shape->start.y = (float)atof(strtok(0, ","));
+                shape->start.z = (float)atof(strtok(0, "\n"));
+                sprintf(key, "CollisionObject%iEnd", i + 1);
+                GetPrivateProfileString(section, key, "", value, 0x80, path);
+                shape->end.x = (float)atof(strtok(value, ","));
+                shape->end.y = (float)atof(strtok(0, ","));
+                shape->end.z = (float)atof(strtok(0, "\n"));
+                sprintf(key, "CollisionObject%iRadius", i + 1);
+                shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
+            } else if (!_stricmp(kind, "CYLINDER")) {
+                shape->type = 1;
+                sprintf(key, "CollisionObject%iBottom", i + 1);
+                GetPrivateProfileString(section, key, "", value, 0x80, path);
+                shape->start.x = (float)atof(strtok(value, ","));
+                shape->start.y = (float)atof(strtok(0, ","));
+                shape->start.z = (float)atof(strtok(0, "\n"));
+                sprintf(key, "CollisionObject%iRadius", i + 1);
+                shape->radius = UnknownFunction47b8a0(section, key, 0.0, path);
+                sprintf(key, "CollisionObject%iHeight", i + 1);
+                shape->height = UnknownFunction47b8a0(section, key, 0.0, path);
+            }
+        }
+    } else {
+        definition->collisionDefinitions = 0;
+    }
+}
+
 // 0x004587b0: writes the .esb next to the .est.
 int EcoSystem::WriteEsb(const char* path) {
     char name[0x104];
@@ -693,6 +755,48 @@ EcoSystem* EcoSystem::UnknownFunction4594d0(void* view, TextureMapManager* textu
         WriteEsb(path);
     }
     return this;
+}
+
+// 0x00459b40: places the objects the PlacementBmp paints (one pixel per
+// terrain cell, the palette index selecting the definition). The cell
+// sizes are `extent; /= width` (that gives retail's `fld; fidiv` over the
+// shared conversion slot), the pixel pointer is taken before them, and the
+// loop bounds re-read the bitmap header each iteration.
+int EcoSystem::PlaceAuthoredObjects() {
+    if (!placementBmp[0])
+        return 0;
+    UnknownBitmapFile* bitmap = UnknownFunction424140(placementBmp, 0);
+    if (!bitmap)
+        return 0;
+    int row;
+    int column;
+    unsigned char* pixel = (unsigned char*)bitmap->bits;
+    float cellX = g_collisionQuadTree->field_0x50;
+    cellX /= bitmap->infoHeader.width;
+    float cellZ = g_collisionQuadTree->field_0x54;
+    cellZ /= bitmap->infoHeader.height;
+    for (row = 0; row < bitmap->infoHeader.height; row++) {
+        for (column = 0; column < bitmap->infoHeader.width; column++) {
+            int index = *pixel++;
+            if (index && definitionTable[index]) {
+                Vector3 position;
+                if (placedCount == totalObjects)
+                    goto done;
+                position.x = (column + 0.5f) * cellX;
+                position.y = 0.0f;
+                position.z = (row + 0.5f) * cellZ;
+                groundTerrain->QueryGround(&position, 0, 0, 0);
+                unsigned char heightParameter = definitionTable[index]->RandomParameter();
+                unsigned char radiusParameter = definitionTable[index]->ParameterForHeight(
+                    definitionTable[index]->HeightForParameter(heightParameter));
+                vegetation[placedCount].Place(textureManager, index, &position, heightParameter, radiusParameter);
+                placedCount++;
+            }
+        }
+    }
+done:
+    UnknownFunction4245b0(bitmap);
+    return 1;
 }
 
 // 0x0045a9a0
@@ -1003,5 +1107,64 @@ int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextur
         }
     }
     g_UnknownGlobal59aefc = 1;
+    return 1;
+}
+
+// 0x0045c6a0 (cdecl): fwrite through a running xor key, 1 KB at a time.
+// The byte is read, then xored with the key; the key accumulates the
+// encoded byte. The block count is the loop bound expression (it stays in
+// a frame slot) and the tail loop counts down.
+int UnknownFunction45c6a0(const unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
+    unsigned char buffer[0x400];
+    int total = size * count;
+    int block;
+    int i;
+    for (block = 0; block < total / 0x400; block++) {
+        unsigned char* out = buffer;
+        for (i = 0; i < 0x400; i++) {
+            unsigned char c = *data++;
+            c ^= *key;
+            *key += c;
+            *out++ = c;
+        }
+        if (fwrite(buffer, 0x400, 1, file) != 1)
+            return 0;
+    }
+    total %= 0x400;
+    if (total == 0)
+        return 1;
+    unsigned char* out = buffer;
+    for (i = total; i > 0; i--) {
+        unsigned char c = *data++;
+        c ^= *key;
+        *key += c;
+        *out++ = c;
+    }
+    return fwrite(buffer, total, 1, file) == 1;
+}
+
+// 0x0045c7b0 (cdecl): fread through the running xor key. A short read is
+// fatal on error, and on EOF only the bytes read are decoded. The decoded
+// byte is computed before the key accumulates the encoded byte.
+int UnknownFunction45c7b0(unsigned char* data, int size, int count, FILE* file, unsigned char* key) {
+    int total = size * count;
+    int read = fread(data, size, count, file);
+    int i;
+    if (read != count) {
+        if (file->_flag & 0x10) {
+            if (!read)
+                return 0;
+            total = read * size;
+        }
+        if (file->_flag & 0x20)
+            return 0;
+    }
+    for (i = 0; i < total; i++) {
+        unsigned char value = *data;
+        unsigned char decoded = *key ^ value;
+        *key += value;
+        *data = decoded;
+        data++;
+    }
     return 1;
 }
