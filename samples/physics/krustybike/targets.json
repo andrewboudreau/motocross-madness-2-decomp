@@ -775,11 +775,29 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "??0KrustyBike@@QAE@H@Z",
+    "target_va": "0x0048fa60",
+    "target_size": 532,
+    "expect": "partial",
+    "notes": "constructor, 86.36% (532/532). Sole divergence 0xb7..0xfa: VC6 hoists the +0x7c0/+0x7bc stores into the +0x1540 kVec3Zero copy, retail +0x11b8/+0x604. The pick is positional from the block end in statement units (retail needs eight fewer after the copy); see the source comment."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
     "candidate_symbol_contains": "Load@KrustyBike",
     "target_va": "0x0048fc80",
     "target_size": 5384,
     "expect": "exact",
     "notes": "bike loader (SEH frame, five new(__FILE__, line) sites). target_size 5384 = extent_with_tables (5366 code + 2 pad + 4-entry jump table at 0x00491178). Exact needed: float-typed KbBikeSetup fields give the retail jump-threaded ternary chains, function-scope Vec3 points[2] plus memset keeps the 0xbc frame, the dead field_0x2d74 cmp is an if/else with identical arms, and 0.001f is the TU-local constant at 0x005541e8",
     "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00495FF0@KrustyBike",
+    "target_va": "0x00495ff0",
+    "target_size": 895,
+    "expect": "partial",
+    "notes": "trick end / bonus, 99.17% (895/895). Stack slots match once the float bonus is a CSE temp, not a local. Only mov al,[+0x153f] vs fsubr order after the fmod call differs (retail loads the flag first)."
   }
 ]

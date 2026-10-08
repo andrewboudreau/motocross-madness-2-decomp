@@ -496,11 +496,21 @@ names its bindings file:
   `0x0067c368`, `0x0067c338`; the constructor and `0x00492670` read the zero
   vector), the two vtordisp thunks `0x00497c30`/`0x00497ca0` and the network
   message 13 decoder `0x004933e0`. The trick end `0x00495ff0` is a near miss
-  (871/895, stack slots). Slot 97's six clip names come from a
+  (99.17%, 895/895): its stack slots match once the float bonus is left as the
+  CSE temporary of `(float)points` instead of a named local; only the order of
+  the +0x153f flag load and the fsubr after the fmod call differs (retail loads
+  the flag first; a local read before the call anchors it before the call, one
+  read after the call is forward-substituted and scheduled after the fsubr).
+  Slot 97's six clip names come from a
   `{id, name[32]}` table at `0x0056cb88` (the two "BackOver" entries are
   separate records). The constructor `0x0048fa60` (`GameObject(1), Bike(flags)`,
-  ret 8) is a near miss (472/532, store scheduling around the +0x1540 vector
-  copy); `0x0048d780` uses an inline-asm rounding helper and stays excluded.
+  ret 8) is a near miss (86.36%, 532/532): VC6 hoists two stores into the load
+  delay of the +0x1540 vector copy and picks them at a fixed distance from the
+  end of the block, counted in statements; retail's pick (+0x11b8/+0x604) is
+  reproduced only by dropping the last eight stores, so retail has eight fewer
+  scheduling units after the copy for a reason not found (statement order,
+  init-list members, copy forms, duplicate stores and inline helpers do not move
+  it). `0x0048d780` uses an inline-asm rounding helper and stays excluded.
   Exact as well: GameObject slot 10 `0x004977a0`
   (the per-frame update reached through the virtual base: update path by
   network state and mode, the mode 4 player re-target, the end of start-up

@@ -32,12 +32,19 @@ static inline float KbLength(const Vec3& v)
     return (float)sqrt(d);
 }
 
-// 0x0048fa60 (near miss, 472 of 532 bytes): the GameObject virtual base is built
-// only for the most-derived object (GameObject(1)), then Bike(flags). Every store
-// matches, but VC6 schedules the +0x7c0/+0x7bc stores into the kVec3Zero copy for
-// +0x1540 where retail puts +0x11b8/+0x604 (the next two statements). Other
-// orders of the first four statements and an inline helper for the
-// +0x7b8/+0x7c0/+0x7bc triple (also written together by slot 97) are worse.
+// 0x0048fa60 (near miss, 86.36%, 532 of 532 bytes): the GameObject virtual base is
+// built only for the most-derived object (GameObject(1)), then Bike(flags). Every
+// store matches; the sole divergence (0xb7..0xfa) is which two stores VC6 hoists
+// into the load delay of the +0x1540 kVec3Zero copy: ours picks +0x7c0/+0x7bc,
+// retail +0x11b8/+0x604 (the next two statements).  Measured: the pair is chosen at
+// a fixed distance from the END of the block, counted in statements (one added
+// store shifts it by one, regardless of size; lea-based copy stores, duplicate
+// stores, type punning and folded inline guards do not count).  Retail's pick is
+// reproduced exactly by dropping the last eight stores, so retail's stream has
+// eight fewer scheduling units after the copy for a reason not yet found.  Other
+// orders of the first four statements, init-list members, component-wise or
+// chained copies and an inline helper for the +0x7b8/+0x7c0/+0x7bc triple (also
+// written together by slot 97) do not move the pick.
 KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 {
     field_0x73c = 0x65;
@@ -1453,9 +1460,13 @@ void KrustyBike::Fn_004933E0(const KbNetDelta* delta, KbNetState* state)
 // handler hears of it. In game mode 0 (or 4 with +0x2eb8 for the +0x568 racer's
 // bike) the score is kept in +0x788 and returned; otherwise the bonus rules
 // (+0x3444) turn it into a capped bonus, shown to the +0x50 racer's bike.
-// Near miss (871 of 895 bytes): retail shares one stack slot between score and
-// gain and one between the integer and float bonus, and loads +0x153f before
-// the fsubr; the declaration orders tried do not reproduce that.
+// Near miss (99.17%, 895 of 895 bytes): the stack slots now match once the float
+// bonus is not a named local (the (float)points conversion is a CSE temp that
+// retail spills over the dead integer slot; naming it costs a fourth slot).  The
+// one remaining divergence is the order of "mov al,[+0x153f]" and the fsubr after
+// the fmod call: retail loads the flag first.  Reading the flag into a local before
+// the fmod call anchors it before the call (mov bl); reading it after the call, in
+// any position, is forward-substituted to the test and scheduled after the fsubr.
 float KrustyBike::Fn_00495FF0()
 {
     field_0x1530 -= (float)fmod(field_0x1530, 100.0);
@@ -1485,7 +1496,6 @@ float KrustyBike::Fn_00495FF0()
         int base = rules->base[rules->index];
         int points = (int)(base * rules->baseScale);
         float gain = 0.0f;
-        float bonus = points;
         float limit = points * rules->limitScale;
         if (field_0x7b4 * 400.0f < limit) {
             float total = step + field_0x7b4;
@@ -1510,7 +1520,7 @@ float KrustyBike::Fn_00495FF0()
                 }
             } else {
                 g_kbGame->GetStringText(0x14d9, text, 0x80);
-                sprintf(line, "%s %.0f.00)", text, bonus * rules->limitScale);
+                sprintf(line, "%s %.0f.00)", text, points * rules->limitScale);
                 KbMessage* message = new(__FILE__, 0xa1d) KbMessage(line, 3.25f);
                 if (message) {
                     sink->Fn_0051B540(message);
