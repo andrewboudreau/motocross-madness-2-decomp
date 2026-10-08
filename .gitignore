@@ -26,3 +26,4 @@ toolchains/
 /analysis/
 /generated/
 .claude/settings.local.json
+_site/
