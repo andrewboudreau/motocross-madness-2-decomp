@@ -111,7 +111,11 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
   partial" page. Control flow, calls and VC6's inlining choices match: VC6
   inlines `ContainerList::Reserve` only in the last two `Add` calls, as
   retail does, once three small helpers carry part of the work (its inline
-  budget scales with the function's size). Stack-slot packing differs;
+  budget scales with the function's size); the helpers take their counts
+  by const reference so the TexMem rows multiply straight from the fields.
+  Stack-slot packing differs (retail's frame is 8 bytes smaller: the
+  format buffer and `filled` reuse dead scalar slots, `now` stays in ebp),
+  about 158 of 1150 instructions;
 - `0x0050dad0` (5020 bytes), the repack with partial texture blits (chosen
   by `0x0050c8c0` when the display's +0x5bc is positive): plans and lowers
   the used textures' levels to fit the group, turns the level counts into
@@ -124,13 +128,19 @@ Near misses (`samples/render/ManagedTextureGroupNearMisses.cpp`):
   texels, then fills the overlay's "TextureManager partial blts" page.
   Control flow, calls, inlining and the scalar stack slots match (one
   `managed` variable across the loops, `while (pass < 3 && ...)` for the
-  blit passes); two of the five 9-entry arrays (0x8c/0xb0) are swapped and
-  the overlay rows rotate eax/ecx/edx, about 145 of 1600 instructions;
-- `0x0050ef70` (1832 bytes), the debug display for manager slot 15: the
+  blit passes); two of the five 9-entry arrays (0x8c/0xb0) are swapped
+  (declaration order, block scopes and memset order do not move them),
+  `dropped = 0` is stored after the empty-list return, and the overlay rows
+  rotate eax/ecx/edx, about 216 of 1600 instructions;
+- `0x0050ef70` (1834 bytes), the debug display for manager slot 15: the
   selected texture copied into the top right of the render target with
   its use and Un/Hi/Lo state, or the selected page with its textures and an
-  outline (GDI pen, MoveToEx/LineTo, TextOutA on the surface's DC). Retail
-  saves ebx/esi only after the first early return.
+  outline (GDI pen, MoveToEx/LineTo, TextOutA on the surface's DC). Every
+  stack slot matches once the page-drawing tail is a block of its own
+  (block-scoped locals reuse dead slots; function-scope ones never do).
+  Left: retail saves ebx/esi only after the first early return, reloads
+  the page at the bottom of the texture loop and multiplies the outline's
+  `left`/`top` as `fld [field]; fmul st(1)`; about 31 of 575 instructions.
 
 ## CacheTexture
 
