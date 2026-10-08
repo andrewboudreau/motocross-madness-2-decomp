@@ -3,11 +3,11 @@
 > Last reviewed: **2026-10-08** · Retail executable: `31fde4cc686a5ee89ef9095b90235325b195596867ecacefe511263e1509b874`
 
 There is not yet a defensible whole-game percentage. The best reproducible
-headline is that **2779 of 2789 selected function targets (99.6%)**
+headline is that **2793 of 2806 selected function targets (99.5%)**
 have strict, byte-for-byte matches in the reviewed calibration suite, compiled
-with VC6 SP3. The suite contains **2793 cases**; repeated
+with VC6 SP3. The suite contains **2810 cases**; repeated
 retail address/extent pairs count once.
-That percentage measures the active target set, **not 99.6% of MCM2**:
+That percentage measures the active target set, **not 99.5% of MCM2**:
 targets are chosen because they are useful or tractable, and the executable's
 complete function inventory has not been established.
 
@@ -15,10 +15,10 @@ complete function inventory has not been established.
 
 | Indicator | Current value | What it means |
 |---|---:|---|
-| Strict VC6 exact targets | **2779 / 2789 (99.6%)** | Unique retail address/extent pairs in the reviewed calibration run |
-| Canonical reconstructed implementation files | **147** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
-| Canonical reconstructed headers | **169** | Layout and interface declarations, including support-only headers |
-| Canonical C++ source lines | **88,803** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
+| Strict VC6 exact targets | **2793 / 2806 (99.5%)** | Unique retail address/extent pairs in the reviewed calibration run |
+| Canonical reconstructed implementation files | **148** | `.cpp` files under `src/reconstructed/` and `src/krusty2/`; may include incomplete candidates |
+| Canonical reconstructed headers | **170** | Layout and interface declarations, including support-only headers |
+| Canonical C++ source lines | **89,213** | Physical lines in the canonical `.cpp` and `.h` files; not a completion percentage |
 | Retail source-path strings | **111** | Navigation evidence; reconstructed files are not one-to-one with original TUs |
 | Recovered RTTI types | **252** | Confirmed type descriptors, not necessarily reconstructed classes |
 | Retail `.text` virtual size | **1,368,518 bytes (1.31 MiB)** | Broad code-section denominator; includes library code, thunks and padding |
@@ -65,9 +65,9 @@ python3 tools/run_calibration.py --compiler vc6 --profile vc6_o2_mt --vc6-root "
 
 Inspect every result: the runner reports nonmatches as data and its exit status
 alone does not prove strict matching. Reviewed code revision:
-`7d7e70eae33ad1097f3d5f989813c3819084faef`. Source inventory counts reflect the current tree
+`3bc578c7193c4d8da207ffb1c00f174beeb0cd5b`. Source inventory counts reflect the current tree
 and do not imply every body in those files matches.
 
 ### Caveats recorded with the snapshot
 
-2779 of 2789 unique retail address/extent pairs passed strict comparison in 2793 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). Every relocation was resolved, or the function had no relocation bytes. The remaining 10 match only with relocations masked or are registered near misses: BaseObject::Release, seven UI compiler-shape probes and two FollowRacer near misses (0x4a9d20, 0x4a9e80). This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.
+2793 of 2806 unique retail address/extent pairs passed strict comparison in 2810 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). Every relocation was resolved, or the function had no relocation bytes. The remaining 13 match only with relocations masked or are registered near misses: BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and three near misses in GridNode (0x483910, 0x484d70) and the orientation-axes helper (0x4b5d00). This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.
