@@ -95,12 +95,22 @@ public:
     // 0x00492670 (ret 0xc; called three times by 0x00492ad0): sends (or records) message 1
     // with this bike's state and keeps a copy in `state`; `dt` is unused.
     void Fn_00492670(KbBikeState* state, float dt, int record);
+    // 0x0048fc80 (ret 0x7c = 31 argument dwords; not a vtable entry, like Vehicle::LoadVehicle):
+    // the bike loader.  Runs Bike's loader 0x004079c0, then builds the collision bodies, the
+    // trick animation tables, the network settings and the optional rider morph.  Returns the
+    // GameObject base.  Parameter names are tier 3; `kind` 0xff marks a ghost bike.
+    GameObject* Load(int a1, int a2, const char* name, const SoultreeLoadDesc* desc, int a5, int a6,
+                     Vec3 a7, Vec3 a8, Vec3 a9, int a10, VehicleInputMap* map, unsigned char kind,
+                     unsigned char a13, KbRace* race, int a15, int a16, int netId,
+                     const KbBikeSetup* setup, int a19, int a20, int a21, int a22,
+                     KbRecorder* recorder, void* a24, int withRider);
 
 public:
     char field_0x734; // 0x734  first KrustyBike field (Bike's own data ends at 0x734)
     char field_0x735; // 0x735
     char field_0x736; // 0x736
-    char pad_0x0737[0x5];
+    char field_0x737; // 0x737  KbBikeSetup+4 (0 without a setup)
+    int field_0x738; // 0x738  KbBikeSetup+0 (250 without a setup); +0x79c classes it (<=125, <500)
     int field_0x73c; // 0x73C  0x65 from the constructor
     KbRace* field_0x740; // 0x740
     KbGhost* field_0x744; // 0x744
@@ -116,7 +126,7 @@ public:
     float field_0x76c; // 0x76C
     int field_0x770; // 0x770
     int field_0x774; // 0x774
-    char pad_0x0778[0x4];
+    float field_0x778; // 0x778  100.0f from the loader
     void* heapBufferA; // 0x77C  heap buffer released in the destructor (tier 3: type unknown)
     void* heapBufferB; // 0x780  heap buffer released in the destructor
     int field_0x784; // 0x784
@@ -125,7 +135,7 @@ public:
     int field_0x790; // 0x790
     int field_0x794; // 0x794
     int field_0x798; // 0x798
-    char pad_0x079C[0x4];
+    int field_0x79c; // 0x79C  0, 1 or 2 from +0x738 (loader)
     short field_0x7a0; // 0x7A0
     short field_0x7a2; // 0x7A2
     char field_0x7a4; // 0x7A4
@@ -138,17 +148,37 @@ public:
     int field_0x7b8; // 0x7B8
     int field_0x7bc; // 0x7BC
     int field_0x7c0; // 0x7C0
-    char pad_0x07C4[0x40];
+    float field_0x7c4; // 0x7C4  loader constants 1.1, 1.3, 1.5, 25, 15, 5, 0 (tier 3 purpose)
+    float field_0x7c8; // 0x7C8
+    float field_0x7cc; // 0x7CC
+    float field_0x7d0; // 0x7D0
+    float field_0x7d4; // 0x7D4
+    float field_0x7d8; // 0x7D8
+    float field_0x7dc; // 0x7DC
+    Vec3 field_0x7e0; // 0x7E0
+    Vec3 field_0x7ec; // 0x7EC
+    int field_0x7f8; // 0x7F8
+    int field_0x7fc; // 0x7FC
+    char pad_0x0800[0x4];
     float field_0x804; // 0x804
     float field_0x808; // 0x808
-    char pad_0x080C[0x8];
+    int field_0x80c; // 0x80C
+    char field_0x810; // 0x810  set with +0x15e4 for a local (+0x734) bike
+    char pad_0x0811[0x3];
     int field_0x814; // 0x814
-    char pad_0x0818[0x11b8 - 0x818];
+    float field_0x818; // 0x818  3000.0f (local bike)
+    float field_0x81c; // 0x81C
+    float field_0x820; // 0x820  3000.0f (local bike)
+    float field_0x824; // 0x824  random in [-7,7) (or [-3,3) in modes 1/5)
+    char pad_0x0828[0x11b8 - 0x828];
     char field_0x11b8; // 0x11B8
     char pad_0x11B9[0x3];
     int field_0x11bc; // 0x11BC  network id (KbNetBike)
     unsigned char field_0x11c0; // 0x11C0
-    char pad_0x11C1[0x1358 - 0x11c1];
+    char pad_0x11C1[0x3];
+    float field_0x11c4; // 0x11C4  clock offset subtracted by 0x00493660 (not UseTimeReceived)
+    KbBikeNetState* states[4]; // 0x11C8  received states, newest first (buffers at 0x11d8..)
+    KbBikeNetState stateBuffers[4]; // 0x11D8  the four 0x60-byte buffers states[] points at
     Vec3 field_0x1358; // 0x1358
     Vec3 field_0x1364; // 0x1364
     Vec3 field_0x1370; // 0x1370
@@ -156,7 +186,7 @@ public:
     float field_0x1380; // 0x1380
     float field_0x1384; // 0x1384
     int field_0x1388; // 0x1388
-    int field_0x138c; // 0x138C
+    float field_0x138c; // 0x138C  seconds left of the slot-50 hold 0x00493660 starts
     KbBikeState recordState; // 0x1390  last state recorded (0x00492ad0 with record set)
     KbRecorder* netRecorder; // 0x13FC
     int field_0x1400; // 0x1400
@@ -192,15 +222,23 @@ public:
     float field_0x1558; // 0x1558  Fn_0048E280: wrapped bearing to the rival relative to heading +0x50, clamped to +-2.7
     KrustyBike* nearestRival; // 0x155C  FindNearestRival result (closest other bike of the race; tier 3 name)
     KbBikeState netState; // 0x1560  last state sent to the peers (0x00492ad0)
-    char pad_0x15CC[0x4];
+    int field_0x15cc; // 0x15CC
     float field_0x15d0; // 0x15D0  seconds since the last short message (0x00492ad0)
     int field_0x15d4; // 0x15D4
-    char pad_0x15D8[0xd];
+    void* field_0x15d8; // 0x15D8  loader argument 30
+    float field_0x15dc; // 0x15DC  KbRace +0x9c/+0xa0/+0xa4 by game type, else 2.0 (local bike)
+    CollisionObject* field_0x15e0; // 0x15E0  local bike's vertical probe segment (0,4,0)-(0,-1,0)
+    char field_0x15e4; // 0x15E4  set for a local bike
     char field_0x15e5; // 0x15E5
     char field_0x15e6; // 0x15E6
     char pad_0x15E7[0x1];
     KbObj128* field_0x15e8; // 0x15E8
-    char pad_0x15EC[0x18];
+    float field_0x15ec; // 0x15EC  seconds into the current state interval (0x00493660)
+    float field_0x15f0; // 0x15F0  length of the current state interval in seconds
+    int field_0x15f4; // 0x15F4  first-packet latch
+    unsigned int field_0x15f8; // 0x15F8  timeReceived of the last newest state seen
+    KbBikeNetState* field_0x15fc; // 0x15FC  interpolation target state
+    KbBikeNetState* field_0x1600; // 0x1600  interpolation source state
     float field_0x1604; // 0x1604  seconds to the next message 10 (0x00492670)
     // own data ends at 0x1608; the compiler places the vtordisp there
 };

@@ -122,6 +122,11 @@ struct KbBikeMessage {
     unsigned char field_0x53;            // +0x7b8 (+0x7a0 in modes 2 and 3)
     unsigned char field_0x54;            // +0x11c0
 };
+// Received copy of message 1 (0x60 bytes, four at KrustyBike+0x11d8) that 0x00493660 reads.
+struct KbBikeNetState : KbBikeMessage {
+    unsigned int timeReceived;           // +0x58 local clock when it arrived
+    int field_0x5c;                      // +0x5c set when the lap/race fields are valid
+};
 // Message type 10 (8 bytes): the bike's +0x11c0 flag and +0x768.
 struct KbBikePing {
     char field_0x00;
@@ -189,9 +194,40 @@ struct KbOverlay {
     char pad_0x0000[0x26c0];
     int lineCount;   // 0x26C0: next free line block
 };
+// 0x70-byte records behind KbGame+0x33fc; the first record's leading int selects the current one
+// (0x0048fc80 reads records[records[0].field_0x0].field_0x28; tier 3).
+struct KbTrackEntry {
+    int field_0x0;
+    char pad_0x04[0x24];
+    int field_0x28;
+    char pad_0x2C[0x70 - 0x2c];
+};
 struct KbGame {
+    // The game object is polymorphic: 0x0048fc80 calls slot 20 (vtable +0x50) with a setting
+    // name and a default and stores the int result (tier 1 slot, tier 3 names).
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6();
+    virtual void UnknownVirtualSlot7();
+    virtual void UnknownVirtualSlot8();
+    virtual void UnknownVirtualSlot9();
+    virtual void UnknownVirtualSlot10();
+    virtual void UnknownVirtualSlot11();
+    virtual void UnknownVirtualSlot12();
+    virtual void UnknownVirtualSlot13();
+    virtual void UnknownVirtualSlot14();
+    virtual void UnknownVirtualSlot15();
+    virtual void UnknownVirtualSlot16();
+    virtual void UnknownVirtualSlot17();
+    virtual void UnknownVirtualSlot18();
+    virtual void UnknownVirtualSlot19();
+    virtual int UnknownVirtualSlot20(const char* name, int defaultValue);
     void GetStringText(int id, char* buffer, int size);   // 0x00521970: fetch text for a string id
-    char pad_0x0000[0x8];
+    char pad_0x0004[0x4];
     KbGameCfg* field_0x8; // 0x8
     char pad_0x000C[0xC];
     int field_0x18; // 0x18
@@ -228,7 +264,13 @@ struct KbGame {
     int field_0x2eb8; // 0x2EB8
     char pad_0x2EBC[0x3334 - 0x2ebc];
     int field_0x3334; // 0x3334
-    char pad_0x3338[0xDC];
+    char pad_0x3338[0xC];
+    char field_0x3344[0x3c]; // 0x3344  three 0x3c-byte blocks whose addresses 0x0048fc80 hands to the Bike loader
+    char field_0x3380[0x3c]; // 0x3380
+    char field_0x33bc[0x3c]; // 0x33BC
+    char pad_0x33F8[0x4];
+    KbTrackEntry* field_0x33fc; // 0x33FC
+    char pad_0x3400[0x14];
     float fullNetPacketIntervalSec; // 0x3414
     float shortNetPacketIntervalSec; // 0x3418
     float fullRecordPacketIntervalSec; // 0x341C
@@ -240,6 +282,32 @@ struct KbGame {
 extern KbGame* g_kbGame;
 // 0x004BFA80: millisecond clock (timeGetTime-based; tier 3).
 unsigned int UnknownFunction4bfa80();
+// 0x004B5D00 (cdecl): forward/up axes from roll, pitch and yaw (tier 3 names).
+void UnknownFunction4b5d00(Vec3* forward, Vec3* up, float roll, float pitch, float yaw);
+// 0x00460C70: 1/sqrt estimate (name from samples/physics/helpers/FastMath.bindings.json).
+float FastInvSqrtEstimate(float v);
+// Network smoothing settings 0x00493660 reads; 0x0048fc80 loads them from the game config.
+extern int g_kbLatencyHiding;        // 0x0056CB3C
+extern int g_kbRateLimiting;         // 0x0056CB40
+extern int g_kbAllowWarping;         // 0x0056CB44
+extern int g_kbUseLatencyThreshold;  // 0x0067C3A0
+extern int g_kbUseExtrapLimit;       // 0x0056CB48
+extern float g_kbExtrapLimit;        // 0x0056CB4C
+extern float g_kbLatencyThreshold;   // 0x0056CB50
+extern float g_kbWarpThreshold;      // 0x0056CB54
+extern int g_kbUseTimeReceived;      // 0x0056CB58
+extern int g_kbAllowNegative;        // 0x0056CB5C
+extern int g_kbInterpolate;          // 0x0056CB60
+extern float g_kbStallThreshold;     // 0x0056CB64  interval time below which slot 50 holds
+extern float g_kbStallHoldSec;       // 0x0056CB68  length of that hold
+// Track view behind KbGame+0x560 (tier 3): checkpoint count at +0xac.
+struct KbTrack {
+    char pad_0x00[0xac];
+    int field_0xac;
+    void UnknownFunction404df0(int a, int b, KrustyBike* bike);   // 0x00404DF0
+};
+// BikeWheel view for 0x00513560 (tier 3 name).
+struct KbWheel { void SetRollDistance(float d); };
 
 // Part table at Vehicle+0x1f0 -> +0xb4 (tier 3): count at +0, 0x44-byte records at +4.  A record
 // with flag bit 3 clear owns a collision object at record+8 -> +0x3c.
@@ -302,7 +370,11 @@ struct KbRace {
     KbRaceSub* field_0x48; // 0x48
     char pad_0x004C[0x4];
     KbRacer* field_0x50; // 0x50
-    char pad_0x0054[0x64];
+    char pad_0x0054[0x48];
+    float field_0x9c; // 0x9C   0x0048fc80 copies one of the three into KrustyBike+0x15dc by game type
+    float field_0xa0; // 0xA0
+    float field_0xa4; // 0xA4
+    char pad_0x00A8[0x10];
     int field_0xb8; // 0xB8
     KbScoreBoard* field_0xbc; // 0xBC
     char pad_0x00C0[0x8];
@@ -316,14 +388,21 @@ struct KbRace {
     char pad_0x0148[0x41];
     char field_0x189; // 0x189
     char field_0x18a; // 0x18A
-    char pad_0x018B[0x3];
+    char pad_0x018B[0x1];
+    char field_0x18c; // 0x18C  0x0048fc80: scene-node flag passed as 0 when set, 1 otherwise
+    char pad_0x018D[0x1];
     char field_0x18e; // 0x18E
     char pad_0x018F[0xD];
     KbSensor* field_0x19c; // 0x19C
-    char pad_0x01A0[0x1dc - 0x1a0];
+    char pad_0x01A0[0x1b8 - 0x1a0];
+    float field_0x1b8; // 0x1B8  race clock in seconds (0x00493660 replays against it)
+    char pad_0x01BC[0x1dc - 0x1bc];
     int field_0x1dc; // 0x1DC  GameObject slot 10 runs the base update when both are 4
     int field_0x1e0; // 0x1E0
-    char pad_0x01E4[0x3fa - 0x1e4];
+    int field_0x1e4; // 0x1E4  -2 while the race has not started (0x00493660)
+    char pad_0x01E8[0x3f8 - 0x1e8];
+    char field_0x3f8; // 0x3F8  0x00493660: skips the wheel roll and the +0x478 flag
+    char pad_0x03F9[0x1];
     char field_0x3fa; // 0x3FA  GameObject slot 10 calls 0x00492ad0 when set
     char field_0x3fb; // 0x3FB  0x00492670 records message 10 when set
 };
@@ -350,10 +429,16 @@ struct KbSink {
 
 // Matrix-like helper at +0x3bc (D3DIMSoultreeCharacter::d3d_field_0x1a0); 0x004FD710
 // transforms a vector.
+struct KbMorphMod;
 struct KbXform {
     void Fn_00444D80(KbObj128* who);   // 0x00444D80 (tier 3: attach/detach with a scene object)
     void Fn_00444DE0(KbObj128* who);   // 0x00444DE0 (D3DIMSoultreeObject; GameObject slot 10)
     Vec3 WorldToLocalDirection(const Vec3* v);
+    // D3DIMSoultreeObject setters (names from src/reconstructed/D3DIMSoulTree.h): 0x0048fc80 calls
+    // the first two with 0 or 1 on the bike and rider nodes and the third with the rider morph.
+    void UnknownFunction444d00(int value);         // 0x00444D00
+    void UnknownFunction444d40(int value);         // 0x00444D40
+    void UnknownFunction444eb0(KbMorphMod* mod);   // 0x00444EB0
 };
 // Element of the array at Bike+0x12c (count at +0x130).
 struct KbChild {
@@ -366,6 +451,8 @@ struct KbChild {
 struct KbCollider {
     void AddIgnoredOwner(void* owner);      // 0x00439410
     void RemoveIgnoredOwner(void* owner);   // 0x00439490
+    void SetIgnoreListMode(int mode);       // 0x00439400
+    void SetUseBroadphase(int enable);      // 0x00432120
 };
 struct KbObj128 {
     char pad_0[0xc];
@@ -411,12 +498,14 @@ struct KbA5C4 {
     KbAnim* FindMotion(const char* name, int a);
     void SetMotion(int a);
     void Fn_004A8BF0(int a, float b);   // 0x004A8BF0 (ret 8): same as D3DIMSoultreeCharacter::Method_0x004a8bf0
+    void ApplyRestPose();               // 0x004A8B00 (Character::ApplyRestPose)
 };
 struct KbA604 {
     void Fn_005305B0(KbAnim* a);
     void Fn_005305F0(KbAnim* a);
     void Fn_00530630(KbAnim* a);
     void Fn_00530680(BikeWheel* w);
+    void Fn_00530680(KbObj128* body);   // same 0x00530680 with one of the two collision bodies
     void Fn_005328B0(SoultreeObject* node, Vec3 a, Vec3 b);
 };
 
@@ -434,6 +523,48 @@ struct KbPlayer {
 };
 // Bounds/collision body at Vehicle::field_0x128 (canonical: CollisionObject::TestMeshBounds).
 struct KbBody { int TestMeshBounds(KbBody* other); };
+
+// ---- loader (0x0048fc80) support ----
+// 0x5c-byte setup record the loader copies and forwards field by field (tier 2 layout, tier 3
+// names): +0 -> KrustyBike+0x738, +4 -> +0x737, +8 is converted to float, +0x24 is passed by
+// address, the rest by value.
+struct KbBikeSetup {
+    int field_0x0;
+    char field_0x4;
+    char pad_0x05[0x3];
+    int field_0x8;
+    // Floats: the loader's `setup ? setup->f : 0` arguments zero their temporaries with
+    // immediates (not the zero register) and VC6 threads their branches as one group.
+    float field_0xc;
+    float field_0x10;
+    float field_0x14;
+    float field_0x18;
+    float field_0x1c;
+    float field_0x20;
+    char field_0x24[0x2c];
+    int field_0x50;
+    int field_0x54;
+    int field_0x58;
+};
+// 0x48-byte object built with 0x0047bb20 (src/reconstructed GhostMod1) for a ghost bike.
+struct KbGhostMod { char pad_0x00[0x48]; KbGhostMod(int flags); };
+// 0x58-byte rider morph (src/reconstructed MorphBastardModifier: ctor 0x004a3150, loader 0x004a33b0).
+struct KbMorphMod {
+    char pad_0x00[0x58];
+    KbMorphMod(int flags);
+    KbMorphMod* UnknownFunction4a33b0(void* a, const char* path, SoultreeObject* node);
+};
+// Bike's own loader 0x004079c0 (`ret 0xa0`, 40 argument dwords; not a vtable entry).  It is a
+// Bike member in truth; vehicle/Bike.h is canonical, so it is reached through this view.
+struct KbBikeLoader {
+    GameObject* Fn_004079C0(int a1, int a2, const char* name, const SoultreeLoadDesc* desc, int a5, int a6,
+                            Vec3 a7, Vec3 a8, Vec3 a9, int a10, VehicleInputMap* map, int a12, int a13,
+                            int noSetup, void* setupName, int s50, int s54, int s58, float s0c, float s10,
+                            float s14, float s18, float s1c, float s20, int a25, int a26, int a27, int localFlag,
+                            void* t0, void* t1, void* t2, int a32, float setupFloat, int a34);
+};
+// 0x004a2fc0 (cdecl): zeroed debug-heap allocation of count x size bytes tagged with the source line.
+void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);
 
 // Non-virtual callees of slot 11 (cdecl; call targets are relocation-masked).  Tier 3 names.
 // 0x004B0AC0: probe at a position with three radii and a scale; returns a byte flag.

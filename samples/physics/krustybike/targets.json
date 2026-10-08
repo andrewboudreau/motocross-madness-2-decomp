@@ -739,7 +739,7 @@
     "target_va": "0x00492ad0",
     "target_size": 2315,
     "expect": "partial",
-    "notes": "message 13 encoder; frame 0x30 vs 0x34 (diff/int-temp packing) and record-timeout tail not cross-jumped",
+    "notes": "message 13 encoder; 2312/2315 bytes, frame 0x34 exact; only the record-interval branch differs (retail: jne deltas; jmp to the end block, network branch push 0; jmp into it; candidate: je end block; jmp deltas, network branch conditional jump) plus the register choice it drags along",
     "bindings": "KrustyBike.bindings.json"
   },
   {
@@ -761,5 +761,43 @@
     "expect": "exact",
     "notes": "message 1 builder; +0x11c0/+0x74c/+0x750/+0x770 store order",
     "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00493660@KrustyBike",
+    "target_va": "0x00493660",
+    "target_size": 8545,
+    "expect": "partial",
+    "notes": "remote-bike network update; 23.5% bytes, aligned instruction ratio 0.88 with the retail frame 0x58 and slots; remaining: 1-in-ebp/0-in-edi allocation from the second SetAxesPtr call on, limitSq store before the AllowWarping test, velocity y/z fmul operand order, pose lerp c-b recompute, and the 100.0f pool (retail 0x5505ec, bound 0x551420 for 0x492670)",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "??0KrustyBike@@QAE@H@Z",
+    "target_va": "0x0048fa60",
+    "target_size": 532,
+    "expect": "partial",
+    "notes": "constructor, 86.36% (532/532). Sole divergence 0xb7..0xfa: VC6 hoists the +0x7c0/+0x7bc stores into the +0x1540 kVec3Zero copy, retail +0x11b8/+0x604. The pick is positional from the block end in statement units (retail needs eight fewer after the copy); see the source comment."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Load@KrustyBike",
+    "target_va": "0x0048fc80",
+    "target_size": 5384,
+    "expect": "exact",
+    "notes": "bike loader (SEH frame, five new(__FILE__, line) sites). target_size 5384 = extent_with_tables (5366 code + 2 pad + 4-entry jump table at 0x00491178). Exact needed: float-typed KbBikeSetup fields give the retail jump-threaded ternary chains, function-scope Vec3 points[2] plus memset keeps the 0xbc frame, the dead field_0x2d74 cmp is an if/else with identical arms, and 0.001f is the TU-local constant at 0x005541e8",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00495FF0@KrustyBike",
+    "target_va": "0x00495ff0",
+    "target_size": 895,
+    "expect": "partial",
+    "notes": "trick end / bonus, 99.17% (895/895). Stack slots match once the float bonus is a CSE temp, not a local. Only mov al,[+0x153f] vs fsubr order after the fmod call differs (retail loads the flag first)."
   }
 ]
