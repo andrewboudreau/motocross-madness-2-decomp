@@ -296,11 +296,11 @@
   {
     "class": "Character",
     "source": "Motnctrl.cpp",
-    "candidate_symbol_contains": "?AdvanceMotion@Character@@QAEHMHH@Z",
-    "target_va": "0x004a6bb0",
-    "target_size": 1293,
+    "candidate_symbol_contains": "?CharacterVirtualSlot7@Character@@UAEHMHH@Z",
+    "target_va": "0x004a70c0",
+    "target_size": 3327,
     "expect": "partial",
-    "notes": "ret 0xc; per-frame advance and blend. 1295 vs 1293 bytes, identical through the weight clamp (+0x127): retail keeps the smoothstep input on the FPU stack (fld st0 / fmul st1 x2) where every float spelling reloads it and a double parameter also keeps it across the clamp; the 2-byte shift moves the rest"
+    "notes": "ret 0xc; slot 7, playback of a non-looping motion with interpolation/extrapolation and blending. 3330 vs 3327 bytes with the same call sequence (AdvanceClamped x2, the operator COMDATs, PoseRotation/RotatePose x2, InterpolatePose x3, BlendToMotion) and the retail smoothstep/clamp shape, but VC6 calls CharacterPose::CharacterPose (0x4a8930) three times then twice where retail calls it twice then four times, inlines the extrapolation operators retail calls (retail only inlines operator- there and calls Vec3::Vec3), and allocates the frame differently (0x284 vs 0x2dc); every byte after the first expansion shifts; 4.79% relocation-masked"
   },
   {
     "class": "D3DIMSoultreeCharacter",

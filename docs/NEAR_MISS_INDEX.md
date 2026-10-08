@@ -188,7 +188,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/motion/D3DIMSoultreeMotnctrl | `0x00445fc0` | 330/331 | b | 1 code diffs: `mov ebp, [ecx + eax + 0x74]` vs `mov ebp, [eax + ecx + 0x74]`; slots differ |
 | physics/motion/D3DIMSoultreeMotnctrl | `0x00446210` | 232/235 | c | 3 code diffs: `mov eax, [eax + 0x3c]` vs `mov ecx, [eax + 0x3c]`; `test eax, eax` vs `test ecx, ecx` |
 | physics/motion/Motnctrl | `0x004a5e40` | 375/780 (masked) | b | 24 code diffs: `push edi` vs `push esi`; `xor ebx, ebx ; cmp eax, ebx ; mov [esp ~` vs `xor ebp, ebp ; cmp eax, ebp ; mov [esp ~`; slots differ |
-| physics/motion/Motnctrl | `0x004a6bb0` | 342/1177 (masked) | b | 17 code diffs: retail adds `fld st(0)`; slots differ |
+| physics/motion/Motnctrl | `0x004a70c0` | 159/3327 (masked) | b | 733 code diffs: retail calls `CharacterPose::CharacterPose` 2 then 4 times where the candidate calls it 3 then 2; retail calls `operator*`/`operator+` in the first extrapolation loop; frame 0x2dc vs 0x284; slots differ |
 | physics/motion/Motnctrl | `0x004a7dc0` | 456/503 (masked) | b | 4 code diffs: `fld [esi + 0x20]` vs `mov [esp + N], ecx`; retail lacks `mov [esp + N], ecx`; slots differ |
 | physics/motion/Motnctrl | `0x004a7fd0` | 562/1009 (masked) | c | 37 code diffs: `fld [esi + 8] ; fmul [edi + 4] ; fld [e~` vs `fld [edi + 4] ; fmul [esi + 8] ; fld [e~`; retail adds `fsubp st(1)` |
 | physics/motion/Motnctrl | `0x004a8470` | 212/1093 (masked) | c | 43 code diffs: retail adds `push ebp`; retail lacks `push ebp` |

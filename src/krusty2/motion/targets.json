@@ -582,6 +582,16 @@
   {
     "class": "Motnctrl",
     "source": "Motnctrl.cpp",
+    "candidate_symbol_contains": "?AdvanceMotion@Character@@QAEHMHH@Z",
+    "target_va": "0x004a6bb0",
+    "target_size": 1293,
+    "expect": "exact",
+    "notes": "Motnctrl.cpp; ret 0xc, per-frame advance and blend; the smoothstep copy through a folded double expression keeps retail's FPU shape (was a near miss in the sample)",
+    "bindings": "Motnctrl.bindings.json"
+  },
+  {
+    "class": "Motnctrl",
+    "source": "Motnctrl.cpp",
     "candidate_symbol_contains": "?ApplyPoseListSlot4@Character@@",
     "target_va": "0x004a8a80",
     "target_size": 59,

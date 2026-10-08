@@ -1,7 +1,7 @@
 // Near misses of D:\aardvark\VC\krusty2\Motnctrl.cpp (0x004a5630..0x004a9a9f).  The strict exact
 // functions of the unit and its types live in src/krusty2/motion/Motnctrl.cpp / Motnctrl.h; this file
 // keeps only the reconstructions that do not match yet (scores in targets.json): the text .VUE
-// loader and the slot 7 pose helpers.
+// loader, the slot 7 pose helpers and slot 7 itself.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -212,90 +212,195 @@ void InterpolatePose(CharacterPose* a, CharacterPose* b, CharacterPose* out, flo
     unused = a->position * s + b->position * t;
 }
 
-// The cubic ease 3x^2 - 2x^3 of the blend weight.  Retail (0x004a6cd3, and slot 7 at 0x004a7711)
-// loads the weight once and keeps it on the FPU stack (fld st0; fadd st0,st0; fsubr 3.0f;
-// fmul st1; fmul st1); every float spelling tried reloads it from memory instead, and a double
-// parameter keeps the weight on the stack through the preceding clamp too (retail reloads there).
+// The cubic ease of the blend weight, as in src/krusty2/motion/Motnctrl.cpp (AdvanceMotion): the
+// float copy through a folded double expression reproduces retail's FPU shape (slot 7 at
+// 0x004a7711: fld w; fld st0; fadd st0,st0; fsubr 3.0f; fmul st1; fmul st1; fstp; fstp st0) while
+// the clamp before it keeps reloading the weight from memory.
 inline float SmoothStep(float x)
 {
-    return (3.0f - (x + x)) * x * x;
+    float t = (float)(x * 1.0);
+    return (3.0f - (t + t)) * t * t;
 }
 
-// The inlined form of InterpolatePose above as AdvanceMotion expands it: VC6 inlines the operators
-// of the first term and calls the out-of-line copies (0x421d00, 0x5015b0, 0x421cb0, 0x515600) for
-// the rest, which the call views reproduce.  The three weighted sums at the end are never used.
-inline void BlendPose(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
+// Slot 7's expansion of the pose blend (the same inline that AdvanceMotion, strict exact in
+// src/krusty2/motion/Motnctrl.cpp, expands with the first term's operators inlined).  In slot 7
+// retail calls the out-of-line copies of every operator (0x421d00, 0x5015b0, 0x421cb0, 0x515600),
+// which the plain operators reproduce once the inline budget runs out, and also calls
+// CharacterPose's generated default constructor (0x004a8930, `mov eax,ecx`) for pose temporaries
+// that are never used otherwise: two in the first expansion and four in the second.  With four
+// unused poses VC6 calls it three times and twice; six or two unused poses move both counts
+// together (five/four, one/zero), so the retail split is not a count of locals.
+inline void BlendPose7(CharacterPose* a, CharacterPose* b, CharacterPose* out, float t)
 {
     ClampFloat(0.0f, 1.0f, &t);
     float s = 1.0f - t;
     out->nodeIndex = a->nodeIndex;
     out->hasPose = a->hasPose;
+    CharacterPose unused1, unused2, unused3, unused4;
     out->axisZ = Vec3Normalize(a->axisZ + (b->axisZ - a->axisZ) * t);
-    Vec3 deltaY, scaledY, sumY;
-    out->axisY = Vec3Normalize(*Vec3AddCall(&sumY, &a->axisY,
-                                            Vec3ScaleCall(&scaledY, Vec3SubtractCall(&deltaY, &b->axisY, &a->axisY), t)));
-    Vec3 deltaP, scaledP, sumP;
-    out->position = *Vec3AddCall(&sumP, &a->position,
-                                 Vec3ScaleCall(&scaledP, Vec3SubtractCall(&deltaP, &b->position, &a->position), t));
-    Vec3 axisX = CrossProductCall(out->axisZ, out->axisY);
-    out->axisY = CrossProductCall(axisX, out->axisZ);
-    Vec3 weightedZA, weightedZB, blendedZ;
-    Vec3AddCall(&blendedZ, Vec3ScaleCall(&weightedZA, &a->axisZ, s), Vec3ScaleCall(&weightedZB, &b->axisZ, t));
-    Vec3 weightedYA, weightedYB, blendedY;
-    Vec3AddCall(&blendedY, Vec3ScaleCall(&weightedYA, &a->axisY, s), Vec3ScaleCall(&weightedYB, &b->axisY, t));
-    Vec3 weightedPA, weightedPB, blendedPosition;
-    Vec3AddCall(&blendedPosition, Vec3ScaleCall(&weightedPA, &a->position, s), Vec3ScaleCall(&weightedPB, &b->position, t));
+    out->axisY = Vec3Normalize(a->axisY + (b->axisY - a->axisY) * t);
+    out->position = a->position + (b->position - a->position) * t;
+    Vec3 axisX = CrossProduct(out->axisZ, out->axisY);
+    out->axisY = CrossProduct(axisX, out->axisZ);
+    Vec3 unused;
+    unused = a->axisZ * s + b->axisZ * t;
+    unused = a->axisY * s + b->axisY * t;
+    unused = a->position * s + b->position * t;
 }
 
-// 0x004a56d0, strict exact in src/krusty2/motion/Motnctrl.cpp: advances *cursor by *time within the
-// looping motion and returns 0 when the motion ran out.
-int AdvanceLooping(Motion* motion, MotionPoseList** cursor, float* time);
+// 0x004a5750, strict exact in src/krusty2/motion/Motnctrl.cpp: non-looping advance returning the two
+// frames to blend and the blend weight.
+int AdvanceClamped(Motion* motion, MotionPoseList** cursor, MotionPoseList** from, MotionPoseList** to,
+                   float* time, float* weight);
 
 // owner: bracket only (Character method contiguous with its Motnctrl.cpp methods)
-// 0x004a6bb0 (ret 0xc; callers 0x49945f, 0x499627, 0x4997b1, 0x4ead18, 0x4eae78, 0x4eb108):
-// per-frame playback.  Advances the current motion by dt (a finished non-looping motion sets
-// chr_field_0x0c and returns 0), then applies every pose of the current frame through slot 4
-// (mirror == 0) or slot 5.  While a blend is active each pose is interpolated from the frame
-// applied last with a smoothstep weight over blendDuration.  Returns the frame number.
-// 1295 vs 1293 bytes: identical up to the ease (see SmoothStep), which shifts the rest.
-int Character::AdvanceMotion(float dt, int mirror, int mask)
+// 0x004a70c0 (ret 0xc; Character slot 7, inherited by D3DIMSoultreeCharacter): per-frame playback of
+// a non-looping motion with sub-frame interpolation.  The current motion is advanced by AdvanceClamped;
+// every pose is interpolated between the two frames around the cursor (or, past the last frame,
+// extrapolated by the rotation and translation of the last frame pair) and applied through slot 4
+// (mirror == 0) or slot 5.  While a blend is active the blend-from motion is advanced the same way and
+// the two poses are interpolated with a smoothstep weight over blendDuration; nodes flagged in the
+// name table keep the blend-from pose.  Past the last frame a looping motion is restarted through
+// BlendToMotion, a non-looping one sets chr_field_0x0c.  Returns the frame number, or 0.
+// Near miss, 3330 vs 3327 bytes: the call sequence and the clamp/ease shape are retail's, but the
+// inline budget is spent differently (see BlendPose7; in the first extrapolation loop retail inlines
+// only operator- for the frame delta, calling Vec3::Vec3 0x404e60 for its result, and calls the
+// operator* / operator+ COMDATs that VC6 inlines here) and the frame is 0x284 instead of 0x2dc.
+int Character::CharacterVirtualSlot7(float time, int mirror, int mask)
 {
+    MotionPoseList* from;
+    MotionPoseList* to;
+    float weight;
+    int finished;
+    int ok;
+
     if (chr_field_0x0c)
         return 0;
-    chr_field_0x10 += dt;
-    if (!AdvanceLooping(currentMotion, &currentFrame, &chr_field_0x10) && currentMotion->looping == 0) {
-        chr_field_0x10 = 0.0f;
-        chr_field_0x0c = 1;
-        return 0;
+    chr_field_0x10 += time;
+    finished = 0;
+    if (AdvanceClamped(currentMotion, &currentFrame, &from, &to, &chr_field_0x10, &weight)) {
+        ok = 1;
+    } else {
+        ok = 0;
+        finished = 1;
     }
     if (blendActive == 0) {
         lastFrame = currentFrame;
         lastFrameTime = chr_field_0x10;
-        for (int i = 0; i < currentFrame->count; i++) {
-            if (mirror == 0)
-                CharacterVirtualSlot4((int)&currentFrame->poses[i], mask);
-            else
-                CharacterVirtualSlot5((int)&currentFrame->poses[i], mask);
+        if (ok) {
+            for (int i = 0; i < from->count; i++) {
+                CharacterPose pose;
+                BlendPose7(&from->poses[i], &to->poses[i], &pose, weight);
+                if (mirror == 0)
+                    CharacterVirtualSlot4((int)&pose, mask);
+                else
+                    CharacterVirtualSlot5((int)&pose, mask);
+            }
+        } else {
+            for (int i = 0; i < from->count; i++) {
+                CharacterPose* a = &from->poses[i];
+                int flag = nodeNames[a->nodeIndex].field_0x38;
+                float t = chr_field_0x10;
+                int fps = currentMotion->fps;
+                CharacterPose* b = &to->poses[i];
+                Vec3 axis;
+                float angle;
+                CharacterPose out;
+                PoseRotation(a, b, &axis, &angle);
+                float ffps = (float)fps;
+                out.hasPose = a->hasPose;
+                angle = ffps * angle * t;
+                out.nodeIndex = a->nodeIndex;
+                if (angle != 0.0f) {
+                    RotatePose(b, &out, axis, angle);
+                } else {
+                    out.axisZ = b->axisZ;
+                    out.axisY = b->axisY;
+                }
+                if (flag) {
+                    Vec3 delta = b->position - a->position;
+                    out.position = b->position + delta * ffps * t;
+                } else {
+                    out.position = b->position;
+                }
+                if (mirror == 0)
+                    CharacterVirtualSlot4((int)&out, mask);
+                else
+                    CharacterVirtualSlot5((int)&out, mask);
+            }
         }
     } else {
-        blendFromTime += dt;
-        float w = blendFromTime / blendDuration;
-        if (w < 0.0f)
+        MotionPoseList* from2;
+        MotionPoseList* to2;
+        float weight2;
+
+        blendFromTime += time;
+        lastFrameTime += time;
+        float r = blendFromTime / blendDuration;
+        float w;
+        if (r < 0.0f)
             w = 0.0f;
-        else if (w >= 1.0f)
+        else if (r >= 1.0f)
             w = 1.0f;
         else
-            w = SmoothStep(w);
-        for (int j = 0; j < currentFrame->count; j++) {
-            CharacterPose pose;
-            BlendPose(&lastFrame->poses[j], &currentFrame->poses[j], &pose, w);
-            if (mirror == 0)
-                CharacterVirtualSlot4((int)&pose, mask);
+            w = SmoothStep(r);
+        int ok2 = AdvanceClamped(blendFromMotion, &lastFrame, &from2, &to2, &lastFrameTime, &weight2) != 0;
+        for (int j = 0; j < from->count; j++) {
+            CharacterPose pose2;
+            CharacterPose out;
+            CharacterPose result;
+            BlendPose7(&from->poses[j], &to->poses[j], &out, weight);
+            if (ok2) {
+                InterpolatePose(&from2->poses[j], &to2->poses[j], &pose2, weight2);
+            } else {
+                CharacterPose* a = &from2->poses[j];
+                int flag = nodeNames[a->nodeIndex].field_0x38;
+                float t = lastFrameTime;
+                int fps = blendFromMotion->fps;
+                CharacterPose* b = &to2->poses[j];
+                Vec3 axis;
+                float angle;
+                PoseRotation(a, b, &axis, &angle);
+                float ffps = (float)fps;
+                pose2.hasPose = a->hasPose;
+                angle = angle * t * ffps;
+                pose2.nodeIndex = a->nodeIndex;
+                if (angle != 0.0f) {
+                    RotatePose(b, &pose2, axis, angle);
+                } else {
+                    pose2.axisZ = b->axisZ;
+                    pose2.axisY = b->axisY;
+                }
+                if (flag) {
+                    pose2.position = b->position + (b->position - a->position) * ffps * t;
+                } else {
+                    pose2.position = b->position;
+                }
+            }
+            InterpolatePose(&pose2, &out, &result, w);
+            if (nodeNames[pose2.nodeIndex].field_0x38)
+                result = pose2;
             else
-                CharacterVirtualSlot5((int)&pose, mask);
+                InterpolatePose(&pose2, &out, &result, w);
+            if (mirror == 0)
+                CharacterVirtualSlot4((int)&result, mask);
+            else
+                CharacterVirtualSlot5((int)&result, mask);
         }
-        if (blendFromTime >= blendDuration)
+        if (blendFromTime >= blendDuration) {
             blendActive = 0;
+            lastFrameTime = 0.0f;
+        }
+    }
+    if (finished) {
+        if (currentMotion->looping) {
+            BlendToMotion(currentMotion);
+            return 0;
+        }
+        chr_field_0x0c = 1;
+        chr_field_0x10 = 0.0f;
+        lastFrameTime = 0.0f;
+        return 0;
     }
     return currentFrame->field_0x00;
 }
