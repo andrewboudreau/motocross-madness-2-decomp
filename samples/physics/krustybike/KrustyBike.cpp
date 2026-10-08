@@ -4,9 +4,11 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "KrustyBike.h"
 #include "math/FastMath.h"
 #include "collision/CollisionObject.h"
+#include "core/MemTag.h"
 
 // KbFloat: identity inline standing in for the original inline float getters (tier 3).
 // Passing a member straight to a float parameter makes VC6 push the raw dword; retail
@@ -2535,4 +2537,410 @@ void KrustyBike::Fn_00493660(float dt, int a)
     prevVelocity = velocity;
     position = savedPos;
     lastStepTime = g_kbGame->field_0x2f0;
+}
+
+// 0x005541e8: a TU-local constant (it sits in KrustyBike.cpp's .rdata between 1/3600 and the
+// first vtable pointers, not in the shared `__real@4@` pool at 0x005507d4 that the remote
+// update uses for its own 0.001f).  Only the loader's three millisecond settings read it.
+static const float kbSecondsPerMillisecond = 0.001f;
+
+// 0x0048fc80 (5366 bytes of code + 2 pad + the 4-entry jump table at 0x00491178 = 5384, ret
+// 0x7c; exact): the bike loader.  Not a vtable entry (KrustyBike's and Bike's slot 40 both
+// hold 0x00503de0); Bike's own loader 0x004079c0 (ret 0xa0) is called directly with `this`,
+// like Vehicle::LoadVehicle.  Five `new(__FILE__, line)` sites give the function its SEH
+// frame (states 0..4; handler 0x0054bd32).  Literal names: the sixteen trick motions with and
+// without the `b` prefix, their `Alt` variants, BikeAndRider.col, Bike.col, RiderMorph.mbf,
+// the eleven network setting names and the Collision memory tag.
+//
+// Shapes the match depends on:
+//  * the `setup ? setup->x : 0` call arguments are jump-threaded in groups by type: the six
+//    float fields zero their temps with immediate stores and form their own chain (ending in
+//    a `jmp +0`), the int ones share the zero register; so KbBikeSetup 0xc..0x20 are floats;
+//  * `Vec3 points[2]` lives at function scope next to `localFlag` (frame slot 0x40, frame
+//    0xbc) and is cleared with two memsets: block scope moved it to 0x14, named locals or
+//    brace-init produced immediates or temporary copies;
+//  * the dead `cmp g->field_0x2d74, 0` survives as an if/else with identical 100.0f arms
+//    (tail-merged), which also restores the register rotation of the whole tail;
+//  * a local `BikeA640* axis` keeps the steer axis in one register for its three stores and
+//    0.42210004f is needed for retail's 0x3ed81d7f (0.4221f rounds to 0x3ed81d7e);
+//  * 0.001f comes from the TU-local kbSecondsPerMillisecond, not the shared pool.
+GameObject* KrustyBike::Load(int a1, int a2, const char* name, const SoultreeLoadDesc* desc, int a5, int a6,
+                             Vec3 a7, Vec3 a8, Vec3 a9, int a10, VehicleInputMap* map, unsigned char kind,
+                             unsigned char a13, KbRace* race, int a15, int a16, int netId,
+                             const KbBikeSetup* setup, int a19, int a20, int a21, int a22,
+                             KbRecorder* recorder, void* a24, int withRider)
+{
+    field_0x7c4 = 1.1f;
+    field_0x7c8 = 1.3f;
+    field_0x7cc = 1.5f;
+    field_0x7d0 = 25.0f;
+    field_0x7d4 = 15.0f;
+    field_0x7d8 = 5.0f;
+    field_0x7dc = 0;
+    inputMap = map;
+    field_0x11bc = netId;
+    if (kind == 0xff) {
+        field_0x736 = 1;
+        field_0x734 = 0;
+    } else {
+        field_0x734 = kind;
+    }
+    field_0x11c0 = kind;
+    field_0x735 = a13;
+    memset(&netState, 0, sizeof(netState));
+    netState.timer = g_kbGame->fullNetPacketIntervalSec;
+    field_0x15d0 = g_kbGame->shortNetPacketIntervalSec;
+    field_0x740 = race;
+    netRecorder = recorder;
+    field_0x15d8 = a24;
+    memset(&recordState, 0, sizeof(recordState));
+    recordState.timer = 1.7014117e38f;
+
+    int localFlag;
+    Vec3 points[2];
+    if (!field_0x734 && !field_0x735 && !field_0x736) {
+        int type = g_kbGame->field_0x33fc[g_kbGame->field_0x33fc->field_0x0].field_0x28;
+        if (type == -6 || type == -7 || type == -12 || type == -13)
+            localFlag = 1;
+        else
+            localFlag = 0;
+    } else {
+        localFlag = 0;
+    }
+
+    float setupFloat;
+    field_0x738 = 250;
+    setupFloat = 0.0f;
+    field_0x737 = 0;
+    if (setup) {
+        KbBikeSetup copy = *setup;
+        setupFloat = (float)copy.field_0x8;
+        field_0x738 = copy.field_0x0;
+        field_0x737 = copy.field_0x4;
+    }
+    if (field_0x736) {
+        field_0x15e8 = (KbObj128*)new(__FILE__, 0x690) KbGhostMod(1);
+        GameObject::Method_0x00469190(field_0x15e8, -1);
+    }
+    field_0x744 = 0;
+    ((KbBikeLoader*)this)->Fn_004079C0(a1, a2, name, desc, a5, a6, a7, a8, a9, a10, map, a15, a16,
+                                       setup == 0,
+                                       setup ? (void*)setup->field_0x24 : 0,
+                                       setup ? setup->field_0x50 : 0,
+                                       setup ? setup->field_0x54 : 0,
+                                       setup ? setup->field_0x58 : 0,
+                                       setup ? setup->field_0xc : 0,
+                                       setup ? setup->field_0x10 : 0,
+                                       setup ? setup->field_0x14 : 0,
+                                       setup ? setup->field_0x18 : 0,
+                                       setup ? setup->field_0x1c : 0,
+                                       setup ? setup->field_0x20 : 0,
+                                       a19, a20, a21, localFlag,
+                                       g_kbGame->field_0x3344, g_kbGame->field_0x3380, g_kbGame->field_0x33bc,
+                                       a22, setupFloat, 0);
+    if (field_0x735) {
+        BikeA640* axis = steerAxis;
+        axis->steerValue = 0.5f;
+        axis->l_0x4 = 0.42210004f;
+        axis->l_0x8 = 1.0f;
+    }
+    if (field_0x734 || field_0x736) {
+        field_0x5bc = 0;
+        field_0x5c0 = 0;
+    }
+    field_0x7a8 = 3.5f;
+    field_0x1520 = 0;
+    field_0x1524 = 0;
+    field_0x1528 = 0;
+    field_0x1550 = 0;
+    field_0x1554 = 0;
+    crashTimer = 0;
+    states[0] = &stateBuffers[0];
+    states[1] = &stateBuffers[1];
+    states[2] = &stateBuffers[2];
+    states[3] = &stateBuffers[3];
+    memset(states[0], 0, sizeof(KbBikeNetState));
+    memset(states[1], 0, sizeof(KbBikeNetState));
+    memset(states[2], 0, sizeof(KbBikeNetState));
+    memset(states[3], 0, sizeof(KbBikeNetState));
+    stateBuffers[0].timeReceived = 0;
+    stateBuffers[1].timeReceived = 0;
+    stateBuffers[2].timeReceived = 0;
+    stateBuffers[3].timeReceived = 0;
+    field_0x15fc = states[1];
+    field_0x1600 = states[2];
+    UnknownVirtualSlot43();
+
+    if (g_kbGame->field_0x2d74 != 0 && g_kbGame->field_0x2d74 != 5 && g_kbGame->field_0x2d74 != 1) {
+        heapBufferA = DebugCalloc(100, 4, __FILE__, 0x6fa);
+        if (!heapBufferA)
+            return 0;
+    } else {
+        heapBufferA = 0;
+    }
+    if (g_kbGame->field_0x2d74 == 1 || g_kbGame->field_0x2d74 == 5) {
+        heapBufferB = DebugCalloc(600, 4, __FILE__, 0x702);
+        if (!heapBufferB)
+            return 0;
+    } else {
+        heapBufferB = 0;
+    }
+
+    UnknownVirtualSlot34();
+    OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
+                                 &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+    savedForward = bodyForward;
+    savedUp = bodyUp;
+    savedYaw = bodyYaw;
+    savedPitch = bodyPitch;
+    savedRoll = bodyRoll;
+    savedSinRoll = bodySinRoll;
+    savedCosRoll = bodyCosRoll;
+    savedCosPitch = bodyCosPitch;
+    savedSinPitch = bodySinPitch;
+    field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
+
+    animSetB[0] = (int)FindMotion("bBarKneel", 1);
+    animSetB[1] = (int)FindMotion("bSplitX", 1);
+    animSetB[2] = (int)FindMotion("bBKahuna", 1);
+    animSetB[3] = (int)FindMotion("bCordova", 1);
+    animSetB[4] = (int)FindMotion("bHeelClicker", 1);
+    animSetB[5] = (int)FindMotion("bNacNac", 1);
+    animSetB[6] = (int)FindMotion("bSuperMan", 1);
+    animSetB[7] = (int)FindMotion("bAirWalk", 1);
+    animSetB[8] = (int)FindMotion("bBarHop", 1);
+    animSetB[9] = (int)FindMotion("bSeatGrab", 1);
+    animSetB[10] = (int)FindMotion("bSaranWrap", 1);
+    animSetB[11] = (int)FindMotion("bCliffHanger", 1);
+    animSetB[12] = (int)FindMotion("bHeartAttack", 1);
+    animSetB[13] = (int)FindMotion("bTailGrab", 1);
+    animSetB[14] = (int)FindMotion("bLazyBoy", 1);
+    animSetB[15] = (int)FindMotion("bDCanCan", 1);
+    animSetD[0] = (int)FindMotion("bBarKneelAlt", 1);
+    animSetD[1] = 0;
+    animSetD[2] = 0;
+    animSetD[3] = 0;
+    animSetD[4] = (int)FindMotion("bHeelClickerAlt", 1);
+    animSetD[5] = (int)FindMotion("bNacNacAlt", 1);
+    animSetD[6] = (int)FindMotion("bSuperManAlt", 1);
+    animSetD[7] = 0;
+    animSetD[8] = 0;
+    animSetD[9] = 0;
+    animSetD[10] = (int)FindMotion("bSaranWrapAlt", 1);
+    animSetD[11] = 0;
+    animSetD[12] = 0;
+    animSetD[13] = 0;
+    animSetD[14] = 0;
+    animSetD[15] = (int)FindMotion("bDCanCanAlt", 1);
+    animSetA[0] = (int)((KbA5C4*)riderCharacter)->FindMotion("BarKneel", 1);
+    animSetA[1] = (int)((KbA5C4*)riderCharacter)->FindMotion("SplitX", 1);
+    animSetA[2] = (int)((KbA5C4*)riderCharacter)->FindMotion("BKahuna", 1);
+    animSetA[3] = (int)((KbA5C4*)riderCharacter)->FindMotion("Cordova", 1);
+    animSetA[4] = (int)((KbA5C4*)riderCharacter)->FindMotion("HeelClicker", 1);
+    animSetA[5] = (int)((KbA5C4*)riderCharacter)->FindMotion("NacNac", 1);
+    animSetA[6] = (int)((KbA5C4*)riderCharacter)->FindMotion("SuperMan", 1);
+    animSetA[7] = (int)((KbA5C4*)riderCharacter)->FindMotion("AirWalk", 1);
+    animSetA[8] = (int)((KbA5C4*)riderCharacter)->FindMotion("BarHop", 1);
+    animSetA[9] = (int)((KbA5C4*)riderCharacter)->FindMotion("SeatGrab", 1);
+    animSetA[10] = (int)((KbA5C4*)riderCharacter)->FindMotion("SaranWrap", 1);
+    animSetA[11] = (int)((KbA5C4*)riderCharacter)->FindMotion("CliffHanger", 1);
+    animSetA[12] = (int)((KbA5C4*)riderCharacter)->FindMotion("HeartAttack", 1);
+    animSetA[13] = (int)((KbA5C4*)riderCharacter)->FindMotion("TailGrab", 1);
+    animSetA[14] = (int)((KbA5C4*)riderCharacter)->FindMotion("LazyBoy", 1);
+    animSetA[15] = (int)((KbA5C4*)riderCharacter)->FindMotion("DCanCan", 1);
+    animSetC[0] = (int)((KbA5C4*)riderCharacter)->FindMotion("BarKneelAlt", 1);
+    animSetC[1] = 0;
+    animSetC[2] = 0;
+    animSetC[3] = 0;
+    animSetC[4] = (int)((KbA5C4*)riderCharacter)->FindMotion("HeelClickerAlt", 1);
+    animSetC[5] = (int)((KbA5C4*)riderCharacter)->FindMotion("NacNacAlt", 1);
+    animSetC[6] = (int)((KbA5C4*)riderCharacter)->FindMotion("SuperManAlt", 1);
+    animSetC[7] = 0;
+    animSetC[8] = 0;
+    animSetC[9] = 0;
+    animSetC[10] = (int)((KbA5C4*)riderCharacter)->FindMotion("SaranWrapAlt", 1);
+    animSetC[11] = 0;
+    animSetC[12] = 0;
+    animSetC[13] = 0;
+    animSetC[14] = 0;
+    animSetC[15] = (int)((KbA5C4*)riderCharacter)->FindMotion("DCanCanAlt", 1);
+
+    altBodyA = (KbObj128*)new(__FILE__, 0x77e) CollisionObject(1);
+    ((CollisionObject*)altBodyA)->Configure(a1, 1, 1, 1);
+    ((CollisionObject*)altBodyA)->LoadShape(modelNode->firstChild, "BikeAndRider.col");
+    GameObject::Method_0x00469190((GraphicsTest*)(CollisionObject*)altBodyA, -1);
+    altBodyB = (KbObj128*)new(__FILE__, 0x784) CollisionObject(1);
+    ((CollisionObject*)altBodyB)->Configure(a1, 1, 1, 1);
+    ((CollisionObject*)altBodyB)->LoadShape(modelNode->firstChild, "Bike.col");
+    GameObject::Method_0x00469190((GraphicsTest*)(CollisionObject*)altBodyB, -1);
+    altBodyB->field_0xc.UnknownVirtualSlot4();
+    ((CollisionObject*)altBodyA)->ownerType = 100;
+    ((CollisionObject*)altBodyB)->ownerType = 100;
+    ((CollisionObject*)altBodyA)->ownerObject = this;
+    ((CollisionObject*)altBodyB)->ownerObject = this;
+    collisionObject = (CollisionObject*)altBodyA;
+    collisionObject->Fn_00435fe0();
+    ((KbA604*)field_0x604)->Fn_00530680(altBodyA);
+    ((KbA604*)field_0x604)->Fn_00530680(altBodyB);
+    ((CollisionHullShape*)collisionObject->shape)->sceneNode = (int)modelNode->firstChild;
+    ((KbCollider*)frontWheel)->SetUseBroadphase(1);
+    ((KbCollider*)rearWheel)->SetUseBroadphase(1);
+    ((KbCollider*)field_0x604->a_0x38)->SetUseBroadphase(1);
+    if (field_0x735) {
+        if (g_kbGame->field_0x2d84) {
+            ((CollisionObject*)altBodyB)->onHitCallback = 0;
+            ((CollisionObject*)altBodyB)->onHitByCallback = 0;
+            ((CollisionObject*)altBodyA)->onHitCallback = 0;
+            ((CollisionObject*)altBodyA)->onHitByCallback = 0;
+        } else {
+            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
+            altBodyB->field_0xc.UnknownVirtualSlot4();
+            altBodyA->field_0xc.UnknownVirtualSlot4();
+        }
+    } else if (g_kbGame->field_0x18 > 1 && !g_kbGame->field_0x2d84) {
+        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
+        altBodyB->field_0xc.UnknownVirtualSlot4();
+        altBodyA->field_0xc.UnknownVirtualSlot4();
+    } else {
+        ((CollisionObject*)altBodyB)->onHitCallback = KrustyCollisionCallbackA;
+        ((CollisionObject*)altBodyB)->onHitByCallback = KrustyCollisionCallbackB;
+        ((CollisionObject*)altBodyA)->onHitCallback = KrustyCollisionCallbackA;
+        ((CollisionObject*)altBodyA)->onHitByCallback = KrustyCollisionCallbackB;
+    }
+    field_0x604->Method_0x005327c0();
+    field_0x1540 = position;
+    if (field_0x735) {
+        BikeA640* axis = steerAxis;
+        axis->steerValue = 0.5f;
+        axis->l_0x4 = 0.42210004f;
+        axis->l_0x8 = 1.0f;
+    }
+    field_0x154c = 0;
+    field_0x15cc = 0;
+    field_0x11c4 = 0;
+
+    g_kbLatencyHiding = g_kbGame->UnknownVirtualSlot20("LatencyHiding", 1);
+    g_kbRateLimiting = g_kbGame->UnknownVirtualSlot20("RateLimiting", 1);
+    g_kbAllowWarping = g_kbGame->UnknownVirtualSlot20("AllowWarping", 1);
+    g_kbUseLatencyThreshold = g_kbGame->UnknownVirtualSlot20("UseLatencyThreshold", 0);
+    g_kbUseExtrapLimit = g_kbGame->UnknownVirtualSlot20("UseExtrapLimit", 1);
+    g_kbExtrapLimit = (float)g_kbGame->UnknownVirtualSlot20("ExtrapLimit", 100) * kbSecondsPerMillisecond;
+    g_kbLatencyThreshold = (float)g_kbGame->UnknownVirtualSlot20("LatencyThreshold", 500) * kbSecondsPerMillisecond;
+    g_kbWarpThreshold = (float)g_kbGame->UnknownVirtualSlot20("WarpThreshold", 200) * kbSecondsPerMillisecond;
+    g_kbUseTimeReceived = g_kbGame->UnknownVirtualSlot20("UseTimeReceived", 1);
+    g_kbAllowNegative = g_kbGame->UnknownVirtualSlot20("AllowNegative", 1);
+    g_kbInterpolate = g_kbGame->UnknownVirtualSlot20("Interpolate", 1);
+    field_0x15ec = 0;
+    field_0x15f0 = 0;
+    field_0x15f4 = 1;
+    field_0x15f8 = 0;
+    if (field_0x738 <= 125)
+        field_0x79c = 0;
+    else if (field_0x738 < 500)
+        field_0x79c = 1;
+    else
+        field_0x79c = 2;
+
+    if (field_0x734) {
+        field_0x15e4 = 1;
+        field_0x810 = 1;
+        if (g_kbGame->field_0x2d74 == 0) {
+            switch (g_kbGame->field_0x60c) {
+            case 3:
+            case 4:
+                field_0x15dc = field_0x740->field_0xa4;
+                break;
+            case 1:
+                field_0x15dc = field_0x740->field_0x9c;
+                break;
+            case 2:
+                field_0x15dc = field_0x740->field_0xa0;
+                break;
+            }
+        } else {
+            field_0x15dc = 2.0f;
+        }
+        int prevTag = g_MemTagStack->Push("Collision");
+        field_0x15e0 = new(__FILE__, 0x82f) CollisionObject(1);
+        field_0x15e0->Configure((int)field_0x18, 1, 1, 0);
+        field_0x15e0->ignoreVegetation = 1;
+        GameObject::Method_0x00469190((GraphicsTest*)field_0x15e0, -1);
+        memset(&points[0], 0, sizeof(Vec3));
+        memset(&points[1], 0, sizeof(Vec3));
+        points[0].y = 4.0f;
+        points[1].y = -1.0f;
+        field_0x15e0->SetMeshShape(1, points);
+        field_0x15e0->SetIgnoreListMode(1);
+        field_0x15e0->AddIgnoredOwner(altBodyB);
+        field_0x15e0->AddIgnoredOwner(altBodyA);
+        field_0x15e0->AddIgnoredOwner(rearWheel);
+        field_0x15e0->AddIgnoredOwner(frontWheel);
+        g_MemTagStack->Pop(prevTag);
+        field_0x80c = 0;
+        field_0x814 = 0;
+        field_0x818 = 3000.0f;
+        field_0x820 = 3000.0f;
+        field_0x81c = 0;
+        if (g_kbGame->field_0x2d74 != 5 && g_kbGame->field_0x2d74 != 1)
+            field_0x824 = KbRandUnit() * 14.0f - 7.0f;
+        else
+            field_0x824 = KbRandUnit() * 6.0f - 3.0f;
+    } else {
+        field_0x15e0 = 0;
+        field_0x810 = 0;
+        field_0x15e4 = 0;
+    }
+
+    // Retail keeps a dead `cmp g_kbGame->field_0x2d74, 0` here: two arms that store the
+    // same constant, tail-merged by VC6 (the original values were presumably tuned equal).
+    if (g_kbGame->field_0x2d74 == 0)
+        field_0x778 = 100.0f;
+    else
+        field_0x778 = 100.0f;
+    field_0x7e0 = Vec3(0.0f, 0.0f, 0.0f);
+    field_0x7ec = Vec3(0.0f, 0.0f, 0.0f);
+    field_0x7f8 = 0;
+    field_0x7fc = 0;
+    ((KbCollider*)frontWheel)->SetIgnoreListMode(1);
+    ((KbCollider*)frontWheel)->AddIgnoredOwner(altBodyB);
+    ((KbCollider*)frontWheel)->AddIgnoredOwner(altBodyA);
+    ((KbCollider*)frontWheel)->AddIgnoredOwner(rearWheel);
+    ((KbCollider*)rearWheel)->SetIgnoreListMode(1);
+    ((KbCollider*)rearWheel)->AddIgnoredOwner(altBodyB);
+    ((KbCollider*)rearWheel)->AddIgnoredOwner(altBodyA);
+    ((KbCollider*)rearWheel)->AddIgnoredOwner(frontWheel);
+    ((KbCollider*)altBodyB)->SetIgnoreListMode(1);
+    ((KbCollider*)altBodyB)->AddIgnoredOwner(frontWheel);
+    ((KbCollider*)altBodyB)->AddIgnoredOwner(rearWheel);
+    ((KbCollider*)altBodyA)->SetIgnoreListMode(1);
+    ((KbCollider*)altBodyA)->AddIgnoredOwner(frontWheel);
+    ((KbCollider*)altBodyA)->AddIgnoredOwner(rearWheel);
+    if (field_0x740->field_0x18c) {
+        ((KbXform*)modelNode)->UnknownFunction444d40(0);
+        ((KbXform*)riderCharacter->c_0x1a0)->UnknownFunction444d40(0);
+        ((KbXform*)modelNode)->UnknownFunction444d00(0);
+        ((KbXform*)riderCharacter->c_0x1a0)->UnknownFunction444d00(0);
+    } else {
+        ((KbXform*)modelNode)->UnknownFunction444d40(1);
+        ((KbXform*)riderCharacter->c_0x1a0)->UnknownFunction444d40(1);
+        ((KbXform*)modelNode)->UnknownFunction444d00(1);
+        ((KbXform*)riderCharacter->c_0x1a0)->UnknownFunction444d00(1);
+    }
+    if (field_0x736) {
+        UnknownVirtualSlot50(1, 0.0f, 1);
+        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
+    }
+    if (withRider) {
+        ((KbA5C4*)riderCharacter)->ApplyRestPose();
+        ((SoultreeObject*)riderCharacter->c_0x1a0)->TranslateIn(0, Vec3(0.0f, 0.0f, 0.0f));
+        Vec3 axisY(0.0f, 1.0f, 0.0f);
+        Vec3 axisZ(0.0f, 0.0f, 1.0f);
+        ((SoultreeObject*)riderCharacter->c_0x1a0)->SetAxesIn(0, &axisZ, &axisY, 0, 1);
+        KbMorphMod* morph = new(__FILE__, 0x891) KbMorphMod(1);
+        morph->UnknownFunction4a33b0((void*)a1, "RiderMorph.mbf", (SoultreeObject*)riderCharacter->c_0x1a0);
+        GameObject::Method_0x00469190(morph, -1);
+        ((KbXform*)riderCharacter->c_0x1a0)->UnknownFunction444eb0(morph);
+    }
+    UnknownVirtualSlot102(0.001f);
+    return this;
 }

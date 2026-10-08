@@ -771,5 +771,15 @@
     "expect": "partial",
     "notes": "remote-bike network update; 23.5% bytes, aligned instruction ratio 0.88 with the retail frame 0x58 and slots; remaining: 1-in-ebp/0-in-edi allocation from the second SetAxesPtr call on, limitSq store before the AllowWarping test, velocity y/z fmul operand order, pose lerp c-b recompute, and the 100.0f pool (retail 0x5505ec, bound 0x551420 for 0x492670)",
     "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Load@KrustyBike",
+    "target_va": "0x0048fc80",
+    "target_size": 5384,
+    "expect": "exact",
+    "notes": "bike loader (SEH frame, five new(__FILE__, line) sites). target_size 5384 = extent_with_tables (5366 code + 2 pad + 4-entry jump table at 0x00491178). Exact needed: float-typed KbBikeSetup fields give the retail jump-threaded ternary chains, function-scope Vec3 points[2] plus memset keeps the 0xbc frame, the dead field_0x2d74 cmp is an if/else with identical arms, and 0.001f is the TU-local constant at 0x005541e8",
+    "bindings": "KrustyBike.bindings.json"
   }
 ]
