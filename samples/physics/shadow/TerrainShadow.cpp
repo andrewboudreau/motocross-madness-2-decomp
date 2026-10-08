@@ -365,3 +365,186 @@ full:
     }
     shadow->texture->UnlockPixels(0);
 }
+
+// ---------------------------------------------------------------------------------------------
+// 0x00508bc0 (slot 27, 3087 bytes): the shadow's footprint on the terrain.  Casts the light
+// frustum's corner rays at the height field and accumulates the hit cells' grid rectangle
+// (minX..maxZ) and the hits' screen rectangle (field_0x6668..field_0x6674); returns whether
+// the footprint is on screen and large enough (tier 3 semantics).
+// ---------------------------------------------------------------------------------------------
+
+// The unit's vector with the d3dvec.inl constructors (ProjectedShadow.h's ShadowVec3 has none;
+// slot 27's expanded operators build their results through the three-argument constructor,
+// and the out-of-line sites call its COMDAT copy 0x00404e60).
+struct TerrainShadowVec {
+    TerrainShadowVec() {}
+    TerrainShadowVec(float x_, float y_, float z_) { x = x_; y = y_; z = z_; }
+    float x, y, z;
+};
+
+// Views of the objects slot 27 reaches (tier 2 from the call sites; the canonical
+// declarations are src/krusty2/visibility/VisibilityQuadTree.h and broadphase/Terrain.h):
+// the light camera's eye, look and up vectors behind ProjectedShadow::camera, the terrain's
+// segment cast with the hit cell as its fourth argument, and the visibility clipper's
+// vertex projection.
+struct TerrainShadowCamera {
+    char pad_0x00[0x170];
+    TerrainShadowVec eye;          // +0x170
+    TerrainShadowVec look;         // +0x17c
+    TerrainShadowVec up;           // +0x188
+    float pad_0x194;
+    float field_0x198;             // +0x198 look distance in mode 1 (tier 3)
+};
+struct TerrainShadowViewer {       // GameObject::field_0x18 of the receiver
+    char pad_0x00[8];
+    void* camera;                  // +0x08 the visibility camera (matrix at +0xec)
+    int width;                     // +0x0c
+    int height;                    // +0x10
+};
+class TerrainShadowCaster {
+public:
+    int UnknownFunction506e90(const TerrainShadowVec* from, const TerrainShadowVec* to, TerrainShadowVec* hit,
+                              TerrainCell** cell, int a, int b);              // 0x00506e90 (ret 0x18)
+};
+class TerrainShadowClipper {
+public:
+    void UnknownFunction52f190(const void* camera, const void* matrix, int count,
+                               const TerrainShadowVec* vertices, TerrainShadowVec* screen, int* codes); // 0x0052f190
+};
+extern TerrainShadowClipper* g_terrainShadowClipper;                               // 0x00575a98
+
+// Out-of-line call views (docs/VC6_INLINE_BUDGET.md): the far corners of mode 2 are built
+// with the COMDAT constructor, difference and sum.
+struct TerrainShadowVecCall : TerrainShadowVec {
+    TerrainShadowVecCall(float x_, float y_, float z_);                            // 0x00404e60
+};
+TerrainShadowVec* TerrainShadowAddCall(TerrainShadowVec* out, const TerrainShadowVec* a, const TerrainShadowVec* b);      // 0x00421cb0
+TerrainShadowVec* TerrainShadowSubtractCall(TerrainShadowVec* out, const TerrainShadowVec* a, const TerrainShadowVec* b); // 0x00421d00
+
+static inline TerrainShadowVec operator+(const TerrainShadowVec& a, const TerrainShadowVec& b)
+{
+    return TerrainShadowVec(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+static inline TerrainShadowVec operator-(const TerrainShadowVec& a, const TerrainShadowVec& b)
+{
+    return TerrainShadowVec(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+static inline TerrainShadowVec operator*(const TerrainShadowVec& v, float s)
+{
+    return TerrainShadowVec(s * v.x, s * v.y, s * v.z);
+}
+static inline TerrainShadowVec& operator+=(TerrainShadowVec& a, const TerrainShadowVec& b)
+{
+    a.x += b.x;
+    a.y += b.y;
+    a.z += b.z;
+    return a;
+}
+static inline TerrainShadowVec TerrainShadowCross(const TerrainShadowVec& a, const TerrainShadowVec& b)
+{
+    TerrainShadowVec r;
+    r.x = a.y * b.z - a.z * b.y;
+    r.y = a.z * b.x - a.x * b.z;
+    r.z = a.x * b.y - a.y * b.x;
+    return r;
+}
+static inline TerrainShadowVec TerrainShadowSubtractCtorCall(const TerrainShadowVec& a, const TerrainShadowVec& b)
+{
+    return TerrainShadowVecCall(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+static inline TerrainShadowVec TerrainShadowAddCtorCall(const TerrainShadowVec& a, const TerrainShadowVec& b)
+{
+    return TerrainShadowVecCall(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+// The light camera, re-read through the shadow at every use as retail does.
+#define TERRAIN_SHADOW_CAMERA() ((TerrainShadowCamera*)shadow->camera)
+#define TERRAIN_SHADOW_MIN(a, b) ((a) < (b) ? (a) : (b))
+#define TERRAIN_SHADOW_MAX(a, b) ((a) > (b) ? (a) : (b))
+
+// Grows the grid and screen rectangles by one terrain hit. A macro, not an inline helper:
+// the two modes repeat this text and the final test, and that size is what gives the
+// function the expansion budget retail shows (docs/VC6_INLINE_BUDGET.md); as inline helpers
+// the budget is used up before the first corner.
+#define TERRAIN_SHADOW_ACCUMULATE(cell, hit)                                                         \
+    minX = TERRAIN_SHADOW_MIN(minX, (cell)->gridX);                                                   \
+    maxX = TERRAIN_SHADOW_MAX(maxX, (cell)->gridX);                                                   \
+    minZ = TERRAIN_SHADOW_MIN(minZ, (cell)->gridZ);                                                   \
+    maxZ = TERRAIN_SHADOW_MAX(maxZ, (cell)->gridZ);                                                   \
+    g_terrainShadowClipper->UnknownFunction52f190(TERRAIN_SHADOW_VIEWER()->camera,                   \
+                                                  (char*)TERRAIN_SHADOW_VIEWER()->camera + 0xec, 1,  \
+                                                  &(hit), &screen, &code);                           \
+    field_0x6668 = TERRAIN_SHADOW_MIN(field_0x6668, screen.x);                                       \
+    field_0x666c = TERRAIN_SHADOW_MAX(field_0x666c, screen.x);                                       \
+    field_0x6670 = TERRAIN_SHADOW_MIN(field_0x6670, screen.y);                                       \
+    field_0x6674 = TERRAIN_SHADOW_MAX(field_0x6674, screen.y)
+#define TERRAIN_SHADOW_VIEWER() ((TerrainShadowViewer*)field_0x18)
+
+// The footprint is usable when its screen rectangle overlaps the viewport and is at least
+// 10 x 5 pixels; otherwise the cell list and the vertices are dropped.
+#define TERRAIN_SHADOW_FINISH()                                                                      \
+    if ((float)TERRAIN_SHADOW_VIEWER()->width > field_0x6668 && field_0x666c > 0.0f                   \
+        && (float)TERRAIN_SHADOW_VIEWER()->height > field_0x6670 && field_0x6674 > 0.0f               \
+        && field_0x666c - field_0x6668 > 10.0f && field_0x6674 - field_0x6670 > 5.0f)                \
+        return 1;                                                                                    \
+    cellCount = 0;                                                                                   \
+    vertexCount = 0;                                                                                 \
+    return 0
+
+int TerrainShadow::UnknownVirtualSlot27()
+{
+    minX = 0x7fffffff;
+    minZ = 0x7fffffff;
+    maxX = 0x80000000;
+    maxZ = 0x80000000;
+    field_0x6668 = 3.4028235e38f;
+    field_0x6670 = 3.4028235e38f;
+    field_0x666c = -3.4028235e38f;
+    field_0x6674 = -3.4028235e38f;
+    TerrainShadowVec eye = TERRAIN_SHADOW_CAMERA()->eye;
+    TerrainShadowVec screen;
+    int code;
+    if (shadow->mode == 1) {
+        eye += TERRAIN_SHADOW_CAMERA()->look * TERRAIN_SHADOW_CAMERA()->field_0x198;
+        float half = (float)shadow->texture->size * 0.5f;
+        TerrainShadowVec right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * half;
+        TerrainShadowVec up = TERRAIN_SHADOW_CAMERA()->up * half;
+        TerrainShadowVec corners[4];
+        corners[0] = (eye - right) - up;
+        corners[1] = (right + eye) + up;
+        corners[2] = (right + eye) - up;
+        corners[3] = (eye - right) + up;
+        for (int i = 0; i < 4; i++) {
+            TerrainShadowVec hit;
+            TerrainCell* cell;
+            if (((TerrainShadowCaster*)caster)->UnknownFunction506e90(&TERRAIN_SHADOW_CAMERA()->eye, &corners[i], &hit, &cell, 0, 0))
+                TERRAIN_SHADOW_ACCUMULATE(cell, hit);
+        }
+        TERRAIN_SHADOW_FINISH();
+    } else {
+        eye += TERRAIN_SHADOW_CAMERA()->look * 10000.0f;
+        TerrainShadowVec right = TerrainShadowCross(TERRAIN_SHADOW_CAMERA()->look, TERRAIN_SHADOW_CAMERA()->up) * shadow->lensScale;
+        TerrainShadowVec up = TERRAIN_SHADOW_CAMERA()->up * shadow->lensScale;
+        TerrainShadowVec nearCorners[4];
+        nearCorners[0] = (TERRAIN_SHADOW_CAMERA()->eye - right) - up;
+        nearCorners[1] = (right + TERRAIN_SHADOW_CAMERA()->eye) + up;
+        nearCorners[2] = (right + TERRAIN_SHADOW_CAMERA()->eye) - up;
+        nearCorners[3] = TerrainShadowAddCtorCall(TERRAIN_SHADOW_CAMERA()->eye - right, up);
+        TerrainShadowVec farCorners[4];
+        farCorners[0] = TerrainShadowSubtractCtorCall(TerrainShadowSubtractCtorCall(eye, right), up);
+        farCorners[1] = TerrainShadowAddCtorCall(TerrainShadowAddCtorCall(right, eye), up);
+        farCorners[2] = TerrainShadowSubtractCtorCall(TerrainShadowAddCtorCall(right, eye), up);
+        TerrainShadowVec difference;
+        TerrainShadowVec sum;
+        farCorners[3] = *TerrainShadowAddCall(&sum, TerrainShadowSubtractCall(&difference, &eye, &right), &up);
+        for (int i = 0; i < 4; i++) {
+            TerrainShadowVec hit;
+            TerrainCell* cell;
+            while (((TerrainShadowCaster*)caster)->UnknownFunction506e90(&nearCorners[i], &farCorners[i], &hit, &cell, 0, 0)) {
+                TERRAIN_SHADOW_ACCUMULATE(cell, hit);
+                TerrainShadowVec step = TerrainShadowVecCall(TERRAIN_SHADOW_CAMERA()->look.x * 3.0f, TERRAIN_SHADOW_CAMERA()->look.y * 3.0f, TERRAIN_SHADOW_CAMERA()->look.z * 3.0f);
+                nearCorners[i] = *TerrainShadowAddCall(&sum, &hit, &step);
+            }
+        }
+        TERRAIN_SHADOW_FINISH();
+    }
+}

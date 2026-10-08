@@ -34,10 +34,22 @@ the operator forms, about 30 extra trivial statements (dead code counts,
 `;` does not) make every site inline, and the first 0x19b bytes then match
 retail (ratio 0.78; the tangent temporaries' slots differ). So the original
 caller was about 15% larger in front-end nodes than the decoded code shows,
-or its helpers cheaper; no padded source is kept. Slot 10 `0x0042fd80` (2907 bytes) is decoded
-in outline (path step, wheel spin, steering through `0x004308e0` /
-`0x00430b10`, the collision objects' frames through out-of-line cross
-product `0x00515600` and normalisation `0x005087b0`) but not written.
+or its helpers cheaper; no padded source is kept. Slot 10 `0x0042fd80` (2907 bytes) is written
+in the same sample (807/3018, same calls and flow): the first update sets
+a two-point mesh on the sensor collider and the wheel height; each frame it
+wraps `field_0x194` with `fmod`, evaluates the path at the look-ahead,
+behind (`-1.0f`) and steering (`-field_0x198`) distances through
+`0x004308e0`/`0x00430b10` (the result named before the subtraction, the
+path call repeated in both branches of the look-ahead test, as retail's
+pushes show), spins the wheels (`fmod` by 2 pi), clamps the steering angle
+to +-30 degrees, queries the ground (`0x00507c10`), orthonormalises the
+world axes for the sensor collider's transform (`0x00435830`, the first
+cross product expanded, the rest through `0x00515600`/`0x005087b0`),
+blends the surface normal, orients the body (`0x004fbd70`) and the wheels
+(`0x004b5d00` or sin/cos of the spin), and pushes the body collider's hit
+into its rigid body (`* 1.005f`). Left: the frame slot order and the
+steering clamp, which retail writes through a memory local (`fst`,
+`fld; fld` reloads) where VC6 keeps the angle on the x87 stack here.
 
 **Grid1.cpp** (`0x0047c880..0x0047db5f`). Evidence: the `__FILE__` literal
 at `0x0056c0a0` (xrefs `0x0047c97a`, `0x0047d49b`) and RTTI

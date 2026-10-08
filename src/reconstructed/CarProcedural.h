@@ -43,6 +43,14 @@ public:
     CarProceduralNode* UnknownFunction4fdae0(const char* name);       // 0x004fdae0 named child
     void UnknownFunction4fc970(Vector3* position);                   // 0x004fc970
     void UnknownFunction4fe0a0(Vector3* a, Vector3* b);              // 0x004fe0a0 (ret 8)
+    // Frame-relative helpers slot 10 uses (src/krusty2/core/SoultreeObject.h
+    // documents them): position in `frame` space, placement there, the
+    // local<->world direction maps and the two-axis orientation setter.
+    void UnknownFunction4fc9a0(CarProceduralNode* frame, Vector3* position);   // 0x004fc9a0 (ret 8)
+    void UnknownFunction4fc740(CarProceduralNode* frame, Vector3* position);   // 0x004fc740 (ret 8)
+    Vector3 UnknownFunction4fd710(const Vector3& direction);                  // 0x004fd710 (ret 8) world -> local
+    Vector3 UnknownFunction4fd5c0(const Vector3& direction);                  // 0x004fd5c0 (ret 8) local -> world
+    void UnknownFunction4fbd70(const Vector3* axisA, const Vector3* axisB, int frame, int flag); // 0x004fbd70 (ret 0x10)
 
     int field_0x04;
     int field_0x08;
@@ -63,6 +71,25 @@ struct CarProceduralBody {
     Vector3 field_0xf8;
 };
 
+// Contact record reached through CarProceduralCollision::field_0x5c (the
+// collision object's +0x5c, a void* in src/krusty2/collision). Slot 10
+// reads +0x00 as the push-out vector of the body collider (scaled by 1.005
+// into the body's velocity), and from the sensor collider the float at +0
+// and the normal at +0x08 (tier 3 roles).
+struct CarProceduralContact {
+    Vector3 field_0x00;
+    Vector3 field_0x0c;
+    Vector3 field_0x18;
+};
+
+// Ground query provider at CarProcedural::field_0x20c (0x00507c10, thiscall,
+// ret 0x10: snaps *position to the surface and writes its normal; other
+// units declare the same function on their own views of the terrain).
+class CarProceduralTerrain {
+public:
+    void UnknownFunction507c10(Vector3* position, Vector3* normal, int a, int b);
+};
+
 class CarProceduralQuadTreeObject {
 public:
     virtual void UnknownNodeVirtualSlot0();
@@ -80,11 +107,15 @@ public:
     void UnknownFunction432800(CarProceduralModel* model, const char* path); // 0x00432800
     void UnknownFunction435fe0();                                    // 0x00435fe0
     void UnknownFunction439410(CarProceduralCollision* other);       // 0x00439410
+    void UnknownFunction432ab0(int count, Vector3* points);         // 0x00432ab0 (ret 8): mesh shape
+    void UnknownFunction435830(const Matrix4* transform);            // 0x00435830 (ret 4): sets the transform
+    void UnknownFunction435fb0();                                    // 0x00435fb0: placement update
+    int UnknownFunction438e70();                                     // 0x00438e70: runs the collision query
 
     unsigned char field_0x40[0x54 - 0x40];   // the GraphicsTest base ends at +0x40
     CarProceduralBody* field_0x54;
-    int field_0x58;
-    void* field_0x5c;
+    int field_0x58;                            // has contact
+    CarProceduralContact* field_0x5c;
     unsigned char field_0x60[0x68 - 0x60];
     int field_0x68;
     unsigned char field_0x6c[0xb8 - 0x6c];
@@ -153,7 +184,7 @@ public:
     Vector3 field_0x1e8;
     Vector3 field_0x1f4;
     Vector3 field_0x200;
-    void* field_0x20c;
+    void* field_0x20c;                         // the ground query provider (CarProceduralTerrain in slot 10)
     CarProceduralNode** field_0x210;           // wheels
     Vector3 field_0x214;
     Vector3 field_0x220;

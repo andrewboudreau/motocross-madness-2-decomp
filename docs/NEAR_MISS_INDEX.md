@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 195, c 168, total 363. The three class (a) functions of the
+Counts: a 0, b 199, c 168, total 367. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -206,6 +206,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/shadow/ProjectedShadow | `0x004dbd30` | 81/647 (masked) | b | 20 code diffs: `mov ecx, [esi + 0x74] ; mov ebx, [esi +~` vs `mov edi, [esi + 0x74] ; mov ecx, [esi +~`; `mov edi, ebx` vs `sar edi, 1 ; mov [esp + N], edx ; mov [~`; frame 0x40 vs 0x3c, slot order differs |
 | physics/shadow/ProjectedShadow | `0x004dc2b0` | 29/324 (masked) | b | 29 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x24 vs 0x34, slot order differs |
 | physics/shadow/TerrainShadow | `0x005097d0` | 105/442 (masked) | b | 16 code diffs: `jmp @29` vs `jmp @31 ; mov edx, [esp + N]`; `mov edx, [ecx + 0x54] ; fild [edx + 0x1~` vs `mov [esp + N], edx ; mov eax, [ecx + 0x~`; slots differ |
+| physics/shadow/TerrainShadow | `0x00508bc0` | 353/3031 | b | slot 27 footprint: frame 0xdc vs 0xd0, slot order, the cross product's operand order and the corner loops' form; the inline budget needs the per-mode accumulate/finish text repeated (macros) |
 | physics/shadow/TerrainShadow | `0x00509aa0` | 86/1548 (masked) | b | 90 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x370c vs 0x3728, slot order differs |
 | physics/soultree_base/SoultreePhysicsInlines | `0x0040b410` | 275/404 (masked) | b | 18 code diffs: `fld [edi + 0x1b0]` vs `fld [esi + 4]`; `fld [edi + 0x1b4]` vs `fld [esi + 8]`; slots differ |
 | physics/suspension/Shock | `0x004f9f90` | 227/230 (masked) | b | 1 code diffs: `fld [A] ; fdiv st(1)` vs `fld st(0) ; fdivr [A]`; slots differ |
@@ -228,6 +229,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/BikeRace | `0x0041f1d0` | 230/881 | c | 44 code diffs: retail adds `xor edx, edx`; `mov eax, [edi + 0x3430] ; test eax, eax~` vs `cmp [edi + 0x3430], edx ; jne @271` |
 | race/BikeRace | `0x0041f5e0` | 163/2636 | c | 59 code diffs: `sub esp, 0x594` vs `sub esp, 0x494`; retail adds `xor ebx, ebx ; mov ecx, [eax + 8]` |
 | race/BikeRace | `0x004210f0` | 879/2940 | b | 25 code diffs: `ja @852` vs `ja A`; `jle @852` vs `jle A`; slots differ |
+| race/CarProcedural | `0x0042fd80` | 807/3018 | b | slot 10: slot order (frame 0xe8 vs 0xdc) and the steering clamp's memory local |
 | race/CarProcedural | `0x00430b10` | 299/843 | b | 45 code diffs: retail adds `mov esi, ecx`; `mov edi, ecx ; mov esi, [edi + 0x6c] ; ~` vs `mov edi, [esi + 0x6c] ; mov ebp, [esi +~`; slots differ |
 | race/Krusty3DObjects | `0x0048b100` | 137/2092 (masked) | c | 91 code diffs: `sub esp, 0x54` vs `sub esp, 0x3c`; retail adds `push edi` |
 | race/Krusty3DObjects | `0x0048ccc0` | 47/1308 | b | 3 code diffs: `je @349` vs `je A`; `jne @349` vs `jne A`; slots differ |
@@ -236,6 +238,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/RaceStatus | `0x004e6a50` | 490/1003 | b | 6 code diffs: `je @289` vs `je A`; `je @289` vs `je A`; slots differ |
 | race/Recorder | `0x004e6f80` | 516/2180 | c | 52 code diffs |
 | race/Recorder | `0x004e7d60` | 272/2448 | b | 99 code diffs: `jne @767 ; mov eax, [esi + 0x88] ; test~` vs `jne @761 ; mov ecx, [esi + 0x88] ; xor ~`; slot order differs |
+| race/Wrecker | `0x005306e0` | 1817/4183 | b | slot 10: first 0x62c bytes exact; the inverse/product term order, an unread position copy and the second product's expansion (budget) |
+| race/Wrecker | `0x00531740` | 768/1617 | b | frame 0xc4 matches; slot order and `0.0f - scaled.z` operand order |
 | race/Wrecker | `0x00531da0` | 629/634 | b | 1 code diffs: `fld [esp + N] ; fmul st(1)` vs `fld st(0) ; fmul [esp + N]`; slots differ |
 | render/BackgroundImage | `0x00403d50` | 24/69 (masked) | c | 2 code diffs: `mov [esi], A` vs `mov ecx, 1`; `mov eax, 1 ; mov [esi + 0x30], eax ; mo~` vs `mov [esi], A ; mov [esi + 0x30], ecx ; ~` |
 | render/BackgroundImage | `0x00403dc0` | 53/222 (masked) | c | 15 code diffs |

@@ -21,6 +21,12 @@ relocation resolved by the bindings. Three near misses are parked in
   slot 23 (`0x00532890`). The other slots are inherited from GraphicsTest and
   GameObject (`analysis/class_dossiers.json`). The constructor and the
   destructor write the vptr at `0x0052ffc6` and `0x005300dd`.
+- Slot 10 (`0x005306e0`) calls slot 11 of the gravity model, the rigid body
+  and the collision model's GraphicsTest subobject (`lea ecx,[eax+0xc]`
+  without a null check) with the sub-step length: the per-step update
+  `GameObjectVirtualSlot11(float dt)` of `src/krusty2/core/GameObject.h`,
+  declared here through the `UnknownWreckerSteppable` view because
+  `src/reconstructed/GameObject.h` gives the slot an int.
 - Confirmed: Bike slot 97 (`0x00409420`) allocates 0x53c bytes and calls the
   constructor `0x0052ff90` with 1, then `0x00530190` with "rider.col"
   (`src/krusty2/vehicle/Bike.cpp`, its `BikeA604` view of this class).
@@ -60,9 +66,10 @@ relocation resolved by the bindings. Three near misses are parked in
 | `+0xdc`, `+0xe8`/`+0xf4`/`+0x100` | vectors; box centre, half extents, frame | `0x005328b0`, `0x005329e0` |
 | `+0x104`/`+0x108` | per-probe position and flag arrays | `0x00532900` grows both |
 | `+0x10c`, `+0x118` | push impulse, its scale (5.0) | `0x005329e0` |
-| `+0x11c`/`+0x120` | particle manager, particle frame 0..12 | `0x00531da0` |
+| `+0x11c`/`+0x120`/`+0x124` | particle manager, particle frames 0..12 (`0x00531da0`) and 0x1d..0x2c (`0x00531740`) | `0x00531da0`, `0x00531740` |
 | `+0x128` | `float[256]` of `rand() * (1/32768)` | constructor |
-| `+0x528..+0x538` | flags | constructor, slot 10 |
+| `+0x528` | index into `+0x128`, wraps at 256 | `0x00531740` |
+| `+0x52c..+0x538` | flags | constructor, slot 10 |
 
 ## Functions
 
@@ -105,35 +112,13 @@ relocation resolved by the bindings. Three near misses are parked in
 |---|---:|---|---|
 | `0x00531da0` | 634 | 629/634 | one `fld`/`fmul` operand pair in the first component of `step` |
 | `0x00532580` | 562 | 490/562 | the copies go through a member-by-member copy helper and the old up row is three float locals (both now match); each cross product's two loads are swapped and its `fsubp` is scheduled after the destination pointer copy |
-| `0x005329e0` | 1312 | 213/1314 | stack frame 0xa0 here, 0x94 in retail. Retail's inline budget ([VC6_INLINE_BUDGET](VC6_INLINE_BUDGET.md)) runs out at the final scale: it expands `operator*` but calls the `Vector3` constructor (`0x00404e60`) inside it, then calls `operator*` (`0x005015b0`) for `* frameTime`. The natural `sum * field_0x118 * frameTime` gets the 0x94 frame with every site expanded; one more trivial inline expansion reproduces the constructor call, so the original had about one small inline helper more |
+| `0x005329e0` | 1312 | 215/1306 | frame 0x94 (retail's) once the final scale is `UnknownFunction5015b0(WreckerScaleCtorCall(sum, field_0x118), frameTime)`, the scaled temporary passed straight through; only the slot order differs (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`; a probe-count accessor does not change the budget) |
+| `0x00531740` | 1624 | 768/1617 | contact particle spray; frame 0xc4 (retail's) and every call and operator in retail's order. Written with `WreckerLength` by value, the dot product and the gravity/step scales through the out-of-line views, and three scratch vectors reused across the body (delta/wind/step-along, dir/drift-per-particle, cross result/side/step), which gives retail's slot sharing. Left: the slot order (`velocity` 0x14 here, 0x28 in retail) and `0.0f - scaled.z` of the folded cross product with the Y axis, which retail loads as `fld scaled.z; fsubr` (the constant's leaf is older there); a by-value cross product does not change it |
+| `0x005306e0` | 4176 | 1817/4183 | slot 10, the per-frame update. The first 0x62c bytes are retail's: the idle path (collision model step, probe flags and the mean probe motion, the pose rate scales as `field_0xbc * (1.0f / frameTime)` written per statement so VC6's CSE copies the rate for the first use), the sub-step loop (`step` 0.02 or frameTime/3, slots 11 through the float view `UnknownWreckerSteppable`), the wreck state changes and the rider's slot 7. The rider carry-over block differs: the rigid inverse of the wreck pose (`WreckerInvertRigid`) and the two 4x4 products (`WreckerMatrixProduct`, the soultree.cpp text on the named `_RC` elements) have retail's shape but other term and operand orders (retail `t.x` sums z, y, x; here x, z, y), retail keeps a second copy of `field_0x6c.position` at `[esp+0x10]` that nothing reads, and the second product is only expanded with `__forceinline` (plain `inline` leaves it out of line: the original's tree was smaller, docs/VC6_INLINE_BUDGET.md). The axis rebuild (constructor, normalisation and cross product out of line) and the translation carry-over match retail's calls |
 
 ## Not reconstructed
 
-- Slot 10 `0x005306e0` (about 4.2 KB, ends `0x0053172f`): the per-frame
-  update. It drives the gravity model and rigid body, runs `0x00532020` and
-  `0x005329e0`, and steps the rider pose. A function-start scan that
-  trusts alignment splits it at `0x00530880`; the body continues past it.
-  Not attempted: like `0x00531740` it calls the out-of-line Vector3
-  constructor (`0x00404e60`), normalisation (`0x005087b0`) and cross
-  product (`0x00515600`), so it depends on reproducing the original's
-  inline structure, which is what sets VC6's per-function expansion budget
-  ([VC6_INLINE_BUDGET](VC6_INLINE_BUDGET.md)); the out-of-line copies are
-  COMDAT instances of the header inlines, not library functions.
-- `0x00531740` (1624 bytes): contact response per probe. It uses
-  `0x00460b50`/`0x00460c00`, `0x0040ae30`, `0x005015b0`, `0x00421cb0` and
-  calls the out-of-line `Vector3` constructor (`0x00404e60`) nine times,
-  where every exact function of the unit inlines it, and the out-of-line
-  dot product (`0x0040ae30`), scale (`0x005015b0`) and sum (`0x00421cb0`).
-  Decoded (contact particles: a spray along the slide, `dt * 200` per
-  frame, from the particle manager's free list at +0x2c/+0x40) but not
-  written: the inline/out-of-line mix is the blocker (the budget is
-  exhausted early, so the original expanded more or larger helpers before
-  those sites than the decoded arithmetic shows).
 - `0x0052ff00`, `0x0052ff20`: ownership open (see Evidence).
-
-The near miss `0x00531da0` also keeps its `fld [delta.x]; fmul st(1)` with
-`step` built through a free `operator*=(Vector3&, float)`, `(1/count) *
-delta` or mixed component orders.
 
 ## Remaining uncertainty
 

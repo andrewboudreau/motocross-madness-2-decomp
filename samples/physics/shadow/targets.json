@@ -70,6 +70,16 @@
     "bindings": "TerrainShadow.bindings.json"
   },
   {
+    "class": "TerrainShadow",
+    "source": "TerrainShadow.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot27@TerrainShadow",
+    "target_va": "0x00508bc0",
+    "target_size": 3087,
+    "expect": "partial",
+    "notes": "slot 27 footprint (353/3031 B, frame 0xdc vs 0xd0). Both light modes decoded: mode 1 casts the four frustum corner rays once, mode 2 walks each near->far ray in look*3 steps; the hit cells' +0x24/+0x26 grid coordinates and the projected hits' screen x/y are min/maxed, then the 10x5 pixel viewport test. The accumulate/finish text is repeated per mode (macros): as inline helpers VC6 exhausts the expansion budget before the first corner. Left: slot order, the cross product's operand order (retail re-reads shadow->camera for every use) and the corner loops' form",
+    "bindings": "TerrainShadow.bindings.json"
+  },
+  {
     "class": "ProjectedShadow",
     "source": "ProjectedShadow.cpp",
     "candidate_symbol_contains": "??0ProjectedShadow",

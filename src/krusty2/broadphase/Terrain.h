@@ -106,7 +106,10 @@ struct TerrainCellOwner {
 struct TerrainCell {
     char pad_0x00[8];
     void* key;                                                 // +0x08
-    char pad_0x0c[0x38 - 0x0c];
+    char pad_0x0c[0x24 - 0x0c];
+    unsigned short gridX;                                      // +0x24 cell column (LookupCell compares it with x)
+    unsigned short gridZ;                                      // +0x26 cell row
+    char pad_0x28[0x38 - 0x28];
     TerrainCellOwner* owner;                                   // +0x38
     char pad_0x3c[4];
     int field_0x40;                                            // +0x40 nonzero lets TerrainShadow slot 30 emit the cell's vertices

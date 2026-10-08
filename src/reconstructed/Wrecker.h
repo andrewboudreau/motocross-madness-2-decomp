@@ -44,6 +44,27 @@ public:
     int field_0x08;
 };
 
+// GameObject slot 11 as the physics objects implement it: the per-step
+// update with the step length (src/krusty2/core/GameObject.h declares it
+// with `float dt`; src/reconstructed/GameObject.h still declares the slot
+// with an int). Slot 10 of Wrecker calls it through this view of the same
+// vtable on its gravity model, rigid body and collision model.
+class UnknownWreckerSteppable {
+public:
+    virtual void UnknownVirtualSlot0();
+    virtual void UnknownVirtualSlot1();
+    virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3();
+    virtual void UnknownVirtualSlot4();
+    virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6();
+    virtual void UnknownVirtualSlot7();
+    virtual void UnknownVirtualSlot8();
+    virtual void UnknownVirtualSlot9();
+    virtual void UnknownVirtualSlot10();
+    virtual int UnknownVirtualSlot11(float step);
+};
+
 struct UnknownWreckerSkeleton;
 
 // 32-byte probe record of the collision model (+0x104, count +0x100).
@@ -59,6 +80,13 @@ public:
     // 0x00439410 (thiscall, ret 4): appends `owner` to the ignore list.
     void UnknownFunction439410(UnknownWreckerCollisionObject* owner);
     void UnknownFunction435fe0();                      // 0x00435fe0
+    // The per-step update (GameObject slot 11 with the step length, see
+    // UnknownWreckerSteppable) on the GraphicsTest subobject at +0xc.
+    // Spelled with the explicit offset: a pointer conversion to the base
+    // gets a null check that slot 10 of Wrecker does not have.
+    void UnknownFunctionStep(float step) {
+        ((UnknownWreckerSteppable*)((char*)this + 0xc))->UnknownVirtualSlot11(step);
+    }
 
     unsigned char field_0x40[0x58 - 0x40];  // GraphicsTest subobject ends at +0x40
     int field_0x58;
@@ -114,6 +142,18 @@ struct UnknownWreckerFrame {
     float field_0x3c;
 };
 
+// A 4x4 transform with D3DMATRIX element names (row-vector convention,
+// translation in row 4). Slot 10 keeps three of these as locals; the
+// element names (not m[r][c] indexing) give retail's operand order in the
+// inlined inverse and products.
+struct UnknownWreckerMatrix {
+    UnknownWreckerMatrix() {}
+    float _11, _12, _13, _14;
+    float _21, _22, _23, _24;
+    float _31, _32, _33, _34;
+    float _41, _42, _43, _44;
+};
+
 // Scene-graph node (0x004fxxxx methods; the rider's +0x1a0, the rigid
 // body's +0x234 and Wrecker+0xb8 all point at one). Names provisional.
 struct UnknownWreckerSkeleton {
@@ -121,6 +161,9 @@ struct UnknownWreckerSkeleton {
     void UnknownFunction4fc740(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc740 (ret 8)
     void UnknownFunction4fc9a0(UnknownWreckerSkeleton* frame, Vector3* position); // 0x004fc9a0 (ret 8)
     void UnknownFunction4fca80(UnknownWreckerSkeleton* frame, UnknownWreckerFrame* out);        // 0x004fca80 (ret 8)
+    void UnknownFunction4fca80(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* out);       // the same function, for a matrix local
+    void UnknownFunction4fb8c0(UnknownWreckerSkeleton* frame, UnknownWreckerMatrix* matrix);    // 0x004fb8c0 (ret 8): sets this node's matrix in `frame` space
+    void UnknownFunction4fc890(UnknownWreckerSkeleton* frame, const Vector3* offset);           // 0x004fc890 (ret 8): translates by `offset` given in `frame` space
     void UnknownFunction4fcc70();                                  // 0x004fcc70
     Vector3 UnknownFunction4fd660(const Vector3& point);           // 0x004fd660 (ret 8)
     Vector3 UnknownFunction4fd710(const Vector3& direction);       // 0x004fd710 (ret 8)
@@ -219,17 +262,44 @@ public:
     int field_0x38;
 };
 
+// One particle of the manager below (the layout src/krusty2/effects/
+// ParticleManager.h documents; 0x00531740 fills position, frame, age,
+// lifetime, size, growth, flags and velocity directly).
+struct UnknownWreckerParticle {
+    Vector3 field_0x00;        // position
+    int field_0x0c;            // colour
+    int field_0x10;            // sprite frame
+    float field_0x14;          // age
+    float field_0x18;          // lifetime
+    float field_0x1c;          // size
+    float field_0x20;          // growth per tick
+    unsigned char field_0x24[0x34 - 0x24];
+    unsigned int field_0x34;   // flags (4: integrate position, 0x10: gravity)
+    Vector3 field_0x38;        // velocity
+    void* field_0x44;
+};
+
 // Particle system at Wrecker+0x11c (Bike hands over its own; RTTI
-// ParticleManager). 0x004baa50 (thiscall, ret 0x20) adds one particle.
-class UnknownWreckerParticles {
+// ParticleManager). 0x004baa50 (thiscall, ret 0x20) adds one particle;
+// 0x00531740 takes the next free entry of field_0x40 itself.
+class UnknownWreckerParticles : public GameObject {
 public:
     int UnknownFunction4baa50(float age, const Vector3* position, int frame, float size,
                               float lifetime, float growth, unsigned int flags, int color);
+
+    int field_0x2c;            // live particle count (the next free index)
+    int field_0x30;
+    unsigned char field_0x34[0x40 - 0x34];
+    UnknownWreckerParticle* field_0x40[1000];
+    unsigned char field_0xfe0[0x1f98 - 0xfe0];
+    Vector3 field_0x1f98;      // gravity (0, -64, 0)
 };
 
 // 0x00460b50 (cdecl): table-driven square root (FollowCamera.h declares the
 // same function).
 float UnknownFunction460b50(float value);
+// 0x00460c00 (cdecl): the matching reciprocal square root.
+float UnknownFunction460c00(float value);
 
 // 0x005015b0 (cdecl): the out-of-line copy of a vector scale (see
 // src/krusty2/math/Math3D.h, Vec3ScaleCall).
