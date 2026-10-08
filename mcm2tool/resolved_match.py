@@ -98,7 +98,14 @@ def _is_eh_handler_push(prefix: bytes) -> bool:
     if not prefix.startswith(head) or not prefix.endswith(b'\x68'):
         return False
     loads = prefix[len(head):-1]
-    if not loads or len(loads) % 4:
+    # Bike's loader 0x004079c0 tests a float argument first: `fld dword [esp+disp32]`
+    # (d9 84 24 xx xx xx xx) then `fcomp dword [abs32]` (d8 1d xx xx xx xx, unrelocated
+    # here) sit between `push -1` and `push offset handler`.
+    if loads.startswith(b'\xd9\x84\x24') and len(loads) >= 13 and loads[7:9] == b'\xd8\x1d':
+        loads = loads[13:]
+    if not loads:
+        return True
+    if len(loads) % 4:
         return False
     for i in range(0, len(loads), 4):
         opcode, modrm, sib = loads[i], loads[i + 1], loads[i + 2]

@@ -286,17 +286,35 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   eax and the constant 2 of the state stores kept in edi.
 - `Method_00527A20` `0x00527a20` stays at 349/866: references to the wheel or to the
   destination vector do not change the struct-assignment addressing.
-- Bike's loader `0x004079c0` (6745 bytes, `ret 0xa0` = 40 argument dwords, 8 EH states,
-  0x2cc-byte frame) is not reconstructed.  Decoded so far: it calls `LoadVehicle` with
-  `(a, 1, 1, 3, 3, 2, 0.698f, 0.9f, ...)`, copies the 16-byte name with `strncpy`, sets
-  `field_0x15c = 165`, `field_0x724 = 32`, `sideLieThreshold = cos(0.785)`, the pose
-  bounds 0.8/0.55/1.8, allocates the rider (`new(__FILE__, 0x583)`, 0x240 bytes, ctor
-  `0x004455b0`), the 0x4c-byte object at +0x60c (line 0x660, ctor `0x004a23a0` with a
-  literal), compares the wheel names against two local literal tables (`strcmp`
-  `0x00536070`), builds the shocks (`0x004fa700`, 0xe4 bytes, line 0x683; `0x004f9ee0`,
-  0xd8 bytes, line 0x696) and the tires (`0x00512f10`, 0x2c0 bytes, line 0x6b8) and registers
-  them through `AddLateTicker`/`AddEarlyTicker`/`AddWheel`.  The local literal tables and
-  the per-wheel configuration loop make it a multi-session job.
+- `Bike::LoadBike` `0x004079c0` (6745 bytes, `ret 0xa0` = 40 argument dwords, 8 EH states,
+  0x2cc-byte frame) is written out as a partial (strict 2078/6718, instruction ratio 0.88,
+  every call, EH state and x87 sequence in retail order).  It runs `LoadVehicle` with
+  `(a1, engineName, a3, desc, info, position, forward, up, a9, map, a10, a11 (230 when <= 0),
+  0.9f, 0.698f, device, 2, 3, 3, 1, 1, defaultEngine, tables, 0.18f, axes, track, a21)`
+  (the gear argument is a float), copies the 16-byte name, sets `loadWeight = 165`,
+  `field_0x724 = 32`, `sideLieThreshold = cos(5 * 0.01745329)`, the pose bounds 0.85/0.55/
+  0.8/1.8 and `field_0x28 = 32.2 / loadWeight`, builds the rider (`new(__FILE__, 0x583)
+  D3DIMSoultreeCharacter(statusFlags & 1)`, loaded through its slot 11 and dropped when
+  `GameObject::Method_0x00469190` answers 0, which is why that method now returns int), the
+  handlebar part `BikeA60C("Handlebars", modelNode, steerState)` (line 0x660) and the two
+  wheels: per wheel a local name table (`"Inline"`/`"InlineRear"`), a `{name[20], kind}`
+  table of four kinds matched with the library `strcmp` (`#pragma function(strcmp)`), a
+  rotating shock (`0x004fa700`, line 0x683, `AddLateTicker`) for the rear wheel or an inline
+  shock (`0x004f9ee0`, line 0x696, `AddEarlyTicker`) for the front, the tire (`0x00512f10`,
+  line 0x6b8, registered through its GameObject subobject at +0xc and `AddWheel`), the wheel
+  position in model space, and the shock arm length (`BikeDistance`, x and y squares in
+  named temporaries).  The front/rear wheels are the largest/smallest model z; the
+  `"NullFrame"` node becomes `centerNode`; the dust/dirt/steam emitters (lines 0x70f..0x711)
+  are attached through slot 37 (types 1, 2 and 4 at (0, 2.5, -2.75)); three contact points
+  (`AddCollisionPoint` 0x0043a330 at (+-1.305, 0.225, -0.228) on the handlebar node and
+  (0, 3.345, -3.206) on the model) feed `field_0x5f8/0x5fc/0x600`; the wheel base and the
+  rear/front load shares, the box inertia of the bike (length from the model, width and
+  height from the rider), of the rider and of the steering integrator gains, the start
+  orientation, 29 pose-handle lookups, the collision callbacks and the four smoothers end
+  it.  What still differs: the register spill homes (retail keeps the wheel-position array,
+  the loop index and the front z at `0x10/0x14/0x28`), the matched wheel kind (esi in
+  retail, spilled here), and the store scheduling of the local string tables and the
+  Vec3 constants.
 - `0x00526e80` is slot 38's jump table, `0x0040ca40`/`0x0052b690` are vtordisp thunks;
   `0x0040ae00` is Bike.cpp's COMDAT copy of `Vec3::operator*=` (the `BikeVec3ScaleAssign`
   view calls it).
@@ -306,7 +324,7 @@ python tools/run_physics_samples.py --strict --root src/krusty2/vehicle \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-This run reports `131/159 strict exact` with no required failures (`0x409420` is
+This run reports `131/160 strict exact` with no required failures (`0x409420` is
 strict exact since the BikeA604 constructor call is bound to `0x0052ff90`).
 
 ## SoulTreePhysics round-out

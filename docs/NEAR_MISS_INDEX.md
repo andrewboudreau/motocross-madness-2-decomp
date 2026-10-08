@@ -107,6 +107,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/vehicle/Bike | `0x00405db0` | 657/664 (masked) | b | 2 code diffs: `fld [esi + 8] ; fmul [eax]` vs `fld [eax] ; fmul [esi + 8]`; `fld [esi + 4] ; fmul [eax]` vs `fld [eax] ; fmul [esi + 4]`; slots differ |
 | krusty2/vehicle/Bike | `0x004060c0` | 121/1436 (masked) | b | 63 code diffs: `mov edx, [esi + 0x4a8] ; mov eax, [esi ~` vs `mov eax, [esi + 0x4a8] ; mov ecx, [esi ~`; retail lacks `xor ecx, ecx`; frame 0x204 vs 0x214 |
 | krusty2/vehicle/Bike | `0x00406ae0` | 78/1576 (masked) | b | 118 code diffs: `push ecx` vs `push ebp ; mov ebp, esp ; sub esp, 8`; `jne @16 ; mov [esp + N], 0 ; jmp @20` vs `jne @18 ; mov [ebp - N], 0 ; jmp @22`; frame 0x0 vs 0x8 |
+| krusty2/vehicle/Bike | `0x004079c0` | 2078/6718 | b | spill homes of the loop values, the matched wheel kind kept in esi by retail, store scheduling of the local string tables and Vec3 constants (see PHYSICS_VALIDATION.md) |
 | krusty2/vehicle/Bike | `0x00407440` | 63/384 (masked) | c | 16 code diffs: `jne @25` vs `jne @37 ; fld [esp + N]`; `mov [esp + N], A ; jmp @26 ; mov [esp +~` vs `fstp st(0) ; fld [A] ; fst [esp + N]` |
 | krusty2/vehicle/Bike | `0x00409b30` | 826/1260 (masked) | c | 18 code diffs: `jmp @217` vs `jmp @222 ; mov ecx, [esp + N]`; `mov edx, [esi]` vs `mov [esp + N], ecx ; jmp @222 ; mov edx~` |
 | krusty2/vehicle/Bike | `0x0040a520` | 439/2272 | b | 96 code diffs: retail lacks `test al, al`; retail adds `test al, al`; slots differ |

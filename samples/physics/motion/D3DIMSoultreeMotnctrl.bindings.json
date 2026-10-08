@@ -35,7 +35,7 @@
   "?GetPosition@SoultreeObject@@QAEPAUVec3@@PAU2@@Z": "0x004fc970",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
   "?Init@SceneItem@@QAEXPAX0HH@Z": "0x004ff0b0",
-  "?Method_0x00469190@GameObject@@QAEXPAXH@Z": "0x00469190",
+  "?Method_0x00469190@GameObject@@QAEHPAXH@Z": "0x00469190",
   "?LoadVut@Character@@QAEXXZ": "0x004a62d0",
   "?LoadMir@Character@@QAEXXZ": "0x004a6500",
   "?SortPoseList@Character@@QAEXPAX@Z": "0x004a6b10",

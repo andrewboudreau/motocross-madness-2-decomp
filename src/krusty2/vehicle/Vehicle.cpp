@@ -2004,7 +2004,7 @@ GameObject* Vehicle::LoadVehicle(int a1, const char* engineName, const char* a3,
                                  Vec3 a6, Vec3 a7, Vec3 a8, void* a9, VehicleInputMap* map, void* a10,
                                  float a11, float arg18, float steerScale, void* device, int wheelCap,
                                  int extraContacts, int a13, int earlyCap, int lateCap, int defaultEngine,
-                                 int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, int gearArg,
+                                 int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float gearArg,
                                  VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
                                  SoultreeSlot1f0* a14, int a21)
 {

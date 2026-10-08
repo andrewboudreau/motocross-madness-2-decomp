@@ -156,7 +156,7 @@
   "?Load@KrustyBike@@QAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HHUVec3@@22HPAUVehicleInputMap@@EEPAUKbRace@@HHHPBUKbBikeSetup@@HHHHPAUKbRecorder@@PAXH@Z$ehhandler": "0x0054bd32",
   "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
-  "?Method_0x00469190@GameObject@@QAEXPAXH@Z": "0x00469190",
+  "?Method_0x00469190@GameObject@@QAEHPAXH@Z": "0x00469190",
   "?Method_0x004fb8c0@BikeA1A0@@QAEXHPAUMatrix4@@@Z": "0x004fb8c0",
   "?Method_0x00532220@BikeA604@@QAEXH@Z": "0x00532220",
   "?Method_0x00532310@BikeA604@@QAEXXZ": "0x00532310",

@@ -153,7 +153,7 @@ struct VehicleSpeedState {
     // 0x004d2940 (ret 0x24): the gearbox constructor (src/reconstructed/GearRatios.h names the
     // parameters); LoadVehicle passes 0.02f, the table/rpm arguments or zeros, and field_0x524[2..3].
     VehicleSpeedState(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
-                      int rpmStep, int a6, float riseRate, float fallRate);
+                      int rpmStep, float a6, float riseRate, float fallRate);
     void Method_004D2F50(float dt, int a, int b);   // 0x004d2f50, purpose unknown
     void Method_004D3030(int a, float speed);       // 0x004d3030, purpose unknown
 };
@@ -167,6 +167,15 @@ struct VehicleSmoother {
         timeConstant = tc;
         minValue = 3.402823466e+38f;
         maxValue = -3.402823466e+38f;
+        blendFactor = 1.0f;
+    }
+    // Bike's loader re-arms the two smoothers in place: the value and blend factor are reset,
+    // the time constant only when one is given (FLT_MAX keeps the old one).
+    void Reset(float tc)
+    {
+        smoothedValue = 0.0f;
+        if (tc != 3.402823466e+38f)
+            timeConstant = tc;
         blendFactor = 1.0f;
     }
     float smoothedValue;  // +0x00 slot 49 VehSmooth: x += (target-x)*blend
@@ -187,6 +196,7 @@ struct VehicleSteerState {
     // (motion/SteeringControl.h); LoadVehicle builds the object with its two axes.
     VehicleSteerState(float scale, float t, const Vec3* axisZ, const Vec3* axisY);
     int SetAxisFromDirection(const Vec3* worldDir, SoultreeObject* frame);
+    int SetAxisFromPoints(SoultreeObject* from, SoultreeObject* to, SoultreeObject* frame);   // 0x00504d30 (SteeringControl::SetAxisFromPoints)
     void AddAngle(float value, SoultreeObject* node);   // 0x00504ec0, purpose unknown
     void SetAngle(float a, SoultreeObject* node);       // 0x00504e20 (SteeringControl::SetAngle)
 };
@@ -239,7 +249,9 @@ class Vehicle;
 // reads them as InlineShock / RotatingShock.
 struct VehicleWheel;
 struct VehicleShock {
-    char pad_0x00[0x58];
+    char pad_0x00[0x44];
+    SoultreeObject* node;            // +0x44 the shock's scene node (Suspension.h: found below the root by name)
+    char pad_0x48[0x10];
     Vec3 spring;                     // +0x58 spring force (Suspension.h name); Method_00529450 projects it on the ground normal
     char pad_0x64[0x10];
     Vec3 displacement;               // +0x74 Suspension.h name; scaled by field_0x94 and projected on the Y axis
@@ -248,10 +260,26 @@ struct VehicleShock {
     void ClearForces();                                         // 0x004f9c70
 };
 struct VehicleInlineShock : VehicleShock {
+    // 0x004f9ee0 (ret 0x24): Bike's loader builds it with the shock name, the model node, the
+    // handlebar node and six floats (0xd8 bytes, `new(__FILE__, 0x696)`); parameter roles tier 3.
+    VehicleInlineShock(const char* name, SoultreeObject* root, SoultreeObject* anchor, float a4,
+                       float a5, float a6, float a7, float a8, float a9);
     void Retract(float amount, const VehicleWheel* carrier);   // 0x004fa310
+    void UpdateAxis(SoultreeObject* a, SoultreeObject* b);     // 0x004f9f90 (ret 8)
+    char pad_0x98[0x40];             // 0xd8 bytes (the loader's allocation)
 };
 struct VehicleRotatingShock : VehicleShock {
+    // 0x004fa700 (ret 0x2c): name, model node, seven floats, the wheel kind and an optional axis
+    // (0xe4 bytes, `new(__FILE__, 0x683)`); parameter roles tier 3.
+    VehicleRotatingShock(const char* name, SoultreeObject* root, float a3, float a4, float a5,
+                         float a6, float a7, float a8, float a9, int axisId, const Vec3* axisOverride);
     void Retract(float amount, const VehicleWheel* carrier);   // 0x004fab60
+    char pad_0x98[0x28];
+    float swingAngle;                // +0xc0 Bike's loader: sin(swingAngle * 0.5) * 2 * armLength -> field_0xc4
+    float field_0xc4;
+    float armLength;                 // +0xc8 Bike's loader: distance from the wheel node to the shock node
+    float armLengthSq;               // +0xcc armLength squared
+    char pad_0xd0[0x14];             // 0xe4 bytes (the loader's allocation)
 };
 struct VehicleWheelAux {             // object at VehicleWheel+0x2a8 (provisional)
     char pad_0x00[0x8C];
@@ -267,6 +295,12 @@ struct VehicleContactPoint {
 };
 // Elements of Vehicle+0x53c (provisional: only touched offsets are named).
 struct VehicleWheel {
+    // 0x00512f10 (ret 0x3c; samples/physics/tire/Tire.h Tire::Tire): wheel name, model node,
+    // twelve tuning values, the steer state of a steered wheel (else 0) and the track
+    // (0x2c0 bytes, `new(__FILE__, 0x6b8)` in Bike's loader).
+    VehicleWheel(const char* name, SoultreeObject* root, float a3, float a4, int a5,
+                 VehicleSteerState* steer, float a7, float a8, float a9, float a10, float a11,
+                 float a12, float a13, float a14, SoultreeSlot1f0* track);
     char pad_0x00[0xB8];
     VehicleContactPoint contactPoint;  // +0xb8 AddWheel registers it in collisionPoints
     char pad_0xBC[0x10];
@@ -462,7 +496,7 @@ public:
                             Vec3 a6, Vec3 a7, Vec3 a8, void* a9, VehicleInputMap* map, void* a10,
                             float a11, float arg18, float steerScale, void* device, int wheelCap,
                             int extraContacts, int a13, int earlyCap, int lateCap, int defaultEngine,
-                            int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, int gearArg,
+                            int* torqueTable, int rpmLow, int rpmHigh, int rpmStep, float gearArg,
                             VehicleAxis* steer, VehicleAxis* lean, VehicleAxis* throttle,
                             SoultreeSlot1f0* a14, int a21);
     int Method_00478FE0();      // 0x00478fe0, shared `xor eax,eax; ret` stub (direct call from CheckCrash)

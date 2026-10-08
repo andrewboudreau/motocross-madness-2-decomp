@@ -5,6 +5,10 @@
 #include "vehicle/Bike.h"
 #include "collision/CollisionObject.h"
 
+// The loader compares the wheel names with the library strcmp (0x00536070), not the
+// intrinsic expansion.
+#pragma function(strcmp)
+
 static inline float BikeMin(float a, float b) { return a < b ? a : b; }
 static inline float BikeMaxF(float a, float b) { return a > b ? a : b; }
 static inline float BikeAbs(float x);   // defined below (slot 99 region)
@@ -432,6 +436,372 @@ Bike::Bike(int flags) : GameObject(1), Vehicle(flags)
     field_0x730 = 0;
     field_0x61c = g_BikeVec3_005778a8;
     field_0x700 = 0;
+}
+
+// ---- the loader (0x004079c0) --------------------------------------------------------------
+// Helpers of LoadBike.  BikeAddContactPoint is CollisionPoint.cpp's AddCollisionPoint
+// (0x0043a330) with the owner node and track typed as this unit passes them.
+void BikeCollisionCallback(CollisionObject* self, CollisionObject* other);
+void BikeStaticCollisionCallback(CollisionObject* self, CollisionObject* other);
+extern BikeA5F8* __cdecl BikeAddContactPoint(int capacity, SoultreeContact** points, const Vec3* position,
+                                             SoultreeObject* owner, float a4, int* count, float a6,
+                                             SoultreeSlot1f0* track);
+
+// Name/kind table the loader matches the wheel names against.
+struct BikeWheelKind {
+    char name[20];
+    int kind;
+};
+
+// A truncating copy into a `size`-byte buffer (the shape BikeRace.cpp's COPY_TEXT and the
+// SoulTreePhysics loaders use).
+#define BIKE_COPY_TEXT(dest, source, size)                         \
+    {                                                              \
+        int length = strlen(source);                               \
+        int copied = length > (size) - 1 ? (size) - 1 : length;    \
+        strncpy(dest, source, copied);                             \
+        (dest)[copied] = 0;                                        \
+    }
+
+// Distance between two points with the squared x/y terms kept in named temporaries (the
+// shock-arm length), and the plain accumulated form (the wheel base); both treat a unit
+// squared length as 1 (the shape every Vehicle/Bike length helper has).
+static inline float BikeDistance(const Vec3& a, const Vec3& b)
+{
+    float dz = a.z - b.z;
+    float dy = a.y - b.y;
+    float dx = a.x - b.x;
+    float dx2 = dx * dx;
+    float dy2 = dy * dy;
+    float len2 = dz * dz + (dx2 + dy2);
+    if (len2 == 1.0f)
+        return 1.0f;
+    return (float)sqrt(len2);
+}
+static inline float BikeDistanceAcc(const Vec3& a, const Vec3& b)
+{
+    float dx = a.x - b.x;
+    float dy = a.y - b.y;
+    float dz = a.z - b.z;
+    float len2 = (dx * dx + dy * dy) + dz * dz;
+    if (len2 == 1.0f)
+        return 1.0f;
+    return (float)sqrt(len2);
+}
+// The wheel as the GameObject tree sees it: Tire derives from CollisionObject (a
+// QuadTreeObject head of 12 bytes) and then GameObject, so the GameObject subobject sits at
+// +0xc (Tire.h base offsets).  Only used to convert the new wheel.
+struct BikeQuadTreeHead {
+    virtual void UnknownVirtualSlot0();
+    int field_0x04;
+    int field_0x08;
+};
+struct BikeTireObject : BikeQuadTreeHead, GameObject {
+};
+
+GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const char* riderModel,
+                           const SoultreeLoadDesc* desc, const BikeA5C8* info, Vec3 startPosition,
+                           Vec3 forward, Vec3 up, void* a9, VehicleInputMap* map,
+                           const char* name, int a19, int defaultEngine, int* torqueTable,
+                           int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
+                           float rearSpring, float rearDamper, float frontRatio, float rearRatio,
+                           int a31, int a32, void* a10, void* device, VehicleAxis* steer,
+                           VehicleAxis* lean, VehicleAxis* throttle, SoultreeSlot1f0* trackObject,
+                           float a11, int a21)
+{
+    int i;
+    char partName[64];
+    Vec3 wheelPoint;
+    Vec3 shockPoint;
+    Vec3 frontPoint;
+    Vec3 rearPoint;
+    Vec3 bikeCenter;
+    Vec3 bikeExtents;
+    Vec3 riderCenter;
+    Vec3 riderExtents;
+    Matrix4 riderMatrix;
+    Vec3* wheelPos;
+    float riderMass;
+    float maxZ;
+    float minZ;
+
+    if (a11 <= 0.0f)
+        a11 = 230.0f;
+    LoadVehicle(a1, engineName, a3, desc, (int)info, startPosition, forward, up, a9, map, a10, a11,
+                0.9f, 0.698f, device, 2, 3, 3, 1, 1, defaultEngine, torqueTable, rpmLow, rpmHigh,
+                rpmStep, 0.18f, steer, lean, throttle, trackObject, a21);
+    field_0x5bc = a31;
+    field_0x5c0 = a32;
+    BIKE_COPY_TEXT(riderName, name, 16);
+    loadWeight = 165.0f;
+    field_0x724 = 32.0f;
+    sideLieThreshold = (float)cos(5.0 * 0.01745329);
+    field_0x70c = 0.85f;
+    field_0x704 = 0.55f;
+    leanPoseMin = 0.8f;
+    leanPoseMax = 1.8f;
+    riderMass = loadWeight * 0.0310559f;
+    if (loadWeight != 0.0f)
+        field_0x28 = 32.2f / loadWeight;
+    else
+        field_0x28 = 1.0f;
+    UnknownVirtualSlot0(loadWeight);
+    wobbleTime = 0.0f;
+    field_0x710 = crashTimerReload - 0.5f;
+    UnknownVirtualSlot1(loadWeight);
+
+    riderCharacter = (BikeA5C4*)new(__FILE__, 0x583) D3DIMSoultreeCharacter(GameObject::statusFlags & 1);
+    if (!GameObject::Method_0x00469190(
+            ((D3DIMSoultreeCharacter*)riderCharacter)->D3DIMVirtualSlot11(
+                (int)GameObject::field_0x18, riderModel, desc, (int)info, 1, 1), -1))
+        riderCharacter = 0;
+    if (desc && (desc->field_0x25 & 1))
+        riderCharacter->c_0x1a0->Fn_4444c0(1);
+    if (info)
+        field_0x5c8 = *info;
+    bodyForward = kVec3ZAxis;
+    bodyUp = kVec3YAxis;
+    UnknownVirtualSlot35(1, 1);
+    UnknownVirtualSlot34();
+    savedForward = bodyForward;
+    savedUp = bodyUp;
+    poseNode = modelNode->FindByName("Bike");
+    field_0x60c = new(__FILE__, 0x660) BikeA60C("Handlebars", modelNode, steerState);
+    wheelPos = (Vec3*)new(__FILE__, 0x664) char[2 * sizeof(Vec3)];
+
+    // Per-wheel configuration: front, rear (tier 3 names; the defaults apply with the
+    // default engine, otherwise the caller's six values scale them).
+    int rotating[2] = { 0, 1 };
+    float damper[2] = { 800.0f, 400.0f };
+    float spring[2] = { 1700.0f, 1000.0f };
+    float ratio[2] = { 0.7f, 0.7f };
+    float limit[2] = { 80.0f, 80.0f };
+    if (!defaultEngine) {
+        damper[0] = frontDamper * 400.0f + 600.0f;
+        damper[1] = rearDamper * 200.0f + 300.0f;
+        spring[0] = frontSpring * 400.0f + 1500.0f;
+        spring[1] = rearSpring * 400.0f + 800.0f;
+        ratio[0] = frontRatio * 0.2f + 0.6f;
+        ratio[1] = rearRatio * 0.2f + 0.6f;
+    }
+
+    for (i = 0; i < 2; i++) {
+        char wheelNames[2][32] = { "Inline", "InlineRear" };
+        BikeWheelKind kinds[4] = {
+            { "InlineRear", 0 }, { "InlineFront", 1 }, { "TransverseLeft", 2 }, { "TransverseRight", 3 }
+        };
+        int kind = 0;
+        int k;
+        for (k = 0; k < 4; k++) {
+            if (strcmp(wheelNames[i], kinds[k].name) == 0) {
+                kind = kinds[k].kind;
+                break;
+            }
+        }
+        char shockNames[2][32] = { "Shocks", "SwingArm" };
+        BIKE_COPY_TEXT(partName, shockNames[i], 64);
+        VehicleRotatingShock* rotShock;
+        VehicleInlineShock* lineShock;
+        if (rotating[i]) {
+            rotShock = new(__FILE__, 0x683) VehicleRotatingShock(partName, modelNode, 0.558f, 1.5f, damper[i],
+                                                                 spring[i], ratio[i], limit[i], 0.25f, kind, 0);
+            AddLateTicker((VehicleTicker*)rotShock);
+        } else {
+            lineShock = new(__FILE__, 0x696) VehicleInlineShock(partName, modelNode, field_0x60c->node, 1.0f,
+                                                                spring[i], damper[i], ratio[i], limit[i], 0.25f);
+            AddEarlyTicker((VehicleTicker*)lineShock);
+        }
+        int driven[2] = { 0, 1 };
+        int steered[2] = { 1, 0 };
+        int kind5[2] = { 0, 1 };
+        char tireNames[2][32] = { "TireFront", "TireRear" };
+        BIKE_COPY_TEXT(partName, tireNames[i], 64);
+        if (strlen(partName) == 0) {
+            BaseObjectVirtualSlot2();
+            return 0;
+        }
+        float grip[2] = { 0.5f, 1.0f };
+        float roll[2] = { 0.1f, 1.0f };
+        float a12 = field_0x524[4] * 10.0f;
+        float a13 = field_0x524[5] * 25.0f;
+        VehicleWheel* wheel = new(__FILE__, 0x6b8) VehicleWheel(partName, modelNode, 0.15f, 2.0f, kind5[i],
+                                                                steered[i] ? steerState : 0, 45.0f, 1.0f,
+                                                                roll[i], 255.0f, grip[i], a12, a13, 0.5f, trackObject);
+        BikeTireObject* tire = (BikeTireObject*)wheel;
+        tire->GameObjectVirtualSlot8((int)GameObject::field_0x18);
+        GameObject::Method_0x00469190((GameObject*)tire, -1);
+        if (rotating[i]) {
+            AddWheel(wheel, 0, 0, (int)rotShock, driven[i] ? (VehicleWheelAux*)engineState : 0);
+            wheel->sceneNode->GetPositionIn(0, &wheelPoint);
+            wheelPos[i] = modelNode->WorldToLocalPoint(wheelPoint);
+            wheel->sceneNode->GetPositionIn(0, &wheelPoint);
+            rotShock->node->GetPositionIn(0, &shockPoint);
+            float len = BikeDistance(wheelPoint, shockPoint);
+            rotShock->armLength = len;
+            rotShock->armLengthSq = len * len;
+            rotShock->field_0xc4 = (float)sin(rotShock->swingAngle * 0.5f) * len * 2.0f;
+        } else {
+            AddWheel(wheel, 0, (int)lineShock, 0, driven[i] ? (VehicleWheelAux*)engineState : 0);
+            wheel->sceneNode->GetPositionIn(0, &wheelPoint);
+            wheelPos[i] = modelNode->WorldToLocalPoint(wheelPoint);
+            lineShock->UpdateAxis(wheel->sceneNode, field_0x60c->node);
+        }
+    }
+
+    maxZ = -3.402823466e+38f;
+    minZ = 3.402823466e+38f;
+    for (i = 0; i < wheelCount; i++) {
+        if (wheelPos[i].z > maxZ) {
+            frontWheel = (BikeWheel*)wheelList[i];
+            maxZ = wheelPos[i].z;
+        }
+        if (wheelPos[i].z < minZ) {
+            rearWheel = (BikeWheel*)wheelList[i];
+            minZ = wheelPos[i].z;
+        }
+    }
+    delete wheelPos;
+    centerNode = modelNode->FindByName("NullFrame");
+
+    if (field_0x124) {
+        field_0x728 = new(__FILE__, 0x70f) BikeDustEmitter(1);
+        GameObject::Method_0x00469190(field_0x728->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
+        field_0x72c = new(__FILE__, 0x710) BikeDirtChunkEmitter(1);
+        GameObject::Method_0x00469190(field_0x72c->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
+        field_0x730 = new(__FILE__, 0x711) BikeSteamEmitter(1);
+        GameObject::Method_0x00469190(field_0x730->UnknownVirtualSlot27(GameObject::field_0x18, field_0x124), -1);
+        field_0x730->field_0x60 = 1;
+    }
+
+    Vec3 leftPeg = Vec3(-1.305f, 0.225f, -0.228f);
+    Vec3 rightPeg = Vec3(1.305f, 0.225f, -0.228f);
+    Vec3 tailPoint = Vec3(0.0f, 3.345f, -3.206f);
+    field_0x5f8 = BikeAddContactPoint(collisionPointCapacity, collisionPoints, &leftPeg, field_0x60c->node,
+                                      0.0f, &collisionPointCount, 0.6f, track);
+    field_0x5fc = BikeAddContactPoint(collisionPointCapacity, collisionPoints, &rightPeg, field_0x60c->node,
+                                      0.0f, &collisionPointCount, 0.6f, track);
+    field_0x600 = (int)BikeAddContactPoint(collisionPointCapacity, collisionPoints, &tailPoint, modelNode,
+                                           -0.3f, &collisionPointCount, 0.6f, track);
+    UnknownVirtualSlot37(1, field_0x728, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
+    UnknownVirtualSlot37(2, field_0x72c, rearWheel ? (SoultreeAttachTarget*)&rearWheel->contactPoint_0x0b8 : 0, 0);
+    Vec3 steamOffset = Vec3(0.0f, 2.5f, -2.75f);
+    UnknownVirtualSlot37(4, field_0x730, 0, &steamOffset);
+    if (centerNode == 0) {
+        BaseObjectVirtualSlot2();
+        return 0;
+    }
+
+    modelNode->GetMatrixIn(0, &riderMatrix);
+    riderCharacter->c_0x1a0->Method_0x004fb8c0(0, &riderMatrix);
+    UnknownVirtualSlot97();
+    steerState->SetAxisFromPoints(frontWheel->sceneNode, field_0x60c->node, poseNode);
+    steerState->SetAngle(0.0f, poseNode);
+    frontWheel->sceneNode->GetPositionIn(0, &frontPoint);
+    rearWheel->sceneNode->GetPositionIn(0, &rearPoint);
+    scratchVector = frontPoint;
+    scratchVector.y = 0.0f;
+    scratchVector2 = rearPoint;
+    scratchVector2.y = 0.0f;
+    wheelBase = BikeDistanceAcc(scratchVector2, scratchVector);
+    centerNode->GetPositionIn(0, &centerOfMass);
+    localCenterOfMass = poseNode->WorldToLocalPoint(centerOfMass);
+    scratchVector = poseNode->WorldToLocalPoint(frontWheel->nodePosition);
+    float share = scratchVector.z - localCenterOfMass.z;
+    if (share < 0.0f)
+        share = -share;
+    rearWheel->w_0x294 = share / wheelBase;
+    frontWheel->w_0x294 = 1.0f - rearWheel->w_0x294;
+    UnknownVirtualSlot8();
+
+    // Box inertia of the bike (length from the model, width/height from the rider), of the
+    // rider and of the steering integrator gains (tier 3 reading).
+    modelNode->GetSubtreeBounds(&bikeCenter, &bikeExtents);
+    float length = bikeExtents.z * 2.0f;
+    riderCharacter->c_0x1a0->GetSubtreeBounds(&riderCenter, &riderExtents);
+    float width = riderExtents.x * 2.0f;
+    float height = riderExtents.y * 2.0f;
+    float h2 = height * height;
+    float l2 = length * length;
+    invInertia.x = 1.0f / ((l2 + h2) * (bodyMass * (1.0f / 12.0f)));
+    float w2 = width * width;
+    invInertia.y = 1.0f / ((w2 + l2) * (bodyMass * (1.0f / 12.0f)));
+    float wh2 = w2 + h2;
+    invInertia.z = 1.0f / ((bodyMass * (1.0f / 12.0f)) * wh2);
+    float depth = riderExtents.z * 2.0f;
+    float d2 = depth * depth;
+    float riderMk = riderMass * (1.0f / 12.0f);
+    ((Vec3*)field_0xfc)->x = 1.0f / ((d2 + h2) * riderMk);
+    ((Vec3*)field_0xfc)->y = 1.0f / ((w2 + d2) * riderMk);
+    ((Vec3*)field_0xfc)->z = 1.0f / (riderMk * wh2);
+    float wheelMass = baseWeight * 0.05f;
+    wheelMass = wheelMass * 0.0310559f;
+    float r = frontWheel->w_0x274 * 2.0f;
+    float r2 = r * r;
+    float wheelMk = wheelMass * (1.0f / 12.0f);
+    field_0x610.x = 1.0f / ((r2 + h2) * wheelMk);
+    field_0x610.y = 1.0f / ((w2 + r2) * wheelMk);
+    field_0x610.z = 1.0f / (wheelMk * wh2);
+    UnknownVirtualSlot43();
+
+    bodyForward = forward;
+    bodyUp = up;
+    UnknownVirtualSlot35(1, 1);
+    UnknownVirtualSlot34();
+    savedForward = bodyForward;
+    savedUp = bodyUp;
+    OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
+                                 &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+    savedYaw = bodyYaw;
+    savedPitch = bodyPitch;
+    savedRoll = bodyRoll;
+    savedSinRoll = bodySinRoll;
+    savedCosRoll = bodyCosRoll;
+    savedCosPitch = bodyCosPitch;
+    savedSinPitch = bodySinPitch;
+    UnknownVirtualSlot33(&position, &bodyForward, &bodyUp, &kVec3YAxis, 0, loadWeight);
+    field_0x574 = Vec3(bodyForward.x, 0.0f, bodyForward.z);
+
+    riderPoseHandles[0] = riderCharacter->FindMotion("LeanR01", 1);
+    riderPoseHandles[1] = riderCharacter->FindMotion("LeanR02", 1);
+    riderPoseHandles[2] = riderCharacter->FindMotion("LeanR03", 1);
+    riderPoseHandles[3] = riderCharacter->FindMotion("Turn1D", 1);
+    riderPoseHandles[4] = riderCharacter->FindMotion("Turn1U", 1);
+    riderPoseHandles[5] = riderCharacter->FindMotion("Turn2D", 1);
+    riderPoseHandles[6] = riderCharacter->FindMotion("Turn2U", 1);
+    riderPoseHandles[7] = riderCharacter->FindMotion("Turn3D", 1);
+    riderPoseHandles[8] = riderCharacter->FindMotion("Turn3U", 1);
+    riderPoseHandles[10] = riderCharacter->FindMotion("Wheelie", 1);
+    riderPoseHandles[11] = riderCharacter->FindMotion("CrosOv1", 1);
+    riderPoseHandles[12] = riderCharacter->FindMotion("CrosOv2", 1);
+    riderPoseHandles[13] = riderCharacter->FindMotion("CrosOv3", 1);
+    riderPoseHandles[14] = riderCharacter->FindMotion("LookBack", 1);
+    riderPoseHandles[15] = riderCharacter->FindMotion("Victory", 1);
+    riderPoseHandles[16] = riderCharacter->FindMotion("BackUpTop", 1);
+    riderPoseHandles[17] = riderCharacter->FindMotion("BackUpBottom", 1);
+    bikePoseHandles[0] = bikePoseHandles[1] = (int)D3DIMSoultreeCharacter::FindMotion("BLeanR02", 1);
+    bikePoseHandles[2] = bikePoseHandles[1];
+    bikePoseHandles[3] = bikePoseHandles[5] = (int)D3DIMSoultreeCharacter::FindMotion("BTurn2D", 1);
+    bikePoseHandles[7] = bikePoseHandles[5];
+    bikePoseHandles[4] = bikePoseHandles[6] = (int)D3DIMSoultreeCharacter::FindMotion("BTurn2U", 1);
+    bikePoseHandles[8] = bikePoseHandles[6];
+    bikePoseHandles[10] = (int)D3DIMSoultreeCharacter::FindMotion("BWheelie", 1);
+    bikePoseHandles[11] = (int)D3DIMSoultreeCharacter::FindMotion("CrosBik1", 1);
+    bikePoseHandles[12] = (int)D3DIMSoultreeCharacter::FindMotion("CrosBik2", 1);
+    bikePoseHandles[13] = (int)D3DIMSoultreeCharacter::FindMotion("CrosBik3", 1);
+    bikePoseHandles[14] = (int)D3DIMSoultreeCharacter::FindMotion("bLookBack", 1);
+    bikePoseHandles[16] = (int)D3DIMSoultreeCharacter::FindMotion("bBackUpTop", 1);
+    if (collisionObject) {
+        collisionObject->onHitCallback = BikeCollisionCallback;
+        collisionObject->onHitByCallback = BikeStaticCollisionCallback;
+    }
+    field_0x604->Method_0x005327c0();
+    D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], 0.5f);
+    riderCharacter->Method_0x004a8bf0(riderPoseHandles[1], 0.5f);
+    verticalAccelSmoother->Reset(fixedStepTime * 7.0f);
+    forwardAccelSmoother->Reset(0.5f);
+    steerAxis = new(__FILE__, 0x7df) BikeA640(frontWheel->w_0x294, fixedStepTime * 6.3f);
+    poseSmoother = new(__FILE__, 0x7e0) BikeA644(field_0x704, 1.0f, -1.0f);
+    return this;
 }
 
 int Bike::UnknownVirtualSlot33(const Vec3* a, const Vec3* b, const Vec3* c,

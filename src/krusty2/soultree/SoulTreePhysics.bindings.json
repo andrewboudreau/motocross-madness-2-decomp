@@ -113,7 +113,7 @@
   "?Fn_4444c0@SoultreeD3DNode@@QAEXH@Z": "0x004444c0",
   "?Fn_4e9cd0@SoultreeFileFinder@@QAEHPAVSoultreeFile@@PBD1PAD@Z": "0x004e9cd0",
   "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",
-  "?Method_0x00469190@GameObject@@QAEXPAXH@Z": "0x00469190",
+  "?Method_0x00469190@GameObject@@QAEHPAXH@Z": "0x00469190",
   "?SetHullShape@CollisionObject@@QAEXPAXHHHH@Z": "0x00432720",
   "?SetModelShape@CollisionObject@@QAEXPAXHHHH@Z": "0x004324b0",
   "?UnknownVirtualSlot2@SoultreePhysicsBaseObject@@UAEPAVGameObject@@HHUVec3@@00PAX1MHHPAVSoultreeSlot1f0@@MHMMMHHEH@Z": "0x00500c50",

@@ -76,7 +76,7 @@ public:
     virtual void GameObjectVirtualSlot26();      // 0x004692c0: ret, sets bit 3 of statusFlags
     // Non-virtual, this == the GameObject subobject (Bike slot 97 0x00409420 computes
     // `lea ecx,[vbase]` before calling it).  Argument types tier 3.
-    void Method_0x00469190(void* a, int b);
+    int Method_0x00469190(void* a, int b);   // returns nonzero on success (Bike's loader tests it)
 
     // +0x08..+0x14: previous sibling, next sibling, first child, parent (src/reconstructed/GameObject.h;
     // the parent link is walked to the root by 0x005046e0, children are chained through +0x0c).

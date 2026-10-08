@@ -26,7 +26,7 @@
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
   "?Load@CollisionCharacter@@QAEPAVGameObject@@HPBD0PBUSoultreeLoadDesc@@HHH@Z$ehhandler": "0x00549e64",
   "?LoadShape@CollisionObject@@QAEXPAXPBD@Z": "0x00432800",
-  "?Method_0x00469190@GameObject@@QAEXPAXH@Z": "0x00469190",
+  "?Method_0x00469190@GameObject@@QAEHPAXH@Z": "0x00469190",
   "?Pop@MemTagStack@@QAEXH@Z": "0x004a2d90",
   "?Push@MemTagStack@@QAEHPBD@Z": "0x004a2d00",
   "?QueryCollisions@CollisionObject@@QAEHXZ": "0x00438e70",

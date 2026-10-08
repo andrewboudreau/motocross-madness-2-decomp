@@ -1618,5 +1618,15 @@
     "expect": "exact",
     "notes": "Strict exact under vc6_o2_ml. Inline budget reproduced with per-site call views (Vec3 ctor 0x00404e60, operator+= 0x00428060, DotProduct 0x0040ae30, operator* 0x005015b0, equality 0x005299e0); the secondary-shock `*up +=` needs a reference to scratchVector2 to load its x first.",
     "bindings": "Vehicle.bindings.json"
+  },
+  {
+    "bindings": "Bike.bindings.json",
+    "candidate_symbol_contains": "LoadBike@Bike",
+    "class": "Bike",
+    "expect": "partial",
+    "notes": "Bike's loader (ret 0xa0, 8 EH states, 0x2cc frame): LoadVehicle, the rider character, the handlebar part, the two wheels with their shocks, three contact points, three particle emitters, the inertia tensors and the pose handles are all written out; every call, EH state and x87 sequence is in retail order (instruction ratio 0.88). What differs: the stack slots of the register spills (wheelPos/loop index/front-rear z at 0x10/0x14/0x28 in retail), the frame's low 0x30 bytes being laid out differently, the matched wheel kind kept in esi by retail (spilled here), and store scheduling inside the local string tables and the Vec3 constants. Strict 2078/6718 (size 6714 vs 6745).",
+    "source": "Bike.cpp",
+    "target_size": 6745,
+    "target_va": "0x004079c0"
   }
 ]

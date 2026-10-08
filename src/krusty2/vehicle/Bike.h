@@ -36,9 +36,52 @@ struct BikeA644;
 struct BikeQ;
 struct BikeA38;
 
-// Object at Bike+0x60c.  ~Bike deletes it through an out-of-line empty destructor (0x00464e90).
+// Object at Bike+0x60c: the handlebar part (samples/physics/tire/Tire.h MovingPart, 0x4c bytes).
+// The loader builds it with `new(__FILE__, 0x660)` from the "Handlebars" node of the model and
+// the steer state; ~Bike deletes it through an out-of-line empty destructor (0x00464e90).
 struct BikeA60C {
+    BikeA60C(const char* name, SoultreeObject* root, VehicleSteerState* owner);   // 0x004a23a0 (ret 0xc)
     ~BikeA60C();
+    char pad_0x00[0x40];
+    SoultreeObject* node;          // +0x40 root->FindByName(name); the shocks and contacts are anchored on it
+    VehicleSteerState* owner;      // +0x44 ctor argument
+    int field_0x48;
+};
+
+// 24-byte block the loader's sixth argument points to; copied into Bike+0x5c8 when present
+// (tier 3: contents unknown, only the whole-block copy is decoded).
+struct BikeA5C8 {
+    int field_0x00[6];
+};
+
+// Particle emitters the loader hangs on the bike (samples/physics/effects/ParticleEmitters.h:
+// Dust 0x80 bytes, DirtChunk 0x608, Steam 0x47c).  Provisional views: the constructor, the
+// GameObject-shaped virtual slot 27 that returns the child to register, and Steam's +0x60 flag.
+struct BikeParticleEmitterView {
+    virtual void UnknownVirtualSlot0(); virtual void UnknownVirtualSlot1(); virtual void UnknownVirtualSlot2();
+    virtual void UnknownVirtualSlot3(); virtual void UnknownVirtualSlot4(); virtual void UnknownVirtualSlot5();
+    virtual void UnknownVirtualSlot6(); virtual void UnknownVirtualSlot7(); virtual void UnknownVirtualSlot8();
+    virtual void UnknownVirtualSlot9(); virtual void UnknownVirtualSlot10(); virtual void UnknownVirtualSlot11();
+    virtual void UnknownVirtualSlot12(); virtual void UnknownVirtualSlot13(); virtual void UnknownVirtualSlot14();
+    virtual void UnknownVirtualSlot15(); virtual void UnknownVirtualSlot16(); virtual void UnknownVirtualSlot17();
+    virtual void UnknownVirtualSlot18(); virtual void UnknownVirtualSlot19(); virtual void UnknownVirtualSlot20();
+    virtual void UnknownVirtualSlot21(); virtual void UnknownVirtualSlot22(); virtual void UnknownVirtualSlot23();
+    virtual void UnknownVirtualSlot24(); virtual void UnknownVirtualSlot25(); virtual void UnknownVirtualSlot26();
+    virtual void* UnknownVirtualSlot27(void* a, GameObject* manager);
+};
+struct BikeDustEmitter : BikeParticleEmitterView {
+    explicit BikeDustEmitter(int flags);        // 0x004b8a00
+    char pad_0x04[0x7c];                        // 0x80 bytes (`new(__FILE__, 0x70f)`)
+};
+struct BikeDirtChunkEmitter : BikeParticleEmitterView {
+    explicit BikeDirtChunkEmitter(int flags);   // 0x004b8df0
+    char pad_0x04[0x604];                       // 0x608 bytes (`new(__FILE__, 0x710)`)
+};
+struct BikeSteamEmitter : BikeParticleEmitterView {
+    explicit BikeSteamEmitter(int flags);       // 0x004b9f40
+    char pad_0x04[0x5c];
+    int field_0x60;                             // the loader sets it to 1
+    char pad_0x64[0x418];                       // 0x47c bytes (`new(__FILE__, 0x711)`)
 };
 
 // Objects reached through Bike fields.  Layout is only known where accessed.
@@ -79,7 +122,8 @@ struct BikeWheel {
     float loadWeight;
     char pad_0x15c[16];
     int w_0x16c;              // Method_0x0040a520 sets it to 2 while the wheel is in contact
-    char pad_0x170[80];
+    char pad_0x170[76];
+    SoultreeObject* sceneNode;  // +0x1bc wheel scene node (VehicleWheel name)
     BikeWheelFrame* w_0x1c0;  // frame whose +0xc axis Method_0x0040a520 projects on
     char pad_0x1c4[60];
     Vec3 nodePosition;        // +0x200 (VehicleWheel name)
@@ -156,6 +200,10 @@ struct BikeA5C4 {
     char pad_0x010[400];
     BikeA1A0* c_0x1a0;
     void Method_0x004a8c50(int a, int b, float c, float d);
+    // The rider is a D3DIMSoultreeCharacter (the loader builds it with 0x004455b0): Character's
+    // FindMotion 0x004a6b30 and Method_0x004a8bf0 seen through this view.
+    int FindMotion(const char* name, int a);
+    void Method_0x004a8bf0(int a, float b);
 };
 
 struct BikeA1A0 {
@@ -163,6 +211,8 @@ struct BikeA1A0 {
     SoultreeObject* d_0x140;           // SoultreeObject::firstChild
     int FindByName(const char* name);     // 0x004fdae0, SoultreeObject::FindByName (soultree.cpp)
     void Method_0x004444e0();
+    void Fn_4444c0(int a);                // 0x004444c0 (SoultreeD3DNode::Fn_4444c0)
+    void GetSubtreeBounds(Vec3* center, Vec3* extents);   // 0x004fe850 (SoultreeObject::GetSubtreeBounds)
     void Method_0x004fb8c0(int a, Matrix4* b);
 };
 
@@ -188,13 +238,33 @@ struct BikeA1F4 {
     int i_0xbe8;
 };
 
+// Smoother objects at Bike+0x640 / +0x644 (the Vehicle.h VehicleSmoother shape, 0x14 bytes each;
+// the loader builds them with `new(__FILE__, 0x7df/0x7e0)` and inline constructors).
 struct BikeA640 {
+    BikeA640(float value, float tc)
+    {
+        steerValue = value;
+        l_0x4 = tc;
+        minValue = 3.402823466e+38f;
+        maxValue = -3.402823466e+38f;
+        l_0x8 = 1.0f;
+    }
     float steerValue;
     float l_0x4;
     float l_0x8;
+    float minValue;
+    float maxValue;
 };
 
 struct BikeA644 {
+    BikeA644(float tc, float rise, float fall)
+    {
+        smoothTime = tc;
+        smoothedValue = 0;
+        maxRise = rise;
+        maxFall = fall;
+        smoothRatio = 1.0f;
+    }
     int smoothedValue;
     float smoothTime;
     float smoothRatio;
@@ -277,6 +347,20 @@ public:
     virtual void UnknownVirtualSlot101();
     virtual void UnknownVirtualSlot102(float arg);
     
+    // 0x004079c0 (6745 bytes, `ret 0xa0` = 40 argument dwords): the bike loader.  Runs
+    // Vehicle::LoadVehicle, builds the rider character, the handlebar part, the two wheels
+    // with their shocks, the three contact points, the particle emitters and the pose handles.
+    // Argument names are tier 3 except where a callee's parameter fixes them; a19 is unused.
+    GameObject* LoadBike(int a1, const char* engineName, const char* a3, const char* riderModel,
+                         const SoultreeLoadDesc* desc, const BikeA5C8* info, Vec3 position,
+                         Vec3 forward, Vec3 up, void* a9, VehicleInputMap* map,
+                         const char* name, int a19, int defaultEngine, int* torqueTable,
+                         int rpmLow, int rpmHigh, int rpmStep, float frontSpring, float frontDamper,
+                         float rearSpring, float rearDamper, float frontRatio, float rearRatio,
+                         int a31, int a32, void* a10, void* device, VehicleAxis* steer,
+                         VehicleAxis* lean, VehicleAxis* throttle, SoultreeSlot1f0* track,
+                         float a11, int a21);
+
     // 0x0040a520 (2272 bytes): integrates a steering torque from the angular velocity, the
     // front wheel's contact and the two +0x5f8/+0x5fc contacts, turns it by the steer state
     // and returns the normalised projection (0 when nothing drives it).
@@ -291,7 +375,7 @@ public:
     int field_0x5bc;              // first Bike field (Vehicle's own data ends at 0x5bc)
     int field_0x5c0;
     BikeA5C4* riderCharacter;  // +0x5c4 slot 8/89 (0x406ae0): calls Method_0x004a8c50(poseA, poseB, poseParam, w) on it and riderCharacter->c_0x1a0 scene node; slot 97 passes it with "rider.col" to the 0x604 object
-    char pad_0x5c8[24];
+    BikeA5C8 field_0x5c8;         // +0x5c8 copy of the loader's info block (when given)
     char riderName[16];           // +0x5e0 ctor strcpy from global 0x00577738 (empty string in the image); tier 3 name
     BikeWheel* frontWheel;       // +0x5f0 front wheel (largest config z, see 0x4079c0 loop at 0x408705); tier 3
     BikeWheel* rearWheel;       // +0x5f4 rear wheel (smallest config z, 0x408728); tier 3
@@ -326,16 +410,16 @@ public:
     int field_0x700;
     float field_0x704;
     float sideLieThreshold;  // +0x708 slot 38 tail: compared with |dot(g_BikeVec3_005778c8, field_0xa0)|; if smaller 'bike is lying on its side' branch
-    char pad_0x70c[4];
+    float field_0x70c;             // +0x70c loader: 0.85f
     float field_0x710;
     float wobbleTime;  // +0x714 slot 91 wobble: wobbleTime += field_0x13c each frame, cubed (t*t*t*0.3578) to cap amplitude, halved on sign flip, zeroed by slot 71
     float wobbleSign;  // +0x718 slot 91 wobble: sign of field_0x2c; compared with new sign to detect flip; set in slot 71 from sign of field_0x48
     float wobbleOffset;  // +0x71c slot 91 wobble: added into field_0xd8.z, decays *0.9 per frame, reloaded from field_0xd8.z on flip/slot 71
     int wobbleStage;  // +0x720 slot 91 wobble: cycles 1..2 on each sign flip, loop active only while 1..2; slot 71 sets to 1
     float field_0x724;
-    int field_0x728;               // +0x728 cleared in the ctor
-    int field_0x72c;               // +0x72c cleared in the ctor
-    int field_0x730;               // +0x730 cleared in the ctor; own data ends at 0x734, the compiler places the vtordisp there
+    BikeDustEmitter* field_0x728;        // +0x728 cleared in the ctor; the loader's dust emitter (attachment type 1 on the rear wheel)
+    BikeDirtChunkEmitter* field_0x72c;   // +0x72c cleared in the ctor; dirt chunks (attachment type 2 on the rear wheel)
+    BikeSteamEmitter* field_0x730;       // +0x730 cleared in the ctor; steam (attachment type 4 at (0, 2.5, -2.75)); own data ends at 0x734, the compiler places the vtordisp there
 };
 
 typedef char bike_assert_sizeof[(sizeof(Bike) == 0x738 + 0x2c) ? 1 : -1];
