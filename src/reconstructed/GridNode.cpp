@@ -5,8 +5,9 @@
 // 0x0055cb08, vtable 0x00553ec0) is tier 1; the class is declared in
 // Griddraw.h. There is no __FILE__ literal: the file name is ours (tier 3).
 // Its .data is the third copy of the shared row tables (0x0056c2ac), which
-// 0x00483910 and 0x00484d70 read. 0x00483910 and slot 1 are not
-// reconstructed; 0x00484d70 is a near miss (samples/render/GridNodeNearMisses.cpp).
+// 0x00483910 and 0x00484d70 read. Slot 1 is not reconstructed; 0x00483910
+// (corner fetch) and 0x00484d70 are near misses
+// (samples/render/GridNodeNearMisses.cpp).
 
 #include "Griddraw.h"
 

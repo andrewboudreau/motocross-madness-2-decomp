@@ -232,6 +232,11 @@ public:
     virtual int UnknownVirtualSlot1(void* a, void* b, void* out, int c, int d, int e); // 0x00483d40
     // 0x00484d70: the leaf whose grid position is (x, z), or 0 (GridNode.cpp).
     GridNode* UnknownFunction484d70(int x, int z);
+    // 0x00483910 (GridNode.cpp): the four corners of the cell at (x, z) in
+    // this node's units: heights[4], normals[4] (optional) and the cells'
+    // first bytes (optional); 0 with zeroed outputs when no leaf covers it.
+    int UnknownFunction483910(int x, int z, float* heights, GridVec3* normals,
+                              unsigned char* surface);
 
     GridNode** children;                       // +0x04 256 entries (0x400 bytes)
     GridNode* parent;                          // +0x08

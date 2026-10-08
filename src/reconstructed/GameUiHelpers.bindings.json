@@ -1,0 +1,20 @@
+{
+  "??_C@_01PCFE@?2?$AA@": "0x00568c24",
+  "??_C@_04MHIC@NONE?$AA@": "0x00568c60",
+  "??_C@_05KEJO@?$CFs?2?$CFs?$AA@": "0x005667dc",
+  "?UnknownFunction47b670@@YAHPAUVector3@@0PAUUnknownBikeRaceNode@@H@Z": "0x0047b670",
+  "?UnknownFunction47b800@@YAHMMMMMMMMPAM0@Z": "0x0047b800",
+  "?UnknownFunction47b8a0@@YAMPBD0N0@Z": "0x0047b8a0",
+  "?UnknownFunction47b930@@YAXPBD00PADH0@Z": "0x0047b930",
+  "?UnknownFunction47b9e0@@YAHPBD0H0@Z": "0x0047b9e0",
+  "?UnknownFunction47ba80@@YAXPBD000@Z": "0x0047ba80",
+  "__imp__GetCurrentDirectoryA@8": "0x00550254",
+  "__imp__GetPrivateProfileIntA@16": "0x00550208",
+  "__imp__GetPrivateProfileStringA@24": "0x00550204",
+  "__imp__WritePrivateProfileStringA@16": "0x005501b8",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3fff8000000000000000": "0x00550748",
+  "_atof": "0x00536340",
+  "_sprintf": "0x00534aaf",
+  "_strstr": "0x005362c0"
+}

@@ -18,6 +18,18 @@ KeyboardDevice::KeyboardDevice() : PCInputDevice(0) {
     modifierState = 0;
 }
 
+// 0x00489f80: attaches `binding` to this device's list for its axis and
+// gives it the keys that step it down and up.
+int KeyboardDevice::UnknownFunction489f80(UnknownControlBinding* binding, int key, int key2,
+                                          float step, float interval) {
+    binding->field_0x00 = this;
+    binding->field_0x1c = step;
+    binding->field_0x20 = interval;
+    axisBindings[binding->field_0x08].Add(binding);
+    binding->UnknownFunction43cce0(key, key2);
+    return 1;
+}
+
 // 0x0048a030: drops every binding with id `id`.
 void KeyboardDevice::UnknownVirtualSlot0(int id) {
     for (int list = 0; list < 6; list++) {
