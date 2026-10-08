@@ -131,8 +131,6 @@
   "?ParameterForHeight@UnknownEcoDefinition@@QAEHM@Z": "0x00455f60",
   "?HeightForParameter@UnknownEcoDefinition@@QAEME@Z": "0x00455f90",
   "?RadiusForParameter@UnknownEcoDefinition@@QAEME@Z": "0x00455ff0",
-  "?LoadModel@UnknownEcoDefinition@@QAEHPAVTextureMapManager@@H@Z": "0x00456050",
-  "?LoadModel@UnknownEcoDefinition@@QAEHPAVTextureMapManager@@H@Z$ehhandler": "0x0054a8b4",
   "?PlaceQuantized@Vegetation@@QAEXEPAVTextureMapManager@@PBGEE@Z": "0x004567a0",
   "?PlaceQuantized@Vegetation@@QAEXPAVTextureMapManager@@EPBUUnknownEcoCoordinates@@EE@Z": "0x004567a0",
   "?Place@Vegetation@@QAEXEPAVTextureMapManager@@PBUVector3@@EE@Z": "0x004567e0",
