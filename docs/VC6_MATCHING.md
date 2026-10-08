@@ -367,6 +367,10 @@ evidence.
 
 ### 2. Close the smallest, best-constrained unclaimed near misses
 
+[NEAR_MISS_INDEX.md](NEAR_MISS_INDEX.md) lists every near miss with its score
+and whether it differs only in frame slots (class a), in slots and code (b)
+or in code alone (c).
+
 Use one candidate per commit and run the full calibration after any shared-header
 change, because seemingly harmless declarations have already changed VC6 register
 allocation in other translation units.

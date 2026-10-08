@@ -8,7 +8,9 @@
 // - SphereInFrustum 0x0052fbb0: 517/526, same size and code; retail keeps depth in the camera
 //   argument's slot and the near depth in the centre argument's slot, VC6 swaps the two (and
 //   so the x high/low values that reuse them).  Declaration order and dropping the named
-//   temporaries change nothing.
+//   temporaries change nothing; neither do a named `farDepth`, `nearDepth`/`depth` declared
+//   at their use, the lows assigned before their tests, an explicit `crosses = 0` else arm,
+//   `depth + -radius` or the second test's operands swapped (docs/NEAR_MISS_INDEX.md, class a).
 #include "visibility/VisibilityQuadTree.cpp"
 
 // 0x0052f190 (ret 0x18).  ProjectPoint over `count` vertices (0x20-byte records): the

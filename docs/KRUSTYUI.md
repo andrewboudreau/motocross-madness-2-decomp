@@ -85,6 +85,15 @@ The random helper `RandomUnit()` returns `(float)(rand() * (1.0f / 32768))`.
 The explicit cast is what keeps VC6 from folding the scale into a following
 constant (`* 36`) or reordering it after a variable factor (`* (count - 1)`).
 
+`0x0049a8b0` (1897 bytes, exact) loads `bikes.pb` and `riders.pb` into the
++0x48/+0x50/+0x58 lists: only manufacturers 3 and 7, their bike 2, and riders
+42 and 44 are read. Each file's entry count is a local of its own `if` block;
+the two share one frame slot, which is what puts the manufacturer index at
+`[esp+0x1c]` below the bike count at `[esp+0x20]` as in retail (a single
+function-scope count swaps them; docs/VC6_FRAME_LAYOUT.md). The implicit
+`Exit1Dlg` destructor `0x00450fc0` (`jmp 0x0046a070`) is registered from the
+same file.
+
 Near misses (`samples/ui/KrustyUINearMisses.cpp`, own bindings file):
 
 - `0x004988a0`, TrackGame slot 4's initialiser (872 of 1104 bytes). It loads
@@ -93,11 +102,6 @@ Near misses (`samples/ui/KrustyUINearMisses.cpp`, own bindings file):
   `ui`, `ui\wait.tga` and `ui\uires.res`, restores "MRUProfile" and
   "JoystickFilter", and offline opens `Intro1Dlg` (line 201). From the scale
   store on, retail picks different registers.
-- `0x0049a8b0`, which loads `bikes.pb` and `riders.pb` (1891 of 1897 bytes).
-  Only manufacturers 3 and 7, their bike 2, and riders 42 and 44 are read.
-  Retail keeps the manufacturer index at `[esp+0x1c]` and the bike count at
-  `[esp+0x20]`; VC6 here swaps them whatever the declaration order, scope or
-  names.
 - `0x0049b0d0`, which picks distinct random bikes and riders for the AI
   (880 of 916 bytes). Retail places the "class 1 above 0.2" arm after the
   probe loop; every if/else, goto and ternary form tried keeps it before.

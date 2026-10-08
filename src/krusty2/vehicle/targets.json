@@ -1605,8 +1605,8 @@
     "candidate_symbol_contains": "LoadVehicle@Vehicle",
     "target_va": "0x00525e20",
     "target_size": 1373,
-    "expect": "partial",
-    "notes": "1372/1373 bytes: every byte matches except one load. The gearbox constructor's name argument is read from the EH temporary of the `new` (the dead slot of the map parameter, [esp+0x48] at 0x005260d3); an uninitialised local name reproduces the uninitialised read but VC6 homes it in the gearArg slot ([esp+0xc0], 7-byte vs 4-byte encoding), so everything after it is shifted by 3 bytes. Not a vtable entry (`ret 0x94`; Bike's loader 0x004079c0 calls it directly).",
+    "expect": "exact",
+    "notes": "the second parameter is the engine name handed to the VehicleSpeedState constructor (retail reads [esp+0x48] at 0x005260d3, the a2 argument slot after seven pushes); with it as an `int` the name had to be an uninitialised local, which VC6 homed in the gearArg slot ([esp+0xc0], 7-byte encoding) and shifted the tail by 3 bytes. Not a vtable entry (`ret 0x94`; Bike's loader 0x004079c0 calls it directly).",
     "bindings": "Vehicle.bindings.json"
   },
   {

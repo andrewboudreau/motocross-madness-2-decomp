@@ -458,7 +458,7 @@ public:
     // calls it directly).  Forwards a1..a11, a13, a14 and a21 to SoultreePhysicsCharacter slot
     // 40 with (0.02f, 100, 0.001f, 0.1f, 3) and the track byte; the other arguments configure
     // the vehicle (names tier 3).
-    GameObject* LoadVehicle(int a1, int a2, const char* a3, const SoultreeLoadDesc* a4, int a5,
+    GameObject* LoadVehicle(int a1, const char* engineName, const char* a3, const SoultreeLoadDesc* a4, int a5,
                             Vec3 a6, Vec3 a7, Vec3 a8, void* a9, VehicleInputMap* map, void* a10,
                             float a11, float arg18, float steerScale, void* device, int wheelCap,
                             int extraContacts, int a13, int earlyCap, int lateCap, int defaultEngine,

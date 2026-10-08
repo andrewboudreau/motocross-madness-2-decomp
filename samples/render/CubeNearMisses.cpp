@@ -6,7 +6,11 @@
 // face pointer of the bit-0 loop into the dead `stream` and `baseOffset`
 // argument slots the other way round from retail (retail: counter in
 // `baseOffset`'s slot, pointer in `stream`'s). Declaration order, separate
-// loop variables, an int `flags` and a pointer local do not change it.
+// loop variables, an int `flags` and a pointer local do not change it; nor
+// do a counter of its own for the bit-0 loop (top-level or block-scoped), a
+// counter per loop, an explicit `int* p`/`UnknownCubeFace* f` walk, the
+// `field_0x48 + i` spelling or a `return this` before the `fail` tail
+// (docs/NEAR_MISS_INDEX.md, class a).
 
 #include "../../src/reconstructed/Cube.h"
 

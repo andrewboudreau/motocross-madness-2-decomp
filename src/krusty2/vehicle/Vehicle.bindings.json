@@ -28,7 +28,7 @@
   "?GetAverageGroundNormal@Vehicle@@QAEPAUVec3@@PAU2@@Z": "0x00528400",
   "?GetPosition@SoultreeObject@@QAEPAUVec3@@PAU2@@Z": "0x004fc970",
   "?GetPositionIn@SoultreeObject@@QAEXPAV1@PAUVec3@@@Z": "0x004fc9a0",
-  "?LoadVehicle@Vehicle@@QAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HUVec3@@22PAXPAUVehicleInputMap@@3MMM3HHHHHHPAHHHHHPAUVehicleAxis@@66PAVSoultreeSlot1f0@@H@Z$ehhandler": "0x0054f0d2",
+  "?LoadVehicle@Vehicle@@QAEPAVGameObject@@HPBD0PBUSoultreeLoadDesc@@HUVec3@@22PAXPAUVehicleInputMap@@3MMM3HHHHHHPAHHHHHPAUVehicleAxis@@66PAVSoultreeSlot1f0@@H@Z$ehhandler": "0x0054f0d2",
   "?LocalToWorldDirection@SoultreeObject@@QAE?AUVec3@@ABU2@@Z": "0x004fd5c0",
   "?Method_004444E0@VehSceneNodeView@@QAEXXZ": "0x004444e0",
   "?Method_00478FE0@Vehicle@@QAEHXZ": "0x00478fe0",

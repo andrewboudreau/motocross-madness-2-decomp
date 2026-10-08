@@ -6,7 +6,10 @@
 // 0x004853b0 (1085 bytes, 1079 match): only stack slots differ. Retail keeps
 //   the ControlInterface pointer in the fontSize argument slot (+0x3c) and
 //   the `new` temporaries in the target slot (+0x20); VC6 here uses +0x20
-//   and +0x28. Local and expression forms of the devices do not change it.
+//   and +0x28. Local and expression forms of the devices do not change it,
+//   nor do `controls` declared at its use or per block, the index declared
+//   in the loop, a `user` local or storing the font size before the name
+//   (docs/NEAR_MISS_INDEX.md, class a).
 // 0x00485a70 (345 bytes): same calls and argument order; retail keeps
 //   `flags & 4` in edi and `wait` in ebp, VC6 here keeps `a`/`parent` in
 //   ebp (a `flags & 4` local makes it worse).

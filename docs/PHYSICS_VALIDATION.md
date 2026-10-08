@@ -267,11 +267,11 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   runs `SoultreePhysicsCharacter` slot 40 with `(0.02f, 100, 0.001f, 0.1f, 3)` and the track
   byte, builds the spark emitter `0x004b9830` (state 2, child via its slot 27 and
   `GameObject::Method_0x00469190`) and the steering control `0x00504b60` (state 3, axis
-  `a8 * -1.0f`), then installs `VehicleHit`/`VehicleHitBy`.  1372 of 1373 bytes match: the
-  gearbox's name argument is loaded from the `new` temporary's slot (the dead `map`
-  parameter home, `[esp+0x48]` at `0x005260d3`, i.e. an uninitialised value); an
-  uninitialised local reproduces the read but VC6 homes it in the dead `gearArg` slot
-  (`[esp+0xc0]`), which costs 3 bytes.  `maxLeanAngle`/`maxLeanRate` are
+  `a8 * -1.0f`), then installs `VehicleHit`/`VehicleHitBy`.  Exact: the gearbox's name
+  argument is the second parameter (`[esp+0x48]` at `0x005260d3` is the a2 argument slot
+  after seven pushes, not the `new` temporary); read as an uninitialised local instead, VC6
+  homed it in the dead `gearArg` slot (`[esp+0xc0]`), which cost 3 bytes.
+  `maxLeanAngle`/`maxLeanRate` are
   `40.0f * 0.01745329f` / `120.0f * 0.01745329f` (the `(float)(deg * pi / 180)` forms are
   one ulp off).
 - `Bike::Method_0x0040a520` `0x0040a520` (2272 bytes) is a partial (2265 bytes, same calls

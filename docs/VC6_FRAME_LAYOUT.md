@@ -213,3 +213,26 @@ rule attributes to the source:
 No source form was found that reproduces the dead slot (a local used only in
 dead code gets no slot, fact 3), so the parser stays a near miss; the sample
 header records these findings.
+
+## Applied to the scan of every near miss
+
+`docs/NEAR_MISS_INDEX.md` classifies every near miss in the repository by
+whether it differs from retail only in frame slots. Two of them became exact:
+
+- krustyui.cpp `0x0049a8b0`: the manufacturer index and the bike count (both
+  4 bytes, both three references) were swapped. Declaring the entry `count`
+  inside each file's `if` block makes the two counts share one slot (fact 4)
+  and that changes the tie order of the whole list, which moves the index
+  below the bike count. A function-scope `count` or shared loop indices do
+  not.
+- Vehicle.cpp `0x00525e20`: not a layout change. The read at `[esp+0x48]`
+  that an uninitialised local reproduced is the second parameter's slot (the
+  engine name), which VC6 had homed elsewhere.
+
+The remaining slot-only cases (`0x0043d230`, `0x004853b0`, `0x0052fbb0`) are
+spill homes in dead argument slots of frameless functions: two values take
+the dead `stream`/`baseOffset`, `fontSize`/local or `camera`/`center` slots
+the other way round. The rule above orders frame locals; which dead argument
+slot a spilled scalar takes is not measured yet, and the scoping, naming and
+temporary forms tried are listed in each sample's header.
+
