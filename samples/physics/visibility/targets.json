@@ -17,15 +17,5 @@
     "expect": "partial",
     "notes": "382/418, x87 load order only.",
     "bindings": "../../../src/krusty2/visibility/VisibilityQuadTree.bindings.json"
-  },
-  {
-    "class": "VisibilityClipper",
-    "source": "VisibilityClipperNearMisses.cpp",
-    "candidate_symbol_contains": "?SphereInFrustum@VisibilityClipper",
-    "target_va": "0x0052fbb0",
-    "target_size": 526,
-    "expect": "partial",
-    "notes": "517/526, two stack slots swapped.",
-    "bindings": "../../../src/krusty2/visibility/VisibilityQuadTree.bindings.json"
   }
 ]

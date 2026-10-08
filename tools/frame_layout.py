@@ -741,6 +741,95 @@ def suggest_adjustments(symbols: list[FrameSymbol], target: list[str], max_round
 # Report
 # --------------------------------------------------------------------------
 
+# --------------------------------------------------------------------------
+# Homes in dead argument slots
+# --------------------------------------------------------------------------
+
+@dataclass
+class ArgSlot:
+    """A dead argument slot in the order VC6 hands such slots out."""
+    name: str
+    offset: int          # frame-base offset of the slot
+    free_from: int       # instruction index after which the slot holds no argument
+
+
+@dataclass
+class HomeSymbol:
+    """A value that needs a memory home (an x87 local, a register spill)."""
+    name: str
+    count: int           # the compiler's use count (IR uses, not memory references)
+    size: int
+    first_def: int       # instruction index of its first definition
+    last_use: int        # instruction index of its last reference
+
+
+def predict_arg_homes(symbols: list[HomeSymbol], slots: list[ArgSlot]) -> dict[str, int | None]:
+    """Assign homes in dead argument slots the way VC6 SP3 does (docs/VC6_FRAME_LAYOUT.md).
+
+    The symbols rank by count per byte, descending, ties by last use ascending
+    (the frame rule's key); each takes the first slot, in the order ``slots``
+    gives them (the arguments' first use in the source), whose argument died
+    before the symbol's first definition and whose earlier occupants do not
+    overlap it. Symbols that fit nowhere map to None (a frame slot).
+    """
+    occupants: dict[int, list[HomeSymbol]] = {sl.offset: [] for sl in slots}
+    order = sorted(symbols, key=lambda s: (-s.count / max(s.size, 1), s.last_use))
+    homes: dict[str, int | None] = {}
+    for s in order:
+        homes[s.name] = None
+        if s.size > 4:
+            continue
+        for sl in slots:
+            if sl.free_from >= s.first_def:
+                continue
+            if all(o.last_use < s.first_def or o.first_def > s.last_use for o in occupants[sl.offset]):
+                occupants[sl.offset].append(s)
+                homes[s.name] = sl.offset
+                break
+    return homes
+
+
+def _is_write(text: str) -> bool:
+    mn, _, ops = text.partition(' ')
+    if mn in ('fst', 'fstp', 'fist', 'fistp', 'fisttp', 'lea', 'pop'):
+        return True
+    if mn.startswith('mov') or mn in ('add', 'sub', 'inc', 'dec', 'and', 'or', 'xor', 'neg', 'not'):
+        return bool(re.match(r'(byte|word|dword|qword) ptr \[', ops))
+    return False
+
+
+def argument_slot_homes(info: FrameInfo) -> list[dict]:
+    """Argument slots that the function writes: the argument's death and the values homed there.
+
+    Returns one row per written slot: ``arg`` (0-based argument index),
+    ``offset``, ``death`` (index of the argument's last read before the first
+    write, -1 when the slot is written before any read), and ``values``, the
+    runs of accesses that start at each write ([first index, last index,
+    reference count]).
+    """
+    arg_base = info.frame_size + info.saved_regs + 4
+    by_off: dict[int, list[FrameAccess]] = defaultdict(list)
+    for a in info.accesses:
+        if a.offset >= arg_base and a.width in (0, 1, 2, 4):
+            by_off[a.offset].append(a)
+    rows = []
+    for off in sorted(by_off):
+        acc = sorted(by_off[off], key=lambda a: a.index)
+        if not any(_is_write(a.text) for a in acc):
+            continue
+        first_write = next(i for i, a in enumerate(acc) if _is_write(a.text))
+        death = acc[first_write - 1].index if first_write else -1
+        values = []
+        for a in acc[first_write:]:
+            if _is_write(a.text) or not values:
+                values.append([a.index, a.index, 1])
+            else:
+                values[-1][1] = a.index
+                values[-1][2] += 1
+        rows.append({'arg': (off - arg_base) // 4, 'offset': off, 'death': death, 'values': values})
+    return rows
+
+
 def local_ranges(proc: CvProc, info: FrameInfo) -> list[dict]:
     """Candidate locals as frame-base offsets with sizes (gap-filled when the type is unknown)."""
     locs = [l for l in proc.locals if l.register is None and l.bprel < 0]
@@ -901,7 +990,9 @@ def build_report(cand: list[Insn], retail: list[Insn], proc: CvProc,
                     s.region = off + 1
     predicted = flatten(predict_layout(syms))
     adjust = suggest_adjustments(syms, retail_order) if retail_order else None
+    arg_homes = {'candidate': argument_slot_homes(ci), 'retail': argument_slot_homes(ri)}
     return {
+        'arg_homes': arg_homes,
         'candidate': {'frame_size': ci.frame_size, 'saved_regs': ci.saved_regs, 'ebp_based': ci.ebp_based,
                       'insns': len(cand), 'accesses': len(ci.accesses), 'depth_resets': ci.depth_resets},
         'retail': {'frame_size': ri.frame_size, 'saved_regs': ri.saved_regs, 'ebp_based': ri.ebp_based,
@@ -956,6 +1047,16 @@ def print_report(rep: dict) -> None:
     if rep['predicted_order'] != rep['candidate_order']:
         print('  (the reference count read from the disassembly does not reproduce the candidate;'
               ' treat refs as a proxy)')
+    print()
+    ah = rep.get('arg_homes') or {}
+    if ah.get('candidate') or ah.get('retail'):
+        print('values homed in argument slots (arg#: offset, argument dead after insn; occupant runs first..last/refs):')
+        for side in ('candidate', 'retail'):
+            rows = ah.get(side) or []
+            print('  %-9s %s' % (side + ':', ' | '.join(
+                'arg%d: %x dead@%d %s' % (r['arg'], r['offset'], r['death'],
+                                         ' '.join('%d..%d/%d' % tuple(v) for v in r['values'])) for r in rows) or '-'))
+        print('  (slots are handed out in the order of the arguments\' first use; the symbol rank is the frame rule\'s)')
     print()
     adj = rep['adjustments']
     if adj is None:

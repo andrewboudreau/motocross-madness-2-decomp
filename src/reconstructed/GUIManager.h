@@ -318,7 +318,7 @@ public:
     // and a callback).
     GUIManager* SetUp(void* target, Palette8* palette, TextureMapManager* textures,
                       BackgroundImage* background, int startSound, SoundGroup* sound,
-                      const char* font, int fontSize, const char* cursor,
+                      const char* font, short fontSize, const char* cursor,
                       int callback);
     // 0x00485a70: shows `dialog`.
     UIDialog* ShowDialog(UIDialog* dialog, int a, int flags, int b,

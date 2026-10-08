@@ -28,17 +28,18 @@ cases moved here from GameCursor.cpp. The Parameterblocks.h copies
 in this file's range; they are not claimed.
 
 Exact:
-- cube.cpp (16): the stream alignment helper, reset, the constructor, the
-  destructor and its deleting wrapper, the vectors and texture loaders, and
-  the eight `$E`.
+- cube.cpp (17): the stream alignment helper, reset, the constructor, the
+  header reader `0x0043d230` (its three argument stores must come in the
+  order group, stream, baseOffset: VC6 homes `flags`, the face pointer and
+  the face counter in the dead argument slots in that order,
+  docs/VC6_FRAME_LAYOUT.md), the destructor and its deleting wrapper, the
+  vectors and texture loaders, and the eight `$E`.
 - cubedraw.cpp (22): the constructor, the destructor and its deleting
   wrapper, the loader `0x0043d980`, `0x0043e210`, slot 12, the eight empty
   array `$E` (their order cannot be checked because the bodies are
   identical) and the eight vector `$E`.
 
 Near misses:
-- `samples/render/CubeNearMisses.cpp`: the header read `0x0043d230`,
-  where two stack slots are swapped.
 - `samples/render/CubeDrawNearMisses.cpp`: the geometry builder
   `0x0043dc60`, the texture coordinates `0x0043e0b0`, the visibility test
   `0x0043e330` and slot 14 `0x0043e4c0`. They differ in register use,

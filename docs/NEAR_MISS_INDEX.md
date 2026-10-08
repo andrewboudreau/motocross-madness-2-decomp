@@ -17,7 +17,11 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 3, b 195, c 168, total 366.
+Counts: a 0, b 195, c 168, total 363. The three class (a) functions of the
+first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
+VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
+homes in dead argument slots, which VC6 hands out in the order of the
+arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 
 | TU | VA | score | class | what differs |
 |---|---|---|---|---|
@@ -213,7 +217,6 @@ Counts: a 3, b 195, c 168, total 366.
 | physics/vehicle/VehicleInlines | `0x0040c4c0` | 103/114 (masked) | b | 3 code diffs: `fld [edi + 4] ; fmul [esi]` vs `fld [esi] ; fmul [edi + 4]`; retail adds `fsubp st(1) ; mov [ebx + 4], ecx`; slots differ |
 | physics/vehicle/VehicleInlines | `0x0040c540` | 119/126 (masked) | b | 2 code diffs: retail adds `fsubp st(1) ; mov [ebx + 4], eax`; retail lacks `fsubp st(1) ; mov [ebx + 4], eax`; slots differ |
 | physics/visibility/VisibilityClipper | `0x0052f190` | 382/418 | c | 8 code diffs: `fld [ecx + 0x1c] ; fmul [edx + 4]` vs `fld [edx + 4] ; fmul [ecx + 0x1c]`; `fld [ecx + 0x2c] ; fmul [edx + 8]` vs `fld [edx + 8] ; fmul [ecx + 0x2c]` |
-| physics/visibility/VisibilityClipper | `0x0052fbb0` | 517/526 | a | slots only: `depth` and `nearDepth` spill into the dead camera/center argument slots the other way round (named/at-use temporaries, declaration order, operand forms tried) |
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2046/2814 (masked) | c | 137 code diffs: `mov eax, [esp + N] ; mov ecx, [esp + N]` vs `mov eax, [edi + 4]`; retail adds `mov ecx, [eax] ; mov eax, [esp + N] ; p~` |
 | race/BikeRace | `0x00417ed0` | 191/6756 | c | 1 code diffs: retail lacks `add ecx, 0x1cc ; test ecx, ecx ; jne @50` |
 | race/BikeRace | `0x00419970` | 667/13322 | b | 66 code diffs: `je @1965 ; jmp @1960` vs `je A ; jmp A`; `mov edx, [ebp + N] ; mov [eax + 0x2fc],~` vs `mov ecx, [ebp + N] ; mov [eax + 0x2fc],~`; frame 0xac4 vs 0xab0, slot order differs |
@@ -237,7 +240,6 @@ Counts: a 3, b 195, c 168, total 366.
 | render/BackgroundImage | `0x004049d0` | 39/603 (masked) | c | 33 code diffs: `xor edi, edi` vs `mov [esp + N], 0`; `mov [esp + N], edi ; mov [ecx], edi ; j~` vs `mov [ecx], 0 ; je @162` |
 | render/CacheTexture | `0x0050f9b0` | 606/618 (masked) | b | 8 code diffs: `mov ebp, ecx` vs `mov ebx, ecx`; `mov ebx, [ebp + N]` vs `mov ebp, [ebx + 0x184]`; slots differ |
 | render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
-| render/Cube | `0x0043d230` | 445/452 | a | slots only: the bit-0 loop's face counter and face pointer spill into the dead `stream`/`baseOffset` argument slots the other way round (separate counters, pointer forms and declaration orders tried) |
 | render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |
 | render/CubeDraw | `0x0043e0b0` | 30/352 | c | 22 code diffs: retail adds `push ebx`; retail adds `mov ecx, [esp + N]` |
 | render/CubeDraw | `0x0043e330` | 90/399 | b | 15 code diffs: `mov ecx, [edi + 0x18] ; mov eax, [ecx +~` vs `mov eax, [edi + 0x18] ; mov ecx, [eax +~`; `mov eax, [ecx + 8] ; mov edx, [eax + 0x~` vs `mov ecx, [eax + 8] ; mov edx, [ecx + 0x~`; slots differ |
@@ -333,7 +335,6 @@ Counts: a 3, b 195, c 168, total 366.
 | ui/DlgProcs | `0x004507a0` | 589/1668 | c | 32 code diffs: `mov eax, [edx + 0x570] ; mov ecx, [eax ~` vs `mov ecx, [edx + 0x570] ; lea eax, [edx ~` |
 | ui/DlgProcs | `0x004513a0` | 506/2004 | c | 19 code diffs: `jne @515` vs `jne A`; `ja @515` vs `ja A` |
 | ui/DlgProcs | `0x00452930` | 276/1875 | c | 86 code diffs: retail adds `jmp @67 ; mov ebx, [esp + N] ; push 1` |
-| ui/GUIManager | `0x004853b0` | 1079/1085 | a | slots only: retail homes `controls` in the dead fontSize argument slot (+0x3c) and the GUIInputDevice `new` temporaries in +0x20; VC6 uses +0x20/+0x28 (local/at-use/block-scoped forms of the devices, user and index tried) |
 | ui/GUIManager | `0x00485a70` | 62/345 | c | 29 code diffs: retail lacks `mov edx, ebx`; retail lacks `mov ebp, [esp + N]` |
 | ui/GUIManager | `0x00486170` | 280/896 | b | 52 code diffs: retail lacks `xor ebx, ebx`; `cmp ecx, ebx` vs `xor ebx, ebx`; frame 0xa4 vs 0xb0, slot order differs |
 | ui/GUIManager | `0x00486b10` | 86/106 | c | 5 code diffs: retail lacks `mov edx, [esi + 0x48]`; `mov [esp + N], edx` vs `pop edi` |

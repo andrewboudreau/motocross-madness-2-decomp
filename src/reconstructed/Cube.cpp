@@ -1,6 +1,5 @@
 // Cube.cpp -- reconstruction of D:\aardvark\VC\krusty2\cube.cpp. See Cube.h
-// for the TU extent and the class. The header reader 0x0043d230 is a near
-// miss in samples/render/CubeNearMisses.cpp.
+// for the TU extent and the class.
 
 #include "Cube.h"
 
@@ -57,6 +56,70 @@ void Cube::Reset()
 Cube::Cube()
 {
     Reset();
+}
+
+// 0x0043d230: reads the cube header from `stream`: the file format, the flags, the
+// per-face texture masks and size codes, the three vectors, then (flags bit 2) the
+// per-face 0x88 tables, (bit 0) the per-face 0x48 tables and (bit 1) the 0x800
+// alignment skip; records the texture data offset. Returns 0 and releases the cube
+// when a read fails or `a` is set. The three argument stores come in the order
+// group, stream, baseOffset: VC6 hands the dead argument slots out in the order of
+// the arguments' first use, and that order homes `flags` in the group slot, the
+// face pointer in the stream slot and the face counter in the baseOffset slot
+// (docs/VC6_FRAME_LAYOUT.md).
+Cube* Cube::UnknownFunction43d230(UnknownTextureStream* stream, int a, ManagedTextureGroup* group,
+                                  int baseOffset)
+{
+    short flags;
+    int face;
+    int i;
+
+    field_0x610 = group;
+    field_0x08 = stream;
+    alignmentBase = baseOffset;
+    if (stream->UnknownFunction461640(&fileFormat, 4, 1) != 1)
+        goto fail;
+    if (stream->UnknownFunction461640(&flags, 2, 1) != 1)
+        goto fail;
+    if (stream->UnknownFunction461640(&field_0x12, 2, 1) != 1)
+        goto fail;
+    for (face = 0; face < 6; face++) {
+        if (stream->UnknownFunction461640(&field_0x38[face].presentTextures, 2, 1) != 1)
+            goto fail;
+    }
+    for (face = 0; face < 6; face++) {
+        if (stream->UnknownFunction461640(&field_0x38[face].sizeCodes, 4, 1) != 1)
+            goto fail;
+    }
+    if (stream->UnknownFunction461640(&field_0x14, 12, 1) != 1)
+        goto fail;
+    if (stream->UnknownFunction461640(&field_0x20, 12, 1) != 1)
+        goto fail;
+    if (stream->UnknownFunction461640(&field_0x2c, 12, 1) != 1)
+        goto fail;
+    if (flags & 4) {
+        for (face = 0; face < 6; face++) {
+            if (stream->UnknownFunction461640(field_0x38[face].field_0x88, 0x20, 1) != 1)
+                goto fail;
+        }
+    }
+    if (flags & 1) {
+        for (face = 0; face < 6; face++) {
+            for (i = 0; i < 16; i++) {
+                if (stream->UnknownFunction461640(&field_0x38[face].field_0x48[i], 4, 1) != 1)
+                    goto fail;
+            }
+        }
+    }
+    if (flags & 2)
+        UnknownFunction43d0d0(stream, alignmentBase);
+    textureDataOffset = stream->UnknownFunction461600();
+    if (a) {
+    fail:
+        Release();
+        return 0;
+    }
+    return this;
 }
 
 // 0x0043d400

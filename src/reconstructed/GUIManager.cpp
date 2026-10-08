@@ -175,6 +175,82 @@ GUIManager::GUIManager(int flags) : GameObject(flags) {
     drawGrabFirst = 0;
 }
 
+// 0x004853b0.  `fontSize` is a short: VC6 copies a sub-int parameter at entry, so its
+// slot is the second dead argument slot handed out (after `target`'s) and the
+// ControlInterface pointer lands there; with an int parameter the slot frees only at
+// the font-size store and the pointer takes `target`'s slot (docs/VC6_FRAME_LAYOUT.md).
+GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager* textures,
+                              BackgroundImage* background, int startSound, SoundGroup* sound,
+                              const char* font, short fontSize, const char* cursor,
+                              int callback) {
+    ControlInterface* controls;
+    int i;
+
+    GameObject::UnknownVirtualSlot8(target);
+    guiTextures = textures;
+    guiSoundGroup = sound;
+    if (startSound && SoundSystem()->InitializeSound(22050, 1, 16, 4000000, 0) == 0)
+        SoundSystem()->SetPrimaryFormat(22050, 1, 16);
+    if (!sound) {
+        guiSoundGroup = new(__FILE__, 130) SoundGroup(1);
+        AppendChild(guiSoundGroup, -1);
+        ownsSoundGroup = 1;
+    }
+    dialogContainer = (GameObject*)AppendChild(new(__FILE__, 136) UIDlgContainer, -1);
+    field_0x38 = palette;
+    guiPalette = palette;
+    guiBackground = background;
+    strcpy(dialogFontName, font);
+    dialogFontSize = fontSize;
+    if (cursor)
+        strcpy(cursorImage, cursor);
+    UnknownVirtualSlot18();
+    field_0xd4 = callback;
+    toolTipFont = CreateFontA(12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 2, 2, "Arial");
+    controls = g_TrackGame->controlInterface;
+    if (controls->mouse) {
+        mouseDevice = (GUIInputDevice*)AppendChild(
+            (new(__FILE__, 162) GUIInputDevice)
+                ->Bind(field_0x18, (InputDevice*)controls->mouse, 0, 0, 0, 0),
+            -1);
+        mouseDevice->UnknownFunction469260(dialogContainer, -1);
+        mouseDevice->Rebind();
+    }
+    if (controls->keyboard) {
+        keyboardDevice = (GUIInputDevice*)AppendChild(
+            (new(__FILE__, 169) GUIInputDevice)
+                ->Bind(field_0x18, (InputDevice*)controls->keyboard, 0, 0, 0, 0),
+            -1);
+        keyboardDevice->UnknownFunction469260(dialogContainer, -1);
+        keyboardDevice->Rebind();
+    }
+    if (controls->joystickCount) {
+        for (i = 0; i < controls->joystickCount; i++) {
+            joystickDevices[i] = (GUIInputDevice*)AppendChild(
+                (new(__FILE__, 177) GUIInputDevice)
+                    ->Bind(field_0x18, (InputDevice*)controls->joysticks[i], -2.0f, 2.0f, -2.0f,
+                           2.0f),
+                -1);
+            joystickDevices[i]->UnknownFunction469260(dialogContainer, -1);
+            joystickDevices[i]->Rebind();
+        }
+    }
+    users[0] = (GUIUser*)AppendChild(
+        (new(__FILE__, 188) GUIUser)->UnknownFunction487650(field_0x18, this), -1);
+    if (users[0]) {
+        userCount = 1;
+        users[0]->AcceptKeyboardAndJoysticks();
+        if (mouseDevice) {
+            users[0]->SetPointerDevice(mouseDevice);
+            UnknownFunction486590(0, 1);
+            UnknownFunction4865e0(0, 0);
+        }
+    }
+    users[0]->EnableImeInput(0);
+    languageModule = LoadLibraryA("uilang.dll");
+    return this;
+}
+
 // 0x00485320
 GUIManager::~GUIManager() {
     ReleaseCursors();

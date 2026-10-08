@@ -2,10 +2,11 @@
 import struct
 import unittest
 
-from tools.frame_layout import (CvType, FrameSymbol, Insn, align, assign_offsets, callee_cleans,
-                                equal_run_permutation, flatten, frame_operand, normalize,
-                                parse_cv_procs, parse_cv_types, predict_layout,
-                                suggest_adjustments, track_frame, type_size, vc6_quicksort)
+from tools.frame_layout import (ArgSlot, CvType, FrameSymbol, HomeSymbol, Insn, align, argument_slot_homes,
+                                assign_offsets, callee_cleans, equal_run_permutation, flatten,
+                                frame_operand, normalize, parse_cv_procs, parse_cv_types,
+                                predict_arg_homes, predict_layout, suggest_adjustments,
+                                track_frame, type_size, vc6_quicksort)
 
 
 def cv_record(kind: int, body: bytes) -> bytes:
@@ -196,3 +197,84 @@ class LayoutRuleTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class ArgumentSlotTests(unittest.TestCase):
+    """Homes in dead argument slots, measured on the float probes of docs/VC6_FRAME_LAYOUT.md.
+
+    Slots are given in the order of the arguments' first use; ``free_from`` is
+    the index of that use. Symbol intervals are the probes' instruction indices.
+    """
+    ABCD = [ArgSlot('a', 4, 0), ArgSlot('b', 8, 1), ArgSlot('c', 12, 3), ArgSlot('d', 16, 4)]
+
+    def test_count_ranks_first_then_slot_order(self):
+        # p1: x (4 uses) and y (3 uses) defined after a, b died -> x in a, y in b
+        homes = predict_arg_homes([HomeSymbol('x', 4, 4, 2, 23), HomeSymbol('y', 3, 4, 5, 20)], self.ABCD)
+        self.assertEqual(homes, {'x': 4, 'y': 8})
+        # q2: y with more uses takes a
+        homes = predict_arg_homes([HomeSymbol('x', 4, 4, 2, 23), HomeSymbol('y', 6, 4, 5, 30)], self.ABCD)
+        self.assertEqual(homes, {'y': 4, 'x': 8})
+
+    def test_slots_follow_the_arguments_first_use(self):
+        # p2 / z1: y = c*d first, then x = a*b with more uses: c and d are handed out first,
+        # a and b (used later) stay unused
+        slots = [ArgSlot('c', 12, 0), ArgSlot('d', 16, 1), ArgSlot('a', 4, 3), ArgSlot('b', 8, 4)]
+        homes = predict_arg_homes([HomeSymbol('y', 3, 4, 2, 25), HomeSymbol('x', 6, 4, 5, 40)], slots)
+        self.assertEqual(homes, {'x': 12, 'y': 16})
+        # Cube 0x0043d230: flags (2 bytes, 3 uses) ranks first, then the face pointer and
+        # the counter (tied, pointer's last use first): group, stream, baseOffset in the
+        # order the source first uses the arguments
+        slots = [ArgSlot('group', 0x1c, 0), ArgSlot('stream', 0x14, 1), ArgSlot('baseOffset', 0x20, 2)]
+        syms = [HomeSymbol('flags', 3, 2, 10, 90), HomeSymbol('pointer', 3, 4, 60, 88),
+                HomeSymbol('counter', 3, 4, 59, 87)]
+        self.assertEqual(predict_arg_homes(syms, slots), {'flags': 0x1c, 'pointer': 0x20, 'counter': 0x14})
+        syms[1].last_use, syms[2].last_use = 87, 88
+        self.assertEqual(predict_arg_homes(syms, slots), {'flags': 0x1c, 'pointer': 0x14, 'counter': 0x20})
+
+    def test_live_arguments_are_skipped(self):
+        # q4: b is read at the end -> x in a, y in c
+        slots = [ArgSlot('a', 4, 0), ArgSlot('b', 8, 60), ArgSlot('c', 12, 3), ArgSlot('d', 16, 4)]
+        homes = predict_arg_homes([HomeSymbol('x', 4, 4, 2, 50), HomeSymbol('y', 3, 4, 5, 20)], slots)
+        self.assertEqual(homes, {'x': 4, 'y': 12})
+
+    def test_ties_rank_by_last_use(self):
+        # w2: equal counts, y's last use first -> y in a
+        homes = predict_arg_homes([HomeSymbol('x', 3, 4, 2, 27), HomeSymbol('y', 3, 4, 5, 20)], self.ABCD)
+        self.assertEqual(homes, {'y': 4, 'x': 8})
+
+    def test_first_fit_sharing(self):
+        # r3: x4 (2..23) y3 (5..26) u3 (25..47) v4 (28..46) -> {x,v} a, y b, u c
+        syms = [HomeSymbol('x', 4, 4, 2, 23), HomeSymbol('y', 3, 4, 5, 26),
+                HomeSymbol('u', 3, 4, 25, 47), HomeSymbol('v', 4, 4, 28, 46)]
+        self.assertEqual(predict_arg_homes(syms, self.ABCD), {'x': 4, 'v': 4, 'y': 8, 'u': 12})
+        # r2: x3 y4 u4 v3 -> {y,v} a, {x,u} b
+        syms = [HomeSymbol('x', 3, 4, 2, 23), HomeSymbol('y', 4, 4, 5, 26),
+                HomeSymbol('u', 4, 4, 25, 47), HomeSymbol('v', 3, 4, 28, 46)]
+        self.assertEqual(predict_arg_homes(syms, self.ABCD), {'y': 4, 'v': 4, 'x': 8, 'u': 8})
+        # r7: all 3 uses, last uses x y v u -> {x,v} a, y b, u c
+        syms = [HomeSymbol('x', 3, 4, 2, 16), HomeSymbol('y', 3, 4, 5, 19),
+                HomeSymbol('u', 3, 4, 18, 33), HomeSymbol('v', 3, 4, 21, 32)]
+        self.assertEqual(predict_arg_homes(syms, self.ABCD), {'x': 4, 'v': 4, 'y': 8, 'u': 12})
+
+    def test_sphere_in_frustum(self):
+        # 0x0052fbb0: first uses camera, center, radius, m; camera and center die in the
+        # prologue, radius at its last read (95), m at its reload (44). depth (4 uses) and
+        # nearDepth (3), then the four 3-use highs/lows whose last uses come in the order
+        # xLow, xHigh, yLow, yHigh.
+        slots = [ArgSlot('camera', 0x24, 1), ArgSlot('center', 0x2c, 2), ArgSlot('radius', 0x30, 95),
+                 ArgSlot('m', 0x28, 44)]
+        syms = [HomeSymbol('depth', 4, 4, 14, 40), HomeSymbol('nearDepth', 3, 4, 16, 31),
+                HomeSymbol('xHigh', 3, 4, 67, 124), HomeSymbol('xLow', 3, 4, 73, 117),
+                HomeSymbol('yHigh', 3, 4, 89, 131), HomeSymbol('yLow', 3, 4, 96, 127)]
+        homes = predict_arg_homes(syms, slots)
+        self.assertEqual(homes, {'depth': 0x24, 'nearDepth': 0x2c, 'xLow': 0x24, 'xHigh': 0x2c,
+                                 'yLow': 0x30, 'yHigh': 0x28})
+
+    def test_argument_slot_homes_rows(self):
+        insns = [Insn(0, 'fld', 'dword ptr [esp + 4]', 4), Insn(4, 'fmul', 'dword ptr [esp + 8]', 4),
+                 Insn(8, 'fstp', 'dword ptr [esp + 4]', 4), Insn(12, 'fld', 'dword ptr [esp + 4]', 4),
+                 Insn(16, 'fstp', 'dword ptr [esp + 8]', 4), Insn(20, 'ret', '0x8', 3)]
+        info = track_frame(insns)
+        rows = argument_slot_homes(info)
+        self.assertEqual([(r['arg'], r['offset'], r['death'], r['values']) for r in rows],
+                         [(0, 4, 0, [[2, 3, 2]]), (1, 8, 1, [[4, 4, 1]])])

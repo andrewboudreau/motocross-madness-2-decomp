@@ -11,7 +11,7 @@ partial candidate; the separate helper samples are not covered by that claim.
   other imports; their callers are 0x4c9cd5..0x4c9ea8 and 0x4a0ea1).
 - `VisibilityQuadTree : QuadTree (+0), GameObject (+0x874)`; primary vtable 0x558dfc,
   secondary (GameObject shape) 0x558d8c. `VisibilityQuadTreeNode : QuadTreeNode`, vtable 0x558e08.
-- 16 exact (see targets.json), Traverse 0x52d610 partial (72.7%, 3026 vs 3027 bytes, call-site arg scheduling). Samples: 3 exact, 3 partial (VisProjectPoint, VisCullQuad, VisSphereInFrustum).
+- 17 exact (see targets.json), Traverse 0x52d610 partial (72.7%, 3026 vs 3027 bytes, call-site arg scheduling). Samples: ProjectVertices partial.
 - File statics, in `.CRT$XCU` order (entries 340-347, right after the previous unit's
   vectors and before wrecker.cpp's): an empty static (0x52d2c0/0x52d2d0), the frozen camera
   0x68a968 built by the PCCamera constructor 0x4bed80(1) with atexit destructor 0x4624d0
@@ -24,14 +24,15 @@ partial candidate; the separate helper samples are not covered by that claim.
   CullQuad could not match. They lie between the unit's second empty static (0x52f080) and
   its Math3D.h initializers (0x52fdc0), and .CRT$XCU lists those initializers inside the
   unit's own run (entries 340-347), so they are this unit's code (strong inference).
-  Strict exact in VisibilityQuadTree.cpp (pending registration): TransformVectors 0x52f0a0,
-  TestDot 0x52f140, ProjectPoint 0x52f340, CullQuad 0x52f4d0, CullPolygon 0x52fac0.
+  Strict exact in VisibilityQuadTree.cpp: TransformVectors 0x52f0a0, TestDot 0x52f140,
+  ProjectPoint 0x52f340, CullQuad 0x52f4d0, CullPolygon 0x52fac0 and SphereInFrustum 0x52fbb0
+  (a pointer to the camera's side-plane column taken before the depth product makes the
+  camera the first-used argument, which is where VC6 homes `depth`; docs/VC6_FRAME_LAYOUT.md).
   ProjectPoint's first argument is the camera (viewport size at +0x1a8/+0x1ac) and its
   second the matrix; CullQuad needs the per-component copy; ProjectPoint and the two near
   misses need the 0x20-byte clip-point local (retail's frame size).
-- Near misses (`samples/physics/visibility/VisibilityClipperNearMisses.cpp`): ProjectVertices
-  0x52f190 (382/418, x87 load order only) and SphereInFrustum 0x52fbb0 (517/526, two stack
-  slots swapped).
+- Near miss (`samples/physics/visibility/VisibilityClipperNearMisses.cpp`): ProjectVertices
+  0x52f190 (382/418, x87 load order only).
 - Not done: TestBox 0x52f570 (1358 bytes, ebp frame with inline `fistp` rounding, excluded).
 - The verified debug walk uses a typed renderer pointer at camera+0x18. The partial
   projection probe has a separate provisional `VisProjectionRecord`; its matrix-prefix

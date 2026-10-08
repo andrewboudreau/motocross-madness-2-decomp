@@ -3,13 +3,8 @@
 // compile this file and compare each function with
 // src/reconstructed/GUIManager.bindings.json.
 //
-// 0x004853b0 (1085 bytes, 1079 match): only stack slots differ. Retail keeps
-//   the ControlInterface pointer in the fontSize argument slot (+0x3c) and
-//   the `new` temporaries in the target slot (+0x20); VC6 here uses +0x20
-//   and +0x28. Local and expression forms of the devices do not change it,
-//   nor do `controls` declared at its use or per block, the index declared
-//   in the loop, a `user` local or storing the font size before the name
-//   (docs/NEAR_MISS_INDEX.md, class a).
+// 0x004853b0 (SetUp) is exact in src/reconstructed/GUIManager.cpp with a `short`
+//   font-size parameter (docs/VC6_FRAME_LAYOUT.md: dead argument slots).
 // 0x00485a70 (345 bytes): same calls and argument order; retail keeps
 //   `flags & 4` in edi and `wait` in ebp, VC6 here keeps `a`/`parent` in
 //   ebp (a `flags & 4` local makes it worse).
@@ -28,79 +23,6 @@
 //   inline helper, an if/else assignment or early-return layouts).
 
 #include "../../src/reconstructed/GUIManager.cpp"
-
-// 0x004853b0
-GUIManager* GUIManager::SetUp(void* target, Palette8* palette, TextureMapManager* textures,
-                              BackgroundImage* background, int startSound, SoundGroup* sound,
-                              const char* font, int fontSize, const char* cursor,
-                              int callback) {
-    ControlInterface* controls;
-    int i;
-
-    GameObject::UnknownVirtualSlot8(target);
-    guiTextures = textures;
-    guiSoundGroup = sound;
-    if (startSound && SoundSystem()->InitializeSound(22050, 1, 16, 4000000, 0) == 0)
-        SoundSystem()->SetPrimaryFormat(22050, 1, 16);
-    if (!sound) {
-        guiSoundGroup = new(__FILE__, 130) SoundGroup(1);
-        AppendChild(guiSoundGroup, -1);
-        ownsSoundGroup = 1;
-    }
-    dialogContainer = (GameObject*)AppendChild(new(__FILE__, 136) UIDlgContainer, -1);
-    field_0x38 = palette;
-    guiPalette = palette;
-    guiBackground = background;
-    strcpy(dialogFontName, font);
-    dialogFontSize = fontSize;
-    if (cursor)
-        strcpy(cursorImage, cursor);
-    UnknownVirtualSlot18();
-    field_0xd4 = callback;
-    toolTipFont = CreateFontA(12, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 2, 2, "Arial");
-    controls = g_TrackGame->controlInterface;
-    if (controls->mouse) {
-        mouseDevice = (GUIInputDevice*)AppendChild(
-            (new(__FILE__, 162) GUIInputDevice)
-                ->Bind(field_0x18, (InputDevice*)controls->mouse, 0, 0, 0, 0),
-            -1);
-        mouseDevice->UnknownFunction469260(dialogContainer, -1);
-        mouseDevice->Rebind();
-    }
-    if (controls->keyboard) {
-        keyboardDevice = (GUIInputDevice*)AppendChild(
-            (new(__FILE__, 169) GUIInputDevice)
-                ->Bind(field_0x18, (InputDevice*)controls->keyboard, 0, 0, 0, 0),
-            -1);
-        keyboardDevice->UnknownFunction469260(dialogContainer, -1);
-        keyboardDevice->Rebind();
-    }
-    if (controls->joystickCount) {
-        for (i = 0; i < controls->joystickCount; i++) {
-            joystickDevices[i] = (GUIInputDevice*)AppendChild(
-                (new(__FILE__, 177) GUIInputDevice)
-                    ->Bind(field_0x18, (InputDevice*)controls->joysticks[i], -2.0f, 2.0f, -2.0f,
-                           2.0f),
-                -1);
-            joystickDevices[i]->UnknownFunction469260(dialogContainer, -1);
-            joystickDevices[i]->Rebind();
-        }
-    }
-    users[0] = (GUIUser*)AppendChild(
-        (new(__FILE__, 188) GUIUser)->UnknownFunction487650(field_0x18, this), -1);
-    if (users[0]) {
-        userCount = 1;
-        users[0]->AcceptKeyboardAndJoysticks();
-        if (mouseDevice) {
-            users[0]->SetPointerDevice(mouseDevice);
-            UnknownFunction486590(0, 1);
-            UnknownFunction4865e0(0, 0);
-        }
-    }
-    users[0]->EnableImeInput(0);
-    languageModule = LoadLibraryA("uilang.dll");
-    return this;
-}
 
 // 0x00485a70
 UIDialog* GUIManager::ShowDialog(UIDialog* dialog, int a, int flags, int b,

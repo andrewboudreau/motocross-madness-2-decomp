@@ -109,6 +109,51 @@ with `tools/frame_layout.py OBJ --dump`. "Nearest esp" is the lowest address
    which is why `tools/frame_layout.py` reports its reference count as a
    proxy and prints the rule's prediction only as a self-check.
 
+9. **Homes in dead argument slots.** A value that needs a memory home but
+   is not a frame local (an x87 `float` local, a spilled register
+   candidate, a `short` whose address is taken) goes into the slot of an
+   argument before the frame grows. The rule, measured on 60 float probes
+   (p/q/r/w/z/y/u/k series under "Reproduction") and confirmed on three
+   retail functions:
+   - **Symbol order**: the frame rule's key, count per byte descending, ties
+     by last reference ascending (w1-w8: of two 3-use floats the one whose
+     last use comes first takes the first slot; q2/z7: more uses win
+     whatever the order; the count is the compiler's, so a compare that
+     consumes a value kept on the x87 stack counts although it loads
+     nothing).
+   - **Slot order**: the slots are handed out in the order of the
+     arguments' *first use in the source* (the IR order), not of the
+     prologue loads or the emitted instructions. Cube `0x0043d230` stores
+     three arguments into members; permuting those three statements
+     permutes the homes of the function's `flags`, face pointer and face
+     counter one-to-one while the emitted code (scheduled the other way
+     round) stays identical. For arguments read in place (floats) the
+     first use is the read (p1: `x = a * b; y = c * d` homes x in a, y in
+     b; p2 with the statements swapped homes them in c and d, and a and b
+     stay unused although they die before y's definition).
+   - **Availability**: a slot is free for a symbol when the argument's last
+     read and the previous occupants' last references precede the
+     symbol's first definition (first fit; r1-r12: four floats defined in
+     two waves share two slots in every combination the counts allow;
+     q3/q4: an argument read at the end is skipped).
+   - **Sub-int parameters** are copied at entry, so their slot is free from
+     the first use of the first argument on: GUIManager::SetUp
+     `0x004853b0` homes its ControlInterface pointer in the `short
+     fontSize` slot, the second slot handed out, although the font size is
+     stored halfway through the function; with `int fontSize` the pointer
+     takes `target`'s slot.
+   - **Commutative expressions hide the source order**: `center->y *
+     camera->matrixB[1][0]` and the swapped spelling give the same IR
+     order in VisibilityClipper::SphereInFrustum `0x0052fbb0` (center
+     first, which homes `depth` in the center slot); a pointer to the
+     camera's side-plane column taken before that product (`side`, used
+     for `spread`) makes the camera the first-used argument and the
+     function exact. Which operand VC6 orders first inside one expression
+     is the operand-order question of docs/VC6_OPERAND_ORDER.md.
+   - After the arguments the compiler's own temporaries (the `new`
+     results of SetUp) share by the same first fit; a slot an occupant
+     holds during the symbol's life is skipped.
+
 ## Remaining uncertainty
 
 - The order within step 1 is the order of the symbols' last references in
@@ -125,6 +170,11 @@ with `tools/frame_layout.py OBJ --dump`. "Nearest esp" is the lowest address
   equal-density symbols of different sizes are measured on few cases.
 - Whether the density is compared exactly or with an integer scale: all
   thresholds measured so far (q9, q10, u-series) match the exact ratio.
+- For argument slots, the "first use" of an argument inside a commutative
+  expression follows VC6's canonical operand order, which the probes did not
+  pin down: `p->f[0] * q->f[1] * r->f[2]` hands out q, r, p in the u-series
+  but r, q, p when p is used nowhere else (k1); an earlier separate use of
+  the argument is the reliable lever.
 
 ## Reproduction
 
@@ -149,6 +199,14 @@ void w1() { char p[0x80]; char q[0x80]; char r[0x80]; char s[0x80]; char t[0x80]
 // s3: char c[0x80] x3; { char a[0x80] x2 } { char b[0x80] x2 } -> a/b (shared) first
 // q13 f4/f5: char a[0x44] x10, char b[0x3c] x1 -> b first; b[0x40] -> a first
 // m2: 1 1 1 2 2 -> d e a b c ; 1 1 2 2 -> d c a b ; 1 2 2 -> c b a
+// argument slots (stdcall floats, frameless; homes read from the S_BPREL32
+// offsets, +8 = first argument):
+// p1: float x = a*b (4 uses), y = c*d (3) -> x in a, y in b; p2 (y first) -> x in c, y in d
+// q3: `return x + a` keeps a live -> x in b, y in c; q4 (b live) -> x in a, y in c
+// w1..w8: 3 uses each, every def/test/last-use order -> the earlier last use takes a
+// r1..r12: x, y early, u, v late (u = x*3, v = y*5), counts varied -> first fit
+//   (r3: x4 y3 u3 v4 -> {x,v} a, y b, u c; r2: x3 y4 u4 v3 -> {y,v} a, {x,u} b)
+// u1/u5/u13, k1/k4: S* p, q, r pointer arguments, order of the handed-out slots
 ```
 
 `tests/test_frame_layout.py` holds the measured permutations and thresholds
@@ -179,12 +237,19 @@ symbol, `--va` the retail function. The report shows:
   layout the proxy count is off for the flagged symbols), and the +k/-k
   count changes under which the rule reproduces the retail order (a greedy
   search; "no adjustment found" means the orders differ in more than counts,
-  usually in the scalars' spill homes).
+  usually in the scalars' spill homes);
+- the argument slots each side writes (`values homed in argument slots`):
+  the argument index, the instruction after which the argument is dead and
+  the runs of accesses that start at each write. Two functions whose runs
+  sit in different argument slots differ in the order the source first uses
+  those arguments (fact 9), or in the rank of the homed values.
 
 `--dump` lists the locals of every procedure in an object (probe objects).
 The parsing and prediction code is importable (`parse_cv_procs`,
 `parse_cv_types`, `track_frame`, `align`, `predict_layout`,
-`suggest_adjustments`) and covered by `tests/test_frame_layout.py`.
+`suggest_adjustments`, `predict_arg_homes` for fact 9 with the slots given
+in first-use order, `argument_slot_homes`) and covered by
+`tests/test_frame_layout.py`.
 
 ## Applied to gameui's resource parser `0x0046a920`
 
@@ -229,10 +294,16 @@ whether it differs from retail only in frame slots. Two of them became exact:
   that an uninitialised local reproduced is the second parameter's slot (the
   engine name), which VC6 had homed elsewhere.
 
-The remaining slot-only cases (`0x0043d230`, `0x004853b0`, `0x0052fbb0`) are
-spill homes in dead argument slots of frameless functions: two values take
-the dead `stream`/`baseOffset`, `fontSize`/local or `camera`/`center` slots
-the other way round. The rule above orders frame locals; which dead argument
-slot a spilled scalar takes is not measured yet, and the scoping, naming and
-temporary forms tried are listed in each sample's header.
+The three slot-only cases were homes in dead argument slots (fact 9) and are
+exact:
+
+- Cube `0x0043d230`: the member stores of `group`, `stream` and `baseOffset`
+  come in that order; the earlier candidate stored `baseOffset` before
+  `stream`, which handed the slots out in the other order (all six
+  permutations give six different layouts and the same code).
+- GUIManager::SetUp `0x004853b0`: `fontSize` is a `short`; its slot is free
+  from entry and is the second one handed out.
+- VisibilityClipper::SphereInFrustum `0x0052fbb0`: `const float* side =
+  &camera->matrixC[0][0]`, taken before the depth product and used for the
+  side-plane spread, makes the camera the first-used argument.
 

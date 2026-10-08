@@ -388,5 +388,15 @@
     "expect": "exact",
     "notes": "all callers load ecx from 0x575a98 (thiscall); in the unit range between 0x52f080 and the Math3D $E at 0x52fdc0",
     "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityClipper",
+    "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "?SphereInFrustum@VisibilityClipper",
+    "target_va": "0x0052fbb0",
+    "target_size": 526,
+    "expect": "exact",
+    "notes": "all callers load ecx from 0x575a98 (thiscall); in the unit range between 0x52f080 and the Math3D $E at 0x52fdc0; the side-plane column pointer taken first gives retail's argument-slot homes (docs/VC6_FRAME_LAYOUT.md)",
+    "bindings": "VisibilityQuadTree.bindings.json"
   }
 ]

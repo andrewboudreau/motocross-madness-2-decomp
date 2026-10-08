@@ -7816,6 +7816,15 @@ CASES = [
         'reason': 'GUIManager vtable slot 0',
     },
     {
+        'name': 'GUIManager.cpp GUIManager SetUp 0x004853b0',
+        'bindings': 'src/reconstructed/GUIManager.bindings.json',
+        'source': 'src/reconstructed/GUIManager.cpp',
+        'symbol': '?SetUp@GUIManager@@QAEPAV1@PAXPAVPalette8@@PAVTextureMapManager@@PAVBackgroundImage@@HPAVSoundGroup@@PBDF5H@Z',
+        'target_va': '0x004853b0',
+        'target_size': 1085,
+        'reason': 'EH 0x0054b7ba; a short fontSize parameter frees its slot at entry, which homes the ControlInterface pointer at +0x3c (docs/VC6_FRAME_LAYOUT.md)',
+    },
+    {
         'name': 'GUIManager.cpp GUIManager destructor 0x00485320',
         'bindings': 'src/reconstructed/GUIManager.bindings.json',
         'source': 'src/reconstructed/GUIManager.cpp',
@@ -10271,6 +10280,15 @@ CASES = [
         'target_va': '0x0043d1f0',
         'target_size': 25,
         'reason': 'writes RTTI Cube vptr 0x551288',
+    },
+    {
+        'name': 'cube.cpp Cube 0x43d230 header reader',
+        'bindings': 'src/reconstructed/Cube.bindings.json',
+        'source': 'src/reconstructed/Cube.cpp',
+        'symbol': '?UnknownFunction43d230@Cube@@QAEPAV1@PAVUnknownTextureStream@@HPAVManagedTextureGroup@@H@Z',
+        'target_va': '0x0043d230',
+        'target_size': 452,
+        'reason': 'calls the file-static 0x43d0d0; argument stores ordered group, stream, baseOffset give the retail argument-slot homes (docs/VC6_FRAME_LAYOUT.md)',
     },
     {
         'name': 'cube.cpp Cube deleting destructor',

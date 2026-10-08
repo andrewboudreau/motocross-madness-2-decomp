@@ -411,3 +411,66 @@ int VisibilityClipper::CullPolygon(const VisibilityCamera* camera, VisibilityCul
     }
     return 1;
 }
+
+// 0x0052fbb0 (ret 0x14).  Sphere against the view frustum.  The camera supplies the depth
+// axis (+0xb4/+0xc4/+0xd4/+0xe4, a column of matrixB), the near/far limits (+0x1bc / +0x1c0)
+// and the side-plane scale (`side`: matrixC column 0); `m` gives x', y' and w.  Returns 0
+// when the sphere is outside; `fullyInside`, when given, receives 1 only if the sphere crosses
+// no plane.  `side` is taken before the depth is computed: VC6 homes `depth` and `nearDepth`
+// in the dead camera/center argument slots in the order of the arguments' first use, and the
+// address of the side-plane column is the camera's first use (docs/VC6_FRAME_LAYOUT.md).
+int VisibilityClipper::SphereInFrustum(const VisibilityCamera* camera, const VisibilityMatrix* m,
+                                       const VisibilityBoxVec* center, float radius,
+                                       int* fullyInside)
+{
+    int crosses = 0;
+    float depth, nearDepth, spread, xHigh, xLow, yHigh, yLow;
+    VisibilityClipPoint c;
+    const float* side = &camera->matrixC[0][0];
+    depth = center->y * camera->matrixB[1][0];
+    depth += center->z * camera->matrixB[2][0];
+    depth += center->x * camera->matrixB[0][0];
+    depth += camera->matrixB[3][0];
+    nearDepth = depth - radius;
+    if (nearDepth > camera->farPlane || depth + radius < camera->nearPlane) {
+        if (fullyInside)
+            *fullyInside = 0;
+        return 0;
+    }
+    if (depth + radius > camera->farPlane || nearDepth < camera->nearPlane)
+        crosses = 1;
+    spread = (side[4] + side[0]) * radius;
+    spread += depth * side[8];
+    spread += side[12];
+    c.w = center->y * m->m[1][3];
+    c.w += center->z * m->m[2][3];
+    c.w += center->x * m->m[0][3];
+    c.w += m->m[3][3];
+    c.x = center->y * m->m[1][0];
+    c.x += center->z * m->m[2][0];
+    c.x += center->x * m->m[0][0];
+    c.x += m->m[3][0];
+    xHigh = c.x + spread;
+    if (xHigh < 0.0f || (xLow = c.x - spread) > c.w) {
+        if (fullyInside)
+            *fullyInside = 0;
+        return 0;
+    }
+    c.y = center->y * m->m[1][1];
+    c.y += center->z * m->m[2][1];
+    c.y += center->x * m->m[0][1];
+    c.y += m->m[3][1];
+    yHigh = c.y + spread;
+    if (yHigh < 0.0f || (yLow = c.y - spread) > c.w) {
+        if (fullyInside)
+            *fullyInside = 0;
+        return 0;
+    }
+    if (!fullyInside)
+        return 1;
+    if (!crosses && !(xLow < 0.0f) && !(xHigh > c.w) && !(yLow < 0.0f) && !(yHigh > c.w))
+        *fullyInside = 1;
+    else
+        *fullyInside = 0;
+    return 1;
+}
