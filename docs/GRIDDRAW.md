@@ -200,6 +200,36 @@ child blocks, sets their masks (0x3fffff fully visible, 0x1fffff a leaf,
 cleared through the empty `0x00464e90`) and marks the ancestors dirty
 when the mask changed.
 
+## GridNode.cpp (provisional name)
+
+`src/reconstructed/GridNode.cpp`, `0x004838a0..0x00484dd0`, the code after
+Griddraw.cpp and before GUIManager.cpp's initializers; its `.data` is the
+third copy of the row tables (`0x0056c2ac`/`0x0056c2f0`) and the constant
+1/127 at `0x00553ec8` right after the GridNode vtable. Exact: the GridNode
+destructor `0x004838a0` and its deleting wrapper `0x004838f0`. Near misses
+(`samples/render/GridNodeNearMisses.cpp`):
+
+| Function | Bytes | What differs |
+|---|---:|---|
+| `0x00483910` (cell sampler, Terrain `0x00507cf8`) | 48/1027 | retail keeps x and z in their argument homes across the descent loop (VC6's tail-recursion elimination of the child call) and a copy of x in ebp; the leaf paths and the default fill are the same code |
+| `0x00483d40` (GridNode slot 1, 4140 B) | 96/4189 | ebp frame; the cell indices are rounded with a bare `fistp` (the `__asm` helper this project leaves out); the crossing loops keep the running y/z on the x87 stack |
+| `0x00484d70` (leaf lookup) | 81/90 | register choice for the table index |
+
+What the two large functions do (names tier 3): `0x00483910(x, z, heights,
+normals, bytes)` descends to the leaf holding sample (x, z), clamping out of
+range indices to the border child, and writes the four corner heights
+`((h - base) * field_0x10 + base) * field_0x14`, normals (signed bytes / 127,
+x and z also scaled by field_0x10) and sample bytes of that cell in the order
+(x,z), (x+1,z), (x,z+1), (x+1,z+1); without a leaf it writes 0, (0,1,0), 0
+and returns 0. Slot 1 `(p0, p1, out, outNode, outX, outZ)` intersects the
+segment with the height field: it collects the crossings with the x and y
+grid lines of the node (cell size `1 << shift`), merges them along the
+segment, and per cell either recurses into the child whose height range
+(+0x18..+0x1c) the segment reaches or, in a leaf, intersects the two cell
+triangles (diagonal chosen by the parity of ix ^ iy) through
+`0x004a1300`; a hit inside the segment's box is written in parent units
+(`gridX << (level * 4)` added) and returns 1.
+
 ## Function names
 
 Names given from each function's behaviour (string literals, D3D/DirectDraw

@@ -58,7 +58,7 @@ struct CollisionModelBody {
     CollisionVec3 halfExtents;     // +0x24 model bounds half extents
     CollisionVec3 field_0x30;
     CollisionVec3 field_0x3c;
-    char field_0x48[0x40];
+    Matrix4 field_0x48;            // +0x48 SetTransform keeps the previous field_0x88 here
     Matrix4 field_0x88;
     Matrix4 field_0xc8;
     CollisionVec3 sweptCenter;     // +0x108 written by the swept variants (0x00437ef0)
@@ -124,8 +124,9 @@ public:
 // Result record of the last box test (global pointer at 0x00579058); the mesh tests read a
 // vec3 at +8 from it and rotate it into world space.  Tier 3 shape.
 struct CollisionBoxResult {
-    char field_0x00[8];
-    CollisionVec3 field_0x08;
+    float fraction;                // +0x00 hit fraction along the segment (0x00439820 starts it at 1.0)
+    const CollisionVec3* point;    // +0x04 segment leaf point (0x00439820 starts it at 0)
+    CollisionVec3 field_0x08;      // +0x08 face normal
 };
 extern CollisionBoxResult* g_CollisionBoxResult;   // 0x00579058
 

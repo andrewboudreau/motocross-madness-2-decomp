@@ -229,9 +229,21 @@ struct GridVec3 {
 class GridNode {
 public:
     virtual ~GridNode();                                        // 0x004838a0 (slot 0 0x004838f0)
-    virtual int UnknownVirtualSlot1(void* a, void* b, void* out, int c, int d, int e); // 0x00483d40
+    // 0x00483d40 (ret 0x18, GridNode.cpp): first crossing of the segment p0..p1
+    // (node-local x, y grid units; z height) with the height field: walks the
+    // grid-line crossings cell by cell, recurses into children whose height
+    // range the segment reaches and intersects the two cell triangles in a leaf.
+    // Writes *out in parent units, the leaf to *outNode and the rounded hit
+    // coordinates to *outX/*outZ (each when non-null); returns 1 on a hit.
+    virtual int UnknownVirtualSlot1(const GridVec3* p0, const GridVec3* p1, GridVec3* out, GridNode** outNode,
+                                    int* outX, int* outZ); // 0x00483d40
     // 0x00484d70: the leaf whose grid position is (x, z), or 0 (GridNode.cpp).
     GridNode* UnknownFunction484d70(int x, int z);
+    // 0x00483910 (ret 0x14, GridNode.cpp): descends to the leaf holding sample
+    // (x, z) and writes the four corner heights, normals and sample bytes of
+    // that cell (order (x,z), (x+1,z), (x,z+1), (x+1,z+1)); returns 1, or 0
+    // with heights 0, normals (0,1,0) and bytes 0 when no leaf exists.
+    int UnknownFunction483910(int x, int z, float* heights, GridVec3* normals, unsigned char* bytes);
 
     GridNode** children;                       // +0x04 256 entries (0x400 bytes)
     GridNode* parent;                          // +0x08

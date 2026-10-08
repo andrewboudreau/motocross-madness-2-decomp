@@ -758,5 +758,35 @@
     "expect": "partial",
     "notes": "1054/1068: size and frame exact; only the capsule end-point transforms differ in x87 operand order.",
     "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "UpdateModelBounds@CollisionObject",
+    "target_va": "0x00434eb0",
+    "target_size": 1885,
+    "expect": "partial",
+    "notes": "model bounds refit: inverse of field_0x88 inline, per enabled element the three axis half extents rotated twice (element matrix, then the inverse) and summed as |x|+|y|+|z|, the tree root centre through two out-of-line 0x42a510 calls, Min/Max out of line; same call/inline pattern as retail, differs in frame slots (0x12c vs 0x134), the loop counter register (ebp vs esi) and the rotated x component retail keeps on the x87 stack",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "SetTransform@CollisionObject",
+    "target_va": "0x00435830",
+    "target_size": 1676,
+    "expect": "partial",
+    "notes": "shape placement by type (jump table 0x435ea8): hull inlines the 4x4 product local*m and the point transform, model calls 0x436500/0x42a510 and UpdateModelBounds, mesh calls CollisionLength, sphere uses its own transform, capsule nothing; the hull product's term order (3,2,1,4 with the local matrix loaded first) is not reproduced by the CollisionMatrixMultiply source form in the inline context",
+    "bindings": "CollisionObject.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObject.cpp",
+    "candidate_symbol_contains": "SegmentTouchesObject",
+    "target_va": "0x00439820",
+    "target_size": 1493,
+    "expect": "partial",
+    "notes": "segment query (cdecl): bounding-sphere pre-test with the Vec3 operators called out of line, then 0x429e60 on the hull (inverse inline) or on every element after 0x4253b0 (inverse 0x42e2b0 out of line); differs in the frame (0xc0 vs 0xa8: the operator temporaries) and register choices",
+    "bindings": "CollisionObject.bindings.json"
   }
 ]

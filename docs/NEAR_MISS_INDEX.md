@@ -94,6 +94,9 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/collision/CollisionObject | `0x00438550` | 55/677 (masked) | b | 28 code diffs: retail adds `mov [esp + N], 0`; `fmul st(3)` vs `fmul [esp + N]`; frame 0x54 vs 0x7c |
 | krusty2/collision/CollisionObject | `0x00438c90` | 61/475 | c | 31 code diffs: `mov ebx, [ecx + 0x54]` vs `xor ebx, ebx`; `xor ebp, ebp` vs `mov ebp, [ecx + 0x54] ; sub edx, ebx` |
 | krusty2/collision/CollisionObject | `0x004392c0` | 303/311 | c | 6 code diffs: `mov eax, [esp + N] ; mov ecx, [eax + 0x~` vs `mov ecx, [esp + N] ; mov eax, [ecx + 0x~`; `dec ecx` vs `dec eax` |
+| krusty2/collision/CollisionObject | `0x00434eb0` | 382/1820 | b | UpdateModelBounds: same call/inline pattern; frame 0x12c vs 0x134, loop counter ebp vs esi, the rotated x component retail keeps on the x87 stack |
+| krusty2/collision/CollisionObject | `0x00435830` | 157/1776 | b | SetTransform: the hull case's inline 4x4 product emits its terms as 1,3,2,4 (retail 3,2,1,4 with the local matrix loaded first); frame 0x30 both |
+| krusty2/collision/CollisionObject | `0x00439820` | 122/1596 | b | SegmentTouchesObject: operator temporaries (frame 0xc0 vs 0xa8), register choices |
 | krusty2/soultree/SoulTreePhysics | `0x00500220` | 270/619 (masked) | b | 24 code diffs: `je @201 ; fld [edi + 8]` vs `je @197`; `fmul [esi + 4]` vs `fld [esi + 4] ; fmul [edi + 8]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x005013d0` | 400/457 (masked) | b | 8 code diffs: `fld [ecx + 8] ; fmul [eax + 4]` vs `fld [eax + 4] ; fmul [ecx + 8]`; `fld [ecx + 8] ; fmul [eax]` vs `fld [eax] ; fmul [ecx + 8]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501600` | 651/925 | b | 18 code diffs: `jmp @239 ; fld [esp + N]` vs `jmp @242`; slots differ |
@@ -268,6 +271,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/Grid1 | `0x0047d470` | 309/786 | b | 31 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x838 vs 0x834, slot order differs |
 | render/Grid1 | `0x0047d780` | 216/1008 | b | 50 code diffs: `je @321 ; mov esi, [esp + N]` vs `je @315`; `mov eax, [esi]` vs `mov edi, [esp + N]`; slot order differs |
 | render/GridNode | `0x00484d70` | 81/90 | c | 3 code diffs: `mov ecx, [eax*4 + A] ; add ecx, ebx ; m~` vs `mov eax, [eax*4 + A] ; add eax, ebx ; m~`; retail adds `xor ecx, ecx ; mov cx, word ptr [eax + ~` |
+| render/GridNode | `0x00483910` | 48/1027 | b | cell sampler: x/z kept in their argument homes across the descent loop in retail (frame 0x14 vs 0xc), every register differs |
+| render/GridNode | `0x00483d40` | 96/4189 | b | slot 1: ebp frame, bare fistp rounding (`__asm` helper), running y/z of the crossing loops on the x87 stack |
 | render/Griddraw | `0x0047de90` | 977/1083 (masked) | c | 30 code diffs: retail lacks `mov esi, [esp + N]`; `mov edi, [ebp*N + N]` vs `mov edi, [esp + N]` |
 | render/Griddraw | `0x0047e430` | 140/144 (masked) | c | 1 code diffs: `mov edx, esi ; add edx, [ebp + N]` vs `mov edx, [ebp + N] ; add edx, esi` |
 | render/Griddraw | `0x0047e600` | 994/1477 (masked) | b | 15 code diffs: `fld [edx + 0x40] ; fmul [ecx + 0x164]` vs `fld [ecx + 0x164] ; fmul [edx + 0x40]`; `fld [edx + 0x40] ; fmul [esi + 0x18]` vs `fld [esi + 0x18] ; fmul [edx + 0x40]`; slots differ |

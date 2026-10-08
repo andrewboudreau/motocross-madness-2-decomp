@@ -2185,3 +2185,290 @@ int SphereTouchesObject(const CollisionVec3* center, float radius, float radiusS
     return 0;
 }
 
+
+// ==============================================================================================
+// Section: transforms and the segment query (0x00434eb0, 0x00435830, 0x00439820)
+// ==============================================================================================
+// In-place rigid inverse as 0x00434eb0 and 0x00439820 expand it on a stack copy (transpose,
+// then the negated translation dot products in the order of CollisionInvertRigidRelFrame).
+// 0x0042e2b0 is the out-of-line copy that 0x00439820's model case calls (cdecl, one argument).
+static inline void CollisionInvertRigidInPlace(Matrix4* m)
+{
+    float t;
+    t = m->_12; m->_12 = m->_21; m->_21 = t;
+    t = m->_13; m->_13 = m->_31; m->_31 = t;
+    t = m->_23; m->_23 = m->_32; m->_32 = t;
+    CollisionVec3 p;
+    p.x = -((m->_43 * m->_31 + m->_42 * m->_21) + m->_41 * m->_11);
+    p.y = -((m->_42 * m->_22 + m->_41 * m->_12) + m->_43 * m->_32);
+    p.z = -((m->_43 * m->_33 + m->_42 * m->_23) + m->_41 * m->_13);
+    m->_41 = p.x;
+    m->_42 = p.y;
+    m->_43 = p.z;
+}
+void CollisionInvertRigidCall(Matrix4* m);   // 0x0042e2b0
+
+// BoundingBoxTreeQuery.cpp entry points the segment query uses (bvh/BoundingBoxTreeQuery.h
+// declares them on its own node types; the tree pointer is opaque here).
+int SegmentBoxOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 p0, Vec3 p1,
+                      const Matrix4* m);                                             // 0x004253b0
+int SegmentTreeQueryWithVertices(const Vec3* ends, void* node, const Matrix4* xf,
+                                 Vec3* vertices);                                    // 0x00429e60
+// Call views (see math/Math3D.h): the Vec3 constructor 0x00404e60 inside the expanded
+// operators of 0x00439820.
+struct CollisionVec3Call : Vec3 {
+    CollisionVec3Call(float x_, float y_, float z_);
+};
+static inline Vec3 SubtractCtorCall(const Vec3& a, const Vec3& b)
+{
+    return CollisionVec3Call(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+static inline Vec3 AddCtorCall(const Vec3& a, const Vec3& b)
+{
+    return CollisionVec3Call(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+static inline Vec3 ScaleCtorCall(const Vec3& v, float s)
+{
+    return CollisionVec3Call(v.x * s, v.y * s, v.z * s);
+}
+
+// Vector by value times the 3x3 block / the full transform (row-vector convention), as the
+// bounds code expands them; 0x0042a510 is the out-of-line copy of the point form.
+static inline void CollisionRotateInline(Vec3* out, Vec3 v, const Matrix4* m)
+{
+    out->x = v.x * m->_11 + v.y * m->_21 + v.z * m->_31;
+    out->y = v.x * m->_12 + v.y * m->_22 + v.z * m->_32;
+    out->z = v.x * m->_13 + v.y * m->_23 + v.z * m->_33;
+}
+
+// 0x00434eb0: refit the model bounds.  Every enabled element's box (tree root: center and
+// half extents) is rotated into the model frame; the half extents go axis by axis so the
+// projected extent is the sum of the absolute components.  The first element starts the
+// running min/max, the others extend it (CollisionVec3Min/Max out of line).
+void CollisionObject::UpdateModelBounds()
+{
+    CollisionModelBody* model = (CollisionModelBody*)shape;
+    model->field_0x30 = model->center;
+    model->field_0x3c = model->halfExtents;
+    Matrix4 inv = model->field_0x88;
+    CollisionInvertRigidInPlace(&inv);
+    Vec3 minBound;
+    Vec3 maxBound;
+    for (int i = 0; i < model->elementCount; i++) {
+        if (model->elementEnabled[i]) {
+            CollisionHullBody* e = &model->elements[i];
+            CollisionBoxBounds* box = e->triangleTree;
+            Vec3 ax = Vec3(box->halfExtents.x, 0.0f, 0.0f);
+            Vec3 ay = Vec3(0.0f, box->halfExtents.y, 0.0f);
+            Vec3 az = Vec3(0.0f, 0.0f, box->halfExtents.z);
+            CollisionRotateInline(&ax, ax, &e->worldTransform);
+            CollisionRotateInline(&ax, ax, &inv);
+            CollisionRotateInline(&ay, ay, &e->worldTransform);
+            CollisionRotateInline(&ay, ay, &inv);
+            CollisionRotateInline(&az, az, &e->worldTransform);
+            CollisionRotateInline(&az, az, &inv);
+            Vec3 extent;
+            extent.x = CollisionAbs(ax.x) + CollisionAbs(ay.x) + CollisionAbs(az.x);
+            extent.y = CollisionAbs(ax.y) + CollisionAbs(ay.y) + CollisionAbs(az.y);
+            extent.z = CollisionAbs(ax.z) + CollisionAbs(ay.z) + CollisionAbs(az.z);
+            Vec3 center;
+            DebugTransformPoint(&center, *(Vec3*)&box->center, &e->worldTransform);
+            DebugTransformPoint(&center, center, &inv);
+            if (i != 0) {
+                *(CollisionInlineVec3*)&minBound = CollisionVec3Min(*(CollisionVec3*)&minBound, *(CollisionVec3*)&(center - extent));
+                *(CollisionInlineVec3*)&maxBound = CollisionVec3Max(*(CollisionVec3*)&maxBound, *(CollisionVec3*)&(center + extent));
+            } else {
+                minBound = center - extent;
+                maxBound = center + extent;
+            }
+        }
+    }
+    *(Vec3*)&model->center = (minBound + maxBound) * 0.5f;
+    *(Vec3*)&model->halfExtents = (maxBound - minBound) * 0.5f;
+}
+
+// The 4x4 product of CollisionMatrixMultiply (0x00436500) as SetTransform's hull case expands it
+// (the model case calls the function).
+static inline void CollisionMatrixMultiplyInline(Matrix4* out, const Matrix4* a, const Matrix4* b)
+{
+    out->_11 = b->_11 * a->_11 + b->_12 * a->_21 + b->_13 * a->_31 + b->_14 * a->_41;
+    out->_12 = b->_11 * a->_12 + b->_12 * a->_22 + b->_13 * a->_32 + b->_14 * a->_42;
+    out->_13 = b->_11 * a->_13 + b->_12 * a->_23 + b->_13 * a->_33 + b->_14 * a->_43;
+    out->_14 = b->_11 * a->_14 + b->_12 * a->_24 + b->_13 * a->_34 + b->_14 * a->_44;
+    out->_21 = b->_21 * a->_11 + b->_22 * a->_21 + b->_23 * a->_31 + b->_24 * a->_41;
+    out->_22 = b->_21 * a->_12 + b->_22 * a->_22 + b->_23 * a->_32 + b->_24 * a->_42;
+    out->_23 = b->_21 * a->_13 + b->_22 * a->_23 + b->_23 * a->_33 + b->_24 * a->_43;
+    out->_24 = b->_21 * a->_14 + b->_22 * a->_24 + b->_23 * a->_34 + b->_24 * a->_44;
+    out->_31 = b->_31 * a->_11 + b->_32 * a->_21 + b->_33 * a->_31 + b->_34 * a->_41;
+    out->_32 = b->_31 * a->_12 + b->_32 * a->_22 + b->_33 * a->_32 + b->_34 * a->_42;
+    out->_33 = b->_31 * a->_13 + b->_32 * a->_23 + b->_33 * a->_33 + b->_34 * a->_43;
+    out->_34 = b->_31 * a->_14 + b->_32 * a->_24 + b->_33 * a->_34 + b->_34 * a->_44;
+    out->_41 = b->_41 * a->_11 + b->_42 * a->_21 + b->_43 * a->_31 + b->_44 * a->_41;
+    out->_42 = b->_41 * a->_12 + b->_42 * a->_22 + b->_43 * a->_32 + b->_44 * a->_42;
+    out->_43 = b->_41 * a->_13 + b->_42 * a->_23 + b->_43 * a->_33 + b->_44 * a->_43;
+    out->_44 = b->_41 * a->_14 + b->_42 * a->_24 + b->_43 * a->_34 + b->_44 * a->_44;
+}
+
+// v * M + translation as the hull case of 0x00435830 expands it (the sum of the three
+// products first, then the translation).
+static inline void CollisionTransformPointInline(Vec3* out, const Vec3& v, const Matrix4* m)
+{
+    out->x = (v.x * m->_11 + v.y * m->_21 + v.z * m->_31) + m->_41;
+    out->y = (v.x * m->_12 + v.y * m->_22 + v.z * m->_32) + m->_42;
+    out->z = (v.x * m->_13 + v.y * m->_23 + v.z * m->_33) + m->_43;
+}
+
+// Length of a vector as 0x00435830 expands it: the dot product is called out of line
+// (0x0040ae30) at both expanded sites; 0x00435ec0 (CollisionLength) is the mesh case's call.
+static inline float CollisionLengthInline(const Vec3& v)
+{
+    float s = Vec3DotCall(&v, &v);
+    return s == 1.0f ? 1.0f : FastSqrt(s);
+}
+
+// 0x00435830 (thiscall, ret 4): places the shape with the new body matrix m.
+//   hull:   the previous body matrix is kept, worldTransform = localTransform * m (inline
+//           product), motionTransform = prev * inverse(m); the bounding sphere is the tree
+//           root's box moved by the motion and transformed by the body matrix.
+//   model:  field_0x48 keeps the old matrix, field_0xc8 = old * inverse(m); every element
+//           gets its scene node's world matrix and the same three matrices; then the
+//           bounds are refitted (UpdateModelBounds) and the sphere comes from them.
+//   mesh:   the matrix is stored; the sphere is the tree root box.
+//   sphere: the sphere is the shape's own centre and radius through its transform.
+//   capsule: nothing.
+void CollisionObject::SetTransform(const Matrix4* m)
+{
+    switch (shapeType) {
+    case 0: {
+        CollisionHullBody* hull = (CollisionHullBody*)shape;
+        CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;   // +0x40, the bounding-sphere centre
+        hull->prevBodyTransform = hull->bodyTransform;
+        hull->bodyTransform = *m;
+        CollisionMatrixMultiplyInline(&hull->worldTransform, m, &hull->localTransform);
+        CollisionRelativeTransform(&hull->motionTransform, m, &hull->prevBodyTransform);
+        *boundCenter = hull->triangleTree->center;
+        Vec3 half = *(Vec3*)&hull->triangleTree->halfExtents;
+        MoveBox((Vec3*)boundCenter, &half, &hull->motionTransform);
+        boundRadius = CollisionLengthInline(half);
+        Vec3 c = *(Vec3*)boundCenter;
+        CollisionTransformPointInline((Vec3*)boundCenter, c, &hull->bodyTransform);
+        break;
+    }
+    case 1: {
+        CollisionModelBody* model = (CollisionModelBody*)shape;
+        model->field_0x48 = model->field_0x88;
+        model->field_0x88 = *m;
+        CollisionRelativeTransform(&model->field_0xc8, m, &model->field_0x48);
+        for (int i = 0; i < model->elementCount; i++) {
+            CollisionHullBody* e = &model->elements[i];
+            e->prevBodyTransform = e->bodyTransform;
+            ((CollisionSceneNode*)e->sceneNode)->GetMatrixIn(0, &e->bodyTransform);
+            CollisionMatrixMultiply(&e->worldTransform, &e->bodyTransform, &e->localTransform);
+            CollisionRelativeTransform(&e->motionTransform, &e->bodyTransform, &e->prevBodyTransform);
+        }
+        UpdateModelBounds();
+        CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;
+        *boundCenter = model->center;
+        Vec3 half = *(Vec3*)&model->halfExtents;
+        MoveBox((Vec3*)boundCenter, &half, &model->field_0xc8);
+        boundRadius = CollisionLengthInline(half);
+        DebugTransformPoint((Vec3*)boundCenter, *(Vec3*)boundCenter, &model->field_0x88);
+        break;
+    }
+    case 2: {
+        CollisionMeshBody* mesh = (CollisionMeshBody*)shape;
+        mesh->field_0x08 = *m;
+        CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;
+        *boundCenter = mesh->field_0x04->center;
+        CollisionVec3 half = mesh->field_0x04->halfExtents;
+        boundRadius = CollisionLength(&half);
+        DebugTransformPoint((Vec3*)boundCenter, *(Vec3*)boundCenter, &mesh->field_0x08);
+        break;
+    }
+    case 3:
+        break;
+    case 4: {
+        CollisionSphereShape* sphere = (CollisionSphereShape*)shape;
+        CollisionVec3* boundCenter = (CollisionVec3*)&field_0x34;
+        *boundCenter = sphere->center;
+        boundRadius = sphere->radius;
+        DebugTransformPoint((Vec3*)boundCenter, *(Vec3*)boundCenter, (const Matrix4*)&sphere->transform);
+        break;
+    }
+    }
+}
+
+// 0x00439820 (cdecl; the segment version of SphereTouchesObject 0x004394f0): the segment
+// ends[0]..ends[1] against the object.  Rejects when the closest point of the segment to
+// the bounding-sphere centre lies outside the sphere; otherwise runs the segment tree query
+// (0x00429e60) on the hull, or on every enabled element of the model after the model bounds
+// test (0x004253b0), with the hit record installed as the box result.  On a hit *outPoint
+// is the point at the hit fraction and *outNormal the record's normal rotated into world.
+int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, CollisionVec3* outPoint,
+                         CollisionVec3* outNormal)
+{
+    if (object->statusFlags & 1) {
+        const Vec3* p = (const Vec3*)ends;
+        const Vec3* center = (const Vec3*)&object->field_0x34;   // +0x40
+        Vec3 tmp;
+        Vec3 d = *Vec3SubtractCall(&tmp, &p[1], &p[0]);
+        Vec3 v = *Vec3SubtractCall(&tmp, center, &p[0]);
+        float t = Vec3DotCall(&v, &d) / Vec3DotCall(&d, &d);
+        if (t >= 1.0f)
+            t = 1.0f;
+        else if (t <= 0.0f)
+            t = 0.0f;
+        Vec3 scaled = CollisionVec3Call(d.x * t, d.y * t, d.z * t);
+        Vec3 closest = *Vec3AddCall(&tmp, &p[0], &scaled);
+        Vec3 diff = *Vec3SubtractCall(&tmp, center, &closest);
+        if (CollisionLength((CollisionVec3*)&diff) < object->boundRadius) {
+            switch (object->shapeType) {
+            case 0: {
+                CollisionHullBody* hull = (CollisionHullBody*)object->shape;
+                CollisionBoxResult hit;
+                hit.fraction = 1.0f;
+                hit.point = 0;
+                *(Vec3*)&hit.field_0x08 = Vec3(0.0f, 0.0f, 0.0f);
+                SetCollisionBoxResult(&hit);
+                Matrix4 inv = hull->worldTransform;
+                CollisionInvertRigidInPlace(&inv);
+                int result = SegmentTreeQueryWithVertices(p, hull->triangleTree, &inv,
+                                                          (Vec3*)hull->vertices);
+                if (result) {
+                    Vec3 d = SubtractCtorCall(p[1], p[0]);
+                    Vec3 scaled = ScaleCtorCall(d, hit.fraction);
+                    *(Vec3*)outPoint = AddCtorCall(scaled, p[0]);
+                    *outNormal = CollisionRotateCols(hit.field_0x08, &hull->worldTransform);
+                }
+                return result;
+            }
+            case 1: {
+                CollisionModelBody* model = (CollisionModelBody*)object->shape;
+                CollisionBoxResult hit;
+                hit.fraction = 1.0f;
+                hit.point = 0;
+                *(Vec3*)&hit.field_0x08 = Vec3(0.0f, 0.0f, 0.0f);
+                SetCollisionBoxResult(&hit);
+                Matrix4 inv = model->field_0x88;
+                CollisionInvertRigidCall(&inv);
+                if (SegmentBoxOverlap((Vec3*)&model->center, (Vec3*)&model->halfExtents, p[0], p[1], &inv)) {
+                    for (int i = 0; i < model->elementCount; i++) {
+                        CollisionHullBody* e = &model->elements[i];
+                        inv = e->worldTransform;
+                        CollisionInvertRigidCall(&inv);
+                        if (SegmentTreeQueryWithVertices(p, e->triangleTree, &inv, (Vec3*)e->vertices)) {
+                            Vec3 d = SubtractCtorCall(p[1], p[0]);
+                            Vec3 scaled = ScaleCtorCall(d, hit.fraction);
+                            Vec3AddCall((Vec3*)outPoint, &scaled, &p[0]);
+                            Vec3TransformNormal(outNormal, hit.field_0x08, &e->worldTransform);
+                            return 1;
+                        }
+                    }
+                }
+                return 0;
+            }
+            }
+        }
+    }
+    return 0;
+}

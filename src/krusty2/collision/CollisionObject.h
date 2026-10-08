@@ -128,6 +128,10 @@ public:
     // shape and derives values from them. Name tier 3. Callers: ObjectPlacement
     // 0x004b0df0 and Tire 0x00514550.
     void SetTransform(const Matrix4* m);
+    // 0x00434eb0 (thiscall, no arguments; called by SetTransform's model case): refits the
+    // model's bounds (center, halfExtents) around the enabled elements, expressed in the
+    // model frame (inverse of field_0x88), after saving the old bounds in field_0x30/field_0x3c.
+    void UpdateModelBounds();
     // 0x00439400, thiscall, ret 4: ignoreListMode = mode (tier 1).
     void SetIgnoreListMode(int mode);
     // 0x00439410, thiscall, ret 4 (tier 1 body): unique-add of owner into the growable
