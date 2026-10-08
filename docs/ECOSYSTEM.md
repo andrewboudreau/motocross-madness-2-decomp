@@ -64,7 +64,7 @@ That leaves 49 functions.
   3D and fade distances, model flags, billboard range and limit, and three
   render-state switches.
 
-## Exact (44 calibration cases)
+## Exact (45 calibration cases)
 
 Small: the two peak-hold `$E` pairs and the four vector `$E` pairs; the
 definition constructor / destructor and its four parameter helpers
@@ -80,7 +80,10 @@ PlacementBmp placement `0x00459b40` and the two xor stream helpers
 `0x0045c6a0` / `0x0045c7b0` (the .esb's fwrite / fread through a running
 one-byte key).
 
-Medium and large: the geometry build `0x00456a10` (1512 bytes: the
+Medium and large: the definition load `0x00456050` (1522 bytes: the
+billboard texture, the `.slt` model's LOD vertex / face sections through a
+parameter block, the x / y extents into the height and radius scales); the
+geometry build `0x00456a10` (1512 bytes: the
 AgeManager-registered vertex block, rotation from the camera's horizontal
 direction, the planar and model-normal lighting paths); the lighting update
 `0x0045a9a0`; slot 12 `0x0045aad0`
@@ -97,6 +100,17 @@ entry or a new owned stream, the 256-entry index skim, the per-name
 billboard and `.slt` texture loads with the "KeyColorTrees" format).
 
 Source forms that mattered:
+- `0x00456050`: the path buffer must not shadow the `name` member (the
+  shadowing local was the 163/1513 near miss); the extremes are initialised
+  in the order maxX, minX, maxY, minY; every vertex field is addressed as
+  `modelVertices[lod][i].field` (retail re-reads the LOD pointer per
+  access); and the three face ints are declared at the LOD-loop scope, not
+  inside the face loop. At face-loop scope VC6 hoists the three 16-bit
+  loads above the first `*index++` store; at LOD-loop scope it keeps
+  retail's load / store / load / add order (the address-taken ints then
+  outlive the stores, so the stores are treated as possible aliases). The
+  manifest's 1513 bytes stop before the `add esp; ret 8` epilogue; the
+  function is 1522 bytes.
 - `0x004567e0` loads each position component before the scale
   (`fld [position]; fmul [scale]`) only when the components are read
   through by-value accessors (`VectorX(*position)`); with `position->x` VC6
@@ -163,8 +177,7 @@ sample's bindings file; `$ehhandler` keys for the EH prologues).
 |---|---|---|
 | `0x00456890` | fade / distance band | 356/369: retail schedules the camera pointer load and the z store before the first `fmul`. The block is scheduling-invariant: eighteen data-flow-equivalent spellings (locals before or after the camera load, no camera local, the view in a local, one declaration per statement, a position reference, the products computed before the camera, `-=`, int locals and casts, a `Vector3` position, z first, a delta vector) give the same bytes, and every statement reordering scores lower. Helper boundaries do not move it either: inline and static accessors for the eye and the scaled coordinate, pointer, reference and by-value helpers, a struct copy and the difference as a `Vector3` all give the identical 356 or less, and `/G6` scores 267. |
 | `0x004570a0` | collision object placement | 103/386: retail loads the definition-table entry once into `edi` before the position conversions and keeps it (the candidate re-reads the table per use), and picks other registers for the three shape store blocks. Writing the shape stores through per-statement casts of `object->field_0x54` (`ECO_SPHERE->...`) reproduces retail's re-read of the shape pointer for every store, and the hull copy stores y before x. |
-| `0x00456050` | definition load (.slt) | 163/1513: `this` / `textures` register roles and the local layout (the loop extremes, a/b/c, faces) differ; the frame is 0x1b8 for 0x1b4. |
-| `0x00457480` | .est reader (2626 bytes) | 371/2646 (the matcher now binds the handler of the `push ebp; mov ebp, esp; and esp, -8; push -1; push handler` prologue); the probe stream is kept in `esi` as well as its EH slot, and the local layout follows from that. |
+| `0x00457480` | .est reader (2629 bytes) | 561/2629 compiled in the unit (587/2648 in the sample, whose out-of-unit definition constructor adds an EH state the unit does not need), three instructions short of exact: VC6 keeps the constant 1 of `method = 1` and `i = 1` in `edi` where retail stores both immediates. The probe stream lives in `esi` as well as its EH slot only with a plain `delete probe;` (the `if (probe)` guard keeps it in memory), which also puts `total`, `i` and the loop pointer in retail's slots; the "VTop" key is read into the field the constructor and `WriteEsb` call `uCenter` and "UCenter" into `vTop` (retail's order). Forms that leave the constant register: `total` / `i` at function or block scope, `i = 1` before or after `total = 0.0f`, `for (int i = 1 ...)`, `float total = 0.0f` at the declaration, an `if / else { }` method chain, `? 1 : 0` flag conversions, nested `if`s and named temporaries for the `strstr` / `_stricmp` / open results. The manifest's 2646 bytes include eleven `nop`s of padding. |
 | `0x00457ed0` | collision objects (1150 bytes) | 1105/1153: the cylinder height load `mov edx, [edi+0x20]` is scheduled before the cosine in retail (every placement of the `.y` store scores lower). The offset is `operator+` shaped (`Vector3(a.x + b.x, ...)`, `UnknownEcoOffset(shape->start, vertices[j])`; the named-result form scores less); its z component is summed vertex-first as in retail only when the vertex's z is read through a by-value accessor. |
 | `0x00458da0` | .txt listing | 457/461: four SIB operands are `[esi + eax]` instead of retail's `[eax + esi]` (array base / induction order); no source form found yet (`i[vegetation]` and an `int index = i` copy compile to the same bytes). |
 | `0x004598d0` | placement from the .esb | 445/455 (the documented 462 included seven bytes of padding): only where `mov ecx, [g_collisionQuadTree]` sits among the last `ComputeCode` argument's `fsub` / `fstp` differs. Widening the definition byte to `int` right after its read (`int definition = definitionByte;`) hoists the zero-extension into a register and spills the loop counter as retail does. |

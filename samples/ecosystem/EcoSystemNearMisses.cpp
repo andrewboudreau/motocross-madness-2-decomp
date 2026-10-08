@@ -18,9 +18,14 @@
 //   0x004570a0  retail loads the definition-table entry once into edi before
 //               the position conversions and picks other registers for the
 //               shape store blocks (103/386)
-//   0x00456050  register roles of this/textures and the local layout
-//   0x00457480  the probe stream also lives in esi; the aligned-frame EH
-//               prologue is not recognised by the matcher
+//   0x00457480  three instructions: VC6 keeps the constant 1 of `method = 1`
+//               and `i = 1` in edi where retail stores immediates (561/2629
+//               compiled inside the unit; the sample TU adds an EH state for
+//               the definition `new` because the ctor is out of unit).
+//               `delete probe;` without the `if` keeps the probe in esi as
+//               retail does; "VTop" is read into uCenter and "UCenter" into
+//               vTop (retail's order); scope/order/if-shape variants of
+//               total, i and method did not move the constant
 //   0x00457ed0  one scheduled load (the cylinder height) in the vertex loop
 //               (1105/1153)
 //   0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
@@ -167,111 +172,6 @@ CollisionObject* Vegetation::GetCollisionObject(int index) {
     return object;
 }
 
-// 0x00456050: loads the billboard texture and the .slt model (vertices,
-// faces and its texture); `modelFlags` is the detail band's model flag.
-int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags) {
-    char name[0x104];
-    char section[0x80];
-    if (billboardName[0]) {
-        billboardTexture = UnknownFunction50a590(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
-        if (!billboardTexture->UnknownVirtualSlot7())
-            billboardTexture->UnknownVirtualSlot8(1, 0, 0);
-    }
-    if (name[0]) {
-        int nameLength = strlen(name);
-        int length = nameLength > 0x103 ? 0x103 : nameLength;
-        strncpy(name, name, length);
-        name[length] = 0;
-        strcat(name, ".slt");
-        UnknownTextureStream* stream = new(__FILE__, 0xc0) UnknownTextureStream(g_UnknownResourceManager572b44);
-        if (stream->UnknownFunction460f50(name, "r", 0)) {
-            int lod;
-            UnknownParameterBlock* block = new(__FILE__, 0xc2) UnknownParameterBlock;
-            block->UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
-            block->UnknownFunction4b78f0("Material - 0");
-            block->UnknownFunction4b7b30("TextureMap", name, -1);
-            int format = 1555;
-            if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->field_0x1c0 & 8)
-                && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
-                format = g_TrackGame->field_0x10->field_0x28;
-            modelTexture = UnknownFunction50a590(textures, name, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
-            if (!modelTexture->UnknownVirtualSlot7()) {
-                int loaded = modelTexture->field_0x20;
-                if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
-                    modelTexture->UnknownVirtualSlot18(keyColor);
-                modelTexture->UnknownVirtualSlot8(1, 0, 0);
-            }
-            block->UnknownFunction4b78f0("LOD Information");
-            block->UnknownFunction4b7f10("NumberOfLOD", 0, &lodCount);
-            if (lodCount > kMaxLods)
-                lodCount = kMaxLods;
-            float maxY = -FLT_MAX;
-            float minY = FLT_MAX;
-            float maxX = -FLT_MAX;
-            float minX = FLT_MAX;
-            for (lod = 0; lod < lodCount; lod++) {
-                int faces;
-                int i;
-                sprintf(section, "LOD %d - Surface 0", lod);
-                block->UnknownFunction4b78f0(section);
-                block->UnknownFunction4b7f10("NumberOfVertices", 0, &modelVertexCount[lod]);
-                block->UnknownFunction4b7f10("NumberOfFaces", 0, &faces);
-                modelIndexCount[lod] = faces * 3;
-                modelVertices[lod] = (UnknownEcoModelVertex*)DebugMalloc(
-                    modelVertexCount[lod] * sizeof(UnknownEcoModelVertex) + faces * 3 * sizeof(unsigned short), __FILE__, 0x106);
-                modelIndices[lod] = (unsigned short*)(modelVertices[lod] + modelVertexCount[lod]);
-                sprintf(section, "LOD %d - Surface 0 - Vertices", lod);
-                block->UnknownFunction4b7f70(section);
-                for (i = 0; i < modelVertexCount[lod]; i++) {
-                    UnknownEcoModelVertex* vertex = &modelVertices[lod][i];
-                    block->UnknownFunction4b8010(0);
-                    block->UnknownFunction4b81c0(0, &vertex->position.x);
-                    block->UnknownFunction4b81c0(1, &vertex->position.y);
-                    block->UnknownFunction4b81c0(2, &vertex->position.z);
-                    if (vertex->position.y > maxY)
-                        maxY = vertex->position.y;
-                    if (vertex->position.y < minY)
-                        minY = vertex->position.y;
-                    if (vertex->position.x > maxX)
-                        maxX = vertex->position.x;
-                    if (vertex->position.x < minX)
-                        minX = vertex->position.x;
-                    block->UnknownFunction4b81c0(3, &vertex->normal.x);
-                    block->UnknownFunction4b81c0(4, &vertex->normal.y);
-                    block->UnknownFunction4b81c0(5, &vertex->normal.z);
-                    block->UnknownFunction4b81c0(6, &vertex->tu);
-                    block->UnknownFunction4b81c0(7, &vertex->tv);
-                    if (vertex->tv < 0.0f)
-                        vertex->tv = vertex->tv + 1.0f;
-                }
-                sprintf(section, "LOD %i - Surface 0 - Faces", lod);
-                block->UnknownFunction4b7f70(section);
-                unsigned short* index = modelIndices[lod];
-                for (i = 0; i < modelIndexCount[lod] / 3; i++) {
-                    int a;
-                    int b;
-                    int c;
-                    block->UnknownFunction4b8010(0);
-                    block->UnknownFunction4b8180(0, &a);
-                    block->UnknownFunction4b8180(1, &b);
-                    block->UnknownFunction4b8180(2, &c);
-                    *index++ = (unsigned short)a;
-                    *index++ = (unsigned short)b;
-                    *index++ = (unsigned short)c;
-                }
-            }
-            if (block)
-                delete block;
-            modelHeightScale = 1.0f / (maxY - minY);
-            modelRadiusScale = 2.0f / (maxX - minX);
-            field_0x1d4 = modelHeightScale * minY;
-        }
-        if (stream)
-            delete stream;
-    }
-    return 1;
-}
-
 // 0x00457480
 int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
     char name[0x104];
@@ -287,8 +187,7 @@ int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
         UnknownTextureStream* probe = new(__FILE__, 0x2eb) UnknownTextureStream(g_UnknownResourceManager572b44);
         if (probe->UnknownFunction460f50(name, "rb", 0))
             strcpy(strstr(path, ".est"), ".esb");
-        if (probe)
-            delete probe;
+        delete probe;
     }
     if (strstr(path, ".est")) {
         float total;
@@ -323,8 +222,10 @@ int EcoSystem::ReadEst(char* path, UnknownTextureStream* stream) {
                 definitionTable[i]->uLeft = UnknownFunction47b8a0(section, "ULeft", 0.0, path) * (1.0f / 256.0f);
                 definitionTable[i]->uRight = UnknownFunction47b8a0(section, "URight", 1.0, path) * (1.0f / 256.0f);
                 definitionTable[i]->vBottom = UnknownFunction47b8a0(section, "VBottom", 0.0, path) * (1.0f / 256.0f);
-                definitionTable[i]->uCenter = UnknownFunction47b8a0(section, "UCenter", 1.0, path) * (1.0f / 256.0f);
-                definitionTable[i]->vTop = UnknownFunction47b8a0(section, "VTop", 1.0, path) * (1.0f / 256.0f);
+                // Retail crosses these two keys: "VTop" lands in the field the
+                // ctor and WriteEsb treat as uCenter, "UCenter" in vTop.
+                definitionTable[i]->uCenter = UnknownFunction47b8a0(section, "VTop", 1.0, path) * (1.0f / 256.0f);
+                definitionTable[i]->vTop = UnknownFunction47b8a0(section, "UCenter", 1.0, path) * (1.0f / 256.0f);
                 definitionTable[i]->usePlanarLighting = GetPrivateProfileInt(section, "UsePlanarLighting", 1, path) != 0;
                 definitionTable[i]->blendLods = GetPrivateProfileInt(section, "BlendLODs", 1, path) != 0;
                 definitionTable[i]->percentBias = UnknownFunction47b8a0(section, "PercentBias", 1.0, path);

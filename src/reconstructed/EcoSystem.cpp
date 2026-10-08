@@ -147,6 +147,110 @@ float UnknownEcoDefinition::RadiusForParameter(unsigned char parameter) {
     return meanRadius + (maxRadius - meanRadius) * (255 - parameter) * (1.0f / 128.0f);
 }
 
+// 0x00456050: loads the billboard texture and the .slt model (vertices,
+// faces and its texture); `modelFlags` is the detail band's model flag.
+int UnknownEcoDefinition::LoadModel(TextureMapManager* textures, int modelFlags) {
+    char path[0x104];
+    char section[0x80];
+    if (billboardName[0]) {
+        billboardTexture = UnknownFunction50a590(textures, billboardName, modelFlags, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
+        if (!billboardTexture->UnknownVirtualSlot7())
+            billboardTexture->UnknownVirtualSlot8(1, 0, 0);
+    }
+    if (name[0]) {
+        int nameLength = strlen(name);
+        int length = nameLength > 0x103 ? 0x103 : nameLength;
+        strncpy(path, name, length);
+        path[length] = 0;
+        strcat(path, ".slt");
+        UnknownTextureStream* stream = new(__FILE__, 0xc0) UnknownTextureStream(g_UnknownResourceManager572b44);
+        if (stream->UnknownFunction460f50(path, "r", 0)) {
+            int lod;
+            UnknownParameterBlock* block = new(__FILE__, 0xc2) UnknownParameterBlock;
+            block->UnknownFunction4b77a0((UnknownParameterStream*)stream, 0, 1);
+            block->UnknownFunction4b78f0("Material - 0");
+            block->UnknownFunction4b7b30("TextureMap", path, -1);
+            int format = 1555;
+            if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->field_0x1c0 & 8)
+                && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
+                format = g_TrackGame->field_0x10->field_0x28;
+            modelTexture = UnknownFunction50a590(textures, path, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
+            if (!modelTexture->UnknownVirtualSlot7()) {
+                int loaded = modelTexture->field_0x20;
+                if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
+                    modelTexture->UnknownVirtualSlot18(keyColor);
+                modelTexture->UnknownVirtualSlot8(1, 0, 0);
+            }
+            block->UnknownFunction4b78f0("LOD Information");
+            block->UnknownFunction4b7f10("NumberOfLOD", 0, &lodCount);
+            if (lodCount > kMaxLods)
+                lodCount = kMaxLods;
+            float maxX = -FLT_MAX;
+            float minX = FLT_MAX;
+            float maxY = -FLT_MAX;
+            float minY = FLT_MAX;
+            for (lod = 0; lod < lodCount; lod++) {
+                int faces;
+                int i;
+                int a;
+                int b;
+                int c;
+                sprintf(section, "LOD %d - Surface 0", lod);
+                block->UnknownFunction4b78f0(section);
+                block->UnknownFunction4b7f10("NumberOfVertices", 0, &modelVertexCount[lod]);
+                block->UnknownFunction4b7f10("NumberOfFaces", 0, &faces);
+                modelIndexCount[lod] = faces * 3;
+                modelVertices[lod] = (UnknownEcoModelVertex*)DebugMalloc(
+                    modelVertexCount[lod] * sizeof(UnknownEcoModelVertex) + faces * 3 * sizeof(unsigned short), __FILE__, 0x106);
+                modelIndices[lod] = (unsigned short*)(modelVertices[lod] + modelVertexCount[lod]);
+                sprintf(section, "LOD %d - Surface 0 - Vertices", lod);
+                block->UnknownFunction4b7f70(section);
+                for (i = 0; i < modelVertexCount[lod]; i++) {
+                    block->UnknownFunction4b8010(0);
+                    block->UnknownFunction4b81c0(0, &modelVertices[lod][i].position.x);
+                    block->UnknownFunction4b81c0(1, &modelVertices[lod][i].position.y);
+                    block->UnknownFunction4b81c0(2, &modelVertices[lod][i].position.z);
+                    if (modelVertices[lod][i].position.y > maxY)
+                        maxY = modelVertices[lod][i].position.y;
+                    if (modelVertices[lod][i].position.y < minY)
+                        minY = modelVertices[lod][i].position.y;
+                    if (modelVertices[lod][i].position.x > maxX)
+                        maxX = modelVertices[lod][i].position.x;
+                    if (modelVertices[lod][i].position.x < minX)
+                        minX = modelVertices[lod][i].position.x;
+                    block->UnknownFunction4b81c0(3, &modelVertices[lod][i].normal.x);
+                    block->UnknownFunction4b81c0(4, &modelVertices[lod][i].normal.y);
+                    block->UnknownFunction4b81c0(5, &modelVertices[lod][i].normal.z);
+                    block->UnknownFunction4b81c0(6, &modelVertices[lod][i].tu);
+                    block->UnknownFunction4b81c0(7, &modelVertices[lod][i].tv);
+                    if (modelVertices[lod][i].tv < 0.0f)
+                        modelVertices[lod][i].tv = modelVertices[lod][i].tv + 1.0f;
+                }
+                sprintf(section, "LOD %i - Surface 0 - Faces", lod);
+                block->UnknownFunction4b7f70(section);
+                unsigned short* index = modelIndices[lod];
+                for (i = 0; i < modelIndexCount[lod] / 3; i++) {
+                    block->UnknownFunction4b8010(0);
+                    block->UnknownFunction4b8180(0, &a);
+                    block->UnknownFunction4b8180(1, &b);
+                    block->UnknownFunction4b8180(2, &c);
+                    *index++ = (unsigned short)a;
+                    *index++ = (unsigned short)b;
+                    *index++ = (unsigned short)c;
+                }
+            }
+            if (block)
+                delete block;
+            modelHeightScale = 1.0f / (maxY - minY);
+            modelRadiusScale = 2.0f / (maxX - minX);
+            field_0x1d4 = modelHeightScale * minY;
+        }
+        if (stream)
+            delete stream;
+    }
+    return 1;
+}
+
 // 0x00456650
 Vegetation::Vegetation() {
     quantizedPosition.x = 0;

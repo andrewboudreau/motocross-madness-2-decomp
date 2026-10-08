@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 199, c 168, total 367. The three class (a) functions of the
+Counts: a 0, b 198, c 168, total 366. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -46,10 +46,9 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | camera/VehicleCamera | `0x0052cc80` | 553/573 | c | 4 code diffs: `mov byte ptr [esi + 0x277], 0` vs `xor al, al ; mov byte ptr [esi + 0x277]~` |
 | control/ControlInterface | `0x004bf4f0` | 43/124 | c | 5 code diffs: `test ecx, ecx ; je @38 ; mov edx, [esp ~` vs `jmp @5` |
 | control/ControlInterface | `0x004bf6a0` | 438/726 (masked) | c | 58 code diffs: `jne @158` vs `jne @165 ; lea eax, [esp + N]`; `jmp @169 ; lea ecx, [esp + N]` vs `push eax ; jmp @178` |
-| ecosystem/EcoSystem | `0x00456050` | 163/1522 | b | 80 code diffs: retail adds `mov ebx, ecx ; mov cl, byte ptr [ebx + ~`; `mov ebp, ecx ; mov ebx, [esp + N] ; mov~` vs `mov ebp, [esp + N] ; lea eax, [ebx + 0x~`; frame 0x1b8 vs 0x1b4, slot order differs |
 | ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]` |
 | ecosystem/EcoSystem | `0x004570a0` | 103/386 | b | retail keeps the definition-table entry in `edi` across the position conversions (`mov edi, [eax + ecx*4 + 0x58]`); register choice in the shape store blocks |
-| ecosystem/EcoSystem | `0x00457480` | 371/2646 | c | 59 code diffs: `mov [esp + N], eax ; jmp @74` vs `mov esi, eax ; mov [esp + N], esi ; jmp~` |
+| ecosystem/EcoSystem | `0x00457480` | 561/2629 (in the unit) | c | 3 code diffs: `mov edi, 1 ; mov [esi + 0x30], edi` vs `mov dword ptr [esi + 0x30], 1`; `mov [esp + N], edi` vs `mov dword ptr [esp + N], 1` (the constant 1 of `method = 1` / `i = 1` kept in `edi`) |
 | ecosystem/EcoSystem | `0x00457ed0` | 1105/1153 | b | 4 code diffs: retail adds `mov edx, [edi + 0x20]`; retail adds `fmul [A]`; slots differ |
 | ecosystem/EcoSystem | `0x00458da0` | 457/461 | c | 4 code diffs: `mov cl, byte ptr [esi + eax + 0x14]` vs `mov cl, byte ptr [eax + esi + 0x14]`; `lea eax, [esi + edx]` vs `lea eax, [edx + esi]` |
 | ecosystem/EcoSystem | `0x004598d0` | 445/455 | c | 1 code diff: `mov ecx, [0x68aba4]` sits between the last ComputeCode argument's `fsub` and `fstp` in retail |

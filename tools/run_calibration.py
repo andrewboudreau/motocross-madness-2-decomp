@@ -20920,6 +20920,15 @@ CASES = [
         'reason': 'Mean/Min/MaxRadius interpolation by 1/128',
     },
     {
+        'name': 'EcoSystem.cpp UnknownEcoDefinition::LoadModel',
+        'bindings': 'src/reconstructed/EcoSystem.bindings.json',
+        'source': 'src/reconstructed/EcoSystem.cpp',
+        'symbol': '?LoadModel@UnknownEcoDefinition@@QAEHPAVTextureMapManager@@H@Z',
+        'target_va': '0x00456050',
+        'target_size': 1522,
+        'reason': 'Billboard texture plus .slt model load (vertices, faces, extents); the face ints are LOD-loop scoped',
+    },
+    {
         'name': 'EcoSystem.cpp Vegetation ctor',
         'bindings': 'src/reconstructed/EcoSystem.bindings.json',
         'source': 'src/reconstructed/EcoSystem.cpp',
