@@ -46,7 +46,18 @@ These match:
 - the EH states, the error paths and the 0x650 frame.
 
 These differ:
-- the stack slots of most locals;
+- the stack slots of most locals: retail shares more. Its `+0xc` (23
+  uses) holds `stream` (13 here at `+0x8`) together with the
+  `shadowLight` / `textureBytes` / `all` class (16 here at `+0xc`); its
+  `+0` (12) is `needed` / `iterator` (19 here at `+0x4`); its `+0x4` (12)
+  joins `visibility` / `forced` (13 here, `+0x10`) with `step` (`+0x68`
+  here); `flareLight` / `margin` (11, `+0`) is retail's `+0x14`, `i` /
+  `iterator` (8, `+0x14`) its `+0x1c`; the 19-use temporary `+0x2c` is
+  retail's `+0x30`, `+0x44` (10) its `+0x48`, `+0x60` (11) stays,
+  `sceneSteps` moves from `+0x48` to `+0x64`, `skyTextures` / `hasCube`
+  share retail's `+0x68`. VC6 shares a slot between locals whose scopes
+  are disjoint (an address-taken local lives for its whole block), so the
+  original declares these in inner blocks;
 - register choices and expression shapes in the memory-budget tree
   (`0x004de7e0..0x004ded5e`);
 - the zero register retail keeps around the collision links.

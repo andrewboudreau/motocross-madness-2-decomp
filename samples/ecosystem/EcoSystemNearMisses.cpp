@@ -25,8 +25,6 @@
 //   0x004598d0  loop counter in memory, definition byte cached in a register
 //   0x00459b40  fidiv for the cell size, bitmap pointer in ebp
 //   0x0045c6a0  pointer/count-down block loop
-//   0x0045c040  one byte: the spill slot of the probe stream's `new`
-//               temporary (1618/1619)
 //   0x00459ce0  the frame slots: same size, the locals and temporaries
 //               are assigned in a different order (323/3300)
 //   0x0045b060  frame 0xe0 for 0xf0 and the slot order; the lean of the
@@ -664,120 +662,6 @@ int EcoSystem::PlaceAuthoredObjects() {
     }
 done:
     UnknownFunction4245b0(bitmap);
-    return 1;
-}
-
-// 0x0045c040 (cdecl): loads every texture the .esb names before the
-// ecosystem itself is created (the loader then finds them in the manager).
-// `path` is rewritten to the .esb name when one exists next to the .est.
-int UnknownFunction45c040(TextureMapManager* textures, char* path, UnknownTextureStream* stream, int modelFlags) {
-    char names[256][0x80];
-    char billboardNames[256][0x80];
-    unsigned int keyColors[256];
-    char esbName[0x104];
-    char sltName[0x104];
-    unsigned char present;
-    unsigned char length;
-    int method;
-    int collisionCount;
-    int ownsStream = 0;
-    int i;
-    memset(billboardNames, 0, sizeof(billboardNames));
-    memset(names, 0, sizeof(names));
-    g_UnknownGlobal59af10 = 0;
-    if (!stream && strstr(path, ".est")) {
-        int pathLength = strlen(path);
-        int count = pathLength > 0x103 ? 0x103 : pathLength;
-        strncpy(esbName, path, count);
-        esbName[count] = 0;
-        strcpy(strstr(esbName, ".est"), ".esb");
-        UnknownTextureStream* probe = new(__FILE__, 0xad7) UnknownTextureStream(g_UnknownResourceManager572b44);
-        if (probe->UnknownFunction460f50(esbName, "rb", 0))
-            strcpy(strstr(path, ".est"), ".esb");
-        if (probe)
-            delete probe;
-    }
-    if (!strstr(path, ".esb"))
-        return 0;
-    UnknownTextureStream* esb = stream;
-    if (!esb) {
-        UnknownResourceEntry* entry = g_UnknownResourceManager572b44->UnknownFunction4e9360(path, 1);
-        if (!entry) {
-            esb = new(__FILE__, 0xaf8) UnknownTextureStream(g_UnknownResourceManager572b44);
-            if (!esb->UnknownFunction460f50(path, "rb", 0)) {
-                if (esb)
-                    delete esb;
-                return 0;
-            }
-            ownsStream = 1;
-        } else {
-            esb = entry->field_0x14;
-        }
-    }
-    esb->UnknownFunction461640(&method, 4, 1);
-    for (i = 0; i < 256; i++) {
-        esb->UnknownFunction461640(&present, 1, 1);
-        if (present) {
-            esb->UnknownFunction461640(&length, 1, 1);
-            esb->UnknownFunction461640(names[i], length, 1);
-            esb->UnknownFunction461640(&length, 1, 1);
-            esb->UnknownFunction461640(billboardNames[i], length, 1);
-            esb->UnknownFunction461340(0x34, 1, 1);
-            esb->UnknownFunction461640(&keyColors[i], 4, 1);
-            if (method == 2) {
-                esb->UnknownFunction461340(0x24, 1, 1);
-                esb->UnknownFunction461640(&present, 1, 1);
-                if (present) {
-                    esb->UnknownFunction461640(&length, 1, 1);
-                    esb->UnknownFunction461340(length, 1, 1);
-                }
-            }
-            esb->UnknownFunction461640(&collisionCount, 4, 1);
-            esb->UnknownFunction461340(collisionCount * sizeof(UnknownEcoCollisionDefinition), 1, 1);
-        }
-    }
-    if (ownsStream) {
-        if (esb)
-            delete esb;
-    }
-    for (i = 0; i < 256; i++) {
-        if (billboardNames[i][0]) {
-            UnknownEcoTexture* texture = UnknownFunction50a590(textures, billboardNames[i], modelFlags, 0, 2, 5, 6, 0, 0x80,
-                                                               0xff00ff, 1, 1);
-            if (!texture->UnknownVirtualSlot7()) {
-                texture->UnknownVirtualSlot8(1, 0, 0);
-                g_UnknownGlobal59af10++;
-            }
-        }
-        if (names[i][0]) {
-            strcpy(sltName, names[i]);
-            strcat(sltName, ".slt");
-            UnknownTextureStream* sltStream = new(__FILE__, 0xb50) UnknownTextureStream(g_UnknownResourceManager572b44);
-            if (sltStream->UnknownFunction460f50(sltName, "r", 0)) {
-                UnknownParameterBlock* block = new(__FILE__, 0xb52) UnknownParameterBlock;
-                block->UnknownFunction4b77a0((UnknownParameterStream*)sltStream, 0, 1);
-                block->UnknownFunction4b78f0("Material - 0");
-                block->UnknownFunction4b7b30("TextureMap", sltName, -1);
-                int format = 1555;
-                if (!g_TrackGame->field_0x2d0 && (g_TrackGame->field_0x10->field_0x1c0 & 8)
-                    && g_TrackGame->GetRegistryFlag("KeyColorTrees", 0))
-                    format = g_TrackGame->field_0x10->field_0x28;
-                UnknownEcoTexture* texture = UnknownFunction50a590(textures, sltName, format, 0, 2, 5, 6, 0, 0x80, 0xff00ff, 1, 1);
-                if (!texture->UnknownVirtualSlot7()) {
-                    g_UnknownGlobal59af10++;
-                    int loaded = texture->field_0x20;
-                    if (loaded == 555 || loaded == 565 || loaded == 888 || loaded == 1555)
-                        texture->UnknownVirtualSlot18(keyColors[i]);
-                    texture->UnknownVirtualSlot8(1, 0, 0);
-                }
-                if (block)
-                    delete block;
-            }
-            if (sltStream)
-                delete sltStream;
-        }
-    }
-    g_UnknownGlobal59aefc = 1;
     return 1;
 }
 

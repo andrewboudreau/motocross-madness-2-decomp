@@ -284,8 +284,6 @@
   "?SphereInFrustum@UnknownEcoVisibilityClipper@@QAEHPBVUnknownEcoCamera@@PBXPBUVector3@@MPAH@Z": "0x0052fbb0",
   "?UnknownFunction447f40@UnknownEcoDebugOverlay@@QAAXHPBDZZ": "0x00447f40",
   "?UnknownFunction447fa0@UnknownEcoDebugOverlay@@QAAXHPBDZZ": "0x00447fa0",
-  "?UnknownFunction45c040@@YAHPAVTextureMapManager@@PADPAVUnknownTextureStream@@H@Z": "0x0045c040",
-  "?UnknownFunction45c040@@YAHPAVTextureMapManager@@PADPAVUnknownTextureStream@@H@Z$ehhandler": "0x0054aa28",
   "?UnknownFunction4a2d20@MemTagStack@@QAEHPBD@Z": "0x004a2d20",
   "?UnknownFunction4cb690@UnknownPeakHold@@QAEHXZ": "0x004cb690",
   "?UnknownFunction4cb6b0@UnknownPeakHold@@QAEXH@Z": "0x004cb6b0",

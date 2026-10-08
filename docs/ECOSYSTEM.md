@@ -64,7 +64,7 @@ That leaves 49 functions.
   3D and fade distances, model flags, billboard range and limit, and three
   render-state switches.
 
-## Exact (39 calibration cases)
+## Exact (40 calibration cases)
 
 Small: the two peak-hold `$E` pairs and the four vector `$E` pairs; the
 definition constructor / destructor and its four parameter helpers
@@ -87,7 +87,10 @@ lists with their 100/20-entry growth); the render-state setter
 `0x0045ade0`; the .esb writer `0x004587b0` (1513 bytes); the .esb reader
 `0x00458f70` (1351 bytes); the creator `0x004594d0` (859 bytes: table
 selection, scale from the QuadTree extents, load, textures, collisions,
-object array, buffers, placement by method, .esb write).
+object array, buffers, placement by method, .esb write); the texture
+preload `0x0045c040` (1619 bytes: the `.est` to `.esb` probe, the archive
+entry or a new owned stream, the 256-entry index skim, the per-name
+billboard and `.slt` texture loads with the "KeyColorTrees" format).
 
 Source forms that mattered:
 - `0x004567e0` loads each position component before the scale
@@ -114,6 +117,15 @@ Source forms that mattered:
   per-object definition byte goes through a local before `fwrite`.
 - `0x00458f70`: the stream selection is `if (!stream) { if (!entry) new +
   open else entry stream, flag } else flag`.
+- `0x0045c040`: the index read (stream selection, the 256-entry skim,
+  the texture loads) is a block of its own in which `collisionCount` is
+  declared. VC6 gives an address-taken local the lifetime of its scope, so
+  a function-scope `collisionCount` can share nothing, while the block
+  keeps it dead in the probe block (its slot then holds the probe `new`'s
+  EH temporary, `[esp+0x20]`) and live across the stream's `new` (whose
+  temporary takes `ownsStream`'s dead slot) and the second loop (whose
+  induction spill gets its own slot). Declaring it mid-function at
+  function scope changes nothing: only block scope shortens the lifetime.
 - `0x004594d0`: the band table is a conditional expression; the index
   buffer is filled through a running index; `unitsPerCoordinate = size *
   (1.0f / 65536.0f)`.
@@ -136,9 +148,8 @@ sample's bindings file; `$ehhandler` keys for the EH prologues).
 | `0x00459b40` | placement from the PlacementBmp | 56/412: `fidiv` for the cell size, the bitmap pointer in `ebp`, pixel pointer kept in memory. |
 | `0x0045c6a0` | xor fwrite | 14/254: retail walks a pointer and a 1024 count-down per block, with the block count in a local. |
 | `0x0045c7b0` | xor fread | 90/115: register roles (total in `edi`, key in `ebx`) and the byte update order. |
-| `0x0045c040` | texture preload (1619 bytes) | 1618/1619: one byte, the spill slot of the probe stream's `new` temporary (`[esp+0x20]`, shared with the dead `collisionCount`, where VC6 here shares `[esp+0x1c]` with the second loop's induction temporary). Declaration order of the six scalars, scoping `collisionCount`, a function-scope probe, `delete probe` without the test, a split condition and a named open result all give the same 1618. Everything else is reproduced: the `.est` to `.esb` probe, the archive entry or a new owned stream (the stream is a separate local, `esb = stream`; keeping the parameter keeps it in `ebp`), the 256-entry skim with 0x34 / 0x24 / `count * 0x24` seeks, the per-name billboard and `.slt` texture loads with the "KeyColorTrees" format. |
-| `0x00459ce0` | Auto-method generator (3257 bytes) | 323/3300: the control flow and every expression match; the frame (0xe14) is the same size but the slots are assigned differently (VC6 assigns the generator's locals and temporaries to slots by first use and liveness, not by declaration order, and the retail order interleaves the per-draw scalars with the two `Vector3` temporaries), so most memory operands differ by their displacement. Source forms that mattered: the two `rand()` scales stay separate only through a named local (`random = UnknownEcoRandom(); threshold = random * 3.0f`); the draw is `rand() * (100.0f / 32767.0f)` (RAND_MAX), the position `rand() * (1 / 32768.0f) * range`; the TGA sampler divides by a local copy of the QuadTree extent (`x / worldX * width` gives retail's `fld; fdivr`); the ring tables are `Vector3(i * spacing, 0, (mode - 1) * spacing)` constructor temporaries; `tga = 0` precedes the `memset`; the registry query is Game slot 20, not slot 22. |
-| `0x0045b060` | slot 14, the draw (3967 bytes) | 461/3919: the structure matches (identity world matrix, saved TEXTUREPERSPECTIVE / SHADEMODE, three leaned face normals, their lit colours, the geometry list, the 120-quad billboard batches with the four- and six-vertex forms and index patterns, the overlay rows, the state restore) but the frame is 0xe0 for 0xf0 and the slots differ: retail keeps the `back * 0.1f` lean of x on the x87 stack and spills the z lean twice (`[esp+0x20]` and `[esp+0xbc]`), and the per-quad locals interleave with the function's. The lit colour clamps are conditional expressions (`v < 1.0f ? v : 1.0f`, the value stays on the stack); the intensities are a `Vector3` (memory, read three times each); the dot products sum as `z + (x + y)`. |
+| `0x00459ce0` | Auto-method generator (3257 bytes) | 323/3300: the control flow and every expression match; the frame (0xe14) is the same size and the arrays (`tgas`, `cumulative`, the rings) sit at retail's offsets, but the scalar slots differ. Retail's slot order by use count is reproduced except for how VC6's slot sharing groups the temporaries: retail shares the int-to-float conversion temporaries (`fild [esp+0x10]`) with the first loops' 256 count-down and the placement loop's `j` (34 uses at `[esp+0x10]`), `i` of the ring loops with `probability` (28 uses at `+0x14`), and the `fimul` products with their `(int)` results (`+0x28`, 12 uses); here the conversion temporaries share with the `fimul` products (36 uses), `i` with `clusterCount` (27) and `probability` stands alone (11), so `tga`, `heightParameter`, `radius` / `threshold` and the four-use scalars shift by one or two slots. Source forms that mattered: the two `rand()` scales stay separate only through a named local (`random = UnknownEcoRandom(); threshold = random * 3.0f`); the draw is `rand() * (100.0f / 32767.0f)` (RAND_MAX), the position `rand() * (1 / 32768.0f) * range`; the TGA sampler divides by a local copy of the QuadTree extent (`x / worldX * width` gives retail's `fld; fdivr`); the ring tables are `Vector3(i * spacing, 0, (mode - 1) * spacing)` constructor temporaries; `tga = 0` precedes the `memset`; the registry query is Game slot 20, not slot 22. |
+| `0x0045b060` | slot 14, the draw (3967 bytes) | 461/3919: the structure matches (identity world matrix, saved TEXTUREPERSPECTIVE / SHADEMODE, three leaned face normals, their lit colours, the geometry list, the 120-quad billboard batches with the four- and six-vertex forms and index patterns, the overlay rows, the state restore) but the frame is 0xe0 for 0xf0 and the slot sharing differs: retail folds the per-quad vertex offset temporaries (separate 2- to 4-use slots here at `+0x44`..`+0x5c`) into its 9-use classes at `+0x4` / `+0x8` / `+0xc`, splits the `intensity` / `right` class (14 uses here at `+0`) over `+0x4`, `+0x18` and `+0x20`, keeps `z` of the lean as its 14-use `[esp+0x10]` (11 uses here) and `object` at `+0x14` with 8 uses (3 here), and spends four more scalar slots (3- and 4-use classes at `+0x1c`, `+0x28`, `+0x30`, `+0x38`, `+0x64`, `+0xac`), so only the identity matrix, the saved states and the two-use scalars (`+0x6c`..`+0xa0`, `+0xb0`..) sit at retail's offsets. The lit colour clamps are conditional expressions (`v < 1.0f ? v : 1.0f`, the value stays on the stack); the intensities are a `Vector3` (memory, read three times each); the dot products sum as `z + (x + y)`. |
 
 With the three large functions decoded there are no unattempted functions
 left in the unit.

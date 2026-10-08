@@ -164,7 +164,8 @@ type, member and function names are provisional.
   Only the address of the name terminator differs (retail adds the element
   offset to the array base first); the order follows the spill of the
   element offset around the physics branch, which retail shares (sample
-  header). The views of those classes live in the
+  header). Every frame slot is at retail's offset; the two bytes are the
+  commutative operand order of one address computation. The views of those classes live in the
   sample. Shapes that mattered: nested `if`s for the missing-count and
   no-models messages, `model[0x44]` and `slt[0x108]` (retail's frame), the
   emitter loop inside `if (points > 0)` and `if (a2)`, inline keyword
@@ -198,6 +199,25 @@ type, member and function names are provisional.
   - `for (m...; m++)` with `m + 1` passed to sprintf;
   - the sound node chosen by if/else on full member expressions;
   - `strrchr` for the ".col" name.
+
+  Slot map (candidate -> retail, frame-relative, by use count): the
+  shared `axes` / `j` class (20 uses, `+0`), `animations` (6, `+0xc`),
+  `lagDistance` (5, `+0x18`), `tires` (4, `+0x20`), `useLighting` (3,
+  `+0x24`), `exclude` (2, `+0x30`) and `name` (`+0x44`) already sit at
+  retail's offsets. Retail's `+0x4` is `automatic` with 7 uses (6 here:
+  retail stores the strcspn result and reloads it for the compare),
+  `+0x8` is `fps` (4 uses) sharing with the random-set loop's spilled
+  element offset (`k * 0x44`, 4 uses; here the counter itself lives in
+  `i`'s slot, 10 uses), `+0x10` is `i` (6), `+0x14` `frontWheelsTurn`,
+  `+0x1c` `next`; the seven two-use scalars come out in a different order
+  (retail: randomTriggerPercent, oneShotDistance, exclude, flags, heading,
+  pitch, force2D from `+0x28`; here heading, randomTriggerPercent,
+  exclude, pitch, oneShotDistance, force2D, flags), which no declaration
+  order changes (VC6 orders ties by a function of the whole list, not of
+  the tied group); `sltPath` is retail's `+0xaf4` (here `+0xa70`) and
+  `list` retail's `+0xa70` (here `+0xb74`).
+  A separate random-set counter with a loop-scoped `fps` reproduces
+  retail's `fps` sharing but not its strength-reduced offset.
 - `0x004f17a0` lies after the player-record initializers that open
   SelectGamePicProcs.cpp.
 

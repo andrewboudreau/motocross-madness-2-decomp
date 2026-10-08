@@ -158,6 +158,8 @@
   "?UnknownFunction4594c0@EcoSystem@@QAEXH@Z": "0x004594c0",
   "?UnknownFunction4594d0@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVUnknownEcoTerrain@@PAVLightManager@@PADPAVUnknownTextureStream@@HHH@Z": "0x004594d0",
   "?UnknownFunction4594d0@EcoSystem@@QAEPAV1@PAXPAVTextureMapManager@@PAVUnknownEcoTerrain@@PAVLightManager@@PADPAVUnknownTextureStream@@HHH@Z$ehhandler": "0x0054a9a7",
+  "?UnknownFunction45c040@@YAHPAVTextureMapManager@@PADPAVUnknownTextureStream@@H@Z": "0x0045c040",
+  "?UnknownFunction45c040@@YAHPAVTextureMapManager@@PADPAVUnknownTextureStream@@H@Z$ehhandler": "0x0054aa28",
   "?PlaceStoredObjects@EcoSystem@@QAEHXZ": "0x004598d0",
   "?PlaceAuthoredObjects@EcoSystem@@QAEHXZ": "0x00459b40",
   "?GenerateObjects@EcoSystem@@QAEHH@Z": "0x00459ce0",

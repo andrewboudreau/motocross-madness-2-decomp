@@ -45,7 +45,8 @@ Near misses (`samples/race/BikeRaceNearMisses.cpp`):
   register throughout; the candidates do not.
 - `0x004210f0` (start grid), 969 of 2940 bytes: VC6's inline budget
   places the out-of-line `Vector3` constructor/scale calls differently
-  (see the comment in the sample).
+  (see the comment in the sample); every frame slot is at retail's
+  offset.
 - `0x00417ed0` (setup, 6745 bytes with the jump table at `0x0041992c`;
   ret 0x24; QuarryStuntEvent.cpp's loader calls it after the
   constructor), 2800 of 6756 positions: all 166 calls in retail order, the
@@ -53,13 +54,32 @@ Near misses (`samples/race/BikeRaceNearMisses.cpp`):
   the buffers at retail's offsets. Retail spills `z*z` of both vector
   lengths to a stack temporary (`fstp [t]; faddp; fadd [t]`, a shape found
   nowhere else in the binary) and orders the girl block's temporaries
-  differently, so most esp offsets below +0x44 differ.
+  differently, so most esp offsets below +0x44 differ. The spill is a
+  store-and-reload of a memory temporary: a `volatile float zz = v.z *
+  v.z` in the length helper reproduces the `fstp [t]`, the `fadd [t]`,
+  the slot (`angle`'s dead `[esp+0x34]`) and the rest of the frame (6727
+  of 6768 positions), but VC6 then evaluates the square before `x * x`
+  and `y * y` where retail evaluates it last; assignments inside the
+  expression, casts, comma forms, accumulations and inline helpers keep
+  the products on the x87 stack. Slot map below `+0x44`: retail's `+0x20`
+  (10 uses) and `+0x24` (9) are the classes here at `+0x2c` (8) and
+  `+0x30` (`height` / `angle`, 7), the two extra uses being the spilled
+  square at each site; `axis` moves from `+0x20` to `+0x28` and the
+  seven-use classes from `+0x24` / `+0x28` to `+0x2c` / `+0x30`.
 - `0x00419970` (loader, 13428 bytes; ret 0x14, frame 0xab0), 1380 of
   13322 positions: completely decoded (pro circuit, network, offline,
   ghost and AI racers, collision pairing; EH states for `new` lines
   0x3b6..0x78f, frees at lines 0x4ff..0x501, 0x550..0x552 and
   0x7f7..0x7f9); 194 of retail's 195 calls in order. The candidate's frame
-  (0xac4) orders the locals differently, and register choice follows.
+  (0xac4) orders the locals differently, and register choice follows:
+  retail's 23-use classes at `+0` and `+0x4` are `i` (15 here, `+0x14`)
+  with `fromEvent` (16, `+0x10`) and `riderModels` (29 here, `+0`) with
+  `skill`; its `+0x8` / `+0xc` are `recordIndex` / `id` (here `+0x4` /
+  `+0x8`), `position` and `direction` sit at `+0x14` / `+0x20` (here
+  `+0x20` / `+0x2c`), `playerId` falls to `+0x48` (16 uses here, 10
+  there), `names` to `+0x30`, `plate` to `+0x40`, `setup` to `+0x6c`;
+  the candidate's `slots` (11 uses) has no retail slot, and retail
+  shares its temporaries into fewer classes (0x14 bytes of frame).
 
 Facts the two functions establish:
 - Racers are KrustyBike (constructor `0x0048fa60`, 0x1638 bytes, the

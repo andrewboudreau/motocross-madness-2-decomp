@@ -21064,6 +21064,15 @@ CASES = [
         'reason': 'GameObject slot 23 then key 4 toggles 0x56a12c',
     },
     {
+        'name': 'EcoSystem.cpp texture preload',
+        'bindings': 'src/reconstructed/EcoSystem.bindings.json',
+        'source': 'src/reconstructed/EcoSystem.cpp',
+        'symbol': '?UnknownFunction45c040@@YAHPAVTextureMapManager@@PADPAVUnknownTextureStream@@H@Z',
+        'target_va': '0x0045c040',
+        'target_size': 1619,
+        'reason': '.est to .esb probe, 256-entry index skim, billboard and .slt texture loads; the index read is a block so collisionCount shares the probe new temporary slot',
+    },
+    {
         'name': 'EcoSystem.cpp EcoSystem $E kVec3Zero body',
         'bindings': 'src/reconstructed/EcoSystem.bindings.json',
         'source': 'src/reconstructed/EcoSystem.cpp',
