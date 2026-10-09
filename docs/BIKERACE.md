@@ -14,7 +14,11 @@ Evidence:
 
 Extent: `0x00417b00..0x004238bb` (strong inference). The plate-number
 painter at `0x00417500..0x00417aff` may also belong here and is
-unresolved. From `0x004238c0` the code is GR_BitString's; BlockAllocator.cpp
+unresolved. Its constructor `0x00417500` (loads BikeNumbers128.tga through
+`0x0050a590`, digit widths 19 except 13 for "1"), destructor `0x00417570`
+and digit blit `0x00417580` are strict exact in the provisional unit
+`src/reconstructed/BikeNumberPainter.cpp` (class name ours, tier 3); the
+x87 plate renderer `0x00417670` is not attempted. From `0x004238c0` the code is GR_BitString's; BlockAllocator.cpp
 starts at `0x00423f70`. The four kVec3 `$E` pairs sit mid-file at
 `0x0041cdf0..0x0041cf2b`.
 

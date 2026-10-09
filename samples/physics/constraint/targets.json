@@ -168,5 +168,65 @@
     "expect": "exact",
     "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary, then copies it to 0x579830. Exact with copy-initialization `static const ConZeroVec g_ConZero = ConZeroVec(0,0,0);`; direct initialization gives three direct stores instead.",
     "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x0043c930",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (1,0,0) constant 0x00579840 (5-byte jmp to 0x0043c940).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x0043c940",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (1,0,0) in a stack temporary and copies it to 0x00579840 (copy-initialization from the inline constructor).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x0043c980",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,1,0) constant 0x00579850 (5-byte jmp to 0x0043c990).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x0043c990",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,1,0) in a stack temporary and copies it to 0x00579850 (copy-initialization from the inline constructor).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x0043c9d0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,0,1) constant 0x00579820 (5-byte jmp to 0x0043c9e0).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
+  },
+  {
+    "class": "ConstraintMethodCollisionModel",
+    "source": "ConstraintMethodCollisionModel.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x0043c9e0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,0,1) in a stack temporary and copies it to 0x00579820 (copy-initialization from the inline constructor).",
+    "bindings": "ConstraintMethodCollisionModel.bindings.json"
   }
 ]

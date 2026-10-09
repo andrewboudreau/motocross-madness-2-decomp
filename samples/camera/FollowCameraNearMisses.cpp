@@ -337,7 +337,7 @@ bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
         if (height > field_0x170.y)
             field_0x170.y = height;
         UnknownFunction42e930(66.0f);
-        UnknownFunction42e690(dt);
+        Camera::UnknownVirtualSlot10(dt);
         return true;
     }
     UnknownVirtualSlot54();
@@ -714,7 +714,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             roll = 0.0f;
             UnknownVirtualSlot54();
         }
-        UnknownFunction42e9b0(&smoothed, 0, 0, (int)&roll, 0);
+        UnknownFunction42e9b0(&smoothed, 0, 0, &roll, 0);
         UnknownVirtualSlot29(cachedTarget);
         if (UnknownVirtualSlot56()) {
             if (cameraState != 7 && !field_0x276) {
@@ -774,7 +774,7 @@ int FollowCamera::UnknownVirtualSlot10(float dt) {
             }
         }
         UnknownFunction42e930(field_0x294->Update(field_0x258, dt));
-        UnknownFunction42e690(dt);
+        Camera::UnknownVirtualSlot10(dt);
         field_0x278 = wide;
         return 1;
     }

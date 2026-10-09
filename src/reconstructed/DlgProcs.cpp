@@ -971,7 +971,7 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
         viewEye.y = 1.0f;
         *target = g_TrackGame->ui->field_0x474;
         viewTarget.y += 3.0f;
-        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(eye, 0, 0, 0, (int)&fov);
+        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(eye, 0, 0, 0, &fov);
         g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(*target);
         g_TrackGame->ui->field_0x468->UnknownFunction42f190(
             previewArea.left, previewArea.top, previewArea.right - previewArea.left,

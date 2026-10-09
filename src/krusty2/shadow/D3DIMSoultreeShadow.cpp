@@ -69,13 +69,18 @@ int D3DIMSoultreeShadow::UnknownVirtualSlot28()
 
 // 0x00581eb8..0x005995b8: 3000 32-byte lit vertices (FVF 0x1e2, the D3DLVERTEX layout) that
 // slot 14 draws with g_d3dimShadowIndexTable (tier 2: the slot 14 draw call and the extent up
-// to the index table).  PROVISIONAL name.
+// to the index table).  PROVISIONAL name.  The empty constructor (d3dtypes.h gives
+// D3DLVERTEX one under D3D_OVERLOADS) makes the array dynamically initialized: .CRT$XCU
+// entry 94, after this file's vector set, is the thunk 0x00446820 to the bare `ret` body
+// 0x00446830 (strong inference: the entry follows the set with no gap and the array is the
+// only class-typed static left in the file).
 struct D3DIMShadowVertex {
     float x, y, z;
     int reserved;
     unsigned int diffuse;
     unsigned int specular;
     float tu, tv;
+    D3DIMShadowVertex() {}
 };
 D3DIMShadowVertex g_d3dimShadowVertices[3000];
 

@@ -57,7 +57,7 @@ inline CollisionVec3 operator*(const CollisionVec3& v, float s) {
 extern CollisionVec3 g_CollisionZeroVec3;
 // Third global vec3 at 0x005797b0 (initial value of CollisionObject::field_0xa0/field_0xac).
 extern CollisionVec3 g_CollisionVec3_5797b0;
-// Second global vec3 at 0x00579810 (source of CollisionPoint::field_0x2c initial value; value unknown).
+// Second global vec3 at 0x00579810 (source of CollisionPoint::field_0x2c initial value; (0,1,0), stored by the initializer 0x0043b100).
 extern CollisionVec3 g_CollisionVec3_579810;
 
 // The debug operator new/delete (size or ptr, __FILE__, __LINE__) are in DebugAlloc.h.

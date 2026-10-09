@@ -30,11 +30,12 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | audio/PCAudio | `0x004bd0c0` | 110/314 (masked) | c | 16 code diffs |
 | audio/PCAudio | `0x004bdc00` | 79/407 (masked) | b | 33 code diffs: `sub esp, 8` vs `sub esp, N`; retail lacks `mov ebx, [esp + N]`; frame 0x8 vs 0xc |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
+| camera/Camera | `0x0042e550` | 13/206 | c | retail reloads the display-mode index for the height (`mov edx, [eax + 0xc]` twice) and shares the return tail, so everything after it shifts; named width/height temps and width/height accessors both reuse the index (src/reconstructed/Camera.cpp) |
 | camera/FollowCamera | `0x00462ee0` | 418/564 | c | 12 code diffs: retail lacks `mov byte ptr [esi + 0x274], bl ; mov [e~`; retail adds `mov [edx + 8], eax` |
 | camera/FollowCamera | `0x00465000` | 198/210 | c | 2 code diffs: retail lacks `mov byte ptr [esi + 0x277], 0`; retail adds `mov byte ptr [esi + 0x277], al` |
 | camera/FollowCamera | `0x004650e0` | 262/943 | b | 3 code diffs: `je @266 ; jmp @261` vs `je A ; jmp A`; `je @79` vs `je A`; frame 0x180 vs 0x18c |
 | camera/FollowCamera | `0x004654e0` | 358/576 | b | 6 code diffs: retail adds `fsubp st(1)`; retail lacks `fsubp st(1)`; slots differ |
-| camera/FollowCamera | `0x00465720` | 931/1267 | c | 4 code diffs: `jne @301` vs `jne A`; retail adds `fld [esp + N]` |
+| camera/FollowCamera | `0x00465720` | 1203/1267 | c | x87 operand order of the matrix-row dot products (retail loads the copied vector first: `fld [esp + 0x18] ; fmul [esp + 0x7c]`) (rescored after binding slot 47 and Camera slot 10 `0x0042e690`) |
 | camera/FollowCamera | `0x00465c20` | 3659/3672 | b | 4 code diffs: retail adds `lea ecx, [esp + N]`; retail lacks `lea ecx, [esp + N]`; slots differ |
 | camera/KrustyBikeCamera | `0x00497e20` | 337/376 | c | 10 code diffs: `mov ecx, [A]` vs `mov edx, [A]`; retail lacks `lea eax, [esp + N] ; mov edx, [ecx + 0x~` |
 | camera/VehicleCamera | `0x0052cc80` | 553/573 | c | 4 code diffs: `mov byte ptr [esi + 0x277], 0` vs `xor al, al ; mov byte ptr [esi + 0x277]~` |
