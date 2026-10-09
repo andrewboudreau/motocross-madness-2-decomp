@@ -14,9 +14,15 @@
 //   (retail: ebp = first, esi/edi = pixel pointers) and the x87 sequence for
 //   the three channel sums (retail keeps the green difference on the stack
 //   and stores the blue one) differ; the expansion and loop shapes match.
-// UnknownDisplay::ProbePartialTextureUploads (0x004cab00, 1129 bytes): the
-//   PartialTexBlt driver; register allocation differs throughout (retail
-//   keeps `this` in ebp and spills it), structure follows retail.
+// UnknownDisplay::ProbePartialTextureUploads (0x004cab00, 1129 bytes; ours
+//   1113): the PartialTexBlt driver. Retail sets tile.top/bottom in the row
+//   loop, threads the loop exit straight to the result store (the created
+//   target is copied into `render` only on success, so `render` keeps its
+//   tested-null entry value) and places the `!file` (-2) arm after the
+//   epilogue (`if (file) ... else`). Left: retail keeps the mode index in
+//   esi shared with the created target (reloaded on failure, two separate
+//   -3 stores; VC6 here merges them), tests `render` again after the found
+//   path, and places the Slot8-success path after the epilogue.
 // VideoCard::VideoCard (0x0052d180, 115 bytes; VideoCard.cpp): every store
 //   matches; retail clears the zero register before the bit-2 mask, a
 //   scheduling difference no statement order reproduced.
@@ -177,9 +183,10 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
                 if (!SetFullscreenDisplayMode(i, 1)) {
                     result = -3;
                 } else {
-                    render = (new (__FILE__, 2053) PCRenderTarget)
+                    RenderTarget* created = (new (__FILE__, 2053) PCRenderTarget)
                                  ->InitializeRenderTarget(this, &IID_IDirect3DHALDevice, backBuffer, 1, frameBufferCount);
-                    if (render) {
+                    if (created) {
+                        render = created;
                         result = 1;
                         g_TrackGame->renderTarget = render;
                         g_TrackGame->display = this;
@@ -191,9 +198,7 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
         }
     }
     if (render) {
-        if (!file) {
-            result = -2;
-        } else {
+        if (file) {
             image = new (__FILE__, 2078) PCTextureMap(0, 0);
             if (!image->UnknownVirtualSlot4(file->bits, file->width, file->height, file->width, file->width,
                                             file->bitsPerPixel == 16 ? 0x22b : 0x378, render->field_0x28, 0, 0,
@@ -218,11 +223,11 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
                         result = -1;
                     } else {
                         for (int y = 0; result == 1 && y < 256; y += 64) {
+                            tile.top = y;
+                            tile.bottom = y + 64;
                             for (int x = 0; result == 1 && x < 256; x += 64) {
                                 tile.left = x;
-                                tile.top = y;
                                 tile.right = x + 64;
-                                tile.bottom = y + 64;
                                 if (!TestPartialTextureUpload((PCRenderTarget*)render, &tile, image, expected, rendered,
                                                            this, 1))
                                     result = 0;
@@ -237,7 +242,8 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
                 rendered->Release();
             if (expected)
                 expected->Release();
-        }
+        } else
+            result = -2;
         if (!target && render) {
             delete render;
             g_TrackGame->renderTarget = 0;

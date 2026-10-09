@@ -3,8 +3,16 @@
 // evidence and the exact functions are in src/reconstructed/D3DIMSoulTree.h
 // and .cpp. Bindings: D3DIMSoulTreeNearMisses.bindings.json.
 //
-// ReadLods (0x00440060, 1964 bytes): 1955/1964. The .slt LOD
-// reader. Two operand orders: retail forms the surface address as
+// ReadLods (0x00440060, 1964 bytes): 1958/1964. The .slt LOD
+// reader. The colour packed from named long components (r, g, b) gives
+// retail's `[faces + offset]` face stores; the inline D3DRGB-style
+// expression gives `[offset + faces]`. The remaining operand order is not
+// spelling- or declaration-sensitive: it flips with the amount of IR in the
+// vertex loop (emptying it or dropping half its statements gives retail's
+// order, no single deletion does), every neutral rewrite of the s-loop
+// surface pointer, the loop declarations and the group loops was tried, and
+// a 0..63 typedef prefix scan leaves it unchanged. Before that change:
+// retail forms the surface address as
 // `offset + surfaces` (mov ebx, offset; mov edi, surfaces; add ebx, edi)
 // and stores the face indices as [faces + offset]; VC6 emits
 // `surfaces + offset` and [offset + faces] for every indexing form tried
@@ -42,9 +50,17 @@
 // scale * +0xcc * width in that order; VC6 reorders both products.
 // `*(float*)&field_0xcc`: SoultreeMaterial.h types +0xcc as int.
 //
-// SoultreeVirtualSlot7 (0x00444560, 1008 bytes): 680/1233 with the source
-// in ebp instead of ebx and the two node lists in swapped frame slots
-// (retail frame 0x2c, ours 0x30).
+// SoultreeVirtualSlot7 (0x00444560, 1233 bytes): the node search reuses
+// the CollectDescendants counter `index` (retail keeps it in that slot,
+// frame 0x2c now matches), the surface array size is read back from
+// `to->surfaceCount`, the final UnknownFunction444440 call is shared after
+// the if/else (retail pops edi/ebp before it), and `to` declared before
+// `from` gives retail's loop-head schedule. The instruction stream then
+// equals retail's up to a register rotation: retail keeps the source in ebx,
+// `from` in edi and `to` in ebp (ours ebp, ebx, edi), whose disp8 on [ebp]
+// makes VC6 here 2 bytes shorter (355/1231 by position). Swapping or
+// dropping locals, the loop declarations and a typedef-prefix scan do not
+// rotate it.
 //
 // UnknownFunction440810 (0x00440810, 1328 bytes): texture density per
 // material. Same 388 instructions; the uv delta is a copy of a zeroed
@@ -209,8 +225,10 @@ int D3DIMSoultreeObject::ReadLods()
                 parameterBlock->UnknownFunction4b81c0(12, &red);
                 parameterBlock->UnknownFunction4b81c0(13, &green);
                 parameterBlock->UnknownFunction4b81c0(14, &blue);
-                surface->drawnVertices[v].diffuse = 0xff000000 | ((long)(red * 255.0) << 16) |
-                                                    ((long)(green * 255.0) << 8) | (long)(blue * 255.0);
+                long r = (long)(red * 255.0);
+                long g = (long)(green * 255.0);
+                long b = (long)(blue * 255.0);
+                surface->drawnVertices[v].diffuse = 0xff000000 | (r << 16) | (g << 8) | b;
                 surface->drawnVertices[v].specular = 0;
                 surface->vertices[v] = surface->drawnVertices[v];
                 surface->uvs[v].u = surface->vertices[v].tu;
@@ -468,10 +486,10 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
         source->CollectDescendants(&index, sourceNodes);
         lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x8a2);
         for (int lod = 0; lod < lodCount; lod++) {
-            UnknownSoultreeLod* from = &source->lodTable[lod];
             UnknownSoultreeLod* to = &lodTable[lod];
+            UnknownSoultreeLod* from = &source->lodTable[lod];
             to->surfaceCount = from->surfaceCount;
-            to->surfaces = (UnknownSoultreeSurface*)DebugMalloc(from->surfaceCount * 0x38, __FILE__, 0x8aa);
+            to->surfaces = (UnknownSoultreeSurface*)DebugMalloc(to->surfaceCount * 0x38, __FILE__, 0x8aa);
             for (int i = 0; i < to->surfaceCount; i++) {
                 UnknownSoultreeSurface* s = &from->surfaces[i];
                 UnknownSoultreeSurface* d = &to->surfaces[i];
@@ -500,9 +518,9 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
                 int first = 0;
                 for (int j = 0; j < d->groupCount; j++) {
                     d->groups[j].node = 0;
-                    for (k = 0; !d->groups[j].node; k++) {
-                        if (sourceNodes[k] == s->groups[j].node)
-                            d->groups[j].node = nodes[k];
+                    for (index = 0; !d->groups[j].node; index++) {
+                        if (sourceNodes[index] == s->groups[j].node)
+                            d->groups[j].node = nodes[index];
                     }
                     d->groups[j].vertexCount = s->groups[j].vertexCount;
                     d->groups[j].sourceVertices = &d->vertices[first];
@@ -514,11 +532,10 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot7(SoultreeObject* sourceNode)
         }
         DebugFree(nodes, __FILE__, 0x8e1);
         DebugFree(sourceNodes, __FILE__, 0x8e2);
-        UnknownFunction444440();
     } else {
         lodTable = 0;
-        UnknownFunction444440();
     }
+    UnknownFunction444440();
 }
 
 // 0x00460b50 (cdecl): table-driven square root (FollowCamera.h and

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 196, c 142, total 338. The three class (a) functions of the
+Counts: a 0, b 194, c 143, total 337. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -232,7 +232,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/CubeDraw | `0x0043e0b0` | 30/352 | c | 22 code diffs: retail adds `push ebx`; retail adds `mov ecx, [esp + N]` |
 | render/CubeDraw | `0x0043e330` | 90/399 | b | 15 code diffs: `mov ecx, [edi + 0x18] ; mov eax, [ecx +~` vs `mov eax, [edi + 0x18] ; mov ecx, [eax +~`; `mov eax, [ecx + 8] ; mov edx, [eax + 0x~` vs `mov ecx, [eax + 8] ; mov edx, [ecx + 0x~`; slots differ |
 | render/CubeDraw | `0x0043e4c0` | 203/886 | c | 38 code diffs: `sub esp, 0x50` vs `sub esp, 0x54`; `push 0 ; push 0` vs `xor esi, esi ; push esi ; push esi` |
-| render/D3DIMSoulTree | `0x00440060` | 1955/1964 | b | 4 code diffs: `mov ebx, [esi + 4] ; mov edi, [esp + N]` vs `mov ebx, [esp + N] ; mov edi, [esi + 4]`; `mov word ptr [esi + ecx], dx` vs `mov word ptr [ecx + esi], dx`; slots differ |
+| render/D3DIMSoulTree | `0x00440060` | 1958/1964 | c | frame matches; 1 code diff: retail forms the surface address `offset + surfaces` (`mov ebx, [esp + N] ; mov edi, [esi + 4]`), VC6 `surfaces + offset`; it follows the amount of vertex-loop IR, not spelling (sample header) |
 | render/D3DIMSoulTree | `0x00440810` | 135/1349 | b | 50 code diffs: `jle @345 ; xor esi, esi` vs `jle @340`; `mov [esp + N], esi ; mov eax, [edi + 0x~` vs `mov edx, [edi + 0x1c] ; mov esi, ebx ; ~`; frame 0x84 vs 0x80, slot order differs |
 | render/D3DIMSoulTree | `0x00440d40` | 241/486 | b | 8 code diffs: `mov ebp, [edi + 4]` vs `mov ecx, [edi + 4]`; `add ebp, eax` vs `mov ebp, eax ; add ebp, ecx`; slots differ |
 | render/D3DIMSoulTree | `0x00440f30` | 241/763 (masked) | b | 39 code diffs: `push ebx ; mov ebx, ecx ; mov [esp + N]~` vs `push esi ; mov esi, ecx ; mov [esp + N]~`; `je @1860 ; mov eax, [ebx + 0x18c]` vs `je A ; mov eax, [esi + 0x18c]`; frame 0x940 vs 0x9e8, slot order differs |
@@ -243,11 +243,10 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/D3DIMSoulTree | `0x00443aa0` | 799/832 | c | 11 code diffs: retail lacks `fmul [eax + 0x10] ; fld [esp + N]`; retail lacks `faddp st(1)` |
 | render/D3DIMSoulTree | `0x00443de0` | 25/588 | b | 35 code diffs: `mov eax, [esp + N] ; sub esp, 0x28 ; te~` vs `sub esp, N`; retail adds `mov ebx, [esp + N] ; push ebp`; frame 0x0 vs 0x28, slot order differs |
 | render/D3DIMSoulTree | `0x00444140` | 610/764 | b | 7 code diffs: retail lacks `add ebp, 0x164`; retail adds `lea edx, [ebp + N]`; slots differ |
-| render/D3DIMSoulTree | `0x00444560` | 665/1233 | b | 49 code diffs: `push ebp ; mov ebp, [esp + N]` vs `push ebx ; mov ebx, [esp + N]`; `mov eax, [ebp + N]` vs `mov eax, [ebx + 0x24]`; frame 0x30 vs 0x2c |
-| render/DebugOverlay | `0x00447a00` | 76/1027 | b | 56 code diffs: retail lacks `push ebp`; `xor ebp, ebp` vs `xor ebx, ebx`; frame 0x264 vs 0x26c, slot order differs |
+| render/D3DIMSoulTree | `0x00444560` | 355/1231 | b | frame 0x2c matches; instruction stream equals retail up to a register rotation (source ebx/ebp, `from` edi/ebx, `to` ebp/edi), 2 bytes shorter from the [ebp] disp8 |
+| render/DebugOverlay | `0x00447a00` | 79/989 | b | frame 0x26c matches; VC6 pushes ebp in the prologue and keeps `c` in ebp at the row head (retail: eax from its slot, ebp pushed only around the GDI section) |
 | render/DebugOverlay | `0x00447de0` | 66/174 | c | 13 code diffs: retail adds `push ebx`; retail lacks `push edi` |
 | render/DirectoryList | `0x0044a600` | 74/109 | c | 6 code diffs: `jne @31 ; mov al, byte ptr [esp + N]` vs `jne @32 ; mov eax, [esp + N]` |
-| render/DirectoryList | `0x0044ac30` | 329/1151 | b | 72 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; frame 0x24 vs 0x20, slot order differs |
 | render/FontTexture | `0x004673d0` | 607/645 | b | 5 code diffs: retail adds `push esi ; push edi`; `jne @196 ; push esi ; push edi` vs `jne @194`; slots differ |
 | render/GR_BitString | `0x004239c0` | 343/420 | b | 14 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; slots differ |
 | render/GR_BitString | `0x00423b70` | 93/442 | b | 16 code diffs: retail adds `add esi, 4`; `or ecx, eax` vs `or eax, ecx ; mov [edx - 4], eax`; slots differ |
@@ -283,7 +282,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/PCTextureMap | `0x004c8550` | 319/321 (masked) | b | 2 code diffs: `mov edx, [esi + 0xc]` vs `mov edx, [esi + 8]`; `imul edx, [esi + 8]` vs `imul edx, [esi + 0xc]`; slots differ |
 | render/PCVideoCard | `0x004ca520` | 26/124 | c | 13 code diffs: `mov ebx, [esp + N]` vs `push ebp`; retail adds `mov ebp, [ecx + 0x74]` |
 | render/PCVideoCard | `0x004ca5a0` | 50/490 | c | 15 code diffs: retail adds `push ebp ; mov ebp, [esp + N]`; retail lacks `mov [eax], ebx ; mov eax, [esp + N]` |
-| render/PCVideoCard | `0x004cab00` | 165/1141 | b | 57 code diffs: `mov edi, ecx` vs `mov ebp, ecx`; `mov [esp + N], edi` vs `mov [esp + N], ebp`; slots differ |
+| render/PCVideoCard | `0x004cab00` | 144/1113 | b | retail keeps the mode index in esi shared with the created target (two -3 stores), re-tests `render` after the found path and places the Slot8-success path after the epilogue |
 | render/PCVideoCard | `0x004cb330` | 35/628 | b | 46 code diffs: `push ebx ; mov ebx, [esp + N]` vs `push ebp ; mov ebp, [esp + N]`; `mov eax, [ebx]` vs `mov eax, [ebp + N]`; slots differ |
 | render/PCVideoCard | `0x0052d180` | 96/115 | c | 3 code diffs: retail adds `xor esi, esi ; and cl, 0xfb`; `and cl, 0xfb` vs `mov byte ptr [edx + 0x70], cl` |
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |

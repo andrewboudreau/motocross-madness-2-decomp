@@ -1,14 +1,14 @@
 // Near-miss DebugOverlay.cpp candidates, kept out of src/reconstructed until
 // they match (the exact members are in src/reconstructed/DebugOverlay.cpp).
 //
-// DebugOverlay::UnknownFunction447a00 (0x00447a00, 980 bytes; ours 1027):
-// the GDI font builder. The calls, LOGFONT fields (stored in retail's
-// order), glyph table writes and control flow follow retail, but VC6
-// allocates registers differently: retail keeps the zero constant in ebx,
-// the glyph index `c`, `x` and `top` in stack slots and the run length in
-// ebp (pushed only around the GDI section); here ebp holds zero for the
-// whole function and `c` lives in ebx, which also grows the frame
-// (0x264 vs 0x26c) and turns the byte stores into immediates.
+// DebugOverlay::UnknownFunction447a00 (0x00447a00, 980 bytes; ours 989):
+// the GDI font builder. The glyph loop is a top-tested `while (c < 256)`
+// (a do-while lets VC6 peel the first u0 = 0 and reuse u1 as the next u0),
+// and the GetDC/ReleaseDC/Slot8 failures share one `failed: return 0`.
+// Zero in ebx, the run length in ebp and the glyph pointer in edi match.
+// Left: VC6 here pushes ebp in the prologue and keeps `c` in ebp at the row
+// head (retail reads it into eax once from its stack slot), which shifts the
+// frame by 4; retail shares the row pointer's slot with the v0 temporary.
 //
 // DebugOverlay::UnknownFunction447de0 (0x00447de0, 174 bytes): 66/171 by
 // position. Retail keeps the row colour 0xffffff in ebx inside the row loop
@@ -70,7 +70,7 @@ int DebugOverlay::UnknownFunction447a00()
             characters[i] = (char)i;
         HDC dc;
         if (fontTexture->systemSurface->GetDC((void**)&dc))
-            return 0;
+            goto failed;
         SetBkColor(dc, 1);
         SetBkMode(dc, 1);
         HGDIOBJ previous = SelectObject(dc, handle);
@@ -88,7 +88,7 @@ int DebugOverlay::UnknownFunction447a00()
             int count = 1;
             float v0 = (top + 1) * (1.0f / 256.0f);
             float v1 = bottom * (1.0f / 256.0f);
-            do {
+            while (c < 256) {
                 field_0x26d0[c].u0 = x * (1.0f / 256.0f);
                 field_0x26d0[c].v0 = v0;
                 field_0x26d0[c].v1 = v1;
@@ -104,16 +104,18 @@ int DebugOverlay::UnknownFunction447a00()
                 field_0x26d0[c].u1 = size.cx * (1.0f / 256.0f);
                 count++;
                 c++;
-            } while (c < 256);
+            }
             top = bottom;
         }
         DeleteObject(handle);
         SelectObject(dc, previous);
         if (fontTexture->systemSurface->ReleaseDC(dc))
-            return 0;
+            goto failed;
     }
-    if (fontTexture->UnknownVirtualSlot8(1, 0, 0))
-        return 1;
+    if (!fontTexture->UnknownVirtualSlot8(1, 0, 0))
+        goto failed;
+    return 1;
+failed:
     return 0;
 }
 

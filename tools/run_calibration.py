@@ -7564,6 +7564,15 @@ CASES = [
         'reason': 'two clamped copies',
     },
     {
+        'name': 'dirlist.cpp CombinedDirectoryList merge slot 1 0x44ac30',
+        'bindings': 'src/reconstructed/DirectoryList.bindings.json',
+        'source': 'src/reconstructed/DirectoryList.cpp',
+        'symbol': '?UnknownVirtualSlot1@CombinedDirectoryList@@UAEHXZ',
+        'target_va': '0x0044ac30',
+        'target_size': 1130,
+        'reason': 'entries copied through the inline UnknownFunctionSet; j and found initialised in the for header',
+    },
+    {
         'name': 'ResourceManager.cpp global init 0x4e8d30',
         'bindings': 'src/reconstructed/ResourceManager.bindings.json',
         'source': 'src/reconstructed/ResourceManager.cpp',

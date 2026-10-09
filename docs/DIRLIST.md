@@ -25,10 +25,13 @@ names follow the Win32 calls that fill them.
 
 The MAX_PATH - 1 clamped copy is a macro (`COPY_NAME`): retail addresses
 the destination at each use and loads the clamp constant first, which an
-inline function does not reproduce. The entry setter is an inline method.
+inline function does not reproduce. The entry setter is an inline method;
+CombinedDirectoryList slot 1 `0x0044ac30` copies all three entry lists
+through it (written out with COPY_NAME, VC6 keeps a separate pointer and
+loses the merged count's register), and initialises the search as
+`for (j = 0, found = 0; ...)` (`found = 0` first swaps the two slots).
 
-Exact: 25 calibration cases (everything above except the two near misses).
+Exact: 26 calibration cases (everything above except the near miss).
 
-Near misses (`samples/render/DirectoryListNearMisses.cpp`, notes there): the
-found-file filter `0x0044a600` (attribute load width) and
-CombinedDirectoryList slot 1 `0x0044ac30` (register allocation).
+Near miss (`samples/render/DirectoryListNearMisses.cpp`, notes there): the
+found-file filter `0x0044a600` (attribute load width).

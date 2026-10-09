@@ -324,3 +324,70 @@ void CombinedDirectoryList::UnknownFunction44abb0(const char* first, const char*
     COPY_NAME(field_0x21c, first);
     COPY_NAME(field_0x320, second);
 }
+
+// 0x0044ac30: lists both directories, then merges them: the second
+// directory's entries tagged 5, each first-directory name found there
+// retagged 3 and the others appended with 3.
+int CombinedDirectoryList::UnknownVirtualSlot1() {
+    DirectoryList* first;
+    DirectoryList* second;
+    UnknownDirectoryEntry* merged;
+    int total;
+    int found;
+    int i;
+    int j;
+
+    count = 0;
+    current = 0;
+    if (entries) {
+        delete entries;
+        entries = 0;
+    }
+    first = new (__FILE__, 464) DirectoryList;
+    second = new (__FILE__, 465) DirectoryList;
+    if (!first || !second)
+        return 0;
+    first->UnknownFunction44a220(pattern, 1);
+    first->UnknownFunction44a1d0(field_0x21c);
+    first->UnknownVirtualSlot1();
+    first->UnknownFunction44aab0();
+    second->UnknownFunction44a220(pattern, 1);
+    second->UnknownFunction44a1d0(field_0x320);
+    second->UnknownVirtualSlot1();
+    second->UnknownFunction44aab0();
+
+    total = second->count;
+    merged = new (__FILE__, 480) UnknownDirectoryEntry[total + first->count];
+    for (i = 0; i < second->count; i++) {
+        merged[i].UnknownFunctionSet(second->entries[i].name, 5);
+    }
+    for (i = 0; i < first->count; i++) {
+        for (j = 0, found = 0; j < total; j++) {
+            if (!strcmp(first->entries[i].name, merged[j].name)) {
+                merged[j].field_0x108 = 3;
+                found = 1;
+                total--;
+            }
+        }
+        if (!found) {
+            merged[total].UnknownFunctionSet(first->entries[i].name, 3);
+            total++;
+        }
+    }
+
+    count = total;
+    entries = new (__FILE__, 512) UnknownDirectoryEntry[total];
+    if (!entries) {
+        delete first;
+        delete second;
+        delete merged;
+        return 0;
+    }
+    for (i = 0; i < count; i++) {
+        entries[i].UnknownFunctionSet(merged[i].name, merged[i].field_0x108);
+    }
+    delete first;
+    delete second;
+    delete merged;
+    return 1;
+}
