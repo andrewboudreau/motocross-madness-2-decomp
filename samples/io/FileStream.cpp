@@ -19,12 +19,18 @@
 // - 0x00461b90: retail stores the 0xfa seed inside the inlined strcat and sets up the
 //   name pointer (lea esi) right after strlen; no statement order, helper, index or
 //   countdown loop shape moves those two.
+//   Storing the seed before _splitpath matches the lea esi but moves the store ahead
+//   of the call; storing it after strlen also leaves 2 differences.
 // - 0x004618e0: retail loads buffer/size/count into registers before the pushes;
 //   VC6 here pushes them from the stack. Register locals, a helper for the fseek
 //   block and an unsigned count do not change it.
+//   A `FILE* file = stream->field_0x14;` local in the fwrite tail does schedule all
+//   loads before the pushes, but in ecx/edx/eax where retail uses edx/eax/ecx
+//   (a register tie-break); not kept.
 // - 0x00460d10: a member-initialiser list stores in declaration order (62% with every
 //   field in it), but retail's order is the body order below with the argument
-//   loaded into edx at entry; neither form reproduces the entry load.
+//   loaded into edx at entry; neither form, a local copy nor chained assignments
+//   reproduce the entry load.
 // - 0x00461340: retail loads the decoded position (+0x0c) once and keeps the next
 //   pointer in a different register; the `position` ternary, an explicit if/else
 //   and assigning position before the zero test all give the same or worse code.

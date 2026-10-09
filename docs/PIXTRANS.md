@@ -8,7 +8,7 @@ provisional.
 Extent: `0x004cde20..0x004d28af` (strong inference; no `$E`). The code
 before it is window code called from PCGame, with its own bss.
 
-Exact: 35 calibration cases, plus eight more in `Pixtrans.cpp` (strict
+Exact: 36 calibration cases, plus eight more in `Pixtrans.cpp` (strict
 exact, not yet calibration cases): the seven per-format downsamplers
 `0x004cfaf0` (24-bit), `0x004cfc40` (8888), `0x004d0020` (4444),
 `0x004d0170` (1555), `0x004d02c0` (565), `0x004d0440` (555) and
@@ -29,6 +29,7 @@ Earlier cases:
 | VA | Size | Role |
 |---|---:|---|
 | `0x004cde20` | 234 | halves 24-bit pixels (2x2 average) |
+| `0x004ce190` | 641 | halves 4444 pixels (rounded 2x2 average per channel) |
 | `0x004d0870` | 134 | 4444 to 8888 |
 | `0x004d0900` | 204 | 24-bit to 565, dithered through `0x004cf2a0` when asked |
 | `0x004d09d0` | 204 | 24-bit to 555, dithered through `0x004cf2a0` when asked |
@@ -96,11 +97,15 @@ the row index (`(UnknownPixel32*)source + y * sourceStride`); VC6 then
 strength-reduces the row offsets and keeps the hoisted steps in the dead
 argument slots exactly as retail does. Walking row pointers advanced by the
 stride put the steps in other slots. The downsamplers' halvers are declared
-in `Pixtrans.h` and bound but not reconstructed: 4444 `0x004ce190` (last
-argument always 0; bit 0 of it selects a packed-arithmetic path), 1555
-`0x004ce420`, 555 `0x004ce5f0` and 565 `0x004cea10` (filter flag, then the
-magenta key 0x7c1f/0xf81f; both have an ebp frame) and palette
-`0x004cee30`. The `DebugMalloc`/`delete` line numbers of the downsamplers
+in `Pixtrans.h` and bound. 4444 `0x004ce190` is exact. Bit 0 of its last
+argument (always 0) selects a packed path. That path loads the four pixels as
+`unsigned int` in one multi-declarator declaration; separate declarations
+reorder the loads. Like retail, it counts pixels with `height` through an
+unsigned `!=` loop. 555 `0x004ce5f0` and 565 `0x004cea10` take a filter flag,
+then the magenta key 0x7c1f/0xf81f. They are out of scope because their packed
+path is hand-written assembly: an ebp frame, a memory accumulator, and a
+balanced add/sub of the source pointer. 1555 `0x004ce420` and palette
+`0x004cee30` are near misses. The `DebugMalloc`/`delete` line numbers of the downsamplers
 run from 1329 (24-bit) to 1840 (palette).
 
 Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004ce420` (the
@@ -109,7 +114,9 @@ Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004ce420` (the
 `0x004d07d0` (1555 to 8888; only the pixel pointer's base offset);
 `0x004d24d0` (average colour; the shared return's position); `0x004cdf10`, the 8888 halver, which
 averages colour over the 2x2 pixels with alpha set (the fourth pixel adds
-the third one's alpha in retail) and differs in register assignment.
+the third one's alpha in retail) and differs in register assignment;
+`0x004cee30` (the palette halver, 45/1133: VC6 pushes ebp in the prologue
+and homes the source row in `source`'s slot, which shifts every slot).
 
 `0x004d0d40` is hand-written assembly (frame pointer, dead `mov eax, 0`,
 `push ebp` inside the loop) and is out of scope. The palette-index
@@ -117,8 +124,8 @@ converters `0x004d0aa0`/`0x004d0b90`/`0x004d0c40` (24-bit, 565, 555) dither
 through `0x004cf2a0` when asked and otherwise map through the 555-to-index
 and 565-to-index tables `0x004de280`/`0x004de290`.
 
-Not reconstructed: the halvers `0x004ce190`, `0x004ce5f0`, `0x004cea10`
-and `0x004cee30` and the ditherer `0x004cf2a0`. The table getters
+Not reconstructed: the halvers `0x004ce5f0` and `0x004cea10` (assembly)
+and the ditherer `0x004cf2a0`. The table getters
 `0x004de280`/`0x004de290` are exact in `src/reconstructed/Quantize.cpp`.
 `0x004cf162` and `0x004d0000` are not function
 starts (inside the ditherer and `0x004cfe70`).

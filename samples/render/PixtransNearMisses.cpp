@@ -25,6 +25,17 @@
 // lower-row pointer, function-scope pixels, a 1555 bitfield struct and
 // direct indexing do not keep them.
 //
+// Halve8 (0x004cee30, 1133 bytes; candidate 1093): the palette-index
+// halver. The search for the magenta entry, both block loops, the key test
+// and the >= 2 rule match, and nested ifs reproduce retail's single
+// `return 0` block. Retail pushes ebp only after the three checks,
+// holds 0xff in bl for the search and keeps the found index in the dead
+// `source` slot with both row pointers in locals. VC6 here pushes ebp in
+// the prologue and homes `sourceRow` in `source`'s slot, which shifts every
+// slot. `key` as the loop variable (with or without `== 256` -> -1) and a
+// combined `key < 256 && key != -1` test are worse. The fast loop's red/blue/green
+// sum order also differs (retail sums blue before green).
+//
 // UnknownFunction4d24d0 (0x004d24d0, 987 bytes): a bitmap's average colour
 // (0xAARRGGBB) by format. Every case body matches; the shared palette and
 // 24-bit return lands after the 24-bit loop here but after the palette
@@ -330,4 +341,98 @@ int Halve1555(void* destination, void* source, int width, int height, int destin
         row += destinationStride;
     }
     return 1;
+}
+
+// 0x004cee30: halves palette indices. Each 2x2 block's RGB entries are
+// averaged and mapped back through the palette's 555-to-index table. If the
+// palette holds magenta (255, 0, 255) that index is the key: key pixels are
+// left out of the average and a block with fewer than two others stays the key.
+int Halve8(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, UnknownTexturePalette* palette) {
+    unsigned char* sourceRow = (unsigned char*)source;
+    unsigned char* row = (unsigned char*)destination;
+    if (palette) {
+        unsigned char* indices = palette->UnknownFunction4de280();
+        if (indices) {
+            UnknownPixel24* entries = (UnknownPixel24*)palette->UnknownFunction4de270();
+            if (entries) {
+                int key = -1;
+                for (int i = 0; i < 256; i++) {
+                    if (entries[i].red == 0xff && entries[i].green == 0 && entries[i].blue == 0xff) {
+                        key = i;
+                        break;
+                    }
+                }
+                if (key != -1) {
+                    for (int y = 0; y < height; y++) {
+                        unsigned char* from = sourceRow;
+                        unsigned char* to = row;
+                        for (int x = 0; x < width; x++, from += 2) {
+                            int ia = from[0];
+                            UnknownPixel24 a = entries[ia];
+                            int ib = from[1];
+                            UnknownPixel24 b = entries[ib];
+                            int ic = from[sourceStride];
+                            UnknownPixel24 c = entries[ic];
+                            int id = from[sourceStride + 1];
+                            UnknownPixel24 d = entries[id];
+                            int count = 0, red = 0, green = 0, blue = 0;
+                            if (ia != key) {
+                                red = a.red;
+                                green = a.green;
+                                blue = a.blue;
+                                count = 1;
+                            }
+                            if (ib != key) {
+                                red += b.red;
+                                green += b.green;
+                                blue += b.blue;
+                                count++;
+                            }
+                            if (ic != key) {
+                                red += c.red;
+                                green += c.green;
+                                blue += c.blue;
+                                count++;
+                            }
+                            if (id != key) {
+                                red += d.red;
+                                green += d.green;
+                                blue += d.blue;
+                                count++;
+                            }
+                            if (count >= 2) {
+                                red = (red + count * 4) / count;
+                                green = (green + count * 4) / count;
+                                blue = (blue + count * 4) / count;
+                                *to++ = indices[(red >> 3) << 10 | (green >> 3) << 5 | blue >> 3];
+                            } else {
+                                *to++ = (unsigned char)key;
+                            }
+                        }
+                        sourceRow += sourceStride * 2;
+                        row += destinationStride;
+                    }
+                    return 1;
+                }
+                for (int y = 0; y < height; y++) {
+                    unsigned char* from = sourceRow;
+                    unsigned char* to = row;
+                    for (int x = 0; x < width; x++, from += 2) {
+                        UnknownPixel24 a = entries[from[0]];
+                        UnknownPixel24 b = entries[from[1]];
+                        UnknownPixel24 c = entries[from[sourceStride]];
+                        UnknownPixel24 d = entries[from[sourceStride + 1]];
+                        *to++ = indices[((a.red + b.red + c.red + d.red + 16) >> 5) << 10
+                                        | ((a.green + b.green + c.green + d.green + 16) >> 5) << 5
+                                        | (a.blue + b.blue + c.blue + d.blue + 16) >> 5];
+                    }
+                    sourceRow += sourceStride * 2;
+                    row += destinationStride;
+                }
+                return 1;
+            }
+        }
+    }
+    return 0;
 }

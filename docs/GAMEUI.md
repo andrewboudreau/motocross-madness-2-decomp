@@ -213,8 +213,8 @@ parser. Most of the remaining ones differ only in register choice (slots 49
 of UIControl and UIButton, UIAnim's constructor and advance, the colour-key
 test) or in block placement (UIScrollCtl slot 60, UIFrame's file
 constructor); the forms tried are noted in the sample. UIControl's deleting
-destructor (`0x00470430`) is byte-exact but VC6 emits it only alongside the
-near-miss UIControl constructor, so it is not registered.
+destructor (`0x00470430`) is byte-exact; VC6 emits it only alongside the
+near-miss UIControl constructor, so its calibration case compiles the sample.
 
 The resource parser `0x0046a920` (16 KB, in the sample): it lists the
 resource's sections between "Set_Anim", "Set_Sound" and "Set_Control"

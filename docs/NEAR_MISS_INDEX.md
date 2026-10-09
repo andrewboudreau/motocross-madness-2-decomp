@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 198, c 171, total 369. The three class (a) functions of the
+Counts: a 0, b 199, c 171, total 370. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -308,6 +308,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/PCVideoCard | `0x0052d180` | 96/115 | c | 3 code diffs: retail adds `xor esi, esi ; and cl, 0xfb`; `and cl, 0xfb` vs `mov byte ptr [edx + 0x70], cl` |
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
 | render/Pixtrans | `0x004ce420` | 55/456 | b | 23 code diffs: `sub esp, 8` vs `sub esp, N ; mov edx, [esp + N]`; `mov eax, [esp + N] ; test eax, eax` vs `test edx, edx`; frame 0x8 vs 0x10 |
+| render/Pixtrans | `0x004cee30` | 45/1133 | b | candidate 1093 B, 314 code diffs: `push ebp` in the prologue vs after the three palette checks; `sourceRow` homed in `source`'s slot shifts every slot; fast-loop channel sum order |
 | render/Pixtrans | `0x004d0700` | 16/208 | c | 19 code diffs: `mov ecx, eax` vs `mov edx, eax ; mov ecx, [esp + N] ; pus~`; `shr ecx, 5` vs `shr edx, 5` |
 | render/Pixtrans | `0x004d07d0` | 72/146 | c | 4 code diffs: `mov byte ptr [eax - 2], bl` vs `mov byte ptr [eax - 3], bl`; `mov byte ptr [eax - 1], bl` vs `mov byte ptr [eax - 2], bl` |
 | render/Pixtrans | `0x004d24d0` | 419/988 | c | 4 code diffs: retail lacks `jmp @207 ; mov eax, [esp + N] ; mov [es~`; retail adds `mov eax, [esp + N] ; mov [esp + N], eax~` |

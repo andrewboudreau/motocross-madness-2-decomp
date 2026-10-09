@@ -17,7 +17,8 @@ Evidence
 - RotatingShock::SolveContact (0x4fac60) uses a 4-entry jump table at 0x4fafc0; the extent
   is 880 bytes including the table.
 
-Diagnostic counts: 20 relocation-masked matches, 3 partial of 23 targets.
+Diagnostic counts: 24 relocation-masked matches, 3 partial of 27 targets (the four `$E`
+wrappers match once their bodies are bound).
 These are not strict acceptance; reviewed bindings are still required.
 - partial: UpdateAxis 0x4f9f90 (98.7%, `1.0f/len` gives `fld [1.0]; fdiv st(1)` instead of
   `fld st(0); fdivr [1.0]`, tried named locals, reordering, and component-wise forms);

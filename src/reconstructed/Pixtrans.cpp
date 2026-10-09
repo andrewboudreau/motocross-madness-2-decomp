@@ -46,6 +46,55 @@ int Halve24(void* destination, void* source, int width, int height, int destinat
     return 1;
 }
 
+// 0x004ce190: halves 4444 pixels, rounding each channel's 2x2 average. Bit 0
+// of `value` (always 0 from the downsamplers) selects a packed path that
+// spreads the nibbles to 0x0f0f0f0f and sums them together; as in retail, that
+// path counts pixels with `height` and never advances the source in a row.
+int Halve4444(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, int value) {
+    if (value & 1) {
+        unsigned short* sourceRow = (unsigned short*)source;
+        unsigned short* row = (unsigned short*)destination;
+        for (int y = 0; y < height; y++) {
+            unsigned short* to = row;
+            for (unsigned int x = 0; x != (unsigned int)height; x++) {
+                unsigned int a = sourceRow[0], b = sourceRow[1], c = sourceRow[sourceStride],
+                             d = sourceRow[sourceStride + 1];
+                int sum = ((a & 0xf0f0) << 12 | (a & 0x0f0f)) + ((b & 0xf0f0) << 12 | (b & 0x0f0f))
+                        + ((c & 0xf0f0) << 12 | (c & 0x0f0f)) + ((d & 0xf0f0) << 12 | (d & 0x0f0f));
+                sum >>= 2;
+                *to++ = (unsigned short)((sum & 0x0f0f) | ((sum >> 12) & ~0x0f0f));
+            }
+            sourceRow += sourceStride * 2;
+            row += destinationStride;
+        }
+        return 1;
+    }
+    unsigned short* sourceRow = (unsigned short*)source;
+    unsigned short* row = (unsigned short*)destination;
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        unsigned short* to = row;
+        for (int x = 0; x < width; x++, to++, from += 2) {
+            unsigned short a = from[0];
+            unsigned short b = from[1];
+            unsigned short c = from[sourceStride];
+            unsigned short d = from[sourceStride + 1];
+            int r = ((a >> 10) & 0x3c) + ((b >> 10) & 0x3c) + ((c >> 10) & 0x3c) + ((d >> 10) & 0x3c) + 2;
+            unsigned short out = r >> 4;
+            int g = ((a >> 6) & 0x3c) + ((b >> 6) & 0x3c) + ((c >> 6) & 0x3c) + ((d >> 6) & 0x3c) + 2;
+            out = out << 4 | g >> 4;
+            int bl = ((a >> 2) & 0x3c) + ((b >> 2) & 0x3c) + ((c >> 2) & 0x3c) + ((d >> 2) & 0x3c) + 2;
+            out = out << 4 | bl >> 4;
+            int al = (((a & 0xf) + (b & 0xf) + (c & 0xf) + (d & 0xf)) * 4 + 2) >> 4;
+            *to = out << 4 | al;
+        }
+        sourceRow += sourceStride * 2;
+        row += destinationStride;
+    }
+    return 1;
+}
+
 // 0x004d0900: converts 24-bit to 565, through the ditherer when asked.
 int Convert24To565(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride, int dither) {
