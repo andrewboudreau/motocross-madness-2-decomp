@@ -16,7 +16,7 @@ Extent: `0x00469db0..0x0047b66f`. Evidence:
 - **Vtables:** UIDialog `0x00552a9c` through UIProgressBar `0x00553c68`.
 - **`$E`:** its four kVec3 initializers sit at `0x0046e870..0x0046ea5b`.
 
-Exact: 316 functions compile strict-exact from GameUi.cpp. 309 are
+Exact: 320 functions compile strict-exact from GameUi.cpp. 313 are
 registered as calibration cases, including the 13 drawing, input and layout
 functions in the file's last section ("Drawing and input slots"), the ten
 promoted from the near-miss sample (UIControl slots 22, 23 and 41, UIScrollBar
@@ -37,8 +37,22 @@ UIVideoStatic; the bodies are shared), UIVideoStatic's constructor,
 destructor pair, slots 40 and 48 and `0x0047b3d0`. The
 UIDDLListBox constructor case (`0x00479d10`) is re-keyed to its retail argument order
 `??0UIDDLListBox@@QAE@HHPAUCameraRect@@PAVUIDialog@@PAVUIDropDownList@@@Z`.
+The UIControl constructor, destructor and deleting destructor (`0x00470170`,
+`0x00470450`, `0x00470430`) and the UIListBox constructor (`0x00475c70`) are
+registered too.
 
 Source forms the promoted functions needed (each one byte-exact only this way):
+- UIControl constructor (`0x00470170`): the owner is tested twice,
+  `if (owner) post3D = owner->field_0x7f18; else post3D = 1;` and then
+  `if (owner) field_0x18 = ...`; VC6 threads the second test and places the
+  ownerless store after the epilogue, as retail does.
+- UIControl destructor (`0x00470450`): two independent
+  `ownerDialog->guiUser && ... == this` tests (focus control, then
+  `field_0x1d8`), each setting a local tool tip that one final test shows.
+  Nesting them inside one guiUser test keeps the focus control in a register.
+- UIListBox constructor (`0x00475c70`): the font height is read as members
+  in both the test and the divisor; a local for it reuses the test's load as
+  the divisor.
 - UIControl slot 23 (`0x00471fd0`, a key or button press) and slot 22
   (`0x00472130`): the result of slot 55/56 goes into a local `handled` that
   one final `if (!handled) return GameObject::...; return 1;` tests. Every
@@ -204,17 +218,14 @@ Other header facts:
   `ShowDialog` passes its int `b` and `d` as the area and the name).
 - GameObject.h befriends UICtlContainer, UIControl and UIDialog.
 
-Near misses (`samples/ui/GameUiNearMisses.cpp`): 28 functions, listed with
-their differences at the top of the sample, among them the UIControl and
-UIListBox constructors, the UIControl destructor, UIListBox `0x00477110`
+Near misses (`samples/ui/GameUiNearMisses.cpp`): 25 functions, listed with
+their differences at the top of the sample, among them UIListBox `0x00477110`
 (adds an image row and returns 0/1; retail places the epilogue after the
 stream-failure block), several list-box and scroll slots and the resource
 parser. Most of the remaining ones differ only in register choice (slots 49
 of UIControl and UIButton, UIAnim's constructor and advance, the colour-key
 test) or in block placement (UIScrollCtl slot 60, UIFrame's file
-constructor); the forms tried are noted in the sample. UIControl's deleting
-destructor (`0x00470430`) is byte-exact but VC6 emits it only alongside the
-near-miss UIControl constructor, so it is not registered.
+constructor); the forms tried are noted in the sample.
 
 The resource parser `0x0046a920` (16 KB, in the sample): it lists the
 resource's sections between "Set_Anim", "Set_Sound" and "Set_Control"

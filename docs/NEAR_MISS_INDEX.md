@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 198, c 171, total 369. The three class (a) functions of the
+Counts: a 0, b 198, c 167, total 365. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -354,8 +354,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x0046e8c0` | 55/64 | c | 4 code diffs: retail lacks `mov edx, [ecx]`; `lea eax, [esp + N]` vs `mov eax, [ecx] ; lea edx, [esp + N]` |
 | ui/GameUi | `0x0046ea80` | 160/164 | c | 2 code diffs: `cmp [eax + 0x78], edi` vs `cmp [eax + 0x78], esi`; `push esi` vs `push edi` |
 | ui/GameUi | `0x0046ef00` | 352/555 | c | 13 code diffs: retail adds `mov [edi + 0xc], ebx`; retail lacks `mov [edi + 0xc], ebx` |
-| ui/GameUi | `0x00470170` | 535/578 | c | 3 code diffs: retail lacks `jmp @136 ; mov [esi + 0x1dc], edi`; retail adds `mov [esi + 0x1dc], edi ; jmp @134` |
-| ui/GameUi | `0x00470450` | 88/386 | c | 14 code diffs: `je @53 ; push edi ; mov edi, [eax + 0x1~` vs `je @43 ; cmp [eax + 0x1d4], esi ; jne @~` |
 | ui/GameUi | `0x004705d0` | 91/101 | c | 5 code diffs: `mov edx, [esi + 0xcc]` vs `mov ecx, [esi + 0xcc] ; push ecx`; retail lacks `push edx` |
 | ui/GameUi | `0x00470f10` | 118/332 | c | 7 code diffs: `mov edi, [esi + 0xb8]` vs `mov ebp, [esi + 0xb8]`; `fmul [edi + 0x9c4]` vs `fmul [ebp + N]` |
 | ui/GameUi | `0x00472960` | 352/566 | c | 18 code diffs: retail lacks `push A`; retail adds `push A` |
@@ -367,10 +365,9 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x00474150` | 339/1048 | c | 28 code diffs |
 | ui/GameUi | `0x00474880` | 254/355 | c | 34 code diffs: retail adds `push ebx`; retail adds `push esi ; mov esi, ecx` |
 | ui/GameUi | `0x004749f0` | 49/274 | c | 9 code diffs: `je @77` vs `je A`; `jne @85` vs `jne A` |
-| ui/GameUi | `0x00475c70` | 319/398 | c | 4 code diffs: `jne @81` vs `jne @82 ; mov ecx, [esi + 0xb8] ; cmp e~`; `cmp eax, ebx ; je @79 ; mov eax, [eax +~` vs `mov ecx, [eax + 0xdc] ; mov eax, [esi +~` |
 | ui/GameUi | `0x00477110` | 356/646 | c | 12 code diffs: `mov ecx, [esp + N]` vs `mov eax, [esp + N]`; retail adds `mov [esp + N], eax ; mov ecx, [esi + 0x~` |
 | ui/GameUi | `0x004773a0` | 169/232 | c | 5 code diffs: `mov ecx, [esp + N] ; mov [esp + N], ecx~` vs `mov eax, [esp + N]`; retail adds `mov ecx, [esi + 0xc] ; mov edx, [esi + ~` |
-| ui/GameUi | `0x00477800` | 5/262 | c | 12 code diffs: `mov eax, [A]` vs `mov ecx, [A]`; retail adds `xor eax, eax` |
+| ui/GameUi | `0x00477800` | 78/242 | c | 2 register choices: `mov edx, [ecx + 0x218]` vs `mov eax, [ecx + 0x218]`; `mov eax, [A]` vs `mov edx, [A]` (flow and layout are retail's) |
 | ui/GameUi | `0x00477bc0` | 89/288 | c | 16 code diffs: retail lacks `xor edx, edx`; retail adds `xor ecx, ecx` |
 | ui/GameUi | `0x00477e90` | 155/344 | c | 14 code diffs: `push ebp` vs `push ebx`; `mov ebp, [esp + N]` vs `mov ebx, [esp + N]` |
 | ui/GameUi | `0x00478570` | 139/682 | b | 32 code diffs: `lea eax, [esi + 0x1bc] ; mov [esp + N],~` vs `mov eax, [esi + 0x1bc] ; lea ebx, [esi ~`; retail adds `mov [esp + N], ebx`; slot order differs |
@@ -388,7 +385,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/ProCircuitProcs | `0x004d8fc0` | 750/882 | c | 45 code diffs: retail adds `mov fs:[X], esp`; retail lacks `mov fs:[X], esp` |
 | ui/ProCircuitProcs | `0x004d9860` | 225/1123 | b | 20 code diffs: retail adds `mov fs:[X], esp ; sub esp, N`; retail lacks `mov fs:[X], esp ; sub esp, 0x84`; frame 0x0 vs 0x84 |
 | ui/ProCircuitProcs | `0x004d9cd0` | 48/755 | c | 37 code diffs: retail adds `mov eax, [A]`; retail adds `mov ebp, [eax + 0x3444]` |
-| ui/ProCircuitProcs | `0x004d9fd0` | 312/312 (masked) | c | 1 code diffs: `add byte ptr [eax], al ; mov al, byte p~` vs `sub byte ptr [eax - A], ah ; dec ebp ; ~` |
 | ui/SelectGamePicProcs | `0x004f17a0` | 617/2258 | b | 2 code diffs: `je @651` vs `je A`; retail lacks `mov [esp + N], 0 ; je @191 ; mov edx, [~`; slot order differs |
 | ui/SelectGamePicProcs | `0x004f2340` | 933/2148 | b | 62 code diffs: `mov [esp + N], ecx` vs `push esi`; `push esi` vs `mov [esp + N], ecx`; slot order differs |
 | ui/SelectGamePicProcs | `0x004f3720` | 92/380 | b | 10 code diffs: retail lacks `jmp @44 ; lea ecx, [esp + N] ; push 0x80`; slots differ |

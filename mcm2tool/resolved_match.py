@@ -84,14 +84,19 @@ def _is_eh_handler_push(prefix: bytes) -> bool:
     `push offset handler` when the fs:[0] load comes first (Scene 0x004ea7e0).
     It can also schedule loads of globals (`mov r32, [abs32]`, unrelocated in
     the object) between the fs:[0] load and `push -1` (bikerace.cpp slot 10
-    0x0041d2b0).
+    0x0041d2b0), or a stack-argument load (`mov r32, [esp+disp8]`) there
+    (procircuitprocs.cpp PCNewEventDlg slot 29 0x004d9fd0).
     """
     if prefix in _EH_PROLOGUES.get(len(prefix), ()):
         return True
     fs_load = b'\x64\xa1\x00\x00\x00\x00'
-    while (prefix.startswith(fs_load) and len(prefix) >= len(fs_load) + 6
-           and prefix[6] == 0x8b and prefix[7] & 0xc7 == 0x05):
-        prefix = fs_load + prefix[len(fs_load) + 6:]
+    while prefix.startswith(fs_load) and len(prefix) >= len(fs_load) + 4 and prefix[6] == 0x8b:
+        if len(prefix) >= len(fs_load) + 6 and prefix[7] & 0xc7 == 0x05:
+            prefix = fs_load + prefix[len(fs_load) + 6:]
+        elif prefix[7] & 0xc7 == 0x44 and prefix[8] == 0x24:
+            prefix = fs_load + prefix[len(fs_load) + 4:]
+        else:
+            break
     if prefix in _EH_PROLOGUES.get(len(prefix), ()):
         return True
     head = b'\x64\xa1\x00\x00\x00\x00\x6a\xff'

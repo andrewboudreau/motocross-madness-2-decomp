@@ -33,13 +33,16 @@ closes with its own `$E` set `0x004da3e0..0x004da51b`, whose vectors
 `0x00689b08` and `0x00689b28` are read at `0x004d6aba` and `0x004d73df`. The slot-29 procedures belong to the
 RTTI PC*Dlg vtables.
 
-Exact (33):
+Exact (34):
 - The eight `$E`.
 - Three qsort comparators.
 - The state-dialog opener `0x004d4ba0`.
 - The slot 29 of PCStartupDlg, PCNewDlg, PCCentralDlg, PCCentralNextDlg,
-  PCCentralStandingsDlg, PCLastRaceDlg, PCFailedDlg, PCFinishedDlg and
-  PCCompleteDlg.
+  PCCentralStandingsDlg, PCLastRaceDlg, PCFailedDlg, PCFinishedDlg,
+  PCNewEventDlg and PCCompleteDlg. PCNewEventDlg's (`0x004d9fd0`) /GX
+  prologue loads `mov edx,[esp+4]` between the fs:[0] load and `push -1`;
+  `mcm2tool/resolved_match.py` recognises that shape so its handler
+  `0x0054d257` binds.
 - Their helpers.
 - PCCentralBikeRiderDlg's slots 13, 26 and 31, its plate painter and rider
   store. Slots 13 and 26 share their bodies with the SP/MP bike dialogs'
@@ -57,9 +60,6 @@ Near misses (`samples/ui/ProCircuitProcsNearMisses.cpp`):
 - The slot 29 of PCBailoutDlg, PCBunnyDlg and PCBonusTrackDlg: prologue
   scheduling differs.
 - `0x004d6fc0`: one register differs.
-- PCNewEventDlg slot 29 `0x004d9fd0`: byte-exact once its exception handler
-  `0x0054d257` is bound. The resolver does not yet recognise that
-  `mov edx,[esp+4]` EH prologue shape.
 
 - PCCentralBikeRiderDlg slot 10 `0x004d72c0`, 1233 of 1291 bytes: only
   the scheduling of the by-value vector copies for the camera call differs.

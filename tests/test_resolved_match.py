@@ -142,6 +142,21 @@ class EhPrologueShapeTests(unittest.TestCase):
         prefix = b'\x64\xa1\x00\x00\x00\x00' + b'\x8b\x51\x00' + b'\x6a\xff\x68'
         self.assertFalse(_is_eh_handler_push(prefix))
 
+    def test_stack_argument_load_scheduled_after_fs_load(self):
+        from mcm2tool.resolved_match import _is_eh_handler_push
+        # mov eax, fs:[0]; mov edx, [esp+4]; push -1; push offset handler
+        # (procircuitprocs.cpp PCNewEventDlg slot 29 0x004d9fd0)
+        prefix = b'\x64\xa1\x00\x00\x00\x00' + b'\x8b\x54\x24\x04' + b'\x6a\xff\x68'
+        self.assertTrue(_is_eh_handler_push(prefix))
+
+    def test_non_stack_disp8_load_after_fs_load_is_not_a_prologue(self):
+        from mcm2tool.resolved_match import _is_eh_handler_push
+        # mov edx, [ecx+4] (no esp SIB) and mov edx, [esp+disp32] are rejected
+        tail = b'\x6a\xff\x68'
+        fs_load = b'\x64\xa1\x00\x00\x00\x00'
+        self.assertFalse(_is_eh_handler_push(fs_load + b'\x8b\x51\x04' + tail))
+        self.assertFalse(_is_eh_handler_push(fs_load + b'\x8b\x94\x24\x04\x00\x00\x00' + tail))
+
     def test_push_minus_one_before_fs_load(self):
         from mcm2tool.resolved_match import _is_eh_handler_push
         # push -1; mov eax, fs:[0]; push offset handler (EcoSystem 0x0045c040)

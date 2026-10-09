@@ -7,10 +7,6 @@
 //   hoisted load.
 // 0x0046ea80 (160/164): the two arguments are loaded into the opposite
 //   registers (id in esi in retail); a local copy of either does not change it.
-// 0x00470170 UIControl constructor (535/578): retail places the owner == 0
-//   block differently.
-// 0x00470450 UIControl destructor (88/386): retail threads the tool-tip jumps
-//   and keeps a value in edi.
 // 0x004705d0 UIControl slot 49 (91/101) and 0x004733a0 UIButton slot 49
 //   (85/99): the value loaded for each call lands in another register
 //   (retail: ecx/edx, VC6 here: edx/eax); an int SetFontColor, a local for the
@@ -28,9 +24,6 @@
 //   then case 0x101; VC6 here places the tail after case 9. Switch (either
 //   case order, `break` or `return` after the tail), if/else and goto forms
 //   all give the same layout.
-// 0x00475c70 UIListBox constructor (319/382): retail re-tests the row height
-//   after the owner's font height test and reloads the owner for it; VC6
-//   here threads both tests (five if/ternary forms tried).
 // 0x00477110 adds an image row from a file (356/646): with `a` a UIAnim
 //   loaded from `file`, otherwise a row naming the TGA file with its header's
 //   size. Calls, constants and the row stores follow retail. Retail places
@@ -42,7 +35,12 @@
 // 0x004773a0 adds an image row (169/232): retail loads the frame's width
 //   before its height and stores the row's +0x18 later; 40 store orders were
 //   tried.
-// 0x00477800 qsort compare (5/262).
+// 0x00477800 qsort compare (78/242): the flow and block layout are retail's
+//   (one `result` initialised to 0, the probe loop as `while (1)` with its
+//   exit tests as breaks; `while (cond)` and `for (;;)` rotate it). Retail
+//   puts the first control temporary in eax and the next global load in edx;
+//   VC6 here swaps the two (no declaration-shift k changes it; early returns,
+//   a local list pointer and local order do not either).
 // 0x00477bc0 (89/286): retail keeps zero in a different register.
 // 0x00477e90 UIListBox slot 55 (155/344): retail keeps the point in ebx and
 //   the row offset in ebp; VC6 here swaps them.
@@ -68,7 +66,10 @@
 //   the prologue and keeps `this` in esi.
 // 0x00479710 UIDDLScrollBar slot 57 (736/738): the list's +0x204 goes through
 //   ebp instead of ecx (retail keeps `position`'s register busy there).
-//   Inlining the row expression costs a prologue push instead.
+//   Inlining the row expression (also through an inline helper) puts it in
+//   ebx and costs a prologue push instead; a separate result local, a `last`
+//   local and the goto-free form (a `>=` test around the repeat event)
+//   compile the same or worse. No declaration-shift k changes it.
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
 // 0x0047a400 drop-down layout (320/960): store scheduling of the part rects.
@@ -127,117 +128,6 @@ void UIDialog::EnableGroup(int id, int value) {
         if (control->groupId == id)
             control->UnknownVirtualSlot49(value);
     }
-}
-
-// 0x00470170
-UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
-    : GameObject(1) {
-    AppendClassName(this);
-    controlType = type;
-    eventCode = id;
-    if (area) {
-        *(CameraRect*)field_0x2c = *area;
-        *(CameraRect*)field_0x3c = *area;
-    } else {
-        field_0x3c[0] = field_0x3c[1] = field_0x3c[2] = field_0x3c[3] = 0;
-        *(CameraRect*)field_0x2c = *(CameraRect*)field_0x3c;
-    }
-    savedState = 0;
-    currentState = 0;
-    field_0x68 = 0;
-    enabled = 1;
-    field_0x70 = 1;
-    groupId = 0;
-    attachId = 0;
-    ownerDialog = owner;
-    ownerGui = owner ? owner->guiManager : 0;
-    anchorControl = 0;
-    relAnchor = 0;
-    shapeBounds = 0;
-    sourceBlit = 0;
-    boundValue = 0;
-    backgroundRegion = -1;
-    redrawFrames = 0;
-    controlText = 0;
-    toolTipText = 0;
-    textColor = 0xffff;
-    currentTextColor = 0xffff;
-    textDrop = 1;
-    dropColor = 0;
-    textAlign = 1;
-    field_0xd0 = 0;
-    textLines = 0;
-    needsRedraw = 1;
-    moveable = 0;
-    keyBind = 0;
-    field_0x1c8 = 0;
-    field_0x1c4 = 0;
-    mouseAnim = 0;
-    for (int i = 0; i < 5; i++) {
-        stateImages[i] = 0;
-        sounds[i] = 0;
-    }
-    field_0x164 = 0;
-    transitionDelay = 0;
-    transitionTime = 0;
-    slideSound = 0;
-    fxAnimOut = 0;
-    fxAnimIn = 0;
-    fxSoundOut = 0;
-    fxSoundIn = 0;
-    controlName[0] = 0;
-    ownsFont = 0;
-    fontHandle = 0;
-    fontFace[0] = 0;
-    fontHeight = 0;
-    bold = 0;
-    italic = 0;
-    textTopMargin = 0;
-    textLeftMargin = 0;
-    drawnTexture = 0;
-    field_0x1d0 = 0;
-    field_0xb4 = 0;
-    field_0x1d4 = -1;
-    if (owner) {
-        post3D = owner->field_0x7f18;
-        field_0x18 = owner->UnknownInlineField18();
-    } else {
-        post3D = 1;
-    }
-    permanent = 0;
-    field_0x1e8 = 0;
-}
-
-// 0x00470450
-UIControl::~UIControl() {
-    if (ownerDialog && !g_TrackGame->field_0x2d5_bit1) {
-        field_0x25_bit3 = 1;
-        ToolTip* tip = 0;
-        if (ownerDialog->guiUser) {
-            if (ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
-                ownerDialog->guiUser->UnknownFunction487bf0(0);
-                tip = ownerDialog->guiUser->userToolTip;
-            }
-            if (ownerDialog->guiUser && ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
-                ownerDialog->UnknownFunction470000(0, 0, 1);
-                tip = ownerDialog->guiUser->userToolTip;
-            }
-        }
-        if (tip)
-            tip->ShowText(0, 0, 1.0f);
-    }
-    if (backgroundRegion != -1 && ownerDialog && ownerDialog->dialogBackground)
-        ownerDialog->dialogBackground->UnknownFunction404200(backgroundRegion);
-    if (controlText)
-        DebugFree(controlText, __FILE__, 0xba3);
-    if (toolTipText)
-        DebugFree(toolTipText, __FILE__, 0xba4);
-    if (ownsFont)
-        DeleteObject((HGDIOBJ)fontHandle);
-    if (textLines)
-        DebugFree(textLines, __FILE__, 0xba8);
-    if (field_0x1c4)
-        DebugFree(field_0x1c4, __FILE__, 0xba9);
 }
 
 // 0x004705d0
@@ -392,43 +282,6 @@ void UIScrollCtl::UnknownVirtualSlot60(int value) {
     }
 }
 
-// 0x00475c70
-UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
-    : UIControl(3, id, area, owner) {
-    selectBrush = 0;
-    itemBrush = 0;
-    rowCount = 0;
-    selectedRow = 0;
-    firstVisibleRow = 0;
-    rowCapacity = rows;
-    lastPageRowCount = 0;
-    selectColor = 0xffffff;
-    rowTable = (UnknownGameUiListRow*)DebugMalloc(rows * sizeof(UnknownGameUiListRow), __FILE__, 0x1b50);
-    field_0x24c = UnknownFunction477b60;
-    field_0x218 = (int)this;
-    autoSort = 0;
-    field_0x220 = 0;
-    selectable = 1;
-    allowWScroll = 1;
-    field_0x234 = 0;
-    field_0x230 = 0;
-    field_0x22c = 0;
-    lastClickTime = 0;
-    field_0x240 = 0;
-    rowCount = 0;
-    firstVisibleRow = 0;
-    lastPageRowCount = 0;
-    memset(rowTable, 0, rowCapacity * sizeof(UnknownGameUiListRow));
-    field_0x244 = 1;
-    int height = fontHeight;
-    if (!height && (!ownerDialog || !ownerDialog->dialogFontHeight)) {
-        visibleRowCount = 1;
-    } else {
-        int rowsShown = (field_0x2c[3] - field_0x2c[1]) / (height ? height : ownerDialog->dialogFontHeight);
-        visibleRowCount = rowsShown < 1 ? 1 : rowsShown;
-    }
-}
-
 // 0x00477110
 int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
     if (rowCount >= rowCapacity && !UnknownFunction476f50(rowCount + 1))
@@ -510,27 +363,30 @@ int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
 
 // 0x00477800: the order 0x00477900 sorts by, then the linked lists' orders.
 static int UnknownFunction477800(const void* a, const void* b) {
-    if (!g_UnknownGlobal65b608->sortingList)
-        return 0;
-    int result = g_UnknownGlobal65b608->sortingList->field_0x218_control->field_0x24c(a, b);
-    if (result)
-        return result;
-    int left = ((const UnknownGameUiListRow*)a)->sortIndex;
-    int right = ((const UnknownGameUiListRow*)b)->sortIndex;
-    GameObjectIterator* iterator =
-        (GameObjectIterator*)g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownVirtualSlot53();
-    UIListBox* other;
-    while ((other = static_cast<UIListBox*>(
-                g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472790(iterator))) != 0) {
-        if (other->rowCount != g_UnknownGlobal65b608->sortingList->field_0x218_control->rowCount) {
-            result = -1;
-            break;
+    int result = 0;
+    if (g_UnknownGlobal65b608->sortingList) {
+        result = g_UnknownGlobal65b608->sortingList->field_0x218_control->field_0x24c(a, b);
+        if (!result) {
+            int left = ((const UnknownGameUiListRow*)a)->sortIndex;
+            int right = ((const UnknownGameUiListRow*)b)->sortIndex;
+            GameObjectIterator* iterator =
+                (GameObjectIterator*)g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownVirtualSlot53();
+            while (1) {
+                UIListBox* other = static_cast<UIListBox*>(
+                    g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472790(iterator));
+                if (!other)
+                    break;
+                if (other->rowCount != g_UnknownGlobal65b608->sortingList->field_0x218_control->rowCount) {
+                    result = -1;
+                    break;
+                }
+                result = other->field_0x24c(&other->rowTable[left], &other->rowTable[right]);
+                if (result)
+                    break;
+            }
+            g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472730(iterator);
         }
-        result = other->field_0x24c(&other->rowTable[left], &other->rowTable[right]);
-        if (result)
-            break;
     }
-    g_UnknownGlobal65b608->sortingList->field_0x218_control->UnknownFunction472730(iterator);
     return result;
 }
 

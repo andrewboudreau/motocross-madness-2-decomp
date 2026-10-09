@@ -359,5 +359,6 @@
   "_rand": "0x00534c1b",
   "_sprintf": "0x00534aaf",
   "_srand": "0x00534c0e",
-  "_strrchr": "0x00534a60"
+  "_strrchr": "0x00534a60",
+  "?UnknownVirtualSlot29@PCNewEventDlg@@UAEXPAUUnknownDialogEvent@@@Z$ehhandler": "0x0054d257"
 }

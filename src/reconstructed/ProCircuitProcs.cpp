@@ -766,6 +766,52 @@ void PCFinishedDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
     }
 }
 
+// 0x004d9fd0
+void PCNewEventDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
+{
+    UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
+    switch (event->kind) {
+    case kDialogInit: {
+        int description;
+        const char* image;
+        switch (circuit->field_0x40) {
+        case 5:
+            description = 0x1465;
+            image = "WinScreen";
+            break;
+        case 1:
+            description = 0x1454;
+            image = "BajaScreen";
+            break;
+        case 2:
+            description = 0x1455;
+            image = "NatScreen";
+            break;
+        case 3:
+            description = 0x1456;
+            image = "SuperScreen";
+            break;
+        }
+        UIControl* control = FindControl("TxtDescription", 12);
+        control->field_0x1e8 = 1;
+        UnknownSetText(control, description);
+        UnknownSetText(FindControl("TitleText", 12), 0x1467);
+        control = FindControl("ButDecline", 1);
+        control->Show(0, 1);
+        UnknownSetText(FindControl("ButAccept", 1), 0x916);
+        control = FindControl("Pic", 5);
+        control->SetImage(0, FindSectionObject(image));
+        break;
+    }
+    case kDialogCommand: {
+        PCCentralDlg* dialog = new(__FILE__, 1896) PCCentralDlg;
+        guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, 0, 0, 0, 1);
+        EndDialog(0);
+        break;
+    }
+    }
+}
+
 // 0x004da1b0
 void PCCompleteDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
 {

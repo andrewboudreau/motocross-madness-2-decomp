@@ -861,6 +861,43 @@ void UIAnim::LoadFromModule(void* module, int id, int a, void* palette) {
 // ---------------------------------------------------------------------------
 // UIListBox (continued)
 
+// 0x00475c70: the font height is read as members in both the test and the
+// divisor (a local for it makes VC6 reuse the test's load as the divisor).
+UIListBox::UIListBox(int id, int rows, CameraRect* area, UIDialog* owner)
+    : UIControl(3, id, area, owner) {
+    selectBrush = 0;
+    itemBrush = 0;
+    rowCount = 0;
+    selectedRow = 0;
+    firstVisibleRow = 0;
+    rowCapacity = rows;
+    lastPageRowCount = 0;
+    selectColor = 0xffffff;
+    rowTable = (UnknownGameUiListRow*)DebugMalloc(rows * sizeof(UnknownGameUiListRow), __FILE__, 0x1b50);
+    field_0x24c = UnknownFunction477b60;
+    field_0x218 = (int)this;
+    autoSort = 0;
+    field_0x220 = 0;
+    selectable = 1;
+    allowWScroll = 1;
+    field_0x234 = 0;
+    field_0x230 = 0;
+    field_0x22c = 0;
+    lastClickTime = 0;
+    field_0x240 = 0;
+    rowCount = 0;
+    firstVisibleRow = 0;
+    lastPageRowCount = 0;
+    memset(rowTable, 0, rowCapacity * sizeof(UnknownGameUiListRow));
+    field_0x244 = 1;
+    if (!(fontHeight || (ownerDialog && ownerDialog->dialogFontHeight))) {
+        visibleRowCount = 1;
+    } else {
+        int rowsShown = (field_0x2c[3] - field_0x2c[1]) / (fontHeight ? fontHeight : ownerDialog->dialogFontHeight);
+        visibleRowCount = rowsShown < 1 ? 1 : rowsShown;
+    }
+}
+
 // 0x00475e20
 UIListBox::~UIListBox() {
     if (boundValue)
@@ -1898,6 +1935,117 @@ void UIDialog::ReleaseBackgroundGrab() {
 
 // ---------------------------------------------------------------------------
 // UIControl: text and transitions
+
+// 0x00470170: the owner is tested twice (post3D, then +0x18); VC6 threads
+// the second test and places the ownerless store after the epilogue.
+UIControl::UIControl(int type, int id, CameraRect* area, UIDialog* owner)
+    : GameObject(1) {
+    AppendClassName(this);
+    controlType = type;
+    eventCode = id;
+    if (area) {
+        *(CameraRect*)field_0x2c = *area;
+        *(CameraRect*)field_0x3c = *area;
+    } else {
+        field_0x3c[0] = field_0x3c[1] = field_0x3c[2] = field_0x3c[3] = 0;
+        *(CameraRect*)field_0x2c = *(CameraRect*)field_0x3c;
+    }
+    savedState = 0;
+    currentState = 0;
+    field_0x68 = 0;
+    enabled = 1;
+    field_0x70 = 1;
+    groupId = 0;
+    attachId = 0;
+    ownerDialog = owner;
+    ownerGui = owner ? owner->guiManager : 0;
+    anchorControl = 0;
+    relAnchor = 0;
+    shapeBounds = 0;
+    sourceBlit = 0;
+    boundValue = 0;
+    backgroundRegion = -1;
+    redrawFrames = 0;
+    controlText = 0;
+    toolTipText = 0;
+    textColor = 0xffff;
+    currentTextColor = 0xffff;
+    textDrop = 1;
+    dropColor = 0;
+    textAlign = 1;
+    field_0xd0 = 0;
+    textLines = 0;
+    needsRedraw = 1;
+    moveable = 0;
+    keyBind = 0;
+    field_0x1c8 = 0;
+    field_0x1c4 = 0;
+    mouseAnim = 0;
+    for (int i = 0; i < 5; i++) {
+        stateImages[i] = 0;
+        sounds[i] = 0;
+    }
+    field_0x164 = 0;
+    transitionDelay = 0;
+    transitionTime = 0;
+    slideSound = 0;
+    fxAnimOut = 0;
+    fxAnimIn = 0;
+    fxSoundOut = 0;
+    fxSoundIn = 0;
+    controlName[0] = 0;
+    ownsFont = 0;
+    fontHandle = 0;
+    fontFace[0] = 0;
+    fontHeight = 0;
+    bold = 0;
+    italic = 0;
+    textTopMargin = 0;
+    textLeftMargin = 0;
+    drawnTexture = 0;
+    field_0x1d0 = 0;
+    field_0xb4 = 0;
+    field_0x1d4 = -1;
+    if (owner)
+        post3D = owner->field_0x7f18;
+    else
+        post3D = 1;
+    if (owner)
+        field_0x18 = owner->UnknownInlineField18();
+    permanent = 0;
+    field_0x1e8 = 0;
+}
+
+// 0x00470450: two independent guiUser tests (VC6 threads the second one);
+// nesting them inside one test keeps the focus control in a register.
+UIControl::~UIControl() {
+    if (ownerDialog && !g_TrackGame->field_0x2d5_bit1) {
+        field_0x25_bit3 = 1;
+        ToolTip* tip = 0;
+        if (ownerDialog->guiUser && ownerDialog->guiUser->focusControl == (UnknownGuiControl*)this) {
+            ownerDialog->guiUser->UnknownFunction487bf0(0);
+            tip = ownerDialog->guiUser->userToolTip;
+        }
+        if (ownerDialog->guiUser && ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this) {
+            ownerDialog->UnknownFunction470000(0, 0, 1);
+            tip = ownerDialog->guiUser->userToolTip;
+        }
+        if (tip)
+            tip->ShowText(0, 0, 1.0f);
+    }
+    if (backgroundRegion != -1 && ownerDialog && ownerDialog->dialogBackground)
+        ownerDialog->dialogBackground->UnknownFunction404200(backgroundRegion);
+    if (controlText)
+        DebugFree(controlText, __FILE__, 0xba3);
+    if (toolTipText)
+        DebugFree(toolTipText, __FILE__, 0xba4);
+    if (ownsFont)
+        DeleteObject((HGDIOBJ)fontHandle);
+    if (textLines)
+        DebugFree(textLines, __FILE__, 0xba8);
+    if (field_0x1c4)
+        DebugFree(field_0x1c4, __FILE__, 0xba9);
+}
 
 // 0x00470660
 void UIControl::Show(int a, int b) {
