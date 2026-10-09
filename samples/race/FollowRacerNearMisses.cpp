@@ -15,7 +15,11 @@
 // ternary retail pushes the three arguments of the virtual call before the
 // `fstp` into +0x760; VC6 here stores after the first push. The if/else,
 // max-helper, local-result, int-zero, double-literal and statement-order
-// forms tried move the compare or the stores instead.
+// forms tried move the compare or the stores instead, as do const-reference
+// and by-value inline max helpers, the ternary on the locals or on
+// const-reference aliases of the fields, and the fields read directly in the
+// ternary; a `keep` local for the selected value, block-scoping the two
+// locals and the /G6 and /ML profiles leave the fstp where it is.
 
 #include <stdlib.h>
 

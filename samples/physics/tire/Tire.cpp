@@ -940,6 +940,10 @@ static inline void TireAddTo(CollisionVec3& v, const CollisionVec3& d)
 // VC6 here uses `test` and immediates, which shifts the argument offsets by the
 // missing push, and so schedules the A path's first world-position add the
 // other way round. The shared `depth` local keeps it out of the `axisB` slot.
+// Swapping or chaining the final clears, a `solved` flag instead of the early
+// returns, explicit `!= 0` compares with the block-scoped pointers, a
+// zero-initialised `active` and the A path add written as three `+=` stores
+// (97/805) do not give VC6 the zero register.
 void Tire::UpdateShock(float dt, int a2, int crashed, const CollisionVec3* offset,
                        const CollisionVec3* velocity, const CollisionVec3* axisB)
 {

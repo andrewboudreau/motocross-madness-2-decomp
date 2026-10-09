@@ -2,6 +2,16 @@
   {
     "class": "NormalDistribution",
     "source": "NormalDistribution.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x004aff80",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": "XCU 202 entry: calls the initialiser body and tail-jumps to the atexit registration",
+    "bindings": "NormalDistribution.bindings.json"
+  },
+  {
+    "class": "NormalDistribution",
+    "source": "NormalDistribution.cpp",
     "candidate_symbol_contains": "_$E1",
     "target_va": "0x004aff90",
     "target_size": 13,

@@ -14,6 +14,16 @@
 //   retail +4/+8 pointer bias and the register use; VC6 reorders the sums
 //   itself (retail sums z, y, x for w and y, z, x / y, x, z for the rows), so the
 //   written term order does not matter.
+//
+// Also tried for 0x004a11e0 without any change (274/281): the offset dot
+// through const-reference aliases of `normal` or `a`, with swapped
+// DotProduct arguments, as an explicit chain in either order or mixed
+// per-term order, through the index accessor on both operands, through a
+// float temporary; NormalizeVector written as `v->x = v->x * scale`,
+// through a reference and the index accessor, or as `*v = *v * scale`; the
+// cross product as three member stores, through a Cross helper or as index
+// stores (those lose 20-200 bytes); and the /G6 and /ML profiles (/G6 is
+// worse for both functions).
 #include "../../src/reconstructed/MatrixUtil.h"
 
 // 0x00460c00 (src/krusty2/math/FastMath.h).

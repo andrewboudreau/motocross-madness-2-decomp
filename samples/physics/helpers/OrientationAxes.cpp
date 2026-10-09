@@ -8,7 +8,11 @@
 // `t = s * z; t += c * y;` in the pitch step is load-bearing (one expression
 // multiplies by c first); an early `if (!up || !forward) return 0;`, a nested
 // `if (up && forward)` and splitting the last yaw product the same way do not
-// move the mov.
+// move the mov. Neither do an `int result = 1` local (declared at the top or
+// just before the last block), returning `forward != 0`, `up != 0`, their
+// conjunction or `true`, a block-scoped last temporary, the last sum with
+// its operands swapped, or the /G6 and /ML profiles; a result flag set inside
+// a nested `if (up && forward)` loses 240 bytes.
 #include <math.h>
 
 #include "../../../src/reconstructed/MatrixUtil.h"

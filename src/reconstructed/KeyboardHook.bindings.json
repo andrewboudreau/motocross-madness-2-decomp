@@ -1,0 +1,10 @@
+{
+  "?InstallTaskSwitchHook@@YAHXZ": "0x00505420",
+  "?RemoveTaskSwitchHook@@YAXXZ": "0x00505460",
+  "?TaskSwitchHookProc@@YGJHIJ@Z": "0x005053d0",
+  "_g_taskSwitchAllowed": "0x00574684",
+  "_g_taskSwitchHook": "0x00689fdc",
+  "__imp__CallNextHookEx@16": "0x00550350",
+  "__imp__SetWindowsHookExA@16": "0x0055034c",
+  "__imp__UnhookWindowsHookEx@4": "0x00550348"
+}
