@@ -4639,6 +4639,15 @@ CASES = [
         'reason': 'bottom row indexed as top[sourceStride]',
     },
     {
+        'name': 'Pixtrans 4444 halve 0x4ce190',
+        'bindings': 'src/reconstructed/Pixtrans.bindings.json',
+        'source': 'src/reconstructed/Pixtrans.cpp',
+        'symbol': '?Halve4444@@YAHPAX0HHHHH@Z',
+        'target_va': '0x004ce190',
+        'target_size': 641,
+        'reason': 'unsigned short pixel locals; packed path loads unsigned int pixels in one declaration and counts x unsigned with !=',
+    },
+    {
         'name': 'PCAudio UnknownPCAudioObject constructor',
         'bindings': 'src/reconstructed/PCAudio.bindings.json',
         'source': 'src/reconstructed/PCAudio.cpp',
@@ -25634,6 +25643,15 @@ CASES = [
         'target_va': '0x004bd4b0',
         'target_size': 136,
         'reason': 'PCAudio.cpp range; calls CreateBuffer 0x4bd540 and Query3DBuffer 0x4bd6e0',
+    },
+    {
+        'name': 'gameui.cpp sample UIControl deleting destructor 0x470430',
+        'bindings': 'samples/ui/GameUiNearMisses.bindings.json',
+        'source': 'samples/ui/GameUiNearMisses.cpp',
+        'symbol': '??_GUIControl@@UAEPAXI@Z',
+        'target_va': '0x00470430',
+        'target_size': 30,
+        'reason': 'RTTI UIControl slot 0 (vtable entry 0x470430 calls the destructor 0x470450); emitted only beside the near-miss UIControl constructor in the sample TU',
     },
 ]
 

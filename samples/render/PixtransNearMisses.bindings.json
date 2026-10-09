@@ -53,6 +53,7 @@
   "?ReplaceColor8@@YAHPAXEEHHH@Z": "0x004d1b40",
   "?UnknownFunction4d1b90@@YAHPAX0HHHHHHPAUUnknownTexturePalette@@H@Z": "0x004d1b90",
   "?UnknownFunction4d1d20@@YAHPAX0HHHHHHHPAUUnknownTexturePalette@@HI@Z": "0x004d1d20",
+  "?UnknownFunction4de270@UnknownTexturePalette@@QAEPAEXZ": "0x004de270",
   "?UnknownFunction4de280@UnknownTexturePalette@@QAEPAEXZ": "0x004de280",
   "?UnknownFunction4de290@UnknownTexturePalette@@QAEPAEXZ": "0x004de290",
   "__FILE__:pixtrans.cpp": "0x00571688",

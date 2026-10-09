@@ -299,6 +299,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/PCVideoCard | `0x0052d180` | 96/115 | c | 3 code diffs: retail adds `xor esi, esi ; and cl, 0xfb`; `and cl, 0xfb` vs `mov byte ptr [edx + 0x70], cl` |
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
 | render/Pixtrans | `0x004ce420` | 55/456 | b | 23 code diffs: `sub esp, 8` vs `sub esp, N ; mov edx, [esp + N]`; `mov eax, [esp + N] ; test eax, eax` vs `test edx, edx`; frame 0x8 vs 0x10 |
+| render/Pixtrans | `0x004cee30` | 45/1133 | b | candidate 1093 B, 314 code diffs: `push ebp` in the prologue vs after the three palette checks; `sourceRow` homed in `source`'s slot shifts every slot; fast-loop channel sum order |
 | render/Pixtrans | `0x004d24d0` | 419/988 | c | 4 code diffs: retail lacks `jmp @207 ; mov eax, [esp + N] ; mov [es~`; retail adds `mov eax, [esp + N] ; mov [esp + N], eax~` |
 | render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
 | render/SoultreeMaterial | `0x004ff180` | 650/652 | c | 2 code diffs: `mov eax, [ecx] ; call [eax + 0x20]` vs `mov edx, [ecx] ; call [edx + 0x20]`; `add byte ptr [eax], al ; mov al, byte p~` vs `mov esi, A ; dec edi ; add cl, dh` |

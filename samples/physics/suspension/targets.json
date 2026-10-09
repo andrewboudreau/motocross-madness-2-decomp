@@ -228,5 +228,45 @@
     "expect": "exact",
     "notes": "kShockAxisZ dynamic initializer (thunk 0x4fb0c0)",
     "bindings": "Shock.bindings.json"
+  },
+  {
+    "class": "Shock",
+    "source": "Shock.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x004fafd0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kShockZero initialiser jmp thunk (to the body 0x4fafe0)",
+    "bindings": "Shock.bindings.json"
+  },
+  {
+    "class": "Shock",
+    "source": "Shock.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x004fb020",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kShockAxisX initialiser jmp thunk (to the body 0x4fb030)",
+    "bindings": "Shock.bindings.json"
+  },
+  {
+    "class": "Shock",
+    "source": "Shock.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x004fb070",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kShockAxisY initialiser jmp thunk (to the body 0x4fb080)",
+    "bindings": "Shock.bindings.json"
+  },
+  {
+    "class": "Shock",
+    "source": "Shock.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x004fb0c0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "kShockAxisZ initialiser jmp thunk (to the body 0x4fb0d0)",
+    "bindings": "Shock.bindings.json"
   }
 ]
