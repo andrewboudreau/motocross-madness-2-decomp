@@ -671,6 +671,10 @@ void Vehicle::UnknownVirtualSlot72(Vec3* out, VehicleWheel* wheel)
 }
 
 // ---- impact handlers (slots 18..20) ----
+// Smaller of two values; the scrape clamps go through it (the by-value copy is what keeps
+// each component on the x87 stack across its compare, as retail does).
+static inline float VehMinF(float a, float b) { return (a < b) ? a : b; }
+
 // Commit an impact to a sink: latch the current vector into the previous one, mark it dirty.
 static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink** sink)
 {
@@ -682,38 +686,36 @@ static inline void VehCommitImpact(VehicleImpactEvent* ev, VehicleImpactSink** s
 
 // Posts a one-shot impact for the first wheel (aux-driven first, then any) or contact whose
 // surface material is flagged in the material table and which has not yet reported one.
+// Slots 18 and 19 scan with guarded do-while loops (retail's unrotated `jge exit; jmp top`
+// back edges), slot 20 with for loops (rotated `jl top`).
 void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
 {
     VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
-    VehicleWheel* w;
-    int i;
-    for (i = 0; i < wheelCount; i++) {
-        w = wheelList[i];
+    int i = 0;
+    if (wheelCount > 0) do {
+        VehicleWheel* w = wheelList[i];
         if (w->aux && w->inContact && !w->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial]))
-            break;
-    }
-    if (i < wheelCount) {
-        w->impactPosted = 1;
-        float v = w->field_0x2bc * 20.0f;
-        v = (v > 1.0f) ? v : 1.0f;
-        ev->impactSink->SetPosition(w->groundPoint, v);
-        VehCommitImpact(ev, &ev->impactSink);
-        return;
-    }
-    for (i = 0; i < wheelCount; i++) {
-        w = wheelList[i];
+            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial])) {
+            w->impactPosted = 1;
+            float v = w->field_0x2bc * 20.0f;
+            ev->impactSink->SetPosition(w->groundPoint, (v > 1.0f) ? v : 1.0f);
+            VehCommitImpact(ev, &ev->impactSink);
+            return;
+        }
+    } while (++i < wheelCount);
+    i = 0;
+    if (wheelCount > 0) do {
+        VehicleWheel* w = wheelList[i];
         if (w->inContact && !w->impactPosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial]))
-            break;
-    }
-    if (i < wheelCount) {
-        w->impactPosted = 1;
-        ev->impactSink->SetPosition(w->groundPoint, 0.0f);
-        VehCommitImpact(ev, &ev->impactSink);
-        return;
-    }
-    for (i = 0; i < collisionPointCount; i++) {
+            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + w->surfaceMaterial])) {
+            w->impactPosted = 1;
+            ev->impactSink->SetPosition(w->groundPoint, 0.0f);
+            VehCommitImpact(ev, &ev->impactSink);
+            return;
+        }
+    } while (++i < wheelCount);
+    i = 0;
+    if (collisionPointCount > 0) do {
         VehicleContact* c = ((VehicleContact**)collisionPoints)[i];
         if (c->contactActive && !c->impactPosted &&
             (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x400 + c->surfaceMaterial])) {
@@ -722,7 +724,7 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
             VehCommitImpact(ev, &ev->impactSink);
             return;
         }
-    }
+    } while (++i < collisionPointCount);
 }
 
 // Slide/scrape impact: like slot 18 but posts a clamped scrape vector (wheel normal-ish frame
@@ -730,50 +732,41 @@ void Vehicle::UnknownVirtualSlot18(SoultreeAttachment* arg)
 void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
 {
     VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
-    VehicleWheel* w;
-    int i;
-    for (i = 0; i < wheelCount; i++) {
-        w = wheelList[i];
+    int i = 0;
+    if (wheelCount > 0) do {
+        VehicleWheel* w = wheelList[i];
         if (w->aux && w->inContact && !w->slidePosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial]))
-            break;
-    }
-    if (i < wheelCount) {
-        if (!(w->field_0x2b8 < 0.95f))
-            return;
-        w->slidePosted = 1;
-        ev->slideSink->SetPosition(w->groundPoint);
-        VehCommitImpact(ev, &ev->slideSink);
-        scratchVector2.x = (turnAngle < 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
-        scratchVector2.y = 0.0f;
-        scratchVector2.z = -w->tangentCos;
-        scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
-        scratchVector.y = w->field_0x2bc * 3.0f;
-        float s = w->field_0x290 * invStepTime;
-        scratchVector.x *= s;
-        scratchVector.y *= s;
-        scratchVector.z *= s;
-        if (!(scratchVector.x < 15.0f))
-            scratchVector.x = 15.0f;
-        if (!(scratchVector.y < 18.0f))
-            scratchVector.y = 18.0f;
-        if (!(scratchVector.z < 15.0f))
-            scratchVector.z = 15.0f;
-        ev->slideSink->scrapeVector = scratchVector;
-        return;
-    }
-    for (i = 0; i < wheelCount; i++) {
-        w = wheelList[i];
-        if (w->inContact && !w->slidePosted &&
-            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial]))
-            break;
-    }
-    if (i < wheelCount) {
-        w->slidePosted = 1;
-        if (w->field_0x280.z > 0.2f) {
+            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial])) {
+            if (!(w->field_0x2b8 < 0.95f))
+                return;
+            w->slidePosted = 1;
+            ev->slideSink->SetPosition(w->groundPoint);
             VehCommitImpact(ev, &ev->slideSink);
+            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
+            scratchVector2.y = 0.0f;
+            scratchVector2.z = -w->tangentCos;
+            scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
+            scratchVector.y = w->field_0x2bc * 3.0f;
+            scratchVector *= w->field_0x290 * invStepTime;
+            scratchVector.x = VehMinF(scratchVector.x, 15.0f);
+            scratchVector.y = VehMinF(scratchVector.y, 18.0f);
+            scratchVector.z = VehMinF(scratchVector.z, 15.0f);
+            ev->slideSink->scrapeVector = scratchVector;
+            return;
         }
-    }
+    } while (++i < wheelCount);
+    i = 0;
+    if (wheelCount > 0) do {
+        VehicleWheel* w = wheelList[i];
+        if (w->inContact && !w->slidePosted &&
+            (!track || ((VehicleMaterialSet*)track)->field_0xa4[0x408 + w->surfaceMaterial])) {
+            w->slidePosted = 1;
+            if (w->field_0x280.z > 0.2f) {
+                VehCommitImpact(ev, &ev->slideSink);
+            }
+            return;
+        }
+    } while (++i < wheelCount);
 }
 
 // Second scrape channel: like slot 19 (sink at event+0x0c, no per-material table gate) but posts a clamped scrape vector (wheel normal-ish frame
@@ -781,46 +774,36 @@ void Vehicle::UnknownVirtualSlot19(SoultreeAttachment* arg)
 void Vehicle::UnknownVirtualSlot20(SoultreeAttachment* arg)
 {
     VehicleImpactEvent* ev = (VehicleImpactEvent*)arg;
-    VehicleWheel* w = 0;
     int i;
     for (i = 0; i < wheelCount; i++) {
-        w = wheelList[i];
-        if (w->aux && w->inContact && !w->scrapePosted)
-            break;
-    }
-    if (i < wheelCount) {
-        if (!(w->field_0x2b8 < 0.95f))
+        VehicleWheel* w = wheelList[i];
+        if (w->aux && w->inContact && !w->scrapePosted) {
+            if (!(w->field_0x2b8 < 0.95f))
+                return;
+            w->scrapePosted = 1;
+            ev->scrapeSink->SetPosition(w->groundPoint);
+            VehCommitImpact(ev, &ev->scrapeSink);
+            scratchVector2.x = (turnAngle >= 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
+            scratchVector2.y = 0.0f;
+            scratchVector2.z = -w->tangentCos;
+            scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
+            scratchVector.y = w->field_0x2bc * 3.0f;
+            scratchVector *= w->field_0x290 * invStepTime;
+            scratchVector.x = VehMinF(scratchVector.x, 15.0f);
+            scratchVector.y = VehMinF(scratchVector.y, 18.0f);
+            scratchVector.z = VehMinF(scratchVector.z, 15.0f);
+            ev->scrapeSink->scrapeVector = scratchVector;
             return;
-        w->scrapePosted = 1;
-        ev->scrapeSink->SetPosition(w->groundPoint);
-        VehCommitImpact(ev, &ev->scrapeSink);
-        scratchVector2.x = (turnAngle < 0.0f ? -1.0f : 1.0f) * w->field_0x280.z;
-        scratchVector2.y = 0.0f;
-        scratchVector2.z = -w->tangentCos;
-        scratchVector = modelNode->LocalToWorldDirection(scratchVector2);
-        scratchVector.y = w->field_0x2bc * 3.0f;
-        float s = w->field_0x290 * invStepTime;
-        scratchVector.x *= s;
-        scratchVector.y *= s;
-        scratchVector.z *= s;
-        if (!(scratchVector.x < 15.0f))
-            scratchVector.x = 15.0f;
-        if (!(scratchVector.y < 18.0f))
-            scratchVector.y = 18.0f;
-        if (!(scratchVector.z < 15.0f))
-            scratchVector.z = 15.0f;
-        ev->scrapeSink->scrapeVector = scratchVector;
-        return;
+        }
     }
     for (i = 0; i < wheelCount; i++) {
-        w = wheelList[i];
-        if (w->inContact && !w->scrapePosted)
-            break;
-    }
-    if (i < wheelCount) {
-        w->scrapePosted = 1;
-        if (w->field_0x280.z > 0.2f) {
-            VehCommitImpact(ev, &ev->scrapeSink);
+        VehicleWheel* w = wheelList[i];
+        if (w->inContact && !w->scrapePosted) {
+            w->scrapePosted = 1;
+            if (w->field_0x280.z > 0.2f) {
+                VehCommitImpact(ev, &ev->scrapeSink);
+            }
+            return;
         }
     }
 }

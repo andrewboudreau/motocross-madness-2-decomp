@@ -265,8 +265,8 @@
     "candidate_symbol_contains": "NextObjectSorted",
     "target_va": "0x004dd600",
     "target_size": 330,
-    "expect": "partial",
-    "notes": "88.0% (329 vs 330 bytes). Same algorithm (qsort with CompareObjectKey, 2-element swap inline). Exact up to the outer loop's bottom: retail ends the loop with `cmp eax,edi; je ret0; jmp top` and puts the return-0 block last, but VC6 rotates every while/for(;;) loop whose top is a conditional exit into a bottom `jne body`. That shape has not been reproduced yet.",
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml. qsort with CompareObjectKey, 2-element swap inline. The sort dispatch is a switch on sortedCount (case 0/1 nothing, 2 swap, default qsort: VC6 sends n < 0 straight to qsort); the outer loop is while (1) with the cursor test at the top and an explicit if (!queryCursor) return 0 after the advance (retail's bottom je ret0 / jmp top that reloads the cursor). An if-chain on n and a guarded do-while (cell) loop gave 316/318.",
     "bindings": "Quadtree.bindings.json"
   },
   {

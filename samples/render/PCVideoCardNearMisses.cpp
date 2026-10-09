@@ -4,7 +4,8 @@
 // UnknownDisplay::CreateModeSurfaces (0x004ca520, 116 bytes): logic and
 //   calls match; retail loads +0x74 and all four mode fields into registers
 //   before testing the argument and computes the free memory as
-//   neg/lea (memory - pixels * 2); local orders and pixel temporaries tried.
+//   neg/lea (memory - pixels * 2); local orders and pixel temporaries tried,
+//   as were a `memory` local read first and `width * height` written twice.
 // UnknownDisplay::ProbeNonLocalTextureMemory (0x004ca5a0, 484 bytes): retail keeps
 //   `target` in ebp, caches 480/16 in registers for the mode search and has
 //   one more 4-byte local; the flow (EH-guarded new PCRenderTarget, 128x128
@@ -16,12 +17,6 @@
 // UnknownDisplay::ProbePartialTextureUploads (0x004cab00, 1129 bytes): the
 //   PartialTexBlt driver; register allocation differs throughout (retail
 //   keeps `this` in ebp and spills it), structure follows retail.
-// UnknownDisplay::SetGDISurfaceVisible (0x004cb5b0, 186 bytes): retail
-//   returns int (0 when a flip, GetGDISurface or the flip budget fails, else
-//   1). Display.h keeps `void` because GUIManager.bindings.json binds
-//   ?SetGDISurfaceVisible@UnknownDisplay@@QAEXH@Z. With `int` the body
-//   matches except the placement of the shared `return 0` block after the
-//   loop (145/184 bytes).
 // VideoCard::VideoCard (0x0052d180, 115 bytes; VideoCard.cpp): every store
 //   matches; retail clears the zero register before the bit-2 mask, a
 //   scheduling difference no statement order reproduced.
@@ -252,30 +247,6 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
     partialTextureUploadResult = result;
 }
 
-
-// 0x004cb5b0: with `enable`, flips until the GDI surface is the primary
-// (at most back buffers + 1 times); then sets +0x6c.
-void UnknownDisplay::SetGDISurfaceVisible(int enable) {
-    if (enable) {
-        UnknownSurfaceInterface* gdi = 0;
-        directDraw->GetGDISurface(&gdi);
-        for (int i = 0; primarySurface != gdi; ) {
-            if (gdi)
-                gdi->Release();
-            gdi = 0;
-            if (primarySurface->Flip(0, 1))
-                return;
-            if (directDraw->GetGDISurface(&gdi))
-                return;
-            g_TrackGame->renderTarget->UnknownFunction4e8cc0();
-            if (++i > frameBufferCount)
-                return;
-        }
-        if (gdi)
-            gdi->Release();
-    }
-    freezeFrameIndex = enable;
-}
 
 // 0x0052d180
 VideoCard::VideoCard() {

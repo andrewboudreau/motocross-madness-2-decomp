@@ -857,6 +857,8 @@ int Bike::UnknownVirtualSlot100(float a, int b, float c)
     return crashState;
 }
 
+// Callers pass operator temporaries (a - b, (a + b) * 0.5f): only then are the vector's
+// components newer than the scale factor, so every scaling loads the component first.
 static inline Vec3 BikeNormalized(const Vec3& v)
 {
     float lenSq = v.y * v.y + v.x * v.x;
@@ -870,13 +872,7 @@ static inline Vec3 BikeNormalized(const Vec3& v)
 Vec3* Bike::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
 {
     *pos = modelNode->WorldToLocalPoint(rearWheel->wheelPosition);
-    const Vec3* b = &rearWheel->wheelPosition;
-    const Vec3* a = &frontWheel->wheelPosition;
-    Vec3 d;
-    d.x = a->x - b->x;
-    d.y = a->y - b->y;
-    d.z = a->z - b->z;
-    *out = BikeNormalized(d);
+    *out = BikeNormalized(frontWheel->wheelPosition - rearWheel->wheelPosition);
     return out;
 }
 
@@ -888,9 +884,7 @@ Vec3* Bike::UnknownVirtualSlot54(Vec3* out)
     }
     if (frontWheel->inContact != 0) {
         if (rearWheel->inContact != 0) {
-            Vec3 s(frontWheel->groundNormal.x + rearWheel->groundNormal.x, frontWheel->groundNormal.y + rearWheel->groundNormal.y, frontWheel->groundNormal.z + rearWheel->groundNormal.z);
-            Vec3 mid(s.x * 0.5f, s.y * 0.5f, s.z * 0.5f);
-            *out = BikeNormalized(mid);
+            *out = BikeNormalized((frontWheel->groundNormal + rearWheel->groundNormal) * 0.5f);
             return out;
         }
         *out = frontWheel->groundNormal;

@@ -13,10 +13,14 @@
 //   message kind into ecx after moving `this` to esi and before loading
 //   TrackGame+0x3444 (the reverse here), and picks ecx/edx the other way for
 //   the TrackGame/module temporaries. Local order, scopes and a `kind` copy do
-//   not move it.
+//   not move it, nor do per-case circuit locals, a `TrackGame* game` local,
+//   a const/register circuit, an inline circuit getter or a circuit macro
+//   (exact PCNewEventDlg slot 29 has the same source shape and retail's
+//   order).
 // PCBonusTrackDlg::UnknownVirtualSlot29 (0x004d9cd0, 752 bytes): the same
 //   prologue difference, and retail copies the circuit pointer from ebp to
-//   edi for the init case (VC6 here keeps one register).
+//   edi for the init case (VC6 here keeps one register; `current = circuit`
+//   and using `circuit` directly compile the same).
 // PCStartupDlg::AddCircuitRow (0x004d59a0, 756 bytes): exact in
 //   some states of the shared headers; in others the only difference is the
 //   order of the two reloads after the shared strcpy of the "Class" column

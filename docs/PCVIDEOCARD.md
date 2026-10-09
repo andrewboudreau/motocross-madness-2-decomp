@@ -44,8 +44,11 @@ for the distinction between the checks on these edits and the prior VC6 results.
 
 ## Matching status
 
-Exact: 28 calibration cases (22 PCVideoCard, 6 VideoCard). Near misses
-(`samples/render/PCVideoCardNearMisses.cpp`, notes there): `0x004ca520`,
-`0x004ca5a0`, the PartialTexBlt driver `0x004cab00`, `0x004cb330`,
-`0x004cb5b0` (declared void for GUIManager's bindings; retail returns
-int) and the VideoCard constructor `0x0052d180`.
+Exact: 29 calibration cases (23 PCVideoCard, 6 VideoCard). The GDI-surface
+flip `0x004cb5b0` returns int (0 when a flip, the GDI surface query or the
+flip budget fails); its flip loop is a guarded do-while (`int i = 0; if
+(primarySurface != gdi) do ... while (primarySurface != gdi)`), which keeps
+retail's unrotated `je; jmp top` exit with the shared `return 0` after it.
+Near misses (`samples/render/PCVideoCardNearMisses.cpp`, notes there):
+`0x004ca520`, `0x004ca5a0`, the PartialTexBlt driver `0x004cab00`,
+`0x004cb330` and the VideoCard constructor `0x0052d180`.

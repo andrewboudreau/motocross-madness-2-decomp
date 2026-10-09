@@ -542,7 +542,7 @@
     "target_va": "0x00496da0",
     "target_size": 119,
     "expect": "partial",
-    "notes": "61.6% (121 vs 119 bytes): retail hoists lea ecx,[o+0xc] after the game-global load and derefs the vptr through it; local KbSink* variants hoist it earlier (50%), nested ifs duplicate paths (78.8% but 138 bytes)"
+    "notes": "61.6% (121 vs 119 bytes): retail hoists lea ecx,[o+0xc] after the game-global load and derefs the vptr through it; local KbSink* variants hoist it earlier (50%), nested ifs duplicate paths (78.8% but 138 bytes) altBodyA/altBodyB are CollisionObjects (RTTI 0x0055afe0: QuadTreeObject at 0, GraphicsTest at +0xc), so the slot 4/5 calls are base-class virtual calls; declaring that base relation changes no byte. Nested ifs (x18 > 1, then x2d84) hoist the lea into the second test as retail does but duplicate the outer else instead of entering retail's shared tail."
   },
   {
     "class": "KrustyBike",
@@ -561,7 +561,7 @@
     "target_va": "0x00496d20",
     "target_size": 119,
     "expect": "partial",
-    "notes": "Real body of slot 101 (behind the 16-byte jmp stub at 0x496d10). Same divergence as Fn_00496DA0: retail hoists lea ecx,[eax+0xc] into the compare block and loads the vptr through ecx; ours loads it from [eax+0xc]."
+    "notes": "Real body of slot 101 (behind the 16-byte jmp stub at 0x496d10). Same divergence as Fn_00496DA0: retail hoists lea ecx,[eax+0xc] into the compare block and loads the vptr through ecx; ours loads it from [eax+0xc]. altBodyA/altBodyB are CollisionObjects (RTTI 0x0055afe0: QuadTreeObject at 0, GraphicsTest at +0xc), so the slot 4/5 calls are base-class virtual calls; declaring that base relation changes no byte. Nested ifs (x18 > 1, then x2d84) hoist the lea into the second test as retail does but duplicate the outer else instead of entering retail's shared tail."
   },
   {
     "class": "KrustyBike",
@@ -798,6 +798,6 @@
     "target_va": "0x00495ff0",
     "target_size": 895,
     "expect": "partial",
-    "notes": "trick end / bonus, 99.17% (895/895). Stack slots match once the float bonus is a CSE temp, not a local. Only mov al,[+0x153f] vs fsubr order after the fmod call differs (retail loads the flag first); a named float/double remainder temp is forward-substituted (no change), dropping the (float) cast gives a double fsubr (11%)."
+    "notes": "trick end / bonus, 99.17% (895/895). Stack slots match once the float bonus is a CSE temp, not a local. Only mov al,[+0x153f] vs fsubr order after the fmod call differs (retail loads the flag first); a named float/double remainder temp is forward-substituted (no change), dropping the (float) cast gives a double fsubr (11%). Also unchanged: x = x - (float)fmod(...), bool/unsigned char flag types; double-typed forms change the frame."
   }
 ]

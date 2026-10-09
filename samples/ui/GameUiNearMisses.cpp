@@ -6,7 +6,8 @@
 //   the vtable (and so keeps the vtable in eax); every store order gives the
 //   hoisted load.
 // 0x0046ea80 (160/164): the two arguments are loaded into the opposite
-//   registers (id in esi in retail); a local copy of either does not change it.
+//   registers (id in esi in retail); a local copy of either, `id == groupId`,
+//   for, guarded do-while and `continue` loop forms do not change it.
 // 0x004705d0 UIControl slot 49 (91/101) and 0x004733a0 UIButton slot 49
 //   (85/99): the value loaded for each call lands in another register
 //   (retail: ecx/edx, VC6 here: edx/eax); an int SetFontColor, a local for the
@@ -15,15 +16,11 @@
 // 0x00472e30 UIAnim constructor (34/82): retail stores the palette (+0xf4)
 //   after the zeroed members, right before the frame-list memset; VC6 here
 //   hoists it next to the texture store whatever the statement, initializer
-//   list or loop form.
+//   list or loop form (retail loads both arguments into ecx/edx with zero in
+//   eax; VC6 here loads them into eax/ecx and zeroes eax after).
 // 0x00472fe0 UIAnim advance (77/194): retail copies the frame index into ecx
 //   before indexing the frame list (`mov ecx, eax`); a local index, a
 //   reloaded member and GetCurrentFrame() all index with eax.
-// 0x004749f0 UIScrollCtl slot 60 (52/274): retail lets case 10 fall into the
-//   shared event tail (ending in its own ret) and places case 9 after it,
-//   then case 0x101; VC6 here places the tail after case 9. Switch (either
-//   case order, `break` or `return` after the tail), if/else and goto forms
-//   all give the same layout.
 // 0x00477110 adds an image row from a file (356/646): with `a` a UIAnim
 //   loaded from `file`, otherwise a row naming the TGA file with its header's
 //   size. Calls, constants and the row stores follow retail. Retail places
@@ -31,7 +28,9 @@
 //   `return 0` (and the final `return 1`) there; VC6 here keeps the epilogue
 //   last, which shifts every later offset. Retail also loads `b` into eax and
 //   the frame's size into ecx/edx (VC6 here: ecx, edx/eax). Fail-first,
-//   if-block and goto forms were tried.
+//   if-block, goto, an early stream-failure return and the whole body inside
+//   `if (rowCount < rowCapacity || grow)` with one trailing `return 0` were
+//   tried.
 // 0x004773a0 adds an image row (169/232): retail loads the frame's width
 //   before its height and stores the row's +0x18 later; 40 store orders were
 //   tried.
@@ -41,35 +40,41 @@
 //   puts the first control temporary in eax and the next global load in edx;
 //   VC6 here swaps the two (no declaration-shift k changes it; early returns,
 //   a local list pointer and local order do not either).
-// 0x00477bc0 (89/286): retail keeps zero in a different register.
+// 0x00477bc0 (89/286): retail keeps zero in the height accumulator's
+//   register (ecx) and loads each row height into ebp before adding it; a
+//   row-height local, `height` declared before the owner test, a `visible`
+//   local and while forms do not reproduce it.
 // 0x00477e90 UIListBox slot 55 (155/344): retail keeps the point in ebx and
 //   the row offset in ebp; VC6 here swaps them.
 // 0x0047b490 colour-key test (116/210): retail keeps the key pixel in esi,
 //   the width in edx and spills the row counter into the key's argument
 //   slot; VC6 here spills the pixel instead. Hoisting the width or
 //   reordering the red/green/blue terms moves the register pressure
-//   elsewhere.
+//   elsewhere; retail ORs red|green then blue, and no term order,
+//   parenthesisation or `pixel |=` split changes VC6 here's blue-first
+//   chain.
 // 0x00472960 UIFrame constructor from a file (352/562): retail places the
 //   sprintf (image missing) block after the epilogue, jumping back to the
-//   `if (image)` free test; VC6 here lays it inline.
+//   `if (image)` free test; VC6 here lays it inline and threads its jump past
+//   the test (the same unthreaded test as GUIUser::SetPointerDevice). An
+//   `if (!image)` first, goto, inline/macro free helpers and a `return` after
+//   the free were tried.
 // 0x0046ef00 UIDialog slot 10 (352/555): the timer's +0x0c is cleared before
-//   +0x14 is loaded, and the joystick branches sit after the epilogue.
+//   +0x14 is loaded, and the joystick branches after the first sit after the
+//   epilogue. `while (1)`/`for (;;)` device loops, `continue` per branch and
+//   the joystick test as an inline helper (with and without returns) keep
+//   them inline.
 // 0x004734c0 UIButton slot 28 (256/328) and 0x00478e10 UIMultiState slot 28
 //   (28/328): retail keeps the 8-bit result in edi and the 16-bit one in
 //   memory, tests Unlock's result and returns separately when Lock fails.
-//   Ternary, separate-result and goto forms keep the result in memory.
+//   Ternary, separate-result and goto forms keep the result in memory; an
+//   early return on Lock failure, an empty `if (Unlock)` and an inline
+//   unlock-and-return helper compile the same, and an Unlock and return in
+//   each format branch (cross-jumped) puts the result in ebp (76/323).
 // 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
 //   redraw count in memory.
 // 0x00474150 UIEditBox slot 20 (339/1048): Backspace: retail loads the
 //   length before the lead-byte test.
-// 0x00474880 UIScrollCtl slot 55 (254/355): retail pushes every register in
-//   the prologue and keeps `this` in esi.
-// 0x00479710 UIDDLScrollBar slot 57 (736/738): the list's +0x204 goes through
-//   ebp instead of ecx (retail keeps `position`'s register busy there).
-//   Inlining the row expression (also through an inline helper) puts it in
-//   ebx and costs a prologue push instead; a separate result local, a `last`
-//   local and the goto-free form (a `>=` test around the repeat event)
-//   compile the same or worse. No declaration-shift k changes it.
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
 // 0x0047a400 drop-down layout (320/960): store scheduling of the part rects.
@@ -237,48 +242,6 @@ void UIButton::UnknownVirtualSlot49(int enable) {
         }
         currentTextColor = textColor;
         SetFontColor(0x999999);
-    }
-}
-
-// 0x004749f0
-void UIScrollCtl::UnknownVirtualSlot60(int value) {
-    UITimer* timer = (UITimer*)value;
-    UnknownDialogEvent event;
-    event.handled = 0;
-    GameObjectIterator* iterator;
-    UIControl* control;
-    switch (timer->timerId) {
-    case 0x101:
-        ownerDialog->RemoveTimer(timer);
-        ownerDialog->AddTimer(0x102, 100, (int)this);
-        break;
-    case 0x102:
-        switch (controlType) {
-        case 9:
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
-                if (control->controlType == 3)
-                    ((UIListBox*)control)->ScrollBy(-1);
-            }
-            goto send;
-        case 10:
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
-                if (control->controlType == 3)
-                    ((UIListBox*)control)->ScrollBy(1);
-            }
-        send:
-            UnknownFunction472730(iterator);
-            event.kind = 0xe;
-            event.code = eventCode;
-            event.controlName = GetName();
-            event.dialog = ownerDialog;
-            event.gui = ownerGui;
-            event.control = this;
-            ownerDialog->UnknownVirtualSlot29(&event);
-            break;
-        }
-        break;
     }
 }
 
@@ -870,123 +833,6 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
         result = 1;
     }
     return result;
-}
-
-// 0x00474880: a click scrolls the arrow's lists by a row, then repeats on a timer.
-int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
-    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
-        UnknownDialogEvent event;
-        event.handled = 0;
-        GameObjectIterator* iterator;
-        UIControl* control;
-        if (controlType == 9) {
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
-                if (control->controlType == 3) {
-                    ((UIListBox*)control)->lastClickTime = 0;
-                    ((UIListBox*)control)->ScrollBy(-1);
-                }
-                if (control->controlType == 6) {
-                    ((UIDropDownList*)control)->listPart->lastClickTime = 0;
-                    ((UIDropDownList*)control)->listPart->ScrollBy(-1);
-                }
-            }
-        } else {
-            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
-            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
-                if (control->controlType == 3) {
-                    ((UIListBox*)control)->lastClickTime = 0;
-                    ((UIListBox*)control)->ScrollBy(1);
-                }
-                if (control->controlType == 6) {
-                    ((UIDropDownList*)control)->listPart->lastClickTime = 0;
-                    ((UIDropDownList*)control)->listPart->ScrollBy(1);
-                }
-            }
-        }
-        UnknownFunction472730(iterator);
-        event.code = eventCode;
-        event.kind = 0xe;
-        event.controlName = controlName;
-        event.dialog = ownerDialog;
-        event.control = this;
-        event.gui = ownerDialog->guiManager;
-        ownerDialog->UnknownVirtualSlot29(&event);
-        ownerDialog->AddTimer(0x101, 0xfa, (int)this);
-    }
-    return UIControl::UnknownVirtualSlot55(a, b);
-}
-
-// 0x00479710: dragging the thumb; holding it still repeats kind 0x11.
-void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
-    UIControl::UnknownVirtualSlot57(a, position);
-    UnknownDialogEvent event;
-    event.handled = 0;
-    if (!a && position) {
-        int width = UnknownVirtualSlot61();
-        int height = UnknownVirtualSlot62();
-        UnknownVirtualSlot50();
-        if (controlType == 8) {
-            if (field_0x1f0)
-                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - field_0x2c[0], 0));
-            else
-                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
-                                                       UnknownMaxInt(position[0] - field_0x2c[0] - thumbWidth / 2, 0));
-        } else {
-            if (field_0x1f0 != 0.0f)
-                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - field_0x2c[1], 0));
-            else
-                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
-                                                       UnknownMaxInt(position[1] - field_0x2c[1] - thumbHeight / 2, 0));
-        }
-        if (field_0x1f0)
-            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
-        if (!field_0x208) {
-            event.kind = 0xf;
-            event.code = eventCode;
-            event.controlName = ownerList->GetName();
-            event.dialog = ownerDialog;
-            event.gui = ownerGui;
-            event.control = this;
-            ownerDialog->UnknownVirtualSlot29(&event);
-            field_0x208 = 1;
-        }
-        if (!event.handled) {
-            if (position[0] == dragX && position[1] == dragY) {
-                field_0x218_float += ownerDialog->lastFrameTime;
-                if (field_0x218_float < field_0x214)
-                    goto scroll;
-                event.kind = 0x11;
-                event.code = eventCode;
-                event.controlName = ownerList->GetName();
-                event.dialog = ownerDialog;
-                event.gui = ownerGui;
-                event.control = this;
-                ownerDialog->UnknownVirtualSlot29(&event);
-            } else {
-                event.kind = 3;
-                event.code = eventCode;
-                event.controlName = ownerList->GetName();
-                event.dialog = ownerDialog;
-                event.gui = ownerGui;
-                event.control = this;
-                ownerDialog->UnknownVirtualSlot29(&event);
-                dragX = position[0];
-                dragY = position[1];
-                field_0x218_float = 0.0f;
-            }
-            if (!event.handled) {
-            scroll:
-                UIListBox* list = ownerList->listPart;
-                if (list) {
-                    int rows = list->rowCount - list->lastPageRowCount;
-                    list->ScrollToRow(UnknownFunction475300(rows), 0);
-                }
-            }
-        }
-    }
 }
 
 // 0x00478570: draws the state's image, then its text.

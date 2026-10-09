@@ -110,5 +110,7 @@
   "__except_list": "0x00000000",
   "__stricmp": "0x00536070",
   "_atoi": "0x00536057",
-  "_sprintf": "0x00534aaf"
+  "_sprintf": "0x00534aaf",
+  "?Select@SurfaceMap@@QAEXXZ": "0x00505310",
+  "?ApplyRenderStates@SoultreeMaterial@@QAEXXZ": "0x004ff180"
 }

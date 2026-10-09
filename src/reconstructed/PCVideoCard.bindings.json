@@ -41,7 +41,7 @@
   "?ProbePartialTextureUploads@UnknownDisplay@@QAEXPAVRenderTarget@@@Z": "0x004cab00",
   "?TestPartialTextureUpload@@YAHPAVPCRenderTarget@@PAUUnknownRect@@PAVPCTextureMap@@22PAUUnknownDisplay@@H@Z": "0x004caf70",
   "?MeanTextureChannelDifference@@YAMPAVTextureMap@@0@Z": "0x004cb330",
-  "?SetGDISurfaceVisible@UnknownDisplay@@QAEXH@Z": "0x004cb5b0",
+  "?SetGDISurfaceVisible@UnknownDisplay@@QAEHH@Z": "0x004cb5b0",
   "?UnknownFunction4e8cc0@RenderTarget@@QAEXXZ": "0x004e8cc0",
   "?UnknownFunction511970@@YAHH@Z": "0x00511970",
   "?UnknownFunction5119c0@@YAXHPAX@Z": "0x005119c0",

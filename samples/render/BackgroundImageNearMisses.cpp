@@ -1,10 +1,6 @@
 // Near-miss BackgroundImage.cpp candidates, kept out of src/reconstructed
 // until they match. See docs/BACKGROUNDIMAGE.md.
 //
-// Constructor 0x00403d50 (77 bytes): the stores match, but retail emits the
-// vptr store between the -1 stores and the 1 stores. With body assignments
-// VC6 here stores it first; with member initializers it stores it last.
-//
 // Slot 13 0x00403dc0 (246 bytes): retail loads the camera's viewport
 // height into ebx before reading the display mode; VC6 here loads the mode
 // first (an inverted condition and a nested test give the same code).
@@ -31,24 +27,6 @@ extern CameraRect g_UnknownGlobal577808;
 // 0x005777a0 / 0x005777a8: 0x004049d0's region index and clipped rectangle.
 int g_UnknownGlobal5777a0;
 CameraRect g_UnknownGlobal5777a8;
-
-// 0x00403d50
-BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
-    copyValid = 0;
-    field_0x2c = 0;
-    regionTable = 0;
-    regionCapacity = 0;
-    regionCount = 0;
-    fullRestoreFrames = 0;
-    heldDcSurface = 0;
-    heldDc = 0;
-    field_0x5c = 0;
-    imageRegion = -1;
-    field_0x64 = -1;
-    field_0x30 = 1;
-    field_0x60 = 1;
-    field_0x68 = 1;
-}
 
 // 0x00403dc0: while the camera covers the whole screen the background is
 // restored from the off-screen copy region by region; otherwise (or while

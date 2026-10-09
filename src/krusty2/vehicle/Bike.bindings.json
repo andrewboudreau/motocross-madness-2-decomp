@@ -90,6 +90,7 @@
   "?BikeVec3Dot@@YAMABUVec3@@0@Z": "0x0040ae30",
   "?BikeVec3Scale@@YA?AUVec3@@ABU1@M@Z": "0x005015b0",
   "?BikeVec3Sub@@YA?AUVec3@@ABU1@0@Z": "0x00421d00",
+  "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?FindByName@BikeA1A0@@QAEHPBD@Z": "0x004fdae0",
   "?FindByName@SoultreeObject@@QAEPAV1@PBD@Z": "0x004fdae0",

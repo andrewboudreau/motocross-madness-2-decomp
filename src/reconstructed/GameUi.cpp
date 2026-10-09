@@ -683,6 +683,111 @@ UIScrollCtl::UIScrollCtl(int type, int id, CameraRect* area, UIDialog* owner)
 UIScrollCtl::~UIScrollCtl() {
 }
 
+// 0x00474880: a click scrolls the arrow's lists by a row, then repeats on a timer.
+int UIScrollCtl::UnknownVirtualSlot55(int a, int b) {
+    if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a) {
+        UnknownDialogEvent event;
+        event.handled = 0;
+        GameObjectIterator* iterator;
+        UIControl* control;
+        if (controlType == 9) {
+            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+                if (control->controlType == 3) {
+                    ((UIListBox*)control)->lastClickTime = 0;
+                    ((UIListBox*)control)->ScrollBy(-1);
+                }
+                if (control->controlType == 6) {
+                    ((UIDropDownList*)control)->listPart->lastClickTime = 0;
+                    ((UIDropDownList*)control)->listPart->ScrollBy(-1);
+                }
+            }
+            UnknownFunction472730(iterator);
+            event.code = eventCode;
+            event.kind = 0xe;
+            event.controlName = controlName;
+            event.dialog = ownerDialog;
+            event.control = this;
+            event.gui = ownerDialog->guiManager;
+            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->AddTimer(0x101, 0xfa, (int)this);
+        } else {
+            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+                if (control->controlType == 3) {
+                    ((UIListBox*)control)->lastClickTime = 0;
+                    ((UIListBox*)control)->ScrollBy(1);
+                }
+                if (control->controlType == 6) {
+                    ((UIDropDownList*)control)->listPart->lastClickTime = 0;
+                    ((UIDropDownList*)control)->listPart->ScrollBy(1);
+                }
+            }
+            UnknownFunction472730(iterator);
+            event.code = eventCode;
+            event.kind = 0xe;
+            event.controlName = controlName;
+            event.dialog = ownerDialog;
+            event.control = this;
+            event.gui = ownerDialog->guiManager;
+            ownerDialog->UnknownVirtualSlot29(&event);
+            ownerDialog->AddTimer(0x101, 0xfa, (int)this);
+        }
+    }
+    return UIControl::UnknownVirtualSlot55(a, b);
+}
+
+// 0x004749f0: the scroll timer (0x101 starts the repeat timer 0x102, which
+// scrolls the list boxes by one row). Each case has its own copy of the event
+// tail; VC6 cross-jumps case 9's copy into case 10's.
+void UIScrollCtl::UnknownVirtualSlot60(int value) {
+    UITimer* timer = (UITimer*)value;
+    UnknownDialogEvent event;
+    event.handled = 0;
+    GameObjectIterator* iterator;
+    UIControl* control;
+    switch (timer->timerId) {
+    case 0x101:
+        ownerDialog->RemoveTimer(timer);
+        ownerDialog->AddTimer(0x102, 100, (int)this);
+        break;
+    case 0x102:
+        switch (controlType) {
+        case 9:
+            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+                if (control->controlType == 3)
+                    ((UIListBox*)control)->ScrollBy(-1);
+            }
+            UnknownFunction472730(iterator);
+            event.kind = 0xe;
+            event.code = eventCode;
+            event.controlName = GetName();
+            event.dialog = ownerDialog;
+            event.gui = ownerGui;
+            event.control = this;
+            ownerDialog->UnknownVirtualSlot29(&event);
+            break;
+        case 10:
+            iterator = (GameObjectIterator*)UnknownVirtualSlot53();
+            for (control = UnknownFunction472750(iterator); control; control = UnknownFunction472750(iterator)) {
+                if (control->controlType == 3)
+                    ((UIListBox*)control)->ScrollBy(1);
+            }
+            UnknownFunction472730(iterator);
+            event.kind = 0xe;
+            event.code = eventCode;
+            event.controlName = GetName();
+            event.dialog = ownerDialog;
+            event.gui = ownerGui;
+            event.control = this;
+            ownerDialog->UnknownVirtualSlot29(&event);
+            break;
+        }
+        break;
+    }
+}
+
 // 0x00474b10
 int UIScrollCtl::UnknownVirtualSlot56(int a, int* position) {
     if (ownerDialog->guiUser->field_0x1d8 == (UnknownGuiControl*)this && !a && currentState == 2) {
@@ -4399,6 +4504,79 @@ int UIListBox::UnknownVirtualSlot40() {
 
 failed:
     return 0;
+}
+
+// 0x00479710: dragging the thumb; holding it still repeats kind 0x11.
+void UIDDLScrollBar::UnknownVirtualSlot57(int a, int* position) {
+    UIControl::UnknownVirtualSlot57(a, position);
+    UnknownDialogEvent event;
+    event.handled = 0;
+    if (!a && position) {
+        int width = UnknownVirtualSlot61();
+        int height = UnknownVirtualSlot62();
+        UnknownVirtualSlot50();
+        if (controlType == 8) {
+            if (field_0x1f0)
+                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
+                                                       UnknownMaxInt(position[0] - field_0x2c[0], 0));
+            else
+                field_0x1ec_float = (float)UnknownMinInt(width - thumbWidth,
+                                                       UnknownMaxInt(position[0] - field_0x2c[0] - thumbWidth / 2, 0));
+        } else {
+            if (field_0x1f0 != 0.0f)
+                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
+                                                       UnknownMaxInt(position[1] - field_0x2c[1], 0));
+            else
+                field_0x1ec_float = (float)UnknownMinInt(height - thumbHeight,
+                                                       UnknownMaxInt(position[1] - field_0x2c[1] - thumbHeight / 2, 0));
+        }
+        if (field_0x1f0)
+            UnknownFunction4753c0(UnknownFunction475300(field_0x1f0), field_0x1f0);
+        if (!field_0x208) {
+            event.kind = 0xf;
+            event.code = eventCode;
+            event.controlName = ownerList->GetName();
+            event.dialog = ownerDialog;
+            event.gui = ownerGui;
+            event.control = this;
+            ownerDialog->UnknownVirtualSlot29(&event);
+            field_0x208 = 1;
+        }
+        if (!event.handled) {
+            if (position[0] == dragX && position[1] == dragY) {
+                field_0x218_float += ownerDialog->lastFrameTime;
+                if (field_0x218_float < field_0x214)
+                    goto scroll;
+                event.kind = 0x11;
+                event.code = eventCode;
+                event.controlName = ownerList->GetName();
+                event.dialog = ownerDialog;
+                event.gui = ownerGui;
+                event.control = this;
+                ownerDialog->UnknownVirtualSlot29(&event);
+            } else {
+                event.kind = 3;
+                event.code = eventCode;
+                event.controlName = ownerList->GetName();
+                event.dialog = ownerDialog;
+                event.gui = ownerGui;
+                event.control = this;
+                ownerDialog->UnknownVirtualSlot29(&event);
+                dragX = position[0];
+                dragY = position[1];
+                field_0x218_float = 0.0f;
+            }
+            if (!event.handled) {
+            scroll:
+                UIListBox* list = ownerList->listPart;
+                if (list != 0) {
+                    int count = list->rowCount;
+                    int page = list->lastPageRowCount;
+                    list->ScrollToRow(UnknownFunction475300(count - page), 0);
+                }
+            }
+        }
+    }
 }
 
 // 0x00479a00: a click on the bar moves the thumb (slider) or pages the list.

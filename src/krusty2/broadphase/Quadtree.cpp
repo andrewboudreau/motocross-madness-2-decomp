@@ -582,10 +582,10 @@ QuadTreeObject* QuadTree::NextObjectSorted()
     g_pQuadTree = this;
     if (sortedCount != 0)
         return 0;
-    QuadTreeResultLink* cell = queryCursor;
-    if (!cell)
-        return 0;
-    do {
+    while (1) {
+        QuadTreeResultLink* cell = queryCursor;
+        if (!cell)
+            return 0;
         if (!itemCursor) {
             itemCursor = cell->item->itemList;
             if (itemCursor) {
@@ -604,27 +604,30 @@ QuadTreeObject* QuadTree::NextObjectSorted()
                     itemSlotIndex = 0;
                     itemCursor = itemCursor->next;
                 } while (itemCursor);
-                int n = sortedCount;
-                if (n < 0 || n > 1) {
-                    if (n == 2) {
-                        if ((unsigned short)sortedStack[0]->sortKey >
-                            (unsigned short)sortedStack[1]->sortKey) {
-                            QuadTreeObject* t = sortedStack[0];
-                            sortedStack[0] = sortedStack[1];
-                            sortedStack[1] = t;
-                        }
-                    } else {
-                        qsort(sortedStack, n, 4, CompareObjectKey);
+                switch (sortedCount) {
+                case 0:
+                case 1:
+                    break;
+                case 2:
+                    if ((unsigned short)sortedStack[0]->sortKey >
+                        (unsigned short)sortedStack[1]->sortKey) {
+                        QuadTreeObject* t = sortedStack[0];
+                        sortedStack[0] = sortedStack[1];
+                        sortedStack[1] = t;
                     }
+                    break;
+                default:
+                    qsort(sortedStack, sortedCount, 4, CompareObjectKey);
+                    break;
                 }
             }
         }
-        cell = queryCursor->next;
-        queryCursor = cell;
+        queryCursor = queryCursor->next;
         if (sortedCount)
             return sortedStack[--sortedCount];
-    } while (cell);
-    return 0;
+        if (!queryCursor)
+            return 0;
+    }
 }
 
 void QuadTree::RestartQuery()

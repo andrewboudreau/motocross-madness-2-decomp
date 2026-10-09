@@ -16,7 +16,7 @@
     "target_va": "0x00405db0",
     "target_size": 724,
     "expect": "partial",
-    "notes": "98.9% (724/724). Only diff: retail loads n.x first in the 2nd/3rd cross-product terms (fld [n]; fmul [out+x]) while VC6 loads out first. Tried: pointer/reference/direct member forms and operand swaps; direct member expression flips ALL three terms to n-first (and loses the add eax,0x230 CSE), so retail's shape is neither.",
+    "notes": "98.9% (724/724). Only diff: retail loads n.x first in the 2nd/3rd cross-product terms (fld [n]; fmul [out+x]) while VC6 loads out first. Tried: pointer/reference/direct member forms and operand swaps; direct member expression flips ALL three terms to n-first (and loses the add eax,0x230 CSE), so retail's shape is neither. Also tried: a const Vec3* for n, the cross product passed straight to BikeNormalized, CrossProduct(frontWheel->w_0x230, *out) through a wheel local (no change).",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -315,8 +315,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot54@Bike",
     "target_va": "0x0040c8b0",
     "target_size": 354,
-    "expect": "partial",
-    "notes": "98.5%. Wheel-normal selector: nesting wheelsInContact==0, then front inContact, then rear inContact gives retail's control flow. Remaining diff is the normalise tail: retail scales some components with fld [mem]; fmul st(1), VC6 emits fld st(0); fmul [mem] (same cause as slots 55, 72 and 76).",
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml. Wheel-normal selector: nesting wheelsInContact==0, then front inContact, then rear inContact gives retail's control flow; the normalised midpoint is BikeNormalized((front + rear) * 0.5f): the operator temporary makes every scaling load the component first (a named Vec3 built from components keeps x scalar-first).",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -415,8 +415,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot55@Bike",
     "target_va": "0x0040ce60",
     "target_size": 244,
-    "expect": "partial",
-    "notes": "81.1% (240 vs 244). Same scalar-kept-live normalise tail as slot 76 (retail ends with fstp st(0)); ours consumes the scalar on the last multiply (4 bytes shorter).",
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml. Direction rear->front wheel normalised through BikeNormalized(front - rear); the operator temporary gives retail's component-first scaling and frame (a memberwise local Vec3 d gave 197/240).",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -1045,8 +1045,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot18@Vehicle",
     "target_va": "0x529dc0",
     "target_size": 529,
-    "expect": "partial",
-    "notes": "7.9% (482/529). Impact post over 3 passes (aux wheels, wheels, contacts). First divergence +0x0f: retail places the found-action block right after each loop (loop back-edge is cmp/jge exit/jmp top); we place it after all loops (jl top). Retail also holds constant 1 in edi across the sink call. Shared commit tail is reproduced via goto commit.",
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml. Impact post over 3 passes (aux wheels, wheels, contacts), each a guarded do-while (int i = 0; if (n > 0) do { ... } while (++i < n)) whose found branch posts and returns: that gives retail's unrotated back edge (jge exit; jmp top) with the action block after it. The weight clamp is passed as (v > 1.0f) ? v : 1.0f directly.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -1055,8 +1055,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot19@Vehicle",
     "target_va": "0x529fe0",
     "target_size": 679,
-    "expect": "partial",
-    "notes": "8.4% (681/679). Scrape impact with clamped vector into sink+0x74. First divergence +0x0: frame 0xc (retail) vs 0x10 and register roles (retail ebp=this, esi=wheel list; we edi=this); retail hoists loop pointers and shares the tail.",
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml. Same guarded do-while scans as slot 18. The sign factor is turnAngle >= 0 ? -1 : 1 (retail loads 1.0 when turnAngle < 0), the scale is one Vec3 *= and the clamps go through a by-value min helper (VehMinF), which keeps each component on the x87 stack across its compare.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -1065,8 +1065,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot20@Vehicle",
     "target_va": "0x52a290",
     "target_size": 614,
-    "expect": "partial",
-    "notes": "4.5% (602/614). Slot 19 without material gate, sink at event+0xc, flag 0x168. First divergence +0x3: retail counts up in eax with 'cmp eax,ecx' and compares wheel fields via loaded regs; we cache zero in ebx (cmp mem,ebx).",
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml. Slot 19's body without the material gate; here the scans are plain for loops with the post-and-return inside (retail's loops are rotated, unlike slots 18/19).",
     "bindings": "Vehicle.bindings.json"
   },
   {

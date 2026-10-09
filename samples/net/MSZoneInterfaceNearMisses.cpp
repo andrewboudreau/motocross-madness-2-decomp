@@ -9,7 +9,11 @@
 // (`jbe` to the copy), and puts the memcpy/log block after it; VC6 SP3 sinks
 // the failure block to the end of the function for this source and for the
 // nested-if, if/else and `||`-combined variants tried (293/384 and 297/393
-// bytes; the `||` form also loses the threaded second type test).
+// bytes; the `||` form also loses the threaded second type test). The
+// success free (line 114) precedes the failure free (line 118) in the
+// source; `if (result >= 0) { ... return 1; } failed: ...`, a trailing
+// `failed:` label, `do { ... break; } while (0)` and `while (1)` forms all
+// keep VC6's layout.
 // Check: compile this file and compare ?UnknownFunction4aa360@... and
 // ?UnknownFunction4aa4e0@... with src/reconstructed/MSZoneInterface.bindings.json.
 

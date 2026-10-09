@@ -646,3 +646,30 @@ int TestPartialTextureUpload(PCRenderTarget* target, UnknownRect* area, PCTextur
         return 0;
     return 1;
 }
+
+// 0x004cb5b0: with `enable`, flips until the GDI surface is the primary (at
+// most back buffers + 1 times), then sets +0x6c; 0 when a flip, the GDI
+// surface query or the flip budget fails.
+int UnknownDisplay::SetGDISurfaceVisible(int enable) {
+    if (enable) {
+        UnknownSurfaceInterface* gdi = 0;
+        directDraw->GetGDISurface(&gdi);
+        int i = 0;
+        if (primarySurface != gdi) do {
+            if (gdi)
+                gdi->Release();
+            gdi = 0;
+            if (primarySurface->Flip(0, 1))
+                return 0;
+            if (directDraw->GetGDISurface(&gdi))
+                return 0;
+            g_TrackGame->renderTarget->UnknownFunction4e8cc0();
+            if (++i > frameBufferCount)
+                return 0;
+        } while (primarySurface != gdi);
+        if (gdi)
+            gdi->Release();
+    }
+    freezeFrameIndex = enable;
+    return 1;
+}

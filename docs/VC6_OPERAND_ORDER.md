@@ -267,3 +267,56 @@ python3 tools/decl_shift_scan.py samples/render/MatrixUtilNearMisses.cpp \
   needs no EH frame, so such a function only gets retail's frameless prologue when
   compiled inside its own unit.
 
+
+## Source shapes measured on the physics class (c) near misses
+
+- A vector normalised or scaled through an inline helper loads every component first
+  (`fld v.x; fmul st(1)`) only when the argument is an operator temporary
+  (`Normalized(a - b)`, `Normalized((a + b) * 0.5f)`); a named local built component by
+  component (`Vec3 d; d.x = a.x - b.x; ...` or `Vec3 m(s.x * 0.5f, ...)`) keeps `x`
+  scalar-first (`fld st(0); fmul [x]`). Bike slots 54/55.
+- A switch whose cases each assign their own source (`dst = a; break;` per case) is
+  tail-merged into one copy with the source in a scratch register; selecting a source
+  pointer in the cases and copying once after the switch gives a different register plan
+  and late callee-saved pushes. Tire `0x512e80`.
+- A value read into a local before an if/else stays in its own register; the same member
+  expression written inside both branches is CSEd into a register freed by the branch
+  test. D3DIMSoultreeCharacter slot 4.
+- `switch (n) { case 0: case 1: break; case 2: ...; default: ... }` lets VC6 send `n < 0`
+  straight to the default block; the equivalent `if (n < 0 || n > 1) { if (n == 2) ...`
+  re-tests `n == 2`. QuadTree `0x4dd600`.
+- `while (1) { p = member; if (!p) return 0; ... member = member->next; ...;
+  if (!member) return 0; }` gives retail's bottom `je exit; jmp top` whose target reloads
+  the member; a guarded do-while on a local cursor jumps past the reload. QuadTree
+  `0x4dd600`.
+- A scan written as a guarded do-while with the found action inside (`if (cond) { ...;
+  return; }`) places the action after the unrotated back edge; the same scan as a `for`
+  loop with the action inside gives the rotated `jl top` form. Retail uses both in
+  neighbouring functions (Vehicle slots 18/19 versus 20).
+- A clamp through a by-value inline helper (`min(v.x, 15.0f)`) keeps the value on the x87
+  stack across the compare (`fld; fcom; jne; fstp st(0); fld c`); the in-place forms
+  `if (!(v.x < c)) v.x = c` and `v.x = v.x < c ? v.x : c` reload or spill it. Vehicle
+  slot 19.
+- Identical tails written out in each branch (`case 9: ...; tail; break; case 10: ...;
+  tail; break;`) are cross-jumped: the fall-through branch keeps its copy and its own
+  epilogue, the other branch jumps into it. A shared `goto` label or a tail after the
+  switch places one copy after both branches instead. UIScrollCtl slots 55/60
+  (`0x474880`, `0x4749f0`).
+- Retail's three separate `EnableImeInput` call sites (one per value) come from
+  `if (a && !strcmp(a, s)) f(0); else f(1);`; passing the condition as one argument
+  computes it into a register first. GUIUser `0x487870`.
+- Two `if (Blt(...)) goto failed;` branches with one `failed: return 0;` keep both tests
+  as branches; `if (x) return 0;` followed by `return 1` becomes `neg/sbb/inc`, and two
+  identical branch bodies are merged. GameCursor slot 15 `0x43ed40`.
+- `if (w >= limit) w = limit;` with `int limit = p->w - 2;` emits `sub reg, 2`; the
+  repeated expression `p->w - 2` is CSEd as `add reg, -2`.
+- `int count = list->rowCount; int page = list->lastPageRowCount; f(g(count - page))`
+  loads the subtrahend into ecx where `int rows = a - b;` (or the inline expression) puts
+  it into a callee-saved register. UIDDLScrollBar slot 57 `0x479710`.
+- Identical bodies written as separate cases (`case 3: body; break; case 6: body;
+  break;`) are merged into one block, but the merge happens after register assignment,
+  so later cases keep the alternation of the unmerged form; `case 3: case 6:` shifts it.
+  SoultreeMaterial::ApplyRenderStates `0x4ff180`.
+- The register that caches a repeated constant follows the constant's first use in the
+  source: `field_0x30 = 1;` written first keeps 1 in ecx and places the vptr store
+  between the -1 and 1 stores. BackgroundImage constructor `0x403d50`.

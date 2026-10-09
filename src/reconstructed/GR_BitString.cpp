@@ -10,7 +10,7 @@
 // Not reconstructed: the reader 0x00423ef0 (Lzw.cpp's caller binds it). It
 // has an ebp frame, a `bswap` and the `mov [ebp-4], esi` / `mov eax,
 // [ebp-4]` return of a VC6 __asm body, so it is assumed to be inline
-// assembly. The shifts 0x004238c0, 0x004239c0 and 0x00423b70 are near misses
+// assembly. The shifts 0x004239c0 and 0x00423b70 are near misses
 // in samples/render/GR_BitStringNearMisses.cpp.
 
 #include "GR_BitString.h"
@@ -84,6 +84,40 @@ unsigned int* g_UnknownLowMaskTable568224 = g_UnknownLowMasks5681a0;
 unsigned int g_UnknownReadWord578e90;
 int g_UnknownReadBits578e94;
 unsigned int* g_UnknownReadCursor578e98;
+
+// 0x004238c0
+void GR_BitString::UnknownFunction4238c0(int count) {
+    int remaining;
+    int shiftWords;
+    int words;
+    unsigned int* dst;
+    unsigned int* src;
+
+    if (count >= 32) {
+        words = (field_0x04 + 31) / 32;
+        shiftWords = count / 32;
+        count -= shiftWords * 32;
+        remaining = words - shiftWords;
+        if (remaining > 0) {
+            dst = (unsigned int*)field_0x08;
+            src = dst + shiftWords;
+            do {
+                *dst++ = *src++;
+            } while (--remaining);
+            do {
+                *dst++ = field_0x18;
+            } while (--shiftWords);
+        } else {
+            dst = (unsigned int*)field_0x08;
+            remaining = words;
+            do {
+                *dst++ = field_0x18;
+            } while (--remaining);
+        }
+    }
+    if (count > 0)
+        UnknownFunction4239c0(count);
+}
 
 // 0x00423940
 void GR_BitString::UnknownFunction423940(int count) {

@@ -134,8 +134,8 @@
     "candidate_symbol_contains": "CharacterVirtualSlot4@D3DIMSoultreeCharacter",
     "target_va": "0x00446210",
     "target_size": 235,
-    "expect": "partial",
-    "notes": "98.63%: retail puts the 0x3c flag in ecx where ours uses eax (one register difference); separate nodeNames[idx] reads",
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml: the field_0x3c enable is read in each branch (VC6 CSEs it and loads it into the dead hasPose register ecx); an axesEnabled local read before the branch gave 232/235 (eax).",
     "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {

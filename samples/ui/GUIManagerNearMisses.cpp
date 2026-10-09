@@ -12,15 +12,19 @@
 //   (frame 0xb0 against 0xa4) and allocates registers differently around
 //   the row copy and the 8-bit dim loop.
 // 0x00486b10 (106 bytes): retail stores the centred x before loading the
-//   control's bottom and passes the text in eax; VC6 here hoists the load.
+//   control's bottom and passes the text in eax; VC6 here hoists the load
+//   (also with a POINT, a centre helper, a `left` local, a pointer to the
+//   array or a ShowText call in each branch).
 // 0x00486b80 (553 bytes, ratio 0.97): retail computes the width limit as
 //   `sub eax, 2` (VC6 here: `add eax, -2`) and spills width/height into the
-//   SIZE slots later.
-// 0x00487870 (283 bytes): same flow; retail caches `result` in edi and
-//   spills it around the inline strcmp; VC6 here keeps it on the stack.
+//   SIZE slots later. VC6 emits `sub` only for a named `limit` local (the
+//   repeated `field_0x0c - 2` is CSE'd as `add -2`), but that form moves the
+//   textArea stores (218/554); updating `size.cx`/`size.cy` in place gives
+//   retail's tail (457/555) and loses the head.
 // 0x00488120 (49 bytes): retail keeps the `device ? owner : 0` branch
 //   (jmp + xor) that VC6 here threads into the owner test (also with an
-//   inline helper, an if/else assignment or early-return layouts).
+//   inline helper, an if/else assignment, early-return layouts, `owner == 0`
+//   first, a result variable, a switch and an assignment in the condition).
 
 #include "../../src/reconstructed/GUIManager.cpp"
 
@@ -237,32 +241,6 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
     }
     shown = 0;
     showDelay = -1.0f;
-}
-
-// 0x00487870
-int GUIUser::UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl** previous) {
-    int result = 1;
-
-    if (control && control != field_0x1d8)
-        result = control->UnknownVirtualSlot31();
-    if (result) {
-        if (field_0x1d8 && !field_0x1d8->field_0x25_bit3 && field_0x1d8 != control)
-            field_0x1d8->UnknownVirtualSlot32(control);
-        if (focusControl && !focusControl->field_0x25_bit3 && focusControl != control)
-            focusControl->UnknownVirtualSlot33(control);
-        if (previous)
-            *previous = focusControl;
-        field_0x1d8 = control;
-        focusControl = control;
-        if (g_TrackGame->display->freezeFrameIndex) {
-            if (control->controlType == 11) {
-                EnableImeInput(!control->acceptedCharacters || strcmp(control->acceptedCharacters, "0123456789") != 0);
-            } else {
-                EnableImeInput(0);
-            }
-        }
-    }
-    return result;
 }
 
 // 0x00488120

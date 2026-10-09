@@ -10,6 +10,7 @@
   "??_7QuadTreeNode@@6B@": "0x00557648",
   "?Alloc@BlockAllocator@@QAEPAXXZ": "0x00423fc0",
   "?CollectItems@QuadTree@@QAEXPAUQuadTreeItemLink@@@Z": "0x004ddd20",
+  "?CompareObjectKey@@YAHPBX0@Z": "0x004dd5d0",
   "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60",
   "?DebugRealloc@@YAPAXPAXIPBDH@Z": "0x004a2ec0",
   "?Free@BlockAllocator@@QAEXPAX@Z": "0x00424050",
@@ -25,5 +26,6 @@
   "__real@4@00000000000000000000": "0x00550484",
   "__real@4@3ffe8000000000000000": "0x005507f4",
   "__real@4@3fff8000000000000000": "0x00550748",
-  "__real@4@400e8000000000000000": "0x00555f4c"
+  "__real@4@400e8000000000000000": "0x00555f4c",
+  "_qsort": "0x00534426"
 }

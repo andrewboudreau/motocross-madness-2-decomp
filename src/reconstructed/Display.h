@@ -54,7 +54,7 @@ struct UnknownDisplay : public VideoCard {
     int CreateSystemRenderSurface(int backBuffers);     // 0x004ca130
     int CreateModeSurfaces(int windowed);               // 0x004ca520
     void ProbePartialTextureUploads(RenderTarget* target); // 0x004cab00: blit timing
-    void SetGDISurfaceVisible(int enable);              // 0x004cb5b0 (GUIManager.cpp 0x004868b0)
+    int SetGDISurfaceVisible(int enable);               // 0x004cb5b0 (GUIManager.cpp 0x004868b0)
 
     UnknownDirectDrawInterface* directDraw;    // +0x190: IDirectDraw7 (DirectDrawCreateEx)
     UnknownDirect3DInterface* direct3D;        // +0x194: IDirect3D7 (QueryInterface)

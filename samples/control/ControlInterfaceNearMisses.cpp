@@ -5,7 +5,11 @@
 // table): the keyboard and mouse cases call the same slot, so their tails
 // merge. Retail keeps the keyboard case whole and has the mouse case jump
 // into it; VC6 here does the opposite. Case order, early-return and
-// result-variable forms do not change it.
+// result-variable forms do not change it. A keyboard pointer assigned in
+// cases 0 and 1 and tested and called after the switch shares the tail as
+// retail does, but VC6 lays the mouse assignment out before the shared block
+// (retail: after it, jumping back); case order, a ternary or if/else
+// selection and per-case pointer locals do not move it.
 //
 // UnknownReportError (0x004bf6a0, 978 bytes with jump tables): the switch
 // cases (values traced from retail's decision tree, in retail body order)

@@ -36,7 +36,7 @@
     "target_va": "0x00513490",
     "target_size": 201,
     "expect": "partial",
-    "notes": "98.87% at exact size 201: zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap"
+    "notes": "98.87% at exact size 201: zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap Also tried: permuted zero.x/y/z store order (worse, 196-197) and member-wise copies into pts[i].origin (frame changes)."
   },
   {
     "class": "Tire",
@@ -53,8 +53,8 @@
     "candidate_symbol_contains": "HandleContact@Tire",
     "target_va": "0x00512e80",
     "target_size": 137,
-    "expect": "partial",
-    "notes": "14% : same switch cases and vec copy, but retail keeps 0x65 and default as separate returns with the vector pointer in edx and esi saved for the whole function; VC6 orders the case tests and saves esi differently"
+    "expect": "exact",
+    "notes": "Byte-exact under vc6_o2_ml: each case assigns its own source vector to contactObjectVelocity (VC6 tail-merges the three copies, keeps the source in edx and saves esi at entry); selecting a source pointer in the switch and copying once after it gave 19/134."
   },
   {
     "class": "Tire",

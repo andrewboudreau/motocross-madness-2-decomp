@@ -170,7 +170,7 @@
     "target_va": "0x4b5a60",
     "target_size": 657,
     "expect": "partial",
-    "notes": "partial 97.1%: provisional semantics; sqrt(a.x*a.x+a.z*a.z) order fixed. Remaining: fmul operand order in the b rotation sums (source term order has no effect) and one extra live FPU stack value before the pitch sqrt."
+    "notes": "partial 97.1%: provisional semantics; sqrt(a.x*a.x+a.z*a.z) order fixed. Remaining: fmul operand order in the b rotation sums (source term order has no effect) and one extra live FPU stack value before the pitch sqrt. Retail loads c and s before b.x/b.z in the b rotation (b's components older); scalar float parameters instead of the two Vec3s, POD/const parameter types and inline rotation helpers (by value or reference, any parameter order) do not change it."
   },
   {
     "class": "Math",

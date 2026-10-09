@@ -20,7 +20,7 @@ copies the regions back from the copy (BltFast) and clears their depth
 the screen. The camera's viewport fields are protected in Camera.h, so the
 file reads them through `UnknownBackgroundCamera`.
 
-Exact (16 calibration cases): the destructor and its deleting wrapper,
+Exact (17 calibration cases): the constructor, the destructor and its deleting wrapper,
 slots 8, 15 and 18, `0x004040b0` (set image), `0x00404200` (release a
 region), `0x00404240` (record a region rectangle, clipped with `?:`),
 `0x004042e0` (restore the regions), `0x00404480` (draw an image into a
@@ -44,8 +44,14 @@ region loop is a guarded do-while (`int i = 0; if (regionCapacity > 0) do
 ... while (i < regionCapacity)`), which VC6 leaves unrotated and exits with
 retail's `jge; jmp top`.
 
+The constructor's vptr store sits between the -1 and the 1 stores because
+VC6 keeps the constant 1 in ecx from the start: `field_0x30 = 1` is the
+first body statement, before the zeros, the two -1 stores and the other
+two 1 stores. With the 1 stores last VC6 materialises 1 in eax after the
+-1 stores and stores the vptr first.
+
 Near misses (`samples/render/BackgroundImageNearMisses.cpp`, notes there):
-the constructor (vptr store placement), slot 13 and the DC lookup
+slot 13 and the DC lookup
 `0x004049d0` (retail stores its leading zeros as immediates; VC6 here
 caches 0 in edi).
 

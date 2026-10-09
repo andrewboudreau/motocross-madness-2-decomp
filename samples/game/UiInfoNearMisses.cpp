@@ -7,7 +7,10 @@
 // final +0x98/+0x94 stores), computes &field_0x27f8 before the first
 // stores and places the second 0x1ec-byte copy after the +0x196c store; VC6
 // here picks eax for 1 and schedules the copies and the memset differently.
-// Store-order permutations, struct-assignment copies and memset forms tried.
+// Store-order permutations, struct-assignment copies and memset forms tried
+// (all 120 orders of the five leading +0x27f8 stores: storing field_0x00
+// first gives retail's ecx/eax/edx constants but not its schedule; best
+// 371/427).
 //
 // TrackGameMode::UnknownFunction5238f0 (0x005238f0, 353 bytes): 189 of 379.
 // Retail shares one `return 0` epilogue and keeps fopen's result in eax until

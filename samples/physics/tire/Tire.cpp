@@ -125,17 +125,18 @@ struct TireContactOwner {
 // tag of the other object (tier 3 semantics; the owner offsets 0x40/0x64/0x224 are literal).
 void Tire::HandleContact(int a, int tag, CollisionObject* other)
 {
-    const CollisionVec3* src;
+    // Each case copies its own vector (VC6 merges the three copies into one tail and keeps
+    // the source in edx); selecting a source pointer first gives a different register plan.
     switch (tag) {
     case 0x64:
     case 0x68:
-        src = &((TireContactOwner*)other->ownerObject)->field_0x64;
+        contactObjectVelocity = ((TireContactOwner*)other->ownerObject)->field_0x64;
         break;
     case 0x2711:
-        src = &((TireContactOwner*)other->ownerObject)->field_0x224;
+        contactObjectVelocity = ((TireContactOwner*)other->ownerObject)->field_0x224;
         break;
     case 0x69:
-        src = &((TireContactOwner*)other->ownerObject)->field_0x40;
+        contactObjectVelocity = ((TireContactOwner*)other->ownerObject)->field_0x40;
         break;
     case 0x65:
         hasContactObjectVelocity = 0;
@@ -144,7 +145,6 @@ void Tire::HandleContact(int a, int tag, CollisionObject* other)
         hasContactObjectVelocity = 0;
         return;
     }
-    contactObjectVelocity = *src;
     hasContactObjectVelocity = 1;
 }
 

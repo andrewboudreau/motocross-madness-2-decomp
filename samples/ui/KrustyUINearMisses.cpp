@@ -14,7 +14,8 @@
 // racers' bikes and riders. 880 of 916 bytes: retail lays the class 1/2
 // test out as "<= 0.2: class 2 or probe; > 0.2: class 1 or probe" with the
 // second arm placed after the probe loop; every if/else, goto and ternary
-// form tried here keeps both arms before it.
+// form tried here keeps both arms before it, and a probe loop duplicated per
+// arm (macro) is not cross-jumped.
 //
 #include <stdio.h>
 #include <stdlib.h>

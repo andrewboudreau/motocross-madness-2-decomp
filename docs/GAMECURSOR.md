@@ -20,8 +20,10 @@ over a saved background region. It follows two control bindings
 GameCursor.h, and its GUICursor : GameCursor stays there; no mangled names
 changed. BackgroundImage.h declares `0x00404700`, which slot 15 calls.
 
-Exact: 7 calibration cases. These are the constructor, the destructor and
+Exact: 8 calibration cases. These are the constructor, the destructor and
 its deleting wrapper, the two init functions `0x0043ea70` and `0x0043eaf0`,
-the image load `0x0043ebd0` and the position `0x0043f100`. Near miss (`samples/ui/GameCursorNearMisses.cpp`):
-slot 15 `0x0043ed40`, where the final two Blt branches differ in register
-allocation and in which branch receives the inlined epilogue.
+the image load `0x0043ebd0`, slot 15 `0x0043ed40` and the position
+`0x0043f100`. Slot 15's two Blt branches share one `failed: return 0;`
+label (`goto failed`), and the image branch reads `field_0x34` into a local;
+with `return 0` in each branch VC6 merges the two calls or turns one test
+into `neg/sbb/inc`.

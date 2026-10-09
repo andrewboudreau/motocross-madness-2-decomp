@@ -86,7 +86,7 @@
     "target_va": "0x004b8f40",
     "target_size": 970,
     "expect": "partial",
-    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: writes particles straight into the manager table (inlined AddParticle-like code). Only the first component of each r-scaled vector differs (retail fld mem; fmul st(1), VC6 emits fld st(0); fmul mem)",
+    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: writes particles straight into the manager table (inlined AddParticle-like code). Only the first component of each r-scaled vector differs (retail fld mem; fmul st(1), VC6 emits fld st(0); fmul mem) Also unchanged: velStep * (n - i) / gravStep * (n - i) (member operator), d built as position - previousPosition, and by-value or v * s forms of the free operator*(float, ParticleVec3) in ParticleManager.h.",
     "bindings": "DirtChunkParticleEmitter.bindings.json"
   },
   {
@@ -126,7 +126,7 @@
     "target_va": "0x004b9460",
     "target_size": 970,
     "expect": "partial",
-    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: same shape as DirtChunk (initial age 375, frame wraps at 13); same residual first-component fld st(0) difference",
+    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: same shape as DirtChunk (initial age 375, frame wraps at 13); same residual first-component fld st(0) difference Also unchanged: velStep * (n - i) / gravStep * (n - i) (member operator), d built as position - previousPosition, and by-value or v * s forms of the free operator*(float, ParticleVec3) in ParticleManager.h.",
     "bindings": "DirtSprayParticleEmitter.bindings.json"
   },
   {
@@ -186,7 +186,7 @@
     "target_va": "0x004b99a0",
     "target_size": 1055,
     "expect": "partial",
-    "notes": "98.4% (1055 vs 1055 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: DirtChunk-like direct particle fill that switches itself off once the manager table is full or the burst ends; residual is the same first-component fld st(0) difference as DirtChunk/DirtSpray",
+    "notes": "98.4% (1055 vs 1055 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: DirtChunk-like direct particle fill that switches itself off once the manager table is full or the burst ends; residual is the same first-component fld st(0) difference as DirtChunk/DirtSpray Also unchanged: velStep * (n - i) / gravStep * (n - i) (member operator), d built as position - previousPosition, and by-value or v * s forms of the free operator*(float, ParticleVec3) in ParticleManager.h.",
     "bindings": "SparkParticleEmitter.bindings.json"
   },
   {

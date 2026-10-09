@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 201, c 157, total 358. The three class (a) functions of the
+Counts: a 0, b 198, c 143, total 341. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -64,7 +64,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | inputdevice/PCJoystickDevice | `0x004c3790` | 345/417 (masked) | b | 7 code diffs: `mov eax, [esi + 0x260] ; mov ecx, [A] ;~` vs `mov ecx, [esi + 0x260] ; mov edx, [A] ;~`; `mov ecx, [ecx + 0x14]` vs `mov ecx, [edx + 0x14]`; slots differ |
 | krusty2/broadphase/Quadtree | `0x004dcac0` | 20/562 (masked) | b | 37 code diffs: retail adds `sub esp, N`; `sub esp, 0x30` vs `mov [esp + N], ecx`; frame 0x0 vs 0x34, slot order differs |
 | krusty2/broadphase/Quadtree | `0x004dcf20` | 35/309 (masked) | b | 20 code diffs: `push esi ; mov esi, [esp + N] ; cmp esi~` vs `push ebp ; mov ebp, ecx ; mov ecx, [esp~`; `dec eax ; mov ebx, esi ; mov [ecx + 0x8~` vs `mov ebx, [ebp + N] ; dec ebx ; mov eax,~`; slot order differs |
-| krusty2/broadphase/Quadtree | `0x004dd600` | 316/318 (masked) | c | 2 code diffs |
 | krusty2/broadphase/Terrain | `0x00506e90` | 850/1502 (masked) | b | 44 code diffs: `je @308` vs `je @282 ; fld [esp + N] ; push ecx`; retail adds `mov ecx, [esp + N]`; slots differ |
 | krusty2/broadphase/Terrain | `0x00507c10` | 71/2731 (masked) | b | 128 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x114 vs 0x108, slot order differs |
 | krusty2/broadphase/Terrain | `0x005059d0` | 1593/2116 | c | TRN loader: same frame (0x440, every local in its retail slot), calls and EH states; register choice (retail keeps -1 in edi/ebx, the candidate keeps 3 and 0 in ebx), colour-key scheduling and the palette loop's pre-offset pointer stride differ |
@@ -106,8 +105,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/vehicle/Bike | `0x0040b600` | 58/949 (masked) | b | 36 code diffs: retail adds `push edi`; frame 0x3c vs 0x48 |
 | krusty2/vehicle/Bike | `0x0040ba30` | 55/973 (masked) | b | 64 code diffs: retail lacks `push edi`; frame 0x1c vs 0x18 |
 | krusty2/vehicle/Bike | `0x0040c000` | 135/802 (masked) | b | 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
-| krusty2/vehicle/Bike | `0x0040c8b0` | 329/334 (masked) | c | 1 code diffs: `fld st(0) ; fmul [esp + N]` vs `fld [esp + N] ; fmul st(1)` |
-| krusty2/vehicle/Bike | `0x0040ce60` | 185/228 (masked) | b | 6 code diffs: retail adds `fld [esp + N] ; fmul st(1)`; retail lacks `fld st(0) ; fmul [esp + N]`; slots differ |
 | krusty2/vehicle/Vehicle | `0x005257a0` | 579/637 (masked) | b | 5 code diffs: retail lacks `mov [esi + 0x4fc], ebx ; mov [esi + 0x5~`; retail adds `mov [edx + 8], ecx`; slots differ |
 | krusty2/vehicle/Vehicle | `0x005265d0` | 51/471 (masked) | b | 35 code diffs: retail lacks `fld [eax + 8]`; retail adds `mov ebx, [esp + N] ; mov ecx, [esp + N]`; slots differ |
 | krusty2/vehicle/Vehicle | `0x005268d0` | 248/1446 (masked) | b | 87 code diffs: retail adds `xor ebx, ebx`; retail lacks `xor ebp, ebp`; slot order differs |
@@ -118,9 +115,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/vehicle/Vehicle | `0x005281b0` | 40/479 (masked) | b | 37 code diffs: retail adds `mov esi, [esp + N]`; `mov edi, [esp + N] ; mov esi, ecx` vs `mov edi, ecx`; slots differ |
 | krusty2/vehicle/Vehicle | `0x005286a0` | 236/722 (masked) | b | 53 code diffs: retail lacks `push ebp`; retail adds `push edi`; frame 0x30 vs 0x3c |
 | krusty2/vehicle/Vehicle | `0x005293e0` | 88/100 (masked) | c | 2 code diffs: `mov ecx, [esi + 0x1e8] ; mov edx, [esi ~` vs `mov edx, [esi + 0x1e8]`; `push ecx` vs `push edx ; mov edx, [esi + 0x4dc]` |
-| krusty2/vehicle/Vehicle | `0x00529dc0` | 96/513 (masked) | c | 22 code diffs: `jl @10 ; jmp @34 ; mov edx, [esp + N]` vs `jge @58 ; jmp @10` |
-| krusty2/vehicle/Vehicle | `0x00529fe0` | 36/635 (masked) | b | 38 code diffs: retail adds `mov ebp, ecx`; retail lacks `mov esi, ecx`; frame 0x10 vs 0xc |
-| krusty2/vehicle/Vehicle | `0x0052a290` | 31/570 (masked) | b | 35 code diffs: retail adds `xor eax, eax`; retail adds `mov ebp, ecx`; frame 0x10 vs 0xc |
 | krusty2/vehicle/Vehicle | `0x0052a6a0` | 19/331 (masked) | b | 22 code diffs: `push ecx ; push ebx` vs `sub esp, 8`; retail lacks `fld [edi + 0xe0]`; frame 0x0 vs 0x8 |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 304/3018 (masked) | b | 120 code diffs: `test eax, eax ; mov [esp + N], eax ; jn~` vs `mov ebp, eax ; xor ebx, ebx ; cmp ebp, ~`; `push 0` vs `push ebx`; frame 0xdc vs 0x104, slot order differs |
 | krusty2/vehicle/Vehicle | `0x0052b6d0` | 28/63 | c | 4 code diffs: retail lacks `fld [A]`; retail adds `mov edx, [A]` |
@@ -182,7 +176,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/krustybike/KrustyBike | `0x00496da0` | 61/99 (masked) | c | 3 code diffs: retail adds `lea ecx, [eax + 0xc]`; `jne @27 ; mov edx, [eax + 0xc] ; lea ec~` vs `jne @28 ; mov eax, [ecx] ; call [eax + ~` |
 | physics/motion/D3DIMSoultreeMotnctrl | `0x00445680` | 244/616 (masked) | b | 34 code diffs: `mov esi, [esp + N] ; mov edi, eax ; tes~` vs `mov esi, eax ; test esi, esi ; jne @118`; retail adds `push edx`; frame 0x30c vs 0x308 |
 | physics/motion/D3DIMSoultreeMotnctrl | `0x00445fc0` | 330/331 | b | 1 code diffs: `mov ebp, [ecx + eax + 0x74]` vs `mov ebp, [eax + ecx + 0x74]`; slots differ |
-| physics/motion/D3DIMSoultreeMotnctrl | `0x00446210` | 232/235 | c | 3 code diffs: `mov eax, [eax + 0x3c]` vs `mov ecx, [eax + 0x3c]`; `test eax, eax` vs `test ecx, ecx` |
 | physics/motion/Motnctrl | `0x004a5e40` | 375/780 (masked) | b | 24 code diffs: `push edi` vs `push esi`; `xor ebx, ebx ; cmp eax, ebx ; mov [esp ~` vs `xor ebp, ebp ; cmp eax, ebp ; mov [esp ~`; slots differ |
 | physics/motion/Motnctrl | `0x004a70c0` | 159/3327 (masked) | b | 733 code diffs: retail calls `CharacterPose::CharacterPose` 2 then 4 times where the candidate calls it 3 then 2; retail calls `operator*`/`operator+` in the first extrapolation loop; frame 0x2dc vs 0x284; slots differ |
 | physics/motion/Motnctrl | `0x004a7dc0` | 456/503 (masked) | b | 4 code diffs: `fld [esi + 0x20]` vs `mov [esp + N], ecx`; retail lacks `mov [esp + N], ecx`; slots differ |
@@ -204,7 +197,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/suspension/Shock | `0x004f9f90` | 227/230 (masked) | b | 1 code diffs: `fld [A] ; fdiv st(1)` vs `fld st(0) ; fdivr [A]`; slots differ |
 | physics/suspension/Shock | `0x004fa400` | 458/674 (masked) | b | 20 code diffs: `je @160 ; mov eax, [A]` vs `je @162`; `jmp @180` vs `mov eax, [A] ; mov [esp + N], ecx ; mov~`; slots differ |
 | physics/suspension/Shock | `0x004fac60` | 764/812 (masked) | b | 17 code diffs: retail adds `fsubp st(1)`; retail lacks `fsubp st(1)`; slots differ |
-| physics/tire/Tire | `0x00512e80` | 19/137 | c | 13 code diffs: retail adds `push esi` |
 | physics/tire/Tire | `0x00513490` | 175/177 (masked) | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` |
 | physics/tire/Tire | `0x005135f0` | 248/1444 (masked) | b | 53 code diffs: retail adds `mov edx, [esp + N]`; retail lacks `fmul [esi + 0xe8] ; fld [esp + N] ; fmu~`; frame 0xc vs 0x18 |
 | physics/tire/Tire | `0x00513c70` | 96/805 | b | 24 code diffs: retail adds `push ebx`; retail adds `xor ebx, ebx`; slots differ |
@@ -233,7 +225,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/Wrecker | `0x005306e0` | 1817/4183 | b | slot 10: first 0x62c bytes exact; the inverse/product term order, an unread position copy and the second product's expansion (budget) |
 | race/Wrecker | `0x00531740` | 768/1617 | b | frame 0xc4 matches; slot order and `0.0f - scaled.z` operand order |
 | race/Wrecker | `0x00531da0` | 629/634 | b | 1 code diffs: `fld [esp + N] ; fmul st(1)` vs `fld st(0) ; fmul [esp + N]`; slots differ |
-| render/BackgroundImage | `0x00403d50` | 24/69 (masked) | c | 2 code diffs: `mov [esi], A` vs `mov ecx, 1`; `mov eax, 1 ; mov [esi + 0x30], eax ; mo~` vs `mov [esi], A ; mov [esi + 0x30], ecx ; ~` |
 | render/BackgroundImage | `0x00403dc0` | 53/222 (masked) | c | 15 code diffs |
 | render/BackgroundImage | `0x004049d0` | 39/603 (masked) | c | 33 code diffs: `xor edi, edi` vs `mov [esp + N], 0`; `mov [esp + N], edi ; mov [ecx], edi ; j~` vs `mov [ecx], 0 ; je @162` |
 | render/CacheTexture | `0x0050f9b0` | 606/618 (masked) | b | 8 code diffs: `mov ebp, ecx` vs `mov ebx, ecx`; `mov ebx, [ebp + N]` vs `mov ebp, [ebx + 0x184]`; slots differ |
@@ -259,7 +250,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/DirectoryList | `0x0044a600` | 74/109 | c | 6 code diffs: `jne @31 ; mov al, byte ptr [esp + N]` vs `jne @32 ; mov eax, [esp + N]` |
 | render/DirectoryList | `0x0044ac30` | 329/1151 | b | 72 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; frame 0x24 vs 0x20, slot order differs |
 | render/FontTexture | `0x004673d0` | 607/645 | b | 5 code diffs: retail adds `push esi ; push edi`; `jne @196 ; push esi ; push edi` vs `jne @194`; slots differ |
-| render/GR_BitString | `0x004238c0` | 111/121 | c | 8 code diffs: `mov esi, eax` vs `mov edi, eax`; `sar esi, 5` vs `sar edi, 5` |
 | render/GR_BitString | `0x004239c0` | 343/420 | b | 14 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; slots differ |
 | render/GR_BitString | `0x00423b70` | 93/442 | b | 16 code diffs: retail adds `add esi, 4`; `or ecx, eax` vs `or eax, ecx ; mov [edx - 4], eax`; slots differ |
 | render/Grid1 | `0x0047d370` | 101/172 | c | 11 code diffs: retail adds `mov esi, ecx ; lea ecx, [eax + eax*4]`; `mov edi, ecx ; lea ecx, [eax + eax*4] ;~` vs `mov edi, [esi + 0x3c]` |
@@ -296,14 +286,12 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/PCVideoCard | `0x004ca5a0` | 50/490 | c | 15 code diffs: retail adds `push ebp ; mov ebp, [esp + N]`; retail lacks `mov [eax], ebx ; mov eax, [esp + N]` |
 | render/PCVideoCard | `0x004cab00` | 165/1141 | b | 57 code diffs: `mov edi, ecx` vs `mov ebp, ecx`; `mov [esp + N], edi` vs `mov [esp + N], ebp`; slots differ |
 | render/PCVideoCard | `0x004cb330` | 35/628 | b | 46 code diffs: `push ebx ; mov ebx, [esp + N]` vs `push ebp ; mov ebp, [esp + N]`; `mov eax, [ebx]` vs `mov eax, [ebp + N]`; slots differ |
-| render/PCVideoCard | `0x004cb5b0` | 145/186 | c | 8 code diffs |
 | render/PCVideoCard | `0x0052d180` | 96/115 | c | 3 code diffs: retail adds `xor esi, esi ; and cl, 0xfb`; `and cl, 0xfb` vs `mov byte ptr [edx + 0x70], cl` |
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
 | render/Pixtrans | `0x004ce420` | 55/456 | b | 23 code diffs: `sub esp, 8` vs `sub esp, N ; mov edx, [esp + N]`; `mov eax, [esp + N] ; test eax, eax` vs `test edx, edx`; frame 0x8 vs 0x10 |
 | render/Pixtrans | `0x004cee30` | 45/1133 | b | candidate 1093 B, 314 code diffs: `push ebp` in the prologue vs after the three palette checks; `sourceRow` homed in `source`'s slot shifts every slot; fast-loop channel sum order |
 | render/Pixtrans | `0x004d24d0` | 419/988 | c | 4 code diffs: retail lacks `jmp @207 ; mov eax, [esp + N] ; mov [es~`; retail adds `mov eax, [esp + N] ; mov [esp + N], eax~` |
 | render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
-| render/SoultreeMaterial | `0x004ff180` | 650/652 | c | 2 code diffs: `mov eax, [ecx] ; call [eax + 0x20]` vs `mov edx, [ecx] ; call [edx + 0x20]`; `add byte ptr [eax], al ; mov al, byte p~` vs `mov esi, A ; dec edi ; add cl, dh` |
 | render/TextService | `0x0050ade0` | 117/125 | c | 1 code diffs: `mov eax, [ebp + N] ; mov edx, edi ; mov~` vs `mov ecx, [ebp + N] ; mov eax, edi ; mov~` |
 | render/TextService | `0x0050b080` | 477/890 | b | 34 code diffs: `mov edx, [esp + N]` vs `xor edx, edx ; not ecx`; `not ecx` vs `dec ecx`; slot order differs |
 | render/TextService | `0x0050b400` | 354/758 | b | 33 code diffs: `mov edx, [esp + N]` vs `xor edx, edx ; not ecx`; `not ecx` vs `dec ecx`; slot order differs |
@@ -337,10 +325,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GUIManager | `0x00485a70` | 62/345 | c | 29 code diffs: retail lacks `mov edx, ebx`; retail lacks `mov ebp, [esp + N]` |
 | ui/GUIManager | `0x00486170` | 280/896 | b | 52 code diffs: retail lacks `xor ebx, ebx`; `cmp ecx, ebx` vs `xor ebx, ebx`; frame 0xa4 vs 0xb0, slot order differs |
 | ui/GUIManager | `0x00486b10` | 86/106 | c | 5 code diffs: retail lacks `mov edx, [esi + 0x48]`; `mov [esp + N], edx` vs `pop edi` |
-| ui/GUIManager | `0x00486b80` | 227/555 | c | 13 code diffs: `add eax, -2` vs `sub eax, 2`; retail adds `mov edi, [esp + N]` |
-| ui/GUIManager | `0x00487870` | 18/285 | c | 27 code diffs: retail adds `push edi ; mov edi, 1`; `mov [esp + N], 1 ; je @16` vs `mov [esp + N], edi ; je @19` |
+| ui/GUIManager | `0x00486b80` | 227/555 | c | 13 code diffs: `add eax, -2` vs `sub eax, 2`; retail adds `mov edi, [esp + N]` (a named `limit` local gives retail's `sub eax, 2`, but retail also writes width/height back into `size`'s slots) |
 | ui/GUIManager | `0x00488120` | 17/52 | c | 5 code diffs: retail adds `jmp @6 ; xor edx, edx` |
-| ui/GameCursor | `0x0043ed40` | 871/946 | c | 8 code diffs: `je @259` vs `jne @312`; `xor eax, eax` vs `mov eax, 1` |
 | ui/GameUi | `0x0046a920` | 684/2323 (masked) | b | 17 code diffs: `mov eax, 0x64` vs `mov ecx, 0x64 ; mov eax, 1 ; mov [esp +~`; `mov eax, 1` vs `mov [esp + N], eax`; frame 0x9bf4 vs 0x9c74, slot order differs |
 | ui/GameUi | `0x0046e8c0` | 55/64 | c | 4 code diffs: retail lacks `mov edx, [ecx]`; `lea eax, [esp + N]` vs `mov eax, [ecx] ; lea edx, [esp + N]` |
 | ui/GameUi | `0x0046ea80` | 160/164 | c | 2 code diffs: `cmp [eax + 0x78], edi` vs `cmp [eax + 0x78], esi`; `push esi` vs `push edi` |
@@ -354,8 +340,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x004734c0` | 256/354 | c | 8 code diffs: `je @82 ; jmp @81` vs `je @83 ; mov edi, 1 ; jmp @84` |
 | ui/GameUi | `0x004738a0` | 206/975 | b | 53 code diffs: `mov edi, [esi + 0x1bc] ; mov ebx, eax` vs `mov ecx, [esi + 0x1bc] ; lea ebx, [esi ~`; retail lacks `lea ebp, [esi + 0x1bc]`; frame 0x38 vs 0x40 |
 | ui/GameUi | `0x00474150` | 339/1048 | c | 28 code diffs |
-| ui/GameUi | `0x00474880` | 254/355 | c | 34 code diffs: retail adds `push ebx`; retail adds `push esi ; mov esi, ecx` |
-| ui/GameUi | `0x004749f0` | 49/274 | c | 9 code diffs: `je @77` vs `je A`; `jne @85` vs `jne A` |
 | ui/GameUi | `0x00477110` | 356/646 | c | 12 code diffs: `mov ecx, [esp + N]` vs `mov eax, [esp + N]`; retail adds `mov [esp + N], eax ; mov ecx, [esi + 0x~` |
 | ui/GameUi | `0x004773a0` | 169/232 | c | 5 code diffs: `mov ecx, [esp + N] ; mov [esp + N], ecx~` vs `mov eax, [esp + N]`; retail adds `mov ecx, [esi + 0xc] ; mov edx, [esi + ~` |
 | ui/GameUi | `0x00477800` | 78/242 | c | 2 register choices: `mov edx, [ecx + 0x218]` vs `mov eax, [ecx + 0x218]`; `mov eax, [A]` vs `mov edx, [A]` (flow and layout are retail's) |
@@ -363,7 +347,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x00477e90` | 155/344 | c | 14 code diffs: `push ebp` vs `push ebx`; `mov ebp, [esp + N]` vs `mov ebx, [esp + N]` |
 | ui/GameUi | `0x00478570` | 139/682 | b | 32 code diffs: `lea eax, [esi + 0x1bc] ; mov [esp + N],~` vs `mov eax, [esi + 0x1bc] ; lea ebx, [esi ~`; retail adds `mov [esp + N], ebx`; slot order differs |
 | ui/GameUi | `0x00478e10` | 11/328 | b | 1 code diffs: retail lacks `push ebp ; push esi ; mov esi, ecx`; frame 0x90 vs 0x84 |
-| ui/GameUi | `0x00479710` | 736/738 | c | 1 code diffs: `mov ebp, [edi + 0x204] ; sub eax, ebp` vs `mov ecx, [edi + 0x204] ; sub eax, ecx` |
 | ui/GameUi | `0x0047a400` | 320/962 | c | 21 code diffs: retail adds `mov [esi + 0x20c], ecx`; `mov [esi + 0x20c], ecx` vs `add ecx, ebp ; mov [esi + 0x210], edx ;~` |
 | ui/GameUi | `0x0047b490` | 116/220 | c | 14 code diffs: retail adds `mov esi, ecx`; `mov esi, ecx ; sar edx, 8 ; sar esi, 5` vs `sar esi, 8 ; sar edx, 5 ; and esi, 0xf8~` |
 | ui/KrustyUI | `0x004988a0` | 872/1104 | b | 8 code diffs: `mov edx, [esi + 0x2c] ; mov eax, [esp +~` vs `mov eax, [esi + 0x2c] ; mov ecx, [esp +~`; `mov edx, [eax + 0xc0] ; mov [edx + 0x5c~` vs `mov eax, [eax + 0xc0] ; mov [eax + 0x5c~`; slots differ |

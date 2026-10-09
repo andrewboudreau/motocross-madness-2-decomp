@@ -7,7 +7,10 @@
 //   calls and stores; retail keeps the event in ebx and copies the preview
 //   rectangle's address into edi before reading it, VC6 here reads the
 //   rectangle through `this`. A local pointer, an inline accessor, an inline
-//   inset helper and an aggregate initializer compile the same.
+//   inset helper (also one that calls PtInRect, by pointer, reference or as
+//   a member of a CameraRect-derived struct) and an aggregate initializer
+//   compile the same. Retail saves edi inside the block (push/pop around the
+//   rectangle code), which no candidate reproduces.
 // SPBikeRiderDlg::FillBikeRiderLists (0x0044f750, 509 bytes): the same
 //   flow and calls as MPBikeRiderDlg 0x004f8220 (also a near miss); retail
 //   swaps the registers holding KrustyUI and the bike entry.

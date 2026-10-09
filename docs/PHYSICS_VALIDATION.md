@@ -102,14 +102,15 @@ Two more sources pass strict comparison:
 
 - `src/krusty2/shadow/D3DIMSoultreeShadow.cpp` now passes 17 cases. Slot 14,
   `0x447540`, was added.
-- `samples/physics/motion/D3DIMSoultreeMotnctrl.cpp` passes 23 of 26
+- `samples/physics/motion/D3DIMSoultreeMotnctrl.cpp` passes 24 of 26
   targets. These are the D3DIMSoultreeCharacter methods and the four vector
   `$E` pairs, with `D3DIMSoultreeMotnctrl.bindings.json`.
   - Slot 2 `0x445fc0` is one byte off.
-  - Slot 4 `0x446210` (98.6%) differs in register choice.
+  - Slot 4 `0x446210` is exact once the field_0x3c enable is read inside
+    each branch rather than into a local before the branch.
   - Slot 11 `0x445680` is at 39.6%.
 
-D3DIMSoultreeMotnctrl.cpp stays in `samples/` because those three targets are still partial.
+D3DIMSoultreeMotnctrl.cpp stays in `samples/` because those two targets are still partial.
 Of its bindings, the seven that `tools/propose_bindings.py` could not prove
 were checked by hand. One of them is `_strupr` at `0x535d3d`; that CRT
 identity is provisional.
@@ -121,7 +122,7 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-This run reports `40/43 strict exact` with no required failures.
+This run reports `43/45 strict exact` with no required failures.
 
 ## Wave-8 promoted slice
 
@@ -228,6 +229,13 @@ Strict exact under `vc6_o2_ml` with `Vehicle.bindings.json` / `Bike.bindings.jso
   scratchVector2 = slot76(...); scratchVector = WorldToLocalDirection(...)`).
 - Bike.cpp: slot 76 `0x00406840`; slots 1, 5, 39, 41, 56, 57, 59, 73 and 75 were already
   exact with the promoted source and only carried stale `partial` notes.
+- Bike.cpp slots 54 `0x0040c8b0` and 55 `0x0040ce60`: `BikeNormalized` receives an operator
+  temporary (`(front + rear) * 0.5f`, `front - rear`); a local Vec3 built component by
+  component left `x` scalar-first.
+- Vehicle.cpp impact handlers, slots 18 `0x00529dc0`, 19 `0x00529fe0` and 20 `0x0052a290`:
+  each scan posts and returns from inside its loop; slots 18/19 scan with guarded do-while
+  loops (unrotated back edge), slot 20 with `for` loops. Slot 19/20's sign factor is
+  `turnAngle >= 0 ? -1 : 1` and the scrape clamps go through a by-value min helper.
 
 x87 operand order facts measured on these targets (they add to the list below):
 
@@ -327,7 +335,7 @@ python tools/run_physics_samples.py --strict --root src/krusty2/vehicle \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-This run reports `131/160 strict exact` with no required failures (`0x409420` is
+This run reports `139/164 strict exact` with no required failures (`0x409420` is
 strict exact since the BikeA604 constructor call is bound to `0x0052ff90`).
 
 ## SoulTreePhysics round-out

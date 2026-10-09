@@ -112,14 +112,13 @@ void D3DIMSoultreeCharacter::CharacterVirtualSlot4(int a, int b)
     if (mask && mask[pose->nodeIndex] == 0)
         return;
     SoultreeObject* node = nodeNames[pose->nodeIndex].node;
-    int axesEnabled = nodeNames[pose->nodeIndex].field_0x3c;
     if (pose->hasPose) {
-        if (axesEnabled)
+        if (nodeNames[pose->nodeIndex].field_0x3c)
             node->SetAxesPtr(&pose->axisZ, &pose->axisY, 0, 1);
         if (nodeNames[pose->nodeIndex].field_0x38)
             node->SetPositionVec3(pose->position);
     } else {
-        if (axesEnabled)
+        if (nodeNames[pose->nodeIndex].field_0x3c)
             node->SetAxesIn(modelNode, &pose->axisZ, &pose->axisY, 0, 1);
         if (nodeNames[pose->nodeIndex].field_0x38)
             node->TranslateIn(modelNode, pose->position);

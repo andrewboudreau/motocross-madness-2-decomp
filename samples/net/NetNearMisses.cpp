@@ -13,7 +13,9 @@
 // The ring-slot address uses [edi+eax+4] where retail has [eax+edi+4], and
 // after the slot-17 call retail reloads field_0x34 into edx and forms the
 // slot with lea; direct indexing throughout (53.3%) and a pointer for the
-// whole body (47.9%) are worse.
+// whole body (47.9%) are worse. Taking the message pointer only inside
+// `if (!messages[index].from)` gives retail's reload and `lea` there, but
+// VC6 then swaps ebx and ebp for the index and the pointer (196/370).
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>

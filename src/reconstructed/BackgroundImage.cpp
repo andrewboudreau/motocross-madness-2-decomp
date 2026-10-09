@@ -22,6 +22,24 @@ UnknownRect g_UnknownGlobal5777c8;
 // 0x005777e8: the drawn rectangle 0x00404700 records for its region.
 CameraRect g_UnknownGlobal5777e8;
 
+// 0x00403d50
+BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
+    field_0x30 = 1;
+    copyValid = 0;
+    field_0x2c = 0;
+    regionTable = 0;
+    regionCapacity = 0;
+    regionCount = 0;
+    fullRestoreFrames = 0;
+    heldDcSurface = 0;
+    heldDc = 0;
+    field_0x5c = 0;
+    imageRegion = -1;
+    field_0x64 = -1;
+    field_0x60 = 1;
+    field_0x68 = 1;
+}
+
 // 0x00404010
 BackgroundImage::~BackgroundImage() {
     if (heldDc && heldDcSurface)

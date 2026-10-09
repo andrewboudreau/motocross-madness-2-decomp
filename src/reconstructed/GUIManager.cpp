@@ -932,6 +932,36 @@ int GUIUser::UnknownFunction487800(UnknownGuiControl* control, UnknownGuiControl
     return result;
 }
 
+// 0x00487870: moves the focus to `control`; a digits-only edit box turns the
+// IME off.
+int GUIUser::UnknownFunction487870(UnknownGuiControl* control, UnknownGuiControl** previous) {
+    int result = 1;
+
+    if (control && control != field_0x1d8)
+        result = control->UnknownVirtualSlot31();
+    if (result) {
+        if (field_0x1d8 && !field_0x1d8->field_0x25_bit3 && field_0x1d8 != control)
+            field_0x1d8->UnknownVirtualSlot32(control);
+        if (focusControl && !focusControl->field_0x25_bit3 && focusControl != control)
+            focusControl->UnknownVirtualSlot33(control);
+        if (previous)
+            *previous = focusControl;
+        field_0x1d8 = control;
+        focusControl = control;
+        if (g_TrackGame->display->freezeFrameIndex) {
+            if (control->controlType == 11) {
+                if (control->acceptedCharacters && !strcmp(control->acceptedCharacters, "0123456789"))
+                    EnableImeInput(0);
+                else
+                    EnableImeInput(1);
+            } else {
+                EnableImeInput(0);
+            }
+        }
+    }
+    return result;
+}
+
 // 0x00487990
 void GUIUser::EnableImeInput(int enable) {
     POINT position;

@@ -64,7 +64,9 @@
 // FollowCamera::UnknownVirtualSlot36 (0x00465000, 209 bytes): 12 bytes differ.
 // Retail's disabled exit is `xor al, al; mov [esi+0x277], al` (one zero for
 // the store and the return); every source form tried so far emits an
-// immediate store followed by `xor al, al`.
+// immediate store followed by `xor al, al` (also an early `!enable` return,
+// a `settled` result, storing `enable`, an inline setter and
+// `return field_0x277` after the store).
 #include "../../src/reconstructed/FollowCamera.h"
 
 #include "../../src/reconstructed/DebugAlloc.h"

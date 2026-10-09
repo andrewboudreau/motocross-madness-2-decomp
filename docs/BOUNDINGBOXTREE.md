@@ -31,10 +31,11 @@ file name not recovered). This is a separate unit (strong inference):
 BlockAllocator.cpp and bmpfile.cpp, which follow it, were already fully
 matched.
 
-Exact: 8 calibration cases. These are the constructor, the destructor and
-its deleting wrapper, slots 0-3, and the whole-word back shift
-`0x00423940`. GR_BitString.h drops the inline `~GR_PixelString`. With it,
+Exact: 9 calibration cases. These are the constructor, the destructor and
+its deleting wrapper, slots 0-3, and the whole-word shifts `0x004238c0`
+and `0x00423940`. In `0x004238c0` the fill-only branch counts a separate
+`remaining = words` down (counting `words` itself swaps esi and edi). GR_BitString.h drops the inline `~GR_PixelString`. With it,
 VC6 gives `~GR_BitString` an EH frame that retail lacks. Near misses
-(`samples/render/GR_BitStringNearMisses.cpp`): the three other shift
+(`samples/render/GR_BitStringNearMisses.cpp`): the two sub-word shift
 helpers, which differ in register swaps and OR operand order. The bit
 reader `0x00423ef0` looks like an `__asm` body and is not attempted.

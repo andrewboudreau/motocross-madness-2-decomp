@@ -48,7 +48,10 @@
 // set and clear paths and places the `!changed` early return just before
 // the parent hand-off; VC6 here keeps two copies (they differ in edx/ecx)
 // and places the return check inline. An update flag, gotos, an inverted
-// 0x80 test and the inverted branch order were tried.
+// 0x80 test and the inverted branch order were tried. With `goto notify`
+// from the 0x80 branch into the clear path's notify block every instruction
+// matches retail's except that VC6 places the `!changed` return block
+// directly after the 0x80 test (retail: after the notify block).
 //
 // DrawableGridNode 0x0047f210 (per-block buffer rebuild, 1576 bytes; 426 of
 // 1586): the calls, reallocations, copies and the bookkeeping after the loops

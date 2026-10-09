@@ -109,7 +109,7 @@
   "?ReleaseBackgroundGrab@GUIManager@@QAEXXZ": "0x004860f0",
   "?ReleaseCursor@GUIUser@@QAEXXZ": "0x004880c0",
   "?ReleaseCursors@GUIManager@@QAEXXZ": "0x00486680",
-  "?SetGDISurfaceVisible@UnknownDisplay@@QAEXH@Z": "0x004cb5b0",
+  "?SetGDISurfaceVisible@UnknownDisplay@@QAEHH@Z": "0x004cb5b0",
   "?SetPointerDevice@GUIUser@@QAEHPAVGUIInputDevice@@@Z": "0x00488120",
   "?SetPrimaryFormat@PCSoundInterface@@QAEHHHH@Z": "0x004be910",
   "?SetUp@GUIManager@@QAEPAV1@PAXPAVPalette8@@PAVTextureMapManager@@PAVBackgroundImage@@HPAVSoundGroup@@PBDF5H@Z": "0x004853b0",
