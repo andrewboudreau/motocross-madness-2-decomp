@@ -44,7 +44,12 @@ static inline float KbLength(const Vec3& v)
 // eight fewer scheduling units after the copy for a reason not yet found.  Other
 // orders of the first four statements, init-list members, component-wise or
 // chained copies and an inline helper for the +0x7b8/+0x7c0/+0x7bc triple (also
-// written together by slot 97) do not move the pick.
+// written together by slot 97) do not move the pick.  Re-measured: the pick index
+// is (units after the copy) - 32 and is end-anchored only; units added before the
+// copy, `a = b = 0` chains, `0.0f` vs `0` literals and moving +0x11b8/+0x604 ahead
+// of the copy leave it in place (those two then simply stay before the copy), and a
+// redundant store to one field is eliminated.  Adding many stores instead makes the
+// scheduler hoist copy 2's lea and the EH-state reload far up.
 KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 {
     field_0x73c = 0x65;
@@ -1467,6 +1472,8 @@ void KrustyBike::Fn_004933E0(const KbNetDelta* delta, KbNetState* state)
 // the fmod call: retail loads the flag first.  Reading the flag into a local before
 // the fmod call anchors it before the call (mov bl); reading it after the call, in
 // any position, is forward-substituted to the test and scheduled after the fsubr.
+// Also tried: a named `float`/`double` remainder temp (forward-substituted, no
+// change) and dropping the (float) cast (double fsubr from a spill slot, 11%).
 float KrustyBike::Fn_00495FF0()
 {
     field_0x1530 -= (float)fmod(field_0x1530, 100.0);
@@ -1751,7 +1758,13 @@ static inline void KbSub(Vec3* out, const Vec3& a, const Vec3& b)
 // at the end too but inverts the record test (`je sendFull; jmp deltas`) and makes the
 // network branch jump there conditionally instead of duplicating the push. Inline calls,
 // a literal 0, a boolean flag, explicit gotos to `deltas`, swapped branches, an inverted
-// test with an empty then-block and an explicit final return were tried.
+// test with an empty then-block and an explicit final return were tried.  Retail has three
+// physical full-send copies (two early ones with their own epilogues, the end block the
+// `je` early returns use); a physical `{ Fn_00492670(..); return; }` in both branches gives
+// VC6's cross-jumping retail's local shape (`jne deltas` and `push 0; jmp home+1`) but it
+// keeps the first copy (record branch, inline) as the home and drops the end block
+// (2295 B, 78 differing instructions); `goto deltas` + inline calls move the block inline
+// after the record branch and the network copy to the end (2337-2348 B).
 // Shapes that mattered: `KbSub` through an out-pointer keeps `diff` a 12-byte slot (the
 // operator form is scalar-replaced and repacks the frame); one `ping` next to `message`
 // overlays the dead `d` slots; the angular-velocity and angle limits are 2 pi, not 30;
@@ -1942,7 +1955,9 @@ static inline int KbWithinWarpBand(float dist2, float frame, float warp)
 // Still different: retail keeps 1 in ebp from the second SetAxesPtr call on and 0 in edi
 // (candidate: 0 in ebp, 1 in ebx, and a zero register through the tail where retail
 // uses `test`/`push 0`), which also forces `c` through a stack byte; retail stores
-// `(len+50)*(len+50)` before the AllowWarping test; the velocity y/z `fld s; fmul` order;
+// `(len+50)*(len+50)` before the AllowWarping test (a named `lim` or `limitSq *= limitSq`
+// stores the unsquared sum instead and re-squares after the branch, 22.89% vs 23.46%);
+// the velocity y/z `fld s; fmul` order;
 // retail recomputes `c - b` for the pose lerps while the candidate reuses `d`; the retail
 // 100.0f lives at 0x5505ec while the shared bindings bind it to 0x551420 (0x492670).
 void KrustyBike::Fn_00493660(float dt, int a)
@@ -2097,9 +2112,11 @@ void KrustyBike::Fn_00493660(float dt, int a)
                     delta = states[0]->velocity * field_0x15ec + states[0]->position - position;
                 if (g_kbRateLimiting) {
                     dist2 = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
-                    // the position may move at speed + 50 per second
                     // the position may move at speed + 50 per second; retail stores limitSq
-                    // before the AllowWarping test, VC6 propagates it here into the division
+                    // before the AllowWarping test (fld st0; fmul st1; fstp; fstp st0), VC6
+                    // forward-substitutes it into the division. `float lim = len + 50; lim*lim`
+                    // and `limitSq = len + 50; limitSq *= limitSq` both store lim instead and
+                    // re-square it after the branch (22.89% vs 23.46%).
                     float limitSq = (len + 50.0f) * (len + 50.0f);
                     if (g_kbAllowWarping
                         && !KbWithinWarpBand(dist2 / limitSq, g_kbGame->field_0x2f0, g_kbWarpThreshold)) {

@@ -739,7 +739,7 @@
     "target_va": "0x00492ad0",
     "target_size": 2315,
     "expect": "partial",
-    "notes": "message 13 encoder; 2312/2315 bytes, frame 0x34 exact; only the record-interval branch differs (retail: jne deltas; jmp to the end block, network branch push 0; jmp into it; candidate: je end block; jmp deltas, network branch conditional jump) plus the register choice it drags along",
+    "notes": "message 13 encoder; 2312/2315 bytes, frame 0x34 exact; only the record-interval branch differs (retail: jne deltas; jmp to the end block, network branch push 0; jmp into it; candidate: je end block; jmp deltas, network branch conditional jump) plus the register choice it drags along. Physical call+return copies in both branches give retail's jne/push 0 shape but VC6 homes the cross-jump at the first copy (2295 B); gotos to deltas move the block inline (2337-2348 B)",
     "bindings": "KrustyBike.bindings.json"
   },
   {
@@ -769,7 +769,7 @@
     "target_va": "0x00493660",
     "target_size": 8545,
     "expect": "partial",
-    "notes": "remote-bike network update; 23.5% bytes, aligned instruction ratio 0.88 with the retail frame 0x58 and slots; remaining: 1-in-ebp/0-in-edi allocation from the second SetAxesPtr call on, limitSq store before the AllowWarping test, velocity y/z fmul operand order, pose lerp c-b recompute, and the 100.0f pool (retail 0x5505ec, bound 0x551420 for 0x492670)",
+    "notes": "remote-bike network update; 23.5% bytes, aligned instruction ratio 0.88 with the retail frame 0x58 and slots; remaining: 1-in-ebp/0-in-edi allocation from the second SetAxesPtr call on, limitSq store before the AllowWarping test (a named lim or limitSq *= limitSq stores the sum and re-squares after the branch, 22.89%), velocity y/z fmul operand order, pose lerp c-b recompute, and the 100.0f pool (retail 0x5505ec, bound 0x551420 for 0x492670)",
     "bindings": "KrustyBike.bindings.json"
   },
   {
@@ -779,7 +779,7 @@
     "target_va": "0x0048fa60",
     "target_size": 532,
     "expect": "partial",
-    "notes": "constructor, 86.36% (532/532). Sole divergence 0xb7..0xfa: VC6 hoists the +0x7c0/+0x7bc stores into the +0x1540 kVec3Zero copy, retail +0x11b8/+0x604. The pick is positional from the block end in statement units (retail needs eight fewer after the copy); see the source comment."
+    "notes": "constructor, 86.36% (532/532). Sole divergence 0xb7..0xfa: VC6 hoists the +0x7c0/+0x7bc stores into the +0x1540 kVec3Zero copy, retail +0x11b8/+0x604. The pick index is (units after the copy) - 32, end-anchored only: leading units, chained assignments, 0.0f literals and moving the two stores ahead of the copy do not move it (retail needs eight fewer units after the copy); see the source comment."
   },
   {
     "class": "KrustyBike",
@@ -798,6 +798,6 @@
     "target_va": "0x00495ff0",
     "target_size": 895,
     "expect": "partial",
-    "notes": "trick end / bonus, 99.17% (895/895). Stack slots match once the float bonus is a CSE temp, not a local. Only mov al,[+0x153f] vs fsubr order after the fmod call differs (retail loads the flag first)."
+    "notes": "trick end / bonus, 99.17% (895/895). Stack slots match once the float bonus is a CSE temp, not a local. Only mov al,[+0x153f] vs fsubr order after the fmod call differs (retail loads the flag first); a named float/double remainder temp is forward-substituted (no change), dropping the (float) cast gives a double fsubr (11%)."
   }
 ]
