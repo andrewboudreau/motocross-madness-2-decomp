@@ -67,6 +67,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/broadphase/Quadtree | `0x004dd600` | 316/318 (masked) | c | 2 code diffs |
 | krusty2/broadphase/Terrain | `0x00506e90` | 850/1502 (masked) | b | 44 code diffs: `je @308` vs `je @282 ; fld [esp + N] ; push ecx`; retail adds `mov ecx, [esp + N]`; slots differ |
 | krusty2/broadphase/Terrain | `0x00507c10` | 71/2731 (masked) | b | 128 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `push ebp`; frame 0x114 vs 0x108, slot order differs |
+| krusty2/broadphase/Terrain | `0x005059d0` | 1593/2116 | c | TRN loader: same frame (0x440, every local in its retail slot), calls and EH states; register choice (retail keeps -1 in edi/ebx, the candidate keeps 3 and 0 in ebx), colour-key scheduling and the palette loop's pre-offset pointer stride differ |
 | krusty2/collision/CollisionObject | `0x00431df0` | 19/85 | c | 2 code diffs: `mov eax, [esi + 0x14] ; add eax, ebx` vs `mov edx, [esi + 0x14] ; mov eax, ebx ; ~` |
 | krusty2/collision/CollisionObject | `0x00432260` | 441/458 | b | 2 code diffs: retail adds `mov [esp + N], eax`; retail lacks `mov [esp + N], eax`; slots differ |
 | krusty2/collision/CollisionObject | `0x004334c0` | 1046/1066 (masked) | b | 11 code diffs: `call A` vs `call @0`; `fmul [edi + 4]` vs `fmul [edi + 0x24]`; slots differ |

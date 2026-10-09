@@ -1,0 +1,8 @@
+{
+  "_g_savedShowImeUi": "0x0068ace4",
+  "_g_showImeUiSaved": "0x0068ace8",
+  "__imp__DispatchMessageA@4": "0x00550308",
+  "__imp__PeekMessageA@20": "0x00550310",
+  "__imp__SystemParametersInfoA@16": "0x005502c0",
+  "__imp__TranslateMessage@4": "0x0055030c"
+}

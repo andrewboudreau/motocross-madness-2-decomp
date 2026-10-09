@@ -22,7 +22,7 @@ Totals on the game side (`0x00401000..0x0053303c`): 252,322 gap bytes,
 of which 131,653 bytes in 224 unregistered function starts (the keyboard
 hook, the NormalDistribution thunk, the four readerless kVec3 sets, Camera
 `0x0042e690`/`0x0042e930`/`0x0042e9b0`, the TextureMap.h copy `0x00430ff0`
-and the CollisionPoint and ConstraintMethodCollisionModel kVec3 sets were
+the CollisionPoint and ConstraintMethodCollisionModel kVec3 sets, Terrain.cpp's XCU 304 thunk, the two IME-UI helpers `0x0052ff00`/`0x0052ff20` and the vtordisp thunks `0x005042e0`/`0x0052b690` were
 registered after the scan; their rows below are adjusted by hand). After the game
 code: 29 import thunks, 5,421 bytes of DirectInput data-format tables,
 the VC6 LIBCMT span (`0x00534426..0x00548b50`, 443 atlas functions), a
@@ -97,7 +97,7 @@ neighbours' `__FILE__` xrefs).
 | `0x004f9a5a..0x004fb1e0` | 6022 | 27 (0 unreg., 0 B) | Shock family (samples/physics/suspension Shock.cpp) | RTTI Shock/InlineShock/RotatingShock; XCU 275-278 (second kVec3 set after SelectiveGravityModel's), the `$E` jmp wrappers 0x4fafd0/0x4fb020/0x4fb070/0x4fb0c0 now registered with their bodies; three partials | 2 |
 | `0x004fb1e0..0x004fb2b0` | 208 | 5 (0 unreg., 0 B) | SkyCube (provisional 'SkyCube.cpp') | RTTI SkyCube : DrawableCube (ctor 0x4fb1e0 calls the DrawableCube ctor 0x43d910, dtor thunk 0x4fb220 -> 0x43e290, slot 10 0x4fb260); constructed by QuarryStuntEvent (0x4fb230); before soultree.cpp (0x4fdb7d); reconstructed in src/reconstructed/SkyCube.cpp, all 5 functions strict exact | 2 |
 | `0x005051ed..0x005053b0` | 451 | 6 (0 unreg., 0 B) | SurfaceMap (samples/physics/motion) | RTTI SurfaceMap; registered masked; between SteeringControl.cpp (0x504bd2) and Terrain.cpp | 2 |
-| `0x005053b0..0x00505480` | 208 | 4 (0 unreg., 0 B) | Alt-Tab keyboard hook (unknown; Terrain.cpp top by position) | SetWindowsHookEx(WH_KEYBOARD, 0x5053d0) install/remove with VK_TAB/VK_ESCAPE+ALT filter; 0x5053b0 called from KrustyUI; XCU 304 (0x505480, builds a PCCamera at 0x68a090) precedes Terrain's timer initializers 305-314, so Terrain.cpp's own statics start here; all four strict exact in src/reconstructed/KeyboardHook.cpp (the ALT test is `(WORD)(lParam >> 16) & KF_ALTDOWN`) | 3 |
+| `0x005053b0..0x00505480` | 208 | 4 (0 unreg., 0 B) | Alt-Tab keyboard hook (unknown; Terrain.cpp top by position) | SetWindowsHookEx(WH_KEYBOARD, 0x5053d0) install/remove with VK_TAB/VK_ESCAPE+ALT filter; 0x5053b0 called from KrustyUI; XCU 304 (0x505480, builds a PCCamera at 0x68a090) precedes Terrain's timer initializers 305-314, so Terrain.cpp's own statics start here; all four strict exact in src/reconstructed/KeyboardHook.cpp (the ALT test is `(WORD)(lParam >> 16) & KF_ALTDOWN`); the XCU 304 thunk 0x505480 strict exact as `_$E4` of src/reconstructed/TerrainSupport.cpp | 3 |
 | `0x00508add..0x0050a3a0` | 6339 | 8 (1 unreg., 3087 B) | TerrainShadow (samples/physics/shadow TerrainShadow.cpp) | RTTI TerrainShadow slots 14/27/28/29/30; slot 14 0x50a1a0 strict exact, slot 30 0x509aa0 partial (inline fistp helper in retail); 0x508bc0 (3087 B) unregistered; before Texmap.cpp (0x50a6bc) | 2 |
 | `0x0050beca..0x0050f6a0` | 14294 | 16 (3 unreg., 10596 B) | TextureCache.cpp (registered as ManagedTextureGroup.cpp) | __FILE__ TextureCache.cpp xref 0x50c4e2 inside 0x50c4a0; RTTI ManagedTextureGroup; 0x50c960 (3742 B), 0x50dad0 (5020 B), 0x50ef70 (1834 B) unregistered, called from ManagedTextureGroup/TextureMapManager code; near misses in samples/render/ManagedTextureGroupNearMisses.cpp (158, 216 and 31 differing instructions: stack-slot packing, two swapped arrays, a shrink-wrapped prologue) | 1 |
 | `0x005104fc..0x00510a50` | 1364 | 18 (0 unreg., 0 B) | TextureCache.cpp (registered as ManagedTexture.cpp) | RTTI ManagedTexture; all registered; same retail unit as above by bracket (TextService.cpp 0x50aea0 .. TextureMapManager.cpp 0x510c5e) | 2 |
@@ -138,15 +138,23 @@ neighbours' `__FILE__` xrefs).
   attributions are strong inference, not literal evidence.
 - XCU 304 (`0x00505480`, a global PCCamera at `0x0068a090`) is listed between
   Terrain.cpp's vector set (300-303) and its timer initializers (305-314), so it
-  is Terrain.cpp's. Whether the keyboard-hook code before it (`0x005053b0..`,
+  is Terrain.cpp's; the thunk is strict exact as `_$E4` of
+  `src/reconstructed/TerrainSupport.cpp`. Whether the keyboard-hook code before it (`0x005053b0..`,
   strict exact in `src/reconstructed/KeyboardHook.cpp`) is Terrain.cpp's top
   or a separate Sv..Te unit is open.
 - Provisional file names (`CDAudio`, `ClipRectangle`, `DeviceSetup`,
   `ExceptionHandler`, `FileStream`, `Fog`, `GhostMod`, `GraphicsTest`, `GridNode`,
   `Main`, `MediaControl`, `MemTag`, `PickDevice`, `Rectangle2D`, `SkyCube`,
-  `TransparencyMod`, `KrustyVCR`, `ZoneReport`, `PlacementQueries`, `QuatUtil`) are ours. None appears in `analysis/source_paths.txt`; they are
+  `TransparencyMod`, `KrustyVCR`, `ZoneReport`, `PlacementQueries`, `QuatUtil`,
+  `ImeUiState`) are ours. None appears in `analysis/source_paths.txt`; they are
   bounded only by the alphabetical bracket given in the evidence column. The
   RTTI class names in them are confirmed; the file ownership is not.
+- The IME-UI helpers `0x0052ff00` (saves SPI_GETSHOWIMEUI into `0x0068ace4`
+  and sets the flag `0x0068ace8`) and `0x0052ff20` (drains the message queue,
+  then restores SPI_SETSHOWIMEUI when the flag is set) are strict exact in
+  `src/reconstructed/ImeUiState.cpp`. No literal or RTTI attributes them; they
+  sit between VisibilityQuadTree.cpp's initializers and wrecker.cpp's
+  constructor `0x0052ff90` (docs/WRECKER.md), so the unit is tier 3.
 - `0x00448560..0x00449e60`, `0x0045ff80..0x004624d0` and
   `0x004a05db..0x004a10e0` may each hold more than one unit; nothing in the
   binary separates them.

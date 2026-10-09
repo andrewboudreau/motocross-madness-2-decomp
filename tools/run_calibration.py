@@ -25653,6 +25653,24 @@ CASES = [
         'target_size': 30,
         'reason': 'RTTI UIControl slot 0 (vtable entry 0x470430 calls the destructor 0x470450); emitted only beside the near-miss UIControl constructor in the sample TU',
     },
+    {
+        'name': 'ImeUiState 0x52ff00 save IME status-window setting',
+        'bindings': 'src/reconstructed/ImeUiState.bindings.json',
+        'source': 'src/reconstructed/ImeUiState.cpp',
+        'symbol': '?UnknownFunction52ff00@@YAXXZ',
+        'target_va': '0x0052ff00',
+        'target_size': 28,
+        'reason': 'SystemParametersInfoA(SPI_GETSHOWIMEUI) into a static, then a saved flag',
+    },
+    {
+        'name': 'ImeUiState 0x52ff20 drain messages and restore IME setting',
+        'bindings': 'src/reconstructed/ImeUiState.bindings.json',
+        'source': 'src/reconstructed/ImeUiState.cpp',
+        'symbol': '?UnknownFunction52ff20@@YAXXZ',
+        'target_va': '0x0052ff20',
+        'target_size': 111,
+        'reason': 'while (PeekMessageA(PM_REMOVE)) Translate/Dispatch, then SPI_SETSHOWIMEUI with the saved value',
+    },
 ]
 
 def main():

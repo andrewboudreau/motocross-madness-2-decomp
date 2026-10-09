@@ -1,11 +1,20 @@
 // Terrain.cpp -- reconstruction of D:\aardvark\VC\krusty2\Terrain.cpp.
 #include "Terrain.h"
 
+#include <float.h>
+#include <string.h>
+
+// d3dtypes.h colour macros (Terrain::Load builds two D3DCOLORs).
+#define RGBA_MAKE(r, g, b, a) ((unsigned int)(((a) << 24) | ((r) << 16) | ((g) << 8) | (b)))
+#define RGBA_GETRED(rgb) (((rgb) >> 16) & 0xff)
+#define RGBA_GETGREEN(rgb) (((rgb) >> 8) & 0xff)
+#define RGBA_GETBLUE(rgb) ((rgb) & 0xff)
+
 Terrain::Terrain(int a)
     : GameObject(a)
 {
     gridCellSize = 1.0f;
-    field_0x3c = 0;
+    stream = 0;
     field_0x84 = 0;
     field_0x88 = 0;
     field_0x90 = 0;
@@ -109,6 +118,194 @@ void Terrain::RetireOwnedObject(BaseObject* object)
             }
         }
     }
+}
+
+// Boundary declarations for Terrain::Load (tier 1 addresses, tier 3 names).
+struct TerrainGameSettings {                                    // TrackGame (src/reconstructed/Game.h)
+    char pad_0x000[0x2d0];
+    int softwareRendering;                                      // +0x2d0
+};
+extern TerrainGameSettings* g_terrainGame;                      // 0x0056e26c
+extern TerrainQualityEntry g_terrainQualityHardware[10];        // 0x00574920 (Terrain.cpp .data)
+extern TerrainQualityEntry g_terrainQualitySoftware[10];        // 0x005749c0
+extern int g_terrainTextureSize;                                // 0x0067a684 width of the last surface record
+extern int g_terrainTextureShift;                               // 0x0056c200 bit length of that width
+// 0x004a2fc0: calloc(count, size, __FILE__, __LINE__) (BikeRace.h's DebugCalloc).
+void* DebugCalloc(unsigned int count, unsigned int size, const char* file, int line);
+// 0x0050a590 (TextureMap.h): shared texture `name` through the manager.
+TerrainSurfaceBase* TerrainLoadTexture(TextureMapManager* manager, const char* name, int format,
+                                       void* palette, int flags, int addressU, int addressV,
+                                       void* choice, int alphaThreshold, unsigned int key,
+                                       int addRef, int fromArchive);
+// ColorMapper (0x18b10 bytes; ctor 0x004ddf40, 0x004de270 returns its 256 RGB triplets).
+class TerrainColorMapper : public BaseObject {
+public:
+    explicit TerrainColorMapper(TerrainStream* stream);
+    unsigned char* GetColors();
+    char pad_0x08[0x18b10 - 0x08];
+};
+// GridBaseBlock (src/reconstructed/Gridbase.h; 0xd50 bytes, ctor 0x0047dc20).
+class TerrainGridBlock {
+public:
+    explicit TerrainGridBlock(TerrainStream* stream);
+    char pad_0x000[0xd50];
+};
+
+// In-place scale (an inlined Vec3 operator*=: the factor stays on the x87 stack).
+static inline void ScaleTerrainVec3(TerrainVec3& v, float s)
+{
+    v.x *= s;
+    v.y *= s;
+    v.z *= s;
+}
+
+// 0x005059d0.
+Terrain* Terrain::Load(int host, TerrainStream* stream, int, TerrainSurfaceDesc* desc,
+                       int quality, int field0xc40, const char* textureName, int halfFormat)
+{
+    GameObject::GameObjectVirtualSlot8(host);
+    field_0xc18 = *desc;
+    int surfaceFlags = halfFormat ? 8 : 0;
+    g_pTerrainQualityTable = g_terrainQualityHardware;
+    if (!g_terrainGame->softwareRendering)
+        g_pTerrainQualityTable = g_terrainQualitySoftware;
+    SelectQuality(quality);
+    if (field0xc40)
+        field_0xc34 = 1;
+    if (!stream) {
+        BaseObjectVirtualSlot2();
+        return 0;
+    }
+    this->stream = stream;
+    if (stream->inner)
+        stream->Seek(stream->innerStart, 0, 0);
+    field_0xc38 = this->stream->Tell();
+    field_0x38 = field_0xc18.registry;
+    field_0xc40 = field0xc40;
+    field_0xc84 = new(__FILE__, 0x11c) TerrainOwned;
+    field_0xc88 = new(__FILE__, 0x122) TerrainOwned;
+    ownedObjectArray = (BaseObject**)DebugCalloc(200, 4, __FILE__, 0x127);
+
+    char tag[4];
+    int version;
+    this->stream->Read(tag, 4, 1);
+    this->stream->Read(&version, 4, 1);
+    if (strcmp(tag, "TRN") != 0 || version != 5)
+        goto fail;
+    field_0xc94 = 5;
+    field_0xc98 = 6;
+    if (!textureName)
+        textureName = "testnoise.tga";
+    field_0xc3c = TerrainLoadTexture(field_0xc18.manager, textureName, 0x115c, 0, 2, 5, 6, 0,
+                                     0x80, 0xff00ff, 1, 1);
+    if (field_0xc3c) {
+        field_0xc3c->CreateTextureSurface(1, 0, 1);
+        colorKey = field_0xc3c->field_0x3c;
+    } else {
+        colorKey = 0xffffffff;
+    }
+
+    {
+        unsigned int key = colorKey;
+        unsigned int alpha = 0xff - (key >> 24);
+        unsigned int keep = 0xff - alpha;
+        unsigned int red = RGBA_GETRED(key) * keep / 0xff;
+        field_0xc9c = RGBA_MAKE(alpha, alpha, alpha, 0xff);
+        field_0xca0 = RGBA_MAKE(red, RGBA_GETGREEN(key) * keep / 0xff, RGBA_GETBLUE(key) * keep / 0xff, 0xff);
+    }
+    qualityParamA = 0x100;
+
+    int hasPalette;
+    this->stream->Read(&hasPalette, 4, 1);
+    if (hasPalette) {
+        TerrainColorMapper* mapper = new(__FILE__, 0x167) TerrainColorMapper(this->stream);
+        field_0x30 = mapper;
+        unsigned char* colors = mapper->GetColors();
+        TerrainPaletteEntry entries[256];
+        for (int i = 0; i < 256; i++) {
+            entries[i].red = colors[i * 3];
+            entries[i].green = colors[i * 3 + 1];
+            entries[i].blue = colors[i * 3 + 2];
+            entries[i].flags = 0;
+        }
+        TerrainDirectDraw* directDraw = ((TerrainHost*)field_0x18)->display->directDraw;
+        if (directDraw->CreatePalette(0x44, entries, &field_0x34, 0) != 0)
+            goto fail;
+    } else {
+        field_0x34 = 0;
+    }
+
+    int gridSize;
+    int unusedHeader;
+    int blockRecords;
+    int surfaceRecords;
+    this->stream->Read(&field_0xbe8, 4, 1);
+    this->stream->Read(&gridCellSize, 4, 1);
+    this->stream->Read(&gridSize, 4, 1);
+    this->stream->Read(&unusedHeader, 4, 1);
+    this->stream->Read(&blockCount, 4, 1);
+    this->stream->Read(&blockRecords, 4, 1);
+    blocks = (void**)DebugMalloc(blockCount * 4, __FILE__, 0x197);
+    this->stream->Seek(blockCount * 4, 1, 1);
+    this->stream->Read(&ownedObjectCount, 4, 1);
+    this->stream->Read(&surfaceRecords, 4, 1);
+    this->stream->Seek(ownedObjectCount * 4, 1, 1);
+    int i;
+    for (i = 0; i < blockRecords; i++)
+        blocks[i] = new(__FILE__, 0x1ab) TerrainGridBlock(this->stream);
+
+    if (surfaceRecords) {
+        int width;
+        for (i = 0; i < surfaceRecords; i++) {
+            int height;
+            int format;
+            this->stream->Read(&width, 4, 1);
+            this->stream->Read(&height, 4, 1);
+            this->stream->Read(&format, 4, 1);
+            TerrainSurfaceBase* surface;
+            if (field_0x38 && width == 0x100) {
+                TerrainSurface* managed = new(__FILE__, 0x1bb) TerrainSurface(field_0xc18.manager);
+                surface = managed;
+                surface->LoadSurface(this->stream, width, height, 1, format, 0, 0, field_0x30,
+                                     surfaceFlags | 2, field_0x34, 2, 1, &field_0xc18, 0x80, 0xff00ff);
+                field_0x38->Register(managed);
+            } else {
+                surface = new(__FILE__, 0x1c8) TerrainSurfaceBase(field_0xc18.manager, 1);
+                surface->LoadSurface(this->stream, width, height, 1, format, 0, 0, field_0x30,
+                                     surfaceFlags | 2, field_0x34, 2, 1, &field_0xc18, 0x80, 0xff00ff);
+                if (statusFlags & 1)
+                    surface->CreateTextureSurface(1, 0, 0);
+            }
+            ownedObjects[i] = surface;
+        }
+        g_terrainTextureSize = width;
+        g_terrainTextureShift = 0;
+        for (int w = width; w > 0; w >>= 1)
+            g_terrainTextureShift++;
+    }
+
+    boundsMin = TerrainVec3(FLT_MAX, FLT_MAX, FLT_MAX);
+    boundsMax = TerrainVec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+    heightField = new(__FILE__, 0x1e6) TerrainShutdownObject(this->stream, host, 0, this, gridSize,
+                                                             gridSize * 4, 0, 0, 0, &boundsMin,
+                                                             &boundsMax);
+    boundsMax.x += 16.0f;
+    boundsMax.z += 16.0f;
+    ScaleTerrainVec3(boundsMax, gridCellSize);
+    ScaleTerrainVec3(boundsMin, gridCellSize);
+    if (heightField) {
+        int levels = heightField->field_0x28;
+        int shift = heightField->gridShift;
+        if (levels > 0)
+            shift -= levels * 4;
+        invGridCellSize = 1.0f / ((float)(1 << shift) * gridCellSize);
+    }
+    return this;
+
+fail:
+    heightField = 0;
+    BaseObjectVirtualSlot2();
+    return 0;
 }
 
 // 0x00507bb0.

@@ -42,10 +42,25 @@ public:
 // tier 3 member names.
 class TerrainOwned {
 public:
+    TerrainOwned();                                             // 0x00401000 (0x14 bytes: Terrain::Load's line 0x11c/0x122 allocations)
     ~TerrainOwned();                                            // 0x00401020
     int Purge(int target);                                      // 0x004011b0 (ret 4; 0x00505600 calls it with 0 between --age and ++age)
     void MarkUsed(void* entry);                                 // 0x00401250 (ret 4; AgeManager::MarkUsed; TerrainShadow slot 30 passes a cell mesh's +0x144)
     int age;                                                    // +0x00 decremented around Purge by Terrain::AcquireOwnedObject
+    char pad_0x04[0x14 - 0x04];
+};
+
+// PROVISIONAL view of the file stream at Terrain+0x3c (UnknownTextureStream in
+// src/reconstructed/TextureMap.h; tier 1 call targets, tier 3 names).
+class TerrainStream {
+public:
+    int Seek(int offset, int origin, int flag);                 // 0x00461340 (ret 0xc)
+    int Tell();                                                 // 0x00461600
+    int Read(void* buffer, int size, int count);                // 0x00461640 (ret 0xc)
+    char pad_0x00[0x1c];
+    TerrainStream* inner;                                       // +0x1c inner stream (archive entry)
+    char pad_0x20[0x130 - 0x20];
+    int innerStart;                                             // +0x130 start offset in the inner stream
 };
 
 // Boundary views of PCTextureMap and ManagedTexture, created by 0x00505600.  Base ctor 0x004c5f00 (ret 8,
@@ -61,7 +76,18 @@ public:
     virtual int CreateSurface(int a1, int a2, int a3, int a4, int a5, int a6, int a7, BaseObject* a8,
                               int a9, TerrainComObject* a10, int a11, int a12, int a13, int a14,
                               void* a15, int a16, int a17);     // slot 4, +0x10
-    char pad_0x08[0x80 - 0x08];
+    // Slot 5 (+0x14, 15 stack arguments): loads the texture from a stream (TextureMap.h's
+    // UnknownVirtualSlot5; argument roles from there, tier 3).
+    virtual int LoadSurface(TerrainStream* stream, int width, int height, int minimumSize,
+                            int fileFormat, int dataSize, int format, BaseObject* palette,
+                            int flags, TerrainComObject* surfacePalette, int addressU,
+                            int addressV, void* choice, int alphaThreshold, unsigned int key);
+    virtual TerrainSurfaceBase* UnknownVirtualSlot6();
+    virtual int UnknownVirtualSlot7();
+    virtual int CreateTextureSurface(int a, int b, int c);      // slot 8, +0x20
+    char pad_0x08[0x3c - 0x08];
+    unsigned int field_0x3c;                                    // +0x3c read as Terrain's colour key by Terrain::Load
+    char pad_0x40[0x80 - 0x40];
 };
 class TerrainSurface : public TerrainSurfaceBase {
 public:
@@ -75,7 +101,8 @@ public:
 };
 struct TerrainSurfaceDesc {
     TextureMapManager* manager;                                // +0x00 passed to PCTextureMap/ManagedTexture constructors
-    char pad_0x04[0x14];
+    TerrainSurfaceRegistry* registry;                          // +0x04 copied to Terrain::field_0x38 by Terrain::Load
+    char pad_0x08[0x10];
 };
 
 struct TerrainVec3;
@@ -115,8 +142,15 @@ struct TerrainCell {
     int field_0x40;                                            // +0x40 nonzero lets TerrainShadow slot 30 emit the cell's vertices
 };
 
+class Terrain;
 class TerrainShutdownObject {
 public:
+    // 0x0047c880 (Grid1.cpp, DrawableGridNodeSharedTextures in src/reconstructed/Grid1.h;
+    // 0x5c bytes, 11 stack arguments): reads the height field from the stream.  Terrain::Load
+    // passes (stream, host, 0, this, gridSize, gridSize * 4, 0, 0, 0, &boundsMin, &boundsMax).
+    TerrainShutdownObject(TerrainStream* stream, int host, void* parentNode, Terrain* terrain,
+                          int size, int size4, int a7, int a8, int a9, TerrainVec3* boundsMin,
+                          TerrainVec3* boundsMax);
     // 0x00484d70 (thiscall, ret 8): walks the cell quadtree (child table +0x04, shift +0x29, nibble
     // table at 0x0056c2ac) down to the leaf whose +0x24/+0x26 halfwords equal (x, z); null if none.
     TerrainCell* LookupCell(int x, int z);
@@ -140,6 +174,7 @@ public:
     char pad_0x20[0x28 - 0x20];
     unsigned char field_0x28;
     unsigned char gridShift;                                   // +0x29 log2 shift: grid edge = 16 << gridShift cells
+    char pad_0x2a[0x5c - 0x2a];
 };
 
 // 0x0056df04 / 0x004a2d00 / 0x004a2d90 bracket the Terrain dtor body: MemTagStack in
@@ -180,9 +215,29 @@ struct TerrainSharedState {
 // The timer's identity and layout are already reconstructed in PeakHold.h.
 // Keep the local alias for the unknown roles of these ten Terrain timers.
 typedef UnknownPeakHold TerrainPeakHold;
+// PROVISIONAL views for Terrain::Load's palette: Display (src/reconstructed/Display.h) holds
+// the IDirectDraw7-shaped interface at +0x190; slot 5 is CreatePalette (flags 0x44 =
+// DDPCAPS_8BIT | DDPCAPS_ALLOW256, 256 entries, out pointer, outer unknown).
+struct TerrainPaletteEntry {
+    unsigned char red, green, blue, flags;                      // PALETTEENTRY layout
+};
+class TerrainDirectDraw {
+public:
+    virtual long __stdcall QueryInterface(void* iid, void** out);
+    virtual unsigned long __stdcall AddRef();
+    virtual unsigned long __stdcall Release();
+    virtual long __stdcall Compact();
+    virtual long __stdcall CreateClipper(unsigned long flags, void** out, void* outer);
+    virtual long __stdcall CreatePalette(unsigned long flags, TerrainPaletteEntry* entries,
+                                         TerrainComObject** out, void* outer);
+};
+struct TerrainDisplay {
+    char pad_0x00[0x190];
+    TerrainDirectDraw* directDraw;                              // +0x190
+};
 struct TerrainHost {
     int field_0x00;
-    int field_0x04;
+    TerrainDisplay* display;                                    // +0x04
     TerrainSharedState* sharedState;  // +0x08 pointer to the 0x220-byte block copied to g_terrainSharedState by slot 23
 };
 extern TerrainSharedState g_terrainSharedState;                 // 0x0068a090
@@ -266,15 +321,22 @@ public:
     void SetField0xbec(int value);                              // 0x00507930 (ret 4)
     void SelectQuality(int index);                              // 0x00507960 (ret 4)
     explicit Terrain(int a);                                    // 0x00505830 (ret 4), forwards a to GameObject(int)
+    // 0x005059d0 (thiscall, ret 0x20; called from QuarryStuntEvent).  Reads the "TRN" version 5
+    // terrain file from `stream`; returns this, or 0 after Release() on a bad header or a failed
+    // palette.  Name and argument roles are tier 3; the third argument is never read.
+    Terrain* Load(int host, TerrainStream* stream, int unused, TerrainSurfaceDesc* desc,
+                  int quality, int field0xc40, const char* textureName, int halfFormat);
     virtual ~Terrain();                                         // 0x005059b0 -> core 0x005079f0
 
     BaseObject* field_0x30;                                     // slot 2 called (0x005079f0)
     TerrainComObject* field_0x34;                               // Release()d, then zeroed
     TerrainSurfaceRegistry* field_0x38;                         // +0x38 tested by 0x00505600 (registers new surfaces)
-    int field_0x3c;
+    TerrainStream* stream;                                      // +0x3c Load's stream argument
     float gridCellSize;                                           // +0x40 ctor 1.0f
     TerrainShutdownObject* heightField;  // +0x44 object with CastSegment slot and GetCellCorners; QueryGround returns early when null; dtor Shutdown(1) then deletes
-    char field_0x48[0x24];
+    TerrainVec3 boundsMin;                                      // +0x48 Load: FLT_MAX, filled by the height field, scaled by gridCellSize
+    TerrainVec3 boundsMax;                                      // +0x54 Load: -FLT_MAX, filled, x/z + 16, scaled
+    char field_0x60[0x6c - 0x60];
     int appliedDrawDistance;  // +0x6c slot 12 (0x507610) compares drawDistance with it, sets a dirty flag when different, then stores drawDistance into it; appliedDrawDistance is also the int a of ComputeRatios
     int field_0x70;
     float field_0x74;                                           // ratio of the two ints (0x507bb0)
@@ -297,7 +359,8 @@ public:
     char field_0xb8[0x53c - 0xb8];
     int field_0x53c;
     int ownedObjectCount;                                            // +0x540 count of ownedObjects[]
-    BaseObject* ownedObjects[(0xbec - 0x544) / 4];
+    BaseObject* ownedObjects[(0xbe8 - 0x544) / 4];               // +0x544 Load: one surface per file record
+    int field_0xbe8;                                            // +0xbe8 read by Load (fourth header dword after the palette)
     int drawDistance;                                            // +0xbec ctor 1000
     int qualityIndex;  // +0xbf0 SelectQuality arg; indexes g_pTerrainQualityTable
     int drawDistanceDirty;  // +0xbf4 set to 1 when SetField0xbec changes the value
@@ -313,13 +376,17 @@ public:
     float invGridCellSize;                                          // +0xc30 ctor 1.0f
     int field_0xc34;
     int field_0xc38;
-    BaseObject* field_0xc3c;                                    // slot 2 called
+    TerrainSurfaceBase* field_0xc3c;                            // slot 2 called; Load: the 0x0050a590 texture (testnoise.tga by default)
     int field_0xc40;
     TerrainMatrix transform;                                  // +0xc44 copy of the matrix from 0x004a1410
     TerrainOwned* field_0xc84;
     TerrainOwned* field_0xc88;
     int field_0xc8c;
-    char field_0xc90[0xca4 - 0xc90];
+    unsigned int colorKey;                                      // +0xc90 Load: field_0xc3c->field_0x3c, or -1 without the texture
+    int field_0xc94;                                            // +0xc94 Load: 5 (the texture's fifth-argument value)
+    int field_0xc98;                                            // +0xc98 Load: 6
+    unsigned int field_0xc9c;                                   // +0xc9c Load: opaque grey of the key's inverted alpha
+    unsigned int field_0xca0;                                   // +0xca0 Load: key colour scaled by its alpha
     int qualityParamA;  // +0xca4 SelectQuality: table[index].field_0x04 (or table[9] when lowestQualityOverride)
     int qualityParamB;  // +0xca8 SelectQuality: table[index].field_0x08
     int field_0xcac;

@@ -292,6 +292,16 @@
   {
     "class": "Terrain",
     "source": "Terrain.cpp",
+    "candidate_symbol_contains": "?Load@Terrain@@",
+    "target_va": "0x005059d0",
+    "target_size": 2116,
+    "expect": "partial",
+    "notes": "75.3% strict (1593/2116). TRN v5 loader (__FILE__ lines 0x11c..0x1e6). Frame layout is retail's (0x440, every local in its retail slot). Same calls, arguments, EH states and control flow; candidate is 2114 bytes. Register allocation differs: retail keeps -1 in edi/ebx and uses immediates for 0 and 3 (the candidate holds 3 and 0 in ebx), the colour-key block schedules the red product inside the c9c chain with the key in ebx, and the palette loop strides a pre-offset pointer (add eax,2 / add eax,3). Tried: goto fail (single fail block, kept), inline Vec3 scale helper (kept), keep before c9c, red local first (kept), *colors++ palette loop (worse), separate loop counters (C2362 with goto).",
+    "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
     "candidate_symbol_contains": "??1Terrain@@",
     "target_va": "0x005079f0",
     "target_size": 441,
@@ -488,6 +498,16 @@
     "expect": "exact",
     "notes": "static const Vec3 (0,0,1) dynamic initializer body; closes Terrain.cpp: .CRT$XCU lists it just before the file's own initializers, its .bss is interleaved with theirs, and Terrain code reads the y axis (docs/INITIALIZERS.md). Copy-initialisation gives the stack temporary plus copy.",
     "bindings": "Terrain.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "../../reconstructed/TerrainSupport.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x505480",
+    "target_size": 10,
+    "expect": "exact",
+    "notes": ".CRT$XCU 304 thunk: call the g_terrainSharedState initialiser, jmp to its atexit registration",
+    "bindings": "../../reconstructed/TerrainSupport.bindings.json"
   },
   {
     "class": "Terrain",
