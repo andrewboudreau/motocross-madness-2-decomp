@@ -4,10 +4,10 @@
   "retail_text_bytes": 1368518,
   "retail_source_paths": 111,
   "rtti_types": 252,
-  "vc6_selected_targets": 2807,
-  "vc6_exact_targets": 2794,
-  "notes": "2794 of 2807 unique retail address/extent pairs passed strict comparison in 2811 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). Every relocation was resolved, or the function had no relocation bytes. The remaining 13 match only with relocations masked or are registered near misses: BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and three near misses in GridNode (0x483910, 0x484d70) and the orientation-axes helper (0x4b5d00). This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.",
-  "vc6_case_count": 2811,
+  "vc6_selected_targets": 2843,
+  "vc6_exact_targets": 2830,
+  "notes": "2830 of 2843 unique retail address/extent pairs passed strict comparison in 2847 calibration cases using authentic VC6 SP3 (Windows, native CL.EXE). Every relocation was resolved, or the function had no relocation bytes. The remaining 13 match only with relocations masked or are registered near misses: BaseObject::Release, seven UI compiler-shape probes, two FollowRacer near misses (0x4a9d20, 0x4a9e80) and three near misses in GridNode (0x483910, 0x484d70) and the orientation-axes helper (0x4b5d00). This excludes the physics runner, whose historical exact label masks relocations, and is not a census of retail functions. RTTI/source-path and .text figures were regenerated from the hash-pinned executable.",
+  "vc6_case_count": 2847,
   "vc6_profile": "vc6_o2_mt",
-  "reviewed_commit": "408b6b23f99b64acf9efbb871aaedb4e65a28e72"
+  "reviewed_commit": "c3539102f473ed66a060162360087546ac553fcb"
 }
