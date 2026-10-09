@@ -26,6 +26,15 @@ int g_UnknownGlobal689938;
 // VC6 allocates the two loads to different registers than retail.
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
 
+// Copies at most 0x103 characters of `name` to `to` and terminates them.
+#define CopySoundName(to, name)                          \
+    {                                                    \
+        int length = strlen(name);                       \
+        int count = length > 0x103 ? 0x103 : length;     \
+        strncpy(to, name, count);                        \
+        to[count] = 0;                                   \
+    }
+
 // 0x004bb630: waits for the half-played events and refills the half that
 // just finished playing, until the stop event.
 unsigned __stdcall UnknownSoundNotifier::UnknownThreadProc(void* context) {
@@ -333,6 +342,42 @@ failed:
     return 0;
 }
 
+// 0x004bc320: loads the sound from `stream`, or from the file `name`.
+// Static sounds (flags 1 and 4) are read completely; streamed sounds
+// (flag 2) keep the stream.
+int Sound::UnknownFunction4bc320(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c) {
+    UnknownTextureStream* file;
+
+    if (!SoundSystem() || !SoundSystem()->field_0x2c_bit0)
+        return 0;
+    if (!stream) {
+        file = new (__FILE__, 544) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        if (!file->UnknownFunction460f50(name, "rb", 0)) {
+            delete file;
+            return 0;
+        }
+    } else {
+        file = stream;
+    }
+    if (flags & 5) {
+        if (!LoadWave(file, flags, a, b, -1))
+            goto failed;
+        if (!stream)
+            delete file;
+    } else if (flags & 2) {
+        field_0x40 = file;
+        if (!LoadWave(file, flags, a, b, c))
+            goto failed;
+    }
+    CopySoundName(field_0x60, name);
+    return 1;
+failed:
+    if (!stream)
+        delete file;
+    field_0x40 = 0;
+    return 0;
+}
+
 // 0x004bc490: buffer control flags for sound flags 1 (volume), 2 (pan) and
 // 4 (frequency).
 unsigned long Sound::GetBufferControlFlags(unsigned long flags) {
@@ -344,6 +389,33 @@ unsigned long Sound::GetBufferControlFlags(unsigned long flags) {
     if (flags & 4)
         controls |= 0x20;
     return controls;
+}
+
+// 0x004bc4c0: shares `source`'s buffer.
+int Sound::DuplicateFrom(Sound* source) {
+    if (!source || !SoundSystem() || !SoundSystem()->field_0x2c_bit0)
+        return 0;
+    ReleaseBuffers();
+    strcpy(field_0x60, "");
+    UnknownSoundBuffer* duplicate = 0;
+    if (!DuplicateBuffer(&duplicate, source))
+        return 0;
+    field_0x0c = duplicate;
+    if (source->field_0x10) {
+        if (field_0x10) {
+            field_0x10->Release();
+            field_0x10 = 0;
+        }
+        if (!Query3DBuffer(field_0x0c, &field_0x10))
+            return 0;
+    }
+    field_0x28 = source;
+    field_0x1f4_bit1 = 1;
+    source->AddRef();
+    CopySoundName(field_0x60, field_0x28->field_0x60);
+    if (field_0x1ec & 0x80)
+        SetVolume(field_0x08->field_0x30, 0);
+    return 1;
 }
 
 // 0x004bc5f0: whether the buffer's property set supports `support` for
@@ -424,6 +496,84 @@ int Sound::IsPlaying() {
     }
     if (field_0x1e8 & 4)
         LeaveCriticalSection(&field_0x48);
+    return 0;
+}
+
+// 0x004bcb30: sets the frequency (100..100000 Hz) of the sound and its
+// duplicates; unless `force`, only while playing and when it changes.
+int Sound::SetFrequency(unsigned long frequency, int force) {
+    if (!SoundSystem()->field_0x2c_bit0)
+        return 1;
+    if (field_0x0c && field_0x1f5_bit0 &&
+        (force || (field_0x19c != frequency && IsPlaying()))) {
+        if (frequency < 100 || frequency > 100000)
+            goto failed;
+        if (field_0x0c->SetFrequency(frequency) < 0)
+            goto failed;
+        int i = 0;
+        if (field_0x24 > 0) {
+            do {
+                if (field_0x20[i] && field_0x20[i]->SetFrequency(frequency) < 0)
+                    goto failed;
+                i++;
+            } while (i < field_0x24);
+        }
+    }
+    field_0x19c = frequency;
+    return 1;
+failed:
+    return 0;
+}
+
+// 0x004bcbe0: sets the volume (-10000..0) of a 2D sound and its duplicates.
+int Sound::SetVolume(long volume, int force) {
+    if (!SoundSystem()->field_0x2c_bit0)
+        return 1;
+    if (field_0x0c && !field_0x10 && field_0x1f5_bit0 &&
+        (force || (field_0x1a0 != volume && IsPlaying()))) {
+        if (volume >= -10000) {
+            if (volume > 0)
+                volume = 0;
+        } else {
+            volume = -10000;
+        }
+        if (field_0x0c->SetVolume(volume) < 0)
+            goto failed;
+        int i = 0;
+        if (field_0x24 > 0) {
+            do {
+                if (field_0x20[i] && field_0x20[i]->SetVolume(volume) < 0)
+                    goto failed;
+                i++;
+            } while (i < field_0x24);
+        }
+    }
+    field_0x1a0 = volume;
+    return 1;
+failed:
+    return 0;
+}
+
+// 0x004bcca0: sets the pan of a 2D sound and its duplicates.
+int Sound::SetPan(long pan, int force) {
+    if (!SoundSystem()->field_0x2c_bit0)
+        return 1;
+    if (field_0x0c && !field_0x10 && field_0x1f5_bit0 &&
+        (force || (field_0x1a4 != pan && IsPlaying()))) {
+        if (field_0x0c->SetPan(pan) < 0)
+            goto failed;
+        int i = 0;
+        if (field_0x24 > 0) {
+            do {
+                if (field_0x20[i] && field_0x20[i]->SetPan(pan) < 0)
+                    goto failed;
+                i++;
+            } while (i < field_0x24);
+        }
+    }
+    field_0x1a4 = pan;
+    return 1;
+failed:
     return 0;
 }
 
@@ -599,6 +749,21 @@ int Sound::FillBufferFromStream(UnknownSoundBuffer** buffer, UnknownTextureStrea
         return 0;
     field_0x1f5_bit0 = 1;
     return 1;
+}
+
+// 0x004bd4b0: creates the buffer a streamed sound is loaded into.
+int Sound::CreatePendingBuffer() {
+    ReleaseBuffers();
+    int stereo = field_0x16a.channels > 1;
+    int is3D = (field_0x1e8 >> 3) & 1;
+    if (!CreateBuffer(&field_0x18, field_0x198, field_0x16a.samplesPerSec, field_0x16a.bitsPerSample,
+                               field_0x16a.blockAlign, stereo, is3D, 1, field_0x1ec, 0))
+        goto failed;
+    if (is3D && !Query3DBuffer(field_0x18, &field_0x1c))
+        goto failed;
+    return 1;
+failed:
+    return 0;
 }
 
 // 0x004bd540: creates a PCM buffer: static ones in software, others in

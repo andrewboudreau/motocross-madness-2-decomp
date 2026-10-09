@@ -1,10 +1,6 @@
 // Near-miss Net.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/NET.md.
 //
-// NetPendingMessage::SetPending (0x004aadc0, 84 bytes): 87.5%.
-// Retail stores the type, the sequence and then field_0x8f4 (the size);
-// VC6 here hoists the field_0x8f4 store ahead of the other two.
-//
 // NetworkInterface::ConnectUsingLobby (0x004ab960, 989 bytes): about
 // 15%; the candidate is 1072 bytes. Retail keeps the constant zero in ebx
 // and tail-merges the error paths; VC6 here keeps `connection` in ebx and
@@ -12,10 +8,6 @@
 //
 // NetworkInterface::CreateAddress (0x004abf10, 948 bytes): 92.4%.
 // The MODEM case keeps `port` in edx where retail uses ebx.
-//
-// NetworkInterface::NextPlayer (0x004ac7c0, 53 bytes): 86.8%.
-// The loop counter and *index swap ecx and edx. Caching *index in a local,
-// declaring the counter first and `*index = i + 1` (90.6%) do not fix it.
 //
 // NetworkInterface::DispatchMessages (0x004aced0, 370 bytes): 95.5%.
 // The ring-slot address uses [edi+eax+4] where retail has [eax+edi+4], and
@@ -69,19 +61,6 @@ extern "C" long __stdcall DirectPlayLobbyCreateA(GUID* provider,
         strncpy(error, text, count);                                     \
         error[count] = 0;                                                \
     }
-
-// 0x004aadc0
-int NetPendingMessage::SetPending(int messageType, short sequence, void* source,
-                                              unsigned int length, int sender, int receiver)
-{
-    Set(source, length, sender, receiver, 0);
-    type = messageType;
-    *(short*)&data[2] = sequence;
-    sendSize = length;
-    resendTimer = 0;
-    next = 0;
-    return 1;
-}
 
 // 0x004ab960: connects with the settings of a lobby that launched the game.
 long NetworkInterface::ConnectUsingLobby()
@@ -256,23 +235,6 @@ int NetworkInterface::CreateAddress(GUID provider, char* address, char* port,
     return 1;
 failed:
     return 0;
-}
-
-// 0x004ac7c0: the player at *index, advancing *index.
-NetPlayer* NetworkInterface::NextPlayer(int* index)
-{
-    NetPlayer* player = players;
-    if (!player)
-        return 0;
-    for (int i = 0; i != *index; i++) {
-        if (!player)
-            return 0;
-        player = player->next;
-    }
-    if (!player)
-        return 0;
-    (*index)++;
-    return player;
 }
 
 // 0x004aced0: dispatches the received messages in ring order.

@@ -102,16 +102,30 @@ Source shapes:
   tests the locked sizes as `> 0` (unsigned, `jbe`) and jumps into the
   silence block from the first half.
 
-Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there): the
-frequency, volume and pan setters, the streamed buffer creator `0x004bd4b0`,
-`0x004bc4c0`, `0x004bc320`, `0x004bd0c0`, the factory `0x004bb890` and the
-manager's thread `0x004bdc00`, and the start-up `0x004bc6b0` (the setters'
-loop shape; in the samples file it also gains an EH frame because the
-notifier's constructor is not defined there).
+Exact (6 more): the frequency, volume and pan setters
+(`0x004bcb30`/`0x004bcbe0`/`0x004bcca0`), the loader `0x004bc320`, the
+duplicator `0x004bc4c0` and the streamed buffer creator `0x004bd4b0`.
+Their source shapes:
+
+- The duplicate loops are guarded do-whiles (`int i = 0; if (field_0x24 >
+  0) do { ... } while (++i ...)`): VC6 leaves a do-while unrotated, which
+  gives retail's `jge store; jmp top` exit with the shared `return 0`
+  between the loop and the final store. `for`, `while`, `break` with a later
+  test and gotos all rotate the loop.
+- The volume clamp is `if (volume >= -10000) { if (volume > 0) volume = 0; }
+  else volume = -10000;` (the `volume = -10000` block last).
+- The 0x103-character name copy is a macro, not an inline function
+  (`CopySoundName`, like Net.cpp's NET_ERROR_TEXT, with a `count` ternary):
+  the inline version keeps the destination address in a register and swaps
+  `this` and the source pointer in 0x004bc4c0 and 0x004bc320.
+- The streamed buffer creator computes `stereo` into a local before `is3D`.
+
+Near misses (`samples/audio/PCAudioNearMisses.cpp`, notes there):
+`0x004be910`, `0x004bd0c0`, the factory `0x004bb890`, the manager's thread
+`0x004bdc00` and the start-up `0x004bc6b0` (in the samples file it also
+gains an EH frame because the notifier's constructor is not defined there;
+inside PCAudio.cpp the frame matches retail).
 
 Every function of PCAudio.cpp (`0x004bb630`–`0x004bed40`) is now either
 exact or a documented near miss. `0x004be330` is not a function start (inside
-`0x004be2d0`). For the setters, a `break` with a later index test, a
-`while` loop, `continue` on an empty duplicate and a `goto` around the
-failure return were also tried; VC6 still places the `return 0` after the
-store.
+`0x004be2d0`).

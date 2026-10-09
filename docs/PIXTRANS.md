@@ -103,10 +103,16 @@ magenta key 0x7c1f/0xf81f; both have an ebp frame) and palette
 `0x004cee30`. The `DebugMalloc`/`delete` line numbers of the downsamplers
 run from 1329 (24-bit) to 1840 (palette).
 
+`0x004d0700` (565 to 8888, keyed) and `0x004d07d0` (1555 to 8888) are
+exact. `0x004d0700` takes the row pointers from the arguments before
+`Pack565(key)` (VC6 hands the dead argument slots to the locals in the
+order of the arguments' first use, so the y counter lands in the key's
+slot as in retail) and stores alpha 0xff in both arms; `0x004d07d0` writes
+alpha with an if/else (a `?:` changes the base offset of the
+strength-reduced pixel pointer).
+
 Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004ce420` (the
 1555 halver; retail keeps the two lower-row pixels in frame slots),
-`0x004d0700` (565 to 8888, keyed; register and slot choice) and
-`0x004d07d0` (1555 to 8888; only the pixel pointer's base offset);
 `0x004d24d0` (average colour; the shared return's position); `0x004cdf10`, the 8888 halver, which
 averages colour over the 2x2 pixels with alpha set (the fourth pixel adds
 the third one's alpha in retail) and differs in register assignment.

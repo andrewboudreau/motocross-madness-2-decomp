@@ -9,16 +9,6 @@
 // height into ebx before reading the display mode; VC6 here loads the mode
 // first (an inverted condition and a nested test give the same code).
 //
-// 0x004040f0 (261 bytes): retail places the shared `return -1` after the
-// search loop and jumps there on a failed realloc; VC6 here places it at the
-// end (early returns or `goto failed`).
-//
-// 0x004043c0 (177 bytes): the instructions match; retail lays the
-// `return 0` block out between the loop and the final `return 1` (`jge`
-// out, `jmp` back), VC6 here puts it last. A local rectangle pointer, the
-// accessor, early returns, `continue`, `goto` and a while loop all compile
-// to the same layout.
-//
 // 0x004049d0 (678 bytes): retail stores the three leading zeros (and
 // `field_0x60 = 0`) as immediates; VC6 here caches 0 in edi, which shifts
 // the register choice of the region loop. Statement orders and a helper
@@ -90,59 +80,6 @@ int BackgroundImage::UnknownVirtualSlot13() {
     }
     if (--fullRestoreFrames < 0)
         fullRestoreFrames = 0;
-    return 1;
-}
-
-// 0x004040f0: a free region, or four more.
-int BackgroundImage::UnknownFunction4040f0(int owner) {
-    int i;
-
-    if (regionCapacity > regionCount) {
-        for (i = 0; i < regionCapacity; i++) {
-            if (regionTable[i].framesLeft == 0) {
-                regionTable[i].framesLeft = Target()->field_0x14 + 1;
-                regionTable[i].owner = owner;
-                regionCount++;
-                return i;
-            }
-        }
-        goto failed;
-    }
-    regionTable = (UnknownBackgroundRegion*)DebugRealloc(regionTable, (regionCapacity + 4) * sizeof(UnknownBackgroundRegion),
-                                                        __FILE__, 270);
-    if (!regionTable)
-        goto failed;
-    for (i = regionCapacity; i < regionCapacity + 4; i++) {
-        regionTable[i].framesLeft = 0;
-        regionTable[i].pendingFrame = -1;
-        regionTable[i].owner = 0;
-    }
-    regionTable[regionCapacity].framesLeft = Target()->field_0x14 + 1;
-    regionTable[regionCapacity].lastFrameCount = Target()->field_0x1c;
-    regionTable[regionCapacity].owner = owner;
-    regionCapacity += 4;
-    regionCount++;
-    return regionCapacity - 4;
-failed:
-    return -1;
-}
-
-// 0x004043c0: clears the depth buffer under each region's previous-frame
-// rectangle.
-int BackgroundImage::ClearRegionDepth() {
-    if (regionCount && Target()->field_0x08) {
-        int frame = Target()->field_0x18 - 1;
-        if (frame < 0)
-            frame = Target()->field_0x14 - 1;
-        for (int i = 0; i < regionCapacity; i++) {
-            if (regionTable[i].framesLeft &&
-                regionTable[i].frameRects[frame].right - regionTable[i].frameRects[frame].left > 0 &&
-                regionTable[i].frameRects[frame].bottom - regionTable[i].frameRects[frame].top > 0 &&
-                Target()->device->Clear(1, &regionTable[i].frameRects[frame], 2, 0,
-                                                      Target()->field_0x2c, 0) != 0)
-                return 0;
-        }
-    }
     return 1;
 }
 

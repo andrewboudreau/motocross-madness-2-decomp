@@ -250,3 +250,20 @@ python3 tools/decl_shift_scan.py samples/render/MatrixUtilNearMisses.cpp \
 - The flattened-chain emission order (reverse source order) was measured for
   three-term chains of leaf products; longer chains and mixed chains were
   not.
+
+## Control-flow source shapes (measured while matching PCAudio, Net, Pixtrans and BackgroundImage)
+
+- Retail's unrotated loop exit (`jge exit; jmp top`, with the return block between the
+  loop and the following code) comes only from a guarded do-while:
+  `int i = 0; if (n > 0) do { ... } while (++i < n);`. `for` and `while` loops, with or
+  without `break`/`goto`, are rotated. (`while (1) { if (done) break; ... }` keeps a
+  top-tested loop instead, see FontTexture.)
+- A trailing `return X;` after an if-block merges with an earlier identical return, so
+  failure paths jump back to it; `goto failed` or an early return emits a second copy.
+- A helper written as a macro reproduces retail's address recomputation where the same
+  helper as an inline function keeps the destination in a register (PCAudio's sound
+  name copy).
+- `new` of a class whose constructor is defined earlier in the same unit and cannot throw
+  needs no EH frame, so such a function only gets retail's frameless prologue when
+  compiled inside its own unit.
+

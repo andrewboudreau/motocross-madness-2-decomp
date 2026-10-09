@@ -35,11 +35,19 @@ accessor): retail reloads +0x50 and the target's frame index after each
 global store. A local rectangle pointer or reference keeps them in
 registers and does not match.
 
+The region allocator `0x004040f0` and the depth clear `0x004043c0` are
+exact. The allocator's failed realloc reaches the search's `return -1` by
+VC6 merging the function's trailing `return -1` (after `if (regionTable)
+{ ... return regionCapacity - 4; }`) into the earlier one; `goto failed`
+or an early return places a second copy at the end. The depth clear's
+region loop is a guarded do-while (`int i = 0; if (regionCapacity > 0) do
+... while (i < regionCapacity)`), which VC6 leaves unrotated and exits with
+retail's `jge; jmp top`.
+
 Near misses (`samples/render/BackgroundImageNearMisses.cpp`, notes there):
-the constructor (vptr store placement), slot 13, the region allocator
-`0x004040f0`, the depth clear `0x004043c0` (block layout only) and the DC
-lookup `0x004049d0` (retail stores its leading zeros as immediates; VC6
-here caches 0 in edi).
+the constructor (vptr store placement), slot 13 and the DC lookup
+`0x004049d0` (retail stores its leading zeros as immediates; VC6 here
+caches 0 in edi).
 
 ## Function names
 

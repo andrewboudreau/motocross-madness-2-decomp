@@ -10,28 +10,24 @@
 // every order of the four field assignments, a channel temporary, `?:` and
 // an if/else body leave VC6 loading `stereo` into esi first.
 //
-// Sound 0x004bcb30 / 0x004bcbe0 / 0x004bcca0 (frequency, volume, pan): retail
-// places the shared `return 0` between the duplicate loop and the final
-// store (the loop exits with `jge store; jmp top`); here it lands after the
-// store. Early returns, `goto failed`, a while loop, an HRESULT-carrying loop
-// and a combined condition all keep VC6's layout.
-//
-// Sound 0x004bd4b0 (creates a streamed sound's buffer): the arguments of
-// 0x004bd540 are scheduled into different registers.
-//
-// Sound 0x004bc4c0 (duplicates a sound) and 0x004bc320 (loads from a stream
-// or file): `this` and the source pointer swap ebx/ebp (ebp/edi).
-//
 // Sound 0x004bd0c0 (refills from the archive or file) and 0x004bb890 (the
 // sound factory): retail keeps one `return 1` block shared by both branches
-// and inlines the factory's early `return 0` epilogues; VC6 here folds the
+// and inlines the factory's early `return 0` epilogues (the first one
+// without `xor eax, eax`, eax being the null entry); VC6 here folds the
 // archive branch's result into `neg/sbb` and shares the factory's failures.
+// An if/else with one trailing `return 1`, gotos to shared labels, a
+// result variable and an ok flag were tried for 0x004bd0c0.
 //
-// Sound 0x004bc6b0 (starts a sound): the same loop shape as the setters:
-// retail exits the duplicate search with `jge failed; jmp top` and jumps to
-// one shared failure epilogue, where VC6 here copies the epilogue after the
-// loop (goto, break-then-test and a found flag all give that). The prologue
-// also stores the bitfield and play flags in the other order.
+// Sound 0x004bc6b0 (starts a sound): compiled inside PCAudio.cpp (where the
+// UnknownSoundNotifier constructor is defined, so VC6 drops the EH frame
+// like retail) with the guarded do-while duplicate search and playFlags
+// used before preferHardware, 237 of 629 bytes match: the search loop, the
+// prologue and the slot of `status` agree. Left: VC6 cross-jumps the two
+// `Play()` failure tails (streamed `return 0` and the `& 5` branch's
+// `goto failed`) where retail keeps them apart (the streamed one returns
+// Play's zero without `xor eax, eax`), and retail initialises `queue` after
+// the EnterCriticalSection. Here (outside PCAudio.cpp) VC6 also adds the EH
+// frame.
 //
 // UnknownPCAudioObject 0x004bdc00 (the loader thread): retail's queue loop is
 // not rotated and spills one local (frame 0xc); here VC6 rotates the loop
@@ -48,15 +44,6 @@
 #include "../../src/reconstructed/UnknownResourceManager.h"
 
 #define SoundSystem() ((PCSoundInterface*)g_TrackGame->soundInterface)
-
-// Copies at most 0x103 characters of `name` and terminates them.
-static inline void CopySoundName(char* to, const char* name) {
-    int length = strlen(name);
-    if (length > 0x103)
-        length = 0x103;
-    strncpy(to, name, length);
-    to[length] = 0;
-}
 
 // 0x004be910: sets the primary buffer's PCM format.
 int PCSoundInterface::SetPrimaryFormat(int rate, int stereo, int bits) {
@@ -108,133 +95,6 @@ named:
     return sound;
 }
 
-// 0x004bc320: loads the sound from `stream`, or from the file `name`.
-// Static sounds (flags 1 and 4) are read completely; streamed sounds
-// (flag 2) keep the stream.
-int Sound::UnknownFunction4bc320(const char* name, UnknownTextureStream* stream, int flags, int a, int b, int c) {
-    UnknownTextureStream* file;
-
-    if (!SoundSystem() || !SoundSystem()->field_0x2c_bit0)
-        return 0;
-    if (!stream) {
-        file = new (__FILE__, 544) UnknownTextureStream((int)g_UnknownResourceManager572b44);
-        if (!file->UnknownFunction460f50(name, "rb", 0)) {
-            delete file;
-            return 0;
-        }
-    } else {
-        file = stream;
-    }
-    if (flags & 5) {
-        if (!LoadWave(file, flags, a, b, -1))
-            goto failed;
-        if (!stream)
-            delete file;
-    } else if (flags & 2) {
-        field_0x40 = file;
-        if (!LoadWave(file, flags, a, b, c))
-            goto failed;
-    }
-    CopySoundName(field_0x60, name);
-    return 1;
-failed:
-    if (!stream)
-        delete file;
-    field_0x40 = 0;
-    return 0;
-}
-
-// 0x004bc4c0: shares `source`'s buffer.
-int Sound::DuplicateFrom(Sound* source) {
-    if (!source || !SoundSystem() || !SoundSystem()->field_0x2c_bit0)
-        return 0;
-    ReleaseBuffers();
-    strcpy(field_0x60, "");
-    UnknownSoundBuffer* duplicate = 0;
-    if (!DuplicateBuffer(&duplicate, source))
-        return 0;
-    field_0x0c = duplicate;
-    if (source->field_0x10) {
-        if (field_0x10) {
-            field_0x10->Release();
-            field_0x10 = 0;
-        }
-        if (!Query3DBuffer(field_0x0c, &field_0x10))
-            return 0;
-    }
-    field_0x28 = source;
-    field_0x1f4_bit1 = 1;
-    source->AddRef();
-    CopySoundName(field_0x60, field_0x28->field_0x60);
-    if (field_0x1ec & 0x80)
-        SetVolume(field_0x08->field_0x30, 0);
-    return 1;
-}
-
-// 0x004bcb30: sets the frequency (100..100000 Hz) of the sound and its
-// duplicates; unless `force`, only while playing and when it changes.
-int Sound::SetFrequency(unsigned long frequency, int force) {
-    if (!SoundSystem()->field_0x2c_bit0)
-        return 1;
-    if (field_0x0c && field_0x1f5_bit0 &&
-        (force || (field_0x19c != frequency && IsPlaying()))) {
-        if (frequency < 100 || frequency > 100000)
-            goto failed;
-        if (field_0x0c->SetFrequency(frequency) < 0)
-            goto failed;
-        for (int i = 0; i < field_0x24; i++) {
-            if (field_0x20[i] && field_0x20[i]->SetFrequency(frequency) < 0)
-                goto failed;
-        }
-    }
-    field_0x19c = frequency;
-    return 1;
-failed:
-    return 0;
-}
-
-// 0x004bcbe0: sets the volume (-10000..0) of a 2D sound and its duplicates.
-int Sound::SetVolume(long volume, int force) {
-    if (!SoundSystem()->field_0x2c_bit0)
-        return 1;
-    if (field_0x0c && !field_0x10 && field_0x1f5_bit0 &&
-        (force || (field_0x1a0 != volume && IsPlaying()))) {
-        if (volume < -10000)
-            volume = -10000;
-        else if (volume > 0)
-            volume = 0;
-        if (field_0x0c->SetVolume(volume) < 0)
-            goto failed;
-        for (int i = 0; i < field_0x24; i++) {
-            if (field_0x20[i] && field_0x20[i]->SetVolume(volume) < 0)
-                goto failed;
-        }
-    }
-    field_0x1a0 = volume;
-    return 1;
-failed:
-    return 0;
-}
-
-// 0x004bcca0: sets the pan of a 2D sound and its duplicates.
-int Sound::SetPan(long pan, int force) {
-    if (!SoundSystem()->field_0x2c_bit0)
-        return 1;
-    if (field_0x0c && !field_0x10 && field_0x1f5_bit0 &&
-        (force || (field_0x1a4 != pan && IsPlaying()))) {
-        if (field_0x0c->SetPan(pan) < 0)
-            goto failed;
-        for (int i = 0; i < field_0x24; i++) {
-            if (field_0x20[i] && field_0x20[i]->SetPan(pan) < 0)
-                goto failed;
-        }
-    }
-    field_0x1a4 = pan;
-    return 1;
-failed:
-    return 0;
-}
-
 // 0x004bd0c0: refills `buffer` from the sound's archive entry or file,
 // skipping the 44-byte header.
 int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
@@ -264,20 +124,6 @@ int Sound::FillBufferFromFile(UnknownSoundBuffer** buffer) {
         }
     }
     delete file;
-    return 0;
-}
-
-// 0x004bd4b0: creates the buffer a streamed sound is loaded into.
-int Sound::CreatePendingBuffer() {
-    ReleaseBuffers();
-    int is3D = (field_0x1e8 >> 3) & 1;
-    if (!CreateBuffer(&field_0x18, field_0x198, field_0x16a.samplesPerSec, field_0x16a.bitsPerSample,
-                               field_0x16a.blockAlign, field_0x16a.channels > 1, is3D, 1, field_0x1ec, 0))
-        goto failed;
-    if (is3D && !Query3DBuffer(field_0x18, &field_0x1c))
-        goto failed;
-    return 1;
-failed:
     return 0;
 }
 
@@ -356,9 +202,9 @@ int Sound::PlayWithOptions(int restart, unsigned long playFlags, int preferHardw
     if (!SoundSystem()->field_0x2c_bit0 || !field_0x08 || !field_0x08->field_0x2c_bit0 ||
         field_0x08->field_0x25_bit2)
         return 1;
-    field_0x1f4_bit6 = preferHardware;
     int looping = playFlags & 1;
     field_0x1f0 = playFlags;
+    field_0x1f4_bit6 = preferHardware;
     if (field_0x1e8 & 2) {
         field_0x1f0 = 1;
     } else if (!(field_0x1e8 & 0x20)) {
@@ -378,22 +224,21 @@ int Sound::PlayWithOptions(int restart, unsigned long playFlags, int preferHardw
         if ((status & 1) == 1 && looping == field_0x1f4_bit3) {
             if (!restart)
                 goto done;
-            int found = 0;
-            for (; i < field_0x24; i++) {
-                if (field_0x20[i]) {
-                    if (field_0x20[i]->GetStatus(&status) < 0)
-                        goto failed;
-                    if ((status & 1) != 1) {
-                        found = 1;
-                        break;
+            if (field_0x24 > 0) {
+                do {
+                    if (field_0x20[i]) {
+                        if (field_0x20[i]->GetStatus(&status) < 0)
+                            goto failed;
+                        if ((status & 1) != 1) {
+                            if (field_0x20[i]->Play(0, 0, playFlags) < 0)
+                                goto failed;
+                            return 1;
+                        }
                     }
-                }
+                    i++;
+                } while (i < field_0x24);
             }
-            if (!found)
-                goto failed;
-            if (field_0x20[i]->Play(0, 0, playFlags) < 0)
-                goto failed;
-            return 1;
+            goto failed;
         }
         if (!(field_0x1e8 & 5)) {
             if (field_0x1e8 & 2) {

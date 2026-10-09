@@ -92,6 +92,39 @@ void BackgroundImage::SetImage(PCTextureMap* image) {
     }
 }
 
+// 0x004040f0: a free region, or four more.
+int BackgroundImage::UnknownFunction4040f0(int owner) {
+    int i;
+
+    if (regionCapacity > regionCount) {
+        for (i = 0; i < regionCapacity; i++) {
+            if (regionTable[i].framesLeft == 0) {
+                regionTable[i].framesLeft = Target()->field_0x14 + 1;
+                regionTable[i].owner = owner;
+                regionCount++;
+                return i;
+            }
+        }
+        return -1;
+    }
+    regionTable = (UnknownBackgroundRegion*)DebugRealloc(regionTable, (regionCapacity + 4) * sizeof(UnknownBackgroundRegion),
+                                                        __FILE__, 270);
+    if (regionTable) {
+        for (i = regionCapacity; i < regionCapacity + 4; i++) {
+            regionTable[i].framesLeft = 0;
+            regionTable[i].pendingFrame = -1;
+            regionTable[i].owner = 0;
+        }
+        regionTable[regionCapacity].framesLeft = Target()->field_0x14 + 1;
+        regionTable[regionCapacity].lastFrameCount = Target()->field_0x1c;
+        regionTable[regionCapacity].owner = owner;
+        regionCapacity += 4;
+        regionCount++;
+        return regionCapacity - 4;
+    }
+    return -1;
+}
+
 // 0x00404200
 void BackgroundImage::UnknownFunction404200(int index) {
     if (regionTable && index < regionCapacity) {
@@ -130,6 +163,29 @@ int BackgroundImage::RestoreRegions() {
                 if (regionTable[i].framesLeft == 0)
                     regionCount--;
             }
+        }
+    }
+    return 1;
+}
+
+// 0x004043c0: clears the depth buffer under each region's previous-frame
+// rectangle.
+int BackgroundImage::ClearRegionDepth() {
+    if (regionCount && Target()->field_0x08) {
+        int frame = Target()->field_0x18 - 1;
+        if (frame < 0)
+            frame = Target()->field_0x14 - 1;
+        int i = 0;
+        if (regionCapacity > 0) {
+            do {
+                if (regionTable[i].framesLeft &&
+                    regionTable[i].frameRects[frame].right - regionTable[i].frameRects[frame].left > 0 &&
+                    regionTable[i].frameRects[frame].bottom - regionTable[i].frameRects[frame].top > 0 &&
+                    Target()->device->Clear(1, &regionTable[i].frameRects[frame], 2, 0,
+                                            Target()->field_0x2c, 0) != 0)
+                    return 0;
+                i++;
+            } while (i < regionCapacity);
         }
     }
     return 1;

@@ -1,8 +1,8 @@
 # Net.cpp: the DirectPlay network layer
 
 `src/reconstructed/Net.cpp` reconstructs `D:\aardvark\VC\krusty2\Net.cpp`
-(`0x004aab00`..`0x004ae2e7`). 81 functions match strictly under the default
-VC6 profile and are registered as calibration cases; five near misses
+(`0x004aab00`..`0x004ae2e7`). 83 functions match strictly under the default
+VC6 profile and are registered as calibration cases; three near misses
 are in `samples/net/NetNearMisses.cpp`. The RTTI names are `NetworkInterface`,
 `InfoType`, `PlayerInfoType`, `ConnectionInfoType` and `SessionInfoType`. All
 other type, member and function names are provisional.
@@ -87,13 +87,18 @@ Function and member names in `Net.h` are provisional (tier 3) unless noted:
 
 | VA | Size | Match | Difference |
 |---|---:|---:|---|
-| `0x004aadc0` | 84 | 87.5% | the size store is hoisted above the type and sequence stores |
 | `0x004ab960` | 989 | ~15% | candidate is 1072 bytes; retail keeps zero in ebx and tail-merges the error texts |
 | `0x004abf10` | 948 | 92.4% | MODEM case: `port` is in edx where retail uses ebx |
-| `0x004ac7c0` | 53 | 86.8% | the loop counter and `*index` swap ecx/edx |
 | `0x004aced0` | 370 | 95.5% | SIB operand order and how field_0x34 is reloaded after the slot-17 call |
 
 ## Source shapes that mattered
+
+- `0x004aadc0` stores the sequence through a local `short*` into the data
+  (`header[1] = sequence`); written as `*(short*)&data[2]` VC6 hoists the
+  size store above the type and sequence stores.
+- `0x004ac7c0` tests `players` before copying it into the walk pointer
+  (`if (!players) return 0; NetPlayer* player = players;`) and compares
+  `i != *index`; copying first swaps the counter and `*index` registers.
 
 - Retail uses goto-failed shapes throughout: the success path is out of
   line in `0x004ac510`, `0x004ac720`, `0x004accd0`, `0x004acd20`,

@@ -118,6 +118,20 @@ NetPendingMessage::NetPendingMessage()
     field_0x900 = 0;
 }
 
+// 0x004aadc0: data[2..3] carry the sequence number.
+int NetPendingMessage::SetPending(int messageType, short sequence, void* source,
+                                  unsigned int length, int sender, int receiver)
+{
+    Set(source, length, sender, receiver, 0);
+    type = messageType;
+    short* header = (short*)data;
+    header[1] = sequence;
+    sendSize = length;
+    resendTimer = 0;
+    next = 0;
+    return 1;
+}
+
 // 0x004aae20 (identical-code folded with another TU's one-pointer constructor)
 NetPendingList::NetPendingList()
 {
@@ -678,6 +692,23 @@ failed:
     if (playerName)
         DebugFree(playerName, __FILE__, 1370);
     return 0;
+}
+
+// 0x004ac7c0: the player at *index, advancing *index.
+NetPlayer* NetworkInterface::NextPlayer(int* index)
+{
+    if (!players)
+        return 0;
+    NetPlayer* player = players;
+    for (int i = 0; i != *index; i++) {
+        if (!player)
+            return 0;
+        player = player->next;
+    }
+    if (!player)
+        return 0;
+    (*index)++;
+    return player;
 }
 
 // 0x004ac800

@@ -7,6 +7,57 @@
 #include "DebugAlloc.h"
 #include "TextureMap.h"
 
+// 0x004d0700: converts 565 to 8888; the key colour becomes opaque magenta.
+int Convert565To8888(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride, unsigned int key) {
+    unsigned short* sourceRow = (unsigned short*)source;
+    UnknownPixel32* row = (UnknownPixel32*)destination;
+    unsigned short transparent = Pack565(key);
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        UnknownPixel32* to = row;
+        for (int x = 0; x < width; x++, to++, from++) {
+            if (*from == transparent) {
+                to->red = 0xff;
+                to->green = 0;
+                to->blue = 0xff;
+                to->alpha = 0xff;
+            } else {
+                to->red = (*from >> 8) & 0xf8;
+                to->green = (*from >> 3) & 0xfc;
+                to->blue = *from << 3;
+                to->alpha = 0xff;
+            }
+        }
+        sourceRow += sourceStride;
+        row += destinationStride;
+    }
+    return 1;
+}
+
+// 0x004d07d0: converts 1555 to 8888.
+int Convert1555To8888(void* destination, void* source, int width, int height, int destinationStride,
+                          int sourceStride) {
+    unsigned short* sourceRow = (unsigned short*)source;
+    UnknownPixel32* row = (UnknownPixel32*)destination;
+    for (int y = 0; y < height; y++) {
+        unsigned short* from = sourceRow;
+        UnknownPixel32* to = row;
+        for (int x = 0; x < width; x++, to++, from++) {
+            to->red = (*from >> 7) & 0xf8;
+            to->green = (*from >> 2) & 0xf8;
+            to->blue = *from << 3;
+            if (*from & 0x8000)
+                to->alpha = 0xff;
+            else
+                to->alpha = 0;
+        }
+        sourceRow += sourceStride;
+        row += destinationStride;
+    }
+    return 1;
+}
+
 // 0x004d0870: converts 4444 to 8888.
 int Convert4444To8888(void* destination, void* source, int width, int height, int destinationStride,
                           int sourceStride) {

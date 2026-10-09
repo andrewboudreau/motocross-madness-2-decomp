@@ -8,15 +8,6 @@
 // Accumulator declaration order (all 120) and an indexed lower row do not
 // change it.
 //
-// Convert565To8888 (0x004d0700, 208 bytes): 565 to 8888 with a key.
-// The row pointers and the 0xff constant land in different registers and
-// slots (retail keeps 0xff in dl and both rows in argument slots); about 60
-// lines differ in every pointer-order and key-placement variant.
-//
-// Convert1555To8888 (0x004d07d0, 146 bytes): 1555 to 8888. Only the
-// pixel pointer's base offset differs (retail addresses the pixel from its
-// alpha byte, VC6 here from blue); 7 lines.
-//
 // Halve1555 (0x004ce420, 456 bytes; candidate 448): the 1555
 // halver behind 0x004d0170. The arithmetic, the >= 2 test and the packing
 // match. Retail loads the two lower-row pixels before the first test and
@@ -37,53 +28,6 @@
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/Pixtrans.h"
 #include "../../src/reconstructed/TextureMap.h"
-
-// 0x004d0700: converts 565 to 8888; the key colour becomes opaque magenta.
-int Convert565To8888(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride, unsigned int key) {
-    unsigned short transparent = Pack565(key);
-    unsigned short* sourceRow = (unsigned short*)source;
-    UnknownPixel32* row = (UnknownPixel32*)destination;
-    for (int y = 0; y < height; y++) {
-        unsigned short* from = sourceRow;
-        UnknownPixel32* to = row;
-        for (int x = 0; x < width; x++, to++, from++) {
-            if (*from == transparent) {
-                to->red = 0xff;
-                to->green = 0;
-                to->blue = 0xff;
-            } else {
-                to->red = (*from >> 8) & 0xf8;
-                to->green = (*from >> 3) & 0xfc;
-                to->blue = *from << 3;
-            }
-            to->alpha = 0xff;
-        }
-        sourceRow += sourceStride;
-        row += destinationStride;
-    }
-    return 1;
-}
-
-// 0x004d07d0: converts 1555 to 8888.
-int Convert1555To8888(void* destination, void* source, int width, int height, int destinationStride,
-                          int sourceStride) {
-    unsigned short* sourceRow = (unsigned short*)source;
-    UnknownPixel32* row = (UnknownPixel32*)destination;
-    for (int y = 0; y < height; y++) {
-        unsigned short* from = sourceRow;
-        UnknownPixel32* to = row;
-        for (int x = 0; x < width; x++, to++, from++) {
-            to->red = (*from >> 7) & 0xf8;
-            to->green = (*from >> 2) & 0xf8;
-            to->blue = *from << 3;
-            to->alpha = (*from & 0x8000) ? 0xff : 0;
-        }
-        sourceRow += sourceStride;
-        row += destinationStride;
-    }
-    return 1;
-}
 
 // 0x004cdf10: halves 8888 pixels. Colour averages the 2x2 pixels whose
 // alpha is set; alpha is the block's sum / 4. (The fourth pixel adds the
