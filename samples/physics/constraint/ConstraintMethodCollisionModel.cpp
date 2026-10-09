@@ -185,15 +185,20 @@ int ConstraintMethodCollisionModel::GameObjectVirtualSlot11(float t)
     return 1;
 }
 
-// TU-private zero vector at 0x00579830.  The dynamic initializer (thunk 0x0043c8e0, body
-// 0x0043c8f0) builds it in a stack temporary and copies it out, which is the shape VC6 gives
+// TU-private vector constants, .CRT$XCU entries 66-69: zero 0x00579830 (thunk 0x0043c8e0,
+// body 0x0043c8f0), x axis 0x00579840 (0x0043c930/0x0043c940), y axis 0x00579850
+// (0x0043c980/0x0043c990) and z axis 0x00579820 (0x0043c9d0/0x0043c9e0).  Each 60-byte body
+// builds the value in a stack temporary and copies it out, which is the shape VC6 gives
 // copy-initialization from a constructor call (direct initialization stores the floats
-// straight into the global).
-struct ConZeroVec {
+// straight into the global).  Only the zero vector has a reader here.
+struct ConStaticVec3 {
     float x, y, z;
-    ConZeroVec(float a, float b, float c) : x(a), y(b), z(c) {}
+    ConStaticVec3(float a, float b, float c) : x(a), y(b), z(c) {}
 };
-static const ConZeroVec g_ConZero = ConZeroVec(0.0f, 0.0f, 0.0f);
+static const ConStaticVec3 g_ConZero = ConStaticVec3(0.0f, 0.0f, 0.0f);
+static const ConStaticVec3 g_ConXAxis = ConStaticVec3(1.0f, 0.0f, 0.0f);
+static const ConStaticVec3 g_ConYAxis = ConStaticVec3(0.0f, 1.0f, 0.0f);
+static const ConStaticVec3 g_ConZAxis = ConStaticVec3(0.0f, 0.0f, 1.0f);
 
 void ConstraintMethodCollisionModel::ApplyContactImpulse(ConBody* other, float t,
                                                          ConVec3 a, ConVec3 b, ConVec3 c)

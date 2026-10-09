@@ -48,7 +48,16 @@ functions are now exact:
 - `0x0042f210` returns the viewport rectangle.
 
 So are its eight kVec3 `$E` (`0x0042f250..0x0042f38b`). That is 11 more
-calibration cases. The kVec3 statics sit at the end of Camera.cpp because
+calibration cases.
+
+Also exact: slot 10 `0x0042e690` (distance moved and angle turned since the
+last frame, then the field-of-view and viewport-width keys; its two dot
+products need an inline `Dot(a, b)` returning `a.z*b.z + (a.x*b.x +
+a.y*b.y)`, while plain member expressions in any term order get the x87
+operand order wrong), `0x0042e930` and `0x0042e9b0` (the frame setter,
+whose roll and fov arguments are `const float*`). `0x0042e550` is a near
+miss: retail reloads the display-mode index for the height. Slots 28
+`0x0042ee30` and 29 `0x0042eb10` are not attempted. The kVec3 statics sit at the end of Camera.cpp because
 the `$E` code follows every Camera function.
 
 ## Function names

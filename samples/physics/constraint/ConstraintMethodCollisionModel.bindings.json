@@ -16,6 +16,12 @@
   "?SetModelShape@CollisionObject@@QAEXPAXHHHH@Z": "0x004324b0",
   "?UpdatePlacement@CollisionObject@@QAEXXZ": "0x00435fb0",
   "_$E1": "0x0043c8f0",
+  "_$E10": "0x0043c9e0",
+  "_$E4": "0x0043c940",
+  "_$E7": "0x0043c990",
   "__FILE__:constraintmethodcollisionmodel.cpp": "0x00568818",
+  "_g_ConXAxis": "0x00579840",
+  "_g_ConYAxis": "0x00579850",
+  "_g_ConZAxis": "0x00579820",
   "_g_ConZero": "0x00579830"
 }

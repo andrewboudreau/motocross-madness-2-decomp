@@ -332,6 +332,16 @@
   {
     "class": "Bike",
     "source": "Bike.cpp",
+    "candidate_symbol_contains": "??_EBike@@$4PPPPPPPM@A@AEPAXI@Z",
+    "target_va": "0x0040ca40",
+    "target_size": 8,
+    "expect": "exact",
+    "notes": "vtordisp thunk for the virtual-base (object_offset 0x738) slot 0: sub ecx,[ecx-4]; jmp to the deleting destructor 0x0040ca50.",
+    "bindings": "Bike.bindings.json"
+  },
+  {
+    "class": "Bike",
+    "source": "Bike.cpp",
     "candidate_symbol_contains": "??_GBike@@UAEPAXI@Z",
     "target_va": "0x0040ca50",
     "target_size": 51,

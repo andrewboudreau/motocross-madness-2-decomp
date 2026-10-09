@@ -205,5 +205,85 @@
     "expect": "exact",
     "notes": "return ++g gives mov/inc/mov; owner: bracket only",
     "bindings": "CollisionVectorHelpers.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E2",
+    "target_va": "0x0043b050",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,0,0) constant 0x005797f0 (5-byte jmp to 0x0043b060).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E1",
+    "target_va": "0x0043b060",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,0,0) in a stack temporary and copies it to 0x005797f0 (copy-initialization from the inline constructor).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E5",
+    "target_va": "0x0043b0a0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (1,0,0) constant 0x00579800 (5-byte jmp to 0x0043b0b0).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E4",
+    "target_va": "0x0043b0b0",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (1,0,0) in a stack temporary and copies it to 0x00579800 (copy-initialization from the inline constructor).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E8",
+    "target_va": "0x0043b0f0",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,1,0) constant 0x00579810 (5-byte jmp to 0x0043b100).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E7",
+    "target_va": "0x0043b100",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,1,0) in a stack temporary and copies it to 0x00579810 (copy-initialization from the inline constructor).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E11",
+    "target_va": "0x0043b140",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "Dynamic-initializer thunk for the (0,0,1) constant 0x005797e0 (5-byte jmp to 0x0043b150).",
+    "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionPoint",
+    "source": "CollisionPoint.cpp",
+    "candidate_symbol_contains": "_$E10",
+    "target_va": "0x0043b150",
+    "target_size": 60,
+    "expect": "exact",
+    "notes": "Dynamic-initializer body: builds (0,0,1) in a stack temporary and copies it to 0x005797e0 (copy-initialization from the inline constructor).",
+    "bindings": "CollisionPoint.bindings.json"
   }
 ]

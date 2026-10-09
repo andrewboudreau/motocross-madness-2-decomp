@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <math.h>
+
 #include "Camera.h"
+#include "TrackGame.h"
 
 // 0x0042e340. The two trailing copies (+0x214 from +0x17c, +0x208 from +0x170)
 // are evidenced by retail reusing the registers that hold the first vectors'
@@ -22,13 +25,13 @@ Camera::Camera(int flags) : GameObject(flags) {
     field_0x17c = Vector3(0.0f, 0.0f, 1.0f);
     field_0x188 = Vector3(0.0f, 1.0f, 0.0f);
     field_0x170 = Vector3(0.0f, 0.0f, 0.0f);
-    field_0x194 = 0;
+    field_0x194 = 0.0f;
     field_0x1f0 = 0;
     field_0x1fc = 0;
     field_0x1f4 = 0;
     field_0x1f8 = 0;
-    field_0x200 = 0;
-    field_0x204 = 0;
+    field_0x200 = 0.0f;
+    field_0x204 = 0.0f;
     field_0x1d4 = 1;
     field_0x1d8 = 1;
     field_0x214 = field_0x17c;
@@ -79,6 +82,121 @@ int Camera::UnknownVirtualSlot13() {
     }
     UnknownFunction42e8e0();
     return 1;
+}
+
+// 0x0042e550: takes the owner's size, the current display mode's aspect
+// ratio and a full-target viewport (+0x1a0: x, y, width, height and the
+// minimum/maximum depth 0.0f/1.0f), submits the viewport through the
+// owner's slot 14 and derives the height/width ratio from it.
+// Near miss (docs/NEAR_MISS_INDEX.md): retail keeps the display-mode array in
+// a register, re-reads only the current index for the height and clears edi
+// between the two fild loads; this source reloads the array as well.
+int Camera::UnknownFunction42e550() {
+    RenderTarget* owner = Owner();
+    field_0x1c4 = owner->field_0x0c;
+    field_0x1c8 = owner->field_0x10;
+    UnknownDisplay* display = owner->field_0x04;
+    float width = (float)display->displayModes[display->currentDisplayMode].width;
+    float height = (float)display->displayModes[display->currentDisplayMode].height;
+    field_0x19c = width / height;
+    field_0x1a0[0] = 0;
+    field_0x1a0[1] = 0;
+    field_0x1a0[2] = field_0x1c4;
+    field_0x1a0[3] = field_0x1c8;
+    ((float*)field_0x1a0)[4] = 0.0f;
+    ((float*)field_0x1a0)[5] = 1.0f;
+    if (!owner->UnknownVirtualSlot14(field_0x1a0))
+        return 0;
+    field_0x1b8 = (float)(unsigned int)field_0x1a0[3] / (float)(unsigned int)field_0x1a0[2];
+    field_0x1d0 = Owner()->field_0x14 + 1;
+    field_0x1cc = Owner()->field_0x14 + 1;
+    return 1;
+}
+
+float UnknownFunction460b50(float value); // 0x00460b50 (FastSqrt)
+
+// Retail adds the z term last and multiplies b's components into a's; both
+// orders are visible in 0x0042e690.
+static inline float Dot(const Vector3& a, const Vector3& b) {
+    return a.z * b.z + (a.x * b.x + a.y * b.y);
+}
+
+// 0x0042e690: +0x200 is how far the position moved and +0x204 the angle the
+// forward direction turned since the last frame (+0x208/+0x214 keep the
+// previous values). Unless bit 2 of +0x25 is set it then counts down
+// +0x1d0/+0x1cc, applies the field-of-view keys (0xc7/0xcf, when +0x1d4 is
+// set) and the viewport width keys (0xd2/0xd3, when +0x1d8 is set) and
+// rebuilds the projection through slot 28.
+int Camera::UnknownVirtualSlot10(float frameTime) {
+    Vector3 delta(field_0x170.x - field_0x208.x, field_0x170.y - field_0x208.y, field_0x170.z - field_0x208.z);
+    field_0x200 = UnknownFunction460b50(Dot(delta, delta));
+    field_0x208 = field_0x170;
+    field_0x204 = (float)acos(Dot(field_0x17c, field_0x214));
+    if (field_0x204 < 0.0f)
+        field_0x204 = -field_0x204;
+    field_0x214 = field_0x17c;
+    if (!field_0x25_bit2) {
+        if (field_0x1d0)
+            field_0x1d0--;
+        if (field_0x1cc)
+            field_0x1cc--;
+        if (field_0x1d4) {
+            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xc7, 0, 0x3f, 0)) {
+                field_0x16c -= 1.0f;
+                if (field_0x16c < field_0x1e0)
+                    field_0x16c = field_0x1e0;
+                UnknownFunction42e930(field_0x16c);
+            }
+            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xcf, 0, 0x3f, 0)) {
+                field_0x16c += 1.0f;
+                if (field_0x16c > field_0x1dc)
+                    field_0x16c = field_0x1dc;
+                UnknownFunction42e930(field_0x16c);
+            }
+        }
+        if (field_0x1d8) {
+            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd2, 0, 0x3f, 0) &&
+                (unsigned int)field_0x1a0[2] < (unsigned int)field_0x1c4)
+                UnknownFunction42f0e0(-1, 2, 0);
+            if (g_TrackGame->controlInterface->UnknownVirtualSlot3(0xd3, 0, 0x3f, 0) &&
+                (unsigned int)field_0x1a0[2] > 0x20)
+                UnknownFunction42f0e0(1, -2, 0);
+        }
+        UnknownVirtualSlot28();
+    }
+    return 1;
+}
+
+// 0x0042e930: a zero value keeps the current +0x16c.
+void Camera::UnknownFunction42e930(float value) {
+    if (value != 0.0)
+        field_0x16c = value;
+    field_0x1d0 = Owner()->field_0x14 + 1;
+}
+
+float FastInvSqrt(float value); // 0x00460c00
+
+// v scaled to unit length (unchanged when it already is).
+static inline Vector3 Normalize(const Vector3& v) {
+    float squared = v.z * v.z + (v.x * v.x + v.y * v.y);
+    if (squared == 1.0f)
+        return v;
+    return v * FastInvSqrt(squared);
+}
+
+// 0x0042e9b0
+void Camera::UnknownFunction42e9b0(const Vector3* position, const Vector3* forward, const Vector3* up,
+                                   const float* roll, const float* fov) {
+    if (position)
+        field_0x170 = *position;
+    if (forward)
+        field_0x17c = Normalize(*forward);
+    if (up)
+        field_0x188 = Normalize(*up);
+    if (roll)
+        field_0x194 = *roll;
+    if (fov)
+        UnknownFunction42e930(*fov);
 }
 
 // 0x0042e8e0

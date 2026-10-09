@@ -11,7 +11,8 @@ The two units fill the gap `0x00430ff0..0x004318d0` between CarProcedural.cpp
 (last `__FILE__` xref `0x0042fb52`, its `$E` pairs end at `0x00430feb`) and
 CollisionCharacter.cpp (`__FILE__` xref `0x00431a12`).
 - `0x00430ff0` is the out-of-line copy of the TextureMap.h inline
-  end-of-stream test. It is covered through its callers.
+  end-of-stream test. It is strict exact as a calibration case compiled
+  from CarProcedural.cpp (ownership stays with whichever unit emitted it).
 - CDAudio is `0x00431050..0x004312a8`.
 - ClipRectangle is `0x004312b0..0x004318cf`. It opens with its own `$E` set,
   `.CRT$XCU` 57.

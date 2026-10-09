@@ -57,11 +57,13 @@ Unregistered `.CRT$XCU` entries are not listed.
 | 45-48 | 42d250-42d38b | 579670 | BoundingBoxTreeBuild | BoundingBoxTreeBuild.cpp | consistent (mid-file) |
 | 49-52 | 42f250-42f38b | 5796b0 | none | Camera.cpp | consistent by position (after Camera code) |
 | 53-56 | 430eb0-430feb | 5796f0 | CarProcedural | CarProcedural.cpp | consistent |
-| 66 | 43c8e0-43c92b | 579830 | ConstraintMethodCollisionModel | ConstraintMethodCollisionModel.cpp | consistent |
+| 62-65 | 43b050-43b18b | 5797e0 | CollisionPoint (y axis 0x579810) | CollisionPoint.cpp | consistent (mid-file) |
+| 66-69 | 43c8e0-43ca1b | 579820 | ConstraintMethodCollisionModel | ConstraintMethodCollisionModel.cpp | consistent |
 | 70-73 | 43d750-43d88b | 579860 | cube | Cube.cpp | consistent |
 | 74-81 | 43d890-43e9ab | 5798a8 | none | CubeDraw.cpp | consistent (CUBE.md) |
 | 86-89 | 4466e0-44681b | 57ef58 | none | D3DIMSoultreeMotnctrl.cpp | consistent by position |
 | 90-93 | 4477d0-44790b | 57ef98 | none | D3DIMSoultreeShadow.cpp | consistent; own static `0x00446820` is listed after, at 94 |
+| 94 | 446820-446830 | 581eb8 | D3DIMSoultreeShadow | D3DIMSoultreeShadow.cpp | own static: the shadow-vertex array's empty inline constructor (`$E14` thunk, bare-`ret` `$E13`) |
 | 95-98 | 453d50-453e8b | 59adb0 | dlgprocs | DlgProcs.cpp | consistent (mid-file) |
 | 117 | 467100-46712b | 65b478 | FontTexture, Game, TextService | FontTexture.cpp | consistent (shared global) |
 | 118-127 | 467850-46798f | 65b490.. | Game | Game.cpp | consistent |

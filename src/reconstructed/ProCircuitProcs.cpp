@@ -944,7 +944,7 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         field_0x7f58.y = 1.0f;
         *target = g_TrackGame->ui->field_0x474;
         field_0x7f64.y += 3.0f;
-        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(eye, 0, 0, 0, (int)&fov);
+        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(eye, 0, 0, 0, &fov);
         g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(*target);
         g_TrackGame->ui->field_0x468->UnknownFunction42f190(
             field_0x7f8c.left, field_0x7f8c.top, field_0x7f8c.right - field_0x7f8c.left,

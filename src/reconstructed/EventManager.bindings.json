@@ -38,7 +38,7 @@
   "?UnknownFunction4204e0@UnknownKrustyBikeView@@QAEPAUUnknownEventRacer@@PAH@Z": "0x004204e0",
   "?UnknownFunction420590@UnknownKrustyBikeView@@QAEXH@Z": "0x00420590",
   "?UnknownFunction420b00@UnknownKrustyBikeView@@QAEXPAD0@Z": "0x00420b00",
-  "?UnknownFunction42e9b0@Camera@@QAEXPAUVector3@@HHHH@Z": "0x0042e9b0",
+  "?UnknownFunction42e9b0@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?SetNextMenu@TransDlg@@QAEXH@Z": "0x00455c40",
   "?Reset@UnknownEventEntry@@QAEXXZ": "0x0045c840",
   "?CopyFromRacer@UnknownEventEntry@@QAEXPAUUnknownEventRacer@@@Z": "0x0045c8b0",

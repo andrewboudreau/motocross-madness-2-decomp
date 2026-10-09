@@ -168,5 +168,25 @@
     "expect": "exact",
     "notes": "slot 14: identity world matrix, texture bind, saved address mode / render state 4, indexed draw of field_0x44 vertices (0x581eb8) and indices (0x5995b8)",
     "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E14",
+    "target_va": "0x446820",
+    "target_size": 5,
+    "expect": "exact",
+    "notes": "g_d3dimShadowVertices initializer jmp thunk (.CRT$XCU 94, after the vector set)",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "_$E13",
+    "target_va": "0x446830",
+    "target_size": 1,
+    "expect": "exact",
+    "notes": "g_d3dimShadowVertices initializer body: the empty inline vertex constructor leaves a bare ret",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
   }
 ]

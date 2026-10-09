@@ -25,6 +25,9 @@ public:
     virtual void UnknownVirtualSlot4();
     virtual void UnknownVirtualSlot5();
     virtual GameObject* UnknownVirtualSlot8(void* value);
+    // 0x0042e690: per-frame update from the +0x170/+0x17c vectors (FollowCamera
+    // slots 10 and 47 call it directly).
+    virtual int UnknownVirtualSlot10(float frameTime);
     virtual int UnknownVirtualSlot13();
     virtual int UnknownVirtualSlot14();
     virtual int UnknownVirtualSlot18();
@@ -45,13 +48,13 @@ public:
     // +0x1c0 = min(maximum, g_UnknownFloat550f70).
     void UnknownFunction42e960(float minimum, float maximum);
     int UnknownFunction42e550(); // 0x0042e550, called by slot 8
-    // 0x0042e690 (ret 4): per-frame update from the +0x170/+0x17c vectors
-    // (FollowCamera slot 47).
-    void UnknownFunction42e690(float frameTime);
     // 0x0042e930: stores a nonzero value in +0x16c and refreshes +0x1d0
     // (FollowCamera slot 47 passes 66.0f).
     void UnknownFunction42e930(float value);
-    void UnknownFunction42e9b0(Vector3* position, int a, int b, int c, int d); // 0x0042e9b0 (EventManager slot 10)
+    // 0x0042e9b0 (EventManager slot 10): sets each non-null part of the
+    // camera frame; the two directions are stored normalized.
+    void UnknownFunction42e9b0(const Vector3* position, const Vector3* forward, const Vector3* up,
+                               const float* roll, const float* fov);
     // 0x0042f0e0: sets (absolute) or offsets the viewport x/width, derives the
     // height from +0x1b8, centres it vertically in +0x1c8 and resubmits it.
     int UnknownFunction42f0e0(int x, int width, int absolute);
@@ -83,9 +86,9 @@ protected:
     Vector3 field_0x170;       // (0, 0, 0); copied to field_0x208
     Vector3 field_0x17c;       // (0, 0, 1); copied to field_0x214
     Vector3 field_0x188;       // (0, 1, 0)
-    int field_0x194;
+    float field_0x194;              // roll, passed to the view matrix by slot 28
     int field_0x198;
-    int field_0x19c;
+    float field_0x19c;              // display-mode width/height (0x0042e550)
     int field_0x1a0[6];             // [0..3]: x, y, width, height for slot 13
     float field_0x1b8;              // height/width ratio (0x0042f0e0)
     float field_0x1bc;              // g_UnknownFloat550f6c (1.0f)
@@ -105,8 +108,8 @@ protected:
     int field_0x1f4;
     int field_0x1f8;
     int field_0x1fc;
-    int field_0x200;
-    int field_0x204;
+    float field_0x200;              // distance moved last frame (slot 10)
+    float field_0x204;              // angle turned last frame (slot 10)
     Vector3 field_0x208;
     Vector3 field_0x214;
 };

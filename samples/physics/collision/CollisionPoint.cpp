@@ -147,3 +147,20 @@ void UpdateCollisionPointWorldPositions(int count, CollisionPoint** points) {
         }
     }
 }
+
+// The file's four dynamically initialized vector constants, .CRT$XCU entries 62-65: thunks
+// 0x0043b050/0x0043b0a0/0x0043b0f0/0x0043b140 jump to 60-byte bodies that build the value in a
+// stack temporary and copy it out (copy-initialization from a constructor call, as for
+// ConstraintMethodCollisionModel.cpp's 0x00579830).  The zero vector 0x005797f0 and the y axis
+// 0x00579810 are the objects the code above reads as g_CollisionZeroVec3 and
+// g_CollisionVec3_579810 (CollisionTypes.h keeps those extern for the other sample units); the
+// x and z axes have no readers here.  The local type stands in for the unrecovered header vector
+// (CollisionVec3's three-float constructor is out of line, 0x00404e60).
+struct CollisionPointConstVec3 {
+    float x, y, z;
+    CollisionPointConstVec3(float a, float b, float c) : x(a), y(b), z(c) {}
+};
+static const CollisionPointConstVec3 kCollisionPointZero = CollisionPointConstVec3(0.0f, 0.0f, 0.0f);
+static const CollisionPointConstVec3 kCollisionPointXAxis = CollisionPointConstVec3(1.0f, 0.0f, 0.0f);
+static const CollisionPointConstVec3 kCollisionPointYAxis = CollisionPointConstVec3(0.0f, 1.0f, 0.0f);
+static const CollisionPointConstVec3 kCollisionPointZAxis = CollisionPointConstVec3(0.0f, 0.0f, 1.0f);

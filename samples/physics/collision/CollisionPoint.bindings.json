@@ -4,6 +4,14 @@
   "??_7CollisionPoint@@6B@": "0x005511d8",
   "?g_CollisionVec3_579810@@3UCollisionVec3@@A": "0x00579810",
   "?g_CollisionZeroVec3@@3UCollisionVec3@@A": "0x005797f0",
+  "_$E1": "0x0043b060",
+  "_$E10": "0x0043b150",
+  "_$E4": "0x0043b0b0",
+  "_$E7": "0x0043b100",
   "__FILE__:collisionpoint.cpp": "0x00568730",
-  "__real@4@4008f9c0000000000000": "0x005511d0"
+  "__real@4@4008f9c0000000000000": "0x005511d0",
+  "_kCollisionPointXAxis": "0x00579800",
+  "_kCollisionPointYAxis": "0x00579810",
+  "_kCollisionPointZAxis": "0x005797e0",
+  "_kCollisionPointZero": "0x005797f0"
 }

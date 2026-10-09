@@ -77,6 +77,7 @@
   "??_C@_0M@PPBE@InlineFront?$AA@": "0x00566e18",
   "??_C@_0N@GGIG@BackUpBottom?$AA@": "0x00566d28",
   "??_C@_0P@ENIE@TransverseLeft?$AA@": "0x00566e08",
+  "??_EBike@@UAEPAXI@Z": "0x0040ca50",
   "?AddAngle@VehicleSteerState@@QAEXMPAVSoultreeObject@@@Z": "0x00504ec0",
   "?AddEarlyTicker@Vehicle@@QAEHPAUVehicleTicker@@@Z": "0x00525cb0",
   "?AddLateTicker@Vehicle@@QAEHPAUVehicleTicker@@@Z": "0x00525cf0",

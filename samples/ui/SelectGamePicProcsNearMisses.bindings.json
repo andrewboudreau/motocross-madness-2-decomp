@@ -154,7 +154,7 @@
   "?UnknownFunction404240@BackgroundImage@@QAEXHPAUCameraRect@@@Z": "0x00404240",
   "?UnknownFunction404da0@BackgroundImage@@QAEXXZ": "0x00404da0",
   "?UnknownFunction417670@UnknownBikeNumberPainter@@QAEXPAXH@Z": "0x00417670",
-  "?UnknownFunction42e9b0@Camera@@QAEXPAUVector3@@HHHH@Z": "0x0042e9b0",
+  "?UnknownFunction42e9b0@Camera@@QAEXPBUVector3@@00PBM1@Z": "0x0042e9b0",
   "?UnknownFunction42f190@Camera@@QAEHHHHH@Z": "0x0042f190",
   "?UnknownFunction44a220@DirectoryList@@QAEXPBDH@Z": "0x0044a220",
   "?UnknownFunction44a2f0@DirectoryList@@QAEHHPAD@Z": "0x0044a2f0",

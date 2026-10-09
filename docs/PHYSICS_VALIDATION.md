@@ -160,7 +160,9 @@ Extent: `0x40d070..0x416e1f` (strong inference). Bike.cpp ends at
 The near miss, steering direction `0x40e510`, is in
 `samples/physics/bikeai`; it differs by an esi/edi swap and frame order.
 The two KrustyBike methods `0x413200` and `0x414370` wait on KrustyBike.h's
-promotion. The five other large functions are not attempted.
+promotion. The five other large functions are not attempted. The Vec3
+`operator-=` COMDAT copy `0x413160` stays unregistered: VC6 emits it only
+for its first caller, the unreconstructed `0x412700` (2641 bytes).
 
 ```bash
 python tools/run_physics_samples.py --strict \
@@ -315,7 +317,8 @@ Large functions of the two units (all registered in `src/krusty2/vehicle/targets
   the loop index and the front z at `0x10/0x14/0x28`), the matched wheel kind (esi in
   retail, spilled here), and the store scheduling of the local string tables and the
   Vec3 constants.
-- `0x00526e80` is slot 38's jump table, `0x0040ca40`/`0x0052b690` are vtordisp thunks;
+- `0x00526e80` is slot 38's jump table, `0x0040ca40`/`0x0052b690` are vtordisp thunks
+  (`0x0040ca40`, `??_EBike@@$4PPPPPPPM@A@AEPAXI@Z`, is strict exact in Bike.cpp's targets);
   `0x0040ae00` is Bike.cpp's COMDAT copy of `Vec3::operator*=` (the `BikeVec3ScaleAssign`
   view calls it).
 
