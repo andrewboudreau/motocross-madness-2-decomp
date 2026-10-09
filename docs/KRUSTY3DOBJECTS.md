@@ -86,7 +86,7 @@ in `samples/race/Krusty3DObjectsNearMisses.cpp`.
 | VA | Size | Status |
 |---|---:|---|
 | `0x0048ccc0` | 1308 | near miss, 1299/1308: BonusObjectManager slot 10. Retail multiplies `fld [camera+0x198]; fmul [this+0x1e4]`; VC6 gives that order only when the camera value is read through a by-value accessor (otherwise it loads `+0x1e4` first, 1295/1308). Left: retail loads the camera pointer before the length store |
-| `0x0048b100` | 2796 | VisualCue slot 10 (jump table `0x0048bbec` on TrackGame `+0x2d74`). Data flow decoded in the samples file; retail inlines the placement block four times without the out-of-line Vector3 constructor, VC6 here does not |
+| `0x0048b100` | 2796 | VisualCue slot 10 (jump table `0x0048bbec` on TrackGame `+0x2d74`). Data flow decoded in the samples file; retail expands the placement block and all its Vector3 operators in the four modes. The block as a macro reproduces that (retail's 16 calls in order, 604 of 748 instructions aligned); an inline member function leaves the constructor and `operator*` out of line. Left: the third camera column copied by integer moves (VC6 keeps two components on the x87 stack), 0 kept in `edi`, and the early returns' own epilogues |
 | `0x0048d1e0` | 864 | BonusObjectManager value display: rounds with the `fld; fistp [mem]` inline-assembly helper the project rules exclude |
 
 ## Remaining uncertainty

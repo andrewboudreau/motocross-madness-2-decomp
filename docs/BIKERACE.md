@@ -22,9 +22,9 @@ x87 plate renderer `0x00417670` is not attempted. From `0x004238c0` the code is 
 starts at `0x00423f70`. The four kVec3 `$E` pairs sit mid-file at
 `0x0041cdf0..0x0041cf2b`.
 
-Exact: 41 functions (39 earlier calibration cases plus two):
+Exact: 42 functions:
 - The constructor, the destructor and its deleting wrapper.
-- Slots 10, 14, 16, 20, 22 and 24.
+- Slots 10, 14, 16, 20, 22, 23 and 24.
 - Network, replay, restart, ghost, racer and debug-draw helpers.
 - The recorder worker `0x00421d50`, its callback `0x004230e0` and two sort
   helpers.
@@ -40,17 +40,30 @@ Source forms needed:
 - `0x00421d50`: float comparisons with -1.0f compile to integer compares;
   the loop index of the message-13 branch is initialised before the mode
   test. The replay tick time is the file static `0x00578e8c`.
+- Slot 23 `0x0041f5e0` (keys; jump tables `0x0041ff40`/`0x0041ff64` and
+  `0x0042001c`): the 0x22 and 0x30 cases format into `char text[0x80]`
+  (only the 0x35 case's is 0x100), which gives the 0x494 frame; the
+  overlay switch tests and queues the message inside each case (`case 2,
+  0, 1/5, 4` in that order) and deletes it only when non-null; the
+  three-way value pick is an if/else chain and the on/off strings are
+  if/else calls, not a switch or `?:`; the picker scans index
+  `raceScene->field_0xb8/0xb4` directly in `for` loops (named count/base
+  locals cost the register that retail uses to keep 0 in `ebx`); the
+  debug page test compares a local copy of `field_0x26c4` with
+  `field_0x0a8`, and the cursor-flag branch is written negated (picker
+  first) with the new picker in a local.
 
 Near misses (`samples/race/BikeRaceNearMisses.cpp`):
 - `0x0041eb20` (camera target), 1699 of 1710 bytes: register swap in the
   scene-object branch (retail loads the index before the table; no
   index/entry spelling or flag changes it).
-- `0x0041f1d0` and slot 23 `0x0041f5e0`: retail keeps 0 in a callee-saved
-  register throughout; the candidates do not.
-- `0x004210f0` (start grid), 969 of 2940 bytes: VC6's inline budget
+- `0x0041f1d0`: retail keeps 0 in a callee-saved register throughout; the
+  candidate does not.
+- `0x004210f0` (start grid), 975 of 2940 bytes: VC6's inline budget
   places the out-of-line `Vector3` constructor/scale calls differently
   (see the comment in the sample); every frame slot is at retail's
-  offset.
+  offset. The side test is `p1.x * p0.z - p0.x * p1.z` (retail's load
+  order and p0/p1 slots).
 - `0x00417ed0` (setup, 6745 bytes with the jump table at `0x0041992c`;
   ret 0x24; QuarryStuntEvent.cpp's loader calls it after the
   constructor), 2800 of 6756 positions: all 166 calls in retail order, the

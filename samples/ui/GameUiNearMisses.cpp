@@ -73,8 +73,13 @@
 //   each format branch (cross-jumped) puts the result in ebp (76/323).
 // 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
 //   redraw count in memory.
-// 0x00474150 UIEditBox slot 20 (339/1048): Backspace: retail loads the
-//   length before the lead-byte test.
+// 0x00474150 UIEditBox slot 20 (1018/1044): Backspace reads the length and
+//   the cursor into locals after the lead-byte test (retail loads both before
+//   the branch and keeps them in ecx/eax across it). Retail gives the cursor
+//   eax (loaded after `test eax, eax`), VC6 here edx, and the register
+//   choice ripples into the Enter case (`eventCode` in eax). BOOL/char/
+//   unsigned locals, function-scope locals, other declaration orders (worse)
+//   and the locals before the call (worse) were tried.
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
 // 0x0047a400 drop-down layout (320/960): store scheduling of the part rects.
@@ -752,12 +757,15 @@ int UIEditBox::UnknownVirtualSlot20(int value) {
             if (field_0xd0 && textLength > 0) {
                 char* previous = CharPrevA(controlText, controlText + textLength);
                 if (previous) {
-                    if (IsDBCSLeadByte(*previous)) {
-                        memmove(previous, controlText + textLength, field_0xd0 - textLength + 1);
+                    int lead = IsDBCSLeadByte(*previous);
+                    int length = field_0xd0;
+                    int cursor = textLength;
+                    if (lead) {
+                        memmove(previous, controlText + cursor, length - cursor + 1);
                         field_0xd0 -= 2;
                         textLength -= 2;
                     } else {
-                        memmove(previous, controlText + textLength, field_0xd0 - textLength + 1);
+                        memmove(previous, controlText + cursor, length - cursor + 1);
                         field_0xd0--;
                         textLength--;
                     }

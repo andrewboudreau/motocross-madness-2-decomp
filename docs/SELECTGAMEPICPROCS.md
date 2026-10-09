@@ -61,18 +61,24 @@ Messages (layouts from the senders and the receiver, slot 24):
   model names.
 - Type 0xf: the bit-packed settings `0x004f2b90` sends.
 
-Also exact: MPBikeRiderDlg `0x004f8d20`.
+Also exact: MPBikeRiderDlg `0x004f8d20`, MPBikeRiderDlg slot 29
+`0x004f78a0` and the picture-list scan `0x004f17a0`:
+- Slot 29's bike-view distance squares x, y and z in that order. A single
+  `x*x + y*y + z*z` expression squares z first; the length helper
+  accumulates the squares one statement at a time.
+- The scan's fallback picture lookup (`ui\\unart.tga` or `unarts.tga`) is
+  written in both arms of the `if`. The duplicated call gives the fallback
+  buffer one more reference than the selected-name buffer, which puts it
+  nearer esp as in retail; VC6 merges the two calls into one.
+- `0x004f17a0` is sensitive to the declaration count before it
+  (docs/VC6_OPERAND_ORDER.md, section 2): two parameter loads swap when
+  18..31 typedefs are prepended to the file (exact at 0..17 and 32..63).
+  Without the lobby message structs (player left, start, grid entry)
+  above it, the file's own count falls into that window.
 
 Near misses (`samples/ui/SelectGamePicProcsNearMisses.cpp`):
 - The chat line `0x004f3720`: block layout differs.
 - The bike and rider lists `0x004f8220`: registers differ.
-- MPBikeRiderDlg slot 29 `0x004f78a0`, 2415 of 2419 bytes: only the x87
-  operand order of a distance differs.
-- The picture-list scan `0x004f17a0`, 2244 of 2258 bytes: the selected
-  and fallback buffers' frame slots are swapped. VC6 orders the frame by
-  reference count. With one reference fewer to the selected buffer, the
-  two buffers tie and VC6 gives the retail order. Declaration order, names,
-  block scope and the loop form do not change it.
 - MPBikeRiderDlg slot 10 `0x004f8820`: only the scheduling of the by-value
   vector copies for the camera call differs.
 - The lobby start message `0x004f2340` (2120 bytes): the same flow,

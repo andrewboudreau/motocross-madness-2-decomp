@@ -125,9 +125,13 @@ Near miss (draft):
   `0x004455b0`) at +0x424 from "%s\Winner.mcf" (or "Winnerd.mcf") with a
   "Podium3/4/5_%02d" motion kept at +0x430; it also uses "CrowdLoop.wav"
   and clears the podium area with `0x0045fce0` / `0x0045fdc0`. A nonzero
-  result makes `0x0045e600` block UI interaction for slot 10. The decoded
-  draft is in `samples/game/EventManagerNearMisses.cpp` (about 500
-  instructions still differ; see its header). `EventManager.h` now gives
+  result makes `0x0045e600` block UI interaction for slot 10. The
+  candidate is in `samples/game/EventManagerNearMisses.cpp` (2064 of 4246
+  bytes with its bindings; the 0x460 frame, control flow, calls and EH
+  states match, and the header lists the shapes found and what still
+  differs). Retail's buffers are a 0x80-byte name, a 0x104-byte path, a
+  0x184-byte message and a separate 0x80-byte buffer for the CrowdLoop
+  error. `EventManager.h` now gives
   the podium characters' slot 11 and motion calls, +0x3d0 as the podium
   `ArcadeObject` and +0x3f0 as the camera's look target.
 

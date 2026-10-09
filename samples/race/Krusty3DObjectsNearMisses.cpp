@@ -17,12 +17,20 @@
 // VisualCue::UnknownVirtualSlot10 (0x0048b100, 2796 bytes, jump table at
 // 0x0048bbec): places the cue in front of the camera by camera mode
 // (TrackGame +0x2d74) and turns it toward the followed racer, the next
-// gate, the selected racer or the free camera's target. The data flow below
-// is decoded from retail; the codegen is far off. Retail inlines the
-// placement block in each case with the camera's third matrix column copied
-// by integer moves and the first two through the FPU, and never calls the
-// out-of-line Vector3 constructor (0x00404e60) that VC6 here emits for the
-// inlined helper.
+// gate, the selected racer or the free camera's target. Retail expands the
+// placement block and every Vector3 operator in it in all four modes (its
+// 16 calls are the ones below, in the same order). An inline member
+// function for the block makes VC6 call the Vector3 constructor and
+// operator* (0x00404e60, 0x005015b0) out of line; the block written as a
+// macro (UNKNOWN_PLACE_CUE) expands everything as retail does (aligned
+// instructions 299 -> 604 of 748). Left: retail copies the camera's third
+// matrix column with integer moves into a stack vector, where VC6 keeps two
+// of its components on the x87 stack (member-wise copies in either order,
+// a by-value column helper: same); retail keeps 0 in edi (pushing ebp)
+// and gives the two explicit early returns their own epilogues, where this
+// candidate caches no zero and jumps to one shared return (writing every
+// `goto hide` as an explicit return makes VC6 cache 0 in ebx but still
+// shares the epilogue).
 
 #include <math.h>
 
@@ -142,23 +150,27 @@ struct UnknownCueOwner {
 
 // Places the cue at its screen position in front of the camera, rebuilding
 // the screen offsets when the field of view changed.
-inline void VisualCue::UnknownPlace() {
-    Vector3 forward = Vector3(arcadeView->field_0x0ac[0][2], arcadeView->field_0x0ac[1][2], arcadeView->field_0x0ac[2][2]);
-    Vector3 up = Vector3(arcadeView->field_0x0ac[0][1], arcadeView->field_0x0ac[1][1], arcadeView->field_0x0ac[2][1]);
-    Vector3 right = Vector3(arcadeView->field_0x0ac[0][0], arcadeView->field_0x0ac[1][0], arcadeView->field_0x0ac[2][0]);
-    if (arcadeView->field_0x16c != builtFieldOfView) {
-        builtFieldOfView = arcadeView->field_0x16c;
-        float half = (float)tan(UnknownDegreesToRadians(builtFieldOfView * 0.5f)) * field_0x44;
-        screenOffsetX = (UnknownScreenX() - 0.5f) * half * 2.0f;
-        screenOffsetY = (0.5f - UnknownScreenY()) * arcadeView->field_0x1b8 * half * 2.0f;
-        modelScale = field_0x38 * field_0x44 / (arcadeView->field_0x198 * field_0x3c);
+#define UNKNOWN_PLACE_CUE() \
+    { \
+    Vector3 forward; \
+    forward.x = arcadeView->field_0x0ac[0][2]; \
+    forward.y = arcadeView->field_0x0ac[1][2]; \
+    forward.z = arcadeView->field_0x0ac[2][2]; \
+    Vector3 up = Vector3(arcadeView->field_0x0ac[0][1], arcadeView->field_0x0ac[1][1], arcadeView->field_0x0ac[2][1]); \
+    Vector3 right = Vector3(arcadeView->field_0x0ac[0][0], arcadeView->field_0x0ac[1][0], arcadeView->field_0x0ac[2][0]); \
+    if (arcadeView->field_0x16c != builtFieldOfView) { \
+        builtFieldOfView = arcadeView->field_0x16c; \
+        float half = (float)tan(UnknownDegreesToRadians(builtFieldOfView * 0.5f)) * field_0x44; \
+        screenOffsetX = (UnknownScreenX() - 0.5f) * half * 2.0f; \
+        screenOffsetY = (0.5f - UnknownScreenY()) * arcadeView->field_0x1b8 * half * 2.0f; \
+        modelScale = field_0x38 * field_0x44 / (arcadeView->field_0x198 * field_0x3c); \
+    } \
+    Vector3 position = arcadeView->field_0x170; \
+    position += forward * field_0x44; \
+    position += right * screenOffsetX; \
+    position += up * screenOffsetY; \
+    UnknownFunction4014f0(&position); \
     }
-    Vector3 position = arcadeView->field_0x170;
-    position += forward * field_0x44;
-    position += right * screenOffsetX;
-    position += up * screenOffsetY;
-    UnknownFunction4014f0(&position);
-}
 
 // 0x0048b100
 int VisualCue::UnknownVirtualSlot10(float frameTime) {
@@ -184,7 +196,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
             return 1;
         }
         isVisible = 1;
-        UnknownPlace();
+        UNKNOWN_PLACE_CUE();
         Vector3 target;
         if (cueView->field_0x48)
             cueView->field_0x48->UnknownFunction518080(cueView->field_0x38->field_0x744->field_0x44, &target);
@@ -199,7 +211,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
     }
     case 1:
     case 5: {
-        UnknownPlace();
+        UNKNOWN_PLACE_CUE();
         UnknownKrustyRacerRef* ref = g_UnknownKrustyGame56e26c->field_0x560->field_0x34->field_0x50->field_0x3b4;
         if (!ref)
             return 1;
@@ -213,7 +225,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         if (!field_0xbc || cueRacerCount <= 1)
             goto hide;
         isVisible = 1;
-        UnknownPlace();
+        UNKNOWN_PLACE_CUE();
         Vector3 target = kVec3Zero;
         for (int i = 0; i < cueRacerCount; i++) {
             if (currentRacer == i) {
@@ -228,7 +240,7 @@ int VisualCue::UnknownVirtualSlot10(float frameTime) {
         return 1;
     }
     case 4: {
-        UnknownPlace();
+        UNKNOWN_PLACE_CUE();
         if (g_UnknownKrustyGame56e26c->field_0x2eb4) {
             Vector3 target;
             g_UnknownKrustyGame56e26c->field_0x568->field_0xdc->field_0x21c.UnknownFunction4fc970(&target);

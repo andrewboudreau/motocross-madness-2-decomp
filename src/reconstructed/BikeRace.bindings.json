@@ -233,5 +233,16 @@
   "_kVec3Zero": "0x00578e60",
   "_s_UnknownStatic578e8c": "0x00578e8c",
   "_sprintf": "0x00534aaf",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "??0ObjectPicker@@QAE@H@Z": "0x004b01c0",
+  "??_C@_07JPAL@?$CFs?5?3?5?$CFs?$AA@": "0x00567f74",
+  "??_C@_0O@HNKJ@ui?2cursor?4tga?$AA@": "0x00567f5c",
+  "?GetUser@UnknownKrustyUIGui@@QAEPAUUnknownKrustyUIGuiLayer@@H@Z": "0x00486540",
+  "?UnknownFunction486590@UnknownKrustyUIGui@@QAEXPBDH@Z": "0x00486590",
+  "?UnknownFunction48a240@KeyboardDevice@@QAEHH@Z": "0x0048a240",
+  "?UnknownFunction499b00@KrustyUI@@QAEXXZ": "0x00499b00",
+  "?UnknownFunction4b0210@ObjectPicker@@QAEPAV1@PAXPAVTextureMapManager@@P6AXPAVCollisionObject@@2@ZPAVGameCursor@@@Z": "0x004b0210",
+  "?UnknownFunction4b04c0@ObjectPicker@@QAEHXZ": "0x004b04c0",
+  "?UnknownFunction51dce0@UnknownBikeRaceOverlay19c@@QAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@PAH@Z": "0x0051dce0",
+  "?UnknownVirtualSlot23@BikeRace@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z$ehhandler": "0x00549cd4"
 }

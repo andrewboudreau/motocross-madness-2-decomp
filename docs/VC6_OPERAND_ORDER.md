@@ -320,3 +320,6 @@ python3 tools/decl_shift_scan.py samples/render/MatrixUtilNearMisses.cpp \
 - The register that caches a repeated constant follows the constant's first use in the
   source: `field_0x30 = 1;` written first keeps 1 in ecx and places the vptr store
   between the -1 and 1 stores. BackgroundImage constructor `0x403d50`.
+- `x*x + y*y + z*z` as one expression squares z first whatever the parenthesisation or
+  accessor; retail's x, y, z order comes from accumulating one square per statement
+  (`l = x*x; l += y*y; l += z*z;`). MPBikeRiderDlg slot 29 `0x4f78a0`.

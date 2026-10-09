@@ -12154,6 +12154,24 @@ CASES = [
         'reason': 'BikeNumbers128 painter 0x417500; callers in slot 29',
     },
     {
+        'name': 'SelectGamePicProcs.cpp SelectGamePicProcs.cpp MPBikeRiderDlg slot 29 0x4f78a0',
+        'bindings': 'src/reconstructed/SelectGamePicProcs.bindings.json',
+        'source': 'src/reconstructed/SelectGamePicProcs.cpp',
+        'symbol': '?UnknownVirtualSlot29@MPBikeRiderDlg@@UAEXPAUUnknownDialogEvent@@@Z',
+        'target_va': '0x004f78a0',
+        'target_size': 2419,
+        'reason': 'MPBikeRiderDlg vtable slot 29; DDLEngineSize/RiderLeft/RiderRight literals',
+    },
+    {
+        'name': 'SelectGamePicProcs.cpp SelectGamePicProcs.cpp FillFileList 0x4f17a0',
+        'bindings': 'src/reconstructed/SelectGamePicProcs.bindings.json',
+        'source': 'src/reconstructed/SelectGamePicProcs.cpp',
+        'symbol': '?FillFileList@@YAHPAVDirectoryList@@PBD11H11PADPAHPAVUIDialog@@HH@Z',
+        'target_va': '0x004f17a0',
+        'target_size': 2258,
+        'reason': 'first __FILE__ user of selectgamepicprocs.cpp (line 0xb4 at 0x4f19f3)',
+    },
+    {
         'name': 'SelectGamePicProcs.cpp SelectGamePicProcs.cpp MPBikeRiderDlg slot 24 0x4f8620',
         'bindings': 'src/reconstructed/SelectGamePicProcs.bindings.json',
         'source': 'src/reconstructed/SelectGamePicProcs.cpp',
@@ -25751,6 +25769,15 @@ CASES = [
         'target_va': '0x00403d50',
         'target_size': 77,
         'reason': 'stores vptr 0x5506d8 (BackgroundImage RTTI); first function of BackgroundImage.cpp; field_0x30 = 1 first keeps 1 in ecx',
+    },
+    {
+        'name': 'bikerace.cpp BikeRace slot23 keys',
+        'bindings': 'src/reconstructed/BikeRace.bindings.json',
+        'source': 'src/reconstructed/BikeRace.cpp',
+        'symbol': '?UnknownVirtualSlot23@BikeRace@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z',
+        'target_va': '0x0041f5e0',
+        'target_size': 2644,
+        'reason': 'vtable slot 23; key switch with jump tables 0x41ff40/0x41ff64/0x42001c; 0x80-byte text buffers in the 0x22/0x30 cases give the 0x494 frame',
     },
 ]
 

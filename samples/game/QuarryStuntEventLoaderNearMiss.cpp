@@ -5,14 +5,20 @@
 // quadtree, shadows, fog and sky, terrain, ecosystem, race, collision links,
 // podium and the remaining race objects, calling `progress` between stages.
 //
-// Status: near miss, about 95% of instructions align (difflib over the
-// register- and frame-normalised listings; 445 of 8005 bytes at the same
-// positions). The call sequence, allocation sizes and lines, EH states,
-// error paths and frame size (0x650) match. Differences: the stack slots of
-// most locals (VC6 orders the frame by use, not by declaration), register
-// choices and expression shapes in the memory-budget decision tree
-// (0x004de7e0..0x004ded5e), the zero register retail keeps in esi around
-// the collision links, and the animation loop's rotation.
+// Status: near miss, about 87% of instructions align (difflib over the
+// register- and frame-normalised listings; 2194 instructions against
+// retail's 2209). The call sequence, allocation sizes and lines, EH states,
+// error paths, the memory-budget decision tree and frame size (0x650)
+// match. Shapes found: the fog object is a bare GameObject (0x2c bytes),
+// the texture-choice members are chained assignments (one load each), the
+// margin percentage is read before the minimum and multiplied after both
+// calls, and the collision loop works through an element pointer with the
+// terrain read once. Left: the stack slots of most scalars (retail shares
+// `step`'s slot with later temporaries but not with the light pointers; a
+// block-scoped `step` merges it with them instead), register choices in
+// the decision tree and around the fog/sky block (retail keeps -1 in edi),
+// the explicit null test of the cube file name, and the animation loop's
+// rotation.
 //
 // The views below are local to this sample: they declare only what the
 // loader touches of classes reconstructed (or not) elsewhere, under
@@ -224,8 +230,6 @@ public:
 class UnknownQuarryFogObject : public GameObject {
 public:
     explicit UnknownQuarryFogObject(int flags);                // 0x00462e10
-
-    unsigned char field_0x2c[0x2c - 0x2c + 1];
 };
 class UnknownQuarryFogLink : public GameObject {
 public:
@@ -420,8 +424,9 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
                 }
             }
         } else {
-            int margin = available * g_TrackGame->GetRegistryInt("MarginPercentage", 10) / 100;
+            int percent = g_TrackGame->GetRegistryInt("MarginPercentage", 10);
             int minimum = g_TrackGame->GetRegistryInt("MinMarginKBytes", 0x200) << 10;
+            int margin = percent * available / 100;
             if (margin < minimum)
                 margin = minimum;
             available -= margin;
@@ -479,21 +484,11 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
             field_0x98 = (GameObject*)g_TrackGame->field_0x3c->UnknownFunction511180(0x115c, 0, 2, 1);
         }
     }
-    modelTextures.field_0x00 = g_TrackGame->field_0x3c;
-    skyTextures.field_0x00 = g_TrackGame->field_0x3c;
-    terrainTextures.field_0x00 = g_TrackGame->field_0x3c;
-    modelTextures.field_0x04 = (ManagedTextureGroup*)field_0x94;
-    skyTextures.field_0x04 = (ManagedTextureGroup*)field_0x94;
-    terrainTextures.field_0x04 = (ManagedTextureGroup*)field_0x94;
-    modelTextures.field_0x08 = (ManagedTextureGroup*)field_0x98;
-    skyTextures.field_0x08 = (ManagedTextureGroup*)field_0x98;
-    terrainTextures.field_0x08 = (ManagedTextureGroup*)field_0x98;
-    modelTextures.field_0x0c = ((PCRenderTarget*)field_0x18)->field_0x28;
-    skyTextures.field_0x0c = ((PCRenderTarget*)field_0x18)->field_0x28;
-    terrainTextures.field_0x0c = ((PCRenderTarget*)field_0x18)->field_0x28;
-    modelTextures.field_0x10 = 0x115c;
-    skyTextures.field_0x10 = 0x115c;
-    terrainTextures.field_0x10 = 0x115c;
+    modelTextures.field_0x00 = skyTextures.field_0x00 = terrainTextures.field_0x00 = g_TrackGame->field_0x3c;
+    modelTextures.field_0x04 = skyTextures.field_0x04 = terrainTextures.field_0x04 = (ManagedTextureGroup*)field_0x94;
+    modelTextures.field_0x08 = skyTextures.field_0x08 = terrainTextures.field_0x08 = (ManagedTextureGroup*)field_0x98;
+    modelTextures.field_0x0c = skyTextures.field_0x0c = terrainTextures.field_0x0c = ((PCRenderTarget*)field_0x18)->field_0x28;
+    modelTextures.field_0x10 = skyTextures.field_0x10 = terrainTextures.field_0x10 = 0x115c;
     if (progress)
         progress(0);
 
@@ -674,17 +669,18 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     g_MemTagStack->Push("Collision");
     if (eventScene->field_0xb8) {
         for (int i = 0; i < eventScene->field_0xb8->field_0x00; i++) {
-            if (eventScene->field_0xb8->field_0x04[i].physics) {
-                ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x1f4 = eventTerrain;
-                if (eventTerrain)
-                    ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x1f8 =
-                        ((UnknownQuarryTerrain*)eventTerrain)->field_0x40;
-                ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x128->UnknownFunction435fe0();
-                ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x128->UnknownFunction432120(1);
-                ((UnknownQuarryPhysicsObject*)eventScene->field_0xb8->field_0x04[i].field_0x08)->field_0x128->UnknownFunction4394d0(eventScene->field_0xb8->field_0x04[i].field_0x08, 0x68);
-            } else if (eventScene->field_0xb8->field_0x04[i].field_0x0c && ((D3DIMSoultreeObject*)eventScene->field_0xb8->field_0x04[i].field_0x04)->UnknownFunction4fda30() == 1) {
-                ((UnknownQuarryCollision*)eventScene->field_0xb8->field_0x04[i].field_0x0c)->UnknownFunction435fe0();
-                ((UnknownQuarryCollision*)eventScene->field_0xb8->field_0x04[i].field_0x0c)->UnknownFunction432120(1);
+            UnknownSceneCaster* caster = &eventScene->field_0xb8->field_0x04[i];
+            if (caster->physics) {
+                UnknownTerrain* terrain = eventTerrain;
+                ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x1f4 = terrain;
+                if (terrain)
+                    ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x1f8 = ((UnknownQuarryTerrain*)terrain)->field_0x40;
+                ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x128->UnknownFunction435fe0();
+                ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x128->UnknownFunction432120(1);
+                ((UnknownQuarryPhysicsObject*)caster->field_0x08)->field_0x128->UnknownFunction4394d0(caster->field_0x08, 0x68);
+            } else if (caster->field_0x0c && ((D3DIMSoultreeObject*)caster->field_0x04)->UnknownFunction4fda30() == 1) {
+                ((UnknownQuarryCollision*)caster->field_0x0c)->UnknownFunction435fe0();
+                ((UnknownQuarryCollision*)caster->field_0x0c)->UnknownFunction432120(1);
             }
         }
     }

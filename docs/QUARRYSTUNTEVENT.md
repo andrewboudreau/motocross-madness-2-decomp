@@ -39,8 +39,9 @@ headers.
 
 The loader `0x004de590` (7952 bytes) is a near miss in
 `samples/game/QuarryStuntEventLoaderNearMiss.cpp`, which carries its own
-`UnknownQuarry*` views. About 95% of the normalised instructions align.
-These match:
+`UnknownQuarry*` views. About 87% of the normalised instructions align
+(2194 instructions against 2209; the fog object `0x00462e10` allocates
+0x2c bytes, a bare GameObject). These match:
 - the call sequence;
 - the allocation sizes and `__FILE__` lines (252..1251);
 - the EH states, the error paths and the 0x650 frame.
@@ -60,7 +61,9 @@ These differ:
   original declares these in inner blocks;
 - register choices and expression shapes in the memory-budget tree
   (`0x004de7e0..0x004ded5e`);
-- the zero register retail keeps around the collision links.
+- the zero register retail keeps around the collision links, and the
+  register holding -1 for the EH states from the fog block on (edi in
+  retail, esi here).
 
 Facts the loader establishes:
 - The three 0x18-byte `UnknownTextureFormatChoice` records hold the

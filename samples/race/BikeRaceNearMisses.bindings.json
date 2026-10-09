@@ -360,5 +360,6 @@
   "_s_UnknownStatic578e8c": "0x00578e8c",
   "_sprintf": "0x00534aaf",
   "_strncpy": "0x00534b10",
-  "_strrchr": "0x00534a60"
+  "_strrchr": "0x00534a60",
+  "??DVector3@@QBE?AU0@M@Z": "0x005015b0"
 }

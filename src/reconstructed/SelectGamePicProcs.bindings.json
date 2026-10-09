@@ -341,5 +341,21 @@
   "_sprintf": "0x00534aaf",
   "_srand": "0x00534c0e",
   "_strncat": "0x00536b60",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "?UnknownFunction4040f0@BackgroundImage@@QAEHH@Z": "0x004040f0",
+  "?UnknownFunction404200@BackgroundImage@@QAEXH@Z": "0x00404200",
+  "?UnknownFunction42f190@Camera@@QAEHHHHH@Z": "0x0042f190",
+  "?FastSqrt@@YAMM@Z": "0x00460b50",
+  "?ShowScene@KrustyUI@@QAEXPAVGameObject@@@Z": "0x004999f0",
+  "?HideScene@KrustyUI@@QAEXXZ": "0x00499a20",
+  "?UnknownFunction4e8cf0@RenderTarget@@QAEXPAVCamera@@@Z": "0x004e8cf0",
+  "?UnknownVirtualSlot29@MPBikeRiderDlg@@UAEXPAUUnknownDialogEvent@@@Z$ehhandler": "0x0054e16a",
+  "__real@4@4000c000000000000000": "0x00550774",
+  "??_C@_0L@IFFH@RiderRight?$AA@": "0x00569b38",
+  "??_C@_09GCBI@RiderLeft?$AA@": "0x00569b44",
+  "??_C@_0P@KGJC@600cc?54?9stroke?$AA@": "0x00569b90",
+  "??_C@_0P@PGIG@500cc?52?9stroke?$AA@": "0x00569ba0",
+  "??_C@_0P@OGDA@400cc?54?9stroke?$AA@": "0x00569bb0",
+  "??_C@_0P@IDOK@250cc?52?9stroke?$AA@": "0x00569bc0",
+  "??_C@_0P@PFI@125cc?52?9stroke?$AA@": "0x00569bd0"
 }

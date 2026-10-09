@@ -828,6 +828,275 @@ int BikeRace::UnknownVirtualSlot20(int value) {
     return 0;
 }
 
+// 0x0041f5e0
+int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    int result;
+    if (g_TrackGame->network != 0 && event->kind == 0) {
+        g_TrackGame->controlInterface->keyboard->UnknownFunction48a240(0xc);
+    }
+    if (field_0x190 && field_0x19c != 0) {
+        if (event->control == 1 && event->kind == 0) {
+            field_0x194 = 0.1f;
+            field_0x19c->field_0x3dc = 0;
+            field_0x190 = false;
+            return 1;
+        }
+        if (field_0x19c->UnknownFunction51dce0(event, entry, &result)) {
+            return 1;
+        }
+    }
+    if (GameObject::UnknownVirtualSlot23(event, entry)) {
+        return 1;
+    }
+    if (!field_0x190 && g_TrackGame->uiInteractionBlocked) {
+        return 0;
+    }
+    if (event->kind == 0) {
+        switch (event->control) {
+        case 0x35:
+            if (g_TrackGame->field_0x18 > 1) {
+                KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
+                if (!keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&
+                    !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0)) {
+                    if (g_TrackGame->mode.field_0x6b4 == 2) {
+                        break;
+                    }
+                    if (field_0x19c != 0) {
+                        field_0x19c->UnknownFunction51dd10();
+                        field_0x19c->field_0x3dc = 1;
+                    }
+                    field_0x194 = 10.0f;
+                    field_0x190 = true;
+                    return 1;
+                }
+                g_TrackGame->mode.field_0x6b4++;
+                if (g_TrackGame->mode.field_0x6b4 == 3) {
+                    g_TrackGame->mode.field_0x6b4 = 0;
+                }
+                if (g_TrackGame->mode.field_0x6b4 == 1 && field_0x19c != 0) {
+                    field_0x19c->UnknownFunction51dd10();
+                    field_0x19c->field_0x3dc = 1;
+                    field_0x190 = true;
+                }
+                char title[0x80];
+                char value[0x80];
+                char text[0x100];
+                g_TrackGame->LoadResourceString(0x1428, title, 0x80);
+                if (g_TrackGame->mode.field_0x6b4 == 0) {
+                    g_TrackGame->LoadResourceString(0x140b, value, 0x80);
+                } else if (g_TrackGame->mode.field_0x6b4 == 1) {
+                    g_TrackGame->LoadResourceString(0x140a, value, 0x80);
+                } else if (g_TrackGame->mode.field_0x6b4 == 2) {
+                    g_TrackGame->LoadResourceString(0x140c, value, 0x80);
+                }
+                sprintf(text, "%s : %s", title, value);
+                UnknownMessage* message = new (__FILE__, 0xcdd) UnknownMessage(text, 3.25f);
+                TextQueueOverlay* overlay;
+                switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
+                case 2:
+                    overlay = g_TrackGame->field_0x564->field_0x6c;
+                    if (overlay != 0 && message != 0) {
+                        overlay->UnknownFunction51b540(message);
+                    }
+                    break;
+                case 0:
+                    overlay = g_TrackGame->field_0x55c->field_0x6c;
+                    if (overlay != 0 && message != 0) {
+                        overlay->UnknownFunction51b540(message);
+                    }
+                    break;
+                case 1:
+                case 5:
+                    overlay = g_TrackGame->field_0x560->field_0x6c;
+                    if (overlay != 0 && message != 0) {
+                        overlay->UnknownFunction51b540(message);
+                    }
+                    break;
+                case 4:
+                    overlay = g_TrackGame->field_0x568->field_0x6c;
+                    if (overlay != 0 && message != 0) {
+                        overlay->UnknownFunction51b540(message);
+                    }
+                    break;
+                }
+                if (message != 0) {
+                    delete message;
+                }
+            }
+            break;
+        case 0x1b:
+            if ((g_TrackGame->field_0x2d4_bit2) &&
+                UnknownFunction43caa0(0x1b, 0, event, 3)) {
+                UnknownFunction41f1d0(1, 0, 0);
+                return 1;
+            }
+            if (!UnknownFunction43caa0(0x1b, 0, event, 0x80)) {
+                UnknownFunction41f1d0(1, 0, 1);
+            }
+            return 1;
+        case 0x1a:
+            if ((g_TrackGame->field_0x2d4_bit2) &&
+                UnknownFunction43caa0(0x1a, 0, event, 3)) {
+                UnknownFunction41f1d0(0, 0, 0);
+                return 1;
+            }
+            if (!UnknownFunction43caa0(0x1a, 0, event, 0x80)) {
+                UnknownFunction41f1d0(0, 0, 1);
+            }
+            return 1;
+
+        case 0xc9:
+            if (UnknownFunction43caa0(0xc9, 0, event, 0x80000000)) {
+                UnknownFunction41f1d0(1, 1, 0);
+                return 1;
+            }
+            break;
+        case 0xd1:
+            if (UnknownFunction43caa0(0xd1, 0, event, 0x80000000)) {
+                UnknownFunction41f1d0(0, 1, 0);
+                return 1;
+            }
+            break;
+        case 0x22:
+            if (UnknownFunction43caa0(0x22, 0, event, 0xc)) {
+                g_TrackGame->mode.field_0xa8c = 1 - g_TrackGame->mode.field_0xa8c;
+                localRacer->field_0x5bc = g_TrackGame->mode.field_0xa8c;
+                TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
+                if (overlay == 0) {
+                    return 1;
+                }
+                char title[0x80];
+                char value[0x80];
+                char text[0x80];
+                g_TrackGame->LoadResourceString(0x140d, title, 0x80);
+                if (localRacer->field_0x5bc) {
+                    g_TrackGame->LoadResourceString(0x1407, value, 0x80);
+                } else {
+                    g_TrackGame->LoadResourceString(0x1408, value, 0x80);
+                }
+                sprintf(text, "%s %s", title, value);
+                UnknownMessage message(text, 1.5f);
+                overlay->UnknownFunction51b540(&message);
+                return 1;
+            }
+            break;
+        case 0x30:
+            if (UnknownFunction43caa0(0x30, 0, event, 0xc)) {
+                g_TrackGame->mode.field_0xa90 = 1 - g_TrackGame->mode.field_0xa90;
+                localRacer->field_0x5c0 = g_TrackGame->mode.field_0xa90;
+                TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
+                if (overlay == 0) {
+                    return 1;
+                }
+                char title[0x80];
+                char value[0x80];
+                char text[0x80];
+                g_TrackGame->LoadResourceString(0x142d, title, 0x80);
+                if (localRacer->field_0x5c0) {
+                    g_TrackGame->LoadResourceString(0x1407, value, 0x80);
+                } else {
+                    g_TrackGame->LoadResourceString(0x1408, value, 0x80);
+                }
+                sprintf(text, "%s %s", title, value);
+                UnknownMessage message(text, 1.5f);
+                overlay->UnknownFunction51b540(&message);
+                return 1;
+            }
+            break;
+        case 0x1f:
+            if (UnknownFunction43caa0(0x1f, 0, event, 0x80)) {
+                field_0x034 = 1 - field_0x034;
+            }
+            break;
+        }
+    }
+    if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay != 0) {
+        if (field_0x0a8 < 0) {
+            field_0x0a8 = g_TrackGame->debugOverlay->NewPage();
+        }
+        int shown = g_TrackGame->debugOverlay->field_0x26c4;
+        if (shown == field_0x0a8) {
+
+            if (UnknownFunction43caa0(0x1c, 0, event, 0x80)) {
+                if (g_TrackGame->ui->field_0x2c->GetUser(0)->field_0x30 == 0) {
+                    g_TrackGame->ui->field_0x2c->UnknownFunction486590("ui\\cursor.tga", 0);
+                }
+                if (!((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->field_0x2c
+                          ->GetUser(0)->field_0x30)->field_0x25_bit0) {
+                    if (objectPicker == 0) {
+                        ObjectPicker* picker = new (__FILE__, 0xed2) ObjectPicker(1);
+                        objectPicker = picker;
+                        picker->UnknownFunction4b0210(
+                            g_TrackGame->renderTarget, 0, UnknownFunction417b00,
+                            (GameCursor*)g_TrackGame->ui->field_0x2c->GetUser(0)->field_0x30);
+                        if (AppendChild(objectPicker, -1)) {
+                            g_TrackGame->ui->UnknownFunction499b00();
+                        }
+                    } else {
+                        g_TrackGame->ui->UnknownFunction499b00();
+                    }
+                } else {
+                    g_TrackGame->debugOverlay->UnknownFunction448000(
+                        field_0x0a8, g_UnknownGlobal567a88 + 1, 0);
+                    g_UnknownGlobal567a88++;
+                    if ((signed char)field_0x0b0 < 0) {
+                        if (g_UnknownGlobal567a88 > 12) {
+                            g_UnknownGlobal567a88 = 2;
+                        } else if (g_UnknownGlobal567a88 > 5 && g_UnknownGlobal567a88 < 9) {
+                            g_UnknownGlobal567a88 = 9;
+                        }
+                    } else if (g_UnknownGlobal567a88 > 5) {
+                        g_UnknownGlobal567a88 = 2;
+                    }
+                }
+            }
+            if (UnknownFunction43caa0(0, 1, event, 0x80000000)) {
+                int picked = objectPicker->UnknownFunction4b04c0();
+                if (picked != 0) {
+                    if (raceScene->field_0xb8 != 0) {
+                        for (int i = 0; i < raceScene->field_0xb8->field_0x00; i++) {
+                            UnknownBikeRacePickCaster* caster =
+                                &((UnknownBikeRacePickCaster*)raceScene->field_0xb8->field_0x04)[i];
+                            if (caster->field_0x00 & 1) {
+                                if (picked == caster->field_0x08->field_0x128) {
+                                    UnknownFunctionCameraView()->field_0x390 = 1;
+                                    field_0x154 = i;
+                                    UnknownFunction41f1d0(1, 0, 0);
+                                    return 1;
+                                }
+                            } else if (picked == caster->field_0x0c) {
+                                UnknownFunctionCameraView()->field_0x390 = 1;
+                                field_0x154 = i;
+                                UnknownFunction41f1d0(1, 0, 0);
+                                return 1;
+                            }
+                        }
+                    }
+                    if (raceScene->field_0xb4 != 0) {
+                        for (int i = 0; i < raceScene->field_0xb4->field_0x00; i++) {
+                            UnknownSceneEntry* entry = &raceScene->field_0xb4->field_0x04[i];
+                            if (entry->field_0x00_bit3) {
+                                if (picked == ((UnknownBikeRacePickCharacter*)entry->field_0x04)->field_0x210) {
+                                    UnknownFunctionCameraView()->field_0x390 = 1;
+                                    field_0x150 = i;
+                                    UnknownFunction41f1d0(1, 0, 1);
+                                    return 1;
+                                }
+                            } else if (picked == ((UnknownBikeRacePickObject*)entry->field_0x08)->field_0x3c) {
+                                UnknownFunctionCameraView()->field_0x390 = 1;
+                                field_0x150 = i;
+                                UnknownFunction41f1d0(1, 0, 1);
+                                return 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 // 0x00420040
 int BikeRace::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
     int count;

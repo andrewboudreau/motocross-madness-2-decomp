@@ -10,12 +10,21 @@
 // not change it.
 //
 // EventManager::CreatePodiumScene (0x0045d480, 4247 bytes): the podium
-// scene. A first full draft: control flow, calls, strings, `new` lines and
-// EH states follow retail, but about 500 instructions still differ: the
-// frame (retail 0x460, three text buffers at +0xe8/+0x1e8/+0x2ec and a
-// second message at +0x168), the zero-direction test's block order, the
-// +0x3444 last-race test (retail materialises a sete), and the rotations'
-// scaling temporaries. The views it needs are declared below.
+// scene; 2064 of 4246 bytes (bindings: EventManagerNearMisses.bindings.json).
+// Control flow, calls, strings, `new` lines, EH states and the frame size
+// (0x460) follow retail. Shapes found: the last-race test assigned to `ok`
+// (retail materialises the sete), separate `column`/`row` products, the zero
+// direction test through an inline helper (it places the copy branch first),
+// PodiumLength over a reference (no by-value copy), the nested
+// UnknownFunction521cd0 test (three Winner sprintf copies), and the buffers
+// name[0x80], path[0x104], message[0x184] plus the crowd message's own
+// [0x80] buffer at +0x168. Left: the squared lengths (retail squares each
+// component as it loads it, `fld; fld st(0); fmulp`, and spills z*z; plain,
+// local-copy, Square-helper, dot-product and accumulated forms all load the
+// three components first), the scalar spill homes below +0x68, the register
+// rotation of the Winner branch (one step behind retail), the place counter
+// store (retail stores 1 after the count test) and the z component order of
+// `field_0x3c4 + offsets[place - 1]`.
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -157,7 +166,7 @@ extern "C" Vector3* __stdcall D3DRMVectorRotate(Vector3* result, Vector3* vector
                                                 float theta);
 
 // |v|, exact for unit vectors.
-static inline float PodiumLength(Vector3 v) {
+static inline float PodiumLength(const Vector3& v) {
     float squared = v.x * v.x + v.y * v.y + v.z * v.z;
     if (squared == 1.0f)
         return 1.0f;
@@ -175,6 +184,11 @@ static inline Vector3 operator-(const Vector3& a, const Vector3& b) {
 #define PODIUM_VIEW(v) ((UnknownPodiumViewFields*)(v))
 #define PODIUM_ARCADE ((UnknownPodiumArcade*)podiumObject)
 
+// Whether v is the zero vector (the grid's "no podium direction").
+static inline int PodiumIsZero(const Vector3& v) {
+    return v.x == 0.0f && v.y == 0.0f && v.z == 0.0f;
+}
+
 // Whether the career's current race is its series' last (the bonus track
 // is the last when there is one).
 static inline int PodiumIsLastRace(UnknownTrackGameObject3444* circuit) {
@@ -188,9 +202,9 @@ static inline int PodiumIsLastRace(UnknownTrackGameObject3444* circuit) {
 
 // 0x0045d480
 int EventManager::CreatePodiumScene() {
-    char name[256];
-    char path[260];
-    char message[388];
+    char name[0x80];
+    char path[0x104];
+    char message[0x184];
     UnknownTrackGameObject3444* circuit = g_TrackGame->field_0x3444;
     TrackGameViewOwner* owner = FindRaceMode();
     UnknownKrustyBikeView* view = FindRaceView();
@@ -201,7 +215,8 @@ int EventManager::CreatePodiumScene() {
     else
         ok = 1;
     if (circuit) {
-        if (!PodiumIsLastRace(circuit))
+        ok = PodiumIsLastRace(circuit);
+        if (!ok)
             return 0;
     } else {
         if (!ok || !*(int*)g_TrackGame->mode.field_0x6c4)
@@ -221,12 +236,14 @@ int EventManager::CreatePodiumScene() {
     float rows = grid->field_0xa4->field_0x398;
     if (!((int)rows & 1))
         rows -= 1.0f;
-    float column;
-    float row;
-    column = row = rows * 0.5f;
+    float column = rows * 0.5f;
+    float row = rows * 0.5f;
     Vector3 direction;
     Vector3 up;
-    if (grid->field_0x98.x == 0.0f && grid->field_0x98.y == 0.0f && grid->field_0x98.z == 0.0f) {
+    if (!PodiumIsZero(grid->field_0x98)) {
+        field_0x3c4 = grid->field_0x8c;
+        direction = PODIUM_OWNER(owner)->field_0x2c->field_0x98;
+    } else {
         if (g_TrackGame->mode.field_0x27f8.field_0x04 == 3 && PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64) {
             PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->UnknownFunction4fc970(&field_0x3c4);
             PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x64->field_0x1a0->UnknownFunction4fc4f0(&direction, &up);
@@ -235,9 +252,6 @@ int EventManager::CreatePodiumScene() {
             field_0x3c4 = Vector3((int)column * spacing * 256.0f, 0.0f, (int)row * spacing * 256.0f);
             direction = kVec3ZAxis;
         }
-    } else {
-        field_0x3c4 = grid->field_0x8c;
-        direction = PODIUM_OWNER(owner)->field_0x2c->field_0x98;
     }
     up = kVec3YAxis;
     PODIUM_VIEW(PODIUM_OWNER(owner)->field_0x34)->field_0x4c->UnknownFunction507c10(&field_0x3c4, 0, 0, 0);
@@ -300,12 +314,15 @@ int EventManager::CreatePodiumScene() {
         racer = PODIUM_OWNER(owner)->field_0x34->UnknownFunction4204e0(&iterator);
         while (racer && ((UnknownPodiumRacer*)racer)->field_0x784 != place)
             racer = PODIUM_OWNER(owner)->field_0x34->UnknownFunction4204e0(&iterator);
-        if (g_TrackGame->UnknownFunction521cd0() &&
-            (g_TrackGame->field_0x3444->field_0x464 & 2) &&
-            racer == PODIUM_OWNER(owner)->field_0x34->field_0x38)
-            sprintf(name, "%s\\Winnerd.mcf", "Res");
-        else
+        if (g_TrackGame->UnknownFunction521cd0()) {
+            if ((g_TrackGame->field_0x3444->field_0x464 & 2) &&
+                racer == PODIUM_OWNER(owner)->field_0x34->field_0x38)
+                sprintf(name, "%s\\Winnerd.mcf", "Res");
+            else
+                sprintf(name, "%s\\Winner.mcf", "Res");
+        } else {
             sprintf(name, "%s\\Winner.mcf", "Res");
+        }
         if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, name, "rb", (int)path)) {
             sprintf(message, "No winner animation file found in resources.  Aborting podium scene.");
             delete stream;
@@ -345,7 +362,8 @@ int EventManager::CreatePodiumScene() {
         UnknownPodiumSound* sound = new(__FILE__, 0x34e) UnknownPodiumSound(PODIUM_OWNER(owner)->field_0x2c->field_0xc4, 1);
         UnknownTextureStream* audio = new(__FILE__, 0x34f) UnknownTextureStream((int)g_UnknownResourceManager572b44);
         if (!g_TrackGame->sceneObject->UnknownFunction4e9cd0(audio, "CrowdLoop.wav", "rb", 0)) {
-            sprintf(message, "CrowdLoop.wav not found in Audio.res.\n");
+            char text[0x80];
+            sprintf(text, "CrowdLoop.wav not found in Audio.res.\n");
             delete audio;
             return 0;
         }

@@ -71,6 +71,18 @@ static inline Vector3 UnknownVectorSum(const Vector3& a, const Vector3& b) {
     return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
+// The bike view's length: the squares are accumulated one statement at a
+// time (x first), and unit vectors skip the square root. A single
+// `x*x + y*y + z*z` expression squares z first (0x004f78a0).
+static inline float UnknownVectorLength(const Vector3& v) {
+    float lengthSquared = v.x * v.x;
+    lengthSquared += v.y * v.y;
+    lengthSquared += v.z * v.z;
+    if (lengthSquared == 1.0f)
+        return 1.0f;
+    return FastSqrt(lengthSquared);
+}
+
 static inline Vector3& operator*=(Vector3& v, float scale) {
     v.x *= scale;
     v.y *= scale;
@@ -118,6 +130,190 @@ struct UnknownGridDraw {
     float field_0x04;                         // random key
     char field_0x08;                          // racer index
 };
+
+// The player left message (type 5).
+struct UnknownPlayerLeftMessage {
+    int field_0x00;
+    int field_0x04;
+    int field_0x08;                           // player id
+};
+
+// The lobby start message (type 0x83, 0x8d8 bytes).
+struct UnknownLobbyStartMessage {
+    int field_0x00;
+    short field_0x04;                         // start
+    UnknownTrackGameModeSettings field_0x08;  // TrackGame+0x2d70
+    int field_0x1f4;                          // TrackGame+0x60c
+    int field_0x1f8[8];                       // racer slot +0xc0
+    char field_0x218[8][0x10];                // racer slot +0xdc (name)
+    char field_0x298[8][0x40];                // racer slot +0x00
+    char field_0x498[8][0x40];                // racer slot +0x40
+    char field_0x698[8][0x40];                // racer slot +0x80
+    int field_0x898[8];                       // racer slot +0xec
+    int field_0x8b8[8];                       // racer slot +0xf0
+};
+
+// A grid entry at race settings +0x14c (TrackGame.h's
+// UnknownTrackGameModeEntry) with the racer index at +5.
+struct UnknownGridEntry {
+    UnknownGridEntry() {
+        field_0x00 = 0;
+        field_0x04 = 0;
+    }
+
+    int field_0x00;                           // player id
+    char field_0x04;                          // championship points
+    char field_0x05;                          // racer index
+};
+
+// 0x004f17a0
+int FillFileList(DirectoryList* directories, const char* directory, const char* pattern, const char* kind,
+                 int a, const char* picture, const char* listName, char* name, int* value,
+                 UIDialog* dialog, int b, int append) {
+    char first[260];
+    char second[260];
+    char fallback[260];
+    char selected[260];
+    char found[260];
+    char path[260];
+    char file[260];
+    char entry[260];
+    char text[64];
+    UIListBox* list = 0;
+    int index = 0;
+    if (!dialog)
+        dialog = (UIDialog*)g_TrackGame->ui->field_0x2c->FindInputDialog();
+    UIListBox* pictures = static_cast<UIListBox*>(dialog->FindControl(picture, 0));
+    pictures->UnknownFunction477e60(1);
+    if (!append)
+        pictures->RemoveAllRows();
+    if (strcmp(listName, "")) {
+        list = static_cast<UIDropDownList*>(dialog->FindControl(listName, 0))->listPart;
+        if (!append)
+            list->RemoveAllRows();
+    }
+    if (!append)
+        g_TrackGame->ui->UnknownFunction49bb80();
+    COPY_TEXT(selected, name, 260);
+    strcpy(name, "");
+    if (value)
+        *value = 0;
+    sprintf(first, "%s\\%s", g_TrackGame->mode.field_0x23d0, directory);
+    sprintf(second, "%s\\%s", g_TrackGame->mode.field_0x24d4, directory);
+    ((CombinedDirectoryList*)directories)->UnknownFunction44abb0(first, second);
+    directories->UnknownFunction44a220(pattern, 1);
+    directories->UnknownVirtualSlot1();
+    if (!directories->UnknownFunction4673b0())
+        return 1;
+    if (a) {
+        sprintf(path, "%s\\%s", "ui", "unart.tga");
+        g_TrackGame->UnknownVirtualSlot18(path, fallback);
+    } else {
+        sprintf(path, "%s\\%s", "ui", "unarts.tga");
+        g_TrackGame->UnknownVirtualSlot18(path, fallback);
+    }
+    int more = directories->UnknownFunction44a550(entry);
+    UnknownTextureStream* stream = new(__FILE__, 180) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+    if (more) {
+        do {
+            int i;
+            int x;
+            int y;
+            int series;
+            for (i = 0; i < 6; i++) {
+                if (!_stricmp(entry, g_TrackGame->mode.field_0x139c[i])) {
+                    if (!g_TrackGame->mode.field_0x1384[i])
+                        goto next;
+                    break;
+                }
+            }
+            g_TrackGame->mode.FindFileDirectory((int)directory, entry, kind, found);
+            g_TrackGame->sceneObject->UnknownFunction4e9b80(found);
+            series = g_TrackGame->mode.UnknownFunction524100();
+            if (_strnicmp(entry, "Quarry01.env", strlen(entry)) && _strnicmp(entry, "Nat04.env", strlen(entry)))
+                series = -1;
+            if (g_TrackGame->mode.field_0x27f8.field_0x04 != 1 &&
+                g_TrackGame->mode.field_0x27f8.field_0x04 != 5) {
+                g_TrackGame->sceneObject->UnknownFunction4ea010(text, entry, 0, "scn", &x, &y);
+                int row;
+                if (g_TrackGame->network && g_TrackGame->network->isHost)
+                    row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, x, y);
+                else
+                    row = g_TrackGame->ui->UnknownFunction49ba70(index, 0, series, entry, 0, 0);
+                if (g_TrackGame->mode.UnknownFunction524100() == 1 ||
+                    g_TrackGame->mode.UnknownFunction524100() == 5) {
+                    if (a)
+                        sprintf(file, "%s01.tga", entry);
+                    else
+                        sprintf(file, "%s01s.tga", entry);
+                } else {
+                    if (a)
+                        sprintf(file, "%s.tga", entry);
+                    else
+                        sprintf(file, "%ss.tga", entry);
+                }
+                sprintf(path, "%s\\%s", directory, file);
+                if (g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)file))
+                    pictures->AddImageFileRow(file, row, 1, 0);
+                else if (g_TrackGame->UnknownVirtualSlot18(path, found))
+                    pictures->AddImageFileRow(found, row, 0, 0);
+                else
+                    pictures->AddImageFileRow(fallback, row, 0, 0);
+                if (!_stricmp("no name", text))
+                    g_TrackGame->LoadResourceString(0x143b, text, 128);
+                list->AddRow(text, row, 0);
+            } else {
+                g_TrackGame->sceneObject->UnknownFunction4ea010(text, entry, 1, "scn", 0, 0);
+                int count = g_TrackGame->sceneObject->field_0x390;
+                for (int scene = 1; scene <= count; scene++) {
+                    g_TrackGame->sceneObject->UnknownFunction4ea010(text, entry, scene, "scn", &x, &y);
+                    int row;
+                    if (g_TrackGame->network && g_TrackGame->network->isHost)
+                        row = g_TrackGame->ui->UnknownFunction49ba70(index, scene, series, entry, x, y);
+                    else
+                        row = g_TrackGame->ui->UnknownFunction49ba70(index, scene, series, entry, 0, 0);
+                    if (a)
+                        sprintf(file, "%s%02d.tga", entry, scene);
+                    else
+                        sprintf(file, "%s%02ds.tga", entry, scene);
+                    sprintf(path, "%s\\%s", directory, file);
+                    if (g_TrackGame->sceneObject->UnknownFunction4e9cd0(stream, path, "rb", (int)file))
+                        pictures->AddImageFileRow(file, row, 1, 0);
+                    else if (g_TrackGame->UnknownVirtualSlot18(path, found))
+                        pictures->AddImageFileRow(found, row, 0, 0);
+                    else
+                        pictures->AddImageFileRow(fallback, row, 0, 0);
+                    if (!_stricmp("no name", text))
+                        g_TrackGame->LoadResourceString(0x143b, text, 128);
+                    list->AddRow(text, row, 0);
+                }
+            }
+        next:
+            index++;
+        } while (directories->UnknownFunction44a4c0(entry));
+    }
+    list->Sort(1);
+    if (!append) {
+        list->SelectRow(0);
+        if (value)
+            *value = 0;
+    }
+    if (strcmp(selected, "")) {
+        g_TrackGame->sceneObject->UnknownFunction4e9e30(selected, "scn", 0);
+        if (g_TrackGame->sceneObject->field_0x38c) {
+            g_TrackGame->sceneObject->UnknownFunction4ea390(text, g_TrackGame->sceneObject->field_0x24c, b);
+            list->SelectRowByText(text);
+            int row = list->GetSelectedRow();
+            if (value)
+                *value = row;
+        }
+    }
+    int row = list->GetRowData(-1);
+    directories->UnknownVirtualSlot1();
+    directories->UnknownFunction44a2f0(g_TrackGame->ui->field_0x60[row].field_0x00, name);
+    delete stream;
+    return 1;
+}
 
 // 0x004f2080: qsort order of the grid entries, by +0x04, largest first
 // (0x004f2340, in the near-miss sample, sorts with it and 0x004f20a0).
@@ -1443,6 +1639,156 @@ void MPEventDlg::UnknownFunction4f7640(UIControl* picture, const char* directory
     }
     if (stream)
         delete stream;
+}
+
+// 0x004f78a0
+void MPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
+    char plate[12];
+    char typed[12];
+    char text[0x80];
+    char format[0x80];
+    switch (event->kind) {
+    case kDialogInit: {
+        field_0x7f78 = 0;
+        g_TrackGame->mode.field_0x9c = 0;
+        field_0x7f88 = 1;
+        field_0x7f84 = 1;
+        FillBikeRiderLists();
+        UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLEngineSize", 6))->listPart;
+        list->RemoveAllRows();
+        list->AddRow("125cc 2-stroke", 0, 0);
+        list->AddRow("250cc 2-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[1]), 0);
+        list->AddRow("400cc 4-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[2]), 0);
+        list->AddRow("500cc 2-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[3]), 0);
+        list->AddRow("600cc 4-stroke", UnknownBikeClassOf(g_UnknownGlobal56cb6c[4]), 0);
+        list->SelectRowByData(
+            UnknownBikeClassOf(((UnknownOptGarageSettings*)g_TrackGame->mode.field_0xfd8)->engineSize));
+        g_TrackGame->LoadResourceString(0x146a, format, 0x80);
+        list = static_cast<UIDropDownList*>(FindControl("LargestOpponentDropDown", 6))->listPart;
+        list->RemoveAllRows();
+        sprintf(text, format, g_UnknownGlobal56cb6c[0]);
+        list->AddRow(text, 0, 0);
+        sprintf(text, format, g_UnknownGlobal56cb6c[1]);
+        list->AddRow(text, 1, 0);
+        sprintf(text, format, g_UnknownGlobal56cb6c[2]);
+        list->AddRow(text, 2, 0);
+        sprintf(text, format, g_UnknownGlobal56cb6c[3]);
+        list->AddRow(text, 3, 0);
+        sprintf(text, format, g_UnknownGlobal56cb6c[4]);
+        list->AddRow(text, 4, 0);
+        list->SelectRow(g_TrackGame->mode.field_0x27f8.field_0x1c);
+        UIEditBox* edit = static_cast<UIEditBox*>(FindControl("EditPlateNumber", 0xb));
+        edit->SetAcceptedCharacters("0123456789");
+        g_TrackGame->ui->ShowScene(this);
+        Vector3* eye = &viewEye;
+        previewArea.left = 0x1b;
+        previewArea.right = 0x138;
+        previewArea.top = 0x69;
+        previewArea.bottom = 0xf6;
+        *eye = kVec3Zero;
+        float fov = 50.0f;
+        Vector3* target = &viewTarget;
+        viewEye.z = 15.0f;
+        viewEye.y = 1.0f;
+        *target = g_TrackGame->ui->field_0x474;
+        viewTarget.y += 3.0f;
+        g_TrackGame->ui->field_0x468->UnknownFunction42e9b0(eye, 0, 0, 0, &fov);
+        g_TrackGame->ui->field_0x468->UnknownVirtualSlot29(*target);
+        g_TrackGame->ui->field_0x468->UnknownFunction42f190(
+            previewArea.left, previewArea.top, previewArea.right - previewArea.left,
+            previewArea.bottom - previewArea.top);
+        viewDistance = UnknownVectorLength(UnknownVectorDifference(*eye, g_TrackGame->ui->field_0x474));
+        ApplyChosenRider();
+        ApplyChosenBike();
+        PaintPlateNumber(g_TrackGame->mode.field_0x1bcc);
+        srand(ReadClock());
+        if (dialogBackground)
+            previewRegion = dialogBackground->UnknownFunction4040f0(1);
+        if ((g_TrackGame->mode.field_0x1bd4 & 4) || g_UnknownGlobal689df4) {
+            FindControl("ButWrench", 0)->UnknownVirtualSlot49(0);
+            FindControl("DDLBikes", 6)->UnknownVirtualSlot49(0);
+            FindControl("BikeLeft", 0)->Show(0, 1);
+            FindControl("BikeRight", 0)->Show(0, 1);
+            FindControl("DDLEngineSize", 6)->UnknownVirtualSlot49(0);
+        }
+        UnknownFunction4f8700();
+        break;
+    }
+    case kDialogListSelect:
+        if (!_stricmp("DDLBikes", event->controlName)) {
+            ApplyChosenBike();
+            UpdateBoundValues(1);
+        } else if (!_stricmp("DDLRiders", event->controlName)) {
+            ApplyChosenRider();
+            UpdateBoundValues(1);
+        } else if (!_stricmp("DDLEngineSize", event->controlName)) {
+            ApplyChosenBike();
+        } else if (!_stricmp("LargestOpponentDropDown", event->controlName)) {
+            if (g_TrackGame->network->isHost)
+                g_TrackGame->mode.field_0x27f8.field_0x1c = static_cast<UIListBox*>(event->control)->GetRowData(-1);
+        }
+        break;
+    case kDialogCommand:
+        if (!_stricmp("BikeLeft", event->controlName)) {
+            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+            int rows = list->rowCount;
+            list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("BikeRight", event->controlName)) {
+            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+            int rows = list->rowCount;
+            list->SelectRow((list->GetSelectedRow() + 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("RiderLeft", event->controlName)) {
+            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
+            int rows = list->rowCount;
+            list->SelectRow((list->GetSelectedRow() + rows - 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("RiderRight", event->controlName)) {
+            UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLRiders", 6))->listPart;
+            int rows = list->rowCount;
+            list->SelectRow((list->GetSelectedRow() + 1) % rows);
+            list->UnknownVirtualSlot66(0);
+        } else if (!_stricmp("ButWrench", event->controlName)) {
+            OptionsDlg* dialog = new(__FILE__, 0xb19) OptionsDlg;
+            guiManager->ShowDialog((UIDialog*)dialog, 0, 2, 0, (UIDialog*)parentDialog, 2, 0, 1);
+        }
+        break;
+    case kDialogEditDone:
+        if (!_stricmp("EditPlateNumber", event->controlName)) {
+            static_cast<UIEditBox*>(event->control)->GetEditText(plate, 9);
+            int number = atoi(plate);
+            if (number < 100)
+                number += 100;
+            if (number >= 101) {
+                if (number > 999)
+                    number = 999;
+            } else {
+                number = 101;
+            }
+            g_TrackGame->mode.field_0x1bcc = number;
+            _itoa(number, plate, 10);
+            static_cast<UIEditBox*>(event->control)->SetEditText(plate);
+            PaintPlateNumber(number);
+        }
+        break;
+    case kDialogEditChange:
+        if (!_stricmp("EditPlateNumber", event->controlName)) {
+            static_cast<UIEditBox*>(event->control)->GetEditText(typed, 9);
+            int number = atoi(typed);
+            if (number >= 100 && number <= 999) {
+                PaintPlateNumber(number);
+                g_TrackGame->mode.field_0x1bcc = number;
+            }
+        }
+        break;
+    case kDialogClose:
+        g_TrackGame->ui->HideScene();
+        if (dialogBackground)
+            dialogBackground->UnknownFunction404200(previewRegion);
+        ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
+        break;
+    }
 }
 
 // 0x004f8570

@@ -7,7 +7,11 @@
 // it addresses the entry (edx/ecx swapped at the branch head as well); a
 // local index, a reference, pointer arithmetic and store orders did not
 // reproduce it; neither do an entry reference, a long/unsigned index,
-// index[array] or the /G, /O, /Zp flag sweep.
+// index[array] or the /G, /O, /Zp flag sweep, nor a table local before the
+// stores, a scene local, a by-value index/scene helper, an index local after
+// the 0x004dab90 call, the entry indexed directly at every use, char-pointer
+// arithmetic, an explicit `!= 0` bit test, the two branches swapped
+// (`if (!caster)`), or 0..63 prepended typedefs (no arena window).
 //
 // 0x0041f1d0 (881 bytes; next/previous camera target): control flow, the
 // three branches and the shared tail call 0x0041eb20(caster) (the caster
@@ -15,11 +19,6 @@
 // keeps the constant 0 in edx from the first instruction (cmp [mem], edx,
 // stores of edx) and so orders registers differently; the candidate tests
 // with `test reg, reg` until the first call.
-//
-// 0x0041f5e0 (2390 bytes with its two jump tables; slot 23, keys): every
-// case is reconstructed, but retail keeps 0 in ebx for the whole function
-// (the candidate keeps the EH state -1 there), and its case-local buffers
-// sit at different stack offsets (frame 0x494 against 0x594).
 //
 // 0x004210f0 (2981 bytes with its jump table; the start grid): every case
 // is decoded and the arithmetic matches where VC6 makes the same inlining
@@ -29,7 +28,16 @@
 // opposite (VC6's inline budget). Call sequence (D dot, I FastInvSqrt,
 // S scale, C constructor): retail DIS..CCDISCCCCCCDISCCCCCCDISCC-CSS+,
 // candidate DIS..DISCCCCCCDISCCCCCCDISCS-SS+. Statement-count and helper
-// spelling variations moved either end but never both.
+// spelling variations moved either end but never both: Normalize written
+// `return Scale(v, FastInvSqrt(length))` gives retail's mode 4 sequence
+// (DISCC-CSS+) but still expands the mode 2/3 tail (aligned ratio 0.85 ->
+// 0.90, strict 450 because the code grows by 4 bytes); trivial inline
+// expansions added at the top cost the mode 2/3 normalisation's nested
+// constructor first (DIC), never the tail's; a by-value grid-slot helper is
+// not expanded at all; Vector3's member operator* instead of Scale, a
+// per-case temporary, `gridFirstSlot + ...` and a merged scale factor make
+// it worse. The side test is `p1.x * p0.z - p0.x * p1.z` (retail's load
+// order and p0/p1 slots).
 //
 // 0x00417ed0 (6745 bytes with its jump table at 0x0041992c; the setup,
 // ret 0x24): every branch, all 166 calls in retail order, EH states 0..0x10
@@ -42,7 +50,12 @@
 // block's temporaries (and with them most esp offsets below +0x44) sit 4
 // to 12 bytes apart; one copy store of the girl offset is scheduled after
 // instead of before `fadd 1.2`. Helper-function, declaration-scope and
-// /G5, /G6, /Ox flag variations did not move either.
+// /G5, /G6, /Ox flag variations did not move either. The three squares as
+// separate locals (any sum order or parenthesisation, a `float[3]`, a
+// named result) put all three products first as retail does but keep the
+// third on the x87 stack (`fadd st(1); faddp st(2); fstp st(0)` or fxch
+// forms) instead of storing it; eight other spellings of the sum and a
+// by-value parameter give the candidate's two-then-one order.
 //
 // 0x00419970 (13428 bytes; the loader, ret 0x14): decoded completely (the
 // pro circuit branch, the network player and AI racers, the offline player,
@@ -301,262 +314,6 @@ void BikeRace::UnknownFunction41f1d0(int forward, int racers, int objects) {
     UnknownFunction41eb20(caster);
 }
 
-// 0x0041f5e0
-int BikeRace::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
-    int result;
-    if (g_TrackGame->network != 0 && event->kind == 0) {
-        g_TrackGame->controlInterface->keyboard->UnknownFunction48a240(0xc);
-    }
-    if (field_0x190 && field_0x19c != 0) {
-        if (event->control == 1 && event->kind == 0) {
-            field_0x194 = 0.1f;
-            field_0x19c->field_0x3dc = 0;
-            field_0x190 = false;
-            return 1;
-        }
-        if (field_0x19c->UnknownFunction51dce0(event, entry, &result)) {
-            return 1;
-        }
-    }
-    if (GameObject::UnknownVirtualSlot23(event, entry)) {
-        return 1;
-    }
-    if (!field_0x190 && g_TrackGame->uiInteractionBlocked) {
-        return 0;
-    }
-    if (event->kind == 0) {
-        switch (event->control) {
-        case 0x35:
-            if (g_TrackGame->field_0x18 > 1) {
-                KeyboardDevice* keyboard = g_TrackGame->controlInterface->keyboard;
-                if (!keyboard->UnknownVirtualSlot5(0x2a, 0x3f, 0) &&
-                    !g_TrackGame->controlInterface->keyboard->UnknownVirtualSlot5(0x36, 0x3f, 0)) {
-                    if (g_TrackGame->mode.field_0x6b4 == 2) {
-                        break;
-                    }
-                    if (field_0x19c != 0) {
-                        field_0x19c->UnknownFunction51dd10();
-                        field_0x19c->field_0x3dc = 1;
-                    }
-                    field_0x194 = 10.0f;
-                    field_0x190 = true;
-                    return 1;
-                }
-                g_TrackGame->mode.field_0x6b4++;
-                if (g_TrackGame->mode.field_0x6b4 == 3) {
-                    g_TrackGame->mode.field_0x6b4 = 0;
-                }
-                if (g_TrackGame->mode.field_0x6b4 == 1 && field_0x19c != 0) {
-                    field_0x19c->UnknownFunction51dd10();
-                    field_0x19c->field_0x3dc = 1;
-                    field_0x190 = true;
-                }
-                char title[0x80];
-                char value[0x80];
-                char text[0x100];
-                g_TrackGame->LoadResourceString(0x1428, title, 0x80);
-                switch (g_TrackGame->mode.field_0x6b4) {
-                case 0:
-                    g_TrackGame->LoadResourceString(0x140b, value, 0x80);
-                    break;
-                case 1:
-                    g_TrackGame->LoadResourceString(0x140a, value, 0x80);
-                    break;
-                case 2:
-                    g_TrackGame->LoadResourceString(0x140c, value, 0x80);
-                    break;
-                }
-                sprintf(text, "%s : %s", title, value);
-                UnknownMessage* message = new (__FILE__, 0xcdd) UnknownMessage(text, 3.25f);
-                TextQueueOverlay* overlay;
-                switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
-                case 0:
-                    overlay = g_TrackGame->field_0x55c->field_0x6c;
-                    break;
-                case 1:
-                case 5:
-                    overlay = g_TrackGame->field_0x560->field_0x6c;
-                    break;
-                case 2:
-                    overlay = g_TrackGame->field_0x564->field_0x6c;
-                    break;
-                case 4:
-                    overlay = g_TrackGame->field_0x568->field_0x6c;
-                    break;
-                }
-                if (overlay != 0 && message != 0) {
-                    overlay->UnknownFunction51b540(message);
-                }
-                delete message;
-            }
-            break;
-        case 0x1b:
-            if ((g_TrackGame->field_0x2d4_bit2) &&
-                UnknownFunction43caa0(0x1b, 0, event, 3)) {
-                UnknownFunction41f1d0(1, 0, 0);
-                return 1;
-            }
-            if (UnknownFunction43caa0(0x1b, 0, event, 0x80)) {
-                return 1;
-            }
-            UnknownFunction41f1d0(1, 0, 1);
-            return 1;
-        case 0x1a:
-            if ((g_TrackGame->field_0x2d4_bit2) &&
-                UnknownFunction43caa0(0x1a, 0, event, 3)) {
-                UnknownFunction41f1d0(0, 0, 0);
-                return 1;
-            }
-            if (UnknownFunction43caa0(0x1a, 0, event, 0x80)) {
-                return 1;
-            }
-            UnknownFunction41f1d0(0, 0, 1);
-            return 1;
-        case 0xc9:
-            if (UnknownFunction43caa0(0xc9, 0, event, 0x80000000)) {
-                UnknownFunction41f1d0(1, 1, 0);
-                return 1;
-            }
-            break;
-        case 0xd1:
-            if (UnknownFunction43caa0(0xd1, 0, event, 0x80000000)) {
-                UnknownFunction41f1d0(0, 1, 0);
-                return 1;
-            }
-            break;
-        case 0x22:
-            if (UnknownFunction43caa0(0x22, 0, event, 0xc)) {
-                g_TrackGame->mode.field_0xa8c = 1 - g_TrackGame->mode.field_0xa8c;
-                localRacer->field_0x5bc = g_TrackGame->mode.field_0xa8c;
-                TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
-                if (overlay == 0) {
-                    return 1;
-                }
-                char title[0x80];
-                char value[0x80];
-                char text[0x100];
-                g_TrackGame->LoadResourceString(0x140d, title, 0x80);
-                g_TrackGame->LoadResourceString(localRacer->field_0x5bc ? 0x1407 : 0x1408,
-                                                             value, 0x80);
-                sprintf(text, "%s %s", title, value);
-                UnknownMessage message(text, 1.5f);
-                overlay->UnknownFunction51b540(&message);
-                return 1;
-            }
-            break;
-        case 0x30:
-            if (UnknownFunction43caa0(0x30, 0, event, 0xc)) {
-                g_TrackGame->mode.field_0xa90 = 1 - g_TrackGame->mode.field_0xa90;
-                localRacer->field_0x5c0 = g_TrackGame->mode.field_0xa90;
-                TextQueueOverlay* overlay = g_TrackGame->eventManager->FindTextQueue();
-                if (overlay == 0) {
-                    return 1;
-                }
-                char title[0x80];
-                char value[0x80];
-                char text[0x100];
-                g_TrackGame->LoadResourceString(0x142d, title, 0x80);
-                g_TrackGame->LoadResourceString(localRacer->field_0x5c0 ? 0x1407 : 0x1408,
-                                                             value, 0x80);
-                sprintf(text, "%s %s", title, value);
-                UnknownMessage message(text, 1.5f);
-                overlay->UnknownFunction51b540(&message);
-                return 1;
-            }
-            break;
-        case 0x1f:
-            if (UnknownFunction43caa0(0x1f, 0, event, 0x80)) {
-                field_0x034 = 1 - field_0x034;
-            }
-            break;
-        }
-    }
-    if (g_TrackGame->field_0x2d4_bit2 && g_TrackGame->debugOverlay != 0) {
-        if (field_0x0a8 < 0) {
-            field_0x0a8 = g_TrackGame->debugOverlay->NewPage();
-        }
-        if (g_TrackGame->debugOverlay->field_0x26c4 == field_0x0a8) {
-            if (UnknownFunction43caa0(0x1c, 0, event, 0x80)) {
-                UnknownKrustyUIGui* gui = g_TrackGame->ui->field_0x2c;
-                if (gui->GetUser(0)->field_0x30 == 0) {
-                    g_TrackGame->ui->field_0x2c->UnknownFunction486590("ui\\cursor.tga", 0);
-                }
-                if (((UnknownBikeRaceObjectFlags*)g_TrackGame->ui->field_0x2c
-                         ->GetUser(0)->field_0x30)->field_0x25_bit0) {
-                    g_TrackGame->debugOverlay->UnknownFunction448000(
-                        field_0x0a8, g_UnknownGlobal567a88 + 1, 0);
-                    g_UnknownGlobal567a88++;
-                    if ((signed char)field_0x0b0 < 0) {
-                        if (g_UnknownGlobal567a88 > 12) {
-                            g_UnknownGlobal567a88 = 2;
-                        } else if (g_UnknownGlobal567a88 > 5 && g_UnknownGlobal567a88 < 9) {
-                            g_UnknownGlobal567a88 = 9;
-                        }
-                    } else if (g_UnknownGlobal567a88 > 5) {
-                        g_UnknownGlobal567a88 = 2;
-                    }
-                } else if (objectPicker == 0) {
-                    objectPicker = new (__FILE__, 0xed2) ObjectPicker(1);
-                    objectPicker->UnknownFunction4b0210(
-                        g_TrackGame->renderTarget, 0, UnknownFunction417b00,
-                        (GameCursor*)g_TrackGame->ui->field_0x2c->GetUser(0)->field_0x30);
-                    if (AppendChild(objectPicker, -1)) {
-                        g_TrackGame->ui->UnknownFunction499b00();
-                    }
-                } else {
-                    g_TrackGame->ui->UnknownFunction499b00();
-                }
-            }
-            if (UnknownFunction43caa0(0, 1, event, 0x80000000)) {
-                int picked = objectPicker->UnknownFunction4b04c0();
-                if (picked != 0) {
-                    Scene* scene = raceScene;
-                    if (scene->field_0xb8 != 0) {
-                        int count = scene->field_0xb8->field_0x00;
-                        UnknownBikeRacePickCaster* casters =
-                            (UnknownBikeRacePickCaster*)scene->field_0xb8->field_0x04;
-                        for (int i = 0; i < count; i++) {
-                            if (casters[i].field_0x00 & 1) {
-                                if (picked == casters[i].field_0x08->field_0x128) {
-                                    UnknownFunctionCameraView()->field_0x390 = 1;
-                                    field_0x154 = i;
-                                    UnknownFunction41f1d0(1, 0, 0);
-                                    return 1;
-                                }
-                            } else if (picked == casters[i].field_0x0c) {
-                                UnknownFunctionCameraView()->field_0x390 = 1;
-                                field_0x154 = i;
-                                UnknownFunction41f1d0(1, 0, 0);
-                                return 1;
-                            }
-                        }
-                    }
-                    if (scene->field_0xb4 != 0) {
-                        int count = scene->field_0xb4->field_0x00;
-                        UnknownSceneEntry* entries = scene->field_0xb4->field_0x04;
-                        for (int i = 0; i < count; i++) {
-                            if (entries[i].field_0x00_bit3) {
-                                if (picked == ((UnknownBikeRacePickCharacter*)entries[i].field_0x04)->field_0x210) {
-                                    UnknownFunctionCameraView()->field_0x390 = 1;
-                                    field_0x150 = i;
-                                    UnknownFunction41f1d0(1, 0, 1);
-                                    return 1;
-                                }
-                            } else if (picked == ((UnknownBikeRacePickObject*)entries[i].field_0x08)->field_0x3c) {
-                                UnknownFunctionCameraView()->field_0x390 = 1;
-                                field_0x150 = i;
-                                UnknownFunction41f1d0(1, 0, 1);
-                                return 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return 0;
-}
-
 
 float FastInvSqrt(float x); // 0x00460c00 (FastMath)
 
@@ -629,7 +386,7 @@ void BikeRace::UnknownFunction4210f0(Vector3* a, Vector3* b, void* reference, in
             TrackVec3 p1;
             raceTrack->UnknownFunction518130(raceTrack->field_0x00->field_0x08, &p0);
             raceTrack->UnknownFunction518130(raceTrack->field_0x00->field_0x08->field_0x2c, &p1);
-            if (p0.z * p1.x - p1.z * p0.x <= 0.0f) {
+            if (p1.x * p0.z - p0.x * p1.z <= 0.0f) {
                 side = 1.0f;
             } else {
                 side = -1.0f;
