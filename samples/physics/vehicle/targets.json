@@ -150,6 +150,16 @@
   "bindings": "../hierarchy/LayoutProbe.bindings.json"
  },
  {
+  "class": "Vehicle",
+  "source": "../hierarchy/LayoutProbe.cpp",
+  "candidate_symbol_contains": "?GameObjectVirtualSlot10@Vehicle@@$4PPPPPPPM@A@AEHM@Z",
+  "target_va": "0x0052b690",
+  "target_size": 8,
+  "expect": "exact",
+  "notes": "vtordisp adjustor thunk (sub ecx,[ecx-4]; jmp 0x0052a830) for the GameObject slot 10 override in the GameObject virtual-base vtable (Vehicle+1472 slot 10); emitted by the compiler from LayoutProbe.cpp. owner: Vehicle.cpp",
+  "bindings": "../hierarchy/LayoutProbe.bindings.json"
+ },
+ {
   "class": "StreamTable",
   "source": "FileSlots.cpp",
   "candidate_symbol_contains": "Seek@StreamTable",

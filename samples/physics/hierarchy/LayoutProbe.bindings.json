@@ -18,6 +18,7 @@
   "??_7SoultreePhysicsCharacter@@6BSoultreePhysicsBaseObject@@@": "0x005580a8",
   "??_8SoultreePhysicsCharacter@@7BD3DIMSoultreeCharacter@@@": "0x00558154",
   "??_8SoultreePhysicsCharacter@@7BSoultreePhysicsBaseObject@@@": "0x0055815c",
+  "??_ESoultreePhysicsCharacter@@UAEPAXI@Z": "0x005042f0",
   "??_EVehicle@@UAEPAXI@Z": "0x0052b630",
   "?GameObjectVirtualSlot10@GameObject@@UAEHM@Z": "0x004693d0",
   "?GameObjectVirtualSlot10@SoultreePhysicsBaseObject@@UAEHM@Z": "0x005036f0",

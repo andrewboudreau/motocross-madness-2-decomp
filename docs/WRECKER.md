@@ -40,7 +40,8 @@ relocation resolved by the bindings. Three near misses are parked in
   0x6e/0x6f around a PeekMessage pump, globals `0x0068ace4`/`0x0068ace8`) lie
   between the previous TU's vector initializers and the Wrecker constructor.
   Their globals directly follow the previous TU's `.bss`, so their owner is
-  open. They are not claimed here.
+  open. They are not claimed here; both are strict exact in their own
+  provisional unit, `src/reconstructed/ImeUiState.cpp`.
 - Collaborators, all confirmed from constructor vptr writes: `+0x38` is a
   ConstraintMethodCollisionModel (`0x0043b8d0`, `0x10c` bytes, GameObject
   table at `+0xc`). `+0x3c` is a SelectiveGravityModel (`0x004f9760`, `0x3c`
@@ -115,10 +116,6 @@ relocation resolved by the bindings. Three near misses are parked in
 | `0x005329e0` | 1312 | 215/1306 | frame 0x94 (retail's) once the final scale is `UnknownFunction5015b0(WreckerScaleCtorCall(sum, field_0x118), frameTime)`, the scaled temporary passed straight through; only the slot order differs (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`; a probe-count accessor does not change the budget) |
 | `0x00531740` | 1624 | 768/1617 | contact particle spray; frame 0xc4 (retail's) and every call and operator in retail's order. Written with `WreckerLength` by value, the dot product and the gravity/step scales through the out-of-line views, and three scratch vectors reused across the body (delta/wind/step-along, dir/drift-per-particle, cross result/side/step), which gives retail's slot sharing. Left: the slot order (`velocity` 0x14 here, 0x28 in retail) and `0.0f - scaled.z` of the folded cross product with the Y axis, which retail loads as `fld scaled.z; fsubr` (the constant's leaf is older there); a by-value cross product does not change it |
 | `0x005306e0` | 4176 | 1817/4183 | slot 10, the per-frame update. The first 0x62c bytes are retail's: the idle path (collision model step, probe flags and the mean probe motion, the pose rate scales as `field_0xbc * (1.0f / frameTime)` written per statement so VC6's CSE copies the rate for the first use), the sub-step loop (`step` 0.02 or frameTime/3, slots 11 through the float view `UnknownWreckerSteppable`), the wreck state changes and the rider's slot 7. The rider carry-over block differs: the rigid inverse of the wreck pose (`WreckerInvertRigid`) and the two 4x4 products (`WreckerMatrixProduct`, the soultree.cpp text on the named `_RC` elements) have retail's shape but other term and operand orders (retail `t.x` sums z, y, x; here x, z, y), retail keeps a second copy of `field_0x6c.position` at `[esp+0x10]` that nothing reads, and the second product is only expanded with `__forceinline` (plain `inline` leaves it out of line: the original's tree was smaller, docs/VC6_INLINE_BUDGET.md). The axis rebuild (constructor, normalisation and cross product out of line) and the translation carry-over match retail's calls |
-
-## Not reconstructed
-
-- `0x0052ff00`, `0x0052ff20`: ownership open (see Evidence).
 
 ## Remaining uncertainty
 

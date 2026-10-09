@@ -188,5 +188,15 @@
   "expect": "exact",
   "notes": "vtordisp thunk for slot 10 in the GameObject vbase vtable 0x00558004 (sub ecx,[ecx-4]; jmp 0x00504210); emitted with the definition. 8 bytes + 8 padding.",
   "bindings": "LayoutProbe.bindings.json"
+ },
+ {
+  "class": "SoultreePhysicsCharacter",
+  "source": "LayoutProbe.cpp",
+  "candidate_symbol_contains": "??_ESoultreePhysicsCharacter@@$4PPPPPPPM@A@AEPAXI@Z",
+  "target_va": "0x005042e0",
+  "target_size": 8,
+  "expect": "exact",
+  "notes": "vtordisp thunk for slot 0 (deleting destructor) in the GameObject vbase vtable SoultreePhysicsCharacter+1080 (sub ecx,[ecx-4]; jmp 0x005042f0); same shape as Vehicle's 0x0052b620. 8 bytes + 8 padding.",
+  "bindings": "LayoutProbe.bindings.json"
  }
 ]
