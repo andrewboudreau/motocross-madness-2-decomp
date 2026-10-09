@@ -25,7 +25,9 @@
 //               `delete probe;` without the `if` keeps the probe in esi as
 //               retail does; "VTop" is read into uCenter and "UCenter" into
 //               vTop (retail's order); scope/order/if-shape variants of
-//               total, i and method did not move the constant
+//               total, i and method did not move the constant, nor did
+//               unsigned/long types, `true`, a nested else chain or a
+//               separate loop variable
 //   0x00457ed0  one scheduled load (the cylinder height) in the vertex loop
 //               (1105/1153)
 //   0x00458da0  four `[eax + esi]` operands come out as `[esi + eax]`
@@ -33,8 +35,11 @@
 //               last ComputeCode argument's fsub/fstp (445/455)
 //   0x00459ce0  the frame slots: same size, the locals and temporaries
 //               are assigned in a different order (323/3300)
-//   0x0045b060  frame 0xe0 for 0xf0 and the slot order; the lean of the
-//               side normals is spilled differently (461/3919)
+//   0x0045b060  frame 0xe0 for 0xf0 and the slot order; retail leans the
+//               side normals through memory temporaries (no Vector3 /
+//               helper spelling of the lean produces them) and releases
+//               edi/ebp/ebx before the overlay rows (461/3967 compiled
+//               inside the unit; the retail function is 3967 bytes)
 
 #include <float.h>
 #include <math.h>

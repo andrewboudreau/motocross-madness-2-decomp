@@ -53,7 +53,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ecosystem/EcoSystem | `0x00458da0` | 457/461 | c | 4 code diffs: `mov cl, byte ptr [esi + eax + 0x14]` vs `mov cl, byte ptr [eax + esi + 0x14]`; `lea eax, [esi + edx]` vs `lea eax, [edx + esi]` |
 | ecosystem/EcoSystem | `0x004598d0` | 445/455 | c | 1 code diff: `mov ecx, [0x68aba4]` sits between the last ComputeCode argument's `fsub` and `fstp` in retail |
 | ecosystem/EcoSystem | `0x00459ce0` | 323/3300 | b | 112 code diffs: retail adds `xor edi, edi`; retail adds `mov [esp + N], edi`; slot order differs |
-| ecosystem/EcoSystem | `0x0045b060` | 195/3919 | c | 5 code diffs: `sub esp, 0xe0` vs `sub esp, 0xf0`; `add esp, 0xe0` vs `add esp, 0xf0` |
+| ecosystem/EcoSystem | `0x0045b060` | 461/3967 (in the unit) | c | frame 0xe0 vs 0xf0 and the slot sharing; retail leans the side normals through memory temporaries and pops `edi` / `ebp` / `ebx` before the overlay rows |
 | game/DeviceSetup | `0x00448560` | 148/1006 | b | 35 code diffs: retail adds `push edi`; `push edi ; xor ebp, ebp` vs `xor edi, edi`; frame 0x11c vs 0x118 |
 | game/EventManager | `0x0045d480` | 331/3715 (masked) | b | 85 code diffs: `cmp [edi + 0x44], eax ; je @58 ; jmp @8~` vs `mov edx, [edi + 0x44] ; xor ecx, ecx ; ~`; frame 0x478 vs 0x460, slot order differs |
 | game/EventManager | `0x0045e710` | 322/379 (masked) | c | 10 code diffs: `mov edx, [ecx + 0xc4c] ; mov [eax + 0x5~` vs `mov ecx, [ecx + 0xc4c] ; mov [eax + 0x5~`; `mov eax, [eax + 0x56c]` vs `mov edx, [eax + 0x56c]` |
