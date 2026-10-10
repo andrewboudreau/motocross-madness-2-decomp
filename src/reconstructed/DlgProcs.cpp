@@ -1058,12 +1058,71 @@ void SPBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {
     }
 }
 
+// 0x0044f750
+void SPBikeRiderDlg::FillBikeRiderLists() {
+    int bike = 0;
+    int rider = 0;
+    char text[0x80];
+    SPBikeRiderDlg* self = this;
+    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+    list->RemoveAllRows();
+    for (int i = 0; i < g_TrackGame->ui->field_0x54; i++) {
+        if (!((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].field_0x88) {
+            int kind = ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].model].modelKind;
+            if (kind != 2 && kind != 3 && (kind != 10 || !(g_TrackGame->mode.field_0x1970 & 1)))
+                continue;
+        }
+        UnknownKrustyUIBike* entry = &((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i];
+        UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[entry->model];
+        sprintf(text, "%s %s", model->displayName, entry->displayName);
+        list->AddRow(text, i, 0);
+        if (g_TrackGame->mode.field_0x1974.field_0xc4 == i)
+            bike = i;
+    }
+    if (bike)
+        list->SelectRowByData(bike);
+    else
+        list->SelectRow(0);
+    list->Sort(1);
+    list = static_cast<UIDropDownList*>(self->FindControl("DDLRiders", 6))->listPart;
+    list->RemoveAllRows();
+    for (int j = 0; j < g_TrackGame->ui->field_0x5c; j++) {
+        UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[j];
+        if (model->modelKind == 2 || model->modelKind == 3 || model->field_0xc0) {
+            list->AddRow(model->displayName, j, 0);
+            if (!strcmp(((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[j].modelName,
+                        g_TrackGame->mode.field_0x1974.field_0x80))
+                rider = j;
+        }
+    }
+    list->SelectRowByData(rider);
+}
+
+
 // 0x0044f950
 void SPBikeRiderDlg::PaintPlateNumber(int number) {
     UnknownBikeNumberPainter painter(g_TrackGame->field_0x1c);
     for (int i = 0; i < g_TrackGame->ui->field_0x4c; i++)
         painter.UnknownFunction417670(
             ((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[i].field_0xc0->plateTexture, number);
+}
+
+// 0x0044fa00: a click inside the bike preview (inset by 50 and 30 pixels)
+// starts dragging it and turns automatic rotation off.
+int SPBikeRiderDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry) {
+    if (event->kind == 1 && event->control == 0) {
+        CameraRect area = previewArea;
+        area.left += 50;
+        area.top += 30;
+        area.right -= 50;
+        area.bottom -= 30;
+        if (PtInRect((RECT*)&area, guiUser->pointerDevice->pointerPosition)) {
+            previewDragged = 1;
+            previewDragging = 1;
+            static_cast<UIMultiState*>(FindControl("ChkAutoRotate", 2))->SetCurrentState(0);
+        }
+    }
+    return UIDialog::UnknownVirtualSlot23(event, entry);
 }
 
 // 0x0044fab0

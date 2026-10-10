@@ -12,11 +12,14 @@
 // first gives retail's ecx/eax/edx constants but not its schedule; best
 // 371/427).
 //
-// TrackGameMode::UnknownFunction5238f0 (0x005238f0, 353 bytes): 189 of 379.
-// Retail shares one `return 0` epilogue and keeps fopen's result in eax until
-// the found block (mov edx, eax there); the nested/goto/condition forms tried
-// share the epilogue (194 of 353) but still copy the result into edx right
-// after each fopen.
+// TrackGameMode::UnknownFunction5238f0 (0x005238f0, 353 bytes): 190 of 357.
+// The found block written once after the CD retry (`if (file) { ...; return
+// 1; } return 0;`) gives retail's block layout and its single `return 0`
+// tail. Left: retail keeps fopen's result in eax until the found block (mov
+// edx, eax there); VC6 here gives `file` edx for its whole life and copies
+// it right after each fopen. Nested/goto/condition forms, a combined
+// `!file && ... && (FindCdDirectory() || WaitForCd())` retry and an inline
+// found helper taking the file by value were tried.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -98,10 +101,11 @@ int TrackGameMode::UnknownFunction5238f0(const char* name, char* path) {
             return 0;
         sprintf(buffer, "%s\\%s", field_0x24d4, name + skip);
         file = fopen(buffer, "r");
-        if (!file)
-            return 0;
     }
-    strcpy(path, buffer);
-    fclose(file);
-    return 1;
+    if (file) {
+        strcpy(path, buffer);
+        fclose(file);
+        return 1;
+    }
+    return 0;
 }

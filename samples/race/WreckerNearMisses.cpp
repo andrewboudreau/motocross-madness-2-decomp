@@ -14,6 +14,14 @@
 // component statements all leave that instruction pair. Retail also needs
 // the length to be written `(y*y + x*x) + z*z` (or `z*z + (x*x + y*y)`);
 // `x*x + y*y + z*z` reuses delta.z from the FPU stack.
+// Also tried (no change unless noted): delta built through a derived
+// constructor with by-value parameters (`Vector3 delta = WreckerVector(to.x -
+// from.x, ...)`, the form that fixes Track 0x518130), alone and with the step
+// scaled by an inline helper (const-reference or by-value vector, scale
+// computed inside or passed in); the squared length through an inline helper
+// or split into `+=` statements; a dead `scale = 0.0f` initialiser;
+// `scale * delta`. Per-component stores into `delta` make all three products
+// scalar-first (423/630).
 //
 // UnknownFunction532580 (0x00532580, 562 bytes): rebuilds the wreck pose's
 // linear (field_0xbc) and angular (field_0xc8) step from the node's frame.

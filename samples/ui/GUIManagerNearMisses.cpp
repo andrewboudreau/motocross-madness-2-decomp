@@ -25,10 +25,14 @@
 //   repeated `field_0x0c - 2` is CSE'd as `add -2`), but that form moves the
 //   textArea stores (218/554); updating `size.cx`/`size.cy` in place gives
 //   retail's tail (457/555) and loses the head.
-// 0x00488120 (49 bytes): retail keeps the `device ? owner : 0` branch
-//   (jmp + xor) that VC6 here threads into the owner test (also with an
-//   inline helper, an if/else assignment, early-return layouts, `owner == 0`
-//   first, a result variable, a switch and an assignment in the condition).
+// 0x00488120 (52 bytes, 46/52): retail keeps the `device ? owner : 0` branch
+//   (jmp + xor) and tests the owner for zero before comparing it with
+//   `this`. VC6 threads the xor arm into the next test whenever that test is
+//   the zero test (inline helper, if/else assignment, early-return layouts,
+//   `owner == 0` first, a result variable, a switch, an assignment in the
+//   condition, an int-cast ternary, `owner && owner != this`, an `owned`
+//   flag); comparing with `this` first (below) keeps the branch, so only the
+//   order of the two tests differs.
 
 #include "../../src/reconstructed/GUIManager.cpp"
 
@@ -251,14 +255,12 @@ void ToolTip::ShowText(const char* text, int* position, float time) {
 int GUIUser::SetPointerDevice(GUIInputDevice* device) {
     GUIUser* owner = device ? device->ownerUser : 0;
 
-    if (owner) {
-        if (owner != this)
-            return 0;
-    } else {
-        pointerDevice = device;
-        if (device)
-            device->ownerUser = this;
-    }
+    if (owner == this)
+        return 1;
+    if (owner)
+        return 0;
+    pointerDevice = device;
+    if (device)
+        device->ownerUser = this;
     return 1;
 }
-

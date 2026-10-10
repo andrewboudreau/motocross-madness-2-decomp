@@ -528,5 +528,6 @@
   "_rand": "0x00534c1b",
   "_sprintf": "0x00534aaf",
   "_srand": "0x00534c0e",
-  "_strncpy": "0x00534b10"
+  "_strncpy": "0x00534b10",
+  "__imp__PtInRect@12": "0x005502d4"
 }

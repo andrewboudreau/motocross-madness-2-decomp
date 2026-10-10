@@ -272,6 +272,69 @@ void PCStartupDlg::FillLists()
     }
 }
 
+// 0x004d59a0
+void PCStartupDlg::AddCircuitRow(UnknownTrackGameObject3444* circuit, int row)
+{
+    char name[64];
+    char text[128];
+    int finished = (circuit->field_0x464 >> 3) & 1;
+    int failed = (circuit->field_0x464 >> 2) & 1;
+    const char* prefix = finished || failed ? "LstDone" : "Lst";
+
+    sprintf(name, "%s%s", prefix, "Name");
+    static_cast<UIListBox*>(FindControl(name, 3))->AddRow(circuit->field_0x00, row, 0);
+
+    sprintf(name, "%s%s", prefix, "Rank");
+    sprintf(text, "%d / %d", circuit->field_0x465[0].field_0x18.field_0x10, circuit->field_0x460);
+    static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
+
+    sprintf(name, "%s%s", prefix, "Class");
+    switch (circuit->field_0x4c) {
+    case 1:
+        strcpy(text, "125");
+        break;
+    case 2:
+        strcpy(text, "250");
+        break;
+    case 3:
+        g_TrackGame->LoadResourceString(0x14cf, text, 127);
+        break;
+    }
+    static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
+
+    sprintf(name, "%s%s", prefix, "Diff");
+    switch (circuit->field_0x50) {
+    case 1:
+        g_TrackGame->LoadResourceString(0x14cb, text, 127);
+        break;
+    case 3:
+        g_TrackGame->LoadResourceString(0x14cd, text, 127);
+        break;
+    default:
+        g_TrackGame->LoadResourceString(0x14cc, text, 127);
+        break;
+    }
+    static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
+
+    sprintf(name, "%s%s", prefix, "Points");
+    _itoa(circuit->field_0x465[0].field_0x18.field_0x00, text, 10);
+    static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
+
+    sprintf(name, "%s%s", prefix, "Cash");
+    sprintf(text, "$%d", circuit->field_0x465[0].field_0x30);
+    static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
+
+    if (finished || failed) {
+        sprintf(name, "%s%s", prefix, "Status");
+        if (failed)
+            g_TrackGame->LoadResourceString(0x1442, text, 128);
+        else if (finished)
+            g_TrackGame->LoadResourceString(0x1443, text, 128);
+        static_cast<UIListBox*>(FindControl(name, 3))->AddRow(text, row, 0);
+    }
+}
+
+
 // 0x004d5ca0
 void PCStartupDlg::FreeFileNames()
 {
@@ -1075,6 +1138,58 @@ void PCCentralBikeRiderDlg::UnknownVirtualSlot29(UnknownDialogEvent* event)
         ((RenderTarget*)field_0x18)->UnknownFunction4e8cf0(0);
         break;
     }
+}
+
+
+// 0x004d6fc0
+void PCCentralBikeRiderDlg::FillBikeRiderLists()
+{
+    int bike = 0;
+    int rider = 0;
+    char text[128];
+    PCCentralBikeRiderDlg* self = this;
+    UIListBox* list = static_cast<UIDropDownList*>(FindControl("DDLBikes", 6))->listPart;
+    list->RemoveAllRows();
+    for (int i = 0; i < g_TrackGame->ui->field_0x54; i++) {
+        int rule = g_TrackGame->field_0x3444->field_0x4c;
+        if (rule != 3 && !((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].field_0x88) {
+            int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].engineSize);
+            if (bikeClass != 0) {
+                if (bikeClass <= 0 || bikeClass > 2)
+                    continue;
+                if (rule != 2)
+                    continue;
+            } else if (rule != 1) {
+                continue;
+            }
+        }
+        UnknownKrustyUIModel* model = &((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x48)[((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].model];
+        if (model->modelKind > g_TrackGame->field_0x3444->field_0x48)
+            continue;
+        sprintf(text, "%s %s", model->displayName, ((UnknownKrustyUIBike*)g_TrackGame->ui->field_0x50)[i].displayName);
+        list->AddRow(text, i, 0);
+        if (g_TrackGame->field_0x3444->field_0x45c == i)
+            bike = i;
+    }
+    if (bike)
+        list->SelectRowByData(bike);
+    else
+        list->SelectRow(0);
+    list->Sort(1);
+    list = static_cast<UIDropDownList*>(self->FindControl("DDLRiders", 6))->listPart;
+    list->RemoveAllRows();
+    for (int j = 0; j < g_TrackGame->ui->field_0x5c; j++) {
+        UnknownKrustyUIModel* entry = &((UnknownKrustyUIModel*)g_TrackGame->ui->field_0x58)[j];
+        if (entry->modelKind <= g_TrackGame->field_0x3444->field_0x48 || entry->field_0xc0) {
+            list->AddRow(entry->displayName, j, 0);
+            if (g_TrackGame->field_0x3444->field_0x458 == j)
+                rider = j;
+        }
+    }
+    if (rider)
+        list->SelectRowByData(rider);
+    else
+        list->SelectRow(0);
 }
 
 

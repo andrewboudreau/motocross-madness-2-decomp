@@ -324,5 +324,18 @@
   "_rand": "0x00534c1b",
   "_sprintf": "0x00534aaf",
   "_srand": "0x00534c0e",
-  "_strrchr": "0x00534a60"
+  "_strrchr": "0x00534a60",
+  "??_C@_03FIFM@125?$AA@": "0x00571bd4",
+  "??_C@_03IHOI@Lst?$AA@": "0x00571bfc",
+  "??_C@_03MPPJ@250?$AA@": "0x00571bd8",
+  "??_C@_04CDCD@Cash?$AA@": "0x00571bbc",
+  "??_C@_04DPBE@Rank?$AA@": "0x00571bec",
+  "??_C@_04EFNI@Name?$AA@": "0x00568c2c",
+  "??_C@_04MEEL@Diff?$AA@": "0x00571bcc",
+  "??_C@_05JKGE@?$CFs?5?$CFs?$AA@": "0x00567f6c",
+  "??_C@_05LCAF@Class?$AA@": "0x00571bdc",
+  "??_C@_06IOLI@Status?$AA@": "0x00571bb0",
+  "??_C@_06PKIA@Points?$AA@": "0x00571bc4",
+  "??_C@_07DEMH@?$CFd?5?1?5?$CFd?$AA@": "0x00571be4",
+  "??_C@_07LOJD@LstDone?$AA@": "0x00571bf4"
 }

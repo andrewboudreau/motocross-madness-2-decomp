@@ -25904,6 +25904,42 @@ CASES = [
         'target_size': 2644,
         'reason': 'vtable slot 23; key switch with jump tables 0x41ff40/0x41ff64/0x42001c; 0x80-byte text buffers in the 0x22/0x30 cases give the 0x494 frame',
     },
+    {
+        'name': 'ProCircuitProcs.cpp PCStartupDlg AddCircuitRow',
+        'bindings': 'src/reconstructed/ProCircuitProcs.bindings.json',
+        'source': 'src/reconstructed/ProCircuitProcs.cpp',
+        'symbol': '?AddCircuitRow@PCStartupDlg@@QAEXPAVUnknownTrackGameObject3444@@H@Z',
+        'target_va': '0x004d59a0',
+        'target_size': 756,
+        'reason': 'Lst/LstDone list columns of one circuit row; declaration-count sensitive (exact at k=0..6 of tools/decl_shift_scan.py in the canonical unit)',
+    },
+    {
+        'name': 'ProCircuitProcs.cpp PCCentralBikeRiderDlg fill lists',
+        'bindings': 'src/reconstructed/ProCircuitProcs.bindings.json',
+        'source': 'src/reconstructed/ProCircuitProcs.cpp',
+        'symbol': '?FillBikeRiderLists@PCCentralBikeRiderDlg@@QAEXXZ',
+        'target_va': '0x004d6fc0',
+        'target_size': 557,
+        'reason': 'DDLBikes/DDLRiders lists filtered by the circuit class rule; the bike row indexed in place (no entry local)',
+    },
+    {
+        'name': 'DlgProcs.cpp SPBikeRiderDlg fill lists',
+        'bindings': 'src/reconstructed/DlgProcs.bindings.json',
+        'source': 'src/reconstructed/DlgProcs.cpp',
+        'symbol': '?FillBikeRiderLists@SPBikeRiderDlg@@QAEXXZ',
+        'target_va': '0x0044f750',
+        'target_size': 509,
+        'reason': 'DDLBikes/DDLRiders lists; the hidden-bike test reads the row in place before the entry local',
+    },
+    {
+        'name': 'DlgProcs.cpp SPBikeRiderDlg slot23 preview drag',
+        'bindings': 'src/reconstructed/DlgProcs.bindings.json',
+        'source': 'src/reconstructed/DlgProcs.cpp',
+        'symbol': '?UnknownVirtualSlot23@SPBikeRiderDlg@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z',
+        'target_va': '0x0044fa00',
+        'target_size': 174,
+        'reason': 'SPBikeRiderDlg vtable slot 23; ChkAutoRotate string; preview area copied into a local and inset in place',
+    },
 ]
 
 def main():
