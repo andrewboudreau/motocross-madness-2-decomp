@@ -182,6 +182,111 @@ int Track::UnknownFunction5179a0(TrackPos a, TrackPos b)
     return 0;
 }
 
+// 0x005179f0: the shortest distance from a to b through the node graph,
+// and optionally the node path. A depth-first walk: a node is marked on its
+// first visit and unmarked when its list entry comes back to the top.
+// `length` is initialised at the top although the value is dead: that first
+// reference makes `fromStart` the newer leaf, so the arrival sum loads it
+// first (`fld fromStart; fadd length`) as retail does.
+int Track::UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, float* distance)
+{
+    TrackListItem* list = 0;
+    float length = 0.0f;
+    if (!distance)
+        return 0;
+    *distance = -1.0f;
+    if (a.node == b.node && UnknownFunction5179a0(a, b)) {
+        if (path) {
+            *path = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1175);
+            if (!*path)
+                return 0;
+            (*path)->field_0x04 = b.node;
+        }
+        *distance = UnknownFunction517da0(a, b);
+        return 1;
+    }
+    TrackPos pos;
+    pos.node = a.node;
+    pos.segment = a.node->field_0x0c;
+    pos.t = 1.0f;
+    float toEnd = UnknownFunction517da0(a, pos);
+    pos.node = b.node;
+    pos.segment = b.node->field_0x08;
+    pos.t = 0.0f;
+    float fromStart = UnknownFunction517da0(pos, b);
+    TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1191);
+    if (!item) {
+        UnknownFunction517930(&list, 0);
+        UnknownFunction517930(path, 0);
+        return 0;
+    }
+    item->field_0x04 = a.node;
+    item->field_0x0c = list;
+    list = item;
+    length = toEnd;
+    while (list) {
+        TrackNode* node = list->field_0x04;
+        if (node->field_0x00 & 4) {
+            length -= node->field_0x04;
+            item = list;
+            list = list->field_0x0c;
+            item->field_0x04->field_0x00 &= ~4;
+            DebugFree(item, __FILE__, 1212);
+        } else {
+            if (node != a.node && node != b.node)
+                length += node->field_0x04;
+            node->field_0x00 |= 4;
+            int count = list->field_0x04->field_0x10;
+            TrackNode** links = list->field_0x04->field_0x14;
+            for (int i = 0; i < count; i++) {
+                if (!(links[i]->field_0x00 & 4) && links[i] != b.node) {
+                    item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1228);
+                    if (!item) {
+                        UnknownFunction517930(&list, 0);
+                        UnknownFunction517930(path, 0);
+                        return 0;
+                    }
+                    item->field_0x04 = links[i];
+                    item->field_0x0c = list;
+                    list = item;
+                } else if (links[i] == b.node) {
+                    length = fromStart + length;
+                    if (*distance == -1.0f || length < *distance) {
+                        *distance = length;
+                        if (path) {
+                            UnknownFunction517930(path, 0);
+                            item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1247);
+                            if (!item) {
+                                UnknownFunction517930(&list, 0);
+                                UnknownFunction517930(path, 0);
+                                return 0;
+                            }
+                            item->field_0x04 = b.node;
+                            item->field_0x0c = *path;
+                            *path = item;
+                            for (TrackListItem* s = list; s; s = s->field_0x0c) {
+                                if (s->field_0x04->field_0x00 & 4) {
+                                    item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1258);
+                                    if (!item) {
+                                        UnknownFunction517930(&list, 0);
+                                        UnknownFunction517930(path, 0);
+                                        return 0;
+                                    }
+                                    item->field_0x04 = s->field_0x04;
+                                    item->field_0x0c = *path;
+                                    *path = item;
+                                }
+                            }
+                        }
+                    }
+                    length -= fromStart;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
 // 0x00517da0: distance along the track from a to b.
 float Track::UnknownFunction517da0(TrackPos a, TrackPos b)
 {
@@ -301,6 +406,48 @@ int Track::UnknownFunction518080(TrackPos pos, TrackVec3* out)
     out->y = d.y * pos.t + segment->field_0x04;
     out->z = d.z * pos.t + segment->field_0x08;
     return 1;
+}
+
+// TrackVec3 built by a constructor. The constructor's by-value parameters
+// give the components fresh leaves (docs/VC6_OPERAND_ORDER.md), which
+// 0x00518130 needs; MakeTrackVec3's copy through a local does not. Kept
+// file-local like the operators above: a constructor in Track.h adds symbols
+// to every unit that includes it.
+struct TrackVector : TrackVec3 {
+    TrackVector(float x_, float y_, float z_)
+    {
+        x = x_;
+        y = y_;
+        z = z_;
+    }
+};
+
+// The unit vector along v (v itself when it already has unit length). The
+// squared length needs the (y*y + x*x) + z*z grouping.
+static inline TrackVec3 TrackNormalized(const TrackVec3& v)
+{
+    float lengthSquared = (v.y * v.y + v.x * v.x) + v.z * v.z;
+    if (lengthSquared == 1.0f)
+        return v;
+    float scale = FastInvSqrt(lengthSquared);
+    return v * scale;
+}
+
+// 0x00518130: the unit direction of a segment. Built through TrackVector's
+// constructor, the difference gives retail's scaling: x scalar-first
+// (`fld st(0); fmul x`), y and z component-first (`fld y; fmul st(1)`), the
+// scale kept on the x87 stack until a final `fstp st(0)`. Per-component
+// stores into a named local scale all three scalar-first.
+int Track::UnknownFunction518130(TrackSegment* segment, TrackVec3* out)
+{
+    if (out && segment && segment->field_0x2c && segment->field_0x24 > 0.0f) {
+        TrackSegment* next = segment->field_0x2c;
+        TrackVec3 d = TrackVector(next->field_0x00 - segment->field_0x00, next->field_0x04 - segment->field_0x04,
+                                  next->field_0x08 - segment->field_0x08);
+        *out = TrackNormalized(d);
+        return 1;
+    }
+    return 0;
 }
 
 // 0x00518230: the horizontal distance from `p` to the strip edge of

@@ -27,13 +27,6 @@
 // combined `key < 256 && key != -1` test are worse. The fast loop's red/blue/green
 // sum order also differs (retail sums blue before green).
 //
-// UnknownFunction4d24d0 (0x004d24d0, 987 bytes): a bitmap's average colour
-// (0xAARRGGBB) by format. Every case body matches; the shared palette and
-// 24-bit return lands after the 24-bit loop here but after the palette
-// loop in retail. Explicit identical returns move it there, but then VC6
-// also merges the 565 and 555 tails; a goto or reordered cases do not
-// change it.
-
 // DitherConvert (0x004cf2a0, 1759 bytes; candidate 1735, 242 match): the
 // Floyd-Steinberg ditherer behind the dithered converters. Two 16.16 error
 // rows (grown on demand, 0x00689a6c/0x00689a70/0x00689a74), each pixel
@@ -136,108 +129,6 @@ int Halve8888(void* destination, void* source, int width, int height, int destin
         row += destinationStride;
     }
     return 1;
-}
-
-#define UNKNOWN_ARGB(a, r, g, b) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b))
-
-// 0x004d24d0: the average colour of a width x height bitmap of `format`
-// (rows of `width` pixels; `stride` is unused), as 0xAARRGGBB with opaque
-// alpha for formats without one; 0 for other formats.
-int UnknownFunction4d24d0(void* bits, int width, int height, int stride, int format,
-                          UnknownTexturePalette* palette) {
-    unsigned int alpha = 0;
-    unsigned int red = 0;
-    unsigned int green = 0;
-    unsigned int blue = 0;
-    unsigned int count = width * height;
-    int x;
-    int y;
-
-    switch (format) {
-    case 565: {
-        unsigned short* row = (unsigned short*)bits;
-        for (y = 0; y < height; y++) {
-            unsigned short* pixel = row;
-            for (x = 0; x < width; x++, pixel++) {
-                red += *pixel >> 11;
-                green += (*pixel >> 5) & 0x3f;
-                blue += *pixel & 0x1f;
-            }
-            row += width;
-        }
-        return UNKNOWN_ARGB(0xff, red * 8 / count, green * 4 / count, blue * 8 / count);
-    }
-    case 555: {
-        unsigned short* row = (unsigned short*)bits;
-        for (y = 0; y < height; y++) {
-            unsigned short* pixel = row;
-            for (x = 0; x < width; x++, pixel++) {
-                red += (*pixel >> 10) & 0x1f;
-                green += (*pixel >> 5) & 0x1f;
-                blue += *pixel & 0x1f;
-            }
-            row += width;
-        }
-        return UNKNOWN_ARGB(0xff, red * 8 / count, green * 8 / count, blue * 8 / count);
-    }
-    case 8: {
-        unsigned char* row = (unsigned char*)bits;
-        for (y = 0; y < height; y++) {
-            unsigned char* pixel = row;
-            for (x = 0; x < width; x++, pixel++) {
-                red += palette->field_0x010[*pixel][0];
-                green += palette->field_0x010[*pixel][1];
-                blue += palette->field_0x010[*pixel][2];
-            }
-            row += width;
-        }
-        break;
-    }
-    case 888: {
-        UnknownPixel24* row = (UnknownPixel24*)bits;
-        for (y = 0; y < height; y++) {
-            UnknownPixel24* pixel = row;
-            for (x = 0; x < width; x++, pixel++) {
-                red += pixel->red;
-                green += pixel->green;
-                blue += pixel->blue;
-            }
-            row += width;
-        }
-        break;
-    }
-    case 8888: {
-        UnknownPixel32* row = (UnknownPixel32*)bits;
-        for (y = 0; y < height; y++) {
-            UnknownPixel32* pixel = row;
-            for (x = 0; x < width; x++, pixel++) {
-                alpha += pixel->alpha;
-                red += pixel->red;
-                green += pixel->green;
-                blue += pixel->blue;
-            }
-            row += width;
-        }
-        return UNKNOWN_ARGB(alpha / count, red / count, green / count, blue / count);
-    }
-    case 4444: {
-        unsigned short* row = (unsigned short*)bits;
-        for (y = 0; y < height; y++) {
-            unsigned short* pixel = row;
-            for (x = 0; x < width; x++, pixel++) {
-                alpha += *pixel >> 12;
-                red += (*pixel >> 8) & 0xf;
-                green += (*pixel >> 4) & 0xf;
-                blue += *pixel & 0xf;
-            }
-            row += width;
-        }
-        return UNKNOWN_ARGB(alpha * 16 / count, red * 16 / count, green * 16 / count, blue * 16 / count);
-    }
-    default:
-        return 0;
-    }
-    return UNKNOWN_ARGB(0xff, red / count, green / count, blue / count);
 }
 
 // 0x004ce420: halves 1555 pixels; colour averages the opaque pixels of

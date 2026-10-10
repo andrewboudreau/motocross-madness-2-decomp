@@ -41,7 +41,10 @@
 // SoultreeVirtualSlot5 (0x00444140, 768 bytes): 610/764. The bounds use
 // by-value Raise/Lower inlines and no face-group pointer; the loops match.
 // VC6 adds the y and z of `high + low` as low + high, and keeps the
-// +0x164 address in ebp where retail uses edx.
+// +0x164 address in ebp where retail uses edx. Unchanged by `high + low`,
+// `0.5f * (...)`, named center/extent locals, operator+ with by-value
+// operands or swapped component sums; explicit component constructors are
+// worse.
 //
 // SelectLod (0x00443de0, 592 bytes): the level-of-detail and
 // mip chooser. Writing the camera expression without a local reproduces
@@ -79,6 +82,8 @@
 // or pointer/reference to `view`: 739), not with symbol numbering (dummy
 // locals), a plain struct instead of the union, projection pointers or
 // flattened indices (unchanged), and no uniform form gives retail's row 1.
+// The product as an inline helper (reference or pointer result, by-value
+// left operand, or returning the matrix) is not inlined by VC6.
 //
 // DrawNormals (normals, 528 bytes) and DrawVertexCrosses
 // (vertex crosses, 512 bytes): both scale by function-local statics in

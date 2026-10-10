@@ -8,6 +8,12 @@
 // the low byte, and an explicit `& 0xff`, `% 256` or `/ 16` on the dword
 // (int or unsigned) is folded away. Char and int parameter types, locals
 // and `(x & 0x10) >> 4` / `? 1 : 0` forms give one of those two shapes.
+// VC6's `mov al` is a valid zero extension only because eax is known to be
+// 0 after the includeFiles test; retail does not use that. Also unchanged:
+// inline helpers taking (unsigned) char/short/int and returning the bit or
+// the low byte, `if (includeFiles) return 1;` first, a ternary, an
+// `unsigned char` block local and `!= 0` (all 45-51 of 80); a single
+// result variable is worse.
 
 #include "../../src/reconstructed/DirectoryList.cpp"
 

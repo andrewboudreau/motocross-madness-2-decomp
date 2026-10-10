@@ -9,7 +9,10 @@
 // differs: retail computes `i - base` in eax with the list in ecx, VC6
 // here keeps the list in eax and the index in edx. Declaration order,
 // `++i`, `== 0`, a named element or name local do not change it; `for`
-// and `while (i < count)` loops rotate.
+// and `while (i < count)` loops rotate. Also unchanged: the assignment and
+// return inside the loop, explicit `operator[]` calls, int/unsigned index
+// and count in all combinations, and the count read after `i = 0`; a
+// 0..63 typedef prefix scan leaves it at 117 (not a tie-break window).
 //
 // UnknownFunction50b400 (0x0050b400, 758 bytes; 4444 texels),
 // UnknownFunction50b700 (0x0050b700, 758 bytes; 1555 texels) and the 32-bit

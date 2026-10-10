@@ -22599,6 +22599,15 @@ CASES = [
         'target_size': 67,
     },
     {
+        'name': 'Track 0x5179f0 shortest path distance',
+        'bindings': 'src/reconstructed/Track.bindings.json',
+        'source': 'src/reconstructed/Track.cpp',
+        'symbol': '?UnknownFunction5179f0@Track@@QAEHUTrackPos@@0PAPAUTrackListItem@@PAM@Z',
+        'target_va': '0x005179f0',
+        'target_size': 929,
+        'reason': 'Track.cpp __FILE__ DebugCalloc lines 1175..1258; dead `length = 0` initialiser makes fromStart the newer leaf',
+    },
+    {
         'name': 'Track 0x517da0 distance between positions',
         'bindings': 'src/reconstructed/Track.bindings.json',
         'source': 'src/reconstructed/Track.cpp',
@@ -22621,6 +22630,15 @@ CASES = [
         'symbol': '?UnknownFunction518080@Track@@QAEHUTrackPos@@PAUTrackVec3@@@Z',
         'target_va': '0x00518080',
         'target_size': 174,
+    },
+    {
+        'name': 'Track 0x518130 segment direction',
+        'bindings': 'src/reconstructed/Track.bindings.json',
+        'source': 'src/reconstructed/Track.cpp',
+        'symbol': '?UnknownFunction518130@Track@@QAEHPAUTrackSegment@@PAUTrackVec3@@@Z',
+        'target_va': '0x00518130',
+        'target_size': 250,
+        'reason': 'between Track.cpp 0x518080 and 0x518230; difference built by a constructor gives x scalar-first, y/z component-first',
     },
     {
         'name': 'Track 0x518230 distance to strip edge',
@@ -25680,6 +25698,15 @@ CASES = [
         'reason': 'converter block before 0x4d0870 Convert4444To8888; 1555 to 8888',
     },
     {
+        'name': 'Pixtrans.cpp 0x4d24d0 average colour',
+        'bindings': 'src/reconstructed/Pixtrans.bindings.json',
+        'source': 'src/reconstructed/Pixtrans.cpp',
+        'symbol': '?UnknownFunction4d24d0@@YAHPAXHHHHPAUUnknownTexturePalette@@@Z',
+        'target_va': '0x004d24d0',
+        'target_size': 987,
+        'reason': 'format switch (565/555/8/888/8888/4444) of Pixtrans.cpp; called by PCTextureMap; per-case returns give the cross-jumped 888 tail',
+    },
+    {
         'name': 'BackgroundImage.cpp 0x4040f0 region allocator',
         'bindings': 'src/reconstructed/BackgroundImage.bindings.json',
         'source': 'src/reconstructed/BackgroundImage.cpp',
@@ -25858,6 +25885,15 @@ CASES = [
         'target_va': '0x00403d50',
         'target_size': 77,
         'reason': 'stores vptr 0x5506d8 (BackgroundImage RTTI); first function of BackgroundImage.cpp; field_0x30 = 1 first keeps 1 in ecx',
+    },
+    {
+        'name': 'BackgroundImage slot 13 0x403dc0 restore',
+        'bindings': 'src/reconstructed/BackgroundImage.bindings.json',
+        'source': 'src/reconstructed/BackgroundImage.cpp',
+        'symbol': '?UnknownVirtualSlot13@BackgroundImage@@UAEHXZ',
+        'target_va': '0x00403dc0',
+        'target_size': 250,
+        'reason': 'BackgroundImage vtable slot 13 (0x5506d8); display-mode size read through inline helpers',
     },
     {
         'name': 'bikerace.cpp BikeRace slot23 keys',

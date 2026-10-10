@@ -40,6 +40,52 @@ BackgroundImage::BackgroundImage(int flags) : GameObject(flags) {
     field_0x68 = 1;
 }
 
+// The current display mode's size. Read through these helpers, each test
+// indexes the mode table afresh and loads the camera's field first, as
+// retail does in 0x00403dc0; written inline, VC6 shares the row address.
+static inline int ModeHeight(UnknownDisplay* display)
+{
+    return display->displayModes[display->currentDisplayMode].height;
+}
+
+static inline int ModeWidth(UnknownDisplay* display)
+{
+    return display->displayModes[display->currentDisplayMode].width;
+}
+
+// 0x00403dc0: while the camera covers the whole screen the background is
+// restored from the off-screen copy region by region; otherwise (or while
+// frames are left to restore) the whole copy is restored.
+int BackgroundImage::UnknownVirtualSlot13() {
+    if (!fullRestoreFrames) {
+        UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->field_0x08;
+        if (!camera || !camera->field_0x25_bit0 || !camera->redrawFrames ||
+            camera->viewportHeight != ModeHeight(g_TrackGame->display) ||
+            camera->viewportWidth != ModeWidth(g_TrackGame->display)) {
+            if (!copyValid) {
+                UnknownVirtualSlot27(offscreenCopy);
+                copyValid = 1;
+            }
+            ResetPendingRects();
+            if (Target()->field_0x08)
+                ClearRegionDepth();
+            RestoreRegions();
+            return 1;
+        }
+    }
+    UnknownVirtualSlot27(Target()->renderSurface);
+    copyValid = 0;
+    if (Target()->field_0x08)
+        ClearRegionDepth();
+    if (regionCount) {
+        for (int i = 0; i < regionCapacity; i++)
+            UnknownFunction404d30(i);
+    }
+    if (--fullRestoreFrames < 0)
+        fullRestoreFrames = 0;
+    return 1;
+}
+
 // 0x00404010
 BackgroundImage::~BackgroundImage() {
     if (heldDc && heldDcSurface)

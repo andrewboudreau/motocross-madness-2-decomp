@@ -116,9 +116,10 @@ slot as in retail) and stores alpha 0xff in both arms; `0x004d07d0` writes
 alpha with an if/else (a `?:` changes the base offset of the
 strength-reduced pixel pointer).
 
-Near misses (`samples/render/PixtransNearMisses.cpp`): `0x004ce420` (the
-1555 halver; retail keeps the two lower-row pixels in frame slots),
-`0x004d24d0` (average colour; the shared return's position); `0x004cdf10`, the 8888 halver, which
+The average colour `0x004d24d0` is exact (identical explicit returns in the
+palette and 24-bit cases, `default: return 0;`). Near misses
+(`samples/render/PixtransNearMisses.cpp`): `0x004ce420` (the
+1555 halver; retail keeps the two lower-row pixels in frame slots); `0x004cdf10`, the 8888 halver, which
 averages colour over the 2x2 pixels with alpha set (the fourth pixel adds
 the third one's alpha in retail) and differs in register assignment;
 `0x004cee30` (the palette halver, 45/1133: VC6 pushes ebp in the prologue

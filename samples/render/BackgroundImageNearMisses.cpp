@@ -1,10 +1,6 @@
 // Near-miss BackgroundImage.cpp candidates, kept out of src/reconstructed
 // until they match. See docs/BACKGROUNDIMAGE.md.
 //
-// Slot 13 0x00403dc0 (246 bytes): retail loads the camera's viewport
-// height into ebx before reading the display mode; VC6 here loads the mode
-// first (an inverted condition and a nested test give the same code).
-//
 // 0x004049d0 (678 bytes): retail stores the three leading zeros (and
 // `field_0x60 = 0`) as immediates; VC6 here caches 0 in edi, which shifts
 // the register choice of the region loop. Statement orders and a helper
@@ -27,39 +23,6 @@ extern CameraRect g_UnknownGlobal577808;
 // 0x005777a0 / 0x005777a8: 0x004049d0's region index and clipped rectangle.
 int g_UnknownGlobal5777a0;
 CameraRect g_UnknownGlobal5777a8;
-
-// 0x00403dc0: while the camera covers the whole screen the background is
-// restored from the off-screen copy region by region; otherwise (or while
-// frames are left to restore) the whole copy is restored.
-int BackgroundImage::UnknownVirtualSlot13() {
-    if (!fullRestoreFrames) {
-        UnknownBackgroundCamera* camera = (UnknownBackgroundCamera*)Target()->field_0x08;
-        if (!camera || !camera->field_0x25_bit0 || !camera->redrawFrames ||
-            camera->viewportHeight != g_TrackGame->display->displayModes[g_TrackGame->display->currentDisplayMode].height ||
-            camera->viewportWidth != g_TrackGame->display->displayModes[g_TrackGame->display->currentDisplayMode].width) {
-            if (!copyValid) {
-                UnknownVirtualSlot27(offscreenCopy);
-                copyValid = 1;
-            }
-            ResetPendingRects();
-            if (Target()->field_0x08)
-                ClearRegionDepth();
-            RestoreRegions();
-            return 1;
-        }
-    }
-    UnknownVirtualSlot27(Target()->renderSurface);
-    copyValid = 0;
-    if (Target()->field_0x08)
-        ClearRegionDepth();
-    if (regionCount) {
-        for (int i = 0; i < regionCapacity; i++)
-            UnknownFunction404d30(i);
-    }
-    if (--fullRestoreFrames < 0)
-        fullRestoreFrames = 0;
-    return 1;
-}
 
 // 0x004049d0: a DC for drawing `rect`: the back buffer, or with the copy
 // current the surfaces in turn (`a` set when the copy is returned), clipped

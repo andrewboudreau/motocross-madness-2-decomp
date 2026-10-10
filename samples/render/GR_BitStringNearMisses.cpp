@@ -7,7 +7,9 @@
 // `this` in ebp (swapped here), places `32 - count` before the first swap,
 // and ends the swaps whose result is stored with `or reg_b3, reg_rest`
 // (the candidate emits the opposite operand order). Rewriting the OR tree,
-// an inline swap helper and declaration order had no effect.
+// an inline swap helper and declaration order had no effect; `32 - count`
+// written at each use (no carryShift) is worse, assigned after the
+// declarations unchanged.
 //
 // 0x00423b70 (442 bytes; sub-word shift toward the back): as 0x004239c0;
 // in addition retail rotates the source-pointer decrement to the loop head

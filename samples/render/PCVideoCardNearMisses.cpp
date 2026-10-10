@@ -6,6 +6,9 @@
 //   before testing the argument and computes the free memory as
 //   neg/lea (memory - pixels * 2); local orders and pixel temporaries tried,
 //   as were a `memory` local read first and `width * height` written twice.
+//   Negated tests sharing one trailing `return 1` (with and without a
+//   `pixels` local or `memory` local) let VC6 sink every load into the
+//   full-screen block (6-21 of 110-125).
 // UnknownDisplay::ProbeNonLocalTextureMemory (0x004ca5a0, 484 bytes): retail keeps
 //   `target` in ebp, caches 480/16 in registers for the mode search and has
 //   one more 4-byte local; the flow (EH-guarded new PCRenderTarget, 128x128

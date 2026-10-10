@@ -95,13 +95,11 @@ leaf. Bike slot 76 (`v.x *= (s = ...)`) makes `s` newer than `v.x`; a named
 
 ### 1.4 What the rule does and does not explain
 
-- Track `0x005179f0` (`length = fromStart + length`): VC6 loads `length`
-  because it is stored after `fromStart`; retail loads `fromStart`, so the
-  original referenced `length` before `fromStart` was computed. Moving the
-  `length = toEnd` store up makes VC6 fold `toEnd` away and changes the frame
-  (429/921); declaring `length` earlier without a reference changes nothing.
-  The source form that keeps `toEnd` a separate slot and still references
-  `length` first was not found.
+- Track `0x005179f0` (`length = fromStart + length`): retail loads `fromStart`
+  first. A dead `float length = 0.0f;` at the top of the function gives `length`
+  its leaf before `fromStart` is computed, so `fromStart` is the newer leaf and VC6
+  emits `fld fromStart; fadd length`; the function is exact with it. Moving the
+  `length = toEnd` store up instead folds `toEnd` away and changes the frame.
 - MatrixUtil `0x004a1a50`, SoultreeTransform `0x004fd710` (`v.x * m._11`,
   the only matrix element the transpose does not touch), Bike slot 54 and the
   particle emitters' normalisations (`fld st(0); fmul` on the first
@@ -362,3 +360,8 @@ python3 tools/decl_shift_scan.py samples/render/MatrixUtilNearMisses.cpp \
   (MatrixUtil `0x004a1a50`) every extra live local (a stride copy, a counter, a matrix
   reference) reorders it, which points at the loop optimiser's renumbering of induction
   addresses rather than at the source text.
+- A dead initialiser creates a local's leaf: `float length = 0.0f;` that is never
+  read still makes later-computed values newer than `length`. Track `0x5179f0`.
+- A vector built by a constructor with by-value parameters and then normalised gives
+  x scalar-first and y/z component-first, with a final `fstp st(0)`; per-component
+  stores into a named local give all three scalar-first. Track `0x518130`.

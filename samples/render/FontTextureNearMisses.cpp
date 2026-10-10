@@ -7,7 +7,8 @@
 // lookup and shares the epilogue with the early return; VC6 here delays the
 // esi/edi pushes past the early return (shrink-wrapping), shifting stack
 // offsets. Restructured early-exit forms (nested if, local font, single
-// enclosing if) do not change it.
+// enclosing if, `font = node ? node->font : 0`) do not change it; a goto
+// to a shared return is not allowed past the rect initialiser.
 //
 // CharacterCell's inline virtual destructor (0x00467680) and its deleting
 // wrapper (0x00467660) are emitted only in a TU that constructs a cell, so

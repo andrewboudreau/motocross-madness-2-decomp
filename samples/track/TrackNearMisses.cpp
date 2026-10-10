@@ -1,23 +1,6 @@
 // Near-miss Track.cpp candidates, kept out of src/reconstructed until they
 // match. See docs/TRACK.md.
 //
-// Track::UnknownFunction518130 (0x00518130, 250 bytes): the candidate is
-// 246 bytes. Everything up to the FastInvSqrt call matches (the squared
-// length needs the (y*y + x*x) + z*z grouping). Retail then keeps the scale
-// on the x87 stack until a final `fstp st(0)` and multiplies y and z as
-// `fld d.y; fmul st(1)`; VC6 here consumes the scale with the last multiply.
-// A scaling helper (by reference, by value or through an out pointer), a
-// Vec3-style constructor/operator* and writing straight into *out leave it
-// unchanged.
-//
-// Track::UnknownFunction5179f0 (0x005179f0, 929 bytes): 929/929 bytes, two
-// differ. When the walk reaches b's node, retail adds the two floats as
-// `fld fromStart; fadd length`; VC6 here always loads `length` first, for
-// `length += fromStart`, `length = fromStart + length`, a separate total, a
-// const fromStart and with the declarations reordered. Everything else,
-// including the stack slots, matches. All six DebugCalloc line numbers
-// (1175, 1191, 1212, 1228, 1247, 1258) are confirmed by the pushes.
-//
 // Track::UnknownFunction516ca0 (0x00516ca0, 586 bytes): the candidate is 576
 // bytes and the frame, stack slots and x87 shape agree. VC6 here reuses the
 // projection's `p - segment` differences (CSE temps at esp+8/+0xc) in the
@@ -25,7 +8,12 @@
 // `fld p.x; fsub [segment]` but does reuse them in the final interpolating
 // branch. Named px/pz locals, TrackVec3 temporaries, an inline Delta helper,
 // a TrackVec3 cast in those branches and reusing dx/dz all keep the CSE
-// (named locals add a second copy and grow the frame to 0x14).
+// (named locals add a second copy and grow the frame to 0x14). A named
+// `TrackVec3 d = p - segment` (MakeTrackVec3-style operator) in those two
+// branches does stop the CSE and gives retail's 185 instructions, but its
+// slots grow the frame to 0x24 (300 of 592); scalar inline helpers, a
+// `float d[2]` or 2-D struct for the projection and a constructor-built
+// 2-D delta are worse (202-232).
 //
 // Track::UnknownFunction516ef0 (0x00516ef0, 1042 bytes): 1042/1042 bytes,
 // 98.2%. Two of the six inlined edge tests evaluate the two factors of one
@@ -34,7 +22,9 @@
 // Factor and comparison order in the source do not move it. A macro over
 // plain floats is much further off, because VC6 then loads the segment
 // operands before p; the inline helper with a by-value TrackVec3 and
-// pointers to the edge points fixes that.
+// pointers to the edge points fixes that. Edge points by reference give the
+// same 1023; by value, or p by reference or pointer, the helper is no longer
+// inlined; p after the edge pointers in the parameter list is worse (994).
 //
 // Track::UnknownFunction517340 (0x00517340, 1509 bytes; the candidate is
 // 1533): the walk, the strip test, the candidate list and the acceptance
@@ -67,132 +57,6 @@
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/TrackRecordDlg.h"
 #include "../../src/krusty2/math/FastMath.h"
-
-// 0x00518130: the unit direction of a segment.
-int Track::UnknownFunction518130(TrackSegment* segment, TrackVec3* out)
-{
-    if (out && segment && segment->field_0x2c && segment->field_0x24 > 0.0f) {
-        TrackSegment* next = segment->field_0x2c;
-        TrackVec3 d;
-        d.x = next->field_0x00 - segment->field_0x00;
-        d.y = next->field_0x04 - segment->field_0x04;
-        d.z = next->field_0x08 - segment->field_0x08;
-        float lengthSquared = (d.y * d.y + d.x * d.x) + d.z * d.z;
-        if (lengthSquared == 1.0f) {
-            *out = d;
-            return 1;
-        }
-        float scale = FastInvSqrt(lengthSquared);
-        TrackVec3 r;
-        r.x = d.x * scale;
-        r.y = d.y * scale;
-        r.z = d.z * scale;
-        *out = r;
-        return 1;
-    }
-    return 0;
-}
-
-// 0x005179f0: the shortest distance from a to b through the node graph,
-// and optionally the node path. A depth-first walk: a node is marked on its
-// first visit and unmarked when its list entry comes back to the top.
-int Track::UnknownFunction5179f0(TrackPos a, TrackPos b, TrackListItem** path, float* distance)
-{
-    TrackListItem* list = 0;
-    if (!distance)
-        return 0;
-    *distance = -1.0f;
-    if (a.node == b.node && UnknownFunction5179a0(a, b)) {
-        if (path) {
-            *path = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1175);
-            if (!*path)
-                return 0;
-            (*path)->field_0x04 = b.node;
-        }
-        *distance = UnknownFunction517da0(a, b);
-        return 1;
-    }
-    TrackPos pos;
-    pos.node = a.node;
-    pos.segment = a.node->field_0x0c;
-    pos.t = 1.0f;
-    float toEnd = UnknownFunction517da0(a, pos);
-    pos.node = b.node;
-    pos.segment = b.node->field_0x08;
-    pos.t = 0.0f;
-    float fromStart = UnknownFunction517da0(pos, b);
-    TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1191);
-    if (!item) {
-        UnknownFunction517930(&list, 0);
-        UnknownFunction517930(path, 0);
-        return 0;
-    }
-    item->field_0x04 = a.node;
-    item->field_0x0c = list;
-    list = item;
-    float length = toEnd;
-    while (list) {
-        TrackNode* node = list->field_0x04;
-        if (node->field_0x00 & 4) {
-            length -= node->field_0x04;
-            item = list;
-            list = list->field_0x0c;
-            item->field_0x04->field_0x00 &= ~4;
-            DebugFree(item, __FILE__, 1212);
-        } else {
-            if (node != a.node && node != b.node)
-                length += node->field_0x04;
-            node->field_0x00 |= 4;
-            int count = list->field_0x04->field_0x10;
-            TrackNode** links = list->field_0x04->field_0x14;
-            for (int i = 0; i < count; i++) {
-                if (!(links[i]->field_0x00 & 4) && links[i] != b.node) {
-                    item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1228);
-                    if (!item) {
-                        UnknownFunction517930(&list, 0);
-                        UnknownFunction517930(path, 0);
-                        return 0;
-                    }
-                    item->field_0x04 = links[i];
-                    item->field_0x0c = list;
-                    list = item;
-                } else if (links[i] == b.node) {
-                    length = fromStart + length;
-                    if (*distance == -1.0f || length < *distance) {
-                        *distance = length;
-                        if (path) {
-                            UnknownFunction517930(path, 0);
-                            item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1247);
-                            if (!item) {
-                                UnknownFunction517930(&list, 0);
-                                UnknownFunction517930(path, 0);
-                                return 0;
-                            }
-                            item->field_0x04 = b.node;
-                            item->field_0x0c = *path;
-                            *path = item;
-                            for (TrackListItem* s = list; s; s = s->field_0x0c) {
-                                if (s->field_0x04->field_0x00 & 4) {
-                                    item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 1258);
-                                    if (!item) {
-                                        UnknownFunction517930(&list, 0);
-                                        UnknownFunction517930(path, 0);
-                                        return 0;
-                                    }
-                                    item->field_0x04 = s->field_0x04;
-                                    item->field_0x0c = *path;
-                                    *path = item;
-                                }
-                            }
-                        }
-                    }
-                    length -= fromStart;
-                }
-            }
-        }
-    }
-    return 1;
-}
 
 // 0x00516ca0: the closest position on `node` to p, in the horizontal
 // plane, and optionally its distance.

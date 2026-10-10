@@ -14,7 +14,10 @@
 // dump. Everything but the 32-bit buffer size matches (391 of 393 bytes):
 // retail loads the height and multiplies by the width, VC6 here the other
 // way round in every operand order, cast, `<< 2` and sizeof form tried; a
-// separate size local or swapped branches are much worse.
+// separate size local or swapped branches are much worse. Also unchanged:
+// `w * (h * 4)`, `(w * h) << 2`, an inline allocation helper taking the
+// surface description (by pointer; by value is far off) and helpers taking
+// width/height by value in either order (209 of 323).
 //
 // PCTextureMap::UnknownVirtualSlot6 (0x004c71c0, 600 bytes): the copy.
 // Everything lines up except that VC6 here keeps the constant 1 in ebp and

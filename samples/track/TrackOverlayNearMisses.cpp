@@ -6,7 +6,10 @@
 // zoom keys. Both arms of the field_0x178 test are identical, so retail keeps
 // only a dead `test`; it schedules fld/fmul/fidiv before that test and VC6
 // here after it. A scale local, a ternary, assigning before the test and an
-// empty or return-only test do not reproduce it.
+// empty or return-only test do not reproduce it; nor do a float or double
+// scale local before an if/else, `radius / 180` in a local, an int zoom
+// copy, an inline UpdateMapScale(this) or MapScale(radius, zoom) helper, and
+// the zoom as a non-static or extern global (volatile is far off).
 
 // RadarOverlay::IntersectLineCircle (0x0051c4f0, 560 bytes, 64%): the
 // candidate is 550 bytes. The arithmetic and branch structure match; VC6
@@ -46,7 +49,8 @@
 // loads the racer into eax and the buffer address into ecx (VC6 here edx and
 // eax), and loads the game pointer into edx (here ecx). Inverted branches, a
 // racer local in that branch, a game local, a float or double local and a
-// buffer pointer do not change it.
+// buffer pointer do not change it; nor do an inline float or double
+// accessor for +0x4a4, an explicit (double) cast or `&text[0]`.
 
 // RadarOverlay::DrawTrackOutline (0x0051c720, 1016 bytes; candidate
 // 1002): draws the track outline through a TrackListItem work list. The

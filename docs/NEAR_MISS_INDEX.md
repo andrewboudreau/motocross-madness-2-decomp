@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 208, c 167, total 375. The three class (a) functions of the
+Counts: a 0, b 208, c 163, total 371. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -260,7 +260,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/Wrecker | `0x00531da0` | 629/634 | b | 1 code diffs: `fld [esp + N] ; fmul st(1)` vs `fld st(0) ; fmul [esp + N]`; slots differ |
 | race/Wrecker | `0x00532580` | 490/562 | c | each cross product loads the old forward component first (retail the new pose's) and schedules its `fsubp` after the destination pointer copy |
 | race/Wrecker | `0x005329e0` | 215/1306 | b | frame 0x94 matches; slot order (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`) |
-| render/BackgroundImage | `0x00403dc0` | 53/222 (masked) | c | 15 code diffs |
 | render/BackgroundImage | `0x004049d0` | 39/603 (masked) | c | 33 code diffs: `xor edi, edi` vs `mov [esp + N], 0`; `mov [esp + N], edi ; mov [ecx], edi ; j~` vs `mov [ecx], 0 ; je @162` |
 | render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
 | render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |
@@ -326,7 +325,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/Pixtrans | `0x004ce420` | 55/456 | b | 23 code diffs: `sub esp, 8` vs `sub esp, N ; mov edx, [esp + N]`; `mov eax, [esp + N] ; test eax, eax` vs `test edx, edx`; frame 0x8 vs 0x10 |
 | render/Pixtrans | `0x004cee30` | 45/1133 | b | candidate 1093 B, 314 code diffs: `push ebp` in the prologue vs after the three palette checks; `sourceRow` homed in `source`'s slot shifts every slot; fast-loop channel sum order |
 | render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
-| render/Pixtrans | `0x004d24d0` | 419/988 | c | 4 code diffs: retail lacks `jmp @207 ; mov eax, [esp + N] ; mov [es~`; retail adds `mov eax, [esp + N] ; mov [esp + N], eax~` |
 | render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
 | render/TextService | `0x0050ade0` | 117/125 | c | 1 code diffs: `mov eax, [ebp + N] ; mov edx, edi ; mov~` vs `mov ecx, [ebp + N] ; mov eax, edi ; mov~` |
 | render/TextService | `0x0050b080` | 477/890 | b | 34 code diffs: `mov edx, [esp + N]` vs `xor edx, edx ; not ecx`; `not ecx` vs `dec ecx`; slot order differs |
@@ -341,8 +339,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | track/Track | `0x00516ca0` | 307/520 (masked) | b | 20 code diffs; slots differ |
 | track/Track | `0x00516ef0` | 1023/1042 | c | 4 code diffs: retail adds `fld [ecx] ; fsub [ecx + 0xc]`; retail lacks `fld [ecx] ; fsub [ecx + 0xc]` |
 | track/Track | `0x00517340` | 57/655 (masked) | b | 44 code diffs: retail lacks `mov [esp + N], 0`; `add esp, 0x24` vs `add esp, 0x20`; frame 0x24 vs 0x20 |
-| track/Track | `0x005179f0` | 843/845 (masked) | c | FPU operand order: `fld [esp+0x3c]; fadd [esp+0x14]` where retail loads 0x14 first (2 bytes) |
-| track/Track | `0x00518130` | 174/234 (masked) | c | 8 code diffs |
 | track/Track | `0x0051ffe0` | 186/511 (masked) | c | 6 code diffs: `test eax, eax ; je @238` vs `cmp eax, ebx ; je A`; `call A ; movsx ebx, byte ptr [esp + edi~` vs `jmp A` |
 | track/TrackOverlay | `0x005194b0` | 246/844 (masked) | b | 10 code diffs: retail lacks `mov [esp + N], 0x10`; retail lacks `mov byte ptr [esp + N], bl`; slot order differs |
 | track/TrackOverlay | `0x00519a20` | 535/894 (masked) | c | 31 code diffs: retail lacks `mov ebp, ecx`; retail adds `push edi ; mov edi, ecx ; xor ebx, ebx` |
