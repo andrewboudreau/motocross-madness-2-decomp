@@ -28,26 +28,26 @@ extent (1,253,440 bytes); everything after it is library or compiler tail.
 
 | Category | Bytes | % `.text` | % game code | Count | Evidence |
 |---|---:|---:|---:|---:|---|
-| `exact_src`: strict VC6 match, source under `src/` | 672,342 | 49.13 | 53.64 | 3,500 | 1: rerun verdicts, relocations resolved |
+| `exact_src`: strict VC6 match, source under `src/` | 674,101 | 49.26 | 53.78 | 3,506 | 1: rerun verdicts, relocations resolved |
 | `exact_samples`: strict match, source only under `samples/` | 31,374 | 2.29 | 2.50 | 358 | 1 (not canonical source) |
 | `library_crt_atlas`: LIBCMT bodies | 77,929 | 5.69 | - | 443 | 1 masked match, [VC6_CRT_ATLAS](VC6_CRT_ATLAS.md) |
 | `library_import_thunk`: `jmp [IAT]` | 198 | 0.01 | - | 33 | 1 decoded IAT target |
 | `library_data`: DINPUT.LIB tables | 4,912 | 0.36 | - | 3 | 1 byte match against VC6 `DINPUT.LIB` |
 | `compiler_eh_text_x`: `$ehhandler` stubs + unwind funclets | 23,502 | 1.72 | - | 394 | 1 decoded `mov eax, FuncInfo; jmp ___CxxFrameHandler` |
-| `inline_asm_excluded` | 40,324 | 2.95 | 3.22 | 31 | 1 instruction (`fistp`/`rdtsc`/`fs:[4]`); 3 for the 4 docs-only rows |
-| `near_miss`: registered partials / near misses | 429,379 | 31.38 | 34.26 | 353 | 1 verdict; extent 2 where padding-delimited |
+| `inline_asm_excluded` | 42,775 | 3.13 | 3.41 | 34 | 1 instruction (`fistp`/`rdtsc`/`fs:[4]`); 3 for the 4 docs-only rows |
+| `near_miss`: registered partials / near misses | 455,939 | 33.32 | 36.38 | 373 | 1 verdict; extent 2 where padding-delimited |
 | `library_span_unlabeled`: LIBCMT span gaps | 5,813 | 0.42 | - | - | 2 |
 | `library_unknown`: after LIBCMT, before the EH tail | 2,722 | 0.20 | - | - | 3 |
 | `padding`: int3/nop alignment | 31,396 | 2.29 | 2.50 | - | 2 decoder rule |
-| `unattributed` | 48,627 | 3.55 | 3.88 | 50 | - |
+| `unattributed` | 17,857 | 1.30 | 1.42 | 17 | - |
 
 Counts are unique registered start addresses (by the category of their first
 byte); for libraries they are objects/thunks/stubs, for `unattributed` the
 padding-delimited ranges.
 
-Headline: **56.1% of game-code bytes (703,716) are strict exact**, 4.5% of it
-(31,374 bytes) only from `samples/`. 34.3% is registered but not exact, 3.2%
-needs inline assembly and 3.9% has no registration at all. No game function is
+Headline: **56.3% of game-code bytes (705,475) are strict exact**, 4.4% of it
+(31,374 bytes) only from `samples/`. 36.4% is registered but not exact, 3.4%
+needs inline assembly and 1.4% has no registration at all. No game function is
 a complete original translation unit yet, and nothing has been linked.
 
 Verdicts were rerun for this snapshot:
@@ -107,50 +107,17 @@ map; it is rebuilt by compiling the owning game functions, not separately.
 
 ### Unattributed ranges over 16 bytes
 
-42 ranges, 48,600 bytes (the other 8 ranges total 27 bytes).
+9 ranges, 17,830 bytes (the other 8 ranges total 27 bytes).
 
 | Range | Bytes | Nearest `__FILE__` xref |
 |---|---:|---|
-| `0x00405c4a..0x00405cca` | 128 | BackgroundImage.cpp (-0x1afa) |
-| `0x00407417..0x0040743c` | 37 | Bike.cpp (+0x823) |
-| `0x00424730..0x00424aab` | 891 | bmpfile.cpp (-0x154) |
 | `0x00424ab0..0x004253ac` | 2300 | bmpfile.cpp (-0x4d4) |
 | `0x00425900..0x004269da` | 4314 | bmpfile.cpp (-0x1324) |
 | `0x00426be0..0x004275f0` | 2576 | bmpfile.cpp (-0x2604) |
-| `0x00427c10..0x0042805d` | 1101 | bmpfile.cpp (-0x3634) |
 | `0x004280e0..0x00428950` | 2160 | BoundingBoxTreeBuild.cpp (+0x367e) |
-| `0x004298c0..0x00429e5c` | 1436 | BoundingBoxTreeBuild.cpp (+0x1e9e) |
 | `0x0042a640..0x0042abff` | 1471 | BoundingBoxTreeBuild.cpp (+0x111e) |
-| `0x00439600..0x00439814` | 532 | CollisionObject.cpp (-0x1a7) |
-| `0x00460d10..0x00460d5d` | 77 | FollowCam.cpp (+0x244a) |
-| `0x00460db0..0x00460e6a` | 186 | FollowCam.cpp (+0x23aa) |
-| `0x00460f50..0x0046130d` | 957 | FollowCam.cpp (+0x220a) |
-| `0x00461340..0x004615fe` | 702 | FollowCam.cpp (+0x1e1a) |
-| `0x00461640..0x004618d7` | 663 | FollowCam.cpp (+0x1b1a) |
-| `0x004618e0..0x00461978` | 152 | FollowCam.cpp (+0x187a) |
-| `0x00461b90..0x00461caa` | 282 | FollowCam.cpp (+0x15ca) |
-| `0x00463a30..0x00464a0a` | 4058 | FollowCam.cpp (-0x822) |
-| `0x0047caa0..0x0047d160` | 1728 | Grid1.cpp (-0x126) |
 | `0x00481300..0x004813d7` | 215 | Griddraw.cpp (+0x129c) |
 | `0x0048eea0..0x0048fa08` | 2920 | KrustyBike.cpp (+0xfb8) |
-| `0x004b7220..0x004b72bd` | 157 | Parameterblocks.cpp (-0x3a) |
-| `0x004b87f0..0x004b8988` | 408 | Parser.cpp (-0x26c) |
-| `0x004ce5f0..0x004cea0f` | 1055 | Pixtrans.cpp (+0xd02) |
-| `0x004cea10..0x004cee2f` | 1055 | Pixtrans.cpp (+0x8e2) |
-| `0x004cf2a0..0x004cf97f` | 1759 | Pixtrans.cpp (+0x52) |
-| `0x004d0d40..0x004d0e32` | 242 | Pixtrans.cpp (-0x657) |
-| `0x004d59a0..0x004d5c94` | 756 | ProCircuitProcs.cpp (-0xc7) |
-| `0x004dbcf2..0x004dbd30` | 62 | Quadtree.cpp (+0xa37) |
-| `0x004dc1f2..0x004dc2a8` | 182 | Quadtree.cpp (+0x537) |
-| `0x004fd340..0x004fd5b6` | 630 | soultree.cpp (+0x83d) |
-| `0x004fe2e0..0x004fe84e` | 1390 | soultree.cpp (-0x2a4) |
-| `0x004fe8a0..0x004feb0a` | 618 | soultree.cpp (+0x54d) |
-| `0x0050dad0..0x0050ee6c` | 5020 | ContainerList.h (+0x147) |
-| `0x00513f90..0x0051416f` | 479 | Tgafile.cpp (-0x117a) |
-| `0x00514170..0x005143cf` | 607 | Tgafile.cpp (-0x135a) |
-| `0x00515c90..0x00515db4` | 292 | Track.cpp (+0x21b) |
-| `0x00515ed0..0x005167f6` | 2342 | Track.cpp (-0x25) |
-| `0x00516980..0x00516c92` | 786 | Track.cpp (+0x3c) |
 | `0x00532580..0x005327b2` | 562 | wrecker.cpp (+0x3b8) |
 | `0x005329e0..0x00532f00` | 1312 | wrecker.cpp (-0x64) |
 
