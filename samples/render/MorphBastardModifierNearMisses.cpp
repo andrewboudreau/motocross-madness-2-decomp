@@ -2,14 +2,24 @@
 // until they match. See src/reconstructed/MorphBastardModifier.h for the
 // class evidence.
 //
-// MorphBastardModifier::UnknownFunction4a33b0 (0x004a33b0, 1982 bytes): the
-// parameter-file loader. Calls, strings, lines, field offsets and the frame
-// size (0x350) match retail; the rigid inverse is an inline that builds a
-// Vector3 (the plain-locals form leaves the frame 0x18 bytes short). The
-// remaining differences are VC6 stack-slot and register assignment for the
-// loop counters and flags (retail: controller +0x10, j +0x14, axis +0x1c,
-// isNew +0x20, k +0x24, i +0x28, targetCount +0x30, channel axis +0x34,
-// found +0x40).
+// MorphBastardModifier::UnknownFunction4a33b0 (0x004a33b0, 2046 bytes): the
+// parameter-file loader, 1938 of 2046 positions. Calls, strings, lines,
+// field offsets and the frame size (0x350) match retail; the object's rigid
+// inverse is MorphBastardInvertRigid (an inline building a Vector3; the
+// plain-locals form leaves the frame 0x18 bytes short). An existing channel
+// records the target index j (retail reads it from j's slot), and its test
+// is `channel->controller == controller && channelAxis == channel->axis`
+// (retail's strength-reduced channel offset in ebx and its `cmp eax, ecx`).
+// The new channel's inverse goes through MorphBastardInvertRigidInPlace,
+// which gives retail's term order; the products' operand order inside
+// t.x/t.y/t.z still differs (six term orders per sum, all 216 combinations,
+// tried).
+// Remaining: the stack homes of the spilled scalars (retail: controller
+// +0x10, j +0x14, axis +0x1c, isNew +0x20, k +0x24, i +0x28, targetCount
+// +0x30, found +0x40, probe +0x44; the two inverse temporaries 0x48/0x54 in
+// the other order). Declaration scopes of targetCount, probe, found and i,
+// constant channel axes, the isNew/controller test order and the
+// targetValue initialisation do not move them.
 //
 // MorphBastardModifier::UnknownVirtualSlot27 (0x004a4c60, 1568 bytes): blends
 // the target deltas of every channel into the copied mesh. The control flow,
@@ -42,6 +52,26 @@
 #include "../../src/reconstructed/Parameterblocks.h"
 #include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/UnknownResourceManager.h"
+
+// The channel's rigid inverse (0x004a33b0's second expansion): the same
+// transpose and negated translation as MorphBastardInvertRigid, through a
+// pointer and with the x term summed last. Retail's two expansions in
+// 0x004a33b0 order their products differently, which suggests two source
+// forms; this one gives retail's term order for the channel (not yet its
+// operand order inside each product).
+inline void MorphBastardInvertRigidInPlace(Matrix4* m)
+{
+    float t;
+    t = m->m[0][1]; m->m[0][1] = m->m[1][0]; m->m[1][0] = t;
+    t = m->m[0][2]; m->m[0][2] = m->m[2][0]; m->m[2][0] = t;
+    t = m->m[1][2]; m->m[1][2] = m->m[2][1]; m->m[2][1] = t;
+    Vector3 p(-((m->m[3][2] * m->m[2][0] + m->m[3][1] * m->m[1][0]) + m->m[3][0] * m->m[0][0]),
+              -(m->m[3][0] * m->m[0][1] + m->m[3][1] * m->m[1][1] + m->m[3][2] * m->m[2][1]),
+              -(m->m[3][0] * m->m[0][2] + m->m[3][1] * m->m[1][2] + m->m[3][2] * m->m[2][2]));
+    m->m[3][0] = p.x;
+    m->m[3][1] = p.y;
+    m->m[3][2] = p.z;
+}
 
 // 0x004a33b0
 MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, const char* path,
@@ -99,10 +129,10 @@ MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, c
                     continue;
                 for (int k = 0; k < morphObjects[i].channelCount; k++) {
                     MorphBastardChannel* channel = &morphObjects[i].channels[k];
-                    if (channel->controller == controller && channel->axis == channelAxis) {
+                    if (channel->controller == controller && channelAxis == channel->axis) {
                         channel->targetNumbers = (int*)DebugRealloc(
                             channel->targetNumbers, channel->targetCount * 4 + 4, __FILE__, 143);
-                        channel->targetNumbers[channel->targetCount] = k;
+                        channel->targetNumbers[channel->targetCount] = j;
                         channel->targetCount++;
                         isNew = 0;
                     }
@@ -123,7 +153,7 @@ MorphBastardModifier* MorphBastardModifier::UnknownFunction4a33b0(void* value, c
                     channel->targetNumbers[1] = j;
                     channel->field_0x5c = -1;
                     controller->UnknownFunction4fca80(0, &channel->inverseRestMatrix);
-                    MorphBastardInvertRigid(channel->inverseRestMatrix);
+                    MorphBastardInvertRigidInPlace(&channel->inverseRestMatrix);
                     morphObjects[i].channelCount++;
                 }
             }

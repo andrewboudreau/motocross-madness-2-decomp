@@ -4216,6 +4216,15 @@ CASES = [
         'reason': 'forwarding call',
     },
     {
+        'name': 'CacheTexture reserve plan 0x50f9b0',
+        'bindings': 'src/reconstructed/CacheTexture.bindings.json',
+        'source': 'src/reconstructed/CacheTexture.cpp',
+        'symbol': '?UnknownFunction50f9b0@CacheTexture@@QAEHPAHH@Z',
+        'target_va': '0x0050f9b0',
+        'target_size': 646,
+        'reason': 'walk initialisation order pairs this/region and space/depth registers; region read before index bases the step pointer',
+    },
+    {
         'name': 'PCTextureMap colour key 0x4c7e30',
         'bindings': 'src/reconstructed/PCTextureMap.bindings.json',
         'source': 'src/reconstructed/PCTextureMap.cpp',
@@ -8950,6 +8959,15 @@ CASES = [
         'reason': 'qsort comparator passed by 0x52d250/0x4c9830',
     },
     {
+        'name': 'VideoCard.cpp VideoCard constructor 0x52d180',
+        'bindings': 'src/reconstructed/VideoCard.bindings.json',
+        'source': 'src/reconstructed/VideoCard.cpp',
+        'symbol': '??0VideoCard@@QAE@XZ',
+        'target_va': '0x0052d180',
+        'target_size': 115,
+        'reason': 'writes vtable 0x558d74; bit field and +0x68 cleared before the 0x7fffffff times',
+    },
+    {
         'name': 'VideoCard.cpp VideoCard deleting dtor 0x52d200',
         'bindings': 'src/reconstructed/VideoCard.bindings.json',
         'source': 'src/reconstructed/VideoCard.cpp',
@@ -11027,6 +11045,15 @@ CASES = [
         'target_va': '0x0047d310',
         'target_size': 84,
         'reason': 'slot 6 of 0x00553e54',
+    },
+    {
+        'name': 'Grid1.cpp DrawableGridNodeSharedTextures slot 7',
+        'bindings': 'src/reconstructed/Grid1.bindings.json',
+        'source': 'src/reconstructed/Grid1.cpp',
+        'symbol': '?UnknownVirtualSlot7@DrawableGridNodeSharedTextures@@UAEXH@Z',
+        'target_va': '0x0047d370',
+        'target_size': 172,
+        'reason': 'slot 7 of 0x00553e54; index and own bits read once through x->blocks[block]',
     },
     {
         'name': 'Grid1.cpp DrawableGridNodeSharedTextures slot 8',

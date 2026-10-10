@@ -1,14 +1,17 @@
 // Near-miss PCGame candidates, kept out of src/reconstructed until they
 // match. See docs/PCGAME.md.
 //
-// PCGame::ProfileDisplays (0x004c0d10, 1790 bytes): the control flow,
-// calls and constants line up, but the frame and registers do not. Retail
-// keeps the 16-byte capability block below the name buffer, and in the first
-// loop holds the count in ebp, the index in edi and the array pointer in
-// ebx. Declaration order, scope placement, a struct or array for the
-// capabilities and separate loop counters leave VC6's layout unchanged.
-// Small test functions place the smaller array lower, as retail does, so
-// something specific to this function decides it.
+// PCGame::ProfileDisplays (0x004c0d10, 1790 bytes, returns 1 from both
+// exits): 1776 of 1790 positions match. The capability block is cleared
+// with memset before its caps word is set (retail stores 0 then
+// 0x10000000 to +0x20); with four field stores the block ranked above the
+// name buffer and every frame offset and register differed (208 of 1772).
+// `display` is assigned before `renderTarget` (retail loads the display
+// pointer before the renderTarget store). Remaining: retail stores the
+// surface description's size (0x7c) right after the memset, VC6 here after
+// pushing the 0x005119c0 arguments. Not moved by sizeof/0x7c spellings, a
+// pointer to the description, an inline clear helper (reference or
+// pointer), a format local or the description declared outside the loop.
 #include <stdio.h>
 #include <string.h>
 
@@ -22,14 +25,14 @@ void UnknownFunction5119c0(int format, void* pixelFormat);
 // list, whether windowed, full-screen, software and hardware rendering work,
 // its video memory, AGP, whether ten 256x256 textures fit and the partial
 // texture blit timing.
-void PCGame::ProfileDisplays() {
+int PCGame::ProfileDisplays() {
     int loaded = 0;
     int i;
     for (i = 0; i < g_UnknownDisplayCount68a764; i++)
         if (LoadDisplayProfile(g_UnknownDisplays68a754[i]))
             loaded++;
     if (loaded == g_UnknownDisplayCount68a764)
-        return;
+        return 1;
     for (i = 0; i < g_UnknownDisplayCount68a764; i++) {
         char name[128];
         sprintf(name, "DriverInfo\\%s\\ProfiledCard", g_UnknownDisplays68a754[i]->driverGuidText);
@@ -58,10 +61,8 @@ void PCGame::ProfileDisplays() {
             UnknownSurfaceCaps caps;
             unsigned long total;
             unsigned long free;
+            memset(&caps, 0, sizeof(caps));
             caps.caps = 0x10000000;
-            caps.caps2 = 0;
-            caps.caps3 = 0;
-            caps.caps4 = 0;
             g_UnknownDisplays68a754[i]->directDraw->GetAvailableVidMem(&caps, &total, &free);
             g_UnknownDisplays68a754[i]->totalVideoMemory = total;
             sprintf(name, "DriverInfo\\%s\\TotalVideoMemory", g_UnknownDisplays68a754[i]->driverGuidText);
@@ -131,8 +132,8 @@ void PCGame::ProfileDisplays() {
                                 if (GetRegistryInt(name, 1) > 0) {
                                     g_UnknownDisplays68a754[i]->partialTextureUploadResult = 0;
                                     SetRegistryInt(name, g_UnknownDisplays68a754[i]->partialTextureUploadResult);
-                                    renderTarget = target;
                                     display = g_UnknownDisplays68a754[i];
+                                    renderTarget = target;
                                     g_UnknownDisplays68a754[i]->ProbePartialTextureUploads(target);
                                     display = 0;
                                     renderTarget = 0;
@@ -149,4 +150,5 @@ void PCGame::ProfileDisplays() {
         }
         g_UnknownDisplays68a754[i]->SetWindowedCooperativeLevel(0, 0, 0, 0);
     }
+    return 1;
 }

@@ -23,10 +23,14 @@
 // match. The 0x540 allocation is reached by a `goto` out of the header scan
 // (its __LINE__ 687 precedes the small one's 698), which reproduces retail's
 // out-of-line block and keeps the header word in the dead stream-argument
-// slot. Retail multiplies the extent terms as `fld min; fmul cell` and
-// stores extent.y with fstp before the 0.1 test; VC6 here loads the cell
-// size first and keeps extent.y on the x87 stack, which adds a pop block and
-// moves the out-of-line allocation earlier.
+// slot. The 0.1 test reads the extent through a reference (an inline
+// helper), which gives retail's `fstp extent.y` and block layout (1605 of
+// 1617; a direct test keeps extent.y on the x87 stack, 1091). Remaining: the
+// extent.x/extent.y products load the cell size first (`fld cell; fmul
+// min`), retail the minimum (`fld min; fmul cell`). Not moved by either
+// operand order, the sum order in the centre terms, a `cell` local, inline
+// multiply helpers (value-first or cell-first), a GridVec3 constructor for
+// the centre, or a reordered 0x16c/0x170 sum.
 //
 // DrawableGridNode 0x00480ad0 (4-cell block draw, 438 bytes; 395 of 438):
 // retail keeps the zero start offset in eax from the prologue and compares
@@ -218,6 +222,15 @@ void UnknownFunction47e430(int half, int start, int step, int rowStep)
 }
 
 
+// Every component of `v` below `limit`. Read through the reference, the
+// components are reloaded after their stores (retail 0x0047e600's `fstp
+// extent.y` followed by a reload); a direct test keeps extent.y on the x87
+// stack.
+static inline int GridExtentBelow(const GridVec3& v, float limit)
+{
+    return v.x < limit && v.y < limit && v.z < limit;
+}
+
 // 0x0047e600: reads the node header from the stream, allocates the draw
 // data (with per-block records when any of the 16 header words is not an
 // 0xfffe/0xffff marker), computes the bounding box and, when asked, creates
@@ -321,7 +334,7 @@ allocated:
     center.z = (data->field_0x170 + data->field_0x168) * terrain->gridCellSize * 0.5f;
     extent.x = center.x - terrain->gridCellSize * data->field_0x164;
     extent.y = center.y - terrain->gridCellSize * field_0x18;
-    if (extent.x < 0.1f && extent.y < 0.1f && extent.z < 0.1f)
+    if (GridExtentBelow(extent, 0.1f))
         extent = GridVec3(0.1f, 0.1f, 0.1f);
     extent.z = center.z - data->field_0x168 * terrain->gridCellSize;
     if (parent)

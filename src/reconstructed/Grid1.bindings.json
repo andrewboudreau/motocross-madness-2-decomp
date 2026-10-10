@@ -20,6 +20,7 @@
   "?UnknownVirtualSlot2@DrawableGridNodeSharedTextures@@UAEPAVGridNode@@PAVUnknownTextureStream@@HPAVDrawableGridNode@@HHHHHPAX2@Z$ehhandler": "0x0054b6c4",
   "?UnknownVirtualSlot4@DrawableGridNodeSharedTextures@@UAEXH@Z": "0x0047d160",
   "?UnknownVirtualSlot6@DrawableGridNodeSharedTextures@@UAEXXZ": "0x0047d310",
+  "?UnknownVirtualSlot7@DrawableGridNodeSharedTextures@@UAEXH@Z": "0x0047d370",
   "?UnknownVirtualSlot8@DrawableGridNodeSharedTextures@@UAEHH@Z": "0x0047d420",
   "?g_grid1DetailDistance@@3MA": "0x0056c034",
   "?g_gridTextureCount@@3HA": "0x0068a2ec",

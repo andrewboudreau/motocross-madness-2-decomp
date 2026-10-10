@@ -57,6 +57,97 @@ int CacheTexture::UnknownFunction50f8e0(ContainerList<ManagedTexture*>* textures
     return 0;
 }
 
+// A step of the depth-first walk in 0x0050f9b0.
+struct UnknownRegionStep {
+    UnknownTextureRegion* region;
+    int index;
+};
+
+// The largest level still wanted, taken off `wanted`; -1 when none is.
+static inline int TakeLargest(int* wanted) {
+    for (int level = 8; level >= 0; level--) {
+        if (wanted[level]) {
+            wanted[level]--;
+            return level;
+        }
+    }
+    return -1;
+}
+
+// 0x0050f9b0
+int CacheTexture::UnknownFunction50f9b0(int* levels, int count) {
+    int wanted[9];
+    memset(wanted, 0, sizeof(wanted));
+    int space = field_0x184;
+    int fitted = 1;
+    int level;
+    for (level = 8; level >= 0; level--) {
+        int n = levels[level];
+        while (n) {
+            int area = LevelArea(level);
+            if (space < area) {
+                fitted = 0;
+                break;
+            }
+            space -= area;
+            wanted[level]++;
+            levels[level]--;
+            n--;
+        }
+    }
+    int same = 1;
+    for (level = 0; level <= 8; level++) {
+        if (field_0xac[level] != wanted[level]) {
+            same = 0;
+            break;
+        }
+    }
+    if (same)
+        return fitted;
+
+    UnknownRegionStep steps[10];
+    int depth = -1;
+    int first = 1;
+    UnknownTextureRegion* region = field_0x84;
+    for (;;) {
+        level = TakeLargest(wanted);
+        if (level == -1)
+            break;
+        if (!first) {
+            while (steps[depth].index++ == 3)
+                depth--;
+            region = steps[depth].region->field_0x00[steps[depth].index];
+        } else {
+            first = 0;
+        }
+        while (region->field_0x18 > level) {
+            depth++;
+            steps[depth].region = region;
+            steps[depth].index = 0;
+            region = UnknownFunction50fc60(region);
+        }
+        UnknownFunction50fd60(region);
+        if (region->field_0x2c)
+            continue;
+        region->field_0x2c = 1;
+        field_0xac[level]++;
+        field_0x88[level]--;
+        field_0xd0[level].Add(region);
+    }
+    for (; depth >= 0; depth--) {
+        UnknownTextureRegion* parent = steps[depth].region;
+        int i = steps[depth].index + 1;
+        for (; i < 4; i++) {
+            UnknownTextureRegion* quarter = parent->field_0x00[i];
+            if (quarter->field_0x00[0])
+                UnknownFunction50fd60(quarter);
+            else
+                UnknownFunction50fc90(quarter);
+        }
+    }
+    return fitted;
+}
+
 // 0x0050fc40
 void CacheTexture::UnknownFunction50fc40() {
     UnknownTextureRegion* root = field_0x84;

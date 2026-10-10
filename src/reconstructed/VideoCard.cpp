@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "VideoCard.h"
 
@@ -36,6 +37,30 @@ int CompareDisplayModes(const void* first, const void* second) {
     if (a->refreshRate != b->refreshRate)
         return a->refreshRate - b->refreshRate;
     return 0;
+}
+
+// 0x0052d180. The bit field and +0x68 are cleared before the two
+// 0x7fffffff times: that order puts retail's `xor esi, esi` ahead of the
+// bit-2 mask.
+VideoCard::VideoCard() {
+    lastFlipFailed = 0;
+    field_0x68 = 0;
+    lastFrameTime = 0x7fffffff;
+    shortestFrameTime = 0x7fffffff;
+    field_0x64 = 0;
+    currentDisplayMode = -1;
+    field_0x88 = 0;
+    frameBufferCount = 0;
+    displayModeCapacity = 0;
+    displayModes = 0;
+    lastPresentTime = 0;
+    field_0x58 = 0;
+    field_0x5c = 0;
+    memset(field_0x90, 0, sizeof(field_0x90));
+    field_0x8c = 0;
+    use8BitTextures = 0;
+    freezeFrameIndex = 0;
+    totalVideoMemory = 0;
 }
 
 // 0x0052d240

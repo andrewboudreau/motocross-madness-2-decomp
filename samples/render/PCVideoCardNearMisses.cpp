@@ -23,9 +23,6 @@
 //   esi shared with the created target (reloaded on failure, two separate
 //   -3 stores; VC6 here merges them), tests `render` again after the found
 //   path, and places the Slot8-success path after the epilogue.
-// VideoCard::VideoCard (0x0052d180, 115 bytes; VideoCard.cpp): every store
-//   matches; retail clears the zero register before the bit-2 mask, a
-//   scheduling difference no statement order reproduced.
 #include "../../src/reconstructed/PCVideoCard.cpp"
 
 #include <string.h>
@@ -251,27 +248,4 @@ void UnknownDisplay::ProbePartialTextureUploads(RenderTarget* target) {
         }
     }
     partialTextureUploadResult = result;
-}
-
-
-// 0x0052d180
-VideoCard::VideoCard() {
-    lastFlipFailed = 0;
-    lastFrameTime = 0x7fffffff;
-    shortestFrameTime = 0x7fffffff;
-    field_0x68 = 0;
-    field_0x64 = 0;
-    currentDisplayMode = -1;
-    field_0x88 = 0;
-    frameBufferCount = 0;
-    displayModeCapacity = 0;
-    displayModes = 0;
-    lastPresentTime = 0;
-    field_0x58 = 0;
-    field_0x5c = 0;
-    memset(field_0x90, 0, sizeof(field_0x90));
-    field_0x8c = 0;
-    use8BitTextures = 0;
-    freezeFrameIndex = 0;
-    totalVideoMemory = 0;
 }

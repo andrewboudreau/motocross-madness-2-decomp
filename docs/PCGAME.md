@@ -81,8 +81,9 @@ the SIB base and index registers of the four stores (the same difference as
 EcoSystem's `0x00458da0`).
 
 Near miss: the profiling pass `0x004c0d10` (1790 bytes,
-`samples/game/PCGameNearMisses.cpp`). Its control flow and calls line up, but
-the frame layout and register assignment do not (notes in the sample). The
+`samples/game/PCGameNearMisses.cpp`, 1776 of 1790 positions; it returns 1
+from both exits). Only the scheduling of one surface-description store
+differs (notes in the sample). The
 pass uses the display's DirectDraw-shaped interface (+0x190) for the
 following, which are inference:
 - SetDisplayMode (method 21);

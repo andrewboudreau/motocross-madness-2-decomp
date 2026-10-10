@@ -148,7 +148,7 @@ RTTI `CacheTexture : PCTextureMap` (vtable `0x005583d8`, 0x190 bytes) is
 the page a ManagedTextureGroup packs its ManagedTextures onto. Its code
 (`0x0050f6a0`-`0x005104fb`) sits between ManagedTextureGroup's and
 ManagedTexture's. Canonical source: `src/reconstructed/CacheTexture.h` /
-`CacheTexture.cpp`; 14 functions are exact.
+`CacheTexture.cpp`; 15 functions are exact.
 
 The page is a quadtree of 0x30-byte regions taken from the manager's
 `BlockAllocator` (TextureMapManager+0x70): four quarters, parent, occupant,
@@ -165,15 +165,18 @@ per level (+0xd0, nine `ContainerList`s of 32). Exact:
   subtree back into the pool), `0x0050fdb0` (place textures on reserved
   leaves, blitting them when no list is given), `0x0050ffa0` (split),
   `0x00510120` (unplace, merging empty parents), `0x00510250` (occupy)
-  and `0x005102b0` (take a texture off).
+  and `0x005102b0` (take a texture off);
+- `0x0050f9b0` (646 bytes), reserve the leaves a level plan wants. Retail's
+  register pairing (`this` then the region in ebx, the free texels then the
+  depth in ebp) follows the walk's initialisation order (`depth`, `first`,
+  then `region`); the final walk reads a step's region before its index,
+  which bases the strength-reduced step pointer at the index field.
 
 Two recurring VC6 shapes: chained assignments (`a = b = 0`) give retail's
 reversed store order, and the region `Init` helper is inlined wherever a
 block is taken.
 
 Near misses (`samples/render/CacheTextureNearMisses.cpp`):
-- `0x0050f9b0` (646 bytes), reserve the leaves a level plan wants: only
-  two register choices differ (11 instructions);
 - `0x005102d0` (558 bytes), blit the occupant's mip levels into its
   region (DirectDraw `GetAttachedSurface`/`Blt`, then slot 9 or +0x188):
   retail places the shared `return 0` block before the final branch

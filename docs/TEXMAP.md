@@ -17,7 +17,7 @@ TextureMap.h changes:
 
 **TextureCache.cpp** (`0x0050bed0..`, at least `0x0050f69f`; `__FILE__`
 `0x00574b84`): every function in the range is already a calibration case
-except five near misses. They are the two repacks `0x0050c960` and
+except four near misses. They are the two repacks `0x0050c960` and
 `0x0050dad0`, the debug display `0x0050ef70`, and CacheTexture
-`0x0050f9b0` and `0x005102d0`. CacheTexture (`0x0050f6a0..0x005104fb`)
+`0x005102d0`. CacheTexture (`0x0050f6a0..0x005104fb`)
 belongs here by proximity only.
