@@ -25,12 +25,14 @@
 //
 // UnknownFunction532580 (0x00532580, 562 bytes): rebuilds the wreck pose's
 // linear (field_0xbc) and angular (field_0xc8) step from the node's frame.
-// 490/562: the temporaries (a member-by-member copy helper), the FPU-held
-// up row (float locals) and the branch layout match. Left: each cross
-// product's loads are swapped (retail `fld pose.z; fmul old.y`, VC6 here
+// 511/562: the temporaries (a member-by-member copy helper), the FPU-held
+// up row (float locals), the branch layout and (with WreckerCross's
+// parenthesised first products) the fsubp/copy schedule match. Left: each
+// cross product's loads are swapped (retail `fld pose.z; fmul old.y`, VC6 here
 // `fld old.y; fmul pose.z` whatever the operand order, argument order,
-// sign convention, by-value or matrix form) and its `fsubp` is scheduled
-// after the destination pointer copy. Also tried: the equality tests written
+// sign convention, by-value or matrix form, with or without parentheses),
+// and the up-row loads at the start are issued before the forward copy's
+// last store. Also tried: the equality tests written
 // pose-first (changes the compares, not the products), the cross product's
 // parameters by value in all three combinations, the forward copy as a plain
 // struct copy and through a pointer to field_0x6c.
@@ -99,11 +101,13 @@ inline float WreckerSquareMagnitude(const Vector3& v) {
     return v.x * v.x + v.y * v.y + v.z * v.z;
 }
 
+// The parenthesised first product puts each fsubp between the load and the store of the
+// previous component's copy, as retail does (docs/VC6_OPERAND_ORDER.md section 3).
 inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
     Vector3 r;
-    r.x = a.y * b.z - a.z * b.y;
-    r.y = a.z * b.x - a.x * b.z;
-    r.z = a.x * b.y - a.y * b.x;
+    r.x = (a.y * b.z) - a.z * b.y;
+    r.y = (a.z * b.x) - a.x * b.z;
+    r.z = (a.x * b.y) - a.y * b.x;
     return r;
 }
 

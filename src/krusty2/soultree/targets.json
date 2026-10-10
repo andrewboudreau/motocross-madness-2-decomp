@@ -105,8 +105,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot4@SoultreePhysicsBaseObject",
     "target_va": "0x005013d0",
     "target_size": 473,
-    "expect": "partial",
-    "notes": "87.53% under vc6_o2_ml (wave 3: was 69.37%). The speed is computed as s = SoultreeDot(*a2,*a2); (s == 1.0f) ? 1.0f : sqrt(s) (?: form, not if/else), and the crosses use the three-float constructor form SoultreeCrossCtor (+2.4%). Remaining: the fmul operand load order in both cross products (retail loads a3 first in every term of the first cross) and lea ebx,[edi+0xd8] scheduled earlier.",
+    "expect": "exact",
+    "notes": "slot 4: two lever-arm offsets (cross + offset, scaled) handed to ContactSolveImpulse 0x005004a0; exact with SoultreeCrossCtor's parenthesised first products",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {
@@ -1168,5 +1168,15 @@
     "expect": "exact",
     "notes": "slot 40 loader (ret 0x6c): D3DIM character slot 11, slot 2 setup, .col path, new(SoulTreePhysics.cpp __FILE__ 0x00574320, 0x8cd) file object + 0x4e9cd0 lookup, CollisionObject shape setup",
     "bindings": "SoulTreePhysics.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "soultree.cpp",
+    "candidate_symbol_contains": "SetAxesPtr@SoultreeObject",
+    "target_va": "0x004fbd70",
+    "target_size": 733,
+    "expect": "exact",
+    "notes": "moved from samples/physics/helpers; inline cross products need Math3D.h's parenthesised first products",
+    "bindings": "soultree.bindings.json"
   }
 ]

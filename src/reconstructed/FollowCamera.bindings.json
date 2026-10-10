@@ -58,5 +58,11 @@
   "_kVec3XAxis": "0x0065b458",
   "_kVec3YAxis": "0x0065b468",
   "_kVec3ZAxis": "0x0065b438",
-  "_kVec3Zero": "0x0065b448"
+  "_kVec3Zero": "0x0065b448",
+  "?UnknownVirtualSlot46@FollowCamera@@UAEXPAUVector3@@0@Z": "0x004654e0",
+  "?UnknownFunction40ae30@@YAMPBUVector3@@0@Z": "0x0040ae30",
+  "__real@4@3fff8000000000000000": "0x00550748",
+  "?UnknownFunction460c00@@YAMM@Z": "0x00460c00",
+  "?UnknownFunction5015b0@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",
+  "?UnknownFunction515600@@YA?AUVector3@@ABU1@0@Z": "0x00515600"
 }

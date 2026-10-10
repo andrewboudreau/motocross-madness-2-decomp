@@ -501,6 +501,58 @@ bool FollowCamera::UnknownVirtualSlot56() {
         ->UnknownVirtualSlot5(0x2A, 0x3F, 0);
 }
 
+// Out-of-line vector helpers that slot 46's inline normalisation calls (VC6
+// did not expand them there). See src/krusty2/math/Math3D.h, whose call views
+// describe the same addresses; names here are provisional.
+float UnknownFunction460c00(float value);                          // 0x00460c00: 1/sqrt approximation
+float UnknownFunction40ae30(const Vector3* a, const Vector3* b);   // 0x0040ae30: dot product
+Vector3 UnknownFunction5015b0(const Vector3& v, float scale);      // 0x005015b0: v * scale
+Vector3 UnknownFunction515600(const Vector3& a, const Vector3& b); // 0x00515600: cross product
+
+// Inline cross product (expanded by slot 46). The parenthesised first
+// products put each fsubp between the load and the store of the previous component's copy,
+// as retail does (docs/VC6_OPERAND_ORDER.md section 3).
+inline Vector3 FollowCameraCross(const Vector3& a, const Vector3& b) {
+    return Vector3((a.y * b.z) - a.z * b.y, (a.z * b.x) - a.x * b.z, (a.x * b.y) - a.y * b.x);
+}
+
+// Inline normalisation: unit-length vectors are returned unchanged.
+inline Vector3 FollowCameraNormalize(const Vector3& v) {
+    float lengthSquared = UnknownFunction40ae30(&v, &v);
+    if (lengthSquared == 1.0f)
+        return v;
+    float scale = UnknownFunction460c00(lengthSquared);
+    return UnknownFunction5015b0(v, scale);
+}
+
+// 0x004654e0: an orthonormal basis from `forward` and `up` (up is made
+// perpendicular to forward, both are normalised) stored with the side vector
+// as rows 0-2 of the +0x344 matrix.
+void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
+    Vector3 z = *forward;
+    Vector3 y = *up;
+    y = FollowCameraCross(z, FollowCameraCross(y, z));
+    y = FollowCameraNormalize(y);
+    z = FollowCameraNormalize(z);
+    Vector3 x = UnknownFunction515600(y, z);
+    field_0x344.m[0][0] = x.x;
+    field_0x344.m[0][1] = x.y;
+    field_0x344.m[0][2] = x.z;
+    field_0x344.m[0][3] = 0.0f;
+    field_0x344.m[1][0] = y.x;
+    field_0x344.m[1][1] = y.y;
+    field_0x344.m[1][2] = y.z;
+    field_0x344.m[1][3] = 0.0f;
+    field_0x344.m[2][0] = z.x;
+    field_0x344.m[2][1] = z.y;
+    field_0x344.m[2][2] = z.z;
+    field_0x344.m[2][3] = 0.0f;
+    field_0x344.m[3][0] = 0.0f;
+    field_0x344.m[3][1] = 0.0f;
+    field_0x344.m[3][2] = 0.0f;
+    field_0x344.m[3][3] = 1.0f;
+}
+
 // 0x00466ad0: Camera's controls first; then, with the game's +0x2d4 bit 0,
 // control 0x21 toggles the override (slot 70) and, while it is on, control
 // 0x10 flips +0x26c and calls slot 69. Outside states 6 and 7 the raw keys

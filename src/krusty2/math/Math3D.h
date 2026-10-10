@@ -55,12 +55,19 @@ inline float SquareMagnitude(const Vec3& v) { return v.x * v.x + v.y * v.y + v.z
 
 // Same component formula as d3dvec.inl CrossProduct. Confirmed shape: PhysicsRigidBody
 // slot 36 (0x004cc230) computes r.y*F.z - r.z*F.y, r.z*F.x - r.x*F.z, r.x*F.y - r.y*F.x.
+// The parentheses are significant (tier 2). Around the first product they make VC6 issue
+// each fsubp between the load and the store of the previous component's copy
+// (`mov r, [tmp]; fsubp; mov [dst], r`), as retail does at every such copy (82 sites);
+// without them it issues the store first. Around the second product they place an
+// integer instruction of PhysicsRigidBody slot 11 (0x004cc630, the `lea` of an argument
+// address) before the torque term's fsubr, as retail does. See docs/VC6_OPERAND_ORDER.md
+// section 3.
 inline Vec3 CrossProduct(const Vec3& a, const Vec3& b)
 {
     Vec3 r;
-    r.x = a.y * b.z - a.z * b.y;
-    r.y = a.z * b.x - a.x * b.z;
-    r.z = a.x * b.y - a.y * b.x;
+    r.x = (a.y * b.z) - (a.z * b.y);
+    r.y = (a.z * b.x) - (a.x * b.z);
+    r.z = (a.x * b.y) - (a.y * b.x);
     return r;
 }
 

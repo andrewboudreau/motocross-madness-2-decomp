@@ -105,5 +105,9 @@
   "_kVec3XAxis": "0x00689ea8",
   "_kVec3YAxis": "0x00689eb8",
   "_kVec3ZAxis": "0x00689e88",
-  "_kVec3Zero": "0x00689e98"
+  "_kVec3Zero": "0x00689e98",
+  "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600",
+  "?FastInvSqrt@@YAMM@Z": "0x00460c00",
+  "?Vec3DotCall@@YAMPBUVec3@@0@Z": "0x0040ae30",
+  "?Vec3ScaleCall@@YAPAUVec3@@PAU1@PBU1@M@Z": "0x005015b0"
 }

@@ -31,9 +31,12 @@ ShockVec3 ShockScaleCall(const ShockVec3& v, float s);                       // 
 ShockVec3 ShockAddCall(const ShockVec3& a, const ShockVec3& b);              // 0x00421cb0 (hidden return pointer)
 float ShockLength(const ShockVec3& v);                                       // 0x00435ec0 (1.0 when |v|^2 == 1, else FastSqrt)
 
+// The parenthesised first products are significant: they put each fsubp between the load and
+// the store of the previous component's copy, as retail does in RotatingShock::SolveContact
+// (docs/VC6_OPERAND_ORDER.md section 3).
 inline ShockVec3 ShockCross(const ShockVec3& a, const ShockVec3& b)
 {
-    return ShockVec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    return ShockVec3((a.y * b.z) - a.z * b.y, (a.z * b.x) - a.x * b.z, (a.x * b.y) - a.y * b.x);
 }
 
 // The four TU-private constant vectors built by the dynamic initializers 0x004fafd0..0x004fb0c0

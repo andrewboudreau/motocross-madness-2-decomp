@@ -64,8 +64,10 @@ struct QueryHit {
 // Dot product and squared length: VC6 emits (y + x) + z for this grouping (tier 2:
 // PointSegmentDistance 0x0042ac00 and SegmentBoxOverlap 0x004253b0 are exact only with it;
 // the out-of-line DotProduct copy 0x0040ae30 sums in the same order, and so does
-// Vec3Normalize 0x005087b0, see math/Math3D.h).
-inline float QueryDot(const Vec3& a, const Vec3& b) { return a.z * b.z + (a.x * b.x + a.y * b.y); }
+// Vec3Normalize 0x005087b0, see math/Math3D.h).  The parentheses around a.y * b.y make
+// PointInTriangle 0x004278d0 store a copied component after the inner faddp, as retail does
+// (docs/VC6_OPERAND_ORDER.md section 3); the other users keep their bytes.
+inline float QueryDot(const Vec3& a, const Vec3& b) { return a.z * b.z + (a.x * b.x + (a.y * b.y)); }
 inline float QuerySquareMagnitude(const Vec3& v) { return v.z * v.z + (v.x * v.x + v.y * v.y); }
 
 // fabs as compare-and-negate (constant 0x00550484), and the min/max the box tests use.

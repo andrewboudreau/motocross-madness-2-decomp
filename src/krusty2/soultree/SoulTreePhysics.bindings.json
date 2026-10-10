@@ -122,5 +122,6 @@
   "?g_0056e26c@@3PAUSoultreeGlobals@@A": "0x0056e26c",
   "?g_00572b44@@3HA": "0x00572b44",
   "_strncpy": "0x00534b10",
-  "_strrchr": "0x00534a60"
+  "_strrchr": "0x00534a60",
+  "?ContactSolveImpulse@@YAXMPBUVec3@@MPAVSoultreeObject@@000PAU1@2M100022PAM@Z": "0x005004a0"
 }

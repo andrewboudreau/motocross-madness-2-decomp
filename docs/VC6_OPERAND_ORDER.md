@@ -191,6 +191,77 @@ they are source-form differences under the deterministic rules of section 1.
 - Adding or removing declarations to move a near miss into a window is not a
   fix: the scan shows no near miss that has one.
 
+## 3. Redundant parentheses around a product
+
+VC6 keeps a redundant pair of parentheses as a node of its own, and that
+node changes the x87 schedule (and sometimes the operand order) of the
+operation that consumes it. Writing `(a * b) - c * d` instead of
+`a * b - c * d` is therefore a source-form difference, not a cosmetic one.
+
+### 3.1 The cross-product copy
+
+Probe (vc6_o2_ml, `static Vec3 s_axes[15]`, Math3D.h's Vec3):
+
+```cpp
+inline Vec3 C(const Vec3& a, const Vec3& b)
+{ Vec3 r; r.x = a.y * b.z - a.z * b.y; r.y = a.z * b.x - a.x * b.z;
+  r.z = a.x * b.y - a.y * b.x; return r; }
+void f() { s_axes[6] = C(s_axes[0], s_axes[3]); }
+```
+
+Each component is stored to a temporary (`fstp [tmp.x]`) and copied with
+integer moves while the next component is computed. Without parentheses
+VC6 fills the slot after the second `fmul` with the whole copy:
+
+```
+fld; fmul; fld; fmul; mov ecx, [tmp.x]; mov [dst.x], ecx; fsubp st(1)
+```
+
+With the first product parenthesised (`(a.y * b.z) - a.z * b.y`, or both
+products) the `fsubp` comes between the copy's load and store:
+
+```
+fld; fmul; fld; fmul; mov ecx, [tmp.x]; fsubp st(1); mov [dst.x], ecx
+```
+
+Parentheses around the second product only, around the whole difference,
+a constructor-built result, member/`operator[]` access, an out pointer,
+by-value parameters, a separate assignment and D3DVECTOR from the VC6
+headers all give the first form; /G3, /G4, /G5, /GB, /Op, /Oa, /Ow, /QIfdiv
+and the data alignment of the vectors do not move it (/G6 gives a third
+schedule).
+
+Retail has the second form at 82 sites of this shape in .text and the
+first at 3 (none of them a cross-product copy); with `faddp` instead of
+`fsubp` the counts are 0 and 25, the unparenthesised form, which matches
+the dot products being written without parentheses. Functions that became
+strict exact with the parenthesised form: BoxOverlap `0x00424ab0`,
+SetAxesPtr `0x004fbd70`, RotatingShock::SolveContact `0x004fac60`,
+SoultreePhysics slot 4 `0x005013d0`, Vehicle slot 35 `0x0040c540` and
+FollowCamera slot 46 `0x004654e0`; Wrecker `0x00532580` gained 21 bytes.
+
+### 3.2 Effects on operand order and other instructions
+
+- The parenthesised product can also change the leaf order of the
+  surrounding terms: SoultreePhysics slot 4's cross products (constructor
+  form) load `a3` first in every term only with `(a.y * b.z) - a.z * b.y`;
+  with both products parenthesised 15 bytes differ.
+- Math3D.h's CrossProduct needs both products parenthesised for
+  PhysicsRigidBody slot 11 `0x004cc630`: the second pair places the
+  `lea edx, [esp+0x3c]` of an argument before the torque term's `fsubr`.
+  The first-only form leaves that one instruction four places later; every
+  other function using CrossProduct scores the same with either form.
+- A sum is affected the same way: QueryDot written
+  `a.z * b.z + (a.x * b.x + (a.y * b.y))` moves the store of a copied
+  component after the inner `faddp` (`mov eax, [tmp]; faddp; fld; fmul;
+  mov [dst], eax`), which makes PointInTriangle `0x004278d0` exact; the
+  functions that need the `(y + x) + z` grouping keep their bytes.
+- Parentheses do not fix the operand-order near misses whose leaves come
+  from earlier statements: Camera slot 29 `0x0042eb10` (64 per-component
+  placements), Vehicle slot 34 `0x0040c4c0` (256 placement and operand-order
+  forms of the y and z terms; slot 35, same helper, is exact) and Wrecker
+  `0x00532580` (16 forms applied to all three components).
+
 ## Reproduction
 
 Probes (compile with `tools/compile.py --compiler vc6`, disassemble the

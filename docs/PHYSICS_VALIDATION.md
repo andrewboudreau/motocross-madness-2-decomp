@@ -211,8 +211,10 @@ partial `UpdateWorldMatrix`.
   keeps the flat view.
 - `SetAxes`'s seventh argument is an int.
 - The helpers samples keep the near misses: LocalToWorldPoint,
-  WorldToLocalDirection, WorldToLocalPoint, SetAxesPtr, SetMatrixIn,
-  GetMatrixIn, SetAxesIn and RotateAboutPoint.
+  WorldToLocalDirection, WorldToLocalPoint, SetMatrixIn, GetMatrixIn,
+  SetAxesIn and RotateAboutPoint. SetAxesPtr `0x004fbd70` is exact in
+  soultree.cpp once its cross products parenthesise the first product
+  (VC6_OPERAND_ORDER.md section 3).
 
 **`src/krusty2/bvh/BoundingBoxTreeQuery.cpp`** (an unattested unit,
 `0x00424690..0x0042ad2f`) passes 33 cases:

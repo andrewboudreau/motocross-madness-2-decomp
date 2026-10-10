@@ -137,15 +137,6 @@
     "notes": "same instructions and frame as retail, but the two copied matrices of each block get swapped stack slots (0x50/0x10)"
   },
   {
-    "class": "SoultreeObject",
-    "source": "SoultreeMatrix.cpp",
-    "candidate_symbol_contains": "SetAxesPtr",
-    "target_va": "0x4fbd70",
-    "target_size": 733,
-    "expect": "partial",
-    "notes": "701/733 bytes: three integer instructions (keepZ test, two temp stores) scheduled one x87 instruction early"
-  },
-  {
     "class": "Math",
     "source": "SoultreeMatrix.cpp",
     "candidate_symbol_contains": "TransposeRotation3x3",

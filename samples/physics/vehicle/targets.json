@@ -6,7 +6,7 @@
   "target_va": "0x0040c4c0",
   "target_size": 118,
   "expect": "partial",
-  "notes": "90.4% (118/118). Cross via VehV3::CrossB member helper; remaining divergence: load order of the last product (b.x*y) in r.z.",
+  "notes": "110/118 strict. Same body and CrossB as slot 35 (exact); after GetAxesIn the y and z terms load b.x first in retail (fld [esi]; fmul [edi+8] / [edi+4]), VC6 here this->z / this->y first; no CrossB spelling (256 paren/operand forms) gives slot 34 without breaking slot 35.",
   "bindings": "VehicleInlines.bindings.json"
  },
  {
@@ -15,8 +15,8 @@
   "candidate_symbol_contains": "UnknownVirtualSlot35@Vehicle",
   "target_va": "0x0040c540",
   "target_size": 130,
-  "expect": "partial",
-  "notes": "94.4% (130/130). Same CrossB helper as slot 34; remaining divergence: load order of the last product in r.z.",
+  "expect": "exact",
+  "notes": "strict exact with VehV3::CrossB written as the plain formula with parenthesised first products (fsubp between the load and the store of the copied component).",
   "bindings": "VehicleInlines.bindings.json"
  },
  {

@@ -755,14 +755,16 @@ static inline CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec
 // VC6 orders the cross-product operands differently (retail loads b's
 // component first in every product; swapping the source operands does not
 // change VC6's choice) and does not keep the copy of the product that retail
-// scales.
+// scales. The parenthesised first products (docs/VC6_OPERAND_ORDER.md section 3) give
+// retail's copy schedule (231/296 strict); none of the 4096 per-component combinations of
+// parentheses and written operand order fixes the y and z loads.
 CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
                                  const CollisionVec3* fallback)
 {
     CollisionVec3 c;
-    c.x = a->y * b->z - a->z * b->y;
-    c.y = a->z * b->x - a->x * b->z;
-    c.z = a->x * b->y - a->y * b->x;
+    c.x = (a->y * b->z) - a->z * b->y;
+    c.y = (a->z * b->x) - a->x * b->z;
+    c.z = (a->x * b->y) - a->y * b->x;
     CollisionVec3 n = c;
     if (c.x == 0.0f && c.y == 0.0f && c.z == 0.0f) {
         n = *fallback;

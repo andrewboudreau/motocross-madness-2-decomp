@@ -686,13 +686,15 @@ struct VehV3 : Vec3
         r.z = x * b.y - b.x * y;
         return r;
     }
-    // Same cross product with the y-component written b.x * z (member order is honoured).
+    // The plain formula with each first product parenthesised: the parentheses put each
+    // fsubp between the load and the store of the previous component's copy, as retail does
+    // in the slot 34/35 inlines (docs/VC6_OPERAND_ORDER.md section 3).
     Vec3 CrossB(const Vec3& b) const
     {
         Vec3 r;
-        r.x = y * b.z - z * b.y;
-        r.y = b.x * z - x * b.z;
-        r.z = x * b.y - b.x * y;
+        r.x = (y * b.z) - z * b.y;
+        r.y = (z * b.x) - x * b.z;
+        r.z = (x * b.y) - y * b.x;
         return r;
     }
 };

@@ -98,6 +98,53 @@ int SweptBoxOverlap(Vec3 aCenter, Vec3 aHalf, const Vec3* bCenter, const Vec3* b
     return BoxOverlap(&aCenter, &aHalf, *bCenter, *bHalf, rel);
 }
 
+// 0x00424ab0.  Box A (aCenter, aHalfExtents) against box B (bCenter, bHalfExtents, given in
+// A's frame through bToA): the separating-axis test on A's three axes, B's three axes and
+// their nine cross products.  Naming `dist` and `ra` but not `rb` sets the inline budget
+// that calls all seven dot products out of line, as retail does; the inline cross products
+// need Math3D.h's parenthesised CrossProduct (docs/VC6_OPERAND_ORDER.md section 3).
+int BoxOverlap(const Vec3* aCenter, const Vec3* aHalfExtents, Vec3 bCenter, Vec3 bHalfExtents,
+               const Matrix4* bToA)
+{
+    TransformPointInline(&bCenter, bCenter, bToA);
+    Vec3 a[3];
+    a[0] = Vec3(aHalfExtents->x, 0.0f, 0.0f);
+    a[1] = Vec3(0.0f, aHalfExtents->y, 0.0f);
+    a[2] = Vec3(0.0f, 0.0f, aHalfExtents->z);
+    Vec3 b[3];
+    b[0] = Vec3(bHalfExtents.x, 0.0f, 0.0f);
+    b[1] = Vec3(0.0f, bHalfExtents.y, 0.0f);
+    b[2] = Vec3(0.0f, 0.0f, bHalfExtents.z);
+    RotateVectorInline(&b[0], b[0], bToA);
+    RotateVectorInline(&b[1], b[1], bToA);
+    RotateVectorInline(&b[2], b[2], bToA);
+    Vec3 t = bCenter - *aCenter;
+    for (int i = 0; i < 15; i++) {
+        switch (i) {
+        case 0: s_axes[0] = Vec3(1.0f, 0.0f, 0.0f); break;
+        case 1: s_axes[1] = Vec3(0.0f, 1.0f, 0.0f); break;
+        case 2: s_axes[2] = Vec3(0.0f, 0.0f, 1.0f); break;
+        case 3: s_axes[3] = Vec3(bToA->_11, bToA->_12, bToA->_13); break;
+        case 4: s_axes[4] = Vec3(bToA->_21, bToA->_22, bToA->_23); break;
+        case 5: s_axes[5] = Vec3(bToA->_31, bToA->_32, bToA->_33); break;
+        case 6: s_axes[6] = CrossProduct(s_axes[0], s_axes[3]); break;
+        case 7: s_axes[7] = CrossProduct(s_axes[0], s_axes[4]); break;
+        case 8: s_axes[8] = CrossProduct(s_axes[0], s_axes[5]); break;
+        case 9: s_axes[9] = CrossProduct(s_axes[1], s_axes[3]); break;
+        case 10: s_axes[10] = CrossProduct(s_axes[1], s_axes[4]); break;
+        case 11: s_axes[11] = CrossProduct(s_axes[1], s_axes[5]); break;
+        case 12: s_axes[12] = CrossProduct(s_axes[2], s_axes[3]); break;
+        case 13: s_axes[13] = CrossProduct(s_axes[2], s_axes[4]); break;
+        case 14: s_axes[14] = CrossProduct(s_axes[2], s_axes[5]); break;
+        }
+        float dist = QueryAbs(DotProduct(t, s_axes[i]));
+        float ra = QueryAbs(DotProduct(a[0], s_axes[i])) + QueryAbs(DotProduct(a[1], s_axes[i])) + QueryAbs(DotProduct(a[2], s_axes[i]));
+        if (dist > ra + QueryAbs(DotProduct(b[0], s_axes[i])) + QueryAbs(DotProduct(b[1], s_axes[i])) + QueryAbs(DotProduct(b[2], s_axes[i])))
+            return 0;
+    }
+    return 1;
+}
+
 // 0x004253b0.  Segment p0-p1 (moved by m) against the box (center, halfExtents): the
 // separating-axis test on the three box axes and the three cross products with the segment.
 int SegmentBoxOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 p0, Vec3 p1,
@@ -231,6 +278,30 @@ int LeafPairQuery(QuerySegmentLeaf* a, QueryTriangleLeaf* b)
     }
     }
     return 0;
+}
+
+// 0x004278d0.  Nonzero when p (already in the triangle's plane) lies inside the triangle.
+int PointInTriangle(const Vec3* p, const QueryTriangle* tri)
+{
+    Vec3 e0 = s_vertices[tri->vertex[2]] - s_vertices[tri->vertex[1]];
+    Vec3 e1 = s_vertices[tri->vertex[0]] - s_vertices[tri->vertex[1]];
+    Vec3 d = *p - s_vertices[tri->vertex[1]];
+    Vec3 c = CrossProduct(e0, d);
+    if (QueryDot(c, tri->normal) < 0.0f)
+        return 0;
+    c = CrossProduct(d, e1);
+    if (QueryDot(c, tri->normal) < 0.0f)
+        return 0;
+    e0 = SubtractCtorCall(s_vertices[tri->vertex[0]], s_vertices[tri->vertex[2]]);
+    e1 = SubtractCtorCall(s_vertices[tri->vertex[1]], s_vertices[tri->vertex[2]]);
+    d = SubtractCtorCall(*p, s_vertices[tri->vertex[2]]);
+    c = CrossProductCall(e0, d);
+    if (Vec3DotCall(&tri->normal, &c) < 0.0f)
+        return 0;
+    c = CrossProductCall(d, e1);
+    if (Vec3DotCall(&tri->normal, &c) < 0.0f)
+        return 0;
+    return 1;
 }
 
 // 0x00428950.  Tree against tree: sets up both relative frames (and the motion matrix when

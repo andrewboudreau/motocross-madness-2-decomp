@@ -25940,6 +25940,15 @@ CASES = [
         'target_size': 174,
         'reason': 'SPBikeRiderDlg vtable slot 23; ChkAutoRotate string; preview area copied into a local and inset in place',
     },
+    {
+        'name': 'FollowCamera slot46 orthonormal basis 0x4654e0',
+        'bindings': 'src/reconstructed/FollowCamera.bindings.json',
+        'source': 'src/reconstructed/FollowCamera.cpp',
+        'symbol': 'UnknownVirtualSlot46@FollowCamera',
+        'target_va': '0x004654e0',
+        'target_size': 576,
+        'reason': 'FollowCamera vtable slot 46; up made perpendicular through two inline cross products whose first products are parenthesised (fsubp between the copy load and store)',
+    },
 ]
 
 def main():

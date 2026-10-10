@@ -26,9 +26,7 @@
 // separate result variable, the call's return value, D3DVECTOR casts and
 // `position = direction * k + target` are all worse.
 //
-// FollowCamera::UnknownVirtualSlot46 (0x004654e0, 576 bytes): 563/576. Two
-// `fsubp` instructions of the second cross product are scheduled one
-// instruction later than retail (before/after the copy of the first result).
+// FollowCamera::UnknownVirtualSlot46 (0x004654e0) is exact in src/reconstructed/FollowCamera.cpp.
 //
 // FollowCamera::UnknownVirtualSlot47 (0x00465720, 1265 bytes): 1203/1267. The
 // matrix product needs m[][] operands (operator() operands reorder every sum);
@@ -154,9 +152,11 @@ Vector3 UnknownFunction5015b0(const Vector3& v, float scale);      // 0x005015b0
 Vector3 UnknownFunction515600(const Vector3& a, const Vector3& b); // 0x00515600: cross product
 Vector3 UnknownFunction5087b0(const Vector3& v);                    // 0x005087b0: normalised copy
 
-// Inline cross product (expanded by slot 46).
+// Inline cross product (expanded by slot 46 and 0x004650e0). The parenthesised first
+// products put each fsubp between the load and the store of the previous component's copy,
+// as retail does (docs/VC6_OPERAND_ORDER.md section 3).
 inline Vector3 FollowCameraCross(const Vector3& a, const Vector3& b) {
-    return Vector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    return Vector3((a.y * b.z) - a.z * b.y, (a.z * b.x) - a.x * b.z, (a.x * b.y) - a.y * b.x);
 }
 
 // Inline normalisation: unit-length vectors are returned unchanged.
@@ -245,35 +245,6 @@ bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool 
     field_0x277 = false;
     return false;
 }
-
-// 0x004654e0: an orthonormal basis from `forward` and `up` (up is made
-// perpendicular to forward, both are normalised) stored with the side vector
-// as rows 0-2 of the +0x344 matrix.
-void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
-    Vector3 z = *forward;
-    Vector3 y = *up;
-    y = FollowCameraCross(z, FollowCameraCross(y, z));
-    y = FollowCameraNormalize(y);
-    z = FollowCameraNormalize(z);
-    Vector3 x = UnknownFunction515600(y, z);
-    field_0x344.m[0][0] = x.x;
-    field_0x344.m[0][1] = x.y;
-    field_0x344.m[0][2] = x.z;
-    field_0x344.m[0][3] = 0.0f;
-    field_0x344.m[1][0] = y.x;
-    field_0x344.m[1][1] = y.y;
-    field_0x344.m[1][2] = y.z;
-    field_0x344.m[1][3] = 0.0f;
-    field_0x344.m[2][0] = z.x;
-    field_0x344.m[2][1] = z.y;
-    field_0x344.m[2][2] = z.z;
-    field_0x344.m[2][3] = 0.0f;
-    field_0x344.m[3][0] = 0.0f;
-    field_0x344.m[3][1] = 0.0f;
-    field_0x344.m[3][2] = 0.0f;
-    field_0x344.m[3][3] = 1.0f;
-}
-
 
 // 0x00465720: while this is the owner's active camera, advances the clock,
 // wraps it to the loaded records and takes the record's matrix times +0x344 as

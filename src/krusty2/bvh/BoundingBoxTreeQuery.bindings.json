@@ -1,4 +1,5 @@
 {
+  "??0Vec3@@QAE@MMM@Z": "0x00404e60",
   "??0Vec3Call@@QAE@MMM@Z": "0x00404e60",
   "??3@YAXPAX@Z": "0x004a30c0",
   "??YVec3AddAssignCall@@QAEAAU0@ABUVec3@@@Z": "0x00428060",
@@ -7,6 +8,9 @@
   "?BoxTriangleQuery@@YAHPBUVec3@@0PBUQueryTriangle@@PBUMatrix4@@@Z": "0x00426be0",
   "?CapsuleTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z": "0x004298c0",
   "?CapsuleTreeQueryWithVertices@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@HPAU1@@Z": "0x00429890",
+  "?CrossProduct@@YA?AUVec3@@ABU1@0@Z": "0x00515600",
+  "?CrossProductCall@@YA?AUVec3@@ABU1@0@Z": "0x00515600",
+  "?DotProduct@@YAMABUVec3@@0@Z": "0x0040ae30",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?FreeBoxTree@@YAXPAUQueryTreeNode@@@Z": "0x0042a160",
   "?InverseTransformPoint@@YAXPAUVec3@@U1@PBUMatrix4@@@Z": "0x0042a5e0",
@@ -61,6 +65,7 @@
   "_kVec3YAxis": "0x00579008",
   "_kVec3ZAxis": "0x00578ea0",
   "_kVec3Zero": "0x00578f30",
+  "_s_axes": "0x00578f50",
   "_s_mode": "0x0057905c",
   "_s_motion": "0x00579018",
   "_s_relativeAB": "0x00578ef0",

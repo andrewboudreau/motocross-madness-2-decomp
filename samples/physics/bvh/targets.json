@@ -11,16 +11,6 @@
   {
     "class": "BoundingBoxTreeQuery",
     "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?PointInTriangle@@YAHPBUVec3@@PBUQueryTriangle@@@Z",
-    "target_va": "0x004278d0",
-    "target_size": 830,
-    "expect": "partial",
-    "notes": "near miss: two copies and the lea ebx of the normal pointer scheduled differently",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "BoundingBoxTreeQuery",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
     "candidate_symbol_contains": "?SphereTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z",
     "target_va": "0x00429570",
     "target_size": 789,
@@ -66,16 +56,6 @@
     "target_size": 1101,
     "expect": "partial",
     "notes": "natural operator form: retail's inline/out-of-line helper sequence; retail keeps 1 in ebp and loads segment[1] at entry (see the file header).",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "(free)",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?BoxOverlap@@",
-    "target_va": "0x00424ab0",
-    "target_size": 2300,
-    "expect": "partial",
-    "notes": "2252/2300: instruction-identical except the fsubp/copy scheduling of the three inline cross products (see the file header).",
     "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   },
   {

@@ -185,8 +185,8 @@
     "candidate_symbol_contains": "SolveContact@RotatingShock",
     "target_va": "0x004fac60",
     "target_size": 880,
-    "expect": "partial",
-    "notes": "partial 94%: jump-table extent; only the scheduling of the cross-product struct copies differs",
+    "expect": "exact",
+    "notes": "strict exact; jump-table extent; needs the parenthesised first product of ShockCross (fsubp between the load and the store of the copied component)",
     "bindings": "Shock.bindings.json"
   },
   {

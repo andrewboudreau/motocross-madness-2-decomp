@@ -76,11 +76,12 @@ void SoultreePhysicsBaseObject::UnknownVirtualSlot3(const Vec3* a1, const Vec3* 
     worldAngularVelocity = sceneNode->LocalToWorldDirection(angularVelocity);
 }
 
-// Cross product built with the three-float constructor.  Slot 4 matches better with this
-// form than with SoultreeCross (87.5% vs 85.1%); some fmul operand loads still differ.
+// Cross product built with the three-float constructor, each first product parenthesised:
+// slot 4 is exact with this form (the parentheses put each fsubp between the load and the
+// store of the previous component's copy; docs/VC6_OPERAND_ORDER.md section 3).
 static inline Vec3 SoultreeCrossCtor(const Vec3& a, const Vec3& b)
 {
-    return Vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    return Vec3((a.y * b.z) - a.z * b.y, (a.z * b.x) - a.x * b.z, (a.x * b.y) - a.y * b.x);
 }
 
 // slot 4 (0x005013d0)

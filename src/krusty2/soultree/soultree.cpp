@@ -15,7 +15,7 @@
 //
 // Every function below is strict exact. Near misses of the same unit (LocalToWorldPoint
 // 0x004fd660, WorldToLocalDirection 0x004fd710, WorldToLocalPoint 0x004fd7f0, SetMatrixIn
-// 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesPtr 0x004fbd70, SetAxesIn 0x004fc050,
+// 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesIn 0x004fc050,
 // GetMatrixIn 0x004fca80, RotateAboutPoint 0x004fd1f0) are in samples/physics/helpers/.
 // Scale 0x004fd340 (inline 4x4 product), AccumulateBounds 0x004fe2e0 and GetWorldBounds
 // 0x004fe8a0 are near misses in samples/physics/helpers/SoultreeBounds.cpp.
@@ -207,6 +207,60 @@ void SoultreeObject::SetAxes(float zx, float zy, float zz, float yx, float yy, f
     Vec3 z(zx, zy, zz);
     Vec3 y(yx, yy, yz);
     SetAxesPtr(&z, &y, orthogonalize, keepZ);
+}
+
+// v / |v| through the out-of-line Vec3 helpers; v itself when |v|^2 is exactly 1.
+static inline Vec3 Normalized(const Vec3& v)
+{
+    float lenSq = Vec3DotCall(&v, &v);
+    if (lenSq == 1.0f)
+        return v;
+    float inv = FastInvSqrt(lenSq);
+    Vec3 r;
+    return *Vec3ScaleCall(&r, &v, inv);
+}
+
+// 0x004fbd70, ret 0x10. Builds the local rotation from row 2 = *axisZ and row 1 = *axisY
+// (row 0 = y x z), keeping the local translation. With 'orthogonalize', r = y x z first
+// replaces y by z x r (keepZ) or z by r x y. Both axes are normalized through the out-of-line
+// helpers (0x0040ae30, 0x00460c00, 0x005015b0); row 0 comes from 0x00515600.
+// The inline cross products need Math3D.h's parenthesised first products (fsubp between the
+// load and the store of the copied component, docs/VC6_OPERAND_ORDER.md section 3).
+void SoultreeObject::SetAxesPtr(const Vec3* axisZ, const Vec3* axisY, int orthogonalize, int keepZ)
+{
+    Vec3 pos;
+    pos.x = localMatrix._41;
+    pos.y = localMatrix._42;
+    pos.z = localMatrix._43;
+    Vec3 z = *axisZ;
+    Vec3 y = *axisY;
+    if (orthogonalize) {
+        Vec3 r = CrossProduct(y, z);
+        if (keepZ)
+            y = CrossProduct(z, r);
+        else
+            z = CrossProduct(r, y);
+    }
+    y = Normalized(y);
+    z = Normalized(z);
+    Vec3 x = CrossProductCall(y, z);
+    localMatrix._11 = x.x;
+    localMatrix._12 = x.y;
+    localMatrix._13 = x.z;
+    localMatrix._14 = 0.0f;
+    localMatrix._21 = y.x;
+    localMatrix._22 = y.y;
+    localMatrix._23 = y.z;
+    localMatrix._24 = 0.0f;
+    localMatrix._31 = z.x;
+    localMatrix._32 = z.y;
+    localMatrix._33 = z.z;
+    localMatrix._34 = 0.0f;
+    localMatrix._41 = pos.x;
+    localMatrix._42 = pos.y;
+    localMatrix._43 = pos.z;
+    localMatrix._44 = 1.0f;
+    InvalidateWorldMatrix();
 }
 
 // 0x004fc4f0. Local rotation rows 2 and 1; either output may be null.

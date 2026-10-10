@@ -1,11 +1,13 @@
 // Near-miss GraphicsTest.cpp candidates (src/krusty2/core/GraphicsTest.cpp), kept out of
 // src/krusty2 until they match.
 //
-// 0x0047bd10 (circle, 917 bytes): same calls (two inlined and two out-of-line cross
-// products, two Vec3Normalize calls), loop and vertex fill. The frame is 0xb84 against
-// retail's 0xb78 (one more Vec3 temporary), and VC6 here picks the other operand order in
-// several products of the basis and of the point transform; the source term order does
-// not change it.
+// 0x0047bd10 (circle, 917 bytes, 814 strict): same calls (two inlined and two out-of-line
+// cross products, two Vec3Normalize calls), loop and vertex fill. With Math3D.h's
+// parenthesised CrossProduct the basis products match retail's operand order and schedule
+// except one load of the first inline cross product (issued one instruction early). Left:
+// the frame (0xb84 against retail's 0xb78, one more Vec3 temporary), the `[eax - 4]` store of
+// the vertex fill, one x87 load scheduled later in the point loop and the operand order of
+// `points[i] += *center` (retail loads the centre first).
 //
 // 0x0047c270 (DrawBox, 626 bytes): 622 of 626 positions; the z sum of `corners[i] +=
 // *center` loads center.z first in retail (x and y match).

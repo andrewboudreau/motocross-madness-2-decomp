@@ -368,5 +368,25 @@
     "expect": "exact",
     "notes": "moved from samples; moved and swept centres in sibling blocks (shared slot), centre read through a pointer, component-wise add",
     "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?BoxOverlap@@",
+    "target_va": "0x00424ab0",
+    "target_size": 2300,
+    "expect": "exact",
+    "notes": "moved from samples; 15-axis box/box SAT; the inline cross products need Math3D.h's parenthesised first product (fsubp between the copy's load and store)",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?PointInTriangle@@",
+    "target_va": "0x004278d0",
+    "target_size": 830,
+    "expect": "exact",
+    "notes": "moved from samples; inline cross products and QueryDot first, out-of-line helpers second; needs the parenthesised first product of CrossProduct and the (a.y * b.y) term of QueryDot",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
   }
 ]
