@@ -25,8 +25,12 @@ D3DIMSoultreeShadow.cpp (D3DIMSoultreeShadow : ShadowReceiver : GameObject, vtab
 ctor 0x446840, Attach 0x4468b0, slot 28 0x446bf0, both deleting dtors (0x446890 is shared with TerrainShadow by
 identical code folding, 0x4477a0), ShadowReceiver slot 8 / dtor, and the four ShadowConstVec3 `$E` pairs are exact.
 Slot 14 (0x447540, 574 bytes) is exact too; it fills the file's vertex array g_d3dimShadowVertices
-(0x581eb8, 3000 32-byte vertices). Open: slots 27, 29 and 30 (inlined 4x4 matrix products, x87 operand
-order). The 0x447910 setter is placed with DebugOverlay.cpp (docs/DEBUGOVERLAY.md). Ownership: slot 30 (0x446f40) pushes the file's own
+(0x581eb8, 3000 32-byte vertices). Near misses (samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp):
+slot 27 0x4468f0 (767 B, 746/767) and slot 29 0x446c30 (771 B, 712/771) are the caster-bounds box test
+(0x52f570) against the shadow camera / the render target's camera after an inlined 4x4 product; only the
+product's x87 term order differs (13 of 16 elements in the best natural form). Slot 30 0x446f40 (1524 B,
+180/1485) builds the receiver vertices from the caster's current LOD meshes; retail rounds the clipped points
+with an inline __asm fld/fistp helper (ebp frame), so it stays partial under the no-asm rule. The 0x447910 setter is placed with DebugOverlay.cpp (docs/DEBUGOVERLAY.md). Ownership: slot 30 (0x446f40) pushes the file's own
 `__FILE__` 0x568cac at 0x447023/0x447043, and the other methods are contiguous members of the same class.
 
 Partial: ctor 84% (prevMinX/Y store scheduling), Init 19.6%, SetLight 6%, ComputeBounds 5.5%

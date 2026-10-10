@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 194, c 143, total 337. The three class (a) functions of the
+Counts: a 0, b 195, c 145, total 340. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -183,6 +183,9 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/motion/Motnctrl | `0x004a8470` | 212/1093 (masked) | c | 43 code diffs: retail adds `push ebp`; retail lacks `push ebp` |
 | physics/motion/SteeringControl | `0x00504d30` | 125/206 (masked) | b | 6 code diffs: `fxch st(2) ; fmul st(2)` vs `fld st(0) ; fmul st(3)`; `fmul st(2)` vs `fmul st(1)`; slots differ |
 | physics/rigidbody/PhysicsRigidBody | `0x004cc630` | 983/1030 (masked) | b | 5 code diffs: retail adds `lea edx, [esp + N]`; retail lacks `lea edx, [esp + N]`; slots differ |
+| physics/shadow/D3DIMSoultreeShadow | `0x004468f0` | 746/767 | c | x87 term order of the inlined 4x4 product (elements _21.._23); the rest, frame included, is retail's |
+| physics/shadow/D3DIMSoultreeShadow | `0x00446c30` | 712/771 | c | x87 term order of the inlined 4x4 product, same helper as slot 27 |
+| physics/shadow/D3DIMSoultreeShadow | `0x00446f40` | 180/1485 | b | retail's inline __asm fld/fistp rounding helper forces an ebp frame (0xe4 locals); the (int) casts call __ftol |
 | physics/shadow/ProjectedShadow | `0x004da570` | 231/275 (masked) | c | 4 code diffs: `mov [esi + 0x88], eax` vs `mov edx, A`; `mov ecx, A` vs `mov [esi + 0x88], eax` |
 | physics/shadow/ProjectedShadow | `0x004da7b0` | 152/777 (masked) | b | 22 code diffs: `lea ecx, [esp + N] ; mov eax, [eax + 4]~` vs `lea edx, [esp + N] ; mov ecx, [eax + 4]~`; `push ecx` vs `push edx`; slots differ |
 | physics/shadow/ProjectedShadow | `0x004dae50` | 21/345 (masked) | b | 27 code diffs: `mov eax, [esp + N] ; sub esp, 0xc ; cmp~` vs `sub esp, N ; push ebx ; mov ebx, [esp +~`; `mov esi, ecx ; jne @72 ; mov edi, [esp ~` vs `cmp ebx, 1 ; mov edi, ecx ; jne @74`; frame 0x0 vs 0xc |
