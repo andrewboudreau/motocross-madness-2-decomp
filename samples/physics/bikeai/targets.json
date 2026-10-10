@@ -18,5 +18,35 @@
     "expect": "partial",
     "notes": "AI path steering direction; full control flow and arithmetic reconstructed (1944 vs 1936 bytes). Retail allocates path=esi/best=edi (swapped here) and a different frame slot order for the Vec3 temporaries; see the file header.",
     "bindings": "BikeAINearMisses.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAINearMisses.cpp",
+    "candidate_symbol_contains": "UnknownFunction415640",
+    "target_va": "0x00415640",
+    "target_size": 6112,
+    "expect": "partial",
+    "notes": "obstacle query along a segment (quadtree / GameObjectIterator walk, debug new line 0xb24); control flow, calls, constants and frame size match (5987/6111); the high one-use temporaries are ordered differently and two dot-call argument pushes are scheduled earlier, see the file header.",
+    "bindings": "BikeAINearMisses.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAINearMisses.cpp",
+    "candidate_symbol_contains": "UnknownFunction40eca0",
+    "target_va": "0x0040eca0",
+    "target_size": 17585,
+    "expect": "partial",
+    "notes": "two-wheel look-ahead simulation, fully reconstructed with natural Math3D operators (VC6's inline budget reproduces retail's inline/constructor-call/operator-call switch-over); 392 masked code differences, frame 0x8b8 vs 0x93c, see the file header.",
+    "bindings": "BikeAINearMisses.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAINearMisses.cpp",
+    "candidate_symbol_contains": "??ZVec3@@QAEAAU0@ABU0@@Z",
+    "target_va": "0x00413160",
+    "target_size": 33,
+    "expect": "exact",
+    "notes": "Vec3::operator-= (math/Math3D.h) out-of-line COMDAT that VC6 emits after 0x0040eca0 once that function exhausts its inline budget (called at 0x00412eff / 0x00412f97)",
+    "bindings": "BikeAINearMisses.bindings.json"
   }
 ]

@@ -158,23 +158,38 @@ Extent: `0x40d070..0x416e1f` (strong inference). Bike.cpp ends at
 `0x415640`. A second Math3D set at `0x417350` means BikeCamera code
 (`0x416e20..0x417aff`) is a separate, unattested unit.
 
-Two near misses are in `samples/physics/bikeai`. The steering direction
-`0x40e510` differs by an esi/edi swap and frame order. The jump prediction
-`0x40d200` (4464 bytes, 4430/4464) differs only in the scheduling of two
-stores.
-The two KrustyBike methods `0x413200` and `0x414370` wait on KrustyBike.h's
-promotion. The other large functions are not attempted. The Vec3
-`operator-=` COMDAT copy `0x413160` stays unregistered: VC6 emits it only
-for its first caller (`0x412eff`), inside the unreconstructed BikeAI function
-that starts at `0x40eca0`; `0x412700` is a mid-function address, not a function start.
+Four near misses and one exact COMDAT are in `samples/physics/bikeai`:
+- the steering direction `0x40e510` differs by an esi/edi swap and frame order;
+- the jump prediction `0x40d200` (4464 bytes, 4430/4464) differs only in the
+  scheduling of two stores;
+- the obstacle query `0x415640` (6112 bytes, 5987/6111) differs in the order of
+  its one-use temporaries and two argument-push placements;
+- the two-wheel look-ahead simulation `0x40eca0` (17585 bytes, extent
+  `0x40eca0..0x413150`; `0x412700` is a mid-function address) is fully
+  reconstructed: 392 masked code differences, frame 0x8b8 vs 0x93c;
+- the Vec3 `operator-=` COMDAT `0x413160` is strict exact; VC6 emits it after
+  `0x40eca0`, whose epilogue calls it.
+
+`0x40eca0` exhausts VC6's per-function inline budget. Its first part expands every
+Vec3 operator; from `0x410d00` the operators are expanded but call the
+out-of-line constructor `0x404e60`; the epilogue calls whole operators
+(`0x428090`, `0x421cb0`, `0x421d00`, `0x5015b0`, `0x413160`). Natural Math3D
+operators reproduce this pattern call for call (one site differs). The budget is
+consumed per inline expansion, so source forms before a switch-over point move
+it. The two KrustyBike methods `0x413200` and `0x414370` wait on KrustyBike.h's
+promotion.
 
 ```bash
 python tools/run_physics_samples.py --strict \
   --source src/krusty2/vehicle/BikeAI.cpp \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
+python tools/run_physics_samples.py --strict \
+  --source samples/physics/bikeai/BikeAINearMisses.cpp \
+  --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-This run reports `23/23 strict exact`.
+The first run reports `23/23 strict exact`, the second `1/5 strict exact` (the
+COMDAT; the four near misses are registered as partial).
 
 ## Wave-10 soultree and box-tree query slice
 

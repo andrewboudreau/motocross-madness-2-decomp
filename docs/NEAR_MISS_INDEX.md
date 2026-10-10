@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 196, c 150, total 346. The three class (a) functions of the
+Counts: a 0, b 198, c 150, total 348. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -132,6 +132,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | net/ZoneReport | `0x0049ca60` | 4792/4810 | c | retail folds the 1-based type's +1 into the `>= 30` branch (`add ebx, -0x1a`, jumping past the else branch's `inc ebx`); VC6 here subtracts 27 and increments after the join (an in-branch +1 spills the index) |
 | physics/bikeai/BikeAI | `0x0040d200` | 4430/4464 | c | 2 scheduling diffs: the initial `seg.y = 0` store and the ground-branch `p.y = ground.y` store each sit one instruction pair earlier than retail's |
 | physics/bikeai/BikeAI | `0x0040e510` | 1133/1944 | b | 53 code diffs: retail adds `mov esi, [esp + N] ; test esi, esi`; `mov edi, [esp + N] ; test edi, edi ; je~` vs `je @582`; slot order differs |
+| physics/bikeai/BikeAI | `0x00415640` | 5987/6111 | b | 17 code diffs: retail pushes the dot-call arguments after the z*z term (`faddp ; fld ; fmul ; push ; push` vs `push ; push ; faddp`); order of the one-use temporaries above +0x100 differs |
+| physics/bikeai/BikeAI | `0x0040eca0` | 1288/17345 | b | 392 code diffs: retail keeps the start-up and loop-head zero vectors in memory (candidate folds them); frame 0x93c vs 0x8b8, slot order differs |
 | physics/bvh/BoundingBoxTreeBuild | `0x0042c260` | 447/1627 | b | 1 code diffs: retail lacks `mov edx, [eax + 0x27c] ; mov eax, [eax ~`; slots differ |
 | physics/bvh/BoundingBoxTreeBuild | `0x0042d390` | 1601/1608 | b | 3 code diffs: `mov ebx, [ebx + ecx]` vs `mov ebx, [ecx + ebx]`; `mov ebx, [ebx + ecx - 0x1c]` vs `mov ebx, [ecx + ebx - 0x1c]`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004278d0` | 778/830 | b | 7 code diffs: retail adds `fsubp st(1) ; fld [esp + N] ; fmul [esp~`; retail adds `fld [esp + N] ; fmul [esp + N] ; lea eb~`; slots differ |
