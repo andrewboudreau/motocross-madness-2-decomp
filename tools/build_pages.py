@@ -21,7 +21,7 @@ REPO_URL = 'https://github.com/andrewboudreau/motocross-madness-2-decomp'
 
 # Landing-page groups; every other document is listed under "Units".
 GROUPS = [
-    ('Status', ['DECOMPILATION_PROGRESS', 'VC6_MATCHING', 'NEAR_MISS_INDEX',
+    ('Status', ['DECOMPILATION_PROGRESS', 'REBUILD_GAPS', 'VC6_MATCHING', 'NEAR_MISS_INDEX',
                 'UNATTRIBUTED', 'INITIALIZERS', 'PHYSICS_VALIDATION']),
     ('How VC6 SP3 compiles this code', ['VC6_FRAME_LAYOUT', 'VC6_OPERAND_ORDER',
                                         'VC6_INLINE_BUDGET', 'VC6_CRT_ATLAS']),

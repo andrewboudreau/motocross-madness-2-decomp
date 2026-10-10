@@ -171,3 +171,17 @@ category-pilots-probe: ensure-work
 
 category-pilots-test:
 	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_category_pilots.py' -v
+
+.PHONY: rebuild-data-coverage rebuild-data-coverage-test
+rebuild-data-coverage: ensure-work
+	VC6_ROOT="$(VC6_ROOT)" PYTHONPATH=. $(PYTHON) tools/rebuild_data_coverage.py --exe "$(EXE)"
+
+rebuild-data-coverage-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_rebuild_data_coverage.py' -v
+
+.PHONY: rebuild-coverage rebuild-coverage-test
+rebuild-coverage:
+	$(PYTHON) tools/with_private_env.py --root "$(PRIVATE_ROOT)" -- $(PYTHON) tools/rebuild_coverage.py --run-vc6
+
+rebuild-coverage-test:
+	PYTHONPATH=. $(PYTHON) -m unittest discover -s tests -p 'test_rebuild_coverage.py' -v
