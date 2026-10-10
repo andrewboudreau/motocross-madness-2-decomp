@@ -22,6 +22,73 @@ public:
     virtual unsigned long __stdcall Release();
 };
 
+// IDirect3DVertexBuffer7-shaped (slot 27 locks 0x1f8c with flags 1 and unlocks it; slot 14 does
+// the same with 0x1f88).  Slot 3 Lock(flags, &data, &size), slot 4 Unlock (tier 1 call shapes).
+class ParticleVertexBuffer : public ParticleComObject {
+public:
+    virtual long __stdcall Lock(unsigned long flags, void** data, unsigned long* size);
+    virtual long __stdcall Unlock();
+};
+
+// D3DVERTEXBUFFERDESC-shaped stack block passed to ParticleDirect3D slot 5 by slot 27:
+// size 0x10, caps 0x800, FVF 0x1c4 or 0x1e2, vertex count 1500 or 4000.
+struct ParticleVertexBufferDesc {
+    unsigned long size;
+    unsigned long caps;
+    unsigned long fvf;
+    unsigned long vertexCount;
+};
+
+// IDirect3D7-shaped: slot 27 calls slot 5 (CreateVertexBuffer(desc, &buffer, 0)) three times.
+class ParticleDirect3D : public ParticleComObject {
+public:
+    virtual long __stdcall UnknownVirtualSlot3();
+    virtual long __stdcall UnknownVirtualSlot4();
+    virtual long __stdcall CreateVertexBuffer(ParticleVertexBufferDesc* desc,
+                                              ParticleVertexBuffer** buffer, unsigned long flags);
+};
+
+// GameObject::field_0x18 as slot 27 walks it: (+0x04)->(+0x194) is the Direct3D object.
+struct ParticleDeviceHolder {
+    char field_0x00[0x194];
+    ParticleDirect3D* direct3D;    // +0x194
+};
+struct ParticleRenderContext {
+    char field_0x00[4];
+    ParticleDeviceHolder* device;  // +0x04
+};
+
+// The texture 0x0050a590 returns (a TextureMap; BaseObject slot 2 releases it in the dtor).
+// Slot 27 calls its slot 8 with (1, 0, 0).
+class ParticleTexture : public BaseObject {
+public:
+    virtual int UnknownVirtualSlot4();
+    virtual int UnknownVirtualSlot5();
+    virtual ParticleTexture* UnknownVirtualSlot6();
+    virtual int UnknownVirtualSlot7();
+    virtual int UnknownVirtualSlot8(int a, int b, int c);
+};
+class TextureMapManager;
+// 0x0050a590 (cdecl; src/reconstructed/TextureMap.h UnknownFunction50a590): the texture
+// `name` through the manager; 0 on failure.  Pointer parameters other than the first two are
+// passed as 0 here.
+ParticleTexture* UnknownFunction50a590(TextureMapManager* manager, const char* name, int format,
+                                       void* palette, int flags, int addressU, int addressV,
+                                       void* choice, int alphaThreshold, unsigned int key,
+                                       int addRef, int fromArchive);
+
+// One 0x20-byte TLVERTEX-sized template (FVF 0x1c4); slot 27 writes only x, y, z.
+struct ParticleCornerVertex {
+    float x, y, z;
+    char field_0x0c[0x20 - 0x0c];
+};
+
+// Four sprite-cell texture-coordinate corners (u, v) in the global table at 0x00689158
+// (61 entries, slot 27 fills 0..17 and 29..60).
+struct ParticleUVRect {
+    float u0, v0, u1, v1, u2, v2, u3, v3;
+};
+
 // The global at 0x0056e26c (tier 3 name).  Only the two words the particle code tests are known.
 struct ParticleGameContext {
     char field_0x00[0x1c4];
@@ -80,7 +147,10 @@ public:
     virtual ~ParticleManager();
     virtual int GameObjectVirtualSlot10(float dt);
     virtual int GameObjectVirtualSlot14();
-    virtual int UnknownVirtualSlot27(void* a, void* b, void* c, void* d);
+    // 0x004ba4d0 (ret 0x10): returns this, or 0 (after BaseObject slot 2) when a vertex buffer
+    // or the index array is missing.
+    virtual ParticleManager* UnknownVirtualSlot27(int parentArg, TextureMapManager* textures,
+                                                  const char* textureName, int field);
 
     // 0x004baa50 (thiscall, ret 0x20).  Takes the next particle from the free tail of the table
     // and fills it in; returns 0 when all 1000 are in use.
@@ -92,14 +162,16 @@ public:
     char field_0x34[0x40 - 0x34];
     Particle* particles[1000];          // +0x40 0x3e8 pointers, zeroed by the ctor, filled in slot 27, freed by the dtor
     Particle* visible[1000];            // +0xfe0 slot 14 collects the drawable particles here and qsorts them by depth
-    BaseObject* field_0x1f80;           // +0x1f80 released through BaseObject slot 2 (`call [eax+8]` with this in ecx) by the dtor
-    ParticleComObject* vertexBuffer;                 // +0x1f84 COM object released by the dtor (slot 27 asks the device for 0x1e2.. bytes)
-    ParticleComObject* indexBufferObject;            // +0x1f88 COM object released by the dtor
-    ParticleComObject* field_0x1f8c;                 // +0x1f8c COM object locked in slot 27 (0x7d00 dwords zeroed)
+    ParticleTexture* texture;           // +0x1f80 slot 27 loads it (0x0050a590); released through BaseObject slot 2 by the dtor
+    ParticleVertexBuffer* vertexBuffer;              // +0x1f84 FVF 0x1c4, 1500 vertices (slot 27); released by the dtor
+    ParticleVertexBuffer* indexBufferObject;         // +0x1f88 FVF 0x1e2, 1500 vertices (slot 27); locked by slot 14; released by the dtor
+    ParticleVertexBuffer* field_0x1f8c;              // +0x1f8c FVF 0x1c4, 4000 vertices; slot 27 locks it and zeroes 0x1f400 bytes
     int field_0x1f90;                   // +0x1f90 set to 1 by the ctor and again by slot 27
     unsigned short* indices;            // +0x1f94 delete'd by the dtor; slot 27 fills 0x2ee0 bytes of quad indices
     ParticleVec3 gravity;               // +0x1f98 ctor stores (0, -64, 0); slot 10 adds dt*gravity to flagged particle velocity
-    char field_0x1fa4[0x2058 - 0x1fa4]; // +0x1fa4.. slot 27 fills texture/corner tables; not decoded yet
+    ParticleCornerVertex corners[4];    // +0x1fa4 slot 27: (1,1,0), (-1,1,0), (1,-1,0), (-1,-1,0)
+    ParticleVec3 cornerNormals[4];      // +0x2024 slot 27: (+-1, +-1, 0.25) scaled by FastInvSqrt(2.0625)
+    int field_0x2054;                   // +0x2054 slot 27's last argument
 };
 
 #endif

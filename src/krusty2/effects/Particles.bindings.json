@@ -3,8 +3,20 @@
   "??1GameObject@@UAE@XZ": "0x468d60",
   "??1ParticleManager@@UAE@XZ": "0x4ba420",
   "??1ParticleManager@@UAE@XZ$ehhandler": "0x54c9a8",
+  "??2@YAPAXIPBDH@Z": "0x4a3010",
   "??3@YAXPAX@Z": "0x4a30c0",
   "??_7ParticleManager@@6B@": "0x555d10",
+  "?FastInvSqrt@@YAMM@Z": "0x460c00",
+  "?GameObjectVirtualSlot8@GameObject@@UAEPAV1@H@Z": "0x4692f0",
+  "?UnknownFunction50a590@@YAPAVParticleTexture@@PAVTextureMapManager@@PBDHPAXHHH2HIHH@Z": "0x50a590",
   "?g_gameContext@@3PAUParticleGameContext@@A": "0x56e26c",
-  "__real@4@4008fa00000000000000": "0x550f44"
+  "?g_particleCellUVs@@3PAUParticleUVRect@@A": "0x689158",
+  "__FILE__:particles.cpp": "0x56fa00",
+  "__real@4@3ffb8000000000000000": "0x553e78",
+  "__real@4@3ffc8000000000000000": "0x55080c",
+  "__real@4@3ffd8000000000000000": "0x5507f8",
+  "__real@4@3ffe8000000000000000": "0x5507f4",
+  "__real@4@3ffec000000000000000": "0x55084c",
+  "__real@4@4008fa00000000000000": "0x550f44",
+  "__real@4@bfff8000000000000000": "0x550810"
 }

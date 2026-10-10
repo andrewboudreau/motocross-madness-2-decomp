@@ -180,6 +180,16 @@
     "bindings": "Particles.bindings.json"
   },
   {
+    "class": "ParticleManager",
+    "source": "Particles.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot27@ParticleManager",
+    "target_va": "0x004ba4d0",
+    "target_size": 1406,
+    "expect": "exact",
+    "notes": "vtable 0x00555d10 slot 27: 1000 debug-new particles (line 0x48a), three CreateVertexBuffer calls, the 6000-entry quad index array (line 0x4a8), the sprite-cell UV table at 0x00689158, the texture load and the corner templates/normals",
+    "bindings": "Particles.bindings.json"
+  },
+  {
     "class": "NullManager",
     "source": "Nulls.cpp",
     "candidate_symbol_contains": "GameObjectVirtualSlot8@NullManager",

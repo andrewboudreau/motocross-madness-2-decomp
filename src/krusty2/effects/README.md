@@ -1,6 +1,6 @@
 # effects: Particles.cpp, NormalDistribution.cpp, Nulls.cpp
 
-Validation: the 18 cases in this directory pass strict VC6 SP3 comparison,
+Validation: the 19 cases in this directory pass strict VC6 SP3 comparison,
 including the added NullManager slot-8 override. Adjacent bindings resolve every
 relocation. The emitter samples are strict too (bindings next to each sample source).
 
@@ -10,9 +10,9 @@ Retail files (all under `D:\aardvark\VC\krusty2\`):
 |---|---|---|---|---|
 | NormalDistribution.cpp | 0x0056ece4 | 0x4afdea..0x4b0109 | 0x4affcb..0x4b0059 (debug delete, line 0x1e) | 6 / 0 |
 | Nulls.cpp | 0x0056ed14 | 0x4b0059..0x4b0239 | 0x4b0109 (the `new` at line 5) | 6 / 0 |
-| Particles.cpp | 0x0056fa00 | 0x4b8584..0x4bb8d8 | 0x004ba4f1 and 0x004ba5c8 (slot 27, line 0x48a and 0x4a8) | 6 / 0 (+ 2 slots unattempted) |
+| Particles.cpp | 0x0056fa00 | 0x4b8584..0x4bb8d8 | 0x004ba4f1 and 0x004ba5c8 (slot 27, line 0x48a and 0x4a8) | 7 / 0 (+ slot 14 unattempted) |
 
-18 strict cases, 0 partial in this directory. `samples/physics/effects/` adds 33 strict exact and 8 partial (41 entries) for the
+19 strict cases, 0 partial in this directory. `samples/physics/effects/` adds 33 strict exact and 8 partial (41 entries) for the
 emitter classes and the vector-constant initialisers, whose ownership is not proven; 0 required failures
 (DirtChunk, DirtSpray and Spark slot 10 are 98.3% partials).
 
@@ -33,6 +33,16 @@ emitter classes and the vector-constant initialisers, whose ownership is not pro
 * `ParticleManager`: RTTI COL 0x0055e0b0, vtable 0x00555d10 (28 slots), base GameObject at offset 0. Overrides slot 0, slot 10
   (0x004baaf0), slot 14 (0x004bac60) and adds slot 27 (0x004ba4d0). Size at least 0x2058; each `Particle` is 0x48 bytes
   (`new(0x48, __FILE__, 0x48a)` x 1000).
+* Slot 27 (0x004ba4d0, exact) fills the rest of the object: `field_0x18`(+4)(+0x194) is an IDirect3D7-shaped object whose slot 5
+  (CreateVertexBuffer) gets a {0x10, caps 0x800, FVF, count} block three times: +0x1f84 (FVF 0x1c4, 1500), +0x1f88 (0x1e2, 1500),
+  +0x1f8c (0x1c4, 4000; locked with flags 1, 0x1f400 bytes zeroed, unlocked). +0x1f94 is `new unsigned short[6000]` (line 0x4a8) of quad
+  indices (4i, 4i+1, 4i+2, 4i, 4i+2, 4i+3). +0x1f80 is the 0x0050a590 texture (format 0x115c, key 0xff00ff), slot 8 called with (1, 0, 0).
+  +0x1fa4 holds four 0x20-byte vertex templates (x, y = +-1, z = 0), +0x2024 four Vec3 (+-1, +-1, 0.25) * FastInvSqrt(2.0625), +0x2054 the
+  last argument. Returns this, or 0 after BaseObject slot 2 when either vertex buffer at +0x1f84/+0x1f88 or the index array is null.
+* Global 0x00689158: 61 sprite cells of four (u, v) corners. Slot 27 fills cells 0..13 (4x4 grid of 0.25), 14..17 (0.125 cells from
+  (0.25, 0.75)), 29..44 (0.0625 cells from (0.5, 0.75)) and 45..60 (0.0625 cells from (0.75, 0.75)); cells 18..28 are not written there.
+  Shapes that mattered: the index loop written over the quad number (`indices[i*6 + k] = i*4 + c`); a quad-counter loop over the
+  index position, or a named `v = i*4`, changes the strength reduction.
 
 ## Proposed slot names (tier 3)
 
@@ -65,8 +75,11 @@ E1/E3/E2 with the body, atexit registration and dtor wrapper), but no source ord
 
 ## Open problems
 
-* ParticleManager slot 27 (0x004ba4d0, 1406 bytes) and slot 14 (0x004bac60, 2751 bytes) are not attempted: they build sprite
-  UV tables in globals at 0x0068915c..0x006898fc and drive the D3D vertex buffers.
+* ParticleManager slot 14 (0x004bac60..0x004bb61e) is not attempted: it uses an ebp frame and the `fstp; fld; mov eax,[p]; fistp [eax]`
+  float-to-int sequence of an inline-asm rounding helper (0x004bb26b, 0x004bb2a5), so it is excluded. It also owns a function-local
+  static 16-dword matrix at 0x006898f8 (guard bit 0 of 0x00689154, initialised from 0x004a1410) whose atexit destructor thunk is the
+  one-byte `ret` at 0x004bb620 (pushed at 0x004bacbb; the type therefore has an empty user-declared destructor). That thunk can only
+  be produced together with slot 14.
 * The five emitter constructors are partial: the retail store order interleaves the position/previousPosition zeroing with the
   scalar stores, and Steam's table fill stores one float through a temporary and four ints (a Vec4-like fill); the source shape
   that causes either is not found.
