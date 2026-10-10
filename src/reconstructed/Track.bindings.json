@@ -32,5 +32,6 @@
   "?UnknownFunction516ca0@Track@@QAEHUTrackVec3@@PAUTrackNode@@PAUTrackPos@@PAM@Z": "0x00516ca0",
   "?FastSqrt@@YAMM@Z": "0x00460b50",
   "?UnknownFunction516ef0@Track@@QAEHUTrackVec3@@PAUTrackSegment@@1@Z": "0x00516ef0",
-  "?UnknownFunction517340@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z": "0x00517340"
+  "?UnknownFunction517340@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z": "0x00517340",
+  "?UnknownFunction47b800@@YAHMMMMMMMMPAM0@Z": "0x0047b800"
 }

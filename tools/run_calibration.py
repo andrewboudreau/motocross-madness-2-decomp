@@ -22551,6 +22551,14 @@ CASES = [
         'target_size': 174,
     },
     {
+        'name': 'Track 0x518230 distance to strip edge',
+        'bindings': 'src/reconstructed/Track.bindings.json',
+        'source': 'src/reconstructed/Track.cpp',
+        'symbol': '?UnknownFunction518230@Track@@QAEHUTrackVec3@@PAUTrackSegment@@PAMH@Z',
+        'target_va': '0x00518230',
+        'target_size': 1033,
+    },
+    {
         'name': 'Track.cpp 0x518640 mm:ss formatter',
         'bindings': 'src/reconstructed/Track.bindings.json',
         'source': 'src/reconstructed/Track.cpp',

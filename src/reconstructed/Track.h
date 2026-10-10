@@ -107,6 +107,7 @@ public:
     int UnknownFunction517ea0(TrackPos pos, TrackPos* out, TrackListItem** path, float distance, unsigned char flags);
     int UnknownFunction518080(TrackPos pos, TrackVec3* out);
     int UnknownFunction518130(TrackSegment* segment, TrackVec3* out);
+    int UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out, int mode);
 
     TrackNode* field_0x00;          // start node
     float field_0x04;               // lap length

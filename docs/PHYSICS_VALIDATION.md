@@ -418,8 +418,13 @@ the inlined cross products in PoseRotation 0x4a7fd0, WorldToLocalDirection
 - Treat operand-order-only partials as low priority. The only remaining approach
   is a whole-function brute force over statement order, temporaries and
   destination form.
-- The `fld st0 ... fpatan ... fstp st0` sequence in 0x48e280 (a dead duplicate,
-  popped after the call) was not produced by any source form tried.
+- The `fld st0; fxch st(2); fxch st(1); fxch st(2); fpatan; fxch st(1); fstp st(0)`
+  sequence of 0x48e280 (a dead duplicate of the x argument) appears when the
+  subtraction after `atan2` is done in double: `(float)(atan2(d.x, d.z) - savedYaw)`
+  (a float cast of `atan2` alone gives a plain `fpatan`). VC6 then pops the
+  duplicate after the `fsub` of the yaw, where retail pops it before; a double
+  local, a separate `-=` statement, `(double)` casts and `/Op`, `/Oi-`, `/G5`,
+  `/Ow`, `/Oa` do not move it.
 
 **Inline budget.** Motnctrl expands some helpers inline at some sites and calls their
 out-of-line copies at others. Synthetic tests show (measured in detail in
@@ -560,8 +565,9 @@ names its bindings file:
   over the int temporary (frame 0x30, retail 0x34) and keeps the full
   message 1 call after the record-interval test in place instead of
   cross-jumping it to the last call site. Not reconstructed: `0x0048e3e0`
-  (inline-asm `fistp` rounding), `0x0048eea0` (the fpatan/fxch form of
-  `0x0048e280`), the set-up `0x0048fc80` (5.4 KB, 25 arguments) and
+  (inline-asm `fistp` rounding), `0x0048eea0` (2239 bytes, the head-turn
+  update: it contains the same `atan2` pop-order blocker as `0x0048e280` twice,
+  at `0x0048f2fc` and `0x0048f4c5`), the set-up `0x0048fc80` (5.4 KB, 25 arguments) and
   `0x00493660` (8.5 KB).
 - TerrainShadow.cpp (`samples/physics/shadow`): slot 14 `0x0050a1a0` is exact
   (D3DIMSoultreeShadow slot 14's draw of the +0x34 vertices without the world

@@ -5,7 +5,42 @@
 #include "Track.h"
 
 #include "DebugAlloc.h"
+#include "GameUiHelpers.h"
 #include "../krusty2/math/FastMath.h"
+
+// Vector helpers for 0x00518230. They are file-local: declared in Track.h
+// they shift operand order in other TUs that include it (docs/TRACK.md).
+static inline TrackVec3 MakeTrackVec3(float x, float y, float z)
+{
+    TrackVec3 v;
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    return v;
+}
+
+static inline TrackVec3 operator-(const TrackVec3& a, const TrackVec3& b)
+{
+    return MakeTrackVec3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+static inline TrackVec3 operator+(const TrackVec3& a, const TrackVec3& b)
+{
+    return MakeTrackVec3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+static inline TrackVec3 operator*(const TrackVec3& v, float s)
+{
+    return MakeTrackVec3(v.x * s, v.y * s, v.z * s);
+}
+
+static inline TrackVec3& operator+=(TrackVec3& a, const TrackVec3& b)
+{
+    a.x += b.x;
+    a.y += b.y;
+    a.z += b.z;
+    return a;
+}
 
 // 0x00515dc0: an empty string leaves nothing to split.
 UnknownTokenizer::UnknownTokenizer(char* text)
@@ -265,6 +300,90 @@ int Track::UnknownFunction518080(TrackPos pos, TrackVec3* out)
     out->x = d.x * pos.t + segment->field_0x00;
     out->y = d.y * pos.t + segment->field_0x04;
     out->z = d.z * pos.t + segment->field_0x08;
+    return 1;
+}
+
+// 0x00518230: the horizontal distance from `p` to the strip edge of
+// `segment` chosen by `mode` (10: the +0x0c edge, 11: the +0x18 edge, 17:
+// the nearer of both). The edge is cut with the perpendicular through p in
+// the x/z plane (the y/z plane for an edge with no x/z extent) and the cut is
+// clamped to the edge's ends. BikeAI.cpp calls it with modes 10 and 11
+// (0x00415326, 0x0041535c).
+int Track::UnknownFunction518230(TrackVec3 p, TrackSegment* segment, float* out, int mode)
+{
+    TrackVec3 a;
+    TrackVec3 d;
+    TrackVec3 a2;
+    TrackVec3 d2;
+    TrackVec3 n;
+    TrackVec3 q;
+    float t;
+    float u;    // the second parameter of the cut, then the second distance
+    if (!segment || !segment->field_0x2c || !out)
+        return 0;
+    TrackSegment* next = segment->field_0x2c;
+    switch (mode) {
+    case 17:
+        a = *(TrackVec3*)&segment->field_0x0c;
+        d = *(TrackVec3*)&next->field_0x0c - *(TrackVec3*)&segment->field_0x0c;
+        a2 = *(TrackVec3*)&segment->field_0x18;
+        d2 = *(TrackVec3*)&next->field_0x18 - *(TrackVec3*)&segment->field_0x18;
+        break;
+    case 11:
+        a = *(TrackVec3*)&segment->field_0x18;
+        d = *(TrackVec3*)&next->field_0x18 - *(TrackVec3*)&segment->field_0x18;
+        break;
+    case 10:
+        a = *(TrackVec3*)&segment->field_0x0c;
+        d = *(TrackVec3*)&next->field_0x0c - *(TrackVec3*)&segment->field_0x0c;
+        break;
+    }
+    if (d.x == 0.0f && d.z == 0.0f) {
+        if (d.y == 0.0f)
+            return 0;
+        n.x = d.z;
+        n.z = -d.y;
+        UnknownFunction47b800(a.y, a.z, d.y, d.z, p.y, p.z, n.x, n.z, &t, &u);
+    } else {
+        n.x = d.z;
+        n.z = -d.x;
+        UnknownFunction47b800(a.x, a.z, d.x, d.z, p.x, p.z, n.x, n.z, &t, &u);
+    }
+    if (t < 0.0f)
+        t = 0.0f;
+    else if (t > 1.0f)
+        t = 1.0f;
+    d = d * t;
+    a += d;
+    a.x -= p.x;
+    a.y -= p.y;
+    a.z -= p.z;
+    *out = a.x * a.x + a.z * a.z;
+    if (mode == 17) {
+        if (d2.x == 0.0f && d2.z == 0.0f) {
+            if (d2.y == 0.0f)
+                return 0;
+            n.x = d2.z;
+            n.z = -d2.y;
+            UnknownFunction47b800(a2.y, a2.z, d2.y, d2.z, p.y, p.z, n.x, n.z, &t, &u);
+        } else {
+            n.x = d2.z;
+            n.z = -d2.x;
+            UnknownFunction47b800(a2.x, a2.z, d2.x, d2.z, p.x, p.z, n.x, n.z, &t, &u);
+        }
+        if (t < 0.0f)
+            t = 0.0f;
+        else if (t > 1.0f)
+            t = 1.0f;
+        q = d2 * t + a2;
+        float dx = q.x - p.x;
+        float dz = q.z - p.z;
+        u = dx * dx;
+        u += dz * dz;
+        if (u < *out)
+            *out = u;
+    }
+    *out = FastSqrt(*out);
     return 1;
 }
 

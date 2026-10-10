@@ -1393,13 +1393,15 @@ KrustyBike* KrustyBike::FindNearestRival(float* outDistance)
 // owner: bracket only (0x48e280; callers 0x48e533, 0x495288)
 // Look at the nearest rival: compute the bearing to it relative to the heading (savedYaw +0x50), wrap to
 // +-pi and, when it is more than 0.698 rad off-axis, start the head-turn pose (clamped at +-2.7).
+// Near miss: the double subtraction after atan2 gives retail's duplicated x argument around fpatan,
+// but VC6 pops the duplicate after the yaw fsub (retail pops it first).
 void KrustyBike::Fn_0048E280()
 {
     nearestRival = FindNearestRival(0);
     if (!nearestRival)
         return;
     Vec3 d = nearestRival->position - position;
-    float angle = (float)atan2(d.x, d.z) - savedYaw;
+    float angle = (float)(atan2(d.x, d.z) - savedYaw);
     if (angle < -3.14159274f)
         angle += 6.28318548f;
     else if (angle > 3.14159274f)
@@ -1422,7 +1424,7 @@ void KrustyBike::Fn_0048E280()
         field_0x1558 = -2.7f;
         field_0x1550 = -0.7f;
     } else {
-        field_0x1550 = field_0x1558 * 0.36963f * 0.7f;
+        field_0x1550 = (field_0x1558 * 0.36963f) * 0.7f;
     }
     field_0x1554 = 0;
     ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[14], 0.5f);

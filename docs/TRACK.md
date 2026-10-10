@@ -41,7 +41,7 @@ to finish at Track+0x04.
 
 ## Status
 
-The following 13 functions are exact under `vc6_o2_mt`, with every
+The following 14 functions are exact under `vc6_o2_mt`, with every
 relocation bound:
 
 | VA | Bytes | Body |
@@ -57,6 +57,7 @@ relocation bound:
 | `0x00517da0` | 256 | distance along the track from a to b |
 | `0x00517ea0` | 465 | moves a position a distance along a node path |
 | `0x00518080` | 174 | the point at a position |
+| `0x00518230` | 1033 | horizontal distance from a point to a segment's strip edge (mode 10, 11 or 17: either edge or the nearer) |
 | `0x00518640` | 67 | formats whole seconds as `mm:ss` |
 | `0x00518690` | 134 | formats a lap time, or `--:--.--` when unset |
 
@@ -92,11 +93,24 @@ declares it `int`.
 Not yet attempted:
 - the loader `0x00515ed0` (2342 bytes);
 - the closest-position search `0x00516980` (786 bytes; its inner loop is the
-  same as `0x00516ca0`'s, so it is likely to hit the same blocker);
-- `0x00518230` (1033 bytes).
+  same as `0x00516ca0`'s, so it is likely to hit the same blocker).
 
 ## Source shapes that mattered
 
+- `0x00518230` (called from BikeAI.cpp `0x00415326`/`0x0041535c` with modes
+  10 and 11): the edge differences come from Track.cpp's file-static
+  inline `operator-`, which returns its result through an inline
+  `MakeTrackVec3(x, y, z)` (an aggregate temporary filled in place
+  schedules the copy into the direction before the last component is
+  stored). The helpers stay in Track.cpp: TrackVec3 constructors or
+  operators declared in Track.h shift VC6's operand-order tie-break in TUs
+  that include it (TrackGame slot 1 `0x00520ab0`, Scene::ReadLight
+  `0x004eb570` and SelectGamePicProcs `0x004f17a0` stop matching). The
+  perpendicular is a TrackVec3 local whose `.x`/`.z` are written before the
+  `0x0047b800` call (a plain float is pushed directly). The first edge's closest point is `d = d * t; a += d;
+  a -= p` component-wise in place; the second edge uses `d2 * t + a2` and
+  accumulates its squared distance in the `u` out-parameter local
+  (`u = dx * dx; u += dz * dz`), which is why it lives in memory.
 - `0x00515df0`: `*p++ = 0; if (*p == 0) p = 0; else while (strchr(...)) p++;`
   gives retail's late `push edi`.
 - `0x00516870`: a `while (list)` loop, not do-while.

@@ -164,7 +164,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/helpers/SoultreeTransform | `0x004fd660` | 160/164 (masked) | c | 2 code diffs: retail adds `mov ecx, eax`; retail lacks `mov ecx, eax` |
 | physics/helpers/SoultreeTransform | `0x004fd710` | 203/205 (masked) | c | FPU operand order: one `fld/fmul` pair loads the other operand first (2 bytes) |
 | physics/helpers/SoultreeTransform | `0x004fd7f0` | 259/281 (masked) | b | 6 code diffs: retail adds `mov eax, [esp + N]`; retail lacks `mov eax, [esp + N]`; slots differ |
-| physics/krustybike/KrustyBike | `0x0048e280` | 69/273 (masked) | c | 13 code diffs: retail adds `fld st(0) ; fxch st(2) ; fxch st(1)`; retail adds `fxch st(1) ; fstp st(0)` |
+| physics/krustybike/KrustyBike | `0x0048e280` | 280/287 (masked) | c | 1 code diff: retail pops the dead `atan2` duplicate (`fxch st(1) ; fstp st(0)`) before `fsub [esi + 0x50]`, the candidate after it |
 | physics/krustybike/KrustyBike | `0x0048fa60` | 380/440 (masked) | c | 4 code diffs: retail hoists `mov [esi + 0x11b8], bl ; mov [esi + 0x604], ebx` into the load delay of the +0x1540 kVec3Zero copy where the candidate hoists `+0x7c0/+0x7bc` (pick index = units after the copy - 32) |
 | physics/krustybike/KrustyBike | `0x004919a0` | 147/221 (masked) | c | 8 code diffs: retail adds `mov edx, [edx + 0x60c] ; fsub [ecx + 0x~`; retail lacks `fsub [ecx + 0xb8]` |
 | physics/krustybike/KrustyBike | `0x00491d10` | 211/1176 (masked) | b | 53 code diffs: retail lacks `sub esp, N`; retail adds `sub esp, 0x20`; frame 0x24 vs 0x0 |

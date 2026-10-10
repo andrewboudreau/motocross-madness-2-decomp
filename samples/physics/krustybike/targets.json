@@ -620,7 +620,7 @@
     "target_va": "0x0048e280",
     "target_size": 339,
     "expect": "partial",
-    "notes": "Bearing to nearest rival, head-turn pose. 25%: retail inlines fpatan keeping dz live on the FPU (fld st0; fxch x3; fpatan; fxch; fstp st0); VC6 emits plain fpatan for atan2(dx,dz) in every source shape tried (locals, Vec3 difference)."
+    "notes": "Bearing to nearest rival, head-turn pose. 78.6%: `(float)(atan2(d.x, d.z) - savedYaw)` gives retail's fld st0/fxch/fpatan/fxch/fstp st0 sequence and `(x * 0.36963f) * 0.7f` its two multiplies; VC6 pops the dead duplicate after the yaw fsub, retail before it."
   },
   {
     "class": "KrustyBike",
