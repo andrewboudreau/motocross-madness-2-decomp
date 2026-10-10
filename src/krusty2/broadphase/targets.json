@@ -758,5 +758,15 @@
     "expect": "exact",
     "notes": "pool acquire / surface create (SEH, 2 new paths on field_0x38). Needed the epilogue-order: field_0xcc0++ before the array store, then count++",
     "bindings": "../../reconstructed/TerrainSupport.bindings.json"
+  },
+  {
+    "class": "Terrain",
+    "source": "Terrain.cpp",
+    "candidate_symbol_contains": "?GameObjectVirtualSlot14@Terrain@@",
+    "target_va": "0x00506220",
+    "target_size": 3173,
+    "expect": "exact",
+    "notes": "slot 14 (vtable 0x0055825c): dual-texture probe (DriverInfo registry keys / ValidateDevice), height-field draw passes, render-state restore, profile page. Exact with field_0x18 cast at every use (a cached local or inline accessor breaks VC6's tail merge of the single-pass branch).",
+    "bindings": "Terrain.bindings.json"
   }
 ]

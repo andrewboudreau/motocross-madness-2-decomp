@@ -11,6 +11,7 @@ class MemTagStack {
 public:
     int Push(const char* tag);      // 0x004a2d00: returns the previous tag
     void Pop(int previous);         // 0x004a2d90
+    int UnknownFunction4a2d20(const char* tag);  // 0x004a2d20 (ret 4): Terrain slot 14 prints it as "Memory %d"
 };
 
 extern MemTagStack* g_MemTagStack;  // 0x0056df04

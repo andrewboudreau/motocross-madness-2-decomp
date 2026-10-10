@@ -40,7 +40,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 46 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 56 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
 | `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (43 strict cases of 55) and `BikeAI.cpp` (23 strict cases), `Vehicle.h`, `Bike.h` |
-| `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (20 strict cases of 22) |
+| `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (21 strict cases of 24) |
 | `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 36 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
 | `motion/` | SphereManager: 14 strict cases; `Motnctrl.cpp`: 40; `SteeringControl.cpp`: 21; shared motion layouts |
@@ -85,6 +85,12 @@ The physics runner adds `src/krusty2` to the include path.
   y axis 0x68a058 is read by Terrain code (see `docs/INITIALIZERS.md`).
 - Terrain derives from `GameObject` and `GroundFogableObject`, as the RTTI says (mdisp 0,
   and 0x2c for GroundFogableObject, which has no vfptr). Both bases are kept.
+- Slot 14 0x506220 (3173 bytes, vtable 0x0055825c) is strict exact: the dual-texture probe
+  (`DriverInfo\%s\CanRenderDualTextureInSinglePass` / `TerrainDetailTextureMethod`
+  registry values, else a ValidateDevice probe), the height-field passes through
+  DrawableGridNode 0x480900 / 0x480920, and the profile page. It needs `field_0x18`
+  cast at every use: a cached local or an inline accessor stops VC6 sharing the tail
+  of the single-pass branch with the detail pass.
 - `QueryGround` 0x507c10 contains inline fistp instructions not reproduced by the
   tested C++ casts. The original source mechanism is unproven.
 - The helper types (`TerrainVec3`, `TerrainMatrix`, `TerrainShutdownObject`,

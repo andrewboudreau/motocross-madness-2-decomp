@@ -85,9 +85,14 @@ public:
     virtual TerrainSurfaceBase* UnknownVirtualSlot6();
     virtual int UnknownVirtualSlot7();
     virtual int CreateTextureSurface(int a, int b, int c);      // slot 8, +0x20
+    virtual int UnknownVirtualSlot9(void* rect, int mode);     // PCTextureMap.h slot names
+    virtual void UnknownVirtualSlot10();                        // 0x004c7610: releases the texture surface
+    virtual int UnknownVirtualSlot11();                         // 0x004c7970: sets it as texture stage 0 (Terrain slot 14, detail pass)
     char pad_0x08[0x3c - 0x08];
     unsigned int field_0x3c;                                    // +0x3c read as Terrain's colour key by Terrain::Load
-    char pad_0x40[0x80 - 0x40];
+    char pad_0x40[0x74 - 0x40];
+    void* textureSurface;                                       // +0x74 PCTextureMap's texture surface (Terrain slot 14 binds it with the device's SetTexture)
+    char pad_0x78[0x80 - 0x78];
 };
 class TerrainSurface : public TerrainSurfaceBase {
 public:
@@ -165,6 +170,11 @@ public:
     // and per-corner surface bytes[4] (three output arrays, see Terrain::QueryGround).
     void GetCellCorners(int ix, int iz, float* heights, TerrainVec3* normals,
                         unsigned char* surface);
+    // 0x00480900 (ret 4) / 0x00480920 (ret 8): DrawableGridNode draw entry points
+    // (src/reconstructed/Griddraw.h).  Terrain slot 14 passes the render target and, for the
+    // detail passes, the detail texture; a zero result makes slot 14 return 0 (tier 3 roles).
+    int UnknownFunction480900(void* target);
+    int UnknownFunction480920(void* target, TerrainSurfaceBase* texture);
 
     // Members read by Terrain::CastSegment (tier 2 offsets, tier 3 names).
     void* cellTable;                                           // +0x04 cell table read by 0x00483910
@@ -303,6 +313,8 @@ public:
     // heightField->CastSegment, and on a hit returns the world-space hit point in *out.
     int CastSegment(const TerrainVec3* from, const TerrainVec3* to, TerrainVec3* out, int a, int b, int c);
     // GameObject slot overrides (vtable 0x0055825c, tier 1 addresses).
+    // Slot 14 (0x00506220): draws the height field (tier 3 role; see Terrain.cpp).
+    virtual int GameObjectVirtualSlot14();
     virtual int GameObjectVirtualSlot19(int a);                 // 0x00507920 returns 0
     void GetHeightRange(float* outMin, float* outMax);          // 0x00508970
     virtual int GameObjectVirtualSlot22(int a, int b);          // 0x004dc4c0 returns 0 (shared stub)
@@ -389,8 +401,8 @@ public:
     unsigned int field_0xca0;                                   // +0xca0 Load: key colour scaled by its alpha
     int qualityParamA;  // +0xca4 SelectQuality: table[index].field_0x04 (or table[9] when lowestQualityOverride)
     int qualityParamB;  // +0xca8 SelectQuality: table[index].field_0x08
-    int field_0xcac;
-    int lowestQualityOverride;  // +0xcb0 slot 23 key 2 toggles it; when set qualityParamA comes from table[9]
+    int field_0xcac;                                            // +0xcac slot 14 prints it as "CanSinglePassDual"
+    int lowestQualityOverride;  // +0xcb0 slot 23 key 2 toggles it; when set qualityParamA comes from table[9]; slot 14 prints it as "SinglePassDual" and then draws the detail texture in stage 1
     int field_0xcb4;
     BaseObject** ownedObjectArray;                                   // +0xcb8 array; each element slot 2 called
     int ownedObjectArrayCount;                                            // +0xcbc count of ownedObjectArray[]

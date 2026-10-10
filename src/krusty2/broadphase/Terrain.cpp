@@ -2,6 +2,7 @@
 #include "Terrain.h"
 
 #include <float.h>
+#include <stdio.h>
 #include <string.h>
 
 // d3dtypes.h colour macros (Terrain::Load builds two D3DCOLORs).
@@ -121,9 +122,31 @@ void Terrain::RetireOwnedObject(BaseObject* object)
 }
 
 // Boundary declarations for Terrain::Load (tier 1 addresses, tier 3 names).
+class TerrainDebugOverlay;
+struct TerrainGameDisplay {                                     // Display (src/reconstructed/Display.h)
+    char pad_0x000[0x4bc];
+    char driverName[1];                                         // +0x4bc the DriverInfo registry key component
+};
 struct TerrainGameSettings {                                    // TrackGame (src/reconstructed/Game.h)
-    char pad_0x000[0x2d0];
+    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
+    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
+    virtual void Slot8(); virtual void Slot9(); virtual void Slot10(); virtual void Slot11();
+    virtual void Slot12(); virtual void Slot13(); virtual void Slot14(); virtual void Slot15();
+    virtual void Slot16(); virtual void Slot17(); virtual void Slot18(); virtual void Slot19();
+    virtual int GetRegistryInt(const char* name, int defaultValue);   // slot 20 (+0x50)
+    virtual void Slot21(); virtual void Slot22(); virtual void Slot23(); virtual void Slot24();
+    virtual int SetRegistryInt(const char* name, int value);          // slot 25 (+0x64)
+    char pad_0x004[0x0c - 0x04];
+    TerrainGameDisplay* display;                                // +0x00c
+    char pad_0x010[0x38 - 0x10];
+    TerrainDebugOverlay* overlay;                               // +0x038 profile page printer
+    char pad_0x03c[0x2d0 - 0x3c];
     int softwareRendering;                                      // +0x2d0
+    unsigned char debugFlags;                                   // +0x2d4 bit 2: print the terrain profile page
+    char pad_0x2d5[0x54c - 0x2d5];
+    int magFilter;                                              // +0x54c texture stage state 0x10 value
+    int minFilter;                                              // +0x550 state 0x11
+    int mipFilter;                                              // +0x554 state 0x12
 };
 extern TerrainGameSettings* g_terrainGame;                      // 0x0056e26c
 extern TerrainQualityEntry g_terrainQualityHardware[10];        // 0x00574920 (Terrain.cpp .data)
@@ -306,6 +329,334 @@ fail:
     heightField = 0;
     BaseObjectVirtualSlot2();
     return 0;
+}
+
+// Boundary declarations for slot 14 (tier 1 addresses and offsets, tier 3 names).
+// The IDirect3DDevice7-shaped device at the render target's +0x50 (slot 35 SetTexture,
+// slot 38 ValidateDevice).
+class TerrainDevice {
+public:
+    virtual long __stdcall Slot0(); virtual long __stdcall Slot1(); virtual long __stdcall Slot2();
+    virtual long __stdcall Slot3(); virtual long __stdcall Slot4(); virtual long __stdcall Slot5();
+    virtual long __stdcall Slot6(); virtual long __stdcall Slot7(); virtual long __stdcall Slot8();
+    virtual long __stdcall Slot9(); virtual long __stdcall Slot10(); virtual long __stdcall Slot11();
+    virtual long __stdcall Slot12(); virtual long __stdcall Slot13(); virtual long __stdcall Slot14();
+    virtual long __stdcall Slot15(); virtual long __stdcall Slot16(); virtual long __stdcall Slot17();
+    virtual long __stdcall Slot18(); virtual long __stdcall Slot19(); virtual long __stdcall Slot20();
+    virtual long __stdcall Slot21(); virtual long __stdcall Slot22(); virtual long __stdcall Slot23();
+    virtual long __stdcall Slot24(); virtual long __stdcall Slot25(); virtual long __stdcall Slot26();
+    virtual long __stdcall Slot27(); virtual long __stdcall Slot28(); virtual long __stdcall Slot29();
+    virtual long __stdcall Slot30(); virtual long __stdcall Slot31(); virtual long __stdcall Slot32();
+    virtual long __stdcall Slot33(); virtual long __stdcall Slot34();
+    virtual long __stdcall SetTexture(unsigned long stage, void* surface);           // slot 35 (+0x8c)
+    virtual long __stdcall Slot36(); virtual long __stdcall Slot37();
+    virtual long __stdcall ValidateDevice(unsigned long* passes);                    // slot 38 (+0x98)
+};
+// The camera at the render target's +0x08 (slot 30 sets the world matrix, as in
+// D3DIMSoultreeShadow.cpp).
+class TerrainCamera {
+public:
+    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
+    virtual void Slot4(); virtual void Slot5(); virtual void Slot6(); virtual void Slot7();
+    virtual void Slot8(); virtual void Slot9(); virtual void Slot10(); virtual void Slot11();
+    virtual void Slot12(); virtual void Slot13(); virtual void Slot14(); virtual void Slot15();
+    virtual void Slot16(); virtual void Slot17(); virtual void Slot18(); virtual void Slot19();
+    virtual void Slot20(); virtual void Slot21(); virtual void Slot22(); virtual void Slot23();
+    virtual void Slot24(); virtual void Slot25(); virtual void Slot26(); virtual void Slot27();
+    virtual void Slot28(); virtual void Slot29();
+    virtual void SetWorldMatrix(const TerrainMatrix* m);                              // slot 30 (+0x78)
+};
+// The render target at GameObject::field_0x18 (PCRenderTarget; slot names as in
+// D3DIMSoultreeShadow.cpp).
+class TerrainRenderTarget {
+public:
+    virtual void Slot0(); virtual void Slot1(); virtual void Slot2(); virtual void Slot3();
+    virtual void Slot4(); virtual void Slot5();
+    virtual long GetTextureStageState(int stage, int type, int* value);  // slot 6
+    virtual long SetTextureStageState(int stage, int type, int value);   // slot 7
+    virtual void SetRenderState(int state, int value, int force);        // slot 8
+    virtual long GetRenderState(int state, int* value);                  // slot 9
+    void* display;                                             // +0x04
+    TerrainCamera* camera;                                     // +0x08
+    char pad_0x0c[0x38 - 0x0c];
+    int transformCount;                                        // +0x38 printed as "Total Transforms" (difference over the call)
+    char pad_0x3c[0x44 - 0x3c];
+    int triangleCount;                                         // +0x44 printed as "Total Triangles"
+    char pad_0x48[0x50 - 0x48];
+    TerrainDevice* device;                                     // +0x50
+};
+// The profile page (DebugOverlay in src/reconstructed; cdecl member printers).
+class TerrainDebugOverlay {
+public:
+    void UnknownFunction447f40(int row, const char* format, ...);   // 0x00447f40: one line
+    void UnknownFunction447fa0(int row, const char* format, ...);   // 0x00447fa0: the page title
+    char pad_0x0000[0x26c0];
+    int pageCount;                                             // +0x26c0 next free page
+};
+
+// Terrain timing / memory counters (tier 3 names, tier 1 addresses; defined outside this file).
+extern int g_UnknownGlobal68a308;     // 0x0068a308 "AgeTime" first value
+extern int g_UnknownGlobal68a30c;     // 0x0068a30c "AgeTime" second value
+extern int g_UnknownGlobal68a310;     // 0x0068a310 "Cache" count
+extern int g_UnknownGlobal689ff4;     // 0x00689ff4 "Cache" bytes
+extern int g_UnknownGlobal68a318;     // 0x0068a318 "PrepareGeometry" time
+extern int g_UnknownGlobal68a31c;     // 0x0068a31c "Render3D" time (written here)
+extern int g_UnknownGlobal68a320;     // 0x0068a320 "Total" time (written here)
+extern int g_UnknownGlobal68a328;     // 0x0068a328 nonzero once the dual-texture probe has run
+extern int g_gridDrawMemory;          // 0x0068a300 (Griddraw.cpp)
+extern int g_gridDrawMemoryPeak;      // 0x0068a2fc (Griddraw.cpp)
+extern int g_UnknownGlobal574714;     // 0x00574714 profile page row, -1 until allocated
+extern TerrainPeakHold g_terrainPeak0;   // 0x0068a008 (TerrainSupport.cpp)
+extern TerrainPeakHold g_terrainPeak1;   // 0x0068a038
+extern TerrainPeakHold g_terrainPeak2;   // 0x0068a2e0
+extern TerrainPeakHold g_terrainPeak3;   // 0x0068a2c0
+extern TerrainPeakHold g_terrainPeak4;   // 0x0068a048
+extern TerrainPeakHold g_terrainPeak5;   // 0x0068a2b0
+extern TerrainPeakHold g_terrainPeak6;   // 0x0068a018
+extern TerrainPeakHold g_terrainPeak7;   // 0x0068a2d0
+extern TerrainPeakHold g_terrainPeak8;   // 0x0068a068
+extern TerrainPeakHold g_terrainPeak9;   // 0x0068a078
+unsigned int ReadClock();                // 0x004bfa80
+
+// 0x00506220 (slot 14; tier 3 names).  Once per run, unless software rendering, decides
+// whether the detail texture can be drawn in the same pass as the base texture (registry
+// DriverInfo\<driver>\CanRenderDualTextureInSinglePass and TerrainDetailTextureMethod, or a
+// ValidateDevice probe with both textures bound when the first is unknown).  Then draws the
+// height field with the base texture and, depending on that choice, the detail texture in a
+// second stage or a second blended pass, restores the render states and prints the profile
+// page when the game's debug flag 4 is set.  Retail re-reads field_0x18 for every call
+// (tier 1); with a cached local, or an inline accessor, VC6 does not share the tail of the
+// single-pass branch with the detail pass.
+int Terrain::GameObjectVirtualSlot14()
+{
+    if (!g_terrainToggle718)
+        return 1;
+    int transforms = ((TerrainRenderTarget*)field_0x18)->transformCount;
+    int triangles = ((TerrainRenderTarget*)field_0x18)->triangleCount;
+    int previousTag = g_MemTagStack->Push("Terrain");
+    unsigned int start = ReadClock();
+
+    if (!g_UnknownGlobal68a328) {
+        if (g_terrainGame->softwareRendering) {
+            field_0xcac = 0;
+            lowestQualityOverride = 0;
+        } else {
+            char key[256];
+            sprintf(key, "DriverInfo\\%s\\CanRenderDualTextureInSinglePass",
+                    g_terrainGame->display->driverName);
+            int canDual = g_terrainGame->GetRegistryInt(key, -1);
+            if (canDual == 0 || canDual == 1) {
+                field_0xcac = canDual;
+                sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod",
+                        g_terrainGame->display->driverName);
+                int method = g_terrainGame->GetRegistryInt(key, 1);
+                if (method < 0 || method > 2)
+                    method = 1;
+                if (method == 2) {
+                    lowestQualityOverride = 1;
+                    g_terrainQualityValue = 1;
+                } else {
+                    lowestQualityOverride = 0;
+                }
+                if (g_pTerrainQualityTable[qualityIndex].field_0x0c && method >= 1)
+                    g_terrainQualityValue = 1;
+                else
+                    g_terrainQualityValue = 0;
+            } else {
+                field_0xcac = 0;
+                lowestQualityOverride = 0;
+                if (field_0xc3c) {
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 1);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0xb, 0);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 2, 2);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 3, 1);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 5, 2);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 2);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 0xd);
+                    ((TerrainRenderTarget*)field_0x18)->device->SetTexture(0, ((TerrainSurfaceBase*)ownedObjects[0])->textureSurface);
+                    ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, field_0xc3c->textureSurface);
+                    unsigned long passes = 0;
+                    ((TerrainRenderTarget*)field_0x18)->device->ValidateDevice(&passes);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 0);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0xb, 1);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 1);
+                    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 1);
+                    ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, 0);
+                    g_terrainGame->SetRegistryInt(key, passes == 1);
+                    if (passes == 1) {
+                        field_0xcac = 1;
+                        lowestQualityOverride = 0;
+                        sprintf(key, "DriverInfo\\%s\\TerrainDetailTextureMethod",
+                                g_terrainGame->display->driverName);
+                        g_terrainGame->SetRegistryInt(key, 1);
+                    }
+                    g_terrainQualityValue = g_pTerrainQualityTable[qualityIndex].field_0x0c;
+                }
+            }
+            g_UnknownGlobal68a328 = 1;
+        }
+    }
+
+    int savedPerspective;
+    ((TerrainRenderTarget*)field_0x18)->GetRenderState(4, &savedPerspective);
+    int savedShade;
+    ((TerrainRenderTarget*)field_0x18)->GetRenderState(9, &savedShade);
+    ((TerrainRenderTarget*)field_0x18)->camera->SetWorldMatrix(&transform);
+    field_0x88 = 0;
+    field_0x8c = 0;
+    {
+        unsigned int key = colorKey;
+        unsigned int alpha = 0x109 - (key >> 24);
+        unsigned int keep = 0xff - alpha;
+        unsigned int red = RGBA_GETRED(key) * keep / 0xff;
+        field_0xc9c = RGBA_MAKE(alpha, alpha, alpha, 0xff);
+        field_0xca0 = RGBA_MAKE(red, RGBA_GETGREEN(key) * keep / 0xff, RGBA_GETBLUE(key) * keep / 0xff, 0xff);
+    }
+
+    if (!field_0xc34 && !g_terrainQualityValue) {
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+    } else {
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
+        if (g_terrainGame->softwareRendering)
+            ((TerrainRenderTarget*)field_0x18)->SetRenderState(9, 1, 0);
+        else
+            ((TerrainRenderTarget*)field_0x18)->SetRenderState(9, 2, 0);
+    }
+    ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
+
+    if (lowestQualityOverride && field_0xc3c) {
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, g_terrainGame->minFilter);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x12, g_terrainGame->mipFilter);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0x10, g_terrainGame->magFilter);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0x11, g_terrainGame->minFilter);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0x12, g_terrainGame->mipFilter);
+        field_0xcb4 = 0;
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 1);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 0xb, 0);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 2, 2);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 3, 1);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 5, 2);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 2);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 0xd);
+        ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
+        ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, field_0xc3c->textureSurface);
+        if (!heightField->UnknownFunction480920(((TerrainRenderTarget*)field_0x18), field_0xc3c))
+            return 0;
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0xb, 0);
+    } else {
+        if (!g_terrainGame->softwareRendering && field_0xc3c && g_terrainQualityValue) {
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
+            ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 1, 0);
+            heightField->UnknownFunction480900(((TerrainRenderTarget*)field_0x18));
+            ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
+        } else {
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 2);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 1);
+            ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1d, 0, 0);
+            heightField->UnknownFunction480900(((TerrainRenderTarget*)field_0x18));
+        }
+        if (!g_terrainGame->softwareRendering && field_0xc3c && g_terrainQualityValue) {
+            field_0xc3c->UnknownVirtualSlot11();
+            ((TerrainRenderTarget*)field_0x18)->SetRenderState(0x1b, 1, 0);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 1, 4);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 2, 2);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 3, 0);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 4, 2);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 5, 2);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, 2);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x12, 1);
+            if (!heightField->UnknownFunction480920(((TerrainRenderTarget*)field_0x18), field_0xc3c))
+                return 0;
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x10, g_terrainGame->magFilter);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x11, g_terrainGame->minFilter);
+            ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(0, 0x12, g_terrainGame->mipFilter);
+        }
+    }
+    ((TerrainRenderTarget*)field_0x18)->SetRenderState(4, savedPerspective, 0);
+    ((TerrainRenderTarget*)field_0x18)->SetRenderState(9, savedShade, 0);
+    field_0x88 /= 3;
+    GameObject::GameObjectVirtualSlot14();
+    g_UnknownGlobal68a31c = ReadClock() - start;
+
+    if ((g_terrainGame->debugFlags & 4) && g_terrainGame->overlay) {
+        if (g_UnknownGlobal574714 < 0) {
+            int page = g_terrainGame->overlay->pageCount++;
+            g_UnknownGlobal574714 = page;
+        }
+        g_terrainPeak0.UnknownFunction4cb6b0(g_UnknownGlobal68a308);
+        g_terrainPeak1.UnknownFunction4cb6b0(g_UnknownGlobal68a30c);
+        g_terrainPeak2.UnknownFunction4cb6b0(field_0xc04);
+        g_terrainPeak3.UnknownFunction4cb6b0(field_0xbfc);
+        g_terrainPeak4.UnknownFunction4cb6b0(field_0xc00);
+        g_terrainPeak5.UnknownFunction4cb6b0(g_UnknownGlobal68a310);
+        g_terrainPeak7.UnknownFunction4cb6b0(g_UnknownGlobal68a318);
+        g_terrainPeak8.UnknownFunction4cb6b0(g_UnknownGlobal68a31c);
+        g_UnknownGlobal68a320 = g_UnknownGlobal68a318 + g_UnknownGlobal68a31c;
+        g_terrainPeak9.UnknownFunction4cb6b0(g_UnknownGlobal68a320);
+        g_terrainGame->overlay->UnknownFunction447fa0(g_UnknownGlobal574714, "Terrain Tolerance:%d",
+                                                      drawDistance);
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Memory %d",
+                                                      g_MemTagStack->UnknownFunction4a2d20("Terrain"));
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "AgeTime %d(%d) %d(%d)",
+                                                      g_UnknownGlobal68a308, g_UnknownGlobal68a30c,
+                                                      g_terrainPeak0.UnknownFunction4cb690(),
+                                                      g_terrainPeak1.UnknownFunction4cb690());
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Setup   %d %d",
+                                                      field_0xc04, g_terrainPeak2.UnknownFunction4cb690());
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Eval    %d[%d] %d",
+                                                      field_0xbfc, field_0x90,
+                                                      g_terrainPeak3.UnknownFunction4cb690());
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Mesh    %d[%d] %d",
+                                                      field_0xc00, field_0xa4,
+                                                      g_terrainPeak4.UnknownFunction4cb690());
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Cache   %d[%f] %d[%f]",
+                                                      g_UnknownGlobal68a310,
+                                                      g_UnknownGlobal689ff4 * (1.0f / 1048576.0f),
+                                                      g_terrainPeak5.UnknownFunction4cb690(),
+                                                      g_terrainPeak6.UnknownFunction4cb690() * (1.0f / 1048576.0f));
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "  [%f]",
+                                                      (ownedObjectArrayCount << 17) * (1.0f / 786432.0f));
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total   %d %d",
+                                                      g_UnknownGlobal68a320, g_terrainPeak9.UnknownFunction4cb690());
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Vertex Buffers %d (%d)",
+                                                      g_gridDrawMemory, g_gridDrawMemoryPeak);
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "PrepareGeometry% 3d (%d)",
+                                                      g_UnknownGlobal68a318, g_terrainPeak7.UnknownFunction4cb690());
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Render3D%        3d (%d)",
+                                                      g_UnknownGlobal68a31c, g_terrainPeak8.UnknownFunction4cb690());
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total%           3d (%d)",
+                                                      g_UnknownGlobal68a320, g_terrainPeak9.UnknownFunction4cb690());
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total Transforms %d",
+                                                      ((TerrainRenderTarget*)field_0x18)->transformCount - transforms);
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "Total Triangles  %d",
+                                                      ((TerrainRenderTarget*)field_0x18)->triangleCount - triangles);
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "CanSinglePassDual %s",
+                                                      field_0xcac ? "TRUE" : "FALSE");
+        g_terrainGame->overlay->UnknownFunction447f40(g_UnknownGlobal574714, "SinglePassDual    %s",
+                                                      lowestQualityOverride ? "TRUE" : "FALSE");
+    }
+    g_MemTagStack->Pop(previousTag);
+    if (lowestQualityOverride) {
+        ((TerrainRenderTarget*)field_0x18)->device->SetTexture(1, 0);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 1, 1);
+        ((TerrainRenderTarget*)field_0x18)->SetTextureStageState(1, 4, 1);
+    }
+    return 1;
 }
 
 // 0x00507bb0.
