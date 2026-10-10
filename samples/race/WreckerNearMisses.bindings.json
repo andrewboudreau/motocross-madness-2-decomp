@@ -27,7 +27,7 @@
   "?WreckerCrossCall@@YA?AUVector3@@ABU1@0@Z": "0x00515600",
   "?WreckerDotCall@@YAMPBUVector3@@0@Z": "0x0040ae30",
   "?WreckerNormalizeCall@@YA?AUVector3@@ABU1@@Z": "0x005087b0",
-  "?WreckerSubtractCall@@YAPAUVector3@@PAU1@PBU1@1@Z": "0x00421d00",
+  "?WreckerSubtractValue@@YA?AUVector3@@ABU1@0@Z": "0x00421d00",
   "__FILE__": "0x00575ab8",
   "__ftol": "0x00534a88",
   "__real@4@00000000000000000000": "0x00550484",

@@ -41,6 +41,18 @@
 // instructions, retail frame 0x1fc (ours 0x1b4); the source here uses the
 // inline Vector3 constructor where retail calls 0x00404e60, and VC6's
 // term order differs in the products.
+// Retail's in/out-of-line split is a budget split of one helper set: the
+// three axis blocks are the same code (row getter 0x004a2350, cross
+// product 0x00515600, the normalisation calling the dot product 0x0040ae30,
+// axis-angle 0x0042de90, the Vector3 constructor), expanded in the first
+// block and called from the second on. Rewritten that way, with the
+// helpers as header-style inlines bound to those copies and the product as
+// MatrixMultiply's text with both operands by value (inlined, VC6 copies
+// only the operand aliasing the output, retail's rep movsd), VC6 expands
+// less than retail when the product is a helper (the first axis-angle
+// matrix, cross product and rows are called; masked ratio 0.67-0.69) and
+// everything when the product is written in the body (0.63). Retail's
+// caller lies between the two, so the hand split below (0.885) is kept.
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

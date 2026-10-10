@@ -307,3 +307,10 @@ exact:
   &camera->matrixC[0][0]`, taken before the depth product and used for the
   side-plane spread, makes the camera the first-used argument.
 
+- Locals of sibling inline expansions share frame slots, like sibling blocks. Writing
+  a rigid inverse, two matrix products and an axis rebuild as inline helpers gives
+  Wrecker slot 10 `0x5306e0` retail's 0x128 frame; written out in the body the
+  frame is 0x134.
+- An inlined helper taking a struct by value copies the argument only when it can
+  change under the call (it aliases the output); an unmodified local is read in place.
+  This reproduces retail's two `rep movsd` copies in Wrecker slot 10.

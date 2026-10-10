@@ -372,14 +372,13 @@ rebuilt; allowing `__asm` for exactly these bodies is a project decision.
 
 ## What is needed next
 
-1. **Code that exists but does not match**: 420,465 near-miss bytes in 351
+1. **Code that exists but does not match**: 455,939 near-miss bytes in 373
    functions (largest: BikeRace `0x00419970`, 13 KB; GameUi `0x0046a920`,
    16 KB to padding; D3DIMSoulTree `0x00440f30`, 7.9 KB; QuarryStuntEvent
    `0x004de590`). See [NEAR_MISS_INDEX](NEAR_MISS_INDEX.md).
-2. **No registration**: 57,541 bytes in 52 ranges (table above); the
-   bmpfile..BoundingBoxTreeBuild bracket (16.2 KB), BikeAI (8.9 KB), the
-   file-stream code and FollowCam (7.1 KB), the TextureCache bracket
-   (5.0 KB) and Pixtrans (4.1 KB) hold 41 KB of it.
+2. **No registration**: 17,857 bytes in 17 ranges (table above); the five
+   BVH routines between bmpfile.cpp and BoundingBoxTreeBuild.cpp hold 12.8 KB
+   and KrustyBike `0x0048eea0` 2.9 KB of it.
 3. **Promotion**: 51,969 strict-exact bytes live only in `samples/` (six retail
    units and 15 classes have no canonical source).
 4. **Unit layout**: whole-object matching per retail unit (function order,

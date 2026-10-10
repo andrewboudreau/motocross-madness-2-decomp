@@ -22,7 +22,10 @@
 // product's loads are swapped (retail `fld pose.z; fmul old.y`, VC6 here
 // `fld old.y; fmul pose.z` whatever the operand order, argument order,
 // sign convention, by-value or matrix form) and its `fsubp` is scheduled
-// after the destination pointer copy.
+// after the destination pointer copy. Also tried: the equality tests written
+// pose-first (changes the compares, not the products), the cross product's
+// parameters by value in all three combinations, the forward copy as a plain
+// struct copy and through a pointer to field_0x6c.
 //
 // UnknownFunction5329e0 (0x005329e0, 1312 bytes): pushes probes back out of
 // the box field_0xe8/field_0xf4 and turns the mean push into the impulse
@@ -48,11 +51,22 @@
 // retail's slot sharing shows. Left: the slot order and `0.0f - scaled.z`
 // of the cross product with the Y axis (retail loads scaled.z first).
 //
-// UnknownVirtualSlot10 (0x005306e0, 4176 bytes; 1817/4183): the first
-// 0x62c bytes match retail. The rider carry-over (rigid inverse of the
-// wreck pose, two 4x4 products, axis rebuild) keeps retail's shape and
-// calls but not its term/operand order; the second product expands only
-// with __forceinline (docs/VC6_INLINE_BUDGET.md).
+// UnknownVirtualSlot10 (0x005306e0, 4168 bytes; 4174/4178): every block
+// matches retail except one term pair of the first product. Retail's frame
+// (0x128) and order come from the rider carry-over written with inline
+// helpers: the inverse's translation, the by-value product operands and the
+// axis rebuild's locals live in sibling inline scopes that share slots (the
+// inverse's t with the rebuild's forward); the old position is copied
+// through WreckerCopy from a pointer to the member pose (the dead temporary
+// at frame 0, the y/z loads through the rep movsd source); the subtract is
+// called by value (its result a temporary). Retail rebuilds up as
+// forward x right. Left: relative._23 adds `a._23 * b._22` before
+// `a._33 * b._23` in retail (the other 15 elements match); swap and t.z
+// term orders, reference/pointer helpers, __forceinline, const by-value
+// operands, the frame pointer's type, statement order inside the product,
+// and declaration counts (tools/decl_shift_scan.py, k = 0..63) do not move
+// it. Earlier forms: an explicit scratch matrix, the inverse written on the
+// local, the rebuild written in the body (frame 0x134, 1817/4183).
 
 #include <math.h>
 #include <stdlib.h>
@@ -182,7 +196,7 @@ struct WreckerVec3Call : Vector3 {
 };
 float WreckerDotCall(const Vector3* a, const Vector3* b);          // 0x0040ae30
 Vector3* WreckerAddCall(Vector3* out, const Vector3* a, const Vector3* b);      // 0x00421cb0
-Vector3* WreckerSubtractCall(Vector3* out, const Vector3* a, const Vector3* b); // 0x00421d00
+Vector3 WreckerSubtractValue(const Vector3& a, const Vector3& b);                // 0x00421d00
 
 // |v|, exact for unit vectors (the same helper CarProcedural.cpp expands).
 static inline float WreckerLength(Vector3 v) {
@@ -335,10 +349,34 @@ static inline void WreckerInvertRigid(UnknownWreckerMatrix* m) {
     m->_43 = t.z;
 }
 
-// The 4x4 product expanded inline (the MatrixProduct text of
-// src/krusty2/soultree/soultree.cpp): *out = b * a in the row-vector
-// convention.
-static __forceinline void WreckerMatrixProduct(UnknownWreckerMatrix* out, const UnknownWreckerMatrix& a, const UnknownWreckerMatrix& b) {
+// Rebuilds the rotation rows of a pose from its up and forward rows.
+static inline void WreckerOrthonormalize(UnknownWreckerMatrix* m) {
+    Vector3 up = WreckerVec3Call(m->_21, m->_22, m->_23);
+    Vector3 forward = WreckerVec3Call(m->_31, m->_32, m->_33);
+    forward = WreckerNormalizeCall(forward);
+    Vector3 right = WreckerNormalizeCall(WreckerCrossCall(up, forward));
+    up = WreckerCrossCall(forward, right);
+    m->_11 = right.x;
+    m->_12 = right.y;
+    m->_13 = right.z;
+    m->_14 = 0.0f;
+    m->_21 = up.x;
+    m->_22 = up.y;
+    m->_23 = up.z;
+    m->_24 = 0.0f;
+    m->_31 = forward.x;
+    m->_32 = forward.y;
+    m->_33 = forward.z;
+    m->_34 = 0.0f;
+}
+
+// The 4x4 product expanded inline: MatrixMultiply (0x0042a1a0,
+// src/krusty2/math/Math3D.h) with both operands by value, *out = b * a in
+// the row-vector convention. Inlined, VC6 copies only the operands that
+// can change under it: the member pose (a, rep movsd) in the first product
+// of slot 10 and the output itself (b) in the second; an unmodified local
+// is read in place.
+static inline void WreckerMatrixProduct(UnknownWreckerMatrix* out, UnknownWreckerMatrix a, UnknownWreckerMatrix b) {
     out->_11 = a._11 * b._11 + a._21 * b._12 + a._31 * b._13 + a._41 * b._14;
     out->_12 = a._12 * b._11 + a._22 * b._12 + a._32 * b._13 + a._42 * b._14;
     out->_13 = a._13 * b._11 + a._23 * b._12 + a._33 * b._13 + a._43 * b._14;
@@ -465,38 +503,19 @@ int Wrecker::UnknownVirtualSlot10(float frameTime) {
         // Carry the rider's root over by the motion of the wreck node since
         // the pose field_0x6c was taken, then re-orthonormalise its axes.
         UnknownWreckerMatrix pose;
-        UnknownWreckerMatrix scratch;
         UnknownWreckerMatrix relative;
         field_0xb8->UnknownFunction4fca80(0, &pose);
-        Vector3 oldPosition = field_0x6c.position;
+        UnknownWreckerFrame* frame = &field_0x6c;
+        Vector3 oldPosition = WreckerCopy(frame->position);
         WreckerInvertRigid(&pose);
-        scratch = *(UnknownWreckerMatrix*)&field_0x6c;
-        WreckerMatrixProduct(&relative, scratch, pose);
+        WreckerMatrixProduct(&relative, *(UnknownWreckerMatrix*)frame, pose);
         field_0x34->field_0x1a0->UnknownFunction4fca80(0, &pose);
-        scratch = pose;
-        WreckerMatrixProduct(&pose, relative, scratch);
-        Vector3 up = WreckerVec3Call(pose._21, pose._22, pose._23);
-        Vector3 forward = WreckerVec3Call(pose._31, pose._32, pose._33);
-        forward = WreckerNormalizeCall(forward);
-        Vector3 right = WreckerNormalizeCall(WreckerCrossCall(up, forward));
-        up = WreckerCrossCall(right, forward);
-        pose._11 = right.x;
-        pose._12 = right.y;
-        pose._13 = right.z;
-        pose._14 = 0.0f;
-        pose._21 = up.x;
-        pose._22 = up.y;
-        pose._23 = up.z;
-        pose._24 = 0.0f;
-        pose._31 = forward.x;
-        pose._32 = forward.y;
-        pose._33 = forward.z;
-        pose._34 = 0.0f;
+        WreckerMatrixProduct(&pose, relative, pose);
+        WreckerOrthonormalize(&pose);
         field_0x34->field_0x1a0->UnknownFunction4fb8c0(0, &pose);
         Vector3 position;
         field_0xb8->UnknownFunction4fc9a0(0, &position);
-        Vector3 result;
-        Vector3 delta = *WreckerSubtractCall(&result, &oldPosition, &position);
+        Vector3 delta = WreckerSubtractValue(oldPosition, position);
         field_0x34->field_0x1a0->UnknownFunction4fc890(0, &delta);
         field_0xb4 = 0;
     }

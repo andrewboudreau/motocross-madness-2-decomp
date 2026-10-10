@@ -21,9 +21,36 @@
 // and match retail's first 0x19b bytes; the tangent temporaries' slots
 // then differ. No padded source is kept.
 //
-// Not reconstructed: slot 10 (0x0042fd80, 2907 bytes), the per-frame
-// update along the path (wheel spin and steering, the collision objects'
-// transform and the body velocity).
+// CarProcedural::UnknownVirtualSlot10 (0x0042fd80, 2909 bytes): the
+// per-frame update along the path (wheel spin and steering, the collision
+// objects' transform and the body velocity). With relocations and frame
+// offsets masked the instruction stream is 781 instructions like retail's
+// and 88% aligned. Retail facts the source follows: the sensor contact's
+// normal is at +0x08 (`add ecx, 8`); the back and steering points subtract
+// field_0x1c4 straight from the call result (no named copy) and keep the
+// time offset on the x87 stack (`fld t; fsub st(1)` ... `fstp st(0)`, a
+// float local); the collider frame is built by an inline helper taking
+// the axes by value (its locals share slots with the blocks' vectors); the
+// target is built per component (no y sum) and the 4fd5c0 result is a
+// named copy; the body velocity is corrected per component. Left: the
+// frame is 0xd0 against retail's 0xdc. Retail's slot groups (frame offsets)
+// are {temps, local, target, first-update position} 0x0, {side, forward
+// axis} 0xc, t 0x18, {box, ahead, right axis, offset} 0x1c, {back, up axis}
+// 0x34, a float spill 0x40, normal 0x44, {flat, axisA} 0x50, position 0x5c,
+// ground 0x68, forward 0x74, result 0x80, axisB 0x84, placement 0x90,
+// transform 0x9c: the wheel loop's axisA shares with flat and axisB with
+// nothing, here both share with the first-update and steering blocks. A
+// bare block or an inline helper around flat moves it into the box group
+// or runs out of inline budget (operator- called). The steering clamp
+// stores the angle to memory in retail (`fst [t's slot]`, reloaded twice
+// for the upper bound); by-value, const-reference, member-argument and
+// expression-argument clamp helpers and the if/else and ternary forms keep
+// it on the x87 stack. Also left: the normalisation of `back` loads its
+// components first in retail, the 1f4 blend the scalar first (here the
+// reverse), and argument-push scheduling around the steering call, the
+// frame helper's copies and the 4fd5c0 call. Earlier form (one named ahead
+// for all three path points, the frame written in the body, the contact
+// normal at +0x0c): 807/3018 with frame 0xf4.
 
 #include <math.h>
 
@@ -161,6 +188,46 @@ static inline Vector3& operator-=(Vector3& a, const Vector3& b)
     return a;
 }
 
+// The orthonormal frame of a forward and an up direction at a position.
+static inline void CarFrame(Matrix4* m, Vector3 forwardAxis, Vector3 upAxis, const Vector3& position)
+{
+    Vector3 rightAxis = CarCross(upAxis, forwardAxis);
+    upAxis = CarCrossCall(forwardAxis, rightAxis);
+    upAxis = CarNormalizeCall(upAxis);
+    forwardAxis = CarNormalizeCall(forwardAxis);
+    rightAxis = CarCrossCall(upAxis, forwardAxis);
+    (*m)(0, 0) = rightAxis.x;
+    (*m)(0, 1) = rightAxis.y;
+    (*m)(0, 2) = rightAxis.z;
+    (*m)(0, 3) = 0.0f;
+    (*m)(1, 0) = upAxis.x;
+    (*m)(1, 1) = upAxis.y;
+    (*m)(1, 2) = upAxis.z;
+    (*m)(1, 3) = 0.0f;
+    (*m)(2, 0) = forwardAxis.x;
+    (*m)(2, 1) = forwardAxis.y;
+    (*m)(2, 2) = forwardAxis.z;
+    (*m)(2, 3) = 0.0f;
+    (*m)(3, 0) = position.x;
+    (*m)(3, 1) = position.y;
+    (*m)(3, 2) = position.z;
+    (*m)(3, 3) = 1.0f;
+}
+
+// The sensor collider's contact record: the penetration depth at +0 and
+// the surface normal at +0x08 (tier 3 roles).
+struct CarProceduralSensorContact {
+    float field_0x00;
+    float field_0x04;
+    Vector3 field_0x08;
+};
+
+// v limited to [lo, hi].
+static inline float CarClamp(float v, float lo, float hi)
+{
+    return v > lo ? (v < hi ? v : hi) : lo;
+}
+
 int CarProcedural::UnknownVirtualSlot10(float frameTime)
 {
     int result = GameObject::UnknownVirtualSlot10(frameTime);
@@ -202,25 +269,19 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     Vector3 local = field_0x34->UnknownFunction4fd710(forward);
     if (field_0x60 > 0)
         field_0x18c = (float)fmod(field_0x184 * field_0x1a8 * local.z * frameTime + field_0x18c, 6.2831855f);
-    ahead = UnknownFunction430b10(t - UnknownFunction4308e0(t, -1.0f));
-    Vector3 back = ahead - field_0x1c4;
+    float behind = UnknownFunction4308e0(t, -1.0f);
+    Vector3 back = UnknownFunction430b10(t - behind) - field_0x1c4;
     CarNormalizeInPlace(back);
     if (field_0x5c)
         field_0x1f4 = back;
     else
         field_0x1f4 = field_0x1f4 * field_0x1ac + back * (1.0f - field_0x1ac);
     if (field_0x50 && field_0x60 > 0) {
-        ahead = UnknownFunction430b10(t - UnknownFunction4308e0(t, -field_0x198));
-        Vector3 side = ahead - field_0x1c4;
+        float wheelbase = UnknownFunction4308e0(t, -field_0x198);
+        Vector3 side = UnknownFunction430b10(t - wheelbase) - field_0x1c4;
         Vector3 steer = field_0x34->UnknownFunction4fd710(side);
-        float angle = (float)atan2(steer.x, steer.z);
-        field_0x190 = angle;
-        if (angle < -0.52359873f)
-            field_0x190 = -0.52359873f;
-        else if (angle > 0.52359873f)
-            field_0x190 = 0.52359873f;
-        else
-            field_0x190 = angle;
+        field_0x190 = (float)atan2(steer.x, steer.z);
+        field_0x190 = CarClamp(field_0x190, -0.52359873f, 0.52359873f);
     }
     Vector3 position;
     field_0x34->UnknownFunction4fc9a0(0, &position);
@@ -228,30 +289,8 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
     Vector3 normal;
     ((CarProceduralTerrain*)field_0x20c)->UnknownFunction507c10(&ground, &normal, 0, 0);
     // The sensor collider's frame: the world axes orthonormalised.
-    Vector3 forwardAxis = kVec3ZAxis;
-    Vector3 upAxis = kVec3YAxis;
-    Vector3 rightAxis = CarCross(upAxis, forwardAxis);
-    upAxis = CarCrossCall(forwardAxis, rightAxis);
-    upAxis = CarNormalizeCall(upAxis);
-    forwardAxis = CarNormalizeCall(forwardAxis);
-    rightAxis = CarCrossCall(upAxis, forwardAxis);
     Matrix4 transform;
-    transform(0, 0) = rightAxis.x;
-    transform(0, 1) = rightAxis.y;
-    transform(0, 2) = rightAxis.z;
-    transform(0, 3) = 0.0f;
-    transform(1, 0) = upAxis.x;
-    transform(1, 1) = upAxis.y;
-    transform(1, 2) = upAxis.z;
-    transform(1, 3) = 0.0f;
-    transform(2, 0) = forwardAxis.x;
-    transform(2, 1) = forwardAxis.y;
-    transform(2, 2) = forwardAxis.z;
-    transform(2, 3) = 0.0f;
-    transform(3, 0) = position.x;
-    transform(3, 1) = position.y;
-    transform(3, 2) = position.z;
-    transform(3, 3) = 1.0f;
+    CarFrame(&transform, kVec3ZAxis, kVec3YAxis, position);
     field_0x38->UnknownFunction435830(&transform);
     field_0x38->UnknownFunction438e70();
     if (field_0x38->field_0x58) {
@@ -259,7 +298,7 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         Vector3 lifted = kVec3YAxis * ((1.0f - contact->field_0x00.x) * field_0x188 * 2.0f - field_0x188) + position;
         if (lifted.y > ground.y) {
             ground = lifted;
-            normal = contact->field_0x0c;
+            normal = ((CarProceduralSensorContact*)contact)->field_0x08;
         }
     }
     if (field_0x5c)
@@ -268,9 +307,9 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         field_0x200 = field_0x200 * field_0x1b0 + normal * (1.0f - field_0x1b0);
     Vector3 flat = field_0x1f4 - field_0x200 * CarDot(field_0x1f4, field_0x200);
     field_0x34->UnknownFunction4fbd70(&flat, &field_0x200, 0, 1);
-    Vector3 target = field_0x1d0 + field_0x1c4;
-    target.y = ground.y;
-    Vector3 placement = target - field_0x34->UnknownFunction4fd5c0(field_0x1dc);
+    Vector3 target(field_0x1d0.x + field_0x1c4.x, ground.y, field_0x1d0.z + field_0x1c4.z);
+    Vector3 offset = field_0x34->UnknownFunction4fd5c0(field_0x1dc);
+    Vector3 placement = target - offset;
     field_0x34->UnknownFunction4fc740(0, &placement);
     for (unsigned int i = 0; i < field_0x60; i++) {
         Vector3 axisA;
@@ -292,7 +331,10 @@ int CarProcedural::UnknownVirtualSlot10(float frameTime)
         CarProceduralContact* contact = field_0x3c->field_0x5c;
         field_0x214 = contact->field_0x18;
         field_0x220 = contact->field_0x0c;
-        field_0x3c->field_0x54->field_0xf8 -= contact->field_0x00 * 1.005f;
+        Vector3& velocity = field_0x3c->field_0x54->field_0xf8;
+        velocity.x -= contact->field_0x00.x * 1.005f;
+        velocity.y -= contact->field_0x00.y * 1.005f;
+        velocity.z -= contact->field_0x00.z * 1.005f;
     }
     return result;
 }

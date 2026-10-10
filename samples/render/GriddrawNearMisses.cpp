@@ -41,7 +41,11 @@
 // DrawableGridNode 0x00481300 (4-cell block walk, 216 bytes; 114 of 216):
 // retail forms the child index as `lea ecx,[edi+ebp]; add ecx,table[quad]`;
 // every order of the three terms gives VC6's `mov edx,table[quad];
-// add edx,edi; add edx,ebp`, the form retail itself uses in 0x0047ef80.
+// add edx,edi; add edx,ebp`, the form retail itself uses in 0x0047ef80. Also
+// tried: a row counter times 16, `(j << 4)`, an `int cell = i + j` local
+// (with `+=` of the table entry), unsigned counters, `(&children[j + i])[..]`,
+// `(children + table[quad])[i + j]`, a local copy of `children` and an inline
+// child-lookup helper taking the cell index; all keep VC6's form.
 //
 // DrawableGridNode 0x00482b40 (rectangle re-test, 327 bytes; 292 of 327):
 // retail computes zEnd before the start row and loads the row offset before

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 212, c 158, total 370. The three class (a) functions of the
+Counts: a 0, b 212, c 161, total 373. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -244,7 +244,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/BikeRace | `0x0041eb20` | 1699/1710 | c | retail loads the scene-table index (+0x150) before the table pointer in the scene-object branch (edx/ecx swapped at the branch head) |
 | race/BikeRace | `0x0041f1d0` | 230/881 | c | 44 code diffs: retail adds `xor edx, edx`; `mov eax, [edi + 0x3430] ; test eax, eax~` vs `cmp [edi + 0x3430], edx ; jne @271` |
 | race/BikeRace | `0x004210f0` | 975/2940 | b | inline budget: retail calls the Vector3 constructor in the mode 2/3 tail and expands Scale in mode 4; registers follow |
-| race/CarProcedural | `0x0042fd80` | 807/3018 | b | slot 10: slot order (frame 0xe8 vs 0xdc) and the steering clamp's memory local |
+| race/CarProcedural | `0x0042fd80` | 221/2844 | b | slot 10: frame 0xd0 vs 0xdc (retail shares the wheel loop's axisA with the orientation's `flat`, axisB with nothing), the steering clamp's memory local, component/scalar load order in the `back` normalisation and blend; masked, 781 instructions like retail's |
 | race/CarProcedural | `0x00430b10` | 299/843 | b | 45 code diffs: retail adds `mov esi, ecx`; `mov edi, ecx ; mov esi, [edi + 0x6c] ; ~` vs `mov edi, [esi + 0x6c] ; mov ebp, [esi +~`; slots differ |
 | race/Krusty3DObjects | `0x0048b100` | 151/2784 | b | third camera column copied by integer moves in retail (two components kept on the x87 stack here); retail keeps 0 in edi and gives early returns their own epilogues |
 | race/Krusty3DObjects | `0x0048ccc0` | 47/1308 | b | 3 code diffs: `je @349` vs `je A`; `jne @349` vs `jne A`; slots differ |
@@ -253,9 +253,11 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/RaceStatus | `0x004e6a50` | 490/1003 | b | 6 code diffs: `je @289` vs `je A`; `je @289` vs `je A`; slots differ |
 | race/Recorder | `0x004e6f80` | 516/2180 | c | 52 code diffs |
 | race/Recorder | `0x004e7d60` | 272/2448 | b | 99 code diffs: `jne @767 ; mov eax, [esi + 0x88] ; test~` vs `jne @761 ; mov ecx, [esi + 0x88] ; xor ~`; slot order differs |
-| race/Wrecker | `0x005306e0` | 1817/4183 | b | slot 10: first 0x62c bytes exact; the inverse/product term order, an unread position copy and the second product's expansion (budget) |
+| race/Wrecker | `0x005306e0` | 4174/4178 | c | slot 10: one term pair of the first product (`relative._23` adds `a._23 * b._22` before `a._33 * b._23` in retail) |
 | race/Wrecker | `0x00531740` | 768/1617 | b | frame 0xc4 matches; slot order and `0.0f - scaled.z` operand order |
 | race/Wrecker | `0x00531da0` | 629/634 | b | 1 code diffs: `fld [esp + N] ; fmul st(1)` vs `fld st(0) ; fmul [esp + N]`; slots differ |
+| race/Wrecker | `0x00532580` | 490/562 | c | each cross product loads the old forward component first (retail the new pose's) and schedules its `fsubp` after the destination pointer copy |
+| race/Wrecker | `0x005329e0` | 215/1306 | b | frame 0x94 matches; slot order (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`) |
 | render/BackgroundImage | `0x00403dc0` | 53/222 (masked) | c | 15 code diffs |
 | render/BackgroundImage | `0x004049d0` | 39/603 (masked) | c | 33 code diffs: `xor edi, edi` vs `mov [esp + N], 0`; `mov [esp + N], edi ; mov [ecx], edi ; j~` vs `mov [ecx], 0 ; je @162` |
 | render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
@@ -292,6 +294,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/Griddraw | `0x0047e600` | 1605/1617 (masked) | c | frame matches; the extent.x/extent.y products load the cell size first (`fld [edx + 0x40] ; fmul [ecx + 0x164]`), retail the minimum |
 | render/Griddraw | `0x0047f210` | 361/543 (masked) | b | 29 code diffs: retail adds `xor esi, esi`; retail lacks `xor edi, edi`; slot order differs |
 | render/Griddraw | `0x00480ad0` | 363/406 (masked) | b | 15 code diffs: retail adds `push ebp`; `push ebp` vs `push esi`; slots differ |
+| render/Griddraw | `0x00481300` | 121/216 (masked) | c | child index: `lea ecx, [edi + ebp] ; add ecx, table[quad]` vs `mov edx, table[quad] ; add edx, edi ; add edx, ebp` |
 | render/Griddraw | `0x004815e0` | 59/994 (masked) | b | 39 code diffs: `push edi ; mov edx, [esi + 0x34] ; mov ~` vs `mov ecx, [esi + 0x34] ; mov edx, [esi +~`; `je @22` vs `je @19 ; fstp [esp + N] ; fld st(0)`; slots differ |
 | render/Griddraw | `0x00481b30` | 127/351 (masked) | b | 15 code diffs: `mov edx, [eax + 0x60] ; fld [eax + 0x64]` vs `fld [eax + 0x60] ; mov edx, [eax + 0x64]`; retail lacks `mov [esp + N], edx`; slots differ |
 | render/Griddraw | `0x00481de0` | 133/1616 (masked) | b | 85 code diffs: retail adds `mov ebx, [esp + N]`; retail adds `mov ebp, [esp + N]`; slots differ |
