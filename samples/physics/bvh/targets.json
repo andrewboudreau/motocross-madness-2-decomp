@@ -47,5 +47,35 @@
     "expect": "partial",
     "notes": "near miss: one extra store of the transformed centre x (retail keeps it on the FPU stack)",
     "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?SweptBoxOverlap@@",
+    "target_va": "0x00424730",
+    "target_size": 891,
+    "expect": "partial",
+    "notes": "855/891: instruction-identical, frame slots of half/moved/ext/delta differ (see the file header).",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?CapsuleTreeQuery@@",
+    "target_va": "0x004298c0",
+    "target_size": 1436,
+    "expect": "partial",
+    "notes": "532/1418: matches through the |dist| test; operator-result temporaries and the shared return 1 differ afterwards (see the file header).",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?SegmentTriangleQuery@@",
+    "target_va": "0x00427c10",
+    "target_size": 1101,
+    "expect": "partial",
+    "notes": "371/1073 first draft: retail reloads the record pointer at every use; registers differ (see the file header).",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   }
 ]

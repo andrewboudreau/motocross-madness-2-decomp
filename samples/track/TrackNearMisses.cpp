@@ -58,9 +58,11 @@
 // branches swapped, `continue`, an `ok` variable and track[n] = 0 in both
 // first-file branches do not move it; a goto into the first copy rearranges
 // the prologue (edi pushed late) and is further off.
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include "../../src/reconstructed/DebugAlloc.h"
+#include "../../src/reconstructed/TextureMap.h"
 #include "../../src/reconstructed/Track.h"
 #include "../../src/reconstructed/TrackGame.h"
 #include "../../src/reconstructed/TrackRecordDlg.h"
@@ -491,4 +493,324 @@ int Track::UnknownFunction517340(Vector3 p, TrackPos from, float distance, float
         DebugFree(done, __FILE__, 994);
     }
     return found;
+}
+
+// 0x00516980: the closest position on the track to p, in the horizontal
+// plane, over every node reachable from the start node (the depth-first walk
+// of 0x00516870), and optionally its distance. Near miss (465 of 776
+// compared bytes; retail 786): frame, slots, walk and the first half of the
+// segment loop match; as in 0x00516ca0, VC6 here reuses the `p - segment`
+// differences in the t < 0 and t == 0 branches where retail recomputes them,
+// so the branch code is shorter and every later offset shifts. Named px/pz
+// locals (retail stores both before the division) add a second copy instead.
+int Track::UnknownFunction516980(Vector3 p, TrackPos* out, float* outDistance)
+{
+    float best = -1.0f;
+    if (!out)
+        return 0;
+    if (!field_0x00)
+        return 0;
+    TrackListItem* item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 514);
+    if (!item)
+        return 0;
+    item->field_0x04 = field_0x00;
+    TrackListItem* list = item;
+    while (list) {
+        TrackNode* node = list->field_0x04;
+        if (node->field_0x00 & 4) {
+            node->field_0x00 &= ~4;
+            item = list;
+            list = list->field_0x0c;
+            DebugFree(item, __FILE__, 530);
+        } else {
+            node->field_0x00 |= 4;
+            TrackSegment* segment = list->field_0x04->field_0x08;
+            if (segment) {
+                if (!segment->field_0x2c) {
+                    float dx = p.x - segment->field_0x00;
+                    float dz = p.z - segment->field_0x08;
+                    float distanceSquared = dz * dz + dx * dx;
+                    if (distanceSquared < best || best < 0.0f) {
+                        best = distanceSquared;
+                        out->node = list->field_0x04;
+                        out->segment = segment;
+                        out->t = 0.0f;
+                    }
+                }
+                for (; segment; segment = segment->field_0x2c) {
+                    TrackSegment* next = segment->field_0x2c;
+                    if (!next)
+                        break;
+                    float ex = next->field_0x00 - segment->field_0x00;
+                    float ez = next->field_0x08 - segment->field_0x08;
+                    float t;
+                    float dx;
+                    float dz;
+                    if (ex == 0.0f && ez == 0.0f) {
+                        t = 0.0f;
+                        dx = p.x - segment->field_0x00;
+                        dz = p.z - segment->field_0x08;
+                    } else {
+                        t = ((p.z - segment->field_0x08) * ez + (p.x - segment->field_0x00) * ex) / (ez * ez + ex * ex);
+                        if (t > 1.0f) {
+                            t = 1.0f;
+                            dx = p.x - next->field_0x00;
+                            dz = p.z - next->field_0x08;
+                        } else if (t < 0.0f) {
+                            t = 0.0f;
+                            dx = p.x - segment->field_0x00;
+                            dz = p.z - segment->field_0x08;
+                        } else if (t == 1.0f) {
+                            dx = p.x - next->field_0x00;
+                            dz = p.z - next->field_0x08;
+                        } else if (t == 0.0f) {
+                            dx = p.x - segment->field_0x00;
+                            dz = p.z - segment->field_0x08;
+                        } else {
+                            dx = (p.x - segment->field_0x00) - t * ex;
+                            dz = (p.z - segment->field_0x08) - t * ez;
+                        }
+                    }
+                    float distanceSquared = dz * dz + dx * dx;
+                    if (distanceSquared < best || best < 0.0f) {
+                        best = distanceSquared;
+                        out->node = list->field_0x04;
+                        out->segment = segment;
+                        out->t = t;
+                    }
+                }
+            }
+            int count = list->field_0x04->field_0x10;
+            TrackNode** links = list->field_0x04->field_0x14;
+            for (int i = 0; i < count; i++) {
+                if (!(links[i]->field_0x00 & 4)) {
+                    item = (TrackListItem*)DebugCalloc(1, sizeof(TrackListItem), __FILE__, 588);
+                    if (!item)
+                        return 0;
+                    item->field_0x04 = links[i];
+                    item->field_0x0c = list;
+                    list = item;
+                }
+            }
+        }
+    }
+    if (outDistance) {
+        if (best > 0.0f)
+            *outDistance = FastSqrt(best);
+        else if (best == 0.0f)
+            *outDistance = 0.0f;
+    }
+    return 1;
+}
+
+// 0x00515ed0: the track loader. A chunk stream: one id byte, then the
+// chunk's data, until the stream ends (the inline end test 0x00430ff0):
+// 1 node count (allocates the node table), 2/3 x/z offset, 4 scale, 5 node
+// index (allocates the node), 6 node flags (bit 0 set), 7 node length,
+// 8 new segment, 9/10/11 the last segment's centre / left / right point
+// (scaled and offset; 9 also sets the previous segment's horizontal length),
+// 12 skipped, 13 link count (allocates the links), 14 one link (slot and
+// node index, range-checked against the count inclusively as retail does),
+// 15/16 the start / finish probe. Afterwards the link indices become node
+// pointers, the start node is kept, the probes are placed on the track and
+// the lap length is measured from just after the start round to it.
+// Draft near miss (117 of 2400 compared bytes; retail 2342): the chunk
+// dispatch, calls and arithmetic follow retail, but the frame is 0x64
+// (retail 0x48) and retail keeps `this` in ebp (spilled to the frame for the
+// probe chunks), so every frame offset differs.
+// The start / finish probe the loader fills (bikerace.cpp's 0x3c-byte gate).
+struct TrackProbe {
+    TrackVec3 centre;               // +0x00
+    TrackVec3 direction;            // +0x0c
+    TrackVec3 halfExtents;          // +0x18
+    float field_0x24;
+    float field_0x28;               // 150 after loading
+    TrackPos pos;                   // +0x2c
+};
+
+static inline void ReadProbe(UnknownTextureStream* stream, TrackProbe* probe, float scale,
+                             float offsetX, float offsetZ)
+{
+    stream->UnknownFunction461640(&probe->centre.x, 4, 1);
+    stream->UnknownFunction461640(&probe->centre.y, 4, 1);
+    stream->UnknownFunction461640(&probe->centre.z, 4, 1);
+    stream->UnknownFunction461640(&probe->direction.x, 4, 1);
+    stream->UnknownFunction461640(&probe->direction.y, 4, 1);
+    stream->UnknownFunction461640(&probe->direction.z, 4, 1);
+    stream->UnknownFunction461640(&probe->halfExtents.x, 4, 1);
+    stream->UnknownFunction461640(&probe->halfExtents.y, 4, 1);
+    stream->UnknownFunction461640(&probe->halfExtents.z, 4, 1);
+    stream->UnknownFunction461640(&probe->field_0x24, 4, 1);
+    probe->halfExtents.x *= scale;
+    probe->halfExtents.y *= scale;
+    probe->halfExtents.z *= scale;
+    probe->field_0x24 *= scale;
+    probe->centre.x = probe->centre.x * scale + offsetX;
+    probe->centre.y *= scale;
+    probe->centre.z = probe->centre.z * scale + offsetZ;
+}
+
+int Track::UnknownFunction515ed0(UnknownTextureStream* stream, void* start, void* finish, int* hasStart,
+                                 int* hasFinish)
+{
+    int count = 0;
+    float offsetX = 0.0f;
+    float offsetZ = 0.0f;
+    float scale = 1.0f;
+    TrackNode** nodes;
+    int index;
+    TrackSegment** link;
+    int linkCount;
+    if (!stream)
+        return 0;
+    char chunk;
+    stream->UnknownFunction461640(&chunk, 1, 1);
+    index = 0;
+    while (!stream->UnknownFunction430ff0()) {
+        if (chunk == 1) {
+            stream->UnknownFunction461640(&count, 4, 1);
+            if (count <= 0)
+                return 0;
+            nodes = (TrackNode**)DebugCalloc(count, 4, __FILE__, 81);
+            if (!nodes)
+                return 0;
+        } else if (chunk == 2) {
+            stream->UnknownFunction461640(&offsetX, 4, 1);
+        } else if (chunk == 3) {
+            stream->UnknownFunction461640(&offsetZ, 4, 1);
+        } else if (chunk == 4) {
+            stream->UnknownFunction461640(&scale, 4, 1);
+        } else if (chunk == 5) {
+            stream->UnknownFunction461640(&index, 4, 1);
+            if (index < 0 || index >= count)
+                goto fail;
+            nodes[index] = (TrackNode*)DebugCalloc(1, sizeof(TrackNode), __FILE__, 108);
+            if (!nodes[index])
+                goto fail;
+            link = &nodes[index]->field_0x08;
+        } else if (chunk == 6) {
+            if (!nodes[index])
+                goto fail;
+            int flags;
+            stream->UnknownFunction461640(&flags, 4, 1);
+            nodes[index]->field_0x00 = (unsigned char)(flags | 1);
+        } else if (chunk == 7) {
+            if (!nodes[index])
+                goto fail;
+            stream->UnknownFunction461640(&nodes[index]->field_0x04, 4, 1);
+            nodes[index]->field_0x04 *= scale;
+        } else if (chunk == 8) {
+            if (!nodes[index] || !link)
+                goto fail;
+            TrackSegment* segment = (TrackSegment*)DebugCalloc(1, sizeof(TrackSegment), __FILE__, 141);
+            if (!segment)
+                goto fail;
+            segment->field_0x28 = nodes[index]->field_0x0c;
+            *link = segment;
+            link = &segment->field_0x2c;
+            nodes[index]->field_0x0c = segment;
+        } else if (chunk == 9) {
+            if (!nodes[index] || !nodes[index]->field_0x0c)
+                goto fail;
+            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x00, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x04, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x08, 4, 1);
+            nodes[index]->field_0x0c->field_0x00 = scale * nodes[index]->field_0x0c->field_0x00 + offsetX;
+            nodes[index]->field_0x0c->field_0x04 = scale * nodes[index]->field_0x0c->field_0x04;
+            nodes[index]->field_0x0c->field_0x08 = scale * nodes[index]->field_0x0c->field_0x08 + offsetZ;
+            TrackSegment* segment = nodes[index]->field_0x0c;
+            TrackSegment* previous = segment->field_0x28;
+            if (previous) {
+                float dx = segment->field_0x00 - previous->field_0x00;
+                float dz = segment->field_0x08 - previous->field_0x08;
+                previous->field_0x24 = (float)sqrt(dz * dz + dx * dx);
+            }
+        } else if (chunk == 10) {
+            if (!nodes[index] || !nodes[index]->field_0x0c)
+                goto fail;
+            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x0c, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x10, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x14, 4, 1);
+            nodes[index]->field_0x0c->field_0x0c = scale * nodes[index]->field_0x0c->field_0x0c + offsetX;
+            nodes[index]->field_0x0c->field_0x10 = scale * nodes[index]->field_0x0c->field_0x10;
+            nodes[index]->field_0x0c->field_0x14 = scale * nodes[index]->field_0x0c->field_0x14 + offsetZ;
+        } else if (chunk == 11) {
+            if (!nodes[index] || !nodes[index]->field_0x0c)
+                goto fail;
+            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x18, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x1c, 4, 1);
+            stream->UnknownFunction461640(&nodes[index]->field_0x0c->field_0x20, 4, 1);
+            nodes[index]->field_0x0c->field_0x18 = scale * nodes[index]->field_0x0c->field_0x18 + offsetX;
+            nodes[index]->field_0x0c->field_0x1c = scale * nodes[index]->field_0x0c->field_0x1c;
+            nodes[index]->field_0x0c->field_0x20 = scale * nodes[index]->field_0x0c->field_0x20 + offsetZ;
+        } else if (chunk == 12) {
+            int unused;
+            stream->UnknownFunction461640(&unused, 4, 1);
+        } else if (chunk == 13) {
+            if (!nodes[index])
+                goto fail;
+            stream->UnknownFunction461640(&linkCount, 4, 1);
+            if (linkCount < 0)
+                goto fail;
+            nodes[index]->field_0x10 = linkCount;
+            nodes[index]->field_0x14 = (TrackNode**)DebugCalloc(linkCount, 4, __FILE__, 231);
+            if (!nodes[index]->field_0x14)
+                goto fail;
+        } else if (chunk == 14) {
+            if (!nodes[index] || !nodes[index]->field_0x14)
+                goto fail;
+            int slot;
+            int target;
+            stream->UnknownFunction461640(&slot, 4, 1);
+            stream->UnknownFunction461640(&target, 4, 1);
+            if (slot < 0 || slot > linkCount || target < 0 || target > count)
+                goto fail;
+            nodes[index]->field_0x14[slot] = (TrackNode*)target;
+        } else if (chunk == 15) {
+            *hasStart = 1;
+            ReadProbe(stream, (TrackProbe*)start, scale, offsetX, offsetZ);
+        } else if (chunk == 16) {
+            *hasFinish = 1;
+            ReadProbe(stream, (TrackProbe*)finish, scale, offsetX, offsetZ);
+        }
+        stream->UnknownFunction461640(&chunk, 1, 1);
+    }
+    {
+        for (int i = 0; i < count; i++) {
+            if (nodes[i] && nodes[i]->field_0x14) {
+                for (int j = 0; j < nodes[i]->field_0x10; j++) {
+                    int k = (int)nodes[i]->field_0x14[j];
+                    if (k >= 0 && k < count)
+                        nodes[i]->field_0x14[j] = nodes[k];
+                }
+            }
+        }
+    }
+    field_0x00 = nodes[0];
+    DebugFree(nodes, __FILE__, 315);
+    if (*hasStart) {
+        TrackProbe* probe = (TrackProbe*)start;
+        probe->field_0x28 = 150.0f;
+        UnknownFunction516980(*(Vector3*)&probe->centre, &probe->pos, 0);
+    }
+    if (*hasFinish) {
+        TrackProbe* probe = (TrackProbe*)finish;
+        probe->field_0x28 = 150.0f;
+        UnknownFunction516980(*(Vector3*)&probe->centre, &probe->pos, 0);
+    }
+    {
+        TrackPos from;
+        from.node = field_0x00;
+        from.segment = field_0x00->field_0x08;
+        from.t = 0.0001f;
+        TrackPos to;
+        to.node = field_0x00;
+        to.segment = field_0x00->field_0x08;
+        to.t = 0.0f;
+        UnknownFunction5179f0(from, to, 0, &field_0x04);
+    }
+    return 1;
+fail:
+    UnknownFunction515e70((UnknownStream*)stream, nodes, count);
+    return 0;
 }

@@ -285,5 +285,15 @@
     "expect": "exact",
     "notes": "Dynamic-initializer body: builds (0,0,1) in a stack temporary and copies it to 0x005797e0 (copy-initialization from the inline constructor).",
     "bindings": "CollisionPoint.bindings.json"
+  },
+  {
+    "class": "CollisionObject",
+    "source": "CollisionObjectNearMisses.cpp",
+    "candidate_symbol_contains": "Fn_00439600",
+    "target_va": "0x00439600",
+    "target_size": 532,
+    "expect": "partial",
+    "notes": "516/532: capsule broad-phase query; only the x87 order of the segment-parameter numerator differs (retail multiplies v.y*d.y and v.x*d.x before v.z*d.z); natural, reversed and regrouped orders give the same code or reassociate worse (see the file header).",
+    "bindings": "../../../src/krusty2/collision/CollisionObject.bindings.json"
   }
 ]

@@ -34,11 +34,22 @@
 // also merges the 565 and 555 tails; a goto or reordered cases do not
 // change it.
 
+// DitherConvert (0x004cf2a0, 1759 bytes; candidate 1735, 242 match): the
+// Floyd-Steinberg ditherer behind the dithered converters. Two 16.16 error
+// rows (grown on demand, 0x00689a6c/0x00689a70/0x00689a74), each pixel
+// rounded to the nearest 5-bit level per channel and, with a palette, to
+// the palette entry when it is exactly that colour; errors spread 7/16
+// right, 5/16 below, 3/16 below left and the remainder below right. Draft:
+// the flow, calls and arithmetic follow retail, but VC6 here assigns the
+// format, the pixel size and the palette/width to ebx/esi/edi where retail
+// uses edi/ebx/esi, and the frame is 0x50 against retail's 0x54.
+//
 #include <string.h>
 
 #include "../../src/reconstructed/DebugAlloc.h"
 #include "../../src/reconstructed/Pixtrans.h"
 #include "../../src/reconstructed/TextureMap.h"
+#include "../../src/reconstructed/Tgafile.h"
 
 // 0x004cdf10: halves 8888 pixels. Colour averages the 2x2 pixels whose
 // alpha is set; alpha is the block's sum / 4. (The fourth pixel adds the
@@ -379,4 +390,157 @@ int Halve8(void* destination, void* source, int width, int height, int destinati
         }
     }
     return 0;
+}
+
+// The ditherer's two error rows (16.16 channel triples), grown on demand.
+int g_ditherCapacity;               // 0x00689a6c
+int* g_ditherRows[2];               // 0x00689a70, 0x00689a74
+
+// A 16.16 channel rounded to the nearest of the 32 5-bit levels.
+static inline int QuantizeChannel(int value)
+{
+    if (value < 0)
+        return 0;
+    if (value >= 0x1000000)
+        return 0xffffff;
+    int level = value / 0x80000 * 0x80000;
+    if (value - level > 0x40000)
+        level += 0x80000;
+    return level;
+}
+
+static inline int ClampHigh(int value)
+{
+    return value >= 0x1000000 ? 0xffffff : value;
+}
+
+static inline int Absolute(int value)
+{
+    return value < 0 ? -value : value;
+}
+
+static inline void ReadRow(int format, void* source, int* channels, int width)
+{
+    if (format == 555)
+        ReadRow555((unsigned short*)source, channels, width);
+    else if (format == 565)
+        ReadRow565((unsigned short*)source, channels, width);
+    else
+        ReadRow24((UnknownPixel24*)source, channels, width);
+}
+
+int DitherConvert(void* source, int format, int width, int height, int sourceStride,
+                  int destinationStride, void* output24, void* output565, void* output555,
+                  void* output8, UnknownTexturePalette* palette)
+{
+    int bytesPerPixel = UnknownFunction511970(format);
+    unsigned char* indices;
+    unsigned char* colors;
+    if (palette) {
+        indices = palette->UnknownFunction4de280();
+        colors = palette->UnknownFunction4de270();
+    }
+    if (g_ditherCapacity < width) {
+        if (g_ditherRows[0])
+            DebugFree(g_ditherRows[0], __FILE__, 1065);
+        g_ditherCapacity = 0;
+        g_ditherRows[0] = (int*)DebugMalloc(width * 24, __FILE__, 1068);
+        if (!g_ditherRows[0])
+            return 0;
+        g_ditherCapacity = width;
+        g_ditherRows[1] = g_ditherRows[0] + width * 3;
+    }
+    ReadRow(format, source, g_ditherRows[0], width);
+    int rowBytes = bytesPerPixel * sourceStride;
+    unsigned char* nextSource = (unsigned char*)source + rowBytes;
+    unsigned char* row24 = (unsigned char*)output24;
+    unsigned short* row565 = (unsigned short*)output565;
+    unsigned short* row555 = (unsigned short*)output555;
+    unsigned char* row8 = (unsigned char*)output8;
+    for (int y = 0; y < height; y++) {
+        int* current = g_ditherRows[y % 2];
+        int* next = g_ditherRows[1 - y % 2];
+        unsigned char* to24 = row24;
+        unsigned short* to565 = row565;
+        unsigned short* to555 = row555;
+        unsigned char* to8 = row8;
+        if (y != height - 1)
+            ReadRow(format, nextSource, next, width);
+        for (int x = 0; x < width; x++) {
+            int red = current[0];
+            int qr = QuantizeChannel(red);
+            int green = current[1];
+            int qg = QuantizeChannel(green);
+            int blue = current[2];
+            int qb = QuantizeChannel(blue);
+            unsigned char index;
+            if (palette) {
+                index = indices[(unsigned short)((ClampHigh(qr) >> 9 & 0xfc1f | ClampHigh(qg) >> 14) & 0xffe0
+                                                 | ClampHigh(qb) >> 19)];
+                unsigned char* color = colors + index * 3;
+                int pr = color[0] << 16;
+                int pg = color[1] << 16;
+                int pb = color[2] << 16;
+                if (Absolute(red - pr) <= 0 && Absolute(green - pg) <= 0 && Absolute(blue - pb) <= 0) {
+                    qr = pr;
+                    qg = pg;
+                    qb = pb;
+                }
+            }
+            int errorRed = red - qr;
+            int errorGreen = green - qg;
+            int errorBlue = blue - qb;
+            current[0] = ClampHigh(qr);
+            current[1] = ClampHigh(qg);
+            current[2] = ClampHigh(qb);
+            current[0] = current[0] < 0 ? 0 : current[0];
+            current[1] = current[1] < 0 ? 0 : current[1];
+            current[2] = current[2] < 0 ? 0 : current[2];
+            if (output24) {
+                to24[0] = (unsigned char)(current[0] >> 16);
+                to24[1] = (unsigned char)(current[1] >> 16);
+                to24[2] = (unsigned char)(current[2] >> 16);
+                to24 += 3;
+            }
+            if (output565) {
+                *to565 = (unsigned short)((current[0] >> 8 & 0xf81f | current[1] >> 13) & 0xffe0 | current[2] >> 19);
+                to565++;
+            }
+            if (output555) {
+                *to555 = (unsigned short)((current[0] >> 9 & 0xfc1f | current[1] >> 14) & 0xffe0 | current[2] >> 19);
+                to555++;
+            }
+            if (output8) {
+                *to8 = index;
+                to8++;
+            }
+            if (x < width - 1) {
+                int e7 = errorRed * 7 / 16;
+                current[3] += e7;
+                next[3] += errorRed - e7 - errorRed * 5 / 16 - errorRed * 3 / 16;
+                e7 = errorGreen * 7 / 16;
+                current[4] += e7;
+                next[4] += errorGreen - e7 - errorGreen * 5 / 16 - errorGreen * 3 / 16;
+                e7 = errorBlue * 7 / 16;
+                current[5] += e7;
+                next[5] += errorBlue - e7 - errorBlue * 5 / 16 - errorBlue * 3 / 16;
+            }
+            next[0] += errorRed * 5 / 16;
+            next[1] += errorGreen * 5 / 16;
+            next[2] += errorBlue * 5 / 16;
+            if (x > 0) {
+                next[-3] += errorRed * 3 / 16;
+                next[-2] += errorGreen * 3 / 16;
+                next[-1] += errorBlue * 3 / 16;
+            }
+            current += 3;
+            next += 3;
+        }
+        nextSource += rowBytes;
+        row24 += destinationStride * 3;
+        row565 += destinationStride;
+        row555 += destinationStride;
+        row8 += destinationStride;
+    }
+    return 1;
 }

@@ -234,9 +234,9 @@
     "source": "ProjectedShadow.cpp",
     "candidate_symbol_contains": "?RenderShadow@",
     "target_va": "0x004db8c0",
-    "target_size": 1074,
+    "target_size": 1136,
     "expect": "partial",
-    "notes": "2.3%, 884/1074 B: retail has an ebp frame and an unrolled 15-entry jump-table dword clear; rasteriser and transform helpers are called out of line",
+    "notes": "2.3%, 884/1074 B: retail has an ebp frame and an unrolled 15-entry jump-table dword clear; rasteriser and transform helpers are called out of line. Extent 0x004db8c0..0x004dbd30 includes the alignment mov and the 15-entry jump table after the ret.",
     "bindings": "ProjectedShadow.bindings.json"
   },
   {
@@ -244,9 +244,9 @@
     "source": "ProjectedShadow.cpp",
     "candidate_symbol_contains": "?Present@",
     "target_va": "0x004dbd30",
-    "target_size": 1218,
+    "target_size": 1400,
     "expect": "partial",
-    "notes": "12.5%, 655/1218 B: 2x2 box filter into the halved rect; retail clears with three unrolled jump tables (45/30/15 entries, included in the extent)",
+    "notes": "12.5%, 655/1218 B: 2x2 box filter into the halved rect; retail clears with three unrolled jump tables (45/30/15 entries). Extent 0x004dbd30..0x004dc2a8 includes the three jump tables after the ret.",
     "bindings": "ProjectedShadow.bindings.json"
   },
   {

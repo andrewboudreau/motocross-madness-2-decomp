@@ -175,6 +175,11 @@ public:
     // so that the pivot stays where it was in the parent's space. Tier 3 name.
     void RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle);
 
+    // 0x004fd340, thiscall, ret 0xc: localMatrix = diag(x, y, z, 1) * localMatrix through an
+    // inline product that leaves the local translation (+0xe8..+0xf0) untouched, then
+    // InvalidateWorldMatrix. Tier 3 name.
+    void Scale(float x, float y, float z);
+
     // ---- added in wave 4 (motion): methods called by SteeringControl / D3DIMSoultreeMotnctrl ----
 
     // 0x004fbd70, thiscall, ret 0x10: SetAxesIn-style setter taking the two axes by pointer

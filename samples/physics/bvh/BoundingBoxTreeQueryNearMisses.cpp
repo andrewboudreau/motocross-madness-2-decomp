@@ -18,11 +18,30 @@
 // LeafPairQuery 0x004275f0, LeafNodeQuery 0x004269e0 and SegmentTreeQuery 0x00429e90 are
 // exact in the src file.
 //
-// Not attempted yet: 0x00424730 (box swept by a motion matrix, then BoxOverlap),
-// BoxOverlap 0x00424ab0 (15-axis SAT through a jump table), 0x00425900 (capsule against
-// box), BoxTriangleQuery 0x00426be0, SegmentTriangleQuery 0x00427c10, TreeTreeQueryNodes
-// 0x004280e0 (inlines the 15-axis SAT), CapsuleTreeQuery 0x004298c0 (calls most Vec3
-// helpers out of line), 0x0042a640 (capsule against triangle).
+// - SweptBoxOverlap 0x00424730 (891/891 bytes, 855 match): instruction-identical; only the
+//   frame slots of half / moved / ext / delta differ (retail half, ext, delta, moved from esp
+//   up; here half, moved, ext, delta).  The three axes must be one Vec3 array (separate
+//   locals reorder every slot), the half extents a local copy written back to the by-value
+//   parameter, and the clamps QueryMin / QueryMax (their parameter copy is retail's [esp+8]).
+//
+// - CapsuleTreeQuery 0x004298c0 (1418 vs 1436 bytes, 532 match): the frame (0x54), the
+//   inline transforms and the out-of-line Vec3 operator calls match through the |dist| test
+//   (the point branch needs its own block so its locals share the triangle branch's slots);
+//   from there VC6 here assigns the operator result temporaries other slots and shares the
+//   `return 1` of the PointInTriangle test, where retail returns inline.  Calls the
+//   unreconstructed 0x0042a640 (SegmentSegmentDistance) for the three edges.
+//
+// - SegmentTriangleQuery 0x00427c10 (1073 vs 1101 bytes, 371 match): first draft.  The
+//   segment is moved into the triangle's frame relative to the sweep record's offset, clipped
+//   against the face plane, and on a hit inside the triangle the record's offset, contact,
+//   scale, count and the contact normal list (0x00579068/0x00579014, deduplicated through
+//   0x005299e0 unless 0x00579668 is set) are updated.  Retail reloads the record pointer
+//   0x00579058 at every use and holds other registers; the two flag branches are literal
+//   (the set-flag branch adds the push vector a second time and replaces the contact).
+//
+// Not attempted yet: BoxOverlap 0x00424ab0 (15-axis SAT through a jump table), 0x00425900 (capsule against
+// box), BoxTriangleQuery 0x00426be0, TreeTreeQueryNodes
+// 0x004280e0 (inlines the 15-axis SAT), 0x0042a640 (capsule against triangle).
 #include "bvh/BoundingBoxTreeQuery.h"
 
 // The unit's file statics (bound to the same addresses as in the src file).
@@ -188,4 +207,168 @@ void MoveBox(Vec3* center, Vec3* halfExtents, const Matrix4* m)
     }
     *center += moved;
     *halfExtents = grown;
+}
+
+// 0x00424730.  Overlap of box B (bCenter, bHalf, in A's frame through rel) with box A swept by
+// the motion xfA: A's half extents rotated by xfA give the moved box's extents, the union of
+// the box before and after the move (relative to aCenter) gives the swept centre offset and
+// half extents, then BoxOverlap.
+int SweptBoxOverlap(Vec3 aCenter, Vec3 aHalf, const Vec3* bCenter, const Vec3* bHalf,
+                    const Matrix4* rel, const Matrix4* xfA)
+{
+    Vec3 axis[3];
+    axis[0] = Vec3(aHalf.x, 0.0f, 0.0f);
+    axis[1] = Vec3(0.0f, aHalf.y, 0.0f);
+    axis[2] = Vec3(0.0f, 0.0f, aHalf.z);
+    Vec3TransformNormal(&axis[0], axis[0], xfA);
+    Vec3TransformNormal(&axis[1], axis[1], xfA);
+    Vec3TransformNormal(&axis[2], axis[2], xfA);
+    Vec3 half = aHalf;
+    Vec3 ext;
+    ext.x = QueryAbs(axis[0].x) + QueryAbs(axis[1].x) + QueryAbs(axis[2].x);
+    ext.y = QueryAbs(axis[0].y) + QueryAbs(axis[1].y) + QueryAbs(axis[2].y);
+    ext.z = QueryAbs(axis[0].z) + QueryAbs(axis[1].z) + QueryAbs(axis[2].z);
+    Vec3 moved;
+    TransformPointPtr(&moved, &aCenter, xfA);
+    Vec3 delta;
+    delta.x = moved.x - aCenter.x;
+    delta.y = moved.y - aCenter.y;
+    delta.z = moved.z - aCenter.z;
+    for (int i = 0; i < 3; i++) {
+        float lo = delta[i] - ext[i];
+        float hi = ext[i] + delta[i];
+        lo = QueryMin(-half[i], lo);
+        hi = QueryMax(half[i], hi);
+        moved[i] = (hi + lo) * 0.5f;
+        half[i] = (hi - lo) * 0.5f;
+    }
+    aHalf = half;
+    aCenter += moved;
+    return BoxOverlap(&aCenter, &aHalf, *bCenter, *bHalf, rel);
+}
+
+// 0x004298c0.  Capsule (segment ends[0]..ends[1], radius) against the tree; the triangle
+// branch clips the segment against the face plane, the point branch measures the distance
+// from the transformed point to the segment.  See the header for what differs.
+int CapsuleTreeQuery(const Vec3* ends, float radius, float radiusSq, QueryTreeNode* node,
+                     const Matrix4* xf, int triangles)
+{
+    if (node->volume < 0.0f) {
+        if (triangles) {
+            QueryTriangle* tri = &((QueryTriangleLeaf*)node)->tri;
+            Vec3 p;
+            InverseTransformPointInline(&p, *ends, xf);
+            Vec3 d;
+            Vec3TransformNormalTranspose(&d, Vec3Sub(ends[1], ends[0]), xf);
+            float t = -(Vec3Dot(tri->normal, p) + tri->planeOffset) / Vec3Dot(tri->normal, d);
+            if (!(t < 1.0f))
+                t = 1.0f;
+            else if (t <= 0.0f)
+                t = 0.0f;
+            Vec3 c = Vec3Add(Vec3Scale(d, t), p);
+            float dist = Vec3Dot(Vec3Sub(c, s_vertices[tri->vertex[0]]), tri->normal);
+            if (QueryAbs(dist) <= radius) {
+                Vec3 q = Vec3Sub(c, Vec3ScaleLeft(dist, tri->normal));
+                if (PointInTriangle(&q, tri))
+                    return 1;
+                Vec3 e = Vec3Sub(s_vertices[tri->vertex[1]], s_vertices[tri->vertex[0]]);
+                if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[0]], &e) > radius)
+                    return 1;
+                e = Vec3Sub(s_vertices[tri->vertex[2]], s_vertices[tri->vertex[1]]);
+                if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[1]], &e) > radius)
+                    return 1;
+                e = Vec3Sub(s_vertices[tri->vertex[0]], s_vertices[tri->vertex[2]]);
+                if (SegmentSegmentDistance(&p, &d, &s_vertices[tri->vertex[2]], &e) > radius)
+                    return 1;
+            }
+            return 0;
+        } else {
+            Vec3 p;
+            TransformPointInline(&p, ((QueryPointLeaf*)node)->point, xf);
+            Vec3 dir = Vec3Call(ends[1].x - ends[0].x, ends[1].y - ends[0].y, ends[1].z - ends[0].z);
+            float t = Vec3Dot(dir, Vec3Sub(p, *ends)) / Vec3Dot(dir, dir);
+            if (!(t < 1.0f))
+                t = 1.0f;
+            else if (t <= 0.0f)
+                t = 0.0f;
+            Vec3 r = Vec3Sub(p, Vec3Add(Vec3ScaleLeft(t, dir), *ends));
+            if (Vec3LengthCall(&r) < radius)
+                return 1;
+            return 0;
+        }
+    }
+    if (!BoxCapsuleOverlap(&node->center, &node->halfExtents, ends, radius, radiusSq, xf))
+        return 0;
+    return CapsuleTreeQuery(ends, radius, radiusSq, node->child[0], xf, triangles) ||
+           CapsuleTreeQuery(ends, radius, radiusSq, node->child[1], xf, triangles);
+}
+
+// 0x00427c10.  Segment (moved by m) against a triangle, accumulating into the sweep record.
+extern Vec3 g_CollisionScratchPoints[128];   // 0x00579068
+extern int g_CollisionScratchCount;          // 0x00579014
+extern int g_unknown579668;                  // 0x00579668
+
+// The sweep record SegmentTriangleQuery accumulates into (the same pointer as
+// g_CollisionBoxResult; CollisionShapeTests.h's CollisionSweepQuery).
+struct QuerySweepRecord {
+    Vec3AddAssignCall offset;       // +0x00
+    unsigned char field_0x0c[0x0c];
+    Vec3AddAssignCall contact;      // +0x18
+    float scale;                    // +0x24
+    int count;                      // +0x28
+};
+
+int Vec3Equal(const Vec3* a, const Vec3* b);   // 0x005299e0
+
+int SegmentTriangleQuery(const QueryTriangle* tri, const Vec3* segment, const Matrix4* m)
+{
+    QuerySweepRecord* record = (QuerySweepRecord*)g_CollisionBoxResult;
+    Vec3 start;
+    TransformPointInline(&start, segment[0], m);
+    start.x -= record->offset.x;
+    start.y -= record->offset.y;
+    start.z -= record->offset.z;
+    Vec3 dir;
+    TransformPointInline(&dir, segment[1], m);
+    dir.x -= start.x;
+    dir.y -= start.y;
+    dir.z -= start.z;
+    if (QueryDot(dir, tri->normal) <= 0.0f)
+        return 0;
+    float t = -((QueryDot(start, tri->normal) + tri->planeOffset) / QueryDot(dir, tri->normal));
+    if (t < 0.0f || t > 1.0f)
+        return 0;
+    record->scale *= t;
+    Vec3 step = Vec3Call(dir.x * t, dir.y * t, dir.z * t);
+    Vec3 hit = Vec3Call(step.x + start.x, step.y + start.y, step.z + start.z);
+    Vec3 push;
+    if (!g_unknown579668) {
+        Vec3 v = Vec3Call(step.x, step.y, step.z);
+        float s = -QueryDot(v, tri->normal);
+        push = Vec3Call(s * tri->normal.x, s * tri->normal.y, s * tri->normal.z);
+    } else {
+        Vec3 v = Vec3Call(step.x, step.y, step.z);
+        push = Vec3ScaleLeft(-QueryDot(v, tri->normal), tri->normal);
+    }
+    if (!PointInTriangle(&hit, tri))
+        return 0;
+    record->offset += push;
+    record->contact += hit;
+    if (!g_unknown579668) {
+        int i;
+        for (i = 0; i < g_CollisionScratchCount; i++) {
+            if (Vec3Equal(&g_CollisionScratchPoints[i], &tri->normal))
+                break;
+        }
+        if (i >= g_CollisionScratchCount)
+            g_CollisionScratchPoints[g_CollisionScratchCount++] = tri->normal;
+        record->count++;
+        return 1;
+    }
+    record->offset += push;
+    (Vec3&)record->contact = hit;
+    record->count = 1;
+    g_CollisionScratchPoints[0] = tri->normal;
+    g_CollisionScratchCount = 1;
+    return 1;
 }

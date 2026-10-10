@@ -13,7 +13,7 @@
   "?ComputeTimeBehind@@YAHPAUUnknownEventRacerPart@@H@Z": "0x004e6210",
   "?RankByScore@@YAHH@Z": "0x004e62d0",
   "?UpdateLapRace@@YAHPAPAUUnknownEventRacerPart@@PAVTrack@@MPAUUnknownBikeRaceNode@@2HH@Z": "0x004e63e0",
-  "?UnknownFunction516980@Track@@QAEHUVector3@@PAUTrackPos@@H@Z": "0x00516980",
+  "?UnknownFunction516980@Track@@QAEHUVector3@@PAUTrackPos@@PAM@Z": "0x00516980",
   "?UnknownFunction517340@Track@@QAEHUVector3@@UTrackPos@@MMHPAU3@@Z": "0x00517340",
   "?UnknownFunction517da0@Track@@QAEMUTrackPos@@0@Z": "0x00517da0",
   "?UnknownFunction518080@Track@@QAEHUTrackPos@@PAUTrackVec3@@@Z": "0x00518080",

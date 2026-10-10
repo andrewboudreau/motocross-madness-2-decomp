@@ -311,5 +311,35 @@
     "expect": "exact",
     "notes": "static const Vec3 (0,0,1) initialiser body: temporary copied to 0x00689970",
     "bindings": "AxisSettle.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeBounds.cpp",
+    "candidate_symbol_contains": "?Scale@SoultreeObject",
+    "target_va": "0x004fd340",
+    "target_size": 630,
+    "expect": "partial",
+    "notes": "588/630: rows 1 and 4 emit their off-diagonal products in another order (x87 leaf order); prologue, frame and rows 2-3 match. See SoultreeBounds.cpp.",
+    "bindings": "SoultreeBounds.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeBounds.cpp",
+    "candidate_symbol_contains": "?GetWorldBounds@SoultreeObject",
+    "target_va": "0x004fe8a0",
+    "target_size": 618,
+    "expect": "partial",
+    "notes": "541/610: frame slot order (retail c, e, w, a) and the hi = w + ext tail (retail keeps ext on the x87 stack). See SoultreeBounds.cpp.",
+    "bindings": "SoultreeBounds.bindings.json"
+  },
+  {
+    "class": "SoultreeObject",
+    "source": "SoultreeBounds.cpp",
+    "candidate_symbol_contains": "?AccumulateBounds@SoultreeObject",
+    "target_va": "0x004fe2e0",
+    "target_size": 1390,
+    "expect": "partial",
+    "notes": "first draft: same flow, calls and arithmetic; retail frame 0x48 vs 0x3c (by-value direction temporaries, centre in ebx/ebp/edx, out-of-line Vec3 ctor 0x00404e60 for hi). See SoultreeBounds.cpp.",
+    "bindings": "SoultreeBounds.bindings.json"
   }
 ]

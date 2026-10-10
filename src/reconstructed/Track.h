@@ -89,8 +89,9 @@ public:
     int UnknownFunction515e70(UnknownStream* stream, TrackNode** nodes, int count);
     int UnknownFunction516800(TrackNode* node);
     int UnknownFunction516870(TrackNode** start);
-    // 0x00516980 (RaceStatus.cpp): places `p` on the track.
-    int UnknownFunction516980(Vector3 p, TrackPos* out, int flags);
+    // 0x00516980 (RaceStatus.cpp): places `p` on the track (the closest
+    // position over every reachable node) and optionally returns its distance.
+    int UnknownFunction516980(Vector3 p, TrackPos* out, float* outDistance);
     int UnknownFunction516ca0(TrackVec3 p, TrackNode* node, TrackPos* out, float* outDistance);
     int UnknownFunction516ef0(TrackVec3 p, TrackSegment* segment, TrackSegment* next);
     int UnknownFunction517310(TrackSegment* segment, TrackNode* node);

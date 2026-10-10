@@ -17,8 +17,8 @@
 // 0x004fd660, WorldToLocalDirection 0x004fd710, WorldToLocalPoint 0x004fd7f0, SetMatrixIn
 // 0x004fb8c0 with the transpose COMDAT 0x004fefb0, SetAxesPtr 0x004fbd70, SetAxesIn 0x004fc050,
 // GetMatrixIn 0x004fca80, RotateAboutPoint 0x004fd1f0) are in samples/physics/helpers/.
-// Not attempted yet: Scale 0x004fd340 (inline 4x4 product), AccumulateBounds 0x004fe2e0 and
-// GetWorldBounds 0x004fe8a0 (x87 heavy).
+// Scale 0x004fd340 (inline 4x4 product), AccumulateBounds 0x004fe2e0 and GetWorldBounds
+// 0x004fe8a0 are near misses in samples/physics/helpers/SoultreeBounds.cpp.
 #define SOULTREE_OBJECT_WITH_BASES
 #include <math.h>
 #include <string.h>

@@ -124,14 +124,21 @@ the third one's alpha in retail) and differs in register assignment;
 `0x004cee30` (the palette halver, 45/1133: VC6 pushes ebp in the prologue
 and homes the source row in `source`'s slot, which shifts every slot).
 
-`0x004d0d40` is hand-written assembly (frame pointer, dead `mov eax, 0`,
-`push ebp` inside the loop) and is out of scope. The palette-index
+`0x004d0d40` is inline assembly (frame pointer, dead `mov eax, 0`,
+`push ebp` inside the loop, `ebp` used as the loop counter) and is out of scope. The palette-index
 converters `0x004d0aa0`/`0x004d0b90`/`0x004d0c40` (24-bit, 565, 555) dither
 through `0x004cf2a0` when asked and otherwise map through the 555-to-index
 and 565-to-index tables `0x004de280`/`0x004de290`.
 
-Not reconstructed: the halvers `0x004ce5f0` and `0x004cea10` (assembly)
-and the ditherer `0x004cf2a0`. The table getters
+Not reconstructed: the halvers `0x004ce5f0` and `0x004cea10`, inline assembly
+by strong inference (the only `push ebp; mov ebp, esp` frames among the unit's
+halvers; their pixel loops accumulate into a zeroed argument slot in memory,
+`mov [ebp+0x1c], 0; add [ebp+0x1c], ebx; ...`, and count down `dec [ebp+0x24]`,
+which VC6 `/O2` does not emit for C locals). The ditherer `0x004cf2a0`
+(Floyd-Steinberg over two 16.16 error rows, 0x00689a6c..0x00689a74) is a
+draft near miss in `samples/render/PixtransNearMisses.cpp` (242 of 1735
+compared bytes: flow and arithmetic match, the format, pixel size and
+palette registers are permuted and the frame is 4 bytes smaller). The table getters
 `0x004de280`/`0x004de290` are exact in `src/reconstructed/Quantize.cpp`.
 `0x004cf162` and `0x004d0000` are not function
 starts: the first is mid-instruction inside the palette halver
@@ -147,8 +154,8 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004cdf10` `Halve8888`
 - `0x004ce190` `Halve4444`
 - `0x004ce420` `Halve1555`
-- `0x004ce5f0` `Halve555`
-- `0x004cea10` `Halve565`
+- `0x004ce5f0` `Halve555` (inline assembly)
+- `0x004cea10` `Halve565` (inline assembly)
 - `0x004cee30` `Halve8`
 - `0x004cf2a0` `DitherConvert`
 - `0x004cf980` `ReadRow24`
@@ -171,7 +178,7 @@ replace are in Git history. Tier 3 unless the entry says otherwise.
 - `0x004d0aa0` `Convert24To8`
 - `0x004d0b90` `Convert565To8`
 - `0x004d0c40` `Convert555To8`
-- `0x004d0d40` `Convert555To8Fast`
+- `0x004d0d40` `Convert555To8Fast` (inline assembly)
 - `0x004d0e40` `Convert555To8888`
 - `0x004d0f10` `Convert555To24`
 - `0x004d0fb0` `Convert555To565`

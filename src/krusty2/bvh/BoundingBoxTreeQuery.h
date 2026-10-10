@@ -140,6 +140,8 @@ Vec3 Vec3Sub(const Vec3& a, const Vec3& b);     // 0x00421d00 operator-
 Vec3 Vec3Add(const Vec3& a, const Vec3& b);     // 0x00421cb0 operator+
 Vec3 Vec3Scale(const Vec3& v, float s);         // 0x005015b0 operator*(const Vec3&, float)
 float Vec3Dot(const Vec3& a, const Vec3& b);    // 0x0040ae30 DotProduct
+Vec3 Vec3ScaleLeft(float s, const Vec3& v);     // 0x00428090 operator*(float, const Vec3&)
+float Vec3LengthCall(const Vec3* v);            // 0x00435ec0 length (CollisionLength)
 
 // The operators expanded inline while their constructor is called out of line (the nested
 // expansion is the first one VC6 gives up when the budget runs low).
@@ -162,12 +164,16 @@ inline Vec3 ScaleCtorCall(const Vec3& v, float s)
 // The unit's functions (cdecl).
 // ---------------------------------------------------------------------------------------
 
+int SweptBoxOverlap(Vec3 aCenter, Vec3 aHalf, const Vec3* bCenter, const Vec3* bHalf,
+                    const Matrix4* rel, const Matrix4* xfA);                       // 0x00424730
 int BoxOverlap(const Vec3* aCenter, const Vec3* aHalfExtents, Vec3 bCenter, Vec3 bHalfExtents,
                const Matrix4* bToA);                                               // 0x00424ab0
 int SegmentBoxOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 p0, Vec3 p1,
                       const Matrix4* m);                                           // 0x004253b0
 int BoxSphereOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 sphereCenter,
                      float radius, float radiusSq, const Matrix4* xf);             // 0x00425750
+int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* ends,
+                      float radius, float radiusSq, const Matrix4* xf);            // 0x00425900
 int LeafNodeQuery(QueryTreeNode* a, QueryTreeNode* b, int useMotion);              // 0x004269e0
 int BoxTriangleQuery(const Vec3* center, const Vec3* halfExtents, const QueryTriangle* tri,
                      const Matrix4* m);                                            // 0x00426be0
@@ -202,6 +208,9 @@ void Vec3TransformNormalTranspose(Vec3* out, Vec3 v, const Matrix4* m);         
 void Vec3TransformPoint(Vec3* out, Vec3 v, const Matrix4* m);                      // 0x0042a510
 void TransformPointPtr(Vec3* out, const Vec3* v, const Matrix4* m);                // 0x0042a580
 void InverseTransformPoint(Vec3* out, Vec3 p, const Matrix4* m);                   // 0x0042a5e0
+// 0x0042a640: a distance between the segments p0 + s*d0 and p1 + t*d1 (0 when d0 x d1 is
+// zero); CapsuleTreeQuery reports a hit when it exceeds the radius.  Not reconstructed.
+float SegmentSegmentDistance(const Vec3* p0, const Vec3* d0, const Vec3* p1, const Vec3* d1);
 float PointSegmentDistance(const Vec3* p, const Vec3* a, const Vec3* b);           // 0x0042ac00
 
 #endif

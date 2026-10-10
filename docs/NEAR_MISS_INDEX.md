@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 196, c 146, total 342. The three class (a) functions of the
+Counts: a 0, b 210, c 158, total 368. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -34,6 +34,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | camera/Camera | `0x0042eb10` | 659/690 | c | four fld/fmul operand pairs of the up × forward cross product load the other operand first (samples/camera/CameraNearMisses.cpp) |
 | camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) |
 | camera/FollowCamera | `0x00462ee0` | 418/564 | c | 12 code diffs: retail lacks `mov byte ptr [esi + 0x274], bl ; mov [e~`; retail adds `mov [edx + 8], eax` |
+| camera/FollowCamera | `0x00463a30` | 903/4042 | b | slot 45 (keyboard/joystick controls), 138 code diffs; aligned instruction ratio 0.937 (samples/camera/FollowCameraNearMisses.cpp) |
 | camera/FollowCamera | `0x00465000` | 198/210 | c | 2 code diffs: retail lacks `mov byte ptr [esi + 0x277], 0`; retail adds `mov byte ptr [esi + 0x277], al` |
 | camera/FollowCamera | `0x004650e0` | 262/943 | b | 3 code diffs: `je @266 ; jmp @261` vs `je A ; jmp A`; `je @79` vs `je A`; frame 0x180 vs 0x18c |
 | camera/FollowCamera | `0x004654e0` | 358/576 | b | 6 code diffs: retail adds `fsubp st(1)`; retail lacks `fsubp st(1)`; slots differ |
@@ -66,6 +67,13 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | gameui/MediaControl | `0x004a2560` | 53/656 | b | 29 code diffs: retail adds `push ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3100` | 102/1449 (masked) | b | 90 code diffs: retail lacks `push ebp`; retail lacks `xor ebp, ebp`; slots differ |
 | inputdevice/PCJoystickDevice | `0x004c3790` | 345/417 (masked) | b | 7 code diffs: `mov eax, [esi + 0x260] ; mov ecx, [A] ;~` vs `mov ecx, [esi + 0x260] ; mov edx, [A] ;~`; `mov ecx, [ecx + 0x14]` vs `mov ecx, [edx + 0x14]`; slots differ |
+| io/FileStream | `0x00460d10` | 17/77 | c | 3 code diffs: retail loads the argument into edx on entry; VC6 here loads it into ecx just before the +0x12c store, which it hoists above the header byte stores (samples/io/FileStream.cpp) |
+| io/FileStream | `0x00460db0` | 27/176 | c | 10 code diffs: retail keeps the first fseek-failure block inline (samples/io/FileStream.cpp) |
+| io/FileStream | `0x00460f50` | 284/933 | c | 18 code diffs: VC6 here stores access[0] as well; candidate 933 of 957 bytes |
+| io/FileStream | `0x00461340` | 201/700 | c | 29 code diffs: retail loads the decoded position (+0x0c) once and keeps the next pointer in another register |
+| io/FileStream | `0x00461640` | 202/671 | c | 22 code diffs: retail keeps the advanced buffer pointer in a register |
+| io/FileStream | `0x004618e0` | 136/152 | c | 7 code diffs: retail loads buffer/size/count into registers before the pushes |
+| io/FileStream | `0x00461b90` | 257/282 | c | 3 code diffs: retail stores the 0xfa seed inside the inlined strcat and sets up the name pointer right after strlen |
 | krusty2/broadphase/Quadtree | `0x004dcac0` | 20/562 (masked) | b | 37 code diffs: retail adds `sub esp, N`; `sub esp, 0x30` vs `mov [esp + N], ecx`; frame 0x0 vs 0x34, slot order differs |
 | krusty2/broadphase/Quadtree | `0x004dcf20` | 35/309 (masked) | b | 20 code diffs: `push esi ; mov esi, [esp + N] ; cmp esi~` vs `push ebp ; mov ebp, ecx ; mov ecx, [esp~`; `dec eax ; mov ebx, esi ; mov [ecx + 0x8~` vs `mov ebx, [ebp + N] ; dec ebx ; mov eax,~`; slot order differs |
 | krusty2/broadphase/Terrain | `0x00506e90` | 850/1502 (masked) | b | 44 code diffs: `je @308` vs `je @282 ; fld [esp + N] ; push ecx`; retail adds `mov ecx, [esp + N]`; slots differ |
@@ -130,18 +138,24 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | net/NetThread | `0x004af8e0` | 234/338 | c | 19 code diffs: retail adds `push ebx`; retail adds `mov eax, [A]` |
 | net/NetThread | `0x004afa90` | 698/1251 | b | 14 code diffs: `jne @388` vs `jne A`; `jne @374` vs `jne A`; slots differ |
 | net/ZoneReport | `0x0049ca60` | 4792/4810 | c | retail folds the 1-based type's +1 into the `>= 30` branch (`add ebx, -0x1a`, jumping past the else branch's `inc ebx`); VC6 here subtracts 27 and increments after the join (an in-branch +1 spills the index) |
+| parameterblocks/Parameterblocks | `0x004b7220` | 144/157 | c | `this` and `path` in ebp/ebx where retail uses ebx/ebp (samples/parameterblocks/ParameterblocksNearMisses.cpp) |
+| parser/Parser | `0x004b87f0` | 33/406 | b | prologue: retail pushes ebx/ebp/esi/edi before the null test, VC6 here pushes ebx/ebp after the early return (samples/parser/ParserNearMisses.cpp) |
 | physics/bikeai/BikeAI | `0x0040d200` | 4430/4464 | c | 2 scheduling diffs: the initial `seg.y = 0` store and the ground-branch `p.y = ground.y` store each sit one instruction pair earlier than retail's |
 | physics/bikeai/BikeAI | `0x0040e510` | 1133/1944 | b | 53 code diffs: retail adds `mov esi, [esp + N] ; test esi, esi`; `mov edi, [esp + N] ; test edi, edi ; je~` vs `je @582`; slot order differs |
 | physics/bikeai/BikeAI | `0x00415640` | 5987/6111 | b | 17 code diffs: retail pushes the dot-call arguments after the z*z term (`faddp ; fld ; fmul ; push ; push` vs `push ; push ; faddp`); order of the one-use temporaries above +0x100 differs |
 | physics/bikeai/BikeAI | `0x0040eca0` | 1288/17345 | b | 392 code diffs: retail keeps the start-up and loop-head zero vectors in memory (candidate folds them); frame 0x93c vs 0x8b8, slot order differs |
 | physics/bvh/BoundingBoxTreeBuild | `0x0042c260` | 447/1627 | b | 1 code diffs: retail lacks `mov edx, [eax + 0x27c] ; mov eax, [eax ~`; slots differ |
 | physics/bvh/BoundingBoxTreeBuild | `0x0042d390` | 1601/1608 | b | 3 code diffs: `mov ebx, [ebx + ecx]` vs `mov ebx, [ecx + ebx]`; `mov ebx, [ebx + ecx - 0x1c]` vs `mov ebx, [ecx + ebx - 0x1c]`; slots differ |
+| physics/bvh/BoundingBoxTreeQuery | `0x00424730` | 855/891 | b | instruction-identical; frame slots of half / moved / ext / delta (retail half, ext, delta, moved) |
 | physics/bvh/BoundingBoxTreeQuery | `0x004278d0` | 778/830 | b | 7 code diffs: retail adds `fsubp st(1) ; fld [esp + N] ; fmul [esp~`; retail adds `fld [esp + N] ; fmul [esp + N] ; lea eb~`; slots differ |
+| physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 371/1073 | b | first draft: retail reloads the sweep-record pointer 0x00579058 at every use; registers differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x00428db0` | 429/797 | b | 10 code diffs: retail lacks `mov [esp + N], eax`; retail adds `mov [esp + N], eax`; slot order differs |
 | physics/bvh/BoundingBoxTreeQuery | `0x004290d0` | 564/813 | b | 6 code diffs: retail lacks `fstp [esp + N]`; retail lacks `fld [esp + N]`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x00429570` | 246/831 | b | 17 code diffs: `jne @82 ; xor eax, eax ; pop edi` vs `je @272`; slots differ |
+| physics/bvh/BoundingBoxTreeQuery | `0x004298c0` | 532/1418 | b | matches through the distance-to-plane test; operator-result temporaries in other slots and a shared `return 1` afterwards |
 | physics/collision/CollisionContactUpdate | `0x0043aa30` | 25/698 (masked) | b | 51 code diffs: retail lacks `sub esp, N`; retail adds `sub esp, 0x1c ; mov ecx, [edx]`; frame 0x10 vs 0x0 |
 | physics/collision/CollisionContactUpdate | `0x0043ad80` | 26/315 (masked) | c | 19 code diffs: `sub esp, 0xc` vs `sub esp, 0x24`; retail adds `jne @7 ; xor eax, eax ; add esp, 0x24` |
+| physics/collision/CollisionObject | `0x00439600` | 516/532 | c | x87 order of the segment-parameter numerator (retail multiplies v.y*d.y and v.x*d.x before v.z*d.z) (samples/physics/collision/CollisionObjectNearMisses.cpp) |
 | physics/collision/CollisionPoint | `0x0043a640` | 41/814 (masked) | b | 44 code diffs: retail adds `push ebx`; retail adds `fld [esi + 0x30] ; fmul [eax + 4] ; fld~`; slots differ |
 | physics/collision/CollisionPoint | `0x0043aff0` | 36/81 (masked) | c | 2 code diffs: `je @28 ; mov edx, [eax + 0xa4] ; test e~` vs `je @29 ; mov ecx, [eax + 0xa4] ; test e~` |
 | physics/collision/CollisionPoint | `0x0043b240` | 155/162 (masked) | c | 2 code diffs: retail adds `fstp [esp + N]`; retail lacks `fstp [esp + N]` |
@@ -162,6 +176,9 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/helpers/GraphicsTest | `0x0047bd10` | 423/917 | b | 16 code diffs: retail adds `fsubp st(1)`; retail lacks `fsubp st(1)`; slots differ |
 | physics/helpers/GraphicsTest | `0x0047c270` | 622/626 | b | 1 code diffs: `fld [eax] ; fadd [esi + 8]` vs `fld [esi + 8] ; fadd [eax]`; slots differ |
 | physics/helpers/OrientationAngles | `0x004b5a60` | 564/581 (masked) | c | 2 code diffs: retail adds `fld st(0) ; fmul st(1)`; retail lacks `fld st(1) ; fmul st(2)` |
+| physics/helpers/SoultreeBounds | `0x004fd340` | 588/630 | c | rows 1 and 4 of the inline scale product emit their off-diagonal x87 products in another order (samples/physics/helpers/SoultreeBounds.cpp) |
+| physics/helpers/SoultreeBounds | `0x004fe2e0` | 80/1297 | b | first draft: frame 0x3c vs retail 0x48 (by-value direction temporaries, centre in ebx/ebp/edx) |
+| physics/helpers/SoultreeBounds | `0x004fe8a0` | 541/610 | b | frame slot order (retail c, e, w, a) and the hi = w + ext tail |
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 249/1072 (masked) | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
 | physics/helpers/SoultreeMatrix | `0x004fbd70` | 661/693 (masked) | b | 6 code diffs: retail lacks `test eax, eax`; retail adds `test eax, eax`; slots differ |
 | physics/helpers/SoultreeMatrix | `0x004fc050` | 392/1104 (masked) | b | 35 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; slot order differs |
@@ -210,9 +227,12 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/tire/Tire | `0x00513490` | 175/177 (masked) | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` |
 | physics/tire/Tire | `0x005135f0` | 248/1444 (masked) | b | 53 code diffs: retail adds `mov edx, [esp + N]`; retail lacks `fmul [esi + 0xe8] ; fld [esp + N] ; fmu~`; frame 0xc vs 0x18 |
 | physics/tire/Tire | `0x00513c70` | 96/805 | b | 24 code diffs: retail adds `push ebx`; retail adds `xor ebx, ebx`; slots differ |
+| physics/tire/Tire | `0x00513f90` | 470/479 | b | stack slots: retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local |
+| physics/tire/Tire | `0x00514170` | 276/589 | b | `fld st(0); fcomp` where retail uses `fcom`; x87 operand order of the `dir` scaling |
 | physics/tire/Tire | `0x00514550` | 169/3838 (masked) | b | 214 code diffs: `lea edi, [esi + 0x200] ; push edi` vs `lea ebp, [esi + 0x200] ; push ebp`; retail lacks `lea ebp, [esi + 0x20c] ; lea ebx, [esi ~`; frame 0xb8 vs 0xc0 |
 | physics/tire/Tire | `0x00515880` | 48/653 (masked) | b | 35 code diffs: retail adds `mov eax, [esp + N] ; push esi ; mov ecx~`; retail lacks `mov ecx, [esp + N]`; slots differ |
 | physics/tire/Tire | `0x00515b50` | 132/271 (masked) | c | 9 code diffs: `fld [ecx + 0x180] ; fmul [ecx + 0x58] ;~` vs `fld [ecx + 0x54] ; fmul [ecx + 0x17c] ;~`; `fld [ecx + 0x178] ; fmul [ecx + 0x50]` vs `fld [ecx + 0x58] ; fmul [ecx + 0x180]` |
+| physics/tire/Tire | `0x00515c90` | 213/296 | b | x87 operand order of the normalised cross product |
 | physics/vehicle/VehicleInlines | `0x0040c4c0` | 103/114 (masked) | b | 3 code diffs: `fld [edi + 4] ; fmul [esi]` vs `fld [esi] ; fmul [edi + 4]`; retail adds `fsubp st(1) ; mov [ebx + 4], ecx`; slots differ |
 | physics/vehicle/VehicleInlines | `0x0040c540` | 119/126 (masked) | b | 2 code diffs: retail adds `fsubp st(1) ; mov [ebx + 4], eax`; retail lacks `fsubp st(1) ; mov [ebx + 4], eax`; slots differ |
 | physics/visibility/VisibilityClipper | `0x0052f190` | 382/418 | c | 8 code diffs: `fld [ecx + 0x1c] ; fmul [edx + 4]` vs `fld [edx + 4] ; fmul [ecx + 0x1c]`; `fld [ecx + 0x2c] ; fmul [edx + 8]` vs `fld [edx + 8] ; fmul [ecx + 0x2c]` |
@@ -259,6 +279,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/FontTexture | `0x004673d0` | 607/645 | b | 5 code diffs: retail adds `push esi ; push edi`; `jne @196 ; push esi ; push edi` vs `jne @194`; slots differ |
 | render/GR_BitString | `0x004239c0` | 343/420 | b | 14 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; slots differ |
 | render/GR_BitString | `0x00423b70` | 93/442 | b | 16 code diffs: retail adds `add esi, 4`; `or ecx, eax` vs `or eax, ecx ; mov [edx - 4], eax`; slots differ |
+| render/Grid1 | `0x0047caa0` | 104/1740 | b | slot 3 texture stage switch; frame 0x14 vs retail 0x10, 93 code diffs (samples/render/Grid1NearMisses.cpp) |
 | render/Grid1 | `0x0047d470` | 309/786 | b | 31 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x838 vs 0x834, slot order differs |
 | render/Grid1 | `0x0047d780` | 216/1008 | b | 50 code diffs: `je @321 ; mov esi, [esp + N]` vs `je @315`; `mov eax, [esi]` vs `mov edi, [esp + N]`; slot order differs |
 | render/GridNode | `0x00484d70` | 81/90 | c | 3 code diffs: `mov ecx, [eax*4 + A] ; add ecx, ebx ; m~` vs `mov eax, [eax*4 + A] ; add eax, ebx ; m~`; retail adds `xor ecx, ecx ; mov cx, word ptr [eax + ~` |
@@ -276,6 +297,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/Griddraw | `0x00482dd0` | 142/288 (masked) | c | 20 code diffs |
 | render/Griddraw | `0x00483200` | 45/727 (masked) | b | 53 code diffs: retail adds `mov ebp, [esp + N]`; retail lacks `mov ebp, [esp + N]`; slots differ |
 | render/ManagedTextureGroup | `0x0050c960` | 17/227 (masked) | c | 5 code diffs: `sub esp, 0x80` vs `sub esp, 0x78`; `je @167` vs `je A` |
+| render/ManagedTextureGroup | `0x0050dad0` | 1887/5022 | b | repack with partial blits, 87 code diffs (samples/render/ManagedTextureGroupNearMisses.cpp) |
 | render/ManagedTextureGroup | `0x0050ef70` | 16/231 (masked) | b | 19 code diffs: retail lacks `push ebx`; retail lacks `push esi`; slots differ |
 | render/MatrixUtil | `0x004a11e0` | 274/281 | b | 3 code diffs: retail adds `fsubp st(1)`; retail lacks `fsubp st(1)`; slots differ |
 | render/MatrixUtil | `0x004a1a50` | 171/175 | c | 1 code diffs: `fld [ecx + 4] ; fmul [eax + 0x28]` vs `fld [eax + 0x28] ; fmul [ecx + 4]` |
@@ -296,6 +318,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/Pixtrans | `0x004cdf10` | 46/636 | b | 33 code diffs: retail adds `mov ecx, [esp + N] ; mov [esp + N], eax~`; retail lacks `mov [esp + N], eax ; mov eax, [esp + N]~`; slot order differs |
 | render/Pixtrans | `0x004ce420` | 55/456 | b | 23 code diffs: `sub esp, 8` vs `sub esp, N ; mov edx, [esp + N]`; `mov eax, [esp + N] ; test eax, eax` vs `test edx, edx`; frame 0x8 vs 0x10 |
 | render/Pixtrans | `0x004cee30` | 45/1133 | b | candidate 1093 B, 314 code diffs: `push ebp` in the prologue vs after the three palette checks; `sourceRow` homed in `source`'s slot shifts every slot; fast-loop channel sum order |
+| render/Pixtrans | `0x004cf2a0` | 242/1735 | b | draft: format, pixel size and palette in ebx/esi/edi where retail uses edi/ebx/esi; frame 0x50 vs 0x54 |
 | render/Pixtrans | `0x004d24d0` | 419/988 | c | 4 code diffs: retail lacks `jmp @207 ; mov eax, [esp + N] ; mov [es~`; retail adds `mov eax, [esp + N] ; mov [esp + N], eax~` |
 | render/ResourceManager | `0x004e9030` | 100/798 | b | 5 code diffs: `jne @35` vs `mov [esp + N], ebx ; jne @36`; `je @250` vs `je A`; slots differ |
 | render/TextService | `0x0050ade0` | 117/125 | c | 1 code diffs: `mov eax, [ebp + N] ; mov edx, edi ; mov~` vs `mov ecx, [ebp + N] ; mov eax, edi ; mov~` |
@@ -306,6 +329,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/Tgafile | `0x00512990` | 354/982 (masked) | c | 49 code diffs |
 | track/SceneManager | `0x004ecd60` | 2047/4536 | b | 11 code diffs: `je @1189` vs `je A`; `je @1189` vs `je A`; slots differ |
 | track/SceneManager | `0x004edfe0` | 3468/5346 | b | 34 code diffs: `je @1459` vs `je A`; `je @1459` vs `je A`; slot order differs |
+| track/Track | `0x00515ed0` | 117/2400 (masked) | b | draft: frame 0x64 vs retail 0x48 and retail keeps `this` in ebp, so every frame offset differs; dispatch, calls and arithmetic follow retail |
+| track/Track | `0x00516980` | 465/776 (masked) | c | as `0x00516ca0`: VC6 reuses the `p - segment` differences in the t < 0 and t == 0 branches, retail recomputes them; later offsets shift |
 | track/Track | `0x00516ca0` | 307/520 (masked) | b | 20 code diffs; slots differ |
 | track/Track | `0x00516ef0` | 1023/1042 | c | 4 code diffs: retail adds `fld [ecx] ; fsub [ecx + 0xc]`; retail lacks `fld [ecx] ; fsub [ecx + 0xc]` |
 | track/Track | `0x00517340` | 57/655 (masked) | b | 44 code diffs: retail lacks `mov [esp + N], 0`; `add esp, 0x24` vs `add esp, 0x20`; frame 0x24 vs 0x20 |
@@ -356,6 +381,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/KrustyUI | `0x0049b0d0` | 880/916 | c | 5 code diffs: `jne @202 ; cmp ecx, 1 ; jne @204` vs `je @212`; `jne @205` vs `jne @202 ; jmp @218 ; cmp ecx, 1` |
 | ui/OptionProcs | `0x004b5600` | 73/341 | b | 8 code diffs: retail adds `mov ebx, ecx`; retail lacks `mov ebp, ecx`; slots differ |
 | ui/OptionProcs | `0x004b5760` | 259/708 | c | 29 code diffs |
+| ui/ProCircuitProcs | `0x004d59a0` | 747/756 | c | order of the two reloads after the "Class" strcpy (retail reloads `this` before `row`); flips with unrelated declarations |
 | ui/ProCircuitProcs | `0x004d6fc0` | 555/557 | b | 1 code diffs: `mov ebp, [esp + N] ; add eax, ebp` vs `mov ecx, [esp + N] ; add eax, ecx`; slots differ |
 | ui/ProCircuitProcs | `0x004d72c0` | 1125/1291 | b | 11 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 | ui/ProCircuitProcs | `0x004d8c40` | 427/886 | c | 15 code diffs: retail lacks `mov edx, [esi + 8]`; retail lacks `mov ebx, [esi + 0x14]` |

@@ -4,9 +4,9 @@
     "source": "Bike.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot38@Bike",
     "target_va": "0x00405190",
-    "target_size": 2746,
+    "target_size": 2874,
     "expect": "partial",
-    "notes": "5.8% (2509 vs 2746 incl. jump table). Collision-response dispatch (Bike override of Vehicle slot 38): switch on kind 0/1/0x66/0x6a (impact sink), 100 and 0x68 (other vehicle), 0x65, 0x69, 0x3e8 (direct slot 3, returns), 0x3e9, 0x3ea (body via +0xc4), 0x2711; tail calls slot 4 (body) or slot 3, then slot 100 notifications. All decoded; frame is 0xac in retail vs smaller here (retail builds vectors through struct temps), so every offset diverges early.",
+    "notes": "5.8% (2509 vs 2746 incl. jump table). Collision-response dispatch (Bike override of Vehicle slot 38): switch on kind 0/1/0x66/0x6a (impact sink), 100 and 0x68 (other vehicle), 0x65, 0x69, 0x3e8 (direct slot 3, returns), 0x3e9, 0x3ea (body via +0xc4), 0x2711; tail calls slot 4 (body) or slot 3, then slot 100 notifications. All decoded; frame is 0xac in retail vs smaller here (retail builds vectors through struct temps), so every offset diverges early. Extent 0x00405190..0x00405cca includes the dword jump table and the byte index table after it (the index table was outside the earlier 2746-byte extent).",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -84,9 +84,9 @@
     "source": "Bike.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot89@Bike",
     "target_va": "0x00406ae0",
-    "target_size": 2359,
+    "target_size": 2396,
     "expect": "partial",
-    "notes": "5.0% (1984 vs 2359). Rider-pose blend state machine (field_0x520 states 1..5, field_0x65c output, field_0x644 smoothing). Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule); plain (int) calls __ftol here. Clamp/branch layout also differs.",
+    "notes": "5.0% (1984 vs 2359). Rider-pose blend state machine (field_0x520 states 1..5, field_0x65c output, field_0x644 smoothing). Retail uses an ebp frame with [ebp-4]/[ebp-8] temps and fistp stores (inlined fistp float-to-int helper, i.e. inline asm in the original, out of reach under the no-asm rule); plain (int) calls __ftol here. Clamp/branch layout also differs. Extent 0x00406ae0..0x0040743c includes the nop and the 9-entry jump table after the last ret.",
     "bindings": "Bike.bindings.json"
   },
   {

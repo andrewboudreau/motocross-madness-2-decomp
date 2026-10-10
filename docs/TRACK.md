@@ -90,10 +90,19 @@ slot and assigns the path loop's registers differently. Candidates are
 fifth parameter is a work list of nodes, although RaceStatus.cpp's binding
 declares it `int`.
 
-Not yet attempted:
-- the loader `0x00515ed0` (2342 bytes);
-- the closest-position search `0x00516980` (786 bytes; its inner loop is the
-  same as `0x00516ca0`'s, so it is likely to hit the same blocker).
+The closest-position search `0x00516980` (786 bytes) walks every node
+reachable from the start node (the depth-first list of `0x00516870`) with
+`0x00516ca0`'s segment loop; its third parameter is the optional distance
+output (`float*`; RaceStatus.cpp passes 0). It is a near miss in
+`samples/track/TrackNearMisses.cpp` (465 of 776 compared bytes) with the same
+blocker as `0x00516ca0`: VC6 reuses the `p - segment` differences in the
+t < 0 and t == 0 branches, which retail recomputes.
+
+The loader `0x00515ed0` (2342 bytes) reads a chunk stream (an id byte,
+then the chunk's data; ids 1-16 are decoded in
+`samples/track/TrackNearMisses.cpp`). It is a draft near miss there (117 of
+2400 compared bytes): dispatch, calls and arithmetic follow retail, but the
+frame is 0x64 against retail's 0x48 and retail keeps `this` in ebp.
 
 ## Source shapes that mattered
 

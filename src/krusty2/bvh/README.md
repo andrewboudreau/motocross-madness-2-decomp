@@ -60,7 +60,8 @@ Strict exact beyond the registered 33 cases (pending registration, all in
 
 Near misses with their current scores are listed at the top of
 `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`.
-- 0x424730 (the box swept by a motion matrix, then BoxOverlap) materialises each axis
-  vector in a stack temporary before copying it to a named local, and calls the out-of-line
-  0x42a450 / 0x42a580 helpers; a natural reconstruction is 764 of 891 bytes.
+- 0x424730 (SweptBoxOverlap: the box swept by a motion matrix, then BoxOverlap) materialises
+  each axis vector in a stack temporary before copying it into a `Vec3 axis[3]`, and calls the
+  out-of-line 0x42a450 / 0x42a580 helpers; the sample is instruction-identical (855 of 891
+  bytes), only four frame slots differ.
 

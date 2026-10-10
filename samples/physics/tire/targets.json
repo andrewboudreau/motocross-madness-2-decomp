@@ -352,5 +352,35 @@
     "expect": "partial",
     "notes": "11.9% (tier 3 name): shock solve against the contact for the inline (+0x2b0) and rotating (+0x2ac) attachments with the contact's penetration/inContact/world+surface position follow-up; both copies, all four exits and the solve call sequences match; candidate 805 B vs 797. Retail keeps a zero register (xor ebx, ebx) for its null/flag compares and the final two clears, VC6 here uses test/immediates (one push less shifts every argument offset by 4 and commutes the A path's first fadd). The outputs reuse the dead dt/velocity argument slots as in retail; the function-scope depth keeps it out of the axisB slot",
     "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "UpdateDriveShare@Tire",
+    "target_va": "0x00513f90",
+    "target_size": 479,
+    "expect": "partial",
+    "notes": "470/479: only the stack slots differ; retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local, VC6 the other way round (see Tire.cpp).",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "ApplyDrive@Tire",
+    "target_va": "0x00514170",
+    "target_size": 607,
+    "expect": "partial",
+    "notes": "276/589 compared: the set-up matches; VC6 then loads *speed with `fld st(0); fcomp` where retail uses `fcom`, and the x87 operand order of the `dir` scaling differs (see Tire.cpp).",
+    "bindings": "Tire.bindings.json"
+  },
+  {
+    "class": "Tire",
+    "source": "Tire.cpp",
+    "candidate_symbol_contains": "Fn_00515c90@Tire",
+    "target_va": "0x00515c90",
+    "target_size": 292,
+    "expect": "partial",
+    "notes": "213/296 compared: normalised cross product with fallback; x87 operand order differs (see Tire.cpp).",
+    "bindings": "Tire.bindings.json"
   }
 ]
