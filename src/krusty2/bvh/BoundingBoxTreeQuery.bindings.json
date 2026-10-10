@@ -22,6 +22,7 @@
   "?SegmentTriangleQuery@@YAHPBUQueryTriangle@@PBUVec3@@PBUMatrix4@@@Z": "0x00427c10",
   "?SphereTreeQuery@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@H@Z": "0x00429570",
   "?SphereTreeQueryWithVertices@@YAHPBUVec3@@MMPAUQueryTreeNode@@PBUMatrix4@@HPAU1@@Z": "0x00429540",
+  "?SweptBoxOverlap@@YAHUVec3@@0PBU1@1PBUMatrix4@@2@Z": "0x00424730",
   "?TransformPointPtr@@YAXPAUVec3@@PBU1@PBUMatrix4@@@Z": "0x0042a580",
   "?TreeBoxOverlap@@YAHPAUQueryTreeNode@@0PBUMatrix4@@1@Z": "0x00428c20",
   "?TreeTreeQuery@@YAHPAUQueryTreeNode@@0PBUMatrix4@@1HPAUVec3@@1@Z": "0x00428950",

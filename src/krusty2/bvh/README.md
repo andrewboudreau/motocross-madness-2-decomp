@@ -60,8 +60,13 @@ Strict exact beyond the registered 33 cases (pending registration, all in
 
 Near misses with their current scores are listed at the top of
 `samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp`.
-- 0x424730 (SweptBoxOverlap: the box swept by a motion matrix, then BoxOverlap) materialises
-  each axis vector in a stack temporary before copying it into a `Vec3 axis[3]`, and calls the
-  out-of-line 0x42a450 / 0x42a580 helpers; the sample is instruction-identical (855 of 891
-  bytes), only four frame slots differ.
-
+- SweptBoxOverlap 0x424730 is exact: the moved centre and the swept centre are block-scoped
+  locals (sibling blocks share one slot, which then ranks below the delta and extent
+  vectors), the centre is read through a pointer for the delta, and the swept centre is
+  added back component by component.
+- BoxOverlap 0x424ab0, BoxTriangleQuery 0x426be0, the inline SAT of TreeTreeQueryNodes
+  0x4280e0 and SegmentTriangleQuery 0x427c10 reproduce retail's mix of expanded and
+  out-of-line Vec3 helpers when written with the natural operators and inline helpers (VC6
+  inline budget); the out-of-line copies are the COMDATs 0x42a450 / 0x42a510 / 0x42a5e0 /
+  0x5087b0 and the Vec3 operators.  BoxOverlap is instruction-identical except the `fsubp`
+  placement in its inline cross products.  BoxCapsuleOverlap 0x425900 is a first draft.

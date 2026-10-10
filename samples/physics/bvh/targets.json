@@ -51,16 +51,6 @@
   {
     "class": "(free)",
     "source": "BoundingBoxTreeQueryNearMisses.cpp",
-    "candidate_symbol_contains": "?SweptBoxOverlap@@",
-    "target_va": "0x00424730",
-    "target_size": 891,
-    "expect": "partial",
-    "notes": "855/891: instruction-identical, frame slots of half/moved/ext/delta differ (see the file header).",
-    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
-  },
-  {
-    "class": "(free)",
-    "source": "BoundingBoxTreeQueryNearMisses.cpp",
     "candidate_symbol_contains": "?CapsuleTreeQuery@@",
     "target_va": "0x004298c0",
     "target_size": 1436,
@@ -75,7 +65,57 @@
     "target_va": "0x00427c10",
     "target_size": 1101,
     "expect": "partial",
-    "notes": "371/1073 first draft: retail reloads the record pointer at every use; registers differ (see the file header).",
+    "notes": "natural operator form: retail's inline/out-of-line helper sequence; retail keeps 1 in ebp and loads segment[1] at entry (see the file header).",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?BoxOverlap@@",
+    "target_va": "0x00424ab0",
+    "target_size": 2300,
+    "expect": "partial",
+    "notes": "2252/2300: instruction-identical except the fsubp/copy scheduling of the three inline cross products (see the file header).",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?BoxCapsuleOverlap@@",
+    "target_va": "0x00425900",
+    "target_size": 4314,
+    "expect": "partial",
+    "notes": "first draft: decoded structure; inline budget and radius-sum x87 order differ (see the file header).",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?BoxTriangleQuery@@",
+    "target_va": "0x00426be0",
+    "target_size": 2576,
+    "expect": "partial",
+    "notes": "13-axis SAT: helper call pattern matches; cross scheduling, min/max and a 4-byte slot differ (see the file header).",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?TreeTreeQueryNodes@@",
+    "target_va": "0x004280e0",
+    "target_size": 2160,
+    "expect": "partial",
+    "notes": "inline copy of the BoxOverlap SAT; one extra expanded constructor and the recursion tails differ (see the file header).",
+    "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
+  },
+  {
+    "class": "(free)",
+    "source": "BoundingBoxTreeQueryNearMisses.cpp",
+    "candidate_symbol_contains": "?SegmentSegmentDistance@@",
+    "target_va": "0x0042a640",
+    "target_size": 1471,
+    "expect": "partial",
+    "notes": "call-view form; retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80) (see the file header).",
     "bindings": "BoundingBoxTreeQueryNearMisses.bindings.json"
   }
 ]

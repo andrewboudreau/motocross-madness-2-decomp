@@ -18,30 +18,64 @@
 // LeafPairQuery 0x004275f0, LeafNodeQuery 0x004269e0 and SegmentTreeQuery 0x00429e90 are
 // exact in the src file.
 //
-// - SweptBoxOverlap 0x00424730 (891/891 bytes, 855 match): instruction-identical; only the
-//   frame slots of half / moved / ext / delta differ (retail half, ext, delta, moved from esp
-//   up; here half, moved, ext, delta).  The three axes must be one Vec3 array (separate
-//   locals reorder every slot), the half extents a local copy written back to the by-value
-//   parameter, and the clamps QueryMin / QueryMax (their parameter copy is retail's [esp+8]).
+// SweptBoxOverlap 0x00424730 is exact in the src file as well.
+//
+// The SAT functions below are written with the natural Vec3 operators and inline helpers.
+// VC6's inline budget (docs/VC6_INLINE_BUDGET.md) then reproduces retail's mix of expanded
+// and out-of-line helper calls exactly; the out-of-line instances are bound to retail's
+// COMDAT copies (TransformPointInline 0x0042a510, RotateVectorInline 0x0042a450,
+// Vec3NormalizeInline 0x005087b0, CrossProduct 0x00515600, DotProduct 0x0040ae30, the
+// Vec3 constructor and operators).
+// - BoxOverlap 0x00424ab0 (2300/2300 bytes, 2252 match): instruction-identical, frame and
+//   registers included, except that in the three inline cross products (cases 6-8) retail
+//   issues each `fsubp` between the load and the store of the previous component's copy and
+//   VC6 here after the store (six spots).  The same scheduling difference is the one left in
+//   PointInTriangle and BoxTriangleQuery; no cross-product spelling, operand order, CPU flag
+//   (/G3../G6, /GB) or declaration count (0..63 prepended typedefs) moves it.  Naming `dist`
+//   and `ra` but not `rb` sets the budget that calls all seven dot products out of line.
+// - BoxTriangleQuery 0x00426be0 (2576 bytes, 2568 here): the 13-axis box/triangle SAT.  The
+//   inline/out-of-line pattern and the jump table match; the cross-product scheduling of
+//   cases 4-8, the min/max of the projected triangle (retail keeps p2 on the x87 stack and
+//   stores p1 twice) and a 4-byte frame slot (0x164 vs 0x160) differ.
+// - TreeTreeQueryNodes 0x004280e0 (2160 bytes, 2228 here): expands the SAT of BoxOverlap
+//   inline with every helper called out of line except QueryAbs, which this source
+//   reproduces through an inline copy of the BoxOverlap body (BoxOverlapInline; BoxOverlap
+//   itself is not expanded in SweptBoxOverlap or TreeBoxOverlap, so it cannot be the inline
+//   function).  Differences: VC6 here still expands the first a[] constructor, and the
+//   recursion tails are cross-jumped differently (retail's leaf branches jump into the
+//   b-children tail of the box branch).
+// - SegmentSegmentDistance 0x0042a640 (1471 bytes, 0.89 instruction ratio): written with
+//   explicit call views.  Retail homes the plane parameters, clamps and the first length in
+//   the dead d0/d1 argument slots (frame 0x60); VC6 here keeps them in a 0x80 frame, and the
+//   inline cross products load a's components first in the x term.  The natural operator
+//   form expands more helpers than retail (see the notes at the function).
 //
 // - CapsuleTreeQuery 0x004298c0 (1418 vs 1436 bytes, 532 match): the frame (0x54), the
 //   inline transforms and the out-of-line Vec3 operator calls match through the |dist| test
 //   (the point branch needs its own block so its locals share the triangle branch's slots);
 //   from there VC6 here assigns the operator result temporaries other slots and shares the
-//   `return 1` of the PointInTriangle test, where retail returns inline.  Calls the
-//   unreconstructed 0x0042a640 (SegmentSegmentDistance) for the three edges.
+//   `return 1` of the PointInTriangle test, where retail returns inline.  Calls
+//   SegmentSegmentDistance 0x0042a640 (near miss below) for the three edges.  Retail calls
+//   every Vec3 operator out of line here; the natural operator form expands most of them.
 //
-// - SegmentTriangleQuery 0x00427c10 (1073 vs 1101 bytes, 371 match): first draft.  The
-//   segment is moved into the triangle's frame relative to the sweep record's offset, clipped
-//   against the face plane, and on a hit inside the triangle the record's offset, contact,
-//   scale, count and the contact normal list (0x00579068/0x00579014, deduplicated through
-//   0x005299e0 unless 0x00579668 is set) are updated.  Retail reloads the record pointer
-//   0x00579058 at every use and holds other registers; the two flag branches are literal
-//   (the set-flag branch adds the push vector a second time and replaces the contact).
+// - SegmentTriangleQuery 0x00427c10 (1101 bytes, 1110 here): the natural operator form gives
+//   retail's exact sequence of inline and out-of-line helpers (five constructor calls,
+//   operator*(float, Vec3), three Vec3::operator+= calls).  The segment is moved into the
+//   triangle's frame relative to the sweep record's offset, clipped against the face plane,
+//   and on a hit inside the triangle the record's offset, contact, scale, count and the
+//   contact normal list (0x00579068/0x00579014, deduplicated through 0x005299e0 unless
+//   0x00579668 is set) are updated; the two flag branches are literal (the set-flag branch
+//   adds the push vector a second time and replaces the contact).  Differences: retail keeps
+//   the constant 1 in ebp (count, scratch count and result), so its register plan and the
+//   copy of segment[1] at entry differ, and the dot product of the set-flag branch loads z
+//   first.
 //
-// Not attempted yet: BoxOverlap 0x00424ab0 (15-axis SAT through a jump table), 0x00425900 (capsule against
-// box), BoxTriangleQuery 0x00426be0, TreeTreeQueryNodes
-// 0x004280e0 (inlines the 15-axis SAT), 0x0042a640 (capsule against triangle).
+// - BoxCapsuleOverlap 0x00425900 (4314 bytes, 4237 here): first draft with the decoded
+//   structure (box axes, axes crossed with the segment direction, three corner directions).
+//   The segment transform, the midpoint/half-segment constructor calls and the box-axis tests
+//   match; the inline budget differs from retail from the fifth normalisation on (retail
+//   calls DotProduct in all seven, and both squared-corner constructors), and the sums of the
+//   projected radii are accumulated in another x87 order.
 #include "bvh/BoundingBoxTreeQuery.h"
 
 // The unit's file statics (bound to the same addresses as in the src file).
@@ -209,42 +243,357 @@ void MoveBox(Vec3* center, Vec3* halfExtents, const Matrix4* m)
     *halfExtents = grown;
 }
 
-// 0x00424730.  Overlap of box B (bCenter, bHalf, in A's frame through rel) with box A swept by
-// the motion xfA: A's half extents rotated by xfA give the moved box's extents, the union of
-// the box before and after the move (relative to aCenter) gives the swept centre offset and
-// half extents, then BoxOverlap.
-int SweptBoxOverlap(Vec3 aCenter, Vec3 aHalf, const Vec3* bCenter, const Vec3* bHalf,
-                    const Matrix4* rel, const Matrix4* xfA)
+// The 15 separating-axis candidates of the box/box test, filled lazily inside the loop.
+static Vec3 s_axes[15];             // 0x00578f50
+
+// 0x00424ab0.  Box A (aCenter, aHalfExtents) against box B (bCenter, bHalfExtents, given in
+// A's frame through bToA): the separating-axis test on A's three axes, B's three axes and
+// their nine cross products.  See the file header for what differs.
+int BoxOverlap(const Vec3* aCenter, const Vec3* aHalfExtents, Vec3 bCenter, Vec3 bHalfExtents,
+               const Matrix4* bToA)
 {
-    Vec3 axis[3];
-    axis[0] = Vec3(aHalf.x, 0.0f, 0.0f);
-    axis[1] = Vec3(0.0f, aHalf.y, 0.0f);
-    axis[2] = Vec3(0.0f, 0.0f, aHalf.z);
-    Vec3TransformNormal(&axis[0], axis[0], xfA);
-    Vec3TransformNormal(&axis[1], axis[1], xfA);
-    Vec3TransformNormal(&axis[2], axis[2], xfA);
-    Vec3 half = aHalf;
-    Vec3 ext;
-    ext.x = QueryAbs(axis[0].x) + QueryAbs(axis[1].x) + QueryAbs(axis[2].x);
-    ext.y = QueryAbs(axis[0].y) + QueryAbs(axis[1].y) + QueryAbs(axis[2].y);
-    ext.z = QueryAbs(axis[0].z) + QueryAbs(axis[1].z) + QueryAbs(axis[2].z);
-    Vec3 moved;
-    TransformPointPtr(&moved, &aCenter, xfA);
-    Vec3 delta;
-    delta.x = moved.x - aCenter.x;
-    delta.y = moved.y - aCenter.y;
-    delta.z = moved.z - aCenter.z;
-    for (int i = 0; i < 3; i++) {
-        float lo = delta[i] - ext[i];
-        float hi = ext[i] + delta[i];
-        lo = QueryMin(-half[i], lo);
-        hi = QueryMax(half[i], hi);
-        moved[i] = (hi + lo) * 0.5f;
-        half[i] = (hi - lo) * 0.5f;
+    TransformPointInline(&bCenter, bCenter, bToA);
+    Vec3 a[3];
+    a[0] = Vec3(aHalfExtents->x, 0.0f, 0.0f);
+    a[1] = Vec3(0.0f, aHalfExtents->y, 0.0f);
+    a[2] = Vec3(0.0f, 0.0f, aHalfExtents->z);
+    Vec3 b[3];
+    b[0] = Vec3(bHalfExtents.x, 0.0f, 0.0f);
+    b[1] = Vec3(0.0f, bHalfExtents.y, 0.0f);
+    b[2] = Vec3(0.0f, 0.0f, bHalfExtents.z);
+    RotateVectorInline(&b[0], b[0], bToA);
+    RotateVectorInline(&b[1], b[1], bToA);
+    RotateVectorInline(&b[2], b[2], bToA);
+    Vec3 t = bCenter - *aCenter;
+    for (int i = 0; i < 15; i++) {
+        switch (i) {
+        case 0: s_axes[0] = Vec3(1.0f, 0.0f, 0.0f); break;
+        case 1: s_axes[1] = Vec3(0.0f, 1.0f, 0.0f); break;
+        case 2: s_axes[2] = Vec3(0.0f, 0.0f, 1.0f); break;
+        case 3: s_axes[3] = Vec3(bToA->_11, bToA->_12, bToA->_13); break;
+        case 4: s_axes[4] = Vec3(bToA->_21, bToA->_22, bToA->_23); break;
+        case 5: s_axes[5] = Vec3(bToA->_31, bToA->_32, bToA->_33); break;
+        case 6: s_axes[6] = CrossProduct(s_axes[0], s_axes[3]); break;
+        case 7: s_axes[7] = CrossProduct(s_axes[0], s_axes[4]); break;
+        case 8: s_axes[8] = CrossProduct(s_axes[0], s_axes[5]); break;
+        case 9: s_axes[9] = CrossProduct(s_axes[1], s_axes[3]); break;
+        case 10: s_axes[10] = CrossProduct(s_axes[1], s_axes[4]); break;
+        case 11: s_axes[11] = CrossProduct(s_axes[1], s_axes[5]); break;
+        case 12: s_axes[12] = CrossProduct(s_axes[2], s_axes[3]); break;
+        case 13: s_axes[13] = CrossProduct(s_axes[2], s_axes[4]); break;
+        case 14: s_axes[14] = CrossProduct(s_axes[2], s_axes[5]); break;
+        }
+        float dist = QueryAbs(DotProduct(t, s_axes[i]));
+        float ra = QueryAbs(DotProduct(a[0], s_axes[i])) + QueryAbs(DotProduct(a[1], s_axes[i])) + QueryAbs(DotProduct(a[2], s_axes[i]));
+        if (dist > ra + QueryAbs(DotProduct(b[0], s_axes[i])) + QueryAbs(DotProduct(b[1], s_axes[i])) + QueryAbs(DotProduct(b[2], s_axes[i])))
+            return 0;
     }
-    aHalf = half;
-    aCenter += moved;
-    return BoxOverlap(&aCenter, &aHalf, *bCenter, *bHalf, rel);
+    return 1;
+}
+
+// v / |v| (returns v when |v|^2 == 1); its out-of-line copy is 0x005087b0 (Math3D.h's
+// Vec3Normalize).
+inline Vec3 Vec3NormalizeInline(const Vec3& v)
+{
+    float sq = DotProduct(v, v);
+    if (sq == 1.0f)
+        return v;
+    float inv = FastInvSqrt(sq);
+    return v * inv;
+}
+
+// 0x00425900.  Box (center, halfExtents) against a capsule (segment ends[0]..ends[1] moved
+// by the inverse of xf, radius): the box axes, the three axes crossed with the normalised
+// segment direction, then for the xy, xz and yz planes the direction towards the corner
+// nearer to one of the segment's ends (squared distances, signed by that end's position).
+// First draft; see the file header.
+int BoxCapsuleOverlap(const Vec3* center, const Vec3* halfExtents, const Vec3* ends,
+                      float radius, float radiusSq, const Matrix4* xf)
+{
+    Vec3 p0, p1;
+    InverseTransformPointInline(&p0, ends[0], xf);
+    InverseTransformPointInline(&p1, ends[1], xf);
+    p0 -= *center;
+    p1 -= *center;
+    Vec3 mid = (p0 + p1) * 0.5f;
+    Vec3 d = mid - p0;
+    if (QueryAbs(mid.x) > QueryAbs(d.x) + halfExtents->x + radius)
+        return 0;
+    if (QueryAbs(mid.y) > QueryAbs(d.y) + halfExtents->y + radius)
+        return 0;
+    if (QueryAbs(mid.z) > QueryAbs(d.z) + radius + halfExtents->z)
+        return 0;
+    Vec3 a[3];
+    a[0] = Vec3(halfExtents->x, 0.0f, 0.0f);
+    a[1] = Vec3(0.0f, halfExtents->y, 0.0f);
+    a[2] = Vec3(0.0f, 0.0f, halfExtents->z);
+    Vec3 u = Vec3NormalizeInline(p1 - p0);
+    Vec3 l;
+    l = Vec3NormalizeInline(Vec3(-u.z, 0.0f, u.x));
+    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
+                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+        return 0;
+    l = Vec3NormalizeInline(Vec3(u.y, -u.x, 0.0f));
+    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
+                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+        return 0;
+    l = Vec3NormalizeInline(Vec3(0.0f, u.z, -u.y));
+    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
+                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+        return 0;
+    Vec3 c0(QueryAbs(halfExtents->x) - QueryAbs(p0.x), QueryAbs(halfExtents->y) - QueryAbs(p0.y),
+            QueryAbs(halfExtents->z) - QueryAbs(p0.z));
+    Vec3 c1(QueryAbs(halfExtents->x) - QueryAbs(p1.x), QueryAbs(halfExtents->y) - QueryAbs(p1.y),
+            QueryAbs(halfExtents->z) - QueryAbs(p1.z));
+    Vec3 s0 = Vec3(c0.x * c0.x, c0.y * c0.y, c0.z * c0.z);
+    Vec3 s1 = Vec3(c1.x * c1.x, c1.y * c1.y, c1.z * c1.z);
+    Vec3 w;
+    if (s0.x + s0.y < s1.x + s1.y) {
+        w.x = p0.x < 0.0f ? -s0.x : s0.x;
+        w.y = p0.y < 0.0f ? -s0.y : s0.y;
+    } else {
+        w.x = p1.x < 0.0f ? -s1.x : s1.x;
+        w.y = p1.y < 0.0f ? -s1.y : s1.y;
+    }
+    w.z = 0.0f;
+    l = Vec3NormalizeInline(w);
+    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
+                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+        return 0;
+    if (s0.x + s0.z < s1.x + s1.z) {
+        w.x = p0.x < 0.0f ? -s0.x : s0.x;
+        w.z = p0.z < 0.0f ? -s0.z : s0.z;
+    } else {
+        w.x = p1.x < 0.0f ? -s1.x : s1.x;
+        w.z = p1.z < 0.0f ? -s1.z : s1.z;
+    }
+    w.y = 0.0f;
+    l = Vec3NormalizeInline(w);
+    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
+                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+        return 0;
+    if (s0.y + s0.z < s1.y + s1.z) {
+        w.y = p0.y < 0.0f ? -s0.y : s0.y;
+        w.z = p0.z < 0.0f ? -s0.z : s0.z;
+    } else {
+        w.y = p1.y < 0.0f ? -s1.y : s1.y;
+        w.z = p1.z < 0.0f ? -s1.z : s1.z;
+    }
+    w.x = 0.0f;
+    l = Vec3NormalizeInline(w);
+    if (QueryAbs(l.z * mid.z + (l.x * mid.x + l.y * mid.y)) > QueryAbs(DotProduct(l, a[0])) + QueryAbs(DotProduct(l, a[1])) + QueryAbs(DotProduct(l, a[2])) +
+                                         QueryAbs(l.z * d.z + (l.x * d.x + l.y * d.y)) + radius)
+        return 0;
+    return 1;
+}
+
+// 0x00426be0.  Box (center, halfExtents) against a triangle moved by m: the 13-axis
+// separating-axis test (face normal, the box axes, the box axes crossed with two edges and
+// with the normalised third edge).  The third edge is v[2] - v[0] (the same direction as the
+// second one, negated): retail's choice, kept.
+int BoxTriangleQuery(const Vec3* center, const Vec3* halfExtents, const QueryTriangle* tri,
+                     const Matrix4* m)
+{
+    Vec3 v[3];
+    TransformPointInline(&v[0], s_vertices[tri->vertex[0]], m);
+    TransformPointInline(&v[1], s_vertices[tri->vertex[1]], m);
+    TransformPointInline(&v[2], s_vertices[tri->vertex[2]], m);
+    Vec3 n;
+    RotateVectorInline(&n, tri->normal, m);
+    Vec3 a[3];
+    a[0] = Vec3(halfExtents->x, 0.0f, 0.0f);
+    a[1] = Vec3(0.0f, halfExtents->y, 0.0f);
+    a[2] = Vec3(0.0f, 0.0f, halfExtents->z);
+    Vec3 c = v[0] - *center;
+    Vec3 e0, e1, e2;
+    for (int i = 0; i < 13; i++) {
+        switch (i) {
+        case 0: s_axes[0] = n; break;
+        case 1: s_axes[1] = Vec3(1.0f, 0.0f, 0.0f); break;
+        case 2: s_axes[2] = Vec3(0.0f, 1.0f, 0.0f); break;
+        case 3: s_axes[3] = Vec3(0.0f, 0.0f, 1.0f); break;
+        case 4: s_axes[4] = CrossProduct(s_axes[1], e0); break;
+        case 5: s_axes[5] = CrossProduct(s_axes[2], e0); break;
+        case 6: s_axes[6] = CrossProduct(s_axes[3], e0); break;
+        case 7: s_axes[7] = CrossProduct(s_axes[1], e1); break;
+        case 8: s_axes[8] = CrossProduct(s_axes[2], e1); break;
+        case 9: s_axes[9] = CrossProduct(s_axes[3], e1); break;
+        case 10:
+            e2 = Vec3NormalizeInline(v[2] - v[0]);
+            s_axes[10] = CrossProduct(s_axes[1], e2);
+            break;
+        case 11: s_axes[11] = CrossProduct(s_axes[2], e2); break;
+        case 12: s_axes[12] = CrossProduct(s_axes[3], e2); break;
+        }
+        float r = QueryAbs(DotProduct(a[0], s_axes[i])) + QueryAbs(DotProduct(a[1], s_axes[i])) + QueryAbs(DotProduct(a[2], s_axes[i]));
+        if (i == 0) {
+            if (QueryAbs(DotProduct(c, s_axes[0])) > r)
+                return 0;
+            e0 = v[0] - v[1];
+            e1 = v[0] - v[2];
+        } else {
+            float p0 = DotProduct(c, s_axes[i]);
+            float d1 = DotProduct(e0, s_axes[i]);
+            float p2 = p0 - DotProduct(e1, s_axes[i]);
+            float p1 = p0 - d1;
+            float mn = QueryMin(QueryMin(p1, p2), p0);
+            float mx = QueryMax(QueryMax(p1, p2), p0);
+            if (-r > mx || r < mn)
+                return 0;
+        }
+    }
+    return 1;
+}
+
+// The box/box test as TreeTreeQueryNodes expands it: the BoxOverlap body (with the arrays
+// declared first, which keeps their constructors expanded at the low budget left there).
+inline int BoxOverlapInline(const Vec3* aCenter, const Vec3* aHalfExtents, Vec3 bCenter,
+                            Vec3 bHalfExtents, const Matrix4* bToA)
+{
+    Vec3 a[3];
+    Vec3 b[3];
+    TransformPointInline(&bCenter, bCenter, bToA);
+    a[0] = Vec3(aHalfExtents->x, 0.0f, 0.0f);
+    a[1] = Vec3(0.0f, aHalfExtents->y, 0.0f);
+    a[2] = Vec3(0.0f, 0.0f, aHalfExtents->z);
+    b[0] = Vec3(bHalfExtents.x, 0.0f, 0.0f);
+    b[1] = Vec3(0.0f, bHalfExtents.y, 0.0f);
+    b[2] = Vec3(0.0f, 0.0f, bHalfExtents.z);
+    RotateVectorInline(&b[0], b[0], bToA);
+    RotateVectorInline(&b[1], b[1], bToA);
+    RotateVectorInline(&b[2], b[2], bToA);
+    Vec3 t = bCenter - *aCenter;
+    for (int i = 0; i < 15; i++) {
+        switch (i) {
+        case 0: s_axes[0] = Vec3(1.0f, 0.0f, 0.0f); break;
+        case 1: s_axes[1] = Vec3(0.0f, 1.0f, 0.0f); break;
+        case 2: s_axes[2] = Vec3(0.0f, 0.0f, 1.0f); break;
+        case 3: s_axes[3] = Vec3(bToA->_11, bToA->_12, bToA->_13); break;
+        case 4: s_axes[4] = Vec3(bToA->_21, bToA->_22, bToA->_23); break;
+        case 5: s_axes[5] = Vec3(bToA->_31, bToA->_32, bToA->_33); break;
+        case 6: s_axes[6] = CrossProduct(s_axes[0], s_axes[3]); break;
+        case 7: s_axes[7] = CrossProduct(s_axes[0], s_axes[4]); break;
+        case 8: s_axes[8] = CrossProduct(s_axes[0], s_axes[5]); break;
+        case 9: s_axes[9] = CrossProduct(s_axes[1], s_axes[3]); break;
+        case 10: s_axes[10] = CrossProduct(s_axes[1], s_axes[4]); break;
+        case 11: s_axes[11] = CrossProduct(s_axes[1], s_axes[5]); break;
+        case 12: s_axes[12] = CrossProduct(s_axes[2], s_axes[3]); break;
+        case 13: s_axes[13] = CrossProduct(s_axes[2], s_axes[4]); break;
+        case 14: s_axes[14] = CrossProduct(s_axes[2], s_axes[5]); break;
+        }
+        float dist = QueryAbs(DotProduct(t, s_axes[i]));
+        float ra = QueryAbs(DotProduct(a[0], s_axes[i])) + QueryAbs(DotProduct(a[1], s_axes[i])) + QueryAbs(DotProduct(a[2], s_axes[i]));
+        if (dist > ra + QueryAbs(DotProduct(b[0], s_axes[i])) + QueryAbs(DotProduct(b[1], s_axes[i])) + QueryAbs(DotProduct(b[2], s_axes[i])))
+            return 0;
+    }
+    return 1;
+}
+
+// 0x004280e0.  Walks two trees: leaf against leaf (LeafPairQuery), leaf against node
+// (LeafNodeQuery, then the node's children), node against node (box overlap, swept by the
+// motion matrix when useMotion is set, then the children of the larger node).
+int TreeTreeQueryNodes(QueryTreeNode* a, QueryTreeNode* b, int useMotion)
+{
+    if (a->volume < 0.0f && b->volume < 0.0f)
+        return LeafPairQuery((QuerySegmentLeaf*)a, (QueryTriangleLeaf*)b);
+    if (a->volume >= 0.0f && b->volume >= 0.0f) {
+        if (useMotion ? SweptBoxOverlap(a->center, a->halfExtents, &b->center, &b->halfExtents, &s_relativeAB, &s_motion)
+                      : BoxOverlapInline(&a->center, &a->halfExtents, b->center, b->halfExtents, &s_relativeAB)) {
+            int hit = 0;
+            if (a->volume > b->volume) {
+                if (TreeTreeQueryNodes(a->child[0], b, useMotion))
+                    hit = 1;
+                if (TreeTreeQueryNodes(a->child[1], b, useMotion))
+                    hit = 1;
+            } else {
+                if (TreeTreeQueryNodes(a, b->child[0], useMotion))
+                    hit = 1;
+                if (TreeTreeQueryNodes(a, b->child[1], useMotion))
+                    hit = 1;
+            }
+            return hit;
+        }
+    } else {
+        if (LeafNodeQuery(a, b, useMotion)) {
+            int hit = 0;
+            if (a->volume < 0.0f) {
+                if (TreeTreeQueryNodes(a, b->child[0], useMotion))
+                    hit = 1;
+                if (TreeTreeQueryNodes(a, b->child[1], useMotion))
+                    hit = 1;
+            } else {
+                if (TreeTreeQueryNodes(a->child[0], b, useMotion))
+                    hit = 1;
+                if (TreeTreeQueryNodes(a->child[1], b, useMotion))
+                    hit = 1;
+            }
+            return hit;
+        }
+    }
+    return 0;
+}
+
+// Helpers of SegmentSegmentDistance, written against the call views (the natural operator
+// form expands more of them than retail: VC6 here keeps DotProduct(n, n), the in-range
+// operators and the second plane's denominator inline where retail calls them).
+inline Vec3 SegCross(const Vec3& a, const Vec3& b)
+{
+    return Vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+}
+
+inline Vec3 SegNormalize(const Vec3& v)
+{
+    float sq = Vec3Dot(v, v);
+    if (sq == 1.0f)
+        return v;
+    float inv = FastInvSqrt(sq);
+    return Vec3Scale(v, inv);
+}
+
+inline float SegLength(const Vec3& v)
+{
+    float sq = Vec3Dot(v, v);
+    if (sq == 1.0f)
+        return 1.0f;
+    return FastSqrt(sq);
+}
+
+inline float SegClamp01(float v) { return v < 1.0f ? QueryMax(v, 0.0f) : 1.0f; }
+
+float Vec3LengthRef(const Vec3& v);   // 0x00435ec0 (call view of the length helper)
+
+// Distance from p to the segment a + s*d, s clamped to [0, 1].
+inline float SegPointDistance(const Vec3& p, const Vec3& a, const Vec3& d)
+{
+    float s = Vec3Dot(Vec3Sub(p, a), d);
+    s = SegClamp01(s);
+    return Vec3LengthRef(Vec3Sub(Vec3Add(Vec3ScaleLeft(s, d), a), p));
+}
+
+// 0x0042a640.  Distance between the segments p0 + s*d0 and p1 + t*d1 (0 when they are
+// parallel): each line is cut with the plane through the other segment that contains the
+// common normal; when both cuts lie on the segments the distance between the two points,
+// otherwise the larger (retail: QueryMax) of the two point-to-segment distances.
+float SegmentSegmentDistance(const Vec3* p0, const Vec3* d0, const Vec3* p1, const Vec3* d1)
+{
+    Vec3 n = SegCross(*d0, *d1);
+    if (Vec3Dot(n, n) == 0.0f)
+        return 0.0f;
+    Vec3 c = SegCross(*d0, n);
+    Vec3 m0 = SegNormalize(c);
+    float off = -DotProduct(m0, *p1);
+    float t0 = -((off + (m0.x * p0->x + m0.y * p0->y) + m0.z * p0->z) / DotProduct(m0, *d0));
+    c = SegCross(*d1, n);
+    Vec3 m1 = SegNormalize(c);
+    off = -DotProduct(m1, *p0);
+    float t1 = -((off + (m1.x * p1->x + m1.y * p1->y) + m1.z * p1->z) / Vec3Dot(m1, *d1));
+    if (t0 >= 0.0f && t0 <= 1.0f && t1 >= 0.0f && t1 <= 1.0f)
+        return SegLength(Vec3Sub(Vec3Add(Vec3ScaleLeft(t0, *d0), *p0), Vec3Add(Vec3ScaleLeft(t1, *d1), *p1)));
+    Vec3 c0 = Vec3Add(Vec3ScaleLeft(t0, *d0), *p0);
+    Vec3 c1 = Vec3Add(Vec3ScaleLeft(t1, *d1), *p1);
+    float l1 = SegPointDistance(c0, *p1, *d1);
+    float l2 = SegPointDistance(c1, *p0, *d0);
+    return QueryMax(l1, l2);
 }
 
 // 0x004298c0.  Capsule (segment ends[0]..ends[1], radius) against the tree; the triangle
@@ -311,49 +660,42 @@ extern int g_unknown579668;                  // 0x00579668
 // The sweep record SegmentTriangleQuery accumulates into (the same pointer as
 // g_CollisionBoxResult; CollisionShapeTests.h's CollisionSweepQuery).
 struct QuerySweepRecord {
-    Vec3AddAssignCall offset;       // +0x00
+    Vec3 offset;                    // +0x00
     unsigned char field_0x0c[0x0c];
-    Vec3AddAssignCall contact;      // +0x18
+    Vec3 contact;                   // +0x18
     float scale;                    // +0x24
     int count;                      // +0x28
 };
+// Retail reloads the record pointer at every use; a macro keeps that without spending inline
+// budget.
+#define g_SweepRecord ((QuerySweepRecord*)g_CollisionBoxResult)
 
 int Vec3Equal(const Vec3* a, const Vec3* b);   // 0x005299e0
 
 int SegmentTriangleQuery(const QueryTriangle* tri, const Vec3* segment, const Matrix4* m)
 {
-    QuerySweepRecord* record = (QuerySweepRecord*)g_CollisionBoxResult;
     Vec3 start;
     TransformPointInline(&start, segment[0], m);
-    start.x -= record->offset.x;
-    start.y -= record->offset.y;
-    start.z -= record->offset.z;
+    start -= g_SweepRecord->offset;
     Vec3 dir;
     TransformPointInline(&dir, segment[1], m);
-    dir.x -= start.x;
-    dir.y -= start.y;
-    dir.z -= start.z;
+    dir -= start;
     if (QueryDot(dir, tri->normal) <= 0.0f)
         return 0;
     float t = -((QueryDot(start, tri->normal) + tri->planeOffset) / QueryDot(dir, tri->normal));
     if (t < 0.0f || t > 1.0f)
         return 0;
-    record->scale *= t;
-    Vec3 step = Vec3Call(dir.x * t, dir.y * t, dir.z * t);
-    Vec3 hit = Vec3Call(step.x + start.x, step.y + start.y, step.z + start.z);
+    g_SweepRecord->scale *= t;
+    Vec3 hit = dir * t + start;
     Vec3 push;
-    if (!g_unknown579668) {
-        Vec3 v = Vec3Call(step.x, step.y, step.z);
-        float s = -QueryDot(v, tri->normal);
-        push = Vec3Call(s * tri->normal.x, s * tri->normal.y, s * tri->normal.z);
-    } else {
-        Vec3 v = Vec3Call(step.x, step.y, step.z);
-        push = Vec3ScaleLeft(-QueryDot(v, tri->normal), tri->normal);
-    }
+    if (!g_unknown579668)
+        push = -DotProduct(dir * t, tri->normal) * tri->normal;
+    else
+        push = -DotProduct(dir * t, tri->normal) * tri->normal;
     if (!PointInTriangle(&hit, tri))
         return 0;
-    record->offset += push;
-    record->contact += hit;
+    g_SweepRecord->offset += push;
+    g_SweepRecord->contact += hit;
     if (!g_unknown579668) {
         int i;
         for (i = 0; i < g_CollisionScratchCount; i++) {
@@ -362,12 +704,12 @@ int SegmentTriangleQuery(const QueryTriangle* tri, const Vec3* segment, const Ma
         }
         if (i >= g_CollisionScratchCount)
             g_CollisionScratchPoints[g_CollisionScratchCount++] = tri->normal;
-        record->count++;
+        g_SweepRecord->count++;
         return 1;
     }
-    record->offset += push;
-    (Vec3&)record->contact = hit;
-    record->count = 1;
+    g_SweepRecord->offset += push;
+    g_SweepRecord->contact = hit;
+    g_SweepRecord->count = 1;
     g_CollisionScratchPoints[0] = tri->normal;
     g_CollisionScratchCount = 1;
     return 1;

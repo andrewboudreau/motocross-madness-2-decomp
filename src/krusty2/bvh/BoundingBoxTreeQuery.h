@@ -209,7 +209,8 @@ void Vec3TransformPoint(Vec3* out, Vec3 v, const Matrix4* m);                   
 void TransformPointPtr(Vec3* out, const Vec3* v, const Matrix4* m);                // 0x0042a580
 void InverseTransformPoint(Vec3* out, Vec3 p, const Matrix4* m);                   // 0x0042a5e0
 // 0x0042a640: a distance between the segments p0 + s*d0 and p1 + t*d1 (0 when d0 x d1 is
-// zero); CapsuleTreeQuery reports a hit when it exceeds the radius.  Not reconstructed.
+// zero); CapsuleTreeQuery reports a hit when it exceeds the radius.  Near miss in
+// samples/physics/bvh/BoundingBoxTreeQueryNearMisses.cpp.
 float SegmentSegmentDistance(const Vec3* p0, const Vec3* d0, const Vec3* p1, const Vec3* d1);
 float PointSegmentDistance(const Vec3* p, const Vec3* a, const Vec3* b);           // 0x0042ac00
 

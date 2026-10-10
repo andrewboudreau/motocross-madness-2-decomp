@@ -48,6 +48,56 @@ int g_CollisionScratchCount;
 // 0x00579058: the hit record the leaf tests update (set by the collision code, 0x00439e00).
 QueryHit* g_CollisionBoxResult;
 
+// 0x00424730.  Overlap of box B (bCenter, bHalf, in A's frame through rel) with box A swept by
+// the motion xfA: A's half extents rotated by xfA give the moved box's extents, the union of
+// the box before and after the move (relative to aCenter) gives the swept centre offset and
+// half extents, then BoxOverlap.
+// Source shape (VC6 SP3, tier 2): the moved centre and the swept centre live in sibling
+// blocks, which share one frame slot and rank it below the delta and extent vectors as in
+// retail; the centre is read through a pointer for the delta and added back component by
+// component (operator+= or a direct read loads the swept centre first).
+int SweptBoxOverlap(Vec3 aCenter, Vec3 aHalf, const Vec3* bCenter, const Vec3* bHalf,
+                    const Matrix4* rel, const Matrix4* xfA)
+{
+    Vec3 axis[3];
+    axis[0] = Vec3(aHalf.x, 0.0f, 0.0f);
+    axis[1] = Vec3(0.0f, aHalf.y, 0.0f);
+    axis[2] = Vec3(0.0f, 0.0f, aHalf.z);
+    Vec3TransformNormal(&axis[0], axis[0], xfA);
+    Vec3TransformNormal(&axis[1], axis[1], xfA);
+    Vec3TransformNormal(&axis[2], axis[2], xfA);
+    Vec3 half = aHalf;
+    Vec3 ext;
+    ext.x = QueryAbs(axis[0].x) + QueryAbs(axis[1].x) + QueryAbs(axis[2].x);
+    ext.y = QueryAbs(axis[0].y) + QueryAbs(axis[1].y) + QueryAbs(axis[2].y);
+    ext.z = QueryAbs(axis[0].z) + QueryAbs(axis[1].z) + QueryAbs(axis[2].z);
+    Vec3 delta;
+    {
+        Vec3 moved;
+        const Vec3* c = &aCenter;
+        TransformPointPtr(&moved, c, xfA);
+        delta.x = moved.x - c->x;
+        delta.y = moved.y - c->y;
+        delta.z = moved.z - c->z;
+    }
+    {
+        Vec3 center;
+        for (int i = 0; i < 3; i++) {
+            float lo = delta[i] - ext[i];
+            float hi = ext[i] + delta[i];
+            lo = QueryMin(-half[i], lo);
+            hi = QueryMax(half[i], hi);
+            center[i] = (hi + lo) * 0.5f;
+            half[i] = (hi - lo) * 0.5f;
+        }
+        aHalf = half;
+        aCenter.x += center.x;
+        aCenter.y += center.y;
+        aCenter.z += center.z;
+    }
+    return BoxOverlap(&aCenter, &aHalf, *bCenter, *bHalf, rel);
+}
+
 // 0x004253b0.  Segment p0-p1 (moved by m) against the box (center, halfExtents): the
 // separating-axis test on the three box axes and the three cross products with the segment.
 int SegmentBoxOverlap(const Vec3* center, const Vec3* halfExtents, Vec3 p0, Vec3 p1,

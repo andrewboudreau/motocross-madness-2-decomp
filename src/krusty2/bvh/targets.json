@@ -358,5 +358,15 @@
     "expect": "exact",
     "notes": "moved from samples; segment[2] at function scope",
     "bindings": "BoundingBoxTreeQuery.bindings.json"
+  },
+  {
+    "class": "BoundingBoxTreeQuery",
+    "source": "BoundingBoxTreeQuery.cpp",
+    "candidate_symbol_contains": "?SweptBoxOverlap@",
+    "target_va": "0x00424730",
+    "target_size": 891,
+    "expect": "exact",
+    "notes": "moved from samples; moved and swept centres in sibling blocks (shared slot), centre read through a pointer, component-wise add",
+    "bindings": "BoundingBoxTreeQuery.bindings.json"
   }
 ]

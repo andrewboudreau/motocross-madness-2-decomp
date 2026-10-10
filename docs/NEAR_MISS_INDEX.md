@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 212, c 161, total 373. The three class (a) functions of the
+Counts: a 0, b 215, c 162, total 377. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -148,13 +148,17 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/bikeai/BikeAI | `0x00414370` | 394/4678 | b | KrustyBike member: frame 0x74 vs 0x78 (retail spills the difficulty, candidate keeps it in edi); kind 1/5 gate-distance test placed after the single-point and no-track paths |
 | physics/bvh/BoundingBoxTreeBuild | `0x0042c260` | 447/1627 | b | 1 code diffs: retail lacks `mov edx, [eax + 0x27c] ; mov eax, [eax ~`; slots differ |
 | physics/bvh/BoundingBoxTreeBuild | `0x0042d390` | 1601/1608 | b | 3 code diffs: `mov ebx, [ebx + ecx]` vs `mov ebx, [ecx + ebx]`; `mov ebx, [ebx + ecx - 0x1c]` vs `mov ebx, [ecx + ebx - 0x1c]`; slots differ |
-| physics/bvh/BoundingBoxTreeQuery | `0x00424730` | 855/891 | b | instruction-identical; frame slots of half / moved / ext / delta (retail half, ext, delta, moved) |
+| physics/bvh/BoundingBoxTreeQuery | `0x00424ab0` | 2252/2300 | c | instruction-identical except six `fsubp` placements in the inline cross products (retail between the load and the store of the previous component's copy) |
+| physics/bvh/BoundingBoxTreeQuery | `0x00425900` | 718/4237 | b | first draft: inline budget differs from the fifth normalisation on; radius sums accumulated in another x87 order |
+| physics/bvh/BoundingBoxTreeQuery | `0x00426be0` | 1647/2572 | b | helper call pattern matches; cross-product `fsubp` placement, min/max of the projections and one 4-byte slot (frame 0x160 vs 0x164) |
 | physics/bvh/BoundingBoxTreeQuery | `0x004278d0` | 778/830 | b | 7 code diffs: retail adds `fsubp st(1) ; fld [esp + N] ; fmul [esp~`; retail adds `fld [esp + N] ; fmul [esp + N] ; lea eb~`; slots differ |
-| physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 371/1073 | b | first draft: retail reloads the sweep-record pointer 0x00579058 at every use; registers differ |
+| physics/bvh/BoundingBoxTreeQuery | `0x00427c10` | 349/1110 | b | natural operator form: retail's helper call sequence; retail keeps the constant 1 in ebp and copies segment[1] at entry, so registers and slots differ |
+| physics/bvh/BoundingBoxTreeQuery | `0x004280e0` | 453/2228 | b | inline BoxOverlap copy: one constructor still expanded and the recursion tails cross-jumped differently |
 | physics/bvh/BoundingBoxTreeQuery | `0x00428db0` | 429/797 | b | 10 code diffs: retail lacks `mov [esp + N], eax`; retail adds `mov [esp + N], eax`; slot order differs |
 | physics/bvh/BoundingBoxTreeQuery | `0x004290d0` | 564/813 | b | 6 code diffs: retail lacks `fstp [esp + N]`; retail lacks `fld [esp + N]`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x00429570` | 246/831 | b | 17 code diffs: `jne @82 ; xor eax, eax ; pop edi` vs `je @272`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x004298c0` | 532/1418 | b | matches through the distance-to-plane test; operator-result temporaries in other slots and a shared `return 1` afterwards |
+| physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 38/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
 | physics/collision/CollisionContactUpdate | `0x0043aa30` | 25/698 (masked) | b | 51 code diffs: retail lacks `sub esp, N`; retail adds `sub esp, 0x1c ; mov ecx, [edx]`; frame 0x10 vs 0x0 |
 | physics/collision/CollisionContactUpdate | `0x0043ad80` | 26/315 (masked) | c | 19 code diffs: `sub esp, 0xc` vs `sub esp, 0x24`; retail adds `jne @7 ; xor eax, eax ; add esp, 0x24` |
 | physics/collision/CollisionObject | `0x00439600` | 516/532 | c | x87 order of the segment-parameter numerator (retail multiplies v.y*d.y and v.x*d.x before v.z*d.z) (samples/physics/collision/CollisionObjectNearMisses.cpp) |
