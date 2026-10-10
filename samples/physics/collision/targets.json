@@ -192,8 +192,8 @@
     "candidate_symbol_contains": "UpdateCollisionPointWorldPositions",
     "target_va": "0x0043aff0",
     "target_size": 88,
-    "expect": "partial",
-    "notes": "85 vs 88 bytes: control flow, loop and the reload of *points after the call match; operand order of the thiscall setup (lea ecx before mov ecx,[eax+4]) and the register used for the +0xa4 test differ",
+    "expect": "exact",
+    "notes": "the owner is read again through (*points) for the call, so the +0xa4 test gets ecx and the thiscall setup reloads it",
     "bindings": "CollisionPoint.bindings.json"
   },
   {

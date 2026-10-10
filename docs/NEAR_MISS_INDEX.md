@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 196, c 158, total 354. The three class (a) functions of the
+Counts: a 0, b 196, c 157, total 353. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -158,7 +158,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/collision/CollisionContactUpdate | `0x0043ad80` | 26/315 (masked) | c | 19 code diffs: `sub esp, 0xc` vs `sub esp, 0x24`; retail adds `jne @7 ; xor eax, eax ; add esp, 0x24` |
 | physics/collision/CollisionObject | `0x00439600` | 516/532 | c | x87 order of the segment-parameter numerator (retail multiplies v.y*d.y and v.x*d.x before v.z*d.z) (samples/physics/collision/CollisionObjectNearMisses.cpp) |
 | physics/collision/CollisionPoint | `0x0043a640` | 41/814 (masked) | b | 44 code diffs: retail adds `push ebx`; retail adds `fld [esi + 0x30] ; fmul [eax + 4] ; fld~`; slots differ |
-| physics/collision/CollisionPoint | `0x0043aff0` | 36/81 (masked) | c | 2 code diffs: `je @28 ; mov edx, [eax + 0xa4] ; test e~` vs `je @29 ; mov ecx, [eax + 0xa4] ; test e~` |
 | physics/collision/CollisionPoint | `0x0043b240` | 155/162 (masked) | c | 2 code diffs: retail adds `fstp [esp + N]`; retail lacks `fstp [esp + N]` |
 | physics/collision/CollisionVectorHelpers | `0x0043b190` | 150/156 (masked) | b | 2 code diffs: retail adds `mov ecx, [esp + N]`; `mov ecx, [esp + N] ; fld [eax + 4] ; fm~` vs `fld [ecx + 4] ; fmul [eax + 4]`; slots differ |
 | physics/collision/CollisionVectorHelpers | `0x0043ca20` | 61/115 | b | 5 code diffs: retail adds `mov edx, [esp + N]`; retail lacks `mov edx, [esp + N]`; slots differ |
