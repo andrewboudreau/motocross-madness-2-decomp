@@ -2032,6 +2032,16 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00495FF0@KrustyBike",
+    "target_va": "0x00495ff0",
+    "target_size": 895,
+    "expect": "exact",
+    "notes": "trick end / bonus. Exact with the redundant parentheses around the (float)fmod term: VC6 keeps them as an IL node, which issues the +0x153f flag load before the fsubr as retail does (docs/VC6_OPERAND_ORDER.md section 3). Stack slots match with the float bonus as a CSE temp.",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot29@KrustyBike",
     "target_va": "0x00495e50",
     "target_size": 401,

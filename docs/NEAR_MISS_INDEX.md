@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 196, c 160, total 356. The three class (a) functions of the
+Counts: a 0, b 196, c 159, total 355. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -192,7 +192,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/krustybike/KrustyBike | `0x00491d10` | 211/1176 (masked) | b | 53 code diffs: retail lacks `sub esp, N`; retail adds `sub esp, 0x20`; frame 0x24 vs 0x0 |
 | physics/krustybike/KrustyBike | `0x00492ad0` | 192/2315 | c | 10 code diffs (frame 0x34 exact): record-interval branch `je @end ; jmp @deltas` vs retail `jne @deltas ; jmp @end`, network branch conditional jump vs retail `push 0 ; jmp @end+1`, and the register choice it drags along |
 | physics/krustybike/KrustyBike | `0x00493660` | 2005/8545 | c | 528 code diffs (frame 0x58 and slots exact): retail keeps 1 in ebp and 0 in edi from the second SetAxesPtr call on; retail stores `(len+50)*(len+50)` before the AllowWarping test; velocity y/z `fld s ; fmul` order; pose lerp `c - b` recompute |
-| physics/krustybike/KrustyBike | `0x00495ff0` | 717/723 (masked) | c | 2 code diffs: `fsubr [esp + N] ; mov al, [esi + 0x153f]` vs retail `mov al, [esi + 0x153f] ; fsubr [esp + N]` after the fmod call |
 | physics/krustybike/KrustyBike | `0x004965e0` | 243/407 (masked) | b | 10 code diffs: retail lacks `mov [esp + N], 0`; retail lacks `mov [esp + N], 0 ; mov edx, [esp + N]`; slots differ |
 | physics/krustybike/KrustyBike | `0x00496d10` | 1/1 (masked) | c | 1 code diffs: `jmp A` vs `jmp @12 ; nop ; nop ` |
 | physics/krustybike/KrustyBike | `0x00496d20` | 61/99 (masked) | c | 3 code diffs: retail adds `lea ecx, [eax + 0xc]`; `jne @27 ; mov edx, [eax + 0xc] ; lea ec~` vs `jne @28 ; mov eax, [ecx] ; call [eax + ~` |

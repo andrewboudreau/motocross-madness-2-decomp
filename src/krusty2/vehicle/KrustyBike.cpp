@@ -943,6 +943,80 @@ void KrustyBike::UnknownVirtualSlot49(float dt)
     field_0x7a2 = field_0x7a0;
 }
 
+// 0x00495ff0: ends a trick. The angle (+0x1530) drops its part below 100, the
+// score is angle x multiplier (+0x1538, +0.5 for a +0x153f landing); the race
+// handler hears of it. In game mode 0 (or 4 with +0x2eb8 for the +0x568 racer's
+// bike) the score is kept in +0x788 and returned; otherwise the bonus rules
+// (+0x3444) turn it into a capped bonus, shown to the +0x50 racer's bike.
+// The redundant parentheses around the (float) fmod term are significant: VC6 keeps them
+// as an IL node, which schedules retail's `mov al, [+0x153f]` before the fsubr
+// (docs/VC6_OPERAND_ORDER.md section 3); without them the load follows it.
+float KrustyBike::Fn_00495FF0()
+{
+    field_0x1530 -= ((float)fmod(field_0x1530, 100.0));
+    if (field_0x153f)
+        field_0x1538 += 0.5f;
+    float score = field_0x1530 * field_0x1538;
+    if (field_0x740->field_0x38 == this && field_0x740->handler)
+        field_0x740->handler->ReportTrickScore(this, score);
+    if (!g_kbGame->field_0x2d74 ||
+        (g_kbGame->field_0x2d74 == 4 && g_kbGame->field_0x2eb8 && g_kbGame->field_0x568->field_0xa8 == this)) {
+        if (field_0x740->field_0x38 == this) {
+            if (field_0x740->field_0xbc)
+                field_0x740->field_0xbc->Fn_0048D1E0(field_0x1530, field_0x1538);
+            int points = (int)score;
+            if (field_0x788 > points)
+                points = field_0x788;
+            field_0x788 = points;
+        }
+        Fn_0048D8B0();
+        return score;
+    }
+    KbBonusTable* rules = g_kbGame->field_0x3444;
+    if (rules) {
+        float step = field_0x1530 * 0.000016f;
+        if (!(step < 1.0f))
+            step = 1.0f;
+        int base = rules->base[rules->index];
+        int points = (int)(base * rules->baseScale);
+        float gain = 0.0f;
+        float limit = points * rules->limitScale;
+        if (field_0x7b4 * 400.0f < limit) {
+            float total = step + field_0x7b4;
+            if (total * 400.0f > limit) {
+                field_0x7b4 = limit * 0.0025f;
+            } else {
+                field_0x7b4 = total;
+                gain = step * 400.0f;
+            }
+        }
+        if (this == field_0x740->field_0x50->field_0x3b4) {
+            KbMsgSink* sink = g_kbGame->field_0x570->Fn_0045D340();
+            char text[0x80];
+            char line[0x80];
+            if (gain > 0.0f) {
+                g_kbGame->GetStringText(0x14d8, text, 0x80);
+                sprintf(line, "%s %.0f.00", text, gain);
+                KbMessage* message = new(__FILE__, 0xa14) KbMessage(line, 3.25f);
+                if (message) {
+                    sink->Fn_0051B540(message);
+                    delete message;
+                }
+            } else {
+                g_kbGame->GetStringText(0x14d9, text, 0x80);
+                sprintf(line, "%s %.0f.00)", text, points * rules->limitScale);
+                KbMessage* message = new(__FILE__, 0xa1d) KbMessage(line, 3.25f);
+                if (message) {
+                    sink->Fn_0051B540(message);
+                    delete message;
+                }
+            }
+        }
+    }
+    Fn_0048D8B0();
+    return 0.0f;
+}
+
 // 0x00496F90: both bikes' collision objects ignore each other (AddIgnoredOwner = 0x00439410).
 void KrustyBike::Fn_00496F90(KrustyBike* other)
 {

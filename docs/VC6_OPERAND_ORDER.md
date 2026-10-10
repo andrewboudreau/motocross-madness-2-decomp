@@ -261,6 +261,25 @@ FollowCamera slot 46 `0x004654e0`; Wrecker `0x00532580` gained 21 bytes.
   placements), Vehicle slot 34 `0x0040c4c0` (256 placement and operand-order
   forms of the y and z terms; slot 35, same helper, is exact) and Wrecker
   `0x00532580` (16 forms applied to all three components).
+- The node is not limited to products: `x -= ((float)fmod(x, 100.0));`
+  issues an unrelated byte load (`mov al, [esi + 0x153f]`, the next
+  statement's test) before the `fsubr`, as retail does; without the extra
+  pair the load follows it. KrustyBike `0x00495ff0` became exact with it.
+- 4x4 product term order is not a parenthesisation effect. Wrecker slot 10
+  `0x005306e0` (one term pair of `_23`): every permutation and bracketing
+  of `_23` (528 forms) and of each other single element (11 bracketings
+  each) scores at most the plain sum; uniform bracketings of all 16
+  elements lose 30 to 700 bytes and the heavier ones exceed the inline
+  budget. D3DIMSoultreeShadow slots 27/29 (`0x004468f0`, `0x00446c30`):
+  no uniform form of the 16 sums (24 term orders x 11 bracketings x
+  product parentheses) beats the plain one; slot 27 alone is reached with
+  a non-natural term order in `_21` plus a bracketed `_23`, but slot 29,
+  which inlines the same helper, then differs in four rows, so no single
+  helper text serves both.
+- A greedy search that wraps one product or `(float)` cast at a time in
+  redundant parentheses, run over every physics near miss up to 2600
+  bytes (111 functions), found no other exact function; gains elsewhere
+  were a few bytes and not kept.
 
 ### 3.3 Search over the non-physics near misses
 

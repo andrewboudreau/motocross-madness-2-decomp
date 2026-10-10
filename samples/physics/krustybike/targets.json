@@ -85,15 +85,6 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "Fn_00495FF0@KrustyBike",
-    "target_va": "0x00495ff0",
-    "target_size": 895,
-    "expect": "partial",
-    "notes": "trick end / bonus, 99.17% (895/895). Stack slots match once the float bonus is a CSE temp, not a local. Only mov al,[+0x153f] vs fsubr order after the fmod call differs (retail loads the flag first); a named float/double remainder temp is forward-substituted (no change), dropping the (float) cast gives a double fsubr (11%). Also unchanged: x = x - (float)fmod(...), bool/unsigned char flag types; double-typed forms change the frame."
-  },
-  {
-    "class": "KrustyBike",
-    "source": "KrustyBikeNearMisses.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot102@KrustyBike",
     "target_va": "0x0048eea0",
     "target_size": 2920,

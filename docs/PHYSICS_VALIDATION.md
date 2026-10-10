@@ -489,8 +489,8 @@ where supported, without promoting that evidence into exact-code status.
 count as strict validation. `expect: "partial"` retains known code-generation
 mismatches. Full-root status of the `--strict` audit:
 
-- `--root src/krusty2`: 682/738 strict exact, 0 required failures.
-- `--root samples/physics`: 311/403 strict exact, 0 required failures.
+- `--root src/krusty2`: 690/744 strict exact, 0 required failures.
+- `--root samples/physics`: 315/403 strict exact, 0 required failures.
 
 Every other required target's relocations are bound in a `*.bindings.json` next to its
 source. The bindings came from `tools/propose_bindings.py` on masked-exact targets; the
@@ -558,12 +558,11 @@ Tire sample's exact targets:
   set (`0x00491190..0x004912cb`, vectors `0x0067c348`, `0x0067c358`,
   `0x0067c368`, `0x0067c338`; the constructor and `0x00492670` read the zero
   vector), the two vtordisp thunks `0x00497c30`/`0x00497ca0` and the network
-  message 13 decoder `0x004933e0`. The trick end `0x00495ff0` is a near miss
-  (99.17%, 895/895): its stack slots match once the float bonus is left as the
-  CSE temporary of `(float)points` instead of a named local; only the order of
-  the +0x153f flag load and the fsubr after the fmod call differs (retail loads
-  the flag first; a local read before the call anchors it before the call, one
-  read after the call is forward-substituted and scheduled after the fsubr).
+  message 13 decoder `0x004933e0`. The trick end `0x00495ff0` is strict exact
+  in the canonical file: its stack slots match once the float bonus is left as the
+  CSE temporary of `(float)points` instead of a named local, and the redundant
+  parentheses in `x -= ((float)fmod(x, 100.0))` issue the +0x153f flag load
+  before the fsubr as retail does (docs/VC6_OPERAND_ORDER.md section 3).
   Slot 97's six clip names come from a
   `{id, name[32]}` table at `0x0056cb88` (the two "BackOver" entries are
   separate records). The constructor `0x0048fa60` (`GameObject(1), Bike(flags)`,
