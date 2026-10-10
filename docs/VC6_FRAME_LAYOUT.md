@@ -314,3 +314,14 @@ exact:
 - An inlined helper taking a struct by value copies the argument only when it can
   change under the call (it aliases the output); an unmodified local is read in place.
   This reproduces retail's two `rep movsd` copies in Wrecker slot 10.
+- A struct assigned from an inline-constructed value (`sum = Vec3(0, 0, 0)`, `dst = sum * s`
+  with an operator that returns `Vec3(...)`) goes through a 12-byte temporary that copies
+  field by field; `Vec3 sum(0, 0, 0)` or per-component stores build in place and leave that
+  slot out. The ModelVsHull family (`0x437c20`, `0x437ef0`, `0x438280`, `0x4376f0`) gets
+  retail's frame from both temporaries sharing one slot; its inverse is written into the
+  product's own local (`MatrixMultiply(&rel, rel, b)`), one 64-byte slot.
+- An inline helper that returns the base type (`Vec3`) from an out-of-line constructor of a
+  derived call type (`return BikeOolVec3(...)`) constructs into a temporary and copies it into
+  the helper's return slot; returning the derived type binds the constructor result directly.
+  Retail's chain of such helpers in Bike slot 46 (`0x40b600`) shows the copies all landing in
+  one slot at frame 0.

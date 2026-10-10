@@ -14,6 +14,7 @@
 // 13 (row 2, elements _21.._23, differ); local declaration order, b*a operand order, the
 // soultree.cpp MatrixProduct argument convention and dummy declarations before the types change
 // nothing.  A non-natural term order in _21 reaches 15 of 16, no pair of reorders reaches 16.
+// A by-value helper copies `view` (84/938); only `local` by value reads it in place (680/767).
 // Slot 30 (0x00446f40, 1524 B) builds the receiver's shadow vertices from the caster's current
 // LOD meshes (TerrainShadow slot 30 0x00509aa0 is its terrain twin).  Inherent near miss: retail
 // rounds the clipped points with an inline __asm fld/fistp helper (float temp at ebp-8 / ebp-0x14,

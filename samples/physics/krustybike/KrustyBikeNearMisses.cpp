@@ -204,47 +204,6 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
     }
 }
 
-// owner: bracket only (0x48e280; callers 0x48e533, 0x495288)
-// Look at the nearest rival: compute the bearing to it relative to the heading (savedYaw +0x50), wrap to
-// +-pi and, when it is more than 0.698 rad off-axis, start the head-turn pose (clamped at +-2.7).
-// Near miss: the double subtraction after atan2 gives retail's duplicated x argument around fpatan,
-// but VC6 pops the duplicate after the yaw fsub (retail pops it first).
-void KrustyBike::Fn_0048E280()
-{
-    nearestRival = FindNearestRival(0);
-    if (!nearestRival)
-        return;
-    Vec3 d = nearestRival->position - position;
-    float angle = (float)(atan2(d.x, d.z) - savedYaw);
-    if (angle < -3.14159274f)
-        angle += 6.28318548f;
-    else if (angle > 3.14159274f)
-        angle -= 6.28318548f;
-    field_0x1558 = angle;
-    if (angle < 0)
-        angle = -angle;
-    if (angle <= 0.698f)
-        return;
-    UnknownVirtualSlot41();
-    field_0x431 = 0;
-    field_0x430 = 1;
-    field_0x432 = 1;
-    field_0x154d = 1;
-    field_0x433 = (char)0xff;
-    if (field_0x1558 > 2.7f) {
-        field_0x1558 = 2.7f;
-        field_0x1550 = 0.7f;
-    } else if (field_0x1558 < -2.7f) {
-        field_0x1558 = -2.7f;
-        field_0x1550 = -0.7f;
-    } else {
-        field_0x1550 = (field_0x1558 * 0.36963f) * 0.7f;
-    }
-    field_0x1554 = 0;
-    ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[14], 0.5f);
-    D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], 0.5f);
-}
-
 // 0x00495ff0: ends a trick. The angle (+0x1530) drops its part below 100, the
 // score is angle x multiplier (+0x1538, +0.5 for a +0x153f landing); the race
 // handler hears of it. In game mode 0 (or 4 with +0x2eb8 for the +0x568 racer's
@@ -1161,4 +1120,334 @@ void KrustyBike::Fn_00493660(float dt, int a)
     prevVelocity = velocity;
     position = savedPos;
     lastStepTime = g_kbGame->field_0x2f0;
+}
+
+// 0x0048eea0, KrustyBike slot 102 (overrides Bike 0x00407440): the rider/bike pose update.
+// Crashed (or +0x5b8 set): Bike's steer pose (pose 1) unless remote.  Otherwise, with +0x430
+// set, either a trick clip runs (+0x433 = 16 + trick) or the head turns towards the nearest
+// rival (+0x433 = -1, started by 0x0048e280); without it, the +0x7a4 == 2 end pose or Bike's
+// lean-pose blend with the KrustyBike extras (poses 16/17 and the four-pose blend 0x004a9050).
+// Tables (tier 1 data, tier 3 names): 0x0056cc60 the trick clip lengths in seconds (the clip
+// time +0x1520 is clamped to them), 0x0056d060 the frame after which a trick's landing window
+// (three frames) opens.
+extern float s_kbTrickLength[16];   // 0x0056cc60
+extern int s_kbTrickFrame[16];      // 0x0056d060
+
+// Whether trick `trick` may chain from the current input direction (0..7): not when the
+// input is the trick's own direction or one of its two neighbours in the table.
+static inline int KbTrickChains(int trick, int input)
+{
+    switch (trick % 8) {
+    case 0:
+        return input != 0 && input != 4 && input != 5;
+    case 1:
+        return input != 1 && input != 5 && input != 6;
+    case 2:
+        return input != 2 && input != 6 && input != 7;
+    case 3:
+        return input != 3 && input != 4 && input != 7;
+    case 4:
+        return input != 4 && input != 0 && input != 3;
+    case 5:
+        return input != 5 && input != 0 && input != 1;
+    case 6:
+        return input != 6 && input != 1 && input != 2;
+    case 7:
+        return input != 7 && input != 2 && input != 3;
+    }
+    return 0;
+}
+
+static inline float KbMinF(float a, float b) { return a < b ? a : b; }
+
+// Near miss (0x0048eea0..0x0048fa08, 2920 bytes with the 8-entry switch table at 0x0048f9e8;
+// sdiff ratio 0.955, 69 differing instruction lines): calls, the 0x50 frame, every branch,
+// constant and store match.  Measured: `int remote = a || b;` (not if/assign) gives retail's
+// `cmp [g+0x3428], ebp`; the rider pose-16 test on the member poseIndex (the bike-side test
+// reloads it) stops VC6 threading the idx == 16 path past the 11..13 test; the head-turn
+// look value is computed after each join (a per-arm `field_0x1554 * 0.71f` folds 0.24 * 0.71)
+// and the turning value is a local (retail's dt-slot temporary); `(x * 0.36963f) * 0.7f`
+// keeps the two multiplies.  Left: (1) VC6 cross-jumps the head-turn arms differently: retail
+// keeps the + side hold block (the - side jumps into it after `fld head`) and the - side
+// `1558 = angle; 1550 = target` tail; the store order of the hold block moves the merge
+// (1554/154d/1558 gives retail's per-arm schedule without the merge, 1554/1558/154d merges
+// into the - copy); (2) the trick-chain switch ends each case with `jne call; jmp skip`
+// where retail has `je skip; jmp call` (an inline predicate, a blocked-predicate, per-case
+// if/return and a goto-skip switch compile identically); (3) the pending-trick else block
+// (`+0x153c = 0`) sits before the shared advance instead of after it (inverted, nested and
+// goto forms, and the advance copied into both arms, do not move it); (4) the crash path keeps
+// t on the x87 stack where retail spills it to the dead dt slot (Bike's own slot 102 spills
+// with the same text; t as a separate statement, the dt parameter itself, if/else and an
+// inline max do not).
+void KrustyBike::UnknownVirtualSlot102(float dt)
+{
+    if (crashState || *(int*)pad_0x5B8) {
+        if (!field_0x735 && !g_kbGame->field_0x3428) {
+            float t = -(steerState->steerAngle / steerState->field_0x08);
+            t = (t + 1.0f) * 0.25f;
+            t += 0.25f;
+            poseParam = (t > 0.25f) ? KbMinF(t, 0.75f) : 0.25f;
+        }
+        D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], poseParam);
+        return;
+    }
+    if (field_0x430) {
+        if (field_0x433 >= 0) {
+            // Trick clip.
+            if (field_0x432) {
+                field_0x432 = 0;
+                ((Character*)riderCharacter)->CharacterVirtualSlot7(0, 0, 0);
+                CharacterVirtualSlot7(0, 0, 0);
+            } else {
+                int remote = field_0x735 || g_kbGame->field_0x3428;
+                int held;
+                if (!field_0x734 && !remote && (UnknownVirtualSlot84(6, 0x3f) || UnknownVirtualSlot84(7, 0x3f)))
+                    held = 1;
+                else
+                    held = 0;
+                field_0x1520 += dt;
+                if (field_0x433 < 16 && field_0x1520 > s_kbTrickLength[field_0x433])
+                    field_0x1520 = s_kbTrickLength[field_0x433];
+                if (!held && field_0x152c == 0.0f) {
+                    if (remote) {
+                        if (!field_0x153c) {
+                            if (field_0x153e && field_0x433 > 15)
+                                Fn_0048D990(field_0x433 - 16);
+                            ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
+                            CharacterVirtualSlot7(dt, 0, 0);
+                        }
+                    } else {
+                        if (field_0x153c && field_0x433 < 16 && animSetC[field_0x433]) {
+                            field_0x153c = 0;
+                            int input = UnknownVirtualSlot88();
+                            if (input != -1 && KbTrickChains(field_0x433, input))
+                                Fn_0048D990(field_0x433);
+                        } else {
+                            field_0x153c = 0;
+                        }
+                        ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
+                        CharacterVirtualSlot7(dt, 0, 0);
+                    }
+                } else {
+                    int frame = D3DIMSoultreeCharacter::currentFrame->field_0x00;
+                    if (frame > s_kbTrickFrame[field_0x433] && frame < s_kbTrickFrame[field_0x433] + 3) {
+                        field_0x153c = 1;
+                        if (field_0x734) {
+                            field_0x152c -= dt;
+                            if (field_0x152c < 0.0) {
+                                field_0x152c = 0;
+                                field_0x153c = 0;
+                            }
+                        } else {
+                            field_0x1528 += dt;
+                            field_0x1520 -= dt;
+                        }
+                    } else {
+                        ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
+                        CharacterVirtualSlot7(dt, 0, 0);
+                    }
+                }
+            }
+        } else {
+            // Head turn towards the nearest rival: +0x1554 is the current head angle, +0x1550
+            // its target (bearing +0x1558 scaled into the pose range), +0x154d the turn phase,
+            // +0x154e the return to straight ahead.
+            float look;
+            if (field_0x154e) {
+                // Turning back to straight ahead.
+                if (field_0x1550 < 0.0f) {
+                    field_0x1554 += dt;
+                    if (field_0x1554 > 0.0f) {
+                        field_0x1554 = 0;
+                        field_0x430 = 0;
+                        field_0x433 = 0;
+                        field_0x154e = 0;
+                    }
+                } else {
+                    field_0x1554 -= dt;
+                    if (field_0x1554 < 0.0f) {
+                        field_0x1554 = 0;
+                        field_0x430 = 0;
+                        field_0x433 = 0;
+                        field_0x154e = 0;
+                    }
+                }
+                look = field_0x1554 * 0.71f;
+            } else if (field_0x154d) {
+                // Turning towards the target; near it, the rival's bearing is taken again.
+                if (field_0x1550 > 0.0f) {
+                    float head = field_0x1554 + dt;
+                    field_0x1554 = head;
+                    if (head > field_0x1550) {
+                        field_0x154d = 0;
+                        field_0x1554 = 0.24f;
+                        look = field_0x1558 * 0.1837f;
+                    } else if (field_0x1550 - 0.1f < head) {
+                        Vec3 d = nearestRival->position - position;
+                        float angle = (float)(atan2(d.x, d.z)) - savedYaw;
+                        if (angle < -3.14159274f)
+                            angle += 6.28318548f;
+                        else if (angle > 3.14159274f)
+                            angle -= 6.28318548f;
+                        float target = (angle * 0.36963f) * 0.7f;
+                        if (angle < field_0x1558) {
+                            if (head > target) {
+                                // Passed the new target: hold the head where it is.
+                                field_0x1554 = 0.24f;
+                                field_0x154d = 0;
+                                field_0x1558 = head * 3.864687f;
+                            } else {
+                                field_0x1558 = angle;
+                                field_0x1550 = target;
+                            }
+                        } else if (angle > 2.7f) {
+                            field_0x1558 = 2.7f;
+                            field_0x1550 = 0.7f;
+                        } else {
+                            field_0x1558 = angle;
+                            field_0x1550 = target;
+                        }
+                        look = field_0x1554 * 0.71f;
+                    } else {
+                        look = head * 0.71f;
+                    }
+                } else if (field_0x1550 < 0.0f) {
+                    float head = field_0x1554 - dt;
+                    field_0x1554 = head;
+                    if (head < field_0x1550) {
+                        field_0x154d = 0;
+                        field_0x1554 = 0.24f;
+                        look = field_0x1558 * 0.1837f;
+                    } else if (field_0x1550 + 0.1f > head) {
+                        Vec3 d = nearestRival->position - position;
+                        float angle = (float)(atan2(d.x, d.z)) - savedYaw;
+                        if (angle < -3.14159274f)
+                            angle += 6.28318548f;
+                        else if (angle > 3.14159274f)
+                            angle -= 6.28318548f;
+                        float target = (angle * 0.36963f) * 0.7f;
+                        if (angle > field_0x1558) {
+                            if (head < target) {
+                                // Passed the new target: hold the head where it is.
+                                field_0x1554 = 0.24f;
+                                field_0x154d = 0;
+                                field_0x1558 = head * 3.864687f;
+                            } else {
+                                field_0x1558 = angle;
+                                field_0x1550 = target;
+                            }
+                        } else if (angle < -2.7f) {
+                            field_0x1558 = -2.7f;
+                            field_0x1550 = -0.7f;
+                        } else {
+                            field_0x1558 = angle;
+                            field_0x1550 = target;
+                        }
+                        look = field_0x1554 * 0.71f;
+                    } else {
+                        look = head * 0.71f;
+                    }
+                } else {
+                    field_0x154d = 0;
+                    field_0x1554 = 0.24f;
+                    look = field_0x1558 * 0.1837f;
+                }
+            } else {
+                // Holding: once the hold time runs out, turn back from the current bearing.
+                field_0x1554 -= dt;
+                if (field_0x1554 < 0.0f) {
+                    field_0x154e = 1;
+                    field_0x1550 = field_0x1554 = (field_0x1558 * 0.36963f) * 0.7f;
+                    look = field_0x1554 * 0.71f;
+                } else {
+                    look = field_0x1558 * 0.1837f;
+                }
+            }
+            float pose = look + 0.5f;
+            ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[14], pose);
+            D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], pose);
+        }
+    } else if (field_0x7a4 == 2) {
+        // The end pose (riderPoseHandles[15]) once the rider character is ready.
+        if (riderCharacter->c_0xc) {
+            ((KbA5C4*)riderCharacter)->SetMotion(riderPoseHandles[15]);
+            ((KbA5C4*)riderCharacter)->field_0x10 = 0;
+            field_0x7a4++;
+        } else {
+            ((Character*)riderCharacter)->CharacterVirtualSlot7(dt, 0, 0);
+        }
+        if (field_0x7a4 > 2) {
+            if (field_0x6fc)
+                UnknownVirtualSlot41();
+            field_0x431 = 0;
+        }
+    } else {
+        int cnt = poseState;
+        int idx = poseIndex;
+        int next;
+        int other;
+        int blend;
+        if (field_0x6fc) {
+            next = idx + 1;
+            if (next > 13)
+                next = 13;
+            blend = 0;
+        } else if (idx > 2) {
+            next = idx + 2;
+            if (idx == 10) {
+                next = idx;
+                blend = 0;
+            } else {
+                other = cnt + 2;
+                if (other > 10)
+                    other = 10;
+                blend = 1;
+            }
+        } else {
+            other = cnt + 2;
+            next = idx + 1;
+            if (other > 8)
+                other = 8;
+            blend = 1;
+        }
+        float w = 1.0f - poseBlend;
+        if (idx > 2)
+            blend = 0;
+        if (poseIndex == 16) {
+            if (field_0x664 < 0.45f) {
+                float lean = field_0x434;
+                if (lean < 0.0f)
+                    lean = -lean;
+                float minimum = dt * 0.55371f;
+                float rate = lean * dt * 0.55371f;
+                field_0x668 = (rate > minimum) ? rate : minimum;
+            }
+            field_0x664 += field_0x668;
+            if (field_0x664 > 1.0f)
+                field_0x664 -= 1.0f;
+            ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[16], poseParam);
+            ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[17], field_0x664);
+        } else if (blend) {
+            ((Character*)riderCharacter)->Method_0x004a9050(riderPoseHandles[idx], riderPoseHandles[next],
+                riderPoseHandles[cnt], riderPoseHandles[other], poseParam, w, poseLeanBlend);
+        } else {
+            riderCharacter->Method_0x004a8c50(riderPoseHandles[idx], riderPoseHandles[next], poseParam, w);
+        }
+        if (idx >= 11 && idx <= 13) {
+            D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);
+        } else if (poseIndex == 16) {
+            D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[16], poseParam);
+        } else if (blend) {
+            D3DIMSoultreeCharacter::Method_0x004a9050(bikePoseHandles[idx], bikePoseHandles[next],
+                bikePoseHandles[cnt], bikePoseHandles[other], poseParam, w, poseLeanBlend);
+        } else {
+            D3DIMSoultreeCharacter::Method_0x004a8c50(bikePoseHandles[idx], bikePoseHandles[next], poseParam, w);
+        }
+    }
+    int mode = field_0x604->a_0x44;
+    if (mode == 0 || mode == 1) {
+        Matrix4 tmp;
+        modelNode->GetMatrixIn(0, &tmp);
+        riderCharacter->c_0x1a0->Method_0x004fb8c0(0, &tmp);
+    }
 }

@@ -192,7 +192,7 @@
     "target_va": "0x005135f0",
     "target_size": 1664,
     "expect": "partial",
-    "notes": "17.2% (tier 3 name): contact-patch update, all 3 paths (minLength>0.001 with reject/normalise, dot<=0.001 tail, short-axis tail with out-of-line dot) and all stores present; candidate 1628 B vs 1664. First divergence is register/temp allocation after the second cross product (retail keeps the normal pointer in ecx, we address through esi) and x87 temp reuse of dead parameter slots (retail stores a dot in the arg9 slot); the g_TireZeroVec3 copies and the CollisionVec3 ctor call form on the tail paths differ"
+    "notes": "559/1666 (tier 3 name): contact-patch update. The normal lever is Cross(TireProjectOnto(axis, n), rel) and the slip vector the CollisionVec3 operators' axis * speed + lever (their temporary gives retail's 0x18 frame). Left: retail homes the projected vector in the dead `axis` argument slot (here a frame temporary), loads the normal through ecx, and differs in the tail paths' copies."
   },
   {
     "class": "Tire",

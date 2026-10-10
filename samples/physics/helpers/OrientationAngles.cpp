@@ -17,48 +17,54 @@ int OrientationAnglesFromVectors(Vec3 a, Vec3 b, float* yaw, float* pitch, float
     if (!yaw || !pitch || !roll)
         return 0;
 
-    // Heading of a in the x/z plane: (cos, sin) = (a.z, a.x) / |(a.z, a.x)|.
+    // The components are read into locals first; that is what makes VC6 load the heading
+    // terms c and s before b's components and the rotated az before a.y (their leaves are
+    // older, docs/VC6_OPERAND_ORDER.md).
+    float ax = a.x, ay = a.y, az = a.z;
+    float bx = b.x, by = b.y, bz = b.z;
+
+    // Heading of a in the x/z plane: (cos, sin) = (az, ax) / |(az, ax)|.
     float c, s;
-    float len = (float)sqrt(a.x * a.x + a.z * a.z);
+    float len = (float)sqrt(ax * ax + az * az);
     if (len == 0.0f) {
         c = 1.0f;
         s = 0.0f;
     } else {
-        c = a.z / len;
-        s = a.x / len;
+        c = az / len;
+        s = ax / len;
     }
     *yaw = (float)acos(c);
-    if (a.x < 0.0f)
+    if (ax < 0.0f)
         *yaw = -*yaw;
 
     // Turn a and b about y by the heading, then take the pitch of a.
-    float az = c * a.z + s * a.x;
-    float bz = c * b.z + s * b.x;
-    float bx = c * b.x - s * b.z;
-    len = (float)sqrt(az * az + a.y * a.y);
+    float fz = c * az + s * ax;
+    float uz = c * bz + s * bx;
+    float ux = c * bx - s * bz;
+    len = (float)sqrt(fz * fz + ay * ay);
     if (len == 0.0f) {
         *cosPitch = 1.0f;
         *sinPitch = 0.0f;
     } else {
-        *cosPitch = az / len;
-        *sinPitch = a.y / len;
+        *cosPitch = fz / len;
+        *sinPitch = ay / len;
     }
     *pitch = (float)acos(*cosPitch);
-    if (a.y < 0.0f)
+    if (ay < 0.0f)
         *pitch = -*pitch;
 
     // Roll of b about the pitched axis.
-    float by = b.y * *cosPitch - bz * *sinPitch;
-    len = (float)sqrt(by * by + bx * bx);
+    float uy = by * *cosPitch - uz * *sinPitch;
+    len = (float)sqrt(uy * uy + ux * ux);
     if (len == 0.0f) {
         *cosRoll = 1.0f;
         *sinRoll = 0.0f;
     } else {
-        *cosRoll = by / len;
-        *sinRoll = bx / len;
+        *cosRoll = uy / len;
+        *sinRoll = ux / len;
     }
     *roll = (float)acos(*cosRoll);
-    if (bx < 0.0f)
+    if (ux < 0.0f)
         *roll = -*roll;
 
     // Near straight up/down the yaw and roll axes coincide: fold roll into yaw.

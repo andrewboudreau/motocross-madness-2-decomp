@@ -69,6 +69,7 @@ public:
     virtual void UnknownVirtualSlot96();
     virtual int UnknownVirtualSlot99(float a, float b, int c, float d);
     virtual void UnknownVirtualSlot101();
+    virtual void UnknownVirtualSlot102(float dt);   // 0x0048eea0: rider/bike pose update (trick clips, head turn)
 
     // 0x00414370 (in BikeAI.cpp; called by slot 63 0x004924c0, which ignores the result):
     // rebuilds the AI racing line aiPath for this frame; 0 when a track query fails.
@@ -228,7 +229,7 @@ public:
     char field_0x154e; // 0x154E
     char pad_0x154F[0x1];
     float field_0x1550; // 0x1550  Fn_0048E280 stores a clamped, scaled bearing to the nearest rival
-    int field_0x1554; // 0x1554  Fn_0048E280 clears it
+    float field_0x1554; // 0x1554  head angle of the turn towards the rival (slot 102); Fn_0048E280 clears it
     float field_0x1558; // 0x1558  Fn_0048E280: wrapped bearing to the rival relative to heading +0x50, clamped to +-2.7
     KrustyBike* nearestRival; // 0x155C  FindNearestRival result (closest other bike of the race; tier 3 name)
     KbBikeState netState; // 0x1560  last state sent to the peers (0x00492ad0)

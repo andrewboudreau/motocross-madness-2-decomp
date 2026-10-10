@@ -416,7 +416,7 @@
     "target_va": "0x00436e50",
     "target_size": 2205,
     "expect": "partial",
-    "notes": "9.5%: per-element inline non-swept sequence with 0x42a4b0/0x42a510/0x42a450/0x43c890/0x428060; retail inlines all matrix products (1122 vs 2205)",
+    "notes": "335/2099: the product is the inline by-value MatrixMultiplyInline (retail copies the aliased inverse and b+0x88), frame 0x108 vs retail 0x120. Retail inlines the first contact-offset rotation and calls 0x0042a4b0/0x0042a450/0x0042a510 for the rest (inline budget of one inline helper), keeps a in ebx and b in ebp.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -426,7 +426,7 @@
     "target_va": "0x004376f0",
     "target_size": 707,
     "expect": "partial",
-    "notes": "27.0%: rel = inv(A+0xc8)*B+0x88, dead GetPositionRelativeTo(0,&v), loop calling HullVsHullSwept",
+    "notes": "677/707: rel = inverse(a+0xc8) * b+0x88 in one local, zero sum via a Vec3 temporary that also serves as the unread 0x4fc9a0 output (frame 0x60 like retail). Left: one push schedule, the loop's this/offset loads and the mean's x term.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -456,7 +456,7 @@
     "target_va": "0x00437c20",
     "target_size": 716,
     "expect": "partial",
-    "notes": "28.4%: rel = inv(A+0x88)*B+0x48 (retail inlines the 4x4 product and rigid inverse; mine calls helpers, 582 vs 716), loop calls HullVsHull",
+    "notes": "698/716: rel = inverse(model+0x88) * hull+0x48 with the inverse written into the product's own local (one Matrix4 slot, frame 0x60 like retail); zero sum and mean go through Vec3 temporaries. Left: two argument-push schedules, the x term of the mean (retail s * sum.x, then sum.y * s) and the copy registers.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -466,7 +466,7 @@
     "target_va": "0x00437ef0",
     "target_size": 906,
     "expect": "partial",
-    "notes": "9.4%: swept variant (B+0xc8, 0x4290d0 ranges, HullVsHullSwept); retail inlines matrix products (639 vs 906)",
+    "notes": "843/906: swept variant; the model box is copied into locals that 0x004290d0 grows in place, then stored to +0x108/+0x114 and passed by value (frame 0x7c like retail). Left: scheduling of the two box copies, one push and the mean's x term.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -476,7 +476,7 @@
     "target_va": "0x00438280",
     "target_size": 710,
     "expect": "partial",
-    "notes": "27.6%: rel = inv(A+0x88)*B+0x88, loop over B hulls calling ModelVsHull; inlined-matrix-product gap",
+    "notes": "694/710: as ModelVsHull with ModelVsHull per element of b (frame 0x60 like retail). Left: one push schedule, the mean's x term and the copy registers.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -486,7 +486,7 @@
     "target_va": "0x00438550",
     "target_size": 783,
     "expect": "partial",
-    "notes": "8.1%: swept form of ModelVsModel (4290d0, ModelVsHullSwept); inlined-matrix-product gap",
+    "notes": "712/783: unlike the other three it keeps the last element contact (no averaging; retail copies q->contact into a local on each hit and back at the end) and the inverse's x/y translation terms pair as CollisionInvertRigidModel. Left: scheduling of the box copies and register choice in the loop.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -786,7 +786,7 @@
     "target_va": "0x00439820",
     "target_size": 1493,
     "expect": "partial",
-    "notes": "segment query (cdecl): bounding-sphere pre-test with the Vec3 operators called out of line, then 0x429e60 on the hull (inverse inline) or on every element after 0x4253b0 (inverse 0x42e2b0 out of line); differs in the frame (0xc0 vs 0xa8: the operator temporaries) and register choices",
+    "notes": "149/1476: the pre-test calls the out-of-line operators as by-value views (SegmentSubtract/Add/Dot/Length; Add takes the scaled vector first, as retail pushes it). Retail gives each operator result its own frame slot (frame 0xa8; here the temporaries share) and keeps the segment pointer in ebx.",
     "bindings": "CollisionObject.bindings.json"
   }
 ]

@@ -15,8 +15,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot72@Bike",
     "target_va": "0x00405db0",
     "target_size": 724,
-    "expect": "partial",
-    "notes": "98.9% (724/724). Only diff: retail loads n.x first in the 2nd/3rd cross-product terms (fld [n]; fmul [out+x]) while VC6 loads out first. Tried: pointer/reference/direct member forms and operand swaps; direct member expression flips ALL three terms to n-first (and loses the add eax,0x230 CSE), so retail's shape is neither. Also tried: a const Vec3* for n, the cross product passed straight to BikeNormalized, CrossProduct(frontWheel->w_0x230, *out) through a wheel local (no change).",
+    "expect": "exact",
+    "notes": "Strict exact. The in-place normalisation of *out goes through an inline helper (BikeNormalizeInPlace(out)); written in the body, *out's components keep older leaves and the cross product with n loads out first in its 2nd/3rd terms. Retail's order is that of fresh leaves in the order the cross product creates them.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -256,7 +256,7 @@
     "target_va": "0x0040b600",
     "target_size": 1066,
     "expect": "partial",
-    "notes": "slot 46: SEMANTICALLY COMPLETE (all four paths, out-of-line Vec3 ctor 0x404e60 modelled), 1025/1066 bytes; first divergence is retail pushing edi and keeping 12 extra bytes of frame (0x48 vs 0x3c) [5.6% match under vc6_o2_ml]",
+    "notes": "slot 46, 1048/1066: the midpoint helpers return Vec3 built from the out-of-line constructor 0x404e60 (each result is a temporary copied into a shared return slot), nested in one expression on the both-wheels path; the one-wheel path calls 0x421d00 on 0x421cb0's result. Left: the frame offsets of three constructor temporaries and the rear/front register pair on the one-wheel path.",
     "bindings": "Bike.bindings.json"
   },
   {
@@ -836,7 +836,7 @@
     "target_va": "0x005286a0",
     "target_size": 784,
     "expect": "partial",
-    "notes": "32.7% (782/784). Tilt angle: project reference normal perpendicular to axis, side = right x axis, angle = asin(min(1,|perp x side|))*sign, cos to field_0x4b0 on request. First divergence: register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac; we swap them); declaration order/locals did not change it.",
+    "notes": "263/782: tilt angle; the scale/subtract outputs are separate locals (frame 0x3c like retail). Left: retail shares the ground-normal output with the projection (and n with the side vector, the normalise temporary separate), register roles (retail esi=this, ebx=a, edi=perp, ebp=&field_0x1ac).",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -2337,6 +2337,16 @@
     "target_size": 5384,
     "expect": "exact",
     "notes": "bike loader (SEH frame, five new(__FILE__, line) sites). target_size 5384 = extent_with_tables (5366 code + 2 pad + 4-entry jump table at 0x00491178). Exact needed: float-typed KbBikeSetup fields give the retail jump-threaded ternary chains, function-scope Vec3 points[2] plus memset keeps the 0xbc frame, the dead field_0x2d74 cmp is an if/else with identical arms, and 0.001f is the TU-local constant at 0x005541e8",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_0048E280",
+    "target_va": "0x0048e280",
+    "target_size": 339,
+    "expect": "exact",
+    "notes": "Bearing to the nearest rival, head-turn start. Exact with `(float)(atan2(d.x, d.z)) - savedYaw`: the parenthesised cast operand keeps the dead fpatan duplicate and pops it before the yaw fsub; `(x * 0.36963f) * 0.7f` keeps the two multiplies.",
     "bindings": "KrustyBike.bindings.json"
   }
 ]

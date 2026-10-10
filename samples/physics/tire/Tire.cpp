@@ -239,6 +239,17 @@ static inline float TireLengthFromSq(float lenSq)
     return FastSqrt(lenSq);
 }
 
+// The part of v along the unit normal n.
+static inline CollisionVec3 TireProjectOnto(const CollisionVec3& v, const CollisionVec3& n)
+{
+    float k = v.y * n.y + v.x * n.x + v.z * n.z;
+    CollisionVec3 p;
+    p.x = k * n.x;
+    p.y = k * n.y;
+    p.z = k * n.z;
+    return p;
+}
+
 // 0x005135f0.  Semantics are tier 3.  `this` is the complete Tire; the CollisionPoint
 // members are addressed through the subobject (+0xb8).
 //   field_0x38 = contact position - *pos, field_0x5c = axis x field_0x38;
@@ -259,11 +270,8 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
 
     this->CollisionPoint::field_0x5c = CollisionCross(axis, this->CollisionPoint::relativePosition);
 
-    float k = axis.y * this->CollisionPoint::surfaceNormal.y + axis.x * this->CollisionPoint::surfaceNormal.x + axis.z * this->CollisionPoint::surfaceNormal.z;
-    axis.x = k * this->CollisionPoint::surfaceNormal.x;
-    axis.y = k * this->CollisionPoint::surfaceNormal.y;
-    axis.z = k * this->CollisionPoint::surfaceNormal.z;
-    normalLeverCross = CollisionCross(axis, this->CollisionPoint::relativePosition);
+    normalLeverCross = CollisionCross(TireProjectOnto(axis, this->CollisionPoint::surfaceNormal),
+                                      this->CollisionPoint::relativePosition);
 
     if (minLength > 0.001f) {
         if (CollisionRejectFrom(&axis, &ref, &this->CollisionPoint::surfaceNormal)) {
@@ -275,9 +283,7 @@ void Tire::UpdateContactPatch(const CollisionVec3* pos, CollisionVec3 axis, Coll
         if (d > 0.001f) {
             if (reportContactOutputs)
                 *outValue = d;
-            slipVector.x = this->CollisionPoint::tangentSpeed * axis.x + normalLeverCross.x;
-            slipVector.y = this->CollisionPoint::tangentSpeed * axis.y + normalLeverCross.y;
-            slipVector.z = this->CollisionPoint::tangentSpeed * axis.z + normalLeverCross.z;
+            slipVector = axis * this->CollisionPoint::tangentSpeed + normalLeverCross;
             float lenSq = TireDot(&slipVector, &slipVector);
             float len;
             if (lenSq == 0.0f)

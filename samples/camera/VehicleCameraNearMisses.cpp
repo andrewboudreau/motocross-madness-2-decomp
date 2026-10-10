@@ -21,11 +21,13 @@
 // cast to stay two multiplies.
 //
 // VehicleCamera::UnknownVirtualSlot35 (0x0052c510, 1267 bytes, 813/1261):
-// the body follows retail's blocks and x87 sequences, but the frame is 12
-// bytes smaller (retail keeps one more Vector3), the direction and the
-// velocity/ahead slots are swapped, the length is kept on the x87 stack
-// where retail spills it to the squared-length slot and divides from
-// memory, and retail duplicates the x scaling into both range branches.
+// frame (0x48) and slot assignment match retail. Left: the squared length
+// loads x*x before y*y in retail (here y*y first), and retail duplicates the
+// x scaling into both range branches (`fld x; fmul st(1)` after
+// distance * field_0x228, `fld st(0); fmul x` after the -0.25 range) where
+// VC6 here shares one block. Tried without effect: the four groupings of
+// Length's terms and of `along`, `direction * range`, `range * direction`
+// and per-component scaling in the range branch.
 // `a` is tested as a byte (FollowCamera.h declares it unsigned char).
 #include "../../src/reconstructed/VehicleCamera.h"
 

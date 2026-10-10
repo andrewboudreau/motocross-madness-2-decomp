@@ -1687,6 +1687,13 @@ int CollisionObject::ModelVsCapsule(CollisionModelBody* model, CollisionCapsuleS
 // and average the contact positions the element tests wrote to query->contact.
 // ---------------------------------------------------------------------------
 
+// The query's contact position as a Math3D Vec3 (inline constructor and operators; the
+// model tests below accumulate and average it with them).
+static inline Vec3& QueryContact(CollisionSweepQuery* q)
+{
+    return *(Vec3*)&q->contact;
+}
+
 // 0x00437c20: model vs hull.  Forwards to ModelVsHullSwept when model->swept is set;
 // otherwise rel = inverse(model+0x88) * hull+0x48 and each enabled element is tested
 // against the hull with the box-box test 0x00436720; the contact is the mean of the hits.
@@ -1695,29 +1702,24 @@ int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, Co
     if (a->swept)
         return ModelVsHullSwept(a, b, q);
 
-    Matrix4 inv;
-    CollisionInvertRigid(&inv, &a->field_0x88);
-    Matrix4 rel;
-    MatrixMultiply(&rel, inv, b->worldTransform);
     int hit = 0;
+    Matrix4 rel;
+    CollisionInvertRigid(&rel, &a->field_0x88);
+    MatrixMultiply(&rel, rel, b->worldTransform);
     if (SweptBoxOverlap(a->center, a->halfExtents, &b->triangleTree->center,
                     &b->triangleTree->halfExtents, &rel, &a->field_0xc8)) {
-        Vec3 sum(0.0f, 0.0f, 0.0f);
+        Vec3 sum;
+        sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
             if (a->elementEnabled[i] && HullVsHull(&a->elements[i], b, q)) {
-                sum.x += q->contact.x;
-                sum.y += q->contact.y;
-                sum.z += q->contact.z;
+                sum += QueryContact(q);
                 hit = 1;
                 count++;
             }
         }
         if (hit) {
-            float s = 1.0f / count;
-            q->contact.x = sum.x * s;
-            q->contact.y = sum.y * s;
-            q->contact.z = sum.z * s;
+            QueryContact(q) = sum * (1.0f / count);
         }
         return hit;
     }
@@ -1725,34 +1727,34 @@ int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, Co
 }
 
 // 0x00437ef0: swept model vs hull.  Like ModelVsHull, but the relative frame uses the hull's
-// +0xc8 matrix, the model's swept bounds come from 0x004290d0 (cached in the model at
-// +0x108/+0x114) and each enabled element is tested with the swept hull test 0x00436af0.
+// +0xc8 matrix, a copy of the model box (centre, half extents) is grown in place by
+// 0x004290d0 and cached in the model at +0x108/+0x114, and each enabled element is tested
+// with the swept hull test 0x00436af0.
 int CollisionObject::ModelVsHullSwept(CollisionModelBody* a, CollisionHullBody* b, CollisionSweepQuery* q)
 {
-    Matrix4 inv;
-    CollisionInvertRigid(&inv, &a->field_0x88);
-    Matrix4 rel;
-    MatrixMultiply(&rel, inv, b->bodyTransform);
-    GrowBoxByTransformedBox(&a->sweptCenter, &a->sweptHalfExtents, a->field_0x30, a->field_0x3c, &a->field_0xc8);
     int hit = 0;
-    if (SweptBoxOverlap(a->sweptCenter, a->sweptHalfExtents, &b->triangleTree->center,
+    Matrix4 rel;
+    CollisionInvertRigid(&rel, &a->field_0x88);
+    MatrixMultiply(&rel, rel, b->bodyTransform);
+    CollisionVec3 center = a->center;
+    CollisionVec3 half = a->halfExtents;
+    GrowBoxByTransformedBox(&center, &half, a->field_0x30, a->field_0x3c, &a->field_0xc8);
+    a->sweptCenter = center;
+    a->sweptHalfExtents = half;
+    if (SweptBoxOverlap(center, half, &b->triangleTree->center,
                     &b->triangleTree->halfExtents, &rel, &a->field_0xc8)) {
-        Vec3 sum(0.0f, 0.0f, 0.0f);
+        Vec3 sum;
+        sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < a->elementCount; i++) {
             if (a->elementEnabled[i] && HullVsHullSwept(&a->elements[i], b, q)) {
-                sum.x += q->contact.x;
-                sum.y += q->contact.y;
-                sum.z += q->contact.z;
+                sum += QueryContact(q);
                 hit = 1;
                 count++;
             }
         }
         if (hit) {
-            float s = 1.0f / count;
-            q->contact.x = sum.x * s;
-            q->contact.y = sum.y * s;
-            q->contact.z = sum.z * s;
+            QueryContact(q) = sum * (1.0f / count);
         }
         return hit;
     }
@@ -1767,28 +1769,23 @@ int CollisionObject::ModelVsModel(CollisionModelBody* a, CollisionModelBody* b, 
     if (a->swept)
         return ModelVsModelSwept(a, b, q);
 
-    Matrix4 inv;
-    CollisionInvertRigid(&inv, &a->field_0x88);
-    Matrix4 rel;
-    MatrixMultiply(&rel, inv, b->field_0x88);
     int hit = 0;
+    Matrix4 rel;
+    CollisionInvertRigid(&rel, &a->field_0x88);
+    MatrixMultiply(&rel, rel, b->field_0x88);
     if (SweptBoxOverlap(a->center, a->halfExtents, &b->center, &b->halfExtents, &rel, &a->field_0xc8)) {
-        Vec3 sum(0.0f, 0.0f, 0.0f);
+        Vec3 sum;
+        sum = Vec3(0.0f, 0.0f, 0.0f);
         int count = 0;
         for (int i = 0; i < b->elementCount; i++) {
             if (ModelVsHull(a, &b->elements[i], q)) {
-                sum.x += q->contact.x;
-                sum.y += q->contact.y;
-                sum.z += q->contact.z;
+                sum += QueryContact(q);
                 hit = 1;
                 count++;
             }
         }
         if (hit) {
-            float s = 1.0f / count;
-            q->contact.x = sum.x * s;
-            q->contact.y = sum.y * s;
-            q->contact.z = sum.z * s;
+            QueryContact(q) = sum * (1.0f / count);
         }
         return hit;
     }
@@ -1796,33 +1793,47 @@ int CollisionObject::ModelVsModel(CollisionModelBody* a, CollisionModelBody* b, 
 }
 
 // 0x00438550: swept model vs model: as ModelVsModel with a's swept bounds (0x004290d0) and
-// ModelVsHullSwept per element of b.
+// ModelVsHullSwept per element of b, except that the result is the last element's contact
+// (copied out on each hit and back at the end), not the mean.
+// The rigid inverse as ModelVsModelSwept (0x00438550) expands it: the x translation term
+// pairs differ from CollisionInvertRigid, y follows CollisionInvertRigidRelFrame.
+static inline void CollisionInvertRigidModel(Matrix4* out, const Matrix4* src)
+{
+    *out = *src;
+    float t;
+    t = out->m[0][1]; out->m[0][1] = out->m[1][0]; out->m[1][0] = t;
+    t = out->m[0][2]; out->m[0][2] = out->m[2][0]; out->m[2][0] = t;
+    t = out->m[1][2]; out->m[1][2] = out->m[2][1]; out->m[2][1] = t;
+    CollisionVec3 p;
+    p.x = -((out->m[3][2] * out->m[2][0] + out->m[3][0] * out->m[0][0]) + out->m[3][1] * out->m[1][0]);
+    p.y = -((out->m[3][1] * out->m[1][1] + out->m[3][0] * out->m[0][1]) + out->m[3][2] * out->m[2][1]);
+    p.z = -((out->m[3][2] * out->m[2][2] + out->m[3][1] * out->m[1][2]) + out->m[3][0] * out->m[0][2]);
+    out->m[3][0] = p.x;
+    out->m[3][1] = p.y;
+    out->m[3][2] = p.z;
+}
 int CollisionObject::ModelVsModelSwept(CollisionModelBody* a, CollisionModelBody* b, CollisionSweepQuery* q)
 {
-    Matrix4 inv;
-    CollisionInvertRigid(&inv, &a->field_0x88);
-    Matrix4 rel;
-    MatrixMultiply(&rel, inv, b->field_0x88);
-    GrowBoxByTransformedBox(&a->sweptCenter, &a->sweptHalfExtents, a->field_0x30, a->field_0x3c, &a->field_0xc8);
     int hit = 0;
-    if (SweptBoxOverlap(a->sweptCenter, a->sweptHalfExtents, &b->center, &b->halfExtents, &rel, &a->field_0xc8)) {
-        Vec3 sum(0.0f, 0.0f, 0.0f);
-        int count = 0;
+    Matrix4 rel;
+    CollisionInvertRigidModel(&rel, &a->field_0x88);
+    MatrixMultiply(&rel, rel, b->field_0x88);
+    CollisionVec3 center = a->center;
+    CollisionVec3 half = a->halfExtents;
+    GrowBoxByTransformedBox(&center, &half, a->field_0x30, a->field_0x3c, &a->field_0xc8);
+    a->sweptCenter = center;
+    a->sweptHalfExtents = half;
+    if (SweptBoxOverlap(center, half, &b->center, &b->halfExtents, &rel, &a->field_0xc8)) {
+        Vec3 last;
+        last = Vec3(0.0f, 0.0f, 0.0f);
         for (int i = 0; i < b->elementCount; i++) {
             if (ModelVsHullSwept(a, &b->elements[i], q)) {
-                sum.x += q->contact.x;
-                sum.y += q->contact.y;
-                sum.z += q->contact.z;
                 hit = 1;
-                count++;
+                last = QueryContact(q);
             }
         }
-        if (hit) {
-            float s = 1.0f / count;
-            q->contact.x = sum.x * s;
-            q->contact.y = sum.y * s;
-            q->contact.z = sum.z * s;
-        }
+        if (hit)
+            QueryContact(q) = last;
         return hit;
     }
     return 0;
@@ -1909,36 +1920,54 @@ int CollisionObject::HullVsHullSwept(CollisionHullBody* a, CollisionHullBody* b,
 // The call to 0x004fc9a0 (node position, result stored to a dead local) is kept as decoded.
 int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* b, CollisionSweepQuery* q)
 {
-    Matrix4 inv;
-    CollisionInvertRigid(&inv, &a->bodyTransform);
-    Matrix4 rel;
-    MatrixMultiply(&rel, inv, b->field_0x88);
     int hit = 0;
+    Matrix4 rel;
+    CollisionInvertRigid(&rel, &a->bodyTransform);
+    MatrixMultiply(&rel, rel, b->field_0x88);
     if (SweptBoxOverlap(a->triangleTree->center, a->triangleTree->halfExtents, &b->center,
                     &b->halfExtents, &rel, &a->motionTransform)) {
-        Vec3 sum(0.0f, 0.0f, 0.0f);
-        CollisionVec3 nodePos(0.0f, 0.0f, 0.0f);
+        Vec3 sum;
+        sum = Vec3(0.0f, 0.0f, 0.0f);
+        CollisionVec3 nodePos;
         int count = 0;
         // Retail makes this call (0x004fc9a0); nodePos is never read.
         ((CollisionSceneNode*)a->sceneNode)->GetPositionRelativeTo(0, &nodePos);
         for (int i = 0; i < b->elementCount; i++) {
             if (b->elementEnabled[i] && HullVsHullSwept(a, &b->elements[i], q)) {
-                sum.x += q->contact.x;
-                sum.y += q->contact.y;
-                sum.z += q->contact.z;
+                sum += QueryContact(q);
                 hit = 1;
                 count++;
             }
         }
         if (hit) {
-            float s = 1.0f / count;
-            q->contact.x = sum.x * s;
-            q->contact.y = sum.y * s;
-            q->contact.z = sum.z * s;
+            QueryContact(q) = sum * (1.0f / count);
         }
         return hit;
     }
     return 0;
+}
+
+// The 4x4 product of MatrixMultiply (0x0042a1a0) expanded inline with its by-value
+// operands (same text as the out-of-line body; *out = b * a in the row-vector convention).
+// HullVsModel (0x00436e50) inlines it; the operand aliasing the output is copied first.
+static inline void MatrixMultiplyInline(Matrix4* out, Matrix4 a, Matrix4 b)
+{
+    out->_11 = a._11 * b._11 + a._21 * b._12 + a._31 * b._13 + a._41 * b._14;
+    out->_12 = a._12 * b._11 + a._22 * b._12 + a._32 * b._13 + a._42 * b._14;
+    out->_13 = a._13 * b._11 + a._23 * b._12 + a._33 * b._13 + a._43 * b._14;
+    out->_14 = a._14 * b._11 + a._24 * b._12 + a._34 * b._13 + a._44 * b._14;
+    out->_21 = a._11 * b._21 + a._21 * b._22 + a._31 * b._23 + a._41 * b._24;
+    out->_22 = a._12 * b._21 + a._22 * b._22 + a._32 * b._23 + a._42 * b._24;
+    out->_23 = a._13 * b._21 + a._23 * b._22 + a._33 * b._23 + a._43 * b._24;
+    out->_24 = a._14 * b._21 + a._24 * b._22 + a._34 * b._23 + a._44 * b._24;
+    out->_31 = a._11 * b._31 + a._21 * b._32 + a._31 * b._33 + a._41 * b._34;
+    out->_32 = a._12 * b._31 + a._22 * b._32 + a._32 * b._33 + a._42 * b._34;
+    out->_33 = a._13 * b._31 + a._23 * b._32 + a._33 * b._33 + a._43 * b._34;
+    out->_34 = a._14 * b._31 + a._24 * b._32 + a._34 * b._33 + a._44 * b._34;
+    out->_41 = a._11 * b._41 + a._21 * b._42 + a._31 * b._43 + a._41 * b._44;
+    out->_42 = a._12 * b._41 + a._22 * b._42 + a._32 * b._43 + a._42 * b._44;
+    out->_43 = a._13 * b._41 + a._23 * b._42 + a._33 * b._43 + a._43 * b._44;
+    out->_44 = a._14 * b._41 + a._24 * b._42 + a._34 * b._43 + a._44 * b._44;
 }
 
 // 0x00436e50: hull A vs model B, non-swept.  Forwards to HullVsModelSwept when a->field_0x00
@@ -1952,11 +1981,10 @@ int CollisionObject::HullVsModel(CollisionHullBody* a, CollisionModelBody* b, Co
     if (a->swept)
         return HullVsModelSwept(a, b, q);
 
-    Matrix4 inv;
-    CollisionInvertRigid(&inv, &a->bodyTransform);
-    Matrix4 rel;
-    MatrixMultiply(&rel, inv, b->field_0x88);
     int hit = 0;
+    Matrix4 rel;
+    CollisionInvertRigid(&rel, &a->bodyTransform);
+    MatrixMultiplyInline(&rel, rel, b->field_0x88);
     if (SweptBoxOverlap(a->triangleTree->center, a->triangleTree->halfExtents, &b->center,
                     &b->halfExtents, &rel, &a->motionTransform)) {
         CollisionContactSum sum;
@@ -2404,24 +2432,26 @@ void CollisionObject::SetTransform(const Matrix4* m)
 // (0x00429e60) on the hull, or on every enabled element of the model after the model bounds
 // test (0x004253b0), with the hit record installed as the box result.  On a hit *outPoint
 // is the point at the hit fraction and *outNormal the record's normal rotated into world.
+// By-value views of the out-of-line Vec3 operators the pre-test calls (each result is a
+// compiler temporary): subtract 0x00421d00, add 0x00421cb0, dot 0x0040ae30, length 0x00435ec0.
+Vec3 SegmentSubtract(const Vec3& a, const Vec3& b);
+Vec3 SegmentAdd(const Vec3& a, const Vec3& b);
+float SegmentDot(const Vec3& a, const Vec3& b);
+float SegmentLength(const Vec3& v);
 int SegmentTouchesObject(const CollisionVec3* ends, CollisionObject* object, CollisionVec3* outPoint,
                          CollisionVec3* outNormal)
 {
     if (object->statusFlags & 1) {
         const Vec3* p = (const Vec3*)ends;
         const Vec3* center = (const Vec3*)&object->field_0x34;   // +0x40
-        Vec3 tmp;
-        Vec3 d = *Vec3SubtractCall(&tmp, &p[1], &p[0]);
-        Vec3 v = *Vec3SubtractCall(&tmp, center, &p[0]);
-        float t = Vec3DotCall(&v, &d) / Vec3DotCall(&d, &d);
+        Vec3 d = SegmentSubtract(p[1], p[0]);
+        float t = SegmentDot(d, SegmentSubtract(*center, p[0])) / SegmentDot(d, d);
         if (t >= 1.0f)
             t = 1.0f;
         else if (t <= 0.0f)
             t = 0.0f;
         Vec3 scaled = CollisionVec3Call(d.x * t, d.y * t, d.z * t);
-        Vec3 closest = *Vec3AddCall(&tmp, &p[0], &scaled);
-        Vec3 diff = *Vec3SubtractCall(&tmp, center, &closest);
-        if (CollisionLength((CollisionVec3*)&diff) < object->boundRadius) {
+        if (SegmentLength(SegmentSubtract(*center, SegmentAdd(scaled, p[0]))) < object->boundRadius) {
             switch (object->shapeType) {
             case 0: {
                 CollisionHullBody* hull = (CollisionHullBody*)object->shape;

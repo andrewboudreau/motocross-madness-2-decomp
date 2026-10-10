@@ -56,15 +56,6 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "Fn_0048E280",
-    "target_va": "0x0048e280",
-    "target_size": 339,
-    "expect": "partial",
-    "notes": "Bearing to nearest rival, head-turn pose. 78.6%: `(float)(atan2(d.x, d.z) - savedYaw)` gives retail's fld st0/fxch/fpatan/fxch/fstp st0 sequence and `(x * 0.36963f) * 0.7f` its two multiplies; VC6 pops the dead duplicate after the yaw fsub, retail before it."
-  },
-  {
-    "class": "KrustyBike",
-    "source": "KrustyBikeNearMisses.cpp",
     "candidate_symbol_contains": "Fn_00492AD0@KrustyBike",
     "target_va": "0x00492ad0",
     "target_size": 2315,
@@ -99,5 +90,14 @@
     "target_size": 895,
     "expect": "partial",
     "notes": "trick end / bonus, 99.17% (895/895). Stack slots match once the float bonus is a CSE temp, not a local. Only mov al,[+0x153f] vs fsubr order after the fmod call differs (retail loads the flag first); a named float/double remainder temp is forward-substituted (no change), dropping the (float) cast gives a double fsubr (11%). Also unchanged: x = x - (float)fmod(...), bool/unsigned char flag types; double-typed forms change the frame."
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBikeNearMisses.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot102@KrustyBike",
+    "target_va": "0x0048eea0",
+    "target_size": 2920,
+    "expect": "partial",
+    "notes": "Slot 102 (overrides Bike 0x00407440): the rider/bike pose update (trick clips, head turn towards the nearest rival, Bike's lean-pose blend). Extent 0x48eea0..0x48fa08 (0x48f760 is a jump target inside; the 8-entry switch table 0x48f9e8 ends it). Calls, frame (0x50), every branch and constant match; left: VC6 tail-merges the head-turn arms differently (retail keeps the + side hold block and the - side retarget tail), the switch's last compare polarity, the place of the trick-pending else block, and the crash path's clamp keeps t on the x87 stack where retail spills it to the dead dt slot."
   }
 ]

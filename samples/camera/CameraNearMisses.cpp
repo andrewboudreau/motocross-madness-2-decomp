@@ -8,6 +8,8 @@
 // order, member vs operator[] access, Vector3(...) vs member-assigned results,
 // swapped parameter roles, pointer parameters and a cross written in the body
 // all leave four pairs wrong (or lose the forward pointer in esi).
+// By-value Cross parameters (either or both) and a by-value normalisation copy
+// the vectors (97..232/690).
 // Established: the direction through an inline difference passed straight to
 // the out-of-line-dot normalisation, the right vector's z + (x + y) squared
 // length and its scale through the 0x00404e60 constructor copy.

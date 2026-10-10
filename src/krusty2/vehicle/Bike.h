@@ -410,7 +410,7 @@ public:
     float poseParam;  // +0x65c slot 61: passed as time/weight arg to Method_0x004a8c50 and Method_0x004a8bf0; slot 89 state machine writes it from the smoothed value (x = t * -0.25)
     float poseLeanBlend;  // +0x660 slot 89: (lean - min)/(max - min) pose lean blend; slot 61: (speed*0.0310559+1)*0.5
     float field_0x664;                // retail does fld/fcomp on it (KrustyBike request)
-    int field_0x668;
+    float field_0x668;  // KrustyBike slot 102: per-frame advance of field_0x664 (pose 17 time)
     int riderPoseHandles[18];  // +0x66c slot 61: riderPoseHandles[idx], riderPoseHandles[next] passed to riderCharacter->Method_0x004a8c50 (rider-side pose ids, 18 entries)
     int bikePoseHandles[18];  // +0x6b4 slot 61: bikePoseHandles[idx], [next] passed to D3DIMSoultreeCharacter::Method_0x004a8c50 (bike-side pose ids, 18 entries)
     int field_0x6fc;

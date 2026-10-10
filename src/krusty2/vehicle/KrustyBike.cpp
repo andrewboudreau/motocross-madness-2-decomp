@@ -1202,6 +1202,49 @@ KrustyBike* KrustyBike::FindNearestRival(float* outDistance)
     return best;
 }
 
+// owner: bracket only (0x48e280; callers 0x48e533, 0x495288)
+// Look at the nearest rival: the bearing to it relative to the heading (savedYaw +0x50),
+// wrapped to +-pi; when it is more than 0.698 rad off-axis the head-turn pose starts
+// (+0x430/+0x432/+0x154d set, +0x433 = -1; slot 102 runs it), its target clamped at +-2.7.
+// The bearing is `(float)(atan2(...))` minus the yaw: the parenthesised operand of the cast
+// keeps the dead duplicate of the x argument around fpatan and pops it before the yaw fsub,
+// as retail does (see docs/VC6_OPERAND_ORDER.md).
+void KrustyBike::Fn_0048E280()
+{
+    nearestRival = FindNearestRival(0);
+    if (!nearestRival)
+        return;
+    Vec3 d = nearestRival->position - position;
+    float angle = (float)(atan2(d.x, d.z)) - savedYaw;
+    if (angle < -3.14159274f)
+        angle += 6.28318548f;
+    else if (angle > 3.14159274f)
+        angle -= 6.28318548f;
+    field_0x1558 = angle;
+    if (angle < 0)
+        angle = -angle;
+    if (angle <= 0.698f)
+        return;
+    UnknownVirtualSlot41();
+    field_0x431 = 0;
+    field_0x430 = 1;
+    field_0x432 = 1;
+    field_0x154d = 1;
+    field_0x433 = (char)0xff;
+    if (field_0x1558 > 2.7f) {
+        field_0x1558 = 2.7f;
+        field_0x1550 = 0.7f;
+    } else if (field_0x1558 < -2.7f) {
+        field_0x1558 = -2.7f;
+        field_0x1550 = -0.7f;
+    } else {
+        field_0x1550 = (field_0x1558 * 0.36963f) * 0.7f;
+    }
+    field_0x1554 = 0;
+    ((KbA5C4*)riderCharacter)->Fn_004A8BF0(riderPoseHandles[14], 0.5f);
+    D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[14], 0.5f);
+}
+
 // 0x004933e0: the decoded network state (+0x1358..+0x1388) accumulates message 13's
 // byte deltas; the result is copied into *state.
 void KrustyBike::Fn_004933E0(const KbNetDelta* delta, KbNetState* state)

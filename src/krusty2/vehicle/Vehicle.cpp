@@ -420,14 +420,16 @@ void Vehicle::UnknownVirtualSlot56(Vec3* a, int b, Vec3* c)
         return;
     }
     Vec3 n;
-    Vec3 t;
-    if (!c)
+    if (!c) {
+        Vec3 t;
         n = *GetAverageGroundNormal(&t);
-    else
+    } else
         n = *c;
-    Vec3 proj = *Vec3ScaleCall(&t, a, Vec3DotCall(&n, a));
+    Vec3 s;
+    Vec3 proj = *Vec3ScaleCall(&s, a, Vec3DotCall(&n, a));
     Vec3* perp = &scratchVector2;
-    *perp = *Vec3SubtractCall(&t, &n, &proj);
+    Vec3 d;
+    *perp = *Vec3SubtractCall(&d, &n, &proj);
     if (!(perp->x == 0.0f && perp->y == 0.0f && perp->z == 0.0f) && perp) {
         *perp = Vec3Normalize(*perp);
         scratchVector = ((VehV3&)sideAxis).Cross(*a);

@@ -1098,15 +1098,22 @@ void Bike::UnknownVirtualSlot102(float)
     }
 }
 
-// Member-form cross product: VC6 keeps source multiplicand order here, where the free
-// function form canonicalises it (same observation as Vehicle.cpp's VehV3).
-static inline Vec3 BikeCrossMixed(const Vec3& a, const Vec3& n)
+// *v scaled to unit length in place (the zero vector when it has none).  Slot 72 needs it as
+// an inline helper: the cross product that follows loads *out's components as fresh leaves
+// (retail's operand order, docs/VC6_OPERAND_ORDER.md) only when the normalisation went
+// through the helper's own pointer.
+static inline void BikeNormalizeInPlace(Vec3* v)
 {
-    Vec3 c;
-    c.x = a.z * n.y - a.y * n.z;
-    c.y = a.x * n.z - n.x * a.z;
-    c.z = n.x * a.y - a.x * n.y;
-    return c;
+    float lenSq = v->y * v->y + v->x * v->x;
+    lenSq += v->z * v->z;
+    if (lenSq == 0.0f) {
+        *v = g_BikeVec3_005778a8;
+    } else {
+        float s = FastInvSqrt(lenSq);
+        v->x *= s;
+        v->y *= s;
+        v->z *= s;
+    }
 }
 
 void Bike::UnknownVirtualSlot72(Vec3* out, VehicleWheel*)
@@ -1125,16 +1132,7 @@ void Bike::UnknownVirtualSlot72(Vec3* out, VehicleWheel*)
             out->y += b->groundNormal.y;
             out->z += b->groundNormal.z;
             weight += rearWheel->contactLoad;
-            float lenSq = out->y * out->y + out->x * out->x;
-            lenSq += out->z * out->z;
-            if (lenSq == 0.0f) {
-                *out = g_BikeVec3_005778a8;
-            } else {
-                float s = FastInvSqrt(lenSq);
-                out->x *= s;
-                out->y *= s;
-                out->z *= s;
-            }
+            BikeNormalizeInPlace(out);
             weight *= 0.5f;
             const Vec3& n = frontWheel->w_0x230;
             Vec3 c = CrossProduct(n, *out);
@@ -1606,15 +1604,15 @@ struct BikeOolVec3 : public Vec3 {
     BikeOolVec3(float x_, float y_, float z_);
 };
 
-static inline BikeOolVec3 BikeOolSub(const Vec3& a, const Vec3& b)
+static inline Vec3 BikeOolSub(const Vec3& a, const Vec3& b)
 {
     return BikeOolVec3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
-static inline BikeOolVec3 BikeOolAdd(const Vec3& a, const Vec3& b)
+static inline Vec3 BikeOolAdd(const Vec3& a, const Vec3& b)
 {
     return BikeOolVec3(a.x + b.x, a.y + b.y, a.z + b.z);
 }
-static inline BikeOolVec3 BikeOolHalf(const Vec3& v)
+static inline Vec3 BikeOolHalf(const Vec3& v)
 {
     return BikeOolVec3(v.x * 0.5f, v.y * 0.5f, v.z * 0.5f);
 }
@@ -1643,20 +1641,15 @@ Vec3* Bike::UnknownVirtualSlot46(Vec3* out, float t)
             return out;
         } else {
             // the midpoint chain goes through the out-of-line Vec3 constructor
-            Vec3 d = BikeOolSub(rearWheel->wheelPosition, frontWheel->wheelPosition);
-            Vec3 half = BikeOolHalf(d);
-            Vec3 mid = BikeOolAdd(half, frontWheel->wheelPosition);
-            Vec3 rel = BikeOolSub(mid, position);
-            *out = modelNode->WorldToLocalDirection(scratchVector = rel);
+            *out = modelNode->WorldToLocalDirection(scratchVector = BikeOolSub(BikeOolAdd(BikeOolHalf(
+                BikeOolSub(rearWheel->wheelPosition, frontWheel->wheelPosition)), frontWheel->wheelPosition), position));
             return out;
         }
     } else {
-        Vec3 d = BikeOolSub(rearWheel->wheelPosition, frontWheel->wheelPosition);
-        Vec3 half = BikeOolHalf(d);
+        Vec3 half = BikeOolHalf(BikeOolSub(rearWheel->wheelPosition, frontWheel->wheelPosition));
         Vec3 mid, rel;
-        Vec3AddCall(&mid, &frontWheel->wheelPosition, &half);
-        Vec3SubtractCall(&rel, &mid, &position);
-        *out = modelNode->WorldToLocalDirection(scratchVector = rel);
+        scratchVector = *Vec3SubtractCall(&rel, Vec3AddCall(&mid, &frontWheel->wheelPosition, &half), &position);
+        *out = modelNode->WorldToLocalDirection(scratchVector);
         return out;
     }
 }

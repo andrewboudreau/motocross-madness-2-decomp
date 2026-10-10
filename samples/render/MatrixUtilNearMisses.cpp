@@ -14,6 +14,12 @@
 //   retail +4/+8 pointer bias and the register use; VC6 reorders the sums
 //   itself (retail sums z, y, x for w and y, z, x / y, x, z for the rows), so the
 //   written term order does not matter.
+//   Also tried without gain: for/while/guarded do-while and count-up loops, the
+//   increments in the for header or reordered, float*/char* cursors, the point
+//   copied into locals or a Vector3, a stride or matrix-reference local, an
+//   inline point-transform helper (pointer, reference or by-value point), the rows
+//   computed into x/y/z/w locals and the divide written as `/ w`. Every extra live
+//   local (stride, counter, reference) reorders many products at once.
 //
 // 0x004a1500 (ViewMatrix, 744 bytes): 646/744; retail length, frame, slots,
 //   calls and FP code. Only the scheduling of the integer moves that store

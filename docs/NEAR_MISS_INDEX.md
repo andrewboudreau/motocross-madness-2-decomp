@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 215, c 162, total 377. The three class (a) functions of the
+Counts: a 0, b 208, c 167, total 375. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -43,7 +43,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | camera/KrustyBikeCamera | `0x00497e20` | 337/376 | c | 10 code diffs: `mov ecx, [A]` vs `mov edx, [A]`; retail lacks `lea eax, [esp + N] ; mov edx, [ecx + 0x~` |
 | camera/VehicleCamera | `0x0052cc80` | 553/573 | c | 4 code diffs: `mov byte ptr [esi + 0x277], 0` vs `xor al, al ; mov byte ptr [esi + 0x277]~` |
 | camera/VehicleCamera | `0x0052c030` | 1221/1240 | c | one normalisation multiplies x as `fld st(0); fmul x` (retail `fld x; fmul st(1)`); one `y = 0` store scheduled after the z*z product |
-| camera/VehicleCamera | `0x0052c510` | 813/1261 | b | frame 0x3c vs 0x48; direction and velocity slots swapped; the length stays on the x87 stack (retail spills it); x scaling not duplicated into the range branches |
+| camera/VehicleCamera | `0x0052c510` | 813/1261 | c | slot 35: frame and slots match; x87 order of the squared length (retail x*x first) and the range branches' x scaling (retail `fld x; fmul st(1)` / `fld st(0); fmul x`) |
 | control/ControlInterface | `0x004bf4f0` | 43/124 | c | 5 code diffs: `test ecx, ecx ; je @38 ; mov edx, [esp ~` vs `jmp @5` |
 | control/ControlInterface | `0x004bf6a0` | 438/726 (masked) | c | 58 code diffs: `jne @158` vs `jne @165 ; lea eax, [esp + N]`; `jmp @169 ; lea ecx, [esp + N]` vs `push eax ; jmp @178` |
 | ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]` |
@@ -88,17 +88,17 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/collision/CollisionObject | `0x00436100` | 31/804 | c | 35 code diffs: `sub esp, 0x4c` vs `sub esp, 0xac`; `mov eax, [ecx + 0x54]` vs `mov ecx, [ecx + 0x54] ; lea edi, [esp +~` |
 | krusty2/collision/CollisionObject | `0x00436720` | 66/790 (masked) | c | 52 code diffs: `sub esp, 0x18` vs `sub esp, 0xc`; `add esp, 0x18` vs `add esp, 0xc` |
 | krusty2/collision/CollisionObject | `0x00436af0` | 33/812 (masked) | c | 16 code diffs: retail lacks `mov eax, [esp + N]`; `lea esi, [eax + 0x48] ; jle @48` vs `mov edi, [esp + N] ; jle @47` |
-| krusty2/collision/CollisionObject | `0x00436e50` | 103/1087 (masked) | b | 56 code diffs: retail adds `mov ebx, [esp + N]`; retail lacks `mov ebp, [esp + N]`; frame 0x88 vs 0x120, slot order differs |
-| krusty2/collision/CollisionObject | `0x004376f0` | 167/619 (masked) | b | 14 code diffs: retail adds `mov [esp + N], 0`; retail lacks `xor edi, edi ; mov [esp + N], edi`; slots differ |
-| krusty2/collision/CollisionObject | `0x00437c20` | 177/623 (masked) | b | 20 code diffs: `add esp, 0x54` vs `add esp, 0x60`; retail adds `mov [esp + N], 0`; frame 0x54 vs 0x60 |
-| krusty2/collision/CollisionObject | `0x00437ef0` | 66/704 (masked) | b | 26 code diffs: retail adds `mov [esp + N], 0`; retail adds `lea ecx, [ebx + 0x18]`; frame 0x54 vs 0x7c |
-| krusty2/collision/CollisionObject | `0x00438280` | 171/619 (masked) | b | 24 code diffs: `add esp, 0x54` vs `add esp, 0x60`; retail adds `mov [esp + N], 0`; frame 0x54 vs 0x60 |
-| krusty2/collision/CollisionObject | `0x00438550` | 55/677 (masked) | b | 28 code diffs: retail adds `mov [esp + N], 0`; `fmul st(3)` vs `fmul [esp + N]`; frame 0x54 vs 0x7c |
+| krusty2/collision/CollisionObject | `0x00436e50` | 335/2099 | b | HullVsModel: frame 0x108 vs 0x120; retail inlines the first offset rotation and calls 0x42a4b0/0x42a450/0x42a510 for the rest (inline budget), a in ebx, b in ebp |
+| krusty2/collision/CollisionObject | `0x004376f0` | 677/707 | c | HullVsModelSwept: frame matches; one push schedule, loop loads, the mean's x term |
+| krusty2/collision/CollisionObject | `0x00437c20` | 698/716 | c | ModelVsHull: frame and slots match (inverse written into the product's local); two push schedules before 0x424730/0x436720, the mean's x term (retail `fld st(0); fmul sum.x`, then `fld sum.y; fmul st(1)`), copy registers |
+| krusty2/collision/CollisionObject | `0x00437ef0` | 843/906 | c | ModelVsHullSwept: frame 0x7c matches; scheduling of the two box copies before 0x4290d0, one push, the mean's x term |
+| krusty2/collision/CollisionObject | `0x00438280` | 694/710 | c | ModelVsModel: as ModelVsHull (one push schedule, the mean's x term, copy registers) |
+| krusty2/collision/CollisionObject | `0x00438550` | 712/783 | c | ModelVsModelSwept keeps the last contact (no averaging); scheduling of the box copies, register choice in the loop |
 | krusty2/collision/CollisionObject | `0x00438c90` | 61/475 | c | 31 code diffs: `mov ebx, [ecx + 0x54]` vs `xor ebx, ebx`; `xor ebp, ebp` vs `mov ebp, [ecx + 0x54] ; sub edx, ebx` |
 | krusty2/collision/CollisionObject | `0x004392c0` | 303/311 | c | 6 code diffs: `mov eax, [esp + N] ; mov ecx, [eax + 0x~` vs `mov ecx, [esp + N] ; mov eax, [ecx + 0x~`; `dec ecx` vs `dec eax` |
 | krusty2/collision/CollisionObject | `0x00434eb0` | 382/1820 | b | UpdateModelBounds: same call/inline pattern; frame 0x12c vs 0x134, loop counter ebp vs esi, the rotated x component retail keeps on the x87 stack |
 | krusty2/collision/CollisionObject | `0x00435830` | 157/1776 | b | SetTransform: the hull case's inline 4x4 product emits its terms as 1,3,2,4 (retail 3,2,1,4 with the local matrix loaded first); frame 0x30 both |
-| krusty2/collision/CollisionObject | `0x00439820` | 122/1596 | b | SegmentTouchesObject: operator temporaries (frame 0xc0 vs 0xa8), register choices |
+| krusty2/collision/CollisionObject | `0x00439820` | 149/1476 | b | SegmentTouchesObject: pre-test calls match; retail gives each operator result its own slot (frame 0xa8 vs 0x9c), segment pointer in ebx |
 | krusty2/soultree/SoulTreePhysics | `0x00500220` | 270/619 (masked) | b | 24 code diffs: `je @201 ; fld [edi + 8]` vs `je @197`; `fmul [esi + 4]` vs `fld [esi + 4] ; fmul [edi + 8]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x005013d0` | 400/457 (masked) | b | 8 code diffs: `fld [ecx + 8] ; fmul [eax + 4]` vs `fld [eax + 4] ; fmul [ecx + 8]`; `fld [ecx + 8] ; fmul [eax]` vs `fld [eax] ; fmul [ecx + 8]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00501600` | 651/925 | b | 18 code diffs: `jmp @239 ; fld [esp + N]` vs `jmp @242`; slots differ |
@@ -106,7 +106,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/soultree/SoulTreePhysics | `0x00502330` | 231/239 | b | 2 code diffs: retail adds `fld [esp + N] ; fmul st(1)`; retail lacks `fld st(0) ; fmul [esp + N]`; slots differ |
 | krusty2/soultree/SoulTreePhysics | `0x00502f60` | 1366/1942 | c | 6 code diffs: retail adds `mov [esi + 0xbc], ebx`; retail lacks `mov [esi + 0xbc], ebx` |
 | krusty2/vehicle/Bike | `0x00405190` | 139/2381 (masked) | b | 99 code diffs: retail adds `mov edx, [esp + N]`; retail adds `push edi ; xor ebx, ebx ; xor edi, edi`; frame 0x94 vs 0xac, slot order differs |
-| krusty2/vehicle/Bike | `0x00405db0` | 657/664 (masked) | b | 2 code diffs: `fld [esi + 8] ; fmul [eax]` vs `fld [eax] ; fmul [esi + 8]`; `fld [esi + 4] ; fmul [eax]` vs `fld [eax] ; fmul [esi + 4]`; slots differ |
 | krusty2/vehicle/Bike | `0x004060c0` | 121/1436 (masked) | b | 63 code diffs: `mov edx, [esi + 0x4a8] ; mov eax, [esi ~` vs `mov eax, [esi + 0x4a8] ; mov ecx, [esi ~`; retail lacks `xor ecx, ecx`; frame 0x204 vs 0x214 |
 | krusty2/vehicle/Bike | `0x00406ae0` | 78/1576 (masked) | b | 118 code diffs: `push ecx` vs `push ebp ; mov ebp, esp ; sub esp, 8`; `jne @16 ; mov [esp + N], 0 ; jmp @20` vs `jne @18 ; mov [ebp - N], 0 ; jmp @22`; frame 0x0 vs 0x8 |
 | krusty2/vehicle/Bike | `0x004079c0` | 2078/6718 | b | spill homes of the loop values, the matched wheel kind kept in esi by retail, store scheduling of the local string tables and Vec3 constants (see PHYSICS_VALIDATION.md) |
@@ -114,7 +113,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/vehicle/Bike | `0x00409b30` | 826/1260 (masked) | c | 18 code diffs: `jmp @217` vs `jmp @222 ; mov ecx, [esp + N]`; `mov edx, [esi]` vs `mov [esp + N], ecx ; jmp @222 ; mov edx~` |
 | krusty2/vehicle/Bike | `0x0040a520` | 439/2272 | b | 96 code diffs: retail lacks `test al, al`; retail adds `test al, al`; slots differ |
 | krusty2/vehicle/Bike | `0x0040aec0` | 527/1186 (masked) | b | 35 code diffs; slots differ |
-| krusty2/vehicle/Bike | `0x0040b600` | 58/949 (masked) | b | 36 code diffs: retail adds `push edi`; frame 0x3c vs 0x48 |
+| krusty2/vehicle/Bike | `0x0040b600` | 1048/1066 | b | slot 46: three out-of-line-constructor temporaries in other slots; rear/front register pair on the one-wheel path |
 | krusty2/vehicle/Bike | `0x0040ba30` | 55/973 (masked) | b | 64 code diffs: retail lacks `push edi`; frame 0x1c vs 0x18 |
 | krusty2/vehicle/Bike | `0x0040c000` | 135/802 (masked) | b | 60 code diffs: retail adds `push ebp ; mov ebp, esp`; retail lacks `fld [A]`; slot order differs |
 | krusty2/vehicle/Vehicle | `0x005257a0` | 579/637 (masked) | b | 5 code diffs: retail lacks `mov [esi + 0x4fc], ebx ; mov [esi + 0x5~`; retail adds `mov [edx + 8], ecx`; slots differ |
@@ -125,7 +124,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/vehicle/Vehicle | `0x00527a20` | 349/870 | b | 25 code diffs: `jne @99` vs `jne @98 ; mov [esp + N], 0 ; mov edx, [~`; `lea edx, [esi + 0x120]` vs `mov [esi + 0x12c], 0`; slots differ |
 | krusty2/vehicle/Vehicle | `0x00527e30` | 31/831 | b | 42 code diffs: `push ebp` vs `push ebx ; mov ebx, ecx ; xor ecx, ecx`; retail adds `mov eax, [ebx + 0x444]`; frame 0x28 vs 0x2c |
 | krusty2/vehicle/Vehicle | `0x005281b0` | 40/479 (masked) | b | 37 code diffs: retail adds `mov esi, [esp + N]`; `mov edi, [esp + N] ; mov esi, ecx` vs `mov edi, ecx`; slots differ |
-| krusty2/vehicle/Vehicle | `0x005286a0` | 236/722 (masked) | b | 53 code diffs: retail lacks `push ebp`; retail adds `push edi`; frame 0x30 vs 0x3c |
+| krusty2/vehicle/Vehicle | `0x005286a0` | 263/782 | b | slot 56: frame 0x3c matches; retail shares the ground-normal output with the projection and n with the side vector; register roles |
 | krusty2/vehicle/Vehicle | `0x005293e0` | 88/100 (masked) | c | 2 code diffs: `mov ecx, [esi + 0x1e8] ; mov edx, [esi ~` vs `mov edx, [esi + 0x1e8]`; `push ecx` vs `push edx ; mov edx, [esi + 0x4dc]` |
 | krusty2/vehicle/Vehicle | `0x0052a6a0` | 19/331 (masked) | b | 22 code diffs: `push ecx ; push ebx` vs `sub esp, 8`; retail lacks `fld [edi + 0xe0]`; frame 0x0 vs 0x8 |
 | krusty2/vehicle/Vehicle | `0x0052a940` | 304/3018 (masked) | b | 120 code diffs: `test eax, eax ; mov [esp + N], eax ; jn~` vs `mov ebp, eax ; xor ebx, ebx ; cmp ebp, ~`; `push 0` vs `push ebx`; frame 0xdc vs 0x104, slot order differs |
@@ -181,8 +180,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/effects/SteamParticleEmitter | `0x004b9f40` | 21/164 (masked) | c | 6 code diffs: `lea edi, [esi + 0x74]` vs `lea ecx, [esi + 0x54] ; mov edx, ebx ; ~`; `mov [esi + 0x54], ebx ; mov [esi + 0x58~` vs `mov [ecx + 8], edx` |
 | physics/helpers/GraphicsTest | `0x0047bd10` | 423/917 | b | 16 code diffs: retail adds `fsubp st(1)`; retail lacks `fsubp st(1)`; slots differ |
 | physics/helpers/GraphicsTest | `0x0047c270` | 622/626 | b | 1 code diffs: `fld [eax] ; fadd [esi + 8]` vs `fld [esi + 8] ; fadd [eax]`; slots differ |
-| physics/helpers/OrientationAngles | `0x004b5a60` | 564/581 (masked) | c | 2 code diffs: retail adds `fld st(0) ; fmul st(1)`; retail lacks `fld st(1) ; fmul st(2)` |
-| physics/helpers/SoultreeBounds | `0x004fd340` | 588/630 | c | rows 1 and 4 of the inline scale product emit their off-diagonal x87 products in another order (samples/physics/helpers/SoultreeBounds.cpp) |
+| physics/helpers/SoultreeBounds | `0x004fd340` | 596/630 | c | with both product operands by value, row 1's k = 3 product and the term order of _44 differ (samples/physics/helpers/SoultreeBounds.cpp) |
 | physics/helpers/SoultreeBounds | `0x004fe2e0` | 80/1297 | b | first draft: frame 0x3c vs retail 0x48 (by-value direction temporaries, centre in ebx/ebp/edx) |
 | physics/helpers/SoultreeBounds | `0x004fe8a0` | 541/610 | b | frame slot order (retail c, e, w, a) and the hi = w + ext tail |
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 249/1072 (masked) | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
@@ -193,7 +191,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/helpers/SoultreeTransform | `0x004fd660` | 160/164 (masked) | c | 2 code diffs: retail adds `mov ecx, eax`; retail lacks `mov ecx, eax` |
 | physics/helpers/SoultreeTransform | `0x004fd710` | 203/205 (masked) | c | FPU operand order: one `fld/fmul` pair loads the other operand first (2 bytes) |
 | physics/helpers/SoultreeTransform | `0x004fd7f0` | 259/281 (masked) | b | 6 code diffs: retail adds `mov eax, [esp + N]`; retail lacks `mov eax, [esp + N]`; slots differ |
-| physics/krustybike/KrustyBike | `0x0048e280` | 280/287 (masked) | c | 1 code diff: retail pops the dead `atan2` duplicate (`fxch st(1) ; fstp st(0)`) before `fsub [esi + 0x50]`, the candidate after it |
+| physics/krustybike/KrustyBike | `0x0048eea0` | 608/2952 | c | slot 102, frame 0x50 exact; VC6 cross-jumps the head-turn arms differently (retail keeps the + side hold block and the - side retarget tail), `jne call ; jmp skip` vs retail `je skip ; jmp call` in the trick-chain switch, the `+0x153c = 0` else block before the shared advance, and the crash clamp keeps t on the x87 stack where retail spills it to the dt slot |
 | physics/krustybike/KrustyBike | `0x0048fa60` | 380/440 (masked) | c | 4 code diffs: retail hoists `mov [esi + 0x11b8], bl ; mov [esi + 0x604], ebx` into the load delay of the +0x1540 kVec3Zero copy where the candidate hoists `+0x7c0/+0x7bc` (pick index = units after the copy - 32) |
 | physics/krustybike/KrustyBike | `0x004919a0` | 147/221 (masked) | c | 8 code diffs: retail adds `mov edx, [edx + 0x60c] ; fsub [ecx + 0x~`; retail lacks `fsub [ecx + 0xb8]` |
 | physics/krustybike/KrustyBike | `0x00491d10` | 211/1176 (masked) | b | 53 code diffs: retail lacks `sub esp, N`; retail adds `sub esp, 0x20`; frame 0x24 vs 0x0 |
@@ -231,7 +229,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/suspension/Shock | `0x004fa400` | 458/674 (masked) | b | 20 code diffs: `je @160 ; mov eax, [A]` vs `je @162`; `jmp @180` vs `mov eax, [A] ; mov [esp + N], ecx ; mov~`; slots differ |
 | physics/suspension/Shock | `0x004fac60` | 764/812 (masked) | b | 17 code diffs: retail adds `fsubp st(1)`; retail lacks `fsubp st(1)`; slots differ |
 | physics/tire/Tire | `0x00513490` | 175/177 (masked) | c | 2 code diffs: `mov [ebp + N], ebx` vs `mov [ebp + N], edi`; `mov [ebp + N], edi` vs `mov [ebp + N], ebx` |
-| physics/tire/Tire | `0x005135f0` | 248/1444 (masked) | b | 53 code diffs: retail adds `mov edx, [esp + N]`; retail lacks `fmul [esi + 0xe8] ; fld [esp + N] ; fmu~`; frame 0xc vs 0x18 |
+| physics/tire/Tire | `0x005135f0` | 559/1666 | b | UpdateContactPatch: frame 0x18 matches; retail homes the projected axis in the dead `axis` argument slot, normal through ecx, tail-path copies |
 | physics/tire/Tire | `0x00513c70` | 96/805 | b | 24 code diffs: retail adds `push ebx`; retail adds `xor ebx, ebx`; slots differ |
 | physics/tire/Tire | `0x00513f90` | 470/479 | b | stack slots: retail keeps `boost` in the dead argument slot and the squared length/`minimum` in the local |
 | physics/tire/Tire | `0x00514170` | 276/589 | b | `fld st(0); fcomp` where retail uses `fcom`; x87 operand order of the `dir` scaling |

@@ -169,8 +169,9 @@
     "candidate_symbol_contains": "OrientationAnglesFromVectors",
     "target_va": "0x4b5a60",
     "target_size": 657,
-    "expect": "partial",
-    "notes": "partial 97.1%: provisional semantics; sqrt(a.x*a.x+a.z*a.z) order fixed. Remaining: fmul operand order in the b rotation sums (source term order has no effect) and one extra live FPU stack value before the pitch sqrt. Retail loads c and s before b.x/b.z in the b rotation (b's components older); scalar float parameters instead of the two Vec3s, POD/const parameter types and inline rotation helpers (by value or reference, any parameter order) do not change it."
+    "expect": "exact",
+    "notes": "Strict exact. The six components are copied into locals at the top: their leaves are then older than the heading terms c/s and the rotated z, which gives retail's operand order in the b rotation and the pitch sqrt (copies of by-value Vec3 parameters, not inline helpers, decide it).",
+    "bindings": "OrientationAngles.bindings.json"
   },
   {
     "class": "Math",
@@ -319,7 +320,7 @@
     "target_va": "0x004fd340",
     "target_size": 630,
     "expect": "partial",
-    "notes": "588/630: rows 1 and 4 emit their off-diagonal products in another order (x87 leaf order); prologue, frame and rows 2-3 match. See SoultreeBounds.cpp.",
+    "notes": "596/630: with both product operands by value (as MatrixMultiply takes them) row 1 loads s12/s14 the retail way; its k = 3 product and the term order of _44 still differ (x87 leaf order); prologue, frame and rows 2-3 match. See SoultreeBounds.cpp.",
     "bindings": "SoultreeBounds.bindings.json"
   },
   {

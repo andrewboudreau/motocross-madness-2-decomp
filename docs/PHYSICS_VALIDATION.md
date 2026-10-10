@@ -279,9 +279,9 @@ x87 operand order facts measured on these targets (they add to the list below):
   directly, which memberwise helpers reproduce for member copies but not for the
   `(0,0,0)` temporary (VC6 folds it).  That function stays `partial` (349/866, first
   0x120 bytes exact).  Vehicle slot 55 `0x0052b6d0` reloads `out` between its two
-  copies (VC6 keeps it in a register: 28/59).  Bike slot 72 `0x00405db0` loads `n.x`
-  (the displacement-free `[eax]`) first in two cross-product terms; no cross-product
-  form tried (member, pointer, by-value, explicit terms, named `nx`) does (717/724).
+  copies (VC6 keeps it in a register: 28/59).  Bike slot 72 `0x00405db0` is exact once
+  the in-place normalisation of `*out` goes through an inline helper, which resets the
+  operand tracking for the following cross product.
 
 Large functions of the two units (all registered in `src/krusty2/vehicle/targets.json`):
 
@@ -442,12 +442,11 @@ the inlined cross products in PoseRotation 0x4a7fd0, WorldToLocalDirection
   is a whole-function brute force over statement order, temporaries and
   destination form.
 - The `fld st0; fxch st(2); fxch st(1); fxch st(2); fpatan; fxch st(1); fstp st(0)`
-  sequence of 0x48e280 (a dead duplicate of the x argument) appears when the
-  subtraction after `atan2` is done in double: `(float)(atan2(d.x, d.z) - savedYaw)`
-  (a float cast of `atan2` alone gives a plain `fpatan`). VC6 then pops the
-  duplicate after the `fsub` of the yaw, where retail pops it before; a double
-  local, a separate `-=` statement, `(double)` casts and `/Op`, `/Oi-`, `/G5`,
-  `/Ow`, `/Oa` do not move it.
+  sequence of 0x48e280 (a dead duplicate of the x argument) comes from
+  `(float)(atan2(d.x, d.z)) - savedYaw` with the call parenthesised inside the
+  cast: VC6 then pops the duplicate before the yaw `fsub`, as retail does, and
+  0x48e280 is exact. `(float)(atan2(...) - yaw)` pops it after the `fsub`;
+  `(float)atan2(...)` gives a plain `fpatan`.
 
 **Inline budget.** Motnctrl expands some helpers inline at some sites and calls their
 out-of-line copies at others. Synthetic tests show (measured in detail in
@@ -590,9 +589,9 @@ Tire sample's exact targets:
   over the int temporary (frame 0x30, retail 0x34) and keeps the full
   message 1 call after the record-interval test in place instead of
   cross-jumping it to the last call site. Not reconstructed: `0x0048e3e0`
-  (inline-asm `fistp` rounding), `0x0048eea0` (2239 bytes, the head-turn
-  update: it contains the same `atan2` pop-order blocker as `0x0048e280` twice,
-  at `0x0048f2fc` and `0x0048f4c5`). The loader `0x0048fc80` (5.4 KB, 31 argument
+  (inline-asm `fistp` rounding). Slot 102 `0x0048eea0` (2920 bytes, the head-turn
+  update) is a partial: calls, frame and constants match; branch cross-jumping,
+  the trick-chain switch tails and one spilled clamp differ. The loader `0x0048fc80` (5.4 KB, 31 argument
   dwords) is exact and the network update `0x00493660` (8.5 KB) is a partial.
 - TerrainShadow.cpp (`samples/physics/shadow`): slot 14 `0x0050a1a0` is exact
   (D3DIMSoultreeShadow slot 14's draw of the +0x34 vertices without the world
@@ -617,5 +616,5 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The KrustyBike sources give 70 of 81 strict exact (the 11 partials are the near
+The KrustyBike sources give 71 of 82 strict exact (the 11 partials are the near
 misses listed above and in docs/NEAR_MISS_INDEX.md).

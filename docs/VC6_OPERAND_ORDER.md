@@ -331,3 +331,34 @@ python3 tools/decl_shift_scan.py samples/render/MatrixUtilNearMisses.cpp \
 - Testing `sum + term > limit` before `sum += term` loads the term into its own
   register; `sum += term; if (sum > limit)` adds straight from memory.
   UIListBox::UpdateScrollBars `0x477bc0`.
+- `atan2` of two components of an inlined `Vec3` temporary (`Vec3 d = a - b;`) keeps a dead
+  duplicate of the x argument around `fpatan` (`fld st(0); fxch st(2); fxch st(1); fxch st(2);
+  fpatan`) only when the call sits in a parenthesised cast or a double expression, and the
+  form decides where the duplicate is popped: `(float)(atan2(d.x, d.z)) - yaw` pops it right
+  after `fpatan`, before the yaw `fsub` (retail KrustyBike `0x0048e280` and the two head-turn
+  sites of slot 102 `0x0048eea0`); `(float)(atan2(d.x, d.z) - yaw)` pops it after the `fsub`;
+  `(float)atan2(d.x, d.z) - yaw`, `atan2(...) - yaw` and separate float locals for the two
+  components give a plain `fpatan`. `(float)(x)` and `(float)x` differ only here: for `sqrt`,
+  plain doubles and products the parentheses change nothing.
+- Leaves belong to the variable an expression goes through, so an inline helper's parameter
+  hides the caller's earlier references. Bike slot 72 `0x00405db0` normalises `*out` in place
+  and then forms `CrossProduct(n, *out)`: written in the body, the normalisation gives `*out`'s
+  components old leaves and VC6 loads `out` first in the 2nd/3rd terms; through
+  `inline void BikeNormalizeInPlace(Vec3* v)` the cross product creates fresh leaves for
+  `out` and `n` in its own order (`n.y < out.z < n.z < out.y < out.x < n.x`), which is retail's.
+- The reverse also holds: copying by-value `Vec3` parameters into float locals at the top of
+  the function (`float ax = a.x, ...; float bx = b.x, ...;`) makes those leaves older than
+  everything computed later, so later locals load first (`fld c; fmul bz`, `fld fz; fmul fz`
+  before `ay*ay`). OrientationAngles `0x004b5a60` needs this; scalar parameters, POD/const
+  parameter types and inline rotation helpers do not give it.
+- Not explained by the leaf-age rule: the term order of inlined 4x4 products (Wrecker slot 10
+  `0x005306e0` relative._23, D3DIMSoultreeShadow slots 27/29, SoultreeObject::Scale
+  `0x004fd340`). Within one product the order of the four terms changes from element to
+  element although the elements share their leaves (Scale row 1 is k = 2, 3, 4, 1 with the
+  zero elements of `s` loaded first for k = 2 only; rows 2 and 3 are k = 4, 3, 1, 2), so the
+  chain is not sorted by any single per-leaf age. A by-value helper copies operands that a
+  const-reference helper reads in place (shadow 680/767 with `a` by value); unrelated earlier
+  leaves (probe `p2`) and the number of unused locals do not move a chain, but in a loop
+  (MatrixUtil `0x004a1a50`) every extra live local (a stride copy, a counter, a matrix
+  reference) reorders it, which points at the loop optimiser's renumbering of induction
+  addresses rather than at the source text.

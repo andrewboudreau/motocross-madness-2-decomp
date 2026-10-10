@@ -105,6 +105,7 @@ public:
     int AdvanceMotion(float dt, int mirror, int mask);      // 0x004a6bb0, ret 0xc: per-frame playback, returns the frame number
     void Method_0x004a8bf0(int a, float b);                 // ret 8
     void Method_0x004a8c50(int a, int b, float c, float d); // ret 0x10
+    void Method_0x004a9050(int a, int b, int c, int d, float e, float f, float g); // ret 0x1c: four-pose blend (KrustyBike slot 102)
 
     // vfptr +0, vbptr +4 (compiler generated); Character's own data up to 0x1a0.
     // Offsets are tier 1 (ctor 0x004a6780 stores, slot 8 0x004a98b0 copies, Motnctrl.cpp users);

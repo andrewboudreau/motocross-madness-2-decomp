@@ -86,7 +86,7 @@
     "target_va": "0x004b8f40",
     "target_size": 970,
     "expect": "partial",
-    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: writes particles straight into the manager table (inlined AddParticle-like code). Only the first component of each r-scaled vector differs (retail fld mem; fmul st(1), VC6 emits fld st(0); fmul mem) Also unchanged: velStep * (n - i) / gravStep * (n - i) (member operator), d built as position - previousPosition, and by-value or v * s forms of the free operator*(float, ParticleVec3) in ParticleManager.h.",
+    "notes": "98.3% (970 vs 970 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). update: writes particles straight into the manager table (inlined AddParticle-like code). Only the first component of each r-scaled vector differs (retail fld mem; fmul st(1), VC6 emits fld st(0); fmul mem) Also unchanged: velStep * (n - i) / gravStep * (n - i) (member operator), d built as position - previousPosition, and by-value or v * s forms of the free operator*(float, ParticleVec3) in ParticleManager.h. Also unchanged or worse: a named `n - (float)i` local, velStep/gravStep defined before step, velStep written inline in the loop (not hoisted).",
     "bindings": "DirtChunkParticleEmitter.bindings.json"
   },
   {
