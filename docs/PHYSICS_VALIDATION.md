@@ -158,12 +158,15 @@ Extent: `0x40d070..0x416e1f` (strong inference). Bike.cpp ends at
 `0x415640`. A second Math3D set at `0x417350` means BikeCamera code
 (`0x416e20..0x417aff`) is a separate, unattested unit.
 
-The near miss, steering direction `0x40e510`, is in
-`samples/physics/bikeai`; it differs by an esi/edi swap and frame order.
+Two near misses are in `samples/physics/bikeai`. The steering direction
+`0x40e510` differs by an esi/edi swap and frame order. The jump prediction
+`0x40d200` (4464 bytes, 4430/4464) differs only in the scheduling of two
+stores.
 The two KrustyBike methods `0x413200` and `0x414370` wait on KrustyBike.h's
-promotion. The five other large functions are not attempted. The Vec3
+promotion. The other large functions are not attempted. The Vec3
 `operator-=` COMDAT copy `0x413160` stays unregistered: VC6 emits it only
-for its first caller, the unreconstructed `0x412700` (2641 bytes).
+for its first caller (`0x412eff`), inside the unreconstructed BikeAI function
+that starts at `0x40eca0`; `0x412700` is a mid-function address, not a function start.
 
 ```bash
 python tools/run_physics_samples.py --strict \

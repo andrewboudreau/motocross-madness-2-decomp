@@ -2,6 +2,16 @@
   {
     "class": "BikeAI",
     "source": "BikeAINearMisses.cpp",
+    "candidate_symbol_contains": "UnknownFunction40d200",
+    "target_va": "0x0040d200",
+    "target_size": 4464,
+    "expect": "partial",
+    "notes": "AI jump prediction along the path; control flow, calls, constants, FPU operand order and frame match (4430/4464). Two stores (initial seg.y = 0, ground-branch p.y = ground.y) are scheduled one instruction pair earlier than retail; see the file header.",
+    "bindings": "BikeAINearMisses.bindings.json"
+  },
+  {
+    "class": "BikeAI",
+    "source": "BikeAINearMisses.cpp",
     "candidate_symbol_contains": "UnknownFunction40e510",
     "target_va": "0x0040e510",
     "target_size": 1936,
