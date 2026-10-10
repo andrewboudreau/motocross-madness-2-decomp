@@ -4,23 +4,25 @@
 //
 // 0x0046e8c0 dialog slot 28 (55/64): retail stores the value before loading
 //   the vtable (and so keeps the vtable in eax); every store order gives the
-//   hoisted load.
+//   hoisted load, and so do an inline send helper, an inline initialiser, an
+//   event pointer local and a `this` copy.
 // 0x0046ea80 (160/164): the two arguments are loaded into the opposite
 //   registers (id in esi in retail); a local copy of either, `id == groupId`,
 //   for, guarded do-while and `continue` loop forms do not change it.
 // 0x004705d0 UIControl slot 49 (91/101) and 0x004733a0 UIButton slot 49
 //   (85/99): the value loaded for each call lands in another register
 //   (retail: ecx/edx, VC6 here: edx/eax); an int SetFontColor, a local for the
-//   state, `if (enabled)` and the inverted branch order give the same bytes.
-// 0x00470f10 UIControl slot 39 (226/332): a register permutation.
+//   state, `if (enabled)` and the inverted branch order give the same bytes;
+//   so do an `enabled != enable` block, one colour local for both calls,
+//   inline wrappers for both calls, inline accessors for every operand (32
+//   combinations) and an int-returning slot 29/SetFontColor. An extra member
+//   copy in the first branch moves the second branch's registers, so the
+//   choice is function-wide.
 // 0x00472e30 UIAnim constructor (34/82): retail stores the palette (+0xf4)
 //   after the zeroed members, right before the frame-list memset; VC6 here
 //   hoists it next to the texture store whatever the statement, initializer
 //   list or loop form (retail loads both arguments into ecx/edx with zero in
 //   eax; VC6 here loads them into eax/ecx and zeroes eax after).
-// 0x00472fe0 UIAnim advance (77/194): retail copies the frame index into ecx
-//   before indexing the frame list (`mov ecx, eax`); a local index, a
-//   reloaded member and GetCurrentFrame() all index with eax.
 // 0x00477110 adds an image row from a file (356/646): with `a` a UIAnim
 //   loaded from `file`, otherwise a row naming the TGA file with its header's
 //   size. Calls, constants and the row stores follow retail. Retail places
@@ -39,20 +41,31 @@
 //   exit tests as breaks; `while (cond)` and `for (;;)` rotate it). Retail
 //   puts the first control temporary in eax and the next global load in edx;
 //   VC6 here swaps the two (no declaration-shift k changes it; early returns,
-//   a local list pointer and local order do not either).
-// 0x00477bc0 (89/286): retail keeps zero in the height accumulator's
-//   register (ecx) and loads each row height into ebp before adding it; a
-//   row-height local, `height` declared before the owner test, a `visible`
-//   local and while forms do not reproduce it.
-// 0x00477e90 UIListBox slot 55 (155/344): retail keeps the point in ebx and
-//   the row offset in ebp; VC6 here swaps them.
+//   a local list pointer and local order do not either). An early
+//   `return 0` for a missing list with `if (result) return result;` gives
+//   retail's later edx/eax pair but duplicates the epilogues (4/234); the
+//   same returns inside the list test, a result declared without an
+//   initialiser and an assignment in the condition move the layout too.
+// 0x00477e90 UIListBox slot 55 (322/342): an `int height` local for the
+//   first GetRowHeight call gives retail's ebx (point) and ebp (row offset);
+//   without it (155/344) the two are swapped. With the local, retail still
+//   loads rect.top into ecx and the point's y before x and adds the height
+//   into eax; VC6 here adds into the rect.top register and loads x first.
+//   `height += rect.top`, `height + rect.top`, a `top` local, a POINT copy
+//   before or after, the local at function scope or reused for the second
+//   call, a nested flags test, `(POINT*)b` casts, an owner local, `point !=
+//   0`, `found != 0`, guarded do-while rows and `rect.bottom = h; bottom +=
+//   top` were tried.
 // 0x0047b490 colour-key test (116/210): retail keeps the key pixel in esi,
 //   the width in edx and spills the row counter into the key's argument
 //   slot; VC6 here spills the pixel instead. Hoisting the width or
 //   reordering the red/green/blue terms moves the register pressure
 //   elsewhere; retail ORs red|green then blue, and no term order,
 //   parenthesisation or `pixel |=` split changes VC6 here's blue-first
-//   chain.
+//   chain. Retail places `return 0` before `return found` after Unlock;
+//   `if (!Unlock) return 0; return found;` becomes neg/sbb/and, early
+//   returns for a failed Lock duplicate the epilogue, and goto, result
+//   variable, while/for row loops and a row pointer do not give it.
 // 0x00472960 UIFrame constructor from a file (352/562): retail places the
 //   sprintf (image missing) block after the epilogue, jumping back to the
 //   `if (image)` free test; VC6 here lays it inline and threads its jump past
@@ -70,7 +83,9 @@
 //   Ternary, separate-result and goto forms keep the result in memory; an
 //   early return on Lock failure, an empty `if (Unlock)` and an inline
 //   unlock-and-return helper compile the same, and an Unlock and return in
-//   each format branch (cross-jumped) puts the result in ebp (76/323).
+//   each format branch (cross-jumped) puts the result in ebp (76/323). A
+//   `result = opaque` copy before Unlock (returned once or from both arms of
+//   the Unlock test, or as `Unlock ? opaque : opaque`) is propagated away.
 // 0x004738a0 UIEditBox slot 40 (206/975): retail keeps the width and the
 //   redraw count in memory.
 // 0x00474150 UIEditBox slot 20 (1018/1044): Backspace reads the length and
@@ -82,7 +97,11 @@
 //   and the locals before the call (worse) were tried.
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
-// 0x0047a400 drop-down layout (320/960): store scheduling of the part rects.
+// 0x0047a400 drop-down layout (320/960): store scheduling of the part rects
+//   (retail stores area left, top, right, bottom in order and adds the
+//   scroll bottom into the top register); `scroll.bottom + top`, `+=` on the
+//   area members, `area->left + scroll.right` and the scroll rect's sides set
+//   before its top/bottom (worse) were tried.
 // 0x0046a920 UIDialog's resource parser (16 KB; 92% of instructions equal
 //   with stack offsets and relocations ignored, 74% raw): the control flow,
 //   calls and constants follow retail. Retail keeps the current control in
@@ -112,9 +131,6 @@
 #include "../../src/reconstructed/Palette8.h"
 #include "../../src/reconstructed/Parameterblocks.h"
 #include "../../src/reconstructed/Tgafile.h"
-
-// 0x0065b5c8: the time stamp of the last image step (UIAnim 0x00472fe0).
-int g_UnknownGlobal65b5c8;
 
 // 0x0046e8c0
 void UIDialog::UnknownVirtualSlot28(int value) {
@@ -158,42 +174,6 @@ void UIControl::UnknownVirtualSlot49(int enable) {
     }
 }
 
-// 0x00470f10
-void UIControl::UnknownVirtualSlot39() {
-    UIDialog* owner = ownerDialog;
-    int left = field_0x3c[0];
-    field_0x2c[0] = (int)(left * owner->scaleX);
-    int top = field_0x3c[1];
-    field_0x2c[1] = (int)(top * owner->scaleY);
-    int right = field_0x3c[2];
-    field_0x2c[2] = (int)(right * owner->scaleX);
-    int bottom = field_0x3c[3];
-    field_0x2c[3] = (int)(bottom * owner->scaleY);
-    if (anchorControl && relAnchor) {
-        field_0x2c[1] += anchorControl->field_0x2c[1];
-        field_0x2c[3] += anchorControl->field_0x2c[1];
-        field_0x2c[0] += anchorControl->field_0x2c[0];
-        field_0x2c[2] += anchorControl->field_0x2c[0];
-    } else {
-        field_0x2c[1] += owner->screenArea.top;
-        field_0x2c[3] += owner->screenArea.top;
-        field_0x2c[0] += owner->screenArea.left;
-        field_0x2c[2] += owner->screenArea.left;
-    }
-    field_0x4c[0] = field_0x2c[0] < 0 ? -field_0x2c[0] : 0;
-    field_0x4c[1] = field_0x2c[1] < 0 ? -field_0x2c[1] : 0;
-    int width = right - left;
-    int height = bottom - top;
-    int over = field_0x2c[2] - g_TrackGame->renderTarget->field_0x0c;
-    int under = field_0x2c[3] - g_TrackGame->renderTarget->field_0x10;
-    if (over > 0)
-        width -= over;
-    field_0x4c[2] = width;
-    if (under > 0)
-        height -= under;
-    field_0x4c[3] = height;
-}
-
 // 0x00472e30
 UIAnim::UIAnim(void* textures, void* palette) {
     animTextures = textures;
@@ -207,29 +187,6 @@ UIAnim::UIAnim(void* textures, void* palette) {
     playBackwards = 0;
     animPalette = palette;
     memset(frameList, 0, sizeof(frameList));
-}
-
-// 0x00472fe0
-UIFrame* UIAnim::Advance() {
-    int now = UnknownFunction4bfa80();
-    g_UnknownGlobal65b5c8 = now;
-    if (abs(now - lastStepTime) > frameDelay || frameList[currentFrame]->isSound == 1) {
-        lastStepTime = now;
-        if (playBackwards) {
-            if (!playForwards && currentFrame > 0)
-                return frameList[--currentFrame];
-            playForwards = 0;
-            if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
-                return frameList[currentFrame = frameCount];
-        } else {
-            if (!playForwards && currentFrame + 1 < frameCount)
-                return frameList[++currentFrame];
-            playForwards = 0;
-            if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
-                currentFrame = 0;
-        }
-    }
-    return frameList[currentFrame];
 }
 
 // 0x004733a0
@@ -358,29 +315,6 @@ static int UnknownFunction477800(const void* a, const void* b) {
     return result;
 }
 
-// 0x00477bc0
-void UIListBox::UpdateScrollBars() {
-    UIDialog* owner = ownerDialog;
-    if (!owner)
-        return;
-    int height = 0;
-    lastPageRowCount = 0;
-    for (int i = rowCount - 1; i >= 0; i--) {
-        height += rowTable[i].height;
-        if (height > field_0x2c[3] - field_0x2c[1])
-            break;
-        lastPageRowCount++;
-    }
-    lastPageRowCount = lastPageRowCount < 0 ? 0 : lastPageRowCount;
-    GameObjectIterator iterator(owner->controlContainer, 1, "UIControl");
-    UIControl* control;
-    while ((control = (UIControl*)iterator.Next()) != 0) {
-        if (control->attachId == attachId && (control->controlType == 8 || control->controlType == 7))
-            static_cast<UIScrollBar*>(control)->UnknownFunction475200(this);
-    }
-    UnknownVirtualSlot50();
-}
-
 // 0x00477e90
 int UIListBox::UnknownVirtualSlot55(int a, int b) {
     POINT* point = (POINT*)b;
@@ -390,7 +324,8 @@ int UIListBox::UnknownVirtualSlot55(int a, int b) {
                 int found = 0;
                 RECT rect = *(RECT*)field_0x2c;
                 for (int row = firstVisibleRow; row < firstVisibleRow + visibleRowCount; row++) {
-                    rect.bottom = rect.top + GetRowHeight(row);
+                    int height = GetRowHeight(row);
+                    rect.bottom = rect.top + height;
                     if (PtInRect(&rect, *point) && !(rowTable[row].flags & 1)) {
                         SelectRow(row);
                         UnknownVirtualSlot66(&found);

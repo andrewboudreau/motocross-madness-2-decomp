@@ -323,3 +323,11 @@ python3 tools/decl_shift_scan.py samples/render/MatrixUtilNearMisses.cpp \
 - `x*x + y*y + z*z` as one expression squares z first whatever the parenthesisation or
   accessor; retail's x, y, z order comes from accumulating one square per statement
   (`l = x*x; l += y*y; l += z*z;`). MPBikeRiderDlg slot 29 `0x4f78a0`.
+- One `return frameList[currentFrame];` at the end, with each branch only updating the
+  index, is copied into every exit and indexes through `mov ecx, eax`; early
+  `return frameList[--currentFrame]` forms index with eax. UIAnim::Advance `0x472fe0`.
+- `-x < 0 ? 0 : -x` compiles to the branch-free `mov edx, 0; neg; sets; dec; and`;
+  `x < 0 ? -x : 0` compiles to branches. UIControl slot 39 `0x470f10`.
+- Testing `sum + term > limit` before `sum += term` loads the term into its own
+  register; `sum += term; if (sum > limit)` adds straight from memory.
+  UIListBox::UpdateScrollBars `0x477bc0`.

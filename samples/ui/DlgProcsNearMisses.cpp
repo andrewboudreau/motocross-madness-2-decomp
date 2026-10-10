@@ -18,7 +18,9 @@
 //   line numbers; retail keeps the event in ebx for the option cases (whose
 //   identical tails it merges into case 0xcb's) and does not keep zero in a
 //   register, VC6 here merges the tails into case 0xd0 and uses ebx for zero.
-//   Every order of the first five cases was tried.
+//   Every order of the first five cases was tried; a `short` FindControl
+//   type parameter (so the two zero arguments differ in type) compiles the
+//   same.
 // MainDlg::UnknownVirtualSlot29 (0x0044b200, 5232 bytes): the same cases,
 //   calls and strings; retail shares one frame slot between the two
 //   ConnectionInfoType[5] arrays (frame 0x6c4), VC6 here gives each array its

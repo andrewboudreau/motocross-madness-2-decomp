@@ -50,6 +50,8 @@ static inline int UnknownMaxInt(int a, int b) { return a < b ? b : a; }
 
 // cdecl 0x0047b570: resizes a DebugMalloc'd block (KrustyUI.cpp).
 void* UnknownFunction47b570(void* block, unsigned int size);
+// 0x0065b5c8: the time stamp of the last image step (UIAnim 0x00472fe0).
+int g_UnknownGlobal65b5c8;
 // 0x0065b608: the dialog whose list box is being sorted (0x00477900).
 UIDialog* g_UnknownGlobal65b608;
 // 0x0065b60c: the frames of the zoom transition (UIControl slot 41).
@@ -212,6 +214,44 @@ char* UIControl::GetName() {
     return controlName;
 }
 
+// 0x00470f10: scales the design rect by the dialog's scale into the screen
+// rect (+0x2c), offsets it by the anchor control or the dialog, and clips
+// the visible part (+0x4c) to the render target.
+void UIControl::UnknownVirtualSlot39() {
+    UIDialog* owner = ownerDialog;
+    int left = field_0x3c[0];
+    field_0x2c[0] = (int)(left * owner->scaleX);
+    int top = field_0x3c[1];
+    field_0x2c[1] = (int)(top * owner->scaleY);
+    int right = field_0x3c[2];
+    field_0x2c[2] = (int)(right * owner->scaleX);
+    int bottom = field_0x3c[3];
+    field_0x2c[3] = (int)(bottom * owner->scaleY);
+    if (anchorControl && relAnchor) {
+        field_0x2c[1] += anchorControl->field_0x2c[1];
+        field_0x2c[3] += anchorControl->field_0x2c[1];
+        field_0x2c[0] += anchorControl->field_0x2c[0];
+        field_0x2c[2] += anchorControl->field_0x2c[0];
+    } else {
+        field_0x2c[1] += owner->screenArea.top;
+        field_0x2c[3] += owner->screenArea.top;
+        field_0x2c[0] += owner->screenArea.left;
+        field_0x2c[2] += owner->screenArea.left;
+    }
+    field_0x4c[0] = -field_0x2c[0] < 0 ? 0 : -field_0x2c[0];
+    field_0x4c[1] = -field_0x2c[1] < 0 ? 0 : -field_0x2c[1];
+    int width = right - left;
+    int height = bottom - top;
+    int over = field_0x2c[2] - g_TrackGame->renderTarget->field_0x0c;
+    int under = field_0x2c[3] - g_TrackGame->renderTarget->field_0x10;
+    if (over > 0)
+        width -= over;
+    field_0x4c[2] = width;
+    if (under > 0)
+        height -= under;
+    field_0x4c[3] = height;
+}
+
 // 0x00471fa0
 TextureMap* UIControl::UnknownVirtualSlot48(int state) {
     if (state == -1)
@@ -270,6 +310,34 @@ int UIAnim::AddFrame(UIFrame* frame) {
         return 1;
     }
     return 0;
+}
+
+// 0x00472fe0: steps to the next frame once the frame delay has passed (or at
+// once past a sound frame), bouncing or looping as the pass count says.
+UIFrame* UIAnim::Advance() {
+    int now = UnknownFunction4bfa80();
+    g_UnknownGlobal65b5c8 = now;
+    if (abs(now - lastStepTime) > frameDelay || frameList[currentFrame]->isSound == 1) {
+        lastStepTime = now;
+        if (playBackwards) {
+            if (!playForwards && currentFrame > 0) {
+                currentFrame--;
+            } else {
+                playForwards = 0;
+                if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
+                    currentFrame = frameCount;
+            }
+        } else {
+            if (!playForwards && currentFrame + 1 < frameCount) {
+                currentFrame++;
+            } else {
+                playForwards = 0;
+                if (passesLeft == 0x7fff || (passesLeft && --field_0x18 > 0))
+                    currentFrame = 0;
+            }
+        }
+    }
+    return frameList[currentFrame];
 }
 
 // ---------------------------------------------------------------------------
@@ -1132,6 +1200,30 @@ void UIListBox::SetAllowWScroll(int value) {
 // 0x00477bb0
 void UIListBox::SetSelectable(int a) {
     selectable = a;
+}
+
+// 0x00477bc0: counts the rows of the last page (the rows that fit from the
+// end) and updates the scroll bars attached to the list.
+void UIListBox::UpdateScrollBars() {
+    UIDialog* owner = ownerDialog;
+    if (!owner)
+        return;
+    int height = 0;
+    lastPageRowCount = 0;
+    for (int i = rowCount - 1; i >= 0; i--) {
+        if (height + rowTable[i].height > field_0x2c[3] - field_0x2c[1])
+            break;
+        height += rowTable[i].height;
+        lastPageRowCount++;
+    }
+    lastPageRowCount = lastPageRowCount < 0 ? 0 : lastPageRowCount;
+    GameObjectIterator iterator(owner->controlContainer, 1, "UIControl");
+    UIControl* control;
+    while ((control = (UIControl*)iterator.Next()) != 0) {
+        if (control->attachId == attachId && (control->controlType == 8 || control->controlType == 7))
+            static_cast<UIScrollBar*>(control)->UnknownFunction475200(this);
+    }
+    UnknownVirtualSlot50();
 }
 
 // 0x00477ce0

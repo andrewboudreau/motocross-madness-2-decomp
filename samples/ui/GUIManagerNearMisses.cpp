@@ -7,14 +7,18 @@
 //   font-size parameter (docs/VC6_FRAME_LAYOUT.md: dead argument slots).
 // 0x00485a70 (345 bytes): same calls and argument order; retail keeps
 //   `flags & 4` in edi and `wait` in ebp, VC6 here keeps `a`/`parent` in
-//   ebp (a `flags & 4` local makes it worse).
+//   ebp (a `flags & 4` local makes it worse: 21/347, the local lands in
+//   ecx; also with the local assigned in the condition). Inverting the
+//   first test (`(flags & 4) || (flags & 2)` with the grab code first)
+//   compiles the same.
 // 0x00486170 (896 bytes): same logic; retail keeps three more stack locals
 //   (frame 0xb0 against 0xa4) and allocates registers differently around
 //   the row copy and the 8-bit dim loop.
 // 0x00486b10 (106 bytes): retail stores the centred x before loading the
 //   control's bottom and passes the text in eax; VC6 here hoists the load
 //   (also with a POINT, a centre helper, a `left` local, a pointer to the
-//   array or a ShowText call in each branch).
+//   array or a ShowText call in each branch, and with the centre written
+//   as `width / 2 + left`, a `width` or `left` local, or `left` then `+=`).
 // 0x00486b80 (553 bytes, ratio 0.97): retail computes the width limit as
 //   `sub eax, 2` (VC6 here: `add eax, -2`) and spills width/height into the
 //   SIZE slots later. VC6 emits `sub` only for a named `limit` local (the
