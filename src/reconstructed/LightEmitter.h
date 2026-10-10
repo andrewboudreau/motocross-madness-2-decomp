@@ -77,8 +77,9 @@ public:
     LightEmitter* UnknownFunction4a0190(int type);        // 0x004a0190: first light of `type`
     // 0x0049e4a0 lights `count` vertices (Griddraw.h's GridVertexSink is
     // this function seen from the terrain). Not reconstructed: it and its
-    // three workers 0x0049e6b0, 0x0049f1c0 and 0x0049f8d0 round with an
-    // inline `fld; fistp` sequence that VC6 only emits for inline assembly.
+    // three workers 0x0049e6b0, 0x0049f1c0 and 0x0049f8d0 (ebp frames) round
+    // with an inlined `fld [tmp]; mov eax, [p]; fistp [eax]` helper that VC6
+    // only emits for inline assembly.
     void UnknownFunction49e4a0(void* matrix, int count, void* vertices, void* buffer,
                                int stride, void* colors);
 

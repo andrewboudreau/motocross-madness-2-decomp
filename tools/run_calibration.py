@@ -328,6 +328,15 @@ CASES = [
         'reason': "4x3 digit grid; column left unset outside 0..9 (read from the digit's slot); DDBLT_WAIT Blt between +0x70 surfaces",
     },
     {
+        'name': 'BikeNumberPainter plate renderer',
+        'bindings': 'src/reconstructed/BikeNumberPainter.bindings.json',
+        'source': 'src/reconstructed/BikeNumberPainter.cpp',
+        'symbol': '?UnknownFunction417670@UnknownBikeNumberPainter@@QAEXPAVD3DIMSoultreeObject@@H@Z',
+        'target_va': '0x00417670',
+        'target_size': 1157,
+        'reason': 'PROCEDURAL materials cleared by a colour-fill Blt and painted digit by digit (number itself loses its hundreds and tens); digit count picks the UV scale/offsets applied through full lodTable[i].surfaces[j] expressions',
+    },
+    {
         'name': 'PCCamera slot27',
         'bindings': 'src/reconstructed/Camera.bindings.json',
         'source': 'src/reconstructed/PCCamera.cpp',
@@ -596,6 +605,15 @@ CASES = [
         'target_va': '0x0052bfa0',
         'target_size': 76,
         'reason': 'ternary distance through the FPU; 85.0 tail-duplicated',
+    },
+    {
+        'name': 'VehicleCamera slot68 fixed view',
+        'bindings': 'src/reconstructed/VehicleCamera.bindings.json',
+        'source': 'src/reconstructed/VehicleCamera.cpp',
+        'symbol': '?UnknownVirtualSlot68@VehicleCamera@@UAEXXZ',
+        'target_va': '0x0052bcf0',
+        'target_size': 684,
+        'reason': 'lead = (float)(y * 1/32.2) * 1.5 keeps the two multiplies; the 0.19 lift reuses (heading * lead).y; fov clamp 10..70 then Camera slot 29',
     },
     {
         'name': 'VehicleCamera slot72',

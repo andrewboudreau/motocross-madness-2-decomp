@@ -1,4 +1,18 @@
 {
   "??_C@_0BD@JLHO@BikeNumbers128?4tga?$AA@": "0x005679dc",
-  "?UnknownFunction50a590@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHPAXHIHH@Z": "0x0050a590"
+  "??_C@_0L@COPB@PROCEDURAL?$AA@": "0x005679f0",
+  "?UnknownFunction417580@UnknownBikeNumberPainter@@QAEXHHPAVPCTextureMap@@@Z": "0x00417580",
+  "?UnknownFunction50a590@@YAPAVTextureMap@@PAVTextureMapManager@@PBDHHHHHPAUSoultreeTextureOptions@@HIHH@Z": "0x0050a590",
+  "?UnknownFunction510670@ManagedTexture@@QAEXXZ": "0x00510670",
+  "__ftol": "0x00534a88",
+  "__real@4@00000000000000000000": "0x00550484",
+  "__real@4@3ffbcccccd0000000000": "0x005507d0",
+  "__real@4@3ffbe147ae0000000000": "0x00550d10",
+  "__real@4@3ffcb333330000000000": "0x00550d0c",
+  "__real@4@3ffea666660000000000": "0x00550b80",
+  "__real@4@3ffec000000000000000": "0x0055084c",
+  "__real@4@3fff8000000000000000": "0x00550748",
+  "__real@4@bffe8000000000000000": "0x00550758",
+  "__real@8@3ffe8000000000000000": "0x00550d18",
+  "__stricmp": "0x00536070"
 }

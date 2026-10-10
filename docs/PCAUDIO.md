@@ -127,5 +127,6 @@ gains an EH frame because the notifier's constructor is not defined there;
 inside PCAudio.cpp the frame matches retail).
 
 Every function of PCAudio.cpp (`0x004bb630`–`0x004bed40`) is now either
-exact or a documented near miss. `0x004be330` is not a function start (inside
-`0x004be2d0`).
+exact or a documented near miss. `0x004be330` is not a function start: it is
+mid-instruction (`lea eax, [esi + 0x90]` at `0x004be32d`) inside
+`0x004be2d0`.

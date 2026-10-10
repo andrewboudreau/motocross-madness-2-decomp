@@ -134,7 +134,8 @@ Not reconstructed: the halvers `0x004ce5f0` and `0x004cea10` (assembly)
 and the ditherer `0x004cf2a0`. The table getters
 `0x004de280`/`0x004de290` are exact in `src/reconstructed/Quantize.cpp`.
 `0x004cf162` and `0x004d0000` are not function
-starts (inside the ditherer and `0x004cfe70`).
+starts: the first is mid-instruction inside the palette halver
+`0x004cee30` (which runs to `0x004cf29c`), the second inside `0x004cfe70`.
 
 ## Function names
 

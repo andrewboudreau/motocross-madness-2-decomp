@@ -216,6 +216,7 @@ references. All bodies below are strict exact under the default profile.
 | VehicleCamera 50 | `0x0052cb80` | 73 | Vehicle part position 0, raised by 5 |
 | VehicleCamera 51 | `0x0052cec0` | 10 | Vehicle +0x48 |
 | VehicleCamera 67 | `0x0052bfa0` | 76 | Preset: distance 17 (`.rdata` `0x00558d60`) in vehicle mode, else 60 |
+| VehicleCamera 68 | `0x0052bcf0` | 684 | Fixed view: base (`0x0052bc50`) + heading (`0x0052bac0`) × y/32.2 × 1.5 − 0.2 × heading + 0.45 × (z, 0, −x), adjusted by subject `0x00507c10`; y at least base y − 1 and position y + 7 (21 outside vehicle mode); +0x258 = (200 − horizontal distance to the target + 3 up) / 180 × 60 + 10, clamped to 10..70; then Camera slot 29 at that target |
 | VehicleCamera 72 | `0x0052bff0` | 62 | Hold while vehicle +0x444; else FollowCamera slot 72 or reset to state 0 |
 | VehicleCamera 74 | `0x00417490` | 31 | Inline in the header; vehicle mode and vehicle +0x444 |
 | VehicleCamera 75 | `0x0052d010` | 58 | FollowCamera slot 75, else not vehicle mode or vehicle +0x444 clear |
@@ -268,9 +269,32 @@ Slot 36 (`0x0052cc80`, 573 bytes) is a near miss in
 exit, which shows FollowCamera slot 36's pattern (retail `xor al, al;
 mov [esi+0x277], al`, VC6 an immediate store and a merged `return false`).
 Its tolerances are 10 while vehicle +0x434 > 0.1, else 0.01, and it returns
-+0x274 as the bool result (so +0x274 is `bool`). Slots 35 (`0x0052c510`), 41
-(`0x0052c030`) and 68 (`0x0052bcf0`) are not reconstructed; slot 41 normalises
-a heading with `0x00460c00` and reads the unit's z axis.
++0x274 as the bool result (so +0x274 is `bool`).
+
+Slot 68 matches with two source facts: retail multiplies by 1/32.2 and by
+1.5 separately (VC6 folds the constants of a plain `y * a * b`, so the first
+product is cast to `float`), and the 0.19 lift reads `(heading * lead).y`,
+the y of the vector product, not a fresh `heading.y * lead`.
+
+Also near misses in the same samples file:
+
+- Slot 41 (`0x0052c030`, 1240 bytes, 1221/1240): the followed heading. In
+  vehicle mode below |speed| 10 it blends the vehicle's +0x88 × max(+0xbc,
+  0.01) towards slot 33's velocity (negated unless vehicle +0x440) by
+  |speed| × 0.1, flattens it, normalises it in place and eases it from
+  +0x29c with weights 0.82/0.18; faster, it uses the velocity with y
+  halved and eased; outside vehicle mode the first axis from
+  `0x004fc4f0` of the target's model, or the z axis. Differences: the
+  x-first `fld x; fmul st(1)` of one normalisation and one `y = 0` store's
+  position. The weights `0x00558d64`/`0x00558d68` are literals
+  (`__real` constants placed after the vtable).
+- Slot 35 (`0x0052c510`, 1267 bytes, 813/1261): the chase position
+  (heading turned by +0x308 × 0.7 about y, pitched by −vehicle +0x4c in
+  state 3, through `D3DRMVectorRotate`; distance from the preset angles,
+  zoom and speed; lift eased in +0x2d8 over the vehicle's first rider
+  with +0x2a8 set). Its `a` argument is tested as a byte, so FollowCamera.h
+  declares it `unsigned char` (slot 48's int argument still passes without
+  conversion code); +0x2d8 is a float. Frame and slot layout differ.
 
 ## KrustyBikeCamera
 

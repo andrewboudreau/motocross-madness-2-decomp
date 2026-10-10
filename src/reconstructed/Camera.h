@@ -36,7 +36,7 @@ public:
     // Pure: Camera's vtable holds LIBCMT _purecall (0x00534cfe) in slot 27.
     virtual void UnknownVirtualSlot27() = 0;
     virtual void UnknownVirtualSlot28();
-    virtual void UnknownVirtualSlot29(Vector3 value);
+    virtual int UnknownVirtualSlot29(Vector3 value);
     virtual int UnknownVirtualSlot30(const Matrix4* value);
     virtual int UnknownVirtualSlot31(const Matrix4* value);
     virtual int UnknownVirtualSlot32(const Matrix4* value);
@@ -81,13 +81,15 @@ protected:
     Matrix4 worldMatrix;       // +0x2c, set by slot 30
     Matrix4 projectionMatrix;  // +0x6c, set by slot 32
     Matrix4 viewMatrix;        // +0xac, set by slot 31
-    unsigned char field_0xec[0x80]; // not touched by the constructor
+    // Rebuilt by slot 28: [1] (+0x12c) is the projection times the viewport
+    // scale (0.5, -0.5, offset 0.5), [0] (+0xec) that times the view matrix.
+    Matrix4 field_0xec[2];
     float field_0x16c;              // 77.0f
     Vector3 field_0x170;       // (0, 0, 0); copied to field_0x208
     Vector3 field_0x17c;       // (0, 0, 1); copied to field_0x214
     Vector3 field_0x188;       // (0, 1, 0)
     float field_0x194;              // roll, passed to the view matrix by slot 28
-    int field_0x198;
+    float field_0x198;              // half viewport width / tan(fov / 2) (slot 28)
     float field_0x19c;              // display-mode width/height (0x0042e550)
     int field_0x1a0[6];             // [0..3]: x, y, width, height for slot 13
     float field_0x1b8;              // height/width ratio (0x0042f0e0)

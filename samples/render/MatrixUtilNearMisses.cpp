@@ -15,6 +15,17 @@
 //   itself (retail sums z, y, x for w and y, z, x / y, x, z for the rows), so the
 //   written term order does not matter.
 //
+// 0x004a1500 (ViewMatrix, 744 bytes): 646/744; retail length, frame, slots,
+//   calls and FP code. Only the scheduling of the integer moves that store
+//   the up and direction columns (and write the normalised direction back to
+//   its parameter) between the cross-product x87 instructions differs. The
+//   normalisation needs the out-of-line dot (0x0040ae30) and scale
+//   (0x005015b0) with a named scale local; the row-3 dots need the
+//   file's DotProduct(v, from). Tried without gain: column, row and mixed
+//   store orders, the cross as member stores, float locals or d3dvec.inl's
+//   index-store CrossProduct, a separate normalised-direction local, the
+//   identity built after the normalisations and const parameters.
+//
 // Also tried for 0x004a11e0 without any change (274/281): the offset dot
 // through const-reference aliases of `normal` or `a`, with swapped
 // DotProduct arguments, as an explicit chain in either order or mixed
@@ -89,4 +100,45 @@ void UnknownFunction4a1a50(void* target, const void* source, const Matrix4* matr
         q = (Vector3*)((char*)q + targetStride);
         count--;
     }
+}
+
+// 0x0040ae30 (cdecl): out-of-line dot product.
+float UnknownFunction40ae30(const Vector3* a, const Vector3* b);
+// 0x005015b0 (cdecl): out-of-line v * scale.
+Vector3 UnknownFunction5015b0(const Vector3& v, float scale);
+
+// v scaled to unit length (unchanged when it already is) through the
+// out-of-line dot product and scale.
+static inline Vector3 NormalizeCall(const Vector3& v) {
+    float squared = UnknownFunction40ae30(&v, &v);
+    if (squared == 1.0f)
+        return v;
+    float scale = FastInvSqrt(squared);
+    return UnknownFunction5015b0(v, scale);
+}
+
+// 0x004a1500: rows 0-2 hold right = up x direction, the normalised up and
+// direction as columns, row 3 the negated dot products with `from`; a
+// nonzero roll then rotates the view about its z axis.
+Matrix4 ViewMatrix(Vector3 from, Vector3 direction, Vector3 up, float roll) {
+    Matrix4 view = IdentityMatrix();
+    up = NormalizeCall(up);
+    direction = NormalizeCall(direction);
+    Vector3 right(up.y * direction.z - up.z * direction.y, up.z * direction.x - up.x * direction.z,
+                  up.x * direction.y - up.y * direction.x);
+    view(0, 0) = right.x;
+    view(1, 0) = right.y;
+    view(2, 0) = right.z;
+    view(0, 1) = up.x;
+    view(1, 1) = up.y;
+    view(2, 1) = up.z;
+    view(0, 2) = direction.x;
+    view(1, 2) = direction.y;
+    view(2, 2) = direction.z;
+    view(3, 0) = -DotProduct(right, from);
+    view(3, 1) = -DotProduct(up, from);
+    view(3, 2) = -DotProduct(direction, from);
+    if (roll != 0.0f)
+        view = MatrixMult(RotateZMatrix(-roll), view);
+    return view;
 }

@@ -63,6 +63,9 @@ Matrix4 ZeroMatrix();                          // 0x004a13e0
 Matrix4 IdentityMatrix();                      // 0x004a1410
 // 0x004a1460: perspective projection; fov in radians, aspect scales row 1.
 Matrix4 ProjectionMatrix(float nearPlane, float farPlane, float fov, float aspect);
+// 0x004a1500: view matrix for a camera at `from` looking along `direction`,
+// rolled by `roll` radians about the view axis.
+Matrix4 ViewMatrix(Vector3 from, Vector3 direction, Vector3 up, float roll);
 Matrix4 RotateZMatrix(float radians);          // 0x004a17f0
 Matrix4 MatrixMult(Matrix4 a, Matrix4 b);      // 0x004a1860
 // 0x004a18e0: inverse of the upper 3x3 of `m` (ZeroMatrix when singular); the

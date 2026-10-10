@@ -9,9 +9,12 @@ Names are provisional.
   initialiser `0x0049e230` ("sphere.slt", jump table in the extent), the
   manager constructor/destructors, add, change counter, find-by-type
   `0x004a0190` and the cdecl vector negation `0x0049f180`. 26 cases.
-  The lighting routine `0x0049e4a0` and its three workers (`0x0049e6b0`,
-  `0x0049f1c0`, `0x0049f8d0`) round with the `fld; fistp [mem]` pattern of
-  inline assembly and are not attempted. The shared bodies at slot 12
+  The lighting routine `0x0049e4a0` and its three workers (`0x0049e6b0`
+  to `0x0049f1be`, `0x0049f1c0` to `0x0049f8b5`, `0x0049f8d0` to
+  `0x004a0150`) are out of scope: each has an ebp frame and rounds nine
+  times with an inlined `__asm` helper (`fstp [tmp]; mov [p], eax; fld
+  [tmp]; mov eax, [p]; fistp [eax]`, the value and the destination pointer
+  homed in stack slots), which VC6 emits only for inline assembly. The shared bodies at slot 12
   (`0x00467ae0`) and slot 8 (`0x004452e0`) compile exact but are not
   counted, since the address alone does not prove ownership.
 - `Quantize.cpp` (RTTI `ColorMapper : BaseObject`, vtable `0x00557658`;

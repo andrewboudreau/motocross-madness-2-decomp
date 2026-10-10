@@ -9,7 +9,10 @@ class is `UnknownTextureStream`, declared in `src/reconstructed/TextureMap.h`.
 - The code runs from `0x00460d10` to `0x00461d57`.
   - Before it: the FastMath helpers.
   - After it: the shadow fill code at `0x00461d60` and `0x00461e60`, which
-    is inline assembly.
+    is inline assembly. `0x00461d60` (to `0x00461e58`, `ret 0xc`) has an
+    ebp frame and two floor-division blocks that reload their operands
+    from homed stack slots into fixed esi/edi and clear edx with
+    `xor edx, edx` (not `cdq`) before `idiv`.
 - There is no `__FILE__` literal and no RTTI. The file name and every
   member name are ours (tier 3).
 - Callers include Track, SceneManager, Motnctrl, CarProcedural,

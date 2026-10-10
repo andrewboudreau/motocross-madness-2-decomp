@@ -137,7 +137,8 @@ public:
     // (with `a`) to slot 35; BikeCamera's and KrustyBikeCamera's slot 34 load
     // it with fld/fmul. VehicleCamera's slot 35 (0x0052c510) never reads it.
     virtual Vector3 UnknownVirtualSlot34(float dt);
-    virtual Vector3 UnknownVirtualSlot35(int a, float dt) = 0;
+    // VehicleCamera's override tests `a` as a byte (slot 48 passes its int).
+    virtual Vector3 UnknownVirtualSlot35(unsigned char a, float dt) = 0;
     // 0x00465000 (near miss: samples/camera)
     virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
     virtual Vector3 UnknownVirtualSlot37();
@@ -263,7 +264,7 @@ protected:
     float field_0x2cc;          // snapshot of field_0x234
     float field_0x2d0;          // set with field_0x2d4 by 0x00463140
     float field_0x2d4;          // 7.0f
-    int field_0x2d8;
+    float field_0x2d8;          // lift eased by VehicleCamera slot 35
     int field_0x2dc;                 // capacity of points (0x00463140)
     int pointCount;                  // +0x2e0, number of entries in points
     UnknownFollowCameraPoint* points; // +0x2e4, owned table

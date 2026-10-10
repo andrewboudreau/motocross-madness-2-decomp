@@ -56,9 +56,27 @@ products need an inline `Dot(a, b)` returning `a.z*b.z + (a.x*b.x +
 a.y*b.y)`, while plain member expressions in any term order get the x87
 operand order wrong), `0x0042e930` and `0x0042e9b0` (the frame setter,
 whose roll and fov arguments are `const float*`). `0x0042e550` is a near
-miss: retail reloads the display-mode index for the height. Slots 28
-`0x0042ee30` and 29 `0x0042eb10` are not attempted. The kVec3 statics sit at the end of Camera.cpp because
-the `$E` code follows every Camera function.
+miss: retail reloads the display-mode index for the height. The kVec3
+statics sit at the end of Camera.cpp because the `$E` code follows every
+Camera function.
+
+Slots 28 and 29 are near misses in `samples/camera/CameraNearMisses.cpp`:
+
+- Slot 28 `0x0042ee30` (492 bytes, 487/492) rebuilds the matrices: view =
+  `ViewMatrix(+0x170, +0x17c, +0x188, +0x194)`, projection =
+  `ProjectionMatrix(+0x1bc, +0x1c0, fov +0x16c in degrees, width / height)`,
+  +0x12c = `MatrixMult(viewport, projection)` with the viewport scale (0.5,
+  −0.5, offset 0.5, 0.5), +0xec = that times the view, and +0x198 = half
+  the viewport width / tan(fov / 2) (a float; Camera.h now types +0xec as
+  two matrices). Only the position of one `sub esp, 0x40` against a
+  `rep movsd` differs. The half angle needs a `float` cast: VC6 folds
+  `fov * 0.5f * k` into one constant, retail multiplies twice.
+- Slot 29 `0x0042eb10` (690 bytes, 659/690) aims the camera at a point
+  (returns `int`: 0 when the point is the position). Up becomes (0, 1, 0),
+  forward the direction normalised through the out-of-line dot `0x0040ae30`,
+  right = up × forward normalised through the `0x00404e60` constructor copy
+  (the x axis when looking straight up or down) and up = forward × right.
+  Four fld/fmul operand pairs of the first cross product differ.
 
 ## Function names
 

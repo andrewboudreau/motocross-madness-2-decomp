@@ -17,14 +17,30 @@ public:
     UnknownVehiclePart* UnknownFunction4fdae0(const char* name);
     void UnknownFunction4444e0(); // 0x004444e0 (BikeCamera slot 53)
     void UnknownFunction4fdb50(); // 0x004fdb50 (BikeCamera slot 54)
+    // 0x004fc4f0 (src/krusty2's SoultreeObject::GetAxes): writes two axis
+    // vectors; VehicleCamera slot 41 uses the first.
+    void UnknownFunction4fc4f0(Vector3* first, Vector3* second);
+};
+
+// An entry of the vehicle's +0x53c list (VehicleCamera slot 35).
+struct UnknownCameraRider {
+    unsigned char field_0x000[0x150];
+    float field_0x150;                   // slot 35 lifts the camera above -0.5
+    unsigned char field_0x154[0x2a8 - 0x154];
+    int field_0x2a8;
 };
 
 struct UnknownCameraVehicle {
     unsigned char field_0x000[0x48];
     float field_0x48;                    // VehicleCamera slot 51
-    unsigned char field_0x04c[0x64 - 0x4c];
+    float field_0x4c;                    // VehicleCamera slot 35 pitch angle
+    unsigned char field_0x050[0x64 - 0x50];
     Vector3 field_0x64;                  // VehicleCamera slot 33
-    unsigned char field_0x070[0x3bc - 0x70];
+    unsigned char field_0x070[0x88 - 0x70];
+    Vector3 field_0x88;                  // VehicleCamera slot 41 heading fallback
+    unsigned char field_0x094[0xbc - 0x94];
+    float field_0xbc;                    // VehicleCamera slot 41 (at least 0.01)
+    unsigned char field_0x0c0[0x3bc - 0xc0];
     UnknownVehiclePart* field_0x3bc;     // VehicleCamera slot 50
     unsigned char field_0x3c0[0x434 - 0x3c0];
     float field_0x434;                   // VehicleCamera slot 36 tests > 0.1
@@ -39,6 +55,24 @@ struct UnknownCameraVehicle {
     unsigned char field_0x468[0x488 - 0x468];
     Vector3 field_0x488;                 // 0x0052bc50 in vehicle mode
     Vector3 field_0x494;                 // 0x0052bac0 in vehicle mode
+    unsigned char field_0x4a0[0x53c - 0x4a0];
+    UnknownCameraRider** field_0x53c;    // riders (VehicleCamera slot 35)
+    int field_0x540;
+    int field_0x544;                     // rider count
+    unsigned char field_0x548[0x56c - 0x548];
+    int field_0x56c;                     // nonzero: look for a rider with +0x2a8 set
+
+    // Inlined by VehicleCamera slot 35: the first rider with +0x2a8 set
+    // when +0x56c asks for one, else the first rider.
+    UnknownCameraRider* UnknownInlineRider() {
+        if (field_0x56c) {
+            for (int i = 0; i < field_0x544; i++) {
+                if (field_0x53c[i]->field_0x2a8)
+                    return field_0x53c[i];
+            }
+        }
+        return field_0x53c[0];
+    }
 };
 
 // Optional targets at VehicleCamera+0x384 / +0x388 (slot 33).
@@ -56,8 +90,11 @@ struct UnknownCameraTargetB {
     Vector3 field_0x40;
 };
 
-// .rdata float next to VehicleCamera's vtable, loaded by slot 67 (17.0f).
+// .rdata floats next to VehicleCamera's vtable: 17.0f (slot 67) and the
+// 0.18f/0.82f blend weights of slots 35 and 41.
 extern const float g_UnknownFloat558d60;
+extern const float g_UnknownFloat558d64;
+extern const float g_UnknownFloat558d68;
 
 // RTTI: VehicleCamera : FollowCamera. Vehicle.cpp is a name-overlap candidate
 // for its translation unit, not established. Implements FollowCamera's pure
@@ -82,14 +119,17 @@ public:
     Vector3 UnknownFunction52bb60();
 
     virtual Vector3 UnknownVirtualSlot33();
+    virtual Vector3 UnknownVirtualSlot35(unsigned char a, float dt);
 
     virtual float UnknownVirtualSlot39();
+    virtual Vector3 UnknownVirtualSlot41();
     virtual void UnknownVirtualSlot42(bool flag);
     virtual Vector3 UnknownVirtualSlot50();
     virtual float UnknownVirtualSlot51();
     virtual bool UnknownVirtualSlot36(const Vector3& point, bool enable, bool force);
     virtual Vector3 UnknownVirtualSlot57(float dt);
     virtual void UnknownVirtualSlot67();
+    virtual void UnknownVirtualSlot68();
     virtual void UnknownVirtualSlot72();
     // Inline: retail's copy (0x00417490) is emitted next to BikeCamera code.
     virtual bool UnknownVirtualSlot74() {

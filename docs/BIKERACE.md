@@ -15,10 +15,17 @@ Evidence:
 Extent: `0x00417b00..0x004238bb` (strong inference). The plate-number
 painter at `0x00417500..0x00417aff` may also belong here and is
 unresolved. Its constructor `0x00417500` (loads BikeNumbers128.tga through
-`0x0050a590`, digit widths 19 except 13 for "1"), destructor `0x00417570`
-and digit blit `0x00417580` are strict exact in the provisional unit
-`src/reconstructed/BikeNumberPainter.cpp` (class name ours, tier 3); the
-x87 plate renderer `0x00417670` is not attempted. From `0x004238c0` the code is GR_BitString's; BlockAllocator.cpp
+`0x0050a590`, digit widths 19 except 13 for "1"), destructor `0x00417570`,
+digit blit `0x00417580` and plate renderer `0x00417670` (to `0x00417af2`) are
+strict exact in the provisional unit `src/reconstructed/BikeNumberPainter.cpp`
+(class name ours, tier 3). The renderer takes a `D3DIMSoultreeObject`: it
+clears each material texture named "PROCEDURAL" with a colour-fill Blt,
+paints the number centred on x 28 (subtracting the hundreds and tens from
+the `number` parameter itself as they are drawn), rebuilds the texture
+(slot 15, then `ManagedTexture` `0x00510670` or slot 9), and, when the
+digits counted over every plate are fewer than four, rescales the texture
+coordinates of the vertices with z >= -0.5 of every surface using that
+material (scale 1/0.75/0.65, offsets by digit count). From `0x004238c0` the code is GR_BitString's; BlockAllocator.cpp
 starts at `0x00423f70`. The four kVec3 `$E` pairs sit mid-file at
 `0x0041cdf0..0x0041cf2b`.
 

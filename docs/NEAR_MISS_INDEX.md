@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 195, c 146, total 341. The three class (a) functions of the
+Counts: a 0, b 196, c 150, total 346. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -31,6 +31,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | audio/PCAudio | `0x004bdc00` | 79/407 (masked) | b | 33 code diffs: `sub esp, 8` vs `sub esp, N`; retail lacks `mov ebx, [esp + N]`; frame 0x8 vs 0xc |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
 | camera/Camera | `0x0042e550` | 13/206 | c | retail reloads the display-mode index for the height (`mov edx, [eax + 0xc]` twice) and shares the return tail, so everything after it shifts; named width/height temps and width/height accessors both reuse the index (src/reconstructed/Camera.cpp) |
+| camera/Camera | `0x0042eb10` | 659/690 | c | four fld/fmul operand pairs of the up × forward cross product load the other operand first (samples/camera/CameraNearMisses.cpp) |
+| camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) |
 | camera/FollowCamera | `0x00462ee0` | 418/564 | c | 12 code diffs: retail lacks `mov byte ptr [esi + 0x274], bl ; mov [e~`; retail adds `mov [edx + 8], eax` |
 | camera/FollowCamera | `0x00465000` | 198/210 | c | 2 code diffs: retail lacks `mov byte ptr [esi + 0x277], 0`; retail adds `mov byte ptr [esi + 0x277], al` |
 | camera/FollowCamera | `0x004650e0` | 262/943 | b | 3 code diffs: `je @266 ; jmp @261` vs `je A ; jmp A`; `je @79` vs `je A`; frame 0x180 vs 0x18c |
@@ -39,6 +41,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | camera/FollowCamera | `0x00465c20` | 3659/3672 | b | 4 code diffs: retail adds `lea ecx, [esp + N]`; retail lacks `lea ecx, [esp + N]`; slots differ |
 | camera/KrustyBikeCamera | `0x00497e20` | 337/376 | c | 10 code diffs: `mov ecx, [A]` vs `mov edx, [A]`; retail lacks `lea eax, [esp + N] ; mov edx, [ecx + 0x~` |
 | camera/VehicleCamera | `0x0052cc80` | 553/573 | c | 4 code diffs: `mov byte ptr [esi + 0x277], 0` vs `xor al, al ; mov byte ptr [esi + 0x277]~` |
+| camera/VehicleCamera | `0x0052c030` | 1221/1240 | c | one normalisation multiplies x as `fld st(0); fmul x` (retail `fld x; fmul st(1)`); one `y = 0` store scheduled after the z*z product |
+| camera/VehicleCamera | `0x0052c510` | 813/1261 | b | frame 0x3c vs 0x48; direction and velocity slots swapped; the length stays on the x87 stack (retail spills it); x scaling not duplicated into the range branches |
 | control/ControlInterface | `0x004bf4f0` | 43/124 | c | 5 code diffs: `test ecx, ecx ; je @38 ; mov edx, [esp ~` vs `jmp @5` |
 | control/ControlInterface | `0x004bf6a0` | 438/726 (masked) | c | 58 code diffs: `jne @158` vs `jne @165 ; lea eax, [esp + N]`; `jmp @169 ; lea ecx, [esp + N]` vs `push eax ; jmp @178` |
 | ecosystem/EcoSystem | `0x00456890` | 356/369 | c | 2 code diffs: retail lacks `fmul [eax + 0x5a8]`; retail adds `fmul [eax + 0x5a8]` |
@@ -275,6 +279,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/ManagedTextureGroup | `0x0050ef70` | 16/231 (masked) | b | 19 code diffs: retail lacks `push ebx`; retail lacks `push esi`; slots differ |
 | render/MatrixUtil | `0x004a11e0` | 274/281 | b | 3 code diffs: retail adds `fsubp st(1)`; retail lacks `fsubp st(1)`; slots differ |
 | render/MatrixUtil | `0x004a1a50` | 171/175 | c | 1 code diffs: `fld [ecx + 4] ; fmul [eax + 0x28]` vs `fld [eax + 0x28] ; fmul [ecx + 4]` |
+| render/MatrixUtil | `0x004a1500` | 646/744 | c | integer column stores interleaved differently with the cross-product x87 code |
 | render/MorphBastardModifier | `0x004a33b0` | 729/2035 | b | 11 code diffs: `jle @611` vs `jle A`; retail adds `mov [eax + 0x34], edx`; slots differ |
 | render/MorphBastardModifier | `0x004a3c80` | 74/3663 | b | 4 code diffs: `push ebp` vs `mov ebx, [esp + N]`; `mov ecx, [esp + N]` vs `mov ecx, [ebx + 0x44]`; frame 0x1b4 vs 0x1fc |
 | render/MorphBastardModifier | `0x004a4c60` | 107/1570 | c | 19 code diffs: retail lacks `xor edi, edi ; test eax, eax ; mov [esp~`; retail adds `cmp eax, esi` |

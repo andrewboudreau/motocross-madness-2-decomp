@@ -100,6 +100,48 @@ Vector3 VehicleCamera::UnknownFunction52bc50() {
     return field_0x3a4;
 }
 
+static inline Vector3 Add(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+// 0x0052bcf0: places the camera beside and behind the heading, leads it by
+// the heading's climb (y / 32.2 * 1.5), keeps it above the base point and
+// derives the field of view (+0x258, 10..70) from the horizontal distance to
+// the raised target point, then aims at that point (Camera slot 29). Retail
+// multiplies by 1/32.2 and 1.5 separately (VC6 folds the two constants of a
+// plain product, hence the float cast), and the 0.19 lift reuses the y of
+// heading * lead.
+void VehicleCamera::UnknownVirtualSlot68() {
+    Vector3 heading = UnknownFunction52bac0();
+    Vector3 base = UnknownFunction52bc50();
+    float lead = (float)(heading.y * 0.0310559f) * 1.5f;
+    Vector3 side(heading.z, 0.0f, -heading.x);
+    field_0x170 = Add(Add(Add(base, heading * lead), heading * -0.2f), side * 0.45f);
+    field_0x240->UnknownFunction507c10(&field_0x170, 0, 0, 0);
+    if (heading.y > 10.0f)
+        base.y += (heading * lead).y * 0.19f;
+    if (vehicleMode) {
+        float low = field_0x170.y + 7.0f;
+        float high = base.y - 1.0f;
+        field_0x170.y = high > low ? high : low;
+    } else {
+        float low = field_0x170.y + 21.0f;
+        float high = base.y - 1.0f;
+        field_0x170.y = high > low ? high : low;
+    }
+    Vector3 target = targetPoint;
+    target.y += 3.0f;
+    float dx = FollowCameraAbs(field_0x170.x - target.x);
+    float dz = FollowCameraAbs(field_0x170.z - target.z);
+    float closeness = (200.0f - UnknownFunction460b50(dx * dx + dz * dz)) * 0.0055555557f;
+    field_0x258 = closeness * 60.0f + 10.0f;
+    if (field_0x258 < 10.0f)
+        field_0x258 = 10.0f;
+    if (field_0x258 > 70.0f)
+        field_0x258 = 70.0f;
+    UnknownVirtualSlot29(target);
+}
+
 // 0x0052ca10: 0x0052bb60's position, led by the tracked point (slot 33)
 // scaled by dt (at most 0.2) while the camera is free to follow.
 Vector3 VehicleCamera::UnknownVirtualSlot57(float dt) {

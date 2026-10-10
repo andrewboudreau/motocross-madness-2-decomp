@@ -23,7 +23,7 @@ SDK where noted.
 | `ZeroMatrix` | `0x004a13e0` | 41 | strict exact | Nested loop folds to `rep stosd` |
 | `IdentityMatrix` | `0x004a1410` | 71 | strict exact | `(row == column) ? 1.0f : 0.0f` |
 | `ProjectionMatrix` | `0x004a1460` | 156 | strict exact | Takes an aspect ratio (not in the SDK); cot(fov/2) diagonal, Q = 1/(1 - near/far) |
-| `ViewMatrix` | `0x004a1500` | 744 | not matched | See below |
+| `ViewMatrix` | `0x004a1500` | 744 | near miss (646/744) | `samples/render/MatrixUtilNearMisses.cpp`; see below |
 | `RotateZMatrix` | `0x004a17f0` | 106 | strict exact | |
 | `MatrixMult` | `0x004a1860` | 123 | strict exact | Both matrices by value; `result(i, j) += a(k, j) * b(i, k)` |
 | `MatrixInverse` | `0x004a18e0` | 362 | strict exact | Upper 3x3 by cofactors, `inverse * (...)`; `ZeroMatrix` when the determinant is zero |
@@ -63,8 +63,17 @@ changes the code, so they are separate functions in retail.
 
 It sets right = up × direction. Rows 0-2 hold right/up/direction as columns,
 row 3 holds the negated dot products with `from`, and a nonzero roll applies
-`MatrixMult(RotateZMatrix(-roll), view)`. The best candidate (scratch only)
-has the right length with about 103 of 744 bytes differing, all in
-scheduling of the column stores and the term order of the row-3 sums.
-Statement order, term order, `CrossProduct` helper forms and the Normalize
-shape have been tried; the remaining difference is not yet explained.
+`MatrixMult(RotateZMatrix(-roll), view)`. Camera slot 28 (`0x0042ee30`)
+calls it with the camera frame by value.
+
+The candidate in `samples/render/MatrixUtilNearMisses.cpp` has retail's
+length, frame, calls and x87 code (646/744). Required: the scale goes
+through a named `scale` local before the `0x005015b0` call (otherwise VC6
+stores the inverse square root straight into the argument slot), and the
+row-3 sums are the file's `DotProduct(v, from)` (`z + (x + y)` through
+`operator[]`). What remains is the interleaving of the integer moves that
+store the up and direction columns (and write the normalised direction
+back to its parameter) with the cross-product x87 code. Column, row and
+mixed store orders, member-store, float-local and d3dvec.inl
+`CrossProduct` forms, a separate direction local and const parameters do
+not reproduce it.
