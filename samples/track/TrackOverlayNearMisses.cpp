@@ -2,17 +2,10 @@
 // they match. See docs/TRACKOVERLAY.md. They compile against
 // src/reconstructed/TrackOverlay.h.
 //
-// RadarOverlay::UnknownVirtualSlot23 (0x0051bb60, 246 bytes, 89.69%): the
-// zoom keys. Both arms of the field_0x178 test are identical, so retail keeps
-// only a dead `test`; it schedules fld/fmul/fidiv before that test and VC6
-// here after it. A scale local, a ternary, assigning before the test and an
-// empty or return-only test do not reproduce it; nor do a float or double
-// scale local before an if/else, `radius / 180` in a local, an int zoom
-// copy, an inline UpdateMapScale(this) or MapScale(radius, zoom) helper, and
-// the zoom as a non-static or extern global (volatile is far off).
-
-// RadarOverlay::IntersectLineCircle (0x0051c4f0, 560 bytes, 64%): the
-// candidate is 550 bytes. The arithmetic and branch structure match; VC6
+// RadarOverlay::IntersectLineCircle (0x0051c4f0, 560 bytes, 334/520 masked):
+// the candidate is 552 bytes; `(ex * dx) + ey * dy` and the final
+// `... < (by * by) + bx * bx` (best of 3328 parenthesisations of the sums and
+// products) gain 13 bytes. The arithmetic and branch structure match; VC6
 // here assigns the scale, discriminant and intersection temporaries to
 // other frame slots (retail shares one slot for the scale and the
 // discriminant and reuses the parameter slots for the direction and x1/x2),
@@ -132,36 +125,6 @@ extern "C" __declspec(dllimport) int __stdcall DrawTextA(void* dc, const char* t
 static int s_UnknownGlobal57513c = 2;
 static int s_UnknownGlobal68a444;
 
-// 0x0051bb60: control 0x21 toggles the frame rate, 0x34 and 0x33 zoom.
-// Retail tests +0x178 before each scale update although both arms compute
-// the same value; the identical if/else keeps that test.
-int RadarOverlay::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry)
-{
-    if (UnknownFunction43caa0(0x21, 0, event, 0x80000000)) {
-        showFrameRate = 1 - showFrameRate;
-        return 1;
-    }
-    if (UnknownFunction43caa0(0x34, 0, event, 0x80000000)) {
-        if (++s_UnknownGlobal57513c > 5)
-            s_UnknownGlobal57513c = 5;
-        if (largeMap)
-            mapScale = mapRadius / 180.0f / s_UnknownGlobal57513c;
-        else
-            mapScale = mapRadius / 180.0f / s_UnknownGlobal57513c;
-        return 1;
-    }
-    if (UnknownFunction43caa0(0x33, 0, event, 0x80000000)) {
-        if (--s_UnknownGlobal57513c < 1)
-            s_UnknownGlobal57513c = 1;
-        if (largeMap)
-            mapScale = mapRadius / 180.0f / s_UnknownGlobal57513c;
-        else
-            mapScale = mapRadius / 180.0f / s_UnknownGlobal57513c;
-        return 1;
-    }
-    return 0;
-}
-
 // 0x0051c4f0
 int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const float* circle, float* a4, float* point)
 {
@@ -187,7 +150,7 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
     float disc = r * r * lengthSquared - cross * cross;
     if (disc < -1e-14f)
         return -1;
-    float proj = ex * dx + ey * dy;
+    float proj = (ex * dx) + ey * dy;
     if (disc < 1e-14f) {
         float k = proj / lengthSquared;
         point[0] = k * dx + px;
@@ -206,7 +169,7 @@ int RadarOverlay::IntersectLineCircle(const float* a, const float* b, const floa
     float ax = point[0] - x1;
     float by = point[1] - y2;
     float bx = point[0] - x2;
-    if (ax * ax + ay * ay < by * by + bx * bx) {
+    if (ax * ax + ay * ay < (by * by) + bx * bx) {
         point[0] = x1;
         point[1] = y1;
     } else {

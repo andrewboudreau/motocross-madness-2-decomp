@@ -83,7 +83,12 @@
 // locals), a plain struct instead of the union, projection pointers or
 // flattened indices (unchanged), and no uniform form gives retail's row 1.
 // The product as an inline helper (reference or pointer result, by-value
-// left operand, or returning the matrix) is not inlined by VC6.
+// left operand, or returning the matrix) is not inlined by VC6. Redundant
+// parentheses (docs/VC6_OPERAND_ORDER.md section 3): one bracketing for the
+// whole row gives 806; a different one per element of row 1 reaches 826
+// (_21..._23 retail's order, _24 still t1, t3, t2, t0 where retail sums t3,
+// t2, t1, t0, unchanged by its 264 orders); not kept, since nothing ties
+// those per-element forms to the source.
 //
 // DrawNormals (normals, 528 bytes) and DrawVertexCrosses
 // (vertex crosses, 512 bytes): both scale by function-local statics in

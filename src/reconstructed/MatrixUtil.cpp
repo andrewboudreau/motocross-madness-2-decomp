@@ -19,10 +19,12 @@ static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 float FastInvSqrt(float x);
 
 // Normalizes `v` in place; the zero vector stays zero. The squared length is
-// summed as z^2 + (x^2 + y^2): the natural x + y + z order swaps the x87
-// loads in 0x004a10e0 and 0x004a11e0.
+// summed as z^2 + ((x^2) + (y^2)): the natural x + y + z order swaps the x87
+// loads in 0x004a10e0 and 0x004a11e0, and 0x004a11e0's offset dot loads
+// `normal` first only with the inner squares parenthesised
+// (docs/VC6_OPERAND_ORDER.md section 3).
 inline void NormalizeVector(Vector3* v) {
-    float lengthSquared = v->z * v->z + (v->x * v->x + v->y * v->y);
+    float lengthSquared = v->z * v->z + ((v->x * v->x) + (v->y * v->y));
     if (lengthSquared == 0.0f) {
         *v = kVec3Zero;
     } else {
@@ -53,7 +55,21 @@ void UnknownFunction4a10e0(const Vector3* v, const Vector3* n, Vector3* out) {
     NormalizeVector(out);
 }
 
-// 0x004a11e0 (TriangleNormal) is a near miss: samples/render/MatrixUtilNearMisses.cpp.
+// 0x004a11e0: normal = normalize((b - a) x (c - a)); offset = -(normal . a).
+// c - a stays on the x87 stack while b - a is spilled; the cross product is
+// built by the Vector3 constructor with parenthesised products. Which
+// products carry the parentheses is a tie-break: every form with four
+// parenthesised products matches, three or five do not (probe of all 64
+// forms; docs/VC6_OPERAND_ORDER.md section 3).
+void TriangleNormal(const Vector3* a, const Vector3* b, const Vector3* c, Vector3* normal, float* offset) {
+    Vector3 e2 = *c - *a;
+    Vector3 e1 = *b - *a;
+    *normal = Vector3((e1.y * e2.z) - e1.z * e2.y, (e1.z * e2.x) - e1.x * e2.z, (e1.x * e2.y) - (e1.y * e2.x));
+    NormalizeVector(normal);
+    if (offset) {
+        *offset = -DotProduct(*normal, *a);
+    }
+}
 
 // 0x004a1300: the triangle's plane (normal, offset) from TriangleNormal, then
 // from + (to - from) * t with t = -(normal . from + offset) / (normal . direction).
@@ -102,6 +118,60 @@ Matrix4 ProjectionMatrix(float nearPlane, float farPlane, float fov, float aspec
     result.m[3][2] = -q * nearPlane;
     result.m[2][3] = 1.0f;
     return result;
+}
+
+// 0x0040ae30 (cdecl): out-of-line dot product.
+float UnknownFunction40ae30(const Vector3* a, const Vector3* b);
+// 0x005015b0 (cdecl): out-of-line v * scale.
+Vector3 UnknownFunction5015b0(const Vector3& v, float scale);
+
+// v scaled to unit length (unchanged when it already is) through the
+// out-of-line dot product and scale.
+static inline Vector3 NormalizeCall(const Vector3& v) {
+    float squared = UnknownFunction40ae30(&v, &v);
+    if (squared == 1.0f)
+        return v;
+    float scale = FastInvSqrt(squared);
+    return UnknownFunction5015b0(v, scale);
+}
+
+// Dot product through the members, summed as z + (x + (y)): ViewMatrix's
+// row-3 dots load y before x only with the y product parenthesised, and
+// the index-accessor DotProduct in that form breaks 0x004a1300
+// (docs/VC6_OPERAND_ORDER.md section 3).
+static inline float DotMembers(const Vector3& a, const Vector3& b) {
+    return a.z * b.z + (a.x * b.x + (a.y * b.y));
+}
+
+// 0x004a1500: rows 0-2 hold right = up x direction, the normalised up and
+// direction as columns, row 3 the negated dot products with `from`; a
+// nonzero roll then rotates the view about its z axis. The cross product is
+// stored member by member with both products of each component
+// parenthesised, which places retail's integer column copies between the
+// x87 instructions.
+Matrix4 ViewMatrix(Vector3 from, Vector3 direction, Vector3 up, float roll) {
+    Matrix4 view = IdentityMatrix();
+    up = NormalizeCall(up);
+    direction = NormalizeCall(direction);
+    Vector3 right;
+    right.x = (up.y * direction.z) - (up.z * direction.y);
+    right.y = (up.z * direction.x) - (up.x * direction.z);
+    right.z = (up.x * direction.y) - (up.y * direction.x);
+    view(0, 0) = right.x;
+    view(1, 0) = right.y;
+    view(2, 0) = right.z;
+    view(0, 1) = up.x;
+    view(1, 1) = up.y;
+    view(2, 1) = up.z;
+    view(0, 2) = direction.x;
+    view(1, 2) = direction.y;
+    view(2, 2) = direction.z;
+    view(3, 0) = -DotMembers(right, from);
+    view(3, 1) = -DotMembers(up, from);
+    view(3, 2) = -DotMembers(direction, from);
+    if (roll != 0.0f)
+        view = MatrixMult(RotateZMatrix(-roll), view);
+    return view;
 }
 
 // 0x004a17f0

@@ -42,7 +42,7 @@
 // 0x00417ed0 (6745 bytes with its jump table at 0x0041992c; the setup,
 // ret 0x24): every branch, all 166 calls in retail order, EH states 0..0x10
 // and the 0x4e8-byte frame with its buffers at retail's offsets
-// (0x0a8/0x1ac/0x2b0/0x3b4). 2800 of 6756 positions match; aligned
+// (0x0a8/0x1ac/0x2b0/0x3b4). 2804 of 6756 positions match; aligned
 // instruction ratio 0.990. What differs: retail spills z*z of each vector
 // length to a stack temporary (`fstp [t]; faddp; fadd [t]`, a shape found
 // nowhere else in the binary) and keeps the youind axis in the slot it
@@ -55,7 +55,9 @@
 // named result) put all three products first as retail does but keep the
 // third on the x87 stack (`fadd st(1); faddp st(2); fstp st(0)` or fxch
 // forms) instead of storing it; eight other spellings of the sum and a
-// by-value parameter give the candidate's two-then-one order.
+// by-value parameter give the candidate's two-then-one order. Of the 144
+// bracketings with redundant parentheses (docs/VC6_OPERAND_ORDER.md section
+// 3), `(x*x) + y*y + z*z` is best (+4 bytes) and none stores z*z.
 //
 // 0x00419970 (13428 bytes; the loader, ret 0x14): decoded completely (the
 // pro circuit branch, the network player and AI racers, the offline player,
@@ -471,7 +473,7 @@ public:
 // The length of `v` (1 without a square root for unit vectors); the setup
 // restores the lengths D3DRMVectorRotate's unit results lose.
 static inline float UnknownVectorLength(const Vector3& v) {
-    float lengthSquared = v.x * v.x + v.y * v.y + v.z * v.z;
+    float lengthSquared = (v.x * v.x) + v.y * v.y + v.z * v.z;
     if (lengthSquared == 1.0f)
         return 1.0f;
     return (float)sqrt(lengthSquared);

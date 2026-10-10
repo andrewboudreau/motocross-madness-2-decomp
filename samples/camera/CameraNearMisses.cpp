@@ -9,7 +9,10 @@
 // swapped parameter roles, pointer parameters and a cross written in the body
 // all leave four pairs wrong (or lose the forward pointer in esi).
 // By-value Cross parameters (either or both) and a by-value normalisation copy
-// the vectors (97..232/690).
+// the vectors (97..232/690). Redundant parentheses (docs/VC6_OPERAND_ORDER.md
+// section 3): the 64 product placements of Cross times five squared-length
+// forms, and times ten orders/forms of the (0, 1, 0) up assignment, all stay
+// at 659; no declaration count (k = 0..63) changes it.
 // Established: the direction through an inline difference passed straight to
 // the out-of-line-dot normalisation, the right vector's z + (x + y) squared
 // length and its scale through the 0x00404e60 constructor copy.

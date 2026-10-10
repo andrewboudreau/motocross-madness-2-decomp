@@ -262,6 +262,40 @@ FollowCamera slot 46 `0x004654e0`; Wrecker `0x00532580` gained 21 bytes.
   forms of the y and z terms; slot 35, same helper, is exact) and Wrecker
   `0x00532580` (16 forms applied to all three components).
 
+### 3.3 Search over the non-physics near misses
+
+Every render, track, camera, race, game, UI and net near miss whose
+difference is term order or instruction placement in arithmetic was
+recompiled over the parenthesisations of the differing expression (all
+bracketings, term orders and parenthesised products; coordinate descent
+where the product of the choices is large).
+
+- Exact: TriangleNormal `0x004a11e0` (the squared length in NormalizeVector
+  written `z*z + ((x*x) + (y*y))` makes the offset dot load `normal` first;
+  of the 64 placements in the constructor-built cross product, exactly those
+  with four parenthesised products match, so the count of nodes acts like
+  the arena tie-break), ViewMatrix `0x004a1500` (member-stored cross product
+  with both products of each component parenthesised places the integer
+  column copies, 646 -> 740; the row-3 dots then need `z + (x + (y))`) and
+  RadarOverlay slot 23 `0x0051bb60` (`(mapRadius / 180.0f) / zoom` moves the
+  fld/fmul/fidiv before a dead test: division nodes behave like products).
+- Improved: VehicleCamera `0x0052c030` 1221 -> 1233 (same NormalizeVector
+  form), `0x0052c510` 813 -> 817 (`(x*x) + y*y + z*z`), Track `0x00516ef0`
+  1023 -> 1032 (a doubly parenthesised factor `((b->x - a->x))` reorders one
+  of six inlined edges), TrackOverlay `0x0051c4f0` 321 -> 334 (masked),
+  Wrecker `0x00531740` 768 -> 772, BikeRace `0x00417ed0` 2800 -> 2804.
+- No change: Camera slot 29 `0x0042eb10`, MatrixUtil `0x004a1a50` (6208
+  forms), Wrecker `0x00531da0`, `0x00532580` and slot 10 `0x005306e0`,
+  FollowCamera `0x00465720` and `0x004650e0`, Griddraw `0x0047e600`,
+  EventManager `0x0045d480`, MorphBastardModifier `0x004a33b0` and
+  D3DIMSoulTree `0x00444140`. D3DIMSoulTree slot 12 `0x00443aa0` reaches
+  826/832 only with a different bracketing per matrix element.
+- Integer and address arithmetic never changed: Griddraw `0x00481300` and
+  `0x0047e430` (`a + (b + c)`, `(a + b) + c`, parenthesised terms),
+  PCTextureMap `0x004c8550` (the imul order, 432 forms) and D3DIMSoulTree
+  `0x00440d40` (`&p->groups[j]`, `p->groups + j`, `(p->groups) + j`). The
+  parenthesis node matters for the x87 expressions only.
+
 ## Reproduction
 
 Probes (compile with `tools/compile.py --compiler vc6`, disassemble the

@@ -45,7 +45,10 @@
 // tried: a row counter times 16, `(j << 4)`, an `int cell = i + j` local
 // (with `+=` of the table entry), unsigned counters, `(&children[j + i])[..]`,
 // `(children + table[quad])[i + j]`, a local copy of `children` and an inline
-// child-lookup helper taking the cell index; all keep VC6's form.
+// child-lookup helper taking the cell index; all keep VC6's form. Redundant
+// parentheses do not change it either (144 bracketings and orders of the
+// three terms, with the 0x0047e430 edge index's 8 forms), nor 0x0047e600's
+// extent/centre products (512 + 125 forms).
 //
 // DrawableGridNode 0x00482b40 (rectangle re-test, 327 bytes; 292 of 327):
 // retail computes zEnd before the start row and loads the row offset before

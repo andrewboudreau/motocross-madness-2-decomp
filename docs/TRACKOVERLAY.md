@@ -57,7 +57,10 @@ at lines 2284 and 2294).
 - DropTextOverlay: `0x0051ae80`..`0x0051b1f0`, 5 functions.
 - UnknownMessage and TextQueueOverlay: `0x0051b200`..`0x0051b670`, 11
   functions.
-- RadarOverlay: `0x0051b690`..`0x0051c460`, 11 functions.
+- RadarOverlay: `0x0051b690`..`0x0051c460`, 12 functions, among them the
+  zoom keys (slot 23, `0x0051bb60`): the dead `largeMap` test stays only with
+  the scale written `(mapRadius / 180.0f) / zoom`, which schedules the
+  fld/fmul/fidiv before it (docs/VC6_OPERAND_ORDER.md section 3).
 - The `$E` initializers and their stubs: `0x0051dba0`..`0x0051dcdc`, 8
   functions.
 - RadarOverlay's gate drawing `0x0051cb20` (the current and next gate as
@@ -99,9 +102,6 @@ These are in `samples/track/TrackOverlayNearMisses.cpp`, with notes:
   incremented count swap ebx and ebp.
 - `0x0051c4f0` (line/circle intersection, 560 bytes; candidate 550): frame
   slot assignment of the float temporaries differs.
-- `0x0051bb60` (RadarOverlay slot 23, the zoom keys, 89.69%): retail keeps a
-  dead `field_0x178` test. It schedules the fld/fmul/fidiv sequence before
-  that test; VC6 schedules it after.
 - `0x0051c720` (track outline, 1016 bytes; candidate 1002): walks the
   track graph (`Track.h`: TrackNode, TrackSegment, TrackListItem; the
   view's +0x48 is the Track) and draws each node's segment edge clipped to

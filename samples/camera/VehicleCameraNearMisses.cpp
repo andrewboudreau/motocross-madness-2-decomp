@@ -9,20 +9,22 @@
 // bool local, `return field_0x277 = false`, storing `force`/`enable` and an
 // early-return ordering all give the same code.
 //
-// VehicleCamera::UnknownVirtualSlot41 (0x0052c030, 1240 bytes, 1223/1240):
-// same length, frame, slots and blocks. Two differences: the slow-vehicle
-// branch's in-place normalisation multiplies x as `fld x; fmul st(1)` where
-// VC6 emits `fld st(0); fmul x` (the shared tail of the other branches has
-// VC6's form in retail too), and the no-vehicle branch stores y = 0 between
-// the x*x and z*z products where VC6 stores it after both. `*=`, `v = v * s`
-// and `v = s * v` forms and four squared-length associations do not move
-// either. The 0.18/0.82 weights are literals (their __real constants sit
+// VehicleCamera::UnknownVirtualSlot41 (0x0052c030, 1240 bytes, 1233/1240):
+// same length, frame, slots and blocks. The no-vehicle branch's y = 0 store
+// between the x*x and z*z products needs the squared length written
+// `z*z + ((x*x) + (y*y))` (docs/VC6_OPERAND_ORDER.md section 3). Left: the
+// slow-vehicle branch's in-place normalisation multiplies x as
+// `fld x; fmul st(1)` where VC6 emits `fld st(0); fmul x` (the shared tail of
+// the other branches has VC6's form in retail too). `*=`, `v = v * s`,
+// `v = s * v` and parenthesised products per component (125 forms), and seven
+// forms of the heading sum, do not move it. The 0.18/0.82 weights are literals (their __real constants sit
 // after the vtable, first used by this unit) and `y * 0.5 * 0.18` needs the
 // cast to stay two multiplies.
 //
-// VehicleCamera::UnknownVirtualSlot35 (0x0052c510, 1267 bytes, 813/1261):
-// frame (0x48) and slot assignment match retail. Left: the squared length
-// loads x*x before y*y in retail (here y*y first), and retail duplicates the
+// VehicleCamera::UnknownVirtualSlot35 (0x0052c510, 1267 bytes, 817/1261):
+// frame (0x48) and slot assignment match retail. The squared length loads
+// x*x first as in retail when written `(x*x) + y*y + z*z` (all 144
+// bracketings tried). Left: retail duplicates the
 // x scaling into both range branches (`fld x; fmul st(1)` after
 // distance * field_0x228, `fld st(0); fmul x` after the -0.25 range) where
 // VC6 here shares one block. Tried without effect: the four groupings of
@@ -96,7 +98,7 @@ static inline Vector3 Sub(const Vector3& a, const Vector3& b) {
 
 // Normalizes `v` in place; the zero vector stays zero.
 static inline void NormalizeVector(Vector3* v) {
-    float lengthSquared = v->z * v->z + (v->x * v->x + v->y * v->y);
+    float lengthSquared = v->z * v->z + ((v->x * v->x) + (v->y * v->y));
     if (lengthSquared == 0.0f) {
         *v = kVec3Zero;
     } else {
@@ -180,7 +182,7 @@ static inline float AngleWeight(float angle) {
 
 // |v|, exact when it is 1.
 static inline float Length(const Vector3& v) {
-    float squared = v.x * v.x + v.y * v.y + v.z * v.z;
+    float squared = (v.x * v.x) + v.y * v.y + v.z * v.z;
     if (squared == 1.0f)
         return 1.0f;
     return UnknownFunction460b50(squared);

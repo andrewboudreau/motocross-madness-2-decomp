@@ -15,10 +15,12 @@
 // `float d[2]` or 2-D struct for the projection and a constructor-built
 // 2-D delta are worse (202-232).
 //
-// Track::UnknownFunction516ef0 (0x00516ef0, 1042 bytes): 1042/1042 bytes,
-// 98.2%. Two of the six inlined edge tests evaluate the two factors of one
-// product in the other order (edge 2: retail computes b.x - a.x before
-// p.z - a.z; edge 6: p.x - a.x before b.z - a.z). The other four match.
+// Track::UnknownFunction516ef0 (0x00516ef0, 1042 bytes): 1032/1042. Edge 2
+// (retail computes b.x - a.x before p.z - a.z) matches with the first factor
+// written `((b->x - a->x))` (docs/VC6_OPERAND_ORDER.md section 3); edge 6
+// still evaluates p.x - a.x before b.z - a.z (retail the other way). All 256
+// combinations of factor/product parentheses, factor order and comparison
+// direction give 1032 at best; no declaration count (k = 0..63) changes it.
 // Factor and comparison order in the source do not move it. A macro over
 // plain floats is much further off, because VC6 then loads the segment
 // operands before p; the inline helper with a by-value TrackVec3 and
@@ -135,7 +137,7 @@ static inline int UnknownEdgeCrosses(TrackVec3 p, const TrackVec3* a, const Trac
 {
     return (a->x <= p.x || b->x <= p.x)
         && (p.z >= a->z && p.z < b->z || p.z >= b->z && p.z < a->z)
-        && ((b->x - a->x) * (p.z - a->z) <= (p.x - a->x) * (b->z - a->z)) == (p.z >= a->z);
+        && (((b->x - a->x)) * (p.z - a->z) <= (p.x - a->x) * (b->z - a->z)) == (p.z >= a->z);
 }
 
 // 0x00516ef0: whether p lies, in the horizontal plane, inside the strip

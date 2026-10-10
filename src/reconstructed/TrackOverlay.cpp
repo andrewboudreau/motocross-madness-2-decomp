@@ -1106,6 +1106,38 @@ int RadarOverlay::UnknownFunction51baf0(UnknownKrustyBikeView* view, int a2)
     return 1;
 }
 
+// 0x0051bb60: control 0x21 toggles the frame rate, 0x34 and 0x33 zoom.
+// Retail tests +0x178 before each scale update although both arms compute
+// the same value; the identical if/else keeps that test. The parenthesised
+// first quotient schedules fld/fmul/fidiv before that dead test, as retail
+// does (docs/VC6_OPERAND_ORDER.md section 3).
+int RadarOverlay::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry)
+{
+    if (UnknownFunction43caa0(0x21, 0, event, 0x80000000)) {
+        showFrameRate = 1 - showFrameRate;
+        return 1;
+    }
+    if (UnknownFunction43caa0(0x34, 0, event, 0x80000000)) {
+        if (++s_UnknownGlobal57513c > 5)
+            s_UnknownGlobal57513c = 5;
+        if (largeMap)
+            mapScale = (mapRadius / 180.0f) / s_UnknownGlobal57513c;
+        else
+            mapScale = (mapRadius / 180.0f) / s_UnknownGlobal57513c;
+        return 1;
+    }
+    if (UnknownFunction43caa0(0x33, 0, event, 0x80000000)) {
+        if (--s_UnknownGlobal57513c < 1)
+            s_UnknownGlobal57513c = 1;
+        if (largeMap)
+            mapScale = (mapRadius / 180.0f) / s_UnknownGlobal57513c;
+        else
+            mapScale = (mapRadius / 180.0f) / s_UnknownGlobal57513c;
+        return 1;
+    }
+    return 0;
+}
+
 // 0x0051bc60
 int RadarOverlay::DrawForViewMode()
 {

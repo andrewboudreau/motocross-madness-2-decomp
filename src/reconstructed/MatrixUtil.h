@@ -52,8 +52,7 @@ inline Vector3 operator*(float scale, const Vector3& v) {
 // result into `out`.
 void UnknownFunction4a10e0(const Vector3* v, const Vector3* n, Vector3* out);
 // 0x004a11e0: unit normal of the triangle a, b, c and, when `offset` is
-// given, the plane offset -(normal . a). Near miss (one store scheduled one
-// instruction apart): samples/render/MatrixUtilNearMisses.cpp.
+// given, the plane offset -(normal . a).
 void TriangleNormal(const Vector3* a, const Vector3* b, const Vector3* c, Vector3* normal, float* offset);
 // 0x004a1300: where the line through `from` and `to` meets the plane of the
 // triangle a, b, c.

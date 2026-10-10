@@ -55,7 +55,7 @@
 // differs (215/1306; retail keeps `push` nearest esp). A probe-count
 // accessor does not change the budget.
 //
-// UnknownFunction531740 (0x00531740, 1624 bytes; 768/1617): the contact
+// UnknownFunction531740 (0x00531740, 1624 bytes; 772/1617): the contact
 // particle spray. Frame 0xc4 and every call, operator and constant in
 // retail's order; three scratch vectors are reused across the body as
 // retail's slot sharing shows. Left: the slot order and `0.0f - scaled.z`
@@ -102,10 +102,12 @@ inline float WreckerSquareMagnitude(const Vector3& v) {
 }
 
 // The parenthesised first product puts each fsubp between the load and the store of the
-// previous component's copy, as retail does (docs/VC6_OPERAND_ORDER.md section 3).
+// previous component's copy, as retail does (docs/VC6_OPERAND_ORDER.md section 3); both
+// x products parenthesised gain 4 bytes in 0x00531740 (best of the 64 forms; 0x00531da0,
+// 0x00532580 and slot 10 score the same with every form).
 inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
     Vector3 r;
-    r.x = (a.y * b.z) - a.z * b.y;
+    r.x = (a.y * b.z) - (a.z * b.y);
     r.y = (a.z * b.x) - a.x * b.z;
     r.z = (a.x * b.y) - a.y * b.x;
     return r;
