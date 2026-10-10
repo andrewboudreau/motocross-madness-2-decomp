@@ -11,13 +11,6 @@
 // ((gx * 0xffff + x) << 16) - gz + z. Index expression forms, a split
 // declaration and seven spellings of the packed word leave both unchanged.
 //
-// UnknownFunction47e430 (0x0047e430, 156 bytes; 152 of 156): only the edge
-// address differs. Retail loads the row offset first (`mov edx,[ebp];
-// add edx,esi`); VC6 here starts from x (`mov edx,esi; add edx,[ebp]`).
-// Both operand orders, an index temporary, pointer arithmetic, inline
-// helpers, a const or unsigned table and a walking row pointer all give
-// VC6's order. 0x00482b40 has the same difference.
-//
 // DrawableGridNode 0x0047e600 (node loader, 1617 bytes; 1091 of 1630): the
 // stream reads, both allocations, the bit fields and the child creation
 // match. The 0x540 allocation is reached by a `goto` out of the header scan
@@ -49,10 +42,6 @@
 // parentheses do not change it either (144 bracketings and orders of the
 // three terms, with the 0x0047e430 edge index's 8 forms), nor 0x0047e600's
 // extent/centre products (512 + 125 forms).
-//
-// DrawableGridNode 0x00482b40 (rectangle re-test, 327 bytes; 292 of 327):
-// retail computes zEnd before the start row and loads the row offset before
-// x (see 0x0047e430).
 //
 // DrawableGridNode 0x00482dd0 (direction-bit update, 300 bytes; 147 of 333):
 // retail shares one copy of the "mark dirty and notify" tail between the
@@ -209,23 +198,6 @@ int GridVertexCache::GetVertex(int x, int z)
         count++;
     }
     return slots[i].index;
-}
-
-
-// 0x0047e430
-void UnknownFunction47e430(int half, int start, int step, int rowStep)
-{
-    int z = start;
-    int row = 0;
-    for (; z <= 16; z += rowStep, row++) {
-        int x;
-        if (start == 0)
-            x = (row & 1) ? 0 : half;
-        else
-            x = half;
-        for (; x <= 16; x += step)
-            UnknownFunction47e340(x, z, half, start, step, rowStep, &g_gridEdges[g_gridRow17[z] + x]);
-    }
 }
 
 
@@ -454,43 +426,6 @@ int DrawableGridNode::UnknownFunction481300(int x, int z, int size, int quad)
         }
     }
     return 1;
-}
-
-
-// 0x00482b40: 0x00482a40's test over one subdivision level of a
-// rectangle, skipping vertices pinned by a direction bit.
-void DrawableGridNode::UnknownFunction482b40(int x0, int z0, int w, int h, int half, int start,
-                                             int step, int rowStep)
-{
-    int row = 0;
-    int zEnd = z0 + h;
-    for (int z = z0 + start; z <= zEnd; z += rowStep, row++) {
-        int x;
-        if (start == 0)
-            x = (row & 1) ? 0 : half;
-        else
-            x = half;
-        for (x += x0; x <= x0 + w; x += step) {
-            int i = g_gridRow17[z] + x;
-            if (data->field_0x000[i] & 0xf)
-                continue;
-            if (!UnknownFunction481cc0(x, z)) {
-                data->field_0x000[i] |= 0x40;
-                if (data->field_0x000[i] & 0x80)
-                    continue;
-                data->field_0x000[i] |= 0x80;
-            } else {
-                data->field_0x000[i] &= ~0x40;
-                if (!(data->field_0x000[i] & 0x80))
-                    continue;
-                if (data->field_0x000[i] & 0x10)
-                    continue;
-                data->field_0x000[i] &= ~0x80;
-            }
-            data->b1 = 1;
-            UnknownFunction482c90(x, z, data->field_0x000[i] & 0x80);
-        }
-    }
 }
 
 

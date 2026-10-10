@@ -122,6 +122,24 @@ void UnknownFunction47e340(int x, int z, int h, int v, int maskX, int maskZ, Gri
     }
 }
 
+// 0x0047e430: one subdivision level of the edge table. Retail loads the row
+// offset before x (`mov edx, [ebp]; add edx, esi`), which only a copy of x as
+// the inner loop variable reproduces.
+void UnknownFunction47e430(int half, int start, int step, int rowStep)
+{
+    int z = start;
+    int row = 0;
+    for (; z <= 16; z += rowStep, row++) {
+        int x;
+        if (start == 0)
+            x = (row & 1) ? 0 : half;
+        else
+            x = half;
+        for (int n = x; n <= 16; n += step)
+            UnknownFunction47e340(n, z, half, start, step, rowStep, &g_gridEdges[g_gridRow17[z] + n]);
+    }
+}
+
 // 0x0047e4d0
 static void UnknownFunction47e4d0()
 {
@@ -1058,6 +1076,46 @@ void DrawableGridNode::UnknownFunction482ae0()
         step <<= 1;
     }
     UnknownFunction482b40(0, 0, 16, 16, 0, 0, 16, 16);
+}
+
+// 0x00482b40: 0x00482a40's test over one subdivision level of a
+// rectangle, skipping vertices pinned by a direction bit. Retail loads the
+// row offset before x, which the row pointer and the inner loop's own copy
+// of x reproduce.
+void DrawableGridNode::UnknownFunction482b40(int x0, int z0, int w, int h, int half, int start,
+                                             int step, int rowStep)
+{
+    int row = 0;
+    int z = z0 + start;
+    int zEnd = z0 + h;
+    for (; z <= zEnd; z += rowStep, row++) {
+        int x;
+        if (start == 0)
+            x = (row & 1) ? 0 : half;
+        else
+            x = half;
+        int* r = &g_gridRow17[z];
+        for (int n = x0 + x; n <= x0 + w; n += step) {
+            int i = *r + n;
+            if (data->field_0x000[i] & 0xf)
+                continue;
+            if (!UnknownFunction481cc0(n, z)) {
+                data->field_0x000[i] |= 0x40;
+                if (data->field_0x000[i] & 0x80)
+                    continue;
+                data->field_0x000[i] |= 0x80;
+            } else {
+                data->field_0x000[i] &= ~0x40;
+                if (!(data->field_0x000[i] & 0x80))
+                    continue;
+                if (data->field_0x000[i] & 0x10)
+                    continue;
+                data->field_0x000[i] &= ~0x80;
+            }
+            data->b1 = 1;
+            UnknownFunction482c90(n, z, data->field_0x000[i] & 0x80);
+        }
+    }
 }
 
 // 0x00482c90: passes a vertex change on to the two vertices it depends on;

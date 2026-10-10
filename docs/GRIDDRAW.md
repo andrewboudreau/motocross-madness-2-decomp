@@ -141,11 +141,9 @@ See the notes at the top of `samples/render/GriddrawNearMisses.cpp`:
 | Function | Bytes | What differs |
 |---|---:|---|
 | `GridVertexCache::GetVertex` `0x0047de90` | 1069/1187 | x/z/index register assignment; the packed-word expression |
-| `0x0047e430` | 152/156 | row offset vs x operand order of the edge index |
 | `0x0047e600` (node loader) | 1605/1617 | x87 operand order of the extent.x/extent.y products (the 0.1 test reads the extent through a reference) |
 | `0x00480ad0` (block draw) | 395/438 | the zero offset kept in eax for compares; esi/edi swapped |
 | `0x00481300` (block walk) | 114/216 | child index term order |
-| `0x00482b40` (rectangle re-test) | 292/327 | as `0x0047e430`, plus the zEnd/start order |
 | `0x00482dd0` (direction bit) | 147/333 | the shared notify tail and the early-return placement |
 | `0x0047f210` (per-block rebuild) | 426/1586 | x/count-copy registers, frame slots, minY/maxY load order |
 | `0x00481b30` (block distance) | 139/393 | which floats stay on the x87 stack |

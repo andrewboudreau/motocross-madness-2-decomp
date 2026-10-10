@@ -373,6 +373,16 @@ python3 tools/decl_shift_scan.py samples/render/MatrixUtilNearMisses.cpp \
   three-term chains of leaf products; longer chains and mixed chains were
   not.
 
+## Integer index order in strength-reduced loops (Griddraw 0x0047e430, 0x00482b40)
+
+`g_gridEdges[g_gridRow17[z] + x]` with `x` the inner loop variable compiles to
+`mov edx, esi; add edx, [ebp]` (x first), retail's `mov edx, [ebp]; add edx, esi`
+(row offset first) needs the inner loop to run on a copy of the starting x
+(`for (int n = x; n <= 16; n += step)`). In `0x00482b40` the row also goes
+through a pointer (`int* r = &g_gridRow17[z]; i = *r + n`) and `z` is
+initialised before `zEnd` (the scheduler then emits `zEnd` first). Worth
+trying on other `[base+index]` / `add r, r` order near misses.
+
 ## Control-flow source shapes (measured while matching PCAudio, Net, Pixtrans and BackgroundImage)
 
 - Retail's unrotated loop exit (`jge exit; jmp top`, with the return block between the

@@ -397,8 +397,7 @@ extern GridEdge g_gridEdges[17 * 17];                   // 0x006754e0
 
 // 0x0047e340: fills the neighbours of (x, z) for one subdivision step.
 void UnknownFunction47e340(int x, int z, int h, int v, int maskX, int maskZ, GridEdge* out);
-// 0x0047e430: one subdivision level of the edge table (near miss, see
-// samples/render/GriddrawNearMisses.cpp).
+// 0x0047e430: one subdivision level of the edge table.
 void UnknownFunction47e430(int half, int start, int step, int rowStep);
 
 // One cached vertex (32 bytes; tier 2 from 0x0047de90's stores).
