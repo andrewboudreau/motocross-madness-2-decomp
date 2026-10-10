@@ -106,7 +106,7 @@
   "?FindMotion@KbA5C4@@QAEPAUKbAnim@@PBDH@Z": "0x004a6b30",
   "?FindNearestRival@KrustyBike@@QAEPAV1@PAM@Z": "0x0048e190",
   "?Fn_004079C0@KbBikeLoader@@QAEPAVGameObject@@HHPBDPBUSoultreeLoadDesc@@HHUVec3@@22HPAUVehicleInputMap@@HHHPAXHHHMMMMMMHHHH444HMH@Z": "0x004079c0",
-  "?Fn_00413200@KrustyBike@@QAEXM@Z": "0x00413200",
+  "?Fn_00413200@KrustyBike@@QAEHM@Z": "0x00413200",
   "?Fn_00414370@KrustyBike@@QAEHM@Z": "0x00414370",
   "?Fn_00435fe0@CollisionObject@@QAEXXZ": "0x00435fe0",
   "?Fn_00444D80@KbXform@@QAEXPAUKbObj128@@@Z": "0x00444d80",

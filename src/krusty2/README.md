@@ -39,7 +39,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `contact/` | `ContactImpulse.h`, `ObjectPlacement.h` (shared contact layouts); `ObjectPlacement.cpp`: 8 strict cases |
 | `soultree/` | `SoulTreePhysics.cpp` and the SoultreePhysicsBaseObject/Character/Object headers: 46 strict cases of 52; `SoultreeQuadTreeRenderer.cpp`: 9 strict cases; `soultree.cpp` (SoultreeObject): 56 strict cases |
 | `gravity/` | `SelectiveGravityModel.cpp`: 15 strict cases |
-| `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (43 strict cases of 55) and `BikeAI.cpp` (23 strict cases), `Vehicle.h`, `Bike.h` |
+| `vehicle/` | `Vehicle.cpp` (65 strict cases of 81 registered), `Bike.cpp` (43 strict cases of 55), `BikeAI.cpp` (23 strict cases) and `KrustyBike.cpp` (70 strict cases; its 11 partials are in `samples/physics/krustybike/KrustyBikeNearMisses.cpp`), `Vehicle.h`, `Bike.h`, `KrustyBike.h`, `KrustyBikeTypes.h` |
 | `broadphase/` | `Quadtree.cpp`/`.h` (24 strict cases of 27), `Terrain.cpp`/`.h` (21 strict cases of 24) |
 | `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 36 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
@@ -47,7 +47,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `shadow/` | D3DIMSoultreeShadow: 17 strict cases; other shadow candidates in samples |
 | `visibility/` | VisibilityQuadTree: 39 strict cases; partial traversal in samples |
 
-Every `exact` target under `src/krusty2` is strict exact (595 of 651 targets; the rest are
+Every `exact` target under `src/krusty2` is strict exact (682 of 738 targets; the rest are
 `partial`). The reviewed slices and their exact reproduction commands are in [PHYSICS_VALIDATION.md](../../docs/PHYSICS_VALIDATION.md).
 SelectiveGravityModel.cpp (0x4f9760..0x4f9a59) is promoted on its own. The Shock
 family (0x4f9a60..0x4fb1d7) builds a second set of the Math3D.h constant vectors
@@ -97,6 +97,24 @@ The physics runner adds `src/krusty2` to the include path.
   `TerrainComObject`, `TerrainOwned` and others) are provisional stand-ins with tier 3 names.
   `TerrainVec3` stays separate from the shared Vec3 because including `Math3D.h` would add
   static initializers that Terrain.cpp does not have.
+
+## Evidence: KrustyBike.cpp
+
+- Name: `D:\aardvark\VC\krusty2\KrustyBike.cpp`, string at 0x0056d3ac (tier 1), with debug
+  allocations and deletes in the loader 0x0048fc80, the destructor 0x00491540, 0x00495ff0 and
+  slot 49 0x00496790.
+- Code bracket: after `Krusty3DObjects.cpp` (unit ends 0x0048d77c) and before KrustyBikeCamera
+  (0x00497cb0, its own unit with the `.CRT$XCU` 159-162 vector set; name ours). KrustyBike.cpp's
+  own xrefs span 0x0048fe58..0x00496b19.
+- Every promoted function is a KrustyBike method, a TU-local helper or the unit's `.CRT$XCU`
+  155-158 vector set (0x00491190, read by the constructor and 0x00492670); the two vtordisp
+  thunks 0x00497c30/0x00497ca0 close the unit. The RTTI tables (+0 0x00554548, +540
+  0x00554514, +5644 0x005544a4) name the class.
+- Two KrustyBike members, 0x00413200 and 0x00414370, were emitted in BikeAI.cpp's code; their
+  near-miss reconstructions are in `samples/physics/bikeai/BikeAINearMisses.cpp`.
+- `samples/physics/krustybike/KrustyBikeNearMisses.cpp` includes the canonical file and holds
+  the 11 partial targets (constructor, slots 11/14/70/101 and helpers, the network encoders
+  0x00492ad0/0x00493660, 0x00495ff0 and 0x0048e280).
 
 ## Evidence: CollisionObject.cpp, Vehicle.cpp, Bike.cpp, SoulTreePhysics.cpp (wave 6)
 

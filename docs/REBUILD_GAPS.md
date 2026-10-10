@@ -28,26 +28,26 @@ extent (1,253,440 bytes); everything after it is library or compiler tail.
 
 | Category | Bytes | % `.text` | % game code | Count | Evidence |
 |---|---:|---:|---:|---:|---|
-| `exact_src`: strict VC6 match, source under `src/` | 651,747 | 47.62 | 52.00 | 3,430 | 1: rerun verdicts, relocations resolved |
-| `exact_samples`: strict match, source only under `samples/` | 51,969 | 3.80 | 4.15 | 428 | 1 (not canonical source) |
+| `exact_src`: strict VC6 match, source under `src/` | 672,342 | 49.13 | 53.64 | 3,500 | 1: rerun verdicts, relocations resolved |
+| `exact_samples`: strict match, source only under `samples/` | 31,374 | 2.29 | 2.50 | 358 | 1 (not canonical source) |
 | `library_crt_atlas`: LIBCMT bodies | 77,929 | 5.69 | - | 443 | 1 masked match, [VC6_CRT_ATLAS](VC6_CRT_ATLAS.md) |
 | `library_import_thunk`: `jmp [IAT]` | 198 | 0.01 | - | 33 | 1 decoded IAT target |
 | `library_data`: DINPUT.LIB tables | 4,912 | 0.36 | - | 3 | 1 byte match against VC6 `DINPUT.LIB` |
 | `compiler_eh_text_x`: `$ehhandler` stubs + unwind funclets | 23,502 | 1.72 | - | 394 | 1 decoded `mov eax, FuncInfo; jmp ___CxxFrameHandler` |
 | `inline_asm_excluded` | 40,324 | 2.95 | 3.22 | 31 | 1 instruction (`fistp`/`rdtsc`/`fs:[4]`); 3 for the 4 docs-only rows |
-| `near_miss`: registered partials / near misses | 420,465 | 30.72 | 33.54 | 351 | 1 verdict; extent 2 where padding-delimited |
+| `near_miss`: registered partials / near misses | 429,379 | 31.38 | 34.26 | 353 | 1 verdict; extent 2 where padding-delimited |
 | `library_span_unlabeled`: LIBCMT span gaps | 5,813 | 0.42 | - | - | 2 |
 | `library_unknown`: after LIBCMT, before the EH tail | 2,722 | 0.20 | - | - | 3 |
 | `padding`: int3/nop alignment | 31,396 | 2.29 | 2.50 | - | 2 decoder rule |
-| `unattributed` | 57,541 | 4.20 | 4.59 | 52 | - |
+| `unattributed` | 48,627 | 3.55 | 3.88 | 50 | - |
 
 Counts are unique registered start addresses (by the category of their first
 byte); for libraries they are objects/thunks/stubs, for `unattributed` the
 padding-delimited ranges.
 
-Headline: **56.1% of game-code bytes (703,716) are strict exact**, 7.4% of it
-(51,969 bytes) only from `samples/`. 33.5% is registered but not exact, 3.2%
-needs inline assembly and 4.6% has no registration at all. No game function is
+Headline: **56.1% of game-code bytes (703,716) are strict exact**, 4.5% of it
+(31,374 bytes) only from `samples/`. 34.3% is registered but not exact, 3.2%
+needs inline assembly and 3.9% has no registration at all. No game function is
 a complete original translation unit yet, and nothing has been linked.
 
 Verdicts were rerun for this snapshot:
@@ -107,14 +107,12 @@ map; it is rebuilt by compiling the owning game functions, not separately.
 
 ### Unattributed ranges over 16 bytes
 
-44 ranges, 57,514 bytes (the other 8 ranges total 27 bytes).
+42 ranges, 48,600 bytes (the other 8 ranges total 27 bytes).
 
 | Range | Bytes | Nearest `__FILE__` xref |
 |---|---:|---|
 | `0x00405c4a..0x00405cca` | 128 | BackgroundImage.cpp (-0x1afa) |
 | `0x00407417..0x0040743c` | 37 | Bike.cpp (+0x823) |
-| `0x00413200..0x00414210` | 4112 | BikeAI.cpp (+0x1647) |
-| `0x00414370..0x00415632` | 4802 | BikeAI.cpp (+0x4d7) |
 | `0x00424730..0x00424aab` | 891 | bmpfile.cpp (-0x154) |
 | `0x00424ab0..0x004253ac` | 2300 | bmpfile.cpp (-0x4d4) |
 | `0x00425900..0x004269da` | 4314 | bmpfile.cpp (-0x1324) |
@@ -215,7 +213,7 @@ xrefs, else the name match.
 | 38 | `GUIManager.cpp` | `0x00485430..0x00487f34` (xref) | 16 | src | `reconstructed/GUIManager.cpp` |
 | 39 | `InGameProcs.cpp` | `0x00488928..0x00488929` (xref) | 1 | src | `reconstructed/InGameProcs.cpp` |
 | 40 | `Krusty3DObjects.cpp` | `0x0048a5b0..0x0048d77c` (doc) | 10 | src | `reconstructed/Krusty3DObjects.cpp` |
-| 41 | `KrustyBike.cpp` | `0x0048fe58..0x00496b19` (xref) | 15 | samples only | `samples/physics/krustybike/KrustyBike.cpp` |
+| 41 | `KrustyBike.cpp` | `0x0048fe58..0x00496b19` (xref) | 15 | src | `krusty2/vehicle/KrustyBike.cpp` |
 | 42 | `krustyui.cpp` | `0x00498a03..0x0049bb94` (xref) | 53 | src | `reconstructed/KrustyUI.cpp` |
 | 43 | `LightEmitter.cpp` | `0x0049e276..0x0049e4fd` (xref) | 4 | src | `reconstructed/LightEmitter.cpp` |
 | 44 | `Lzw.cpp` | `0x004a0371..0x004a03ad` (xref) | 2 | src | `reconstructed/Lzw.cpp` |
@@ -283,9 +281,9 @@ xrefs, else the name match.
 | 106 | `VisibilityQuadTree.cpp` | `0x0052d4c9..0x0052d4ca` (xref) | 1 | src | `krusty2/visibility/VisibilityQuadTree.cpp` |
 | 107 | `wrecker.cpp` | `0x005300f8..0x0053297d` (xref) | 14 | src | `reconstructed/Wrecker.cpp` |
 
-Totals: **101 units `src`, 6 `samples only`** (CollisionCharacter,
+Totals: **102 units `src`, 5 `samples only`** (CollisionCharacter,
 CollisionPoint, ConstraintMethodCollisionModel, D3DIMSoultreeMotnctrl,
-KrustyBike, ProjectedShadow), **none without any reconstruction**. That only
+ProjectedShadow), **none without any reconstruction**. That only
 says some function is reconstructed; per-unit byte coverage is in the report
 (`registered_bytes_in_extent`).
 
@@ -320,14 +318,14 @@ of the 252 RTTI type descriptors, `GR_PixelString`, `GroundFogableObject` and
 
 | C++ definition | Classes |
 |---|---:|
-| `class`/`struct` body under `src/` | 228 |
+| `class`/`struct` body under `src/` | 229 |
 | under `src/` with a stand-in name (`PCVideoCard`, RTTI noted in `Display.h`) | 1 |
-| only under `samples/` | 15 |
+| only under `samples/` | 14 |
 | CRT (`type_info`, `exception`, `bad_cast`, `bad_typeid`, `__non_rtti_object`; all slots in LIBCMT) | 5 |
 | nowhere | 0 |
 
 Samples-only: CollisionCharacter, ConstraintMethodCollisionModel,
-DirtChunk/DirtSpray/Dust/Spark/SteamParticleEmitter, InlineShock, KrustyBike,
+DirtChunk/DirtSpray/Dust/Spark/SteamParticleEmitter, InlineShock,
 PhysicsBody, PhysicsRigidBody, RotatingShock, Shock, TerrainShadow, Tire.
 
 A slot counts as reconstructed when its function start is strict exact (CRT

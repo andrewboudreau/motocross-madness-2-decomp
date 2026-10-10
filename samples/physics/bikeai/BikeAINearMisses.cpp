@@ -62,21 +62,15 @@
 // 0x00413160 (Vec3::operator-=, 33 bytes) is the out-of-line COMDAT that VC6 emits
 // right after 0x0040eca0 for its epilogue; this file reproduces it strict exact.
 #include "../../../src/krusty2/vehicle/BikeAI.cpp"
+#include "vehicle/KrustyBike.h"
 #include "collision/CollisionObject.h"
 #include "broadphase/Quadtree.h"
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
-// AI racing line: up to 200 points.  Offsets tier 1 (0x0040e510), names tier 3.
-struct UnknownBikeAIPath {
-    int count;          // +0x000
-    int index;          // +0x004 current segment
-    float t;            // +0x008 parameter along the current segment
-    Vec3 points[200];   // +0x00c
-    float field_0x96c;  // +0x96c takeoff speed written by 0x0040d200 (fstp, clamped to >= 40.0f)
-    float field_0x970;  // +0x970 read by 0x0040eca0 (1.5f when there is no path)
-    float lookAhead;    // +0x974
-};
+// The AI racing line UnknownBikeAIPath is declared in vehicle/KrustyBikeTypes.h
+// (KrustyBike+0x838 holds one).
 
 // View of the game object at 0x0056e26c (TrackGame in src/reconstructed): the object tree
 // root, the race kind and the +0x2d80 flag are read here.
@@ -96,7 +90,8 @@ extern UnknownBikeAIGameView* g_BikeAIGame_0056e26c;
 int UnknownFunction47b800(float ax, float az, float dax, float daz, float bx, float bz,
                           float dbx, float dbz, float* s, float* u);
 
-// Inline length helper: same body as the out-of-line 0x00413190 (inlined in 0x0040e510).
+// Inline length helper: same body as the out-of-line 0x00413190 (inlined in 0x0040e510
+// and 0x00413200).
 inline float BikeAILength(const Vec3& v)
 {
     float lenSq = (v.x * v.x + v.y * v.y) + v.z * v.z;
@@ -1343,5 +1338,653 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
         *frontSusp = frontS;
     if (rearSusp)
         *rearSusp = rearS;
+    return 1;
+}
+
+
+// ---------------------------------------------------------------------------
+// KrustyBike methods emitted in BikeAI.cpp: 0x00413200 and 0x00414370.
+// ---------------------------------------------------------------------------
+// Both are KrustyBike members (thiscall, ret 4, `this` in esi; KrustyBike.cpp's slot 49
+// 0x00496c27 and slot 63 0x004924c0 call them) that the linker placed inside BikeAI.cpp's
+// code: 0x00413200 reads and writes BikeAI's file-static filter 0x00577ac0, 0x00414370 holds
+// BikeAI.cpp's own __FILE__ xrefs (0x00414847, 0x0041486f), and they bracket the unit's
+// Math3D vector set 0x00414210.  The class layout is src/krusty2/vehicle/KrustyBike.h
+// (aiPath at +0x838 and the AI fields +0x7e0..+0x834, +0x11b0, +0x11b4 are typed there).
+//
+// 0x00413200 (4112 bytes): every call, constant, branch and the instruction count (1120)
+// match.  Differences: (1) stack slots; the 0x74 frame is reached with two of slot 11's three
+// out-vectors at function scope, but VC6 places them above the steering vector where
+// retail has them in the middle of the frame (659 of 4122 strict bytes); with all three
+// in the hit block the frame is 0x5c, all three at function scope 0x80; (2) operand order
+// in the angular-velocity block: retail loads the forward vector's components first in
+// CrossProduct(forward, up) and mixes the order in CrossProduct(w, forward) (the leaf-age
+// rule of docs/VC6_OPERAND_ORDER.md; pointer locals for forward/up/w fixed half of it);
+// (3) the ground-branch lean clamp: retail stores the lean and reloads it for the -1 test,
+// the candidate keeps it on the FPU stack (a reference clamp helper does not change it).
+// Shapes that mattered: the gearbox timer as an inline taking dt (fld dt; fsubr), the
+// filter step as `step = tc; if (dt < step) step = dt` (tc loaded first),
+// VehicleSpeedState::Method_004D2F50's third parameter as bool (retail pushes eax unmasked),
+// the x/y-grouped dot product, dot(normal, forward) in both AI branches, and
+// `(controlInput.y + 1) + 1` through a named temporary (one expression folds to + 2.0).
+//
+// 0x00414370 (4802 bytes): block order, calls and constants match (1279 vs 1302
+// instructions).  Retail's race-kind test lays out the default (free-roam) block first,
+// then kinds 1/5, then 2/3, which the nested `kind != 3 && kind != 2` form reproduces (a
+// switch builds a jump table).  Differences: frame 0x74 vs 0x78 (retail keeps the
+// difficulty in a stack slot, which the uninitialised trick delay of the other kinds
+// shares; the candidate gives it edi); in the kind 1/5 branch retail emits the gate
+// distance test right after the track loop and jumps back to it from the single-point and
+// no-track paths (the candidate places it after them); the random free-roam target scales
+// through a stored temporary.  The trick search needs the `for` form (a do/while is
+// rotated with the first division folded to * 0.2).
+// 0x00572988: look-ahead distance of the race-kind 2/3 path samples (100.0f).
+extern float g_BikeAILookAhead_00572988;
+
+// 0x00566f74: target speed along the racing line, 200 entries per AI class (KrustyBike+0x79c).
+extern float g_BikeAISpeedTable_00566f74[][200];
+
+// One step of the filter at 0x00577ac0 towards `target`; returns the new value.
+inline float BikeAIFilterStep(UnknownBikeAIFilter* f, float dt, float target)
+{
+    float step = f->timeConstant;
+    if (dt < step)
+        step = dt;
+    f->alpha = step / f->timeConstant;
+    f->value = (target - f->value) * f->alpha + f->value;
+    return f->value;
+}
+
+// The same step on a Vehicle smoother (Vehicle.cpp's VehSmooth).
+inline void BikeAISmooth(VehicleSmoother* s, float dt, float target)
+{
+    float step = dt;
+    if (!(step < s->timeConstant))
+        step = s->timeConstant;
+    s->blendFactor = step / s->timeConstant;
+    s->smoothedValue = (target - s->smoothedValue) * s->blendFactor + s->smoothedValue;
+}
+
+// Dot product with the x/y pair grouped (retail sums y*y' + x*x' first, then z*z').
+inline float BikeAIDot(const Vec3& a, const Vec3& b)
+{
+    return (a.x * b.x + a.y * b.y) + a.z * b.z;
+}
+
+// Counts the gearbox's shift timer down by dt, stopping at zero.
+inline void BikeAITickGearTimer(VehicleSpeedState* ss, float dt)
+{
+    if (ss->gearTimer != 0.0f) {
+        ss->gearTimer -= dt;
+        if (ss->gearTimer < 0.0f)
+            ss->gearTimer = 0.0f;
+    }
+}
+
+// Clamps v to [-1, 1] in place.
+inline void BikeAIClampUnit(float& v)
+{
+    if (v > 1.0f)
+        v = 1.0f;
+    else if (v < -1.0f)
+        v = -1.0f;
+}
+
+#define BIKEAI_ABS(x) ((x) < 0.0f ? -(x) : (x))
+
+// 0x00413200, 4112 bytes (ret 4): KrustyBike's AI physics step, run by slot 49 instead of
+// the Vehicle step while the race context's +0x18a flag is set.  Steering comes from the
+// controls (player) or from the landing prediction and the racing line (AI, +0x734); the
+// bike is then advanced by the look-ahead model 0x0040eca0 as two wheel points, and the
+// angular velocity, speed, suspension, wheel roll, crash test and orientation are derived
+// from the result.  Names tier 3.
+int KrustyBike::Fn_00413200(float dt)
+{
+    Vec3 a, c;
+    float impact = 0.0f;
+    justReset = 0;
+    frameTime = dt;
+    stepTime = dt;
+    invStepTime = 1.0f / dt;
+    int steps = 1;
+    UnknownVirtualSlot30();
+    UnknownVirtualSlot64(dt);
+    pointsTouching = 0;
+    int hit = UnknownVirtualSlot39(dt);
+    justLanded = 0;
+    BikeAITickGearTimer(engineState, stepTime);
+    if (!field_0x7a4)
+        field_0x478 = crashState == 0 && UnknownVirtualSlot80() && field_0x740->field_0x18a;
+    else
+        field_0x478 = 0;
+    field_0x479 = crashState == 0 && UnknownVirtualSlot81();
+    engineState->Method_004D2F50(stepTime, field_0x478, field_0x479);
+    engineState->Method_004D3030(field_0x478, linearSpeed);
+    if (hit) {
+        Vec3 b;
+        int dummy = 0;
+        UnknownVirtualSlot11(hit, &a, &b, &c, &dummy);
+        UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, UnknownVirtualSlot32());
+        steps = 0;
+        stepRemainder = 0.0f;
+    } else {
+        PlaceWheels();
+        if (spawnProtectTimer > 0.0f) {
+            spawnProtectTimer -= stepTime;
+            if (spawnProtectTimer <= 0.0f)
+                UnknownVirtualSlot50(0, 0, 0);
+        }
+    }
+    UnknownVirtualSlot26();
+
+    Vec3 steer;
+    float lean;
+    if (!field_0x734) {
+        steer.x = controlInput.x;
+        steer.y = controlInput.y;
+        if (UnknownVirtualSlot80())
+            steer.z = 1.0f;
+        else if (UpdateWheelRampLevels())
+            steer.z = -1.0f;
+        else
+            steer.z = 0.0f;
+    } else {
+        field_0x828.x = 0.0f;
+        field_0x828.y = 1.0f;
+        field_0x828.z = 0.0f;
+        steer = Vec3(0.0f, 0.0f, 0.0f);
+        if (airborne) {
+            PredictLanding(position, velocity, &field_0x834, 0, &field_0x828, (Terrain*)terrain);
+            float pitch = BikeAIDot(field_0x828, bodyForward) - 0.087f;
+            if (field_0x834 > 0.0f)
+                steer.y = pitch * 3.5f / field_0x834;
+            else
+                steer.y = pitch;
+            if (pitch > 0.0f)
+                lean = BikeAIFilterStep(&g_BikeAIFilter_00577ac0, dt, 1.0f);
+            else
+                lean = BikeAIFilterStep(&g_BikeAIFilter_00577ac0, dt, -1.0f);
+            BikeAIClampUnit(lean);
+        } else {
+            float pitch = BikeAIDot(field_0x828, bodyForward);
+            if (BIKEAI_ABS(pitch) < 0.3f)
+                pitch = 0.0f;
+            pitch *= 4.0f;
+            if (BIKEAI_ABS(-pitch) > 0.1f) {
+                if (pitch > 0.0f)
+                    lean = 0.1f;
+                else
+                    lean = -0.1f;
+            } else {
+                lean = pitch;
+                BikeAIClampUnit(lean);
+            }
+        }
+        float speedGap = aiPath.field_0x96c - linearSpeed;
+        if (!airborne && speedGap > 0.0f) {
+            field_0x804 = 1.0f;
+            field_0x808 = 0.0f;
+            field_0x478 = 1;
+        } else {
+            field_0x804 = 0.0f;
+            if (speedGap < -20.0f)
+                field_0x808 = 1.0f;
+            else
+                field_0x808 = 0.0f;
+            field_0x478 = 0;
+        }
+    }
+    if (BIKEAI_ABS(position.y) > 10000.0f)
+        position.y = 0.0f;
+
+    Vec3 start = position;
+    Vec3* fwd = &bodyForward;
+    Vec3* up = &bodyUp;
+    worldAngularVelocity = *fwd * angularVelocity.z + *up * angularVelocity.y
+                           - CrossProduct(*fwd, *up) * angularVelocity.x;
+    Vec3* w = &worldAngularVelocity;
+    field_0x7e0 = CrossProduct(*w, *fwd) * 3.5f + velocity;
+    field_0x7ec = velocity - CrossProduct(*w, *fwd) * 3.5f;
+    char airborneOut = airborne;
+    UnknownFunction40eca0(&steer, &field_0x7e0, &field_0x7ec, &velocity, 0, &position,
+                          &bodyForward, &bodyUp, dt, dt, field_0x740->field_0x4c, &airborneOut,
+                          &impact, field_0x15e0, &field_0x7f8, &field_0x7fc,
+                          &frontWheel->inContact, &rearWheel->inContact, &aiPath,
+                          g_BikeAISpeedTable_00566f74[field_0x79c], field_0x824, field_0x11b0);
+    worldAngularVelocity = -CrossProduct(field_0x7e0 - velocity, bodyForward) * 0.2857f;
+    angularVelocity = modelNode->WorldToLocalDirection(worldAngularVelocity);
+    linearSpeed = BikeAILength(velocity);
+    turnRate = 0.0f;
+
+    float travel = -field_0x7f8;
+    frontWheel->w_0x2b0->ClampAndStepAlong(travel, 0, frontWheel->w_0x2b0->q_0xc0 * travel);
+    rearWheel->w_0x2ac->q_0x98 = field_0x7fc;
+    rearWheel->w_0x2ac->ClampAndStep(field_0x7fc, 0);
+    if (airborne)
+        anyWheelInContact = 0;
+    else
+        anyWheelInContact = 1;
+
+    float steerTarget = worldAngularVelocity.y * -1.2732f;
+    float steerDiff = steerTarget - controlInput.x;
+    if (BIKEAI_ABS(steerDiff) > 0.125f) {
+        if (steerDiff > 0.0f)
+            controlInput.x += 0.125f;
+        else
+            controlInput.x -= 0.125f;
+    } else {
+        controlInput.x = steerTarget;
+    }
+    float leanDiff = lean - controlInput.y;
+    if (BIKEAI_ABS(leanDiff) > 0.25f) {
+        if (leanDiff > 0.0f)
+            controlInput.y += 0.25f;
+        else
+            controlInput.y -= 0.25f;
+    } else {
+        controlInput.y = lean;
+    }
+    if (controlInput.x > 1.0f)
+        controlInput.x = 1.0f;
+    else if (controlInput.x < -1.0f)
+        controlInput.x = -1.0f;
+    if (controlInput.y > 1.0f)
+        controlInput.y = 1.0f;
+    else if (controlInput.y < -1.0f)
+        controlInput.y = -1.0f;
+    float leanAxis = controlInput.y + 1.0f;
+    steerAxis->steerValue = (leanAxis + 1.0f) * 0.25f;
+    UnknownVirtualSlot35(1, 1);
+    if (field_0x734 && airborne)
+        controlInput.x = 0.0f;
+
+    field_0x434 = BikeAIDot(velocity, bodyForward);
+    rearWheel->w_0x148 = field_0x434;
+    frontWheel->w_0x148 = field_0x434;
+    rearWheel->w_0x27c = field_0x434;
+    frontWheel->w_0x27c = field_0x434;
+    rearWheel->w_0x14c = 0.0f;
+    frontWheel->w_0x14c = 0.0f;
+    if (field_0x434 > 0.0f)
+        movingForward = 1;
+    else
+        movingForward = 0;
+    if (frontWheel->inContact)
+        ((KbWheel*)frontWheel)->SetRollDistance(field_0x434 / frontWheel->w_0x274 * dt);
+    else
+        ((KbWheel*)frontWheel)->SetRollDistance(field_0x434 / frontWheel->w_0x274 * dt);
+    if (rearWheel->inContact)
+        ((KbWheel*)rearWheel)->SetRollDistance(field_0x434 / rearWheel->w_0x274 * dt);
+    else
+        ((KbWheel*)rearWheel)->SetRollDistance(field_0x434 / rearWheel->w_0x274 * dt);
+    modelNode->SetPosition(position);
+    UnknownVirtualSlot71(airborneOut);
+    airborne = airborneOut;
+    if (airborneOut)
+        landingLatched = 0;
+    if (crashState) {
+        UnknownVirtualSlot87();
+    } else {
+        if (airborneOut)
+            UnknownVirtualSlot91();
+        UnknownVirtualSlot90(&steps, dt);
+    }
+    UnknownVirtualSlot28(steps);
+
+    if (collisionObject->hasContact && lastCollisionType != 1000 &&
+        lastCollisionType != 100 && lastCollisionType != 101)
+        field_0x814 += dt;
+    else
+        field_0x814 = 0;
+    if (BIKEAI_ABS(impact) > field_0x778 || BIKEAI_ABS(linearSpeed - prevSpeed) > 44.0f ||
+        bodyUp.y <= 0.0f || field_0x814 > 0.5f) {
+        crashState = 1;
+        crashDirection = 1;
+        crashReason = 4;
+        UnknownVirtualSlot41();
+        field_0x574 = Vec3(savedForward.x, 0.0f, savedForward.z);
+        field_0x431 = 0;
+        field_0x433 = 0;
+        if (savedUp.y < 0.0f)
+            field_0x464 = 1;
+        else
+            field_0x464 = 0;
+        field_0x45c = savedYaw;
+        field_0x604->Method_0x00532220(crashDirection);
+        UnknownVirtualSlot69();
+    }
+    savedForward = bodyForward;
+    savedUp = bodyUp;
+    centerNode->GetPositionIn(0, &centerOfMass);
+    UnknownVirtualSlot34();
+    OrientationAnglesFromVectors(bodyForward, bodyUp, &bodyYaw, &bodyPitch, &bodyRoll,
+                                 &bodySinRoll, &bodyCosRoll, &bodyCosPitch, &bodySinPitch);
+    UnknownVirtualSlot29(1);
+    prevSpeed = linearSpeed;
+    Vec3 moved = position - start;
+    frontWheel->w_0x0d8 += moved;
+    rearWheel->w_0x0d8 += moved;
+    UnknownVirtualSlot21();
+    scratchVector = modelNode->WorldToLocalDirection(velocity);
+    BikeAISmooth(forwardAccelSmoother, frameTime,
+                 (scratchVector.z - prevLocalForwardVelocity) / frameTime);
+    smoothedForwardAccel = forwardAccelSmoother->smoothedValue;
+    prevLocalForwardVelocity = scratchVector.z;
+    UnknownVirtualSlot102(dt);
+    return 1;
+}
+
+// rand() scaled to [0, 1).  A float-returning inline keeps a later scale factor from being
+// folded into the 1/32768 (KrustyBike.cpp's KbRandUnit has the same body).
+inline float BikeAIRandUnit()
+{
+    float r = rand() * (1.0f / 32768.0f);
+    return r;
+}
+
+// 0x0040d120's normalise without the zero test: v unchanged when |v|^2 is exactly 1.
+inline Vec3 BikeAINormalizeInline(const Vec3& v)
+{
+    float lenSq = SquareMagnitude(v);
+    if (lenSq == 1.0f)
+        return v;
+    float s = FastInvSqrt(lenSq);
+    return Vec3(s * v.x, s * v.y, s * v.z);
+}
+
+// 0x00414370, 4802 bytes (ret 4): rebuilds the AI racing line aiPath for this frame and
+// returns 1 (0 when a track query fails).  By race kind (game +0x2d74):
+//  * 2 and 3 (track races): the shortest track path from the bike's progress position to
+//    the race's target position, sampled every 0.1 of the speed (100 points) or ahead of
+//    the bike; off the track for 5 s the bike is respawned through slots 11/33;
+//  * 1 and 5: a short line along the gates of KbGhost+0x34 (3 points around the gate,
+//    or the gate itself), or the start-gate run-up while +0x7a4 is set;
+//  * otherwise: one random free-roam target 444 units (scaled by the terrain) away.
+// The racing line's target speed (40 near a gate, else 1000) and the AI class's speed scale
+// (+0x7c4..+0x7cc by game difficulty +0x60c) follow; a local bike may then start a trick
+// while airborne (0x0048d780 picks it, 0x0048d910 plays it).  Names tier 3.
+int KrustyBike::Fn_00414370(float dt)
+{
+    KbTrackItem* list;
+    KbTrackItem** tail;
+    KbRaw3 from;
+    KbRaw3 p;
+    KbGate* gate;
+    Vec3 a, b, c;
+    float distance;
+    float right, left;
+    float gateAhead, bikeAhead;
+    float speed, t, n, lenSq, dx, dz;
+    float trickDelay;
+    int dummy;
+    int count;
+    int i;
+
+    memset(&aiPath, 0, sizeof(aiPath));
+    list = 0;
+    dummy = 0;
+    int difficulty = g_kbGame->field_0x60c;
+    int kind = g_kbGame->field_0x2d74;
+    if (kind != 3 && kind != 2) {
+        if (kind != 1 && kind != 5) {
+            aiPath.count = 1;
+            Vec3 d;
+            d = Vec3(field_0x818 - position.x, field_0x81c - position.y, field_0x820 - position.z);
+            d.y = 0.0f;
+            if (d.x * d.x + d.z * d.z < 2500.0f) {
+                d.x = rand() * (1.0f / 32768.0f);
+                d.y = 0.0f;
+                d.z = rand() * (1.0f / 32768.0f);
+                d = BikeAINormalizeInline(d) * 444.0f * terrain->worldScale;
+                field_0x818 = terrain->worldScale * 666.66f + d.x;
+                field_0x81c = 0.0f;
+                field_0x820 = terrain->worldScale * 666.66f + d.z;
+            } else {
+                aiPath.points[0].x = field_0x818;
+                aiPath.points[0].y = field_0x81c;
+                aiPath.points[0].z = field_0x820;
+            }
+            aiPath.field_0x96c = 1000.0f;
+            aiPath.field_0x970 = field_0x7cc;
+            aiPath.lookAhead = linearSpeed * 0.25f;
+            field_0x15dc = field_0x740->field_0xa4;
+            if (difficulty == 3)
+                trickDelay = field_0x7d8;
+            else if (difficulty == 2)
+                trickDelay = field_0x7d4;
+            else if (difficulty == 1)
+                trickDelay = field_0x7d0;
+        } else {
+            if (field_0x7a4) {
+                field_0x80c += dt;
+                if (field_0x80c < 2.0f) {
+                    aiPath.count = 1;
+                    aiPath.points[0].y = 0.0f;
+                    aiPath.points[0].x = bodyForward.z * 40.0f + position.x;
+                    aiPath.points[0].z = position.z - bodyForward.x * 40.0f;
+                    aiPath.field_0x96c = 40.0f;
+                    return 1;
+                }
+                aiPath.field_0x96c = 0.0f;
+                return 1;
+            }
+            speed = linearSpeed;
+            if (field_0x740->field_0x48) {
+                if (!field_0x740->field_0x48->UnknownFunction516ca0(position, field_0x740->field_0x48->field_0x0,
+                                                                    &field_0x744->field_0x38, 0))
+                    return 0;
+                if (!field_0x744->field_0x44.a) {
+                    field_0x744->field_0x44.a = field_0x744->field_0x38.a;
+                    field_0x744->field_0x44.b = field_0x744->field_0x38.b;
+                    field_0x744->field_0x44.c = field_0x744->field_0x38.c;
+                }
+                gate = field_0x744->field_0x34;
+                if (!gate->trackPos.a)
+                    field_0x740->field_0x48->UnknownFunction516ca0(gate->position, field_0x740->field_0x48->field_0x0,
+                                                                  &gate->trackPos, 0);
+                gateAhead = field_0x740->field_0x48->UnknownFunction517da0(field_0x744->field_0x44,
+                                                                          field_0x744->field_0x34->trackPos);
+                bikeAhead = field_0x740->field_0x48->UnknownFunction517da0(field_0x744->field_0x38,
+                                                                          field_0x744->field_0x34->trackPos);
+                if (bikeAhead > 0.0f && gateAhead > 0.0f && bikeAhead < gateAhead) {
+                    field_0x744->field_0x44.a = field_0x744->field_0x38.a;
+                    field_0x744->field_0x44.b = field_0x744->field_0x38.b;
+                    field_0x744->field_0x44.c = field_0x744->field_0x38.c;
+                }
+                list = (KbTrackItem*)DebugCalloc(1, 0x10, __FILE__, 0x99f);
+                if (!list)
+                    return 0;
+                list->field_0x04 = field_0x740->field_0x48->field_0x0;
+                list->field_0x0c = (KbTrackItem*)DebugCalloc(1, 0x10, __FILE__, 0x9a3);
+                if (!list->field_0x0c)
+                    return 0;
+                list->field_0x0c->field_0x04 = field_0x740->field_0x48->field_0x0;
+                if (list && bikeAhead < gateAhead) {
+                    aiPath.count = 100;
+                    t = 0.0f;
+                    for (i = 0; i < aiPath.count; i++) {
+                        if (!field_0x740->field_0x48->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
+                                                                           t * linearSpeed, 0))
+                            return 0;
+                        if (!field_0x740->field_0x48->UnknownFunction518080(p, &aiPath.points[i]))
+                            return 0;
+                        aiPath.points[i].y = position.y + 2.0f;
+                        t += 0.1f;
+                        if (t > 10.0f)
+                            break;
+                    }
+                } else {
+                    aiPath.count = 1;
+                    aiPath.points[0] = field_0x744->field_0x34->position;
+                }
+            } else if (field_0x744->field_0x08 < 300.0f) {
+                aiPath.count = 3;
+                gate = field_0x744->field_0x34;
+                if (BikeAIDot(gate->position - position, gate->direction) < 0.0f) {
+                    aiPath.points[0] = speed * gate->direction + gate->position;
+                    aiPath.points[2] = field_0x744->field_0x34->position - speed * field_0x744->field_0x34->direction;
+                } else {
+                    aiPath.points[0] = gate->position - speed * gate->direction;
+                    aiPath.points[2] = speed * field_0x744->field_0x34->direction + field_0x744->field_0x34->position;
+                }
+                aiPath.points[1] = field_0x744->field_0x34->position;
+            } else {
+                aiPath.count = 1;
+                aiPath.points[0] = field_0x744->field_0x34->position;
+            }
+            gate = field_0x744->field_0x34;
+            dx = position.x - gate->position.x;
+            dz = position.z - gate->position.z;
+            if (FastSqrt(dx * dx + dz * dz) < gateAhead) {
+                if (BikeAIDot(SafeNormalize(velocity), SafeNormalize(gate->position - position)) < 0.70755f)
+                    aiPath.field_0x96c = 40.0f;
+                else
+                    aiPath.field_0x96c = 1000.0f;
+                aiPath.lookAhead = 20.0f;
+                field_0x11b0 = 1;
+            } else {
+                aiPath.field_0x96c = 1000.0f;
+                aiPath.field_0x970 = field_0x7cc;
+                field_0x11b0 = 0;
+                aiPath.lookAhead = linearSpeed * 0.25f;
+            }
+            if (difficulty == 3)
+                aiPath.field_0x970 = field_0x7cc;
+            else if (difficulty == 2)
+                aiPath.field_0x970 = field_0x7c8;
+            else if (difficulty == 1)
+                aiPath.field_0x970 = field_0x7c4;
+            aiPath.lookAhead = linearSpeed * 0.25f;
+        }
+    } else {
+        if (!field_0x744->field_0x44.a || !field_0x744->field_0x44.b)
+            return 0;
+        if (!field_0x740->field_0x134.a || !field_0x740->field_0x134.b)
+            return 0;
+        if (!field_0x740->field_0x48->UnknownFunction5179f0(field_0x744->field_0x44, field_0x740->field_0x134,
+                                                             &list, &distance))
+            return 0;
+        tail = &list;
+        while (*tail)
+            tail = &(*tail)->field_0x0c;
+        from = field_0x740->field_0x134;
+        from.t += 0.01f;
+        if (!field_0x740->field_0x48->UnknownFunction5179f0(from, field_0x740->field_0x134, tail, &distance))
+            return 0;
+        if (field_0x78c) {
+            if (list) {
+                aiPath.count = 100;
+                t = 0.0f;
+                for (i = 0; i < aiPath.count; i++) {
+                    if (!field_0x740->field_0x48->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
+                                                                       t * linearSpeed, 0))
+                        return 0;
+                    if (!field_0x740->field_0x48->UnknownFunction518080(p, &aiPath.points[i]))
+                        return 0;
+                    aiPath.points[i].y = position.y + 2.0f;
+                    t += 0.1f;
+                    if (t > 10.0f)
+                        break;
+                }
+            } else {
+                aiPath.count = 1;
+                aiPath.points[0] = linearSpeed * bodyForward + position;
+            }
+            if (!g_kbGame->field_0x2d70)
+                field_0x11b4 = 0.0f;
+        } else {
+            count = 1;
+            if (!g_kbGame->field_0x2d70) {
+                field_0x11b4 += dt;
+                if (field_0x11b4 >= 5.0f) {
+                    UnknownVirtualSlot11(count, &a, &b, &c, &dummy);
+                    UnknownVirtualSlot33(&a, &b, &bodyUp, &c, dummy, UnknownVirtualSlot32());
+                    field_0x11b4 = 0.0f;
+                }
+            }
+            aiPath.count = count;
+            if (list) {
+                t = 1.0f;
+                for (i = 0; i < aiPath.count; i++) {
+                    if (!field_0x740->field_0x48->UnknownFunction517ea0(field_0x744->field_0x44, &p, &list,
+                                                                       g_BikeAILookAhead_00572988 * t, 0))
+                        return 0;
+                    if (!field_0x740->field_0x48->UnknownFunction518080(p, &aiPath.points[i]))
+                        return 0;
+                    aiPath.points[i].y = position.y + 2.0f;
+                    lenSq = SquareMagnitude(aiPath.points[i] - position);
+                    if (lenSq == 1.0f || FastSqrt(lenSq) < 100.0f)
+                        aiPath.field_0x96c = 40.0f;
+                    t += 0.1f;
+                    if (t > 1.0f)
+                        break;
+                }
+            } else {
+                p = field_0x744->field_0x44;
+                if (!field_0x740->field_0x48->UnknownFunction518080(field_0x744->field_0x44, &aiPath.points[0]))
+                    return 0;
+            }
+        }
+        aiPath.field_0x96c = 1000.0f;
+        aiPath.field_0x970 = field_0x7cc;
+        aiPath.lookAhead = linearSpeed * 0.25f;
+        if (difficulty == 3)
+            aiPath.field_0x970 = field_0x7cc;
+        else if (difficulty == 2)
+            aiPath.field_0x970 = field_0x7c8;
+        else if (difficulty == 1)
+            aiPath.field_0x970 = field_0x7c4;
+        if (field_0x7a4) {
+            field_0x78c = field_0x740->field_0x48->UnknownFunction517340(position, field_0x744->field_0x44,
+                                                                        -1.0f, -1.0f, 0, 0);
+            if (!field_0x78c) {
+                aiPath.field_0x96c = 0.0f;
+                goto done;
+            }
+            aiPath.field_0x96c = 40.0f;
+            Vec3 dir;
+            if (!field_0x740->field_0x48->UnknownFunction518130(field_0x744->field_0x44.b, &dir))
+                return 0;
+            field_0x740->field_0x48->UnknownFunction518230(position, field_0x744->field_0x44.b, &right, 10);
+            field_0x740->field_0x48->UnknownFunction518230(position, field_0x744->field_0x44.b, &left, 11);
+            if (BikeAIDot(dir, bodyForward) < 0.0f)
+                dir = -dir;
+            if (left < right) {
+                dir.x = dir.z;
+                dir.z = -dir.x;
+            } else {
+                dir.x = -dir.z;
+                dir.z = dir.x;
+            }
+            dir.y = 0.0f;
+            dir = SafeNormalize(dir);
+            aiPath.count = 1;
+            aiPath.points[0] = aiPath.field_0x96c * dir + position;
+        }
+        if (field_0x78c)
+            field_0x11b0 = 1;
+        else
+            field_0x11b0 = 0;
+    }
+    if (field_0x15e4 && !(trickDelay > field_0x7dc)) {
+        if (!field_0x430 && airborne) {
+            PredictLanding(position, velocity, &field_0x834, 0, 0, (Terrain*)terrain);
+            if (BikeAIRandUnit() * 100.0f <= field_0x15dc) {
+                for (n = 5.0f; n >= 1.0f; n -= 1.0f) {
+                    if (Fn_0048D780(&field_0x15d4, field_0x834 / n - 0.5f, 0))
+                        break;
+                }
+                if (n > 0.0f) {
+                    Fn_0048D910(field_0x15d4);
+                    field_0x7dc = 0;
+                }
+            }
+        }
+    } else {
+        field_0x7dc += dt;
+    }
+done:
+    if (list)
+        field_0x740->field_0x48->UnknownFunction517930(&list, 0);
     return 1;
 }

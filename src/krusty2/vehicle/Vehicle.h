@@ -154,7 +154,7 @@ struct VehicleSpeedState {
     // parameters); LoadVehicle passes 0.02f, the table/rpm arguments or zeros, and field_0x524[2..3].
     VehicleSpeedState(const char* name, float unused, int* torqueTable, int rpmLow, int rpmHigh,
                       int rpmStep, float a6, float riseRate, float fallRate);
-    void Method_004D2F50(float dt, int a, int b);   // 0x004d2f50, purpose unknown
+    void Method_004D2F50(float dt, int a, bool b);  // 0x004d2f50, purpose unknown (b: one byte pushed)
     void Method_004D3030(int a, float speed);       // 0x004d3030, purpose unknown
 };
 // Exponential smoother objects at Vehicle+0x58c / +0x598 (provisional): f0 is the smoothed value.

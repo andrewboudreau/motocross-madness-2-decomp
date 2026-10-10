@@ -158,7 +158,7 @@ Extent: `0x40d070..0x416e1f` (strong inference). Bike.cpp ends at
 `0x415640`. A second Math3D set at `0x417350` means BikeCamera code
 (`0x416e20..0x417aff`) is a separate, unattested unit.
 
-Four near misses and one exact COMDAT are in `samples/physics/bikeai`:
+Six near misses and one exact COMDAT are in `samples/physics/bikeai`:
 - the steering direction `0x40e510` differs by an esi/edi swap and frame order;
 - the jump prediction `0x40d200` (4464 bytes, 4430/4464) differs only in the
   scheduling of two stores;
@@ -168,7 +168,14 @@ Four near misses and one exact COMDAT are in `samples/physics/bikeai`:
   `0x40eca0..0x413150`; `0x412700` is a mid-function address) is fully
   reconstructed: 392 masked code differences, frame 0x8b8 vs 0x93c;
 - the Vec3 `operator-=` COMDAT `0x413160` is strict exact; VC6 emits it after
-  `0x40eca0`, whose epilogue calls it.
+  `0x40eca0`, whose epilogue calls it;
+- the KrustyBike AI physics step `0x413200` (4112 bytes, 16.1%): calls, branches
+  and the 1120 instructions match, the 0x74 frame too, but slot 11's out-vectors sit
+  at other offsets and the angular-velocity cross products load their operands in
+  another order;
+- the KrustyBike racing-line builder `0x414370` (4802 bytes, 8.5%): block order and
+  calls match; frame 0x74 vs 0x78 and the kind 1/5 gate-distance test is placed
+  after the single-point and no-track paths instead of before them.
 
 `0x40eca0` exhausts VC6's per-function inline budget. Its first part expands every
 Vec3 operator; from `0x410d00` the operators are expanded but call the
@@ -176,8 +183,9 @@ out-of-line constructor `0x404e60`; the epilogue calls whole operators
 (`0x428090`, `0x421cb0`, `0x421d00`, `0x5015b0`, `0x413160`). Natural Math3D
 operators reproduce this pattern call for call (one site differs). The budget is
 consumed per inline expansion, so source forms before a switch-over point move
-it. The two KrustyBike methods `0x413200` and `0x414370` wait on KrustyBike.h's
-promotion.
+it. `0x413200` and `0x414370` are KrustyBike members placed in BikeAI.cpp's code
+(the first reads and writes the file-static filter `0x577ac0`, the second holds the
+unit's `__FILE__` xrefs); they use the promoted `src/krusty2/vehicle/KrustyBike.h`.
 
 ```bash
 python tools/run_physics_samples.py --strict \
@@ -188,8 +196,8 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The first run reports `23/23 strict exact`, the second `1/5 strict exact` (the
-COMDAT; the four near misses are registered as partial).
+The first run reports `23/23 strict exact`, the second `1/7 strict exact` (the
+COMDAT; the six near misses are registered as partial).
 
 ## Wave-10 soultree and box-tree query slice
 
@@ -480,8 +488,8 @@ where supported, without promoting that evidence into exact-code status.
 count as strict validation. `expect: "partial"` retains known code-generation
 mismatches. Full-root status of the `--strict` audit:
 
-- `--root src/krusty2`: 595/651 strict exact, 0 required failures.
-- `--root samples/physics`: 328/401 strict exact, 0 required failures.
+- `--root src/krusty2`: 682/738 strict exact, 0 required failures.
+- `--root samples/physics`: 311/403 strict exact, 0 required failures.
 
 Every other required target's relocations are bound in a `*.bindings.json` next to its
 source. The bindings came from `tools/propose_bindings.py` on masked-exact targets; the
@@ -536,14 +544,16 @@ Strict exact with the units' existing sources (registration pending):
 - SoultreeQuadTreeRenderer.cpp: slot 23 `0x005048d0` (debug key 0x2d toggles the nodes).
 - SteeringControl.cpp: promoted from samples (see `src/krusty2/motion/README.md`).
 
-## KrustyBike and Tire samples with bindings
+## KrustyBike and Tire with bindings
 
-`samples/physics/krustybike/KrustyBike.bindings.json` and
-`samples/physics/tire/Tire.bindings.json` resolve every relocation of the
-samples' exact targets; every exact entry of the two `targets.json` files
-names its bindings file:
+KrustyBike.cpp is promoted: its 70 exact targets are in
+`src/krusty2/vehicle/KrustyBike.cpp` (bindings `KrustyBike.bindings.json`, entries
+in `src/krusty2/vehicle/targets.json`), its 11 partial targets in
+`samples/physics/krustybike/KrustyBikeNearMisses.cpp`, which includes the canonical
+file. `samples/physics/tire/Tire.bindings.json` resolves every relocation of the
+Tire sample's exact targets:
 
-- KrustyBike.cpp: the 56 existing exact targets, plus the `.CRT$XCU` 155-158
+- KrustyBike.cpp: the 56 exact targets of the first slice, plus the `.CRT$XCU` 155-158
   set (`0x00491190..0x004912cb`, vectors `0x0067c348`, `0x0067c358`,
   `0x0067c368`, `0x0067c338`; the constructor and `0x00492670` read the zero
   vector), the two vtordisp thunks `0x00497c30`/`0x00497ca0` and the network
@@ -582,8 +592,8 @@ names its bindings file:
   cross-jumping it to the last call site. Not reconstructed: `0x0048e3e0`
   (inline-asm `fistp` rounding), `0x0048eea0` (2239 bytes, the head-turn
   update: it contains the same `atan2` pop-order blocker as `0x0048e280` twice,
-  at `0x0048f2fc` and `0x0048f4c5`), the set-up `0x0048fc80` (5.4 KB, 25 arguments) and
-  `0x00493660` (8.5 KB).
+  at `0x0048f2fc` and `0x0048f4c5`). The loader `0x0048fc80` (5.4 KB, 31 argument
+  dwords) is exact and the network update `0x00493660` (8.5 KB) is a partial.
 - TerrainShadow.cpp (`samples/physics/shadow`): slot 14 `0x0050a1a0` is exact
   (D3DIMSoultreeShadow slot 14's draw of the +0x34 vertices without the world
   matrix). Slot 30 `0x00509aa0` rounds with inline-asm `fistp`; slot 27
@@ -597,11 +607,15 @@ names its bindings file:
   the same file: `0x00513f90` (470/479, stack slots), `0x00514170` and
   `0x00515c90` (x87 operand order).
 
-Check (85/85 exact targets strict for these two files):
+Check:
 
 ```bash
 python tools/run_physics_samples.py --strict \
-  --source samples/physics/krustybike/KrustyBike.cpp \
+  --source src/krusty2/vehicle/KrustyBike.cpp \
+  --source samples/physics/krustybike/KrustyBikeNearMisses.cpp \
   --source samples/physics/tire/Tire.cpp \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
+
+The KrustyBike sources give 70 of 81 strict exact (the 11 partials are the near
+misses listed above and in docs/NEAR_MISS_INDEX.md).

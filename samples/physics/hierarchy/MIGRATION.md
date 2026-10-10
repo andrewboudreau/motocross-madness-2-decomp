@@ -179,7 +179,7 @@ A trial migration compiled against the canonical header and reproduced the same 
   - Bike overrides only the GameObject destructor. GameObject slot 10 is inherited through the thunk `sub ecx,[ecx-4]; sub ecx,0x178` (0x0040cab0, byte-matched).
   - Expect vtable counts of 103 / 12 / 27.
 
-## KrustyBike: `krustybike/KrustyBikeTypes.h` and `KrustyBike.h`, generated from `work/e_krustybike/spec.py`
+## KrustyBike: `krustybike/KrustyBikeTypes.h` and `KrustyBike.h` (now `src/krusty2/vehicle/`), generated from `work/e_krustybike/spec.py`
 
 - **Delete** the flat stand-in `class Bike { ... };` in KrustyBikeTypes.h.
 - **Include** `"../bike/Bike.h"` once it is migrated.

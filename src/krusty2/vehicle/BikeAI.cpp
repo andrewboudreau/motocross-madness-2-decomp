@@ -13,7 +13,9 @@
 //    next set (0x00417350) belongs to the TU that holds BikeCamera, so BikeCamera
 //    (0x00416e20..) is outside this file.
 // The free functions below are cdecl helpers used by the AI path code
-// (0x0040d200, 0x0040e510, 0x0040eca0).  All names are provisional.
+// (0x0040d200, 0x0040e510, 0x0040eca0).  All names are provisional.  The KrustyBike
+// members 0x00413200 and 0x00414370 that sit in this unit are near misses in
+// samples/physics/bikeai/BikeAINearMisses.cpp (class layout: vehicle/KrustyBike.h).
 #include "math/Math3D.h"
 #include "broadphase/Terrain.h"
 

@@ -106,7 +106,7 @@ struct BikeWheel {
     char pad_0x000[184];
     char contactPoint_0x0b8[20];   // registered in the owner's collisionPoints list; ~Bike removes it (0x00409a10)
     Vec3 wheelPosition;
-    char pad_0x0d8[12];
+    Vec3 w_0x0d8;             // KrustyBike 0x00413200 moves it with the body's step displacement
     Vec3 groundNormal;
     char pad_0x0f0[12];
     Vec3 appliedShare;
@@ -116,7 +116,7 @@ struct BikeWheel {
     char pad_0x12c[24];
     float contactLoad;
     float w_0x148;
-    char pad_0x14c[4];
+    float w_0x14c;            // KrustyBike 0x00413200 clears it
     float w_0x150;
     char pad_0x154[4];
     float loadWeight;
@@ -272,9 +272,16 @@ struct BikeA644 {
     float maxFall;
 };
 
+// Shock objects at BikeWheel+0x2ac (RotatingShock) / +0x2b0 (InlineShock); the classes are
+// in samples/physics/suspension/Suspension.h.
 struct BikeQ {
     char pad_0x000[148];
     float q_0x94;
+    float q_0x98;             // KrustyBike 0x00413200 stores the rear travel here
+    char pad_0x09c[0x24];
+    Vec3 q_0xc0;              // InlineShock::axis
+    void ClampAndStepAlong(float maxDelta, float dt, Vec3& pos);   // 0x004fa090 InlineShock::ClampAndStep
+    void ClampAndStep(float maxDelta, float dt);                   // 0x004fa8b0 RotatingShock::ClampAndStep
 };
 
 struct BikeA38 {

@@ -2,14 +2,14 @@
 //
 // Confirmed (tier 1): RTTI base Bike; three vtables: +0 0x00554548 (103 slots),
 // +540 0x00554514, +5644 0x005544a4 (rtti_classes vtable_records / COLs).
-// Bases are canonical (bike/Bike.h -> vehicle/Vehicle.h -> hierarchy/...), so the
+// Bases are canonical (vehicle/Bike.h -> vehicle/Vehicle.h), so the
 // +540 (D3DIMSoultreeCharacter) and +5644 (virtual GameObject, vtordisp at +0x1608)
 // subobjects are real.  KrustyBike's own data is 0x734..0x1608.  Overrides use the
 // canonical slot signatures.
 #ifndef KRUSTYBIKE_H
 #define KRUSTYBIKE_H
 
-#include "KrustyBikeTypes.h"
+#include "vehicle/KrustyBikeTypes.h"
 
 class KrustyBike : public Bike {
 public:
@@ -70,7 +70,9 @@ public:
     virtual int UnknownVirtualSlot99(float a, float b, int c, float d);
     virtual void UnknownVirtualSlot101();
 
-    int Fn_00414370(float dt);   // called by slot 63 (0x004924c0); the result is unused
+    // 0x00414370 (in BikeAI.cpp; called by slot 63 0x004924c0, which ignores the result):
+    // rebuilds the AI racing line aiPath for this frame; 0 when a track query fails.
+    int Fn_00414370(float dt);
     void Fn_0048D8B0();
     void Fn_0048D910(int idx);
     void Fn_0048D990(int idx);
@@ -87,7 +89,11 @@ public:
     // 0x004933e0: adds message 13's deltas to the decoded network state and copies it out.
     void Fn_004933E0(const KbNetDelta* delta, KbNetState* state);
     void Fn_00496E30(int a);
-    void Fn_00413200(float dt);
+    // 0x00413200 (in BikeAI.cpp; called by slot 49 for AI bikes): one physics step of the
+    // two-point look-ahead model 0x0040eca0 instead of the Vehicle step; returns 1.
+    int Fn_00413200(float dt);
+    // 0x0048d780 (inline-asm rounding, not reconstructed): called by 0x00414370.
+    int Fn_0048D780(int* out, float t, int a);
     // 0x00493660 (8.5 KB) and 0x00492ad0: per-frame steps GameObject slot 10 runs (ret 8;
     // tier 3 roles: the local/replayed update and the network update).
     void Fn_00493660(float dt, int a);
@@ -157,20 +163,24 @@ public:
     float field_0x7dc; // 0x7DC
     Vec3 field_0x7e0; // 0x7E0
     Vec3 field_0x7ec; // 0x7EC
-    int field_0x7f8; // 0x7F8
-    int field_0x7fc; // 0x7FC
+    float field_0x7f8; // 0x7F8  front suspension travel of the look-ahead model (0x00413200)
+    float field_0x7fc; // 0x7FC  rear suspension travel
     char pad_0x0800[0x4];
     float field_0x804; // 0x804
     float field_0x808; // 0x808
-    int field_0x80c; // 0x80C
+    float field_0x80c; // 0x80C  seconds of the start-gate run-up (0x00414370)
     char field_0x810; // 0x810  set with +0x15e4 for a local (+0x734) bike
     char pad_0x0811[0x3];
-    int field_0x814; // 0x814
+    float field_0x814; // 0x814  seconds with the collision object in contact (0x00413200)
     float field_0x818; // 0x818  3000.0f (local bike)
     float field_0x81c; // 0x81C
     float field_0x820; // 0x820  3000.0f (local bike)
     float field_0x824; // 0x824  random in [-7,7) (or [-3,3) in modes 1/5)
-    char pad_0x0828[0x11b8 - 0x828];
+    Vec3 field_0x828;  // 0x828  ground normal under the predicted landing (0x00413200)
+    float field_0x834; // 0x834  predicted time to landing (PredictLanding 0x0040e370)
+    UnknownBikeAIPath aiPath; // 0x838  racing line rebuilt by 0x00414370 each frame
+    int field_0x11b0;  // 0x11B0  last argument of the look-ahead simulation 0x0040eca0
+    float field_0x11b4; // 0x11B4  seconds off the track before 0x00414370 respawns the bike
     char field_0x11b8; // 0x11B8
     char pad_0x11B9[0x3];
     int field_0x11bc; // 0x11BC  network id (KbNetBike)

@@ -2,9 +2,9 @@
 //
 // Everything here is tier-3 (provisional): member offsets are confirmed by decoded
 // instructions in the KrustyBike overrides, but the names are inferred.  The base
-// class is the canonical Bike (bike/Bike.h).  The Kb* structs below are area-local
+// class is the canonical Bike (vehicle/Bike.h).  The Kb* structs below are area-local
 // views of objects reached through inherited members whose canonical types are still
-// generic; the overrides cast to them at the use site (MIGRATION.md rule 6).
+// generic; the overrides cast to them at the use site (samples/physics/hierarchy/MIGRATION.md rule 6).
 #ifndef KRUSTYBIKE_TYPES_H
 #define KRUSTYBIKE_TYPES_H
 
@@ -30,6 +30,42 @@ class KrustyBike;
 // Vectors use the shared Math3D Vec3 (12 bytes: x,y,z at +0,+4,+8; tier 1 layout).
 #include "vehicle/Bike.h"
 #include "contact/ObjectPlacement.h"
+
+class Terrain;
+
+// A position on the race track (node, segment, t along the segment; the TrackPos of
+// src/reconstructed/Track.h), copied as three dwords.  t is a float (0x00414370 adds
+// 0.01 to it); the race reset writes the raw dwords.
+struct KbRaw3 {
+    int a;
+    int b;
+    union {
+        int c;
+        float t;
+    };
+};
+
+// Object at KbGhost+0x34 / KbRace+0xc8 (tier 3 view): a point with a direction and its
+// track position, which 0x00414370 places on the track when it is still unset.
+struct KbGate {
+    Vec3 position;          // +0x00
+    Vec3 direction;         // +0x0c
+    char pad_0x18[0x14];
+    KbRaw3 trackPos;        // +0x2c
+};
+
+// AI racing line: up to 200 points.  Offsets tier 1 (0x0040e510, 0x00414370), names
+// tier 3.  KrustyBike+0x838 holds one; 0x00414370 rebuilds it every frame.
+struct UnknownBikeAIPath {
+    int count;          // +0x000
+    int index;          // +0x004 current segment
+    float t;            // +0x008 parameter along the current segment
+    Vec3 points[200];   // +0x00c
+    float field_0x96c;  // +0x96c target speed: 0x00414370 writes 40 or 1000, 0x0040d200 the
+                        //        takeoff speed (clamped to >= 40.0f)
+    float field_0x970;  // +0x970 read by 0x0040eca0 (1.5f when there is no path)
+    float lookAhead;    // +0x974
+};
 
 // 0x0067C348: a global zero vector copied by several overrides (three dword loads).
 extern Vec3 g_kbZeroVec;
@@ -360,7 +396,30 @@ struct KbBonusTable {
 #pragma pack(pop)
 
 // Object reached through KrustyBike+0x740 (event/race context).
-struct KbRaceSub { int* field_0x0; };
+// Work-list entry of the track's graph walks (src/reconstructed/Track.h TrackListItem,
+// calloc(1, 0x10)); 0x00414370 builds a two-entry list starting at the track's first node.
+struct KbTrackItem {
+    int field_0x00;
+    int* field_0x04;               // node
+    KbTrackItem* field_0x08;
+    KbTrackItem* field_0x0c;       // next
+};
+// The race's Track (src/reconstructed/Track.h; tier 3 view): field_0x0 is the start node.
+// Positions on the track are KbRaw3 {node, segment, t} passed by value.
+struct KbRaceSub {
+    int* field_0x0;
+    int UnknownFunction516ca0(Vec3 p, int* node, KbRaw3* out, float* outDistance);
+    int UnknownFunction517340(Vec3 p, KbRaw3 from, float distance, float range, int path,
+                              KbRaw3* out);
+    int UnknownFunction517930(KbTrackItem** list, int all);
+    int UnknownFunction5179f0(KbRaw3 a, KbRaw3 b, KbTrackItem** path, float* distance);
+    float UnknownFunction517da0(KbRaw3 a, KbRaw3 b);
+    int UnknownFunction517ea0(KbRaw3 pos, KbRaw3* out, KbTrackItem** path, float distance,
+                              unsigned char flags);
+    int UnknownFunction518080(KbRaw3 pos, Vec3* out);
+    int UnknownFunction518130(int segment, Vec3* out);
+    int UnknownFunction518230(Vec3 p, int segment, float* out, int mode);
+};
 struct KbRace {
     KrustyBike* NextBike(int* cursor);   // 0x004204E0: next bike of the race (cursor starts at 0)
     char pad_0x0000[0x38];
@@ -368,7 +427,7 @@ struct KbRace {
     char pad_0x003C[0x8];
     KbRaceHandler* handler; // 0x44
     KbRaceSub* field_0x48; // 0x48
-    char pad_0x004C[0x4];
+    Terrain* field_0x4c; // 0x4C  terrain passed to the look-ahead simulation 0x0040eca0
     KbRacer* field_0x50; // 0x50
     char pad_0x0054[0x48];
     float field_0x9c; // 0x9C   0x0048fc80 copies one of the three into KrustyBike+0x15dc by game type
@@ -378,12 +437,14 @@ struct KbRace {
     int field_0xb8; // 0xB8
     KbScoreBoard* field_0xbc; // 0xBC
     char pad_0x00C0[0x8];
-    int field_0xc8; // 0xC8
+    KbGate* field_0xc8; // 0xC8
     char pad_0x00CC[0x2C];
     int field_0xf8; // 0xF8
     int field_0xfc; // 0xFC
     int field_0x100; // 0x100
-    char pad_0x0104[0x40];
+    char pad_0x0104[0x30];
+    KbRaw3 field_0x134; // 0x134  track position the race-kind 2/3 path search runs to (0x00414370)
+    char pad_0x0140[0x4];
     int field_0x144; // 0x144
     char pad_0x0148[0x41];
     char field_0x189; // 0x189
@@ -407,13 +468,13 @@ struct KbRace {
     char field_0x3fb; // 0x3FB  0x00492670 records message 10 when set
 };
 // Record at KrustyBike+0x744 (tier 3): per-bike state block reset by slot 43.
-struct KbRaw3 { int a, b, c; };
 struct KbGhost {
     char pad_0x00[0x8];
-    int field_0x08, field_0x0c, field_0x10, field_0x14, field_0x18;
+    float field_0x08;   // 0x00414370 compares it with 300.0f
+    int field_0x0c, field_0x10, field_0x14, field_0x18;
     Vec3 field_0x1c;
     Vec3 field_0x28;
-    int field_0x34;
+    KbGate* field_0x34;
     KbRaw3 field_0x38;
     KbRaw3 field_0x44;
 };

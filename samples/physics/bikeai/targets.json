@@ -48,5 +48,25 @@
     "expect": "exact",
     "notes": "Vec3::operator-= (math/Math3D.h) out-of-line COMDAT that VC6 emits after 0x0040eca0 once that function exhausts its inline budget (called at 0x00412eff / 0x00412f97)",
     "bindings": "BikeAINearMisses.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "BikeAINearMisses.cpp",
+    "candidate_symbol_contains": "?Fn_00413200@KrustyBike@@",
+    "target_va": "0x00413200",
+    "target_size": 4112,
+    "expect": "partial",
+    "notes": "16.1% (4122 vs 4112 bytes, 659 strict positions). KrustyBike AI physics step (slot 49 runs it while KbRace+0x18a is set), emitted in BikeAI.cpp: steering from the controls or from the landing prediction and the racing line, the two-point look-ahead model 0x0040eca0, then angular velocity, speed, suspension, wheel roll, crash test and orientation. Calls, constants, branches and the 1120 instructions match; frame 0x74 matches but slot 11's out-vectors sit at other offsets, the cross products in the angular-velocity block load their operands in a different order, and the ground-branch lean clamp keeps the value on the FPU stack. See the file section.",
+    "bindings": "BikeAINearMisses.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "BikeAINearMisses.cpp",
+    "candidate_symbol_contains": "?Fn_00414370@KrustyBike@@",
+    "target_va": "0x00414370",
+    "target_size": 4802,
+    "expect": "partial",
+    "notes": "8.5% (4678 vs 4802 bytes, 394 strict positions). KrustyBike racing-line builder (slot 63 calls it), emitted in BikeAI.cpp: by race kind the track path search (Track 0x5179f0/0x517ea0/0x518080, respawn after 5 s off the track), the gate line (kinds 1/5) or a random free-roam target, then target speed, AI speed class and the airborne trick pick (0x48d780/0x48d910). Block order and calls match; frame 0x74 vs 0x78 (retail spills the difficulty), and in kinds 1/5 retail places the gate-distance test before the single-point and no-track paths. See the file section.",
+    "bindings": "BikeAINearMisses.bindings.json"
   }
 ]

@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 210, c 158, total 368. The three class (a) functions of the
+Counts: a 0, b 212, c 158, total 370. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -144,6 +144,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/bikeai/BikeAI | `0x0040e510` | 1133/1944 | b | 53 code diffs: retail adds `mov esi, [esp + N] ; test esi, esi`; `mov edi, [esp + N] ; test edi, edi ; je~` vs `je @582`; slot order differs |
 | physics/bikeai/BikeAI | `0x00415640` | 5987/6111 | b | 17 code diffs: retail pushes the dot-call arguments after the z*z term (`faddp ; fld ; fmul ; push ; push` vs `push ; push ; faddp`); order of the one-use temporaries above +0x100 differs |
 | physics/bikeai/BikeAI | `0x0040eca0` | 1288/17345 | b | 392 code diffs: retail keeps the start-up and loop-head zero vectors in memory (candidate folds them); frame 0x93c vs 0x8b8, slot order differs |
+| physics/bikeai/BikeAI | `0x00413200` | 659/4122 | b | KrustyBike member: frame 0x74 exact but slot 11's out-vectors at other offsets; operand order of the angular-velocity cross products; ground-branch lean clamp keeps the value on the FPU stack |
+| physics/bikeai/BikeAI | `0x00414370` | 394/4678 | b | KrustyBike member: frame 0x74 vs 0x78 (retail spills the difficulty, candidate keeps it in edi); kind 1/5 gate-distance test placed after the single-point and no-track paths |
 | physics/bvh/BoundingBoxTreeBuild | `0x0042c260` | 447/1627 | b | 1 code diffs: retail lacks `mov edx, [eax + 0x27c] ; mov eax, [eax ~`; slots differ |
 | physics/bvh/BoundingBoxTreeBuild | `0x0042d390` | 1601/1608 | b | 3 code diffs: `mov ebx, [ebx + ecx]` vs `mov ebx, [ecx + ebx]`; `mov ebx, [ebx + ecx - 0x1c]` vs `mov ebx, [ecx + ebx - 0x1c]`; slots differ |
 | physics/bvh/BoundingBoxTreeQuery | `0x00424730` | 855/891 | b | instruction-identical; frame slots of half / moved / ext / delta (retail half, ext, delta, moved) |

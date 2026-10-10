@@ -9,7 +9,7 @@
 //     base offset) must match retail byte for byte.
 //
 // Vehicle, Bike and KrustyBike are reduced probe classes here: only their member-block
-// sizes (read from vehicle/Vehicle.h, bike/Bike.h and krustybike/KrustyBike.h, corrected
+// sizes (read from vehicle/Vehicle.h, vehicle/Bike.h and vehicle/KrustyBike.h, corrected
 // for the vtordisp) and the GameObject virtuals they override (from the vbase vtables)
 // are modelled.  The full reconstructions live in those directories.
 //
