@@ -1,5 +1,5 @@
 ProjectedShadow and TerrainShadow candidates are preserved in `samples/physics/shadow/`.
-D3DIMSoultreeShadow.cpp has 17 strictly verified cases with adjacent bindings.
+D3DIMSoultreeShadow.cpp has 18 strictly verified cases with adjacent bindings.
 Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDATION.md).
 
 # ProjectedShadow.cpp (shadow)
@@ -19,16 +19,17 @@ Evidence
 - RTTI: ProjectedShadow : GameObject (vptr at +0). Overrides slots 10 (float dt), 12, 13.
 - Layout: see the `// +0xNN` comments in ProjectedShadow.h. Size >= 0x134.
 
-Counts: ProjectedShadow.cpp 19 strict exact, 7 partial of 26 targets; D3DIMSoultreeShadow.cpp 17 strict exact.
+Counts: ProjectedShadow.cpp 19 strict exact, 7 partial of 26 targets; D3DIMSoultreeShadow.cpp 18 strict exact.
 
 D3DIMSoultreeShadow.cpp (D3DIMSoultreeShadow : ShadowReceiver : GameObject, vtable 0x55156c; ShadowReceiver 0x5515ec):
 ctor 0x446840, Attach 0x4468b0, slot 28 0x446bf0, both deleting dtors (0x446890 is shared with TerrainShadow by
 identical code folding, 0x4477a0), ShadowReceiver slot 8 / dtor, and the four ShadowConstVec3 `$E` pairs are exact.
 Slot 14 (0x447540, 574 bytes) is exact too; it fills the file's vertex array g_d3dimShadowVertices
-(0x581eb8, 3000 32-byte vertices). Near misses (samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp):
-slot 27 0x4468f0 (767 B, 746/767) and slot 29 0x446c30 (771 B, 712/771) are the caster-bounds box test
-(0x52f570) against the shadow camera / the render target's camera after an inlined 4x4 product; only the
-product's x87 term order differs (13 of 16 elements in the best natural form). Slot 30 0x446f40 (1524 B,
+(0x581eb8, 3000 32-byte vertices). Slot 27 0x4468f0 (767 B) is exact: the caster-bounds box test
+(0x52f570) against the shadow camera after an inlined 4x4 product, whose helper reads b through a
+second reference in _24 so that VC6 orders the row-2 sums as retail. Near misses
+(samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp): slot 29 0x446c30 (771 B, 730/771), the same
+test against the render target's camera; only the product's x87 term order differs. Slot 30 0x446f40 (1524 B,
 180/1485) builds the receiver vertices from the caster's current LOD meshes; retail rounds the clipped points
 with an inline __asm fld/fistp helper (ebp frame), so it stays partial under the no-asm rule. The 0x447910 setter is placed with DebugOverlay.cpp (docs/DEBUGOVERLAY.md). Ownership: slot 30 (0x446f40) pushes the file's own
 `__FILE__` 0x568cac at 0x447023/0x447043, and the other methods are contiguous members of the same class.

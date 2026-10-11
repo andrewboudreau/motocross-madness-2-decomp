@@ -52,6 +52,92 @@ D3DIMSoultreeShadow* D3DIMSoultreeShadow::Attach(int host, ShadowCaster* c, Proj
     return 0;
 }
 
+// Row-major 4x4 matrix with the D3DMATRIX member names and the index view (Math3D.h's
+// Matrix4 shape; this TU's ShadowMatrix only has m[4][4]).  Local view, tier 3.
+struct D3DIMShadowMatrix4 {
+    D3DIMShadowMatrix4() {}
+    union {
+        struct {
+            float _11, _12, _13, _14;
+            float _21, _22, _23, _24;
+            float _31, _32, _33, _34;
+            float _41, _42, _43, _44;
+        };
+        float m[4][4];
+    };
+};
+
+// The caster as slot 27 uses it (a D3DIMSoultreeObject; BoundingBoxTreeBuild.h
+// TreeModelSource).  Local view, tier 3.
+class D3DIMShadowCasterView {
+public:
+    void GetMatrixIn(void* frame, D3DIMShadowMatrix4* out);           // 0x004fca80
+    void GetBounds(ShadowVec3* center, ShadowVec3* halfExtents);      // 0x004fe850
+    char pad_0x00[0x14c];
+    int field_0x14c;                // +0x14c nonzero skips the visibility test
+};
+class D3DIMShadowCameraView {
+public:
+    char pad_0x00[0xec];
+    D3DIMShadowMatrix4 matrix_0xec; // +0xec
+};
+// The object at 0x00575a98 (src/krusty2/visibility/VisibilityQuadTree.h VisibilityClipper).
+class D3DIMShadowClipper {
+public:
+    int TestBox(D3DIMShadowCameraView* camera, const float* matrix, const float* center,
+                const float* extent, int* screenRect, int* cornersInside, int unused);  // 0x0052f570
+};
+extern D3DIMShadowClipper* g_visibilityClipper;   // 0x00575a98
+
+static inline void D3DIMShadowMatrixProduct(D3DIMShadowMatrix4* out, const D3DIMShadowMatrix4& a,
+                                            const D3DIMShadowMatrix4& b)
+{
+    // Reading b through a second name in _24 only makes VC6 order the row-2 sums as retail
+    // does in slot 27 (docs/VC6_OPERAND_ORDER.md section 1.2: the alias gives b's row-2
+    // column leaves a different age).
+    const D3DIMShadowMatrix4& right = b;
+    out->_11 = a._11 * b._11 + a._12 * b._21 + a._13 * b._31 + a._14 * b._41;
+    out->_12 = a._11 * b._12 + a._12 * b._22 + a._13 * b._32 + a._14 * b._42;
+    out->_13 = a._11 * b._13 + a._12 * b._23 + a._13 * b._33 + a._14 * b._43;
+    out->_14 = a._11 * b._14 + a._12 * b._24 + a._13 * b._34 + a._14 * b._44;
+    out->_21 = a._21 * b._11 + a._22 * b._21 + a._23 * b._31 + a._24 * b._41;
+    out->_22 = a._21 * b._12 + a._22 * b._22 + a._23 * b._32 + a._24 * b._42;
+    out->_23 = a._21 * b._13 + a._22 * b._23 + a._23 * b._33 + a._24 * b._43;
+    out->_24 = a._21 * right._14 + a._22 * right._24 + a._23 * right._34 + a._24 * right._44;
+    out->_31 = a._31 * b._11 + a._32 * b._21 + a._33 * b._31 + a._34 * b._41;
+    out->_32 = a._31 * b._12 + a._32 * b._22 + a._33 * b._32 + a._34 * b._42;
+    out->_33 = a._31 * b._13 + a._32 * b._23 + a._33 * b._33 + a._34 * b._43;
+    out->_34 = a._31 * b._14 + a._32 * b._24 + a._33 * b._34 + a._34 * b._44;
+    out->_41 = a._41 * b._11 + a._42 * b._21 + a._43 * b._31 + a._44 * b._41;
+    out->_42 = a._41 * b._12 + a._42 * b._22 + a._43 * b._32 + a._44 * b._42;
+    out->_43 = a._41 * b._13 + a._42 * b._23 + a._43 * b._33 + a._44 * b._43;
+    out->_44 = a._41 * b._14 + a._42 * b._24 + a._43 * b._34 + a._44 * b._44;
+}
+
+// 0x004468f0 (slot 27): clears field_0x38 and field_0x34, then sets field_0x34 when the caster's
+// bounds pass the shadow camera's box test; returns field_0x34.  Slot 29
+// (0x00446c30, the same test with the render target's camera) is a near miss in
+// samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp.
+int D3DIMSoultreeShadow::UnknownVirtualSlot27()
+{
+    D3DIMShadowCasterView* c = (D3DIMShadowCasterView*)caster;
+    field_0x38 = 0;
+    field_0x34 = 0;
+    if (!c->field_0x14c) {
+        D3DIMShadowMatrix4 local;
+        ShadowVec3 center, extent;
+        D3DIMShadowMatrix4 m;
+        c->GetMatrixIn(0, &local);
+        ((D3DIMShadowCasterView*)caster)->GetBounds(&center, &extent);
+        const D3DIMShadowMatrix4& view = ((D3DIMShadowCameraView*)shadow->camera)->matrix_0xec;
+        D3DIMShadowMatrixProduct(&m, local, view);
+        if (g_visibilityClipper->TestBox((D3DIMShadowCameraView*)shadow->camera, &m._11, &center.x,
+                                         &extent.x, 0, 0, 0))
+            field_0x34 = 1;
+    }
+    return field_0x34;
+}
+
 // 0x00446bf0: texel size of the shadow texture (0.5 / size when the +0x98 flag is set, else
 // 1.0 / size), kept in a file-scope float; returns 0.
 float g_d3dimShadowTexel;  // 0x0057efa4

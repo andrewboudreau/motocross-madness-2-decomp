@@ -22,6 +22,16 @@
   {
     "class": "D3DIMSoultreeShadow",
     "source": "D3DIMSoultreeShadow.cpp",
+    "candidate_symbol_contains": "?UnknownVirtualSlot27@D3DIM",
+    "target_va": "0x4468f0",
+    "target_size": 767,
+    "expect": "exact",
+    "notes": "slot 27: caster bounds box test after the inlined 4x4 product; b read through a second reference in _24 orders the row-2 sums",
+    "bindings": "D3DIMSoultreeShadow.bindings.json"
+  },
+  {
+    "class": "D3DIMSoultreeShadow",
+    "source": "D3DIMSoultreeShadow.cpp",
     "candidate_symbol_contains": "?UnknownVirtualSlot28@D3DIM",
     "target_va": "0x446bf0",
     "target_size": 63,

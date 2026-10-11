@@ -44,7 +44,7 @@ Headers have no retail names beyond a few `.h` strings, so their names are ours
 | `bvh/` | Shared box-tree layouts and `BoundingBoxTreeQuery.cpp` (unattested name, 36 strict cases); the builder is matched in `src/reconstructed/BoundingBoxTreeBuild.cpp` |
 | `effects/` | NormalDistribution, NullManager, ParticleManager: 18 strict cases |
 | `motion/` | SphereManager: 14 strict cases; `Motnctrl.cpp`: 40; `SteeringControl.cpp`: 21; shared motion layouts |
-| `shadow/` | D3DIMSoultreeShadow: 17 strict cases; other shadow candidates in samples |
+| `shadow/` | D3DIMSoultreeShadow: 18 strict cases; other shadow candidates in samples |
 | `visibility/` | VisibilityQuadTree: 39 strict cases; partial traversal in samples |
 
 Every `exact` target under `src/krusty2` is strict exact (682 of 738 targets; the rest are
