@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 188, c 142, total 330. The three class (a) functions of the
+Counts: a 0, b 187, c 138, total 325. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -31,7 +31,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | audio/PCAudio | `0x004bdc00` | 91/483 | b | retail extent 483; `while (1)` gives retail's top-tested queue loop (155 insns); left: retail ebp=audio, ebx=&cs then loaded, edi=&sound cs, ready/bytes spilled (frame 0xc vs 8) |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
 | camera/Camera | `0x0042e550` | 13/206 | c | retail reloads the display-mode index for the height (`mov edx, [eax + 0xc]` twice) and shares the return tail, so everything after it shifts; named width/height temps and width/height accessors both reuse the index (src/reconstructed/Camera.cpp) |
-| camera/Camera | `0x0042eb10` | 659/690 | c | four fld/fmul operand pairs of the up × forward cross product load the other operand first (samples/camera/CameraNearMisses.cpp) |
 | camera/Camera | `0x0042ee30` | 487/492 | c | `sub esp, 0x40` emitted after the `rep movsd` that copies the projection argument (retail before it) | in the first MatrixMult; argument copies, viewport temporaries and declaration forms do not move it |
 | camera/FollowCamera | `0x00462ee0` | 418/564 | c | 12 code diffs: retail lacks `mov byte ptr [esi + 0x274], bl ; mov [e~`; retail adds `mov [edx + 8], eax` |
 | camera/FollowCamera | `0x00463a30` | 903/4042 | b | slot 45 (keyboard/joystick controls), 138 code diffs; aligned instruction ratio 0.937 (samples/camera/FollowCameraNearMisses.cpp) |
@@ -188,8 +187,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/motion/Motnctrl | `0x004a7fd0` | 562/1009 (masked) | c | 37 code diffs: `fld [esi + 8] ; fmul [edi + 4] ; fld [e~` vs `fld [edi + 4] ; fmul [esi + 8] ; fld [e~`; retail adds `fsubp st(1)` |
 | physics/motion/Motnctrl | `0x004a8470` | 212/1093 (masked) | c | 43 code diffs: retail adds `push ebp`; retail lacks `push ebp` |
 | physics/motion/SteeringControl | `0x00504d30` | 125/206 (masked) | b | 6 code diffs: `fxch st(2) ; fmul st(2)` vs `fld st(0) ; fmul st(3)`; `fmul st(2)` vs `fmul st(1)`; slots differ |
-| physics/shadow/D3DIMSoultreeShadow | `0x004468f0` | 746/767 | c | x87 term order of the inlined 4x4 product (elements _21.._23); the rest, frame included, is retail's |
-| physics/shadow/D3DIMSoultreeShadow | `0x00446c30` | 712/771 | c | x87 term order of the inlined 4x4 product, same helper as slot 27 |
+| physics/shadow/D3DIMSoultreeShadow | `0x00446c30` | 730/771 | c | x87 term order of the inlined 4x4 product: one term pair in each of _11, _21, _31, _41 (retail's sum orders differ from slot 27's with the same helper) (samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp) |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446f40` | 180/1485 | b | retail's inline __asm fld/fistp rounding helper forces an ebp frame (0xe4 locals); the (int) casts call __ftol |
 | physics/shadow/ProjectedShadow | `0x004da570` | 231/275 (masked) | c | 4 code diffs: `mov [esi + 0x88], eax` vs `mov edx, A`; `mov ecx, A` vs `mov [esi + 0x88], eax` |
 | physics/shadow/ProjectedShadow | `0x004da7b0` | 152/777 (masked) | b | 22 code diffs: `lea ecx, [esp + N] ; mov eax, [eax + 4]~` vs `lea edx, [esp + N] ; mov ecx, [eax + 4]~`; `push ecx` vs `push edx`; slots differ |
@@ -211,8 +209,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/tire/Tire | `0x00514550` | 169/3838 (masked) | b | 214 code diffs: `lea edi, [esi + 0x200] ; push edi` vs `lea ebp, [esi + 0x200] ; push ebp`; retail lacks `lea ebp, [esi + 0x20c] ; lea ebx, [esi ~`; frame 0xb8 vs 0xc0 |
 | physics/tire/Tire | `0x00515880` | 48/653 (masked) | b | 35 code diffs: retail adds `mov eax, [esp + N] ; push esi ; mov ecx~`; retail lacks `mov ecx, [esp + N]`; slots differ |
 | physics/tire/Tire | `0x00515b50` | 132/271 (masked) | c | 9 code diffs: `fld [ecx + 0x180] ; fmul [ecx + 0x58] ;~` vs `fld [ecx + 0x54] ; fmul [ecx + 0x17c] ;~`; `fld [ecx + 0x178] ; fmul [ecx + 0x50]` vs `fld [ecx + 0x58] ; fmul [ecx + 0x180]` |
-| physics/tire/Tire | `0x00515c90` | 231/296 | b | x87 operand order of the y and z terms of the normalised cross product (retail loads b first) |
-| physics/visibility/VisibilityClipper | `0x0052f190` | 382/418 | c | 8 code diffs: `fld [ecx + 0x1c] ; fmul [edx + 4]` vs `fld [edx + 4] ; fmul [ecx + 0x1c]`; `fld [ecx + 0x2c] ; fmul [edx + 8]` vs `fld [edx + 8] ; fmul [ecx + 0x2c]` |
+| physics/tire/Tire | `0x00515c90` | 287/292 | b | true extent 292; the x component of the normalisation scale loads the scalar first (`fld st(0); fmul c.x`), retail the component; cross product, registers and y/z scales match (samples/physics/tire/Tire.cpp) |
 | physics/visibility/VisibilityQuadTreeTraversal | `0x0052d610` | 2046/2814 (masked) | c | 137 code diffs: `mov eax, [esp + N] ; mov ecx, [esp + N]` vs `mov eax, [edi + 4]`; retail adds `mov ecx, [eax] ; mov eax, [esp + N] ; p~` |
 | race/BikeRace | `0x00417ed0` | 2804/6756 | c | retail stores `z*z` of each vector length to a stack temporary (`fstp [t]; faddp; fadd [t]`); the girl block's temporaries sit 4 to 12 bytes apart |
 | race/BikeRace | `0x00419970` | 1386/13322 | b | frame 0xac4 vs 0xab0, slot order differs (register choice follows); retail keeps one more stream destructor tail |
@@ -230,7 +227,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/Recorder | `0x004e7d60` | 272/2448 | b | 99 code diffs: `jne @767 ; mov eax, [esi + 0x88] ; test~` vs `jne @761 ; mov ecx, [esi + 0x88] ; xor ~`; slot order differs |
 | race/Wrecker | `0x005306e0` | 4174/4178 | c | slot 10: one term pair of the first product (`relative._23` adds `a._23 * b._22` before `a._33 * b._23` in retail) |; pointer locals to the inverse, the product operands, the swapped element and the inverse rows give 3781..4174 |
 | race/Wrecker | `0x00531740` | 772/1617 | b | frame 0xc4 matches; slot order and `0.0f - scaled.z` operand order |
-| race/Wrecker | `0x00532580` | 511/562 | c | each cross product loads the old forward component first (retail the new pose's); the up-row loads are issued before the forward copy's last store |
 | race/Wrecker | `0x005329e0` | 215/1306 | b | frame 0x94 matches; slot order (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`) |
 | render/BackgroundImage | `0x004049d0` | 39/603 (masked) | c | 33 code diffs: `xor edi, edi` vs `mov [esp + N], 0`; `mov [esp + N], edi ; mov [ecx], edi ; j~` vs `mov [ecx], 0 ; je @162` |
 | render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
@@ -283,7 +279,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/PCTextureMap | `0x004c69c0` | 429/894 (masked) | c | 31 code diffs: `jne @390` vs `jne A`; `jne @120` vs `jne @116 ; lea edx, [esp + N]` |
 | render/PCTextureMap | `0x004c71c0` | 286/538 (masked) | c | 27 code diffs: `mov ebp, 1` vs `mov ebx, 1`; `and eax, ebp` vs `and eax, ebx` |
 | render/PCTextureMap | `0x004c7b40` | 247/767 | b | 35 code diffs: retail lacks `mov edi, [eax]`; slots differ |
-| render/PCTextureMap | `0x004c8550` | 319/321 (masked) | b | 2 code diffs: `mov edx, [esi + 0xc]` vs `mov edx, [esi + 8]`; `imul edx, [esi + 8]` vs `imul edx, [esi + 0xc]`; slots differ |
 | render/PCVideoCard | `0x004ca520` | 26/124 | c | 13 code diffs: `mov ebx, [esp + N]` vs `push ebp`; retail adds `mov ebp, [ecx + 0x74]` |
 | render/PCVideoCard | `0x004ca5a0` | 50/490 | c | 15 code diffs: retail adds `push ebp ; mov ebp, [esp + N]`; retail lacks `mov [eax], ebx ; mov eax, [esp + N]` |
 | render/PCVideoCard | `0x004cab00` | 144/1113 | b | retail keeps the mode index in esi shared with the created target (two -3 stores), re-tests `render` after the found path and places the Slot8-success path after the epilogue |
