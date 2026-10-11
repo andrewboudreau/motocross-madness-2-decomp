@@ -22335,6 +22335,15 @@ CASES = [
         'reason': 'frees lines, sections and string values',
     },
     {
+        'name': 'Parameterblocks open through archives',
+        'bindings': 'src/reconstructed/Parameterblocks.bindings.json',
+        'source': 'src/reconstructed/Parameterblocks.cpp',
+        'symbol': '?UnknownFunction4b7220@UnknownParameterBlock@@QAEXPAVUnknownParameterStream@@PBD1H@Z',
+        'target_va': '0x004b7220',
+        'target_size': 157,
+        'reason': 'found call written in both branches (cross-jumped); this in ebx, path in ebp',
+    },
+    {
         'name': 'Parameterblocks scan-load section',
         'bindings': 'src/reconstructed/Parameterblocks.bindings.json',
         'source': 'src/reconstructed/Parameterblocks.cpp',

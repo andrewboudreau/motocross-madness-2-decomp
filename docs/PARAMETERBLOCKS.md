@@ -2,9 +2,8 @@
 
 `src/reconstructed/Parameterblocks.h` / `Parameterblocks.cpp` reconstruct
 `D:\aardvark\VC\krusty2\Parameterblocks.cpp`, `0x004b6f30..0x004b8465`. Under
-`vc6_o2_mt`, 26 of the 27 functions match exactly with every relocation bound
-(26 calibration cases). `0x004b7220` is a near miss in
-`samples/parameterblocks/ParameterblocksNearMisses.cpp`.
+`vc6_o2_mt`, all 27 functions match exactly with every relocation bound
+(27 calibration cases).
 
 The TU reads INI-style text: `[section]` headers, then `key=value` lines or
 comma-separated rows. Lines starting with `;` are comments. It reads through
@@ -19,7 +18,7 @@ the game's file stream, and archives can redirect that stream.
 | `0x004b70c0` | 108 | converts a value to text |
 | `0x004b7130` | 91 | constructor |
 | `0x004b7190` | 136 | destructor |
-| `0x004b7220` | 157 | opens a file through the archives (**near miss**, 91.7%) |
+| `0x004b7220` | 157 | opens a file through the archives |
 | `0x004b72c0` | 664 | finds a section by scanning and loads its lines |
 | `0x004b7560` | 575 | indexes every section's offset, line count and mode |
 | `0x004b77a0` | 130 | opens a stream at an offset, optionally indexing it |
@@ -87,13 +86,19 @@ the game's file stream, and archives can redirect that stream.
 - The int and float converters copy the raw 32 bits for both numeric types,
   in two identical case bodies. VC6 does not merge them.
 
-## Near miss
+## Register weight from a duplicated call
 
-`0x004b7220`: the calls, arguments, branch layout and frame all match. Retail
-keeps `this` in `ebx` and `path` in `ebp`, and saves `ebp` only around the
-not-found block. VC6 here swaps the two registers (144 of 157 bytes). None of
-these changed it: early returns, if/else, a top-declared entry, a local copy
-of the path, `== 0` comparisons.
+`0x004b7220`: retail keeps `this` in `ebx` and `path` in `ebp`, and saves
+`ebp` only around the not-found block. With the found call
+`UnknownFunction4b77a0(entry->field_0x14, entry->field_0x18, index)` written
+once after the not-found block, VC6 swaps the two registers (144 of 157
+bytes); early returns, if/else, a top-declared entry, a local copy of the
+path, `== 0` comparisons, inline helpers for the lookups and a `self` copy of
+`this` do not change it. Writing the call out a second time at the end of the
+not-found block makes it exact: VC6 cross-jumps the two copies into one block,
+but the extra source reference raises `this` above `path` in the callee-saved
+register order. In a probe, a field store through `this` (one reference
+more than the duplicated call) raised it above `name` into `edi` instead.
 
 ## Remaining uncertainty
 

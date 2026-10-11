@@ -146,8 +146,35 @@ UnknownParameterBlock::~UnknownParameterBlock()
     field_0x540 = 0;
 }
 
-// 0x004b7220 (open through the stream's archives) is a near miss; see
-// samples/parameterblocks/ParameterblocksNearMisses.cpp.
+// Opens `name` through the stream's archive list (+0x12c): find it, else add
+// the archive at `path` (loading `name` from it when that fails) and find it
+// again; without an entry or archives it opens the stream itself at offset 0.
+// The found call is written out in both branches: VC6 cross-jumps the two
+// copies into retail's single block, and the extra source reference of `this`
+// is what gives it ebx and `path` ebp (one copy swaps the two registers).
+void UnknownParameterBlock::UnknownFunction4b7220(UnknownParameterStream* stream,
+                                                  const char* name, const char* path,
+                                                  int index)
+{
+    if (stream->field_0x12c) {
+        UnknownParameterArchiveEntry* entry =
+            stream->field_0x12c->UnknownFunction4e9360(name, 0);
+        if (!entry) {
+            if (!stream->field_0x12c->UnknownFunction4e9030(path, 0))
+                stream->field_0x12c->UnknownFunction4e9430(name, path);
+            entry = stream->field_0x12c->UnknownFunction4e9360(name, 0);
+            if (!entry) {
+                UnknownFunction4b77a0(stream, 0, index);
+                return;
+            }
+            UnknownFunction4b77a0(entry->field_0x14, entry->field_0x18, index);
+            return;
+        }
+        UnknownFunction4b77a0(entry->field_0x14, entry->field_0x18, index);
+        return;
+    }
+    UnknownFunction4b77a0(stream, 0, index);
+}
 
 // Scans forward for `[name]` and loads the section's non-empty,
 // non-comment lines. `lines` must be cleared before the line count and
