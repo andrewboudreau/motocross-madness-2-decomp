@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 195, c 149, total 344. The three class (a) functions of the
+Counts: a 0, b 195, c 148, total 343. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -83,10 +83,10 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | krusty2/collision/CollisionObject | `0x00436720` | 66/790 (masked) | c | 52 code diffs: `sub esp, 0x18` vs `sub esp, 0xc`; `add esp, 0x18` vs `add esp, 0xc` |
 | krusty2/collision/CollisionObject | `0x00436af0` | 33/812 (masked) | c | 16 code diffs: retail lacks `mov eax, [esp + N]`; `lea esi, [eax + 0x48] ; jle @48` vs `mov edi, [esp + N] ; jle @47` |
 | krusty2/collision/CollisionObject | `0x00436e50` | 335/2099 | b | HullVsModel: frame 0x108 vs 0x120; retail inlines the first offset rotation and calls 0x42a4b0/0x42a450/0x42a510 for the rest (inline budget), a in ebx, b in ebp |
-| krusty2/collision/CollisionObject | `0x004376f0` | 677/707 | c | HullVsModelSwept: frame matches; one push schedule, loop loads, the mean's x term |
-| krusty2/collision/CollisionObject | `0x00437c20` | 698/716 | c | ModelVsHull: frame and slots match (inverse written into the product's local); two push schedules before 0x424730/0x436720, the mean's x term (retail `fld st(0); fmul sum.x`, then `fld sum.y; fmul st(1)`), copy registers |
-| krusty2/collision/CollisionObject | `0x00437ef0` | 843/906 | c | ModelVsHullSwept: frame 0x7c matches; scheduling of the two box copies before 0x4290d0, one push, the mean's x term |
-| krusty2/collision/CollisionObject | `0x00438280` | 694/710 | c | ModelVsModel: as ModelVsHull (one push schedule, the mean's x term, copy registers) |
+| krusty2/collision/CollisionObject | `0x004376f0` | 681/707 | c | HullVsModelSwept: mean as ModelVsHull. Left: one push schedule, the loop's this/offset loads and the mean copy registers |
+| krusty2/collision/CollisionObject | `0x00437c20` | 703/716 | c | ModelVsHull: frame and slots match; mean written per component with `s` assigned inside the x product (x term now matches). Left: two argument-push schedules (before 0x424730 and before HullVsHull) and the mean copy registers (retail eax/ecx/edx) |
+| krusty2/collision/CollisionObject | `0x00437ef0` | 847/906 | c | ModelVsHullSwept: frame 0x7c matches; mean as ModelVsHull. Left: scheduling of the two box copies, one push and the mean copy registers |
+| krusty2/collision/CollisionObject | `0x00438280` | 699/710 | c | ModelVsModel: as ModelVsHull, with the same per-component mean. Left: one push schedule (`sub esp, 0xc` placement) and the mean copy registers |
 | krusty2/collision/CollisionObject | `0x00438550` | 712/783 | c | ModelVsModelSwept keeps the last contact (no averaging); scheduling of the box copies, register choice in the loop |
 | krusty2/collision/CollisionObject | `0x00438c90` | 61/475 | c | 31 code diffs: `mov ebx, [ecx + 0x54]` vs `xor ebx, ebx`; `xor ebp, ebp` vs `mov ebp, [ecx + 0x54] ; sub edx, ebx` |
 | krusty2/collision/CollisionObject | `0x004392c0` | 303/311 | c | 6 code diffs: `mov eax, [esp + N] ; mov ecx, [eax + 0x~` vs `mov ecx, [esp + N] ; mov eax, [ecx + 0x~`; `dec ecx` vs `dec eax` |
@@ -151,7 +151,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/bvh/BoundingBoxTreeQuery | `0x0042a640` | 41/1428 | b | retail homes floats in the dead d0/d1 argument slots (frame 0x60 vs 0x80); cross-product operand order of the x term |
 | physics/collision/CollisionContactUpdate | `0x0043aa30` | 25/698 (masked) | b | 51 code diffs: retail lacks `sub esp, N`; retail adds `sub esp, 0x1c ; mov ecx, [edx]`; frame 0x10 vs 0x0 |
 | physics/collision/CollisionContactUpdate | `0x0043ad80` | 26/315 (masked) | c | 19 code diffs: `sub esp, 0xc` vs `sub esp, 0x24`; retail adds `jne @7 ; xor eax, eax ; add esp, 0x24` |
-| physics/collision/CollisionObject | `0x00439600` | 516/532 | c | x87 order of the segment-parameter numerator (retail multiplies v.y*d.y and v.x*d.x before v.z*d.z) (samples/physics/collision/CollisionObjectNearMisses.cpp) |
 | physics/collision/CollisionPoint | `0x0043a640` | 41/814 (masked) | b | 44 code diffs: retail adds `push ebx`; retail adds `fld [esi + 0x30] ; fmul [eax + 4] ; fld~`; slots differ |
 | physics/collision/CollisionPoint | `0x0043b240` | 155/162 (masked) | c | 2 code diffs: retail adds `fstp [esp + N]`; retail lacks `fstp [esp + N]` |
 | physics/collision/CollisionVectorHelpers | `0x0043b190` | 150/156 (masked) | b | 2 code diffs: retail adds `mov ecx, [esp + N]`; `mov ecx, [esp + N] ; fld [eax + 4] ; fm~` vs `fld [ecx + 4] ; fmul [eax + 4]`; slots differ |

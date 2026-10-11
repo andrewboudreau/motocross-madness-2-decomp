@@ -426,7 +426,7 @@
     "target_va": "0x004376f0",
     "target_size": 707,
     "expect": "partial",
-    "notes": "677/707: rel = inverse(a+0xc8) * b+0x88 in one local, zero sum via a Vec3 temporary that also serves as the unread 0x4fc9a0 output (frame 0x60 like retail). Left: one push schedule, the loop's this/offset loads and the mean's x term.",
+    "notes": "681/707: rel = inverse(a+0xc8) * b+0x88 in one local, zero sum via a Vec3 temporary that also serves as the unread 0x4fc9a0 output (frame 0x60 like retail); mean written per component with s assigned inside the x product. Left: one push schedule, the loop's this/offset loads and the mean copy registers.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -456,7 +456,7 @@
     "target_va": "0x00437c20",
     "target_size": 716,
     "expect": "partial",
-    "notes": "698/716: rel = inverse(model+0x88) * hull+0x48 with the inverse written into the product's own local (one Matrix4 slot, frame 0x60 like retail); zero sum and mean go through Vec3 temporaries. Left: two argument-push schedules, the x term of the mean (retail s * sum.x, then sum.y * s) and the copy registers.",
+    "notes": "703/716: rel = inverse(model+0x88) * hull+0x48 with the inverse written into the product's own local (one Matrix4 slot, frame 0x60 like retail); zero sum via a Vec3 temporary; mean written per component as mean.x = sum.x * (s = 1.0f / count), then sum.y * s, sum.z * s (matches retail fld st(0); fmul sum.x). Left: two argument-push schedules (before 0x424730 and before HullVsHull) and the mean copy registers (retail eax/ecx/edx).",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -466,7 +466,7 @@
     "target_va": "0x00437ef0",
     "target_size": 906,
     "expect": "partial",
-    "notes": "843/906: swept variant; the model box is copied into locals that 0x004290d0 grows in place, then stored to +0x108/+0x114 and passed by value (frame 0x7c like retail). Left: scheduling of the two box copies, one push and the mean's x term.",
+    "notes": "847/906: swept variant; the model box is copied into locals that 0x004290d0 grows in place, then stored to +0x108/+0x114 and passed by value (frame 0x7c like retail); mean as ModelVsHull. Left: scheduling of the two box copies, one push and the mean copy registers.",
     "bindings": "CollisionObject.bindings.json"
   },
   {
@@ -476,7 +476,7 @@
     "target_va": "0x00438280",
     "target_size": 710,
     "expect": "partial",
-    "notes": "694/710: as ModelVsHull with ModelVsHull per element of b (frame 0x60 like retail). Left: one push schedule, the mean's x term and the copy registers.",
+    "notes": "699/710: as ModelVsHull with ModelVsHull per element of b (frame 0x60 like retail), same per-component mean. Left: one push schedule (sub esp,0xc placement) and the mean copy registers.",
     "bindings": "CollisionObject.bindings.json"
   },
   {

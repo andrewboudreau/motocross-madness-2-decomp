@@ -779,7 +779,9 @@ int TreeBoxOverlap(CollisionBoxBounds* boundsA, CollisionBoxBounds* boundsB, con
 
 // 0x004392c0: bounds-only overlap of this object against `other` (used by TestMeshAgainst).
 // Partial 303/311 (same size and frame): retail holds `other` in ecx and its shape type in eax
-// for the second switch, VC6 swaps the two registers here.
+// for the second switch, VC6 swaps the two registers here.  No effect or worse: a local
+// type or object copy, shape-first tests, declaration order, xfB first, every case order,
+// returns inside the cases and an inline helper (pointer, reference or return form).
 int CollisionObject::TestMeshBounds(CollisionObject* other)
 {
     CollisionBoxBounds modelBoundsA;
@@ -946,6 +948,9 @@ void CollisionObject::DrawTree(CollisionTreeNode* node, int depth, const Matrix4
 // 0x004334c0 (ret 0x14).  Like DrawTree, but also shows where `motion` moves each node.
 // A box is drawn, moved by 0x00428db0 and drawn again.  A triangle is drawn and each
 // corner is joined (in red) to its image under `motion`.
+// Near miss (1046/1066): rows y/z of q[1], q[2] sum (z, y), x in retail and (x, z), y here;
+// a uniform sweep of DebugTransformPointRef forms (that also keeps 0x00433930 exact) found
+// nothing better.
 void CollisionObject::DrawTreeMotion(CollisionTreeNode* node, int depth, const Matrix4* xf,
                                      const Matrix4* motion, const Vec3* verts)
 {
@@ -1176,6 +1181,8 @@ struct CollisionCapsuleView {
 // sphere and a capsule its two end spheres joined by ten rings along the axis.
 // Near miss (1054/1068, size and frame exact): only the capsule end-point transforms differ in
 // x87 operand order (retail sums p0's terms y, z, x and loads m->_11 before p1.x).
+// Swapping capsule/shape bases and by-value, pointer, temporary or per-row helpers gave
+// nothing; per-row hand-ordered products reach 1060/1068 only in unreadable forms.
 // The ring step is d / 10.0f: VC6 turns it into a multiply by the reciprocal constant
 // 0x005511cc, a separate pool entry from the literal 0.1f at 0x005507d0.
 int CollisionObject::GameObjectVirtualSlot14()
@@ -1719,7 +1726,17 @@ int CollisionObject::ModelVsHull(CollisionModelBody* a, CollisionHullBody* b, Co
             }
         }
         if (hit) {
-            QueryContact(q) = sum * (1.0f / count);
+            Vec3 mean;
+            float s;
+            mean.x = sum.x * (s = 1.0f / count);
+            mean.y = sum.y * s;
+            mean.z = sum.z * s;
+            QueryContact(q) = mean;
+            // Retail scales x as fld st(0); fmul sum.x and y/z component
+            // first: s assigned inside the x product gives that order
+            // (sum * (1.0f / count), a Vec3 ctor, member operators and a
+            // by-value helper all scale x component first).  The copy
+            // registers (retail eax/ecx/edx) still differ.
         }
         return hit;
     }
@@ -1754,7 +1771,12 @@ int CollisionObject::ModelVsHullSwept(CollisionModelBody* a, CollisionHullBody* 
             }
         }
         if (hit) {
-            QueryContact(q) = sum * (1.0f / count);
+            Vec3 mean;
+            float s;
+            mean.x = sum.x * (s = 1.0f / count);
+            mean.y = sum.y * s;
+            mean.z = sum.z * s;
+            QueryContact(q) = mean;
         }
         return hit;
     }
@@ -1785,7 +1807,12 @@ int CollisionObject::ModelVsModel(CollisionModelBody* a, CollisionModelBody* b, 
             }
         }
         if (hit) {
-            QueryContact(q) = sum * (1.0f / count);
+            Vec3 mean;
+            float s;
+            mean.x = sum.x * (s = 1.0f / count);
+            mean.y = sum.y * s;
+            mean.z = sum.z * s;
+            QueryContact(q) = mean;
         }
         return hit;
     }
@@ -1940,7 +1967,12 @@ int CollisionObject::HullVsModelSwept(CollisionHullBody* a, CollisionModelBody* 
             }
         }
         if (hit) {
-            QueryContact(q) = sum * (1.0f / count);
+            Vec3 mean;
+            float s;
+            mean.x = sum.x * (s = 1.0f / count);
+            mean.y = sum.y * s;
+            mean.z = sum.z * s;
+            QueryContact(q) = mean;
         }
         return hit;
     }
@@ -2127,6 +2159,10 @@ void CollisionRelativeTransform(Matrix4* out, const Matrix4* from, const Matrix4
 // the final 0x00432180 call and is tier 2; the geometric meaning is tier 3.
 // Retail inlines the first two relative transforms (two copies of the inverse, then
 // 0x00436500) and calls 0x00432180 only for the last one, so they are written out here.
+// Near miss (441/458): one store (mov [esp+0x30], eax) of the second inverse copy is
+// scheduled later.  No gain from an inline CollisionRelativeTransform (inlines all three),
+// three calls, swapped inverse variants, two inverse locals, block scopes, declaration
+// orders, t2 first or reordered rows in the second copy.
 void CollisionRelativeFrame(Matrix4* out, const Matrix4* m1, const Matrix4* m2, const Matrix4* m3)
 {
     Matrix4 inv;

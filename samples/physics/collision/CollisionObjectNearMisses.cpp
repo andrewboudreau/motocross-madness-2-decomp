@@ -1,12 +1,21 @@
 // Near misses for src/krusty2/collision/CollisionObject.cpp (TU CollisionObject.cpp).
 //
 // Fn_00439600 (0x00439600, 532 bytes; cdecl, called from BikeAI.cpp 0x00416105, 0x00416a9c,
-// 0x00416ccf): 516/532 with every relocation resolved.  Only the numerator of the segment
-// parameter differs: retail multiplies v.y*d.y and v.x*d.x before v.z*d.z (v.z stays on the
-// x87 stack); every source order tried (natural, reversed, parenthesised, CollisionDot with
-// either operand order) emits v.z*d.z first.  The denominator needs the explicit
-// (y*y + x*x) + z*z grouping and the distance (y*y + x*x) + z*z; the rest matches.
+// 0x00416ccf): exact with every relocation resolved.  The segment-parameter numerator and the
+// distance go through a by-reference inline dot whose body is grouped (x + y) + z: retail
+// multiplies v.y*d.y and v.x*d.x before v.z*d.z and consumes v.z in place.  The same grouping
+// written inline in the expression ((v.y*d.y + v.x*d.x) + v.z*d.z, with or without
+// parenthesised products) keeps v.z alive on the x87 stack and pops it after the divide (four
+// bytes longer); the flat sum in any order, CollisionDot and by-value helpers emit v.z*d.z
+// first.  The denominator must stay written out as (d.y*d.y + d.x*d.x) + d.z*d.z: the helper
+// with d twice is 2 bytes shorter.
 #include "collision/CollisionObject.cpp"
+
+// Dot product grouped (x + y) + z, by reference (see the file header).
+inline float CapsuleSegmentDot(const CollisionVec3& a, const CollisionVec3& b)
+{
+    return (a.x * b.x + a.y * b.y) + a.z * b.z;
+}
 
 // 0x00439600 (cdecl; BikeAI.cpp 0x00416105, 0x00416a9c, 0x00416ccf): the capsule version of
 // 0x004394f0.  The point of the segment closest to the object's bounding-sphere centre
@@ -17,14 +26,14 @@ int Fn_00439600(CollisionVec3* ends, float radius, float radiusSq, CollisionObje
         const CollisionVec3* center = (const CollisionVec3*)&object->field_0x34;
         CollisionVec3 d = ends[1] - ends[0];
         CollisionVec3 v = *center - ends[0];
-        float t = (v.x * d.x + v.y * d.y + v.z * d.z) / ((d.y * d.y + d.x * d.x) + d.z * d.z);
+        float t = CapsuleSegmentDot(v, d) / ((d.y * d.y + d.x * d.x) + d.z * d.z);
         if (t >= 1.0f)
             t = 1.0f;
         else if (t <= 0.0f)
             t = 0.0f;
         CollisionVec3 closest = ends[0] + d * t;
         CollisionVec3 diff = *center - closest;
-        float distSq = (diff.y * diff.y + diff.x * diff.x) + diff.z * diff.z;
+        float distSq = CapsuleSegmentDot(diff, diff);
         float dist = distSq == 1.0f ? 1.0f : FastSqrt(distSq);
         if (dist < radius + object->boundRadius) {
             switch (object->shapeType) {
