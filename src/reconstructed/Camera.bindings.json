@@ -1,6 +1,7 @@
 {
   "??0Camera@@QAE@H@Z": "0x0042e340",
   "??0Camera@@QAE@H@Z$ehhandler": "0x00549d68",
+  "??0CameraVec3Call@@QAE@MMM@Z": "0x00404e60",
   "??0GameObject@@QAE@H@Z": "0x00468ca0",
   "??1Camera@@UAE@XZ": "0x0042f020",
   "??1GameObject@@UAE@XZ": "0x00468d60",
@@ -11,6 +12,7 @@
   "?FastInvSqrt@@YAMM@Z": "0x00460c00",
   "?IdentityMatrix@@YA?AUMatrix4@@XZ": "0x004a1410",
   "?SaveScreenshot@PCRenderTarget@@QAEXXZ": "0x004c5d00",
+  "?UnknownFunction40ae30@@YAMPBUVector3@@0@Z": "0x0040ae30",
   "?UnknownFunction42e550@Camera@@QAEHXZ": "0x0042e550",
   "?UnknownFunction42e8e0@Camera@@QAEHXZ": "0x0042e8e0",
   "?UnknownFunction42e930@Camera@@QAEXM@Z": "0x0042e930",
@@ -27,6 +29,7 @@
   "?UnknownVirtualSlot18@GameObject@@UAEHXZ": "0x004694d0",
   "?UnknownVirtualSlot23@GameObject@@UAEHPAUUnknownControlEvent@@PAUUnknownInputEntry@@@Z": "0x004695d0",
   "?UnknownVirtualSlot28@Camera@@UAEXXZ": "0x0042ee30",
+  "?UnknownVirtualSlot29@Camera@@UAEHUVector3@@@Z": "0x0042eb10",
   "?UnknownVirtualSlot30@Camera@@UAEHPBUMatrix4@@@Z": "0x0042edd0",
   "?UnknownVirtualSlot31@Camera@@UAEHPBUMatrix4@@@Z": "0x0042edf0",
   "?UnknownVirtualSlot32@Camera@@UAEHPBUMatrix4@@@Z": "0x0042ee10",

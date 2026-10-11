@@ -222,6 +222,73 @@ int Camera::UnknownVirtualSlot14() {
     return 1;
 }
 
+// 0x0040ae30 (cdecl): out-of-line dot product.
+float UnknownFunction40ae30(const Vector3* a, const Vector3* b);
+
+// Vector3 seen through the out-of-line (x, y, z) constructor copy 0x00404e60.
+struct CameraVec3Call : Vector3 {
+    CameraVec3Call(float x_, float y_, float z_);
+};
+
+// v scaled to unit length through the out-of-line dot product.
+static inline Vector3 NormalizeCall(const Vector3& v) {
+    float squared = UnknownFunction40ae30(&v, &v);
+    if (squared == 1.0f)
+        return v;
+    float scale = FastInvSqrt(squared);
+    return Vector3(v.x * scale, v.y * scale, v.z * scale);
+}
+
+static inline Vector3 Diff(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+static inline Vector3 Cross(const Vector3& a, const Vector3& b) {
+    Vector3 r;
+    r.x = a.y * b.z - a.z * b.y;
+    r.y = a.z * b.x - a.x * b.z;
+    r.z = a.x * b.y - a.y * b.x;
+    return r;
+}
+
+// v scaled to unit length through the constructor copy.
+static inline Vector3 NormalizeInline(const Vector3& v) {
+    float squared = v.z * v.z + (v.x * v.x + v.y * v.y);
+    if (squared == 1.0f)
+        return v;
+    float scale = FastInvSqrt(squared);
+    return CameraVec3Call(scale * v.x, scale * v.y, scale * v.z);
+}
+
+// 0x0042eb10: aims the camera at `target`. Returns 0 when the target is the
+// camera position; otherwise the forward direction becomes the unit vector to
+// the target, the up vector is rebuilt from (0, 1, 0) through the right
+// vector (the x axis when looking straight up or down) and the projection is
+// marked for refresh. The `up` reference used for x, y and the first cross
+// (but not the z store) is what puts the cross product's fld/fmul operands
+// in retail order; with plain member access four pairs swap (659/690), with
+// the reference for all three stores 675/690.
+int Camera::UnknownVirtualSlot29(Vector3 target) {
+    if (target.x == field_0x170.x && target.y == field_0x170.y && target.z == field_0x170.z)
+        return 0;
+    Vector3& up = field_0x188;
+    up.x = 0.0f;
+    up.y = 1.0f;
+    field_0x188.z = 0.0f;
+    field_0x17c = NormalizeCall(Diff(target, field_0x170));
+    float y = field_0x17c.y;
+    if (y < 0.0f)
+        y = -y;
+    Vector3 right;
+    if (y != 1.0f)
+        right = NormalizeInline(Cross(up, field_0x17c));
+    else
+        right = Vector3(1.0f, 0.0f, 0.0f);
+    field_0x188 = Cross(field_0x17c, right);
+    field_0x1d0 = Owner()->field_0x14 + 1;
+    return 1;
+}
+
 int Camera::UnknownVirtualSlot30(const Matrix4* value) {
     worldMatrix = *value;
     return 1;

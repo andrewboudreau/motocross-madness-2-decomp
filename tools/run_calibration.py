@@ -292,6 +292,15 @@ CASES = [
         'reason': 'constant-first comparisons: ternary for +0x1bc, if/else for +0x1c0',
     },
     {
+        'name': 'Camera slot 29 look at',
+        'bindings': 'src/reconstructed/Camera.bindings.json',
+        'source': 'src/reconstructed/Camera.cpp',
+        'symbol': '?UnknownVirtualSlot29@Camera@@UAEHUVector3@@@Z',
+        'target_va': '0x0042eb10',
+        'target_size': 690,
+        'reason': 'an up reference for the x/y stores and the first cross (z stored through the member) keeps the cross product fld/fmul operands in retail order',
+    },
+    {
         'name': 'Camera 0x42e930 field of view',
         'bindings': 'src/reconstructed/Camera.bindings.json',
         'source': 'src/reconstructed/Camera.cpp',

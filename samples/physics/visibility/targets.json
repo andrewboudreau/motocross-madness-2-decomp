@@ -7,15 +7,5 @@
     "target_size": 3027,
     "expect": "partial",
     "notes": "72.7%, 3026 vs 3027 bytes: call-site argument-load scheduling in recursive/slot-2 call blocks"
-  },
-  {
-    "class": "VisibilityClipper",
-    "source": "VisibilityClipperNearMisses.cpp",
-    "candidate_symbol_contains": "?ProjectVertices@VisibilityClipper",
-    "target_va": "0x0052f190",
-    "target_size": 418,
-    "expect": "partial",
-    "notes": "382/418, x87 load order only.",
-    "bindings": "../../../src/krusty2/visibility/VisibilityQuadTree.bindings.json"
   }
 ]

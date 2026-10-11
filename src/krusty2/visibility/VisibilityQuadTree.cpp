@@ -302,6 +302,59 @@ int VisibilityClipper::TestDot(const VisibilityCamera* camera, const VisibilityB
     return 1;
 }
 
+// 0x0052f190 (ret 0x18).  ProjectPoint over `count` vertices (0x20-byte records): the
+// viewport-scaled projections go to `out`, the outcodes to `codes` when it is given.
+// The x87 operand order of the twelve products follows the age of their leaves
+// (docs/VC6_OPERAND_ORDER.md): `p`, a local copy of the vertex cursor, makes the vertex
+// components newer than the matrix parameter's elements; the parenthesised x sum and the
+// second matrix name used by the row-0 terms of y and z give retail's order in every
+// product.
+void VisibilityClipper::ProjectVertices(const VisibilityCamera* camera, const VisibilityMatrix* m,
+                                        int count, const VisibilityVertex* v,
+                                        VisibilityBoxVec* out, int* codes)
+{
+    const VisibilityMatrix* matrix = m;
+    for (int i = 0; i < count; i++) {
+        const VisibilityVertex* p = v;
+        VisibilityClipPoint c;
+        int code = 0;
+        c.w = p->x * m->m[0][3];
+        c.w += p->y * m->m[1][3];
+        c.w += p->z * m->m[2][3];
+        c.w += m->m[3][3];
+        float inv = 1.0f / c.w;
+        c.x = p->y * m->m[1][0] + (p->z * m->m[2][0] + p->x * m->m[0][0]);
+        c.x += m->m[3][0];
+        if (c.x < 0.0)
+            code = 1;
+        else if (c.w - c.x < 0.0)
+            code = 2;
+        c.y = p->z * m->m[2][1];
+        c.y += p->y * m->m[1][1];
+        c.y += p->x * matrix->m[0][1];
+        c.y += m->m[3][1];
+        if (c.y < 0.0)
+            code |= 4;
+        else if (c.w - c.y < 0.0)
+            code |= 8;
+        c.z = p->y * m->m[1][2];
+        c.z += p->x * matrix->m[0][2];
+        c.z += p->z * m->m[2][2];
+        c.z += m->m[3][2];
+        if (c.z < 0.0)
+            code |= 0x10;
+        else if (c.w - c.z < 0.0)
+            code |= 0x20;
+        out->x = camera->viewportWidth * c.x * inv;
+        out->y = camera->viewportHeight * c.y * inv;
+        out->z = camera->viewportHeight * c.z * inv;
+        if (codes)
+            *codes++ = code;
+        v++;
+        out++;
+    }
+}
+
 // 0x0052f340 (ret 0x14).  Projects a point with the matrix, writes the outcode (x: 1 / 2 for
 // x' < 0 / x' > w, y: 4 / 8, z: 0x10 / 0x20) and, when `screen` is given, the coordinates
 // scaled by the camera's viewport size (converted as unsigned values).  Returns 1 when the

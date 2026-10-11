@@ -362,6 +362,16 @@
   {
     "class": "VisibilityClipper",
     "source": "VisibilityQuadTree.cpp",
+    "candidate_symbol_contains": "?ProjectVertices@VisibilityClipper",
+    "target_va": "0x0052f190",
+    "target_size": 418,
+    "expect": "exact",
+    "notes": "all callers load ecx from 0x575a98 (thiscall); in the unit range between 0x52f080 and the Math3D $E at 0x52fdc0; the vertex cursor copied into a loop-local pointer, the parenthesised x sum and a second matrix name for the row-0 terms of y and z give retail's x87 operand order (docs/VC6_OPERAND_ORDER.md)",
+    "bindings": "VisibilityQuadTree.bindings.json"
+  },
+  {
+    "class": "VisibilityClipper",
+    "source": "VisibilityQuadTree.cpp",
     "candidate_symbol_contains": "?ProjectPoint@VisibilityClipper",
     "target_va": "0x0052f340",
     "target_size": 389,
