@@ -1017,6 +1017,28 @@ float KrustyBike::Fn_00495FF0()
     return 0.0f;
 }
 
+// 0x004965e0 (slot 14, exact): apply an impulse.  field_0x24 behaves as an inverse mass
+// (dv = k * impulse) after the impulse's x and z are cleared.  Written as `invMass * *a`:
+// VC6 forwards the two zero stores into the scaled vector and folds k * 0 into one pooled
+// 0.0f on the FPU stack (fld/fst shared by x and z), as retail does; the explicit
+// Vec3(0.0f, invMass * a->y, 0.0f) stores immediates instead.
+void KrustyBike::UnknownVirtualSlot14(Vec3* a, const Vec3* b, const Vec3* c)
+{
+    if (field_0x740->field_0x18a) {
+        Bike::UnknownVirtualSlot14(a, b, c);
+        return;
+    }
+    angularAcceleration = UnknownVirtualSlot16(b);
+    UnknownVirtualSlot15(c, &angularAcceleration);
+    angularVelocity += stepTime * angularAcceleration;
+    angularVelocity *= 0.999f;
+    a->x = 0;
+    a->z = 0;
+    acceleration = invMass * *a;
+    velocity += stepTime * acceleration;
+    linearSpeed = KbLength(velocity);
+}
+
 // owner: bracket only (0x496d20 sits between slot 101's stub and Fn_00496DA0)
 // 0x00496d20 (exact): the real body of slot 101, switching the active scene object from
 // altBodyA to altBodyB.  Retail's slot 101 entry (0x496d10) is a 16-byte stub, `jmp 0x496d20`

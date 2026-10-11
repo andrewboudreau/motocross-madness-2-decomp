@@ -357,5 +357,7 @@
   "_sprintf": "0x00534aaf",
   "?g_kbDirector@@3PAUKbDirector@@A": "0x0068aba4",
   "?Remove@KbDirector@@QAEXPAUKbObj128@@H@Z": "0x004dcf20",
-  "?Fn_00435FE0@KbObj128@@QAEXXZ": "0x00435fe0"
+  "?Fn_00435FE0@KbObj128@@QAEXXZ": "0x00435fe0",
+  "?UnknownVirtualSlot14@SoultreePhysicsBaseObject@@UAEXPAUVec3@@PBU2@1@Z": "0x00502080",
+  "__real@4@3ffeffbe770000000000": "0x00554744"
 }

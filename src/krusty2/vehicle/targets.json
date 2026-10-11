@@ -2042,6 +2042,16 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "UnknownVirtualSlot14@KrustyBike",
+    "target_va": "0x004965e0",
+    "target_size": 431,
+    "expect": "exact",
+    "notes": "slot 14 (overrides SoultreePhysicsBaseObject 0x00502080): apply an impulse with x/z cleared. Exact with acceleration = invMass * *a: VC6 forwards the zero stores and folds k * 0 to one pooled 0.0f kept on the FPU stack for x and z, as retail does.",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
     "candidate_symbol_contains": "Fn_00496D20@KrustyBike",
     "target_va": "0x00496d20",
     "target_size": 119,

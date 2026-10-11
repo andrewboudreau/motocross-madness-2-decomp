@@ -75,24 +75,6 @@ void KrustyBike::UnknownVirtualSlot101()
     Fn_00496D20();
 }
 
-// Slot 14: apply an impulse. field_0x13c behaves as an inverse mass (dv = k * impulse).
-void KrustyBike::UnknownVirtualSlot14(Vec3* a, const Vec3* b, const Vec3* c)
-{
-    if (field_0x740->field_0x18a) {
-        Bike::UnknownVirtualSlot14(a, b, c);
-        return;
-    }
-    angularAcceleration = UnknownVirtualSlot16(b);
-    UnknownVirtualSlot15(c, &angularAcceleration);
-    angularVelocity += stepTime * angularAcceleration;
-    angularVelocity *= 0.999f;
-    a->x = 0;
-    a->z = 0;
-    acceleration = Vec3(0.0f, invMass * a->y, 0.0f);
-    velocity += stepTime * acceleration;
-    linearSpeed = KbLength(velocity);
-}
-
 // Slot 70: threshold test against a per-mode table; a[] and b[][] are static-init'd locals.
 int KrustyBike::UnknownVirtualSlot70(float arg)
 {
