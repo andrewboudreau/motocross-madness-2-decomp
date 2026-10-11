@@ -17,7 +17,9 @@
 //   2112 bracketings, term orders and parenthesised products of the z row,
 //   and all 4096 combinations of parenthesised products over the four sums,
 //   in this file and inside src/reconstructed/MatrixUtil.cpp, give 171 at
-//   best.
+//   best. The Matrix4 operator()(row, col) and Vector3 operator[] accessors
+//   (which decide MatrixMult's operand order) change nothing either, used
+//   for every element or only for the z row / its z term.
 //
 // TriangleNormal 0x004a11e0 and ViewMatrix 0x004a1500 are exact in
 // src/reconstructed/MatrixUtil.cpp (parenthesised products).

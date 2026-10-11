@@ -88,8 +88,9 @@
     "candidate_symbol_contains": "LocalToWorldPoint",
     "target_va": "0x004fd660",
     "target_size": 168,
-    "expect": "partial",
-    "notes": "164/168 bytes: one integer mov ecx,eax scheduled before the last faddp in retail. Exact members of soultree.cpp: src/krusty2/soultree/soultree.cpp"
+    "expect": "exact",
+    "bindings": "SoultreeTransform.bindings.json",
+    "notes": "x/y accumulated by statements, z one expression with its first two products parenthesised (moves mov ecx,eax before the last faddp). Exact members of soultree.cpp: src/krusty2/soultree/soultree.cpp"
   },
   {
     "class": "SoultreeObject",
@@ -98,6 +99,7 @@
     "target_va": "0x004fd710",
     "target_size": 209,
     "expect": "partial",
+    "bindings": "SoultreeTransform.bindings.json",
     "notes": "207/209 bytes: retail loads v.x before m._11 in the last x product"
   },
   {
@@ -107,7 +109,8 @@
     "target_va": "0x004fd7f0",
     "target_size": 285,
     "expect": "partial",
-    "notes": "~88%; term order and negation temporaries differ"
+    "bindings": "SoultreeTransform.bindings.json",
+    "notes": "273/285 bytes (InvertRigid + TransformPoint form): y translation term order and the second swap's integer moves differ"
   },
   {
     "class": "SoultreeObject",
