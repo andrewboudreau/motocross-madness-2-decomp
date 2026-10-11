@@ -274,6 +274,59 @@ void Wrecker::UnknownFunction532490() {
     field_0x534 = 1;
 }
 
+// The parenthesised first product puts each fsubp between the load and the
+// store of the previous component's copy, as retail does
+// (docs/VC6_OPERAND_ORDER.md section 3).
+inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
+    Vector3 r;
+    r.x = (a.y * b.z) - (a.z * b.y);
+    r.y = (a.z * b.x) - a.x * b.z;
+    r.z = (a.x * b.y) - a.y * b.x;
+    return r;
+}
+
+// Copies a vector member by member into a returned local: retail copies
+// the old position (and forward row) through a stack temporary this way.
+static inline Vector3 WreckerCopy(const Vector3& v) {
+    Vector3 r;
+    r.x = v.x;
+    r.y = v.y;
+    r.z = v.z;
+    return r;
+}
+
+// 0x00532580: rebuilds the wreck pose's linear (field_0xbc) and angular
+// (field_0xc8) step from the node's frame. Two references fix the leaf ages
+// (docs/VC6_OPERAND_ORDER.md section 1.2): `target` for the new forward row
+// in the equality tests makes its components newer than the copied old
+// forward, so the cross product loads them first as retail does (511 -> 523
+// of 562; through the reference only in the cross product it stays 511), and
+// `up` for the old up row gives retail's schedule of the step's last store
+// and the forward copy around the up-row loads (a pointer, a reference to
+// field_0xbc for the subtract or the reference for up.x alone do the same).
+void Wrecker::UnknownFunction532580() {
+    UnknownWreckerFrame pose;
+    field_0xbc = WreckerCopy(field_0x6c.position);
+    field_0xb8->UnknownFunction4fca80(0, &pose);
+    field_0xbc = pose.position - field_0xbc;
+    Vector3 forward = WreckerCopy(field_0x6c.forward);
+    const Vector3& target = pose.forward;
+    // The old up row stays on the FPU stack: float locals.
+    const Vector3& up = field_0x6c.up;
+    float upX = up.x;
+    float upY = up.y;
+    float upZ = up.z;
+    if (upX == pose.up.x && upY == pose.up.y && upZ == pose.up.z) {
+        if (forward.x == target.x && forward.y == target.y && forward.z == target.z)
+            field_0xc8 = Vector3(0.0f, 0.0f, 0.0f);
+        else
+            field_0xc8 = WreckerCross(forward, pose.forward);
+    } else {
+        field_0xc8 = WreckerCross(Vector3(upX, upY, upZ), pose.up);
+    }
+    field_0xc8 = UnknownFunction5015b0(field_0xc8, 1.0f);
+}
+
 void Wrecker::UnknownFunction5327c0() {
     if (field_0x44) {
         for (int i = 0; i < field_0x64; i++) {

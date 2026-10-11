@@ -380,7 +380,7 @@
     "target_va": "0x00515c90",
     "target_size": 292,
     "expect": "partial",
-    "notes": "213/296 compared: normalised cross product with fallback; x87 operand order differs (see Tire.cpp).",
+    "notes": "287/292 strict: normalised cross product with fallback; only the x scale loads the scalar first (see Tire.cpp).",
     "bindings": "Tire.bindings.json"
   }
 ]

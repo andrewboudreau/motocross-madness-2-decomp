@@ -750,23 +750,33 @@ static inline CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec
     return r;
 }
 
-// 0x00515c90 (near miss): the normalised cross product a x b; the fallback when
-// it is exactly zero (this is unused). The dot product and control flow match;
-// VC6 orders the cross-product operands differently (retail loads b's
-// component first in every product; swapping the source operands does not
-// change VC6's choice) and does not keep the copy of the product that retail
-// scales. The parenthesised first products (docs/VC6_OPERAND_ORDER.md section 3) give
-// retail's copy schedule (231/296 strict); none of the 4096 per-component combinations of
-// parentheses and written operand order fixes the y and z loads.
+// 0x00515c90 (near miss, 287/292): the normalised cross product a x b; the
+// fallback when it is exactly zero (this is unused). Three source shapes give
+// retail's leaf ages (docs/VC6_OPERAND_ORDER.md section 1.2): the reference
+// `av` for a.y in the first product puts the y and z products' b components
+// first (231 -> 238); assigning n after its declaration instead of
+// initialising it gives retail's esi/ecx/edx result registers (242); testing
+// n.y and n.z (not c) for zero makes those components older than the
+// FastInvSqrt result, so their scales load the scalar first and the last one
+// consumes it (287). The parenthesised first products give retail's copy
+// schedule. Left: the x scale loads the scalar first (`fld st(0); fmul c.x`),
+// retail the component. Unchanged (287): x written as n.x * inv, inv * n.x,
+// c.x * inv, through a reference, pointer or float pointer; the x test on c
+// or n; the squared length through the helper or in the body on c or n;
+// `n = c` through a reference; a member-wise copy is far worse (91). With
+// the scales reading c for y and z the schedule matches but the addresses do
+// not; the 64 a/b alias placements (reference or pointer) peak at 238.
 CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
                                  const CollisionVec3* fallback)
 {
+    const CollisionVec3& av = *a;
     CollisionVec3 c;
-    c.x = (a->y * b->z) - a->z * b->y;
+    c.x = (av.y * b->z) - a->z * b->y;
     c.y = (a->z * b->x) - a->x * b->z;
     c.z = (a->x * b->y) - a->y * b->x;
-    CollisionVec3 n = c;
-    if (c.x == 0.0f && c.y == 0.0f && c.z == 0.0f) {
+    CollisionVec3 n;
+    n = c;
+    if (n.x == 0.0f && n.y == 0.0f && n.z == 0.0f) {
         n = *fallback;
     } else {
         float lenSq = TireDotInline(n, n);

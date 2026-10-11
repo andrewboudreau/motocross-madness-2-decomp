@@ -6331,6 +6331,15 @@ CASES = [
         'reason': 'state 2 without the velocity handover',
     },
     {
+        'name': 'Wrecker pose step 0x532580',
+        'bindings': 'src/reconstructed/Wrecker.bindings.json',
+        'source': 'src/reconstructed/Wrecker.cpp',
+        'symbol': '?UnknownFunction532580@Wrecker@@QAEXXZ',
+        'target_va': '0x00532580',
+        'target_size': 562,
+        'reason': 'references to the new forward row (equality tests) and the old up row give the cross product loads and the up-row schedule',
+    },
+    {
         'name': 'Wrecker end wreck 0x5327c0',
         'bindings': 'src/reconstructed/Wrecker.bindings.json',
         'source': 'src/reconstructed/Wrecker.cpp',

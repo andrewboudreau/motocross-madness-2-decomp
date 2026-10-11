@@ -4,20 +4,6 @@
 // and compare the symbol against retail with
 // samples/race/WreckerNearMisses.bindings.json.
 //
-// UnknownFunction532580 (0x00532580, 562 bytes): rebuilds the wreck pose's
-// linear (field_0xbc) and angular (field_0xc8) step from the node's frame.
-// 511/562: the temporaries (a member-by-member copy helper), the FPU-held
-// up row (float locals), the branch layout and (with WreckerCross's
-// parenthesised first products) the fsubp/copy schedule match. Left: each
-// cross product's loads are swapped (retail `fld pose.z; fmul old.y`, VC6 here
-// `fld old.y; fmul pose.z` whatever the operand order, argument order,
-// sign convention, by-value or matrix form, with or without parentheses),
-// and the up-row loads at the start are issued before the forward copy's
-// last store. Also tried: the equality tests written
-// pose-first (changes the compares, not the products), the cross product's
-// parameters by value in all three combinations, the forward copy as a plain
-// struct copy and through a pointer to field_0x6c.
-//
 // UnknownFunction5329e0 (0x005329e0, 1312 bytes): pushes probes back out of
 // the box field_0xe8/field_0xf4 and turns the mean push into the impulse
 // field_0x10c. Every block matches in shape, including the per-axis clip
@@ -86,8 +72,8 @@ inline float WreckerSquareMagnitude(const Vector3& v) {
 
 // The parenthesised first product puts each fsubp between the load and the store of the
 // previous component's copy, as retail does (docs/VC6_OPERAND_ORDER.md section 3); both
-// x products parenthesised gain 4 bytes in 0x00531740 (best of the 64 forms; 0x00532580
-// and slot 10 score the same with every form).
+// x products parenthesised gain 4 bytes in 0x00531740 (best of the 64 forms; slot 10
+// scores the same with every form). 0x00532580 is exact in src/reconstructed/Wrecker.cpp.
 inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
     Vector3 r;
     r.x = (a.y * b.z) - (a.z * b.y);
@@ -104,27 +90,6 @@ static inline Vector3 WreckerCopy(const Vector3& v) {
     r.y = v.y;
     r.z = v.z;
     return r;
-}
-
-void Wrecker::UnknownFunction532580() {
-    UnknownWreckerFrame pose;
-    field_0xbc = WreckerCopy(field_0x6c.position);
-    field_0xb8->UnknownFunction4fca80(0, &pose);
-    field_0xbc = pose.position - field_0xbc;
-    Vector3 forward = WreckerCopy(field_0x6c.forward);
-    // The old up row stays on the FPU stack: float locals.
-    float upX = field_0x6c.up.x;
-    float upY = field_0x6c.up.y;
-    float upZ = field_0x6c.up.z;
-    if (upX == pose.up.x && upY == pose.up.y && upZ == pose.up.z) {
-        if (forward.x == pose.forward.x && forward.y == pose.forward.y && forward.z == pose.forward.z)
-            field_0xc8 = Vector3(0.0f, 0.0f, 0.0f);
-        else
-            field_0xc8 = WreckerCross(forward, pose.forward);
-    } else {
-        field_0xc8 = WreckerCross(Vector3(upX, upY, upZ), pose.up);
-    }
-    field_0xc8 = UnknownFunction5015b0(field_0xc8, 1.0f);
 }
 
 // Per-axis clip of a probe against the box (inlined three times).

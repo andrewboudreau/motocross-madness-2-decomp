@@ -107,5 +107,9 @@
   "_kVec3YAxis": "0x0068ad20",
   "_kVec3ZAxis": "0x0068acf0",
   "_kVec3Zero": "0x0068ad00",
-  "_rand": "0x00534c1b"
+  "_rand": "0x00534c1b",
+  "?UnknownFunction4fca80@UnknownWreckerSkeleton@@QAEXPAU1@PAUUnknownWreckerFrame@@@Z": "0x004fca80",
+  "?UnknownFunction5015b0@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",
+  "?UnknownFunction532580@Wrecker@@QAEXXZ": "0x00532580",
+  "__real@4@00000000000000000000": "0x00550484"
 }
