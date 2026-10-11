@@ -499,3 +499,77 @@ trying on other `[base+index]` / `add r, r` order near misses.
 - A vector built by a constructor with by-value parameters and then normalised gives
   x scalar-first and y/z component-first, with a final `fstp st(0)`; per-component
   stores into a named local give all three scalar-first. Track `0x518130`.
+
+## Source-form levers measured on the 2026-10-11 near-miss pass
+
+Each item names the function that became exact (or moved) with it. A form that
+fixes one function is a candidate, not a rule: several were tried on siblings
+without effect, as noted.
+
+- **Pointer local to an array element.** `Vec3* p = &points[i];` used for the
+  stores and for `Transform(p, *p, &m)` fixed x87 operand order and SIB order
+  where the element is used across several statements: BoundingBoxTreeBuild
+  `0x0042d390` (needed in both vertex loops), GraphicsTest DrawBox `0x0047c270`,
+  DrawCircle `0x0047bd10` (+4). It also decides address operand order:
+  `T* g = &s->arr[i]` gives `offset + base`, re-indexing `s->arr[i].` at each use
+  gives `base + offset` (D3DIMSoulTree `0x004431f0`; not enough for its sibling
+  DrawNormals `0x00442fe0`).
+- **Byte-offset accessor.** For an array of large structs `messages[index]` gives
+  `[edi + eax + N]`; an inline `MessageAt(messages, offset)` with
+  `int offset = index * sizeof(NetMessage)` gives `[eax + edi + N]` (Net `0x004aced0`).
+- **Reciprocal inside an inline helper.** `inline Vec3 operator/(const Vec3& v,
+  float s) { return v * (1.0f / s); }` gives retail's `fld st(0); fmul [x]`; the
+  same product in the caller (scale local, per component, `v * (1.0f / s)`) does not
+  (Wrecker `0x00531da0`, SoulTreePhysics `0x00502330`).
+- **Stores embedded in an expression.** `axis * (1.0f / (axisLength = len))` gives
+  `fld st(0); fdivr [1.0]` where a separate store gives `fld [1.0]; fdiv st(1)`
+  (Shock `0x004f9f90`). `m.x = v.x * (s = 1.0f / n); m.y = v.y * s; m.z = v.z * s;`
+  gives the x-only `fld st(0); fmul v.x` of retail's collision means
+  (CollisionObject `0x00437c20`, `0x00438280`, `0x004376f0`, `0x00437ef0`, +4..5 each).
+- **Grouped sums through by-reference helpers.** `(a.x*b.x + a.y*b.y) + a.z*b.z` in an
+  inline by-reference helper reproduced CollisionObject `0x00439600`; written inline,
+  VC6 keeps v.z live. The squared length `v.z*v.z + ((v.x*v.x) + (v.y*v.y))` in an
+  inlined helper (any parameter passing) instead of in the body gives `fld x; fmul
+  st(1)` in the normalisation (VehicleCamera `0x0052c030`). A flat sum gets VC6's
+  term order whatever order it is written in; only explicit grouping forces it.
+- **Parentheses around call arguments.** In EcoSystem `0x004598d0` the
+  `mov ecx, [g_collisionQuadTree]` of a `ComputeCode((x - r), (z - r), (x + r),
+  (z + r))` thiscall moves before the last `fsub/fstp` once there are at least three
+  redundant parenthesis nodes across the arguments, whichever arguments carry them.
+  Parentheses changed nothing in integer-only code (BikeRace `0x0041eb20`, ZoneReport).
+- **Mixing statement rows and expression rows.** `+=` statement rows ignore redundant
+  parentheses (4096 combinations, SoultreeTransform `0x004fd660`); writing the last
+  row as one parenthesised expression moved the result-pointer `mov ecx, eax`
+  ahead of the last `faddp`.
+- **One more live symbol.** A named result local (`Vec3 side = ...CrossB(up); axis =
+  side;`), a pointer local or a `this` copy gave retail's b.x-first cross-product
+  order in VehicleInlines `0x0040c4c0`; an unused int, braces and declaration shifts
+  did not. `const Vec3& rear = ..., & front = ...;` declared rear first fixed Bike
+  slot 46's register pair (`0x0040b600`).
+- **Written operand order of a product between two struct copies.** For FollowCamera
+  slot 47 `0x00465720` `b.m[k][j] * a.m[i][k]` (not `a * b`) gives retail's hoisted
+  `a(0,3)` load, and `m[r][c]` access instead of `operator()` lets VC6 interleave the
+  dword copies; only row order 2, 1, 3 with x, y, z components matched (36 swept).
+  This is an exception to section 1's canonicalised factor order.
+- **Constant identity.** `/ 10.0f` becomes a multiply by the reciprocal constant
+  `0x005511cc`; `* 0.1f` uses `0x005507d0`. A relocation mismatch between the two
+  says which the source used (VehicleCamera `0x0052c030`).
+- **Register priority follows reference counts.** Writing the found call out in both
+  branches (`UnknownFunction4b77a0(entry->...); return;` twice), which VC6 cross-jumps
+  back into one block, adds a source reference to `this` and moves it from ebp to
+  ebx (Parameterblocks `0x004b7220`). Copying a member read into a named local before
+  a compare inside a loop swaps the esi/edi assignment of loop-invariant parameters
+  (UIDialog::EnableGroup `0x0046ea80`).
+- **Store order of a local struct.** The order of field stores picks the registers
+  of later vtable/address temporaries: UIDialog slot 28 `0x0046e8c0` matched one of
+  1680 orders.
+- **Bool joins.** `field = false; return false;` stores the immediate; a `bool result`
+  assigned on every path with one `return result` gives `xor al, al; mov [m], al` and
+  stops VC6 cross-jumping the final `return false` into another tail (FollowCamera
+  `0x00465000`, VehicleCamera `0x0052cc80`). One ternary per component instead of one
+  if/else block moves the `pop edi` placement (ToolTip `0x00486b10`, +3).
+- **Not moved by any of these:** byte-store parity in EcoSystem `0x00458da0` (each
+  variable-index byte store toggles the later SIB order), the `memset` + `.size`
+  store placement in PCGame `0x004c0d10`, Tire `0x00513490`'s origin-store registers,
+  the D3DIMSoultreeCharacter `0x00445fc0` SIB byte, and the Track `0x00516ef0` edge
+  tie-break (~5,500 forms).
