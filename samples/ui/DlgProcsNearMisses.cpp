@@ -3,13 +3,6 @@
 // matched functions). Check: compile this file and compare each function with
 // DlgProcsNearMisses.bindings.json.
 //
-// UnknownFunction452930 (0x00452930, 1875 bytes): the same cases, calls and
-//   line numbers; retail keeps the event in ebx for the option cases (whose
-//   identical tails it merges into case 0xcb's) and does not keep zero in a
-//   register, VC6 here merges the tails into case 0xd0 and uses ebx for zero.
-//   Every order of the first five cases was tried; a `short` FindControl
-//   type parameter (so the two zero arguments differ in type) compiles the
-//   same.
 // MainDlg::UnknownVirtualSlot29 (0x0044b200, 5232 bytes): the same cases,
 //   calls and strings; retail shares one frame slot between the two
 //   ConnectionInfoType[5] arrays (frame 0x6c4), VC6 here gives each array its
@@ -41,168 +34,13 @@
 //   calls, strings and list columns; inside the per-racer loops retail
 //   reloads TrackGame/EventManager into other registers (VC6 here keeps them
 //   live across the loop), so the loop bodies differ from the first loop on.
+//   In 0x004513a0's first loop (595/2004) retail reloads the EventManager
+//   for the +0x04 sprintf argument while VC6 here reuses it. Unchanged
+//   (2026-10-11): `continue` on the +0x24 test, an `EventManager* const&`
+//   alias, an entry reference or pointer, a TrackGame local, an `(int)`
+//   cast and `(field_0x50 + i)->`.
 
 #include "../../src/reconstructed/DlgProcs.cpp"
-
-extern "C" const GUID DPSPGUID_TCPIP;         // 0x005567e0
-extern "C" const GUID DPSPGUID_SERIAL;        // 0x005567f0
-
-// TrackGame's settings blocks, as OptionProcs.cpp names them.
-static inline UnknownOptGameSettings* UnknownGameSettingsOf(TrackGame* game) {
-    return (UnknownOptGameSettings*)((char*)game + 0xc24);
-}
-
-static inline UnknownOptSoundSettings* UnknownSoundSettingsOf(TrackGame* game) {
-    return (UnknownOptSoundSettings*)((char*)game + 0xf98);
-}
-
-static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* game) {
-    return (UnknownOptGraphicsSettings*)&game->mode.field_0xa4c;
-}
-
-// 0x00452930
-void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
-    void* address;
-    unsigned long size;
-    char text[128];
-    switch (menu) {
-    case 0xc9:
-        event->dialog->UpdateBoundValues(1);
-        *UnknownGameSettingsOf(g_TrackGame) = g_UnknownGlobal688898;
-        g_TrackGame->ui->field_0x2c->field_0x0ec = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
-        g_TrackGame->ui->OpenMenu(0x66);
-        event->dialog->EndDialog(0);
-        event->handled = 1;
-        break;
-    case 0xca:
-        event->dialog->UpdateBoundValues(1);
-        *UnknownSoundSettingsOf(g_TrackGame) = g_UnknownGlobal688798;
-        g_TrackGame->UnknownFunction521a30();
-        g_TrackGame->ui->OpenMenu(0x66);
-        event->dialog->EndDialog(0);
-        event->handled = 1;
-        break;
-    case 0xcb: {
-        event->dialog->UpdateBoundValues(1);
-        UIListBox* modes = static_cast<UIDropDownList*>(event->dialog->FindControl("ModeDDL", 0))->listPart;
-        g_UnknownGlobal6887d8.resolutionRow = modes->GetRowData(-1);
-        *UnknownGraphicsSettingsOf(g_TrackGame) = g_UnknownGlobal6887d8;
-        g_TrackGame->ui->OpenMenu(0x66);
-        event->dialog->EndDialog(0);
-        event->handled = 1;
-        break;
-    }
-    case 0xcd:
-        if (strcmp(g_TrackGame->mode.field_0x27f8.field_0x36, "")) {
-            g_TrackGame->ui->OpenMenu(0xd0);
-            event->dialog->EndDialog(0);
-            event->handled = 1;
-        }
-        break;
-    case 0xd0:
-        g_TrackGame->ui->OpenMenu(0x68);
-        event->dialog->EndDialog(0);
-        event->handled = 1;
-        break;
-    case 0xd8: {
-        UnknownComPortAddress serial;
-        serial.port = 0;
-        serial.baudRate = 0;
-        serial.stopBits = 0;
-        serial.parity = 0;
-        serial.flowControl = 0;
-        UnknownFunction4ae410(&g_SerialSettings, &serial);
-        if (!g_TrackGame->network->CreateAddress(DPSPGUID_SERIAL, "", "", &serial, &address,
-                                                                     &size)) {
-            event->dialog->EndDialog(0xd);
-            event->handled = 1;
-            break;
-        }
-        if (g_TrackGame->network->InitializeConnection(address, size, 8)) {
-            DebugFree(address, __FILE__, 3843);
-            g_TrackGame->ui->OpenMenu(0x85c);
-            return;
-        }
-        event->dialog->EndDialog(0xd);
-        event->handled = 1;
-        DebugFree(address, __FILE__, 3850);
-        break;
-    }
-    case 0xd9:
-        address = 0;
-        static_cast<UIEditBox*>(event->dialog->FindControl("EditBox", 0))->GetEditText(text, 128);
-        if (!strcmp(text, "")) {
-            event->dialog->EndDialog(0xe);
-            event->handled = 1;
-            break;
-        }
-        if (!g_TrackGame->network->CreateAddress(DPSPGUID_TCPIP, text, "", 0, &address, &size)) {
-            event->dialog->EndDialog(0xd);
-            event->handled = 1;
-            break;
-        }
-        if (g_TrackGame->network->InitializeConnection(address, size, 4)) {
-            event->dialog->EndDialog(0xf);
-            event->handled = 1;
-            DebugFree(address, __FILE__, 3874);
-            break;
-        }
-        event->dialog->EndDialog(0xd);
-        event->handled = 1;
-        DebugFree(address, __FILE__, 3879);
-        break;
-    case 0x104:
-    case 0x105:
-        g_TrackGame->ui->field_0x30 = g_TrackGame->ui->field_0x3c;
-        switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
-        case 0:
-        case 2:
-            event->dialog->EndDialog(0);
-            event->handled = 1;
-            break;
-        case 3:
-            g_TrackGame->ui->OpenMenu(0xcd);
-            break;
-        }
-        break;
-    case 0x12c:
-        static_cast<UIEditBox*>(event->dialog->FindControl("EditBox", 0))
-            ->GetEditText(g_TrackGame->mode.field_0x10, 128);
-        if (!strcmp(g_TrackGame->mode.field_0x10, "")) {
-            char computer[16];
-            size = sizeof(computer);
-            GetComputerNameA(computer, &size);
-            COPY_TEXT(g_TrackGame->mode.field_0x10, computer, 128);
-            if (!strcmp(g_TrackGame->mode.field_0x10, "")) {
-                g_TrackGame->LoadResourceString(0xbd8, text, 128);
-                COPY_TEXT(g_TrackGame->mode.field_0x10, text, 128);
-            }
-        }
-        event->dialog->EndDialog(0x14);
-        event->handled = 1;
-        break;
-    case 0x12f:
-        event->dialog->EndDialog(0x32);
-        event->handled = 1;
-        break;
-    case 0x191:
-        g_TrackGame->SetMenuOpen(0, 0x191, 1);
-        break;
-    case 0x1f9:
-        event->dialog->EndDialog(0);
-        event->handled = 1;
-        break;
-    case 0x1fa:
-        event->dialog->EndDialog(0);
-        event->handled = 1;
-        break;
-    case 0xbb9:
-    case 0xbba:
-    case 0xbbb:
-        CreateProfile(event);
-        break;
-    }
-}
 
 // 0x0044b200
 void MainDlg::UnknownVirtualSlot29(UnknownDialogEvent* event) {

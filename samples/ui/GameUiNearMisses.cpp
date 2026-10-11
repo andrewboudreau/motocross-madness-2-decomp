@@ -36,9 +36,6 @@
 //   if-block, goto, an early stream-failure return and the whole body inside
 //   `if (rowCount < rowCapacity || grow)` with one trailing `return 0` were
 //   tried.
-// 0x004773a0 adds an image row (169/232): retail loads the frame's width
-//   before its height and stores the row's +0x18 later; 40 store orders were
-//   tried.
 // 0x00477800 qsort compare (78/242): the flow and block layout are retail's
 //   (one `result` initialised to 0, the probe loop as `while (1)` with its
 //   exit tests as breaks; `while (cond)` and `for (;;)` rotate it). Retail
@@ -234,32 +231,6 @@ int UIListBox::AddImageFileRow(const char* file, int data, int a, int b) {
         row.height = header->height;
         UnknownFunction512dd0(header);
     }
-    rowTable[rowCount] = row;
-    SetRowData(rowCount, data);
-    rowCount++;
-    visibleRowCount = CountVisibleRows();
-    UpdateScrollBars();
-    if (autoSort)
-        Sort(1);
-    return 1;
-}
-
-// 0x004773a0
-int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
-    if (rowCount >= rowCapacity && !UnknownFunction476f50(rowCount + 1))
-        return 0;
-    UnknownGameUiListRow row;
-    row.kind = 2;
-    row.text = 0;
-    row.image = image;
-    image->AddRef();
-    UIFrame* frame = image->frameList[0];
-    row.flags = a;
-    row.width = frame->frameWidth;
-    row.height = frame->frameHeight;
-    row.imageFile = 0;
-    row.textLines = 0;
-    row.field_0x30 = 0;
     rowTable[rowCount] = row;
     SetRowData(rowCount, data);
     rowCount++;

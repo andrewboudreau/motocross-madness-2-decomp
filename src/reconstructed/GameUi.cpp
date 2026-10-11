@@ -2793,6 +2793,32 @@ int UIListBox::AddRow(const char* text, int data, int a) {
     return 0;
 }
 
+// 0x004773a0
+int UIListBox::AddImageRow(UIAnim* image, int data, int a) {
+    if (rowCount >= rowCapacity && !UnknownFunction476f50(rowCount + 1))
+        return 0;
+    UnknownGameUiListRow row;
+    row.kind = 2;
+    row.text = 0;
+    row.image = image;
+    image->AddRef();
+    UIFrame* frame = image->frameList[0];
+    row.width = frame->frameWidth;
+    row.height = frame->frameHeight;
+    row.flags = a;
+    row.imageFile = 0;
+    row.textLines = 0;
+    row.field_0x30 = 0;
+    rowTable[rowCount] = row;
+    SetRowData(rowCount, data);
+    rowCount++;
+    visibleRowCount = CountVisibleRows();
+    UpdateScrollBars();
+    if (autoSort)
+        Sort(1);
+    return 1;
+}
+
 // ---------------------------------------------------------------------------
 // UIMultiState and UIRadioButton: states
 

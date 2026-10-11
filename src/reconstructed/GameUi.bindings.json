@@ -140,6 +140,7 @@
   "??_GUITimer@@UAEPAXI@Z": "0x0046fe10",
   "?AddControl@UIDialog@@QAEPAVGameObject@@PAV2@HH@Z": "0x0046a8a0",
   "?AddFrame@UIAnim@@QAEHPAVUIFrame@@@Z": "0x00472fb0",
+  "?AddImageRow@UIListBox@@QAEHPAVUIAnim@@HH@Z": "0x004773a0",
   "?AddRef@BaseObject@@UAEHXZ": "0x00405160",
   "?AddRow@UIListBox@@QAEHPBDHH@Z": "0x00476d80",
   "?AddTimer@UIDialog@@QAEXHHH@Z": "0x0046fce0",

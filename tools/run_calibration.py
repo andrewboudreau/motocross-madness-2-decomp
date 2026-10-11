@@ -13315,6 +13315,15 @@ CASES = [
         'reason': 'declared in DialogProc.h',
     },
     {
+        'name': 'dlgprocs.cpp dlgprocs option/connection menu commands',
+        'bindings': 'src/reconstructed/DlgProcs.bindings.json',
+        'source': 'src/reconstructed/DlgProcs.cpp',
+        'symbol': '?UnknownFunction452930@@YAXHPAUUnknownDialogEvent@@@Z',
+        'target_va': '0x00452930',
+        'target_size': 1875,
+        'reason': 'declared in DialogProc.h',
+    },
+    {
         'name': 'dlgprocs.cpp dlgprocs back menu',
         'bindings': 'src/reconstructed/DlgProcs.bindings.json',
         'source': 'src/reconstructed/DlgProcs.cpp',
@@ -16040,6 +16049,15 @@ CASES = [
         'target_va': '0x00476d80',
         'target_size': 337,
         'reason': 'direct callee in gameui.cpp extent 0x469db0-0x47b66f',
+    },
+    {
+        'name': 'gameui.cpp UIListBox::AddImageRow',
+        'bindings': 'src/reconstructed/GameUi.bindings.json',
+        'source': 'src/reconstructed/GameUi.cpp',
+        'symbol': '?AddImageRow@UIListBox@@QAEHPAVUIAnim@@HH@Z',
+        'target_va': '0x004773a0',
+        'target_size': 232,
+        'reason': 'UIListBox image-row append in gameui.cpp extent 0x469db0-0x47b66f',
     },
     {
         'name': 'gameui.cpp UIControl::fn476ee0',

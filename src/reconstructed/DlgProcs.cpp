@@ -74,6 +74,19 @@ extern "C" const GUID DPSPGUID_TCPIP;                   // 0x005567e0
 extern "C" const GUID DPSPGUID_SERIAL;                  // 0x005567f0
 extern "C" const GUID DPSPGUID_MODEM;                   // 0x00556800
 
+// TrackGame's settings blocks, as OptionProcs.cpp names them.
+static inline UnknownOptGameSettings* UnknownGameSettingsOf(TrackGame* game) {
+    return (UnknownOptGameSettings*)((char*)game + 0xc24);
+}
+
+static inline UnknownOptSoundSettings* UnknownSoundSettingsOf(TrackGame* game) {
+    return (UnknownOptSoundSettings*)((char*)game + 0xf98);
+}
+
+static inline UnknownOptGraphicsSettings* UnknownGraphicsSettingsOf(TrackGame* game) {
+    return (UnknownOptGraphicsSettings*)&game->mode.field_0xa4c;
+}
+
 // 0x0059adbc: the profile row "ButRemoveProfile" asked to remove.
 int g_UnknownGlobal59adbc;
 int g_UnknownGlobal59adfc;
@@ -1667,6 +1680,149 @@ void UnknownFunction4526b0(int menu, UnknownDialogEvent* event) {
     case 0xbbb:
         event->dialog->EndDialog(0);
         event->handled = 1;
+        break;
+    }
+}
+
+// 0x00452930
+void UnknownFunction452930(int menu, UnknownDialogEvent* event) {
+    void* address;
+    unsigned long size;
+    char text[128];
+    switch (menu) {
+    case 0xc9:
+        event->dialog->UpdateBoundValues(1);
+        *UnknownGameSettingsOf(g_TrackGame) = g_UnknownGlobal688898;
+        g_TrackGame->ui->field_0x2c->field_0x0ec = UnknownGameSettingsOf(g_TrackGame)->uiAnimations;
+        g_TrackGame->ui->OpenMenu(0x66);
+        event->dialog->EndDialog(0);
+        event->handled = 1;
+        break;
+    case 0xca:
+        event->dialog->UpdateBoundValues(1);
+        *UnknownSoundSettingsOf(g_TrackGame) = g_UnknownGlobal688798;
+        g_TrackGame->UnknownFunction521a30();
+        g_TrackGame->ui->OpenMenu(0x66);
+        event->dialog->EndDialog(0);
+        event->handled = 1;
+        break;
+    case 0xcb: {
+        event->dialog->UpdateBoundValues(1);
+        UIListBox* modes = static_cast<UIDropDownList*>(event->dialog->FindControl("ModeDDL", 0))->listPart;
+        g_UnknownGlobal6887d8.resolutionRow = modes->GetRowData(-1);
+        *UnknownGraphicsSettingsOf(g_TrackGame) = g_UnknownGlobal6887d8;
+        g_TrackGame->ui->OpenMenu(0x66);
+        event->dialog->EndDialog(0);
+        event->handled = 1;
+        break;
+    }
+    case 0xcd:
+        if (strcmp(g_TrackGame->mode.field_0x27f8.field_0x36, "")) {
+            g_TrackGame->ui->OpenMenu(0xd0);
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+        }
+        break;
+    case 0xd0:
+        g_TrackGame->ui->OpenMenu(0x68);
+        event->dialog->EndDialog(0);
+        event->handled = 1;
+        break;
+    case 0xd8: {
+        UnknownComPortAddress serial;
+        memset(&serial, 0, sizeof(serial));
+        UnknownFunction4ae410(&g_SerialSettings, &serial);
+        if (g_TrackGame->network->CreateAddress(DPSPGUID_SERIAL, "", "", &serial, &address,
+                                                                    &size)) {
+            if (g_TrackGame->network->InitializeConnection(address, size, 8)) {
+                DebugFree(address, __FILE__, 3843);
+                g_TrackGame->ui->OpenMenu(0x85c);
+                return;
+            }
+            event->dialog->EndDialog(0xd);
+            event->handled = 1;
+            DebugFree(address, __FILE__, 3850);
+        } else {
+            event->dialog->EndDialog(0xd);
+            event->handled = 1;
+        }
+        break;
+    }
+    case 0xd9: {
+        address = 0;
+        UIEditBox* edit = static_cast<UIEditBox*>(event->dialog->FindControl("EditBox", 0));
+        edit->GetEditText(text, 128);
+        if (!strcmp(text, "")) {
+            event->dialog->EndDialog(0xe);
+            event->handled = 1;
+            break;
+        }
+        if (g_TrackGame->network->CreateAddress(DPSPGUID_TCPIP, text, "", 0, &address, &size)) {
+            if (g_TrackGame->network->InitializeConnection(address, size, 4)) {
+                event->dialog->EndDialog(0xf);
+                event->handled = 1;
+                DebugFree(address, __FILE__, 3874);
+            } else {
+                event->dialog->EndDialog(0xd);
+                event->handled = 1;
+                DebugFree(address, __FILE__, 3879);
+            }
+        } else {
+            event->dialog->EndDialog(0xd);
+            event->handled = 1;
+        }
+        break;
+    }
+    case 0x104:
+    case 0x105:
+        g_TrackGame->ui->field_0x30 = g_TrackGame->ui->field_0x3c;
+        switch (g_TrackGame->mode.field_0x27f8.field_0x04) {
+        case 0:
+        case 2:
+            event->dialog->EndDialog(0);
+            event->handled = 1;
+            break;
+        case 3:
+            g_TrackGame->ui->OpenMenu(0xcd);
+            break;
+        }
+        break;
+    case 0x12c: {
+        UIEditBox* name = static_cast<UIEditBox*>(event->dialog->FindControl("EditBox", 0));
+        name->GetEditText(g_TrackGame->mode.field_0x10, 128);
+        if (!strcmp(g_TrackGame->mode.field_0x10, "")) {
+            char computer[16];
+            size = sizeof(computer);
+            GetComputerNameA(computer, &size);
+            COPY_TEXT(g_TrackGame->mode.field_0x10, computer, 128);
+            if (!strcmp(g_TrackGame->mode.field_0x10, "")) {
+                g_TrackGame->LoadResourceString(0xbd8, text, 128);
+                COPY_TEXT(g_TrackGame->mode.field_0x10, text, 128);
+            }
+        }
+        event->dialog->EndDialog(0x14);
+        event->handled = 1;
+        break;
+    }
+    case 0x12f:
+        event->dialog->EndDialog(0x32);
+        event->handled = 1;
+        break;
+    case 0x191:
+        g_TrackGame->SetMenuOpen(0, 0x191, 1);
+        break;
+    case 0x1f9:
+        event->dialog->EndDialog(0);
+        event->handled = 1;
+        break;
+    case 0x1fa:
+        event->dialog->EndDialog(0);
+        event->handled = 1;
+        break;
+    case 0xbb9:
+    case 0xbba:
+    case 0xbbb:
+        CreateProfile(event);
         break;
     }
 }
