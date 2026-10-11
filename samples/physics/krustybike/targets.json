@@ -24,7 +24,7 @@
     "target_va": "0x00491d10",
     "target_size": 1296,
     "expect": "partial",
-    "notes": "17.9% (candidate 1280 vs 1296; if-form prologue beats ternary). Tier-3: camera/target ray query per game mode. First divergence: retail loads game ptr before sub esp,0x20 and merges call tails; mine spills lim and hoists a4/a5 loads."
+    "notes": "37.0% (523/1296 strict, candidate 1300 bytes). Tier-3: camera/target ray query per game mode. flag/lim assigned in both if arms (prologue, frame 0x20 and lim in ebp match); the mode 2/3 copy path breaks out (retail returns there) and copies position from *a2. Left: the 2/3 normalise join sits after the invsqrt arm (retail after the zero arm), its query call is not cross-jumped into the shared call, and retail homes the case 0/4 call in case 4 (candidate in case 0)."
   },
   {
     "class": "KrustyBike",

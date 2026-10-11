@@ -95,14 +95,26 @@ int KrustyBike::UnknownVirtualSlot70(float arg)
 // (unit direction) according to the game mode (g->0x2d74: 0..5), then issues the same
 // collision query as the base class with per-mode ranges.  The two "copy the stored
 // vectors" paths fall off the end without setting a result (retail leaves eax as is).
+// Near miss (523/1296 strict, 1300 bytes): flag and lim are assigned in both arms (an
+// initialiser plus a conditional store keeps 0 in edi and spills lim), and the mode 2/3
+// copy path ends with `break` (retail returns there; it does not fall into case 0) and
+// copies position from *a2.  Left: the 2/3 normalise places its join after the invsqrt
+// arm (retail: after the zero arm, the invsqrt arm jumps back) and its query call is not
+// cross-jumped into the shared case 0/4 call; case 0 jumps to a call homed in case 4 in
+// retail (here case 4 jumps into case 0's).  `d != 0` first, a Vec3 ternary, `*a3 * inv`
+// and an inv local do not help (494-523).
 int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* a5)
 {
-    int flag = 0;
+    int flag;
     if (g_kbGame->field_0x578.Fn_00524100() == 3 || g_kbGame->field_0x578.Fn_00524100() == 4)
         flag = 1;
-    int lim = 0x66;
+    else
+        flag = 0;
+    int lim;
     if (g_kbGame->field_0x578.Fn_00524100() == 5 || g_kbGame->field_0x578.Fn_00524100() == 4)
         lim = 0x7fffffff;
+    else
+        lim = 0x66;
     unsigned char hit = 0;
     if (g_kbGame->field_0x578.Fn_00524100() == 5)
         hit = Kb_004B0AC0(&position, 2.0f, 2.0f, 2.0f, terrainScale, 0, 0, 0, 0);
@@ -114,7 +126,8 @@ int KrustyBike::UnknownVirtualSlot11(int a1, Vec3* a2, Vec3* a3, Vec3* a4, int* 
             g->field_0xc50) {
             *a2 = respawnPosition;
             *a3 = respawnHeading;
-            position = respawnPosition;
+            position = *a2;
+            break;
         } else {
             Vec3 v = respawnPosition;
             *a2 = position;
