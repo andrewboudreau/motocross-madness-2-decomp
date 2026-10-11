@@ -211,6 +211,63 @@ void VehicleCamera::UnknownVirtualSlot42(bool flag) {
     }
 }
 
+// 0x0052cc80: FollowCamera slot 36 with vehicle tolerances: while the
+// vehicle's +0x434 is above 0.1 a point within 10 of the current values is
+// accepted, otherwise within 0.01. The two `result` joins are retail's
+// shapes: a constant `return` gets an immediate +0x277 store and shares the
+// final `return false` tail, where retail materialises the 0 in al
+// (`xor al, al; mov [esi+0x277], al`) and keeps a separate final tail.
+bool VehicleCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool force) {
+    if (cameraState == 6)
+        return true;
+    if (enable) {
+        if (vehicleMode) {
+            if (vehicle->field_0x434 > 0.1f) {
+                if (!force && field_0x274 &&
+                    FollowCameraAbs(field_0x288->value - point.x) < 10.0f &&
+                    FollowCameraAbs(field_0x290->value - point.z) < 10.0f &&
+                    FollowCameraAbs(field_0x28c->value - point.y) < 10.0f) {
+                    UnknownVirtualSlot44(point);
+                    UnknownVirtualSlot43(cachedTarget);
+                }
+            } else {
+                bool result;
+                if (force)
+                    result = false;
+                else {
+                    if (!field_0x274 &&
+                        FollowCameraAbs(field_0x288->value - point.x) < 0.01f &&
+                        FollowCameraAbs(field_0x290->value - point.z) < 0.01f &&
+                        FollowCameraAbs(field_0x28c->value - point.y) < 0.01f) {
+                        UnknownVirtualSlot44(point);
+                        UnknownVirtualSlot43(cachedTarget);
+                        field_0x277 = true;
+                        return true;
+                    }
+                    result = field_0x274;
+                }
+                field_0x277 = true;
+                return result;
+            }
+        } else {
+            UnknownVirtualSlot44(point);
+        }
+        field_0x277 = true;
+        return true;
+    }
+    if (vehicleMode && vehicle->field_0x434 > 0.1f && field_0x277) {
+        bool result;
+        if (force)
+            result = true;
+        else {
+            result = false;
+            field_0x277 = result;
+        }
+        return result;
+    }
+    return false;
+}
+
 // 0x0052cec0
 float VehicleCamera::UnknownVirtualSlot51() {
     return vehicle->field_0x48;

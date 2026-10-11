@@ -52,11 +52,15 @@ point table, and the cyclic state list. `VehicleCamera`, `BikeCamera`, and
 and view pointers. These names describe observed use; they do not establish the
 original source identifiers or the pointed-to runtime classes.
 
-Two near misses are kept in `samples/camera/FollowCameraNearMisses.cpp`:
+Slot 36 (`0x00465000`, 209 bytes) is exact. Its result is one `bool`
+variable joined at a single `return`: only then does the disabled path store
+the zero from al (`xor al, al; mov [esi+0x277], al`). With
+`field_0x277 = false; return false;` (or `return field_0x277 = false`,
+storing `enable`, a named local) VC6 propagates the constant and stores the
+immediate.
 
-- Slot 36 (`0x00465000`, 209 bytes) differs by 12 bytes. Retail ends its
-  disabled path with one zero register for the +0x277 store and the return,
-  which no source form tried so far reproduces.
+A near miss is kept in `samples/camera/FollowCameraNearMisses.cpp`:
+
 - The constructor (`0x00462ee0`, 564 bytes) has every value and offset right,
   and its virtual call to slot 71 binds statically to `0x00466e50`. About 141
   bytes differ: VC6 schedules the +0x274/+0x2dc zero stores into a load-delay
@@ -212,6 +216,7 @@ references. All bodies below are strict exact under the default profile.
 | VehicleCamera 57 | `0x0052ca10` | 356 | `0x0052bb60` plus slot 33 × min(dt, 0.2) unless state 7, game +0x1c4 or vehicle +0x444 |
 | VehicleCamera `$E` | `0x0052ced0..0x0052d00b` | 8 × 5/60 | `.CRT$XCU` 336-339: zero, x, y, z axes at `0x0068a728`, `0x0068a738`, `0x0068a748`, `0x0068a718` |
 | VehicleCamera 42 | `0x0052cc00` | 122 | +0x308 = fov/zoom ratio × vehicle +0x43c × 0.3 (0.4 in state 3), 0 otherwise |
+| VehicleCamera 36 | `0x0052cc80` | 573 | Settle check with tolerance 10 (vehicle +0x434 > 0.1) or 0.01; records the check in +0x277; `bool result` joins (see below) |
 | VehicleCamera 39 | `0x0052cbd0` | 41 | Returns vehicle +0x45c; +0x23c += π when vehicle +0x464 is set |
 | VehicleCamera 50 | `0x0052cb80` | 73 | Vehicle part position 0, raised by 5 |
 | VehicleCamera 51 | `0x0052cec0` | 10 | Vehicle +0x48 |
@@ -264,12 +269,13 @@ slot 51 (`0x0052cec0`) and slot 75 (`0x0052d010`); the zero vector the code
 reads is that set's, so the vectors are file statics of the unit. VfwDeco.cpp
 starts at `0x0052d050`.
 
-Slot 36 (`0x0052cc80`, 573 bytes) is a near miss in
-`samples/camera/VehicleCameraNearMisses.cpp`: identical up to the disabled
-exit, which shows FollowCamera slot 36's pattern (retail `xor al, al;
-mov [esi+0x277], al`, VC6 an immediate store and a merged `return false`).
-Its tolerances are 10 while vehicle +0x434 > 0.1, else 0.01, and it returns
-+0x274 as the bool result (so +0x274 is `bool`).
+Slot 36 (`0x0052cc80`, 573 bytes) is exact. Its tolerances are 10 while
+vehicle +0x434 > 0.1, else 0.01, and it returns +0x274 as the bool result
+(so +0x274 is `bool`). Like FollowCamera slot 36 it needs `bool result`
+joins: one for the low-speed path (`force` gives false, otherwise +0x274)
+and one for the disabled path (`force` gives true, otherwise false stored
+to +0x277). With constant returns VC6 stores the immediate and cross-jumps
+the final `return false` into the stored path's tail.
 
 Slot 68 matches with two source facts: retail multiplies by 1/32.2 and by
 1.5 separately (VC6 folds the constants of a plain `y * a * b`, so the first
@@ -357,7 +363,7 @@ FollowCamera and BikeCamera slot 40 cases now use the `@@UAEXM@Z` names.
 The 0x344 matrix belongs to FollowCamera, not VehicleCamera.
 
 Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
-- The constructor and slot 36, both already known.
+- The constructor, already known.
 - Slot 10 `0x00465c20` (3672 bytes, the per-frame update): 13 bytes differ,
   with no member-pointer or reference-cast workarounds. The remaining bytes
   are two scheduling choices: the second D3DRMVectorRotate's `&direction` is

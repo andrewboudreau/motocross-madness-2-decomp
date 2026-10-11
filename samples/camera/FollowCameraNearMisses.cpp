@@ -59,12 +59,7 @@
 // bytes differ, all instruction order; moving those two statements anywhere
 // earlier does not help.
 //
-// FollowCamera::UnknownVirtualSlot36 (0x00465000, 209 bytes): 12 bytes differ.
-// Retail's disabled exit is `xor al, al; mov [esi+0x277], al` (one zero for
-// the store and the return); every source form tried so far emits an
-// immediate store followed by `xor al, al` (also an early `!enable` return,
-// a `settled` result, storing `enable`, an inline setter and
-// `return field_0x277` after the store).
+// FollowCamera::UnknownVirtualSlot36 (0x00465000) is exact in src/reconstructed/FollowCamera.cpp.
 #include "../../src/reconstructed/FollowCamera.h"
 
 #include "../../src/reconstructed/DebugAlloc.h"
@@ -224,26 +219,6 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x2f8 = 280.0f;
     field_0x2fc = 70.0f;
     field_0x300 = 20.0f;
-}
-
-// 0x00465000: when enabled and not forced, a point the +0x288..+0x290 values
-// already sit on (within 0.01) is fed through slot 44 and reported as
-// settled; +0x277 records that the check ran.
-bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool force) {
-    if (enable) {
-        if (!force && !field_0x274 &&
-            FollowCameraAbs(field_0x288->value - point.x) < 0.01f &&
-            FollowCameraAbs(field_0x290->value - point.z) < 0.01f &&
-            FollowCameraAbs(field_0x28c->value - point.y) < 0.01f) {
-            UnknownVirtualSlot44(point);
-            field_0x277 = true;
-            return true;
-        }
-        field_0x277 = true;
-        return false;
-    }
-    field_0x277 = false;
-    return false;
 }
 
 // 0x00465720: while this is the owner's active camera, advances the clock,

@@ -877,6 +877,15 @@ CASES = [
         'reason': 'ratio * vehicle +0x43c * 0.3/0.4 into +0x308',
     },
     {
+        'name': 'VehicleCamera slot36',
+        'bindings': 'src/reconstructed/VehicleCamera.bindings.json',
+        'source': 'src/reconstructed/VehicleCamera.cpp',
+        'symbol': '?UnknownVirtualSlot36@VehicleCamera@@UAE_NABUVector3@@_N1@Z',
+        'target_va': '0x0052cc80',
+        'target_size': 573,
+        'reason': 'bool result joins: the disabled exit stores the 0 from al (xor al, al; mov [esi+0x277], al) and keeps its own final return tail',
+    },
+    {
         'name': 'BikeCamera slot40 table seed',
         'bindings': 'src/reconstructed/BikeCamera.bindings.json',
         'source': 'src/reconstructed/BikeCamera.cpp',
@@ -26020,6 +26029,15 @@ CASES = [
         'target_va': '0x004654e0',
         'target_size': 576,
         'reason': 'FollowCamera vtable slot 46; up made perpendicular through two inline cross products whose first products are parenthesised (fsubp between the copy load and store)',
+    },
+    {
+        'name': 'FollowCamera slot36 settle check',
+        'bindings': 'src/reconstructed/FollowCamera.bindings.json',
+        'source': 'src/reconstructed/FollowCamera.cpp',
+        'symbol': '?UnknownVirtualSlot36@FollowCamera@@UAE_NABUVector3@@_N1@Z',
+        'target_va': '0x00465000',
+        'target_size': 209,
+        'reason': 'one bool result joined at a single return: the disabled exit stores the zero from al (xor al, al; mov [esi+0x277], al), the settled exit the 1 from al',
     },
 ]
 

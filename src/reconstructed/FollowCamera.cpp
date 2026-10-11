@@ -501,6 +501,33 @@ bool FollowCamera::UnknownVirtualSlot56() {
         ->UnknownVirtualSlot5(0x2A, 0x3F, 0);
 }
 
+// 0x00465000: when enabled and not forced, a point the +0x288..+0x290 values
+// already sit on (within 0.01) is fed through slot 44 and reported as
+// settled; +0x277 records that the check ran. The result is one variable
+// joined at a single return: retail's disabled exit stores the zero from al
+// (`xor al, al; mov [esi+0x277], al`), which `field_0x277 = false;
+// return false;` does not give (VC6 stores the immediate).
+bool FollowCamera::UnknownVirtualSlot36(const Vector3& point, bool enable, bool force) {
+    bool result;
+    if (enable) {
+        if (!force && !field_0x274 &&
+            FollowCameraAbs(field_0x288->value - point.x) < 0.01f &&
+            FollowCameraAbs(field_0x290->value - point.z) < 0.01f &&
+            FollowCameraAbs(field_0x28c->value - point.y) < 0.01f) {
+            UnknownVirtualSlot44(point);
+            result = true;
+            field_0x277 = result;
+        } else {
+            field_0x277 = true;
+            result = false;
+        }
+    } else {
+        result = false;
+        field_0x277 = result;
+    }
+    return result;
+}
+
 // Out-of-line vector helpers that slot 46's inline normalisation calls (VC6
 // did not expand them there). See src/krusty2/math/Math3D.h, whose call views
 // describe the same addresses; names here are provisional.
