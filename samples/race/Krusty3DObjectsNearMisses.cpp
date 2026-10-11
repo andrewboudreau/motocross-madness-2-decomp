@@ -35,7 +35,11 @@
 // and gives the two explicit early returns their own epilogues, where this
 // candidate caches no zero and jumps to one shared return (writing every
 // `goto hide` as an explicit return makes VC6 cache 0 in ebx but still
-// shares the epilogue).
+// shares the epilogue). The half field of view goes through a macro: as an
+// inline function, VC6 folded `* 0.5f * 0.01745329f` into one 0.0087266f
+// multiply, where retail keeps both (fmul 0x005507f4, fmul 0x00550480); the
+// macro restores retail's two constants (candidate 2784 -> 2808 bytes of
+// 2796, same-mnemonic alignment 653 -> 657 of 752 instructions).
 
 #include <math.h>
 
@@ -72,9 +76,7 @@ static inline float Length(Vector3 v) {
 static const Vector3 kVec3Zero = Vector3(0.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 
-static inline float UnknownDegreesToRadians(float degrees) {
-    return degrees * 0.01745329f;
-}
+#define UNKNOWN_DEGREES_TO_RADIANS(degrees) ((degrees) * 0.01745329f)
 
 
 static const UnknownBonusKey g_UnknownBonusKeys[7] = {
@@ -165,7 +167,7 @@ struct UnknownCueOwner {
     Vector3 right = Vector3(arcadeView->field_0x0ac[0][0], arcadeView->field_0x0ac[1][0], arcadeView->field_0x0ac[2][0]); \
     if (arcadeView->field_0x16c != builtFieldOfView) { \
         builtFieldOfView = arcadeView->field_0x16c; \
-        float half = (float)tan(UnknownDegreesToRadians(builtFieldOfView * 0.5f)) * field_0x44; \
+        float half = (float)tan(UNKNOWN_DEGREES_TO_RADIANS(builtFieldOfView * 0.5f)) * field_0x44; \
         screenOffsetX = (UnknownScreenX() - 0.5f) * half * 2.0f; \
         screenOffsetY = (0.5f - UnknownScreenY()) * arcadeView->field_0x1b8 * half * 2.0f; \
         modelScale = field_0x38 * field_0x44 / (arcadeView->field_0x198 * field_0x3c); \

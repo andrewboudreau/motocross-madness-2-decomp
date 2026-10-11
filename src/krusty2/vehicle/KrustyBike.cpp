@@ -453,8 +453,9 @@ void KrustyBike::UnknownVirtualSlot48()
 
 // Slot 86: per-frame wheel-contact update (provisional semantics).  When the race context
 // flag (field_0x740+0x18a) is set, a lookup ramp derived from field_0x664 (0.12..0.4762,
-// scaled by 1010.668) feeds the wheel's helper object, and in one game mode the wheel's
-// two force accumulators are halved; the wheel is then always updated.
+// scaled by 360 / 0.3562 = 1010.66815f, the float retail holds, so 360 at 0.12) feeds the
+// wheel's helper object, and in one game mode the wheel's two force accumulators are
+// halved; the wheel is then always updated.
 void KrustyBike::UnknownVirtualSlot86()
 {
     BikeWheel* w = rearWheel;
@@ -463,7 +464,7 @@ void KrustyBike::UnknownVirtualSlot86()
     if (field_0x740->field_0x18a) {
         float ramp;
         if (field_0x47a && field_0x664 >= 0.12f && field_0x664 < 0.4762f)
-            ramp = (0.4762f - field_0x664) * 1010.668f;
+            ramp = (0.4762f - field_0x664) * (360.0f / 0.3562f);
         else
             ramp = 0;
         if (w->w_0x2a8)
@@ -1492,7 +1493,7 @@ int KrustyBike::GameObjectVirtualSlot10(float dt)
                                     position.z, bodyYaw * 57.29578f);
         if (s_kbTimeTo60Armed) {
             if (field_0x434 > 0.2f) {
-                if (field_0x434 < 88.0f) {
+                if (field_0x434 < 60.0f * 1.46666f) {   // 60 mph in ft/s: 87.9996f, not 88
                     s_kbTimeTo60 += g_kbGame->field_0x2f0;
                 } else {
                     s_kbLastTimeTo60 = s_kbTimeTo60;

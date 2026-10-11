@@ -233,7 +233,7 @@ float CarProcedural::UnknownFunction4308e0(float time, float distance)
         forward = 1;
     Vector3 previous = UnknownFunction430b10(time);
     for (; count < 200; count++) {
-        if (fabs(travelled - distance) <= 0.1)
+        if (fabs(travelled - distance) <= 0.1f)
             break;
         Vector3 position;
         if (travelled < distance) {

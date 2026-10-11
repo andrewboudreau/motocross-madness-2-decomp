@@ -103,7 +103,7 @@ void InitTrigTables()
 {
     g_TrigTableScale = 10430.21875f;
     for (unsigned int i = 0; i < 0x10000; i++) {
-        float angle = i * 9.5873799e-05f;
+        float angle = i * (1.0f / 10430.21875f);   // one step: 1 / scale, not 2 pi / 65536
         float s = (float)sin(angle);
         g_SinTable[i] = s;
         g_CosTable[i] = (float)cos(angle);

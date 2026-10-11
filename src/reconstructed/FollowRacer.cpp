@@ -11,6 +11,11 @@
 #include "BikeRace.h"
 #include "TrackGame.h"
 
+// Replay angle delta step. Retail holds 0.0490873456f (0x0055534c), which is
+// 3.14159f / 64 exactly, not the correctly rounded pi / 64 that KrustyBike.cpp
+// 0x004933e0 uses; the spelling is inferred from the bits.
+#define GHOST_ANGLE_STEP (3.14159f / 64.0f)
+
 // 0x004a9aa0: applies a kind-0x10 replay delta to the ghost's state and
 // copies the state into `part` (the same shape as KrustyBike.cpp 0x004933e0).
 void UnknownBikeRaceGhost::UnknownFunction4a9aa0(const UnknownBikeRaceGhostDelta* delta,
@@ -18,13 +23,13 @@ void UnknownBikeRaceGhost::UnknownFunction4a9aa0(const UnknownBikeRaceGhostDelta
 {
     Vector3 d0(delta->delta0[0] * 0.234375f, delta->delta0[1] * 0.234375f, delta->delta0[2] * 0.234375f);
     Vector3 d1(delta->delta1[0] * 0.234375f, delta->delta1[1] * 0.234375f, delta->delta1[2] * 0.234375f);
-    Vector3 d2(delta->delta2[0] * 0.049087387f, delta->delta2[1] * 0.049087387f, delta->delta2[2] * 0.049087387f);
+    Vector3 d2(delta->delta2[0] * GHOST_ANGLE_STEP, delta->delta2[1] * GHOST_ANGLE_STEP, delta->delta2[2] * GHOST_ANGLE_STEP);
     field_0x5d4 += d0;
     field_0x5e0 += d1;
     field_0x5ec += d2;
-    field_0x5f8 += delta->delta3[0] * 0.049087387f;
-    field_0x5fc += delta->delta3[1] * 0.049087387f;
-    field_0x600 += delta->delta3[2] * 0.049087387f;
+    field_0x5f8 += delta->delta3[0] * GHOST_ANGLE_STEP;
+    field_0x5fc += delta->delta3[1] * GHOST_ANGLE_STEP;
+    field_0x600 += delta->delta3[2] * GHOST_ANGLE_STEP;
     int step;
     if (delta->step & 1)
         step = (delta->step >> 1) * 8;

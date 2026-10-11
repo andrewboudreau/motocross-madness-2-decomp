@@ -535,7 +535,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     BIKE_COPY_TEXT(riderName, name, 16);
     loadWeight = 165.0f;
     field_0x724 = 32.0f;
-    sideLieThreshold = (float)cos(5.0 * 0.01745329);
+    sideLieThreshold = (float)cos(5.0f * 0.01745329f);
     field_0x70c = 0.85f;
     field_0x704 = 0.55f;
     leanPoseMin = 0.8f;

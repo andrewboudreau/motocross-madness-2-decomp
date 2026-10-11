@@ -31,7 +31,8 @@ provisional (proximity only).
 - `0x004a9aa0` takes a kind-0x10 replay delta (`UnknownBikeRaceGhostDelta`:
   a kind byte, four signed byte triples and a step byte) and a ghost part.
   Two triples scale by 0.234375 (`0x00554714`) into the position-like
-  vectors at +0x5d4/+0x5e0, two by pi/64 = 0.049087387 (`0x0055534c`) into
+  vectors at +0x5d4/+0x5e0, two by 3.14159f / 64 = 0.0490873456 (`0x0055534c`,
+  slightly below the correctly rounded pi/64 KrustyBike uses) into
   +0x5ec and the three scalars +0x5f8/+0x5fc/+0x600. The step byte is
   halved; an odd step byte means the half is in units of eight. The step is
   stored in the part's `field_0x02`, accumulated into +0x604, and the whole
