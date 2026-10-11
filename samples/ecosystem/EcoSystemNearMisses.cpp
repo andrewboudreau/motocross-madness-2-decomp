@@ -50,7 +50,11 @@
 //               `length[name]`/end-pointer spellings, clamp spellings
 //               (if/ternary, <, <=, >=), `sizeof`, pointer arithmetic, a
 //               reference, split file/strrchr forms, and 0..40 prepended
-//               typedefs (no arena window)
+//               typedefs (no arena window). Also unchanged: a `char*`
+//               alias of `name` in any subset of the four head uses
+//               and `(vegetation + i)->`; an element pointer/reference
+//               (180), a vegetation base local (205) and index or
+//               byte-offset element helpers (257) are far worse
 //   0x00459ce0  the frame slots: same size, the locals and temporaries
 //               are assigned in a different order (323/3300)
 //   0x0045b060  frame 0xe0 for 0xf0 and the slot order; retail leans the
