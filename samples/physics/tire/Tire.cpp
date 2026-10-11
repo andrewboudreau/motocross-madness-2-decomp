@@ -766,6 +766,9 @@ static inline CollisionVec3 TireCross(const CollisionVec3& a, const CollisionVec
 // `n = c` through a reference; a member-wise copy is far worse (91). With
 // the scales reading c for y and z the schedule matches but the addresses do
 // not; the 64 a/b alias placements (reference or pointer) peak at 238.
+// 0..40 dead initialised int locals at the top, before the scales or in the
+// cross-product helper give 287 at every count: this operand order is not the
+// declaration-count tie-break (docs/VC6_OPERAND_ORDER.md, second 2026-10-11 pass).
 CollisionVec3* Tire::Fn_00515c90(CollisionVec3* out, const CollisionVec3* a, const CollisionVec3* b,
                                  const CollisionVec3* fallback)
 {

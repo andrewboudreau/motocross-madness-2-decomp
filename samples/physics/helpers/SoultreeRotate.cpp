@@ -8,7 +8,7 @@
 // position; the node is then rotated by (axis, angle) via 0x004fceb0; finally the position is
 // set to p - pivot * R(new local), i.e. translation + (-pivot) * rotation, so that the pivot
 // keeps its place after the rotation.
-// Partial (targets.json); 0..15 dead initialised int locals at the top of the function change nothing.
+// Partial (targets.json); 0..33 dead initialised int locals at the top of the function change nothing.
 void SoultreeObject::RotateAboutPoint(Vec3 pivot, Vec3 axis, float angle)
 {
     Vec3 p;

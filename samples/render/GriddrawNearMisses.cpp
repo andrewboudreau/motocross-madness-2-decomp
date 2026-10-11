@@ -31,6 +31,7 @@
 // A reference to the cell size or the minimum, a terrain or draw-data
 // pointer alias, used in either product and either operand order (216
 // forms), keeps cell-first too.
+// 0..33 dead initialised int locals at the top keep 1605 at every count.
 //
 // DrawableGridNode 0x00480ad0 (4-cell block draw, 438 bytes; 395 of 438):
 // retail keeps the zero start offset in eax from the prologue and compares

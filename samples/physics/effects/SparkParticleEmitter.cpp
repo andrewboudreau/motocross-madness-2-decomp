@@ -54,6 +54,7 @@ void SparkParticleEmitter::SetPosition(ParticleVec3 p)
 }
 
 // 0x004b99a0.  Like DirtChunk, but fires once while field_0x64 is positive and then switches itself off.
+// 0..33 dead initialised int locals at the top change nothing (1027/1039 masked).
 int SparkParticleEmitter::GameObjectVirtualSlot10(float dt)
 {
     if (g_gameContext->frozen == 0) {

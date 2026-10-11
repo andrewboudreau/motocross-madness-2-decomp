@@ -6,7 +6,7 @@
     "target_va": "0x0043b240",
     "target_size": 186,
     "expect": "partial",
-    "notes": "155/162: same size; residual is one store pair scheduled differently (retail `fstp [esp+8]` before `mov [edx+4], eax`). Unchanged: `((-normalForce) * surfaceGrip) * frictionCoefficient`, a named magnitude local stored then reused through the member, a frictionForce temp, parenthesised and chained-assignment forms. Worse: dropping the parentheses around -normalForce, `-(a * b) * c` / `-(a * b * c)`, `(-n) * (g * c)`, using the local magnitude in the product, componentwise frictionForce stores. 0..15 dead locals change nothing.",
+    "notes": "155/162: same size; residual is one store pair scheduled differently (retail `fstp [esp+8]` before `mov [edx+4], eax`). Unchanged: `((-normalForce) * surfaceGrip) * frictionCoefficient`, a named magnitude local stored then reused through the member, a frictionForce temp, parenthesised and chained-assignment forms. Worse: dropping the parentheses around -normalForce, `-(a * b) * c` / `-(a * b * c)`, `(-n) * (g * c)`, using the local magnitude in the product, componentwise frictionForce stores. 0..33 dead initialised locals at the top change nothing.",
     "bindings": "CollisionPoint.bindings.json"
   },
   {

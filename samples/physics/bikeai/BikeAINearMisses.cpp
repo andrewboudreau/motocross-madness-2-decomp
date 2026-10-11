@@ -46,6 +46,7 @@
 // those: `k * d` / `10.0f * d` / `push * d` in each of the six update statements (64
 // combinations, identical code), and parenthesised, integer, named-local, per-block
 // local and negated zero vectors.
+// 0..17 dead initialised int locals at the top change nothing (6059).
 // Source forms that mattered: unsigned char type-id statics with an unsigned compare
 // (`mov bl, 0xff`), the max/min helpers with by-value arguments (two spellings,
 // see BikeAIMaxR), the squared distance and k dot product grouped z + ((x) + y)

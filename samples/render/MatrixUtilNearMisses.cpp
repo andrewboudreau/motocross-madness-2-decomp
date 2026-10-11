@@ -22,6 +22,8 @@
 //   for every element or only for the z row / its z term. A second matrix or
 //   point alias (reference/pointer) used in only one or two terms gives
 //   126..171.
+//   0..33 dead initialised int locals at the top give 171 at every count
+//   (unlike the live locals above, they do not reorder it).
 //
 // TriangleNormal 0x004a11e0 and ViewMatrix 0x004a1500 are exact in
 // src/reconstructed/MatrixUtil.cpp (parenthesised products).

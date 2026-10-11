@@ -19,6 +19,17 @@
 // without the alias 13; local declaration order, b*a operand order, the soultree.cpp
 // MatrixProduct argument convention and dummy declarations before the types change nothing.
 // A by-value helper copies `view` (84/938); only `local` by value reads it in place.
+// Declaration counts (2026-10-11): each initialised local declared before the product, in
+// the slot or in the helper, is one unit and the term orders depend on the count mod 32
+// (`right` counts by its declaration only: none of 72 placements of its use changes slot 27).
+// Slot 29 reaches 748/771 at 1, 2, 9, 10, 18, 25, 26 extra top-of-slot locals; what is left is
+// row 2 (a._21/a._22 order). It is exact with 25 top locals plus 6 locals in the helper
+// before `out->_21` (or 26 + 5), but the shared helper keeps slot 27 exact only with
+// (top, helper) = (0, 0), (24, 8), (25, 7), (26, 6), (27, 5), so a joint form needs 5 or 6
+// units inside the helper and 26..27 / 25..26 at the tops: no named local or alias found.
+// Tried with 0..31 top counts each, none exact: `right` declared before row 2, a `left` alias
+// for row 2, no alias, the camera folded into the view reference (best 748/751), and a
+// per-row inline helper (much worse).
 // Slot 30 (0x00446f40, 1524 B) builds the receiver's shadow vertices from the caster's current
 // LOD meshes (TerrainShadow slot 30 0x00509aa0 is its terrain twin).  Inherent near miss: retail
 // rounds the clipped points with an inline __asm fld/fistp helper (float temp at ebp-8 / ebp-0x14,

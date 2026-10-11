@@ -17,13 +17,18 @@
 //   the translation restored, a temporary result, SetIdentity or reversed diagonal stores and
 //   accumulation (`t += ...`); with both operands by value (as MatrixMultiply 0x0042a1a0 takes
 //   them; VC6 reads the unmodified `s` in place).
+//   Rechecked 2026-10-11: the count windows repeat every 32 locals, not 8 (n and n + 32
+//   give the same code; windows at 6-7 (_44), 9-10 (row 3), 12-13 (row 2), 15 (row 1));
+//   with this form every count 0..31 stays at 618, and the written k order with 0..31
+//   locals is no better. Locals of any type count one each; uninitialised unused ones
+//   and extra statements count nothing.
 // GetWorldBounds (0x004fe8a0, 618 bytes; 541/610): the subtree box through the world matrix,
 //   the half extents through |R| (a diagonal matrix times R, inline fabs). The instruction
 //   stream matches up to the tail; retail places the diagonal matrix at esp+0x10 below the
 //   centre and the product (frame order c, e, w, a; here c, w, a, e, which no use-count change
 //   reproduces) and computes hi = w + ext with w as the destination, keeping ext on the x87
 //   stack until three final pops.
-//   0..15 dead initialised int locals at the top of the function change nothing.
+//   0..33 dead initialised int locals at the top of the function change nothing.
 // AccumulateBounds (0x004fe2e0, 1390 bytes; 80/1297): first draft. Same flow, calls and
 //   arithmetic; retail's frame is 0x48 (here 0x3c): it copies each direction into a by-value
 //   temporary at esp+0x40 and keeps the world centre in ebx/ebp/edx, and loads the three

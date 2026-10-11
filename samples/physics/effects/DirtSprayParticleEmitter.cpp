@@ -47,6 +47,7 @@ int DirtSprayParticleEmitter::UnknownVirtualSlot27(void* a, ParticleManager* m)
 
 // 0x004b9460.  Writes the particles straight into the manager's table: dt (plus the carried
 // remainder) times the rate is the number of particles, spread along the segment moved this tick.
+// 0..33 dead initialised int locals at the top change nothing (947/958 masked).
 int DirtSprayParticleEmitter::GameObjectVirtualSlot10(float dt)
 {
     if (g_gameContext->frozen == 0) {

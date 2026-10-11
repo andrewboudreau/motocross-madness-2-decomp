@@ -72,6 +72,10 @@
 // sums globally (737); reference aliases of world/projection on one or all
 // row 1 leaves score the same as the bare declaration (references to locals
 // fold), and a second reference to the camera's view matrix gives 160.
+// Dead initialised int locals (2026-10-11): 0..33 at the top and 0..31 just before row 1
+// give the same scores by count (799 at 0 and 29..33, otherwise 706..776), so the count
+// moves all rows together and no count gives retail's row 1. SoultreeVirtualSlot5 stays
+// at 610 for 0..33 top locals.
 //
 // DrawNormals (normals, 528 bytes): scales by the function-local static
 // 0x00568944 = 0.5, which is what puts the variable before the vertex

@@ -35,6 +35,9 @@
 // computes b.z - a.z first in edges 2, 5 and 6 and p.x - a.x first in 1, 3
 // and 4; edges 3 and 6 differ only in their base pointer, so the tie-break
 // is not structural.
+// 2026-10-11: 1..31 dead initialised int locals before any of the six edge tests repeat
+// 1002, 992, 1012, 1032 with period 4 wherever they go (top or before edge 2..6);
+// locals inside UnknownEdgeCrosses stop it being inlined from 4 on.
 //
 // Track::UnknownFunction517340 (0x00517340, 1509 bytes; the candidate is
 // 1533): the walk, the strip test, the candidate list and the acceptance
