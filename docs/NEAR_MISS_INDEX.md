@@ -28,7 +28,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | audio/PCAudio | `0x004bb890` | 35/272 (masked) | c | 11 code diffs: `je @65` vs `jne @23 ; mov ecx, [esp + N] ; mov fs:[~`; `je @65` vs `jne @51 ; xor eax, eax ; mov ecx, [esp ~` |
 | audio/PCAudio | `0x004bc6b0` | 47/580 (masked) | c | 54 code diffs: retail lacks `mov eax, fs:[X] ; push -1 ; push A`; retail lacks `mov fs:[X], esp` |
 | audio/PCAudio | `0x004bd0c0` | 110/314 (masked) | c | 16 code diffs |
-| audio/PCAudio | `0x004bdc00` | 79/407 (masked) | b | 33 code diffs: `sub esp, 8` vs `sub esp, N`; retail lacks `mov ebx, [esp + N]`; frame 0x8 vs 0xc |
+| audio/PCAudio | `0x004bdc00` | 91/483 | b | retail extent 483; `while (1)` gives retail's top-tested queue loop (155 insns); left: retail ebp=audio, ebx=&cs then loaded, edi=&sound cs, ready/bytes spilled (frame 0xc vs 8) |
 | audio/PCAudio | `0x004be910` | 108/158 | c | 6 code diffs: retail adds `mov [esp + N], edx`; retail adds `mov [esp + N], edx` |
 | camera/Camera | `0x0042e550` | 13/206 | c | retail reloads the display-mode index for the height (`mov edx, [eax + 0xc]` twice) and shares the return tail, so everything after it shifts; named width/height temps and width/height accessors both reuse the index (src/reconstructed/Camera.cpp) |
 | camera/Camera | `0x0042eb10` | 659/690 | c | four fld/fmul operand pairs of the up × forward cross product load the other operand first (samples/camera/CameraNearMisses.cpp) |
@@ -226,7 +226,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/RaceSound | `0x004e4d10` | 563/2038 | c | 10 code diffs: `je @599` vs `je A`; `jne @280` vs `jne A` |
 | race/RaceStatus | `0x004e5d00` | 168/519 | c | 29 code diffs: retail adds `mov ebp, [esp + N]`; retail adds `test ebp, ebp` |
 | race/RaceStatus | `0x004e6a50` | 490/1003 | b | 6 code diffs: `je @289` vs `je A`; `je @289` vs `je A`; slots differ |
-| race/Recorder | `0x004e6f80` | 516/2180 | c | 52 code diffs |
+| race/Recorder | `0x004e6f80` | 652/2180 | c | case 1 `goto opened` reproduces retail's jmp into case 2's tail; left: case 2's `[0xc8]=1; Leave` suffix still cross-jumps into case 4 (retail keeps it), and `name`/`headerSize` slots swap (0x08/0x10); real extent 2148 |
 | race/Recorder | `0x004e7d60` | 272/2448 | b | 99 code diffs: `jne @767 ; mov eax, [esi + 0x88] ; test~` vs `jne @761 ; mov ecx, [esi + 0x88] ; xor ~`; slot order differs |
 | race/Wrecker | `0x005306e0` | 4174/4178 | c | slot 10: one term pair of the first product (`relative._23` adds `a._23 * b._22` before `a._33 * b._23` in retail) |; pointer locals to the inverse, the product operands, the swapped element and the inverse rows give 3781..4174 |
 | race/Wrecker | `0x00531740` | 772/1617 | b | frame 0xc4 matches; slot order and `0.0f - scaled.z` operand order |
@@ -256,7 +256,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/GR_BitString | `0x004239c0` | 343/420 | b | 14 code diffs: retail lacks `mov ebx, ecx`; retail adds `mov ebp, ecx`; slots differ |
 | render/GR_BitString | `0x00423b70` | 93/442 | b | 16 code diffs: retail adds `add esi, 4`; `or ecx, eax` vs `or eax, ecx ; mov [edx - 4], eax`; slots differ |
 | render/Grid1 | `0x0047caa0` | 104/1740 | b | slot 3 texture stage switch; frame 0x14 vs retail 0x10, 93 code diffs (samples/render/Grid1NearMisses.cpp) |
-| render/Grid1 | `0x0047d470` | 309/786 | b | 31 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x838 vs 0x834, slot order differs |
+| render/Grid1 | `0x0047d470` | 313/786 | b | `rest` before `line`; line pointer still spilled (frame 0x838 vs 0x834), first/row in ebx/edx where retail has edx/eax |
 | render/Grid1 | `0x0047d780` | 216/1008 | b | 50 code diffs: `je @321 ; mov esi, [esp + N]` vs `je @315`; `mov eax, [esi]` vs `mov edi, [esp + N]`; slot order differs |
 | render/GridNode | `0x00484d70` | 81/90 | c | 3 code diffs: `mov ecx, [eax*4 + A] ; add ecx, ebx ; m~` vs `mov eax, [eax*4 + A] ; add eax, ebx ; m~`; retail adds `xor ecx, ecx ; mov cx, word ptr [eax + ~` |; ~110 loop, index-local, final-test and parenthesis spellings unchanged |
 | render/GridNode | `0x00483910` | 1040/1067 | c | cell sampler: 4 code diffs in the shift setup only; retail reuses the level byte of the leaf test (`and eax, 0xff ; shl eax, 2`, children into ecx), VC6 re-reads it (`xor eax, eax ; mov al, [ecx + 0x28]`) |
