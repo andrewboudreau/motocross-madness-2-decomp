@@ -12235,6 +12235,15 @@ CASES = [
         'reason': 'message 0x8e; player records 0x689d0c',
     },
     {
+        'name': 'SelectGamePicProcs.cpp MultiPlayerDlg network messages 0x4f3a70',
+        'bindings': 'src/reconstructed/SelectGamePicProcs.bindings.json',
+        'source': 'src/reconstructed/SelectGamePicProcs.cpp',
+        'symbol': '?UnknownVirtualSlot24@MultiPlayerDlg@@UAEHHPAXHHH@Z',
+        'target_va': '0x004f3a70',
+        'target_size': 2729,
+        'reason': 'MultiPlayerDlg vtable slot 24; ButRdyPlayer%d, OpponentsListBox; player-record loop end 0x689dd0; __FILE__ 0x573c6c line 0x537',
+    },
+    {
         'name': 'SelectGamePicProcs.cpp SelectGamePicProcs.cpp MultiPlayerDlg ready cleared report 0x4f57c0',
         'bindings': 'src/reconstructed/SelectGamePicProcs.bindings.json',
         'source': 'src/reconstructed/SelectGamePicProcs.cpp',

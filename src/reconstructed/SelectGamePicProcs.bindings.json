@@ -357,5 +357,8 @@
   "??_C@_0P@PGIG@500cc?52?9stroke?$AA@": "0x00569ba0",
   "??_C@_0P@OGDA@400cc?54?9stroke?$AA@": "0x00569bb0",
   "??_C@_0P@IDOK@250cc?52?9stroke?$AA@": "0x00569bc0",
-  "??_C@_0P@PFI@125cc?52?9stroke?$AA@": "0x00569bd0"
+  "??_C@_0P@PFI@125cc?52?9stroke?$AA@": "0x00569bd0",
+  "?UnknownVirtualSlot24@MultiPlayerDlg@@UAEHHPAXHHH@Z$ehhandler": "0x0054e01a",
+  "??_C@_0N@MHG@mainmenu?4dtm?$AA@": "0x0056d8ac",
+  "??_7MainDlg@@6B@": "0x00554fb8"
 }

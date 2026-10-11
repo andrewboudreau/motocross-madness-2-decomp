@@ -28,7 +28,14 @@
 //   `edi = esp` after the camera and vtable loads and loads z before storing
 //   y). A pointer, reference, `this->`, explicit copy, cast or camera local
 //   for the argument leaves it; a user-defined Vector3 copy constructor
-//   copies before the camera is evaluated (worse).
+//   copies before the camera is evaluated (worse). Also unchanged: inline
+//   helpers taking the camera and the vector (const reference, by value,
+//   pointer), a `Vector3(viewTarget)` temporary, parentheses, and the
+//   declaration count (0..63 prepended typedefs); a `Vector3(x, y, z)`
+//   temporary is much worse. In probes VC6 interleaves the copy like retail
+//   only when the destination pointer lands in a scratch register; with it
+//   in a callee-saved register (edi, `this` live afterwards) it takes the
+//   pointer first and copies x, y, z in order, whatever the struct type.
 // SPRaceInfoDlg::UnknownVirtualSlot29 (0x004507a0, 1652 bytes) and
 // MPRaceInfoDlg::UnknownVirtualSlot29 (0x004513a0, 2004 bytes): the same
 //   calls, strings and list columns; inside the per-racer loops retail

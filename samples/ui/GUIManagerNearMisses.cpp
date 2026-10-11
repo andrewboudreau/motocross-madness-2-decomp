@@ -40,6 +40,10 @@
 //   flag, nested if/else, goto, a `const` or `void*` owner, a `self` local,
 //   `!device ? 0 : owner`, `this == owner`); comparing with `this` first
 //   (below) keeps the branch, so only the order of the two tests differs.
+//   Also threaded (15/52): an inline owner helper (early returns or a
+//   ternary) with nested `if (owner) { if (owner == this) ... }`, `!= this`
+//   or `return owner == this;`, a `(GUIUser*)0` or `device != 0` ternary,
+//   a parenthesised ternary and an extra `hasOwner` local.
 
 #include "../../src/reconstructed/GUIManager.cpp"
 

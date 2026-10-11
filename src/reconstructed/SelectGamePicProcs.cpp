@@ -20,6 +20,7 @@
 #include "BackgroundImage.h"
 #include "Camera.h"
 #include "DebugAlloc.h"
+#include "DlgProcs.h" // MainDlg, built inline by slot 24 (0x004f43c1)
 #include "EventManager.h"
 #include "../krusty2/math/FastMath.h"
 #include "MatrixUtil.h"
@@ -692,6 +693,178 @@ void MultiPlayerDlg::RemoveLobbyPlayer(int index) {
         network->Send(0x8e, &message, sizeof(message), network->localPlayer, player);
         field_0x7f68.FreeSlot(message.field_0x04);
     }
+}
+
+// 0x004f3a70: the lobby's network messages. The player-state loop walks
+// eight records (end pointer 0x00689dd0), one past g_UnknownGlobal689d08;
+// the arrival delay is one parenthesised expression (without the outer
+// parentheses VC6 loads TrackGame before the fild).
+int MultiPlayerDlg::UnknownVirtualSlot24(int type, void* data, int from, int to, int flags) {
+    int i;
+    if (from && type == 2) {
+        UnknownPlayerStateMessage* state = (UnknownPlayerStateMessage*)data;
+        for (i = 0; i < 8; i++) {
+            if (g_UnknownGlobal689d08[i].id != from)
+                continue;
+            char name[0x80];
+            sprintf(name, "ButRdyPlayer%d", i + 2);
+            UIControl* button = FindControl(name, 1);
+            if (button) {
+                if (state->field_0x01) {
+                    button->SetFontColor(0xffffff);
+                    g_UnknownGlobal689dbc[i] = 1;
+                    field_0x7f68.SetSlot(from, state->field_0xc3);
+                    if (!g_UnknownGlobal689dd8[i]) {
+                        char text[0x80];
+                        char line[0x80];
+                        g_TrackGame->LoadResourceString(0x14d5, text, 0x80);
+                        sprintf(line, text, g_UnknownGlobal689d08[i].name, state->field_0xc8);
+                        AddChatLine(-1, line);
+                        g_UnknownGlobal689dd8[i] = 1;
+                    }
+                } else {
+                    button->SetFontColor(0x808080);
+                    g_UnknownGlobal689dbc[i] = 0;
+                    g_UnknownGlobal689dd8[i] = 0;
+                    field_0x7f68.FreeSlot(from);
+                }
+            }
+            g_TrackGame->mode.field_0x1be4[i + 1].field_0xd4 = g_UnknownGlobal689d08[i].id;
+            g_TrackGame->mode.field_0x1be4[i + 1].field_0xd8 = 0;
+            COPY_TEXT(g_TrackGame->mode.field_0x1be4[i + 1].field_0xdc, g_UnknownGlobal689d08[i].name, 0x10);
+            g_TrackGame->mode.field_0x1be4[i + 1].UnknownFunction521fb0(state->field_0x42, state->field_0x02,
+                                                                                 state->field_0x82);
+            g_TrackGame->mode.field_0x1be4[i + 1].field_0xec = state->field_0xc8;
+            g_TrackGame->mode.field_0x1be4[i + 1].field_0xf0 = state->field_0xcc;
+            g_TrackGame->mode.field_0x1be4[i + 1].field_0xf4 = state->field_0xcd;
+            g_TrackGame->mode.field_0x1be4[i + 1].field_0xc0 = state->field_0xd0;
+            g_TrackGame->mode.field_0x1be4[i + 1].field_0xc4 = state->field_0xc2;
+            float delay = ((float)(unsigned int)flags - (float)(unsigned int)state->field_0xc4);
+            if (delay < g_TrackGame->mode.field_0x1be4[i + 1].field_0xd0)
+                g_TrackGame->mode.field_0x1be4[i + 1].field_0xd0 = delay;
+            field_0x7f68.SetSlot(from, state->field_0xc3);
+            if (g_TrackGame->network->isHost && field_0x7f58) {
+                UIListBox* list = static_cast<UIListBox*>(field_0x7f58->FindControl("OpponentsListBox", 0));
+                if (list && list->rowCount - 1 != g_TrackGame->mode.field_0x1bd8) {
+                    int selection = list->GetSelectedRow();
+                    list->RemoveAllRows();
+                    for (int j = 0; j <= g_TrackGame->mode.field_0x1bd8; j++) {
+                        char number[0x80];
+                        sprintf(number, "%d", j);
+                        list->AddRow(number, j, 0);
+                    }
+                    if (g_TrackGame->mode.field_0x1bd8 < selection)
+                        list->SelectRow(g_TrackGame->mode.field_0x1bd8);
+                    else
+                        list->SelectRow(selection);
+                }
+            }
+        }
+    } else if (from && type == 0x83) {
+        UnknownLobbyStartMessage* start = (UnknownLobbyStartMessage*)data;
+        g_TrackGame->mode.field_0x27f8 = start->field_0x08;
+        g_TrackGame->mode.field_0x94 = start->field_0x1f4;
+        int total = g_TrackGame->mode.field_0x27f8.field_0x35 + g_TrackGame->mode.field_0x27f8.field_0x28;
+        if (start->field_0x04) {
+            for (i = g_TrackGame->mode.field_0x27f8.field_0x35; i < total; i++) {
+                g_TrackGame->mode.field_0x1be4[i].field_0xc0 = start->field_0x1f8[i];
+                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0xdc, start->field_0x218[i], 0x10);
+                g_TrackGame->mode.field_0x1be4[i].field_0xd8 = i;
+                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x00, start->field_0x298[i], 0x40);
+                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x40, start->field_0x498[i], 0x40);
+                COPY_TEXT(g_TrackGame->mode.field_0x1be4[i].field_0x80, start->field_0x698[i], 0x40);
+                g_TrackGame->mode.field_0x1be4[i].field_0xec = start->field_0x898[i];
+                g_TrackGame->mode.field_0x1be4[i].field_0xf0 = start->field_0x8b8[i];
+            }
+            memcpy(field_0x7f68.field_0x00, start->field_0x08.field_0x18c, sizeof(field_0x7f68.field_0x00));
+            FillRacerSlots();
+        } else {
+            FollowTrackChange();
+        }
+    } else if (from && type == 0xf) {
+        UnknownLobbySettingsMessage* settings = (UnknownLobbySettingsMessage*)data;
+        g_TrackGame->mode.field_0x27f8.field_0x140 = settings->minutes;
+        g_TrackGame->mode.field_0x27f8.field_0x04 = settings->eventType;
+        g_TrackGame->mode.field_0x27f8.field_0x00 = settings->raceMode;
+        g_TrackGame->mode.field_0x27f8.field_0x08 = settings->field_0x2d78;
+        g_TrackGame->mode.field_0x27f8.field_0x20 = settings->laps;
+        g_TrackGame->mode.field_0x27f8.field_0x28 = settings->opponents;
+        g_TrackGame->mode.field_0x27f8.field_0x35 = settings->players;
+        g_TrackGame->mode.field_0x27f8.field_0x0c = settings->races;
+        g_TrackGame->mode.field_0x27f8.field_0x144 = settings->tagBall;
+        g_TrackGame->mode.field_0x27f8.field_0x148 = settings->stuntMode;
+        g_TrackGame->mode.field_0x27f8.field_0x10 = settings->treeCollision;
+        g_TrackGame->mode.field_0x27f8.field_0x14 = settings->riderCollision;
+        g_TrackGame->mode.field_0x27f8.field_0x18 = settings->fastFinishes;
+        g_TrackGame->mode.field_0x27f8.field_0x1c = settings->bikeClass;
+        g_TrackGame->mode.field_0x27f8.field_0x34 = settings->trackNumber;
+        g_TrackGame->mode.field_0x27f8.field_0x138 = settings->field_0x0c;
+        g_TrackGame->mode.field_0x27f8.field_0x13c = settings->field_0x10;
+        g_TrackGame->mode.field_0x94 = settings->detail;
+        g_TrackGame->mode.UnknownFunction5240e0(g_TrackGame->mode.field_0x27f8.field_0x08);
+        g_TrackGame->mode.field_0x27f8.field_0x36[0] = 0;
+        strncat(g_TrackGame->mode.field_0x27f8.field_0x36, settings->trackName, 0x3f);
+        memcpy(field_0x7f68.field_0x00, settings->slots, sizeof(field_0x7f68.field_0x00));
+        FollowTrackChange();
+    } else if (from && type == 0x85) {
+        AddChatLine(from, (const char*)data + 4);
+        return 1;
+    } else if (from && type == 0x92) {
+        AddChatLine(-1, (const char*)data + 4);
+        return 1;
+    } else if (type == 5) {
+        field_0x7f68.FreeSlot(((UnknownPlayerLeftMessage*)data)->field_0x08);
+        if (field_0x7f58) {
+            UIListBox* list = static_cast<UIListBox*>(field_0x7f58->FindControl("OpponentsListBox", 0));
+            if (g_TrackGame->network->isHost && list &&
+                list->rowCount - 1 != g_TrackGame->mode.field_0x1bd8) {
+                int selection = list->GetSelectedRow();
+                list->RemoveAllRows();
+                for (int j = 0; j <= g_TrackGame->mode.field_0x1bd8; j++) {
+                    char number[0x80];
+                    sprintf(number, "%d", j);
+                    list->AddRow(number, j, 0);
+                }
+                if (g_TrackGame->mode.field_0x1bd8 < selection)
+                    list->SelectRow(g_TrackGame->mode.field_0x1bd8);
+                else
+                    list->SelectRow(selection);
+            }
+        }
+    } else if (from && type == 0x8e) {
+        UnknownKickMessage* kick = (UnknownKickMessage*)data;
+        int player = g_TrackGame->network->localPlayer;
+        if (kick->field_0x04 == player) {
+            if (g_TrackGame->network->lobbyConnected) {
+                EndDialog(0);
+                g_TrackGame->ui->OpenExitDialog();
+                return 1;
+            }
+            EndDialog(0);
+            g_TrackGame->ui->field_0x2c->ShowDialog(new(__FILE__, 0x537) MainDlg, 0x64, 2, 0, 0, 0x63,
+                                                                         0, 1);
+            return 1;
+        }
+        field_0x7f68.FreeSlot(kick->field_0x04);
+        if (field_0x7f58) {
+            UIListBox* list = static_cast<UIListBox*>(field_0x7f58->FindControl("OpponentsListBox", 0));
+            if (g_TrackGame->network->isHost && list &&
+                list->rowCount - 1 != g_TrackGame->mode.field_0x1bd8) {
+                int selection = list->GetSelectedRow();
+                list->RemoveAllRows();
+                for (int j = 0; j <= g_TrackGame->mode.field_0x1bd8; j++) {
+                    char number[0x80];
+                    sprintf(number, "%d", j);
+                    list->AddRow(number, j, 0);
+                }
+                if (g_TrackGame->mode.field_0x1bd8 < selection)
+                    list->SelectRow(g_TrackGame->mode.field_0x1bd8);
+                else
+                    list->SelectRow(selection);
+            }
+        }
+    }
+    return GameObject::UnknownVirtualSlot24(type, data, from, to, flags);
 }
 
 // 0x00689e04: only written (0x004f4520).
