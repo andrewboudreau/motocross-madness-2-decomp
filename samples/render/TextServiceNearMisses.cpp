@@ -13,6 +13,12 @@
 // return inside the loop, explicit `operator[]` calls, int/unsigned index
 // and count in all combinations, and the count read after `i = 0`; a
 // 0..63 typedef prefix scan leaves it at 117 (not a tie-break window).
+// Retail schedules `sub eax,edx` before loading the data pointer (as the
+// exact FindCell 0x00467340 does); also unchanged at 117: an inline
+// FontAt(list, i) helper in the loop and/or for the result, a named index
+// copy, m_data[i - m_base] spelled three ways, a by-value accessor struct,
+// `i -= base`, pointer arithmetic, signed/`-base + i`/`i + 0` indices, a
+// cast, `fonts[0][i]` and extra parentheses.
 //
 // UnknownFunction50b400 (0x0050b400, 758 bytes; 4444 texels),
 // UnknownFunction50b700 (0x0050b700, 758 bytes; 1555 texels) and the 32-bit

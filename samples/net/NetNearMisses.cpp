@@ -9,13 +9,20 @@
 // NetworkInterface::CreateAddress (0x004abf10, 948 bytes): 92.4%.
 // The MODEM case keeps `port` in edx where retail uses ebx.
 //
-// NetworkInterface::DispatchMessages (0x004aced0, 370 bytes): 95.5%.
-// The ring-slot address uses [edi+eax+4] where retail has [eax+edi+4], and
-// after the slot-17 call retail reloads field_0x34 into edx and forms the
-// slot with lea; direct indexing throughout (53.3%) and a pointer for the
-// whole body (47.9%) are worse. Taking the message pointer only inside
-// `if (!messages[index].from)` gives retail's reload and `lea` there, but
-// VC6 then swaps ebx and ebp for the index and the pointer (196/370).
+// NetworkInterface::DispatchMessages (0x004aced0, 370 bytes): 361/370.
+// Addressing the slot through a byte offset (MessageAt below) fixes the
+// SIB base/index order everywhere (was 355/370 with messages[index]). The
+// rest is in the system-message block: retail loads [edx+edi+4] (from) and
+// then forms the pointer with `lea ebx,[edx+edi]`; VC6 here forms it first
+// (`mov ecx,[esi+0x34]; mov ebx,edi; add ebx,ecx`) and pushes system[2]
+// from edx instead of eax. Taking the pointer only inside the `if (!from)`
+// (through offset or index) gives retail's load+lea but swaps ebx and ebp
+// for the index and the pointer (197/370); local declaration order, name
+// buffer order, `last != index`, a split increment, removing the `system`
+// local or the `message` pointer, per-case `system` locals and a loop-scope
+// pointer declared outside the `if` do not change that swap. Using offset in
+// the pointer itself (`&MessageAt(..)` or a cast) outside the `if` gives a
+// 368-byte form; a reference for the whole loop body is far worse.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
@@ -239,6 +246,14 @@ failed:
     return 0;
 }
 
+// Ring slot at a byte offset into the received-message array. Addressing the
+// slot as messages + offset (offset = index * sizeof) gives retail's
+// [eax+edi+4] SIB order; messages[index] gives [edi+eax+4].
+static inline NetMessage& MessageAt(NetMessage* messages, int offset)
+{
+    return *(NetMessage*)((char*)messages + offset);
+}
+
 // 0x004aced0: dispatches the received messages in ring order.
 void NetworkInterface::DispatchMessages(int value)
 {
@@ -261,16 +276,17 @@ void NetworkInterface::DispatchMessages(int value)
         }
         do {
             more = index != last;
-            if (messages[index].from && !FindPlayer(messages[index].from) &&
-                GetPlayerName(messages[index].from, name))
-                AddPlayer(messages[index].from, name);
-            if (messages[index].type == 0x40) {
-                AcknowledgeMessage(*(short*)(messages[index].data + 2));
+            int offset = index * sizeof(NetMessage);
+            if (MessageAt(messages, offset).from && !FindPlayer(MessageAt(messages, offset).from) &&
+                GetPlayerName(MessageAt(messages, offset).from, name))
+                AddPlayer(MessageAt(messages, offset).from, name);
+            if (MessageAt(messages, offset).type == 0x40) {
+                AcknowledgeMessage(*(short*)(MessageAt(messages, offset).data + 2));
             } else {
                 g_TrackGame->UnknownVirtualSlot17(
-                    messages[index].type, messages[index].data,
-                    messages[index].from, messages[index].to,
-                    messages[index].flags);
+                    MessageAt(messages, offset).type, MessageAt(messages, offset).data,
+                    MessageAt(messages, offset).from, MessageAt(messages, offset).to,
+                    MessageAt(messages, offset).flags);
                 NetMessage* message = &messages[index];
                 if (!message->from) {
                     // DirectPlay system message: type, player type, player id.
@@ -288,7 +304,7 @@ void NetworkInterface::DispatchMessages(int value)
                     }
                 }
             }
-            messages[index].type = 0;
+            MessageAt(messages, offset).type = 0;
             if (++index >= 0x100)
                 index = 0;
         } while (more);

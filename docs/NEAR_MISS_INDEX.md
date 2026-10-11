@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 194, c 148, total 342. The three class (a) functions of the
+Counts: a 0, b 194, c 147, total 341. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -52,7 +52,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | game/EventManager | `0x0045d480` | 2064/4246 | b | frame size 0x460 matches; scalar spill homes below +0x68 differ, the squared lengths load all three components before squaring (retail `fld; fld st(0); fmulp` per component), the Winner branch registers run one step behind retail |
 | game/EventManager | `0x0045e710` | 454/533 | c | 10 code diffs: `mov edx, [ecx + 0xc4c] ; mov [eax + 0x5~` vs `mov ecx, [ecx + 0xc4c] ; mov [eax + 0x5~`; `mov eax, [eax + 0x56c]` vs `mov edx, [eax + 0x56c]` |
 | game/Game | `0x00467b70` | 406/813 | b | 11 code diffs: `jne @128 ; pop edi ; pop esi` vs `je @227`; slot order differs |
-| game/PCGame | `0x004c0d10` | 1776/1790 | c | retail stores the surface description's size right after the memset, VC6 after pushing the 0x005119c0 arguments |
+| game/PCGame | `0x004c0d10` | 1776/1790 | c | retail stores the surface description's size right after the memset, VC6 after pushing the 0x005119c0 arguments |; helpers, a derived-struct constructor, pointer/format locals and sizeof spellings do not move it (retail stores it after the pushes in the matched 0x004c5950) |
 | game/QuarryStuntEvent | `0x004e0560` | 22/331 | b | 30 code diffs: `sub esp, N` vs `push ecx`; retail lacks `xor ebx, ebx`; frame 0xc vs 0x0 |
 | game/QuarryStuntEvent | `0x004e14a0` | 166/1760 | b | 9 code diffs: `mov edx, [A] ; test edx, edx` vs `mov ecx, [A] ; test ecx, ecx`; `mov eax, [ecx + 0x26c0] ; lea edx, [eax~` vs `mov eax, [eax + 0x38] ; mov ecx, [eax +~`; slots differ |
 | game/QuarryStuntEventLoader | `0x004de590` | 397/7912 | b | the register holding -1 for the EH states is esi here, edi in retail (from the fog block on); scalar slots differ (`step` shares a slot with later temporaries in retail); register choice in the memory-budget tree |
@@ -126,11 +126,10 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | net/MSZoneInterface | `0x004aa4e0` | 237/309 (masked) | c | 7 code diffs |
 | net/Net | `0x004ab960` | 149/1072 | b | 51 code diffs: `test esi, esi ; jge @54` vs `cmp esi, ebx ; jge @51`; retail adds `lea edx, [esp + N]`; slots differ |
 | net/Net | `0x004abf10` | 874/948 | b | 13 code diffs: retail adds `mov ecx, [A]`; `mov ecx, [A]` vs `mov ebx, [esp + N]`; slots differ |
-| net/Net | `0x004aced0` | 355/370 | c | 15 code diffs: `mov eax, [edi + eax + 4]` vs `mov eax, [eax + edi + 4]`; `mov eax, [edi + edx + 4]` vs `mov eax, [edx + edi + 4]` |
+| net/Net | `0x004aced0` | 361/370 | c | ring slot addressed through a byte-offset helper (fixes every SIB order); retail loads `from` before `lea ebx, [edx + edi]` for the system-message pointer, VC6 forms the pointer first (`mov ebx, edi ; add ebx, ecx`) and pushes system[2] from edx instead of eax |
 | net/NetThread | `0x004af8e0` | 234/338 | c | 19 code diffs: retail adds `push ebx`; retail adds `mov eax, [A]` |
 | net/NetThread | `0x004afa90` | 698/1251 | b | 14 code diffs: `jne @388` vs `jne A`; `jne @374` vs `jne A`; slots differ |
 | net/ZoneReport | `0x0049ca60` | 4792/4810 | c | retail folds the 1-based type's +1 into the `>= 30` branch (`add ebx, -0x1a`, jumping past the else branch's `inc ebx`); VC6 here subtracts 27 and increments after the join (an in-branch +1 spills the index); parentheses, `index = index - 27`, `index += -27` and `field_0x29c = ++index` give identical bytes |
-| parameterblocks/Parameterblocks | `0x004b7220` | 144/157 | c | `this` and `path` in ebp/ebx where retail uses ebx/ebp (samples/parameterblocks/ParameterblocksNearMisses.cpp) |
 | parser/Parser | `0x004b87f0` | 33/406 | b | prologue: retail pushes ebx/ebp/esi/edi before the null test, VC6 here pushes ebx/ebp after the early return (samples/parser/ParserNearMisses.cpp) |
 | physics/bikeai/BikeAI | `0x0040d200` | 4430/4464 | c | 2 scheduling diffs: the initial `seg.y = 0` store and the ground-branch `p.y = ground.y` store each sit one instruction pair earlier than retail's |
 | physics/bikeai/BikeAI | `0x0040e510` | 1133/1944 | b | 53 code diffs: retail adds `mov esi, [esp + N] ; test esi, esi`; `mov edi, [esp + N] ; test edi, edi ; je~` vs `je @582`; slot order differs |

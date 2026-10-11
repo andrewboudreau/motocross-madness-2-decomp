@@ -12,6 +12,14 @@
 // pushing the 0x005119c0 arguments. Not moved by sizeof/0x7c spellings, a
 // pointer to the description, an inline clear helper (reference or
 // pointer), a format local or the description declared outside the loop.
+// Also unchanged: a memset+size helper (pointer or reference), a helper
+// that also makes the 0x005119c0 call, a derived description whose
+// constructor clears and sizes it, a pixel-format pointer local (before or
+// after the clear), a format local after the size store, `(char*)&desc +
+// 0x48`, a PCRenderTarget cast for the format and sizeof(type); storing
+// the size through memset's return value is worse (1344). The canonical
+// PCRenderTarget::MeasureTextureMemory (0x004c5950) has the same three
+// statements and retail there does store the size after the pushes.
 #include <stdio.h>
 #include <string.h>
 

@@ -26,7 +26,18 @@
 //   block and an unsigned count do not change it.
 //   A `FILE* file = stream->field_0x14;` local in the fwrite tail does schedule all
 //   loads before the pushes, but in ecx/edx/eax where retail uses edx/eax/ecx
-//   (a register tie-break); not kept.
+//   (a register tie-break); not kept. 136/152: the scratch registers are
+//   rotated one step against retail throughout (fclose argument eax vs edx,
+//   encoded call's file and key edx/ecx vs ecx/eax, fwrite's file esi vs
+//   ecx). Also unchanged:
+//   the tail-call form `if (field_0x1c) return field_0x1c->...`, every
+//   int/unsigned/long/size_t count and const void*/void*/const char* buffer
+//   type, a 0..63 typedef and 0..19 prototype prefix, a standalone TU,
+//   while/for/next InnermostStream loops, `!= 0`/NULL tests, int position,
+//   a result local or ternary for the encoded return, a key local, inline
+//   helpers for the close, resync, encoded write and plain write, dead
+//   locals or empty statements at six positions and an else-return copy.
+//   FILE* locals in the seek block and a nested fseek(f, ftell(f)) are worse.
 // - 0x00460d10: a member-initialiser list stores in declaration order (62% with every
 //   field in it), but retail's order is the body order below with the argument
 //   loaded into edx at entry; neither form, a local copy nor chained assignments
