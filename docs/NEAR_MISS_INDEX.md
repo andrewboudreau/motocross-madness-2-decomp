@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 184, c 130, total 314. The three class (a) functions of the
+Counts: a 0, b 184, c 128, total 312. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -158,7 +158,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/effects/SparkParticleEmitter | `0x004b99a0` | 1027/1039 (masked) | c | 1 code diff: gravStep first component `fld st(0) ; fmul [esp + N]` vs retail `fld [esp + N] ; fmul st(1)` (writing gravStep as `inv * (dt * manager->gravity)` fixed the velStep one; ~400 further variants do not move it) |
 | physics/effects/SteamParticleEmitter | `0x004b9f40` | 21/164 (masked) | c | 6 code diffs: `lea edi, [esi + 0x74]` vs `lea ecx, [esi + 0x54] ; mov edx, ebx ; ~`; `mov [esi + 0x54], ebx ; mov [esi + 0x58~` vs `mov [ecx + 8], edx` |
 | physics/helpers/GraphicsTest | `0x0047bd10` | 818/917 | b | DrawCircle: frame 0xb84 vs 0xb78, the `[eax - 4]` store and the centre-sum operand order; a `Vec3* p = &points[i]` local gave +4 |
-| physics/helpers/SoultreeBounds | `0x004fd340` | 596/630 | c | with both product operands by value, row 1's k = 3 product and the term order of _44 differ (samples/physics/helpers/SoultreeBounds.cpp) |
+| physics/helpers/SoultreeBounds | `0x004fd340` | 618/630 | c | rows _11.._13 written k = 1,3,2,4 and _14 k = 3,1,2,4; the s13 product of _11.._14 loads its operands the other way (retail m3j first) and two _44 products differ (samples/physics/helpers/SoultreeBounds.cpp) |
 | physics/helpers/SoultreeBounds | `0x004fe2e0` | 80/1297 | b | first draft: frame 0x3c vs retail 0x48 (by-value direction temporaries, centre in ebx/ebp/edx) |
 | physics/helpers/SoultreeBounds | `0x004fe8a0` | 541/610 | b | frame slot order (retail c, e, w, a) and the hi = w + ext tail |
 | physics/helpers/SoultreeMatrix | `0x004fb8c0` | 249/1072 (masked) | b | 13 code diffs: `mov ecx, [esp + N] ; mov edx, [esp + N]~` vs `lea ecx, [esp + N] ; push ecx`; `fld [esp + N] ; mov [esp + N], ecx ; le~` vs `call A`; slot order differs |
@@ -184,7 +184,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/motion/SteeringControl | `0x00504d30` | 125/206 (masked) | b | 6 code diffs: `fxch st(2) ; fmul st(2)` vs `fld st(0) ; fmul st(3)`; `fmul st(2)` vs `fmul st(1)`; slots differ |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446c30` | 730/771 | c | x87 term order of the inlined 4x4 product: one term pair in each of _11, _21, _31, _41 (retail's sum orders differ from slot 27's with the same helper) (samples/physics/shadow/D3DIMSoultreeShadowNearMisses.cpp) |
 | physics/shadow/D3DIMSoultreeShadow | `0x00446f40` | 180/1485 | b | retail's inline __asm fld/fistp rounding helper forces an ebp frame (0xe4 locals); the (int) casts call __ftol |
-| physics/shadow/ProjectedShadow | `0x004da570` | 231/275 (masked) | c | 4 code diffs: `mov [esi + 0x88], eax` vs `mov edx, A`; `mov ecx, A` vs `mov [esi + 0x88], eax` |
 | physics/shadow/ProjectedShadow | `0x004da7b0` | 152/777 (masked) | b | 22 code diffs: `lea ecx, [esp + N] ; mov eax, [eax + 4]~` vs `lea edx, [esp + N] ; mov ecx, [eax + 4]~`; `push ecx` vs `push edx`; slots differ |
 | physics/shadow/ProjectedShadow | `0x004dae50` | 21/345 (masked) | b | 27 code diffs: `mov eax, [esp + N] ; sub esp, 0xc ; cmp~` vs `sub esp, N ; push ebx ; mov ebx, [esp +~`; `mov esi, ecx ; jne @72 ; mov edi, [esp ~` vs `cmp ebx, 1 ; mov edi, ecx ; jne @74`; frame 0x0 vs 0xc |
 | physics/shadow/ProjectedShadow | `0x004db0d0` | 88/1597 (masked) | b | 108 code diffs: retail adds `push ebp`; retail adds `mov ecx, [ebx + 0x2c]`; frame 0x9c vs 0xc0, slot order differs |
@@ -220,9 +219,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | race/RaceStatus | `0x004e6a50` | 490/1003 | b | 6 code diffs: `je @289` vs `je A`; `je @289` vs `je A`; slots differ |
 | race/Recorder | `0x004e6f80` | 652/2180 | c | case 1 `goto opened` reproduces retail's jmp into case 2's tail; left: case 2's `[0xc8]=1; Leave` suffix still cross-jumps into case 4 (retail keeps it), and `name`/`headerSize` slots swap (0x08/0x10); real extent 2148 |
 | race/Recorder | `0x004e7d60` | 272/2448 | b | 99 code diffs: `jne @767 ; mov eax, [esi + 0x88] ; test~` vs `jne @761 ; mov ecx, [esi + 0x88] ; xor ~`; slot order differs |
-| race/Wrecker | `0x005306e0` | 4174/4178 | c | slot 10: one term pair of the first product (`relative._23` adds `a._23 * b._22` before `a._33 * b._23` in retail) |; pointer locals to the inverse, the product operands, the swapped element and the inverse rows give 3781..4174 |
 | race/Wrecker | `0x00531740` | 772/1617 | b | frame 0xc4 matches; slot order and `0.0f - scaled.z` operand order |
-| race/Wrecker | `0x005329e0` | 215/1306 | b | frame 0x94 matches; slot order (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`) |
+| race/Wrecker | `0x005329e0` | 241/1312 | b | frame 0x94 matches; slot order (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`) |
 | render/BackgroundImage | `0x004049d0` | 39/603 (masked) | c | 33 code diffs: `xor edi, edi` vs `mov [esp + N], 0`; `mov [esp + N], edi ; mov [ecx], edi ; j~` vs `mov [ecx], 0 ; je @162` |
 | render/CacheTexture | `0x005102d0` | 426/529 (masked) | b | 13 code diffs; slots differ |
 | render/CubeDraw | `0x0043dc60` | 121/1064 | b | 53 code diffs: `xor ebp, ebp` vs `xor edx, edx`; `mov [esp + N], ebp ; mov edi, 0x100 ; o~` vs `mov [esp + N], edx ; mov ebx, 0x100 ; o~`; slots differ |
