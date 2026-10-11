@@ -2308,7 +2308,9 @@ static inline void CollisionRotateInline(Vec3* out, Vec3 v, const Matrix4* m)
 // 0x00434eb0: refit the model bounds.  Every enabled element's box (tree root: center and
 // half extents) is rotated into the model frame; the half extents go axis by axis so the
 // projected extent is the sum of the absolute components.  The first element starts the
-// running min/max, the others extend it (CollisionVec3Min/Max out of line).
+// running min/max, the others extend it (CollisionVec3Min/Max out of line).  Retail builds the
+// Min argument with the out-of-line Vec3 constructor 0x00404e60 (three inline differences
+// pushed z first) but the Max argument with the 0x00421cb0 sum.
 void CollisionObject::UpdateModelBounds()
 {
     CollisionModelBody* model = (CollisionModelBody*)shape;
@@ -2339,7 +2341,7 @@ void CollisionObject::UpdateModelBounds()
             DebugTransformPoint(&center, *(Vec3*)&box->center, &e->worldTransform);
             DebugTransformPoint(&center, center, &inv);
             if (i != 0) {
-                *(CollisionInlineVec3*)&minBound = CollisionVec3Min(*(CollisionVec3*)&minBound, *(CollisionVec3*)&(center - extent));
+                *(CollisionInlineVec3*)&minBound = CollisionVec3Min(*(CollisionVec3*)&minBound, *(CollisionVec3*)&CollisionVec3Call(center.x - extent.x, center.y - extent.y, center.z - extent.z));
                 *(CollisionInlineVec3*)&maxBound = CollisionVec3Max(*(CollisionVec3*)&maxBound, *(CollisionVec3*)&(center + extent));
             } else {
                 minBound = center - extent;

@@ -6,7 +6,7 @@
     "target_va": "0x004b8a00",
     "target_size": 122,
     "expect": "partial",
-    "notes": "19.1% (118 vs 122 bytes). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor; store order differs from retail (retail interleaves the zero stores of position/previousPosition through a shared register; a member-zeroing Vec3 was tried and does not reproduce it)",
+    "notes": "25/122 strict with every relocation bound (GameObject(int) 0x00468ca0). Ownership uncertain (no __FILE__ reference; contiguous with Particles.cpp). ctor; emitRate starts at 4000.0 (retail imm 0x457a0000; the clamp in slot 3 caps it at 1000); store order differs from retail (retail interleaves the zero stores of position/previousPosition through a shared register; a member-zeroing Vec3 was tried and does not reproduce it)",
     "bindings": "DustParticleEmitter.bindings.json"
   },
   {

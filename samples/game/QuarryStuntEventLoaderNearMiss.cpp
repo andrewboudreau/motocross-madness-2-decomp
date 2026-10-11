@@ -18,7 +18,8 @@
 // block-scoped `step` merges it with them instead), register choices in
 // the decision tree and around the fog/sky block (retail keeps -1 in edi),
 // the explicit null test of the cube file name, and the animation loop's
-// rotation.
+// rotation. The camera setup passes 1.048f (retail pushes 0x3f8624dd; the
+// earlier 1.0485f was a semantic slip hidden by the masked score).
 //
 // The views below are local to this sample: they declare only what the
 // loader touches of classes reconstructed (or not) elsewhere, under
@@ -511,7 +512,7 @@ int BaseQuarryEvent::UnknownFunction4de590(UnknownProgressCallback progress) {
     presets[6] = 6;
     presets[7] = 7;
     raceCamera = (UnknownQuarryCamera*)(new(__FILE__, 585) UnknownQuarryBikeCamera(1))
-                     ->UnknownFunction497d90(field_0x18, 0.55f, 0.3f, 27.0f, 7.0f, 1.0485f, 2, 8, presets);
+                     ->UnknownFunction497d90(field_0x18, 0.55f, 0.3f, 27.0f, 7.0f, 1.048f, 2, 8, presets);
     if (!AppendChild((GameObject*)raceCamera, -1)) {
         sprintf(text, "KrustyBikeCamera not created.\n");
         return 0;

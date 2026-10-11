@@ -31,7 +31,7 @@ public:
 
     int firstUpdate;          // +0x2c ctor 1; slot 10 clears it after copying position to previousPosition
     ParticleManager* manager; // +0x30 stored by slot 27 (null in the ctor); target of AddParticle
-    float emitRate;           // +0x34 ctor 1000.0; slot 10 clamps it to 500..1000 (particles per second)
+    float emitRate;           // +0x34 ctor 4000.0 (retail imm 0x457a0000); slot 10 clamps it to 500..1000 (particles per second)
     float lifetimeScale;      // +0x38 ctor 6.0
     float speed;              // +0x3c ctor 1.0; slot 10 clamps to 0.1..2.0 from distance moved / dt
     float maxAge;             // +0x40 ctor 10.0

@@ -834,6 +834,8 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
 // velocities, their mean and its length, the suspension values, the contact flags, the
 // airborne flag and the largest impact.  Returns 0 when the jump prediction fails, else
 // 1.  Caller: KrustyBike 0x00413a0c.  Arithmetic tier 1 (decoded), names tier 3.
+// Both 0x0040d200 calls pass 0.05f as the sixth argument (retail pushes 0x3d4ccccd at
+// +0x5cd and +0x3951; an earlier 0.1f was a semantic slip).
 int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outVel, float* outSpeed,
                           Vec3* center, Vec3* forward, Vec3* side, float maxTime, float dt,
                           Terrain* terrain, char* outAirborne, float* outImpact, CollisionObject* probe,
@@ -907,7 +909,7 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
             aim = SafeNormalize(aim);
         }
         takeoffVel = vF;
-        if (!UnknownFunction40d200(front, vF, path, &aim, 0.5f, 0.1f, terrain, sideOffset, &takeoffTime,
+        if (!UnknownFunction40d200(front, vF, path, &aim, 0.5f, 0.05f, terrain, sideOffset, &takeoffTime,
                                    &takeoffVel))
             return 0;
         if (DotProduct(aim, fwd) < 0.70755f) {
@@ -1263,7 +1265,7 @@ int UnknownFunction40eca0(Vec3* steer, Vec3* frontVel, Vec3* rearVel, Vec3* outV
                     aim = SafeNormalize(aim);
                 }
                 takeoffVel = vF;
-                if (!UnknownFunction40d200(front, vF, path, &aim, 0.5f, 0.1f, terrain, sideOffset, &takeoffTime,
+                if (!UnknownFunction40d200(front, vF, path, &aim, 0.5f, 0.05f, terrain, sideOffset, &takeoffTime,
                                            &takeoffVel))
                     return 0;
                 if (DotProduct(aim, fwd) < 0.70755f) {

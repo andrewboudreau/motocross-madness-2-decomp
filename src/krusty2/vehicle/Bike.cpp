@@ -1059,7 +1059,7 @@ void Bike::UnknownVirtualSlot102(float)
         float t = -(steerState->steerAngle / steerState->field_0x08);
         t = (t + 1.0f) * 0.25f;
         t += 0.25f;
-        t = (t > 0.25f) ? BikeMin(t, 0.75f) : 0.25f;
+        t = BikeMin(BikeMaxF(t, 0.25f), 0.75f);
         poseParam = t;
         D3DIMSoultreeCharacter::Method_0x004a8bf0(bikePoseHandles[1], t);
         return;
@@ -1076,8 +1076,7 @@ void Bike::UnknownVirtualSlot102(float)
             next = 13;
     } else if (idx > 2) {
         if (!(cnt == 10 && idx == 5)) {
-            float sp = smoothedVerticalAccel;
-            sp = (sp < 32.2f) ? ((sp > -32.2f) ? sp : -32.2f) : 32.2f;
+            float sp = BikeMaxF(BikeMin(smoothedVerticalAccel, 32.2f), -32.2f);
             poseLeanBlend = (sp * 0.0310559f + 1.0f) * 0.5f;
         }
         next = idx + 2;

@@ -9,7 +9,7 @@ DustParticleEmitter::DustParticleEmitter(int flags) : GameObject(flags)
     manager = 0;
     field_0x70 = 0;
     firstUpdate = 1;
-    emitRate = 1000.0f;
+    emitRate = 4000.0f;
     lifetimeScale = 6.0f;
     speed = 1.0f;
     maxAge = 10.0f;

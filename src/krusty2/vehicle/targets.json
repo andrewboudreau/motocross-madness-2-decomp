@@ -96,7 +96,7 @@
     "target_va": "0x00407440",
     "target_size": 485,
     "expect": "partial",
-    "notes": "456/485. Structure right except (1) the clamp t=(t>0.25)?min(t,0.75):0.25: retail spills t to [esp+4] right after the sum and reloads it twice, merges both arms on the FPU into one fst; ours stores the constants in each arm (mov [t], imm); and (2) register roles: retail idx=edi, next=ebx, step=eax, cnt=ecx; ours reversed, declaration order has no effect.",
+    "notes": "474/485, 131/135 instructions align. Both clamps are nested BikeMin/BikeMaxF calls: the crash pose is BikeMin(BikeMaxF(t, 0.25), 0.75) (the head through the first return now matches) and the vertical-accel lean is BikeMaxF(BikeMin(a, 32.2), -32.2) (retail tests 32.2 first, from the helper's by-value copy at [esp+0x10]). Left: (1) retail keeps the dead `cnt += 2` (add ecx, 2; mov [esp+0x10], ecx) in the idx<=2 arm; (2) register roles: retail idx=edi, next=ebx, step=eax, cnt=ecx; ours reversed, declaration order has no effect; (3) the 0.0310559 factor is read from 0x00550790 (the copy VehicleCamera binds) while the rest of Bike.cpp uses 0x00550ad0, and 1.0f/32.2f folds to the same __real symbol.",
     "bindings": "Bike.bindings.json"
   },
   {
