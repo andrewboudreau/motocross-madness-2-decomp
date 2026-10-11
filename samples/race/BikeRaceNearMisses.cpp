@@ -60,7 +60,17 @@
 // forms) instead of storing it; eight other spellings of the sum and a
 // by-value parameter give the candidate's two-then-one order. Of the 144
 // bracketings with redundant parentheses (docs/VC6_OPERAND_ORDER.md section
-// 3), `(x*x) + y*y + z*z` is best (+4 bytes) and none stores z*z.
+// 3), `(x*x) + y*y + z*z` is best (+4 bytes) and none stores z*z. Also
+// without effect (2799-2804): an inline square helper (by value or const
+// reference, for z or all three), `(float)` casts on the products, a double
+// result variable, and accumulating per statement (`l = x*x; l += y*y;
+// l += z*z`, `l = (x*x) + y*y; l += z*z`, z first, from 0.0f, `l = l + ...`);
+// promoting z*z to double (`(float)(... + (double)v.z * v.z)`, 2819) keeps
+// all three products on the stack (`fld st(1); fmul st(2)` tail). An
+// all-double sum (`double l = (double)v.x * v.x + ...`) scores 6625 only
+// because its longer x87 code (fld st(n) squares, `fcom qword`) restores
+// the 12 bytes the two missing spills cost, so the code after the length
+// sites realigns; it is not retail's float code and is not used.
 //
 // 0x00419970 (13428 bytes; the loader, ret 0x14): decoded completely (the
 // pro circuit branch, the network player and AI racers, the offline player,
