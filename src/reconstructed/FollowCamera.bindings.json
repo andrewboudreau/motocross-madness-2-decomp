@@ -66,5 +66,11 @@
   "?UnknownFunction5015b0@@YA?AUVector3@@ABU1@M@Z": "0x005015b0",
   "?UnknownFunction515600@@YA?AUVector3@@ABU1@0@Z": "0x00515600",
   "__real@4@3ff8a3d70a0000000000": "0x005507b8",
-  "?UnknownVirtualSlot36@FollowCamera@@UAE_NABUVector3@@_N1@Z": "0x00465000"
+  "?UnknownVirtualSlot36@FollowCamera@@UAE_NABUVector3@@_N1@Z": "0x00465000",
+  "__ftol": "0x00534a88",
+  "?UnknownVirtualSlot47@FollowCamera@@UAE_NMPBUVector3@@@Z": "0x00465720",
+  "?UnknownFunction507c10@UnknownFollowCameraSubject@@QAEXPAUVector3@@HHH@Z": "0x00507c10",
+  "__real@4@4000e000000000000000": "0x00550b94",
+  "?UnknownFunction42e930@Camera@@QAEXM@Z": "0x0042e930",
+  "?UnknownVirtualSlot10@Camera@@UAEHM@Z": "0x0042e690"
 }

@@ -282,18 +282,24 @@ Slot 68 matches with two source facts: retail multiplies by 1/32.2 and by
 product is cast to `float`), and the 0.19 lift reads `(heading * lead).y`,
 the y of the vector product, not a fresh `heading.y * lead`.
 
-Also near misses in the same samples file:
+Slot 41 (`0x0052c030`, 1240 bytes, exact) is the followed heading. In
+vehicle mode below |speed| 10 it blends the vehicle's +0x88 × max(+0xbc,
+0.01) towards slot 33's velocity (negated unless vehicle +0x440) by
+|speed| / 10, flattens it, normalises it in place and eases it from +0x29c
+with weights 0.82/0.18. Faster, it uses the velocity with y halved and
+eased. Outside vehicle mode it takes the first axis from `0x004fc4f0` of the
+target's model, or the z axis. Two source facts:
+- The lead weight is `/ 10.0f`. VC6 turns it into a multiply by the
+  reciprocal constant `0x005511cc`, not the literal 0.1f at `0x005507d0`.
+- The normalisations are written out in the body, with the squared length
+  from an inline `LengthSquared(const Vector3&)`. Then the slow branch scales
+  x as `fld x; fmul st(1)`, as retail does. An inline normalising helper, or
+  a squared length written in the body, gives `fld st(0); fmul x`.
+The weights `0x00558d64`/`0x00558d68` are literals (`__real` constants
+placed after the vtable).
 
-- Slot 41 (`0x0052c030`, 1240 bytes, 1221/1240): the followed heading. In
-  vehicle mode below |speed| 10 it blends the vehicle's +0x88 × max(+0xbc,
-  0.01) towards slot 33's velocity (negated unless vehicle +0x440) by
-  |speed| × 0.1, flattens it, normalises it in place and eases it from
-  +0x29c with weights 0.82/0.18; faster, it uses the velocity with y
-  halved and eased; outside vehicle mode the first axis from
-  `0x004fc4f0` of the target's model, or the z axis. Differences: the
-  x-first `fld x; fmul st(1)` of one normalisation and one `y = 0` store's
-  position. The weights `0x00558d64`/`0x00558d68` are literals
-  (`__real` constants placed after the vtable).
+Also a near miss in the same samples file:
+
 - Slot 35 (`0x0052c510`, 1267 bytes, 813/1261): the chase position
   (heading turned by +0x308 × 0.7 about y, pitched by −vehicle +0x4c in
   state 3, through `D3DRMVectorRotate`; distance from the preset angles,
@@ -362,6 +368,15 @@ Slot 40 takes a float, because slot 38 loads its argument as one. So the
 FollowCamera and BikeCamera slot 40 cases now use the `@@UAEXM@Z` names.
 The 0x344 matrix belongs to FollowCamera, not VehicleCamera.
 
+Slot 47 (`0x00465720`, 1267 bytes) is exact. It plays the recorded path:
+the record matrix times +0x344 becomes the view, and rows 2, 1 and 3 become
+the forward, up and position vectors. The products are written `b * a`
+(+0x344 element first). With `a * b`, VC6 loads +0x344's element first in
+the (0, 0) sum, where retail hoists a(0, 3) above the second matrix copy.
+The rows are copied x, y, z through `m[][]` in forward, up, position order.
+That gives retail's interleaved eax/ecx/edx copies; operator() or other
+orders serialise them.
+
 Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
 - The constructor, already known.
 - Slot 10 `0x00465c20` (3672 bytes, the per-frame update): 13 bytes differ,
@@ -374,8 +389,6 @@ Near misses (`samples/camera/FollowCameraNearMisses.cpp`):
   x87 stall slot of its block; retail's slot is that of a block starting at
   `fld st(0)` (sample header lists the forms tried). The state-5 distance is
   `dz*dz + dx*dx + dy` (the y delta is not squared in retail).
-- Slot 46 `0x004654e0`: two late `fsubp`.
-- Slot 47 `0x00465720`.
 - The CAMERA-file loader `0x004650e0`: retail keeps cross products in memory.
 - Slot 45 `0x00463a30`: aligned instruction ratio 0.937 (1088 instructions
   against 1079). Retail's null-joystick tests jump to the shared epilogue at

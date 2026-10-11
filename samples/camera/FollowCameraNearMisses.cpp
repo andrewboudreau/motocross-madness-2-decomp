@@ -28,10 +28,7 @@
 //
 // FollowCamera::UnknownVirtualSlot46 (0x004654e0) is exact in src/reconstructed/FollowCamera.cpp.
 //
-// FollowCamera::UnknownVirtualSlot47 (0x00465720, 1265 bytes): 1203/1267. The
-// matrix product needs m[][] operands (operator() operands reorder every sum);
-// left are retail's first a(0,3) load hoisted above the second rep movsd and
-// the interleaved (scheduled) copies of rows 1-3 into +0x188/+0x17c/+0x170.
+// FollowCamera::UnknownVirtualSlot47 (0x00465720) is exact in src/reconstructed/FollowCamera.cpp.
 //
 // FollowCamera::UnknownVirtualSlot45 (0x00463a30, 4055 bytes plus padding):
 // the control flow, the stack frame (0x20, with ebp/edi holding the 1.55/7.0
@@ -220,78 +217,6 @@ FollowCamera::FollowCamera(int flags) : PCCamera(flags) {
     field_0x2fc = 70.0f;
     field_0x300 = 20.0f;
 }
-
-// 0x00465720: while this is the owner's active camera, advances the clock,
-// wraps it to the loaded records and takes the record's matrix times +0x344 as
-// the view; the position (row 3, moved by `offset`) is kept 3.5 above the
-// subject's ground. Otherwise slot 54 runs. Always returns true.
-bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
-    if (Owner()->field_0x08 == this) {
-        frameTime += dt;
-        unsigned int count = frameCount;
-        float period = count * field_0x270;
-        while (frameTime > period)
-            frameTime -= period;
-        unsigned int index = (unsigned int)(frameTime * field_0x270);
-        while (index >= count)
-            index -= count;
-        Matrix4 a = frames[index];
-        Matrix4 b = field_0x344;
-        viewMatrix(0, 0) = a.m[0][0] * b.m[0][0] + a.m[0][1] * b.m[1][0] +
-                           a.m[0][2] * b.m[2][0] + a.m[0][3] * b.m[3][0];
-        viewMatrix(0, 1) = a.m[0][0] * b.m[0][1] + a.m[0][1] * b.m[1][1] +
-                           a.m[0][2] * b.m[2][1] + a.m[0][3] * b.m[3][1];
-        viewMatrix(0, 2) = a.m[0][0] * b.m[0][2] + a.m[0][1] * b.m[1][2] +
-                           a.m[0][2] * b.m[2][2] + a.m[0][3] * b.m[3][2];
-        viewMatrix(0, 3) = a.m[0][0] * b.m[0][3] + a.m[0][1] * b.m[1][3] +
-                           a.m[0][2] * b.m[2][3] + a.m[0][3] * b.m[3][3];
-        viewMatrix(1, 0) = a.m[1][0] * b.m[0][0] + a.m[1][1] * b.m[1][0] +
-                           a.m[1][2] * b.m[2][0] + a.m[1][3] * b.m[3][0];
-        viewMatrix(1, 1) = a.m[1][0] * b.m[0][1] + a.m[1][1] * b.m[1][1] +
-                           a.m[1][2] * b.m[2][1] + a.m[1][3] * b.m[3][1];
-        viewMatrix(1, 2) = a.m[1][0] * b.m[0][2] + a.m[1][1] * b.m[1][2] +
-                           a.m[1][2] * b.m[2][2] + a.m[1][3] * b.m[3][2];
-        viewMatrix(1, 3) = a.m[1][0] * b.m[0][3] + a.m[1][1] * b.m[1][3] +
-                           a.m[1][2] * b.m[2][3] + a.m[1][3] * b.m[3][3];
-        viewMatrix(2, 0) = a.m[2][0] * b.m[0][0] + a.m[2][1] * b.m[1][0] +
-                           a.m[2][2] * b.m[2][0] + a.m[2][3] * b.m[3][0];
-        viewMatrix(2, 1) = a.m[2][0] * b.m[0][1] + a.m[2][1] * b.m[1][1] +
-                           a.m[2][2] * b.m[2][1] + a.m[2][3] * b.m[3][1];
-        viewMatrix(2, 2) = a.m[2][0] * b.m[0][2] + a.m[2][1] * b.m[1][2] +
-                           a.m[2][2] * b.m[2][2] + a.m[2][3] * b.m[3][2];
-        viewMatrix(2, 3) = a.m[2][0] * b.m[0][3] + a.m[2][1] * b.m[1][3] +
-                           a.m[2][2] * b.m[2][3] + a.m[2][3] * b.m[3][3];
-        viewMatrix(3, 0) = a.m[3][0] * b.m[0][0] + a.m[3][1] * b.m[1][0] +
-                           a.m[3][2] * b.m[2][0] + a.m[3][3] * b.m[3][0];
-        viewMatrix(3, 1) = a.m[3][0] * b.m[0][1] + a.m[3][1] * b.m[1][1] +
-                           a.m[3][2] * b.m[2][1] + a.m[3][3] * b.m[3][1];
-        viewMatrix(3, 2) = a.m[3][0] * b.m[0][2] + a.m[3][1] * b.m[1][2] +
-                           a.m[3][2] * b.m[2][2] + a.m[3][3] * b.m[3][2];
-        viewMatrix(3, 3) = a.m[3][0] * b.m[0][3] + a.m[3][1] * b.m[1][3] +
-                           a.m[3][2] * b.m[2][3] + a.m[3][3] * b.m[3][3];
-        field_0x17c.z = viewMatrix(2, 2);
-        field_0x17c.x = viewMatrix(2, 0);
-        field_0x17c.y = viewMatrix(2, 1);
-        field_0x188.z = viewMatrix(1, 2);
-        field_0x188.x = viewMatrix(1, 0);
-        field_0x188.y = viewMatrix(1, 1);
-        field_0x170.z = viewMatrix(3, 2);
-        field_0x170.x = viewMatrix(3, 0);
-        field_0x170.y = viewMatrix(3, 1);
-        field_0x170 += *offset;
-        Vector3 ground = field_0x170;
-        field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
-        float height = ground.y + 3.5f;
-        if (height > field_0x170.y)
-            field_0x170.y = height;
-        UnknownFunction42e930(66.0f);
-        Camera::UnknownVirtualSlot10(dt);
-        return true;
-    }
-    UnknownVirtualSlot54();
-    return true;
-}
-
 
 // 0x004650e0: each "CAMERA" line holds two skipped words, three skipped
 // numbers, a direction, an up hint and a position (each stored x, z, y) and

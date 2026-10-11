@@ -580,6 +580,81 @@ void FollowCamera::UnknownVirtualSlot46(Vector3* forward, Vector3* up) {
     field_0x344.m[3][3] = 1.0f;
 }
 
+// 0x00465720: while this is the owner's active camera, advances the clock,
+// wraps it to the loaded records and takes the record's matrix times +0x344 as
+// the view; the position (row 3, moved by `offset`) is kept 3.5 above the
+// subject's ground. Otherwise slot 54 runs. Always returns true. The products
+// are written b * a and the rows read through m[][]: with a * b VC6 loads
+// field_0x344's element first in the (0, 0) sum (retail hoists a(0, 3) above
+// the second copy), and operator() or other copy orders lose the interleaved
+// row copies.
+bool FollowCamera::UnknownVirtualSlot47(float dt, const Vector3* offset) {
+    if (Owner()->field_0x08 == this) {
+        frameTime += dt;
+        unsigned int count = frameCount;
+        float period = count * field_0x270;
+        while (frameTime > period)
+            frameTime -= period;
+        unsigned int index = (unsigned int)(frameTime * field_0x270);
+        while (index >= count)
+            index -= count;
+        Matrix4 a = frames[index];
+        Matrix4 b = field_0x344;
+        viewMatrix(0, 0) = b.m[0][0] * a.m[0][0] + b.m[1][0] * a.m[0][1] +
+                           b.m[2][0] * a.m[0][2] + b.m[3][0] * a.m[0][3];
+        viewMatrix(0, 1) = b.m[0][1] * a.m[0][0] + b.m[1][1] * a.m[0][1] +
+                           b.m[2][1] * a.m[0][2] + b.m[3][1] * a.m[0][3];
+        viewMatrix(0, 2) = b.m[0][2] * a.m[0][0] + b.m[1][2] * a.m[0][1] +
+                           b.m[2][2] * a.m[0][2] + b.m[3][2] * a.m[0][3];
+        viewMatrix(0, 3) = b.m[0][3] * a.m[0][0] + b.m[1][3] * a.m[0][1] +
+                           b.m[2][3] * a.m[0][2] + b.m[3][3] * a.m[0][3];
+        viewMatrix(1, 0) = b.m[0][0] * a.m[1][0] + b.m[1][0] * a.m[1][1] +
+                           b.m[2][0] * a.m[1][2] + b.m[3][0] * a.m[1][3];
+        viewMatrix(1, 1) = b.m[0][1] * a.m[1][0] + b.m[1][1] * a.m[1][1] +
+                           b.m[2][1] * a.m[1][2] + b.m[3][1] * a.m[1][3];
+        viewMatrix(1, 2) = b.m[0][2] * a.m[1][0] + b.m[1][2] * a.m[1][1] +
+                           b.m[2][2] * a.m[1][2] + b.m[3][2] * a.m[1][3];
+        viewMatrix(1, 3) = b.m[0][3] * a.m[1][0] + b.m[1][3] * a.m[1][1] +
+                           b.m[2][3] * a.m[1][2] + b.m[3][3] * a.m[1][3];
+        viewMatrix(2, 0) = b.m[0][0] * a.m[2][0] + b.m[1][0] * a.m[2][1] +
+                           b.m[2][0] * a.m[2][2] + b.m[3][0] * a.m[2][3];
+        viewMatrix(2, 1) = b.m[0][1] * a.m[2][0] + b.m[1][1] * a.m[2][1] +
+                           b.m[2][1] * a.m[2][2] + b.m[3][1] * a.m[2][3];
+        viewMatrix(2, 2) = b.m[0][2] * a.m[2][0] + b.m[1][2] * a.m[2][1] +
+                           b.m[2][2] * a.m[2][2] + b.m[3][2] * a.m[2][3];
+        viewMatrix(2, 3) = b.m[0][3] * a.m[2][0] + b.m[1][3] * a.m[2][1] +
+                           b.m[2][3] * a.m[2][2] + b.m[3][3] * a.m[2][3];
+        viewMatrix(3, 0) = b.m[0][0] * a.m[3][0] + b.m[1][0] * a.m[3][1] +
+                           b.m[2][0] * a.m[3][2] + b.m[3][0] * a.m[3][3];
+        viewMatrix(3, 1) = b.m[0][1] * a.m[3][0] + b.m[1][1] * a.m[3][1] +
+                           b.m[2][1] * a.m[3][2] + b.m[3][1] * a.m[3][3];
+        viewMatrix(3, 2) = b.m[0][2] * a.m[3][0] + b.m[1][2] * a.m[3][1] +
+                           b.m[2][2] * a.m[3][2] + b.m[3][2] * a.m[3][3];
+        viewMatrix(3, 3) = b.m[0][3] * a.m[3][0] + b.m[1][3] * a.m[3][1] +
+                           b.m[2][3] * a.m[3][2] + b.m[3][3] * a.m[3][3];
+        field_0x17c.x = viewMatrix.m[2][0];
+        field_0x17c.y = viewMatrix.m[2][1];
+        field_0x17c.z = viewMatrix.m[2][2];
+        field_0x188.x = viewMatrix.m[1][0];
+        field_0x188.y = viewMatrix.m[1][1];
+        field_0x188.z = viewMatrix.m[1][2];
+        field_0x170.x = viewMatrix.m[3][0];
+        field_0x170.y = viewMatrix.m[3][1];
+        field_0x170.z = viewMatrix.m[3][2];
+        field_0x170 += *offset;
+        Vector3 ground = field_0x170;
+        field_0x240->UnknownFunction507c10(&ground, 0, 0, 0);
+        float height = ground.y + 3.5f;
+        if (height > field_0x170.y)
+            field_0x170.y = height;
+        UnknownFunction42e930(66.0f);
+        Camera::UnknownVirtualSlot10(dt);
+        return true;
+    }
+    UnknownVirtualSlot54();
+    return true;
+}
+
 // 0x00466ad0: Camera's controls first; then, with the game's +0x2d4 bit 0,
 // control 0x21 toggles the override (slot 70) and, while it is on, control
 // 0x10 flips +0x26c and calls slot 69. Outside states 6 and 7 the raw keys

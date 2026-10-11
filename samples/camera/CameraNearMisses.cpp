@@ -22,6 +22,13 @@
 // that copies the projection matrix (MatrixMult's second argument), VC6 after.
 // Assigning through a named product, a nested assignment, m[][] stores, the
 // viewport built by an inline helper and the store order do not move it.
+// Also unchanged (487): a projection copy (local, Matrix4(...) temporary,
+// through a pointer or this->), a viewport temporary, `Matrix4 viewport;`
+// declared apart or at the top, the stores through a float pointer or a
+// reference, a named 0.5f constant, -viewport(0, 0) for the -0.5 and a block
+// around the viewport. Chained stores, a projection local assigned after
+// the viewport, the view matrix built after it and the products nested into
+// the second MatrixMult call are worse.
 // The half field of view needs the (float) cast: without it VC6 folds
 // 0.5f * 0.01745329f into one constant, while retail multiplies twice.
 #include <math.h>

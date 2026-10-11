@@ -3,17 +3,7 @@
 //
 // VehicleCamera::UnknownVirtualSlot36 (0x0052cc80) is exact in src/reconstructed/VehicleCamera.cpp.
 //
-// VehicleCamera::UnknownVirtualSlot41 (0x0052c030, 1240 bytes, 1233/1240):
-// same length, frame, slots and blocks. The no-vehicle branch's y = 0 store
-// between the x*x and z*z products needs the squared length written
-// `z*z + ((x*x) + (y*y))` (docs/VC6_OPERAND_ORDER.md section 3). Left: the
-// slow-vehicle branch's in-place normalisation multiplies x as
-// `fld x; fmul st(1)` where VC6 emits `fld st(0); fmul x` (the shared tail of
-// the other branches has VC6's form in retail too). `*=`, `v = v * s`,
-// `v = s * v` and parenthesised products per component (125 forms), and seven
-// forms of the heading sum, do not move it. The 0.18/0.82 weights are literals (their __real constants sit
-// after the vtable, first used by this unit) and `y * 0.5 * 0.18` needs the
-// cast to stay two multiplies.
+// VehicleCamera::UnknownVirtualSlot41 (0x0052c030) is exact in src/reconstructed/VehicleCamera.cpp.
 //
 // VehicleCamera::UnknownVirtualSlot35 (0x0052c510, 1267 bytes, 817/1261):
 // frame (0x48) and slot assignment match retail. The squared length loads
@@ -23,7 +13,9 @@
 // distance * field_0x228, `fld st(0); fmul x` after the -0.25 range) where
 // VC6 here shares one block. Tried without effect: the four groupings of
 // Length's terms and of `along`, `direction * range`, `range * direction`
-// and per-component scaling in the range branch.
+// and per-component scaling in the range branch. Writing the scaling out in
+// the body (either branch, both, or one shared range variable) as slot 41's
+// normalisations are is worse (798..824).
 // `a` is tested as a byte (FollowCamera.h declares it unsigned char).
 #include "../../src/reconstructed/VehicleCamera.h"
 
@@ -32,84 +24,8 @@ static const Vector3 kVec3XAxis = Vector3(1.0f, 0.0f, 0.0f);
 static const Vector3 kVec3YAxis = Vector3(0.0f, 1.0f, 0.0f);
 static const Vector3 kVec3ZAxis = Vector3(0.0f, 0.0f, 1.0f);
 
-float FastInvSqrt(float value); // 0x00460c00
-
 static inline Vector3 Add(const Vector3& a, const Vector3& b) {
     return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
-}
-
-static inline Vector3 Sub(const Vector3& a, const Vector3& b) {
-    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
-}
-
-// Normalizes `v` in place; the zero vector stays zero.
-static inline void NormalizeVector(Vector3* v) {
-    float lengthSquared = v->z * v->z + ((v->x * v->x) + (v->y * v->y));
-    if (lengthSquared == 0.0f) {
-        *v = kVec3Zero;
-    } else {
-        float scale = FastInvSqrt(lengthSquared);
-        v->x *= scale;
-        v->y *= scale;
-        v->z *= scale;
-    }
-}
-
-// 0x0052c030: the heading the camera follows (slot 10 stores it at +0x29c),
-// flattened to the ground plane and normalised.
-Vector3 VehicleCamera::UnknownVirtualSlot41() {
-    Vector3 heading;
-    if (vehicleMode) {
-        if (FollowCameraAbs(vehicle->field_0x434) < 10.0f) {
-            Vector3 velocity = UnknownVirtualSlot33();
-            if (!vehicle->field_0x440)
-                velocity = Vector3(-velocity.x, -velocity.y, -velocity.z);
-            velocity.y = 0.0f;
-            if (velocity.x == 0.0f && velocity.z == 0.0f)
-                velocity = vehicle->field_0x88;
-            float scale = vehicle->field_0xbc;
-            if (scale <= 0.01f)
-                scale = 0.01f;
-            Vector3 facing = vehicle->field_0x88 * scale;
-            facing.y = 0.0f;
-            if (facing.x == 0.0f && facing.z == 0.0f)
-                facing = velocity;
-            heading = Add(Sub(velocity, facing) * (FollowCameraAbs(vehicle->field_0x434) * 0.1f), facing);
-            if (!vehicle->field_0x440)
-                heading.y = heading.y * 0.5f;
-            else
-                heading.y = 0.0f;
-            NormalizeVector(&heading);
-            heading.x = field_0x29c.x * 0.82f + heading.x * 0.18f;
-            heading.y = field_0x29c.y * 0.82f + heading.y * 0.18f;
-            heading.z = field_0x29c.z * 0.82f + heading.z * 0.18f;
-        } else {
-            heading = UnknownVirtualSlot33();
-            if (!vehicle->field_0x440) {
-                heading = Vector3(-heading.x, -heading.y, -heading.z);
-                heading.y = (float)(heading.y * 0.5f) * 0.18f + field_0x29c.y * 0.82f;
-            } else {
-                heading.y = 0.0f;
-            }
-            NormalizeVector(&heading);
-        }
-    } else {
-        Vector3 other;
-        if (field_0x384) {
-            UnknownVehiclePart* model = field_0x384->field_0x1a0;
-            if (model->field_0x140)
-                model->field_0x140->UnknownFunction4fc4f0(&heading, &other);
-            else
-                model->UnknownFunction4fc4f0(&heading, &other);
-        } else if (field_0x388) {
-            field_0x388->field_0x34->UnknownFunction4fc4f0(&heading, &other);
-        } else {
-            heading = kVec3ZAxis;
-        }
-        heading.y = 0.0f;
-        NormalizeVector(&heading);
-    }
-    return heading;
 }
 
 static inline void ScaleInPlace(Vector3* v, float s) {

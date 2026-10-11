@@ -181,6 +181,102 @@ void VehicleCamera::UnknownVirtualSlot72() {
     }
 }
 
+float FastInvSqrt(float value); // 0x00460c00
+
+static inline Vector3 Sub(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+static inline float LengthSquared(const Vector3& v) {
+    return v.z * v.z + ((v.x * v.x) + (v.y * v.y));
+}
+
+// 0x0052c030: the heading the camera follows (slot 10 stores it at +0x29c),
+// flattened to the ground plane and normalised. The three normalisations are
+// written out with the squared length through LengthSquared: retail's slow
+// branch scales x as `fld x; fmul st(1)`, which an inline normalising helper
+// (or a squared length written in the body) turns into `fld st(0); fmul x`.
+// The lead weight is `/ 10.0f` (the reciprocal constant 0x005511cc, not the
+// literal 0.1f at 0x005507d0).
+Vector3 VehicleCamera::UnknownVirtualSlot41() {
+    Vector3 heading;
+    if (vehicleMode) {
+        if (FollowCameraAbs(vehicle->field_0x434) < 10.0f) {
+            Vector3 velocity = UnknownVirtualSlot33();
+            if (!vehicle->field_0x440)
+                velocity = Vector3(-velocity.x, -velocity.y, -velocity.z);
+            velocity.y = 0.0f;
+            if (velocity.x == 0.0f && velocity.z == 0.0f)
+                velocity = vehicle->field_0x88;
+            float scale = vehicle->field_0xbc;
+            if (scale <= 0.01f)
+                scale = 0.01f;
+            Vector3 facing = vehicle->field_0x88 * scale;
+            facing.y = 0.0f;
+            if (facing.x == 0.0f && facing.z == 0.0f)
+                facing = velocity;
+            heading = Add(Sub(velocity, facing) * (FollowCameraAbs(vehicle->field_0x434) / 10.0f), facing);
+            if (!vehicle->field_0x440)
+                heading.y = heading.y * 0.5f;
+            else
+                heading.y = 0.0f;
+            float lengthSquared = LengthSquared(heading);
+            if (lengthSquared == 0.0f) {
+                heading = kVec3Zero;
+            } else {
+                float inverseLength = FastInvSqrt(lengthSquared);
+                heading.x *= inverseLength;
+                heading.y *= inverseLength;
+                heading.z *= inverseLength;
+            }
+            heading.x = field_0x29c.x * 0.82f + heading.x * 0.18f;
+            heading.y = field_0x29c.y * 0.82f + heading.y * 0.18f;
+            heading.z = field_0x29c.z * 0.82f + heading.z * 0.18f;
+        } else {
+            heading = UnknownVirtualSlot33();
+            if (!vehicle->field_0x440) {
+                heading = Vector3(-heading.x, -heading.y, -heading.z);
+                heading.y = (float)(heading.y * 0.5f) * 0.18f + field_0x29c.y * 0.82f;
+            } else {
+                heading.y = 0.0f;
+            }
+            float lengthSquared = LengthSquared(heading);
+            if (lengthSquared == 0.0f) {
+                heading = kVec3Zero;
+            } else {
+                float inverseLength = FastInvSqrt(lengthSquared);
+                heading.x *= inverseLength;
+                heading.y *= inverseLength;
+                heading.z *= inverseLength;
+            }
+        }
+    } else {
+        Vector3 other;
+        if (field_0x384) {
+            UnknownVehiclePart* model = field_0x384->field_0x1a0;
+            if (model->field_0x140)
+                model->field_0x140->UnknownFunction4fc4f0(&heading, &other);
+            else
+                model->UnknownFunction4fc4f0(&heading, &other);
+        } else if (field_0x388) {
+            field_0x388->field_0x34->UnknownFunction4fc4f0(&heading, &other);
+        } else {
+            heading = kVec3ZAxis;
+        }
+        heading.y = 0.0f;
+        float lengthSquared = LengthSquared(heading);
+        if (lengthSquared == 0.0f) {
+            heading = kVec3Zero;
+        } else {
+            float inverseLength = FastInvSqrt(lengthSquared);
+            heading.x *= inverseLength;
+            heading.y *= inverseLength;
+            heading.z *= inverseLength;
+        }
+    }
+    return heading;
+}
+
 // 0x0052cb80: the vehicle's position 0, raised by 5.
 Vector3 VehicleCamera::UnknownVirtualSlot50() {
     Vector3 position;

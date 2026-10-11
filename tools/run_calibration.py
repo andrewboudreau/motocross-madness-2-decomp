@@ -886,6 +886,15 @@ CASES = [
         'reason': 'bool result joins: the disabled exit stores the 0 from al (xor al, al; mov [esi+0x277], al) and keeps its own final return tail',
     },
     {
+        'name': 'VehicleCamera slot41 heading',
+        'bindings': 'src/reconstructed/VehicleCamera.bindings.json',
+        'source': 'src/reconstructed/VehicleCamera.cpp',
+        'symbol': '?UnknownVirtualSlot41@VehicleCamera@@UAE?AUVector3@@XZ',
+        'target_va': '0x0052c030',
+        'target_size': 1240,
+        'reason': 'normalisations written out with an inline LengthSquared (slow branch scales x as fld x; fmul st(1)); / 10.0f uses the reciprocal constant',
+    },
+    {
         'name': 'BikeCamera slot40 table seed',
         'bindings': 'src/reconstructed/BikeCamera.bindings.json',
         'source': 'src/reconstructed/BikeCamera.cpp',
@@ -26038,6 +26047,15 @@ CASES = [
         'target_va': '0x00465000',
         'target_size': 209,
         'reason': 'one bool result joined at a single return: the disabled exit stores the zero from al (xor al, al; mov [esi+0x277], al), the settled exit the 1 from al',
+    },
+    {
+        'name': 'FollowCamera slot47 recorded path',
+        'bindings': 'src/reconstructed/FollowCamera.bindings.json',
+        'source': 'src/reconstructed/FollowCamera.cpp',
+        'symbol': '?UnknownVirtualSlot47@FollowCamera@@UAE_NMPBUVector3@@@Z',
+        'target_va': '0x00465720',
+        'target_size': 1267,
+        'reason': 'matrix product written b * a (a(0, 3) loads first in the (0, 0) sum); rows copied x, y, z through m[][] in forward, up, position order (interleaved copies)',
     },
 ]
 
