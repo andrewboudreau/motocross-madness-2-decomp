@@ -1533,9 +1533,9 @@ void KrustyBike::Fn_00492670(KbBikeState* state, float dt, int record)
     message.field_0x01 = field_0x784;
     message.poseIndex = poseIndex;
     message.poseState = poseState;
-    message.poseParam = poseParam * 100.0f;
-    message.poseLeanBlend = poseLeanBlend * 100.0f;
-    message.poseBlend = poseBlend * 100.0f;
+    message.poseParam = poseParam * 255.0f;
+    message.poseLeanBlend = poseLeanBlend * 255.0f;
+    message.poseBlend = poseBlend * 255.0f;
     if (field_0x430) {
         if (field_0x433 >= 0)
             message.motion = field_0x433 + 1;

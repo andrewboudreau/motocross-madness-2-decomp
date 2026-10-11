@@ -528,7 +528,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
     if (a11 <= 0.0f)
         a11 = 230.0f;
     LoadVehicle(a1, engineName, a3, desc, (int)info, startPosition, forward, up, a9, map, a10, a11,
-                0.9f, 0.698f, device, 2, 3, 3, 1, 1, defaultEngine, torqueTable, rpmLow, rpmHigh,
+                0.9f, 40.0f * 0.01745329f, device, 2, 3, 3, 1, 1, defaultEngine, torqueTable, rpmLow, rpmHigh,
                 rpmStep, 0.18f, steer, lean, throttle, trackObject, a21);
     field_0x5bc = a31;
     field_0x5c0 = a32;
@@ -603,7 +603,7 @@ GameObject* Bike::LoadBike(int a1, const char* engineName, const char* a3, const
         VehicleRotatingShock* rotShock;
         VehicleInlineShock* lineShock;
         if (rotating[i]) {
-            rotShock = new(__FILE__, 0x683) VehicleRotatingShock(partName, modelNode, 0.558f, 1.5f, damper[i],
+            rotShock = new(__FILE__, 0x683) VehicleRotatingShock(partName, modelNode, 32.0f * 0.01745329f, 1.5f, damper[i],
                                                                  spring[i], ratio[i], limit[i], 0.25f, kind, 0);
             AddLateTicker((VehicleTicker*)rotShock);
         } else {

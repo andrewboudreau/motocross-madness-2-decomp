@@ -43,7 +43,7 @@
     "target_va": "0x00493660",
     "target_size": 8545,
     "expect": "partial",
-    "notes": "remote-bike network update; 23.5% bytes, aligned instruction ratio 0.88 with the retail frame 0x58 and slots; remaining: 1-in-ebp/0-in-edi allocation from the second SetAxesPtr call on, limitSq store before the AllowWarping test (a named lim or limitSq *= limitSq stores the sum and re-squares after the branch, 22.89%), velocity y/z fmul operand order, pose lerp c-b recompute, and the 100.0f pool (retail 0x5505ec, bound 0x551420 for 0x492670)",
+    "notes": "remote-bike network update; 23.5% bytes, aligned instruction ratio 0.88 with the retail frame 0x58 and slots; remaining: 1-in-ebp/0-in-edi allocation from the second SetAxesPtr call on, limitSq store before the AllowWarping test (a named lim or limitSq *= limitSq stores the sum and re-squares after the branch, 22.89%), velocity y/z fmul operand order, pose lerp c-b recompute",
     "bindings": "KrustyBikeNearMisses.bindings.json"
   },
   {

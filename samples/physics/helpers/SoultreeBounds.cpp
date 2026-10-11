@@ -28,7 +28,12 @@
 //   arithmetic; retail's frame is 0x48 (here 0x3c): it copies each direction into a by-value
 //   temporary at esp+0x40 and keeps the world centre in ebx/ebp/edx, and loads the three
 //   pointer arguments only where they are used; in the `*have` branch retail builds hi through
-//   the out-of-line Vec3 constructor 0x00404e60 (inline budget).
+//   the out-of-line Vec3 constructor 0x00404e60 (inline budget). The *have clamps store
+//   unconditionally (retail `fld lo.x; fcom l.x; test ah,1; jne keep; fstp st0; fld l.x;
+//   keep: fstp lo.x`, `test ah,0x41` for hi), i.e. lo = lo < l ? lo : l, hi = hi > h ? hi : h;
+//   the earlier `if (!(lo < l)) lo = l` form skipped the store. Float Min/Max helpers for
+//   them push both l and h through the out-of-line ctor (frame 0x60); ternaries keep both
+//   inline (frame 0x3c), so retail spends one more inline site before h than this source.
 #include <string.h>
 #include "math/Math3D.h"
 
@@ -165,18 +170,12 @@ void SoultreeObject::AccumulateBounds(int* have, Vec3* lo, Vec3* hi, const Matri
         if (*have) {
             Vec3 l = c - ext;
             Vec3 h = c + ext;
-            if (!(lo->x < l.x))
-                lo->x = l.x;
-            if (!(lo->y < l.y))
-                lo->y = l.y;
-            if (!(lo->z < l.z))
-                lo->z = l.z;
-            if (!(hi->x > h.x))
-                hi->x = h.x;
-            if (!(hi->y > h.y))
-                hi->y = h.y;
-            if (!(hi->z > h.z))
-                hi->z = h.z;
+            lo->x = lo->x < l.x ? lo->x : l.x;
+            lo->y = lo->y < l.y ? lo->y : l.y;
+            lo->z = lo->z < l.z ? lo->z : l.z;
+            hi->x = hi->x > h.x ? hi->x : h.x;
+            hi->y = hi->y > h.y ? hi->y : h.y;
+            hi->z = hi->z > h.z ? hi->z : h.z;
         } else {
             *lo = c - ext;
             *hi = c + ext;

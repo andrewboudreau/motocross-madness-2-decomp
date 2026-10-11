@@ -294,9 +294,9 @@ void KrustyBike::Fn_00492AD0(float dt, int record)
                                     }
                                     message.poseIndex = poseIndex;
                                     message.poseState = poseState;
-                                    message.poseParam = poseParam * 100.0f;
-                                    message.poseLeanBlend = poseLeanBlend * 100.0f;
-                                    message.poseBlend = poseBlend * 100.0f;
+                                    message.poseParam = poseParam * 255.0f;
+                                    message.poseLeanBlend = poseLeanBlend * 255.0f;
+                                    message.poseBlend = poseBlend * 255.0f;
                                     if (field_0x430) {
                                         if (field_0x433 >= 0)
                                             message.motion = field_0x433 + 1;
@@ -402,8 +402,9 @@ static inline int KbWithinWarpBand(float dist2, float frame, float warp)
 // `(len+50)*(len+50)` before the AllowWarping test (a named `lim` or `limitSq *= limitSq`
 // stores the unsquared sum instead and re-squares after the branch, 22.89% vs 23.46%);
 // the velocity y/z `fld s; fmul` order;
-// retail recomputes `c - b` for the pose lerps while the candidate reuses `d`; the retail
-// 100.0f lives at 0x5505ec while the shared bindings bind it to 0x551420 (0x492670).
+// retail recomputes `c - b` for the pose lerps while the candidate reuses `d`. The
+// 100.0f here is 0x5505ec; 0x492670/0x492ad0 scale the message-1 pose bytes by 255.0f (0x551420),
+// which the bindings used to give the 100.0f key.
 void KrustyBike::Fn_00493660(float dt, int a)
 {
     KbBikeNetState* cur;
