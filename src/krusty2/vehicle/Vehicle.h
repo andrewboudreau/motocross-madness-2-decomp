@@ -240,7 +240,6 @@ struct VehicleTicker {               // elements of Vehicle+0x554/+0x560 (provis
 class SoultreeContact;
 // 0x0043a570: appends a contact to the owner's contact array (provisional).
 extern void __cdecl VehAddContact(int capacity, SoultreeContact** arr, int a2, int* count, void* contact);
-extern void __stdcall VehWheelApply(float weight, float a, float b, float* speed);
 class Vehicle;
 // Suspension objects hung on a wheel (VehicleWheel+0x2b0 / +0x2ac).  PlaceWheels retracts
 // them by a fraction of the last step and clears their forces while the wheel is in contact;
@@ -258,6 +257,9 @@ struct VehicleShock {
     char pad_0x80[0x14];
     float field_0x94;                // scale of the displacement impulse, consumed (zeroed) by Method_00529450
     void ClearForces();                                         // 0x004f9c70
+    // 0x004f9d30 (ret 0x10): Suspension.h's Shock::ApplyDamping; Method_005293E0 passes the
+    // wheel's load weight, Vehicle+0x4dc, the last step time and its speed output.
+    void ApplyDamping(float weight, float a, float dt, float* speed);
 };
 struct VehicleInlineShock : VehicleShock {
     // 0x004f9ee0 (ret 0x24): Bike's loader builds it with the shock name, the model node, the
@@ -436,7 +438,7 @@ public:
     virtual int UnknownVirtualSlot52();
     virtual float UnknownVirtualSlot53();
     virtual Vec3* UnknownVirtualSlot54(Vec3* out);
-    virtual Vec3* UnknownVirtualSlot55(Vec3* unused, Vec3* out);
+    virtual Vec3* UnknownVirtualSlot55(Vec3* out, Vec3* pos);
     virtual void UnknownVirtualSlot56(Vec3* a, int b, Vec3* c);
     virtual float UnknownVirtualSlot57();
     virtual void UnknownVirtualSlot58(Vec3* a, int b);

@@ -975,8 +975,8 @@
     "candidate_symbol_contains": "Method_005293E0",
     "target_va": "0x005293e0",
     "target_size": 104,
-    "expect": "partial",
-    "notes": "wave3: 88%; retail picks edx for field_0x1e8 then eax for load weight; ours loads in a different register order",
+    "expect": "exact",
+    "notes": "0x004f9d30 is a thiscall on the wheel's shock (primaryAux, else secondaryAux), which keeps the shock in ecx across the argument loads.",
     "bindings": "Vehicle.bindings.json"
   },
   {
@@ -1185,8 +1185,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot55@Vehicle",
     "target_va": "0x0052b6d0",
     "target_size": 63,
-    "expect": "partial",
-    "notes": "42.6% (59/63). Returns out (eax). First divergence: the copy from the global vec uses edx dword moves and reloads out in retail.",
+    "expect": "exact",
+    "notes": "slot 55: the zero vector goes to the second argument (`pos`, as Bike's override) and savedForward to the first, which is returned.",
     "bindings": "Vehicle.bindings.json"
   },
   {

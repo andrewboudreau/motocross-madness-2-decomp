@@ -15,6 +15,7 @@
   "??_7Vehicle@@6BGameObject@@@": "0x005589e0",
   "??_7Vehicle@@6BSoultreePhysicsBaseObject@@@": "0x00558a84",
   "?AddAngle@VehicleSteerState@@QAEXMPAVSoultreeObject@@@Z": "0x00504ec0",
+  "?ApplyDamping@VehicleShock@@QAEXMMMPAM@Z": "0x004f9d30",
   "?ApplyDrive@VehicleWheel@@QAEXMMHMPAMPAUVec3@@1@Z": "0x00514170",
   "?ApplyRestPose@Character@@QAEXXZ": "0x004a8b00",
   "?CheckCrash@Vehicle@@QAEHXZ": "0x00526830",

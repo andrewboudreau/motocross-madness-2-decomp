@@ -30,11 +30,9 @@ float Vehicle::UnknownVirtualSlot53()
     return 1.0f;
 }
 
-Vec3* Vehicle::UnknownVirtualSlot55(Vec3* unused, Vec3* out)
+Vec3* Vehicle::UnknownVirtualSlot55(Vec3* out, Vec3* pos)
 {
-    out->x = kVec3Zero.x;
-    out->y = kVec3Zero.y;
-    out->z = kVec3Zero.z;
+    *pos = kVec3Zero;
     *out = savedForward;
     return out;
 }
@@ -1732,13 +1730,17 @@ int Vehicle::AddWheel(VehicleWheel* wheel, int a2, int a3, int a4, VehicleWheelA
     return 0;
 }
 
-// 0x005293e0: for every wheel that has an attachment value, apply its load weight.
+// 0x005293e0: for every flagged wheel, its shock (primary, else secondary) applies the
+// wheel load weight to the speed (0x004f9d30).
 void Vehicle::Method_005293E0(float* speed)
 {
     for (int i = 0; i < wheelCount; i++) {
         VehicleWheel* wheel = wheelList[i];
-        if (wheel->field_0x268 && (wheel->primaryAux || wheel->secondaryAux))
-            VehWheelApply(wheel->loadWeight, field_0x4dc, lastStepTime, speed);
+        if (wheel->field_0x268) {
+            VehicleShock* shock = (VehicleShock*)(wheel->primaryAux ? wheel->primaryAux : wheel->secondaryAux);
+            if (shock)
+                shock->ApplyDamping(wheel->loadWeight, field_0x4dc, lastStepTime, speed);
+        }
     }
 }
 
