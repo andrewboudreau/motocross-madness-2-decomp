@@ -552,9 +552,9 @@ Strict exact with the units' existing sources (registration pending):
 
 ## KrustyBike and Tire with bindings
 
-KrustyBike.cpp is promoted: its 70 exact targets are in
+KrustyBike.cpp is promoted: its 74 exact targets are in
 `src/krusty2/vehicle/KrustyBike.cpp` (bindings `KrustyBike.bindings.json`, entries
-in `src/krusty2/vehicle/targets.json`), its 11 partial targets in
+in `src/krusty2/vehicle/targets.json`), its 8 partial targets in
 `samples/physics/krustybike/KrustyBikeNearMisses.cpp`, which includes the canonical
 file. `samples/physics/tire/Tire.bindings.json` resolves every relocation of the
 Tire sample's exact targets:
@@ -563,7 +563,10 @@ Tire sample's exact targets:
   set (`0x00491190..0x004912cb`, vectors `0x0067c348`, `0x0067c358`,
   `0x0067c368`, `0x0067c338`; the constructor and `0x00492670` read the zero
   vector), the two vtordisp thunks `0x00497c30`/`0x00497ca0` and the network
-  message 13 decoder `0x004933e0`. The trick end `0x00495ff0` is strict exact
+  message 13 decoder `0x004933e0`. The scene-object swaps `0x00496d20` (slot
+  101's body behind its 16-byte jmp stub) and `0x00496da0` are exact with the mode
+  test as a nested if that tests +0x2d84 positively; VC6 then cross-jumps the outer
+  else into the slot-5 tail as retail does. The trick end `0x00495ff0` is strict exact
   in the canonical file: its stack slots match once the float bonus is left as the
   CSE temporary of `(float)points` instead of a named local, and the redundant
   parentheses in `x -= ((float)fmod(x, 100.0))` issue the +0x153f flag load
@@ -622,5 +625,5 @@ python tools/run_physics_samples.py --strict \
   --vc6-root "$VC6_ROOT" --exe "$MCM2_EXE"
 ```
 
-The KrustyBike sources give 71 of 82 strict exact (the 11 partials are the near
+The KrustyBike sources give 74 of 82 strict exact (the 8 partials are the near
 misses listed above and in docs/NEAR_MISS_INDEX.md).

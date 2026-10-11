@@ -68,34 +68,6 @@ KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
     altBodyA = 0;
 }
 
-// Back-camera swap: like slot 101 with the two scene objects exchanged.
-void KrustyBike::Fn_00496DA0()
-{
-    altBodyB->field_0xc.UnknownVirtualSlot4();
-    g_kbDirector->Remove(altBodyB, altBodyB->field_0x84);
-    collisionObject = (CollisionObject*)altBodyA;
-    if (g_kbGame->field_0x18 > 1 && !g_kbGame->field_0x2d84)
-        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
-    else
-        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
-    ((KbObj128*)collisionObject)->Fn_00435FE0();
-}
-
-// owner: bracket only (0x496d20 sits between slot 101's stub and Fn_00496DA0)
-// Real body of slot 101: switch the active scene object from altBodyA to altBodyB.  Retail's
-// slot 101 entry (0x496d10) is a 16-byte stub, `jmp 0x496d20` plus 11 nops, in front of it.
-void KrustyBike::Fn_00496D20()
-{
-    altBodyA->field_0xc.UnknownVirtualSlot4();
-    g_kbDirector->Remove(altBodyA, altBodyA->field_0x84);
-    collisionObject = (CollisionObject*)altBodyB;
-    if (g_kbGame->field_0x18 > 1 && !g_kbGame->field_0x2d84)
-        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
-    else
-        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
-    ((KbObj128*)collisionObject)->Fn_00435FE0();
-}
-
 // The 5-byte `jmp` plus 11 nops of retail's stub cannot be reproduced from C++ (no inline asm
 // or padding tricks), so this stays partial.
 void KrustyBike::UnknownVirtualSlot101()

@@ -354,5 +354,8 @@
   "_s_kbLastTimeTo60": "0x0067c3b4",
   "_s_kbTimeTo60": "0x0067c3b0",
   "_s_kbTimeTo60Armed": "0x0056d0a0",
-  "_sprintf": "0x00534aaf"
+  "_sprintf": "0x00534aaf",
+  "?g_kbDirector@@3PAUKbDirector@@A": "0x0068aba4",
+  "?Remove@KbDirector@@QAEXPAUKbObj128@@H@Z": "0x004dcf20",
+  "?Fn_00435FE0@KbObj128@@QAEXXZ": "0x00435fe0"
 }

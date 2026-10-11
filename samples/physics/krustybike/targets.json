@@ -24,7 +24,7 @@
     "target_va": "0x00496d10",
     "target_size": 135,
     "expect": "partial",
-    "notes": "Body (from 0x496d20) 61.6%; the whole function cannot match: retail starts with jmp +11 and 11 nops (patch-point padding, not expressible in C++). Body divergence: retail computes the KbSink pointer (lea ecx,[eax+0xc]) after loading the game global in ecx and derefs the vptr through it."
+    "notes": "The whole function cannot match: retail starts with jmp +11 and 11 nops (patch-point padding, not expressible in C++); its body 0x496d20 (Fn_00496D20) is exact in src/krusty2/vehicle/KrustyBike.cpp."
   },
   {
     "class": "KrustyBike",
@@ -34,24 +34,6 @@
     "target_size": 1296,
     "expect": "partial",
     "notes": "17.9% (candidate 1280 vs 1296; if-form prologue beats ternary). Tier-3: camera/target ray query per game mode. First divergence: retail loads game ptr before sub esp,0x20 and merges call tails; mine spills lim and hoists a4/a5 loads."
-  },
-  {
-    "class": "KrustyBike",
-    "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "Fn_00496DA0",
-    "target_va": "0x00496da0",
-    "target_size": 119,
-    "expect": "partial",
-    "notes": "61.6% (121 vs 119 bytes): retail hoists lea ecx,[o+0xc] after the game-global load and derefs the vptr through it; local KbSink* variants hoist it earlier (50%), nested ifs duplicate paths (78.8% but 138 bytes) altBodyA/altBodyB are CollisionObjects (RTTI 0x0055afe0: QuadTreeObject at 0, GraphicsTest at +0xc), so the slot 4/5 calls are base-class virtual calls; declaring that base relation changes no byte. Nested ifs (x18 > 1, then x2d84) hoist the lea into the second test as retail does but duplicate the outer else instead of entering retail's shared tail."
-  },
-  {
-    "class": "KrustyBike",
-    "source": "KrustyBikeNearMisses.cpp",
-    "candidate_symbol_contains": "Fn_00496D20",
-    "target_va": "0x00496d20",
-    "target_size": 119,
-    "expect": "partial",
-    "notes": "Real body of slot 101 (behind the 16-byte jmp stub at 0x496d10). Same divergence as Fn_00496DA0: retail hoists lea ecx,[eax+0xc] into the compare block and loads the vptr through ecx; ours loads it from [eax+0xc]. altBodyA/altBodyB are CollisionObjects (RTTI 0x0055afe0: QuadTreeObject at 0, GraphicsTest at +0xc), so the slot 4/5 calls are base-class virtual calls; declaring that base relation changes no byte. Nested ifs (x18 > 1, then x2d84) hoist the lea into the second test as retail does but duplicate the outer else instead of entering retail's shared tail."
   },
   {
     "class": "KrustyBike",

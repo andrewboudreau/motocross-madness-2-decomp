@@ -1017,6 +1017,45 @@ float KrustyBike::Fn_00495FF0()
     return 0.0f;
 }
 
+// owner: bracket only (0x496d20 sits between slot 101's stub and Fn_00496DA0)
+// 0x00496d20 (exact): the real body of slot 101, switching the active scene object from
+// altBodyA to altBodyB.  Retail's slot 101 entry (0x496d10) is a 16-byte stub, `jmp 0x496d20`
+// plus 11 nops, in front of it.  The mode test is a nested if with the 0x2d84 test written
+// positively: VC6 then computes &obj->field_0xc in the second test block, calls through ecx
+// and cross-jumps the outer else into the inner slot-5 tail as retail does (the flat
+// `x18 > 1 && !x2d84` form and the nested `!x2d84` form do not).
+void KrustyBike::Fn_00496D20()
+{
+    altBodyA->field_0xc.UnknownVirtualSlot4();
+    g_kbDirector->Remove(altBodyA, altBodyA->field_0x84);
+    collisionObject = (CollisionObject*)altBodyB;
+    if (g_kbGame->field_0x18 > 1) {
+        if (g_kbGame->field_0x2d84)
+            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
+        else
+            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
+    } else
+        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
+    ((KbObj128*)collisionObject)->Fn_00435FE0();
+}
+
+// owner: bracket only (0x496da0, directly after Fn_00496D20)
+// 0x00496da0 (exact): back-camera swap, Fn_00496D20 with the two scene objects exchanged.
+void KrustyBike::Fn_00496DA0()
+{
+    altBodyB->field_0xc.UnknownVirtualSlot4();
+    g_kbDirector->Remove(altBodyB, altBodyB->field_0x84);
+    collisionObject = (CollisionObject*)altBodyA;
+    if (g_kbGame->field_0x18 > 1) {
+        if (g_kbGame->field_0x2d84)
+            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
+        else
+            ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot4();
+    } else
+        ((KbObj128*)collisionObject)->field_0xc.UnknownVirtualSlot5();
+    ((KbObj128*)collisionObject)->Fn_00435FE0();
+}
+
 // 0x00496F90: both bikes' collision objects ignore each other (AddIgnoredOwner = 0x00439410).
 void KrustyBike::Fn_00496F90(KrustyBike* other)
 {

@@ -2042,6 +2042,26 @@
   {
     "class": "KrustyBike",
     "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00496D20@KrustyBike",
+    "target_va": "0x00496d20",
+    "target_size": 119,
+    "expect": "exact",
+    "notes": "real body of slot 101 (behind the 16-byte jmp stub at 0x496d10): swap the active scene object to altBodyB. Exact with the mode test as a nested if testing 0x2d84 positively (VC6 computes &obj->field_0xc in the second test block and cross-jumps the outer else into the slot-5 tail).",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
+    "candidate_symbol_contains": "Fn_00496DA0@KrustyBike",
+    "target_va": "0x00496da0",
+    "target_size": 119,
+    "expect": "exact",
+    "notes": "back-camera swap (Fn_00496D20 with the scene objects exchanged); exact with the same nested-if mode test.",
+    "bindings": "KrustyBike.bindings.json"
+  },
+  {
+    "class": "KrustyBike",
+    "source": "KrustyBike.cpp",
     "candidate_symbol_contains": "UnknownVirtualSlot29@KrustyBike",
     "target_va": "0x00495e50",
     "target_size": 401,
