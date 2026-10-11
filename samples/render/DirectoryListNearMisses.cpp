@@ -13,7 +13,11 @@
 // inline helpers taking (unsigned) char/short/int and returning the bit or
 // the low byte, `if (includeFiles) return 1;` first, a ternary, an
 // `unsigned char` block local and `!= 0` (all 45-51 of 80); a single
-// result variable is worse.
+// result variable is worse. A further 29 forms (`/ 16 & 1`, `% 2`,
+// `(unsigned char)(attributes >> 4) & 1`, `(bool)`, signed/plain char,
+// `*(unsigned char*)&attributes`, a const reference to the parameter,
+// `& 0xff` and char block locals, `1 & (...)`) give 74-75 of 109 by
+// position, all with the byte load.
 
 #include "../../src/reconstructed/DirectoryList.cpp"
 

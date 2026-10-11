@@ -15,18 +15,17 @@ RTTI `Palette8 : BaseObject` (vtable `0x00555aa4`), `FontTexture`
   deleting wrapper. It uses Quantize's `ColorMapper::UnknownFunction4dddd0`.
 - `FontTexture.cpp`: the static manager object at `0x0065b478` and its
   `$E` constructor/atexit chain (`0x00467100..0x0046714f`; the guard byte is
-  `0x0065b480`), the FontTexture constructor, destructors and accessors.
-  The CharacterCell destructor pair is emitted only in the TU that builds a
-  CharacterCell (the loader), so it is checked from
-  `samples/render/FontTextureNearMisses.cpp`. Which class owns the static
+  `0x0065b480`), the FontTexture constructor, destructors, accessors and the
+  loader `0x004673d0`. The CharacterCell destructor pair is emitted only in
+  the TU that builds a CharacterCell (the loader). Which class owns the static
   object is not established; Game.h's `g_UnknownStatic65b478` names the same
   address.
 - `FontTextureManager.cpp`: the manager list's constructors, destructor,
   append, removal, clear and search by name (`0x00467690..0x00467847`).
 
-Exact: 31 calibration cases (4 + 4 + 16 + 7), including FontTexture's
-`FindCell` `0x00467340` and the manager's removal `0x00467760` and search
-`0x004677f0`.
+Exact: 32 calibration cases (4 + 4 + 17 + 7), including FontTexture's
+`FindCell` `0x00467340` and loader `0x004673d0` and the manager's removal
+`0x00467760` and search `0x004677f0`.
 
 Source forms that mattered:
 - `0x00467340` and `0x004677f0` keep the loop test at the top only as
@@ -35,9 +34,11 @@ Source forms that mattered:
 - `0x00467760` writes `delete node` in both arms of the unlink. VC6 merges
   the two into one tail, and that keeps the delete's `add esp, 4` apart from
   the release call's, as in retail.
-
-Near miss (notes in the sample file): the loader `0x004673d0` (esi/edi
-saves placed before the early return in retail).
+- `0x004673d0` writes the lookup hit and the load path as an if/else that
+  share one `return font;`. With an early `return node->font;` VC6 delays
+  the esi/edi saves past that return (retail saves all four registers
+  first); a block around the cell loop's `code`/`rect` locals moves their
+  stack slots.
 
 ## Function names
 

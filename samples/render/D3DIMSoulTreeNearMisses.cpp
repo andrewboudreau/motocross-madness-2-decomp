@@ -64,7 +64,11 @@
 // whole row gives 806; a different one per element of row 1 reaches 826
 // (_21..._23 retail's order, _24 still t1, t3, t2, t0 where retail sums t3,
 // t2, t1, t0, unchanged by its 264 orders); not kept, since nothing ties
-// those per-element forms to the source.
+// those per-element forms to the source. Any extra local, even an unused
+// `const Matrix4& p = projection;` or `Matrix4* w = &world;`, reorders the
+// sums globally (737); reference aliases of world/projection on one or all
+// row 1 leaves score the same as the bare declaration (references to locals
+// fold), and a second reference to the camera's view matrix gives 160.
 //
 // DrawNormals (normals, 528 bytes): scales by the function-local static
 // 0x00568944 = 0.5, which is what puts the variable before the vertex

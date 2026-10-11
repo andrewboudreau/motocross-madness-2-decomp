@@ -4,6 +4,8 @@
 
 #include "DebugAlloc.h"
 #include "TextureMap.h"
+#include "TrackOverlay.h"
+#include "UnknownResourceManager.h"
 
 UnknownFontTextureManager FontTexture::s_UnknownManager65b478;
 
@@ -84,4 +86,49 @@ const char* FontTexture::UnknownFunction4673b0() {
 // 0x004673c0
 TextureMap* FontTexture::GetTexture() {
     return field_0x0c;
+}
+
+// 0x004673d0: the loader. The cell file holds the count, then per cell its
+// code and four rectangle values. The lookup hit and the load path share one
+// return: an early `return node->font;` lets VC6 delay the esi/edi saves past
+// it, and a block around the cell loop's locals moves their stack slots.
+FontTexture* FontTexture::UnknownFunction4673d0(const char* name, const char* path, const char* textureName,
+                                                int format, TextureMapManager* manager, int a5) {
+    UnknownFontTextureNode* node;
+    UnknownTextureStream* stream;
+    unsigned int count;
+    FontTexture* font;
+    unsigned int i;
+    TextureMap* texture;
+
+    node = s_UnknownManager65b478.UnknownFunction4677f0(name);
+    if (node && node->font) {
+        font = node->font;
+    } else {
+        count = 0;
+        stream = new(__FILE__, 138) UnknownTextureStream((int)g_UnknownResourceManager572b44);
+        stream->UnknownFunction460f50(path, "rb", 0);
+        stream->UnknownFunction461640(&count, 4, 1);
+        font = new(__FILE__, 152) FontTexture(count, name);
+        int code = 0;
+        float rect[4] = {0, 0, 0, 0};
+        for (i = 0; i < count; i++) {
+            stream->UnknownFunction461640(&code, 4, 1);
+            stream->UnknownFunction461640(rect, 4, 4);
+            font->SetCell(i, new(__FILE__, 166) CharacterCell(code,
+                Rectangle2D(rect[g_UnknownGlobal57972c], rect[g_UnknownGlobal568468], rect[g_UnknownGlobal56846c],
+                            rect[g_UnknownGlobal568470])));
+        }
+        texture = UnknownFunction50a590(manager, textureName, format, 0, 0, 5, 6, a5, 0x80, 0xff00ff, 1, 0);
+        if (texture) {
+            texture->UnknownVirtualSlot8(1, 0, 0);
+            font->SetTexture(texture);
+            s_UnknownManager65b478.UnknownFunction4676c0(font);
+        } else {
+            delete font;
+            font = 0;
+        }
+        delete stream;
+    }
+    return font;
 }
