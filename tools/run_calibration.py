@@ -6295,6 +6295,15 @@ CASES = [
         'reason': 'cross-registers ignore lists (line 0xb4)',
     },
     {
+        'name': 'Wrecker slot 10 0x5306e0',
+        'bindings': 'src/reconstructed/Wrecker.bindings.json',
+        'source': 'src/reconstructed/Wrecker.cpp',
+        'symbol': '?UnknownVirtualSlot10@Wrecker@@UAEHM@Z',
+        'target_va': '0x005306e0',
+        'target_size': 4178,
+        'reason': 'per-frame update; the named slot-11 view pointer in WreckerStep gives the carry-over product its relative._23 term order',
+    },
+    {
         'name': 'Wrecker probe trail particles 0x531da0',
         'bindings': 'src/reconstructed/Wrecker.bindings.json',
         'source': 'src/reconstructed/Wrecker.cpp',

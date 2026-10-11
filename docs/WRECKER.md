@@ -1,9 +1,9 @@
 # wrecker.cpp (Wrecker)
 
 `src/reconstructed/Wrecker.h` / `Wrecker.cpp` / `Wrecker.bindings.json`
-reconstruct part of `D:\aardvark\VC\krusty2\wrecker.cpp`: 29 functions are
+reconstruct part of `D:\aardvark\VC\krusty2\wrecker.cpp`: 30 functions are
 strict exact under `vc6_o2_mt` (VC6 SP3 `/O2 /GR /GX /MT`), with every
-relocation resolved by the bindings. Three near misses are parked in
+relocation resolved by the bindings. Two near misses are parked in
 `samples/race/WreckerNearMisses.cpp`.
 
 ## Evidence
@@ -114,6 +114,18 @@ relocation resolved by the bindings. Three near misses are parked in
   leaves than the copied old forward, so each cross product loads them first)
   and `up` for the old up row, which gives the schedule of the step's last
   store and the forward copy around the up-row loads.
+- Slot 10 (`0x005306e0`, the per-frame update) comes from the rider
+  carry-over written with inline helpers: the rigid inverse
+  (`WreckerInvertRigid`, its `t` sharing a slot with the axis rebuild's
+  `forward`), two products with both operands by value (MatrixMultiply's
+  text; inlined, VC6 copies only the member pose in the first and the output
+  operand in the second), the axis rebuild `WreckerOrthonormalize` (up =
+  forward x right), the old position copied through `WreckerCopy` from a
+  pointer to `field_0x6c` and the subtract called by value. The last term
+  pair (`relative._23` adds `a._23 * b._22` before `a._33 * b._23`) needs the
+  named view pointer in `WreckerStep`: VC6 orders those equal terms by the
+  count of referenced local symbols created before the product, modulo 8
+  (two to seven more than the cast written inline give retail's order).
 - `0x005301c0` passes the literal "Fall02" (`0x0056d418`) to `0x004a8b10`.
 - `GameObject.h` gains `friend class Wrecker`: Wrecker clears and sets
   bit 0 of its rigid body's `+0x25` byte (bitfield code: `and cl, 0xfe` and
@@ -123,9 +135,8 @@ relocation resolved by the bindings. Three near misses are parked in
 
 | VA | Size | Score | Remaining difference |
 |---|---:|---|---|
-| `0x005329e0` | 1312 | 215/1306 | frame 0x94 (retail's) once the final scale is `UnknownFunction5015b0(WreckerScaleCtorCall(sum, field_0x118), frameTime)`, the scaled temporary passed straight through; only the slot order differs (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`; a probe-count accessor does not change the budget) |
+| `0x005329e0` | 1312 | 241/1312 | frame 0x94 (retail's) once the final scale is `UnknownFunction5015b0(WreckerScaleCtorCall(sum, field_0x118), frameTime)`, the scaled temporary passed straight through; only the slot order differs (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`; a probe-count accessor does not change the budget) |
 | `0x00531740` | 1624 | 768/1617 | contact particle spray; frame 0xc4 (retail's) and every call and operator in retail's order. Written with `WreckerLength` by value, the dot product and the gravity/step scales through the out-of-line views, and three scratch vectors reused across the body (delta/wind/step-along, dir/drift-per-particle, cross result/side/step), which gives retail's slot sharing. Left: the slot order (`velocity` 0x14 here, 0x28 in retail) and `0.0f - scaled.z` of the folded cross product with the Y axis, which retail loads as `fld scaled.z; fsubr` (the constant's leaf is older there); a by-value cross product does not change it |
-| `0x005306e0` | 4168 | 4174/4178 | slot 10, the per-frame update. Every block is retail's except one term pair: in `relative._23` of the first product retail adds `a._23 * b._22` before `a._33 * b._23` (the other 15 elements and the whole second product match; statement order, reference/pointer helpers, `__forceinline` and declaration counts (tools/decl_shift_scan.py) do not move it). Retail's frame (0x128) and code come from the rider carry-over written with inline helpers: the rigid inverse (`WreckerInvertRigid`, its `t` sharing a slot with the axis rebuild's `forward`), two products with both operands by value (MatrixMultiply's text; inlined, VC6 copies only the member pose in the first and the output operand in the second, the rep movsd copies), the axis rebuild `WreckerOrthonormalize` (up = forward x right), the old position copied through `WreckerCopy` from a pointer to `field_0x6c` (the dead temporary at frame 0 and the y/z loads through the rep movsd source) and the subtract called by value |
 
 ## Remaining uncertainty
 

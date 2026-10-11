@@ -147,6 +147,249 @@ inline Vector3 operator+(const Vector3& a, const Vector3& b) {
 inline Vector3 operator-(const Vector3& a, const Vector3& b) {
     return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 }
+// ---------------------------------------------------------------------------
+// Out-of-line call views (docs/VC6_INLINE_BUDGET.md): the sites where retail
+// calls the COMDAT copy of a header inline instead of expanding it. Declared
+// only; the bindings map them to the retail copies.
+// ---------------------------------------------------------------------------
+struct WreckerVec3Call : Vector3 {
+    WreckerVec3Call(float x_, float y_, float z_);                 // 0x00404e60
+};
+Vector3 WreckerSubtractValue(const Vector3& a, const Vector3& b);  // 0x00421d00
+Vector3 WreckerNormalizeCall(const Vector3& v);                    // 0x005087b0
+Vector3 WreckerCrossCall(const Vector3& a, const Vector3& b);      // 0x00515600
+
+// Copies a vector member by member into a returned local: retail copies
+// the old position (and forward row) through a stack temporary this way.
+static inline Vector3 WreckerCopy(const Vector3& v) {
+    Vector3 r;
+    r.x = v.x;
+    r.y = v.y;
+    r.z = v.z;
+    return r;
+}
+
+
+static inline Vector3& operator*=(Vector3& v, float s) {
+    v.x *= s;
+    v.y *= s;
+    v.z *= s;
+    return v;
+}
+
+// Per-step update of a GameObject (slot 11) through the float view. The
+// named view pointer (one more local symbol in each of the two expansions)
+// is what gives the first carry-over product retail's term order in
+// relative._23 (a._23 * b._22 before a._33 * b._23): with the cast written
+// inline that element sums the other way (4174/4178). VC6 SP3 orders equal
+// candidates there by the count of referenced local symbols created before
+// the product, modulo 8: two to seven more give retail's order, one more
+// is worse, eight more is back to the old order (dead initialised ints
+// probe the same window; the uninitialised ones are not counted).
+static inline void WreckerStep(GameObject* object, float step) {
+    UnknownWreckerSteppable* steppable = (UnknownWreckerSteppable*)object;
+    steppable->UnknownVirtualSlot11(step);
+}
+
+// In-place inverse of a rigid transform (the InvertRigid helper of
+// src/krusty2/bvh/BoundingBoxTreeQuery.h on a Matrix4).
+static inline void WreckerInvertRigid(UnknownWreckerMatrix* m) {
+    float swap;
+    swap = m->_12; m->_12 = m->_21; m->_21 = swap;
+    swap = m->_13; m->_13 = m->_31; m->_31 = swap;
+    swap = m->_23; m->_23 = m->_32; m->_32 = swap;
+    Vector3 t;
+    t.x = -(m->_41 * m->_11 + m->_42 * m->_21 + m->_43 * m->_31);
+    t.y = -(m->_41 * m->_12 + m->_42 * m->_22 + m->_43 * m->_32);
+    t.z = -(m->_41 * m->_13 + m->_42 * m->_23 + m->_43 * m->_33);
+    m->_41 = t.x;
+    m->_42 = t.y;
+    m->_43 = t.z;
+}
+
+// Rebuilds the rotation rows of a pose from its up and forward rows.
+static inline void WreckerOrthonormalize(UnknownWreckerMatrix* m) {
+    Vector3 up = WreckerVec3Call(m->_21, m->_22, m->_23);
+    Vector3 forward = WreckerVec3Call(m->_31, m->_32, m->_33);
+    forward = WreckerNormalizeCall(forward);
+    Vector3 right = WreckerNormalizeCall(WreckerCrossCall(up, forward));
+    up = WreckerCrossCall(forward, right);
+    m->_11 = right.x;
+    m->_12 = right.y;
+    m->_13 = right.z;
+    m->_14 = 0.0f;
+    m->_21 = up.x;
+    m->_22 = up.y;
+    m->_23 = up.z;
+    m->_24 = 0.0f;
+    m->_31 = forward.x;
+    m->_32 = forward.y;
+    m->_33 = forward.z;
+    m->_34 = 0.0f;
+}
+
+// The 4x4 product expanded inline: MatrixMultiply (0x0042a1a0,
+// src/krusty2/math/Math3D.h) with both operands by value, *out = b * a in
+// the row-vector convention. Inlined, VC6 copies only the operands that
+// can change under it: the member pose (a, rep movsd) in the first product
+// of slot 10 and the output itself (b) in the second; an unmodified local
+// is read in place.
+static inline void WreckerMatrixProduct(UnknownWreckerMatrix* out, UnknownWreckerMatrix a, UnknownWreckerMatrix b) {
+    out->_11 = a._11 * b._11 + a._21 * b._12 + a._31 * b._13 + a._41 * b._14;
+    out->_12 = a._12 * b._11 + a._22 * b._12 + a._32 * b._13 + a._42 * b._14;
+    out->_13 = a._13 * b._11 + a._23 * b._12 + a._33 * b._13 + a._43 * b._14;
+    out->_14 = a._14 * b._11 + a._24 * b._12 + a._34 * b._13 + a._44 * b._14;
+    out->_21 = a._11 * b._21 + a._21 * b._22 + a._31 * b._23 + a._41 * b._24;
+    out->_22 = a._12 * b._21 + a._22 * b._22 + a._32 * b._23 + a._42 * b._24;
+    out->_23 = a._13 * b._21 + a._23 * b._22 + a._33 * b._23 + a._43 * b._24;
+    out->_24 = a._14 * b._21 + a._24 * b._22 + a._34 * b._23 + a._44 * b._24;
+    out->_31 = a._11 * b._31 + a._21 * b._32 + a._31 * b._33 + a._41 * b._34;
+    out->_32 = a._12 * b._31 + a._22 * b._32 + a._32 * b._33 + a._42 * b._34;
+    out->_33 = a._13 * b._31 + a._23 * b._32 + a._33 * b._33 + a._43 * b._34;
+    out->_34 = a._14 * b._31 + a._24 * b._32 + a._34 * b._33 + a._44 * b._34;
+    out->_41 = a._11 * b._41 + a._21 * b._42 + a._31 * b._43 + a._41 * b._44;
+    out->_42 = a._12 * b._41 + a._22 * b._42 + a._32 * b._43 + a._42 * b._44;
+    out->_43 = a._13 * b._41 + a._23 * b._42 + a._33 * b._43 + a._43 * b._44;
+    out->_44 = a._14 * b._41 + a._24 * b._42 + a._34 * b._43 + a._44 * b._44;
+}
+
+// Slot 10, 0x005306e0 (4178 bytes): the per-frame update. Retail's frame
+// (0x128) and order come from the rider carry-over written with inline
+// helpers: the inverse's translation, the by-value product operands and the
+// axis rebuild's locals live in sibling inline scopes that share slots (the
+// inverse's t with the rebuild's forward); the old position is copied
+// through WreckerCopy from a pointer to the member pose (the dead temporary
+// at frame 0, the y/z loads through the rep movsd source); the subtract is
+// called by value (its result a temporary). Retail rebuilds up as
+// forward x right. See WreckerStep for the last term order.
+int Wrecker::UnknownVirtualSlot10(float frameTime) {
+    GameObject::UnknownVirtualSlot10(frameTime);
+    if (field_0x44 == 0) {
+        field_0x38->UnknownFunctionStep(frameTime);
+        if (field_0x52c)
+            field_0x52c = 0;
+        else
+            UnknownFunction532020(frameTime);
+        field_0xd8 = 0;
+        UnknownFunction5329e0(frameTime);
+        field_0xdc = kVec3Zero;
+        float touching = 0.0f;
+        for (int i = 0; i < field_0x38->field_0x100; i++) {
+            if (field_0x38->field_0x104[i].field_0x10) {
+                field_0x108[i] = 1;
+                field_0xd8 = 1;
+                field_0xdc += field_0x104[i];
+                touching += 1.0f;
+            } else {
+                field_0x108[i] = 0;
+            }
+        }
+        if (field_0xd8)
+            field_0xdc *= 1.0f / touching;
+        UnknownFunction532580();
+        field_0xbc = field_0xbc * (1.0f / frameTime);
+        field_0xc8 = field_0xc8 * (1.0f / frameTime);
+        field_0xb8->UnknownFunction4fca80(0, &field_0x6c);
+    } else {
+        if (field_0xd4 && !field_0x34->field_0x34) {
+            field_0x34->UnknownFunction4a8b80(field_0xd4, 0.5f);
+            field_0xd4 = 0;
+            if (field_0x538 == 0 && field_0x530 == 0) {
+                field_0x530 = 1;
+            } else {
+                field_0xb4 = 1;
+                field_0x538 = 0;
+                field_0x530 = 0;
+            }
+        }
+        float remaining = frameTime;
+        field_0xb0 = 0;
+        float step = 0.02f;
+        if (frameTime > 0.06f)
+            step = frameTime * (1.0f / 3);
+        while (remaining > 0.0f) {
+            if (remaining < step)
+                step = remaining;
+            if (field_0x44 != 1) {
+                WreckerStep(field_0x3c, step);
+                WreckerStep(field_0x40, step);
+            }
+            if (field_0x52c)
+                field_0x52c = 0;
+            else
+                UnknownFunction532020(frameTime);
+            for (int i = 0; i < field_0x38->field_0x100; i++)
+                field_0x108[i] = field_0x38->field_0x104[i].field_0x10;
+            UnknownFunction5329e0(step);
+            if (field_0x44 != 1) {
+                Vector3 position;
+                field_0x40->field_0x234->UnknownFunction4fc9a0(0, &position);
+                position += field_0x10c;
+                field_0x40->field_0x234->UnknownFunction4fc740(0, &position);
+            }
+            field_0x38->UnknownFunctionStep(step);
+            remaining -= step;
+        }
+        if (field_0x38->field_0x58) {
+            field_0xb0 = 1;
+            field_0xac = 1;
+            if (field_0x44 == 2) {
+                field_0x44 = 3;
+                field_0xd4 = field_0x58[(int)(RANDOM_UNIT() * field_0x5c)];
+            }
+        }
+        if (field_0x44) {
+            if (field_0x44 == 1) {
+                UnknownWreckerRaceState* state = field_0x34->field_0x18;
+                if ((float)(state->field_0xa8 - *field_0x34->field_0x1c) / state->field_0xb4 < 0.5f) {
+                    UnknownFunction532490();
+                    UnknownFunction532580();
+                    field_0xbc = field_0xbc * (1.0f / frameTime);
+                    field_0xc8 = field_0xc8 * (1.0f / frameTime);
+                    field_0x40->UnknownVirtualSlot44();
+                    field_0x40->field_0x154 = field_0xbc;
+                    field_0x40->field_0x160 = field_0xbc;
+                    field_0x40->field_0x16c = field_0x40->field_0x234->UnknownFunction4fd710(field_0xc8);
+                }
+            }
+            if (field_0x530 && !field_0x34->field_0x34) {
+                field_0xb4 = 1;
+                field_0x530 = 0;
+            }
+            if (field_0xb4 && field_0x534) {
+                UnknownFunction532580();
+                field_0xbc = field_0xbc * (1.0f / frameTime);
+                field_0xc8 = field_0xc8 * (1.0f / frameTime);
+                field_0x534 = 0;
+            }
+            field_0xb8->UnknownFunction4fca80(0, &field_0x6c);
+            field_0x34->UnknownVirtualSlot7(frameTime, 0, 0);
+        }
+    }
+    if (field_0xb4) {
+        // Carry the rider's root over by the motion of the wreck node since
+        // the pose field_0x6c was taken, then re-orthonormalise its axes.
+        UnknownWreckerMatrix pose;
+        UnknownWreckerMatrix relative;
+        field_0xb8->UnknownFunction4fca80(0, &pose);
+        UnknownWreckerFrame* frame = &field_0x6c;
+        Vector3 oldPosition = WreckerCopy(frame->position);
+        WreckerInvertRigid(&pose);
+        WreckerMatrixProduct(&relative, *(UnknownWreckerMatrix*)frame, pose);
+        field_0x34->field_0x1a0->UnknownFunction4fca80(0, &pose);
+        WreckerMatrixProduct(&pose, relative, pose);
+        WreckerOrthonormalize(&pose);
+        field_0x34->field_0x1a0->UnknownFunction4fb8c0(0, &pose);
+        Vector3 position;
+        field_0xb8->UnknownFunction4fc9a0(0, &position);
+        Vector3 delta = WreckerSubtractValue(oldPosition, position);
+        field_0x34->field_0x1a0->UnknownFunction4fc890(0, &delta);
+        field_0xb4 = 0;
+    }
+    UnknownFunction532150();
+    return 1;
+}
+
 // Division by a scalar through the reciprocal. Inlined, it gives retail's
 // `fld st(0); fmul [delta.x]` for the first component of the step in
 // 0x00531da0; the same reciprocal product written in the caller
@@ -282,16 +525,6 @@ inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
     r.x = (a.y * b.z) - (a.z * b.y);
     r.y = (a.z * b.x) - a.x * b.z;
     r.z = (a.x * b.y) - a.y * b.x;
-    return r;
-}
-
-// Copies a vector member by member into a returned local: retail copies
-// the old position (and forward row) through a stack temporary this way.
-static inline Vector3 WreckerCopy(const Vector3& v) {
-    Vector3 r;
-    r.x = v.x;
-    r.y = v.y;
-    r.z = v.z;
     return r;
 }
 

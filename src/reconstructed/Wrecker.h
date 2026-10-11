@@ -310,8 +310,8 @@ class Wrecker : public GraphicsTest {
 public:
     explicit Wrecker(int flags);                       // 0x0052ff90
     virtual ~Wrecker();                                // 0x005300a0 / 0x005300c0
-    // Slot 10, 0x005306e0 (about 4.2 KB): the per-frame wreck update; not
-    // reconstructed (see docs/WRECKER.md).
+    // Slot 10, 0x005306e0 (4178 bytes): the per-frame wreck update
+    // (Wrecker.cpp).
     virtual int UnknownVirtualSlot10(float frameTime);
     // Slot 14, 0x004de400: `jmp GameObject slot 14`. The linker folded
     // this body with identical ones of other classes, so the copy that
