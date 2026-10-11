@@ -503,6 +503,112 @@ int OptControlsDlg::UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInpu
     return 1;
 }
 
+// 0x004b5600
+int OptControlsDlg::UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry)
+{
+    int other;
+    char text[128];
+    if (!waitingForInput)
+        return GameObject::UnknownVirtualSlot22(event, entry);
+    if (event->kind == 0 && event->control == 1) {
+        UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
+        int row = keys->GetSelectedRow();
+        g_TrackGame->field_0x33fc->UnknownFunction449350(g_TrackGame->field_0x33fc->field_0x00, row, text);
+        keys->SetRowText(row, text);
+        EndInputWait();
+        return 1;
+    } else {
+        UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
+        int row = keys->GetSelectedRow();
+        if (!GetInputText(row, event->kind, event->control, text))
+            return 1;
+        if (g_TrackGame->field_0x33fc->UnknownFunction448cc0(row, event->kind, event->control, &other)) {
+            keys->SetRowText(other, "");
+            g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, other, -1, 0);
+        }
+        keys->SetRowText(row, text);
+        g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, row, event->kind, event->control);
+    }
+    EndInputWait();
+    return 1;
+}
+
+// 0x004b5760
+void OptControlsDlg::MapMovedInput()
+{
+    JoystickDevice* joystick = g_TrackGame->controlInterface->activeJoystick;
+    MouseDevice* mouse = g_TrackGame->controlInterface->mouse;
+    UIListBox* keys = static_cast<UIListBox*>(FindControl("MapKeyListBox", 3));
+    int row = keys->GetSelectedRow();
+    int code;
+    int kind;
+    int other;
+    char text[128];
+    if (row >= 5)
+        return;
+    if (joystick) {
+        for (int i = 0; i < 6; i++) {
+            float delta = joystick->UnknownFunction489e20(i) - axisValuesAtWait[i];
+            if (delta < 0.0f)
+                delta = -delta;
+            if (delta > 16384.0f) {
+                switch (i) {
+                case 0:
+                    code = -3;
+                    break;
+                case 1:
+                    code = -5;
+                    break;
+                case 2:
+                    code = -7;
+                    break;
+                case 3:
+                    code = -9;
+                    break;
+                case 4:
+                    code = -11;
+                    break;
+                case 5:
+                    code = -13;
+                    break;
+                }
+                kind = 2;
+                goto found;
+            }
+        }
+    }
+    if (!mouse)
+        return;
+    if (mouse->UnknownVirtualSlot4(-3, 0x3f, 0) || mouse->UnknownVirtualSlot4(-2, 0x3f, 0)) {
+        code = -3;
+        kind = 1;
+    } else if (mouse->UnknownVirtualSlot4(-5, 0x3f, 0) || mouse->UnknownVirtualSlot4(-4, 0x3f, 0)) {
+        code = -5;
+        kind = 1;
+    } else {
+        return;
+    }
+found:
+    if (row % 2)
+        row--;
+    if (g_TrackGame->field_0x33fc->UnknownFunction448cc0(row, kind, code, &other)) {
+        keys->SetRowText(other, "");
+        g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, other, -1, 0);
+        if (other < 4) {
+            g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, other + 1, -1, 0);
+            keys->SetRowText(other + 1, "");
+        }
+    }
+    g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, row, kind, code);
+    g_TrackGame->field_0x33fc->UnknownFunction449350(g_TrackGame->field_0x33fc->field_0x00, row, text);
+    keys->SetRowText(row, text);
+    if (row < 4) {
+        g_TrackGame->field_0x33fc->UnknownFunction448c90(g_TrackGame->field_0x33fc->field_0x00, row + 1, kind, code);
+        keys->SetRowText(row + 1, text);
+    }
+    EndInputWait();
+}
+
 // 0x004b5a20
 void OptControlsDlg::EndInputWait()
 {

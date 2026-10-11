@@ -159,13 +159,13 @@ int GetInputText(int row, int kind, int code, char* text);
 class OptControlsDlg : public UIDialog {
 public:
     OptControlsDlg() : UIDialog(1, "OptCont.dtm") {}
-    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004b5600 (near miss in samples/ui)
+    virtual int UnknownVirtualSlot22(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004b5600
     virtual int UnknownVirtualSlot23(UnknownControlEvent* event, UnknownInputEntry* entry); // 0x004b55d0
     virtual void UnknownVirtualSlot29(UnknownDialogEvent* event);   // 0x004b2e00
     virtual void UnknownVirtualSlot31(int save);                    // 0x004b3470
     void ListMappedKeys();             // 0x004b3410: lists the mapped keys
     void ColorListRows();             // 0x004b54c0: colours the list rows
-    void MapMovedInput();             // 0x004b5760: maps a moved axis or mouse direction (near miss in samples/ui)
+    void MapMovedInput();             // 0x004b5760: maps a moved axis or mouse direction
     void EndInputWait();             // 0x004b5a20: ends the wait for input
 
     float axisValuesAtWait[6];                // +0x7f58: joystick axis values when the wait began

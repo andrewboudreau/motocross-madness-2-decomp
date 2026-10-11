@@ -72,17 +72,18 @@ copies +0xc24, +0xf98, +0xfc4, +0xfe0, +0x1550 and +0x19d4 into the file's
 globals with `rep movsd`. OptionProcs.h models these as
 `UnknownOpt*Settings`.
 
-Exact: 34 calibration cases. These are the eight `$E`, ten slot-29
-procedures, five slot-31 handlers, OptControlsDlg's slot 23 and ten
-helpers. Source forms needed:
+Exact: 36 calibration cases. These are the eight `$E`, ten slot-29
+procedures, five slot-31 handlers, OptControlsDlg's slots 22 and 23 and
+eleven helpers. Source forms needed:
 - Name compares use `_stricmp` and `_strnicmp`.
 - An inline drop-down accessor reads control +0x1fc, and an inline lookup
   walks the bike-class table at `0x0056cb6c`.
 - `0x004b3aa0` nests `__min(__min(...))`.
-
-Near misses (`samples/ui/OptionProcsNearMisses.cpp`): OptControlsDlg slot
-22 `0x004b5600` and `0x004b5760`. Both have the same instructions with
-swapped registers.
+- OptControlsDlg slot 22 `0x004b5600` ends each branch with its own
+  `EndInputWait(); return 1;`; one shared tail swaps `this` and the list
+  box between ebx and ebp.
+- `0x004b5760` sets `kind = 1` after `code` in each mouse branch; one store
+  at the join swaps the code and row + 1 between esi and edi.
 
 Header additions:
 - GameUi.h: control slots 55-66, list rows and fields.
