@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 189, c 143, total 332. The three class (a) functions of the
+Counts: a 0, b 188, c 142, total 330. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -317,7 +317,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | track/TrackOverlay | `0x0051e3f0` | 886/894 (masked) | b | 6 code diffs: `mov edx, [ebx + ebp*4 + 0x16c]` vs `mov eax, [ebx + ebp*4 + 0x16c]`; `lea eax, [esp + N] ; fld [edx + 0x4a4]` vs `lea ecx, [esp + N] ; fld [eax + 0x4a4]`; slots differ |; the "%.3f" branch register choice (racer eax, buffer ecx, game edx); shadowing-size, racer-local and branch forms reach 853-886 |
 | ui/DlgProcs | `0x0044b200` | 925/5232 | b | 144 code diffs: `ja @1362` vs `ja A`; `jmp @1362` vs `jmp A`; frame 0xc64 vs 0x6c4 |
 | ui/DlgProcs | `0x0044fae0` | 1181/1235 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
-| ui/DlgProcs | `0x004507a0` | 589/1668 | c | 32 code diffs: `mov eax, [edx + 0x570] ; mov ecx, [eax ~` vs `mov ecx, [edx + 0x570] ; lea eax, [edx ~` |
+| ui/DlgProcs | `0x004507a0` | 589/1668 | c | 32 code diffs: retail computes `lea eax,[TrackGame+0x570]` in each loop test and reloads eventManager through it at the body top; VC6 here reuses the loaded pointer; a reference-returning accessor, `++i`, a reversed test, `(&em)[0]` and `field_0x50 + i` all compile the same |
 | ui/DlgProcs | `0x004513a0` | 506/2004 | c | 19 code diffs: `jne @515` vs `jne A`; `ja @515` vs `ja A` |
 | ui/DlgProcs | `0x00452930` | 276/1875 | c | 86 code diffs: retail adds `jmp @67 ; mov ebx, [esp + N] ; push 1` |
 | ui/GUIManager | `0x00485a70` | 62/345 | c | 29 code diffs: retail lacks `mov edx, ebx`; retail lacks `mov ebp, [esp + N]` |
@@ -344,8 +344,6 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | ui/GameUi | `0x0047b490` | 116/220 | c | 14 code diffs: retail adds `mov esi, ecx`; `mov esi, ecx ; sar edx, 8 ; sar esi, 5` vs `sar esi, 8 ; sar edx, 5 ; and esi, 0xf8~` |
 | ui/KrustyUI | `0x004988a0` | 872/1104 | b | 8 code diffs: `mov edx, [esi + 0x2c] ; mov eax, [esp +~` vs `mov eax, [esi + 0x2c] ; mov ecx, [esp +~`; `mov edx, [eax + 0xc0] ; mov [edx + 0x5c~` vs `mov eax, [eax + 0xc0] ; mov [eax + 0x5c~`; slots differ |
 | ui/KrustyUI | `0x0049b0d0` | 880/916 | c | 5 code diffs: `jne @202 ; cmp ecx, 1 ; jne @204` vs `je @212`; `jne @205` vs `jne @202 ; jmp @218 ; cmp ecx, 1` |
-| ui/OptionProcs | `0x004b5600` | 73/341 | b | 8 code diffs: retail adds `mov ebx, ecx`; retail lacks `mov ebp, ecx`; slots differ |
-| ui/OptionProcs | `0x004b5760` | 259/708 | c | 29 code diffs |
 | ui/ProCircuitProcs | `0x004d72c0` | 1125/1291 | b | 11 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 | ui/ProCircuitProcs | `0x004d8c40` | 427/886 | c | 15 code diffs: retail lacks `mov edx, [esi + 8]`; retail lacks `mov ebx, [esi + 0x14]` |
 | ui/ProCircuitProcs | `0x004d8fc0` | 750/882 | c | 45 code diffs: retail adds `mov fs:[X], esp`; retail lacks `mov fs:[X], esp` |
