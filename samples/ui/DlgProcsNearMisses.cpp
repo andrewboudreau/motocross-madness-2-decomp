@@ -14,7 +14,14 @@
 //   calls and strings; retail shares one frame slot between the two
 //   ConnectionInfoType[5] arrays (frame 0x6c4), VC6 here gives each array its
 //   own slot (frame 0xc64), so every later frame offset differs. Retail also
-//   pushes the constant 1 where VC6 here keeps it in edi.
+//   pushes the constant 1 where VC6 here keeps it in edi. One array at
+//   function scope is constructed at entry (worse) and one array in a
+//   braced kDialogCommand case is worse. In probes VC6 SP3 shares disjoint
+//   slots for POD arrays, constructor-only arrays and scalar objects with
+//   destructors, but never for two arrays whose element has a destructor
+//   (sibling blocks, else-if chains, switch cases, sequential blocks, try,
+//   same name, inline virtual InfoType destructor), so the source shape
+//   that lets retail share them is still unknown.
 // SPBikeRiderDlg::UnknownVirtualSlot10 (0x0044fae0, 1235 bytes, 1181
 //   match): the same flow and x87 code; only the scheduling of the by-value
 //   Vector3 copies passed to the camera's slot 29 differs (retail takes

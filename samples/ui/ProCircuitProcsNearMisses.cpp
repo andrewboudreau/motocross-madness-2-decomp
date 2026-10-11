@@ -7,7 +7,11 @@
 //   flow, calls and x87 code; in the per-racer update retail loads +0x0c
 //   before +0x08 for `field_0x30 += stunt - medical - repairs - fee +
 //   winnings` and then adds +0x0c into +0x24 in memory, VC6 here loads +0x08
-//   first. Reassociating or splitting the expression compiles the same.
+//   first. Reassociating or splitting the expression compiles the same
+//   (all 120 orders of the five terms give one object); reordering the
+//   points/paid/+0x30 statements, a winnings local, an AddStats inline
+//   helper (pointer or reference), a by-value net helper or a stats pointer
+//   are worse.
 // PCBailoutDlg::UnknownVirtualSlot29 (0x004d8fc0, 882 bytes, 750 match) and
 // PCBunnyDlg::UnknownVirtualSlot29 (0x004d9860, 1120 bytes): retail loads the
 //   message kind into ecx after moving `this` to esi and before loading
@@ -16,7 +20,10 @@
 //   not move it, nor do per-case circuit locals, a `TrackGame* game` local,
 //   a const/register circuit, an inline circuit getter or a circuit macro
 //   (exact PCNewEventDlg slot 29 has the same source shape and retail's
-//   order).
+//   order). g_TrackGame->field_0x3444 read in every case, a leading `kind`
+//   local and `self = this` are worse or the same, and no typedef count
+//   (0..63) ahead of the TU makes 0x004d8c40, 0x004d8fc0, 0x004d9860 or
+//   0x004d9cd0 exact, so it is not a symbol-arena tie-break.
 // PCBonusTrackDlg::UnknownVirtualSlot29 (0x004d9cd0, 752 bytes): the same
 //   prologue difference, and retail copies the circuit pointer from ebp to
 //   edi for the init case (VC6 here keeps one register; `current = circuit`
