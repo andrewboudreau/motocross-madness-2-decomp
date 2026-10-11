@@ -573,3 +573,72 @@ without effect, as noted.
   store placement in PCGame `0x004c0d10`, Tire `0x00513490`'s origin-store registers,
   the D3DIMSoultreeCharacter `0x00445fc0` SIB byte, and the Track `0x00516ef0` edge
   tie-break (~5,500 forms).
+
+## Levers from the second 2026-10-11 pass
+
+These forms made the named functions exact. As above, each one is a candidate to
+try on similar code. None is a rule.
+
+- **Partial aliases.** A second name used for only some reads changes the load
+  order of those reads. `const Vector3& up = field_0x188;` used for the x/y stores
+  and the first Cross argument fixed Camera slot 29 (`0x0042eb10`). The same idea
+  fixed VisibilityClipper::ProjectVertices (`0x0052f190`), Wrecker (`0x00532580`),
+  D3DIMSoultreeShadow slot 27 (`0x004468f0`, used only in the `_24` row of the
+  inlined product) and PCTextureMap::WriteLevel (`0x004c8550`). In WriteLevel the
+  alias was used in one branch and changed the operand order in the other branch.
+- **Aliases also change address formation.** `T& r = *p;` used for one read
+  changes the `offset + base` order of an element address. This fixed
+  D3DIMSoulTree ReadLods (`0x00440060`) and TransformVertexGroups (`0x00440d40`).
+  A reference to a local struct folds away and has no effect.
+- **Local-symbol count orders equal-cost terms (provisional).** In flattened
+  4-term product sums, the order of equal-cost terms followed how many
+  initialised locals were referenced before the expression, modulo 8. Locals in
+  an inline helper and in its caller count together; unused uninitialised locals
+  and file-scope declarations do not count. A named cast pointer in an inline
+  helper that is expanded twice adds two, which fixed Wrecker slot 10
+  (`0x005306e0`). A per-row search over all 24 term orders moved SoultreeBounds
+  Scale `0x004fd340` from 596 to 618 bytes.
+- **`||` versus separate `goto` tests.** Writing `if (a) goto failed; if (b) goto
+  failed;` with the shared failure block under the last test places that block
+  right after the test, so control falls through into it. One `||` condition
+  places it elsewhere. This fixed MSZoneInterface `0x004aa360` and `0x004aa4e0`.
+  In a switch case, `(A && B) || (C && D)` placed the second arm after the
+  following loop, as retail does; if/else forms did not (KrustyUI `0x0049b0d0`).
+- **Success in the if-branch.** When retail places the failure block after the
+  success path, put the successful call in the if-branch and the failure in the
+  else (DlgProcs `0x00452930`).
+- **Zero stores can claim a register for the whole function.** Five `= 0` member
+  stores made VC6 keep zero in ebx for all of DlgProcs `0x00452930`, which changed
+  register choice and tail merging in distant cases. `memset` gives a local `xor`
+  instead.
+- **One shared return instead of an early return.** Writing the lookup hit and
+  the load path as if/else with one `return` stops VC6 delaying the esi/edi saves
+  past the early return (FontTexture `0x004673d0`).
+- **Duplicate tails and per-branch flags.** Repeating `EndInputWait(); return 1;`
+  in one branch adds a use of `this` and swaps ebx and ebp. VC6 still merges the
+  duplicate tail, so the bytes match (OptControlsDlg slot 22 `0x004b5600`).
+  Setting `kind = 1` in each branch after its code, instead of once at the join,
+  fixed MapMovedInput (`0x004b5760`).
+- **Naming a pointer local from a field before argument stores.** This makes VC6
+  load the argument at function entry instead of hoisting its store above earlier
+  byte stores (FileStream ctor `0x00460d10`).
+- **Parentheses around a whole initialiser.** `float d = ((float)a - (float)b);`
+  changed the order of a `fild` and an unrelated global load (MultiPlayerDlg slot
+  24 `0x004f3a70`). Parenthesising only one operand made the result much worse.
+- **Exhaustive store-order sweeps.** All 720 orders of six independent stores
+  took about 36 s with 12 jobs and found 20 exact orders for UIListBox::AddImageRow
+  (`0x004773a0`). An earlier hand-picked set of 40 orders had found none.
+- **Check semantics first.** Some diffs that looked like register allocation
+  were reconstruction errors:
+  - Vehicle `0x005293e0` called a `__thiscall` callee that was declared
+    `__stdcall`. The callee's prologue does `mov esi, ecx`.
+  - Vehicle slot 55 `0x0052b6d0` wrote to the wrong argument.
+  - The loop bound of MultiPlayerDlg slot 24 was one record too small. The
+    masked comparison hid this because the end pointer is a relocation, so
+    check relocation addends whenever the masked score is full but the strict
+    score is not.
+- **Not moved:** in PCJoystickDevice `0x004c3790` and FileStream `0x004618e0`,
+  retail's eax→ecx→edx scratch-register rotation starts one step later than
+  VC6's. No form tried shifted it. In VC6 SP3, two arrays whose element type has
+  a destructor never share a stack slot, but retail's 0x0044b200 shares one. The
+  `sub esp` before `rep movsd` in Camera `0x0042ee30` was not reproduced either.
