@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 190, c 146, total 336. The three class (a) functions of the
+Counts: a 0, b 189, c 143, total 332. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -130,9 +130,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | net/NetThread | `0x004afa90` | 698/1251 | b | 14 code diffs: `jne @388` vs `jne A`; `jne @374` vs `jne A`; slots differ |
 | net/ZoneReport | `0x0049ca60` | 4792/4810 | c | retail folds the 1-based type's +1 into the `>= 30` branch (`add ebx, -0x1a`, jumping past the else branch's `inc ebx`); VC6 here subtracts 27 and increments after the join (an in-branch +1 spills the index); parentheses, `index = index - 27`, `index += -27` and `field_0x29c = ++index` give identical bytes |
 | parser/Parser | `0x004b87f0` | 33/406 | b | prologue: retail pushes ebx/ebp/esi/edi before the null test, VC6 here pushes ebx/ebp after the early return (samples/parser/ParserNearMisses.cpp) |
-| physics/bikeai/BikeAI | `0x0040d200` | 4430/4464 | c | 2 scheduling diffs: the initial `seg.y = 0` store and the ground-branch `p.y = ground.y` store each sit one instruction pair earlier than retail's |
 | physics/bikeai/BikeAI | `0x0040e510` | 1133/1944 | b | 53 code diffs: retail adds `mov esi, [esp + N] ; test esi, esi`; `mov edi, [esp + N] ; test edi, edi ; je~` vs `je @582`; slot order differs |
-| physics/bikeai/BikeAI | `0x00415640` | 5987/6111 | b | 17 code diffs: retail pushes the dot-call arguments after the z*z term (`faddp ; fld ; fmul ; push ; push` vs `push ; push ; faddp`); order of the one-use temporaries above +0x100 differs |
+| physics/bikeai/BikeAI | `0x00415640` | 6059/6112 | b | schedule and frame size match (squared distance and k dot grouped `z + ((x) + y)`); the one-use temporaries above +0x100 sit in other slots and the start-up zero vectors are stored x-first (retail z-first); the retail extent includes one nop of padding (candidate 6111 bytes) |
 | physics/bikeai/BikeAI | `0x0040eca0` | 1288/17345 | b | 392 code diffs: retail keeps the start-up and loop-head zero vectors in memory (candidate folds them); frame 0x93c vs 0x8b8, slot order differs |
 | physics/bikeai/BikeAI | `0x00413200` | 659/4122 | b | KrustyBike member: frame 0x74 exact but slot 11's out-vectors at other offsets; operand order of the angular-velocity cross products; ground-branch lean clamp keeps the value on the FPU stack |
 | physics/bikeai/BikeAI | `0x00414370` | 394/4678 | b | KrustyBike member: frame 0x74 vs 0x78 (retail spills the difficulty, candidate keeps it in edi); kind 1/5 gate-distance test placed after the single-point and no-track paths |
@@ -177,13 +176,10 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | physics/krustybike/KrustyBike | `0x0048eea0` | 608/2952 | c | slot 102, frame 0x50 exact; VC6 cross-jumps the head-turn arms differently (retail keeps the + side hold block and the - side retarget tail), `jne call ; jmp skip` vs retail `je skip ; jmp call` in the trick-chain switch, the `+0x153c = 0` else block before the shared advance, and the crash clamp keeps t on the x87 stack where retail spills it to the dt slot |
 | physics/krustybike/KrustyBike | `0x0048fa60` | 380/440 (masked) | c | 4 code diffs: retail hoists `mov [esi + 0x11b8], bl ; mov [esi + 0x604], ebx` into the load delay of the +0x1540 kVec3Zero copy where the candidate hoists `+0x7c0/+0x7bc` (pick index = units after the copy - 32) |
 | physics/krustybike/KrustyBike | `0x004919a0` | 147/221 (masked) | c | 8 code diffs: retail adds `mov edx, [edx + 0x60c] ; fsub [ecx + 0x~`; retail lacks `fsub [ecx + 0xb8]` |
-| physics/krustybike/KrustyBike | `0x00491d10` | 211/1176 (masked) | b | 53 code diffs: retail lacks `sub esp, N`; retail adds `sub esp, 0x20`; frame 0x24 vs 0x0 |
+| physics/krustybike/KrustyBike | `0x00491d10` | 523/1296 | b | prologue, frame 0x20 and lim in ebp match (if/else flag/lim, mode 2/3 copy path breaks); the 2/3 normalise join sits after the invsqrt arm (retail after the zero arm), its query call is not cross-jumped into the shared call, and retail homes the case 0/4 call in case 4 (candidate in case 0); candidate 1300 bytes |
 | physics/krustybike/KrustyBike | `0x00492ad0` | 192/2315 | c | 10 code diffs (frame 0x34 exact): record-interval branch `je @end ; jmp @deltas` vs retail `jne @deltas ; jmp @end`, network branch conditional jump vs retail `push 0 ; jmp @end+1`, and the register choice it drags along |
 | physics/krustybike/KrustyBike | `0x00493660` | 2005/8545 | c | 528 code diffs (frame 0x58 and slots exact): retail keeps 1 in ebp and 0 in edi from the second SetAxesPtr call on; retail stores `(len+50)*(len+50)` before the AllowWarping test; velocity y/z `fld s ; fmul` order; pose lerp `c - b` recompute |
-| physics/krustybike/KrustyBike | `0x004965e0` | 243/407 (masked) | b | 10 code diffs: retail lacks `mov [esp + N], 0`; retail lacks `mov [esp + N], 0 ; mov edx, [esp + N]`; slots differ |
 | physics/krustybike/KrustyBike | `0x00496d10` | 1/1 (masked) | c | 1 code diffs: `jmp A` vs `jmp @12 ; nop ; nop ` |
-| physics/krustybike/KrustyBike | `0x00496d20` | 61/99 (masked) | c | 3 code diffs: retail adds `lea ecx, [eax + 0xc]`; `jne @27 ; mov edx, [eax + 0xc] ; lea ec~` vs `jne @28 ; mov eax, [ecx] ; call [eax + ~` |
-| physics/krustybike/KrustyBike | `0x00496da0` | 61/99 (masked) | c | 3 code diffs: retail adds `lea ecx, [eax + 0xc]`; `jne @27 ; mov edx, [eax + 0xc] ; lea ec~` vs `jne @28 ; mov eax, [ecx] ; call [eax + ~` |
 | physics/motion/D3DIMSoultreeMotnctrl | `0x00445680` | 244/616 (masked) | b | 34 code diffs: `mov esi, [esp + N] ; mov edi, eax ; tes~` vs `mov esi, eax ; test esi, esi ; jne @118`; retail adds `push edx`; frame 0x30c vs 0x308 |
 | physics/motion/D3DIMSoultreeMotnctrl | `0x00445fc0` | 330/331 | b | 1 code diffs: `mov ebp, [ecx + eax + 0x74]` vs `mov ebp, [eax + ecx + 0x74]`; slots differ |
 | physics/motion/Motnctrl | `0x004a5e40` | 375/780 (masked) | b | 24 code diffs: `push edi` vs `push esi`; `xor ebx, ebx ; cmp eax, ebx ; mov [esp ~` vs `xor ebp, ebp ; cmp eax, ebp ; mov [esp ~`; slots differ |
