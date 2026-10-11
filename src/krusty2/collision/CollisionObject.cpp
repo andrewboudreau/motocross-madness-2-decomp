@@ -67,8 +67,11 @@ void CollisionHullShape_Free(CollisionHullShape* s) {
 
 void CollisionModelShape_Free(void* shape) {
     CollisionModelShapeData* s = (CollisionModelShapeData*)shape;
-    for (int i = 0; i < s->hullCount; i++)
-        CollisionHullShape_Free((CollisionHullShape*)&s->hulls[i]);
+    // Indexing through the reference (not s->hulls[i]) makes VC6 rebuild each
+    // hull address as ebx + edx from a fresh hulls load, as retail does.
+    CollisionModelShapeData& model = *s;
+    for (int i = 0; i < model.hullCount; i++)
+        CollisionHullShape_Free((CollisionHullShape*)&model.hulls[i]);
     operator delete(s->hulls);
     operator delete(s->field_0x04);
     operator delete(s->field_0x08);
@@ -781,7 +784,8 @@ int TreeBoxOverlap(CollisionBoxBounds* boundsA, CollisionBoxBounds* boundsB, con
 // Partial 303/311 (same size and frame): retail holds `other` in ecx and its shape type in eax
 // for the second switch, VC6 swaps the two registers here.  No effect or worse: a local
 // type or object copy, shape-first tests, declaration order, xfB first, every case order,
-// returns inside the cases and an inline helper (pointer, reference or return form).
+// returns inside the cases and an inline helper (pointer, reference or return form), and a
+// `CollisionObject& o = *other;` alias on any subset of the switch and the three case reads.
 int CollisionObject::TestMeshBounds(CollisionObject* other)
 {
     CollisionBoxBounds modelBoundsA;

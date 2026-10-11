@@ -15358,6 +15358,15 @@ CASES = [
         'reason': 'destructor called by UIFrame deleting wrapper',
     },
     {
+        'name': 'gameui.cpp UIAnim constructor',
+        'bindings': 'src/reconstructed/GameUi.bindings.json',
+        'source': 'src/reconstructed/GameUi.cpp',
+        'symbol': '??0UIAnim@@QAE@PAX0@Z',
+        'target_va': '0x00472e30',
+        'target_size': 82,
+        'reason': 'vptr 0x552ccc (UIAnim RTTI); counters zeroed before the textures store, frame list cleared by a loop (rep stosd after the palette store)',
+    },
+    {
         'name': 'gameui.cpp UIAnim::scalar deleting dtor',
         'bindings': 'src/reconstructed/GameUi.bindings.json',
         'source': 'src/reconstructed/GameUi.cpp',

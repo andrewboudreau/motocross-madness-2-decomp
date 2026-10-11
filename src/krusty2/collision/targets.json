@@ -15,8 +15,8 @@
     "candidate_symbol_contains": "CollisionModelShape_Free",
     "target_va": "0x00431df0",
     "target_size": 85,
-    "expect": "partial",
-    "notes": "83 vs 85 bytes: retail pushes ebx only inside the loop and builds eax = ebx + edx (edx = hull array reloaded each pass); not reproduced",
+    "expect": "exact",
+    "notes": "hull loop indexes through a CollisionModelShapeData& alias, giving retail's ebx + edx address formation",
     "bindings": "CollisionObject.bindings.json"
   },
   {

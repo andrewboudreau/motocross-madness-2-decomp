@@ -36,7 +36,8 @@
 // UnknownFunction50ba00 (0x0050ba00, 802 bytes): 770 of 802; only the
 // scheduling of two stores (v3.sx and v5.sx) differs. Writing through a
 // vertex pointer, other vertex orders, field orders and an inline vertex
-// setter are further off.
+// setter are further off (all 720 orders of the six vertex blocks swept
+// with tools/sweep_variants.py: 652..718 against 770 for the kept order).
 //
 // CharacterCell::UnknownFunction50beb0 (0x0050beb0, the out-of-line copy of
 // FontTexture.h's inline) is emitted only in a TU that calls it, so it is

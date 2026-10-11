@@ -16,16 +16,10 @@
 //   currentTextColor/textColor/stateImages[4] (also as `UIAnim*`), `!= 0`
 //   image tests, parentheses on each operand and per-branch `enabled`
 //   stores. Retail UIControl and UIButton pick opposite registers for the
-//   same fragments, so the choice is an allocation tie-break.
-// 0x00472e30 UIAnim constructor (34/82): retail stores the palette (+0xf4)
-//   after the zeroed members, right before the frame-list memset; VC6 here
-//   hoists it next to the texture store whatever the statement, initializer
-//   list or loop form (retail loads both arguments into ecx/edx with zero in
-//   eax; VC6 here loads them into eax/ecx and zeroes eax after). Also
-//   tried: the palette, the textures or both after the memset, the memset
-//   first, the palette before the textures, a palette local, `this->`, a
-//   `memset(&frameList[0], 0, 50 * 4)` and a clearing loop (35/82, same
-//   register choice).
+//   same fragments, so the choice is an allocation tie-break. A
+//   `UIControl* self = this;` copy used for any subset of the 13 member
+//   accesses (120 of 8192 sampled with tools/sweep_variants.py) is folded
+//   away: every form gives 91.
 // 0x00477110 adds an image row from a file (356/646): with `a` a UIAnim
 //   loaded from `file`, otherwise a row naming the TGA file with its header's
 //   size. Calls, constants and the row stores follow retail. Retail places
@@ -156,21 +150,6 @@ void UIControl::UnknownVirtualSlot49(int enable) {
         currentTextColor = textColor;
         SetFontColor(0x999999);
     }
-}
-
-// 0x00472e30
-UIAnim::UIAnim(void* textures, void* palette) {
-    animTextures = textures;
-    currentFrame = 0;
-    frameCount = 0;
-    passesLeft = 0;
-    field_0x18 = 0;
-    lastStepTime = 0;
-    playForwards = 1;
-    frameDelay = 0;
-    playBackwards = 0;
-    animPalette = palette;
-    memset(frameList, 0, sizeof(frameList));
 }
 
 // 0x004733a0

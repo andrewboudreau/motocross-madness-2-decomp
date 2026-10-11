@@ -2,18 +2,19 @@
 // kept out of src/reconstructed/UiInfo.cpp until they match.
 //
 // TrackGameMode::UnknownFunction522440 (0x00522440, 427 bytes): restores the
-// default settings. Calls, constants and stores all match; 355 of 427 bytes.
-// Retail keeps 1 in ecx and 2 in edx from the start (and reuses edx for the
-// final +0x98/+0x94 stores), computes &field_0x27f8 before the first
-// stores and places the second 0x1ec-byte copy after the +0x196c store; VC6
-// here picks eax for 1 and schedules the copies and the memset differently.
-// Store-order permutations, struct-assignment copies and memset forms tried
-// (all 120 orders of the five leading +0x27f8 stores: storing field_0x00
-// first gives retail's ecx/eax/edx constants but not its schedule; best
-// 371/427). Also no gain over the kept form: a reference or pointer alias
-// of field_0x27f8 used for the field_0x00 store, the other stores and the
-// memcpy sources (32 combinations), the second memcpy at every later
-// position and a struct assignment at every position.
+// default settings. Calls, constants and stores all match; 383 of 427 bytes.
+// The leading +0x27f8 store order 0x30, 0x0c, 0x10, 0x00, 0x14 gives
+// retail's ecx = 1 / edx = 2 constants and &field_0x27f8 setup, and an
+// explicit zeroing loop for field_0x1384 (not memset) gives retail's rep
+// stosd placement. Left: retail schedules the +0x2828 store after `mov
+// edx, 2` and places the second 0x1ec-byte rep movsd after the +0x196c
+// store. Exhaustive sweeps (tools/sweep_variants.py) found nothing better:
+// all 5040 orders of the first seven stores x memcpy/struct-assignment
+// copies; 120 orders of the five +0x27f8 stores x 15 positions of the
+// second memcpy x memset/loop zeroing; memcpy vs struct assignment for
+// both copies at every position (moving the second copy later costs
+// 100+ bytes). Earlier passes also tried a reference or pointer alias of
+// field_0x27f8 for the stores and the memcpy sources (32 combinations).
 //
 // TrackGameMode::UnknownFunction5238f0 (0x005238f0, 353 bytes): 190 of 357.
 // The found block written once after the CD retry (`if (file) { ...; return
@@ -44,10 +45,10 @@ void TrackGameMode::UnknownFunction522440() {
     UnknownFunction522cb0((UnknownTrackGameModeOptionsFd8*)field_0x1090);
     UnknownFunction522cd0();
     field_0x27f8.field_0x30 = 1;
-    field_0x27f8.field_0x10 = 1;
-    field_0x27f8.field_0x14 = 1;
     field_0x27f8.field_0x0c = 2;
+    field_0x27f8.field_0x10 = 1;
     field_0x27f8.field_0x00 = 0;
+    field_0x27f8.field_0x14 = 1;
     field_0x27f8.field_0x20 = 5;
     field_0x27f8.field_0x140 = 15.0f;
     field_0x27f8.field_0x2c = 0;
@@ -72,7 +73,8 @@ void TrackGameMode::UnknownFunction522440() {
     field_0x90 = 0;
     field_0x2dbc = 0;
     field_0x1bcc = 101;
-    memset(field_0x1384, 0, sizeof(field_0x1384));
+    for (int i = 0; i < 6; i++)
+        field_0x1384[i] = 0;
     field_0x98 = 2;
     field_0x94 = 2;
 }

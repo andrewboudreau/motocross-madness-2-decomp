@@ -2099,12 +2099,12 @@ Vehicle::Vehicle(int flags) : GameObject(1), SoultreePhysicsCharacter(flags)
     attachments = 0;
     attachmentCount = 0;
     attachmentCapacity = 0;
-    terrainScale = 1.0f;
     steerAxis = 0;
     field_0x4a4 = 1.0f;
+    terrainScale = 1.0f;
+    throttleAxis = 0;
     inputMap = 0;
     leanAxis = 0;
-    throttleAxis = 0;
     anyWheelInContact = 0;
     field_0x5a0 = 0;
     turnAngle = 0;

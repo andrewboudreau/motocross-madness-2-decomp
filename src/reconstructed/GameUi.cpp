@@ -1003,6 +1003,24 @@ UIFrame::~UIFrame() {
         frameSound->Release();
 }
 
+// 0x00472e30. The zeroed counters come first and the textures after them;
+// the frame list is cleared by a loop (memset puts the `lea edi` elsewhere).
+// This store order was found by an exhaustive sweep (tools/sweep_variants.py).
+UIAnim::UIAnim(void* textures, void* palette) {
+    currentFrame = 0;
+    frameCount = 0;
+    passesLeft = 0;
+    field_0x18 = 0;
+    lastStepTime = 0;
+    animTextures = textures;
+    playForwards = 1;
+    frameDelay = 0;
+    playBackwards = 0;
+    animPalette = palette;
+    for (int i = 0; i < 50; i++)
+        frameList[i] = 0;
+}
+
 // 0x00472eb0
 UIAnim::~UIAnim() {
     for (int i = 0; i < frameCount; i++) {
