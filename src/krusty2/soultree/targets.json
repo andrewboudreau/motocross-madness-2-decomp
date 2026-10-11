@@ -235,8 +235,8 @@
     "candidate_symbol_contains": "UnknownVirtualSlot17@SoultreePhysicsBaseObject",
     "target_va": "0x00502330",
     "target_size": 239,
-    "expect": "partial",
-    "notes": "96.41% under vc6_o2_ml; residual x87 operand order in the y term of the normalized sum. Waves 2-3: all 8 operand orders of s*v vs v*s, named vs inline 1.0f/n, in-place *=, temp Vec3, operator* and /n forms tried; none reach retail's mixed 'fld st0 / fld mem' form.",
+    "expect": "exact",
+    "notes": "exact under vc6_o2_ml: the mean is returned through a file-local inline DivideVec(v, s) { return v * (1.0f / s); } called as DivideVec(sum, (float)n). Written in the caller (all 8 operand orders of s*v vs v*s, named vs inline 1.0f/n, in-place *=, temp Vec3, per-component constructor) or as (1.0f / s) * v in the helper, VC6 never gives retail's mixed 'fld st0 / fld mem' schedule.",
     "bindings": "SoulTreePhysics.bindings.json"
   },
   {

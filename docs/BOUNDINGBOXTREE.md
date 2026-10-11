@@ -3,15 +3,17 @@
 **BoundingBoxTreeBuild.cpp** (`0x0042ad30..0x0042e2a3`,
 `src/reconstructed/BoundingBoxTreeBuild.*`; layouts and evidence in
 `src/krusty2/bvh/README.md`). It moved from `samples/physics/bvh`; the old
-sample copies were removed. Exact: 27 calibration cases. These are the six
+sample copies were removed. Exact: 28 calibration cases. These are the six
 split and bounds helpers, the three split choosers, the triangle, point
-and box node and tree builders, AxisAngleMatrix, the three readers and
+and box node and tree builders, BuildModelPointTree `0x0042d390`, AxisAngleMatrix, the three readers and
 the eight `$E`. Its bindings were read back from the retail relocation
 sites after a masked match. Each float constant was checked against its
 stored value, and the kVec3 addresses against the `$E` bodies. The stream
-stand-in is now the shared `UnknownTextureStream`. Near misses
+stand-in is now the shared `UnknownTextureStream`. BuildModelPointTree
+needs a `TreeVec3* p = &points[count]` local in both vertex loops for
+retail's operand order. Near miss
 (`samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp`):
-GatherModelTriangles `0x0042c260` and BuildModelPointTree `0x0042d390`.
+GatherModelTriangles `0x0042c260`.
 
 The code before `0x0042ad30` is a separate, unattested unit. It has its
 own kVec3 `$E` set (`0x00429400`), its own bss, and the five empty `$E`

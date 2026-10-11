@@ -1,7 +1,7 @@
 // Near-miss GraphicsTest.cpp candidates (src/krusty2/core/GraphicsTest.cpp), kept out of
 // src/krusty2 until they match.
 //
-// 0x0047bd10 (circle, 917 bytes, 814 strict): same calls (two inlined and two out-of-line
+// 0x0047bd10 (circle, 917 bytes, 818 strict): same calls (two inlined and two out-of-line
 // cross products, two Vec3Normalize calls), loop and vertex fill. With Math3D.h's
 // parenthesised CrossProduct the basis products match retail's operand order and schedule
 // except one load of the first inline cross product (issued one instruction early). Left:
@@ -9,8 +9,9 @@
 // the vertex fill, one x87 load scheduled later in the point loop and the operand order of
 // `points[i] += *center` (retail loads the centre first).
 //
-// 0x0047c270 (DrawBox, 626 bytes): 622 of 626 positions; the z sum of `corners[i] +=
-// *center` loads center.z first in retail (x and y match).
+// A `Vec3* p = &points[i]` local for the transform and the centre sum gives 818 (the same
+// pointer local made DrawBox 0x0047c270 exact, now in src/krusty2/core/GraphicsTest.cpp);
+// using it for the cos/sin stores as well gives 799.
 #include <math.h>
 
 #include "core/GraphicsTest.h"
@@ -84,10 +85,11 @@ void GraphicsTest::DrawCircle(const Vec3* center, float radius, const Vec3* axis
         points[i].x = cos(angle) * radius;
         points[i].y = 0;
         points[i].z = sin(angle) * radius;
+        Vec3* p = &points[i];
         if (axis) {
-            GraphicsTestTransform(&points[i], points[i], &m);
+            GraphicsTestTransform(p, *p, &m);
         }
-        points[i] += *center;
+        *p += *center;
     }
     points[segments] = points[0];
     for (i = 0; i < segments * 2; i++) {
@@ -105,50 +107,4 @@ void GraphicsTest::DrawCircle(const Vec3* center, float radius, const Vec3* axis
         vertices[i * 2 + 1].z = points[i + 1].z;
     }
     RENDERER()->DrawPrimitive(2, 0x1e2, vertices, segments * 2, 0);
-}
-
-// 0x0047c270
-void GraphicsTest::DrawBox(const Vec3* center, const Vec3* halfExtents, const Matrix4* xf)
-{
-    unsigned short edges[12][2] = {
-        {0, 1}, {1, 2}, {2, 3}, {3, 0},
-        {4, 5}, {5, 6}, {6, 7}, {7, 4},
-        {0, 4}, {1, 5}, {2, 6}, {3, 7},
-    };
-    Vec3 corners[8];
-    int i;
-
-    corners[0].x = -halfExtents->x;
-    corners[0].y = halfExtents->y;
-    corners[0].z = halfExtents->z;
-    corners[1].x = halfExtents->x;
-    corners[1].y = halfExtents->y;
-    corners[1].z = halfExtents->z;
-    corners[2].x = halfExtents->x;
-    corners[2].y = halfExtents->y;
-    corners[2].z = -halfExtents->z;
-    corners[3].x = -halfExtents->x;
-    corners[3].y = halfExtents->y;
-    corners[3].z = -halfExtents->z;
-    corners[4].x = -halfExtents->x;
-    corners[4].y = -halfExtents->y;
-    corners[4].z = halfExtents->z;
-    corners[5].x = halfExtents->x;
-    corners[5].y = -halfExtents->y;
-    corners[5].z = halfExtents->z;
-    corners[6].x = halfExtents->x;
-    corners[6].y = -halfExtents->y;
-    corners[6].z = -halfExtents->z;
-    corners[7].x = -halfExtents->x;
-    corners[7].y = -halfExtents->y;
-    corners[7].z = -halfExtents->z;
-    for (i = 0; i < 8; i++) {
-        corners[i] += *center;
-        if (xf) {
-            GraphicsTestTransform(&corners[i], corners[i], xf);
-        }
-    }
-    for (i = 0; i < 12; i++) {
-        DrawLine(&corners[edges[i][0]], &corners[edges[i][1]]);
-    }
 }

@@ -1646,7 +1646,12 @@ Vec3* Bike::UnknownVirtualSlot46(Vec3* out, float t)
             return out;
         }
     } else {
-        Vec3 half = BikeOolHalf(BikeOolSub(rearWheel->wheelPosition, frontWheel->wheelPosition));
+        // named rear/front references give retail's register pair for the
+        // wheel positions (1048 -> 1061/1066); the remaining difference is
+        // the frame slots of the constructor temporaries
+        const Vec3& rear = rearWheel->wheelPosition;
+        const Vec3& front = frontWheel->wheelPosition;
+        Vec3 half = BikeOolHalf(BikeOolSub(rear, front));
         Vec3 mid, rel;
         scratchVector = *Vec3SubtractCall(&rel, Vec3AddCall(&mid, &frontWheel->wheelPosition, &half), &position);
         *out = modelNode->WorldToLocalDirection(scratchVector);

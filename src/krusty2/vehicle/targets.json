@@ -256,7 +256,7 @@
     "target_va": "0x0040b600",
     "target_size": 1066,
     "expect": "partial",
-    "notes": "slot 46, 1048/1066: the midpoint helpers return Vec3 built from the out-of-line constructor 0x404e60 (each result is a temporary copied into a shared return slot), nested in one expression on the both-wheels path; the one-wheel path calls 0x421d00 on 0x421cb0's result. Left: the frame offsets of three constructor temporaries and the rear/front register pair on the one-wheel path.",
+    "notes": "slot 46, 1061/1066: the midpoint helpers return Vec3 built from the out-of-line constructor 0x404e60 (each result is a temporary copied into a shared return slot), nested in one expression on the both-wheels path; the one-wheel path calls 0x421d00 on 0x421cb0's result. Named const Vec3& rear/front locals on the one-wheel path fixed the register pair (1048 -> 1061; front-first declaration stays 1048). Left: the frame offsets of the constructor temporaries (sub/half ctor, the 0x421cb0 mid, the WorldToLocal temp). Tried without effect: half/mid/rel declaration orders, assignment forms; worse: a diff local, by-value helper, inline ctor, split statement.",
     "bindings": "Bike.bindings.json"
   },
   {

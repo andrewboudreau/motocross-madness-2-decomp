@@ -1,9 +1,9 @@
 # wrecker.cpp (Wrecker)
 
 `src/reconstructed/Wrecker.h` / `Wrecker.cpp` / `Wrecker.bindings.json`
-reconstruct part of `D:\aardvark\VC\krusty2\wrecker.cpp`: 27 functions are
+reconstruct part of `D:\aardvark\VC\krusty2\wrecker.cpp`: 28 functions are
 strict exact under `vc6_o2_mt` (VC6 SP3 `/O2 /GR /GX /MT`), with every
-relocation resolved by the bindings. Three near misses are parked in
+relocation resolved by the bindings. Four near misses are parked in
 `samples/race/WreckerNearMisses.cpp`.
 
 ## Evidence
@@ -82,6 +82,7 @@ relocation resolved by the bindings. Three near misses are parked in
 | `0x00530190` | 36 | setup | qualified `GameObject::UnknownVirtualSlot8`, returns `this` |
 | `0x005301c0` | 995 | builds the physics objects | `field_0xe8`, `field_0xf4`, then `field_0x100 = 0` |
 | `0x005305b0`, `0x005305f0`, `0x00530630`, `0x00530680` | 60-82 | appends | `DebugRealloc(p, n * 4 + 4, ...)`; `0x00530630` returns `count - 1` |
+| `0x00531da0` | 634 | probe trail particles | `step = delta / (float)count` through an inline `operator/` returning `v * (1.0f / s)`; the squared length `(y*y + x*x) + z*z` |
 | `0x00532020` | 293 | probe contact pass | index the probe array in every expression (a probe pointer local reorders the loads) |
 | `0x00532150` | 193 | box inertia | `y*y + z*z`, `x*x + z*z`, `x*x + y*y` |
 | `0x00532220`, `0x00532310`, `0x00532490` | 230-372 | wreck state changes | `RANDOM_UNIT() * count` |
@@ -97,6 +98,12 @@ relocation resolved by the bindings. Three near misses are parked in
 - The random factor is a macro. As an inline function, VC6 moves the
   constant `1/32768` behind the caller's multiply (and once even negates it).
   Retail multiplies `rand()` by the constant first.
+- `0x00531da0` divides the probe delta by the particle count through an
+  inline `operator/` that multiplies by `1.0f / s`. Inlined, it keeps the
+  reciprocal on the stack for the first component (`fld st(0); fmul
+  [delta.x]`); the same product written in the body (`delta * (1.0f /
+  count)`, a `scale` local, free or member `operator*`, per-component
+  constructors) loads `delta.x` first.
 - In the constructor the integer members are zeroed before the two vector
   members. Assigning `field_0xdc` first makes VC6 build the temporary with
   immediates instead of the zero register.
@@ -111,7 +118,6 @@ relocation resolved by the bindings. Three near misses are parked in
 
 | VA | Size | Score | Remaining difference |
 |---|---:|---|---|
-| `0x00531da0` | 634 | 629/634 | one `fld`/`fmul` operand pair in the first component of `step` |
 | `0x00532580` | 562 | 490/562 | the copies go through a member-by-member copy helper and the old up row is three float locals (both now match); each cross product's two loads are swapped and its `fsubp` is scheduled after the destination pointer copy |
 | `0x005329e0` | 1312 | 215/1306 | frame 0x94 (retail's) once the final scale is `UnknownFunction5015b0(WreckerScaleCtorCall(sum, field_0x118), frameTime)`, the scaled temporary passed straight through; only the slot order differs (retail keeps `push` nearest esp, then `p`, `previousPush`, `sum`; a probe-count accessor does not change the budget) |
 | `0x00531740` | 1624 | 768/1617 | contact particle spray; frame 0xc4 (retail's) and every call and operator in retail's order. Written with `WreckerLength` by value, the dot product and the gravity/step scales through the out-of-line views, and three scratch vectors reused across the body (delta/wind/step-along, dir/drift-per-particle, cross result/side/step), which gives retail's slot sharing. Left: the slot order (`velocity` 0x14 here, 0x28 in retail) and `0.0f - scaled.z` of the folded cross product with the Y axis, which retail loads as `fld scaled.z; fsubr` (the constant's leaf is older there); a by-value cross product does not change it |

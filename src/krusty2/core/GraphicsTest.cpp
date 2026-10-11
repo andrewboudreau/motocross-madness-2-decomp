@@ -40,8 +40,15 @@ public:
 #define RENDERER() ((GraphicsTestRenderer*)field_0x18)
 #define RGBA_MAKE(r, g, b, a) (((a) << 24) | ((r) << 16) | ((g) << 8) | (b))
 
-// The circle 0x0047bd10 and DrawBox 0x0047c270 are near misses:
-// samples/physics/helpers/GraphicsTestNearMisses.cpp.
+// Row-vector transform with translation (row 3).
+inline void GraphicsTestTransform(Vec3* out, Vec3 v, const Matrix4* m)
+{
+    out->x = v.x * m->_11 + v.y * m->_21 + v.z * m->_31 + m->_41;
+    out->y = v.x * m->_12 + v.y * m->_22 + v.z * m->_32 + m->_42;
+    out->z = v.x * m->_13 + v.y * m->_23 + v.z * m->_33 + m->_43;
+}
+
+// The circle 0x0047bd10 is a near miss: samples/physics/helpers/GraphicsTestNearMisses.cpp.
 
 // 0x0047bc70
 GraphicsTest::GraphicsTest(int flags)
@@ -77,6 +84,56 @@ void GraphicsTest::DrawSphere(const Vec3* center, float radius, int segments)
         float r = FastSqrt(radius * radius - h * h);
         DrawCircle(&p, r, &axis, segments);
         p.z += radius / (segments * 0.5f);
+    }
+}
+
+// 0x0047c270: a wire box of half extents `halfExtents` about `center`, optionally transformed
+// by `xf` (12 edges of the 8 corners).
+void GraphicsTest::DrawBox(const Vec3* center, const Vec3* halfExtents, const Matrix4* xf)
+{
+    unsigned short edges[12][2] = {
+        {0, 1}, {1, 2}, {2, 3}, {3, 0},
+        {4, 5}, {5, 6}, {6, 7}, {7, 4},
+        {0, 4}, {1, 5}, {2, 6}, {3, 7},
+    };
+    Vec3 corners[8];
+    int i;
+
+    corners[0].x = -halfExtents->x;
+    corners[0].y = halfExtents->y;
+    corners[0].z = halfExtents->z;
+    corners[1].x = halfExtents->x;
+    corners[1].y = halfExtents->y;
+    corners[1].z = halfExtents->z;
+    corners[2].x = halfExtents->x;
+    corners[2].y = halfExtents->y;
+    corners[2].z = -halfExtents->z;
+    corners[3].x = -halfExtents->x;
+    corners[3].y = halfExtents->y;
+    corners[3].z = -halfExtents->z;
+    corners[4].x = -halfExtents->x;
+    corners[4].y = -halfExtents->y;
+    corners[4].z = halfExtents->z;
+    corners[5].x = halfExtents->x;
+    corners[5].y = -halfExtents->y;
+    corners[5].z = halfExtents->z;
+    corners[6].x = halfExtents->x;
+    corners[6].y = -halfExtents->y;
+    corners[6].z = -halfExtents->z;
+    corners[7].x = -halfExtents->x;
+    corners[7].y = -halfExtents->y;
+    corners[7].z = -halfExtents->z;
+    for (i = 0; i < 8; i++) {
+        // the corner pointer local gives retail's center-first z sum
+        // (corners[i] += *center loads corner.z first, 622/626)
+        Vec3* corner = &corners[i];
+        *corner += *center;
+        if (xf) {
+            GraphicsTestTransform(corner, *corner, xf);
+        }
+    }
+    for (i = 0; i < 12; i++) {
+        DrawLine(&corners[edges[i][0]], &corners[edges[i][1]]);
     }
 }
 

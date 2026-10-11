@@ -17,8 +17,8 @@
 //   CollisionObject; kept in samples/physics/bvh/RigidTransform.cpp), then Camera.cpp 0x0042e340.
 // The four kVec3 `$E` pairs 0x0042d250..0x0042d38b sit mid-file.
 //
-// Near misses (samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp): GatherModelTriangles
-// 0x0042c260 and BuildModelPointTree 0x0042d390.
+// Near miss (samples/physics/bvh/BoundingBoxTreeBuildNearMisses.cpp): GatherModelTriangles
+// 0x0042c260.
 #include <math.h>
 #include <string.h>
 
@@ -631,6 +631,84 @@ const TreeVec3 kVec3Zero = TreeVec3(0.0f, 0.0f, 0.0f);
 const TreeVec3 kVec3XAxis = TreeVec3(1.0f, 0.0f, 0.0f);
 const TreeVec3 kVec3YAxis = TreeVec3(0.0f, 1.0f, 0.0f);
 const TreeVec3 kVec3ZAxis = TreeVec3(0.0f, 0.0f, 1.0f);
+
+// 0x0042d390.  Builds a point tree over a render model's vertices: all vertices of the current
+// LOD when `frame` is null, otherwise only the vertex ranges that belong to `frame`.  Each point
+// goes through the inverse of the model's (or the frame's) GetMatrixIn(0) matrix, then all of
+// them through the inverse of `m`.  Only the frame branch reassigns `total` (retail keeps the
+// summed count in the frame==0 branch and copies the gathered count in the other one).
+// The `TreeVec3* p = &points[count]` locals of both vertex loops give retail's operand order
+// (written as points[count] the frame==0 loop's y row comes out z-term first and the frame
+// loop reads [vertices+offset] for retail's [offset+vertices]: 1601/1608; the local in only
+// one loop gives 1604 or 1601).
+void BuildModelPointTree(BoxTreeNode* root, TreeMatrix4* m, TreeModelSource* model,
+                         TreeSceneNode* frame)
+{
+    TreeVec3* points;
+    TreeMatrix4 frameInverse;
+    TreeMatrix4 inverse;
+    TreeModelMesh* mesh;
+    int total;
+    int count;
+    int first;
+    int end;
+    int i;
+    int j;
+    int k;
+
+    model->SelectLod(-1);
+    total = 0;
+    for (i = 0; i < model->lods[model->currentLod].meshCount; i++)
+        total += model->lods[model->currentLod].meshes[i].vertexCount;
+    points = (TreeVec3*)DebugMalloc(total * sizeof(TreeVec3), __FILE__, 0x44f);
+    count = 0;
+    if (frame == 0) {
+        model->GetMatrixIn(0, &frameInverse);
+        InvertRigid(&frameInverse);
+        for (i = 0; i < model->lods[model->currentLod].meshCount; i++) {
+            mesh = &model->lods[model->currentLod].meshes[i];
+            for (j = 0; j < mesh->vertexCount; j++) {
+                TreeVec3* p = &points[count];
+                p->x = mesh->vertices[j].position.x;
+                p->y = mesh->vertices[j].position.y;
+                p->z = mesh->vertices[j].position.z;
+                TransformPoint(p, *p, &frameInverse);
+                count++;
+            }
+        }
+    } else {
+        frame->GetMatrixIn(0, &frameInverse);
+        InvertRigid(&frameInverse);
+        for (i = 0; i < model->lods[model->currentLod].meshCount; i++) {
+            mesh = &model->lods[model->currentLod].meshes[i];
+            first = 0;
+            end = 0;
+            for (k = 0; k < mesh->partCount; k++) {
+                if (mesh->parts[k].frame == frame) {
+                    first = ((char*)mesh->parts[k].firstVertex - (char*)mesh->vertices) /
+                            sizeof(TreeModelVertex);
+                    end = first + mesh->parts[k].vertexCount;
+                }
+            }
+            for (j = first; j < end; j++) {
+                TreeVec3* p = &points[count];
+                p->x = mesh->vertices[j].position.x;
+                p->y = mesh->vertices[j].position.y;
+                p->z = mesh->vertices[j].position.z;
+                TransformPoint(p, *p, &frameInverse);
+                count++;
+            }
+        }
+        total = count;
+    }
+
+    inverse = *m;
+    InvertRigid(&inverse);
+    for (i = 0; i < total; i++)
+        TransformPoint(&points[i], points[i], &inverse);
+    BuildPointNode(root, points, total);
+    DebugFree(points, __FILE__, 0x48a);
+}
 
 // 0x0042d9e0.  BuildTriangleNode for a model (box) tree: element i is the box boxes[2*i],
 // boxes[2*i+1] with centre centers[i]; a leaf holds one box.  Retail copies only the

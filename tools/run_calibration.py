@@ -6268,6 +6268,15 @@ CASES = [
         'reason': 'cross-registers ignore lists (line 0xb4)',
     },
     {
+        'name': 'Wrecker probe trail particles 0x531da0',
+        'bindings': 'src/reconstructed/Wrecker.bindings.json',
+        'source': 'src/reconstructed/Wrecker.cpp',
+        'symbol': '?UnknownFunction531da0@Wrecker@@QAEXUVector3@@0M@Z',
+        'target_va': '0x00531da0',
+        'target_size': 634,
+        'reason': 'step = delta / (float)count through an inline operator/ returning v * (1.0f / s)',
+    },
+    {
         'name': 'Wrecker probe contacts 0x532020',
         'bindings': 'src/reconstructed/Wrecker.bindings.json',
         'source': 'src/reconstructed/Wrecker.cpp',
@@ -17336,6 +17345,15 @@ CASES = [
         'target_va': '0x0042d350',
         'target_size': 60,
         'reason': 'writes 0x579670',
+    },
+    {
+        'name': 'BoundingBoxTreeBuild.cpp BuildModelPointTree',
+        'bindings': 'src/reconstructed/BoundingBoxTreeBuild.bindings.json',
+        'source': 'src/reconstructed/BoundingBoxTreeBuild.cpp',
+        'symbol': '?BuildModelPointTree@@YAXPAUBoxTreeNode@@PAUTreeMatrix4@@PAVTreeModelSource@@PAVTreeSceneNode@@@Z',
+        'target_va': '0x0042d390',
+        'target_size': 1608,
+        'reason': 'lines 0x44f..0x48a',
     },
     {
         'name': 'BoundingBoxTreeBuild.cpp BuildBoxNode',

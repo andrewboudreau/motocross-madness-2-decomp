@@ -139,6 +139,62 @@ void Wrecker::UnknownFunction530680(UnknownWreckerCollisionObject* object) {
     object->UnknownFunction439410(field_0x38);
 }
 
+// Vector helpers in the d3dvec.inl style (MatrixUtil.h's Vector3 has only
+// the scale and += operators).
+inline Vector3 operator+(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+inline Vector3 operator-(const Vector3& a, const Vector3& b) {
+    return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+// Division by a scalar through the reciprocal. Inlined, it gives retail's
+// `fld st(0); fmul [delta.x]` for the first component of the step in
+// 0x00531da0; the same reciprocal product written in the caller
+// (`delta * (1.0f / count)`, or a `scale` local) loads delta.x first.
+inline Vector3 operator/(const Vector3& v, float s) {
+    return v * (1.0f / s);
+}
+
+// 0x00531da0: emits a trail of particles along a probe's movement. Retail
+// needs the squared length written `(y*y + x*x) + z*z` (or
+// `z*z + (x*x + y*y)`); `x*x + y*y + z*z` reuses delta.z from the FPU stack.
+void Wrecker::UnknownFunction531da0(Vector3 from, Vector3 to, float frameTime) {
+    Vector3 delta = to - from;
+    float lengthSq = (delta.y * delta.y + delta.x * delta.x) + delta.z * delta.z;
+    float length = lengthSq == 1.0f ? 1.0f : UnknownFunction460b50(lengthSq);
+    float speed = length / frameTime;
+    if (speed < 0.5f)
+        return;
+    speed *= 0.013333f;
+    if (field_0x44) {
+        if (speed < 1.5f)
+            speed = 1.5f;
+        else if (speed > 2.0f)
+            speed = 2.0f;
+    } else {
+        if (speed < 0.25f)
+            speed = 0.25f;
+        else if (speed > 2.0f)
+            speed = 2.0f;
+    }
+    float lifetime = speed * 2000.0f;
+    if (lifetime < 500.0f)
+        lifetime = 500.0f;
+    else if (lifetime > 1000.0f)
+        lifetime = 1000.0f;
+    int count = (int)(length / (speed * 0.6f));
+    if (!count)
+        count = 1;
+    float age = lifetime * 0.25f;
+    Vector3 step = delta / (float)count;
+    for (int i = 0; i < count; i++) {
+        Vector3 position = from + step * (float)i;
+        field_0x11c->UnknownFunction4baa50(age, &position, field_0x120, speed, lifetime, speed + speed, 10, 0xffffff);
+        if (++field_0x120 >= 13)
+            field_0x120 = 0;
+    }
+}
+
 void Wrecker::UnknownFunction532020(float frameTime) {
     for (int i = 0; i < field_0x38->field_0x100; i++) {
         if (field_0x38->field_0x104[i].field_0x10) {

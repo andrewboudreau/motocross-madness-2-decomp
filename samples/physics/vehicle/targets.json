@@ -5,8 +5,8 @@
   "candidate_symbol_contains": "UnknownVirtualSlot34@Vehicle",
   "target_va": "0x0040c4c0",
   "target_size": 118,
-  "expect": "partial",
-  "notes": "110/118 strict. Same body and CrossB as slot 35 (exact); after GetAxesIn the y and z terms load b.x first in retail (fld [esi]; fmul [edi+8] / [edi+4]), VC6 here this->z / this->y first; no CrossB spelling (256 paren/operand forms) gives slot 34 without breaking slot 35.",
+  "expect": "exact",
+  "notes": "Exact once the cross product goes through a named local (Vec3 side = ...CrossB(bodyUp); sideAxis = side). Written as slot 35's single assignment VC6 loads this->z / this->y before b.x in the y and z terms (110/118); any extra live symbol (the local, a node/axis pointer local, slot 35's parameters) gives retail's b.x-first order, an unused int does not. No CrossB spelling (256 paren/operand forms) or declaration shift (k = 0..63) moved it.",
   "bindings": "VehicleInlines.bindings.json"
  },
  {

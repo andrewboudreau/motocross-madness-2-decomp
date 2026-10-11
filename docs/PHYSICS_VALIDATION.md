@@ -425,9 +425,14 @@ python tools/run_physics_samples.py --strict --source src/krusty2/soultree/SoulT
 These were measured with VC6 SP3 `/O2` on the real targets and on small synthetic
 sources. They describe compiler behaviour, not original source.
 
-**x87 operand load order.** Cases include the Vehicle slot 34/35 cross product,
-the inlined cross products in PoseRotation 0x4a7fd0, WorldToLocalDirection
-0x4fd710 and Bike slot 76 0x406840.
+**x87 operand load order.** Cases include the inlined cross products in
+PoseRotation 0x4a7fd0, WorldToLocalDirection 0x4fd710 and Bike slot 76 0x406840.
+The Vehicle slot 34/35 cross product is exact: slot 34 (0x40c4c0) gets retail's
+`b.x`-first order once the function has one more live symbol (a named `side`
+result local; slot 35 has its parameters). A `Vec3* corner = &corners[i]` local
+did the same for GraphicsTest::DrawBox 0x47c270's centre sum, and a reciprocal
+`v * (1.0f / s)` moved into an inline helper fixed SoultreePhysics 0x502330 and
+Wrecker 0x531da0 (`fld st(0); fmul [x]`).
 
 - These partials differ only in which memory operand of a product is loaded with
   `fld` first.

@@ -42,6 +42,16 @@
   {
     "class": "GraphicsTest",
     "source": "GraphicsTest.cpp",
+    "candidate_symbol_contains": "?DrawBox",
+    "target_va": "0x0047c270",
+    "target_size": 626,
+    "expect": "exact",
+    "notes": "wire box; a Vec3* corner local in the corner loop gives retail's center-first z sum (corners[i] += *center: 622/626)",
+    "bindings": "GraphicsTest.bindings.json"
+  },
+  {
+    "class": "GraphicsTest",
+    "source": "GraphicsTest.cpp",
     "candidate_symbol_contains": "?DrawLine",
     "target_va": "0x0047c4f0",
     "target_size": 120,

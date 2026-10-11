@@ -4,25 +4,6 @@
 // and compare the symbol against retail with
 // samples/race/WreckerNearMisses.bindings.json.
 //
-// UnknownFunction531da0 (0x00531da0, 634 bytes): emits a trail of particles
-// along a probe's movement. 629 of 634 compared bytes match. The difference
-// is the x component of `step`: retail computes `scale * delta.x` with the
-// reciprocal still on the stack (`fld st(0); fmul [delta.x]`). VC6 here
-// loads delta.x first (`fld [delta.x]; fmul st(1)`). Member operator*,
-// free operator* with either order, a reciprocal folded into the operand,
-// an explicit per-component constructor, `*=` on a copy and separate
-// component statements all leave that instruction pair. Retail also needs
-// the length to be written `(y*y + x*x) + z*z` (or `z*z + (x*x + y*y)`);
-// `x*x + y*y + z*z` reuses delta.z from the FPU stack.
-// Also tried (no change unless noted): delta built through a derived
-// constructor with by-value parameters (`Vector3 delta = WreckerVector(to.x -
-// from.x, ...)`, the form that fixes Track 0x518130), alone and with the step
-// scaled by an inline helper (const-reference or by-value vector, scale
-// computed inside or passed in); the squared length through an inline helper
-// or split into `+=` statements; a dead `scale = 0.0f` initialiser;
-// `scale * delta`. Per-component stores into `delta` make all three products
-// scalar-first (423/630).
-//
 // UnknownFunction532580 (0x00532580, 562 bytes): rebuilds the wreck pose's
 // linear (field_0xbc) and angular (field_0xc8) step from the node's frame.
 // 511/562: the temporaries (a member-by-member copy helper), the FPU-held
@@ -74,6 +55,8 @@
 // `a._33 * b._23` in retail (the other 15 elements match); swap and t.z
 // term orders, reference/pointer helpers, __forceinline, const by-value
 // operands, the frame pointer's type, statement order inside the product,
+// pointer locals (to the inverse, the product's source or output, the
+// swapped element, the inverse's rows: 3781..4174),
 // and declaration counts (tools/decl_shift_scan.py, k = 0..63) do not move
 // it. Earlier forms: an explicit scratch matrix, the inverse written on the
 // local, the rebuild written in the body (frame 0x134, 1817/4183).
@@ -103,52 +86,14 @@ inline float WreckerSquareMagnitude(const Vector3& v) {
 
 // The parenthesised first product puts each fsubp between the load and the store of the
 // previous component's copy, as retail does (docs/VC6_OPERAND_ORDER.md section 3); both
-// x products parenthesised gain 4 bytes in 0x00531740 (best of the 64 forms; 0x00531da0,
-// 0x00532580 and slot 10 score the same with every form).
+// x products parenthesised gain 4 bytes in 0x00531740 (best of the 64 forms; 0x00532580
+// and slot 10 score the same with every form).
 inline Vector3 WreckerCross(const Vector3& a, const Vector3& b) {
     Vector3 r;
     r.x = (a.y * b.z) - (a.z * b.y);
     r.y = (a.z * b.x) - a.x * b.z;
     r.z = (a.x * b.y) - a.y * b.x;
     return r;
-}
-
-void Wrecker::UnknownFunction531da0(Vector3 from, Vector3 to, float frameTime) {
-    Vector3 delta = to - from;
-    float lengthSq = (delta.y * delta.y + delta.x * delta.x) + delta.z * delta.z;
-    float length = lengthSq == 1.0f ? 1.0f : UnknownFunction460b50(lengthSq);
-    float speed = length / frameTime;
-    if (speed < 0.5f)
-        return;
-    speed *= 0.013333f;
-    if (field_0x44) {
-        if (speed < 1.5f)
-            speed = 1.5f;
-        else if (speed > 2.0f)
-            speed = 2.0f;
-    } else {
-        if (speed < 0.25f)
-            speed = 0.25f;
-        else if (speed > 2.0f)
-            speed = 2.0f;
-    }
-    float lifetime = speed * 2000.0f;
-    if (lifetime < 500.0f)
-        lifetime = 500.0f;
-    else if (lifetime > 1000.0f)
-        lifetime = 1000.0f;
-    int count = (int)(length / (speed * 0.6f));
-    if (!count)
-        count = 1;
-    float age = lifetime * 0.25f;
-    float scale = 1.0f / count;
-    Vector3 step = delta * scale;
-    for (int i = 0; i < count; i++) {
-        Vector3 position = from + step * (float)i;
-        field_0x11c->UnknownFunction4baa50(age, &position, field_0x120, speed, lifetime, speed + speed, 10, 0xffffff);
-        if (++field_0x120 >= 13)
-            field_0x120 = 0;
-    }
 }
 
 // Copies a vector member by member into a returned local: retail copies

@@ -217,6 +217,15 @@ Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot16(const Vec3* in)
     return t;
 }
 
+// Division through the reciprocal. Inlined, it gives slot 17's mixed schedule (x as
+// `fld st0; fmul [sum.x]`, y as `fld [sum.y]; fmul st1`, z consuming the reciprocal);
+// the product written in the caller (`sum * (1.0f / n)`, per-component constructors, a
+// named reciprocal) or `(1.0f / s) * v` in the helper give other orders.
+static inline Vec3 DivideVec(const Vec3& v, float s)
+{
+    return v * (1.0f / s);
+}
+
 // slot 17 (0x00502330): average of the target positions of the non-type-4 attachments.
 Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot17()
 {
@@ -236,7 +245,7 @@ Vec3 SoultreePhysicsBaseObject::UnknownVirtualSlot17()
         n++;
     }
     if (n) {
-        return Vec3(sum.x * (1.0f / n), sum.y * (1.0f / n), sum.z * (1.0f / n));
+        return DivideVec(sum, (float)n);
     }
     return g_Zero;
 }
