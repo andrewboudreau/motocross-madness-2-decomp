@@ -142,7 +142,7 @@ bmpfile.cpp (4), Palette8.cpp (4), FontTexture.cpp (16, two of them via
 `samples/render/FontTextureNearMisses.cpp`) and FontTextureManager.cpp (7)
 match strictly; see [FONTS AND BITMAPS](FONTTEXTURE.md).
 
-LightEmitter.cpp (26), Quantize.cpp (8) and MSZoneInterface.cpp (14) match
+LightEmitter.cpp (26), Quantize.cpp (8) and MSZoneInterface.cpp (16) match
 strictly; see [LIGHTS, QUANTIZE AND ZONE](LIGHTEMITTER.md).
 
 dirlist.cpp (the drive list, DirectoryList and CombinedDirectoryList)

@@ -24,10 +24,11 @@ class is `UnknownTextureStream`, declared in `src/reconstructed/TextureMap.h`.
 - Encoded files start with "FAOE". Their bytes go through a running key at
   `+0x01`, seeded from the file name.
 
-## Exact (11), `src/reconstructed/FileStream.cpp`
+## Exact (12), `src/reconstructed/FileStream.cpp`
 
 | VA | Size (bytes) |
 |---|---|
+| `0x00460d10` | 77 |
 | `0x00460d60` | 15 |
 | `0x00460d70` | 57 |
 | `0x00460e70` | 209 |
@@ -41,6 +42,10 @@ class is `UnknownTextureStream`, declared in `src/reconstructed/TextureMap.h`.
 | `0x00461d40` | 24 |
 
 Source forms that mattered:
+- **`0x00460d10`:** the constructor names the buffer pointer
+  (`char* buffer = field_0x21;`) after the header bytes and before the
+  argument store; only then does VC6 load the argument at entry (edx) and
+  keep the buffer address in ecx for both pointer stores.
 - **`0x00460e70`:** the NULL test guards the rest, so its message is
   emitted last.
 - **`0x00461980`:** the decode reads the byte into a `char` temporary and
@@ -55,13 +60,12 @@ Source forms that mattered:
 - **`0x00461cb0`:** returns `_fstat`'s result, not void. `TextureMap.h` and
   `SceneManager.bindings.json` now use the `int` signature.
 
-## Near misses (7), `samples/io/FileStream.cpp`
+## Near misses (6), `samples/io/FileStream.cpp`
 
 The notes are in the source header.
 
 | VA | Size (bytes) | Masked match | Function |
 |---|---|---|---|
-| `0x00460d10` | 77 | 22% | constructor |
 | `0x00460db0` | 186 | 16% | header check |
 | `0x00460f50` | 957 | 30% | open |
 | `0x00461340` | 702 | 29% | seek |

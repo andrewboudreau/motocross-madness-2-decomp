@@ -9,7 +9,12 @@
 // cases 0 and 1 and tested and called after the switch shares the tail as
 // retail does, but VC6 lays the mouse assignment out before the shared block
 // (retail: after it, jumping back); case order, a ternary or if/else
-// selection and per-case pointer locals do not move it.
+// selection and per-case pointer locals do not move it. Measured over the
+// real 104-byte extent (88 code + 16 table): a shared `input` local with a
+// `call:` label in case 0 and `input = mouse; goto call;` in case 1 gives
+// 76/104 (the same with the label after the switch, a result variable or a
+// while wrapper); case 1 first 74, case 1 last 64; per-case locals,
+// returns and if-break forms keep the tails apart (43).
 //
 // UnknownReportError (0x004bf6a0, 978 bytes with jump tables): the switch
 // cases (values traced from retail's decision tree, in retail body order)

@@ -1,7 +1,7 @@
 // FileStream.cpp -- near misses of the buffered file stream (UnknownTextureStream,
-// declared in src/reconstructed/TextureMap.h), 0x00460d10..0x00461d57. The eleven
-// methods that match retail are in src/reconstructed/FileStream.cpp; these seven
-// (constructor, header check, open, seek, read, write, write-header) stay here with
+// declared in src/reconstructed/TextureMap.h), 0x00460d10..0x00461d57. The twelve
+// methods that match retail are in src/reconstructed/FileStream.cpp; these six
+// (header check, open, seek, read, write, write-header) stay here with
 // their notes. The bindings file covers both.
 //
 // A stream reads a file directly or a slice (+0x130, +0x04) of an inner stream (+0x1c);
@@ -18,7 +18,11 @@
 //   where retail keeps `*p++` inside the expression.
 // - 0x00461b90: retail stores the 0xfa seed inside the inlined strcat and sets up the
 //   name pointer (lea esi) right after strlen; no statement order, helper, index or
-//   countdown loop shape moves those two.
+//   countdown loop shape moves those two. Swept without gain (257/282 best):
+//   the seed store at each of 168 positions with (char)0xfa, -6, '\xfa' and
+//   0xfa, for/split-p++/countdown loops with early or late `p`, inline seed
+//   helpers taking the stream, a char* or a char&, a char& key alias for some
+//   or all uses and `p` set before strlen; strcpy(name + strlen) gives 166.
 //   Storing the seed before _splitpath matches the lea esi but moves the store ahead
 //   of the call; storing it after strlen also leaves 2 differences.
 // - 0x004618e0: retail loads buffer/size/count into registers before the pushes;
@@ -38,10 +42,10 @@
 //   helpers for the close, resync, encoded write and plain write, dead
 //   locals or empty statements at six positions and an else-return copy.
 //   FILE* locals in the seek block and a nested fseek(f, ftell(f)) are worse.
-// - 0x00460d10: a member-initialiser list stores in declaration order (62% with every
-//   field in it), but retail's order is the body order below with the argument
-//   loaded into edx at entry; neither form, a local copy nor chained assignments
-//   reproduce the entry load.
+//   A later 88-variant sweep (fseek `!= 0`, a result local, FILE* locals or
+//   references for some or all reads of field_0x14, comma zeroing, ternary,
+//   else and positive encoded returns, the top-level branch inverted) stays
+//   at 136 or below.
 // - 0x00461340: retail loads the decoded position (+0x0c) once and keeps the next
 //   pointer in a different register; the `position` ternary, an explicit if/else
 //   and assigning position before the zero test all give the same or worse code.
@@ -71,28 +75,6 @@ static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream
         stream = stream->field_0x1c;
     }
     return stream;
-}
-
-// 0x00460d10. Near miss (22%): retail loads the argument into edx on entry and stores
-// it in sequence; every ordering tried here loads it just before its store.
-UnknownTextureStream::UnknownTextureStream(int a)
-{
-    field_0x08 = 0;
-    field_0x10 = 0;
-    field_0x01 = 0;
-    field_0x14 = 0;
-    field_0x03 = 0;
-    field_0x1c = 0;
-    field_0x0c = 0;
-    field_0x130 = 0;
-    field_0x04 = 0;
-    field_0x02 = 'F';
-    field_0x00 = 'A';
-    field_0x20 = 'O';
-    field_0x18 = 'E';
-    field_0x12c = (UnknownResourceManager*)a;
-    field_0x124 = field_0x21;
-    field_0x128 = field_0x21;
 }
 
 // Whether the next four bytes are the "FAOE" header. As an inline helper the

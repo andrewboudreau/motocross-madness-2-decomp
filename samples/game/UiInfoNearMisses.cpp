@@ -10,7 +10,10 @@
 // Store-order permutations, struct-assignment copies and memset forms tried
 // (all 120 orders of the five leading +0x27f8 stores: storing field_0x00
 // first gives retail's ecx/eax/edx constants but not its schedule; best
-// 371/427).
+// 371/427). Also no gain over the kept form: a reference or pointer alias
+// of field_0x27f8 used for the field_0x00 store, the other stores and the
+// memcpy sources (32 combinations), the second memcpy at every later
+// position and a struct assignment at every position.
 //
 // TrackGameMode::UnknownFunction5238f0 (0x005238f0, 353 bytes): 190 of 357.
 // The found block written once after the CD retry (`if (file) { ...; return

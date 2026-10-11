@@ -7,7 +7,14 @@
 // differently). Retail then rotates registers differently in both
 // button-event calls (joystickIndex in ecx and the global in edx, not eax and
 // ecx) and in the POV copy. Pointer, unsigned, store-in-branch and
-// device-local forms do not fix it.
+// device-local forms do not fix it. Also tried without gain: the
+// pressed/previous loads swapped, `previous != pressed`, the state store
+// embedded in the test, an unsigned shift, `!pressed`, `pressed` as the
+// call argument, `this->joystickIndex`, a controlInterface or index local
+// (335), the inverted branch (356), an hr local, an empty-if inversion of
+// the gamepad test and loop counters declared up front. VC6 here assigns
+// the scratch registers in strict eax/ecx/edx rotation, as retail does, but
+// retail's rotation starts one step later (ecx) at the first branch.
 //
 // PCJoystickDevice::ReadBufferedState (0x004c3100, 1652 bytes with jump
 // tables): the buffered reader. Its control flow and switches line up (a

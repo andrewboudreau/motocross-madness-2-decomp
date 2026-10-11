@@ -9,7 +9,7 @@
 // byte by byte with a running key seeded from the file name.
 //
 // This file holds the methods that match retail byte for byte. The near misses
-// (constructor, header check, open, seek, read, write, write-header) stay in
+// (header check, open, seek, read, write, write-header) stay in
 // samples/io/FileStream.cpp with their notes; docs/FILESTREAM.md has the table.
 
 #include <io.h>
@@ -29,6 +29,30 @@ static inline UnknownTextureStream* InnermostStream(UnknownTextureStream* stream
         stream = stream->field_0x1c;
     }
     return stream;
+}
+
+// 0x00460d10. The buffer pointer is named before the argument store: only then does VC6
+// load the argument at entry (edx) and keep the buffer address in ecx for both pointer
+// stores, as retail does.
+UnknownTextureStream::UnknownTextureStream(int a)
+{
+    field_0x08 = 0;
+    field_0x10 = 0;
+    field_0x01 = 0;
+    field_0x14 = 0;
+    field_0x03 = 0;
+    field_0x1c = 0;
+    field_0x0c = 0;
+    field_0x130 = 0;
+    field_0x04 = 0;
+    field_0x02 = 'F';
+    field_0x00 = 'A';
+    field_0x20 = 'O';
+    field_0x18 = 'E';
+    char* buffer = field_0x21;
+    field_0x12c = (UnknownResourceManager*)a;
+    field_0x124 = buffer;
+    field_0x128 = buffer;
 }
 
 // 0x00460d60

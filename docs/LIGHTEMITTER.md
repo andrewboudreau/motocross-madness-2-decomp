@@ -27,9 +27,11 @@ Names are provisional.
   the global TrackGame at `0x006851a0`. The definition of
   `g_TrackGame` is placed here because `0x0056e26c` follows this
   file's strings in .data (strong inference). `SendDebugMessage` is
-  now declared variadic (retail calls `_vsnprintf`). 14 cases. Near misses
-  in `samples/net/MSZoneInterfaceNearMisses.cpp`: the lobby queries
-  `0x004aa360` and `0x004aa4e0` (failure-block placement). The soultree
+  now declared variadic (retail calls `_vsnprintf`). 16 cases, including
+  the lobby queries `0x004aa360` and `0x004aa4e0`: their response checks
+  are separate `if (...) goto failed;` tests with the shared free/return 0
+  block under the last test, which gives retail's failure-block placement
+  (one `||` condition moves the block). The soultree
   physics inlines inside this TU (`0x004aa150..0x004aa340`) stay in
   `samples/physics`.
 
