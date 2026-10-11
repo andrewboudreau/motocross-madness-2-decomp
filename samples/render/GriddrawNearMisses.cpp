@@ -36,7 +36,12 @@
 // retail keeps the zero start offset in eax from the prologue and compares
 // the range pointer and block index against it (`cmp esi,eax`), with the
 // draw data in edi and the ranges in esi; VC6 here uses `test` and swaps
-// esi/edi. Five placements of the zero initialisers were tried.
+// esi/edi. Five placements of the zero initialisers were tried. Also
+// unchanged (395): `indexStart = vertexStart`, `ranges != 0`, `!block`, an
+// assignment inside the test, a draw-data local, unsigned/long vertexStart
+// and all four block locals declared at the top; initialising indexStart
+// with vertexStart at the top (four spellings) gives 355, short types and a
+// vertexStart assigned only in the else are far worse.
 //
 // DrawableGridNode 0x00481300 (4-cell block walk, 216 bytes; 114 of 216):
 // retail forms the child index as `lea ecx,[edi+ebp]; add ecx,table[quad]`;

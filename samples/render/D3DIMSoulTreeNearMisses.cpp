@@ -20,7 +20,10 @@
 // +0x164 address in ebp where retail uses edx. Unchanged by `high + low`,
 // `0.5f * (...)`, named center/extent locals, operator+ with by-value
 // operands or swapped component sums; explicit component constructors are
-// worse.
+// worse. Retail sums every component low-first and forms +0x164 in edx
+// after the +0x158 stores; VC6 here sums y and z high-first. Worse: the
+// zero reset as `high` then `low` (604) or chained (515-518), `high`
+// declared first (596), the Lower calls first (588) or interleaved (556).
 //
 // SelectLod (0x00443de0, 592 bytes): the level-of-detail and
 // mip chooser. Writing the camera expression without a local reproduces
