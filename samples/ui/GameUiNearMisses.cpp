@@ -99,7 +99,10 @@
 //   eax (loaded after `test eax, eax`), VC6 here edx, and the register
 //   choice ripples into the Enter case (`eventCode` in eax). BOOL/char/
 //   unsigned locals, function-scope locals, other declaration orders (worse)
-//   and the locals before the call (worse) were tried.
+//   and the locals before the call (worse) were tried. Also worse
+//   (2026-10-11): only one of the two locals (1004 with `length`, 351 with
+//   `cursor`), neither (339), the call as the if condition, and the two
+//   decrements in the other order (1002).
 // 0x00478570 UIMultiState slot 40 (139/682): retail keeps &+0x1bc in ebx and
 //   shares its spill slot with the DC.
 // 0x0047a400 drop-down layout (320/960): store scheduling of the part rects
