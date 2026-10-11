@@ -5,7 +5,11 @@
 // index in eax (reusing the node register) and compares gridX through ecx and gridZ
 // through edx, VC6 here swaps them. Index locals, operand order, pointer walks, the
 // shape of the final test, recursive forms, /G6, /O1 and /Oy- (about thirty
-// spellings) do not change it.
+// spellings) do not change it. Nor do 82 more forms: `while (table)`,
+// `for (;;) ... break` or `while (node->children)` walks (a child local or
+// not), row/col/index/shift locals, `*(table + ...)`, redundant parentheses
+// in the index or the test, `&&`/`||`/two-if/ternary tests, swapped or
+// z-first comparisons and int casts or locals for gridX/gridZ (77/86 at best).
 //
 // 0x00483910 (cell sampler, 1067 bytes): 1040/1067, 331 vs 330 instructions. The
 // frame (0x14), the leaf-first layout, the descent loop (VC6's tail-recursion

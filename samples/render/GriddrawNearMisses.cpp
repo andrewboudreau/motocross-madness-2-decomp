@@ -23,7 +23,11 @@
 // min`), retail the minimum (`fld min; fmul cell`). Not moved by either
 // operand order, the sum order in the centre terms, a `cell` local, inline
 // multiply helpers (value-first or cell-first), a GridVec3 constructor for
-// the centre, or a reordered 0x16c/0x170 sum.
+// the centre, or a reordered 0x16c/0x170 sum; nor by 432 centre/extent forms
+// (centre product order and parentheses times extent operand order and
+// parentheses), all identical. Probes show the order follows the leaves:
+// extent.x with +0x168 gives min-first, extent.z with +0x164 cell-first, and
+// moving extent.x after the 0.1 test or using +0x18 keeps cell-first.
 //
 // DrawableGridNode 0x00480ad0 (4-cell block draw, 438 bytes; 395 of 438):
 // retail keeps the zero start offset in eax from the prologue and compares

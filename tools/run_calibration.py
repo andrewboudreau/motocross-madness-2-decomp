@@ -17914,6 +17914,15 @@ CASES = [
         'reason': 'called by the draw function; FVF 0x1e2',
     },
     {
+        'name': 'D3DIMSoulTree.CPP D3DIMSoulTree vertex crosses 0x4431f0',
+        'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
+        'source': 'src/reconstructed/D3DIMSoulTree.cpp',
+        'symbol': '?DrawVertexCrosses@D3DIMSoultreeObject@@QAEXPAUUnknownSoultreeSurface@@@Z',
+        'target_va': '0x004431f0',
+        'target_size': 512,
+        'reason': 'called by the draw function; static size 0x568948 = 0.025',
+    },
+    {
         'name': 'D3DIMSoulTree.CPP D3DIMSoulTree surface buffers 0x4433f0',
         'bindings': 'src/reconstructed/D3DIMSoulTree.bindings.json',
         'source': 'src/reconstructed/D3DIMSoulTree.cpp',

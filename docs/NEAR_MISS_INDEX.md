@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 195, c 148, total 343. The three class (a) functions of the
+Counts: a 0, b 194, c 148, total 342. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -248,12 +248,11 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/CubeDraw | `0x0043e0b0` | 30/352 | c | 22 code diffs: retail adds `push ebx`; retail adds `mov ecx, [esp + N]` |
 | render/CubeDraw | `0x0043e330` | 90/399 | b | 15 code diffs: `mov ecx, [edi + 0x18] ; mov eax, [ecx +~` vs `mov eax, [edi + 0x18] ; mov ecx, [eax +~`; `mov eax, [ecx + 8] ; mov edx, [eax + 0x~` vs `mov ecx, [eax + 8] ; mov edx, [ecx + 0x~`; slots differ |
 | render/CubeDraw | `0x0043e4c0` | 203/886 | c | 38 code diffs: `sub esp, 0x50` vs `sub esp, 0x54`; `push 0 ; push 0` vs `xor esi, esi ; push esi ; push esi` |
-| render/D3DIMSoulTree | `0x00440060` | 1958/1964 | c | frame matches; 1 code diff: retail forms the surface address `offset + surfaces` (`mov ebx, [esp + N] ; mov edi, [esi + 4]`), VC6 `surfaces + offset`; it follows the amount of vertex-loop IR, not spelling (sample header) |
+| render/D3DIMSoulTree | `0x00440060` | 1958/1964 | c | frame matches; 1 code diff: retail forms the surface address `offset + surfaces` (`mov ebx, [esp + N] ; mov edi, [esi + 4]`), VC6 `surfaces + offset`; it follows the amount of vertex-loop IR, not spelling (sample header) |; colour-pack parentheses (108 forms) and surface/vertex pointer locals do not move it |
 | render/D3DIMSoulTree | `0x00440810` | 135/1349 | b | 50 code diffs: `jle @345 ; xor esi, esi` vs `jle @340`; `mov [esp + N], esi ; mov eax, [edi + 0x~` vs `mov edx, [edi + 0x1c] ; mov esi, ebx ; ~`; frame 0x84 vs 0x80, slot order differs |
 | render/D3DIMSoulTree | `0x00440d40` | 241/486 | b | 8 code diffs: `mov ebp, [edi + 4]` vs `mov ecx, [edi + 4]`; `add ebp, eax` vs `mov ebp, eax ; add ebp, ecx`; slots differ |
 | render/D3DIMSoulTree | `0x00440f30` | 241/763 (masked) | b | 39 code diffs: `push ebx ; mov ebx, ecx ; mov [esp + N]~` vs `push esi ; mov esi, ecx ; mov [esp + N]~`; `je @1860 ; mov eax, [ebx + 0x18c]` vs `je A ; mov eax, [esi + 0x18c]`; frame 0x940 vs 0x9e8, slot order differs |
 | render/D3DIMSoulTree | `0x00442fe0` | 77/504 (masked) | b | 37 code diffs: retail adds `mov esi, ecx`; retail lacks `mov edi, ecx`; slot order differs |
-| render/D3DIMSoulTree | `0x004431f0` | 100/122 (masked) | b | 8 code diffs: `xor ebx, ebx` vs `xor edi, edi`; `push ebx` vs `push edi`; frame 0x134 vs 0x130 |
 | render/D3DIMSoulTree | `0x004435b0` | 135/404 | b | 22 code diffs: retail adds `xor ebp, ebp`; retail lacks `xor edi, edi`; slots differ |
 | render/D3DIMSoulTree | `0x00443740` | 66/796 | b | 29 code diffs: retail adds `xor ebp, ebp`; retail lacks `push 0`; slots differ |
 | render/D3DIMSoulTree | `0x00443aa0` | 799/832 | c | 11 code diffs: retail lacks `fmul [eax + 0x10] ; fld [esp + N]`; retail lacks `faddp st(1)` |
@@ -269,11 +268,11 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/Grid1 | `0x0047caa0` | 104/1740 | b | slot 3 texture stage switch; frame 0x14 vs retail 0x10, 93 code diffs (samples/render/Grid1NearMisses.cpp) |
 | render/Grid1 | `0x0047d470` | 309/786 | b | 31 code diffs: retail adds `mov edi, [esp + N]`; retail lacks `mov edi, [esp + N]`; frame 0x838 vs 0x834, slot order differs |
 | render/Grid1 | `0x0047d780` | 216/1008 | b | 50 code diffs: `je @321 ; mov esi, [esp + N]` vs `je @315`; `mov eax, [esi]` vs `mov edi, [esp + N]`; slot order differs |
-| render/GridNode | `0x00484d70` | 81/90 | c | 3 code diffs: `mov ecx, [eax*4 + A] ; add ecx, ebx ; m~` vs `mov eax, [eax*4 + A] ; add eax, ebx ; m~`; retail adds `xor ecx, ecx ; mov cx, word ptr [eax + ~` |
+| render/GridNode | `0x00484d70` | 81/90 | c | 3 code diffs: `mov ecx, [eax*4 + A] ; add ecx, ebx ; m~` vs `mov eax, [eax*4 + A] ; add eax, ebx ; m~`; retail adds `xor ecx, ecx ; mov cx, word ptr [eax + ~` |; ~110 loop, index-local, final-test and parenthesis spellings unchanged |
 | render/GridNode | `0x00483910` | 1040/1067 | c | cell sampler: 4 code diffs in the shift setup only; retail reuses the level byte of the leaf test (`and eax, 0xff ; shl eax, 2`, children into ecx), VC6 re-reads it (`xor eax, eax ; mov al, [ecx + 0x28]`) |
 | render/GridNode | `0x00483d40` | 96/4189 | b | slot 1: ebp frame and four bare `fistp [eax]` from an `__asm` rounding helper (`__ftol` still used elsewhere), so unreachable under the no-inline-asm rule; `/Oy-` changes nothing else |
 | render/Griddraw | `0x0047de90` | 977/1083 (masked) | c | 30 code diffs: retail lacks `mov esi, [esp + N]`; `mov edi, [ebp*N + N]` vs `mov edi, [esp + N]` |
-| render/Griddraw | `0x0047e600` | 1605/1617 (masked) | c | frame matches; the extent.x/extent.y products load the cell size first (`fld [edx + 0x40] ; fmul [ecx + 0x164]`), retail the minimum |
+| render/Griddraw | `0x0047e600` | 1605/1617 (masked) | c | frame matches; the extent.x/extent.y products load the cell size first (`fld [edx + 0x40] ; fmul [ecx + 0x164]`), retail the minimum |; the order follows which fields are read (+0x168 gives min-first, +0x164/+0x18 cell-first), not source order or parentheses (432 forms) |
 | render/Griddraw | `0x0047f210` | 361/543 (masked) | b | 29 code diffs: retail adds `xor esi, esi`; retail lacks `xor edi, edi`; slot order differs |
 | render/Griddraw | `0x00480ad0` | 363/406 (masked) | b | 15 code diffs: retail adds `push ebp`; `push ebp` vs `push esi`; slots differ |
 | render/Griddraw | `0x00481300` | 121/216 (masked) | c | child index: `lea ecx, [edi + ebp] ; add ecx, table[quad]` vs `mov edx, table[quad] ; add edx, edi ; add edx, ebp` |
@@ -315,7 +314,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | track/Track | `0x00515ed0` | 117/2400 (masked) | b | draft: frame 0x64 vs retail 0x48 and retail keeps `this` in ebp, so every frame offset differs; dispatch, calls and arithmetic follow retail |
 | track/Track | `0x00516980` | 465/776 (masked) | c | as `0x00516ca0`: VC6 reuses the `p - segment` differences in the t < 0 and t == 0 branches, retail recomputes them; later offsets shift |
 | track/Track | `0x00516ca0` | 307/520 (masked) | b | 20 code diffs; slots differ |
-| track/Track | `0x00516ef0` | 1032/1042 | c | edge 6 of the crossing test computes `b.z - a.z` before `p.x - a.x` in retail; edge 2 matches with the helper's first factor written `((b->x - a->x))` |
+| track/Track | `0x00516ef0` | 1032/1042 | c | edge 6 of the crossing test computes `b.z - a.z` before `p.x - a.x` in retail; edge 2 matches with the helper's first factor written `((b->x - a->x))` |; retail orders edges 2, 5, 6 one way and 1, 3, 4 the other; ~5,500 parenthesis/cast/struct/local forms give 1032 at best |
 | track/Track | `0x00517340` | 57/655 (masked) | b | 44 code diffs: retail lacks `mov [esp + N], 0`; `add esp, 0x24` vs `add esp, 0x20`; frame 0x24 vs 0x20 |
 | track/Track | `0x0051ffe0` | 186/511 (masked) | c | 6 code diffs: `test eax, eax ; je @238` vs `cmp eax, ebx ; je A`; `call A ; movsx ebx, byte ptr [esp + edi~` vs `jmp A` |
 | track/TrackOverlay | `0x005194b0` | 246/844 (masked) | b | 10 code diffs: retail lacks `mov [esp + N], 0x10`; retail lacks `mov byte ptr [esp + N], bl`; slot order differs |
@@ -325,7 +324,7 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | track/TrackOverlay | `0x0051c720` | 249/962 (masked) | b | 10 code diffs: `mov [ebp + N], ecx ; fstp [ebx + 0x1dc]~` vs `mov [ebx + 0x1bc], ecx`; retail adds `fstp [esi] ; fild [esp + N]`; frame 0x74 vs 0x8c, slot order differs |
 | track/TrackOverlay | `0x0051cf80` | 583/1779 (masked) | c | 35 code diffs: `jle @263 ; mov ecx, [ebx + 4] ; mov eax~` vs `jle @267 ; mov ecx, ebx ; mov ebx, [ebx]`; retail lacks `mov edx, [ebx] ; mov [esp + N], ecx` |
 | track/TrackOverlay | `0x0051d730` | 214/510 (masked) | b | 26 code diffs: `xor ebp, ebp` vs `xor ebx, ebx`; `mov [esi + 0x198], ebp ; mov [esp + N],~` vs `mov [esi + 0x198], ebx ; mov [esp + N],~`; slots differ |
-| track/TrackOverlay | `0x0051e3f0` | 886/894 (masked) | b | 6 code diffs: `mov edx, [ebx + ebp*4 + 0x16c]` vs `mov eax, [ebx + ebp*4 + 0x16c]`; `lea eax, [esp + N] ; fld [edx + 0x4a4]` vs `lea ecx, [esp + N] ; fld [eax + 0x4a4]`; slots differ |
+| track/TrackOverlay | `0x0051e3f0` | 886/894 (masked) | b | 6 code diffs: `mov edx, [ebx + ebp*4 + 0x16c]` vs `mov eax, [ebx + ebp*4 + 0x16c]`; `lea eax, [esp + N] ; fld [edx + 0x4a4]` vs `lea ecx, [esp + N] ; fld [eax + 0x4a4]`; slots differ |; the "%.3f" branch register choice (racer eax, buffer ecx, game edx); shadowing-size, racer-local and branch forms reach 853-886 |
 | ui/DlgProcs | `0x0044b200` | 925/5232 | b | 144 code diffs: `ja @1362` vs `ja A`; `jmp @1362` vs `jmp A`; frame 0xc64 vs 0x6c4 |
 | ui/DlgProcs | `0x0044fae0` | 1181/1235 | b | 8 code diffs: retail lacks `mov edi, esp`; retail adds `mov edi, esp`; slots differ |
 | ui/DlgProcs | `0x004507a0` | 589/1668 | c | 32 code diffs: `mov eax, [edx + 0x570] ; mov ecx, [eax ~` vs `mov ecx, [edx + 0x570] ; lea eax, [edx ~` |

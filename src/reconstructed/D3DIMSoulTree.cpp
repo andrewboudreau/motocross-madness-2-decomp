@@ -301,6 +301,55 @@ void D3DIMSoultreeObject::DrawWireframe(UnknownSoultreeSurface* surface)
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot8(D3DRENDERSTATE_FILLMODE, D3DFILL_SOLID, 1);
 }
 
+// 0x004431f0: a six-point cross (+-size on each axis, red lines) at every
+// vertex of the surface's vertex groups. The group is read through
+// surface->groups[i] at each use (a group pointer local gives VC6's
+// `offset + groups` add, retail adds `groups + offset`) and the transformed
+// point is copied per component (a Vector3 assignment gives another frame
+// slot and register allocation).
+void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
+{
+    static float size = 0.025f;                    // 0x00568948
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
+    Vector3 offsets[6];
+    UnknownSoultreeVertex cross[6];
+    int k;
+    for (k = 0; k < 6; k++) {
+        offsets[k].x = 0.0f;
+        offsets[k].y = 0.0f;
+        offsets[k].z = 0.0f;
+        cross[k].tu = 0;
+        cross[k].tv = 0;
+        cross[k].specular = 0xff0000;
+        cross[k].diffuse = 0;
+    }
+    offsets[0].x += size;
+    offsets[1].x -= size;
+    offsets[2].y += size;
+    offsets[3].y -= size;
+    offsets[4].z += size;
+    offsets[5].z -= size;
+    for (int i = 0; i < surface->groupCount; i++) {
+        for (int j = 0; j < surface->groups[i].vertexCount; j++) {
+            for (k = 0; k < 6; k++) {
+                Vector3 point;
+                point.x = surface->groups[i].transformedVertices[j].position.x;
+                point.y = surface->groups[i].transformedVertices[j].position.y;
+                point.z = surface->groups[i].transformedVertices[j].position.z;
+                point += offsets[k];
+                point = surface->groups[i].node->UnknownFunction4fd660(point);
+                cross[k].position.x = point.x;
+                cross[k].position.y = point.y;
+                cross[k].position.z = point.z;
+            }
+            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)cross, 6, 0);
+        }
+    }
+    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
+}
+
 // 0x004433f0
 void D3DIMSoultreeObject::UnknownFunction4433f0(int surface, UnknownSoultreeVertex** vertices,
                                                 int* vertexCount, unsigned short** indices, int* indexCount,

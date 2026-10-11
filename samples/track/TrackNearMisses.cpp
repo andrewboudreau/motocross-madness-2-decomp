@@ -27,6 +27,14 @@
 // pointers to the edge points fixes that. Edge points by reference give the
 // same 1023; by value, or p by reference or pointer, the helper is no longer
 // inlined; p after the edge pointers in the parameter list is worse (994).
+// Also 1032 at best: 100 argument parenthesis/cast forms for edge 6, 648
+// parenthesis depths of the four factors, both products and `p.z >= a->z`,
+// 256 forms of the condition comparisons, and the edge points as struct
+// locals, inline struct casts, TrackVec3 locals, `+ i`/`[i]` indexing or six
+// named locals, each with 324 parenthesis forms (4536 compiles). Retail
+// computes b.z - a.z first in edges 2, 5 and 6 and p.x - a.x first in 1, 3
+// and 4; edges 3 and 6 differ only in their base pointer, so the tie-break
+// is not structural.
 //
 // Track::UnknownFunction517340 (0x00517340, 1509 bytes; the candidate is
 // 1533): the walk, the strip test, the candidate list and the acceptance

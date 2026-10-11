@@ -43,7 +43,10 @@
 // eax), and loads the game pointer into edx (here ecx). Inverted branches, a
 // racer local in that branch, a game local, a float or double local and a
 // buffer pointer do not change it; nor do an inline float or double
-// accessor for +0x4a4, an explicit (double) cast or `&text[0]`.
+// accessor for +0x4a4, an explicit (double) cast or `&text[0]`. Also tried:
+// no inner shadowing `size` (853), a racer local at the top of the else
+// (worse), a racer local in the "%.3f" branch only, `!= 0` tests, no racer
+// local in the 0x6c0 branch (884) and unbraced if/else (unchanged).
 
 // RadarOverlay::DrawTrackOutline (0x0051c720, 1016 bytes; candidate
 // 1002): draws the track outline through a TrackListItem work list. The

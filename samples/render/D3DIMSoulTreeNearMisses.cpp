@@ -11,7 +11,12 @@
 // vertex loop (emptying it or dropping half its statements gives retail's
 // order, no single deletion does), every neutral rewrite of the s-loop
 // surface pointer, the loop declarations and the group loops was tried, and
-// a 0..63 typedef prefix scan leaves it unchanged. Before that change:
+// a 0..63 typedef prefix scan leaves it unchanged. Also unchanged or worse:
+// 108 parenthesis forms of the colour pack; the surface pointer as `+= s`,
+// declared at function or LOD scope, a reference, `s` declared outside the
+// loop or a char* offset (`&lodTable[lod].surfaces[s]` is much worse); and
+// vertex/normal/copy pointer locals in the vertex loop with each uv source.
+// Before that change:
 // retail forms the surface address as
 // `offset + surfaces` (mov ebx, offset; mov edi, surfaces; add ebx, edi)
 // and stores the face indices as [faces + offset]; VC6 emits
@@ -90,12 +95,15 @@
 // t2, t1, t0, unchanged by its 264 orders); not kept, since nothing ties
 // those per-element forms to the source.
 //
-// DrawNormals (normals, 528 bytes) and DrawVertexCrosses
-// (vertex crosses, 512 bytes): both scale by function-local statics in
-// .data (0x00568944 = 0.5, 0x00568948 = 0.025), which is what puts the
-// variable before the vertex operand in retail's fmul/fadd. Remaining:
-// retail materializes the face-group address with `lea` and keeps
-// different induction registers.
+// DrawNormals (normals, 528 bytes): scales by the function-local static
+// 0x00568944 = 0.5, which is what puts the variable before the vertex
+// operand in retail's fmul/fadd. Remaining: retail materializes the
+// face-group address with `lea` and keeps different induction registers.
+// Its sibling DrawVertexCrosses (0x004431f0) is exact in
+// src/reconstructed/D3DIMSoulTree.cpp once the `group` pointer local is
+// dropped and the call result is copied per component; the same two changes
+// here (group local position, per-component from/to/line copies, 96 combos)
+// reach 99..114/504 at best, so DrawNormals needs something else.
 //
 // DrawCurrentLod (0x00440f30..0x00442dd8, 7848 bytes): the drawing
 // function. A nine-way switch on the material mapping type (+0xc8; source
@@ -710,49 +718,6 @@ void D3DIMSoultreeObject::DrawNormals(UnknownSoultreeSurface* surface)
             line[1].diffuse = 0;
             line[1].specular = 0xffffff;
             ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)line, 2, 0);
-        }
-    }
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
-}
-
-// 0x004431f0
-void D3DIMSoultreeObject::DrawVertexCrosses(UnknownSoultreeSurface* surface)
-{
-    static float size = 0.025f;                    // 0x00568948
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot7(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
-    ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(2, 0);
-    Vector3 offsets[6];
-    UnknownSoultreeVertex cross[6];
-    int k;
-    for (k = 0; k < 6; k++) {
-        offsets[k].x = 0.0f;
-        offsets[k].y = 0.0f;
-        offsets[k].z = 0.0f;
-        cross[k].tu = 0;
-        cross[k].tv = 0;
-        cross[k].specular = 0xff0000;
-        cross[k].diffuse = 0;
-    }
-    offsets[0].x += size;
-    offsets[1].x -= size;
-    offsets[2].y += size;
-    offsets[3].y -= size;
-    offsets[4].z += size;
-    offsets[5].z -= size;
-    for (int i = 0; i < surface->groupCount; i++) {
-        for (int j = 0; j < surface->groups[i].vertexCount; j++) {
-            for (k = 0; k < 6; k++) {
-                UnknownSoultreeFaceGroup* group = &surface->groups[i];
-                Vector3 point;
-                point.x = group->transformedVertices[j].position.x;
-                point.y = group->transformedVertices[j].position.y;
-                point.z = group->transformedVertices[j].position.z;
-                point += offsets[k];
-                point = group->node->UnknownFunction4fd660(point);
-                cross[k].position = point;
-            }
-            ((RenderTarget*)field_0x18)->UnknownVirtualSlot16(D3DPT_LINELIST, D3DFVF_LVERTEX, (int)cross, 6, 0);
         }
     }
     ((RenderTarget*)field_0x18)->UnknownVirtualSlot10(7, 0);
