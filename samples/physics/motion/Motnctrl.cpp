@@ -122,6 +122,10 @@ void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle);
 // 'angle' about 'axis'.  The pose's axes and position form a matrix (row 0 the cross of axisY and
 // axisZ), which is multiplied by the rotation; the position is copied unchanged.
 // Partial (targets.json); 0..15 dead initialised int locals at the top of the function change nothing.
+// Swept (tools/sweep_variants.py): every declaration order of pose/rotation/position/axisX/axisZ
+// (hoisted or not) leaves 456 masked; normalising axisZ first gives 448; initialising from
+// Vec3Normalize(src->...), via copies, named or scoped temporaries, and `Vec3 position =
+// src->position` are all worse (55..193).
 void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 {
     Matrix4 pose;
