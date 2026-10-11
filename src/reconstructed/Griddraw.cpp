@@ -54,6 +54,7 @@ int g_gridQuadOrder[16] = {
 extern int g_gridDrawMemory;      // bytes held by node vertex buffers
 extern int g_gridDrawFrameCount;  // top-level node visits
 extern int g_gridDrawMemoryPeak;  // 0x0068a2fc, high-water mark of g_gridDrawMemory
+float FastSqrt(float x);         // 0x00460b50
 
 int g_gridSize = 1 << (g_gridLevels - 1);               // 0x0067a684 ($E 0x0047ddb0)
 GridVertexCache g_gridVertexCache;                      // 0x00677910 ($E 0x0047dde0)
@@ -1144,6 +1145,43 @@ void DrawableGridNode::UnknownFunction482c90(int x, int z, int flag)
     }
 }
 
+// 0x00482dd0: sets or clears direction bit `dir` of a vertex, re-tests it
+// and forwards border vertices to the parent node. Both paths set one
+// `notify` flag; VC6 then threads it into a single notify block and places
+// the `!changed` return after it, as retail does (gotos or two notify blocks
+// place the return check inline).
+void DrawableGridNode::UnknownFunction482dd0(int x, int z, int flag, int dir, GridBaseCell* origin)
+{
+    if (x < 0 || z < 0 || x > 16 || z > 16)
+        return;
+    terrain->field_0x9c++;
+    int changed = 0;
+    int i = g_gridRow17[z] + x;
+    GridBaseCell* cell = &block->cells[i];
+    int notify = 0;
+    if (flag) {
+        if (!(data->field_0x000[i] & (unsigned char)dir)) {
+            data->field_0x000[i] |= (unsigned char)dir;
+            changed = 1;
+        }
+        if (!(data->field_0x000[i] & 0x80)) {
+            data->field_0x000[i] |= 0x80;
+            notify = 1;
+        }
+    } else {
+        data->field_0x000[i] &= ~(unsigned char)dir;
+        if (!(data->field_0x000[i] & 0xf) && UnknownFunction482f00(x, z))
+            notify = 1;
+    }
+    if (notify) {
+        data->b1 = 1;
+        UnknownFunction482c90(x, z, data->field_0x000[i] & 0x80);
+    } else if (flag && !changed)
+        return;
+    if (parent && !origin && (x == 0 || x == 16 || z == 0 || z == 16))
+        ((DrawableGridNode*)parent)->UnknownFunction4835c0(this, x, z, flag, dir, cell);
+}
+
 // 0x00482f00: re-tests a vertex that lost its pins; returns 1 when the
 // vertex was dropped.
 int DrawableGridNode::UnknownFunction482f00(int x, int z)
@@ -1322,6 +1360,47 @@ int DrawableGridNode::UnknownFunction481a20(int block)
     else
         data->field_0x178 &= ~(1 << block);
     return visible;
+}
+
+// 0x00481b30: distance from the viewer to a 4 x 4 block's box.
+float DrawableGridNode::UnknownFunction481b30(int block)
+{
+    float ex = terrain->viewerX;
+    float ey = terrain->viewerY;
+    float ez = terrain->viewerZ;
+    float size = (data->field_0x16c - data->field_0x164) * 0.25f;
+    float minX = (block % 4) * size + data->field_0x164;
+    float maxX = minX + size;
+    float minZ = (block / 4) * size + data->field_0x168;
+    float maxZ = minZ + size;
+    // Squared distances from the viewer to the block's x and z ranges; each
+    // bound is replaced by the viewer's offset from it. (With separate delta
+    // locals VC6 folds the single-use maxX into minX + size; retail stores it.)
+    float distX;
+    if ((minX = ex - minX) < 0.0f)
+        distX = minX * minX;
+    else if ((maxX = ex - maxX) > 0.0f)
+        distX = maxX * maxX;
+    else
+        distX = 0.0f;
+    float distZ;
+    if ((minZ = ez - minZ) < 0.0f)
+        distZ = minZ * minZ;
+    else if ((maxZ = ez - maxZ) > 0.0f)
+        distZ = maxZ * maxZ;
+    else
+        distZ = 0.0f;
+    float dist = distX + distZ;
+    float distY;
+    float below = ey - field_0x18;
+    float above = ey - field_0x1c;
+    if (below < 0.0f)
+        distY = below * below;
+    else if (above > 0.0f)
+        distY = above * above;
+    else
+        distY = 0.0f;
+    return FastSqrt(distY + dist);
 }
 
 // 0x00481db0: the root call of the visibility walk 0x00481de0 with the

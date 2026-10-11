@@ -9,7 +9,10 @@
 // and the slot index in edi; retail keeps x in ebp, z in edi and the index
 // in esi, and computes the packed (dx << 16) + dz word as
 // ((gx * 0xffff + x) << 16) - gz + z. Index expression forms, a split
-// declaration and seven spellings of the packed word leave both unchanged.
+// declaration and seven spellings of the packed word leave both unchanged. Also
+// unchanged or worse: `* 65536`/`* 0x10000` of the x difference, the shifts
+// distributed over x and the origin, unsigned short casts, and `|` instead of
+// `+` (the `|` form gives z retail's edi but not the x/index registers, 1084).
 //
 // DrawableGridNode 0x0047e600 (node loader, 1617 bytes; 1091 of 1630): the
 // stream reads, both allocations, the bit fields and the child creation
@@ -43,6 +46,10 @@
 // and all four block locals declared at the top; initialising indexStart
 // with vertexStart at the top (four spellings) gives 355, short types and a
 // vertexStart assigned only in the else are far worse.
+// Comparing ranges with `(GridBlockRange*)vertexStart`, testing
+// `data->field_0x17c` first, `ranges = 0` and an assignment in the test, and
+// zero-initialised vertexCount/indexStart/indexCount all keep `test`: VC6
+// folds a known zero into the compare (probes never produce `cmp r, zero`).
 //
 // DrawableGridNode 0x00481300 (4-cell block walk, 216 bytes; 114 of 216):
 // retail forms the child index as `lea ecx,[edi+ebp]; add ecx,table[quad]`;
@@ -55,16 +62,9 @@
 // parentheses do not change it either (144 bracketings and orders of the
 // three terms, with the 0x0047e430 edge index's 8 forms), nor 0x0047e600's
 // extent/centre products (512 + 125 forms).
-//
-// DrawableGridNode 0x00482dd0 (direction-bit update, 300 bytes; 147 of 333):
-// retail shares one copy of the "mark dirty and notify" tail between the
-// set and clear paths and places the `!changed` early return just before
-// the parent hand-off; VC6 here keeps two copies (they differ in edx/ecx)
-// and places the return check inline. An update flag, gotos, an inverted
-// 0x80 test and the inverted branch order were tried. With `goto notify`
-// from the 0x80 branch into the clear path's notify block every instruction
-// matches retail's except that VC6 places the `!changed` return block
-// directly after the 0x80 test (retail: after the notify block).
+// Also unchanged: a `GridNode* (*)[16]` row view indexed `[r][...]`,
+// `(&children[i])[j + cell]`, `(children + i + j)[cell]` and inline child
+// lookups taking (cell, i + j), (i + j, cell), (i, j, cell) or (cell, i, j).
 //
 // DrawableGridNode 0x0047f210 (per-block buffer rebuild, 1576 bytes; 426 of
 // 1586): the calls, reallocations, copies and the bookkeeping after the loops
@@ -77,20 +77,20 @@
 // them; retail keeps both, so x steps inside the body), three m/n
 // initialisations and the origin taken from x/z.
 //
-// DrawableGridNode 0x00481b30 (block distance, 391 bytes; 139 of 393): retail
-// keeps the viewer x and the block size on the x87 stack and copies viewer
-// y and z to the frame, then adds the x and z terms before the y test with one
-// FastSqrt call per y case. VC6 here keeps a different value on the x87
-// stack. Tried four axis-distance spellings, three return forms and all six
-// orders of the viewer locals.
-//
 // DrawableGridNode 0x00483200 (border vertex walk, 955 bytes; 84 of 956):
 // control flow, the tail call VC6 turns into a loop and every call match;
 // VC6 gives x ebp and z ebx (retail: ebx and ebp) and re-reads `level` for
 // the shift loop where retail reuses al. Tried the shift and count loop
 // forms, rx as a variable or inline, the cell comparison forms, an explicit
 // node loop (worse) and x reused as the divided column.
-
+// The `z & mask + unit` argument is retail's precedence (`lea edx, [esi +
+// ecx] ; and edx, ebp`). Level reuse: an `int` copy of level reloads it, an
+// `unsigned char` copy gives retail's `test al, al` / `and eax, 0xff` pair but
+// spills the copy into an argument slot; `level > 0`, `0 < level`, a leaf-first
+// early return, and down-counting, while, unsigned char and `(int)level` loop
+// forms keep the reload. Register swap: rz as a local (worse), the cx/cz and
+// px/pz declaration and division orders, px/pz taken from cx/cz, named
+// x >> shift / z >> shift, and 0..33 dead initialised locals change nothing.
 //
 // DrawableGridNode 0x004815e0 (detail update, 1082 bytes; candidate 1083):
 // computes the squared near and far distances of the viewer to the node's
@@ -106,6 +106,13 @@
 // Tried: locals, block scopes, const/register, repeated expressions, an
 // inline helper with reference, pointer or by-value arguments, and an
 // accumulating form (which enregisters only the first delta).
+// The two 65535 clamps are written `w >= 65535.0f ? 0xffff : ...`, which gives
+// retail's branch polarity (64 of 1083; the `<` form 60). Also tried for the
+// deltas: no named deltas (expressions throughout), only one of them named,
+// the delta assigned inside the test (`(ax = ...) < 0`, comma forms), copies
+// of the bounds overwritten by the deltas (the form that made 0x00481b30
+// exact), and the far term written before the near term; none keeps both on
+// the x87 stack, and small probes never do either.
 //
 // DrawableGridNode 0x00481de0 (visibility walk, 1750 bytes; candidate
 // 1712): tests the node's box (or the four quadrant boxes, recursively,
@@ -117,6 +124,14 @@
 // retail keeps `size` then `a9` in ebx and `a1` in ebp, and lays out the
 // subdivision block after the general tests rather than as the
 // fall-through of the `size <= 1` branch, so the body differs throughout.
+// Retail's order is: the size > 1 tests, the size <= 1 block falling into
+// the subdivision, then the visible/corners tests, the all-visible loops,
+// the size == 0 child case, a second `visible` test before the a7 switch
+// (`childMask |= 1`, `2 << a8`, `0x20 << a8`; cases 1 and 2 return through
+// the `a7 != 0` exit). Writing that switch after the if/else under its own
+// `if (visible)`, `if (visible && corners == 0) ... else if (visible)`, and
+// the size branches swapped (`size <= 1` first) do not move the subdivision
+// block ahead of the tests.
 
 #include <float.h>
 #include <string.h>
@@ -442,39 +457,6 @@ int DrawableGridNode::UnknownFunction481300(int x, int z, int size, int quad)
 }
 
 
-// 0x00482dd0: sets or clears direction bit `dir` of a vertex, re-tests it
-// and forwards border vertices to the parent node.
-void DrawableGridNode::UnknownFunction482dd0(int x, int z, int flag, int dir, GridBaseCell* origin)
-{
-    if (x < 0 || z < 0 || x > 16 || z > 16)
-        return;
-    terrain->field_0x9c++;
-    int changed = 0;
-    int i = g_gridRow17[z] + x;
-    GridBaseCell* cell = &block->cells[i];
-    if (flag) {
-        if (!(data->field_0x000[i] & (unsigned char)dir)) {
-            data->field_0x000[i] |= (unsigned char)dir;
-            changed = 1;
-        }
-        if (!(data->field_0x000[i] & 0x80)) {
-            data->field_0x000[i] |= 0x80;
-            data->b1 = 1;
-            UnknownFunction482c90(x, z, data->field_0x000[i] & 0x80);
-        } else if (!changed) {
-            return;
-        }
-    } else {
-        data->field_0x000[i] &= ~(unsigned char)dir;
-        if (!(data->field_0x000[i] & 0xf) && UnknownFunction482f00(x, z)) {
-            data->b1 = 1;
-            UnknownFunction482c90(x, z, data->field_0x000[i] & 0x80);
-        }
-    }
-    if (parent && !origin && (x == 0 || x == 16 || z == 0 || z == 16))
-        ((DrawableGridNode*)parent)->UnknownFunction4835c0(this, x, z, flag, dir, cell);
-}
-
 // 0x0047f210: per-block buffer rebuild (see the note at the top).
 int DrawableGridNode::UnknownFunction47f210()
 {
@@ -597,39 +579,6 @@ int DrawableGridNode::UnknownFunction47f210()
     return 1;
 }
 
-// 0x00481b30: distance from the viewer to a 4 x 4 block's box.
-float DrawableGridNode::UnknownFunction481b30(int block)
-{
-    float ex = terrain->viewerX;
-    float ey = terrain->viewerY;
-    float ez = terrain->viewerZ;
-    float size = (data->field_0x16c - data->field_0x164) * 0.25f;
-    float minX = (block % 4) * size + data->field_0x164;
-    float maxX = minX + size;
-    float minZ = (block / 4) * size + data->field_0x168;
-    float maxZ = minZ + size;
-    float dist;
-    float d = ex - minX;
-    if (d < 0.0f)
-        dist = d * d;
-    else if (ex - maxX > 0.0f)
-        dist = (ex - maxX) * (ex - maxX);
-    else
-        dist = 0.0f;
-    if (ez - minZ < 0.0f)
-        dist += (ez - minZ) * (ez - minZ);
-    else if (ez - maxZ > 0.0f)
-        dist += (ez - maxZ) * (ez - maxZ);
-    else
-        dist += 0.0f;
-    float below = ey - field_0x18;
-    float above = ey - field_0x1c;
-    if (below < 0.0f)
-        return FastSqrt(below * below + dist);
-    if (above > 0.0f)
-        return FastSqrt(above * above + dist);
-    return FastSqrt(0.0f + dist);
-}
 
 // 0x00483200: walks a border vertex down the node tree (VC6 turns the final
 // child call into a loop, as retail does).
@@ -804,7 +753,7 @@ float DrawableGridNode::UnknownFunction4815e0(int coarse)
         else
             q = dy;
         float v = (dySq / q + q) * data->field_0x174 * terrain->field_0x74;
-        data->field_0x122 = (v < 65535.0f) ? (unsigned short)(int)v : 0xffff;
+        data->field_0x122 = (v >= 65535.0f) ? 0xffff : (unsigned short)(int)v;
         if (dyLo < 0.0f)
             dyLo = -dyLo;
         if (dyHi < 0.0f)
@@ -814,7 +763,7 @@ float DrawableGridNode::UnknownFunction4815e0(int coarse)
         float ratioNear = (m + near2) / nearDist;
         float ratioFar = (m + far2) / farDist;
         float w = ((ratioNear > ratioFar) ? ratioNear : ratioFar) * (data->field_0x174 * terrain->field_0x74);
-        data->field_0x124 = (w < 65535.0f) ? (unsigned short)(int)w : 0xffff;
+        data->field_0x124 = (w >= 65535.0f) ? 0xffff : (unsigned short)(int)w;
         return distance;
     }
     float q;

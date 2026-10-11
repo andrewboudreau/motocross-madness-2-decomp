@@ -17,7 +17,7 @@ ignored. "what differs" is the first difference the scan found, not a full
 diagnosis; the sample headers hold the forms already tried. Regenerate with
 the scan described at the end.
 
-Counts: a 0, b 177, c 125, total 302. The three class (a) functions of the
+Counts: a 0, b 176, c 124, total 300. The three class (a) functions of the
 first scan (Cube `0x0043d230`, GUIManager::SetUp `0x004853b0`,
 VisibilityClipper::SphereInFrustum `0x0052fbb0`) are exact: their slots were
 homes in dead argument slots, which VC6 hands out in the order of the
@@ -245,10 +245,8 @@ arguments' first use in the source (docs/VC6_FRAME_LAYOUT.md, fact 9).
 | render/Griddraw | `0x0047f210` | 361/543 (masked) | b | 29 code diffs: retail adds `xor esi, esi`; retail lacks `xor edi, edi`; slot order differs |
 | render/Griddraw | `0x00480ad0` | 395/438 | b | retail keeps the zero vertexStart in eax and compares ranges/block against it (`cmp esi,eax`, `indexStart = eax`), ranges in esi and data in edi; VC6 uses `test` and swaps esi/edi; ~20 init/type/declaration forms unchanged or worse |
 | render/Griddraw | `0x00481300` | 121/216 (masked) | c | child index: `lea ecx, [edi + ebp] ; add ecx, table[quad]` vs `mov edx, table[quad] ; add edx, edi ; add edx, ebp` |
-| render/Griddraw | `0x004815e0` | 59/994 (masked) | b | 39 code diffs: `push edi ; mov edx, [esi + 0x34] ; mov ~` vs `mov ecx, [esi + 0x34] ; mov edx, [esi +~`; `je @22` vs `je @19 ; fstp [esp + N] ; fld st(0)`; slots differ |
-| render/Griddraw | `0x00481b30` | 127/351 (masked) | b | 15 code diffs: `mov edx, [eax + 0x60] ; fld [eax + 0x64]` vs `fld [eax + 0x60] ; mov edx, [eax + 0x64]`; retail lacks `mov [esp + N], edx`; slots differ |
+| render/Griddraw | `0x004815e0` | 64/1083 | b | retail keeps both axis deltas on the x87 stack across the near/far branch (`fcom`, spilled in the arms) and pushes edi after the coarse return; VC6 stores them, which shifts the frame (the 65535 clamps now branch as retail) |
 | render/Griddraw | `0x00481de0` | 133/1616 (masked) | b | 85 code diffs: retail adds `mov ebx, [esp + N]`; retail adds `mov ebp, [esp + N]`; slots differ |
-| render/Griddraw | `0x00482dd0` | 142/288 (masked) | c | 20 code diffs |
 | render/Griddraw | `0x00483200` | 45/727 (masked) | b | 53 code diffs: retail adds `mov ebp, [esp + N]`; retail lacks `mov ebp, [esp + N]`; slots differ |
 | render/ManagedTextureGroup | `0x0050c960` | 17/227 (masked) | c | 5 code diffs: `sub esp, 0x80` vs `sub esp, 0x78`; `je @167` vs `je A` |
 | render/ManagedTextureGroup | `0x0050dad0` | 1887/5022 | b | repack with partial blits, 87 code diffs (samples/render/ManagedTextureGroupNearMisses.cpp) |

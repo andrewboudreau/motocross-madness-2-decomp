@@ -85,6 +85,8 @@ Also exact (8 more calibration cases): the buffer
 rebuild `0x0047f840`, the index builders `0x0047fce0`, `0x0047fe70` and
 `0x00480200`, the draw submissions `0x00480c90` and `0x00480fb0`, the
 detail-band re-test `0x00482760` and the border hand-off `0x004835c0`.
+Then the block distance `0x00481b30` and the direction-bit update
+`0x00482dd0`.
 
 ## Source shapes retail needs
 
@@ -131,6 +133,16 @@ detail-band re-test `0x00482760` and the border hand-off `0x004835c0`.
   start positions per curve value, +0xb08 vertex indices).
 - `0x004835c0` computes the shift with a `shift += 4` loop over
   `level - 1`; VC6 reduces it to retail's `lea ecx,[eax*4]`.
+- `0x00481b30` writes each axis delta back into the bound it was taken
+  from inside the test (`(minX = ex - minX) < 0.0f`). The assignment makes
+  VC6 compare a copy (`fld st(0) ; fcomp`), and overwriting minX keeps the
+  single-use maxX stored: with a separate delta local VC6 folds maxX into
+  `minX + size`. The three axis results are if/else-if/else assignments
+  added after the tests, so VC6 copies the FastSqrt tail into each y case.
+- `0x00482dd0` sets one `notify` flag in the set and the clear path and
+  tests it after the if/else (`else if (flag && !changed) return;`).
+- `0x004815e0`'s 65535 clamps are `w >= 65535.0f ? 0xffff : ...`; the `<`
+  form inverts the branch.
 - Unsigned shorts: the draw data's +0x122..+0x128 (stored as 0xffff),
   `GridNode::field_0x20` (compared with `ja`), and the sample height.
 
@@ -144,12 +156,9 @@ See the notes at the top of `samples/render/GriddrawNearMisses.cpp`:
 | `0x0047e600` (node loader) | 1605/1617 | x87 operand order of the extent.x/extent.y products (the 0.1 test reads the extent through a reference) |
 | `0x00480ad0` (block draw) | 395/438 | the zero offset kept in eax for compares; esi/edi swapped |
 | `0x00481300` (block walk) | 114/216 | child index term order |
-| `0x00482dd0` (direction bit) | 147/333 | the shared notify tail and the early-return placement |
 | `0x0047f210` (per-block rebuild) | 426/1586 | x/count-copy registers, frame slots, minY/maxY load order |
-| `0x00481b30` (block distance) | 139/393 | which floats stay on the x87 stack |
 | `0x00483200` (border walk) | 84/956 | x/z in ebp/ebx (retail ebx/ebp), `level` reload |
-
-| `0x004815e0` (detail update) | 60/1083 | the two axis deltas stay on the x87 stack across the branch in retail; VC6 stores them, which shifts the frame and keeps `push edi` in the prologue |
+| `0x004815e0` (detail update) | 64/1083 | the two axis deltas stay on the x87 stack across the branch in retail; VC6 stores them, which shifts the frame and keeps `push edi` in the prologue |
 | `0x00481de0` (visibility walk) | 143/1712 | `extent`/`a1` in ebp/ebx where retail keeps `size`, `a9` and `a1`; the subdivision block's placement |
 
 ## Not reconstructed

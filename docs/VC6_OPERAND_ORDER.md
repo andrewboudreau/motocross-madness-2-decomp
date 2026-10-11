@@ -659,3 +659,16 @@ try on similar code. None is a rule.
   VC6's. No form tried shifted it. In VC6 SP3, two arrays whose element type has
   a destructor never share a stack slot, but retail's 0x0044b200 shares one. The
   `sub esp` before `rep movsd` in Camera `0x0042ee30` was not reproduced either.
+- **Assignment inside an x87 compare.** In Griddraw `0x00481b30`,
+  `if ((d = a - b) > 0.0f) r = d * d;` compares a copy (`fld st(0) ; fcomp [c]`)
+  and keeps `d` on the stack for the product; the same difference written as a
+  common subexpression (`if (a - b > 0.0f) r = (a - b) * (a - b);`) or as a local
+  assigned before the test compares with `fcom`. Assigning into a local also ends
+  single-use forwarding: with `float hi = lo + size;` read once, VC6 folds `hi`
+  into `lo + size` (keeping `lo` and `size` on the x87 stack) unless `lo` is
+  overwritten first (`(lo = a - lo) < 0.0f`).
+- **Result flags threaded into one block.** Setting `notify = 1` in two branches and
+  testing it once after the if/else gives one copy of the notified block, with the
+  `else if (flag && !changed) return;` test placed after it; gotos into a shared
+  block, or the block written in both branches, place that return test inline.
+  Griddraw `0x00482dd0`.
