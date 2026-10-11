@@ -2,16 +2,23 @@
 // src/krusty2/vehicle/BikeAI.cpp until they match.  The canonical file is included
 // first so the TU-local statics and helpers are the same.
 //
-// 0x0040d200 (4464 bytes, AI jump prediction along the path): 4430/4464 strict
-// positions.  Control flow, calls, constants, FPU operand order and the 0x178-byte
-// frame match; two stores are scheduled one slot apart from retail.  Retail emits
-// the initial `seg.y = 0` after `fld/fmul seg.x` (the candidate after `fld/fmul
-// seg.z`), and the ground-branch `p.y = ground.y` store after `fld/fmul normal.z`
-// (the candidate right after the ground.y load).  The copy in the inner segment
-// loop already matches.  Source order, indexed access, helper and pointer
-// variants did not move either store.  The frame needed `normal` at function scope
-// (inside the loop body VC6 packs it into dir's slot) and the done-block flat
-// speed reusing `flatSpeed`.
+// 0x0040d200 (4464 bytes, AI jump prediction along the path): strict exact.  The
+// frame needed `normal` at function scope (inside the loop body VC6 packs it into
+// dir's slot) and the done-block flat speed reusing `flatSpeed`.  Three source forms
+// place the last instructions (docs/VC6_OPERAND_ORDER.md section 3):
+//  * the segment length is BikeAISegmentLength, whose `(x*x)` parentheses put the
+//    `seg.y = 0` store between the x*x and z*z products (BikeAILength's plain form
+//    is needed at the takeoff-speed site; one helper for all sites loses the frame
+//    slot of that site);
+//  * BikeAIDotZ parenthesises y*y, which puts the ground-branch `p.y = ground.y`
+//    store after the z*z product;
+//  * before the loop the segment (single-point path) and the direction are taken
+//    from `p` rather than from `pos` (the loop does the same), which gives p.z an
+//    earlier leaf so `p += dt * v` loads the product's z first (`fld t.z; fadd p.z`).
+// Tried without effect on those spots: the parentheses on BikeAILength at the other
+// sites, by-value/pointer helpers with the plain body, the declaration and
+// constructor forms of p, ground and target, and 96 forms of `p += dt * v; p.y +=
+// g * halfDtSq; v.y += g * dt` (operator order, parentheses, written-out sums).
 //
 // 0x0040e510 (1936 bytes, AI path steering direction): every branch, call and
 // constant is reconstructed and the instruction sequence aligns 1:1 apart from
@@ -205,10 +212,27 @@ int UnknownFunction40e510(Vec3* outDir, Vec3 pos, UnknownBikeAIPath* path, float
 // array as Vector3 g_UnknownGlobal578dc0[2]).
 extern Vec3 g_UnknownGlobal578dc0[2];
 
-// Dot product in the operand order retail 0x0040d200 evaluates: (y + x) + z.
+// Length of a path segment in 0x0040d200 (seg.y is 0 there, so VC6 folds the y*y
+// term).  Same result as BikeAILength; the redundant parentheses around x*x are a
+// source-form difference (docs/VC6_OPERAND_ORDER.md section 3): with them VC6 emits
+// the preceding `seg.y = 0` store between the x*x and z*z products, as retail does at
+// both segment sites, while the takeoff-speed site (BikeAILength) needs the plain form.
+inline float BikeAISegmentLength(const Vec3& v)
+{
+    float lenSq = ((v.x * v.x) + v.y * v.y) + v.z * v.z;
+    if (lenSq == 0.0f)
+        return 0.0f;
+    if (lenSq == 1.0f)
+        return 1.0f;
+    return 1.0f / FastInvSqrt(lenSq);
+}
+
+// Dot product in the operand order retail 0x0040d200 evaluates: (y + x) + z.  The
+// parentheses around y*y place the ground-branch `p.y = ground.y` store after the
+// z*z product (retail); without them it is issued before the first faddp.
 inline float BikeAIDotZ(const Vec3& a, const Vec3& b)
 {
-    return a.z * b.z + (a.x * b.x + a.y * b.y);
+    return a.z * b.z + (a.x * b.x + (a.y * b.y));
 }
 
 // Call view of the out-of-line Vec3 constructor 0x00404e60 (see math/Math3D.h).
@@ -265,13 +289,13 @@ int UnknownFunction40d200(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* out
     float flatSpeed = FastSqrt(vel.x * vel.x + vel.z * vel.z);
     Vec3 seg;
     if (path->count == 1)
-        seg = path->points[idx] - pos;
+        seg = path->points[idx] - p;
     else if (idx < path->count - 1)
         seg = path->points[idx + 1] - path->points[idx];
     else
         seg = path->points[idx] - path->points[idx - 1];
     seg.y = 0.0f;
-    float len = BikeAILength(seg);
+    float len = BikeAISegmentLength(seg);
     float invLen = len > 0.0f ? 1.0f / len : 0.0f;
     Vec3 n;
     n.x = seg.z;
@@ -279,7 +303,7 @@ int UnknownFunction40d200(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* out
     n.z = -seg.x;
     n = SafeNormalize(n);
     Vec3 target = path->points[idx] + seg * t + n * side;
-    Vec3 dir = target - pos;
+    Vec3 dir = target - p;
     dir.y = 0.0f;
     dir = SafeNormalize(dir);
     Vec3 v(dir.x * flatSpeed, vel.y, dir.z * flatSpeed);
@@ -341,7 +365,7 @@ int UnknownFunction40d200(Vec3 pos, Vec3 vel, UnknownBikeAIPath* path, Vec3* out
             else
                 seg = path->points[idx] - path->points[idx - 1];
             seg.y = 0.0f;
-            len = BikeAILength(seg);
+            len = BikeAISegmentLength(seg);
             invLen = len > 0.0f ? 1.0f / len : 0.0f;
             n.x = seg.z;
             n.y = 0.0f;
