@@ -36,16 +36,20 @@
 // 17 KB function ran out of inline budget, so in the original source it is very
 // likely one inline function used in both places.
 //
-// 0x00415640 (6112 bytes, obstacle query along a segment): 5987/6111 strict
-// positions.  Control flow, calls, constants and the 0x1ec frame size match and the
-// masked instruction stream differs in 17 places.  Left: the order of the one-use
-// operator temporaries above +0x100 in the frame (offset, the dn * k / dn * 10 / dn *
-// push temporaries of both owner branches, the segment-length temporaries and the
-// vegetation position), and two scheduling spots where retail pushes the dot-call
-// arguments after the z*z term of SquareMagnitude (0x00415e0c, 0x00416788).
+// 0x00415640 (6111 bytes plus one byte of nop padding, obstacle query along a
+// segment): 6059/6112 strict positions.  Control flow, calls, constants, every
+// instruction's schedule and the 0x1ec frame size match.  Left: the order of the
+// one-use operator temporaries above +0x100 in the frame (offset, the dn * k / dn * 10
+// / dn * push temporaries of both owner branches, the segment-length temporaries, the
+// vegetation position and the outPoint temporary), and the store order of the
+// `Vec3(0, 0, 0)` temporaries at the start (retail z, y, x).  Tried without effect on
+// those: `k * d` / `10.0f * d` / `push * d` in each of the six update statements (64
+// combinations, identical code), and parenthesised, integer, named-local, per-block
+// local and negated zero vectors.
 // Source forms that mattered: unsigned char type-id statics with an unsigned compare
 // (`mov bl, 0xff`), the max/min helpers with by-value arguments (two spellings,
-// see BikeAIMaxR), SquareMagnitude for the unnormalised distance, hoisting s/u, d,
+// see BikeAIMaxR), the squared distance and k dot product grouped z + ((x) + y)
+// (BikeAISquareMagnitude, BikeAIDot3), SquareMagnitude for the unnormalised distance, hoisting s/u, d,
 // distSq and normal out of the owner branches (shared slots), a named `step` for the
 // vegetation push, and the call views below for the dot product, the constructor
 // and operator*(Vec3, float) that retail calls even in this function's first lines.
@@ -485,6 +489,20 @@ inline Vec3 BikeAINormalizeSV(const Vec3& v)
     return BikeAIVec3Call(s * v.x, s * v.y, s * v.z);
 }
 
+// Squared distance and dot product of the owner branches of 0x00415640, grouped
+// z + ((x) + y): retail sums (x + y) + z and issues the dot-call argument pushes after
+// the z*z term.  Math3D's flat SquareMagnitude / DotProduct give (x + z) + y with the
+// pushes before it (72 bytes).  Both helpers need the parenthesised x product.
+inline float BikeAISquareMagnitude(const Vec3& v)
+{
+    return v.z * v.z + ((v.x * v.x) + v.y * v.y);
+}
+
+inline float BikeAIDot3(const Vec3& a, const Vec3& b)
+{
+    return a.z * b.z + ((a.x * b.x) + a.y * b.y);
+}
+
 // Max / min with by-value arguments.  Retail's four bounds of the query box need the two
 // comparison spellings (0x00415c8f..0x00415cb5); the arguments are swapped in the call.
 inline float BikeAIMax(float a, float b)
@@ -643,14 +661,14 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
                 if (obj->ownerType == 0x64 || obj->ownerType == 0x65) {
                     UnknownBikeAISegmentOwner* owner = (UnknownBikeAISegmentOwner*)obj->ownerObject;
                     d = owner->start - seg[0];
-                    distSq = SquareMagnitude(d);
+                    distSq = BikeAISquareMagnitude(d);
                     d = BikeAINormalizeVS(d);
                     UnknownFunction47b800(seg[0].x, seg[0].z, delta.x, delta.z, owner->start.x, owner->start.z,
                                           owner->dir.x, owner->dir.z, &s, &u);
                     if (s >= 0.0f && s <= 1.0f && u >= 0.0f && u <= 1.0f) {
                         hit = 1;
                         pt = owner->dir - acc;
-                        float k = DotProduct(pt, d);
+                        float k = BikeAIDot3(pt, d);
                         if (k < 0.0f)
                             acc += d * k;
                     } else if (distSq < 100.0f && DotProduct(acc, d) > 0.0f) {
@@ -663,14 +681,14 @@ int UnknownFunction415640(Vec3* seg, float radius, int skipVegetation, int ignor
                     UnknownBikeAIPointOwner* owner = (UnknownBikeAIPointOwner*)obj->ownerObject;
                     Vec3* center = (Vec3*)&obj->field_0x34;
                     d = *center - seg[0];
-                    distSq = SquareMagnitude(d);
+                    distSq = BikeAISquareMagnitude(d);
                     d = BikeAINormalizeVS(d);
                     UnknownFunction47b800(seg[0].x, seg[0].z, delta.x, delta.z, center->x, center->z,
                                           owner->dir.x, owner->dir.z, &s, &u);
                     if (s >= 0.0f && s <= 1.0f && u >= 0.0f && u <= 1.0f) {
                         hit = 1;
                         pt = owner->dir - acc;
-                        float k = DotProduct(pt, d);
+                        float k = BikeAIDot3(pt, d);
                         if (k < 0.0f)
                             acc += d * k;
                     } else if (distSq < 100.0f && DotProduct(acc, d) > 0.0f) {
