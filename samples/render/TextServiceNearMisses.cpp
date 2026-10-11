@@ -21,6 +21,9 @@
 // cast, `fonts[0][i]` and extra parentheses. A list pointer or reference
 // local (in any subset of the count, loop and result reads) caches the
 // list in a register (8 of 125); declared inside the loop it stays 117.
+// A 144-form sweep (count/i statement order, `while (1)`/`for (;;)`, three
+// bound tests, four strcmp operand orders and `== 0`, i++/++i/i += 1) also
+// stays at 117.
 //
 // UnknownFunction50b400 (0x0050b400, 758 bytes; 4444 texels),
 // UnknownFunction50b700 (0x0050b700, 758 bytes; 1555 texels) and the 32-bit

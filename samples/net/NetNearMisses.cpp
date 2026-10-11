@@ -22,7 +22,10 @@
 // local or the `message` pointer, per-case `system` locals and a loop-scope
 // pointer declared outside the `if` do not change that swap. Using offset in
 // the pointer itself (`&MessageAt(..)` or a cast) outside the `if` gives a
-// 368-byte form; a reference for the whole loop body is far worse.
+// 368-byte form; a reference for the whole loop body is far worse. Sweeps of
+// the in-`if` pointer form (144 combinations: pointer and test forms, the
+// `system` local, the switch operand, increment forms and the `more` operand
+// order) keep the ebx/ebp swap (best 197) and leave the original at 361.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>

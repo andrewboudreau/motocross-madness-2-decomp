@@ -23,7 +23,9 @@ Template markers (a line marker is the first token on its own line):
   int dead = 0;
   //@end
 
-  inline: {@NAME:a@|(a)@}  or anonymous {@a@|(a)@}
+  inline: {@NAME:a@|(a)@}  or anonymous {@a@|(a)@}; inline choices nest
+  ({@E:m - {@P:w * h@|pixels@} * 2@|m + {@P:w * h@|pixels@} * -2@}) but stay
+  on one line
 
 Choice points that share a NAME are linked: they take the same choice (or
 the same permutation), so a local's declaration and its uses can switch
@@ -70,7 +72,7 @@ sys.path.insert(0, str(ROOT / 'tools'))
 # --------------------------------------------------------------------------
 
 _LINE_MARKER = re.compile(r'^\s*//@(perm|alt|opt|\||end)(?![\w|])\s*(\S*)')
-_INLINE = re.compile(r'\{@(?:([A-Za-z_][\w.]*):)?(.*?)@\}', re.S)
+_INLINE_NAME = re.compile(r'([A-Za-z_][\w.]*):')
 
 
 class TemplateError(ValueError):
@@ -85,19 +87,44 @@ class Choice:
 
 
 def _inline_nodes(text: str, counter: list[int]) -> list:
-    nodes, pos = [], 0
-    for m in _INLINE.finditer(text):
-        if m.start() > pos:
-            nodes.append(text[pos:m.start()])
-        name = m.group(1)
-        if not name:
-            counter[0] += 1
-            name = f'inline{counter[0]}'
-        nodes.append(Choice(name, 'alt', [[part] for part in m.group(2).split('@|')]))
-        pos = m.end()
-    if pos < len(text):
-        nodes.append(text[pos:])
-    return nodes
+    """Literal text and inline choices; choices nest (`{@a@|{@B:b@|c@}@}`)."""
+    return _inline_parse(text, 0, counter, top=True)[0]
+
+
+def _inline_parse(text: str, pos: int, counter: list[int], top: bool):
+    """Nodes up to the end of `text` (top) or of the current item (`@|`/`@}`)."""
+    nodes: list = []
+    start = pos
+    while pos < len(text):
+        if text.startswith('{@', pos):
+            if pos > start:
+                nodes.append(text[start:pos])
+            pos += 2
+            m = _INLINE_NAME.match(text, pos)
+            if m:
+                name, pos = m.group(1), m.end()
+            else:
+                counter[0] += 1
+                name = f'inline{counter[0]}'
+            items = []
+            while True:
+                item, pos = _inline_parse(text, pos, counter, top=False)
+                items.append(item)
+                pos += 2
+                if text.startswith('@}', pos - 2):
+                    break
+            nodes.append(Choice(name, 'alt', items))
+            start = pos
+            continue
+        if not top and (text.startswith('@|', pos) or text.startswith('@}', pos)):
+            break
+        pos += 1
+    else:
+        if not top:
+            raise TemplateError('unterminated inline choice {@...@}')
+    if pos > start:
+        nodes.append(text[start:pos])
+    return nodes, pos
 
 
 def parse_template(text: str) -> list:
@@ -259,7 +286,39 @@ def normalised_alignment(retail: bytes, cand: bytes) -> tuple[int, int, int]:
     return sum(blk.size for blk in sm.get_matching_blocks()), len(a), len(b)
 
 
-def score_target(pe, obj, target: Target, bindings: dict[str, int] | None) -> dict:
+def instruction_diff(retail: bytes, cand: bytes, context: int = 2) -> list[str]:
+    """Side-by-side retail | candidate listing of the differing instruction runs.
+
+    Instructions are paired on their normalised text (as in the alignment
+    score); equal runs longer than 2 * context are elided to their ends.
+    """
+    from frame_layout import disassemble, normalize
+    a, b = disassemble(retail), disassemble(cand)
+    sm = difflib.SequenceMatcher(None, [normalize(i) for i in a], [normalize(i) for i in b],
+                                 autojunk=False)
+
+    def text(ins):
+        return f'{ins.address:4x} {ins.mnemonic} {ins.op_str}'.rstrip() if ins else ''
+    lines = []
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == 'equal':
+            n = i2 - i1
+            keep = range(n) if n <= 2 * context else [*range(context), None, *range(n - context, n)]
+            for k in keep:
+                if k is None:
+                    lines.append(f'{"...":<44}   ...')
+                else:
+                    lines.append(f'{text(a[i1 + k]):<44}   {text(b[j1 + k])}')
+            continue
+        for k in range(max(i2 - i1, j2 - j1)):
+            left = a[i1 + k] if i1 + k < i2 else None
+            right = b[j1 + k] if j1 + k < j2 else None
+            lines.append(f'{text(left):<44} | {text(right)}')
+    return lines
+
+
+def score_target(pe, obj, target: Target, bindings: dict[str, int] | None,
+                 want_diff: bool = False) -> dict:
     from mcm2tool.resolved_match import RelocationError, match_object
     from mcm2tool.coff import relocation_mask
     sym = obj.find_symbol(target.symbol)
@@ -294,6 +353,8 @@ def score_target(pe, obj, target: Target, bindings: dict[str, int] | None) -> di
     aligned, nr, nc = normalised_alignment(retail, cand)
     row.update({'aligned': aligned, 'retail_insns': nr, 'candidate_insns': nc,
                 'insn_diffs': max(nr, nc) - aligned})
+    if want_diff:
+        row['diff'] = instruction_diff(retail, cand)
     return row
 
 
@@ -343,6 +404,8 @@ def main(argv=None):
     ap.add_argument('--stop-on-exact', action='store_true')
     ap.add_argument('--dry-run', action='store_true')
     ap.add_argument('--render', type=int, metavar='N', help='write variant N (enumeration order) and exit')
+    ap.add_argument('--diff', action='store_true',
+                    help='print a retail | candidate instruction diff of the best variant')
     a = ap.parse_args(argv)
 
     template = Path(a.template).resolve()
@@ -389,9 +452,9 @@ def main(argv=None):
     results: list[dict] = []
     stop = [False]
 
-    def job(index: int, asg: dict[str, int], text: str) -> dict:
+    def job(index: int, asg: dict[str, int], text: str, want_diff: bool = False) -> dict:
         row = {'index': index, 'choices': describe(dims, asg), 'assignment': asg}
-        if stop[0]:
+        if stop[0] and not want_diff:
             row['skipped'] = True
             return row
         src = out / f'v{index:06d}{template.suffix}'
@@ -406,7 +469,7 @@ def main(argv=None):
                 row['compile_error'] = r.stdout[-2000:]
                 return row
             coff = CoffObject(obj)
-            row['targets'] = [score_target(pe, coff, t, bindings) for t in a.target]
+            row['targets'] = [score_target(pe, coff, t, bindings, want_diff) for t in a.target]
             row['exact'] = all(t['exact'] for t in row['targets'])
             row['matching'] = sum(t['matching'] for t in row['targets'])
             row['aligned'] = sum(t['aligned'] for t in row['targets'])
@@ -467,6 +530,12 @@ def main(argv=None):
         print(f"{rank:3} #{r['index']:<6} {per}  {r['choices']}")
         (out / f'best_{rank}{template.suffix}').write_text(render(nodes, all_asg[r['index']]),
                                                            encoding='latin-1')
+    if a.diff and scored:
+        best = scored[0]
+        row = job(best['index'], all_asg[best['index']], render(nodes, all_asg[best['index']]), True)
+        for t in row.get('targets', []):
+            print(f"\n#{best['index']} {t['va']} retail | candidate ({t['matching']}/{t['compared']})")
+            print('\n'.join(t['diff']))
     return 0 if any(r['exact'] for r in scored) else 1
 
 

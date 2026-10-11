@@ -8,7 +8,12 @@
 //   as were a `memory` local read first and `width * height` written twice.
 //   Negated tests sharing one trailing `return 1` (with and without a
 //   `pixels` local or `memory` local) let VC6 sink every load into the
-//   full-screen block (6-21 of 110-125).
+//   full-screen block (6-21 of 110-125). Sweeps (1152 + 1920 combinations:
+//   all orders of the four field locals and an optional `memory` local, a
+//   `pixels` local, three return structures, both comparison directions and
+//   ten spellings of the budget: `m - p * 2`, `2 * p`, `-p * 2 + m`,
+//   `p + p`, `p << 1`, sizeof(short) with casts, ...) give at most 27/124:
+//   VC6 emits the same shl/sub for every spelling and loads +0x74 late.
 // UnknownDisplay::ProbeNonLocalTextureMemory (0x004ca5a0, 484 bytes): retail keeps
 //   `target` in ebp, caches 480/16 in registers for the mode search and has
 //   one more 4-byte local; the flow (EH-guarded new PCRenderTarget, 128x128

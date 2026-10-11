@@ -853,6 +853,13 @@ static inline void TireScale(CollisionVec3& v, float s)
 // keeps `boost` in the dead argument slot and the squared length/`minimum` in the
 // local, VC6 the other way round (declaration order does not change it).
 // 0..15 dead initialised int locals at the top of the function change nothing either.
+// A tools/sweep_variants.py sweep (768 combinations, best 470) crossed 8 boost forms
+// (as here, `!(boost > 1)` nested if, empty-if, `||`/`&&` embedded assignments, two
+// ternaries, inverted if/else), 4 length forms (TireLength, an inline FromSq
+// expression, by-value and pointer helpers), 4 minimum forms (if/else, helper with
+// returns or a local, ternary initialiser), 3 clamp forms and a `vehicle` copy.
+// Only the nested-if boost puts boost in the argument slot, and it reorders the
+// stores (98/479).
 void Tire::UpdateDriveShare(TireVehicle* vehicle)
 {
     if (!field_0x2a8)

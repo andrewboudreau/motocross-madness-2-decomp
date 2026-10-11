@@ -7,7 +7,9 @@
 // global into eax (the short form, 2 bytes less) and the menu into edx where
 // VC6 here picks ecx and eax; it also reuses ecx for TrackGame+0xc4c. Local,
 // base-pointer, assignment-in-argument and declaration-placement forms do
-// not change it.
+// not change it; nor do (40-form sweep) the layer store through GetUser
+// directly, a layer-item local or a value local, a GUI local for
+// ShowDialog or the `new` assigned inside the ShowDialog call.
 //
 // EventManager::CreatePodiumScene (0x0045d480, 4247 bytes): the podium
 // scene; 2064 of 4246 bytes (bindings: EventManagerNearMisses.bindings.json).

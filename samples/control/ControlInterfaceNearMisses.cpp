@@ -14,7 +14,10 @@
 // `call:` label in case 0 and `input = mouse; goto call;` in case 1 gives
 // 76/104 (the same with the label after the switch, a result variable or a
 // while wrapper); case 1 first 74, case 1 last 64; per-case locals,
-// returns and if-break forms keep the tails apart (43).
+// returns and if-break forms keep the tails apart (43). Sweeps without goto
+// (600 combinations: case order, five return/break forms per case, a
+// `default:`, a KeyboardDevice cast on the mouse; 108 result-variable forms)
+// never merge the tails (best 43).
 //
 // UnknownReportError (0x004bf6a0, 978 bytes with jump tables): the switch
 // cases (values traced from retail's decision tree, in retail body order)

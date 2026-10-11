@@ -51,6 +51,18 @@ class TemplateTests(unittest.TestCase):
         out = variants('f({@a@|(a)@}, {@b@|(b)@});\n')
         self.assertEqual(out, ['f(a, b);\n', 'f(a, (b));\n', 'f((a), b);\n', 'f((a), (b));\n'])
 
+    def test_nested_inline_choices(self):
+        out = variants('r = {@E:m - {@P:a@|p@}@|{@P:a@|p@} + m@};\n')
+        self.assertEqual(out, ['r = m - a;\n', 'r = m - p;\n', 'r = a + m;\n', 'r = p + m;\n'])
+
+    def test_nested_inline_anonymous_and_empty_items(self):
+        out = variants('f({@x{@1@|2@}@|@});\n')
+        self.assertEqual(sorted(set(out)), ['f();\n', 'f(x1);\n', 'f(x2);\n'])
+
+    def test_unterminated_inline_choice_raises(self):
+        with self.assertRaises(TemplateError):
+            parse_template('f({@a@|b);\n')
+
     def test_nested_choices(self):
         text = '//@perm P\n//@alt A\na1;\n//@|\na2;\n//@end\n//@|\nb;\n//@end\n'
         out = variants(text)
@@ -91,6 +103,21 @@ class EnumerationTests(unittest.TestCase):
     def test_limit_above_total_enumerates_all(self):
         dims = {'A': ('alt', 2), 'B': ('alt', 3)}
         self.assertEqual(len(list(assignments(dims, 100, 0))), 6)
+
+
+class DiffTests(unittest.TestCase):
+    def test_instruction_diff_marks_changes_and_elides_equal_runs(self):
+        from tools.sweep_variants import instruction_diff
+        retail = bytes.fromhex('8b442404' '83c001' + '40' * 6 + 'c3')
+        cand = bytes.fromhex('8b442404' '83c002' + '40' * 6 + 'c3')
+        lines = instruction_diff(retail, cand)
+        changed = [line for line in lines if ' | ' in line]
+        self.assertEqual(len(changed), 1)
+        self.assertIn('add eax, 1', changed[0])
+        self.assertIn('add eax, 2', changed[0])
+        self.assertTrue(any(line.startswith('...') for line in lines))
+        self.assertIn('ret', lines[-1])
+        self.assertEqual(instruction_diff(retail, retail, context=10)[0].count('mov eax'), 2)
 
 
 class TargetTests(unittest.TestCase):
