@@ -10,6 +10,11 @@
 // Declaring the locals at the top, in the block, in either order or as an
 // array, an else form, a named bool for the +0x18e test, a local for
 // +0x560 and a named int switch value all leave it unchanged.
+// Also unchanged: 0..15 dead locals, 0..12 file-scope declarations (prototypes,
+// structs, statics, inline functions) before the function, a Vector3 pointer for
+// slot 47, a float local for the height, `2.0f + y`, explicit this-> calls, a
+// local for cameraState, `== false`, and the tail nested in an else. A view
+// local for the second call and setting the flag last are worse.
 // The vector passed to slot 46 (0x0067c3e8) is the unit's kVec3YAxis
 // (src/reconstructed/KrustyBikeCamera.cpp); it is file-static there, so this
 // sample keeps its own static.

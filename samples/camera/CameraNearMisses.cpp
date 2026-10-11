@@ -15,6 +15,7 @@
 // the second MatrixMult call are worse.
 // The half field of view needs the (float) cast: without it VC6 folds
 // 0.5f * 0.01745329f into one constant, while retail multiplies twice.
+// 0..15 dead initialised int locals at the top of the function leave the `sub esp, 0x40` in place.
 #include <math.h>
 
 #include "../../src/reconstructed/Camera.h"

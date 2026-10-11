@@ -51,6 +51,8 @@ static inline Vec3 RotateVectorRetail(Vec3 v, const Matrix4& m)
 }
 
 // 0x004fd710. v * transpose(R(world)): copies worldMatrix, transposes the copy, rotates.
+// Also unchanged: reference and pointer aliases of v and m with single and pairwise
+// flips of all 18 reads (171 variants each), and 0..15 dead initialised int locals at the top of the function.
 // PARTIAL 207/209 bytes (203/205 masked): retail loads v.x before m._11 in the last x
 // product (m._11 is the only element of the product the transpose does not touch). No
 // form moves that operand: all 768 term orders, operand orders, bracketings and
@@ -95,6 +97,7 @@ static inline Vec3 TransformPoint(const Vec3& p, const Matrix4& m)
 
 // 0x004fd7f0. p * inverse(worldMatrix) for a rigid transform: copy worldMatrix, invert the
 // copy in place, transform the point. PARTIAL 273/285 bytes (269/281 masked): in retail
+// (0..15 dead initialised int locals at the top of the function or inside InvertRigid change nothing.)
 // the second swap's integer moves come after the first's and the y translation sums
 // _22*_42, _12*_41, then _32*_43; the candidate sums _22*_42, _32*_43, _12*_41.
 // Writing t.y as '((m._41 * m._12) + (m._42 * m._22)) + (m._43 * m._32)' fixes both but

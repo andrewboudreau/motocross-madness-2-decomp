@@ -23,6 +23,7 @@
 // of the copy leave it in place (those two then simply stay before the copy), and a
 // redundant store to one field is eliminated.  Adding many stores instead makes the
 // scheduler hoist copy 2's lea and the EH-state reload far up.
+// 0..15 dead initialised int locals at the top of the function do not move the pick either.
 KrustyBike::KrustyBike(int flags) : GameObject(1), Bike(flags)
 {
     field_0x73c = 0x65;

@@ -849,6 +849,7 @@ static inline void TireScale(CollisionVec3& v, float s)
 // 0x00513f90 (near miss, 470 of 479 bytes): only the stack slots differ; retail
 // keeps `boost` in the dead argument slot and the squared length/`minimum` in the
 // local, VC6 the other way round (declaration order does not change it).
+// 0..15 dead initialised int locals at the top of the function change nothing either.
 void Tire::UpdateDriveShare(TireVehicle* vehicle)
 {
     if (!field_0x2a8)

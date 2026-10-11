@@ -25,6 +25,7 @@
 // other way (before the subtractions). For the rotation, a scoped or
 // separate result variable, the call's return value, D3DVECTOR casts and
 // `position = direction * k + target` are all worse.
+// 0..15 dead initialised int locals at the top of the function change nothing.
 //
 // FollowCamera::UnknownVirtualSlot46 (0x004654e0) is exact in src/reconstructed/FollowCamera.cpp.
 //

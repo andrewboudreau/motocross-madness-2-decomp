@@ -39,8 +39,6 @@ ProjectedShadow::ProjectedShadow(int flags)
     field_0x98 = 1;
     updateThisFrame = 1;
     updatePeriod = 1;
-    prevMaxX = 0x80000000;
-    prevMaxY = 0x80000000;
     sizeShift = 0;
     field_0x94 = 0;
     vertexCapacity = 0;
@@ -51,7 +49,9 @@ ProjectedShadow::ProjectedShadow(int flags)
     receivers = 0;
     receiverCapacity = 0;
     prevMinX = 0x7fffffff;
+    prevMaxX = 0x80000000;
     prevMinY = 0x7fffffff;
+    prevMaxY = 0x80000000;
     center = kVec3Zero;
     halfExtents = kVec3Zero;
     dirtyFlags = 0;

@@ -121,6 +121,7 @@ void AxisAngleMatrix(Matrix4* m, float x, float y, float z, float angle);
 // 0x004a7dc0 (cdecl, called twice by slot 7 when the angle is nonzero): *dst = *src rotated by
 // 'angle' about 'axis'.  The pose's axes and position form a matrix (row 0 the cross of axisY and
 // axisZ), which is multiplied by the rotation; the position is copied unchanged.
+// Partial (targets.json); 0..15 dead initialised int locals at the top of the function change nothing.
 void RotatePose(CharacterPose* src, CharacterPose* dst, Vec3 axis, float angle)
 {
     Matrix4 pose;

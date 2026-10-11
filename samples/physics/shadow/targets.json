@@ -85,8 +85,8 @@
     "candidate_symbol_contains": "??0ProjectedShadow",
     "target_va": "0x004da570",
     "target_size": 331,
-    "expect": "partial",
-    "notes": "ctor 84%: prevMinX/Y store scheduling differs (retail loads 0x7fffffff early, stores late)",
+    "expect": "exact",
+    "notes": "constructor; the previous-bounds stores are written per axis (min x, max x, min y, max y) after receiverCapacity, which gives retail's early 0x7fffffff load and late stores",
     "bindings": "ProjectedShadow.bindings.json"
   },
   {

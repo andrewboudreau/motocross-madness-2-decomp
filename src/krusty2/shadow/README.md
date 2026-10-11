@@ -6,7 +6,7 @@ Shared headers stay here. See [physics validation](../../../docs/PHYSICS_VALIDAT
 
 Validation: every exact target of `samples/physics/shadow/` passes strict VC6 SP3
 comparison with `ProjectedShadow.bindings.json` / `TerrainShadow.bindings.json`
-(ProjectedShadow.cpp 19 of 26 targets, TerrainShadow.cpp 4 of 5; the rest are partial).
+(ProjectedShadow.cpp 20 of 26 targets, TerrainShadow.cpp 4 of 5; the rest are partial).
 
 Evidence
 - `__FILE__` string "ProjectedShadow.cpp" at VA 0x571fd8; own xrefs 0x4da745..0x4dacbc
@@ -19,7 +19,7 @@ Evidence
 - RTTI: ProjectedShadow : GameObject (vptr at +0). Overrides slots 10 (float dt), 12, 13.
 - Layout: see the `// +0xNN` comments in ProjectedShadow.h. Size >= 0x134.
 
-Counts: ProjectedShadow.cpp 19 strict exact, 7 partial of 26 targets; D3DIMSoultreeShadow.cpp 18 strict exact.
+Counts: ProjectedShadow.cpp 20 strict exact, 6 partial of 26 targets; D3DIMSoultreeShadow.cpp 18 strict exact.
 
 D3DIMSoultreeShadow.cpp (D3DIMSoultreeShadow : ShadowReceiver : GameObject, vtable 0x55156c; ShadowReceiver 0x5515ec):
 ctor 0x446840, Attach 0x4468b0, slot 28 0x446bf0, both deleting dtors (0x446890 is shared with TerrainShadow by
@@ -34,7 +34,10 @@ test against the render target's camera; only the product's x87 term order diffe
 with an inline __asm fld/fistp helper (ebp frame), so it stays partial under the no-asm rule. The 0x447910 setter is placed with DebugOverlay.cpp (docs/DEBUGOVERLAY.md). Ownership: slot 30 (0x446f40) pushes the file's own
 `__FILE__` 0x568cac at 0x447023/0x447043, and the other methods are contiguous members of the same class.
 
-Partial: ctor 84% (prevMinX/Y store scheduling), Init 19.6%, SetLight 6%, ComputeBounds 5.5%
+The ctor 0x4da570 is exact: the previous-bounds fields are written per axis (min x, max x, min y,
+max y) after receiverCapacity; written as max pair then min pair, VC6 hoists the 0x7fffffff stores.
+
+Partial: Init 19.6%, SetLight 6%, ComputeBounds 5.5%
 (1761/2020 B), RenderShadow 2.3% (884/1074 B), Present 12.5% (655/1218 B), TintCasterVertices 9% (354/352 B).
 
 Notes
