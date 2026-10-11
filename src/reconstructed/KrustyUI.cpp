@@ -939,3 +939,87 @@ void KrustyUI::UnknownFunction49b020(const char** names, int count) {
     }
     DebugFree(used, __FILE__, 1157);
 }
+
+// 0x0049b0d0: picks `count` distinct random bikes and riders. Only models of
+// availability 2 or 3 take part, and a bike must be in the player's class or
+// a neighbouring one (1 and 2, 3 and 4). A first pick of an unused bike
+// keeps class 1 four times in five and class 2 one time in five (any other
+// class always); otherwise the next unused bike after it is taken. The
+// class 1/2 test is one `||` of two `&&` pairs: if/else, goto and ternary
+// forms of it lay the second arm out before the probe loop, retail after it.
+void KrustyUI::UnknownFunction49b0d0(int* bikes, int count, int* riders) {
+    int* usedBikes = (int*)DebugCalloc(field_0x54, sizeof(int), __FILE__, 1164);
+    int* usedRiders = (int*)DebugCalloc(field_0x5c, sizeof(int), __FILE__, 1165);
+    int playerClass = UnknownBikeClassOf(
+        ((UnknownTrackGameModeOptionsFd8*)g_TrackGame->mode.field_0xfd8)->field_0x00);
+    srand(UnknownFunction4bfa80());
+    int i;
+    for (i = 0; i < field_0x5c; i++) {
+        int type = ((UnknownKrustyUIModelEntry*)field_0x58)[i].field_0xc4;
+        if (type < 2 || type > 3)
+            usedRiders[i] = -1;
+    }
+    for (i = 0; i < field_0x54; i++) {
+        int type = ((UnknownKrustyUIModelEntry*)field_0x48)[((UnknownKrustyUIBikeEntry*)field_0x50)[i].field_0x00].field_0xc4;
+        if (type < 2 || type > 3) {
+            usedBikes[i] = -1;
+            continue;
+        }
+        int bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)field_0x50)[i].field_0x8c);
+        if (playerClass == bikeClass || (playerClass == 1 && bikeClass == 2)
+            || (playerClass == 2 && bikeClass == 1) || (playerClass == 3 && bikeClass == 4)
+            || (playerClass == 4 && bikeClass == 3))
+            continue;
+        usedBikes[i] = -1;
+    }
+    for (int k = 0; k < count; k++) {
+        int index;
+        float chance;
+        int bikeClass;
+        do {
+            index = (int)(RandomUnit() * (field_0x54 - 1));
+        } while (usedBikes[index] == -1);
+        int start = index;
+        if (!usedBikes[index]) {
+            chance = RandomUnit();
+            bikeClass = UnknownBikeClassOf(((UnknownKrustyUIBikeEntry*)field_0x50)[index].field_0x8c);
+            switch (bikeClass) {
+            case 1:
+            case 2:
+                if ((chance <= 0.2f && bikeClass == 2) || (chance > 0.2f && bikeClass == 1))
+                    goto found;
+                break;
+            case 3:
+            case 4:
+                if (chance > 0.5f)
+                    goto found;
+                goto found;
+            default:
+                goto found;
+            }
+        }
+        do {
+            if (++index == field_0x54)
+                index = 0;
+            if (index == start)
+                break;
+        } while (usedBikes[index]);
+    found:
+        usedBikes[index] = 1;
+        bikes[k] = index;
+        do {
+            index = (int)(RandomUnit() * (field_0x5c - 1));
+        } while (usedRiders[index] == -1);
+        start = index;
+        while (usedRiders[index]) {
+            if (++index == field_0x5c)
+                index = 0;
+            if (index == start)
+                break;
+        }
+        usedRiders[index] = 1;
+        riders[k] = index;
+    }
+    DebugFree(usedBikes, __FILE__, 1299);
+    DebugFree(usedRiders, __FILE__, 1300);
+}

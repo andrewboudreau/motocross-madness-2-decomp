@@ -3415,6 +3415,15 @@ CASES = [
         'reason': 'float local keeps rand scale and 36 as two multiplies; DebugCalloc',
     },
     {
+        'name': 'KrustyUI random AI bikes and riders 0x49b0d0',
+        'bindings': 'src/reconstructed/KrustyUI.bindings.json',
+        'source': 'src/reconstructed/KrustyUI.cpp',
+        'symbol': '?UnknownFunction49b0d0@KrustyUI@@QAEXPAHH0@Z',
+        'target_va': '0x0049b0d0',
+        'target_size': 916,
+        'reason': 'class 1/2 test as one || of two && pairs puts the class 1 arm after the probe loop',
+    },
+    {
         'name': 'PCTextureMap constructor',
         'bindings': 'src/reconstructed/PCTextureMap.bindings.json',
         'source': 'src/reconstructed/PCTextureMap.cpp',
