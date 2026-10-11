@@ -163,5 +163,18 @@
   "?g_UnknownSharedSurfaces68a394@@3PAPAUUnknownSurfaceInterface@@A": "0x0068a394",
   "__FILE__": "0x00570524",
   "__ftol": "0x00534a88",
-  "_sprintf": "0x00534aaf"
+  "_sprintf": "0x00534aaf",
+  "??_C@_04OEJP@?4bmp?$AA@": "0x00570568",
+  "??_C@_04LCGE@?4tga?$AA@": "0x00570560",
+  "??_C@_03JHFA@tex?$AA@": "0x0057055c",
+  "_fclose": "0x00534c3d",
+  "??_C@_0BB@DPEC@C?3?2temp?2?$CFs?$CF03d?$CFs?$AA@": "0x00570548",
+  "??_C@_01LHO@r?$AA@": "0x00566a38",
+  "_fopen": "0x00534ceb",
+  "?UnknownFunction4245f0@@YAXPAUUnknownBitmapFile@@PAXPAY02EHH@Z": "0x004245f0",
+  "_strncpy": "0x00534b10",
+  "?UnknownFunction424380@@YAHPAUUnknownBitmapFile@@@Z": "0x00424380",
+  "?DebugMalloc@@YAPAXIPBDH@Z": "0x004a2e20",
+  "?WriteTga32@@YAHPAXHHIPBDH@Z": "0x005127f0",
+  "?DebugFree@@YAXPAXPBDH@Z": "0x004a2e60"
 }

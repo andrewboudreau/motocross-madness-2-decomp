@@ -28,6 +28,9 @@
 // parentheses), all identical. Probes show the order follows the leaves:
 // extent.x with +0x168 gives min-first, extent.z with +0x164 cell-first, and
 // moving extent.x after the 0.1 test or using +0x18 keeps cell-first.
+// A reference to the cell size or the minimum, a terrain or draw-data
+// pointer alias, used in either product and either operand order (216
+// forms), keeps cell-first too.
 //
 // DrawableGridNode 0x00480ad0 (4-cell block draw, 438 bytes; 395 of 438):
 // retail keeps the zero start offset in eax from the prologue and compares

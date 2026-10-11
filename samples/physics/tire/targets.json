@@ -36,7 +36,7 @@
     "target_va": "0x00513490",
     "target_size": 201,
     "expect": "partial",
-    "notes": "98.87% at exact size 201 (175/177 masked): zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap in the origin stores (retail x<-edi, y<-edx, z<-ebx). Also tried without gain: permuted zero.x/y/z store order (worse), chained `zero.x = zero.y = zero.z` and comma forms, zero declared before/after i/zeroValue (`i` last much worse), member-wise copies into pts[i].origin (worse), rim stores first, while loop, pointer/reference to pts[i], scoped zero block, a second zero local, `float zeroValue = 0`, prepended typedefs 0..63 (no change)."
+    "notes": "98.87% at exact size 201 (175/177 masked): zero Vec3 now built from a float zeroValue local (stays in registers) and i=0 hoisted; remaining difference is an edi/ebx register swap in the origin stores (retail x<-edi, y<-edx, z<-ebx). Also tried without gain: permuted zero.x/y/z store order (worse), chained `zero.x = zero.y = zero.z` and comma forms, zero declared before/after i/zeroValue (`i` last much worse), member-wise copies into pts[i].origin (worse), rim stores first, while loop, pointer/reference to pts[i], scoped zero block, a second zero local, `float zeroValue = 0`, prepended typedefs 0..63 (no change). Lever sweep, no gain: every store order with each component taken from zeroValue or an earlier component (36 forms), origin/point/zero reference or pointer locals, a copied zero inside the loop."
   },
   {
     "class": "Tire",

@@ -145,7 +145,7 @@
     "target_va": "0x00445fc0",
     "target_size": 331,
     "expect": "partial",
-    "notes": "99.68% (310/311): single SIB base/index order byte differs ([ecx+eax+0x74] vs retail [eax+ecx+0x74]; eax = nodeNames, ecx = the strength-reduced (i+1)*0x40 induction slot). Unchanged: nodeNames[1 + i], (nodeNames + i + 1)->node and other pointer-arithmetic spellings, (i + 1)[nodeNames], (nodeNames + 1)[i], entry pointer/reference locals, an `index` local, a table local, char* byte-offset casts, an inline NodeAt helper, ++i, node/parent declared outside the loop, `parent` read through nodeNames again, prepended dummies/typedefs. Worse: unsigned i, moving the node fetch before or between the pose writes, dropping the node/parent locals.",
+    "notes": "99.68% (310/311): single SIB base/index order byte differs ([ecx+eax+0x74] vs retail [eax+ecx+0x74]; eax = nodeNames, ecx = the strength-reduced (i+1)*0x40 induction slot). Unchanged: nodeNames[1 + i], (nodeNames + i + 1)->node and other pointer-arithmetic spellings, (i + 1)[nodeNames], (nodeNames + 1)[i], entry pointer/reference locals, an `index` local, a table local, char* byte-offset casts, an inline NodeAt helper, ++i, node/parent declared outside the loop, `parent` read through nodeNames again, prepended dummies/typedefs. Worse: unsigned i, moving the node fetch before or between the pose writes, dropping the node/parent locals. Lever sweep, unchanged: byte-offset (int offset = i * sizeof entry) and index inline accessors, a `this` copy, extra pointer locals to the entry or table; a `next` entry local is far worse.",
     "bindings": "D3DIMSoultreeMotnctrl.bindings.json"
   },
   {

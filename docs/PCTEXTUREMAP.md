@@ -16,7 +16,7 @@ destroyed through vfwdeco.cpp's
 
 ## Status
 
-Exact (24 calibration cases):
+Exact (25 calibration cases):
 - the constructor `0x004c5f00` (TextureMap's `0x0050a4e0`, then clears
   +0x70..+0x7c);
 - the scalar deleting destructor `0x004c5f30` and the destructor
@@ -90,6 +90,14 @@ Exact (24 calibration cases):
 - `0x004c84e0`, which locks a level (flags 0x811), writes it to a file
   through `0x004c8550` and unlocks it. Slot 20 calls it on every level with
   no name, so slot 20 dumps the mip chain.
+- `0x004c8550`, the level dump: the first free `C:\temp\<name><nnn>.bmp`
+  (8-bit, through bmpfile.cpp's `0x004245f0` and `0x00424380`) or `.tga`
+  (converted to 32-bit by Pixtrans `0x004d1d20` into a `DebugMalloc`
+  buffer, lines 2149/2154, and written by Tgafile.cpp's `0x005127f0`).
+  `name` defaults to "tex". The 8-bit branch reads the description
+  through a `const` reference: that alone makes VC6 load the height
+  before the width in the `.tga` branch's buffer size, as retail does
+  (no operand order, cast or bracketing of the product itself does);
 - slot 9 (385 bytes), the upload: BltFast down the mip chain with partial
   texture blits (Display+0x5bc) or a positive mode, halving the rectangle
   per level, otherwise the device's Load; then the colour key. The null
@@ -105,12 +113,6 @@ Near misses (`samples/render/PCTextureMapNearMisses.cpp`):
   the destination and sets each pixel to `table[source << 8 | destination]`
   (8-bit; 16-bit pixels read the destination byte through the pixel value).
   The loop nest's register assignment differs;
-- `0x004c8550` (391 of 393 bytes), the level dump: the first free
-  `C:\temp\<name><nnn>.bmp` (8-bit, through bmpfile.cpp's `0x004245f0`
-  and `0x00424380`) or `.tga` (converted to 32-bit by Pixtrans `0x004d1d20`
-  into a `DebugMalloc` buffer, lines 2149/2154, and written by Tgafile.cpp's
-  `0x005127f0`). `name` defaults to "tex". Only the buffer size's
-  multiplication operand order differs;
 - slot 6 (ratio 0.78 of 600 bytes), the copy. It makes a `ManagedTexture`
   (RTTI `ManagedTexture : PCTextureMap`, 0xbc bytes, registered with the
   source's +0x90 ManagedTextureGroup) when TextureMap+0x68 bit 0 is set,

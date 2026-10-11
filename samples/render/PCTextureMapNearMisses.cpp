@@ -10,16 +10,6 @@
 // VC6 here swaps left/bottom and the row pointers. Declaration order of the
 // rect locals, row pointers, operand order and indexed loops do not help.
 //
-// PCTextureMap::WriteLevel (0x004c8550, 393 bytes): the level
-// dump. Everything but the 32-bit buffer size matches (391 of 393 bytes):
-// retail loads the height and multiplies by the width, VC6 here the other
-// way round in every operand order, cast, `<< 2` and sizeof form tried; a
-// separate size local or swapped branches are much worse. Also unchanged:
-// `w * (h * 4)`, `(w * h) << 2`, an inline allocation helper taking the
-// surface description (by pointer; by value is far off) and helpers taking
-// width/height by value in either order (209 of 323). All 432 bracketings,
-// orders and redundant parentheses of the product give the same bytes.
-//
 // PCTextureMap::UnknownVirtualSlot6 (0x004c71c0, 600 bytes): the copy.
 // Everything lines up except that VC6 here keeps the constant 1 in ebp and
 // the copy in ebx (retail: ebx and ebp), which also moves the 8-bit key
@@ -111,41 +101,6 @@ int PCTextureMap::CopyRectTo(unsigned long x, unsigned long y, UnknownSurfaceInt
     return 1;
 failed:
     return 0;
-}
-
-// 0x004c8550: writes a locked level to C:\temp\<name><nnn>.bmp (8-bit) or
-// .tga (anything else, converted to 32-bit first), taking the first number
-// with no existing file. `name` defaults to "tex".
-void PCTextureMap::WriteLevel(UnknownSurfaceDesc* desc, const char* name) {
-    char path[260];
-    UnknownBitmapFile bitmap;
-    const char* extension = desc->pixelFormat.bitCount == 8 ? ".bmp" : ".tga";
-    int number = 0;
-    if (!name)
-        name = "tex";
-    FILE* file = 0;
-    do {
-        if (file)
-            fclose(file);
-        sprintf(path, "C:\\temp\\%s%03d%s", name, number, extension);
-        file = fopen(path, "r");
-        number++;
-    } while (file);
-    if (desc->pixelFormat.bitCount == 8) {
-        UnknownFunction4245f0(&bitmap, desc->surface, field_0x2c->field_0x010, desc->width, desc->height);
-        int length = strlen(path);
-        int count = length > 0x7f ? 0x7f : length;
-        strncpy(bitmap.name, path, count);
-        bitmap.name[count] = 0;
-        UnknownFunction424380(&bitmap);
-    } else {
-        void* pixels = DebugMalloc(desc->width * desc->height * sizeof(unsigned int), __FILE__, 2149);
-        UnknownFunction4d1d20(pixels, desc->surface, desc->width, desc->height, desc->width,
-                              desc->pitch / UnknownFunction511970(field_0x20), 8888, field_0x20, 0, 0, 0x80,
-                              0xff00ff);
-        WriteTga32(pixels, desc->width, desc->height, 0, path, 32);
-        DebugFree(pixels, __FILE__, 2154);
-    }
 }
 
 // 0x004c71c0: a copy of the texture (a ManagedTexture registered with this

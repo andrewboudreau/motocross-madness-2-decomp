@@ -115,7 +115,7 @@
     "target_va": "0x0043b190",
     "target_size": 168,
     "expect": "partial",
-    "notes": "96% (150/156) under vc6_o2_ml; vector rejection (a - proj_b(a)). Residual: retail loads b's pointer before a's and computes the y term as b.y * a.y (VC6: a first, a.y * b.y). Unchanged: every operand order / permutation of the dot terms and CollisionDot(*a, *b), one-statement and t-inline forms, Vec3/DotProduct casts, non-const or reference parameters, renamed parameters, prepended dummies/typedefs. `const CollisionVec3& u = *b, & v = *a` locals fix the pointer load order but sum the dot as (z + y) + x (143/156).",
+    "notes": "96% (150/156) under vc6_o2_ml; vector rejection (a - proj_b(a)). Residual: retail loads b's pointer before a's and computes the y term as b.y * a.y (VC6: a first, a.y * b.y). Unchanged: every operand order / permutation of the dot terms and CollisionDot(*a, *b), one-statement and t-inline forms, Vec3/DotProduct casts, non-const or reference parameters, renamed parameters, prepended dummies/typedefs. `const CollisionVec3& u = *b, & v = *a` locals fix the pointer load order but sum the dot as (z + y) + x (143/156). Lever sweep (masked 162/168 of 168 is the best): a reference alias of a and/or b used in any subset of the dot terms, in all six term orders (384 + 384 forms); u/v references with every term order, operand order and bracketing, CollisionDot(u, v)/(v, u), and t/out through the references (196 forms).",
     "bindings": "CollisionVectorHelpers.bindings.json"
   },
   {

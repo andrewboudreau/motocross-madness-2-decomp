@@ -3550,6 +3550,15 @@ CASES = [
         'reason': 'lock 0x811, fill, unlock',
     },
     {
+        'name': 'PCTextureMap write level 0x4c8550',
+        'bindings': 'src/reconstructed/PCTextureMap.bindings.json',
+        'source': 'src/reconstructed/PCTextureMap.cpp',
+        'symbol': '?WriteLevel@PCTextureMap@@QAEXPAUUnknownSurfaceDesc@@PBD@Z',
+        'target_va': '0x004c8550',
+        'target_size': 393,
+        'reason': 'first free numbered temp file; the 8-bit branch reads the description through a reference',
+    },
+    {
         'name': 'PCTextureMap slot8 create texture',
         'bindings': 'src/reconstructed/PCTextureMap.bindings.json',
         'source': 'src/reconstructed/PCTextureMap.cpp',
