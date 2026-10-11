@@ -280,6 +280,194 @@ void D3DIMSoultreeObject::SoultreeVirtualSlot3()
     UnknownFunction440810();
 }
 
+// 0x00440060: reads the levels of detail from the .slt keys; returns 1
+// when a surface has no material (slot 3 then adds an untextured one).
+// The surface array is allocated through a second name for the level
+// (`levelRef`); with `level->` there VC6 forms the s-loop surface address
+// as `surfaces + offset`, retail `offset + surfaces`.
+int D3DIMSoultreeObject::ReadLods()
+{
+    int untextured = 0;
+    int count = UnknownFunction4fda30();
+    SoultreeObject** nodes = (SoultreeObject**)DebugMalloc(count * 4, __FILE__, 0x1dd);
+    int index = 1;
+    nodes[0] = this;
+    CollectDescendants(&index, nodes);
+    char section[0x80];
+    sprintf(section, "LOD Information");
+    parameterBlock->UnknownFunction4b78f0(section);
+    parameterBlock->UnknownFunction4b7f10("NumberOfLOD", 0, &lodCount);
+    parameterBlock->UnknownFunction4b7f10("UseAutoLOD", 0, &field_0x288);
+    int i;
+    if (field_0x288) {
+        autoLodDistances = (float*)DebugMalloc(lodCount * 4 - 1, __FILE__, 0x1ec);
+        for (i = 0; i < lodCount - 1; i++) {
+            sprintf(section, "AutoLOD#%i", i);
+            parameterBlock->UnknownFunction4b7f40(section, -1.0f, &autoLodDistances[i]);
+        }
+    }
+    lodTable = (UnknownSoultreeLod*)DebugMalloc(lodCount * 8, __FILE__, 0x1f5);
+    UnknownSoultreeFaceGroup* groups = (UnknownSoultreeFaceGroup*)DebugMalloc(count * 0x14, __FILE__, 0x1f9);
+    for (i = 0; i < count; i++)
+        groups[i].node = nodes[i];
+    for (int lod = 0; lod < lodCount; lod++) {
+        UnknownSoultreeLod* level = &lodTable[lod];
+        UnknownSoultreeLod& levelRef = *level;
+        sprintf(section, "LOD %i", lod);
+        parameterBlock->UnknownFunction4b78f0(section);
+        parameterBlock->UnknownFunction4b7f10("NumberOfSurfaces", 0, &level->surfaceCount);
+        levelRef.surfaces = (UnknownSoultreeSurface*)DebugMalloc(levelRef.surfaceCount * 0x38, __FILE__, 0x206);
+        for (int s = 0; s < level->surfaceCount; s++) {
+            UnknownSoultreeSurface* surface = &level->surfaces[s];
+            surface->field_0x2c = 1.0f;
+            surface->field_0x30 = 0;
+            surface->field_0x34 = 0;
+            sprintf(section, "LOD %i - Surface %i", lod, s);
+            parameterBlock->UnknownFunction4b78f0(section);
+            parameterBlock->UnknownFunction4b7f10("NumberOfVertices", 0, &surface->vertexCount);
+            parameterBlock->UnknownFunction4b7f10("NumberOfFaces", 0, &surface->faceCount);
+            parameterBlock->UnknownFunction4b7f10("NumberOfMaterials", 0, &surface->materialCount);
+            if (surface->materialCount > 0) {
+                surface->materialIndices = (int*)DebugMalloc(surface->materialCount * 4, __FILE__, 0x216);
+                for (int m = 0; m < surface->materialCount; m++) {
+                    char key[0x80];
+                    sprintf(key, "Material#%i", m);
+                    parameterBlock->UnknownFunction4b7f10(key, 0, &surface->materialIndices[m]);
+                }
+            } else {
+                untextured = 1;
+                surface->materialIndices = (int*)DebugMalloc(4, __FILE__, 0x21e);
+                surface->materialIndices[0] = 0;
+                surface->materialCount = 1;
+            }
+            surface->vertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x223);
+            surface->drawnVertices = (UnknownSoultreeVertex*)DebugMalloc(surface->vertexCount * 0x20, __FILE__, 0x224);
+            surface->normals = (Vector3*)DebugMalloc(surface->vertexCount * 0xc, __FILE__, 0x225);
+            surface->indices = (unsigned short*)DebugMalloc(surface->faceCount * 6, __FILE__, 0x226);
+            surface->uvs = (UnknownSoultreeUV*)DebugMalloc(surface->vertexCount * 8, __FILE__, 0x227);
+            sprintf(section, "LOD %i - Surface %i - Vertices", lod, s);
+            parameterBlock->UnknownFunction4b7f70(section);
+            int v;
+            for (v = 0; v < surface->vertexCount; v++) {
+                float red;
+                float green;
+                float blue;
+                parameterBlock->UnknownFunction4b8010(0);
+                parameterBlock->UnknownFunction4b81c0(0, &surface->drawnVertices[v].position.x);
+                parameterBlock->UnknownFunction4b81c0(1, &surface->drawnVertices[v].position.y);
+                parameterBlock->UnknownFunction4b81c0(2, &surface->drawnVertices[v].position.z);
+                parameterBlock->UnknownFunction4b81c0(3, &surface->normals[v].x);
+                parameterBlock->UnknownFunction4b81c0(4, &surface->normals[v].y);
+                parameterBlock->UnknownFunction4b81c0(5, &surface->normals[v].z);
+                parameterBlock->UnknownFunction4b81c0(6, &surface->drawnVertices[v].tu);
+                parameterBlock->UnknownFunction4b81c0(7, &surface->drawnVertices[v].tv);
+                parameterBlock->UnknownFunction4b81c0(12, &red);
+                parameterBlock->UnknownFunction4b81c0(13, &green);
+                parameterBlock->UnknownFunction4b81c0(14, &blue);
+                long r = (long)(red * 255.0);
+                long g = (long)(green * 255.0);
+                long b = (long)(blue * 255.0);
+                surface->drawnVertices[v].diffuse = 0xff000000 | (r << 16) | (g << 8) | b;
+                surface->drawnVertices[v].specular = 0;
+                surface->vertices[v] = surface->drawnVertices[v];
+                surface->uvs[v].u = surface->vertices[v].tu;
+                surface->uvs[v].v = surface->vertices[v].tv;
+            }
+            sprintf(section, "LOD %i - Surface %i - Faces", lod, s);
+            parameterBlock->UnknownFunction4b7f70(section);
+            for (int f = 0; f < surface->faceCount; f++) {
+                int a;
+                int b;
+                int c;
+                parameterBlock->UnknownFunction4b8010(0);
+                parameterBlock->UnknownFunction4b8180(0, &a);
+                parameterBlock->UnknownFunction4b8180(1, &b);
+                parameterBlock->UnknownFunction4b8180(2, &c);
+                surface->indices[f * 3] = a;
+                surface->indices[f * 3 + 1] = b;
+                surface->indices[f * 3 + 2] = c;
+            }
+            sprintf(section, "LOD %i - Surface %i - Object Pointer List", lod, s);
+            parameterBlock->UnknownFunction4b7f70(section);
+            int used = 0;
+            for (i = 0; i < count; i++) {
+                int first;
+                int vertices;
+                parameterBlock->UnknownFunction4b8010(0);
+                parameterBlock->UnknownFunction4b8180(0, &first);
+                parameterBlock->UnknownFunction4b8180(1, &vertices);
+                groups[i].vertexCount = vertices;
+                groups[i].sourceVertices = &surface->vertices[first];
+                groups[i].transformedVertices = &surface->drawnVertices[first];
+                groups[i].normals = &surface->normals[first];
+                if (vertices > 0)
+                    used++;
+            }
+            surface->groupCount = used;
+            surface->groups = (UnknownSoultreeFaceGroup*)DebugMalloc(used * 0x14, __FILE__, 0x283);
+            int k = 0;
+            for (i = 0; i < count; i++) {
+                if (groups[i].vertexCount > 0)
+                    surface->groups[k++] = groups[i];
+            }
+        }
+    }
+    UnknownFunction444440();
+    DebugFree(groups, __FILE__, 0x291);
+    DebugFree(nodes, __FILE__, 0x292);
+    return untextured;
+}
+
+// 0x00440d40: the source group is read through a second name for the
+// surface (`surfaceRef`); with `surface->` VC6 forms its address as
+// `groups + offset`, retail `offset + groups`.
+void D3DIMSoultreeObject::TransformVertexGroups(int lod)
+{
+    int saved = field_0x27c;
+    if (lod != -1)
+        field_0x27c = lod;
+    for (int i = 0; i < lodTable[field_0x27c].surfaceCount; i++) {
+        UnknownSoultreeSurface* surface = &lodTable[field_0x27c].surfaces[i];
+        UnknownSoultreeSurface& surfaceRef = *surface;
+        int colored = 0;
+        int k;
+        for (k = 0; k < surface->materialCount; k++) {
+            SoultreeMaterial* material = materialTable[surface->materialIndices[k]];
+            if (!material->hasTextureName || material->useVertexColor)
+                colored = 1;
+        }
+        UnknownSoultreeSurface* drawn;
+        if (secondModifierCount > 0) {
+            for (k = 0; k < secondModifierCount; k++)
+                ((D3DIMSoultreeModifier*)secondModifierList[k])->UnknownVirtualSlot27(
+                    this, (UnknownSoultreeMesh*)surface, (UnknownSoultreeMesh**)&drawn);
+        } else {
+            drawn = surface;
+        }
+        for (int j = 0; j < drawn->groupCount; j++) {
+            UnknownSoultreeFaceGroup* group = &drawn->groups[j];
+            UnknownSoultreeFaceGroup* source = &surfaceRef.groups[j];
+            int count = group->vertexCount;
+            if (count) {
+                group->node->UpdateWorldMatrix();
+                void* target = group->transformedVertices;
+                void* vertices = source->sourceVertices;
+                if (field_0x1a4) {
+                    if (colored)
+                        lightManager->UnknownFunction49e4a0(&group->node->worldMatrix, count,
+                                                           group->normals, vertices, 0xc, target);
+                    else
+                        lightManager->UnknownFunction49e4a0(&group->node->worldMatrix, count,
+                                                           group->normals, vertices, 0xc, 0);
+                }
+                TransformPoints(vertices, target, &group->node->worldMatrix, count, 0x20, 0x20);
+            }
+        }
+    }
+    field_0x18c = 0;
+    field_0x27c = saved;
+}
+
 // The four vector constants that open about 73 retail files (see
 // src/krusty2/math/Math3D.h). Here they sit mid-file: 0x0057ef08,
 // 0x0057ef18, 0x0057ef28 and 0x0057eed8, initialised by
