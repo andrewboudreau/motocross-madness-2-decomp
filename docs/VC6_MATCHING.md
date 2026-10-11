@@ -79,6 +79,13 @@ translation-unit ownership remain provisional.
 RTTI, decoded vptr writes and deleting-wrapper evidence. `0x004a30c0` includes
 [application allocation accounting](ALLOCATION.md). Wrong bindings fail comparison.
 
+The exception is a binding that sends a `__real@` constant to the wrong address. An
+instruction's bytes do not include the value it loads, so if the binding points
+at retail's own constant, the comparison passes even when the source literal is
+wrong. `python tools/check_real_bindings.py --exe "$MCM2_EXE"` decodes every
+`__real@` key in the tracked `*.bindings.json` files. It then checks that the
+retail bytes at the bound address hold that value.
+
 ## Validated slices
 
 The seven emitted fixed-size `BlockAllocator` bodies are now exact under the
